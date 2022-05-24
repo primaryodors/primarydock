@@ -164,6 +164,9 @@ int main(int argc, char** argv)
 			else if (!strcmp(fields[0], "EMIN"))
 			{	kJmol_cutoff = atof(fields[1]);
 			}
+			else if (!strcmp(fields[0], "ELIM"))
+			{	kJmol_cutoff = -atof(fields[1]);
+			}
 			else if (!strcmp(fields[0], "FLEX"))
 			{	flex = (atoi(fields[1]) != 0);
 			}
@@ -658,8 +661,8 @@ int main(int argc, char** argv)
 							 	&& dr[j][k].metric[l]
 							 	&& dr[j][k].metric[l][0];
 							 l++)
-						{	cout << dr[j][k].metric[l] << ": " << dr[j][k].mkJmol[l] << endl;
-							if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << dr[j][k].mkJmol[l] << endl;
+						{	cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l] << endl;
+							if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l] << endl;
 						}
 						
 						for (l=0; l<_INTER_TYPES_LIMIT; l++)
@@ -674,13 +677,13 @@ int main(int argc, char** argv)
 								case vdW:			strcpy(lbtyp, "Total van der Waals: ");				break;
 								default:			goto _btyp_unassigned;
 							}
-							cout << lbtyp << dr[j][k].bytype[l] << endl;
-							if (output) *output << lbtyp << dr[j][k].bytype[l] << endl;
+							cout << lbtyp << -dr[j][k].bytype[l] << endl;
+							if (output) *output << lbtyp << -dr[j][k].bytype[l] << endl;
 						}
 						_btyp_unassigned:
 						
-						if (output) *output << "Total: " << dr[j][k].kJmol << endl << endl;
-						cout << "Total: " << dr[j][k].kJmol << endl << endl;
+						if (output) *output << "Total: " << -dr[j][k].kJmol << endl << endl;
+						cout << "Total: " << -dr[j][k].kJmol << endl << endl;
 						
 						if (!dr[j][k].pdbdat.length())
 						{	cout << "Uh-oh!" << endl;

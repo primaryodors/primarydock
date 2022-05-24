@@ -40,12 +40,9 @@ per residue, binding energy per type, total binding energy, PDB data of the liga
 residues. This output can be captured and parsed by external code, written in your language of choice, for further computation, storage
 in a database, etc.
 
-Note that in contrast to most docking software, PODock uses positive values for binding/intermolecular attraction and negative values
-for repulsion.
-
 If you would like to contribute to this project:
 <ol><li>I would be sooo very grateful for the help!</li>
-<li>Please create a branch off of master, then submit a pull request;</li>
+<li>Please create a branch off of main, then submit a pull request;</li>
 <li>Use whichever { style you prefer; as long as the code is readable and it works, that's all I care about.</li>
 <li>Have fun and try not to let the project vex you. (:</li>
 </ol>

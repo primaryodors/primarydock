@@ -298,6 +298,13 @@ int Molecule::from_sdf(const char* sdf_dat)
 		if (!fields[0] || !fields[1]) break;
 		if (!strcmp(fields[1], "END")) break;
 		
+		if (!strcmp(fields[1], "CHG"))
+		{	for (i=3; fields[i] && fields[i+1]; i+=2)
+			{	int aidx = atoi(fields[i]);
+				atoms[aidx-1]->increment_charge(atof(fields[i+1]));
+			}
+		}
+		
 		if (j == 3)
 		{	na = atoi(fields[0]);
 			nb = atoi(fields[1]);

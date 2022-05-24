@@ -1,6 +1,4 @@
 # Ignore build arfifacts
-!/**/
-!*.*
 *.o
 *test
 metal

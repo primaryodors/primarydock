@@ -246,10 +246,14 @@ ATOM     55  SG  CYS     4       6.721  -8.103   4.542  1.00001.00           S
 					else aadef = aaa;
 					
 					if (aaa && aaa->aabonds)
+					{	
 						for (i=0; aaa->aabonds[i]; i++)
 						{	AABondDef* aab = aaa->aabonds[i];
 							if (!strcmp(aab->aname, a->name))
-							{	Atom* btom = get_atom(aab->bname);
+							{	if (aaa->aabonds[i] && aaa->aabonds[i]->acharge)
+								{	a->increment_charge(aaa->aabonds[i]->acharge);
+								}
+								Atom* btom = get_atom(aab->bname);
 								if (btom)
 								{	a->bond_to(btom, aab->cardinality);
 									if (aab->cardinality == 1 && !aab->can_rotate)
@@ -261,6 +265,7 @@ ATOM     55  SG  CYS     4       6.721  -8.103   4.542  1.00001.00           S
 								}
 							}
 						}
+					}
 					
 				}	catch (int ex)
 				{	if (ex == ATOM_NOT_OF_AMINO_ACID) throw ex;

@@ -425,7 +425,13 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
 }
 
 float Atom::get_charge()
-{	return charge;
+{	if (Z == 1 && !charge)
+	{	if (bonded_to && bonded_to[0].btom)
+		{	float bchg = bonded_to[0].btom->charge;
+			if (bchg > 0) return bchg;
+		}
+	}
+	return charge;
 }
 
 Bond::Bond()

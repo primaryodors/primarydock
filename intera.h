@@ -1,0 +1,69 @@
+
+#include "atom.h"
+
+#ifndef _INTERATOMIC
+#define _INTERATOMIC
+
+enum intera_type
+{	covalent,
+	ionic,
+	hbond,
+	pi,
+	polarpi,
+	mcoord,
+	vdW
+};
+
+class InteratomicForce
+{	public:
+	InteratomicForce();
+	intera_type get_type() { return type; }
+	float get_arity() { return arity; }
+	float get_distance() { return distance; }
+	float get_kJmol() { return kJ_mol; }
+	float get_dp() { return dirprop; }
+	
+	char* get_config_string();
+	
+	static bool atom_is_capable_of(Atom* a, intera_type t);
+	static InteratomicForce** get_applicable(Atom* a, Atom* b);
+	static float total_binding(Atom* a, Atom* b);
+	static float distance_anomaly(Atom* a, Atom* b);
+	static float covalent_bond_radius(Atom* a, Atom* b, int cardinality);
+	static float coordinate_bond_radius(Atom* a, Atom* b, intera_type btype);
+	
+	protected:
+	int Za=0;
+	int bZa=0;
+	int Zb=0;
+	int bZb=0;
+	intera_type type=vdW;
+	float arity=0;
+	int aritybZa=0;
+	int aritybZb=0;
+	float distance=0;
+	float kJ_mol=0;
+	float dirprop=0;		// Directional Propensity.
+	
+	void read_dat_line(char* line);
+	static void read_all_forces();
+};
+
+Vector* get_geometry_for_pi_stack(Vector* in_geometry);
+
+static InteratomicForce intertmp;
+static InteratomicForce* all_forces[65536];
+static InteratomicForce** forces_by_Z[36][36] = {};				// Good for H thru Br. Includes BCNOFPSKNaClBrMgCaFeCuZn.
+static bool read_forces_dat = false;
+static bool reading_forces = false;
+std::ostream& operator<<(std::ostream& os, const intera_type& it);
+std::ostream& operator<<(std::ostream& os, const InteratomicForce& f);
+extern float total_binding_by_type[_INTER_TYPES_LIMIT];
+
+#endif
+
+
+
+
+
+

@@ -1,0 +1,660 @@
+<html>
+<head>
+<title>Viewer - podock</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="../chemdoodle/install/ChemDoodleWeb.css" type="text/css">
+<style>
+body
+{	color: #6af;
+}
+
+#ctrls div
+{	margin-left: 15px;
+}
+
+#posey
+{	background-color: #123;
+	min-width: 71px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.posebtn
+{	background-color: #246;
+	border-top: 1px solid #369;
+	border-left: 1px solid #369;
+	border-right: 1px solid #234;
+	border-bottom: 1px solid #234;
+	border-radius: 5px;
+	padding-left: 5px;
+	padding-right: 5px;
+	margin-left: 2px;
+	margin-right: 2px;
+	cursor: pointer;
+}
+
+.posebtn.hilite
+{	background-color: #369;
+	border-top: 1px solid #468;
+	border-left: 1px solid #468;
+	border-right: 1px solid #357;
+	border-bottom: 1px solid #357;
+}
+
+.nodebtn
+{	background-color: #234;
+	padding-left: 5px;
+	padding-right: 5px;
+	margin-left: 0px;
+	margin-right: 0px;
+	cursor: pointer;
+}
+
+.nodebtn.hilite
+{	background-color: #357;
+}
+
+input[type=file]
+{	width: 600px;
+}
+
+#clip
+{	width: 503px;
+}
+
+</style>
+<script type="text/javascript" src="../chemdoodle/install/ChemDoodleWeb.js"></script>
+<script src="https://unpkg.com/ngl@0.10.4/dist/ngl.js"></script>
+<script>
+/******************************************************************************/
+// http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+function getParameterByName(name, url)
+{
+    if (!url)
+    {
+		url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+/******************************************************************************/
+</script>
+</head>
+<body bgcolor="#000">
+<div id="ctrls" style="display: flex;">
+	<input type="file">
+	
+	<div id="posey" title="Use the A-Z keys or the up and down arrow keys to choose poses when viewing dock results.">&nbsp;
+	</div>
+	
+	<div	id="pnodz"
+			title="Use the 0-9 keys or the left and right arrow keys to choose nodes when viewing dock results. Shift+A-Z selects nodes 10 - 35."
+			>&nbsp;</div>
+			
+	<div id="clipslide">
+	Clip:
+	<input type="range" id="clip" min="0" max="100" step="1" value="0" class="slider" onkeyup="this.blur();">
+	<input type="checkbox" id="preserve" onchange="$('#clip').trigger('input');"> Preserve Ligand
+	</div>
+</div>
+<center>
+<div id="viewport" style="width:1800px; height:880px;"></div>
+</center>
+<script>
+
+// Modify this array to your preferred TMR color scheme.
+var tmcolor =
+{	1: 0x666666,
+	2: 0x0099ff,
+	3: 0x00ff66,
+	4: 0x6600ff,
+	5: 0xccff00,
+	6: 0xff9900,
+	7: 0xcc0033
+}
+	
+var stage = new NGL.Stage("viewport");
+var gmodel = [], model = [], is_ligand = [], mrep = [], mrparams = [], mpos = [], mnod = [];
+var gpose = 1, gnode = 0;
+var orid;
+var mtlcoord = [];
+var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
+
+var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+  this.atomColor = function (atom)
+  {
+  	switch (atom.atomType.element)
+  	{	case 'H': 		return atom.isBackbone() ? 0x79949b : 0xd1f5ff;
+  		case 'C':
+  		if (atom.isBackbone()) return 0x666666;
+  		else switch (atom.resname)
+  		{	case 'GLY':
+  			return 0xcccccc;
+  			
+  			case 'ALA': case 'ILE': case 'LEU': case 'PRO': case 'VAL':
+  			return 0x999999;
+  			
+  			case 'MET': case 'CYS':
+  			return 0xcccc99;
+  			
+  			case 'PHE': case 'TRP': case 'TYR':
+  			return 0x886688;
+  			
+  			case 'SER': case 'THR': case 'GLN': case 'ASN':
+  			return 0x66cc99;
+  			
+  			case 'ASP': case 'GLU':
+  			return 0xff9999;
+  			
+  			case 'HIS': case 'LYS': case 'ARG':
+  			return 0x6699ff;
+  			
+  			default:
+  			return 0x666666;
+  		}
+  		
+  		case 'N':  		return atom.isBackbone() ? 0x000066 : 0x0066FF;
+  		case 'O':  		return atom.isBackbone() ? 0x660000 : 0xFF0000;
+  		case 'P':  		return 0xff77c6;
+  		case 'S':  		return 0xffdd00;
+  		case 'Cl': 		return 0x33cc00;
+  		case 'Cu': 		return 0xe5a072;
+  		case 'Zn': 		return 0x92b0cc;
+  		case 'Na':		return 0xffcc00;
+  		case 'Mg':		return 0x99ffcc;
+  		case 'K':		return 0x9966ff;
+  		case 'Ca':		return 0xf7f7f7;
+  		case 'Fe':		return 0x845f42;
+  		
+  		default:  		return 0x99aabb;
+  	}
+    
+    if (atom.serial == 5) console.log(atom);
+    if (atom.serial < 1000) 
+    {
+      return 0x0000FF;  // blue
+    }
+    else if (atom.serial > 2000)
+    {
+      return 0xFF0000;  // red
+    }
+    else 
+    {
+      return 0x00FF00;  // green
+    }
+  };
+});
+
+var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+	this.atomColor = function (atom)
+	{
+		var resno = atom.resno;
+		var i;
+		
+		for (i=1; i<=7; i++)
+		{
+			if (resno >= tmstart[i] && resno <= tmend[i]) return tmcolor[i];
+			else if (resno < tmstart[i]) return (i&1) ? 0x99cc66 : 0xcc9966;
+		}
+		
+		return 0xcc9966;
+	}
+});
+
+stage.setParameters(
+{
+    'backgroundColor': '#000',
+    'ambientColor': '#6cc',
+    'ambientIntensity': 0.5,
+    'lightColor': '#f9c',
+    'lightIntensity': 0.6,
+});
+
+// These do not work in Chrome on Linux.
+stage.mouseControls.remove( "scroll-ctrl" );
+stage.mouseControls.remove( "scroll-shift" );
+stage.mouseControls.remove( "scroll-alt" );
+
+// Things better stay where they are.
+stage.mouseControls.remove( "drag-ctrl-right ");
+stage.mouseControls.remove( "drag-ctrl-left ");
+
+var url = 'http://primaryodors.org/sdf.php';
+var molid = getParameterByName('mol') ? getParameterByName('mol') : 'FRUCON';
+$.ajax(
+{
+	url: url,
+	data:
+	{
+		m: molid
+	},
+	success: function(result)
+	{
+		var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
+		stage.loadFile( stringBlob, { ext: "sdf" } ).then( function( comp )
+		{	comp.addRepresentation( "ball+stick", { multipleBond: true } );
+			gmodel.push(comp);
+		} );
+	}
+});
+
+function showPose(p)
+{	var i;
+	
+	var pnodz = $('#pnodz')[0];
+	pnodz.innerHTML = "Node: ";
+	var pmax = 1;
+	
+	for (i=0; i<model.length; i++)
+	{	if (mpos[i] == p && mnod[i] == 0)
+			model[i].addRepresentation( mrep[i], mrparams[i] );
+		else
+			model[i].removeAllRepresentations();
+		
+		if (mpos[i] > pmax) pmax = mpos[i];
+		
+		if (mpos[i] == p && $("#nodebtn"+mnod[i]).length == 0 )
+		{	var nodebtn = document.createElement("a");
+			nodebtn.className = "nodebtn";
+			if (mnod[i]==0) $(nodebtn).addClass("hilite");
+			nodebtn.innerText = mnod[i];
+			nodebtn.id = "nodebtn"+mnod[i];
+			nodebtn.setAttribute("onclick", "showNode("+mnod[i]+");");
+			
+			pnodz.appendChild(nodebtn);
+		}
+	}
+	
+	if (p < 1)
+	{	showPose(1);		// RECURSION!!!
+		return;
+	}
+	
+	if (p > pmax)
+	{	showPose(pmax);		// RECURSION!!!
+		return;
+	}
+	
+	gpose = p;
+	gnode = 0;
+	
+	$(".posebtn").removeClass("hilite");
+	$("#posebtn"+p).addClass("hilite");
+	
+	$("#clip").trigger("input");
+}
+
+function showNode(n)
+{	var i;
+	var nmax = 0;
+	for (i=0; i<model.length; i++)
+	{	if (mpos[i] == gpose && mnod[i] == n)
+			model[i].addRepresentation( mrep[i], mrparams[i] );
+		else
+			model[i].removeAllRepresentations();
+		
+		if (mpos[i] == gpose && mnod[i] > nmax) nmax = mnod[i];
+	}
+	
+	if (n < 0)
+	{	showNode(0);		// RECURSION!!!
+		return;
+	}
+	
+	if (n > nmax)
+	{	showNode(nmax);		// RECURSION!!!
+		return;
+	}
+	
+	$(".nodebtn").removeClass("hilite");
+	$("#nodebtn"+n).addClass("hilite");
+	
+	gnode = parseInt(n);			// Givl upi Javascript from one sddjpar to another.
+	
+	$("#clip").trigger("input");
+}
+
+$("body").on("keyup", function(e, obj)
+{	var cc = e.key.charCodeAt(0);
+	if (e.altkey || e.ctrlkey) return;
+	
+	if (e.keyCode >= 37 && e.keyCode <= 40)
+	{	if (e.keyCode == 37) showNode(gnode-1);
+		if (e.keyCode == 38) showPose(gpose-1);
+		if (e.keyCode == 39) showNode(gnode+1);
+		if (e.keyCode == 40) showPose(gpose+1);
+		e.preventDefault();
+		return;
+	}
+	else
+	{
+		if (cc > 0x60 && cc <= 0x7a) showPose(cc-0x60);
+		else if (cc >= 0x30 && cc <= 0x39) showNode(cc-0x30);
+		else if (cc > 0x40 && cc <= 0x59) showNode(cc-55);
+		e.preventDefault();
+	}
+});
+
+$("#clip").on("input", function (e, obj)
+{	var i;
+	var clipValue = parseFloat($("#clip")[0].value);
+	for (i=0; i<model.length; i++)
+	{	model[i].eachRepresentation( function(obj)
+		{	lcv = clipValue;
+			if (is_ligand[i] && $("#preserve")[0].checked) lcv = 0;
+			obj.setParameters( { "clipNear": lcv } );
+		});
+	}
+	for (i=0; i<gmodel.length; i++)
+	{	gmodel[i].eachRepresentation( function(obj)
+		{
+			obj.setParameters( { "clipNear": clipValue } );
+		});
+	}
+});
+	
+function getFileContents(event)
+{
+    var ff = event.target.files;
+    
+    var f = ff[0];
+    var r = new FileReader();
+    r.fname = f.name;
+    model = []
+    gmodel = [];
+
+    r.onload = (function(lf)
+    {
+        return function(e)
+        {	
+        	var fext = e.target.fname.substr(e.target.fname.lastIndexOf('.')+1);
+        	orid = 'OR1A1';
+        	try
+        	{	orid = e.target.fname.match(/(OR[0-9]{1,2}[A-Z]{1,2}|TAAR|VN1R)[0-9]{1,2}/)[0];
+        	}
+        	catch (e)
+        	{	;
+        	}
+        	
+        	$.ajax(
+			{
+				url: "http://www.primaryodors.org/recepinfo.php",
+				data:
+				{
+					recep: orid,
+				},
+				fext: fext,
+				success: function(poresult)
+				{
+					poresult = poresult.split("\n");
+					
+					var i;
+					for (i=0; i<poresult.length; i++)
+					{	var ln = poresult[i];
+						if (ln.substr(0, 6) == "METAL|")
+						{	var fields = ln.split("|");
+							var j;
+							for (j=1; j<fields.length; j++)
+							{	var m = fields[j].match(/[0-9]{3}[:]/);
+								if (m && m.length)
+									mtlcoord.push(parseInt(m[0]));
+							}
+						}
+						if (ln.substr(0, 7) == "REGION|")
+						{	var fields = ln.split("|");
+							if (fields[1].substr(0, 3) == "TMR")
+							{	var tmr = parseInt(fields[1].substr(3));
+								tmstart[tmr] = parseInt(fields[2]);
+								tmend[tmr] = parseInt(fields[3]);
+							}
+						}
+					}
+					
+					var fext = this.fext;
+					switch (fext)
+					{	case 'sdf':
+						case 'pdb':
+						stage.removeAllComponents();
+						window.result = e.target.result;
+						var stringBlob = new Blob( [ e.target.result ], { type: 'text/plain'} );
+						stage.loadFile( stringBlob, { ext: fext } ).then( function( comp )
+						{
+							if (fext == 'sdf')
+							{	comp.addRepresentation( "ball+stick", { multipleBond: true } );
+								gmodel.push(comp);
+							}
+							
+							if (fext == 'pdb')
+							{	comp.addRepresentation( "cartoon",
+								{
+									opacity: 0.8,
+									colorScheme: PODefRgnScheme,
+									// colorScale: 'rainbow',
+									metalness: 0.15
+								});
+								gmodel.push(comp);
+								
+								var i;
+								var subset = [], shiny = [];
+								var result = window.result.split("\n");
+								for (i=0; i<result.length; i++)
+								{	var ln = result[i];
+									var resno = parseInt(ln.substr(22,4));
+									var aname = ln.substr(12,4).trim();
+									if (mtlcoord.indexOf(resno) >= 0 
+										&& aname != "N"
+										&& aname != "HN"
+										&& aname != "H"
+										&& aname != "CA"
+										&& aname != "HA"
+										&& aname != "HA1"
+										&& aname != "HA2"
+										// Due to a bug in NGL, the C and O atoms are required if including CA in
+										// licorice, ball+stick, or line mode. Hyperball avoids this but is slower to render.
+										// && aname != "C"
+										// && aname != "O"
+										) subset.push(ln);
+									if (ln.substr(17,3) == "MTL") shiny.push(ln);
+								}
+								var stringBlob1 = new Blob( [ subset.join("\n") ], { type: 'text/plain'} );
+								stage.loadFile( stringBlob1, { ext: 'pdb' } ).then( function( comp1 )
+								{	comp1.addRepresentation( "licorice",
+									{
+										opacity: 1,
+										colorScheme: PODefScheme,
+										metalness: 0.13,
+									});
+									gmodel.push(comp1);
+								});
+								var stringBlob2 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
+								stage.loadFile( stringBlob2, { ext: 'pdb' } ).then( function( comp2 )
+								{	comp2.addRepresentation( "spacefill",
+									{
+										opacity: 0.95,
+										colorScheme: PODefScheme,
+										metalness: 0.53,
+									});
+									gmodel.push(comp2);
+								});
+							}
+							
+							comp.autoView();
+						} );
+						break;
+						
+						case 'txt':
+						stage.removeAllComponents();
+						var lines = e.target.result.split("\n");
+						
+						$.ajax(
+						{
+							url: "http://www.primaryodors.org/orpdb.php",
+							data:
+							{	recep: orid,
+								mod: "m",
+							},
+							success: function(poresult)
+							{	var i;
+								var shiny = [];
+								var result = poresult.split("\n");
+								for (i=0; i<result.length; i++)
+								{	var ln = result[i];
+									var resno = parseInt(ln.substr(22,4));
+									var aname = ln.substr(12,4).trim();
+									if (ln.substr(17,3) == "MTL") shiny.push(ln);
+								}
+								
+								var stringBlob3 = new Blob( [ poresult ], { type: 'text/plain'} );
+								stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp3 )
+								{	comp3.addRepresentation( "cartoon",
+									{
+										opacity: 1,
+										colorScheme: PODefRgnScheme,
+										metalness: 0.13,
+										// clipNear: 47,
+									});
+									gmodel.push(comp3);
+								});
+								
+								if (shiny.length)
+								{	var stringBlob4 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
+									stage.loadFile( stringBlob4, { ext: 'pdb' } ).then( function( comp4 )
+									{	comp4.addRepresentation( "spacefill",
+										{
+											opacity: 0.95,
+											colorScheme: PODefScheme,
+											metalness: 0.53,
+										});
+										gmodel.push(comp4);
+									});
+								}
+							}
+						});
+						
+						var posey = $('#posey')[0];
+						var i, writing=false, p=0, n=0;
+						var protmp = "", ligtmp = "";
+						posey.innerHTML = "Pose: ";
+						model = [];
+						is_ligand = [];
+						mpos = [];
+						mnod = [];
+						for (i=0; i<lines.length; i++)
+						{
+							var ln = lines[i];
+							
+							if (ln.substr(0,6) == "Pose: ")
+							{	p = parseInt(ln.substr(6));
+								ligtmp += "REMARK 225 " + ln + "\n";
+							}
+							else if (ln.substr(0,6) == "Node: ")
+							{	n = parseInt(ln.substr(6));
+								ligtmp += "REMARK 225 " + ln + "\n";
+							}
+							else if (ln.trim() == "PDBDAT:")
+							{	if (p>0) writing = true;
+							}
+							else if (ln.trim() == "END")
+							{	if (!n)
+								{	var posea = document.createElement("a");
+									posea.className = "posebtn";
+									if (p==1) $(posea).addClass("hilite");
+									posea.innerText = p;
+									posea.id = "posebtn"+p;
+									posea.setAttribute("onclick", "showPose("+p+");");
+									
+									posey.appendChild(posea);
+								}
+								
+								if (writing)
+								{
+									var stringBlob = new Blob( [ protmp ], { type: 'text/plain'} );
+									stage.loadFile( stringBlob, { ext: 'pdb', name: p+"|"+n } ).then( function( comp )
+									{
+										var rparam = 
+										{	opacity: 0.8,
+											colorScheme: PODefScheme,
+											// clipNear: 44,
+										};
+										
+										/*if (!model.length)
+										{
+											comp.addRepresentation( "licorice", rparam );
+											comp.autoView();
+										}*/
+										
+										model.push(comp);
+										mrep.push("licorice");
+										mrparams.push(rparam);
+										is_ligand.push(0);
+										
+										var lpn = comp.name.split("|");
+										mpos.push(lpn[0]);
+										mnod.push(lpn[1]);
+									} );
+									
+									stringBlob = new Blob( [ ligtmp ], { type: 'text/plain'} );
+									stage.loadFile( stringBlob, { ext: 'pdb', name: p+"|"+n } ).then( function( comp )
+									{
+										var rparam = 
+										{	multipleBond: true,
+										};
+										
+										/*if (model.length < 2)
+										{	comp.addRepresentation( "ball+stick", rparam );
+											comp.autoView();
+										}*/
+										
+										model.push(comp);
+										mrep.push("ball+stick");
+										mrparams.push(rparam);
+										is_ligand.push(1);
+										
+										var lpn = comp.name.split("|");
+										mpos.push(lpn[0]);
+										mnod.push(lpn[1]);
+									} );
+								}
+								writing = false;
+								protmp = ligtmp = "";
+							}
+							else if (writing)
+							{	if (ln.substr(17,3) == "LIG")
+									ligtmp += ln + "\n";
+								else
+									protmp += ln + "\n";
+							}
+						}
+						window.setTimeout(function() { showPose(1); }, 259);
+						break;
+						
+						default:
+						alert('Unknown file type ' + fext);
+					}
+				}
+			});
+        };
+	})(f);
+	r.readAsText(f);
+}
+
+$('input[type=file]').on('input', getFileContents);
+
+</script>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

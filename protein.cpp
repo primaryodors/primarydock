@@ -11,8 +11,7 @@
 using namespace std;
 
 Protein::Protein(const char* lname)
-{	name = new char[strlen(lname)+1]{};
-	strcpy(name, lname);
+{	name = lname;
 	aaptrmin.n = aaptrmax.n = 0;
 }
 

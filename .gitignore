@@ -1,0 +1,6 @@
+# Ignore build arfifacts
+*.o
+*test
+metal
+podock
+

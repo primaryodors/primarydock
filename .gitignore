@@ -1,6 +1,14 @@
 # Ignore build arfifacts
+!/**/
+!*.*
 *.o
 *test
 metal
 podock
+*.config
+*.dat
+*.pdb
+*.sdf
+*.txt
+*~
 

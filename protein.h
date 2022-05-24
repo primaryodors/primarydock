@@ -4,6 +4,8 @@
 #ifndef _PROTEIN
 #define _PROTEIN
 
+#include <string>
+
 void ext_mtl_coord_cnf_cb(int iter);
 
 class Protein
@@ -67,7 +69,7 @@ class Protein
 	int* mcoord_resnos = NULL;
 	
 	protected:
-	char* name=0;
+	std::string name;
 	char* sequence=0;
 	AminoAcid** residues=0;
 	AminoAcid*** res_can_coll = 0;

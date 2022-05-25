@@ -14,6 +14,8 @@
 
 using namespace std;
 
+float potential_distance = 0;
+
 Molecule::Molecule(const char* lname)
 {	name = new char[strlen(lname)+1]{};
 	strcpy(name, lname);
@@ -1205,7 +1207,7 @@ void Molecule::rotate(LocatedVector vector, float theta)
 bool Molecule::shielded(Atom* a, Atom* b) const
 {	int i;
 	float r = a->distance_to(b);
-	float r6 = r*0.666, r125 = 1.25*r;
+	float r6 = r*1.26, r125 = 1.25*r;
 	if (r < 2) return false;
 	
 	Point aloc = a->get_location(), bloc = b->get_location();
@@ -1218,10 +1220,51 @@ bool Molecule::shielded(Atom* a, Atom* b) const
 		if (rbi > r6) continue;
 		if ((rai+rbi) > r125) continue;
 		Point sloc = ai->get_location();
-		if (find_3d_angle(&aloc, &bloc, &sloc) > _shield_angle) return true;
+		float f3da = find_3d_angle(&aloc, &bloc, &sloc);
+		if (f3da > _shield_angle)
+		{	if (last_iter && (a->residue == 114 || b->residue == 114) && ((a->residue + b->residue) == 114))
+			{	/*cout << ai->name << " shields "
+					 << a->residue << ":" << a->name << "..."
+					 << b->residue << ":" << b->name
+					 << " angle " << (f3da*fiftyseven)
+					 << endl;*/
+				return true;
+			}
+		}
 	}
 	
 	return false;
+}
+
+float Molecule::get_atom_mol_bind_potential(Atom* a)
+{	if (!atoms) return 0;
+	int i, j;
+	float retval=0;
+	potential_distance = 0;
+	for (i=0; atoms[i]; i++)
+	{	if (atoms[i]->is_backbone) continue;
+		InteratomicForce** ifs = InteratomicForce::get_applicable(a, atoms[i]);
+		if (!ifs) continue;
+		for (j=0; ifs[j]; j++)
+		{	
+			if (ifs[j]->get_type() == ionic)
+			{	if (sgn(a->get_charge()) != -sgn(atoms[i]->get_charge())) continue;
+				retval += 60;
+			}
+			else
+				retval += ifs[j]->get_kJmol();
+			/*cout << a->name << " can " << ifs[j]->get_type() << " strength " << ifs[j]->get_kJmol()
+				 << " with " << (atoms[i]->aa3let ? atoms[i]->aa3let : "") << atoms[i]->residue << ":"
+				 << atoms[i]->name << endl;*/
+			
+			potential_distance += ifs[j]->get_distance();
+		}
+		delete[] ifs;
+	}
+	
+	potential_distance /= retval;
+	
+	return retval;
 }
 
 float Molecule::get_intermol_binding(Molecule* ligand)
@@ -1624,6 +1667,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 	for (iter=0; iter<iters; iter++)
 	{	float bind = 0, bind1;
 		improvement=0;
+		last_iter = (iter == (iters-1));
 		for (i=0; mm[i]; i++)
 		{	bool nearby[inplen+4] = {};
 			Point icen = mm[i]->get_barycenter();

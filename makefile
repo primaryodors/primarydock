@@ -8,7 +8,7 @@ CFLAGS=-g -fpermissive -fextended-identifiers -std=c++11
 clean:
 	rm *.o
 
-point.o: point.h point.cpp
+point.o: point.h point.cpp constants.h
 	$(CC) -c point.cpp -o point.o $(CFLAGS)
 
 atom.o: atom.h atom.cpp

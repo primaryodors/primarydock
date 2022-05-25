@@ -414,6 +414,8 @@ int main(int argc, char** argv)
 				
 				// Rotate the ligand in space so that its strongest binding atom points to a binding
 				// pocket feature with a strong potential binding.
+				std::string alignment_name = "";
+				float alignment_potential = 0, alignment_distance = 0;
 				for (i=0; reaches_spheroid[nodeno][i]; i++)
 				{	if (!p.aa_ptr_in_range(reaches_spheroid[nodeno][i]))
 					{	reaches_spheroid[nodeno][i] = NULL;
@@ -432,14 +434,27 @@ int main(int argc, char** argv)
 						*debug << endl;
 					}
 					#endif
+					float pottmp = (
+									reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb)
+								 	+ reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh)
+								   )
+								   / pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter())
+								 ;
+					// cout << reaches_spheroid[nodeno][i]->get_3letter() << reaches_spheroid[nodeno][i]->get_residue_no() << " " << pottmp << endl;
 					if (reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ)
 						&&
 						(	!alignment_aa 
 							||
-							(!(rand() % sphres))
+							pottmp > alignment_potential
+							||
+							((pose>1) && pottmp > (0.9 * alignment_potential) && !(rand() % sphres))
 						)
 					   )
-					alignment_aa = reaches_spheroid[nodeno][i];
+					{	alignment_aa = reaches_spheroid[nodeno][i];
+						alignment_name = std::to_string(reaches_spheroid[nodeno][i]->get_residue_no());
+						alignment_potential = pottmp;
+						alignment_distance = potential_distance;
+					}
 					#if _DBG_STEPBYSTEP
 					if (debug) *debug << "Candidate alignment AA." << endl;
 					#endif
@@ -448,17 +463,23 @@ int main(int argc, char** argv)
 				if (debug) *debug << "Selected an alignment AA." << endl;
 				#endif
 				
-				if (met) alignment_aa = met;
+				if (met)
+				{	alignment_aa = met;
+					alignment_name = "metal";
+				}
 				#if _DBG_STEPBYSTEP
 				if (debug) *debug << "Alignment AA." << endl;
 				#endif
 				
 				if (alignment_aa)
-				{	Atom* alca;
+				{	cout << "Aligning bb to " << alignment_name << endl;
+					Atom* alca;
 					if (alignment_aa == met)
 						alca = alignment_aa->get_nearest_atom(ligbb->get_location());
 					else
-						alca = alignment_aa->get_atom("CA");
+					{	// alca = alignment_aa->get_atom("CA");
+						alca = alignment_aa->get_most_bindable();
+					}
 					#if _DBG_STEPBYSTEP
 					if (debug) *debug << "Got alignment atom." << endl;
 					#endif
@@ -466,15 +487,37 @@ int main(int argc, char** argv)
 					if (alca)
 					{	Point pt, al, cen;
 						pt	= ligbb->get_location();
+						if (ligbbh)
+						{	Point pth = ligbbh->get_location();
+							pt.x += 0.5*(pth.x-pt.x);
+							pt.y += 0.5*(pth.y-pt.y);
+							pt.z += 0.5*(pth.z-pt.z);
+						}
 						al	= alca->get_location();
 						cen	= m.get_barycenter();
 						
 						Rotation rot = align_points_3d(&pt, &al, &cen);
 						m.rotate(&rot.v, rot.a);
 						
+						Point ptr = alca->get_location().subtract(pt);
+						Vector v(ptr);
+						v.r -= alignment_distance;
+						v.r *= 0.5;
+						m.move(v);
+						
 						// Preemptively minimize intermol collisions.
-						m.intermol_conform_norecen(alignment_aa, iters, reaches_spheroid[nodeno]);
-						if (debug) *debug << "Alignment atom is " << alignment_aa->get_name() << ":" << alca->name << " Z " << alca->get_Z() << endl;
+						Molecule* mtmp[3];
+						mtmp[0] = &m;
+						mtmp[1] = alignment_aa;
+						mtmp[2] = NULL;
+						m.movability = MOV_ALL;
+						alignment_aa->movability = MOV_FLEXONLY;
+						Molecule::multimol_conform(mtmp);
+						// m.intermol_conform_norecen(alignment_aa, iters, reaches_spheroid[nodeno]);
+						// alignment_aa->intermol_conform_norecen(&m, iters, reaches_spheroid[nodeno]);
+						if (debug) *debug << "Alignment atom is "
+									 	  << alignment_aa->get_name() << ":" << alca->name
+										  << " Z " << alca->get_Z() << endl;
 					}
 				}
 				#if _DBG_STEPBYSTEP

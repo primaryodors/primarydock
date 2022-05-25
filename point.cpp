@@ -11,6 +11,7 @@ using namespace std;
 
 const char* Greek = "ABGDEZHQIKLMNJOPRSTYFXCW";
 std::ofstream *debug = NULL;
+bool last_iter = false;
 
 Point::Point()
 {	x = y = z = 0;
@@ -210,9 +211,9 @@ float find_angle_delta(float a1, float a2)
 float find_3d_angle(Point* A, Point* B, Point* source)	
 {   if (!source) source = new Point();
 	
-	Point lA = source->subtract(A);
+	Point lA = A->subtract(source);
 	lA.scale(1);
-	Point lB = source->subtract(B);
+	Point lB = B->subtract(source);
 	lB.scale(1);
 	
 	// https://stackoverflow.com/questions/1211212/how-to-calculate-an-angle-from-three-points

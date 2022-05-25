@@ -6,7 +6,7 @@
 #define fiftyseventh (M_PI/180)
 
 #define _kJmol_cuA 0.5
-#define _INTERA_R_CUTOFF 15
+#define _INTERA_R_CUTOFF 20
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
 
@@ -29,7 +29,7 @@
 
 #define _def_atc 100
 #define _ALLOW_FLEX_RINGS 0
-#define _shield_angle 150.0 * M_PI / 180
+#define _shield_angle 130.0 * M_PI / 180
 #define _fullrot_stepdeg 30
 #define _fullrot_steprad M_PI/180*_fullrot_stepdeg
 #define _fullrot_every 10

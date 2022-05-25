@@ -84,6 +84,10 @@ class Molecule
 	
 	static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);
 	
+	// Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
+	float get_atom_mol_bind_potential(Atom* a);
+
+	
 	void intermol_conform(Molecule* ligand, int iters = 50);
 	void intermol_conform(Molecule* ligand, int iters, Molecule** avoid_colliding_with);
 	void intermol_conform(Molecule* ligand, int iters, AminoAcid** avoid_colliding_with);
@@ -137,6 +141,8 @@ class Molecule
 	void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_colliding_with, float lastbind);
 	void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_colliding_with, float lastbind);
 };
+
+extern float potential_distance;
 
 
 #endif

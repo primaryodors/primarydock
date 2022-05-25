@@ -261,7 +261,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 		retval[j]->Za = a->get_Z();
 		retval[j]->Zb = b->get_Z();
 		retval[j]->type = ionic;
-		retval[j]->kJ_mol = 60; // Deliberately exaggerated. Do not multiply by sgn charges here or total_binding() will reverse it.
+		retval[j]->kJ_mol = 20; // Do not multiply by sgn charges here or total_binding() will reverse it.
 		retval[j]->distance = 0.584 * (a->get_vdW_radius() + b->get_vdW_radius());		// Based on NH...O and the vdW radii of O and H.
 		retval[j]->dirprop = 0;
 		
@@ -545,15 +545,17 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 		}
 		
 		if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
-		{	partial *= (sgn(a->get_charge()) * -sgn(b->get_charge()));
-			/*cout << "Ionic interaction between "
+		{	partial *= ((a->get_charge()) * -(b->get_charge()));
+			
+			if (0 && (a->residue == 114 || b->residue == 114))
+				cout << "Ionic interaction between "
 				 << a->name << " (" << a->get_charge() << ") and "
 				 << b->name << " ("  << b->get_charge() << ")"
 				 << " r=" << r
 				 << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
 				 << " aniso=" << aniso << " (" << asum << "*" << bsum << ") = "
 				 << partial
-				 << endl;*/
+				 << endl;
 		}
 		
 		if (fabs(partial) >= 500)

@@ -40,4 +40,28 @@ int main (int argc, char** argv)
 		 << ".\n";
 	
 	cout << "Point pt6 from vector v is " << pt6.get_3d_distance(&pt5) << " Angstroms from pt5.\n";
+	
+	Point ptrot8, ptref(pt5.x + 0, pt5.y + 0, pt5.z + 1);
+	
+	float f;
+	for (f=0; f<M_PI*2; f+=0.1)
+	{	ptrot8.x = pt5.x + sin(f);
+		ptrot8.y = pt5.y + 0;
+		ptrot8.z = pt5.z + cos(f);
+		
+		cout << "Rotation " << (f*fiftyseven) << " points are "
+			 << find_3d_angle(ptrot8, ptref, pt5)*fiftyseven << " degrees apart."
+			 << endl;
+	}
 }
+
+
+
+
+
+
+
+
+
+
+

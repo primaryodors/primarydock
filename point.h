@@ -171,5 +171,7 @@ extern const char* Greek;
 
 extern std::ofstream *debug;
 
+extern bool last_iter;
+
 #endif
 

@@ -2015,7 +2015,8 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 	
 	Atom* preva = ipreva;
 	float card = ipreva?1:0;
-	for (i=0; smilesstr[i]; i++)
+	int len = strlen(smilesstr);
+	for (i=0; i<len; i++)
 	{	
 		if (smilesstr[i] == '.')
 		{	card = 0;
@@ -2171,7 +2172,16 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 		}
 		
 		if (bracket)
-		{	if (	(smilesstr[i] >= 'A' && smilesstr[i] <= 'Z')
+		{
+			if (smilesstr[i] == '@')
+			{	if (bracketed)
+				{	bracketed->swap_chirality = !bracketed->swap_chirality;
+					continue;
+				}
+				else throw 0xbade9c0d;
+			}
+			
+			if (	(smilesstr[i] >= 'A' && smilesstr[i] <= 'Z')
 					||
 					(smilesstr[i] >= 'a' && smilesstr[i] <= 'z')
 			   )
@@ -2182,7 +2192,12 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 				esym[1] = smilesstr[i+1];
 				esym[2] = 0;
 				
-				if (!Atom::Z_from_esym(esym))
+				if (smilesstr[i+1] < 'a'
+					||
+					smilesstr[i+1] > 'z'
+					|| 
+					!Atom::Z_from_esym(esym)
+				   )
 				{	esym[1] = 0;
 					ioff = 0;
 				}
@@ -2204,10 +2219,17 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 							Atom* a = add_atom(esym, aname, bracketed, 1);
 							a->dnh = true;
 						}
-						
-						i++;
 					}
-				}	else throw 0xbade9c0d;
+				}
+				else
+				{	std::string str = smilesstr, estr = esym;
+					cout << "Bad element symbol " << esym << " (" << i << ")." << endl
+						 << str.substr(0, i)
+						 << "\x1b[4m" << str.substr(i, estr.length())
+						 << "\x1b[0m" << str.substr(i+estr.length())
+						 << endl;
+					throw 0xbade9c0d;
+				}
 				
 				continue;
 			}

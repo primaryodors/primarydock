@@ -2,7 +2,6 @@
 <head>
 <title>Viewer - podock</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="../chemdoodle/install/ChemDoodleWeb.css" type="text/css">
 <style>
 body
 {	color: #6af;
@@ -63,7 +62,35 @@ body
 }
 
 input[type=file]
-{	width: 600px;
+{	/*width: 600px;*/
+}
+
+input, select
+{	background-color: #036;
+	color: #9cf;
+	border: 1px solid #06c;
+	border-radius: 5px;
+}
+
+option.agonist
+{	background-color: #044;
+	color: #9ef;
+	font-weight: bold;
+}
+
+option.non_agonist
+{	background-color: #234;
+	color: #bcd;
+}
+
+option.antagonist
+{	background-color: #410;
+	color: #fb9;
+}
+
+option.unknown
+{	background-color: #000;
+	color: #999;
 }
 
 #clip
@@ -71,7 +98,6 @@ input[type=file]
 }
 
 </style>
-<script type="text/javascript" src="../chemdoodle/install/ChemDoodleWeb.js"></script>
 <script src="https://unpkg.com/ngl@0.10.4/dist/ngl.js"></script>
 <script>
 /******************************************************************************/
@@ -94,7 +120,9 @@ function getParameterByName(name, url)
 </head>
 <body bgcolor="#000">
 <div id="ctrls" style="display: flex;">
+	<div id="filediv">
 	<input type="file">
+	</div>
 	
 	<div id="posey" title="Use the A-Z keys or the up and down arrow keys to choose poses when viewing dock results.">&nbsp;
 	</div>
@@ -395,278 +423,269 @@ function getFileContents(event)
     $('#ligbtn, #prsv').hide();
 
     r.onload = (function(lf)
-    {
-        return function(e)
-        {	
-        	var fext = e.target.fname.substr(e.target.fname.lastIndexOf('.')+1);
-        	orid = 'OR1A1';
-        	try
-        	{	orid = e.target.fname.match(/(OR[0-9]{1,2}[A-Z]{1,2}|TAAR|VN1R)[0-9]{1,2}/)[0];
-        	}
-        	catch (e)
-        	{	;
-        	}
-        	
-        	$.ajax(
-			{
-				url: "http://www.primaryodors.org/recepinfo.php",
-				data:
-				{
-					recep: orid,
-				},
-				fext: fext,
-				success: function(poresult)
-				{
-					poresult = poresult.split("\n");
-					
-					var i;
-					for (i=0; i<poresult.length; i++)
-					{	var ln = poresult[i];
-						if (ln.substr(0, 6) == "METAL|")
-						{	var fields = ln.split("|");
-							var j;
-							for (j=1; j<fields.length; j++)
-							{	var m = fields[j].match(/[0-9]{3}[:]/);
-								if (m && m.length)
-									mtlcoord.push(parseInt(m[0]));
-							}
-						}
-						if (ln.substr(0, 7) == "REGION|")
-						{	var fields = ln.split("|");
-							if (fields[1].substr(0, 3) == "TMR")
-							{	var tmr = parseInt(fields[1].substr(3));
-								tmstart[tmr] = parseInt(fields[2]);
-								tmend[tmr] = parseInt(fields[3]);
-							}
-						}
-					}
-					
-					var fext = this.fext;
-					switch (fext)
-					{	case 'sdf':
-						case 'pdb':
-						stage.removeAllComponents();
-						window.result = e.target.result;
-						var stringBlob = new Blob( [ e.target.result ], { type: 'text/plain'} );
-						stage.loadFile( stringBlob, { ext: fext } ).then( function( comp )
-						{
-							if (fext == 'sdf')
-							{	comp.addRepresentation( "ball+stick", { multipleBond: true } );
-								gmodel.push(comp);
-							}
-							
-							if (fext == 'pdb')
-							{	comp.addRepresentation( "cartoon",
-								{
-									opacity: 0.8,
-									colorScheme: PODefRgnScheme,
-									// colorScale: 'rainbow',
-									metalness: 0.15
-								});
-								gmodel.push(comp);
-								
-								var i;
-								var subset = [], shiny = [];
-								var result = window.result.split("\n");
-								for (i=0; i<result.length; i++)
-								{	var ln = result[i];
-									var resno = parseInt(ln.substr(22,4));
-									var aname = ln.substr(12,4).trim();
-									if (mtlcoord.indexOf(resno) >= 0 
-										&& aname != "N"
-										&& aname != "HN"
-										&& aname != "H"
-										&& aname != "CA"
-										&& aname != "HA"
-										&& aname != "HA1"
-										&& aname != "HA2"
-										// Due to a bug in NGL, the C and O atoms are required if including CA in
-										// licorice, ball+stick, or line mode. Hyperball avoids this but is slower to render.
-										// && aname != "C"
-										// && aname != "O"
-										) subset.push(ln);
-									if (ln.substr(17,3) == "MTL") shiny.push(ln);
-								}
-								var stringBlob1 = new Blob( [ subset.join("\n") ], { type: 'text/plain'} );
-								stage.loadFile( stringBlob1, { ext: 'pdb' } ).then( function( comp1 )
-								{	comp1.addRepresentation( "licorice",
-									{
-										opacity: 1,
-										colorScheme: PODefScheme,
-										metalness: 0.13,
-									});
-									gmodel.push(comp1);
-								});
-								var stringBlob2 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
-								stage.loadFile( stringBlob2, { ext: 'pdb' } ).then( function( comp2 )
-								{	comp2.addRepresentation( "spacefill",
-									{
-										opacity: 0.95,
-										colorScheme: PODefScheme,
-										metalness: 0.53,
-									});
-									gmodel.push(comp2);
-								});
-							}
-							
-							comp.autoView();
-						} );
-						break;
-						
-						case 'txt':
-						stage.removeAllComponents();
-						var lines = e.target.result.split("\n");
-						
-						$.ajax(
-						{
-							url: "http://www.primaryodors.org/orpdb.php",
-							data:
-							{	recep: orid,
-								mod: "m",
-							},
-							success: function(poresult)
-							{	var i;
-								var shiny = [];
-								var result = poresult.split("\n");
-								for (i=0; i<result.length; i++)
-								{	var ln = result[i];
-									var resno = parseInt(ln.substr(22,4));
-									var aname = ln.substr(12,4).trim();
-									if (ln.substr(17,3) == "MTL") shiny.push(ln);
-								}
-								
-								var stringBlob3 = new Blob( [ poresult ], { type: 'text/plain'} );
-								stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp3 )
-								{	comp3.addRepresentation( "cartoon",
-									{
-										opacity: 0.7,
-										colorScheme: PODefRgnScheme,
-										metalness: 0.13,
-										// clipNear: 47,
-									});
-									gmodel.push(comp3);
-								});
-								
-								if (shiny.length)
-								{	var stringBlob4 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
-									stage.loadFile( stringBlob4, { ext: 'pdb' } ).then( function( comp4 )
-									{	comp4.addRepresentation( "spacefill",
-										{
-											opacity: 0.95,
-											colorScheme: PODefScheme,
-											metalness: 0.53,
-										});
-										gmodel.push(comp4);
-									});
-								}
-							}
-						});
-						
-						var posey = $('#posey')[0];
-						var i, writing=false, p=0, n=0;
-						var protmp = "", ligtmp = "";
-						posey.innerHTML = "Pose: ";
-						model = [];
-						is_ligand = [];
-						mpos = [];
-						mnod = [];
-						for (i=0; i<lines.length; i++)
-						{
-							var ln = lines[i];
-							
-							if (ln.substr(0,6) == "Pose: ")
-							{	p = parseInt(ln.substr(6));
-								ligtmp += "REMARK 225 " + ln + "\n";
-							}
-							else if (ln.substr(0,6) == "Node: ")
-							{	n = parseInt(ln.substr(6));
-								ligtmp += "REMARK 225 " + ln + "\n";
-							}
-							else if (ln.trim() == "PDBDAT:")
-							{	if (p>0) writing = true;
-							}
-							else if (ln.trim() == "END")
-							{	if (!n)
-								{	var posea = document.createElement("a");
-									posea.className = "posebtn";
-									if (p==1) $(posea).addClass("hilite");
-									posea.innerText = p;
-									posea.id = "posebtn"+p;
-									posea.setAttribute("onclick", "showPose("+p+");");
-									
-									posey.appendChild(posea);
-								}
-								
-								if (writing)
-								{
-									var stringBlob = new Blob( [ protmp ], { type: 'text/plain'} );
-									stage.loadFile( stringBlob, { ext: 'pdb', name: p+"|"+n } ).then( function( comp )
-									{
-										var rparam = 
-										{	opacity: 0.8,
-											colorScheme: PODefScheme,
-											// clipNear: 44,
-										};
-										
-										/*if (!model.length)
-										{
-											comp.addRepresentation( "licorice", rparam );
-											comp.autoView();
-										}*/
-										
-										model.push(comp);
-										mrep.push("licorice");
-										mrparams.push(rparam);
-										is_ligand.push(0);
-										
-										var lpn = comp.name.split("|");
-										mpos.push(lpn[0]);
-										mnod.push(lpn[1]);
-									} );
-									
-									stringBlob = new Blob( [ ligtmp ], { type: 'text/plain'} );
-									stage.loadFile( stringBlob, { ext: 'pdb', name: p+"|"+n } ).then( function( comp )
-									{
-										var rparam = 
-										{	multipleBond: true,
-										};
-										
-										/*if (model.length < 2)
-										{	comp.addRepresentation( "ball+stick", rparam );
-											comp.autoView();
-										}*/
-										
-										model.push(comp);
-										mrep.push("ball+stick");
-										mrparams.push(rparam);
-										is_ligand.push(1);
-										
-										var lpn = comp.name.split("|");
-										mpos.push(lpn[0]);
-										mnod.push(lpn[1]);
-									} );
-								}
-								writing = false;
-								protmp = ligtmp = "";
-							}
-							else if (writing)
-							{	if (ln.substr(17,3) == "LIG")
-									ligtmp += ln + "\n";
-								else
-									protmp += ln + "\n";
-							}
-						}
-						window.setTimeout(function() { showPose(1); }, 259);
-						break;
-						
-						default:
-						alert('Unknown file type ' + fext);
-					}
-				}
-			});
+    {   return function(e)
+        {	return loadFile(e.target.result, e.target.fname);
         };
 	})(f);
 	r.readAsText(f);
+}
+
+function loadFile(fileData, fileName = "")
+{	
+	var fext = fileName.substr(fileName.lastIndexOf('.')+1);
+	orid = 'OR1A1';
+	try
+	{	orid = fileName.match(/(OR[0-9]{1,2}[A-Z]{1,2}|TAAR|VN1R)[0-9]{1,2}/)[0];
+	}
+	catch (e)
+	{	;
+	}
+	
+	$.ajax(
+	{
+		url: "http://www.primaryodors.org/recepinfo.php",
+		data:
+		{
+			recep: orid,
+		},
+		fext: fext,
+		fileData: fileData,
+		success: function(poresult)
+		{
+			poresult = poresult.split("\n");
+			
+			var i;
+			for (i=0; i<poresult.length; i++)
+			{	var ln = poresult[i];
+				if (ln.substr(0, 6) == "METAL|")
+				{	var fields = ln.split("|");
+					var j;
+					for (j=1; j<fields.length; j++)
+					{	var m = fields[j].match(/[0-9]{3}[:]/);
+						if (m && m.length)
+							mtlcoord.push(parseInt(m[0]));
+					}
+				}
+				if (ln.substr(0, 7) == "REGION|")
+				{	var fields = ln.split("|");
+					if (fields[1].substr(0, 3) == "TMR")
+					{	var tmr = parseInt(fields[1].substr(3));
+						tmstart[tmr] = parseInt(fields[2]);
+						tmend[tmr] = parseInt(fields[3]);
+					}
+				}
+			}
+			
+			var fext = this.fext;
+			switch (fext)
+			{	case 'sdf':
+				case 'pdb':
+				stage.removeAllComponents();
+				window.result = fileData;
+				var stringBlob = new Blob( [ fileData ], { type: 'text/plain'} );
+				stage.loadFile( stringBlob, { ext: fext } ).then( function( comp )
+				{
+					if (fext == 'sdf')
+					{	comp.addRepresentation( "ball+stick", { multipleBond: true } );
+						gmodel.push(comp);
+					}
+					
+					if (fext == 'pdb')
+					{	comp.addRepresentation( "cartoon",
+						{
+							opacity: 0.8,
+							colorScheme: PODefRgnScheme,
+							// colorScale: 'rainbow',
+							metalness: 0.15
+						});
+						gmodel.push(comp);
+						
+						var i;
+						var subset = [], shiny = [];
+						var result = window.result.split("\n");
+						for (i=0; i<result.length; i++)
+						{	var ln = result[i];
+							var resno = parseInt(ln.substr(22,4));
+							var aname = ln.substr(12,4).trim();
+							if (mtlcoord.indexOf(resno) >= 0 
+								&& aname != "N"
+								&& aname != "HN"
+								&& aname != "H"
+								&& aname != "CA"
+								&& aname != "HA"
+								&& aname != "HA1"
+								&& aname != "HA2"
+								// Due to a bug in NGL, the C and O atoms are required if including CA in
+								// licorice, ball+stick, or line mode. Hyperball avoids this but is slower to render.
+								// && aname != "C"
+								// && aname != "O"
+								) subset.push(ln);
+							if (ln.substr(17,3) == "MTL") shiny.push(ln);
+						}
+						var stringBlob1 = new Blob( [ subset.join("\n") ], { type: 'text/plain'} );
+						stage.loadFile( stringBlob1, { ext: 'pdb' } ).then( function( comp1 )
+						{	comp1.addRepresentation( "licorice",
+							{
+								opacity: 1,
+								colorScheme: PODefScheme,
+								metalness: 0.13,
+							});
+							gmodel.push(comp1);
+						});
+						var stringBlob2 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
+						stage.loadFile( stringBlob2, { ext: 'pdb' } ).then( function( comp2 )
+						{	comp2.addRepresentation( "spacefill",
+							{
+								opacity: 0.95,
+								colorScheme: PODefScheme,
+								metalness: 0.53,
+							});
+							gmodel.push(comp2);
+						});
+					}
+					
+					comp.autoView();
+				} );
+				break;
+				
+				case 'txt':
+				stage.removeAllComponents();
+				var lines = fileData.split("\n");
+				
+				$.ajax(
+				{
+					url: "http://www.primaryodors.org/orpdb.php",
+					data:
+					{	recep: orid,
+						mod: "m",
+					},
+					success: function(poresult)
+					{	var i;
+						var shiny = [];
+						var result = poresult.split("\n");
+						for (i=0; i<result.length; i++)
+						{	var ln = result[i];
+							var resno = parseInt(ln.substr(22,4));
+							var aname = ln.substr(12,4).trim();
+							if (ln.substr(17,3) == "MTL") shiny.push(ln);
+						}
+						
+						var stringBlob3 = new Blob( [ poresult ], { type: 'text/plain'} );
+						stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp3 )
+						{	comp3.addRepresentation( "cartoon",
+							{
+								opacity: 0.7,
+								colorScheme: PODefRgnScheme,
+								metalness: 0.13,
+							});
+							gmodel.push(comp3);
+						});
+						
+						if (shiny.length)
+						{	var stringBlob4 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
+							stage.loadFile( stringBlob4, { ext: 'pdb' } ).then( function( comp4 )
+							{	comp4.addRepresentation( "spacefill",
+								{
+									opacity: 0.95,
+									colorScheme: PODefScheme,
+									metalness: 0.53,
+								});
+								gmodel.push(comp4);
+							});
+						}
+					}
+				});
+				
+				var posey = $('#posey')[0];
+				var i, writing=false, p=0, n=0;
+				var protmp = "", ligtmp = "";
+				posey.innerHTML = "Pose: ";
+				model = [];
+				is_ligand = [];
+				mpos = [];
+				mnod = [];
+				for (i=0; i<lines.length; i++)
+				{
+					var ln = lines[i];
+					
+					if (ln.substr(0,6) == "Pose: ")
+					{	p = parseInt(ln.substr(6));
+						ligtmp += "REMARK 225 " + ln + "\n";
+					}
+					else if (ln.substr(0,6) == "Node: ")
+					{	n = parseInt(ln.substr(6));
+						ligtmp += "REMARK 225 " + ln + "\n";
+					}
+					else if (ln.trim() == "PDBDAT:")
+					{	if (p>0) writing = true;
+					}
+					else if (ln.trim() == "END")
+					{	if (!n)
+						{	var posea = document.createElement("a");
+							posea.className = "posebtn";
+							if (p==1) $(posea).addClass("hilite");
+							posea.innerText = p;
+							posea.id = "posebtn"+p;
+							posea.setAttribute("onclick", "showPose("+p+");");
+							
+							posey.appendChild(posea);
+						}
+						
+						if (writing)
+						{
+							var stringBlob = new Blob( [ protmp ], { type: 'text/plain'} );
+							stage.loadFile( stringBlob, { ext: 'pdb', name: p+"|"+n } ).then( function( comp )
+							{
+								var rparam = 
+								{	opacity: 0.8,
+									colorScheme: PODefScheme,
+								};
+								
+								model.push(comp);
+								mrep.push("licorice");
+								mrparams.push(rparam);
+								is_ligand.push(0);
+								
+								var lpn = comp.name.split("|");
+								mpos.push(parseInt(lpn[0]));
+								mnod.push(parseInt(lpn[1]));
+							} );
+							
+							stringBlob = new Blob( [ ligtmp ], { type: 'text/plain'} );
+							stage.loadFile( stringBlob, { ext: 'pdb', name: p+"|"+n } ).then( function( comp )
+							{
+								var rparam = 
+								{	multipleBond: true,
+								};
+								
+								model.push(comp);
+								mrep.push("ball+stick");
+								mrparams.push(rparam);
+								is_ligand.push(1);
+								
+								var lpn = comp.name.split("|");
+								mpos.push(parseInt(lpn[0]));
+								mnod.push(parseInt(lpn[1]));
+							} );
+						}
+						writing = false;
+						protmp = ligtmp = "";
+					}
+					else if (writing)
+					{	if (ln.substr(17,3) == "LIG")
+							ligtmp += ln + "\n";
+						else
+							protmp += ln + "\n";
+					}
+				}
+				window.setTimeout(function() { showPose(1); }, 259);
+				break;
+				
+				default:
+				alert('Unknown file type ' + fext);
+			}
+		}
+	});
 }
 
 $('input[type=file]').on('input', getFileContents);

@@ -2016,6 +2016,7 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 	Atom* preva = ipreva;
 	float card = ipreva?1:0;
 	int len = strlen(smilesstr);
+	int lastEZ = 0;
 	for (i=0; i<len; i++)
 	{	
 		if (smilesstr[i] == '.')
@@ -2077,6 +2078,23 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 			aname[j] = 0;
 			preva->name = aname;
 			//i++;
+			continue;
+		}
+		
+		if (smilesstr[i] == '\\'
+			||
+			smilesstr[i] == '/'
+			)
+		{	if (lastEZ)
+			{	int EZ = (smilesstr[i] == '/') ? 1 : -1;
+				cout << EZ << endl;
+				preva->EZ_flip = sgn(EZ) != sgn(lastEZ);
+				lastEZ = 0;
+			}
+			else
+			{	lastEZ = (smilesstr[i] == '/') ? 1 : -1;
+				cout << lastEZ << " = ";
+			}
 			continue;
 		}
 		

@@ -1139,6 +1139,7 @@ Vector Atom::get_next_free_geometry(float lcard)
 		if (i >= geometry) i=0;
 		
 		if (geometry == 4 && swap_chirality && i >= 2) i ^= 1;
+		if (geometry == 3 && EZ_flip && i >= 1) i = 3-i;
 		
 		retval = v[i];
 	}
@@ -1153,6 +1154,7 @@ int Atom::get_idx_next_free_geometry()
 		for (i=0; i < geometry && bonded_to[i].btom; i++);
 		if (i >= geometry) i=0;
 		if (geometry == 4 && swap_chirality && i >= 2) i ^= 1;
+		if (geometry == 3 && EZ_flip && i >= 1) i = 3-i;
 		return i;
 	}
 }

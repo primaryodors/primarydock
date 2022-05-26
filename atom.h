@@ -115,6 +115,7 @@ class Atom
 	bool dnh=false;				// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.
 	Point* arom_center=0;
 	bool swap_chirality = false;
+	bool EZ_flip = false;
 	float last_bind_energy=0;
 	
 	protected:

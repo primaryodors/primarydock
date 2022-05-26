@@ -2,9 +2,34 @@
 <head>
 <title>Viewer - podock</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<script>
+var nglcitation
+	= "AS Rose, AR Bradley, Y Valasatava, JM Duarte, A Prlić and PW Rose.\n"
+	+ "Web-based molecular graphics for large complexes.\n"
+	+ "ACM Proceedings of the 21st International Conference on Web3D Technology (Web3D '16):\n"
+	+ "185-186, 2016. doi:10.1145/2945292.2945324\n"
+	+ "\n"
+	+ "AS Rose and PW Hildebrand.\n"
+	+ "NGL Viewer: a web application for molecular visualization.\n"
+	+ "Nucl Acids Res (1 July 2015) 43 (W1):\n"
+	+ "W576-W579 first published online April 29, 2015.\n"
+	+ "doi:10.1093/nar/gkv402";
+</script>
 <style>
 body
 {	color: #6af;
+	overflow: hidden;
+}
+
+#citefloat
+{	position: fixed;
+	right: 25px;
+	bottom: 15px;
+	font-family: Verdana, Arial, Sans-Serif;
+	font-size: 11px;
+	color: #06c;
+	cursor: pointer;
 }
 
 #ctrls div
@@ -119,7 +144,7 @@ function getParameterByName(name, url)
 </script>
 </head>
 <body bgcolor="#000">
-<div id="ctrls" style="display: flex;">
+<div id="ctrls" style="display: flex; flex-wrap: wrap;">
 	<div id="filediv">
 	<input type="file">
 	</div>
@@ -146,7 +171,7 @@ function getParameterByName(name, url)
 	</div>
 </div>
 <center>
-<div id="viewport" style="width:1800px; height:880px;"></div>
+<div id="viewport" style="width:1800px; height:880px; background-color: #000;"></div>
 </center>
 <script>
 
@@ -168,6 +193,13 @@ var gpose = 1, gnode = 0;
 var orid;
 var mtlcoord = [];
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
+
+window.onresize = function()
+{	var w = parseInt(window.visualViewport.width - $("#viewport")[0].getBoundingClientRect().top - 5);
+	var h = parseInt(window.visualViewport.height - 5);
+	$('#viewport').css("width", w+"px").css("height",h+"px");
+	stage.setSize(w, h);
+};
 
 var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
@@ -691,7 +723,11 @@ function loadFile(fileData, fileName = "")
 $('input[type=file]').on('input', getFileContents);
 
 </script>
-  
+
+<div id="citefloat">
+<a onclick="alert(nglcitation);">Visualization using NGL Viewer</a>
+</div>
+
   
   
   

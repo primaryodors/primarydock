@@ -8,6 +8,13 @@
 
 void ext_mtl_coord_cnf_cb(int iter);
 
+class Region
+{	public:
+	int start;
+	int end;
+	std::string name;
+};
+
 class Protein
 {	public:
 	// Constructors.
@@ -24,6 +31,7 @@ class Protein
 	void delete_residues(int startres, int endres);
 	void delete_sidechains(int startres, int endres);
 	MetalCoord* coordinate_metal(Atom* metal, int residues, int* resnos, char** res_anames);
+	void set_region(std::string name, int start, int end);
 	
 	// Serialization.
 	int load_pdb(FILE* instream);				// Returns number of residues loaded.
@@ -79,6 +87,7 @@ class Protein
 	int metcount=0;
 	Star aaptrmin, aaptrmax;
 	MetalCoord** m_mcoord=0;
+	Region regions[PROT_MAX_RGN]{};
 	
 	int* get_residues_in_reach(int resno);
 	float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);

@@ -107,6 +107,7 @@ class InteratomicForce;
 class Molecule;
 class AminoAcid;
 class Protein;
+class Region;
 class Rotation;
 
 union Star
@@ -122,6 +123,7 @@ union Star
 	Molecule* pmol;
 	AminoAcid* paa;
 	Protein* pprot;
+	Region* preg;
 	Rotation* prot;
 };
 

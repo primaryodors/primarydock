@@ -44,6 +44,7 @@
 
 #define SPHREACH_MAX 1024
 
+#define PROT_MAX_RGN 40
 #define ALPHA_PHI fiftyseventh*-61
 #define ALPHA_PSI fiftyseventh*-43
 

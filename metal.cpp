@@ -45,14 +45,14 @@ int main(int argc, char** argv)
 			mcoorda[j++] = strstr(argv[i], ":")+1;
 		}
 		else if (!strcmp(argv[i], "-o")) outfile = argv[++i];
-		else if (!strcmp(argv[i], "-b"))
+		/*else if (!strcmp(argv[i], "-b"))
 		{	pocketcen.x = atof(argv[++i]);
 			pocketcen.y = atof(argv[++i]);
 			pocketcen.z = atof(argv[++i]);
 			pocketset = true;
-		}
+		}*/
 		else if (!strcmp(argv[i], "-c")) charge = atoi(argv[++i]);
-		else if (!strcmp(argv[i], "--nh")) dohelix = false;
+		// else if (!strcmp(argv[i], "--nh")) dohelix = false;
 		else if (!strcmp(argv[i], "-e")) esym = argv[++i];
 	}
 	

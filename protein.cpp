@@ -626,9 +626,9 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 }
 
 void Protein::delete_residue(int resno)
-{	if (!resno) return 0;
-	if (resno > get_seq_length()) return 0;
-	if (!residues) return 0;
+{	if (!resno) return;
+	if (resno > get_seq_length()) return;
+	if (!residues) return;
 	
 	int i, j;
 	for (i=0; residues[i]; i++)
@@ -651,16 +651,16 @@ void Protein::delete_residues(int startres, int endres)
 }
 
 void Protein::delete_sidechain(int resno)
-{	if (!resno) return 0;
-	if (resno > get_seq_length()) return 0;
-	if (!residues) return 0;
+{	if (!resno) return;
+	if (resno > get_seq_length()) return;
+	if (!residues) return;
 	
 	AminoAcid* aa = get_residue(resno);
 	aa->delete_sidechain();
 }
 
 void Protein::delete_sidechains(int startres, int endres)
-{	if (!residues) return 0;
+{	if (!residues) return;
 	int i;
 	for (i=0; residues[i]; i++)
 	{	int res = residues[i]->get_residue_no();
@@ -807,6 +807,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, ch
 		m_mcoord[j]->coord_res[i]->movability = MOV_NONE;
 	
 	m_mcoord[j]->locked = true;
+	return m_mcoord[j];
 }
 
 void Protein::mtl_coord_cnf_cb(int iter)
@@ -910,6 +911,26 @@ float Protein::orient_helix(int startres, int endres, int stopat, float angle, i
 	
 	return ha;
 }
+
+void Protein::set_region(std::string rgname, int start, int end)
+{	int i;
+	for (i=0; i<PROT_MAX_RGN; i++) if (!regions[i].start) break;
+	if (i >= PROT_MAX_RGN) return;		// Nope.
+	
+	regions[i].name = rgname;
+	regions[i].start = start;
+	regions[i].end = end;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

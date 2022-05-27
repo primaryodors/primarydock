@@ -37,6 +37,9 @@
 #define _def_ang_momentum _fullrot_steprad/2
 #define _def_bnd_momentum _fullrot_steprad/2
 
+#define _voxel_resolution 0.1
+#define USE_VOXEL_ARRAY false
+
 #define ATOM_NOT_OF_AMINO_ACID 0x907aa
 
 #define SPHREACH_MAX 1024

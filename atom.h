@@ -13,7 +13,9 @@ class Bond
 	Atom* atom = 0;
 	Atom* btom = 0;
 	float cardinality=0;			// aromatic bonds = 1.5.
-	bool can_rotate=0;
+	bool can_rotate=false;
+	bool can_flip=false;
+	float flip_angle=0;				// signed.
 	float angular_momentum=0;
 	
 	Bond();

@@ -778,14 +778,14 @@ void Bond::fill_moves_with_cache()
 		}
 	} while (k);
 	
-	moves_with_btom = new Atom*[tmplen+1]{};
+	moves_with_btom = new Atom*[tmplen+4]{};
 	
 	for (i=0; i<tmplen; i++)
 	{	moves_with_btom[i] = attmp[i];
 		attmp[i]->used = false;
 	}
-	btom->used = false;
 	moves_with_btom[i] = 0;
+	btom->used = false;
 	
 	if (_DBGMOVES) cout << endl << endl;
 }
@@ -793,7 +793,10 @@ void Bond::fill_moves_with_cache()
 bool Bond::rotate(float theta, bool allow_backbone)
 {	if (!moves_with_btom) fill_moves_with_cache();
 	if (!moves_with_btom) return false;
-	if (!can_rotate) return false;
+	if (!can_rotate)
+	{	if (can_flip) theta = flip_angle;
+		else return false;
+	}
 
 	int i;
 	Point cen = btom->get_location();
@@ -812,6 +815,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
 		if (!allow_backbone)
 		{	if (moves_with_btom[i]->is_backbone)
 			{	cout << "DANGER: Rotation of " << atom->residue << ":" << atom->name << " - " << btom->name << endl;
+				if (can_flip) flip_angle = -flip_angle;
 				throw 0xbadb09d;
 			}
 		}
@@ -826,6 +830,8 @@ bool Bond::rotate(float theta, bool allow_backbone)
 		moves_with_btom[i]->rotate_geometry(rot);
 	}
 	//cout << endl;
+	
+	if (can_flip) flip_angle = -flip_angle;
 
 	return true;
 }
@@ -1035,25 +1041,25 @@ Vector* Atom::get_geometry_aligned_to_bonds()
 	}
 	
 	if (mirror_geo >= 0)
-	{	Bond b = bonded_to[mirror_geo];
+	{	Bond* b = &bonded_to[mirror_geo];
 		if (_DBGGEO) cout << name << " location: " << location.printable() << endl;
-		if (_DBGGEO) cout << b.btom->name << " location: " << b.btom->location.printable() << endl;
-		geov[0] = v_from_pt_sub(b.btom->location, location);
+		if (_DBGGEO) cout << b->btom->name << " location: " << b->btom->location.printable() << endl;
+		geov[0] = v_from_pt_sub(b->btom->location, location);
 		geov[0].r = 1;
 		Point _4avg[2];
-		_4avg[0] = b.btom->location;
+		_4avg[0] = b->btom->location;
 		_4avg[1] = location;
 		Point avg = average_of_points(_4avg, 2);
 		if (_DBGGEO) cout << "avg: " << avg.printable() << endl;
 		
 		j=1;
-		b.btom->mirror_geo = -1;		// Prevent infinite loop.
-		Vector* bgeov = b.btom->get_geometry_aligned_to_bonds();		// RECURSION!
+		b->btom->mirror_geo = -1;		// Prevent infinite loop.
+		Vector* bgeov = b->btom->get_geometry_aligned_to_bonds();		// RECURSION!
 		
-		for (i=0; i<b.btom->geometry; i++)
-		{	if (!b.btom->bonded_to[i].btom || b.btom->bonded_to[i].btom != this)
+		for (i=0; i<b->btom->geometry; i++)
+		{	if (!b->btom->bonded_to[i].btom || b->btom->bonded_to[i].btom != this)
 			{	Point bgp(&bgeov[i]);
-				bgp = bgp.add(b.btom->location);
+				bgp = bgp.add(b->btom->location);
 				if (_DBGGEO) cout << "bgp: " << bgp.printable() << " from vector φ=" << bgeov[i].phi << " θ=" << bgeov[i].theta << " r=" << bgeov[i].r << endl;
 				Point mirr = avg.subtract(bgp.subtract(&avg));
 				if (_DBGGEO) cout << "mirr: " << mirr.printable() << endl;
@@ -1070,31 +1076,59 @@ Vector* Atom::get_geometry_aligned_to_bonds()
 	bool doswings = false;
 	
 	if (bonded_to[0].btom)
-	{	if (geometry > 2 && bonded_to[1].btom)
-		{	Point g0(&geov[0]);		g0.scale(1);
-			Point g1(&geov[1]);		g1.scale(1);
-			Point a0 = bonded_to[0].btom->location.subtract(location);	a0.scale(1);
-			Point a1 = bonded_to[1].btom->location.subtract(location);	a1.scale(1);
-			Rotation* rots = align_2points_3d(&g0, &a0, &g1, &a1, &center);
-			
-			geo_rot_1 = rots[0];
-			geo_rot_2 = rots[1];
-			
-			int k;
-			for (k=0; k<2; k++)
-			{	for (i=0; i<geometry; i++)
-				{	Point pt1(&geov[i]);
-					Point pt2 = rotate3D(&pt1, &center, &rots[k]);
-					Vector v2(&pt2);
-					v2.r = 1;
-					geov[i] = v2;
+	{	if (geometry > 2)
+		{	if (bonded_to[1].btom)
+			{	Point g0(&geov[0]);		g0.scale(1);
+				Point g1(&geov[1]);		g1.scale(1);
+				Point a0 = bonded_to[0].btom->location.subtract(location);	a0.scale(1);
+				Point a1 = bonded_to[1].btom->location.subtract(location);	a1.scale(1);
+				Rotation* rots = align_2points_3d(&g0, &a0, &g1, &a1, &center);
+				
+				geo_rot_1 = rots[0];
+				geo_rot_2 = rots[1];
+				
+				int k;
+				for (k=0; k<2; k++)
+				{	for (i=0; i<geometry; i++)
+					{	Point pt1(&geov[i]);
+						Point pt2 = rotate3D(&pt1, &center, &rots[k]);
+						Vector v2(&pt2);
+						v2.r = 1;
+						geov[i] = v2;
+					}
 				}
+				
+				if (_DBGGEO) cout << name << " returns trans double-aligned geometry (" << geometry << "):"
+								  << bonded_to[0].btom->name << ", " << bonded_to[1].btom->name << "."
+								  << endl;
+				return geov;
+			}
+			else if (bonded_to[2].btom)
+			{	Point g0(&geov[0]);		g0.scale(1);
+				Point g1(&geov[2]);		g1.scale(1);
+				Point a0 = bonded_to[0].btom->location.subtract(location);	a0.scale(1);
+				Point a1 = bonded_to[2].btom->location.subtract(location);	a1.scale(1);
+				Rotation* rots = align_2points_3d(&g0, &a0, &g1, &a1, &center);
+				
+				geo_rot_1 = rots[0];
+				geo_rot_2 = rots[1];
+				
+				int k;
+				for (k=0; k<2; k++)
+				{	for (i=0; i<geometry; i++)
+					{	Point pt1(&geov[i]);
+						Point pt2 = rotate3D(&pt1, &center, &rots[k]);
+						Vector v2(&pt2);
+						v2.r = 1;
+						geov[i] = v2;
+					}
+				}
+				
+				if (_DBGGEO) cout << name << " returns cis double-aligned geometry (" << geometry << ")." << endl;
+				return geov;
 			}
 			
-			if (_DBGGEO) cout << name << " returns double-aligned geometry (" << geometry << ")." << endl;
-			return geov;
 		}
-		
 		
 		
 		// Get alignment for the first bond.

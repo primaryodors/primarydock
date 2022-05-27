@@ -1995,6 +1995,8 @@ bool Molecule::from_smiles(char* smilesstr)
 	delete[] paren;
 	hydrogenate();
 	
+	voxel_computation(5);
+	
 	return retval;
 }
 
@@ -2008,6 +2010,8 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 	bool bracket=false, prevarom=false;
 	Atom* bracketed=0;
 	
+	cout << "From: " << smilesstr << endl;
+	
 	immobile = false;
 	
 	int i, j=1, k=0, l, atno=get_atom_count()+1;
@@ -2017,8 +2021,16 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 	float card = ipreva?1:0;
 	int len = strlen(smilesstr);
 	int lastEZ = 0;
+	
+	int numdb = 0, dbi = 0;
+	for (i=0; i<len; i++) if (smilesstr[i] == '=') numdb++;
+	
+	int EZgiven[numdb+4];
+	Atom* EZatom0[numdb+4];
+	Atom* EZatom1[numdb+4];
+	
 	for (i=0; i<len; i++)
-	{	
+	{	cout << "'" << smilesstr[i] << "' ";
 		if (smilesstr[i] == '.')
 		{	card = 0;
 			continue;
@@ -2036,6 +2048,8 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 		
 		if (smilesstr[i] == '=')
 		{	card = 2;
+			EZgiven[dbi] = 0;
+			EZatom0[dbi] = preva;
 			continue;
 		}
 		
@@ -2054,7 +2068,22 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 			paren[spnum].startsfrom = preva;
 			paren[spnum].smilesstr = new char[smlen-i+4]{};
 			strcpy(paren[spnum].smilesstr, &smilesstr[++i]);
-			while (smilesstr[i] != ')') i++;
+			// while (smilesstr[i] != ')') i++;
+			
+			int level = 1;
+			while (level)
+			{	i++;
+				if (smilesstr[i] == '(') level++;
+				if (smilesstr[i] == ')') level--;
+				if (!smilesstr[i]) throw 0xbade9c0d;
+			}
+			
+			/*for (l=0; paren[spnum].smilesstr[l]; l++)
+			{	if (paren[spnum].smilesstr[l] == ')')
+				{	paren[spnum].smilesstr[l+1] = NULL;
+					break;
+				}
+			}*/
 			spnum++;
 			continue;
 		}
@@ -2088,7 +2117,7 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 		{	if (lastEZ)
 			{	int EZ = (smilesstr[i] == '/') ? 1 : -1;
 				cout << EZ << endl;
-				preva->EZ_flip = sgn(EZ) != sgn(lastEZ);
+				preva->EZ_flip = EZgiven[dbi-1] = sgn(EZ) != sgn(lastEZ);
 				lastEZ = 0;
 			}
 			else
@@ -2103,18 +2132,36 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 			if (!numbered[j])
 			{	numbered[j] = preva;
 				sqidx[j] = k-1;
+				cout << "Set ring " << j << endl;
 				continue;
 			}
 			else
 			{	// Rotate bonds to close the loop.
+				cout << "conclude ring " << j << endl;
 				bool allarom = true;
 				Atom* aloop[256];
 				for (l=sqidx[j]; l<k; l++)
 				{	aloop[l-sqidx[j]] = sequence[l];
 					if (!seqarom[l]) allarom = false;
+					cout << aloop[l-sqidx[j]]->name << " ";
 				}
 				aloop[l-sqidx[j]] = 0;
 				int ringsz = l-sqidx[j];
+				cout << ringsz << endl;
+				
+				// Also default all unmarked double bonds to cis.
+				/*for (l=0; l<dbi; l++)
+				{	if (!EZgiven[l] && EZatom0[l] && EZatom1[l])
+					{	Bond* lb = EZatom0[l]->get_bond_between(EZatom1[l]);
+						lb->can_rotate = true;
+						lb->flip_angle = M_PI;
+						lb = EZatom1[l]->get_bond_between(EZatom0[l]);
+						if (lb)
+						{	lb->can_flip = true;
+							lb->flip_angle = M_PI;
+						}
+					}
+				}*/
 				
 				// If the ring has fewer than 5 members, or if it's aromatic, turn it into a regular polygon.
 				if (ringsz<5 || allarom)
@@ -2174,6 +2221,19 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 				
 				float anomaly = close_loop(aloop, card);
 				cout << "Ring closure anomaly " << anomaly << endl;
+
+				/*for (l=0; l<dbi; l++)
+				{	if (!EZgiven[l] && EZatom0[l] && EZatom1[l])
+					{	Bond* lb = EZatom0[l]->get_bond_between(EZatom1[l]);
+						lb->can_flip = false;
+						lb->can_rotate = false;
+						lb = EZatom1[l]->get_bond_between(EZatom0[l]);
+						if (lb)
+						{	lb->can_flip = false;
+							lb->can_rotate = false;
+						}
+					}
+				}*/
 				
 				if (card) preva->bond_to(numbered[j], card);
 				card = 1;
@@ -2225,6 +2285,9 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 					if (!bracketed)
 					{	sprintf(aname, "%s%d", esym, atno++);
 						bracketed = add_atom(esym, aname, preva, card);
+						if (card == 2)
+						{	EZatom1[dbi++] = bracketed;
+						}
 						bracketed->dnh = true;
 						i += ioff; ioff=0;
 					}	else
@@ -2294,6 +2357,9 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 		// cout << "Bonding new " << esym << " named " << aname << " to " << (preva?preva->name:"nothing") << " cardinality " << card << endl;
 		Atom* a = add_atom(esym, aname, card ? preva : 0, card);
 		if (aromatic) a->aromatize();
+		if (card == 2)
+		{	EZatom1[dbi++] = a;
+		}
 		
 		seqarom[k] = aromatic;
 		sequence[k++] = a;
@@ -2400,7 +2466,14 @@ float Molecule::close_loop(Atom** path, float lcard)
 		int geo = path[i]->get_geometry();
 		
 		for (j=0; j<geo; j++)
-			if (b[j]->btom && b[j]->can_rotate) rotables[k++] = b[j];
+		{	if (b[j]->btom
+				&&
+				(	b[j]->can_rotate
+					||
+					b[j]->can_flip
+				)
+			   ) rotables[k++] = b[j];
+		}
 			
 		last = path[i];
 	}
@@ -2430,7 +2503,13 @@ float Molecule::close_loop(Atom** path, float lcard)
 		{	if (rotables[i]->rotate(bondrot[i]))
 			{	float newanom = fsb_lsb_anomaly(first, last, lcard, bond_length);
 				float ncoll = get_internal_collisions();
-				if (newanom <= anomaly && ncoll <= allowance * icoll)
+				if ((	newanom <= anomaly
+						||
+						(rotables[i]->can_flip && (rand()%100) < 22)
+					)
+					&&
+					ncoll <= allowance * icoll
+				   )
 				{	if (_DBGCLSLOOP) cout << "Anomaly was " << anomaly << " now " << newanom << ", keeping." << endl;
 					anomaly = newanom;
 					icoll = ncoll;
@@ -2515,7 +2594,100 @@ Point Molecule::get_bounding_box() const
 	return pt;
 }
 
+void Molecule::voxel_computation(int iters)
+{	if (!atoms) return;
+	return;			// THIS FUNCTION DOES NOT WORK.
 
+	// Get the molecule's bounding box, then grow it slightly.
+	Point boxvtx = get_bounding_box();
+	Point molcen = get_barycenter();
+	
+	boxvtx.scale(boxvtx.magnitude() * 1.25);
+	
+	// Define a voxel space with 0.1A resolution.
+	int xmax = ceil(boxvtx.x * 2 / _voxel_resolution);
+	int ymax = ceil(boxvtx.y * 2 / _voxel_resolution);
+	int zmax = ceil(boxvtx.z * 2 / _voxel_resolution);
+	int numvox = (xmax+1) * (ymax+1) * (zmax+1);
+	int voxperx = (ymax+1) * (zmax+1);
+	int voxpery = (zmax+1);
+	#if USE_VOXEL_ARRAY
+	float voxelspace[numvox + 8];
+	#endif
+	
+	// For each iteration,
+	int iter;
+	for (iter=0; iter<iters; iter++)
+	{	int i, j, vx, vy, vz, vxi, vxyi;
+		float ax, ay, az;
+		float min_energy = 99999;
+		Point min_ener_vox;
+		Point aloc;
+		
+		// For each atom of the molecule,
+		for (i=0; atoms[i]; i++)
+		{	cout << iter << "," << i << " / " << iters << endl;
+				
+			// Find its energy level for every voxel in the space.
+			// For non-bonded atoms, just use an inverse square of the distance.
+			// For bonded atoms, use the negative inverse square of 1+distance anomaly.
+			// Keep track of the lowest energy level.
+			float energy;
+			min_energy = 99999;
+			min_ener_vox = aloc = atoms[i]->get_location();
+			
+			for (vx=0; vx<xmax; vx++)
+			{	vxi = vx * voxperx;
+				if (vxi >= numvox) break;
+				ax = _voxel_resolution * vx;
+				
+				for (vy=0; vy<ymax; vy++)
+				{
+					vxyi = vxi + vy * voxpery;
+					if (vxyi >= numvox) break;
+					ay = _voxel_resolution * vy;
+					
+					for (vz=0; vz<zmax; vz++)
+					{
+						az = _voxel_resolution * vz;
+						energy = 0;
+						Point aloctmp(ax, ay, az);
+						aloctmp = aloctmp.add(molcen);
+						
+						for (j=0; atoms[j]; j++)
+						{	if (j==i) continue;
+							Bond* b = atoms[i]->get_bond_between(atoms[j]);
+							float r = aloctmp.get_3d_distance(atoms[j]->get_location());
+							if (b)
+							{	float optimal_r = InteratomicForce::covalent_bond_radius(atoms[i], atoms[j], b->cardinality);
+								float anomaly = fabs(r - optimal_r);
+								energy -= 1.0/pow(1.0+anomaly, 2);
+							}
+							else
+							{	energy += 1.0/pow(0.00001+r, 2);
+							}
+						}
+						
+						#if USE_VOXEL_ARRAY
+						int vxyzi = vxyi + vz;
+						if (vxyzi >= numvox) break;
+						
+						voxelspace[vxyzi] = energy;
+						#endif
+						
+						if (energy < min_energy)
+						{	min_energy = energy;
+							min_ener_vox = aloctmp;
+						}
+					}	// next vz
+				}	// next vy
+			}	// next vx
+			
+			// Move the atom to the lowest energy voxel.
+			atoms[i]->move(min_ener_vox);
+		}
+	}
+}
 
 
 

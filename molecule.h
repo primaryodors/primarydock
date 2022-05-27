@@ -49,6 +49,7 @@ class Molecule
 	virtual void rotate(Vector* vector, float theta);
 	void rotate(LocatedVector vector, float theta);
 	bool shielded(Atom* a, Atom* b) const;
+	void voxel_computation(int iters = 5);
 	
 	// Atom functions.
 	Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);

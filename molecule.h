@@ -65,6 +65,7 @@ class Molecule
 	Bond** get_all_bonds(bool unidirectional);
 	void clear_all_bond_caches();					// Call this any time you add or remove an atom.
 	bool rotate_bond(const Bond* rot8b, const float angle);
+	void fix_bond_lengths(int iters = 200);
 	
 	// Ring functions.
 	int identify_rings();

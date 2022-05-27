@@ -210,8 +210,28 @@ void Molecule::hydrogenate()
 		for (j=bcardsum; j<valence; j++)
 		{	char hname[5];
 			sprintf(hname, "H%d", atcount+1);
-			add_atom("H", hname, atoms[i], 1);
+			Atom* H = add_atom("H", hname, atoms[i], 1);
 			//cout << "Adding " << hname << " to " << atoms[i]->name << " whose valence is " << valence << " and has " << bcardsum << " bonds already." << endl;
+			if (atoms[i]->get_geometry() == 3)
+			{	cout << "slurm" << i+1;
+				Bond* aib = atoms[i]->get_bond_by_idx(1);
+				if (aib && aib->total_rotations) // aib->btom == H)
+				{	cout << "_you_should_not_ask";
+					Bond* b0 = atoms[i]->get_bond_by_idx(0);
+					if (b0->btom)
+					{	cout << "_about_the_secret_ingredient";
+						Point source = atoms[i]->get_location();
+						Point axis = b0->btom->get_location();
+						Point movable = H->get_location();
+						Vector v(axis.subtract(source));
+						
+						Point visibly_moved = rotate3D(movable, source, v, M_PI);
+						
+						H->move(visibly_moved);
+					}
+				}
+				cout << " ";
+			}
 		}
 		
 	}
@@ -1993,9 +2013,10 @@ bool Molecule::from_smiles(char* smilesstr)
 	}
 	
 	delete[] paren;
+	fix_bond_lengths(200);
 	hydrogenate();
 	
-	voxel_computation(5);
+	// voxel_computation(5);
 	
 	return retval;
 }
@@ -2009,8 +2030,6 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 	int sp = 0;
 	bool bracket=false, prevarom=false;
 	Atom* bracketed=0;
-	
-	cout << "From: " << smilesstr << endl;
 	
 	immobile = false;
 	
@@ -2030,8 +2049,7 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 	Atom* EZatom1[numdb+4];
 	
 	for (i=0; i<len; i++)
-	{	cout << "'" << smilesstr[i] << "' ";
-		if (smilesstr[i] == '.')
+	{	if (smilesstr[i] == '.')
 		{	card = 0;
 			continue;
 		}
@@ -2116,13 +2134,11 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 			)
 		{	if (lastEZ)
 			{	int EZ = (smilesstr[i] == '/') ? 1 : -1;
-				cout << EZ << endl;
 				preva->EZ_flip = EZgiven[dbi-1] = sgn(EZ) != sgn(lastEZ);
 				lastEZ = 0;
 			}
 			else
 			{	lastEZ = (smilesstr[i] == '/') ? 1 : -1;
-				cout << lastEZ << " = ";
 			}
 			continue;
 		}
@@ -2132,22 +2148,18 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 			if (!numbered[j])
 			{	numbered[j] = preva;
 				sqidx[j] = k-1;
-				cout << "Set ring " << j << endl;
 				continue;
 			}
 			else
 			{	// Rotate bonds to close the loop.
-				cout << "conclude ring " << j << endl;
 				bool allarom = true;
 				Atom* aloop[256];
 				for (l=sqidx[j]; l<k; l++)
 				{	aloop[l-sqidx[j]] = sequence[l];
 					if (!seqarom[l]) allarom = false;
-					cout << aloop[l-sqidx[j]]->name << " ";
 				}
 				aloop[l-sqidx[j]] = 0;
 				int ringsz = l-sqidx[j];
-				cout << ringsz << endl;
 				
 				// Also default all unmarked double bonds to cis.
 				/*for (l=0; l<dbi; l++)
@@ -2250,7 +2262,8 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 		}
 		
 		if (bracket)
-		{
+		{	bool aromatic = false;
+			
 			if (smilesstr[i] == '@')
 			{	if (bracketed)
 				{	bracketed->swap_chirality = !bracketed->swap_chirality;
@@ -2280,11 +2293,18 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 					ioff = 0;
 				}
 				
+				if (esym[0] >= 'a')
+				{	aromatic = true;
+					esym[0] &= 0x5f;
+					if (prevarom) card=1.5;
+				}
+				
 				if (Atom::Z_from_esym(esym))
 				{	char aname[7];
 					if (!bracketed)
 					{	sprintf(aname, "%s%d", esym, atno++);
 						bracketed = add_atom(esym, aname, preva, card);
+						if (aromatic) bracketed->aromatize();
 						if (card == 2)
 						{	EZatom1[dbi++] = bracketed;
 						}
@@ -2337,6 +2357,12 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
 			{	bracket = false;
 				preva = bracketed;
 				bracketed = 0;
+				
+				seqarom[k] = aromatic;
+				sequence[k++] = preva;
+				card = 1;
+				prevarom = aromatic;
+				
 				continue;
 			}
 			
@@ -2480,6 +2506,7 @@ float Molecule::close_loop(Atom** path, float lcard)
 	rotables[k] = 0;
 	
 	if (last == first) return 0;
+	last->mirror_geo = -1;
 	int ringsize = k;
 	
 	float bond_length = InteratomicForce::covalent_bond_radius(first, last, lcard);
@@ -2689,7 +2716,36 @@ void Molecule::voxel_computation(int iters)
 	}
 }
 
-
+void Molecule::fix_bond_lengths(int iters)
+{	if (!atoms) return;
+	int iter, i, j;
+	
+	for (iter=0; iter<iters; iter++)
+	{
+		for (i=0; atoms[i]; i++)
+		{	Point aloc = atoms[i]->get_location();
+			Bond** b = atoms[i]->get_bonds();
+			int g = atoms[i]->get_geometry();
+			
+			for (j=0; j<g; j++)
+			{
+				if (b[j]->btom)
+				{
+					Point bloc = b[j]->btom->get_location();
+					Vector v(bloc.subtract(aloc));
+					float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+					
+					v.r += 0.1 * (optimal-v.r);
+					
+					// TODO: Bond angles.
+					
+					b[j]->btom->move(aloc.add(v));
+				}
+			}
+		}
+	}
+	
+}
 
 
 

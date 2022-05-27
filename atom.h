@@ -17,6 +17,7 @@ class Bond
 	bool can_flip=false;
 	float flip_angle=0;				// signed.
 	float angular_momentum=0;
+	float total_rotations=0;
 	
 	Bond();
 	Bond(Atom* a, Atom* b, int card);

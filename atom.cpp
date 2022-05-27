@@ -832,6 +832,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
 	//cout << endl;
 	
 	if (can_flip) flip_angle = -flip_angle;
+	total_rotations += theta;
 
 	return true;
 }

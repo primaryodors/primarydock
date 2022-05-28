@@ -15,91 +15,123 @@ using namespace std;
 class Vector;
 
 class Point
-{	public:
-	float x=0, y=0, z=0;
-	float weight = 1;
-	
-	Point();
-	Point(Vector v);
-	Point(Vector* v);
-	Point(float x, float y, float z);
-	Point add(Point add_to) { return add(&add_to); }
-	Point add(Point* add_to);
-	Point add(Vector* add_to);
-	Point subtract(const Point subtracted);
-	Point subtract(const Point* subtracted);
-	Point subtract(Vector* subtracted) { Point pt(subtracted); return subtract(pt); }
-	Point negate();
-	float get_3d_distance(const Point reference) { return get_3d_distance(&reference); }
-	float get_3d_distance(const Point* reference);
-	Point multiply_3d_distance(const Point* reference, float r_mult);
-	bool pt_in_bounding_box(const Point* corner1, const Point* corner2);
-	float magnitude();
-	void scale(float new_magn);
-	
-	char* printable();
-	
-	Point& operator=(Vector v);
-	friend std::ostream& operator<<(std::ostream& os, const Vector& v);
+{
+public:
+    float x=0, y=0, z=0;
+    float weight = 1;
+
+    Point();
+    Point(Vector v);
+    Point(Vector* v);
+    Point(float x, float y, float z);
+    Point add(Point add_to)
+    {
+        return add(&add_to);
+    }
+    Point add(Point* add_to);
+    Point add(Vector* add_to);
+    Point subtract(const Point subtracted);
+    Point subtract(const Point* subtracted);
+    Point subtract(Vector* subtracted)
+    {
+        Point pt(subtracted);
+        return subtract(pt);
+    }
+    Point negate();
+    float get_3d_distance(const Point reference)
+    {
+        return get_3d_distance(&reference);
+    }
+    float get_3d_distance(const Point* reference);
+    Point multiply_3d_distance(const Point* reference, float r_mult);
+    bool pt_in_bounding_box(const Point* corner1, const Point* corner2);
+    float magnitude();
+    void scale(float new_magn);
+
+    char* printable();
+
+    Point& operator=(Vector v);
+    friend std::ostream& operator<<(std::ostream& os, const Vector& v);
 };
 
 class Vector
-{	public:
-	float r=0, theta=0, phi=0;
-	
-	Vector() { r = theta = phi = 0; }
-	Vector(const Point from);
-	Vector(const Point* from);
-	Vector(float r, float theta, float phi);
-	Vector negate() { Point pt(this); pt = pt.negate(); Vector v(&pt); return v; }
-	Vector add(Vector v) { return add(&v); };
-	Vector add(Vector* v);
-	
-	char* printable();
-	
-	Vector& operator=(Point p);
-	friend std::ostream& operator<<(std::ostream& os, const Point& p);
+{
+public:
+    float r=0, theta=0, phi=0;
+
+    Vector()
+    {
+        r = theta = phi = 0;
+    }
+    Vector(const Point from);
+    Vector(const Point* from);
+    Vector(float r, float theta, float phi);
+    Vector negate()
+    {
+        Point pt(this);
+        pt = pt.negate();
+        Vector v(&pt);
+        return v;
+    }
+    Vector add(Vector v)
+    {
+        return add(&v);
+    };
+    Vector add(Vector* v);
+
+    char* printable();
+
+    Vector& operator=(Point p);
+    friend std::ostream& operator<<(std::ostream& os, const Point& p);
 };
 
 class LocatedVector : public Vector
-{	public:
-	Point origin;
+{
+public:
+    Point origin;
 };
 
 class Rotation
-{	public:
-	Vector v;
-	float a=0;
-	Rotation()
-	{	a = 0;
-	};
-	
-	Rotation add(Rotation rot) { return add(&rot); };
-	Rotation add(Rotation* rot);
-	
-	char* printable();
+{
+public:
+    Vector v;
+    float a=0;
+    Rotation()
+    {
+        a = 0;
+    };
+
+    Rotation add(Rotation rot)
+    {
+        return add(&rot);
+    };
+    Rotation add(Rotation* rot);
+
+    char* printable();
 };
 
 class LocRotation : public Rotation
-{	public:
-	Point origin;
-	
-	LocRotation();
-	LocRotation(LocatedVector lv);
-	LocatedVector get_lv();
+{
+public:
+    Point origin;
+
+    LocRotation();
+    LocRotation(LocatedVector lv);
+    LocatedVector get_lv();
 };
 
 class Atom;
 
 class Tug
-{	public:
-	Vector vec;
-	Rotation rot;
-	
-	Tug() { ; }
-	Tug(Atom* atom, Point molcen, Vector pull);
-	
-	Tug add(Tug t);
+{
+public:
+    Vector vec;
+    Rotation rot;
+
+    Tug() { ; }
+    Tug(Atom* atom, Point molcen, Vector pull);
+
+    Tug add(Tug t);
 };
 
 class Bond;
@@ -111,23 +143,26 @@ class Region;
 class Rotation;
 
 union Star
-{	int n;
-	char* psz;
-	const char* cpsz;
-	void* p;
-	Atom* pa;
-	Atom** ppa;
-	Bond* pb;
-	Bond** ppb;
-	InteratomicForce* pif;
-	Molecule* pmol;
-	AminoAcid* paa;
-	Protein* pprot;
-	Region* preg;
-	Rotation* prot;
+{
+    int n;
+    char* psz;
+    const char* cpsz;
+    void* p;
+    Atom* pa;
+    Atom** ppa;
+    Bond* pb;
+    Bond** ppb;
+    InteratomicForce* pif;
+    Molecule* pmol;
+    AminoAcid* paa;
+    Protein* pprot;
+    Region* preg;
+    Rotation* prot;
 };
 
 Point average_of_points(Point* points, int count);
+Point average_of_points(Point* point, ...);
+Point average_of_points(int count, Point point, ...);
 float find_angle(float dx, float dy);
 float find_angle_delta(float a1, float a2);
 float find_3d_angle(Point* A, Point* B, Point* source);
@@ -160,7 +195,8 @@ std::string str_pad(const std::string &str, int pad_length, std::string pad_stri
 
 // From here: https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
 template <typename T> int sgn(T val)
-{	return (T(0) < val) - (val < T(0));
+{
+    return (T(0) < val) - (val < T(0));
 }
 
 std::ostream& operator<<(std::ostream& os, const Point& p);

@@ -10,9 +10,9 @@ void ext_mtl_coord_cnf_cb(int iter);
 
 class Region
 {	public:
-	int start;
-	int end;
-	std::string name;
+	int start=0;
+	int end=0;
+	std::string name="";
 };
 
 class Protein
@@ -45,6 +45,7 @@ class Protein
 	Molecule* metals_as_molecule();
 	AminoAcid** get_residues_can_collide(int resno);
 	bool aa_ptr_in_range(AminoAcid* aaptr);
+	Region get_region(std::string name);
 	
 	// Metrics functions.
 	float get_internal_collisions();

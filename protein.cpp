@@ -922,7 +922,11 @@ void Protein::set_region(std::string rgname, int start, int end)
 	regions[i].end = end;
 }
 
-
+Region Protein::get_region(std::string rgname)
+{	int i;
+	for (i=0; i<PROT_MAX_RGN; i++) if (regions[i].name == rgname) return regions[i];
+	return Region();
+}
 
 
 

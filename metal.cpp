@@ -36,6 +36,8 @@ int main(int argc, char** argv)
 	Point pocketcen;
 	bool pocketset = false;
 	bool dohelix = true;
+	char* rcpfile = NULL;
+	char* rcpinfo = NULL;
 	
 	j=0;
 	for (i=1; i<argc; i++)
@@ -54,10 +56,18 @@ int main(int argc, char** argv)
 		else if (!strcmp(argv[i], "-c")) charge = atoi(argv[++i]);
 		// else if (!strcmp(argv[i], "--nh")) dohelix = false;
 		else if (!strcmp(argv[i], "-e")) esym = argv[++i];
+		else if (!strcmp(argv[i], "-i"))
+		{	if (argc < i+2 || !argv[i+1]) throw 0xbadf12e;
+			rcpfile = argv[i+1];
+		}
 	}
 	
 	int numres = j;
-	if (!inpfile || !numres || !mcoordres[0] || (mcoorda[0] < argv[1]) || !esym || !outfile)
+	if (!inpfile 
+		||	(	(!numres || !mcoordres[0] || (mcoorda[0] < argv[1]) || !esym )
+				&& !rcpfile
+			)
+		|| !outfile)
 	{	cout << "Usage:" << endl;
 		cout << "metal -p {path/to/input.pdb} -r {resno}:{aname} -r {resno}:{aname} -r {resno}:{aname} -e {elem_sym} [-b {pocket.x} {pocket.y} {pocket.z}] -o {path/to/output.pdb}" << endl;
 		cout << endl << "Example:" << endl;
@@ -80,13 +90,48 @@ int main(int argc, char** argv)
 	p.load_pdb(pf);
 	fclose(pf);
 	
-	cout << "TMR1 angle: " << (p.get_helix_orientation( 21,  49)*fiftyseven-360) << endl;
-	cout << "TMR2 angle: " << (p.get_helix_orientation( 58,  81)*fiftyseven) << endl;
-	cout << "TMR3 angle: " << (p.get_helix_orientation( 94, 123)*fiftyseven-360) << endl;
-	cout << "TMR4 angle: " << (p.get_helix_orientation(143, 163)*fiftyseven) << endl;
-	cout << "TMR5 angle: " << (p.get_helix_orientation(196, 218)*fiftyseven-360) << endl;
-	cout << "TMR6 angle: " << (p.get_helix_orientation(236, 261)*fiftyseven) << endl;
-	cout << "TMR7 angle: " << (p.get_helix_orientation(268, 289)*fiftyseven-360) << endl;
+	if (rcpfile)
+	{	pf = fopen(rcpfile, "rb");
+		if (!pf) throw 0xbadf12e;
+		while (!feof(pf))
+		{	char buffer[16384];
+			fgets(buffer, 16361, pf);
+			if (buffer[0] >= ' ')
+			{	char** fields = chop_spaced_fields(buffer, '|');
+				
+				if (!strcmp(fields[0], "REGION"))
+				{	p.set_region(fields[1], atoi(fields[2]), atoi(fields[3]));
+				}
+				else if (!strcmp(fields[0], "METAL"))
+				{	esym = new char[strlen(fields[1])+4];
+					strcpy(esym, fields[1]);
+					
+					for (i=2; fields[i]; i++)
+					{	if (strstr(fields[i], ":"))
+						{	mcoordres[j] = atoi(&fields[i][3]);
+							mcoorda[j++] = strstr(fields[i], ":")+1;
+						}
+						else if (strstr(fields[i], "HELIX="))
+						{	dohelix = (fields[i][6] - '0');
+						}
+					}
+				}
+			}
+		}
+		fclose(pf);
+		numres = j;
+		
+		for (i=1; i<=7; i++)
+		{	char rgname[10]{};
+			sprintf(rgname, "TMR%d", i);	
+			Region rgn = p.get_region(rgname);
+			float turn = (i & 1) ? -360 : 0;
+			if (rgn.start) cout << rgname << " angle: " << (p.get_helix_orientation(rgn.start, rgn.end)*fiftyseven+turn) << endl;
+		}
+	}
+	
+	
+	
 	
 	int startres = mcoordres[0]-1, endres = mcoordres[numres-1]+1, stopat = mcoordres[numres-1]+15;
 	Point mtgt = pocketcen, wayuphigh = pocketcen;

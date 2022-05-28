@@ -463,17 +463,17 @@ int in_array(Star needle, Star* haystack)
 	return -1;
 }
 
-char** chop_spaced_fields(char* line)
+char** chop_spaced_fields(char* line, char separator)
 {	char** retval = new char*[100]{};
 	int i, j=0;
 	
-	if (line[0] == '\t') line[0] = ' ';
-	if (line[0] != ' ') retval[j++] = line;
+	if (separator == ' ' && line[0] == '\t') line[0] = separator;
+	if (line[0] != separator) retval[j++] = line;
 	for (i=1; line[i] && (line[i] != '\n'); i++)
-	{	if (line[i] == '\t') line[i] = ' ';
-		if (line[i-1] == ' ' && line[i] != ' ') retval[j++] = line+i;
-		else if (line[i-1] == 0 && line[i] != ' ') retval[j++] = line+i;
-		else if (line[i-1] != ' ' && line[i] == ' ') line[i] = 0;
+	{	if (separator == ' ' && line[i] == '\t') line[i] = separator;
+		if (line[i-1] == separator && line[i] != separator) retval[j++] = line+i;
+		else if (line[i-1] == 0 && line[i] != separator) retval[j++] = line+i;
+		else if (line[i-1] != separator && line[i] == separator) line[i] = 0;
 		if (j >= 99) break;
 	}
 	if (line[i] == '\n') line[i] = 0;

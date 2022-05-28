@@ -116,6 +116,16 @@ int main(int argc, char** argv)
 						}
 					}
 				}
+				else if (!strcmp(fields[0], "POCKET"))
+				{	if (!strcmp(fields[1], "type=A"))
+					{	char* pktf = strstr(fields[2], "=")+1;
+						pocketcen.x = atof(pktf);
+						pktf = strstr(fields[3], "=")+1;
+						pocketcen.y = atof(pktf);
+						pktf = strstr(fields[4], "=")+1;
+						pocketcen.z = atof(pktf);
+					}
+				}
 			}
 		}
 		fclose(pf);
@@ -133,7 +143,8 @@ int main(int argc, char** argv)
 	
 	
 	
-	int startres = mcoordres[0]-1, endres = mcoordres[numres-1]+1, stopat = mcoordres[numres-1]+15;
+	int startres, endres, stopat;
+	
 	Point mtgt = pocketcen, wayuphigh = pocketcen;
 	mtgt.y = 5000;
 	wayuphigh.y += 4000;
@@ -141,14 +152,29 @@ int main(int argc, char** argv)
 	Atom *Cend = aa->get_atom("C"), *Oend = aa->get_atom("O");
 	Point Cpt = Cend->get_location(), Opt = Oend->get_location();
 	if (dohelix)
-	{	cout << "Extending strand." << endl;
+	{	startres = mcoordres[0]-1;
+		endres = mcoordres[numres-1]+1;
+		Region rgn = p.get_region("TMR5");
+		stopat = rgn.start-1;
+		
+		/*cout << "Extending strand." << endl;
 		p.conform_backbone(startres-15, stopat, Cend, wayuphigh, 25);
 		
 		save_transitional_pdb(&p);
+		*/
 		
 		cout << "Generating an alpha helix." << endl;
 		p.make_helix(startres, endres, stopat, ALPHA_PHI, ALPHA_PSI);
 		save_transitional_pdb(&p);
+		
+		// Move the start of the helix to above TMR5.
+		
+		// Move the end of the helix to about 2/3 of the way to a point above TMR3.
+		
+		// Find a point along the region between the helix and TMR5 and move it between the helix and pocket center.
+		
+		// Just from the point found in the previous step, reconnect the loose end to TMR5.
+		
 	}
 	
 	cout << "Coordinating metal ion." << endl;
@@ -167,7 +193,7 @@ int main(int argc, char** argv)
 		save_transitional_pdb(&p);
 		cout << "Extending strand further." << endl;
 		p.conform_backbone(endres, stopat, Cend, wayuphigh, 25);
-		save_transitional_pdb(&p);*/
+		save_transitional_pdb(&p);
 		cout << "Bringing the metal over the pocket center." << endl;
 		p.conform_backbone(mcoordres[0]-15, stopat, m, mtgt, 50);
 		save_transitional_pdb(&p);
@@ -182,7 +208,7 @@ int main(int argc, char** argv)
 		
 		cout << "Reconnecting broken pieces." << endl;
 		p.conform_backbone(endres, stopat, Cend, Cpt, Oend, Opt, 50);
-		save_transitional_pdb(&p);
+		save_transitional_pdb(&p);*/
 		
 		// Reconform the head segment.
 		// p.conform_backbone(20, 1, 50, 15);

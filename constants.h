@@ -45,8 +45,27 @@
 #define SPHREACH_MAX 1024
 
 #define PROT_MAX_RGN 40
+
+// Torsion angles for various helices and for beta strands.
 #define ALPHA_PHI fiftyseventh*-61
 #define ALPHA_PSI fiftyseventh*-43
+#define BETA_PHI fiftyseventh*-140
+#define BETA_PSI fiftyseventh*130
+#define _310_PHI fiftyseventh*-49
+#define _310_PSI fiftyseventh*-26
+#define PI_PHI fiftyseventh*-55
+#define PI_PSI fiftyseventh*-70
+
 
 #endif
+
+
+
+
+
+
+
+
+
+
 

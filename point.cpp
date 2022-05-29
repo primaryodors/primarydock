@@ -1,7 +1,7 @@
 
-#include <math.h>
+#include <cmath>
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -11,7 +11,7 @@
 using namespace std;
 
 const char* Greek = "ABGDEZHQIKLMNJOPRSTYFXCW";
-std::ofstream *debug = NULL;
+std::ofstream *debug = nullptr;
 bool last_iter = false;
 
 Point::Point()

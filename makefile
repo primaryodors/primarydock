@@ -58,3 +58,6 @@ podock: podock.cpp point.cpp atom.o molecule.o intera.o aminoacid.o protein.o
 
 point_report: point_test
 	./point_test >point_test.approved.txt
+
+aniso_report: aniso_test
+	./aniso_test >aniso_test.approved.txt

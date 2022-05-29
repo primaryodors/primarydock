@@ -573,7 +573,7 @@ void Protein::conform_backbone(int startres, int endres,
     }
 
 	set_collidables();
-    float tolerance = 1.2, alignfactor = 10;
+    float tolerance = 1.2, alignfactor = 100;
     for (iter=0; iter<iters; iter++)
     {
         cout << "Iteration " << iter << endl;
@@ -588,7 +588,8 @@ void Protein::conform_backbone(int startres, int endres,
                 AminoAcid* aa = get_residue(i);
                 AminoAcid** rcc = get_residues_can_collide(i);
                 if (!rcc) cout << "No collidables." << endl;
-                bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                if (a1)		bind -= aa->get_intermol_collisions(rcc);
+                else		bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1)
             {
@@ -612,7 +613,8 @@ void Protein::conform_backbone(int startres, int endres,
                 {
                     AminoAcid* aa = get_residue(i);
                     AminoAcid** rcc = get_residues_can_collide(i);
-                    bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                    if (a1)		bind1 -= aa->get_intermol_collisions(rcc);
+                	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
                 }
                 if (a1)
                 {
@@ -649,7 +651,8 @@ void Protein::conform_backbone(int startres, int endres,
             {
                 AminoAcid* aa = get_residue(i);
                 AminoAcid** rcc = get_residues_can_collide(i);
-                bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                if (a1)		bind1 -= aa->get_intermol_collisions(rcc);
+            	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1)
             {

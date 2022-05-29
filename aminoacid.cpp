@@ -149,7 +149,9 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     }
 
     // hydrogenate();
-    minimize_internal_collisions();
+    // minimize_internal_collisions();
+    rotate_backbone_abs(N_asc, M_PI);
+    rotate_backbone_abs(CA_asc, M_PI);
 }
 
 void AminoAcid::save_pdb(FILE* os, int atomno_offset)

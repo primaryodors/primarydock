@@ -165,7 +165,7 @@ int main(int argc, char** argv)
 
 
 
-    int startres, hxstart, hxend, endres;
+    int startres, hxstart, hxend, endres, res;
     float stepht = 6;
 
     Point mtgt = pocketcen, wayuphigh = pocketcen;
@@ -220,7 +220,7 @@ int main(int argc, char** argv)
         	p.get_atom_location(endres+4, "CA")
         	);
         pt5.y += stepht*2;
-        p.conform_backbone(startres, endres, p.get_atom(hxstart, "CA"), pt5, 15);
+    	p.conform_backbone(startres, endres, p.get_atom(hxstart, "CA"), pt5, 10);
         save_transitional_pdb(&p);
         
         cout << "Extending the loose strand." << endl;

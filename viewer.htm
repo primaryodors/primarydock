@@ -1,20 +1,21 @@
 <html>
 <head>
+<meta charset="UTF-8">
 <title>Viewer - podock</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-            <script>
-            var nglcitation
-            = "AS Rose, AR Bradley, Y Valasatava, JM Duarte, A Prlić and PW Rose.\n"
-              + "Web-based molecular graphics for large complexes.\n"
-              + "ACM Proceedings of the 21st International Conference on Web3D Technology (Web3D '16):\n"
-              + "185-186, 2016. doi:10.1145/2945292.2945324\n"
-              + "\n"
-              + "AS Rose and PW Hildebrand.\n"
-              + "NGL Viewer: a web application for molecular visualization.\n"
-              + "Nucl Acids Res (1 July 2015) 43 (W1):\n"
-              + "W576-W579 first published online April 29, 2015.\n"
-              + "doi:10.1093/nar/gkv402";
+<script>
+var nglcitation
+	= "AS Rose, AR Bradley, Y Valasatava, JM Duarte, A Prlić and PW Rose.\n"
+	+ "Web-based molecular graphics for large complexes.\n"
+	+ "ACM Proceedings of the 21st International Conference on Web3D Technology (Web3D '16):\n"
+	+ "185-186, 2016. doi:10.1145/2945292.2945324\n"
+	+ "\n"
+	+ "AS Rose and PW Hildebrand.\n"
+	+ "NGL Viewer: a web application for molecular visualization.\n"
+	+ "Nucl Acids Res (1 July 2015) 43 (W1):\n"
+	+ "W576-W579 first published online April 29, 2015.\n"
+	+ "doi:10.1093/nar/gkv402";
 </script>
 <style>
 body
@@ -23,15 +24,43 @@ body
 	overflow: hidden;
 }
 
+a
+{	color: #39f;
+	text-decoration: none;
+}
+a:hover
+{
+	text-decoration: underline;
+}
+
 #citefloat
 {
 	position: fixed;
+	text-align: right;
     right: 25px;
     bottom: 15px;
 	font-family: Verdana, Arial, Sans-Serif;
     font-size: 11px;
 	color: #06c;
-	cursor: pointer;
+}
+
+#citefloat span
+{
+    background-color: rgba(0,0,0,0.53);
+	color: rgba(0, 128, 255, 0);
+	font-size: 15px;
+	transition: color 2s, height 2s;
+	text-align: left;
+	display: block;
+	height: 0px;
+	overflow: hidden;
+}
+
+#citefloat:hover span
+{
+	color: rgba(192, 192, 192, 1);
+	display: block;
+	height: auto;
 }
 
 #ctrls div
@@ -553,7 +582,7 @@ function loadFile(fileData, fileName = "")
                     var j;
                     for (j=1; j<fields.length; j++)
                     {
-                        var m = fields[j].match(/[0-9] {3} [:]/);
+                        var m = fields[j].match(/[0-9]{3}[:]/);
                         if (m && m.length)
                             mtlcoord.push(parseInt(m[0]));
                     }
@@ -809,9 +838,15 @@ $('input[type=file]').on('input', getFileContents);
 </script>
 
 <div id="citefloat">
-	<a onclick="alert(nglcitation);">Visualization using NGL Viewer</a>
+	<span>
+	</span>
+	<br>
+	<a href="https://nglviewer.org/ngl/api/">Visualization using NGL Viewer</a>
 </div>
 
+<script>
+$('#citefloat span')[0].innerText = nglcitation;
+</script>
 
 
 

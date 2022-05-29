@@ -509,6 +509,8 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
             if (i == endres) break;
         }
     }
+    
+    set_collidables();
 }
 
 void Protein::conform_backbone(int startres, int endres, int iters, bool backbone_atoms_only)
@@ -736,6 +738,8 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         }
     }
 #endif
+	
+	set_collidables();
 }
 
 void Protein::delete_residue(int resno)

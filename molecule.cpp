@@ -1192,7 +1192,6 @@ Bond** Molecule::get_rotatable_bonds()
                     btemp[bonds++] = lb[j];
                     btemp[bonds] = 0;
                 }
-                else lb[j]->can_rotate = false;
             }
             if (lb) delete[] lb;
         }

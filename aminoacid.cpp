@@ -149,7 +149,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     }
 
     // hydrogenate();
-    // minimize_internal_collisions();
+	minimize_internal_collisions();
     for (i=0; i<100; i++)
     {
 		rotate_backbone_abs(N_asc, 0);
@@ -907,6 +907,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     }
     if (!atom || !btom) return retval;
     Bond* b = atom->get_bond_between(btom);
+    if (!m_mcoord) b->can_rotate = true;
     
 	atom = get_atom("HN");
 	if (!atom) atom = get_atom("H");
@@ -924,9 +925,9 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     	float r = atom->get_location().get_3d_distance(btom->get_location());
     	if (r < bestr)
     	{	bestrad = fiftyseventh*i;
+    		bestr = r;
     	}
     }
-    
 
     // To this maximum stretch angle, add the input angle and do the backbone rotation.
     LocatedVector retlv = rotate_backbone(dir, bestrad+angle);

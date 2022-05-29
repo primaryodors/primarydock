@@ -796,6 +796,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
     for (i=startres; i<=endres; i++)
     {
     	aas[i] = get_residue(i);
+    	aas[i]->movability = MOV_FLEXONLY;
     }
     aas[i] = 0;
     Molecule::multimol_conform(aas, 25);

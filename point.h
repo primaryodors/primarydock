@@ -48,7 +48,7 @@ public:
     float magnitude();
     void scale(float new_magn);
 
-    char* printable();
+    char* printable() const;
 
     Point& operator=(Vector v);
     friend std::ostream& operator<<(std::ostream& os, const Vector& v);
@@ -79,7 +79,7 @@ public:
     };
     Vector add(Vector* v);
 
-    char* printable();
+    char* printable() const;
 
     Vector& operator=(Point p);
     friend std::ostream& operator<<(std::ostream& os, const Point& p);

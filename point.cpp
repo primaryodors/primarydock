@@ -99,14 +99,14 @@ float Point::get_3d_distance(const Point* reference)
     return sqrt(dx*dx + dy*dy + dz*dz);
 }
 
-char* Point::printable()
+char* Point::printable() const
 {
     char* buffer = new char[256] {};
     sprintf(buffer, "[%f,%f,%f]", x, y, z);
     return buffer;
 }
 
-char* Vector::printable()
+char* Vector::printable() const
 {
     char* buffer = new char[256] {};
     sprintf(buffer, "[φ=%f°, θ=%f°, r=%f]", phi*180/M_PI, theta*180/M_PI, r);

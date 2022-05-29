@@ -30,6 +30,7 @@ bool Protein::add_residue(const int resno, const char aaletter)
     else if (resno % 256)
     {
         AminoAcid** oldres = residues;
+        char* oldseq = sequence;
         residues = new AminoAcid*[resno+261] {};
         sequence = new char[resno+261] {};
         ca = new Atom*[resno+261] {};
@@ -37,8 +38,10 @@ bool Protein::add_residue(const int resno, const char aaletter)
         for (i=0; oldres[i]; i++)
         {
             residues[i] = oldres[i];
+            sequence[i] = oldseq[i];
         }
         residues[i] = 0;
+        sequence[i] = 0;
     }
 
     i = resno-1;
@@ -89,14 +92,14 @@ Point Protein::get_atom_location(int resno, const char* aname)
 	return aa->get_atom_location(aname);
 }
 
-bool Protein::add_sequence(const char* sequence)
+bool Protein::add_sequence(const char* lsequence)
 {
-    if (!sequence) return false;
+    if (!lsequence) return false;
 
     int i;
-    for (i=0; sequence[i]; i++)
+    for (i=0; lsequence[i]; i++)
     {
-        add_residue(i+1, sequence[i]);
+        add_residue(i+1, lsequence[i]);
     }
 
     set_collidables();
@@ -278,16 +281,37 @@ void Protein::set_collidables()
     }
 
     res_can_coll[seqlen] = 0;
+    
+    /*for (i=0; i<seqlen; i++)
+    {
+    	cout << i << ": ";
+    	for (j=0; res_can_coll[i][j]; j++)
+    		cout << *res_can_coll[i][j] << " ";
+    	cout << endl;
+    }*/
 }
 
 AminoAcid** Protein::get_residues_can_collide(int resno)
 {
     if (!residues) return 0;
+	if (!res_can_coll) set_collidables();
 
-    int i;
+    int i, j;
     for (i=0; residues[i]; i++)
     {
-        if (residues[i]->get_residue_no() == resno) return res_can_coll[i];
+        if (residues[i]->get_residue_no() == resno)
+        {
+        	if (!res_can_coll[i] || !res_can_coll[i][0]) set_collidables();
+        	/*cout << i << ": " << flush;
+        	if (res_can_coll[i] && res_can_coll[i][0])
+        	{
+        		cout << *res_can_coll[i][0] << endl;
+				for (j=0; res_can_coll[i][j]; j++)
+					cout << j << " " << flush;
+				cout << endl;
+			}*/
+        	return res_can_coll[i];
+    	}
     }
 
     return 0;
@@ -535,7 +559,7 @@ void Protein::conform_backbone(int startres, int endres,
                               )
 {
     int inc = sgn(endres-startres);
-    int res, i, iter;
+    int res, i, j, iter;
     bb_rot_dir dir1 = (inc>0) ? N_asc : CA_desc,
                dir2 = (inc>0) ? CA_asc : C_desc;
     
@@ -548,6 +572,7 @@ void Protein::conform_backbone(int startres, int endres,
     	momenta2[res-minres] = randsgn()*_fullrot_steprad;
     }
 
+	set_collidables();
     float tolerance = 1.2, alignfactor = 10;
     for (iter=0; iter<iters; iter++)
     {
@@ -562,6 +587,7 @@ void Protein::conform_backbone(int startres, int endres,
             {
                 AminoAcid* aa = get_residue(i);
                 AminoAcid** rcc = get_residues_can_collide(i);
+                if (!rcc) cout << "No collidables." << endl;
                 bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1)

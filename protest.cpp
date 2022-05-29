@@ -34,6 +34,7 @@ int main(int argc, char** argv)
 
     Protein p(namearg?argv[namearg]:"Test");
     p.add_sequence(argv[seqarg]);
+    p.set_collidables();
     
     // Stretch it out.
     Point pt = p.get_atom_location(1, "N");

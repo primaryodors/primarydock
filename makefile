@@ -56,6 +56,5 @@ bktest: backbone_test.cpp atom.o point.o intera.o molecule.o aminoacid.o protein
 podock: podock.cpp point.cpp atom.o molecule.o intera.o aminoacid.o protein.o
 	$(CC) podock.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o podock $(CFLAGS)
 
-
-
-
+point_report: point_test
+	./point_test >point_test.approved.txt

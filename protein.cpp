@@ -243,8 +243,6 @@ void Protein::set_collidables()
 
     if (res_can_coll)
     {
-        /*for (i=0; res_can_coll[i]; i++)
-        	delete res_can_coll[i];*/
         delete[] res_can_coll;
     }
 
@@ -563,7 +561,6 @@ void Protein::conform_backbone(int startres, int endres,
             for (i=res; i != endres; i += inc)
             {
                 AminoAcid* aa = get_residue(i);
-                set_collidables();
                 AminoAcid** rcc = get_residues_can_collide(i);
                 bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
@@ -588,7 +585,6 @@ void Protein::conform_backbone(int startres, int endres,
                 for (i=res; i != endres; i += inc)
                 {
                     AminoAcid* aa = get_residue(i);
-                    set_collidables();
                     AminoAcid** rcc = get_residues_can_collide(i);
                     bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
                 }
@@ -604,6 +600,7 @@ void Protein::conform_backbone(int startres, int endres,
                 }
 
                 // If no, put it back.
+                if (res == startres) cout << bind << " v. " << bind1 << endl;
                 if (bind1 < tolerance*bind)
                 {
                     rotate_backbone_partial(res, endres, dir1, -angle);
@@ -612,6 +609,7 @@ void Protein::conform_backbone(int startres, int endres,
                 else
                 {
                     if (bind1 < bind) bind = bind1;
+                    momenta1[res-minres] *= 1.05;
                 }
             }
 
@@ -624,7 +622,6 @@ void Protein::conform_backbone(int startres, int endres,
             for (i=res; i != endres; i += inc)
             {
                 AminoAcid* aa = get_residue(i);
-                set_collidables();
                 AminoAcid** rcc = get_residues_can_collide(i);
                 bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
@@ -640,13 +637,19 @@ void Protein::conform_backbone(int startres, int endres,
             }
 
             // If no, put it back.
-            if (bind1 < bind)
+            if (res == startres) cout << bind << " vs. " << bind1 << endl;
+            if (bind1 < tolerance*bind)
             {
                 rotate_backbone_partial(res, endres, dir2, -angle);
                 momenta2[res-minres] *= -0.666;
             }
+            else
+            {
+                momenta2[res-minres] *= 1.05;
+            }
 
-            alignfactor *= 1.1;
+            alignfactor *= 1.01;
+            tolerance = ((tolerance-1)*0.97)+1;
         }
     }
 }

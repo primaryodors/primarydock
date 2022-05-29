@@ -648,7 +648,7 @@ void Protein::conform_backbone(int startres, int endres,
                 momenta2[res-minres] *= 1.05;
             }
 
-            alignfactor *= 1.01;
+            alignfactor *= 1.003;
             tolerance = ((tolerance-1)*0.97)+1;
         }
     }

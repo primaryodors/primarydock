@@ -10,6 +10,15 @@ using namespace std;
 int main(int argc, char** argv)
 {
     int i, seqarg=1, namearg=0;
+    
+    if (argc < 2)
+    {
+    	cout << "Usage:" << endl << "protest [sequence]" << endl;
+    	cout << endl;
+    	cout << "Optionally, you can override the default aminos.dat file with --dat [filename], for example if using non-standard amino acids.";
+    	cout << endl;
+    	return -1;
+    }
 
     if (!strcmp("--dat", argv[seqarg]))
     {
@@ -25,6 +34,12 @@ int main(int argc, char** argv)
 
     Protein p(namearg?argv[namearg]:"Test");
     p.add_sequence(argv[seqarg]);
+    
+    // Stretch it out.
+    Point pt = p.get_atom_location(1, "N");
+    pt.x += 10000;
+    int len = p.get_seq_length();
+    p.conform_backbone(1, len, p.get_atom(len, "C"), pt, 50);
 
     const char* outfn = "test.pdb";
     FILE* pf = fopen(outfn, "wb");

@@ -19,25 +19,19 @@
 <style>
 body
 {
-color:
-#6af;
-overflow:
-    hidden;
+	color: #6af;
+	overflow: hidden;
 }
 
 #citefloat
 {
-position:
-    fixed;
+	position: fixed;
     right: 25px;
     bottom: 15px;
-font-family:
-    Verdana, Arial, Sans-Serif;
+	font-family: Verdana, Arial, Sans-Serif;
     font-size: 11px;
-color:
-#06c;
-cursor:
-    pointer;
+	color: #06c;
+	cursor: pointer;
 }
 
 #ctrls div
@@ -47,8 +41,7 @@ cursor:
 
 #posey
 {
-background-color:
-#123;
+	background-color: #123;
     min-width: 71px;
     padding-left: 5px;
     padding-right: 5px;
@@ -56,14 +49,12 @@ background-color:
 
 .clickme
 {
-cursor:
-    pointer;
+	cursor: pointer;
 }
 
 .posebtn
 {
-background-color:
-#246;
+	background-color: #246;
     border-top: 2px solid #47a;
     border-left: 2px solid #369;
     border-right: 2px solid #234;
@@ -73,17 +64,14 @@ background-color:
     padding-right: 3px;
     margin-left: 2px;
     margin-right: 2px;
-cursor:
-    pointer;
+	cursor: pointer;
     font-size: 14px;
-font-family:
-    Verdana, Arial, sans-serif;
+	font-family: Verdana, Arial, sans-serif;
 }
 
 .posebtn.hilite
 {
-background-color:
-#369;
+	background-color: #369;
     border-top: 2px solid #68a;
     border-left: 2px solid #579;
     border-right: 2px solid #246;
@@ -92,23 +80,19 @@ background-color:
 
 .nodebtn
 {
-background-color:
-#234;
+	background-color: #234;
     padding-left: 5px;
     padding-right: 5px;
     margin-left: 0px;
     margin-right: 0px;
-cursor:
-    pointer;
+	cursor: pointer;
     font-size: 14px;
-font-family:
-    Verdana, Arial, sans-serif;
+	font-family: Verdana, Arial, sans-serif;
 }
 
 .nodebtn.hilite
 {
-background-color:
-#357;
+	background-color: #357;
 }
 
 input[type=file]
@@ -118,46 +102,35 @@ input[type=file]
 
 input, select
 {
-background-color:
-#036;
-color:
-#9cf;
+	background-color: #036;
+	color: #9cf;
     border: 1px solid #06c;
     border-radius: 5px;
 }
 
 option.agonist
 {
-background-color:
-#044;
-color:
-#9ef;
-font-weight:
-    bold;
+	background-color: #044;
+	color: #9ef;
+	font-weight: bold;
 }
 
 option.non_agonist
 {
-background-color:
-#234;
-color:
-#bcd;
+	background-color: #234;
+	color: #bcd;
 }
 
 option.antagonist
 {
-background-color:
-#410;
-color:
-#fb9;
+	background-color: #410;
+	color: #fb9;
 }
 
 option.unknown
 {
-background-color:
-#000;
-color:
-#999;
+	background-color: #000;
+	color: #999;
 }
 
 #clip
@@ -167,10 +140,10 @@ color:
 
 </style>
 <script src="https://unpkg.com/ngl@0.10.4/dist/ngl.js"></script>
-            <script>
-            /******************************************************************************/
+<script>
+/******************************************************************************/
 // http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-            function getParameterByName(name, url)
+function getParameterByName(name, url)
 {
     if (!url)
     {
@@ -187,49 +160,49 @@ color:
 </script>
 </head>
 <body bgcolor="#000">
-              <div id="ctrls" style="display: flex; flex-wrap: wrap;">
-                                    <div id="filediv">
-                                            <input type="file">
-                                                    </div>
+<div id="ctrls" style="display: flex; flex-wrap: wrap;">
+    <div id="filediv">
+		<input type="file">
+    </div>
 
-                                                    <div id="posey" title="Use the A-Z keys or the up and down arrow keys to choose poses when viewing dock results.">&nbsp;
+<div id="posey" title="Use the A-Z keys or the up and down arrow keys to choose poses when viewing dock results.">&nbsp;
 </div>
 
-<div	id="pnodz"
-           title="Use the 0-9 keys or the left and right arrow keys to choose nodes when viewing dock results. Shift+A-Z selects nodes 10 - 35."
-                 >&nbsp;
+<div id="pnodz"
+     title="Use the 0-9 keys or the left and right arrow keys to choose nodes when viewing dock results. Shift+A-Z selects nodes 10 - 35."
+     >&nbsp;
 </div>
 
 <div id="clipslide">
-        Clip:
-        <input type="range" id="clip" min="0" max="100" step="1" value="0" class="slider" onkeyup="this.blur();">
-                                   <span id="prsv" style="display: none;">
-                                            <input type="checkbox" id="preserve" checked onchange="$('#clip').trigger('input');"> Preserve Ligand
-                                                    </span>
-                                                    </div>
+Clip:
+<input type="range" id="clip" min="0" max="100" step="1" value="0" class="slider" onkeyup="this.blur();">
+<span id="prsv" style="display: none;">
+<input type="checkbox" id="preserve" checked onchange="$('#clip').trigger('input');"> Preserve Ligand
+</span>
+</div>
 
-                                                    <div id="center">
-                                                            Center:
-                                                            <a class="posebtn clickme" onclick="gmodel[0].autoView();" title="Middle-click an atom to center it.">Model</a>
-                                                                        <a class="posebtn clickme" onclick="curr_ligand.autoView();" id="ligbtn" style="display: none;">Ligand</a>
-                                                                                    </div>
-                                                                                    </div>
-                                                                                    <center>
-                                                                                    <div id="viewport" style="width:1800px; height:880px; background-color: #000;"></div>
-                                                                                            </center>
-                                                                                            <script>
+<div id="center">
+Center:
+<a class="posebtn clickme" onclick="gmodel[0].autoView();" title="Middle-click an atom to center it.">Model</a>
+<a class="posebtn clickme" onclick="curr_ligand.autoView();" id="ligbtn" style="display: none;">Ligand</a>
+</div>
+</div>
+<center>
+<div id="viewport" style="width:1800px; height:880px; background-color: #000;"></div>
+</center>
+<script>
 
 // Modify this array to your preferred TMR color scheme.
-                                                                                            var tmcolor =
-        {
-            1: 0x666666,
-            2: 0x0099ff,
-            3: 0x00ff66,
-            4: 0x6600ff,
-            5: 0xccff00,
-            6: 0xff9900,
-            7: 0xcc0033
-        }
+var tmcolor =
+{
+    1: 0x666666,
+    2: 0x0099ff,
+    3: 0x00ff66,
+    4: 0x6600ff,
+    5: 0xccff00,
+    6: 0xff9900,
+    7: 0xcc0033
+}
 
 var stage = new NGL.Stage("viewport");
 var gmodel = [], model = [], is_ligand = [], mrep = [], mrparams = [], mpos = [], mnod = [];
@@ -253,77 +226,64 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
     {
         switch (atom.atomType.element)
         {
-        case 'H':
-            return atom.isBackbone() ? 0x79949b : 0xd1f5ff;
-        case 'C':
+        	case 'H': return atom.isBackbone() ? 0x79949b : 0xd1f5ff;
+            
+        	case 'C':
             if (atom.isBackbone()) return 0x666666;
             else switch (atom.resname)
-                {
+            {
                 case 'GLY':
-                    return 0xcccccc;
+                return 0xcccccc;
 
                 case 'ALA':
                 case 'ILE':
                 case 'LEU':
                 case 'PRO':
                 case 'VAL':
-                    return 0x999999;
+                return 0x999999;
 
                 case 'MET':
                 case 'CYS':
-                    return 0xcccc99;
+                return 0xcccc99;
 
                 case 'PHE':
                 case 'TRP':
                 case 'TYR':
-                    return 0x886688;
+                return 0x886688;
 
                 case 'SER':
                 case 'THR':
                 case 'GLN':
                 case 'ASN':
-                    return 0x66cc99;
+                return 0x66cc99;
 
                 case 'ASP':
                 case 'GLU':
-                    return 0xff9999;
+                return 0xff9999;
 
                 case 'HIS':
                 case 'LYS':
                 case 'ARG':
-                    return 0x6699ff;
+                return 0x6699ff;
 
                 default:
-                    return 0x666666;
-                }
+                return 0x666666;
+            }
 
-        case 'N':
-            return atom.isBackbone() ? 0x000066 : 0x0066FF;
-        case 'O':
-            return atom.isBackbone() ? 0x660000 : 0xFF0000;
-        case 'P':
-            return 0xff77c6;
-        case 'S':
-            return 0xffdd00;
-        case 'Cl':
-            return 0x33cc00;
-        case 'Cu':
-            return 0xe5a072;
-        case 'Zn':
-            return 0x92b0cc;
-        case 'Na':
-            return 0xffcc00;
-        case 'Mg':
-            return 0x99ffcc;
-        case 'K':
-            return 0x9966ff;
-        case 'Ca':
-            return 0xf7f7f7;
-        case 'Fe':
-            return 0x845f42;
+        	case 'N': return atom.isBackbone() ? 0x000066 : 0x0066FF;
+        	case 'O': return atom.isBackbone() ? 0x660000 : 0xFF0000;
+        	case 'P': return 0xff77c6;
+        	case 'S': return 0xffdd00;
+        	case 'Cl': return 0x33cc00;
+        	case 'Cu': return 0xe5a072;
+        	case 'Zn': return 0x92b0cc;
+        	case 'Na': return 0xffcc00;
+        	case 'Mg': return 0x99ffcc;
+        	case 'K': return 0x9966ff;
+        	case 'Ca': return 0xf7f7f7;
+        	case 'Fe': return 0x845f42;
 
-        default:
-            return 0x99aabb;
+        	default: return 0x99aabb;
         }
 
         if (atom.serial == 5) console.log(atom);
@@ -361,10 +321,10 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 
 stage.setParameters(
 {
-'backgroundColor': '#000',
-'ambientColor': '#6cc',
+	'backgroundColor': '#000',
+	'ambientColor': '#6cc',
     'ambientIntensity': 0.5,
-'lightColor': '#f9c',
+	'lightColor': '#f9c',
     'lightIntensity': 0.6,
 });
 
@@ -381,14 +341,14 @@ var url = 'http://primaryodors.org/sdf.php';
 var molid = getParameterByName('mol') ? getParameterByName('mol') : 'FRUCON';
 $.ajax(
 {
-url: url,
-data:
+	url: url,
+	data:
     {
-m: molid
+		m: molid
     },
-success: function(result)
+	success: function(result)
     {
-var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
+		var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
         stage.loadFile( stringBlob, { ext: "sdf" } ).then( function( comp )
         {
             comp.addRepresentation( "ball+stick", { multipleBond: true } );
@@ -572,14 +532,14 @@ function loadFile(fileData, fileName = "")
 
     $.ajax(
     {
-url: "http://www.primaryodors.org/recepinfo.php",
-data:
+		url: "http://www.primaryodors.org/recepinfo.php",
+		data:
         {
-recep: orid,
+			recep: orid,
         },
-fext: fext,
-fileData: fileData,
-success: function(poresult)
+		fext: fext,
+		fileData: fileData,
+		success: function(poresult)
         {
             poresult = poresult.split("\n");
 
@@ -613,8 +573,8 @@ success: function(poresult)
             var fext = this.fext;
             switch (fext)
             {
-            case 'sdf':
-            case 'pdb':
+		        case 'sdf':
+		        case 'pdb':
                 stage.removeAllComponents();
                 window.result = fileData;
                 var stringBlob = new Blob( [ fileData ], { type: 'text/plain'} );
@@ -631,7 +591,7 @@ success: function(poresult)
                         comp.addRepresentation( "cartoon",
                         {
                             opacity: 0.8,
-colorScheme: PODefRgnScheme,
+							colorScheme: PODefRgnScheme,
                             // colorScale: 'rainbow',
                             metalness: 0.15
                         });
@@ -666,7 +626,7 @@ colorScheme: PODefRgnScheme,
                             comp1.addRepresentation( "licorice",
                             {
                                 opacity: 1,
-colorScheme: PODefScheme,
+								colorScheme: PODefScheme,
                                 metalness: 0.13,
                             });
                             gmodel.push(comp1);
@@ -677,7 +637,7 @@ colorScheme: PODefScheme,
                             comp2.addRepresentation( "spacefill",
                             {
                                 opacity: 0.95,
-colorScheme: PODefScheme,
+								colorScheme: PODefScheme,
                                 metalness: 0.53,
                             });
                             gmodel.push(comp2);
@@ -688,19 +648,19 @@ colorScheme: PODefScheme,
                 } );
                 break;
 
-            case 'txt':
+            	case 'txt':
                 stage.removeAllComponents();
                 var lines = fileData.split("\n");
 
                 $.ajax(
                 {
-url: "http://www.primaryodors.org/orpdb.php",
-data:
+					url: "http://www.primaryodors.org/orpdb.php",
+					data:
                     {
-recep: orid,
-mod: "m",
+						recep: orid,
+						mod: "m",
                     },
-success: function(poresult)
+					success: function(poresult)
                     {
                         var i;
                         var shiny = [];
@@ -719,7 +679,7 @@ success: function(poresult)
                             comp3.addRepresentation( "cartoon",
                             {
                                 opacity: 0.7,
-colorScheme: PODefRgnScheme,
+								colorScheme: PODefRgnScheme,
                                 metalness: 0.13,
                             });
                             gmodel.push(comp3);
@@ -733,7 +693,7 @@ colorScheme: PODefRgnScheme,
                                 comp4.addRepresentation( "spacefill",
                                 {
                                     opacity: 0.95,
-colorScheme: PODefScheme,
+									colorScheme: PODefScheme,
                                     metalness: 0.53,
                                 });
                                 gmodel.push(comp4);
@@ -790,8 +750,7 @@ colorScheme: PODefScheme,
                                 var rparam =
                                 {
                                     opacity: 0.8,
-colorScheme:
-                                    PODefScheme,
+									colorScheme: PODefScheme,
                                 };
 
                                 model.push(comp);
@@ -809,8 +768,7 @@ colorScheme:
                             {
                                 var rparam =
                                 {
-multipleBond:
-                                    true,
+									multipleBond: true,
                                 };
 
                                 model.push(comp);
@@ -840,7 +798,7 @@ multipleBond:
                 }, 259);
                 break;
 
-            default:
+            	default:
                 alert('Unknown file type ' + fext);
             }
         }
@@ -848,12 +806,11 @@ multipleBond:
 }
 
 $('input[type=file]').on('input', getFileContents);
-
 </script>
 
 <div id="citefloat">
-        <a onclick="alert(nglcitation);">Visualization using NGL Viewer</a>
-                   </div>
+	<a onclick="alert(nglcitation);">Visualization using NGL Viewer</a>
+</div>
 
 
 

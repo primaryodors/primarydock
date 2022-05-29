@@ -177,7 +177,7 @@ int main(int argc, char** argv)
     if (dohelix)
     {
         hxstart = mcoordres[0]-1;
-        hxend = mcoordres[numres-1]+1;
+        hxend = mcoordres[numres-1]+3;
         Region rgn = p.get_region("TMR4");
         startres = rgn.end+1;
         rgn = p.get_region("TMR5");
@@ -190,11 +190,11 @@ int main(int argc, char** argv)
     	Opt = Oend->get_location();
         
 
-        /*cout << "Extending strand." << endl;
-        p.conform_backbone(hxstart-15, endres, Cend, wayuphigh, 25);
+        cout << "Extending strand." << endl;
+        p.conform_backbone(startres, endres, Cend, wayuphigh, 25);
 
         save_transitional_pdb(&p);
-        */
+        
 
         cout << "Generating an alpha helix." << endl;
         p.make_helix(hxstart, hxend, endres, ALPHA_PHI, ALPHA_PSI);
@@ -224,7 +224,7 @@ int main(int argc, char** argv)
         save_transitional_pdb(&p);
         
         cout << "Extending the loose strand." << endl;
-        p.conform_backbone(hxstart-2, endres, p.get_atom(endres, "CA"), wayuphigh, 50);
+        p.conform_backbone(hxstart-2, endres, p.get_atom(endres, "CA"), wayuphigh, 20);
         save_transitional_pdb(&p);
 
         cout << "Moving the end of the helix above TMR3." << endl;
@@ -239,7 +239,7 @@ int main(int argc, char** argv)
         pt5.weight = 1;
         pt3.weight = 2;
         Point pt53 = average_of_points(&pt5, &pt3);
-        p.conform_backbone(hxstart-2, endres, p.get_atom(hxend, "CA"), pt53, 50);
+        p.conform_backbone(hxstart-2, endres, p.get_atom(hxend, "CA"), pt53, 20);
         save_transitional_pdb(&p);
 
         // Find a point along the region between the helix and TMR5 and move it between the helix and pocket center.

@@ -235,6 +235,7 @@ var tmcolor =
 
 var stage = new NGL.Stage("viewport");
 var gmodel = [], model = [], is_ligand = [], mrep = [], mrparams = [], mpos = [], mnod = [];
+var resmdl = [], restoggled = [];
 var curr_ligand = false;
 var gpose = 1, gnode = 0;
 var orid;
@@ -248,6 +249,41 @@ window.onresize = function()
     $('#viewport').css("width", w+"px").css("height",h+"px");
     stage.setSize(w, h);
 };
+
+stage.mouseControls.add( "scroll-ctrl+shift", function( stage, delta )
+{
+    var ai = stage.getParameters().ambientIntensity;
+    stage.setParameters( { ambientIntensity: Math.max( 0, ai + delta / 50 ) } );
+} );
+
+stage.mouseControls.add("clickPick", function(stage, e)
+{
+	/*if (typeof e.atom != "undefined")
+		alert(e.atom.resno); */
+	
+	try
+	{
+		if (restoggled[e.atom.resno]) // resmdl[e.atom.resno].hasRepresentation())
+		{
+			resmdl[e.atom.resno].removeAllRepresentations();
+			restoggled[e.atom.resno] = 0;
+		}
+		else
+		{
+			resmdl[e.atom.resno].addRepresentation( "licorice",
+            {
+                opacity: 1,
+				colorScheme: PODefScheme,
+                metalness: 0.13,
+            });
+			restoggled[e.atom.resno] = 1;
+		}
+	}
+	catch (ex)
+	{
+		;
+	}
+});
 
 var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
@@ -531,9 +567,6 @@ function getFileContents(event)
     var f = ff[0];
     var r = new FileReader();
     r.fname = f.name;
-    model = []
-            gmodel = [];
-    curr_ligand = false;
     $('#ligbtn, #prsv').hide();
 
     r.onload = (function(lf)
@@ -548,6 +581,11 @@ function getFileContents(event)
 
 function loadFile(fileData, fileName = "")
 {
+    model = []
+    gmodel = [];
+    curr_ligand = false;
+	resmdl = [];
+	
     var fext = fileName.substr(fileName.lastIndexOf('.')+1);
     orid = 'OR1A1';
     try
@@ -606,6 +644,35 @@ function loadFile(fileData, fileName = "")
 		        case 'pdb':
                 stage.removeAllComponents();
                 window.result = fileData;
+                
+                if (fext == 'pdb')
+                {
+                	var i;
+                	var lines = fileData.split("\n");
+                    var lres = 0;
+                    var tmpstr = "";
+                    for (i=0; i<lines.length; i++)
+                    {
+                        var ln = lines[i];
+                        var resno = parseInt(ln.substr(22,4));
+                        
+                        if (lres != resno)
+                        {
+                        	var stringBlob6 = new Blob( [tmpstr], { type: 'text/plain'} );
+                        	stage.loadFile( stringBlob6, { ext: 'pdb' } ).then( function( comp6 )
+                    		{
+                    			resmdl.push(comp6);
+                    			restoggled.push(0);
+                    		});
+                    		
+                        	lres = resno;
+                        	tmpstr = "";
+                        }
+                        
+                        tmpstr += ln + "\n";
+                    }
+                }
+                
                 var stringBlob = new Blob( [ fileData ], { type: 'text/plain'} );
                 stage.loadFile( stringBlob, { ext: fext } ).then( function( comp )
                 {
@@ -694,12 +761,29 @@ function loadFile(fileData, fileName = "")
                         var i;
                         var shiny = [];
                         var result = poresult.split("\n");
+                        var lres = 0;
+                        var tmpstr = "";
                         for (i=0; i<result.length; i++)
                         {
                             var ln = result[i];
                             var resno = parseInt(ln.substr(22,4));
                             var aname = ln.substr(12,4).trim();
                             if (ln.substr(17,3) == "MTL") shiny.push(ln);
+                            
+                            if (lres != resno)
+                            {
+                            	var stringBlob5 = new Blob( [tmpstr], { type: 'text/plain'} );
+                            	stage.loadFile( stringBlob5, { ext: 'pdb' } ).then( function( comp5 )
+                        		{
+                        			resmdl.push(comp5);
+                    				restoggled.push(0);
+                        		});
+                        		
+                            	lres = resno;
+                            	tmpstr = "";
+                            }
+                            
+                            tmpstr += ln + "\n";
                         }
 
                         var stringBlob3 = new Blob( [ poresult ], { type: 'text/plain'} );

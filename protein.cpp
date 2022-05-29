@@ -540,6 +540,15 @@ void Protein::conform_backbone(int startres, int endres,
     int res, i, iter;
     bb_rot_dir dir1 = (inc>0) ? N_asc : CA_desc,
                dir2 = (inc>0) ? CA_asc : C_desc;
+    
+    int am = abs(endres-startres), minres = (inc>0) ? startres : endres;
+    float momenta1[am+4]{}, momenta2[am+4]{};
+    
+    for (res = startres; res != endres; res += inc)
+    {
+    	momenta1[res-minres] = randsgn()*_fullrot_steprad;
+    	momenta2[res-minres] = randsgn()*_fullrot_steprad;
+    }
 
     float tolerance = 1.2, alignfactor = 10;
     for (iter=0; iter<iters; iter++)
@@ -569,10 +578,10 @@ void Protein::conform_backbone(int startres, int endres,
                 bind += alignfactor/pt.get_3d_distance(target2);
             }
 
-            if (strcmp(get_residue(res)->get_3letter(), "PRO"))
+            if (strcmp(get_residue(res)->get_3letter(), "PRO"))		// TODO: Don't hard code this to proline, but check bond flexibility.
             {
                 // Rotate the first bond a random amount. TODO: use angular momenta.
-                angle = frand(-_fullrot_steprad, _fullrot_steprad);
+                angle = momenta1[res-minres]; // frand(-_fullrot_steprad, _fullrot_steprad);
                 rotate_backbone_partial(res, endres, dir1, angle);
 
                 // Have bindings/collisions improved?
@@ -598,6 +607,7 @@ void Protein::conform_backbone(int startres, int endres,
                 if (bind1 < tolerance*bind)
                 {
                     rotate_backbone_partial(res, endres, dir1, -angle);
+                    momenta1[res-minres] *= -0.666;
                 }
                 else
                 {
@@ -606,7 +616,7 @@ void Protein::conform_backbone(int startres, int endres,
             }
 
             // Rotate the second bond.
-            angle = frand(-_fullrot_steprad, _fullrot_steprad);
+            angle = momenta2[res-minres]; // frand(-_fullrot_steprad, _fullrot_steprad);
             rotate_backbone_partial(res, endres, dir2, angle);
 
             // Improvement?
@@ -633,6 +643,7 @@ void Protein::conform_backbone(int startres, int endres,
             if (bind1 < bind)
             {
                 rotate_backbone_partial(res, endres, dir2, -angle);
+                momenta2[res-minres] *= -0.666;
             }
 
             alignfactor *= 1.1;

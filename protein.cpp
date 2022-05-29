@@ -101,6 +101,14 @@ bool Protein::add_sequence(const char* lsequence)
     {
         add_residue(i+1, lsequence[i]);
     }
+    
+    Molecule* aas[get_seq_length()+4]{};
+    for (i=1; i<=get_seq_length(); i++)
+    {
+    	aas[i] = get_residue(i);
+        
+    }
+    Molecule::multimol_conform(aas, 25);
 
     set_collidables();
 
@@ -783,6 +791,14 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 #endif
 	
 	set_collidables();
+    
+    Molecule* aas[get_seq_length()+4]{};
+    for (i=startres; i<=endres; i++)
+    {
+    	aas[i] = get_residue(i);
+    }
+    aas[i] = 0;
+    Molecule::multimol_conform(aas, 25);
 }
 
 void Protein::delete_residue(int resno)

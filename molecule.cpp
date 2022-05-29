@@ -1969,11 +1969,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
             for (j=0; mm[j]; j++)
             {
-                if (j == i)
+                /* if (j == i)
                 {
                     nearby[j] = false;
                     continue;
-                }
+                } */
 
                 Point jcen = mm[j]->get_barycenter();
                 Atom* ia = mm[i]->get_nearest_atom(jcen);

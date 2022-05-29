@@ -150,8 +150,11 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 
     // hydrogenate();
     // minimize_internal_collisions();
-    rotate_backbone_abs(N_asc, M_PI);
-    rotate_backbone_abs(CA_asc, M_PI);
+    for (i=0; i<100; i++)
+    {
+		rotate_backbone_abs(N_asc, 0);
+		rotate_backbone_abs(CA_asc, 0);
+	}
 }
 
 void AminoAcid::save_pdb(FILE* os, int atomno_offset)
@@ -875,79 +878,55 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
 
     // Get the location of the previous C, and the location of the local C.
     Atom *atom, *btom;
-
-    if (dir == N_asc || dir == CA_desc)
-        btom = previous_residue_C();
-    else
-        btom = next_residue_N();
-
-    retval.v.theta = 0.1;
-    if (!btom) return retval;
-    Point prevC = btom->get_location();
-
-    if (dir == N_asc || dir == CA_desc)
-        btom = get_atom("C");
-    else
-        btom = get_atom("N");
-
-    retval.v.theta = 0.2;
-    if (!btom) return retval;
-    Point locC = btom->get_location();
-    if (dir == CA_desc || dir == CA_asc)
-    {
-        Point swap = prevC;
-        prevC = locC;
-        locC = swap;
-    }
-
-    // Get the N-CA vector and CA as the center of rotation.
+    
+    
     switch (dir)
     {
-    case N_asc:
+    	case N_asc:
         atom = get_atom("N");
         btom = get_atom("CA");
         break;
 
-    case CA_asc:
+    	case CA_asc:
         atom = get_atom("CA");
         btom = get_atom("C");
         break;
 
-    case CA_desc:
+    	case CA_desc:
         atom = get_atom("CA");
         btom = get_atom("N");
         break;
 
-    case C_desc:
+    	case C_desc:
         atom = get_atom("C");
         btom = get_atom("CA");
         break;
 
-    default:
+    	default:
         ; //return retval;
     }
-
-    retval.v.theta = 0.3;
     if (!atom || !btom) return retval;
     Bond* b = atom->get_bond_between(btom);
-    if (!b->can_rotate) return retval;			// Proline.
-    Point origin = atom->get_location();
-    Point pt = btom->get_location().subtract(origin);
-    Vector axis(pt);
-
-    // Use the vector as the axis and make an imaginary circle, finding the angle that separates the C atoms most.
-    int i, step=10, besti=0;
-    float bestrad=0, bestr = 0.00001;
-
-    Atom *Cprev, *Hlocal, *Olocal, *Nnext;
-    Cprev = previous_residue_C();
-    Hlocal = get_atom("NH");
-    if (!Hlocal) Hlocal = get_atom("H");
-    Olocal = get_atom("O");
-    Nnext = next_residue_N();
-
-    float cpl = 1000, delta = 0.5, rad = bestrad;
-    int k;
+    
+	atom = get_atom("HN");
+	if (!atom) atom = get_atom("H");
+    btom = get_atom("O");
+    if (!atom || !btom) return retval;
+    
+    // Use the vector as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
+    int i, step=3;
+    float bestrad=0, bestr;
+    
+    bestr = atom->get_location().get_3d_distance(btom->get_location());
+    for (i=0; i<360; i+=step)
+    {
+    	b->rotate(fiftyseventh*step, true);
+    	float r = atom->get_location().get_3d_distance(btom->get_location());
+    	if (r < bestr)
+    	{	bestrad = fiftyseventh*i;
+    	}
+    }
+    
 
     // To this maximum stretch angle, add the input angle and do the backbone rotation.
     LocatedVector retlv = rotate_backbone(dir, bestrad+angle);

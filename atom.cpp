@@ -442,6 +442,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     int bi = get_idx_bond_between(excluding);
     Bond* palin = excluding->get_bond_between(this);
     Atom** atoms = palin->get_moves_with_btom();
+    if (!atoms) return 0;
 
     //cout << "Moving assembly starting with " << name << " excluding " << excluding->name << endl;
 

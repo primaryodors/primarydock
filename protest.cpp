@@ -35,12 +35,6 @@ int main(int argc, char** argv)
     Protein p(namearg?argv[namearg]:"Test");
     p.add_sequence(argv[seqarg]);
     p.set_collidables();
-    
-    // Stretch it out.
-    Point pt = p.get_atom_location(1, "N");
-    pt.x += 10000;
-    int len = p.get_seq_length();
-    p.conform_backbone(1, len, p.get_atom(len, "C"), pt, 50);
 
     const char* outfn = "test.pdb";
     FILE* pf = fopen(outfn, "wb");
@@ -48,6 +42,14 @@ int main(int argc, char** argv)
     p.end_pdb(pf);
     fclose(pf);
     cout << "Wrote " << outfn << endl;
+    
+    p.make_helix(1, p.get_seq_length(), ALPHA_PHI, ALPHA_PSI);
+    const char* outfn1 = "test1.pdb";
+    pf = fopen(outfn1, "wb");
+    p.save_pdb(pf);
+    p.end_pdb(pf);
+    fclose(pf);
+    cout << "Wrote " << outfn1 << endl;
 
     Molecule m("Test2");
     pf = fopen(outfn, "rb");

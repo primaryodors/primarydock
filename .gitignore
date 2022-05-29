@@ -9,4 +9,5 @@ podock
 *.sdf
 *.txt
 *~
-
+cmake-*
+.idea/

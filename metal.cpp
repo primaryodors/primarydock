@@ -191,7 +191,7 @@ int main(int argc, char** argv)
         
 
         cout << "Extending strand." << endl;
-        p.conform_backbone(startres, endres, Cend, wayuphigh, 25);
+        p.conform_backbone(startres, endres, Cend, wayuphigh, 50);
 
         save_transitional_pdb(&p);
         
@@ -220,11 +220,11 @@ int main(int argc, char** argv)
         	p.get_atom_location(endres+4, "CA")
         	);
         pt5.y += stepht*2;
-    	p.conform_backbone(startres, endres, p.get_atom(hxstart, "CA"), pt5, 10);
+    	p.conform_backbone(startres, endres, p.get_atom(hxstart, "CA"), pt5, 100);
         save_transitional_pdb(&p);
         
         cout << "Extending the loose strand." << endl;
-        p.conform_backbone(hxstart-2, endres, p.get_atom(endres, "CA"), wayuphigh, 20);
+        p.conform_backbone(hxstart-2, endres, p.get_atom(endres, "CA"), wayuphigh, 50);
         save_transitional_pdb(&p);
 
         cout << "Moving the end of the helix above TMR3." << endl;
@@ -239,7 +239,7 @@ int main(int argc, char** argv)
         pt5.weight = 1;
         pt3.weight = 2;
         Point pt53 = average_of_points(&pt5, &pt3);
-        p.conform_backbone(hxstart-2, endres, p.get_atom(hxend, "CA"), pt53, 20);
+        p.conform_backbone(hxstart-2, endres, p.get_atom(hxend, "CA"), pt53, 100);
         save_transitional_pdb(&p);
 
         // Find a point along the region between the helix and TMR5 and move it between the helix and pocket center.
@@ -251,44 +251,15 @@ int main(int argc, char** argv)
         pt53.weight = 1.0 - pocketcen.weight;
         Point shelf = average_of_points(&pt53, &pocketcen);
         cout << "Creating shelf." << endl;
-        p.conform_backbone(hxend, endres, p.get_atom(midpoint, "CA"), shelf, 15);
+        p.conform_backbone(hxend, endres, p.get_atom(midpoint, "CA"), shelf, 150);
         save_transitional_pdb(&p);
         
 
         // Just from the point found in the previous step, reconnect the loose end to TMR5.
         cout << "Reconnecting broken pieces." << endl;
-        p.conform_backbone(midpoint, endres, Cend, Cpt, Oend, Opt, 50);
+        p.conform_backbone(midpoint, endres, Cend, Cpt, Oend, Opt, 250);
         save_transitional_pdb(&p);
 
-    }
-
-    if (dohelix)
-    {
-        /*cout << "Extending strand." << endl;
-        p.conform_backbone(mcoordres[0]-12, endres, m, wayuphigh, 25);
-        save_transitional_pdb(&p);
-        cout << "Extending strand further." << endl;
-        p.conform_backbone(hxend, endres, Cend, wayuphigh, 25);
-        save_transitional_pdb(&p);
-        cout << "Bringing the metal over the pocket center." << endl;
-        p.conform_backbone(mcoordres[0]-15, endres, m, mtgt, 50);
-        save_transitional_pdb(&p);
-        cout << "Leveling the helix." << endl;
-        cout << "Old helix angle: " << (p.get_helix_orientation(hxstart, hxend)*fiftyseven) << endl;
-        cout << "New helix angle: " << (p.orient_helix(hxstart, hxend, endres, 0, 15)*fiftyseven) << endl;
-        save_transitional_pdb(&p);
-        return 0;
-        cout << "Extending post-helix strand." << endl;
-        p.conform_backbone(hxend, endres, Cend, wayuphigh, 25);
-        save_transitional_pdb(&p);
-
-        cout << "Reconnecting broken pieces." << endl;
-        p.conform_backbone(hxend, endres, Cend, Cpt, Oend, Opt, 50);
-        save_transitional_pdb(&p);*/
-
-        // Reconform the head segment.
-        // p.conform_backbone(20, 1, 50, 15);
-        // save_transitional_pdb(&p);
     }
 
     pf = fopen(outfile, "wb");

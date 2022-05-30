@@ -85,7 +85,7 @@ mol_assem_report: REPORT="mol_assem_test.approved.txt"
 mol_assem_report: mol_assem_test
 	./mol_assem_test >$(REPORT)
 	echo "Content of test.sdf:" >> $(REPORT)
-	cat test.sdf >> $(REPORT)
+	sed '2d' test.sdf >> $(REPORT)  # remove line 2 (date stamp)
 
 protest_report: REPORT="protest.approved.txt"
 protest_report: protest

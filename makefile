@@ -56,11 +56,14 @@ bktest: backbone_test.cpp atom.o point.o intera.o molecule.o aminoacid.o protein
 podock: podock.cpp point.cpp atom.o molecule.o intera.o aminoacid.o protein.o
 	$(CC) podock.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o podock $(CFLAGS)
 
-point_report: point_test
-	./point_test >point_test.approved.txt
-
+# low-tooling regression tests below
 aniso_report: aniso_test
 	./aniso_test >aniso_test.approved.txt
 
+point_report: point_test
+	./point_test >point_test.approved.txt
+
 mol_assem_report: mol_assem_test
 	./mol_assem_test >mol_assem_test.approved.txt
+
+reports: aniso_report point_report mol_assem_report

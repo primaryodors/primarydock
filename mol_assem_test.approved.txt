@@ -1,8 +1,8 @@
 Created empty molecule named Test.
 Added a carbon atom. Its location is [0.000000,0.000000,0.000000].
 Added another carbon atom. Its location is [0.000000,1.540000,-0.000000].
-Added an oxygen atom. Its location is [-1.335880,2.016666,0.181973].
-Internal collisions: 0.0238849 cu.A.
+Added an oxygen atom. Its location is [-0.693308,2.016666,-1.156293].
+Internal collisions: 0.397662 cu.A.
 Minimizing internal collisions...
-Internal collisions: 7.75326e-08 cu.A.
+Internal collisions: 3.27826e-07 cu.A.
 Saved test.sdf

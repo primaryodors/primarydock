@@ -97,7 +97,6 @@ public:
     // Bond functions.
     Bond** get_bonds();
     int get_bonded_atoms_count();
-    int get_sum_cardinality();
     bool bond_to(Atom* btom, float cardinality);
     void unbond(Atom* btom);
     float is_bonded_to(Atom* btom);			// If yes, return the cardinality.

@@ -552,7 +552,7 @@ int Atom::get_sum_cardinality()
 {
     if (!bonded_to) return 0;
     int i, retval=0;
-    for (i=0; i<geometry; i++) if (bonded_to[i].btom) retval += bonded_to[i].cardinality;
+    for (i=0; i<geometry; i++) if (bonded_to[i].btom) retval += floor(bonded_to[i].cardinality);
     return retval;
 }
 

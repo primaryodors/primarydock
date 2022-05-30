@@ -33,6 +33,21 @@ a:hover
 	text-decoration: underline;
 }
 
+#pleasewait
+{
+	position: fixed;
+	top: 22%;
+	left: 40%;
+	right: 40%;
+	width: 20%;
+	text-align: center;
+	background-color: rgba(0,11,31,0.67);
+	color: #def;
+	padding: 15px;
+	border-radius: 25px;
+	box-shadow: 0px 0px 41px rgba(0,0,0,0.22), 5px 3px 5px rgba(0,0,0,0.41);
+}
+
 #citefloat
 {
 	position: fixed;
@@ -581,6 +596,12 @@ function getFileContents(event)
 
 function loadFile(fileData, fileName = "")
 {
+	$("#pleasewait").show();
+	window.setTimeout( function()
+	{
+		$("#pleasewait").hide();
+	}, 5381);
+	
     model = []
     gmodel = [];
     curr_ligand = false;
@@ -914,6 +935,10 @@ function loadFile(fileData, fileName = "")
             	default:
                 alert('Unknown file type ' + fext);
             }
+            window.setTimeout(function()
+            {
+            	$("#pleasewait").hide();
+        	}, 503);
         }
     });
 }
@@ -932,7 +957,10 @@ $('input[type=file]').on('input', getFileContents);
 $('#citefloat span')[0].innerText = nglcitation;
 </script>
 
-
+<div id="pleasewait" style="display: none;">
+<h2>Please Wait...</h2>
+<img src="http://www.primaryodors.org/imgs/Proton_Zundel.gif">
+</div>
 
 
 

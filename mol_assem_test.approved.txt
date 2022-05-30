@@ -1,8 +1,31 @@
 Created empty molecule named Test.
 Added a carbon atom. Its location is [0.000000,0.000000,0.000000].
 Added another carbon atom. Its location is [0.000000,1.540000,-0.000000].
-Added an oxygen atom. Its location is [-0.565498,2.016666,-1.223888].
-Internal collisions: 0.417545 cu.A.
+Added an oxygen atom. Its location is [-1.297404,2.016666,0.366649].
+Internal collisions: 0.012574 cu.A.
 Minimizing internal collisions...
-Internal collisions: 3.27826e-07 cu.A.
+Internal collisions: 0 cu.A.
 Saved test.sdf
+Test
+  podock-2205300149313D
+https://github.com/ssepeq/podock
+ 9 8  0     0  0  0  0  0  0999 V2000
+    0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.5400   -0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.1882    2.0167    0.6371 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3633    1.0277 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8900   -0.3633   -0.5138 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.8900   -0.3633   -0.5138 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0322    1.9033   -1.0272 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8734    1.9033    0.5415 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9679    2.3589    1.5176 H   0  0  0  0  0  0  0  0  0  0  0  0
+  1  2 1.00  0  0  0  0
+  1  4 1.00  0  0  0  0
+  1  5 1.00  0  0  0  0
+  1  6 1.00  0  0  0  0
+  2  3 1.00  0  0  0  0
+  2  7 1.00  0  0  0  0
+  2  8 1.00  0  0  0  0
+  3  9 1.00  0  0  0  0
+M  END
+

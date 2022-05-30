@@ -65,6 +65,8 @@ point_report: point_test
 
 mol_assem_report: mol_assem_test
 	./mol_assem_test >mol_assem_test.approved.txt
+	echo "Content of test.sdf:"
+	cat test.sdf >> mol_assem_test.approved.txt
 
 protest_report: protest
 	./protest TTTTTTTT >protest.approved.txt

@@ -19,9 +19,23 @@ enum MovabilityType
     MOV_NONE		=    0
 };
 
+class Molecule;
+
+class MolVirtual
+{
+	public:
+    virtual Bond** get_rotatable_bonds() = 0;
+};
+
+class Ligand : public MolVirtual, public Molecule
+{
+	public:
+    Bond** get_rotatable_bonds();
+};
+
 class Molecule
 {
-public:
+	public:
     Molecule(const char* name);
     Molecule(const char* name, Atom** collection);
     virtual ~Molecule();
@@ -37,14 +51,8 @@ public:
     float close_loop(Atom** path, float closing_bond_cardinality);
 
     // Getters.
-    const char* get_name() const
-    {
-        return name;
-    };
-    int get_atom_count() const
-    {
-        return atcount;
-    }
+    const char* get_name() const	{        return name;		}
+    int get_atom_count() const		{        return atcount;	}
     int get_bond_count(bool unidirectional) const;
     Atom* get_nearest_atom(Point loc) const;
     Atom* get_nearest_atom(Point loc, intera_type capable_of) const;
@@ -66,26 +74,18 @@ public:
     Atom* add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard);
     char** get_atom_names() const;
     Atom* get_atom(const char* aname) const;
-    Atom* get_atom(const int a_idx) const
-    {
-        return atoms[a_idx];
-    }
+    Atom* get_atom(const int a_idx) const    {        return atoms[a_idx];    }
     void hydrogenate();
     void clear_atom_binding_energies();
 
     // Bond functions.
-    Bond** get_rotatable_bonds();
     Bond** get_all_bonds(bool unidirectional);
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
-    bool rotate_bond(const Bond* rot8b, const float angle);
     void fix_bond_lengths(int iters = 200);
 
     // Ring functions.
     int identify_rings();
-    int get_num_rings()
-    {
-        return ringcount;
-    }
+    int get_num_rings()    {        return ringcount;    }
     bool ring_is_coplanar(int ringid);
     bool ring_is_aromatic(int ringid);
     Point get_ring_center(int ringid);
@@ -105,7 +105,7 @@ public:
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
 
-
+	// TODO: These all should be rewritten to assemble an array and call multimol_conform().
     void intermol_conform(Molecule* ligand, int iters = 50);
     void intermol_conform(Molecule* ligand, int iters, Molecule** avoid_colliding_with);
     void intermol_conform(Molecule* ligand, int iters, AminoAcid** avoid_colliding_with);
@@ -125,7 +125,7 @@ public:
     MovabilityType movability = MOV_ALL;
     float lastbind = 0;
 
-protected:
+	protected:
     Molecule();
     Atom** atoms = 0;
     int atcount = 0;

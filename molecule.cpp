@@ -1139,7 +1139,7 @@ _not_basic:
     }
 }
 
-Bond** Molecule::get_rotatable_bonds()
+Bond** Ligand::get_rotatable_bonds()
 {
     if (!atoms) return 0;
     if (rotatable_bonds) return rotatable_bonds;

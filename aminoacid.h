@@ -33,6 +33,7 @@ public:
  	char smiles[50] = {};
  	float reach = 2.5;
  	AABondDef** aabonds=0;
+ 	bool proline_like = false;
 };
 
 class MetalCoord
@@ -46,7 +47,7 @@ public:
  	Point coord_atom_avg_loc();
 };
 
-class AminoAcid : public Molecule
+class AminoAcid : public MolVirtual, public Molecule
 {
 public:
  	// Constructors.
@@ -99,7 +100,7 @@ public:
 
 protected:
  	void load_aa_defs();
- 	void copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs);
+ 	void copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs, bool proline_like);
 
  	int residue_no=0;
  	char region[25] {};

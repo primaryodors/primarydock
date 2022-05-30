@@ -538,7 +538,7 @@ bool Molecule::save_sdf(FILE* os, Molecule** lig)
             gmtm->tm_hour, gmtm->tm_min, gmtm->tm_sec
            );
 
-    fprintf(os, "https://github.com/ssepeq/podock\n");
+    fprintf(os, "https://github.com/primaryodors/podock\n");
 
     int ac, bc, chargeds=0;
     ac = get_atom_count();

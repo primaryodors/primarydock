@@ -57,6 +57,9 @@ podock: podock.cpp point.cpp atom.o molecule.o intera.o aminoacid.o protein.o
 	$(CC) podock.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o podock $(CFLAGS)
 
 # low-tooling regression tests below
+atom_report: atom_test
+	./atom_test H >atom_test.approved.txt
+
 aniso_report: aniso_test
 	./aniso_test >aniso_test.approved.txt
 
@@ -77,4 +80,4 @@ protest_report: protest
 	echo "Content of test2.sdf:" >> protest.approved.txt
 	cat test2.sdf >> protest.approved.txt
 
-reports: aniso_report point_report mol_assem_report protest_report
+reports: atom_test aniso_report point_report mol_assem_report protest_report

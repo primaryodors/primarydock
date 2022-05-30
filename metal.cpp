@@ -213,12 +213,13 @@ int main(int argc, char** argv)
     if (dohelix)
     {
         cout << "Moving the start of the helix to above TMR5." << endl;
-        Point pt5 = average_of_points(4,
-        	p.get_atom_location(endres+1, "CA"),
-        	p.get_atom_location(endres+2, "CA"),
-        	p.get_atom_location(endres+3, "CA"),
-        	p.get_atom_location(endres+4, "CA")
-        	);
+        Point foravg[8]{};
+        int avgi = 0;
+        foravg[avgi++] = p.get_atom_location(endres+1, "CA");
+        foravg[avgi++] = p.get_atom_location(endres+2, "CA");
+        foravg[avgi++] = p.get_atom_location(endres+3, "CA");
+        foravg[avgi++] = p.get_atom_location(endres+4, "CA");
+        Point pt5 = average_of_points(foravg, avgi);
         pt5.y += stepht*2;
     	p.conform_backbone(startres, endres, p.get_atom(hxstart, "CA"), pt5, 100);
         save_transitional_pdb(&p);
@@ -229,27 +230,39 @@ int main(int argc, char** argv)
 
         cout << "Moving the end of the helix above TMR3." << endl;
         int start3 = p.get_region_start("TMR3");
-        Point pt3 = average_of_points(4,
-        	p.get_atom_location(start3+1, "CA"),
-        	p.get_atom_location(start3+2, "CA"),
-        	p.get_atom_location(start3+3, "CA"),
-        	p.get_atom_location(start3+4, "CA")
-        	);
+        avgi = 0;
+        foravg[avgi++] = p.get_atom_location(start3+1, "CA");
+        foravg[avgi++] = p.get_atom_location(start3+2, "CA");
+        foravg[avgi++] = p.get_atom_location(start3+3, "CA");
+        foravg[avgi++] = p.get_atom_location(start3+4, "CA");
+        Point pt3 = average_of_points(foravg, avgi);
         pt3.y = pt5.y;
         pt5.weight = 1;
         pt3.weight = 2;
-        Point pt53 = average_of_points(&pt5, &pt3);
+        
+        avgi = 0;
+        foravg[avgi++] = pt5;
+        foravg[avgi++] = pt3;
+        Point pt53 = average_of_points(foravg, avgi);
         p.conform_backbone(startres, endres, p.get_atom(hxend, "CA"), pt53, 100);
         save_transitional_pdb(&p);
 
         // Find a point along the region between the helix and TMR5 and move it between the helix and pocket center.
         int midpoint = (hxend + endres) / 2;
         pt5.weight = pt3.weight = 1;
-        pt53 = average_of_points(&pt5, &pt3);
+        
+        avgi = 0;
+        foravg[avgi++] = pt5;
+        foravg[avgi++] = pt3;
+        pt53 = average_of_points(foravg, avgi);
         float rcen = pt53.get_3d_distance(pocketcen);
         pocketcen.weight = stepht / rcen;
         pt53.weight = 1.0 - pocketcen.weight;
-        Point shelf = average_of_points(&pt53, &pocketcen);
+        
+        avgi = 0;
+        foravg[avgi++] = pt53;
+        foravg[avgi++] = pocketcen;
+        Point shelf = average_of_points(foravg, avgi);
         cout << "Creating shelf." << endl;
         p.conform_backbone(hxend, endres, p.get_atom(midpoint, "CA"), shelf, 150);
         save_transitional_pdb(&p);

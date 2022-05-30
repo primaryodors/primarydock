@@ -161,8 +161,6 @@ union Star
 };
 
 Point average_of_points(Point* points, int count);
-Point average_of_points(Point* point, ...);
-Point average_of_points(int count, Point point, ...);
 float find_angle(float dx, float dy);
 float find_angle_delta(float a1, float a2);
 float find_3d_angle(Point* A, Point* B, Point* source);

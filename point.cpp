@@ -5,7 +5,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <cstdarg>
 #include "point.h"
 
 using namespace std;
@@ -217,41 +216,6 @@ Point average_of_points(Point* points, int count)
     Point retval(x, y, z);
     return retval;
 }
-
-Point average_of_points(Point* point, ...)
-{	
-	int i, count;
-	for (i=0; (&point)[i]; i++);
-	count = i;
-
-	return average_of_points(point, i);
-}
-
-Point average_of_points(int count, Point point, ...)
-{
-	va_list valist;
-	Point pt(0,0,0);
-	float wsum = 0;
-	int i;
-	va_start(valist, count);
-	for (i = 0; i < count; i++)
-	{
-		Point lpt = va_arg(valist, Point);
-		pt = pt.add(lpt);
-		wsum += lpt.weight;
-	}
-	va_end(valist);
-	
-	if (wsum)
-	{
-		pt.x /= wsum;
-		pt.y /= wsum;
-		pt.z /= wsum;
-	}
-	
-	return pt;
-}
-
 
 float find_angle(float dx, float dy)
 {

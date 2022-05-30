@@ -36,7 +36,8 @@ int main(int argc, char** argv)
     p.add_sequence(argv[seqarg]);
     p.set_collidables();
 
-    const char* outfn = "test.pdb";
+	char outfn[32]{};
+    strcpy(outfn, "test.pdb");
     FILE* pf = fopen(outfn, "wb");
     p.save_pdb(pf);
     p.end_pdb(pf);
@@ -44,12 +45,38 @@ int main(int argc, char** argv)
     cout << "Wrote " << outfn << endl;
     
     p.make_helix(1, p.get_seq_length(), ALPHA_PHI, ALPHA_PSI);
-    const char* outfn1 = "test1.pdb";
-    pf = fopen(outfn1, "wb");
+    strcpy(outfn, "test_alpha.pdb");
+    pf = fopen(outfn, "wb");
     p.save_pdb(pf);
     p.end_pdb(pf);
     fclose(pf);
-    cout << "Wrote " << outfn1 << endl;
+    cout << "Wrote " << outfn << endl;
+    
+    p.make_helix(1, p.get_seq_length(), BETA_PHI, BETA_PSI);
+    strcpy(outfn, "test_beta.pdb");
+    pf = fopen(outfn, "wb");
+    p.save_pdb(pf);
+    p.end_pdb(pf);
+    fclose(pf);
+    cout << "Wrote " << outfn << endl;
+    
+    p.make_helix(1, p.get_seq_length(), _310_PHI, _310_PSI);
+    strcpy(outfn, "test_310.pdb");
+    pf = fopen(outfn, "wb");
+    p.save_pdb(pf);
+    p.end_pdb(pf);
+    fclose(pf);
+    cout << "Wrote " << outfn << endl;
+    
+    p.make_helix(1, p.get_seq_length(), PI_PHI, PI_PSI);
+    strcpy(outfn, "test_pi.pdb");
+    pf = fopen(outfn, "wb");
+    p.save_pdb(pf);
+    p.end_pdb(pf);
+    fclose(pf);
+    cout << "Wrote " << outfn << endl;
+    
+    
 
     Molecule m("Test2");
     pf = fopen(outfn, "rb");

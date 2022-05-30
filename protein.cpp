@@ -99,14 +99,15 @@ bool Protein::add_sequence(const char* lsequence)
     int i;
     for (i=0; lsequence[i]; i++)
     {
+    	cout << lsequence[i];
         add_residue(i+1, lsequence[i]);
     }
+    cout << endl;
     
     Molecule* aas[get_seq_length()+4]{};
     for (i=1; i<=get_seq_length(); i++)
     {
     	aas[i] = get_residue(i);
-        
     }
     Molecule::multimol_conform(aas, 25);
 
@@ -573,11 +574,16 @@ void Protein::conform_backbone(int startres, int endres,
     
     int am = abs(endres-startres), minres = (inc>0) ? startres : endres;
     float momenta1[am+4]{}, momenta2[am+4]{};
+    int eando_res[am+4]{};
+    float eando_mult[am+4]{};
     
-    for (res = startres; res != endres; res += inc)
+    for (res = startres; res <= endres; res += inc)
     {
     	momenta1[res-minres] = randsgn()*_fullrot_steprad;
     	momenta2[res-minres] = randsgn()*_fullrot_steprad;
+    	eando_res[res-minres] = min(res + (rand() % 5), endres);
+    	eando_mult[res-minres] = 1;
+    	
     }
 
 	set_collidables();
@@ -596,7 +602,7 @@ void Protein::conform_backbone(int startres, int endres,
                 AminoAcid* aa = get_residue(i);
                 AminoAcid** rcc = get_residues_can_collide(i);
                 if (!rcc) cout << "No collidables." << endl;
-                if (a1)		bind -= aa->get_intermol_collisions(rcc);
+                if (a1)		bind -= aa->get_intermol_collisions(AminoAcid::aas_to_mols(rcc));
                 else		bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1)
@@ -621,7 +627,7 @@ void Protein::conform_backbone(int startres, int endres,
                 {
                     AminoAcid* aa = get_residue(i);
                     AminoAcid** rcc = get_residues_can_collide(i);
-                    if (a1)		bind1 -= aa->get_intermol_collisions(rcc);
+                    if (a1)		bind1 -= aa->get_intermol_collisions(AminoAcid::aas_to_mols(rcc));
                 	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
                 }
                 if (a1)
@@ -659,7 +665,7 @@ void Protein::conform_backbone(int startres, int endres,
             {
                 AminoAcid* aa = get_residue(i);
                 AminoAcid** rcc = get_residues_can_collide(i);
-                if (a1)		bind1 -= aa->get_intermol_collisions(rcc);
+                if (a1)		bind1 -= aa->get_intermol_collisions(AminoAcid::aas_to_mols(rcc));
             	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1)

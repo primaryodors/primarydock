@@ -90,7 +90,7 @@ mol_assem_report: mol_assem_test
 protest_report: REPORT="protest.approved.txt"
 protest_report: protest
 	REPORT="protest.approved.txt"
-	./protest TTTTTTTT >$(REPORT)
+	./protest ARNDCEQGHILKMFPUSTWYV >$(REPORT)
 	echo "Content of test.pdb:" >> $(REPORT)
 	cat test.pdb >> $(REPORT)
 	echo "Content of test1.pdb:" >> $(REPORT)

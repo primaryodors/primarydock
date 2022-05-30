@@ -583,6 +583,7 @@ bool Molecule::save_sdf(FILE* os, Molecule** lig)
     {
         Point p = latoms[i]->get_location();
         const char* esym = latoms[i]->get_elem_sym();
+        if (!esym) continue;
 
         if (latoms[i]->get_charge()) chargeds++;
 
@@ -2809,6 +2810,11 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
     Vector normal;
     Point ringcen;
 
+	if (!ring_members || !ring_members[0])
+	{
+		cout << "Notice: empty ring passed to Molecule::make_coplanar_ring()." << endl;
+		return;
+	}
     Bond** a0b = ring_members[0]->get_bonds();
     if (!a0b[0]->btom || !a0b[1]->btom)
     {

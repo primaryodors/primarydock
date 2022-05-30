@@ -157,6 +157,21 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 	}
 }
 
+Molecule** AminoAcid::aas_to_mols(AminoAcid** aas)
+{
+	if (!aas) return NULL;
+	int i, j;
+	for (i=0; aas[i]; i++);
+	Molecule** mols = new Molecule*[i+4]{};
+	for (j=0; j<i; j++)
+	{
+		mols[j] = aas[j];
+	}
+	mols[i] = NULL;
+
+	return mols;
+}
+
 void AminoAcid::save_pdb(FILE* os, int atomno_offset)
 {
     int i;
@@ -672,6 +687,7 @@ Atom* AminoAcid::next_residue_N()
 
 LocRotation* AminoAcid::flatten()
 {
+	Bond* b;
     LocRotation* retval = new LocRotation[5] {};
     if (m_mcoord) return retval;	// NO.
 
@@ -706,28 +722,28 @@ LocRotation* AminoAcid::flatten()
         bool proline = false;
         switch (j)
         {
-        case 0:
+        	case 0:
             // Correction about C=N axis.
             retval[0].v = v_from_pt_sub(localN->get_location(), prevC->get_location());
             retval[0].origin = localN->get_location();
             retval[0].a = 0;
             break;
 
-        case 1:
+        	case 1:
             // Correction about N-HN axis.
             retval[1].v = v_from_pt_sub(localHN->get_location(), localN->get_location());
             retval[1].origin = localN->get_location();
             retval[1].a = 0;
             break;
 
-        case 2:
+        	case 2:
             // Correction about C-O axis.
             retval[2].v = v_from_pt_sub(prevO->get_location(), prevC->get_location());
             retval[2].origin = prevC->get_location();
             retval[2].a = 0;
             break;
 
-        case 3:
+        	case 3:
             // Phi correction.
             retval[3].v = v_from_pt_sub(localCA->get_location(), localN->get_location());
             retval[3].origin = localCA->get_location();
@@ -735,15 +751,16 @@ LocRotation* AminoAcid::flatten()
             if (!localN->get_bond_between(localCA)->can_rotate) proline = true;
             break;
 
-        case 4:
+        	case 4:
             // Psi correction.
             retval[4].v = v_from_pt_sub(localC->get_location(), localCA->get_location());
             retval[4].origin = localCA->get_location();
             retval[4].a = 0;
-            if (!localCA->get_bond_between(localC)->can_rotate) proline = true;
+            b = localCA->get_bond_between(localC);
+            if (b && !b->can_rotate) proline = true;
             break;
 
-        default:
+        	default:
             ;
         }
 
@@ -907,6 +924,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     }
     if (!atom || !btom) return retval;
     Bond* b = atom->get_bond_between(btom);
+    if (!b) return retval;
     if (!m_mcoord) b->can_rotate = true;
     
 	atom = get_atom("HN");
@@ -981,7 +999,7 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     if (!btom) return retval;
 
     Bond* b = rotcen->get_bond_between(btom);
-    if (!b->can_rotate)
+    if (!b || !b->can_rotate)
     {
         // cout << "FORBIDDEN cannot rotate " << *this << ":" << rotcen->name << "-" << btom->name << endl;
         retval.r = 0;		// Fail condition.

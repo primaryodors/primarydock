@@ -8,7 +8,6 @@ Internal collisions: 3.8743e-07 cu.A.
 Saved test.sdf
 Content of test.sdf:
 Test
-  podock-2205300240543D
 https://github.com/ssepeq/podock
  9 8  0     0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0

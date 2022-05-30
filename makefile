@@ -66,4 +66,13 @@ point_report: point_test
 mol_assem_report: mol_assem_test
 	./mol_assem_test >mol_assem_test.approved.txt
 
-reports: aniso_report point_report mol_assem_report
+protest_report: protest
+	./protest TTTTTTTT >protest.approved.txt
+	echo "Content of test.pdb:" >> protest.approved.txt
+	cat test.pdb >> protest.approved.txt
+	echo "Content of test1.pdb:" >> protest.approved.txt
+	cat test1.pdb >> protest.approved.txt
+	echo "Content of test2.sdf:" >> protest.approved.txt
+	cat test2.sdf >> protest.approved.txt
+
+reports: aniso_report point_report mol_assem_report protest_report

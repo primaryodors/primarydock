@@ -6,7 +6,7 @@
 
 class SMILES_Parenthetical
 {
-public:
+	public:
     Atom* startsfrom=0;
     char* smilesstr=0;
 };
@@ -19,9 +19,17 @@ enum MovabilityType
     MOV_NONE		=    0
 };
 
+enum MoleculeType
+{
+	MOLTYP_UNKNOWN,
+	MOLTYP_LIGAND,
+	MOLTYP_WATER,
+	MOLTYP_AMINOACID
+};
+
 class Molecule
 {
-public:
+	public:
     Molecule(const char* name);
     Molecule(const char* name, Atom** collection);
     virtual ~Molecule();
@@ -125,7 +133,7 @@ public:
     MovabilityType movability = MOV_ALL;
     float lastbind = 0;
 
-protected:
+	protected:
     Molecule();
     Atom** atoms = 0;
     int atcount = 0;
@@ -147,7 +155,7 @@ protected:
     int smlen = 0;
     SMILES_Parenthetical* paren;
     int spnum = 0;
-
+	MoleculeType mol_typ = MOLTYP_UNKNOWN;
 
     int aidx(Atom* a);
     void reallocate();

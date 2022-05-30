@@ -9,6 +9,7 @@
 #include <ctime>
 #include <stdint.h>
 #include "molecule.h"
+#include "aminoacid.h"
 
 #define _DBGCLSLOOP 0
 
@@ -1143,6 +1144,15 @@ Bond** Molecule::get_rotatable_bonds()
 {
     if (!atoms) return 0;
     if (rotatable_bonds) return rotatable_bonds;
+    if (mol_typ == MOLTYP_AMINOACID)
+    {	
+    	// TODO: There has to be a better way.
+    	Star s;
+    	s.pmol = this;
+    	rotatable_bonds = s.paa->get_rotatable_bonds();
+    	return rotatable_bonds;
+    }
+    // cout << name << " Molecule::get_rotatable_bonds()" << endl;
 
     Bond* btemp[65536];
     int mwblimit = atcount/2;						// Prevent rotations that move most of the molecule.
@@ -1203,6 +1213,54 @@ Bond** Molecule::get_rotatable_bonds()
     rotatable_bonds[bonds] = 0;
 
     return rotatable_bonds;
+}
+
+// TODO: There has to be a better way.
+Bond** AminoAcid::get_rotatable_bonds()
+{
+    // cout << name << " AminoAcid::get_rotatable_bonds()" << endl;
+    // Return ONLY side chain bonds, from lower to higher Greek. E.g. CA-CB but NOT CB-CA.
+    // Exclude CA-N and CA-C as these will be managed by the Protein class.
+    if (!atoms) return 0;
+    if (aadef && aadef->proline_like)
+    {
+    	// cout << "Proline-like! No rotbonds!" << endl;
+    	return NULL;
+	}
+    Bond* btemp[65536];
+
+    int i,j, bonds=0;
+    for (i=0; atoms[i]; i++)
+    {
+        Bond** lb = atoms[i]->get_bonds();
+        int g = atoms[i]->get_geometry();
+        for (j=0; j<g; j++)
+        {
+            if (lb[j]->can_rotate
+                    &&
+                    lb[j]->atom && lb[j]->btom
+                    &&
+                    (!lb[j]->atom->is_backbone || !strcmp(lb[j]->atom->name, "CA"))
+                    &&
+                    !lb[j]->btom->is_backbone
+                    &&
+                    greek_from_aname(lb[j]->atom->name) == (greek_from_aname(lb[j]->btom->name)-1)
+                    &&
+                    lb[j]->btom->get_Z() > 1
+               )
+            {
+                btemp[bonds++] = lb[j];
+                btemp[bonds] = 0;
+            }
+            else lb[j]->can_rotate = false;
+        }
+        if (lb) delete[] lb;
+    }
+
+    Bond** retval = new Bond*[bonds+1] {};
+    for (i=0; i<=bonds; i++) retval[i] = btemp[i];
+
+    return retval;
 }
 
 Bond** Molecule::get_all_bonds(bool unidirectional)

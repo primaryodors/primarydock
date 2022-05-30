@@ -22,6 +22,7 @@ AminoAcid::AminoAcid(FILE* instream)
     movability = MOV_FLEXONLY;
     from_pdb(instream);
     mincoll = get_internal_collisions();
+    mol_typ = MOLTYP_AMINOACID;
 }
 
 AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
@@ -29,6 +30,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     if (!aa_defs[0]._1let) AminoAcid::load_aa_defs();
     immobile = true;
     movability = MOV_FLEXONLY;
+    mol_typ = MOLTYP_AMINOACID;
 
     if (!prevaa) residue_no = 1;
     else residue_no = prevaa->residue_no + 1;
@@ -337,7 +339,7 @@ _return_added:
     return added;
 }
 
-void AminoAcid::copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs)
+void AminoAcid::copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs, bool proline_like)
 {
     int lidx = (letter & 0x5f) - 'A';
     if (lidx<0 || lidx>26) return;
@@ -346,50 +348,12 @@ void AminoAcid::copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbd
     for (j=0; j<tbdctr; j++)
     {
         aa_defs[lidx].aabonds[j] = tmpbdefs[j];
+        aa_defs[lidx].proline_like = proline_like;
     }
     aa_defs[lidx].aabonds[tbdctr] = 0;
 }
 
-Bond** AminoAcid::get_rotatable_bonds()
-{
-    // Return ONLY side chain bonds, from lower to higher Greek. E.g. CA-CB but NOT CB-CA.
-    // Exclude CA-N and CA-C as these will be managed by the Protein class.
-    if (!atoms) return 0;
-    Bond* btemp[65536];
 
-    int i,j, bonds=0;
-    for (i=0; atoms[i]; i++)
-    {
-        Bond** lb = atoms[i]->get_bonds();
-        int g = atoms[i]->get_geometry();
-        for (j=0; j<g; j++)
-        {
-            if (lb[j]->can_rotate
-                    &&
-                    lb[j]->atom && lb[j]->btom
-                    &&
-                    (!lb[j]->atom->is_backbone || !strcmp(lb[j]->atom->name, "CA"))
-                    &&
-                    !lb[j]->btom->is_backbone
-                    &&
-                    greek_from_aname(lb[j]->atom->name) == (greek_from_aname(lb[j]->btom->name)-1)
-                    &&
-                    lb[j]->btom->get_Z() > 1
-               )
-            {
-                btemp[bonds++] = lb[j];
-                btemp[bonds] = 0;
-            }
-            else lb[j]->can_rotate = false;
-        }
-        if (lb) delete[] lb;
-    }
-
-    Bond** retval = new Bond*[bonds+1] {};
-    for (i=0; i<=bonds; i++) retval[i] = btemp[i];
-
-    return retval;
-}
 
 void AminoAcid::load_aa_defs()
 {
@@ -408,6 +372,7 @@ void AminoAcid::load_aa_defs()
         int tbdctr=0;
         char lastletter = '\0';
         bool isbb = false;
+        bool proline_like = false;
         while (!feof(pf))
         {
             fgets(buffer, 1011, pf);
@@ -426,8 +391,9 @@ void AminoAcid::load_aa_defs()
 
                     if (!lastletter || fields[0][0] != lastletter)
                     {
-                        copy_loaded_to_object(lastletter, tbdctr, tmpbdefs);
+                        copy_loaded_to_object(lastletter, tbdctr, tmpbdefs, proline_like);
                         tbdctr = 0;
+                        proline_like = false;
 
                         if (tmpbdefs) delete tmpbdefs;
                         tmpbdefs = new AABondDef*[256] {};
@@ -479,6 +445,7 @@ void AminoAcid::load_aa_defs()
                           &&
                           !strchr(fields[5], '!')
                           ;
+                    if (isbb && strchr(fields[5], '!')) proline_like = true;
 
                     if (fields[6][0] == '+') fields[6][0] = ' ';
                     tmpbdefs[tbdctr]->acharge = atof(fields[6]);
@@ -504,6 +471,7 @@ void AminoAcid::load_aa_defs()
                               &&
                               !strchr(fields[5], '!')
                               ;
+                        if (isbb && strchr(fields[5], '!')) proline_like = true;
                         strcpy(tmpbdefs[tbdctr-1]->bname, fields[4]);
                         tmpbdefs[tbdctr]->cardinality = atof(part2);
                         tmpbdefs[tbdctr]->can_rotate
@@ -511,6 +479,7 @@ void AminoAcid::load_aa_defs()
                               &&
                               !strchr(part2, '!')
                               ;
+                        if (isbb && strchr(part2, '!')) proline_like = true;
                         tmpbdefs[tbdctr]->acharge = atof(fields[6]);
                     }
                     else
@@ -542,7 +511,7 @@ void AminoAcid::load_aa_defs()
                 delete[] fields;
             }
         }
-        copy_loaded_to_object(lastletter, tbdctr, tmpbdefs);
+        copy_loaded_to_object(lastletter, tbdctr, tmpbdefs, proline_like);
         fclose(pf);
     }
 }

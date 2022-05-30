@@ -33,6 +33,7 @@ public:
  	char smiles[50] = {};
  	float reach = 2.5;
  	AABondDef** aabonds=0;
+ 	bool proline_like = false;
 };
 
 class MetalCoord
@@ -99,7 +100,7 @@ public:
 
 protected:
  	void load_aa_defs();
- 	void copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs);
+ 	void copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs, bool proline_like);
 
  	int residue_no=0;
  	char region[25] {};
@@ -111,6 +112,7 @@ extern AADef aa_defs[26];		// Indexed by letter so 0=A ala, 2=C cys, 3=D asp, et
 extern char* override_aminos_dat;
 
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa);
+
 
 #endif
 

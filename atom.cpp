@@ -1,11 +1,11 @@
 
-#include <math.h>
+#include <cmath>
 #include <iostream>
-#include <string.h>
+#include <cstring>
 #include <algorithm>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
-#include <limits.h>
+#include <climits>
 #include "atom.h"
 
 #define _DBGMOVES 0

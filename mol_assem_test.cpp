@@ -24,7 +24,6 @@ int main(int argc, char** argv)
         cout << "Added a carbon atom. Its location is " << (buffer = C1->get_location().printable()) << "." << endl;
         delete buffer;
 
-
         Atom* C2 = m.add_atom("C", "C2", C1, 1);
         cout << "Added another carbon atom. Its location is " << (buffer = C2->get_location().printable()) << "." << endl;
         delete buffer;

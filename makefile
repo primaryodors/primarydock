@@ -56,8 +56,46 @@ bktest: backbone_test.cpp atom.o point.o intera.o molecule.o aminoacid.o protein
 podock: podock.cpp point.cpp atom.o molecule.o intera.o aminoacid.o protein.o
 	$(CC) podock.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o podock $(CFLAGS)
 
-point_report: point_test
-	./point_test >point_test.approved.txt
+# low-tooling regression tests below
+amino_report: REPORT="amino_test.approved.txt"
+amino_report: amino_test
+	./amino_test >$(REPORT)
+	echo "Content of test.pdb:" >> $(REPORT)
+	cat test.pdb >> $(REPORT)
 
+atom_report: REPORT="atom_test.approved.txt"
+atom_report: atom_test
+	./atom_test H >$(REPORT)
+
+aniso_report: REPORT="aniso_test.approved.txt"
 aniso_report: aniso_test
-	./aniso_test >aniso_test.approved.txt
+	./aniso_test >$(REPORT)
+
+point_report: REPORT="point_test.approved.txt"
+point_report: point_test
+	./point_test >$(REPORT)
+
+mol_report: REPORT="mol_test.approved.txt"
+mol_report: mol_test
+	./mol_test >$(REPORT)
+	echo "Content of output.sdf:" >> $(REPORT)
+	cat output.sdf >> $(REPORT)
+
+mol_assem_report: REPORT="mol_assem_test.approved.txt"
+mol_assem_report: mol_assem_test
+	./mol_assem_test >$(REPORT)
+	echo "Content of test.sdf:" >> $(REPORT)
+	cat test.sdf >> $(REPORT)
+
+protest_report: REPORT="protest.approved.txt"
+protest_report: protest
+	REPORT="protest.approved.txt"
+	./protest TTTTTTTT >$(REPORT)
+	echo "Content of test.pdb:" >> $(REPORT)
+	cat test.pdb >> $(REPORT)
+	echo "Content of test1.pdb:" >> $(REPORT)
+	cat test1.pdb >> $(REPORT)
+	echo "Content of test2.sdf:" >> $(REPORT)
+	cat test2.sdf >> $(REPORT)
+
+reports: amino_report atom_test aniso_report point_report mol_report mol_assem_report protest_report

@@ -408,18 +408,13 @@ Rotation align_points_3d(Point* point, Point* align, Point* center)
             return rot;
         }
 
-        Point pt;
-
-        do
+        Point pt(0,0,1);
+        n = compute_normal(point, align, &pt);
+        if (n.r < 0.1)
         {
-            pt.x = 0.1 * (rand() % 503);
-            pt.y = 0.1 * (rand() % 503);
-            pt.z = 0.1 * (rand() % 503);
-
-            n = compute_normal(point, align, &pt);
-            // cout << n.r << " ";
+        	pt = Point(0,0,1);
+        	n = compute_normal(point, align, &pt);
         }
-        while (n.r < 0.01);
 
         rot.v = n;
         rot.a = M_PI;

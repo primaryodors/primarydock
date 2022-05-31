@@ -865,6 +865,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     // Get the location of the previous C, and the location of the local C.
     Atom *atom, *btom;
     
+    angle = M_PI+angle;
     
     switch (dir)
     {
@@ -889,17 +890,31 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
         break;
 
     	default:
-        ; //return retval;
+        return retval;
     }
     if (!atom || !btom) return retval;
     Bond* b = atom->get_bond_between(btom);
     if (!b) return retval;
     if (!m_mcoord) b->can_rotate = true;
     
-	atom = get_atom("HN");
-	if (!atom) atom = get_atom("H");
-    btom = get_atom("O");
-    if (!atom || !btom) return retval;
+	switch (dir)
+    {
+    	case N_asc:
+        case CA_desc:
+        atom = get_atom("HN");
+        if (!atom) get_atom("H");
+        btom = get_atom("C");
+        break;
+
+    	case CA_asc:
+        case C_desc:
+        atom = get_atom("N");
+        btom = get_atom("O");
+        break;
+
+    	default:
+        return retval;
+    }
     
     // Use the vector as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
     int i, step=3;

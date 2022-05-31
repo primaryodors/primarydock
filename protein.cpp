@@ -748,7 +748,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             }
         delete[] lr2;
 
-        LocRotation lr = aa->rotate_backbone_abs(dir1, M_PI-phi);
+        LocRotation lr = aa->rotate_backbone_abs(dir1, phi);
 
         if (lr.v.r)
         {
@@ -762,7 +762,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             }
         }
 
-        lr = aa->rotate_backbone_abs(dir2, M_PI-psi);
+        lr = aa->rotate_backbone_abs(dir2, psi);
 
         if (lr.v.r)
         {

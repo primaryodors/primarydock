@@ -37,6 +37,7 @@ int main(int argc, char** argv)
     p.set_collidables();
 
 	char outfn[32]{};
+    p.make_helix(1, p.get_seq_length(), M_PI, M_PI);
     strcpy(outfn, "test.pdb");
     FILE* pf = fopen(outfn, "wb");
     p.save_pdb(pf);
@@ -45,6 +46,7 @@ int main(int argc, char** argv)
     cout << "Wrote " << outfn << endl;
     
     p.make_helix(1, p.get_seq_length(), ALPHA_PHI, ALPHA_PSI);
+    // p.make_helix(1, p.get_seq_length(), ALPHA_PHI, ALPHA_PSI-ALPHA_PHI);
     strcpy(outfn, "test_alpha.pdb");
     pf = fopen(outfn, "wb");
     p.save_pdb(pf);

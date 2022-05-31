@@ -442,7 +442,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     // is calculated as a cosine and then raised to this exponent.
     Point center;
 
-    if (!forces) goto _canstill_collide;
+    if (!forces) goto _canstill_clash;
 
     if (r < 0.5) forces[0] = NULL;
 
@@ -644,7 +644,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     if (rbind < 0.7) rbind = 0.7;
 
-_canstill_collide:
+_canstill_clash:
     ;
     if (r < rbind)
     {

@@ -101,10 +101,10 @@ class Molecule
     Atom** get_ring_atoms(int ringid);
 
     // Interaction functions.
-    float get_internal_collisions();
-    void minimize_internal_collisions();
-    float get_intermol_collisions(const Molecule* ligand);
-    float get_intermol_collisions(Molecule** ligands);
+    float get_internal_clashes();
+    void minimize_internal_clashes();
+    float get_intermol_clashes(const Molecule* ligand);
+    float get_intermol_clashes(Molecule** ligands);
     float get_intermol_binding(Molecule* ligand);
     float get_intermol_binding(Molecule** ligands);
 
@@ -115,17 +115,17 @@ class Molecule
 
 
     void intermol_conform(Molecule* ligand, int iters = 50);
-    void intermol_conform(Molecule* ligand, int iters, Molecule** avoid_colliding_with);
-    void intermol_conform(Molecule* ligand, int iters, AminoAcid** avoid_colliding_with);
+    void intermol_conform(Molecule* ligand, int iters, Molecule** avoid_clashing_with);
+    void intermol_conform(Molecule* ligand, int iters, AminoAcid** avoid_clashing_with);
     void intermol_conform(Molecule** ligands, int iters = 50);
     void intermol_conform_norecen(AminoAcid** ligands, int iters = 50);
-    void intermol_conform(Molecule** ligands, int iters, Molecule** avoid_colliding_with);
-    void intermol_conform_norecen(Molecule* ligand, int iters, Molecule** avoid_colliding_with);
-    void intermol_conform_norecen(Molecule* ligand, int iters, AminoAcid** avoid_colliding_with);
-    void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_colliding_with);
-    void intermol_conform_norecen(Molecule** ligands, int iters, AminoAcid** avoid_colliding_with);
-    void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_colliding_with);
-    void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_colliding_with);
+    void intermol_conform(Molecule** ligands, int iters, Molecule** avoid_clashing_with);
+    void intermol_conform_norecen(Molecule* ligand, int iters, Molecule** avoid_clashing_with);
+    void intermol_conform_norecen(Molecule* ligand, int iters, AminoAcid** avoid_clashing_with);
+    void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_clashing_with);
+    void intermol_conform_norecen(Molecule** ligands, int iters, AminoAcid** avoid_clashing_with);
+    void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with);
+    void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with);
     void reset_conformer_momenta();
     Atom* get_most_bindable();						// Return a pointer ot the atom with the greatest potential intermol binding.
 
@@ -144,7 +144,7 @@ class Molecule
     bool* ring_aromatic = 0;
     Bond** rotatable_bonds = 0;
     bool immobile = false;
-    float mincoll = 0;					// Baseline computed internal collisions due to unavoidably close atoms.
+    float minclash = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
     bool doing_bkbend = false;
 
     // For intermol conformer optimization:
@@ -162,10 +162,10 @@ class Molecule
     float fsb_lsb_anomaly(Atom* first, Atom* last, float lcard, float bond_length);
     void make_coplanar_ring(Atom** ring_members);
 
-    void intermol_conform_norecen(Molecule* ligand, int iters, Molecule** avoid_colliding_with, float lastbind);
-    void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_colliding_with, float lastbind);
-    void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_colliding_with, float lastbind);
-    void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_colliding_with, float lastbind);
+    void intermol_conform_norecen(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
+    void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
+    void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
+    void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
 };
 
 extern float potential_distance;

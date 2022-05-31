@@ -35,12 +35,12 @@ int main(int argc, char** argv)
 
     m.hydrogenate();
 
-    cout << "Internal collisions: " << m.get_internal_collisions() << " cu.A." << endl;
+    cout << "Internal clashes: " << m.get_internal_clashes() << " cu.A." << endl;
 
-    cout << "Minimizing internal collisions..." << endl;
-    m.minimize_internal_collisions();
+    cout << "Minimizing internal clashes..." << endl;
+    m.minimize_internal_clashes();
 
-    cout << "Internal collisions: " << m.get_internal_collisions() << " cu.A." << endl;
+    cout << "Internal clashes: " << m.get_internal_clashes() << " cu.A." << endl;
 
     const char* tstoutf = "test.sdf";
     FILE* pf = fopen(tstoutf, "wb");

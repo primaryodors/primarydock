@@ -21,7 +21,7 @@ AminoAcid::AminoAcid(FILE* instream)
     immobile = true;
     movability = MOV_FLEXONLY;
     from_pdb(instream);
-    mincoll = get_internal_collisions();
+    minclash = get_internal_clashes();
     mol_typ = MOLTYP_AMINOACID;
 }
 
@@ -156,7 +156,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     }
 
     // hydrogenate();
-	minimize_internal_collisions();
+	minimize_internal_clashes();
     for (i=0; i<100; i++)
     {
 		rotate_backbone_abs(N_asc, 0);
@@ -531,7 +531,7 @@ bool AminoAcid::can_reach(AminoAcid* other) const
 
     if (!ca1 || !ca2)
     {
-        cout << "Warning: Could not determine reach of " << *this << " - " << *other << " to avoid possibility of collision." << endl;
+        cout << "Warning: Could not determine reach of " << *this << " - " << *other << " to avoid possibility of clash." << endl;
         return false;
     }
 

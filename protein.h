@@ -27,7 +27,7 @@ public:
     bool add_residue(const char* pdbdata);
     bool add_sequence(const char* sequence);
     float coordinate_metal(const char* metal_elemsym, const int* coord_residues);		// Returns coordination anomaly.
-    void set_collidables();
+    void set_clashables();
     void delete_residue(int resno);
     void delete_sidechain(int resno);
     void delete_residues(int startres, int endres);
@@ -45,7 +45,7 @@ public:
     int get_start_resno();
     AminoAcid* get_residue(int resno);
     Molecule* metals_as_molecule();
-    AminoAcid** get_residues_can_collide(int resno);
+    AminoAcid** get_residues_can_clash(int resno);
     bool aa_ptr_in_range(AminoAcid* aaptr);
     Region get_region(std::string name);
     int get_region_start(std::string name);
@@ -54,10 +54,10 @@ public:
     Point get_atom_location(int resno, const char* aname);
 
     // Metrics functions.
-    float get_internal_collisions();
-    float get_intermol_collisions(const Molecule* ligand);
+    float get_internal_clashes();
+    float get_intermol_clashes(const Molecule* ligand);
     float get_intermol_binding(const Molecule* ligand);
-    int get_residues_can_collide_ligand
+    int get_residues_can_clash_ligand
     (	AminoAcid** reaches_spheroid,
         const Molecule* ligand,
         const Point nodecen,
@@ -87,7 +87,7 @@ protected:
     std::string name;
     char* sequence=0;
     AminoAcid** residues=0;
-    AminoAcid*** res_can_coll = 0;
+    AminoAcid*** res_can_clash = 0;
     Atom** ca=0;
     float* res_reach=0;
     Atom** metals=0;

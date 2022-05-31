@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 
     Protein p(namearg?argv[namearg]:"Test");
     p.add_sequence(argv[seqarg]);
-    p.set_collidables();
+    p.set_clashables();
 
 	char outfn[32]{};
     p.make_helix(1, p.get_seq_length(), M_PI, M_PI);
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
     pf = fopen(outfn, "rb");
     m.from_pdb(pf);
     fclose(pf);
-    // m.minimize_internal_collisions();
+    // m.minimize_internal_clashes();
 
     const char* outfn2 = "test2.sdf";
     pf = fopen(outfn2, "wb");

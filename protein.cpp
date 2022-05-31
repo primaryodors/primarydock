@@ -117,7 +117,7 @@ bool Protein::add_sequence(const char* lsequence)
     }
     Molecule::multimol_conform(aas, 25);
     
-    set_collidables();
+    set_clashables();
 
     return true;
 }
@@ -232,7 +232,7 @@ int Protein::load_pdb(FILE* is)
     // cout << "Read residue " << *residues[rescount] << endl;
     residues[rescount] = 0;
 
-    set_collidables();
+    set_clashables();
 
     return rescount;
 }
@@ -253,19 +253,19 @@ int  Protein::get_start_resno()
 }
 
 
-void Protein::set_collidables()
+void Protein::set_clashables()
 {
     int i, j, k;
 
-    // cout << "Setting collidables." << endl;
+    // cout << "Setting clashables." << endl;
 
-    if (res_can_coll)
+    if (res_can_clash)
     {
-        delete[] res_can_coll;
+        delete[] res_can_clash;
     }
 
     int seqlen = get_seq_length();
-    res_can_coll = new AminoAcid**[seqlen+1] {};
+    res_can_clash = new AminoAcid**[seqlen+1] {};
 
     // cout << "seqlen is " << seqlen << endl;
 
@@ -283,56 +283,56 @@ void Protein::set_collidables()
                 if (debug) *debug << *residues[j] << " can reach " << *residues[i] << endl;
             }
         }
-        res_can_coll[i] = new AminoAcid*[k+1] {};
+        res_can_clash[i] = new AminoAcid*[k+1] {};
         for (j=0; j<k; j++)
         {
-            res_can_coll[i][j] = temp[j];
+            res_can_clash[i][j] = temp[j];
             /*cout << residues[i]->get_aa_definition()->_3let << residues[i]->get_residue_no()
-            	 << " can collide with "
-            	 << res_can_coll[i][j]->get_aa_definition()->_3let << res_can_coll[i][j]->get_residue_no()
+            	 << " can clash with "
+            	 << res_can_clash[i][j]->get_aa_definition()->_3let << res_can_clash[i][j]->get_residue_no()
             	 << endl;*/
         }
-        res_can_coll[i][k] = 0;
+        res_can_clash[i][k] = 0;
     }
 
-    res_can_coll[seqlen] = 0;
+    res_can_clash[seqlen] = 0;
     
     /*for (i=0; i<seqlen; i++)
     {
     	cout << i << ": ";
-    	for (j=0; res_can_coll[i][j]; j++)
-    		cout << *res_can_coll[i][j] << " ";
+    	for (j=0; res_can_clash[i][j]; j++)
+    		cout << *res_can_clash[i][j] << " ";
     	cout << endl;
     }*/
 }
 
-AminoAcid** Protein::get_residues_can_collide(int resno)
+AminoAcid** Protein::get_residues_can_clash(int resno)
 {
     if (!residues) return 0;
-	if (!res_can_coll) set_collidables();
+	if (!res_can_clash) set_clashables();
 
     int i, j;
     for (i=0; residues[i]; i++)
     {
         if (residues[i]->get_residue_no() == resno)
         {
-        	if (!res_can_coll[i] || !res_can_coll[i][0]) set_collidables();
+        	if (!res_can_clash[i] || !res_can_clash[i][0]) set_clashables();
         	/*cout << i << ": " << flush;
-        	if (res_can_coll[i] && res_can_coll[i][0])
+        	if (res_can_clash[i] && res_can_clash[i][0])
         	{
-        		cout << *res_can_coll[i][0] << endl;
-				for (j=0; res_can_coll[i][j]; j++)
+        		cout << *res_can_clash[i][0] << endl;
+				for (j=0; res_can_clash[i][j]; j++)
 					cout << j << " " << flush;
 				cout << endl;
 			}*/
-        	return res_can_coll[i];
+        	return res_can_clash[i];
     	}
     }
 
     return 0;
 }
 
-int Protein::get_residues_can_collide_ligand(AminoAcid** reaches_spheroid,
+int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         const Molecule* ligand,
         const Point nodecen,
         const Point size,
@@ -548,7 +548,7 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
         }
     }
     
-    set_collidables();
+    set_clashables();
 }
 
 void Protein::conform_backbone(int startres, int endres, int iters, bool backbone_atoms_only)
@@ -594,7 +594,7 @@ void Protein::conform_backbone(int startres, int endres,
     	eando_mult[residx] = 1;
     }
 
-	set_collidables();
+	set_clashables();
     float tolerance = 1.2, alignfactor = 100;
     for (iter=0; iter<iters; iter++)
     {
@@ -603,16 +603,16 @@ void Protein::conform_backbone(int startres, int endres,
         {
         	int residx = res-minres;
         	
-            // Get the preexisting nearby residues and inter-residue binding/collision value.
+            // Get the preexisting nearby residues and inter-residue binding/clash value.
             // These will likely have changed since last iteration.
             float bind=0, bind1=0, angle;
 
             for (i=res; i != endres; i += inc)
             {
                 AminoAcid* aa = get_residue(i);
-                AminoAcid** rcc = get_residues_can_collide(i);
-                if (!rcc) cout << "No collidables." << endl;
-                if (a1)		bind -= aa->get_intermol_collisions(AminoAcid::aas_to_mols(rcc));
+                AminoAcid** rcc = get_residues_can_clash(i);
+                if (!rcc) cout << "No clashables." << endl;
+                if (a1)		bind -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
                 else		bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1)
@@ -633,12 +633,12 @@ void Protein::conform_backbone(int startres, int endres,
                 rotate_backbone_partial(res, endres, dir1, angle);
                 if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, -angle*eando_mult[residx]);
 
-                // Have bindings/collisions improved?
+                // Have bindings/clashes improved?
                 for (i=res; i != endres; i += inc)
                 {
                     AminoAcid* aa = get_residue(i);
-                    AminoAcid** rcc = get_residues_can_collide(i);
-                    if (a1)		bind1 -= aa->get_intermol_collisions(AminoAcid::aas_to_mols(rcc));
+                    AminoAcid** rcc = get_residues_can_clash(i);
+                    if (a1)		bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
                 	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
                 }
                 if (a1)
@@ -677,8 +677,8 @@ void Protein::conform_backbone(int startres, int endres,
             for (i=res; i != endres; i += inc)
             {
                 AminoAcid* aa = get_residue(i);
-                AminoAcid** rcc = get_residues_can_collide(i);
-                if (a1)		bind1 -= aa->get_intermol_collisions(AminoAcid::aas_to_mols(rcc));
+                AminoAcid** rcc = get_residues_can_clash(i);
+                if (a1)		bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
             	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1)
@@ -812,7 +812,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
     }
 #endif
 	
-	set_collidables();
+	set_clashables();
     
     Molecule* aas[get_seq_length()+4]{};
     for (i=startres; i<=endres; i++)

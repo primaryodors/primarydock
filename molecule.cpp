@@ -415,7 +415,7 @@ int Molecule::from_sdf(const char* sdf_dat)
 
     identify_rings();
     identify_acidbase();
-    mincoll = get_internal_collisions();
+    minclash = get_internal_clashes();
     return added;
 }
 
@@ -1294,12 +1294,12 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
 }
 
 
-float Molecule::get_internal_collisions()
+float Molecule::get_internal_clashes()
 {
     int i, j;
     float r;
     Atom* a, *b;
-    float coll = 0;
+    float clash = 0;
 
     if (!atoms) return 0;
 
@@ -1318,32 +1318,32 @@ float Molecule::get_internal_collisions()
             r = pta.get_3d_distance(&ptb);
             if (r < avdW + bvdW)
             {
-                float lcoll = sphere_intersection(avdW, bvdW, r);
-                coll += lcoll;
-                // cout << atoms[i]->name << " collides with " << atoms[j]->name << " by " << lcoll << " cu. A." << endl;
+                float lclash = sphere_intersection(avdW, bvdW, r);
+                clash += lclash;
+                // cout << atoms[i]->name << " clashes with " << atoms[j]->name << " by " << lclash << " cu. A." << endl;
             }
         }
     }
 
-    if (coll < mincoll) mincoll = coll;
+    if (clash < minclash) minclash = clash;
 
-    return coll-mincoll;
+    return clash-minclash;
 }
 
-float Molecule::get_intermol_collisions(const Molecule* ligand)
+float Molecule::get_intermol_clashes(const Molecule* ligand)
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
     ligands[1] = NULL;
-    return get_intermol_collisions(ligands);
+    return get_intermol_clashes(ligands);
 }
 
-float Molecule::get_intermol_collisions(Molecule** ligands)
+float Molecule::get_intermol_clashes(Molecule** ligands)
 {
     int i, j, l;
     float r;
     Atom* a, *b;
-    float coll = 0;
+    float clash = 0;
 
     if (!atoms) return 0;
     if (!ligands) return 0;
@@ -1369,19 +1369,19 @@ float Molecule::get_intermol_collisions(Molecule** ligands)
                 r = pta.get_3d_distance(&ptb) + 1e-3;
                 if (r < avdW + bvdW)
                 {
-                    float lcoll = sphere_intersection(avdW, bvdW, r);
-                    if (lcoll > 0)
+                    float lclash = sphere_intersection(avdW, bvdW, r);
+                    if (lclash > 0)
                     {
-                        coll += lcoll;
-                        /*cout << name << ":" << atoms[i]->name << " collides with " <<
-                        	ligands[l]->name << ":" << ligands[l]->atoms[j]->name << " by " << lcoll << " cu. A." << endl;*/
+                        clash += lclash;
+                        /*cout << name << ":" << atoms[i]->name << " clashes with " <<
+                        	ligands[l]->name << ":" << ligands[l]->atoms[j]->name << " by " << lclash << " cu. A." << endl;*/
                     }
                 }
             }
         }
     }
 
-    return coll*_kJmol_cuA;
+    return clash*_kJmol_cuA;
 }
 
 void Molecule::move(Vector move_amt)
@@ -1569,7 +1569,7 @@ float Molecule::get_intermol_binding(Molecule** ligands)
     if (!ligands[0]) return 0;
     int i, j, l;
     float kJmol = 0;
-    kJmol -= get_internal_collisions();
+    kJmol -= get_internal_clashes();
 
     for (i=0; i<atcount; i++)
         atoms[i]->last_bind_energy = 0;
@@ -1609,15 +1609,15 @@ float Molecule::get_intermol_binding(Molecule** ligands)
 }
 
 
-void Molecule::minimize_internal_collisions()
+void Molecule::minimize_internal_clashes()
 {
     if (!atoms) return;
 
-    mincoll = 0;
+    minclash = 0;
     int i, j, iter;
-    float coll = get_internal_collisions();
+    float clash = get_internal_clashes();
 
-    if (!coll) return;		// Already zero, nothing to decrease to.
+    if (!clash) return;		// Already zero, nothing to decrease to.
 
     Bond** b = get_rotatable_bonds();
     if (!b) return;
@@ -1634,12 +1634,12 @@ void Molecule::minimize_internal_collisions()
         for (i=0; i<numrb; i++)
         {
             b[i]->rotate(angle[i]);
-            mincoll = 0;
-            float coll1 = get_internal_collisions();
+            minclash = 0;
+            float clash1 = get_internal_clashes();
 
-            if (coll1 <= coll)
+            if (clash1 <= clash)
             {
-                coll = coll1;
+                clash = clash1;
                 angle[i] *= 0.99;
             }
             else
@@ -1650,7 +1650,7 @@ void Molecule::minimize_internal_collisions()
         }
     }
 
-    mincoll = coll;
+    minclash = clash;
 }
 
 void Molecule::intermol_conform(Molecule* ligand, int iters)
@@ -1708,7 +1708,7 @@ void Molecule::intermol_conform(Molecule** ligands, int iters, Molecule** avcw)
 
     float bind = get_intermol_binding(ligands);
     float bind1;
-    if (avcw) bind -= get_intermol_collisions(avcw);
+    if (avcw) bind -= get_intermol_clashes(avcw);
 
     for (iter=0; iter<iters; iter++)
     {
@@ -1719,7 +1719,7 @@ void Molecule::intermol_conform(Molecule** ligands, int iters, Molecule** avcw)
             Point lmpt(lmx,0,0);
             move(lmpt);
             bind1 = get_intermol_binding(ligands);
-            if (avcw) bind -= get_intermol_collisions(avcw);
+            if (avcw) bind -= get_intermol_clashes(avcw);
 
             /*if (fabs(lmx) > 0.5) lmx *= 0.9;
             if (fabs(lmy) > 0.5) lmy *= 0.9;
@@ -1745,7 +1745,7 @@ void Molecule::intermol_conform(Molecule** ligands, int iters, Molecule** avcw)
             float oldy = get_barycenter().y;
             move(lmpt);
             bind1 = get_intermol_binding(ligands);
-            if (avcw) bind -= get_intermol_collisions(avcw);
+            if (avcw) bind -= get_intermol_clashes(avcw);
 
             if (bind1 < bind)
             {
@@ -1767,7 +1767,7 @@ void Molecule::intermol_conform(Molecule** ligands, int iters, Molecule** avcw)
             lmpt.z = lmz;
             move(lmpt);
             bind1 = get_intermol_binding(ligands);
-            if (avcw) bind -= get_intermol_collisions(avcw);
+            if (avcw) bind -= get_intermol_clashes(avcw);
 
             if (bind1 < bind)
             {
@@ -1785,7 +1785,7 @@ void Molecule::intermol_conform(Molecule** ligands, int iters, Molecule** avcw)
             // Entire molecule rotation.
             rotate(&xv, amx);
             bind1 = get_intermol_binding(ligands);
-            if (avcw) bind -= get_intermol_collisions(avcw);
+            if (avcw) bind -= get_intermol_clashes(avcw);
 
             if (bind1 < bind)
             {
@@ -1800,7 +1800,7 @@ void Molecule::intermol_conform(Molecule** ligands, int iters, Molecule** avcw)
 
             rotate(&yv, amy);
             bind1 = get_intermol_binding(ligands);
-            if (avcw) bind -= get_intermol_collisions(avcw);
+            if (avcw) bind -= get_intermol_clashes(avcw);
 
             if (bind1 < bind)
             {
@@ -1815,7 +1815,7 @@ void Molecule::intermol_conform(Molecule** ligands, int iters, Molecule** avcw)
 
             rotate(&zv, amz);
             bind1 = get_intermol_binding(ligands);
-            if (avcw) bind -= get_intermol_collisions(avcw);
+            if (avcw) bind -= get_intermol_clashes(avcw);
 
             if (bind1 < bind)
             {
@@ -1869,7 +1869,7 @@ void Molecule::intermol_conform_norecen(Molecule** ligands, int iters, Molecule*
     float bind;
     bind = isnan(lastbind) ? get_intermol_binding(ligands) : lastbind;
     float bind1;
-    if (avcw) bind -= get_intermol_collisions(avcw);
+    if (avcw) bind -= get_intermol_clashes(avcw);
 
     for (iter=0; iter<iters; iter++)
     {
@@ -1878,7 +1878,7 @@ void Molecule::intermol_conform_norecen(Molecule** ligands, int iters, Molecule*
             // Entire molecule rotation.
             rotate(&xv, amx);
             bind1 = get_intermol_binding(ligands);
-            if (avcw) bind -= get_intermol_collisions(avcw);
+            if (avcw) bind -= get_intermol_clashes(avcw);
 
             if (bind1 < bind)
             {
@@ -1892,7 +1892,7 @@ void Molecule::intermol_conform_norecen(Molecule** ligands, int iters, Molecule*
 
             rotate(&yv, amy);
             bind1 = get_intermol_binding(ligands);
-            if (avcw) bind -= get_intermol_collisions(avcw);
+            if (avcw) bind -= get_intermol_clashes(avcw);
 
             if (bind1 < bind)
             {
@@ -1906,7 +1906,7 @@ void Molecule::intermol_conform_norecen(Molecule** ligands, int iters, Molecule*
 
             rotate(&zv, amz);
             bind1 = get_intermol_binding(ligands);
-            if (avcw) bind -= get_intermol_collisions(avcw);
+            if (avcw) bind -= get_intermol_clashes(avcw);
 
             if (bind1 < bind)
             {
@@ -1955,8 +1955,8 @@ void Molecule::intermol_conform_flexonly(Molecule** ligands, int iters, Molecule
     float bind;
     bind = isnan(lastbind) ? get_intermol_binding(ligands) : lastbind;
     float bind1;
-    if (avcw) bind -= get_intermol_collisions(avcw);
-    bind -= get_internal_collisions();
+    if (avcw) bind -= get_intermol_clashes(avcw);
+    bind -= get_internal_clashes();
 
     for (iter=0; iter<iters; iter++)
     {
@@ -1981,8 +1981,8 @@ void Molecule::intermol_conform_flexonly(Molecule** ligands, int iters, Molecule
                 }
 
                 bind1 = get_intermol_binding(ligands);
-                if (avcw) bind -= get_intermol_collisions(avcw);
-                bind1 -= get_internal_collisions();
+                if (avcw) bind -= get_intermol_clashes(avcw);
+                bind1 -= get_internal_clashes();
 
                 if (bind1 < bind)
                 {
@@ -2050,7 +2050,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
                 if (nearby[j])
                 {
-                    // get_intermol_binding includes collisions, so we don't have to check them here.
+                    // get_intermol_binding includes clashes, so we don't have to check them here.
                     bind += mm[i]->get_intermol_binding(mm[j]);
                 }
             }
@@ -2989,8 +2989,8 @@ float Molecule::close_loop(Atom** path, float lcard)
 
     int iter;
     float anomaly = fsb_lsb_anomaly(first, last, lcard, bond_length);
-    float icoll = get_internal_collisions();
-    float ocoll = icoll;
+    float iclash = get_internal_clashes();
+    float oclash = iclash;
     float bondrot[ringsize];
 
     for (i=0; i<ringsize; i++) bondrot[i] = M_PI/2*randsgn();
@@ -3004,18 +3004,18 @@ float Molecule::close_loop(Atom** path, float lcard)
             if (rotables[i]->rotate(bondrot[i]))
             {
                 float newanom = fsb_lsb_anomaly(first, last, lcard, bond_length);
-                float ncoll = get_internal_collisions();
+                float nclash = get_internal_clashes();
                 if ((	newanom <= anomaly
                         ||
                         (rotables[i]->can_flip && (rand()%100) < 22)
                     )
                         &&
-                        ncoll <= allowance * icoll
+                        nclash <= allowance * iclash
                    )
                 {
                     if (_DBGCLSLOOP) cout << "Anomaly was " << anomaly << " now " << newanom << ", keeping." << endl;
                     anomaly = newanom;
-                    icoll = ncoll;
+                    iclash = nclash;
                 }
                 else
                 {

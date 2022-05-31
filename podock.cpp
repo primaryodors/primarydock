@@ -80,7 +80,7 @@ void iteration_callback(int iter)
 
         int i;
         AminoAcid* resphres[SPHREACH_MAX+4] = {};
-        int sphres = protein->get_residues_can_collide_ligand(resphres, ligand, bary, size, mcoord_resno);
+        int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, mcoord_resno);
         for (i=0; i<sphres; i++)
         {
             discrete[i+2].paa = resphres[i];
@@ -358,7 +358,7 @@ int main(int argc, char** argv)
     if (debug) *debug << "Created metals molecule." << endl;
 #endif
 
-    float bcoll = 0;
+    float bclash = 0;
 
     for (l=0; l<seql; l++)
     {
@@ -368,15 +368,15 @@ int main(int argc, char** argv)
         {
             AminoAcid* naa = p.get_residue(n+rstart);
             if (!naa) continue;
-            bcoll += laa->get_intermol_collisions(naa);
+            bclash += laa->get_intermol_clashes(naa);
         }
 
-        bcoll += m.get_intermol_collisions(laa);
+        bclash += m.get_intermol_clashes(laa);
 
-        if (met) bcoll += laa->get_intermol_collisions(met);
+        if (met) bclash += laa->get_intermol_clashes(met);
     }
-    if (met) bcoll += m.get_intermol_collisions(met);
-    if (debug) *debug << "Initial collisions: " << bcoll << endl;
+    if (met) bclash += m.get_intermol_clashes(met);
+    if (debug) *debug << "Initial clashes: " << bclash << endl;
 
 
     // TODO: Output some basic stats: receptor, ligand, etc.
@@ -436,7 +436,7 @@ int main(int argc, char** argv)
 #endif
 
 
-            sphres = p.get_residues_can_collide_ligand(reaches_spheroid[nodeno], &m, nodecen, size, mcoord_resno);
+            sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, mcoord_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
 
             /*cout << "Dock residues for node " << nodeno << ": " << endl;
@@ -558,7 +558,7 @@ int main(int argc, char** argv)
                         v.r *= 0.5;
                         m.move(v);
 
-                        // Preemptively minimize intermol collisions.
+                        // Preemptively minimize intermol clashes.
                         Molecule* mtmp[3];
                         mtmp[0] = &m;
                         mtmp[1] = alignment_aa;
@@ -627,7 +627,7 @@ int main(int argc, char** argv)
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 
-            if (debug) *debug << "Pose " << pose << " pathnode " << nodeno /*<< " collisions " << coll*/ << endl;
+            if (debug) *debug << "Pose " << pose << " pathnode " << nodeno /*<< " clashes " << clash*/ << endl;
 
             m.clear_atom_binding_energies();
 
@@ -641,7 +641,7 @@ int main(int argc, char** argv)
                 btot += lb;
             }
 
-            sphres = p.get_residues_can_collide_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, mcoord_resno);
+            sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, mcoord_resno);
             // cout << "sphres " << sphres << endl;
             for (i=0; i<sphres; i++)
             {

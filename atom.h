@@ -105,6 +105,7 @@ public:
     Atom* is_bonded_to(const int family);
     bool shares_bonded_with(Atom* btom);
     Bond* get_bond_between(Atom* btom);
+    Bond* get_bond_between(const char* bname);
     Bond* get_bond_by_idx(int bidx);
     int get_idx_bond_between(Atom* btom);
     void aromatize()

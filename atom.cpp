@@ -423,6 +423,16 @@ Atom** Bond::get_moves_with_btom()
 
 bool Atom::move(Point* pt)
 {
+	/*if (name && !strcmp(name, "CB"))
+	{
+		Bond* b = get_bond_between("CA");
+		if (b && b->btom)
+		{
+			float r = b->btom->get_location().get_3d_distance(pt);
+			if (r > 1.55) throw 0x7e57196;
+		}
+	}*/
+	
     location = *pt;
     location.weight = at_wt;
     geov = NULL;
@@ -431,6 +441,15 @@ bool Atom::move(Point* pt)
 
 bool Atom::move_rel(Vector* v)
 {
+	/*if (name && !strcmp(name, "CB"))
+	{
+		Bond* b = get_bond_between("CA");
+		if (b && b->btom)
+		{
+			float r = b->btom->get_location().get_3d_distance(location.add(v));
+			if (r > 1.55) throw 0x7e57196;
+		}
+	}*/
     location = location.add(v);
     geov = NULL;
     return true;
@@ -587,6 +606,17 @@ Bond* Atom::get_bond_between(Atom* btom)
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (bonded_to[i].btom == btom)
+                return &bonded_to[i];
+    return 0;
+}
+
+Bond* Atom::get_bond_between(const char* bname)
+{
+    if (!bonded_to) return 0;
+    int i;
+    for (i=0; i<geometry; i++)
+        if (bonded_to[i].btom)
+            if (bonded_to[i].btom && !strcmp( bonded_to[i].btom->name, bname ))
                 return &bonded_to[i];
     return 0;
 }
@@ -945,10 +975,14 @@ bool Bond::rotate(float theta, bool allow_backbone)
                 continue;
             }
         }
-        else
-        {
-            if (moves_with_btom[i]->residue != btom->residue) continue;
-        }
+        if (moves_with_btom[i]->residue != btom->residue) continue;
+        
+        /*cout << moves_with_btom[i]->residue << ":" << moves_with_btom[i]->name
+        	 << " from "
+        	 << atom->residue << ":" << atom->name
+        	 << "-"
+        	 << btom->residue << ":" << btom->name
+        	 << endl << flush;*/
 
         Point loc = moves_with_btom[i]->get_location();
         Point nl  = rotate3D(&loc, &cen, &v, theta);

@@ -1228,8 +1228,41 @@ Bond** AminoAcid::get_rotatable_bonds()
     	return NULL;
 	}
     Bond* btemp[65536];
-
+    
     int i,j, bonds=0;
+    if (aadef && aadef->aabonds)
+    {
+    	for (i=0; aadef->aabonds[i]; i++)
+    	{
+    		if (aadef->aabonds[i]->cardinality == 1
+    			&&
+    			aadef->aabonds[i]->can_rotate
+    		   )
+    		{
+    			Atom* la = get_atom(aadef->aabonds[i]->aname);
+    			if (la
+    				&& (!la->is_backbone || !strcmp(la->name, "CA"))
+    			   )
+    			{
+    				Bond* lb = la->get_bond_between(aadef->aabonds[i]->bname);
+    				lb->can_rotate = aadef->aabonds[i]->can_rotate;
+    				if (!lb->btom->is_backbone
+		                &&
+		                greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)-1)
+		                &&
+		                lb->btom->get_Z() > 1
+                       )
+                    {
+				        btemp[bonds++] = lb;
+				        btemp[bonds] = 0;
+				    }
+				}
+    		}
+    	}
+    	
+    	goto _found_aadef;
+    }
+
     for (i=0; atoms[i]; i++)
     {
         Bond** lb = atoms[i]->get_bonds();
@@ -1257,6 +1290,7 @@ Bond** AminoAcid::get_rotatable_bonds()
         if (lb) delete[] lb;
     }
 
+	_found_aadef:
     Bond** retval = new Bond*[bonds+1] {};
     for (i=0; i<=bonds; i++) retval[i] = btemp[i];
 

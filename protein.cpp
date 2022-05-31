@@ -517,6 +517,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
 
 void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, float angle)
 {
+	if (startres == endres) return;
     int inc = (dir == CA_desc || dir == C_desc) ? -1 : 1;
     if (sgn(endres - startres) != sgn(inc))
     {
@@ -579,11 +580,12 @@ void Protein::conform_backbone(int startres, int endres,
     
     for (res = startres; res <= endres; res += inc)
     {
-    	momenta1[res-minres] = randsgn()*_fullrot_steprad;
-    	momenta2[res-minres] = randsgn()*_fullrot_steprad;
-    	eando_res[res-minres] = min(res + (rand() % 5), endres);
-    	eando_mult[res-minres] = 1;
-    	
+    	int residx = res-minres;
+    	momenta1[residx] = randsgn()*_fullrot_steprad;
+    	momenta2[residx] = randsgn()*_fullrot_steprad;
+    	eando_res[residx] = min(res + (rand() % 5) + 1, endres);
+    	if (eando_res[residx] == res) eando_res[residx] = 0;
+    	eando_mult[residx] = 1;
     }
 
 	set_collidables();
@@ -593,6 +595,8 @@ void Protein::conform_backbone(int startres, int endres,
         cout << "Iteration " << iter << endl;
         for (res = startres; res != endres; res += inc)
         {
+        	int residx = res-minres;
+        	
             // Get the preexisting nearby residues and inter-residue binding/collision value.
             // These will likely have changed since last iteration.
             float bind=0, bind1=0, angle;
@@ -619,8 +623,9 @@ void Protein::conform_backbone(int startres, int endres,
             if (strcmp(get_residue(res)->get_3letter(), "PRO"))		// TODO: Don't hard code this to proline, but check bond flexibility.
             {
                 // Rotate the first bond a random amount. TODO: use angular momenta.
-                angle = momenta1[res-minres]; // frand(-_fullrot_steprad, _fullrot_steprad);
+                angle = momenta1[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
                 rotate_backbone_partial(res, endres, dir1, angle);
+                if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, -angle*eando_mult[residx]);
 
                 // Have bindings/collisions improved?
                 for (i=res; i != endres; i += inc)
@@ -646,18 +651,20 @@ void Protein::conform_backbone(int startres, int endres,
                 if (bind1 < tolerance*bind)
                 {
                     rotate_backbone_partial(res, endres, dir1, -angle);
-                    momenta1[res-minres] *= -0.666;
+                    if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, angle*eando_mult[residx]);
+                    momenta1[residx] *= -0.666;
                 }
                 else
                 {
                     if (bind1 < bind) bind = bind1;
-                    momenta1[res-minres] *= 1.05;
+                    momenta1[residx] *= 1.05;
                 }
             }
 
             // Rotate the second bond.
-            angle = momenta2[res-minres]; // frand(-_fullrot_steprad, _fullrot_steprad);
+            angle = momenta2[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
             rotate_backbone_partial(res, endres, dir2, angle);
+            if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, -angle*eando_mult[residx]);
 
             // Improvement?
             bind1 = 0;
@@ -684,11 +691,12 @@ void Protein::conform_backbone(int startres, int endres,
             if (bind1 < tolerance*bind)
             {
                 rotate_backbone_partial(res, endres, dir2, -angle);
-                momenta2[res-minres] *= -0.666;
+                if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, angle*eando_mult[residx]);
+                momenta2[residx] *= -0.666;
             }
             else
             {
-                momenta2[res-minres] *= 1.05;
+                momenta2[residx] *= 1.05;
             }
 
             alignfactor *= 1.003;

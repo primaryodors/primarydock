@@ -1450,6 +1450,7 @@ void Molecule::recenter(Point nl)
 void Molecule::rotate(Vector* vector, float theta)
 {
     if (!atoms) return;
+    // cout << name << " Molecule::rotate()" << endl;
 
     Point cen = get_barycenter();
 

@@ -40,7 +40,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     if (!aa_defs[idx].aabonds)
     {
         cout << "Cannot load " << letter << " please make sure amino acid exists in aminos.dat and all atoms are defined." << endl;
-        throw 0xbadac1d;			// Also known as p!ɔepeq.
+        throw 0xbadac1d;
     }
 
     name = aa_defs[idx].name;
@@ -121,13 +121,18 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
             }
             // close_loop(&path[m], aa_defs[idx].aabonds[j]->cardinality);
 
+			// TODO: These two lines are causing previous residues' side chains to separate from the backbone.
+			#if 0
             a->bond_to(bt, aa_defs[idx].aabonds[j]->cardinality);
             make_coplanar_ring(&path[m]);
+            #endif
         }
         else
         {
             a = add_atom(elemsym, aa_defs[idx].aabonds[j]->aname, bt, aa_defs[idx].aabonds[j]->cardinality);
-            // cout << "New atom is " << a->name << " and bond-to is " << (bt ? bt->name : "null") << endl;
+            /*cout << "New atom is " << a->name << " and bond-to is " << (bt ? bt->name : "null");
+            if (bt) cout << ", atoms are " << a->get_location().get_3d_distance(bt->get_location()) << "A apart.";
+            cout << endl;*/
             if (!strcmp("CA", aa_defs[idx].aabonds[j]->aname)) a->swap_chirality = true;
             a->aaletter = letter;
             strcpy(a->aa3let, aa_defs[idx]._3let);
@@ -583,6 +588,7 @@ bool AminoAcid::capable_of_inter(intera_type inter)
 void AminoAcid::rotate(LocatedVector vector, float theta)
 {
     if (!atoms) return;
+    // cout << name << " AminoAcid::rotate()" << endl;
 
     int i;
     for (i=0; i<atcount; i++)
@@ -659,6 +665,10 @@ LocRotation* AminoAcid::flatten()
 	Bond* b;
     LocRotation* retval = new LocRotation[5] {};
     if (m_mcoord) return retval;	// NO.
+    
+    retval[0] = rotate_backbone_abs(N_asc, M_PI);
+    retval[1] = rotate_backbone_abs(CA_asc, M_PI);
+    return retval;
 
     Atom* prevC = previous_residue_C();
     if (!prevC) return retval;

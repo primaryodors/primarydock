@@ -55,6 +55,12 @@ int main(int argc, char** argv)
         while (aa = aa->get_next());
         fclose(pf);
         cout << "Wrote " << outfn << endl;
+
+		const char* outfn2 = "test.sdf";
+		pf = fopen(outfn2, "wb");
+		firstaa->save_sdf(pf);
+		fclose(pf);
+		cout << "Wrote " << outfn2 << endl;
     }
     else
     {
@@ -65,6 +71,12 @@ int main(int argc, char** argv)
         aa.save_pdb(pf);
         fclose(pf);
         cout << "Wrote " << outfn << endl;
+
+		const char* outfn2 = "test.sdf";
+		pf = fopen(outfn2, "wb");
+		aa.save_sdf(pf);
+		fclose(pf);
+		cout << "Wrote " << outfn2 << endl;
     }
 
     return 0;

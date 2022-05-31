@@ -104,13 +104,19 @@ bool Protein::add_sequence(const char* lsequence)
     }
     cout << endl;
     
+    for (i=0; lsequence[i]; i++)
+    {
+        float r = get_atom_location(i+1, "CA").get_3d_distance(get_atom_location(i+1, "CB"));
+        cout << i+1 << ":CA-CB = " << r << endl;
+    }
+    
     Molecule* aas[get_seq_length()+4]{};
     for (i=1; i<=get_seq_length(); i++)
     {
     	aas[i] = get_residue(i);
     }
     Molecule::multimol_conform(aas, 25);
-
+    
     set_collidables();
 
     return true;
@@ -727,6 +733,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         LocRotation* lr2 = aa->flatten();
 
         for (j=0; j<5; j++)
+        {
             if (lr2[j].v.r && lr2[j].a)
             {
                 AminoAcid* movable;
@@ -746,6 +753,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                     if (j == 3) psis[round_theta]++;
                 }
             }
+        }
         delete[] lr2;
 
         LocRotation lr = aa->rotate_backbone_abs(dir1, phi);

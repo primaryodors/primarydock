@@ -56,6 +56,9 @@ bktest: backbone_test.cpp atom.o point.o intera.o molecule.o aminoacid.o protein
 podock: podock.cpp point.cpp atom.o molecule.o intera.o aminoacid.o protein.o
 	$(CC) podock.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o podock $(CFLAGS)
 
+performance_test: podock testdata/test_TAAR8.config testdata/TAAR8.rotated.pdb testdata/CAD_ion.sdf
+	./podock testdata/test_TAAR8.config
+
 # low-tooling regression tests below
 amino_report: REPORT="amino_test.approved.txt"
 amino_report: amino_test

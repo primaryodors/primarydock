@@ -1,9 +1,0 @@
-ARNDCEQGHILKMFPUSTWYV
-Wrote test.pdb
-Wrote test_alpha.pdb
-Wrote test_beta.pdb
-Wrote test_310.pdb
-Wrote test_pi.pdb
-Wrote test2.sdf
-Read 21 residue(s).
-

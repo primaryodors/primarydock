@@ -7,7 +7,6 @@ podock
 *.dat
 *.pdb
 *.sdf
-*.txt
 *~
 cmake-*
 .idea/

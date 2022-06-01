@@ -6,7 +6,7 @@ CC=g++
 CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14 -fprofile-arcs -ftest-coverage
 
 clean:
-	rm *.o
+	rm *.o *.gcov *.gcno *.gcda
 
 point.o: point.h point.cpp constants.h
 	$(CC) -c point.cpp -o point.o $(CFLAGS)

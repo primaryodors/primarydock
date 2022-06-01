@@ -34,7 +34,7 @@ int main(int argc, char** argv)
             AADef* def = aa->get_aa_definition();
 
             cout << def->name << " bonds can rotate: " << endl;
-            if (!b) cout << "None." << endl;
+            if (!b || !b[0]) cout << "None." << endl;
             else
             {
                 for (j=0; b[j]; j++)

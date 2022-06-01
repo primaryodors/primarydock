@@ -118,13 +118,13 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                 ptr = ptb[0]->btom;
                 // ptb[0]->can_rotate = true;
             }
-            // close_loop(&path[m], aa_defs[idx].aabonds[j]->cardinality);
 
 			// TODO: These lines are causing previous residues' side chains to separate from the backbone.
 			#if 1
-            a->bond_to(bt, aa_defs[idx].aabonds[j]->cardinality);
             // TODO: call close_loop() instead of coplanar ring.
             make_coplanar_ring(&path[m]);
+            // close_loop(&path[m], aa_defs[idx].aabonds[j]->cardinality);
+            a->bond_to(bt, aa_defs[idx].aabonds[j]->cardinality);
             #endif
         }
         else

@@ -463,7 +463,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     Atom** atoms = palin->get_moves_with_btom();
     if (!atoms) return 0;
 
-    //cout << "Moving assembly starting with " << name << " excluding " << excluding->name << endl;
+    cout << "Moving assembly starting with " << name << " excluding " << excluding->name << endl;
 
     int i, atomct=0;
     Vector mov, alignv;
@@ -481,7 +481,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     a0loc = rotate3D(&a0loc, pt, &rot);
     location = a0loc;
     atomct++;
-    //cout << "Motion includes " << name << endl;
+    cout << "Motion includes " << name << endl;
 
     for (i=0; atoms[i]; i++)
     {
@@ -492,7 +492,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
         atoms[i]->location = aloc;
         atoms[i]->geov = NULL;
         atomct++;
-        //cout << "Motion includes " << atoms[i]->name << endl;
+        cout << "Motion includes " << atoms[i]->name << endl;
     }
 
     return atomct;

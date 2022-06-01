@@ -1246,14 +1246,14 @@ Bond** AminoAcid::get_rotatable_bonds()
     			{
     				Bond* lb = la->get_bond_between(aadef->aabonds[i]->bname);
     				lb->can_rotate = aadef->aabonds[i]->can_rotate;
-    				if (!lb->btom->is_backbone
+    				if (!la->is_backbone
+    					&&
+    					la->get_Z() > 1
 		                &&
-		                greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)-1)
-		                &&
-		                lb->btom->get_Z() > 1
+		                greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)+1)
                        )
                     {
-				        btemp[bonds++] = lb;
+				        btemp[bonds++] = lb->btom->get_bond_between(la);
 				        btemp[bonds] = 0;
 				    }
 				}
@@ -2937,18 +2937,28 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
         ring_members[l]->clear_geometry_cache();
 
         Bond* b2=0;
-        for (i=0; i<2; i++)
+        int bgeo = ring_members[l]->get_geometry();
+    	cout << bgeo << ", checking " << ring_members[l]->name << "... " << flush;
+        for (i=0; i<bgeo; i++)
         {
+        	cout << i << " ";
             b2 = ring_members[l]->get_bond_by_idx(i);
+            if (!b2)
+            {
+            	cout << "null bond." << endl;
+                continue;
+            }
             if (!b2->btom)
             {
+            	cout << "null btom." << endl;
                 b2=0;
                 continue;
             }
             for (j=0; j<ringsz; j++)
             {
-                if (ring_members[j] == b2->btom)
+            	if (ring_members[j] == b2->btom)
                 {
+            		cout << "btom is part of the ring." << endl;
                     b2 = 0;
                     break;
                 }
@@ -2957,6 +2967,7 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
         }
         if (b2 && b2->btom)
         {
+        	cout << "found " << b2->btom->name << endl;
             Point ptnew = ring_members[l]->get_location().subtract(ringcen);
             ptnew.scale(InteratomicForce::covalent_bond_radius(ring_members[l], b2->btom, b2->cardinality));
             ptnew = ring_members[l]->get_location().add(ptnew);

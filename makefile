@@ -68,11 +68,6 @@ performance_test: podock testdata/test_TAAR8.config testdata/TAAR8.rotated.pdb t
 amino_report: REPORT="amino_test.approved.txt"
 amino_report: amino_test
 	bash amino_tests.bash ARNDCEQGHILKMFPUSTWYV
-#	./amino_test >$(REPORT)
-#	echo "Content of test.pdb:" >> $(REPORT)
-#	cat test.pdb >> $(REPORT)
-#	echo "Content of test.sdf:" >> $(REPORT)
-#	sed '2d' test.sdf >> $(REPORT)
 
 atom_report: REPORT="atom_test.approved.txt"
 atom_report: atom_test

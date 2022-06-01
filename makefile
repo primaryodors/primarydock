@@ -3,7 +3,12 @@ all: point.o atom.o intera.o molecule.o aminoacid.o protein.o point_test atom_te
 # TODO: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
 
 CC=g++
-CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14 -fprofile-arcs -ftest-coverage
+
+# Default CFLAG - no code coverage
+CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14
+
+# For code coverage instrumentation, switch to these CFLAGS (slower performance):
+#CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14 -fprofile-arcs -ftest-coverage
 
 clean:
 	rm *.o *.gcov *.gcno *.gcda

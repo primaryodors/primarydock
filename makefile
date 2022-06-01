@@ -105,4 +105,4 @@ protein_report: protein_test
 	echo "Content of test2.sdf:" >> $(REPORT)
 	cat test2.sdf >> $(REPORT)
 
-reports: amino_report atom_test aniso_report point_report mol_report mol_assem_report protest_report
+reports: amino_report atom_test aniso_report point_report mol_report mol_assem_report protein_report

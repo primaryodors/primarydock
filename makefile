@@ -70,6 +70,8 @@ amino_report: amino_test
 	./amino_test >$(REPORT)
 	echo "Content of test.pdb:" >> $(REPORT)
 	cat test.pdb >> $(REPORT)
+	echo "Content of test.sdf:" >> $(REPORT)
+	cat test.sdf >> $(REPORT)
 
 atom_report: REPORT="atom_test.approved.txt"
 atom_report: atom_test

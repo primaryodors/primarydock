@@ -52,13 +52,13 @@ amino_test: amino_test.cpp point.o atom.o molecule.o intera.o aminoacid.o
 metal: metal.cpp point.o atom.o molecule.o intera.o aminoacid.o protein.o
 	$(CC) metal.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o metal $(CFLAGS)
 
-protest: protest.cpp point.cpp atom.o molecule.o intera.o aminoacid.o protein.o
-	$(CC) protest.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o protest $(CFLAGS)
+protein_test: protein_test.cpp point.o atom.o molecule.o intera.o aminoacid.o protein.o
+	$(CC) protein_test.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o protein_test $(CFLAGS)
 
 bktest: backbone_test.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o
 	$(CC) backbone_test.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o bktest $(CFLAGS)
 
-podock: podock.cpp point.cpp atom.o molecule.o intera.o aminoacid.o protein.o
+podock: podock.cpp point.o atom.o molecule.o intera.o aminoacid.o protein.o
 	$(CC) podock.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o podock $(CFLAGS)
 
 performance_test: podock testdata/test_TAAR8.config testdata/TAAR8.rotated.pdb testdata/CAD_ion.sdf
@@ -95,10 +95,9 @@ mol_assem_report: mol_assem_test
 	echo "Content of test.sdf:" >> $(REPORT)
 	sed '2d' test.sdf >> $(REPORT)  # remove line 2 (date stamp)
 
-protest_report: REPORT="protest.approved.txt"
-protest_report: protest
-	REPORT="protest.approved.txt"
-	./protest ARNDCEQGHILKMFPUSTWYV >$(REPORT)
+protein_report: REPORT="protein_test.approved.txt"
+protein_report: protein_test
+	./protein_test ARNDCEQGHILKMFPUSTWYV >$(REPORT)
 	echo "Content of test.pdb:" >> $(REPORT)
 	cat test.pdb >> $(REPORT)
 	echo "Content of test1.pdb:" >> $(REPORT)

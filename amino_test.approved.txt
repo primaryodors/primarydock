@@ -13,7 +13,6 @@ ATOM      9  C   ALA     1       1.257  -1.346   1.628  1.00001.00            C
 ATOM     10  O   ALA     1       1.519  -1.880   2.928  1.00001.00            O
 Content of test.sdf:
 alanine
-  podock-2206011926073D
 https://github.com/primaryodors/podock
  10 9  0     0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0

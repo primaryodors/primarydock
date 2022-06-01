@@ -89,7 +89,7 @@ mol_report: REPORT="mol_test.approved.txt"
 mol_report: mol_test
 	./mol_test >$(REPORT)
 	echo "Content of output.sdf:" >> $(REPORT)
-	cat output.sdf >> $(REPORT)
+	sed '2d' output.sdf >> $(REPORT)
 
 mol_assem_report: REPORT="mol_assem_test.approved.txt"
 mol_assem_report: mol_assem_test

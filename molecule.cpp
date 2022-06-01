@@ -1291,8 +1291,9 @@ Bond** AminoAcid::get_rotatable_bonds()
     }
 
 	_found_aadef:
-    Bond** retval = new Bond*[bonds+1] {};
+    Bond** retval = new Bond*[bonds+8] {};
     for (i=0; i<=bonds; i++) retval[i] = btemp[i];
+    retval[i] = 0;
 
     return retval;
 }

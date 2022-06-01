@@ -238,7 +238,6 @@ TER
 END
 Content of test2.sdf:
 Test2
-  podock-2206011924143D
 https://github.com/primaryodors/podock
  100 99  0     0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0

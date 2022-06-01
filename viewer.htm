@@ -612,7 +612,7 @@ function loadFile(fileData, fileName = "")
     orid = 'OR1A1';
     try
     {
-        orid = fileName.match(/(OR[0-9] {1,2} [A-Z] {1,2}|TAAR|VN1R)[0-9] {1,2}/)[0];
+        orid = fileName.match(/(OR[0-9]{1,2}[A-Z]{1,2}|TAAR|VN1R)[0-9]{1,2}/)[0];
     }
     catch (e)
     {

@@ -107,6 +107,6 @@ protein_report: protein_test
 	echo "Content of test1.pdb:" >> $(REPORT)
 	cat test1.pdb >> $(REPORT)
 	echo "Content of test2.sdf:" >> $(REPORT)
-	cat test2.sdf >> $(REPORT)
+	sed '2d' test2.sdf >> $(REPORT)
 
 reports: amino_report atom_test aniso_report point_report mol_report mol_assem_report protein_report

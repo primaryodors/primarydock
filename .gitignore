@@ -11,3 +11,7 @@ podock
 *~
 cmake-*
 .idea/
+*.gcov
+*.gcno
+*.gcda
+

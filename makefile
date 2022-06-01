@@ -95,9 +95,11 @@ mol_assem_report: mol_assem_test
 	echo "Content of test.sdf:" >> $(REPORT)
 	sed '2d' test.sdf >> $(REPORT)  # remove line 2 (date stamp)
 
+#ARNDCEQGHILKMFPUSTWYV
+
 protein_report: REPORT="protein_test.approved.txt"
 protein_report: protein_test
-	./protein_test ARNDCEQGHILKMFPUSTWYV >$(REPORT)
+	./protein_test AAAAAAAAAA >$(REPORT)
 	echo "Content of test.pdb:" >> $(REPORT)
 	cat test.pdb >> $(REPORT)
 	echo "Content of test1.pdb:" >> $(REPORT)

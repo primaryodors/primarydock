@@ -11,6 +11,7 @@ CC=g++
 # Default CFLAG - no code coverage
 CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14
 
+
 # For code coverage instrumentation, switch to these CFLAGS (slower performance):
 #CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14 -fprofile-arcs -ftest-coverage
 

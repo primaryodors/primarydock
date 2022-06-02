@@ -2320,7 +2320,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     {
                         mm[i]->rotate(&v, -mm[i]->amz);
                         mm[i]->amz *= reversal;
-                        cout << "x";
+                        //cout << "x";
                     }
                     else
                     {

@@ -92,7 +92,7 @@ point_report: test/point_test
 
 molecule_report: REPORT="test/molecule_test.approved.txt"
 molecule_report: test/molecule_test
-	./test/molecule_test >$(REPORT)
+	./test/molecule_test | sed '/^#/d' >$(REPORT)  # ignore lines starting with #
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test

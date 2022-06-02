@@ -3,10 +3,15 @@ all: point.o atom.o intera.o molecule.o aminoacid.o protein.o point_test atom_te
 # TODO: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
 
 CC=g++
-CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14 -fprofile-arcs -ftest-coverage
+
+# Default CFLAG - no code coverage
+CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14
+
+# For code coverage instrumentation, switch to these CFLAGS (slower performance):
+#CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14 -fprofile-arcs -ftest-coverage
 
 clean:
-	rm *.o
+	rm *.o *.gcov *.gcno *.gcda
 
 point.o: point.h point.cpp constants.h
 	$(CC) -c point.cpp -o point.o $(CFLAGS)
@@ -47,13 +52,13 @@ amino_test: amino_test.cpp point.o atom.o molecule.o intera.o aminoacid.o
 metal: metal.cpp point.o atom.o molecule.o intera.o aminoacid.o protein.o
 	$(CC) metal.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o metal $(CFLAGS)
 
-protest: protest.cpp point.cpp atom.o molecule.o intera.o aminoacid.o protein.o
-	$(CC) protest.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o protest $(CFLAGS)
+protein_test: protein_test.cpp point.o atom.o molecule.o intera.o aminoacid.o protein.o
+	$(CC) protein_test.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o protein_test $(CFLAGS)
 
 bktest: backbone_test.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o
 	$(CC) backbone_test.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o bktest $(CFLAGS)
 
-podock: podock.cpp point.cpp atom.o molecule.o intera.o aminoacid.o protein.o
+podock: podock.cpp point.o atom.o molecule.o intera.o aminoacid.o protein.o
 	$(CC) podock.cpp atom.o point.o intera.o molecule.o aminoacid.o protein.o -o podock $(CFLAGS)
 
 performance_test: podock testdata/test_TAAR8.config testdata/TAAR8.rotated.pdb testdata/CAD_ion.sdf
@@ -62,9 +67,7 @@ performance_test: podock testdata/test_TAAR8.config testdata/TAAR8.rotated.pdb t
 # low-tooling regression tests below
 amino_report: REPORT="amino_test.approved.txt"
 amino_report: amino_test
-	./amino_test >$(REPORT)
-	echo "Content of test.pdb:" >> $(REPORT)
-	cat test.pdb >> $(REPORT)
+	bash amino_tests.bash ARNDCEQGHILKMFPUSTWYV
 
 atom_report: REPORT="atom_test.approved.txt"
 atom_report: atom_test
@@ -82,7 +85,7 @@ mol_report: REPORT="mol_test.approved.txt"
 mol_report: mol_test
 	./mol_test >$(REPORT)
 	echo "Content of output.sdf:" >> $(REPORT)
-	cat output.sdf >> $(REPORT)
+	sed '2d' output.sdf >> $(REPORT)
 
 mol_assem_report: REPORT="mol_assem_test.approved.txt"
 mol_assem_report: mol_assem_test
@@ -90,15 +93,16 @@ mol_assem_report: mol_assem_test
 	echo "Content of test.sdf:" >> $(REPORT)
 	sed '2d' test.sdf >> $(REPORT)  # remove line 2 (date stamp)
 
-protest_report: REPORT="protest.approved.txt"
-protest_report: protest
-	REPORT="protest.approved.txt"
-	./protest ARNDCEQGHILKMFPUSTWYV >$(REPORT)
+#ARNDCEQGHILKMFPUSTWYV
+
+protein_report: REPORT="protein_test.approved.txt"
+protein_report: protein_test
+	./protein_test AAAAAAAAAA >$(REPORT)
 	echo "Content of test.pdb:" >> $(REPORT)
 	cat test.pdb >> $(REPORT)
 	echo "Content of test1.pdb:" >> $(REPORT)
 	cat test1.pdb >> $(REPORT)
 	echo "Content of test2.sdf:" >> $(REPORT)
-	cat test2.sdf >> $(REPORT)
+	sed '2d' test2.sdf >> $(REPORT)
 
-reports: amino_report atom_test aniso_report point_report mol_report mol_assem_report protest_report
+reports: amino_report atom_test aniso_report point_report mol_report mol_assem_report protein_report

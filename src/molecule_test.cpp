@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
         if (cp)
         {
-            Vector normal = m1.get_ring_normal(i);
+            SCoord normal = m1.get_ring_normal(i);
             cout << "Ring normal: φ=" << (normal.phi * 180.0/M_PI) << "° θ=" << (normal.theta * 180.0/M_PI) << "°." << endl;
         }
     }
@@ -140,13 +140,13 @@ int main(int argc, char** argv)
 
 
 
-    Vector v1(&pt1);
+    SCoord v1(&pt1);
     float rotdeg = -30;
     m2.rotate(&v1, rotdeg * M_PI/180);
     cout << "Rotated molecule 2 by " << rotdeg << " degrees. Intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
 
     Point pt(0,0,1.0);
-    Vector v(&pt);
+    SCoord v(&pt);
     float ttlmv = 0;
     while (m1.get_intermol_clashes(&m2))
     {
@@ -166,8 +166,14 @@ int main(int argc, char** argv)
     mols[1] = &m2;
     mols[3] = NULL;
     Molecule::multimol_conform(mols, 50);
-    cout << "Post-conformation intermol energy level: " << m1.get_intermol_binding(&m2) << " kJ/mol." << endl;
-
+    float energyLevel = m1.get_intermol_binding(&m2);
+    cout << "\n# Post-conformation intermol energy level: " << energyLevel << " kJ/mol." << endl;
+    const float energyLevelThreshold = -1.0;
+    if(energyLevel > energyLevelThreshold)
+        cout << "Energy level above threshold, SUCCESS.\n";
+    else
+        cout << "Energy level below threshold, FAIL.\n";
+ 
     const char* tstoutf = "output.sdf";
     pf = fopen(tstoutf, "wb");
     Molecule* ligands[2];

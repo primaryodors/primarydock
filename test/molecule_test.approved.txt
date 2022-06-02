@@ -1,0 +1,23 @@
+Created empty molecule named nothing.
+Created molecule named BZN.sdf.
+Read data.
+Loaded 12 atoms of BZN.sdf into molecule.
+Found 1 ring(s).
+Ring atoms: C5 C6 C1 C2 C3 C4 
+
+Ring 0 is coplanar.
+Ring centered at [-1.21243,0.7,0].
+Ring normal: φ=180° θ=0°.
+Internal clashes: 0 cu. A.
+Molecule moved to [0.2,-0.499999,-0.3].
+Added a carbon atom. Its location is [0.000000,0.000000,0.000000].
+Added another carbon atom. Its location is [0.000000,1.540000,-0.000000].
+Added an oxygen atom. Its location is [0.000000,2.016666,-1.348217].
+Loaded test ligand. Intermol clashes: 75.7671 cu. A.
+Rotated molecule 2 by -30 degrees. Intermol clashes: 73.524 cu. A.
+1 1 1 1 1 Moved molecule 2 by 5 A.
+Intermol clashes: 0 cu. A.
+Intermol energy level: 0 kJ/mol.
+
+Energy level above threshold, SUCCESS.
+Saved output.sdf

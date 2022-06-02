@@ -31,7 +31,7 @@ Known issue: please make sure to add an empty line at the end of your config fil
 
 Once your .config file is ready, and the PODock code is compiled, simply cd to the podock folder and run the following command:
 
-./podock [config file]
+./bin/podock [config file]
 
 (...replacing "[config file]" with the actual name of the file you edited or created.)
 

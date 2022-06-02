@@ -404,9 +404,9 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
     return retval;
 }
 
-Vector* get_geometry_for_pi_stack(Vector* in_geo)
+SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
 {
-    Vector* retval = new Vector[5] {};
+    SCoord* retval = new SCoord[5] {};
     int i;
     Point pt[5];
 
@@ -469,8 +469,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         else if (forces[i]->get_dp()) dp = forces[i]->get_dp();
 
         // Anisotropy.
-        Vector* ageo = a->get_geometry_aligned_to_bonds();
-        Vector* bgeo = b->get_geometry_aligned_to_bonds();
+        SCoord* ageo = a->get_geometry_aligned_to_bonds();
+        SCoord* bgeo = b->get_geometry_aligned_to_bonds();
         int ag = a->get_geometry();
         int bg = b->get_geometry();
         int abc = a->get_bonded_atoms_count();

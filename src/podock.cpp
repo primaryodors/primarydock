@@ -39,7 +39,7 @@ int mcoord_resno[256] = {};
 Molecule* ligand;
 Point ligcen_target;
 Point size(10,10,10);
-Vector path[256] = {};
+SCoord path[256] = {};
 int pathnodes=1;		// The pocketcen is the initial node.
 int poses = 10;
 int iters = 50;
@@ -159,7 +159,7 @@ int main(int argc, char** argv)
                              atof(fields[3]),
                              atof(fields[4])
                             );
-                    Vector v(&pt);
+                    SCoord v(&pt);
                     path[nodeno] = v;
                     if ((nodeno) > pathnodes) pathnodes = nodeno;
                 }
@@ -553,7 +553,7 @@ int main(int argc, char** argv)
                         m.rotate(&rot.v, rot.a);
 
                         Point ptr = alca->get_location().subtract(pt);
-                        Vector v(ptr);
+                        SCoord v(ptr);
                         v.r -= alignment_distance;
                         v.r *= 0.5;
                         m.move(v);

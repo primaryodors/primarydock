@@ -66,7 +66,7 @@ protected:
     static void read_all_forces();
 };
 
-Vector* get_geometry_for_pi_stack(Vector* in_geometry);
+SCoord* get_geometry_for_pi_stack(SCoord* in_geometry);
 
 static InteratomicForce intertmp;
 static InteratomicForce* all_forces[65536];

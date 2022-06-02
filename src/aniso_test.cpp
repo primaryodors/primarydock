@@ -165,7 +165,7 @@ int main(int argc, char** argv)
                 float phi = find_angle(lx, y);
                 float theta = (1.0-r/(size))*(M_PI/2);
 
-                Vector v(hb->get_distance(), theta, phi);
+                SCoord v(hb->get_distance(), theta, phi);
                 Point loc = anisoa->get_location().add(&v);
 
                 probe.move(&loc);
@@ -198,7 +198,7 @@ int main(int argc, char** argv)
                 if (!x && !y)
                 {
                     int anisg = anisoa->get_geometry();
-                    Vector* anisgeo = anisoa->get_geometry_aligned_to_bonds();
+                    SCoord* anisgeo = anisoa->get_geometry_aligned_to_bonds();
                     if (anisgeo)
                         for (i=0; i<anisg; i++)
                         {

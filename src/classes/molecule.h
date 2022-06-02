@@ -60,11 +60,11 @@ class Molecule
 
     // Spatial functions.
     Point get_barycenter() const;
-    virtual void move(Vector move_amt);
+    virtual void move(SCoord move_amt);
     virtual void move(Point move_amt);
     virtual void recenter(Point new_location);
-    virtual void rotate(Vector* vector, float theta);
-    void rotate(LocatedVector vector, float theta);
+    virtual void rotate(SCoord* SCoord, float theta);
+    void rotate(LocatedVector SCoord, float theta);
     bool shielded(Atom* a, Atom* b) const;
     void voxel_computation(int iters = 5);
     Point get_atom_location(char* aname);
@@ -97,7 +97,7 @@ class Molecule
     bool ring_is_coplanar(int ringid);
     bool ring_is_aromatic(int ringid);
     Point get_ring_center(int ringid);
-    Vector get_ring_normal(int ringid);
+    SCoord get_ring_normal(int ringid);
     Atom** get_ring_atoms(int ringid);
 
     // Interaction functions.

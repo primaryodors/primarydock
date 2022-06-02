@@ -12,7 +12,7 @@
 
 using namespace std;
 
-class Vector;
+class SCoord;
 
 class Point
 {
@@ -21,18 +21,18 @@ public:
     float weight = 1;
 
     Point();
-    Point(Vector v);
-    Point(Vector* v);
+    Point(SCoord v);
+    Point(SCoord* v);
     Point(float x, float y, float z);
     Point add(Point add_to)
     {
         return add(&add_to);
     }
     Point add(Point* add_to);
-    Point add(Vector* add_to);
+    Point add(SCoord* add_to);
     Point subtract(const Point subtracted);
     Point subtract(const Point* subtracted);
-    Point subtract(Vector* subtracted)
+    Point subtract(SCoord* subtracted)
     {
         Point pt(subtracted);
         return subtract(pt);
@@ -50,42 +50,42 @@ public:
 
     char* printable() const;
 
-    Point& operator=(Vector v);
-    friend std::ostream& operator<<(std::ostream& os, const Vector& v);
+    Point& operator=(SCoord v);
+    friend std::ostream& operator<<(std::ostream& os, const SCoord& v);
 };
 
-class Vector
+class SCoord
 {
 public:
     float r=0, theta=0, phi=0;
 
-    Vector()
+    SCoord()
     {
         r = theta = phi = 0;
     }
-    Vector(const Point from);
-    Vector(const Point* from);
-    Vector(float r, float theta, float phi);
-    Vector negate()
+    SCoord(const Point from);
+    SCoord(const Point* from);
+    SCoord(float r, float theta, float phi);
+    SCoord negate()
     {
         Point pt(this);
         pt = pt.negate();
-        Vector v(&pt);
+        SCoord v(&pt);
         return v;
     }
-    Vector add(Vector v)
+    SCoord add(SCoord v)
     {
         return add(&v);
     };
-    Vector add(Vector* v);
+    SCoord add(SCoord* v);
 
     char* printable() const;
 
-    Vector& operator=(Point p);
+    SCoord& operator=(Point p);
     friend std::ostream& operator<<(std::ostream& os, const Point& p);
 };
 
-class LocatedVector : public Vector
+class LocatedVector : public SCoord
 {
 public:
     Point origin;
@@ -94,7 +94,7 @@ public:
 class Rotation
 {
 public:
-    Vector v;
+    SCoord v;
     float a=0;
     Rotation()
     {
@@ -125,11 +125,11 @@ class Atom;
 class Tug
 {
 public:
-    Vector vec;
+    SCoord vec;
     Rotation rot;
 
     Tug() { ; }
-    Tug(Atom* atom, Point molcen, Vector pull);
+    Tug(Atom* atom, Point molcen, SCoord pull);
 
     Tug add(Tug t);
 };
@@ -165,17 +165,17 @@ float find_angle(float dx, float dy);
 float find_angle_delta(float a1, float a2);
 float find_3d_angle(Point* A, Point* B, Point* source);
 float find_3d_angle(Point A, Point B, Point source);
-float find_angle_along_vector(Point* pt1, Point* pt2, Point* source, Vector* v);
-Point rotate3D(Point* point, Point* source, Vector* vector, float theta);
-Point rotate3D(Point point, Point source, Vector vector, float theta);
+float find_angle_along_vector(Point* pt1, Point* pt2, Point* source, SCoord* v);
+Point rotate3D(Point* point, Point* source, SCoord* SCoord, float theta);
+Point rotate3D(Point point, Point source, SCoord SCoord, float theta);
 Point rotate3D(Point* point, Point* source, Rotation* rot);
 Rotation align_points_3d(Point* point, Point* align, Point* center);
 Rotation* align_2points_3d(Point* point1, Point* align1, Point* point2, Point* align2, Point* center);
-Vector compute_normal(Point* pt1, Point* pt2, Point* pt3);
-Vector compute_normal(Point pt1, Point pt2, Point pt3);
+SCoord compute_normal(Point* pt1, Point* pt2, Point* pt3);
+SCoord compute_normal(Point pt1, Point pt2, Point pt3);
 float are_points_planar(Point p1, Point p2, Point p3, Point p4);
 float sphere_intersection(float r1, float r2, float d);
-Vector v_from_pt_sub(Point distal, Point reference);
+SCoord v_from_pt_sub(Point distal, Point reference);
 
 // Misc. functions not Point-related but not enough to warrant their own .h and .cpp files:
 int in_array(void* needle, void** haystack);
@@ -198,7 +198,7 @@ template <typename T> int sgn(T val)
 }
 
 std::ostream& operator<<(std::ostream& os, const Point& p);
-std::ostream& operator<<(std::ostream& os, const Vector& v);
+std::ostream& operator<<(std::ostream& os, const SCoord& v);
 std::ostream& operator<<(std::ostream& os, const Rotation& r);
 
 

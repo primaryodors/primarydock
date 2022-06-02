@@ -32,15 +32,15 @@ int main (int argc, char** argv)
          << " degrees apart relative to [0,0,0].\n";
 
     Point pt5(-1.6,3.1,-0.7);
-    Vector v(&pt5);
+    SCoord v(&pt5);
     Point pt6(&v);
 
-    cout << "Vector v from point pt5 has r=" << v.r
+    cout << "SCoord v from point pt5 has r=" << v.r
          << ", theta=" << v.theta * 180.0 / M_PI
          << ", phi=" << v.phi * 180.0 / M_PI
          << ".\n";
 
-    cout << "Point pt6 from vector v is " << pt6.get_3d_distance(&pt5) << " Angstroms from pt5.\n";
+    cout << "Point pt6 from SCoord v is " << pt6.get_3d_distance(&pt5) << " Angstroms from pt5.\n";
 
     Point ptrot8, ptref(pt5.x + 0, pt5.y + 0, pt5.z + 1);
 

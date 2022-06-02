@@ -93,8 +93,6 @@ point_report: test/point_test
 mol_report: REPORT="test/mol_test.approved.txt"
 mol_report: test/mol_test
 	./test/mol_test >$(REPORT)
-	echo "Content of output.sdf:" >> $(REPORT)
-	sed '2d' output.sdf >> $(REPORT)
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test

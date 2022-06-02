@@ -75,37 +75,37 @@ performance_test: $(BINDIR)/podock testdata/test_TAAR8.config testdata/TAAR8.rot
 
 # low-tooling regression tests below
 amino_report: REPORT="amino_test.approved.txt"
-amino_report: amino_test
-	bash amino_tests.bash ARNDCEQGHILKMFPUSTWYV
+amino_report: test/amino_test
+	bash test/amino_tests.bash ARNDCEQGHILKMFPUSTWYV
 
 atom_report: REPORT="atom_test.approved.txt"
-atom_report: atom_test
-	./atom_test H >$(REPORT)
+atom_report: test/atom_test
+	./test/atom_test H >$(REPORT)
 
 aniso_report: REPORT="aniso_test.approved.txt"
-aniso_report: aniso_test
-	./aniso_test >$(REPORT)
+aniso_report: test/aniso_test
+	./test/aniso_test >$(REPORT)
 
 point_report: REPORT="point_test.approved.txt"
-point_report: point_test
-	./point_test >$(REPORT)
+point_report: test/point_test
+	./test/point_test >$(REPORT)
 
 mol_report: REPORT="mol_test.approved.txt"
-mol_report: mol_test
-	./mol_test >$(REPORT)
+mol_report: test/mol_test
+	./test/mol_test >$(REPORT)
 	echo "Content of output.sdf:" >> $(REPORT)
 	sed '2d' output.sdf >> $(REPORT)
 
 mol_assem_report: REPORT="mol_assem_test.approved.txt"
-mol_assem_report: mol_assem_test
-	./mol_assem_test >$(REPORT)
+mol_assem_report: test/mol_assem_test
+	./test/mol_assem_test >$(REPORT)
 	echo "Content of test.sdf:" >> $(REPORT)
 	sed '2d' test.sdf >> $(REPORT)  # remove line 2 (date stamp)
 
 #ARNDCEQGHILKMFPUSTWYV
 
 protein_report: REPORT="protein_test.approved.txt"
-protein_report: protein_test
+protein_report: test/protein_test
 	./protein_test AAAAAAAAAA >$(REPORT)
 	echo "Content of test.pdb:" >> $(REPORT)
 	cat test.pdb >> $(REPORT)

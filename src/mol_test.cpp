@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
         if (cp)
         {
-            Vector normal = m1.get_ring_normal(i);
+            SCoord normal = m1.get_ring_normal(i);
             cout << "Ring normal: φ=" << (normal.phi * 180.0/M_PI) << "° θ=" << (normal.theta * 180.0/M_PI) << "°." << endl;
         }
     }
@@ -140,13 +140,13 @@ int main(int argc, char** argv)
 
 
 
-    Vector v1(&pt1);
+    SCoord v1(&pt1);
     float rotdeg = -30;
     m2.rotate(&v1, rotdeg * M_PI/180);
     cout << "Rotated molecule 2 by " << rotdeg << " degrees. Intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
 
     Point pt(0,0,1.0);
-    Vector v(&pt);
+    SCoord v(&pt);
     float ttlmv = 0;
     while (m1.get_intermol_clashes(&m2))
     {

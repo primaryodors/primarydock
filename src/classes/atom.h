@@ -31,7 +31,7 @@ public:
     }
     Atom** get_moves_with_btom();
     int count_moves_with_btom();
-    void swing(Vector newdir);		// Rotate btom, and all its moves_with atoms, about atom so that the bond points to newdir.
+    void swing(SCoord newdir);		// Rotate btom, and all its moves_with atoms, about atom so that the bond points to newdir.
 
 protected:
     void fill_moves_with_cache();
@@ -125,16 +125,16 @@ public:
     {
         return move(&pt);
     }
-    bool move_rel(Vector* v);
+    bool move_rel(SCoord* v);
     int move_assembly(Point* pt, Atom* excluding);			// Return number of atoms moved. Note excluding must be a bonded atom.
-    Vector* get_basic_geometry();
-    Vector* get_geometry_aligned_to_bonds();
+    SCoord* get_basic_geometry();
+    SCoord* get_geometry_aligned_to_bonds();
     float distance_to(Atom* btom)
     {
         if (!btom) return -1;
         else return location.get_3d_distance(&btom->location);
     };
-    Vector get_next_free_geometry(float lcard);
+    SCoord get_next_free_geometry(float lcard);
     int get_idx_next_free_geometry();
     void rotate_geometry(Rotation rot);			// Necessary for bond rotation.
     void clear_geometry_cache()
@@ -175,7 +175,7 @@ protected:
     int valence=0;
     int geometry=0;						// number of vertices, so 4 = tetrahedral; 6 = octahedral; etc.
     int origgeo=0;
-    Vector* geov=0;
+    SCoord* geov=0;
     float at_wt = 0;
     float vdW_rad = 0;
     float elecn = 0;

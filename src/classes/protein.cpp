@@ -423,7 +423,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         pt1.y /= size.y;
         pt1.z /= size.z;
 
-        Vector dir(&pt1);
+        SCoord dir(&pt1);
 
         if (dir.r <= 1.25)
         {
@@ -954,7 +954,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, ch
         m_mcoord[j]->coord_atoms[2]->get_location()
     };
     Point coordcen = average_of_points(ptarr, 3);
-    Vector normal = compute_normal(ptarr[0], ptarr[1], ptarr[2]);
+    SCoord normal = compute_normal(ptarr[0], ptarr[1], ptarr[2]);
     normal.r = 3;
     Point pnormal = coordcen.add(normal), pantinormal = coordcen.subtract(normal);
     int nc = 0, anc = 0;
@@ -1038,8 +1038,8 @@ void Protein::mtl_coord_cnf_cb(int iter)
     int i;
     for (i=0; m_mcoord[i]; i++)
     {
-        // Vector delta(m_mcoord[i]->coord_atom_avg_loc().subtract(m_mcoord[i]->metal->get_location()));
-        Vector delta(gmtgt.subtract(m_mcoord[i]->metal->get_location()));
+        // SCoord delta(m_mcoord[i]->coord_atom_avg_loc().subtract(m_mcoord[i]->metal->get_location()));
+        SCoord delta(gmtgt.subtract(m_mcoord[i]->metal->get_location()));
         delta.r *= 0.1;
         m_mcoord[i]->metal->move_rel(&delta);
     }
@@ -1091,7 +1091,7 @@ float Protein::get_helix_orientation(int startres, int endres)
         blkavg[i] = average_of_points(&ptarr[i], 10);
         if (i>0)
         {
-            Vector v(blkavg[i].subtract(blkavg[i-1]));
+            SCoord v(blkavg[i].subtract(blkavg[i-1]));
             retval += v.theta;
             j++;
         }

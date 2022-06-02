@@ -72,11 +72,11 @@ public:
  	void save_pdb(FILE* outstream, int atomno_offset=0);
 
  	// Spatial functions.
- 	void move(Vector move_amt) 					{ 	 	return; 	}
+ 	void move(SCoord move_amt) 					{ 	 	return; 	}
  	void move(Point move_amt) 					{ 	 	return; 	}
  	void recenter(Point new_location) 			{ 	 	return; 	}
- 	void rotate(Vector* vector, float theta) 	{ 	 	return; 	}
- 	void rotate(LocatedVector vector, float theta);
+ 	void rotate(SCoord* SCoord, float theta) 	{ 	 	return; 	}
+ 	void rotate(LocatedVector SCoord, float theta);
  	LocatedVector rotate_backbone(bb_rot_dir direction, float angle);	// Return the origin and direction of the rotation axis.
  	LocRotation rotate_backbone_abs(bb_rot_dir direction, float angle);
  	LocRotation* flatten();		// Ensure the peptide bond is coplanar and the CA lies in the same plane. Return LocRotation[2].

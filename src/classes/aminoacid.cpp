@@ -596,7 +596,7 @@ bool AminoAcid::capable_of_inter(intera_type inter)
     return false;
 }
 
-void AminoAcid::rotate(LocatedVector vector, float theta)
+void AminoAcid::rotate(LocatedVector SCoord, float theta)
 {
     if (!atoms) return;
     // cout << name << " AminoAcid::rotate()" << endl;
@@ -605,7 +605,7 @@ void AminoAcid::rotate(LocatedVector vector, float theta)
     for (i=0; i<atcount; i++)
     {
         Point loc = atoms[i]->get_location();
-        Point nl  = rotate3D(&loc, &vector.origin, &vector, theta);
+        Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
         atoms[i]->move(&nl);
     }
 
@@ -613,7 +613,7 @@ void AminoAcid::rotate(LocatedVector vector, float theta)
     if (m_mcoord && m_mcoord->coord_res && m_mcoord->coord_res[0] == this)
     {
         Point loc = m_mcoord->metal->get_location();
-        Point nl  = rotate3D(&loc, &vector.origin, &vector, theta);
+        Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
         m_mcoord->metal->move(&nl);
     }
 }
@@ -937,7 +937,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
         return retval;
     }
     
-    // Use the vector as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
+    // Use the SCoord as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
     int i, step=3;
     float bestrad=0, bestr;
     
@@ -971,7 +971,7 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     if (!atoms) return retval;
     if (m_mcoord) return retval;	// NO.
 
-    // Determine the center of rotation and rotation vector.
+    // Determine the center of rotation and rotation SCoord.
     switch (direction)
     {
     case N_asc:
@@ -1012,7 +1012,7 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     }
 
     rel = btom->get_location().subtract(retval.origin);
-    Vector v(rel);
+    SCoord v(rel);
     retval.phi = v.phi;
     retval.theta = v.theta;
     retval.r = v.r;

@@ -46,8 +46,8 @@ test/point_test: src/point_test.cpp $(OBJDIR)/point.o
 test/atom_test: src/atom_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o
 	$(CC) src/atom_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o -o test/atom_test $(CFLAGS)
 
-test/mol_test: src/mol_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/molecule.o $(OBJDIR)/intera.o
-	$(CC) src/mol_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o -o test/mol_test $(CFLAGS)
+test/molecule_test: src/molecule_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/molecule.o $(OBJDIR)/intera.o
+	$(CC) src/molecule_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o -o test/molecule_test $(CFLAGS)
 
 test/aniso_test: src/aniso_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/molecule.o $(OBJDIR)/intera.o
 	$(CC) src/aniso_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o -o test/aniso_test $(CFLAGS)
@@ -90,17 +90,15 @@ point_report: REPORT="test/point_test.approved.txt"
 point_report: test/point_test
 	./test/point_test >$(REPORT)
 
-mol_report: REPORT="test/mol_test.approved.txt"
-mol_report: test/mol_test
-	./test/mol_test >$(REPORT)
+molecule_report: REPORT="test/molecule_test.approved.txt"
+molecule_report: test/molecule_test
+	./test/molecule_test >$(REPORT)
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test
 	./test/mol_assem_test >$(REPORT)
 	echo "Content of test.sdf:" >> $(REPORT)
 	sed '2d' test.sdf >> $(REPORT)  # remove line 2 (date stamp)
-
-#ARNDCEQGHILKMFPUSTWYV
 
 protein_report: REPORT="test/protein_test.approved.txt"
 protein_report: test/protein_test
@@ -124,4 +122,4 @@ protein_report: test/protein_test
 	echo "Content of test2.sdf:" >> $(REPORT)
 	sed '2d' test2.sdf >> $(REPORT)
 
-reports: amino_report atom_report aniso_report point_report mol_report mol_assem_report protein_report
+reports: amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report

@@ -166,8 +166,13 @@ int main(int argc, char** argv)
     mols[1] = &m2;
     mols[3] = NULL;
     Molecule::multimol_conform(mols, 50);
-    cout << "Post-conformation intermol energy level: " << m1.get_intermol_binding(&m2) << " kJ/mol." << endl;
-
+    float energyLevel = m1.get_intermol_binding(&m2);
+    cout << "\n# Post-conformation intermol energy level: " << energyLevel << " kJ/mol." << endl;
+    if(energyLevel > 0)
+        cout << "Energy level above 0, SUCCESS.\n";
+    else
+        cout << "Energy level below 0, FAIL.\n";
+ 
     const char* tstoutf = "output.sdf";
     pf = fopen(tstoutf, "wb");
     Molecule* ligands[2];

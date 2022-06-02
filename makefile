@@ -1,7 +1,8 @@
 OBJDIR=obj
 BINDIR=bin
+OUTDIR=output
 
-all: $(OBJDIR) $(BINDIR) $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o test/point_test test/atom_test test/mol_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/bktest $(BINDIR)/metal $(BINDIR)/podock
+all: $(OBJDIR) $(BINDIR) $(OUTDIR) $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/bktest $(BINDIR)/metal $(BINDIR)/podock
 
 # TODO: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
 
@@ -9,6 +10,7 @@ CC=g++
 
 # Default CFLAG - no code coverage
 CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14
+
 
 # For code coverage instrumentation, switch to these CFLAGS (slower performance):
 #CFLAGS=-g -fpermissive -Wwrite-strings -fextended-identifiers -std=c++14 -fprofile-arcs -ftest-coverage
@@ -21,6 +23,9 @@ $(OBJDIR):
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
+
+$(OUTDIR):
+	mkdir -p $(OUTDIR)
 
 $(OBJDIR)/point.o: $(OBJDIR) src/classes/point.h src/classes/point.cpp src/classes/constants.h
 	$(CC) -c src/classes/point.cpp -o $(OBJDIR)/point.o $(CFLAGS)
@@ -92,7 +97,7 @@ point_report: test/point_test
 
 molecule_report: REPORT="test/molecule_test.approved.txt"
 molecule_report: test/molecule_test
-	./test/molecule_test | sed '/^#/d' >$(REPORT)  # ignore lines starting with #
+	./test/molecule_test 'CC(=O)[O-]' 'C[NH+](C)C' | sed '/^#/d' >$(REPORT)  # ignore lines starting with #
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test

@@ -8,6 +8,14 @@ recompile the code.
 
 To Use PODock:
 
+First clone the repository, then execute the following commands:
+
+For Linux:
+```
+git checkout stable
+make
+```
+
 The application will require 3D maps of your target receptor(s) in PDB format. Please note that PODock does not currently
 hydrogenate PDB models that do not include hydrogen atoms, so if your model contains heavy atoms only, the accuracy of
 docking results may be severely compromised.

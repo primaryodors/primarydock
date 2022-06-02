@@ -134,7 +134,7 @@ G       GLY     glycine        N        <C     1.5      0         NCC(=O)O
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-H       HIS     histidine      N        <C     1.5      0         N[C@H](C(=O)O)CC1=NCNC=1
+H       HIS     histidine      N        <C     1.5      0         N[C@H](C(=O)O)CC1N=CNC=1
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0

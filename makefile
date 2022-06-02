@@ -22,22 +22,22 @@ $(OBJDIR):
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
-$(OBJDIR)/point.o: src/classes/point.h src/classes/point.cpp src/classes/constants.h
+$(OBJDIR)/point.o: $(OBJDIR) src/classes/point.h src/classes/point.cpp src/classes/constants.h
 	$(CC) -c src/classes/point.cpp -o $(OBJDIR)/point.o $(CFLAGS)
 
-$(OBJDIR)/atom.o: src/classes/atom.h src/classes/atom.cpp
+$(OBJDIR)/atom.o: $(OBJDIR) src/classes/atom.h src/classes/atom.cpp
 	$(CC) -c src/classes/atom.cpp -o $(OBJDIR)/atom.o $(CFLAGS)
 
-$(OBJDIR)/intera.o: src/classes/intera.h src/classes/intera.cpp
+$(OBJDIR)/intera.o: $(OBJDIR) src/classes/intera.h src/classes/intera.cpp
 	$(CC) -c src/classes/intera.cpp -o $(OBJDIR)/intera.o $(CFLAGS)
 
-$(OBJDIR)/molecule.o: src/classes/molecule.h src/classes/molecule.cpp
+$(OBJDIR)/molecule.o: $(OBJDIR) src/classes/molecule.h src/classes/molecule.cpp
 	$(CC) -c src/classes/molecule.cpp -o $(OBJDIR)/molecule.o $(CFLAGS)
 
-$(OBJDIR)/aminoacid.o: src/classes/aminoacid.h src/classes/aminoacid.cpp
+$(OBJDIR)/aminoacid.o: $(OBJDIR) src/classes/aminoacid.h src/classes/aminoacid.cpp
 	$(CC) -c src/classes/aminoacid.cpp -o $(OBJDIR)/aminoacid.o $(CFLAGS)
 
-$(OBJDIR)/protein.o: src/classes/protein.h src/classes/protein.cpp
+$(OBJDIR)/protein.o: $(OBJDIR) src/classes/protein.h src/classes/protein.cpp
 	$(CC) -c src/classes/protein.cpp -o $(OBJDIR)/protein.o $(CFLAGS)
 
 test/point_test: src/point_test.cpp $(OBJDIR)/point.o

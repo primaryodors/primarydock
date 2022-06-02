@@ -104,6 +104,16 @@ Moiety
 A functional group of a molecule; an atom or small collection of atoms capable of interacting and reacting with the external environment.
 
 
+Node
+
+(Specific to POdock): An imaginary point in space, serving as the target location for the barycenter of a ligand at a certain point along a path.
+
+
+Path
+
+(Specific to POdock): An imaginary line, curve, or squiggle, defined by a series of nodes, that the ligand is induced to approximately follow during docking calculations.
+
+
 Peptide
 
 A molecule consisting of amino acids polymerized together.
@@ -117,6 +127,11 @@ A type of binding where aromatic rings can adopt various conformations including
 Polar
 
 Containing one or more dipoles.
+
+
+Pose
+
+A spatial configuration of a ligand inside the binding pocket of a protein.
 
 
 Protein

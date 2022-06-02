@@ -1,443 +1,1482 @@
 AAAAAAAAAA
-1:CA-CB = 1.53999
-2:CA-CB = 1.53961
-3:CA-CB = 1.53964
-4:CA-CB = 1.53908
-5:CA-CB = 1.53932
-6:CA-CB = 1.53948
-7:CA-CB = 1.53803
-8:CA-CB = 1.53949
-9:CA-CB = 1.53997
-10:CA-CB = 1.54006
+1:CA-CB = 0
+2:CA-CB = 0
+3:CA-CB = 0
+4:CA-CB = 0
+5:CA-CB = 0
+6:CA-CB = 0
+7:CA-CB = 0
+8:CA-CB = 0
+9:CA-CB = 0
+10:CA-CB = 0
+Warning: Could not determine reach of ALA1 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA9 to avoid possibility of clash.
 Wrote test.pdb
+Warning: Could not determine reach of ALA1 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA9 to avoid possibility of clash.
 Wrote test_alpha.pdb
+Warning: Could not determine reach of ALA1 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA9 to avoid possibility of clash.
 Wrote test_beta.pdb
+Warning: Could not determine reach of ALA1 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA9 to avoid possibility of clash.
 Wrote test_310.pdb
+Warning: Could not determine reach of ALA1 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA1 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA2 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA3 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA4 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA5 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA6 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA7 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA9 to avoid possibility of clash.
+Warning: Could not determine reach of ALA8 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA9 - ALA10 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA1 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA2 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA3 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA4 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA5 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA6 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA7 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA8 to avoid possibility of clash.
+Warning: Could not determine reach of ALA10 - ALA9 to avoid possibility of clash.
 Wrote test_pi.pdb
 Wrote test2.sdf
-Read 10 residue(s).
+Warning: Residue 1 has no AADef.
+Read 1 residue(s).
 Content of test.pdb:
-ATOM      1  N   ALA     1       0.000   0.000   0.000  1.00001.00            N
-ATOM      2  HN  ALA     1       0.000   1.000  -0.000  1.00001.00            H
-ATOM      3  CA  ALA     1       0.000  -0.490   1.386  1.00001.00            C
-ATOM      4  HA  ALA     1      -0.000   0.358   2.071  1.00001.00            H
-ATOM      5  CB  ALA     1      -1.257  -1.346   1.628  1.00001.00            C
-ATOM      6  HB1 ALA     1      -1.469  -1.386   2.696  1.00001.00            H
-ATOM      7  HB2 ALA     1      -1.088  -2.355   1.253  1.00001.00            H
-ATOM      8  HB3 ALA     1      -2.105  -0.902   1.106  1.00001.00            H
-ATOM      9  C   ALA     1       1.257  -1.346   1.628  1.00001.00            C
-ATOM     10  O   ALA     1       2.163  -1.605   0.553  1.00001.00            O
-ATOM     11  N   ALA     2       1.526  -1.895   2.965  1.00001.00            N
-ATOM     12  HN  ALA     2       0.949  -1.764   3.770  1.00001.00            H
-ATOM     13  CA  ALA     2       2.586  -2.726   3.555  1.00001.00            C
-ATOM     14  HA  ALA     2       2.575  -3.712   3.091  1.00001.00            H
-ATOM     15  CB  ALA     2       3.953  -2.061   3.315  1.00001.00            C
-ATOM     16  HB1 ALA     2       4.444  -2.534   2.465  1.00001.00            H
-ATOM     17  HB2 ALA     2       4.574  -2.177   4.204  1.00001.00            H
-ATOM     18  HB3 ALA     2       3.810  -1.000   3.108  1.00001.00            H
-ATOM     19  C   ALA     2       2.342  -2.869   5.068  1.00001.00            C
-ATOM     20  O   ALA     2       1.264  -2.165   5.689  1.00001.00            O
-ATOM     21  N   ALA     3       3.219  -3.730   5.876  1.00001.00            N
-ATOM     22  HN  ALA     3       3.994  -4.256   5.525  1.00001.00            H
-ATOM     23  CA  ALA     3       3.293  -4.100   7.296  1.00001.00            C
-ATOM     24  HA  ALA     3       3.504  -3.212   7.893  1.00001.00            H
-ATOM     25  CB  ALA     3       1.950  -4.709   7.739  1.00001.00            C
-ATOM     26  HB1 ALA     3       1.861  -4.642   8.823  1.00001.00            H
-ATOM     27  HB2 ALA     3       1.908  -5.755   7.435  1.00001.00            H
-ATOM     28  HB3 ALA     3       1.132  -4.161   7.272  1.00001.00            H
-ATOM     29  C   ALA     3       4.417  -5.132   7.500  1.00001.00            C
-ATOM     30  O   ALA     3       5.130  -5.645   6.371  1.00001.00            O
-ATOM     31  N   ALA     4       4.757  -5.592   8.854  1.00001.00            N
-ATOM     32  HN  ALA     4       4.312  -5.287   9.696  1.00001.00            H
-ATOM     33  CA  ALA     4       5.734  -6.533   9.420  1.00001.00            C
-ATOM     34  HA  ALA     4       5.532  -7.536   9.044  1.00001.00            H
-ATOM     35  CB  ALA     4       7.155  -6.108   9.007  1.00001.00            C
-ATOM     36  HB1 ALA     4       7.494  -6.730   8.180  1.00001.00            H
-ATOM     37  HB2 ALA     4       7.831  -6.229   9.854  1.00001.00            H
-ATOM     38  HB3 ALA     4       7.146  -5.063   8.696  1.00001.00            H
-ATOM     39  C   ALA     4       5.622  -6.528  10.955  1.00001.00            C
-ATOM     40  O   ALA     4       4.725  -5.623  11.604  1.00001.00            O
-ATOM     41  N   ALA     5       6.437  -7.454  11.754  1.00001.00            N
-ATOM     42  HN  ALA     5       7.088  -8.118  11.384  1.00001.00            H
-ATOM     43  CA  ALA     5       6.596  -7.729  13.189  1.00001.00            C
-ATOM     44  HA  ALA     5       6.979  -6.839  13.689  1.00001.00            H
-ATOM     45  CB  ALA     5       5.231  -8.109  13.793  1.00001.00            C
-ATOM     46  HB1 ALA     5       5.251  -7.944  14.870  1.00001.00            H
-ATOM     47  HB2 ALA     5       5.022  -9.160  13.590  1.00001.00            H
-ATOM     48  HB3 ALA     5       4.453  -7.492  13.345  1.00001.00            H
-ATOM     49  C   ALA     5       7.584  -8.892  13.384  1.00001.00            C
-ATOM     50  O   ALA     5       8.126  -9.569  12.246  1.00001.00            O
-ATOM     51  N   ALA     6       7.973  -9.309  14.739  1.00001.00            N
-ATOM     52  HN  ALA     6       7.644  -8.893  15.587  1.00001.00            H
-ATOM     53  CA  ALA     6       8.859 -10.340  15.298  1.00001.00            C
-ATOM     54  HA  ALA     6       8.479 -11.326  15.035  1.00001.00            H
-ATOM     55  CB  ALA     6      10.276 -10.165  14.721  1.00001.00            C
-ATOM     56  HB1 ALA     6      10.451 -10.918  13.951  1.00001.00            H
-ATOM     57  HB2 ALA     6      11.009 -10.284  15.518  1.00001.00            H
-ATOM     58  HB3 ALA     6      10.371  -9.171  14.285  1.00001.00            H
-ATOM     59  C   ALA     6       8.908 -10.199  16.830  1.00001.00            C
-ATOM     60  O   ALA     6       8.185  -9.147  17.476  1.00001.00            O
-ATOM     61  N   ALA     7       9.697 -11.147  17.630  1.00001.00            N
-ATOM     62  HN  ALA     7      10.231 -11.908  17.263  1.00001.00            H
-ATOM     63  CA  ALA     7       9.972 -11.322  19.063  1.00001.00            C
-ATOM     64  HA  ALA     7      10.512 -10.453  19.439  1.00001.00            H
-ATOM     65  CB  ALA     7       8.645 -11.471  19.826  1.00001.00            C
-ATOM     66  HB1 ALA     7       8.791 -11.191  20.870  1.00001.00            H
-ATOM     67  HB2 ALA     7       8.305 -12.506  19.772  1.00001.00            H
-ATOM     68  HB3 ALA     7       7.891 -10.819  19.379  1.00001.00            H
-ATOM     69  C   ALA     7      10.826 -12.584  19.271  1.00001.00            C
-ATOM     70  O   ALA     7      11.170 -13.410  18.155  1.00001.00            O
-ATOM     71  N   ALA     8      11.290 -12.944  20.619  1.00001.00            N
-ATOM     72  HN  ALA     8      11.098 -12.427  21.453  1.00001.00            H
-ATOM     73  CA  ALA     8      12.095 -14.036  21.186  1.00001.00            C
-ATOM     74  HA  ALA     8      11.586 -14.985  21.022  1.00001.00            H
-ATOM     75  CB  ALA     8      13.473 -14.067  20.499  1.00001.00            C
-ATOM     76  HB1 ALA     8      13.514 -14.907  19.806  1.00001.00            H
-ATOM     77  HB2 ALA     8      14.251 -14.181  21.254  1.00001.00            H
-ATOM     78  HB3 ALA     8      13.629 -13.137  19.953  1.00001.00            H
-ATOM     79  C   ALA     8      12.280 -13.806  22.697  1.00001.00            C
-ATOM     80  O   ALA     8      11.774 -12.615  23.307  1.00001.00            O
-ATOM     81  N   ALA     9      12.976 -14.810  23.513  1.00001.00            N
-ATOM     82  HN  ALA     9      13.360 -15.668  23.171  1.00001.00            H
-ATOM     83  CA  ALA     9      13.329 -14.933  24.935  1.00001.00            C
-ATOM     84  HA  ALA     9      13.997 -14.119  25.215  1.00001.00            H
-ATOM     85  CB  ALA     9      12.050 -14.865  25.789  1.00001.00            C
-ATOM     86  HB1 ALA     9      12.298 -14.501  26.787  1.00001.00            H
-ATOM     87  HB2 ALA     9      11.610 -15.859  25.864  1.00001.00            H
-ATOM     88  HB3 ALA     9      11.337 -14.187  25.321  1.00001.00            H
-ATOM     89  C   ALA     9      14.034 -16.281  25.174  1.00001.00            C
-ATOM     90  O   ALA     9      14.195 -17.205  24.094  1.00001.00            O
-ATOM     91  N   ALA    10      14.543 -16.618  26.511  1.00001.00            N
-ATOM     92  HN  ALA    10      14.473 -16.034  27.320  1.00001.00            H
-ATOM     93  CA  ALA    10      15.244 -17.768  27.099  1.00001.00            C
-ATOM     94  HA  ALA    10      14.613 -18.654  27.027  1.00001.00            H
-ATOM     95  CB  ALA    10      16.560 -18.012  26.337  1.00001.00            C
-ATOM     96  HB1 ALA    10      16.469 -18.917  25.736  1.00001.00            H
-ATOM     97  HB2 ALA    10      17.376 -18.129  27.049  1.00001.00            H
-ATOM     98  HB3 ALA    10      16.763 -17.163  25.687  1.00001.00            H
-ATOM     99  C   ALA    10      15.555 -17.479  28.580  1.00001.00            C
-ATOM    100  O   ALA    10      15.218 -16.210  29.147  1.00001.00            O
+ATOM      1  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM      2  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM      3  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM      4  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM      5  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM      6  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM      7  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM      8  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM      9  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     10  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     11  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     12  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     13  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     14  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     15  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     16  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     17  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     18  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     19  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     20  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     21  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     22  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     23  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     24  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     25  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     26  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     27  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     28  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     29  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     30  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     31  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     32  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     33  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     34  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     35  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     36  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     37  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     38  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     39  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     40  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     41  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     42  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     43  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     44  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     45  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     46  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     47  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     48  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     49  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     50  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     51  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     52  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     53  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     54  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     55  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     56  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     57  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     58  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     59  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     60  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     61  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     62  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     63  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     64  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     65  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     66  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     67  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     68  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     69  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     70  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     71  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     72  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     73  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     74  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     75  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     76  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     77  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     78  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     79  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     80  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     81  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     82  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     83  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     84  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     85  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     86  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     87  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     88  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     89  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     90  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     91  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     92  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     93  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     94  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     95  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     96  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     97  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     98  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     99  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    100  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    101  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    102  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    103  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    104  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM    105  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM    106  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM    107  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM    108  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM    109  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM    110  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM    111  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM    112  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    113  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    114  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    115  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    116  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    117  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM    118  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM    119  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM    120  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM    121  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM    122  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM    123  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM    124  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM    125  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    126  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    127  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    128  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    129  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    130  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
 
 TER
 END
-Content of test1.pdb:
-ATOM      1  N   THR     1       0.000   0.000   0.000  1.00001.00            N
-ATOM      2  HN  THR     1       0.000   1.000  -0.000  1.00001.00            H
-ATOM      3  CA  THR     1       0.000  -0.490   1.386  1.00001.00            C
-ATOM      4  HA  THR     1       0.899  -1.081   1.562  1.00001.00            H
-ATOM      5  CB  THR     1      -0.025   0.708   2.354  1.00001.00            C
-ATOM      6  HB  THR     1      -0.234   0.354   3.364  1.00001.00            H
-ATOM      7  OG1 THR     1      -1.045   1.625   1.950  1.00001.00            O
-ATOM      8  HG1 THR     1      -1.333   2.146   2.716  1.00001.00            H
-ATOM      9  CG2 THR     1       1.342   1.416   2.330  1.00001.00            C
-ATOM     10 1HG2 THR     1       1.470   1.989   3.248  1.00001.00            H
-ATOM     11 2HG2 THR     1       1.388   2.088   1.473  1.00001.00            H
-ATOM     12 3HG2 THR     1       2.135   0.672   2.252  1.00001.00            H
-ATOM     13  C   THR     1      -1.245  -1.366   1.621  1.00001.00            C
-ATOM     14  O   THR     1      -1.618  -1.736   2.951  1.00001.00            O
-ATOM     15  N   THR     2      -2.048  -1.823   0.478  1.00001.00            N
-ATOM     16  HN  THR     2      -1.860  -1.612  -0.482  1.00001.00            H
-ATOM     17  CA  THR     2      -3.258  -2.641   0.316  1.00001.00            C
-ATOM     18  HA  THR     2      -3.495  -2.736  -0.743  1.00001.00            H
-ATOM     19  CB  THR     2      -3.015  -4.040   0.915  1.00001.00            C
-ATOM     20  HB  THR     2      -2.921  -3.959   1.998  1.00001.00            H
-ATOM     21  OG1 THR     2      -1.813  -4.588   0.371  1.00001.00            O
-ATOM     22  HG1 THR     2      -1.449  -5.243   0.987  1.00001.00            H
-ATOM     23  CG2 THR     2      -4.202  -4.958   0.570  1.00001.00            C
-ATOM     24 1HG2 THR     2      -4.681  -5.295   1.490  1.00001.00            H
-ATOM     25 2HG2 THR     2      -3.843  -5.821   0.012  1.00001.00            H
-ATOM     26 3HG2 THR     2      -4.923  -4.410  -0.035  1.00001.00            H
-ATOM     27  C   THR     2      -4.435  -1.967   1.047  1.00001.00            C
-ATOM     28  O   THR     2      -4.928  -2.520   2.270  1.00001.00            O
-ATOM     29  N   THR     3      -5.052  -0.756   0.486  1.00001.00            N
-ATOM     30  HN  THR     3      -4.771  -0.305  -0.361  1.00001.00            H
-ATOM     31  CA  THR     3      -6.153   0.132   0.885  1.00001.00            C
-ATOM     32  HA  THR     3      -6.240   0.948   0.168  1.00001.00            H
-ATOM     33  CB  THR     3      -7.469  -0.665   0.919  1.00001.00            C
-ATOM     34  HB  THR     3      -8.242  -0.072   1.409  1.00001.00            H
-ATOM     35  OG1 THR     3      -7.271  -1.881   1.643  1.00001.00            O
-ATOM     36  HG1 THR     3      -7.382  -1.714   2.591  1.00001.00            H
-ATOM     37  CG2 THR     3      -7.909  -0.991  -0.521  1.00001.00            C
-ATOM     38 1HG2 THR     3      -8.994  -1.095  -0.555  1.00001.00            H
-ATOM     39 2HG2 THR     3      -7.443  -1.923  -0.840  1.00001.00            H
-ATOM     40 3HG2 THR     3      -7.600  -0.184  -1.185  1.00001.00            H
-ATOM     41  C   THR     3      -5.866   0.708   2.284  1.00001.00            C
-ATOM     42  O   THR     3      -6.649   0.288   3.404  1.00001.00            O
-ATOM     43  N   THR     4      -4.787   1.689   2.468  1.00001.00            N
-ATOM     44  HN  THR     4      -4.192   2.036   1.743  1.00001.00            H
-ATOM     45  CA  THR     4      -4.239   2.432   3.612  1.00001.00            C
-ATOM     46  HA  THR     4      -3.396   3.039   3.281  1.00001.00            H
-ATOM     47  CB  THR     4      -5.330   3.346   4.200  1.00001.00            C
-ATOM     48  HB  THR     4      -6.103   2.735   4.665  1.00001.00            H
-ATOM     49  OG1 THR     4      -5.907   4.130   3.155  1.00001.00            O
-ATOM     50  HG1 THR     4      -6.807   4.397   3.408  1.00001.00            H
-ATOM     51  CG2 THR     4      -4.706   4.277   5.257  1.00001.00            C
-ATOM     52 1HG2 THR     4      -5.159   4.078   6.228  1.00001.00            H
-ATOM     53 2HG2 THR     4      -4.885   5.314   4.978  1.00001.00            H
-ATOM     54 3HG2 THR     4      -3.632   4.095   5.312  1.00001.00            H
-ATOM     55  C   THR     4      -3.765   1.439   4.690  1.00001.00            C
-ATOM     56  O   THR     4      -4.479   1.328   5.923  1.00001.00            O
-ATOM     57  N   THR     5      -2.578   0.606   4.450  1.00001.00            N
-ATOM     58  HN  THR     5      -2.021   0.619   3.620  1.00001.00            H
-ATOM     59  CA  THR     5      -1.852  -0.417   5.217  1.00001.00            C
-ATOM     60  HA  THR     5      -1.028  -0.803   4.617  1.00001.00            H
-ATOM     61  CB  THR     5      -1.298   0.208   6.510  1.00001.00            C
-ATOM     62  HB  THR     5      -0.945  -0.583   7.173  1.00001.00            H
-ATOM     63  OG1 THR     5      -2.332   0.949   7.162  1.00001.00            O
-ATOM     64  HG1 THR     5      -2.138   1.009   8.110  1.00001.00            H
-ATOM     65  CG2 THR     5      -0.129   1.149   6.165  1.00001.00            C
-ATOM     66 1HG2 THR     5       0.547   1.214   7.017  1.00001.00            H
-ATOM     67 2HG2 THR     5      -0.518   2.141   5.933  1.00001.00            H
-ATOM     68 3HG2 THR     5       0.410   0.759   5.303  1.00001.00            H
-ATOM     69  C   THR     5      -2.811  -1.569   5.572  1.00001.00            C
-ATOM     70  O   THR     5      -3.224  -1.762   6.927  1.00001.00            O
-ATOM     71  N   THR     6      -3.302  -2.469   4.519  1.00001.00            N
-ATOM     72  HN  THR     6      -3.065  -2.406   3.549  1.00001.00            H
-ATOM     73  CA  THR     6      -4.196  -3.635   4.478  1.00001.00            C
-ATOM     74  HA  THR     6      -4.304  -3.974   3.448  1.00001.00            H
-ATOM     75  CB  THR     6      -3.599  -4.769   5.332  1.00001.00            C
-ATOM     76  HB  THR     6      -3.641  -4.491   6.386  1.00001.00            H
-ATOM     77  OG1 THR     6      -2.238  -4.987   4.951  1.00001.00            O
-ATOM     78  HG1 THR     6      -1.754  -5.382   5.693  1.00001.00            H
-ATOM     79  CG2 THR     6      -4.409  -6.059   5.110  1.00001.00            C
-ATOM     80 1HG2 THR     6      -4.872  -6.365   6.048  1.00001.00            H
-ATOM     81 2HG2 THR     6      -3.744  -6.849   4.759  1.00001.00            H
-ATOM     82 3HG2 THR     6      -5.183  -5.879   4.364  1.00001.00            H
-ATOM     83  C   THR     6      -5.576  -3.243   5.037  1.00001.00            C
-ATOM     84  O   THR     6      -6.010  -3.759   6.299  1.00001.00            O
-ATOM     85  N   THR     7      -6.449  -2.340   4.274  1.00001.00            N
-ATOM     86  HN  THR     7      -6.227  -1.934   3.387  1.00001.00            H
-ATOM     87  CA  THR     7      -7.785  -1.763   4.480  1.00001.00            C
-ATOM     88  HA  THR     7      -8.050  -1.143   3.622  1.00001.00            H
-ATOM     89  CB  THR     7      -8.815  -2.897   4.631  1.00001.00            C
-ATOM     90  HB  THR     7      -9.761  -2.485   4.987  1.00001.00            H
-ATOM     91  OG1 THR     7      -8.331  -3.859   5.572  1.00001.00            O
-ATOM     92  HG1 THR     7      -9.080  -4.336   5.963  1.00001.00            H
-ATOM     93  CG2 THR     7      -9.034  -3.578   3.268  1.00001.00            C
-ATOM     94 1HG2 THR     7     -10.029  -4.020   3.239  1.00001.00            H
-ATOM     95 2HG2 THR     7      -8.285  -4.357   3.126  1.00001.00            H
-ATOM     96 3HG2 THR     7      -8.943  -2.836   2.475  1.00001.00            H
-ATOM     97  C   THR     7      -7.781  -0.900   5.754  1.00001.00            C
-ATOM     98  O   THR     7      -8.437  -1.364   6.935  1.00001.00            O
-ATOM     99  N   THR     8      -7.102   0.404   5.757  1.00001.00            N
-ATOM    100  HN  THR     8      -6.620   0.805   4.978  1.00001.00            H
-ATOM    101  CA  THR     8      -6.894   1.468   6.749  1.00001.00            C
-ATOM    102  HA  THR     8      -6.285   2.260   6.311  1.00001.00            H
-ATOM    103  CB  THR     8      -8.255   2.045   7.177  1.00001.00            C
-ATOM    104  HB  THR     8      -8.790   1.306   7.769  1.00001.00            H
-ATOM    105  OG1 THR     8      -9.021   2.370   6.014  1.00001.00            O
-ATOM    106  HG1 THR     8      -9.962   2.353   6.234  1.00001.00            H
-ATOM    107  CG2 THR     8      -8.034   3.316   8.016  1.00001.00            C
-ATOM    108 1HG2 THR     8      -8.421   3.158   9.023  1.00001.00            H
-ATOM    109 2HG2 THR     8      -8.557   4.153   7.554  1.00001.00            H
-ATOM    110 3HG2 THR     8      -6.968   3.537   8.067  1.00001.00            H
-ATOM    111  C   THR     8      -6.174   0.889   7.980  1.00001.00            C
-ATOM    112  O   THR     8      -6.875   0.751   9.221  1.00001.00            O
+Content of test_alpha.pdb:
+ATOM      1  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM      2  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM      3  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM      4  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM      5  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM      6  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM      7  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM      8  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM      9  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     10  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     11  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     12  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     13  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     14  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     15  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     16  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     17  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     18  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     19  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     20  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     21  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     22  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     23  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     24  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     25  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     26  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     27  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     28  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     29  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     30  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     31  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     32  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     33  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     34  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     35  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     36  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     37  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     38  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     39  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     40  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     41  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     42  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     43  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     44  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     45  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     46  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     47  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     48  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     49  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     50  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     51  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     52  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     53  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     54  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     55  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     56  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     57  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     58  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     59  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     60  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     61  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     62  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     63  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     64  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     65  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     66  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     67  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     68  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     69  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     70  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     71  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     72  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     73  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     74  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     75  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     76  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     77  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     78  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     79  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     80  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     81  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     82  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     83  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     84  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     85  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     86  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     87  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     88  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     89  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     90  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     91  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     92  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     93  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     94  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     95  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     96  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     97  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     98  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     99  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    100  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    101  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    102  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    103  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    104  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM    105  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM    106  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM    107  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM    108  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM    109  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM    110  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM    111  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM    112  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    113  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    114  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    115  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    116  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    117  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM    118  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM    119  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM    120  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM    121  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM    122  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM    123  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM    124  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM    125  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    126  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    127  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    128  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    129  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    130  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+
+TER
+END
+Content of test_beta.pdb:
+ATOM      1  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM      2  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM      3  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM      4  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM      5  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM      6  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM      7  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM      8  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM      9  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     10  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     11  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     12  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     13  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     14  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     15  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     16  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     17  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     18  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     19  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     20  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     21  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     22  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     23  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     24  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     25  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     26  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     27  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     28  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     29  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     30  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     31  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     32  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     33  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     34  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     35  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     36  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     37  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     38  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     39  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     40  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     41  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     42  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     43  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     44  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     45  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     46  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     47  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     48  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     49  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     50  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     51  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     52  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     53  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     54  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     55  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     56  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     57  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     58  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     59  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     60  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     61  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     62  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     63  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     64  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     65  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     66  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     67  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     68  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     69  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     70  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     71  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     72  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     73  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     74  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     75  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     76  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     77  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     78  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     79  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     80  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     81  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     82  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     83  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     84  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     85  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     86  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     87  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     88  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     89  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     90  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     91  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     92  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     93  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     94  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     95  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     96  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     97  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     98  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     99  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    100  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    101  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    102  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    103  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    104  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM    105  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM    106  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM    107  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM    108  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM    109  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM    110  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM    111  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM    112  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    113  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    114  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    115  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    116  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    117  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM    118  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM    119  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM    120  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM    121  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM    122  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM    123  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM    124  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM    125  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    126  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    127  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    128  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    129  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    130  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+
+TER
+END
+Content of test_310.pdb:
+ATOM      1  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM      2  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM      3  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM      4  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM      5  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM      6  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM      7  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM      8  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM      9  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     10  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     11  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     12  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     13  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     14  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     15  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     16  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     17  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     18  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     19  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     20  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     21  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     22  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     23  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     24  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     25  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     26  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     27  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     28  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     29  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     30  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     31  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     32  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     33  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     34  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     35  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     36  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     37  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     38  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     39  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     40  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     41  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     42  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     43  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     44  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     45  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     46  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     47  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     48  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     49  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     50  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     51  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     52  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     53  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     54  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     55  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     56  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     57  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     58  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     59  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     60  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     61  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     62  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     63  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     64  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     65  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     66  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     67  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     68  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     69  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     70  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     71  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     72  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     73  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     74  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     75  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     76  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     77  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     78  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     79  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     80  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     81  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     82  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     83  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     84  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     85  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     86  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     87  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     88  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     89  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     90  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     91  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     92  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     93  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     94  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     95  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     96  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     97  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     98  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     99  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    100  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    101  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    102  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    103  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    104  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM    105  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM    106  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM    107  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM    108  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM    109  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM    110  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM    111  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM    112  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    113  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    114  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    115  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    116  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    117  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM    118  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM    119  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM    120  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM    121  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM    122  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM    123  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM    124  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM    125  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    126  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    127  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    128  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    129  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    130  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+
+TER
+END
+Content of test_pi.pdb:
+ATOM      1  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM      2  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM      3  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM      4  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM      5  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM      6  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM      7  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM      8  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM      9  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     10  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     11  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     12  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     13  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     14  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     15  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     16  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     17  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     18  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     19  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     20  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     21  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     22  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     23  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     24  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     25  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     26  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     27  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     28  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     29  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     30  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     31  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     32  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     33  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     34  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     35  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     36  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     37  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     38  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     39  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     40  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     41  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     42  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     43  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     44  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     45  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     46  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     47  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     48  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     49  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     50  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     51  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     52  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     53  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     54  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     55  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     56  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     57  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     58  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     59  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     60  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     61  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     62  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     63  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     64  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     65  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     66  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     67  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     68  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     69  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     70  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     71  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     72  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     73  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     74  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     75  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     76  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     77  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     78  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     79  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     80  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     81  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     82  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     83  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     84  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     85  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     86  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM     87  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM     88  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM     89  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM     90  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM     91  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM     92  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM     93  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM     94  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM     95  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM     96  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM     97  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM     98  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM     99  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    100  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    101  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    102  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    103  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    104  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM    105  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM    106  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM    107  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM    108  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM    109  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM    110  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM    111  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM    112  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    113  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    114  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    115  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    116  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    117  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
+ATOM    118  N1  LIG     0      -0.000   0.000  -0.000  1.00001.00            N
+ATOM    119  C2  LIG     0      -0.000   1.470   0.000  1.00001.00            C
+ATOM    120  H3  LIG     0      -0.000   1.833  -1.028  1.00001.00            H
+ATOM    121  C4  LIG     0      -1.257   1.983   0.726  1.00001.00            C
+ATOM    122  C5  LIG     0       1.257   1.983   0.726  1.00001.00            C
+ATOM    123  O6  LIG     0       0.868   2.778   1.849  1.00001.00            O
+ATOM    124  O7  LIG     0       2.347   1.693   0.316  1.00001.00            O
+ATOM    125  H8  LIG     0      -0.000  -0.333   0.943  1.00001.00            H
+ATOM    126  H9  LIG     0       0.816  -0.333  -0.471  1.00001.00            H
+ATOM    127  H10 LIG     0      -0.961   2.589   1.582  1.00001.00            H
+ATOM    128  H11 LIG     0      -1.851   1.136   1.069  1.00001.00            H
+ATOM    129  H12 LIG     0      -1.851   2.589   0.041  1.00001.00            H
+ATOM    130  H13 LIG     0       1.220   3.676   1.748  1.00001.00            H
 
 TER
 END
 Content of test2.sdf:
 Test2
 https://github.com/primaryodors/podock
- 100 99  0     0  0  0  0  0  0999 V2000
+ 130 27  0     0  0  0  0  0  0999 V2000
     0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000    1.0000    0.0000 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.0000   -0.4900    1.3860 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.8420   -0.0550    1.9250 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.1270   -2.0250    1.3880 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.5090   -2.3570    2.3530 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.8530   -2.4700    1.2120 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.8130   -2.3340    0.6000 H   0  0  0  0  0  0  0  0  0  0  0  0
-    1.3160   -0.0830    2.0740 C   0  0  0  0  0  0  0  0  0  0  0  0
-    1.3140    0.9450    3.0690 O   0  0  0  0  0  0  0  0  0  0  0  0
-    2.5740   -0.7500    1.7100 N   0  0  0  0  0  0  0  0  0  0  0  0
-    2.6660   -1.4760    1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
-    3.9760   -0.6340    2.1360 C   0  0  0  0  0  0  0  0  0  0  0  0
-    4.0570   -0.8890    3.1920 H   0  0  0  0  0  0  0  0  0  0  0  0
-    4.8450   -1.5970    1.3070 C   0  0  0  0  0  0  0  0  0  0  0  0
-    5.0380   -2.5010    1.8850 H   0  0  0  0  0  0  0  0  0  0  0  0
-    5.7910   -1.1140    1.0630 H   0  0  0  0  0  0  0  0  0  0  0  0
-    4.3230   -1.8580    0.3870 H   0  0  0  0  0  0  0  0  0  0  0  0
-    4.4600    0.8110    1.9180 C   0  0  0  0  0  0  0  0  0  0  0  0
-    4.6560    1.6770    3.0390 O   0  0  0  0  0  0  0  0  0  0  0  0
-    4.7220    1.3010    0.5570 N   0  0  0  0  0  0  0  0  0  0  0  0
-    4.6120    0.7660   -0.2810 H   0  0  0  0  0  0  0  0  0  0  0  0
-    5.1780    2.5740   -0.0220 C   0  0  0  0  0  0  0  0  0  0  0  0
-    6.1690    2.8130    0.3620 H   0  0  0  0  0  0  0  0  0  0  0  0
-    5.2380    2.4480   -1.5550 C   0  0  0  0  0  0  0  0  0  0  0  0
-    5.9010    3.2140   -1.9560 H   0  0  0  0  0  0  0  0  0  0  0  0
-    4.2390    2.5790   -1.9700 H   0  0  0  0  0  0  0  0  0  0  0  0
-    5.6160    1.4620   -1.8240 H   0  0  0  0  0  0  0  0  0  0  0  0
-    4.1940    3.6940    0.3630 C   0  0  0  0  0  0  0  0  0  0  0  0
-    4.5660    4.6680    1.3420 O   0  0  0  0  0  0  0  0  0  0  0  0
-    2.8720    3.7630   -0.2760 N   0  0  0  0  0  0  0  0  0  0  0  0
-    2.5310    3.1260   -0.9680 H   0  0  0  0  0  0  0  0  0  0  0  0
-    1.7090    4.6550   -0.1690 C   0  0  0  0  0  0  0  0  0  0  0  0
-    1.9980    5.6650   -0.4590 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.5910    4.1550   -1.1000 C   0  0  0  0  0  0  0  0  0  0  0  0
-    0.5800    4.7540   -2.0110 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.3720    4.2440   -0.5950 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.7700    3.1100   -1.3550 H   0  0  0  0  0  0  0  0  0  0  0  0
-    1.2020    4.6650    1.2840 C   0  0  0  0  0  0  0  0  0  0  0  0
-    1.4220    5.8100    2.1110 O   0  0  0  0  0  0  0  0  0  0  0  0
-    0.4900    3.4960    1.8210 N   0  0  0  0  0  0  0  0  0  0  0  0
-    0.2930    2.6570    1.3150 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.1190    3.1520    3.1140 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.9200    3.8560    3.3380 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.6930    1.7260    3.0470 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.4520    1.6020    3.8210 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.1080    1.0010    3.2040 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.1430    1.5620    2.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.9500    3.2230    4.2200 C   0  0  0  0  0  0  0  0  0  0  0  0
-    0.9310    4.2960    5.1660 O   0  0  0  0  0  0  0  0  0  0  0  0
-    1.9900    2.1880    4.3040 N   0  0  0  0  0  0  0  0  0  0  0  0
-    2.0790    1.4060    3.6870 H   0  0  0  0  0  0  0  0  0  0  0  0
-    3.1350    1.9330    5.1900 C   0  0  0  0  0  0  0  0  0  0  0  0
-    2.7770    1.7540    6.2030 H   0  0  0  0  0  0  0  0  0  0  0  0
-    3.9030    0.6950    4.6920 C   0  0  0  0  0  0  0  0  0  0  0  0
-    3.6620   -0.1620    5.3220 H   0  0  0  0  0  0  0  0  0  0  0  0
-    4.9750    0.8890    4.7390 H   0  0  0  0  0  0  0  0  0  0  0  0
-    3.6170    0.4800    3.6620 H   0  0  0  0  0  0  0  0  0  0  0  0
-    4.0720    3.1540    5.1840 C   0  0  0  0  0  0  0  0  0  0  0  0
-    4.1140    4.0300    6.3150 O   0  0  0  0  0  0  0  0  0  0  0  0
-    4.9240    3.4220    4.0170 N   0  0  0  0  0  0  0  0  0  0  0  0
-    4.9580    2.8650    3.1870 H   0  0  0  0  0  0  0  0  0  0  0  0
-    5.9090    4.4540    3.6610 C   0  0  0  0  0  0  0  0  0  0  0  0
-    6.7270    4.4380    4.3800 H   0  0  0  0  0  0  0  0  0  0  0  0
-    6.4590    4.1740    2.2520 C   0  0  0  0  0  0  0  0  0  0  0  0
-    7.4370    4.6430    2.1420 H   0  0  0  0  0  0  0  0  0  0  0  0
-    5.7750    4.5790    1.5050 H   0  0  0  0  0  0  0  0  0  0  0  0
-    6.5570    3.0960    2.1050 H   0  0  0  0  0  0  0  0  0  0  0  0
-    5.2350    5.8360    3.6820 C   0  0  0  0  0  0  0  0  0  0  0  0
-    5.5360    6.7660    4.7260 O   0  0  0  0  0  0  0  0  0  0  0  0
-    4.2780    6.2040    2.6280 N   0  0  0  0  0  0  0  0  0  0  0  0
-    4.0090    5.6190    1.8630 H   0  0  0  0  0  0  0  0  0  0  0  0
-    3.4660    7.3910    2.3270 C   0  0  0  0  0  0  0  0  0  0  0  0
-    4.1200    8.2450    2.1550 H   0  0  0  0  0  0  0  0  0  0  0  0
-    2.6210    7.1290    1.0680 C   0  0  0  0  0  0  0  0  0  0  0  0
-    3.0450    7.6750    0.2250 H   0  0  0  0  0  0  0  0  0  0  0  0
-    1.5990    7.4660    1.2400 H   0  0  0  0  0  0  0  0  0  0  0  0
-    2.6190    6.0610    0.8450 H   0  0  0  0  0  0  0  0  0  0  0  0
-    2.5350    7.6900    3.5170 C   0  0  0  0  0  0  0  0  0  0  0  0
-    2.8020    8.8050    4.3720 O   0  0  0  0  0  0  0  0  0  0  0  0
-    1.3710    6.8300    3.7740 N   0  0  0  0  0  0  0  0  0  0  0  0
-    1.1110    6.0330    3.2290 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.2970    6.8040    4.7770 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.2920    7.7180    4.7020 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.6120    5.5860    4.5250 C   0  0  0  0  0  0  0  0  0  0  0  0
-   -1.6080    5.7880    4.9190 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.1940    4.7120    5.0240 H   0  0  0  0  0  0  0  0  0  0  0  0
-   -0.6760    5.3970    3.4540 H   0  0  0  0  0  0  0  0  0  0  0  0
-    0.9120    6.7030    6.1850 C   0  0  0  0  0  0  0  0  0  0  0  0
-    0.8770    7.8310    7.0630 O   0  0  0  0  0  0  0  0  0  0  0  0
-    1.5340    5.4470    6.6270 N   0  0  0  0  0  0  0  0  0  0  0  0
-    1.6020    4.6120    6.0800 H   0  0  0  0  0  0  0  0  0  0  0  0
-    2.2000    4.9910    7.8560 C   0  0  0  0  0  0  0  0  0  0  0  0
-    1.4970    5.0360    8.6880 H   0  0  0  0  0  0  0  0  0  0  0  0
-    2.6830    3.5400    7.6700 C   0  0  0  0  0  0  0  0  0  0  0  0
-    2.0620    2.8710    8.2660 H   0  0  0  0  0  0  0  0  0  0  0  0
-    3.7200    3.4580    7.9940 H   0  0  0  0  0  0  0  0  0  0  0  0
-    2.6070    3.2670    6.6190 H   0  0  0  0  0  0  0  0  0  0  0  0
-    3.4070    5.8990    8.1530 C   0  0  0  0  0  0  0  0  0  0  0  0
-    3.3560    6.8240    9.2430 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.4700    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.8330   -1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8680    2.7780    1.8490 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3470    1.6930    0.3160 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3330    0.9430 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8160   -0.3330   -0.4710 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9610    2.5890    1.5820 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    1.1360    1.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    2.5890    0.0410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2200    3.6760    1.7480 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.4700    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.8330   -1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8680    2.7780    1.8490 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3470    1.6930    0.3160 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3330    0.9430 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8160   -0.3330   -0.4710 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9610    2.5890    1.5820 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    1.1360    1.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    2.5890    0.0410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2200    3.6760    1.7480 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.4700    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.8330   -1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8680    2.7780    1.8490 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3470    1.6930    0.3160 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3330    0.9430 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8160   -0.3330   -0.4710 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9610    2.5890    1.5820 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    1.1360    1.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    2.5890    0.0410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2200    3.6760    1.7480 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.4700    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.8330   -1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8680    2.7780    1.8490 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3470    1.6930    0.3160 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3330    0.9430 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8160   -0.3330   -0.4710 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9610    2.5890    1.5820 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    1.1360    1.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    2.5890    0.0410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2200    3.6760    1.7480 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.4700    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.8330   -1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8680    2.7780    1.8490 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3470    1.6930    0.3160 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3330    0.9430 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8160   -0.3330   -0.4710 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9610    2.5890    1.5820 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    1.1360    1.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    2.5890    0.0410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2200    3.6760    1.7480 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.4700    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.8330   -1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8680    2.7780    1.8490 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3470    1.6930    0.3160 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3330    0.9430 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8160   -0.3330   -0.4710 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9610    2.5890    1.5820 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    1.1360    1.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    2.5890    0.0410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2200    3.6760    1.7480 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.4700    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.8330   -1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8680    2.7780    1.8490 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3470    1.6930    0.3160 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3330    0.9430 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8160   -0.3330   -0.4710 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9610    2.5890    1.5820 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    1.1360    1.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    2.5890    0.0410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2200    3.6760    1.7480 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.4700    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.8330   -1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8680    2.7780    1.8490 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3470    1.6930    0.3160 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3330    0.9430 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8160   -0.3330   -0.4710 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9610    2.5890    1.5820 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    1.1360    1.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    2.5890    0.0410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2200    3.6760    1.7480 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.4700    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.8330   -1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8680    2.7780    1.8490 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3470    1.6930    0.3160 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3330    0.9430 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8160   -0.3330   -0.4710 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9610    2.5890    1.5820 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    1.1360    1.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    2.5890    0.0410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2200    3.6760    1.7480 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    0.0000    0.0000 N   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.4700    0.0000 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000    1.8330   -1.0280 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2570    1.9830    0.7260 C   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8680    2.7780    1.8490 O   0  0  0  0  0  0  0  0  0  0  0  0
+    2.3470    1.6930    0.3160 O   0  0  0  0  0  0  0  0  0  0  0  0
+    0.0000   -0.3330    0.9430 H   0  0  0  0  0  0  0  0  0  0  0  0
+    0.8160   -0.3330   -0.4710 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -0.9610    2.5890    1.5820 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    1.1360    1.0690 H   0  0  0  0  0  0  0  0  0  0  0  0
+   -1.8510    2.5890    0.0410 H   0  0  0  0  0  0  0  0  0  0  0  0
+    1.2200    3.6760    1.7480 H   0  0  0  0  0  0  0  0  0  0  0  0
   1  2 1.00  0  0  0  0
-  1  3 1.00  0  0  0  0
-  3  4 1.00  0  0  0  0
-  3  5 1.00  0  0  0  0
-  3  9 1.00  0  0  0  0
+  1  8 1.00  0  0  0  0
+  1  9 1.00  0  0  0  0
+  1 14 1.00  0  0  0  0
+  2  3 1.00  0  0  0  0
+  2  4 1.00  0  0  0  0
+  2  5 1.00  0  0  0  0
+  3 15 1.00  0  0  0  0
+  4 10 1.00  0  0  0  0
+  4 11 1.00  0  0  0  0
+  4 12 1.00  0  0  0  0
   5  6 1.00  0  0  0  0
   5  7 1.00  0  0  0  0
-  5  8 1.00  0  0  0  0
-  9 10 1.00  0  0  0  0
-  9 11 1.00  0  0  0  0
- 11 12 1.00  0  0  0  0
- 11 13 1.00  0  0  0  0
- 13 14 1.00  0  0  0  0
- 13 15 1.00  0  0  0  0
+  5 18 1.00  0  0  0  0
+  6 13 1.00  0  0  0  0
+  6 18 1.00  0  0  0  0
+  6 19 1.00  0  0  0  0
+  7 18 1.00  0  0  0  0
+  7 20 1.00  0  0  0  0
+  7 31 1.00  0  0  0  0
+  8 14 1.00  0  0  0  0
+  9 14 1.00  0  0  0  0
+ 10 17 1.00  0  0  0  0
+ 11 17 1.00  0  0  0  0
+ 12 25 1.00  0  0  0  0
  13 19 1.00  0  0  0  0
- 15 16 1.00  0  0  0  0
- 15 17 1.00  0  0  0  0
- 15 18 1.00  0  0  0  0
- 19 20 1.00  0  0  0  0
- 19 21 1.00  0  0  0  0
- 21 22 1.00  0  0  0  0
- 21 23 1.00  0  0  0  0
- 23 24 1.00  0  0  0  0
- 23 25 1.00  0  0  0  0
- 23 29 1.00  0  0  0  0
- 25 26 1.00  0  0  0  0
- 25 27 1.00  0  0  0  0
- 25 28 1.00  0  0  0  0
- 29 30 1.00  0  0  0  0
- 29 31 1.00  0  0  0  0
- 31 32 1.00  0  0  0  0
- 31 33 1.00  0  0  0  0
- 33 34 1.00  0  0  0  0
- 33 35 1.00  0  0  0  0
- 33 39 1.00  0  0  0  0
- 35 36 1.00  0  0  0  0
- 35 37 1.00  0  0  0  0
- 35 38 1.00  0  0  0  0
- 39 40 1.00  0  0  0  0
- 39 41 1.00  0  0  0  0
- 41 42 1.00  0  0  0  0
- 41 43 1.00  0  0  0  0
- 43 44 1.00  0  0  0  0
- 43 45 1.00  0  0  0  0
- 43 49 1.00  0  0  0  0
- 45 46 1.00  0  0  0  0
- 45 47 1.00  0  0  0  0
- 45 48 1.00  0  0  0  0
- 49 50 1.00  0  0  0  0
- 49 51 1.00  0  0  0  0
- 51 52 1.00  0  0  0  0
- 51 53 1.00  0  0  0  0
- 53 54 1.00  0  0  0  0
- 53 55 1.00  0  0  0  0
- 53 59 1.00  0  0  0  0
- 55 56 1.00  0  0  0  0
- 55 57 1.00  0  0  0  0
- 55 58 1.00  0  0  0  0
- 59 60 1.00  0  0  0  0
- 59 61 1.00  0  0  0  0
- 61 62 1.00  0  0  0  0
- 61 63 1.00  0  0  0  0
- 63 64 1.00  0  0  0  0
- 63 65 1.00  0  0  0  0
- 63 69 1.00  0  0  0  0
- 65 66 1.00  0  0  0  0
- 65 67 1.00  0  0  0  0
- 65 68 1.00  0  0  0  0
- 69 70 1.00  0  0  0  0
- 69 71 1.00  0  0  0  0
- 71 72 1.00  0  0  0  0
- 71 73 1.00  0  0  0  0
- 73 74 1.00  0  0  0  0
- 73 75 1.00  0  0  0  0
- 73 79 1.00  0  0  0  0
- 75 76 1.00  0  0  0  0
- 75 77 1.00  0  0  0  0
- 75 78 1.00  0  0  0  0
- 79 80 1.00  0  0  0  0
- 79 81 1.00  0  0  0  0
- 81 82 1.00  0  0  0  0
- 81 83 1.00  0  0  0  0
- 83 84 1.00  0  0  0  0
- 83 85 1.00  0  0  0  0
- 83 89 1.00  0  0  0  0
- 85 86 1.00  0  0  0  0
- 85 87 1.00  0  0  0  0
- 85 88 1.00  0  0  0  0
- 89 90 1.00  0  0  0  0
- 89 91 1.00  0  0  0  0
- 91 92 1.00  0  0  0  0
- 91 93 1.00  0  0  0  0
- 93 94 1.00  0  0  0  0
- 93 95 1.00  0  0  0  0
- 93 99 1.00  0  0  0  0
- 95 96 1.00  0  0  0  0
- 95 97 1.00  0  0  0  0
- 95 98 1.00  0  0  0  0
- 99100 1.00  0  0  0  0
+ 20 33 1.00  0  0  0  0
 M  END
 

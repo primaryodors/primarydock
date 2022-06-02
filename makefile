@@ -74,29 +74,29 @@ performance_test: $(BINDIR)/podock testdata/test_TAAR8.config testdata/TAAR8.rot
 	./$(BINDIR)/podock testdata/test_TAAR8.config
 
 # low-tooling regression tests below
-amino_report: REPORT="amino_test.approved.txt"
+amino_report: REPORT="test/amino_test.approved.txt"
 amino_report: test/amino_test
 	bash test/amino_tests.bash ARNDCEQGHILKMFPUSTWYV
 
-atom_report: REPORT="atom_test.approved.txt"
+atom_report: REPORT="test/atom_test.approved.txt"
 atom_report: test/atom_test
 	./test/atom_test H >$(REPORT)
 
-aniso_report: REPORT="aniso_test.approved.txt"
+aniso_report: REPORT="test/aniso_test.approved.txt"
 aniso_report: test/aniso_test
 	./test/aniso_test >$(REPORT)
 
-point_report: REPORT="point_test.approved.txt"
+point_report: REPORT="test/point_test.approved.txt"
 point_report: test/point_test
 	./test/point_test >$(REPORT)
 
-mol_report: REPORT="mol_test.approved.txt"
+mol_report: REPORT="test/mol_test.approved.txt"
 mol_report: test/mol_test
 	./test/mol_test >$(REPORT)
 	echo "Content of output.sdf:" >> $(REPORT)
 	sed '2d' output.sdf >> $(REPORT)
 
-mol_assem_report: REPORT="mol_assem_test.approved.txt"
+mol_assem_report: REPORT="test/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test
 	./test/mol_assem_test >$(REPORT)
 	echo "Content of test.sdf:" >> $(REPORT)
@@ -104,14 +104,26 @@ mol_assem_report: test/mol_assem_test
 
 #ARNDCEQGHILKMFPUSTWYV
 
-protein_report: REPORT="protein_test.approved.txt"
+protein_report: REPORT="test/protein_test.approved.txt"
 protein_report: test/protein_test
-	./protein_test AAAAAAAAAA >$(REPORT)
+	./test/protein_test AAAAAAAAAA >$(REPORT)
+	# Straight Strand PDB.
 	echo "Content of test.pdb:" >> $(REPORT)
 	cat test.pdb >> $(REPORT)
-	echo "Content of test1.pdb:" >> $(REPORT)
-	cat test1.pdb >> $(REPORT)
+	# Alpha helix PDB.
+	echo "Content of test_alpha.pdb:" >> $(REPORT)
+	cat test_alpha.pdb >> $(REPORT)
+	# Beta pleated PDB.
+	echo "Content of test_beta.pdb:" >> $(REPORT)
+	cat test_beta.pdb >> $(REPORT)
+	# 3.10 helix PDB.
+	echo "Content of test_310.pdb:" >> $(REPORT)
+	cat test_310.pdb >> $(REPORT)
+	# Pi helix PDB.
+	echo "Content of test_pi.pdb:" >> $(REPORT)
+	cat test_pi.pdb >> $(REPORT)
+	# SDF of most recent PDB.
 	echo "Content of test2.sdf:" >> $(REPORT)
 	sed '2d' test2.sdf >> $(REPORT)
 
-reports: amino_report atom_test aniso_report point_report mol_report mol_assem_report protein_report
+reports: amino_report atom_report aniso_report point_report mol_report mol_assem_report protein_report

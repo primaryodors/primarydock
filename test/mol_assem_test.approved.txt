@@ -6,6 +6,7 @@ Internal clashes: 0.43268 cu.A.
 Minimizing internal clashes...
 Internal clashes: 3.8743e-07 cu.A.
 Saved test.sdf
+Saved test.pdb
 Content of test.sdf:
 Test
 https://github.com/primaryodors/podock

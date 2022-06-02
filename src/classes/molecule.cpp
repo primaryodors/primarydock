@@ -1225,7 +1225,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     if (!atoms) return 0;
     if (aadef && aadef->proline_like)
     {
-    	cout << "Proline-like! No rotbonds!" << endl;
+    	// cout << "Proline-like! No rotbonds!" << endl;
     	return NULL;
 	}
     Bond* btemp[65536];

@@ -1,7 +1,8 @@
 OBJDIR=obj
 BINDIR=bin
+OUTDIR=output
 
-all: $(OBJDIR) $(BINDIR) $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/bktest $(BINDIR)/metal $(BINDIR)/podock
+all: $(OBJDIR) $(BINDIR) $(OUTDIR) $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/bktest $(BINDIR)/metal $(BINDIR)/podock
 
 # TODO: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
 
@@ -21,6 +22,9 @@ $(OBJDIR):
 
 $(BINDIR):
 	mkdir -p $(BINDIR)
+
+$(OUTDIR):
+	mkdir -p $(OUTDIR)
 
 $(OBJDIR)/point.o: $(OBJDIR) src/classes/point.h src/classes/point.cpp src/classes/constants.h
 	$(CC) -c src/classes/point.cpp -o $(OBJDIR)/point.o $(CFLAGS)

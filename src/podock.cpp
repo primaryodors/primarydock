@@ -45,6 +45,7 @@ int poses = 10;
 int iters = 50;
 bool flex=true;
 float kJmol_cutoff = 0.01;
+bool kcal = false;
 float drift = 0.333;
 Molecule** gcfmols = NULL;
 
@@ -195,6 +196,10 @@ int main(int argc, char** argv)
             {
                 flex = (atoi(fields[1]) != 0);
             }
+            else if (!strcmp(fields[0], "KCAL"))
+            {
+                kcal = true;
+            }
             else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
             {
                 iters = atoi(fields[1]);
@@ -241,6 +246,7 @@ int main(int argc, char** argv)
     if (debug) *debug << "Loaded config file." << endl;
 #endif
 
+	if (kcal) kJmol_cutoff /= _kcal_per_kJ;
     drift = 1.0 / (iters/25+1);
 
     // Load the protein or return an error.
@@ -755,6 +761,7 @@ int main(int argc, char** argv)
     cout << endl;
     if (output) *output << endl;
 
+	const float energy_mult = kcal ? _kcal_per_kJ : 1;
     for (i=1; i<=poses; i++)
     {
         for (j=0; j<poses; j++)
@@ -776,8 +783,8 @@ int main(int argc, char** argv)
                                 && dr[j][k].metric[l][0];
                                 l++)
                         {
-                            cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l] << endl;
-                            if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l] << endl;
+                            cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
+                            if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
                         }
 
                         for (l=0; l<_INTER_TYPES_LIMIT; l++)
@@ -808,13 +815,13 @@ int main(int argc, char** argv)
                             default:
                                 goto _btyp_unassigned;
                             }
-                            cout << lbtyp << -dr[j][k].bytype[l] << endl;
-                            if (output) *output << lbtyp << -dr[j][k].bytype[l] << endl;
+                            cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
+                            if (output) *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                         }
 _btyp_unassigned:
 
-                        if (output) *output << "Total: " << -dr[j][k].kJmol << endl << endl;
-                        cout << "Total: " << -dr[j][k].kJmol << endl << endl;
+                        if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
+                        cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
 
                         if (!dr[j][k].pdbdat.length())
                         {
@@ -838,8 +845,16 @@ _btyp_unassigned:
                 {
                     if (i == 1)
                     {
-                        cout << "No poses found within kJ/mol limit." << endl;
-                        if (output) *output << "No poses found within kJ/mol limit." << endl;
+                    	if (kcal)
+                    	{
+		                    cout << "No poses found within kcal/mol limit." << endl;
+		                    if (output) *output << "No poses found within kcal/mol limit." << endl;
+                    	}
+                    	else
+                    	{
+		                    cout << "No poses found within kJ/mol limit." << endl;
+		                    if (output) *output << "No poses found within kJ/mol limit." << endl;
+	                    }
                     }
                     cout << "Exiting." << endl;
                     goto _exitposes;

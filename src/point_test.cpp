@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "point.h"
+#include "classes/point.h"
 
 using namespace std;
 

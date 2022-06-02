@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string>
 #include <math.h>
-#include "molecule.h"
+#include "classes/molecule.h"
 
 using namespace std;
 

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <cstring>
-#include "protein.h"
+#include "classes/protein.h"
 
 using namespace std;
 

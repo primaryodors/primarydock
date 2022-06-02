@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sstream>
-#include "protein.h"
+#include "classes/protein.h"
 
 using namespace std;
 

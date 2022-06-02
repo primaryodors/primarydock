@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string>
 #include <math.h>
-#include "protein.h"
+#include "classes/protein.h"
 
 using namespace std;
 

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string>
 #include <math.h>
-#include "aminoacid.h"
+#include "classes/aminoacid.h"
 
 using namespace std;
 

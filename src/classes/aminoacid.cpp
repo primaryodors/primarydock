@@ -50,6 +50,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     {
     	from_smiles(aa_defs[idx].SMILES.c_str());
     	// TODO: Atom names!
+    	
+    	get_rotatable_bonds();
     	goto _skip_aabonds;
     }
     

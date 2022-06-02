@@ -1040,7 +1040,7 @@ void Bond::swing(SCoord newdir)
 
 SCoord* Atom::get_basic_geometry()
 {
-    SCoord* retval = new SCoord[geometry] {};
+    SCoord* retval = new SCoord[geometry+2] {};
 
     int i, j;
     float x, y, z;

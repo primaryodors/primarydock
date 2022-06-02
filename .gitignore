@@ -1,6 +1,6 @@
 # Ignore build arfifacts
 *.o
-*test
+*_test
 metal
 podock
 *.config

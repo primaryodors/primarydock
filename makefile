@@ -22,22 +22,22 @@ $(OBJDIR):
 $(BINDIR):
 	mkdir -p $(BINDIR)
 
-$(OBJDIR)/point.o: src/classes/point.h src/classes/point.cpp src/classes/constants.h
+$(OBJDIR)/point.o: $(OBJDIR) src/classes/point.h src/classes/point.cpp src/classes/constants.h
 	$(CC) -c src/classes/point.cpp -o $(OBJDIR)/point.o $(CFLAGS)
 
-$(OBJDIR)/atom.o: src/classes/atom.h src/classes/atom.cpp
+$(OBJDIR)/atom.o: $(OBJDIR) src/classes/atom.h src/classes/atom.cpp
 	$(CC) -c src/classes/atom.cpp -o $(OBJDIR)/atom.o $(CFLAGS)
 
-$(OBJDIR)/intera.o: src/classes/intera.h src/classes/intera.cpp
+$(OBJDIR)/intera.o: $(OBJDIR) src/classes/intera.h src/classes/intera.cpp
 	$(CC) -c src/classes/intera.cpp -o $(OBJDIR)/intera.o $(CFLAGS)
 
-$(OBJDIR)/molecule.o: src/classes/molecule.h src/classes/molecule.cpp
+$(OBJDIR)/molecule.o: $(OBJDIR) src/classes/molecule.h src/classes/molecule.cpp
 	$(CC) -c src/classes/molecule.cpp -o $(OBJDIR)/molecule.o $(CFLAGS)
 
-$(OBJDIR)/aminoacid.o: src/classes/aminoacid.h src/classes/aminoacid.cpp
+$(OBJDIR)/aminoacid.o: $(OBJDIR) src/classes/aminoacid.h src/classes/aminoacid.cpp
 	$(CC) -c src/classes/aminoacid.cpp -o $(OBJDIR)/aminoacid.o $(CFLAGS)
 
-$(OBJDIR)/protein.o: src/classes/protein.h src/classes/protein.cpp
+$(OBJDIR)/protein.o: $(OBJDIR) src/classes/protein.h src/classes/protein.cpp
 	$(CC) -c src/classes/protein.cpp -o $(OBJDIR)/protein.o $(CFLAGS)
 
 test/point_test: src/point_test.cpp $(OBJDIR)/point.o
@@ -46,8 +46,8 @@ test/point_test: src/point_test.cpp $(OBJDIR)/point.o
 test/atom_test: src/atom_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o
 	$(CC) src/atom_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o -o test/atom_test $(CFLAGS)
 
-test/mol_test: src/mol_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/molecule.o $(OBJDIR)/intera.o
-	$(CC) src/mol_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o -o test/mol_test $(CFLAGS)
+test/molecule_test: src/molecule_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/molecule.o $(OBJDIR)/intera.o
+	$(CC) src/molecule_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o -o test/molecule_test $(CFLAGS)
 
 test/aniso_test: src/aniso_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/molecule.o $(OBJDIR)/intera.o
 	$(CC) src/aniso_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o -o test/aniso_test $(CFLAGS)
@@ -76,7 +76,7 @@ performance_test: $(BINDIR)/podock testdata/test_TAAR8.config testdata/TAAR8.rot
 # low-tooling regression tests below
 amino_report: REPORT="test/amino_test.approved.txt"
 amino_report: test/amino_test
-	bash test/amino_tests.bash ARNDCEQGHILKMFPUSTWYV
+	bash src/amino_tests.bash ARNDCEQGHILKMFPUSTWYV
 
 atom_report: REPORT="test/atom_test.approved.txt"
 atom_report: test/atom_test
@@ -90,19 +90,15 @@ point_report: REPORT="test/point_test.approved.txt"
 point_report: test/point_test
 	./test/point_test >$(REPORT)
 
-mol_report: REPORT="test/mol_test.approved.txt"
-mol_report: test/mol_test
-	./test/mol_test >$(REPORT)
-	echo "Content of output.sdf:" >> $(REPORT)
-	sed '2d' output.sdf >> $(REPORT)
+molecule_report: REPORT="test/molecule_test.approved.txt"
+molecule_report: test/molecule_test
+	./test/molecule_test | sed '/^#/d' >$(REPORT)  # ignore lines starting with #
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test
 	./test/mol_assem_test >$(REPORT)
 	echo "Content of test.sdf:" >> $(REPORT)
 	sed '2d' test.sdf >> $(REPORT)  # remove line 2 (date stamp)
-
-#ARNDCEQGHILKMFPUSTWYV
 
 protein_report: REPORT="test/protein_test.approved.txt"
 protein_report: test/protein_test
@@ -126,4 +122,4 @@ protein_report: test/protein_test
 	echo "Content of test2.sdf:" >> $(REPORT)
 	sed '2d' test2.sdf >> $(REPORT)
 
-reports: amino_report atom_report aniso_report point_report mol_report mol_assem_report protein_report
+reports: amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report

@@ -1,0 +1,179 @@
+
+Glossary of Terms
+
+The following terms are used by POdock and generally in molecular docking/computational chemistry/biochemistry.
+
+
+Activation
+
+A conformational change (i.e. change of shape) in a receptor caused by its interaction with whatever it is sensitive to. 
+
+
+Amino Acid
+
+In general this is a molecule having both an acidic moiety and an amino group (-NH2). More specifically, in a biochemistry context the term amino acid refers to l-alpha-amino carboxylic acids, which have the formula R-CH(-NH2)-CO2H and a laevo chirality. The proteinogenic amino acids are all laevo except for glycine which is achiral. In laevo chirality, if the molecule be positioned with the amino group on the viewer's left, and the carboxylic acid group on the viewer's right, and the side chain pointing up, the side chain will lean towards the viewer.
+
+
+Aromatic
+
+Referring to a conjugated ring of atoms with resonance all throughout the ring. Aromatic rings are planar and unusually chemically stable. Above and below the rings are pi bonds capable of binding with other moieties. Examples of aromatic ring compounds include benzene, pyrrole, and thiazole. Though aromaticity is named for the fact that many aromatic molecules have distinctive smells, there are many non-aromatic aroma compounds and many odorless aromatic compounds.
+
+
+Binding
+
+A phenomenon where parts of one molecule and parts of another molecule exert attractive forces on each other, favoring poses where these parts are placed close together.
+
+
+Bond
+
+A link between atoms that keeps them near to each other in space. Every bond has an optimal bond radius which is the most stable/lowest energy level distance between the centers of its atoms. In biochemistry, most bonds are covalent meaning electrons are shared between the atoms, forming a very strong and very directional bond that is difficult to bend or break. Covalent bonds can be single, double, triple, or in rare cases, quadruple. Only single bonds can rotate; the others are rigid. Partial double bond quality happens in resonance structures such as aromatic rings. Other types of bonds include ionic bonds, hydrogen bonds, halogen bonds, pi stacking, and van der Waals bonding, all of which are weaker and less directional than covalent bonding.
+
+
+Chiral
+
+Of a molecule, this means the molecular structure has a "handedness", i.e. it exists as one of two isomers that are mirror images of each other, and cannot be rotated to form the other isomer. This most often happens when four dissimilar moieties are bonded to a single carbon atom, forming a chiral center. Some chiral molecules, such as carvone, have different odors depending on which isomer is present. A molecule can have multiple chiral centers, for example menthol which has 3 chiral centers and therefore 8 chiral isomers.
+
+
+Clash
+
+A condition of two non-bonded atoms' centers being closer than the sum of their van der Waals radii. Clashes are avoided in real molecules, because they increase energy levels, and a structure that includes clashes will usually be impossible, however tiny clashes can and do happen when the energy of a bond is enough to overcome a very small amount of van der Waals spherical superimposition.
+
+
+Conjugated
+
+Containing alternating single and double bonds. Conjugated molecules always exhibit resonance, and conjugated carbon chains are good absorbers of light and conductors of electricity.
+
+
+Coordination
+
+A complex of atoms surrounding a metal ion; a chelation. Can also refer to the coordinate bond between an atom such as N, O, or S and a metal ion. Coordination complexes are a way for proteins to bind strongly to a metal ion that acts in some way favorable to the protein's function. In some olfactory receptors, bound metal ions are thought to bind with odorant ligands that activate the receptor.
+
+
+Dipole
+
+Two atoms bonded together that have different electronegativity values, causing each one to have a partial charge. Can also refer to a moiety or a whole molecule where several smaller dipoles add up to a larger dipole, such as water which is a dipole because of its two polar O-H bonds.
+
+
+Dock
+
+The process of calculating how molecules will orient in space relative to each other, especially poses of a ligand for a protein such as a receptor.
+
+
+Electronegativity
+
+A measure of how readily an atom donates or accepts electrons, depending on which element it belongs to. Highly electronegative elements include fluorine, chlorine, and oxygen, while highly electropositive elements include potassium, sodium, and calcium.
+
+
+Energy Level
+
+The amount of stored energy in a system. All molecular systems will always seek the lowest energy level by optimizing their bond radii and bond angles, minimizing clashes, and bringing parts with attractive forces as close to their optimal distances as possible.
+
+
+Halogen Bond
+
+A non-covalent bond between an acceptor atom (such as N, O, or S) and a donor halogen atom typically bonded to a carbon atom. The halogens are fluorine, chlorine, bromine, iodine, astatine, and (probably) tennesine, though only the first four are ever encountered in real-world molecular interactions.
+
+
+Hydrogen Bond
+
+A non-covalent bond between an acceptor atom (such as N, O, or S) and a donor atom (an H bonded to an N, O, S, or a halogen). Hydrogen bonds occur because the hydrogen atom and its heavy atom form a dipole that attracts certain heavy atoms like a magnet.
+
+
+Interaction
+
+Attractive and/or repulsive forces between molecules and/or non-bonded atoms.
+
+
+Ion
+
+An atom or molecule that is charged because it has gained (negative charge) or lost (positive charge) one or more electrons. Ions with opposite charges experience an attractive effect and can form ionic bonds.
+
+
+Isomer
+
+A molecule with the same numbers of the same kinds of atoms as another molecule, arranged in a different spatial configuration.
+
+
+Ligand
+
+An atom or molecule spatially bound to another atom or molecule by means other than a covalent bond.
+
+
+Moiety
+
+A functional group of a molecule; an atom or small collection of atoms capable of interacting and reacting with the external environment.
+
+
+Peptide
+
+A molecule consisting of amino acids polymerized together.
+
+
+Pi Stacking
+
+A type of binding where aromatic rings can adopt various conformations including stacking on top of each other. Pi stacking involves the pi orbitals of conjugated or double-bonded systems and can even happen in simple double-bonded molecules such as ethylene.
+
+
+Polar
+
+Containing one or more dipoles.
+
+
+Protein
+
+Generally any large peptide made by a cell using the sequence from a gene.
+
+
+Receptor
+
+A protein whose function is to detect something (e.g. light, odors, tastes, hormones, etc). The largest class of receptors is the G-Protein Coupled Receptors or GPCRs, which comprise several subclasses, the largest of which is the seven-helix transmembrane proteins or 7HP. All of the olfactory receptors are 7HP GPCRs, as are the opsins that enable vision; the receptors for sweet, bitter, and umami; endocrine and neurotransmitter receptors; and the cannabinoid receptors.
+
+
+Residue
+
+A single monomer of a peptide chain; a single amino acid component of a protein or other peptide.
+
+
+Resonance
+
+A phenomenon where single and double bonds reversibly switch places, causing a quantum state where each affected bond can be simultaneously single and double, acting like a double bond by being rigid and participating in pi stacking.
+
+
+Ring
+
+Several atoms arranged in an approximately circular or closed-loop configuration.
+
+
+Salt Bridge
+
+An ionic bond between a positively charged basic (alkaline) moiety and a negatively charged acidic moiety. Named for the general concept of a salt as the result of an acid-base reaction, not necessarily table salt.
+
+
+Side Chain
+
+The part of a residue that differs according to the amino acid it derives from.
+
+
+SMILES
+
+Simplified Molecular-Input Line-Entry System. A means of encoding the structure of any molecule in one line of text.
+
+
+van der Waals Bond
+
+A type of binding between nonpolar atoms or molecules, where the random movement of some atom's electrons in their orbitals induces temporary polarization effects in other atoms, forming a small attractive force. vdW binding becomes repulsive below 4 Angstroms of interatomic distance, and at more than 4A its intensity falls off with the inverse sixth power of the distance. Most of the other binding forces fall off with the inverse square of distance.
+
+
+van der Waals Radius
+
+The radius of an imaginary sphere around each atom, that normally no other atom can penetrate except to form a bond. Atoms whose centers are separated by less than the sum of their vdW radii are said to clash, unless they are bonded together in which case the bond radius will be less than the combined vdW radii.
+
+
+
+
+
+
+
+
+
+

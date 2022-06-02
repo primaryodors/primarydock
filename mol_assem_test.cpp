@@ -46,6 +46,13 @@ int main(int argc, char** argv)
     FILE* pf = fopen(tstoutf, "wb");
     if (m.save_sdf(pf)) cout << "Saved " << tstoutf << endl;
     else cout << "Failed to save " << tstoutf << endl;
+    fclose(pf);
+    
+    const char* tstpdbf = "test.pdb";
+    pf = fopen(tstpdbf, "wb");
+    m.save_pdb(pf);
+    cout << "Saved " << tstpdbf << endl;
+    fclose(pf);
 
     return 0;
 }

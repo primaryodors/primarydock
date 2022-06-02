@@ -30,10 +30,10 @@ public:
  	char _1let = '\0';
  	char _3let[4] = {};
  	char name[20] = {};
- 	char smiles[50] = {};
  	float reach = 2.5;
  	AABondDef** aabonds=0;
  	bool proline_like = false;
+ 	std::string SMILES = "";
 };
 
 class MetalCoord

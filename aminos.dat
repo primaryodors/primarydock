@@ -16,7 +16,7 @@
 #
 
 #AA     3let    name           aname    bto    card    charge     SMILES
-A       ALA     alanine        N        <C     1.5      0         NC(C(=O)O)C
+A       ALA     alanine        N        <C     1.5      0         N[C@H](C(=O)O)C
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -27,7 +27,7 @@ A       ALA     alanine        N        <C     1.5      0         NC(C(=O)O)C
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-R       ARG     arginine       N        <C     1.5      0         NC(C(=O)O)CCCNC(N)=[NH2+]
+R       ARG     arginine       N        <C     1.5      0         N[C@H](C(=O)O)CCCNC(N)=[NH2+]
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -52,7 +52,7 @@ R       ARG     arginine       N        <C     1.5      0         NC(C(=O)O)CCCN
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-N       ASN     asparagine     N        <C     1.5      0         NC(C(=O)O)CC(=O)N
+N       ASN     asparagine     N        <C     1.5      0         N[C@H](C(=O)O)CC(=O)N
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -67,7 +67,7 @@ N       ASN     asparagine     N        <C     1.5      0         NC(C(=O)O)CC(=
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-D       ASP     aspartic_acid  N        <C     1.5      0         NC(C(=O)O)CC(=O)[O-]
+D       ASP     aspartic_acid  N        <C     1.5      0         N[C@H](C(=O)O)CC(=O)[O-]
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -80,7 +80,7 @@ D       ASP     aspartic_acid  N        <C     1.5      0         NC(C(=O)O)CC(=
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-C       CYS     cysteine       N        <C     1.5      0         NC(C(=O)O)CS
+C       CYS     cysteine       N        <C     1.5      0         N[C@H](C(=O)O)CS
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -92,7 +92,7 @@ C       CYS     cysteine       N        <C     1.5      0         NC(C(=O)O)CS
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-E       GLU     glutamic_acid  N        <C     1.5      0         NC(C(=O)O)CCC(=O)[O-]
+E       GLU     glutamic_acid  N        <C     1.5      0         N[C@H](C(=O)O)CCC(=O)[O-]
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -108,7 +108,7 @@ E       GLU     glutamic_acid  N        <C     1.5      0         NC(C(=O)O)CCC(
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-Q       GLN     glutamine      N        <C     1.5      0         NC(C(=O)O)CCC(=O)N
+Q       GLN     glutamine      N        <C     1.5      0         N[C@H](C(=O)O)CCC(=O)N
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -134,7 +134,7 @@ G       GLY     glycine        N        <C     1.5      0         NCC(=O)O
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-H       HIS     histidine      N        <C     1.5      0         NC(C(=O)O)CC1=NCNC=1
+H       HIS     histidine      N        <C     1.5      0         N[C@H](C(=O)O)CC1=NCNC=1
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -152,7 +152,7 @@ H       HIS     histidine      N        <C     1.5      0         NC(C(=O)O)CC1=
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-I       ILE     isoleucine     N        <C     1.5      0         NC(C(=O)O)C(C)CC
+I       ILE     isoleucine     N        <C     1.5      0         N[C@H](C(=O)O)C(C)CC
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -172,7 +172,7 @@ I       ILE     isoleucine     N        <C     1.5      0         NC(C(=O)O)C(C)
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-L       LEU     leucine        N        <C     1.5      0         NC(C(=O)O)CC(C)C
+L       LEU     leucine        N        <C     1.5      0         N[C@H](C(=O)O)CC(C)C
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -192,7 +192,7 @@ L       LEU     leucine        N        <C     1.5      0         NC(C(=O)O)CC(C
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-K       LYS     lysine         N        <C     1.5      0         NC(C(=O)O)CCCCN
+K       LYS     lysine         N        <C     1.5      0         N[C@H](C(=O)O)CCCCN
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -215,7 +215,7 @@ K       LYS     lysine         N        <C     1.5      0         NC(C(=O)O)CCCC
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-M       MET     methionine     N        <C     1.5      0         NC(C(=O)O)CCCSC
+M       MET     methionine     N        <C     1.5      0         N[C@H](C(=O)O)CCCSC
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -233,7 +233,7 @@ M       MET     methionine     N        <C     1.5      0         NC(C(=O)O)CCCS
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-F       PHE     phenylalanine  N        <C     1.5      0         NC(C(=O)O)Cc1ccccc1
+F       PHE     phenylalanine  N        <C     1.5      0         N[C@H](C(=O)O)Cc1ccccc1
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -254,7 +254,7 @@ F       PHE     phenylalanine  N        <C     1.5      0         NC(C(=O)O)Cc1c
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-P       PRO     proline        N        <C     1.5      0         N1C(C(=O)O)CCC1
+P       PRO     proline        N        <C     1.5      0         N1[C@H](C(=O)O)CCC1
 "       "       "              CA       N      1!       0
 "       "       "              HA       CA     1        0
 "       "       "              CB       CA     1!       0
@@ -269,7 +269,7 @@ P       PRO     proline        N        <C     1.5      0         N1C(C(=O)O)CCC
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-U       SEC     selenocysteine N        <C     1.5      0         NC(C(=O)O)C[Se]
+U       SEC     selenocysteine N        <C     1.5      0         N[C@H](C(=O)O)C[Se]
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -281,7 +281,7 @@ U       SEC     selenocysteine N        <C     1.5      0         NC(C(=O)O)C[Se
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-S       SER     serine         N        <C     1.5      0         NC(C(=O)O)CO
+S       SER     serine         N        <C     1.5      0         N[C@H](C(=O)O)CO
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -293,7 +293,7 @@ S       SER     serine         N        <C     1.5      0         NC(C(=O)O)CO
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-T       THR     threonine      N        <C     1.5      0         NC(C(=O)O)C(C)O
+T       THR     threonine      N        <C     1.5      0         N[C@H](C(=O)O)C(C)O
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -308,7 +308,7 @@ T       THR     threonine      N        <C     1.5      0         NC(C(=O)O)C(C)
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-W       TRP     tryptophan     N        <C      1.5      0         NC(C(=O)O)CC1=CNc2ccccc21
+W       TRP     tryptophan     N        <C      1.5      0         N[C@H](C(=O)O)CC1=CNc2ccccc21
 "       "       "              HN       N       1       +0.5
 "       "       "              CA       N       1        0
 "       "       "              HA1      CA      1        0
@@ -334,7 +334,7 @@ W       TRP     tryptophan     N        <C      1.5      0         NC(C(=O)O)CC1
 "       "       "              C        CA      1        0
 "       "       "              O        C       1.5     -0.5
 
-Y       TYR     tyrosine       N        <C     1.5      0         NC(C(=O)O)Cc1ccc(O)cc1
+Y       TYR     tyrosine       N        <C     1.5      0         N[C@H](C(=O)O)Cc1ccc(O)cc1
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0
@@ -356,7 +356,7 @@ Y       TYR     tyrosine       N        <C     1.5      0         NC(C(=O)O)Cc1c
 "       "       "              C        CA     1        0
 "       "       "              O        C      1.5     -0.5
 
-V       VAL     valine         N        <C     1.5      0         NC(C(=O)O)C(C)C
+V       VAL     valine         N        <C     1.5      0         N[C@H](C(=O)O)C(C)C
 "       "       "              HN       N      1       +0.5
 "       "       "              CA       N      1        0
 "       "       "              HA       CA     1        0

@@ -44,6 +44,15 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     }
 
     name = aa_defs[idx].name;
+    
+    
+    if (aa_defs[idx].SMILES.length())
+    {
+    	from_smiles(aa_defs[idx].SMILES.c_str());
+    	// TODO: Atom names!
+    	goto _skip_aabonds;
+    }
+    
 
     int i, j, k;
 
@@ -154,6 +163,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
             a->flip_mirror = true;
         }
     }
+    
+    _skip_aabonds:
 
     // hydrogenate();
     for (i=0; i<100; i++)
@@ -492,7 +503,7 @@ void AminoAcid::load_aa_defs()
                         strcpy(tmpbdefs[tbdctr]->bname, fields[4]);
                     }
 
-                    if (fields[7]) strcpy(aa_defs[idx].smiles, fields[7]);
+                    if (fields[7]) aa_defs[idx].SMILES = fields[7];
 
                     tbdctr++;
 

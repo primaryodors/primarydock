@@ -18,7 +18,7 @@ Rotated molecule 2 by -30 degrees. Intermol clashes: 73.524 cu. A.
 1 1 1 1 1 Moved molecule 2 by 5 A.
 Intermol clashes: 0 cu. A.
 Intermol energy level: 0 kJ/mol.
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-# Post-conformation intermol energy level: 0.0767405 kJ/mol.
-Energy level above 0, SUCCESS.
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# Post-conformation intermol energy level: 0.0318143 kJ/mol.
+Energy level above threshold, SUCCESS.
 Saved output.sdf

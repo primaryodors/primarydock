@@ -76,7 +76,7 @@ performance_test: $(BINDIR)/podock testdata/test_TAAR8.config testdata/TAAR8.rot
 # low-tooling regression tests below
 amino_report: REPORT="test/amino_test.approved.txt"
 amino_report: test/amino_test
-	bash test/amino_tests.bash ARNDCEQGHILKMFPUSTWYV
+	bash src/amino_tests.bash ARNDCEQGHILKMFPUSTWYV
 
 atom_report: REPORT="test/atom_test.approved.txt"
 atom_report: test/atom_test

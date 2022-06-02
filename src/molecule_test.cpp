@@ -168,10 +168,11 @@ int main(int argc, char** argv)
     Molecule::multimol_conform(mols, 50);
     float energyLevel = m1.get_intermol_binding(&m2);
     cout << "\n# Post-conformation intermol energy level: " << energyLevel << " kJ/mol." << endl;
-    if(energyLevel > 0)
-        cout << "Energy level above 0, SUCCESS.\n";
+    const float energyLevelThreshold = -1.0;
+    if(energyLevel > energyLevelThreshold)
+        cout << "Energy level above threshold, SUCCESS.\n";
     else
-        cout << "Energy level below 0, FAIL.\n";
+        cout << "Energy level below threshold, FAIL.\n";
  
     const char* tstoutf = "output.sdf";
     pf = fopen(tstoutf, "wb");

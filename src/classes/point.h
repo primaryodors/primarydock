@@ -67,7 +67,7 @@ class SCoord
     SCoord add(SCoord v)    {        return add(&v);    };
     SCoord add(SCoord* v);
 
-    char* printable() const;
+    std::string printable() const;
 
     SCoord& operator=(Point p);
     friend std::ostream& operator<<(std::ostream& os, const Point& p);

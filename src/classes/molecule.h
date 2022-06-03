@@ -45,14 +45,8 @@ class Molecule
     float close_loop(Atom** path, float closing_bond_cardinality);
 
     // Getters.
-    const char* get_name() const
-    {
-        return name;
-    };
-    int get_atom_count() const
-    {
-        return atcount;
-    }
+    const char* get_name() const	{	return name;	}
+    int get_atom_count() const	{	return atcount;	}
     int get_bond_count(bool unidirectional) const;
     Atom* get_nearest_atom(Point loc) const;
     Atom* get_nearest_atom(Point loc, intera_type capable_of) const;
@@ -74,10 +68,7 @@ class Molecule
     Atom* add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard);
     char** get_atom_names() const;
     Atom* get_atom(const char* aname) const;
-    Atom* get_atom(const int a_idx) const
-    {
-        return atoms[a_idx];
-    }
+    Atom* get_atom(const int a_idx) const	{	return atoms[a_idx];	}
     void hydrogenate();
     void clear_atom_binding_energies();
 
@@ -90,10 +81,7 @@ class Molecule
 
     // Ring functions.
     int identify_rings();
-    int get_num_rings()
-    {
-        return ringcount;
-    }
+    int get_num_rings()	{	return ringcount;	}
     bool ring_is_coplanar(int ringid);
     bool ring_is_aromatic(int ringid);
     Point get_ring_center(int ringid);

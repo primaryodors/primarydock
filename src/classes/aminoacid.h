@@ -17,11 +17,12 @@ enum bb_rot_dir
 class AABondDef
 {
 public:
- 	char aname[7];
- 	char bname[7];
- 	float cardinality;
- 	float acharge;
- 	bool can_rotate;
+ 	char aname[7] = {};
+ 	char bname[7] = {};
+ 	float cardinality=0;
+ 	float acharge=0;
+ 	bool can_rotate=false;
+ 	int SMILES_idx=0;
 };
 
 class AADef

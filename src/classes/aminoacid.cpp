@@ -44,17 +44,69 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     }
 
     name = aa_defs[idx].name;
-    
+
+    int i, j, k, l;
     
     if (aa_defs[idx].SMILES.length())
     {
     	from_smiles(aa_defs[idx].SMILES.c_str());
-    	// TODO: Atom names!
+    	
+    	// Atom names.
+    	Atom** atoms_new = new Atom*[get_atom_count()+4]{};
+    	bool used[get_atom_count()+4]{};
+    	l=0;
+    	// for (j=0; atoms[j]; j++) cout << atoms[j]->name << " ";
+    	// cout << endl;
+    	for (j=0; aa_defs[idx].aabonds[j]; j++)
+    	{
+			bool found = false;
+    		int aidx = aa_defs[idx].aabonds[j]->SMILES_idx;
+    		// cout << aa_defs[idx].aabonds[j]->aname << " has SMILES index " << aidx << " ";
+    		if (!aidx) continue;
+    		
+    		if (aidx < 1000)
+    		{
+    			aidx--;
+    			// cout << "old name = " << atoms[aidx]->name << " ";
+    			found = true;
+			}
+    		else
+    		{
+    			Atom* heavy = atoms[aidx-1001];
+    			for (k=0; atoms[k]; k++)
+    			{
+    				if (!used[k] && atoms[k]->get_Z() == 1 && atoms[k]->is_bonded_to(heavy))
+    				{
+    					aidx = k;
+    					// cout << "old name = " << atoms[aidx]->name << " ";
+    					found = true;
+    					break;
+    				}
+    			}
+    		}
+    		
+    		if (found)
+    		{
+    			if (atoms[aidx]->name) delete atoms[aidx]->name;
+    			atoms[aidx]->name = new char[8];
+				used[aidx] = true;
+    			strcpy(atoms[aidx]->name, aa_defs[idx].aabonds[j]->aname);
+				// cout << "new name = " << atoms[aidx]->name << " ";
+    			atoms_new[l++] = atoms[aidx];
+    			atoms_new[l] = 0;
+    		}
+    		// cout << endl;
+		}
+		
+		if (l)
+		{
+			delete atoms;
+			atoms = atoms_new;
+			atcount = l;
+		}
+    	
     	goto _skip_aabonds;
     }
-    
-
-    int i, j, k;
 
     for (j=0; aa_defs[idx].aabonds[j]; j++)
     {
@@ -503,7 +555,22 @@ void AminoAcid::load_aa_defs()
                         strcpy(tmpbdefs[tbdctr]->bname, fields[4]);
                     }
 
-                    if (fields[7]) aa_defs[idx].SMILES = fields[7];
+                    if (fields[7])
+                    {
+                    	if (fields[7][0] == '=')
+                    	{
+                    		tmpbdefs[tbdctr]->SMILES_idx = atoi(&fields[7][1]);
+                    	}
+                    	else if (fields[7][0] == '@')
+                    	{
+                    		tmpbdefs[tbdctr]->SMILES_idx = 1000 + atoi(&fields[7][1]);
+                    	}
+                    	else
+                    	{
+                    		aa_defs[idx].SMILES = fields[7];
+                    		tmpbdefs[tbdctr]->SMILES_idx = 1;
+                		}
+                	}
 
                     tbdctr++;
 
@@ -941,6 +1008,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     int i, step=3;
     float bestrad=0, bestr;
     
+    if (!atom || !btom) return retval;
     bestr = atom->get_location().get_3d_distance(btom->get_location());
     for (i=0; i<360; i+=step)
     {

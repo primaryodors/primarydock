@@ -6,11 +6,12 @@ DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR)
 OBJS=$(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 TESTS=test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/bktest
 APPS=$(BINDIR)/metal $(BINDIR)/podock
-
+REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
 all: $(DIRS) \
 	 $(OBJS) \
 	 $(TESTS) \
-	 $(APPS)
+	 $(APPS) \
+	 $(REPORTS)
 
 # TODO: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
 
@@ -135,4 +136,4 @@ protein_report: test/protein_test
 	echo "Content of test2.sdf:" >> $(REPORT)
 	sed '2d' test2.sdf >> $(REPORT)
 
-reports: amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
+reports: $(REPORTS)

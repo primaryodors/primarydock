@@ -1,4 +1,7 @@
-Ring closure anomaly 5.91087
+Ring closure anomaly 5.13795
+Unbond C-O8
+Unbond H17-O8
+Unbond N-H10
 proline bonds can rotate: 
 None.
 

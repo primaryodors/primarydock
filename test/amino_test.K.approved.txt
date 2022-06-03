@@ -1,5 +1,12 @@
+Unbond C-O13
+Unbond H25-O13
+Unbond N-H16
 lysine bonds can rotate: 
-None.
+CA - CB
+CB - CG
+CG - CD
+CD - CE
+CE - NZ
 
 Wrote test.pdb
 Wrote test.sdf

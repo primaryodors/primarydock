@@ -1,0 +1,12 @@
+Ring closure anomaly 4.01581
+Unbond C-O11
+Unbond H22-O11
+Unbond N-H14
+Unbond CG-H17
+Unbond CE1-H19
+histidine bonds can rotate: 
+CA - CB
+CB - CG
+
+Wrote test.pdb
+Wrote test.sdf

@@ -1,5 +1,12 @@
+Unbond C-O13
+Unbond H25-O13
+Unbond N-H17
 arginine bonds can rotate: 
-None.
+CA - CB
+CB - CG
+CG - CD
+CD - NE
+NE - CZ
 
 Wrote test.pdb
 Wrote test.sdf

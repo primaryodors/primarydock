@@ -1,5 +1,11 @@
+Unbond C-O9
+Unbond H20-O9
+Unbond N-H12
 methionine bonds can rotate: 
-None.
+CA - CB
+CB - CG
+CG - SD
+SD - CE
 
 Wrote test.pdb
 Wrote test.sdf

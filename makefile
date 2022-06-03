@@ -10,8 +10,9 @@ REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_a
 all: $(DIRS) \
 	 $(OBJS) \
 	 $(TESTS) \
-	 $(APPS) 
-#	 $(REPORTS)
+	 $(APPS) \
+	 $(REPORTS)
+code: $(OBJS) $(APPS)
 
 CC=g++
 

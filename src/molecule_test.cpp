@@ -122,16 +122,16 @@ int main(int argc, char** argv)
     else
     {
         Atom* C1 = m2.add_atom("C", "C1", 0, 0);
-        strcpy(buffer, C1->get_location().printable());
-        cout << "Added a carbon atom. Its location is " << buffer  << "." << endl;
+//        strcpy(buffer, C1->get_location().printable());
+        cout << "Added a carbon atom. Its location is " << C1->get_location().printable()  << "." << endl;
 
         Atom* C2 = m2.add_atom("C", "C2", C1, 1);
-        strcpy(buffer, C2->get_location().printable());
-        cout << "Added another carbon atom. Its location is " << buffer << "." << endl;
+//        strcpy(buffer, C2->get_location().printable());
+        cout << "Added another carbon atom. Its location is " << C2->get_location().printable() << "." << endl;
 
         Atom* O3 = m2.add_atom("O", "O3", C2, 1);
-        strcpy(buffer, O3->get_location().printable());
-        cout << "Added an oxygen atom. Its location is " << buffer << "." << endl;
+//        strcpy(buffer, O3->get_location().printable());
+        cout << "Added an oxygen atom. Its location is " << O3->get_location().printable() << "." << endl;
 
         m2.hydrogenate();
     }

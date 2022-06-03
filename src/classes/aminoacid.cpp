@@ -161,6 +161,10 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		Atom* prevCA = prevaa->get_atom("CA");
 		Atom* prevO  = prevaa->get_atom("O");
 		if (!prevCA || !prevO) return;
+		Atom* currHN = get_atom("HN");
+		if (!currHN) currHN = get_atom("H");
+		Atom* currCA = get_atom("CA");
+		if (!currHN || currCA) return;
 		
 		// Get the curr.N - prev.C relative location and scale it to 1.32A.
 		SCoord sc = prevC->get_location().subtract(currN->get_location());
@@ -189,16 +193,32 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			rotate(lv, minus);
 		
 		// Get the normal from the curr.HN - curr.N - curr.CA plane.
+		axis = compute_normal(prevCA->get_location(), prevC->get_location(), prevO->get_location());
 		
 		// Get the angle along the normal of prev.C - curr.N - curr.HN.
+		theta = find_angle_along_vector(prevC->get_location(), currHN->get_location(), currN->get_location(), axis);
+		plus  = triangular - theta;
+		minus = triangular*2 - theta;
 		
 		// Rotate the current molecule about the curr.N atom, using the normal as an axis,
 		// to get a 120 degree angle not clashing prev.C with curr.CA.
+		maybeP = rotate3D(currCA->get_location(), currN->get_location(), axis, plus);
+		maybeM = rotate3D(currCA->get_location(), currN->get_location(), axis, minus);
+		lv.copy(axis);
+		lv.origin = currN->get_location();
+		if (maybeP.get_3d_distance(prevC->get_location()) > maybeM.get_3d_distance(prevC->get_location()))
+			rotate(lv, plus);
+		else
+			rotate(lv, minus);
 		
 		// Get the angle of curr.HN - prev.O along the prev.C - curr.N axis.
+		axis = currN->get_location().subtract(prevC->get_location());
+		theta = find_angle_along_vector(currHN->get_location(), prevO->get_location(), currN->get_location(), axis);
 		
 		// Rotate the current molecule around curr.N to get 180 degrees.
-		
+		lv.copy(axis);
+		lv.origin = currN->get_location();
+		rotate(lv, M_PI-theta);
 	}
 }
 

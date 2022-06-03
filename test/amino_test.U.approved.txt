@@ -1,6 +1,3 @@
-Unbond C-O8
-Unbond H14-O8
-Unbond N-H11
 selenocysteine bonds can rotate: 
 CA - CB
 CB - SEG

@@ -12,8 +12,7 @@ all: $(DIRS) \
 	 $(TESTS) \
 	 $(APPS) \
 	 $(REPORTS)
-
-# TODO: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
+code: $(OBJS) $(APPS)
 
 CC=g++
 

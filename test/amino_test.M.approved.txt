@@ -1,6 +1,3 @@
-Unbond C-O9
-Unbond H20-O9
-Unbond N-H12
 methionine bonds can rotate: 
 CA - CB
 CB - CG

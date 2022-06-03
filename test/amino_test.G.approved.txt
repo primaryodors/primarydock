@@ -1,6 +1,3 @@
-Unbond C-O4
-Unbond H10-O4
-Unbond N-H7
 glycine bonds can rotate: 
 None.
 

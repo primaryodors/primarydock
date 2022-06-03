@@ -270,6 +270,10 @@ float find_3d_angle(Point A, Point B, Point source)
     return find_3d_angle(&a, &b, &c);
 }
 
+float find_angle_along_vector(Point pt1, Point pt2, Point source, SCoord v)
+{
+	return find_angle_along_vector(&pt1, &pt2, &source, &v);
+}
 
 float find_angle_along_vector(Point* pt1, Point* pt2, Point* source, SCoord* v)
 {
@@ -301,12 +305,12 @@ Point rotate3D(Point* point, Point* source, Rotation* rot)
     return rotate3D(point, source, &rot->v, rot->a);
 }
 
-Point rotate3D(Point point, Point source, SCoord SCoord, float theta)
+Point rotate3D(Point point, Point source, SCoord axis, float theta)
 {
-    return rotate3D(&point, &source, &SCoord, theta);
+    return rotate3D(&point, &source, &axis, theta);
 }
 
-Point rotate3D(Point* point, Point* source, SCoord* SCoord, float theta)
+Point rotate3D(Point* point, Point* source, SCoord* axis, float theta)
 {
     // shamelessly copied from http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
 
@@ -316,11 +320,11 @@ Point rotate3D(Point* point, Point* source, SCoord* SCoord, float theta)
         source = &cen;
     }
 
-    if (!SCoord->r) return *point;
-    Point lvec(SCoord);
+    if (!axis->r) return *point;
+    Point lvec(axis);
 
     float x = point->x, y = point->y, z = point->z;
-    float u = lvec.x / SCoord->r, v = lvec.y / SCoord->r, w = lvec.z / SCoord->r;
+    float u = lvec.x / axis->r, v = lvec.y / axis->r, w = lvec.z / axis->r;
     float a, b, c;
     if (source)
     {

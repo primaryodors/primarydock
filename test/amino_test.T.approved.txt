@@ -1,6 +1,3 @@
-Unbond C-O7
-Unbond H14-O7
-Unbond N-H11
 threonine bonds can rotate: 
 CA - CB
 CB - OG1

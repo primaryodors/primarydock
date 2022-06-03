@@ -1,6 +1,3 @@
-Unbond C-O8
-Unbond H19-O8
-Unbond N-H12
 isoleucine bonds can rotate: 
 CA - CB
 CB - CG1

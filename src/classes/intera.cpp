@@ -743,7 +743,7 @@ float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type bty
     throw BOND_DEF_NOT_FOUND;
 }
 
-char* InteratomicForce::get_config_string()
+char* InteratomicForce::get_config_string() const
 {
     char buffer[128];
     const char* bondchrs[5] = {"", "-", "=", "#", "$"};

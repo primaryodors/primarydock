@@ -2433,7 +2433,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
 
 
-bool Molecule::from_smiles(char* smilesstr)
+bool Molecule::from_smiles(char const * smilesstr)
 {
     smlen = strlen(smilesstr);
     paren = new SMILES_Parenthetical[smlen] {};
@@ -2456,7 +2456,7 @@ bool Molecule::from_smiles(char* smilesstr)
     return retval;
 }
 
-bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
+bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
 {
     Atom* stack[256];
     Atom* numbered[10];

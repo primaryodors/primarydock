@@ -804,12 +804,7 @@ std::ostream& operator<<(std::ostream& os, const intera_type& it)
 
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& f)
 {
-    char* str = f.get_config_string();
-    if (str)
-    {
-        os << str;
-        delete str;
-    }
+    os << f.get_config_string();
     return os;
 }
 

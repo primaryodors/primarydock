@@ -289,7 +289,7 @@ Atom* Molecule::get_atom(const char* aname) const
     return 0;
 }
 
-Point Molecule::get_atom_location(char* aname)
+Point Molecule::get_atom_location(char const * aname)
 {	if (!atoms)
 	{
 		Point pt;

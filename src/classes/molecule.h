@@ -61,7 +61,7 @@ class Molecule
     void rotate(LocatedVector SCoord, float theta);
     bool shielded(Atom* a, Atom* b) const;
     void voxel_computation(int iters = 5);
-    Point get_atom_location(char* aname);
+    Point get_atom_location(char const * aname);
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);

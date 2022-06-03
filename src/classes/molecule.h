@@ -41,7 +41,7 @@ class Molecule
     void save_pdb(FILE* outf, int atomno_offset=0);
     int from_pdb(FILE* inf);				// returns number of atoms loaded.
     void identify_acidbase();				// called within every load.
-    bool from_smiles(char* smilesstr);
+    bool from_smiles(char const * smilesstr);
     float close_loop(Atom** path, float closing_bond_cardinality);
 
     // Getters.
@@ -139,7 +139,7 @@ class Molecule
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.
     float amx=0,amy=0,amz=0;			// Angular momentum xyz.
 
-    bool from_smiles(char* smilesstr, Atom* ipreva);
+    bool from_smiles(char const * smilesstr, Atom* ipreva);
     int smlen = 0;
     SMILES_Parenthetical* paren;
     int spnum = 0;

@@ -1366,9 +1366,9 @@ float Molecule::get_internal_clashes()
     return clash-minclash;
 }
 
-float Molecule::get_intermol_clashes(const Molecule* ligand)
+float Molecule::get_intermol_clashes(Molecule* ligand)
 {
-    Molecule* ligands[4];
+    Molecule * ligands[4];
     ligands[0] = ligand;
     ligands[1] = NULL;
     return get_intermol_clashes(ligands);

@@ -2,7 +2,15 @@ OBJDIR=obj
 BINDIR=bin
 OUTDIR=output
 
-all: $(OBJDIR) $(BINDIR) $(OUTDIR) $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/bktest $(BINDIR)/metal $(BINDIR)/podock
+DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR)
+OBJS=$(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
+TESTS=test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/bktest
+APPS=$(BINDIR)/metal $(BINDIR)/podock
+
+all: $(DIRS) \
+	 $(OBJS) \
+	 $(TESTS) \
+	 $(APPS)
 
 # TODO: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
 

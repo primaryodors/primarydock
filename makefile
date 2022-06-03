@@ -10,10 +10,8 @@ REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_a
 all: $(DIRS) \
 	 $(OBJS) \
 	 $(TESTS) \
-	 $(APPS) \
-	 $(REPORTS)
-
-# TODO: https://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
+	 $(APPS) 
+#	 $(REPORTS)
 
 CC=g++
 

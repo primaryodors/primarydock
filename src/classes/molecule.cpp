@@ -1432,7 +1432,7 @@ void Molecule::move(SCoord move_amt)
 
     for (i=0; atoms[i]; i++)
     {
-        if (atoms[i]->residue) return;
+        // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
         loc = loc.add(&move_amt);
         atoms[i]->move(&loc);
@@ -1451,8 +1451,8 @@ void Molecule::move(Point move_amt)
 
     for (i=0; atoms[i]; i++)
     {
-        //cout << atoms[i]->residue << " ";
-        if (atoms[i]->residue) return;
+        // cout << atoms[i]->name << " ";
+        // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
         loc = loc.add(&move_amt);
         atoms[i]->move(&loc);

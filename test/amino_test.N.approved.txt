@@ -1,6 +1,3 @@
-Unbond C-O8
-Unbond H17-O8
-Unbond N-H12
 asparagine bonds can rotate: 
 CA - CB
 CB - CG

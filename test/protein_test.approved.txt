@@ -1,34 +1,4 @@
-AUnbond C-O6
-Unbond H13-O6
-Unbond N-H9
-AUnbond C-O6
-Unbond H13-O6
-Unbond N-H9
-prevaa.AUnbond C-O6
-Unbond H13-O6
-Unbond N-H9
-prevaa.AUnbond C-O6
-Unbond H13-O6
-Unbond N-H9
-prevaa.AUnbond C-O6
-Unbond H13-O6
-Unbond N-H9
-prevaa.AUnbond C-O6
-Unbond H13-O6
-Unbond N-H9
-prevaa.AUnbond C-O6
-Unbond H13-O6
-Unbond N-H9
-prevaa.AUnbond C-O6
-Unbond H13-O6
-Unbond N-H9
-prevaa.AUnbond C-O6
-Unbond H13-O6
-Unbond N-H9
-prevaa.AUnbond C-O6
-Unbond H13-O6
-Unbond N-H9
-prevaa.
+AA2 A3 A4 A5 A6 A7 A8 A9 A10 
 1:CA-CB = 1.54
 2:CA-CB = 1.54
 3:CA-CB = 1.54

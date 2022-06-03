@@ -127,7 +127,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 					{
 						if (b[j]->btom)
 						{
-							cout << "Unbond " << b[j]->btom->name << "-" << atoms[i]->name << endl << flush;
+							// cout << "Unbond " << b[j]->btom->name << "-" << atoms[i]->name << endl << flush;
 							b[j]->btom->unbond(atoms[i]);
 						}
 					}
@@ -154,8 +154,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 	
 	if (prevaa)
 	{
-		cout << "prevaa.";
-		
 		// Make sure we have all the right atoms.
 		Atom* currN = get_atom("N");
 		Atom* prevC = prevaa->get_atom("C");
@@ -166,15 +164,14 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		Atom* currHN = get_atom("HN");
 		if (!currHN) currHN = get_atom("H");
 		Atom* currCA = get_atom("CA");
-		if (!currHN || currCA) return;
+		if (!currHN || !currCA) return;
 		
 		movability = MOV_ALL;
 		immobile = false;
 		
 		Point ptdbg(10,0,0);
-		SCoord sc(ptdbg);
-		Molecule::move(sc);
-		return;		// Debug step.
+		SCoord sc;
+		Molecule::move(ptdbg);
 		
 		// Get the curr.N - prev.C relative location and scale it to 1.32A.
 		sc = prevC->get_location().subtract(currN->get_location());
@@ -182,7 +179,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		// Move the entire current molecule so the N is now at that distance.
 		sc.r -= 1.32;
 		Molecule::move(sc);
-		return;		// Debug step.
 		
 		// Get the normal from the prev.CA - prev.C - prev.O plane.
 		SCoord axis = compute_normal(prevCA->get_location(), prevC->get_location(), prevO->get_location());
@@ -221,6 +217,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			Molecule::rotate(lv, plus);
 		else
 			Molecule::rotate(lv, minus);
+		// return;		// Debug step.
 		
 		// Get the angle of curr.HN - prev.O along the prev.C - curr.N axis.
 		axis = currN->get_location().subtract(prevC->get_location());

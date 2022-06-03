@@ -1,6 +1,3 @@
-Unbond C-O12
-Unbond H23-O12
-Unbond N-H16
 tyrosine bonds can rotate: 
 CA - CB
 CB - CG

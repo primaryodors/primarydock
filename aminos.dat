@@ -309,30 +309,30 @@ T		THR		threonine	N		<C		1.5		0		N[C@H](C(=O)O)C(C)O
 "		"		"			O		C		1.5		-0.5	=9
 
 W		TRP		tryptophan	N		<C		1.5		0		N[C@H](C(=O)O)CC1=CNc2ccccc21
-"		"		"			HN		N		1		+0.5
-"		"		"			CA		N		1		0
-"		"		"			HA1		CA		1		0
-"		"		"			HA2		CA		1		0
-"		"		"			CB		CA		1		0
-"		"		"			HB1		CB		1		0
-"		"		"			HB2		CB		1		0
-"		"		"			CG		CB		1		0
-"		"		"			CD1		CG		1.5		0
-"		"		"			HD1		CD1		1		0
-"		"		"			NE1		CD1		1!,1!	0
-"		"		"			HE1		NE1		1!		0
-"		"		"			CD2		CG		1.5		0
-"		"		"			CE2		CD2		1.5		0
-"		"		"			CZ2		CE2		1.5		0
-"		"		"			HZ2		CZ2		1!		0
-"		"		"			CH2		CZ2		1.5		0
-"		"		"			HH2		CH2		1!		0
-"		"		"			CZ3		CH2		1.5		0
-"		"		"			HZ3		CZ3		1!		0
-"		"		"			CE3		CZ3,NE1	1.5,1	0
-"		"		"			HE3		CE3,CD2	1,1.5	0
-"		"		"			C		CA		1		0
-"		"		"			O		C		1.5		-0.5
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB1		CB		1		0		@4
+"		"		"			HB2		CB		1		0		@4
+"		"		"			CG		CB		1		0		=5
+"		"		"			CD1		CG		1.5		0		=6
+"		"		"			HD1		CD1		1		0		@6
+"		"		"			NE1		CD1		1!,1!	0		=7
+"		"		"			HE1		NE1		1!		0		@7
+"		"		"			CD2		CG		1.5		0		=13
+"		"		"			CE2		CD2		1.5		0		=12
+"		"		"			HE2		CE2		1		0		@12
+"		"		"			CZ2		CE2		1.5		0		=11
+"		"		"			HZ2		CZ2		1!		0		@11
+"		"		"			CH2		CZ2		1.5		0		=10
+"		"		"			HH2		CH2		1!		0		@10
+"		"		"			CZ3		CH2		1.5		0		=9
+"		"		"			HZ3		CZ3		1!		0		@9
+"		"		"			CE3		CZ3,NE1	1.5,1	0		=8
+"		"		"			HE3		CE3,CD2	1,1.5	0		@8
+"		"		"			C		CA		1		0		=14
+"		"		"			O		C		1.5		-0.5	=16
 
 Y		TYR		tyrosine	N		<C		1.5		0		N[C@H](C(=O)O)Cc1ccc(O)cc1
 "		"		"			HN		N		1		+0.5	@1

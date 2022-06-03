@@ -4,7 +4,7 @@ OUTDIR=output
 
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR)
 OBJS=$(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
-TESTS=test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/bktest
+TESTS=test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/backbone_test
 APPS=$(BINDIR)/metal $(BINDIR)/podock
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
 all: $(DIRS) \
@@ -12,7 +12,7 @@ all: $(DIRS) \
 	 $(TESTS) \
 	 $(APPS) \
 	 $(REPORTS)
-code: $(OBJS) $(APPS)
+code: $(OBJS) $(TESTS) $(APPS)
 
 CC=g++
 
@@ -77,8 +77,8 @@ $(BINDIR)/metal: src/metal.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/mole
 test/protein_test: src/protein_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/molecule.o $(OBJDIR)/intera.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 	$(CC) src/protein_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o -o test/protein_test $(CFLAGS)
 
-test/bktest: src/backbone_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
-	$(CC) src/backbone_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o -o test/bktest $(CFLAGS)
+test/backbone_test: src/backbone_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
+	$(CC) src/backbone_test.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o -o test/backbone_test $(CFLAGS)
 
 $(BINDIR)/podock: src/podock.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/molecule.o $(OBJDIR)/intera.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 	$(CC) src/podock.cpp $(OBJDIR)/atom.o $(OBJDIR)/point.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o -o $(BINDIR)/podock $(CFLAGS)

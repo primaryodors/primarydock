@@ -154,6 +154,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 	
 	if (prevaa)
 	{
+		cout << "prevaa.";
+		
 		// Make sure we have all the right atoms.
 		Atom* currN = get_atom("N");
 		Atom* prevC = prevaa->get_atom("C");
@@ -166,12 +168,21 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		Atom* currCA = get_atom("CA");
 		if (!currHN || currCA) return;
 		
+		movability = MOV_ALL;
+		immobile = false;
+		
+		Point ptdbg(10,0,0);
+		SCoord sc(ptdbg);
+		Molecule::move(sc);
+		return;		// Debug step.
+		
 		// Get the curr.N - prev.C relative location and scale it to 1.32A.
-		SCoord sc = prevC->get_location().subtract(currN->get_location());
+		sc = prevC->get_location().subtract(currN->get_location());
 		
 		// Move the entire current molecule so the N is now at that distance.
 		sc.r -= 1.32;
-		move(sc);
+		Molecule::move(sc);
+		return;		// Debug step.
 		
 		// Get the normal from the prev.CA - prev.C - prev.O plane.
 		SCoord axis = compute_normal(prevCA->get_location(), prevC->get_location(), prevO->get_location());
@@ -188,9 +199,9 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		LocatedVector lv(axis);
 		lv.origin = prevC->get_location();
 		if (maybeP.get_3d_distance(prevCA->get_location()) > maybeM.get_3d_distance(prevCA->get_location()))
-			rotate(lv, plus);
+			Molecule::rotate(lv, plus);
 		else
-			rotate(lv, minus);
+			Molecule::rotate(lv, minus);
 		
 		// Get the normal from the curr.HN - curr.N - curr.CA plane.
 		axis = compute_normal(prevCA->get_location(), prevC->get_location(), prevO->get_location());
@@ -207,9 +218,9 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		lv.copy(axis);
 		lv.origin = currN->get_location();
 		if (maybeP.get_3d_distance(prevC->get_location()) > maybeM.get_3d_distance(prevC->get_location()))
-			rotate(lv, plus);
+			Molecule::rotate(lv, plus);
 		else
-			rotate(lv, minus);
+			Molecule::rotate(lv, minus);
 		
 		// Get the angle of curr.HN - prev.O along the prev.C - curr.N axis.
 		axis = currN->get_location().subtract(prevC->get_location());
@@ -218,7 +229,10 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		// Rotate the current molecule around curr.N to get 180 degrees.
 		lv.copy(axis);
 		lv.origin = currN->get_location();
-		rotate(lv, M_PI-theta);
+		Molecule::rotate(lv, M_PI-theta);
+		
+		movability = MOV_FLEXONLY;
+		immobile = true;
 	}
 }
 

@@ -1,7 +1,7 @@
 Created empty molecule named Test.
-Added a carbon atom. Its location is [0.000000,0.000000,0.000000].
-Added another carbon atom. Its location is [0.000000,1.540000,-0.000000].
-Added an oxygen atom. Its location is [0.000000,2.016666,-1.348217].
+Added a carbon atom. Its location is [0,0,0].
+Added another carbon atom. Its location is [0,1.54,-6.73155e-08].
+Added an oxygen atom. Its location is [2.03575e-07,2.01667,-1.34822].
 Internal clashes: 0.43268 cu.A.
 Minimizing internal clashes...
 Internal clashes: 3.8743e-07 cu.A.

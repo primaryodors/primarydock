@@ -2,8 +2,8 @@
 #include <cmath>
 #include <algorithm>
 #include <cstdio>
-#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include "point.h"
 
@@ -98,11 +98,11 @@ float Point::get_3d_distance(const Point* reference)
     return sqrt(dx*dx + dy*dy + dz*dz);
 }
 
-char* Point::printable() const
+std::string Point::printable() const
 {
-    char* buffer = new char[256] {};
-    sprintf(buffer, "[%f,%f,%f]", x, y, z);
-    return buffer;
+    std::stringstream buffer;
+    buffer << "[" << x << "," << y << "," << z << "]";
+    return buffer.str();
 }
 
 char* SCoord::printable() const
@@ -690,12 +690,7 @@ float frand(float lmin, float lmax)
 
 std::ostream& operator<<(std::ostream& os, const Point& p)
 {
-    char* str = p.printable();
-    if (str)
-    {
-        os << str;
-        delete str;
-    }
+    os << p.printable();
     return os;
 }
 

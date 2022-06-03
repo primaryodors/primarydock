@@ -1,14 +1,3 @@
-AAAAAAAAAA
-1:CA-CB = 1.54
-2:CA-CB = 1.54
-3:CA-CB = 1.54
-4:CA-CB = 1.54
-5:CA-CB = 1.54
-6:CA-CB = 1.54
-7:CA-CB = 1.54
-8:CA-CB = 1.54
-9:CA-CB = 1.54
-10:CA-CB = 1.54
 Wrote test.pdb
 Wrote test_alpha.pdb
 Wrote test_beta.pdb

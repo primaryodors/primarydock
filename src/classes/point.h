@@ -42,7 +42,7 @@ class Point
     float magnitude();
     void scale(float new_magn);
 
-    char* printable() const;
+    std::string printable() const;
 
     Point& operator=(SCoord v);
     friend std::ostream& operator<<(std::ostream& os, const SCoord& v);

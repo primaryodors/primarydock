@@ -99,15 +99,13 @@ bool Protein::add_sequence(const char* lsequence)
     int i;
     for (i=0; lsequence[i]; i++)
     {
-    	cout << lsequence[i];
         add_residue(i+1, lsequence[i]);
     }
-    cout << endl;
     
     for (i=0; lsequence[i]; i++)
     {
         float r = get_atom_location(i+1, "CA").get_3d_distance(get_atom_location(i+1, "CB"));
-        cout << i+1 << ":CA-CB = " << r << endl;
+        if (fabs(r-1.54) > 0.2) cout << i+1 << lsequence[i] << ":CA-CB = " << r << endl;
     }
     
     Molecule* aas[get_seq_length()+4]{};

@@ -4,6 +4,10 @@
 
 #define fiftyseven (180.0/M_PI)
 #define fiftyseventh (M_PI/180)
+#define tetrahedral arccos(−1.0/3)
+#define triangular (M_PI/1.5)
+#define square (M_PI/2);
+#define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
 #define _kJmol_cuA 0.5

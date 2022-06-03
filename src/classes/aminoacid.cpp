@@ -87,15 +87,29 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     		
     		if (found)
     		{
-    			if (atoms[aidx]->name) delete atoms[aidx]->name;
+				used[aidx] = true;
+				
     			atoms[aidx]->clear_all_moves_cache();
     			atoms[aidx]->aaletter = letter;
     			strcpy(atoms[aidx]->aa3let, aa_defs[idx]._3let);
     			atoms[aidx]->residue = residue_no;
+    			if (atoms[aidx]->name) delete atoms[aidx]->name;
     			atoms[aidx]->name = new char[8];
-				used[aidx] = true;
+    			
     			strcpy(atoms[aidx]->name, aa_defs[idx].aabonds[j]->aname);
 				// cout << "new name = " << atoms[aidx]->name << " ";
+		        if	(
+		        	!strcmp(atoms[aidx]->name, "N")
+	                || !strcmp(atoms[aidx]->name, "HN")
+	                || !strcmp(atoms[aidx]->name, "CA")
+	                || !strcmp(atoms[aidx]->name, "C")
+	                || !strcmp(atoms[aidx]->name, "O")
+		        	)
+		        {
+		            atoms[aidx]->is_backbone = true;
+	            }
+		        else atoms[aidx]->is_backbone = false;
+		        
     			atoms_new[l++] = atoms[aidx];
     			atoms_new[l] = 0;
     		}
@@ -127,118 +141,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		}
     	
     	get_rotatable_bonds();
-    	goto _skip_aabonds;
     }
-
-    for (j=0; aa_defs[idx].aabonds[j]; j++)
-    {
-        char elemsym[5];
-
-        // If atom name starts with a number, then the element symbol begins on the next char.
-        if (aa_defs[idx].aabonds[j]->aname[0] < 'A')
-            strcpy(elemsym, &aa_defs[idx].aabonds[j]->aname[1]);
-        else
-            strcpy(elemsym, aa_defs[idx].aabonds[j]->aname);
-
-        for (k=4; k; k--)
-        {
-            if (elemsym[k] < 'A') elemsym[k] = 0;		// Remove any numbers from the end of the symbol.
-            else
-            {
-                elemsym[k] = 0;							// Remove the Greek letter if present and count it complete.
-                break;
-            }
-        }
-
-        if (elemsym[1]) elemsym[1] |= 0x20;
-
-        if (!Atom::Z_from_esym(elemsym))
-        {
-            cout << "Bad atom name in aminos.dat " << aa_defs[idx].aabonds[j]->aname << " for " << aa_defs[idx].name << endl;
-            throw 0xbadac1d;
-        }
-
-        Atom* bt = 0;
-        bool peptide_bond = false;
-        if (aa_defs[idx].aabonds[j]->bname[0] != '<')
-        {
-            bt = get_atom(aa_defs[idx].aabonds[j]->bname);
-            if (!bt)
-            {
-                cout << aa_defs[idx].aabonds[j]->bname << " not found or out of sequence in " << aa_defs[idx].name << endl;
-                throw 0xbadac1d;
-            }
-        }
-        else
-        {
-            if (prevaa)
-            {
-                bt = prevaa->get_atom(&aa_defs[idx].aabonds[j]->bname[1]);
-                prev_aa = prevaa;
-                prevaa->next_aa = this;
-                peptide_bond = true;
-            }
-        }
-
-        Atom* a;
-        if (a = get_atom(aa_defs[idx].aabonds[j]->aname))
-        {
-            int m=255;
-            Atom* ptr;
-            Atom* path[256];
-
-            bool allarom = (aa_defs[idx].aabonds[j]->cardinality > 1 && aa_defs[idx].aabonds[j]->cardinality < 2);
-            //cout << "Existing atom is " << a->name << " and bond-to is " << bt->name << endl;
-            path[m--] = 0;
-            for (ptr=a; m; m--)
-            {
-                path[m] = ptr;
-                //cout << "Path for ring contains " << ptr->name << endl;
-                if (ptr == bt) break;
-                Bond** ptb = ptr->get_bonds();
-                //cout << ptr->name << " is bonded to " << (ptb[0]->btom ? ptb[0]->btom->name : "null") << endl;
-                if (!ptb[0]->btom) break;
-                ptr = ptb[0]->btom;
-                // ptb[0]->can_rotate = true;
-            }
-
-			// TODO: These lines are causing previous residues' side chains to separate from the backbone.
-			#if 1
-            // TODO: call close_loop() instead of coplanar ring.
-            make_coplanar_ring(&path[m]);
-            // close_loop(&path[m], aa_defs[idx].aabonds[j]->cardinality);
-            a->bond_to(bt, aa_defs[idx].aabonds[j]->cardinality);
-            #endif
-        }
-        else
-        {
-            a = add_atom(elemsym, aa_defs[idx].aabonds[j]->aname, bt, aa_defs[idx].aabonds[j]->cardinality);
-            /*cout << "New atom is " << a->name << " and bond-to is " << (bt ? bt->name : "null");
-            if (bt) cout << ", atoms are " << a->get_location().get_3d_distance(bt->get_location()) << "A apart.";
-            cout << endl;*/
-            if (!strcmp("CA", aa_defs[idx].aabonds[j]->aname)) a->swap_chirality = true;
-            a->aaletter = letter;
-            strcpy(a->aa3let, aa_defs[idx]._3let);
-            a->residue = residue_no;
-            if (   !strcmp(aa_defs[idx].aabonds[j]->aname, "N")
-                    || !strcmp(aa_defs[idx].aabonds[j]->aname, "HN")
-                    || !strcmp(aa_defs[idx].aabonds[j]->aname, "CA")
-                    || !strcmp(aa_defs[idx].aabonds[j]->aname, "C")
-                    || !strcmp(aa_defs[idx].aabonds[j]->aname, "O")
-               )
-                a->is_backbone = true;
-            else a->is_backbone = false;
-        }
-
-        if (peptide_bond)
-        {
-            // a->aromatize();
-            a->mirror_geo = 0;
-            a->flip_mirror = true;
-        }
-    }
-    
-    _skip_aabonds:
 
     // hydrogenate();
     for (i=0; i<100; i++)
@@ -248,6 +151,55 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		rotate_backbone_abs(CA_asc, 0);
 	}
 	minimize_internal_clashes();
+	
+	if (prevaa)
+	{
+		// Make sure we have all the right atoms.
+		Atom* currN = get_atom("N");
+		Atom* prevC = prevaa->get_atom("C");
+		if (!currN || !prevC) return;
+		Atom* prevCA = prevaa->get_atom("CA");
+		Atom* prevO  = prevaa->get_atom("O");
+		if (!prevCA || !prevO) return;
+		
+		// Get the curr.N - prev.C relative location and scale it to 1.32A.
+		SCoord sc = prevC->get_location().subtract(currN->get_location());
+		
+		// Move the entire current molecule so the N is now at that distance.
+		sc.r -= 1.32;
+		move(sc);
+		
+		// Get the normal from the prev.CA - prev.C - prev.O plane.
+		SCoord axis = compute_normal(prevCA->get_location(), prevC->get_location(), prevO->get_location());
+		
+		// Get the angle along the normal of prev.O - prev.C - curr.N.
+		float theta = find_angle_along_vector(prevO->get_location(), currN->get_location(), prevC->get_location(), axis);
+		float plus  = triangular - theta;
+		float minus = triangular*2 - theta;		// 240deg is the same as -120deg.
+		
+		// Rotate the current molecule about the prev.C atom, using the normal as an axis,
+		// to get a 120 degree angle not clashing curr.N with prev.CA.
+		Point maybeP = rotate3D(currN->get_location(), prevC->get_location(), axis, plus);
+		Point maybeM = rotate3D(currN->get_location(), prevC->get_location(), axis, minus);
+		LocatedVector lv(axis);
+		lv.origin = prevC->get_location();
+		if (maybeP.get_3d_distance(prevCA->get_location()) > maybeM.get_3d_distance(prevCA->get_location()))
+			rotate(lv, plus);
+		else
+			rotate(lv, minus);
+		
+		// Get the normal from the curr.HN - curr.N - curr.CA plane.
+		
+		// Get the angle along the normal of prev.C - curr.N - curr.HN.
+		
+		// Rotate the current molecule about the curr.N atom, using the normal as an axis,
+		// to get a 120 degree angle not clashing prev.C with curr.CA.
+		
+		// Get the angle of curr.HN - prev.O along the prev.C - curr.N axis.
+		
+		// Rotate the current molecule around curr.N to get 180 degrees.
+		
+	}
 }
 
 Molecule** AminoAcid::aas_to_mols(AminoAcid** aas)

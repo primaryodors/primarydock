@@ -19,7 +19,7 @@ float potential_distance = 0;
 
 Molecule::Molecule(const char* lname)
 {
-    name = new char[strlen(lname)+1] {};
+    name = new char[strlen(lname)+1];
     strcpy(name, lname);
 
     atoms = NULL;
@@ -50,13 +50,13 @@ Molecule::Molecule(const char* lname, Atom** collection)
 
     int i, j;
     for (i=0; collection[i]; i++);
-    atoms = new Atom*[i+1] {};
+    atoms = new Atom*[i+1];
     for (j=0; j<i; j++)
         atoms[j] = collection[j];
     atoms[i] = 0;
     atcount = i;
 
-    name = new char[strlen(lname)+1] {};
+    name = new char[strlen(lname)+1];
     strcpy(name, lname);
 
     smiles = NULL;
@@ -108,7 +108,7 @@ void Molecule::reallocate()
     {
         int oac = atcount;
         int ac1 = oac + _def_atc;
-        Atom** latoms = new Atom*[ac1+10] {};
+        Atom** latoms = new Atom*[ac1+10];
 
         int i;
         if (atoms && oac)
@@ -125,7 +125,7 @@ void Molecule::reallocate()
 Atom* Molecule::add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard)
 {
     Atom* a = new Atom(elemsym, location);
-    a->name = new char[strlen(aname)+1] {};
+    a->name = new char[strlen(aname)+1];
     a->residue = 0;
     strcpy(a->name, aname);
     if (bond_to && bcard) a->bond_to(bond_to, bcard);
@@ -147,7 +147,7 @@ Atom* Molecule::add_atom(const char* elemsym, const char* aname, Atom* bondto, c
 
     SCoord v = bondto->get_next_free_geometry(bcard);
     Atom* a = new Atom(elemsym);
-    a->name = new char[strlen(aname)+1] {};
+    a->name = new char[strlen(aname)+1];
     a->residue = 0;
     strcpy(a->name, aname);
 
@@ -270,7 +270,7 @@ void Molecule::hydrogenate()
 char** Molecule::get_atom_names() const
 {
     int i;
-    char** retval = new char*[atcount+1] {};
+    char** retval = new char*[atcount+1];
 
     for (i=0; i<atcount; i++) retval[i] = atoms[i]->name;
     retval[atcount] = 0;
@@ -342,7 +342,7 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
 int Molecule::from_sdf(const char* sdf_dat)
 {
     if (!sdf_dat) return 0;
-    const char* lines[8192] {};
+    const char* lines[8192];
     int i,j=0,lncount;
 
     immobile = false;
@@ -364,7 +364,7 @@ int Molecule::from_sdf(const char* sdf_dat)
 
     for (j=3; j<lncount; j++)
     {
-        char line[1024] {};
+        char line[1024];
         strncpy(line, lines[j], 1023);
         fields = chop_spaced_fields(line);
 
@@ -385,7 +385,7 @@ int Molecule::from_sdf(const char* sdf_dat)
             na = atoi(fields[0]);
             nb = atoi(fields[1]);
 
-            atoms = new Atom*[na+1] {};
+            atoms = new Atom*[na+1];
         }
         else if (added < na)
         {
@@ -393,7 +393,7 @@ int Molecule::from_sdf(const char* sdf_dat)
             if (fields[3][0] >= 'a' && fields[3][0] <= 'z') fields[3][0] -= 0x20;
             Atom* a = new Atom(fields[3], loc);
             delete loc;
-            a->name = new char[16] {};
+            a->name = new char[16];
             sprintf(a->name, "%s%d", fields[3], added+1);
             a->residue = 0;
             atoms[atcount++] = a;
@@ -723,7 +723,7 @@ Point Molecule::get_ring_center(int ringid)
     if (!ring_atoms[ringid]) return nothing;
     for (ringsz = 0; ring_atoms[ringid][ringsz]; ringsz++);
 
-    Point* alocs = new Point[ringsz] {};
+    Point* alocs = new Point[ringsz];
     int i;
     for (i=0; i<ringsz; i++)
     {
@@ -763,7 +763,7 @@ Atom** Molecule::get_ring_atoms(int ringid)
     int ringsz;
     for (ringsz = 0; ring_atoms[ringid][ringsz]; ringsz++);
 
-    Atom** retval = new Atom*[ringsz+1] {};
+    Atom** retval = new Atom*[ringsz+1];
 
     int i;
     for (i=0; i<=ringsz; i++) retval[i] = ring_atoms[ringid][i];
@@ -773,7 +773,7 @@ Atom** Molecule::get_ring_atoms(int ringid)
 
 int Molecule::identify_rings()
 {
-    Atom **ringstmp[256] = {}, *a;
+    Atom **ringstmp[256], *a;
     int chainlen[256];
     bool is_ring[256];
     int found_rings=0, chains=0, cnvchain, active, i, j, k, l, m, n, p;
@@ -781,8 +781,8 @@ int Molecule::identify_rings()
     Atom *ra, *rb;
 
     ringcount = 0;
-    ring_atoms = new Atom**[atcount] {};
-    ring_aromatic = new bool[atcount] {};
+    ring_atoms = new Atom**[atcount];
+    ring_aromatic = new bool[atcount];
 
     // Start at any ato Mark it "used".
     a = atoms[0];
@@ -798,7 +798,7 @@ int Molecule::identify_rings()
         if (b[i]->btom)
             if (b[i]->btom->get_valence() > 1)
             {
-                ringstmp[chains] = new Atom*[256] {};
+                ringstmp[chains] = new Atom*[256];
                 ringstmp[chains][0] = a;
                 ringstmp[chains][1] = b[i]->btom;
                 ringstmp[chains][2] = 0;
@@ -870,7 +870,7 @@ _done_l:
             {
                 // Count backwards from one chain until find the diverging atom, then jump to the other chain and count forward
                 // until reach the/a converging ato This is a RING; add it to the list.
-                ring_atoms[ringcount] = new Atom*[chainlen[i] + chainlen[cnvchain]] {};
+                ring_atoms[ringcount] = new Atom*[chainlen[i] + chainlen[cnvchain]];
                 n = 0;
                 // cout << "Counting backwards from " << chainlen[i]-1 << endl;
                 for (m = chainlen[i]-1; m >= 0; m--)
@@ -981,7 +981,7 @@ _exit_m:
                         // If there is more than one "unused" bonded atom of an eligible element, create new chains for the surplus atoms.
                         if (k)
                         {
-                            ringstmp[chains] = new Atom*[256] {};
+                            ringstmp[chains] = new Atom*[256];
                             for (l=0; l<chainlen[i]-1; l++)
                                 ringstmp[chains][l] = ringstmp[i][l];
                             ringstmp[chains][l] = b[j]->btom;
@@ -1209,7 +1209,7 @@ Bond** Molecule::get_rotatable_bonds()
         }
 
     // cout << bonds << " rotatable bond(s)." << endl;
-    rotatable_bonds = new Bond*[bonds+1] {};
+    rotatable_bonds = new Bond*[bonds+1];
     for (i=0; i<=bonds; i++) rotatable_bonds[i] = btemp[i];
     rotatable_bonds[bonds] = 0;
 
@@ -1292,7 +1292,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     }
 
 	_found_aadef:
-    Bond** retval = new Bond*[bonds+8] {};
+    Bond** retval = new Bond*[bonds+8];
     for (i=0; i<=bonds; i++) retval[i] = btemp[i];
     retval[i] = 0;
 
@@ -1323,7 +1323,7 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
         if (lb) delete[] lb;
     }
 
-    Bond** retval = new Bond*[bonds+1] {};
+    Bond** retval = new Bond*[bonds+1];
     for (i=0; i<=bonds; i++) retval[i] = btemp[i];
 
     return retval;
@@ -2059,7 +2059,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
         last_iter = (iter == (iters-1));
         for (i=0; mm[i]; i++)
         {
-            bool nearby[inplen+4] = {};
+            bool nearby[inplen+4];
             Point icen = mm[i]->get_barycenter();
 
             for (j=0; mm[j]; j++)
@@ -2436,7 +2436,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 bool Molecule::from_smiles(char const * smilesstr)
 {
     smlen = strlen(smilesstr);
-    paren = new SMILES_Parenthetical[smlen] {};
+    paren = new SMILES_Parenthetical[smlen];
     spnum = 0;
 
     bool retval = from_smiles(smilesstr, NULL);
@@ -2528,7 +2528,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
         {
             // stack[sp++] = preva;
             paren[spnum].startsfrom = preva;
-            paren[spnum].smilesstr = new char[smlen-i+4] {};
+            paren[spnum].smilesstr = new char[smlen-i+4];
             strcpy(paren[spnum].smilesstr, &smilesstr[++i]);
             // while (smilesstr[i] != ')') i++;
 
@@ -2562,7 +2562,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
         // Nonstandard feature.
         if (smilesstr[i] == '{')
         {
-            char* aname = new char[5] {};
+            char* aname = new char[5];
             i++;
             j=0;
             while (smilesstr[i] != '}' && j<5)

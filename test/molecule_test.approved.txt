@@ -5,8 +5,8 @@ Internal clashes: 0.026827 cu. A.
 Bond C1 - C2 can rotate.
 Bond C2 - O3 can rotate.
 Molecule moved to [0.2,-0.5,-0.3].
-Loaded test ligand. Intermol clashes: 44.7541 cu. A.
-Rotated molecule 2 by -30 degrees. Intermol clashes: 44.1886 cu. A.
+Loaded test ligand. Intermol clashes: 44 cu. A.
+Rotated molecule 2 by -30 degrees. Intermol clashes: 44.1887 cu. A.
 1 1 1 1 
 
 Energy level above threshold, SUCCESS.

@@ -22,19 +22,19 @@ bool Protein::add_residue(const int resno, const char aaletter)
 
     if (!residues)
     {
-        residues = new AminoAcid*[resno+256] {};
-        sequence = new char[resno+256] {};
-        ca = new Atom*[resno+256] {};
-        res_reach = new float[resno+256] {};
+        residues = new AminoAcid*[resno+256];
+        sequence = new char[resno+256];
+        ca = new Atom*[resno+256];
+        res_reach = new float[resno+256];
     }
     else if (resno % 256)
     {
         AminoAcid** oldres = residues;
         char* oldseq = sequence;
-        residues = new AminoAcid*[resno+261] {};
-        sequence = new char[resno+261] {};
-        ca = new Atom*[resno+261] {};
-        res_reach = new float[resno+261] {};
+        residues = new AminoAcid*[resno+261];
+        sequence = new char[resno+261];
+        ca = new Atom*[resno+261];
+        res_reach = new float[resno+261];
         for (i=0; oldres[i]; i++)
         {
             residues[i] = oldres[i];
@@ -108,7 +108,7 @@ bool Protein::add_sequence(const char* lsequence)
         if (fabs(r-1.54) > 0.2) cout << i+1 << lsequence[i] << ":CA-CB = " << r << endl;
     }
     
-    Molecule* aas[get_seq_length()+4]{};
+    Molecule* aas[get_seq_length()+4];
     for (i=1; i<=get_seq_length(); i++)
     {
     	aas[i] = get_residue(i);
@@ -166,7 +166,7 @@ int Protein::load_pdb(FILE* is)
             {
                 if (!metcount % 16)
                 {
-                    Atom** mtmp = new Atom*[metcount+20] {};
+                    Atom** mtmp = new Atom*[metcount+20];
                     if (metals)
                     {
                         for (i=0; metals[i]; i++)
@@ -193,10 +193,10 @@ int Protein::load_pdb(FILE* is)
         }
     }
 
-    residues 	= new AminoAcid*[rescount+1] {};
-    sequence 	= new char[rescount+1] {};
-    ca       	= new Atom*[rescount+1] {};
-    res_reach	= new float[rescount+1] {};
+    residues 	= new AminoAcid*[rescount+1];
+    sequence 	= new char[rescount+1];
+    ca       	= new Atom*[rescount+1];
+    res_reach	= new float[rescount+1];
 
     for (i=0; i<rescount; i++)
     {
@@ -263,7 +263,7 @@ void Protein::set_clashables()
     }
 
     int seqlen = get_seq_length();
-    res_can_clash = new AminoAcid**[seqlen+1] {};
+    res_can_clash = new AminoAcid**[seqlen+1];
 
     // cout << "seqlen is " << seqlen << endl;
 
@@ -281,7 +281,7 @@ void Protein::set_clashables()
                 if (debug) *debug << *residues[j] << " can reach " << *residues[i] << endl;
             }
         }
-        res_can_clash[i] = new AminoAcid*[k+1] {};
+        res_can_clash[i] = new AminoAcid*[k+1];
         for (j=0; j<k; j++)
         {
             res_can_clash[i][j] = temp[j];
@@ -339,7 +339,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 {
     int i, j, sphres = 0;
     int seql = get_seq_length();
-    bool resno_already[8192] = {};
+    bool resno_already[8192];
 
     for (i=0; i<SPHREACH_MAX; i++) reaches_spheroid[i] = NULL;
 
@@ -578,9 +578,9 @@ void Protein::conform_backbone(int startres, int endres,
                dir2 = (inc>0) ? CA_asc : C_desc;
     
     int am = abs(endres-startres), minres = (inc>0) ? startres : endres;
-    float momenta1[am+4]{}, momenta2[am+4]{};
-    int eando_res[am+4]{};
-    float eando_mult[am+4]{};
+    float momenta1[am+4], momenta2[am+4];
+    int eando_res[am+4];
+    float eando_mult[am+4];
     
     for (res = startres; res <= endres; res += inc)
     {
@@ -720,7 +720,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
     if (inc != sgn(stopat-startres)) return;
     if (stopat < endres) endres = stopat;
     int res, i, j, iter;
-    int phis[365] = {}, psis[365] = {};
+    int phis[365], psis[365];
     bb_rot_dir dir1 = (inc>0) ? N_asc : CA_desc,
                dir2 = (inc>0) ? CA_asc : C_desc;
 
@@ -812,7 +812,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 	
 	set_clashables();
     
-    Molecule* aas[get_seq_length()+4]{};
+    Molecule* aas[get_seq_length()+4];
     for (i=startres; i<=endres; i++)
     {
     	aas[i] = get_residue(i);
@@ -886,7 +886,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, ch
     int i, j=0, k=0;
     if (!m_mcoord)
     {
-        m_mcoord = new MetalCoord*[2] {};
+        m_mcoord = new MetalCoord*[2];
         m_mcoord[0] = new MetalCoord();
         m_mcoord[1] = NULL;
     }
@@ -903,7 +903,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, ch
 
     if (!metals)
     {
-        metals = new Atom*[2] {};
+        metals = new Atom*[2];
         metals[0] = metal;
         metals[1] = NULL;
     }
@@ -1000,7 +1000,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, ch
     ma[1] = NULL;
     Molecule m("Metal", ma);
     m.movability = MOV_ALL;
-    Molecule* lmols[maxres-minres+8] {};
+    Molecule* lmols[maxres-minres+8];
     int lmolc=0;
     lmols[lmolc++] = &m;
     for (i=minres; i<=maxres; i++)
@@ -1056,7 +1056,7 @@ float Protein::get_helix_orientation(int startres, int endres)
         cout << "Helix too short for determining orientation. " << startres << "-" << endres << endl;
         return 0;
     }
-    Point pt, ptarr[acount+8] {};
+    Point pt, ptarr[acount+8];
     for (i=0; i<=rescount; i++)
     {
         /*Star s;
@@ -1080,7 +1080,7 @@ float Protein::get_helix_orientation(int startres, int endres)
 
     // Take a running average of 10-atom blocks, then measure the average radians from vertical for imaginary lines between consecutive averages.
     int bcount = acount-10;
-    Point blkavg[bcount+8] {};
+    Point blkavg[bcount+8];
     float retval = 0;
     j=0;
 

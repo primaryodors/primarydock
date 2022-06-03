@@ -94,7 +94,7 @@ protected:
     int metcount=0;
     Star aaptrmin, aaptrmax;
     MetalCoord** m_mcoord=0;
-    Region regions[PROT_MAX_RGN] {};
+    Region regions[PROT_MAX_RGN];
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);

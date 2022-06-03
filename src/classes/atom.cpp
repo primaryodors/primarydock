@@ -44,7 +44,7 @@ void Atom::read_elements()
                     int lZ = atoi(fields[0]);
                     if (lZ && fields[1])
                     {
-                        elem_syms[lZ] = new char[3] {};
+                        elem_syms[lZ] = new char[3];
                         strcpy(elem_syms[lZ], fields[1]);
                         // cout << fields[6] << endl;
 
@@ -213,7 +213,7 @@ Atom::Atom(const char* elem_sym)
 
     figure_out_valence();
 
-    bonded_to = new Bond[abs(geometry)] {};
+    bonded_to = new Bond[abs(geometry)];
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -231,7 +231,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
 
     figure_out_valence();
 
-    bonded_to = new Bond[abs(geometry)] {};
+    bonded_to = new Bond[abs(geometry)];
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -250,14 +250,14 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
 
     figure_out_valence();
 
-    bonded_to = new Bond[abs(geometry)] {};
+    bonded_to = new Bond[abs(geometry)];
     strcpy(aa3let, "LIG");
     residue = 999;
 }
 
 Atom::Atom(FILE* is)
 {
-    char buffer[1024] = {}, res3let[5] = {};
+    char buffer[1024], res3let[5];
     int resno=0;
 
     while (1)
@@ -310,7 +310,7 @@ Atom::Atom(FILE* is)
                         esym[1] |= 0x20;
                     }
 
-                    name = new char[5] {};
+                    name = new char[5];
                     strcpy(name, fields[2]);
 
                     Z = Z_from_esym(esym);
@@ -318,7 +318,7 @@ Atom::Atom(FILE* is)
                     reciprocity = used = false;
 
                     figure_out_valence();
-                    bonded_to = new Bond[abs(geometry)] {};
+                    bonded_to = new Bond[abs(geometry)];
 
                     Point aloc(atof(fields[5]), atof(fields[6]),atof(fields[7]));
                     location = aloc;
@@ -415,7 +415,7 @@ Atom** Bond::get_moves_with_btom()
         cachesz = i+1;
     if (!cachesz) return 0;
 
-    Atom** retval = new Atom*[cachesz+1] {};
+    Atom** retval = new Atom*[cachesz+1];
     for (i=0; i<cachesz; i++)
         retval[i] = moves_with_btom[i];
     retval[cachesz] = 0;
@@ -541,7 +541,7 @@ Bond** Atom::get_bonds()
     if (!geometry || geometry<0 || isnan(geometry)) geometry=4;
     try
     {
-        Bond** retval = new Bond*[geometry+1] {};
+        Bond** retval = new Bond*[geometry+1];
         for (i=0; i<geometry; i++) retval[i] = &bonded_to[i];
         retval[geometry] = 0;
         return retval;
@@ -928,7 +928,7 @@ void Bond::fill_moves_with_cache()
     }
     while (k);
 
-    moves_with_btom = new Atom*[tmplen+4] {};
+    moves_with_btom = new Atom*[tmplen+4];
 
     for (i=0; i<tmplen; i++)
     {
@@ -1041,7 +1041,7 @@ void Bond::swing(SCoord newdir)
 
 SCoord* Atom::get_basic_geometry()
 {
-    SCoord* retval = new SCoord[geometry+2] {};
+    SCoord* retval = new SCoord[geometry+2];
 
     int i, j;
     float x, y, z;

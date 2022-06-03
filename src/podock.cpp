@@ -35,11 +35,11 @@ char* get_file_ext(char* filename)
 
 Protein* protein;
 int seql = 0;
-int mcoord_resno[256] = {};
+int mcoord_resno[256];
 Molecule* ligand;
 Point ligcen_target;
 Point size(10,10,10);
-SCoord path[256] = {};
+SCoord path[256];
 int pathnodes=1;		// The pocketcen is the initial node.
 int poses = 10;
 int iters = 50;
@@ -80,7 +80,7 @@ void iteration_callback(int iter)
         discrete[1].pmol = gcfmols[1];
 
         int i;
-        AminoAcid* resphres[SPHREACH_MAX+4] = {};
+        AminoAcid* resphres[SPHREACH_MAX+4];
         int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, mcoord_resno);
         for (i=0; i<sphres; i++)
         {
@@ -96,9 +96,9 @@ void iteration_callback(int iter)
 
 int main(int argc, char** argv)
 {
-    char configfname[256] = {};
-    char protfname[256] = {};
-    char ligfname[256] = {};
+    char configfname[256];
+    char protfname[256];
+    char ligfname[256];
     Point pocketcen;
     std::ofstream *output = NULL;
 
@@ -276,7 +276,7 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
 
-    char buffer[65536] = {};
+    char buffer[65536];
     switch (ext[0])
     {
     case 's':
@@ -351,7 +351,7 @@ int main(int argc, char** argv)
     Point nodecen = pocketcen;
     seql = p.get_seq_length();
     int rstart = p.get_start_resno();
-    AminoAcid* reaches_spheroid[pathnodes+2][SPHREACH_MAX] = {};
+    AminoAcid* reaches_spheroid[pathnodes+2][SPHREACH_MAX];
     int sphres = 0;
 
     // Filter residues according to which ones are close enough to the spheroid to "reach" it.
@@ -588,7 +588,7 @@ int main(int argc, char** argv)
             // cout << pose << ":" << nodeno << " drift " << driftamt << endl;
             int iters_div = iters*0.259;
 
-            Molecule* cfmols[SPHREACH_MAX+4] = {};
+            Molecule* cfmols[SPHREACH_MAX+4];
             gcfmols = cfmols;
             i=0;
             m.movability = MOV_ALL;
@@ -626,8 +626,8 @@ int main(int argc, char** argv)
             if (debug) *debug << "Preparing output." << endl;
 #endif
 
-            char metrics[p.get_seq_length()+8][10] = {};
-            float mkJmol[p.get_seq_length()+8] = {};
+            char metrics[p.get_seq_length()+8][10];
+            float mkJmol[p.get_seq_length()+8];
             int metcount=0;
             float btot=0;
 
@@ -670,8 +670,8 @@ int main(int argc, char** argv)
 #endif
 
             dr[drcount][nodeno].kJmol = btot;
-            dr[drcount][nodeno].metric = new char*[metcount+2] {};
-            dr[drcount][nodeno].mkJmol = new float[metcount] {};
+            dr[drcount][nodeno].metric = new char*[metcount+2];
+            dr[drcount][nodeno].mkJmol = new float[metcount];
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
 #endif
@@ -686,12 +686,12 @@ int main(int argc, char** argv)
 
             for (i=0; i<metcount; i++)
             {
-                dr[drcount][nodeno].metric[i] = new char[max(8,(int)strlen(metrics[i])+4)] {};
+                dr[drcount][nodeno].metric[i] = new char[max(8,(int)strlen(metrics[i])+4)];
                 strcpy(dr[drcount][nodeno].metric[i], metrics[i]);
                 dr[drcount][nodeno].mkJmol[i] = mkJmol[i];
                 // cout << "*" << dr[drcount][nodeno].metric[i] << ": " << dr[drcount][nodeno].mkJmol[i] << endl;
             }
-            dr[drcount][nodeno].metric[i] = new char[1] {};
+            dr[drcount][nodeno].metric[i] = new char[1];
             dr[drcount][nodeno].metric[i][0] = 0;
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "More metrics or something idfk." << endl;
@@ -789,7 +789,7 @@ int main(int argc, char** argv)
 
                         for (l=0; l<_INTER_TYPES_LIMIT; l++)
                         {
-                            char lbtyp[64] = {};
+                            char lbtyp[64];
                             switch (l+covalent)
                             {
                             case covalent:

@@ -105,6 +105,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			atcount = l;
 		}
     	
+    	get_rotatable_bonds();
     	goto _skip_aabonds;
     }
 

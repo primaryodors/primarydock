@@ -5,6 +5,7 @@
 #define fiftyseven (180.0/M_PI)
 #define fiftyseventh (M_PI/180)
 
+#define _kcal_per_kJ 0.239006
 #define _kJmol_cuA 0.5
 #define _INTERA_R_CUTOFF 20
 #define _INTER_TYPES_LIMIT 10

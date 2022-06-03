@@ -50,31 +50,13 @@ public:
 
     // Basic getters.
     const char* get_elem_sym();
-    int get_Z()
-    {
-        return Z;
-    }
-    int get_family()
-    {
-        return family;
-    }
-    int get_valence()
-    {
-        return valence;
-    }
-    int get_geometry()
-    {
-        return geometry;
-    }
+    int get_Z()    {        return Z;    }
+    int get_family()    {        return family;    }
+    int get_valence()    {        return valence;    }
+    int get_geometry()    {        return geometry;    }
     Point get_location();
-    float get_vdW_radius()
-    {
-        return vdW_rad;
-    }
-    float get_atomic_weight()
-    {
-        return at_wt;
-    }
+    float get_vdW_radius()    {        return vdW_rad;    }
+    float get_atomic_weight()    {        return at_wt;    }
     float get_charge();
     float get_acidbase();
     float is_polar();						// -1 if atom is H-bond acceptor; +1 if donor.
@@ -83,16 +65,10 @@ public:
     bool is_pi();
 
     // Setters.
-    void set_acidbase(float ab)
-    {
-        acidbase = ab;
-    }
+    void set_acidbase(float ab)    {        acidbase = ab;    }
     void set_aa_properties();
     void clear_all_moves_cache();
-    void increment_charge(float lcharge)
-    {
-        charge += lcharge;
-    }
+    void increment_charge(float lcharge)    {        charge += lcharge;    }
 
     // Bond functions.
     Bond** get_bonds();
@@ -121,10 +97,7 @@ public:
 
     // Spatial functions.
     bool move(Point* pt);
-    bool move(Point pt)
-    {
-        return move(&pt);
-    }
+    bool move(Point pt)    {        return move(&pt);    }
     bool move_rel(SCoord* v);
     int move_assembly(Point* pt, Atom* excluding);			// Return number of atoms moved. Note excluding must be a bonded atom.
     SCoord* get_basic_geometry();
@@ -137,10 +110,7 @@ public:
     SCoord get_next_free_geometry(float lcard);
     int get_idx_next_free_geometry();
     void rotate_geometry(Rotation rot);			// Necessary for bond rotation.
-    void clear_geometry_cache()
-    {
-        geov=0;
-    }
+    void clear_geometry_cache()    {        geov=0;    }
     void swing_all(int startat=0);
 
     // Static fuctions.

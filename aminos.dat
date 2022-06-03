@@ -15,370 +15,363 @@
 # PYL since it is extremely rare, is known only in microorganisms, and has a complex side chain.
 #
 
-#AA     3let    name           aname    bto    card    charge     SMILES
-A       ALA     alanine        N        <C     1.5      0         N[C@H](C(=O)O)C
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              HB3      CB     1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+#AA	3let	name			aname	bto	card	charge	SMILES
+A		ALA		alanine		N		<C	1.5		0		N[C@H](C(=O)O)C
+"		"		"			HN		N	1		+0.5	@1
+"		"		"			CA		N	1		0		=2
+"		"		"			HA		CA	1		0		@2
+"		"		"			CB		CA	1		0		=4
+"		"		"			HB1		CB	1		0		@4
+"		"		"			HB2		CB	1		0		@4
+"		"		"			HB3		CB	1		0		@4
+"		"		"			C		CA	1		0		=5
+"		"		"			O		C	1.5		-0.5	=7
 
-R       ARG     arginine       N        <C     1.5      0         N[C@H](C(=O)O)CCCNC(N)=[NH2+]
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              HG1      CG     1        0
-"       "       "              HG2      CG     1        0
-"       "       "              CD       CG     1        0
-"       "       "              HD1      CD     1        0
-"       "       "              HD2      CD     1        0
-"       "       "              NE       CD     1        0
-"       "       "              HE       NE     1        0
-"       "       "              CZ       NE     1        0
-"       "       "              NH1      CZ     1.5      0
-"       "       "              1HH1     NH1    1       +0.25
-"       "       "              2HH1     NH1    1       +0.25
-"       "       "              NH2      CZ     1.5      0
-"       "       "              1HH2     NH2    1       +0.25
-"       "       "              2HH2     NH2    1       +0.25
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+R		ARG		arginine	N		<C	1.5		0		N[C@H](C(=O)O)CCCNC(N)=[NH2+]
+"		"		"			HN		N	1		+0.5	@1
+"		"		"			CA		N	1		0		=2
+"		"		"			HA		CA	1		0		@2
+"		"		"			CB		CA	1		0		=4
+"		"		"			HB1		CB	1		0		@4
+"		"		"			HB2		CB	1		0		@4
+"		"		"			CG		CB	1		0		=5
+"		"		"			HG1		CG	1		0		@5
+"		"		"			HG2		CG	1		0		@5
+"		"		"			CD		CG	1		0		=6
+"		"		"			HD1		CD	1		0		@6
+"		"		"			HD2		CD	1		0		@6
+"		"		"			NE		CD	1		0		=7
+"		"		"			HE		NE	1		0		@7
+"		"		"			CZ		NE	1		0		=8
+"		"		"			NH1		CZ	1.5		0		=9
+"		"		"			1HH1	NH1	1		+0.25	@9
+"		"		"			2HH1	NH1	1		+0.25	@9
+"		"		"			NH2		CZ	1.5		0		=14
+"		"		"			1HH2	NH2	1		+0.25	@14
+"		"		"			2HH2	NH2	1		+0.25	@14
+"		"		"			C		CA	1		0		=12
+"		"		"			O		C	1.5		-0.5	=15
 
-N       ASN     asparagine     N        <C     1.5      0         N[C@H](C(=O)O)CC(=O)N
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              OD1      CG     1.5     -0.5
-"       "       "              ND2      CG     1.5      0
-"       "       "              1HD2     ND2    1       +0.25
-"       "       "              2HD2     ND2    1       +0.25
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+N		ASN		asparagine	N		<C	1.5		0		N[C@H](C(=O)O)CC(=O)N
+"		"		"			HN		N	1		+0.5	@1
+"		"		"			CA		N	1		0		=2
+"		"		"			HA		CA	1		0		@2
+"		"		"			CB		CA	1		0		=4
+"		"		"			HB1		CB	1		0		@4
+"		"		"			HB2		CB	1		0		@4
+"		"		"			CG		CB	1		0		=5
+"		"		"			OD1		CG	1.5		-0.5	=10
+"		"		"			ND2		CG	1.5		0		=6
+"		"		"			1HD2	ND2	1		+0.25	@6
+"		"		"			2HD2	ND2	1		+0.25	@6
+"		"		"			C		CA	1		0		=7
+"		"		"			O		C	1.5		-0.5	=9
 
-D       ASP     aspartic_acid  N        <C     1.5      0         N[C@H](C(=O)O)CC(=O)[O-]
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              OD1      CG     1.5     -0.5
-"       "       "              OD2      CG     1.5     -0.5
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+D		ASP	aspartic_acid	N		<C	1.5		0		N[C@H](C(=O)O)CC(=O)[O-]
+"		"		"			HN		N	1		+0.5	@1
+"		"		"			CA		N	1		0		=2
+"		"		"			HA		CA	1		0		@2
+"		"		"			CB		CA	1		0		=4
+"		"		"			HB1		CB	1		0		@4
+"		"		"			HB2		CB	1		0		@4
+"		"		"			CG		CB	1		0		=5
+"		"		"			OD1		CG	1.5		-0.5	=6
+"		"		"			OD2		CG	1.5		-0.5	=10
+"		"		"			C		CA	1		0		=7
+"		"		"			O		C	1.5		-0.5	=9
 
-C       CYS     cysteine       N        <C     1.5      0         N[C@H](C(=O)O)CS
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              SG       CB     1        0
-"       "       "              HG       SG     1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+C		CYS		cysteine	N		<C	1.5		0		N[C@H](C(=O)O)CS
+"		"		"			HN		N	1		+0.5	@1
+"		"		"			CA		N	1		0		=2
+"		"		"			HA		CA	1		0		@2
+"		"		"			CB		CA	1		0		=4
+"		"		"			HB1		CB	1		0		@4
+"		"		"			HB2		CB	1		0		@4
+"		"		"			SG		CB	1		0		=5
+"		"		"			HG		SG	1		0		@5
+"		"		"			C		CA	1		0		=6
+"		"		"			O		C	1.5		-0.5	=8
 
-E       GLU     glutamic_acid  N        <C     1.5      0         N[C@H](C(=O)O)CCC(=O)[O-]
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              HG1      CG     1        0
-"       "       "              HG2      CG     1        0
-"       "       "              CD       CG     1        0
-"       "       "              OE1      CD     1.5     -0.5
-"       "       "              OE2      CD     1.5     -0.5
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+E		GLU	glutamic_acid	N		<C	1.5		0		N[C@H](C(=O)O)CCC(=O)[O-]
+"		"		"			HN		N	1		+0.5	@1
+"		"		"			CA		N	1		0		=2
+"		"		"			HA		CA	1		0		@2
+"		"		"			CB		CA	1		0		=4
+"		"		"			HB1		CB	1		0		@4
+"		"		"			HB2		CB	1		0		@4
+"		"		"			CG		CB	1		0		=5
+"		"		"			HG1		CG	1		0		@5
+"		"		"			HG2		CG	1		0		@5
+"		"		"			CD		CG	1		0		=6
+"		"		"			OE1		CD	1.5		-0.5	=7
+"		"		"			OE2		CD	1.5		-0.5	=11
+"		"		"			C		CA	1		0		=8
+"		"		"			O		C	1.5		-0.5	=10
 
-Q       GLN     glutamine      N        <C     1.5      0         N[C@H](C(=O)O)CCC(=O)N
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              HG1      CG     1        0
-"       "       "              HG2      CG     1        0
-"       "       "              CD       CG     1        0
-"       "       "              OE1      CD     1.5     -0.5
-"       "       "              NE2      CD     1.5      0
-"       "       "              1HE2     NE2    1       +0.25
-"       "       "              2HE2     NE2    1       +0.25
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+Q		GLN		glutamine	N		<C	1.5		0		N[C@H](C(=O)O)CCC(=O)N
+"		"		"			HN		N	1		+0.5	@1
+"		"		"			CA		N	1		0		=2
+"		"		"			HA		CA	1		0		@2
+"		"		"			CB		CA	1		0		=4
+"		"		"			HB1		CB	1		0		@4
+"		"		"			HB2		CB	1		0		@4
+"		"		"			CG		CB	1		0		=5
+"		"		"			HG1		CG	1		0		@5
+"		"		"			HG2		CG	1		0		@5
+"		"		"			CD		CG	1		0		=6
+"		"		"			OE1		CD	1.5		-0.5	=11
+"		"		"			NE2		CD	1.5		0		=7
+"		"		"			1HE2	NE2	1		+0.25	@7
+"		"		"			2HE2	NE2	1		+0.25	@7
+"		"		"			C		CA	1		0		=8
+"		"		"			O		C	1.5		-0.5	=10
 
-G       GLY     glycine        N        <C     1.5      0         NCC(=O)O
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA1      CA     1        0
-"       "       "              HA2      CA     1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+G		GLY		glycine		N		<C	1.5		0		NCC(=O)O
+"		"		"			HN		N	1		+0.5	@1
+"		"		"			CA		N	1		0		=2
+"		"		"			HA1		CA	1		0		@2
+"		"		"			HA2		CA	1		0		@2
+"		"		"			C		CA	1		0		=3
+"		"		"			O		C	1.5		-0.5	=5
 
-H       HIS     histidine      N        <C     1.5      0         N[C@H](C(=O)O)CC1N=CNC=1
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              ND1      CG     2        0
-"       "       "              CE1      ND1    1!       0
-"       "       "              HE1      CE1    1        0
-"       "       "              NE2      CE1    1!       0
-"       "       "              HE2      NE2    1        0
-"       "       "              CD2      NE2,CG 1!,2     0
-"       "       "              HD2      CD2    1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+H		HIS		histidine	N		<C		1.5		0		N[C@H](C(=O)O)CC1=NCNC=1
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB1		CB		1		0		@4
+"		"		"			HB2		CB		1		0		@4
+"		"		"			CG		CB		1		0		=5
+"		"		"			ND1		CG		2		0		=6
+"		"		"			CE1		ND1		1!		0		=7
+"		"		"			HE1		CE1		1		0		@7
+"		"		"			NE2		CE1		1!		0		=8
+"		"		"			HE2		NE2		1		0		@8
+"		"		"			CD2		NE2,CG	1!,2	0		=9
+"		"		"			HD2		CD2		1		0		@9
+"		"		"			C		CA		1		0		=10
+"		"		"			O		C		1.5		-0.5	=12
 
-I       ILE     isoleucine     N        <C     1.5      0         N[C@H](C(=O)O)C(C)CC
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB       CB     1        0
-"       "       "              CG1      CB     1        0
-"       "       "              1HG1     CG1    1        0
-"       "       "              2HG1     CG1    1        0
-"       "       "              CG2      CB     1        0
-"       "       "              1HG2     CG2    1        0
-"       "       "              2HG2     CG2    1        0
-"       "       "              3HG2     CG2    1        0
-"       "       "              CD1      CG1    1        0
-"       "       "              HD1      CD1    1        0
-"       "       "              HD2      CD1    1        0
-"       "       "              HD3      CD1    1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+I		ILE		isoleucine	N		<C		1.5		0		N[C@H](C(=O)O)C(C)CC
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB		CB		1		0		@4
+"		"		"			CG1		CB		1		0		=5
+"		"		"			1HG1	CG1		1		0		@5
+"		"		"			2HG1	CG1		1		0		@5
+"		"		"			CG2		CB		1		0		=9
+"		"		"			1HG2	CG2		1		0		@9
+"		"		"			2HG2	CG2		1		0		@9
+"		"		"			3HG2	CG2		1		0		@9
+"		"		"			CD1		CG1		1		0		=6
+"		"		"			HD1		CD1		1		0		@6
+"		"		"			HD2		CD1		1		0		@6
+"		"		"			HD3		CD1		1		0		@6
+"		"		"			C		CA		1		0		=7
+"		"		"			O		C		1.5		-0.5	=10
 
-L       LEU     leucine        N        <C     1.5      0         N[C@H](C(=O)O)CC(C)C
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              HG       CG     1        0
-"       "       "              CD1      CG     1        0
-"       "       "              1HD1     CD1    1        0
-"       "       "              2HD1     CD1    1        0
-"       "       "              3HD1     CD1    1        0
-"       "       "              CD2      CG     1        0
-"       "       "              1HD2     CD2    1        0
-"       "       "              2HD2     CD2    1        0
-"       "       "              3HD2     CD2    1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+L		LEU		leucine		N		<C		1.5		0		N[C@H](C(=O)O)CC(C)C
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB1		CB		1		0		@4
+"		"		"			HB2		CB		1		0		@4
+"		"		"			CG		CB		1		0		=5
+"		"		"			HG		CG		1		0		@5
+"		"		"			CD1		CG		1		0		=6
+"		"		"			1HD1	CD1		1		0		@6
+"		"		"			2HD1	CD1		1		0		@6
+"		"		"			3HD1	CD1		1		0		@6
+"		"		"			CD2		CG		1		0		=9
+"		"		"			1HD2	CD2		1		0		@9
+"		"		"			2HD2	CD2		1		0		@9
+"		"		"			3HD2	CD2		1		0		@9
+"		"		"			C		CA		1		0		=7
+"		"		"			O		C		1.5		-0.5	=10
 
-K       LYS     lysine         N        <C     1.5      0         N[C@H](C(=O)O)CCCCN
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              HG1      CG     1        0
-"       "       "              HG2      CG     1        0
-"       "       "              CD       CG     1        0
-"       "       "              HD1      CD     1        0
-"       "       "              HD2      CD     1        0
-"       "       "              CE       CD     1        0
-"       "       "              HE1      CE     1        0
-"       "       "              HE2      CE     1        0
-"       "       "              NZ       CE     1        0
-"       "       "              HZ1      NZ     1       +0.333
-"       "       "              HZ2      NZ     1       +0.333
-"       "       "              HZ3      NZ     1       +0.333
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+K		LYS		lysine		N		<C		1.5		0		N[C@H](C(=O)O)CCCC[NH3+]
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB1		CB		1		0		@4
+"		"		"			HB2		CB		1		0		@4
+"		"		"			CG		CB		1		0		=5
+"		"		"			HG1		CG		1		0		@5
+"		"		"			HG2		CG		1		0		@5
+"		"		"			CD		CG		1		0		=6
+"		"		"			HD1		CD		1		0		@6
+"		"		"			HD2		CD		1		0		@6
+"		"		"			CE		CD		1		0		=7
+"		"		"			HE1		CE		1		0		@7
+"		"		"			HE2		CE		1		0		@7
+"		"		"			NZ		CE		1		0		=8
+"		"		"			HZ1		NZ		1		+0.333	@8
+"		"		"			HZ2		NZ		1		+0.333	@8
+"		"		"			HZ3		NZ		1		+0.333	@8
+"		"		"			C		CA		1		0		=12
+"		"		"			O		C		1.5		-0.5	=14
 
-M       MET     methionine     N        <C     1.5      0         N[C@H](C(=O)O)CCCSC
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              HG1      CG     1        0
-"       "       "              HG2      CG     1        0
-"       "       "              SD       CG     1        0
-"       "       "              CE       SD     1        0
-"       "       "              HE1      CE     1        0
-"       "       "              HE2      CE     1        0
-"       "       "              HE3      CE     1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+M		MET		methionine	N		<C		1.5		0		N[C@H](C(=O)O)CCSC
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB1		CB		1		0		@4
+"		"		"			HB2		CB		1		0		@4
+"		"		"			CG		CB		1		0		=5
+"		"		"			HG1		CG		1		0		@5
+"		"		"			HG2		CG		1		0		@5
+"		"		"			SD		CG		1		0		=6
+"		"		"			CE		SD		1		0		=7
+"		"		"			HE1		CE		1		0		@7
+"		"		"			HE2		CE		1		0		@7
+"		"		"			HE3		CE		1		0		@7
+"		"		"			C		CA		1		0		=8
+"		"		"			O		C		1.5		-0.5	=10
 
-F       PHE     phenylalanine  N        <C     1.5      0         N[C@H](C(=O)O)Cc1ccccc1
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              CD1      CG     1.5      0
-"       "       "              HD1      CD1    1        0
-"       "       "              CE1      CD1    1.5      0
-"       "       "              HE1      CE1    1        0
-"       "       "              CZ       CE1    1.5      0
-"       "       "              HZ       CZ     1        0
-"       "       "              CE2      CZ     1.5      0
-"       "       "              HE2      CE2    1        0
-"       "       "              CD2      CE2,CG 1.5,1.5  0
-"       "       "              HD2      CD2    1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+F		PHE	phenylalanine	N		<C		1.5		0		N[C@H](C(=O)O)Cc1ccccc1
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB1		CB		1		0		@4
+"		"		"			HB2		CB		1		0		@4
+"		"		"			CG		CB		1		0		=5
+"		"		"			CD1		CG		1.5		0		=6
+"		"		"			HD1		CD1		1		0		@6
+"		"		"			CE1		CD1		1.5		0		=7
+"		"		"			HE1		CE1		1		0		@7
+"		"		"			CZ		CE1		1.5		0		=8
+"		"		"			HZ		CZ		1		0		@8
+"		"		"			CE2		CZ		1.5		0		=9
+"		"		"			HE2		CE2		1		0		@9
+"		"		"			CD2		CE2,CG	1.5,1.5	0		=10
+"		"		"			HD2		CD2		1		0		@10
+"		"		"			C		CA		1		0		=11
+"		"		"			O		C		1.5		-0.5	=13
 
-P       PRO     proline        N        <C     1.5      0         N1[C@H](C(=O)O)CCC1
-"       "       "              CA       N      1!       0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1!       0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1!       0
-"       "       "              HG1      CG     1        0
-"       "       "              HG2      CG     1        0
-"       "       "              CD       CG,N   1!,1!    0
-"       "       "              HD1      CD     1        0
-"       "       "              HD2      CD     1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+P		PRO		proline		N		<C		1.5		0		N1[C@H](C(=O)O)CCC1
+"		"		"			CA		N		1!		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1!		0		=4
+"		"		"			HB1		CB		1		0		@4
+"		"		"			HB2		CB		1		0		@4
+"		"		"			CG		CB		1!		0		=5
+"		"		"			HG1		CG		1		0		@5
+"		"		"			HG2		CG		1		0		@5
+"		"		"			CD		CG,N	1!,1!	0		=6
+"		"		"			HD1		CD		1		0		@6
+"		"		"			HD2		CD		1		0		@6
+"		"		"			C		CA		1		0		=7
+"		"		"			O		C		1.5		-0.5	=9
 
-U       SEC     selenocysteine N        <C     1.5      0         N[C@H](C(=O)O)C[Se]
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              SEG      CB     1        0
-"       "       "              HG       SEG    1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+U		SEC	selenocysteine	N		<C		1.5		0		N[C@H](C(=O)O)C[SeH]
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB1		CB		1		0		@4
+"		"		"			HB2		CB		1		0		@4
+"		"		"			SEG		CB		1		0		=5
+"		"		"			HG		SEG		1		0		@5
+"		"		"			C		CA		1		0		=7
+"		"		"			O		C		1.5		-0.5	=9
 
-S       SER     serine         N        <C     1.5      0         N[C@H](C(=O)O)CO
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              OG       CB     1        0
-"       "       "              HG       OG     1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+S		SER		serine		N		<C		1.5		0		N[C@H](C(=O)O)CO
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB1		CB		1		0		@4
+"		"		"			HB2		CB		1		0		@4
+"		"		"			OG		CB		1		0		=5
+"		"		"			HG		OG		1		0		@5
+"		"		"			C		CA		1		0		=6
+"		"		"			O		C		1.5		-0.5	=8
 
-T       THR     threonine      N        <C     1.5      0         N[C@H](C(=O)O)C(C)O
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB       CB     1        0
-"       "       "              OG1      CB     1        0
-"       "       "              HG1      OG1    1        0
-"       "       "              CG2      CB     1        0
-"       "       "              1HG2     CG2    1        0
-"       "       "              2HG2     CG2    1        0
-"       "       "              3HG2     CG2    1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+T		THR		threonine	N		<C		1.5		0		N[C@H](C(=O)O)C(C)O
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB		CB		1		0		@4
+"		"		"			OG1		CB		1		0		=5
+"		"		"			HG1		OG1		1		0		@5
+"		"		"			CG2		CB		1		0		=8
+"		"		"			1HG2	CG2		1		0		@8
+"		"		"			2HG2	CG2		1		0		@8
+"		"		"			3HG2	CG2		1		0		@8
+"		"		"			C		CA		1		0		=6
+"		"		"			O		C		1.5		-0.5	=9
 
-W       TRP     tryptophan     N        <C      1.5      0         N[C@H](C(=O)O)CC1=CNc2ccccc21
-"       "       "              HN       N       1       +0.5
-"       "       "              CA       N       1        0
-"       "       "              HA1      CA      1        0
-"       "       "              HA2      CA      1        0
-"       "       "              CB       CA      1        0
-"       "       "              HB1      CB      1        0
-"       "       "              HB2      CB      1        0
-"       "       "              CG       CB      1        0
-"       "       "              CD1      CG      1.5      0
-"       "       "              HD1      CD1     1        0
-"       "       "              NE1      CD1     1!,1!    0
-"       "       "              HE1      NE1     1!       0
-"       "       "              CD2      CG      1.5      0
-"       "       "              CE2      CD2     1.5      0
-"       "       "              CZ2      CE2     1.5      0
-"       "       "              HZ2      CZ2     1!       0
-"       "       "              CH2      CZ2     1.5      0
-"       "       "              HH2      CH2     1!       0
-"       "       "              CZ3      CH2     1.5      0
-"       "       "              HZ3      CZ3     1!       0
-"       "       "              CE3      CZ3,NE1 1.5,1      0
-"       "       "              HE3      CE3,CD2 1,1.5    0
-"       "       "              C        CA      1        0
-"       "       "              O        C       1.5     -0.5
+W		TRP		tryptophan	N		<C		1.5		0		N[C@H](C(=O)O)CC1=CNc2ccccc21
+"		"		"			HN		N		1		+0.5
+"		"		"			CA		N		1		0
+"		"		"			HA1		CA		1		0
+"		"		"			HA2		CA		1		0
+"		"		"			CB		CA		1		0
+"		"		"			HB1		CB		1		0
+"		"		"			HB2		CB		1		0
+"		"		"			CG		CB		1		0
+"		"		"			CD1		CG		1.5		0
+"		"		"			HD1		CD1		1		0
+"		"		"			NE1		CD1		1!,1!	0
+"		"		"			HE1		NE1		1!		0
+"		"		"			CD2		CG		1.5		0
+"		"		"			CE2		CD2		1.5		0
+"		"		"			CZ2		CE2		1.5		0
+"		"		"			HZ2		CZ2		1!		0
+"		"		"			CH2		CZ2		1.5		0
+"		"		"			HH2		CH2		1!		0
+"		"		"			CZ3		CH2		1.5		0
+"		"		"			HZ3		CZ3		1!		0
+"		"		"			CE3		CZ3,NE1	1.5,1	0
+"		"		"			HE3		CE3,CD2	1,1.5	0
+"		"		"			C		CA		1		0
+"		"		"			O		C		1.5		-0.5
 
-Y       TYR     tyrosine       N        <C     1.5      0         N[C@H](C(=O)O)Cc1ccc(O)cc1
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB1      CB     1        0
-"       "       "              HB2      CB     1        0
-"       "       "              CG       CB     1        0
-"       "       "              CD1      CG     1.5      0
-"       "       "              HD1      CD1    1        0
-"       "       "              CE1      CD1    1.5      0
-"       "       "              HE1      CE1    1        0
-"       "       "              CZ       CE1    1.5      0
-"       "       "              OH       CZ     1        0
-"       "       "              HH       OH     1        0
-"       "       "              CE2      CZ     1.5      0
-"       "       "              HE2      CE2    1        0
-"       "       "              CD2      CE2,CG 1.5,1.5  0
-"       "       "              HD2      CD2    1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
+Y		TYR		tyrosine	N		<C		1.5		0		N[C@H](C(=O)O)Cc1ccc(O)cc1
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB1		CB		1		0		@4
+"		"		"			HB2		CB		1		0		@4
+"		"		"			CG		CB		1		0		=5
+"		"		"			CD1		CG		1.5		0		=6
+"		"		"			HD1		CD1		1		0		@6
+"		"		"			CE1		CD1		1.5		0		=7
+"		"		"			HE1		CE1		1		0		@7
+"		"		"			CZ		CE1		1.5		0		=8
+"		"		"			OH		CZ		1		0		=13
+"		"		"			HH		OH		1		0		@13
+"		"		"			CE2		CZ		1.5		0		=9
+"		"		"			HE2		CE2		1		0		@9
+"		"		"			CD2		CE2,CG	1.5,1.5	0		=10
+"		"		"			HD2		CD2		1		0		@10
+"		"		"			C		CA		1		0		=11
+"		"		"			O		C		1.5		-0.5	=14
 
-V       VAL     valine         N        <C     1.5      0         N[C@H](C(=O)O)C(C)C
-"       "       "              HN       N      1       +0.5
-"       "       "              CA       N      1        0
-"       "       "              HA       CA     1        0
-"       "       "              CB       CA     1        0
-"       "       "              HB       CB     1        0
-"       "       "              CG1      CB     1        0
-"       "       "              1HG1     CG1    1        0
-"       "       "              2HG1     CG1    1        0
-"       "       "              3HG1     CG1    1        0
-"       "       "              CG2      CB     1        0
-"       "       "              1HG2     CG2    1        0
-"       "       "              2HG2     CG2    1        0
-"       "       "              3HG2     CG2    1        0
-"       "       "              C        CA     1        0
-"       "       "              O        C      1.5     -0.5
-
-
-
-
-
-
-
+V		VAL		valine		N		<C		1.5		0		N[C@H](C(=O)O)C(C)C
+"		"		"			HN		N		1		+0.5	@1
+"		"		"			CA		N		1		0		=2
+"		"		"			HA		CA		1		0		@2
+"		"		"			CB		CA		1		0		=4
+"		"		"			HB		CB		1		0		@4
+"		"		"			CG1		CB		1		0		=5
+"		"		"			1HG1	CG1		1		0		@5
+"		"		"			2HG1	CG1		1		0		@5
+"		"		"			3HG1	CG1		1		0		@5
+"		"		"			CG2		CB		1		0		=8
+"		"		"			1HG2	CG2		1		0		@8
+"		"		"			2HG2	CG2		1		0		@8
+"		"		"			3HG2	CG2		1		0		@8
+"		"		"			C		CA		1		0		=6
+"		"		"			O		C		1.5		-0.5	=9
 
 
 

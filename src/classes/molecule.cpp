@@ -1493,7 +1493,7 @@ void Molecule::rotate(SCoord* SCoord, float theta)
     int i;
     for (i=0; i<atcount; i++)
     {
-        if (atoms[i]->residue) return;
+        // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
         Point nl  = rotate3D(&loc, &cen, SCoord, theta);
         atoms[i]->move(&nl);
@@ -1507,7 +1507,7 @@ void Molecule::rotate(LocatedVector SCoord, float theta)
     int i;
     for (i=0; i<atcount; i++)
     {
-        if (atoms[i]->residue) return;
+        // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
         Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
         atoms[i]->move(&nl);

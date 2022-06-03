@@ -152,6 +152,15 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 	}
 	minimize_internal_clashes();
 	
+	Atom* CA = get_atom("CA");
+	Atom* CB = get_atom("CB");
+	
+	if (CA && CB)
+	{
+		Bond* b = CA->get_bond_between(CB);
+		if (b) b->rotate(triangular);
+	}
+	
 	if (prevaa)
 	{
 		// Make sure we have all the right atoms.
@@ -187,6 +196,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		float theta = find_angle_along_vector(prevO->get_location(), currN->get_location(), prevC->get_location(), axis);
 		float plus  = triangular - theta;
 		float minus = triangular*2 - theta;		// 240deg is the same as -120deg.
+		cout << theta*fiftyseven << " " << plus*fiftyseven << " " << minus*fiftyseven << endl;
 		
 		// Rotate the current molecule about the prev.C atom, using the normal as an axis,
 		// to get a 120 degree angle not clashing curr.N with prev.CA.

@@ -1,5 +1,9 @@
+Unbond C-O12
+Unbond H23-O12
+Unbond N-H15
 phenylalanine bonds can rotate: 
-None.
+CA - CB
+CB - CG
 
 Wrote test.pdb
 Wrote test.sdf

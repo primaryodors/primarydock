@@ -91,7 +91,7 @@ class Molecule
     // Interaction functions.
     float get_internal_clashes();
     void minimize_internal_clashes();
-    float get_intermol_clashes(const Molecule* ligand);
+    float get_intermol_clashes(Molecule* ligand);
     float get_intermol_clashes(Molecule** ligands);
     float get_intermol_binding(Molecule* ligand);
     float get_intermol_binding(Molecule** ligands);

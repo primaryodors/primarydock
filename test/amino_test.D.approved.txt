@@ -1,5 +1,9 @@
+Unbond C-O8
+Unbond H15-O8
+Unbond N-H12
 aspartic_acid bonds can rotate: 
-None.
+CA - CB
+CB - CG
 
 Wrote test.pdb
 Wrote test.sdf

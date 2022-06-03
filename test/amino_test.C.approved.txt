@@ -1,5 +1,9 @@
+Unbond C-O7
+Unbond H14-O7
+Unbond N-H10
 cysteine bonds can rotate: 
-None.
+CA - CB
+CB - SG
 
 Wrote test.pdb
 Wrote test.sdf

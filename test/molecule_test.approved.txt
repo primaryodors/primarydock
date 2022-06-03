@@ -7,9 +7,7 @@ Bond C2 - O3 can rotate.
 Molecule moved to [0.2,-0.5,-0.3].
 Loaded test ligand. Intermol clashes: 44.7541 cu. A.
 Rotated molecule 2 by -30 degrees. Intermol clashes: 44.1886 cu. A.
-1 1 1 1 Moved molecule 2 by 4 A.
-Intermol clashes: 0 cu. A.
-Intermol energy level: 0.581542 kJ/mol.
+1 1 1 1 
 
 Energy level above threshold, SUCCESS.
 Saved output.sdf

@@ -1,5 +1,11 @@
+Unbond C-O8
+Unbond H19-O8
+Unbond N-H12
 leucine bonds can rotate: 
-None.
+CA - CB
+CB - CG
+CG - CD1
+CG - CD2
 
 Wrote test.pdb
 Wrote test.sdf

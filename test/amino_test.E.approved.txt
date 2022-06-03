@@ -1,5 +1,10 @@
+Unbond C-O9
+Unbond H18-O9
+Unbond N-H13
 glutamic_acid bonds can rotate: 
-None.
+CA - CB
+CB - CG
+CG - CD
 
 Wrote test.pdb
 Wrote test.sdf

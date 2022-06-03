@@ -1,5 +1,9 @@
+Unbond C-O7
+Unbond H14-O7
+Unbond N-H10
 serine bonds can rotate: 
-None.
+CA - CB
+CB - OG
 
 Wrote test.pdb
 Wrote test.sdf

@@ -1,6 +1,9 @@
-Ring closure anomaly 1.98026
+Unbond C-O15
+Unbond H27-O15
+Unbond N-H18
 tryptophan bonds can rotate: 
-None.
+CA - CB
+CB - CG
 
 Wrote test.pdb
 Wrote test.sdf

@@ -1,5 +1,8 @@
+Unbond C-O6
+Unbond H13-O6
+Unbond N-H9
 alanine bonds can rotate: 
-None.
+CA - CB
 
 Wrote test.pdb
 Wrote test.sdf

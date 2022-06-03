@@ -88,6 +88,10 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     		if (found)
     		{
     			if (atoms[aidx]->name) delete atoms[aidx]->name;
+    			atoms[aidx]->clear_all_moves_cache();
+    			atoms[aidx]->aaletter = letter;
+    			strcpy(atoms[aidx]->aa3let, aa_defs[idx]._3let);
+    			atoms[aidx]->residue = residue_no;
     			atoms[aidx]->name = new char[8];
 				used[aidx] = true;
     			strcpy(atoms[aidx]->name, aa_defs[idx].aabonds[j]->aname);
@@ -100,6 +104,23 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		
 		if (l)
 		{
+			for (i=0; atoms[i]; i++)
+			{
+				if ( in_array( (void*)atoms[i], (void**)atoms_new ) < 0 )
+				{
+					Bond** b = atoms[i]->get_bonds();
+					for (j=0; b[j]; j++)
+					{
+						if (b[j]->btom)
+						{
+							cout << "Unbond " << b[j]->btom->name << "-" << atoms[i]->name << endl << flush;
+							b[j]->btom->unbond(atoms[i]);
+						}
+					}
+					delete atoms[i];
+				}
+			}
+			
 			delete atoms;
 			atoms = atoms_new;
 			atcount = l;
@@ -222,7 +243,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     // hydrogenate();
     for (i=0; i<100; i++)
     {
-		rotate_backbone_abs(N_asc, 0);
+		// rotate_backbone_abs(N_asc, 0);
+		rotate_backbone_abs(CA_desc, 0);
 		rotate_backbone_abs(CA_asc, 0);
 	}
 	minimize_internal_clashes();

@@ -384,12 +384,14 @@ void Atom::unbond(Atom* btom)
     {
         int i;
         for (i=0; i<geometry; i++)
+        {
             if (bonded_to[i].btom == btom)
             {
                 bonded_to[i].btom = NULL;
                 bonded_to[i].cardinality=0;
                 bonded_to[i].can_rotate=0;
             }
+        }
     }
 }
 
@@ -554,7 +556,6 @@ void Atom::clear_all_moves_cache()
 {
     if (!bonded_to) return;
     int i;
-    Bond** retval = new Bond*[geometry+1] {};
     for (i=0; i<geometry; i++) bonded_to[i].clear_moves_with_cache();
     geov = NULL;
 }
@@ -961,10 +962,9 @@ bool Bond::rotate(float theta, bool allow_backbone)
     rot.a = theta;
     btom->rotate_geometry(rot);
 
-    //cout << "Rotating " << atom->name << "-" << btom->name << "... ";
+    // cout << "Rotating " << atom->name << "-" << btom->name << "... ";
     for (i=0; moves_with_btom[i]; i++)
     {
-        //cout << moves_with_btom[i]->name << " ";
         if (!allow_backbone)
         {
             if (moves_with_btom[i]->is_backbone)
@@ -976,6 +976,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
             }
         }
         if (moves_with_btom[i]->residue != btom->residue) continue;
+        // cout << moves_with_btom[i]->name << " ";
         
         /*cout << moves_with_btom[i]->residue << ":" << moves_with_btom[i]->name
         	 << " from "
@@ -990,7 +991,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
         moves_with_btom[i]->move(&nl);
         moves_with_btom[i]->rotate_geometry(rot);
     }
-    //cout << endl;
+    // cout << endl;
 
     if (can_flip) flip_angle = -flip_angle;
     total_rotations += theta;

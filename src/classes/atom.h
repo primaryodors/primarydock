@@ -25,10 +25,7 @@ public:
     ~Bond();
 
     bool rotate(float angle_radians, bool allow_backbone = false);
-    void clear_moves_with_cache()
-    {
-        moves_with_btom = 0;
-    }
+    void clear_moves_with_cache()	{	moves_with_btom = 0;	}
     Atom** get_moves_with_btom();
     int count_moves_with_btom();
     void swing(SCoord newdir);		// Rotate btom, and all its moves_with atoms, about atom so that the bond points to newdir.

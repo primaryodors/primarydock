@@ -22,10 +22,10 @@ $(OBJDIR):
 	if [ ! -f $(OBJDIR) ]; then mkdir -p $(OBJDIR); fi
 
 $(BINDIR):
-	mkdir -p $(BINDIR)
+	if [ ! -f $(BINDIR) ]; then mkdir -p $(BINDIR); fi
 
 $(OUTDIR):
-	mkdir -p $(OUTDIR)
+	if [ ! -f $(OUTDIR) ]; then mkdir -p $(OUTDIR); fi
 
 $(OBJDIR)/point.o: src/classes/point.h src/classes/point.cpp src/classes/constants.h
 	$(CC) -c src/classes/point.cpp -o $(OBJDIR)/point.o $(CFLAGS)

@@ -154,7 +154,7 @@ int main(int argc, char** argv)
         ttlmv += v.r;
         cout << v.r << " ";
     }
-    cout << "# Moved molecule 2 by " << ttlmv << " A." << endl;
+    cout << "\n# Moved molecule 2 by " << ttlmv << " A." << endl;
 
     cout << "# Intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
     cout << "# Intermol energy level: " << m1.get_intermol_binding(&m2) << " kJ/mol." << endl;

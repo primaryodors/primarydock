@@ -2694,7 +2694,7 @@ bool Molecule::from_smiles(char* smilesstr, Atom* ipreva)
                 }
 
                 float anomaly = close_loop(aloop, card);
-                cout << "Ring closure anomaly " << anomaly << endl;
+                cout << "# Ring closure anomaly " << anomaly << endl;
 
                 /*for (l=0; l<dbi; l++)
                 {	if (!EZgiven[l] && EZatom0[l] && EZatom1[l])

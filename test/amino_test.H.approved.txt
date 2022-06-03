@@ -1,4 +1,3 @@
-Ring closure anomaly 4.01581
 Unbond C-O11
 Unbond H22-O11
 Unbond N-H14

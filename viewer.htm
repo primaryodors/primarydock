@@ -20,12 +20,12 @@ var nglcitation
 <style>
 body
 {
-	color: #6af;
+	color: #69c;
 	overflow: hidden;
 }
 
 a
-{	color: #39f;
+{	color: #2af;
 	text-decoration: none;
 }
 a:hover
@@ -91,9 +91,15 @@ a:hover
     padding-right: 5px;
 }
 
-.clickme
+.clickme, .clickme:hover
 {
 	cursor: pointer;
+	text-decoration: none;
+}
+
+.clickme:hover
+{
+	color: #9cf;
 }
 
 .posebtn
@@ -139,6 +145,10 @@ a:hover
 	background-color: #357;
 }
 
+.symbol
+{	font-size: 20px!important;
+}
+
 input[type=file]
 {
     /*width: 600px;*/
@@ -180,6 +190,25 @@ option.unknown
 #clip
 {
     width: 503px;
+}
+
+#seqdd
+{
+	background-color: #235;
+	position: absolute;
+	display: block;
+	top: 25px;
+	left: 225px;
+	z-index: 1000;
+	padding: 10px;
+	border: 1px solid #249;
+	border-radius: 15px;
+}
+
+.sctgbtn
+{
+	font-family: Monospace;
+	margin-bottom: 10px;
 }
 
 </style>
@@ -225,6 +254,10 @@ Clip:
 </span>
 </div>
 
+<div id="affichage">
+<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
+</div>
+
 <div id="center">
 Center:
 <a class="posebtn clickme" onclick="gmodel[0].autoView();" title="Middle-click an atom to center it.">Model</a>
@@ -236,8 +269,77 @@ Center:
 </center>
 <script>
 
-// Modify this array to your preferred TMR color scheme.
+const aa1let = "ARNDCEQGHILKMFPSTWYVU";
+const aa3let =
+[
+	'ALA', 'ARG', 'ASN', 'ASP', 'CYS',
+	'GLU', 'GLN', 'GLY', 'HIS', 'ILE',
+	'LEU', 'LYS', 'MET', 'PHE', 'PRO',
+	'SER', 'THR', 'TRP', 'TYR', 'VAL',
+	'SEC',
+];
+
+function aa_1let_from_3let(laa3let)
+{
+	var retval = "?";
+	aa3let.forEach(function(item, index)
+	{
+		if (item == laa3let) retval = aa1let.substr(index, 1);
+	});
+	return retval;
+}
+
+var tmoid = false;
+function show_seqdd()
+{
+	var seqdd = $('#seqdd')[0];
+	seqdd.innerHTML = "<b>Show/Hide Side Chains:</b><br><br>";
+	
+	var i;
+	for (i=0; i<sequence.length; i++)
+	{
+		var tgl = document.createElement("span");
+		tgl.className = "clickme nodebtn sctgbtn";
+		tgl.innerText = sequence.substr(i, 1);
+		tgl.title = sequence.substr(i, 1)+(i+1);
+		tgl.setAttribute("onclick", "toggleSideChain("+(i+1)+");");
+		seqdd.appendChild(tgl);
+		
+		if (!((i+1)%30)) seqdd.appendChild(document.createElement("br")).appendChild(document.createElement("br"));
+	}
+	
+	var sdchbtn = $('#sdchbtn')[0];
+	var btnrect = sdchbtn.getBoundingClientRect();
+	$(seqdd
+		).css("top", parseInt(btnrect.bottom).toString()+"px"
+		).css("left", parseInt(btnrect.left).toString()+"px"
+		).toggle().on("mouseleave", function()
+		{
+			if (tmoid) window.clearTimeout(tmoid);
+			tmoid = window.setTimeout(function()
+			{
+				$('#seqdd').hide();
+			}, 1000);
+		}).on("mousemove", function()
+		{
+			if (tmoid) window.clearTimeout(tmoid);
+		});
+	
+}
+
+// Can modify this array to your preferred TMR color scheme.
 var tmcolor =
+{
+    1: 0x666666,
+    2: 0x993366,
+    3: 0x0033ff,
+    4: 0x3399cc,
+    5: 0x00ff99,
+    6: 0x33ff00,
+    7: 0xcc7733
+};
+
+/*var tmcolor =
 {
     1: 0x666666,
     2: 0x0099ff,
@@ -246,7 +348,7 @@ var tmcolor =
     5: 0xccff00,
     6: 0xff9900,
     7: 0xcc0033
-}
+};*/
 
 var stage = new NGL.Stage("viewport");
 var gmodel = [], model = [], is_ligand = [], mrep = [], mrparams = [], mpos = [], mnod = [];
@@ -256,6 +358,7 @@ var gpose = 1, gnode = 0;
 var orid;
 var mtlcoord = [];
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
+var sequence = "";
 
 window.onresize = function()
 {
@@ -273,32 +376,34 @@ stage.mouseControls.add( "scroll-ctrl+shift", function( stage, delta )
 
 stage.mouseControls.add("clickPick", function(stage, e)
 {
-	/*if (typeof e.atom != "undefined")
-		alert(e.atom.resno); */
-	
+	toggleSideChain(e.atom.resno);
+});
+
+function toggleSideChain(resno)
+{
 	try
 	{
-		if (restoggled[e.atom.resno]) // resmdl[e.atom.resno].hasRepresentation())
+		if (restoggled[resno]) // resmdl[e.atom.resno].hasRepresentation())
 		{
-			resmdl[e.atom.resno].removeAllRepresentations();
-			restoggled[e.atom.resno] = 0;
+			resmdl[resno].removeAllRepresentations();
+			restoggled[resno] = 0;
 		}
 		else
 		{
-			resmdl[e.atom.resno].addRepresentation( "licorice",
+			resmdl[resno].addRepresentation( "licorice",
             {
                 opacity: 1,
 				colorScheme: PODefScheme,
                 metalness: 0.13,
             });
-			restoggled[e.atom.resno] = 1;
+			restoggled[resno] = 1;
 		}
 	}
 	catch (ex)
 	{
 		;
 	}
-});
+}
 
 var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
@@ -324,7 +429,8 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 
                 case 'MET':
                 case 'CYS':
-                return 0xcccc99;
+                case 'SEC':
+                return 0xbbcc99;
 
                 case 'PHE':
                 case 'TRP':
@@ -339,12 +445,13 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 
                 case 'ASP':
                 case 'GLU':
-                return 0xff9999;
+                return 0xffcc99;
 
                 case 'HIS':
                 case 'LYS':
                 case 'ARG':
-                return 0x6699ff;
+                case 'PYL':
+                return 0x99ccff;
 
                 default:
                 return 0x666666;
@@ -354,6 +461,7 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
         	case 'O': return atom.isBackbone() ? 0x660000 : 0xFF0000;
         	case 'P': return 0xff77c6;
         	case 'S': return 0xffdd00;
+        	case 'Se': return 0xffaa00;
         	case 'Cl': return 0x33cc00;
         	case 'Cu': return 0xe5a072;
         	case 'Zn': return 0x92b0cc;
@@ -366,19 +474,7 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
         	default: return 0x99aabb;
         }
 
-        if (atom.serial == 5) console.log(atom);
-        if (atom.serial < 1000)
-        {
-            return 0x0000FF;  // blue
-        }
-        else if (atom.serial > 2000)
-        {
-            return 0xFF0000;  // red
-        }
-        else
-        {
-            return 0x00FF00;  // green
-        }
+        return 0xcc00ff;
     };
 });
 
@@ -392,7 +488,7 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
         for (i=1; i<=7; i++)
         {
             if (resno >= tmstart[i] && resno <= tmend[i]) return tmcolor[i];
-            else if (resno < tmstart[i]) return (i&1) ? 0x99cc66 : 0xcc9966;
+            else if (resno < tmstart[i]) return (i&1) ? 0xccddee : 0xcc9966;
         }
 
         return 0xcc9966;
@@ -667,6 +763,7 @@ function loadFile(fileData, fileName = "")
                 stage.removeAllComponents();
                 window.result = fileData;
                 
+                sequence = "";
                 if (fext == 'pdb')
                 {
                 	var i;
@@ -689,10 +786,13 @@ function loadFile(fileData, fileName = "")
                     		
                         	lres = resno;
                         	tmpstr = "";
+                        	if (ln.length > 20) sequence += aa_1let_from_3let(ln.substr(17,3).trim());
                         }
+                        if (ln.length < 20) continue;
                         
                         tmpstr += ln + "\n";
                     }
+                    
                 }
                 
                 var stringBlob = new Blob( [ fileData ], { type: 'text/plain'} );
@@ -964,7 +1064,8 @@ $('#citefloat span')[0].innerText = nglcitation;
 <img src="http://www.primaryodors.org/imgs/Proton_Zundel.gif">
 </div>
 
-
+<div id="seqdd" style="display: none;">
+</div>
 
 
 

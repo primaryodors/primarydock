@@ -62,6 +62,7 @@ class Molecule
     bool shielded(Atom* a, Atom* b) const;
     void voxel_computation(int iters = 5);
     Point get_atom_location(char const * aname);
+    void correct_structure(int iters = 200);
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -77,7 +78,6 @@ class Molecule
     Bond** get_all_bonds(bool unidirectional);
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
     bool rotate_bond(const Bond* rot8b, const float angle);
-    void fix_bond_lengths(int iters = 200);
 
     // Ring functions.
     int identify_rings();

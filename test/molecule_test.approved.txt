@@ -1,7 +1,767 @@
 Created empty molecule named nothing.
 Created molecule named CC(=O)[O-].
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 109.471 10.5288
+C2-O3(C1) 3 109.471 10.5288
+C2-O3(O4) 3 130.529 -10.5288
+C2-O4(O3) 3 130.529 -10.5288
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 159.07 -39.0704
+C2-C1(O4) 3 93.6885 26.3115
+C2-O3(C1) 3 159.07 -39.0704
+C2-O3(O4) 3 107.241 12.7589
+C2-O4(C1) 3 93.6885 26.3115
+C2-O4(O3) 3 107.241 12.7589
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 10.9361 109.064
+C2-C1(O4) 3 40.8306 79.1694
+C2-O3(C1) 3 10.9361 109.064
+C2-O3(O4) 3 29.8945 90.1055
+C2-O4(C1) 3 40.8306 79.1694
+C2-O4(O3) 3 29.8945 90.1055
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 156.827 -36.8274
+C2-C1(O4) 3 143.88 -23.8804
+C2-O3(C1) 3 156.827 -36.8274
+C2-O3(O4) 3 59.2922 60.7078
+C2-O4(C1) 3 143.88 -23.8804
+C2-O4(O3) 3 59.2922 60.7078
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 153.055 -33.0549
+C2-O3(C1) 3 153.055 -33.0549
+C2-O3(O4) 3 33.6405 86.3595
+C2-O4(O3) 3 33.6405 86.3595
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 166.71 -46.71
+C2-C1(O4) 3 139.884 -19.8844
+C2-O3(C1) 3 166.71 -46.71
+C2-O3(O4) 3 53.3778 66.6222
+C2-O4(C1) 3 139.884 -19.8844
+C2-O4(O3) 3 53.3778 66.6222
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 63.9093 56.0907
+C2-C1(O4) 3 172.292 -52.2922
+C2-O3(C1) 3 63.9093 56.0907
+C2-O4(C1) 3 172.292 -52.2922
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 19.0259 100.974
+C2-C1(O4) 3 51.7117 68.2883
+C2-O3(C1) 3 19.0259 100.974
+C2-O3(O4) 3 32.7514 87.2486
+C2-O4(C1) 3 51.7117 68.2883
+C2-O4(O3) 3 32.7514 87.2486
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 134.866 -14.8658
+C2-C1(O4) 3 92.73 27.27
+C2-O3(C1) 3 134.866 -14.8658
+C2-O3(O4) 3 49.1265 70.8735
+C2-O4(C1) 3 92.73 27.27
+C2-O4(O3) 3 49.1265 70.8735
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-O3(O4) 3 100.29 19.7103
+C2-O4(O3) 3 100.29 19.7103
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 34.7197 85.2803
+C2-C1(O4) 3 131.962 -11.9623
+C2-O3(C1) 3 34.7197 85.2803
+C2-O3(O4) 3 161.014 -41.0136
+C2-O4(C1) 3 131.962 -11.9623
+C2-O4(O3) 3 161.014 -41.0136
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 67.8207 52.1793
+C2-O3(C1) 3 67.8207 52.1793
+C2-O3(O4) 3 70.7491 49.2509
+C2-O4(O3) 3 70.7491 49.2509
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 99.4173 20.5827
+C2-C1(O4) 3 67.0478 52.9522
+C2-O3(C1) 3 99.4173 20.5827
+C2-O3(O4) 3 33.488 86.5121
+C2-O4(C1) 3 67.0478 52.9522
+C2-O4(O3) 3 33.488 86.5121
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-O3(O4) 3 96.0255 23.9745
+C2-O4(O3) 3 96.0255 23.9745
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 6.11013 113.89
+C2-C1(O4) 3 155.121 -35.121
+C2-O3(C1) 3 6.11013 113.89
+C2-O3(O4) 3 149.816 -29.8157
+C2-O4(C1) 3 155.121 -35.121
+C2-O4(O3) 3 149.816 -29.8157
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 39.9901 80.0099
+C2-C1(O4) 3 97.1068 22.8932
+C2-O3(C1) 3 39.9901 80.0099
+C2-O3(O4) 3 58.4679 61.5321
+C2-O4(C1) 3 97.1068 22.8932
+C2-O4(O3) 3 58.4679 61.5321
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 71.7382 48.2618
+C2-C1(O4) 3 138.266 -18.2657
+C2-O3(C1) 3 71.7382 48.2618
+C2-O3(O4) 3 91.7771 28.2229
+C2-O4(C1) 3 138.266 -18.2657
+C2-O4(O3) 3 91.7771 28.2229
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 131.081 -11.0814
+C2-C1(O4) 3 54.5649 65.4351
+C2-O3(C1) 3 131.081 -11.0814
+C2-O3(O4) 3 80.542 39.458
+C2-O4(C1) 3 54.5649 65.4351
+C2-O4(O3) 3 80.542 39.458
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 10.5313 109.469
+C2-C1(O4) 3 130.818 -10.8175
+C2-O3(C1) 3 10.5313 109.469
+C2-O3(O4) 3 126.769 -6.76923
+C2-O4(C1) 3 130.818 -10.8175
+C2-O4(O3) 3 126.769 -6.76923
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 151.234 -31.2337
+C2-C1(O4) 3 74.1482 45.8518
+C2-O3(C1) 3 151.234 -31.2337
+C2-O4(C1) 3 74.1482 45.8518
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 24.9276 95.0724
+C2-C1(O4) 3 79.7848 40.2152
+C2-O3(C1) 3 24.9276 95.0724
+C2-O3(O4) 3 104.698 15.3019
+C2-O4(C1) 3 79.7848 40.2152
+C2-O4(O3) 3 104.698 15.3019
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 94.6912 25.3088
+C2-C1(O4) 3 63.5266 56.4734
+C2-O3(C1) 3 94.6912 25.3088
+C2-O3(O4) 3 86.8602 33.1398
+C2-O4(C1) 3 63.5266 56.4734
+C2-O4(O3) 3 86.8602 33.1398
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 87.5424 32.4576
+C2-C1(O4) 3 21.7742 98.2258
+C2-O3(C1) 3 87.5424 32.4576
+C2-O3(O4) 3 66.0365 53.9635
+C2-O4(C1) 3 21.7742 98.2258
+C2-O4(O3) 3 66.0365 53.9635
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 111.045 8.95462
+C2-C1(O4) 3 176.376 -56.3763
+C2-O3(C1) 3 111.045 8.95462
+C2-O3(O4) 3 68.1753 51.8247
+C2-O4(C1) 3 176.376 -56.3763
+C2-O4(O3) 3 68.1753 51.8247
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 142.426 -22.4258
+C2-C1(O4) 3 113.143 6.85745
+C2-O3(C1) 3 142.426 -22.4258
+C2-O3(O4) 3 86.1836 33.8164
+C2-O4(C1) 3 113.143 6.85745
+C2-O4(O3) 3 86.1836 33.8164
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 111.354 8.64646
+C2-C1(O4) 3 19.1709 100.829
+C2-O3(C1) 3 111.354 8.64646
+C2-O3(O4) 3 101.281 18.7192
+C2-O4(C1) 3 19.1709 100.829
+C2-O4(O3) 3 101.281 18.7192
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 67.3934 52.6066
+C2-C1(O4) 3 129.158 -9.15813
+C2-O3(C1) 3 67.3934 52.6066
+C2-O3(O4) 3 150.697 -30.6974
+C2-O4(C1) 3 129.158 -9.15813
+C2-O4(O3) 3 150.697 -30.6974
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 47.8834 72.1166
+C2-C1(O4) 3 159.12 -39.1198
+C2-O3(C1) 3 47.8834 72.1166
+C2-O3(O4) 3 136.321 -16.321
+C2-O4(C1) 3 159.12 -39.1198
+C2-O4(O3) 3 136.321 -16.321
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O3) 3 36.9377 83.0623
+C2-C1(O4) 3 54.8923 65.1077
+C2-O3(C1) 3 36.9377 83.0623
+C2-O3(O4) 3 59.7708 60.2292
+C2-O4(C1) 3 54.8923 65.1077
+C2-O4(O3) 3 59.7708 60.2292
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+C2-C1(O4) 3 86.6588 33.3412
+C2-O3(O4) 3 63.6571 56.3429
+C2-O4(C1) 3 86.6588 33.3412
+C2-O4(O3) 3 63.6571 56.3429
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
+Moving assembly starting with C2 excluding C1
+Motion includes C2
+Motion includes O3
+Motion includes O4
+Moving assembly starting with C2 excluding O3
+Motion includes C2
+Motion includes C1
+Motion includes O4
+Moving assembly starting with C2 excluding O4
+Motion includes C2
+Motion includes C1
+Motion includes O3
 Loaded 0 atoms of CC(=O)[O-] into molecule.
-Internal clashes: 0.026827 cu. A.
+Internal clashes: 0 cu. A.
 Bond C1 - C2 can rotate.
 Bond C2 - O3 can rotate.
 Molecule moved to [0.2,-0.5,-0.3].
@@ -9,5 +769,5 @@ Loaded test ligand. Intermol clashes: 44 cu. A.
 Rotated molecule 2 by -30 degrees. Intermol clashes: 44.1887 cu. A.
 1 1 1 1 
 
-Energy level above threshold, SUCCESS.
+Energy level below threshold, FAIL.
 Saved output.sdf

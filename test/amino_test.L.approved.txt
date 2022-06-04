@@ -1,3 +1,4787 @@
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 125.243 -15.7713
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 125.101 -15.63
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C6(C4) 4 116.928 -7.4567
+C5-C9(C4) 4 90.3442 19.127
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C7-C2(O8) 3 109.471 10.5287
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 100.011 19.9892
+C7-O8(O10) 3 130.529 -10.5287
+C7-O10(C2) 3 104.733 15.2666
+C7-O10(O8) 3 130.529 -10.5287
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(C4) 4 120.866 -11.3946
+C2-H3(C4) 4 94.5122 14.959
+C2-C4(N1) 4 120.866 -11.3946
+C2-C4(H3) 4 94.5122 14.959
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 65.9847 43.4865
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C9(C4) 4 95.5126 13.9586
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 93.0717 26.9283
+C7-O10(C2) 3 146.309 -26.3087
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 79.095 30.3762
+C2-N1(C4) 4 85.4672 24.0041
+C2-H3(N1) 4 79.095 30.3762
+C2-H3(C7) 4 121.732 -12.2611
+C2-C4(N1) 4 85.4672 24.0041
+C2-C4(C7) 4 128.146 -18.6746
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(H3) 4 121.732 -12.2611
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C6(C4) 4 117.732 -8.26079
+C5-C9(C4) 4 97.238 12.2332
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 104.838 15.1623
+C7-O10(C2) 3 135.119 -15.1195
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 88.9621 20.5091
+C2-N1(C4) 4 84.5564 24.9149
+C2-H3(N1) 4 88.9621 20.5091
+C2-H3(C7) 4 118.513 -9.04222
+C2-C4(N1) 4 84.5564 24.9149
+C2-C4(C7) 4 131.149 -21.6781
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(H3) 4 118.513 -9.04222
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 101.704 7.76757
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C6(C4) 4 117.951 -8.47988
+C5-C9(C4) 4 98.968 10.5032
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 94.0659 15.4053
+C2-N1(C4) 4 92.3523 17.1189
+C2-H3(N1) 4 94.0659 15.4053
+C2-H3(C7) 4 116.525 -7.05349
+C2-C4(N1) 4 92.3523 17.1189
+C2-C4(C7) 4 125.971 -16.5001
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(H3) 4 116.525 -7.05349
+C2-C7(C4) 4 116.825 -7.35366
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 98.3245 11.1467
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C6(C4) 4 117.482 -8.01066
+C5-C9(C4) 4 100.494 8.97739
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 96.9704 12.5008
+C2-N1(C4) 4 96.2792 13.192
+C2-H3(N1) 4 96.9704 12.5008
+C2-H3(C7) 4 115.307 -5.83577
+C2-C4(N1) 4 96.2792 13.192
+C2-C4(C7) 4 123.042 -13.5703
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(H3) 4 115.307 -5.83577
+C2-C7(C4) 4 118.141 -8.6698
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 96.4668 13.0044
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C6(C4) 4 116.858 -7.38724
+C5-C9(C4) 4 101.539 7.93208
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 126.019 -6.0193
+C7-O10(C2) 3 112.188 7.8117
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 98.9049 10.5664
+C2-N1(C4) 4 98.5945 10.8767
+C2-H3(N1) 4 98.9049 10.5664
+C2-C4(N1) 4 98.5945 10.8767
+C2-C4(C7) 4 121.109 -11.6379
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 119.117 -9.64553
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 95.6056 13.8656
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C6(C4) 4 116.164 -6.69283
+C5-C9(C4) 4 102.207 7.26373
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O10(C2) 3 110.456 9.54408
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 100.326 9.14505
+C2-N1(C4) 4 100.126 9.34494
+C2-H3(N1) 4 100.326 9.14505
+C2-C4(N1) 4 100.126 9.34494
+C2-C4(C7) 4 119.71 -10.2388
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 119.859 -10.3876
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 95.4061 14.0651
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C6(C4) 4 115.408 -5.93649
+C5-C9(C4) 4 102.625 6.84643
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O10(C2) 3 114.075 5.92516
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 101.412 8.05886
+C2-N1(C4) 4 101.256 8.2156
+C2-H3(N1) 4 101.412 8.05886
+C2-C4(N1) 4 101.256 8.2156
+C2-C4(C7) 4 118.63 -9.15897
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 120.418 -10.9467
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 95.6501 13.8211
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C9(C4) 4 102.909 6.56191
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 105.651 14.3487
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 102.226 7.24556
+C2-N1(C4) 4 102.172 7.29927
+C2-H3(N1) 4 102.226 7.24556
+C2-C4(N1) 4 102.172 7.29927
+C2-C4(C7) 4 117.763 -8.29158
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 120.837 -11.3654
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 96.1837 13.2876
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C9(C4) 4 103.166 6.30548
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 93.3653 26.6347
+C7-O10(C2) 3 133.415 -13.4151
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 102.823 6.64839
+C2-N1(C4) 4 102.927 6.54452
+C2-H3(N1) 4 102.823 6.64839
+C2-C4(N1) 4 102.927 6.54452
+C2-C4(C7) 4 117.059 -7.58772
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 121.157 -11.6862
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 96.9034 12.5678
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C5-C9(C4) 4 103.478 5.99321
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 82.7333 37.2667
+C7-O10(C2) 3 143.681 -23.6812
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 103.276 6.19559
+C2-N1(C4) 4 103.527 5.94457
+C2-H3(N1) 4 103.276 6.19559
+C2-C4(N1) 4 103.527 5.94457
+C2-C4(C7) 4 116.488 -7.0163
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 121.409 -11.9382
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 97.74 11.7312
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 73.871 46.129
+C7-O10(C2) 3 152.673 -32.6726
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-N1(H3) 4 103.638 5.83326
+C2-H3(N1) 4 103.638 5.83326
+C2-C4(C7) 4 116.02 -6.54837
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 121.63 -12.1588
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 98.6431 10.8281
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 66.3083 53.6917
+C7-O10(C2) 3 160.429 -40.4285
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-C4(C7) 4 115.631 -6.16015
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 121.793 -12.3216
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 99.5806 9.89064
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 59.7157 60.2843
+C7-O10(C2) 3 166.889 -46.8886
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+C2-C4(C7) 4 115.306 -5.83434
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 121.929 -12.4581
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 100.524 8.94747
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 53.9585 66.0415
+C7-O10(C2) 3 170.95 -50.9504
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 121.663 -12.1914
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 101.469 8.00198
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 49.2945 70.7055
+C7-O10(C2) 3 169.19 -49.1899
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 121.772 -12.3006
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 102.362 7.1089
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 46.7679 73.2321
+C7-O10(C2) 3 161.513 -41.5135
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 121.861 -12.3902
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+C4-C5(C2) 4 103.223 6.24822
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 48.7422 71.2578
+C7-O10(C2) 3 149.242 -29.2416
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 121.935 -12.4639
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 57.2438 62.7562
+C7-O10(C2) 3 132.933 -12.9326
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.002 -12.5305
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 68.3416 51.6584
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.064 -12.5928
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 75.4854 44.5146
+C7-O10(C2) 3 106.473 13.5274
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.121 -12.6497
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 78.4826 41.5174
+C7-O10(C2) 3 100.72 19.2802
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.174 -12.7032
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 79.8914 40.1086
+C7-O10(C2) 3 96.8972 23.1028
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.226 -12.755
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 80.93 39.07
+C7-O10(C2) 3 93.7281 26.2719
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.275 -12.8039
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 81.8642 38.1358
+C7-O10(C2) 3 90.9125 29.0875
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.322 -12.8503
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 82.7285 37.2715
+C7-O10(C2) 3 88.3836 31.6164
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.366 -12.8952
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 83.5285 36.4715
+C7-O10(C2) 3 86.1031 33.8969
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.41 -12.9385
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 84.2674 35.7326
+C7-O10(C2) 3 84.0364 35.9636
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.452 -12.9803
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 84.9468 35.0532
+C7-O10(C2) 3 82.1505 37.8495
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C2-C7(C4) 4 122.493 -13.0217
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+C7-O8(C2) 3 85.5707 34.4293
+C7-O10(C2) 3 80.4119 39.5881
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding N1
+Motion includes C2
+Motion includes H3
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C4 excluding C2
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding C2
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding H3
+Motion includes C2
+Motion includes N1
+Motion includes C4
+Motion includes C7
+Motion includes C5
+Motion includes O8
+Motion includes O10
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C2 excluding C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C4 excluding C5
+Motion includes C4
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C5 excluding C6
+Motion includes C5
+Motion includes C4
+Motion includes C9
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C2 excluding C7
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C7 excluding O8
+Motion includes C7
+Motion includes C2
+Motion includes O10
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
+Moving assembly starting with C5 excluding C9
+Motion includes C5
+Motion includes C4
+Motion includes C6
+Motion includes C2
+Motion includes N1
+Motion includes H3
+Motion includes C7
+Motion includes O8
+Motion includes O10
+Moving assembly starting with C7 excluding O10
+Motion includes C7
+Motion includes C2
+Motion includes O8
+Motion includes N1
+Motion includes H3
+Motion includes C4
+Motion includes C5
+Motion includes C6
+Motion includes C9
 leucine bonds can rotate: 
 CA - CB
 CB - CG

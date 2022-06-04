@@ -160,15 +160,31 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		// Make sure we have all the right atoms.
 		Atom* currN = get_atom("N");
 		Atom* prevC = prevaa->get_atom("C");
+		
 		if (!currN || !prevC) return;
+		
 		currN->aromatize();				// Not actually aromatic, but the pi bond geometry is the same.
 		prevC->aromatize();
 		Atom* prevCA = prevaa->get_atom("CA");
 		Atom* prevO  = prevaa->get_atom("O");
+		
 		if (!prevCA || !prevO) return;
+		
 		Atom* currHN = get_atom("HN");
 		if (!currHN) currHN = get_atom("H");
 		Atom* currCA = get_atom("CA");
+		
+		// Proline doesn't have an HN.
+		if (!currHN)
+		{
+			Bond** nb = currN->get_bonds();
+			for (i=0; !currHN && i<3; i++)
+			{
+				if (nb[i]->btom && nb[i]->btom != currCA)
+					currHN = nb[i]->btom;
+			}
+		}
+		
 		if (!currHN || !currCA) return;
 		
 		movability = MOV_ALL;

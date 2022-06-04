@@ -16,7 +16,7 @@ enum bb_rot_dir
 
 class AABondDef
 {
-public:
+	public:
  	char aname[7] = {};
  	char bname[7] = {};
  	float cardinality=0;
@@ -27,7 +27,7 @@ public:
 
 class AADef
 {
-public:
+	public:
  	char _1let = '\0';
  	char _3let[4] = {};
  	char name[20] = {};
@@ -39,7 +39,7 @@ public:
 
 class MetalCoord
 {
-public:
+	public:
  	Atom* metal;
  	Atom** coord_atoms;
  	AminoAcid** coord_res;
@@ -50,7 +50,7 @@ public:
 
 class AminoAcid : public Molecule
 {
-public:
+	public:
  	// Constructors.
  	AminoAcid(FILE* instream);
  	AminoAcid(const char letter, AminoAcid* prev_res=0);
@@ -99,7 +99,7 @@ public:
  	int atno_offset=0;
  	MetalCoord* m_mcoord=0;
 
-protected:
+	protected:
  	void load_aa_defs();
  	void copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs, bool proline_like);
 

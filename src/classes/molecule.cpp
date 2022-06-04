@@ -3257,7 +3257,6 @@ void Molecule::voxel_computation(int iters)
     }
 }
 
-#define _DEV_FIX_MSTRUCT 0
 void Molecule::correct_structure(int iters)
 {
     if (!atoms) return;
@@ -3271,6 +3270,7 @@ void Molecule::correct_structure(int iters)
             Point aloc = atoms[i]->get_location();
             Bond** b = atoms[i]->get_bonds();
             int g = atoms[i]->get_geometry();
+            SCoord* ca2b = atoms[i]->get_geometry_aligned_to_bonds();
 
             for (j=0; j<g; j++)
             {
@@ -3285,6 +3285,12 @@ void Molecule::correct_structure(int iters)
                     // Failed attempt at bond angles.
                     if (iter < (iters-20))
                     {
+                    	Point pta[8];
+                    	int ptaq = 0;
+                    	
+                    	pta[ptaq] = v;
+                    	pta[ptaq++].weight = 10;
+                    	
 		                for (k=0; k<g; k++)
 		                {
 		                	if (k == j) continue;
@@ -3302,26 +3308,11 @@ void Molecule::correct_structure(int iters)
 		                			default:  ;
 		                		}
 
-	                			#if _DEV_FIX_MSTRUCT
-		                		if (fabs(f) > 0.1)
-		                		{
-				            		cout << atoms[i]->name << "-" << b[j]->btom->name << "(" << b[k]->btom->name << ")"
-		                				 << " " << g << " " << theta*fiftyseven << " " << f*fiftyseven << endl;
-		                			
-				            		Point pt(v);
-				            		
-				            		SCoord normal = compute_normal(aloc, bloc, cloc);
-				            		Point pt0 = rotate3D(pt, zero, normal, -0.1*f);
-				            		Point pt1 = rotate3D(pt, zero, normal,  0.1*f);
-				            		
-				            		float r0 = pt0.get_3d_distance(cloc);
-				            		float r1 = pt1.get_3d_distance(cloc);
-				            		
-				            		v = (r0 > r1) ? pt0 : pt1;
-			            		}
-			            		#endif
+		                		if (fabs(f) > 0.1) pta[ptaq++] = ca2b[k]; 
 		                	}
 		                }
+		                
+		                if (ptaq) v = average_of_points(pta, ptaq);
 	                }
 
                     v.r = optimal; // += 0.1 * (optimal-v.r);

@@ -45,7 +45,6 @@ public:
     int get_start_resno();
     AminoAcid* get_residue(int resno);
     Molecule* metals_as_molecule();
-    AminoAcid** get_residues_can_clash(int resno);
     bool aa_ptr_in_range(AminoAcid* aaptr);
     Region get_region(std::string name);
     int get_region_start(std::string name);
@@ -57,6 +56,7 @@ public:
     float get_internal_clashes();
     float get_intermol_clashes(const Molecule* ligand);
     float get_intermol_binding(const Molecule* ligand);
+    AminoAcid** get_residues_can_clash(int resno);
     int get_residues_can_clash_ligand
     (	AminoAcid** reaches_spheroid,
         const Molecule* ligand,
@@ -65,8 +65,12 @@ public:
         const int* mcoord_resno
     );
     float get_helix_orientation(int startres, int endres);
+    Point get_region_center(int startres, int endres);
 
     // Motion functions
+    void move_piece(int start_res, int end_res, Point new_center);		// After calling this, reconnect the broken ends with conform_backbone().
+    void rotate_piece(int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.
+    
     void rotate_backbone(int residue_no, bb_rot_dir direction, float angle);
     void rotate_backbone_partial(int startres, int endres, bb_rot_dir direction, float angle);
     void conform_backbone(int startres, int endres, int iters = 50, bool backbone_atoms_only = false);

@@ -1176,6 +1176,27 @@ int Protein::get_region_end(const std::string name)
 	return rgn.end;
 }
 
+Point Protein::get_region_center(int startres, int endres)
+{
+	int rglen = endres-startres;
+	Point range[rglen+4];
+	
+	int i;
+	for (i=0; i<rglen; i++)
+	{
+		// This is slow but that's okay. Moi aussi. J'en ai marre d'être une attardée.
+		range[i] = get_residue(startres+i)->get_barycenter();
+	}
+	
+	return average_of_points(range, rglen);
+}
+
+
+
+
+
+
+
 
 
 

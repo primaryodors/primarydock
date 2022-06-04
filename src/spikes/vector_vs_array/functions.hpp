@@ -1,3 +1,3 @@
 #pragma once
 
-void hello();
+float vector_summer(int n);

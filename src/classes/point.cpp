@@ -105,11 +105,11 @@ std::string Point::printable() const
     return buffer.str();
 }
 
-char* SCoord::printable() const
+std::string SCoord::printable() const
 {
-    char* buffer = new char[256] {};
-    sprintf(buffer, "[φ=%f°, θ=%f°, r=%f]", phi*180/M_PI, theta*180/M_PI, r);
-    return buffer;
+    std::stringstream buffer;
+    buffer << "[φ=" << phi*180/M_PI << ",θ=" << theta*180/M_PI << ",r=" << r << "]";
+    return buffer.str();
 }
 
 char* Rotation::printable()
@@ -696,12 +696,7 @@ std::ostream& operator<<(std::ostream& os, const Point& p)
 
 std::ostream& operator<<(std::ostream& os, const SCoord& v)
 {
-    char* str = v.printable();
-    if (str)
-    {
-        os << str;
-        delete str;
-    }
+    os << v.printable();
     return os;
 }
 

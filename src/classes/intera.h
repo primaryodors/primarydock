@@ -40,7 +40,7 @@ public:
         return dirprop;
     }
 
-    char* get_config_string() const;
+    std::string get_config_string() const;
 
     static bool atom_is_capable_of(Atom* a, intera_type t);
     static InteratomicForce** get_applicable(Atom* a, Atom* b);

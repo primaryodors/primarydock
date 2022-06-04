@@ -743,7 +743,7 @@ float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type bty
     throw BOND_DEF_NOT_FOUND;
 }
 
-char* InteratomicForce::get_config_string() const
+std::string InteratomicForce::get_config_string() const
 {
     char buffer[128];
     const char* bondchrs[5] = {"", "-", "=", "#", "$"};
@@ -766,9 +766,8 @@ char* InteratomicForce::get_config_string() const
             distance,
             kJ_mol
            );
-    char* retval = new char[strlen(buffer)+1] {};
-    strcpy(retval, buffer);
-    return retval;
+    std::string returnValue = buffer;
+    return returnValue;
 }
 
 std::ostream& operator<<(std::ostream& os, const intera_type& it)
@@ -805,12 +804,7 @@ std::ostream& operator<<(std::ostream& os, const intera_type& it)
 
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& f)
 {
-    char* str = f.get_config_string();
-    if (str)
-    {
-        os << str;
-        delete str;
-    }
+    os << f.get_config_string();
     return os;
 }
 

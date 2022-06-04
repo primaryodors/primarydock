@@ -33,7 +33,7 @@ void array_test() {
         cout
                 << "i=" << i
                 << ",n=" << n
-                << ",kind=std::vector"
+                << ",kind=array"
                 << ",time=" << time_us << "µs"
                 << ",time/n=" << time_us / (float)n
                 << endl;

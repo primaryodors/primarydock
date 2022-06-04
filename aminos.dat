@@ -60,12 +60,12 @@ N		ASN		asparagine	N		<C	1.5		0		N[C@H](C(=O)O)CC(=O)N
 "		"		"			HB1		CB	1		0		@4
 "		"		"			HB2		CB	1		0		@4
 "		"		"			CG		CB	1		0		=5
-"		"		"			OD1		CG	1.5		-0.5	=10
+"		"		"			OD1		CG	1.5		-0.5	=9
 "		"		"			ND2		CG	1.5		0		=6
 "		"		"			1HD2	ND2	1		+0.25	@6
 "		"		"			2HD2	ND2	1		+0.25	@6
 "		"		"			C		CA	1		0		=7
-"		"		"			O		C	1.5		-0.5	=9
+"		"		"			O		C	1.5		-0.5	=10
 
 D		ASP	aspartic_acid	N		<C	1.5		0		N[C@H](C(=O)O)CC(=O)[O-]
 "		"		"			HN		N	1		+0.5	@1
@@ -76,9 +76,9 @@ D		ASP	aspartic_acid	N		<C	1.5		0		N[C@H](C(=O)O)CC(=O)[O-]
 "		"		"			HB2		CB	1		0		@4
 "		"		"			CG		CB	1		0		=5
 "		"		"			OD1		CG	1.5		-0.5	=6
-"		"		"			OD2		CG	1.5		-0.5	=10
+"		"		"			OD2		CG	1.5		-0.5	=9
 "		"		"			C		CA	1		0		=7
-"		"		"			O		C	1.5		-0.5	=9
+"		"		"			O		C	1.5		-0.5	=10
 
 C		CYS		cysteine	N		<C	1.5		0		N[C@H](C(=O)O)CS
 "		"		"			HN		N	1		+0.5	@1
@@ -104,9 +104,9 @@ E		GLU	glutamic_acid	N		<C	1.5		0		N[C@H](C(=O)O)CCC(=O)[O-]
 "		"		"			HG2		CG	1		0		@5
 "		"		"			CD		CG	1		0		=6
 "		"		"			OE1		CD	1.5		-0.5	=7
-"		"		"			OE2		CD	1.5		-0.5	=11
+"		"		"			OE2		CD	1.5		-0.5	=10
 "		"		"			C		CA	1		0		=8
-"		"		"			O		C	1.5		-0.5	=10
+"		"		"			O		C	1.5		-0.5	=11
 
 Q		GLN		glutamine	N		<C	1.5		0		N[C@H](C(=O)O)CCC(=O)N
 "		"		"			HN		N	1		+0.5	@1
@@ -119,12 +119,12 @@ Q		GLN		glutamine	N		<C	1.5		0		N[C@H](C(=O)O)CCC(=O)N
 "		"		"			HG1		CG	1		0		@5
 "		"		"			HG2		CG	1		0		@5
 "		"		"			CD		CG	1		0		=6
-"		"		"			OE1		CD	1.5		-0.5	=11
+"		"		"			OE1		CD	1.5		-0.5	=10
 "		"		"			NE2		CD	1.5		0		=7
 "		"		"			1HE2	NE2	1		+0.25	@7
 "		"		"			2HE2	NE2	1		+0.25	@7
 "		"		"			C		CA	1		0		=8
-"		"		"			O		C	1.5		-0.5	=10
+"		"		"			O		C	1.5		-0.5	=11
 
 G		GLY		glycine		N		<C	1.5		0		NCC(=O)O
 "		"		"			HN		N	1		+0.5	@1

@@ -6,7 +6,7 @@ The following terms are used by POdock and generally in molecular docking/comput
 
 Activation
 
-A conformational change (i.e. change of shape) in a receptor caused by its interaction with whatever it is sensitive to. 
+A conformational change (i.e. a slight change of shape) in a receptor caused by its interaction with whatever it is sensitive to. 
 
 
 Amino Acid
@@ -172,6 +172,11 @@ An ionic bond between a positively charged basic (alkaline) moiety and a negativ
 SDF
 
 A file format for representing small to medium sized molecules (under a thousand atoms). It is a standard format for storing molecular structures and is described here: https://www.nonlinear.com/progenesis/sdf-studio/v0.9/faq/sdf-file-format-guidance.aspx
+
+
+Sequence
+
+The exact order of amino acid residues in a protein, or of nucleotide bases in a gene. Sequences are often given as one letter per residue, with each amino acid having its own designated letter.
 
 
 Side Chain

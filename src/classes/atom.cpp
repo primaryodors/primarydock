@@ -465,7 +465,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     Atom** atoms = palin->get_moves_with_btom();
     if (!atoms) return 0;
 
-    cout << "Moving assembly starting with " << name << " excluding " << excluding->name << endl;
+    //cout << "Moving assembly starting with " << name << " excluding " << excluding->name << endl;
 
     int i, atomct=0;
     SCoord mov, alignv;
@@ -483,7 +483,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     a0loc = rotate3D(&a0loc, pt, &rot);
     location = a0loc;
     atomct++;
-    cout << "Motion includes " << name << endl;
+    //cout << "Motion includes " << name << endl;
 
     for (i=0; atoms[i]; i++)
     {
@@ -494,7 +494,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
         atoms[i]->location = aloc;
         atoms[i]->geov = NULL;
         atomct++;
-        cout << "Motion includes " << atoms[i]->name << endl;
+        //cout << "Motion includes " << atoms[i]->name << endl;
     }
 
     return atomct;
@@ -696,40 +696,40 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
             {
                 switch (Z)
                 {
-                case 7:
+                	case 7:
                     polarity = -0.9;
                     lbtom->polarity = 0.9;
                     lbtom->acidbase = 1;
                     acidbase = 1;
                     break;
 
-                case 15:
+                	case 15:
                     polarity = -0.5;
                     lbtom->polarity = 0.5;
                     lbtom->acidbase = 0.75;
                     acidbase = 0.75;
                     break;
 
-                case 8:
-                case 9:
-                case 17:
-                case 35:
-                case 53:
-                case 85:
-                case 117:
+		            case 8:
+		            case 9:
+		            case 17:
+		            case 35:
+		            case 53:
+		            case 85:
+		            case 117:
                     polarity = -1;
                     lbtom->polarity = 1;
                     break;
 
-                case 16:
-                case 34:
+		            case 16:
+		            case 34:
                     polarity = -0.25;
                     lbtom->polarity = 0.25;
                     thiol = -1;
                     lbtom->thiol = 1;
                     break;
 
-                default:
+                	default:
                     break;
                 }
             }
@@ -914,6 +914,7 @@ void Bond::fill_moves_with_cache()
                 for (i=0; b[i]; i++)
                 {
                     //if (b[i]->btom) cout << "(" << b[i]->btom->name << "?) ";
+                    if (!atom->ring_member && (b[i]->btom == atom)) atom->ring_member++;
                     if (b[i]->btom && !b[i]->btom->used && b[i]->btom != atom)
                     {
                         attmp[tmplen++] = b[i]->btom;

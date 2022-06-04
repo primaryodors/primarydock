@@ -10,7 +10,7 @@
 class Atom;
 class Bond
 {
-public:
+	public:
     Atom* atom = 0;
     Atom* btom = 0;
     float cardinality=0;			// aromatic bonds = 1.5.
@@ -30,14 +30,16 @@ public:
     int count_moves_with_btom();
     void swing(SCoord newdir);		// Rotate btom, and all its moves_with atoms, about atom so that the bond points to newdir.
 
-protected:
+	protected:
     void fill_moves_with_cache();
     Atom** moves_with_btom = 0;
 };
 
 class Atom
 {
-public:
+	friend class Bond;
+	
+	public:
     // Constructors and destructors.
     Atom(const char* elem_sym);
     Atom(const char* elem_sym, const Point* location);
@@ -54,33 +56,39 @@ public:
     Point get_location();
     float get_vdW_radius()    {        return vdW_rad;    }
     float get_atomic_weight()    {        return at_wt;    }
-    float get_charge();
     float get_acidbase();
+    float get_charge();
     float is_polar();						// -1 if atom is H-bond acceptor; +1 if donor.
-    int is_thio();							// -1 if atom is S; +1 if atom is H of a sulfhydryl.
     bool is_metal();
+    int is_thio();							// -1 if atom is S; +1 if atom is H of a sulfhydryl.
     bool is_pi();
+    int num_rings()	{	return ring_member;	}
 
     // Setters.
-    void set_acidbase(float ab)    {        acidbase = ab;    }
     void set_aa_properties();
+    void set_acidbase(float ab)    {        acidbase = ab;    }
     void clear_all_moves_cache();
     void increment_charge(float lcharge)    {        charge += lcharge;    }
 
     // Bond functions.
     Bond** get_bonds();
     int get_bonded_atoms_count();
+
     bool bond_to(Atom* btom, float cardinality);
     void unbond(Atom* btom);
+
     float is_bonded_to(Atom* btom);			// If yes, return the cardinality.
     Atom* is_bonded_to(const char* element);
     Atom* is_bonded_to(const char* element, const int cardinality);
     Atom* is_bonded_to(const int family);
+
     bool shares_bonded_with(Atom* btom);
+
     Bond* get_bond_between(Atom* btom);
     Bond* get_bond_between(const char* bname);
     Bond* get_bond_by_idx(int bidx);
     int get_idx_bond_between(Atom* btom);
+
     void aromatize()
     {
         geometry=3;
@@ -135,7 +143,8 @@ public:
     bool EZ_flip = false;
     float last_bind_energy=0;
 
-protected:
+	protected:
+	int ring_member = 0;				// How many rings is this atom part of.
     void figure_out_valence();
     int Z=0;
     Point location;

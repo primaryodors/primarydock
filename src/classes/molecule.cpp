@@ -2448,7 +2448,7 @@ bool Molecule::from_smiles(char const * smilesstr)
     }
 
     delete[] paren;
-    fix_bond_lengths(200);
+    correct_structure(50);
     hydrogenate();
 
     // voxel_computation(5);
@@ -3257,10 +3257,12 @@ void Molecule::voxel_computation(int iters)
     }
 }
 
-void Molecule::fix_bond_lengths(int iters)
+#define _DEV_FIX_MSTRUCT 0
+void Molecule::correct_structure(int iters)
 {
     if (!atoms) return;
-    int iter, i, j;
+    int iter, i, j, k;
+    Point zero(0,0,0);
 
     for (iter=0; iter<iters; iter++)
     {
@@ -3277,12 +3279,60 @@ void Molecule::fix_bond_lengths(int iters)
                     Point bloc = b[j]->btom->get_location();
                     SCoord v(bloc.subtract(aloc));
                     float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+                    
+                    if (g == 4 && b[j]->cardinality > 1 && b[j]->cardinality <= 2) atoms[i]->aromatize();
+                    
+                    // Failed attempt at bond angles.
+                    if (iter < (iters-20))
+                    {
+		                for (k=0; k<g; k++)
+		                {
+		                	if (k == j) continue;
+		                	if (b[k]->btom)
+		                	{
+		                		Point cloc = b[k]->btom->get_location();
+		                		float f=0, theta = find_3d_angle(bloc, cloc, aloc);
+		                		
+		                		switch (g)
+		                		{
+		                			case 2:   f = M_PI          - theta;	break;		                			
+		                			case 3:   f = triangular    - theta;	break;		                			
+		                			case 4:   f = tetrahedral   - theta;	break;		                			
+		                			case 6:   f = square        - theta;	break;		                			
+		                			default:  ;
+		                		}
 
-                    v.r += 0.1 * (optimal-v.r);
+	                			#if _DEV_FIX_MSTRUCT
+		                		if (fabs(f) > 0.1)
+		                		{
+				            		cout << atoms[i]->name << "-" << b[j]->btom->name << "(" << b[k]->btom->name << ")"
+		                				 << " " << g << " " << theta*fiftyseven << " " << f*fiftyseven << endl;
+		                			
+				            		Point pt(v);
+				            		
+				            		SCoord normal = compute_normal(aloc, bloc, cloc);
+				            		Point pt0 = rotate3D(pt, zero, normal, -0.1*f);
+				            		Point pt1 = rotate3D(pt, zero, normal,  0.1*f);
+				            		
+				            		float r0 = pt0.get_3d_distance(cloc);
+				            		float r1 = pt1.get_3d_distance(cloc);
+				            		
+				            		v = (r0 > r1) ? pt0 : pt1;
+			            		}
+			            		#endif
+		                	}
+		                }
+	                }
 
-                    // TODO: Bond angles.
+                    v.r = optimal; // += 0.1 * (optimal-v.r);
 
-                    b[j]->btom->move(aloc.add(v));
+                    if (atoms[i]->num_rings())
+                    	b[j]->btom->move(aloc.add(v));
+                    else
+                    {
+		                Point pt(aloc.add(v));
+		                b[j]->btom->move_assembly(&pt, atoms[i]);
+	                }
                 }
             }
         }

@@ -33,6 +33,20 @@ float vector_ranged_forloop(int n) {
     return sum;
 }
 
+float vector_preallocated_ranged_forloop(int n) {
+    std::vector<int> integers(n);
+
+    for (int i = 1; i <= n; i++)
+        integers[i-1] = i;
+
+    float sum = 0;
+    for (auto value: integers)
+        sum += (float)value;
+
+    return sum;
+}
+
+
 float array_summer(int n) {
     int* integers = new int[n];
 

@@ -16,3 +16,4 @@ cmake-*
 bin/
 obj/
 *.dSYM/
+build/

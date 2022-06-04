@@ -23,14 +23,13 @@ struct DockResult
     float bytype[_INTER_TYPES_LIMIT];
 };
 
-char* get_file_ext(char* filename)
+string get_file_ext(char* filename)
 {
-    int i = strlen(filename)-1;
-    for (; i>=0; i--)
-    {
-        if (filename[i] == '.') return &filename[i+1];
-    }
-    return 0;
+    auto asString = std::string(filename);
+    unsigned long dotPos = asString.find_last_of('.');
+    if(dotPos == string::npos)
+        return "";
+    return asString.substr(dotPos + 1);
 }
 
 Protein* protein;
@@ -269,8 +268,8 @@ int main(int argc, char** argv)
     // Load the ligand or return an error.
     Molecule m(ligfname);
     ligand = &m;
-    char* ext = get_file_ext(ligfname);
-    if (!ext)
+    std::string ext = get_file_ext(ligfname);
+    if (ext.empty())
     {
         cout << "Ligand file is missing its extension! " << ligfname << endl;
         return 0xbadf12e;

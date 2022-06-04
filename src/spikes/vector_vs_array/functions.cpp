@@ -7,18 +7,45 @@
 // with the integers, then loop through them accumulating
 // into a float variable!
 
-float vector_summer(int n) {
+float vector_traditional_forloop(int n) {
     std::vector<int> integers;
 
     for (int i = 1; i <= n; i++)
         integers.push_back(i);
 
     float sum = 0;
-    for (int i = 1; i <= n; i++)
+    for (int i = 0; i < n; i++)
         sum += (float)integers[i];
 
     return sum;
 }
+
+float vector_ranged_forloop(int n) {
+    std::vector<int> integers;
+
+    for (int i = 1; i <= n; i++)
+        integers.push_back(i);
+
+    float sum = 0;
+    for (auto value: integers)
+        sum += (float)value;
+
+    return sum;
+}
+
+float vector_preallocated_ranged_forloop(int n) {
+    std::vector<int> integers(n);
+
+    for (int i = 1; i <= n; i++)
+        integers[i-1] = i;
+
+    float sum = 0;
+    for (auto value: integers)
+        sum += (float)value;
+
+    return sum;
+}
+
 
 float array_summer(int n) {
     int* integers = new int[n];

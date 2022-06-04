@@ -10,7 +10,7 @@
 
 using namespace std;
 
-float total_binding_by_type[_INTER_TYPES_LIMIT] = {};
+float total_binding_by_type[_INTER_TYPES_LIMIT];
 
 void InteratomicForce::read_all_forces()
 {
@@ -37,7 +37,7 @@ void InteratomicForce::read_all_forces()
                 {
                     if (!forces_by_Z[all_forces[ifcount]->Za][all_forces[ifcount]->Zb])
                     {
-                        forces_by_Z[all_forces[ifcount]->Za][all_forces[ifcount]->Zb] = new InteratomicForce*[16] {};
+                        forces_by_Z[all_forces[ifcount]->Za][all_forces[ifcount]->Zb] = new InteratomicForce*[16];
                         for (i=0; i<16; i++)
                             forces_by_Z[all_forces[ifcount]->Za][all_forces[ifcount]->Zb][i] = 0;
                     }
@@ -54,7 +54,7 @@ void InteratomicForce::read_all_forces()
 
                     if (!forces_by_Z[all_forces[ifcount]->Zb][all_forces[ifcount]->Za])
                     {
-                        forces_by_Z[all_forces[ifcount]->Zb][all_forces[ifcount]->Za] = new InteratomicForce*[16] {};
+                        forces_by_Z[all_forces[ifcount]->Zb][all_forces[ifcount]->Za] = new InteratomicForce*[16];
                         for (i=0; i<16; i++)
                             forces_by_Z[all_forces[ifcount]->Zb][all_forces[ifcount]->Za][i] = 0;
                     }
@@ -291,7 +291,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         }
     }
 
-    InteratomicForce** retval = new InteratomicForce*[16] {};
+    InteratomicForce** retval = new InteratomicForce*[16];
     int i, j=0;
 
     // Charged atoms always attract or repel, irrespective of Z.
@@ -406,7 +406,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 
 SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
 {
-    SCoord* retval = new SCoord[5] {};
+    SCoord* retval = new SCoord[5];
     int i;
     Point pt[5];
 
@@ -676,7 +676,7 @@ float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
 float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, int cardinality)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
-    InteratomicForce** retval = new InteratomicForce*[16] {};
+    InteratomicForce** retval = new InteratomicForce*[16];
 
     int i, j=0;
     for (i=0; all_forces[i]; i++)
@@ -711,7 +711,7 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, int cardinality)
 float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type btype)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
-    InteratomicForce** retval = new InteratomicForce*[16] {};
+    InteratomicForce** retval = new InteratomicForce*[16];
 
     int i, j=0;
     for (i=0; all_forces[i]; i++)

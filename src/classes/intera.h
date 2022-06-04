@@ -70,7 +70,7 @@ SCoord* get_geometry_for_pi_stack(SCoord* in_geometry);
 
 static InteratomicForce intertmp;
 static InteratomicForce* all_forces[65536];
-static InteratomicForce** forces_by_Z[36][36] = {};				// Good for H thru Br. Includes BCNOFPSKNaClBrMgCaFeCuZn.
+static InteratomicForce** forces_by_Z[36][36];				// Good for H thru Br. Includes BCNOFPSKNaClBrMgCaFeCuZn.
 static bool read_forces_dat = false;
 static bool reading_forces = false;
 std::ostream& operator<<(std::ostream& os, const intera_type& it);

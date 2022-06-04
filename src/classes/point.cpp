@@ -114,7 +114,7 @@ std::string SCoord::printable() const
 
 char* Rotation::printable()
 {
-    char* buffer = new char[256] {};
+    char* buffer = new char[256];
     sprintf(buffer, "[φ=%f°, θ=%f°, a=%f°]", v.phi*180/M_PI, v.theta*180/M_PI, a*180/M_PI);
     return buffer;
 }
@@ -412,7 +412,7 @@ Rotation align_points_3d(Point* point, Point* align, Point* center)
 
 Rotation* align_2points_3d(Point* point1, Point* align1, Point* point2, Point* align2, Point* center)
 {
-    Rotation* retval = new Rotation[2] {};
+    Rotation* retval = new Rotation[2];
     retval[0] = align_points_3d(point1, align1, center);
 
     Point point2a = rotate3D(point2, center, &retval[0]);
@@ -528,7 +528,7 @@ int in_array(Star needle, Star* haystack)
 
 char** chop_spaced_fields(char* line, char separator)
 {
-    char** retval = new char*[100] {};
+    char** retval = new char*[100];
     int i, j=0;
 
     if (separator == ' ' && line[0] == '\t') line[0] = separator;
@@ -710,7 +710,7 @@ Star* array_unique(Star* inp)
 {
     int i, k=0;
 
-    Star buffer[16384] = {};
+    Star buffer[16384];
     for (i=0; inp[i].n; i++)
     {
         if (!in_array(inp[i], buffer))

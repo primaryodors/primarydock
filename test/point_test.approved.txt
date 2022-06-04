@@ -4,7 +4,7 @@ Point pt is not in bounding box [pt1, pt2].
 Point pt3 is in bounding box [pt1, pt2].
 Points pt and pt1 are 90 degrees apart relative to [0,0,0].
 SCoord v from point pt5 has r=3.55809, theta=60.6047, phi=246.371.
-Point pt6 from SCoord v is 3.57628e-07 Angstroms from pt5.
+Point pt6 from SCoord v is 3.9984e-07 Angstroms from pt5.
 Rotation 0 points are 0 degrees apart.
 Rotation 5.72958 points are 5.72957 degrees apart.
 Rotation 11.4592 points are 11.4592 degrees apart.
@@ -17,7 +17,7 @@ Rotation 45.8366 points are 45.8366 degrees apart.
 Rotation 51.5662 points are 51.5662 degrees apart.
 Rotation 57.2958 points are 57.2958 degrees apart.
 Rotation 63.0254 points are 63.0254 degrees apart.
-Rotation 68.7549 points are 68.755 degrees apart.
+Rotation 68.7549 points are 68.7549 degrees apart.
 Rotation 74.4845 points are 74.4845 degrees apart.
 Rotation 80.2141 points are 80.2141 degrees apart.
 Rotation 85.9437 points are 85.9437 degrees apart.

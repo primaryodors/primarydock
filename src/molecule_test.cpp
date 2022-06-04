@@ -136,7 +136,7 @@ int main(int argc, char** argv)
         m2.hydrogenate();
     }
 
-    cout << "Loaded test ligand. Intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
+    cout << "Loaded test ligand. Intermol clashes: " << (int)m1.get_intermol_clashes(&m2) << " cu. A." << endl;
 
 
 

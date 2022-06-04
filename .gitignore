@@ -13,4 +13,6 @@ cmake-*
 *.gcov
 *.gcno
 *.gcda
-bktest
+bin/
+obj/
+*.dSYM/

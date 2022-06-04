@@ -52,8 +52,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	from_smiles(aa_defs[idx].SMILES.c_str());
     	
     	// Atom names.
-    	Atom** atoms_new = new Atom*[get_atom_count()+4]{};
-    	bool used[get_atom_count()+4]{};
+    	Atom** atoms_new = new Atom*[get_atom_count()+4];
+    	bool used[get_atom_count()+4];
     	l=0;
     	// for (j=0; atoms[j]; j++) cout << atoms[j]->name << " ";
     	// cout << endl;
@@ -260,7 +260,7 @@ Molecule** AminoAcid::aas_to_mols(AminoAcid** aas)
 	if (!aas) return NULL;
 	int i, j;
 	for (i=0; aas[i]; i++);
-	Molecule** mols = new Molecule*[i+4]{};
+	Molecule** mols = new Molecule*[i+4];
 	for (j=0; j<i; j++)
 	{
 		mols[j] = aas[j];
@@ -285,7 +285,7 @@ int AminoAcid::from_pdb(FILE* is)
     /*
     ATOM     55  SG  CYS     4       6.721  -8.103   4.542  1.00001.00           S
     */
-    char buffer[1024] = {}, res3let[5] = {};
+    char buffer[1024], res3let[5];
     int added=0, lasttell=0;
     residue_no=0;
 
@@ -378,7 +378,7 @@ int AminoAcid::from_pdb(FILE* is)
                         {
                             a->aaletter = aa_defs[i]._1let;
                             aaa = &aa_defs[i];
-                            name = new char[10] {}; // aa_defs[i].name;
+                            name = new char[10]; // aa_defs[i].name;
                             sprintf(name, "%s%d", aa_defs[i]._3let, atoi(fields[4]));
                             break;
                         }
@@ -439,7 +439,7 @@ void AminoAcid::copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbd
 {
     int lidx = (letter & 0x5f) - 'A';
     if (lidx<0 || lidx>26) return;
-    aa_defs[lidx].aabonds = new AABondDef*[tbdctr+1] {};
+    aa_defs[lidx].aabonds = new AABondDef*[tbdctr+1];
     int j;
     for (j=0; j<tbdctr; j++)
     {
@@ -492,7 +492,7 @@ void AminoAcid::load_aa_defs()
                         proline_like = false;
 
                         if (tmpbdefs) delete tmpbdefs;
-                        tmpbdefs = new AABondDef*[256] {};
+                        tmpbdefs = new AABondDef*[256];
                     }
 
                     // i = (fields[0][0] & 0x5f) - 'A';
@@ -612,7 +612,7 @@ void AminoAcid::load_aa_defs()
 
                 if (!lastfields[0])
                     for (i=0; i<16; i++)
-                        lastfields[i] = new char[256] {};
+                        lastfields[i] = new char[256];
 
                 for (i=0; fields[i]; i++)
                 {
@@ -769,7 +769,7 @@ Atom* AminoAcid::next_residue_N()
 LocRotation* AminoAcid::flatten()
 {
 	Bond* b;
-    LocRotation* retval = new LocRotation[5] {};
+    LocRotation* retval = new LocRotation[5];
     if (m_mcoord) return retval;	// NO.
     
     retval[0] = rotate_backbone_abs(N_asc, M_PI);

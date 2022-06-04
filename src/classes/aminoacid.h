@@ -17,8 +17,8 @@ enum bb_rot_dir
 class AABondDef
 {
 public:
- 	char aname[7] = {};
- 	char bname[7] = {};
+ 	char aname[7];
+ 	char bname[7];
  	float cardinality=0;
  	float acharge=0;
  	bool can_rotate=false;
@@ -29,8 +29,8 @@ class AADef
 {
 public:
  	char _1let = '\0';
- 	char _3let[4] = {};
- 	char name[20] = {};
+ 	char _3let[4];
+ 	char name[20];
  	float reach = 2.5;
  	AABondDef** aabonds=0;
  	bool proline_like = false;
@@ -104,7 +104,7 @@ protected:
  	void copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs, bool proline_like);
 
  	int residue_no=0;
- 	char region[25] {};
+ 	char region[25];
  	AADef* aadef=0;
  	AminoAcid *prev_aa=0, *next_aa=0;
 };

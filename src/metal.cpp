@@ -31,8 +31,8 @@ int main(int argc, char** argv)
 
     char* inpfile = NULL;
     char* outfile = NULL;
-    int mcoordres[8] {};
-    char* mcoorda[8] {};
+    int mcoordres[8];
+    char* mcoorda[8];
     char* esym = NULL;
     int i, j, charge=2;
     Point pocketcen;
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
         
         for (i=1; i<=7; i++)
         {
-            char rgname[10] {};
+            char rgname[10];
             sprintf(rgname, "TMR%d", i);
             Region rgn = p.get_region(rgname);
             float turn = (i & 1) ? -360 : 0;
@@ -213,7 +213,7 @@ int main(int argc, char** argv)
     if (dohelix)
     {
         cout << "Moving the start of the helix to above TMR5." << endl;
-        Point foravg[8]{};
+        Point foravg[8];
         int avgi = 0;
         foravg[avgi++] = p.get_atom_location(endres+1, "CA");
         foravg[avgi++] = p.get_atom_location(endres+2, "CA");

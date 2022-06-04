@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     p.add_sequence(argv[seqarg]);
     p.set_clashables();
 
-	char outfn[32]{};
+	char outfn[32];
     p.make_helix(1, p.get_seq_length(), M_PI, M_PI);
     strcpy(outfn, "test.pdb");
     FILE* pf = fopen(outfn, "wb");

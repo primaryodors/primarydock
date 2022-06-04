@@ -19,3 +19,16 @@ float vector_summer(int n) {
 
     return sum;
 }
+
+float array_summer(int n) {
+    int integers[n];
+
+    for (int i = 1; i <= n; i++)
+        integers[i] = i;
+
+    float sum = 0;
+    for (int i = 1; i <= n; i++)
+        sum += (float)integers[i];
+
+    return sum;
+}

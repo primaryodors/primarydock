@@ -21,3 +21,6 @@ add_executable(vector_vs_array main.cpp)
 
 # This is how to link a library to an application
 target_link_libraries(vector_vs_array library)
+
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+

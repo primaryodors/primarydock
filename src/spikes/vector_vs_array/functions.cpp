@@ -21,14 +21,15 @@ float vector_summer(int n) {
 }
 
 float array_summer(int n) {
-    int integers[n];
+    int* integers = new int[n];
 
-    for (int i = 1; i <= n; i++)
+    for (int i = 0; i < n; i++)
         integers[i] = i;
 
     float sum = 0;
-    for (int i = 1; i <= n; i++)
+    for (int i = 0; i < n; i++)
         sum += (float)integers[i];
 
+	delete integers;
     return sum;
 }

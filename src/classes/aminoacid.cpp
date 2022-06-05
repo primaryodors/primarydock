@@ -276,21 +276,24 @@ int AminoAcid::from_pdb(FILE* is)
     /*
     ATOM     55  SG  CYS     4       6.721  -8.103   4.542  1.00001.00           S
     */
-    char buffer[1024], res3let[5];
+    char buffer[1024], origbuf[1024], res3let[5];
     int added=0, lasttell=0;
     residue_no=0;
+    res3let[0] = 0;
 
     while (!feof(is))
     {
         lasttell = ftell(is);
         fgets(buffer, 1003, is);
+        int thistell = ftell(is);
+        strcpy(origbuf, buffer);
         char** fields = chop_spaced_fields(buffer);
 
         if (fields)
         {
             if (!strcmp(fields[0], "ATOM")
-                    ||
-                    !strcmp(fields[0], "HETATM")
+                ||
+                !strcmp(fields[0], "HETATM")
                )
             {
                 try
@@ -320,11 +323,13 @@ int AminoAcid::from_pdb(FILE* is)
                     if (!atno_offset) atno_offset = atoi(fields[1]);
 
                     if (strcmp(res3let, fields[3])
-                            ||
-                            residue_no != atoi(fields[4])
+                        ||
+                        residue_no != atoi(fields[4])
                        )
                     {
-                        fseek(is, lasttell, SEEK_SET);
+                    	/*cout << res3let << "/" << fields[3] << " | " << residue_no << "/" << fields[4] << " | "
+                    		 << origbuf << endl << flush;*/
+                        fseek(is, thistell, SEEK_SET);
                         goto _return_added;
                     }
 
@@ -377,7 +382,7 @@ int AminoAcid::from_pdb(FILE* is)
 
                     if (!aaa)
                     {
-                        fseek(is, lasttell, SEEK_SET);
+                        fseek(is, thistell, SEEK_SET);
                         delete[] fields;
                         throw ATOM_NOT_OF_AMINO_ACID;
                     }

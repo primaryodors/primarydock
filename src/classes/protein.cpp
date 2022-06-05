@@ -159,6 +159,7 @@ int Protein::load_pdb(FILE* is)
         try
         {
             AminoAcid* aa = new AminoAcid(is);
+            // cout << rescount << " " << flush;
             restmp[rescount++] = aa;
         }
         catch (int ex)

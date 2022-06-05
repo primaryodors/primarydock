@@ -1464,7 +1464,7 @@ void Molecule::move(SCoord move_amt)
     if (!atoms) return;
     if (immobile)
     {
-        cout << "=^o.0^= ";
+        cout << "Warning: Attempt to move \"immobile\" molecule " << name << endl;
         return;
     }
     int i;
@@ -1483,7 +1483,7 @@ void Molecule::move(Point move_amt)
     if (!atoms) return;
     if (immobile)
     {
-        cout << "=^o.0^= ";
+        cout << "Warning: Attempt to move \"immobile\" molecule " << name << endl;
         return;
     }
     int i;

@@ -68,7 +68,23 @@ bool Protein::add_residue(const int resno, const char aaletter)
     }
 
     i = resno-1;
-    residues[i] = new AminoAcid(aaletter, i ? residues[i-1] : 0);
+    
+    if (i)
+    {
+    	LocatedVector lv = residues[i-1]->predict_next_NH();
+    	residues[i] = new AminoAcid(aaletter, residues[i-1]);
+    	
+    	Atom* a = residues[i]->get_atom("N");
+    	if (a)
+    	{
+    		float r = lv.origin.get_3d_distance(a->get_location());
+    		if (fabs(r) >= 0.01) cout << "Warning: Residue " << resno << " N location is off by " << r << "A." << endl;
+    	}
+    	else cout << "Warning: Residue " << resno << " has no N atom." << endl << flush;
+    }
+    else
+    	residues[i] = new AminoAcid(aaletter, 0);
+    
     sequence[i] = aaletter;
     ca[i] = residues[i]->get_atom("CA");
     res_reach[i] = residues[i]->get_aa_definition()->reach;

@@ -19,6 +19,7 @@ void save_transitional_pdb(Protein* p)
     p->save_pdb(pf);
     p->end_pdb(pf);
     fclose(pf);
+    cout << "Wrote " << filename << endl;
 }
 
 int main(int argc, char** argv)
@@ -190,9 +191,9 @@ int main(int argc, char** argv)
     	Opt = Oend->get_location();
         
 
-        cout << "Extending strand." << endl;
+        //cout << "Extending strand." << endl;
         //p.conform_backbone(startres, endres, Cend, wayuphigh, 50);
-        save_transitional_pdb(&p);
+        //save_transitional_pdb(&p);
         
 
         cout << "Generating an alpha helix." << endl;
@@ -239,9 +240,16 @@ int main(int argc, char** argv)
     	p.move_piece(hxstart, hxend, pt35);
         save_transitional_pdb(&p);
         
+        cout << "Extending strand..." << endl;
+        p.conform_backbone(hxend+1, endres, p.get_atom(endres, "C"), wayuphigh, 100);
+        save_transitional_pdb(&p);
         
-        // p.conform_backbone(startres, hxstart-1, 
-        
+        cout << "Extending shelf..." << endl;
+        Point extreme5 = pt5.subtract(pt3);
+        extreme5.scale(100000);
+        extreme5 = extreme5.add(pt5);
+        p.conform_backbone(hxend+1, endres, p.get_atom(endres, "C"), extreme5, 100);
+        save_transitional_pdb(&p);
 
         // Just from the point found in the previous step, reconnect the loose end to TMR5.
         midpoint = (hxend + endres)/2;

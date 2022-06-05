@@ -81,6 +81,9 @@ public:
  	LocatedVector rotate_backbone(bb_rot_dir direction, float angle);	// Return the origin and direction of the rotation axis.
  	LocRotation rotate_backbone_abs(bb_rot_dir direction, float angle);
  	LocRotation* flatten();		// Ensure the peptide bond is coplanar and the CA lies in the same plane. Return LocRotation[2].
+ 	
+ 	LocatedVector predict_previous_CO();	// The origin locates the C atom and the SCoord points in the direction of the O relative to C.
+ 	LocatedVector predict_next_NH();		// Origin locates N, SCoord points to HN.	
 
  	// Bond functions.
  	bool disulfide_bond(const AminoAcid* bond_to);

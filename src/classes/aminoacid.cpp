@@ -329,7 +329,7 @@ int AminoAcid::from_pdb(FILE* is)
                     {
                     	/*cout << res3let << "/" << fields[3] << " | " << residue_no << "/" << fields[4] << " | "
                     		 << origbuf << endl << flush;*/
-                        fseek(is, thistell, SEEK_SET);
+                        fseek(is, lasttell, SEEK_SET);
                         goto _return_added;
                     }
 
@@ -382,7 +382,7 @@ int AminoAcid::from_pdb(FILE* is)
 
                     if (!aaa)
                     {
-                        fseek(is, thistell, SEEK_SET);
+                        fseek(is, lasttell, SEEK_SET);
                         delete[] fields;
                         throw ATOM_NOT_OF_AMINO_ACID;
                     }

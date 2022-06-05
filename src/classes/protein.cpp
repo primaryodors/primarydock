@@ -715,6 +715,7 @@ void Protein::conform_backbone(int startres, int endres,
             for (i=res; i != endres; i += inc)
             {
                 AminoAcid* aa = get_residue(i);
+                if (!aa) continue;
                 AminoAcid** rcc = get_residues_can_clash(i);
                 if (a1)		bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
             	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);

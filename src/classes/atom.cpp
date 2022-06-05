@@ -259,6 +259,7 @@ Atom::Atom(FILE* is)
 {
     char buffer[1024], res3let[5];
     int resno=0;
+    init_nulls(buffer, 1024);
 
     while (1)
     {
@@ -440,6 +441,7 @@ Atom** Bond::get_moves_with_btom()
     if (!cachesz) return 0;
 
     Atom** retval = new Atom*[cachesz+1];
+    // Not calling init_nulls() for performance reasons.
     for (i=0; i<cachesz; i++)
         retval[i] = moves_with_btom[i];
     retval[cachesz] = 0;
@@ -566,6 +568,7 @@ Bond** Atom::get_bonds()
     try
     {
         Bond** retval = new Bond*[geometry+1];
+        // No init_nulls() because performance.
         for (i=0; i<geometry; i++) retval[i] = &bonded_to[i];
         retval[geometry] = 0;
         return retval;
@@ -954,6 +957,7 @@ void Bond::fill_moves_with_cache()
     while (k);
 
     moves_with_btom = new Atom*[tmplen+4];
+    init_nulls(moves_with_btom, tmplen+4);
 
     for (i=0; i<tmplen; i++)
     {
@@ -1071,7 +1075,6 @@ SCoord* Atom::get_basic_geometry()
     int i, j;
     float x, y, z;
 
-    // Don't ask me why I can't use a switch statement here. goddamn gaslighting compiler.
     if (geometry == 1)
     {
         SCoord v1(1, M_PI/2, 0);

@@ -190,6 +190,12 @@ template <typename T> int sgn(T val)
     return (T(0) < val) - (val < T(0));
 }
 
+template <typename T> void init_nulls(T* array, int length)
+{
+	int i;
+	for (i=0; i<length; i++) array[i] = 0;
+}
+
 std::ostream& operator<<(std::ostream& os, const Point& p);
 std::ostream& operator<<(std::ostream& os, const SCoord& v);
 std::ostream& operator<<(std::ostream& os, const Rotation& r);

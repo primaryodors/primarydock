@@ -47,16 +47,29 @@ float vector_preallocated_ranged_forloop(int n) {
 }
 
 
-float array_summer(int n) {
-    int* integers = new int[n];
+float array_stack_allocation(int n) {
+    int integers[n];
 
     for (int i = 0; i < n; i++)
-        integers[i] = i;
+        integers[i] = i + 1;
 
     float sum = 0;
     for (int i = 0; i < n; i++)
         sum += (float)integers[i];
 
-	delete integers;
+    return sum;
+}
+
+float array_heap_allocation(int n) {
+    int* integers = new int[n];
+
+    for (int i = 0; i < n; i++)
+        integers[i] = i + 1;
+
+    float sum = 0;
+    for (int i = 0; i < n; i++)
+        sum += (float)integers[i];
+
+	delete[] integers;
     return sum;
 }

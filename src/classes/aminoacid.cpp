@@ -167,14 +167,14 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		
 		Point ptdbg(10,0,0);
 		SCoord sc;
-		Molecule::move(ptdbg);
+		aamove(ptdbg);
 		
 		// Get the curr.N - prev.C relative location and scale it to 1.32A.
 		sc = prevC->get_location().subtract(currN->get_location());
 		
 		// Move the entire current molecule so the N is now at that distance.
 		sc.r -= 1.32;
-		Molecule::move(sc);
+		aamove(sc);
 		
 		for (i=0; i<10; i++)
 		{
@@ -771,6 +771,26 @@ bool AminoAcid::capable_of_inter(intera_type inter)
     }
 
     return false;
+}
+
+void AminoAcid::aamove(SCoord move_amt)
+{
+	if (movability < MOV_ALL) return;
+    if (!atoms) return;
+    int i;
+
+    for (i=0; atoms[i]; i++)
+    {
+        Point loc = atoms[i]->get_location();
+        loc = loc.add(&move_amt);
+        atoms[i]->move(&loc);
+    }
+
+    // If you have a metal coordination, AND YOU ARE THE FIRST COORDINATING RESIDUE OF THE METAL, move the metal with you.
+    if (m_mcoord && m_mcoord->coord_res && m_mcoord->coord_res[0] == this)
+    {
+        m_mcoord->metal->move(move_amt);
+    }
 }
 
 void AminoAcid::rotate(LocatedVector SCoord, float theta)

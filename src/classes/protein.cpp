@@ -79,6 +79,18 @@ bool Protein::add_residue(const int resno, const char aaletter)
     	{
     		float r = lv.origin.get_3d_distance(a->get_location());
     		if (fabs(r) >= 0.01) cout << "Warning: Residue " << resno << " N location is off by " << r << "A." << endl;
+    		
+    		Atom* b = residues[i]->get_atom("HN");
+    		if (!b) b = residues[i]->get_atom("H");
+    		if (b)
+    		{
+    			Point HN = b->get_location().subtract(a->get_location());
+    			HN.scale(1);
+    			Point pt(lv);
+    			pt.scale(1);
+    			r = pt.get_3d_distance(HN);
+    			if (fabs(r) >= 0.01) cout << "Warning: Residue " << resno << " HN location is off by " << r << "A." << endl;
+			}
     	}
     	else cout << "Warning: Residue " << resno << " has no N atom." << endl << flush;
     }
@@ -1259,7 +1271,7 @@ void Protein::move_piece(int start_res, int end_res, Point new_center)
 	for (i=start_res; i<=end_res; i++)
 	{
 		AminoAcid* aa = get_residue(i);
-		aa->move(move_amt);
+		aa->aamove(move_amt);
 	}
 }
 

@@ -73,7 +73,7 @@ public:
  	void save_pdb(FILE* outstream, int atomno_offset=0);
 
  	// Spatial functions.
- 	// void move(SCoord move_amt) 					{ 	 	return; 	}
+ 	void aamove(SCoord move_amt);
  	// void move(Point move_amt) 					{ 	 	return; 	}
  	void recenter(Point new_location) 			{ 	 	return; 	}
  	// void rotate(SCoord* SCoord, float theta) 	{ 	 	return; 	}

@@ -22,23 +22,46 @@ bool Protein::add_residue(const int resno, const char aaletter)
 
     if (!residues)
     {
-        residues = new AminoAcid*[resno+256];
-        sequence = new char[resno+256];
-        ca = new Atom*[resno+256];
-        res_reach = new float[resno+256];
+    	int arrlimit = resno+256;
+        residues = new AminoAcid*[arrlimit];
+        sequence = new char[arrlimit];
+        ca = new Atom*[arrlimit];
+        res_reach = new float[arrlimit];
+        
+        for (i=0; i<arrlimit; i++)
+        {
+        	residues[i] = NULL;
+        	sequence[i] = 0;
+        	ca[i] = NULL;
+        	res_reach[i] = 0;
+        }
     }
     else if (resno % 256)
     {
         AminoAcid** oldres = residues;
         char* oldseq = sequence;
-        residues = new AminoAcid*[resno+261];
-        sequence = new char[resno+261];
-        ca = new Atom*[resno+261];
-        res_reach = new float[resno+261];
+        Atom** oldca = ca;
+        float* oldreach = res_reach;
+        int arrlimit = resno+261;
+        residues = new AminoAcid*[arrlimit];
+        sequence = new char[arrlimit];
+        ca = new Atom*[arrlimit];
+        res_reach = new float[arrlimit];
+        
+        for (i=0; i<arrlimit; i++)
+        {
+        	residues[i] = NULL;
+        	sequence[i] = 0;
+        	ca[i] = NULL;
+        	res_reach[i] = 0;
+        }
+        
         for (i=0; oldres[i]; i++)
         {
             residues[i] = oldres[i];
             sequence[i] = oldseq[i];
+            ca[i] = oldca[i];
+            res_reach[i] = oldreach[i];
         }
         residues[i] = 0;
         sequence[i] = 0;
@@ -161,6 +184,7 @@ int Protein::load_pdb(FILE* is)
             AminoAcid* aa = new AminoAcid(is);
             // cout << rescount << " " << flush;
             restmp[rescount++] = aa;
+            restmp[rescount] = NULL;
         }
         catch (int ex)
         {
@@ -174,6 +198,7 @@ int Protein::load_pdb(FILE* is)
                     {
                         for (i=0; metals[i]; i++)
                             mtmp[i] = metals[i];
+                        mtmp[i] = NULL;
                         delete metals;
                     }
                     metals = mtmp;
@@ -181,6 +206,7 @@ int Protein::load_pdb(FILE* is)
 
                 Atom* a = new Atom(is);
                 metals[metcount++] = a;
+                metals[metcount] = NULL;
 
                 for (i=0; i<26; i++)
                 {
@@ -196,10 +222,19 @@ int Protein::load_pdb(FILE* is)
         }
     }
 
-    residues 	= new AminoAcid*[rescount+1];
-    sequence 	= new char[rescount+1];
-    ca       	= new Atom*[rescount+1];
-    res_reach	= new float[rescount+1];
+	int arrlimit = rescount+1;
+    residues 	= new AminoAcid*[arrlimit];
+    sequence 	= new char[arrlimit];
+    ca       	= new Atom*[arrlimit];
+    res_reach	= new float[arrlimit];
+    
+    for (i=0; i<arrlimit; i++)
+    {
+    	residues[i] = NULL;
+    	sequence[i] = 0;
+    	ca[i] = NULL;
+    	res_reach[i] = 0;
+    }
 
     for (i=0; i<rescount; i++)
     {
@@ -218,11 +253,11 @@ int Protein::load_pdb(FILE* is)
             if (!aaptrmin.n || residues[i] < aaptrmin.paa) aaptrmin.paa = residues[i];
             if (!aaptrmax.n || residues[i] > aaptrmax.paa) aaptrmax.paa = residues[i];
 
-            AADef* raa = restmp[i]->get_aa_definition();
+            AADef* raa   = restmp[i]->get_aa_definition();
             if (!raa) cout << "Warning: Residue " << (i+1) << " has no AADef." << endl;
-            sequence[i] = raa ? raa->_1let : '?';
-            ca[i]		= restmp[i]->get_atom("CA");
-            res_reach[i]= raa ? raa->reach : 2.5;
+            sequence[i]  = raa ? raa->_1let : '?';
+            ca[i]		 = restmp[i]->get_atom("CA");
+            res_reach[i] = raa ? raa->reach : 2.5;
         }
         catch (int e)
         {
@@ -628,7 +663,8 @@ void Protein::conform_backbone(int startres, int endres,
                 bind += alignfactor/pt.get_3d_distance(target2);
             }
 
-            if (strcmp(get_residue(res)->get_3letter(), "PRO"))		// TODO: Don't hard code this to proline, but check bond flexibility.
+			if (reinterpret_cast<long>(get_residue(res)) < 0x1000) cout << "Warning missing residue " << res << endl << flush;
+			else if (strcmp(get_residue(res)->get_3letter(), "PRO"))		// TODO: Don't hard code this to proline, but check bond flexibility.
             {
                 // Rotate the first bond a random amount. TODO: use angular momenta.
                 angle = momenta1[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);

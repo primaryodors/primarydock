@@ -1274,16 +1274,26 @@ Bond** AminoAcid::get_rotatable_bonds()
     			   )
     			{
     				Bond* lb = la->get_bond_between(aadef->aabonds[i]->bname);
-    				lb->can_rotate = aadef->aabonds[i]->can_rotate;
-    				if (!la->is_backbone
-    					&&
-    					la->get_Z() > 1
-		                &&
-		                greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)+1)
-                       )
-                    {
-				        btemp[bonds++] = lb->btom->get_bond_between(la);
-				        btemp[bonds] = 0;
+    				if (!lb)
+    				{
+    					cout << "Warning: No bond between " << la->residue << ":" << la->name
+							 << " and " << aadef->aabonds[i]->bname
+							 << endl << flush;
+					}
+    				else
+    				{
+						lb->can_rotate =
+							aadef->aabonds[i]->can_rotate;
+						if (!la->is_backbone
+							&&
+							la->get_Z() > 1
+				            &&
+				            greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)+1)
+		                   )
+		                {
+						    btemp[bonds++] = lb->btom->get_bond_between(la);
+						    btemp[bonds] = 0;
+						}
 				    }
 				}
     		}

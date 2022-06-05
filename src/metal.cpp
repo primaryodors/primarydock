@@ -191,8 +191,7 @@ int main(int argc, char** argv)
         
 
         cout << "Extending strand." << endl;
-        p.conform_backbone(startres, endres, Cend, wayuphigh, 50);
-
+        //p.conform_backbone(startres, endres, Cend, wayuphigh, 50);
         save_transitional_pdb(&p);
         
 

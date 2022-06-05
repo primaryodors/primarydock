@@ -611,6 +611,7 @@ void Protein::conform_backbone(int startres, int endres,
             for (i=res; i != endres; i += inc)
             {
                 AminoAcid* aa = get_residue(i);
+                if (!aa) continue;
                 AminoAcid** rcc = get_residues_can_clash(i);
                 if (!rcc) cout << "No clashables." << endl;
                 if (a1)		bind -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
@@ -821,6 +822,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
     {
     	aas[i-startres] = get_residue(i);
     	aas[i-startres]->movability = MOV_FLEXONLY;
+    	aas[i-startres+1] = 0;
     }
     aas[endres-startres+1] = 0;
     Molecule::multimol_conform(aas, 25);
@@ -980,7 +982,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, ch
 
     // Choose the side of the plane with the fewest CA atoms and set gmtgt about 1A in that direction of plane center.
     // If the two sides are the same, set gmtgt to coordcen.
-    cout << "nc " << nc << " | anc " << anc << endl;
+    // cout << "nc " << nc << " | anc " << anc << endl;
     if (nc < anc)
     {
         normal.r = 7;

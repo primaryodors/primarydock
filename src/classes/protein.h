@@ -68,8 +68,8 @@ public:
     Point get_region_center(int startres, int endres);
 
     // Motion functions
-    void move_piece(int start_res, int end_res, Point new_center);		// After calling this, reconnect the broken ends with conform_backbone().
-    void rotate_piece(int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.
+    void move_piece(int start_res, int end_res, Point new_center);		// After calling this, you should reconnect the broken ends with conform_backbone().
+    void rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.
     
     void rotate_backbone(int residue_no, bb_rot_dir direction, float angle);
     void rotate_backbone_partial(int startres, int endres, bb_rot_dir direction, float angle);

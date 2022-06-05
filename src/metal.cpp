@@ -221,9 +221,27 @@ int main(int argc, char** argv)
         foravg[avgi++] = p.get_atom_location(endres+4, "CA");
         Point pt5 = average_of_points(foravg, avgi);
         pt5.y += stepht*2;
-    	p.conform_backbone(startres, endres, p.get_atom(hxstart, "CA"), pt5, 100);
+        
+        int end3 = p.get_region_start("TMR3");
+        avgi = 0;
+        foravg[avgi++] = p.get_atom_location(end3, "CA");
+        foravg[avgi++] = p.get_atom_location(end3+1, "CA");
+        foravg[avgi++] = p.get_atom_location(end3+2, "CA");
+        foravg[avgi++] = p.get_atom_location(end3+3, "CA");
+        Point pt3 = average_of_points(foravg, avgi);
+        pt3.y += stepht*2;
+        
+        avgi = 0;
+        foravg[avgi++] = pt5;
+        foravg[avgi++] = pt3;
+        Point pt35 = average_of_points(foravg, avgi);
+        
+    	// p.conform_backbone(startres, endres, p.get_atom(hxstart, "CA"), pt5, 100);
+    	p.move_piece(hxstart, hxend, pt35);
         save_transitional_pdb(&p);
         
+        
+        // p.conform_backbone(startres, hxstart-1, 
         
 
         // Just from the point found in the previous step, reconnect the loose end to TMR5.

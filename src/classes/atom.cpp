@@ -1493,10 +1493,9 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     if (fabs(location.z) <  10) fprintf(pf," ");
     fprintf(pf, "%4.3f", location.z);
 
-    fprintf(pf, "  1.00001.00            %s\n", get_elem_sym());
+    fprintf(pf, "  1.00001.00           %s\n", get_elem_sym());
 }
 
-// I fkn hate duplicating code...
 void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
 {
     os << "ATOM   ";

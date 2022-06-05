@@ -244,8 +244,9 @@ int main(int argc, char** argv)
         
 
         // Just from the point found in the previous step, reconnect the loose end to TMR5.
+        midpoint = (hxend + endres)/2;
         cout << "Reconnecting broken pieces." << endl;
-        p.conform_backbone(midpoint, endres, Cend, Cpt, Oend, Opt, 250);
+        p.conform_backbone(midpoint, endres, Cend, Cpt, Oend, Opt, 75);
         save_transitional_pdb(&p);
 
     }

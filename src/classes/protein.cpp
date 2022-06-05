@@ -652,15 +652,15 @@ void Protein::conform_backbone(int startres, int endres,
                 if (a1)		bind -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
                 else		bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
-            if (a1)
+            if (a1 && iter>10)
             {
                 Point pt = a1->get_location();
-                bind += alignfactor/pt.get_3d_distance(target1);
+                bind += alignfactor/(pt.get_3d_distance(target1)+0.000001);
             }
-            if (a2)
+            if (a2 && iter>10)
             {
                 Point pt = a2->get_location();
-                bind += alignfactor/pt.get_3d_distance(target2);
+                bind += alignfactor/(pt.get_3d_distance(target2)+0.000001);
             }
 
 			if (reinterpret_cast<long>(get_residue(res)) < 0x1000) cout << "Warning missing residue " << res << endl << flush;

@@ -47,6 +47,8 @@
 
 #define ATOM_NOT_OF_AMINO_ACID 0x907aa
 
+#define _MAX_NUM_FORCES 65536
+
 #define SPHREACH_MAX 1024
 
 #define PROT_MAX_RGN 40

@@ -15,6 +15,7 @@ float total_binding_by_type[_INTER_TYPES_LIMIT];
 void InteratomicForce::read_all_forces()
 {
     int i, ifcount = 0;
+    init_nulls(all_forces, _MAX_NUM_FORCES);
 
     FILE* pf = fopen("bindings.dat", "rb");
     if (!pf)
@@ -292,6 +293,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
     }
 
     InteratomicForce** retval = new InteratomicForce*[16];
+    init_nulls(retval, 16);
     int i, j=0;
 
     // Charged atoms always attract or repel, irrespective of Z.
@@ -677,6 +679,7 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, int cardinality)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
     InteratomicForce** retval = new InteratomicForce*[16];
+    init_nulls(retval, 16);
 
     int i, j=0;
     for (i=0; all_forces[i]; i++)
@@ -712,6 +715,7 @@ float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type bty
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
     InteratomicForce** retval = new InteratomicForce*[16];
+    init_nulls(retval, 16);
 
     int i, j=0;
     for (i=0; all_forces[i]; i++)

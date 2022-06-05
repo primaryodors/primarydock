@@ -1187,14 +1187,25 @@ Point Protein::get_region_center(int startres, int endres)
 	int i;
 	for (i=0; i<rglen; i++)
 	{
-		// This is slow but that's okay. Moi aussi. J'en ai marre d'être une attardée.
+		// This is slow but that's okay.
 		range[i] = get_residue(startres+i)->get_barycenter();
 	}
 	
 	return average_of_points(range, rglen);
 }
 
-
+void Protein::move_piece(int start_res, int end_res, Point new_center)
+{
+	Point old_center = get_region_center(start_res, end_res);
+	SCoord move_amt = new_center.subtract(old_center);
+	
+	int i;
+	for (i=start_res; i<=end_res; i++)
+	{
+		AminoAcid* aa = get_residue(i);
+		aa->move(move_amt);
+	}
+}
 
 
 

@@ -4,19 +4,10 @@ Loaded 0 atoms of CC(=O)[O-] into molecule.
 Internal clashes: 1.1417 cu. A.
 Bond C1 - C2 can rotate.
 Bond C2 - O3 can rotate.
-<<<<<<< HEAD
 Molecule moved to [0.0980784,-0.467363,-0.0479587].
-Loaded test ligand. Intermol clashes: 54.3754 cu. A.
+Loaded test ligand. Intermol clashes: 54 cu. A.
 Rotated molecule 2 by -30 degrees. Intermol clashes: 56.9046 cu. A.
 1 1 1 1 1 
 
-Energy level above threshold, SUCCESS.
-=======
-Molecule moved to [0.2,-0.5,-0.3].
-Loaded test ligand. Intermol clashes: 44 cu. A.
-Rotated molecule 2 by -30 degrees. Intermol clashes: 44.1887 cu. A.
-1 1 1 1 
-
 Energy level below threshold, FAIL.
->>>>>>> fff02ac2a4356efa5a1bdab5a5c21f071e18764c
 Saved output.sdf

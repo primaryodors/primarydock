@@ -108,10 +108,12 @@ bool Protein::add_sequence(const char* lsequence)
         if (fabs(r-1.54) > 0.2) cout << i+1 << lsequence[i] << ":CA-CB = " << r << endl;
     }
     
-    Molecule* aas[get_seq_length()+4];
-    for (i=1; i<=get_seq_length(); i++)
+    int seql = get_seq_length();
+    Molecule* aas[seql+4];
+    for (i=1; i<=seql; i++)
     {
-    	aas[i] = get_residue(i);
+    	aas[i-1] = get_residue(i);
+    	aas[i] = 0;
     }
     Molecule::multimol_conform(aas, 25);
     
@@ -812,13 +814,14 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 	
 	set_clashables();
     
-    Molecule* aas[get_seq_length()+4];
+    int seql = get_seq_length();
+    Molecule* aas[seql+4];
     for (i=startres; i<=endres; i++)
     {
-    	aas[i] = get_residue(i);
-    	aas[i]->movability = MOV_FLEXONLY;
+    	aas[i-startres] = get_residue(i);
+    	aas[i-startres]->movability = MOV_FLEXONLY;
     }
-    aas[i] = 0;
+    aas[endres-startres+1] = 0;
     Molecule::multimol_conform(aas, 25);
 }
 

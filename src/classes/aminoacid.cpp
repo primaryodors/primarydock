@@ -122,16 +122,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			{
 				if ( in_array( (void*)atoms[i], (void**)atoms_new ) < 0 )
 				{
-					Bond** b = atoms[i]->get_bonds();
-					for (j=0; b[j]; j++)
-					{
-						if (b[j]->btom)
-						{
-							// cout << "Unbond " << b[j]->btom->name << "-" << atoms[i]->name << endl << flush;
-							b[j]->btom->unbond(atoms[i]);
-						}
-					}
-					delete atoms[i];
+					delete_atom(atoms[i]);
 				}
 			}
 			

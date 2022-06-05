@@ -387,12 +387,36 @@ void Atom::unbond(Atom* btom)
         {
             if (bonded_to[i].btom == btom)
             {
+            	if (!reciprocity)
+            	{
+            		bonded_to[i].btom->reciprocity = true;
+            		bonded_to[i].btom->unbond(this);		// RECURSION!
+            		bonded_to[i].btom->reciprocity = false;
+        		}
                 bonded_to[i].btom = NULL;
                 bonded_to[i].cardinality=0;
                 bonded_to[i].can_rotate=0;
             }
         }
     }
+}
+
+void Atom::unbond_all()
+{
+	int i;
+	for (i=0; i<geometry; i++)
+	{
+		if (bonded_to[i].btom)
+		{
+			bonded_to[i].btom->reciprocity = true;
+    		bonded_to[i].btom->unbond(this);		// Potential for recursion!
+    		bonded_to[i].btom->reciprocity = false;
+    		
+            bonded_to[i].btom = NULL;
+            bonded_to[i].cardinality=0;
+            bonded_to[i].can_rotate=0;
+		}
+	}
 }
 
 const char* Atom::get_elem_sym()

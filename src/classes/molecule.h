@@ -70,6 +70,7 @@ class Molecule
     char** get_atom_names() const;
     Atom* get_atom(const char* aname) const;
     Atom* get_atom(const int a_idx) const	{	return atoms[a_idx];	}
+    void delete_atom(Atom* a);
     void hydrogenate();
     void clear_atom_binding_energies();
 

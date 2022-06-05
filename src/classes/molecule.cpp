@@ -82,6 +82,30 @@ Molecule::~Molecule()
     if (ring_aromatic) delete[] ring_aromatic;*/
 }
 
+void Molecule::delete_atom(Atom* a)
+{
+	if (!a) return;
+	int i, j;
+	
+	if (atoms)
+	{
+		for (i=0; atoms[i]; i++)
+		{
+			if (atoms[i] == a)
+			{
+				a->unbond_all();
+				for (j=i+1; atoms[j]; j++) atoms[j-1] = atoms[j];
+				atoms[j-1] = NULL;
+				rotatable_bonds = NULL;
+				return;
+			}
+		}
+	}
+	
+	cout << "Attempt to delete atom " << a->name << " from a molecule it is not part of." << endl << flush;
+	throw 0xbada70b;
+}
+
 void Molecule::reset_conformer_momenta()
 {
     srand (time(NULL));
@@ -97,9 +121,12 @@ void Molecule::reset_conformer_momenta()
     int i;
 
     if (b)
+    {
         for (i=0; b[i]; i++)
+        {
             b[i]->angular_momentum = _def_bnd_momentum * sgn(0.5-(rand()&1));
-
+        }
+    }
 }
 
 void Molecule::reallocate()
@@ -1153,7 +1180,7 @@ Bond** Molecule::get_rotatable_bonds()
     	rotatable_bonds = s.paa->get_rotatable_bonds();
     	return rotatable_bonds;
     }
-    // cout << name << " Molecule::get_rotatable_bonds()" << endl;
+    // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
 
     Bond* btemp[65536];
     int mwblimit = atcount/2;						// Prevent rotations that move most of the molecule.
@@ -1219,10 +1246,11 @@ Bond** Molecule::get_rotatable_bonds()
 // TODO: There has to be a better way.
 Bond** AminoAcid::get_rotatable_bonds()
 {
-    // cout << name << " AminoAcid::get_rotatable_bonds()" << endl;
+    // cout << name << " AminoAcid::get_rotatable_bonds()" << endl << flush;
     // Return ONLY side chain bonds, from lower to higher Greek. E.g. CA-CB but NOT CB-CA.
     // Exclude CA-N and CA-C as these will be managed by the Protein class.
     if (!atoms) return 0;
+    if (rotatable_bonds) return rotatable_bonds;
     if (aadef && aadef->proline_like)
     {
     	// cout << "Proline-like! No rotbonds!" << endl;
@@ -1295,6 +1323,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     Bond** retval = new Bond*[bonds+8];
     for (i=0; i<=bonds; i++) retval[i] = btemp[i];
     retval[i] = 0;
+    rotatable_bonds = retval;
 
     return retval;
 }

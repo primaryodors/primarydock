@@ -15,4 +15,5 @@ cmake-*
 *.gcda
 bin/
 obj/
+build/
 *.dSYM/

@@ -211,6 +211,13 @@ option.unknown
 	margin-bottom: 10px;
 }
 
+.sctgbtn.hilite
+{
+	border: 1px solid #35f;
+    background-color: #345;
+    color: #9cf;
+}
+
 </style>
 <script src="https://unpkg.com/ngl@0.10.4/dist/ngl.js"></script>
 <script>
@@ -299,10 +306,14 @@ function show_seqdd()
 	for (i=0; i<sequence.length; i++)
 	{
 		var tgl = document.createElement("span");
-		tgl.className = "clickme nodebtn sctgbtn";
+		tgl.className = "clickme nodebtn sctgbtn" + (restoggled[i+1] ? " hilite" : "");
 		tgl.innerText = sequence.substr(i, 1);
+		tgl.id = "seqddtgl" + (i+1);
 		tgl.title = sequence.substr(i, 1)+(i+1);
-		tgl.setAttribute("onclick", "toggleSideChain("+(i+1)+");");
+		tgl.setAttribute("onclick", "event.preventDefault(); toggleSideChain("+(i+1)+"); return false;");
+		tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 		seqdd.appendChild(tgl);
 		
 		if (!((i+1)%30)) seqdd.appendChild(document.createElement("br")).appendChild(document.createElement("br"));
@@ -387,6 +398,7 @@ function toggleSideChain(resno)
 		{
 			resmdl[resno].removeAllRepresentations();
 			restoggled[resno] = 0;
+			$('#seqddtgl'+resno).removeClass('hilite');
 		}
 		else
 		{
@@ -397,6 +409,7 @@ function toggleSideChain(resno)
                 metalness: 0.13,
             });
 			restoggled[resno] = 1;
+			$('#seqddtgl'+resno).addClass('hilite');
 		}
 	}
 	catch (ex)
@@ -799,6 +812,15 @@ function loadFile(fileData, fileName = "")
                         
                         tmpstr += ln + "\n";
                     }
+                    if (tmpstr)
+                    {
+	                	var stringBlob6a = new Blob( [tmpstr], { type: 'text/plain'} );
+	                	stage.loadFile( stringBlob6a, { ext: 'pdb' } ).then( function( comp6a )
+	            		{
+	            			resmdl.push(comp6a);
+	            			restoggled.push(0);
+	            		});
+    				}
                     
                 }
                 

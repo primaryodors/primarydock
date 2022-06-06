@@ -155,8 +155,11 @@ bool Protein::add_sequence(const char* lsequence)
     
     for (i=0; lsequence[i]; i++)
     {
-        float r = get_atom_location(i+1, "CA").get_3d_distance(get_atom_location(i+1, "CB"));
-        if (fabs(r-1.54) > 0.2) cout << i+1 << lsequence[i] << ":CA-CB = " << r << endl;
+    	if (get_atom(i+1, "CB"))		// Don't check glycine.
+    	{
+		    float r = get_atom_location(i+1, "CA").get_3d_distance(get_atom_location(i+1, "CB"));
+		    if (fabs(r-1.54) > 0.5) cout << "Error: " << i+1 << lsequence[i] << ":CA-CB = " << r << endl;
+        }
     }
     
     int seql = get_seq_length();

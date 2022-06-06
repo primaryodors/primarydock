@@ -38,6 +38,7 @@ Molecule::Molecule()
     atcount = ringcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = 0;
+    paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
 }
 
 Molecule::Molecule(const char* lname, Atom** collection)

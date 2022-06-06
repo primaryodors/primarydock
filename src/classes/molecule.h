@@ -62,7 +62,7 @@ class Molecule
     bool shielded(Atom* a, Atom* b) const;
     void voxel_computation(int iters = 5);
     Point get_atom_location(char const * aname);
-    void correct_structure(int iters = 200);
+    float correct_structure(int iters = 200);
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);

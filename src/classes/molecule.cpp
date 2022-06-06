@@ -3412,12 +3412,13 @@ void Molecule::voxel_computation(int iters)
 }
 
 #define _DEV_FIX_MSTRUCT 0
-void Molecule::correct_structure(int iters)
+float Molecule::correct_structure(int iters)
 {
-    if (!atoms) return;
+    if (!atoms) return 0;
     int iter, i, j, k;
     Point zero(0,0,0);
-    
+	float error = 0;
+   
     if (ringcount)
     {
     	for (i=0; i<ringcount; i++)
@@ -3432,6 +3433,7 @@ void Molecule::correct_structure(int iters)
 
     for (iter=0; iter<iters; iter++)
     {
+    	error = 0;
         for (i=0; atoms[i]; i++)
         {
             Point aloc = atoms[i]->get_location();
@@ -3445,6 +3447,8 @@ void Molecule::correct_structure(int iters)
                     Point bloc = b[j]->btom->get_location();
                     SCoord v(bloc.subtract(aloc));
                     float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+                    
+                    error += fabs(optimal - v.r);
                     
                     if (g == 4 && b[j]->cardinality > 1 && b[j]->cardinality <= 2) atoms[i]->aromatize();
                     
@@ -3467,12 +3471,14 @@ void Molecule::correct_structure(int iters)
 		                			case 6:   f = square        - theta;	break;		                			
 		                			default:  ;
 		                		}
+		                		
+		                		error += fabs(f);
 
 	                			#if _DEV_FIX_MSTRUCT
 		                		if (fabs(f) > 0.1)
 		                		{
-				            		cout << atoms[i]->name << "-" << b[j]->btom->name << "(" << b[k]->btom->name << ")"
-		                				 << " " << g << " " << theta*fiftyseven << " " << f*fiftyseven << endl;
+				            		/*cout << atoms[i]->name << "-" << b[j]->btom->name << "(" << b[k]->btom->name << ")"
+		                				 << " " << g << " " << theta*fiftyseven << " " << f*fiftyseven << endl;*/
 		                			
 				            		Point pt(v);
 				            		
@@ -3507,6 +3513,7 @@ void Molecule::correct_structure(int iters)
         }
     }
 
+	return error;
 }
 
 

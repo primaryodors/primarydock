@@ -93,7 +93,23 @@ class Atom
     void aromatize()
     {
         geometry=3;
-        if (valence>3) valence--;
+        // if (valence>3) valence--;
+        if (bonded_to)
+        {
+		    int i;
+		    for (i=0; i<geometry; i++)
+		    {
+		    	if (bonded_to[i].cardinality > 1
+		    		||
+		    		(	bonded_to[i].cardinality == 1
+		    			&& bonded_to[i].btom->get_Z() > 1
+		    		)
+		    		)
+		    	{
+		    		bonded_to[i].cardinality = 1.5;
+		    	} 
+	    	}
+        }
         geov=0;
     }
 
@@ -143,9 +159,9 @@ class Atom
     bool swap_chirality = false;
     bool EZ_flip = false;
     float last_bind_energy=0;
+	int ring_member = 0;				// How many rings is this atom part of.
 
 	protected:
-	int ring_member = 0;				// How many rings is this atom part of.
     void figure_out_valence();
     int Z=0;
     Point location;

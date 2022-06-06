@@ -1426,8 +1426,10 @@ SCoord Atom::get_next_free_geometry(float lcard)
 
         if (i >= geometry) i=0;
 
+		int j=i;
         if (geometry == 4 && swap_chirality && i >= 2) i ^= 1;
         if (geometry == 3 && EZ_flip && i >= 1) i = 3-i;
+        if (bonded_to[i].btom) i=j;
 
         retval = v[i];
     }

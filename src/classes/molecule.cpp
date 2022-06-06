@@ -263,18 +263,31 @@ void Molecule::hydrogenate()
             sprintf(hname, "H%d", atcount+1);
             Atom* H = add_atom("H", hname, atoms[i], 1);
             //cout << "Adding " << hname << " to " << atoms[i]->name << " whose valence is " << valence << " and has " << bcardsum << " bonds already." << endl;
+            
+            /*atoms[i]->clear_geometry_cache();
+            SCoord v = atoms[i]->get_next_free_geometry(1);
+            v.r = InteratomicForce::covalent_bond_radius(atoms[i], H, 1);
+            H->move(atoms[i]->get_location().add(v));*/
+            
             if (atoms[i]->get_geometry() == 3)
             {
                 Bond* aib = atoms[i]->get_bond_by_idx(1);
-                if (aib && aib->total_rotations) // aib->btom == H)
+                if (1) // aib && aib->total_rotations) // aib->btom == H)
                 {
-                    Bond* b0 = atoms[i]->get_bond_by_idx(0);
+                    /*Bond* b0 = atoms[i]->get_bond_by_idx(0);
                     Bond* b1 = atoms[i]->get_bond_by_idx(1);
-                    if (!b1 || !b1->btom) b1 = atoms[i]->get_bond_by_idx(2);
+                    if (!b1 || !b1->btom) b1 = atoms[i]->get_bond_by_idx(2);*/
+                    
+                    int k=0;
+                    Bond* b0 = atoms[i]->get_bond_by_idx(k++);
+                    if (!b0->btom || b0->btom == H) b0 = atoms[i]->get_bond_by_idx(k++);
+                    Bond* b1 = atoms[i]->get_bond_by_idx(k++);
+                    if (!b1->btom || b1->btom == H) b1 = atoms[i]->get_bond_by_idx(k++);
+                    
                     if (b0->btom && b1->btom)
                     {
                         Point source = atoms[i]->get_location();
-                        Point axis = b0->btom->get_location();
+                        /*Point axis = b0->btom->get_location();
                         Point avoid = b1->btom->get_location();
                         Point movable = H->get_location();
                         SCoord v(axis.subtract(source));
@@ -283,7 +296,21 @@ void Molecule::hydrogenate()
                         float r_is = movable.get_3d_distance(avoid);
                         float r_wouldbe = visibly_moved.get_3d_distance(avoid);
 
-                        if (r_is < r_wouldbe) H->move(visibly_moved);
+                        if (r_is < r_wouldbe) H->move(visibly_moved);*/
+                        
+                        Point movable = b1->btom->get_location();
+                        /*cout << "Getting normal of " << atoms[i]->name << " - "
+                        	 << b0->btom->name << " - " << b1->btom->name << endl;*/
+                        SCoord axis = compute_normal(source, b0->btom->get_location(), b1->btom->get_location());
+                        Point plus  = rotate3D(movable, source, axis,  triangular);
+                        Point minus = rotate3D(movable, source, axis, -triangular);
+                        
+                        float rp = plus.get_3d_distance(b0->btom->get_location());
+                        float rm = minus.get_3d_distance(b0->btom->get_location());
+                        
+                        Point pt = ((rp > rm) ? plus : minus).subtract(source);
+                        pt.scale(InteratomicForce::covalent_bond_radius(atoms[i], H, 1));
+                        H->move(pt.add(source));
                     }
                 }
             }
@@ -2655,6 +2682,20 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 }
                 aloop[l-sqidx[j]] = 0;
                 int ringsz = l-sqidx[j];
+                
+                if (!ring_atoms)
+                	ring_atoms = new Atom**[16];
+                
+                if (!ring_atoms[ringcount])
+                	ring_atoms[ringcount] = new Atom*[ringsz+2];
+                
+                for (l=0; l<ringsz; l++)
+                {
+                	ring_atoms[ringcount][l] = aloop[l];
+            	}
+                ring_atoms[ringcount][ringsz] = 0;
+                
+                ringcount++;
 
                 // Also default all unmarked double bonds to cis.
                 /*for (l=0; l<dbi; l++)
@@ -2976,22 +3017,24 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
         }
         ring_members[l]->arom_center = &ringcen;
         ring_members[l]->clear_geometry_cache();
+        ring_members[l]->ring_member = max(1, ring_members[l]->ring_member);
+        if (ring_members[l]->get_valence() != 4) ring_members[l]->aromatize();
 
         Bond* b2=0;
         int bgeo = ring_members[l]->get_geometry();
-    	cout << bgeo << ", checking " << ring_members[l]->name << "... " << flush;
+    	// cout << bgeo << ", checking " << ring_members[l]->name << "... " << flush;
         for (i=0; i<bgeo; i++)
         {
-        	cout << i << " ";
+        	// cout << i << " ";
             b2 = ring_members[l]->get_bond_by_idx(i);
             if (!b2)
             {
-            	cout << "null bond." << endl;
+            	// cout << "null bond." << endl;
                 continue;
             }
             if (!b2->btom)
             {
-            	cout << "null btom." << endl;
+            	// cout << "null btom." << endl;
                 b2=0;
                 continue;
             }
@@ -2999,7 +3042,7 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
             {
             	if (ring_members[j] == b2->btom)
                 {
-            		cout << "btom is part of the ring." << endl;
+            		// cout << "btom is part of the ring." << endl;
                     b2 = 0;
                     break;
                 }
@@ -3008,7 +3051,7 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
         }
         if (b2 && b2->btom)
         {
-        	cout << "found " << b2->btom->name << endl;
+        	// cout << "found " << b2->btom->name << endl;
             Point ptnew = ring_members[l]->get_location().subtract(ringcen);
             ptnew.scale(InteratomicForce::covalent_bond_radius(ring_members[l], b2->btom, b2->cardinality));
             ptnew = ring_members[l]->get_location().add(ptnew);
@@ -3302,6 +3345,15 @@ void Molecule::correct_structure(int iters)
     if (!atoms) return;
     int iter, i, j, k;
     Point zero(0,0,0);
+    
+    if (ringcount)
+    {
+    	for (i=0; i<ringcount; i++)
+    	{
+    		cout << "Ring " << i << endl;
+    		make_coplanar_ring(ring_atoms[i]);
+    	}
+    }
 
     for (iter=0; iter<iters; iter++)
     {
@@ -3366,7 +3418,10 @@ void Molecule::correct_structure(int iters)
                     v.r = optimal; // += 0.1 * (optimal-v.r);
 
                     if (atoms[i]->num_rings())
-                    	b[j]->btom->move(aloc.add(v));
+                    {
+                    	// b[j]->btom->move(aloc.add(v));
+                    	;
+                	}
                     else
                     {
 		                Point pt(aloc.add(v));

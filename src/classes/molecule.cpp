@@ -3449,6 +3449,9 @@ float Molecule::correct_structure(int iters)
                     SCoord v(bloc.subtract(aloc));
                     float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
                     
+                    if (fabs(optimal - v.r) > 0.1) cout << atoms[i]->name << cardinality_printable(b[j]->cardinality)
+                    									<< b[j]->btom->name << " radius should be " << optimal
+                    									<< ", is " << v.r << endl;
                     error += fabs(optimal - v.r);
                     
                     if (g == 4 && b[j]->cardinality > 1 && b[j]->cardinality <= 2) atoms[i]->aromatize();

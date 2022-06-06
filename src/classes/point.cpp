@@ -784,6 +784,45 @@ float Pearson_correlation(float* xarr, float* yarr, int length)
     return r;
 }
 
+std::string cardinality_printable(float card)
+{
+	std::string retval = ".";
+	if (card > 1 && card < 2) retval = ":";
+	else switch ((int)card)
+	{
+		case 0:
+		break;
+		
+		case 1:
+		retval = "-";
+		break;
+		
+		case 2:
+		retval = "=";
+		break;
+		
+		case 3:
+		retval = "#";
+		break;
+		
+		case 4:
+		retval = "$";
+		break;
+		
+		default:
+		retval = "!?";
+	}
+	
+	return retval;
+}
+
+
+
+
+
+
+
+
 
 
 

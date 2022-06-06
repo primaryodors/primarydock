@@ -183,6 +183,7 @@ float frand(float min, float max);
 float Pearson_correlation(float* xarr, float* yarr, int length);
 enum STR_PAD {STR_PAD_RIGHT, STR_PAD_LEFT, STR_PAD_BOTH};
 std::string str_pad(const std::string &str, int pad_length, std::string pad_string=" ", STR_PAD pad_type=STR_PAD_RIGHT);
+std::string cardinality_printable(float card);
 
 // From here: https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
 template <typename T> int sgn(T val)

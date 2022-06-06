@@ -46,7 +46,7 @@ public:
     static InteratomicForce** get_applicable(Atom* a, Atom* b);
     static float total_binding(Atom* a, Atom* b);
     static float distance_anomaly(Atom* a, Atom* b);
-    static float covalent_bond_radius(Atom* a, Atom* b, int cardinality);
+    static float covalent_bond_radius(Atom* a, Atom* b, float cardinality);
     static float coordinate_bond_radius(Atom* a, Atom* b, intera_type btype);
 
 protected:

@@ -239,6 +239,8 @@ void Molecule::hydrogenate()
         if (valence > 4) valence = 8 - valence;
 
         //cout << atoms[i]->name << " has valence " << valence;
+        
+        if (valence == 4 && atoms[i]->get_geometry() == 3) valence--;
 
         int bcardsum = 0;
 
@@ -795,6 +797,7 @@ bool Molecule::ring_is_aromatic(int ringid)
     		int fam = ring_atoms[ringid][i]->get_family();
     		if (fam != PNICTOGEN && fam != CHALCOGEN)
     		{
+    			// cout << "Consecutive single bonds. ";
     			retval = false;
     			break;
     		}
@@ -802,6 +805,7 @@ bool Molecule::ring_is_aromatic(int ringid)
     	
     	if (b->cardinality < 1 || b->cardinality > 2)
 		{
+			// cout << "Cardinality " << b->cardinality << " out of range. ";
 			retval = false;
 			break;
 		}
@@ -809,7 +813,7 @@ bool Molecule::ring_is_aromatic(int ringid)
     	prevcard = b->cardinality;
     }
     
-    cout << name << " ring " << ringid << (retval ? " is" : " is not") << " aromatic." << endl;
+    // cout << name << " ring " << ringid << (retval ? " is" : " is not") << " aromatic." << endl;
     
     ring_aromatic[ringid] = retval;
     return ring_aromatic[ringid];
@@ -1464,6 +1468,7 @@ float Molecule::get_internal_clashes()
             float bvdW = atoms[j]->get_vdW_radius();
 
             r = pta.get_3d_distance(&ptb);
+            if (!r) r += 10e-15;
             if (r < avdW + bvdW)
             {
                 float lclash = sphere_intersection(avdW, bvdW, r);
@@ -2814,7 +2819,8 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                         sequence[sqidx[j]+l]->arom_center = &ringcen;
                         sequence[sqidx[j]+l]->clear_geometry_cache();
                     }
-
+					
+					ring_aromatic[ringcount-1] = true;
                     numbered[j] = 0;
                     card = 1;
 

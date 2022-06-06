@@ -2686,6 +2686,9 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 if (!ring_atoms)
                 	ring_atoms = new Atom**[16];
                 
+                if (!ring_aromatic)
+                	ring_aromatic = new bool[16];
+                
                 if (!ring_atoms[ringcount])
                 	ring_atoms[ringcount] = new Atom*[ringsz+2];
                 
@@ -2694,6 +2697,8 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 	ring_atoms[ringcount][l] = aloop[l];
             	}
                 ring_atoms[ringcount][ringsz] = 0;
+                
+                ring_aromatic[ringcount] = ring_is_aromatic(ringcount);
                 
                 ringcount++;
 
@@ -2774,7 +2779,8 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 }
 
                 float anomaly = close_loop(aloop, card);
-                cout << "# Ring closure anomaly " << anomaly << endl;
+                // Ring closure anomaly of more than a tiny amount should always come up as a fail in the tests.
+                if (fabs(anomaly) > 0.1) cout << "Ring closure anomaly " << anomaly << endl;
 
                 /*for (l=0; l<dbi; l++)
                 {	if (!EZgiven[l] && EZatom0[l] && EZatom1[l])
@@ -3093,11 +3099,13 @@ float Molecule::close_loop(Atom** path, float lcard)
         for (j=0; j<geo; j++)
         {
             if (b[j]->btom
-                    &&
-                    (	b[j]->can_rotate
-                        ||
-                        b[j]->can_flip
-                    )
+                &&
+                (	b[j]->can_rotate
+                    ||
+                    b[j]->can_flip
+                )
+                &&
+                strcmp(b[j]->btom->name, "N")
                ) rotables[k++] = b[j];
         }
 
@@ -3130,6 +3138,20 @@ float Molecule::close_loop(Atom** path, float lcard)
     {
         for (i=0; rotables[i]; i++)
         {
+        	float rr = rotables[i]->atom->get_location().get_3d_distance(rotables[i]->btom->get_location());
+        	
+        	if (fabs(rr-bond_length) > 0.01)
+        	{
+        		Point aloc = rotables[i]->atom->get_location();
+        		Point bloc = rotables[i]->btom->get_location();
+        		
+        		bloc = bloc.subtract(aloc);
+        		bloc.scale(bond_length);
+        		bloc = bloc.add(aloc);
+        		
+        		rotables[i]->btom->move(bloc);
+        	}
+        	
             if (rotables[i]->rotate(bondrot[i]))
             {
                 float newanom = fsb_lsb_anomaly(first, last, lcard, bond_length);
@@ -3350,8 +3372,11 @@ void Molecule::correct_structure(int iters)
     {
     	for (i=0; i<ringcount; i++)
     	{
-    		cout << "Ring " << i << endl;
-    		make_coplanar_ring(ring_atoms[i]);
+    		if (ring_aromatic[i])
+    		{
+				// cout << "Ring " << i << endl;
+				make_coplanar_ring(ring_atoms[i]);
+    		}
     	}
     }
 

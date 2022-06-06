@@ -2565,7 +2565,8 @@ bool Molecule::from_smiles(char const * smilesstr)
     }
 
     delete[] paren;
-    correct_structure(50);
+    float anomaly = correct_structure(50);
+    if (anomaly > 0.1) cout << "ERROR: Structural anomaly = " << anomaly << endl;
     hydrogenate();
 
     // voxel_computation(5);
@@ -3472,7 +3473,7 @@ float Molecule::correct_structure(int iters)
 		                			default:  ;
 		                		}
 		                		
-		                		error += fabs(f);
+		                		error += fabs(f)/M_PI;
 
 	                			#if _DEV_FIX_MSTRUCT
 		                		if (fabs(f) > 0.1)

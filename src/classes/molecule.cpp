@@ -767,6 +767,51 @@ bool Molecule::ring_is_aromatic(int ringid)
     if (!ring_aromatic) return false;
     if (ringid >= ringcount) return false;
     if (ringid < 0) return false;
+    if (!ring_atoms) return false;
+    if (!ring_atoms[ringid]) return false;
+    
+    // TODO: Call ring_is_coplanar() but first the friggin molecular assembly has to be working right!
+    
+    int i, j;
+    float prevcard = 0;
+    bool retval = true;
+    
+    int ringsz;
+    for (i=0; ring_atoms[ringid][i]; i++);
+    ringsz = i;
+    
+    Bond* b = ring_atoms[ringid][0]->get_bond_between(ring_atoms[ringid][ringsz-1]);
+    prevcard = b->cardinality;
+    
+    for (i=0; i<ringsz; i++)
+    {
+    	if (ring_atoms[ringid][i+1]) j = i+1;
+    	else j = 0;
+    	
+    	b = ring_atoms[ringid][i]->get_bond_between(ring_atoms[ringid][j]);
+    	
+    	if (prevcard == 1 && b->cardinality == 1)
+    	{
+    		int fam = ring_atoms[ringid][i]->get_family();
+    		if (fam != PNICTOGEN && fam != CHALCOGEN)
+    		{
+    			retval = false;
+    			break;
+    		}
+    	}
+    	
+    	if (b->cardinality < 1 || b->cardinality > 2)
+		{
+			retval = false;
+			break;
+		}
+    	
+    	prevcard = b->cardinality;
+    }
+    
+    cout << name << " ring " << ringid << (retval ? " is" : " is not") << " aromatic." << endl;
+    
+    ring_aromatic[ringid] = retval;
     return ring_aromatic[ringid];
 }
 
@@ -2698,10 +2743,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 	ring_atoms[ringcount][l] = aloop[l];
             	}
                 ring_atoms[ringcount][ringsz] = 0;
-                
-                ring_aromatic[ringcount] = ring_is_aromatic(ringcount);
-                
-                ringcount++;
+                ringcount++;                
 
                 // Also default all unmarked double bonds to cis.
                 /*for (l=0; l<dbi; l++)
@@ -2798,6 +2840,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
 
                 if (card) preva->bond_to(numbered[j], card);
                 card = 1;
+                ring_aromatic[ringcount-1] = ring_is_aromatic(ringcount-1);
 
                 numbered[j] = 0;
 
@@ -3375,7 +3418,7 @@ void Molecule::correct_structure(int iters)
     	{
     		if (ring_aromatic[i])
     		{
-				// cout << "Ring " << i << endl;
+				cout << "Ring " << i << endl;
 				make_coplanar_ring(ring_atoms[i]);
     		}
     	}

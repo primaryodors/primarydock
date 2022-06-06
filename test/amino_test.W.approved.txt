@@ -1,3 +1,5 @@
+Ring 0
+Ring 1
 tryptophan bonds can rotate: 
 CA - CB
 CB - CG

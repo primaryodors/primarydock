@@ -22,19 +22,19 @@ Molecule::Molecule(const char* lname)
     name = new char[strlen(lname)+1];
     strcpy(name, lname);
 
-    atoms = NULL;
-    smiles = NULL;
-    ring_atoms = NULL;
+    atoms = nullptr;
+    smiles = nullptr;
+    ring_atoms = nullptr;
     atcount = ringcount = 0;
     reset_conformer_momenta();
-    rotatable_bonds = 0;
+    rotatable_bonds = nullptr;
 }
 
 Molecule::Molecule()
 {
-    atoms = NULL;
-    smiles = NULL;
-    ring_atoms = NULL;
+    atoms = nullptr;
+    smiles = nullptr;
+    ring_atoms = nullptr;
     atcount = ringcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = 0;
@@ -44,7 +44,7 @@ Molecule::Molecule(const char* lname, Atom** collection)
 {
     if (!collection)
     {
-        cout << "Temporary molecule creation attempted from null atom pointer array." << endl;
+        cout << "Temporary molecule creation attempted from nullptr atom pointer array." << endl;
         throw 0xbadca22;
     }
 
@@ -59,8 +59,8 @@ Molecule::Molecule(const char* lname, Atom** collection)
     name = new char[strlen(lname)+1];
     strcpy(name, lname);
 
-    smiles = NULL;
-    ring_atoms = NULL;
+    smiles = nullptr;
+    ring_atoms = nullptr;
     ringcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = 0;
@@ -95,8 +95,8 @@ void Molecule::delete_atom(Atom* a)
 			{
 				a->unbond_all();
 				for (j=i+1; atoms[j]; j++) atoms[j-1] = atoms[j];
-				atoms[j-1] = NULL;
-				rotatable_bonds = NULL;
+				atoms[j-1] = nullptr;
+				rotatable_bonds = nullptr;
 				return;
 			}
 		}
@@ -108,7 +108,7 @@ void Molecule::delete_atom(Atom* a)
 
 void Molecule::reset_conformer_momenta()
 {
-    srand (time(NULL));
+    srand (time(nullptr));
 
     lmx = _def_lin_momentum * sgn(0.5-(rand()&1));
     lmy = _def_lin_momentum * sgn(0.5-(rand()&1));
@@ -142,7 +142,7 @@ void Molecule::reallocate()
         {
             for (i=0; i<oac; i++) latoms[i] = atoms[i];
         }
-        for (i=oac; i<ac1; i++) latoms[i] = NULL;
+        for (i=oac; i<ac1; i++) latoms[i] = nullptr;
         // delete[] atoms;
         atoms = latoms;
     }
@@ -159,7 +159,7 @@ Atom* Molecule::add_atom(const char* elemsym, const char* aname, const Point* lo
 
     reallocate();
     atoms[atcount++] = a;
-    atoms[atcount] = NULL;
+    atoms[atcount] = nullptr;
 
     return a;
 }
@@ -188,7 +188,7 @@ Atom* Molecule::add_atom(const char* elemsym, const char* aname, Atom* bondto, c
 
         reallocate();
         atoms[atcount++] = a;
-        atoms[atcount] = NULL;
+        atoms[atcount] = nullptr;
         a->bond_to(bondto, bcard);
 
         if ((atcount & 1) && bondto->get_bonded_atoms_count() == 2)
@@ -451,7 +451,7 @@ int Molecule::from_sdf(const char* sdf_dat)
             sprintf(a->name, "%s%d", fields[3], added+1);
             a->residue = 0;
             atoms[atcount++] = a;
-            atoms[atcount] = NULL;
+            atoms[atcount] = nullptr;
             added++;
         }
         else
@@ -1281,7 +1281,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     if (aadef && aadef->proline_like)
     {
     	// cout << "Proline-like! No rotbonds!" << endl;
-    	return NULL;
+    	return nullptr;
 	}
     Bond* btemp[65536];
     
@@ -1436,7 +1436,7 @@ float Molecule::get_intermol_clashes(Molecule* ligand)
 {
     Molecule * ligands[4];
     ligands[0] = ligand;
-    ligands[1] = NULL;
+    ligands[1] = nullptr;
     return get_intermol_clashes(ligands);
 }
 
@@ -1654,7 +1654,7 @@ float Molecule::get_intermol_binding(Molecule* ligand)
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
-    ligands[1] = NULL;
+    ligands[1] = nullptr;
     return get_intermol_binding(ligands);
 }
 
@@ -1759,7 +1759,7 @@ void Molecule::intermol_conform(Molecule* ligand, int iters)
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
-    ligands[1] = NULL;
+    ligands[1] = nullptr;
     intermol_conform(ligands, iters);
 }
 
@@ -1773,7 +1773,7 @@ void Molecule::intermol_conform_norecen(Molecule* ligand, int iters, AminoAcid**
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
-    ligands[1] = NULL;
+    ligands[1] = nullptr;
     intermol_conform_norecen(ligands, iters, avcw);
 }
 
@@ -1791,7 +1791,7 @@ void Molecule::intermol_conform(Molecule* ligand, int iters, Molecule** avcw)
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
-    ligands[1] = NULL;
+    ligands[1] = nullptr;
     intermol_conform(ligands, iters, avcw);
 }
 
@@ -1940,7 +1940,7 @@ void Molecule::intermol_conform_norecen(Molecule* ligand, int iters, Molecule** 
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
-    ligands[1] = NULL;
+    ligands[1] = nullptr;
     intermol_conform_norecen(ligands, iters, avcw);
 }
 
@@ -1953,7 +1953,7 @@ void Molecule::intermol_conform_norecen(Molecule* ligand, int iters, Molecule** 
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
-    ligands[1] = NULL;
+    ligands[1] = nullptr;
     intermol_conform_norecen(ligands, iters, avcw, lastbind);
 }
 
@@ -2039,7 +2039,7 @@ void Molecule::intermol_conform_flexonly(Molecule* ligand, int iters, Molecule**
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
-    ligands[1] = NULL;
+    ligands[1] = nullptr;
     intermol_conform_flexonly(ligands, iters, avcw, lastbind);
 }
 
@@ -2505,7 +2505,7 @@ bool Molecule::from_smiles(char const * smilesstr)
     paren = new SMILES_Parenthetical[smlen];
     spnum = 0;
 
-    bool retval = from_smiles(smilesstr, NULL);
+    bool retval = from_smiles(smilesstr, nullptr);
 
     int i;
     for (i=0; i<spnum; i++)
@@ -2609,7 +2609,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
 
             /*for (l=0; paren[spnum].smilesstr[l]; l++)
             {	if (paren[spnum].smilesstr[l] == ')')
-            	{	paren[spnum].smilesstr[l+1] = NULL;
+            	{	paren[spnum].smilesstr[l+1] = nullptr;
             		break;
             	}
             }*/
@@ -3029,12 +3029,12 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
             b2 = ring_members[l]->get_bond_by_idx(i);
             if (!b2)
             {
-            	// cout << "null bond." << endl;
+            	// cout << "nullptr bond." << endl;
                 continue;
             }
             if (!b2->btom)
             {
-            	// cout << "null btom." << endl;
+            	// cout << "nullptr btom." << endl;
                 b2=0;
                 continue;
             }

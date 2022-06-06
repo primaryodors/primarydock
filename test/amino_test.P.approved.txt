@@ -1,3 +1,4 @@
+Ring 0
 proline bonds can rotate: 
 None.
 

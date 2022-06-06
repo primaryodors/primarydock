@@ -1,3 +1,4 @@
+Ring 0
 histidine bonds can rotate: 
 CA - CB
 CB - CG

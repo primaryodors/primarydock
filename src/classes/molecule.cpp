@@ -3255,11 +3255,23 @@ Atom** Molecule::get_most_bindable(int max_count)
     float best[max_count+2];
     Atom** retval = new Atom*[max_count+2];
     
-    for (k=0; k<max_count; k++) best[k]=0;
+    for (k=0; k<max_count; k++)
+    {
+    	best[k]=0;
+    	retval[k]=0;
+	}
     
     for (i=0; atoms[i]; i++)
     {
         float score = 0;
+        
+        for (k=0; retval[k] && k<max_count; k++)
+        {
+        	if (retval[k] == atoms[i]) goto _resume;
+        	if (retval[k]->is_bonded_to(atoms[i])) goto _resume;
+        	if (retval[k]->shares_bonded_with(atoms[i])) goto _resume;
+        }
+        
 
         if (atoms[i]->get_charge() || atoms[i]->get_acidbase())
             score += 1000;
@@ -3294,6 +3306,9 @@ Atom** Molecule::get_most_bindable(int max_count)
 		        break;
 		    }
 	    }
+	    
+	    _resume:
+	    ;
     }
     retval[max_count] = 0;
 

@@ -147,7 +147,7 @@ void Molecule::reallocate()
         // delete[] atoms;
         atoms = latoms;
     }
-    rotatable_bonds = 0;
+    rotatable_bonds = nullptr;
 }
 
 Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard)

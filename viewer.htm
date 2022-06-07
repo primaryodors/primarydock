@@ -218,6 +218,14 @@ option.unknown
     color: #9cf;
 }
 
+.seqnumln
+{
+	font-family: Monospace;
+	letter-spacing: 1.4px;
+    margin-left: 5px;
+    font-size: 13px;
+}
+
 </style>
 <script src="https://unpkg.com/ngl@0.10.4/dist/ngl.js"></script>
 <script>
@@ -303,6 +311,14 @@ function show_seqdd()
 	seqdd.innerHTML = "<b>Show/Hide Side Chains:</b><br><br>";
 	
 	var i;
+	var span = document.createElement("span");
+	var dots = ". . . . . . . . .";
+	var dotslen = dots.length;
+	span.innerText = dots+"10 "+dots+"20 "+dots+"30";
+	span.className = "seqnumln";
+	span.appendChild(document.createElement("br"));
+	seqdd.appendChild(span);
+	var seqoff = 40;
 	for (i=0; i<sequence.length; i++)
 	{
 		var tgl = document.createElement("span");
@@ -316,7 +332,24 @@ function show_seqdd()
 		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 		seqdd.appendChild(tgl);
 		
-		if (!((i+1)%30)) seqdd.appendChild(document.createElement("br")).appendChild(document.createElement("br"));
+		if (!((i+1)%30))
+		{
+			seqdd.appendChild(document.createElement("br"));
+			seqdd.appendChild(document.createElement("br"));
+			span = document.createElement("span");
+			
+			if (seqoff >= 100) dots = dots.substr(0, dotslen-(seqoff.toString().length-2));
+			span.innerText = dots+seqoff;
+			seqoff += 10; 
+			span.innerText += " "+dots+seqoff;
+			seqoff += 10;
+			span.innerText += " "+dots+seqoff;
+			seqoff += 10;
+			
+			span.className = "seqnumln";
+			span.appendChild(document.createElement("br"));
+			seqdd.appendChild(span);
+		}
 	}
 	
 	var sdchbtn = $('#sdchbtn')[0];
@@ -370,6 +403,8 @@ var orid;
 var mtlcoord = [];
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 var sequence = "";
+
+$("#affichage").hide();
 
 window.onresize = function()
 {
@@ -711,6 +746,8 @@ function loadFile(fileData, fileName = "")
 		$("#pleasewait").hide();
 	}, 5381);
 	
+	$("#affichage").hide();
+	
     model = []
     gmodel = [];
     curr_ligand = false;
@@ -893,6 +930,7 @@ function loadFile(fileData, fileName = "")
 
                     comp.autoView();
                 } );
+                $("#affichage").show();
                 break;
 
             	case 'txt':
@@ -1079,6 +1117,7 @@ function loadFile(fileData, fileName = "")
                 {
                     showPose(1);
                 }, 259);
+                $("#affichage").show();
                 break;
 
             	default:

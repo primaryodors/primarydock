@@ -1004,11 +1004,11 @@ _done_l:
 
                                     int pi_e = 0, pi_eo = 0;
 
-                                    for (p=0; ra = ring_atoms[ringcount][p]; p++)
+                                    for (p=0; (ra = ring_atoms[ringcount][p]); p++)
                                     {
                                         // Count the number of double bonds in the ring. For each double bond, count 2 pi electrons.
                                         rb = ring_atoms[ringcount][p ? (p-1) : (n-1)];
-                                        int card = ra->is_bonded_to(rb);
+                                        int card = (int)ra->is_bonded_to(rb);
 
                                         if (card == 2) pi_e += 2;
 
@@ -1044,10 +1044,10 @@ _not_aromatic:
                                 if (1)
 #endif
                                 {
-                                    for (p=0; ra = ring_atoms[ringcount][p]; p++)
+                                    for (p=0; (ra = ring_atoms[ringcount][p]); p++)
                                     {
                                         rb = ring_atoms[ringcount][p ? (p-1) : (n-1)];
-                                        int card = ra->is_bonded_to(rb);
+                                        int card = (int)ra->is_bonded_to(rb);
 
                                         Bond* ab = ra->get_bond_between(rb);
                                         ab->can_rotate = false;
@@ -1227,7 +1227,8 @@ _not_acidic:
         if (fama == PNICTOGEN)
         {
             Atom* c;
-            if (c = atoms[i]->is_bonded_to("C"))
+            c = atoms[i]->is_bonded_to("C");
+            if (c)
             {
                 if (c->is_bonded_to("O")) goto _not_basic;
             }
@@ -3509,11 +3510,11 @@ float Molecule::correct_structure(int iters)
 		                			case 2:   f = M_PI          - theta;	break;		                			
 		                			case 3:   f = triangular    - theta;	break;		                			
 		                			case 4:   f = tetrahedral   - theta;	break;		                			
-		                			case 6:   f = square        - theta;	break;		                			
+		                			case 6:   f = square        - theta;	break;
 		                			default:  ;
 		                		}
 		                		
-		                		error += fabs(f/M_PI);
+		                		error += (float)fabs(f/M_PI);
 
 	                			#if _DEV_FIX_MSTRUCT
 		                		if (fabs(f) > 0.1)
@@ -3521,8 +3522,8 @@ float Molecule::correct_structure(int iters)
 				            		Point pt(v);
 				            		
 				            		SCoord normal = compute_normal(aloc, bloc, cloc);
-				            		Point pt0 = rotate3D(pt, zero, normal, -0.1*f);
-				            		Point pt1 = rotate3D(pt, zero, normal,  0.1*f);
+				            		Point pt0 = rotate3D(pt, zero, normal, -0.1f*f);
+				            		Point pt1 = rotate3D(pt, zero, normal,  0.1f*f);
 				            		
 				            		float r0 = pt0.get_3d_distance(cloc);
 				            		float r1 = pt1.get_3d_distance(cloc);

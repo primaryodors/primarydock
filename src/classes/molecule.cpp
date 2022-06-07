@@ -17,7 +17,7 @@ using namespace std;
 
 float potential_distance = 0;
 
-Molecule::Molecule(const char* lname)
+Molecule::Molecule(char const* lname)
 {
     name = new char[strlen(lname)+1];
     strcpy(name, lname);
@@ -41,7 +41,7 @@ Molecule::Molecule()
     paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
 }
 
-Molecule::Molecule(const char* lname, Atom** collection)
+Molecule::Molecule(char const* lname, Atom** collection)
 {
     if (!collection)
     {
@@ -150,7 +150,7 @@ void Molecule::reallocate()
     rotatable_bonds = 0;
 }
 
-Atom* Molecule::add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard)
+Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard)
 {
     Atom* a = new Atom(elemsym, location);
     a->name = new char[strlen(aname)+1];
@@ -165,7 +165,7 @@ Atom* Molecule::add_atom(const char* elemsym, const char* aname, const Point* lo
     return a;
 }
 
-Atom* Molecule::add_atom(const char* elemsym, const char* aname, Atom* bondto, const float bcard)
+Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, const float bcard)
 {
     if (!bondto || !bcard)
     {
@@ -335,7 +335,7 @@ char** Molecule::get_atom_names() const
     return retval;
 }
 
-Atom* Molecule::get_atom(const char* aname) const
+Atom* Molecule::get_atom(char const* aname) const
 {
     if (!atoms) return 0;
 
@@ -396,10 +396,10 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
     return atoms[j];
 }
 
-int Molecule::from_sdf(const char* sdf_dat)
+int Molecule::from_sdf(char const* sdf_dat)
 {
     if (!sdf_dat) return 0;
-    const char* lines[8192];
+    char const* lines[8192];
     int i,j=0,lncount;
 
     immobile = false;
@@ -641,7 +641,7 @@ bool Molecule::save_sdf(FILE* os, Molecule** lig)
     for (i=0; i<ac; i++)
     {
         Point p = latoms[i]->get_location();
-        const char* esym = latoms[i]->get_elem_sym();
+        char const* esym = latoms[i]->get_elem_sym();
         if (!esym) continue;
 
         if (latoms[i]->get_charge()) chargeds++;

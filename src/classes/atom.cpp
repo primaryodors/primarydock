@@ -979,6 +979,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
         if (can_flip) theta = flip_angle;
         else return false;
     }
+    // cout << "Rotate " << atom->name << cardinality_printable(cardinality) << btom->name << endl;
 
     int i;
     Point cen = btom->get_location();
@@ -1024,6 +1025,8 @@ bool Bond::rotate(float theta, bool allow_backbone)
 
     if (can_flip) flip_angle = -flip_angle;
     total_rotations += theta;
+    
+    // cout << theta << endl;
 
     return true;
 }

@@ -82,6 +82,7 @@ void iteration_callback(int iter)
         int i;
         AminoAcid* resphres[SPHREACH_MAX+4];
         int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, mcoord_resno);
+        //cout << "Sphres: " << sphres << endl;
         for (i=0; i<sphres; i++)
         {
             discrete[i+2].paa = resphres[i];

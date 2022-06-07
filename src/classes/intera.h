@@ -19,26 +19,11 @@ class InteratomicForce
 {
 public:
     InteratomicForce();
-    intera_type get_type()
-    {
-        return type;
-    }
-    float get_arity()
-    {
-        return arity;
-    }
-    float get_distance()
-    {
-        return distance;
-    }
-    float get_kJmol()
-    {
-        return kJ_mol;
-    }
-    float get_dp()
-    {
-        return dirprop;
-    }
+    intera_type get_type()	{	return type;	}
+    float get_arity()	{	return arity;	}
+    float get_distance()	{	return distance;	}
+    float get_kJmol()	{	return kJ_mol;	}
+    float get_dp()	{	return dirprop;	}
 
     std::string get_config_string() const;
 

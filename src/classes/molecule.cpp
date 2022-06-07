@@ -2456,6 +2456,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
 
             /**** Bond Flexion ****/
+            // cout << mm[i]->name << ": " << mm[i]->movability << endl;
             if (mm[i]->movability >= MOV_FLEXONLY)
             {
                 mm[i]->get_rotatable_bonds();
@@ -2473,13 +2474,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 mm[i]->lastbind = bind;
 
-                // cout << mm[i]->name;
+                //cout << "Iter" << iter << " " << mm[i]->name;
                 if (mm[i]->rotatable_bonds)
                 {
-                    // cout << " has rotbonds ";
+                    //cout << " has rotbonds ";
                     for (k=0; mm[i]->rotatable_bonds[k]; k++)
                     {
-                        // cout << k;
+                        //cout << k;
 
                         rad = 0;
                         bestfrb = -10000;
@@ -2533,7 +2534,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         }
                     }
                 }
-                // cout << endl;
+                //cout << endl;
                 mm[i]->lastbind = bind;
 
                 if (!(iter % _fullrot_every)) mm[i]->reset_conformer_momenta();
@@ -3412,7 +3413,7 @@ void Molecule::voxel_computation(int iters)
     }
 }
 
-#define _DEV_FIX_MSTRUCT 0
+#define _DEV_FIX_MSTRUCT 1
 float Molecule::correct_structure(int iters)
 {
     if (!atoms) return 0;
@@ -3449,14 +3450,18 @@ float Molecule::correct_structure(int iters)
                     SCoord v(bloc.subtract(aloc));
                     float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
                     
-                    if (fabs(optimal - v.r) > 0.1) cout << atoms[i]->name << cardinality_printable(b[j]->cardinality)
-                    									<< b[j]->btom->name << " radius should be " << optimal
-                    									<< ", is " << v.r << endl;
+                    if (iter == iters-1
+                    	&&
+                    	fabs(optimal - v.r) > 0.1
+                    	)
+                    	cout << atoms[i]->name << cardinality_printable(b[j]->cardinality)
+							 << b[j]->btom->name << " radius should be " << optimal
+							 << ", is " << v.r << endl;
                     error += fabs(optimal - v.r);
                     
                     if (g == 4 && b[j]->cardinality > 1 && b[j]->cardinality <= 2) atoms[i]->aromatize();
                     
-                    // Failed attempt at bond angles.
+                    // Bond angles.
                     if (iter < (iters-20))
                     {
 		                for (k=0; k<g; k++)
@@ -3476,14 +3481,11 @@ float Molecule::correct_structure(int iters)
 		                			default:  ;
 		                		}
 		                		
-		                		error += fabs(f)/M_PI;
+		                		error += fabs(f/M_PI);
 
 	                			#if _DEV_FIX_MSTRUCT
 		                		if (fabs(f) > 0.1)
 		                		{
-				            		/*cout << atoms[i]->name << "-" << b[j]->btom->name << "(" << b[k]->btom->name << ")"
-		                				 << " " << g << " " << theta*fiftyseven << " " << f*fiftyseven << endl;*/
-		                			
 				            		Point pt(v);
 				            		
 				            		SCoord normal = compute_normal(aloc, bloc, cloc);
@@ -3504,7 +3506,7 @@ float Molecule::correct_structure(int iters)
 
                     if (atoms[i]->num_rings())
                     {
-                    	// b[j]->btom->move(aloc.add(v));
+                    	b[j]->btom->move(aloc.add(v));
                     	;
                 	}
                     else

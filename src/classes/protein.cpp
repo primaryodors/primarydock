@@ -409,6 +409,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
     int i, j, sphres = 0;
     int seql = get_seq_length();
     bool resno_already[8192];
+    for (i=0; i<8192; i++) resno_already[i] = false;
 
     for (i=0; i<SPHREACH_MAX; i++) reaches_spheroid[i] = NULL;
 

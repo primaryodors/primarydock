@@ -35,6 +35,19 @@ int main(int argc, char** argv)
 
     cout << "Minimizing internal clashes..." << endl;
     m.minimize_internal_clashes();
+    
+    if (argc > 4)
+    {
+    	Atom* a = m.get_atom(argv[2]);
+    	Atom* b = m.get_atom(argv[3]);
+    	float theta = atof(argv[4])/fiftyseven;
+    	
+    	if (a && b)
+    	{
+    		Bond* bn = a->get_bond_between(b);
+    		if (bn) bn->rotate(theta);
+    	}
+    }
 
     cout << "Internal clashes: " << m.get_internal_clashes() << " cu.A." << endl;
 

@@ -3247,12 +3247,16 @@ float Molecule::close_loop(Atom** path, float lcard)
     return anomaly;
 }
 
-Atom* Molecule::get_most_bindable()
+Atom** Molecule::get_most_bindable(int max_count)
 {
     if (!atoms) return 0;
 
-    int i, j=-1;
-    float best=0;
+    int i, j=-1, k, l;
+    float best[max_count+2];
+    Atom** retval = new Atom*[max_count+2];
+    
+    for (k=0; k<max_count; k++) best[k]=0;
+    
     for (i=0; atoms[i]; i++)
     {
         float score = 0;
@@ -3273,15 +3277,28 @@ Atom* Molecule::get_most_bindable()
 
         if (!score) score += 5;		// van der Waals.
 
-        if (score > best)
-        {
-            best = score;
-            j = i;
-        }
+		for (k=0; k<max_count; k++)
+		{
+			if (score > best[k])
+		    {
+		    	for (l=max_count; l>k; l--)
+		    	{
+		    		best[l] = best[l-1];
+		    		retval[l] = retval[l-1];
+	    		}
+		    	
+		        best[k] = score;
+		        retval[k] = atoms[i];
+		        if (!k) j = i;
+		        
+		        break;
+		    }
+	    }
     }
+    retval[max_count] = 0;
 
     if (j < 0) return 0;
-    else return atoms[j];
+    else return retval;
 }
 
 Point Molecule::get_bounding_box() const

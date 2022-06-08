@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 
     m1.reset_conformer_momenta();
     m2.reset_conformer_momenta();
-    Molecule* mols[3];
+    Molecule* mols[4];
     mols[0] = &m1;
     mols[1] = &m2;
     mols[3] = NULL;

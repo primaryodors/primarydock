@@ -1200,6 +1200,48 @@ void Atom::swing_all(int startat)
     }
 }
 
+float Atom::get_bond_angle_anomaly(SCoord v)
+{
+	if (!bonded_to) return 0;
+	int i;
+	float anomaly;
+	float lga = get_geometric_bond_angle();
+	
+	for (i=0; i<geometry; i++)
+	{
+		if (bonded_to[i].btom)
+		{
+			SCoord vb = bonded_to[i].btom->location.subtract(location);
+			float theta = find_3d_angle(v, vb, Point(0,0,0));
+			anomaly += fabs(theta-lga);
+		}
+	}
+	
+	return anomaly;
+}
+
+float Atom::get_geometric_bond_angle()
+{
+	switch (geometry)
+	{
+		case 1:
+		case 2:
+		return M_PI;
+		
+		case 3:		return triangular;
+		case 4:		return tetrahedral;
+		case 5:		return (triangular*3 + square*2)/5;		// Irregular so just return an average.
+		case 6:		return square;
+		
+		case 7:
+		case 8:
+		return tetrahedral/2;
+		
+		default:
+		return tetrahedral;
+	}
+}
+
 SCoord* Atom::get_geometry_aligned_to_bonds()
 {
     int bc = get_bonded_atoms_count();

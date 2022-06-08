@@ -6,7 +6,7 @@
 #define fiftyseventh (M_PI/180)
 #define tetrahedral acos(-1.0/3)
 #define triangular (M_PI/1.5)
-#define square (M_PI/2);
+#define square (M_PI/2)
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006

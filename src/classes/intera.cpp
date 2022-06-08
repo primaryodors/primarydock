@@ -708,6 +708,8 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality
             }
     }
 
+	cout << "Error: Not found covalent bond definition " << a->get_elem_sym() << cardinality_printable(cardinality)
+		 << b->get_elem_sym() << " cardinality " << cardinality << "; please check bindings.dat." << endl;
     throw BOND_DEF_NOT_FOUND;
 }
 

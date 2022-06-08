@@ -79,6 +79,7 @@ class LocatedVector : public SCoord
 	LocatedVector() { r = theta = phi = origin.x = origin.y = origin.z = 0; }
 	LocatedVector(SCoord sc) { copy(sc); }
 	void copy(SCoord sc) { r=sc.r; theta=sc.theta; phi=sc.phi; }
+	Point to_point();
     Point origin;
 };
 

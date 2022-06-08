@@ -749,6 +749,11 @@ LocatedVector LocRotation::get_lv()
     return retval;
 }
 
+Point LocatedVector::to_point()
+{
+	return origin.add(this);
+}
+
 // http://www.sjsu.edu/faculty/gerstman/StatPrimer/correlation.pdf
 float Pearson_correlation(float* xarr, float* yarr, int length)
 {

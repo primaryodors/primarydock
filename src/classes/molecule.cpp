@@ -3446,13 +3446,101 @@ void Molecule::voxel_computation(int iters)
     }
 }
 
-#define _DEV_FIX_MSTRUCT 1
+#define _DEV_FIX_MSTRUCT 0
 float Molecule::correct_structure(int iters)
 {
     if (!atoms) return 0;
     int iter, i, j, k;
     Point zero(0,0,0);
 	float error = 0;
+	Point aloc, bloc;
+	Atom* btom;
+	Bond** b;
+	int bg;
+	float b_bond_angle;
+	LocatedVector lv;
+	
+	#if _DEV_FIX_MSTRUCT
+    for (iter=0; iter<iters; iter++)
+    {
+    	error = 0;
+        for (i=0; atoms[i]; i++)
+        {
+			// Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
+            b = atoms[i]->get_bonds();
+            if (!b) continue;
+			btom = b[0]->btom;
+			if (!btom) continue;
+			bloc = btom->get_location();
+			bg = btom->get_geometry();
+			b_bond_angle = btom->get_geometric_bond_angle();
+			
+			// Make an imaginary sphere around btom, whose radius equals the optimal bond distance.
+			lv.origin = bloc;
+			lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, b[0]->cardinality);
+			float thstep = fiftyseventh*5;
+			float besttheta = 0, bestphi = 0, bestscore = -1e9;
+			for (lv.theta = 0; lv.theta <= M_PI; lv.theta += thstep)
+			{
+				float phstep = fiftyseventh*5*sin(lv.theta);
+				for (lv.phi = 0; lv.phi < (M_PI*2); lv.phi += phstep)
+				{
+					// At many points along the sphere, evaluate the goodness-of-fit as a function of:
+					// Success in conforming to btom's geometry;
+					// Success in avoiding clashes with atoms not bonded to self or btom;
+					// Success in maintaining optimal binding distances to own bonded atoms.
+					// Later, we'll test edge cases where bond strain distorts the usual angles.
+					float score = 0;
+					
+					score -= btom->get_bond_angle_anomaly(lv);
+					
+					for (j=0; atoms[j]; j++)
+					{
+						if (j == i) continue;
+						if (atoms[j] == btom) continue;
+						if (atoms[j]->is_bonded_to(atoms[i])) continue;
+						if (atoms[j]->is_bonded_to(btom)) continue;
+						
+						float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
+						score -= 1.0/fabs(r+0.000000001);
+					}
+					
+					for (j=0; b[j]; j++)
+					{
+						if (!b[j]->btom) continue;
+						float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+						float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
+						
+						score += 100.0 / (fabs(optimal-r)+1);
+					}
+					
+					
+					if (score > bestscore)
+					{
+						besttheta = lv.theta;
+						bestphi = lv.phi;
+						bestscore = score;
+						
+						cout << atoms[i]->name << " θ=" << (besttheta*fiftyseven) << " φ=" << (bestphi*fiftyseven)
+							 << " score=" << bestscore << endl;
+					}
+				}
+			}
+			
+			// Once a "best fit" point in space is found, move there.
+			error -= bestscore;
+			lv.theta = besttheta;
+			lv.phi = bestphi;
+			atoms[i]->move(lv.to_point());
+		}
+	}
+	#endif
+	
+	
+	
+	return error;
+	
+	// Red herring follows (old code that failed to do the desired functionality).
    
     if (ringcount)
     {

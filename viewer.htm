@@ -189,7 +189,7 @@ option.unknown
 
 #clip
 {
-    width: 503px;
+    width: 400px;
 }
 
 #seqdd
@@ -784,7 +784,7 @@ $("#clip").on("input", function (e, obj)
         {
             lcv = clipValue;
             if (is_ligand[i] && $("#preserve")[0].checked) lcv = 0;
-            obj.setParameters( { "clipNear": lcv } );
+            obj.setParameters( { "clipNear": lcv, } );
         });
     }
     for (i=0; i<gmodel.length; i++)
@@ -794,6 +794,7 @@ $("#clip").on("input", function (e, obj)
             obj.setParameters( { "clipNear": clipValue } );
         });
     }
+    stage.setParameters( { "fogNear": (clipValue), "fogFar": Math.max(15+clipValue, 150-clipValue*3), } );
 });
 
 function getFileContents(event)

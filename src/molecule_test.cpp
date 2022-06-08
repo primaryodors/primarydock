@@ -164,10 +164,10 @@ int main(int argc, char** argv)
 
     m1.reset_conformer_momenta();
     m2.reset_conformer_momenta();
-    Molecule* mols[4];
+    Molecule* mols[3];
     mols[0] = &m1;
     mols[1] = &m2;
-    mols[3] = NULL;
+    mols[2] = NULL;
     Molecule::multimol_conform(mols, 50);
     float final_clashes = m1.get_intermol_clashes(&m2);
     if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;

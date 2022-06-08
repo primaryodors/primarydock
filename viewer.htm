@@ -198,7 +198,8 @@ option.unknown
 	position: absolute;
 	display: block;
 	top: 25px;
-	left: 225px;
+	/*left: 225px;*/
+	right: 5px;
 	z-index: 1000;
 	padding: 10px;
 	border: 1px solid #249;
@@ -356,7 +357,7 @@ function show_seqdd()
 	var btnrect = sdchbtn.getBoundingClientRect();
 	$(seqdd
 		).css("top", parseInt(btnrect.bottom).toString()+"px"
-		).css("left", parseInt(btnrect.left).toString()+"px"
+		// ).css("left", parseInt(btnrect.left).toString()+"px"
 		).toggle().on("mouseleave", function()
 		{
 			if (tmoid) window.clearTimeout(tmoid);
@@ -829,6 +830,7 @@ function loadFile(fileData, fileName = "")
     curr_ligand = false;
 	resmdl = [];
 	restoggled = [];
+	sequence = "";
 	
     var fext = fileName.substr(fileName.lastIndexOf('.')+1);
     orid = 'OR1A1';

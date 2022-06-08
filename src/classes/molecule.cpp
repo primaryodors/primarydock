@@ -17,7 +17,7 @@ using namespace std;
 
 float potential_distance = 0;
 
-Molecule::Molecule(const char* lname)
+Molecule::Molecule(char const* lname)
 {
     name = new char[strlen(lname)+1];
     strcpy(name, lname);
@@ -41,7 +41,7 @@ Molecule::Molecule()
     paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
 }
 
-Molecule::Molecule(const char* lname, Atom** collection)
+Molecule::Molecule(char const* lname, Atom** collection)
 {
     if (!collection)
     {
@@ -147,10 +147,10 @@ void Molecule::reallocate()
         // delete[] atoms;
         atoms = latoms;
     }
-    rotatable_bonds = 0;
+    rotatable_bonds = nullptr;
 }
 
-Atom* Molecule::add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard)
+Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard)
 {
     Atom* a = new Atom(elemsym, location);
     a->name = new char[strlen(aname)+1];
@@ -165,7 +165,7 @@ Atom* Molecule::add_atom(const char* elemsym, const char* aname, const Point* lo
     return a;
 }
 
-Atom* Molecule::add_atom(const char* elemsym, const char* aname, Atom* bondto, const float bcard)
+Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, const float bcard)
 {
     if (!bondto || !bcard)
     {
@@ -335,7 +335,7 @@ char** Molecule::get_atom_names() const
     return retval;
 }
 
-Atom* Molecule::get_atom(const char* aname) const
+Atom* Molecule::get_atom(char const* aname) const
 {
     if (!atoms) return 0;
 
@@ -396,10 +396,10 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
     return atoms[j];
 }
 
-int Molecule::from_sdf(const char* sdf_dat)
+int Molecule::from_sdf(char const* sdf_dat)
 {
     if (!sdf_dat) return 0;
-    const char* lines[8192];
+    char const* lines[8192];
     int i,j=0,lncount;
 
     immobile = false;
@@ -641,7 +641,7 @@ bool Molecule::save_sdf(FILE* os, Molecule** lig)
     for (i=0; i<ac; i++)
     {
         Point p = latoms[i]->get_location();
-        const char* esym = latoms[i]->get_elem_sym();
+        char const* esym = latoms[i]->get_elem_sym();
         if (!esym) continue;
 
         if (latoms[i]->get_charge()) chargeds++;
@@ -1004,11 +1004,11 @@ _done_l:
 
                                     int pi_e = 0, pi_eo = 0;
 
-                                    for (p=0; ra = ring_atoms[ringcount][p]; p++)
+                                    for (p=0; (ra = ring_atoms[ringcount][p]); p++)
                                     {
                                         // Count the number of double bonds in the ring. For each double bond, count 2 pi electrons.
                                         rb = ring_atoms[ringcount][p ? (p-1) : (n-1)];
-                                        int card = ra->is_bonded_to(rb);
+                                        int card = (int)ra->is_bonded_to(rb);
 
                                         if (card == 2) pi_e += 2;
 
@@ -1044,10 +1044,10 @@ _not_aromatic:
                                 if (1)
 #endif
                                 {
-                                    for (p=0; ra = ring_atoms[ringcount][p]; p++)
+                                    for (p=0; (ra = ring_atoms[ringcount][p]); p++)
                                     {
                                         rb = ring_atoms[ringcount][p ? (p-1) : (n-1)];
-                                        int card = ra->is_bonded_to(rb);
+                                        int card = (int)ra->is_bonded_to(rb);
 
                                         Bond* ab = ra->get_bond_between(rb);
                                         ab->can_rotate = false;
@@ -1227,7 +1227,8 @@ _not_acidic:
         if (fama == PNICTOGEN)
         {
             Atom* c;
-            if (c = atoms[i]->is_bonded_to("C"))
+            c = atoms[i]->is_bonded_to("C");
+            if (c)
             {
                 if (c->is_bonded_to("O")) goto _not_basic;
             }
@@ -3509,11 +3510,11 @@ float Molecule::correct_structure(int iters)
 		                			case 2:   f = M_PI          - theta;	break;		                			
 		                			case 3:   f = triangular    - theta;	break;		                			
 		                			case 4:   f = tetrahedral   - theta;	break;		                			
-		                			case 6:   f = square        - theta;	break;		                			
+		                			case 6:   f = square        - theta;	break;
 		                			default:  ;
 		                		}
 		                		
-		                		error += fabs(f/M_PI);
+		                		error += (float)fabs(f/M_PI);
 
 	                			#if _DEV_FIX_MSTRUCT
 		                		if (fabs(f) > 0.1)
@@ -3521,8 +3522,8 @@ float Molecule::correct_structure(int iters)
 				            		Point pt(v);
 				            		
 				            		SCoord normal = compute_normal(aloc, bloc, cloc);
-				            		Point pt0 = rotate3D(pt, zero, normal, -0.1*f);
-				            		Point pt1 = rotate3D(pt, zero, normal,  0.1*f);
+				            		Point pt0 = rotate3D(pt, zero, normal, -0.1f*f);
+				            		Point pt1 = rotate3D(pt, zero, normal,  0.1f*f);
 				            		
 				            		float r0 = pt0.get_3d_distance(cloc);
 				            		float r1 = pt1.get_3d_distance(cloc);

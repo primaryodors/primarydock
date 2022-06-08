@@ -72,7 +72,10 @@ int main(int argc, char** argv)
         }
     }
 
-    cout << "Internal clashes: " << m1.get_internal_clashes() << " cu. A." << endl;
+	m1.minimize_internal_clashes();
+	float ic1 = m1.get_internal_clashes();
+    cout << "# Internal clashes: " << ic1 << " cu. A." << endl;
+    if (ic1 > 0.01) cout << "Internal clashes greater than threshold. FAIL." << endl;
 
     char** anames = m1.get_atom_names();
     if (anames)
@@ -104,7 +107,7 @@ int main(int argc, char** argv)
     Point pt1(0.2,-0.5,-0.3);
     m1.recenter(pt1);
     Point loc = m1.get_barycenter();
-    cout << "Molecule moved to [" << loc.x << "," << loc.y << "," << loc.z << "]." << endl;
+    cout << "# Molecule moved to [" << loc.x << "," << loc.y << "," << loc.z << "]." << endl;
 
     // const char* tstlig = "BZN.sdf";
     Molecule m2("test");
@@ -136,14 +139,14 @@ int main(int argc, char** argv)
         m2.hydrogenate();
     }
 
-    cout << "Loaded test ligand. Intermol clashes: " << (int)m1.get_intermol_clashes(&m2) << " cu. A." << endl;
-
-
+	m2.minimize_internal_clashes();
+	float im12 = m1.get_intermol_clashes(&m2);
+    cout << "# Loaded test ligand. Intermol clashes: " << im12 << " cu. A." << endl;
 
     SCoord v1(&pt1);
     float rotdeg = -30;
     m2.rotate(&v1, rotdeg * M_PI/180);
-    cout << "Rotated molecule 2 by " << rotdeg << " degrees. Intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
+    cout << "# Rotated molecule 2 by " << rotdeg << " degrees. Intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
 
     Point pt(0,0,1.0);
     SCoord v(&pt);
@@ -156,8 +159,8 @@ int main(int argc, char** argv)
     }
     cout << "\n# Moved molecule 2 by " << ttlmv << " A." << endl;
 
-    cout << "# Intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
-    cout << "# Intermol energy level: " << m1.get_intermol_binding(&m2) << " kJ/mol." << endl;
+    cout << "# Initial intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
+    cout << "# Initial intermol energy level: " << m1.get_intermol_binding(&m2) << " kJ/mol." << endl;
 
     m1.reset_conformer_momenta();
     m2.reset_conformer_momenta();
@@ -166,6 +169,8 @@ int main(int argc, char** argv)
     mols[1] = &m2;
     mols[3] = NULL;
     Molecule::multimol_conform(mols, 50);
+    float final_clashes = m1.get_intermol_clashes(&m2);
+    if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);
     cout << "\n# Post-conformation intermol energy level: " << energyLevel << " kJ/mol." << endl;
     const float energyLevelThreshold = 5.0;

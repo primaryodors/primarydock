@@ -2567,7 +2567,7 @@ bool Molecule::from_smiles(char const * smilesstr)
     }
 
     delete[] paren;
-    float anomaly = correct_structure(50);
+    float anomaly = correct_structure();
     if (anomaly > 0.1) cout << "ERROR: Structural anomaly = " << anomaly << endl;
     hydrogenate();
 
@@ -3482,7 +3482,7 @@ float Molecule::correct_structure(int iters)
 			float besttheta = 0, bestphi = 0, bestscore = -1e9;
 			for (lv.theta = 0; lv.theta <= M_PI; lv.theta += thstep)
 			{
-				float phstep = fiftyseventh*5*sin(lv.theta);
+				float phstep = fiftyseventh*5/(sin(lv.theta) + 0.25);
 				for (lv.phi = 0; lv.phi < (M_PI*2); lv.phi += phstep)
 				{
 					// At many points along the sphere, evaluate the goodness-of-fit as a function of:
@@ -3521,8 +3521,8 @@ float Molecule::correct_structure(int iters)
 						bestphi = lv.phi;
 						bestscore = score;
 						
-						cout << atoms[i]->name << " θ=" << (besttheta*fiftyseven) << " φ=" << (bestphi*fiftyseven)
-							 << " score=" << bestscore << endl;
+						/*cout << atoms[i]->name << " θ=" << (besttheta*fiftyseven) << " φ=" << (bestphi*fiftyseven)
+							 << " score=" << bestscore << endl;*/
 					}
 				}
 			}

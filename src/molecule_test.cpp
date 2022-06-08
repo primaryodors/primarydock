@@ -155,7 +155,7 @@ int main(int argc, char** argv)
     {
         m2.move(v);
         ttlmv += v.r;
-        cout << v.r << " ";
+        // cout << v.r << " ";
     }
     cout << "\n# Moved molecule 2 by " << ttlmv << " A." << endl;
 

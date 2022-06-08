@@ -401,13 +401,13 @@ int main(int argc, char** argv)
 	{
 		if (ligbb[i])
 		{
-		    cout << "# Best binding heavy atom of ligand" << endl << "LBBA: " << ligbb[i]->name << endl;
-		    if (output) *output << "# Best binding heavy atom of ligand" << endl << "LBBA: " << ligbb[i]->name << endl;
+		    cout << "# Best binding heavy atom " << i << " of ligand" << endl << "# LBBA: " << ligbb[i]->name << endl;
+		    if (output) *output << "# Best binding heavy atom " << i << " of ligand" << endl << "LBBA: " << ligbb[i]->name << endl;
 		}
 		if (ligbbh[i])
 		{
-		    cout << "# Best binding hydrogen of ligand" << endl << "LBBH: " << ligbbh[i]->name << endl;
-		    if (output) *output << "# Best binding hydrogen of ligand" << endl << "LBBH: " << ligbbh[i]->name << endl;
+		    cout << "# Best binding hydrogen " << i << " of ligand" << endl << "# LBBH: " << ligbbh[i]->name << endl;
+		    if (output) *output << "# Best binding hydrogen " << i << " of ligand" << endl << "LBBH: " << ligbbh[i]->name << endl;
 		}
     }
 
@@ -583,10 +583,20 @@ int main(int argc, char** argv)
 		                    al	= alca->get_location();
 		                    cen	= (l==1) ? ligbb[0]->get_location() : m.get_barycenter();
 
-							if (l < 2)
+							Rotation rot;
+							Point origin = ligbb[0]->get_location();
+							SCoord axis;
+							LocatedVector lv;
+	                    	float theta;
+	                    	float besttheta = 0, bestr = 100000;
+	                    	float rstep = fiftyseventh*30;
+							switch (l)
 							{
-				                Rotation rot = align_points_3d(&pt, &al, &cen);
+								case 0:
+								// Pivot about molcen.
+				                rot = align_points_3d(&pt, &al, &cen);
 				                m.rotate(&rot.v, rot.a);
+				                cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
 
 								if (!l)
 								{
@@ -595,11 +605,47 @@ int main(int argc, char** argv)
 						            v.r -= alignment_distance[l];
 						            v.r *= 0.5;
 						            m.move(v);
+						            cout << "# Moved ligand " << v.r << "A towards " << alignment_aa[l]->get_name()
+						            	 << ":" << alca->name << "." << endl;
 					            }
-		                    }
-		                    else
-		                    {
-		                    	// TODO: Rotisserie.
+					            break;
+					            
+					            case 1:
+					            // Pivot about bb0.
+				                rot = align_points_3d(&pt, &al, &origin);
+	                    		lv.copy(rot.v);
+	                    		lv.origin = origin;
+	                    		m.rotate(lv, rot.a);
+				                cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
+					            break;
+					            
+					            case 2:
+		                    	// Rotisserie.
+		                    	axis = ligbb[1]->get_location().subtract(origin);
+		                    	
+		                    	for (theta=0; theta < M_PI*2; theta += rstep)
+		                    	{
+		                    		lv.copy(axis);
+		                    		lv.origin = origin;
+		                    		m.rotate(lv, rstep);
+		                    		
+		                    		float r2 = alca->get_location().get_3d_distance(pt);
+		                    		if (r2 < bestr)
+		                    		{
+		                    			bestr = r2;
+		                    			besttheta = theta;
+		                    		}
+		                    	}
+		                    	
+		                    	lv.copy(axis);
+	                    		lv.origin = origin;
+	                    		m.rotate(lv, besttheta);
+				                cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
+				                	 << "-" << ligbb[1]->name << " axis." << endl;
+	                    		break;
+	                    		
+	                    		default:
+	                    		;
 		                    }
 
 		                    // Preemptively minimize intermol clashes.

@@ -2,9 +2,9 @@
 PrimaryOdors.org molecular docker.<br>
 http://www.primaryodors.org
 
-PODock is a lightweight molecular docking software package that allows path-based docking, side-chain flexion, and per-residue
-binding strength measurement. It uses data files so atomic and interatomic parameters can be fully customized without having to
-recompile the code.
+PODock is a lightweight molecular docking software package that allows path-based docking, side-chain flexion, and binding strength
+measurement at the residue level and per binding type. It uses data files so atomic and interatomic parameters can be fully customized
+without having to recompile the code.
 
 To Use PODock:
 
@@ -61,5 +61,6 @@ Note to developers: if you run podock under a memory utility such as valgrind, y
 uninitialized variables are being used or that conditional jumps depend on them. These are false positives. Many places in the code
 create temporary arrays of pointers and then assign those pointers addresses of objects that persist throughout the entire program
 execution. The memory tool "thinks" the objects are uninitialized even when they are. We recommend using the --undef-value-errors=no
-option with valgrind or the equivalent switch in your utility of choice. It's sad that "standards" discourage programmers from reusing
-objects/data like this, but we've coded it this way anyway in the interest of efficiency.
+option with valgrind or the equivalent switch in your utility of choice.
+
+

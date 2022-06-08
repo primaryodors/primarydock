@@ -439,7 +439,7 @@ function toggleSideChain(resno)
 		{
 			resmdl[resno].addRepresentation( "licorice",
             {
-                opacity: 1,
+                opacity: 0.7,
 				colorScheme: PODefScheme,
                 metalness: 0.13,
             });
@@ -466,40 +466,40 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
             else switch (atom.resname)
             {
                 case 'GLY':
-                return 0xcccccc;
+                return 0x999999;
 
                 case 'ALA':
                 case 'ILE':
                 case 'LEU':
                 case 'PRO':
                 case 'VAL':
-                return 0x999999;
+                return 0x808080;
 
                 case 'MET':
                 case 'CYS':
                 case 'SEC':
-                return 0xbbcc99;
+                return 0x99aa77;
 
                 case 'PHE':
                 case 'TRP':
                 case 'TYR':
-                return 0x886688;
+                return 0x664466;
 
                 case 'SER':
                 case 'THR':
                 case 'GLN':
                 case 'ASN':
-                return 0x66cc99;
+                return 0x66aa77;
 
                 case 'ASP':
                 case 'GLU':
-                return 0xffcc99;
+                return 0xddbb99;
 
                 case 'HIS':
                 case 'LYS':
                 case 'ARG':
                 case 'PYL':
-                return 0x99ccff;
+                return 0x99bbdd;
 
                 default:
                 return 0x666666;
@@ -510,6 +510,79 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
         	case 'P': return 0xff77c6;
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xffaa00;
+        	case 'Cl': return 0x33cc00;
+        	case 'Cu': return 0xe5a072;
+        	case 'Zn': return 0x92b0cc;
+        	case 'Na': return 0xffcc00;
+        	case 'Mg': return 0x99ffcc;
+        	case 'K': return 0x9966ff;
+        	case 'Ca': return 0xf7f7f7;
+        	case 'Fe': return 0x845f42;
+
+        	default: return 0x99aabb;
+        }
+
+        return 0xcc00ff;
+    };
+});
+
+var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function (atom)
+    {
+        switch (atom.atomType.element)
+        {
+        	case 'H': return atom.isBackbone() ? 0x79949b : 0xe1faff;
+            
+        	case 'C':
+            if (atom.isBackbone()) return 0x666666;
+            else switch (atom.resname)
+            {
+                case 'GLY':
+                return 0xe0e0e0;
+
+                case 'ALA':
+                case 'ILE':
+                case 'LEU':
+                case 'PRO':
+                case 'VAL':
+                return 0xbbbbbb;
+
+                case 'MET':
+                case 'CYS':
+                case 'SEC':
+                return 0xddee99;
+
+                case 'PHE':
+                case 'TRP':
+                case 'TYR':
+                return 0xaa77aa;
+
+                case 'SER':
+                case 'THR':
+                case 'GLN':
+                case 'ASN':
+                return 0x99eeaa;
+
+                case 'ASP':
+                case 'GLU':
+                return 0xffddbb;
+
+                case 'HIS':
+                case 'LYS':
+                case 'ARG':
+                case 'PYL':
+                return 0xbbddff;
+
+                default:
+                return 0x777777;
+            }
+
+        	case 'N': return atom.isBackbone() ? 0x000066 : 0x0087FF;
+        	case 'O': return atom.isBackbone() ? 0x660000 : 0xFF2222;
+        	case 'P': return 0xff8add;
+        	case 'S': return 0xffe022;
+        	case 'Se': return 0xffb022;
         	case 'Cl': return 0x33cc00;
         	case 'Cu': return 0xe5a072;
         	case 'Zn': return 0x92b0cc;
@@ -562,21 +635,24 @@ stage.mouseControls.remove( "drag-ctrl-right ");
 stage.mouseControls.remove( "drag-ctrl-left ");
 
 var url = 'http://primaryodors.org/sdf.php';
-var molid = getParameterByName('mol') ? getParameterByName('mol') : 'FRUCON';
+var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
 $.ajax(
 {
 	url: url,
+	cache: false,
 	data:
     {
 		m: molid
     },
 	success: function(result)
     {
+    	$('#posey')[0].innerText = result.split("\n")[0];
 		var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
         stage.loadFile( stringBlob, { ext: "sdf" } ).then( function( comp )
         {
             comp.addRepresentation( "ball+stick", { multipleBond: true } );
             gmodel.push(comp);
+            comp.autoView();
         } );
     }
 });
@@ -861,6 +937,11 @@ function loadFile(fileData, fileName = "")
                     
                 }
                 
+                if (fext == 'sdf')
+                {
+                	$('#posey')[0].innerText = fileData.split("\n")[0];
+            	}
+                
                 var stringBlob = new Blob( [ fileData ], { type: 'text/plain'} );
                 stage.loadFile( stringBlob, { ext: fext } ).then( function( comp )
                 {
@@ -909,7 +990,7 @@ function loadFile(fileData, fileName = "")
                         {
                             comp1.addRepresentation( "licorice",
                             {
-                                opacity: 1,
+                                opacity: 0.7,
 								colorScheme: PODefScheme,
                                 metalness: 0.13,
                             });
@@ -1070,8 +1151,8 @@ function loadFile(fileData, fileName = "")
                             {
                                 var rparam =
                                 {
-                                    opacity: 0.8,
-									colorScheme: PODefScheme,
+                                    opacity: 0.9,
+									colorScheme: PODefSchemeHilite,
                                 };
 
                                 model.push(comp);

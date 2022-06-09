@@ -47,6 +47,10 @@ int length(Atom** array) {
     return numAtoms;
 }
 
+bool isEmpty(Atom** array) {
+    return array[0] == nullptr;
+}
+
 Molecule::Molecule(char const* lname, Atom** collection)
 {
     if (!collection)

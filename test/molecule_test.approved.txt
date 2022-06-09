@@ -1,13 +1,9 @@
 Created empty molecule named nothing.
 Created molecule named CC(=O)[O-].
 Loaded 0 atoms of CC(=O)[O-] into molecule.
-Internal clashes: 1.1417 cu. A.
 Bond C1 - C2 can rotate.
 Bond C2 - O3 can rotate.
-Molecule moved to [0.0980784,-0.467363,-0.0479587].
-Loaded test ligand. Intermol clashes: 54 cu. A.
-Rotated molecule 2 by -30 degrees. Intermol clashes: 56.9046 cu. A.
-1 1 1 1 1 
 
-Energy level below threshold, FAIL.
+
+Energy level above threshold, SUCCESS.
 Saved output.sdf

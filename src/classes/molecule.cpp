@@ -41,6 +41,12 @@ Molecule::Molecule()
     paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
 }
 
+int length(Atom** array) {
+    int numAtoms;
+    for (numAtoms=0; array[numAtoms]; numAtoms++);
+    return numAtoms;
+}
+
 Molecule::Molecule(char const* lname, Atom** collection)
 {
     if (!collection)
@@ -49,13 +55,12 @@ Molecule::Molecule(char const* lname, Atom** collection)
         throw 0xbadca22;
     }
 
-    int i, j;
-    for (i=0; collection[i]; i++);
-    atoms = new Atom*[i+1];
-    for (j=0; j<i; j++)
+    int numAtoms = length(collection);
+    atoms = new Atom*[numAtoms + 1];
+    for (int j=0; j < numAtoms; j++)
         atoms[j] = collection[j];
-    atoms[i] = 0;
-    atcount = i;
+    atoms[numAtoms] = 0;
+    atcount = numAtoms;
 
     name = new char[strlen(lname)+1];
     strcpy(name, lname);

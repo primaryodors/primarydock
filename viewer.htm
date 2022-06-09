@@ -414,6 +414,7 @@ window.onresize = function()
     $('#viewport').css("width", w+"px").css("height",h+"px");
     stage.setSize(w, h);
 };
+window.onresize();
 
 stage.mouseControls.add( "scroll-ctrl+shift", function( stage, delta )
 {

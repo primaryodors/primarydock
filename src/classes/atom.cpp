@@ -1200,29 +1200,56 @@ void Atom::swing_all(int startat)
     }
 }
 
-float Atom::get_bond_angle_anomaly(SCoord v)
+float Atom::get_bond_angle_anomaly(SCoord v, Atom* ignore)
 {
 	if (!bonded_to) return 0;
 	int i;
-	float anomaly;
+	float anomaly = 0;
 	float lga = get_geometric_bond_angle();
 	
+	//cout << " -=- " << lga*fiftyseven << " | ";
 	for (i=0; i<geometry; i++)
 	{
-		if (bonded_to[i].btom)
+		if (bonded_to[i].btom && bonded_to[i].btom != ignore)
 		{
 			SCoord vb = bonded_to[i].btom->location.subtract(location);
 			float theta = find_3d_angle(v, vb, Point(0,0,0));
 			anomaly += fabs(theta-lga);
+			/*cout << "Geometric anomaly for " << name << ": "
+				 << lga*fiftyseven << "deg - " << theta*fiftyseven << "deg difference of " << fabs(theta-lga)*fiftyseven << "deg."
+				 << endl;*/
+			//cout << " " << theta*fiftyseven;
 		}
 	}
+	//cout  << " -=- ";
 	
+	//cout << "Geometric bond angle for " << name << " is " << lga*fiftyseven << "deg." << endl;
 	return anomaly;
 }
 
 float Atom::get_geometric_bond_angle()
 {
-	switch (geometry)
+	int lgeo = origgeo;
+	
+	//cout << name << " " << origgeo << " ";
+	
+	int i, bonded_atoms = 0;
+	for (i=0; i<lgeo; i++) if (bonded_to[i].btom) bonded_atoms++;
+	
+	for (i=0; i<lgeo; i++)
+	{
+		float bcard = bonded_to[i].cardinality;
+		if (bonded_to[i].btom && bcard > 1)
+		{
+			lgeo -= ((i&1) ? floor(bcard-1) : ceil(bcard-1));		// lgeo is an integer so treat two 1.5 bonds the same as a 1 and a 2.
+			//cout << bonded_to[i].btom->name << "-" << bcard << " ";
+		}
+	}
+	if (lgeo < bonded_atoms) lgeo = bonded_atoms;
+	
+	//cout << lgeo << " ";
+	
+	switch (lgeo)
 	{
 		case 1:
 		case 2:

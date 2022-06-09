@@ -17,7 +17,7 @@ enum intera_type
 
 class InteratomicForce
 {
-public:
+	public:
     InteratomicForce();
     intera_type get_type()	{	return type;	}
     float get_arity()	{	return arity;	}
@@ -34,7 +34,7 @@ public:
     static float covalent_bond_radius(Atom* a, Atom* b, float cardinality);
     static float coordinate_bond_radius(Atom* a, Atom* b, intera_type btype);
 
-protected:
+	protected:
     int Za=0;
     int bZa=0;
     int Zb=0;

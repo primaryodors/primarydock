@@ -60,9 +60,8 @@ class Molecule
     virtual void rotate(SCoord* SCoord, float theta);
     void rotate(LocatedVector SCoord, float theta);
     bool shielded(Atom* a, Atom* b) const;
-    void voxel_computation(int iters = 5);
     Point get_atom_location(char const * aname);
-    float correct_structure(int iters = 200);
+    float correct_structure(int iters = 500);
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -71,7 +70,7 @@ class Molecule
     Atom* get_atom(const char* aname) const;
     Atom* get_atom(const int a_idx) const	{	return atoms[a_idx];	}
     void delete_atom(Atom* a);
-    void hydrogenate();
+    void hydrogenate(bool steric_only = false);
     void clear_atom_binding_energies();
 
     // Bond functions.
@@ -124,6 +123,7 @@ class Molecule
 
 	protected:
     Molecule();
+    
     Atom** atoms = 0;
     int atcount = 0;
     char* name = 0;
@@ -150,6 +150,9 @@ class Molecule
     void reallocate();
     float fsb_lsb_anomaly(Atom* first, Atom* last, float lcard, float bond_length);
     void make_coplanar_ring(Atom** ring_members);
+    void recenter_ring(int ringid, Point new_ring_cen);
+    void rotate_ring(int ringid, Rotation rot);
+    bool in_same_ring(Atom* a, Atom* b);
 
     void intermol_conform_norecen(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);

@@ -125,7 +125,7 @@ class Atom
     SCoord* get_basic_geometry();
     SCoord* get_geometry_aligned_to_bonds();
     float get_geometric_bond_angle();
-    float get_bond_angle_anomaly(SCoord v);					// Assume centered on current atom.
+    float get_bond_angle_anomaly(SCoord v, Atom* ignore);	// Assume v is centered on current atom.
     float distance_to(Atom* btom)
     {
         if (!btom) return -1;
@@ -162,6 +162,7 @@ class Atom
     bool EZ_flip = false;
     float last_bind_energy=0;
 	int ring_member = 0;				// How many rings is this atom part of.
+	int arom_ring_member = 0;
 
 	protected:
     void figure_out_valence();

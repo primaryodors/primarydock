@@ -225,7 +225,7 @@ void Molecule::clear_all_bond_caches()
     }
 }
 
-void Molecule::hydrogenate()
+void Molecule::hydrogenate(bool steric_only)
 {
     if (!atoms) return;
     int i, j;
@@ -235,24 +235,26 @@ void Molecule::hydrogenate()
         if (atoms[i]->is_metal()) continue;					// No hydrides.
         if (atoms[i]->dnh) continue;
 
-        int valence = atoms[i]->get_valence();
+        float valence = atoms[i]->get_valence();
         if (valence > 4) valence = 8 - valence;
-
-        //cout << atoms[i]->name << " has valence " << valence;
         
-        if (valence == 4 && atoms[i]->get_geometry() == 3) valence--;
+        // if (atoms[i]->arom_ring_member && valence == 4 && atoms[i]->get_geometry() == 3) valence--;
 
-        int bcardsum = 0;
+        // cout << atoms[i]->name << " has valence " << valence << endl;
+
+        float bcardsum = 0;
 
         Bond** aib = atoms[i]->get_bonds();
-
+		int db = 0;
         if (aib)
         {
             for (j=0; aib[j]; j++)
             {
                 if (aib[j]->btom) bcardsum += aib[j]->cardinality;
+                if (aib[j]->cardinality > 1) db++;
             }
         }
+        if (!db && steric_only) continue;
 
         //cout << " minus existing bonds " << bcardsum ;
 
@@ -260,7 +262,8 @@ void Molecule::hydrogenate()
 
         //cout << " given charge makes " << bcardsum << endl;
 
-        for (j=bcardsum; j<valence; j++)
+		int h_to_add = round(valence - bcardsum);
+        for (j=0; j<h_to_add; j++)
         {
             char hname[5];
             sprintf(hname, "H%d", atcount+1);
@@ -2567,11 +2570,11 @@ bool Molecule::from_smiles(char const * smilesstr)
     }
 
     delete[] paren;
+    // hydrogenate(true);
     float anomaly = correct_structure();
     if (anomaly > 0.1) cout << "ERROR: Structural anomaly = " << anomaly << endl;
-    hydrogenate();
-
-    // voxel_computation(5);
+    else cout << "# Structural anomaly = " << anomaly << endl;
+    hydrogenate(false);
 
     return retval;
 }
@@ -2706,6 +2709,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
             {
                 int EZ = (smilesstr[i] == '/') ? 1 : -1;
                 preva->EZ_flip = EZgiven[dbi-1] = sgn(EZ) != sgn(lastEZ);
+                // cout << preva->name << " EZ flip: " << preva->EZ_flip << endl;
                 lastEZ = 0;
             }
             else
@@ -2831,21 +2835,6 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 }
 
                 float anomaly = close_loop(aloop, card);
-                // Ring closure anomaly of more than a tiny amount should always come up as a fail in the tests.
-                if (fabs(anomaly) > 0.1) cout << "Ring closure anomaly " << anomaly << endl;
-
-                /*for (l=0; l<dbi; l++)
-                {	if (!EZgiven[l] && EZatom0[l] && EZatom1[l])
-                	{	Bond* lb = EZatom0[l]->get_bond_between(EZatom1[l]);
-                		lb->can_flip = false;
-                		lb->can_rotate = false;
-                		lb = EZatom1[l]->get_bond_between(EZatom0[l]);
-                		if (lb)
-                		{	lb->can_flip = false;
-                			lb->can_rotate = false;
-                		}
-                	}
-                }*/
 
                 if (card) preva->bond_to(numbered[j], card);
                 card = 1;
@@ -3077,6 +3066,7 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
         ring_members[l]->arom_center = &ringcen;
         ring_members[l]->clear_geometry_cache();
         ring_members[l]->ring_member = max(1, ring_members[l]->ring_member);
+        ring_members[l]->arom_ring_member = max(1, ring_members[l]->arom_ring_member);
         if (ring_members[l]->get_valence() != 4) ring_members[l]->aromatize();
 
         Bond* b2=0;
@@ -3343,110 +3333,52 @@ Point Molecule::get_bounding_box() const
     return pt;
 }
 
-void Molecule::voxel_computation(int iters)
+void Molecule::recenter_ring(int ringid, Point new_ring_cen)
 {
-    if (!atoms) return;
-    return;			// THIS FUNCTION DOES NOT WORK.
-
-    // Get the molecule's bounding box, then grow it slightly.
-    Point boxvtx = get_bounding_box();
-    Point molcen = get_barycenter();
-
-    boxvtx.scale(boxvtx.magnitude() * 1.25);
-
-    // Define a voxel space with 0.1A resolution.
-    int xmax = ceil(boxvtx.x * 2 / _voxel_resolution);
-    int ymax = ceil(boxvtx.y * 2 / _voxel_resolution);
-    int zmax = ceil(boxvtx.z * 2 / _voxel_resolution);
-    int numvox = (xmax+1) * (ymax+1) * (zmax+1);
-    int voxperx = (ymax+1) * (zmax+1);
-    int voxpery = (zmax+1);
-#if USE_VOXEL_ARRAY
-    float voxelspace[numvox + 8];
-#endif
-
-    // For each iteration,
-    int iter;
-    for (iter=0; iter<iters; iter++)
-    {
-        int i, j, vx, vy, vz, vxi, vxyi;
-        float ax, ay, az;
-        float min_energy = 99999;
-        Point min_ener_vox;
-        Point aloc;
-
-        // For each atom of the molecule,
-        for (i=0; atoms[i]; i++)
-        {
-            cout << iter << "," << i << " / " << iters << endl;
-
-            // Find its energy level for every voxel in the space.
-            // For non-bonded atoms, just use an inverse square of the distance.
-            // For bonded atoms, use the negative inverse square of 1+distance anomaly.
-            // Keep track of the lowest energy level.
-            float energy;
-            min_energy = 99999;
-            min_ener_vox = aloc = atoms[i]->get_location();
-
-            for (vx=0; vx<xmax; vx++)
-            {
-                vxi = vx * voxperx;
-                if (vxi >= numvox) break;
-                ax = _voxel_resolution * vx;
-
-                for (vy=0; vy<ymax; vy++)
-                {
-                    vxyi = vxi + vy * voxpery;
-                    if (vxyi >= numvox) break;
-                    ay = _voxel_resolution * vy;
-
-                    for (vz=0; vz<zmax; vz++)
-                    {
-                        az = _voxel_resolution * vz;
-                        energy = 0;
-                        Point aloctmp(ax, ay, az);
-                        aloctmp = aloctmp.add(molcen);
-
-                        for (j=0; atoms[j]; j++)
-                        {
-                            if (j==i) continue;
-                            Bond* b = atoms[i]->get_bond_between(atoms[j]);
-                            float r = aloctmp.get_3d_distance(atoms[j]->get_location());
-                            if (b)
-                            {
-                                float optimal_r = InteratomicForce::covalent_bond_radius(atoms[i], atoms[j], b->cardinality);
-                                float anomaly = fabs(r - optimal_r);
-                                energy -= 1.0/pow(1.0+anomaly, 2);
-                            }
-                            else
-                            {
-                                energy += 1.0/pow(0.00001+r, 2);
-                            }
-                        }
-
-#if USE_VOXEL_ARRAY
-                        int vxyzi = vxyi + vz;
-                        if (vxyzi >= numvox) break;
-
-                        voxelspace[vxyzi] = energy;
-#endif
-
-                        if (energy < min_energy)
-                        {
-                            min_energy = energy;
-                            min_ener_vox = aloctmp;
-                        }
-                    }	// next vz
-                }	// next vy
-            }	// next vx
-
-            // Move the atom to the lowest energy voxel.
-            atoms[i]->move(min_ener_vox);
-        }
-    }
+	Point old_ring_cen = get_ring_center(ringid);
+	SCoord motion = new_ring_cen.subtract(old_ring_cen);
+	int i;
+	for (i=0; ring_atoms[ringid][i]; i++)
+		ring_atoms[ringid][i]->move_rel(&motion);
 }
 
-#define _DEV_FIX_MSTRUCT 0
+void Molecule::rotate_ring(int ringid, Rotation rot)
+{
+	Point origin = get_ring_center(ringid);
+	int i;
+	for (i=0; ring_atoms[ringid][i]; i++)
+	{
+		Point aloc = ring_atoms[ringid][i]->get_location();
+		aloc = rotate3D(&aloc, &origin, &rot);
+		ring_atoms[ringid][i]->move(aloc);
+	}
+}
+
+bool Molecule::in_same_ring(Atom* a, Atom* b)
+{
+	int i, j;
+	for (i=0; i<ringcount; i++)
+	{
+		bool a_in_ring = false, b_in_ring = false;
+		for (j=0; ring_atoms[i][j]; j++)
+		{
+			if (ring_atoms[i][j] == a)
+			{
+				a_in_ring = true;
+				if (b_in_ring) return true;
+			}
+			else if (ring_atoms[i][j] == b)
+			{
+				b_in_ring = true;
+				if (a_in_ring) return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+#define _DEV_FIX_MSTRUCT 1
 float Molecule::correct_structure(int iters)
 {
     if (!atoms) return 0;
@@ -3456,9 +3388,21 @@ float Molecule::correct_structure(int iters)
 	Point aloc, bloc;
 	Atom* btom;
 	Bond** b;
-	int bg;
+	int g, bg;
 	float b_bond_angle;
 	LocatedVector lv;
+   
+    if (ringcount)
+    {
+    	for (i=0; i<ringcount; i++)
+    	{
+    		if (ring_aromatic[i])
+    		{
+				make_coplanar_ring(ring_atoms[i]);
+    		}
+    	}
+    }
+    else return 0;
 	
 	#if _DEV_FIX_MSTRUCT
     for (iter=0; iter<iters; iter++)
@@ -3466,12 +3410,18 @@ float Molecule::correct_structure(int iters)
     	error = 0;
         for (i=0; atoms[i]; i++)
         {
-			// Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
+        	// Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
             b = atoms[i]->get_bonds();
             if (!b) continue;
+			//if (b[0]->cardinality > 1) continue;
 			btom = b[0]->btom;
 			if (!btom) continue;
+			//if (btom->get_bond_by_idx(0)->cardinality > 1) continue;
+			
+			if (atoms[i]->num_rings() && atoms[i]->is_pi() && in_same_ring(atoms[i], btom)) continue;
+			
 			bloc = btom->get_location();
+			g = atoms[i]->get_geometry();
 			bg = btom->get_geometry();
 			b_bond_angle = btom->get_geometric_bond_angle();
 			
@@ -3480,9 +3430,9 @@ float Molecule::correct_structure(int iters)
 			lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, b[0]->cardinality);
 			float thstep = fiftyseventh*5;
 			float besttheta = 0, bestphi = 0, bestscore = -1e9;
-			for (lv.theta = 0; lv.theta <= M_PI; lv.theta += thstep)
+			for (lv.theta = -square; lv.theta <= square; lv.theta += thstep)
 			{
-				float phstep = fiftyseventh*5/(sin(lv.theta) + 0.25);
+				float phstep = M_PI/(20.0*(sin(lv.theta) + 1));
 				for (lv.phi = 0; lv.phi < (M_PI*2); lv.phi += phstep)
 				{
 					// At many points along the sphere, evaluate the goodness-of-fit as a function of:
@@ -3492,153 +3442,85 @@ float Molecule::correct_structure(int iters)
 					// Later, we'll test edge cases where bond strain distorts the usual angles.
 					float score = 0;
 					
-					score -= btom->get_bond_angle_anomaly(lv);
+					score -= 25.0*btom->get_bond_angle_anomaly(lv, atoms[i]);
 					
+					// Avoid clashes with strangers.
 					for (j=0; atoms[j]; j++)
 					{
 						if (j == i) continue;
-						if (atoms[j] == btom) continue;
 						if (atoms[j]->is_bonded_to(atoms[i])) continue;
-						if (atoms[j]->is_bonded_to(btom)) continue;
 						
 						float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
-						score -= 1.0/fabs(r+0.000000001);
+						score -= 5.0/fabs(r+0.000000001);
 					}
 					
-					for (j=0; b[j]; j++)
+					// Seek optimal bond radii.
+					for (j=1; b[j]; j++)
 					{
 						if (!b[j]->btom) continue;
 						float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
 						float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
 						
-						score += 100.0 / (fabs(optimal-r)+1);
+						score -= 30.0 * fabs(optimal-r);
 					}
-					
 					
 					if (score > bestscore)
 					{
 						besttheta = lv.theta;
 						bestphi = lv.phi;
 						bestscore = score;
-						
-						/*cout << atoms[i]->name << " θ=" << (besttheta*fiftyseven) << " φ=" << (bestphi*fiftyseven)
-							 << " score=" << bestscore << endl;*/
 					}
 				}
 			}
 			
-			// Once a "best fit" point in space is found, move there.
 			error -= bestscore;
+			if (!iter) continue;
+			
+			// Once a "best fit" point in space is found, move there.
 			lv.theta = besttheta;
 			lv.phi = bestphi;
-			atoms[i]->move(lv.to_point());
+			
+			if (atoms[i]->num_rings() && atoms[i]->is_pi())
+			{
+				for (j=0; j<ringcount; j++)
+				{
+					for (k=0; ring_atoms[j][k]; k++)
+					{
+						if (ring_atoms[j][k] == atoms[i])
+						{
+							// Get distance from atom to ring center.
+							Point rcen = get_ring_center(j);
+							Point aloc = atoms[i]->get_location();
+							float rad = rcen.get_3d_distance(aloc);
+							
+							// Center ring at combined distance from btom.
+							LocatedVector lvr = lv;
+							lvr.r += rad;
+							recenter_ring(j, lvr.to_point());
+							
+							// Rotate ring, and all assemblies, to align atom to btom.
+							Point atarget = lv.to_point();
+							aloc = atoms[i]->get_location();
+							rcen = get_ring_center(j);
+							Rotation rot = align_points_3d(&aloc, &atarget, &rcen);
+							rotate_ring(j, rot);
+							
+							break;
+						}
+					}
+				}
+			}
+			else
+			{
+				/*Point pt = lv.to_point();
+				atoms[i]->move_assembly(&pt, btom);*/
+				atoms[i]->move(lv.to_point());
+			}
 		}
+		// cout << error << " " << atcount << endl;
+		// if (error <= 10.0*atcount) break;
 	}
 	#endif
-	
-	
-	
-	return error;
-	
-	// Red herring follows (old code that failed to do the desired functionality).
-   
-    if (ringcount)
-    {
-    	for (i=0; i<ringcount; i++)
-    	{
-    		if (ring_aromatic[i])
-    		{
-				cout << "Ring " << i << endl;
-				make_coplanar_ring(ring_atoms[i]);
-    		}
-    	}
-    }
-
-    for (iter=0; iter<iters; iter++)
-    {
-    	error = 0;
-        for (i=0; atoms[i]; i++)
-        {
-            Point aloc = atoms[i]->get_location();
-            Bond** b = atoms[i]->get_bonds();
-            int g = atoms[i]->get_geometry();
-
-            for (j=0; j<g; j++)
-            {
-                if (b[j]->btom)
-                {
-                    Point bloc = b[j]->btom->get_location();
-                    SCoord v(bloc.subtract(aloc));
-                    float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
-                    
-                    if (iter == iters-1
-                    	&&
-                    	fabs(optimal - v.r) > 0.1
-                    	)
-                    	cout << atoms[i]->name << cardinality_printable(b[j]->cardinality)
-							 << b[j]->btom->name << " radius should be " << optimal
-							 << ", is " << v.r << endl;
-                    error += fabs(optimal - v.r);
-                    
-                    if (g == 4 && b[j]->cardinality > 1 && b[j]->cardinality <= 2) atoms[i]->aromatize();
-                    
-                    // Bond angles.
-                    if (iter < (iters-20))
-                    {
-		                for (k=0; k<g; k++)
-		                {
-		                	if (k == j) continue;
-		                	if (b[k]->btom)
-		                	{
-		                		Point cloc = b[k]->btom->get_location();
-		                		float f=0, theta = find_3d_angle(bloc, cloc, aloc);
-		                		
-		                		switch (g)
-		                		{
-		                			case 2:   f = M_PI          - theta;	break;		                			
-		                			case 3:   f = triangular    - theta;	break;		                			
-		                			case 4:   f = tetrahedral   - theta;	break;		                			
-		                			case 6:   f = square        - theta;	break;
-		                			default:  ;
-		                		}
-		                		
-		                		error += (float)fabs(f/M_PI);
-
-	                			#if _DEV_FIX_MSTRUCT
-		                		if (fabs(f) > 0.1)
-		                		{
-				            		Point pt(v);
-				            		
-				            		SCoord normal = compute_normal(aloc, bloc, cloc);
-				            		Point pt0 = rotate3D(pt, zero, normal, -0.1f*f);
-				            		Point pt1 = rotate3D(pt, zero, normal,  0.1f*f);
-				            		
-				            		float r0 = pt0.get_3d_distance(cloc);
-				            		float r1 = pt1.get_3d_distance(cloc);
-				            		
-				            		v = (r0 > r1) ? pt0 : pt1;
-			            		}
-			            		#endif
-		                	}
-		                }
-	                }
-
-                    v.r = optimal; // += 0.1 * (optimal-v.r);
-
-                    if (atoms[i]->num_rings())
-                    {
-                    	b[j]->btom->move(aloc.add(v));
-                    	;
-                	}
-                    else
-                    {
-		                Point pt(aloc.add(v));
-		                b[j]->btom->move_assembly(&pt, atoms[i]);
-	                }
-                }
-            }
-        }
-    }
 
 	return error;
 }

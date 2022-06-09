@@ -31,12 +31,12 @@ int main(int argc, char** argv)
 
     m.hydrogenate();
 
-    cout << "Internal clashes: " << m.get_internal_clashes() << " cu.A." << endl;
+    cout << "# Internal clashes: " << m.get_internal_clashes() << " cu.A." << endl;
 
     cout << "Minimizing internal clashes..." << endl;
     m.minimize_internal_clashes();
     
-    if (argc > 4)
+    /*if (argc > 4)
     {
     	Atom* a = m.get_atom(argv[2]);
     	Atom* b = m.get_atom(argv[3]);
@@ -47,21 +47,26 @@ int main(int argc, char** argv)
     		Bond* bn = a->get_bond_between(b);
     		if (bn) bn->rotate(theta);
     	}
-    }
+    }*/
 
-    cout << "Internal clashes: " << m.get_internal_clashes() << " cu.A." << endl;
+	float int_clsh = m.get_internal_clashes();
+	if (int_clsh < 1) cout << "# ";
+    cout << "Internal clashes: " << int_clsh << " cu.A." << endl;
 
-    const char* tstoutf = "test.sdf";
+    char tstoutf[1024];
+    if (argc > 2) strcpy(tstoutf, argv[2]);
+    else strcpy(tstoutf, "test.sdf");
     FILE* pf = fopen(tstoutf, "wb");
     if (m.save_sdf(pf)) cout << "Saved " << tstoutf << endl;
     else cout << "Failed to save " << tstoutf << endl;
     fclose(pf);
     
-    const char* tstpdbf = "test.pdb";
+    /*const char* tstpdbf = "test.pdb";
     pf = fopen(tstpdbf, "wb");
     m.save_pdb(pf);
     cout << "Saved " << tstpdbf << endl;
-    fclose(pf);
+    fclose(pf);*/
 
     return 0;
 }
+

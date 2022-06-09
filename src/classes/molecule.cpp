@@ -47,8 +47,14 @@ int length(Atom** array) {
     return numAtoms;
 }
 
-bool isEmpty(Atom** array) {
-    return array[0] == nullptr;
+bool hasAtoms(Atom** array) {
+    if(array == nullptr)
+        return false;
+    return array[0] != nullptr;
+}
+
+bool noAtoms(Atom** array) {
+    return !hasAtoms(array);
 }
 
 Molecule::Molecule(char const* lname, Atom** collection)
@@ -79,7 +85,7 @@ Molecule::Molecule(char const* lname, Atom** collection)
 Molecule::~Molecule()
 {
     /*int i;
-    if (atoms)
+    if (hasAtoms(atoms))
     {	for (i=0; atoms[i]; i++) delete atoms[i];
     	delete[] atoms;
     }
@@ -97,7 +103,7 @@ void Molecule::delete_atom(Atom* a)
 	if (!a) return;
 	int i, j;
 	
-	if (atoms)
+	if (hasAtoms(atoms))
 	{
 		for (i=0; atoms[i]; i++)
 		{
@@ -236,7 +242,7 @@ void Molecule::clear_all_bond_caches()
 
 void Molecule::hydrogenate(bool steric_only)
 {
-    if (!atoms) return;
+    if (noAtoms(atoms)) return;
     int i, j;
 
     for (i=0; atoms[i]; i++)
@@ -349,7 +355,7 @@ char** Molecule::get_atom_names() const
 
 Atom* Molecule::get_atom(char const* aname) const
 {
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
 
     int i;
     for (i=0; atoms[i]; i++)
@@ -359,7 +365,7 @@ Atom* Molecule::get_atom(char const* aname) const
 }
 
 Point Molecule::get_atom_location(char const * aname)
-{	if (!atoms)
+{	if (noAtoms(atoms))
 	{
 		Point pt;
 		return pt;
@@ -371,7 +377,7 @@ Point Molecule::get_atom_location(char const * aname)
 
 Atom* Molecule::get_nearest_atom(Point loc) const
 {
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
 
     int i, j;
     float best, r;
@@ -390,7 +396,7 @@ Atom* Molecule::get_nearest_atom(Point loc) const
 
 Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
 {
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
 
     int i, j;
     float best, r;
@@ -563,7 +569,7 @@ int Molecule::get_bond_count(bool unidirectional) const
 {
     int i, j, bc=0;
 
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
     for (i=0; i<atcount && atoms[i]; i++)
     {
         Bond** b = atoms[i]->get_bonds();
@@ -584,7 +590,7 @@ int Molecule::aidx(Atom* a)
 {
     if (!a) return -1;
     int i;
-    if (!atoms) return -1;
+    if (noAtoms(atoms)) return -1;
 
     for (i=0; atoms[i]; i++)
     {
@@ -619,7 +625,7 @@ bool Molecule::save_sdf(FILE* os, Molecule** lig)
     Atom* latoms[65536];
     Bond* lbonds[65536];
 
-    if (atoms)
+    if (hasAtoms(atoms))
         for (j=0; atoms[j]; j++)
             latoms[j] = atoms[j];
 
@@ -1144,7 +1150,7 @@ _exit_m:
 
 void Molecule::identify_acidbase()
 {
-    if (!atoms) return;
+    if (noAtoms(atoms)) return;
 
     // For every atom in the molecule:
     int i, j, k;
@@ -1260,7 +1266,7 @@ _not_basic:
 
 Bond** Molecule::get_rotatable_bonds()
 {
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
     if (rotatable_bonds) return rotatable_bonds;
     if (mol_typ == MOLTYP_AMINOACID)
     {	
@@ -1339,7 +1345,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     // cout << name << " AminoAcid::get_rotatable_bonds()" << endl << flush;
     // Return ONLY side chain bonds, from lower to higher Greek. E.g. CA-CB but NOT CB-CA.
     // Exclude CA-N and CA-C as these will be managed by the Protein class.
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
     if (rotatable_bonds) return rotatable_bonds;
     if (aadef && aadef->proline_like)
     {
@@ -1430,7 +1436,7 @@ Bond** AminoAcid::get_rotatable_bonds()
 
 Bond** Molecule::get_all_bonds(bool unidirectional)
 {
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
     Bond* btemp[65536];
 
     int i,j, bonds=0;
@@ -1466,7 +1472,7 @@ float Molecule::get_internal_clashes()
     Atom* a, *b;
     float clash = 0;
 
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
 
     for (i=0; atoms[i]; i++)
     {
@@ -1511,7 +1517,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
     Atom* a, *b;
     float clash = 0;
 
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
 
@@ -1552,7 +1558,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
 
 void Molecule::move(SCoord move_amt)
 {
-    if (!atoms) return;
+    if (noAtoms(atoms)) return;
     if (immobile)
     {
         cout << "Warning: Attempt to move \"immobile\" molecule " << name << endl;
@@ -1571,7 +1577,7 @@ void Molecule::move(SCoord move_amt)
 
 void Molecule::move(Point move_amt)
 {
-    if (!atoms) return;
+    if (noAtoms(atoms)) return;
     if (immobile)
     {
         cout << "Warning: Attempt to move \"immobile\" molecule " << name << endl;
@@ -1591,7 +1597,7 @@ void Molecule::move(Point move_amt)
 
 Point Molecule::get_barycenter() const
 {
-    if (!atoms)
+    if (noAtoms(atoms))
     {
         Point pt;
         return pt;
@@ -1615,7 +1621,7 @@ void Molecule::recenter(Point nl)
 
 void Molecule::rotate(SCoord* SCoord, float theta)
 {
-    if (!atoms) return;
+    if (noAtoms(atoms)) return;
     // cout << name << " Molecule::rotate()" << endl;
 
     Point cen = get_barycenter();
@@ -1632,7 +1638,7 @@ void Molecule::rotate(SCoord* SCoord, float theta)
 
 void Molecule::rotate(LocatedVector SCoord, float theta)
 {
-    if (!atoms) return;
+    if (noAtoms(atoms)) return;
 
     int i;
     for (i=0; i<atcount; i++)
@@ -1682,7 +1688,7 @@ bool Molecule::shielded(Atom* a, Atom* b) const
 
 float Molecule::get_atom_mol_bind_potential(Atom* a)
 {
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
     int i, j;
     float retval=0;
     potential_distance = 0;
@@ -1777,7 +1783,7 @@ float Molecule::get_intermol_binding(Molecule** ligands)
 
 void Molecule::minimize_internal_clashes()
 {
-    if (!atoms) return;
+    if (noAtoms(atoms)) return;
 
     minclash = 0;
     int i, j, iter;
@@ -3249,7 +3255,7 @@ float Molecule::close_loop(Atom** path, float lcard)
 
 Atom** Molecule::get_most_bindable(int max_count)
 {
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
 
     int i, j=-1, k, l;
     float best[max_count+2];
@@ -3318,7 +3324,7 @@ Atom** Molecule::get_most_bindable(int max_count)
 
 Point Molecule::get_bounding_box() const
 {
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
 
     int i;
     float xmax=0, ymax=0, zmax=0;
@@ -3390,7 +3396,7 @@ bool Molecule::in_same_ring(Atom* a, Atom* b)
 #define _DEV_FIX_MSTRUCT 1
 float Molecule::correct_structure(int iters)
 {
-    if (!atoms) return 0;
+    if (noAtoms(atoms)) return 0;
     int iter, i, j, k;
     Point zero(0,0,0);
 	float error = 0;

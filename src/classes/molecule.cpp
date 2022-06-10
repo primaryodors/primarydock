@@ -3023,8 +3023,10 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
     int i, j, l, ringsz;
 
     bool allarom = true;
+    // cout << "Making coplanar ring of ";
     for (i=0; ring_members[i]; i++)
     {
+    	// cout << ring_members[i]->name << " ";
         ringsz = i+1;
         Bond** ab = ring_members[i]->get_bonds();
         bool haspi = false;
@@ -3032,8 +3034,10 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
             if (ab[j]->cardinality > 1 && ab[j]->cardinality < 2) haspi = true;
         if (!haspi) allarom = false;
     }
+    // cout << endl;
 
     if (ringsz<3) return;
+    if (ringsz>6) return;
 
     SCoord normal;
     Point ringcen;
@@ -3396,7 +3400,7 @@ float Molecule::correct_structure(int iters)
 	int g, bg;
 	float b_bond_angle;
 	LocatedVector lv;
-   
+    
     if (ringcount)
     {
     	for (i=0; i<ringcount; i++)

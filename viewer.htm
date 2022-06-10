@@ -1211,6 +1211,7 @@ function loadFile(fileData, fileName = "")
             window.setTimeout(function()
             {
             	$("#pleasewait").hide();
+            	$('#clip').trigger("input");
         	}, 503);
         }
     });

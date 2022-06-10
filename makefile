@@ -94,7 +94,7 @@ amino_report: test/amino_test
 atom_report: REPORT="test/atom_test.approved.txt"
 atom_report: test/atom_test
 	./test/atom_test H >test/atom_test.txt
-	diff $(REPORT) test/atom_test.txt
+	diff --color --unified $(REPORT) test/atom_test.txt
 
 aniso_report: REPORT="test/aniso_test.approved.txt"
 aniso_report: test/aniso_test

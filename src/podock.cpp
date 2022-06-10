@@ -325,6 +325,7 @@ int main(int argc, char** argv)
 
 	for (i=0; i<3; i++)
 	{
+		if (!ligbb[i]) continue;
 		if (ligbb[i]->get_Z() == 1)
 		{
 		    ligbbh[i] = ligbb[i];
@@ -419,6 +420,18 @@ int main(int argc, char** argv)
     // srand(time(NULL));
     for (pose=1; pose<=poses; pose++)
     {
+    	if (pose > 1)
+    	{
+    		// TODO: Revert to saved original locations for the side chain atoms instead of reloading the protein.
+		    pf = fopen(protfname, "r");
+			if (!pf)
+			{
+				cout << "Error trying to read " << protfname << endl;
+				return 0xbadf12e;
+			}
+			p.load_pdb(pf);
+			fclose(pf);
+    	}
 #if _DBG_STEPBYSTEP
         if (debug) *debug << "Pose " << pose << endl;
 #endif
@@ -486,6 +499,7 @@ int main(int argc, char** argv)
                 std::string alignment_name = "";
                 for (l=0; l<3; l++)
 				{
+					if (!ligbb[l]) continue;
                 	float alignment_potential = 0;
 		            for (i=0; reaches_spheroid[nodeno][i]; i++)
 		            {
@@ -511,13 +525,10 @@ int main(int argc, char** argv)
 		                    *debug << endl;
 		                }
 #endif
-					
-		                float pottmp = (
-		                                   reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb[l])
-		                                   + reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh[l])
-		                               )
-		                               / pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter())
-		                               ;
+						
+		                float pottmp = reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb[l]);
+		                if (ligbbh[l]) pottmp += reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh[l]);
+		                pottmp /= pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter());
 		                // cout << reaches_spheroid[nodeno][i]->get_3letter() << reaches_spheroid[nodeno][i]->get_residue_no() << " " << pottmp << endl;
 		                if (reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ[l])
 		                        &&

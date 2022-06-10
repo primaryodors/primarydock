@@ -1212,7 +1212,9 @@ float Atom::get_bond_angle_anomaly(SCoord v, Atom* ignore)
 	{
 		if (bonded_to[i].btom && bonded_to[i].btom != ignore)
 		{
+			//cout << bonded_to[i].btom->location << " - " << location;
 			SCoord vb = bonded_to[i].btom->location.subtract(location);
+			//cout << " = " << (Point)vb << endl;
 			float theta = find_3d_angle(v, vb, Point(0,0,0));
 			anomaly += fabs(theta-lga);
 			/*cout << "Geometric anomaly for " << name << ": "

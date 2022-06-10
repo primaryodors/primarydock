@@ -131,6 +131,7 @@ Point Point::multiply_3d_distance(const Point* reference, float r_mult)
 void Point::scale(float new_magn)
 {
     float old_magn = magnitude();
+    if (!old_magn) return;
     float multiplier = new_magn / old_magn;
     x *= multiplier;
     y *= multiplier;

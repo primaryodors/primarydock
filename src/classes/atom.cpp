@@ -214,6 +214,8 @@ Atom::Atom(const char* elem_sym)
     figure_out_valence();
 
     bonded_to = new Bond[abs(geometry)];
+    int i;
+    for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -232,6 +234,8 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
     figure_out_valence();
 
     bonded_to = new Bond[abs(geometry)];
+    int i;
+    for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -251,6 +255,8 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
     figure_out_valence();
 
     bonded_to = new Bond[abs(geometry)];
+    int i;
+    for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
 }
@@ -320,6 +326,7 @@ Atom::Atom(FILE* is)
 
                     figure_out_valence();
                     bonded_to = new Bond[abs(geometry)];
+				    for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
 
                     Point aloc(atof(fields[5]), atof(fields[6]),atof(fields[7]));
                     location = aloc;
@@ -1501,9 +1508,14 @@ SCoord Atom::get_next_free_geometry(float lcard)
         if (i >= geometry) i=0;
 
 		int j=i;
+		cout << name << ": " << i;
         if (geometry == 4 && swap_chirality && i >= 2) i ^= 1;
+        cout << " -> " << i;
         if (geometry == 3 && EZ_flip && i >= 1) i = 3-i;
-        if (bonded_to[i].btom) i=j;
+        cout << " -> " << i;
+        // if (bonded_to[i].btom) i=j;			// For some reason, this line makes everything go very wrong.
+        cout << " -> " << i;
+        cout << endl;
 
         retval = v[i];
     }

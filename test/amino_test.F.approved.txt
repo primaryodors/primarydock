@@ -1,4 +1,3 @@
-Ring 0
 phenylalanine bonds can rotate: 
 CA - CB
 CB - CG

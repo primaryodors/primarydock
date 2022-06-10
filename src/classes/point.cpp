@@ -260,7 +260,11 @@ float find_3d_angle(Point* A, Point* B, Point* source)
     if (param < -1) param = -1;
     if (param >  1) param =  1;
     float retval = acos(param);
-    if (isnan(retval)) cout << "P12 " << P12 << " P13 " << P13 << " P23 " << P23 << endl;
+    if (isnan(retval))
+    {
+    	cout << "P12 " << P12 << " P13 " << P13 << " P23 " << P23 << endl;
+    	throw 0xbad9a9;
+	}
     return retval;
 }
 

@@ -1,0 +1,6 @@
+histidine bonds can rotate: 
+CA - CB
+CB - CG
+
+Wrote test.pdb
+Wrote test.sdf

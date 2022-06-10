@@ -93,20 +93,23 @@ amino_report: test/amino_test
 
 atom_report: REPORT="test/atom_test.approved.txt"
 atom_report: test/atom_test
-	./test/atom_test H >test/atom_test.txt
-	diff --color --unified $(REPORT) test/atom_test.txt
+	./test/atom_test H >test/atom_test.received.txt
+	diff --color --unified $(REPORT) test/atom_test.received.txt
 
 aniso_report: REPORT="test/aniso_test.approved.txt"
 aniso_report: test/aniso_test
-	./test/aniso_test >$(REPORT)
+	./test/aniso_test >test/aniso_test.received.txt
+	diff --color --unified $(REPORT) test/aniso_test.received.txt
 
 point_report: REPORT="test/point_test.approved.txt"
 point_report: test/point_test
-	./test/point_test >$(REPORT)
+	./test/point_test >test/point_test.received.txt
+	diff --color --unified $(REPORT) test/point_test.received.txt
 
 molecule_report: REPORT="test/molecule_test.approved.txt"
 molecule_report: test/molecule_test
-	./test/molecule_test 'CC(=O)[O-]' 'C[NH+](C)C' | sed '/^#/d' >$(REPORT)  # ignore lines starting with #
+	./test/molecule_test 'CC(=O)[O-]' 'C[NH+](C)C' | sed '/^#/d' >test/molecule_test.received.txt # ignore lines starting with #
+	diff --color --unified $(REPORT) test/molecule_test.approved.txt
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test

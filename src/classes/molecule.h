@@ -4,6 +4,8 @@
 #ifndef _MOLECULE
 #define _MOLECULE
 
+#include <vector>
+
 class SMILES_Parenthetical
 {
 	public:

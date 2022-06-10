@@ -1508,14 +1508,14 @@ SCoord Atom::get_next_free_geometry(float lcard)
         if (i >= geometry) i=0;
 
 		int j=i;
-		cout << name << ": " << i;
+		// cout << name << ": " << i;
         if (geometry == 4 && swap_chirality && i >= 2) i ^= 1;
-        cout << " -> " << i;
+        // cout << " -> " << i;
         if (geometry == 3 && EZ_flip && i >= 1) i = 3-i;
-        cout << " -> " << i;
+        // cout << " -> " << i;
         // if (bonded_to[i].btom) i=j;			// For some reason, this line makes everything go very wrong.
-        cout << " -> " << i;
-        cout << endl;
+        // cout << " -> " << i;
+        // cout << endl;
 
         retval = v[i];
     }

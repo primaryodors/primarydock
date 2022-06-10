@@ -56,7 +56,10 @@ int main(int argc, char** argv)
         fclose(pf);
         cout << "Wrote " << outfn << endl;
 
-		const char* outfn2 = "test.sdf";
+		char outfn2[30];
+		AADef* aad = firstaa->get_aa_definition();
+		if (aad) sprintf(outfn2, "%s.sdf", aad->name);
+		else strcpy(outfn2, "aatest.sdf");
 		pf = fopen(outfn2, "wb");
 		firstaa->save_sdf(pf);
 		fclose(pf);

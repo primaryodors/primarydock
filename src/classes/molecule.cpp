@@ -3072,6 +3072,14 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
     C = a0b[1]->btom->get_location();
 
     normal = compute_normal(&A, &B, &C);
+    while (!normal.r)
+    {
+    	C.x = frand(-1, 1);
+    	C.y = frand(-1, 1);
+    	C.z = frand(-1, 1);
+    	normal = compute_normal(&A, &B, &C);
+    }
+    
     // TODO: Un-hardcode the bond lengths below.
     ringcen = A.subtract(&B);
     ringcen.scale(polygon_radius(allarom?1.40:1.54, ringsz));

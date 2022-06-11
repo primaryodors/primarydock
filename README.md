@@ -6,15 +6,15 @@ PODock is a lightweight molecular docking software package that allows path-base
 measurement at the residue level and per binding type. It uses data files so atomic and interatomic parameters can be fully customized
 without having to recompile the code.
 
-To Use PODock:
-
-First clone the repository, then execute the following commands:
+To Use PODock, first clone the repository, then execute the following command:
 
 For Linux:
 ```
-git checkout stable
-make
+make podock
 ```
+
+If you are a developer contributing to the project, you can use `make` to build everything and run the test reports, or 
+`make code` to just build the code and not run the tests.
 
 The application will require 3D maps of your target receptor(s) in PDB format. Please note that PODock does not currently
 hydrogenate PDB models that do not include hydrogen atoms, so if your model contains heavy atoms only, the accuracy of

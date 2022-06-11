@@ -9,6 +9,7 @@ test/mol_assem_test 'C1CC1' test/cyclopropane.sdf
 test/mol_assem_test 'C1=CCC1' test/cyclobutene.sdf
 test/mol_assem_test 'C1=CC=C1' test/cyclobutadiene.sdf
 test/mol_assem_test 'C1=CC1' test/cyclopropene.sdf
+test/mol_assem_test 'C1(C=CC=C1)=C2C=C2' test/calicene.sdf
 test/mol_assem_test 'Oc1c(C)cccc1C' test/2_6-xylenol.sdf
 test/mol_assem_test 'N1[C@H](C(=O)O)CCC1' test/proline.sdf
 test/mol_assem_test 'Cc1c([Cl])c(C)c(O)c(C(=O)[O-])c1[NH3+]' test/total_substitution.sdf

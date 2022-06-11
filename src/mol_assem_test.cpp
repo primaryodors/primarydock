@@ -66,6 +66,8 @@ int main(int argc, char** argv)
     m.save_pdb(pf);
     cout << "Saved " << tstpdbf << endl;
     fclose(pf);*/
+    
+    cout << endl;
 
     return 0;
 }

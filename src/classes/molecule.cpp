@@ -2702,10 +2702,10 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
         // Nonstandard feature.
         if (smilesstr[i] == '{')
         {
-            char* aname = new char[5];
+            char* aname = new char[15];
             i++;
             j=0;
-            while (smilesstr[i] != '}' && j<5)
+            while (smilesstr[i] != '}' && j<15)
             {
                 aname[j] = smilesstr[i];
                 i++;
@@ -2877,7 +2877,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
             {
                 if (bracketed)
                 {
-                    bracketed->swap_chirality = !bracketed->swap_chirality;
+                    bracketed->swap_chirality();
                     continue;
                 }
                 else throw 0xbade9c0d;

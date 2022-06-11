@@ -119,7 +119,7 @@ class Atom
 
     // Spatial functions.
     bool move(Point* pt);
-    bool move(Point pt)    {        return move(&pt);    }
+    bool move(Point pt) { return move(&pt); }
     bool move_rel(SCoord* v);
     int move_assembly(Point* pt, Atom* excluding);			// Return number of atoms moved. Note excluding must be a bonded atom.
     SCoord* get_basic_geometry();
@@ -134,8 +134,9 @@ class Atom
     SCoord get_next_free_geometry(float lcard);
     int get_idx_next_free_geometry();
     void rotate_geometry(Rotation rot);			// Necessary for bond rotation.
-    void clear_geometry_cache()    {        geov=0;    }
+    void clear_geometry_cache() { geov=0; }
     void swing_all(int startat=0);
+    void swap_chirality() { swapped_chirality = !swapped_chirality; chirality_unspecified = false; }
 
     // Static fuctions.
     static int Z_from_esym(const char* elem_sym);
@@ -158,7 +159,6 @@ class Atom
     bool flip_mirror=false;		// If true, do trans rather than cis bond conformation.
     bool dnh=false;				// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.
     Point* arom_center=0;
-    bool swap_chirality = false;
     bool EZ_flip = false;
     float last_bind_energy=0;
 	int ring_member = 0;				// How many rings is this atom part of.
@@ -186,6 +186,8 @@ class Atom
     int family=0;
     // InteratomicForce** Zforces;			// Non-covalent bond types where the atom's Z = either Za or Zb.
     Rotation geo_rot_1, geo_rot_2;
+    bool swapped_chirality = false;
+    bool chirality_unspecified = true;
 
     static void read_elements();
 

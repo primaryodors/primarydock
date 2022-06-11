@@ -1508,15 +1508,35 @@ SCoord Atom::get_next_free_geometry(float lcard)
         if (i >= geometry) i=0;
 
 		int j=i;
-		if (!strcmp(name, "Tumbolia")) cout << name << ": " << i;		// Debugging feature.
-        if (geometry == 4 && swap_chirality && i >= 2) i ^= 1;
-        if (!strcmp(name, "Tumbolia")) cout << " -> " << i;
+        if (geometry == 4 && swapped_chirality && i >= 2) i ^= 1;
         if (geometry == 3 && EZ_flip && i >= 1) i = 3-i;
-        if (!strcmp(name, "Tumbolia")) cout << " -> " << i;
         // if (bonded_to[i].btom) i=j;			// For some reason, this line makes everything go very wrong.
-        if (!strcmp(name, "Tumbolia")) cout << " -> " << i;
-        if (!strcmp(name, "Tumbolia")) cout << endl;
+        if (geometry == 4 && chirality_unspecified)
+        {
+        	if (!strcmp(name, "Tumbolia")) cout << endl;
+    		for (i=0; i<geometry; i++)
+    		{
+		    	Point pt = v[i];
+				pt.scale(1);
+				
+    			float closest = 81;
+		    	if (!strcmp(name, "Tumbolia")) cout << i << "*: " << (Point)v[i] << endl;
+		    	for (j=0; j<geometry; j++)
+		    	{
+		    		if (!bonded_to[j].btom) continue;
+		    		Point pt1 = bonded_to[j].btom->location.subtract(location);
+		    		pt1.scale(1);
+		    		float r = pt1.get_3d_distance(pt);
+		    		if (!strcmp(name, "Tumbolia")) cout << j << ":: " << pt1 << " " << r << endl;
+		    		if (r < closest) closest = r;
+		    	}
+		    	if (!strcmp(name, "Tumbolia")) cout << endl;
+		    	if (closest > 0.81) goto _successful;
+        	}
+        	return retval;
+    	}
 
+		_successful:
         retval = v[i];
         
     }
@@ -1532,7 +1552,7 @@ int Atom::get_idx_next_free_geometry()
         int i;
         for (i=0; i < geometry && bonded_to[i].btom; i++);
         if (i >= geometry) i=0;
-        if (geometry == 4 && swap_chirality && i >= 2) i ^= 1;
+        if (geometry == 4 && swapped_chirality && i >= 2) i ^= 1;
         if (geometry == 3 && EZ_flip && i >= 1) i = 3-i;
         return i;
     }

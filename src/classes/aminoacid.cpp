@@ -608,7 +608,7 @@ void AminoAcid::load_aa_defs()
                             char gk = fields[3][gki];
                             lastgrk.psz = strchr(Hellenic.psz, gk);
                             if (lastgrk.n) lastgrk.n -= Hellenic.n;
-                            float lreach = (1.54*2*cos((tetrahedral_angle-M_PI/2)*2))/2 * lastgrk.n + 1.09;
+                            float lreach = (1.54*2*cos((tetrahedral-M_PI/2)*2))/2 * lastgrk.n + 1.09;
                             if (lreach > aa_defs[idx].reach)
                             {
                                 aa_defs[idx].reach = lreach;

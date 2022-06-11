@@ -187,6 +187,8 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
         Point pt;
         return add_atom(elemsym, aname, &pt, bondto, bcard);
     }
+    
+    // cout << "Add new " << elemsym << " bonded to " << bondto->name << endl;
 
     SCoord v = bondto->get_next_free_geometry(bcard);
     Atom* a = new Atom(elemsym);
@@ -3274,6 +3276,7 @@ Atom** Molecule::get_most_bindable(int max_count)
     for (i=0; atoms[i]; i++)
     {
         float score = 0;
+        atoms[i]->clear_geometry_cache();
         
         for (k=0; retval[k] && k<max_count; k++)
         {

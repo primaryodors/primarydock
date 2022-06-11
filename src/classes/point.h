@@ -5,7 +5,7 @@
 #include <fstream>
 #include <math.h>
 
-#include "constants.h"
+#include "misc.h"
 
 #ifndef _POINT
 #define _POINT
@@ -120,32 +120,6 @@ class Tug
     Tug add(Tug t);
 };
 
-class Bond;
-class InteratomicForce;
-class Molecule;
-class AminoAcid;
-class Protein;
-class Region;
-class Rotation;
-
-union Star
-{
-    int n;
-    char* psz;
-    const char* cpsz;
-    void* p;
-    Atom* pa;
-    Atom** ppa;
-    Bond* pb;
-    Bond** ppb;
-    InteratomicForce* pif;
-    Molecule* pmol;
-    AminoAcid* paa;
-    Protein* pprot;
-    Region* preg;
-    Rotation* prot;
-};
-
 Point average_of_points(Point* points, int count);
 
 float find_angle(float dx, float dy);
@@ -166,49 +140,14 @@ SCoord compute_normal(Point* pt1, Point* pt2, Point* pt3);
 SCoord compute_normal(Point pt1, Point pt2, Point pt3);
 
 float are_points_planar(Point p1, Point p2, Point p3, Point p4);
-
+float polygon_radius(float side_length, int num_sides);
 float sphere_intersection(float r1, float r2, float d);
 
 SCoord v_from_pt_sub(Point distal, Point reference);
 
-// Misc. functions not Point-related but not enough to warrant their own .h and .cpp files:
-int in_array(void* needle, void** haystack);
-int in_array(int needle, int* haystack);
-int in_array(Star needle, Star* haystack);
-Star* array_unique(Star* input_array);
-char** chop_spaced_fields(char* line, char separator = ' ');
-float polygon_radius(float side_length, int num_sides);
-int greek_from_aname(const char* aname);
-int randsgn();
-float frand(float min, float max);
-float Pearson_correlation(float* xarr, float* yarr, int length);
-enum STR_PAD {STR_PAD_RIGHT, STR_PAD_LEFT, STR_PAD_BOTH};
-std::string str_pad(const std::string &str, int pad_length, std::string pad_string=" ", STR_PAD pad_type=STR_PAD_RIGHT);
-std::string cardinality_printable(float card);
-
-// From here: https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
-template <typename T> int sgn(T val)
-{
-    return (T(0) < val) - (val < T(0));
-}
-
-template <typename T> void init_nulls(T* array, int length)
-{
-	int i;
-	for (i=0; i<length; i++) array[i] = 0;
-}
-
 std::ostream& operator<<(std::ostream& os, const Point& p);
 std::ostream& operator<<(std::ostream& os, const SCoord& v);
 std::ostream& operator<<(std::ostream& os, const Rotation& r);
-
-
-const float tetrahedral_angle = acos(-1.0/3);
-extern const char* Greek;
-
-extern std::ofstream *debug;
-
-extern bool last_iter;
 
 #endif
 

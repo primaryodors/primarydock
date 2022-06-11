@@ -1115,7 +1115,7 @@ SCoord* Atom::get_basic_geometry()
 
         for (i=1; i<geometry; i++)
         {
-            SCoord v(1, M_PI/2-tetrahedral_angle, M_PI/1.5*(i-1));
+            SCoord v(1, M_PI/2-tetrahedral, M_PI/1.5*(i-1));
             retval[i] = v;
         }
     }
@@ -1508,16 +1508,17 @@ SCoord Atom::get_next_free_geometry(float lcard)
         if (i >= geometry) i=0;
 
 		int j=i;
-		// cout << name << ": " << i;
+		if (!strcmp(name, "Tumbolia")) cout << name << ": " << i;		// Debugging feature.
         if (geometry == 4 && swap_chirality && i >= 2) i ^= 1;
-        // cout << " -> " << i;
+        if (!strcmp(name, "Tumbolia")) cout << " -> " << i;
         if (geometry == 3 && EZ_flip && i >= 1) i = 3-i;
-        // cout << " -> " << i;
+        if (!strcmp(name, "Tumbolia")) cout << " -> " << i;
         // if (bonded_to[i].btom) i=j;			// For some reason, this line makes everything go very wrong.
-        // cout << " -> " << i;
-        // cout << endl;
+        if (!strcmp(name, "Tumbolia")) cout << " -> " << i;
+        if (!strcmp(name, "Tumbolia")) cout << endl;
 
         retval = v[i];
+        
     }
     geometry = lgeo;
     return retval;

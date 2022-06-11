@@ -2761,13 +2761,19 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 int ringsz = l-sqidx[j];
                 
                 if (!ring_atoms)
-                	ring_atoms = new Atom**[16];
+                {	ring_atoms = new Atom**[16];
+                	int n; for (n=0; n<16; n++) ring_atoms[n] = nullptr;
+                }
                 
                 if (!ring_aromatic)
-                	ring_aromatic = new bool[16];
+                {	ring_aromatic = new bool[16];
+                	int n; for (n=0; n<16; n++) ring_aromatic[n] = false;
+                }
                 
                 if (!ring_atoms[ringcount])
-                	ring_atoms[ringcount] = new Atom*[ringsz+2];
+                {	ring_atoms[ringcount] = new Atom*[ringsz+2];
+                	int n; for (n=0; n<ringsz; n++) ring_atoms[ringcount][n] = nullptr;
+                }
                 
                 for (l=0; l<ringsz; l++)
                 {

@@ -1062,12 +1062,16 @@ function loadFile(fileData, fileName = "")
 						            	lres = resno;
 						            	tmpstr = "";
 				                		sequence += aa1let;
+				                		
+				                		$('#clip').trigger("input");
 		                    		}
 		                		}
 		                    }
 		                    if (ln.length < 20) continue;
                             
                             tmpstr += ln + "\n";
+                            
+                            $('#clip').trigger("input");
                         }
 		                if (tmpstr)
 		                {
@@ -1076,6 +1080,7 @@ function loadFile(fileData, fileName = "")
 			        		{
 			        			resmdl.push(comp5a);
 			        			restoggled.push(0);
+			        			$('#clip').trigger("input");
 			        		});
 						}
 
@@ -1089,6 +1094,7 @@ function loadFile(fileData, fileName = "")
                                 metalness: 0.13,
                             });
                             gmodel.push(comp3);
+                            $('#clip').trigger("input");
                         });
 
                         if (shiny.length)
@@ -1103,6 +1109,7 @@ function loadFile(fileData, fileName = "")
                                     metalness: 0.53,
                                 });
                                 gmodel.push(comp4);
+                                $('#clip').trigger("input");
                             });
                         }
                     }
@@ -1138,14 +1145,19 @@ function loadFile(fileData, fileName = "")
                     {
                         if (!n)
                         {
-                            var posea = document.createElement("a");
-                            posea.className = "posebtn";
-                            if (p==1) $(posea).addClass("hilite");
-                            posea.innerText = p;
-                            posea.id = "posebtn"+p;
-                            posea.setAttribute("onclick", "showPose("+p+");");
+                        	var btnid = "posebtn"+p;
+                        	
+                        	if (!$('#'+btnid).length)
+                        	{
+		                        var posea = document.createElement("a");
+		                        posea.className = "posebtn";
+		                        if (p==1) $(posea).addClass("hilite");
+		                        posea.innerText = p;
+		                        posea.id = btnid;
+		                        posea.setAttribute("onclick", "showPose("+p+");");
 
-                            posey.appendChild(posea);
+		                        posey.appendChild(posea);
+                            }
                         }
 
                         if (writing)
@@ -1167,6 +1179,7 @@ function loadFile(fileData, fileName = "")
                                 var lpn = comp.name.split("|");
                                 mpos.push(parseInt(lpn[0]));
                                 mnod.push(parseInt(lpn[1]));
+                                $('#clip').trigger("input");
                             } );
 
                             stringBlob = new Blob( [ ligtmp ], { type: 'text/plain'} );
@@ -1185,6 +1198,7 @@ function loadFile(fileData, fileName = "")
                                 var lpn = comp.name.split("|");
                                 mpos.push(parseInt(lpn[0]));
                                 mnod.push(parseInt(lpn[1]));
+                                $('#clip').trigger("input");
                             } );
                         }
                         writing = false;
@@ -1201,6 +1215,7 @@ function loadFile(fileData, fileName = "")
                 window.setTimeout(function()
                 {
                     showPose(1);
+                    // curr_ligand.autoView();
                 }, 259);
                 $("#affichage").show();
                 break;
@@ -1212,6 +1227,7 @@ function loadFile(fileData, fileName = "")
             {
             	$("#pleasewait").hide();
             	$('#clip').trigger("input");
+                curr_ligand.autoView();
         	}, 503);
         }
     });

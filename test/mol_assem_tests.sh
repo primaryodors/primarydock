@@ -5,10 +5,7 @@ test/mol_assem_test 'c1ccccc1C' test/toluene1.sdf
 test/mol_assem_test 'C1CCCCC1' test/cyclohexane.sdf
 test/mol_assem_test 'C1CCCC1' test/cyclopentane.sdf
 test/mol_assem_test 'C1CCC1' test/cyclobutane.sdf
-
-# Currently this is segfaulting.
-# test/mol_assem_test 'C1CC1' test/cyclopropane.sdf
-
+test/mol_assem_test 'C1CC1' test/cyclopropane.sdf
 test/mol_assem_test 'C1=CCC1' test/cyclobutene.sdf
 test/mol_assem_test 'C1=CC=C1' test/cyclobutadiene.sdf
 test/mol_assem_test 'C1=CC1' test/cyclopropene.sdf

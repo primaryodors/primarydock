@@ -2579,10 +2579,11 @@ bool Molecule::from_smiles(char const * smilesstr)
     paren = new SMILES_Parenthetical[smlen];
     spnum = 0;
 
-    bool retval = from_smiles(smilesstr, nullptr);
-
     int i;
     for (i=0; i<10; i++) numbered[i] = 0;
+    
+    bool retval = from_smiles(smilesstr, nullptr);
+
     for (i=0; i<spnum; i++)
     {
         retval &= from_smiles(paren[i].smilesstr, paren[i].startsfrom);

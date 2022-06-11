@@ -2571,6 +2571,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
 
 
+Atom* numbered[10];
 
 bool Molecule::from_smiles(char const * smilesstr)
 {
@@ -2581,6 +2582,7 @@ bool Molecule::from_smiles(char const * smilesstr)
     bool retval = from_smiles(smilesstr, nullptr);
 
     int i;
+    for (i=0; i<10; i++) numbered[i] = 0;
     for (i=0; i<spnum; i++)
     {
         retval &= from_smiles(paren[i].smilesstr, paren[i].startsfrom);
@@ -2599,7 +2601,6 @@ bool Molecule::from_smiles(char const * smilesstr)
 bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
 {
     Atom* stack[256];
-    Atom* numbered[10];
     Atom* sequence[65536];
     bool seqarom[65536];
     int sqidx[10];
@@ -2610,7 +2611,6 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     immobile = false;
 
     int i, j=1, k=0, l, atno=get_atom_count()+1;
-    for (i=0; i<10; i++) numbered[i] = 0;
 
     Atom* preva = ipreva;
     float card = ipreva?1:0;
@@ -2625,7 +2625,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     Atom* EZatom1[numdb+4];
 
     for (i=0; i<len; i++)
-    {
+    {    	
         if (smilesstr[i] == '.')
         {
             card = 0;
@@ -2739,14 +2739,17 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
         if (smilesstr[i] >= '0' && smilesstr[i] <= '9')
         {
             j = smilesstr[i] - 48;
+            cout << j;
             if (!numbered[j])
             {
                 numbered[j] = preva;
                 sqidx[j] = k-1;
+                //cout << "+" << endl;;
                 continue;
             }
             else
             {
+            	//cout << " connecting..." << endl;
                 // Rotate bonds to close the loop.
                 bool allarom = true;
                 Atom* aloop[256];
@@ -3408,6 +3411,87 @@ bool Molecule::in_same_ring(Atom* a, Atom* b)
 	return false;
 }
 
+float Molecule::get_atom_error(int i, LocatedVector* best_lv)
+{
+	int j;
+	float error = 0;
+	Point aloc, bloc;
+	Atom* btom;
+	Bond** b;
+	int g, bg;
+	float b_bond_angle;
+	LocatedVector lv;
+	
+	// Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
+    b = atoms[i]->get_bonds();
+    if (!b) return error;
+	btom = b[0]->btom;
+	if (!btom) return error;
+	
+	bloc = btom->get_location();
+	g = atoms[i]->get_geometry();
+	bg = btom->get_geometry();
+	b_bond_angle = btom->get_geometric_bond_angle();
+	
+	// Make an imaginary sphere around btom, whose radius equals the optimal bond distance.
+	lv.origin = bloc;
+	lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, b[0]->cardinality);
+	float thstep = fiftyseventh*5;
+	float besttheta = 0, bestphi = 0, bestscore = -1e9;
+	for (lv.theta = -square; lv.theta <= square; lv.theta += thstep)
+	{
+		float phstep = M_PI/(20.0*(sin(lv.theta) + 1));
+		for (lv.phi = 0; lv.phi < (M_PI*2); lv.phi += phstep)
+		{
+			// At many points along the sphere, evaluate the goodness-of-fit as a function of:
+			// Success in conforming to btom's geometry;
+			// Success in avoiding clashes with atoms not bonded to self or btom;
+			// Success in maintaining optimal binding distances to own bonded atoms.
+			// Later, we'll test edge cases where bond strain distorts the usual angles.
+			float score = 0;
+			
+			score -= 25.0*btom->get_bond_angle_anomaly(lv, atoms[i]);
+			
+			// Avoid clashes with strangers.
+			for (j=0; atoms[j]; j++)
+			{
+				if (j == i) continue;
+				if (atoms[j]->is_bonded_to(atoms[i])) continue;
+				
+				float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
+				score -= 5.0/fabs(r+0.000000001);
+			}
+			
+			// Seek optimal bond radii.
+			for (j=1; b[j]; j++)
+			{
+				if (!b[j]->btom) continue;
+				float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+				float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
+				
+				score -= 30.0 * fabs(optimal-r);
+			}
+			
+			if (score > bestscore)
+			{
+				besttheta = lv.theta;
+				bestphi = lv.phi;
+				bestscore = score;
+			}
+		}
+	}
+	
+	if (best_lv)
+	{
+		best_lv->origin = lv.origin;
+		best_lv->r = lv.r;
+		best_lv->theta = besttheta;
+		best_lv->phi = bestphi;
+	}
+	
+	return -bestscore;
+}
+
 #define _DEV_FIX_MSTRUCT 1
 float Molecule::correct_structure(int iters)
 {
@@ -3440,76 +3524,18 @@ float Molecule::correct_structure(int iters)
     	error = 0;
         for (i=0; atoms[i]; i++)
         {
-        	// Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
-            b = atoms[i]->get_bonds();
-            if (!b) continue;
-			//if (b[0]->cardinality > 1) continue;
+			// Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
+			b = atoms[i]->get_bonds();
+			if (!b) return error;
 			btom = b[0]->btom;
-			if (!btom) continue;
-			//if (btom->get_bond_by_idx(0)->cardinality > 1) continue;
+			if (!btom) return error;
 			
 			if (atoms[i]->num_rings() && atoms[i]->is_pi() && in_same_ring(atoms[i], btom)) continue;
-			
-			bloc = btom->get_location();
-			g = atoms[i]->get_geometry();
-			bg = btom->get_geometry();
-			b_bond_angle = btom->get_geometric_bond_angle();
-			
-			// Make an imaginary sphere around btom, whose radius equals the optimal bond distance.
-			lv.origin = bloc;
-			lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, b[0]->cardinality);
-			float thstep = fiftyseventh*5;
-			float besttheta = 0, bestphi = 0, bestscore = -1e9;
-			for (lv.theta = -square; lv.theta <= square; lv.theta += thstep)
-			{
-				float phstep = M_PI/(20.0*(sin(lv.theta) + 1));
-				for (lv.phi = 0; lv.phi < (M_PI*2); lv.phi += phstep)
-				{
-					// At many points along the sphere, evaluate the goodness-of-fit as a function of:
-					// Success in conforming to btom's geometry;
-					// Success in avoiding clashes with atoms not bonded to self or btom;
-					// Success in maintaining optimal binding distances to own bonded atoms.
-					// Later, we'll test edge cases where bond strain distorts the usual angles.
-					float score = 0;
-					
-					score -= 25.0*btom->get_bond_angle_anomaly(lv, atoms[i]);
-					
-					// Avoid clashes with strangers.
-					for (j=0; atoms[j]; j++)
-					{
-						if (j == i) continue;
-						if (atoms[j]->is_bonded_to(atoms[i])) continue;
-						
-						float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
-						score -= 5.0/fabs(r+0.000000001);
-					}
-					
-					// Seek optimal bond radii.
-					for (j=1; b[j]; j++)
-					{
-						if (!b[j]->btom) continue;
-						float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
-						float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
-						
-						score -= 30.0 * fabs(optimal-r);
-					}
-					
-					if (score > bestscore)
-					{
-						besttheta = lv.theta;
-						bestphi = lv.phi;
-						bestscore = score;
-					}
-				}
-			}
-			
-			error -= bestscore;
+	
+			error += get_atom_error(i, &lv);
 			if (!iter) continue;
 			
 			// Once a "best fit" point in space is found, move there.
-			lv.theta = besttheta;
-			lv.phi = bestphi;
-			
 			if (atoms[i]->num_rings() && atoms[i]->is_pi())
 			{
 				for (j=0; j<ringcount; j++)
@@ -3551,6 +3577,12 @@ float Molecule::correct_structure(int iters)
 		// if (error <= 10.0*atcount) break;
 	}
 	#endif
+
+	error = 0;
+    for (i=0; atoms[i]; i++)
+    {
+    	error += get_atom_error(i, &lv);
+    }
 
 	return error;
 }

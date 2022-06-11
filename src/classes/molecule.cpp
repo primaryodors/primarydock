@@ -2739,7 +2739,6 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
         if (smilesstr[i] >= '0' && smilesstr[i] <= '9')
         {
             j = smilesstr[i] - 48;
-            cout << j;
             if (!numbered[j])
             {
                 numbered[j] = preva;
@@ -3415,7 +3414,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 {
 	int j;
 	float error = 0;
-	Point aloc, bloc;
+	Point bloc;
 	Atom* btom;
 	Bond** b;
 	int g, bg;
@@ -3450,7 +3449,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 			// Later, we'll test edge cases where bond strain distorts the usual angles.
 			float score = 0;
 			
-			score -= 25.0*btom->get_bond_angle_anomaly(lv, atoms[i]);
+			score -= _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
 			
 			// Avoid clashes with strangers.
 			for (j=0; atoms[j]; j++)
@@ -3459,7 +3458,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 				if (atoms[j]->is_bonded_to(atoms[i])) continue;
 				
 				float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
-				score -= 5.0/fabs(r+0.000000001);
+				score -= _SANOM_CLASHES_WEIGHT/fabs(r+0.000000001);
 			}
 			
 			// Seek optimal bond radii.
@@ -3469,7 +3468,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 				float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
 				float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
 				
-				score -= 30.0 * fabs(optimal-r);
+				score -= _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
 			}
 			
 			if (score > bestscore)
@@ -3489,7 +3488,29 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 		best_lv->phi = bestphi;
 	}
 	
-	return -bestscore;
+	lv = (SCoord)atoms[i]->get_location().subtract(bloc);
+	
+	error += _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
+	
+	for (j=0; atoms[j]; j++)
+	{
+		if (j == i) continue;
+		if (atoms[j]->is_bonded_to(atoms[i])) continue;
+		
+		float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
+		error += _SANOM_CLASHES_WEIGHT/fabs(r+0.000000001);
+	}
+	 
+	for (j=1; b[j]; j++)
+	{
+		if (!b[j]->btom) continue;
+		float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+		float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
+		
+		error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
+	}
+	
+	return error+bestscore;
 }
 
 #define _DEV_FIX_MSTRUCT 1

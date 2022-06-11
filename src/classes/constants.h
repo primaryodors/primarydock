@@ -15,6 +15,10 @@
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
 
+#define _SANOM_BOND_ANGLE_WEIGHT 25.0
+#define _SANOM_CLASHES_WEIGHT 5.0
+#define _SANOM_BOND_RAD_WEIGHT 30.0
+
 #define ALKMETAL 1
 #define ALKEARTH 2
 #define TRIEL 3

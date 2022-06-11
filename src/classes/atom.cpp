@@ -1531,7 +1531,7 @@ SCoord Atom::get_next_free_geometry(float lcard)
 		    		if (r < closest) closest = r;
 		    	}
 		    	if (!strcmp(name, "Tumbolia")) cout << endl;
-		    	if (closest > 0.81) goto _successful;
+		    	if (closest > 0.7) goto _successful;				// Slightly less than 1/sqrt(2).
         	}
         	return retval;
     	}

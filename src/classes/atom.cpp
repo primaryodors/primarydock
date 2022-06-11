@@ -1303,7 +1303,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
     Point center;
     int i, j;
 
-    if (arom_center)
+    if (arom_ring_member)
     {
         geometry = 3;
         if (bonded_to[1].btom)
@@ -1394,15 +1394,20 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
     {
         if (geometry > 2)
         {
-            if (bonded_to[1].btom)
+        	j = 0;
+        	if (bonded_to[1].btom) j = 1;
+        	else if (bonded_to[2].btom) j = 2;
+        	int l;
+        	
+            if (j)
             {
                 Point g0(&geov[0]);
                 g0.scale(1);
-                Point g1(&geov[1]);
+                Point g1(&geov[j]);
                 g1.scale(1);
                 Point a0 = bonded_to[0].btom->location.subtract(location);
                 a0.scale(1);
-                Point a1 = bonded_to[1].btom->location.subtract(location);
+                Point a1 = bonded_to[j].btom->location.subtract(location);
                 a1.scale(1);
                 Rotation* rots = align_2points_3d(&g0, &a0, &g1, &a1, &center);
 
@@ -1421,41 +1426,31 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
                         geov[i] = v2;
                     }
                 }
+                
+                g0 = geov[0];
+                g1 = geov[1];
+                g0.scale(1);
+                g1.scale(1);
+                rots = align_2points_3d(&g1, &a1, &g0, &a0, &center);
+                rots[0].a /= 2;
+                rots[1].a /= 2;
+                
+                for (k=0; k<2; k++)
+                {
+                    for (i=0; i<geometry; i++)
+                    {
+                        Point pt1(&geov[i]);
+                        Point pt2 = rotate3D(&pt1, &center, &rots[k]);
+                        SCoord v2(&pt2);
+                        v2.r = 1;
+                        geov[i] = v2;
+                    }
+                }
+                
 
-                if (_DBGGEO) cout << name << " returns trans double-aligned geometry (" << geometry << "):"
+                if (_DBGGEO) cout << name << " returns " << (j==1?"trans":"cis") << " double-aligned geometry (" << geometry << "):"
                                       << bonded_to[0].btom->name << ", " << bonded_to[1].btom->name << "."
                                       << endl;
-                return geov;
-            }
-            else if (bonded_to[2].btom)
-            {
-                Point g0(&geov[0]);
-                g0.scale(1);
-                Point g1(&geov[2]);
-                g1.scale(1);
-                Point a0 = bonded_to[0].btom->location.subtract(location);
-                a0.scale(1);
-                Point a1 = bonded_to[2].btom->location.subtract(location);
-                a1.scale(1);
-                Rotation* rots = align_2points_3d(&g0, &a0, &g1, &a1, &center);
-
-                geo_rot_1 = rots[0];
-                geo_rot_2 = rots[1];
-
-                int k;
-                for (k=0; k<2; k++)
-                {
-                    for (i=0; i<geometry; i++)
-                    {
-                        Point pt1(&geov[i]);
-                        Point pt2 = rotate3D(&pt1, &center, &rots[k]);
-                        SCoord v2(&pt2);
-                        v2.r = 1;
-                        geov[i] = v2;
-                    }
-                }
-
-                if (_DBGGEO) cout << name << " returns cis double-aligned geometry (" << geometry << ")." << endl;
                 return geov;
             }
 

@@ -3037,7 +3037,39 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     return true;
 }
 
-void Molecule::make_coplanar_ring(Atom** ring_members)
+bool Molecule::Huckel(int ringid)
+{
+	if (!ring_atoms) return false;
+	int i;
+	int pi_electrons = 0;
+	int wiggle_room = 0;
+	
+	for (i=0; ring_atoms[ringid][i]; i++)
+	{
+		if (ring_atoms[ringid][i]->is_pi()) pi_electrons++;
+		
+		switch (ring_atoms[ringid][i]->get_family())
+		{
+			case PNICTOGEN:
+			case CHALCOGEN:
+			wiggle_room += 2;
+			break;
+			
+			default:
+			;
+		}
+	}
+	
+	for (i=0; i<=wiggle_room; i+=2)
+	{
+		int n = pi_electrons + i;
+		n -= 2;
+		if (n && !(n % 4)) return true;
+	}
+	return false;
+}
+
+void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
 {
     if (!ring_members) return;
     int i, j, l, ringsz;
@@ -3103,7 +3135,7 @@ void Molecule::make_coplanar_ring(Atom** ring_members)
         ring_members[l]->arom_center = &ringcen;
         ring_members[l]->clear_geometry_cache();
         ring_members[l]->ring_member = max(1, ring_members[l]->ring_member);
-        ring_members[l]->arom_ring_member = max(1, ring_members[l]->arom_ring_member);
+        if (Huckel(ringid)) ring_members[l]->arom_ring_member = max(1, ring_members[l]->arom_ring_member);
         if (ring_members[l]->get_valence() != 4) ring_members[l]->aromatize();
 
         Bond* b2=0;
@@ -3540,7 +3572,7 @@ float Molecule::correct_structure(int iters)
     	{
     		if (ring_aromatic[i])
     		{
-				make_coplanar_ring(ring_atoms[i]);
+				make_coplanar_ring(ring_atoms[i], i);
     		}
     	}
     }

@@ -89,6 +89,7 @@ class Molecule
     Point get_ring_center(int ringid);
     SCoord get_ring_normal(int ringid);
     Atom** get_ring_atoms(int ringid);
+    bool Huckel(int ringid);						// Compiler doesn't allow ü in an identifier - boo hiss!
 
     // Interaction functions.
     float get_internal_clashes();
@@ -151,7 +152,7 @@ class Molecule
     int aidx(Atom* a);
     void reallocate();
     float fsb_lsb_anomaly(Atom* first, Atom* last, float lcard, float bond_length);
-    void make_coplanar_ring(Atom** ring_members);
+    void make_coplanar_ring(Atom** ring_members, int ringid);
     void recenter_ring(int ringid, Point new_ring_cen);
     void rotate_ring(int ringid, Rotation rot);
     bool in_same_ring(Atom* a, Atom* b);

@@ -3489,6 +3489,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 	}
 	
 	lv = (SCoord)atoms[i]->get_location().subtract(bloc);
+	lv.origin = bloc;
 	
 	error += _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
 	

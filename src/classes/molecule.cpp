@@ -613,11 +613,17 @@ bool Molecule::save_sdf(FILE* os, Molecule** lig)
 
     time_t now = time(0);
     tm *gmtm = gmtime(&now);
-    fprintf(os, "  podock-%02d%02d%02d%02d%02d%02d3D\n", gmtm->tm_year % 100, gmtm->tm_mon+1, gmtm->tm_mday,
-            gmtm->tm_hour, gmtm->tm_min, gmtm->tm_sec
-           );
+    
+    // If we used obabel or another third party app, give due credit.
+    if (sdfgen_aboutline.length()) fprintf(os, "%s\n", sdfgen_aboutline.c_str());
+    else
+    {
+		fprintf(os, "  podock-%02d%02d%02d%02d%02d%02d3D\n", gmtm->tm_year % 100, gmtm->tm_mon+1, gmtm->tm_mday,
+		        gmtm->tm_hour, gmtm->tm_min, gmtm->tm_sec
+		       );
 
-    fprintf(os, "https://github.com/primaryodors/podock\n");
+    	fprintf(os, "https://github.com/primaryodors/podock\n");
+	}
 
     int ac, bc, chargeds=0;
     ac = get_atom_count();
@@ -2574,9 +2580,48 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
 
 Atom* numbered[10];
+bool ring_warned = false;
 
 bool Molecule::from_smiles(char const * smilesstr)
 {
+	if (!strchr(smilesstr, '{'))		// {AtomName} is a nonstandard feature and must be handled by POdock code, not a third party app.
+	{
+		// Check if OpenBabel is installed.
+		FILE* pf = popen("which obabel", "r");
+		if (pf)
+		{
+			char buffer[1024];
+			fgets(buffer, 1022, pf);
+			if (strlen(buffer))			// TODO: Change this to employ a regex.
+			{
+				fclose(pf);
+				std::string sdfdat = "";
+				
+				// Temporarily reuse buffer as the obabel command.
+				sprintf(buffer, "obabel -:'%s' --gen3D -osdf", smilesstr);
+				pf = popen(buffer, "r");
+				
+				// Resume using buffer with fgets().
+				int lno = 0;
+				while (buffer[0] != '$')
+				{
+					fgets(buffer, 1022, pf);
+					lno++;
+					sdfdat += buffer;
+					
+					if (lno == 2) sdfgen_aboutline = buffer;
+				}
+				fclose(pf);
+				
+				int result = from_sdf(sdfdat.c_str());
+				return (result > 0);
+			}
+			fclose(pf);
+		}
+	}
+	
+	if (strchr(smilesstr, '!')) ring_warned = true;
+
     smlen = strlen(smilesstr);
     paren = new SMILES_Parenthetical[smlen];
     spnum = 0;
@@ -2628,7 +2673,9 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     Atom* EZatom1[numdb+4];
 
     for (i=0; i<len; i++)
-    {    	
+    {
+    	if (smilesstr[i] == '!') continue;
+    	
         if (smilesstr[i] == '.')
         {
             card = 0;
@@ -2741,6 +2788,16 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
 
         if (smilesstr[i] >= '0' && smilesstr[i] <= '9')
         {
+        	if (!ring_warned)
+        	{
+        		cout << "WARNING: Native support of SMILES is still in development. ";
+        		cout << "Certain molecules containing rings might not render properly." << endl;
+        		cout << "If possible, it is recommended to install OpenBabel (e.g. sudo apt-get install openbabel) ";
+        		cout << "so the integration feature can be used and SMILES strings converted seamlessly to ";
+        		cout << "the corresponding molecular structures." << endl;
+        		ring_warned = true;
+        	}
+        	
             j = smilesstr[i] - 48;
             if (!numbered[j])
             {

@@ -139,6 +139,7 @@ class Molecule
     bool immobile = false;
     float minclash = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
     bool doing_bkbend = false;
+    std::string sdfgen_aboutline = "";
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.

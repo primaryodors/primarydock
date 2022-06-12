@@ -792,7 +792,9 @@ bool Molecule::ring_is_aromatic(int ringid)
     if (!ring_atoms) return false;
     if (!ring_atoms[ringid]) return false;
     
-    // TODO: Call ring_is_coplanar() but first the friggin molecular assembly has to be working right!
+    // TODO: Call ring_is_coplanar() but first the molecular assembly has to be working right.
+    
+    return Huckel(ringid);
     
     int i, j;
     float prevcard = 0;
@@ -3553,6 +3555,15 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 	return error+bestscore;
 }
 
+int Molecule::get_ring_num_atoms(int ringid)
+{
+	if (!ring_atoms) return 0;
+	int i;
+	for (i=0; ring_atoms[ringid][i]; i++);		// Loop until find nullptr; this is the atom count.
+	cout << "Ring " << ringid << " has " << i << endl;
+	return i;
+}
+
 #define _DEV_FIX_MSTRUCT 1
 float Molecule::correct_structure(int iters)
 {
@@ -3571,7 +3582,7 @@ float Molecule::correct_structure(int iters)
     {
     	for (i=0; i<ringcount; i++)
     	{
-    		if (ring_aromatic[i])
+    		if (ring_aromatic[i] || get_ring_num_atoms(i) < 6)
     		{
 				make_coplanar_ring(ring_atoms[i], i);
     		}

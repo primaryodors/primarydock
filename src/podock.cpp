@@ -759,7 +759,7 @@ int main(int argc, char** argv)
             }
             // cout << btot << endl;
 
-            if (btot > 5*m.get_atom_count()) btot = 0;
+            if (btot > 15*m.get_atom_count()) btot = 0;
 
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared metrics." << endl;

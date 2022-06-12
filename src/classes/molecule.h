@@ -89,6 +89,7 @@ class Molecule
     Point get_ring_center(int ringid);
     SCoord get_ring_normal(int ringid);
     Atom** get_ring_atoms(int ringid);
+    int get_ring_num_atoms(int ringid);
     bool Huckel(int ringid);						// Compiler doesn't allow ü in an identifier - boo hiss!
 
     // Interaction functions.

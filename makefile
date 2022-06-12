@@ -117,9 +117,11 @@ molecule_report: test/molecule_test
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test
-	./test/mol_assem_test >$(REPORT)
-	echo "Content of test.sdf:" >> $(REPORT)
-	sed '2d' test.sdf >> $(REPORT)  # remove line 2 (date stamp)
+	bash ./test/mol_assem_tests.sh	# these must be checked visually.
+	./test/mol_assem_test >test/molecule_test.received.txt
+	echo "Content of test.sdf:" >> test/molecule_test.received.txt
+	sed '2d' test.sdf >> test/molecule_test.received.txt  # remove line 2 (date stamp)
+	diff --color --unified $(REPORT) test/molecule_test.received.txt
 
 protein_report: REPORT="test/protein_test.approved.txt"
 protein_report: test/protein_test

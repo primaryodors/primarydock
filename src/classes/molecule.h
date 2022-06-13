@@ -70,7 +70,8 @@ class Molecule
     Atom* add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard);
     char** get_atom_names() const;
     Atom* get_atom(const char* aname) const;
-    Atom* get_atom(const int a_idx) const	{	return atoms[a_idx];	}
+    Atom* get_atom(const int a_idx) const { return atoms[a_idx]; }
+    int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);
     void hydrogenate(bool steric_only = false);
     void clear_atom_binding_energies();

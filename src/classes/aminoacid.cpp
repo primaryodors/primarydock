@@ -25,6 +25,7 @@ AminoAcid::AminoAcid(FILE* instream)
     mol_typ = MOLTYP_AMINOACID;
 }
 
+#define _ALGORITHMIC_GREEK 1
 AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 {
     if (!aa_defs[0]._1let) AminoAcid::load_aa_defs();
@@ -51,6 +52,117 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     {
     	from_smiles(aa_defs[idx].SMILES.c_str());
     	
+    	#ifdef _ALGORITHMIC_GREEK
+    	int ac4 = get_atom_count()+4;
+    	int atom_Greek[ac4];
+    	int atom_append[ac4];
+    	int atom_prepend[ac4];
+    	
+    	for (i=0; i<ac4; i++) atom_Greek[i] = atom_append[i] = atom_prepend[i] = 0;
+    	
+    	for (i=0; atoms[i]; i++)
+    	{
+    		atoms[i]->residue = residue_no;
+    		atoms[i]->aaletter = aa_defs[idx]._1let;
+    		strcpy(atoms[i]->aa3let, aa_defs[idx]._3let);
+		}
+    	
+    	// Find the alpha carbon. Name it CA.
+    	for (i=0; atoms[i]; i++)
+    	{	
+    		if (atoms[i]->get_family() == TETREL)
+    		{
+    			Atom* N = atoms[i]->is_bonded_to(PNICTOGEN, 1);
+    			if (N)
+				{
+					Bond** ab = atoms[i]->get_bonds();
+					for (j=0; ab[j]; j++)
+					{
+						if (ab[j]->btom
+							&&
+							ab[j]->btom->get_family() == TETREL
+							)
+						{
+							Atom* O = ab[j]->btom->is_bonded_to(CHALCOGEN, 2);
+							if (O)
+							{
+								atoms[i]->name = new char[5];
+								strcpy(atoms[i]->name, "CA");
+								k = atom_idx_from_ptr(atoms[i]);
+								if (k >= 0) atom_Greek[k] = 1;
+								
+								ab[j]->btom->name = new char[5];
+								strcpy(ab[j]->btom->name, "C");
+								k = atom_idx_from_ptr(ab[j]->btom);
+								if (k >= 0) atom_Greek[k] = -1;
+								
+								O->name = new char[5];
+								strcpy(O->name, "O");
+								k = atom_idx_from_ptr(O);
+								if (k >= 0) atom_Greek[k] = -1;
+								
+								// Delete the other oxygen and its hydrogen.
+								Atom* OH = ab[j]->btom->is_bonded_to(CHALCOGEN, 1);
+								if (OH)
+								{
+									Atom* HH = OH->is_bonded_to("H");
+									if (HH) delete_atom(HH);
+									delete_atom(OH);
+								}
+								
+								N->name = new char[5];
+								strcpy(N->name, "N");
+								k = atom_idx_from_ptr(N);
+								if (k >= 0) atom_Greek[k] = -1;
+								
+								ab = N->get_bonds();
+								l = 0;
+								int n;
+								for (n=0; ab[n]; n++)
+								{
+									if (ab[n]->btom && ab[n]->btom->get_Z() == 1)
+									{
+										if (!l)
+										{
+											ab[n]->btom->name = new char[5];
+											strcpy(ab[n]->btom->name, "HN");
+											k = atom_idx_from_ptr(ab[n]->btom);
+											if (k >= 0) atom_Greek[k] = -1;
+										}
+										else
+										{
+											delete_atom(ab[n]->btom);
+										}
+										
+										l++;
+									}
+								}
+								
+								goto _found_CA;
+							}
+						}
+					}
+				}
+    		}
+    	}
+    	
+    	cout << "Please check the definition for " << aa_defs[idx].name << " that its SMILES string describes an alpha amino acid." << endl;
+    	throw 0xbadac1d;
+    	
+    	_found_CA:
+    	for (i=0; atoms[i]; i++)
+    	{
+    		if (atom_Greek[i]) continue;
+    		
+    		// If the atom is hydrogen, its Greek will be the same as its bond[0]->btom. Otherwise, it will be one more.
+    		
+    		// Name the atom. If the name already exists, or if {name}1 exists, number the atom(s).
+    		
+    		// If this is a hydrogen and the heavy atom has an append number, use prepend numbers instead.
+    		
+    	}
+    	
+    	#else
     	// Atom names.
     	Atom** atoms_new = new Atom*[get_atom_count()+4];
     	bool used[get_atom_count()+4];
@@ -130,6 +242,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			atoms = atoms_new;
 			atcount = l;
 		}
+		
+		#endif
     	
     	get_rotatable_bonds();
     }
@@ -537,7 +651,9 @@ void AminoAcid::load_aa_defs()
 {
     FILE* pf = fopen(override_aminos_dat ?: "aminos.dat", "rb");
     if (!pf)
+    {
         cout << "ERROR failed to open aminos.dat, please verify file exists and you have permissions." << endl;
+    }
     else
     {
         int i, j;

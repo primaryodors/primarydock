@@ -1,6 +1,6 @@
 # I like 3.11+ of CMake, since it features fetchcontent
 # function, which can include 3rd party dependency libraries
-# from github if needed (e.g. approval tests)
+# from github if necessary (e.g. approval tests)
 cmake_minimum_required (VERSION 3.14)  # PI :)
 
 # Name of project, programming language,

@@ -113,6 +113,7 @@ void Molecule::delete_atom(Atom* a)
 				for (j=i+1; atoms[j]; j++) atoms[j-1] = atoms[j];
 				atoms[j-1] = nullptr;
 				rotatable_bonds = nullptr;
+				atcount--;
 				return;
 			}
 		}
@@ -364,6 +365,15 @@ Atom* Molecule::get_atom(char const* aname) const
         if (!strcmp(atoms[i]->name, aname)) return atoms[i];
 
     return 0;
+}
+
+int Molecule::atom_idx_from_ptr(Atom* a)
+{
+	if (!atoms) return -1;
+	int i;
+	for (i=0; atoms[i]; i++) if (atoms[i] == a) return i;
+	
+	return -1;		// If not found.	
 }
 
 Point Molecule::get_atom_location(char const * aname)

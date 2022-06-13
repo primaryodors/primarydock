@@ -82,6 +82,7 @@ class Atom
     Atom* is_bonded_to(const char* element);
     Atom* is_bonded_to(const char* element, const int cardinality);
     Atom* is_bonded_to(const int family);
+    Atom* is_bonded_to(const int family, const int cardinality);
 
     bool shares_bonded_with(Atom* btom);
 

@@ -674,7 +674,8 @@ Atom* Atom::is_bonded_to(const char* element, const int lcardinality)
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (!strcmp(bonded_to[i].btom->get_elem_sym(), element)
-                    && bonded_to[i].cardinality == lcardinality
+				&&
+				bonded_to[i].cardinality == lcardinality
                )
                 return bonded_to[i].btom;
     return 0;
@@ -687,6 +688,20 @@ Atom* Atom::is_bonded_to(const int family)
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (bonded_to[i].btom->get_family() == family
+               )
+                return bonded_to[i].btom;
+    return 0;
+}
+
+Atom* Atom::is_bonded_to(const int family, const int lcardinality)
+{
+    if (!bonded_to) return 0;
+    int i;
+    for (i=0; i<geometry; i++)
+        if (bonded_to[i].btom)
+            if (bonded_to[i].btom->get_family() == family
+				&&
+				bonded_to[i].cardinality == lcardinality
                )
                 return bonded_to[i].btom;
     return 0;

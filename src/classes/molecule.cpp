@@ -2587,7 +2587,7 @@ bool Molecule::from_smiles(char const * smilesstr)
 	if (!strchr(smilesstr, '{'))		// {AtomName} is a nonstandard feature and must be handled by POdock code, not a third party app.
 	{
 		// Check if OpenBabel is installed.
-		FILE* pf = popen("which obabel", "r");
+		FILE* pf = popen(CMD_CHECK_INSTALLED_3P_SMILES_PARSER, "r");
 		if (pf)
 		{
 			char buffer[1024];
@@ -2598,7 +2598,7 @@ bool Molecule::from_smiles(char const * smilesstr)
 				std::string sdfdat = "";
 				
 				// Temporarily reuse buffer as the obabel command.
-				sprintf(buffer, "obabel -:'%s' --gen3D -osdf", smilesstr);
+				sprintf(buffer, CMD_CALL_3P_SMILES_PARSER, smilesstr);
 				pf = popen(buffer, "r");
 				
 				// Resume using buffer with fgets().
@@ -3617,7 +3617,7 @@ int Molecule::get_ring_num_atoms(int ringid)
 	if (!ring_atoms) return 0;
 	int i;
 	for (i=0; ring_atoms[ringid][i]; i++);		// Loop until find nullptr; this is the atom count.
-	cout << "Ring " << ringid << " has " << i << endl;
+	// cout << "Ring " << ringid << " has " << i << endl;
 	return i;
 }
 
@@ -3645,7 +3645,7 @@ float Molecule::correct_structure(int iters)
     		}
     	}
     }
-    else return 0;
+    else return 0;			// Non-ring structures work fine. The buggy algorithm is when rings are involved.
 	
 	#if _DEV_FIX_MSTRUCT
     for (iter=0; iter<iters; iter++)

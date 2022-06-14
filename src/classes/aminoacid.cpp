@@ -57,14 +57,38 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	int atom_Greek[ac4];
     	int atom_append[ac4];
     	int atom_prepend[ac4];
+    	bool atom_isheavy[ac4];
+    	int atom_prev[ac4];
+    	int numgrk[29];			// 24 letters, one based, plus extra space.
+    	
+    	Atom *N, *HN, *C, *O;
     	
     	for (i=0; i<ac4; i++) atom_Greek[i] = atom_append[i] = atom_prepend[i] = 0;
+    	
+    	for (i=1; i<=24; i++) numgrk[i] = 0;
     	
     	for (i=0; atoms[i]; i++)
     	{
     		atoms[i]->residue = residue_no;
     		atoms[i]->aaletter = aa_defs[idx]._1let;
     		strcpy(atoms[i]->aa3let, aa_defs[idx]._3let);
+    		atom_isheavy[i] = (atoms[i]->get_Z() != 1);
+    		
+    		// If the atom is hydrogen, its Greek will be the same as its bond[0]->btom. Otherwise, it will be one more.
+    		Bond* b0 = atoms[i]->get_bond_by_idx(0);
+    		if (!b0 || !b0->btom)
+    		{
+    			cout << "Error in definition for " << aa_defs[idx].name << "." << endl;
+    			throw 0xbadac1d;
+    		}
+    		j = atom_idx_from_ptr(b0->btom);
+    		if (j < 0)
+    		{
+    			cout << "Error in definition for " << aa_defs[idx].name << "." << endl;
+    			throw 0xbadac1d;
+    		}
+    		
+    		atom_prev[i] = j;
 		}
     	
     	// Find the alpha carbon. Name it CA.
@@ -72,7 +96,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	{	
     		if (atoms[i]->get_family() == TETREL)
     		{
-    			Atom* N = atoms[i]->is_bonded_to(PNICTOGEN, 1);
+    			N = atoms[i]->is_bonded_to(PNICTOGEN, 1);
     			if (N)
 				{
 					Bond** ab = atoms[i]->get_bonds();
@@ -83,32 +107,28 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 							ab[j]->btom->get_family() == TETREL
 							)
 						{
-							Atom* O = ab[j]->btom->is_bonded_to(CHALCOGEN, 2);
+							O = ab[j]->btom->is_bonded_to(CHALCOGEN, 2);
 							if (O)
 							{
 								atoms[i]->name = new char[5];
 								strcpy(atoms[i]->name, "CA");
 								k = atom_idx_from_ptr(atoms[i]);
-								if (k >= 0) atom_Greek[k] = 1;
+								if (k >= 0)
+								{
+									atom_Greek[k] = 1;
+									numgrk[atom_Greek[k]]++;
+								}
 								
-								ab[j]->btom->name = new char[5];
-								strcpy(ab[j]->btom->name, "C");
-								k = atom_idx_from_ptr(ab[j]->btom);
+								C = ab[j]->btom;
+								C->name = new char[5];
+								strcpy(C->name, "C");
+								k = atom_idx_from_ptr(C);
 								if (k >= 0) atom_Greek[k] = -1;
 								
 								O->name = new char[5];
 								strcpy(O->name, "O");
 								k = atom_idx_from_ptr(O);
 								if (k >= 0) atom_Greek[k] = -1;
-								
-								// Delete the other oxygen and its hydrogen.
-								Atom* OH = ab[j]->btom->is_bonded_to(CHALCOGEN, 1);
-								if (OH)
-								{
-									Atom* HH = OH->is_bonded_to("H");
-									if (HH) delete_atom(HH);
-									delete_atom(OH);
-								}
 								
 								N->name = new char[5];
 								strcpy(N->name, "N");
@@ -124,14 +144,11 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 									{
 										if (!l)
 										{
-											ab[n]->btom->name = new char[5];
-											strcpy(ab[n]->btom->name, "HN");
-											k = atom_idx_from_ptr(ab[n]->btom);
+											HN = ab[n]->btom;
+											HN->name = new char[5];
+											strcpy(HN->name, "HN");
+											k = atom_idx_from_ptr(HN);
 											if (k >= 0) atom_Greek[k] = -1;
-										}
-										else
-										{
-											delete_atom(ab[n]->btom);
 										}
 										
 										l++;
@@ -150,105 +167,168 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	throw 0xbadac1d;
     	
     	_found_CA:
+    	// Set the Greek values for heavy atoms.
+    	int maxgrk = 1;
     	for (i=0; atoms[i]; i++)
     	{
     		if (atom_Greek[i]) continue;
-    		
-    		// If the atom is hydrogen, its Greek will be the same as its bond[0]->btom. Otherwise, it will be one more.
-    		
-    		// Name the atom. If the name already exists, or if {name}1 exists, number the atom(s).
-    		
-    		// If this is a hydrogen and the heavy atom has an append number, use prepend numbers instead.
-    		
-    	}
-    	
-    	#else
-    	// Atom names.
-    	Atom** atoms_new = new Atom*[get_atom_count()+4];
-    	bool used[get_atom_count()+4];
-    	l=0;
-    	// for (j=0; atoms[j]; j++) cout << atoms[j]->name << " ";
-    	// cout << endl;
-    	for (j=0; aa_defs[idx].aabonds[j]; j++)
-    	{
-			bool found = false;
-    		int aidx = aa_defs[idx].aabonds[j]->SMILES_idx;
-    		// cout << aa_defs[idx].aabonds[j]->aname << " has SMILES index " << aidx << " ";
-    		if (!aidx) continue;
-    		
-    		if (aidx < 1000)
+    		if (atom_isheavy[i])
     		{
-    			aidx--;
-    			// cout << "old name = " << atoms[aidx]->name << " ";
-    			found = true;
+    			j = atom_prev[i];
+    			atom_Greek[i] = atom_Greek[j]+1;
+    			numgrk[atom_Greek[i]]++;
+    			if (atom_Greek[i] > maxgrk) maxgrk = atom_Greek[i];
 			}
-    		else
+		}
+		
+		// If any heavy atoms have the same Greek, suffix them 1, 2, 3....
+		for (k=1; k<=maxgrk; k++)
+		{
+			if (numgrk[k] < 2) continue;
+			
+			l=0;
+			for (i=0; atoms[i]; i++)
+			{
+				if (!atom_isheavy[i]) continue;
+				if (atom_Greek[i] == k)
+				{
+					atom_append[i] = ++l;
+				}
+			}
+		}
+    	
+    	// Set the Greek values for hydrogens, including the suffix if present.
+    	for (i=0; atoms[i]; i++)
+    	{
+    		if (atom_Greek[i]) continue;
+    		if (!atom_isheavy[i])
     		{
-    			Atom* heavy = atoms[aidx-1001];
-    			for (k=0; atoms[k]; k++)
+    			j = atom_prev[i];
+    			if (atom_Greek[j] < 1) continue;
+    			atom_Greek[i] = atom_Greek[j];
+    			atom_append[i] = atom_append[j];
+			}
+		}
+    	
+    	// If any hydrogens have the same Greek and zero suffix, suffix them 1, 2, 3....
+    	for (i=0; atoms[i]; i++)
+    	{
+    		if (atom_Greek[i] < 0) continue;
+    		if (atom_isheavy[i]) continue;
+    		if (atom_append[i]) continue;
+    		
+    		for (j=i+1; atoms[j]; j++)
+    		{
+    			if (atom_isheavy[j]) continue;
+    			if (atom_Greek[j] == atom_Greek[i] && !atom_append[j])
     			{
-    				if (!used[k] && atoms[k]->get_Z() == 1 && atoms[k]->is_bonded_to(heavy))
+    				atom_append[i] = 1;
+    				atom_append[j] = 2;
+    				l = 2;
+    				
+    				for (k=j+1; atoms[k]; k++)
     				{
-    					aidx = k;
-    					// cout << "old name = " << atoms[aidx]->name << " ";
-    					found = true;
-    					break;
+    					if (atom_isheavy[k]) continue;
+    					if (atom_Greek[k] == atom_Greek[i] && !atom_append[k])
+    						atom_append[k] = ++l;
     				}
     			}
     		}
     		
-    		if (found)
-    		{
-				used[aidx] = true;
-				
-    			atoms[aidx]->clear_all_moves_cache();
-    			atoms[aidx]->aaletter = letter;
-    			strcpy(atoms[aidx]->aa3let, aa_defs[idx]._3let);
-    			atoms[aidx]->residue = residue_no;
-    			if (atoms[aidx]->name) delete atoms[aidx]->name;
-    			atoms[aidx]->name = new char[8];
-    			
-    			strcpy(atoms[aidx]->name, aa_defs[idx].aabonds[j]->aname);
-				// cout << "new name = " << atoms[aidx]->name << " ";
-		        if	(
-		        	!strcmp(atoms[aidx]->name, "N")
-	                || !strcmp(atoms[aidx]->name, "HN")
-	                || !strcmp(atoms[aidx]->name, "CA")
-	                || !strcmp(atoms[aidx]->name, "C")
-	                || !strcmp(atoms[aidx]->name, "O")
-		        	)
-		        {
-		            atoms[aidx]->is_backbone = true;
-	            }
-		        else atoms[aidx]->is_backbone = false;
-		        
-    			atoms_new[l++] = atoms[aidx];
-    			atoms_new[l] = 0;
-    		}
-    		// cout << endl;
 		}
-		
-		if (l)
-		{
-			for (i=0; atoms[i]; i++)
-			{
-				if ( in_array( (void*)atoms[i], (void**)atoms_new ) < 0 )
-				{
-					delete_atom(atoms[i]);
-				}
+    	
+    	// If any hydrogens have the same Greek and the same nonzero suffix, prefix them 1, 2, 3....
+    	for (i=0; atoms[i]; i++)
+    	{
+    		if (atom_Greek[i] < 0) continue;
+    		if (atom_isheavy[i]) continue;
+    		if (!atom_append[atom_prev[i]]) continue;
+    		if (atom_prepend[i]) continue;
+    		
+    		for (j=i+1; atoms[j]; j++)
+    		{
+    			if (atom_isheavy[j]) continue;
+    			if (atom_Greek[j] == atom_Greek[i] && atom_append[j] == atom_append[i])
+    			{
+    				atom_prepend[i] = 1;
+    				atom_prepend[j] = 2;
+    				l = 2;
+    				
+    				for (k=j+1; atoms[k]; k++)
+    				{
+    					if (atom_isheavy[k]) continue;
+    					if (atom_Greek[k] == atom_Greek[i] && atom_append[k] == atom_append[i])
+    						atom_prepend[k] = ++l;
+    				}
+    				
+    				goto _nexti;
+    			}
 			}
 			
-			delete atoms;
-			atoms = atoms_new;
-			atcount = l;
-		}
-		
+			_nexti:
+			;
+    	}
+    	
+    	// Now name all the Greek atoms.
+    	std::string strGrk = Greek;
+    	for (i=0; atoms[i]; i++)
+    	{
+    		/*cout << i
+    			 << "\t" << atom_prev[i]
+    			 << "\t" << atoms[i]->name
+    			 << "\t" << atom_prepend[i]
+    			 << "\t" << atom_Greek[i]
+    			 << "\t" << atom_append[i]
+    			 << endl;*/
+    		
+    		if (atom_Greek[i] < 1) continue;
+    		
+    		std::string newname = "";
+    		if (atom_prepend[i]) newname += std::to_string(atom_prepend[i]);
+    		newname += atoms[i]->get_elem_sym();					// TODO: Convert to upper case.
+    		newname += strGrk.substr(atom_Greek[i]-1, 1);
+    		if (atom_append[i]) newname += std::to_string(atom_append[i]);
+    		
+    		// cout << atoms[i]->name << " is now " << newname << endl;
+    		strcpy(atoms[i]->name, newname.c_str());
+    	}
+    	
+    	// Sort all the backbone and sidechain atoms into a new array.
+    	Atom** new_atoms = new Atom*[atcount];
+    	for (i=0; i<atcount; i++) new_atoms[i] = nullptr;
+    	
+    	l=0;
+    	new_atoms[l++] = N;
+    	new_atoms[l++] = HN;
+    	
+    	for (k=1; k<=maxgrk; k++)
+    	{
+    		for (i=0; atoms[i]; i++)
+    		{
+    			if (atom_Greek[i] == k) new_atoms[l++] = atoms[i];
+    			atoms[i]->clear_geometry_cache();
+    			atoms[i]->clear_all_moves_cache();
+    		}
+    	}
+    	
+    	new_atoms[l++] = C;
+    	new_atoms[l++] = O;
+    	
+    	// Delete any atoms that did not get Greeked.
+    	for (i=atcount-1; i>=0; i--) if (!atom_Greek[i]) delete_atom(atoms[i]);
+    	
+    	// delete[] atoms;
+    	atoms = new_atoms;
+    	atcount = l;
+    	
+    	if (prevaa) N->bond_to(prevaa->get_atom("C"), 1);
+    	
 		#endif
     	
     	get_rotatable_bonds();
     }
-
-	flatten();
+    
+	// flatten();
 	minimize_internal_clashes();
 	
 	Atom* CA = get_atom("CA");
@@ -689,7 +769,7 @@ void AminoAcid::load_aa_defs()
                         tbdctr = 0;
                         proline_like = false;
 
-                        if (tmpbdefs) delete tmpbdefs;
+                        if (tmpbdefs) delete[] tmpbdefs;
                         tmpbdefs = new AABondDef*[256];
                     }
 

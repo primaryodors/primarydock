@@ -101,6 +101,7 @@ Molecule::~Molecule()
 void Molecule::delete_atom(Atom* a)
 {
 	if (!a) return;
+	// return;
 	int i, j;
 	
 	if (hasAtoms(atoms))
@@ -926,9 +927,11 @@ int Molecule::identify_rings()
     ring_atoms = new Atom**[atcount];
     ring_aromatic = new bool[atcount];
 
-    // Start at any ato Mark it "used".
+    // Start at any atom, mark it "used".
     a = atoms[0];
     a->used = true;
+    
+    for (i=0; i<256; i++) ringstmp[i] = nullptr;
 
     // For each "unused" valence>1 atom attached to the start atom, mark it "used" and start a chain.
     // Include the start atom as the first element of the chain.
@@ -941,6 +944,7 @@ int Molecule::identify_rings()
             if (b[i]->btom->get_valence() > 1)
             {
                 ringstmp[chains] = new Atom*[256];
+                for (j=0; j<256; j++) ringstmp[chains][j] = nullptr;
                 ringstmp[chains][0] = a;
                 ringstmp[chains][1] = b[i]->btom;
                 ringstmp[chains][2] = 0;
@@ -1160,7 +1164,7 @@ _exit_m:
     while (active);
 
     // if (b) delete[] b;
-    for (i=0; ringstmp[i]; i++) delete ringstmp[i];
+    for (i=0; ringstmp[i]; i++) delete[] ringstmp[i];
 
     for (i=0; atoms[i]; i++) atoms[i]->used = false;
 
@@ -1375,6 +1379,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     Bond* btemp[65536];
     
     int i,j, bonds=0;
+    for (i=0; i<65536; i++) btemp[i] = nullptr;
     if (aadef && aadef->aabonds)
     {
     	for (i=0; aadef->aabonds[i]; i++)

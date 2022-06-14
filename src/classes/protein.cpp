@@ -103,8 +103,6 @@ bool Protein::add_residue(const int resno, const char aaletter)
     residues[i+1] = 0;
     sequence[i+1] = 0;
 
-    // TODO: Create a peptide bond to the previous residue.
-
     if (!aaptrmin.n || residues[i] < aaptrmin.paa) aaptrmin.paa = residues[i];
     if (!aaptrmax.n || residues[i] > aaptrmax.paa) aaptrmax.paa = residues[i];
 

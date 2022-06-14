@@ -77,6 +77,7 @@ class Atom
     bool bond_to(Atom* btom, float cardinality);
     void unbond(Atom* btom);
     void unbond_all();
+    void consolidate_bonds();
 
     float is_bonded_to(Atom* btom);			// If yes, return the cardinality.
     Atom* is_bonded_to(const char* element);

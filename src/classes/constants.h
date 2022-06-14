@@ -17,7 +17,7 @@
 
 #if defined(__linux__) || defined(__sun) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
 	#define CMD_CHECK_INSTALLED_3P_SMILES_PARSER "which obabel"
-	#define CMD_CALL_3P_SMILES_PARSER "obabel -:'%s' --gen3D -osdf"
+	#define CMD_CALL_3P_SMILES_PARSER "obabel -:'%s' --gen3D -osdf 2> /dev/null"
 #elif _WIN32
 	#define CMD_CHECK_INSTALLED_3P_SMILES_PARSER "dir \"C:\\Program Files\\OpenBabel*\""
 	#define CMD_CALL_3P_SMILES_PARSER "obabel.exe -:'%s' --gen3D -osdf"

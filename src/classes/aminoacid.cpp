@@ -93,7 +93,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	
     	// Find the alpha carbon. Name it CA.
     	for (i=0; atoms[i]; i++)
-    	{	
+    	{
     		if (atoms[i]->get_family() == TETREL)
     		{
     			N = atoms[i]->is_bonded_to(PNICTOGEN, 1);
@@ -112,6 +112,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 							{
 								atoms[i]->name = new char[5];
 								strcpy(atoms[i]->name, "CA");
+								atoms[i]->is_backbone = true;
 								k = atom_idx_from_ptr(atoms[i]);
 								if (k >= 0)
 								{
@@ -122,16 +123,19 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 								C = ab[j]->btom;
 								C->name = new char[5];
 								strcpy(C->name, "C");
+								C->is_backbone = true;
 								k = atom_idx_from_ptr(C);
 								if (k >= 0) atom_Greek[k] = -1;
 								
 								O->name = new char[5];
 								strcpy(O->name, "O");
+								O->is_backbone = true;
 								k = atom_idx_from_ptr(O);
 								if (k >= 0) atom_Greek[k] = -1;
 								
 								N->name = new char[5];
 								strcpy(N->name, "N");
+								N->is_backbone = true;
 								k = atom_idx_from_ptr(N);
 								if (k >= 0) atom_Greek[k] = -1;
 								
@@ -147,6 +151,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 											HN = ab[n]->btom;
 											HN->name = new char[5];
 											strcpy(HN->name, "HN");
+											HN->is_backbone = true;
 											k = atom_idx_from_ptr(HN);
 											if (k >= 0) atom_Greek[k] = -1;
 										}
@@ -275,6 +280,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	{
     		/*cout << i
     			 << "\t" << atom_prev[i]
+    			 << "\t" << atoms[i]->get_elem_sym()
     			 << "\t" << atoms[i]->name
     			 << "\t" << atom_prepend[i]
     			 << "\t" << atom_Greek[i]
@@ -317,11 +323,24 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	// Delete any atoms that did not get Greeked.
     	for (i=atcount-1; i>=0; i--) if (!atom_Greek[i]) delete_atom(atoms[i]);
     	
+    	// Check correct bonding.
+    	/*for (i=0; atoms[i]; i++)
+    	{
+    		Bond** bb = atoms[i]->get_bonds();
+    		int ag = atoms[i]->get_geometry();
+    		for (j=0; j<ag; j++)
+    		{
+    			if (bb[j]->btom) cout << atoms[i]->residue << ":" << atoms[i]->name
+    								  << cardinality_printable(bb[j]->cardinality) 
+    								  << bb[j]->btom->residue << ":" << bb[j]->btom->name << endl;
+    		}
+    	}*/
+    	
+    	if (prevaa) N->bond_to(prevaa->get_atom("C"), 1);
+    	
     	// delete[] atoms;
     	atoms = new_atoms;
     	atcount = l;
-    	
-    	if (prevaa) N->bond_to(prevaa->get_atom("C"), 1);
     	
 		#endif
     	
@@ -1275,6 +1294,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     // the local N atom as far as possible from the next residue's N atom.
     LocRotation retval;
     if (m_mcoord) return retval;	// NO.
+    //return retval;
 
     // Get the location of the previous C, and the location of the local C.
     Atom *atom, *btom;
@@ -1341,7 +1361,8 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     	b->rotate(fiftyseventh*step, true);
     	float r = atom->get_location().get_3d_distance(btom->get_location());
     	if (r < bestr)
-    	{	bestrad = fiftyseventh*i;
+    	{
+    		bestrad = fiftyseventh*i;
     		bestr = r;
     	}
     }
@@ -1364,32 +1385,33 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     char aname[5], bname[5];
     if (!atoms) return retval;
     if (m_mcoord) return retval;	// NO.
+    // return retval;
 
     // Determine the center of rotation and rotation SCoord.
     switch (direction)
     {
-    case N_asc:
-        strcpy(aname, "N");
-        strcpy(bname, "CA");
-        break;
+		case N_asc:
+		    strcpy(aname, "N");
+		    strcpy(bname, "CA");
+		    break;
 
-    case CA_asc:
-        strcpy(aname, "CA");
-        strcpy(bname, "C");
-        break;
+		case CA_asc:
+		    strcpy(aname, "CA");
+		    strcpy(bname, "C");
+		    break;
 
-    case CA_desc:
-        strcpy(aname, "CA");
-        strcpy(bname, "N");
-        break;
+		case CA_desc:
+		    strcpy(aname, "CA");
+		    strcpy(bname, "N");
+		    break;
 
-    case C_desc:
-        strcpy(aname, "C");
-        strcpy(bname, "CA");
-        break;
+		case C_desc:
+		    strcpy(aname, "C");
+		    strcpy(bname, "CA");
+		    break;
 
-    default:
-        return retval;
+		default:
+		    return retval;
     }
     rotcen = get_atom(aname);
     if (!rotcen) return retval;

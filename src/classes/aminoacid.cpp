@@ -654,10 +654,10 @@ int AminoAcid::from_pdb(FILE* is)
                     added++;
 
                     if (   !strcmp(a->name, "N")
-                            || !strcmp(a->name, "HN")
-                            || !strcmp(a->name, "CA")
-                            || !strcmp(a->name, "C")
-                            || !strcmp(a->name, "O")
+                        || !strcmp(a->name, "HN")
+                        || !strcmp(a->name, "CA")
+                        || !strcmp(a->name, "C")
+                        || !strcmp(a->name, "O")
                        )
                         a->is_backbone = true;
                     else a->is_backbone = false;
@@ -712,6 +712,36 @@ int AminoAcid::from_pdb(FILE* is)
                                 }
                             }
                         }
+                    }
+                    else
+                    {
+                    	Atom* bta = nullptr;		// bond to atom.
+                    	float cardinality = 1;		// TODO:
+                    	
+                    	// If HN, bond to N.
+                    	// If CA, bond to N.
+                    	if (!strcmp(a->name, "HN") || !strcmp(a->name, "CA") || !strcmp(a->name, "H"))
+                    	{
+                    		bta = get_atom("N");
+                    	}
+                    	
+                    	// If has Greek > A: if hydrogen, bond to same Greek (mind any suffix!), else bind to earlier Greek.
+                    	
+                    	// If C, bond to CA.
+                    	if (!strcmp(a->name, "C"))
+                    	{
+                    		bta = get_atom("CA");
+                    	}
+                    	
+                    	// If O, bond to C.
+                    	if (!strcmp(a->name, "O"))
+                    	{
+                    		bta = get_atom("C");
+                    		cardinality = 2;
+                    	}
+                    	
+                    	if (bta) a->bond_to(bta, cardinality);
+                    	
                     }
 
                 }

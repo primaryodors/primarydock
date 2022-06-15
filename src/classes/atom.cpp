@@ -709,6 +709,7 @@ Atom* Atom::is_bonded_to(const int family, const int lcardinality)
 
 bool Atom::bond_to(Atom* lbtom, float lcard)
 {
+	if (!lbtom) return false;
     int i;
 
     geov = NULL;

@@ -181,8 +181,61 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     		{
     			j = atom_prev[i];
     			atom_Greek[i] = atom_Greek[j]+1;
-    			numgrk[atom_Greek[i]]++;
-    			if (atom_Greek[i] > maxgrk) maxgrk = atom_Greek[i];
+    			//numgrk[atom_Greek[i]]++;
+    			//if (atom_Greek[i] > maxgrk) maxgrk = atom_Greek[i];
+    			
+    			Bond** ab = atoms[i]->get_bonds();
+    			int ag = atoms[i]->get_geometry();
+    			for (j=0; j<ag; j++)
+    			{
+    				if (ab[j]->btom)
+    				{
+    					k = atom_idx_from_ptr(ab[j]->btom);
+    					if (k >= 0 && !atom_Greek[k])
+    					{
+							atom_Greek[k] = atom_Greek[i]+1;
+							//numgrk[atom_Greek[k]]++;
+							//if (atom_Greek[k] > maxgrk) maxgrk = atom_Greek[k];
+    					}
+    				}
+    			}
+			}
+		}
+		
+		// Recheck each heavy atom has the lowest possible Greek.
+		for (i=0; atoms[i]; i++)
+    	{
+    		if (atom_isheavy[i] && atom_Greek[i] > 1)
+    		{
+    			Bond** ab = atoms[i]->get_bonds();
+    			int ag = atoms[i]->get_geometry();
+    			for (j=0; j<ag; j++)
+    			{
+    				if (ab[j]->btom)
+    				{
+    					k = atom_idx_from_ptr(ab[j]->btom);
+    					if (atom_isheavy[k] && atom_Greek[k] > 0)
+    					{
+							l = atom_Greek[k] + 1;
+							if (l < atom_Greek[i])
+							{
+								atom_Greek[i] = l;
+							}
+						}
+					}
+				}
+    		}
+    	}
+    	
+    	// How many heavy atoms assigned to each Greek letter?
+    	for (k=1; k<=24; k++)
+		{
+			numgrk[k] = 0;
+			for (i=0; atoms[i]; i++)
+			{
+				if (!atom_isheavy[i]) continue;
+				if (atom_Greek[i] == k) numgrk[k]++;
+				if (atom_Greek[i] > maxgrk) maxgrk = atom_Greek[i];
 			}
 		}
 		
@@ -278,14 +331,14 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	std::string strGrk = Greek;
     	for (i=0; atoms[i]; i++)
     	{
-    		/*cout << i
+    		cout << i
     			 << "\t" << atom_prev[i]
     			 << "\t" << atoms[i]->get_elem_sym()
     			 << "\t" << atoms[i]->name
     			 << "\t" << atom_prepend[i]
     			 << "\t" << atom_Greek[i]
     			 << "\t" << atom_append[i]
-    			 << endl;*/
+    			 << endl;
     		
     		if (atom_Greek[i] < 1) continue;
     		
@@ -336,7 +389,11 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     		}
     	}*/
     	
-    	if (prevaa) N->bond_to(prevaa->get_atom("C"), 1);
+    	if (prevaa)
+    	{
+    		Atom* prevC = prevaa->get_atom("C");
+    		if (prevC) N->bond_to(prevC, 1);
+		}
     	
     	// delete[] atoms;
     	atoms = new_atoms;
@@ -591,8 +648,8 @@ int AminoAcid::from_pdb(FILE* is)
         if (fields)
         {
             if (!strcmp(fields[0], "ATOM")
-                ||
-                !strcmp(fields[0], "HETATM")
+                /*||
+                !strcmp(fields[0], "HETATM")*/
                )
             {
                 try

@@ -46,7 +46,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 
     name = aa_defs[idx].name;
 
-    int i, j, k, l;
+    int i, j, k, l, n;
     
     if (aa_defs[idx].SMILES.length())
     {
@@ -203,28 +203,35 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		}
 		
 		// Recheck each heavy atom has the lowest possible Greek.
-		for (i=0; atoms[i]; i++)
-    	{
-    		if (atom_isheavy[i] && atom_Greek[i] > 1)
-    		{
-    			Bond** ab = atoms[i]->get_bonds();
-    			int ag = atoms[i]->get_geometry();
-    			for (j=0; j<ag; j++)
-    			{
-    				if (ab[j]->btom)
-    				{
-    					k = atom_idx_from_ptr(ab[j]->btom);
-    					if (atom_isheavy[k] && atom_Greek[k] > 0)
-    					{
-							l = atom_Greek[k] + 1;
-							if (l < atom_Greek[i])
+		for (n=0; n<10; n++)
+		{
+			for (i=0; atoms[i]; i++)
+			{
+				if (atom_isheavy[i] && atom_Greek[i] > 1)
+				{
+					Bond** ab = atoms[i]->get_bonds();
+					int ag = atoms[i]->get_geometry();
+					for (j=0; j<ag; j++)
+					{
+						if (ab[j]->btom)
+						{
+							// cout << atoms[i]->name << " is bonded to " << ab[j]->btom->name << name << endl;
+							k = atom_idx_from_ptr(ab[j]->btom);
+							// cout << "Greek is " << atom_Greek[i] << " vs. bonded Greek " << atom_Greek[k] << endl;
+							if (atom_isheavy[k] && atom_Greek[k] > 0)
 							{
-								atom_Greek[i] = l;
+								l = atom_Greek[k] + 1;
+								if (l < atom_Greek[i])
+								{
+									atom_Greek[i] = l;
+									atom_prev[i] = k;
+									// cout << "Greek is now " << atom_Greek[i] << endl;
+								}
 							}
 						}
 					}
 				}
-    		}
+			}
     	}
     	
     	// How many heavy atoms assigned to each Greek letter?
@@ -240,6 +247,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		}
 		
 		// If any heavy atoms have the same Greek, suffix them 1, 2, 3....
+		// But if a heavy atom is bonded to another heavy atom with a suffix, then the new atom has to have the same or greater suffix.
 		for (k=1; k<=maxgrk; k++)
 		{
 			if (numgrk[k] < 2) continue;
@@ -250,6 +258,13 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 				if (!atom_isheavy[i]) continue;
 				if (atom_Greek[i] == k)
 				{
+					if (atom_prev[i]>0
+						&&
+						atom_append[atom_prev[i]]
+						&&
+						(atom_append[atom_prev[i]]-1) >= l
+						)
+						l = atom_append[atom_prev[i]]-1;
 					atom_append[i] = ++l;
 				}
 			}
@@ -331,14 +346,14 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	std::string strGrk = Greek;
     	for (i=0; atoms[i]; i++)
     	{
-    		cout << i
+    		/*cout << i
     			 << "\t" << atom_prev[i]
     			 << "\t" << atoms[i]->get_elem_sym()
     			 << "\t" << atoms[i]->name
     			 << "\t" << atom_prepend[i]
     			 << "\t" << atom_Greek[i]
     			 << "\t" << atom_append[i]
-    			 << endl;
+    			 << endl;*/
     		
     		if (atom_Greek[i] < 1) continue;
     		
@@ -367,7 +382,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			if (atom_isheavy[i])
 			{
 				new_atoms[l++] = atoms[i];
-				cout << l-1 << " " << atoms[i]->name << endl;
+				// cout << l-1 << " " << atoms[i]->name << endl;
 				for (j=i+1; atoms[j]; j++)
 				{
 					if (!atom_isheavy[j] 
@@ -378,7 +393,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 						)
 					{
 						new_atoms[l++] = atoms[j];
-						cout << l-1 << " " << atoms[j]->name << endl;
+						// cout << l-1 << " " << atoms[j]->name << endl;
 					}
 				}
 			}

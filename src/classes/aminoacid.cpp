@@ -258,11 +258,11 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	// Set the Greek values for hydrogens, including the suffix if present.
     	for (i=0; atoms[i]; i++)
     	{
-    		if (atom_Greek[i]) continue;
+    		if (atom_Greek[i] < 0) continue;
     		if (!atom_isheavy[i])
     		{
     			j = atom_prev[i];
-    			if (atom_Greek[j] < 1) continue;
+    			if (atom_Greek[j] < 0) continue;
     			atom_Greek[i] = atom_Greek[j];
     			atom_append[i] = atom_append[j];
 			}
@@ -360,18 +360,36 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	new_atoms[l++] = N;
     	new_atoms[l++] = HN;
     	
-    	for (k=1; k<=maxgrk; k++)
-    	{
-    		for (i=0; atoms[i]; i++)
-    		{
-    			if (atom_Greek[i] == k) new_atoms[l++] = atoms[i];
-    			atoms[i]->clear_geometry_cache();
-    			atoms[i]->clear_all_moves_cache();
-    		}
-    	}
+		for (i=0; atoms[i]; i++)
+		{
+			if (atom_Greek[i] <= 0) continue;
+			// if (atom_Greek[i] == k) new_atoms[l++] = atoms[i];
+			if (atom_isheavy[i])
+			{
+				new_atoms[l++] = atoms[i];
+				cout << l-1 << " " << atoms[i]->name << endl;
+				for (j=i+1; atoms[j]; j++)
+				{
+					if (!atom_isheavy[j] 
+						&&
+						atom_Greek[j] == atom_Greek[i]
+						&&
+						(!atom_append[i] || atom_append[j] == atom_append[i])
+						)
+					{
+						new_atoms[l++] = atoms[j];
+						cout << l-1 << " " << atoms[j]->name << endl;
+					}
+				}
+			}
+			atoms[i]->clear_geometry_cache();
+			atoms[i]->clear_all_moves_cache();
+		}
     	
     	new_atoms[l++] = C;
     	new_atoms[l++] = O;
+    	
+    	_finish_anames:
     	
     	// Delete any atoms that did not get Greeked.
     	for (i=atcount-1; i>=0; i--) if (!atom_Greek[i]) delete_atom(atoms[i]);

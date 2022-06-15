@@ -634,6 +634,18 @@ Atom* Atom::is_bonded_to(const char* element)
     return 0;
 }
 
+int Atom::num_bonded_to(const char* element)
+{
+	if (!bonded_to) return 0;
+    int i, j=0;
+    for (i=0; i<geometry; i++)
+        if (bonded_to[i].btom)
+            if (!strcmp(bonded_to[i].btom->get_elem_sym(), element)
+               )
+                j++;
+    return j;
+}
+
 Bond* Atom::get_bond_between(Atom* btom)
 {
     if (!bonded_to) return 0;

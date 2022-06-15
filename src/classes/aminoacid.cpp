@@ -61,7 +61,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	int atom_prev[ac4];
     	int numgrk[29];			// 24 letters, one based, plus extra space.
     	
-    	Atom *N, *HN, *C, *O;
+    	Atom *N = nullptr, *HN = nullptr, *C = nullptr, *O = nullptr;
     	
     	for (i=0; i<ac4; i++) atom_Greek[i] = atom_append[i] = atom_prepend[i] = 0;
     	
@@ -139,26 +139,30 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 								k = atom_idx_from_ptr(N);
 								if (k >= 0) atom_Greek[k] = -1;
 								
-								ab = N->get_bonds();
-								l = 0;
-								int n;
-								for (n=0; ab[n]; n++)
+								if (N->num_bonded_to("H") > 1)		// Proline conditional.
 								{
-									if (ab[n]->btom && ab[n]->btom->get_Z() == 1)
+									ab = N->get_bonds();
+									l = 0;
+									int n;
+									for (n=0; ab[n]; n++)
 									{
-										if (!l)
+										if (ab[n]->btom && ab[n]->btom->get_Z() == 1)
 										{
-											HN = ab[n]->btom;
-											HN->name = new char[5];
-											strcpy(HN->name, "HN");
-											HN->is_backbone = true;
-											k = atom_idx_from_ptr(HN);
-											if (k >= 0) atom_Greek[k] = -1;
+											if (!l)
+											{
+												HN = ab[n]->btom;
+												HN->name = new char[5];
+												strcpy(HN->name, "HN");
+												HN->is_backbone = true;
+												k = atom_idx_from_ptr(HN);
+												if (k >= 0) atom_Greek[k] = -1;
+											}
+											
+											l++;
 										}
-										
-										l++;
 									}
 								}
+								else HN = nullptr;
 								
 								goto _found_CA;
 							}
@@ -176,13 +180,11 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	int maxgrk = 1;
     	for (i=0; atoms[i]; i++)
     	{
-    		if (atom_Greek[i]) continue;
+    		if (atom_Greek[i] < 0) continue;
     		if (atom_isheavy[i])
     		{
     			j = atom_prev[i];
-    			atom_Greek[i] = atom_Greek[j]+1;
-    			//numgrk[atom_Greek[i]]++;
-    			//if (atom_Greek[i] > maxgrk) maxgrk = atom_Greek[i];
+    			if (atom_Greek[j] > 0 && !atom_Greek[i]) atom_Greek[i] = atom_Greek[j]+1;
     			
     			Bond** ab = atoms[i]->get_bonds();
     			int ag = atoms[i]->get_geometry();
@@ -194,14 +196,12 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     					if (k >= 0 && !atom_Greek[k])
     					{
 							atom_Greek[k] = atom_Greek[i]+1;
-							//numgrk[atom_Greek[k]]++;
-							//if (atom_Greek[k] > maxgrk) maxgrk = atom_Greek[k];
     					}
     				}
     			}
 			}
 		}
-		
+				
 		// Recheck each heavy atom has the lowest possible Greek.
 		for (n=0; n<10; n++)
 		{
@@ -221,7 +221,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 							if (atom_isheavy[k] && atom_Greek[k] > 0)
 							{
 								l = atom_Greek[k] + 1;
-								if (l < atom_Greek[i])
+								if (l < atom_Greek[i] || !atom_Greek[i])
 								{
 									atom_Greek[i] = l;
 									atom_prev[i] = k;
@@ -342,6 +342,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			;
     	}
     	
+    	_iagtfksb:
     	// Now name all the Greek atoms.
     	std::string strGrk = Greek;
     	for (i=0; atoms[i]; i++)
@@ -372,13 +373,12 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	for (i=0; i<atcount; i++) new_atoms[i] = nullptr;
     	
     	l=0;
-    	new_atoms[l++] = N;
-    	new_atoms[l++] = HN;
+    	if (N) new_atoms[l++] = N;
+    	if (HN) new_atoms[l++] = HN;
     	
 		for (i=0; atoms[i]; i++)
 		{
 			if (atom_Greek[i] <= 0) continue;
-			// if (atom_Greek[i] == k) new_atoms[l++] = atoms[i];
 			if (atom_isheavy[i])
 			{
 				new_atoms[l++] = atoms[i];
@@ -401,8 +401,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			atoms[i]->clear_all_moves_cache();
 		}
     	
-    	new_atoms[l++] = C;
-    	new_atoms[l++] = O;
+    	if (C) new_atoms[l++] = C;
+    	if (O) new_atoms[l++] = O;
     	
     	_finish_anames:
     	

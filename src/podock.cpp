@@ -397,6 +397,10 @@ int main(int argc, char** argv)
 
 
     // TODO: Output some basic stats: receptor, ligand, etc.
+    cout << "PDB file: " << protfname << endl;
+    if (output) *output << "PDB file: " << protfname << endl;
+    cout << "Ligand: " << ligfname << endl << endl;
+    if (output) *output << "Ligand: " << ligfname << endl << endl;
 	
 	for (i=0; i<3; i++)
 	{

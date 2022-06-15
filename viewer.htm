@@ -1024,14 +1024,25 @@ function loadFile(fileData, fileName = "")
             	case 'dock':
                 stage.removeAllComponents();
                 var lines = fileData.split("\n");
+                
+                var i;
+                var mod = "m";
+                for (i=0; i<10; i++)
+                {
+                	if (lines[i].substr(0, 10) == "PDB file: ")
+                	{
+                		if (lines[i].indexOf(".metal.") < 0) mod = "";
+                		break;
+            		}
+                }
 
                 $.ajax(
                 {
 					url: "http://www.primaryodors.org/orpdb.php",
 					data:
                     {
-						recep: orid,
-						mod: "m",
+						"recep": orid,
+						"mod": mod,
                     },
 					success: function(poresult)
                     {
@@ -1164,8 +1175,8 @@ function loadFile(fileData, fileName = "")
 
                         if (writing)
                         {
-                            var stringBlob = new Blob( [ protmp ], { type: 'text/plain'} );
-                            stage.loadFile( stringBlob, { ext: 'pdb', name: p+"|"+n } ).then( function( comp )
+                            var stringBlob7a = new Blob( [ protmp ], { type: 'text/plain'} );
+                            stage.loadFile( stringBlob7a, { ext: 'pdb', name: p+"|"+n } ).then( function( comp7a )
                             {
                                 var rparam =
                                 {
@@ -1173,31 +1184,31 @@ function loadFile(fileData, fileName = "")
 									colorScheme: PODefSchemeHilite,
                                 };
 
-                                model.push(comp);
+                                model.push(comp7a);
                                 mrep.push("licorice");
                                 mrparams.push(rparam);
                                 is_ligand.push(0);
 
-                                var lpn = comp.name.split("|");
+                                var lpn = comp7a.name.split("|");
                                 mpos.push(parseInt(lpn[0]));
                                 mnod.push(parseInt(lpn[1]));
                                 $('#clip').trigger("input");
                             } );
 
-                            stringBlob = new Blob( [ ligtmp ], { type: 'text/plain'} );
-                            stage.loadFile( stringBlob, { ext: 'pdb', name: p+"|"+n } ).then( function( comp )
+                            var stringBlob7b = new Blob( [ ligtmp ], { type: 'text/plain'} );
+                            stage.loadFile( stringBlob7b, { ext: 'pdb', name: p+"|"+n } ).then( function( comp7b )
                             {
                                 var rparam =
                                 {
 									multipleBond: true,
                                 };
 
-                                model.push(comp);
+                                model.push(comp7b);
                                 mrep.push("ball+stick");
                                 mrparams.push(rparam);
                                 is_ligand.push(1);
 
-                                var lpn = comp.name.split("|");
+                                var lpn = comp7b.name.split("|");
                                 mpos.push(parseInt(lpn[0]));
                                 mnod.push(parseInt(lpn[1]));
                                 $('#clip').trigger("input");

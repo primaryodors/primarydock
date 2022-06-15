@@ -585,6 +585,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             // partial = aniso * forces[i]->kJ_mol * rdecayed;
             partial = aniso * forces[i]->kJ_mol;
         }
+        
+        // When pi stacking benzene rings, each ring member should only bind 1:1 with a
+        // corresponding member of the other ring. The following approximation is an
+        // oversimplification for performance's sake.
+        if (a->arom_ring_member && b->arom_ring_member && forces[i]->type == pi)
+        	partial /= 5;
 
         /*if (fabs(partial) >= 10000)
         // if (isnan(partial) || isinf(partial))

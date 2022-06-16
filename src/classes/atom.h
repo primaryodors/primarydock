@@ -58,6 +58,7 @@ class Ring
 	SCoord get_normal();
 	LocatedVector get_center_and_normal();
 	bool is_coplanar();
+	bool is_conjugated();
     bool Huckel();						// Compiler doesn't allow ü in an identifier - boo hiss!
 	
 	protected:
@@ -97,7 +98,6 @@ class Atom
     bool is_metal();
     int is_thio();							// -1 if atom is S; +1 if atom is H of a sulfhydryl.
     bool is_pi();
-    int num_rings()	{	return ring_member;	}
 
     // Setters.
     void set_aa_properties();
@@ -131,8 +131,11 @@ class Atom
     int get_idx_bond_between(Atom* btom);
     
     // Ring membership.
+    int num_rings();
+    int num_conj_rings();
 	Ring** get_rings();
 	bool is_in_ring(Ring* ring);
+	Ring* closest_arom_ring_to(Point target);
     void aromatize()
     {
         geometry=3;
@@ -204,8 +207,6 @@ class Atom
     Point* arom_center=0;
     bool EZ_flip = false;
     float last_bind_energy=0;
-	int ring_member = 0;				// How many rings is this atom part of.
-	int arom_ring_member = 0;
 
 	protected:
     int Z=0;

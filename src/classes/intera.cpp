@@ -521,12 +521,27 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
             else dpa = dpb = dp;
         }
-
+        
         Point aloc = a->get_location();
         Point bloc = b->get_location();
 
         int anx = a->get_idx_next_free_geometry();
         int bnx = b->get_idx_next_free_geometry();
+        
+        // When pi-bonding to a heavy atom of a conjugated coplanar ring, treat the entire ring as if it were one atom.
+        if ((forces[i]->type == pi || forces[i]->type == polarpi)
+        	&&
+        	a->get_Z() > 1
+        	&&
+        	a->num_conj_rings()
+           )
+		{
+			// Find the coplanar ring closest to bloc, if any.
+			Ring* ar = a->closest_arom_ring_to(bloc);
+			if (ar)
+			{
+			}
+		}
 
         if (forces[i]->type != ionic)
         {
@@ -586,13 +601,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             partial = aniso * forces[i]->kJ_mol;
         }
         
-        // When pi stacking benzene rings, each ring member should only bind 1:1 with a
-        // corresponding member of the other ring. The following approximation is an
-        // oversimplification for performance's sake.
-        if (forces[i]->type == pi && a->arom_ring_member)
-        	partial /= 3.5;
-        if (forces[i]->type == pi && b->arom_ring_member)
-        	partial /= 3.5;
 
         /*if (fabs(partial) >= 10000)
         // if (isnan(partial) || isinf(partial))

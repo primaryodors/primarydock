@@ -981,7 +981,6 @@ void Bond::fill_moves_with_cache()
                 for (i=0; b[i]; i++)
                 {
                     //if (b[i]->btom) cout << "(" << b[i]->btom->name << "?) ";
-                    if (!atom->ring_member && (b[i]->btom == atom)) atom->ring_member++;
                     if (b[i]->btom && !b[i]->btom->used && b[i]->btom != atom)
                     {
                         attmp[tmplen++] = b[i]->btom;
@@ -1336,7 +1335,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
     Point center;
     int i, j;
 
-    if (arom_ring_member)
+    if (num_conj_rings())
     {
         geometry = 3;
         if (bonded_to[1].btom)
@@ -1680,6 +1679,23 @@ int Bond::count_moves_with_btom()
     return i;
 }
 
+int Atom::num_rings()
+{
+	if (!member_of) return 0;
+	int i;
+	for (i=0; member_of[i]; i++);	// Get count.
+	return i;
+}
+
+int Atom::num_conj_rings()
+{
+	if (!member_of) return 0;
+	int i, j=0;
+	for (i=0; member_of[i]; i++)
+		if (member_of[i]->is_conjugated()) j++;
+	return i;
+}
+
 Ring** Atom::get_rings()
 {
 	if (!member_of) return nullptr;
@@ -1701,6 +1717,35 @@ bool Atom::is_in_ring(Ring* ring)
 		if (member_of[i] == ring) return true;
 	
 	return false;
+}
+
+Ring* Atom::closest_arom_ring_to(Point target)
+{
+	int j, k;
+	if (member_of)
+	{
+		k = -1;
+		float brr = 99999;
+		for (j=0; member_of[j]; j++)
+		{
+			Point rloc = member_of[j]->get_center();
+			float rr = rloc.get_3d_distance(target);
+			if (rr < brr)
+			{
+				k = j;
+				brr = rr;
+			}
+		}
+		
+		delete[] member_of;
+		
+		if (k >= 0)
+		{
+			return member_of[k];
+		}
+	}
+	
+	return nullptr;
 }
 
 Ring::Ring(Atom** from_atoms)
@@ -1801,6 +1846,12 @@ SCoord Ring::get_normal()
 	
 	Point pt1(x/w, y/w, z/w);
 	return (SCoord)pt1;
+}
+
+bool Ring::is_conjugated()
+{
+	if (!atoms) return false;
+	return atoms_are_conjugated(atoms);
 }
 
 bool Ring::is_coplanar()

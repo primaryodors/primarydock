@@ -24,8 +24,8 @@ Molecule::Molecule(char const* lname)
 
     atoms = nullptr;
     smiles = nullptr;
-    ring_atoms = nullptr;
-    atcount = ringcount = 0;
+    rings = nullptr;
+    atcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = nullptr;
 }
@@ -34,8 +34,8 @@ Molecule::Molecule()
 {
     atoms = nullptr;
     smiles = nullptr;
-    ring_atoms = nullptr;
-    atcount = ringcount = 0;
+    rings = nullptr;
+    atcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = 0;
     paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
@@ -76,26 +76,14 @@ Molecule::Molecule(char const* lname, Atom** collection)
     strcpy(name, lname);
 
     smiles = nullptr;
-    ring_atoms = nullptr;
-    ringcount = 0;
+    rings = nullptr;
     reset_conformer_momenta();
     rotatable_bonds = 0;
 }
 
 Molecule::~Molecule()
 {
-    /*int i;
-    if (hasAtoms(atoms))
-    {	for (i=0; atoms[i]; i++) delete atoms[i];
-    	delete[] atoms;
-    }
-    if (name) delete[] name;
-    if (smiles) delete smiles;
-    if (ring_atoms)
-    {	for (i=0; ring_atoms[i]; i++) delete[] ring_atoms[i];
-    	delete[] ring_atoms;
-    }
-    if (ring_aromatic) delete[] ring_aromatic;*/
+	;
 }
 
 void Molecule::delete_atom(Atom* a)
@@ -257,8 +245,6 @@ void Molecule::hydrogenate(bool steric_only)
         float valence = atoms[i]->get_valence();
         if (valence > 4) valence = 8 - valence;
         
-        // if (atoms[i]->arom_ring_member && valence == 4 && atoms[i]->get_geometry() == 3) valence--;
-
         // cout << atoms[i]->name << " has valence " << valence << endl;
 
         float bcardsum = 0;
@@ -778,145 +764,40 @@ void Molecule::save_pdb(FILE* os, int atomno_offset)
     fprintf(os, "\nTER\nEND\n");
 }
 
-bool Molecule::ring_is_coplanar(int ringid)
+int Molecule::add_ring(Atom** atoms)
 {
-    int ringsz;
-    if (!ring_atoms) return false;
-    if (!ring_atoms[ringid]) return false;
-    for (ringsz = 0; ring_atoms[ringid][ringsz]; ringsz++);
-
-    if (ringsz < 4) return true;
-
-    int i;
-    float anomaly;
-    for (i=3; i<ringsz; i++)
-    {
-        anomaly = are_points_planar(ring_atoms[ringid][0]->get_location(),
-                                    ring_atoms[ringid][1]->get_location(),
-                                    ring_atoms[ringid][2]->get_location(),
-                                    ring_atoms[ringid][i]->get_location()
-                                   );
-    }
-
-    return (anomaly < 0.1);
-}
-
-bool Molecule::ring_is_aromatic(int ringid)
-{
-    if (!ring_aromatic) return false;
-    if (ringid >= ringcount) return false;
-    if (ringid < 0) return false;
-    if (!ring_atoms) return false;
-    if (!ring_atoms[ringid]) return false;
-    
-    // TODO: Call ring_is_coplanar() but first the molecular assembly has to be working right.
-    
-    return Huckel(ringid);
-    
-    int i, j;
-    float prevcard = 0;
-    bool retval = true;
-    
-    int ringsz;
-    for (i=0; ring_atoms[ringid][i]; i++);
-    ringsz = i;
-    
-    Bond* b = ring_atoms[ringid][0]->get_bond_between(ring_atoms[ringid][ringsz-1]);
-    prevcard = b->cardinality;
-    
-    for (i=0; i<ringsz; i++)
-    {
-    	if (ring_atoms[ringid][i+1]) j = i+1;
-    	else j = 0;
-    	
-    	b = ring_atoms[ringid][i]->get_bond_between(ring_atoms[ringid][j]);
-    	
-    	if (prevcard == 1 && b->cardinality == 1)
-    	{
-    		int fam = ring_atoms[ringid][i]->get_family();
-    		if (fam != PNICTOGEN && fam != CHALCOGEN)
-    		{
-    			// cout << "Consecutive single bonds. ";
-    			retval = false;
-    			break;
-    		}
-    	}
-    	
-    	if (b->cardinality < 1 || b->cardinality > 2)
-		{
-			// cout << "Cardinality " << b->cardinality << " out of range. ";
-			retval = false;
-			break;
-		}
-    	
-    	prevcard = b->cardinality;
-    }
-    
-    // cout << name << " ring " << ringid << (retval ? " is" : " is not") << " aromatic." << endl;
-    
-    ring_aromatic[ringid] = retval;
-    return ring_aromatic[ringid];
-}
-
-Point Molecule::get_ring_center(int ringid)
-{
-    int ringsz;
-    Point nothing;
-    if (!ring_atoms) return nothing;
-    if (!ring_atoms[ringid]) return nothing;
-    for (ringsz = 0; ring_atoms[ringid][ringsz]; ringsz++);
-
-    Point* alocs = new Point[ringsz];
-    int i;
-    for (i=0; i<ringsz; i++)
-    {
-        alocs[i] = ring_atoms[ringid][i]->get_location();
-    }
-
-    Point retval = average_of_points(alocs, ringsz);
-    delete[] alocs;
-    return retval;
-}
-
-SCoord Molecule::get_ring_normal(int ringid)
-{
-    SCoord nothing;
-    if (!ring_atoms) return nothing;
-    if (!ring_atoms[ringid]) return nothing;
-
-    if (!ring_aromatic[ringid] && !ring_is_coplanar(ringid))
-    {
-        // TODO: Some kind of best-fit algorithm using an imaginary circle.
-        return nothing;
-    }
-
-    Point a, b, c;
-    a = ring_atoms[ringid][0]->get_location();
-    b = ring_atoms[ringid][1]->get_location();
-    c = ring_atoms[ringid][2]->get_location();
-
-    return compute_normal(&a, &b, &c);
-}
-
-Atom** Molecule::get_ring_atoms(int ringid)
-{
-    if (!ring_atoms) return 0;
-    if (!ring_atoms[ringid]) return 0;
-
-    int ringsz;
-    for (ringsz = 0; ring_atoms[ringid][ringsz]; ringsz++);
-
-    Atom** retval = new Atom*[ringsz+1];
-
-    int i;
-    for (i=0; i<=ringsz; i++) retval[i] = ring_atoms[ringid][i];
-
-    return retval;
+	int i, ringcount;
+	
+	if (rings)
+	{
+		for (i=0; rings[i]; i++);
+		ringcount = i;
+	}
+	else
+	{
+		ringcount=0;
+	}
+	
+	Ring** ringstmp = new Ring*[i+4];
+	
+	if (rings)
+	{
+		for (i=0; i<ringcount; i++) ringstmp[i] = rings[i];
+		delete[] rings;
+	}
+	
+	ringstmp[ringcount++] = new Ring(atoms);
+	ringstmp[ringcount] = nullptr;
+	rings = ringstmp;
+	
+	return ringcount-1;
 }
 
 int Molecule::identify_rings()
 {
-    Atom **ringstmp[256], *a;
+    Atom** ringstmp[256];
+    int ringcount;
+    Atom *a;
     int chainlen[256];
     bool is_ring[256];
     int found_rings=0, chains=0, cnvchain, active, i, j, k, l, m, n, p;
@@ -924,8 +805,6 @@ int Molecule::identify_rings()
     Atom *ra, *rb;
 
     ringcount = 0;
-    ring_atoms = new Atom**[atcount];
-    ring_aromatic = new bool[atcount];
 
     // Start at any atom, mark it "used".
     a = atoms[0];
@@ -962,11 +841,11 @@ int Molecule::identify_rings()
     {
         active = 0;
 
-        for (i=0; i<chains; i++)
+        /*for (i=0; i<chains; i++)
             if (ringstmp[i][0])
             {
-                //cout << "Begin chain " << i << ": "; Atom::dump_array(ringstmp[i]); cout << endl;
-            }
+                cout << "Begin chain " << i << ": "; Atom::dump_array(ringstmp[i]); cout << endl;
+            }*/
 
         for (i=0; i<chains; i++)
         {
@@ -1016,12 +895,12 @@ _done_l:
             {
                 // Count backwards from one chain until find the diverging atom, then jump to the other chain and count forward
                 // until reach the/a converging ato This is a RING; add it to the list.
-                ring_atoms[ringcount] = new Atom*[chainlen[i] + chainlen[cnvchain]];
+                Atom* ring_atoms[chainlen[i] + chainlen[cnvchain]];
                 n = 0;
                 // cout << "Counting backwards from " << chainlen[i]-1 << endl;
                 for (m = chainlen[i]-1; m >= 0; m--)
                 {
-                    ring_atoms[ringcount][n++] = ringstmp[i][m];
+                    ring_atoms[n++] = ringstmp[i][m];
                     // cout << "m: " << ringstmp[i][m]->name << " ";
                     l = in_array(reinterpret_cast<void*>(ringstmp[i][m]),
                                  reinterpret_cast<void**>(ringstmp[cnvchain])
@@ -1033,62 +912,23 @@ _done_l:
                         for (; ringstmp[cnvchain][l]; l++)
                         {
                             // cout << "l: " << ringstmp[cnvchain][l]->name << " ";
-                            ring_atoms[ringcount][n++] = ringstmp[cnvchain][l];
-                            // cout << "Building " << n << " membered ring: "; Atom::dump_array(ring_atoms[ringcount]); cout << endl;
+                            ring_atoms[n++] = ringstmp[cnvchain][l];
+                            // cout << "Building " << n << " membered ring: "; Atom::dump_array(ring_atoms); cout << endl;
                             if (n >= 3 && (ringstmp[cnvchain][l] == cnva || ringstmp[cnvchain][l] == cnvb))
                             {
-                                // cout << "Found " << n << " membered ring: "; Atom::dump_array(ring_atoms[ringcount]); cout << endl;
-                                ring_atoms[ringcount][n] = 0;
-                                bool cp = ring_is_coplanar(ringcount);
-                                if (cp)
-                                {
-                                    //cout << "Ring is coplanar." << endl;
+                                // cout << "Found " << n << " membered ring: "; Atom::dump_array(ring_atoms); cout << endl;
+                                ring_atoms[n] = 0;
 
-                                    int pi_e = 0, pi_eo = 0;
-
-                                    for (p=0; (ra = ring_atoms[ringcount][p]); p++)
-                                    {
-                                        // Count the number of double bonds in the ring. For each double bond, count 2 pi electrons.
-                                        rb = ring_atoms[ringcount][p ? (p-1) : (n-1)];
-                                        int card = (int)ra->is_bonded_to(rb);
-
-                                        if (card == 2) pi_e += 2;
-
-                                        // If there is a non-pi tetrel in the ring, without a negative charge, the ring is not aromatic.
-                                        int val = ra->get_valence();
-                                        if (val == 4 && !ra->is_pi() && (ra->get_charge() >= 0)) goto _not_aromatic;
-
-                                        // If there is a pnictogen in the ring, count it as two optional pi electrons.
-                                        int geo = ra->get_geometry();
-                                        if (val == 3 && geo >= 4) pi_eo += 2;
-
-                                        // If there is a chalcogen in the ring, count two more optional pi electrons.
-                                        if (val == 2 && geo >= 4) pi_eo += 2;
-                                    }
-
-                                    // If the total number of pi electrons = 4n+2, then the ring is aromatic.
-                                    pi_eo += pi_e;
-                                    for (p = pi_e; p <= pi_eo; p += 2)
-                                    {
-                                        if (!((p-2)&0x3))
-                                        {
-                                            //cout << "Ring is aromatic." << endl;
-                                            ring_aromatic[ringcount] = true;
-                                            break;
-                                        }
-                                    }
-                                }
-_not_aromatic:
-
+                                int nringid = add_ring(ring_atoms);
 #if _ALLOW_FLEX_RINGS
-                                if (cp || ring_aromatic[ringcount])
+                                if (!rings[nringid]->is_coplanar())
 #else
                                 if (1)
 #endif
                                 {
-                                    for (p=0; (ra = ring_atoms[ringcount][p]); p++)
+                                    for (p=0; (ra = ring_atoms[p]); p++)
                                     {
-                                        rb = ring_atoms[ringcount][p ? (p-1) : (n-1)];
+                                        rb = ring_atoms[p ? (p-1) : (n-1)];
                                         int card = (int)ra->is_bonded_to(rb);
 
                                         Bond* ab = ra->get_bond_between(rb);
@@ -1098,7 +938,6 @@ _not_aromatic:
                                     }
                                 }
 
-                                ringcount++;
                                 goto _exit_m;
                             }
                         }
@@ -2835,6 +2674,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 aloop[l-sqidx[j]] = 0;
                 int ringsz = l-sqidx[j];
                 
+                /*
                 if (!ring_atoms)
                 {	ring_atoms = new Atom**[16];
                 	int n; for (n=0; n<16; n++) ring_atoms[n] = nullptr;
@@ -2848,14 +2688,9 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 if (!ring_atoms[ringcount])
                 {	ring_atoms[ringcount] = new Atom*[ringsz+2];
                 	int n; for (n=0; n<ringsz; n++) ring_atoms[ringcount][n] = nullptr;
-                }
+                }*/
                 
-                for (l=0; l<ringsz; l++)
-                {
-                	ring_atoms[ringcount][l] = aloop[l];
-            	}
-                ring_atoms[ringcount][ringsz] = 0;
-                ringcount++;                
+                add_ring(aloop);          
 
                 // Also default all unmarked double bonds to cis.
                 /*for (l=0; l<dbi; l++)
@@ -2872,7 +2707,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 }*/
 
                 // If the ring has fewer than 5 members, or if it's aromatic, turn it into a regular polygon.
-                if (ringsz<5 || allarom)
+                /*if (ringsz<5 || allarom)
                 {
                     Point ringcen;
 
@@ -2932,13 +2767,13 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                     card = 1;
 
                     continue;
-                }
+                }*/
 
                 float anomaly = close_loop(aloop, card);
 
                 if (card) preva->bond_to(numbered[j], card);
                 card = 1;
-                ring_aromatic[ringcount-1] = ring_is_aromatic(ringcount-1);
+                // ring_aromatic[ringcount-1] = ring_is_aromatic(ringcount-1);
 
                 numbered[j] = 0;
 
@@ -3112,38 +2947,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     return true;
 }
 
-bool Molecule::Huckel(int ringid)
-{
-	if (!ring_atoms) return false;
-	int i;
-	int pi_electrons = 0;
-	int wiggle_room = 0;
-	
-	for (i=0; ring_atoms[ringid][i]; i++)
-	{
-		if (ring_atoms[ringid][i]->is_pi()) pi_electrons++;
-		
-		switch (ring_atoms[ringid][i]->get_family())
-		{
-			case PNICTOGEN:
-			case CHALCOGEN:
-			wiggle_room += 2;
-			break;
-			
-			default:
-			;
-		}
-	}
-	
-	for (i=0; i<=wiggle_room; i+=2)
-	{
-		int n = pi_electrons + i;
-		n -= 2;
-		if (n && !(n % 4)) return true;
-	}
-	return false;
-}
-
+/*
 void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
 {
     if (!ring_members) return;
@@ -3251,7 +3055,7 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
             b2->btom->move_assembly(&ptnew, ring_members[l]);
         }
     }
-}
+}*/
 
 float Molecule::fsb_lsb_anomaly(Atom* first, Atom* last, float lcard, float bond_length)
 {
@@ -3478,48 +3282,93 @@ Point Molecule::get_bounding_box() const
     return pt;
 }
 
+bool Molecule::ring_is_coplanar(int ringid)
+{
+	if (!rings) return false;
+	return rings[ringid]->is_coplanar();
+}
+
+bool Molecule::ring_is_aromatic(int ringid)
+{
+	if (!rings) return false;
+	return rings[ringid]->get_type() == AROMATIC;
+}
+
+Point Molecule::get_ring_center(int ringid)
+{
+	if (!rings) return Point(0,0,0);
+	return rings[ringid]->get_center();
+}
+
+SCoord Molecule::get_ring_normal(int ringid)
+{
+	if (!rings) return SCoord(0,0,0);
+	return rings[ringid]->get_normal();
+}
+
+Atom** Molecule::get_ring_atoms(int ringid)
+{
+	if (!rings) return nullptr;
+	return rings[ringid]->get_atoms();
+}
+
+int Molecule::get_ring_num_atoms(int ringid)
+{
+	if (!rings) return 0;
+	return rings[ringid]->get_atom_count();
+}
+
+
 void Molecule::recenter_ring(int ringid, Point new_ring_cen)
 {
+	if (!rings) return;
 	Point old_ring_cen = get_ring_center(ringid);
 	SCoord motion = new_ring_cen.subtract(old_ring_cen);
 	int i;
-	for (i=0; ring_atoms[ringid][i]; i++)
-		ring_atoms[ringid][i]->move_rel(&motion);
+	Atom** ring_atoms = rings[ringid]->get_atoms();
+	for (i=0; ring_atoms[i]; i++)
+		ring_atoms[i]->move_rel(&motion);
+	
+	delete[] ring_atoms;
 }
 
 void Molecule::rotate_ring(int ringid, Rotation rot)
 {
+	if (!rings) return;
 	Point origin = get_ring_center(ringid);
 	int i;
-	for (i=0; ring_atoms[ringid][i]; i++)
+	Atom** ring_atoms = rings[ringid]->get_atoms();
+	for (i=0; ring_atoms[i]; i++)
 	{
-		Point aloc = ring_atoms[ringid][i]->get_location();
+		Point aloc = ring_atoms[i]->get_location();
 		aloc = rotate3D(&aloc, &origin, &rot);
-		ring_atoms[ringid][i]->move(aloc);
+		ring_atoms[i]->move(aloc);
 	}
+	
+	delete[] ring_atoms;
+}
+
+int Molecule::get_num_rings()
+{
+	if (!rings) return 0;
+	int i;
+	for (i=0; rings[i]; i++);	// Get count.
+	return i;
 }
 
 bool Molecule::in_same_ring(Atom* a, Atom* b)
 {
-	int i, j;
-	for (i=0; i<ringcount; i++)
-	{
-		bool a_in_ring = false, b_in_ring = false;
-		for (j=0; ring_atoms[i][j]; j++)
+	int i;
+	Ring** r = a->get_rings();
+	if (!r) return false;
+	for (i=0; r[i]; i++)
+		if (b->is_in_ring(r[i]))
 		{
-			if (ring_atoms[i][j] == a)
-			{
-				a_in_ring = true;
-				if (b_in_ring) return true;
-			}
-			else if (ring_atoms[i][j] == b)
-			{
-				b_in_ring = true;
-				if (a_in_ring) return true;
-			}
+			delete[] r;
+			return true;
 		}
-	}
 	
+	delete[] r;
 	return false;
 }
 
@@ -3627,16 +3476,8 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 	return error+bestscore;
 }
 
-int Molecule::get_ring_num_atoms(int ringid)
-{
-	if (!ring_atoms) return 0;
-	int i;
-	for (i=0; ring_atoms[ringid][i]; i++);		// Loop until find nullptr; this is the atom count.
-	// cout << "Ring " << ringid << " has " << i << endl;
-	return i;
-}
 
-#define _DEV_FIX_MSTRUCT 1
+#define _DEV_FIX_MSTRUCT 0
 float Molecule::correct_structure(int iters)
 {
     if (noAtoms(atoms)) return 0;
@@ -3650,6 +3491,8 @@ float Molecule::correct_structure(int iters)
 	float b_bond_angle;
 	LocatedVector lv;
     
+	#if _DEV_FIX_MSTRUCT
+    // TODO
     if (ringcount)
     {
     	for (i=0; i<ringcount; i++)
@@ -3662,7 +3505,6 @@ float Molecule::correct_structure(int iters)
     }
     else return 0;			// Non-ring structures work fine. The buggy algorithm is when rings are involved.
 	
-	#if _DEV_FIX_MSTRUCT
     for (iter=0; iter<iters; iter++)
     {
     	error = 0;
@@ -3674,7 +3516,8 @@ float Molecule::correct_structure(int iters)
 			btom = b[0]->btom;
 			if (!btom) return error;
 			
-			if (atoms[i]->num_rings() && atoms[i]->is_pi() && in_same_ring(atoms[i], btom)) continue;
+			// TODO
+    		if (atoms[i]->num_rings() && atoms[i]->is_pi() && in_same_ring(atoms[i], btom)) continue;
 	
 			error += get_atom_error(i, &lv);
 			if (!iter) continue;

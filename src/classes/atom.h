@@ -35,9 +35,44 @@ class Bond
     Atom** moves_with_btom = 0;
 };
 
+enum RING_TYPE
+{
+	AROMATIC,
+	ANTIAROMATIC,
+	COPLANAR,
+	OTHER,
+	UNKNOWN
+};
+
+class Ring
+{
+	public:
+	Ring() { ; }
+	Ring(Atom** from_atoms);
+	
+	int get_atom_count() { return atcount; }
+	Atom* get_atom(int index);
+	Atom** get_atoms();
+	RING_TYPE get_type();
+	Point get_center();
+	SCoord get_normal();
+	LocatedVector get_center_and_normal();
+	bool is_coplanar();
+    bool Huckel();						// Compiler doesn't allow ü in an identifier - boo hiss!
+	
+	protected:
+	Atom** atoms = nullptr;
+	int atcount = 0;
+	RING_TYPE type = UNKNOWN;
+	
+	void determine_type();
+	void make_coplanar();
+};
+
 class Atom
 {
 	friend class Bond;
+	friend class Ring;
 	
 	public:
     // Constructors and destructors.
@@ -73,6 +108,7 @@ class Atom
     // Bond functions.
     Bond** get_bonds();
     int get_bonded_atoms_count();
+    int get_count_pi_bonds();
 
     bool bond_to(Atom* btom, float cardinality);
     void unbond(Atom* btom);
@@ -93,7 +129,10 @@ class Atom
     Bond* get_bond_between(const char* bname);
     Bond* get_bond_by_idx(int bidx);
     int get_idx_bond_between(Atom* btom);
-
+    
+    // Ring membership.
+	Ring** get_rings();
+	bool is_in_ring(Ring* ring);
     void aromatize()
     {
         geometry=3;
@@ -169,7 +208,6 @@ class Atom
 	int arom_ring_member = 0;
 
 	protected:
-    void figure_out_valence();
     int Z=0;
     Point location;
     int valence=0;
@@ -192,8 +230,10 @@ class Atom
     Rotation geo_rot_1, geo_rot_2;
     bool swapped_chirality = false;
     bool chirality_unspecified = true;
+	Ring** member_of = nullptr;
 
     static void read_elements();
+    void figure_out_valence();
 
     static char* elem_syms[_ATOM_Z_LIMIT];
     static float vdW_radii[_ATOM_Z_LIMIT];
@@ -204,6 +244,8 @@ class Atom
     static int valences[_ATOM_Z_LIMIT];
     static int geometries[_ATOM_Z_LIMIT];
 };
+
+bool atoms_are_conjugated(Atom** atoms);
 
 static bool read_elem_syms = false;
 

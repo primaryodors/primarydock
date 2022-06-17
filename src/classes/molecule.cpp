@@ -778,7 +778,7 @@ int Molecule::add_ring(Atom** atoms)
 		ringcount=0;
 	}
 	
-	Ring** ringstmp = new Ring*[i+4];
+	Ring** ringstmp = new Ring*[ringcount+4];
 	
 	if (rings)
 	{
@@ -895,7 +895,9 @@ _done_l:
             {
                 // Count backwards from one chain until find the diverging atom, then jump to the other chain and count forward
                 // until reach the/a converging ato This is a RING; add it to the list.
-                Atom* ring_atoms[chainlen[i] + chainlen[cnvchain]];
+                n = chainlen[i] + chainlen[cnvchain];
+                Atom* ring_atoms[n];
+                for (m=0; m<n; m++) ring_atoms[m] = nullptr;
                 n = 0;
                 // cout << "Counting backwards from " << chainlen[i]-1 << endl;
                 for (m = chainlen[i]-1; m >= 0; m--)
@@ -2219,6 +2221,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     {
                         improvement += (bind1 - bind);
                         bind = bind1;
+                        if (fabs(mm[i]->amx) < 0.25) mm[i]->amx *= accel;
                     }
                 }
 
@@ -2272,6 +2275,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     {
                         improvement += (bind1 - bind);
                         bind = bind1;
+                        if (fabs(mm[i]->amy) < 0.25) mm[i]->amy *= accel;
                     }
                 }
 
@@ -2327,6 +2331,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     {
                         improvement += (bind1 - bind);
                         bind = bind1;
+                        if (fabs(mm[i]->amz) < 0.25) mm[i]->amz *= accel;
                     }
                 }
 
@@ -2413,6 +2418,8 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             {
                                 improvement += (bind1 - bind);
                                 bind = bind1;
+                                if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) < 0.25)
+                                	mm[i]->rotatable_bonds[k]->angular_momentum *= accel;
                             }
                         }
                     }

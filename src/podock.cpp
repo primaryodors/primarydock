@@ -104,6 +104,11 @@ int main(int argc, char** argv)
     std::ofstream *output = NULL;
 
     bool configset=false, protset=false, ligset=false, pktset=false;
+    
+    int i;
+    
+    for (i=0; i<256; i++)
+    	configfname[i] = protfname[i] = ligfname[i] = 0;
 
     time_t began = time(NULL);
 
@@ -207,7 +212,7 @@ int main(int argc, char** argv)
             }
             else if (!strcmp(fields[0], "MCOORD"))
             {
-                int i, j=0;
+                int j=0;
                 for (i=1; fields[i]; i++)
                 {
                     mcoord_resno[j++] = atoi(fields[i]);
@@ -239,7 +244,7 @@ int main(int argc, char** argv)
                 output = new std::ofstream(fields[1], std::ofstream::out);
             }
 
-            delete fields;
+            // delete[] fields;
         }
     }
     fclose(pf);
@@ -312,7 +317,7 @@ int main(int argc, char** argv)
 #endif
 
     // Identify the ligand atom with the greatest potential binding.
-    int i, j, k, l, n;
+    int j, k, l, n;
     Atom** ligbb = m.get_most_bindable(3);
     Atom** ligbbh = new Atom*[5];
     intera_type lig_inter_typ[5];

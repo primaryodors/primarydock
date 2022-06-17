@@ -530,6 +530,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         
         SCoord avec[ag], bvec[ag];
         
+        Ring *ar = nullptr, *br = nullptr;
+        
         for (j=0; j<ag; j++)
         	avec[j] = SCoord(0,0,0);
         for (j=anx; j<ag; j++)
@@ -549,7 +551,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
            )
 		{
 			// Find the coplanar ring closest to bloc, if any.
-			Ring* ar = a->closest_arom_ring_to(bloc);
+			ar = a->closest_arom_ring_to(bloc);
 			if (ar)
 			{
 				aloc = ar->get_center();
@@ -568,7 +570,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
            )
 		{
 			// Find the coplanar ring closest to aloc, if any.
-			Ring* br = b->closest_arom_ring_to(aloc);
+			br = b->closest_arom_ring_to(aloc);
 			if (br)
 			{
 				bloc = br->get_center();
@@ -639,6 +641,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             partial = aniso * forces[i]->kJ_mol;
         }
         
+        // Divide each ring by its number of atoms.
+        if (ar) partial /= ar->get_atom_count();
+        if (br) partial /= br->get_atom_count();
 
         /*if (fabs(partial) >= 10000)
         // if (isnan(partial) || isinf(partial))

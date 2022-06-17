@@ -204,7 +204,6 @@ class Atom
     int mirror_geo=-1;			// If >= 0, mirror the geometry of the btom of bonded_to[mirror_geo].
     bool flip_mirror=false;		// If true, do trans rather than cis bond conformation.
     bool dnh=false;				// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.
-    Point* arom_center=0;
     bool EZ_flip = false;
     float last_bind_energy=0;
 

@@ -1100,7 +1100,7 @@ bool AminoAcid::capable_of_inter(intera_type inter)
             if (iff[j]->get_type() == inter)
             {
                 // cout << *this << " is capable of " << inter << " binding because of atom " << atoms[i]->name << endl;
-                delete iff;
+                delete[] iff;
                 return true;
             }
     }

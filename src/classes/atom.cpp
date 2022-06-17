@@ -1337,15 +1337,29 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
 
     if (num_conj_rings())
     {
+    	Point arom_center;
+    	
         geometry = 3;
         if (bonded_to[1].btom)
         {
+        	for (j=0; member_of[j]; j++)
+			{
+				if (bonded_to[0].btom->is_in_ring(member_of[j]) && bonded_to[1].btom->is_in_ring(member_of[j]))
+					arom_center = member_of[j]->get_center();
+			}
+        	
             geov[0] = v_from_pt_sub(bonded_to[0].btom->get_location(), location);
             geov[1] = v_from_pt_sub(bonded_to[1].btom->get_location(), location);
-            geov[2] = v_from_pt_sub(location, *arom_center);
+            geov[2] = v_from_pt_sub(location, arom_center);
         }
         else
         {
+        	for (j=0; member_of[j]; j++)
+			{
+				if (bonded_to[0].btom->is_in_ring(member_of[j]))
+					arom_center = member_of[j]->get_center();
+			}
+        	
             geov = get_basic_geometry();
             Point bond0v = bonded_to[0].btom->get_location().subtract(&location);
             Point vanticen = location.subtract(arom_center);
@@ -1736,8 +1750,6 @@ Ring* Atom::closest_arom_ring_to(Point target)
 				brr = rr;
 			}
 		}
-		
-		delete[] member_of;
 		
 		if (k >= 0)
 		{

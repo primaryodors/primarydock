@@ -461,7 +461,13 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function (atom)
     {
-        switch (atom.atomType.element)
+    	var elem = atom.atomType.element;
+        if (atom.resno <= 1)
+        {
+        	elem = atom.atomname.replace(/[^A-Za-z]/g, '');
+        	elem = elem.charAt(0).toUpperCase() + elem.slice(1).toLowerCase();
+    	}
+        switch (elem)
         {
         	case 'H': return atom.isBackbone() ? 0x79949b : 0xd1f5ff;
             
@@ -514,7 +520,9 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
         	case 'P': return 0xff77c6;
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xffaa00;
-        	case 'Cl': return 0x33cc00;
+        	case 'Cl': return 0x339900;
+        	case 'Br': return 0x993300;
+        	case 'I': return 0x990033;
         	case 'Cu': return 0xe5a072;
         	case 'Zn': return 0x92b0cc;
         	case 'Na': return 0xffcc00;
@@ -534,7 +542,13 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function (atom)
     {
-        switch (atom.atomType.element)
+    	var elem = atom.atomType.element;
+        if (atom.resno <= 1)
+        {
+        	elem = atom.atomname.replace(/[^A-Za-z]/g, '');
+        	elem = elem.charAt(0).toUpperCase() + elem.slice(1).toLowerCase();
+    	}
+        switch (elem)
         {
         	case 'H': return atom.isBackbone() ? 0x79949b : 0xe1faff;
             
@@ -587,7 +601,9 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
         	case 'Se': return 0xffb022;
-        	case 'Cl': return 0x33cc00;
+        	case 'Cl': return 0x339900;
+        	case 'Br': return 0x993300;
+        	case 'I': return 0x990033;
         	case 'Cu': return 0xe5a072;
         	case 'Zn': return 0x92b0cc;
         	case 'Na': return 0xffcc00;
@@ -1201,6 +1217,7 @@ function loadFile(fileData, fileName = "")
                                 var rparam =
                                 {
 									multipleBond: true,
+									colorScheme: PODefSchemeHilite,
                                 };
 
                                 model.push(comp7b);

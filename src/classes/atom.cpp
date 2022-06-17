@@ -1615,7 +1615,7 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     /*
     ATOM   2039  CA  ALA   128      -6.065 -24.834  -5.744  1.00001.00           C
     */
-    fprintf(pf, "ATOM   ");
+    fprintf(pf, residue ? "ATOM   " : "HETATM ");
     if (atomno<1000) fprintf(pf," ");
     if (atomno< 100) fprintf(pf," ");
     if (atomno<  10) fprintf(pf," ");

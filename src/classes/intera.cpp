@@ -528,6 +528,18 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         int anx = a->get_idx_next_free_geometry();
         int bnx = b->get_idx_next_free_geometry();
         
+        SCoord avec[ag], bvec[ag];
+        
+        for (j=0; j<ag; j++)
+        	avec[j] = SCoord(0,0,0);
+        for (j=anx; j<ag; j++)
+        	avec[j-anx] = ageo[j];
+        
+        for (j=0; j<bg; j++)
+        	bvec[j] = SCoord(0,0,0);
+        for (j=bnx; j<bg; j++)
+        	bvec[j-bnx] = bgeo[j];
+        
         // When pi-bonding to a heavy atom of a conjugated coplanar ring, treat the entire ring as if it were one atom.
         if ((forces[i]->type == pi || forces[i]->type == polarpi)
         	&&
@@ -540,6 +552,30 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 			Ring* ar = a->closest_arom_ring_to(bloc);
 			if (ar)
 			{
+				aloc = ar->get_center();
+				avec[0] = ar->get_normal();
+				avec[1] = avec[0];
+				avec[1] = avec[1].negate();
+				for (j=2; j<ag; j++) avec[j] = SCoord(0,0,0);
+			}
+		}
+		
+		if ((forces[i]->type == pi || forces[i]->type == polarpi)
+        	&&
+        	b->get_Z() > 1
+        	&&
+        	b->num_conj_rings()
+           )
+		{
+			// Find the coplanar ring closest to aloc, if any.
+			Ring* br = b->closest_arom_ring_to(aloc);
+			if (br)
+			{
+				bloc = br->get_center();
+				bvec[0] = br->get_normal();
+				bvec[1] = bvec[0];
+				bvec[1] = bvec[1].negate();
+				for (j=2; j<ag; j++) bvec[j] = SCoord(0,0,0);
 			}
 		}
 
@@ -549,9 +585,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 continue;
 
             // Sum up the anisotropic contribution from each geometry vertex of a.
-            for (j=anx; j<ag; j++)
+            for (j=0; j<ag; j++)
             {
-                Point pt(&ageo[j]);
+            	if (!avec[j].r) continue;
+                Point pt(&avec[j]);
                 pt.scale(r);
                 pt = pt.add(aloc);
                 float theta = find_3d_angle(&bloc, &pt, &aloc);
@@ -563,9 +600,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
 
             // Sum up the anisotropic contribution from each geometry vertex of b.
-            for (j=bnx; j<bg; j++)
+            for (j=0; j<bg; j++)
             {
-                Point pt(&bgeo[j]);
+                if (!bvec[j].r) continue;
+                Point pt(&bvec[j]);
                 pt.scale(r);
                 pt = pt.add(bloc);
                 float theta = find_3d_angle(&aloc, &pt, &bloc);

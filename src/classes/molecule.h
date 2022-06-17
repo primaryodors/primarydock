@@ -84,14 +84,14 @@ class Molecule
 
     // Ring functions.
     int identify_rings();
-    int get_num_rings()	{	return ringcount;	}
+    int get_num_rings();
+    int add_ring(Atom** atoms);
     bool ring_is_coplanar(int ringid);
     bool ring_is_aromatic(int ringid);
     Point get_ring_center(int ringid);
     SCoord get_ring_normal(int ringid);
     Atom** get_ring_atoms(int ringid);
     int get_ring_num_atoms(int ringid);
-    bool Huckel(int ringid);						// Compiler doesn't allow ü in an identifier - boo hiss!
 
     // Interaction functions.
     float get_internal_clashes();
@@ -133,9 +133,7 @@ class Molecule
     int atcount = 0;
     char* name = 0;
     char* smiles = 0;
-    int ringcount = 0;
-    Atom*** ring_atoms = 0;
-    bool* ring_aromatic = 0;
+    Ring** rings = nullptr;
     Bond** rotatable_bonds = 0;
     bool immobile = false;
     float minclash = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
@@ -155,7 +153,7 @@ class Molecule
     int aidx(Atom* a);
     void reallocate();
     float fsb_lsb_anomaly(Atom* first, Atom* last, float lcard, float bond_length);
-    void make_coplanar_ring(Atom** ring_members, int ringid);
+    // void make_coplanar_ring(Atom** ring_members, int ringid);
     void recenter_ring(int ringid, Point new_ring_cen);
     void rotate_ring(int ringid, Rotation rot);
     bool in_same_ring(Atom* a, Atom* b);

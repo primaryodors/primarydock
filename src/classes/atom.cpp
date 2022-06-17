@@ -981,7 +981,6 @@ void Bond::fill_moves_with_cache()
                 for (i=0; b[i]; i++)
                 {
                     //if (b[i]->btom) cout << "(" << b[i]->btom->name << "?) ";
-                    if (!atom->ring_member && (b[i]->btom == atom)) atom->ring_member++;
                     if (b[i]->btom && !b[i]->btom->used && b[i]->btom != atom)
                     {
                         attmp[tmplen++] = b[i]->btom;
@@ -1336,17 +1335,31 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
     Point center;
     int i, j;
 
-    if (arom_ring_member)
+    if (num_conj_rings())
     {
+    	Point arom_center;
+    	
         geometry = 3;
         if (bonded_to[1].btom)
         {
+        	for (j=0; member_of[j]; j++)
+			{
+				if (bonded_to[0].btom->is_in_ring(member_of[j]) && bonded_to[1].btom->is_in_ring(member_of[j]))
+					arom_center = member_of[j]->get_center();
+			}
+        	
             geov[0] = v_from_pt_sub(bonded_to[0].btom->get_location(), location);
             geov[1] = v_from_pt_sub(bonded_to[1].btom->get_location(), location);
-            geov[2] = v_from_pt_sub(location, *arom_center);
+            geov[2] = v_from_pt_sub(location, arom_center);
         }
         else
         {
+        	for (j=0; member_of[j]; j++)
+			{
+				if (bonded_to[0].btom->is_in_ring(member_of[j]))
+					arom_center = member_of[j]->get_center();
+			}
+        	
             geov = get_basic_geometry();
             Point bond0v = bonded_to[0].btom->get_location().subtract(&location);
             Point vanticen = location.subtract(arom_center);
@@ -1586,6 +1599,16 @@ int Atom::get_idx_next_free_geometry()
     }
 }
 
+int Atom::get_count_pi_bonds()
+{
+	if (!bonded_to) return 0;
+	int i, retval=0;
+	for (i=0; i<geometry; i++)
+	{
+		if (bonded_to[i].btom && bonded_to[i].cardinality > 1 && bonded_to[i].cardinality < 2) retval++;
+	}
+	return retval;
+}
 
 void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
 {
@@ -1669,6 +1692,309 @@ int Bond::count_moves_with_btom()
     for (i=0; moves_with_btom[i]; i++);
     return i;
 }
+
+int Atom::num_rings()
+{
+	if (!member_of) return 0;
+	int i;
+	for (i=0; member_of[i]; i++);	// Get count.
+	return i;
+}
+
+int Atom::num_conj_rings()
+{
+	if (!member_of) return 0;
+	int i, j=0;
+	for (i=0; member_of[i]; i++)
+		if (member_of[i]->is_conjugated()) j++;
+	return i;
+}
+
+Ring** Atom::get_rings()
+{
+	if (!member_of) return nullptr;
+	int i;
+	for (i=0; member_of[i]; i++);	// Get count.
+	Ring** retval = new Ring*[i+4];
+	
+	for (i=0; member_of[i]; i++) retval[i] = member_of[i];
+	retval[i] = nullptr;
+	
+	return retval;
+}
+
+bool Atom::is_in_ring(Ring* ring)
+{
+	if (!member_of) return false;
+	int i;
+	for (i=0; member_of[i]; i++)
+		if (member_of[i] == ring) return true;
+	
+	return false;
+}
+
+Ring* Atom::closest_arom_ring_to(Point target)
+{
+	int j, k;
+	if (member_of)
+	{
+		k = -1;
+		float brr = 99999;
+		for (j=0; member_of[j]; j++)
+		{
+			Point rloc = member_of[j]->get_center();
+			float rr = rloc.get_3d_distance(target);
+			if (rr < brr)
+			{
+				k = j;
+				brr = rr;
+			}
+		}
+		
+		if (k >= 0)
+		{
+			return member_of[k];
+		}
+	}
+	
+	return nullptr;
+}
+
+Ring::Ring(Atom** from_atoms)
+{
+	if (!from_atoms) return;
+	
+	int i;
+	for (i=0; from_atoms[i]; i++);
+	atcount = i;
+	
+	atoms = new Atom*[atcount+2];
+	for (i=0; i < atcount; i++)
+	{
+		atoms[i] = from_atoms[i];
+		if (!atoms[i]->member_of)
+		{
+			atoms[i]->member_of = new Ring*[4];
+			atoms[i]->member_of[0] = this;
+			atoms[i]->member_of[1] = atoms[i]->member_of[2] = atoms[i]->member_of[3] = nullptr;
+		}
+		else
+		{
+			int j, n;
+			for (n=0; atoms[i]->member_of[n]; n++);		// Determine length.
+			Ring** array = new Ring*[4+n];
+			for (j=0; j<n; j++)
+				array[n] = atoms[i]->member_of[n];
+			array[n++] = this;
+			array[n] = nullptr;
+			delete[] atoms[i]->member_of;
+			atoms[i]->member_of = array;
+		}
+	}
+	
+	atoms[atcount] = nullptr;
+	determine_type();
+}
+
+Atom* Ring::get_atom(int index)
+{
+	if (index < 0 || index >= atcount) return nullptr;
+	return atoms[index];
+}
+
+Atom** Ring::get_atoms()
+{
+	if (!atcount) return nullptr;
+	Atom** retval = new Atom*[atcount+2];
+	int i;
+	
+	for (i=0; i<atcount; i++)
+	{
+		retval[i] = atoms[i];
+	}
+	retval[atcount] = nullptr;
+	
+	return retval;
+}
+
+RING_TYPE Ring::get_type()
+{
+	if (type == UNKNOWN) determine_type();
+	return type;
+}
+
+Point Ring::get_center()
+{
+	Point _4avg[atcount+2];
+	int i;
+	for (i=0; i < atcount; i++)
+	{
+		_4avg[i] = atoms[i]->location;
+	}
+	
+	return average_of_points(_4avg, atcount);
+}
+
+SCoord Ring::get_normal()
+{
+	int i, j, k;
+	float w=0, x=0, y=0, z=0;
+	
+	for (i=0; i < atcount; i++)
+	{
+		for (j=i+1; j < atcount; j++)
+		{
+			for (k=j+1; k < atcount; k++)
+			{
+				// Note if the atoms are not in sequence, this approach will fail.
+				Point pt = compute_normal(atoms[i]->location, atoms[j]->location, atoms[k]->location);
+				w += pt.weight ? pt.weight : 1;
+				x += pt.x;
+				y += pt.y;
+				z += pt.z;
+			}
+		}
+	}
+	
+	Point pt1(x/w, y/w, z/w);
+	return (SCoord)pt1;
+}
+
+bool Ring::is_conjugated()
+{
+	if (!atoms) return false;
+	return atoms_are_conjugated(atoms);
+}
+
+bool Ring::is_coplanar()
+{
+	if (type != UNKNOWN)
+	{
+		return (type == AROMATIC || type == ANTIAROMATIC || type == COPLANAR);
+	}
+	else
+	{
+		if (!atoms) return false;
+		if (!atcount) return false;
+		if (atcount < 4) return true;
+
+		int i;
+		float anomaly;
+		for (i=3; i<atcount; i++)
+		{
+		    anomaly = are_points_planar(atoms[0]->get_location(),
+		                                atoms[1]->get_location(),
+		                                atoms[2]->get_location(),
+		                                atoms[i]->get_location()
+		                               );
+		}
+
+		return (anomaly < 0.1);
+    }
+}
+
+LocatedVector Ring::get_center_and_normal()
+{
+	LocatedVector retval;
+	retval.copy(get_normal());
+	retval.origin = get_center();
+	return retval;
+}
+
+bool Ring::Huckel()
+{
+	if (!atcount) return false;
+	int i;
+	int pi_electrons = 0;
+	int wiggle_room = 0;
+	
+	for (i=0; atoms[i]; i++)
+	{
+		if (atoms[i]->is_pi()) pi_electrons++;
+		
+		switch (atoms[i]->get_family())
+		{
+			case PNICTOGEN:
+			case CHALCOGEN:
+			wiggle_room += 2;
+			break;
+			
+			default:
+			;
+		}
+	}
+	
+	for (i=0; i<=wiggle_room; i+=2)
+	{
+		int n = pi_electrons + i;
+		n -= 2;
+		if (n && !(n % 4)) return true;
+	}
+	return false;
+}
+
+bool atoms_are_conjugated(Atom** atoms)
+{
+	int i;
+	
+	for (i=0; atoms[i]; i++)
+	{
+		if (i && !atoms[i]->is_bonded_to(atoms[i-1])) return false;
+		switch (atoms[i]->get_family())
+		{
+			case TETREL:
+			if (atoms[i]->get_count_pi_bonds() != 1
+				&&
+				!atoms[i]->get_charge()
+				)
+				return false;
+			break;
+			
+			case TRIEL:
+			case PNICTOGEN:
+			case CHALCOGEN:
+			break;
+			
+			default:
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+void Ring::determine_type()
+{
+	if (!atoms_are_conjugated(atoms))
+	{
+		type = OTHER;
+		return;
+	}
+	
+	if (!is_coplanar())
+	{
+		type = OTHER;
+		return;
+	}
+	
+	if (Huckel()) type = AROMATIC;
+	else if (0) type = ANTIAROMATIC;		// TODO
+	else type = COPLANAR;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

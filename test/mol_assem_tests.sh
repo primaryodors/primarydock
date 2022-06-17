@@ -27,4 +27,3 @@ test/mol_assem_test 'C{C1}([C@@H]1[C@H]([C@@H]([C@H](C(O1!)O)O)O)O)O' test/gluco
 test/mol_assem_test 'C{C1}([C@@H]1[C@H]([C@@H]([C@H](C(S1!)S)O)S)S)O' test/tetrathioglucose.sdf
 test/mol_assem_test 'C{C1}([C@@H]1[C@H]([C@@H]([C@H](C(S1!)S)S)S)S)S' test/hexathioglucose.sdf
 
-

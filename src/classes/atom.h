@@ -35,9 +35,45 @@ class Bond
     Atom** moves_with_btom = 0;
 };
 
+enum RING_TYPE
+{
+	AROMATIC,
+	ANTIAROMATIC,
+	COPLANAR,
+	OTHER,
+	UNKNOWN
+};
+
+class Ring
+{
+	public:
+	Ring() { ; }
+	Ring(Atom** from_atoms);
+	
+	int get_atom_count() { return atcount; }
+	Atom* get_atom(int index);
+	Atom** get_atoms();
+	RING_TYPE get_type();
+	Point get_center();
+	SCoord get_normal();
+	LocatedVector get_center_and_normal();
+	bool is_coplanar();
+	bool is_conjugated();
+    bool Huckel();						// Compiler doesn't allow ü in an identifier - boo hiss!
+	
+	protected:
+	Atom** atoms = nullptr;
+	int atcount = 0;
+	RING_TYPE type = UNKNOWN;
+	
+	void determine_type();
+	void make_coplanar();
+};
+
 class Atom
 {
 	friend class Bond;
+	friend class Ring;
 	
 	public:
     // Constructors and destructors.
@@ -62,7 +98,6 @@ class Atom
     bool is_metal();
     int is_thio();							// -1 if atom is S; +1 if atom is H of a sulfhydryl.
     bool is_pi();
-    int num_rings()	{	return ring_member;	}
 
     // Setters.
     void set_aa_properties();
@@ -73,6 +108,7 @@ class Atom
     // Bond functions.
     Bond** get_bonds();
     int get_bonded_atoms_count();
+    int get_count_pi_bonds();
 
     bool bond_to(Atom* btom, float cardinality);
     void unbond(Atom* btom);
@@ -93,7 +129,13 @@ class Atom
     Bond* get_bond_between(const char* bname);
     Bond* get_bond_by_idx(int bidx);
     int get_idx_bond_between(Atom* btom);
-
+    
+    // Ring membership.
+    int num_rings();
+    int num_conj_rings();
+	Ring** get_rings();
+	bool is_in_ring(Ring* ring);
+	Ring* closest_arom_ring_to(Point target);
     void aromatize()
     {
         geometry=3;
@@ -162,14 +204,10 @@ class Atom
     int mirror_geo=-1;			// If >= 0, mirror the geometry of the btom of bonded_to[mirror_geo].
     bool flip_mirror=false;		// If true, do trans rather than cis bond conformation.
     bool dnh=false;				// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.
-    Point* arom_center=0;
     bool EZ_flip = false;
     float last_bind_energy=0;
-	int ring_member = 0;				// How many rings is this atom part of.
-	int arom_ring_member = 0;
 
 	protected:
-    void figure_out_valence();
     int Z=0;
     Point location;
     int valence=0;
@@ -192,8 +230,10 @@ class Atom
     Rotation geo_rot_1, geo_rot_2;
     bool swapped_chirality = false;
     bool chirality_unspecified = true;
+	Ring** member_of = nullptr;
 
     static void read_elements();
+    void figure_out_valence();
 
     static char* elem_syms[_ATOM_Z_LIMIT];
     static float vdW_radii[_ATOM_Z_LIMIT];
@@ -204,6 +244,8 @@ class Atom
     static int valences[_ATOM_Z_LIMIT];
     static int geometries[_ATOM_Z_LIMIT];
 };
+
+bool atoms_are_conjugated(Atom** atoms);
 
 static bool read_elem_syms = false;
 

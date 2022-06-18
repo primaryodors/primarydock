@@ -557,6 +557,7 @@ int Molecule::from_pdb(FILE* is)
                 }
             }
         }
+        buffer[0] = 0;
 
         delete[] fields;
     }
@@ -2477,6 +2478,7 @@ bool Molecule::from_smiles(char const * smilesstr)
 				int result = from_sdf(sdfdat.c_str());
 				return (result > 0);
 			}
+			buffer[0] = 0;
 			fclose(pf);
 		}
 	}

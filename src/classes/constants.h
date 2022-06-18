@@ -77,6 +77,10 @@
 #define _310_PSI fiftyseventh*-26
 #define PI_PHI fiftyseventh*-55
 #define PI_PSI fiftyseventh*-70
+#define POLYPRO2_PHI fiftyseventh*-75
+#define POLYPRO2_PSI fiftyseventh*145
+#define POLYPRO1_PHI fiftyseventh*-75
+#define POLYPRO1_PSI fiftyseventh*160
 
 
 #endif

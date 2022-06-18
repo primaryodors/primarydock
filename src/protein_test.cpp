@@ -78,6 +78,22 @@ int main(int argc, char** argv)
     fclose(pf);
     cout << "Wrote " << outfn << endl;
     
+    p.make_helix(1, p.get_seq_length(), POLYPRO2_PHI, POLYPRO2_PSI);
+    strcpy(outfn, "test_ppro2.pdb");
+    pf = fopen(outfn, "wb");
+    p.save_pdb(pf);
+    p.end_pdb(pf);
+    fclose(pf);
+    cout << "Wrote " << outfn << endl;
+    
+    p.make_helix(1, p.get_seq_length(), POLYPRO1_PHI, POLYPRO1_PSI);
+    strcpy(outfn, "test_ppro1.pdb");
+    pf = fopen(outfn, "wb");
+    p.save_pdb(pf);
+    p.end_pdb(pf);
+    fclose(pf);
+    cout << "Wrote " << outfn << endl;
+    
     
 
     Molecule m("Test2");

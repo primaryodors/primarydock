@@ -38,6 +38,7 @@ void Atom::read_elements()
             if (buffer[0] != '#')
             {
                 char** fields = chop_spaced_fields(buffer);
+                if (!fields) continue;
 
                 if (fields[0])
                 {
@@ -71,6 +72,7 @@ void Atom::read_elements()
 
                 delete[] fields;
             }
+            buffer[0] = 0;
         }
         fclose(pf);
         read_elem_syms = true;
@@ -368,6 +370,7 @@ Atom::Atom(FILE* is)
                 }
             }
         }
+        buffer[0] = 0;
     }
 }
 

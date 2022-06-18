@@ -856,6 +856,7 @@ int AminoAcid::from_pdb(FILE* is)
                 }
             }
         }
+        buffer[0] = 0;
 
         delete[] fields;
     }
@@ -907,6 +908,7 @@ void AminoAcid::load_aa_defs()
             if (buffer[0] != '#' && buffer[0] != '\n')
             {
                 char** fields = chop_spaced_fields(buffer);
+                if (!fields) continue;
 
                 try
                 {
@@ -1053,6 +1055,7 @@ void AminoAcid::load_aa_defs()
 
                 delete[] fields;
             }
+            buffer[0] = 0;
         }
         copy_loaded_to_object(lastletter, tbdctr, tmpbdefs, proline_like);
         fclose(pf);

@@ -654,7 +654,7 @@ Molecule** AminoAcid::aas_to_mols(AminoAcid** aas)
 {
 	if (!aas) return NULL;
 	int i, j;
-	for (i=0; aas[i]; i++);
+	for (i=0; aas[i]; i++);		// Get count.
 	Molecule** mols = new Molecule*[i+4];
 	for (j=0; j<i; j++)
 	{

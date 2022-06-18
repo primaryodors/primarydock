@@ -143,9 +143,9 @@ int greek_from_aname(const char* aname)
 {
     int i, j;
     if (!aname) return -1;
-    for (i=0; aname[i]; i++);
+    for (i=0; aname[i]; i++);	// Get length.
     i--;
-    for (; i>=0 && aname[i] < 'A'; i--);
+    for (; i>=0 && aname[i] < 'A'; i--);	// Walk back until find a letter.
     if (i<0) return i;
     for (j=0; Greek[j]; j++)
         if (Greek[j] == aname[i]) return j;

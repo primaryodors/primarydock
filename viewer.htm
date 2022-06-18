@@ -440,17 +440,11 @@ stage.mouseControls.add("clickPick", function(stage, e)
 	toggleSideChain(e.atom.resno);
 });
 
-function toggleSideChain(resno)
+function showSideChain(resno)
 {
 	try
 	{
-		if (restoggled[resno]) // resmdl[e.atom.resno].hasRepresentation())
-		{
-			resmdl[resno].removeAllRepresentations();
-			restoggled[resno] = 0;
-			$('#seqddtgl'+resno).removeClass('hilite');
-		}
-		else
+		if (!restoggled[resno])
 		{
 			resmdl[resno].addRepresentation( "licorice",
             {
@@ -460,6 +454,28 @@ function toggleSideChain(resno)
             });
 			restoggled[resno] = 1;
 			$('#seqddtgl'+resno).addClass('hilite');
+		}
+	}
+	catch (ex)
+	{
+		;
+	}
+		
+}
+
+function toggleSideChain(resno)
+{
+	try
+	{
+		if (restoggled[resno])
+		{
+			resmdl[resno].removeAllRepresentations();
+			restoggled[resno] = 0;
+			$('#seqddtgl'+resno).removeClass('hilite');
+		}
+		else
+		{
+			showSideChain(resno);
 		}
 	}
 	catch (ex)

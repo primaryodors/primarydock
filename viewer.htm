@@ -290,6 +290,7 @@ Clip:
 <div id="center">
 Center:
 <a class="posebtn clickme" onclick="gmodel[0].autoView();" title="Middle-click an atom to center it.">Model</a>
+<a class="posebtn clickme" onclick="centerPocket();" id="pktbtn" style="display: none;">Pocket</a>
 <a class="posebtn clickme" onclick="curr_ligand.autoView();" id="ligbtn" style="display: none;">Ligand</a>
 </div>
 </div>
@@ -417,6 +418,7 @@ var orid;
 var mtlcoord = [];
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 var sequence = "";
+var pocket = [0,0,0];
 
 $("#affichage").hide();
 
@@ -439,6 +441,16 @@ stage.mouseControls.add("clickPick", function(stage, e)
 {
 	toggleSideChain(e.atom.resno);
 });
+
+function centerPocket()
+{
+	stage.viewerControls.center( 
+	{
+		x: pocket[0],
+		y: pocket[1],
+		z: pocket[2],
+	});
+}
 
 function showSideChain(resno)
 {
@@ -683,26 +695,29 @@ stage.mouseControls.remove( "drag-ctrl-left ");
 
 var url = 'http://primaryodors.org/sdf.php';
 var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
-$.ajax(
+if (molid != "~")
 {
-	url: url,
-	cache: false,
-	data:
-    {
-		m: molid
-    },
-	success: function(result)
-    {
-    	$('#posey')[0].innerText = result.split("\n")[0];
-		var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
-        stage.loadFile( stringBlob, { ext: "sdf" } ).then( function( comp )
-        {
-            comp.addRepresentation( "ball+stick", { multipleBond: true } );
-            gmodel.push(comp);
-            comp.autoView();
-        } );
-    }
-});
+	$.ajax(
+	{
+		url: url,
+		cache: false,
+		data:
+		{
+			m: molid
+		},
+		success: function(result)
+		{
+			$('#posey')[0].innerText = result.split("\n")[0];
+			var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
+		    stage.loadFile( stringBlob, { ext: "sdf" } ).then( function( comp )
+		    {
+		        comp.addRepresentation( "ball+stick", { multipleBond: true } );
+		        gmodel.push(comp);
+		        comp.autoView();
+		    } );
+		}
+	});
+}
 
 function showPose(p)
 {
@@ -927,6 +942,26 @@ function loadFile(fileData, fileName = "")
                         tmstart[tmr] = parseInt(fields[2]);
                         tmend[tmr] = parseInt(fields[3]);
                     }
+                }
+                if (ln.substr(0, 7) == "POCKET|")
+                {
+                	if (!pocket[0] && !pocket[1] && !pocket[2])		// Only care about the first one for now.
+                	{
+                		var fields = ln.split("|");
+                		var i;
+                		for (i=1; i<fields.length; i++)
+                		{
+                			var kv = fields[i].split('=');
+                			if (kv.length > 1)
+                			{
+		            			if (kv[0] == 'center_x') pocket[0] = parseFloat(kv[1]);
+		            			if (kv[0] == 'center_y') pocket[1] = parseFloat(kv[1]);
+		            			if (kv[0] == 'center_z') pocket[2] = parseFloat(kv[1]);
+		            			
+		            			$('#pktbtn').show();
+	            			}
+                		}
+                	}
                 }
             }
 

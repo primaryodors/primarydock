@@ -10,20 +10,20 @@
 #ifndef _MISC
 #define _MISC
 
-class SCoord;
-class Point;
-class LocatedVector;
-class Rotation;
-class LocRotation;
+struct SCoord;
+struct Point;
+struct LocatedVector;
+struct Rotation;
+struct LocRotation;
 class Atom;
-class Tug;
+struct Tug;
 class Bond;
 class InteratomicForce;
 class Molecule;
 class AminoAcid;
 class Protein;
-class Region;
-class Rotation;
+struct Region;
+struct Rotation;
 
 union Star
 {

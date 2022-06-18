@@ -912,7 +912,7 @@ void AminoAcid::load_aa_defs()
 
                 try
                 {
-                    for (i=0; fields[i]; i++) if (fields[i][0] == '"')
+                    for (i=0; fields[i]; i++) if (fields[i][0] == '%')
                         {
                             fields[i] = lastfields[i];
                         }

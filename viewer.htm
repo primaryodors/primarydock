@@ -229,6 +229,11 @@ option.unknown
     font-size: 13px;
 }
 
+.packtight
+{
+	letter-spacing: -4px!important;
+}
+
 </style>
 <script src="https://unpkg.com/ngl@0.10.4/dist/ngl.js"></script>
 <script>
@@ -274,6 +279,12 @@ Clip:
 
 <div id="affichage">
 <a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
+<!-- a id="colbtn" class="nodebtn clickme symbol packtight" onclick="" title="Region Colors">
+	<span style="color: #f90;">&#x2307;</span>
+	<span style="color: #0c0;">&#x2307;</span>
+	<span style="color: #09f;">&#x2307;</span>
+	&nbsp;
+</a -->
 </div>
 
 <div id="center">
@@ -378,12 +389,12 @@ function show_seqdd()
 var tmcolor =
 {
     1: 0x666666,
-    2: 0x993366,
-    3: 0x0033ff,
-    4: 0x3399cc,
-    5: 0x00ff99,
-    6: 0x33ff00,
-    7: 0xcc7733
+    2: 0x0066cc,
+    3: 0x00cc00,
+    4: 0x99cc66,
+    5: 0xffcc00,
+    6: 0xff9900,
+    7: 0x993399,
 };
 
 /*var tmcolor =
@@ -394,7 +405,7 @@ var tmcolor =
     4: 0x6600ff,
     5: 0xccff00,
     6: 0xff9900,
-    7: 0xcc0033
+    7: 0xcc0033,
 };*/
 
 var stage = new NGL.Stage("viewport");

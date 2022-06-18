@@ -13,7 +13,7 @@ all: $(DIRS) \
 	 $(APPS) \
 	 $(REPORTS)
 code: $(OBJS) $(TESTS) $(APPS)
-podock: $(OBJS) $(BINDIR)/podock
+podock: $(DIRS) $(OBJS) $(BINDIR)/podock
 
 CC=g++
 

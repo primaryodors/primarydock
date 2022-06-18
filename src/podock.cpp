@@ -246,6 +246,7 @@ int main(int argc, char** argv)
 
             // delete[] fields;
         }
+        buffer[0] = 0;
     }
     fclose(pf);
 #if _DBG_STEPBYSTEP

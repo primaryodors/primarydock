@@ -55,6 +55,8 @@ char** chop_spaced_fields(char* line, char separator)
     char** retval = new char*[100];
     int i, j=0;
 
+	if (!line[0]) return nullptr;
+	
     if (separator == ' ' && line[0] == '\t') line[0] = separator;
     if (line[0] != separator) retval[j++] = line;
     for (i=1; line[i] && (line[i] != '\n'); i++)

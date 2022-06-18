@@ -463,6 +463,21 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		Atom* currHN = get_atom("HN");
 		if (!currHN) currHN = get_atom("H");
 		Atom* currCA = get_atom("CA");
+		
+		// Proline fix.
+		if (!currHN)
+		{
+			Bond** bb = currN->get_bonds();
+			for (i=0; bb[i]; i++)
+			{
+				if (bb[i]->btom && bb[i]->btom != currCA)
+				{
+					currHN = bb[i]->btom;
+					break;
+				}
+			}
+		}
+		
 		if (!currHN || !currCA) return;
 		
 		movability = MOV_ALL;

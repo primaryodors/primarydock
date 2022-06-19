@@ -965,7 +965,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, ch
     }
     else
     {
-        for (j=0; m_mcoord[j]; j++);
+        for (j=0; m_mcoord[j]; j++);	// Get count.
         MetalCoord** nmc = new MetalCoord*[j+2];
         for (i=0; i<j; i++) nmc[i] = m_mcoord[i];
         nmc[j] = new MetalCoord();
@@ -982,7 +982,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, ch
     }
     else
     {
-        for (k=0; metals[k]; k++);
+        for (k=0; metals[k]; k++);	// Get count.
         Atom** nma = new Atom*[k+2];
         for (i=0; i<k; i++) nma[i] = metals[i];
         nma[k] = metal;

@@ -463,6 +463,21 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		Atom* currHN = get_atom("HN");
 		if (!currHN) currHN = get_atom("H");
 		Atom* currCA = get_atom("CA");
+		
+		// Proline fix.
+		if (!currHN)
+		{
+			Bond** bb = currN->get_bonds();
+			for (i=0; bb[i]; i++)
+			{
+				if (bb[i]->btom && bb[i]->btom != currCA)
+				{
+					currHN = bb[i]->btom;
+					break;
+				}
+			}
+		}
+		
 		if (!currHN || !currCA) return;
 		
 		movability = MOV_ALL;
@@ -639,7 +654,7 @@ Molecule** AminoAcid::aas_to_mols(AminoAcid** aas)
 {
 	if (!aas) return NULL;
 	int i, j;
-	for (i=0; aas[i]; i++);
+	for (i=0; aas[i]; i++);		// Get count.
 	Molecule** mols = new Molecule*[i+4];
 	for (j=0; j<i; j++)
 	{
@@ -841,6 +856,7 @@ int AminoAcid::from_pdb(FILE* is)
                 }
             }
         }
+        buffer[0] = 0;
 
         delete[] fields;
     }
@@ -892,6 +908,7 @@ void AminoAcid::load_aa_defs()
             if (buffer[0] != '#' && buffer[0] != '\n')
             {
                 char** fields = chop_spaced_fields(buffer);
+                if (!fields) continue;
 
                 try
                 {
@@ -1038,6 +1055,7 @@ void AminoAcid::load_aa_defs()
 
                 delete[] fields;
             }
+            buffer[0] = 0;
         }
         copy_loaded_to_object(lastletter, tbdctr, tmpbdefs, proline_like);
         fclose(pf);

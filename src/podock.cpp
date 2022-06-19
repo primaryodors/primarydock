@@ -130,10 +130,12 @@ int main(int argc, char** argv)
     while (!feof(pf))
     {
         char buffer[1024];
+        for (i=0; i<1024; i++) buffer[i] = 0;
         fgets(buffer, 1015, pf);
         if (buffer[0] >= ' ' && buffer[0] != '#')
         {
             char** fields = chop_spaced_fields(buffer);
+            if (!fields) continue;
 
             if (!strcmp(fields[0], "PROT"))
             {
@@ -246,6 +248,7 @@ int main(int argc, char** argv)
 
             // delete[] fields;
         }
+        buffer[0] = 0;
     }
     fclose(pf);
 #if _DBG_STEPBYSTEP

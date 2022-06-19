@@ -8,9 +8,8 @@
 
 void ext_mtl_coord_cnf_cb(int iter);
 
-class Region
+struct Region
 {
-public:
     int start=0;
     int end=0;
     std::string name="";
@@ -18,7 +17,7 @@ public:
 
 class Protein
 {
-public:
+	public:
     // Constructors.
     Protein(const char* name);
 
@@ -87,7 +86,7 @@ public:
 
     int* mcoord_resnos = NULL;
 
-protected:
+	protected:
     std::string name;
     char* sequence=0;
     AminoAcid** residues=0;

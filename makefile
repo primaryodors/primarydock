@@ -5,7 +5,7 @@ OUTDIR=output
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 TESTS=test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/backbone_test
-APPS=$(BINDIR)/metal $(BINDIR)/podock
+APPS=$(BINDIR)/interpreter $(BINDIR)/podock
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
 all: $(DIRS) \
 	 $(OBJS) \
@@ -13,7 +13,7 @@ all: $(DIRS) \
 	 $(APPS) \
 	 $(REPORTS)
 code: $(OBJS) $(TESTS) $(APPS)
-podock: $(OBJS) $(BINDIR)/podock
+podock: $(DIRS) $(OBJS) $(BINDIR)/podock
 
 CC=g++
 
@@ -75,8 +75,8 @@ test/mol_assem_test: src/mol_assem_test.cpp $(OBJS)
 test/amino_test: src/amino_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o
 	$(CC) src/amino_test.cpp $(OBJS) -o test/amino_test $(CFLAGS)
 
-$(BINDIR)/metal: src/metal.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
-	$(CC) src/metal.cpp $(OBJS) -o $(BINDIR)/metal $(CFLAGS)
+$(BINDIR)/interpreter: src/interpreter.cpp $(OBJS)
+	$(CC) src/interpreter.cpp $(OBJS) -o $(BINDIR)/interpreter $(CFLAGS)
 
 test/protein_test: src/protein_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 	$(CC) src/protein_test.cpp $(OBJS) -o test/protein_test $(CFLAGS)

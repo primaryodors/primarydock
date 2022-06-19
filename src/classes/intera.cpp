@@ -72,6 +72,7 @@ void InteratomicForce::read_all_forces()
 
                 ifcount++;
             }
+            buffer[0] = 0;
         }
         fclose(pf);
         reading_forces = false;
@@ -89,6 +90,7 @@ InteratomicForce::InteratomicForce()
 void InteratomicForce::read_dat_line(char* line)
 {
     char** fields = chop_spaced_fields(line);
+    if (!fields) return;
     if (fields[0]
             && fields[1]
             && fields[2]

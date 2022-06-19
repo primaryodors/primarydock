@@ -38,6 +38,7 @@ void Atom::read_elements()
             if (buffer[0] != '#')
             {
                 char** fields = chop_spaced_fields(buffer);
+                if (!fields) continue;
 
                 if (fields[0])
                 {
@@ -71,6 +72,7 @@ void Atom::read_elements()
 
                 delete[] fields;
             }
+            buffer[0] = 0;
         }
         fclose(pf);
         read_elem_syms = true;
@@ -368,6 +370,7 @@ Atom::Atom(FILE* is)
                 }
             }
         }
+        buffer[0] = 0;
     }
 }
 
@@ -1544,7 +1547,7 @@ SCoord Atom::get_next_free_geometry(float lcard)
     else
     {
         int i;
-        for (i=0; bonded_to[i].btom; i++);
+        for (i=0; bonded_to[i].btom; i++);	// Get count.
 
         if (i >= geometry) i=0;
 
@@ -1591,7 +1594,7 @@ int Atom::get_idx_next_free_geometry()
     else
     {
         int i;
-        for (i=0; i < geometry && bonded_to[i].btom; i++);
+        for (i=0; i < geometry && bonded_to[i].btom; i++);	// Get count.
         if (i >= geometry) i=0;
         if (geometry == 4 && swapped_chirality && i >= 2) i ^= 1;
         if (geometry == 3 && EZ_flip && i >= 1) i = 3-i;
@@ -1689,7 +1692,7 @@ int Bond::count_moves_with_btom()
 {
     if (!moves_with_btom) return 0;
     int i;
-    for (i=0; moves_with_btom[i]; i++);
+    for (i=0; moves_with_btom[i]; i++);	// Get count.
     return i;
 }
 
@@ -1765,7 +1768,7 @@ Ring::Ring(Atom** from_atoms)
 	if (!from_atoms) return;
 	
 	int i;
-	for (i=0; from_atoms[i]; i++);
+	for (i=0; from_atoms[i]; i++);	// Get count.
 	atcount = i;
 	
 	atoms = new Atom*[atcount+2];

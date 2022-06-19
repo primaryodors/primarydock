@@ -6,9 +6,8 @@
 
 #include <vector>
 
-class SMILES_Parenthetical
+struct SMILES_Parenthetical
 {
-	public:
     Atom* startsfrom=0;
     char* smilesstr=0;
 };

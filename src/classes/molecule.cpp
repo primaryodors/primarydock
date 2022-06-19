@@ -43,7 +43,7 @@ Molecule::Molecule()
 
 int length(Atom** array) {
     int numAtoms;
-    for (numAtoms=0; array[numAtoms]; numAtoms++);
+    for (numAtoms=0; array[numAtoms]; numAtoms++);	// Get count.
     return numAtoms;
 }
 
@@ -557,6 +557,7 @@ int Molecule::from_pdb(FILE* is)
                 }
             }
         }
+        buffer[0] = 0;
 
         delete[] fields;
     }
@@ -770,7 +771,7 @@ int Molecule::add_ring(Atom** atoms)
 	
 	if (rings)
 	{
-		for (i=0; rings[i]; i++);
+		for (i=0; rings[i]; i++);	// Get count.
 		ringcount = i;
 	}
 	else
@@ -2477,6 +2478,7 @@ bool Molecule::from_smiles(char const * smilesstr)
 				int result = from_sdf(sdfdat.c_str());
 				return (result > 0);
 			}
+			buffer[0] = 0;
 			fclose(pf);
 		}
 	}

@@ -55,6 +55,8 @@ char** chop_spaced_fields(char* line, char separator)
     char** retval = new char*[100];
     int i, j=0;
 
+	if (!line[0]) return nullptr;
+	
     if (separator == ' ' && line[0] == '\t') line[0] = separator;
     if (line[0] != separator) retval[j++] = line;
     for (i=1; line[i] && (line[i] != '\n'); i++)
@@ -143,9 +145,9 @@ int greek_from_aname(const char* aname)
 {
     int i, j;
     if (!aname) return -1;
-    for (i=0; aname[i]; i++);
+    for (i=0; aname[i]; i++);	// Get length.
     i--;
-    for (; i>=0 && aname[i] < 'A'; i--);
+    for (; i>=0 && aname[i] < 'A'; i--);	// Walk back until find a letter.
     if (i<0) return i;
     for (j=0; Greek[j]; j++)
         if (Greek[j] == aname[i]) return j;

@@ -12,11 +12,10 @@
 
 using namespace std;
 
-class SCoord;
+struct SCoord;
 
-class Point
+struct Point
 {
-	public:
     float x=0, y=0, z=0;
     float weight = 1;
 
@@ -48,9 +47,8 @@ class Point
     friend std::ostream& operator<<(std::ostream& os, const SCoord& v);
 };
 
-class SCoord
+struct SCoord
 {
-	public:
     float r=0, theta=0, phi=0;
 
     SCoord()    {        r = theta = phi = 0;    }
@@ -73,9 +71,8 @@ class SCoord
     friend std::ostream& operator<<(std::ostream& os, const Point& p);
 };
 
-class LocatedVector : public SCoord
+struct LocatedVector : public SCoord
 {
-	public:
 	LocatedVector() { r = theta = phi = origin.x = origin.y = origin.z = 0; }
 	LocatedVector(SCoord sc) { copy(sc); }
 	void copy(SCoord sc) { r=sc.r; theta=sc.theta; phi=sc.phi; }
@@ -83,9 +80,8 @@ class LocatedVector : public SCoord
     Point origin;
 };
 
-class Rotation
+struct Rotation
 {
-	public:
     SCoord v;
     float a=0;
     Rotation()	{	a = 0;	};
@@ -96,9 +92,8 @@ class Rotation
     char* printable();
 };
 
-class LocRotation : public Rotation
+struct LocRotation : public Rotation
 {
-	public:
     Point origin;
 
     LocRotation();
@@ -108,9 +103,8 @@ class LocRotation : public Rotation
 
 class Atom;
 
-class Tug
+struct Tug
 {
-	public:
     SCoord vec;
     Rotation rot;
 

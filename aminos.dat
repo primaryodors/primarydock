@@ -22,12 +22,14 @@ E		GLU		glutamic_acid		N[C@H](C(=O)O)CCC(=O)[O-]
 Q		GLN		glutamine			N[C@H](C(=O)O)CCC(=O)N
 G		GLY		glycine				NCC(=O)O
 H		HIS		histidine			N[C@H](C(=O)O)CC1N=CNC=1
+O		HYP		hydroxyproline		N1[C@H](C(=O)O)CC[C@H]1O
 I		ILE		isoleucine			N[C@H](C(=O)O)C(C)CC
 L		LEU		leucine				N[C@H](C(=O)O)CC(C)C
 K		LYS		lysine				N[C@H](C(=O)O)CCCC[NH3+]
 M		MET		methionine			N[C@H](C(=O)O)CCSC
 F		PHE		phenylalanine		N[C@H](C(=O)O)Cc1ccccc1
 P		PRO		proline				N1[C@H](C(=O)O)CCC1
+# O		PYL		pyrrolysine			N[C@H](C(=O)O)CCCCNC(=O)[C@H]1N=CC[C@H]1C
 U		SEC		selenocysteine		N[C@H](C(=O)O)C[SeH]
 S		SER		serine				N[C@H](C(=O)O)CO
 T		THR		threonine			N[C@H](C(=O)O)C(C)O

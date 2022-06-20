@@ -21,7 +21,6 @@ struct AABondDef
  	float cardinality=0;
  	float acharge=0;
  	bool can_rotate=false;
- 	int SMILES_idx=0;
 };
 
 struct AADef
@@ -30,10 +29,9 @@ struct AADef
  	char _3let[4];
  	char name[20];
  	float reach = 2.5;
- 	AABondDef** aabonds=0;
+ 	AABondDef** aabonds = nullptr;
  	bool proline_like = false;
  	std::string SMILES = "";
- 	Molecule* archetype;
 };
 
 struct MetalCoord

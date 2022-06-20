@@ -38,12 +38,12 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 
     int idx = (letter & 0x5f) - 'A';
     aadef = &aa_defs[idx];
-    if (!aa_defs[idx].aabonds)
+    /*if (!aa_defs[idx].aabonds)
     {
         cout << "Cannot load " << letter << " please make sure amino acid exists in aminos.dat and all atoms are defined." << endl;
         throw 0xbadac1d;
-    }
-
+    }*/
+    
     name = aa_defs[idx].name;
 
     int i, j, k, l, n;
@@ -435,6 +435,61 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		#endif
     	
     	get_rotatable_bonds();
+    }	// if SMILES
+    
+    if (!atoms) cout << "WARNING no atoms for " << aa_defs[idx].name << " (" << aa_defs[idx].SMILES << ")" << endl;
+    
+    identify_acidbase();
+    
+    if (!aa_defs[idx].aabonds)
+    {
+    	AABondDef** aabd = new AABondDef*[get_atom_count()+16];
+    	n=0;
+    	for (i=0; atoms[i]; i++)
+    	{
+    		Bond** bb = atoms[i]->get_bonds();
+    		int bg = atoms[i]->get_geometry();
+    		
+    		if (!i)
+    		{
+    			aabd[n] = new AABondDef();
+				strcpy(aabd[n]->aname, atoms[i]->name);
+				strcpy(aabd[n]->bname, "<C");
+				aabd[n]->cardinality = 1.5;
+				aabd[n]->acharge = 0;
+				aabd[n]->can_rotate = false;
+    			n++;
+    		}
+    		
+    		for (j=0; j<bg; j++)
+    		{
+    			if (bb[j]->btom && bb[j]->btom < bb[j]->atom)
+    			{
+    				aabd[n] = new AABondDef();
+    				strcpy(aabd[n]->aname, bb[j]->atom->name);
+    				strcpy(aabd[n]->bname, bb[j]->btom->name);
+    				aabd[n]->cardinality = bb[j]->cardinality;
+    				aabd[n]->acharge = bb[j]->atom->get_charge();
+    				aabd[n]->can_rotate =
+    					(	aabd[n]->cardinality <= 1.1
+	    					&&
+	    					(	!bb[j]->atom->is_pi() || !bb[j]->btom->is_pi()	)
+	    				);
+	    			n++;
+    			}
+    		}
+    		
+    		delete[] bb;
+    	}
+    	
+    	aa_defs[idx].aabonds = new AABondDef*[n+2];
+    	for (i=0; i<n; i++)
+    	{
+    		aa_defs[idx].aabonds[i] = aabd[i];
+			// cout << aa_defs[idx].name << ":" << aa_defs[idx].aabonds[i]->aname << " is bonded to " << aa_defs[idx].aabonds[i]->bname << "." << endl;
+		}
+    	
+    	delete[] aabd;
     }
     
 	// flatten();
@@ -870,14 +925,14 @@ void AminoAcid::copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbd
 {
     int lidx = (letter & 0x5f) - 'A';
     if (lidx<0 || lidx>26) return;
-    aa_defs[lidx].aabonds = new AABondDef*[tbdctr+1];
+    aa_defs[lidx].aabonds = nullptr; // new AABondDef*[tbdctr+1];
     int j;
     for (j=0; j<tbdctr; j++)
     {
-        aa_defs[lidx].aabonds[j] = tmpbdefs[j];
+        //aa_defs[lidx].aabonds[j] = tmpbdefs[j];
         aa_defs[lidx].proline_like = proline_like;
     }
-    aa_defs[lidx].aabonds[tbdctr] = 0;
+    //aa_defs[lidx].aabonds[tbdctr] = 0;
 }
 
 
@@ -1021,16 +1076,16 @@ void AminoAcid::load_aa_defs()
                     {
                     	if (fields[7][0] == '=')
                     	{
-                    		tmpbdefs[tbdctr]->SMILES_idx = atoi(&fields[7][1]);
+                    		// tmpbdefs[tbdctr]->SMILES_idx = atoi(&fields[7][1]);
                     	}
                     	else if (fields[7][0] == '@')
                     	{
-                    		tmpbdefs[tbdctr]->SMILES_idx = 1000 + atoi(&fields[7][1]);
+                    		// tmpbdefs[tbdctr]->SMILES_idx = 1000 + atoi(&fields[7][1]);
                     	}
                     	else
                     	{
                     		aa_defs[idx].SMILES = fields[7];
-                    		tmpbdefs[tbdctr]->SMILES_idx = 1;
+                    		// tmpbdefs[tbdctr]->SMILES_idx = 1;
                 		}
                 	}
 

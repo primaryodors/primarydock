@@ -283,6 +283,10 @@ int main(int argc, char** argv)
 	p.load_pdb(pf);
 	fclose(pf);
 	
+	script_var[vars].name = "%SEQLEN";
+	script_var[vars].value.n = p.get_seq_length();
+	vars++;
+	
 	if (pf = fopen(script_fname.c_str(), "rb"))
 	{
 		while (!feof(pf))
@@ -349,6 +353,31 @@ int main(int argc, char** argv)
 				
 			}	// HELIX
 			
+			else if (!strcmp(fields[0], "SAVE"))
+			{
+				psz = interpret_single_string(fields[1]);
+				
+				pf = fopen(psz, "wb");
+				if (!pf)
+				{
+					cout << "Failed to open " << psz << " for writing." << endl;
+					return 0xbadf12e;
+				}
+				p.save_pdb(pf);
+				p.end_pdb(pf);
+				
+				cout << "Wrote " << psz << "." << endl;
+				
+				fclose(pf);
+				
+				if (fields[2] 
+					&&
+					(	!strcmp("QUIT", fields[2]) || !strcmp("EXIT", fields[2]) || !strcmp("END", fields[2])
+					)
+				   )
+				return 0;
+			}
+			
 			else if (!strcmp(fields[0], "LET"))
 			{
 				n = find_var_index(fields[1]);
@@ -414,9 +443,19 @@ int main(int argc, char** argv)
 					break;
 					
 					case SV_STRING:
-					script_var[n].value.psz = new char(255);
+					
 					psz = interpret_single_string(fields[3]);
-					if (!strcmp(fields[2], "=")) strcpy(script_var[n].value.psz, psz);
+					if (!strcmp(fields[2], "="))
+					{
+						script_var[n].value.psz = new char(255);
+						strcpy(script_var[n].value.psz, psz);
+					}
+					else if (!strcmp(fields[2], "+="))
+					{
+						std::string builder = script_var[n].value.psz;
+						builder.append(psz);
+						strcpy(script_var[n].value.psz, builder.c_str());
+					}
 					else
 					{
 						delete[] psz;

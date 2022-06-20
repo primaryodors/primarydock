@@ -106,9 +106,10 @@ class AminoAcid : public Molecule
  	char region[25];
  	AADef* aadef=0;
  	AminoAcid *prev_aa=0, *next_aa=0;
+ 	float current_phi = M_PI, current_psi = M_PI, current_omega = M_PI;
 };
 
-extern AADef aa_defs[26];		// Indexed by letter so 0=A ala, 2=C cys, 3=D asp, etc.
+extern AADef aa_defs[256];		// Indexed by ASCII value of one-letter code.
 extern char* override_aminos_dat;
 
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa);

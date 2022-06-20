@@ -1242,8 +1242,6 @@ Bond** AminoAcid::get_rotatable_bonds()
     {
     	for (i=0; aadef->aabonds[i]; i++)
     	{
-                
-            
     		if (aadef->aabonds[i]->cardinality == 1
     			&&
     			aadef->aabonds[i]->can_rotate

@@ -12,12 +12,12 @@
 
 using namespace std;
 
-AADef aa_defs[26];
+AADef aa_defs[256];
 char* override_aminos_dat=0;
 
 AminoAcid::AminoAcid(FILE* instream)
 {
-    if (!aa_defs[0]._1let) AminoAcid::load_aa_defs();
+    if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
     movability = MOV_FLEXONLY;
     from_pdb(instream);
@@ -28,7 +28,7 @@ AminoAcid::AminoAcid(FILE* instream)
 #define _ALGORITHMIC_GREEK 1
 AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 {
-    if (!aa_defs[0]._1let) AminoAcid::load_aa_defs();
+    if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
     movability = MOV_FLEXONLY;
     mol_typ = MOLTYP_AMINOACID;
@@ -36,7 +36,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     if (!prevaa) residue_no = 1;
     else residue_no = prevaa->residue_no + 1;
 
-    int idx = (letter & 0x5f) - 'A';
+    int idx = letter;
     aadef = &aa_defs[idx];
     /*if (!aa_defs[idx].aabonds)
     {
@@ -488,6 +488,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     		aa_defs[idx].aabonds[i] = aabd[i];
 			// cout << aa_defs[idx].name << ":" << aa_defs[idx].aabonds[i]->aname << " is bonded to " << aa_defs[idx].aabonds[i]->bname << "." << endl;
 		}
+		aa_defs[idx].aabonds[i] = nullptr;
     	
     	delete[] aabd;
     }
@@ -762,21 +763,6 @@ int AminoAcid::from_pdb(FILE* is)
                     if (!res3let[0])
                     {
                         strcpy(res3let, fields[3]);
-                        /*int i;
-                        // cout << res3let << "|";
-                        for (i=0; i<26; i++)
-                        {	// cout << aa_defs[i]._3let << "|";
-                        	if (!strcmp(res3let, aa_defs[i]._3let))
-                        	{	cout << res3let << " matches " << aa_defs[i]._3let << ". AA is " << aa_defs[i]._1let << endl;
-                        		aadef = &aa_defs[i];
-                        		break;
-                        	}
-                        }
-                        if (!aadef)
-                        {	aadef = new AADef();
-                        	aadef->_1let = '?';
-                        	cout << res3let << " does not match anything." << endl;
-                        }*/
                     }
 
                     if (!atno_offset) atno_offset = atoi(fields[1]);
@@ -827,7 +813,7 @@ int AminoAcid::from_pdb(FILE* is)
                     AADef* aaa=0;
 
                     name=0;
-                    for (i=0; i<26; i++)
+                    for (i=0; i<256; i++)
                     {
                         if (aa_defs[i]._1let && !strcmp(aa_defs[i]._3let, fields[3]))
                         {
@@ -924,15 +910,13 @@ _return_added:
 void AminoAcid::copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs, bool proline_like)
 {
     int lidx = (letter & 0x5f) - 'A';
-    if (lidx<0 || lidx>26) return;
-    aa_defs[lidx].aabonds = nullptr; // new AABondDef*[tbdctr+1];
+    if (lidx<0 || lidx>256) return;
+    aa_defs[lidx].aabonds = nullptr;
     int j;
     for (j=0; j<tbdctr; j++)
     {
-        //aa_defs[lidx].aabonds[j] = tmpbdefs[j];
         aa_defs[lidx].proline_like = proline_like;
     }
-    //aa_defs[lidx].aabonds[tbdctr] = 0;
 }
 
 
@@ -972,7 +956,7 @@ void AminoAcid::load_aa_defs()
                             fields[i] = lastfields[i];
                         }
 
-                    int idx = (fields[0][0] & 0x5f) - 'A';
+                    int idx = fields[0][0];
 
                     if (!lastletter || fields[0][0] != lastletter)
                     {
@@ -983,11 +967,9 @@ void AminoAcid::load_aa_defs()
                         if (tmpbdefs) delete[] tmpbdefs;
                     }
 
-                    // i = (fields[0][0] & 0x5f) - 'A';
-                    // cout << aa_defs[idx]._1let;
                     if (!aa_defs[idx]._1let)
                     {
-                        aa_defs[idx]._1let = 'A'+idx;
+                        aa_defs[idx]._1let = idx;
                         // cout << aa_defs[idx]._1let;
                         strcpy(aa_defs[idx]._3let, fields[1]);
                         strcpy(aa_defs[idx].name, fields[2]);

@@ -69,8 +69,8 @@
 #define PROT_MAX_RGN 40
 
 // Torsion angles for various helices and for beta strands.
-#define ALPHA_PHI fiftyseventh*-61
-#define ALPHA_PSI fiftyseventh*-43
+#define ALPHA_PHI fiftyseventh*-57.8
+#define ALPHA_PSI fiftyseventh*-47.0
 #define BETA_PHI fiftyseventh*-140
 #define BETA_PSI fiftyseventh*130
 #define _310_PHI fiftyseventh*-49
@@ -79,8 +79,10 @@
 #define PI_PSI fiftyseventh*-70
 #define POLYPRO2_PHI fiftyseventh*-75
 #define POLYPRO2_PSI fiftyseventh*145
+#define POLYPRO2_OMEGA fiftyseventh*124
 #define POLYPRO1_PHI fiftyseventh*-75
 #define POLYPRO1_PSI fiftyseventh*160
+#define POLYPRO1_OMEGA fiftyseventh*113
 
 
 #endif

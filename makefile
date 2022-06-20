@@ -58,7 +58,7 @@ $(OBJDIR)/protein.o: src/classes/protein.h src/classes/protein.cpp $(OBJDIR)/ami
 	$(CC) -c src/classes/protein.cpp -o $(OBJDIR)/protein.o $(CFLAGS)
 
 test/point_test: src/point_test.cpp $(OBJDIR)/point.o
-	$(CC) src/point_test.cpp $(OBJDIR)/point.o -o test/point_test $(CFLAGS)
+	$(CC) src/point_test.cpp $(OBJDIR)/point.o $(OBJDIR)/misc.o -o test/point_test $(CFLAGS)
 
 test/atom_test: src/atom_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o
 	$(CC) src/atom_test.cpp $(OBJDIR)/misc.o $(OBJDIR)/atom.o $(OBJDIR)/point.o -o test/atom_test $(CFLAGS)

@@ -1,15 +1,10 @@
 
 # Defines the bonds and charges of amino acid atoms.
 #
-# The columns are: AA letter, AA 3-letter, AA name, atom name, bonded-to name(s), cardinality/ies, atom charge,
-# and amino acid SMILES.
-# Note the precise alignment of the columns is not critical, as the software parses each line as columns separated
-# by one or more spaces.
+# The columns are: AA letter, AA 3-letter, AA name, atom name, bonded-to name(s), cardinality/ies, atom charge, and amino acid SMILES.
+# Note the precise alignment of the columns is not critical, as the software parses each line as columns separated by one or more spaces.
 #
-# Normally there should be no reason to edit this file, as the 20 normal amino acids plus selenocysteine are included.
-# If you wish to do docking with a protein containing pyrrolysine (O, PYL) then you will have to add it here; we omitted
-# PYL since it is extremely rare, is known only in microorganisms, has a complex side chain, and uses the same letter as
-# hydroxyproline.
+# If you add a new entry to this file, make sure to also add the 1-letter and 3-letter codes to the constants in the top of viewer.htm.
 #
 
 #AA		3let	name				SMILES
@@ -29,7 +24,7 @@ K		LYS		lysine				N[C@H](C(=O)O)CCCC[NH3+]
 M		MET		methionine			N[C@H](C(=O)O)CCSC
 F		PHE		phenylalanine		N[C@H](C(=O)O)Cc1ccccc1
 P		PRO		proline				N1[C@H](C(=O)O)CCC1
-# O		PYL		pyrrolysine			N[C@H](C(=O)O)CCCCNC(=O)[C@H]1N=CC[C@H]1C
+o		PYL		pyrrolysine			N[C@H](C(=O)O)CCCC[NH+]=C([O-])[C@@H]1N=CC[C@H]1C
 U		SEC		selenocysteine		N[C@H](C(=O)O)C[SeH]
 S		SER		serine				N[C@H](C(=O)O)CO
 T		THR		threonine			N[C@H](C(=O)O)C(C)O

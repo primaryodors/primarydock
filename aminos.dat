@@ -12,28 +12,28 @@
 # hydroxyproline.
 #
 
-#AA	3let		name			aname	bto		card	charge	SMILES
-A		ALA		alanine			N		<C		1.5		0		N[C@H](C(=O)O)C
-R		ARG		arginine		N		<C		1.5		0		N[C@H](C(=O)O)CCCNC(N)=[NH2+]
-N		ASN		asparagine		N		<C		1.5		0		N[C@H](C(=O)O)CC(=O)N
-D		ASP		aspartic_acid	N		<C		1.5		0		N[C@H](C(=O)O)CC(=O)[O-]
-C		CYS		cysteine		N		<C		1.5		0		N[C@H](C(=O)O)CS
-E		GLU		glutamic_acid	N		<C		1.5		0		N[C@H](C(=O)O)CCC(=O)[O-]
-Q		GLN		glutamine		N		<C		1.5		0		N[C@H](C(=O)O)CCC(=O)N
-G		GLY		glycine			N		<C		1.5		0		NCC(=O)O
-H		HIS		histidine		N		<C		1.5		0		N[C@H](C(=O)O)CC1N=CNC=1
-I		ILE		isoleucine		N		<C		1.5		0		N[C@H](C(=O)O)C(C)CC
-L		LEU		leucine			N		<C		1.5		0		N[C@H](C(=O)O)CC(C)C
-K		LYS		lysine			N		<C		1.5		0		N[C@H](C(=O)O)CCCC[NH3+]
-M		MET		methionine		N		<C		1.5		0		N[C@H](C(=O)O)CCSC
-F		PHE		phenylalanine	N		<C		1.5		0		N[C@H](C(=O)O)Cc1ccccc1
-P		PRO		proline			N		<C		1.5		0		N1[C@H](C(=O)O)CCC1
-U		SEC		selenocysteine	N		<C		1.5		0		N[C@H](C(=O)O)C[SeH]
-S		SER		serine			N		<C		1.5		0		N[C@H](C(=O)O)CO
-T		THR		threonine		N		<C		1.5		0		N[C@H](C(=O)O)C(C)O
-W		TRP		tryptophan		N		<C		1.5		0		N[C@H](C(=O)O)CC1=CNc2ccccc21
-Y		TYR		tyrosine		N		<C		1.5		0		N[C@H](C(=O)O)Cc1ccc(O)cc1
-V		VAL		valine			N		<C		1.5		0		N[C@H](C(=O)O)C(C)C
+#AA		3let	name				SMILES
+A		ALA		alanine				N[C@H](C(=O)O)C
+R		ARG		arginine			N[C@H](C(=O)O)CCCNC(N)=[NH2+]
+N		ASN		asparagine			N[C@H](C(=O)O)CC(=O)N
+D		ASP		aspartic_acid		N[C@H](C(=O)O)CC(=O)[O-]
+C		CYS		cysteine			N[C@H](C(=O)O)CS
+E		GLU		glutamic_acid		N[C@H](C(=O)O)CCC(=O)[O-]
+Q		GLN		glutamine			N[C@H](C(=O)O)CCC(=O)N
+G		GLY		glycine				NCC(=O)O
+H		HIS		histidine			N[C@H](C(=O)O)CC1N=CNC=1
+I		ILE		isoleucine			N[C@H](C(=O)O)C(C)CC
+L		LEU		leucine				N[C@H](C(=O)O)CC(C)C
+K		LYS		lysine				N[C@H](C(=O)O)CCCC[NH3+]
+M		MET		methionine			N[C@H](C(=O)O)CCSC
+F		PHE		phenylalanine		N[C@H](C(=O)O)Cc1ccccc1
+P		PRO		proline				N1[C@H](C(=O)O)CCC1
+U		SEC		selenocysteine		N[C@H](C(=O)O)C[SeH]
+S		SER		serine				N[C@H](C(=O)O)CO
+T		THR		threonine			N[C@H](C(=O)O)C(C)O
+W		TRP		tryptophan			N[C@H](C(=O)O)CC1=CNc2ccccc21
+Y		TYR		tyrosine			N[C@H](C(=O)O)Cc1ccc(O)cc1
+V		VAL		valine				N[C@H](C(=O)O)C(C)C
 
 
 

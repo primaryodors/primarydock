@@ -981,7 +981,6 @@ void AminoAcid::load_aa_defs()
                         proline_like = false;
 
                         if (tmpbdefs) delete[] tmpbdefs;
-                        tmpbdefs = new AABondDef*[256];
                     }
 
                     // i = (fields[0][0] & 0x5f) - 'A';
@@ -995,98 +994,10 @@ void AminoAcid::load_aa_defs()
                         aa_defs[idx].reach = 1.09;
                     }
 
-                    tmpbdefs[tbdctr] = new AABondDef();
-                    strcpy(tmpbdefs[tbdctr]->aname, fields[3]);
 
-                    isbb = !strcmp(fields[3], "N")
-                           || !strcmp(fields[3], "HN")
-                           || !strcmp(fields[3], "CA")
-                           || !strcmp(fields[3], "HA")
-                           || !strcmp(fields[3], "C")
-                           || !strcmp(fields[3], "O")
-                           ;
-
-                    if (!isbb)
+                    if (fields[3])
                     {
-                        int gki = strlen(fields[3])-1;
-                        if (fields[3][gki] >= '0' && fields[3][gki] <= '9') gki--;
-                        if (gki && fields[3][gki-1] >= 'A')
-                        {
-                            char gk = fields[3][gki];
-                            lastgrk.psz = strchr(Hellenic.psz, gk);
-                            if (lastgrk.n) lastgrk.n -= Hellenic.n;
-                            float lreach = (1.54*2*cos((tetrahedral-M_PI/2)*2))/2 * lastgrk.n + 1.09;
-                            if (lreach > aa_defs[idx].reach)
-                            {
-                                aa_defs[idx].reach = lreach;
-                                //cout << aa_defs[idx]._3let << " has a reach of " << lreach << " because lastgreek " << Greek[lastgrk.n] << endl;
-                            }
-                        }
-                    }
-
-                    tmpbdefs[tbdctr]->cardinality = atof(fields[5]);
-                    tmpbdefs[tbdctr]->can_rotate
-                        = tmpbdefs[tbdctr]->cardinality == 1
-                          &&
-                          !strchr(fields[5], '!')
-                          ;
-                    if (isbb && strchr(fields[5], '!')) proline_like = true;
-
-                    if (fields[6][0] == '+') fields[6][0] = ' ';
-                    tmpbdefs[tbdctr]->acharge = atof(fields[6]);
-
-                    char* comma = strstr(fields[4],",");
-                    if (comma)
-                    {
-                        char* part2 = comma+1;
-                        *comma = 0;
-                        strcpy(tmpbdefs[tbdctr]->bname, fields[4]);
-                        // if (i==5) cout << "Fields[4] = " << fields[4] << "; part2 = " << part2 << endl;
-
-                        tbdctr++;
-                        tmpbdefs[tbdctr] = new AABondDef();
-                        strcpy(tmpbdefs[tbdctr]->aname, fields[3]);
-                        strcpy(tmpbdefs[tbdctr]->bname, part2);
-                        comma = strstr(fields[5],",");
-                        part2 = comma+1;
-                        *comma = 0;
-                        tmpbdefs[tbdctr-1]->cardinality = atof(fields[5]);
-                        tmpbdefs[tbdctr-1]->can_rotate
-                            = tmpbdefs[tbdctr-1]->cardinality == 1
-                              &&
-                              !strchr(fields[5], '!')
-                              ;
-                        if (isbb && strchr(fields[5], '!')) proline_like = true;
-                        strcpy(tmpbdefs[tbdctr-1]->bname, fields[4]);
-                        tmpbdefs[tbdctr]->cardinality = atof(part2);
-                        tmpbdefs[tbdctr]->can_rotate
-                            = tmpbdefs[tbdctr]->cardinality == 1
-                              &&
-                              !strchr(part2, '!')
-                              ;
-                        if (isbb && strchr(part2, '!')) proline_like = true;
-                        tmpbdefs[tbdctr]->acharge = atof(fields[6]);
-                    }
-                    else
-                    {
-                        strcpy(tmpbdefs[tbdctr]->bname, fields[4]);
-                    }
-
-                    if (fields[7])
-                    {
-                    	if (fields[7][0] == '=')
-                    	{
-                    		// tmpbdefs[tbdctr]->SMILES_idx = atoi(&fields[7][1]);
-                    	}
-                    	else if (fields[7][0] == '@')
-                    	{
-                    		// tmpbdefs[tbdctr]->SMILES_idx = 1000 + atoi(&fields[7][1]);
-                    	}
-                    	else
-                    	{
-                    		aa_defs[idx].SMILES = fields[7];
-                    		// tmpbdefs[tbdctr]->SMILES_idx = 1;
-                		}
+                		aa_defs[idx].SMILES = fields[3];
                 	}
 
                     tbdctr++;

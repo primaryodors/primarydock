@@ -395,7 +395,7 @@ var tmcolor =
     4: 0x99cc66,
     5: 0xffcc00,
     6: 0xff9900,
-    7: 0x993399,
+    7: 0x993355,
 };
 
 /*var tmcolor =
@@ -456,13 +456,15 @@ function showSideChain(resno)
 {
 	try
 	{
+		var clipValue = parseFloat($("#clip")[0].value);
 		if (!restoggled[resno])
 		{
 			resmdl[resno].addRepresentation( "licorice",
             {
-                opacity: 0.7,
-				colorScheme: PODefScheme,
-                metalness: 0.13,
+                "opacity": 0.7,
+				"colorScheme": PODefScheme,
+                "metalness": 0.13,
+                "clipNear": clipValue,
             });
 			restoggled[resno] = 1;
 			$('#seqddtgl'+resno).addClass('hilite');
@@ -855,6 +857,13 @@ $("#clip").on("input", function (e, obj)
             obj.setParameters( { "clipNear": clipValue } );
         });
     }
+    for (i=0; i<resmdl.length; i++)
+    {
+    	resmdl[i].eachRepresentation( function(obj)
+        {
+            obj.setParameters( { "clipNear": clipValue } );
+        });
+	}
     stage.setParameters( { "fogNear": (clipValue), "fogFar": Math.max(15+clipValue, 150-clipValue*3), } );
 });
 

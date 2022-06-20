@@ -1156,6 +1156,14 @@ Bond** Molecule::get_rotatable_bonds()
             for (j=0; j<g && lb[j]; j++)
             {
                 if (lb[j]->count_moves_with_btom() > mwblimit) continue;
+                
+                // Generally, a single bond between pi atoms cannot rotate.
+                if (lb[j]->atom && lb[j]->atom->is_pi()
+                	&&
+                	lb[j]->btom && lb[j]->btom->is_pi()
+                   )
+                   lb[j]->can_rotate = false;
+                
                 if (lb[j]->btom
                         &&
                         lb[j]->atom < lb[j]->btom
@@ -1177,6 +1185,14 @@ Bond** Molecule::get_rotatable_bonds()
             for (j=0; j<g; j++)
             {
                 if (lb[j]->count_moves_with_btom() > mwblimit) continue;
+                
+                // Generally, a single bond between pi atoms cannot rotate.
+                if (lb[j]->atom && lb[j]->atom->is_pi()
+                	&&
+                	lb[j]->btom && lb[j]->btom->is_pi()
+                   )
+                   lb[j]->can_rotate = false;
+
                 if (lb[j]->can_rotate
                         &&
                         lb[j]->atom && lb[j]->btom
@@ -1226,6 +1242,8 @@ Bond** AminoAcid::get_rotatable_bonds()
     {
     	for (i=0; aadef->aabonds[i]; i++)
     	{
+                
+            
     		if (aadef->aabonds[i]->cardinality == 1
     			&&
     			aadef->aabonds[i]->can_rotate
@@ -1245,8 +1263,13 @@ Bond** AminoAcid::get_rotatable_bonds()
 					}
     				else
     				{
+    					// Generally, a single bond between pi atoms cannot rotate.
+						if (lb->atom->is_pi() && lb->btom && lb->btom->is_pi())
+						   aadef->aabonds[i]->can_rotate = false;
+    					
 						lb->can_rotate =
 							aadef->aabonds[i]->can_rotate;
+
 						if (!la->is_backbone
 							&&
 							la->get_Z() > 1

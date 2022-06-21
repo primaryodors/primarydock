@@ -41,6 +41,7 @@ class Protein
 
     // Getters.
     int get_seq_length();
+    std::string get_sequence();
     int get_start_resno();
     AminoAcid* get_residue(int resno);
     Molecule* metals_as_molecule();

@@ -408,6 +408,12 @@ int  Protein::get_seq_length()
     return i;
 }
 
+std::string Protein::get_sequence()
+{
+	if (!sequence) return 0;
+	return std::string(sequence);
+}
+
 int  Protein::get_start_resno()
 {
     if (!residues) return 0;

@@ -164,8 +164,8 @@ Point interpret_single_point(const char* param)
 char* interpret_single_string(const char* param)
 {
 	int n;
-	char* buffer = new char[256];
-	for (n=0; n<256; n++) buffer[n] = 0;
+	char* buffer = new char[65536];
+	for (n=0; n<65536; n++) buffer[n] = 0;
 	
 	switch (param[0])
 	{
@@ -190,6 +190,7 @@ char* interpret_single_string(const char* param)
 		case '$':
 		n = find_var_index(param);
 		if (n<0) return buffer;
+		if (!script_var[n].value.psz) return buffer;
 		strcpy(buffer, script_var[n].value.psz);
 		return buffer;
 		
@@ -212,6 +213,7 @@ int main(int argc, char** argv)
 	int i, j, k, l, m, n;
 	float f;
 	char* psz;
+	std::string builder;
 	string script_fname = "";
 	string PDB_fname = "";
 	FILE* pf;
@@ -266,6 +268,7 @@ int main(int argc, char** argv)
 	char* slash = strrchr(pdbname, '/');
 	if (!slash) slash = strrchr(pdbname, '\\');
 	
+	// Set some automatic variables.
 	script_var[vars].name = "$PDB";
 	script_var[vars].value.psz = new char[strlen(pdbname)+4];
 	strcpy(script_var[vars].value.psz, pdbname);
@@ -283,8 +286,14 @@ int main(int argc, char** argv)
 	p.load_pdb(pf);
 	fclose(pf);
 	
+	int seqlen = p.get_seq_length();
 	script_var[vars].name = "%SEQLEN";
-	script_var[vars].value.n = p.get_seq_length();
+	script_var[vars].value.n = seqlen;
+	vars++;
+	
+	script_var[vars].name = "$SEQUENCE";
+	script_var[vars].value.psz = new char[seqlen+4];
+	strcpy(script_var[vars].value.psz, p.get_sequence().c_str());
 	vars++;
 	
 	std::vector<std::string> rem_hx = p.get_remarks("650 HELIX");
@@ -325,7 +334,6 @@ int main(int argc, char** argv)
 		fclose(pf);
 	}
 	
-	// TODO: Set some automatic variables.
 	
 	while (program_counter < script_lines.size())
 	{
@@ -374,6 +382,55 @@ int main(int argc, char** argv)
 				
 			}	// HELIX
 			
+			else if (!strcmp(fields[0], "SEARCH"))
+			{
+				l = 1;
+				int sr, er, esr;
+				sr = interpret_single_int(fields[l++]);
+				er = interpret_single_int(fields[l++]);
+				psz = interpret_single_string(fields[l]);
+				esr = er - strlen(psz);
+				
+				n = 0; k = 0;
+				for (i=sr; i<esr; i++)
+				{
+					m = 0;
+					for (j=0; psz[j]; j++)
+					{
+						m += p.get_residue(i+j)->similarity_to(psz[j]);
+					}
+					
+					if (m > n)
+					{
+						k = i;
+						n = m;
+					}
+				}
+				
+				delete[] psz;
+				l++;
+				
+				n = find_var_index(fields[l]);
+				if (n<0) n = vars++;
+				script_var[n].name = fields[l];
+				script_var[n].vt = type_from_name(fields[l]);
+				
+				switch (script_var[n].vt)
+				{
+					case SV_INT: script_var[n].value.n = k; break;
+					case SV_FLOAT: script_var[n].value.f = k; break;
+					case SV_STRING:
+					builder = k;
+					strcpy(script_var[n].value.psz, builder.c_str());
+					break;
+					
+					default:
+					cout << "Bad destination variable type for SEARCH." << endl;
+					return 0xbadfa12;
+				}
+				
+			}	// SEARCH
+			
 			else if (!strcmp(fields[0], "SAVE"))
 			{
 				psz = interpret_single_string(fields[1]);
@@ -403,7 +460,7 @@ int main(int argc, char** argv)
 			else if (!strcmp(fields[0], "LET"))
 			{
 				n = find_var_index(fields[1]);
-				if (n<0)n = vars++;
+				if (n<0) n = vars++;
 				script_var[n].name = fields[1];
 				script_var[n].vt = type_from_name(fields[1]);
 				
@@ -467,23 +524,48 @@ int main(int argc, char** argv)
 					case SV_STRING:
 					
 					psz = interpret_single_string(fields[3]);
+					
+					m = 0;
+					if (fields[4] && !strcmp(fields[4], "FROM"))
+					{
+						m = interpret_single_int(fields[5]);
+						if (m < 0) m = 0;
+						if (m)
+						{
+							if (m > strlen(psz)) psz[0] = 0;
+							else
+							{
+								m--;
+								psz += m;
+								if (fields[6] && !strcmp(fields[6], "FOR"))
+								{
+									k = interpret_single_int(fields[7]);
+									if (k >= 0 && k < strlen(psz)) psz[k] = 0;
+								}
+							}
+						}
+					}
+					
 					if (!strcmp(fields[2], "="))
 					{
-						script_var[n].value.psz = new char(255);
+						script_var[n].value.psz = new char[65536];
 						strcpy(script_var[n].value.psz, psz);
 					}
 					else if (!strcmp(fields[2], "+="))
 					{
-						std::string builder = script_var[n].value.psz;
+						builder = script_var[n].value.psz;
 						builder.append(psz);
+						script_var[n].value.psz = new char[65536];
 						strcpy(script_var[n].value.psz, builder.c_str());
 					}
 					else
 					{
+						psz -= m;
 						delete[] psz;
 						cout << "Unimplemented operator " << fields[2] << " for string assignment." << endl;
 						return 0x51974c5;		// If you use your imagination, that says "syntax".
 					}
+					psz -= m;
 					delete[] psz;
 					break;
 					

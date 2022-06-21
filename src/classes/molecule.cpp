@@ -1255,7 +1255,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     				Bond* lb = la->get_bond_between(aadef->aabonds[i]->bname);
     				if (!lb)
     				{
-    					// TODO: THEN FUCKING ADD IT!
+    					// TODO: Add the missing bond if possible.
     					cout << "Warning: No bond between " << la->residue << ":" << la->name
 							 << " and " << aadef->aabonds[i]->bname
 							 << endl << flush;

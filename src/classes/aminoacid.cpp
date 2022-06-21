@@ -61,7 +61,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	int atom_prev[ac4];
     	int numgrk[29];			// 24 letters, one based, plus extra space.
     	
-    	Atom *N = nullptr, *HN = nullptr, *C = nullptr, *O = nullptr;
+    	Atom *N = nullptr, *HN = nullptr, *CA = nullptr, *C = nullptr, *O = nullptr;
     	
     	for (i=0; i<ac4; i++) atom_Greek[i] = atom_append[i] = atom_prepend[i] = 0;
     	
@@ -110,10 +110,11 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 							O = ab[j]->btom->is_bonded_to(CHALCOGEN, 2);
 							if (O)
 							{
-								atoms[i]->name = new char[5];
-								strcpy(atoms[i]->name, "CA");
-								atoms[i]->is_backbone = true;
-								k = atom_idx_from_ptr(atoms[i]);
+								CA = atoms[i];
+								CA->name = new char[5];
+								strcpy(CA->name, "CA");
+								CA->is_backbone = true;
+								k = atom_idx_from_ptr(CA);
 								if (k >= 0)
 								{
 									atom_Greek[k] = 1;
@@ -438,7 +439,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     }	// if SMILES
     else
     {
-    	cout << "WARNING no atoms for " << letter << " (blank SMILES)." << endl;
+    	if (letter != '#') cout << "WARNING no atoms for " << letter << " (blank SMILES)." << endl;
     	return;
 	}
     
@@ -841,6 +842,12 @@ int AminoAcid::from_pdb(FILE* is)
                         //throw ATOM_NOT_OF_AMINO_ACID;
                     }
                     else aadef = aaa;
+                    
+                    if (aaa && !aaa->aabonds)
+                    {
+                    	AminoAcid* tempaa = new AminoAcid(aaa->_1let);
+                    	delete tempaa;
+                    }
 
                     if (aaa && aaa->aabonds)
                     {
@@ -849,6 +856,7 @@ int AminoAcid::from_pdb(FILE* is)
                             AABondDef* aab = aaa->aabonds[i];
                             if (!strcmp(aab->aname, a->name))
                             {
+                            	// cout << aaa->_1let << ":" << aab->aname << cardinality_printable(aab->cardinality) << aab->bname << endl;
                                 if (aaa->aabonds[i] && aaa->aabonds[i]->acharge)
                                 {
                                     a->increment_charge(aaa->aabonds[i]->acharge);
@@ -865,6 +873,21 @@ int AminoAcid::from_pdb(FILE* is)
                                         if (b) b->can_rotate = false;
                                     }
                                 }
+                            }
+                            else if (!strcmp(aab->bname, a->name))
+                            {
+                            	Atom* btom = get_atom(aab->aname);
+                            	if (btom && !btom->is_bonded_to(a))
+                            	{
+                            		a->bond_to(btom, aab->cardinality);
+                                    if (aab->cardinality == 1 && !aab->can_rotate)
+                                    {
+                                        Bond* b = a->get_bond_between(btom);
+                                        if (b) b->can_rotate = false;
+                                        b = btom->get_bond_between(a);
+                                        if (b) b->can_rotate = false;
+                                    }
+                            	}
                             }
                         }
                     }
@@ -997,6 +1020,7 @@ void AminoAcid::load_aa_defs()
                     if (fields[3])
                     {
                 		aa_defs[idx].SMILES = fields[3];
+                		if (strstr(aa_defs[idx].SMILES.c_str(), "N1")) aa_defs[idx].proline_like = proline_like = true;
                 	}
 
                     tbdctr++;
@@ -1396,8 +1420,14 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     // For the CA-C bond, of a residue not at the C-terminus, there is a torsion angle that will place
     // the local N atom as far as possible from the next residue's N atom.
     LocRotation retval;
-    if (m_mcoord) return retval;	// NO.
-    //return retval;
+    if (m_mcoord)
+    {
+    	cout << *this << " is a metal-coordinating residue; cannot rotate backbone." << endl;
+    	return retval;	// NO.
+	}
+    // return retval;
+    
+    if (aadef && aadef->proline_like) return retval;
 
     // Get the location of the previous C, and the location of the local C.
     Atom *atom, *btom;
@@ -1427,11 +1457,25 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
         break;
 
     	default:
+    	cout << "Bad direction for " << *this << "; cannot rotate backbone." << endl;
         return retval;
     }
-    if (!atom || !btom) return retval;
+    if (!atom || !btom)
+    {
+    	cout << "Not found axial atom for " << *this << "; cannot rotate backbone." << endl;
+    	return retval;
+	}
     Bond* b = atom->get_bond_between(btom);
-    if (!b) return retval;
+    if (!b)
+    {
+    	atom->bond_to(btom, 1);
+    	b = atom->get_bond_between(btom);
+	}
+    if (!b)
+    {
+    	cout << "No bond between " << *this << ":" << atom->name << "-" << btom->name << "; cannot rotate backbone." << endl;
+    	return retval;
+	}
     if (!m_mcoord) b->can_rotate = true;
     
 	switch (dir)
@@ -1450,15 +1494,20 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
         break;
 
     	default:
-        return retval;
+        cout << "Bad direction (second attempt) for " << *this << "; cannot rotate backbone." << endl;
+    	return retval;
     }
     
     // Use the SCoord as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
     int i, step=3;
     float bestrad=0, bestr;
     
-    if (!atom || !btom) return retval;
-    bestr = atom->get_location().get_3d_distance(btom->get_location());
+    if (!atom || !btom)
+    {
+    	cout << "Not found reference atom for " << *this << "; cannot rotate backbone." << endl;
+    	return retval;
+	}
+    bestr = atom->get_location().get_3d_distance(btom->get_location()) * 1000;
     for (i=0; i<360; i+=step)
     {
     	b->rotate(fiftyseventh*step, true);
@@ -1471,7 +1520,8 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     }
 
     // To this maximum stretch angle, add the input angle and do the backbone rotation.
-    LocatedVector retlv = rotate_backbone(dir, bestrad+angle);
+    // cout << "Calling " << *this << ".rotate_backbone( " << (bestrad*fiftyseven) << " + " << (angle*fiftyseven) << ")..." << endl;
+	LocatedVector retlv = rotate_backbone(dir, bestrad+angle);
     retval.v.r = retlv.r;
     retval.v.theta = retlv.theta;
     retval.v.phi = retlv.phi;
@@ -1486,9 +1536,19 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     LocatedVector retval;
     Point rel, bloc;
     char aname[5], bname[5];
-    if (!atoms) return retval;
-    if (m_mcoord) return retval;	// NO.
+    if (!atoms) 
+    {
+    	// cout << "No atoms for " << get_3letter() << residue_no << "; cannot rotate backbone." << endl;
+    	return retval;
+	}
+    if (m_mcoord)
+    {
+    	// cout << get_3letter() << residue_no << "has a metal coordination; cannot rotate backbone." << endl;
+    	return retval;	// NO.
+	}
     // return retval;
+    
+    if (aadef && aadef->proline_like) return retval;
 
     // Determine the center of rotation and rotation SCoord.
     switch (direction)
@@ -1517,15 +1577,23 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
 		    return retval;
     }
     rotcen = get_atom(aname);
-    if (!rotcen) return retval;
+    if (!rotcen)
+    {
+    	// cout << get_3letter() << residue_no << ":" << aname << "not found; cannot rotate backbone." << endl;
+    	return retval;
+	}
     retval.origin = rotcen->get_location();
     btom = get_atom(bname);
-    if (!btom) return retval;
+    if (!btom)
+    {
+    	// cout << get_3letter() << residue_no << ":" << bname << "not found; cannot rotate backbone." << endl;
+    	return retval;
+	}
 
     Bond* b = rotcen->get_bond_between(btom);
     if (!b || !b->can_rotate)
     {
-        // cout << "FORBIDDEN cannot rotate " << *this << ":" << rotcen->name << "-" << btom->name << endl;
+        // cout << "Non-rotatable bond " << *this << ":" << rotcen->name << "-" << btom->name << "; cannot rotate backbone." << endl;
         retval.r = 0;		// Fail condition.
         return retval;
     }

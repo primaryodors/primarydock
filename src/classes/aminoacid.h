@@ -36,6 +36,7 @@ struct AADef
  	bool aromatic = false;
  	bool can_coord_metal = false;
  	int charged = 0;
+ 	bool loaded = false;
 };
 
 struct MetalCoord
@@ -97,6 +98,7 @@ class AminoAcid : public Molecule
  	// Misc.
  	void delete_sidechain();
  	static Molecule** aas_to_mols(AminoAcid** aas);
+ 	int similarity_to(const char letter);
 
  	// Public properties.
  	int strand;

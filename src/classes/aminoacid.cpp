@@ -521,6 +521,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		}
 	}
 	
+	aa_defs[idx].loaded = true;
+	
 	/*cout << "Hydrophilic? " << ((aa_defs[idx].hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD) ? "Y" : "N") << " (" << aa_defs[idx].hydrophilicity << ")" << endl;
 	cout << "Metal coord? " << (aa_defs[idx].can_coord_metal ? "Y" : "N") << endl;
 	cout << "Charge? " << aa_defs[idx].charged << endl;
@@ -1101,6 +1103,37 @@ bool AminoAcid::can_reach(AminoAcid* other) const
     else return false;
 }
 
+int AminoAcid::similarity_to(const char letter)
+{
+	AminoAcid* a = nullptr;
+	if (!aa_defs[letter].SMILES.length()) return 0;
+	if (!aa_defs[letter].loaded)
+	{
+		a = new AminoAcid(letter);
+		delete a;
+	}
+	if (!aadef) return 0;
+	
+	int retval = 0;
+	if (aadef->hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD
+		&&
+		aa_defs[letter].hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD)
+	{
+		retval += fmin(aadef->hydrophilicity, aa_defs[letter].hydrophilicity)*2;
+		if (aadef->charged == aa_defs[letter].charged) retval += 1;
+	}
+	if (aadef->hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD
+		&&
+		aa_defs[letter].hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD)
+		retval += 2;
+	// cout << aadef->hydrophilicity << "|" << aa_defs[letter].hydrophilicity << endl;
+	// return retval;
+	
+	if (aadef->aromatic == aa_defs[letter].aromatic) retval += 2;
+	if (aadef->can_coord_metal == aa_defs[letter].can_coord_metal) retval += 1;
+	
+	return retval;
+}
 
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 {

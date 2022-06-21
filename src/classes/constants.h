@@ -69,6 +69,8 @@
 
 #define PROT_MAX_RGN 40
 
+#define AMINOACID_HYDROPHILICITY_THRESHOLD 0.2
+
 // Torsion angles for various helices and for beta strands.
 #define ALPHA_PHI fiftyseventh*-57.8
 #define ALPHA_PSI fiftyseventh*-47.0

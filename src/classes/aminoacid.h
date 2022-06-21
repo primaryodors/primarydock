@@ -32,6 +32,10 @@ struct AADef
  	AABondDef** aabonds = nullptr;
  	bool proline_like = false;
  	std::string SMILES = "";
+ 	float hydrophilicity = 0;
+ 	bool aromatic = false;
+ 	bool can_coord_metal = false;
+ 	int charged = 0;
 };
 
 struct MetalCoord
@@ -88,6 +92,7 @@ class AminoAcid : public Molecule
 
  	// Intermol functions.
  	float get_intermol_binding(AminoAcid** neighbors, bool backbone_atoms_only = false);
+    float hydrophilicity();
 
  	// Misc.
  	void delete_sidechain();

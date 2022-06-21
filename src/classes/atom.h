@@ -52,7 +52,7 @@ class Ring
 	
 	int get_atom_count() { return atcount; }
 	Atom* get_atom(int index);
-	Atom** get_atoms();
+	Atom** get_atoms() const;
 	RING_TYPE get_type();
 	Point get_center();
 	SCoord get_normal();
@@ -129,6 +129,8 @@ class Atom
     Bond* get_bond_between(const char* bname);
     Bond* get_bond_by_idx(int bidx);
     int get_idx_bond_between(Atom* btom);
+    
+    float hydrophilicity_rule();
     
     // Ring membership.
     int num_rings();
@@ -249,6 +251,7 @@ bool atoms_are_conjugated(Atom** atoms);
 
 static bool read_elem_syms = false;
 
+std::ostream& operator<<(std::ostream& os, const Ring& r);
 
 
 

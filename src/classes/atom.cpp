@@ -549,6 +549,25 @@ float Atom::get_charge()
     return charge;
 }
 
+float Atom::hydrophilicity_rule()
+{
+	float total = 0;
+	
+	if (is_polar()) total += fabs(is_polar());
+	else if (Z == 7 || Z == 8) total += 1;
+	else if (Z == 15 || Z == 16) total += 0.5;
+	else if (family == PNICTOGEN) total += 0.25;
+	else if (family == CHALCOGEN) total += 0.25;
+	else if (family == HALOGEN)
+	{
+		if (is_bonded_to("H") || is_bonded_to(CHALCOGEN)) total += 1;
+	}
+	
+	total += fabs(get_charge());
+	
+	return total;
+}
+
 Bond::Bond()
 {
     atom = btom = 0;
@@ -1608,7 +1627,7 @@ int Atom::get_count_pi_bonds()
 	int i, retval=0;
 	for (i=0; i<geometry; i++)
 	{
-		if (bonded_to[i].btom && bonded_to[i].cardinality > 1 && bonded_to[i].cardinality < 2) retval++;
+		if (bonded_to[i].btom && bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval++;
 	}
 	return retval;
 }
@@ -1805,7 +1824,7 @@ Atom* Ring::get_atom(int index)
 	return atoms[index];
 }
 
-Atom** Ring::get_atoms()
+Atom** Ring::get_atoms() const
 {
 	if (!atcount) return nullptr;
 	Atom** retval = new Atom*[atcount+2];
@@ -1946,6 +1965,7 @@ bool atoms_are_conjugated(Atom** atoms)
 		switch (atoms[i]->get_family())
 		{
 			case TETREL:
+			// cout << atoms[i]->name << "|" << atoms[i]->get_count_pi_bonds() << "|" << atoms[i]->get_charge() << endl;
 			if (atoms[i]->get_count_pi_bonds() != 1
 				&&
 				!atoms[i]->get_charge()
@@ -1985,7 +2005,20 @@ void Ring::determine_type()
 	else type = COPLANAR;
 }
 
-
+std::ostream& operator<<(std::ostream& os, const Ring& r)
+{
+	Atom** a = r.get_atoms();
+	if (!a) os << "[empty]";
+	else
+	{
+		os << "[";
+		int i;
+		for (i=0; a[i]; i++) os << a[i]->name << " ";
+		os << "]";
+	}
+	
+	return os;
+}
 
 
 

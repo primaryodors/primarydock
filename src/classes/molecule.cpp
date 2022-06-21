@@ -420,6 +420,8 @@ int Molecule::from_sdf(char const* sdf_dat)
     int i,j=0,lncount;
 
     immobile = false;
+    
+    // cout << sdf_dat << endl;
 
     lines[j++] = sdf_dat;
     for (i=0; sdf_dat[i]; i++)
@@ -1323,6 +1325,21 @@ Bond** AminoAcid::get_rotatable_bonds()
     return retval;
 }
 
+float Molecule::hydrophilicity()
+{
+	int i, count;
+	float total;
+	for (i=0; atoms[i]; i++)
+	{
+		int Z = atoms[i]->get_Z();
+		if (Z==1) continue;
+		
+		total += atoms[i]->hydrophilicity_rule();
+		count++;
+	}
+	return count ? (total / count) : 0;
+}
+
 Bond** Molecule::get_all_bonds(bool unidirectional)
 {
     if (noAtoms(atoms)) return 0;
@@ -1498,6 +1515,17 @@ Point Molecule::get_barycenter() const
     for (i=0; i<atcount; i++) locs[i] = atoms[i]->get_location();
 
     return average_of_points(locs, atcount);
+}
+
+float Molecule::get_charge()
+{
+	int i;
+	float charge=0;
+	for (i=0; atoms[i]; i++)
+	{
+		charge += atoms[i]->get_charge();
+	}
+	return charge;
 }
 
 void Molecule::recenter(Point nl)

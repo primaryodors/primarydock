@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
     char letter = 'A';
-    if (argc>1)
+    if (argc>1 && strlen(argv[1]) > 1)
     {
         int i, j, seqarg=1;
 
@@ -67,7 +67,10 @@ int main(int argc, char** argv)
     }
     else
     {
+    	if (argc>1) letter = argv[1][0];
         AminoAcid aa(letter);
+        
+        cout << aa.get_name() << " hydrophilicity = " << aa.hydrophilicity() << endl;
 
         const char* outfn = "test.pdb";
         FILE* pf = fopen(outfn, "wb");

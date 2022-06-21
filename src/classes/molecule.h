@@ -52,6 +52,7 @@ class Molecule
     Atom* get_nearest_atom(Point loc) const;
     Atom* get_nearest_atom(Point loc, intera_type capable_of) const;
     Point get_bounding_box() const;				// Return the +x+y+z vertex of a bounding box, including vdW radii, if center={0,0,0}.
+    float get_charge();
 
     // Spatial functions.
     Point get_barycenter() const;
@@ -99,6 +100,7 @@ class Molecule
     float get_intermol_clashes(Molecule** ligands);
     float get_intermol_binding(Molecule* ligand);
     float get_intermol_binding(Molecule** ligands);
+    float hydrophilicity();
 
     static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);
 

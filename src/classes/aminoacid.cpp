@@ -445,8 +445,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     
     if (!atoms || !atoms[0]) cout << "WARNING no atoms for " << aa_defs[idx].name << " (" << aa_defs[idx].SMILES << ")" << endl;
     
-    identify_acidbase();
-    
     if (!aa_defs[idx].aabonds)
     {
     	AABondDef** aabd = new AABondDef*[get_atom_count()+16];
@@ -501,6 +499,34 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     
 	// flatten();
 	minimize_internal_clashes();
+	
+	
+    
+    identify_acidbase();
+    identify_rings();
+    
+    aa_defs[idx].hydrophilicity = AminoAcid::hydrophilicity();
+    if (capable_of_inter(mcoord)) aa_defs[idx].can_coord_metal = true;
+    if (fabs(get_charge()) >= 0.9) aa_defs[idx].charged = sgn(get_charge());
+    
+    if (rings)
+    {
+    	for (i=0; rings[i]; i++)
+    	{
+    		if (rings[i]->is_conjugated() && rings[i]->is_coplanar())
+    		{
+    			aa_defs[idx].aromatic = true;
+    			break;
+			}
+		}
+	}
+	
+	/*cout << "Hydrophilic? " << ((aa_defs[idx].hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD) ? "Y" : "N") << " (" << aa_defs[idx].hydrophilicity << ")" << endl;
+	cout << "Metal coord? " << (aa_defs[idx].can_coord_metal ? "Y" : "N") << endl;
+	cout << "Charge? " << aa_defs[idx].charged << endl;
+	cout << "Aromatic? " << (aa_defs[idx].aromatic ? "Y" : "N") << endl;*/
+	
+	
 	
 	Atom* CA = get_atom("CA");
 	Atom* CB = get_atom("CB");
@@ -1101,7 +1127,8 @@ bool AminoAcid::capable_of_inter(intera_type inter)
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
-        InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], atoms[i]);
+        if (InteratomicForce::atom_is_capable_of(atoms[i], inter)) return true;
+        /*InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], atoms[i]);
         if (!iff) continue;
         for (j=0; iff[j]; j++)
             if (iff[j]->get_type() == inter)
@@ -1109,10 +1136,28 @@ bool AminoAcid::capable_of_inter(intera_type inter)
                 // cout << *this << " is capable of " << inter << " binding because of atom " << atoms[i]->name << endl;
                 delete[] iff;
                 return true;
-            }
+            }*/
     }
 
     return false;
+}
+
+float AminoAcid::hydrophilicity()
+{
+	int i, count=0;
+	float total=0;
+	for (i=0; atoms[i]; i++)
+	{
+		if (atoms[i]->is_backbone) continue;
+		
+		int Z = atoms[i]->get_Z();
+		int fam = atoms[i]->get_family();
+		if (Z==1) continue;
+		
+		total += atoms[i]->hydrophilicity_rule();
+		count++;
+	}
+	return count ? (total / count) : 0;
 }
 
 void AminoAcid::aamove(SCoord move_amt)

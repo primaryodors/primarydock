@@ -287,6 +287,27 @@ int main(int argc, char** argv)
 	script_var[vars].value.n = p.get_seq_length();
 	vars++;
 	
+	std::vector<std::string> rem_hx = p.get_remarks("650 HELIX");
+	for (l=0; l<rem_hx.size(); l++)
+	{
+		char buffer[1024];
+		char buffer1[1024];
+		strcpy(buffer, rem_hx[l].c_str());
+		char** fields = chop_spaced_fields(buffer);
+		
+		sprintf(buffer1, "%c%s.s", '%', fields[3]);
+		script_var[vars].name = buffer1;
+		script_var[vars].value.n = atoi(fields[4]);
+		vars++;
+		
+		sprintf(buffer1, "%c%s.e", '%', fields[3]);
+		script_var[vars].name = buffer1;
+		script_var[vars].value.n = atoi(fields[5]);
+		vars++;
+		
+		delete[] fields;
+	}
+	
 	if (pf = fopen(script_fname.c_str(), "rb"))
 	{
 		while (!feof(pf))
@@ -369,6 +390,7 @@ int main(int argc, char** argv)
 				cout << "Wrote " << psz << "." << endl;
 				
 				fclose(pf);
+				delete[] psz;
 				
 				if (fields[2] 
 					&&

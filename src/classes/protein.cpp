@@ -176,8 +176,17 @@ bool Protein::add_sequence(const char* lsequence)
 
 void Protein::save_pdb(FILE* os)
 {
-    if (!residues) return;
     int i, offset=0;
+
+	if (remarks.size())
+	{
+		for (i=0; i<remarks.size(); i++)
+		{
+			fprintf(os, "%s", remarks[i].c_str());
+		}
+	}
+	
+    if (!residues) return;
     for (i=0; residues[i]; i++)
     {
         residues[i]->save_pdb(os, offset);
@@ -203,23 +212,97 @@ void Protein::end_pdb(FILE* os)
 int Protein::load_pdb(FILE* is)
 {
     AminoAcid* restmp[65536];
-
+    char buffer[1024];
+    Atom* a;
+    
+    AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file. Yeah it's a shoddy way to program but that's the best that can be expected of KMS's horrible mistake.
+    
     int i, rescount=0;
 
     while (!feof(is))
     {
         try
         {
-            AminoAcid* aa = new AminoAcid(is);
-            // cout << rescount << " " << flush;
-            restmp[rescount++] = aa;
-            restmp[rescount] = NULL;
+        	int told = ftell(is);
+        	fgets(buffer, 1003, is);
+        	
+        	if (buffer[0] == 'A' &&
+        		buffer[1] == 'T' &&
+        		buffer[2] == 'O' &&
+        		buffer[3] == 'M'
+        		)
+    		{
+    			fseek(is, told, SEEK_SET);
+    			
+				char tmp3let[5];
+    			for (i=0; i<3; i++)
+    				tmp3let[i] = buffer[17+i];
+    			tmp3let[4] = 0;
+    			
+    			for (i=0; i<256; i++)
+    			{
+    				if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
+    				{
+    					AminoAcid* aa = new AminoAcid(is);
+						// cout << rescount << tmp3let << " " << flush;
+						restmp[rescount++] = aa;
+						restmp[rescount] = NULL;
+						goto _found_AA;
+    				}
+    			}
+    			
+    			// If no AA, load a metal.
+                if (!metcount % 16)
+                {
+                    Atom** mtmp = new Atom*[metcount+20];
+                    if (metals)
+                    {
+                        for (i=0; metals[i]; i++)
+                            mtmp[i] = metals[i];
+                        mtmp[i] = NULL;
+                        delete metals;
+                    }
+                    metals = mtmp;
+                }
+    			
+    			a = new Atom(is);
+                metals[metcount++] = a;
+                metals[metcount] = NULL;
+                // cout << "M" << metcount << " ";
+
+                for (i=0; i<26; i++)
+                {
+                    if (aa_defs[i]._1let && !strcmp(aa_defs[i]._3let, a->aa3let ))
+                    {
+                        a->aaletter = aa_defs[i]._1let;
+                        break;
+                    }
+                }
+    		}
+    		else
+    		{
+    			if (buffer[0] == 'R' &&
+            		buffer[1] == 'E' &&
+            		buffer[2] == 'M' &&
+            		buffer[3] == 'A' &&
+            		buffer[4] == 'R' &&
+            		buffer[5] == 'K'
+            		)
+            	{
+	            	remarks.push_back(buffer);
+	            	// cout << "Found remark " << buffer;
+            	}
+    		}
+        	
+            _found_AA:
+            ;
         }
         catch (int ex)
         {
             // cout << "Exception " << ex << endl;
-            if (ex == ATOM_NOT_OF_AMINO_ACID)
+            switch (ex)
             {
+            	case ATOM_NOT_OF_AMINO_ACID:
                 if (!metcount % 16)
                 {
                     Atom** mtmp = new Atom*[metcount+20];
@@ -233,7 +316,7 @@ int Protein::load_pdb(FILE* is)
                     metals = mtmp;
                 }
 
-                Atom* a = new Atom(is);
+                a = new Atom(is);
                 metals[metcount++] = a;
                 metals[metcount] = NULL;
 
@@ -245,9 +328,24 @@ int Protein::load_pdb(FILE* is)
                         break;
                     }
                 }
+                break;
 
+            	case NOT_ATOM_RECORD:
+            	fgets(buffer, 1003, is);
+            	cout << buffer << endl;
+            	if (buffer[0] == 'R' &&
+            		buffer[1] == 'E' &&
+            		buffer[2] == 'M' &&
+            		buffer[3] == 'A' &&
+            		buffer[4] == 'R' &&
+            		buffer[5] == 'K'
+            		)
+	            	remarks.push_back(buffer);
+	            break;
+	            
+	            default:
+	            throw 0xbadca22;
             }
-            else throw 0xbadca22;
         }
     }
 
@@ -306,8 +404,7 @@ int  Protein::get_seq_length()
 {
     if (!sequence) return 0;
     int i;
-    for (i=0; sequence[i]; i++)
-        ;
+    for (i=0; sequence[i]; i++);	// Obtain the count.
     return i;
 }
 
@@ -317,6 +414,18 @@ int  Protein::get_start_resno()
     else return residues[0]->get_residue_no();
 }
 
+std::vector<std::string> Protein::get_remarks(std::string search_for)
+{
+	std::vector<string> retval;
+	int i;
+	for (i=0; i<remarks.size(); i++)
+	{
+		if (!search_for.length() || strstr(remarks[i].c_str(), search_for.c_str()))
+			retval.push_back(remarks[i]);
+	}
+	
+	return retval;
+}
 
 void Protein::set_clashables()
 {

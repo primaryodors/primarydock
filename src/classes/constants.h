@@ -61,6 +61,7 @@
 #define USE_VOXEL_ARRAY false
 
 #define ATOM_NOT_OF_AMINO_ACID 0x907aa
+#define NOT_ATOM_RECORD 0xb1207e19
 
 #define _MAX_NUM_FORCES 65536
 

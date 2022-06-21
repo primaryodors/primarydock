@@ -436,8 +436,13 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	
     	get_rotatable_bonds();
     }	// if SMILES
+    else
+    {
+    	cout << "WARNING no atoms for " << letter << " (blank SMILES)." << endl;
+    	return;
+	}
     
-    if (!atoms) cout << "WARNING no atoms for " << aa_defs[idx].name << " (" << aa_defs[idx].SMILES << ")" << endl;
+    if (!atoms || !atoms[0]) cout << "WARNING no atoms for " << aa_defs[idx].name << " (" << aa_defs[idx].SMILES << ")" << endl;
     
     identify_acidbase();
     
@@ -734,6 +739,8 @@ void AminoAcid::save_pdb(FILE* os, int atomno_offset)
 int AminoAcid::from_pdb(FILE* is)
 {
     /*
+              1111111111222222222233333333334444444444555555555566666666667777777777
+    01234567890123456789012345678901234567890123456789012345678901234567890123456789
     ATOM     55  SG  CYS     4       6.721  -8.103   4.542  1.00001.00           S
     */
     char buffer[1024], origbuf[1024], res3let[5];
@@ -749,15 +756,16 @@ int AminoAcid::from_pdb(FILE* is)
         strcpy(origbuf, buffer);
         char** fields = chop_spaced_fields(buffer);
 
-        if (fields)
+        try
         {
-            if (!strcmp(fields[0], "ATOM")
-                /*||
-                !strcmp(fields[0], "HETATM")*/
-               )
-            {
-                try
-                {
+		    if (fields)
+		    {
+		    	// cout << fields[0] << endl;
+		        if (!strcmp(fields[0], "ATOM")
+		            /*||
+		            !strcmp(fields[0], "HETATM")*/
+		           )
+		        {
                     // cout << "Resno " << fields[4] << " vs old " << resno << endl;
                     if (!residue_no) residue_no = atoi(fields[4]);
                     if (!res3let[0])
@@ -829,7 +837,8 @@ int AminoAcid::from_pdb(FILE* is)
                     {
                         fseek(is, lasttell, SEEK_SET);
                         delete[] fields;
-                        throw ATOM_NOT_OF_AMINO_ACID;
+                        return added;
+                        //throw ATOM_NOT_OF_AMINO_ACID;
                     }
                     else aadef = aaa;
 
@@ -891,11 +900,19 @@ int AminoAcid::from_pdb(FILE* is)
                     }
 
                 }
-                catch (int ex)
-                {
-                    if (ex == ATOM_NOT_OF_AMINO_ACID) throw ex;
-                }
+		        else
+		        {
+		        	fseek(is, lasttell, SEEK_SET);
+		        	delete[] fields;
+		        	return added;
+		    	}
             }
+            else return added;
+        }
+        catch (int ex)
+        {
+            if (ex == ATOM_NOT_OF_AMINO_ACID) throw ex;
+            if (ex == NOT_ATOM_RECORD) throw ex;
         }
         buffer[0] = 0;
 

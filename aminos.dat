@@ -18,7 +18,7 @@ Q		GLN		glutamine			N[C@H](C(=O)O)CCC(=O)N
 G		GLY		glycine				NCC(=O)O
 H		HIS		histidine			N[C@H](C(=O)O)CC1N=CNC=1
 O		HYP		hydroxyproline		N1[C@H](C(=O)O)CC[C@H]1O
-I		ILE		isoleucine			N[C@H](C(=O)O)C(C)CC
+I		ILE		isoleucine			N[C@H](C(=O)O)C(CC)C
 L		LEU		leucine				N[C@H](C(=O)O)CC(C)C
 K		LYS		lysine				N[C@H](C(=O)O)CCCC[NH3+]
 M		MET		methionine			N[C@H](C(=O)O)CCSC

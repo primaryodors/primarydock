@@ -37,6 +37,7 @@ struct AADef
  	bool can_coord_metal = false;
  	int charged = 0;
  	bool loaded = false;
+ 	bool isoleucine_fix = false;
 };
 
 struct MetalCoord

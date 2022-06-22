@@ -958,7 +958,6 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             {
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
-                cout << i << " ";
                 if (i >= stopat) break;
             }
         }

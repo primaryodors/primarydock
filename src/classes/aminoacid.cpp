@@ -365,6 +365,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     		newname += strGrk.substr(atom_Greek[i]-1, 1);
     		if (atom_append[i]) newname += std::to_string(atom_append[i]);
     		
+    		if (aa_defs[idx].isoleucine_fix && atom_Greek[i]==4 && !atom_append[i]) newname += "1";
+    		
     		// cout << atoms[i]->name << " is now " << newname << endl;
     		strcpy(atoms[i]->name, newname.c_str());
     	}
@@ -1042,6 +1044,8 @@ void AminoAcid::load_aa_defs()
                         strcpy(aa_defs[idx]._3let, fields[1]);
                         strcpy(aa_defs[idx].name, fields[2]);
                         aa_defs[idx].reach = 1.09;
+                        
+                        if (!strcmp(aa_defs[idx].name, "isoleucine")) aa_defs[idx].isoleucine_fix = true;
                     }
 
 

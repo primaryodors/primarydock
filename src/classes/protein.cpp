@@ -939,7 +939,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             }
         }
         delete[] lr2;
-
+        
 		// cout << "Rotating " << *aa << " phi " << (phi*fiftyseven) << " degrees." << endl;
         LocRotation lr = aa->rotate_backbone_abs(dir1, phi);
 

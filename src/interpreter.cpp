@@ -213,6 +213,7 @@ int main(int argc, char** argv)
 	int i, j, k, l, m, n;
 	float f;
 	char* psz;
+	Point pt;
 	std::string builder;
 	string script_fname = "";
 	string PDB_fname = "";
@@ -479,6 +480,7 @@ int main(int argc, char** argv)
 						cout << "Unimplemented operator " << fields[2] << " for int assignment." << endl;
 						return 0x51974c5;
 					}
+					l=0;
 					break;
 					
 					case SV_FLOAT:
@@ -492,6 +494,7 @@ int main(int argc, char** argv)
 						cout << "Unimplemented operator " << fields[2] << " for float assignment." << endl;
 						return 0x51974c5;
 					}
+					l=0;
 					break;
 					
 					case SV_POINT:
@@ -519,15 +522,18 @@ int main(int argc, char** argv)
 						return 0x51974c5;
 					}
 					
+					l=0;
+					
 					break;
 					
 					case SV_STRING:
 					
 					psz = interpret_single_string(fields[3]);
 					
-					m = 0;
+					l = m = 0;
 					if (fields[4] && !strcmp(fields[4], "FROM"))
 					{
+						l+=2;
 						m = interpret_single_int(fields[5]);
 						if (m < 0) m = 0;
 						if (m)
@@ -539,6 +545,7 @@ int main(int argc, char** argv)
 								psz += m;
 								if (fields[6] && !strcmp(fields[6], "FOR"))
 								{
+									l+=2;
 									k = interpret_single_int(fields[7]);
 									if (k >= 0 && k < strlen(psz)) psz[k] = 0;
 								}
@@ -571,6 +578,74 @@ int main(int argc, char** argv)
 					
 					default:
 					;
+				}
+				
+				while (fields[4+l] && fields[5+l])
+				{
+					switch (script_var[n].vt)
+					{
+						case SV_INT:
+						m = interpret_single_int(fields[5+l]);
+						if (!strcmp(fields[4+l], "+")) script_var[n].value.n += m;
+						else if (!strcmp(fields[4+l], "-")) script_var[n].value.n -= m;
+						else if (!strcmp(fields[4+l], "*")) script_var[n].value.n *= m;
+						else if (!strcmp(fields[4+l], "/")) script_var[n].value.n /= m;
+						else if (!strcmp(fields[4+l], "^")) script_var[n].value.n = pow(script_var[n].value.n, m);
+						else
+						{
+							cout << "Bad operator " << fields[4+l] << " for int." << endl;
+							return 0x51974c5;
+						}
+						break;
+						
+						case SV_FLOAT:
+						f = interpret_single_float(fields[5+l]);
+						if (!strcmp(fields[4+l], "+")) script_var[n].value.f += f;
+						else if (!strcmp(fields[4+l], "-")) script_var[n].value.f -= f;
+						else if (!strcmp(fields[4+l], "*")) script_var[n].value.f *= f;
+						else if (!strcmp(fields[4+l], "/")) script_var[n].value.f /= f;
+						else if (!strcmp(fields[4+l], "^")) script_var[n].value.f = pow(script_var[n].value.f, f);
+						else
+						{
+							cout << "Bad operator " << fields[4+l] << " for float." << endl;
+							return 0x51974c5;
+						}
+						break;
+						
+						case SV_POINT:
+						pt = interpret_single_point(fields[5+l]);
+						if (!strcmp(fields[4+l], "+")) *script_var[n].value.ppt = script_var[n].value.ppt->add(pt);
+						else if (!strcmp(fields[4+l], "-")) *script_var[n].value.ppt = script_var[n].value.ppt->subtract(pt);
+						else if (!strcmp(fields[4+l], "*")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() * pt.magnitude());
+						else if (!strcmp(fields[4+l], "/")) script_var[n].value.ppt->scale(pt.magnitude());
+						else
+						{
+							cout << "Bad operator " << fields[4+l] << " for point." << endl;
+							return 0x51974c5;
+						}
+						break;
+						
+						case SV_STRING:
+						builder = script_var[n].value.psz;
+						psz = interpret_single_string(fields[5+l]);
+						if (!strcmp(fields[4+l], "+"))
+						{
+							builder.append(psz);
+							script_var[n].value.psz = new char[65536];
+							strcpy(script_var[n].value.psz, builder.c_str());
+						}
+						else
+						{
+							cout << "Bad operator " << fields[4+l] << " for string." << endl;
+							return 0x51974c5;
+						}
+						break;
+						
+						default:
+						;
+					}
+					
+					l += 2;
 				}
 				
 				

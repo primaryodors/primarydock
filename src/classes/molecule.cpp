@@ -1261,6 +1261,29 @@ Bond** AminoAcid::get_rotatable_bonds()
     					cout << "Warning: No bond between " << la->residue << ":" << la->name
 							 << " and " << aadef->aabonds[i]->bname
 							 << endl << flush;
+						
+						Bond** lbb = la->get_bonds();
+						if (lbb)
+						{
+							cout << la->name << " is bonded to:";
+							int o, ag = la->get_geometry();
+							for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
+							cout << "." << endl;
+						}
+						
+						Atom* lba = get_atom(aadef->aabonds[i]->bname);
+						if (lba)
+						{
+							lbb = lba->get_bonds();
+							if (lbb)
+							{
+								cout << lba->name << " is bonded to:";
+								int o, ag = lba->get_geometry();
+								for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
+								cout << "." << endl;
+							}
+						}
+						else cout << aadef->aabonds[i]->bname << " not found." << endl;
 					}
     				else
     				{

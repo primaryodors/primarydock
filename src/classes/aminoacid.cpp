@@ -1293,10 +1293,6 @@ LocRotation* AminoAcid::flatten()
 	Bond* b;
     LocRotation* retval = new LocRotation[5];
     if (m_mcoord) return retval;	// NO.
-    
-    retval[0] = rotate_backbone_abs(N_asc, M_PI);
-    retval[1] = rotate_backbone_abs(CA_asc, M_PI);
-    return retval;
 
     Atom* prevC = previous_residue_C();
     if (!prevC) return retval;
@@ -1374,84 +1370,85 @@ LocRotation* AminoAcid::flatten()
         if (proline) continue;
 
         float planar = 9999, r = 9999;
-        for (i=0; i<50; i++)
+        for (i=0; i<250; i++)
         {
             if (i == 49 && j >= 3) ad[j] = M_PI;
 
             switch(j)
             {
-            case 3:
-                rotate_backbone(N_asc, ad[j]);
-                break;
+		        case 3:
+		            rotate_backbone(N_asc, ad[j]);
+		            break;
 
-            case 4:
-                rotate_backbone(CA_asc, ad[j]);
-                break;
+		        case 4:
+		            rotate_backbone(CA_asc, ad[j]);
+		            break;
 
-            default:
-                ;
+		        default:
+		            ;
             }
 
-            Point pt1, pt2, pt3, pt4, pt5, pt6, pt7, pt8;
+            Point pCA, pC, pO, lN, lCA, lHN, lC, lO;
+            
+            pCA = prevCA->get_location();
+            pC = prevC->get_location();
+            pO = prevO->get_location();
+                
             if (j < 3)
             {
-                pt1 = prevC->get_location();
-                pt2 = prevO->get_location();
-                pt3 = rotate3D(localN->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
-                pt4 = rotate3D(localCA->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
-                pt5 = rotate3D(localHN->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
-                pt6 = rotate3D(localC->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
-                pt7 = rotate3D(localO->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
-                pt8 = prevCA->get_location();
+                lN = rotate3D(localN->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
+                lCA = rotate3D(localCA->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
+                lHN = rotate3D(localHN->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
+                lC = rotate3D(localC->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
+                lO = rotate3D(localO->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
             }
             else
             {
-                pt1 = prevC->get_location();
-                pt2 = prevO->get_location();
-                pt3 = localN->get_location();
-                pt4 = localCA->get_location();
-                pt5 = localHN->get_location();
-                pt6 = localC->get_location();
-                pt7 = localO->get_location();
+                lN = localN->get_location();
+                lCA = localCA->get_location();
+                lHN = localHN->get_location();
+                lC = localC->get_location();
+                lO = localO->get_location();
             }
 
             float lplanar, lr;
 
             switch (j)
             {
-            case 0:
-                lplanar = are_points_planar(pt1, pt2, pt3, pt5);
-                lr = 4;
-                break;
+		        case 0:
+		            lplanar = are_points_planar(pC, pO, lN, lHN);
+		            lr = 4;
+		            break;
 
-            case 1:
-                lplanar = are_points_planar(pt1, pt2, pt3, pt4);
-                lr = 4;
-                break;
+		        case 1:
+		            lplanar = are_points_planar(pC, lN, lHN, lCA);
+		            lr = 4;
+		            break;
 
-            case 2:
-                lplanar = are_points_planar(pt1, pt2, pt3, pt8);
-                lr = 4;
-                break;
+		        case 2:
+		            lplanar = are_points_planar(pC, pO, lN, pCA);
+		            lr = 4;
+		            break;
 
-            case 3:
-                lplanar = are_points_planar(pt3, pt4, pt5, pt6);
-                lr = pt5.get_3d_distance(pt7);
-                break;
+		        case 3:
+		            lplanar = are_points_planar(lN, lCA, lHN, lC);
+		            lr = lHN.get_3d_distance(lO);
+		            break;
 
-            case 4:
-                lplanar = are_points_planar(pt4, pt5, pt6, pt7);
-                lr = pt5.get_3d_distance(pt7);
-                break;
+		        case 4:
+		            lplanar = are_points_planar(lCA, lHN, lC, lO);
+		            lr = lHN.get_3d_distance(lO);
+		            break;
 
-            default:
-                ;
+		        default:
+		            ;
             }
 
-            if ( (i == 49 && j >= 3) ? (lr <= r) : (lplanar <= planar) )
+            if ( (i >= 40 && j >= 3) ? (lr <= r) : (lplanar <= planar) )
             {
                 retval[j].a += ad[j];
-                if (fabs(ad[j]) < 0.5) ad[j] *= 1.1;
+                if (retval[j].a > M_PI) retval[j].a -= M_PI*2;
+                if (fabs(ad[j]) < 0.5) ad[j] *= 1.05;
                 planar = lplanar;
                 r = lr;
             }
@@ -1459,16 +1456,16 @@ LocRotation* AminoAcid::flatten()
             {
                 switch(j)
                 {
-                case 3:
-                    rotate_backbone(N_asc, -ad[j]);
-                    break;
+		            case 3:
+		                rotate_backbone(N_asc, -ad[j]);
+		                break;
 
-                case 4:
-                    rotate_backbone(CA_asc, -ad[j]);
-                    break;
+		            case 4:
+		                rotate_backbone(CA_asc, -ad[j]);
+		                break;
 
-                default:
-                    ;
+		            default:
+		                ;
                 }
                 ad[j] *= -0.5;
             }
@@ -1477,14 +1474,15 @@ LocRotation* AminoAcid::flatten()
         LocatedVector lv = retval[j].get_lv();
         switch(j)
         {
-        case 0:
-        case 1:
-        case 2:
-            rotate(lv, retval[j].a);
-            break;
+		    case 0:
+		    case 1:
+		    case 2:
+                if (retval[j].a > M_PI) retval[j].a -= M_PI*2;
+		        rotate(lv, retval[j].a);
+		        break;
 
-        default:
-            ;
+		    default:
+		        ;
         }
     }
 

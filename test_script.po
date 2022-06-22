@@ -1,4 +1,10 @@
 
+# Example command:
+# clear; make code; bin/interpreter test_script.po testdata/OR1D2.rotated.pdb
+
+LOAD $arg2
+ECHO "Loaded " $PDB
+
 ECHO "Protein is " $PROTEIN ", a peptide of " %SEQLEN " residues."
 
 LET $msg = "TMR4 ends on residue " + %TMR4.e + " and TMR5 starts on residue " + %TMR5.s + "."
@@ -13,13 +19,17 @@ ECHO $msg
 # LET $testing = $SEQUENCE FROM %TMR4.e FOR 20
 # ECHO $testing
 
+SEARCH 1 %SEQLEN "MAYDRYVAIC" %maydryvaic
+LET $maydryvaic = $SEQUENCE FROM %maydryvaic FOR 10
+ECHO "Olfactory receptor motif " $maydryvaic " found at position " %maydryvaic "."
+
 SEARCH %TMR4.e %TMR5.s "HFFCE" %hxxce
 LET $testing = $SEQUENCE FROM %hxxce FOR 5
-ECHO "Motif found at position " %hxxce ": " $testing
+ECHO "EXR2 zinc-binding motif found at position " %hxxce ": " $testing "."
 
 LET %sr = %hxxce - 2
 LET %er = %hxxce + 9
-ECHO "Making alpha helix of " %sr " - " %er
+ECHO "Making alpha helix of " %sr " - " %er "."
 HELIX ALPHA %sr %er
 
 

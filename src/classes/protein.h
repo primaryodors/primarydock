@@ -52,6 +52,7 @@ class Protein
     Atom* get_atom(int resno, const char* aname);
     Point get_atom_location(int resno, const char* aname);
     std::vector<std::string> get_remarks(std::string search_for = "");
+    std::string get_name() { return std::string(name); }
 
     // Metrics functions.
     float get_internal_clashes();

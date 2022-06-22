@@ -218,9 +218,21 @@ int main(int argc, char** argv)
 	string script_fname = "";
 	string PDB_fname = "";
 	FILE* pf;
+		
+	for (i=0; i<256; i++)
+	{
+		script_var[i].name = "";
+		script_var[i].value.n = 0;
+	}
+	vars = 0;
 	
 	for (i=1; i<argc; i++)
 	{
+		script_var[vars].name = (string)"$arg" + std::to_string(i);
+		script_var[vars].value.psz = new char[strlen(argv[i])+4];
+		strcpy(script_var[vars].value.psz, argv[i]);
+		vars++;
+		
 		if (argv[i][0] == '-')
 		{
 			// TODO:
@@ -235,9 +247,10 @@ int main(int argc, char** argv)
 				strcpy(argvil, argv[i]);
 				for (j=0; argvil[j]; j++) if (argvil[j] >= 'A' && argvil[j] <= 'Z') argvil[j] |= 0x20;
 				
-				if (strstr(argvil, ".pdb"))
+				/*if (strstr(argvil, ".pdb"))
 					PDB_fname = argv[i];
-				else
+				else*/
+				if (!script_fname.length())
 					script_fname = argv[i];
 			}
 			else
@@ -248,75 +261,39 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	if (!PDB_fname.length() || !script_fname.length())
+	if (/*!PDB_fname.length() ||*/ !script_fname.length())
 	{
-		cout << "Usage:" << endl << "interpreter protein.pdb script_filename" << endl;
-		cout << "interpreter script_filename protein.pdb" << endl;
+		/*cout << "Usage:" << endl << "interpreter protein.pdb script_filename" << endl;
+		cout << "interpreter script_filename protein.pdb" << endl;*/
+		cout << "Error: no script filename supplied." << endl;
 		cout << endl;
 		return 0;
 	}
-		
-	for (i=0; i<256; i++)
-	{
-		script_var[i].name = "";
-		script_var[i].value.n = 0;
-	}
-	vars = 0;
 	
-	char pdbname[1024];
+	/*char pdbname[1024];
 	strcpy(pdbname, PDB_fname.c_str());
 	char* dot = strchr(pdbname, '.');
 	char* slash = strrchr(pdbname, '/');
-	if (!slash) slash = strrchr(pdbname, '\\');
+	if (!slash) slash = strrchr(pdbname, '\\');*/
 	
 	// Set some automatic variables.
-	script_var[vars].name = "$PDB";
+	/*script_var[vars].name = "$PDB";
 	script_var[vars].value.psz = new char[strlen(pdbname)+4];
 	strcpy(script_var[vars].value.psz, pdbname);
-	vars++;
+	vars++;*/
 	
-	if (dot) dot[0] = '\0';
+	/*if (dot) dot[0] = '\0';
 	Protein p(&slash[1]);
 	script_var[vars].name = "$PROTEIN";
 	script_var[vars].value.psz = new char[strlen(slash)+4];
 	strcpy(script_var[vars].value.psz, &slash[1]);
 	vars++;
-	if (dot) dot[0] = '.';
+	if (dot) dot[0] = '.';*/
+	Protein p("TheProtein");
 	
-	pf = fopen(pdbname, "rb");
+	/*pf = fopen(pdbname, "rb");
 	p.load_pdb(pf);
-	fclose(pf);
-	
-	int seqlen = p.get_seq_length();
-	script_var[vars].name = "%SEQLEN";
-	script_var[vars].value.n = seqlen;
-	vars++;
-	
-	script_var[vars].name = "$SEQUENCE";
-	script_var[vars].value.psz = new char[seqlen+4];
-	strcpy(script_var[vars].value.psz, p.get_sequence().c_str());
-	vars++;
-	
-	std::vector<std::string> rem_hx = p.get_remarks("650 HELIX");
-	for (l=0; l<rem_hx.size(); l++)
-	{
-		char buffer[1024];
-		char buffer1[1024];
-		strcpy(buffer, rem_hx[l].c_str());
-		char** fields = chop_spaced_fields(buffer);
-		
-		sprintf(buffer1, "%c%s.s", '%', fields[3]);
-		script_var[vars].name = buffer1;
-		script_var[vars].value.n = atoi(fields[4]);
-		vars++;
-		
-		sprintf(buffer1, "%c%s.e", '%', fields[3]);
-		script_var[vars].name = buffer1;
-		script_var[vars].value.n = atoi(fields[5]);
-		vars++;
-		
-		delete[] fields;
-	}
+	fclose(pf);*/
 	
 	if (pf = fopen(script_fname.c_str(), "rb"))
 	{
@@ -431,6 +408,65 @@ int main(int argc, char** argv)
 				}
 				
 			}	// SEARCH
+			
+			else if (!strcmp(fields[0], "LOAD"))
+			{
+				psz = interpret_single_string(fields[1]);
+				
+				pf = fopen(psz, "rb");
+				if (!pf)
+				{
+					cout << "Failed to open " << psz << " for reading." << endl;
+					return 0xbadf12e;
+				}
+				p.load_pdb(pf);
+				
+				fclose(pf);
+				
+				script_var[vars].name = "$PDB";
+				script_var[vars].value.psz = new char[strlen(psz)+4];
+				strcpy(script_var[vars].value.psz, psz);
+				vars++;
+				
+				const char* pname = p.get_name().c_str();
+				script_var[vars].name = "$PROTEIN";
+				script_var[vars].value.psz = new char[strlen(pname)+4];
+				strcpy(script_var[vars].value.psz, pname);
+				vars++;
+				
+				delete[] psz;
+	
+				int seqlen = p.get_seq_length();
+				script_var[vars].name = "%SEQLEN";
+				script_var[vars].value.n = seqlen;
+				vars++;
+				
+				script_var[vars].name = "$SEQUENCE";
+				script_var[vars].value.psz = new char[seqlen+4];
+				strcpy(script_var[vars].value.psz, p.get_sequence().c_str());
+				vars++;
+				
+				std::vector<std::string> rem_hx = p.get_remarks("650 HELIX");
+				for (l=0; l<rem_hx.size(); l++)
+				{
+					char buffer[1024];
+					char buffer1[1024];
+					strcpy(buffer, rem_hx[l].c_str());
+					char** fields = chop_spaced_fields(buffer);
+					
+					sprintf(buffer1, "%c%s.s", '%', fields[3]);
+					script_var[vars].name = buffer1;
+					script_var[vars].value.n = atoi(fields[4]);
+					vars++;
+					
+					sprintf(buffer1, "%c%s.e", '%', fields[3]);
+					script_var[vars].name = buffer1;
+					script_var[vars].value.n = atoi(fields[5]);
+					vars++;
+					
+					delete[] fields;
+				}
+			}
 			
 			else if (!strcmp(fields[0], "SAVE"))
 			{

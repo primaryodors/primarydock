@@ -291,6 +291,13 @@ int Protein::load_pdb(FILE* is)
             	{
 	            	remarks.push_back(buffer);
 	            	// cout << "Found remark " << buffer;
+	            	
+	            	if (buffer[7] == '6' && buffer[8] < '!')
+	            	{
+	            		char** fields = chop_spaced_fields(buffer);
+	            		if (fields[2] && !fields[3])
+	            			name = fields[2];
+	            	}
             	}
     		}
         	
@@ -926,7 +933,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                 {
                     LocatedVector lv = lr2[j].get_lv();
                     movable->rotate(lv, lr2[j].a);
-                    if (i == stopat) break;
+                    if (i >= stopat) break;
                 }
 
                 int round_theta = (int)(lr2[j].a*fiftyseven+0.5);
@@ -951,7 +958,8 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             {
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
-                if (i == stopat) break;
+                cout << i << " ";
+                if (i >= stopat) break;
             }
         }
 
@@ -966,7 +974,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             {
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
-                if (i == stopat) break;
+                if (i >= stopat) break;
             }
         }
 

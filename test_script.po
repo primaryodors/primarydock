@@ -7,7 +7,9 @@ ECHO "Loaded " $PDB
 
 ECHO "Protein is " $PROTEIN ", a peptide of " %SEQLEN " residues."
 
-LET @test = [5,3,81] + [10,3,67]
+LET &testing = 3.1416
+LET %inttest = &testing
+LET @test = [5,&testing,81] + [10,%inttest,67]
 LET @test /= 2
 LET @res174 = 174
 ECHO @test " and " @res174
@@ -15,8 +17,8 @@ ECHO @test " and " @res174
 LET $msg = "TMR4 ends on residue " + %TMR4.e + " and TMR5 starts on residue " + %TMR5.s + "."
 ECHO $msg
 
-# LET &testing = 3.1416
-# LET %inttest = &testing
+# 
+# 
 # ECHO "Testing equals " &testing
 # ECHO "Int test equals " ~
 # ECHO %inttest
@@ -39,7 +41,43 @@ ECHO "Making alpha helix of " %sr " - " %er "."
 HELIX ALPHA %sr %er
 
 
+# Going to want a better way to take averages.
+LET %i = %TMR5.s
+LET @5 = %i
+LET %i ++
+LET @5 += %i
+LET %i ++
+LET @5 += %i
+LET %i ++
+LET @5 += %i
+LET %i ++
+LET @5 /= 4
+ECHO "TMR5 top: " @5
+LET @5 += [0,10,0]
+
+LET %i = %TMR3.s
+LET @3 = %i
+LET %i ++
+LET @3 += %i
+LET %i ++
+LET @3 += %i
+LET %i ++
+LET @3 += %i
+LET %i ++
+LET @3 /= 4
+ECHO "TMR3 top: " @3
+LET @3 += [0,10,0]
+
+ECHO "Aligning alpha helix to " @5 " - " @3
+ALIGN %sr %er 4 @5 @3
+
+
 LET $outfname = $PROTEIN
 LET $outfname += ".scripted.pdb"
 SAVE $outfname QUIT
+
+
+
+
+
 

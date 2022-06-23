@@ -47,30 +47,49 @@ VarType type_from_name(const char* varname)
 int find_var_index(const char* varname)
 {
 	int i;
+	
 	for (i=0; i<vars; i++)
 	{
 		if (!strcmp(script_var[i].name.c_str(), varname)) return i;
 	}
 	
+	char buffer[256];
+	char* c;
+	strcpy(buffer, varname);
+	
+	if (c=strchr(buffer,',')) *c=0;
+	else if (c=strchr(buffer,'.')) *c=0;
+	else if (c=strchr(buffer,':')) *c=0;
+	
+	for (i=0; i<vars; i++)
+	{
+		if (!strcmp(script_var[i].name.c_str(), buffer)) return i;
+	}
+	
 	return -1;
 }
+
+float interpret_single_float(const char* param);
 
 Point interpret_Cartesian_literal(const char* param)
 {
 	char const* next;
 	Point pt;
 	
-	pt.x = atof(&param[1]);
+	// pt.x = atof(&param[1]);
+	pt.x = interpret_single_float(&param[1]);
 	next = strchr(&param[1], ',');
 	if (next)
 	{
 		next = &next[1];
-		pt.y = atof(next);
+		// pt.y = atof(next);
+		pt.y = interpret_single_float(next);
 		
 		next = strchr(next, ',');
 		if (next)
 		{
-			pt.z = atof(&next[1]);
+			// pt.z = atof(&next[1]);
+			pt.z = interpret_single_float(&next[1]);
 		}
 	}
 	
@@ -81,6 +100,14 @@ float interpret_single_float(const char* param)
 {
 	int n;
 	Point pt;
+	
+	if ((param[0] >= '0' && param[0] <= '9')
+		||
+		param[0] == '-'
+	   )
+	{
+		return atof(param);
+	}
 	
 	switch (param[0])
 	{
@@ -422,6 +449,57 @@ int main(int argc, char** argv)
 				}
 				
 			}	// SEARCH
+			
+			else if (!strcmp(fields[0], "ALIGN"))
+			{
+				int sr, er, eachend;
+				Point sp, ep;
+				l = 1;
+				sr = interpret_single_int(fields[l++]);
+				er = interpret_single_int(fields[l++]);
+				eachend = interpret_single_int(fields[l++]);
+				if (!eachend) eachend = 1;
+				sp = interpret_single_point(fields[l++]);
+				ep = interpret_single_point(fields[l++]);
+				
+				// From start and end residues inwards for a total of eachend, average the CA locations.
+				Point sl(0,0,0), el(0,0,0);
+				for (i=0; i<eachend; i++)	// It's actually easier to average manually than to screw around with object arrays.
+				{
+					AminoAcid* aa = p.get_residue(sr+i);
+					if (aa) sl = sl.add(aa->get_CA_location());
+					aa = p.get_residue(er-i);
+					if (aa) el = el.add(aa->get_CA_location());
+				}
+				
+				if (eachend > 1)
+				{
+					sl.scale(sl.magnitude()/eachend);
+					el.scale(el.magnitude()/eachend);
+				}
+				
+				// Translate the range so that the starting average moves to the target start point.
+				SCoord motion = sp.subtract(sl);
+				for (i=sr; i<=er; i++)
+				{
+					AminoAcid* aa = p.get_residue(i);
+					if (aa) aa->aamove(motion);
+				}
+				ep = ep.add(motion);
+				
+				// Rotate the range about the start point so the ending average moves to the target end point.
+				Rotation rot = align_points_3d(&el, &ep, &sp);
+				LocatedVector lv = rot.v;
+				lv.origin = sp;
+				
+				// TODO: Offer the option to align middle residues to point toward some outside landmark.
+				for (i=sr; i<=er; i++)
+				{
+					AminoAcid* aa = p.get_residue(i);
+					if (aa) aa->rotate(lv, rot.a);
+				}
+				
+			}	// ALIGN
 			
 			else if (!strcmp(fields[0], "LOAD"))
 			{

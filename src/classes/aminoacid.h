@@ -70,6 +70,7 @@ class AminoAcid : public Molecule
  	Atom* previous_residue_C();
  	Atom* next_residue_N();
  	Atom* HN_or_substitute();
+ 	Point get_CA_location();
 
  	// Serialization.
  	int from_pdb(FILE* instream);							// returns number of atoms loaded.

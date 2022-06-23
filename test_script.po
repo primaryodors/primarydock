@@ -7,6 +7,11 @@ ECHO "Loaded " $PDB
 
 ECHO "Protein is " $PROTEIN ", a peptide of " %SEQLEN " residues."
 
+LET @test = [5,3,81] + [10,3,67]
+LET @test /= 2
+LET @res174 = 174
+ECHO @test " and " @res174
+
 LET $msg = "TMR4 ends on residue " + %TMR4.e + " and TMR5 starts on residue " + %TMR5.s + "."
 ECHO $msg
 

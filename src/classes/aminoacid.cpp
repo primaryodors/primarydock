@@ -1201,6 +1201,13 @@ float AminoAcid::hydrophilicity()
 	return count ? (total / count) : 0;
 }
 
+Point AminoAcid::get_CA_location()
+{
+	Atom* a = get_atom("CA");
+	if (!a) return Point(0,0,0);
+	return a->get_location();
+}
+
 void AminoAcid::aamove(SCoord move_amt)
 {
 	if (movability < MOV_ALL) return;

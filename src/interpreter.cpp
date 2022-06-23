@@ -30,6 +30,7 @@ ScriptVar script_var[256];
 int vars = 0;
 int program_counter = 0;
 
+Protein p("TheProtein");
 
 VarType type_from_name(const char* varname)
 {
@@ -69,7 +70,7 @@ Point interpret_Cartesian_literal(const char* param)
 		next = strchr(next, ',');
 		if (next)
 		{
-			pt.z = atof(next);
+			pt.z = atof(&next[1]);
 		}
 	}
 	
@@ -125,6 +126,17 @@ Point interpret_single_point(const char* param)
 {
 	int n;
 	Point pt(0,0,0);
+	AminoAcid* aa;
+	
+	if (param[0] >= '0' && param[0] <= '9')
+	{
+		aa = p.get_residue(atoi(param));
+		if (aa)
+		{
+			pt = aa->get_CA_location();
+			return pt;
+		}
+	}
 	
 	switch (param[0])
 	{
@@ -132,6 +144,8 @@ Point interpret_single_point(const char* param)
 		n = find_var_index(param);
 		if (n<0) return pt;
 		pt.x = script_var[n].value.n;
+		aa = p.get_residue(script_var[n].value.n);
+		if (aa) pt = aa->get_CA_location();
 		return pt;
 		
 		case '&':
@@ -289,7 +303,7 @@ int main(int argc, char** argv)
 	strcpy(script_var[vars].value.psz, &slash[1]);
 	vars++;
 	if (dot) dot[0] = '.';*/
-	Protein p("TheProtein");
+	
 	
 	/*pf = fopen(pdbname, "rb");
 	p.load_pdb(pf);
@@ -534,8 +548,11 @@ int main(int argc, char** argv)
 					break;
 					
 					case SV_POINT:
-					script_var[n].value.ppt = new Point();
-					if (!strcmp(fields[2], "=")) *(script_var[n].value.ppt) = interpret_single_point(fields[3]);
+					if (!strcmp(fields[2], "="))
+					{
+						script_var[n].value.ppt = new Point();
+						*(script_var[n].value.ppt) = interpret_single_point(fields[3]);
+					}
 					else if (!strcmp(fields[2], "+=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->add(interpret_single_point(fields[3]));
 					else if (!strcmp(fields[2], "-=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->subtract(interpret_single_point(fields[3]));
 					else if (!strcmp(fields[2], "*="))

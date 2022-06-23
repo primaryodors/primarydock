@@ -15,7 +15,7 @@ using namespace std;
 AADef aa_defs[256];
 char* override_aminos_dat=0;
 
-AminoAcid::AminoAcid(FILE* instream)
+AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa)
 {
     if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
@@ -23,6 +23,8 @@ AminoAcid::AminoAcid(FILE* instream)
     from_pdb(instream);
     minclash = get_internal_clashes();
     mol_typ = MOLTYP_AMINOACID;
+    prev_aa = prevaa;
+    if (prevaa) prevaa->next_aa = this;
 }
 
 #define _ALGORITHMIC_GREEK 1
@@ -45,6 +47,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     }*/
     
     name = aa_defs[idx].name;
+    prev_aa = prevaa;
+    if (prevaa) prevaa->next_aa = this;
 
     int i, j, k, l, n;
     
@@ -1228,7 +1232,9 @@ void AminoAcid::rotate(LocatedVector SCoord, float theta)
         Point loc = atoms[i]->get_location();
         Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
         atoms[i]->move(&nl);
+        // cout << atoms[i]->residue << ":" << atoms[i]->name << nl << " ";
     }
+    // cout << endl;
 
     // If you have a metal coordination, AND YOU ARE THE FIRST COORDINATING RESIDUE OF THE METAL, move the metal with you.
     if (m_mcoord && m_mcoord->coord_res && m_mcoord->coord_res[0] == this)
@@ -1290,6 +1296,76 @@ Atom* AminoAcid::next_residue_N()
         if (btom->residue == C->residue+1) return btom;
     }
     return NULL;
+}
+
+Atom* AminoAcid::HN_or_substitute()
+{
+	Atom* retval = get_atom("HN");
+	if (!retval) retval = get_atom("H");
+	if (!retval)
+	{
+		Atom* a = get_atom("N");
+		if (!a) return nullptr;
+		int i;
+		Bond** bb = a->get_bonds();
+		int g = a->get_geometry();
+		
+		for (i=0; i<g; i++)
+		{
+			if (bb[g]->btom && strcmp(bb[g]->btom->name, "CA")) return bb[g]->btom;
+		}
+	}
+	return retval;
+}
+
+LocRotation AminoAcid::enforce_peptide_bond(bool cis)
+{
+	LocRotation retval;
+	if (!atoms) return retval;
+	if (!prev_aa) return retval;
+	
+	Atom *pC = prev_aa->get_atom("C");
+	Atom *pO = prev_aa->get_atom("O");
+	Atom* lN = get_atom("N");
+	Atom* lH = HN_or_substitute();
+	
+	if (!pC || !pO || !lN || !lH) return retval;
+	
+	Point ptC = pC->get_location();
+	Point ptO = pO->get_location();
+	Point ptN = lN->get_location();
+	Point ptH = lH->get_location();
+	
+	SCoord v = ptN.subtract(ptC);
+	
+	// TODO: Refine the algorithm further so that coplanarity is enforced, including CA atoms, and bond angles as well.
+	float theta, step=1.0*fiftyseventh, bestr = 0, besttheta=0;
+	if (cis) bestr = 999999;
+	for (theta=0; theta < M_PI*2; theta+=step)
+	{
+		Point ptnew = rotate3D(ptH, ptN, v, theta);
+		float r = ptnew.get_3d_distance(ptO);
+		if ((cis && (r < bestr)) || (!cis && (r > bestr)))
+		{
+			bestr = r;
+			besttheta = theta;
+		}
+	}
+	
+	retval.origin = ptN;
+	retval.v = v;
+	retval.a = besttheta;
+	
+	int i;
+	for (i=0; atoms[i]; i++)
+	{
+		Point ptnew = rotate3D(atoms[i]->get_location(), retval.origin, retval.v, retval.a);
+		atoms[i]->move(ptnew);
+		// cout << atoms[i]->residue << ":" << atoms[i]->name << "->" << ptnew << " ";
+	}
+	// cout << endl;
+	
+	return retval;
 }
 
 LocRotation* AminoAcid::flatten()

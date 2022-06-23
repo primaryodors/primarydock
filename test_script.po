@@ -29,6 +29,7 @@ ECHO "EXR2 zinc-binding motif found at position " %hxxce ": " $testing "."
 
 LET %sr = %hxxce - 2
 LET %er = %hxxce + 9
+# HELIX STRAIGHT %sr %er
 ECHO "Making alpha helix of " %sr " - " %er "."
 HELIX ALPHA %sr %er
 

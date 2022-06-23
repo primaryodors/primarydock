@@ -216,6 +216,7 @@ int Protein::load_pdb(FILE* is)
     Atom* a;
     
     AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file. Yeah it's a shoddy way to program but that's the best that can be expected of KMS's horrible mistake.
+    AminoAcid* prevaa = nullptr;
     
     int i, rescount=0;
 
@@ -243,10 +244,11 @@ int Protein::load_pdb(FILE* is)
     			{
     				if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
     				{
-    					AminoAcid* aa = new AminoAcid(is);
+    					AminoAcid* aa = new AminoAcid(is, prevaa);
 						// cout << rescount << tmp3let << " " << flush;
 						restmp[rescount++] = aa;
 						restmp[rescount] = NULL;
+						prevaa = aa;
 						goto _found_AA;
     				}
     			}
@@ -920,11 +922,26 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
     for (res = startres; inc; res += inc)
     {
         AminoAcid* aa = get_residue(res);
+        
+        LocRotation lr = aa->enforce_peptide_bond();
+        
+        if (lr.v.r)
+        {
+            AminoAcid* movable;
+
+            for (i=res+inc; movable = get_residue(i); i+=inc)
+            {
+                LocatedVector lv = lr.get_lv();
+                movable->rotate(lv, lr.a);
+                if (i >= stopat) break;
+            }
+        }
 
         LocRotation* lr2 = aa->flatten();
 
         for (j=0; j<5; j++)
         {
+        	// cout << "Rotating " << *aa << " " << lr2[j].a*fiftyseven << " degrees." << endl;
             if (lr2[j].v.r && lr2[j].a)
             {
                 AminoAcid* movable;
@@ -948,7 +965,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         delete[] lr2;
         
 		// cout << "Rotating " << *aa << " phi " << (phi*fiftyseven) << " degrees." << endl;
-        LocRotation lr = aa->rotate_backbone_abs(dir1, phi);
+        lr = aa->rotate_backbone_abs(dir1, phi);
 
         if (lr.v.r)
         {
@@ -956,11 +973,13 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 
             for (i=res+inc; movable = get_residue(i); i+=inc)
             {
+            	// cout << i << " ";
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
                 if (i >= stopat) break;
             }
         }
+        // cout << endl;
 
         // cout << "Rotating " << *aa << " psi " << (psi*fiftyseven) << " degrees." << endl;
         lr = aa->rotate_backbone_abs(dir2, psi);
@@ -971,11 +990,13 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 
             for (i=res+inc; movable = get_residue(i); i+=inc)
             {
+                // cout << i << " ";
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
                 if (i >= stopat) break;
             }
         }
+        // cout << endl;
 
         if (res >= endres) break;
     }

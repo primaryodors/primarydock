@@ -54,7 +54,7 @@ class AminoAcid : public Molecule
 {
 	public:
  	// Constructors.
- 	AminoAcid(FILE* instream);
+ 	AminoAcid(FILE* instream, AminoAcid* prev_res=0);
  	AminoAcid(const char letter, AminoAcid* prev_res=0);
 
  	// Getters and setters.
@@ -69,6 +69,7 @@ class AminoAcid : public Molecule
  	void set_region(const char* regname) 		{ 	 	strcpy(region, regname); 				}
  	Atom* previous_residue_C();
  	Atom* next_residue_N();
+ 	Atom* HN_or_substitute();
 
  	// Serialization.
  	int from_pdb(FILE* instream);							// returns number of atoms loaded.
@@ -91,6 +92,8 @@ class AminoAcid : public Molecule
  	bool disulfide_bond(const AminoAcid* bond_to);
  	Bond** get_rotatable_bonds();
  	bool capable_of_inter(intera_type inter);
+ 	LocRotation enforce_peptide_bond(bool cis = false);				// Peptide bonds should almost always be in the trans (E) configuration.
+ 	
 
  	// Intermol functions.
  	float get_intermol_binding(AminoAcid** neighbors, bool backbone_atoms_only = false);

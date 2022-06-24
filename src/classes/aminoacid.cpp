@@ -1315,11 +1315,12 @@ Atom* AminoAcid::HN_or_substitute()
 		if (!a) return nullptr;
 		int i;
 		Bond** bb = a->get_bonds();
+		if (!bb) return nullptr;
 		int g = a->get_geometry();
 		
 		for (i=0; i<g; i++)
 		{
-			if (bb[g]->btom && strcmp(bb[g]->btom->name, "CA")) return bb[g]->btom;
+			if (bb[i]->btom && strcmp(bb[i]->btom->name, "CA")) return bb[i]->btom;
 		}
 	}
 	return retval;

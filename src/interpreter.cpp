@@ -475,29 +475,39 @@ int main(int argc, char** argv)
 				ep = interpret_single_point(fields[l++]);
 				
 				// From start and end residues inwards for a total of eachend, average the CA locations.
-				Point sl(0,0,0), el(0,0,0);
+				Point sl(0,0,0);
 				for (i=0; i<eachend; i++)	// It's actually easier to average manually than to screw around with object arrays.
 				{
 					AminoAcid* aa = p.get_residue(sr+i);
 					if (aa) sl = sl.add(aa->get_CA_location());
-					aa = p.get_residue(er-i);
-					if (aa) el = el.add(aa->get_CA_location());
 				}
 				
-				if (eachend > 1)
-				{
-					sl.scale(sl.magnitude()/eachend);
-					el.scale(el.magnitude()/eachend);
-				}
+				if (eachend > 1) sl.scale(sl.magnitude()/eachend);
 				
 				// Translate the range so that the starting average moves to the target start point.
 				SCoord motion = sp.subtract(sl);
 				for (i=sr; i<=er; i++)
 				{
 					AminoAcid* aa = p.get_residue(i);
-					if (aa) aa->aamove(motion);
+					if (aa)
+					{
+						MovabilityType fmov = aa->movability;
+						aa->movability = MOV_ALL;
+						aa->aamove(motion);
+						aa->movability = fmov;
+					}
 				}
-				ep = ep.add(motion);
+				
+				
+				Point el(0,0,0);
+				
+				for (i=0; i<eachend; i++)
+				{
+					AminoAcid* aa = p.get_residue(er-i);
+					if (aa) el = el.add(aa->get_CA_location());
+				}
+				
+				if (eachend > 1) el.scale(el.magnitude()/eachend);
 				
 				// Rotate the range about the start point so the ending average moves to the target end point.
 				Rotation rot = align_points_3d(&el, &ep, &sp);
@@ -508,7 +518,13 @@ int main(int argc, char** argv)
 				for (i=sr; i<=er; i++)
 				{
 					AminoAcid* aa = p.get_residue(i);
-					if (aa) aa->rotate(lv, rot.a);
+					if (aa)
+					{
+						MovabilityType fmov = aa->movability;
+						aa->movability = MOV_ALL;
+						aa->rotate(lv, rot.a);
+						aa->movability = fmov;
+					}
 				}
 				
 			}	// ALIGN

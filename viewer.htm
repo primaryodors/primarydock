@@ -681,9 +681,9 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 stage.setParameters(
 {
 	'backgroundColor': '#080400',
-	'ambientColor': '#6cc',
-    'ambientIntensity': 0.5,
-	'lightColor': '#f9c',
+	'ambientColor': '#59f',
+    'ambientIntensity': 0.4,
+	'lightColor': '#fc8',
     'lightIntensity': 0.6,
 });
 
@@ -714,7 +714,11 @@ if (molid != "~")
 			var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
 		    stage.loadFile( stringBlob, { ext: "sdf" } ).then( function( comp )
 		    {
-		        comp.addRepresentation( "ball+stick", { multipleBond: true } );
+		        comp.addRepresentation( "ball+stick",
+		        {
+		        	multipleBond: true,
+		        	metalness: 0.15,
+		        } );
 		        gmodel.push(comp);
 		        comp.autoView();
 		    } );
@@ -1041,7 +1045,10 @@ function loadFile(fileData, fileName = "")
                 {
                     if (fext == 'sdf')
                     {
-                        comp.addRepresentation( "ball+stick", { multipleBond: true } );
+                        comp.addRepresentation( "ball+stick",
+                        {	multipleBond: true,
+                        	metalness: 0.15,
+                        } );
                         gmodel.push(comp);
                     }
 
@@ -1052,7 +1059,7 @@ function loadFile(fileData, fileName = "")
                             opacity: 0.8,
 							colorScheme: PODefRgnScheme,
                             // colorScale: 'rainbow',
-                            metalness: 0.15
+                            metalness: 0.15,
                         });
                         gmodel.push(comp);
 

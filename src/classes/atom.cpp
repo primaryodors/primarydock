@@ -172,7 +172,7 @@ void Atom::figure_out_valence()
         if (valence > 8) valence = 8;
     }
     origgeo = geometry;
-
+    
     if (valence > abs(geometry)) throw VALENCE_EXCEEDS_GEOMETRY;
 
     if (Z >=  21 && Z <=  30) family = HEAVYMETAL;
@@ -1805,6 +1805,7 @@ Ring::Ring(Atom** from_atoms)
 			int j, n;
 			for (n=0; atoms[i]->member_of[n]; n++);		// Determine length.
 			Ring** array = new Ring*[4+n];
+			for (j=0; j<n+4; j++) array[j] = nullptr;
 			for (j=0; j<n; j++)
 				array[n] = atoms[i]->member_of[n];
 			array[n++] = this;

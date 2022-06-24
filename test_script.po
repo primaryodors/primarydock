@@ -40,6 +40,7 @@ LET %er = %hxxce + 9
 ECHO "Making alpha helix of " %sr " - " %er "."
 HELIX ALPHA %sr %er
 
+LET &grass_is_riz = 13
 
 # Going to want a better way to take averages.
 LET %i = %TMR5.s
@@ -53,7 +54,7 @@ LET @5 += %i
 LET %i ++
 LET @5 /= 4
 ECHO "TMR5 top: " @5
-LET @5 += [0,10,0]
+LET @5 += [0,&grass_is_riz,0]
 
 LET %i = %TMR3.s
 LET @3 = %i
@@ -66,12 +67,14 @@ LET @3 += %i
 LET %i ++
 LET @3 /= 4
 ECHO "TMR3 top: " @3
-LET @3 += [0,10,0]
+LET @3 += [0,&grass_is_riz,0]
 
 # LET &difference = @3.y - @5.y
 # LET @3 -= [0,&difference,0]
 LET @3.y = @5.y
-DUMP
+# Lift the TMR3 end up 1 metric skosh.
+LET @3.y += 3
+# DUMP
 
 ECHO "Aligning alpha helix to " @5 " - " @3
 ALIGN %sr %er 4 @5 @3

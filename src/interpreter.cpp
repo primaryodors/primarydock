@@ -12,6 +12,7 @@ using namespace std;
 
 #define _HAS_DOT 0x8000
 #define _VARNUM_MASK 0xff
+#define _VARFLAGS_MASK 0xff00
 
 enum VarType
 {
@@ -116,13 +117,15 @@ float interpret_single_float(const char* param)
 	switch (param[0])
 	{
 		case '%':
-		n = find_var_index(param) & _VARNUM_MASK;
+		n = find_var_index(param);
 		if (n<0) return 0;
+		n &= _VARNUM_MASK;
 		return script_var[n].value.n;
 		
 		case '&':
-		n = find_var_index(param) & _VARNUM_MASK;
+		n = find_var_index(param);
 		if (n<0) return 0;
+		n &= _VARNUM_MASK;
 		return script_var[n].value.f;
 		
 		case '@':
@@ -301,6 +304,7 @@ int main(int argc, char** argv)
 	for (i=1; i<argc; i++)
 	{
 		script_var[vars].name = (string)"$arg" + std::to_string(i);
+		script_var[vars].vt = SV_STRING;
 		script_var[vars].value.psz = new char[strlen(argv[i])+4];
 		strcpy(script_var[vars].value.psz, argv[i]);
 		vars++;
@@ -342,30 +346,6 @@ int main(int argc, char** argv)
 		return 0;
 	}
 	
-	/*char pdbname[1024];
-	strcpy(pdbname, PDB_fname.c_str());
-	char* dot = strchr(pdbname, '.');
-	char* slash = strrchr(pdbname, '/');
-	if (!slash) slash = strrchr(pdbname, '\\');*/
-	
-	// Set some automatic variables.
-	/*script_var[vars].name = "$PDB";
-	script_var[vars].value.psz = new char[strlen(pdbname)+4];
-	strcpy(script_var[vars].value.psz, pdbname);
-	vars++;*/
-	
-	/*if (dot) dot[0] = '\0';
-	Protein p(&slash[1]);
-	script_var[vars].name = "$PROTEIN";
-	script_var[vars].value.psz = new char[strlen(slash)+4];
-	strcpy(script_var[vars].value.psz, &slash[1]);
-	vars++;
-	if (dot) dot[0] = '.';*/
-	
-	
-	/*pf = fopen(pdbname, "rb");
-	p.load_pdb(pf);
-	fclose(pf);*/
 	
 	if (pf = fopen(script_fname.c_str(), "rb"))
 	{
@@ -461,8 +441,8 @@ int main(int argc, char** argv)
 				l++;
 				
 				n = find_var_index(fields[l]);
-				n &= _VARNUM_MASK;
 				if (n<0) n = vars++;
+				n &= _VARNUM_MASK;
 				script_var[n].name = fields[l];
 				script_var[n].vt = type_from_name(fields[l]);
 				
@@ -549,12 +529,14 @@ int main(int argc, char** argv)
 				
 				script_var[vars].name = "$PDB";
 				script_var[vars].value.psz = new char[strlen(psz)+4];
+				script_var[vars].vt = SV_STRING;
 				strcpy(script_var[vars].value.psz, psz);
 				vars++;
 				
 				const char* pname = p.get_name().c_str();
 				script_var[vars].name = "$PROTEIN";
 				script_var[vars].value.psz = new char[strlen(pname)+4];
+				script_var[vars].vt = SV_STRING;
 				strcpy(script_var[vars].value.psz, pname);
 				vars++;
 				
@@ -562,11 +544,13 @@ int main(int argc, char** argv)
 	
 				int seqlen = p.get_seq_length();
 				script_var[vars].name = "%SEQLEN";
+				script_var[vars].vt = SV_INT;
 				script_var[vars].value.n = seqlen;
 				vars++;
 				
 				script_var[vars].name = "$SEQUENCE";
 				script_var[vars].value.psz = new char[seqlen+4];
+				script_var[vars].vt = SV_STRING;
 				strcpy(script_var[vars].value.psz, p.get_sequence().c_str());
 				vars++;
 				
@@ -580,11 +564,13 @@ int main(int argc, char** argv)
 					
 					sprintf(buffer1, "%c%s.s", '%', fields[3]);
 					script_var[vars].name = buffer1;
+					script_var[vars].vt = SV_INT;
 					script_var[vars].value.n = atoi(fields[4]);
 					vars++;
 					
 					sprintf(buffer1, "%c%s.e", '%', fields[3]);
 					script_var[vars].name = buffer1;
+					script_var[vars].vt = SV_INT;
 					script_var[vars].value.n = atoi(fields[5]);
 					vars++;
 					
@@ -621,10 +607,14 @@ int main(int argc, char** argv)
 			else if (!strcmp(fields[0], "LET"))
 			{
 				n = find_var_index(fields[1]);
-				if (n<0) n = vars++;
+				if (n<0)
+				{
+					n = vars++;
+					script_var[n].name = fields[1];
+					script_var[n].vt = type_from_name(fields[1]);
+				}
+				int flags = n & _VARFLAGS_MASK;
 				n &= _VARNUM_MASK;
-				script_var[n].name = fields[1];
-				script_var[n].vt = type_from_name(fields[1]);
 				
 				switch (script_var[n].vt)
 				{
@@ -659,31 +649,69 @@ int main(int argc, char** argv)
 					break;
 					
 					case SV_POINT:
-					if (!strcmp(fields[2], "="))
+					if (flags & _HAS_DOT)
 					{
-						script_var[n].value.ppt = new Point();
-						*(script_var[n].value.ppt) = interpret_single_point(fields[3]);
-					}
-					else if (!strcmp(fields[2], "+=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->add(interpret_single_point(fields[3]));
-					else if (!strcmp(fields[2], "-=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->subtract(interpret_single_point(fields[3]));
-					else if (!strcmp(fields[2], "*="))
-					{
-						f = interpret_single_float(fields[3]);
-						script_var[n].value.ppt->x *= f;
-						script_var[n].value.ppt->y *= f;
-						script_var[n].value.ppt->z *= f;
-					}
-					else if (!strcmp(fields[2], "/="))
-					{
-						f = interpret_single_float(fields[3]);
-						script_var[n].value.ppt->x /= f;
-						script_var[n].value.ppt->y /= f;
-						script_var[n].value.ppt->z /= f;
+						float* ff = nullptr;
+						
+						char* param = strchr(fields[1], '.');
+						if (!param) return 0xbadd07;
+						param++;
+						if (!strcmp(param, "x")) ff = &(script_var[n].value.ppt->x);
+						else if (!strcmp(param, "X")) ff = &(script_var[n].value.ppt->x);
+						else if (!strcmp(param, "y")) ff = &(script_var[n].value.ppt->y);
+						else if (!strcmp(param, "Y")) ff = &(script_var[n].value.ppt->y);
+						else if (!strcmp(param, "z")) ff = &(script_var[n].value.ppt->z);
+						else if (!strcmp(param, "Z")) ff = &(script_var[n].value.ppt->z);
+						else
+						{
+							cout << "Error: Cartesian has no member named " << param << "." << endl;
+							return 0xbadd07;
+						}
+						
+						if (ff)
+						{
+							if (!strcmp(fields[2], "=")) *ff = interpret_single_float(fields[3]);
+							else if (!strcmp(fields[2], "+=")) *ff += interpret_single_float(fields[3]);
+							else if (!strcmp(fields[2], "-=")) *ff -= interpret_single_float(fields[3]);
+							else if (!strcmp(fields[2], "*=")) *ff *= interpret_single_float(fields[3]);
+							else if (!strcmp(fields[2], "/=")) *ff /= interpret_single_float(fields[3]);
+							else
+							{
+								cout << "Unimplemented operator " << fields[2] << " for float assignment." << endl;
+								return 0x51974c5;
+							}
+							l=0;
+						}
+						break;
 					}
 					else
 					{
-						cout << "Unimplemented operator " << fields[2] << " for Cartesian assignment." << endl;
-						return 0x51974c5;
+						if (!strcmp(fields[2], "="))
+						{
+							script_var[n].value.ppt = new Point();
+							*(script_var[n].value.ppt) = interpret_single_point(fields[3]);
+						}
+						else if (!strcmp(fields[2], "+=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->add(interpret_single_point(fields[3]));
+						else if (!strcmp(fields[2], "-=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->subtract(interpret_single_point(fields[3]));
+						else if (!strcmp(fields[2], "*="))
+						{
+							f = interpret_single_float(fields[3]);
+							script_var[n].value.ppt->x *= f;
+							script_var[n].value.ppt->y *= f;
+							script_var[n].value.ppt->z *= f;
+						}
+						else if (!strcmp(fields[2], "/="))
+						{
+							f = interpret_single_float(fields[3]);
+							script_var[n].value.ppt->x /= f;
+							script_var[n].value.ppt->y /= f;
+							script_var[n].value.ppt->z /= f;
+						}
+						else
+						{
+							cout << "Unimplemented operator " << fields[2] << " for Cartesian assignment." << endl;
+							return 0x51974c5;
+						}
 					}
 					
 					l=0;
@@ -811,8 +839,6 @@ int main(int argc, char** argv)
 					
 					l += 2;
 				}
-				
-				
 			}	// LET
 			
 			else if (!strcmp(fields[0], "ECHO"))
@@ -832,6 +858,22 @@ int main(int argc, char** argv)
 				_no_newline_on_echo:
 				;
 			}	// ECHO
+			
+			else if (!strcmp(fields[0], "DUMP"))
+			{
+				for (j=0; j<vars; j++)
+				{
+					cout << j << ": " << script_var[j].name << " ";
+					switch (script_var[j].vt)
+					{
+						case SV_INT:	cout << "int " << script_var[j].value.n << endl; break;
+						case SV_FLOAT:	cout << "float " << script_var[j].value.f << endl; break;
+						case SV_POINT:	cout << "point " << *script_var[j].value.ppt << endl; break;
+						case SV_STRING:	cout << "string " << script_var[j].value.psz << endl; break;
+						default:		cout << "??? " << hex << script_var[j].value.n << dec << endl; break;
+					}
+				}
+			}	// DUMP
 			
 			else if (!strcmp(fields[0], "GOTO"))
 			{

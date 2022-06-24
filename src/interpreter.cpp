@@ -10,6 +10,9 @@
 
 using namespace std;
 
+#define _HAS_DOT 0x8000
+#define _VARNUM_MASK 0xff
+
 enum VarType
 {
 	SV_INT,
@@ -55,15 +58,16 @@ int find_var_index(const char* varname)
 	
 	char buffer[256];
 	char* c;
+	int flags = 0;
 	strcpy(buffer, varname);
 	
 	if (c=strchr(buffer,',')) *c=0;
-	else if (c=strchr(buffer,'.')) *c=0;
+	else if (c=strchr(buffer,'.')) { flags |= _HAS_DOT; *c=0; }
 	else if (c=strchr(buffer,':')) *c=0;
 	
 	for (i=0; i<vars; i++)
 	{
-		if (!strcmp(script_var[i].name.c_str(), buffer)) return i;
+		if (!strcmp(script_var[i].name.c_str(), buffer)) return i|flags;
 	}
 	
 	return -1;
@@ -112,23 +116,42 @@ float interpret_single_float(const char* param)
 	switch (param[0])
 	{
 		case '%':
-		n = find_var_index(param);
+		n = find_var_index(param) & _VARNUM_MASK;
 		if (n<0) return 0;
 		return script_var[n].value.n;
 		
 		case '&':
-		n = find_var_index(param);
+		n = find_var_index(param) & _VARNUM_MASK;
 		if (n<0) return 0;
 		return script_var[n].value.f;
 		
 		case '@':
 		n = find_var_index(param);
 		if (n<0) return 0;
+		if (n & _HAS_DOT)
+		{
+			param = strchr(param, '.');
+			if (!param) return 0;
+			param++;
+			if (!strcmp(param, "x")) return script_var[n&_VARNUM_MASK].value.ppt->x;
+			else if (!strcmp(param, "X")) return script_var[n&_VARNUM_MASK].value.ppt->x;
+			else if (!strcmp(param, "y")) return script_var[n&_VARNUM_MASK].value.ppt->y;
+			else if (!strcmp(param, "Y")) return script_var[n&_VARNUM_MASK].value.ppt->y;
+			else if (!strcmp(param, "z")) return script_var[n&_VARNUM_MASK].value.ppt->z;
+			else if (!strcmp(param, "Z")) return script_var[n&_VARNUM_MASK].value.ppt->z;
+			else
+			{
+				cout << "Error: Cartesian has no member named " << param << "." << endl;
+				return 0;
+			}
+		}
+		n &= _VARNUM_MASK;
 		return script_var[n].value.ppt->magnitude();
 		
 		case '$':
 		n = find_var_index(param);
 		if (n<0) return 0;
+		n &= _VARNUM_MASK;
 		return atof( script_var[n].value.psz );
 		
 		case '[':
@@ -170,6 +193,7 @@ Point interpret_single_point(const char* param)
 		case '%':
 		n = find_var_index(param);
 		if (n<0) return pt;
+		n &= _VARNUM_MASK;
 		pt.x = script_var[n].value.n;
 		aa = p.get_residue(script_var[n].value.n);
 		if (aa) pt = aa->get_CA_location();
@@ -178,17 +202,20 @@ Point interpret_single_point(const char* param)
 		case '&':
 		n = find_var_index(param);
 		if (n<0) return pt;
+		n &= _VARNUM_MASK;
 		pt.x = script_var[n].value.f;
 		return pt;
 		
 		case '@':
 		n = find_var_index(param);
 		if (n<0) return pt;
+		n &= _VARNUM_MASK;
 		return *(script_var[n].value.ppt);
 		
 		case '$':
 		n = find_var_index(param);
 		if (n<0) return pt;
+		n &= _VARNUM_MASK;
 		return interpret_Cartesian_literal( script_var[n].value.psz );
 		
 		case '[':
@@ -213,24 +240,28 @@ char* interpret_single_string(const char* param)
 		case '%':
 		n = find_var_index(param);
 		if (n<0) return buffer;
+		n &= _VARNUM_MASK;
 		sprintf(buffer, "%d", script_var[n].value.n);
 		return buffer;
 		
 		case '&':
 		n = find_var_index(param);
 		if (n<0) return buffer;
+		n &= _VARNUM_MASK;
 		sprintf(buffer, "%f", script_var[n].value.f);
 		return buffer;
 		
 		case '@':
 		n = find_var_index(param);
 		if (n<0) return buffer;
+		n &= _VARNUM_MASK;
 		strcpy(buffer, script_var[n].value.ppt->printable().c_str());
 		return buffer;
 		
 		case '$':
 		n = find_var_index(param);
 		if (n<0) return buffer;
+		n &= _VARNUM_MASK;
 		if (!script_var[n].value.psz) return buffer;
 		strcpy(buffer, script_var[n].value.psz);
 		return buffer;
@@ -430,6 +461,7 @@ int main(int argc, char** argv)
 				l++;
 				
 				n = find_var_index(fields[l]);
+				n &= _VARNUM_MASK;
 				if (n<0) n = vars++;
 				script_var[n].name = fields[l];
 				script_var[n].vt = type_from_name(fields[l]);
@@ -590,6 +622,7 @@ int main(int argc, char** argv)
 			{
 				n = find_var_index(fields[1]);
 				if (n<0) n = vars++;
+				n &= _VARNUM_MASK;
 				script_var[n].name = fields[1];
 				script_var[n].vt = type_from_name(fields[1]);
 				

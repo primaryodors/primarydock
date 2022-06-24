@@ -68,6 +68,9 @@ LET @3 /= 4
 ECHO "TMR3 top: " @3
 LET @3 += [0,10,0]
 
+LET &difference = @3.y - @5.y
+LET @3 -= [0,&difference,0]
+
 ECHO "Aligning alpha helix to " @5 " - " @3
 ALIGN %sr %er 4 @5 @3
 

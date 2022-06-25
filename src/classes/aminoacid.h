@@ -71,6 +71,7 @@ class AminoAcid : public Molecule
  	Atom* next_residue_N();
  	Atom* HN_or_substitute();
  	Point get_CA_location();
+ 	Point HN_or_substitute_location();
 
  	// Serialization.
  	int from_pdb(FILE* instream);							// returns number of atoms loaded.
@@ -88,6 +89,7 @@ class AminoAcid : public Molecule
  	
  	LocatedVector predict_previous_CO();	// The origin locates the C atom and the SCoord points in the direction of the O relative to C.
  	LocatedVector predict_next_NH();		// Origin locates N, SCoord points to HN.	
+ 	void glom(LocatedVector predicted, bool CO = false);		// Glom the AA by moving its NH or CO to the result of a predict().
 
  	// Bond functions.
  	bool disulfide_bond(const AminoAcid* bond_to);

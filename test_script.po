@@ -92,11 +92,24 @@ LET @3.y -= &drop_shelf
 ECHO "Aligning shelf to " @3 " - " @5
 ALIGN %er1 %shelfer 1 @3 @5
 
+LET %iters = 225
 
 LET %csr = %TMR4.e + 1
 # DUMP
 ECHO "Reconnecting broken " %sr
-CONNECT %csr %sr 500
+CONNECT %csr %sr %iters
+
+
+LET %csr = %hxxce + 9
+LET %csr += %TMR5.s
+LET %csr /= 2
+
+ECHO "Reconnecting broken " %er
+CONNECT %csr %er %iters
+
+ECHO "Reconnecting broken " %TMR5.s
+CONNECT %csr %TMR5.s %iters
+
 
 LET $outfname = $PROTEIN
 LET $outfname += ".scripted.pdb"

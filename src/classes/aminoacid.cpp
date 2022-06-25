@@ -832,6 +832,25 @@ LocatedVector AminoAcid::predict_next_NH()
 	return lv;
 }
 
+void AminoAcid::glom(LocatedVector predicted, bool CO)
+{
+	MovabilityType fmov = movability;
+	movability = MOV_ALL;
+	
+	// Translation: move the entire AA so that the N (or C) corresponds to the predicted origin.
+	Point moveby = predicted.origin.subtract( CO ? get_atom_location("C") : get_atom_location("N") );
+	aamove(moveby);
+	
+	// Rotation: rotate the entire AA about the predicted origin so that the HN (or O) aligns with the predicted vector.
+	Point pt1 = CO ? get_atom_location("O") : HN_or_substitute_location(), pt2 = predicted.to_point();
+	Rotation rot = align_points_3d( &pt1, &pt2, &predicted.origin );
+	LocatedVector lv = rot.v;
+	lv.origin = predicted.origin;
+	rotate(lv, rot.a);
+	
+	movability = fmov;
+}
+
 Molecule** AminoAcid::aas_to_mols(AminoAcid** aas)
 {
 	if (!aas) return NULL;
@@ -1410,6 +1429,13 @@ Atom* AminoAcid::HN_or_substitute()
 		}
 	}
 	return retval;
+}
+
+Point AminoAcid::HN_or_substitute_location()
+{
+	Atom* a = HN_or_substitute();
+	if (!a) return Point(0,0,0);
+	else return a->get_location();
 }
 
 LocRotation AminoAcid::enforce_peptide_bond(bool cis)

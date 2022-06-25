@@ -62,7 +62,6 @@ class Molecule
     virtual void rotate(SCoord* SCoord, float theta);
     void rotate(LocatedVector SCoord, float theta);
     bool shielded(Atom* a, Atom* b) const;
-    Point get_atom_location(char const * aname);
     float correct_structure(int iters = 500);
 
     // Atom functions.
@@ -71,6 +70,7 @@ class Molecule
     char** get_atom_names() const;
     Atom* get_atom(const char* aname) const;
     Atom* get_atom(const int a_idx) const { return atoms[a_idx]; }
+    Point get_atom_location(const char* aname);
     int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);
     void hydrogenate(bool steric_only = false);

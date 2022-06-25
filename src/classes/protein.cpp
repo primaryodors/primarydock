@@ -770,15 +770,17 @@ void Protein::conform_backbone(int startres, int endres,
                dir2 = (inc>0) ? CA_asc : C_desc;
     
     int am = abs(endres-startres), minres = (inc>0) ? startres : endres;
-    float momenta1[am+4], momenta2[am+4];
+    float momenta1o[am+4], momenta2o[am+4], momenta1e[am+4], momenta2e[am+4];
     int eando_res[am+4];
     float eando_mult[am+4];
     
     for (res = startres; res <= endres; res += inc)
     {
     	int residx = res-minres;
-    	momenta1[residx] = randsgn()*_fullrot_steprad;
-    	momenta2[residx] = randsgn()*_fullrot_steprad;
+    	momenta1o[residx] = randsgn()*_fullrot_steprad;
+    	momenta2o[residx] = randsgn()*_fullrot_steprad;
+    	momenta1e[residx] = randsgn()*_fullrot_steprad;
+    	momenta2e[residx] = randsgn()*_fullrot_steprad;
     	eando_res[residx] = min(res + (rand() % 5) + 1, endres);
     	if (eando_res[residx] == res) eando_res[residx] = 0;
     	eando_mult[residx] = 1;
@@ -786,7 +788,7 @@ void Protein::conform_backbone(int startres, int endres,
 
 	set_clashables();
     float tolerance = 1.2, alignfactor = 100;
-    int ignore_clashes_until = iters/3;
+    int ignore_clashes_until = iters*0.666;
     for (iter=0; iter<iters; iter++)
     {
         // cout << "Iteration " << iter << endl;
@@ -811,19 +813,19 @@ void Protein::conform_backbone(int startres, int endres,
             if (a1 && iter>10)
             {
                 Point pt = a1->get_location();
-                bind += alignfactor/(pt.get_3d_distance(target1)+0.000001);
+                bind += alignfactor/(pt.get_3d_distance(target1)+0.001);
             }
             if (a2 && iter>10)
             {
                 Point pt = a2->get_location();
-                bind += alignfactor/(pt.get_3d_distance(target2)+0.000001);
+                bind += alignfactor/(pt.get_3d_distance(target2)+0.001);
             }
 
 			if (reinterpret_cast<long>(get_residue(res)) < 0x1000) cout << "Warning missing residue " << res << endl << flush;
 			else if (strcmp(get_residue(res)->get_3letter(), "PRO"))		// TODO: Don't hard code this to proline, but check bond flexibility.
             {
                 // Rotate the first bond a random amount. TODO: use angular momenta.
-                angle = momenta1[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
+                angle = (iter & 1) ? momenta1o[residx] : momenta1e[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
                 rotate_backbone_partial(res, endres, dir1, angle);
                 if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, -angle*eando_mult[residx]);
 
@@ -838,12 +840,12 @@ void Protein::conform_backbone(int startres, int endres,
                 if (a1)
                 {
                     Point pt = a1->get_location();
-                    bind1 += alignfactor/pt.get_3d_distance(target1);
+                    bind1 += alignfactor/(pt.get_3d_distance(target1)+0.001);
                 }
                 if (a2)
                 {
                     Point pt = a2->get_location();
-                    bind1 += alignfactor/pt.get_3d_distance(target2);
+                    bind1 += alignfactor/(pt.get_3d_distance(target2)+0.001);
                 }
 
                 // If no, put it back.
@@ -852,17 +854,19 @@ void Protein::conform_backbone(int startres, int endres,
                 {
                     rotate_backbone_partial(res, endres, dir1, -angle);
                     if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, angle*eando_mult[residx]);
-                    momenta1[residx] *= -0.666;
+                    if (iter & 1) momenta1o[residx] *= -0.666;
+                    else momenta1e[residx] *= -0.666;
                 }
                 else
                 {
                     if (bind1 < bind) bind = bind1;
-                    momenta1[residx] *= 1.05;
+                    if (iter & 1) momenta1o[residx] *= 1.05;
+                    else momenta1e[residx] *= 1.05;
                 }
             }
 
             // Rotate the second bond.
-            angle = momenta2[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
+            angle = (iter & 1) ? momenta2o[residx] : momenta2e[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
             rotate_backbone_partial(res, endres, dir2, angle);
             if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, -angle*eando_mult[residx]);
 
@@ -879,12 +883,12 @@ void Protein::conform_backbone(int startres, int endres,
             if (a1)
             {
                 Point pt = a1->get_location();
-                bind1 += alignfactor/pt.get_3d_distance(target1);
+                bind1 += alignfactor/(pt.get_3d_distance(target1)+0.001);
             }
             if (a2)
             {
                 Point pt = a2->get_location();
-                bind1 += alignfactor/pt.get_3d_distance(target2);
+                bind1 += alignfactor/(pt.get_3d_distance(target2)+0.001);
             }
 
             // If no, put it back.
@@ -893,11 +897,13 @@ void Protein::conform_backbone(int startres, int endres,
             {
                 rotate_backbone_partial(res, endres, dir2, -angle);
                 if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, angle*eando_mult[residx]);
-                momenta2[residx] *= -0.666;
+                if (iter & 1) momenta2o[residx] *= -0.666;
+                else momenta2e[residx] *= -0.666;
             }
             else
             {
-                momenta2[residx] *= 1.05;
+                if (iter & 1) momenta2o[residx] *= 1.05;
+                else momenta2e[residx] *= 1.05;
             }
 
             alignfactor *= 1.003;
@@ -905,6 +911,77 @@ void Protein::conform_backbone(int startres, int endres,
         }
     }
     cout << endl;
+    
+    return;
+    
+    // TODO: This doesn't work very well.
+    // Glom the last residue onto the target.
+    // Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
+    // Then do the same for the previous residue, and the one before, etc,
+    // all the way back to the starting residue.
+    // Give a warning if the starting residue has an anomaly > 0.1A.
+    AminoAcid *next, *curr, *prev;
+    int pointer = endres;
+    float anomaly = 0;
+    
+	next = get_residue(endres+inc);
+	curr = get_residue(pointer);
+	prev = get_residue(pointer-inc);
+    do
+    {
+		LocatedVector lv = (inc > 0) ? next->predict_previous_CO() : next->predict_next_NH();
+    	curr->glom(lv, inc > 0);
+    	
+    	MovabilityType fmov = curr->movability;
+		curr->movability = MOV_ALL;
+		
+		lv = (inc < 0) ? prev->predict_previous_CO() : prev->predict_next_NH();
+		Point target_heavy = lv.origin;
+		Point target_pole = lv.to_point();
+		
+		float theta, step, r, btheta=0, bestr;
+		for (theta=0; theta < M_PI*2; theta += step)
+		{
+			r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
+			r += target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+			
+			if (!theta || (r < bestr))
+			{
+				bestr = r;
+				btheta = theta;
+			}
+			
+			curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , step );
+		}
+		curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , btheta );
+		
+		btheta=0;
+		for (theta=0; theta < M_PI*2; theta += step)
+		{
+			r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
+			r += target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+			
+			if (!theta || (r < bestr))
+			{
+				bestr = r;
+				btheta = theta;
+			}
+			
+			curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , step );
+		}
+		curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , btheta );
+		anomaly = bestr;
+		
+		curr->movability = fmov;
+    	
+    	pointer -= inc;
+    	next = curr;
+    	curr = prev;
+		prev = get_residue(pointer-inc);
+    } while (pointer != startres);
+    
+    if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
+    						<< "# " << (startres+inc) << " anomaly: " << anomaly << endl;
 }
 
 void Protein::make_helix(int startres, int endres, float phi, float psi)

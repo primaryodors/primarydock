@@ -660,6 +660,92 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 	}
 }
 
+LocatedVector AminoAcid::predict_previous_CO()
+{
+	Atom* N = get_atom("N");
+	if (!N) return LocatedVector();
+	N->aromatize();
+	Atom* CA = get_atom("CA");
+	Atom* HN  = HN_or_substitute();
+	if (!CA || !HN) return LocatedVector();
+	
+	Point prevCloc(1.32,0,0), prevOloc(0,1.2,0);
+	
+	prevCloc = N->get_location().add(prevCloc);
+	prevOloc = prevOloc.add(prevCloc);
+	
+	LocatedVector lv;
+	int i;
+	for (i=0; i<10; i++)
+	{
+		// Step 1: H-N-C angle.
+		SCoord axis = compute_normal(CA->get_location(), N->get_location(), HN->get_location());
+		float theta = find_angle_along_vector(HN->get_location(), prevCloc, N->get_location(), axis);
+		float plus  = triangular - theta;
+		float minus = triangular*2 - theta;
+		
+		// Rotate to get 120 degrees not clashing next.N with curr.CA.
+		Point maybeP = rotate3D(prevCloc, N->get_location(), axis, plus);
+		Point maybeM = rotate3D(prevCloc, N->get_location(), axis, minus);
+		lv.copy(axis);
+		lv.origin = N->get_location();
+		if (maybeP.get_3d_distance(CA->get_location()) > maybeM.get_3d_distance(CA->get_location()))
+		{
+			prevCloc = maybeP;
+			prevOloc = rotate3D(prevOloc, lv.origin, axis, plus);
+		}
+		else
+		{
+			prevCloc = maybeM;
+			prevOloc = rotate3D(prevOloc, lv.origin, axis, minus);
+		}
+		
+		// Step 2: N-C-O angle.
+		axis = compute_normal(CA->get_location(), N->get_location(), HN->get_location());
+		theta = find_angle_along_vector(N->get_location(), prevOloc, prevCloc, axis);
+		plus  = triangular - theta;
+		minus = triangular*2 - theta;
+		
+		// Rotate to get 120 degrees each way.
+		maybeP = rotate3D(prevOloc, prevCloc, axis, plus);
+		maybeM = rotate3D(prevOloc, prevCloc, axis, minus);
+		
+		// Whichever point is farthest from O is the direction of HN (trans configuration).
+		lv.copy(axis);
+		lv.origin = N->get_location();
+		if (maybeP.get_3d_distance(HN->get_location()) > maybeM.get_3d_distance(HN->get_location()))
+		{
+			prevOloc = maybeP;
+		}
+		else
+		{
+			prevOloc = maybeM;
+		}
+		
+		// Step 3: Enforce trans configuration 180 degrees.
+		axis = prevCloc.subtract(N->get_location());
+		theta = find_angle_along_vector(prevOloc, HN->get_location(), prevCloc, axis);
+			
+		// Rotate the around next.N to get 180 degrees.
+		lv.copy(axis);
+		lv.origin = prevCloc;
+		prevOloc = rotate3D(prevOloc, lv.origin, axis, M_PI+theta);
+			
+		// Rotate around C axis C-O to get 180 degrees about that axis.
+		axis = HN->get_location().subtract(N->get_location());
+		theta = find_angle_along_vector(CA->get_location(), prevCloc, N->get_location(), axis);
+		lv.copy(axis);
+		lv.origin = N->get_location();
+		prevCloc = rotate3D(prevCloc, lv.origin, axis, M_PI-theta);
+		prevOloc = rotate3D(prevOloc, lv.origin, axis, M_PI-theta);
+			
+	}
+	
+	lv.copy(prevOloc.subtract(prevCloc));
+	lv.origin = prevCloc;
+	return lv;
+}
+
 LocatedVector AminoAcid::predict_next_NH()
 {
 	Atom* C = get_atom("C");
@@ -669,7 +755,7 @@ LocatedVector AminoAcid::predict_next_NH()
 	Atom* O  = get_atom("O");
 	if (!CA || !O) return LocatedVector();
 	
-	Point nextNloc(1.32,0,0), nextHNloc(0,1,0);
+	Point nextNloc(1.32,0,0), nextHNloc(0,1.0,0);
 	
 	nextNloc = C->get_location().add(nextNloc);
 	nextHNloc = nextHNloc.add(nextNloc);

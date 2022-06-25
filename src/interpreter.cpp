@@ -529,6 +529,46 @@ int main(int argc, char** argv)
 				
 			}	// ALIGN
 			
+			else if (!strcmp(fields[0], "CONNECT"))
+			{
+				l=1;
+				int sr, er, ct, iters=100;
+				sr = interpret_single_int(fields[l++]);
+				ct = interpret_single_int(fields[l++]);
+				if (fields[l]) iters = interpret_single_int(fields[l++]);
+				er = ct - sgn(ct-sr);
+				
+				Atom *a1, *a2;
+				Point target1, target2;
+				AminoAcid *cta = p.get_residue(ct), *era = p.get_residue(er);
+				
+				if (!era || !cta) goto _no_connect;
+				
+				if (ct > sr)
+				{
+					// Line up the C and O of er to the expected prevaa C and O of ct.
+					a1 = era->get_atom("C");
+					a2 = era->get_atom("O");
+					LocatedVector lv = cta->predict_previous_CO();
+					target1 = lv.origin;
+					target2 = lv.to_point();
+				}
+				else
+				{
+					// Line up the N and HN (or substitute) of er to the expected nextaa N and HN of ct.
+					a1 = era->get_atom("N");
+					a2 = era->HN_or_substitute();
+					LocatedVector lv = cta->predict_next_NH();
+					target1 = lv.origin;
+					target2 = lv.to_point();
+				}
+				
+				p.conform_backbone(sr, er, a1, target1, a2, target2, iters);
+				
+				_no_connect:
+				;
+			}	// CONNECT
+			
 			else if (!strcmp(fields[0], "LOAD"))
 			{
 				psz = interpret_single_string(fields[1]);
@@ -696,7 +736,8 @@ int main(int argc, char** argv)
 								cout << "Unimplemented operator " << fields[2] << " for float assignment." << endl;
 								return 0x51974c5;
 							}
-							l=0;
+							l = 0;
+							n = -1;
 						}
 						break;
 					}
@@ -786,9 +827,9 @@ int main(int argc, char** argv)
 					
 					default:
 					;
-				}
+				}	// switch (script_var[n].vt)
 				
-				while (fields[4+l] && fields[5+l])
+				while (n >= 0 && fields[3+l] && fields[4+l] && fields[5+l])
 				{
 					switch (script_var[n].vt)
 					{
@@ -870,7 +911,7 @@ int main(int argc, char** argv)
 					}
 				}
 				
-				cout << endl;
+				cout << endl << flush;
 				_no_newline_on_echo:
 				;
 			}	// ECHO
@@ -896,7 +937,6 @@ int main(int argc, char** argv)
 				sprintf(buffer1, "%s:", fields[1]);
 				for (n=0; n<script_lines.size(); n++)
 				{
-					// debug cout
 					psz = new char[256];
 					strcpy(psz, script_lines[n].c_str());
 					if (!strcmp(psz, buffer1))

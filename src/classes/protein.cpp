@@ -786,9 +786,11 @@ void Protein::conform_backbone(int startres, int endres,
 
 	set_clashables();
     float tolerance = 1.2, alignfactor = 100;
+    int ignore_clashes_until = iters/3;
     for (iter=0; iter<iters; iter++)
     {
-        cout << "Iteration " << iter << endl;
+        // cout << "Iteration " << iter << endl;
+        cout << iter << " " << flush;
         for (res = startres; res != endres; res += inc)
         {
         	int residx = res-minres;
@@ -803,8 +805,8 @@ void Protein::conform_backbone(int startres, int endres,
                 if (!aa) continue;
                 AminoAcid** rcc = get_residues_can_clash(i);
                 if (!rcc) cout << "No clashables." << endl;
-                if (a1)		bind -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
-                else		bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                if (a1 && (iter >= ignore_clashes_until)) bind -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
+                else bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1 && iter>10)
             {
@@ -823,15 +825,15 @@ void Protein::conform_backbone(int startres, int endres,
                 // Rotate the first bond a random amount. TODO: use angular momenta.
                 angle = momenta1[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
                 rotate_backbone_partial(res, endres, dir1, angle);
-                if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, -angle*eando_mult[residx]);
+                if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, -angle*eando_mult[residx]);
 
                 // Have bindings/clashes improved?
                 for (i=res; i != endres; i += inc)
                 {
                     AminoAcid* aa = get_residue(i);
                     AminoAcid** rcc = get_residues_can_clash(i);
-                    if (a1)		bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
-                	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                    if (a1 && (iter >= ignore_clashes_until)) bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
+                	else bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
                 }
                 if (a1)
                 {
@@ -845,7 +847,7 @@ void Protein::conform_backbone(int startres, int endres,
                 }
 
                 // If no, put it back.
-                if (res == startres) cout << bind << " v. " << bind1 << endl;
+                // if (res == startres) cout << bind << " v. " << bind1 << endl;
                 if (bind1 < tolerance*bind)
                 {
                     rotate_backbone_partial(res, endres, dir1, -angle);
@@ -862,7 +864,7 @@ void Protein::conform_backbone(int startres, int endres,
             // Rotate the second bond.
             angle = momenta2[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
             rotate_backbone_partial(res, endres, dir2, angle);
-            if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, -angle*eando_mult[residx]);
+            if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, -angle*eando_mult[residx]);
 
             // Improvement?
             bind1 = 0;
@@ -871,8 +873,8 @@ void Protein::conform_backbone(int startres, int endres,
                 AminoAcid* aa = get_residue(i);
                 if (!aa) continue;
                 AminoAcid** rcc = get_residues_can_clash(i);
-                if (a1)		bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
-            	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                if (a1 && (iter >= ignore_clashes_until)) bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
+            	else bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1)
             {
@@ -886,11 +888,11 @@ void Protein::conform_backbone(int startres, int endres,
             }
 
             // If no, put it back.
-            if (res == startres) cout << bind << " vs. " << bind1 << endl;
+            // if (res == startres) cout << bind << " vs. " << bind1 << endl;
             if (bind1 < tolerance*bind)
             {
                 rotate_backbone_partial(res, endres, dir2, -angle);
-                if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, angle*eando_mult[residx]);
+                if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, angle*eando_mult[residx]);
                 momenta2[residx] *= -0.666;
             }
             else
@@ -902,6 +904,7 @@ void Protein::conform_backbone(int startres, int endres,
             tolerance = ((tolerance-1)*0.97)+1;
         }
     }
+    cout << endl;
 }
 
 void Protein::make_helix(int startres, int endres, float phi, float psi)

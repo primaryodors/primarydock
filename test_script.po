@@ -40,7 +40,7 @@ LET %er = %hxxce + 9
 ECHO "Making alpha helix of " %sr " - " %er "."
 HELIX ALPHA %sr %er
 
-LET &grass_is_riz = 13
+LET &grass_is_riz = 18
 
 # Going to want a better way to take averages.
 LET %i = %TMR5.s
@@ -72,13 +72,31 @@ LET @3 += [0,&grass_is_riz,0]
 # LET &difference = @3.y - @5.y
 # LET @3 -= [0,&difference,0]
 LET @3.y = @5.y
-# Lift the TMR3 end up 1 metric skosh.
+# Lift the TMR3 end 1 metric skosh higher.
 LET @3.y += 3
 # DUMP
 
 ECHO "Aligning alpha helix to " @5 " - " @3
 ALIGN %sr %er 4 @5 @3
 
+
+LET %er1 = %er + 1
+LET %shelfer = %TMR5.s - 1
+ECHO "Straightening " %er1 " - " %shelfer
+HELIX STRAIGHT %er1 %shelfer
+
+
+LET &drop_shelf = 5
+LET @5.y -= &drop_shelf
+LET @3.y -= &drop_shelf
+ECHO "Aligning shelf to " @3 " - " @5
+ALIGN %er1 %shelfer 1 @3 @5
+
+
+LET %csr = %TMR4.e + 1
+# DUMP
+ECHO "Reconnecting broken " %sr
+CONNECT %csr %sr 500
 
 LET $outfname = $PROTEIN
 LET $outfname += ".scripted.pdb"

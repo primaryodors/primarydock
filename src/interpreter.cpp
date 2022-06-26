@@ -16,6 +16,7 @@ using namespace std;
 
 enum VarType
 {
+	SV_NONE,
 	SV_INT,
 	SV_FLOAT,
 	SV_POINT,
@@ -29,12 +30,20 @@ struct ScriptVar
 	VarType vt;
 };
 
+string script_fname = "";
 std::vector<string> script_lines;
 ScriptVar script_var[256];
 int vars = 0;
 int program_counter = 0;
 
 Protein p("TheProtein");
+
+void raise_error(std::string message)
+{
+	cout << script_fname << ":" << program_counter+1 << " Error: ";
+	cout << message << endl;
+	throw 0xbadc0de;
+}
 
 VarType type_from_name(const char* varname)
 {
@@ -44,8 +53,9 @@ VarType type_from_name(const char* varname)
 		case '&':	return SV_FLOAT;
 		case '@':	return SV_POINT;
 		case '$':	return SV_STRING;
-		default:	throw 0xbadfa12;
-	}	
+		default:	raise_error("Variable names may only start with %, &, @, or $.");
+	}
+	return SV_NONE;	
 }
 
 int find_var_index(const char* varname)
@@ -144,7 +154,7 @@ float interpret_single_float(const char* param)
 			else if (!strcmp(param, "Z")) return script_var[n&_VARNUM_MASK].value.ppt->z;
 			else
 			{
-				cout << "Error: Cartesian has no member named " << param << "." << endl;
+				raise_error((std::string)"Cartesian has no member named " + (std::string)param);
 				return 0;
 			}
 		}
@@ -212,6 +222,25 @@ Point interpret_single_point(const char* param)
 		case '@':
 		n = find_var_index(param);
 		if (n<0) return pt;
+		if (n &  _HAS_DOT)
+		{
+			param = strchr(param, '.');
+			if (!param) return 0;
+			param++;
+			if (!strcmp(param, "x")) 		pt = Point(script_var[n&_VARNUM_MASK].value.ppt->x, 0, 0);
+			else if (!strcmp(param, "X")) 	pt = Point(script_var[n&_VARNUM_MASK].value.ppt->x, 0, 0);
+			else if (!strcmp(param, "y")) 	pt = Point(0, script_var[n&_VARNUM_MASK].value.ppt->y, 0);
+			else if (!strcmp(param, "Y")) 	pt = Point(0, script_var[n&_VARNUM_MASK].value.ppt->y, 0);
+			else if (!strcmp(param, "z")) 	pt = Point(0, 0, script_var[n&_VARNUM_MASK].value.ppt->z);
+			else if (!strcmp(param, "Z")) 	pt = Point(0, 0, script_var[n&_VARNUM_MASK].value.ppt->z);
+			else
+			{
+				raise_error((std::string)"Cartesian has no member named " + (std::string)param);
+				return Point(0,0,0);
+			}
+			return pt;
+
+		}
 		n &= _VARNUM_MASK;
 		return *(script_var[n].value.ppt);
 		
@@ -257,6 +286,11 @@ char* interpret_single_string(const char* param)
 		case '@':
 		n = find_var_index(param);
 		if (n<0) return buffer;
+		if (n &  _HAS_DOT)
+		{
+			sprintf(buffer, "%f", interpret_single_float(param));
+			return buffer;
+		}
 		n &= _VARNUM_MASK;
 		strcpy(buffer, script_var[n].value.ppt->printable().c_str());
 		return buffer;
@@ -290,7 +324,6 @@ int main(int argc, char** argv)
 	char* psz;
 	Point pt;
 	std::string builder;
-	string script_fname = "";
 	string PDB_fname = "";
 	FILE* pf;
 		
@@ -354,7 +387,7 @@ int main(int argc, char** argv)
 			char buffer[1024];
 			buffer[0] = '\0';
 			fgets(buffer, 1023, pf);
-			if (buffer[0] && buffer[0] != '#')
+			if (buffer[0]) // && buffer[0] != '#')
 			{
 				while (strlen(buffer) && buffer[strlen(buffer)-1] <= ' ') buffer[strlen(buffer)-1] = '\0';
         		script_lines.push_back(buffer);
@@ -374,6 +407,16 @@ int main(int argc, char** argv)
 		char** fields = chop_spaced_fields(buffer);
 		if (fields && fields[0] && fields[0][0] && fields[0][1])
 		{
+			for (k=0; fields[k]; k++)
+			{
+				if (fields[k][0] == '#')
+				{
+					//cout << "Ignoring comment " << fields[k] << endl;
+					fields[k] = nullptr;
+					break;
+				}
+			}
+			
 			// Debug cout.
 			/*cout << endl << "***Line: " << buffer << endl << "***Fields: ";
 			for (n=0; fields[n]; n++) cout << (n?"|":"") << fields[n];
@@ -387,6 +430,7 @@ int main(int argc, char** argv)
 				float phi, psi;
 				l = 2;
 				
+				if (!fields[1]) raise_error("No parameters given for HELIX.");
 				if (!strcmp(fields[1], "ALPHA")) { phi = ALPHA_PHI; psi = ALPHA_PSI; }
 				else if (!strcmp(fields[1], "PI")) { phi = PI_PHI; psi = PI_PSI; }
 				else if (!strcmp(fields[1], "3.10")) { phi = _310_PHI; psi = _310_PSI; }
@@ -400,13 +444,17 @@ int main(int argc, char** argv)
 				else
 				{
 					phi = interpret_single_float(fields[1]);
+					if (!fields[2]) raise_error("Insufficient parameters given for HELIX.");
 					psi = interpret_single_float(fields[2]);
 					l++;
 				}
 				
 				int sr, er;
+				if (!fields[l]) raise_error("Insufficient parameters given for HELIX.");
 				sr = interpret_single_int(fields[l]);
+				if (!fields[l+1]) raise_error("Insufficient parameters given for HELIX.");
 				er = interpret_single_int(fields[l+1]);
+				if (fields[l+2]) raise_error("Too many parameters given for HELIX.");
 				
 				p.make_helix(sr, er, phi, psi);
 				
@@ -416,8 +464,11 @@ int main(int argc, char** argv)
 			{
 				l = 1;
 				int sr, er, esr;
+				if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
 				sr = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
 				er = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
 				psz = interpret_single_string(fields[l]);
 				esr = er - strlen(psz);
 				
@@ -443,6 +494,8 @@ int main(int argc, char** argv)
 				n = find_var_index(fields[l]);
 				if (n<0) n = vars++;
 				n &= _VARNUM_MASK;
+				if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
+				if (fields[l+1]) raise_error("Too many parameters given for SEARCH.");
 				script_var[n].name = fields[l];
 				script_var[n].vt = type_from_name(fields[l]);
 				
@@ -456,7 +509,7 @@ int main(int argc, char** argv)
 					break;
 					
 					default:
-					cout << "Bad destination variable type for SEARCH." << endl;
+					raise_error("Bad destination variable type for SEARCH.");
 					return 0xbadfa12;
 				}
 				
@@ -467,12 +520,18 @@ int main(int argc, char** argv)
 				int sr, er, eachend;
 				Point sp, ep;
 				l = 1;
+				if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
 				sr = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
 				er = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
 				eachend = interpret_single_int(fields[l++]);
 				if (!eachend) eachend = 1;
+				if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
 				sp = interpret_single_point(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
 				ep = interpret_single_point(fields[l++]);
+				if (fields[l]) raise_error("Too many parameters given for ALIGN.");
 				
 				// From start and end residues inwards for a total of eachend, average the CA locations.
 				Point sl(0,0,0);
@@ -533,9 +592,12 @@ int main(int argc, char** argv)
 			{
 				l=1;
 				int sr, er, ct, iters=100;
+				if (!fields[l]) raise_error("Insufficient parameters given for CONNECT.");
 				sr = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for CONNECT.");
 				ct = interpret_single_int(fields[l++]);
 				if (fields[l]) iters = interpret_single_int(fields[l++]);
+				if (fields[l]) raise_error("Too many parameters given for CONNECT.");
 				er = ct - sgn(ct-sr);
 				
 				Atom *a1, *a2;
@@ -571,12 +633,14 @@ int main(int argc, char** argv)
 			
 			else if (!strcmp(fields[0], "LOAD"))
 			{
+				if (!fields[1]) raise_error("Insufficient parameters given for LOAD.");
 				psz = interpret_single_string(fields[1]);
+				if (fields[2]) raise_error("Too many parameters given for LOAD.");
 				
 				pf = fopen(psz, "rb");
 				if (!pf)
 				{
-					cout << "Failed to open " << psz << " for reading." << endl;
+					raise_error( (std::string)"Failed to open " + (std::string)psz + (std::string)" for reading.");
 					return 0xbadf12e;
 				}
 				p.load_pdb(pf);
@@ -636,12 +700,14 @@ int main(int argc, char** argv)
 			
 			else if (!strcmp(fields[0], "SAVE"))
 			{
+				if (!fields[1]) raise_error("Insufficient parameters given for SAVE.");
 				psz = interpret_single_string(fields[1]);
+				if (fields[2]) raise_error("Too many parameters given for SAVE.");
 				
 				pf = fopen(psz, "wb");
 				if (!pf)
 				{
-					cout << "Failed to open " << psz << " for writing." << endl;
+					raise_error( (std::string)"Failed to open " + (std::string)psz + (std::string)" for writing.");
 					return 0xbadf12e;
 				}
 				p.save_pdb(pf);
@@ -662,6 +728,7 @@ int main(int argc, char** argv)
 			
 			else if (!strcmp(fields[0], "LET"))
 			{
+				if (!fields[1]) raise_error("No parameters given for LET.");
 				n = find_var_index(fields[1]);
 				if (n<0)
 				{
@@ -672,6 +739,8 @@ int main(int argc, char** argv)
 				int flags = n & _VARFLAGS_MASK;
 				n &= _VARNUM_MASK;
 				
+				if (!fields[2]) raise_error("No operator given for LET.");
+				if (!fields[3] && strcmp(fields[2], "++") && strcmp(fields[2], "--") ) raise_error("No rvalue given for LET.");
 				switch (script_var[n].vt)
 				{
 					case SV_INT:
@@ -684,7 +753,7 @@ int main(int argc, char** argv)
 					else if (!strcmp(fields[2], "--")) script_var[n].value.n--;
 					else
 					{
-						cout << "Unimplemented operator " << fields[2] << " for int assignment." << endl;
+						raise_error( (std::string)"Unimplemented operator " + (std::string)fields[2] + (std::string)" for int assignment.");
 						return 0x51974c5;
 					}
 					l=0;
@@ -698,7 +767,7 @@ int main(int argc, char** argv)
 					else if (!strcmp(fields[2], "/=")) script_var[n].value.f /= interpret_single_float(fields[3]);
 					else
 					{
-						cout << "Unimplemented operator " << fields[2] << " for float assignment." << endl;
+						raise_error( (std::string)"Unimplemented operator " + (std::string)fields[2] + (std::string)" for float assignment.");
 						return 0x51974c5;
 					}
 					l=0;
@@ -710,7 +779,7 @@ int main(int argc, char** argv)
 						float* ff = nullptr;
 						
 						char* param = strchr(fields[1], '.');
-						if (!param) return 0xbadd07;
+						if (!param) raise_error( (std::string)"Missing member after dot.");
 						param++;
 						if (!strcmp(param, "x")) ff = &(script_var[n].value.ppt->x);
 						else if (!strcmp(param, "X")) ff = &(script_var[n].value.ppt->x);
@@ -720,7 +789,7 @@ int main(int argc, char** argv)
 						else if (!strcmp(param, "Z")) ff = &(script_var[n].value.ppt->z);
 						else
 						{
-							cout << "Error: Cartesian has no member named " << param << "." << endl;
+							raise_error((std::string)"Cartesian has no member named " + (std::string)param);
 							return 0xbadd07;
 						}
 						
@@ -733,7 +802,7 @@ int main(int argc, char** argv)
 							else if (!strcmp(fields[2], "/=")) *ff /= interpret_single_float(fields[3]);
 							else
 							{
-								cout << "Unimplemented operator " << fields[2] << " for float assignment." << endl;
+								raise_error( (std::string) "Unimplemented operator " + (std::string)fields[2] + (std::string)" for float assignment.");
 								return 0x51974c5;
 							}
 							l = 0;
@@ -766,7 +835,7 @@ int main(int argc, char** argv)
 						}
 						else
 						{
-							cout << "Unimplemented operator " << fields[2] << " for Cartesian assignment." << endl;
+							raise_error( (std::string)"Unimplemented operator " + (std::string)fields[2] + (std::string)" for Cartesian assignment.");
 							return 0x51974c5;
 						}
 					}
@@ -783,6 +852,7 @@ int main(int argc, char** argv)
 					if (fields[4] && !strcmp(fields[4], "FROM"))
 					{
 						l+=2;
+						if (!fields[5]) raise_error("Insufficient parameters given for LET.");
 						m = interpret_single_int(fields[5]);
 						if (m < 0) m = 0;
 						if (m)
@@ -795,6 +865,7 @@ int main(int argc, char** argv)
 								if (fields[6] && !strcmp(fields[6], "FOR"))
 								{
 									l+=2;
+									if (!fields[7]) raise_error("Insufficient parameters given for LET.");
 									k = interpret_single_int(fields[7]);
 									if (k >= 0 && k < strlen(psz)) psz[k] = 0;
 								}
@@ -818,7 +889,7 @@ int main(int argc, char** argv)
 					{
 						psz -= m;
 						delete[] psz;
-						cout << "Unimplemented operator " << fields[2] << " for string assignment." << endl;
+						raise_error( (std::string)"Unimplemented operator " + (std::string)fields[2] + (std::string)" for string assignment.");
 						return 0x51974c5;		// If you use your imagination, that says "syntax".
 					}
 					psz -= m;
@@ -831,6 +902,7 @@ int main(int argc, char** argv)
 				
 				while (n >= 0 && fields[3+l] && fields[4+l] && fields[5+l])
 				{
+					if (!fields[5+l]) raise_error("Insufficient parameters given for LET.");
 					switch (script_var[n].vt)
 					{
 						case SV_INT:
@@ -842,7 +914,7 @@ int main(int argc, char** argv)
 						else if (!strcmp(fields[4+l], "^")) script_var[n].value.n = pow(script_var[n].value.n, m);
 						else
 						{
-							cout << "Bad operator " << fields[4+l] << " for int." << endl;
+							raise_error( (std::string)"Bad operator " + (std::string)fields[4+l] + (std::string)" for int.");
 							return 0x51974c5;
 						}
 						break;
@@ -856,7 +928,8 @@ int main(int argc, char** argv)
 						else if (!strcmp(fields[4+l], "^")) script_var[n].value.f = pow(script_var[n].value.f, f);
 						else
 						{
-							cout << "Bad operator " << fields[4+l] << " for float." << endl;
+							// cout << "Bad operator " << fields[4+l] << " for float." << endl;
+							raise_error( (std::string)"Bad operator " + (std::string)fields[4+l] + (std::string)" for float.");
 							return 0x51974c5;
 						}
 						break;
@@ -869,7 +942,8 @@ int main(int argc, char** argv)
 						else if (!strcmp(fields[4+l], "/")) script_var[n].value.ppt->scale(pt.magnitude());
 						else
 						{
-							cout << "Bad operator " << fields[4+l] << " for point." << endl;
+							// cout << "Bad operator " << fields[4+l] << " for point." << endl;
+							raise_error( (std::string)"Bad operator " + (std::string)fields[4+l] + (std::string)" for point.");
 							return 0x51974c5;
 						}
 						break;
@@ -885,7 +959,8 @@ int main(int argc, char** argv)
 						}
 						else
 						{
-							cout << "Bad operator " << fields[4+l] << " for string." << endl;
+							// cout << "Bad operator " << fields[4+l] << " for string." << endl;
+							raise_error( (std::string)"Bad operator " + (std::string)fields[4+l] + (std::string)" for string.");
 							return 0x51974c5;
 						}
 						break;
@@ -934,6 +1009,7 @@ int main(int argc, char** argv)
 			
 			else if (!strcmp(fields[0], "GOTO"))
 			{
+				if (!fields[1]) raise_error("Insufficient parameters given for GOTO.");
 				sprintf(buffer1, "%s:", fields[1]);
 				for (n=0; n<script_lines.size(); n++)
 				{
@@ -947,7 +1023,7 @@ int main(int argc, char** argv)
 					}
 					delete[] psz;
 				}
-				cout << "Label not found: \"" << buffer1 << '"' << endl;
+				raise_error( (std::string)"Label not found: \"" + (std::string)buffer1 + (std::string)"\"");
 				return 0x51974c5;
 				
 				_found_goto_target:
@@ -961,7 +1037,7 @@ int main(int argc, char** argv)
 			
 			else
 			{
-				cout << "Unimplemented command: \"" << fields[0] << '"' << endl;
+				raise_error( (std::string)"Unimplemented command: \"" + (std::string)fields[0] + (std::string)"\"");
 				return 0x51974c5;
 			}
 		}

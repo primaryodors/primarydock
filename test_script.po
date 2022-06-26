@@ -12,6 +12,7 @@ ECHO "Protein is " $PROTEIN ", a peptide of " %SEQLEN " residues."
 LET &testing = 3.1416
 LET %inttest = &testing
 LET @test = [5,&testing,81] + [10,%inttest,67]
+LET @test.x += @test.y		# something.
 LET @test /= 2
 LET @res174 = 174
 ECHO @test " and " @res174
@@ -28,7 +29,7 @@ ECHO $msg
 # LET $testing = $SEQUENCE FROM %TMR4.e FOR 20
 # ECHO $testing
 
-SEARCH 1 %SEQLEN "MAYDRYVAIC" %maydryvaic
+SEARCH 1 %SEQLEN "MAYDRYVAIC" %maydryvaic #%blah $derp @uh_oh
 LET $maydryvaic = $SEQUENCE FROM %maydryvaic FOR 10
 ECHO "Olfactory receptor motif " $maydryvaic " found at position " %maydryvaic "."
 

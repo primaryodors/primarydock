@@ -774,7 +774,7 @@ void Protein::conform_backbone(int startres, int endres,
     int eando_res[am+4];
     float eando_mult[am+4];
     
-    for (res = startres; res <= endres; res += inc)
+    for (res = startres; res; res += inc)
     {
     	int residx = res-minres;
     	momenta1o[residx] = randsgn()*_fullrot_steprad;
@@ -784,6 +784,7 @@ void Protein::conform_backbone(int startres, int endres,
     	eando_res[residx] = min(res + (rand() % 5) + 1, endres);
     	if (eando_res[residx] == res) eando_res[residx] = 0;
     	eando_mult[residx] = 1;
+    	if (res == endres) break;
     }
 
 	set_clashables();

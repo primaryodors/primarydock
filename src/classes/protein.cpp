@@ -176,8 +176,17 @@ bool Protein::add_sequence(const char* lsequence)
 
 void Protein::save_pdb(FILE* os)
 {
-    if (!residues) return;
     int i, offset=0;
+
+	if (remarks.size())
+	{
+		for (i=0; i<remarks.size(); i++)
+		{
+			fprintf(os, "%s", remarks[i].c_str());
+		}
+	}
+	
+    if (!residues) return;
     for (i=0; residues[i]; i++)
     {
         residues[i]->save_pdb(os, offset);
@@ -203,23 +212,106 @@ void Protein::end_pdb(FILE* os)
 int Protein::load_pdb(FILE* is)
 {
     AminoAcid* restmp[65536];
-
+    char buffer[1024];
+    Atom* a;
+    
+    AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file. Yeah it's a shoddy way to program but that's the best that can be expected of KMS's horrible mistake.
+    AminoAcid* prevaa = nullptr;
+    
     int i, rescount=0;
 
     while (!feof(is))
     {
         try
         {
-            AminoAcid* aa = new AminoAcid(is);
-            // cout << rescount << " " << flush;
-            restmp[rescount++] = aa;
-            restmp[rescount] = NULL;
+        	int told = ftell(is);
+        	fgets(buffer, 1003, is);
+        	
+        	if (buffer[0] == 'A' &&
+        		buffer[1] == 'T' &&
+        		buffer[2] == 'O' &&
+        		buffer[3] == 'M'
+        		)
+    		{
+    			fseek(is, told, SEEK_SET);
+    			
+				char tmp3let[5];
+    			for (i=0; i<3; i++)
+    				tmp3let[i] = buffer[17+i];
+    			tmp3let[4] = 0;
+    			
+    			for (i=0; i<256; i++)
+    			{
+    				if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
+    				{
+    					AminoAcid* aa = new AminoAcid(is, prevaa);
+						// cout << rescount << tmp3let << " " << flush;
+						restmp[rescount++] = aa;
+						restmp[rescount] = NULL;
+						prevaa = aa;
+						goto _found_AA;
+    				}
+    			}
+    			
+    			// If no AA, load a metal.
+                if (!metcount % 16)
+                {
+                    Atom** mtmp = new Atom*[metcount+20];
+                    if (metals)
+                    {
+                        for (i=0; metals[i]; i++)
+                            mtmp[i] = metals[i];
+                        mtmp[i] = NULL;
+                        delete metals;
+                    }
+                    metals = mtmp;
+                }
+    			
+    			a = new Atom(is);
+                metals[metcount++] = a;
+                metals[metcount] = NULL;
+                // cout << "M" << metcount << " ";
+
+                for (i=0; i<26; i++)
+                {
+                    if (aa_defs[i]._1let && !strcmp(aa_defs[i]._3let, a->aa3let ))
+                    {
+                        a->aaletter = aa_defs[i]._1let;
+                        break;
+                    }
+                }
+    		}
+    		else
+    		{
+    			if (buffer[0] == 'R' &&
+            		buffer[1] == 'E' &&
+            		buffer[2] == 'M' &&
+            		buffer[3] == 'A' &&
+            		buffer[4] == 'R' &&
+            		buffer[5] == 'K'
+            		)
+            	{
+	            	remarks.push_back(buffer);
+	            	// cout << "Found remark " << buffer;
+	            	
+	            	if (buffer[7] == '6' && buffer[8] < '!')
+	            	{
+	            		char** fields = chop_spaced_fields(buffer);
+	            		if (fields[2] && !fields[3])
+	            			name = fields[2];
+	            	}
+            	}
+    		}
+        	
+            _found_AA:
+            ;
         }
         catch (int ex)
         {
             // cout << "Exception " << ex << endl;
-            if (ex == ATOM_NOT_OF_AMINO_ACID)
+            switch (ex)
             {
+            	case ATOM_NOT_OF_AMINO_ACID:
                 if (!metcount % 16)
                 {
                     Atom** mtmp = new Atom*[metcount+20];
@@ -233,7 +325,7 @@ int Protein::load_pdb(FILE* is)
                     metals = mtmp;
                 }
 
-                Atom* a = new Atom(is);
+                a = new Atom(is);
                 metals[metcount++] = a;
                 metals[metcount] = NULL;
 
@@ -245,9 +337,24 @@ int Protein::load_pdb(FILE* is)
                         break;
                     }
                 }
+                break;
 
+            	case NOT_ATOM_RECORD:
+            	fgets(buffer, 1003, is);
+            	cout << buffer << endl;
+            	if (buffer[0] == 'R' &&
+            		buffer[1] == 'E' &&
+            		buffer[2] == 'M' &&
+            		buffer[3] == 'A' &&
+            		buffer[4] == 'R' &&
+            		buffer[5] == 'K'
+            		)
+	            	remarks.push_back(buffer);
+	            break;
+	            
+	            default:
+	            throw 0xbadca22;
             }
-            else throw 0xbadca22;
         }
     }
 
@@ -306,9 +413,14 @@ int  Protein::get_seq_length()
 {
     if (!sequence) return 0;
     int i;
-    for (i=0; sequence[i]; i++)
-        ;
+    for (i=0; sequence[i]; i++);	// Obtain the count.
     return i;
+}
+
+std::string Protein::get_sequence()
+{
+	if (!sequence) return 0;
+	return std::string(sequence);
 }
 
 int  Protein::get_start_resno()
@@ -317,6 +429,18 @@ int  Protein::get_start_resno()
     else return residues[0]->get_residue_no();
 }
 
+std::vector<std::string> Protein::get_remarks(std::string search_for)
+{
+	std::vector<string> retval;
+	int i;
+	for (i=0; i<remarks.size(); i++)
+	{
+		if (!search_for.length() || strstr(remarks[i].c_str(), search_for.c_str()))
+			retval.push_back(remarks[i]);
+	}
+	
+	return retval;
+}
 
 void Protein::set_clashables()
 {
@@ -646,25 +770,30 @@ void Protein::conform_backbone(int startres, int endres,
                dir2 = (inc>0) ? CA_asc : C_desc;
     
     int am = abs(endres-startres), minres = (inc>0) ? startres : endres;
-    float momenta1[am+4], momenta2[am+4];
+    float momenta1o[am+4], momenta2o[am+4], momenta1e[am+4], momenta2e[am+4];
     int eando_res[am+4];
     float eando_mult[am+4];
     
-    for (res = startres; res <= endres; res += inc)
+    for (res = startres; res; res += inc)
     {
     	int residx = res-minres;
-    	momenta1[residx] = randsgn()*_fullrot_steprad;
-    	momenta2[residx] = randsgn()*_fullrot_steprad;
+    	momenta1o[residx] = randsgn()*_fullrot_steprad;
+    	momenta2o[residx] = randsgn()*_fullrot_steprad;
+    	momenta1e[residx] = randsgn()*_fullrot_steprad;
+    	momenta2e[residx] = randsgn()*_fullrot_steprad;
     	eando_res[residx] = min(res + (rand() % 5) + 1, endres);
     	if (eando_res[residx] == res) eando_res[residx] = 0;
     	eando_mult[residx] = 1;
+    	if (res == endres) break;
     }
 
 	set_clashables();
     float tolerance = 1.2, alignfactor = 100;
+    int ignore_clashes_until = iters*0.666;
     for (iter=0; iter<iters; iter++)
     {
-        cout << "Iteration " << iter << endl;
+        // cout << "Iteration " << iter << endl;
+        cout << iter << " " << flush;
         for (res = startres; res != endres; res += inc)
         {
         	int residx = res-minres;
@@ -679,66 +808,68 @@ void Protein::conform_backbone(int startres, int endres,
                 if (!aa) continue;
                 AminoAcid** rcc = get_residues_can_clash(i);
                 if (!rcc) cout << "No clashables." << endl;
-                if (a1)		bind -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
-                else		bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                if (a1 && (iter >= ignore_clashes_until)) bind -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
+                else bind += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1 && iter>10)
             {
                 Point pt = a1->get_location();
-                bind += alignfactor/(pt.get_3d_distance(target1)+0.000001);
+                bind += alignfactor/(pt.get_3d_distance(target1)+0.001);
             }
             if (a2 && iter>10)
             {
                 Point pt = a2->get_location();
-                bind += alignfactor/(pt.get_3d_distance(target2)+0.000001);
+                bind += alignfactor/(pt.get_3d_distance(target2)+0.001);
             }
 
 			if (reinterpret_cast<long>(get_residue(res)) < 0x1000) cout << "Warning missing residue " << res << endl << flush;
 			else if (strcmp(get_residue(res)->get_3letter(), "PRO"))		// TODO: Don't hard code this to proline, but check bond flexibility.
             {
                 // Rotate the first bond a random amount. TODO: use angular momenta.
-                angle = momenta1[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
+                angle = (iter & 1) ? momenta1o[residx] : momenta1e[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
                 rotate_backbone_partial(res, endres, dir1, angle);
-                if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, -angle*eando_mult[residx]);
+                if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, -angle*eando_mult[residx]);
 
                 // Have bindings/clashes improved?
                 for (i=res; i != endres; i += inc)
                 {
                     AminoAcid* aa = get_residue(i);
                     AminoAcid** rcc = get_residues_can_clash(i);
-                    if (a1)		bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
-                	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                    if (a1 && (iter >= ignore_clashes_until)) bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
+                	else bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
                 }
                 if (a1)
                 {
                     Point pt = a1->get_location();
-                    bind1 += alignfactor/pt.get_3d_distance(target1);
+                    bind1 += alignfactor/(pt.get_3d_distance(target1)+0.001);
                 }
                 if (a2)
                 {
                     Point pt = a2->get_location();
-                    bind1 += alignfactor/pt.get_3d_distance(target2);
+                    bind1 += alignfactor/(pt.get_3d_distance(target2)+0.001);
                 }
 
                 // If no, put it back.
-                if (res == startres) cout << bind << " v. " << bind1 << endl;
+                // if (res == startres) cout << bind << " v. " << bind1 << endl;
                 if (bind1 < tolerance*bind)
                 {
                     rotate_backbone_partial(res, endres, dir1, -angle);
                     if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, angle*eando_mult[residx]);
-                    momenta1[residx] *= -0.666;
+                    if (iter & 1) momenta1o[residx] *= -0.666;
+                    else momenta1e[residx] *= -0.666;
                 }
                 else
                 {
                     if (bind1 < bind) bind = bind1;
-                    momenta1[residx] *= 1.05;
+                    if (iter & 1) momenta1o[residx] *= 1.05;
+                    else momenta1e[residx] *= 1.05;
                 }
             }
 
             // Rotate the second bond.
-            angle = momenta2[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
+            angle = (iter & 1) ? momenta2o[residx] : momenta2e[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
             rotate_backbone_partial(res, endres, dir2, angle);
-            if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, -angle*eando_mult[residx]);
+            if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, -angle*eando_mult[residx]);
 
             // Improvement?
             bind1 = 0;
@@ -747,37 +878,111 @@ void Protein::conform_backbone(int startres, int endres,
                 AminoAcid* aa = get_residue(i);
                 if (!aa) continue;
                 AminoAcid** rcc = get_residues_can_clash(i);
-                if (a1)		bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
-            	else		bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                if (a1 && (iter >= ignore_clashes_until)) bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
+            	else bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1)
             {
                 Point pt = a1->get_location();
-                bind1 += alignfactor/pt.get_3d_distance(target1);
+                bind1 += alignfactor/(pt.get_3d_distance(target1)+0.001);
             }
             if (a2)
             {
                 Point pt = a2->get_location();
-                bind1 += alignfactor/pt.get_3d_distance(target2);
+                bind1 += alignfactor/(pt.get_3d_distance(target2)+0.001);
             }
 
             // If no, put it back.
-            if (res == startres) cout << bind << " vs. " << bind1 << endl;
+            // if (res == startres) cout << bind << " vs. " << bind1 << endl;
             if (bind1 < tolerance*bind)
             {
                 rotate_backbone_partial(res, endres, dir2, -angle);
-                if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, angle*eando_mult[residx]);
-                momenta2[residx] *= -0.666;
+                if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, angle*eando_mult[residx]);
+                if (iter & 1) momenta2o[residx] *= -0.666;
+                else momenta2e[residx] *= -0.666;
             }
             else
             {
-                momenta2[residx] *= 1.05;
+                if (iter & 1) momenta2o[residx] *= 1.05;
+                else momenta2e[residx] *= 1.05;
             }
 
             alignfactor *= 1.003;
             tolerance = ((tolerance-1)*0.97)+1;
         }
     }
+    cout << endl;
+    
+    return;
+    
+    // TODO: This doesn't work very well.
+    // Glom the last residue onto the target.
+    // Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
+    // Then do the same for the previous residue, and the one before, etc,
+    // all the way back to the starting residue.
+    // Give a warning if the starting residue has an anomaly > 0.1A.
+    AminoAcid *next, *curr, *prev;
+    int pointer = endres;
+    float anomaly = 0;
+    
+	next = get_residue(endres+inc);
+	curr = get_residue(pointer);
+	prev = get_residue(pointer-inc);
+    do
+    {
+		LocatedVector lv = (inc > 0) ? next->predict_previous_CO() : next->predict_next_NH();
+    	curr->glom(lv, inc > 0);
+    	
+    	MovabilityType fmov = curr->movability;
+		curr->movability = MOV_ALL;
+		
+		lv = (inc < 0) ? prev->predict_previous_CO() : prev->predict_next_NH();
+		Point target_heavy = lv.origin;
+		Point target_pole = lv.to_point();
+		
+		float theta, step, r, btheta=0, bestr;
+		for (theta=0; theta < M_PI*2; theta += step)
+		{
+			r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
+			r += target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+			
+			if (!theta || (r < bestr))
+			{
+				bestr = r;
+				btheta = theta;
+			}
+			
+			curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , step );
+		}
+		curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , btheta );
+		
+		btheta=0;
+		for (theta=0; theta < M_PI*2; theta += step)
+		{
+			r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
+			r += target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+			
+			if (!theta || (r < bestr))
+			{
+				bestr = r;
+				btheta = theta;
+			}
+			
+			curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , step );
+		}
+		curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , btheta );
+		anomaly = bestr;
+		
+		curr->movability = fmov;
+    	
+    	pointer -= inc;
+    	next = curr;
+    	curr = prev;
+		prev = get_residue(pointer-inc);
+    } while (pointer != startres);
+    
+    if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
+    						<< "# " << (startres+inc) << " anomaly: " << anomaly << endl;
 }
 
 void Protein::make_helix(int startres, int endres, float phi, float psi)
@@ -798,11 +1003,26 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
     for (res = startres; inc; res += inc)
     {
         AminoAcid* aa = get_residue(res);
+        
+        LocRotation lr = aa->enforce_peptide_bond();
+        
+        if (lr.v.r)
+        {
+            AminoAcid* movable;
+
+            for (i=res+inc; movable = get_residue(i); i+=inc)
+            {
+                LocatedVector lv = lr.get_lv();
+                movable->rotate(lv, lr.a);
+                if (i >= stopat) break;
+            }
+        }
 
         LocRotation* lr2 = aa->flatten();
 
         for (j=0; j<5; j++)
         {
+        	// cout << "Rotating " << *aa << " " << lr2[j].a*fiftyseven << " degrees." << endl;
             if (lr2[j].v.r && lr2[j].a)
             {
                 AminoAcid* movable;
@@ -811,7 +1031,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                 {
                     LocatedVector lv = lr2[j].get_lv();
                     movable->rotate(lv, lr2[j].a);
-                    if (i == stopat) break;
+                    if (i >= stopat) break;
                 }
 
                 int round_theta = (int)(lr2[j].a*fiftyseven+0.5);
@@ -824,8 +1044,9 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             }
         }
         delete[] lr2;
-
-        LocRotation lr = aa->rotate_backbone_abs(dir1, phi);
+        
+		// cout << "Rotating " << *aa << " phi " << (phi*fiftyseven) << " degrees." << endl;
+        lr = aa->rotate_backbone_abs(dir1, phi);
 
         if (lr.v.r)
         {
@@ -833,12 +1054,15 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 
             for (i=res+inc; movable = get_residue(i); i+=inc)
             {
+            	// cout << i << " ";
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
-                if (i == stopat) break;
+                if (i >= stopat) break;
             }
         }
+        // cout << endl;
 
+        // cout << "Rotating " << *aa << " psi " << (psi*fiftyseven) << " degrees." << endl;
         lr = aa->rotate_backbone_abs(dir2, psi);
 
         if (lr.v.r)
@@ -847,11 +1071,13 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 
             for (i=res+inc; movable = get_residue(i); i+=inc)
             {
+                // cout << i << " ";
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
-                if (i == stopat) break;
+                if (i >= stopat) break;
             }
         }
+        // cout << endl;
 
         if (res >= endres) break;
     }

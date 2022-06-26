@@ -28,9 +28,11 @@ struct Rotation;
 union Star
 {
     int n;
+    float f;
     char* psz;
     const char* cpsz;
     void* p;
+    Point* ppt;
     Atom* pa;
     Atom** ppa;
     Bond* pb;

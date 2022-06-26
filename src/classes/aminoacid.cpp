@@ -12,23 +12,25 @@
 
 using namespace std;
 
-AADef aa_defs[26];
+AADef aa_defs[256];
 char* override_aminos_dat=0;
 
-AminoAcid::AminoAcid(FILE* instream)
+AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa)
 {
-    if (!aa_defs[0]._1let) AminoAcid::load_aa_defs();
+    if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
     movability = MOV_FLEXONLY;
     from_pdb(instream);
     minclash = get_internal_clashes();
     mol_typ = MOLTYP_AMINOACID;
+    prev_aa = prevaa;
+    if (prevaa) prevaa->next_aa = this;
 }
 
 #define _ALGORITHMIC_GREEK 1
 AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 {
-    if (!aa_defs[0]._1let) AminoAcid::load_aa_defs();
+    if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
     movability = MOV_FLEXONLY;
     mol_typ = MOLTYP_AMINOACID;
@@ -36,15 +38,17 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     if (!prevaa) residue_no = 1;
     else residue_no = prevaa->residue_no + 1;
 
-    int idx = (letter & 0x5f) - 'A';
+    int idx = letter;
     aadef = &aa_defs[idx];
-    if (!aa_defs[idx].aabonds)
+    /*if (!aa_defs[idx].aabonds)
     {
         cout << "Cannot load " << letter << " please make sure amino acid exists in aminos.dat and all atoms are defined." << endl;
         throw 0xbadac1d;
-    }
-
+    }*/
+    
     name = aa_defs[idx].name;
+    prev_aa = prevaa;
+    if (prevaa) prevaa->next_aa = this;
 
     int i, j, k, l, n;
     
@@ -61,7 +65,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	int atom_prev[ac4];
     	int numgrk[29];			// 24 letters, one based, plus extra space.
     	
-    	Atom *N = nullptr, *HN = nullptr, *C = nullptr, *O = nullptr;
+    	Atom *N = nullptr, *HN = nullptr, *CA = nullptr, *C = nullptr, *O = nullptr;
     	
     	for (i=0; i<ac4; i++) atom_Greek[i] = atom_append[i] = atom_prepend[i] = 0;
     	
@@ -110,10 +114,11 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 							O = ab[j]->btom->is_bonded_to(CHALCOGEN, 2);
 							if (O)
 							{
-								atoms[i]->name = new char[5];
-								strcpy(atoms[i]->name, "CA");
-								atoms[i]->is_backbone = true;
-								k = atom_idx_from_ptr(atoms[i]);
+								CA = atoms[i];
+								CA->name = new char[5];
+								strcpy(CA->name, "CA");
+								CA->is_backbone = true;
+								k = atom_idx_from_ptr(CA);
 								if (k >= 0)
 								{
 									atom_Greek[k] = 1;
@@ -364,6 +369,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     		newname += strGrk.substr(atom_Greek[i]-1, 1);
     		if (atom_append[i]) newname += std::to_string(atom_append[i]);
     		
+    		if (aa_defs[idx].isoleucine_fix && atom_Greek[i]==4 && !atom_append[i]) newname += "1";
+    		
     		// cout << atoms[i]->name << " is now " << newname << endl;
     		strcpy(atoms[i]->name, newname.c_str());
     	}
@@ -435,10 +442,99 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		#endif
     	
     	get_rotatable_bonds();
+    }	// if SMILES
+    else
+    {
+    	if (letter != '#') cout << "WARNING no atoms for " << letter << " (blank SMILES)." << endl;
+    	return;
+	}
+    
+    if (!atoms || !atoms[0]) cout << "WARNING no atoms for " << aa_defs[idx].name << " (" << aa_defs[idx].SMILES << ")" << endl;
+    
+    if (!aa_defs[idx].aabonds)
+    {
+    	AABondDef** aabd = new AABondDef*[get_atom_count()+16];
+    	n=0;
+    	for (i=0; atoms[i]; i++)
+    	{
+    		Bond** bb = atoms[i]->get_bonds();
+    		int bg = atoms[i]->get_geometry();
+    		
+    		if (!i)
+    		{
+    			aabd[n] = new AABondDef();
+				strcpy(aabd[n]->aname, atoms[i]->name);
+				strcpy(aabd[n]->bname, "<C");
+				aabd[n]->cardinality = 1.5;
+				aabd[n]->acharge = 0;
+				aabd[n]->can_rotate = false;
+    			n++;
+    		}
+    		
+    		for (j=0; j<bg; j++)
+    		{
+    			if (bb[j]->btom && bb[j]->btom < bb[j]->atom)
+    			{
+    				aabd[n] = new AABondDef();
+    				strcpy(aabd[n]->aname, bb[j]->atom->name);
+    				strcpy(aabd[n]->bname, bb[j]->btom->name);
+    				aabd[n]->cardinality = bb[j]->cardinality;
+    				aabd[n]->acharge = bb[j]->atom->get_charge();
+    				aabd[n]->can_rotate =
+    					(	aabd[n]->cardinality <= 1.1
+	    					&&
+	    					(	!bb[j]->atom->is_pi() || !bb[j]->btom->is_pi()	)
+	    				);
+	    			n++;
+    			}
+    		}
+    		
+    		delete[] bb;
+    	}
+    	
+    	aa_defs[idx].aabonds = new AABondDef*[n+2];
+    	for (i=0; i<n; i++)
+    	{
+    		aa_defs[idx].aabonds[i] = aabd[i];
+			// cout << aa_defs[idx].name << ":" << aa_defs[idx].aabonds[i]->aname << " is bonded to " << aa_defs[idx].aabonds[i]->bname << "." << endl;
+		}
+		aa_defs[idx].aabonds[i] = nullptr;
+    	
+    	delete[] aabd;
     }
     
 	// flatten();
 	minimize_internal_clashes();
+	
+	
+    
+    identify_acidbase();
+    identify_rings();
+    
+    aa_defs[idx].hydrophilicity = AminoAcid::hydrophilicity();
+    if (capable_of_inter(mcoord)) aa_defs[idx].can_coord_metal = true;
+    if (fabs(get_charge()) >= 0.9) aa_defs[idx].charged = sgn(get_charge());
+    
+    if (rings)
+    {
+    	for (i=0; rings[i]; i++)
+    	{
+    		if (rings[i]->is_conjugated() && rings[i]->is_coplanar())
+    		{
+    			aa_defs[idx].aromatic = true;
+    			break;
+			}
+		}
+	}
+	
+	aa_defs[idx].loaded = true;
+	
+	/*cout << "Hydrophilic? " << ((aa_defs[idx].hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD) ? "Y" : "N") << " (" << aa_defs[idx].hydrophilicity << ")" << endl;
+	cout << "Metal coord? " << (aa_defs[idx].can_coord_metal ? "Y" : "N") << endl;
+	cout << "Charge? " << aa_defs[idx].charged << endl;
+	cout << "Aromatic? " << (aa_defs[idx].aromatic ? "Y" : "N") << endl;*/
+	
+	
 	
 	Atom* CA = get_atom("CA");
 	Atom* CB = get_atom("CB");
@@ -564,6 +660,92 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 	}
 }
 
+LocatedVector AminoAcid::predict_previous_CO()
+{
+	Atom* N = get_atom("N");
+	if (!N) return LocatedVector();
+	N->aromatize();
+	Atom* CA = get_atom("CA");
+	Atom* HN  = HN_or_substitute();
+	if (!CA || !HN) return LocatedVector();
+	
+	Point prevCloc(1.32,0,0), prevOloc(0,1.2,0);
+	
+	prevCloc = N->get_location().add(prevCloc);
+	prevOloc = prevOloc.add(prevCloc);
+	
+	LocatedVector lv;
+	int i;
+	for (i=0; i<10; i++)
+	{
+		// Step 1: H-N-C angle.
+		SCoord axis = compute_normal(CA->get_location(), N->get_location(), HN->get_location());
+		float theta = find_angle_along_vector(HN->get_location(), prevCloc, N->get_location(), axis);
+		float plus  = triangular - theta;
+		float minus = triangular*2 - theta;
+		
+		// Rotate to get 120 degrees not clashing next.N with curr.CA.
+		Point maybeP = rotate3D(prevCloc, N->get_location(), axis, plus);
+		Point maybeM = rotate3D(prevCloc, N->get_location(), axis, minus);
+		lv.copy(axis);
+		lv.origin = N->get_location();
+		if (maybeP.get_3d_distance(CA->get_location()) > maybeM.get_3d_distance(CA->get_location()))
+		{
+			prevCloc = maybeP;
+			prevOloc = rotate3D(prevOloc, lv.origin, axis, plus);
+		}
+		else
+		{
+			prevCloc = maybeM;
+			prevOloc = rotate3D(prevOloc, lv.origin, axis, minus);
+		}
+		
+		// Step 2: N-C-O angle.
+		axis = compute_normal(CA->get_location(), N->get_location(), HN->get_location());
+		theta = find_angle_along_vector(N->get_location(), prevOloc, prevCloc, axis);
+		plus  = triangular - theta;
+		minus = triangular*2 - theta;
+		
+		// Rotate to get 120 degrees each way.
+		maybeP = rotate3D(prevOloc, prevCloc, axis, plus);
+		maybeM = rotate3D(prevOloc, prevCloc, axis, minus);
+		
+		// Whichever point is farthest from O is the direction of HN (trans configuration).
+		lv.copy(axis);
+		lv.origin = N->get_location();
+		if (maybeP.get_3d_distance(HN->get_location()) > maybeM.get_3d_distance(HN->get_location()))
+		{
+			prevOloc = maybeP;
+		}
+		else
+		{
+			prevOloc = maybeM;
+		}
+		
+		// Step 3: Enforce trans configuration 180 degrees.
+		axis = prevCloc.subtract(N->get_location());
+		theta = find_angle_along_vector(prevOloc, HN->get_location(), prevCloc, axis);
+			
+		// Rotate the around next.N to get 180 degrees.
+		lv.copy(axis);
+		lv.origin = prevCloc;
+		prevOloc = rotate3D(prevOloc, lv.origin, axis, M_PI+theta);
+			
+		// Rotate around C axis C-O to get 180 degrees about that axis.
+		axis = HN->get_location().subtract(N->get_location());
+		theta = find_angle_along_vector(CA->get_location(), prevCloc, N->get_location(), axis);
+		lv.copy(axis);
+		lv.origin = N->get_location();
+		prevCloc = rotate3D(prevCloc, lv.origin, axis, M_PI-theta);
+		prevOloc = rotate3D(prevOloc, lv.origin, axis, M_PI-theta);
+			
+	}
+	
+	lv.copy(prevOloc.subtract(prevCloc));
+	lv.origin = prevCloc;
+	return lv;
+}
+
 LocatedVector AminoAcid::predict_next_NH()
 {
 	Atom* C = get_atom("C");
@@ -573,7 +755,7 @@ LocatedVector AminoAcid::predict_next_NH()
 	Atom* O  = get_atom("O");
 	if (!CA || !O) return LocatedVector();
 	
-	Point nextNloc(1.32,0,0), nextHNloc(0,1,0);
+	Point nextNloc(1.32,0,0), nextHNloc(0,1.0,0);
 	
 	nextNloc = C->get_location().add(nextNloc);
 	nextHNloc = nextHNloc.add(nextNloc);
@@ -650,6 +832,25 @@ LocatedVector AminoAcid::predict_next_NH()
 	return lv;
 }
 
+void AminoAcid::glom(LocatedVector predicted, bool CO)
+{
+	MovabilityType fmov = movability;
+	movability = MOV_ALL;
+	
+	// Translation: move the entire AA so that the N (or C) corresponds to the predicted origin.
+	Point moveby = predicted.origin.subtract( CO ? get_atom_location("C") : get_atom_location("N") );
+	aamove(moveby);
+	
+	// Rotation: rotate the entire AA about the predicted origin so that the HN (or O) aligns with the predicted vector.
+	Point pt1 = CO ? get_atom_location("O") : HN_or_substitute_location(), pt2 = predicted.to_point();
+	Rotation rot = align_points_3d( &pt1, &pt2, &predicted.origin );
+	LocatedVector lv = rot.v;
+	lv.origin = predicted.origin;
+	rotate(lv, rot.a);
+	
+	movability = fmov;
+}
+
 Molecule** AminoAcid::aas_to_mols(AminoAcid** aas)
 {
 	if (!aas) return NULL;
@@ -678,6 +879,8 @@ void AminoAcid::save_pdb(FILE* os, int atomno_offset)
 int AminoAcid::from_pdb(FILE* is)
 {
     /*
+              1111111111222222222233333333334444444444555555555566666666667777777777
+    01234567890123456789012345678901234567890123456789012345678901234567890123456789
     ATOM     55  SG  CYS     4       6.721  -8.103   4.542  1.00001.00           S
     */
     char buffer[1024], origbuf[1024], res3let[5];
@@ -693,35 +896,21 @@ int AminoAcid::from_pdb(FILE* is)
         strcpy(origbuf, buffer);
         char** fields = chop_spaced_fields(buffer);
 
-        if (fields)
+        try
         {
-            if (!strcmp(fields[0], "ATOM")
-                /*||
-                !strcmp(fields[0], "HETATM")*/
-               )
-            {
-                try
-                {
+		    if (fields)
+		    {
+		    	// cout << fields[0] << endl;
+		        if (!strcmp(fields[0], "ATOM")
+		            /*||
+		            !strcmp(fields[0], "HETATM")*/
+		           )
+		        {
                     // cout << "Resno " << fields[4] << " vs old " << resno << endl;
                     if (!residue_no) residue_no = atoi(fields[4]);
                     if (!res3let[0])
                     {
                         strcpy(res3let, fields[3]);
-                        /*int i;
-                        // cout << res3let << "|";
-                        for (i=0; i<26; i++)
-                        {	// cout << aa_defs[i]._3let << "|";
-                        	if (!strcmp(res3let, aa_defs[i]._3let))
-                        	{	cout << res3let << " matches " << aa_defs[i]._3let << ". AA is " << aa_defs[i]._1let << endl;
-                        		aadef = &aa_defs[i];
-                        		break;
-                        	}
-                        }
-                        if (!aadef)
-                        {	aadef = new AADef();
-                        	aadef->_1let = '?';
-                        	cout << res3let << " does not match anything." << endl;
-                        }*/
                     }
 
                     if (!atno_offset) atno_offset = atoi(fields[1]);
@@ -772,7 +961,7 @@ int AminoAcid::from_pdb(FILE* is)
                     AADef* aaa=0;
 
                     name=0;
-                    for (i=0; i<26; i++)
+                    for (i=0; i<256; i++)
                     {
                         if (aa_defs[i]._1let && !strcmp(aa_defs[i]._3let, fields[3]))
                         {
@@ -788,9 +977,16 @@ int AminoAcid::from_pdb(FILE* is)
                     {
                         fseek(is, lasttell, SEEK_SET);
                         delete[] fields;
-                        throw ATOM_NOT_OF_AMINO_ACID;
+                        return added;
+                        //throw ATOM_NOT_OF_AMINO_ACID;
                     }
                     else aadef = aaa;
+                    
+                    if (aaa && !aaa->aabonds)
+                    {
+                    	AminoAcid* tempaa = new AminoAcid(aaa->_1let);
+                    	delete tempaa;
+                    }
 
                     if (aaa && aaa->aabonds)
                     {
@@ -799,6 +995,7 @@ int AminoAcid::from_pdb(FILE* is)
                             AABondDef* aab = aaa->aabonds[i];
                             if (!strcmp(aab->aname, a->name))
                             {
+                            	// cout << aaa->_1let << ":" << aab->aname << cardinality_printable(aab->cardinality) << aab->bname << endl;
                                 if (aaa->aabonds[i] && aaa->aabonds[i]->acharge)
                                 {
                                     a->increment_charge(aaa->aabonds[i]->acharge);
@@ -815,6 +1012,21 @@ int AminoAcid::from_pdb(FILE* is)
                                         if (b) b->can_rotate = false;
                                     }
                                 }
+                            }
+                            else if (!strcmp(aab->bname, a->name))
+                            {
+                            	Atom* btom = get_atom(aab->aname);
+                            	if (btom && !btom->is_bonded_to(a))
+                            	{
+                            		a->bond_to(btom, aab->cardinality);
+                                    if (aab->cardinality == 1 && !aab->can_rotate)
+                                    {
+                                        Bond* b = a->get_bond_between(btom);
+                                        if (b) b->can_rotate = false;
+                                        b = btom->get_bond_between(a);
+                                        if (b) b->can_rotate = false;
+                                    }
+                            	}
                             }
                         }
                     }
@@ -850,11 +1062,19 @@ int AminoAcid::from_pdb(FILE* is)
                     }
 
                 }
-                catch (int ex)
-                {
-                    if (ex == ATOM_NOT_OF_AMINO_ACID) throw ex;
-                }
+		        else
+		        {
+		        	fseek(is, lasttell, SEEK_SET);
+		        	delete[] fields;
+		        	return added;
+		    	}
             }
+            else return added;
+        }
+        catch (int ex)
+        {
+            if (ex == ATOM_NOT_OF_AMINO_ACID) throw ex;
+            if (ex == NOT_ATOM_RECORD) throw ex;
         }
         buffer[0] = 0;
 
@@ -869,15 +1089,13 @@ _return_added:
 void AminoAcid::copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs, bool proline_like)
 {
     int lidx = (letter & 0x5f) - 'A';
-    if (lidx<0 || lidx>26) return;
-    aa_defs[lidx].aabonds = new AABondDef*[tbdctr+1];
+    if (lidx<0 || lidx>256) return;
+    aa_defs[lidx].aabonds = nullptr;
     int j;
     for (j=0; j<tbdctr; j++)
     {
-        aa_defs[lidx].aabonds[j] = tmpbdefs[j];
         aa_defs[lidx].proline_like = proline_like;
     }
-    aa_defs[lidx].aabonds[tbdctr] = 0;
 }
 
 
@@ -912,12 +1130,12 @@ void AminoAcid::load_aa_defs()
 
                 try
                 {
-                    for (i=0; fields[i]; i++) if (fields[i][0] == '"')
+                    for (i=0; fields[i]; i++) if (fields[i][0] == '%')
                         {
                             fields[i] = lastfields[i];
                         }
 
-                    int idx = (fields[0][0] & 0x5f) - 'A';
+                    int idx = fields[0][0];
 
                     if (!lastletter || fields[0][0] != lastletter)
                     {
@@ -926,112 +1144,24 @@ void AminoAcid::load_aa_defs()
                         proline_like = false;
 
                         if (tmpbdefs) delete[] tmpbdefs;
-                        tmpbdefs = new AABondDef*[256];
                     }
 
-                    // i = (fields[0][0] & 0x5f) - 'A';
-                    // cout << aa_defs[idx]._1let;
                     if (!aa_defs[idx]._1let)
                     {
-                        aa_defs[idx]._1let = 'A'+idx;
+                        aa_defs[idx]._1let = idx;
                         // cout << aa_defs[idx]._1let;
                         strcpy(aa_defs[idx]._3let, fields[1]);
                         strcpy(aa_defs[idx].name, fields[2]);
                         aa_defs[idx].reach = 1.09;
+                        
+                        if (!strcmp(aa_defs[idx].name, "isoleucine")) aa_defs[idx].isoleucine_fix = true;
                     }
 
-                    tmpbdefs[tbdctr] = new AABondDef();
-                    strcpy(tmpbdefs[tbdctr]->aname, fields[3]);
 
-                    isbb = !strcmp(fields[3], "N")
-                           || !strcmp(fields[3], "HN")
-                           || !strcmp(fields[3], "CA")
-                           || !strcmp(fields[3], "HA")
-                           || !strcmp(fields[3], "C")
-                           || !strcmp(fields[3], "O")
-                           ;
-
-                    if (!isbb)
+                    if (fields[3])
                     {
-                        int gki = strlen(fields[3])-1;
-                        if (fields[3][gki] >= '0' && fields[3][gki] <= '9') gki--;
-                        if (gki && fields[3][gki-1] >= 'A')
-                        {
-                            char gk = fields[3][gki];
-                            lastgrk.psz = strchr(Hellenic.psz, gk);
-                            if (lastgrk.n) lastgrk.n -= Hellenic.n;
-                            float lreach = (1.54*2*cos((tetrahedral-M_PI/2)*2))/2 * lastgrk.n + 1.09;
-                            if (lreach > aa_defs[idx].reach)
-                            {
-                                aa_defs[idx].reach = lreach;
-                                //cout << aa_defs[idx]._3let << " has a reach of " << lreach << " because lastgreek " << Greek[lastgrk.n] << endl;
-                            }
-                        }
-                    }
-
-                    tmpbdefs[tbdctr]->cardinality = atof(fields[5]);
-                    tmpbdefs[tbdctr]->can_rotate
-                        = tmpbdefs[tbdctr]->cardinality == 1
-                          &&
-                          !strchr(fields[5], '!')
-                          ;
-                    if (isbb && strchr(fields[5], '!')) proline_like = true;
-
-                    if (fields[6][0] == '+') fields[6][0] = ' ';
-                    tmpbdefs[tbdctr]->acharge = atof(fields[6]);
-
-                    char* comma = strstr(fields[4],",");
-                    if (comma)
-                    {
-                        char* part2 = comma+1;
-                        *comma = 0;
-                        strcpy(tmpbdefs[tbdctr]->bname, fields[4]);
-                        // if (i==5) cout << "Fields[4] = " << fields[4] << "; part2 = " << part2 << endl;
-
-                        tbdctr++;
-                        tmpbdefs[tbdctr] = new AABondDef();
-                        strcpy(tmpbdefs[tbdctr]->aname, fields[3]);
-                        strcpy(tmpbdefs[tbdctr]->bname, part2);
-                        comma = strstr(fields[5],",");
-                        part2 = comma+1;
-                        *comma = 0;
-                        tmpbdefs[tbdctr-1]->cardinality = atof(fields[5]);
-                        tmpbdefs[tbdctr-1]->can_rotate
-                            = tmpbdefs[tbdctr-1]->cardinality == 1
-                              &&
-                              !strchr(fields[5], '!')
-                              ;
-                        if (isbb && strchr(fields[5], '!')) proline_like = true;
-                        strcpy(tmpbdefs[tbdctr-1]->bname, fields[4]);
-                        tmpbdefs[tbdctr]->cardinality = atof(part2);
-                        tmpbdefs[tbdctr]->can_rotate
-                            = tmpbdefs[tbdctr]->cardinality == 1
-                              &&
-                              !strchr(part2, '!')
-                              ;
-                        if (isbb && strchr(part2, '!')) proline_like = true;
-                        tmpbdefs[tbdctr]->acharge = atof(fields[6]);
-                    }
-                    else
-                    {
-                        strcpy(tmpbdefs[tbdctr]->bname, fields[4]);
-                    }
-
-                    if (fields[7])
-                    {
-                    	if (fields[7][0] == '=')
-                    	{
-                    		tmpbdefs[tbdctr]->SMILES_idx = atoi(&fields[7][1]);
-                    	}
-                    	else if (fields[7][0] == '@')
-                    	{
-                    		tmpbdefs[tbdctr]->SMILES_idx = 1000 + atoi(&fields[7][1]);
-                    	}
-                    	else
-                    	{
-                    		aa_defs[idx].SMILES = fields[7];
-                    		tmpbdefs[tbdctr]->SMILES_idx = 1;
-                		}
+                		aa_defs[idx].SMILES = fields[3];
+                		if (strstr(aa_defs[idx].SMILES.c_str(), "N1")) aa_defs[idx].proline_like = proline_like = true;
                 	}
 
                     tbdctr++;
@@ -1086,6 +1216,37 @@ bool AminoAcid::can_reach(AminoAcid* other) const
     else return false;
 }
 
+int AminoAcid::similarity_to(const char letter)
+{
+	AminoAcid* a = nullptr;
+	if (!aa_defs[letter].SMILES.length()) return 0;
+	if (!aa_defs[letter].loaded)
+	{
+		a = new AminoAcid(letter);
+		delete a;
+	}
+	if (!aadef) return 0;
+	
+	int retval = 0;
+	if (aadef->hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD
+		&&
+		aa_defs[letter].hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD)
+	{
+		retval += fmin(aadef->hydrophilicity, aa_defs[letter].hydrophilicity)*2;
+		if (aadef->charged == aa_defs[letter].charged) retval += 1;
+	}
+	if (aadef->hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD
+		&&
+		aa_defs[letter].hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD)
+		retval += 2;
+	// cout << aadef->hydrophilicity << "|" << aa_defs[letter].hydrophilicity << endl;
+	// return retval;
+	
+	if (aadef->aromatic == aa_defs[letter].aromatic) retval += 2;
+	if (aadef->can_coord_metal == aa_defs[letter].can_coord_metal) retval += 1;
+	
+	return retval;
+}
 
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 {
@@ -1112,7 +1273,8 @@ bool AminoAcid::capable_of_inter(intera_type inter)
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
-        InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], atoms[i]);
+        if (InteratomicForce::atom_is_capable_of(atoms[i], inter)) return true;
+        /*InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], atoms[i]);
         if (!iff) continue;
         for (j=0; iff[j]; j++)
             if (iff[j]->get_type() == inter)
@@ -1120,10 +1282,35 @@ bool AminoAcid::capable_of_inter(intera_type inter)
                 // cout << *this << " is capable of " << inter << " binding because of atom " << atoms[i]->name << endl;
                 delete[] iff;
                 return true;
-            }
+            }*/
     }
 
     return false;
+}
+
+float AminoAcid::hydrophilicity()
+{
+	int i, count=0;
+	float total=0;
+	for (i=0; atoms[i]; i++)
+	{
+		if (atoms[i]->is_backbone) continue;
+		
+		int Z = atoms[i]->get_Z();
+		int fam = atoms[i]->get_family();
+		if (Z==1) continue;
+		
+		total += atoms[i]->hydrophilicity_rule();
+		count++;
+	}
+	return count ? (total / count) : 0;
+}
+
+Point AminoAcid::get_CA_location()
+{
+	Atom* a = get_atom("CA");
+	if (!a) return Point(0,0,0);
+	return a->get_location();
 }
 
 void AminoAcid::aamove(SCoord move_amt)
@@ -1157,7 +1344,9 @@ void AminoAcid::rotate(LocatedVector SCoord, float theta)
         Point loc = atoms[i]->get_location();
         Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
         atoms[i]->move(&nl);
+        // cout << atoms[i]->residue << ":" << atoms[i]->name << nl << " ";
     }
+    // cout << endl;
 
     // If you have a metal coordination, AND YOU ARE THE FIRST COORDINATING RESIDUE OF THE METAL, move the metal with you.
     if (m_mcoord && m_mcoord->coord_res && m_mcoord->coord_res[0] == this)
@@ -1221,15 +1410,89 @@ Atom* AminoAcid::next_residue_N()
     return NULL;
 }
 
+Atom* AminoAcid::HN_or_substitute()
+{
+	Atom* retval = get_atom("HN");
+	if (!retval) retval = get_atom("H");
+	if (!retval)
+	{
+		Atom* a = get_atom("N");
+		if (!a) return nullptr;
+		int i;
+		Bond** bb = a->get_bonds();
+		if (!bb) return nullptr;
+		int g = a->get_geometry();
+		
+		for (i=0; i<g; i++)
+		{
+			if (bb[i]->btom && strcmp(bb[i]->btom->name, "CA")) return bb[i]->btom;
+		}
+	}
+	return retval;
+}
+
+Point AminoAcid::HN_or_substitute_location()
+{
+	Atom* a = HN_or_substitute();
+	if (!a) return Point(0,0,0);
+	else return a->get_location();
+}
+
+LocRotation AminoAcid::enforce_peptide_bond(bool cis)
+{
+	LocRotation retval;
+	if (!atoms) return retval;
+	if (!prev_aa) return retval;
+	
+	Atom *pC = prev_aa->get_atom("C");
+	Atom *pO = prev_aa->get_atom("O");
+	Atom* lN = get_atom("N");
+	Atom* lH = HN_or_substitute();
+	
+	if (!pC || !pO || !lN || !lH) return retval;
+	
+	Point ptC = pC->get_location();
+	Point ptO = pO->get_location();
+	Point ptN = lN->get_location();
+	Point ptH = lH->get_location();
+	
+	SCoord v = ptN.subtract(ptC);
+	
+	// TODO: Refine the algorithm further so that coplanarity is enforced, including CA atoms, and bond angles as well.
+	float theta, step=1.0*fiftyseventh, bestr = 0, besttheta=0;
+	if (cis) bestr = 999999;
+	for (theta=0; theta < M_PI*2; theta+=step)
+	{
+		Point ptnew = rotate3D(ptH, ptN, v, theta);
+		float r = ptnew.get_3d_distance(ptO);
+		if ((cis && (r < bestr)) || (!cis && (r > bestr)))
+		{
+			bestr = r;
+			besttheta = theta;
+		}
+	}
+	
+	retval.origin = ptN;
+	retval.v = v;
+	retval.a = besttheta;
+	
+	int i;
+	for (i=0; atoms[i]; i++)
+	{
+		Point ptnew = rotate3D(atoms[i]->get_location(), retval.origin, retval.v, retval.a);
+		atoms[i]->move(ptnew);
+		// cout << atoms[i]->residue << ":" << atoms[i]->name << "->" << ptnew << " ";
+	}
+	// cout << endl;
+	
+	return retval;
+}
+
 LocRotation* AminoAcid::flatten()
 {
 	Bond* b;
     LocRotation* retval = new LocRotation[5];
     if (m_mcoord) return retval;	// NO.
-    
-    retval[0] = rotate_backbone_abs(N_asc, M_PI);
-    retval[1] = rotate_backbone_abs(CA_asc, M_PI);
-    return retval;
 
     Atom* prevC = previous_residue_C();
     if (!prevC) return retval;
@@ -1307,84 +1570,85 @@ LocRotation* AminoAcid::flatten()
         if (proline) continue;
 
         float planar = 9999, r = 9999;
-        for (i=0; i<50; i++)
+        for (i=0; i<250; i++)
         {
             if (i == 49 && j >= 3) ad[j] = M_PI;
 
             switch(j)
             {
-            case 3:
-                rotate_backbone(N_asc, ad[j]);
-                break;
+		        case 3:
+		            rotate_backbone(N_asc, ad[j]);
+		            break;
 
-            case 4:
-                rotate_backbone(CA_asc, ad[j]);
-                break;
+		        case 4:
+		            rotate_backbone(CA_asc, ad[j]);
+		            break;
 
-            default:
-                ;
+		        default:
+		            ;
             }
 
-            Point pt1, pt2, pt3, pt4, pt5, pt6, pt7, pt8;
+            Point pCA, pC, pO, lN, lCA, lHN, lC, lO;
+            
+            pCA = prevCA->get_location();
+            pC = prevC->get_location();
+            pO = prevO->get_location();
+                
             if (j < 3)
             {
-                pt1 = prevC->get_location();
-                pt2 = prevO->get_location();
-                pt3 = rotate3D(localN->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
-                pt4 = rotate3D(localCA->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
-                pt5 = rotate3D(localHN->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
-                pt6 = rotate3D(localC->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
-                pt7 = rotate3D(localO->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
-                pt8 = prevCA->get_location();
+                lN = rotate3D(localN->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
+                lCA = rotate3D(localCA->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
+                lHN = rotate3D(localHN->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
+                lC = rotate3D(localC->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
+                lO = rotate3D(localO->get_location(), retval[j].origin, retval[j].v, retval[j].a+ad[j]);
             }
             else
             {
-                pt1 = prevC->get_location();
-                pt2 = prevO->get_location();
-                pt3 = localN->get_location();
-                pt4 = localCA->get_location();
-                pt5 = localHN->get_location();
-                pt6 = localC->get_location();
-                pt7 = localO->get_location();
+                lN = localN->get_location();
+                lCA = localCA->get_location();
+                lHN = localHN->get_location();
+                lC = localC->get_location();
+                lO = localO->get_location();
             }
 
             float lplanar, lr;
 
             switch (j)
             {
-            case 0:
-                lplanar = are_points_planar(pt1, pt2, pt3, pt5);
-                lr = 4;
-                break;
+		        case 0:
+		            lplanar = are_points_planar(pC, pO, lN, lHN);
+		            lr = 4;
+		            break;
 
-            case 1:
-                lplanar = are_points_planar(pt1, pt2, pt3, pt4);
-                lr = 4;
-                break;
+		        case 1:
+		            lplanar = are_points_planar(pC, lN, lHN, lCA);
+		            lr = 4;
+		            break;
 
-            case 2:
-                lplanar = are_points_planar(pt1, pt2, pt3, pt8);
-                lr = 4;
-                break;
+		        case 2:
+		            lplanar = are_points_planar(pC, pO, lN, pCA);
+		            lr = 4;
+		            break;
 
-            case 3:
-                lplanar = are_points_planar(pt3, pt4, pt5, pt6);
-                lr = pt5.get_3d_distance(pt7);
-                break;
+		        case 3:
+		            lplanar = are_points_planar(lN, lCA, lHN, lC);
+		            lr = lHN.get_3d_distance(lO);
+		            break;
 
-            case 4:
-                lplanar = are_points_planar(pt4, pt5, pt6, pt7);
-                lr = pt5.get_3d_distance(pt7);
-                break;
+		        case 4:
+		            lplanar = are_points_planar(lCA, lHN, lC, lO);
+		            lr = lHN.get_3d_distance(lO);
+		            break;
 
-            default:
-                ;
+		        default:
+		            ;
             }
 
-            if ( (i == 49 && j >= 3) ? (lr <= r) : (lplanar <= planar) )
+            if ( (i >= 40 && j >= 3) ? (lr <= r) : (lplanar <= planar) )
             {
                 retval[j].a += ad[j];
-                if (fabs(ad[j]) < 0.5) ad[j] *= 1.1;
+                if (retval[j].a > M_PI) retval[j].a -= M_PI*2;
+                if (fabs(ad[j]) < 0.5) ad[j] *= 1.05;
                 planar = lplanar;
                 r = lr;
             }
@@ -1392,16 +1656,16 @@ LocRotation* AminoAcid::flatten()
             {
                 switch(j)
                 {
-                case 3:
-                    rotate_backbone(N_asc, -ad[j]);
-                    break;
+		            case 3:
+		                rotate_backbone(N_asc, -ad[j]);
+		                break;
 
-                case 4:
-                    rotate_backbone(CA_asc, -ad[j]);
-                    break;
+		            case 4:
+		                rotate_backbone(CA_asc, -ad[j]);
+		                break;
 
-                default:
-                    ;
+		            default:
+		                ;
                 }
                 ad[j] *= -0.5;
             }
@@ -1410,14 +1674,15 @@ LocRotation* AminoAcid::flatten()
         LocatedVector lv = retval[j].get_lv();
         switch(j)
         {
-        case 0:
-        case 1:
-        case 2:
-            rotate(lv, retval[j].a);
-            break;
+		    case 0:
+		    case 1:
+		    case 2:
+                if (retval[j].a > M_PI) retval[j].a -= M_PI*2;
+		        rotate(lv, retval[j].a);
+		        break;
 
-        default:
-            ;
+		    default:
+		        ;
         }
     }
 
@@ -1431,8 +1696,14 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     // For the CA-C bond, of a residue not at the C-terminus, there is a torsion angle that will place
     // the local N atom as far as possible from the next residue's N atom.
     LocRotation retval;
-    if (m_mcoord) return retval;	// NO.
-    //return retval;
+    if (m_mcoord)
+    {
+    	cout << *this << " is a metal-coordinating residue; cannot rotate backbone." << endl;
+    	return retval;	// NO.
+	}
+    // return retval;
+    
+    if (aadef && aadef->proline_like) return retval;
 
     // Get the location of the previous C, and the location of the local C.
     Atom *atom, *btom;
@@ -1462,11 +1733,25 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
         break;
 
     	default:
+    	cout << "Bad direction for " << *this << "; cannot rotate backbone." << endl;
         return retval;
     }
-    if (!atom || !btom) return retval;
+    if (!atom || !btom)
+    {
+    	cout << "Not found axial atom for " << *this << "; cannot rotate backbone." << endl;
+    	return retval;
+	}
     Bond* b = atom->get_bond_between(btom);
-    if (!b) return retval;
+    if (!b)
+    {
+    	atom->bond_to(btom, 1);
+    	b = atom->get_bond_between(btom);
+	}
+    if (!b)
+    {
+    	cout << "No bond between " << *this << ":" << atom->name << "-" << btom->name << "; cannot rotate backbone." << endl;
+    	return retval;
+	}
     if (!m_mcoord) b->can_rotate = true;
     
 	switch (dir)
@@ -1485,15 +1770,20 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
         break;
 
     	default:
-        return retval;
+        cout << "Bad direction (second attempt) for " << *this << "; cannot rotate backbone." << endl;
+    	return retval;
     }
     
     // Use the SCoord as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
     int i, step=3;
     float bestrad=0, bestr;
     
-    if (!atom || !btom) return retval;
-    bestr = atom->get_location().get_3d_distance(btom->get_location());
+    if (!atom || !btom)
+    {
+    	cout << "Not found reference atom for " << *this << "; cannot rotate backbone." << endl;
+    	return retval;
+	}
+    bestr = atom->get_location().get_3d_distance(btom->get_location()) * 1000;
     for (i=0; i<360; i+=step)
     {
     	b->rotate(fiftyseventh*step, true);
@@ -1506,7 +1796,8 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     }
 
     // To this maximum stretch angle, add the input angle and do the backbone rotation.
-    LocatedVector retlv = rotate_backbone(dir, bestrad+angle);
+    // cout << "Calling " << *this << ".rotate_backbone( " << (bestrad*fiftyseven) << " + " << (angle*fiftyseven) << ")..." << endl;
+	LocatedVector retlv = rotate_backbone(dir, bestrad+angle);
     retval.v.r = retlv.r;
     retval.v.theta = retlv.theta;
     retval.v.phi = retlv.phi;
@@ -1521,9 +1812,19 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     LocatedVector retval;
     Point rel, bloc;
     char aname[5], bname[5];
-    if (!atoms) return retval;
-    if (m_mcoord) return retval;	// NO.
+    if (!atoms) 
+    {
+    	// cout << "No atoms for " << get_3letter() << residue_no << "; cannot rotate backbone." << endl;
+    	return retval;
+	}
+    if (m_mcoord)
+    {
+    	// cout << get_3letter() << residue_no << "has a metal coordination; cannot rotate backbone." << endl;
+    	return retval;	// NO.
+	}
     // return retval;
+    
+    if (aadef && aadef->proline_like) return retval;
 
     // Determine the center of rotation and rotation SCoord.
     switch (direction)
@@ -1552,15 +1853,23 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
 		    return retval;
     }
     rotcen = get_atom(aname);
-    if (!rotcen) return retval;
+    if (!rotcen)
+    {
+    	// cout << get_3letter() << residue_no << ":" << aname << "not found; cannot rotate backbone." << endl;
+    	return retval;
+	}
     retval.origin = rotcen->get_location();
     btom = get_atom(bname);
-    if (!btom) return retval;
+    if (!btom)
+    {
+    	// cout << get_3letter() << residue_no << ":" << bname << "not found; cannot rotate backbone." << endl;
+    	return retval;
+	}
 
     Bond* b = rotcen->get_bond_between(btom);
     if (!b || !b->can_rotate)
     {
-        // cout << "FORBIDDEN cannot rotate " << *this << ":" << rotcen->name << "-" << btom->name << endl;
+        // cout << "Non-rotatable bond " << *this << ":" << rotcen->name << "-" << btom->name << "; cannot rotate backbone." << endl;
         retval.r = 0;		// Fail condition.
         return retval;
     }

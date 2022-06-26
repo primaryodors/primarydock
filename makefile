@@ -5,7 +5,7 @@ OUTDIR=output
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 TESTS=test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/backbone_test
-APPS=$(BINDIR)/podock
+APPS=$(BINDIR)/podock $(BINDIR)/interpreter
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
 all: $(DIRS) \
 	 $(OBJS) \
@@ -58,7 +58,7 @@ $(OBJDIR)/protein.o: src/classes/protein.h src/classes/protein.cpp $(OBJDIR)/ami
 	$(CC) -c src/classes/protein.cpp -o $(OBJDIR)/protein.o $(CFLAGS)
 
 test/point_test: src/point_test.cpp $(OBJDIR)/point.o
-	$(CC) src/point_test.cpp $(OBJDIR)/point.o -o test/point_test $(CFLAGS)
+	$(CC) src/point_test.cpp $(OBJDIR)/point.o $(OBJDIR)/misc.o -o test/point_test $(CFLAGS)
 
 test/atom_test: src/atom_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o
 	$(CC) src/atom_test.cpp $(OBJDIR)/misc.o $(OBJDIR)/atom.o $(OBJDIR)/point.o -o test/atom_test $(CFLAGS)
@@ -83,6 +83,9 @@ test/backbone_test: src/backbone_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR
 
 $(BINDIR)/podock: src/podock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 	$(CC) src/podock.cpp $(OBJS) -o $(BINDIR)/podock $(CFLAGS)
+
+$(BINDIR)/interpreter: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
+	$(CC) src/interpreter.cpp $(OBJS) -o $(BINDIR)/interpreter $(CFLAGS)
 
 performance_test: $(BINDIR)/podock testdata/test_TAAR8.config testdata/TAAR8.rotated.pdb testdata/CAD_ion.sdf
 	./$(BINDIR)/podock testdata/test_TAAR8.config

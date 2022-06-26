@@ -420,6 +420,8 @@ int Molecule::from_sdf(char const* sdf_dat)
     int i,j=0,lncount;
 
     immobile = false;
+    
+    // cout << sdf_dat << endl;
 
     lines[j++] = sdf_dat;
     for (i=0; sdf_dat[i]; i++)
@@ -506,7 +508,7 @@ int Molecule::from_pdb(FILE* is)
     {
         fgets(buffer, 1003, is);
         char** fields = chop_spaced_fields(buffer);
-
+        
         if (fields)
         {
             if (!strcmp(fields[0], "ATOM")
@@ -1242,8 +1244,6 @@ Bond** AminoAcid::get_rotatable_bonds()
     {
     	for (i=0; aadef->aabonds[i]; i++)
     	{
-                
-            
     		if (aadef->aabonds[i]->cardinality == 1
     			&&
     			aadef->aabonds[i]->can_rotate
@@ -1257,9 +1257,33 @@ Bond** AminoAcid::get_rotatable_bonds()
     				Bond* lb = la->get_bond_between(aadef->aabonds[i]->bname);
     				if (!lb)
     				{
+    					// TODO: Add the missing bond if possible.
     					cout << "Warning: No bond between " << la->residue << ":" << la->name
 							 << " and " << aadef->aabonds[i]->bname
 							 << endl << flush;
+						
+						Bond** lbb = la->get_bonds();
+						if (lbb)
+						{
+							cout << la->name << " is bonded to:";
+							int o, ag = la->get_geometry();
+							for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
+							cout << "." << endl;
+						}
+						
+						Atom* lba = get_atom(aadef->aabonds[i]->bname);
+						if (lba)
+						{
+							lbb = lba->get_bonds();
+							if (lbb)
+							{
+								cout << lba->name << " is bonded to:";
+								int o, ag = lba->get_geometry();
+								for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
+								cout << "." << endl;
+							}
+						}
+						else cout << aadef->aabonds[i]->bname << " not found." << endl;
 					}
     				else
     				{
@@ -1322,6 +1346,21 @@ Bond** AminoAcid::get_rotatable_bonds()
     rotatable_bonds = retval;
 
     return retval;
+}
+
+float Molecule::hydrophilicity()
+{
+	int i, count;
+	float total;
+	for (i=0; atoms[i]; i++)
+	{
+		int Z = atoms[i]->get_Z();
+		if (Z==1) continue;
+		
+		total += atoms[i]->hydrophilicity_rule();
+		count++;
+	}
+	return count ? (total / count) : 0;
 }
 
 Bond** Molecule::get_all_bonds(bool unidirectional)
@@ -1499,6 +1538,17 @@ Point Molecule::get_barycenter() const
     for (i=0; i<atcount; i++) locs[i] = atoms[i]->get_location();
 
     return average_of_points(locs, atcount);
+}
+
+float Molecule::get_charge()
+{
+	int i;
+	float charge=0;
+	for (i=0; atoms[i]; i++)
+	{
+		charge += atoms[i]->get_charge();
+	}
+	return charge;
 }
 
 void Molecule::recenter(Point nl)

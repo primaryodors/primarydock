@@ -10,7 +10,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
     char letter = 'A';
-    if (argc>1)
+    if (argc>1 && strlen(argv[1]) > 1)
     {
         int i, j, seqarg=1;
 
@@ -67,7 +67,16 @@ int main(int argc, char** argv)
     }
     else
     {
+    	if (argc>1) letter = argv[1][0];
         AminoAcid aa(letter);
+        
+        cout << aa.get_name() << " hydrophilicity = " << aa.hydrophilicity() << endl;
+        cout << "Similarity to A " << aa.similarity_to('A') << endl;
+        cout << "Similarity to D " << aa.similarity_to('D') << endl;
+        cout << "Similarity to R " << aa.similarity_to('R') << endl;
+        cout << "Similarity to F " << aa.similarity_to('F') << endl;
+        cout << "Similarity to C " << aa.similarity_to('C') << endl;
+        cout << "Similarity to S " << aa.similarity_to('S') << endl;
 
         const char* outfn = "test.pdb";
         FILE* pf = fopen(outfn, "wb");

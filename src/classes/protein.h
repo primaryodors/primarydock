@@ -35,12 +35,13 @@ class Protein
     void set_region(std::string name, int start, int end);
 
     // Serialization.
-    int load_pdb(FILE* instream);				// Returns number of residues loaded.
-    void save_pdb(FILE* outstream);
-    void end_pdb(FILE* outstream);
+    int load_pdb(FILE* infile);				// Returns number of residues loaded.
+    void save_pdb(FILE* outfile);
+    void end_pdb(FILE* outfile);
 
     // Getters.
     int get_seq_length();
+    std::string get_sequence();
     int get_start_resno();
     AminoAcid* get_residue(int resno);
     Molecule* metals_as_molecule();
@@ -50,6 +51,8 @@ class Protein
     int get_region_end(std::string name);
     Atom* get_atom(int resno, const char* aname);
     Point get_atom_location(int resno, const char* aname);
+    std::vector<std::string> get_remarks(std::string search_for = "");
+    std::string get_name() { return std::string(name); }
 
     // Metrics functions.
     float get_internal_clashes();
@@ -98,6 +101,7 @@ class Protein
     Star aaptrmin, aaptrmax;
     MetalCoord** m_mcoord=0;
     Region regions[PROT_MAX_RGN];
+    std::vector<string> remarks;
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);

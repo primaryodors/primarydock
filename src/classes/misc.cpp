@@ -61,10 +61,20 @@ char** chop_spaced_fields(char* line, char separator)
     if (line[0] != separator) retval[j++] = line;
     for (i=1; line[i] && (line[i] != '\n'); i++)
     {
+    	if (line[i] == '"')
+    	{
+    		retval[j++] = &line[i++];
+    		for (; line[i] && line[i] != '"'; i++);		// Get to next quote character.
+    		if (line[i] == '"') line[++i] = '\0';
+    		continue;
+    	}
+    	
+    	
         if (separator == ' ' && line[i] == '\t') line[i] = separator;
         if (line[i-1] == separator && line[i] != separator) retval[j++] = line+i;
         else if (line[i-1] == 0 && line[i] != separator) retval[j++] = line+i;
         else if (line[i-1] != separator && line[i] == separator) line[i] = 0;
+        if (line[i] == '\n') line[i] = 0;
         if (j >= 99) break;
     }
     if (line[i] == '\n') line[i] = 0;
@@ -233,6 +243,17 @@ std::string cardinality_printable(float card)
 	
 	return retval;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

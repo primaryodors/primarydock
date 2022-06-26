@@ -16,6 +16,16 @@ var nglcitation
 	+ "Nucl Acids Res (1 July 2015) 43 (W1):\n"
 	+ "W576-W579 first published online April 29, 2015.\n"
 	+ "doi:10.1093/nar/gkv402";
+
+const aa1let = "ARNDCEQGHOILKMFPÖUSTWYV";
+const aa3let =
+[
+	'ALA', 'ARG', 'ASN', 'ASP', 'CYS',
+	'GLU', 'GLN', 'GLY', 'HIS', 'HYP',
+	'ILE', 'LEU', 'LYS', 'MET', 'PHE',
+	'PRO', 'PYL', 'SEC', 'SER', 'THR',
+	'TRP', 'TYR', 'VAL',
+];
 </script>
 <style>
 body
@@ -299,16 +309,6 @@ Center:
 </center>
 <script>
 
-const aa1let = "ARNDCEQGHILKMFPSTWYVU";
-const aa3let =
-[
-	'ALA', 'ARG', 'ASN', 'ASP', 'CYS',
-	'GLU', 'GLN', 'GLY', 'HIS', 'ILE',
-	'LEU', 'LYS', 'MET', 'PHE', 'PRO',
-	'SER', 'THR', 'TRP', 'TYR', 'VAL',
-	'SEC',
-];
-
 function aa_1let_from_3let(laa3let)
 {
 	var retval = "?";
@@ -340,7 +340,8 @@ function show_seqdd()
 		tgl.className = "clickme nodebtn sctgbtn" + (restoggled[i+1] ? " hilite" : "");
 		tgl.innerText = sequence.substr(i, 1);
 		tgl.id = "seqddtgl" + (i+1);
-		tgl.title = sequence.substr(i, 1)+(i+1);
+		var ia = aa1let.indexOf(sequence.substr(i,1));
+		tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
 		tgl.setAttribute("onclick", "event.preventDefault(); toggleSideChain("+(i+1)+"); return false;");
 		tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 		tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
@@ -389,7 +390,7 @@ function show_seqdd()
 // Can modify this array to your preferred TMR color scheme.
 var tmcolor =
 {
-    1: 0x666666,
+    1: 0x665577,
     2: 0x0066cc,
     3: 0x00cc00,
     4: 0x99cc66,
@@ -680,9 +681,9 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 stage.setParameters(
 {
 	'backgroundColor': '#080400',
-	'ambientColor': '#6cc',
-    'ambientIntensity': 0.5,
-	'lightColor': '#f9c',
+	'ambientColor': '#59f',
+    'ambientIntensity': 0.4,
+	'lightColor': '#fc8',
     'lightIntensity': 0.6,
 });
 
@@ -713,7 +714,11 @@ if (molid != "~")
 			var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
 		    stage.loadFile( stringBlob, { ext: "sdf" } ).then( function( comp )
 		    {
-		        comp.addRepresentation( "ball+stick", { multipleBond: true } );
+		        comp.addRepresentation( "ball+stick",
+		        {
+		        	multipleBond: true,
+		        	metalness: 0.15,
+		        } );
 		        gmodel.push(comp);
 		        comp.autoView();
 		    } );
@@ -1040,7 +1045,10 @@ function loadFile(fileData, fileName = "")
                 {
                     if (fext == 'sdf')
                     {
-                        comp.addRepresentation( "ball+stick", { multipleBond: true } );
+                        comp.addRepresentation( "ball+stick",
+                        {	multipleBond: true,
+                        	metalness: 0.15,
+                        } );
                         gmodel.push(comp);
                     }
 
@@ -1051,7 +1059,7 @@ function loadFile(fileData, fileName = "")
                             opacity: 0.8,
 							colorScheme: PODefRgnScheme,
                             // colorScale: 'rainbow',
-                            metalness: 0.15
+                            metalness: 0.15,
                         });
                         gmodel.push(comp);
 

@@ -591,7 +591,7 @@ int main(int argc, char** argv)
 			else if (!strcmp(fields[0], "CONNECT"))
 			{
 				l=1;
-				int sr, er, ct, iters=100;
+				int sr, er, ct, iters=250;
 				if (!fields[l]) raise_error("Insufficient parameters given for CONNECT.");
 				sr = interpret_single_int(fields[l++]);
 				if (!fields[l]) raise_error("Insufficient parameters given for CONNECT.");
@@ -637,7 +637,7 @@ int main(int argc, char** argv)
 				psz = interpret_single_string(fields[1]);
 				
 				p.add_sequence(psz);
-				p.conform_backbone(1, p.get_seq_length(), 200);
+				p.conform_backbone(1, p.get_seq_length(), 50);
 				goto _prot_deets;
 			} // GEN
 			

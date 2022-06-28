@@ -788,12 +788,12 @@ void Protein::conform_backbone(int startres, int endres,
     }
 
 	set_clashables();
-    float tolerance = 1.2, alignfactor = 100;
+    float tolerance = 1.2, alignfactor = 100, reversal = -0.81, enhance = 1.25;
     int ignore_clashes_until = iters*0.666;
     for (iter=0; iter<iters; iter++)
     {
         // cout << "Iteration " << iter << endl;
-        cout << iter << " " << flush;
+        cout << " " << iter << flush;
         for (res = startres; res != endres; res += inc)
         {
         	int residx = res-minres;
@@ -855,14 +855,14 @@ void Protein::conform_backbone(int startres, int endres,
                 {
                     rotate_backbone_partial(res, endres, dir1, -angle);
                     if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, angle*eando_mult[residx]);
-                    if (iter & 1) momenta1o[residx] *= -0.666;
-                    else momenta1e[residx] *= -0.666;
+                    if (iter & 1) momenta1o[residx] *= reversal;
+                    else momenta1e[residx] *= reversal;
                 }
                 else
                 {
                     if (bind1 < bind) bind = bind1;
-                    if (iter & 1) momenta1o[residx] *= 1.05;
-                    else momenta1e[residx] *= 1.05;
+                    if (iter & 1) momenta1o[residx] *= enhance;
+                    else momenta1e[residx] *= enhance;
                 }
             }
 
@@ -898,18 +898,31 @@ void Protein::conform_backbone(int startres, int endres,
             {
                 rotate_backbone_partial(res, endres, dir2, -angle);
                 if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, angle*eando_mult[residx]);
-                if (iter & 1) momenta2o[residx] *= -0.666;
-                else momenta2e[residx] *= -0.666;
+                if (iter & 1) momenta2o[residx] *= reversal;
+                else momenta2e[residx] *= reversal;
             }
             else
             {
-                if (iter & 1) momenta2o[residx] *= 1.05;
-                else momenta2e[residx] *= 1.05;
+                if (iter & 1) momenta2o[residx] *= enhance;
+                else momenta2e[residx] *= enhance;
             }
 
             alignfactor *= 1.003;
             tolerance = ((tolerance-1)*0.97)+1;
         }
+        
+        float r = 0;
+        if (a1)
+        {
+        	Point pt = a1->get_location();
+            r += pt.get_3d_distance(target1);
+        }
+        if (a2)
+        {
+        	Point pt = a2->get_location();
+            r += pt.get_3d_distance(target2);
+        }
+        if (r) cout << "." << r << flush;
     }
     cout << endl;
     
@@ -1014,7 +1027,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             {
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
-                if (i >= stopat) break;
+                if (i == stopat) break;
             }
         }
 
@@ -1031,7 +1044,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                 {
                     LocatedVector lv = lr2[j].get_lv();
                     movable->rotate(lv, lr2[j].a);
-                    if (i >= stopat) break;
+                    if (i == stopat) break;
                 }
 
                 int round_theta = (int)(lr2[j].a*fiftyseven+0.5);
@@ -1057,7 +1070,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             	// cout << i << " ";
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
-                if (i >= stopat) break;
+                if (i == stopat) break;
             }
         }
         // cout << endl;
@@ -1074,7 +1087,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                 // cout << i << " ";
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
-                if (i >= stopat) break;
+                if (i == stopat) break;
             }
         }
         // cout << endl;

@@ -77,7 +77,15 @@ class Protein
     void rotate_backbone_partial(int startres, int endres, bb_rot_dir direction, float angle);
     void conform_backbone(int startres, int endres, int iters = 50, bool backbone_atoms_only = false);
     void conform_backbone(int startres, int endres, Atom* a, Point target, int iters = 50);
-    void conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, int iters = 50);
+    void conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, int iters = 50, bool backbone_atoms_only = false);
+    void conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, Atom* a3, Point target3, int iters = 50);
+    void conform_backbone(int startres, int endres,
+                          Atom* a1, Point target1,
+                          Atom* a2, Point target2,
+                          Atom* a3, Point target3,
+                          int iters, bool backbone_atoms_only
+                         );
+    
     void make_helix(int startres, int endres, float phi, float psi);
     void make_helix(int startres, int endres, int stopat, float phi, float psi);
     float orient_helix
@@ -105,11 +113,6 @@ class Protein
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);
-    void conform_backbone(int startres, int endres,
-                          Atom* a1, Point target1,
-                          Atom* a2, Point target2,
-                          int iters, bool backbone_atoms_only
-                         );
     void mtl_coord_cnf_cb(int iter);
     friend void ext_mtl_coord_cnf_cb(int iter);
 };

@@ -600,32 +600,29 @@ int main(int argc, char** argv)
 				if (fields[l]) raise_error("Too many parameters given for CONNECT.");
 				er = ct - sgn(ct-sr);
 				
-				Atom *a1, *a2;
-				Point target1, target2;
+				Atom *a1, *a2, *a3;
 				AminoAcid *cta = p.get_residue(ct), *era = p.get_residue(er);
 				
 				if (!era || !cta) goto _no_connect;
 				
+				Point* pt3;
 				if (ct > sr)
 				{
 					// Line up the C and O of er to the expected prevaa C and O of ct.
 					a1 = era->get_atom("C");
 					a2 = era->get_atom("O");
-					LocatedVector lv = cta->predict_previous_CO();
-					target1 = lv.origin;
-					target2 = lv.to_point();
+					pt3 = cta->predict_previous_COCA();
 				}
 				else
 				{
 					// Line up the N and HN (or substitute) of er to the expected nextaa N and HN of ct.
 					a1 = era->get_atom("N");
 					a2 = era->HN_or_substitute();
-					LocatedVector lv = cta->predict_next_NH();
-					target1 = lv.origin;
-					target2 = lv.to_point();
+					pt3 = cta->predict_next_NHCA();
 				}
+				a3 = era->get_atom("CA");
 				
-				p.conform_backbone(sr, er, a1, target1, a2, target2, iters);
+				p.conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
 				
 				_no_connect:
 				;

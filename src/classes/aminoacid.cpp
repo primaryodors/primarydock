@@ -660,14 +660,15 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 	}
 }
 
-LocatedVector AminoAcid::predict_previous_CO()
+
+Point* AminoAcid::predict_previous_COCA()
 {
 	Atom* N = get_atom("N");
-	if (!N) return LocatedVector();
+	if (!N) return nullptr;
 	N->aromatize();
 	Atom* CA = get_atom("CA");
 	Atom* HN  = HN_or_substitute();
-	if (!CA || !HN) return LocatedVector();
+	if (!CA || !HN) return nullptr;
 	
 	Point prevCloc(1.32,0,0), prevOloc(0,1.2,0);
 	
@@ -675,6 +676,8 @@ LocatedVector AminoAcid::predict_previous_CO()
 	prevOloc = prevOloc.add(prevCloc);
 	
 	LocatedVector lv;
+	Point* retval = new Point[4];
+	Point neighborCA;
 	int i;
 	for (i=0; i<10; i++)
 	{
@@ -738,22 +741,31 @@ LocatedVector AminoAcid::predict_previous_CO()
 		lv.origin = N->get_location();
 		prevCloc = rotate3D(prevCloc, lv.origin, axis, M_PI-theta);
 		prevOloc = rotate3D(prevOloc, lv.origin, axis, M_PI-theta);
-			
+		
+		// Step 4: Obtain other residue's CA location.
+		Point pt = CA->get_location();
+		Rotation rot = align_points_3d(&prevOloc, &pt, &prevCloc);
+		neighborCA = rotate3D(prevOloc, prevCloc, rot.v, -rot.a);
+		neighborCA = neighborCA.subtract(prevCloc);
+		neighborCA.scale(1.54);			// TODO: Make not hard-coded.
+		neighborCA = neighborCA.add(prevCloc);
 	}
 	
-	lv.copy(prevOloc.subtract(prevCloc));
-	lv.origin = prevCloc;
-	return lv;
+	retval[0] = prevCloc;
+	retval[1] = prevOloc;
+	retval[2] = neighborCA;
+	
+	return retval;
 }
 
-LocatedVector AminoAcid::predict_next_NH()
+Point* AminoAcid::predict_next_NHCA()
 {
 	Atom* C = get_atom("C");
-	if (!C) return LocatedVector();
+	if (!C) return nullptr;
 	C->aromatize();
 	Atom* CA = get_atom("CA");
 	Atom* O  = get_atom("O");
-	if (!CA || !O) return LocatedVector();
+	if (!CA || !O) return nullptr;
 	
 	Point nextNloc(1.32,0,0), nextHNloc(0,1.0,0);
 	
@@ -761,6 +773,8 @@ LocatedVector AminoAcid::predict_next_NH()
 	nextHNloc = nextHNloc.add(nextNloc);
 	
 	LocatedVector lv;
+	Point* retval = new Point[4];
+	Point neighborCA;
 	int i;
 	for (i=0; i<10; i++)
 	{
@@ -824,29 +838,45 @@ LocatedVector AminoAcid::predict_next_NH()
 		lv.origin = C->get_location();
 		nextNloc = rotate3D(nextNloc, lv.origin, axis, M_PI-theta);
 		nextHNloc = rotate3D(nextHNloc, lv.origin, axis, M_PI-theta);
-			
+		
+		// Step 4: Obtain other residue's CA location.
+		Point pt = CA->get_location();
+		Rotation rot = align_points_3d(&nextHNloc, &pt, &nextNloc);
+		neighborCA = rotate3D(nextHNloc, nextNloc, rot.v, -rot.a);
+		neighborCA = neighborCA.subtract(nextNloc);
+		neighborCA.scale(1.54);			// TODO: Make not hard-coded.
+		neighborCA = neighborCA.add(nextNloc);
 	}
+		
+	retval[0] = nextNloc;
+	retval[1] = nextHNloc;
+	retval[2] = neighborCA;
 	
-	lv.copy(nextHNloc.subtract(nextNloc));
-	lv.origin = nextNloc;
-	return lv;
+	return retval;
 }
 
-void AminoAcid::glom(LocatedVector predicted, bool CO)
+void AminoAcid::glom(Point* predicted, bool CO)
 {
 	MovabilityType fmov = movability;
 	movability = MOV_ALL;
 	
 	// Translation: move the entire AA so that the N (or C) corresponds to the predicted origin.
-	Point moveby = predicted.origin.subtract( CO ? get_atom_location("C") : get_atom_location("N") );
+	Point moveby = predicted[0].subtract( CO ? get_atom_location("C") : get_atom_location("N") );
 	aamove(moveby);
 	
 	// Rotation: rotate the entire AA about the predicted origin so that the HN (or O) aligns with the predicted vector.
-	Point pt1 = CO ? get_atom_location("O") : HN_or_substitute_location(), pt2 = predicted.to_point();
-	Rotation rot = align_points_3d( &pt1, &pt2, &predicted.origin );
+	Point pt1 = CO ? get_atom_location("O") : HN_or_substitute_location(), pt2 = predicted[1];
+	Rotation rot = align_points_3d( &pt1, &pt2, &predicted[0] );
 	LocatedVector lv = rot.v;
-	lv.origin = predicted.origin;
+	lv.origin = predicted[0];
 	rotate(lv, rot.a);
+	
+	// Rotation: rotate the entire AA about its NH or CO axis to bring the CA in line with the predicted CA.
+	lv.origin = CO ? get_atom_location("C") : get_atom_location("N");
+	SCoord axis = pt1.subtract(lv.origin);
+	float theta = find_angle_along_vector(get_atom_location("CA"), predicted[2], lv.origin, axis);
+	lv.copy(axis);
+	rotate(lv, -theta);
 	
 	movability = fmov;
 }

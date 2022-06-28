@@ -71,13 +71,13 @@ bool Protein::add_residue(const int resno, const char aaletter)
     
     if (i)
     {
-    	LocatedVector lv = residues[i-1]->predict_next_NH();
+    	Point* pts = residues[i-1]->predict_next_NHCA();
     	residues[i] = new AminoAcid(aaletter, residues[i-1]);
     	
     	Atom* a = residues[i]->get_atom("N");
     	if (a)
     	{
-    		float r = lv.origin.get_3d_distance(a->get_location());
+    		float r = pts[0].get_3d_distance(a->get_location());
     		if (fabs(r) >= 0.01) cout << "Warning: Residue " << resno << " N location is off by " << r << "A." << endl;
     		
     		Atom* b = residues[i]->get_atom("HN");
@@ -86,7 +86,7 @@ bool Protein::add_residue(const int resno, const char aaletter)
     		{
     			Point HN = b->get_location().subtract(a->get_location());
     			HN.scale(1);
-    			Point pt(lv);
+    			Point pt = pts[1].subtract(pts[0]);
     			pt.scale(1);
     			r = pt.get_3d_distance(HN);
     			if (fabs(r) >= 0.01) cout << "Warning: Residue " << resno << " HN location is off by " << r << "A." << endl;
@@ -753,14 +753,17 @@ void Protein::conform_backbone(int startres, int endres, Atom* a, Point target, 
     conform_backbone(startres, endres, a, target, NULL, pt, iters, false);
 }
 
-void Protein::conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, int iters)
+void Protein::conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, int iters, bool backbone_atoms_only)
 {
-    conform_backbone(startres, endres, a1, target1, a2, target2, iters, false);
+    conform_backbone(startres, endres, a1, target1, a2, target2, nullptr, Point(), iters, backbone_atoms_only);
 }
+
+#define DBGCONF 1
 
 void Protein::conform_backbone(int startres, int endres,
                                Atom* a1, Point target1,
                                Atom* a2, Point target2,
+                               Atom* a3, Point target3,
                                int iters, bool backbone_atoms_only
                               )
 {
@@ -788,12 +791,15 @@ void Protein::conform_backbone(int startres, int endres,
     }
 
 	set_clashables();
-    float tolerance = 1.2, alignfactor = 100, reversal = -0.81, enhance = 1.25;
+    float tolerance = 1.2, alignfactor = 100, reversal = -0.93, enhance = 1.33;
     int ignore_clashes_until = iters*0.666;
     for (iter=0; iter<iters; iter++)
     {
+    	#if DBGCONF
         // cout << "Iteration " << iter << endl;
         cout << " " << iter << flush;
+        #endif
+        
         for (res = startres; res != endres; res += inc)
         {
         	int residx = res-minres;
@@ -848,6 +854,11 @@ void Protein::conform_backbone(int startres, int endres,
                     Point pt = a2->get_location();
                     bind1 += alignfactor/(pt.get_3d_distance(target2)+0.001);
                 }
+                if (a3)
+                {
+                    Point pt = a3->get_location();
+                    bind1 += alignfactor/(pt.get_3d_distance(target3)+0.001);
+                }
 
                 // If no, put it back.
                 // if (res == startres) cout << bind << " v. " << bind1 << endl;
@@ -891,6 +902,11 @@ void Protein::conform_backbone(int startres, int endres,
                 Point pt = a2->get_location();
                 bind1 += alignfactor/(pt.get_3d_distance(target2)+0.001);
             }
+            if (a3)
+            {
+                Point pt = a3->get_location();
+                bind1 += alignfactor/(pt.get_3d_distance(target3)+0.001);
+            }
 
             // If no, put it back.
             // if (res == startres) cout << bind << " vs. " << bind1 << endl;
@@ -911,6 +927,7 @@ void Protein::conform_backbone(int startres, int endres,
             tolerance = ((tolerance-1)*0.97)+1;
         }
         
+        #if DBGCONF
         float r = 0;
         if (a1)
         {
@@ -922,12 +939,19 @@ void Protein::conform_backbone(int startres, int endres,
         	Point pt = a2->get_location();
             r += pt.get_3d_distance(target2);
         }
+        if (a3)
+        {
+        	Point pt = a3->get_location();
+            r += pt.get_3d_distance(target3);
+        }
         if (r) cout << "." << r << flush;
+        #endif
     }
     cout << endl;
     
     return;
     
+    #if 0
     // TODO: This doesn't work very well.
     // Glom the last residue onto the target.
     // Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
@@ -996,6 +1020,7 @@ void Protein::conform_backbone(int startres, int endres,
     
     if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
     						<< "# " << (startres+inc) << " anomaly: " << anomaly << endl;
+	#endif
 }
 
 void Protein::make_helix(int startres, int endres, float phi, float psi)

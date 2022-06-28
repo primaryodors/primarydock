@@ -87,9 +87,10 @@ class AminoAcid : public Molecule
  	LocRotation rotate_backbone_abs(bb_rot_dir direction, float angle);
  	LocRotation* flatten();		// Ensure the peptide bond is coplanar and the CA lies in the same plane. Return LocRotation[5].
  	
- 	LocatedVector predict_previous_CO();	// The origin locates the C atom and the SCoord points in the direction of the O relative to C.
- 	LocatedVector predict_next_NH();		// Origin locates N, SCoord points to HN.	
- 	void glom(LocatedVector predicted, bool CO = false);		// Glom the AA by moving its NH or CO to the result of a predict().
+	Point* predict_previous_COCA();
+	Point* predict_next_NHCA();
+	void glom(Point* predicted, bool CO = false);		// Glom the AA by moving its NHCA or COCA to the result of a predict().
+	
 
  	// Bond functions.
  	bool disulfide_bond(const AminoAcid* bond_to);

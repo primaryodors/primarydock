@@ -19,8 +19,12 @@ All strings begin with `$`, e.g. `$name`.
 Cartesians have members .x, .y, and .z that behave as floats.
 
 Casting a float to an integer rounds the value (e.g. 0.4 rounds to zero but 0.5 rounds to 1).
-Casting a float to a Cartesian normally sets the .x member to the float value. But a command like `LET @foo = @bar.y` will set the value of `@foo.y`.
-Casting an int to a Cartesian obtains the location of the CA atom for that residue number, if it exists.
+
+Casting a float to a Cartesian normally sets the .x member to the float value, leaving .y=0 and .z=0. But a command like `LET @foo = @bar.y` will result in only the value of `@foo.y` being nonzero.
+
+Casting an integer to a Cartesian obtains the location of the CA atom for that residue number, if it exists.
+
+Casting a Cartesian back to float or integer obtains the magnitude of the Cartesian, equal to sqrt(x^2 + y^2 + z^2).
 
 The command line arguments are made available to the script as $arg1, $arg2, etc.
 

@@ -631,6 +631,16 @@ int main(int argc, char** argv)
 				;
 			}	// CONNECT
 			
+			else if (!strcmp(fields[0], "GEN"))
+			{
+				if (!fields[1]) raise_error("No sequence given for GEN.");
+				psz = interpret_single_string(fields[1]);
+				
+				p.add_sequence(psz);
+				p.conform_backbone(1, p.get_seq_length(), 200);
+				goto _prot_deets;
+			} // GEN
+			
 			else if (!strcmp(fields[0], "LOAD"))
 			{
 				if (!fields[1]) raise_error("Insufficient parameters given for LOAD.");
@@ -646,6 +656,8 @@ int main(int argc, char** argv)
 				p.load_pdb(pf);
 				
 				fclose(pf);
+				
+				_prot_deets:
 				
 				script_var[vars].name = "$PDB";
 				script_var[vars].value.psz = new char[strlen(psz)+4];
@@ -702,7 +714,7 @@ int main(int argc, char** argv)
 			{
 				if (!fields[1]) raise_error("Insufficient parameters given for SAVE.");
 				psz = interpret_single_string(fields[1]);
-				if (fields[2]) raise_error("Too many parameters given for SAVE.");
+				if (fields[3]) raise_error("Too many parameters given for SAVE.");
 				
 				pf = fopen(psz, "wb");
 				if (!pf)
@@ -718,12 +730,12 @@ int main(int argc, char** argv)
 				fclose(pf);
 				delete[] psz;
 				
-				if (fields[2] 
-					&&
-					(	!strcmp("QUIT", fields[2]) || !strcmp("EXIT", fields[2]) || !strcmp("END", fields[2])
-					)
-				   )
-				return 0;
+				if (fields[2])
+				{
+					if ( !strcmp("QUIT", fields[2]) || !strcmp("EXIT", fields[2]) || !strcmp("END", fields[2]) )
+						return 0;
+					else raise_error("Too many parameters given for SAVE.");
+				}
 			}
 			
 			else if (!strcmp(fields[0], "LET"))

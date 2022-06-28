@@ -22,6 +22,8 @@ Casting a float to an integer rounds the value (e.g. 0.4 rounds to zero but 0.5 
 Casting a float to a Cartesian normally sets the .x member to the float value. But a command like `LET @foo = @bar.y` will set the value of `@foo.y`.
 Casting an int to a Cartesian obtains the location of the CA atom for that residue number, if it exists.
 
+The command line arguments are made available to the script as $arg1, $arg2, etc.
+
 The following "magic variables" are supplied upon loading a protein:
 - `$PDB` the path and name of the source PDB file.
 - `$PROTEIN` the name of the protein, derived from a `REMARK 6` record if present.
@@ -91,6 +93,13 @@ QUIT
 ```
 
 Ceases script execution.
+
+# GEN
+```
+GEN "MAYDRYVAIC"
+```
+
+Creates a peptide using the specified sequence.
 
 # GOTO
 Example:

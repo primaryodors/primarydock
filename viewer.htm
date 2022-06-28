@@ -325,15 +325,17 @@ function show_seqdd()
 	var seqdd = $('#seqdd')[0];
 	seqdd.innerHTML = "<b>Show/Hide Side Chains:</b><br><br>";
 	
+	var perline = 40;
+	
 	var i;
 	var span = document.createElement("span");
 	var dots = ". . . . . . . . .";
 	var dotslen = dots.length;
-	span.innerText = dots+"10 "+dots+"20 "+dots+"30";
+	span.innerText = dots+"10 "+dots+"20 "+dots+"30 "+dots+"40 ";
 	span.className = "seqnumln";
 	span.appendChild(document.createElement("br"));
 	seqdd.appendChild(span);
-	var seqoff = 40;
+	var seqoff = 50;
 	for (i=0; i<sequence.length; i++)
 	{
 		var tgl = document.createElement("span");
@@ -348,25 +350,56 @@ function show_seqdd()
 		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 		seqdd.appendChild(tgl);
 		
-		if (!((i+1)%30))
+		if (!((i+1)%perline))
 		{
 			seqdd.appendChild(document.createElement("br"));
 			seqdd.appendChild(document.createElement("br"));
 			span = document.createElement("span");
 			
-			if (seqoff >= 100) dots = dots.substr(0, dotslen-(seqoff.toString().length-2));
-			span.innerText = dots+seqoff;
-			seqoff += 10; 
-			span.innerText += " "+dots+seqoff;
-			seqoff += 10;
-			span.innerText += " "+dots+seqoff;
-			seqoff += 10;
+			var l;
+			span.innerText = "";
+			for (l=0; l<perline; l+=10)
+			{
+				if (seqoff >= 100) dots = dots.substr(0, dotslen-(seqoff.toString().length-2));
+				span.innerText += dots+seqoff + " ";
+				seqoff += 10;
+			}
 			
 			span.className = "seqnumln";
 			span.appendChild(document.createElement("br"));
 			seqdd.appendChild(span);
 		}
 	}
+	
+	seqdd.appendChild(document.createElement("br"));
+	seqdd.appendChild(document.createElement("br"));
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "All";
+	tgl.id = "seqddall";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
+	tgl.setAttribute("onclick", "event.preventDefault(); showAllSideChains(); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "None";
+	tgl.id = "seqddnone";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
+	tgl.setAttribute("onclick", "event.preventDefault(); hideAllSideChains(); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
 	
 	var sdchbtn = $('#sdchbtn')[0];
 	var btnrect = sdchbtn.getBoundingClientRect();
@@ -496,6 +529,28 @@ function toggleSideChain(resno)
 	catch (ex)
 	{
 		;
+	}
+}
+
+function showAllSideChains()
+{
+	var resno = 1;
+	while (typeof restoggled[resno] != "undefined")
+	{
+		showSideChain(resno);
+		resno++;
+	}
+}
+
+function hideAllSideChains()
+{
+	var resno = 1;
+	while (typeof resmdl[resno] != "undefined")
+	{
+		resmdl[resno].removeAllRepresentations();
+		restoggled[resno] = 0;
+		$('#seqddtgl'+resno).removeClass('hilite');
+		resno++;
 	}
 }
 

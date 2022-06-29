@@ -639,6 +639,17 @@ int main(int argc, char** argv)
 				goto _prot_deets;
 			} // GEN
 			
+			else if (!strcmp(fields[0], "DELETE"))
+			{
+				if (!fields[1]) raise_error("Insufficient parameters given for DELETE.");
+				int sr = interpret_single_int(fields[1]), er=0;
+				if (fields[2]) er = interpret_single_int(fields[2]);
+				if (fields[3]) raise_error("Too many parameters given for DELETE.");
+				
+				if (er) p.delete_residues(sr, er);
+				else p.delete_residue(sr);
+			} // DELETE
+			
 			else if (!strcmp(fields[0], "LOAD"))
 			{
 				if (!fields[1]) raise_error("Insufficient parameters given for LOAD.");

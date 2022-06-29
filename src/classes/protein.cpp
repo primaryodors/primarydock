@@ -1050,6 +1050,7 @@ void Protein::make_helix(int startres, int endres, float phi, float psi)
     make_helix(startres, endres, endres, phi, psi);
 }
 
+#define DBG_ASUNDER_HELICES 0
 void Protein::make_helix(int startres, int endres, int stopat, float phi, float psi)
 {
     int inc = sgn(endres-startres);
@@ -1060,6 +1061,9 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
     bb_rot_dir dir1 = (inc>0) ? N_asc : CA_desc,
                dir2 = (inc>0) ? CA_asc : C_desc;
 
+	#if DBG_ASUNDER_HELICES
+	cout << "make_helix( " << startres << ", " << endres << ", " << stopat << ", " << phi << ", " << psi << " )" << endl;
+	#endif
     for (res = startres; inc; res += inc)
     {
         AminoAcid* aa = get_residue(res);
@@ -1070,12 +1074,19 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         {
             AminoAcid* movable;
 
+            if (res != endres)
             for (i=res+inc; movable = get_residue(i); i+=inc)
             {
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
+				#if DBG_ASUNDER_HELICES
+				cout << i << " ";
+				#endif
                 if (i == stopat) break;
             }
+			#if DBG_ASUNDER_HELICES
+			cout << endl;
+			#endif
         }
 
         LocRotation* lr2 = aa->flatten();
@@ -1087,12 +1098,18 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             {
                 AminoAcid* movable;
 
-                for (i=res+1; movable = get_residue(i); i+=inc)
+                if (res != endres) for (i=res+1; movable = get_residue(i); i+=inc)
                 {
                     LocatedVector lv = lr2[j].get_lv();
                     movable->rotate(lv, lr2[j].a);
+					#if DBG_ASUNDER_HELICES
+					cout << i << " ";
+					#endif
                     if (i == stopat) break;
                 }
+				#if DBG_ASUNDER_HELICES
+				cout << endl;
+				#endif
 
                 int round_theta = (int)(lr2[j].a*fiftyseven+0.5);
                 while (round_theta < 0) round_theta += 360;
@@ -1112,13 +1129,19 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         {
             AminoAcid* movable;
 
-            for (i=res+inc; movable = get_residue(i); i+=inc)
+            if (res != endres) for (i=res+inc; movable = get_residue(i); i+=inc)
             {
             	// cout << i << " ";
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
+				#if DBG_ASUNDER_HELICES
+				cout << i << " ";
+				#endif
                 if (i == stopat) break;
             }
+			#if DBG_ASUNDER_HELICES
+			cout << endl;
+			#endif
         }
         // cout << endl;
 
@@ -1129,17 +1152,23 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         {
             AminoAcid* movable;
 
-            for (i=res+inc; movable = get_residue(i); i+=inc)
+            if (res != endres) for (i=res+inc; movable = get_residue(i); i+=inc)
             {
                 // cout << i << " ";
                 LocatedVector lv = lr.get_lv();
                 movable->rotate(lv, lr.a);
+				#if DBG_ASUNDER_HELICES
+				cout << i << " ";
+				#endif
                 if (i == stopat) break;
             }
+			#if DBG_ASUNDER_HELICES
+			cout << endl;
+			#endif
         }
         // cout << endl;
 
-        if (res >= endres) break;
+        if (res == endres) break;
     }
 
     // Hang onto this line, might want it later.

@@ -758,7 +758,7 @@ void Protein::conform_backbone(int startres, int endres, Atom* a1, Point target1
     conform_backbone(startres, endres, a1, target1, a2, target2, nullptr, Point(), iters, backbone_atoms_only);
 }
 
-#define DBGCONF 1
+#define DBGCONF 0
 
 void Protein::conform_backbone(int startres, int endres,
                                Atom* a1, Point target1,
@@ -776,6 +776,8 @@ void Protein::conform_backbone(int startres, int endres,
     float momenta1o[am+4], momenta2o[am+4], momenta1e[am+4], momenta2e[am+4];
     int eando_res[am+4];
     float eando_mult[am+4];
+    float r = 0, lastr = 99999;
+    int iters_since_improvement = 0;
     
     for (res = startres; res; res += inc)
     {
@@ -791,7 +793,7 @@ void Protein::conform_backbone(int startres, int endres,
     }
 
 	set_clashables();
-    float tolerance = 1.2, alignfactor = 100, reversal = -0.93, enhance = 1.33;
+    float tolerance = 1.2, alignfactor = 100, reversal = -0.81, enhance = 1.5;
     int ignore_clashes_until = iters*0.666;
     for (iter=0; iter<iters; iter++)
     {
@@ -862,7 +864,7 @@ void Protein::conform_backbone(int startres, int endres,
 
                 // If no, put it back.
                 // if (res == startres) cout << bind << " v. " << bind1 << endl;
-                if (bind1 < tolerance*bind)
+                if (bind1 < tolerance*bind || (a1 && iters_since_improvement > 10 && frand(0,1)<0.25))
                 {
                     rotate_backbone_partial(res, endres, dir1, -angle);
                     if (eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir2, angle*eando_mult[residx]);
@@ -910,7 +912,7 @@ void Protein::conform_backbone(int startres, int endres,
 
             // If no, put it back.
             // if (res == startres) cout << bind << " vs. " << bind1 << endl;
-            if (bind1 < tolerance*bind)
+            if (bind1 < tolerance*bind || (a1 && iters_since_improvement > 10 && frand(0,1)<0.25))
             {
                 rotate_backbone_partial(res, endres, dir2, -angle);
                 if ((iter & 1) && eando_res[residx]) rotate_backbone_partial(eando_res[residx], endres, dir1, angle*eando_mult[residx]);
@@ -927,8 +929,7 @@ void Protein::conform_backbone(int startres, int endres,
             tolerance = ((tolerance-1)*0.97)+1;
         }
         
-        #if DBGCONF
-        float r = 0;
+        r = 0;
         if (a1)
         {
         	Point pt = a1->get_location();
@@ -944,15 +945,27 @@ void Protein::conform_backbone(int startres, int endres,
         	Point pt = a3->get_location();
             r += pt.get_3d_distance(target3);
         }
+        
+        if (r < 0.999*lastr) iters_since_improvement = 0;
+        else iters_since_improvement++;
+        lastr = r;
+
+        #if DBGCONF
         if (r) cout << "." << r << flush;
         #endif
     }
+    #if DBGCONF
     cout << endl;
+    #endif
+    if (r > 0.25) cout << "Warning - protein strand alignment anomaly outside of tolerance." << endl << "# Anomaly is " << r << " Angstroms." << endl;
+}
+
+void Protein::backconnect(int startres, int endres)
+{
+    int inc = sgn(endres-startres);
     
-    return;
+    #if 1
     
-    #if 0
-    // TODO: This doesn't work very well.
     // Glom the last residue onto the target.
     // Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
     // Then do the same for the previous residue, and the one before, etc,
@@ -965,61 +978,70 @@ void Protein::conform_backbone(int startres, int endres,
 	next = get_residue(endres+inc);
 	curr = get_residue(pointer);
 	prev = get_residue(pointer-inc);
-    do
+	
+    while (next && curr)
     {
-		LocatedVector lv = (inc > 0) ? next->predict_previous_CO() : next->predict_next_NH();
-    	curr->glom(lv, inc > 0);
+		Point* pts = (inc > 0) ? next->predict_previous_COCA() : next->predict_next_NHCA();
+    	curr->glom(pts, inc > 0);
+    	// break;
+		
+		if (prev)
+		{
+			MovabilityType fmov = curr->movability;
+			curr->movability = MOV_ALL;
     	
-    	MovabilityType fmov = curr->movability;
-		curr->movability = MOV_ALL;
-		
-		lv = (inc < 0) ? prev->predict_previous_CO() : prev->predict_next_NH();
-		Point target_heavy = lv.origin;
-		Point target_pole = lv.to_point();
-		
-		float theta, step, r, btheta=0, bestr;
-		for (theta=0; theta < M_PI*2; theta += step)
-		{
-			r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
-			r += target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+			pts = (inc < 0) ? prev->predict_previous_COCA() : prev->predict_next_NHCA();
+			Point target_heavy = pts[0];
+			Point target_pole = pts[1];
 			
-			if (!theta || (r < bestr))
+			float theta, step = fiftyseventh*1.0, r, btheta = 0, bestr;
+			for (theta=0; theta < M_PI*2; theta += step)
 			{
-				bestr = r;
-				btheta = theta;
+				r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
+				// r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+				if (inc > 0) r -= target_pole.get_3d_distance(curr->HN_or_substitute_location());
+				
+				if (!theta || (r < bestr))
+				{
+					bestr = r;
+					btheta = theta;
+				}
+				
+				curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , step );
 			}
+			curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , btheta );
 			
-			curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , step );
-		}
-		curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , btheta );
-		
-		btheta=0;
-		for (theta=0; theta < M_PI*2; theta += step)
-		{
-			r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
-			r += target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
-			
-			if (!theta || (r < bestr))
+			btheta=0;
+			for (theta=0; theta < M_PI*2; theta += step)
 			{
-				bestr = r;
-				btheta = theta;
+				r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
+				// r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+				if (inc < 0) r -= target_pole.get_3d_distance(curr->get_atom_location("O"));
+				
+				if (!theta || (r < bestr))
+				{
+					bestr = r;
+					btheta = theta;
+				}
+				
+				curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , step );
 			}
-			
-			curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , step );
-		}
-		curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , btheta );
-		anomaly = bestr;
+			curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , btheta );
+			anomaly = bestr;
 		
-		curr->movability = fmov;
+			curr->movability = fmov;
+		}
+		
+		if (pointer == startres) break;
     	
     	pointer -= inc;
     	next = curr;
     	curr = prev;
 		prev = get_residue(pointer-inc);
-    } while (pointer != startres);
+    };
     
-    if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
-    						<< "# " << (startres+inc) << " anomaly: " << anomaly << endl;
+    /*if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
+    						<< "# " << (startres-inc) << " anomaly: " << anomaly << endl;*/
 	#endif
 }
 

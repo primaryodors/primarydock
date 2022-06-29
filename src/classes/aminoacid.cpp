@@ -547,6 +547,12 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 	
 	if (prevaa)
 	{
+		movability = MOV_ALL;
+		
+		Point* pts = prevaa->predict_next_NHCA();
+		glom(pts);
+		
+		/*
 		// Make sure we have all the right atoms.
 		Atom* currN = get_atom("N");
 		Atom* prevC = prevaa->get_atom("C");
@@ -654,6 +660,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			lv.origin = currN->get_location();
 			Molecule::rotate(lv, M_PI+theta);
 		}
+		*/
 		
 		movability = MOV_FLEXONLY;
 		immobile = true;
@@ -744,8 +751,11 @@ Point* AminoAcid::predict_previous_COCA()
 		
 		// Step 4: Obtain other residue's CA location.
 		Point pt = CA->get_location();
-		Rotation rot = align_points_3d(&prevOloc, &pt, &prevCloc);
-		neighborCA = rotate3D(prevOloc, prevCloc, rot.v, -rot.a);
+		/*Rotation rot = align_points_3d(&prevOloc, &pt, &prevCloc);
+		neighborCA = rotate3D(prevOloc, prevCloc, rot.v, -rot.a);*/
+		SCoord normal = compute_normal(prevCloc, prevOloc, N->get_location());
+		neighborCA = rotate3D(prevOloc, prevCloc, normal, triangular);
+		if (neighborCA.get_3d_distance(N->get_location()) < 1) neighborCA = rotate3D(prevOloc, prevCloc, normal, -triangular);
 		neighborCA = neighborCA.subtract(prevCloc);
 		neighborCA.scale(1.54);			// TODO: Make not hard-coded.
 		neighborCA = neighborCA.add(prevCloc);
@@ -841,13 +851,16 @@ Point* AminoAcid::predict_next_NHCA()
 		
 		// Step 4: Obtain other residue's CA location.
 		Point pt = CA->get_location();
-		Rotation rot = align_points_3d(&nextHNloc, &pt, &nextNloc);
-		neighborCA = rotate3D(nextHNloc, nextNloc, rot.v, -rot.a);
+		/*Rotation rot = align_points_3d(&nextHNloc, &pt, &nextNloc);
+		neighborCA = rotate3D(nextHNloc, nextNloc, rot.v, -rot.a);*/
+		SCoord normal = compute_normal(nextNloc, nextHNloc, C->get_location());
+		neighborCA = rotate3D(nextHNloc, nextNloc, normal, triangular);
+		if (neighborCA.get_3d_distance(C->get_location()) < 1) neighborCA = rotate3D(nextHNloc, nextNloc, normal, -triangular);
 		neighborCA = neighborCA.subtract(nextNloc);
 		neighborCA.scale(1.54);			// TODO: Make not hard-coded.
 		neighborCA = neighborCA.add(nextNloc);
 	}
-		
+	
 	retval[0] = nextNloc;
 	retval[1] = nextHNloc;
 	retval[2] = neighborCA;
@@ -859,10 +872,14 @@ void AminoAcid::glom(Point* predicted, bool CO)
 {
 	MovabilityType fmov = movability;
 	movability = MOV_ALL;
+	float anomaly;
 	
 	// Translation: move the entire AA so that the N (or C) corresponds to the predicted origin.
 	Point moveby = predicted[0].subtract( CO ? get_atom_location("C") : get_atom_location("N") );
 	aamove(moveby);
+	anomaly = predicted[0].get_3d_distance( CO ? get_atom_location("C") : get_atom_location("N") );
+	if (anomaly > 0.001) cout << "Error: " << ( CO ? "C" : "N" ) << " anomaly outside tolerance!" << endl << "# Anomaly is " << anomaly << endl;
+	// else cout << "# " << ( CO ? "C" : "N" ) << " anomaly within tolerance at " << anomaly << endl;
 	
 	// Rotation: rotate the entire AA about the predicted origin so that the HN (or O) aligns with the predicted vector.
 	Point pt1 = CO ? get_atom_location("O") : HN_or_substitute_location(), pt2 = predicted[1];
@@ -870,6 +887,10 @@ void AminoAcid::glom(Point* predicted, bool CO)
 	LocatedVector lv = rot.v;
 	lv.origin = predicted[0];
 	rotate(lv, rot.a);
+	pt1 = CO ? get_atom_location("O") : HN_or_substitute_location();
+	anomaly = predicted[1].get_3d_distance(pt1);
+	if (anomaly > 0.1) cout << "Error: " << ( CO ? "O" : "HN" ) << " anomaly outside tolerance!" << endl << "# Anomaly is " << anomaly << endl;
+	// else cout << "# " << ( CO ? "O" : "HN" ) << " anomaly within tolerance at " << anomaly << endl;
 	
 	// Rotation: rotate the entire AA about its NH or CO axis to bring the CA in line with the predicted CA.
 	lv.origin = CO ? get_atom_location("C") : get_atom_location("N");
@@ -877,6 +898,31 @@ void AminoAcid::glom(Point* predicted, bool CO)
 	float theta = find_angle_along_vector(get_atom_location("CA"), predicted[2], lv.origin, axis);
 	lv.copy(axis);
 	rotate(lv, -theta);
+	
+	// Rotation: rotate the rest of the AA to bring the C-N-CA or N-C-CA angle to 120deg.
+	pt2 = get_atom_location("CA");
+	rot = align_points_3d( &pt2, &predicted[2], &predicted[0] );
+	int i;
+	Atom* HN = HN_or_substitute();
+	for (i=0; atoms[i]; i++)
+	{
+		if ( CO && !strcmp(atoms[i]->name, "C")) continue;
+		if ( CO && !strcmp(atoms[i]->name, "O")) continue;
+		if (!CO && !strcmp(atoms[i]->name, "N")) continue;
+		if (!CO && atoms[i] == HN) continue;
+		
+		Point pt = rotate3D(atoms[i]->get_location(), lv.origin, rot.v, rot.a);
+		atoms[i]->move(pt);
+	}
+	
+	anomaly = predicted[2].get_3d_distance(get_atom_location("CA"));
+	if (anomaly > 0.1)
+	{
+		rotate(lv, theta*2);
+		anomaly = predicted[2].get_3d_distance(get_atom_location("CA"));
+	}
+	if (anomaly > 0.1) cout << "Error: CA anomaly outside tolerance!" << endl << "# Anomaly is " << anomaly << "." << endl;
+	// else cout << "# CA anomaly within tolerance at " << anomaly << endl;
 	
 	movability = fmov;
 }

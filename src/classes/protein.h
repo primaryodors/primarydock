@@ -86,6 +86,8 @@ class Protein
                           int iters, bool backbone_atoms_only
                          );
     
+    void backconnect(int startres, int endres);
+    
     void make_helix(int startres, int endres, float phi, float psi);
     void make_helix(int startres, int endres, int stopat, float phi, float psi);
     float orient_helix

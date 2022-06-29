@@ -623,6 +623,7 @@ int main(int argc, char** argv)
 				a3 = era->get_atom("CA");
 				
 				p.conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
+				p.backconnect(sr, er);
 				
 				_no_connect:
 				;

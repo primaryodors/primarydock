@@ -551,6 +551,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		
 		Point* pts = prevaa->predict_next_NHCA();
 		glom(pts);
+		delete[] pts;
 		
 		/*
 		// Make sure we have all the right atoms.

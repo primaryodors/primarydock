@@ -400,6 +400,7 @@ int main(int argc, char** argv)
 	
 	while (program_counter < script_lines.size())
 	{
+		// cout << endl << "Process line " << program_counter << "... " << flush;
 		char buffer[1024];
 		char buffer1[1024];
 		for (m=0; m<1024; m++) buffer[m] = buffer1[m] = '\0';
@@ -411,18 +412,19 @@ int main(int argc, char** argv)
 			{
 				if (fields[k][0] == '#')
 				{
-					//cout << "Ignoring comment " << fields[k] << endl;
+					// cout << "Ignoring comment " << fields[k] << endl << flush;
 					fields[k] = nullptr;
 					break;
 				}
 			}
+			// cout << "command " << fields[0] << endl << flush;
 			
 			// Debug cout.
 			/*cout << endl << "***Line: " << buffer << endl << "***Fields: ";
 			for (n=0; fields[n]; n++) cout << (n?"|":"") << fields[n];
 			cout << endl;*/
 			
-			if (fields[0][strlen(fields[0])-1] == ':') continue;
+			if (fields[0][strlen(fields[0])-1] == ':') goto _pc_continue;
 			
 			// Interpret the script.
 			if (!strcmp(fields[0], "HELIX"))
@@ -623,10 +625,11 @@ int main(int argc, char** argv)
 				a3 = era->get_atom("CA");
 				
 				p.conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
+				delete[] pt3;
 				p.backconnect(sr, er);
 				
 				_no_connect:
-				;
+				goto _pc_continue;
 			}	// CONNECT
 			
 			else if (!strcmp(fields[0], "GEN"))
@@ -1063,6 +1066,7 @@ int main(int argc, char** argv)
 			}
 		}
 		
+		_pc_continue:
 		program_counter++;
 	}
 	

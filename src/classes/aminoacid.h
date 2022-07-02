@@ -106,7 +106,8 @@ class AminoAcid : public Molecule
  	void delete_sidechain();
  	static Molecule** aas_to_mols(AminoAcid** aas);
  	int similarity_to(const char letter);
-
+    Ring* get_most_distal_arom_ring();
+    
  	// Public properties.
  	int strand;
  	int atno_offset=0;

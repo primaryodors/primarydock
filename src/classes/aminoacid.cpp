@@ -1329,6 +1329,30 @@ int AminoAcid::similarity_to(const char letter)
 	return retval;
 }
 
+Ring* AminoAcid::get_most_distal_arom_ring()
+{
+	if (!rings) return nullptr;
+	
+	Point caloc = get_atom_location("CA");
+	int i, retidx=-1;
+	float r = 0;
+	for (i=0; rings[i]; i++)
+	{
+		if (rings[i]->get_type() == AROMATIC)
+		{
+			float lr = caloc.get_3d_distance(rings[i]->get_center());
+			if ((lr > r) || !i)
+			{
+				r = lr;
+				retidx = i;
+			}
+		}
+	}
+	
+	if (retidx < 0) return nullptr;
+	return rings[retidx];
+}
+
 #define DBG_TYRLIKE 0
 bool AminoAcid::is_tyrosine_like()
 {

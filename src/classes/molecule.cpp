@@ -3284,6 +3284,8 @@ Atom** Molecule::get_most_bindable(int max_count)
     
     for (i=0; atoms[i]; i++)
     {
+    	if (atoms[i]->is_backbone) continue;
+    	
         float score = 0;
         atoms[i]->clear_geometry_cache();
         

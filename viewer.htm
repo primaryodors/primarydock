@@ -26,6 +26,14 @@ const aa3let =
 	'PRO', 'PYL', 'SEC', 'SER', 'THR',
 	'TRP', 'TYR', 'VAL',
 ];
+
+var opc_molecule = 1.0;
+var opc_ligand = 1.0;
+var opc_cartoon = 0.3;
+var opc_sidechain = 0.2;
+var opc_sidechain_active = 0.5;
+var opc_metal = 0.9;
+
 </script>
 <style>
 body
@@ -495,7 +503,7 @@ function showSideChain(resno)
 		{
 			resmdl[resno].addRepresentation( "licorice",
             {
-                "opacity": 0.7,
+                "opacity": opc_sidechain,
 				"colorScheme": PODefScheme,
                 "metalness": 0.13,
                 "clipNear": clipValue,
@@ -1101,7 +1109,9 @@ function loadFile(fileData, fileName = "")
                     if (fext == 'sdf')
                     {
                         comp.addRepresentation( "ball+stick",
-                        {	multipleBond: true,
+                        {
+                        	opacity: opc_molecule,
+							multipleBond: true,
                         	metalness: 0.15,
                         } );
                         gmodel.push(comp);
@@ -1111,7 +1121,7 @@ function loadFile(fileData, fileName = "")
                     {
                         comp.addRepresentation( "cartoon",
                         {
-                            opacity: 0.8,
+                            opacity: opc_cartoon,
 							colorScheme: PODefRgnScheme,
                             // colorScale: 'rainbow',
                             metalness: 0.15,
@@ -1146,7 +1156,7 @@ function loadFile(fileData, fileName = "")
                         {
                             comp1.addRepresentation( "licorice",
                             {
-                                opacity: 0.7,
+                                opacity: opc_sidechain_active,
 								colorScheme: PODefScheme,
                                 metalness: 0.13,
                             });
@@ -1157,7 +1167,7 @@ function loadFile(fileData, fileName = "")
                         {
                             comp2.addRepresentation( "spacefill",
                             {
-                                opacity: 0.95,
+                                opacity: opc_metal,
 								colorScheme: PODefScheme,
                                 metalness: 0.53,
                             });
@@ -1252,7 +1262,7 @@ function loadFile(fileData, fileName = "")
                         {
                             comp3.addRepresentation( "cartoon",
                             {
-                                opacity: 0.7,
+                                opacity: opc_cartoon,
 								colorScheme: PODefRgnScheme,
                                 metalness: 0.13,
                             });
@@ -1267,7 +1277,7 @@ function loadFile(fileData, fileName = "")
                             {
                                 comp4.addRepresentation( "spacefill",
                                 {
-                                    opacity: 0.95,
+                                    opacity: opc_metal,
 									colorScheme: PODefScheme,
                                     metalness: 0.53,
                                 });
@@ -1330,7 +1340,7 @@ function loadFile(fileData, fileName = "")
                             {
                                 var rparam =
                                 {
-                                    opacity: 0.9,
+                                    opacity: opc_sidechain_active,
 									colorScheme: PODefSchemeHilite,
                                 };
 
@@ -1350,6 +1360,7 @@ function loadFile(fileData, fileName = "")
                             {
                                 var rparam =
                                 {
+									opacity: opc_ligand,
 									multipleBond: true,
 									colorScheme: PODefSchemeHilite,
                                 };

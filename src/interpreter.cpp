@@ -656,7 +656,7 @@ int main(int argc, char** argv)
 			else if (!strcmp(fields[0], "MCOORD"))
 			{
 				l = 1;
-				Atom* m;
+				Atom* ma;
 				string elem_sym;
 				int elem_charge=0;
 				int ncr=0;						// number of coordinating residues.
@@ -685,9 +685,48 @@ int main(int argc, char** argv)
 					goto _yes_I_used_goto_for_this;
 				}
 				
+				if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
 				elem_sym = fields[l++];
-				elem_charge = atoi(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
+				elem_charge = interpret_single_int(fields[l++]);
+				Point pt;
 				
+				if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
+				for (; fields[l]; l++)
+				{
+					bool local_O = force_tyrosine_O;
+					
+					_another_goto:
+					if (!strcmp(fields[l], "YO"))
+					{
+						local_O = true;
+						l++;
+						goto _another_goto;
+					}
+					else if (!strcmp(fields[l], "YAr"))
+					{
+						local_O = false;
+						l++;
+						goto _another_goto;
+					}
+					
+					if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
+					AminoAcid* aa = p.get_residue(interpret_single_int(fields[l++]));
+					
+					if (aa->is_tyrosine_like() && !local_O)
+					{
+						Ring* rr = aa->get_most_distal_arom_ring();
+						if (rr)
+						{
+							n = rr->get_atom_count();
+							// Get members 1 and 1+floor(n/2).
+						}
+					}
+					
+					
+				}
+				
+				ma = new Atom(elem_sym.c_str(), &pt, elem_charge);
 				
 				
 				

@@ -25,13 +25,12 @@ class Protein
     bool add_residue(const int resno, const char aaletter);
     bool add_residue(const char* pdbdata);
     bool add_sequence(const char* sequence);
-    float coordinate_metal(const char* metal_elemsym, const int* coord_residues);		// Returns coordination anomaly.
     void set_clashables();
     void delete_residue(int resno);
     void delete_sidechain(int resno);
     void delete_residues(int startres, int endres);
     void delete_sidechains(int startres, int endres);
-    MetalCoord* coordinate_metal(Atom* metal, int residues, int* resnos, char** res_anames);
+    MetalCoord* coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames);
     void set_region(std::string name, int start, int end);
 
     // Serialization.

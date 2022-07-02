@@ -1747,8 +1747,30 @@ Ring** Atom::get_rings()
 
 bool Atom::is_in_ring(Ring* ring)
 {
-	if (!member_of) return false;
+	if (!ring) return false;
+	
+	// Since the objects can't be trusted to keep the damn data that have been set...
+	Atom** ra = ring->get_atoms();
 	int i;
+	for (i=0; ra[i]; i++)
+	{
+		if (ra[i] == this)
+		{
+			int j, n=0;
+			if (member_of) for (n=0; member_of[n]; n++);		// Determine length.
+			Ring** array = new Ring*[4+n];
+			for (j=0; j<n+4; j++) array[j] = nullptr;
+			if (member_of)
+				for (j=0; j<n; j++)
+					array[n] = member_of[n];
+			array[n++] = ring;
+			array[n] = nullptr;
+			if (member_of) delete[] member_of;
+			member_of = array;
+		}
+	}
+	
+	if (!member_of) return false;
 	for (i=0; member_of[i]; i++)
 		if (member_of[i] == ring) return true;
 	
@@ -1812,6 +1834,7 @@ Ring::Ring(Atom** from_atoms)
 			array[n] = nullptr;
 			delete[] atoms[i]->member_of;
 			atoms[i]->member_of = array;
+			// cout << "Ring::Ring(Atom**): " << atoms[i]->name << " is a member of a ring." << endl;
 		}
 	}
 	

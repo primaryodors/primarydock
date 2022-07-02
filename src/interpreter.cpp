@@ -653,6 +653,46 @@ int main(int argc, char** argv)
 				else p.delete_residue(sr);
 			} // DELETE
 			
+			else if (!strcmp(fields[0], "MCOORD"))
+			{
+				l = 1;
+				Atom* m;
+				string elem_sym;
+				int elem_charge=0;
+				int ncr=0;						// number of coordinating residues.
+				int resnos[13];					// more than the task will ever conceivably require.
+				std::vector<string> cratoms;	// coordinating residue atoms.																						oh god I hooked up with this guy once who used kratom and after we both finished goddamn all he did was yipyapyipyapyipyap all night until finally I said babe, I n**d my sleep, and I musta finally dozed off at something like 5am, yeah kinda like the song. Then it's morning and he goes home and a hot drummer/songwriter is coming over to audition for my rock band that day and I'm running on 3 hours of sleep, what a way to make a first impression, thank flying spaghetti monster our guitarist was my roommate because at least someone in the house was awake. Ahhh, my 30s, when I still had (false) hope. Good times, those.
+				bool force_tyrosine_O = false;
+				bool thiolate = false;
+				
+				_yes_I_used_goto_for_this:
+				if (!strcmp(fields[l], "YO"))
+				{
+					force_tyrosine_O = true;
+					l++;
+					goto _yes_I_used_goto_for_this;
+				}
+				else if (!strcmp(fields[l], "YAr"))
+				{
+					force_tyrosine_O = false;
+					l++;
+					goto _yes_I_used_goto_for_this;
+				}
+				else if (!strcmp(fields[l], "Th8"))
+				{
+					thiolate = true;
+					l++;
+					goto _yes_I_used_goto_for_this;
+				}
+				
+				elem_sym = fields[l++];
+				elem_charge = atoi(fields[l++]);
+				
+				
+				
+				
+			} // MCOORD
+			
 			else if (!strcmp(fields[0], "LOAD"))
 			{
 				if (!fields[1]) raise_error("Insufficient parameters given for LOAD.");

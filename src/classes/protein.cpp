@@ -963,154 +963,160 @@ void Protein::conform_backbone(int startres, int endres,
 }
 
 #define DBG_BCKCONN 0
-#define _INCREMENTAL_BKCONN 0
+#define _INCREMENTAL_BKCONN 1
 void Protein::backconnect(int startres, int endres)
 {
 	int i;
     int inc = sgn(endres-startres);
     
-    #if 1
-    
-    // Glom the last residue onto the target.
-    // Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
-    // Then do the same for the previous residue, and the one before, etc,
-    // all the way back to the starting residue.
-    // Give a warning if the starting residue has an anomaly > 0.1A.
-    AminoAcid *next, *curr, *prev;
-    int pointer = endres;
-    float movfactor = 1, decrement, anomaly = 0;
-    
-    decrement = 1.0 / fabs(endres - startres);		// if exterior is the opposite of interior, what's the opposite of increment?
-    
-	next = get_residue(endres+inc);
-	curr = get_residue(pointer);
-	prev = get_residue(pointer-inc);
-	
-	#if DBG_BCKCONN
-	cout << "backconnect( " << startres << ", " << endres << ")" << endl;
-	#endif
-    while (next && curr)
+    #if _INCREMENTAL_BKCONN
+    int iter;
+    for (iter=24; iter>=0; iter--)
     {
-    	#if DBG_BCKCONN
-    	cout << pointer << ":";
-    	#endif
-    	
-		Point* pts = (inc > 0) ? next->predict_previous_COCA() : next->predict_next_NHCA();
-		Point ptsc[4];
+    #endif
+    
+		// Glom the last residue onto the target.
+		// Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
+		// Then do the same for the previous residue, and the one before, etc,
+		// all the way back to the starting residue.
+		// Give a warning if the starting residue has an anomaly > 0.1A.
+		AminoAcid *next, *curr, *prev;
+		int pointer = endres;
+		float movfactor = 1, decrement, anomaly = 0;
 		
-		#if _INCREMENTAL_BKCONN
-		ptsc[0] = (inc > 0) ? curr->get_atom_location("C") : curr->get_atom_location("N");
-		ptsc[1] = (inc > 0) ? curr->get_atom_location("O") : curr->HN_or_substitute_location();
-		ptsc[2] = curr->get_atom_location("CA");
+		decrement = 1.0 / fabs(endres - startres);		// if exterior is the opposite of interior, what's the opposite of increment?
 		
-		Point _4avg[3];
-		for (i=0; i<3; i++)
+		next = get_residue(endres+inc);
+		curr = get_residue(pointer);
+		prev = get_residue(pointer-inc);
+		
+		#if DBG_BCKCONN
+		cout << "backconnect( " << startres << ", " << endres << ")" << endl;
+		#endif
+		while (next && curr)
 		{
-			_4avg[0] = pts[i];
-			_4avg[1] = ptsc[i];
-			_4avg[0].weight = movfactor;
-			_4avg[1].weight = 1.0 - movfactor;
-			pts[i] = average_of_points(_4avg, 2);
-		}
+			#if DBG_BCKCONN
+			cout << pointer << ":";
+			#endif
+			
+			Point* pts = (inc > 0) ? next->predict_previous_COCA() : next->predict_next_NHCA();
+			Point ptsc[4];
+			
+			#if _INCREMENTAL_BKCONN
+			ptsc[0] = (inc > 0) ? curr->get_atom_location("C") : curr->get_atom_location("N");
+			ptsc[1] = (inc > 0) ? curr->get_atom_location("O") : curr->HN_or_substitute_location();
+			ptsc[2] = curr->get_atom_location("CA");
+			
+			Point _4avg[3];
+			for (i=0; i<3; i++)
+			{
+				_4avg[0] = pts[i];
+				_4avg[1] = ptsc[i];
+				_4avg[0].weight = movfactor;
+				_4avg[1].weight = 1.0 - movfactor;
+				pts[i] = average_of_points(_4avg, 2);
+			}
+			#endif
+			
+			curr->glom(pts, inc > 0);
+			delete[] pts;
+			// break;
+			
+			#if DBG_BCKCONN
+			cout << "g";
+			#endif
+			
+			if (prev)
+			{
+				MovabilityType fmov = curr->movability;
+				curr->movability = MOV_ALL;
+				
+				#if DBG_BCKCONN
+				cout << "a";
+				#endif
+			
+				pts = (inc < 0) ? prev->predict_previous_COCA() : prev->predict_next_NHCA();
+				Point target_heavy = pts[0];
+				Point target_pole = pts[1];
+				delete[] pts;
+				
+				#if DBG_BCKCONN
+				cout << "b";
+				#endif
+				
+				float theta, step = fiftyseventh*1.0, r, btheta = 0, bestr;
+				for (theta=0; theta < M_PI*2; theta += step)
+				{
+					r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
+					// r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+					if (inc > 0) r -= target_pole.get_3d_distance(curr->HN_or_substitute_location());
+					
+					if (!theta || (r < bestr))
+					{
+						bestr = r;
+						btheta = theta;
+					}
+					
+					curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , step );
+				}
+				curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , btheta );
+				
+				#if DBG_BCKCONN
+				cout << "c";
+				#endif
+				
+				btheta=0;
+				for (theta=0; theta < M_PI*2; theta += step)
+				{
+					r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
+					// r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+					if (inc < 0) r -= target_pole.get_3d_distance(curr->get_atom_location("O"));
+					
+					if (!theta || (r < bestr))
+					{
+						bestr = r;
+						btheta = theta;
+					}
+					
+					curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , step );
+				}
+				curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , btheta );
+				anomaly = bestr;
+				
+				#if DBG_BCKCONN
+				cout << "d";
+				#endif
+			
+				curr->movability = fmov;
+			}
+			
+			if (pointer == startres)
+			{
+				#if DBG_BCKCONN
+				cout << ". ";
+				#endif
+				break;
+			}
+			
+			pointer -= inc;
+			next = curr;
+			curr = prev;
+			prev = get_residue(pointer-inc);
+			movfactor -= decrement;
+			
+			#if DBG_BCKCONN
+			cout << ", ";
+			#endif
+		};
+			
+		#if DBG_BCKCONN
+		cout << endl;
 		#endif
 		
-    	curr->glom(pts, inc > 0);
-    	delete[] pts;
-    	// break;
-    	
-    	#if DBG_BCKCONN
-    	cout << "g";
-    	#endif
-		
-		if (prev)
-		{
-			MovabilityType fmov = curr->movability;
-			curr->movability = MOV_ALL;
-			
-			#if DBG_BCKCONN
-			cout << "a";
-			#endif
-    	
-			pts = (inc < 0) ? prev->predict_previous_COCA() : prev->predict_next_NHCA();
-			Point target_heavy = pts[0];
-			Point target_pole = pts[1];
-			delete[] pts;
-			
-			#if DBG_BCKCONN
-			cout << "b";
-			#endif
-			
-			float theta, step = fiftyseventh*1.0, r, btheta = 0, bestr;
-			for (theta=0; theta < M_PI*2; theta += step)
-			{
-				r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
-				// r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
-				if (inc > 0) r -= target_pole.get_3d_distance(curr->HN_or_substitute_location());
-				
-				if (!theta || (r < bestr))
-				{
-					bestr = r;
-					btheta = theta;
-				}
-				
-				curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , step );
-			}
-			curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , btheta );
-			
-			#if DBG_BCKCONN
-			cout << "c";
-			#endif
-			
-			btheta=0;
-			for (theta=0; theta < M_PI*2; theta += step)
-			{
-				r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
-				// r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
-				if (inc < 0) r -= target_pole.get_3d_distance(curr->get_atom_location("O"));
-				
-				if (!theta || (r < bestr))
-				{
-					bestr = r;
-					btheta = theta;
-				}
-				
-				curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , step );
-			}
-			curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , btheta );
-			anomaly = bestr;
-			
-			#if DBG_BCKCONN
-			cout << "d";
-			#endif
-		
-			curr->movability = fmov;
-		}
-		
-		if (pointer == startres)
-		{
-			#if DBG_BCKCONN
-    		cout << ". ";
-    		#endif
-			break;
-		}
-    	
-    	pointer -= inc;
-    	next = curr;
-    	curr = prev;
-		prev = get_residue(pointer-inc);
-		movfactor -= decrement;
-    	
-    	#if DBG_BCKCONN
-    	cout << ", ";
-    	#endif
-    };
-    	
-	#if DBG_BCKCONN
-	cout << endl;
-	#endif
-    
-    /*if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
-    						<< "# " << (startres-inc) << " anomaly: " << anomaly << endl;*/
+		/*if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
+								<< "# " << (startres-inc) << " anomaly: " << anomaly << endl;*/
+	#if _INCREMENTAL_BKCONN
+	}
 	#endif
 }
 
@@ -1338,7 +1344,7 @@ void ext_mtl_coord_cnf_cb(int iter)
     gmprot->mtl_coord_cnf_cb(iter);
 }
 
-MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, char** res_anames)
+MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames)
 {
     int i, j=0, k=0;
     if (!m_mcoord)
@@ -1391,7 +1397,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, ch
             throw 0xbad12e5d;
         }
         m_mcoord[j]->coord_res[i]->m_mcoord = m_mcoord[j];
-        m_mcoord[j]->coord_atoms[i] = m_mcoord[j]->coord_res[i]->get_atom(res_anames[i]);
+        m_mcoord[j]->coord_atoms[i] = m_mcoord[j]->coord_res[i]->get_atom(res_anames[i].c_str());
         if (!m_mcoord[j]->coord_atoms[i])
         {
             cout << "Attempt to bind metal to " << resnos[i] << ":" << res_anames[i] << " not found in protein!" << endl;

@@ -869,6 +869,7 @@ Point* AminoAcid::predict_next_NHCA()
 	return retval;
 }
 
+#define _COUT_GLOMANOM 0
 void AminoAcid::glom(Point* predicted, bool CO)
 {
 	MovabilityType fmov = movability;
@@ -879,8 +880,9 @@ void AminoAcid::glom(Point* predicted, bool CO)
 	Point moveby = predicted[0].subtract( CO ? get_atom_location("C") : get_atom_location("N") );
 	aamove(moveby);
 	anomaly = predicted[0].get_3d_distance( CO ? get_atom_location("C") : get_atom_location("N") );
+	#if _COUT_GLOMANOM
 	if (anomaly > 0.001) cout << "Error: " << ( CO ? "C" : "N" ) << " anomaly outside tolerance!" << endl << "# Anomaly is " << anomaly << endl;
-	// else cout << "# " << ( CO ? "C" : "N" ) << " anomaly within tolerance at " << anomaly << endl;
+	#endif
 	
 	// Rotation: rotate the entire AA about the predicted origin so that the HN (or O) aligns with the predicted vector.
 	Point pt1 = CO ? get_atom_location("O") : HN_or_substitute_location(), pt2 = predicted[1];
@@ -890,8 +892,9 @@ void AminoAcid::glom(Point* predicted, bool CO)
 	rotate(lv, rot.a);
 	pt1 = CO ? get_atom_location("O") : HN_or_substitute_location();
 	anomaly = predicted[1].get_3d_distance(pt1);
+	#if _COUT_GLOMANOM
 	if (anomaly > 0.1) cout << "Error: " << ( CO ? "O" : "HN" ) << " anomaly outside tolerance!" << endl << "# Anomaly is " << anomaly << endl;
-	// else cout << "# " << ( CO ? "O" : "HN" ) << " anomaly within tolerance at " << anomaly << endl;
+	#endif
 	
 	// Rotation: rotate the entire AA about its NH or CO axis to bring the CA in line with the predicted CA.
 	lv.origin = CO ? get_atom_location("C") : get_atom_location("N");
@@ -922,8 +925,9 @@ void AminoAcid::glom(Point* predicted, bool CO)
 		rotate(lv, theta*2);
 		anomaly = predicted[2].get_3d_distance(get_atom_location("CA"));
 	}
+	#if _COUT_GLOMANOM
 	if (anomaly > 0.1) cout << "Error: CA anomaly outside tolerance!" << endl << "# Anomaly is " << anomaly << "." << endl;
-	// else cout << "# CA anomaly within tolerance at " << anomaly << endl;
+	#endif
 	
 	movability = fmov;
 }
@@ -1323,6 +1327,58 @@ int AminoAcid::similarity_to(const char letter)
 	if (aadef->can_coord_metal == aa_defs[letter].can_coord_metal) retval += 1;
 	
 	return retval;
+}
+
+#define DBG_TYRLIKE 0
+bool AminoAcid::is_tyrosine_like()
+{
+	if (!atoms) return false;
+	if (!rings) return false;
+	
+	int i, j;
+	bool has_aromatic_ring = false;
+	
+	for (i=0; rings[i]; i++)
+	{
+		if (rings[i]->get_type() == AROMATIC) has_aromatic_ring = true;
+	}
+	
+	if (!has_aromatic_ring) return false;
+	
+	for (i=0; atoms[i]; i++)
+	{
+		if (atoms[i]->is_backbone) continue;
+		if (atoms[i]->get_Z() == 7 || atoms[i]->get_Z() == 8 || atoms[i]->is_polar() < 0)
+		{
+			bool part_of_arom_ring = false;
+			
+			for (j=0; rings[j]; j++)
+			{
+				bool atom_is_in_ring = atoms[i]->is_in_ring(rings[j]);
+				if (!atom_is_in_ring) continue;
+				
+				bool ring_is_aromatic = rings[j]->get_type() == AROMATIC;
+				if (!ring_is_aromatic) continue;
+				
+				#if DBG_TYRLIKE
+				if (atom_is_in_ring) cout << atoms[i]->name << " is part of ring " << *rings[j] << endl;
+				if (ring_is_aromatic) cout << *rings[j] << " is aromatic." << endl;
+				#endif
+				
+				/*if (atom_is_in_ring && ring_is_aromatic)*/ part_of_arom_ring = true;
+			}
+			if (!part_of_arom_ring)
+			{
+				#if DBG_TYRLIKE
+				cout << atoms[i]->name << " seems to be ringless, yup not missing any important info, derp." << endl;
+				#endif
+				
+				return true;
+			}
+		}
+	}
+	
+	return false;
 }
 
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)

@@ -70,6 +70,9 @@ int main(int argc, char** argv)
     	if (argc>1) letter = argv[1][0];
         AminoAcid aa(letter);
         
+        cout << "Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? "
+        	 << (aa.is_tyrosine_like() ? "Y" : "N") << endl;
+        
         cout << aa.get_name() << " hydrophilicity = " << aa.hydrophilicity() << endl;
         cout << "Similarity to A " << aa.similarity_to('A') << endl;
         cout << "Similarity to D " << aa.similarity_to('D') << endl;

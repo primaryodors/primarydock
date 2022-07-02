@@ -58,15 +58,16 @@ class AminoAcid : public Molecule
  	AminoAcid(const char letter, AminoAcid* prev_res=0);
 
  	// Getters and setters.
- 	AminoAcid* get_prev() const 				{ 	 	return prev_aa; 						}
- 	AminoAcid* get_next() const 				{ 	 	return next_aa; 						}
- 	int get_residue_no() const 					{ 	 	return residue_no; 						}
- 	char get_letter() const 					{ 	 	return aadef ? aadef->_1let : 0; 		}
- 	char* get_3letter() const 					{ 	 	return aadef ? aadef->_3let : 0; 		}
- 	AADef* get_aa_definition() const 			{ 	 	return aadef; 							}
- 	float get_reach() const 					{ 	 	return aadef ? aadef->reach : 2.5; 		}
+ 	AminoAcid* get_prev() const { return prev_aa; }
+ 	AminoAcid* get_next() const { return next_aa; }
+ 	int get_residue_no() const { return residue_no; }
+ 	char get_letter() const { return aadef ? aadef->_1let : 0; }
+ 	char* get_3letter() const { return aadef ? aadef->_3let : 0; }
+ 	AADef* get_aa_definition() const { return aadef; }
+ 	bool is_tyrosine_like();		// An amino acid is tyrosine-like if it has an aromatic ring and a non-backbone H-bond acceptor not part of the ring.
+ 	float get_reach() const { return aadef ? aadef->reach : 2.5; }
  	bool can_reach(AminoAcid* other) const;
- 	void set_region(const char* regname) 		{ 	 	strcpy(region, regname); 				}
+ 	void set_region(const char* regname) { strcpy(region, regname); }
  	Atom* previous_residue_C();
  	Atom* next_residue_N();
  	Atom* HN_or_substitute();
@@ -79,9 +80,7 @@ class AminoAcid : public Molecule
 
  	// Spatial functions.
  	void aamove(SCoord move_amt);
- 	// void move(Point move_amt) 					{ 	 	return; 	}
- 	void recenter(Point new_location) 			{ 	 	return; 	}
- 	// void rotate(SCoord* SCoord, float theta) 	{ 	 	return; 	}
+ 	void recenter(Point new_location) { return; }
  	void rotate(LocatedVector SCoord, float theta);
  	LocatedVector rotate_backbone(bb_rot_dir direction, float angle);	// Return the origin and direction of the rotation axis.
  	LocRotation rotate_backbone_abs(bb_rot_dir direction, float angle);

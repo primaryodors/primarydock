@@ -260,6 +260,44 @@ option.unknown
 </style>
 <script src="https://unpkg.com/ngl@0.10.4/dist/ngl.js"></script>
 <script>
+
+// https://www.w3schools.com/jsref/met_element_exitfullscreen.asp
+function openFullscreen(elem) 
+{
+	if (elem.requestFullscreen) 
+	{
+		elem.requestFullscreen();
+	}
+	else if (elem.webkitRequestFullscreen)
+	{
+		/* Safari */
+		elem.webkitRequestFullscreen();
+	}
+	else if (elem.msRequestFullscreen) 
+	{
+		/* IE11 */
+		elem.msRequestFullscreen();
+	}
+}
+function exitFullscreen()
+{
+	if (document.exitFullscreen)
+	{
+		document.exitFullscreen();
+	}
+	else if (document.webkitExitFullscreen)
+	{
+		/* Safari */
+		document.webkitExitFullscreen();
+	}
+	else if (document.msExitFullscreen) 
+	{ 
+		/* IE11 */
+		document.msExitFullscreen();
+	}
+}
+var is_fullscreen = false;
+
 /******************************************************************************/
 // http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
 function getParameterByName(name, url)
@@ -311,6 +349,7 @@ Clip:
 </div>
 
 <div id="center">
+<a id="fsbtn" class="nodebtn clickme" onclick="if (is_fullscreen) exitFullscreen(); else openFullscreen(document.body); is_fullscreen = !is_fullscreen">&#x26F6;</a>
 Center:
 <a class="posebtn clickme" onclick="gmodel[0].autoView();" title="Middle-click an atom to center it.">Model</a>
 <a class="posebtn clickme" onclick="centerPocket();" id="pktbtn" style="display: none;">Pocket</a>
@@ -1449,6 +1488,7 @@ $('#citefloat span')[0].innerText = nglcitation;
 
 <div id="seqdd" style="display: none;">
 </div>
+
 
 
 

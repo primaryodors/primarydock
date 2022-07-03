@@ -49,6 +49,7 @@ class Ring
 	public:
 	Ring() { ; }
 	Ring(Atom** from_atoms);
+	Ring(Atom** from_atoms, RING_TYPE type);
 	
 	int get_atom_count() { return atcount; }
 	Atom* get_atom(int index);
@@ -66,6 +67,7 @@ class Ring
 	int atcount = 0;
 	RING_TYPE type = UNKNOWN;
 	
+	void fill_with_atoms(Atom** from_atoms);
 	void determine_type();
 	void make_coplanar();
 };

@@ -30,6 +30,7 @@ struct AADef
  	char name[20];
  	float reach = 2.5;
  	AABondDef** aabonds = nullptr;
+ 	Ring** aarings = nullptr;
  	bool proline_like = false;
  	std::string SMILES = "";
  	float hydrophilicity = 0;

@@ -3340,6 +3340,86 @@ Atom** Molecule::get_most_bindable(int max_count)
     else return retval;
 }
 
+#define DBG_BINDABLE 0
+Atom** Molecule::get_most_bindable(int max_num, Atom* for_atom)
+{
+	if (!atoms) return nullptr;
+	if (!for_atom) return nullptr;
+	
+	#if DBG_BINDABLE
+	cout << "Molecule::get_most_bindable( " << max_num << ", " << for_atom->name << " )" << endl;
+	#endif
+	
+	int mn2 = max_num+2;
+	
+	int i, j, k;
+	float bb[mn2];
+	Atom** bba = new Atom*[mn2];
+	
+	for (i=0; i<mn2; i++)
+	{
+		bb[i] = 0;
+		bba[i] = nullptr;
+	}
+	
+	for (i=0; atoms[i]; i++)
+	{
+		if (atoms[i]->is_backbone) continue;
+		InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], for_atom);
+		if (!iff) continue;
+		
+		float lbb = 0;
+		for (j=0; iff[j]; j++)
+		{
+			float kj = iff[j]->get_kJmol();
+			
+			if (atoms[i]->get_charge()) kj *= fabs(atoms[i]->get_charge());
+			if (for_atom->get_charge()) kj *= fabs(for_atom->get_charge());
+			
+			lbb += kj;
+		}
+		
+		#if DBG_BINDABLE
+		// Note: A competent programmer would not have to put these debugs all over the place every stinking function.
+		cout << "Binding potential for " << atoms[i]->name << " " << lbb << " kJ/mol." << endl;
+		#endif
+		
+		for (j=0; j<max_num; j++)
+		{
+			if (lbb > bb[j])
+			{
+				for (k=max_num-1; k>j; k--)
+				{
+					bba[k] = bba[k-1];
+					bb[k] = bb[k-1];
+				}
+				
+				bba[j] = atoms[i];
+				bb[j] = lbb;
+				
+				#if DBG_BINDABLE
+				cout << "Potential is better than previous result " << j << endl;
+				#endif
+				
+				break;
+			}
+		}
+	}
+	
+	#if DBG_BINDABLE
+	cout << "Returning:" << endl << flush;
+	for (i=0; i<max_num; i++)
+	{
+		cout << i << ": " << flush << bba[i] << flush << " ";
+		if (bba[i]) cout << bba[i]->name << flush;
+		cout << endl << flush;
+	}
+	cout << endl;
+	#endif
+	
+	return bba;
+}
+
 Point Molecule::get_bounding_box() const
 {
     if (noAtoms(atoms)) return 0;

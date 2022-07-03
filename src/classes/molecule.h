@@ -122,6 +122,7 @@ class Molecule
     void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with);
     void reset_conformer_momenta();
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
+    Atom** get_most_bindable(int max_num, Atom* for_atom);
 
     bool echo_iters = false;
     MovabilityType movability = MOV_ALL;

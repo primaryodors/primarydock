@@ -664,6 +664,7 @@ int main(int argc, char** argv)
 				std::vector<string> cratoms;	// coordinating residue atoms.																						oh god I hooked up with this guy once who used kratom and after we both finished goddamn all he did was yipyapyipyapyipyap all night until finally I said babe, I n**d my sleep, and I musta finally dozed off at something like 5am, yeah kinda like the song. Then it's morning and he goes home and a hot drummer/songwriter is coming over to audition for my rock band that day and I'm running on 3 hours of sleep, what a way to make a first impression, thank flying spaghetti monster our guitarist was my roommate because at least someone in the house was awake. Ahhh, my 30s, when I still had (false) hope. Good times, those.
 				bool force_tyrosine_O = false;
 				bool thiolate = false;
+				Atom** ba = nullptr;
 				
 				_yes_I_used_goto_for_this:
 				if (!strcmp(fields[l], "YO"))
@@ -690,6 +691,12 @@ int main(int argc, char** argv)
 				if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
 				elem_charge = interpret_single_int(fields[l++]);
 				Point pt;
+				ma = new Atom(elem_sym.c_str(), &pt, elem_charge);
+				string mname = elem_sym.append("1");
+				ma->name = new char[8];
+				strcpy(ma->name, mname.c_str());
+				strcpy(ma->aa3let, "MTL");
+				ma->residue = 0;
 				
 				if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
 				for (; fields[l]; l++)
@@ -711,8 +718,11 @@ int main(int argc, char** argv)
 					}
 					
 					if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
-					AminoAcid* aa = p.get_residue(interpret_single_int(fields[l++]));
+					k = interpret_single_int(fields[l]);
+					AminoAcid* aa = p.get_residue(k);
+					resnos[ncr] = k;
 					
+					// cout << aa->get_3letter() << k << " is " << (aa->is_tyrosine_like() ? "" : "not ") << "tyrosine-like." << endl;
 					if (aa->is_tyrosine_like() && !local_O)
 					{
 						Ring* rr = aa->get_most_distal_arom_ring();
@@ -720,15 +730,37 @@ int main(int argc, char** argv)
 						{
 							n = rr->get_atom_count();
 							// Get members 1 and 1+floor(n/2).
+							cratoms.push_back(rr->get_atom(1)->name);
+							cout << "Found metal coord atom " << resnos[ncr] << ":" << cratoms[ncr] << endl;
+							ncr++;
+							
+							resnos[ncr] = k;
+							j = 1 + (n/2);
+							cratoms.push_back(rr->get_atom(j)->name);
+							cout << "Found metal coord atom " << resnos[ncr] << ":" << cratoms[ncr] << endl;
+							ncr++;
+							
+							goto _found_coord_atom;
 						}
 					}
 					
+					ba = aa->get_most_bindable(1, ma);
+					
+					if (ba && ba[0])
+					{
+						cratoms.push_back(ba[0]->name);
+						cout << "Found metal coord atom " << resnos[ncr] << ":" << cratoms[ncr] << endl;
+						ncr++;
+					}
+					else raise_error((std::string)"No metal coordination atom found for " + (std::string)aa->get_3letter() + to_string(k));
+					
+					_found_coord_atom:
+					;
 					
 				}
 				
-				ma = new Atom(elem_sym.c_str(), &pt, elem_charge);
-				
-				
+				if (ncr < 3) raise_error("MCOORD requires at least 3 coordinating atoms.");
+				p.coordinate_metal(ma, ncr, resnos, cratoms);
 				
 			} // MCOORD
 			

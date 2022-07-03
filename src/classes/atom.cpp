@@ -1804,7 +1804,7 @@ Ring* Atom::closest_arom_ring_to(Point target)
 	return nullptr;
 }
 
-Ring::Ring(Atom** from_atoms)
+void Ring::fill_with_atoms(Atom** from_atoms)
 {
 	if (!from_atoms) return;
 	
@@ -1839,7 +1839,18 @@ Ring::Ring(Atom** from_atoms)
 	}
 	
 	atoms[atcount] = nullptr;
+}
+
+Ring::Ring(Atom** from_atoms)
+{
+	fill_with_atoms(from_atoms);
 	determine_type();
+}
+
+Ring::Ring(Atom** from_atoms, RING_TYPE ltype)
+{
+	fill_with_atoms(from_atoms);
+	type = ltype;
 }
 
 Atom* Ring::get_atom(int index)

@@ -511,6 +511,17 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     identify_acidbase();
     identify_rings();
     
+    if (rings && !aa_defs[idx].aarings)
+    {
+    	int rc2 = get_num_rings() + 2;
+    	aa_defs[idx].aarings = new Ring*[rc2];
+    	for (i=0; rings[i]; i++)
+    	{
+    		aa_defs[idx].aarings[i] = rings[i];
+    	}
+    	aa_defs[idx].aarings[i] = nullptr;
+    }
+    
     aa_defs[idx].hydrophilicity = AminoAcid::hydrophilicity();
     if (capable_of_inter(mcoord)) aa_defs[idx].can_coord_metal = true;
     if (fabs(get_charge()) >= 0.9) aa_defs[idx].charged = sgn(get_charge());
@@ -1058,7 +1069,7 @@ int AminoAcid::from_pdb(FILE* is)
                     {
                         fseek(is, lasttell, SEEK_SET);
                         delete[] fields;
-                        return added;
+                        goto _return_added;
                         //throw ATOM_NOT_OF_AMINO_ACID;
                     }
                     else aadef = aaa;
@@ -1141,16 +1152,18 @@ int AminoAcid::from_pdb(FILE* is)
                     	if (bta) a->bond_to(bta, cardinality);
                     	
                     }
+                    
+                    
 
                 }
 		        else
 		        {
 		        	fseek(is, lasttell, SEEK_SET);
 		        	delete[] fields;
-		        	return added;
+		        	goto _return_added;
 		    	}
             }
-            else return added;
+            else goto _return_added;
         }
         catch (int ex)
         {
@@ -1163,6 +1176,43 @@ int AminoAcid::from_pdb(FILE* is)
     }
 
 _return_added:
+	
+	if (aadef && aadef->aarings)
+    {
+    	int i, j;
+    	for (i=0; aadef->aarings[i]; i++);	// Get count.
+    	rings = new Ring*[i+2];
+    	
+    	for (i=0; aadef->aarings[i]; i++)
+    	{
+    		rings[i] = nullptr;
+    		Atom** ringa = aadef->aarings[i]->get_atoms();
+    		if (!ringa) continue;
+    		
+    		Atom** lra = new Atom*[aadef->aarings[i]->get_atom_count() + 2];
+    		
+    		for (j=0; ringa[j]; j++)
+    		{
+    			Atom* la = get_atom(ringa[j]->name);
+    			if (la)
+    			{
+    				lra[j] = la;
+				}
+    			else
+    			{
+    				lra[j] = new Atom(ringa[j]->get_elem_sym());
+    				lra[j]->name = new char[8];
+    				strcpy(lra[j]->name, ringa[j]->name);
+				}
+    		}
+    		lra[j] = nullptr;
+    		
+    		delete[] ringa;
+    		rings[i] = new Ring(lra, aadef->aarings[i]->get_type());
+    	}
+    	rings[i] = nullptr;
+    }
+    // identify_rings();
 
     return added;
 }
@@ -1356,8 +1406,20 @@ Ring* AminoAcid::get_most_distal_arom_ring()
 #define DBG_TYRLIKE 0
 bool AminoAcid::is_tyrosine_like()
 {
-	if (!atoms) return false;
-	if (!rings) return false;
+	if (!atoms)
+	{
+		#if DBG_TYRLIKE
+		cout << "No atoms." << endl;
+		#endif
+		return false;
+	}
+	if (!rings)
+	{
+		#if DBG_TYRLIKE
+		cout << "No rings." << endl;
+		#endif
+		return false;
+	}
 	
 	int i, j;
 	bool has_aromatic_ring = false;
@@ -1367,7 +1429,13 @@ bool AminoAcid::is_tyrosine_like()
 		if (rings[i]->get_type() == AROMATIC) has_aromatic_ring = true;
 	}
 	
-	if (!has_aromatic_ring) return false;
+	if (!has_aromatic_ring)
+	{
+		#if DBG_TYRLIKE
+		cout << "No aromatic rings." << endl;
+		#endif
+		return false;
+	}
 	
 	for (i=0; atoms[i]; i++)
 	{

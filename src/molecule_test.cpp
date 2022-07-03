@@ -151,13 +151,13 @@ int main(int argc, char** argv)
     Point pt(0,0,1.0);
     SCoord v(&pt);
     float ttlmv = 0;
-    while (m1.get_intermol_clashes(&m2))
+    /*while (m1.get_intermol_clashes(&m2))
     {
         m2.move(v);
         ttlmv += v.r;
         // cout << v.r << " ";
     }
-    cout << "\n# Moved molecule 2 by " << ttlmv << " A." << endl;
+    cout << "\n# Moved molecule 2 by " << ttlmv << " A." << endl;*/
 
     cout << "# Initial intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
     cout << "# Initial intermol energy level: " << m1.get_intermol_binding(&m2) << " kJ/mol." << endl;
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
     mols[0] = &m1;
     mols[1] = &m2;
     mols[2] = NULL;
-    Molecule::multimol_conform(mols, 50);
+    Molecule::multimol_conform(mols, 250);
     float final_clashes = m1.get_intermol_clashes(&m2);
     if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);

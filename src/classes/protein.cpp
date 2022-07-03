@@ -1346,7 +1346,7 @@ void ext_mtl_coord_cnf_cb(int iter)
 
 MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames)
 {
-    int i, j=0, k=0;
+    int i, j=0, k=0, l, n;
     if (!m_mcoord)
     {
         m_mcoord = new MetalCoord*[2];
@@ -1482,9 +1482,77 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     for (i=0; m_mcoord[j]->coord_res[i]; i++)
         m_mcoord[j]->coord_res[i]->movability = MOV_FLEXONLY;
 
+	// Flex the side chains to all be close to one another.
+	int iter;
+	for (iter=0; iter<10; iter++)
+	{
+		for (i=0; i<residues; i++)
+		{
+		    AminoAcid* aa = get_residue(resnos[i]);
+		    if (aa)
+		    {
+		    	Bond** bb = aa->get_rotatable_bonds();
+		    	if (bb)
+		    	{
+		    		float rad = 0, step = 10*fiftyseventh;
+		    		float bestrad, bestr, r;
+		    		
+		    		for (l=0; bb[l]; l++)
+		    		{
+		    			bestrad = 0;
+		    			bestr = 999999;
+		    			for (; rad < M_PI*2; rad += step)
+		    			{
+		    				bb[l]->rotate(step);
+		    				r = 0;
+		    				for (n=0; n<residues; n++)
+		    				{
+		    					if (resnos[n] == resnos[i]) continue;
+		    					r += get_atom_location(resnos[n], res_anames[n].c_str()).get_3d_distance(get_atom_location(resnos[i], res_anames[i].c_str()));
+		    				}
+		    				
+		    				/*cout << iter << " " << *aa << ":"
+		    					 << bb[l]->atom->name << "-" << bb[l]->btom->name
+		    					 << " " << rad*fiftyseven << "deg "
+		    					 << r << endl;*/
+		    				
+		    				if (r < bestr)
+		    				{
+		    					bestrad = rad;
+		    					bestr = r;
+		    				}
+		    			}
+		    		
+		    			if (bestrad) bb[l]->rotate(bestrad);
+		    			
+		    		}		// for (l=0; bb[l]; l++)
+		    	}		// if (bb)
+		    }		// if (aa)
+		}		// for (i=0; i<residues; i++)
+	}		// for iter
+	
+	// Move the metal to the new center of all coordinating atoms.
+	Point pt4avg[residues+2];
+	l=0;
+	for (n=0; n<residues; n++)
+	{
+		Point respt = get_atom_location(resnos[n], res_anames[n].c_str());
+		
+		if (n>0 && resnos[n] == resnos[n-1])
+		{
+			pt4avg[l-1].x = (pt4avg[l-1].x + respt.x)/2;
+			pt4avg[l-1].y = (pt4avg[l-1].y + respt.y)/2;
+			pt4avg[l-1].z = (pt4avg[l-1].z + respt.z)/2;
+		}
+		else
+			pt4avg[l++] = respt;
+	}
+	Point ptmtl = average_of_points(pt4avg, l);
+	metal->move(ptmtl);
+
     // Multimol conform the array.
     gmprot = this;
-    Molecule::multimol_conform(lmols, 250, &ext_mtl_coord_cnf_cb);
+    // Molecule::multimol_conform(lmols, 250, &ext_mtl_coord_cnf_cb);
 
     // Set the coordinating residues' sidechains to immovable.
     for (i=0; m_mcoord[j]->coord_res[i]; i++)

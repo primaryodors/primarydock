@@ -1403,6 +1403,15 @@ Ring* AminoAcid::get_most_distal_arom_ring()
 	return rings[retidx];
 }
 
+std::ostream& operator<<(std::ostream& os, const AABondDef& b)
+{
+	os << b.aname;
+	os << cardinality_printable(b.cardinality);
+	os << b.bname;
+	
+	return os;
+}
+
 #define DBG_TYRLIKE 0
 bool AminoAcid::is_tyrosine_like()
 {

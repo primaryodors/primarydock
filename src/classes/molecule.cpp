@@ -1244,6 +1244,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     {
     	for (i=0; aadef->aabonds[i]; i++)
     	{
+    		// cout << (name ? name : "(no name)") << "." << *(aadef->aabonds[i]) << endl;
     		if (aadef->aabonds[i]->cardinality == 1
     			&&
     			aadef->aabonds[i]->can_rotate
@@ -1287,22 +1288,32 @@ Bond** AminoAcid::get_rotatable_bonds()
 					}
     				else
     				{
+    					// cout << (name ? name : "(no name)") << ":" << *(lb) << endl;
     					// Generally, a single bond between pi atoms cannot rotate.
 						if (lb->atom->is_pi() && lb->btom && lb->btom->is_pi())
 						   aadef->aabonds[i]->can_rotate = false;
     					
-						lb->can_rotate =
-							aadef->aabonds[i]->can_rotate;
+						lb->can_rotate = aadef->aabonds[i]->can_rotate;
 
-						if (!la->is_backbone
+						if ((!la->is_backbone || !strcmp(la->name, "CA"))
 							&&
 							la->get_Z() > 1
 				            &&
-				            greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)+1)
+				            (	greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)+1)
+				            	||
+				            	greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)-1)
+				            )
 		                   )
 		                {
-						    btemp[bonds++] = lb->btom->get_bond_between(la);
+		                	// cout << "Included." << endl;
+		                	
+		                	if (greek_from_aname(la->name) < greek_from_aname(lb->btom->name))
+		                		btemp[bonds++] = la->get_bond_between(lb->btom);
+		                	else
+						    	btemp[bonds++] = lb->btom->get_bond_between(la);
 						    btemp[bonds] = 0;
+						    
+						    // cout << (name ? name : "(no name)") << ":" << *(btemp[bonds-1]) << endl;
 						}
 				    }
 				}
@@ -2113,6 +2124,7 @@ void Molecule::intermol_conform_flexonly(Molecule** ligands, int iters, Molecule
 }
 
 
+#define DBG_BONDFLEX 0
 
 void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 {
@@ -2168,11 +2180,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             }
             mm[i]->lastbind = bind;
 
-            float reversal = -0.666; // TODO: Make this binding-energy dedpendent.
+            float reversal = -0.666; // TODO: Make this binding-energy dependent.
             float accel = 1.1;
 
             /**** Linear Motion ****/
-            if (mm[i]->movability >= MOV_ALL)
+            if (mm[i]->movability >= MOV_ALL && iter >= 10)
             {
                 Point pt(mm[i]->lmx, 0, 0);
                 mm[i]->move(pt);
@@ -2436,13 +2448,20 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 mm[i]->lastbind = bind;
 
-                //cout << "Iter" << iter << " " << mm[i]->name;
+				#if DBG_BONDFLEX
+                cout << "Iter" << iter << " " << mm[i]->name;
+                #endif
+                
                 if (mm[i]->rotatable_bonds)
                 {
-                    //cout << " has rotbonds ";
+                	#if DBG_BONDFLEX
+                    cout << " has rotbonds ";
+                    #endif
                     for (k=0; mm[i]->rotatable_bonds[k]; k++)
                     {
-                        //cout << k;
+                    	#if DBG_BONDFLEX
+                        cout << k;
+                        #endif
 
                         rad = 0;
                         bestfrb = -10000;
@@ -2456,10 +2475,16 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                                 rad += _fullrot_steprad;
 
                                 bind1 = 0;
+                                #if DBG_BONDFLEX
+                                cout << endl << (rad*fiftyseven) << ": ";
+                        		#endif
                                 for (j=0; mm[j]; j++)
                                 {
                                     if (!nearby[j]) continue;
                                     bind1 += mm[i]->get_intermol_binding(mm[j]);
+                                    #if DBG_BONDFLEX
+                                    cout << mm[j]->name << " " << bind1 << " ";
+                        			#endif
                                 }
 
                                 if (bind1 > bestfrb)
@@ -2468,6 +2493,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                                     bestfrrad = rad;
                                 }
                             }
+                            #if DBG_BONDFLEX
+                            cout << endl << "(" << (bestfrrad*fiftyseven) << "deg) ";
+                			#endif
 
                             if (!isnan(bestfrrad))
                                 mm[i]->rotatable_bonds[k]->rotate(bestfrrad);
@@ -2498,7 +2526,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         }
                     }
                 }
-                //cout << endl;
+                #if DBG_BONDFLEX
+                cout << endl;
+    			#endif
                 mm[i]->lastbind = bind;
 
                 if (!(iter % _fullrot_every)) mm[i]->reset_conformer_momenta();

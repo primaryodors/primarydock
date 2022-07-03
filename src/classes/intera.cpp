@@ -561,6 +561,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 				avec[1] = avec[0];
 				avec[1] = avec[1].negate();
 				for (j=2; j<ag; j++) avec[j] = SCoord(0,0,0);
+				ag = 2;
 			}
 		}
 		
@@ -580,6 +581,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 				bvec[1] = bvec[0];
 				bvec[1] = bvec[1].negate();
 				for (j=2; j<ag; j++) bvec[j] = SCoord(0,0,0);
+				bg = 2;
 			}
 		}
 
@@ -671,7 +673,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
         {
-            partial *= ((a->get_charge()) * -(b->get_charge()));
+            partial *= fabs((a->get_charge()) * -(b->get_charge()));
 
             if (0 && (a->residue == 114 || b->residue == 114))
                 cout << "Ionic interaction between "
@@ -683,6 +685,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                      << partial
                      << endl;
         }
+        
+        /*if (forces[i]->type == polarpi || forces[i]->type == mcoord)
+        {
+        	cout << a->name << " ... " << b->name << " pi: " << partial << endl;
+        }*/
 
         if (fabs(partial) >= 500)
         {

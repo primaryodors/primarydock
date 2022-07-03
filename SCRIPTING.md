@@ -116,6 +116,19 @@ label:
 Diverts script execution to the specified label. A line must exist in the script that consists of only the label and a colon `:` character, with
 no spaces and no other characters.
 
+# HELIX
+Examples:
+```
+HELIX ALPHA 174 182
+HELIX -57.8 -47.0 174 182
+```
+
+Create a helix of the specified residue range. If the helix type is specified, it cannot be a variable and must be one of: `ALPHA`, `PI`, `3.10`,
+`PPRO1` (polyproline I), `PPRO2` (polyproline II), `BETA`, or `STRAIGHT`. Note that while the last two aren't helices, they use the same syntax
+because like with helices, the residues' phi and psi bonds are rotated to preset angles.
+
+Phi and psi angles can also be manually specified as in the second example.
+
 # LET
 Examples:
 ```
@@ -143,19 +156,6 @@ so even though `%i` is an integer in the above statement, its value is cast to a
 For strings, the operators `=` `+=` and `+` are allowed, with the plus sign indicating concatenation.
 Substrings are indicated with the word FROM and (optinally) FOR, e.g. `LET $end = $string FROM 10` or `LET $range = $SEQUENCE FROM %start FOR %length`.
 
-# HELIX
-Examples:
-```
-HELIX ALPHA 174 182
-HELIX -57.8 -47.0 174 182
-```
-
-Create a helix of the specified residue range. If the helix type is specified, it cannot be a variable and must be one of: `ALPHA`, `PI`, `3.10`,
-`PPRO1` (polyproline I), `PPRO2` (polyproline II), `BETA`, or `STRAIGHT`. Note that while the last two aren't helices, they use the same syntax
-because like with helices, the residues' phi and psi bonds are rotated to preset angles.
-
-Phi and psi angles can also be manually specified as in the second example.
-
 # LOAD
 Example:
 ```
@@ -163,6 +163,28 @@ LOAD "path/to/protein.pdb"
 ```
 
 Loads the specified protein into working memory. Note only one protein is allowed in memory at a given time.
+
+# MCOORD
+
+Example:
+```
+MCOORD Ag 1 %res1 %res2 %res3 %res4			# Coordinate Ag+ to the residues indicated by the variables.
+MCOORD Th8 Cu 2 123 154 203 259 			# Coordinate Cu2+ to the indicated residues, forming thiolates of any cysteines or selenolates of selenocysteines.
+MCOORD YAr Zn 2 123 234 356 YO 467			# Coordinate Zn2+, cation-pi bonding any tyrosines except the last listed residue.
+```
+
+Coordinate a metal ion to the indicated residues. A minimum of 3 residues is required.
+
+The optional Th8 parameter indicates that the metal ion should be thiolated to any CYS or SEC residues in the list, i.e. the metal will be covalently
+bonded to the S or Se, replacing the residue's H. TODO: This feature has not been implemented yet.
+
+Tyrosine is treated as both an aromatic residue and an oxygen coordinating residue. Aromatic residues are capable of forming cation-pi bonds, therefore
+phenylalanine and tryptophan will also be cation-pi coordinated to the metal if found. The default coordination method for tyrosine is cation-pi, however
+the default can be overridden with YO to force oxygen coordination or YAr to force pi coordination.
+
+Yar or YO before the metal symbol applies globally to the coordination residues. Yar or YO directly before a residue number applies only to that residue,
+overriding the default or any global.
+
 
 # SAVE
 Example:

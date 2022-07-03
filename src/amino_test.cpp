@@ -10,9 +10,10 @@ using namespace std;
 int main(int argc, char** argv)
 {
     char letter = 'A';
+    int i, j;
     if (argc>1 && strlen(argv[1]) > 1)
     {
-        int i, j, seqarg=1;
+        int seqarg=1;
 
         if (!strcmp("--dat", argv[seqarg]))
         {
@@ -72,6 +73,16 @@ int main(int argc, char** argv)
         
         cout << "Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? "
         	 << (aa.is_tyrosine_like() ? "Y" : "N") << endl;
+        
+        Bond** bb = aa.get_rotatable_bonds();
+        if (bb && bb[0])
+        {
+        	for (i=0; bb[i]; i++)
+        	{
+        		cout << bb[i]->atom->name << "-" << bb[i]->btom->name << " can rotate." << endl;
+        	}
+        }
+        else cout << "No rotatable bonds." << endl;
         
         cout << aa.get_name() << " hydrophilicity = " << aa.hydrophilicity() << endl;
         cout << "Similarity to A " << aa.similarity_to('A') << endl;

@@ -836,6 +836,7 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
 
 float Atom::is_polar()
 {
+	if (charge) polarity = sgn(charge);
     return polarity;
 }
 
@@ -2038,6 +2039,15 @@ void Ring::determine_type()
 	if (Huckel()) type = AROMATIC;
 	else if (0) type = ANTIAROMATIC;		// TODO
 	else type = COPLANAR;
+}
+
+std::ostream& operator<<(std::ostream& os, const Bond& b)
+{
+	os << b.atom->name;
+	os << cardinality_printable(b.cardinality);
+	os << b.btom->name;
+	
+	return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const Ring& r)

@@ -249,12 +249,22 @@ If `QUIT`, `EXIT`, or `END` follows the path parameter, script execution will te
 Example:
 ```
 SEARCH 1 %SEQLEN "MAYDRYVAIC" %olfr_motif
+SEARCH 1 %SEQLEN "MAYDRYVAIC" TH 5 %olfr_motif %similarity
 ```
 
 Performs a fuzzy search on the specified residue range looking for the closest match to the indicated search term, and stores the starting resno 
-of the result in the variable given as the 4th parameter. The fuzzy search matches amino acids based on their similarity using the parameters of
-hydrophilicity, aromaticity, metal binding capability, and charge. This search finds the closest match *no matter what*, so it cannot be used to
-determine whether a motif is present, only where the search string most closely matches the sequence.
+of the result in the variable given as the output parameter (`%olfr_motif` in the examples). The fuzzy search matches amino acids based on their
+similarity using the metrics of hydrophilicity, aromaticity, metal binding capability, and charge. By default the search finds the closest match
+**no matter what**, so it will not by itself determine whether a motif exists in the protein, but only find where the search string most closely
+matches the sequence.
+
+The optional `TH` keyword indicates a threshold number of residues that must match the search string **exactly**. Note `X` counts as an exact match
+for any residue. If no match is found with at least the threshold number of exact match residues, then the output variable will be set to zero.
+This is useful for finding whether a motif exists in the specified region.
+
+The optional second output variable receives the total similarity of the best match, or zero if no match was found. This is useful for determining 
+which of two or more motifs a region has, for example it is possible to search a region for both `"XHXXCE"` and `"HYXXCE"` and then compare similarity
+values and use an `IF` to take a different action depending which is the better match.
 
 
 

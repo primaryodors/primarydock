@@ -468,39 +468,59 @@ int main(int argc, char** argv)
 			else if (!strcmp(fields[0], "SEARCH"))
 			{
 				l = 1;
-				int sr, er, esr;
+				int sr, er, esr, sim;
 				if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
 				sr = interpret_single_int(fields[l++]);
 				if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
 				er = interpret_single_int(fields[l++]);
 				if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
-				psz = interpret_single_string(fields[l]);
+				psz = interpret_single_string(fields[l++]);
 				esr = er - strlen(psz);
+				
+				int threshold = -1;
+				int num_eq;
+				
+				if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
+				// if (fields[l+1]) threshold = interpret_single_int(fields[l++]);
+				if (!strcmp(fields[l], "TH"))
+				{
+					l++;
+					threshold = interpret_single_int(fields[l++]);
+				}
 				
 				n = 0; k = 0;
 				for (i=sr; i<esr; i++)
 				{
-					m = 0;
+					m = num_eq = 0;
 					for (j=0; psz[j]; j++)
 					{
-						m += p.get_residue(i+j)->similarity_to(psz[j]);
+						char c = psz[j], aac = p.get_residue(i+j)->get_letter();
+						if (c == 'X') c = aac;
+						
+						if (c == aac) num_eq++;
+						
+						sim = p.get_residue(i+j)->similarity_to(c);
+						// cout << c << "/" << aac << " " << sim << "  ";
+						
+						m += sim;
 					}
+					// cout << "___ m: " << m << ", n: " << n << endl;
 					
-					if (m > n)
+					if (m > n && (num_eq >= threshold || num_eq >= (esr - sr)))
 					{
 						k = i;
 						n = m;
 					}
 				}
+				sim = n;
 				
 				delete[] psz;
-				l++;
 				
 				n = find_var_index(fields[l]);
 				if (n<0) n = vars++;
 				n &= _VARNUM_MASK;
 				if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
-				if (fields[l+1]) raise_error("Too many parameters given for SEARCH.");
+				if (fields[l+1] && fields[l+2]) raise_error("Too many parameters given for SEARCH.");
 				script_var[n].name = fields[l];
 				script_var[n].vt = type_from_name(fields[l]);
 				
@@ -509,13 +529,39 @@ int main(int argc, char** argv)
 					case SV_INT: script_var[n].value.n = k; break;
 					case SV_FLOAT: script_var[n].value.f = k; break;
 					case SV_STRING:
-					builder = k;
+					builder = std::to_string(k);
+					script_var[n].value.psz = new char[builder.length()+2];
 					strcpy(script_var[n].value.psz, builder.c_str());
 					break;
 					
 					default:
 					raise_error("Bad destination variable type for SEARCH.");
 					return 0xbadfa12;
+				}
+				
+				l++;
+				if (fields[l])
+				{
+					n = find_var_index(fields[l]);
+					if (n<0) n = vars++;
+					n &= _VARNUM_MASK;
+					script_var[n].name = fields[l];
+					script_var[n].vt = type_from_name(fields[l]);
+				
+					switch (script_var[n].vt)
+					{
+						case SV_INT: script_var[n].value.n = sim; break;
+						case SV_FLOAT: script_var[n].value.f = sim; break;
+						case SV_STRING:
+						builder = std::to_string(sim);
+						script_var[n].value.psz = new char[builder.length()+2];
+						strcpy(script_var[n].value.psz, builder.c_str());
+						break;
+						
+						default:
+						raise_error("Bad destination variable type for SEARCH.");
+						return 0xbadfa12;
+					}
 				}
 				
 			}	// SEARCH
@@ -1094,6 +1140,11 @@ int main(int argc, char** argv)
 							builder.append(psz);
 							script_var[n].value.psz = new char[65536];
 							strcpy(script_var[n].value.psz, builder.c_str());
+						}
+						else if (!strcmp(fields[4+l], "FOR"))
+						{
+							l += 2;
+							continue;
 						}
 						else
 						{

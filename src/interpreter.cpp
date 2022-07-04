@@ -406,6 +406,7 @@ int main(int argc, char** argv)
 		for (m=0; m<1024; m++) buffer[m] = buffer1[m] = '\0';
 		strcpy(buffer, script_lines[program_counter].c_str());
 		char** fields = chop_spaced_fields(buffer);
+		char** ofields = fields;
 		if (fields && fields[0] && fields[0][0] && fields[0][1])
 		{
 			for (k=0; fields[k]; k++)
@@ -425,6 +426,8 @@ int main(int argc, char** argv)
 			cout << endl;*/
 			
 			if (fields[0][strlen(fields[0])-1] == ':') goto _pc_continue;
+			
+			_interpret_command:
 			
 			// Interpret the script.
 			if (!strcmp(fields[0], "HELIX"))
@@ -1165,6 +1168,85 @@ int main(int argc, char** argv)
 				continue;
 			}	// GOTO
 			
+			else if (!strcmp(fields[0], "IF"))
+			{
+				if (!fields[1]) raise_error("Insufficient parameters given for IF.");
+				if (!fields[2]) raise_error("Insufficient parameters given for IF.");
+				
+				// TODO: NOT operator and IF %var GOTO blah.
+				l = 2;
+				
+				// If the operator is =, and both l-value and r-value are strings, do a direct comparison.
+				if (!fields[l]) raise_error("Insufficient parameters given for IF.");
+				if (!strcmp(fields[l], "="))
+				{
+					if (!fields[l+1]) raise_error("Insufficient parameters given for IF.");
+					if (fields[l-1][0] == fields[l+1][0]
+						||
+						fields[l-1][0] == '$' && fields[l+1][0] == '"'
+						||
+						fields[l-1][0] == '"' && fields[l+1][0] == '$'
+					   )
+					{
+						char *lvalue = interpret_single_string(fields[l-1]),
+							 *rvalue = interpret_single_string(fields[l+1]);
+						if (strcmp(lvalue, rvalue)) goto _evaluated_false;
+						else goto _evaluated_true;
+					}
+				}
+				else
+				{
+					// Otherwise, interpret both values as floats.
+					float lvalue = interpret_single_float(fields[l-1]),
+						  rvalue = interpret_single_float(fields[l+1]);
+					
+					if (!strcmp(fields[l], "="))
+					{	if (lvalue == rvalue) goto _evaluated_true;
+						else goto _evaluated_false;
+					}
+					else if (!strcmp(fields[l], "!="))
+					{	if (lvalue != rvalue) goto _evaluated_true;
+						else goto _evaluated_false;
+					}
+					else if (!strcmp(fields[l], ">"))
+					{	if (lvalue > rvalue) goto _evaluated_true;
+						else goto _evaluated_false;
+					}
+					else if (!strcmp(fields[l], "<"))
+					{	if (lvalue < rvalue) goto _evaluated_true;
+						else goto _evaluated_false;
+					}
+					else if (!strcmp(fields[l], ">="))
+					{	if (lvalue >=rvalue) goto _evaluated_true;
+						else goto _evaluated_false;
+					}
+					else if (!strcmp(fields[l], "<="))
+					{	if (lvalue <= rvalue) goto _evaluated_true;
+						else goto _evaluated_false;
+					}
+					else raise_error( (std::string)"Unknown operator " + (std::string)fields[l] + (std::string)" for comparison.");
+				}
+				
+				_evaluated_true:
+				l += 2;
+				fields = &fields[l];
+				goto _interpret_command;
+				/*if (!strcmp(fields[l], "GOTO"))
+				{
+					
+				}
+				else raise_error( (std::string)"Unimplemented command " + (std::string)fields[l] + (std::string)" for conditional.");*/
+				
+				_evaluated_false:
+				program_counter++;
+				strcpy(buffer, script_lines[program_counter].c_str());
+				fields = chop_spaced_fields(buffer);
+				if (strcmp(fields[0], "ELSE")) continue;
+				
+				fields = &fields[1];
+				goto _interpret_command;
+			}	// IF
+			
 			else if (!strcmp(fields[0], "END") || !strcmp(fields[0], "EXIT") || !strcmp(fields[0], "QUIT"))
 			{
 				return 0;
@@ -1178,6 +1260,7 @@ int main(int argc, char** argv)
 		}
 		
 		_pc_continue:
+		delete[] ofields;
 		program_counter++;
 	}
 	

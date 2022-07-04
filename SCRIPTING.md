@@ -37,6 +37,7 @@ The following "magic variables" are supplied upon loading a protein:
 
 The following commands are supported:
 
+
 # ALIGN
 Example:
 ```
@@ -53,6 +54,7 @@ at each end will be averaged together, in this case 174-177 and 179-182, to dete
 atom locations of residues 174-177 will now equal @location1, and the average of CA locations of residues 179-182 will fall along a straight line pointing
 from @location1 to @location2.
 
+
 # CONNECT
 Examples:
 ```
@@ -66,6 +68,7 @@ The first parameter is the starting residue number of the section to be flexed. 
 examples, the program will flex the range of 160-173 and attempt to reunite 173 with 174. The last optional parameter is the number of iterations, the
 default being 50.
 
+
 # DUMP
 Example:
 ```
@@ -73,6 +76,7 @@ DUMP
 ```
 
 Useful for debugging, this outputs a list of all variables and their values to stdout. It does not take any parameters.
+
 
 # ECHO
 Examples:
@@ -88,6 +92,7 @@ Unlike the `LET` command, `ECHO` does not require a plus sign for concatenation.
 
 If a tilde `~` occurs at the end of the statement, no newline will be output. Otherwise, a newline will be added to whatever was echoed.
 
+
 # END / EXIT / QUIT
 Examples:
 ```
@@ -98,12 +103,14 @@ QUIT
 
 Ceases script execution.
 
+
 # GEN
 ```
 GEN "MAYDRYVAIC"
 ```
 
 Creates a peptide using the specified sequence.
+
 
 # GOTO
 Example:
@@ -115,6 +122,7 @@ label:
 
 Diverts script execution to the specified label. A line must exist in the script that consists of only the label and a colon `:` character, with
 no spaces and no other characters.
+
 
 # HELIX
 Examples:
@@ -128,6 +136,37 @@ Create a helix of the specified residue range. If the helix type is specified, i
 because like with helices, the residues' phi and psi bonds are rotated to preset angles.
 
 Phi and psi angles can also be manually specified as in the second example.
+
+
+# IF
+Examples:
+```
+IF %var >= 10 LET %var = 0
+IF &var1 < &var2 SAVE $name QUIT
+
+IF $match = "HFFCE" ECHO $message
+ELSE ECHO "Nope."
+
+LET %iter = 1
+loop:
+ECHO %iter
+LET %iter ++
+IF %iter <= 10 GOTO loop
+```
+
+The `IF` command evaluates a conditional expression and, if true, executes another command. Currently, only simple A = B type expressions are
+supported, i.e. straightforward comparison of two values, where either value can be a single variable or a single constant; such expressions as
+A = B + 1 do not yet work, nor do logical operators like AND, OR, and NOT.
+
+The operators available for `IF` are `=` `!=` `>` `<` `>=` `<=`. Note that `=` means comparison, not assignment.
+
+If the optional `ELSE` subcommand is provided, it occurs on the next line. `ELSE` without `IF`, or `ELSE` separated from its `IF` even if only by
+a blank line or a comment, will cause an error.
+
+There is no limitation to which commands can be paired with `IF` or `ELSE`.
+
+When using `IF` with `GOTO`, it is possible to create loops as seen in the last example above.
+
 
 # LET
 Examples:
@@ -156,6 +195,7 @@ so even though `%i` is an integer in the above statement, its value is cast to a
 For strings, the operators `=` `+=` and `+` are allowed, with the plus sign indicating concatenation.
 Substrings are indicated with the word FROM and (optinally) FOR, e.g. `LET $end = $string FROM 10` or `LET $range = $SEQUENCE FROM %start FOR %length`.
 
+
 # LOAD
 Example:
 ```
@@ -163,6 +203,7 @@ LOAD "path/to/protein.pdb"
 ```
 
 Loads the specified protein into working memory. Note only one protein is allowed in memory at a given time.
+
 
 # MCOORD
 
@@ -196,6 +237,7 @@ SAVE "path/to/output.pdb" QUIT
 Saves the protein in working memory to the specified file path (can be a string variable).
 
 If `QUIT`, `EXIT`, or `END` follows the path parameter, script execution will terminate immediately after saving the protein.
+
 
 # SEARCH
 Example:

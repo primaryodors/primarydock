@@ -1241,6 +1241,7 @@ int main(int argc, char** argv)
 				program_counter++;
 				strcpy(buffer, script_lines[program_counter].c_str());
 				fields = chop_spaced_fields(buffer);
+				if (!fields || !fields[0]) goto _pc_continue;
 				if (strcmp(fields[0], "ELSE")) continue;
 				
 				fields = &fields[1];

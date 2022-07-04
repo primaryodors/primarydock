@@ -244,7 +244,8 @@ int Protein::load_pdb(FILE* is)
     			
     			for (i=0; i<256; i++)
     			{
-    				if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
+    				// if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
+    				if (!aa_defs[i].loaded)
     				{
     					AminoAcid* aa = new AminoAcid(is, prevaa);
 						// cout << rescount << tmp3let << " " << flush;

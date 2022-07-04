@@ -142,7 +142,7 @@ Phi and psi angles can also be manually specified as in the second example.
 Examples:
 ```
 IF %var >= 10 LET %var = 0
-IF &var1 < &var2 SAVE $name QUIT
+IF &var1 > 0 AND &var1 < &var2 SAVE $name QUIT
 
 IF $match = "HFFCE" ECHO $message
 ELSE ECHO "Nope."
@@ -156,14 +156,20 @@ IF %iter <= 10 GOTO loop
 
 The `IF` command evaluates a conditional expression and, if true, executes another command. Currently, only simple A = B type expressions are
 supported, i.e. straightforward comparison of two values, where either value can be a single variable or a single constant; such expressions as
-A = B + 1 do not yet work, nor do logical operators like AND, OR, and NOT.
+A = B + 1 do not yet work.
+
+`AND` and `OR` are supported, however parentheses are not, and while an unlimited number of `AND`s and/or `OR`s can be chained together, their
+evaluation will be entirely sequential and the chain will evaluate false as soon as any chain of `OR`ed expressions all evaluate false. Note that
+any `ELSE` after such a statement will execute no matter which part of the chain evaluated to false.
 
 The operators available for `IF` are `=` `!=` `>` `<` `>=` `<=`. Note that `=` means comparison, not assignment.
 
 If the optional `ELSE` subcommand is provided, it occurs on the next line. `ELSE` without `IF`, or `ELSE` separated from its `IF` even if only by
-a blank line or a comment, will cause an error.
+a blank line or a comment, will silently fail to execute so please be careful.
 
-There is no limitation to which commands can be paired with `IF` or `ELSE`.
+There is no limitation to which commands can be paired with `IF` or `ELSE` (keeping in mind that `ELSE` is not itself a command). It is possible
+to write a series of `ELSE IF`s, or to combine `IF`s, e.g. `IF &var1 > 0 IF &var1 < &var2 GOTO label`, in fact the `AND` keyword is implemented
+in exactly this way by transparently replacing `AND` with `IF` behind the scenes.
 
 When using `IF` with `GOTO`, it is possible to create loops as seen in the last example above.
 

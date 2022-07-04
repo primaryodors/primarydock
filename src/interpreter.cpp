@@ -1193,10 +1193,12 @@ int main(int argc, char** argv)
 						if (strcmp(lvalue, rvalue)) goto _evaluated_false;
 						else goto _evaluated_true;
 					}
+					else goto _just_interpret_floats;
 				}
 				else
 				{
 					// Otherwise, interpret both values as floats.
+					_just_interpret_floats:
 					float lvalue = interpret_single_float(fields[l-1]),
 						  rvalue = interpret_single_float(fields[l+1]);
 					
@@ -1230,14 +1232,27 @@ int main(int argc, char** argv)
 				_evaluated_true:
 				l += 2;
 				fields = &fields[l];
-				goto _interpret_command;
-				/*if (!strcmp(fields[l], "GOTO"))
+				
+				if (!fields[0]) goto _pc_continue;
+				
+				while (!strcmp(fields[0], "OR"))
 				{
-					
+					fields = &fields[4];
+					if (!fields[0]) goto _pc_continue;
 				}
-				else raise_error( (std::string)"Unimplemented command " + (std::string)fields[l] + (std::string)" for conditional.");*/
+				
+				if (!strcmp(fields[0], "AND")) strcpy(fields[0], "IF");
+				goto _interpret_command;
 				
 				_evaluated_false:
+				if (fields[l+2] && !strcmp(fields[l+2], "OR"))
+				{
+					l += 2;
+					fields = &fields[l];
+					strcpy(fields[0], "IF");
+					goto _interpret_command;
+				}
+				
 				program_counter++;
 				strcpy(buffer, script_lines[program_counter].c_str());
 				fields = chop_spaced_fields(buffer);
@@ -1247,6 +1262,8 @@ int main(int argc, char** argv)
 				fields = &fields[1];
 				goto _interpret_command;
 			}	// IF
+			
+			else if (!strcmp(fields[0], "ELSE")) goto _pc_continue;
 			
 			else if (!strcmp(fields[0], "END") || !strcmp(fields[0], "EXIT") || !strcmp(fields[0], "QUIT"))
 			{

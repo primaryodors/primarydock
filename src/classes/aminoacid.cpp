@@ -1177,6 +1177,22 @@ int AminoAcid::from_pdb(FILE* is)
 
 _return_added:
 	
+	if (aadef && aadef->aabonds)
+    {
+    	int i, j;
+    	
+    	for (i=0; aadef->aabonds[i]; i++)
+    	{
+    		Atom *a = get_atom(aadef->aabonds[i]->aname),
+    			 *b = get_atom(aadef->aabonds[i]->bname);
+    		
+    		if (a && b && !a->is_bonded_to(b))
+    		{
+    			a->bond_to(b, aadef->aabonds[i]->cardinality);
+    		}
+    	}
+    }
+	
 	if (aadef && aadef->aarings)
     {
     	int i, j;

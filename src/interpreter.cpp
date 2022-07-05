@@ -780,13 +780,13 @@ int main(int argc, char** argv)
 							n = rr->get_atom_count();
 							// Get members 1 and 1+floor(n/2).
 							cratoms.push_back(rr->get_atom(1)->name);
-							cout << "Found metal coord atom " << resnos[ncr] << ":" << cratoms[ncr] << endl;
+							cout << "Found metal coord atom " << *aa << ":" << cratoms[ncr] << endl;
 							ncr++;
 							
 							resnos[ncr] = k;
 							j = 1 + (n/2);
 							cratoms.push_back(rr->get_atom(j)->name);
-							cout << "Found metal coord atom " << resnos[ncr] << ":" << cratoms[ncr] << endl;
+							cout << "Found metal coord atom " << *aa << ":" << cratoms[ncr] << endl;
 							ncr++;
 							
 							goto _found_coord_atom;
@@ -798,7 +798,7 @@ int main(int argc, char** argv)
 					if (ba && ba[0])
 					{
 						cratoms.push_back(ba[0]->name);
-						cout << "Found metal coord atom " << resnos[ncr] << ":" << cratoms[ncr] << endl;
+						cout << "Found metal coord atom " << *aa << ":" << cratoms[ncr] << endl;
 						ncr++;
 					}
 					else raise_error((std::string)"No metal coordination atom found for " + (std::string)aa->get_3letter() + to_string(k));

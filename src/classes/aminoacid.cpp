@@ -54,7 +54,31 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     
     if (aa_defs[idx].SMILES.length())
     {
-    	from_smiles(aa_defs[idx].SMILES.c_str());
+    	std::string fname = (std::string)name + (std::string)".sdf";
+    	FILE* pf = fopen(fname.c_str(), "rb");
+    	if (pf)
+    	{
+    		fseek(pf, 0, SEEK_END);
+			int fsz = ftell(pf);
+			fseek(pf, 0, SEEK_SET);
+    		char buffer[fsz + 4];
+    		
+    		fread(buffer, 1, fsz, pf);
+    		fclose(pf);
+    		
+    		from_sdf(buffer);
+    	}
+    	else
+    	{
+    		from_smiles(aa_defs[idx].SMILES.c_str());
+    		
+    		FILE* pf = fopen(fname.c_str(), "wb");
+    		if (pf)
+    		{
+    			save_sdf(pf);
+    			fclose(pf);
+			}
+		}
     	
     	#ifdef _ALGORITHMIC_GREEK
     	int ac4 = get_atom_count()+4;

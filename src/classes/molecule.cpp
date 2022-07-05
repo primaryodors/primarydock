@@ -2196,14 +2196,16 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 if (bind1 < bind)
                 {
+                	// cout << bind << " vs " << bind1 << " x" << endl;
                     pt.x = -pt.x;
                     mm[i]->move(pt);
                     mm[i]->lmx *= reversal;
                 }
                 else
                 {
+                	// cout << bind << " vs " << bind1 << " +" << endl;
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmx) < 0.25) mm[i]->lmx *= accel;
+                    // if (fabs(mm[i]->lmx) < 0.25) mm[i]->lmx *= accel;
                     bind = bind1;
                 }
 
@@ -2225,7 +2227,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 else
                 {
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmy) < 0.25) mm[i]->lmy *= accel;
+                    // if (fabs(mm[i]->lmy) < 0.25) mm[i]->lmy *= accel;
                     bind = bind1;
                 }
 
@@ -2247,8 +2249,24 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 else
                 {
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmz) < 0.25) mm[i]->lmz *= accel;
+                    // if (fabs(mm[i]->lmz) < 0.25) mm[i]->lmz *= accel;
                     bind = bind1;
+                }
+                
+                Point lmpt(mm[i]->lmx, mm[i]->lmy, mm[i]->lmz);
+                if (lmpt.magnitude() > 0.5)
+                {
+                	float lmm = 0.5 / lmpt.magnitude();
+                	mm[i]->lmx *= lmm;
+                	mm[i]->lmy *= lmm;
+                	mm[i]->lmz *= lmm;
+                }
+                else
+                {
+                	float lmm = 0.9;
+                	mm[i]->lmx *= lmm;
+                	mm[i]->lmy *= lmm;
+                	mm[i]->lmz *= lmm;
                 }
 
                 mm[i]->lastbind = bind;
@@ -2267,6 +2285,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
                 if (!(iter % _fullrot_every))
                 {
+                	// cout << endl;
                     while ((M_PI*2-rad) > 1e-3)
                     {
                         mm[i]->rotate(&v, _fullrot_steprad);
@@ -2278,6 +2297,8 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             if (!nearby[j]) continue;
                             bind1 += mm[i]->get_intermol_binding(mm[j]);
                         }
+                        
+                        // cout << "x " << rad*fiftyseven << "deg " << bind1 << endl;
 
                         if (bind1 > bestfrb)
                         {
@@ -2323,7 +2344,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
-                        mm[i]->rotate(&v, _fullrot_steprad);
+                        mm[i]->rotate(&v1, _fullrot_steprad);
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
@@ -2332,6 +2353,8 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             if (!nearby[j]) continue;
                             bind1 += mm[i]->get_intermol_binding(mm[j]);
                         }
+                        
+                        // cout << "y " << rad*fiftyseven << "deg " << bind1 << endl;
 
                         if (bind1 > bestfrb)
                         {
@@ -2341,11 +2364,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
 
                     if (!isnan(bestfrrad))
-                        mm[i]->rotate(&v, bestfrrad);
+                        mm[i]->rotate(&v1, bestfrrad);
                 }
                 else
                 {
-                    mm[i]->rotate(&v, mm[i]->amy);
+                    mm[i]->rotate(&v1, mm[i]->amy);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
                     {
@@ -2354,7 +2377,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
-                        mm[i]->rotate(&v, -mm[i]->amy);
+                        mm[i]->rotate(&v1, -mm[i]->amy);
                         mm[i]->amy *= reversal;
                     }
                     else
@@ -2378,7 +2401,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
-                        mm[i]->rotate(&v, _fullrot_steprad);
+                        mm[i]->rotate(&v2, _fullrot_steprad);
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
@@ -2387,6 +2410,8 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             if (!nearby[j]) continue;
                             bind1 += mm[i]->get_intermol_binding(mm[j]);
                         }
+                        
+                        // cout << "z " << rad*fiftyseven << "deg " << bind1 << endl;
 
                         if (bind1 > bestfrb)
                         {
@@ -2396,11 +2421,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
 
                     if (!isnan(bestfrrad))
-                        mm[i]->rotate(&v, bestfrrad);
+                        mm[i]->rotate(&v2, bestfrrad);
                 }
                 else
                 {
-                    mm[i]->rotate(&v, mm[i]->amz);
+                    mm[i]->rotate(&v2, mm[i]->amz);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
                     {
@@ -2409,7 +2434,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
-                        mm[i]->rotate(&v, -mm[i]->amz);
+                        mm[i]->rotate(&v2, -mm[i]->amz);
                         mm[i]->amz *= reversal;
                         //cout << "x";
                     }

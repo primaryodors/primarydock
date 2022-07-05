@@ -53,7 +53,7 @@
 #define _fullrot_stepdeg 30
 #define _fullrot_steprad M_PI/180*_fullrot_stepdeg
 #define _fullrot_every 10
-#define _def_lin_momentum 0.5
+#define _def_lin_momentum 0.1
 #define _def_ang_momentum _fullrot_steprad/2
 #define _def_bnd_momentum _fullrot_steprad/2
 

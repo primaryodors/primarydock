@@ -506,7 +506,7 @@ int main(int argc, char** argv)
 					}
 					// cout << "___ m: " << m << ", n: " << n << endl;
 					
-					if (m > n && (num_eq >= threshold || num_eq >= (esr - sr)))
+					if (m > n && num_eq >= threshold)
 					{
 						k = i;
 						n = m;

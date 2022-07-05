@@ -49,6 +49,8 @@ class InteratomicForce
 
     void read_dat_line(char* line);
     static void read_all_forces();
+    
+    friend std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);
 };
 
 SCoord* get_geometry_for_pi_stack(SCoord* in_geometry);
@@ -61,6 +63,8 @@ static bool reading_forces = false;
 std::ostream& operator<<(std::ostream& os, const intera_type& it);
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& f);
 extern float total_binding_by_type[_INTER_TYPES_LIMIT];
+
+std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);
 
 #endif
 

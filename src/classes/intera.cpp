@@ -361,9 +361,9 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                 break;
 
             case ionic:
-                if (sgn(a->get_acidbase()) == -sgn(b->get_acidbase())
+                if (	(a->get_acidbase() && b->get_acidbase())
                         ||
-                        sgn(a->get_charge()) == -sgn(b->get_charge())
+                        (a->get_charge() && b->get_charge())
                         ||
                         ((a == b) && a->get_acidbase())
                    )
@@ -620,9 +620,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
             if (asum > 1) asum = 1;
             if (bsum > 1) bsum = 1;
+            
+            if (!asum) asum = 1;
+            if (!bsum) bsum = 1;
 
             // Multiply the two sums.
             aniso = asum * bsum;
+            // if (!aniso) aniso = 0.707;
         }
 
         float partial, rdecayed;
@@ -686,10 +690,24 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                      << endl;
         }
         
-        /*if (forces[i]->type == polarpi || forces[i]->type == mcoord)
+        float achg = a->get_charge(), bchg = b->get_charge()
+        	, apol = a->is_polar(), bpol = b->is_polar();
+        
+        if (achg && bchg) partial = fabs(partial) * sgn(achg) * -sgn(bchg);
+        if (achg && !bchg && bpol) partial = fabs(partial) * sgn(achg) * -sgn(bpol);
+        if (!achg && apol && bchg) partial = fabs(partial) * sgn(apol) * -sgn(bchg);
+        if (!achg && apol && !bchg && bpol) partial = fabs(partial) * sgn(apol) * -sgn(bpol);
+        
+		# if 0
+        //if (forces[i]->type == polarpi || forces[i]->type == mcoord)
+        if (forces[i]->type != vdW)
         {
-        	cout << a->name << " ... " << b->name << " pi: " << partial << endl;
-        }*/
+        	cout << a->name << " ... " << b->name << " " << forces[i]->type << " " << partial
+        		 << " (" << *forces[i] << ") "
+        		 << rdecayed << " " << aniso << " " << ag << " " << bg << " "
+        		 << endl;
+        }
+        #endif
 
         if (fabs(partial) >= 500)
         {
@@ -709,7 +727,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (del_ageo) delete[] ageo;
         if (del_bgeo) delete[] bgeo;
 
-        if (forces[i]->type == ionic) break;
+        if (forces[i]->type == ionic && achg && bchg) break;
     }
 
     if (rbind < 0.7) rbind = 0.7;
@@ -725,6 +743,7 @@ _canstill_clash:
     delete[] forces;
     return kJmol;
 }
+
 
 float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
 {

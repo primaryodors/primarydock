@@ -974,7 +974,7 @@ $("#clip").on("input", function (e, obj)
             obj.setParameters( { "clipNear": clipValue } );
         });
 	}
-    stage.setParameters( { "fogNear": (clipValue), "fogFar": Math.max(15+clipValue, 150-clipValue*3), } );
+    stage.setParameters( { "fogNear": (clipValue), "fogFar": Math.max(25+clipValue, 200-clipValue*3), } );
 });
 
 function getFileContents(event)

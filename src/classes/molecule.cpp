@@ -461,7 +461,8 @@ int Molecule::from_sdf(char const* sdf_dat)
             na = atoi(fields[0]);
             nb = atoi(fields[1]);
 
-            atoms = new Atom*[na+1];
+            atoms = new Atom*[na+4];
+            // cout << "Allocated " << na << " atoms." << endl;
         }
         else if (added < na)
         {
@@ -475,6 +476,8 @@ int Molecule::from_sdf(char const* sdf_dat)
             atoms[atcount++] = a;
             atoms[atcount] = nullptr;
             added++;
+            
+            // cout << "Added " << a->name << endl;
         }
         else
         {

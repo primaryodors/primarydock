@@ -62,6 +62,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			int fsz = ftell(pf);
 			fseek(pf, 0, SEEK_SET);
     		char buffer[fsz + 4];
+    		for (i=0; i<(fsz+4); i++) buffer[i] = 0;
     		
     		fread(buffer, 1, fsz, pf);
     		fclose(pf);
@@ -383,24 +384,27 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     			 << "\t" << atom_prepend[i]
     			 << "\t" << atom_Greek[i]
     			 << "\t" << atom_append[i]
-    			 << endl;*/
+    			 ;*/
     		
-    		if (atom_Greek[i] < 1) continue;
-    		
-    		std::string newname = "";
-    		if (atom_prepend[i]) newname += std::to_string(atom_prepend[i]);
-    		newname += atoms[i]->get_elem_sym();					// TODO: Convert to upper case.
-    		newname += strGrk.substr(atom_Greek[i]-1, 1);
-    		if (atom_append[i]) newname += std::to_string(atom_append[i]);
-    		
-    		if (aa_defs[idx].isoleucine_fix && atom_Greek[i]==4 && !atom_append[i]) newname += "1";
-    		
-    		// cout << atoms[i]->name << " is now " << newname << endl;
-    		strcpy(atoms[i]->name, newname.c_str());
+    		if (atom_Greek[i] >= 1)
+    		{
+				std::string newname = "";
+				if (atom_prepend[i]) newname += std::to_string(atom_prepend[i]);
+				newname += atoms[i]->get_elem_sym();					// TODO: Convert to upper case.
+				newname += strGrk.substr(atom_Greek[i]-1, 1);
+				if (atom_append[i]) newname += std::to_string(atom_append[i]);
+				
+				if (aa_defs[idx].isoleucine_fix && atom_Greek[i]==4 && !atom_append[i]) newname += "1";
+				
+				// cout << atoms[i]->name << " is now " << newname << endl;
+				strcpy(atoms[i]->name, newname.c_str());
+			}
+			
+			// cout << "\t" << atoms[i]->name << endl;
     	}
     	
     	// Sort all the backbone and sidechain atoms into a new array.
-    	Atom** new_atoms = new Atom*[atcount];
+    	Atom** new_atoms = new Atom*[atcount+4];
     	for (i=0; i<atcount; i++) new_atoms[i] = nullptr;
     	
     	l=0;
@@ -459,8 +463,10 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     		if (prevC) N->bond_to(prevC, 1);
 		}
     	
+    	new_atoms[l] = 0;
     	// delete[] atoms;
     	atoms = new_atoms;
+    	// cout << "Atom count was " << atcount << " now " << l << endl;
     	atcount = l;
     	
 		#endif
@@ -479,6 +485,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     {
     	AABondDef** aabd = new AABondDef*[get_atom_count()+16];
     	n=0;
+    	// cout << *this << endl;
     	for (i=0; atoms[i]; i++)
     	{
     		Bond** bb = atoms[i]->get_bonds();
@@ -598,8 +605,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		Atom* prevCA = prevaa->get_atom("CA");
 		Atom* prevO  = prevaa->get_atom("O");
 		if (!prevCA || !prevO) return;
-		Atom* currHN = get_atom("HN");
-		if (!currHN) currHN = get_atom("H");
+		Atom* currHN = HN_or_substitute();
 		Atom* currCA = get_atom("CA");
 		
 		// Proline fix.
@@ -1782,8 +1788,7 @@ LocRotation* AminoAcid::flatten()
     }
     Atom* localN  = get_atom("N");
     if (!localN) return retval;
-    Atom* localHN = get_atom("HN");
-    if (!localHN) localHN = get_atom("H");
+    Atom* localHN = HN_or_substitute();
     if (!localHN) return retval;
     Atom* localCA  = get_atom("CA");
     if (!localCA) return retval;
@@ -2032,8 +2037,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     {
     	case N_asc:
         case CA_desc:
-        atom = get_atom("HN");
-        if (!atom) get_atom("H");
+        atom = HN_or_substitute();
         btom = get_atom("C");
         break;
 
@@ -2162,9 +2166,7 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     }
     if (direction == CA_desc || direction == C_desc)
     {
-        btom = get_atom("HN");
-        if (btom) btom->move(rotate3D(btom->get_location(), retval.origin, retval, angle));
-        btom = get_atom("H");
+        btom = HN_or_substitute();
         if (btom) btom->move(rotate3D(btom->get_location(), retval.origin, retval, angle));
     }
     if (direction == N_asc)

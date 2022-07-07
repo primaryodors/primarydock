@@ -27,7 +27,7 @@ struct AADef
 {
  	char _1let = '\0';
  	char _3let[4];
- 	char name[20];
+ 	char name[40];
  	float reach = 2.5;
  	AABondDef** aabonds = nullptr;
  	Ring** aarings = nullptr;

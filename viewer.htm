@@ -608,7 +608,7 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function (atom)
     {
-    	var elem = atom.atomType.element;
+    	var elem = atom.element;
         if (atom.resno <= 1)
         {
         	elem = atom.atomname.replace(/[^A-Za-z]/g, '');
@@ -1163,6 +1163,8 @@ function loadFile(fileData, fileName = "")
                         	metalness: mtl_bs,
                         } );
                         gmodel.push(comp);
+
+                    	comp.autoView();
                     }
 
                     if (fext == 'pdb')
@@ -1221,9 +1223,13 @@ function loadFile(fileData, fileName = "")
                             });
                             gmodel.push(comp2);
                         });
-                    }
 
-                    comp.autoView();
+                    	comp.autoView();
+                        
+                        const quaternion = new THREE.Quaternion();
+						quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
+						stage.animationControls.rotate(quaternion);
+                    }
                 } );
                 $("#affichage").show();
                 break;
@@ -1319,7 +1325,7 @@ function loadFile(fileData, fileName = "")
                             });
                             gmodel.push(comp3);
                             $('#clip').trigger("input");
-                        });
+	                    });
 
                         if (shiny.length)
                         {

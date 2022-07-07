@@ -57,7 +57,7 @@ int main(int argc, char** argv)
         fclose(pf);
         cout << "Wrote " << outfn << endl;
 
-		char outfn2[30];
+		char outfn2[50];
 		AADef* aad = firstaa->get_aa_definition();
 		if (aad) sprintf(outfn2, "%s.sdf", aad->name);
 		else strcpy(outfn2, "aatest.sdf");

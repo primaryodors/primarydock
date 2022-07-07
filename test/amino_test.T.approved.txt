@@ -1,7 +1,13 @@
-threonine bonds can rotate: 
-CA - CB
-CB - OG1
-CB - CG2
-
+Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? N
+CA-CB can rotate, bringing CG1 OG2 HB 1HG1 2HG1 3HG1 HG2 
+CB-CG1 can rotate, bringing 1HG1 2HG1 3HG1 
+CB-OG2 can rotate, bringing HG2 
+threonine hydrophilicity = 0.333333
+Similarity to A 2
+Similarity to D 3
+Similarity to R 3
+Similarity to F 0
+Similarity to C 3
+Similarity to S 4
 Wrote test.pdb
 Wrote test.sdf

@@ -1,8 +1,14 @@
-isoleucine bonds can rotate: 
-CA - CB
-CB - CG1
-CB - CG2
-CG1 - CD1
-
+Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? N
+CA-CB can rotate, bringing CG2 CG1 HB 1HG2 2HG2 3HG2 CD1 1HG1 2HG1 HD1 HD2 HD3 
+CB-CG2 can rotate, bringing 1HG2 2HG2 3HG2 
+CB-CG1 can rotate, bringing CD1 1HG1 2HG1 HD1 HD2 HD3 
+CG1-CD1 can rotate, bringing HD1 HD2 HD3 
+isoleucine hydrophilicity = 0
+Similarity to A 5
+Similarity to D 2
+Similarity to R 2
+Similarity to F 3
+Similarity to C 4
+Similarity to S 2
 Wrote test.pdb
 Wrote test.sdf

@@ -444,7 +444,7 @@ int Molecule::from_sdf(char const* sdf_dat)
         strncpy(line, lines[j], 1023);
         fields = chop_spaced_fields(line);
 
-        if (!fields[0] || !fields[1]) break;
+        if (!fields || !fields[0] || !fields[1]) break;
         if (!strcmp(fields[1], "END")) break;
 
         if (!strcmp(fields[1], "CHG"))
@@ -1326,6 +1326,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     	goto _found_aadef;
     }
 
+	// cout << name << " ";
     for (i=0; atoms[i]; i++)
     {
         Bond** lb = atoms[i]->get_bonds();
@@ -1345,6 +1346,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                     lb[j]->btom->get_Z() > 1
                )
             {
+            	// cout << *lb[j] << " ";
                 btemp[bonds++] = lb[j];
                 btemp[bonds] = 0;
             }
@@ -1352,6 +1354,7 @@ Bond** AminoAcid::get_rotatable_bonds()
         }
         if (lb) delete[] lb;
     }
+    // cout << endl;
 
 	_found_aadef:
     Bond** retval = new Bond*[bonds+8];

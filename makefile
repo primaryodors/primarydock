@@ -1,8 +1,9 @@
 OBJDIR=obj
 BINDIR=bin
 OUTDIR=output
+SDFDIR=sdf
 
-DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR)
+DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 TESTS=test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/backbone_test
 APPS=$(BINDIR)/podock $(BINDIR)/interpreter
@@ -35,6 +36,9 @@ $(BINDIR):
 
 $(OUTDIR):
 	if [ ! -f $(OUTDIR) ]; then mkdir -p $(OUTDIR); fi
+
+$(SDFDIR):
+	if [ ! -f $(SDFDIR) ]; then mkdir -p $(SDFDIR); fi
 
 $(OBJDIR)/misc.o: src/classes/misc.h src/classes/misc.cpp src/classes/constants.h
 	$(CC) -c src/classes/misc.cpp -o $(OBJDIR)/misc.o $(CFLAGS)

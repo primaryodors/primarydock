@@ -1,5 +1,11 @@
-glycine bonds can rotate: 
-None.
-
+Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? N
+No rotatable bonds.
+glycine hydrophilicity = 0
+Similarity to A 5
+Similarity to D 2
+Similarity to R 2
+Similarity to F 3
+Similarity to C 4
+Similarity to S 2
 Wrote test.pdb
 Wrote test.sdf

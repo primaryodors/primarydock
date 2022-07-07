@@ -1,7 +1,13 @@
-valine bonds can rotate: 
-CA - CB
-CB - CG1
-CB - CG2
-
+Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? N
+CA-CB can rotate, bringing CG1 CG2 HB 1HG1 2HG1 3HG1 1HG2 2HG2 3HG2 
+CB-CG1 can rotate, bringing 1HG1 2HG1 3HG1 
+CB-CG2 can rotate, bringing 1HG2 2HG2 3HG2 
+valine hydrophilicity = 0
+Similarity to A 5
+Similarity to D 2
+Similarity to R 2
+Similarity to F 3
+Similarity to C 4
+Similarity to S 2
 Wrote test.pdb
 Wrote test.sdf

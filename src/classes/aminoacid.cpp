@@ -54,7 +54,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     
     if (aa_defs[idx].SMILES.length())
     {
-    	std::string fname = (std::string)name + (std::string)".sdf";
+    	std::string fname = (std::string)"sdf/" + (std::string)name + (std::string)".sdf";
     	FILE* pf = fopen(fname.c_str(), "rb");
     	if (pf)
     	{

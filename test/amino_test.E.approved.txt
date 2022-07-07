@@ -1,7 +1,14 @@
-glutamic_acid bonds can rotate: 
-CA - CB
-CB - CG
-CG - CD
-
+Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? N
+CA-CB can rotate, bringing CG HB1 HB2 CD HG1 HG2 OE1 OE2 
+CB-CG can rotate, bringing CD HG1 HG2 OE1 OE2 
+CG-CD can rotate, bringing OE1 OE2 
+CD-OE2 can rotate, bringing no atoms.
+glutamic_acid hydrophilicity = 0.6
+Similarity to A 2
+Similarity to D 5
+Similarity to R 4
+Similarity to F 0
+Similarity to C 3
+Similarity to S 4
 Wrote test.pdb
 Wrote test.sdf

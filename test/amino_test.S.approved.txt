@@ -1,6 +1,12 @@
-serine bonds can rotate: 
-CA - CB
-CB - OG
-
+Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? N
+CA-CB can rotate, bringing OG HB1 HB2 HG 
+CB-OG can rotate, bringing HG 
+serine hydrophilicity = 0.5
+Similarity to A 2
+Similarity to D 4
+Similarity to R 4
+Similarity to F 0
+Similarity to C 3
+Similarity to S 5
 Wrote test.pdb
 Wrote test.sdf

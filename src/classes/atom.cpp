@@ -745,6 +745,8 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
 {
 	if (!lbtom) return false;
     int i;
+    
+    // if (this < lbtom && Z > 1 && lbtom->Z > 1) cout << "Bond " << name << cardinality_printable(lcard) << lbtom->name << endl;
 
     geov = NULL;
 

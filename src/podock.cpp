@@ -286,6 +286,7 @@ int main(int argc, char** argv)
     }
 
     char buffer[65536];
+    for (i=0; i<65536; i++) buffer[i] = 0;
     switch (ext[0])
     {
     case 's':

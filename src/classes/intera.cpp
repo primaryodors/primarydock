@@ -645,8 +645,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         else
         {
             rdecayed = r1 * r1;
-            // partial = aniso * forces[i]->kJ_mol * rdecayed;
-            partial = aniso * forces[i]->kJ_mol;
+            partial = aniso * forces[i]->kJ_mol * rdecayed;
+            // partial = aniso * forces[i]->kJ_mol;
         }
         
         // Divide each ring by its number of atoms.

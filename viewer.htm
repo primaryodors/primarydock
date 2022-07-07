@@ -1017,7 +1017,7 @@ function loadFile(fileData, fileName = "")
 	mdlresno.push(0);
 	
     var fext = fileName.substr(fileName.lastIndexOf('.')+1);
-    orid = 'OR1A1';
+    orid = false; // 'OR1A1';
     try
     {
         orid = fileName.match(/(OR[0-9]{1,2}[A-Z]{1,2}|TAAR|VN1R)[0-9]{1,2}/)[0];
@@ -1250,100 +1250,103 @@ function loadFile(fileData, fileName = "")
             		}
                 }
 
-                $.ajax(
-                {
-					url: "http://www.primaryodors.org/orpdb.php",
-					data:
-                    {
-						"recep": orid,
-						"mod": mod,
-                    },
-					success: function(poresult)
-                    {
-                        var i;
-                        var shiny = [];
-                        var result = poresult.split("\n");
-                        var lres = 0;
-                        var tmpstr = "";
-                        for (i=0; i<result.length; i++)
-                        {
-                            var ln = result[i];
-                            var resno = parseInt(ln.substr(22,4));
-                            var aname = ln.substr(12,4).trim();
-                            if (ln.substr(17,3) == "MTL") shiny.push(ln);
-                            
-                            if (lres != resno)
-		                    {
-		                    	if (ln.length > 20)
-		                    	{
-		                    		var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
-		                    		if (aa1let != '?')
-		                    		{
-						            	var stringBlob5 = new Blob( [tmpstr], { type: 'text/plain'} );
-				                    	stage.loadFile( stringBlob5, { ext: 'pdb' } ).then( function( comp5 )
-				                		{
-				                			resmdl.push(comp5);
-				            				restoggled.push(0);
-				                		});
-				                		mdlresno.push(resno);
-						        		
-						            	lres = resno;
-						            	tmpstr = "";
-						            	
-				                		sequence += aa1let;
-				                		
-				                		$('#clip').trigger("input");
-		                    		}
-		                		}
-		                    }
-		                    if (ln.length < 20) continue;
-                            
-                            tmpstr += ln + "\n";
-                            
-                            $('#clip').trigger("input");
-                        }
-		                if (tmpstr)
+				if (orid)
+				{
+		            $.ajax(
+		            {
+						url: "http://www.primaryodors.org/orpdb.php",
+						data:
 		                {
-			            	var stringBlob5a = new Blob( [tmpstr], { type: 'text/plain'} );
-			            	stage.loadFile( stringBlob5a, { ext: 'pdb' } ).then( function( comp5a )
-			        		{
-			        			resmdl.push(comp5a);
-			        			restoggled.push(0);
-			        			$('#clip').trigger("input");
-			        		});
-			        		mdlresno.push(resno);
-						}
+							"recep": orid,
+							"mod": mod,
+		                },
+						success: function(poresult)
+		                {
+		                    var i;
+		                    var shiny = [];
+		                    var result = poresult.split("\n");
+		                    var lres = 0;
+		                    var tmpstr = "";
+		                    for (i=0; i<result.length; i++)
+		                    {
+		                        var ln = result[i];
+		                        var resno = parseInt(ln.substr(22,4));
+		                        var aname = ln.substr(12,4).trim();
+		                        if (ln.substr(17,3) == "MTL") shiny.push(ln);
+		                        
+		                        if (lres != resno)
+				                {
+				                	if (ln.length > 20)
+				                	{
+				                		var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
+				                		if (aa1let != '?')
+				                		{
+								        	var stringBlob5 = new Blob( [tmpstr], { type: 'text/plain'} );
+						                	stage.loadFile( stringBlob5, { ext: 'pdb' } ).then( function( comp5 )
+						            		{
+						            			resmdl.push(comp5);
+						        				restoggled.push(0);
+						            		});
+						            		mdlresno.push(resno);
+								    		
+								        	lres = resno;
+								        	tmpstr = "";
+								        	
+						            		sequence += aa1let;
+						            		
+						            		$('#clip').trigger("input");
+				                		}
+				            		}
+				                }
+				                if (ln.length < 20) continue;
+		                        
+		                        tmpstr += ln + "\n";
+		                        
+		                        $('#clip').trigger("input");
+		                    }
+				            if (tmpstr)
+				            {
+					        	var stringBlob5a = new Blob( [tmpstr], { type: 'text/plain'} );
+					        	stage.loadFile( stringBlob5a, { ext: 'pdb' } ).then( function( comp5a )
+					    		{
+					    			resmdl.push(comp5a);
+					    			restoggled.push(0);
+					    			$('#clip').trigger("input");
+					    		});
+					    		mdlresno.push(resno);
+							}
 
-                        var stringBlob3 = new Blob( [ poresult ], { type: 'text/plain'} );
-                        stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp3 )
-                        {
-                            comp3.addRepresentation( "cartoon",
-                            {
-                                opacity: opc_cartoon,
-								colorScheme: PODefRgnScheme,
-                                metalness: mtl_cartoon,
-                            });
-                            gmodel.push(comp3);
-                            $('#clip').trigger("input");
-	                    });
+		                    var stringBlob3 = new Blob( [ poresult ], { type: 'text/plain'} );
+		                    stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp3 )
+		                    {
+		                        comp3.addRepresentation( "cartoon",
+		                        {
+		                            opacity: opc_cartoon,
+									colorScheme: PODefRgnScheme,
+		                            metalness: mtl_cartoon,
+		                        });
+		                        gmodel.push(comp3);
+		                        $('#clip').trigger("input");
+			                });
 
-                        if (shiny.length)
-                        {
-                            var stringBlob4 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
-                            stage.loadFile( stringBlob4, { ext: 'pdb' } ).then( function( comp4 )
-                            {
-                                comp4.addRepresentation( "spacefill",
-                                {
-                                    opacity: opc_metal,
-									colorScheme: PODefScheme,
-                                    metalness: mtl_metal,
-                                });
-                                gmodel.push(comp4);
-                                $('#clip').trigger("input");
-                            });
-                        }
-                    }
-                });
+		                    if (shiny.length)
+		                    {
+		                        var stringBlob4 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
+		                        stage.loadFile( stringBlob4, { ext: 'pdb' } ).then( function( comp4 )
+		                        {
+		                            comp4.addRepresentation( "spacefill",
+		                            {
+		                                opacity: opc_metal,
+										colorScheme: PODefScheme,
+		                                metalness: mtl_metal,
+		                            });
+		                            gmodel.push(comp4);
+		                            $('#clip').trigger("input");
+		                        });
+		                    }
+		                }
+		            });
+	            }
 
                 var posey = $('#posey')[0];
                 var i, writing=false, p=0, n=0;

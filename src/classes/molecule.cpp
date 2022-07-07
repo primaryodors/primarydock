@@ -2491,7 +2491,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     for (k=0; mm[i]->rotatable_bonds[k]; k++)
                     {
                     	#if DBG_BONDFLEX
-                        cout << k;
+                        cout << k << " " << *mm[i]->rotatable_bonds[k] << " ";
                         #endif
 
                         rad = 0;

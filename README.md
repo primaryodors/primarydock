@@ -6,7 +6,7 @@ PODock is a lightweight molecular docking software package that allows path-base
 measurement at the residue level and per binding type. It uses data files so atomic and interatomic parameters can be fully customized
 without having to recompile the code.
 
-To Use PODock, first clone the repository, then execute the following command:
+To Use PODock, first clone the repository, then execute the following commands:
 
 For Linux:
 ```
@@ -20,8 +20,10 @@ The application will require 3D maps of your target receptor(s) in PDB format. P
 hydrogenate PDB models that do not include hydrogen atoms, so if your model contains heavy atoms only, the accuracy of
 docking results may be severely compromised.
 
-PDBs for most olfactory receptors are available here:<br>
-http://primaryodors.org/cached/
+PDBs for human olfactory receptors can be downloaded from here:<br>
+http://primaryodors.org/ors.php
+
+(Simply click on the receptor of interest, click on the Info tab, and then click Download PDB.)
 
 It will also be necessary to obtain 3D models of your ligand(s). Currently, only SDF format is supported.
 SDFs can be obtained a few different ways:

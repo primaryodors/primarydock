@@ -345,9 +345,9 @@ Clip:
 <div id="center">
 <a id="fsbtn" class="nodebtn clickme" onclick="if (is_fullscreen) exitFullscreen(); else openFullscreen(document.body); is_fullscreen = !is_fullscreen">&#x26F6;</a>
 Center:
-<a class="posebtn clickme" onclick="gmodel[0].autoView();" title="Middle-click an atom to center it.">Model</a>
-<a class="posebtn clickme" onclick="centerPocket();" id="pktbtn" style="display: none;">Pocket</a>
-<a class="posebtn clickme" onclick="curr_ligand.autoView();" id="ligbtn" style="display: none;">Ligand</a>
+<a class="posebtn clickme" onclick="gmodel[0].autoView(); cen_ligand = false;" title="Middle-click an atom to center it.">Model</a>
+<a class="posebtn clickme" onclick="centerPocket(); cen_ligand = false;" id="pktbtn" style="display: none;">Pocket</a>
+<a class="posebtn clickme" onclick="curr_ligand.autoView(); cen_ligand = true;" id="ligbtn" style="display: none;">Ligand</a>
 </div>
 </div>
 <center>
@@ -492,7 +492,7 @@ var tmcolor =
 var stage = new NGL.Stage("viewport");
 var gmodel = [], model = [], is_ligand = [], mrep = [], mrparams = [], mpos = [], mnod = [];
 var resmdl = [], mdlresno = [], restoggled = [];
-var curr_ligand = false;
+var curr_ligand = false, cen_ligand = false;
 var gpose = 1, gnode = 0;
 var orid;
 var mtlcoord = [];
@@ -884,6 +884,8 @@ function showPose(p)
 
     $("#clip").trigger("input");
     if (curr_ligand) $('#ligbtn, #prsv').show();
+    
+    if (cen_ligand) curr_ligand.autoView();
 }
 
 function showNode(n)
@@ -922,6 +924,8 @@ function showNode(n)
 
     $("#clip").trigger("input");
     if (curr_ligand) $('#ligbtn, #prsv').show();
+    
+    if (cen_ligand) curr_ligand.autoView();
 }
 
 $("body").on("keyup", function(e, obj)
@@ -1094,6 +1098,7 @@ function loadFile(fileData, fileName = "")
 		        case 'pdb':
                 stage.removeAllComponents();
                 window.result = fileData;
+                cen_ligand = false;
                 
                 sequence = "";
                 if (fext == 'pdb')
@@ -1238,6 +1243,7 @@ function loadFile(fileData, fileName = "")
             	case 'dock':
                 stage.removeAllComponents();
                 var lines = fileData.split("\n");
+                cen_ligand = true;
                 
                 var i;
                 var mod = "m";

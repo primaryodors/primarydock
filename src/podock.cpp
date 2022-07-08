@@ -95,17 +95,74 @@ void iteration_callback(int iter)
     }
 }
 
+Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
+{
+	int i=1;
+	Point local_pocketcen;
+	if (!strcmp(fields[i], "RES"))
+	{
+		i++;
+		std::vector<int> resnos;
+		for (; fields[i]; i++)
+		{
+			int j = atoi(fields[i]);
+			if (!j) break;
+			resnos.push_back(j);
+		}
+		
+		int sz = resnos.size();
+		Point foravg[sz + 2];
+		for (i=0; i<sz; i++)
+		{
+			foravg[i] = protein->get_atom_location(resnos[i], "CA");
+		}
+		
+		return average_of_points(foravg, sz);
+	}
+	else if (!strcmp(fields[i], "REL"))
+	{
+		if (!old_pocketcen)
+		{
+			cout << "Error: relative coordinates not supported for CEN." << endl;
+		    throw 0xbadb19d;
+	    }
+	    else
+	    {
+	    	i++;
+	    	local_pocketcen.x = old_pocketcen->x + atof(fields[i++]);
+	    	local_pocketcen.y = old_pocketcen->y + atof(fields[i++]);
+	    	local_pocketcen.z = old_pocketcen->z + atof(fields[i++]);
+			return local_pocketcen;
+	    }
+	}
+	else
+	{
+		if (!strcmp(fields[i], "ABS")) i++;
+		local_pocketcen.x = atof(fields[i++]);
+		local_pocketcen.y = atof(fields[i++]);
+		local_pocketcen.z = atof(fields[i++]);
+		return local_pocketcen;
+    }
+}
+
 int main(int argc, char** argv)
 {
     char configfname[256];
     char protfname[256];
     char ligfname[256];
+    char buffer[65536];
     Point pocketcen;
     std::ofstream *output = NULL;
+    
+    std::string CEN_buf = "";
+    std::vector<std::string> pathstrs;
+    std::vector<std::string> states;
 
     bool configset=false, protset=false, ligset=false, pktset=false;
     
     int i;
+    
+    for (i=0; i<65536; i++) buffer[i] = 0;
     
     for (i=0; i<256; i++)
     	configfname[i] = protfname[i] = ligfname[i] = 0;
@@ -129,9 +186,9 @@ int main(int argc, char** argv)
 
     while (!feof(pf))
     {
-        char buffer[1024];
-        for (i=0; i<1024; i++) buffer[i] = 0;
+        std::string origbuff;
         fgets(buffer, 1015, pf);
+        origbuff = buffer;
         if (buffer[0] >= ' ' && buffer[0] != '#')
         {
             char** fields = chop_spaced_fields(buffer);
@@ -149,14 +206,22 @@ int main(int argc, char** argv)
             }
             else if (!strcmp(fields[0], "CEN"))
             {
+            	CEN_buf = origbuff;
+            	/*
                 pocketcen.x = atof(fields[1]);
                 pocketcen.y = atof(fields[2]);
                 pocketcen.z = atof(fields[3]);
                 pktset = true;
+                */
             }
             else if (!strcmp(fields[0], "PATH"))
             {
-                int nodeno = atoi(fields[1]);
+            	i=1;
+            	if (!strcmp(fields[i], "ABS")) i++;
+            	if (!strcmp(fields[i], "REL")) i++;
+            	if (!strcmp(fields[i], "RES")) i++;
+            	
+                int nodeno = atoi(fields[i]);
                 if (nodeno > 255)
                 {
                     cout << "Binding path is limited to 255 nodes." << endl;
@@ -164,14 +229,22 @@ int main(int argc, char** argv)
                 }
                 if (nodeno)
                 {
-                    Point pt(atof(fields[2]),
+                    /*Point pt(atof(fields[2]),
                              atof(fields[3]),
                              atof(fields[4])
                             );
                     SCoord v(&pt);
-                    path[nodeno] = v;
+                    path[nodeno] = v;*/
                     if ((nodeno) > pathnodes) pathnodes = nodeno;
+                    
+                    pathstrs.resize(nodeno+1);
+		            pathstrs[nodeno] = origbuff;
                 }
+
+            }
+            else if (!strcmp(fields[0], "STATE"))
+            {
+            	states.push_back(origbuff);
             }
             else if (!strcmp(fields[0], "SIZE"))
             {
@@ -273,6 +346,18 @@ int main(int argc, char** argv)
     if (debug) *debug << "Loaded protein." << endl;
 #endif
 
+	if (!CEN_buf.length())
+	{
+		cout << "Error: no binding pocket center defined." << endl;
+        return 0xbadb19d;
+	}
+
+	strcpy(buffer, CEN_buf.c_str());
+	
+	char** fields = chop_spaced_fields(buffer);
+	pocketcen = pocketcen_from_config_fields(fields, nullptr);
+    pktset = true;
+
     p.mcoord_resnos = mcoord_resno;
 
     // Load the ligand or return an error.
@@ -285,7 +370,6 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
 
-    char buffer[65536];
     for (i=0; i<65536; i++) buffer[i] = 0;
     switch (ext[0])
     {
@@ -424,6 +508,7 @@ int main(int argc, char** argv)
 		    if (output) *output << "# Best binding hydrogen " << i << " of ligand" << endl << "LBBH: " << ligbbh[i]->name << endl;
 		}
     }
+    cout << endl;
 
     DockResult dr[poses+2][pathnodes+2];
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
@@ -451,14 +536,18 @@ int main(int argc, char** argv)
         nodecen = pocketcen;
         nodecen.weight = 1;
 
-        for (nodeno=0; nodeno<pathnodes; nodeno++)
+        for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
 #endif
             if (nodeno)
             {
-                nodecen = nodecen.add(&path[nodeno]);
+                // nodecen = nodecen.add(&path[nodeno]);
+                strcpy(buffer, pathstrs[nodeno].c_str());
+                fields = chop_spaced_fields(buffer);
+                nodecen = pocketcen_from_config_fields(fields, &nodecen);
+                
 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added whatever points together." << endl;
 #endif
@@ -471,7 +560,7 @@ int main(int argc, char** argv)
 #endif
 
             // Move the ligand to the new node center.
-            if (!nodeno) m.recenter(nodecen);
+            m.recenter(nodecen);
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "Molecule recenter (or not)." << endl;
 #endif
@@ -533,7 +622,7 @@ int main(int argc, char** argv)
 		                    *debug << flush;
 		                    Star s;
 		                    s.paa = reaches_spheroid[nodeno][i];
-		                    *debug << std::hex << s.n << std::dec << " " << flush;
+		                    *debug << *s.paa << " " << flush;
 		                    *debug << *reaches_spheroid[nodeno][i];
 		                    *debug << endl;
 		                }
@@ -692,6 +781,7 @@ int main(int argc, char** argv)
                 if (debug) *debug << "Aligned ligand to AA." << endl;
 #endif
             }
+    		cout << endl;
 
             // float driftamt = 1.0 / (iters/25+1);
             // cout << pose << ":" << nodeno << " drift " << driftamt << endl;
@@ -879,7 +969,7 @@ int main(int argc, char** argv)
             {
                 if (dr[j][0].kJmol >= kJmol_cutoff)
                 {
-                    for (k=0; k<pathnodes; k++)
+                    for (k=0; k<=pathnodes; k++)
                     {
                         cout << "Pose: " << i << endl << "Node: " << k << endl;
                         if (output) *output << "Pose: " << i << endl << "Node: " << k << endl;

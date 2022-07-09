@@ -23,8 +23,8 @@ class Protein
 
     // Build functions.
     bool add_residue(const int resno, const char aaletter);
-    bool add_residue(const char* pdbdata);
     bool add_sequence(const char* sequence);
+    bool add_residue(const char* pdbdata);
     void set_clashables();
     void delete_residue(int resno);
     void delete_sidechain(int resno);
@@ -40,18 +40,18 @@ class Protein
 
     // Getters.
     int get_seq_length();
-    std::string get_sequence();
     int get_start_resno();
-    AminoAcid* get_residue(int resno);
+    std::string get_sequence();
     Molecule* metals_as_molecule();
-    bool aa_ptr_in_range(AminoAcid* aaptr);
+    AminoAcid* get_residue(int resno);
     Region get_region(std::string name);
-    int get_region_start(std::string name);
     int get_region_end(std::string name);
+    int get_region_start(std::string name);
+    bool aa_ptr_in_range( AminoAcid* aaptr );
     Atom* get_atom(int resno, const char* aname);
+    std::string get_name() { return std::string(name); }
     Point get_atom_location(int resno, const char* aname);
     std::vector<std::string> get_remarks(std::string search_for = "");
-    std::string get_name() { return std::string(name); }
 
     // Metrics functions.
     float get_internal_clashes();
@@ -65,19 +65,19 @@ class Protein
         const Point size,
         const int* mcoord_resno
     );
-    float get_helix_orientation(int startres, int endres);
     Point get_region_center(int startres, int endres);
+    float get_helix_orientation(int startres, int endres);
 
     // Motion functions
     void move_piece(int start_res, int end_res, Point new_center);		// After calling this, you should reconnect the broken ends with conform_backbone().
     void rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.
     
     void rotate_backbone(int residue_no, bb_rot_dir direction, float angle);
+    void conform_backbone(int startres, int endres, Atom* a, Point target, int iters = 50);
     void rotate_backbone_partial(int startres, int endres, bb_rot_dir direction, float angle);
     void conform_backbone(int startres, int endres, int iters = 50, bool backbone_atoms_only = false);
-    void conform_backbone(int startres, int endres, Atom* a, Point target, int iters = 50);
-    void conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, int iters = 50, bool backbone_atoms_only = false);
     void conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, Atom* a3, Point target3, int iters = 50);
+    void conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, int iters = 50, bool backbone_atoms_only = false);
     void conform_backbone(int startres, int endres,
                           Atom* a1, Point target1,
                           Atom* a2, Point target2,
@@ -99,23 +99,23 @@ class Protein
     int* mcoord_resnos = NULL;
 
 	protected:
+    Atom** ca=0;
     std::string name;
     char* sequence=0;
     AminoAcid** residues=0;
     AminoAcid*** res_can_clash = 0;
-    Atom** ca=0;
     float* res_reach=0;
     Atom** metals=0;
     int metcount=0;
     Star aaptrmin, aaptrmax;
-    MetalCoord** m_mcoord=0;
     Region regions[PROT_MAX_RGN];
     std::vector<string> remarks;
+    MetalCoord** m_mcoord=0;
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);
-    void mtl_coord_cnf_cb(int iter);
     friend void ext_mtl_coord_cnf_cb(int iter);
+    void mtl_coord_cnf_cb(int iter);
 };
 
 

@@ -522,11 +522,6 @@ int main(int argc, char** argv)
     	{
     		// TODO: Revert to saved original locations for the side chain atoms instead of reloading the protein.
 		    pf = fopen(protfname, "r");
-			if (!pf)
-			{
-				cout << "Error trying to read " << protfname << endl;
-				return 0xbadf12e;
-			}
 			p.load_pdb(pf);
 			fclose(pf);
     	}
@@ -543,6 +538,38 @@ int main(int argc, char** argv)
 #endif
             if (nodeno)
             {
+            	for (i=0; i<states.size(); i++)
+            	{
+            		strcpy(buffer, states[i].c_str());
+                	fields = chop_spaced_fields(buffer);
+                	if (atoi(fields[1]) == nodeno)
+                	{
+                		int sr = atoi(fields[2]), er = atoi(fields[3]);
+                		float theta = atof(fields[4]) * fiftyseventh;
+                		
+                		Point sloc = p.get_atom_location(sr, "CA"),
+                			  eloc = p.get_atom_location(er, "CA");
+                		
+                		LocatedVector lv = (SCoord)(sloc.subtract(eloc));
+                		lv.origin = sloc;
+                		
+                		int resno;
+                		for (resno = sr; resno <= er; resno++)
+                		{
+                			AminoAcid* aa = p.get_residue(resno);
+                			if (aa)
+                			{
+                				MovabilityType mt = aa->movability;
+                				aa->movability = MOV_ALL;
+                				
+                				aa->rotate(lv, theta);
+                				
+                				aa->movability = mt;
+                			}
+                		}
+                	}
+            	}
+            	
                 // nodecen = nodecen.add(&path[nodeno]);
                 strcpy(buffer, pathstrs[nodeno].c_str());
                 fields = chop_spaced_fields(buffer);

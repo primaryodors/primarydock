@@ -217,7 +217,7 @@ int Protein::load_pdb(FILE* is)
     char buffer[1024];
     Atom* a;
     
-    AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file. Yeah it's a shoddy way to program but that's the best that can be expected of KMS's horrible mistake.
+    AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file.
     AminoAcid* prevaa = nullptr;
     
     int i, rescount=0;

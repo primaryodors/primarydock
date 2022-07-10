@@ -355,6 +355,31 @@ Center:
 </center>
 <script>
 
+// Can modify this array to your preferred TMR color scheme.
+var tmcolor =
+{
+    1: 0x665577,
+    2: 0x0066cc,
+    3: 0x00cc66,
+    4: 0x99cc66,
+    5: 0xffcc00,
+    6: 0xff9900,
+    7: 0x993355,
+};
+
+/*var tmcolor =
+{
+    1: 0x666666,
+    2: 0x0099ff,
+    3: 0x00ff66,
+    4: 0x6600ff,
+    5: 0xccff00,
+    6: 0xff9900,
+    7: 0xcc0033,
+};*/
+
+var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
+
 function aa_1let_from_3let(laa3let)
 {
 	var retval = "?";
@@ -363,6 +388,38 @@ function aa_1let_from_3let(laa3let)
 		if (item == laa3let) retval = aa1let.substr(index, 1);
 	});
 	return retval;
+}
+
+function rgn_color(resno, tm_only = false)
+{
+	var i;
+
+    for (i=1; i<=7; i++)
+    {
+        if (resno >= tmstart[i] && resno <= tmend[i]) return tmcolor[i];
+        else if (!tm_only && resno < tmstart[i]) return (i&1) ? 0xccddee : 0xcc9966;
+    }
+
+    return tm_only ? 0 : 0xcc9966;
+}
+
+function rgn_color_dark(resno, tm_only = false)
+{
+	var couleur = rgn_color(resno, tm_only);
+	var r = couleur & 0xff0000;
+	var g = couleur & 0x00ff00;
+	var b = couleur & 0x0000ff;
+
+	r = Math.floor(r/4) & 0xff0000;
+	g = Math.ceil(g/3) & 0x00ff00;
+	b = Math.ceil(b/2);
+	
+	return r + g + b;
+}
+
+function css_color(rgb_int)
+{
+	return '#'+("000000" + rgb_int.toString(16)).substr(-6);
 }
 
 var tmoid = false;
@@ -386,6 +443,8 @@ function show_seqdd()
 	{
 		var tgl = document.createElement("span");
 		tgl.className = "clickme nodebtn sctgbtn" + (restoggled[i+1] ? " hilite" : "");
+		var rcd = rgn_color_dark(i+1, true);
+		if (rcd) tgl.style.backgroundColor = css_color(rcd);
 		tgl.innerText = sequence.substr(i, 1);
 		tgl.id = "seqddtgl" + (i+1);
 		var ia = aa1let.indexOf(sequence.substr(i,1));
@@ -466,29 +525,6 @@ function show_seqdd()
 	
 }
 
-// Can modify this array to your preferred TMR color scheme.
-var tmcolor =
-{
-    1: 0x665577,
-    2: 0x0066cc,
-    3: 0x00cc00,
-    4: 0x99cc66,
-    5: 0xffcc00,
-    6: 0xff9900,
-    7: 0x993355,
-};
-
-/*var tmcolor =
-{
-    1: 0x666666,
-    2: 0x0099ff,
-    3: 0x00ff66,
-    4: 0x6600ff,
-    5: 0xccff00,
-    6: 0xff9900,
-    7: 0xcc0033,
-};*/
-
 var stage = new NGL.Stage("viewport");
 var gmodel = [], model = [], is_ligand = [], mrep = [], mrparams = [], mpos = [], mnod = [];
 var resmdl = [], mdlresno = [], restoggled = [];
@@ -496,7 +532,6 @@ var curr_ligand = false, cen_ligand = false;
 var gpose = 1, gnode = 0;
 var orid;
 var mtlcoord = [];
-var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 var sequence = "";
 var pocket = [0,0,0];
 
@@ -606,7 +641,7 @@ function hideAllSideChains()
 
 var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
-    this.atomColor = function (atom)
+    this.atomColor = function(atom)
     {
     	var elem = atom.element;
         if (atom.resno <= 1)
@@ -687,7 +722,7 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 
 var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
 {
-    this.atomColor = function (atom)
+    this.atomColor = function(atom)
     {
     	var elem = atom.atomType.element;
         if (atom.resno <= 1)
@@ -768,18 +803,10 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
 
 var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
-    this.atomColor = function (atom)
+    this.atomColor = function(atom)
     {
         var resno = atom.resno;
-        var i;
-
-        for (i=1; i<=7; i++)
-        {
-            if (resno >= tmstart[i] && resno <= tmend[i]) return tmcolor[i];
-            else if (resno < tmstart[i]) return (i&1) ? 0xccddee : 0xcc9966;
-        }
-
-        return 0xcc9966;
+        return rgn_color(resno);
     }
 });
 

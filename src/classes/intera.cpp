@@ -465,8 +465,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
            )
         {
             if (r1 > 2.5) continue;
+            if (forces[i]->type == vdW && r > 6) continue;
         }
-        else if (r1 > 7) continue;
+        else if (r1 > 4) continue;
 
         dp = 2;
         if (forces[i]->type == vdW) dp = 1;					// van der Waals forces are non-directional, but the C-H bond still shields.

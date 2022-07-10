@@ -2131,6 +2131,8 @@ void Molecule::intermol_conform_flexonly(Molecule** ligands, int iters, Molecule
 
 
 #define DBG_BONDFLEX 0
+#define DBG_FLEXRES 251
+#define DBG_FLEXROTB 0
 
 void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 {
@@ -2211,7 +2213,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 {
                 	// cout << bind << " vs " << bind1 << " +" << endl;
                     improvement += (bind1 - bind);
-                    // if (fabs(mm[i]->lmx) < 0.25) mm[i]->lmx *= accel;
+                    if (fabs(mm[i]->lmx) < 0.25) mm[i]->lmx *= accel;
                     bind = bind1;
                 }
 
@@ -2233,7 +2235,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 else
                 {
                     improvement += (bind1 - bind);
-                    // if (fabs(mm[i]->lmy) < 0.25) mm[i]->lmy *= accel;
+                    if (fabs(mm[i]->lmy) < 0.25) mm[i]->lmy *= accel;
                     bind = bind1;
                 }
 
@@ -2255,7 +2257,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 else
                 {
                     improvement += (bind1 - bind);
-                    // if (fabs(mm[i]->lmz) < 0.25) mm[i]->lmz *= accel;
+                    if (fabs(mm[i]->lmz) < 0.25) mm[i]->lmz *= accel;
                     bind = bind1;
                 }
                 
@@ -2269,7 +2271,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
-                	float lmm = 0.9;
+                	float lmm = 0.95;
                 	mm[i]->lmx *= lmm;
                 	mm[i]->lmy *= lmm;
                 	mm[i]->lmz *= lmm;
@@ -2465,6 +2467,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             if (mm[i]->movability >= MOV_FLEXONLY)
             {
                 mm[i]->get_rotatable_bonds();
+                int residue = 0;
+                
+                if (mm[i]->rotatable_bonds && mm[i]->rotatable_bonds[0] && mm[i]->rotatable_bonds[0]->atom)
+                	residue = mm[i]->rotatable_bonds[0]->atom->residue;
 
                 // Don't know why this is renecessary.
                 if (mm[i]->movability == MOV_FLEXONLY)
@@ -2480,18 +2486,21 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 mm[i]->lastbind = bind;
 
 				#if DBG_BONDFLEX
-                cout << "Iter" << iter << " " << mm[i]->name;
+                if (DBG_FLEXRES == residue)
+                	cout << "Iter" << iter << " " << mm[i]->name;
                 #endif
                 
                 if (mm[i]->rotatable_bonds)
                 {
                 	#if DBG_BONDFLEX
-                    cout << " has rotbonds ";
+                    if (DBG_FLEXRES == residue)
+                    	cout << " has rotbonds ";
                     #endif
                     for (k=0; mm[i]->rotatable_bonds[k]; k++)
                     {
                     	#if DBG_BONDFLEX
-                        cout << k << " " << *mm[i]->rotatable_bonds[k] << " ";
+                        if (DBG_FLEXRES == residue)
+                        	cout << k << " " << *mm[i]->rotatable_bonds[k] << " ";
                         #endif
 
                         rad = 0;
@@ -2507,14 +2516,17 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
                                 bind1 = 0;
                                 #if DBG_BONDFLEX
-                                cout << endl << (rad*fiftyseven) << ": ";
+                                if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
+                                	cout << endl << (rad*fiftyseven) << ": ";
                         		#endif
                                 for (j=0; mm[j]; j++)
                                 {
                                     if (!nearby[j]) continue;
-                                    bind1 += mm[i]->get_intermol_binding(mm[j]);
+                                    float lbind1 = mm[i]->get_intermol_binding(mm[j]);
+                                    bind1 += lbind1;
                                     #if DBG_BONDFLEX
-                                    cout << mm[j]->name << " " << bind1 << " ";
+                                    if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
+                                    	cout << mm[j]->name << " " << lbind1 << " ";
                         			#endif
                                 }
 
@@ -2525,7 +2537,8 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                                 }
                             }
                             #if DBG_BONDFLEX
-                            cout << endl << "(" << (bestfrrad*fiftyseven) << "deg) ";
+                            if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
+                            	cout << endl << "(" << (bestfrrad*fiftyseven) << "deg) ";
                 			#endif
 
                             if (!isnan(bestfrrad))
@@ -2558,7 +2571,8 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                 }
                 #if DBG_BONDFLEX
-                cout << endl;
+                if (DBG_FLEXRES == residue)
+                	cout << endl;
     			#endif
                 mm[i]->lastbind = bind;
 
@@ -3329,6 +3343,7 @@ float Molecule::close_loop(Atom** path, float lcard)
     return anomaly;
 }
 
+#define _DBG_MOLBB 0
 Atom** Molecule::get_most_bindable(int max_count)
 {
     if (noAtoms(atoms)) return 0;
@@ -3347,17 +3362,38 @@ Atom** Molecule::get_most_bindable(int max_count)
     {
     	if (atoms[i]->is_backbone) continue;
     	
+    	#if _DBG_MOLBB
+    	cout << "Probing atom " << atoms[i]->name << endl;
+    	#endif
+    	
         float score = 0;
         atoms[i]->clear_geometry_cache();
         
         for (k=0; retval[k] && k<max_count; k++)
         {
-        	if (retval[k] == atoms[i]) goto _resume;
-        	if (retval[k]->is_bonded_to(atoms[i])) goto _resume;
-        	if (retval[k]->shares_bonded_with(atoms[i])) goto _resume;
+        	if (retval[k] == atoms[i])
+        	{
+				#if _DBG_MOLBB
+				cout << "Atom is already in return array." << endl;
+				#endif
+        		goto _resume;
+    		}
+        	if (retval[k]->is_bonded_to(atoms[i]) && best[k] >= 10)
+        	{
+				#if _DBG_MOLBB
+				cout << "Atom is bonded to " << retval[k]->name << ", already in return array." << endl;
+				#endif
+        		goto _resume;
+    		}
+        	if (retval[k]->shares_bonded_with(atoms[i]) && best[k] >= 10)
+        	{
+				#if _DBG_MOLBB
+				cout << "Atom shares a bond with " << retval[k]->name << ", already in return array." << endl;
+				#endif
+        		goto _resume;
+    		}
         }
         
-
         if (atoms[i]->get_charge() || atoms[i]->get_acidbase())
             score += 1000;
 
@@ -3373,11 +3409,19 @@ Atom** Molecule::get_most_bindable(int max_count)
             score += 50;
 
         if (!score) score += 5;		// van der Waals.
+        
+        #if _DBG_MOLBB
+    	cout << "Score is " << score << endl;
+    	#endif
 
 		for (k=0; k<max_count; k++)
 		{
 			if (score > best[k])
 		    {
+		    	#if _DBG_MOLBB
+				cout << "Score claims new #" << k << " spot." << endl;
+				#endif
+				
 		    	for (l=max_count; l>k; l--)
 		    	{
 		    		best[l] = best[l-1];
@@ -3390,6 +3434,9 @@ Atom** Molecule::get_most_bindable(int max_count)
 		        
 		        break;
 		    }
+		    #if _DBG_MOLBB
+			cout << "Score does not exceed previous #" << k << " spot of " << best[k] << endl;
+			#endif
 	    }
 	    
 	    _resume:

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sstream>
+#include <algorithm>
 #include "classes/protein.h"
 
 using namespace std;
@@ -157,6 +158,7 @@ int main(int argc, char** argv)
     std::string CEN_buf = "";
     std::vector<std::string> pathstrs;
     std::vector<std::string> states;
+    std::vector<int> extra_wt;
 
     bool configset=false, protset=false, ligset=false, pktset=false;
     
@@ -360,6 +362,13 @@ int main(int argc, char** argv)
 	
 	char** fields = chop_spaced_fields(buffer);
 	pocketcen = pocketcen_from_config_fields(fields, nullptr);
+	if (!strcmp(fields[1], "RES"))
+	{
+		for (i=2; fields[i]; i++)
+		{
+			extra_wt.push_back(atoi(fields[i]));
+		}
+	}
     pktset = true;
 
     p.mcoord_resnos = mcoord_resno;
@@ -537,6 +546,8 @@ int main(int argc, char** argv)
 
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
+        	if (pathstrs.size() < nodeno) break;
+        	
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
 #endif
@@ -578,6 +589,14 @@ int main(int argc, char** argv)
                 strcpy(buffer, pathstrs[nodeno].c_str());
                 fields = chop_spaced_fields(buffer);
                 nodecen = pocketcen_from_config_fields(fields, &nodecen);
+				if (!strcmp(fields[1], "RES"))
+				{
+					extra_wt.clear();
+					for (i=2; fields[i]; i++)
+					{
+						extra_wt.push_back(atoi(fields[i]));
+					}
+				}
                 
 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added whatever points together." << endl;
@@ -627,8 +646,7 @@ int main(int argc, char** argv)
                 if (debug) *debug << "Initialize null AA pointer." << endl;
 #endif
 
-                // Rotate the ligand in space so that its strongest binding atom points to a binding
-                // pocket feature with a strong potential binding.
+                // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
                 for (l=0; l<3; l++)
 				{
@@ -644,7 +662,7 @@ int main(int argc, char** argv)
 		                
 		                if (l && reaches_spheroid[nodeno][i] == alignment_aa[l-1]) continue;
 		                if (l>1 && reaches_spheroid[nodeno][i] == alignment_aa[l-2]) continue;
-
+		                
 #if _DBG_STEPBYSTEP
 		                if (debug)
 		                {
@@ -661,7 +679,18 @@ int main(int argc, char** argv)
 						
 		                float pottmp = reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb[l]);
 		                if (ligbbh[l]) pottmp += reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh[l]);
-		                pottmp /= pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter());
+		                
+		                if (extra_wt.size()
+		                	&&
+		                	std::find(extra_wt.begin(), extra_wt.end(), reaches_spheroid[nodeno][i]->get_residue_no())!=extra_wt.end()
+		                   )
+		                {
+		                	pottmp *= 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+		                }
+		                else
+		                {
+		                	pottmp /= pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter());
+	                	}
 		                // cout << reaches_spheroid[nodeno][i]->get_3letter() << reaches_spheroid[nodeno][i]->get_residue_no() << " " << pottmp << endl;
 		                if (reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ[l])
 		                        &&
@@ -1063,7 +1092,7 @@ _btyp_unassigned:
 
                         if (!dr[j][k].pdbdat.length())
                         {
-                            cout << "Uh-oh!" << endl;
+                            cout << "WARNING: Failed to generate PDB data." << endl;
                             if (output) *output << "(Missing PDB data.)" << endl;
                         }
                         else

@@ -65,6 +65,7 @@ class Protein
         const Point size,
         const int* mcoord_resno
     );
+    std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
     Point get_region_center(int startres, int endres);
     float get_helix_orientation(int startres, int endres);
 

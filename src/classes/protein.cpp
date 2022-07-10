@@ -498,6 +498,29 @@ void Protein::set_clashables()
     }*/
 }
 
+std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool facing)
+{
+	std::vector<AminoAcid*> retval;
+	
+	if (!residues) return retval;
+	int i, j;
+	
+    for (i=0; residues[i]; i++)
+    {
+    	float r = pt.get_3d_distance(residues[i]->get_atom_location("CA"));
+    	
+    	if (facing && residues[i]->get_atom("CB"))
+    	{
+    		float r1 = pt.get_3d_distance(residues[i]->get_atom_location("CB"));
+    		if (r1 > r) continue;
+    	}
+    	
+    	if (r <= maxr) retval.push_back(residues[i]);
+    }
+    
+    return retval;
+}
+
 AminoAcid** Protein::get_residues_can_clash(int resno)
 {
     if (!residues) return 0;

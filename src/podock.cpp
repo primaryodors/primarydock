@@ -538,6 +538,124 @@ int main(int argc, char** argv)
 			p.load_pdb(pf);
 			fclose(pf);
     	}
+    	else
+    	{
+    		// Begin tumble sphere behavior.
+    		std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, 15);
+    		int tsphsz = tsphres.size();
+    		float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
+    		
+    		for (i=0; i<tsphsz; i++)
+    		{
+    			// TODO: Algorithmically determine more accurate values based on interaction type, etc.
+    			outer_sphere[i] = tsphres[i]->get_reach() + 2;
+    			inner_sphere[i] = tsphres[i]->get_reach()/4 + 1;
+    		}
+    		
+    		const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
+    		float xrad, yrad, zrad, step, bestxr, bestyr, bestzr, score, worth, bestscore;
+    		const int ac = m.get_atom_count();
+    		
+    		step = fiftyseventh*30;
+    		bestscore = 0;
+    		for (xrad=0; xrad <= M_PI*2; xrad += step)
+    		{
+    			for (yrad=0; yrad <= M_PI*2; yrad += step)
+    			{
+    				for (zrad=0; zrad <= M_PI*2; zrad += step)
+    				{    					
+    					score = 0;
+    					for (i=0; i<ac; i++)
+    					{
+    						Atom* a = m.get_atom(i);
+    						intera_type it = vdW;
+    						worth = 0.4;
+    						if (a->get_charge() || a->is_polar()) { it = hbond; worth = 40; }
+    						else if (a->is_pi()) { it = pi; worth = 7; }
+    						
+    						for (j=0; j<tsphsz; j++)
+    						{
+    							if (tsphres[j]->capable_of_inter(it))
+    							{
+    								float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));
+    								if (r <= outer_sphere[j])
+    								{	if (r > inner_sphere[j])
+										{
+											score += worth;
+    						
+											if (extra_wt.size()
+												&&
+												std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
+											   )
+											{
+												score += worth * 0.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+											}
+										}
+										else
+										{	score -= 100;
+										}
+									}
+    							}
+    						}
+    					}
+    					
+    					if (score > bestscore)
+    					{
+    						bestxr = xrad;
+    						bestyr = yrad;
+    						bestzr = zrad;
+    						bestscore = score;
+    					}
+    					
+    					m.rotate(zaxis, step);
+    				}
+    				m.rotate(yaxis, step);
+    			}
+    			m.rotate(xaxis, step);
+    		}
+    		
+    		cout << "Tumble sphere best score " << bestscore << " for "
+    			 << "x" << bestxr*fiftyseven << "deg, "
+    			 << "y" << bestyr*fiftyseven << "deg, "
+    			 << "z" << bestzr*fiftyseven << "deg."
+    			 << endl;
+    		
+    		// Rotate the molecule into the best position.
+			m.rotate(xaxis, bestxr);
+			m.rotate(yaxis, bestyr);
+			m.rotate(zaxis, bestzr);
+    		
+    		// Minimize ligand clashes.
+    		for (i=0; i<tsphsz; i++)
+    		{
+    			Bond** tsphb = tsphres[i]->get_rotatable_bonds();
+    			if (tsphb)
+    			{
+    				for (j=0; tsphb[j]; j++)
+    				{
+    					float rad=0, bestrad=0, clash, bestclash=6.25e24;
+    					for (rad=0; rad < M_PI*2; rad += step)
+    					{
+    						clash = tsphres[i]->get_intermol_clashes(&m);
+    						
+    						if (clash < bestclash)
+    						{
+    							bestrad = rad;
+    							bestclash = clash;
+    						}
+    						
+    						tsphb[j]->rotate(step);
+    					}
+    					
+    					tsphb[j]->rotate(bestrad);
+    				}
+    				delete[] tsphb;
+				}
+    		}
+    		
+    		// End tumble sphere behavior.
+    	}
+    	
 #if _DBG_STEPBYSTEP
         if (debug) *debug << "Pose " << pose << endl;
 #endif

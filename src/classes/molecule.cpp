@@ -2469,8 +2469,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 mm[i]->get_rotatable_bonds();
                 int residue = 0;
                 
+				#if DBG_BONDFLEX
                 if (mm[i]->rotatable_bonds && mm[i]->rotatable_bonds[0] && mm[i]->rotatable_bonds[0]->atom)
                 	residue = mm[i]->rotatable_bonds[0]->atom->residue;
+                #endif
 
                 // Don't know why this is renecessary.
                 if (mm[i]->movability == MOV_FLEXONLY)

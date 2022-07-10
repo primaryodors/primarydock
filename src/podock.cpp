@@ -549,7 +549,7 @@ int main(int argc, char** argv)
     		{
     			// TODO: Algorithmically determine more accurate values based on interaction type, etc.
     			outer_sphere[i] = tsphres[i]->get_reach() + 2;
-    			inner_sphere[i] = tsphres[i]->get_reach()/4 + 1;
+    			inner_sphere[i] = tsphres[i]->get_reach()/2 + 2;
     		}
     		
     		const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
@@ -592,7 +592,7 @@ int main(int argc, char** argv)
 											}
 										}
 										else
-										{	score -= 100;
+										{	score -= 200;
 										}
 									}
     							}
@@ -649,7 +649,7 @@ int main(int argc, char** argv)
     					
     					tsphb[j]->rotate(bestrad);
     				}
-    				delete[] tsphb;
+    				// delete[] tsphb;
 				}
     		}
     		
@@ -843,6 +843,7 @@ int main(int argc, char** argv)
                 if (debug) *debug << "Alignment AA." << endl;
 #endif
 
+				if (0)		// Superseded by tumble sphere.
                 for (l=0; l<3; l++)
 				{
                 	if (alignment_aa[l])

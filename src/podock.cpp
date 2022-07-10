@@ -281,6 +281,10 @@ int main(int argc, char** argv)
             {
                 kcal = true;
             }
+            else if (!strcmp(fields[0], "RLIM"))
+            {
+            	_INTERA_R_CUTOFF = atof(fields[1]);
+            }
             else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
             {
                 iters = atoi(fields[1]);
@@ -863,7 +867,6 @@ int main(int argc, char** argv)
 
             m.clear_atom_binding_energies();
 
-            drcount = pose-1;
             if (met)
             {
                 met->clear_atom_binding_energies();
@@ -890,7 +893,9 @@ int main(int argc, char** argv)
             // cout << btot << endl;
 
             if (btot > 15*m.get_atom_count()) btot = 0;
-
+            
+			drcount = pose-1;
+            
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared metrics." << endl;
 #endif
@@ -977,8 +982,12 @@ int main(int argc, char** argv)
             }
 
             drcount = pose;
-        }
-    }
+            
+            // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
+            // calculations for this pose.
+            if (btot < kJmol_cutoff) break;
+        }	// nodeno loop.
+    } // pose loop.
 #if _DBG_STEPBYSTEP
     if (debug) *debug << "Finished poses." << endl;
 #endif
@@ -998,6 +1007,9 @@ int main(int argc, char** argv)
                 {
                     for (k=0; k<=pathnodes; k++)
                     {
+                    	// If pathnode is not within kJ/mol cutoff, abandon it and all subsequent pathnodes of the same pose.
+                    	if (dr[j][k].kJmol < kJmol_cutoff) break;
+                    	
                         cout << "Pose: " << i << endl << "Node: " << k << endl;
                         if (output) *output << "Pose: " << i << endl << "Node: " << k << endl;
 

@@ -1714,7 +1714,7 @@ float Molecule::get_intermol_binding(Molecule** ligands)
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
                 {
-                    if (!shielded(atoms[i], ligands[l]->atoms[j])
+                    if (	!shielded(atoms[i], ligands[l]->atoms[j])
                             &&
                             !ligands[l]->shielded(atoms[i], ligands[l]->atoms[j])
                        )

@@ -70,10 +70,9 @@ template <typename T> void init_nulls(T* array, int length)
 	for (i=0; i<length; i++) array[i] = 0;
 }
 
+extern float _INTERA_R_CUTOFF;
 extern const char* Greek;
-
 extern std::ofstream *debug;
-
 extern bool last_iter;
 
 #endif

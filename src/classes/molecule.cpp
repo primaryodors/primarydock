@@ -1487,6 +1487,14 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 r = pta.get_3d_distance(&ptb) + 1e-3;
                 if (r < avdW + bvdW)
                 {
+                	/*float confidence = 2.5;		// TODO: Get this from the PDB.
+					float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
+					
+					float allowable = give + confidence / sqrt(3);
+					
+					r += allowable;
+					if (r > (avdW + bvdW)) r = avdW + bvdW;*/
+    		
                     float lclash = sphere_intersection(avdW, bvdW, r);
                     if (lclash > 0)
                     {
@@ -1698,7 +1706,7 @@ float Molecule::get_intermol_binding(Molecule** ligands)
     if (!ligands[0]) return 0;
     int i, j, l;
     float kJmol = 0;
-    kJmol -= get_internal_clashes();
+    // kJmol -= get_internal_clashes();
 
     for (i=0; i<atcount; i++)
         atoms[i]->last_bind_energy = 0;

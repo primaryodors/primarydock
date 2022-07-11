@@ -1028,6 +1028,7 @@ int main(int argc, char** argv)
                 strcpy(metrics[metcount], "Metals");
                 mkJmol[metcount++] = lb;
                 btot += lb;
+                // cout << "Metal adds " << lb << " to btot, making " << btot << endl;
             }
 
             sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, mcoord_resno);
@@ -1043,6 +1044,7 @@ int main(int argc, char** argv)
                 // cout << metrics[metcount] << ": " << lb << " . ";
                 mkJmol[metcount++] = lb;
                 btot += lb;
+                // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;
             }
             // cout << btot << endl;
 

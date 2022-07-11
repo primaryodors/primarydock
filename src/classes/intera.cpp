@@ -645,10 +645,30 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         }
         else
         {
-            rdecayed = r1 * r1;
-            partial = aniso * forces[i]->kJ_mol * rdecayed;
-            // partial = aniso * forces[i]->kJ_mol;
+        	/*float confidence = 2.5;		// TODO: Get this from the PDB.
+        	float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
+        	
+        	float allowable = give + confidence / sqrt(3);
+        	
+    		r += allowable;
+    		if (r > forces[i]->distance) r = forces[i]->distance;
+    		r1 = r / forces[i]->distance;*/
+    		
+	        rdecayed = r1 * r1 * r1;
+	        partial = aniso * forces[i]->kJ_mol * rdecayed;
+	        // partial = aniso * forces[i]->kJ_mol;
+	        
+	        // This isn't clashes.
+	        /*if (a->residue == 105)
+	        cout << "Clash! "
+	        	 << (a->residue ? std::to_string(a->residue).c_str() : "") << (a->residue ? ":":"") << a->name
+	        	 << "..."
+	        	 << (b->residue ? std::to_string(b->residue).c_str() : "") << (b->residue ? ":":"") << b->name
+	        	 << " r = " << r << " vs. optimal " << forces[i]->distance
+	        	 << endl;*/
         }
+        
+        // if (partial < 0) partial = 0;
         
         // Divide each ring by its number of atoms.
         if (ar) partial /= ar->get_atom_count();
@@ -734,7 +754,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (rbind < 0.7) rbind = 0.7;
 
 _canstill_clash:
-    ;
+	/*float confidence = 2.5;		// TODO: Get this from the PDB.
+	float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
+	
+	float allowable = give + confidence / sqrt(3);
+	
+	r += allowable;*/
+	
     if (r < rbind)
     {
         float f = rbind/(avdW+bvdW);

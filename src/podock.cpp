@@ -760,6 +760,12 @@ int main(int argc, char** argv)
                 	alignment_aa[l]=0;
                 	alignment_distance[l]=0;
             	}
+            	
+            	for (l=0; l<=pathnodes; l++)
+            	{
+            		dr[drcount][l].metric = 0;
+            	}
+            	
 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Initialize null AA pointer." << endl;
 #endif
@@ -1048,9 +1054,9 @@ int main(int argc, char** argv)
             if (debug) *debug << "Prepared metrics." << endl;
 #endif
 
-            // TODO: WTF is going on here...
+            // Allocate the array.
             dr[drcount][nodeno].kJmol = btot;
-            dr[drcount][nodeno].metric = new char*[metcount+2];
+            dr[drcount][nodeno].metric = new char*[metcount+4];
             dr[drcount][nodeno].mkJmol = new float[metcount];
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
@@ -1064,7 +1070,7 @@ int main(int argc, char** argv)
             if (debug) *debug << "Filled btypes." << endl;
 #endif
 
-            // ...and here????
+			// Populate the array.
             for (i=0; i<metcount; i++)
             {
                 dr[drcount][nodeno].metric[i] = new char[max(8,(int)strlen(metrics[i])+4)];
@@ -1072,8 +1078,11 @@ int main(int argc, char** argv)
                 dr[drcount][nodeno].mkJmol[i] = mkJmol[i];
                 // cout << "*" << dr[drcount][nodeno].metric[i] << ": " << dr[drcount][nodeno].mkJmol[i] << endl;
             }
+            
+            // Terminate with an empty string and a null pointer.
             dr[drcount][nodeno].metric[i] = new char[1];
             dr[drcount][nodeno].metric[i][0] = 0;
+            dr[drcount][nodeno].metric[i+1] = 0;
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "More metrics or something idfk." << endl;
 #endif
@@ -1169,7 +1178,7 @@ int main(int argc, char** argv)
                         
 		                        dr[j][k].metric
 		                        && dr[j][k].metric[l]
-		                        && dr[j][k].metric[l][0];		// TODO: Fix this segfault. metric is coming up unassigned.
+		                        && dr[j][k].metric[l][0];
 		                        
 		                        l++
 		                    )

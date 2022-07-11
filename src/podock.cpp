@@ -1048,6 +1048,7 @@ int main(int argc, char** argv)
             if (debug) *debug << "Prepared metrics." << endl;
 #endif
 
+            // TODO: WTF is going on here...
             dr[drcount][nodeno].kJmol = btot;
             dr[drcount][nodeno].metric = new char*[metcount+2];
             dr[drcount][nodeno].mkJmol = new float[metcount];
@@ -1063,6 +1064,7 @@ int main(int argc, char** argv)
             if (debug) *debug << "Filled btypes." << endl;
 #endif
 
+            // ...and here????
             for (i=0; i<metcount; i++)
             {
                 dr[drcount][nodeno].metric[i] = new char[max(8,(int)strlen(metrics[i])+4)];
@@ -1163,11 +1165,14 @@ int main(int argc, char** argv)
 
                         cout << "# Binding energies" << endl << "BENERG:" << endl;
                         if (output) *output << "# Binding energies" << endl << "BENERG:" << endl;
-                        for (l=0;
-                                dr[j][k].metric
-                                && dr[j][k].metric[l]
-                                && dr[j][k].metric[l][0];
-                                l++)
+                        for (	l=0;
+                        
+		                        dr[j][k].metric
+		                        && dr[j][k].metric[l]
+		                        && dr[j][k].metric[l][0];		// TODO: Fix this segfault. metric is coming up unassigned.
+		                        
+		                        l++
+		                    )
                         {
                             cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
                             if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;

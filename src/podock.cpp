@@ -562,7 +562,7 @@ int main(int argc, char** argv)
 				}
 				
 				const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
-				float xrad, yrad, zrad, step, bestxr, bestyr, bestzr, score, worth, bestscore;
+				float xrad, yrad, zrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
 				const int ac = m.get_atom_count();
 				
 				step = fiftyseventh*30;
@@ -590,15 +590,17 @@ int main(int argc, char** argv)
 										if (r <= outer_sphere[j])
 										{	if (r > inner_sphere[j])
 											{
-												score += worth;
+												weight = 1;
 								
 												if (extra_wt.size()
 													&&
 													std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
 												   )
 												{
-													score += worth * 0.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+													weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
 												}
+												
+												score += worth * weight;
 											}
 											else
 											{	score -= 200;

@@ -391,6 +391,7 @@ Atom::~Atom()
 
 void Atom::unbond(Atom* btom)
 {
+	// if (btom) cout << "Unbonding " << btom->name << " from " << name << endl;
     if (bonded_to)
     {
         int i;
@@ -1364,7 +1365,11 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
     {
     	Point arom_center;
     	
-        geometry = 3;
+    	if (get_count_pi_bonds())
+    	{
+		    geometry = 3;
+        }
+        
         if (bonded_to[1].btom)
         {
         	for (j=0; member_of[j]; j++)

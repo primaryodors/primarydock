@@ -41,19 +41,22 @@ Molecule::Molecule()
     paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
 }
 
-int length(Atom** array) {
+int length(Atom** array)
+{
     int numAtoms;
     for (numAtoms=0; array[numAtoms]; numAtoms++);	// Get count.
     return numAtoms;
 }
 
-bool hasAtoms(Atom** array) {
-    if(array == nullptr)
+bool hasAtoms(Atom** array)
+{
+    if (array == nullptr)
         return false;
     return array[0] != nullptr;
 }
 
-bool noAtoms(Atom** array) {
+bool noAtoms(Atom** array)
+{
     return !hasAtoms(array);
 }
 
@@ -486,6 +489,7 @@ int Molecule::from_sdf(char const* sdf_dat)
 
             if (!a1i || !a2i) break;
             atoms[a1i-1]->bond_to(atoms[a2i-1], atoi(fields[2]));
+            // cout << "Bonded " << atoms[a1i-1]->name << " to " << atoms[a2i-1]->name << endl;
         }
 
         if (fields) delete[] fields;
@@ -495,7 +499,6 @@ int Molecule::from_sdf(char const* sdf_dat)
 
     identify_rings();
     identify_acidbase();
-    minclash = get_internal_clashes();
     return added;
 }
 
@@ -1218,7 +1221,7 @@ Bond** Molecule::get_rotatable_bonds()
             if (lb) delete[] lb;
         }
 
-    // cout << bonds << " rotatable bond(s)." << endl;
+    // cout << (name ? name : "") << " has " << bonds << " rotatable bond(s)." << endl;
     rotatable_bonds = new Bond*[bonds+1];
     for (i=0; i<=bonds; i++) rotatable_bonds[i] = btemp[i];
     rotatable_bonds[bonds] = 0;
@@ -1438,14 +1441,22 @@ float Molecule::get_internal_clashes()
             {
                 float lclash = sphere_intersection(avdW, bvdW, r);
                 clash += lclash;
-                // cout << atoms[i]->name << " clashes with " << atoms[j]->name << " by " << lclash << " cu. A." << endl;
+                if (false && lclash > 3)
+                {
+                	cout << atoms[i]->name << " clashes with " << atoms[j]->name << " by " << lclash << " cu. A. resulting in " << clash << endl;
+                	int g = atoms[i]->get_geometry();
+                	cout << "Geometry: " << g << endl;
+                	Bond** b = atoms[i]->get_bonds();
+                	int k;
+                	for (k=0; k<g; k++)
+                		cout << atoms[i]->name << " is bonded to " << hex << b[k]->btom << dec << " "
+                			 << (b[k]->btom ? b[k]->btom->name : "") << "." << endl;
+            	}
             }
         }
     }
 
-    if (clash < minclash) minclash = clash;
-
-    return clash-minclash;
+    return clash-base_internal_clashes;
 }
 
 float Molecule::get_intermol_clashes(Molecule* ligand)
@@ -1706,7 +1717,9 @@ float Molecule::get_intermol_binding(Molecule** ligands)
     if (!ligands[0]) return 0;
     int i, j, l;
     float kJmol = 0;
-    // kJmol -= get_internal_clashes();
+    kJmol -= get_internal_clashes();
+    
+    // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
 
     for (i=0; i<atcount; i++)
         atoms[i]->last_bind_energy = 0;
@@ -1748,9 +1761,9 @@ float Molecule::get_intermol_binding(Molecule** ligands)
 
 void Molecule::minimize_internal_clashes()
 {
+	// cout << (name ? name : "(no name)");
     if (noAtoms(atoms)) return;
 
-    minclash = 0;
     int i, j, iter;
     float clash = get_internal_clashes();
 
@@ -1771,7 +1784,6 @@ void Molecule::minimize_internal_clashes()
         for (i=0; i<numrb; i++)
         {
             b[i]->rotate(angle[i]);
-            minclash = 0;
             float clash1 = get_internal_clashes();
 
             if (clash1 <= clash)
@@ -1787,7 +1799,8 @@ void Molecule::minimize_internal_clashes()
         }
     }
 
-    minclash = clash;
+    base_internal_clashes = get_internal_clashes();
+    // cout << " base internal clashes: " << base_internal_clashes << endl;
 }
 
 void Molecule::intermol_conform(Molecule* ligand, int iters)

@@ -21,7 +21,7 @@ AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa)
     immobile = false; // true;
     movability = MOV_FLEXONLY;
     from_pdb(instream);
-    minclash = get_internal_clashes();
+    base_internal_clashes = get_internal_clashes();
     mol_typ = MOLTYP_AMINOACID;
     prev_aa = prevaa;
     if (prevaa) prevaa->next_aa = this;

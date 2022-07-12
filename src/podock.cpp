@@ -390,26 +390,29 @@ int main(int argc, char** argv)
     for (i=0; i<65536; i++) buffer[i] = 0;
     switch (ext[0])
     {
-    case 's':
-    case 'S':
-        // SDF
-        pf = fopen(ligfname, "r");
-        fread(buffer, 1, 65535, pf);
-        fclose(pf);
-        m.from_sdf(buffer);
-        break;
+		case 's':
+		case 'S':
+		    // SDF
+		    pf = fopen(ligfname, "r");
+		    fread(buffer, 1, 65535, pf);
+		    fclose(pf);
+		    m.from_sdf(buffer);
+		    break;
 
-    case 'p':
-    case 'P':
-        pf = fopen(ligfname, "r");
-        m.from_pdb(pf);
-        fclose(pf);
-        break;
+		case 'p':
+		case 'P':
+		    pf = fopen(ligfname, "r");
+		    m.from_pdb(pf);
+		    fclose(pf);
+		    break;
 
-    default:
-        cout << "Unrecognized ligand file extension: " << ext << endl;
-        return 0xbadf12e;
+		default:
+		    cout << "Unrecognized ligand file extension: " << ext << endl;
+		    return 0xbadf12e;
     }
+    
+    m.minimize_internal_clashes();
+    
 #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded ligand." << endl;
 #endif

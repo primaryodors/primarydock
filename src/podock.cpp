@@ -581,12 +581,17 @@ int main(int argc, char** argv)
 							{
 								Atom* a = m.get_atom(i);
 								intera_type it = vdW;
-								worth = 0.4;
-								if (a->get_charge() || a->is_polar()) { it = hbond; worth = 40; }
-								else if (a->is_pi()) { it = pi; worth = 7; }
 								
 								for (j=0; j<tsphsz; j++)
 								{
+									worth = 0.4;
+									if (a->get_charge() && tsphres[j]->get_charge()
+										&&
+										sgn(a->get_charge()) == -sgn(tsphres[j]->get_charge())
+									   ) { it = ionic; worth = 100; }
+									else if (a->get_charge() || a->is_polar()) { it = hbond; worth = 40; }
+									else if (a->is_pi()) { it = pi; worth = 7; }
+									
 									if (tsphres[j]->capable_of_inter(it))
 									{
 										float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));

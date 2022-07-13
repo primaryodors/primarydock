@@ -802,6 +802,7 @@ int Molecule::add_ring(Atom** atoms)
 	return ringcount-1;
 }
 
+#define DBG_FND_RNGS 0
 int Molecule::identify_rings()
 {
     Atom** ringstmp[256];
@@ -818,6 +819,10 @@ int Molecule::identify_rings()
     // Start at any atom, mark it "used".
     a = atoms[0];
     a->used = true;
+    
+    #if DBG_FND_RNGS
+    cout << "Identifying rings for " << (name ? name : "(no name molecule)") << "... " << endl;
+    #endif
     
     for (i=0; i<256; i++) ringstmp[i] = nullptr;
 
@@ -850,11 +855,13 @@ int Molecule::identify_rings()
     {
         active = 0;
 
-        /*for (i=0; i<chains; i++)
+		#if DBG_FND_RNGS
+        for (i=0; i<chains; i++)
             if (ringstmp[i][0])
             {
                 cout << "Begin chain " << i << ": "; Atom::dump_array(ringstmp[i]); cout << endl;
-            }*/
+            }
+        #endif
 
         for (i=0; i<chains; i++)
         {
@@ -864,22 +871,34 @@ int Molecule::identify_rings()
             cnvchain = 0;
 
             if (!(a = ringstmp[i][chainlen[i]-1])) continue;
-            //cout << "Chain " << i << " ends in atom " << a->name << endl;
+            #if DBG_FND_RNGS
+            cout << "Chain " << i << " ends in atom " << a->name << endl;
+            #endif
 
             if (!cnva)
             {
                 for (l=0; l<chains; l++)
                 {
-                    //cout << "Preparing to check chain " << i << " against chain " << l << " for bond convergence...\n";
+                    #if DBG_FND_RNGS
+                    cout << "Preparing to check chain " << i << " against chain " << l << " for bond convergence...\n";
+                    #endif
+                    
                     if (l != i && chainlen[l] && ringstmp[l][chainlen[l]-1])
                     {
-                        // cout << "Checking chain " << i << " against chain " << l << " for bond convergence...\n";
+                        #if DBG_FND_RNGS
+                        cout << "Checking chain " << i << " against chain " << l << " for bond convergence...\n";
+                        #endif
+                        
                         // If two chains converge on a single atom, this is your one converging ato
                         if (ringstmp[l][chainlen[l]-1] == a)
                         {
                             cnva = a;
                             cnvb = 0;
-                            //cout << "****** Chains " << i << " and " << l << " converge on atom " << cnva->name << " ******" << endl;
+                            
+                            #if DBG_FND_RNGS
+                            cout << "****** Chains " << i << " and " << l << " converge on atom " << cnva->name << " ******" << endl;
+                            #endif
+                            
                             cnvchain = l;
                             break;
                         }
@@ -888,7 +907,11 @@ int Molecule::identify_rings()
                         {
                             cnva = a;
                             cnvb = ringstmp[l][chainlen[l]-1];
-                            //cout << "***** Chains " << i << " and " << l << " converge on atoms " << cnva->name << " and " << cnvb->name << " *****" << endl;
+                            
+                            #if DBG_FND_RNGS
+                            cout << "***** Chains " << i << " and " << l << " converge on atoms " << cnva->name << " and " << cnvb->name << " *****" << endl;
+                            #endif
+                            
                             cnvchain = l;
                             break;
                         }
@@ -903,31 +926,53 @@ _done_l:
             if (cnva && cnvchain != i)
             {
                 // Count backwards from one chain until find the diverging atom, then jump to the other chain and count forward
-                // until reach the/a converging ato This is a RING; add it to the list.
+                // until reach the/a converging atom. This is a RING; add it to the list.
                 n = chainlen[i] + chainlen[cnvchain];
                 Atom* ring_atoms[n];
                 for (m=0; m<n; m++) ring_atoms[m] = nullptr;
                 n = 0;
-                // cout << "Counting backwards from " << chainlen[i]-1 << endl;
+                
+                #if DBG_FND_RNGS
+                cout << "Counting backwards from " << chainlen[i]-1 << endl;
+                #endif
+                
                 for (m = chainlen[i]-1; m >= 0; m--)
                 {
                     ring_atoms[n++] = ringstmp[i][m];
-                    // cout << "m: " << ringstmp[i][m]->name << " ";
+                    
+                    #if DBG_FND_RNGS
+                    cout << "m: " << ringstmp[i][m]->name << " ";
+                    #endif
+                    
                     l = in_array(reinterpret_cast<void*>(ringstmp[i][m]),
                                  reinterpret_cast<void**>(ringstmp[cnvchain])
                                 );
                     if (l >= 0)
                     {
                         l++;
-                        // cout << "\nCounting forwards from " << l << endl;
+                        
+                        #if DBG_FND_RNGS
+                        cout << "\nCounting forwards from " << l << endl;
+                        #endif
+                        
                         for (; ringstmp[cnvchain][l]; l++)
                         {
-                            // cout << "l: " << ringstmp[cnvchain][l]->name << " ";
+                            #if DBG_FND_RNGS
+                            cout << "l: " << ringstmp[cnvchain][l]->name << " ";
+                            #endif
+                            
                             ring_atoms[n++] = ringstmp[cnvchain][l];
-                            // cout << "Building " << n << " membered ring: "; Atom::dump_array(ring_atoms); cout << endl;
+                            
+                            #if DBG_FND_RNGS
+                            cout << "Building " << n << " membered ring: "; Atom::dump_array(ring_atoms); cout << endl;
+                            #endif
+                            
                             if (n >= 3 && (ringstmp[cnvchain][l] == cnva || ringstmp[cnvchain][l] == cnvb))
                             {
-                                // cout << "Found " << n << " membered ring: "; Atom::dump_array(ring_atoms); cout << endl;
+                                #if DBG_FND_RNGS
+                                cout << "Found " << n << " membered ring: "; Atom::dump_array(ring_atoms); cout << endl;
+                                #endif
+                                
                                 ring_atoms[n] = 0;
 
                                 int nringid = add_ring(ring_atoms);
@@ -985,7 +1030,11 @@ _exit_m:
                             is_ring[chains] = 0;
                             chainlen[chains] = chainlen[i];
                             b[j]->btom->used = true;
-                            //cout << "Another new chain " << chains << ": "; Atom::dump_array(ringstmp[chains]); cout << endl;
+                            
+                            #if DBG_FND_RNGS
+                            cout << "Another new chain " << chains << ": "; Atom::dump_array(ringstmp[chains]); cout << endl;
+                            #endif
+                            
                             chains++;
                             k++;
                             // a = 0;
@@ -997,7 +1046,10 @@ _exit_m:
                             ringstmp[i][chainlen[i]] = 0;
                             b[j]->btom->used = true;
                             k++;
-                            //cout << "Chain " << i << ": "; Atom::dump_array(ringstmp[i]); cout << endl;
+                            
+                            #if DBG_FND_RNGS
+                            cout << "Chain " << i << ": "; Atom::dump_array(ringstmp[i]); cout << endl;
+                            #endif
                         }
                     }
                 }
@@ -1441,6 +1493,7 @@ float Molecule::get_internal_clashes()
             {
                 float lclash = sphere_intersection(avdW, bvdW, r);
                 clash += lclash;
+                
                 if (false && lclash > 3)
                 {
                 	cout << atoms[i]->name << " clashes with " << atoms[j]->name << " by " << lclash << " cu. A. resulting in " << clash << endl;
@@ -2152,14 +2205,14 @@ void Molecule::intermol_conform_flexonly(Molecule** ligands, int iters, Molecule
 
 
 #define DBG_BONDFLEX 0
-#define DBG_FLEXRES 251
+#define DBG_FLEXRES 270
 #define DBG_FLEXROTB 0
 
 void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 {
     if (!mm) return;
 
-    int i, j, k, inplen, iter;
+    int i, j, k, l, n, inplen, iter;
     float rad, bestfrrad, bestfrb;
 
     for (i=0; mm[i]; i++)
@@ -2513,6 +2566,15 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 	cout << "Iter" << iter << " " << mm[i]->name;
                 #endif
                 
+                if (!iter && mm[i]->rings)
+                {
+                	for (l=0; mm[i]->rings[l]; l++)
+                	{
+                		for (n=0; mm[i]->atoms[n]; n++)
+                			mm[i]->atoms[n]->is_in_ring(mm[i]->rings[l]);
+                	}
+                }
+                
                 if (mm[i]->rotatable_bonds)
                 {
                 	#if DBG_BONDFLEX
@@ -2523,7 +2585,17 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     {
                     	#if DBG_BONDFLEX
                         if (DBG_FLEXRES == residue)
-                        	cout << k << " " << *mm[i]->rotatable_bonds[k] << " ";
+                        	cout << k << ".) " << *mm[i]->rotatable_bonds[k] << " ";
+                        	Atom** mwb = mm[i]->rotatable_bonds[k]->get_moves_with_btom();
+                        	if (mwb)
+                        	{
+                        		cout << "bringing ";
+                        		for (j=0; mwb[j]; j++)
+                        		{
+                        			cout << mwb[j]->name << " ";
+                        		}
+                        		cout << endl;
+                    		}
                         #endif
 
                         rad = 0;

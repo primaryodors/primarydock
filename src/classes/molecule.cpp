@@ -1823,8 +1823,11 @@ void Molecule::minimize_internal_clashes()
     if (!clash) return;		// Already zero, nothing to decrease to.
 
     Bond** b = get_rotatable_bonds();
-    if (!b) return;
-    if (!b[0]) return;		// No bonds to rotate.
+    if (!b || !b[0])
+    {
+    	base_internal_clashes = clash;
+    	return;		// No bonds to rotate.
+	}
 
     int numrb = 0;
     for (i=0; b[i]; i++) numrb = i;

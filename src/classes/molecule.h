@@ -138,8 +138,8 @@ class Molecule
     Ring** rings = nullptr;
     Bond** rotatable_bonds = 0;
     bool immobile = false;
-    float minclash = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
     bool doing_bkbend = false;
+    float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
     std::string sdfgen_aboutline = "";
 
     // For intermol conformer optimization:

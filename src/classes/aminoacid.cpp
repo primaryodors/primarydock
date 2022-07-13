@@ -21,7 +21,7 @@ AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa)
     immobile = false; // true;
     movability = MOV_FLEXONLY;
     from_pdb(instream);
-    minclash = get_internal_clashes();
+    base_internal_clashes = get_internal_clashes();
     mol_typ = MOLTYP_AMINOACID;
     prev_aa = prevaa;
     if (prevaa) prevaa->next_aa = this;
@@ -286,6 +286,14 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			for (i=0; atoms[i]; i++)
 			{
 				if (!atom_isheavy[i]) continue;
+				
+				// I hate doing these nonce kludges. It's nonce hence!
+				if (!strcmp(aa_defs[idx]._3let, "TRP") && atom_Greek[i] == 7)
+				{
+					atom_append[i] = 2;
+					continue;
+				}
+				
 				if (atom_Greek[i] == k)
 				{
 					if (atom_prev[i]>0
@@ -375,6 +383,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	_iagtfksb:
     	// Now name all the Greek atoms.
     	std::string strGrk = Greek;
+    	// cout << aa_defs[idx]._3let << endl;
     	for (i=0; atoms[i]; i++)
     	{
     		/*cout << i
@@ -1126,6 +1135,7 @@ int AminoAcid::from_pdb(FILE* is)
                                 if (btom)
                                 {
                                     a->bond_to(btom, aab->cardinality);
+                                    // cout << "Greek bond 1: " << a->aa3let << ":" << a->name << cardinality_printable(aab->cardinality) << btom->name << endl;
                                     if (aab->cardinality == 1 && !aab->can_rotate)
                                     {
                                         Bond* b = a->get_bond_between(btom);
@@ -1141,6 +1151,7 @@ int AminoAcid::from_pdb(FILE* is)
                             	if (btom && !btom->is_bonded_to(a))
                             	{
                             		a->bond_to(btom, aab->cardinality);
+                                    // cout << "Greek bond 2: " << a->aa3let << ":" << a->name << cardinality_printable(aab->cardinality) << btom->name << endl;
                                     if (aab->cardinality == 1 && !aab->can_rotate)
                                     {
                                         Bond* b = a->get_bond_between(btom);
@@ -1180,6 +1191,7 @@ int AminoAcid::from_pdb(FILE* is)
                     	}
                     	
                     	if (bta) a->bond_to(bta, cardinality);
+                        // cout << "Greek bond 3: " << a->aa3let << ":" << a->name << cardinality_printable(cardinality) << bta->name << endl;
                     	
                     }
                     

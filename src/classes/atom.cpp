@@ -391,6 +391,7 @@ Atom::~Atom()
 
 void Atom::unbond(Atom* btom)
 {
+	// if (btom) cout << "Unbonding " << btom->name << " from " << name << endl;
     if (bonded_to)
     {
         int i;
@@ -443,6 +444,8 @@ Point Atom::get_location()
 
 Atom** Bond::get_moves_with_btom()
 {
+	enforce_moves_with_uniqueness();
+	
     int i, cachesz=0;
     if (!moves_with_btom) fill_moves_with_cache();
     if (!moves_with_btom) return 0;
@@ -1032,11 +1035,91 @@ void Bond::fill_moves_with_cache()
     btom->used = false;
 
     if (_DBGMOVES) cout << endl << endl;
+    
+    enforce_moves_with_uniqueness();
+}
+
+void Bond::enforce_moves_with_uniqueness()
+{
+	/*if (!strcmp(atom->name, "CD1") && !strcmp(btom->name, "NE1"))
+	{
+		Ring** rr = atom->get_rings();
+		
+		cout << atom->name << " is a member of:" << endl;
+		if (rr)
+		{
+			int l;
+			
+			for (l=0; rr[l]; l++)
+			{
+				cout << *rr[l] << endl;
+			}
+			
+			delete[] rr;
+		}
+		else cout << "(no rings.)" << endl;
+		
+		rr = btom->get_rings();
+		
+		cout << btom->name << " is a member of:" << endl;
+		if (rr)
+		{
+			int l;
+			
+			for (l=0; rr[l]; l++)
+			{
+				cout << *rr[l] << endl;
+			}
+			
+			delete[] rr;
+		}
+		else cout << "(no rings.)" << endl;
+		
+		cout << endl;
+	}*/
+	
+	// Ring bond rotation is not supported currently.
+	if (atom && btom && atom->in_same_ring_as(btom))
+	{
+		can_rotate = false;
+		if (moves_with_btom) delete[] moves_with_btom;
+		moves_with_btom = nullptr;
+		// cout << atom->name << " is in the same ring as " << btom->name << "; no rotations allowed." << endl;
+		return;
+	}
+	
+	if (!moves_with_btom) return;
+	
+	int i, j, k;
+	
+	for (i=0; moves_with_btom[i]; i++)
+	{
+		for (j=i+1; moves_with_btom[j]; j++)
+		{
+			if (moves_with_btom[j] == moves_with_btom[i]
+				||
+				moves_with_btom[j]->is_backbone
+				||
+				moves_with_btom[j]->residue != btom->residue
+			   )
+			{
+				moves_with_btom[j] = 0;
+				break;
+				
+				for (k=j+1; moves_with_btom[k]; k++)
+				{
+					moves_with_btom[k-1] = moves_with_btom[k];
+				}
+				moves_with_btom[k-1] = 0;
+			}
+		}
+	}
 }
 
 bool Bond::rotate(float theta, bool allow_backbone)
 {
     if (!moves_with_btom) fill_moves_with_cache();
+    enforce_moves_with_uniqueness();
     if (!moves_with_btom) return false;
     if (!can_rotate)
     {
@@ -1364,7 +1447,11 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
     {
     	Point arom_center;
     	
-        geometry = 3;
+    	if (get_count_pi_bonds())
+    	{
+		    geometry = 3;
+        }
+        
         if (bonded_to[1].btom)
         {
         	for (j=0; member_of[j]; j++)
@@ -1748,9 +1835,22 @@ Ring** Atom::get_rings()
 	return retval;
 }
 
+bool Atom::in_same_ring_as(Atom* b)
+{
+	if (!member_of) return false;
+	
+	int i;
+	for (i=0; member_of[i]; i++)
+		if (b->is_in_ring(member_of[i])) return true;
+	
+	return false;
+}
+
 bool Atom::is_in_ring(Ring* ring)
 {
 	if (!ring) return false;
+	
+	// if (!strcmp(name, "NE1")) cout << "Checking if " << aaletter << residue << ":" << name << " is part of ring " << *ring << endl;
 	
 	// Since the objects can't be trusted to keep the damn data that have been set...
 	Atom** ra = ring->get_atoms();
@@ -1759,19 +1859,31 @@ bool Atom::is_in_ring(Ring* ring)
 	{
 		if (ra[i] == this)
 		{
+			// if (!strcmp(name, "NE1")) cout << "Yep!" << endl;
 			int j, n=0;
-			if (member_of) for (n=0; member_of[n]; n++);		// Determine length.
-			Ring** array = new Ring*[4+n];
-			for (j=0; j<n+4; j++) array[j] = nullptr;
-			if (member_of)
-				for (j=0; j<n; j++)
-					array[n] = member_of[n];
-			array[n++] = ring;
-			array[n] = nullptr;
-			if (member_of) delete[] member_of;
-			member_of = array;
+			bool already = false;
+			if (member_of) for (n=0; member_of[n]; n++) if (member_of[n] == ring) already = true;		// Determine length.
+			if (!already)
+			{
+				Ring** array = new Ring*[4+n];
+				for (j=0; j<n+4; j++) array[j] = nullptr;
+				if (member_of)
+					for (j=0; j<n; j++)
+						array[j] = member_of[j];
+				array[n++] = ring;
+				array[n] = nullptr;
+				if (member_of) delete[] member_of;
+				member_of = array;
+			}
 		}
 	}
+	
+	/*if (!strcmp(name, "NE1"))
+	{
+		cout << "----" << endl;
+		for (i=0; member_of[i]; i++) cout << *member_of[i] << endl;
+		cout << "----" << endl << endl;
+	}*/
 	
 	if (!member_of) return false;
 	for (i=0; member_of[i]; i++)
@@ -1824,6 +1936,9 @@ void Ring::fill_with_atoms(Atom** from_atoms)
 			atoms[i]->member_of = new Ring*[4];
 			atoms[i]->member_of[0] = this;
 			atoms[i]->member_of[1] = atoms[i]->member_of[2] = atoms[i]->member_of[3] = nullptr;
+			/*if (atoms[i]->aaletter == 'W') cout << "Ring::Ring(Atom**): "
+				<< atoms[i]->aa3let << atoms[i]->residue << ":" << atoms[i]->name
+				<< " is a member of a ring. " << hex << this << dec << endl;*/
 		}
 		else
 		{
@@ -1837,7 +1952,9 @@ void Ring::fill_with_atoms(Atom** from_atoms)
 			array[n] = nullptr;
 			delete[] atoms[i]->member_of;
 			atoms[i]->member_of = array;
-			// cout << "Ring::Ring(Atom**): " << atoms[i]->name << " is a member of a ring." << endl;
+			/*if (atoms[i]->aaletter == 'W') cout << "Ring::Ring(Atom**): "
+				<< atoms[i]->aaletter << atoms[i]->residue << ":" << atoms[i]->name
+				<< " is a member of a ring. " << hex << this << dec << endl;*/
 		}
 	}
 	

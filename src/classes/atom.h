@@ -32,6 +32,7 @@ class Bond
 
 	protected:
     void fill_moves_with_cache();
+    void enforce_moves_with_uniqueness();
     Atom** moves_with_btom = 0;
 };
 
@@ -140,6 +141,7 @@ class Atom
 	Ring** get_rings();
 	bool is_in_ring(Ring* ring);
 	Ring* closest_arom_ring_to(Point target);
+	bool in_same_ring_as(Atom* b);
     void aromatize()
     {
         geometry=3;

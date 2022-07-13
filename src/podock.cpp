@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sstream>
+#include <algorithm>
 #include "classes/protein.h"
 
 using namespace std;
@@ -48,6 +49,10 @@ float kJmol_cutoff = 0.01;
 bool kcal = false;
 float drift = 0.333;
 Molecule** gcfmols = NULL;
+
+bool use_bestbind_algorithm = false;		// Uses older "best binding" algorithm instead of newer "tumble spheres".
+											// Generally, tumble spheres give better results but let's leave best bind code
+											// in place because we'll be reviving it later.
 
 void iteration_callback(int iter)
 {
@@ -157,6 +162,7 @@ int main(int argc, char** argv)
     std::string CEN_buf = "";
     std::vector<std::string> pathstrs;
     std::vector<std::string> states;
+    std::vector<int> extra_wt;
 
     bool configset=false, protset=false, ligset=false, pktset=false;
     
@@ -360,6 +366,13 @@ int main(int argc, char** argv)
 	
 	char** fields = chop_spaced_fields(buffer);
 	pocketcen = pocketcen_from_config_fields(fields, nullptr);
+	if (!strcmp(fields[1], "RES"))
+	{
+		for (i=2; fields[i]; i++)
+		{
+			extra_wt.push_back(atoi(fields[i]));
+		}
+	}
     pktset = true;
 
     p.mcoord_resnos = mcoord_resno;
@@ -377,26 +390,29 @@ int main(int argc, char** argv)
     for (i=0; i<65536; i++) buffer[i] = 0;
     switch (ext[0])
     {
-    case 's':
-    case 'S':
-        // SDF
-        pf = fopen(ligfname, "r");
-        fread(buffer, 1, 65535, pf);
-        fclose(pf);
-        m.from_sdf(buffer);
-        break;
+		case 's':
+		case 'S':
+		    // SDF
+		    pf = fopen(ligfname, "r");
+		    fread(buffer, 1, 65535, pf);
+		    fclose(pf);
+		    m.from_sdf(buffer);
+		    break;
 
-    case 'p':
-    case 'P':
-        pf = fopen(ligfname, "r");
-        m.from_pdb(pf);
-        fclose(pf);
-        break;
+		case 'p':
+		case 'P':
+		    pf = fopen(ligfname, "r");
+		    m.from_pdb(pf);
+		    fclose(pf);
+		    break;
 
-    default:
-        cout << "Unrecognized ligand file extension: " << ext << endl;
-        return 0xbadf12e;
+		default:
+		    cout << "Unrecognized ligand file extension: " << ext << endl;
+		    return 0xbadf12e;
     }
+    
+    m.minimize_internal_clashes();
+    
 #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded ligand." << endl;
 #endif
@@ -414,41 +430,44 @@ int main(int argc, char** argv)
     Atom** ligbbh = new Atom*[5];
     intera_type lig_inter_typ[5];
     
-    for (i=0; i<5; i++)
+    if (use_bestbind_algorithm)
     {
-    	ligbbh[i] = NULL;
-    	lig_inter_typ[i] = vdW;
-	}
-
-	for (i=0; i<3; i++)
-	{
-		if (!ligbb[i]) continue;
-		if (ligbb[i]->get_Z() == 1)
+		for (i=0; i<5; i++)
 		{
-		    ligbbh[i] = ligbb[i];
-		    ligbb[i] = ligbbh[i]->get_bond_by_idx(0)->btom;
-		}
-		else
-		{
-		    ligbbh[i] = ligbb[i]->is_bonded_to("H");
+			ligbbh[i] = NULL;
+			lig_inter_typ[i] = vdW;
 		}
 
-		if (fabs(ligbb[i]->get_charge()) >= 1
-		        ||
-		        ligbb[i]->get_acidbase()
-		        ||
-		        (ligbbh[i] && fabs(ligbbh[i]->get_charge()) >= 1)
-		        ||
-		        (ligbbh[i] && ligbbh[i]->get_acidbase())
-		   )
-		    lig_inter_typ[i] = ionic;
-		else if (fabs(ligbb[i]->is_polar()) >= 1
-		         ||
-		         (ligbbh[i] && fabs(ligbbh[i]->is_polar()) >= 1)
-		        )
-		    lig_inter_typ[i] = hbond;
-		else if (ligbb[i]->is_pi())
-		    lig_inter_typ[i] = pi;
+		for (i=0; i<3; i++)
+		{
+			if (!ligbb[i]) continue;
+			if (ligbb[i]->get_Z() == 1)
+			{
+				ligbbh[i] = ligbb[i];
+				ligbb[i] = ligbbh[i]->get_bond_by_idx(0)->btom;
+			}
+			else
+			{
+				ligbbh[i] = ligbb[i]->is_bonded_to("H");
+			}
+
+			if (fabs(ligbb[i]->get_charge()) >= 1
+				    ||
+				    ligbb[i]->get_acidbase()
+				    ||
+				    (ligbbh[i] && fabs(ligbbh[i]->get_charge()) >= 1)
+				    ||
+				    (ligbbh[i] && ligbbh[i]->get_acidbase())
+			   )
+				lig_inter_typ[i] = ionic;
+			else if (fabs(ligbb[i]->is_polar()) >= 1
+				     ||
+				     (ligbbh[i] && fabs(ligbbh[i]->is_polar()) >= 1)
+				    )
+				lig_inter_typ[i] = hbond;
+			else if (ligbb[i]->is_pi())
+				lig_inter_typ[i] = pi;
+		}
     }
 
 #if _DBG_STEPBYSTEP
@@ -499,7 +518,7 @@ int main(int argc, char** argv)
     cout << "Ligand: " << ligfname << endl << endl;
     if (output) *output << "Ligand: " << ligfname << endl << endl;
 	
-	for (i=0; i<3; i++)
+	if (use_bestbind_algorithm) for (i=0; i<3; i++)
 	{
 		if (ligbb[i])
 		{
@@ -511,8 +530,8 @@ int main(int argc, char** argv)
 		    cout << "# Best binding hydrogen " << i << " of ligand" << endl << "# LBBH: " << ligbbh[i]->name << endl;
 		    if (output) *output << "# Best binding hydrogen " << i << " of ligand" << endl << "LBBH: " << ligbbh[i]->name << endl;
 		}
+    	cout << endl;
     }
-    cout << endl;
 
     DockResult dr[poses+2][pathnodes+2];
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
@@ -529,6 +548,134 @@ int main(int argc, char** argv)
 			p.load_pdb(pf);
 			fclose(pf);
     	}
+    	else
+    	{
+    		if (!use_bestbind_algorithm)
+    		{
+				// Begin tumble sphere behavior.
+				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, 15);
+				int tsphsz = tsphres.size();
+				float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
+				
+				for (i=0; i<tsphsz; i++)
+				{
+					// TODO: Algorithmically determine more accurate values based on interaction type, etc.
+					outer_sphere[i] = tsphres[i]->get_reach() + 2;
+					inner_sphere[i] = tsphres[i]->get_reach()/2 + 2;
+				}
+				
+				const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
+				float xrad, yrad, zrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
+				const int ac = m.get_atom_count();
+				
+				step = fiftyseventh*30;
+				bestscore = 0;
+				for (xrad=0; xrad <= M_PI*2; xrad += step)
+				{
+					for (yrad=0; yrad <= M_PI*2; yrad += step)
+					{
+						for (zrad=0; zrad <= M_PI*2; zrad += step)
+						{    					
+							score = 0;
+							for (i=0; i<ac; i++)
+							{
+								Atom* a = m.get_atom(i);
+								intera_type it = vdW;
+								
+								for (j=0; j<tsphsz; j++)
+								{
+									worth = 0.4;
+									if (a->get_charge() && tsphres[j]->get_charge()
+										&&
+										sgn(a->get_charge()) == -sgn(tsphres[j]->get_charge())
+									   ) { it = ionic; worth = 100; }
+									else if (a->get_charge() || a->is_polar()) { it = hbond; worth = 40; }
+									else if (a->is_pi()) { it = pi; worth = 7; }
+									
+									if (tsphres[j]->capable_of_inter(it))
+									{
+										float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));
+										if (r <= outer_sphere[j])
+										{	if (r > inner_sphere[j])
+											{
+												weight = 1;
+								
+												if (extra_wt.size()
+													&&
+													std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
+												   )
+												{
+													weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+												}
+												
+												score += worth * weight;
+											}
+											else
+											{	score -= 200;
+											}
+										}
+									}
+								}
+							}
+							
+							if (score > bestscore)
+							{
+								bestxr = xrad;
+								bestyr = yrad;
+								bestzr = zrad;
+								bestscore = score;
+							}
+							
+							m.rotate(zaxis, step);
+						}
+						m.rotate(yaxis, step);
+					}
+					m.rotate(xaxis, step);
+				}
+				
+				cout << "Tumble sphere best score " << bestscore << " for "
+					 << "x" << bestxr*fiftyseven << "deg, "
+					 << "y" << bestyr*fiftyseven << "deg, "
+					 << "z" << bestzr*fiftyseven << "deg."
+					 << endl;
+				
+				// Rotate the molecule into the best position.
+				m.rotate(xaxis, bestxr);
+				m.rotate(yaxis, bestyr);
+				m.rotate(zaxis, bestzr);
+				
+				// Minimize ligand clashes.
+				for (i=0; i<tsphsz; i++)
+				{
+					Bond** tsphb = tsphres[i]->get_rotatable_bonds();
+					if (tsphb)
+					{
+						for (j=0; tsphb[j]; j++)
+						{
+							float rad=0, bestrad=0, clash, bestclash=6.25e24;
+							for (rad=0; rad < M_PI*2; rad += step)
+							{
+								clash = tsphres[i]->get_intermol_clashes(&m);
+								
+								if (clash < bestclash)
+								{
+									bestrad = rad;
+									bestclash = clash;
+								}
+								
+								tsphb[j]->rotate(step);
+							}
+							
+							tsphb[j]->rotate(bestrad);
+						}
+						// delete[] tsphb;
+					}
+				}
+				
+				// End tumble sphere behavior.
+			}
+    	}
+    	
 #if _DBG_STEPBYSTEP
         if (debug) *debug << "Pose " << pose << endl;
 #endif
@@ -537,6 +684,8 @@ int main(int argc, char** argv)
 
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
+        	if (pathstrs.size() < nodeno) break;
+        	
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
 #endif
@@ -578,6 +727,14 @@ int main(int argc, char** argv)
                 strcpy(buffer, pathstrs[nodeno].c_str());
                 fields = chop_spaced_fields(buffer);
                 nodecen = pocketcen_from_config_fields(fields, &nodecen);
+				if (!strcmp(fields[1], "RES"))
+				{
+					extra_wt.clear();
+					for (i=2; fields[i]; i++)
+					{
+						extra_wt.push_back(atoi(fields[i]));
+					}
+				}
                 
 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added whatever points together." << endl;
@@ -623,14 +780,19 @@ int main(int argc, char** argv)
                 	alignment_aa[l]=0;
                 	alignment_distance[l]=0;
             	}
+            	
+            	for (l=0; l<=pathnodes; l++)
+            	{
+            		dr[drcount][l].metric = 0;
+            	}
+            	
 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Initialize null AA pointer." << endl;
 #endif
 
-                // Rotate the ligand in space so that its strongest binding atom points to a binding
-                // pocket feature with a strong potential binding.
+                // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
-                for (l=0; l<3; l++)
+                if (use_bestbind_algorithm) for (l=0; l<3; l++)
 				{
 					if (!ligbb[l]) continue;
                 	float alignment_potential = 0;
@@ -644,7 +806,7 @@ int main(int argc, char** argv)
 		                
 		                if (l && reaches_spheroid[nodeno][i] == alignment_aa[l-1]) continue;
 		                if (l>1 && reaches_spheroid[nodeno][i] == alignment_aa[l-2]) continue;
-
+		                
 #if _DBG_STEPBYSTEP
 		                if (debug)
 		                {
@@ -661,7 +823,18 @@ int main(int argc, char** argv)
 						
 		                float pottmp = reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb[l]);
 		                if (ligbbh[l]) pottmp += reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh[l]);
-		                pottmp /= pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter());
+		                
+		                if (extra_wt.size()
+		                	&&
+		                	std::find(extra_wt.begin(), extra_wt.end(), reaches_spheroid[nodeno][i]->get_residue_no())!=extra_wt.end()
+		                   )
+		                {
+		                	pottmp *= 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+		                }
+		                else
+		                {
+		                	pottmp /= pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter());
+	                	}
 		                // cout << reaches_spheroid[nodeno][i]->get_3letter() << reaches_spheroid[nodeno][i]->get_residue_no() << " " << pottmp << endl;
 		                if (reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ[l])
 		                        &&
@@ -687,7 +860,7 @@ int main(int argc, char** argv)
                 if (debug) *debug << "Selected an alignment AA." << endl;
 #endif
 
-                if (met)
+                if (use_bestbind_algorithm && met)
                 {
                     alignment_aa[0] = met;
                     // alignment_name = "metal";
@@ -696,7 +869,7 @@ int main(int argc, char** argv)
                 if (debug) *debug << "Alignment AA." << endl;
 #endif
 
-                for (l=0; l<3; l++)
+				if (use_bestbind_algorithm)	for (l=0; l<3; l++)
 				{
                 	if (alignment_aa[l])
 		            {
@@ -811,8 +984,8 @@ int main(int argc, char** argv)
 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Aligned ligand to AA." << endl;
 #endif
+    			cout << endl;
             }
-    		cout << endl;
 
             // float driftamt = 1.0 / (iters/25+1);
             // cout << pose << ":" << nodeno << " drift " << driftamt << endl;
@@ -874,6 +1047,7 @@ int main(int argc, char** argv)
                 strcpy(metrics[metcount], "Metals");
                 mkJmol[metcount++] = lb;
                 btot += lb;
+                // cout << "Metal adds " << lb << " to btot, making " << btot << endl;
             }
 
             sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, mcoord_resno);
@@ -889,6 +1063,7 @@ int main(int argc, char** argv)
                 // cout << metrics[metcount] << ": " << lb << " . ";
                 mkJmol[metcount++] = lb;
                 btot += lb;
+                // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;
             }
             // cout << btot << endl;
 
@@ -900,8 +1075,9 @@ int main(int argc, char** argv)
             if (debug) *debug << "Prepared metrics." << endl;
 #endif
 
+            // Allocate the array.
             dr[drcount][nodeno].kJmol = btot;
-            dr[drcount][nodeno].metric = new char*[metcount+2];
+            dr[drcount][nodeno].metric = new char*[metcount+4];
             dr[drcount][nodeno].mkJmol = new float[metcount];
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
@@ -915,6 +1091,7 @@ int main(int argc, char** argv)
             if (debug) *debug << "Filled btypes." << endl;
 #endif
 
+			// Populate the array.
             for (i=0; i<metcount; i++)
             {
                 dr[drcount][nodeno].metric[i] = new char[max(8,(int)strlen(metrics[i])+4)];
@@ -922,8 +1099,11 @@ int main(int argc, char** argv)
                 dr[drcount][nodeno].mkJmol[i] = mkJmol[i];
                 // cout << "*" << dr[drcount][nodeno].metric[i] << ": " << dr[drcount][nodeno].mkJmol[i] << endl;
             }
+            
+            // Terminate with an empty string and a null pointer.
             dr[drcount][nodeno].metric[i] = new char[1];
             dr[drcount][nodeno].metric[i][0] = 0;
+            dr[drcount][nodeno].metric[i+1] = 0;
 #if _DBG_STEPBYSTEP
             if (debug) *debug << "More metrics or something idfk." << endl;
 #endif
@@ -1015,11 +1195,14 @@ int main(int argc, char** argv)
 
                         cout << "# Binding energies" << endl << "BENERG:" << endl;
                         if (output) *output << "# Binding energies" << endl << "BENERG:" << endl;
-                        for (l=0;
-                                dr[j][k].metric
-                                && dr[j][k].metric[l]
-                                && dr[j][k].metric[l][0];
-                                l++)
+                        for (	l=0;
+                        
+		                        dr[j][k].metric
+		                        && dr[j][k].metric[l]
+		                        && dr[j][k].metric[l][0];
+		                        
+		                        l++
+		                    )
                         {
                             cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
                             if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
@@ -1063,7 +1246,7 @@ _btyp_unassigned:
 
                         if (!dr[j][k].pdbdat.length())
                         {
-                            cout << "Uh-oh!" << endl;
+                            cout << "WARNING: Failed to generate PDB data." << endl;
                             if (output) *output << "(Missing PDB data.)" << endl;
                         }
                         else

@@ -530,8 +530,8 @@ int main(int argc, char** argv)
 		    cout << "# Best binding hydrogen " << i << " of ligand" << endl << "# LBBH: " << ligbbh[i]->name << endl;
 		    if (output) *output << "# Best binding hydrogen " << i << " of ligand" << endl << "LBBH: " << ligbbh[i]->name << endl;
 		}
+    	cout << endl;
     }
-    cout << endl;
 
     DockResult dr[poses+2][pathnodes+2];
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
@@ -984,8 +984,8 @@ int main(int argc, char** argv)
 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Aligned ligand to AA." << endl;
 #endif
+    			cout << endl;
             }
-    		cout << endl;
 
             // float driftamt = 1.0 / (iters/25+1);
             // cout << pose << ":" << nodeno << " drift " << driftamt << endl;

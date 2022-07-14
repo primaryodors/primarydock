@@ -311,6 +311,74 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 
         j++;
     }
+    
+    Atom *H = nullptr, *O = nullptr;
+    Bond *brot = nullptr;
+    if (a->get_Z() == 1 && b->get_Z() == 8)
+    {
+    	Atom* HO = a->is_bonded_to("O");
+    	if (HO)
+    	{
+    		Bond** bb = HO->get_bonds();
+    		if (bb)
+    		{
+    			for (i=0; bb[i]; i++)
+    			{
+    				if (bb[i]->btom != a && bb[i]->can_rotate)
+    				{
+    					brot = bb[i];
+    					H = a;
+    					O = b;
+    					break;
+    				}
+    			}
+    			
+    			delete[] bb;
+    		}
+    	}
+    }
+    else if (b->get_Z() == 1 && a->get_Z() == 8)
+    {
+    	Atom* HO = b->is_bonded_to("O");
+    	if (HO)
+    	{
+    		Bond** bb = HO->get_bonds();
+    		if (bb)
+    		{
+    			for (i=0; bb[i]; i++)
+    			{
+    				if (bb[i]->btom != b && bb[i]->can_rotate)
+    				{
+    					brot = bb[i];
+    					H = b;
+    					O = a;
+    					break;
+    				}
+    			}
+    			
+    			delete[] bb;
+    		}
+    	}
+    }
+    
+    if (H && O && brot)
+    {
+    	float rad, step = 30*fiftyseventh, bestr=999999, bestrad=0;
+    	
+    	for (rad=0; rad < M_PI*2; rad += step)
+    	{
+    		float r = H->distance_to(O);
+    		if (r < bestr && r >= 1.6)			// WARNING: Hard coded value.
+    		{
+    			bestrad = rad;
+    			bestr = r;
+    		}
+    		
+    		brot->rotate(step);
+    	}
+    	
+    	if (bestrad) brot->rotate(bestrad);
+    }
 
     for (i=0; look[i]; i++)
     {

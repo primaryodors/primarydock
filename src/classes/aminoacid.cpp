@@ -1560,6 +1560,10 @@ std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 bool AminoAcid::capable_of_inter(intera_type inter)
 {
     if (!atoms) return false;
+    
+    // Lysine and arginine cannot coordinate metals. Histidine is not normally protonated so it is free for metal coordination.
+    // We see real world instances where a mutation of H to R in a metal binding site renders the entire protein nonfunctional.
+    if (inter == mcoord && get_charge() > 0) return false;			
 
     int i, j;
     for (i=0; atoms[i]; i++)

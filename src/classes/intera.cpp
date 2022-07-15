@@ -259,7 +259,8 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
                     break;
 
                 case mcoord:
-                    return true;
+                	if (a->get_charge() <= 0)		// -NH3+ groups would be unable to coordinate metals because of the steric hindrance of the extra proton.
+                    	return true;
                     break;
 
                 case vdW:

@@ -95,9 +95,9 @@ NH      N      hbond    0.5   1.6?       13           3.5
 NH      O      hbond    0.5   1.66        8           1.6
 OH      N      hbond    0.5   1.88       29           3.5
 OH      O      hbond    0.5   1.97       21           1.6
-OH      S      hbond    0.5   2.8?        4?          5
+OH      S      hbond    0.25  2.8?        4?          5
+SH      S      hbond    0.25  2.8?        4?          5
 FH      F      hbond    0.5   2.0?      161.5         ?
-
 
 # https://pubs.acs.org/doi/abs/10.1021/jz502150d?source=cen
 OH      P      hbond    0.5   2.6        18           11?

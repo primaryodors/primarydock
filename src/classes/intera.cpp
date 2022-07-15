@@ -515,7 +515,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     // is calculated as a cosine and then raised to this exponent.
     Point center;
 
-    if (!forces) goto _canstill_clash;
+	if (sgn(a->is_polar()) == sgn(b->is_polar())) kJmol -= 30 / pow(r, 2) * fabs(a->is_polar()) * fabs(b->is_polar());
+    if (!forces)
+    {
+    	goto _canstill_clash;
+	}
 
     if (r < 0.5) forces[0] = NULL;
 
@@ -584,12 +588,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (a->is_polar() < 0 && b->is_polar() >= 0)
             {
                 dpa = dp;
-                dpb = 2;		// Assume same for all donors.
+                dpb = 3;		// Assume same for all donors.
             }
             else if (b->is_polar() < 0 && a->is_polar() >= 0)
             {
                 dpb = dp;
-                dpa = 2;
+                dpa = 3;
             }
             else dpa = dpb = dp;
         }

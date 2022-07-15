@@ -2208,7 +2208,7 @@ void Molecule::intermol_conform_flexonly(Molecule** ligands, int iters, Molecule
 
 
 #define DBG_BONDFLEX 0
-#define DBG_FLEXRES 270
+#define DBG_FLEXRES 203
 #define DBG_FLEXROTB 0
 
 void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
@@ -2290,7 +2290,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 {
                 	// cout << bind << " vs " << bind1 << " +" << endl;
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmx) < 0.25) mm[i]->lmx *= accel;
+                    if (fabs(mm[i]->lmx) < 0.5) mm[i]->lmx *= accel;
                     bind = bind1;
                 }
 
@@ -2312,7 +2312,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 else
                 {
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmy) < 0.25) mm[i]->lmy *= accel;
+                    if (fabs(mm[i]->lmy) < 0.5) mm[i]->lmy *= accel;
                     bind = bind1;
                 }
 
@@ -2334,12 +2334,12 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 else
                 {
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmz) < 0.25) mm[i]->lmz *= accel;
+                    if (fabs(mm[i]->lmz) < 0.5) mm[i]->lmz *= accel;
                     bind = bind1;
                 }
                 
                 Point lmpt(mm[i]->lmx, mm[i]->lmy, mm[i]->lmz);
-                if (lmpt.magnitude() > 0.5)
+                if (lmpt.magnitude() > 1.5)
                 {
                 	float lmm = 0.5 / lmpt.magnitude();
                 	mm[i]->lmx *= lmm;
@@ -2348,7 +2348,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
-                	float lmm = 0.95;
+                	float lmm = 0.97;
                 	mm[i]->lmx *= lmm;
                 	mm[i]->lmy *= lmm;
                 	mm[i]->lmz *= lmm;
@@ -2588,6 +2588,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     {
                     	#if DBG_BONDFLEX
                         if (DBG_FLEXRES == residue)
+                        {
                         	cout << k << ".) " << *mm[i]->rotatable_bonds[k] << " ";
                         	Atom** mwb = mm[i]->rotatable_bonds[k]->get_moves_with_btom();
                         	if (mwb)
@@ -2599,6 +2600,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         		}
                         		cout << endl;
                     		}
+                		}
                         #endif
 
                         rad = 0;

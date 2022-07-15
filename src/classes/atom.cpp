@@ -1127,7 +1127,13 @@ bool Bond::rotate(float theta, bool allow_backbone)
         else return false;
     }
     // cout << "Rotate " << atom->name << cardinality_printable(cardinality) << btom->name << endl;
-
+    
+    if (atom->residue && greek_from_aname(atom->name) > greek_from_aname(btom->name))
+    {
+    	can_rotate = false;
+    	return false;
+    }
+    
     int i;
     Point cen = btom->get_location();
     Point bas = atom->get_location();
@@ -1164,6 +1170,12 @@ bool Bond::rotate(float theta, bool allow_backbone)
 
         Point loc = moves_with_btom[i]->get_location();
         Point nl  = rotate3D(&loc, &cen, &v, theta);
+        
+        /*if (moves_with_btom[i]->residue == 203 && !strcmp(moves_with_btom[i]->name, "HB1"))
+        	cout << "Moving " << moves_with_btom[i]->residue << ":" << moves_with_btom[i]->name << " about axis "
+        		 << atom->residue << ":" << atom->name << " - " << btom->residue << ":" << btom->name
+        		 << endl;*/
+        
         // cout << moves_with_btom[i]->name << loc << " " << (theta*fiftyseven) << " " << nl << endl;
         moves_with_btom[i]->move(&nl);
         moves_with_btom[i]->rotate_geometry(rot);

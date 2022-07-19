@@ -43,7 +43,8 @@ class Molecule
     int from_pdb(FILE* inf);				// returns number of atoms loaded.
     void identify_acidbase();				// called within every load.
     bool from_smiles(char const * smilesstr);
-    float close_loop(Atom** path, float closing_bond_cardinality);
+    void save_state();
+    void restore_state();
 
     // Getters.
     const char* get_name() const	{	return name;	}
@@ -63,6 +64,7 @@ class Molecule
     void rotate(LocatedVector SCoord, float theta);
     bool shielded(Atom* a, Atom* b) const;
     float correct_structure(int iters = 500);
+    float close_loop(Atom** path, float closing_bond_cardinality);
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -143,6 +145,8 @@ class Molecule
     bool doing_bkbend = false;
     float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
     std::string sdfgen_aboutline = "";
+    
+    std::vector<Point> saved_atom_locs;
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.

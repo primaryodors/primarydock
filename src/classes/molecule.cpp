@@ -225,6 +225,25 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
     }
 }
 
+void Molecule::save_state()
+{
+	saved_atom_locs.clear();
+	
+	if (!atoms) return;
+	int i;
+	for (i=0; atoms[i]; i++)
+		saved_atom_locs.push_back(atoms[i]->get_location());
+}
+
+void Molecule::restore_state()
+{
+	if (!atoms) return;
+	int i, n = saved_atom_locs.size();
+	
+	for (i=0; i<n && atoms[i]; i++)
+		atoms[i]->move(saved_atom_locs[i]);
+}
+
 void Molecule::clear_all_bond_caches()
 {
     Bond** b = get_rotatable_bonds();

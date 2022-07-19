@@ -70,6 +70,7 @@ class Protein
     std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
     Point get_region_center(int startres, int endres);
     float get_helix_orientation(int startres, int endres);
+    Point find_loneliest_point(Point search_center, Point spheroid_size);
 
     // Motion functions
     void move_piece(int start_res, int end_res, Point new_center);		// After calling this, you should reconnect the broken ends with conform_backbone().

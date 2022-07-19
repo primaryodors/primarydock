@@ -997,6 +997,14 @@ Molecule** AminoAcid::aas_to_mols(AminoAcid** aas)
 	return mols;
 }
 
+std::string AminoAcid::printable()
+{
+	stringstream s;
+	s << *this;
+	return s.str();
+}
+
+
 void AminoAcid::save_pdb(FILE* os, int atomno_offset)
 {
     int i;

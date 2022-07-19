@@ -1798,7 +1798,50 @@ void Protein::rotate_piece(int start_res, int end_res, int align_res, Point alig
 	}
 }
 
-
+Point Protein::find_loneliest_point(Point cen, Point sz)
+{
+	if (!residues) return cen;
+	
+	float x, y, z, xp, yp, zp, r, bestr = 0, step = 0.25;
+	int i;
+	Point retval = cen;
+	
+	for (x = -sz.x; x <= sz.x; x += step)
+	{
+		xp = x / sz.x; xp *= xp;
+		for (y = -sz.y; y <= sz.y; y += step)
+		{
+			yp = y / sz.y; yp *= yp;
+			for (z = -sz.z; z <= sz.z; z += step)
+			{
+				zp = z / sz.z; zp *= zp;
+				r = sqrt(xp+yp+zp);
+				if (r > 1) continue;
+				
+				Point maybe(sz.x + x, sz.y + y, sz.z + z);
+				float minr = Avogadro;
+				
+				for (i=0; residues[i]; i++)
+				{
+					Atom* a = residues[i]->get_nearest_atom(maybe);
+					if (a)
+					{
+						r = a->get_location().get_3d_distance(maybe);
+						if (r < minr) minr = r;
+					}
+				}
+				
+				if (minr < 1e9 && minr > bestr)
+				{
+					retval = maybe;
+					bestr = minr;
+				}
+			}
+		}
+	}
+	
+	return retval;
+}
 
 
 

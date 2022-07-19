@@ -159,6 +159,8 @@ int main(int argc, char** argv)
     Point pocketcen;
     std::ofstream *output = NULL;
     
+    std::vector<int> exclusion;
+    
     std::string CEN_buf = "";
     std::vector<std::string> pathstrs;
     std::vector<std::string> states;
@@ -219,6 +221,14 @@ int main(int argc, char** argv)
                 pocketcen.z = atof(fields[3]);
                 pktset = true;
                 */
+            }
+            else if (!strcmp(fields[0], "EXCL"))
+            {
+            	i=1;
+            	int excls = atoi(fields[i++]);
+            	int excle = atoi(fields[i++]);
+            	
+            	for (i=excls; i<=excle; i++) exclusion.push_back(i);
             }
             else if (!strcmp(fields[0], "PATH"))
             {
@@ -559,6 +569,16 @@ int main(int argc, char** argv)
 				
 				for (i=0; i<tsphsz; i++)
 				{
+					if (exclusion.size()
+						&&
+						std::find(exclusion.begin(), exclusion.end(), tsphres[i]->get_residue_no())!=exclusion.end()
+					   )
+					{
+						tsphres.erase(tsphres.begin()+i);
+						tsphsz--;
+						continue;
+					}
+
 					// TODO: Algorithmically determine more accurate values based on interaction type, etc.
 					outer_sphere[i] = tsphres[i]->get_reach() + 2;
 					inner_sphere[i] = tsphres[i]->get_reach()/2 + 2;
@@ -760,6 +780,19 @@ int main(int argc, char** argv)
 
             sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, mcoord_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
+            
+            for (i=0; i<sphres; i++)
+            {
+            	if (exclusion.size()
+					&&
+					std::find(exclusion.begin(), exclusion.end(), reaches_spheroid[nodeno][i]->get_residue_no())!=exclusion.end()
+				   )
+				{
+					for (j=i; j<sphres; j++) reaches_spheroid[nodeno][j] = reaches_spheroid[nodeno][j+1];
+					sphres--;
+					reaches_spheroid[nodeno][sphres] = nullptr;
+				}
+            }
 
             /*cout << "Dock residues for node " << nodeno << ": " << endl;
             if (output) *output << "Dock residues for node " << nodeno << ": " << endl;

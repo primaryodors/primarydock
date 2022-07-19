@@ -176,6 +176,24 @@ bool Protein::add_sequence(const char* lsequence)
     return true;
 }
 
+void Protein::save_state()
+{
+	if (!residues) return;
+	int i;
+	
+	for (i=0; residues[i]; i++)
+		residues[i]->save_state();
+}
+
+void Protein::restore_state()
+{
+	if (!residues) return;
+	int i;
+	
+	for (i=0; residues[i]; i++)
+		residues[i]->restore_state();
+}
+
 void Protein::save_pdb(FILE* os)
 {
     int i, offset=0;
@@ -502,6 +520,9 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
 {
 	std::vector<AminoAcid*> retval;
 	
+	float cb_tolerance_angle = 44 * fiftyseventh;
+	float tolerance_sine = sin(cb_tolerance_angle);
+	
 	if (!residues) return retval;
 	int i, j;
 	
@@ -512,7 +533,9 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
     	if (facing && residues[i]->get_atom("CB"))
     	{
     		float r1 = pt.get_3d_distance(residues[i]->get_atom_location("CB"));
-    		if (r1 > r) continue;
+    		float r2 = residues[i]->get_atom_location("CA").get_3d_distance(residues[i]->get_atom_location("CB"));
+    		float tolerance = r2 * tolerance_sine;
+    		if (r1 > r+tolerance) continue;
     	}
     	
     	if (r <= maxr) retval.push_back(residues[i]);
@@ -548,7 +571,7 @@ AminoAcid** Protein::get_residues_can_clash(int resno)
 }
 
 int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
-        const Molecule* ligand,
+        Molecule* ligand,
         const Point nodecen,
         const Point size,
         const int* mcoord_resno

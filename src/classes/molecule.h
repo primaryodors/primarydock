@@ -100,6 +100,8 @@ class Molecule
     float get_intermol_clashes(Molecule** ligands);
     float get_intermol_binding(Molecule* ligand);
     float get_intermol_binding(Molecule** ligands);
+    float get_intermol_potential(Molecule* ligand);
+    float get_intermol_potential(Molecule** ligands);
     float hydrophilicity();
 
     static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);

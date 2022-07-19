@@ -2,13 +2,17 @@
 PrimaryOdors.org molecular docker.<br>
 http://www.primaryodors.org
 
-PODock is a lightweight molecular docking software package that allows path-based docking, side-chain flexion, and binding strength
-measurement at the residue level and per binding type. It uses data files so atomic and interatomic parameters can be fully customized
-without having to recompile the code.
+PODock is a fast, lightweight molecular docking software package that offers the following advantages:
+- Path-based docking;
+- Native support for side-chain flexion;
+- Per-residue binding strength output;
+- Per-binding-type binding strength output;
+- Small self contained codebase with no extraordinary dependencies;
+- Does not require CMake, but can be built on any recent *nix system using make, g++, and the C++14 Standard Library;
+- Interatomic parameters stored in flat text files that can be edited without recompiling the application.
 
-To Use PODock, first clone the repository, then execute the following commands:
+To Use PODock, please first clone the repository, then execute the following command:
 
-For Linux:
 ```
 make podock
 ```
@@ -18,12 +22,8 @@ If you are a developer contributing to the project, you can use `make` to build 
 
 The application will require 3D maps of your target receptor(s) in PDB format. Please note that PODock does not currently
 hydrogenate PDB models that do not include hydrogen atoms, so if your model contains heavy atoms only, the accuracy of
-docking results may be severely compromised.
-
-PDBs for human olfactory receptors can be downloaded from here:<br>
-http://primaryodors.org/ors.php
-
-(Simply click on the receptor of interest, click on the Info tab, and then click Download PDB.)
+docking results may be severely compromised. PDBs for human olfactory receptors are provided in the pdbs folder for olfactory
+docking. They have been modified from the PDBs available at the GPCR-I-TASSER website: https://zhanggroup.org/GPCR-I-TASSER/
 
 It will also be necessary to obtain 3D models of your ligand(s). Currently, only SDF format is supported.
 SDFs can be obtained a few different ways:
@@ -60,9 +60,9 @@ If you would like to contribute to this project:
 </ol>
 
 Note to developers: if you run podock under a memory utility such as valgrind, you are likely to see a lot of errors saying that
-uninitialized variables are being used or that conditional jumps depend on them. These are false positives. Many places in the code
-create temporary arrays of pointers and then assign those pointers addresses of objects that persist throughout the entire program
-execution. The memory tool "thinks" the objects are uninitialized even when they are. We recommend using the --undef-value-errors=no
+uninitialized variables are being used or that conditional jumps depend on them. Most of these are false positives. Many places in the
+code create temporary arrays of pointers and then assign those pointers addresses of objects that persist throughout the entire program
+execution. The memory tool "thinks" the objects have not been initialized even when they have. We recommend using the --undef-value-errors=no
 option with valgrind or the equivalent switch in your utility of choice.
 
 

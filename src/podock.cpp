@@ -537,7 +537,7 @@ int main(int argc, char** argv)
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
     int drcount = 0;
 
-    srand(0xb0ad1cea);
+    srand(0xb00d1cca);
     // srand(time(NULL));
     for (pose=1; pose<=poses; pose++)
     {

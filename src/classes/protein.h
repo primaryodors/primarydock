@@ -37,6 +37,8 @@ class Protein
     int load_pdb(FILE* infile);				// Returns number of residues loaded.
     void save_pdb(FILE* outfile);
     void end_pdb(FILE* outfile);
+    void save_state();
+    void restore_state();
 
     // Getters.
     int get_seq_length();
@@ -60,7 +62,7 @@ class Protein
     AminoAcid** get_residues_can_clash(int resno);
     int get_residues_can_clash_ligand
     (	AminoAcid** reaches_spheroid,
-        const Molecule* ligand,
+        Molecule* ligand,
         const Point nodecen,
         const Point size,
         const int* mcoord_resno
@@ -100,18 +102,18 @@ class Protein
     int* mcoord_resnos = NULL;
 
 	protected:
-    Atom** ca=0;
+    Atom** ca = nullptr;
     std::string name;
-    char* sequence=0;
-    AminoAcid** residues=0;
-    AminoAcid*** res_can_clash = 0;
-    float* res_reach=0;
-    Atom** metals=0;
-    int metcount=0;
+    char* sequence = nullptr;
+    AminoAcid** residues = nullptr;
+    AminoAcid*** res_can_clash = nullptr;
+    float* res_reach = nullptr;
+    Atom** metals = nullptr;
+    int metcount = 0;
     Star aaptrmin, aaptrmax;
     Region regions[PROT_MAX_RGN];
     std::vector<string> remarks;
-    MetalCoord** m_mcoord=0;
+    MetalCoord** m_mcoord = nullptr;
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);

@@ -56,11 +56,16 @@ bool use_bestbind_algorithm = false;		// Uses older "best binding" algorithm ins
 
 void iteration_callback(int iter)
 {
+	#if !allow_iter_cb
+	return;
+	#endif
+	
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     if (iter == (iters-1)) return;
 
     Point bary = ligand->get_barycenter();
 
+	#if allow_drift
     if (bary.get_3d_distance(ligcen_target) > size.magnitude())
     {
         //cout << "Wrangle! " << bary << ": " << bary.get_3d_distance(ligcen_target) << " vs. " << size.magnitude() << endl;
@@ -77,6 +82,7 @@ void iteration_callback(int iter)
     ligand->recenter(bary);
 
     drift *= (1.0 - 0.5/iters);
+    #endif
 
     if (gcfmols && seql)
     {
@@ -321,9 +327,9 @@ int main(int argc, char** argv)
                     cout << "Missing debug file name; check config file." << endl;
                     throw 0xbadf12e;
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 cout << "Starting a debug outstream." << endl;
-#endif
+				#endif
                 debug = new std::ofstream(fields[1], std::ofstream::out);
             }
             else if (!strcmp(fields[0], "OUT"))
@@ -333,9 +339,9 @@ int main(int argc, char** argv)
                     cout << "Missing output file name; check config file." << endl;
                     throw 0xbadf12e;
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 cout << "Starting a file outstream." << endl;
-#endif
+				#endif
                 output = new std::ofstream(fields[1], std::ofstream::out);
             }
 
@@ -344,9 +350,9 @@ int main(int argc, char** argv)
         buffer[0] = 0;
     }
     fclose(pf);
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded config file." << endl;
-#endif
+	#endif
 
 	if (kcal) kJmol_cutoff /= _kcal_per_kJ;
     drift = 1.0 / (iters/25+1);
@@ -362,9 +368,9 @@ int main(int argc, char** argv)
     }
     p.load_pdb(pf);
     fclose(pf);
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
-#endif
+	#endif
 
 	if (!CEN_buf.length())
 	{
@@ -423,16 +429,16 @@ int main(int argc, char** argv)
     
     m.minimize_internal_clashes();
     
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded ligand." << endl;
-#endif
+	#endif
 
     Point box = m.get_bounding_box();
 
     if (debug) *debug << "Ligand bounding box corner (centered at zero): " << box.printable() << endl;
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Ligand bounding box." << endl;
-#endif
+	#endif
 
     // Identify the ligand atom with the greatest potential binding.
     int j, k, l, n;
@@ -480,9 +486,9 @@ int main(int argc, char** argv)
 		}
     }
 
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Identified best binding ligand atoms." << endl;
-#endif
+	#endif
 
     int pose, nodeno, iter;
     Point nodecen = pocketcen;
@@ -497,9 +503,9 @@ int main(int argc, char** argv)
     // When docking with a metalloprotein, use this temporary Molecule for interactions the same as
     // we use AminoAcid objects, except don't attempt to flex the metals object.
     Molecule* met = p.metals_as_molecule();
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Created metals molecule." << endl;
-#endif
+	#endif
 
     float bclash = 0;
 
@@ -696,9 +702,9 @@ int main(int argc, char** argv)
 			}
     	}
     	
-#if _DBG_STEPBYSTEP
+		#if _DBG_STEPBYSTEP
         if (debug) *debug << "Pose " << pose << endl;
-#endif
+		#endif
         nodecen = pocketcen;
         nodecen.weight = 1;
 
@@ -706,9 +712,9 @@ int main(int argc, char** argv)
         {
         	if (pathstrs.size() < nodeno) break;
         	
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
-#endif
+			#endif
             if (nodeno)
             {
             	for (i=0; i<states.size(); i++)
@@ -756,26 +762,26 @@ int main(int argc, char** argv)
 					}
 				}
                 
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added whatever points together." << endl;
-#endif
+			#endif
             }
             Point lastnodecen = nodecen;
             ligcen_target = nodecen;
 
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Saved last nodecen." << endl;
-#endif
+			#endif
 
             // Move the ligand to the new node center.
-            m.recenter(nodecen);
-#if _DBG_STEPBYSTEP
+            // m.recenter(nodecen);
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Molecule recenter (or not)." << endl;
-#endif
+			#endif
             m.reset_conformer_momenta();
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Conformer momenta reset." << endl;
-#endif
+			#endif
 
 
             sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, mcoord_resno);
@@ -819,9 +825,9 @@ int main(int argc, char** argv)
             		dr[drcount][l].metric = 0;
             	}
             	
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Initialize null AA pointer." << endl;
-#endif
+				#endif
 
                 // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
@@ -840,7 +846,7 @@ int main(int argc, char** argv)
 		                if (l && reaches_spheroid[nodeno][i] == alignment_aa[l-1]) continue;
 		                if (l>1 && reaches_spheroid[nodeno][i] == alignment_aa[l-2]) continue;
 		                
-#if _DBG_STEPBYSTEP
+						#if _DBG_STEPBYSTEP
 		                if (debug)
 		                {
 		                    *debug << "Check capable of inter (" << i << ") ";
@@ -852,7 +858,7 @@ int main(int argc, char** argv)
 		                    *debug << *reaches_spheroid[nodeno][i];
 		                    *debug << endl;
 		                }
-#endif
+						#endif
 						
 		                float pottmp = reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb[l]);
 		                if (ligbbh[l]) pottmp += reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh[l]);
@@ -884,23 +890,23 @@ int main(int argc, char** argv)
 		                    alignment_potential = pottmp;
 		                    alignment_distance[l] = potential_distance;
 		                }
-#if _DBG_STEPBYSTEP
+						#if _DBG_STEPBYSTEP
                     	if (debug) *debug << "Candidate alignment AA." << endl;
-#endif
+						#endif
 	                }
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Selected an alignment AA." << endl;
-#endif
+				#endif
 
                 if (use_bestbind_algorithm && met)
                 {
                     alignment_aa[0] = met;
                     // alignment_name = "metal";
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Alignment AA." << endl;
-#endif
+				#endif
 
 				if (use_bestbind_algorithm)	for (l=0; l<3; l++)
 				{
@@ -915,9 +921,9 @@ int main(int argc, char** argv)
 		                    // alca = alignment_aa->get_atom("CA");
 		                    alca = alignment_aa[l]->get_most_bindable(1)[0];
 		                }
-#if _DBG_STEPBYSTEP
+						#if _DBG_STEPBYSTEP
                     	if (debug) *debug << "Got alignment atom." << endl;
-#endif
+						#endif
 
 		                if (alca)
 		                {
@@ -1014,9 +1020,9 @@ int main(int argc, char** argv)
 		                }
 	                }
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Aligned ligand to AA." << endl;
-#endif
+				#endif
     			cout << endl;
             }
 
@@ -1058,9 +1064,9 @@ int main(int argc, char** argv)
             // Any entry with a smaller kJ/mol, increment its pose# but remember the smallest pre-increment pose #
             // from the lot of them;
             // Claim that new smallest pose# (which might be 1) as your own.
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Preparing output." << endl;
-#endif
+			#endif
 
             char metrics[p.get_seq_length()+8][10];
             float mkJmol[p.get_seq_length()+8];
@@ -1104,25 +1110,25 @@ int main(int argc, char** argv)
             
 			drcount = pose-1;
             
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared metrics." << endl;
-#endif
+			#endif
 
             // Allocate the array.
             dr[drcount][nodeno].kJmol = btot;
             dr[drcount][nodeno].metric = new char*[metcount+4];
             dr[drcount][nodeno].mkJmol = new float[metcount];
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
-#endif
+			#endif
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++)
             {
                 dr[drcount][nodeno].bytype[i] = total_binding_by_type[i];
             }
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Filled btypes." << endl;
-#endif
+			#endif
 
 			// Populate the array.
             for (i=0; i<metcount; i++)
@@ -1137,18 +1143,18 @@ int main(int argc, char** argv)
             dr[drcount][nodeno].metric[i] = new char[1];
             dr[drcount][nodeno].metric[i][0] = 0;
             dr[drcount][nodeno].metric[i+1] = 0;
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "More metrics or something idfk." << endl;
-#endif
+			#endif
 
             std::ostringstream pdbdat;
 
             // Prepare a partial PDB of the ligand atoms and all involved residue sidechains.
             n = m.get_atom_count();
             for (l=0; l<n; l++) m.get_atom(l)->stream_pdb_line(pdbdat, 9000+l);
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared ligand PDB." << endl;
-#endif
+			#endif
 
             if (flex)
             {
@@ -1164,9 +1170,9 @@ int main(int argc, char** argv)
                         );
                     }
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Prepared flex PDBs." << endl;
-#endif
+				#endif
             }
 
             dr[drcount][nodeno].pdbdat = pdbdat.str();
@@ -1189,9 +1195,9 @@ int main(int argc, char** argv)
                     dr[drcount][nodeno].pose = bestpose;
                     // cout << "Around the posie: "; for (i=0; i<=drcount; i++) cout << dr[i][nodeno].pose << " "; cout << endl;
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added pose to output array." << endl;
-#endif
+				#endif
             }
 
             drcount = pose;
@@ -1201,9 +1207,9 @@ int main(int argc, char** argv)
             if (btot < kJmol_cutoff) break;
         }	// nodeno loop.
     } // pose loop.
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Finished poses." << endl;
-#endif
+	#endif
 
     // Output the dr[][] array in order of increasing pose number.
     cout << endl;
@@ -1272,7 +1278,8 @@ int main(int argc, char** argv)
                             cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                             if (output) *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                         }
-_btyp_unassigned:
+						
+						_btyp_unassigned:
 
                         if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                         cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
@@ -1318,7 +1325,8 @@ _btyp_unassigned:
             }
         }
     }
-_exitposes:
+	
+	_exitposes:
     cout << (i-1) << " pose(s) found." << endl;
     if (output) *output << (i-1) << " pose(s) found." << endl;
     if (debug) *debug << (i-1) << " pose(s) found." << endl;

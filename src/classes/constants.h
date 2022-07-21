@@ -95,7 +95,11 @@
 
 // Debugging stuff.
 #define allow_ligand_esp 1
-
+#define allow_drift 1
+#define allow_iter_cb 1
+#define allow_linear_motion 1
+#define allow_axial_tumble 1
+#define allow_bond_rots 1
 
 #endif
 

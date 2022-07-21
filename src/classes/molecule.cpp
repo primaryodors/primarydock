@@ -2332,6 +2332,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             float accel = 1.1;
 
             /**** Linear Motion ****/
+            #if allow_linear_motion
             if (mm[i]->movability >= MOV_ALL && iter >= 10)
             {
                 Point pt(mm[i]->lmx, 0, 0);
@@ -2420,7 +2421,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 mm[i]->lastbind = bind;
             }
             /**** End Linear Motion ****/
+            #endif
 
+            #if allow_axial_tumble
             /**** Axial Tumble ****/
             if (mm[i]->movability >= MOV_NORECEN)
             {
@@ -2598,10 +2601,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 mm[i]->lastbind = bind;
             }
             /**** End Axial Tumble ****/
+            #endif
 
             if ((iter % _fullrot_every)) continue;
 
-
+			#if allow_bond_rots
             /**** Bond Flexion ****/
             // cout << mm[i]->name << ": " << mm[i]->movability << endl;
             if (mm[i]->movability >= MOV_FLEXONLY)
@@ -2754,7 +2758,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 if (!(iter % _fullrot_every)) mm[i]->reset_conformer_momenta();
             }
             /**** End Bond Flexion ****/
-        }	// for i
+            #endif
+
+        }	// for i = 0 to iters
         // cout << "Iteration " << iter << " improvement " << improvement << endl;
 
         if (cb) cb(iter);

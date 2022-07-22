@@ -587,101 +587,112 @@ int main(int argc, char** argv)
 				}
 
 				const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
-				float xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
+				float loneliness, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
 				const int ac = m.get_atom_count();
 				Pose besp(&m);
 
 				step = fiftyseventh*30;
 				bestscore = -1000;
-				for (xrad=0; xrad <= M_PI*2; xrad += step)
+				float lonely_step = 1.0 / loneliest.get_3d_distance(pocketcen);
+				for (loneliness=0; loneliness <= 1; loneliness += lonely_step)
 				{
-					for (yrad=0; yrad <= M_PI*2; yrad += step)
+					float centeredness = 1.0 - loneliness;
+					Point tmpcen(loneliest.x * loneliness + pocketcen.x * centeredness,
+								 loneliest.y * loneliness + pocketcen.y * centeredness,
+								 loneliest.z * loneliness + pocketcen.z * centeredness
+								);
+					m.recenter(tmpcen);
+
+					for (xrad=0; xrad <= M_PI*2; xrad += step)
 					{
-						for (zrad=0; zrad <= M_PI*2; zrad += step)
+						for (yrad=0; yrad <= M_PI*2; yrad += step)
 						{
-							
-							Bond** rb = m.get_rotatable_bonds();
-							
-							if (!rb) n = 0;
-							else for (n=0; rb[n]; n++);		// Get count.
-							
-							l = 0;
-							lrad = 0;
-							_xyzl_loop:
-							if (m.get_internal_clashes() >= 1) goto _xyzl_skip_loop;
-							
-							score = 0;
-							for (i=0; i<ac; i++)
+							for (zrad=0; zrad <= M_PI*2; zrad += step)
 							{
-								Atom* a = m.get_atom(i);
-								intera_type it = vdW;
 								
-								for (j=0; j<tsphsz; j++)
+								Bond** rb = m.get_rotatable_bonds();
+								
+								if (!rb) n = 0;
+								else for (n=0; rb[n]; n++);		// Get count.
+								
+								l = 0;
+								lrad = 0;
+								_xyzl_loop:
+								if (m.get_internal_clashes() >= 1) goto _xyzl_skip_loop;
+								
+								score = 0;
+								for (i=0; i<ac; i++)
 								{
-									worth = 0.4;
-									if (a->get_charge() && tsphres[j]->get_charge()
-										&&
-										sgn(a->get_charge()) == -sgn(tsphres[j]->get_charge())
-									   ) { it = ionic; worth = 100; }
-									else if (a->get_charge() || a->is_polar()) { it = hbond; worth = 40; }
-									else if (a->is_pi()) { it = pi; worth = 7; }
+									Atom* a = m.get_atom(i);
+									intera_type it = vdW;
 									
-									if (tsphres[j]->capable_of_inter(it))
+									for (j=0; j<tsphsz; j++)
 									{
-										float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));
-										if (r <= outer_sphere[j])
-										{	if (r > inner_sphere[j])
-											{
-												weight = 1;
-								
-												if (extra_wt.size()
-													&&
-													std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
-												   )
+										worth = 0.4;
+										if (a->get_charge() && tsphres[j]->get_charge()
+											&&
+											sgn(a->get_charge()) == -sgn(tsphres[j]->get_charge())
+										   ) { it = ionic; worth = 100; }
+										else if (a->get_charge() || a->is_polar()) { it = hbond; worth = 40; }
+										else if (a->is_pi()) { it = pi; worth = 7; }
+										
+										if (tsphres[j]->capable_of_inter(it))
+										{
+											float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));
+											if (r <= outer_sphere[j])
+											{	if (r > inner_sphere[j])
 												{
-													weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+													weight = 1;
+									
+													if (extra_wt.size()
+														&&
+														std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
+													   )
+													{
+														weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+													}
+													
+													score += worth * weight;
 												}
-												
-												score += worth * weight;
-											}
-											else
-											{	score -= 200;
+												else
+												{	score -= 200;
+												}
 											}
 										}
 									}
 								}
-							}
-							
-							if (score > bestscore)
-							{
-								besp.copy_state(&m);
-								bestxr = xrad;
-								bestyr = yrad;
-								bestzr = zrad;
-								bestscore = score;
-							}
-							
-							_xyzl_skip_loop:
-							
-							if (rb && rb[l])
-							{
-								rb[l]->rotate(step);
 								
-								lrad += step;
-								if (lrad >= M_PI*2)
+								if (score > bestscore)
 								{
-									l++;
-									if (l < n) goto _xyzl_loop;
+									besp.copy_state(&m);
+									bestxr = xrad;
+									bestyr = yrad;
+									bestzr = zrad;
+									bestscore = score;
 								}
-								else goto _xyzl_loop;
+								
+								_xyzl_skip_loop:
+								
+								if (rb && rb[l])
+								{
+									rb[l]->rotate(step);
+									
+									lrad += step;
+									if (lrad >= M_PI*2)
+									{
+										l++;
+										if (l < n) goto _xyzl_loop;
+									}
+									else goto _xyzl_loop;
+								}
+								
+								
+								m.rotate(zaxis, step);
 							}
-							
-							
-							m.rotate(zaxis, step);
+							m.rotate(yaxis, step);
 						}
-						m.rotate(yaxis, step);
+						m.rotate(xaxis, step);
 					}
-					m.rotate(xaxis, step);
 				}
 				
 				cout << "Tumble sphere best score " << bestscore << " for "

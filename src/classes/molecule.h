@@ -28,8 +28,23 @@ enum MoleculeType
 	MOLTYP_AMINOACID
 };
 
+class Pose
+{
+	public:
+	Pose();
+	Pose(Molecule* from_mol);
+	void copy_state(Molecule* from_mol);
+	void restore_state(Molecule* to_mol);
+	
+	protected:
+	std::vector<Point> saved_atom_locs;
+	Molecule* saved_from = nullptr;
+};
+
 class Molecule
 {
+	friend class Pose;
+	
 	public:
     Molecule(const char* name);
     Molecule(const char* name, Atom** collection);
@@ -127,6 +142,11 @@ class Molecule
     void reset_conformer_momenta();
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
     Atom** get_most_bindable(int max_num, Atom* for_atom);
+    
+    // Debug stuff.
+    #if debug_break_on_move
+    void set_atoms_break_on_move(bool break_on_move) { if (atoms) { int i; for (i=0; atoms[i]; i++) atoms[i]->break_on_move = break_on_move; } }
+    #endif
 
     bool echo_iters = false;
     MovabilityType movability = MOV_ALL;

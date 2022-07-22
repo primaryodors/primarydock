@@ -34,6 +34,21 @@ char* get_file_ext(char* filename)
     return 0;
 }
 
+char configfname[256];
+char protfname[256];
+char ligfname[256];
+Point pocketcen, loneliest;
+std::ofstream *output = NULL;
+
+std::vector<int> exclusion;
+
+std::string CEN_buf = "";
+std::vector<std::string> pathstrs;
+std::vector<std::string> states;
+std::vector<int> extra_wt;
+
+bool configset=false, protset=false, ligset=false, pktset=false;
+
 Protein* protein;
 int seql = 0;
 int mcoord_resno[256];
@@ -156,49 +171,12 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
     }
 }
 
-int main(int argc, char** argv)
+void read_config_file(FILE* pf)
 {
-    char configfname[256];
-    char protfname[256];
-    char ligfname[256];
-    char buffer[65536];
-    Point pocketcen;
-    std::ofstream *output = NULL;
-    
-    std::vector<int> exclusion;
-    
-    std::string CEN_buf = "";
-    std::vector<std::string> pathstrs;
-    std::vector<std::string> states;
-    std::vector<int> extra_wt;
+	char buffer[65536];
+	int i;
 
-    bool configset=false, protset=false, ligset=false, pktset=false;
-    
-    int i;
-    
-    for (i=0; i<65536; i++) buffer[i] = 0;
-    
-    for (i=0; i<256; i++)
-    	configfname[i] = protfname[i] = ligfname[i] = 0;
-
-    time_t began = time(NULL);
-
-    strcpy(configfname, "podock.config");
-
-    if (argc > 1)
-    {
-        strcpy(configfname, argv[1]);
-        configset = true;
-    }
-
-    FILE* pf = fopen(configfname, "r");
-    if (!pf)
-    {
-        cout << "Config file not found: " << configfname << ", exiting." << endl;
-        return 0xbadf12e;
-    }
-
-    while (!feof(pf))
+	while (!feof(pf))
     {
         std::string origbuff;
         fgets(buffer, 1015, pf);
@@ -221,12 +199,6 @@ int main(int argc, char** argv)
             else if (!strcmp(fields[0], "CEN"))
             {
             	CEN_buf = origbuff;
-            	/*
-                pocketcen.x = atof(fields[1]);
-                pocketcen.y = atof(fields[2]);
-                pocketcen.z = atof(fields[3]);
-                pktset = true;
-                */
             }
             else if (!strcmp(fields[0], "EXCL"))
             {
@@ -247,16 +219,10 @@ int main(int argc, char** argv)
                 if (nodeno > 255)
                 {
                     cout << "Binding path is limited to 255 nodes." << endl;
-                    return 0xbad90de;
+                    throw 0xbad90de;
                 }
                 if (nodeno)
                 {
-                    /*Point pt(atof(fields[2]),
-                             atof(fields[3]),
-                             atof(fields[4])
-                            );
-                    SCoord v(&pt);
-                    path[nodeno] = v;*/
                     if ((nodeno) > pathnodes) pathnodes = nodeno;
                     
                     pathstrs.resize(nodeno+1);
@@ -280,7 +246,7 @@ int main(int argc, char** argv)
                 if (!size.x || !size.y || !size.z)
                 {
                     cout << "Pocket size cannot be zero in any dimension." << endl;
-                    return 0xbad512e;
+                    throw 0xbad512e;
                 }
             }
             else if (!strcmp(fields[0], "POSE"))
@@ -344,12 +310,41 @@ int main(int argc, char** argv)
 				#endif
                 output = new std::ofstream(fields[1], std::ofstream::out);
             }
-
-            // delete[] fields;
         }
         buffer[0] = 0;
     }
+}
+
+int main(int argc, char** argv)
+{
+	char buffer[65536];
+    int i;
+    
+    for (i=0; i<65536; i++) buffer[i] = 0;
+    
+    for (i=0; i<256; i++)
+    	configfname[i] = protfname[i] = ligfname[i] = 0;
+
+    time_t began = time(NULL);
+
+    strcpy(configfname, "podock.config");
+
+    if (argc > 1)
+    {
+        strcpy(configfname, argv[1]);
+        configset = true;
+    }
+
+    FILE* pf = fopen(configfname, "r");
+    if (!pf)
+    {
+        cout << "Config file not found: " << configfname << ", exiting." << endl;
+        return 0xbadf12e;
+    }
+
+    read_config_file(pf);
     fclose(pf);
+    
 	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded config file." << endl;
 	#endif
@@ -382,6 +377,7 @@ int main(int argc, char** argv)
 	
 	char** fields = chop_spaced_fields(buffer);
 	pocketcen = pocketcen_from_config_fields(fields, nullptr);
+	loneliest = p.find_loneliest_point(pocketcen, size);
 	if (!strcmp(fields[1], "RES"))
 	{
 		for (i=2; fields[i]; i++)
@@ -572,7 +568,7 @@ int main(int argc, char** argv)
 				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, 15);
 				int tsphsz = tsphres.size();
 				float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
-				
+
 				for (i=0; i<tsphsz; i++)
 				{
 					if (exclusion.size()
@@ -589,19 +585,31 @@ int main(int argc, char** argv)
 					outer_sphere[i] = tsphres[i]->get_reach() + 2;
 					inner_sphere[i] = tsphres[i]->get_reach()/2 + 2;
 				}
-				
+
 				const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
-				float xrad, yrad, zrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
+				float xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
 				const int ac = m.get_atom_count();
-				
+				Pose besp(&m);
+
 				step = fiftyseventh*30;
-				bestscore = 0;
+				bestscore = -1000;
 				for (xrad=0; xrad <= M_PI*2; xrad += step)
 				{
 					for (yrad=0; yrad <= M_PI*2; yrad += step)
 					{
 						for (zrad=0; zrad <= M_PI*2; zrad += step)
-						{    					
+						{
+							
+							Bond** rb = m.get_rotatable_bonds();
+							
+							if (!rb) n = 0;
+							else for (n=0; rb[n]; n++);		// Get count.
+							
+							l = 0;
+							lrad = 0;
+							_xyzl_loop:
+							if (m.get_internal_clashes() >= 1) goto _xyzl_skip_loop;
+							
 							score = 0;
 							for (i=0; i<ac; i++)
 							{
@@ -646,11 +654,28 @@ int main(int argc, char** argv)
 							
 							if (score > bestscore)
 							{
+								besp.copy_state(&m);
 								bestxr = xrad;
 								bestyr = yrad;
 								bestzr = zrad;
 								bestscore = score;
 							}
+							
+							_xyzl_skip_loop:
+							
+							if (rb && rb[l])
+							{
+								rb[l]->rotate(step);
+								
+								lrad += step;
+								if (lrad >= M_PI*2)
+								{
+									l++;
+									if (l < n) goto _xyzl_loop;
+								}
+								else goto _xyzl_loop;
+							}
+							
 							
 							m.rotate(zaxis, step);
 						}
@@ -666,9 +691,10 @@ int main(int argc, char** argv)
 					 << endl;
 				
 				// Rotate the molecule into the best position.
-				m.rotate(xaxis, bestxr);
+				/*m.rotate(xaxis, bestxr);
 				m.rotate(yaxis, bestyr);
-				m.rotate(zaxis, bestzr);
+				m.rotate(zaxis, bestzr);*/
+				besp.restore_state(&m);
 				
 				// Minimize ligand clashes.
 				for (i=0; i<tsphsz; i++)
@@ -1325,7 +1351,7 @@ int main(int argc, char** argv)
             }
         }
     }
-	
+
 	_exitposes:
     cout << (i-1) << " pose(s) found." << endl;
     if (output) *output << (i-1) << " pose(s) found." << endl;

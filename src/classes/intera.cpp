@@ -362,6 +362,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
     	}
     }
     
+    #if allow_auto_hydroxy
     if (H && O && brot)
     {
     	float rad, step = 30*fiftyseventh, bestr=999999, bestrad=0;
@@ -380,6 +381,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
     	
     	if (bestrad) brot->rotate(bestrad);
     }
+    #endif
 
     for (i=0; look[i]; i++)
     {

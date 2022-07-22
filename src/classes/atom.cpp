@@ -464,6 +464,10 @@ Atom** Bond::get_moves_with_btom()
 
 bool Atom::move(Point* pt)
 {
+	#if debug_break_on_move
+	if (break_on_move) throw 0xb16fa7012a96eca7;
+	#endif
+
 	/*if (name && !strcmp(name, "CB"))
 	{
 		Bond* b = get_bond_between("CA");
@@ -482,6 +486,10 @@ bool Atom::move(Point* pt)
 
 bool Atom::move_rel(SCoord* v)
 {
+	#if debug_break_on_move
+	if (break_on_move) throw 0xb16fa7012a96eca7;
+	#endif
+
 	/*if (name && !strcmp(name, "CB"))
 	{
 		Bond* b = get_bond_between("CA");
@@ -520,12 +528,21 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     Point a0loc = location;
     a0loc = a0loc.add(&mov);
     a0loc = rotate3D(&a0loc, pt, &rot);
+    
+	#if debug_break_on_move
+	if (break_on_move) throw 0xb16fa7012a96eca7;
+	#endif
+	
     location = a0loc;
     atomct++;
     //cout << "Motion includes " << name << endl;
 
     for (i=0; atoms[i]; i++)
     {
+		#if debug_break_on_move
+		if (atoms[i]->break_on_move) throw 0xb16fa7012a96eca7;
+		#endif
+
         // atoms[i]->move_rel(mov);
         Point aloc = atoms[i]->location;
         aloc = aloc.add(&mov);

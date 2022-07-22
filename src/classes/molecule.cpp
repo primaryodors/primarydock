@@ -89,6 +89,41 @@ Molecule::~Molecule()
 	;
 }
 
+
+Pose::Pose()
+{
+	;
+}
+
+Pose::Pose(Molecule* m)
+{
+	copy_state(m);
+}
+
+void Pose::copy_state(Molecule* m)
+{
+	saved_atom_locs.clear();
+	saved_from = m;
+	if (!m || !m->atoms) return;
+	
+	int i;
+	for (i=0; m->atoms[i]; i++)
+		saved_atom_locs.push_back(m->atoms[i]->get_location());
+}
+
+void Pose::restore_state(Molecule* m)
+{
+	int sz = saved_atom_locs.size();
+	if (!m || !m->atoms || !sz || m != saved_from) return;
+	
+	int i;
+	for (i=0; i<sz && m->atoms[i]; i++)
+	{
+		m->atoms[i]->move(saved_atom_locs[i]);
+	}
+}
+
+
 void Molecule::delete_atom(Atom* a)
 {
 	if (!a) return;
@@ -2335,6 +2370,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             #if allow_linear_motion
             if (mm[i]->movability >= MOV_ALL && iter >= 10)
             {
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(false);
+            	#endif
+            	
                 Point pt(mm[i]->lmx, 0, 0);
                 mm[i]->move(pt);
                 bind1 = 0;
@@ -2419,6 +2458,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
 
                 mm[i]->lastbind = bind;
+
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(true);
+            	#endif
             }
             /**** End Linear Motion ****/
             #endif
@@ -2427,6 +2470,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             /**** Axial Tumble ****/
             if (mm[i]->movability >= MOV_NORECEN)
             {
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(false);
+            	#endif
+            	
                 Point pt(1,0,0);
                 SCoord v(pt);
 
@@ -2597,8 +2644,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                 }
 
-
                 mm[i]->lastbind = bind;
+                
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(true);
+            	#endif
             }
             /**** End Axial Tumble ****/
             #endif
@@ -2610,6 +2660,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             // cout << mm[i]->name << ": " << mm[i]->movability << endl;
             if (mm[i]->movability >= MOV_FLEXONLY)
             {
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(false);
+            	#endif
+            	
                 mm[i]->get_rotatable_bonds();
                 int residue = 0;
                 
@@ -2754,6 +2808,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 	cout << endl;
     			#endif
                 mm[i]->lastbind = bind;
+                
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(true);
+            	#endif
 
                 if (!(iter % _fullrot_every)) mm[i]->reset_conformer_momenta();
             }

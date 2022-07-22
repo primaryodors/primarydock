@@ -200,18 +200,22 @@ class Atom
     static void dump_array(Atom** aarr);
 
     // Public member vars.
-    int residue=0;				// To be managed and used by the AminoAcid class.
-    char aaletter;				// "
-    char aa3let[4];				// "
-    char* region;				// "
-    bool is_backbone=false;		// "
-    char* name;					// "
-    bool used;					// Required for certain algorithms such as Molecule::identify_rings().
-    int mirror_geo=-1;			// If >= 0, mirror the geometry of the btom of bonded_to[mirror_geo].
-    bool flip_mirror=false;		// If true, do trans rather than cis bond conformation.
-    bool dnh=false;				// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.
+    int residue=0;					// To be managed and used by the AminoAcid class.
+    char aaletter;					// "
+    char aa3let[4];					// "
+    char* region;					// "
+    bool is_backbone=false;			// "
+    char* name;						// "
+    bool used;						// Required for certain algorithms such as Molecule::identify_rings().
+    int mirror_geo=-1;				// If >= 0, mirror the geometry of the btom of bonded_to[mirror_geo].
+    bool flip_mirror=false;			// If true, do trans rather than cis bond conformation.
+    bool dnh=false;					// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.
     bool EZ_flip = false;
     float last_bind_energy=0;
+    
+    #if debug_break_on_move
+    bool break_on_move = false;		// debugging feature.
+    #endif
 
 	protected:
     int Z=0;

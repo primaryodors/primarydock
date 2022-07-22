@@ -1048,8 +1048,8 @@ int main(int argc, char** argv)
                 }
 				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Aligned ligand to AA." << endl;
-				#endif
     			cout << endl;
+				#endif
             }
 
             // float driftamt = 1.0 / (iters/25+1);

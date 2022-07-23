@@ -2503,7 +2503,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (!(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
                 {
                 	// cout << endl;
                     while ((M_PI*2-rad) > 1e-3)
@@ -2560,7 +2560,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (!(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
@@ -2617,7 +2617,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (!(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {

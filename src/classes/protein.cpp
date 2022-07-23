@@ -588,7 +588,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         const Point nodecen,
         const Point size,
         const int* mcoord_resno
-                                            )
+		)
 {
     int i, j, sphres = 0;
     int seql = get_seq_length();
@@ -605,6 +605,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         int resno = aa->get_residue_no();
 
         if (mcoord_resno)
+        {
             for (j=0; mcoord_resno[j]; j++)
             {
                 if (mcoord_resno[j] == resno)
@@ -625,6 +626,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
                     continue;
                 }
             }
+        }
 
         Atom* ca = aa->get_atom("CA");
         if (!ca) continue;
@@ -638,12 +640,11 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 
         if (cb)
         {
+            Point pt1 = pt.subtract(&pt2);
             float angle = find_3d_angle(cb->get_location(), pt2, ca->get_location());
-            if (angle < _can_clash_angle)
+            if (pt1.magnitude() < 3 || angle < _can_clash_angle)
             {
-                Point pt1 = pt;
-                pt1 = pt1.subtract(&pt2);
-                if (pt1.magnitude() <= (aa->get_reach()+1))
+                if (pt1.magnitude() < (aa->get_reach()+2))
                 {
                     if (!resno_already[resno])
                     {
@@ -677,7 +678,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 
         SCoord dir(&pt1);
 
-        if (dir.r <= 1.25)
+        if (dir.r <= 1)
         {
             if (!resno_already[resno])
             {

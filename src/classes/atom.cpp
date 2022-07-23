@@ -1172,7 +1172,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
     {
     	for (i=0; moves_with_btom[i]; i++)
     	{
-    		if (moves_with_btom[i]->is_backbone) mwb_total_binding += 1e9; // goto _cannot_reverse_bondrot;
+    		if (moves_with_btom[i]->is_backbone) mwbi_total_binding += 1e9; // goto _cannot_reverse_bondrot;
     		mwb_total_binding += moves_with_btom[i]->last_bind_energy;
     	}
     	for (i=0; inverse->moves_with_btom[i]; i++)
@@ -1181,7 +1181,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
     		mwbi_total_binding += inverse->moves_with_btom[i]->last_bind_energy;
     	}
     	
-    	if (mwb_total_binding > mwbi_total_binding)
+    	if (mwb_total_binding < mwbi_total_binding)
     		return inverse->rotate(-theta, allow_backbone);				// DANGER! RECURSION.
     }
     _cannot_reverse_bondrot:

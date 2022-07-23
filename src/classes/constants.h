@@ -11,7 +11,7 @@
 
 #define _kcal_per_kJ 0.239006
 #define _kJmol_cuA 1.0
-#define _DEFAULT_INTERA_R_CUTOFF 9
+#define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
 
@@ -55,7 +55,7 @@
 #define _def_atc 100
 #define _ALLOW_FLEX_RINGS 0
 #define _shield_angle (130.0 * fiftyseventh)
-#define _can_clash_angle (150.0 * fiftyseventh)
+#define _can_clash_angle (120.0 * fiftyseventh)
 #define _fullrot_stepdeg 30
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
@@ -99,6 +99,7 @@
 #define allow_axial_tumble 1
 #define allow_bond_rots 1
 #define allow_drift 1
+#define allow_mol_fullrot_iter 1
 #define allow_iter_cb 1
 #define allow_ligand_esp 1
 #define allow_linear_motion 1

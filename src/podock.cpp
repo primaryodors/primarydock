@@ -11,9 +11,6 @@
 
 using namespace std;
 
-#define _DBG_STEPBYSTEP true
-#define _DORESPHRES false
-
 struct DockResult
 {
     int pose;
@@ -565,12 +562,13 @@ int main(int argc, char** argv)
     		if (!use_bestbind_algorithm)
     		{
 				// Begin tumble sphere behavior.
-				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, 15);
+				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude());
 				int tsphsz = tsphres.size();
 				float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
 
 				for (i=0; i<tsphsz; i++)
 				{
+					#if use_exclusions
 					if (exclusion.size()
 						&&
 						std::find(exclusion.begin(), exclusion.end(), tsphres[i]->get_residue_no())!=exclusion.end()
@@ -580,20 +578,28 @@ int main(int argc, char** argv)
 						tsphsz--;
 						continue;
 					}
+					#endif
 
 					// TODO: Algorithmically determine more accurate values based on interaction type, etc.
 					outer_sphere[i] = tsphres[i]->get_reach() + 2;
-					inner_sphere[i] = tsphres[i]->get_reach()/2 + 2;
+					inner_sphere[i] = tsphres[i]->get_reach()/3;
 				}
 
 				const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
-				float loneliness, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
+				float loneliness, blone=0, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
 				const int ac = m.get_atom_count();
 				Pose besp(&m);
+				#if _DBG_TUMBLE_SPHERES
+				std::string tsdbg = "", tsdbgb = "";
+				#endif
 
 				step = fiftyseventh*30;
 				bestscore = -1000;
 				float lonely_step = 1.0 / loneliest.get_3d_distance(pocketcen);
+				#if _DBG_LONELINESS
+				cout << "Loneliest point is " << loneliest.get_3d_distance(pocketcen) << "A from pocketcen." << endl;
+				#endif
+				if (isnan(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
 				for (loneliness=0; loneliness <= 1; loneliness += lonely_step)
 				{
 					float centeredness = 1.0 - loneliness;
@@ -602,6 +608,10 @@ int main(int argc, char** argv)
 								 loneliest.z * loneliness + pocketcen.z * centeredness
 								);
 					m.recenter(tmpcen);
+					
+					#if _DBG_LONELINESS
+					cout << "Ligand is " << loneliness << " lonely." << endl;
+					#endif
 
 					for (xrad=0; xrad <= M_PI*2; xrad += step)
 					{
@@ -621,6 +631,9 @@ int main(int argc, char** argv)
 								if (m.get_internal_clashes() >= 1) goto _xyzl_skip_loop;
 								
 								score = 0;
+								#if _DBG_TUMBLE_SPHERES
+								tsdbg = "";
+								#endif
 								for (i=0; i<ac; i++)
 								{
 									Atom* a = m.get_atom(i);
@@ -652,23 +665,41 @@ int main(int argc, char** argv)
 														weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
 													}
 													
+													#if tumble_spheres_include_vdW
+													if ((worth*weight) < 1) continue;
+													#endif
+													
 													score += worth * weight;
+													#if _DBG_TUMBLE_SPHERES
+													tsdbg += std::string("+ ")
+														  +  std::string(a->name) + std::string(" reaches ") + std::string(tsphres[j]->get_3letter())
+														  +  std::to_string(tsphres[j]->get_residue_no()) + std::string(".  ");
+													#endif
 												}
 												else
 												{	score -= 200;
+													#if _DBG_TUMBLE_SPHERES
+													tsdbg += std::string("- ")
+														  +  std::string(a->name) + std::string(" clashes ") + std::string(tsphres[j]->get_3letter())
+														  +  std::to_string(tsphres[j]->get_residue_no()) + std::string(".  ");
+													#endif
 												}
 											}
 										}
 									}
 								}
 								
+								if (score > 0) score *= 1.0 + 0.5 * centeredness;
+								
 								if (score > bestscore)
 								{
 									besp.copy_state(&m);
+									blone = loneliness;
 									bestxr = xrad;
 									bestyr = yrad;
 									bestzr = zrad;
 									bestscore = score;
+									tsdbgb = tsdbg;
 								}
 								
 								_xyzl_skip_loop:
@@ -686,28 +717,34 @@ int main(int argc, char** argv)
 									else goto _xyzl_loop;
 								}
 								
-								
 								m.rotate(zaxis, step);
-							}
+							}		// zrad.
 							m.rotate(yaxis, step);
-						}
+						}			// yrad.
 						m.rotate(xaxis, step);
-					}
-				}
+					}				// xrad.
+					
+					if (bestscore >= (m.get_atom_count()*20)) break;
+					#if _DBG_LONELINESS
+					cout << "Best score: " << bestscore << endl;
+					#endif
+				}					// loneliness.
 				
 				cout << "Tumble sphere best score " << bestscore << " for "
 					 << "x" << bestxr*fiftyseven << "deg, "
 					 << "y" << bestyr*fiftyseven << "deg, "
 					 << "z" << bestzr*fiftyseven << "deg."
+					 << " (" << blone << " lonely)."
 					 << endl;
-				
-				// Rotate the molecule into the best position.
-				/*m.rotate(xaxis, bestxr);
-				m.rotate(yaxis, bestyr);
-				m.rotate(zaxis, bestzr);*/
+				#if _DBG_TUMBLE_SPHERES
+				cout << tsdbgb << endl;
+				#endif
+
+				// Load the best ligand conformer.
 				besp.restore_state(&m);
-				
+
 				// Minimize ligand clashes.
+				#if prerot_sidechains_from_ligand
 				for (i=0; i<tsphsz; i++)
 				{
 					Bond** tsphb = tsphres[i]->get_rotatable_bonds();
@@ -734,7 +771,11 @@ int main(int argc, char** argv)
 						// delete[] tsphb;
 					}
 				}
+				#endif
 				
+				#if debug_stop_after_tumble_sphere
+				return 0;
+				#endif
 				// End tumble sphere behavior.
 			}
     	}
@@ -826,6 +867,7 @@ int main(int argc, char** argv)
             
             for (i=0; i<sphres; i++)
             {
+            	#if use_exclusions
             	if (exclusion.size()
 					&&
 					std::find(exclusion.begin(), exclusion.end(), reaches_spheroid[nodeno][i]->get_residue_no())!=exclusion.end()
@@ -835,6 +877,7 @@ int main(int argc, char** argv)
 					sphres--;
 					reaches_spheroid[nodeno][sphres] = nullptr;
 				}
+				#endif
             }
 
             /*cout << "Dock residues for node " << nodeno << ": " << endl;

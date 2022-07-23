@@ -101,8 +101,16 @@
 #define allow_linear_motion 1
 #define allow_axial_tumble 1
 #define allow_bond_rots 1
+#define prerot_sidechains_from_ligand 0
+#define use_exclusions 1
+#define tumble_spheres_include_vdW 1
 
 #define debug_break_on_move 0
+#define debug_stop_after_tumble_sphere 0
+#define _DBG_STEPBYSTEP false
+#define _DORESPHRES false
+#define _DBG_LONELINESS true
+#define _DBG_TUMBLE_SPHERES true
 
 #endif
 

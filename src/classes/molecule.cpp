@@ -1271,10 +1271,20 @@ Bond** Molecule::get_rotatable_bonds()
             {
                 if (lb[j]->count_moves_with_btom() > mwblimit) continue;
                 
-                // Generally, a single bond between pi atoms cannot rotate.
-                if (lb[j]->atom && lb[j]->atom->is_pi()
-                	&&
-                	lb[j]->btom && lb[j]->btom->is_pi()
+                if (!lb[j]->atom || !lb[j]->btom) continue;
+                
+                bool pia = lb[j]->atom->is_pi(),
+                	 pib = lb[j]->btom->is_pi();
+                
+                int fa = lb[j]->atom->get_family(),
+                	fb = lb[j]->btom->get_family();
+                
+                // Generally, a single bond between pi atoms, or a bond from a pi atom to an amino group, cannot rotate.
+                if (	(pia && pib)
+                		||
+                		(pia && (fb == PNICTOGEN))
+                		||
+                		(pib && (fa == PNICTOGEN))
                    )
                    lb[j]->can_rotate = false;
                 

@@ -526,6 +526,10 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
 	if (!residues) return retval;
 	int i, j;
 	
+	#if _DBG_TUMBLE_SPHERES
+	cout << "Protein::get_residues_near(" << pt << ", " << maxr << ")" << endl;
+	#endif
+	
     for (i=0; residues[i]; i++)
     {
     	float r = pt.get_3d_distance(residues[i]->get_atom_location("CA"));
@@ -538,8 +542,17 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
     		if (r1 > r+tolerance) continue;
     	}
     	
-    	if (r <= maxr) retval.push_back(residues[i]);
+    	if (r <= maxr)
+    	{
+    		retval.push_back(residues[i]);
+    		#if _DBG_TUMBLE_SPHERES
+    		cout << residues[i]->get_3letter() << residues[i]->get_residue_no() << " ";
+    		#endif
+		}
     }
+    #if _DBG_TUMBLE_SPHERES
+    cout << endl << endl;
+    #endif
     
     return retval;
 }
@@ -630,7 +643,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
             {
                 Point pt1 = pt;
                 pt1 = pt1.subtract(&pt2);
-                if (pt1.magnitude() <= aa->get_reach()*1.25)
+                if (pt1.magnitude() <= (aa->get_reach()+1))
                 {
                     if (!resno_already[resno])
                     {

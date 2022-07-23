@@ -699,7 +699,9 @@ int main(int argc, char** argv)
 									bestyr = yrad;
 									bestzr = zrad;
 									bestscore = score;
+									#if _DBG_TUMBLE_SPHERES
 									tsdbgb = tsdbg;
+									#endif
 								}
 								
 								_xyzl_skip_loop:
@@ -730,13 +732,13 @@ int main(int argc, char** argv)
 					#endif
 				}					// loneliness.
 				
+				#if _DBG_TUMBLE_SPHERES
 				cout << "Tumble sphere best score " << bestscore << " for "
 					 << "x" << bestxr*fiftyseven << "deg, "
 					 << "y" << bestyr*fiftyseven << "deg, "
 					 << "z" << bestzr*fiftyseven << "deg."
 					 << " (" << blone << " lonely)."
 					 << endl;
-				#if _DBG_TUMBLE_SPHERES
 				cout << tsdbgb << endl;
 				#endif
 

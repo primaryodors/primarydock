@@ -71,11 +71,11 @@ class Molecule
     float get_charge();
 
     // Spatial functions.
-    Point get_barycenter() const;
+    Point get_barycenter(bool bond_weighted = false) const;
     virtual void move(SCoord move_amt);
     virtual void move(Point move_amt);
     virtual void recenter(Point new_location);
-    virtual void rotate(SCoord* SCoord, float theta);
+    void rotate(SCoord* SCoord, float theta, bool bond_weighted = false);
     void rotate(LocatedVector SCoord, float theta);
     bool shielded(Atom* a, Atom* b) const;
     float correct_structure(int iters = 500);
@@ -126,7 +126,8 @@ class Molecule
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
 
-
+	// Unused code alert! If everything builds with this compiler switch turned off, the entire list of functions can be removed.
+	#if include_old_intermol_conforms
     void intermol_conform(Molecule* ligand, int iters = 50);
     void intermol_conform(Molecule* ligand, int iters, Molecule** avoid_clashing_with);
     void intermol_conform(Molecule* ligand, int iters, AminoAcid** avoid_clashing_with);
@@ -139,6 +140,8 @@ class Molecule
     void intermol_conform_norecen(Molecule** ligands, int iters, AminoAcid** avoid_clashing_with);
     void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with);
     void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with);
+    #endif
+    
     void reset_conformer_momenta();
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
     Atom** get_most_bindable(int max_num, Atom* for_atom);

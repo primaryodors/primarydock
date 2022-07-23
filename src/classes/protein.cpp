@@ -639,7 +639,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         if (cb)
         {
             float angle = find_3d_angle(cb->get_location(), pt2, ca->get_location());
-            if (angle < M_PI/1.5)
+            if (angle < _can_clash_angle)
             {
                 Point pt1 = pt;
                 pt1 = pt1.subtract(&pt2);
@@ -663,7 +663,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
             }
 
             angle = find_3d_angle(cb->get_location(), nodecen, ca->get_location());
-            if (angle > M_PI/1.5) continue;
+            if (angle > _can_clash_angle) continue;
         }
 
         pt = pt.subtract(&nodecen);

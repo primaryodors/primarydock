@@ -1677,7 +1677,7 @@ void Molecule::move(Point move_amt)
     }
 }
 
-Point Molecule::get_barycenter() const
+Point Molecule::get_barycenter(bool bond_weighted) const
 {
     if (noAtoms(atoms))
     {
@@ -1688,7 +1688,17 @@ Point Molecule::get_barycenter() const
     Point locs[atcount];
     int i;
 
-    for (i=0; i<atcount; i++) locs[i] = atoms[i]->get_location();
+    for (i=0; i<atcount; i++)
+    {
+    	locs[i] = atoms[i]->get_location();
+		locs[i].weight = atoms[i]->get_atomic_weight();
+    	#if allow_tethered_rotations
+    	if (bond_weighted)
+    	{
+    		locs[i].weight += atoms[i]->last_bind_energy;
+    	}
+    	#endif
+	}
 
     return average_of_points(locs, atcount);
 }
@@ -1712,12 +1722,12 @@ void Molecule::recenter(Point nl)
     move(v);
 }
 
-void Molecule::rotate(SCoord* SCoord, float theta)
+void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
 {
     if (noAtoms(atoms)) return;
     // cout << name << " Molecule::rotate()" << endl;
 
-    Point cen = get_barycenter();
+    Point cen = get_barycenter(bond_weighted);
 
     int i;
     for (i=0; i<atcount; i++)
@@ -1967,6 +1977,7 @@ void Molecule::minimize_internal_clashes()
     // cout << " base internal clashes: " << base_internal_clashes << endl;
 }
 
+#if include_old_intermol_conforms
 void Molecule::intermol_conform(Molecule* ligand, int iters)
 {
     Molecule* ligands[4];
@@ -2313,6 +2324,7 @@ void Molecule::intermol_conform_flexonly(Molecule** ligands, int iters, Molecule
         }
     }
 }
+#endif
 
 
 #define DBG_BONDFLEX 0

@@ -54,13 +54,14 @@
 
 #define _def_atc 100
 #define _ALLOW_FLEX_RINGS 0
-#define _shield_angle 130.0 * M_PI / 180
+#define _shield_angle (130.0 * fiftyseventh)
+#define _can_clash_angle (150.0 * fiftyseventh)
 #define _fullrot_stepdeg 30
-#define _fullrot_steprad M_PI/180*_fullrot_stepdeg
+#define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
 #define _def_lin_momentum 0.1
-#define _def_ang_momentum _fullrot_steprad/2
-#define _def_bnd_momentum _fullrot_steprad/2
+#define _def_ang_momentum (_fullrot_steprad/2)
+#define _def_bnd_momentum (_fullrot_steprad/2)
 
 #define _voxel_resolution 0.1
 #define USE_VOXEL_ARRAY false
@@ -95,22 +96,24 @@
 
 // Debugging stuff.
 #define allow_auto_hydroxy 0
-#define allow_ligand_esp 1
-#define allow_drift 1
-#define allow_iter_cb 1
-#define allow_linear_motion 1
 #define allow_axial_tumble 1
 #define allow_bond_rots 1
+#define allow_drift 1
+#define allow_iter_cb 1
+#define allow_ligand_esp 1
+#define allow_linear_motion 1
+#define allow_tethered_rotations 1
 #define prerot_sidechains_from_ligand 0
-#define use_exclusions 1
 #define tumble_spheres_include_vdW 1
+#define use_exclusions 1
 
+#define _DBG_LONELINESS true
+#define _DBG_STEPBYSTEP false
+#define _DBG_TUMBLE_SPHERES true
 #define debug_break_on_move 0
 #define debug_stop_after_tumble_sphere 0
-#define _DBG_STEPBYSTEP false
 #define _DORESPHRES false
-#define _DBG_LONELINESS true
-#define _DBG_TUMBLE_SPHERES true
+#define include_old_intermol_conforms 0
 
 #endif
 

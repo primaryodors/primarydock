@@ -11,9 +11,6 @@
 
 using namespace std;
 
-#define _DBG_STEPBYSTEP true
-#define _DORESPHRES false
-
 struct DockResult
 {
     int pose;
@@ -33,6 +30,21 @@ char* get_file_ext(char* filename)
     }
     return 0;
 }
+
+char configfname[256];
+char protfname[256];
+char ligfname[256];
+Point pocketcen, loneliest;
+std::ofstream *output = NULL;
+
+std::vector<int> exclusion;
+
+std::string CEN_buf = "";
+std::vector<std::string> pathstrs;
+std::vector<std::string> states;
+std::vector<int> extra_wt;
+
+bool configset=false, protset=false, ligset=false, pktset=false;
 
 Protein* protein;
 int seql = 0;
@@ -56,11 +68,16 @@ bool use_bestbind_algorithm = false;		// Uses older "best binding" algorithm ins
 
 void iteration_callback(int iter)
 {
+	#if !allow_iter_cb
+	return;
+	#endif
+	
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     if (iter == (iters-1)) return;
 
     Point bary = ligand->get_barycenter();
 
+	#if allow_drift
     if (bary.get_3d_distance(ligcen_target) > size.magnitude())
     {
         //cout << "Wrangle! " << bary << ": " << bary.get_3d_distance(ligcen_target) << " vs. " << size.magnitude() << endl;
@@ -77,6 +94,7 @@ void iteration_callback(int iter)
     ligand->recenter(bary);
 
     drift *= (1.0 - 0.5/iters);
+    #endif
 
     if (gcfmols && seql)
     {
@@ -150,47 +168,12 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
     }
 }
 
-int main(int argc, char** argv)
+void read_config_file(FILE* pf)
 {
-    char configfname[256];
-    char protfname[256];
-    char ligfname[256];
-    char buffer[65536];
-    Point pocketcen;
-    std::ofstream *output = NULL;
-    
-    std::string CEN_buf = "";
-    std::vector<std::string> pathstrs;
-    std::vector<std::string> states;
-    std::vector<int> extra_wt;
+	char buffer[65536];
+	int i;
 
-    bool configset=false, protset=false, ligset=false, pktset=false;
-    
-    int i;
-    
-    for (i=0; i<65536; i++) buffer[i] = 0;
-    
-    for (i=0; i<256; i++)
-    	configfname[i] = protfname[i] = ligfname[i] = 0;
-
-    time_t began = time(NULL);
-
-    strcpy(configfname, "podock.config");
-
-    if (argc > 1)
-    {
-        strcpy(configfname, argv[1]);
-        configset = true;
-    }
-
-    FILE* pf = fopen(configfname, "r");
-    if (!pf)
-    {
-        cout << "Config file not found: " << configfname << ", exiting." << endl;
-        return 0xbadf12e;
-    }
-
-    while (!feof(pf))
+	while (!feof(pf))
     {
         std::string origbuff;
         fgets(buffer, 1015, pf);
@@ -213,12 +196,14 @@ int main(int argc, char** argv)
             else if (!strcmp(fields[0], "CEN"))
             {
             	CEN_buf = origbuff;
-            	/*
-                pocketcen.x = atof(fields[1]);
-                pocketcen.y = atof(fields[2]);
-                pocketcen.z = atof(fields[3]);
-                pktset = true;
-                */
+            }
+            else if (!strcmp(fields[0], "EXCL"))
+            {
+            	i=1;
+            	int excls = atoi(fields[i++]);
+            	int excle = atoi(fields[i++]);
+            	
+            	for (i=excls; i<=excle; i++) exclusion.push_back(i);
             }
             else if (!strcmp(fields[0], "PATH"))
             {
@@ -231,16 +216,10 @@ int main(int argc, char** argv)
                 if (nodeno > 255)
                 {
                     cout << "Binding path is limited to 255 nodes." << endl;
-                    return 0xbad90de;
+                    throw 0xbad90de;
                 }
                 if (nodeno)
                 {
-                    /*Point pt(atof(fields[2]),
-                             atof(fields[3]),
-                             atof(fields[4])
-                            );
-                    SCoord v(&pt);
-                    path[nodeno] = v;*/
                     if ((nodeno) > pathnodes) pathnodes = nodeno;
                     
                     pathstrs.resize(nodeno+1);
@@ -264,7 +243,7 @@ int main(int argc, char** argv)
                 if (!size.x || !size.y || !size.z)
                 {
                     cout << "Pocket size cannot be zero in any dimension." << endl;
-                    return 0xbad512e;
+                    throw 0xbad512e;
                 }
             }
             else if (!strcmp(fields[0], "POSE"))
@@ -311,9 +290,9 @@ int main(int argc, char** argv)
                     cout << "Missing debug file name; check config file." << endl;
                     throw 0xbadf12e;
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 cout << "Starting a debug outstream." << endl;
-#endif
+				#endif
                 debug = new std::ofstream(fields[1], std::ofstream::out);
             }
             else if (!strcmp(fields[0], "OUT"))
@@ -323,20 +302,49 @@ int main(int argc, char** argv)
                     cout << "Missing output file name; check config file." << endl;
                     throw 0xbadf12e;
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 cout << "Starting a file outstream." << endl;
-#endif
+				#endif
                 output = new std::ofstream(fields[1], std::ofstream::out);
             }
-
-            // delete[] fields;
         }
         buffer[0] = 0;
     }
+}
+
+int main(int argc, char** argv)
+{
+	char buffer[65536];
+    int i;
+    
+    for (i=0; i<65536; i++) buffer[i] = 0;
+    
+    for (i=0; i<256; i++)
+    	configfname[i] = protfname[i] = ligfname[i] = 0;
+
+    time_t began = time(NULL);
+
+    strcpy(configfname, "podock.config");
+
+    if (argc > 1)
+    {
+        strcpy(configfname, argv[1]);
+        configset = true;
+    }
+
+    FILE* pf = fopen(configfname, "r");
+    if (!pf)
+    {
+        cout << "Config file not found: " << configfname << ", exiting." << endl;
+        return 0xbadf12e;
+    }
+
+    read_config_file(pf);
     fclose(pf);
-#if _DBG_STEPBYSTEP
+    
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded config file." << endl;
-#endif
+	#endif
 
 	if (kcal) kJmol_cutoff /= _kcal_per_kJ;
     drift = 1.0 / (iters/25+1);
@@ -352,9 +360,9 @@ int main(int argc, char** argv)
     }
     p.load_pdb(pf);
     fclose(pf);
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
-#endif
+	#endif
 
 	if (!CEN_buf.length())
 	{
@@ -366,6 +374,7 @@ int main(int argc, char** argv)
 	
 	char** fields = chop_spaced_fields(buffer);
 	pocketcen = pocketcen_from_config_fields(fields, nullptr);
+	loneliest = p.find_loneliest_point(pocketcen, size);
 	if (!strcmp(fields[1], "RES"))
 	{
 		for (i=2; fields[i]; i++)
@@ -413,16 +422,16 @@ int main(int argc, char** argv)
     
     m.minimize_internal_clashes();
     
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded ligand." << endl;
-#endif
+	#endif
 
     Point box = m.get_bounding_box();
 
     if (debug) *debug << "Ligand bounding box corner (centered at zero): " << box.printable() << endl;
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Ligand bounding box." << endl;
-#endif
+	#endif
 
     // Identify the ligand atom with the greatest potential binding.
     int j, k, l, n;
@@ -470,9 +479,9 @@ int main(int argc, char** argv)
 		}
     }
 
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Identified best binding ligand atoms." << endl;
-#endif
+	#endif
 
     int pose, nodeno, iter;
     Point nodecen = pocketcen;
@@ -487,9 +496,9 @@ int main(int argc, char** argv)
     // When docking with a metalloprotein, use this temporary Molecule for interactions the same as
     // we use AminoAcid objects, except don't attempt to flex the metals object.
     Molecule* met = p.metals_as_molecule();
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Created metals molecule." << endl;
-#endif
+	#endif
 
     float bclash = 0;
 
@@ -537,7 +546,7 @@ int main(int argc, char** argv)
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
     int drcount = 0;
 
-    srand(0xb0ad1cea);
+    srand(0xb00d1cca);
     // srand(time(NULL));
     for (pose=1; pose<=poses; pose++)
     {
@@ -553,98 +562,191 @@ int main(int argc, char** argv)
     		if (!use_bestbind_algorithm)
     		{
 				// Begin tumble sphere behavior.
-				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, 15);
+				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude());
 				int tsphsz = tsphres.size();
 				float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
-				
+
 				for (i=0; i<tsphsz; i++)
 				{
+					#if use_exclusions
+					if (exclusion.size()
+						&&
+						std::find(exclusion.begin(), exclusion.end(), tsphres[i]->get_residue_no())!=exclusion.end()
+					   )
+					{
+						tsphres.erase(tsphres.begin()+i);
+						tsphsz--;
+						continue;
+					}
+					#endif
+
 					// TODO: Algorithmically determine more accurate values based on interaction type, etc.
 					outer_sphere[i] = tsphres[i]->get_reach() + 2;
-					inner_sphere[i] = tsphres[i]->get_reach()/2 + 2;
+					inner_sphere[i] = tsphres[i]->get_reach()/3;
 				}
-				
+
 				const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
-				float xrad, yrad, zrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
+				float loneliness, blone=0, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
 				const int ac = m.get_atom_count();
-				
+				Pose besp(&m);
+				#if _DBG_TUMBLE_SPHERES
+				std::string tsdbg = "", tsdbgb = "";
+				#endif
+
 				step = fiftyseventh*30;
-				bestscore = 0;
-				for (xrad=0; xrad <= M_PI*2; xrad += step)
+				bestscore = -1000;
+				float lonely_step = 1.0 / loneliest.get_3d_distance(pocketcen);
+				#if _DBG_LONELINESS
+				cout << "Loneliest point is " << loneliest.get_3d_distance(pocketcen) << "A from pocketcen." << endl;
+				#endif
+				if (isnan(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
+				for (loneliness=0; loneliness <= 1; loneliness += lonely_step)
 				{
-					for (yrad=0; yrad <= M_PI*2; yrad += step)
+					float centeredness = 1.0 - loneliness;
+					Point tmpcen(loneliest.x * loneliness + pocketcen.x * centeredness,
+								 loneliest.y * loneliness + pocketcen.y * centeredness,
+								 loneliest.z * loneliness + pocketcen.z * centeredness
+								);
+					m.recenter(tmpcen);
+					
+					#if _DBG_LONELINESS
+					cout << "Ligand is " << loneliness << " lonely." << endl;
+					#endif
+
+					for (xrad=0; xrad <= M_PI*2; xrad += step)
 					{
-						for (zrad=0; zrad <= M_PI*2; zrad += step)
-						{    					
-							score = 0;
-							for (i=0; i<ac; i++)
+						for (yrad=0; yrad <= M_PI*2; yrad += step)
+						{
+							for (zrad=0; zrad <= M_PI*2; zrad += step)
 							{
-								Atom* a = m.get_atom(i);
-								intera_type it = vdW;
 								
-								for (j=0; j<tsphsz; j++)
+								Bond** rb = m.get_rotatable_bonds();
+								
+								if (!rb) n = 0;
+								else for (n=0; rb[n]; n++);		// Get count.
+								
+								l = 0;
+								lrad = 0;
+								_xyzl_loop:
+								if (m.get_internal_clashes() >= 1) goto _xyzl_skip_loop;
+								
+								score = 0;
+								#if _DBG_TUMBLE_SPHERES
+								tsdbg = "";
+								#endif
+								for (i=0; i<ac; i++)
 								{
-									worth = 0.4;
-									if (a->get_charge() && tsphres[j]->get_charge()
-										&&
-										sgn(a->get_charge()) == -sgn(tsphres[j]->get_charge())
-									   ) { it = ionic; worth = 100; }
-									else if (a->get_charge() || a->is_polar()) { it = hbond; worth = 40; }
-									else if (a->is_pi()) { it = pi; worth = 7; }
+									Atom* a = m.get_atom(i);
+									intera_type it = vdW;
 									
-									if (tsphres[j]->capable_of_inter(it))
+									for (j=0; j<tsphsz; j++)
 									{
-										float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));
-										if (r <= outer_sphere[j])
-										{	if (r > inner_sphere[j])
-											{
-												weight = 1;
-								
-												if (extra_wt.size()
-													&&
-													std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
-												   )
+										worth = 0.4;
+										if (a->get_charge() && tsphres[j]->get_charge()
+											&&
+											sgn(a->get_charge()) == -sgn(tsphres[j]->get_charge())
+										   ) { it = ionic; worth = 100; }
+										else if (a->get_charge() || a->is_polar()) { it = hbond; worth = 40; }
+										else if (a->is_pi()) { it = pi; worth = 7; }
+										
+										if (tsphres[j]->capable_of_inter(it))
+										{
+											float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));
+											if (r <= outer_sphere[j])
+											{	if (r > inner_sphere[j])
 												{
-													weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+													weight = 1;
+									
+													if (extra_wt.size()
+														&&
+														std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
+													   )
+													{
+														weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+													}
+													
+													#if tumble_spheres_include_vdW
+													if ((worth*weight) < 1) continue;
+													#endif
+													
+													score += worth * weight;
+													#if _DBG_TUMBLE_SPHERES
+													tsdbg += std::string("+ ")
+														  +  std::string(a->name) + std::string(" reaches ") + std::string(tsphres[j]->get_3letter())
+														  +  std::to_string(tsphres[j]->get_residue_no()) + std::string(".  ");
+													#endif
 												}
-												
-												score += worth * weight;
-											}
-											else
-											{	score -= 200;
+												else
+												{	score -= 200;
+													#if _DBG_TUMBLE_SPHERES
+													tsdbg += std::string("- ")
+														  +  std::string(a->name) + std::string(" clashes ") + std::string(tsphres[j]->get_3letter())
+														  +  std::to_string(tsphres[j]->get_residue_no()) + std::string(".  ");
+													#endif
+												}
 											}
 										}
 									}
 								}
-							}
-							
-							if (score > bestscore)
-							{
-								bestxr = xrad;
-								bestyr = yrad;
-								bestzr = zrad;
-								bestscore = score;
-							}
-							
-							m.rotate(zaxis, step);
-						}
-						m.rotate(yaxis, step);
-					}
-					m.rotate(xaxis, step);
-				}
+								
+								if (score > 0) score *= 1.0 + 0.5 * centeredness;
+								
+								if (score > bestscore)
+								{
+									besp.copy_state(&m);
+									blone = loneliness;
+									bestxr = xrad;
+									bestyr = yrad;
+									bestzr = zrad;
+									bestscore = score;
+									#if _DBG_TUMBLE_SPHERES
+									tsdbgb = tsdbg;
+									#endif
+								}
+								
+								_xyzl_skip_loop:
+								
+								if (rb && rb[l])
+								{
+									rb[l]->rotate(step);
+									
+									lrad += step;
+									if (lrad >= M_PI*2)
+									{
+										l++;
+										if (l < n) goto _xyzl_loop;
+									}
+									else goto _xyzl_loop;
+								}
+								
+								m.rotate(zaxis, step);
+							}		// zrad.
+							m.rotate(yaxis, step);
+						}			// yrad.
+						m.rotate(xaxis, step);
+					}				// xrad.
+					
+					if (bestscore >= (m.get_atom_count()*20)) break;
+					#if _DBG_LONELINESS
+					cout << "Best score: " << bestscore << endl;
+					#endif
+				}					// loneliness.
 				
+				#if _DBG_TUMBLE_SPHERES
 				cout << "Tumble sphere best score " << bestscore << " for "
 					 << "x" << bestxr*fiftyseven << "deg, "
 					 << "y" << bestyr*fiftyseven << "deg, "
 					 << "z" << bestzr*fiftyseven << "deg."
+					 << " (" << blone << " lonely)."
 					 << endl;
-				
-				// Rotate the molecule into the best position.
-				m.rotate(xaxis, bestxr);
-				m.rotate(yaxis, bestyr);
-				m.rotate(zaxis, bestzr);
-				
+				cout << tsdbgb << endl;
+				#endif
+
+				// Load the best ligand conformer.
+				besp.restore_state(&m);
+
 				// Minimize ligand clashes.
+				#if prerot_sidechains_from_ligand
 				for (i=0; i<tsphsz; i++)
 				{
 					Bond** tsphb = tsphres[i]->get_rotatable_bonds();
@@ -671,14 +773,18 @@ int main(int argc, char** argv)
 						// delete[] tsphb;
 					}
 				}
+				#endif
 				
+				#if debug_stop_after_tumble_sphere
+				return 0;
+				#endif
 				// End tumble sphere behavior.
 			}
     	}
     	
-#if _DBG_STEPBYSTEP
+		#if _DBG_STEPBYSTEP
         if (debug) *debug << "Pose " << pose << endl;
-#endif
+		#endif
         nodecen = pocketcen;
         nodecen.weight = 1;
 
@@ -686,9 +792,9 @@ int main(int argc, char** argv)
         {
         	if (pathstrs.size() < nodeno) break;
         	
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
-#endif
+			#endif
             if (nodeno)
             {
             	for (i=0; i<states.size(); i++)
@@ -736,30 +842,45 @@ int main(int argc, char** argv)
 					}
 				}
                 
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added whatever points together." << endl;
-#endif
+			#endif
             }
             Point lastnodecen = nodecen;
             ligcen_target = nodecen;
 
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Saved last nodecen." << endl;
-#endif
+			#endif
 
             // Move the ligand to the new node center.
-            m.recenter(nodecen);
-#if _DBG_STEPBYSTEP
+            // m.recenter(nodecen);
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Molecule recenter (or not)." << endl;
-#endif
+			#endif
             m.reset_conformer_momenta();
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Conformer momenta reset." << endl;
-#endif
+			#endif
 
 
             sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, mcoord_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
+            
+            for (i=0; i<sphres; i++)
+            {
+            	#if use_exclusions
+            	if (exclusion.size()
+					&&
+					std::find(exclusion.begin(), exclusion.end(), reaches_spheroid[nodeno][i]->get_residue_no())!=exclusion.end()
+				   )
+				{
+					for (j=i; j<sphres; j++) reaches_spheroid[nodeno][j] = reaches_spheroid[nodeno][j+1];
+					sphres--;
+					reaches_spheroid[nodeno][sphres] = nullptr;
+				}
+				#endif
+            }
 
             /*cout << "Dock residues for node " << nodeno << ": " << endl;
             if (output) *output << "Dock residues for node " << nodeno << ": " << endl;
@@ -786,9 +907,9 @@ int main(int argc, char** argv)
             		dr[drcount][l].metric = 0;
             	}
             	
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Initialize null AA pointer." << endl;
-#endif
+				#endif
 
                 // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
@@ -807,7 +928,7 @@ int main(int argc, char** argv)
 		                if (l && reaches_spheroid[nodeno][i] == alignment_aa[l-1]) continue;
 		                if (l>1 && reaches_spheroid[nodeno][i] == alignment_aa[l-2]) continue;
 		                
-#if _DBG_STEPBYSTEP
+						#if _DBG_STEPBYSTEP
 		                if (debug)
 		                {
 		                    *debug << "Check capable of inter (" << i << ") ";
@@ -819,7 +940,7 @@ int main(int argc, char** argv)
 		                    *debug << *reaches_spheroid[nodeno][i];
 		                    *debug << endl;
 		                }
-#endif
+						#endif
 						
 		                float pottmp = reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb[l]);
 		                if (ligbbh[l]) pottmp += reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh[l]);
@@ -851,23 +972,23 @@ int main(int argc, char** argv)
 		                    alignment_potential = pottmp;
 		                    alignment_distance[l] = potential_distance;
 		                }
-#if _DBG_STEPBYSTEP
+						#if _DBG_STEPBYSTEP
                     	if (debug) *debug << "Candidate alignment AA." << endl;
-#endif
+						#endif
 	                }
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Selected an alignment AA." << endl;
-#endif
+				#endif
 
                 if (use_bestbind_algorithm && met)
                 {
                     alignment_aa[0] = met;
                     // alignment_name = "metal";
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Alignment AA." << endl;
-#endif
+				#endif
 
 				if (use_bestbind_algorithm)	for (l=0; l<3; l++)
 				{
@@ -882,9 +1003,9 @@ int main(int argc, char** argv)
 		                    // alca = alignment_aa->get_atom("CA");
 		                    alca = alignment_aa[l]->get_most_bindable(1)[0];
 		                }
-#if _DBG_STEPBYSTEP
+						#if _DBG_STEPBYSTEP
                     	if (debug) *debug << "Got alignment atom." << endl;
-#endif
+						#endif
 
 		                if (alca)
 		                {
@@ -981,10 +1102,10 @@ int main(int argc, char** argv)
 		                }
 	                }
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Aligned ligand to AA." << endl;
-#endif
     			cout << endl;
+				#endif
             }
 
             // float driftamt = 1.0 / (iters/25+1);
@@ -1025,9 +1146,9 @@ int main(int argc, char** argv)
             // Any entry with a smaller kJ/mol, increment its pose# but remember the smallest pre-increment pose #
             // from the lot of them;
             // Claim that new smallest pose# (which might be 1) as your own.
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Preparing output." << endl;
-#endif
+			#endif
 
             char metrics[p.get_seq_length()+8][10];
             float mkJmol[p.get_seq_length()+8];
@@ -1071,25 +1192,25 @@ int main(int argc, char** argv)
             
 			drcount = pose-1;
             
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared metrics." << endl;
-#endif
+			#endif
 
             // Allocate the array.
             dr[drcount][nodeno].kJmol = btot;
             dr[drcount][nodeno].metric = new char*[metcount+4];
             dr[drcount][nodeno].mkJmol = new float[metcount];
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
-#endif
+			#endif
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++)
             {
                 dr[drcount][nodeno].bytype[i] = total_binding_by_type[i];
             }
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Filled btypes." << endl;
-#endif
+			#endif
 
 			// Populate the array.
             for (i=0; i<metcount; i++)
@@ -1104,18 +1225,18 @@ int main(int argc, char** argv)
             dr[drcount][nodeno].metric[i] = new char[1];
             dr[drcount][nodeno].metric[i][0] = 0;
             dr[drcount][nodeno].metric[i+1] = 0;
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "More metrics or something idfk." << endl;
-#endif
+			#endif
 
             std::ostringstream pdbdat;
 
             // Prepare a partial PDB of the ligand atoms and all involved residue sidechains.
             n = m.get_atom_count();
             for (l=0; l<n; l++) m.get_atom(l)->stream_pdb_line(pdbdat, 9000+l);
-#if _DBG_STEPBYSTEP
+			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared ligand PDB." << endl;
-#endif
+			#endif
 
             if (flex)
             {
@@ -1131,9 +1252,9 @@ int main(int argc, char** argv)
                         );
                     }
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Prepared flex PDBs." << endl;
-#endif
+				#endif
             }
 
             dr[drcount][nodeno].pdbdat = pdbdat.str();
@@ -1156,9 +1277,9 @@ int main(int argc, char** argv)
                     dr[drcount][nodeno].pose = bestpose;
                     // cout << "Around the posie: "; for (i=0; i<=drcount; i++) cout << dr[i][nodeno].pose << " "; cout << endl;
                 }
-#if _DBG_STEPBYSTEP
+				#if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added pose to output array." << endl;
-#endif
+				#endif
             }
 
             drcount = pose;
@@ -1168,9 +1289,9 @@ int main(int argc, char** argv)
             if (btot < kJmol_cutoff) break;
         }	// nodeno loop.
     } // pose loop.
-#if _DBG_STEPBYSTEP
+	#if _DBG_STEPBYSTEP
     if (debug) *debug << "Finished poses." << endl;
-#endif
+	#endif
 
     // Output the dr[][] array in order of increasing pose number.
     cout << endl;
@@ -1239,7 +1360,8 @@ int main(int argc, char** argv)
                             cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                             if (output) *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                         }
-_btyp_unassigned:
+						
+						_btyp_unassigned:
 
                         if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                         cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
@@ -1285,7 +1407,8 @@ _btyp_unassigned:
             }
         }
     }
-_exitposes:
+
+	_exitposes:
     cout << (i-1) << " pose(s) found." << endl;
     if (output) *output << (i-1) << " pose(s) found." << endl;
     if (debug) *debug << (i-1) << " pose(s) found." << endl;

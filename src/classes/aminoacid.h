@@ -108,6 +108,7 @@ class AminoAcid : public Molecule
  	static Molecule** aas_to_mols(AminoAcid** aas);
  	int similarity_to(const char letter);
     Ring* get_most_distal_arom_ring();
+    std::string printable();
     
  	// Public properties.
  	int strand;

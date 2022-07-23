@@ -89,6 +89,41 @@ Molecule::~Molecule()
 	;
 }
 
+
+Pose::Pose()
+{
+	;
+}
+
+Pose::Pose(Molecule* m)
+{
+	copy_state(m);
+}
+
+void Pose::copy_state(Molecule* m)
+{
+	saved_atom_locs.clear();
+	saved_from = m;
+	if (!m || !m->atoms) return;
+	
+	int i;
+	for (i=0; m->atoms[i]; i++)
+		saved_atom_locs.push_back(m->atoms[i]->get_location());
+}
+
+void Pose::restore_state(Molecule* m)
+{
+	int sz = saved_atom_locs.size();
+	if (!m || !m->atoms || !sz || m != saved_from) return;
+	
+	int i;
+	for (i=0; i<sz && m->atoms[i]; i++)
+	{
+		m->atoms[i]->move(saved_atom_locs[i]);
+	}
+}
+
+
 void Molecule::delete_atom(Atom* a)
 {
 	if (!a) return;
@@ -223,6 +258,25 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
                  << ". Please check bindings.dat." << endl;
         throw 0xbad6160;
     }
+}
+
+void Molecule::save_state()
+{
+	saved_atom_locs.clear();
+	
+	if (!atoms) return;
+	int i;
+	for (i=0; atoms[i]; i++)
+		saved_atom_locs.push_back(atoms[i]->get_location());
+}
+
+void Molecule::restore_state()
+{
+	if (!atoms) return;
+	int i, n = saved_atom_locs.size();
+	
+	for (i=0; i<n && atoms[i]; i++)
+		atoms[i]->move(saved_atom_locs[i]);
 }
 
 void Molecule::clear_all_bond_caches()
@@ -1217,10 +1271,20 @@ Bond** Molecule::get_rotatable_bonds()
             {
                 if (lb[j]->count_moves_with_btom() > mwblimit) continue;
                 
-                // Generally, a single bond between pi atoms cannot rotate.
-                if (lb[j]->atom && lb[j]->atom->is_pi()
-                	&&
-                	lb[j]->btom && lb[j]->btom->is_pi()
+                if (!lb[j]->atom || !lb[j]->btom) continue;
+                
+                bool pia = lb[j]->atom->is_pi(),
+                	 pib = lb[j]->btom->is_pi();
+                
+                int fa = lb[j]->atom->get_family(),
+                	fb = lb[j]->btom->get_family();
+                
+                // Generally, a single bond between pi atoms, or a bond from a pi atom to an amino group, cannot rotate.
+                if (	(pia && pib)
+                		||
+                		(pia && (fb == PNICTOGEN))
+                		||
+                		(pib && (fa == PNICTOGEN))
                    )
                    lb[j]->can_rotate = false;
                 
@@ -1613,7 +1677,7 @@ void Molecule::move(Point move_amt)
     }
 }
 
-Point Molecule::get_barycenter() const
+Point Molecule::get_barycenter(bool bond_weighted) const
 {
     if (noAtoms(atoms))
     {
@@ -1624,7 +1688,17 @@ Point Molecule::get_barycenter() const
     Point locs[atcount];
     int i;
 
-    for (i=0; i<atcount; i++) locs[i] = atoms[i]->get_location();
+    for (i=0; i<atcount; i++)
+    {
+    	locs[i] = atoms[i]->get_location();
+		locs[i].weight = atoms[i]->get_atomic_weight();
+    	#if allow_tethered_rotations
+    	if (bond_weighted)
+    	{
+    		locs[i].weight += atoms[i]->last_bind_energy;
+    	}
+    	#endif
+	}
 
     return average_of_points(locs, atcount);
 }
@@ -1648,12 +1722,12 @@ void Molecule::recenter(Point nl)
     move(v);
 }
 
-void Molecule::rotate(SCoord* SCoord, float theta)
+void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
 {
     if (noAtoms(atoms)) return;
     // cout << name << " Molecule::rotate()" << endl;
 
-    Point cen = get_barycenter();
+    Point cen = get_barycenter(bond_weighted);
 
     int i;
     for (i=0; i<atcount; i++)
@@ -1764,6 +1838,50 @@ void Molecule::clear_atom_binding_energies()
         atoms[i]->last_bind_energy = 0;
 }
 
+float Molecule::get_intermol_potential(Molecule* ligand)
+{
+    Molecule* ligands[4];
+    ligands[0] = ligand;
+    ligands[1] = nullptr;
+    return get_intermol_potential(ligands);
+}
+
+float Molecule::get_intermol_potential(Molecule** ligands)
+{
+    if (!ligands) return 0;
+    if (!ligands[0]) return 0;
+    int i, j, l, n;
+    float kJmol = 0;
+    
+    for (i=0; i<atcount; i++)
+    {
+        Point aloc = atoms[i]->get_location();
+        for (l=0; ligands[l]; l++)
+        {
+            if (ligands[l] == this) continue;
+            for (j=0; j<ligands[l]->atcount; j++)
+            {
+                float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
+                float f = 1.0 / r;		// Regular invert rather than inv square so that actual bonding will take over at short range.
+                InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], ligands[l]->atoms[j]);
+
+                if (iff) for (n=0; iff[n]; n++)
+                {
+                	if (iff[n]->get_type() == vdW) continue;
+                	
+                	if (r < iff[n]->get_distance())
+                		kJmol += iff[n]->get_kJmol();
+                	else
+                    	kJmol += iff[n]->get_kJmol()*f;
+                }
+                delete[] iff;
+            }
+        }
+    }
+
+    return kJmol;
+}
+
 float Molecule::get_intermol_binding(Molecule** ligands)
 {
     if (!ligands) return 0;
@@ -1859,6 +1977,7 @@ void Molecule::minimize_internal_clashes()
     // cout << " base internal clashes: " << base_internal_clashes << endl;
 }
 
+#if include_old_intermol_conforms
 void Molecule::intermol_conform(Molecule* ligand, int iters)
 {
     Molecule* ligands[4];
@@ -2205,6 +2324,7 @@ void Molecule::intermol_conform_flexonly(Molecule** ligands, int iters, Molecule
         }
     }
 }
+#endif
 
 
 #define DBG_BONDFLEX 0
@@ -2269,8 +2389,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             float accel = 1.1;
 
             /**** Linear Motion ****/
+            #if allow_linear_motion
             if (mm[i]->movability >= MOV_ALL && iter >= 10)
             {
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(false);
+            	#endif
+            	
                 Point pt(mm[i]->lmx, 0, 0);
                 mm[i]->move(pt);
                 bind1 = 0;
@@ -2355,12 +2480,22 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
 
                 mm[i]->lastbind = bind;
+
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(true);
+            	#endif
             }
             /**** End Linear Motion ****/
+            #endif
 
+            #if allow_axial_tumble
             /**** Axial Tumble ****/
             if (mm[i]->movability >= MOV_NORECEN)
             {
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(false);
+            	#endif
+            	
                 Point pt(1,0,0);
                 SCoord v(pt);
 
@@ -2368,7 +2503,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (!(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
                 {
                 	// cout << endl;
                     while ((M_PI*2-rad) > 1e-3)
@@ -2380,7 +2515,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         for (j=0; mm[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(mm[j]);
+                            bind1 += mm[i]->get_intermol_binding(mm[j]) + intermol_ESP * mm[i]->get_intermol_potential(mm[j]);
                         }
                         
                         // cout << "x " << rad*fiftyseven << "deg " << bind1 << endl;
@@ -2425,7 +2560,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (!(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
@@ -2436,7 +2571,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         for (j=0; mm[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(mm[j]);
+                            bind1 += mm[i]->get_intermol_binding(mm[j]) + intermol_ESP * mm[i]->get_intermol_potential(mm[j]);
                         }
                         
                         // cout << "y " << rad*fiftyseven << "deg " << bind1 << endl;
@@ -2482,7 +2617,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (!(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
@@ -2493,7 +2628,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         for (j=0; mm[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(mm[j]);
+                            bind1 += mm[i]->get_intermol_binding(mm[j]) + intermol_ESP * mm[i]->get_intermol_potential(mm[j]);
                         }
                         
                         // cout << "z " << rad*fiftyseven << "deg " << bind1 << endl;
@@ -2531,18 +2666,26 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                 }
 
-
                 mm[i]->lastbind = bind;
+                
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(true);
+            	#endif
             }
             /**** End Axial Tumble ****/
+            #endif
 
             if ((iter % _fullrot_every)) continue;
 
-
+			#if allow_bond_rots
             /**** Bond Flexion ****/
             // cout << mm[i]->name << ": " << mm[i]->movability << endl;
             if (mm[i]->movability >= MOV_FLEXONLY)
             {
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(false);
+            	#endif
+            	
                 mm[i]->get_rotatable_bonds();
                 int residue = 0;
                 
@@ -2622,7 +2765,19 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                                 for (j=0; mm[j]; j++)
                                 {
                                     if (!nearby[j]) continue;
-                                    float lbind1 = mm[i]->get_intermol_binding(mm[j]);
+                                    float lbind1 = 
+                                    
+                                    #if allow_ligand_esp
+                            			 (mm[i]->mol_typ == MOLTYP_AMINOACID)
+                            			 ?
+                                    #endif
+                            			 mm[i]->get_intermol_binding(mm[j])
+                                    #if allow_ligand_esp
+                            			 :  
+                            			 mm[i]->get_intermol_potential(mm[j]) - 10 * mm[i]->get_internal_clashes()
+                                    #endif
+                            			 ;
+                            		
                                     bind1 += lbind1;
                                     #if DBG_BONDFLEX
                                     if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
@@ -2675,11 +2830,17 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 	cout << endl;
     			#endif
                 mm[i]->lastbind = bind;
+                
+            	#if debug_break_on_move
+            	mm[i]->set_atoms_break_on_move(true);
+            	#endif
 
                 if (!(iter % _fullrot_every)) mm[i]->reset_conformer_momenta();
             }
             /**** End Bond Flexion ****/
-        }	// for i
+            #endif
+
+        }	// for i = 0 to iters
         // cout << "Iteration " << iter << " improvement " << improvement << endl;
 
         if (cb) cb(iter);

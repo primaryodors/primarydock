@@ -464,6 +464,10 @@ Atom** Bond::get_moves_with_btom()
 
 bool Atom::move(Point* pt)
 {
+	#if debug_break_on_move
+	if (break_on_move) throw 0xb16fa7012a96eca7;
+	#endif
+
 	/*if (name && !strcmp(name, "CB"))
 	{
 		Bond* b = get_bond_between("CA");
@@ -482,6 +486,10 @@ bool Atom::move(Point* pt)
 
 bool Atom::move_rel(SCoord* v)
 {
+	#if debug_break_on_move
+	if (break_on_move) throw 0xb16fa7012a96eca7;
+	#endif
+
 	/*if (name && !strcmp(name, "CB"))
 	{
 		Bond* b = get_bond_between("CA");
@@ -520,12 +528,21 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     Point a0loc = location;
     a0loc = a0loc.add(&mov);
     a0loc = rotate3D(&a0loc, pt, &rot);
+    
+	#if debug_break_on_move
+	if (break_on_move) throw 0xb16fa7012a96eca7;
+	#endif
+	
     location = a0loc;
     atomct++;
     //cout << "Motion includes " << name << endl;
 
     for (i=0; atoms[i]; i++)
     {
+		#if debug_break_on_move
+		if (atoms[i]->break_on_move) throw 0xb16fa7012a96eca7;
+		#endif
+
         // atoms[i]->move_rel(mov);
         Point aloc = atoms[i]->location;
         aloc = aloc.add(&mov);
@@ -1144,6 +1161,32 @@ bool Bond::rotate(float theta, bool allow_backbone)
     rot.v = v;
     rot.a = theta;
     btom->rotate_geometry(rot);
+    
+    #if allow_tethered_rotations
+    // Whichever side has the lower sum of Atom::last_bind_energy values, rotate that side.
+    float mwb_total_binding=0, mwbi_total_binding=0;
+    Bond* inverse = btom->get_bond_between(atom);
+    
+    if (!atom->residue && !btom->residue && inverse && inverse->can_rotate && !(inverse->moves_with_btom)) inverse->fill_moves_with_cache();
+    if (!atom->residue && !btom->residue && inverse && inverse->can_rotate && inverse->moves_with_btom)
+    {
+    	for (i=0; moves_with_btom[i]; i++)
+    	{
+    		if (moves_with_btom[i]->is_backbone) mwbi_total_binding += 1e9; // goto _cannot_reverse_bondrot;
+    		mwb_total_binding += moves_with_btom[i]->last_bind_energy;
+    	}
+    	for (i=0; inverse->moves_with_btom[i]; i++)
+    	{
+    		if (inverse->moves_with_btom[i]->is_backbone) goto _cannot_reverse_bondrot;
+    		mwbi_total_binding += inverse->moves_with_btom[i]->last_bind_energy;
+    	}
+    	
+    	if (mwb_total_binding < mwbi_total_binding)
+    		return inverse->rotate(-theta, allow_backbone);				// DANGER! RECURSION.
+    }
+    _cannot_reverse_bondrot:
+    ;
+	#endif
 
     // cout << "Rotating " << atom->name << "-" << btom->name << "... ";
     for (i=0; moves_with_btom[i]; i++)

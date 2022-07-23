@@ -176,6 +176,24 @@ bool Protein::add_sequence(const char* lsequence)
     return true;
 }
 
+void Protein::save_state()
+{
+	if (!residues) return;
+	int i;
+	
+	for (i=0; residues[i]; i++)
+		residues[i]->save_state();
+}
+
+void Protein::restore_state()
+{
+	if (!residues) return;
+	int i;
+	
+	for (i=0; residues[i]; i++)
+		residues[i]->restore_state();
+}
+
 void Protein::save_pdb(FILE* os)
 {
     int i, offset=0;
@@ -502,8 +520,15 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
 {
 	std::vector<AminoAcid*> retval;
 	
+	float cb_tolerance_angle = 44 * fiftyseventh;
+	float tolerance_sine = sin(cb_tolerance_angle);
+	
 	if (!residues) return retval;
 	int i, j;
+	
+	#if _DBG_TUMBLE_SPHERES
+	cout << "Protein::get_residues_near(" << pt << ", " << maxr << ")" << endl;
+	#endif
 	
     for (i=0; residues[i]; i++)
     {
@@ -512,11 +537,22 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
     	if (facing && residues[i]->get_atom("CB"))
     	{
     		float r1 = pt.get_3d_distance(residues[i]->get_atom_location("CB"));
-    		if (r1 > r) continue;
+    		float r2 = residues[i]->get_atom_location("CA").get_3d_distance(residues[i]->get_atom_location("CB"));
+    		float tolerance = r2 * tolerance_sine;
+    		if (r1 > r+tolerance) continue;
     	}
     	
-    	if (r <= maxr) retval.push_back(residues[i]);
+    	if (r <= maxr)
+    	{
+    		retval.push_back(residues[i]);
+    		#if _DBG_TUMBLE_SPHERES
+    		cout << residues[i]->get_3letter() << residues[i]->get_residue_no() << " ";
+    		#endif
+		}
     }
+    #if _DBG_TUMBLE_SPHERES
+    cout << endl << endl;
+    #endif
     
     return retval;
 }
@@ -548,11 +584,11 @@ AminoAcid** Protein::get_residues_can_clash(int resno)
 }
 
 int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
-        const Molecule* ligand,
+        Molecule* ligand,
         const Point nodecen,
         const Point size,
         const int* mcoord_resno
-                                            )
+		)
 {
     int i, j, sphres = 0;
     int seql = get_seq_length();
@@ -569,6 +605,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         int resno = aa->get_residue_no();
 
         if (mcoord_resno)
+        {
             for (j=0; mcoord_resno[j]; j++)
             {
                 if (mcoord_resno[j] == resno)
@@ -589,6 +626,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
                     continue;
                 }
             }
+        }
 
         Atom* ca = aa->get_atom("CA");
         if (!ca) continue;
@@ -602,12 +640,11 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 
         if (cb)
         {
+            Point pt1 = pt.subtract(&pt2);
             float angle = find_3d_angle(cb->get_location(), pt2, ca->get_location());
-            if (angle < M_PI/1.5)
+            if (pt1.magnitude() < 3 || angle < _can_clash_angle)
             {
-                Point pt1 = pt;
-                pt1 = pt1.subtract(&pt2);
-                if (pt1.magnitude() <= aa->get_reach()*1.25)
+                if (pt1.magnitude() < (aa->get_reach()+2))
                 {
                     if (!resno_already[resno])
                     {
@@ -627,7 +664,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
             }
 
             angle = find_3d_angle(cb->get_location(), nodecen, ca->get_location());
-            if (angle > M_PI/1.5) continue;
+            if (angle > _can_clash_angle) continue;
         }
 
         pt = pt.subtract(&nodecen);
@@ -641,7 +678,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 
         SCoord dir(&pt1);
 
-        if (dir.r <= 1.25)
+        if (dir.r <= 1)
         {
             if (!resno_already[resno])
             {
@@ -1775,7 +1812,50 @@ void Protein::rotate_piece(int start_res, int end_res, int align_res, Point alig
 	}
 }
 
-
+Point Protein::find_loneliest_point(Point cen, Point sz)
+{
+	if (!residues) return cen;
+	
+	float x, y, z, xp, yp, zp, r, bestr = 0, step = 0.25;
+	int i;
+	Point retval = cen;
+	
+	for (x = -sz.x; x <= sz.x; x += step)
+	{
+		xp = x / sz.x; xp *= xp;
+		for (y = -sz.y; y <= sz.y; y += step)
+		{
+			yp = y / sz.y; yp *= yp;
+			for (z = -sz.z; z <= sz.z; z += step)
+			{
+				zp = z / sz.z; zp *= zp;
+				r = sqrt(xp+yp+zp);
+				if (r > 1) continue;
+				
+				Point maybe(sz.x + x, sz.y + y, sz.z + z);
+				float minr = Avogadro;
+				
+				for (i=0; residues[i]; i++)
+				{
+					Atom* a = residues[i]->get_nearest_atom(maybe);
+					if (a)
+					{
+						r = a->get_location().get_3d_distance(maybe);
+						if (r < minr) minr = r;
+					}
+				}
+				
+				if (minr < 1e9 && minr > bestr)
+				{
+					retval = maybe;
+					bestr = minr;
+				}
+			}
+		}
+	}
+	
+	return retval;
+}
 
 
 

@@ -28,8 +28,23 @@ enum MoleculeType
 	MOLTYP_AMINOACID
 };
 
+class Pose
+{
+	public:
+	Pose();
+	Pose(Molecule* from_mol);
+	void copy_state(Molecule* from_mol);
+	void restore_state(Molecule* to_mol);
+	
+	protected:
+	std::vector<Point> saved_atom_locs;
+	Molecule* saved_from = nullptr;
+};
+
 class Molecule
 {
+	friend class Pose;
+	
 	public:
     Molecule(const char* name);
     Molecule(const char* name, Atom** collection);
@@ -43,7 +58,8 @@ class Molecule
     int from_pdb(FILE* inf);				// returns number of atoms loaded.
     void identify_acidbase();				// called within every load.
     bool from_smiles(char const * smilesstr);
-    float close_loop(Atom** path, float closing_bond_cardinality);
+    void save_state();
+    void restore_state();
 
     // Getters.
     const char* get_name() const	{	return name;	}
@@ -55,14 +71,15 @@ class Molecule
     float get_charge();
 
     // Spatial functions.
-    Point get_barycenter() const;
+    Point get_barycenter(bool bond_weighted = false) const;
     virtual void move(SCoord move_amt);
     virtual void move(Point move_amt);
     virtual void recenter(Point new_location);
-    virtual void rotate(SCoord* SCoord, float theta);
+    void rotate(SCoord* SCoord, float theta, bool bond_weighted = false);
     void rotate(LocatedVector SCoord, float theta);
     bool shielded(Atom* a, Atom* b) const;
     float correct_structure(int iters = 500);
+    float close_loop(Atom** path, float closing_bond_cardinality);
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -100,6 +117,8 @@ class Molecule
     float get_intermol_clashes(Molecule** ligands);
     float get_intermol_binding(Molecule* ligand);
     float get_intermol_binding(Molecule** ligands);
+    float get_intermol_potential(Molecule* ligand);
+    float get_intermol_potential(Molecule** ligands);
     float hydrophilicity();
 
     static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);
@@ -107,7 +126,8 @@ class Molecule
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
 
-
+	// Unused code alert! If everything builds with this compiler switch turned off, the entire list of functions can be removed.
+	#if include_old_intermol_conforms
     void intermol_conform(Molecule* ligand, int iters = 50);
     void intermol_conform(Molecule* ligand, int iters, Molecule** avoid_clashing_with);
     void intermol_conform(Molecule* ligand, int iters, AminoAcid** avoid_clashing_with);
@@ -120,9 +140,16 @@ class Molecule
     void intermol_conform_norecen(Molecule** ligands, int iters, AminoAcid** avoid_clashing_with);
     void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with);
     void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with);
+    #endif
+    
     void reset_conformer_momenta();
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
     Atom** get_most_bindable(int max_num, Atom* for_atom);
+    
+    // Debug stuff.
+    #if debug_break_on_move
+    void set_atoms_break_on_move(bool break_on_move) { if (atoms) { int i; for (i=0; atoms[i]; i++) atoms[i]->break_on_move = break_on_move; } }
+    #endif
 
     bool echo_iters = false;
     MovabilityType movability = MOV_ALL;
@@ -141,6 +168,8 @@ class Molecule
     bool doing_bkbend = false;
     float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
     std::string sdfgen_aboutline = "";
+    
+    std::vector<Point> saved_atom_locs;
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.

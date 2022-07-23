@@ -420,6 +420,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     	if (N) new_atoms[l++] = N;
     	if (HN) new_atoms[l++] = HN;
     	
+    	minimize_internal_clashes();
 		for (i=0; atoms[i]; i++)
 		{
 			if (atom_Greek[i] <= 0) continue;
@@ -443,6 +444,9 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 			}
 			atoms[i]->clear_geometry_cache();
 			atoms[i]->clear_all_moves_cache();
+			
+			float r = atoms[i]->distance_to(CA);
+			if (r > aa_defs[idx].reach) aa_defs[idx].reach = r;
 		}
     	
     	if (C) new_atoms[l++] = C;
@@ -996,6 +1000,14 @@ Molecule** AminoAcid::aas_to_mols(AminoAcid** aas)
 
 	return mols;
 }
+
+std::string AminoAcid::printable()
+{
+	stringstream s;
+	s << *this;
+	return s.str();
+}
+
 
 void AminoAcid::save_pdb(FILE* os, int atomno_offset)
 {

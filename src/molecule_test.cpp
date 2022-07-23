@@ -160,7 +160,7 @@ int main(int argc, char** argv)
     cout << "\n# Moved molecule 2 by " << ttlmv << " A." << endl;*/
 
     cout << "# Initial intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
-    cout << "# Initial intermol energy level: " << m1.get_intermol_binding(&m2) << " kJ/mol." << endl;
+    cout << "# Initial intermol energy level: " << -m1.get_intermol_binding(&m2) << " kJ/mol." << endl;
 
     m1.reset_conformer_momenta();
     m2.reset_conformer_momenta();
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
     float final_clashes = m1.get_intermol_clashes(&m2);
     if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);
-    cout << "\n# Post-conformation intermol energy level: " << energyLevel << " kJ/mol." << endl;
+    cout << "\n# Post-conformation intermol energy level: " << -energyLevel << " kJ/mol." << endl;
     const float energyLevelThreshold = 5.0;
     if(energyLevel > energyLevelThreshold)
         cout << "Energy level above threshold, SUCCESS.\n";

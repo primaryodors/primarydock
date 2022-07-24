@@ -678,11 +678,11 @@ bool Molecule::save_sdf(FILE* os, Molecule** lig)
     if (sdfgen_aboutline.length()) fprintf(os, "%s\n", sdfgen_aboutline.c_str());
     else
     {
-		fprintf(os, "  podock-%02d%02d%02d%02d%02d%02d3D\n", gmtm->tm_year % 100, gmtm->tm_mon+1, gmtm->tm_mday,
+		fprintf(os, "  primarydock-%02d%02d%02d%02d%02d%02d3D\n", gmtm->tm_year % 100, gmtm->tm_mon+1, gmtm->tm_mday,
 		        gmtm->tm_hour, gmtm->tm_min, gmtm->tm_sec
 		       );
 
-    	fprintf(os, "https://github.com/primaryodors/podock\n");
+    	fprintf(os, "https://github.com/primaryodors/primarydock\n");
 	}
 
     int ac, bc, chargeds=0;

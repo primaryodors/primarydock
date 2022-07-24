@@ -1,8 +1,8 @@
-# podock
+# primarydock
 PrimaryOdors.org molecular docker.<br>
 http://www.primaryodors.org
 
-PODock is a fast, lightweight molecular docking software package that offers the following advantages:
+primarydock is a fast, lightweight molecular docking software package that offers the following advantages:
 - Path-based docking;
 - Native support for side-chain flexion;
 - Per-residue binding strength output;
@@ -11,16 +11,16 @@ PODock is a fast, lightweight molecular docking software package that offers the
 - Does not require CMake, but can be built on any recent *nix system using make, g++, and the C++14 Standard Library;
 - Interatomic parameters stored in flat text files that can be edited without recompiling the application.
 
-To Use PODock, please first clone the repository, then execute the following command:
+To Use primarydock, please first clone the repository, then execute the following command:
 
 ```
-make podock
+make primarydock
 ```
 
 If you are a developer contributing to the project, you can use `make` to build everything and run the test reports, or 
 `make code` to just build the code and not run the tests.
 
-The application will require 3D maps of your target receptor(s) in PDB format. Please note that PODock does not currently
+The application will require 3D maps of your target receptor(s) in PDB format. Please note that primarydock does not currently
 hydrogenate PDB models that do not include hydrogen atoms, so if your model contains heavy atoms only, the accuracy of
 docking results may be severely compromised. PDBs for human olfactory receptors are provided in the pdbs folder for olfactory
 docking. They have been modified from the PDBs available at the GPCR-I-TASSER website: https://zhanggroup.org/GPCR-I-TASSER/
@@ -35,19 +35,19 @@ SDFs can be obtained a few different ways:
   <li>Or at https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{SMILES}/SDF?record_type=3d</li>
 </ul>
 
-Please take a look at the podock.config file as a sample of the format for dock settings. You will be editing this file
+Please take a look at the primarydock.config file as a sample of the format for dock settings. You will be editing this file
 (or creating a new one) for each receptor+ligand pair that you wish to dock. There are lines for repointing to your PDB and SDF
 model input files, as well as various other options that may be useful to your purposes.
 
-Known issue: please make sure to add an empty line at the end of your config file, or PODock will throw an exception.
+Known issue: please make sure to add an empty line at the end of your config file, or primarydock will throw an exception.
 
-Once your .config file is ready, and the PODock code is compiled, simply cd to the podock folder and run the following command:
+Once your .config file is ready, and the primarydock code is compiled, simply cd to the primarydock folder and run the following command:
 
-./bin/podock [config file]
+./bin/primarydock [config file]
 
 (...replacing "[config file]" with the actual name of the file you edited or created.)
 
-After a little while, depending on your config settings, PODock will output data about one or more poses, including binding energy
+After a little while, depending on your config settings, primarydock will output data about one or more poses, including binding energy
 per residue, binding energy per type, total binding energy, PDB data of the ligand, and (if flexing is enabled) PDB data of the binding
 residues. This output can be captured and parsed by external code, written in your language of choice, for further computation, storage
 in a database, etc.
@@ -59,7 +59,7 @@ If you would like to contribute to this project:
 <li>Have fun and try not to let the project vex you. (:</li>
 </ol>
 
-Note to developers: if you run podock under a memory utility such as valgrind, you are likely to see a lot of errors saying that
+Note to developers: if you run primarydock under a memory utility such as valgrind, you are likely to see a lot of errors saying that
 uninitialized variables are being used or that conditional jumps depend on them. Most of these are false positives. Many places in the
 code create temporary arrays of pointers and then assign those pointers addresses of objects that persist throughout the entire program
 execution. The memory tool "thinks" the objects have not been initialized even when they have. We recommend using the --undef-value-errors=no

@@ -3,6 +3,7 @@
 *_test
 metal
 podock
+primarydock
 *.config
 *.dat
 *.pdb

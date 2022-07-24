@@ -527,7 +527,7 @@ TER
 END
 Content of test2.sdf:
 Test2
-https://github.com/primaryodors/podock
+https://github.com/primaryodors/primarydock
  100 101  0     0  0  0  0  0  0999 V2000
     2.8340   -0.9840   -0.8670 N   0  0  0  0  0  0  0  0  0  0  0  0
     3.8580   -0.9860   -0.8250 H   0  0  0  0  0  0  0  0  0  0  0  0

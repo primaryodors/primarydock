@@ -6,7 +6,7 @@ SDFDIR=sdf
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 TESTS=test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/backbone_test
-APPS=$(BINDIR)/podock $(BINDIR)/interpreter
+APPS=$(BINDIR)/primarydock $(BINDIR)/interpreter
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
 all: $(DIRS) \
 	 $(OBJS) \
@@ -14,7 +14,7 @@ all: $(DIRS) \
 	 $(APPS) \
 	 $(REPORTS)
 code: $(OBJS) $(TESTS) $(APPS)
-podock: $(DIRS) $(OBJS) $(BINDIR)/podock
+primarydock: $(DIRS) $(OBJS) $(BINDIR)/primarydock
 
 CC=g++
 
@@ -85,14 +85,14 @@ test/protein_test: src/protein_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/
 test/backbone_test: src/backbone_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 	$(CC) src/backbone_test.cpp $(OBJS) -o test/backbone_test $(CFLAGS)
 
-$(BINDIR)/podock: src/podock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
-	$(CC) src/podock.cpp $(OBJS) -o $(BINDIR)/podock $(CFLAGS)
+$(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
+	$(CC) src/primarydock.cpp $(OBJS) -o $(BINDIR)/primarydock $(CFLAGS)
 
 $(BINDIR)/interpreter: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 	$(CC) src/interpreter.cpp $(OBJS) -o $(BINDIR)/interpreter $(CFLAGS)
 
-performance_test: $(BINDIR)/podock testdata/test_TAAR8.config testdata/TAAR8.rotated.pdb testdata/CAD_ion.sdf
-	./$(BINDIR)/podock testdata/test_TAAR8.config
+performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.rotated.pdb testdata/CAD_ion.sdf
+	./$(BINDIR)/primarydock testdata/test_TAAR8.config
 
 # low-tooling regression tests below
 amino_report: REPORT="test/amino_test.approved.txt"

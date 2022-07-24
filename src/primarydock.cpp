@@ -324,7 +324,7 @@ int main(int argc, char** argv)
 
     time_t began = time(NULL);
 
-    strcpy(configfname, "podock.config");
+    strcpy(configfname, "primarydock.config");
 
     if (argc > 1)
     {

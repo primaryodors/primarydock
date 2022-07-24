@@ -528,6 +528,10 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     					(	aabd[n]->cardinality <= 1.1
 	    					&&
 	    					(	!bb[j]->atom->is_pi() || !bb[j]->btom->is_pi()	)
+	    					&&
+	    					(	!bb[j]->atom->is_pi() ||  bb[j]->btom->get_family() != PNICTOGEN	)
+	    					&&
+	    					(	bb[j]->atom->get_family() != PNICTOGEN || !bb[j]->btom->is_pi()	)
 	    				);
 	    			n++;
     			}
@@ -607,115 +611,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		Point* pts = prevaa->predict_next_NHCA();
 		glom(pts);
 		delete[] pts;
-		
-		/*
-		// Make sure we have all the right atoms.
-		Atom* currN = get_atom("N");
-		Atom* prevC = prevaa->get_atom("C");
-		if (!currN || !prevC) return;
-		currN->aromatize();				// Not actually aromatic, but the pi bond geometry is the same.
-		prevC->aromatize();
-		Atom* prevCA = prevaa->get_atom("CA");
-		Atom* prevO  = prevaa->get_atom("O");
-		if (!prevCA || !prevO) return;
-		Atom* currHN = HN_or_substitute();
-		Atom* currCA = get_atom("CA");
-		
-		// Proline fix.
-		if (!currHN)
-		{
-			Bond** bb = currN->get_bonds();
-			for (i=0; bb[i]; i++)
-			{
-				if (bb[i]->btom && bb[i]->btom != currCA)
-				{
-					currHN = bb[i]->btom;
-					break;
-				}
-			}
-		}
-		
-		if (!currHN || !currCA) return;
-		
-		movability = MOV_ALL;
-		immobile = false;
-		
-		Point ptdbg(10,0,0);
-		SCoord sc;
-		aamove(ptdbg);
-		
-		// Get the curr.N - prev.C relative location and scale it to 1.32A.
-		sc = prevC->get_location().subtract(currN->get_location());
-		
-		// Move the entire current molecule so the N is now at that distance.
-		sc.r -= 1.32;
-		aamove(sc);
-		
-		for (i=0; i<10; i++)
-		{
-			// Get the normal from the prev.CA - prev.C - prev.O plane.
-			SCoord axis = compute_normal(prevCA->get_location(), prevC->get_location(), prevO->get_location());
-			
-			// Get the angle along the normal of prev.O - prev.C - curr.N.
-			float theta = find_angle_along_vector(prevO->get_location(), currN->get_location(), prevC->get_location(), axis);
-			float plus  = triangular - theta;
-			float minus = triangular*2 - theta;		// 240deg is the same as -120deg.
-			
-			// Rotate the current molecule about the prev.C atom, using the normal as an axis,
-			// to get a 120 degree angle not clashing curr.N with prev.CA.
-			Point maybeP = rotate3D(currN->get_location(), prevC->get_location(), axis, plus);
-			Point maybeM = rotate3D(currN->get_location(), prevC->get_location(), axis, minus);
-			LocatedVector lv(axis);
-			lv.origin = prevC->get_location();
-			if (maybeP.get_3d_distance(prevCA->get_location()) > maybeM.get_3d_distance(prevCA->get_location()))
-				Molecule::rotate(lv, plus);
-			else
-				Molecule::rotate(lv, minus);
-			
-			// Get the normal from the curr.HN - curr.N - curr.CA plane.
-			axis = compute_normal(prevCA->get_location(), prevC->get_location(), prevO->get_location());
-			
-			// Get the angle along the normal of prev.C - curr.N - curr.HN.
-			theta = find_angle_along_vector(prevC->get_location(), currHN->get_location(), currN->get_location(), axis);
-			plus  = triangular - theta;
-			minus = triangular*2 - theta;
-			
-			// Rotate the current molecule about the curr.N atom, using the normal as an axis,
-			// to get a 120 degree angle not clashing prev.C with curr.CA.
-			maybeP = rotate3D(currCA->get_location(), currN->get_location(), axis, plus);
-			maybeM = rotate3D(currCA->get_location(), currN->get_location(), axis, minus);
-			lv.copy(axis);
-			lv.origin = currN->get_location();
-			if (maybeP.get_3d_distance(prevC->get_location()) > maybeM.get_3d_distance(prevC->get_location()))
-				Molecule::rotate(lv, plus);
-			else
-				Molecule::rotate(lv, minus);
-			// return;		// Debug step.
-			
-			// Get the angle of curr.HN - prev.O along the prev.C - curr.N axis.
-			axis = currN->get_location().subtract(prevC->get_location());
-			theta = find_angle_along_vector(currHN->get_location(), prevO->get_location(), currN->get_location(), axis);
-			
-			// Rotate the current molecule around curr.N to get 180 degrees.
-			lv.copy(axis);
-			lv.origin = currN->get_location();
-			Molecule::rotate(lv, M_PI+theta);
-			
-			// Rotate around prev.C axis prev.C-prev.O to get 180 degrees about that axis.
-			axis = prevO->get_location().subtract(prevC->get_location());
-			theta = find_angle_along_vector(prevCA->get_location(), currN->get_location(), prevC->get_location(), axis);
-			lv.copy(axis);
-			lv.origin = prevC->get_location();
-			Molecule::rotate(lv, M_PI-theta);
-			
-			// Rotate around curr.N axis curr.N-curr.HN to get 180 degrees about that axis.
-			axis = currHN->get_location().subtract(currN->get_location());
-			theta = find_angle_along_vector(currCA->get_location(), prevC->get_location(), currN->get_location(), axis);
-			lv.copy(axis);
-			lv.origin = currN->get_location();
-			Molecule::rotate(lv, M_PI+theta);
-		}
-		*/
 		
 		movability = MOV_FLEXONLY;
 		immobile = true;

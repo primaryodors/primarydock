@@ -58,8 +58,6 @@ class Molecule
     int from_pdb(FILE* inf);				// returns number of atoms loaded.
     void identify_acidbase();				// called within every load.
     bool from_smiles(char const * smilesstr);
-    void save_state();
-    void restore_state();
 
     // Getters.
     const char* get_name() const	{	return name;	}
@@ -126,22 +124,6 @@ class Molecule
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
 
-	// Unused code alert! If everything builds with this compiler switch turned off, the entire list of functions can be removed.
-	#if include_old_intermol_conforms
-    void intermol_conform(Molecule* ligand, int iters = 50);
-    void intermol_conform(Molecule* ligand, int iters, Molecule** avoid_clashing_with);
-    void intermol_conform(Molecule* ligand, int iters, AminoAcid** avoid_clashing_with);
-    void intermol_conform(Molecule** ligands, int iters = 50);
-    void intermol_conform_norecen(AminoAcid** ligands, int iters = 50);
-    void intermol_conform(Molecule** ligands, int iters, Molecule** avoid_clashing_with);
-    void intermol_conform_norecen(Molecule* ligand, int iters, Molecule** avoid_clashing_with);
-    void intermol_conform_norecen(Molecule* ligand, int iters, AminoAcid** avoid_clashing_with);
-    void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_clashing_with);
-    void intermol_conform_norecen(Molecule** ligands, int iters, AminoAcid** avoid_clashing_with);
-    void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with);
-    void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with);
-    #endif
-    
     void reset_conformer_momenta();
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
     Atom** get_most_bindable(int max_num, Atom* for_atom);
@@ -169,8 +151,6 @@ class Molecule
     float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
     std::string sdfgen_aboutline = "";
     
-    std::vector<Point> saved_atom_locs;
-
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.
     float amx=0,amy=0,amz=0;			// Angular momentum xyz.

@@ -37,8 +37,6 @@ class Protein
     int load_pdb(FILE* infile);				// Returns number of residues loaded.
     void save_pdb(FILE* outfile);
     void end_pdb(FILE* outfile);
-    void save_state();
-    void restore_state();
 
     // Getters.
     int get_seq_length();

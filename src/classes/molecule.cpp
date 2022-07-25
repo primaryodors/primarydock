@@ -2020,6 +2020,8 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
             float reversal = -0.666; // TODO: Make this binding-energy dependent.
             float accel = 1.1;
+            
+            Pose put_it_back;
 
             /**** Linear Motion ****/
             #if allow_linear_motion
@@ -2030,6 +2032,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             	#endif
             	
                 Point pt(mm[i]->lmx, 0, 0);
+                put_it_back.copy_state(mm[i]);
                 mm[i]->move(pt);
                 bind1 = 0;
                 for (j=0; mm[j]; j++)
@@ -2039,14 +2042,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 if (bind1 < bind)
                 {
-                	// cout << bind << " vs " << bind1 << " x" << endl;
-                    pt.x = -pt.x;
-                    mm[i]->move(pt);
+                	put_it_back.restore_state(mm[i]);
                     mm[i]->lmx *= reversal;
                 }
                 else
                 {
-                	// cout << bind << " vs " << bind1 << " +" << endl;
                     improvement += (bind1 - bind);
                     if (fabs(mm[i]->lmx) < 0.5) mm[i]->lmx *= accel;
                     bind = bind1;
@@ -2054,6 +2054,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
                 pt.x = 0;
                 pt.y = mm[i]->lmy;
+                put_it_back.copy_state(mm[i]);
                 mm[i]->move(pt);
                 bind1 = 0;
                 for (j=0; mm[j]; j++)
@@ -2063,8 +2064,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 if (bind1 < bind)
                 {
-                    pt.y = -pt.y;
-                    mm[i]->move(pt);
+                	put_it_back.restore_state(mm[i]);
                     mm[i]->lmy *= reversal;
                 }
                 else
@@ -2076,6 +2076,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
                 pt.y = 0;
                 pt.z = mm[i]->lmz;
+                put_it_back.copy_state(mm[i]);
                 mm[i]->move(pt);
                 bind1 = 0;
                 for (j=0; mm[j]; j++)
@@ -2085,8 +2086,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 if (bind1 < bind)
                 {
-                    pt.z = -pt.z;
-                    mm[i]->move(pt);
+                	put_it_back.restore_state(mm[i]);
                     mm[i]->lmz *= reversal;
                 }
                 else
@@ -2165,6 +2165,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
+                	put_it_back.copy_state(mm[i]);
                     mm[i]->rotate(&v, mm[i]->amx);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
@@ -2174,7 +2175,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
-                        mm[i]->rotate(&v, -mm[i]->amx);
+                        put_it_back.restore_state(mm[i]);
                         mm[i]->amx *= reversal;
                     }
                     else
@@ -2221,6 +2222,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
+                	put_it_back.copy_state(mm[i]);
                     mm[i]->rotate(&v1, mm[i]->amy);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
@@ -2230,7 +2232,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
-                        mm[i]->rotate(&v1, -mm[i]->amy);
+                        put_it_back.restore_state(mm[i]);
                         mm[i]->amy *= reversal;
                     }
                     else
@@ -2278,6 +2280,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
+                	put_it_back.copy_state(mm[i]);
                     mm[i]->rotate(&v2, mm[i]->amz);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
@@ -2287,7 +2290,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
-                        mm[i]->rotate(&v2, -mm[i]->amz);
+                        put_it_back.restore_state(mm[i]);
                         mm[i]->amz *= reversal;
                         //cout << "x";
                     }
@@ -2435,7 +2438,8 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         else
                         {
                             float ra = mm[i]->rotatable_bonds[k]->angular_momentum;
-                            mm[i]->rotatable_bonds[k]->rotate(ra);
+                            put_it_back.copy_state(mm[i]);
+                    		mm[i]->rotatable_bonds[k]->rotate(ra);
 
                             bind1 = 0;
                             for (j=0; mm[j]; j++)
@@ -2445,7 +2449,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             }
                             if (bind1 < bind)
                             {
-                                mm[i]->rotatable_bonds[k]->rotate(-ra);
+                                put_it_back.restore_state(mm[i]);
                                 mm[i]->rotatable_bonds[k]->angular_momentum *= reversal;
                             }
                             else

@@ -1358,6 +1358,7 @@ int main(int argc, char** argv)
 		                        l++
 		                    )
                         {
+                        	if (fabs(dr[j][k].mvdWrepl[l]) < 0.001) continue;
                             cout << dr[j][k].metric[l] << ": " << -dr[j][k].mvdWrepl[l]*energy_mult << endl;
                             if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mvdWrepl[l]*energy_mult << endl;
                         }

@@ -512,6 +512,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float r = a->distance_to(b);
     float avdW = a->get_vdW_radius(), bvdW = b->get_vdW_radius();
     float rbind = avdW+bvdW;
+    
+    bool can_vdW_repel = true;
 
     float dp = 2;			// Directional propensity. The anisotropic component from each single vertex
     // is calculated as a cosine and then raised to this exponent.
@@ -547,6 +549,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         dp = 2;
         if (forces[i]->type == vdW) dp = 1;					// van der Waals forces are non-directional, but the C-H bond still shields.
         else if (forces[i]->get_dp()) dp = forces[i]->get_dp();
+        
+        if (forces[i]->type != pi && forces[i]->type != vdW) can_vdW_repel = false;
 
         // Anisotropy.
         SCoord* ageo = a->get_geometry_aligned_to_bonds();
@@ -830,7 +834,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
 _canstill_clash:
 	/*float confidence = 2.5;		// TODO: Get this from the PDB.
-	float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
+	float give = 0.5;				// TODO: Compute this from the receptor secondary structure.
 	
 	float allowable = give + confidence / sqrt(3);
 	
@@ -841,6 +845,18 @@ _canstill_clash:
         float f = rbind/(avdW+bvdW);
         kJmol -= pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);
     }
+    
+    if (can_vdW_repel && r < 4)
+    {
+    	float f = pow(fabs(sphere_intersection(2, 2, r)*_kJmol_cuA), 6);
+    	// f /= 2;
+    	a->last_vdW_repulsion += f;
+    	b->last_vdW_repulsion += f;
+    }
+    
+    // float kJhalf = kJmol/2;
+    a->last_bind_energy += kJmol;
+    b->last_bind_energy += kJmol;
 
     delete[] forces;
     return kJmol;

@@ -1823,7 +1823,10 @@ void Molecule::clear_atom_binding_energies()
 {
     int i;
     for (i=0; i<atcount; i++)
+    {
         atoms[i]->last_bind_energy = 0;
+        atoms[i]->last_vdW_repulsion = 0;
+    }
 }
 
 float Molecule::get_intermol_potential(Molecule* ligand)
@@ -1874,22 +1877,23 @@ float Molecule::get_intermol_binding(Molecule** ligands)
 {
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
-    int i, j, l;
+    int i, j, k, l;
     float kJmol = 0;
     kJmol -= get_internal_clashes();
     
-    // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
-
-    for (i=0; i<atcount; i++)
-        atoms[i]->last_bind_energy = 0;
+    clear_atom_binding_energies();
+    
+    k=0;
+    for (l=0; ligands[l]; l++) if (ligands[l] == this) k=l;
 
     for (i=0; i<atcount; i++)
     {
         Point aloc = atoms[i]->get_location();
-        for (l=0; ligands[l]; l++)
+        for (l=k; ligands[l]; l++)
         {
-            if (ligands[l] == this) continue;
-            for (j=0; j<ligands[l]->atcount; j++)
+        	j=0;
+            if (ligands[l] == this) j = i + 1;
+            for (; j<ligands[l]->atcount; j++)
             {
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
@@ -1903,7 +1907,7 @@ float Molecule::get_intermol_binding(Molecule** ligands)
                         if (abind && !isnan(abind) && !isinf(abind))
                         {
                             kJmol += abind;
-                            atoms[i]->last_bind_energy += abind;
+                            // atoms[i]->last_bind_energy += abind;
                             // cout << atoms[i]->name << " to " << ligands[l]->atoms[j]->name << ": " << r << " A; " << abind << " kJ/mol." << endl;
                         }
                     }

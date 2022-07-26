@@ -2053,7 +2053,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             	#endif
             	
                 Point pt(mm[i]->lmx, 0, 0);
+                #if use_pose_to_undo_bad_linear
                 put_it_back.copy_state(mm[i]);
+                #endif
                 mm[i]->move(pt);
                 bind1 = 0;
                 for (j=0; mm[j]; j++)
@@ -2063,7 +2065,12 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 if (bind1 < bind)
                 {
+                	#if use_pose_to_undo_bad_linear
                 	put_it_back.restore_state(mm[i]);
+                	#else
+                	pt.x *= -1;
+                	mm[i]->move(pt);
+                	#endif
                     mm[i]->lmx *= reversal;
                 }
                 else
@@ -2082,7 +2089,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
                 pt.x = 0;
                 pt.y = mm[i]->lmy;
+                #if use_pose_to_undo_bad_linear
                 put_it_back.copy_state(mm[i]);
+                #endif
                 mm[i]->move(pt);
                 bind1 = 0;
                 for (j=0; mm[j]; j++)
@@ -2092,7 +2101,12 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 if (bind1 < bind)
                 {
+                	#if use_pose_to_undo_bad_linear
                 	put_it_back.restore_state(mm[i]);
+                	#else
+                	pt.y *= -1;
+                	mm[i]->move(pt);
+                	#endif
                     mm[i]->lmy *= reversal;
                 }
                 else
@@ -2111,7 +2125,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
                 pt.y = 0;
                 pt.z = mm[i]->lmz;
+                #if use_pose_to_undo_bad_linear
                 put_it_back.copy_state(mm[i]);
+                #endif
                 mm[i]->move(pt);
                 bind1 = 0;
                 for (j=0; mm[j]; j++)
@@ -2121,7 +2137,12 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 if (bind1 < bind)
                 {
+                	#if use_pose_to_undo_bad_linear
                 	put_it_back.restore_state(mm[i]);
+                	#else
+                	pt.z *= -1;
+                	mm[i]->move(pt);
+                	#endif
                     mm[i]->lmz *= reversal;
                 }
                 else
@@ -2216,7 +2237,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
+                	#if use_pose_to_undo_bad_axial
                 	put_it_back.copy_state(mm[i]);
+                	#endif
                     mm[i]->rotate(&v, mm[i]->amx);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
@@ -2226,7 +2249,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
+                    	#if use_pose_to_undo_bad_axial
                         put_it_back.restore_state(mm[i]);
+                        #else
+                        mm[i]->rotate(&v, -mm[i]->amx);
+                        #endif
                         mm[i]->amx *= reversal;
                     }
                     else
@@ -2289,7 +2316,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
+                	#if use_pose_to_undo_bad_axial
                 	put_it_back.copy_state(mm[i]);
+                	#endif
                     mm[i]->rotate(&v1, mm[i]->amy);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
@@ -2299,7 +2328,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
+                    	#if use_pose_to_undo_bad_axial
                         put_it_back.restore_state(mm[i]);
+                        #else
+                        mm[i]->rotate(&v, -mm[i]->amy);
+                        #endif
                         mm[i]->amy *= reversal;
                     }
                     else
@@ -2363,7 +2396,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
+                	#if use_pose_to_undo_bad_axial
                 	put_it_back.copy_state(mm[i]);
+                	#endif
                     mm[i]->rotate(&v2, mm[i]->amz);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
@@ -2373,7 +2408,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
+                    	#if use_pose_to_undo_bad_axial
                         put_it_back.restore_state(mm[i]);
+                        #else
+                        mm[i]->rotate(&v, -mm[i]->amz);
+                        #endif
                         mm[i]->amz *= reversal;
                         //cout << "x";
                     }
@@ -2537,7 +2576,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         else
                         {
                             float ra = mm[i]->rotatable_bonds[k]->angular_momentum;
+                            #if use_pose_to_undo_bad_flex
                             put_it_back.copy_state(mm[i]);
+                            #endif
                     		mm[i]->rotatable_bonds[k]->rotate(ra);
 
                             bind1 = 0;
@@ -2548,7 +2589,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             }
                             if (bind1 < bind)
                             {
+                            	#if use_pose_to_undo_bad_flex
                                 put_it_back.restore_state(mm[i]);
+                                #else
+                                mm[i]->rotatable_bonds[k]->rotate(-ra);
+                                #endif
                                 mm[i]->rotatable_bonds[k]->angular_momentum *= reversal;
                             }
                             else

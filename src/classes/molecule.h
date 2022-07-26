@@ -111,6 +111,7 @@ class Molecule
 
     // Interaction functions.
     float get_internal_clashes();
+    float get_total_vdW_repulsion();
     void minimize_internal_clashes();
     float get_intermol_clashes(Molecule* ligand);
     float get_intermol_clashes(Molecule** ligands);

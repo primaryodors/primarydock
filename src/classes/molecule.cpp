@@ -1517,6 +1517,19 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
     return retval;
 }
 
+float Molecule::get_total_vdW_repulsion()
+{
+	if (!atoms) return 0;
+	int i;
+	float retval;
+	
+	for (i=0; atoms[i]; i++)
+	{
+		retval += atoms[i]->last_vdW_repulsion;
+	}
+	
+	return retval;
+}
 
 float Molecule::get_internal_clashes()
 {

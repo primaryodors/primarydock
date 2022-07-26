@@ -848,10 +848,14 @@ _canstill_clash:
     
     if (can_vdW_repel && r < 4)
     {
-    	float f = pow(fabs(sphere_intersection(2, 2, r)*_kJmol_cuA), 6);
-    	// f /= 2;
-    	a->last_vdW_repulsion += f;
-    	b->last_vdW_repulsion += f;
+    	float f = // -pow(fabs(sphere_intersection(2, 2, r)*0.4), 6);
+    			  -pow(4.0 - r, 6);
+    	f /= 4096;
+    	if (f >= 0.01)
+    	{
+			a->last_vdW_repulsion += f;
+			b->last_vdW_repulsion += f;
+		}
     }
     
     // float kJhalf = kJmol/2;

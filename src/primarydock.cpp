@@ -17,6 +17,7 @@ struct DockResult
     float kJmol;
     char** metric;
     float* mkJmol;
+    float* mvdWrepl;
     std::string pdbdat;
     float bytype[_INTER_TYPES_LIMIT];
 };
@@ -1162,6 +1163,7 @@ int main(int argc, char** argv)
 
             char metrics[p.get_seq_length()+8][10];
             float mkJmol[p.get_seq_length()+8];
+            float mvdWrepl[p.get_seq_length()+8];
             int metcount=0;
             float btot=0;
 
@@ -1176,7 +1178,8 @@ int main(int argc, char** argv)
                 met->clear_atom_binding_energies();
                 float lb = m.get_intermol_binding(met);
                 strcpy(metrics[metcount], "Metals");
-                mkJmol[metcount++] = lb;
+                mkJmol[metcount] = lb;
+                mvdWrepl[metcount++] = m.get_total_vdW_repulsion();
                 btot += lb;
                 // cout << "Metal adds " << lb << " to btot, making " << btot << endl;
             }
@@ -1192,7 +1195,8 @@ int main(int argc, char** argv)
                 if (lb > 90) lb = 0;
                 sprintf(metrics[metcount], "%s%d", reaches_spheroid[nodeno][i]->get_3letter(), reaches_spheroid[nodeno][i]->get_residue_no());
                 // cout << metrics[metcount] << ": " << lb << " . ";
-                mkJmol[metcount++] = lb;
+                mkJmol[metcount] = lb;
+                mvdWrepl[metcount++] = m.get_total_vdW_repulsion();
                 btot += lb;
                 // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;
             }
@@ -1210,6 +1214,7 @@ int main(int argc, char** argv)
             dr[drcount][nodeno].kJmol = btot;
             dr[drcount][nodeno].metric = new char*[metcount+4];
             dr[drcount][nodeno].mkJmol = new float[metcount];
+            dr[drcount][nodeno].mvdWrepl = new float[metcount];
 			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
 			#endif
@@ -1228,6 +1233,7 @@ int main(int argc, char** argv)
                 dr[drcount][nodeno].metric[i] = new char[max(8,(int)strlen(metrics[i])+4)];
                 strcpy(dr[drcount][nodeno].metric[i], metrics[i]);
                 dr[drcount][nodeno].mkJmol[i] = mkJmol[i];
+                dr[drcount][nodeno].mvdWrepl[i] = mvdWrepl[i];
                 // cout << "*" << dr[drcount][nodeno].metric[i] << ": " << dr[drcount][nodeno].mkJmol[i] << endl;
             }
             
@@ -1338,6 +1344,25 @@ int main(int argc, char** argv)
                             cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
                             if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
                         }
+                        cout << endl;
+                        if (output) *output << endl;
+
+                        cout << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
+                        if (output) *output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
+                        for (	l=0;
+                        
+		                        dr[j][k].metric
+		                        && dr[j][k].metric[l]
+		                        && dr[j][k].metric[l][0];
+		                        
+		                        l++
+		                    )
+                        {
+                            cout << dr[j][k].metric[l] << ": " << -dr[j][k].mvdWrepl[l]*energy_mult << endl;
+                            if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mvdWrepl[l]*energy_mult << endl;
+                        }
+                        cout << endl;
+                        if (output) *output << endl;
 
                         for (l=0; l<_INTER_TYPES_LIMIT; l++)
                         {

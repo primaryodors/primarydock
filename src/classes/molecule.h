@@ -37,7 +37,8 @@ class Pose
 	void restore_state(Molecule* to_mol);
 	
 	protected:
-	std::vector<Point> saved_atom_locs;
+	int sz = 0;
+	Point* saved_atom_locs = nullptr;
 	Molecule* saved_from = nullptr;
 };
 
@@ -60,7 +61,7 @@ class Molecule
     bool from_smiles(char const * smilesstr);
 
     // Getters.
-    const char* get_name() const	{	return name;	}
+    const char* get_name() const	{	return name ? name : "(no name)";	}
     int get_atom_count() const	{	return atcount;	}
     int get_bond_count(bool unidirectional) const;
     Atom* get_nearest_atom(Point loc) const;

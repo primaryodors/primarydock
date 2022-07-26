@@ -403,6 +403,11 @@ int main(int argc, char** argv)
 		case 'S':
 		    // SDF
 		    pf = fopen(ligfname, "r");
+			if (!pf)
+			{
+				cout << "Error trying to read " << ligfname << endl;
+				return 0xbadf12e;
+			}
 		    fread(buffer, 1, 65535, pf);
 		    fclose(pf);
 		    m.from_sdf(buffer);
@@ -411,6 +416,11 @@ int main(int argc, char** argv)
 		case 'p':
 		case 'P':
 		    pf = fopen(ligfname, "r");
+			if (!pf)
+			{
+				cout << "Error trying to read " << ligfname << endl;
+				return 0xbadf12e;
+			}
 		    m.from_pdb(pf);
 		    fclose(pf);
 		    break;

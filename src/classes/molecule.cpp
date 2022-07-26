@@ -102,18 +102,25 @@ Pose::Pose(Molecule* m)
 
 void Pose::copy_state(Molecule* m)
 {
-	saved_atom_locs.clear();
-	saved_from = m;
-	if (!m || !m->atoms) return;
+	if (saved_from != m)
+	{
+		if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete[] saved_atom_locs;
+		saved_from = m;
+		if (!m || !m->atoms) return;
+		
+		sz = m->get_atom_count();
+		saved_atom_locs = new Point[sz+4];
+	}
 	
 	int i;
 	for (i=0; m->atoms[i]; i++)
-		saved_atom_locs.push_back(m->atoms[i]->get_location());
+	{
+		saved_atom_locs[i] = m->atoms[i]->get_location();
+	}
 }
 
 void Pose::restore_state(Molecule* m)
-{
-	int sz = saved_atom_locs.size();
+{	
 	if (!m || !m->atoms || !sz || m != saved_from) return;
 	
 	int i;
@@ -1976,6 +1983,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
         mm[i]->reset_conformer_momenta();
     }
     inplen = i;
+    
+    #if multimol_save_best_pose
+    Pose bestpose[inplen+4];
+    float bpbind[inplen+4];
+    #endif
 
     float improvement;
     for (iter=0; iter<iters; iter++)
@@ -1987,6 +1999,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
         {
             bool nearby[inplen+4];
             Point icen = mm[i]->get_barycenter();
+            
+            #if multimol_save_best_pose
+            bestpose[i].copy_state(mm[i]);
+            bpbind[i] = -Avogadro;
+            #endif
 
             for (j=0; mm[j]; j++)
             {
@@ -2050,6 +2067,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     improvement += (bind1 - bind);
                     if (fabs(mm[i]->lmx) < 0.5) mm[i]->lmx *= accel;
                     bind = bind1;
+                    #if multimol_save_best_pose
+                    if (bind1 > bpbind[i])
+                    {
+                    	bestpose[i].copy_state(mm[i]);
+                    	bpbind[i] = bind1;
+                    }
+                    #endif
                 }
 
                 pt.x = 0;
@@ -2072,6 +2096,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     improvement += (bind1 - bind);
                     if (fabs(mm[i]->lmy) < 0.5) mm[i]->lmy *= accel;
                     bind = bind1;
+                    #if multimol_save_best_pose
+                    if (bind1 > bpbind[i])
+                    {
+                    	bestpose[i].copy_state(mm[i]);
+                    	bpbind[i] = bind1;
+                    }
+                    #endif
                 }
 
                 pt.y = 0;
@@ -2094,6 +2125,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     improvement += (bind1 - bind);
                     if (fabs(mm[i]->lmz) < 0.5) mm[i]->lmz *= accel;
                     bind = bind1;
+                    #if multimol_save_best_pose
+                    if (bind1 > bpbind[i])
+                    {
+                    	bestpose[i].copy_state(mm[i]);
+                    	bpbind[i] = bind1;
+                    }
+                    #endif
                 }
                 
                 Point lmpt(mm[i]->lmx, mm[i]->lmy, mm[i]->lmz);
@@ -2161,7 +2199,16 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
 
                     if (!isnan(bestfrrad))
+                    {
                         mm[i]->rotate(&v, bestfrrad);
+		                #if multimol_save_best_pose
+		                if (bestfrb > bpbind[i])
+		                {
+		                	bestpose[i].copy_state(mm[i]);
+		                	bpbind[i] = bestfrb;
+		                }
+		                #endif
+                    }
                 }
                 else
                 {
@@ -2183,6 +2230,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         improvement += (bind1 - bind);
                         bind = bind1;
                         if (fabs(mm[i]->amx) < 0.25) mm[i]->amx *= accel;
+		                #if multimol_save_best_pose
+		                if (bind1 > bpbind[i])
+		                {
+		                	bestpose[i].copy_state(mm[i]);
+		                	bpbind[i] = bind1;
+		                }
+		                #endif
                     }
                 }
 
@@ -2218,7 +2272,16 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
 
                     if (!isnan(bestfrrad))
+                    {
                         mm[i]->rotate(&v1, bestfrrad);
+		                #if multimol_save_best_pose
+		                if (bestfrb > bpbind[i])
+		                {
+		                	bestpose[i].copy_state(mm[i]);
+		                	bpbind[i] = bestfrb;
+		                }
+		                #endif
+	                }
                 }
                 else
                 {
@@ -2240,6 +2303,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         improvement += (bind1 - bind);
                         bind = bind1;
                         if (fabs(mm[i]->amy) < 0.25) mm[i]->amy *= accel;
+		                #if multimol_save_best_pose
+		                if (bind1 > bpbind[i])
+		                {
+		                	bestpose[i].copy_state(mm[i]);
+		                	bpbind[i] = bind1;
+		                }
+		                #endif
                     }
                 }
 
@@ -2276,7 +2346,16 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
 
                     if (!isnan(bestfrrad))
+                    {
                         mm[i]->rotate(&v2, bestfrrad);
+                        #if multimol_save_best_pose
+		                if (bestfrb > bpbind[i])
+		                {
+		                	bestpose[i].copy_state(mm[i]);
+		                	bpbind[i] = bestfrb;
+		                }
+		                #endif
+	                }
                 }
                 else
                 {
@@ -2299,6 +2378,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         improvement += (bind1 - bind);
                         bind = bind1;
                         if (fabs(mm[i]->amz) < 0.25) mm[i]->amz *= accel;
+                        #if multimol_save_best_pose
+		                if (bind1 > bpbind[i])
+		                {
+		                	bestpose[i].copy_state(mm[i]);
+		                	bpbind[i] = bind1;
+		                }
+		                #endif
                     }
                 }
 
@@ -2433,7 +2519,16 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 			#endif
 
                             if (!isnan(bestfrrad))
+                            {
                                 mm[i]->rotatable_bonds[k]->rotate(bestfrrad);
+                                #if multimol_save_best_pose
+						        if (bestfrb > bpbind[i])
+						        {
+						        	bestpose[i].copy_state(mm[i]);
+						        	bpbind[i] = bestfrb;
+						        }
+						        #endif
+					        }
                         }
                         else
                         {
@@ -2458,6 +2553,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                                 bind = bind1;
                                 if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) < 0.25)
                                 	mm[i]->rotatable_bonds[k]->angular_momentum *= accel;
+						        #if multimol_save_best_pose
+						        if (bind1 > bpbind[i])
+						        {
+						        	bestpose[i].copy_state(mm[i]);
+						        	bpbind[i] = bind1;
+						        }
+						        #endif
                             }
                         }
                     }
@@ -2477,7 +2579,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             /**** End Bond Flexion ****/
             #endif
 
-        }	// for i = 0 to iters
+			#if multimol_save_best_pose
+			if (bpbind[i] > 0) bestpose[i].restore_state(mm[i]);
+			#endif
+        }	// for i
         // cout << "Iteration " << iter << " improvement " << improvement << endl;
 
         if (cb) cb(iter);

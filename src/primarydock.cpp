@@ -1349,24 +1349,6 @@ int main(int argc, char** argv)
                         cout << endl;
                         if (output) *output << endl;
 
-                        cout << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
-                        if (output) *output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
-                        for (	l=0;
-                        
-		                        dr[j][k].metric
-		                        && dr[j][k].metric[l]
-		                        && dr[j][k].metric[l][0];
-		                        
-		                        l++
-		                    )
-                        {
-                        	if (fabs(dr[j][k].mvdWrepl[l]) < 0.001) continue;
-                            cout << dr[j][k].metric[l] << ": " << -dr[j][k].mvdWrepl[l]*energy_mult << endl;
-                            if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mvdWrepl[l]*energy_mult << endl;
-                        }
-                        cout << endl;
-                        if (output) *output << endl;
-
                         for (l=0; l<_INTER_TYPES_LIMIT; l++)
                         {
                             char lbtyp[64];
@@ -1398,6 +1380,26 @@ int main(int argc, char** argv)
                             cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                             if (output) *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                         }
+                        cout << endl;
+                        if (output) *output << endl;
+
+                        cout << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
+                        if (output) *output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
+                        for (	l=0;
+                        
+		                        dr[j][k].metric
+		                        && dr[j][k].metric[l]
+		                        && dr[j][k].metric[l][0];
+		                        
+		                        l++
+		                    )
+                        {
+                        	if (fabs(dr[j][k].mvdWrepl[l]) < 0.001) continue;
+                            cout << dr[j][k].metric[l] << ": " << -dr[j][k].mvdWrepl[l]*energy_mult << endl;
+                            if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mvdWrepl[l]*energy_mult << endl;
+                        }
+                        cout << endl;
+                        if (output) *output << endl;
 						
 						_btyp_unassigned:
 

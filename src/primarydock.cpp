@@ -677,7 +677,7 @@ int main(int argc, char** argv)
 														weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
 													}
 													
-													#if tumble_spheres_include_vdW
+													#if !tumble_spheres_include_vdW
 													if ((worth*weight) < 1) continue;
 													#endif
 													
@@ -1382,6 +1382,11 @@ int main(int argc, char** argv)
                         }
                         cout << endl;
                         if (output) *output << endl;
+						
+						_btyp_unassigned:
+
+                        if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
+                        cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
 
                         cout << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
                         if (output) *output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
@@ -1400,11 +1405,6 @@ int main(int argc, char** argv)
                         }
                         cout << endl;
                         if (output) *output << endl;
-						
-						_btyp_unassigned:
-
-                        if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
-                        cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
 
                         if (!dr[j][k].pdbdat.length())
                         {

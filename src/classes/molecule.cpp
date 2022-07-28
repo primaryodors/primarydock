@@ -92,28 +92,36 @@ Molecule::~Molecule()
 
 Pose::Pose()
 {
-	;
+	reset();
 }
 
 Pose::Pose(Molecule* m)
 {
+	reset();
 	copy_state(m);
+}
+
+void Pose::reset()
+{
+	sz = 0;
+	saved_atom_locs = nullptr;
+	saved_from = nullptr;
 }
 
 void Pose::copy_state(Molecule* m)
 {
-	if (saved_from != m)
+	if (!saved_atom_locs || saved_from != m)
 	{
 		if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete[] saved_atom_locs;
 		saved_from = m;
 		if (!m || !m->atoms) return;
 		
 		sz = m->get_atom_count();
-		saved_atom_locs = new Point[sz+4];
+		saved_atom_locs = new Point[sz+16];
 	}
 	
 	int i;
-	for (i=0; m->atoms[i]; i++)
+	for (i=0; m->atoms[i] && i<sz; i++)
 	{
 		saved_atom_locs[i] = m->atoms[i]->get_location();
 	}
@@ -1987,6 +1995,7 @@ void Molecule::minimize_internal_clashes()
 #define DBG_BONDFLEX 0
 #define DBG_FLEXRES 203
 #define DBG_FLEXROTB 0
+#define DBG_UNINIT_MOLPTRS 0
 
 void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 {
@@ -1997,6 +2006,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
     for (i=0; mm[i]; i++)
     {
+    	#if DBG_UNINIT_MOLPTRS
+    	// cout << mm[i] << " " << flush << mm[i]->get_name() << " | " << flush;
+    	#endif
         mm[i]->reset_conformer_momenta();
     }
     inplen = i;
@@ -2004,6 +2016,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
     #if multimol_save_best_pose
     Pose bestpose[inplen+4];
     float bpbind[inplen+4];
+    #if DBG_UNINIT_MOLPTRS
+    cout << "Resetting... ";
+    #endif
+    for (i=0; i<inplen+4; i++) bestpose[i].reset();
+    #if DBG_UNINIT_MOLPTRS
+    cout << "Done! ";
+    #endif
     #endif
 
     float improvement;
@@ -2018,6 +2037,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             Point icen = mm[i]->get_barycenter();
             
             #if multimol_save_best_pose
+			#if DBG_UNINIT_MOLPTRS
+			cout << mm[i] << " " << flush << mm[i]->get_name() << " | " << flush;
+			#endif
             bestpose[i].copy_state(mm[i]);
             bpbind[i] = -Avogadro;
             #endif
@@ -2645,6 +2667,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 			if (bpbind[i] > 0) bestpose[i].restore_state(mm[i]);
 			#endif
         }	// for i
+        #if DBG_UNINIT_MOLPTRS
+		cout << endl << endl;
+		#endif
         // cout << "Iteration " << iter << " improvement " << improvement << endl;
 
         if (cb) cb(iter);

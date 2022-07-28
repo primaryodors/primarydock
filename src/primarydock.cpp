@@ -105,6 +105,7 @@ void iteration_callback(int iter)
 
         int i;
         AminoAcid* resphres[SPHREACH_MAX+4];
+        for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
         int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, mcoord_resno);
         //cout << "Sphres: " << sphres << endl;
         for (i=0; i<sphres; i++)
@@ -115,7 +116,7 @@ void iteration_callback(int iter)
 
         sphres += 2;
         for (i=0; i<sphres; i++) gcfmols[i] = discrete[i].pmol;
-        gcfmols[sphres] = NULL;
+        gcfmols[sphres] = nullptr;
     }
 }
 
@@ -1124,6 +1125,7 @@ int main(int argc, char** argv)
             int iters_div = iters*0.259;
 
             Molecule* cfmols[SPHREACH_MAX+4];
+            for (i=0; i<SPHREACH_MAX+4; i++) cfmols[i] = nullptr;
             gcfmols = cfmols;
             i=0;
             m.movability = MOV_ALL;

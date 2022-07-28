@@ -35,6 +35,7 @@ class Pose
 	Pose(Molecule* from_mol);
 	void copy_state(Molecule* from_mol);
 	void restore_state(Molecule* to_mol);
+	void reset();
 	
 	protected:
 	int sz = 0;

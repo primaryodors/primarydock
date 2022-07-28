@@ -80,6 +80,7 @@ class Molecule
     bool shielded(Atom* a, Atom* b) const;
     float correct_structure(int iters = 500);
     float close_loop(Atom** path, float closing_bond_cardinality);
+    void crumple(float theta);					// Randomly rotate all rotatable bonds by +/- the specified angle.
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);

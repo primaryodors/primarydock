@@ -1240,6 +1240,16 @@ _not_basic:
     }
 }
 
+void Molecule::crumple(float theta)
+{
+	Bond** b = get_rotatable_bonds();
+	if (!b) return;
+	
+	int i;
+	for (i=0; b[i]; i++)
+		b[i]->rotate(theta*randsgn());
+}
+
 Bond** Molecule::get_rotatable_bonds()
 {
     if (noAtoms(atoms)) return 0;

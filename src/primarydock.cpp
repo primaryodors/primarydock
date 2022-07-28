@@ -562,6 +562,9 @@ int main(int argc, char** argv)
     // srand(time(NULL));
     for (pose=1; pose<=poses; pose++)
     {
+    	ligand->minimize_internal_clashes();
+    	ligand->crumple(fiftyseventh*15);    	
+    	
     	if (pose > 1)
     	{
     		// TODO: Revert to saved original locations for the side chain atoms instead of reloading the protein.

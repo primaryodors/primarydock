@@ -2,7 +2,7 @@
 PrimaryOdors.org molecular docker.<br>
 http://www.primaryodors.org
 
-PrimaryDock is a lightweight molecular docking software package that offers the following advantages:
+PrimaryDock is a lightweight stochastic molecular docking software package that offers the following advantages:
 - Path-based docking;
 - Native support for side-chain flexion;
 - Per-residue binding strength output;

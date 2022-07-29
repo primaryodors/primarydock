@@ -109,6 +109,7 @@
 #define use_pose_to_undo_bad_linear 0
 #define use_pose_to_undo_bad_axial 0
 #define use_pose_to_undo_bad_flex 0
+#define monte_carlo_axial 1
 
 // Auto hydroxy makes d-limonene fail in OR1A1. So does pre-rotate side chains.
 #define allow_auto_hydroxy 0

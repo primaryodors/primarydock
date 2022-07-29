@@ -2291,6 +2291,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 	#if use_pose_to_undo_bad_axial
                 	put_it_back.copy_state(mm[i]);
                 	#endif
+                	
+                	#if monte_carlo_axial
+                	mm[i]->amx = frand(-10*fiftyseventh, 10*fiftyseventh);
+                	#endif
+                	
                     mm[i]->rotate(&v, mm[i]->amx);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
@@ -2370,6 +2375,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 	#if use_pose_to_undo_bad_axial
                 	put_it_back.copy_state(mm[i]);
                 	#endif
+                	
+                	#if monte_carlo_axial
+                	mm[i]->amy = frand(-10*fiftyseventh, 10*fiftyseventh);
+                	#endif
+                	
                     mm[i]->rotate(&v1, mm[i]->amy);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
@@ -2450,6 +2460,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 	#if use_pose_to_undo_bad_axial
                 	put_it_back.copy_state(mm[i]);
                 	#endif
+                	
+                	#if monte_carlo_axial
+                	mm[i]->amz = frand(-10*fiftyseventh, 10*fiftyseventh);
+                	#endif
+                	
                     mm[i]->rotate(&v2, mm[i]->amz);
                     bind1 = 0;
                     for (j=0; mm[j]; j++)

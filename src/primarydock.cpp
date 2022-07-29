@@ -63,7 +63,7 @@ bool kcal = false;
 float drift = 0.333;
 Molecule** gcfmols = NULL;
 
-bool use_bestbind_algorithm = false;		// Uses older "best binding" algorithm instead of newer "tumble spheres".
+bool use_bestbind_algorithm = true;		// Uses older "best binding" algorithm instead of newer "tumble spheres".
 											// Generally, tumble spheres give better results but let's leave best bind code
 											// in place because we'll be reviving it later.
 
@@ -81,9 +81,9 @@ void iteration_callback(int iter)
 	#if allow_drift
 	if (ligand->lastbind > 100)
 	{
-        ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
-        ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
-        ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
+        ligcen_target.x += (loneliest.x - ligcen_target.x) * 0.1*drift;
+        ligcen_target.y += (loneliest.y - ligcen_target.y) * 0.1*drift;
+        ligcen_target.z += (loneliest.z - ligcen_target.z) * 0.1*drift;
 	}
 	
     if (bary.get_3d_distance(ligcen_target) > size.magnitude())
@@ -710,7 +710,7 @@ int main(int argc, char** argv)
 													#endif
 												}
 												else
-												{	score -= 200;
+												{	score -= 2000;
 													#if _DBG_TUMBLE_SPHERES
 													tsdbg += std::string("- ")
 														  +  std::string(a->name) + std::string(" clashes ") + std::string(tsphres[j]->get_3letter())
@@ -722,7 +722,7 @@ int main(int argc, char** argv)
 									}
 								}
 								
-								if (score > 0) score *= 1.0 + 0.5 * centeredness;
+								if (score > 0) score *= 1.0 + 0.1 * centeredness;
 								
 								#if _DBG_TUMBLE_SPHERES
 								// cout << score << " vs. incumbent " << bestscore << endl;
@@ -762,7 +762,7 @@ int main(int argc, char** argv)
 						m.rotate(xaxis, step);
 					}				// xrad.
 					
-					if (bestscore >= (m.get_atom_count()*20)) break;
+					if (bestscore >= (m.get_atom_count()*13)) break;
 					#if _DBG_LONELINESS
 					cout << "Best score: " << bestscore << endl;
 					#endif

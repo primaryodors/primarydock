@@ -66,6 +66,7 @@ class Protein
         const int* mcoord_resno
     );
     std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
+    Point estimate_pocket_size(std::vector<AminoAcid*> bounding_aminos);
     Point get_region_center(int startres, int endres);
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size);

@@ -1839,7 +1839,48 @@ Point Protein::find_loneliest_point(Point cen, Point sz)
 	return retval;
 }
 
-
+Point Protein::estimate_pocket_size(std::vector<AminoAcid*> ba)
+{
+	int i, n = ba.size();
+	if (!n) return Point();
+	float cx, cy, cz;
+	
+	cx = cy = cz = 0;
+	for (i=0; i<n; i++)
+	{
+		Point pt = ba[i]->get_atom_location("CA");
+		cx += pt.x;
+		cy += pt.y;
+		cz += pt.z;
+	}
+	
+	Point center(cx/n, cy/n, cz/n);
+	
+	float sx, sy, sz, wx, wy, wz;
+	sx = sy = sz = wx = wy = wz = 0;
+	for (i=0; i<n; i++)
+	{
+		Point pt = ba[i]->get_atom_location("CA").subtract(center);
+		float mag = pt.magnitude();
+		mag -= 0.666 * ba[i]->get_reach();
+		pt.scale(mag);
+		float lwx = (fabs(pt.x) / sqrt(pt.y*pt.y + pt.z*pt.z)) / mag;
+		float lwy = (fabs(pt.y) / sqrt(pt.x*pt.x + pt.z*pt.z)) / mag;
+		float lwz = (fabs(pt.z) / sqrt(pt.x*pt.x + pt.y*pt.y)) / mag;
+		
+		sx += lwx * fabs(pt.x);
+		sy += lwy * fabs(pt.y);
+		sz += lwz * fabs(pt.z);
+		
+		wx += lwx;
+		wy += lwy;
+		wz += lwz;
+	}
+	
+	Point size(sx/wx, sy/wy, sz/wz);
+	
+	return size;
+}
 
 
 

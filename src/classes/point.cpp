@@ -603,7 +603,13 @@ Point LocatedVector::to_point()
 	return origin.add(this);
 }
 
-
+bool Point::fits_inside(Point c)
+{
+	if (fabs(x) < fabs(c.x)) return false;
+	if (fabs(y) < fabs(c.y)) return false;
+	if (fabs(z) < fabs(c.z)) return false;
+	return true;
+}
 
 
 

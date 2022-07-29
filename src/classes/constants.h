@@ -114,7 +114,7 @@
 #define allow_auto_hydroxy 0
 #define prerot_sidechains_from_ligand 0
 
-#define _DBG_LONELINESS 0
+#define _DBG_LONELINESS 1
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TUMBLE_SPHERES 1
 #define debug_break_on_move 0

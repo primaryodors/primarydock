@@ -35,7 +35,7 @@ char* get_file_ext(char* filename)
 char configfname[256];
 char protfname[256];
 char ligfname[256];
-Point pocketcen, loneliest;
+Point pocketcen, loneliest, pocketsize, ligbbox;
 std::ofstream *output = NULL;
 
 std::vector<int> exclusion;
@@ -581,6 +581,14 @@ int main(int argc, char** argv)
 				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude()+4);
 				int tsphsz = tsphres.size();
 				float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
+				
+				pocketsize = p.estimate_pocket_size(tsphres);
+				ligbbox = m.get_bounding_box();
+				
+				for (i=0; !ligbbox.fits_inside(pocketsize) && i<100; i++)
+				{
+					m.crumple(fiftyseventh*30);
+				}
 
 				for (i=0; i<tsphsz; i++)
 				{
@@ -614,6 +622,7 @@ int main(int argc, char** argv)
 				float lonely_step = 1.0 / loneliest.get_3d_distance(pocketcen);
 				#if _DBG_LONELINESS
 				cout << "Loneliest point is " << loneliest.get_3d_distance(pocketcen) << "A from pocketcen." << endl;
+				cout << "Pocket size is " << pocketsize << " vs. ligand bounding box " << ligbbox << endl;
 				#endif
 				if (isnan(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
 				for (loneliness=0; loneliness <= 1; loneliness += lonely_step)

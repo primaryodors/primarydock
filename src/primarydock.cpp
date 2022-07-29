@@ -79,6 +79,13 @@ void iteration_callback(int iter)
     Point bary = ligand->get_barycenter();
 
 	#if allow_drift
+	if (ligand->lastbind > 100)
+	{
+        ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
+        ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
+        ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
+	}
+	
     if (bary.get_3d_distance(ligcen_target) > size.magnitude())
     {
         //cout << "Wrangle! " << bary << ": " << bary.get_3d_distance(ligcen_target) << " vs. " << size.magnitude() << endl;

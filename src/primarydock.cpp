@@ -563,6 +563,7 @@ int main(int argc, char** argv)
     for (pose=1; pose<=poses; pose++)
     {
     	ligand->minimize_internal_clashes();
+    	float lig_min_int_clsh = m.get_internal_clashes();
     	ligand->crumple(fiftyseventh*15);    	
     	
     	if (pose > 1)
@@ -577,7 +578,7 @@ int main(int argc, char** argv)
     		if (!use_bestbind_algorithm)
     		{
 				// Begin tumble sphere behavior.
-				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude());
+				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude()+4);
 				int tsphsz = tsphres.size();
 				float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
 
@@ -596,7 +597,7 @@ int main(int argc, char** argv)
 					#endif
 
 					// TODO: Algorithmically determine more accurate values based on interaction type, etc.
-					outer_sphere[i] = tsphres[i]->get_reach() + 2;
+					outer_sphere[i] = tsphres[i]->get_reach() + 1;
 					inner_sphere[i] = tsphres[i]->get_reach()/3;
 				}
 
@@ -609,7 +610,7 @@ int main(int argc, char** argv)
 				#endif
 
 				step = fiftyseventh*30;
-				bestscore = -1000;
+				bestscore = -10000;
 				float lonely_step = 1.0 / loneliest.get_3d_distance(pocketcen);
 				#if _DBG_LONELINESS
 				cout << "Loneliest point is " << loneliest.get_3d_distance(pocketcen) << "A from pocketcen." << endl;
@@ -643,11 +644,12 @@ int main(int argc, char** argv)
 								l = 0;
 								lrad = 0;
 								_xyzl_loop:
-								if (m.get_internal_clashes() >= 1) goto _xyzl_skip_loop;
+								if (m.get_internal_clashes() >= lig_min_int_clsh*5+5) goto _xyzl_skip_loop;
 								
 								score = 0;
 								#if _DBG_TUMBLE_SPHERES
 								tsdbg = "";
+								// cout << m.get_internal_clashes() << " vs. " << lig_min_int_clsh << endl;
 								#endif
 								for (i=0; i<ac; i++)
 								{
@@ -706,6 +708,9 @@ int main(int argc, char** argv)
 								
 								if (score > 0) score *= 1.0 + 0.5 * centeredness;
 								
+								#if _DBG_TUMBLE_SPHERES
+								// cout << score << " vs. incumbent " << bestscore << endl;
+								#endif
 								if (score > bestscore)
 								{
 									besp.copy_state(&m);

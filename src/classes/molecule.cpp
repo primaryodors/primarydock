@@ -1245,9 +1245,15 @@ void Molecule::crumple(float theta)
 	Bond** b = get_rotatable_bonds();
 	if (!b) return;
 	
+	float int_clsh = get_internal_clashes();
+	
 	int i;
 	for (i=0; b[i]; i++)
-		b[i]->rotate(theta*randsgn());
+	{
+		float ltheta = theta*randsgn();
+		b[i]->rotate(ltheta);
+		if (get_internal_clashes() > int_clsh*2) b[i]->rotate(-ltheta);
+	}
 }
 
 Bond** Molecule::get_rotatable_bonds()

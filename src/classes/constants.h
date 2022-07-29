@@ -116,7 +116,7 @@
 
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0
-#define _DBG_TUMBLE_SPHERES 0
+#define _DBG_TUMBLE_SPHERES 1
 #define debug_break_on_move 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0

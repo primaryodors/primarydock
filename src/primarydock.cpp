@@ -81,9 +81,9 @@ void iteration_callback(int iter)
 	#if allow_drift
 	if (ligand->lastbind > 100)
 	{
-        ligcen_target.x += (loneliest.x - ligcen_target.x) * 0.1*drift;
-        ligcen_target.y += (loneliest.y - ligcen_target.y) * 0.1*drift;
-        ligcen_target.z += (loneliest.z - ligcen_target.z) * 0.1*drift;
+        ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
+        ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
+        ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
 	}
 	
     if (bary.get_3d_distance(ligcen_target) > size.magnitude())
@@ -612,8 +612,8 @@ int main(int argc, char** argv)
 					#endif
 
 					// TODO: Algorithmically determine more accurate values based on interaction type, etc.
-					outer_sphere[i] = tsphres[i]->get_reach() + 2;
-					inner_sphere[i] = tsphres[i]->get_reach()/3+1;
+					outer_sphere[i] = tsphres[i]->get_reach() + 2.5;
+					inner_sphere[i] = tsphres[i]->get_reach() / 3 + 1;
 				}
 
 				const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
@@ -623,9 +623,16 @@ int main(int argc, char** argv)
 				#if _DBG_TUMBLE_SPHERES
 				std::string tsdbg = "", tsdbgb = "";
 				#endif
+				
+				if (ligbbox.x > ligbbox.y && pocketsize.x < pocketsize.y) m.rotate(zaxis, square);
+				if (ligbbox.x > ligbbox.z && pocketsize.x < pocketsize.z) m.rotate(yaxis, square);
+				if (ligbbox.y > ligbbox.x && pocketsize.y < pocketsize.x) m.rotate(zaxis, square);
+				if (ligbbox.y > ligbbox.z && pocketsize.y < pocketsize.z) m.rotate(xaxis, square);
+				if (ligbbox.z > ligbbox.x && pocketsize.z < pocketsize.x) m.rotate(yaxis, square);
+				if (ligbbox.z > ligbbox.y && pocketsize.z < pocketsize.y) m.rotate(xaxis, square);
 
 				step = fiftyseventh*30;
-				bestscore = -10000;
+				bestscore = -Avogadro;
 				float lonely_step = 1.0 / loneliest.get_3d_distance(pocketcen);
 				#if _DBG_LONELINESS
 				cout << "Loneliest point " << loneliest << " is " << loneliest.get_3d_distance(pocketcen) << "A from pocketcen " << pocketcen << "." << endl;
@@ -651,6 +658,14 @@ int main(int argc, char** argv)
 						{
 							for (zrad=0; zrad <= M_PI*2; zrad += step)
 							{
+								ligbbox = m.get_bounding_box();
+				
+								if (ligbbox.x > ligbbox.y && pocketsize.x < pocketsize.y) continue;
+								if (ligbbox.x > ligbbox.z && pocketsize.x < pocketsize.z) continue;
+								if (ligbbox.y > ligbbox.x && pocketsize.y < pocketsize.x) continue;
+								if (ligbbox.y > ligbbox.z && pocketsize.y < pocketsize.z) continue;
+								if (ligbbox.z > ligbbox.x && pocketsize.z < pocketsize.x) continue;
+								if (ligbbox.z > ligbbox.y && pocketsize.z < pocketsize.y) continue;
 								
 								Bond** rb = m.get_rotatable_bonds();
 								
@@ -710,7 +725,7 @@ int main(int argc, char** argv)
 													#endif
 												}
 												else
-												{	score -= 1000;
+												{	score -= 200;
 													#if _DBG_TUMBLE_SPHERES
 													tsdbg += std::string("- ")
 														  +  std::string(a->name) + std::string(" clashes ") + std::string(tsphres[j]->get_3letter())
@@ -735,8 +750,10 @@ int main(int argc, char** argv)
 									
 									#if _DBG_TUMBLE_SPHERES
 										tsdbgb = tsdbg;
-										int u, v, w;
 										
+										cout << "Tumble score " << score << " for ligand box " << m.get_bounding_box() << endl;
+										/*
+										int u, v, w;
 										char protfttl[1000];
 										strcpy(protfttl, protfname);
 										
@@ -778,6 +795,7 @@ int main(int argc, char** argv)
 										}
 										tspdbdat << "END" << endl;
 										tspdbdat.close();
+										*/
 									#endif
 								}
 								

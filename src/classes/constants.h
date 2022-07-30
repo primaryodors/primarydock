@@ -105,9 +105,11 @@
 #define allow_mol_fullrot_iter 1
 #define allow_tethered_rotations 1
 #define clashing_push_ca 1
-#define clashing_push_amount 0.02
+#define clashing_push_amount 0.15
 #define monte_carlo_axial 1
+#define monte_carlo_flex 1
 #define multimol_save_best_pose 0
+#define pocketcen_is_loneliest 1
 #define tumble_spheres_include_vdW 1
 #define use_exclusions 1
 #define use_pose_to_undo_bad_axial 0

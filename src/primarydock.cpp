@@ -79,12 +79,14 @@ void iteration_callback(int iter)
     Point bary = ligand->get_barycenter();
 
 	#if allow_drift
+	#if !pocketcen_is_loneliest
 	if (ligand->lastbind > 100)
 	{
         ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
         ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
         ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
 	}
+	#endif
 	
     if (bary.get_3d_distance(ligcen_target) > size.magnitude())
     {
@@ -384,6 +386,11 @@ int main(int argc, char** argv)
 	char** fields = chop_spaced_fields(buffer);
 	pocketcen = pocketcen_from_config_fields(fields, nullptr);
 	loneliest = p.find_loneliest_point(pocketcen, size);
+	
+	#if pocketcen_is_loneliest
+	pocketcen = loneliest;
+	#endif
+	
 	if (!strcmp(fields[1], "RES"))
 	{
 		for (i=2; fields[i]; i++)
@@ -639,6 +646,12 @@ int main(int argc, char** argv)
 				cout << "Pocket size is " << pocketsize << " vs. ligand bounding box " << ligbbox << endl;
 				#endif
 				if (isnan(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
+				
+				#if pocketcen_is_loneliest
+				if (1)
+				{
+					m.recenter(pocketcen);
+				#else
 				for (loneliness=0; loneliness <= 1; loneliness += lonely_step)
 				{
 					float centeredness = 1.0 - loneliness;
@@ -647,8 +660,9 @@ int main(int argc, char** argv)
 								 loneliest.z * loneliness + pocketcen.z * centeredness
 								);
 					m.recenter(tmpcen);
+				#endif
 					
-					#if _DBG_LONELINESS
+					#if _DBG_LONELINESS && !pocketcen_is_loneliest
 					cout << "Ligand is " << loneliness << " lonely centered at " << tmpcen << "." << endl;
 					#endif
 
@@ -737,7 +751,9 @@ int main(int argc, char** argv)
 									}
 								}
 								
+								#if !pocketcen_is_loneliest
 								if (score > 0) score *= 1.0 + 0.1 * centeredness;
+								#endif
 								
 								if (score > bestscore)
 								{

@@ -2689,7 +2689,12 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         }
                         else
                         {
+                        	#if monte_carlo_flex
+                        	float ra = frand(-_fullrot_steprad/2, _fullrot_steprad/2);
+                        	#else
                             float ra = mm[i]->rotatable_bonds[k]->angular_momentum;
+                            #endif
+                            
                             #if use_pose_to_undo_bad_flex
                             put_it_back.copy_state(mm[i]);
                             #endif

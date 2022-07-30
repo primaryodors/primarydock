@@ -1798,23 +1798,32 @@ Point Protein::find_loneliest_point(Point cen, Point sz)
 {
 	if (!residues) return cen;
 	
-	float x, y, z, xp, yp, zp, r, bestr = 0, step = 0.25;
+	float x, y, z, xp, yp, zp, xa, ya, za, r, bestr = 0, step = 0.25;
 	int i;
 	Point retval = cen;
+	
+	sz.x /= 2; sz.y /= 2; sz.z /= 2;
+	
+	/*if (fabs(sz.x) > 4) sz.x = 4;
+	if (fabs(sz.y) > 4) sz.y = 4;
+	if (fabs(sz.z) > 4) sz.z = 4;*/
 	
 	for (x = -sz.x; x <= sz.x; x += step)
 	{
 		xp = x / sz.x; xp *= xp;
+		xa = cen.x + x;
 		for (y = -sz.y; y <= sz.y; y += step)
 		{
 			yp = y / sz.y; yp *= yp;
+			ya = cen.y + y;
 			for (z = -sz.z; z <= sz.z; z += step)
 			{
 				zp = z / sz.z; zp *= zp;
+				za = cen.z + z;
 				r = sqrt(xp+yp+zp);
 				if (r > 1) continue;
 				
-				Point maybe(sz.x + x, sz.y + y, sz.z + z);
+				Point maybe(xa, ya, za);
 				float minr = Avogadro;
 				
 				for (i=0; residues[i]; i++)

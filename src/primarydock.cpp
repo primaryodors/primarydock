@@ -63,7 +63,7 @@ bool kcal = false;
 float drift = 0.333;
 Molecule** gcfmols = NULL;
 
-bool use_bestbind_algorithm = true;		// Uses older "best binding" algorithm instead of newer "tumble spheres".
+bool use_bestbind_algorithm = false; 		// Uses older "best binding" algorithm instead of newer "tumble spheres".
 											// Generally, tumble spheres give better results but let's leave best bind code
 											// in place because we'll be reviving it later.
 
@@ -612,8 +612,8 @@ int main(int argc, char** argv)
 					#endif
 
 					// TODO: Algorithmically determine more accurate values based on interaction type, etc.
-					outer_sphere[i] = tsphres[i]->get_reach() + 1;
-					inner_sphere[i] = tsphres[i]->get_reach()/3;
+					outer_sphere[i] = tsphres[i]->get_reach() + 2;
+					inner_sphere[i] = tsphres[i]->get_reach()/3+1;
 				}
 
 				const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
@@ -628,7 +628,7 @@ int main(int argc, char** argv)
 				bestscore = -10000;
 				float lonely_step = 1.0 / loneliest.get_3d_distance(pocketcen);
 				#if _DBG_LONELINESS
-				cout << "Loneliest point is " << loneliest.get_3d_distance(pocketcen) << "A from pocketcen." << endl;
+				cout << "Loneliest point " << loneliest << " is " << loneliest.get_3d_distance(pocketcen) << "A from pocketcen " << pocketcen << "." << endl;
 				cout << "Pocket size is " << pocketsize << " vs. ligand bounding box " << ligbbox << endl;
 				#endif
 				if (isnan(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
@@ -642,7 +642,7 @@ int main(int argc, char** argv)
 					m.recenter(tmpcen);
 					
 					#if _DBG_LONELINESS
-					cout << "Ligand is " << loneliness << " lonely." << endl;
+					cout << "Ligand is " << loneliness << " lonely centered at " << tmpcen << "." << endl;
 					#endif
 
 					for (xrad=0; xrad <= M_PI*2; xrad += step)
@@ -710,7 +710,7 @@ int main(int argc, char** argv)
 													#endif
 												}
 												else
-												{	score -= 2000;
+												{	score -= 1000;
 													#if _DBG_TUMBLE_SPHERES
 													tsdbg += std::string("- ")
 														  +  std::string(a->name) + std::string(" clashes ") + std::string(tsphres[j]->get_3letter())
@@ -724,9 +724,6 @@ int main(int argc, char** argv)
 								
 								if (score > 0) score *= 1.0 + 0.1 * centeredness;
 								
-								#if _DBG_TUMBLE_SPHERES
-								// cout << score << " vs. incumbent " << bestscore << endl;
-								#endif
 								if (score > bestscore)
 								{
 									besp.copy_state(&m);
@@ -735,8 +732,52 @@ int main(int argc, char** argv)
 									bestyr = yrad;
 									bestzr = zrad;
 									bestscore = score;
+									
 									#if _DBG_TUMBLE_SPHERES
-									tsdbgb = tsdbg;
+										tsdbgb = tsdbg;
+										int u, v, w;
+										
+										char protfttl[1000];
+										strcpy(protfttl, protfname);
+										
+										char** lfields = chop_spaced_fields(protfttl, '/');
+										
+										for (u=0; lfields[u]; u++);
+										u--;
+										
+										char fname[1000];
+										sprintf(fname, "output/tumble_%s_%d_%d_%d_%f.dock",
+											lfields[u],
+											(int)(xrad*fiftyseven),
+											(int)(yrad*fiftyseven),
+											(int)(zrad*fiftyseven),
+											score);
+										cout << fname << endl;
+										std::ofstream tspdbdat(fname, std::ofstream::out);
+										
+										tspdbdat << "PDB file: " << protfname << endl;
+										tspdbdat << "Pose: 1\nNode: 0\nPDBDAT:\n";
+										
+										int lac = m.get_atom_count();
+										for (u=0; u<lac; u++) m.get_atom(u)->stream_pdb_line(tspdbdat, 9000+u);
+										
+										int pseql = p.get_seq_length();
+										v = 1;
+										for (u = 1; u < pseql; u++)
+										{
+											AminoAcid* dbgaa = p.get_residue(u);
+											if (dbgaa)
+											{
+												int aaac = dbgaa->get_atom_count();
+												for (w=0; w<aaac; w++)
+												{
+													Atom* dbga = dbgaa->get_atom(w);
+													if (!strcmp(dbga->name, "CA") || !strcmp(dbga->name, "CB")) dbga->stream_pdb_line(tspdbdat, v++);
+												}
+											}
+										}
+										tspdbdat << "END" << endl;
+										tspdbdat.close();
 									#endif
 								}
 								

@@ -56,7 +56,7 @@
 #define _ALLOW_FLEX_RINGS 0
 #define _shield_angle (130.0 * fiftyseventh)
 #define _can_clash_angle (120.0 * fiftyseventh)
-#define _fullrot_stepdeg 30
+#define _fullrot_stepdeg (360.0/13)
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
 #define _def_lin_momentum 0.1
@@ -96,22 +96,23 @@
 
 // Debugging stuff.
 #define allow_axial_tumble 1
+#define allow_bond_flex_steepslope 1
 #define allow_bond_rots 1
 #define allow_drift 1
-#define allow_mol_fullrot_iter 1
 #define allow_iter_cb 1
 #define allow_ligand_esp 1
 #define allow_linear_motion 1
+#define allow_mol_fullrot_iter 1
 #define allow_tethered_rotations 1
+#define clashing_push_ca 1
+#define clashing_push_amount 0.02
+#define monte_carlo_axial 1
+#define multimol_save_best_pose 0
 #define tumble_spheres_include_vdW 1
 #define use_exclusions 1
-#define multimol_save_best_pose 0
-#define use_pose_to_undo_bad_linear 0
 #define use_pose_to_undo_bad_axial 0
 #define use_pose_to_undo_bad_flex 0
-#define monte_carlo_axial 1
-#define push_away_from_ca_of_clashing 1
-#define clashing_push_amount 0.01
+#define use_pose_to_undo_bad_linear 0
 
 // Auto hydroxy makes d-limonene fail in OR1A1. So does pre-rotate side chains.
 #define allow_auto_hydroxy 0

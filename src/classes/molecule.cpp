@@ -2041,10 +2041,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
     #endif
     #endif
     
-    #if push_away_from_ca_of_clashing
-    Atom* mmca[inplen+4];
-    
-    for (i=0; mm[i]; i++) mmca[i] = mm[i]->get_atom("CA");
+    #if clashing_push_ca
+    Atom* mmca[inplen*4];
+    for (i=0; i<inplen*4; i++) mmca[i] = nullptr;
     #endif
 
     float improvement;
@@ -2053,6 +2052,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
         float bind = 0, bind1;
         improvement=0;
         last_iter = (iter == (iters-1));
+        
+        #if clashing_push_ca
+        for (i=0; mm[i]; i++) mmca[i] = mm[i]->get_atom("CA");
+        #endif
+        
         for (i=0; mm[i]; i++)
         {
             bool nearby[inplen+4];
@@ -2121,7 +2125,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     float delta = mm[i]->get_intermol_binding(mm[j]);
                     bind1 += delta;
                     
-                    #if push_away_from_ca_of_clashing
+                    #if clashing_push_ca
                     if (delta < 0 && mmca[j])
                     {
                 		Point pt = mm[i]->get_barycenter().subtract(mmca[j]->get_location());
@@ -2169,7 +2173,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     float delta = mm[i]->get_intermol_binding(mm[j]);
                     bind1 += delta;
                     
-                    #if push_away_from_ca_of_clashing
+                    #if clashing_push_ca
                     if (delta < 0 && mmca[j])
                     {
                 		Point pt = mm[i]->get_barycenter().subtract(mmca[j]->get_location());
@@ -2217,7 +2221,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     float delta = mm[i]->get_intermol_binding(mm[j]);
                     bind1 += delta;
                     
-                    #if push_away_from_ca_of_clashing
+                    #if clashing_push_ca
                     if (delta < 0 && mmca[j])
                     {
                 		Point pt = mm[i]->get_barycenter().subtract(mmca[j]->get_location());
@@ -2548,7 +2552,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             /**** End Axial Tumble ****/
             #endif
 
+            #if !allow_bond_flex_steepslope
             if ((iter % _fullrot_every)) continue;
+            #endif
 
 			#if allow_bond_rots
             /**** Bond Flexion ****/

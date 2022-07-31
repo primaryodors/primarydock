@@ -852,12 +852,12 @@ _canstill_clash:
     			  -pow(4.0 - r, 6);
     	f /= 1024;
 		a->last_vdW_repulsion += f;
-		b->last_vdW_repulsion += f;
+		//b->last_vdW_repulsion += f;
     }
     
     // float kJhalf = kJmol/2;
     a->last_bind_energy += kJmol;
-    b->last_bind_energy += kJmol;
+    //b->last_bind_energy += kJmol;
 
     delete[] forces;
     return kJmol;

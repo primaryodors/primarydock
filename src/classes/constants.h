@@ -106,10 +106,10 @@
 #define allow_linear_motion 1
 #define allow_mol_fullrot_iter 1
 #define allow_tethered_rotations 1
-#define clashing_push_ca 1
+#define clashing_push_ca 0
 #define clashing_push_amount 0.15
 #define default_bestbind 0
-#define monte_carlo_axial 1
+#define monte_carlo_axial 0
 #define monte_carlo_flex 1
 #define multimol_save_best_pose 0
 #define pocketcen_is_loneliest 1

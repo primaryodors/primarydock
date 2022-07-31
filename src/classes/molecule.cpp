@@ -1914,24 +1914,23 @@ float Molecule::get_intermol_binding(Molecule** ligands)
 {
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
-    int i, j, k, l;
+    int i, j, l;
     float kJmol = 0;
     kJmol -= get_internal_clashes();
     
-    clear_atom_binding_energies();
-    
-    k=0;
-    for (l=0; ligands[l]; l++) if (ligands[l] == this) k=l;
+    for (i=0; i<atcount; i++)
+        atoms[i]->last_bind_energy = 0;
 
     for (i=0; i<atcount; i++)
     {
         Point aloc = atoms[i]->get_location();
-        for (l=k; ligands[l]; l++)
+        for (l=0; ligands[l]; l++)
         {
-        	j=0;
-            if (ligands[l] == this) j = i + 1;
-            for (; j<ligands[l]->atcount; j++)
+            // if (ligands[l] == this) continue;
+            for (j=0; j<ligands[l]->atcount; j++)
             {
+            	if (atoms[i] == ligands[l]->atoms[j]) continue;
+            	if (atoms[i]->is_bonded_to(ligands[l]->atoms[j])) continue;
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
                 {
@@ -1944,16 +1943,12 @@ float Molecule::get_intermol_binding(Molecule** ligands)
                         if (abind && !isnan(abind) && !isinf(abind))
                         {
                             kJmol += abind;
-                            // atoms[i]->last_bind_energy += abind;
-                            // cout << atoms[i]->name << " to " << ligands[l]->atoms[j]->name << ": " << r << " A; " << abind << " kJ/mol." << endl;
                         }
                     }
                 }
             }
         }
     }
-    // cout << "Total: " << kJmol << endl;
-    // cout << endl;
 
     return kJmol;
 }

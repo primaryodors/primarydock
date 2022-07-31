@@ -63,9 +63,10 @@ bool kcal = false;
 float drift = 0.333;
 Molecule** gcfmols = NULL;
 
-bool use_bestbind_algorithm = false; 		// Uses older "best binding" algorithm instead of newer "tumble spheres".
-											// Generally, tumble spheres give better results but let's leave best bind code
-											// in place because we'll be reviving it later.
+// Switch to enable older "best binding" algorithm instead of newer "tumble spheres".
+// Generally, tumble spheres give better results but let's leave best bind code
+// in place because we'll be reviving it later.
+bool use_bestbind_algorithm = default_bestbind;
 
 void iteration_callback(int iter)
 {

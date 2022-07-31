@@ -10,7 +10,7 @@
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 1.0
+#define _kJmol_cuA 0.5
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -106,6 +106,7 @@
 #define allow_tethered_rotations 1
 #define clashing_push_ca 1
 #define clashing_push_amount 0.15
+#define default_bestbind 0
 #define monte_carlo_axial 1
 #define monte_carlo_flex 1
 #define multimol_save_best_pose 0
@@ -120,9 +121,9 @@
 #define allow_auto_hydroxy 0
 #define prerot_sidechains_from_ligand 0
 
-#define _DBG_LONELINESS 1
+#define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0
-#define _DBG_TUMBLE_SPHERES 1
+#define _DBG_TUMBLE_SPHERES 0
 #define debug_break_on_move 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0

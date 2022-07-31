@@ -579,7 +579,7 @@ int main(int argc, char** argv)
     {
     	ligand->minimize_internal_clashes();
     	float lig_min_int_clsh = m.get_internal_clashes();
-    	ligand->crumple(fiftyseventh*15);    	
+    	ligand->crumple(fiftyseventh*44);
     	
     	if (pose > 1)
     	{

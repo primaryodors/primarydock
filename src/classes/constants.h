@@ -93,8 +93,10 @@
 #define POLYPRO1_PSI fiftyseventh*160
 #define POLYPRO1_OMEGA fiftyseventh*113
 
-
-// Debugging stuff.
+// Adjusting these constants might improve results, but in most cases will not.
+// Some of these features will even cause segfaults or false negative failed docks
+// of known receptor-agonist pairs if enabled.
+#define allow_auto_hydroxy 0
 #define allow_axial_tumble 1
 #define allow_bond_flex_steepslope 1
 #define allow_bond_rots 1
@@ -111,16 +113,14 @@
 #define monte_carlo_flex 1
 #define multimol_save_best_pose 0
 #define pocketcen_is_loneliest 1
+#define prerot_sidechains_from_ligand 0
 #define tumble_spheres_include_vdW 1
 #define use_exclusions 1
 #define use_pose_to_undo_bad_axial 0
 #define use_pose_to_undo_bad_flex 0
 #define use_pose_to_undo_bad_linear 0
 
-// Auto hydroxy makes d-limonene fail in OR1A1. So does pre-rotate side chains.
-#define allow_auto_hydroxy 0
-#define prerot_sidechains_from_ligand 0
-
+// Debugging stuff.
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TUMBLE_SPHERES 0

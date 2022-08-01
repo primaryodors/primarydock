@@ -92,28 +92,43 @@ Molecule::~Molecule()
 
 Pose::Pose()
 {
-	;
+	reset();
 }
 
 Pose::Pose(Molecule* m)
 {
+	reset();
 	copy_state(m);
+}
+
+void Pose::reset()
+{
+	sz = 0;
+	saved_atom_locs = nullptr;
+	saved_from = nullptr;
 }
 
 void Pose::copy_state(Molecule* m)
 {
-	saved_atom_locs.clear();
-	saved_from = m;
-	if (!m || !m->atoms) return;
+	if (!saved_atom_locs || saved_from != m)
+	{
+		if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete[] saved_atom_locs;
+		saved_from = m;
+		if (!m || !m->atoms) return;
+		
+		sz = m->get_atom_count();
+		saved_atom_locs = new Point[sz+16];
+	}
 	
 	int i;
-	for (i=0; m->atoms[i]; i++)
-		saved_atom_locs.push_back(m->atoms[i]->get_location());
+	for (i=0; m->atoms[i] && i<sz; i++)
+	{
+		saved_atom_locs[i] = m->atoms[i]->get_location();
+	}
 }
 
 void Pose::restore_state(Molecule* m)
-{
-	int sz = saved_atom_locs.size();
+{	
 	if (!m || !m->atoms || !sz || m != saved_from) return;
 	
 	int i;
@@ -122,6 +137,7 @@ void Pose::restore_state(Molecule* m)
 		m->atoms[i]->move(saved_atom_locs[i]);
 	}
 }
+
 
 
 void Molecule::delete_atom(Atom* a)

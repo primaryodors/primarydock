@@ -2181,7 +2181,14 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
+                	#if monte_carlo_axial
+                	Pose putitback(mm[i]);
+                	float ra = fabs(mm[i]->amx);
+                	ra = frand(-ra, ra);
+                	mm[i]->rotate(&v, ra);
+                	#else
                     mm[i]->rotate(&v, mm[i]->amx);
+                    #endif
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
                     {
@@ -2190,8 +2197,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
+                    	#if monte_carlo_axial
+                    	putitback.restore_state(mm[i]);
+                        mm[i]->amx *= 0.98;
+                    	#else
                         mm[i]->rotate(&v, -mm[i]->amx);
                         mm[i]->amx *= reversal;
+                        #endif
                     }
                     else
                     {
@@ -2237,7 +2249,15 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
+                	#if monte_carlo_axial
+                	Pose putitback(mm[i]);
+                	float ra = fabs(mm[i]->amy);
+                	ra = frand(-ra, ra);
+                	mm[i]->rotate(&v, ra);
+                	#else
                     mm[i]->rotate(&v1, mm[i]->amy);
+                    #endif
+                    
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
                     {
@@ -2246,8 +2266,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
+                    	#if monte_carlo_axial
+                    	putitback.restore_state(mm[i]);
+                        mm[i]->amy *= 0.98;
+                    	#else
                         mm[i]->rotate(&v1, -mm[i]->amy);
                         mm[i]->amy *= reversal;
+                    	#endif
                     }
                     else
                     {
@@ -2294,7 +2319,15 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
+                	#if monte_carlo_axial
+                	Pose putitback(mm[i]);
+                	float ra = fabs(mm[i]->amz);
+                	ra = frand(-ra, ra);
+                	mm[i]->rotate(&v, ra);
+                	#else
                     mm[i]->rotate(&v2, mm[i]->amz);
+                    #endif
+                    
                     bind1 = 0;
                     for (j=0; mm[j]; j++)
                     {
@@ -2303,9 +2336,14 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     }
                     if (bind1 < bind)
                     {
+                    	#if monte_carlo_axial
+                    	putitback.restore_state(mm[i]);
+                        mm[i]->amz *= 0.98;
+                    	#else
                         mm[i]->rotate(&v2, -mm[i]->amz);
                         mm[i]->amz *= reversal;
                         //cout << "x";
+                        #endif
                     }
                     else
                     {

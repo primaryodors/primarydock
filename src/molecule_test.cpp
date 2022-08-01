@@ -10,6 +10,8 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+	float energyLevelThreshold = 0.25;
+	
     Molecule m("nothing");
     cout << "Created empty molecule named " << m.get_name() << ".\n";
 
@@ -121,6 +123,8 @@ int main(int argc, char** argv)
     if (argc > 2)
     {
         m2.from_smiles(argv[2]);
+        
+        if (argc > 3) energyLevelThreshold = atof(argv[3]);
     }
     else
     {
@@ -168,12 +172,12 @@ int main(int argc, char** argv)
     mols[0] = &m1;
     mols[1] = &m2;
     mols[2] = NULL;
-    Molecule::multimol_conform(mols, 250);
+    Molecule::multimol_conform(mols, 200);
     float final_clashes = m1.get_intermol_clashes(&m2);
     if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);
     cout << "\n# Post-conformation intermol energy level: " << -energyLevel << " kJ/mol." << endl;
-    const float energyLevelThreshold = 5.0;
+    
     if(energyLevel > energyLevelThreshold)
         cout << "Energy level above threshold, SUCCESS.\n";
     else
@@ -197,16 +201,3 @@ int main(int argc, char** argv)
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

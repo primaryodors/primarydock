@@ -35,11 +35,14 @@ class Pose
 	Pose(Molecule* from_mol);
 	void copy_state(Molecule* from_mol);
 	void restore_state(Molecule* to_mol);
+	void reset();
 	
 	protected:
-	std::vector<Point> saved_atom_locs;
+	int sz = 0;
+	Point* saved_atom_locs = nullptr;
 	Molecule* saved_from = nullptr;
 };
+
 
 class Molecule
 {

@@ -98,11 +98,11 @@
 // of known receptor-agonist pairs if enabled.
 #define allow_auto_hydroxy 0
 #define allow_axial_tumble 1
-#define allow_bond_flex_steepslope 1
+#define allow_bond_flex_steepslope 0
 #define allow_bond_rots 1
 #define allow_drift 1
 #define allow_iter_cb 1
-#define allow_ligand_esp 1
+#define allow_ligand_esp 0
 #define allow_linear_motion 1
 #define allow_mol_fullrot_iter 1
 #define allow_tethered_rotations 1

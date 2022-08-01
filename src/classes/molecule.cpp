@@ -2362,7 +2362,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             /**** End Axial Tumble ****/
             #endif
 
+			#if !monte_carlo_flex
             if ((iter % _fullrot_every)) continue;
+            #endif
 
 			#if allow_bond_rots
             /**** Bond Flexion ****/
@@ -2408,8 +2410,13 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 	}
                 }
                 
+                
                 if (mm[i]->rotatable_bonds)
                 {
+                	#if monte_carlo_flex
+		            Pose putitback(mm[i]);
+		            #endif
+                	
                 	#if DBG_BONDFLEX
                     if (DBG_FLEXRES == residue)
                     	cout << " has rotbonds ";
@@ -2489,6 +2496,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         else
                         {
                             float ra = mm[i]->rotatable_bonds[k]->angular_momentum;
+                            
+                            #if monte_carlo_flex
+                            ra = frand(-fabs(ra), fabs(ra));
+                            #endif
+                            
                             mm[i]->rotatable_bonds[k]->rotate(ra);
 
                             bind1 = 0;
@@ -2499,13 +2511,21 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             }
                             if (bind1 < bind)
                             {
+                            	#if monte_carlo_flex
+                            	putitback.restore_state(mm[i]);
+                            	mm[i]->rotatable_bonds[k]->angular_momentum *= 0.98;
+                            	#else
                                 mm[i]->rotatable_bonds[k]->rotate(-ra);
                                 mm[i]->rotatable_bonds[k]->angular_momentum *= reversal;
+                                #endif
                             }
                             else
                             {
                                 improvement += (bind1 - bind);
                                 bind = bind1;
+                                #if monte_carlo_flex
+                                putitback.copy_state(mm[i]);
+                                #endif
                                 if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) < 0.25)
                                 	mm[i]->rotatable_bonds[k]->angular_momentum *= accel;
                             }

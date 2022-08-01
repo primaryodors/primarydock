@@ -13,7 +13,7 @@ all: $(DIRS) \
 	 $(TESTS) \
 	 $(APPS) \
 	 $(REPORTS)
-code: $(OBJS) $(TESTS) $(APPS)
+code: $(OBJS) $(TESTS) molecule_report $(APPS)
 primarydock: $(DIRS) $(OBJS) $(BINDIR)/primarydock
 
 CC=g++
@@ -114,10 +114,11 @@ point_report: test/point_test
 	./test/point_test >test/point_test.received.txt
 	diff --color --unified $(REPORT) test/point_test.received.txt
 
-molecule_report: REPORT="test/molecule_test.approved.txt"
+molecule_report: REPORT="test/molecule_test1.approved.txt"
 molecule_report: test/molecule_test
-	./test/molecule_test 'C{C1}C(=O)[O-]' 'C{C1}[NH+](C)C' | sed '/^#/d' >test/molecule_test.received.txt # ignore lines starting with #
-	diff --color --unified $(REPORT) test/molecule_test.approved.txt
+	# ./test/molecule_test 'C{C1}C(=O)[O-]' 'C{C1}[NH+](C)C' | sed '/^#/d' >test/molecule_test.received.txt # ignore lines starting with #
+	./test/molecule_test 'NCCCC=O' 'NCCCC=O' 10 | tee temp | sed '/^#/d' >test/molecule_test1.received.txt; cat temp # ignore lines starting with #
+	diff --color --unified $(REPORT) test/molecule_test1.received.txt
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test

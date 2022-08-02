@@ -2,7 +2,7 @@
 PrimaryOdors.org molecular docker.<br>
 http://www.primaryodors.org
 
-PrimaryDock is a fast, lightweight molecular docking software package that offers the following advantages:
+PrimaryDock is a lightweight molecular docking software package that offers the following advantages:
 - Path-based docking;
 - Native support for side-chain flexion;
 - Per-residue binding strength output;
@@ -18,7 +18,9 @@ make primarydock
 ```
 
 If you are a developer contributing to the project, you can use `make` to build everything and run the test reports, or 
-`make code` to just build the code and not run the tests.
+`make code` to just build the code and run only the amino aldehyde test. This test is critical to the function of PrimaryDock
+because any change to the code that causes it to fail, means the docking functionality will be impaired. (If it fails once,
+just try running `make code` again.)
 
 The application will require 3D maps of your target receptor(s) in PDB format. Please note that PrimaryDock does not currently
 hydrogenate PDB models that do not include hydrogen atoms, so if your model contains heavy atoms only, the accuracy of

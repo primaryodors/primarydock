@@ -17,6 +17,7 @@ struct DockResult
     float kJmol;
     char** metric;
     float* mkJmol;
+    float* mvdWrepl;
     std::string pdbdat;
     float bytype[_INTER_TYPES_LIMIT];
 };
@@ -34,7 +35,7 @@ char* get_file_ext(char* filename)
 char configfname[256];
 char protfname[256];
 char ligfname[256];
-Point pocketcen, loneliest;
+Point pocketcen, loneliest, pocketsize, ligbbox;
 std::ofstream *output = NULL;
 
 std::vector<int> exclusion;
@@ -62,9 +63,10 @@ bool kcal = false;
 float drift = 0.333;
 Molecule** gcfmols = NULL;
 
-bool use_bestbind_algorithm = false;		// Uses older "best binding" algorithm instead of newer "tumble spheres".
-											// Generally, tumble spheres give better results but let's leave best bind code
-											// in place because we'll be reviving it later.
+// Switch to enable older "best binding" algorithm instead of newer "tumble spheres".
+// Generally, tumble spheres give better results but let's leave best bind code
+// in place because we'll be reviving it later.
+bool use_bestbind_algorithm = default_bestbind;
 
 void iteration_callback(int iter)
 {
@@ -78,6 +80,15 @@ void iteration_callback(int iter)
     Point bary = ligand->get_barycenter();
 
 	#if allow_drift
+	#if !pocketcen_is_loneliest
+	if (ligand->lastbind > 100)
+	{
+        ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
+        ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
+        ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
+	}
+	#endif
+	
     if (bary.get_3d_distance(ligcen_target) > size.magnitude())
     {
         //cout << "Wrangle! " << bary << ": " << bary.get_3d_distance(ligcen_target) << " vs. " << size.magnitude() << endl;
@@ -104,6 +115,7 @@ void iteration_callback(int iter)
 
         int i;
         AminoAcid* resphres[SPHREACH_MAX+4];
+        for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
         int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, mcoord_resno);
         //cout << "Sphres: " << sphres << endl;
         for (i=0; i<sphres; i++)
@@ -114,7 +126,7 @@ void iteration_callback(int iter)
 
         sphres += 2;
         for (i=0; i<sphres; i++) gcfmols[i] = discrete[i].pmol;
-        gcfmols[sphres] = NULL;
+        gcfmols[sphres] = nullptr;
     }
 }
 
@@ -375,6 +387,11 @@ int main(int argc, char** argv)
 	char** fields = chop_spaced_fields(buffer);
 	pocketcen = pocketcen_from_config_fields(fields, nullptr);
 	loneliest = p.find_loneliest_point(pocketcen, size);
+	
+	#if pocketcen_is_loneliest
+	pocketcen = loneliest;
+	#endif
+	
 	if (!strcmp(fields[1], "RES"))
 	{
 		for (i=2; fields[i]; i++)
@@ -403,6 +420,11 @@ int main(int argc, char** argv)
 		case 'S':
 		    // SDF
 		    pf = fopen(ligfname, "r");
+			if (!pf)
+			{
+				cout << "Error trying to read " << ligfname << endl;
+				return 0xbadf12e;
+			}
 		    fread(buffer, 1, 65535, pf);
 		    fclose(pf);
 		    m.from_sdf(buffer);
@@ -411,6 +433,11 @@ int main(int argc, char** argv)
 		case 'p':
 		case 'P':
 		    pf = fopen(ligfname, "r");
+			if (!pf)
+			{
+				cout << "Error trying to read " << ligfname << endl;
+				return 0xbadf12e;
+			}
 		    m.from_pdb(pf);
 		    fclose(pf);
 		    break;
@@ -550,6 +577,10 @@ int main(int argc, char** argv)
     // srand(time(NULL));
     for (pose=1; pose<=poses; pose++)
     {
+    	ligand->minimize_internal_clashes();
+    	float lig_min_int_clsh = m.get_internal_clashes();
+    	ligand->crumple(fiftyseventh*44);
+    	
     	if (pose > 1)
     	{
     		// TODO: Revert to saved original locations for the side chain atoms instead of reloading the protein.
@@ -562,9 +593,17 @@ int main(int argc, char** argv)
     		if (!use_bestbind_algorithm)
     		{
 				// Begin tumble sphere behavior.
-				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude());
+				std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude()+4);
 				int tsphsz = tsphres.size();
 				float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
+				
+				pocketsize = p.estimate_pocket_size(tsphres);
+				ligbbox = m.get_bounding_box();
+				
+				for (i=0; !ligbbox.fits_inside(pocketsize) && i<100; i++)
+				{
+					m.crumple(fiftyseventh*30);
+				}
 
 				for (i=0; i<tsphsz; i++)
 				{
@@ -581,8 +620,8 @@ int main(int argc, char** argv)
 					#endif
 
 					// TODO: Algorithmically determine more accurate values based on interaction type, etc.
-					outer_sphere[i] = tsphres[i]->get_reach() + 2;
-					inner_sphere[i] = tsphres[i]->get_reach()/3;
+					outer_sphere[i] = tsphres[i]->get_reach() + 2.5;
+					inner_sphere[i] = tsphres[i]->get_reach() / 3 + 1;
 				}
 
 				const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
@@ -592,14 +631,28 @@ int main(int argc, char** argv)
 				#if _DBG_TUMBLE_SPHERES
 				std::string tsdbg = "", tsdbgb = "";
 				#endif
+				
+				if (ligbbox.x > ligbbox.y && pocketsize.x < pocketsize.y) m.rotate(zaxis, square);
+				if (ligbbox.x > ligbbox.z && pocketsize.x < pocketsize.z) m.rotate(yaxis, square);
+				if (ligbbox.y > ligbbox.x && pocketsize.y < pocketsize.x) m.rotate(zaxis, square);
+				if (ligbbox.y > ligbbox.z && pocketsize.y < pocketsize.z) m.rotate(xaxis, square);
+				if (ligbbox.z > ligbbox.x && pocketsize.z < pocketsize.x) m.rotate(yaxis, square);
+				if (ligbbox.z > ligbbox.y && pocketsize.z < pocketsize.y) m.rotate(xaxis, square);
 
 				step = fiftyseventh*30;
-				bestscore = -1000;
+				bestscore = -Avogadro;
 				float lonely_step = 1.0 / loneliest.get_3d_distance(pocketcen);
 				#if _DBG_LONELINESS
-				cout << "Loneliest point is " << loneliest.get_3d_distance(pocketcen) << "A from pocketcen." << endl;
+				cout << "Loneliest point " << loneliest << " is " << loneliest.get_3d_distance(pocketcen) << "A from pocketcen " << pocketcen << "." << endl;
+				cout << "Pocket size is " << pocketsize << " vs. ligand bounding box " << ligbbox << endl;
 				#endif
 				if (isnan(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
+				
+				#if pocketcen_is_loneliest
+				if (1)
+				{
+					m.recenter(pocketcen);
+				#else
 				for (loneliness=0; loneliness <= 1; loneliness += lonely_step)
 				{
 					float centeredness = 1.0 - loneliness;
@@ -608,9 +661,10 @@ int main(int argc, char** argv)
 								 loneliest.z * loneliness + pocketcen.z * centeredness
 								);
 					m.recenter(tmpcen);
+				#endif
 					
-					#if _DBG_LONELINESS
-					cout << "Ligand is " << loneliness << " lonely." << endl;
+					#if _DBG_LONELINESS && !pocketcen_is_loneliest
+					cout << "Ligand is " << loneliness << " lonely centered at " << tmpcen << "." << endl;
 					#endif
 
 					for (xrad=0; xrad <= M_PI*2; xrad += step)
@@ -619,6 +673,14 @@ int main(int argc, char** argv)
 						{
 							for (zrad=0; zrad <= M_PI*2; zrad += step)
 							{
+								ligbbox = m.get_bounding_box();
+				
+								if (ligbbox.x > ligbbox.y && pocketsize.x < pocketsize.y) continue;
+								if (ligbbox.x > ligbbox.z && pocketsize.x < pocketsize.z) continue;
+								if (ligbbox.y > ligbbox.x && pocketsize.y < pocketsize.x) continue;
+								if (ligbbox.y > ligbbox.z && pocketsize.y < pocketsize.z) continue;
+								if (ligbbox.z > ligbbox.x && pocketsize.z < pocketsize.x) continue;
+								if (ligbbox.z > ligbbox.y && pocketsize.z < pocketsize.y) continue;
 								
 								Bond** rb = m.get_rotatable_bonds();
 								
@@ -628,11 +690,12 @@ int main(int argc, char** argv)
 								l = 0;
 								lrad = 0;
 								_xyzl_loop:
-								if (m.get_internal_clashes() >= 1) goto _xyzl_skip_loop;
+								if (m.get_internal_clashes() >= lig_min_int_clsh*5+5) goto _xyzl_skip_loop;
 								
 								score = 0;
 								#if _DBG_TUMBLE_SPHERES
 								tsdbg = "";
+								// cout << m.get_internal_clashes() << " vs. " << lig_min_int_clsh << endl;
 								#endif
 								for (i=0; i<ac; i++)
 								{
@@ -665,7 +728,7 @@ int main(int argc, char** argv)
 														weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
 													}
 													
-													#if tumble_spheres_include_vdW
+													#if !tumble_spheres_include_vdW
 													if ((worth*weight) < 1) continue;
 													#endif
 													
@@ -689,7 +752,9 @@ int main(int argc, char** argv)
 									}
 								}
 								
-								if (score > 0) score *= 1.0 + 0.5 * centeredness;
+								#if !pocketcen_is_loneliest
+								if (score > 0) score *= 1.0 + 0.1 * centeredness;
+								#endif
 								
 								if (score > bestscore)
 								{
@@ -699,8 +764,55 @@ int main(int argc, char** argv)
 									bestyr = yrad;
 									bestzr = zrad;
 									bestscore = score;
+									
 									#if _DBG_TUMBLE_SPHERES
-									tsdbgb = tsdbg;
+										tsdbgb = tsdbg;
+										
+										cout << "Tumble score " << score << " for ligand box " << m.get_bounding_box() << endl;
+										/*
+										int u, v, w;
+										char protfttl[1000];
+										strcpy(protfttl, protfname);
+										
+										char** lfields = chop_spaced_fields(protfttl, '/');
+										
+										for (u=0; lfields[u]; u++);
+										u--;
+										
+										char fname[1000];
+										sprintf(fname, "output/tumble_%s_%d_%d_%d_%f.dock",
+											lfields[u],
+											(int)(xrad*fiftyseven),
+											(int)(yrad*fiftyseven),
+											(int)(zrad*fiftyseven),
+											score);
+										cout << fname << endl;
+										std::ofstream tspdbdat(fname, std::ofstream::out);
+										
+										tspdbdat << "PDB file: " << protfname << endl;
+										tspdbdat << "Pose: 1\nNode: 0\nPDBDAT:\n";
+										
+										int lac = m.get_atom_count();
+										for (u=0; u<lac; u++) m.get_atom(u)->stream_pdb_line(tspdbdat, 9000+u);
+										
+										int pseql = p.get_seq_length();
+										v = 1;
+										for (u = 1; u < pseql; u++)
+										{
+											AminoAcid* dbgaa = p.get_residue(u);
+											if (dbgaa)
+											{
+												int aaac = dbgaa->get_atom_count();
+												for (w=0; w<aaac; w++)
+												{
+													Atom* dbga = dbgaa->get_atom(w);
+													if (!strcmp(dbga->name, "CA") || !strcmp(dbga->name, "CB")) dbga->stream_pdb_line(tspdbdat, v++);
+												}
+											}
+										}
+										tspdbdat << "END" << endl;
+										tspdbdat.close();
+										*/
 									#endif
 								}
 								
@@ -726,7 +838,7 @@ int main(int argc, char** argv)
 						m.rotate(xaxis, step);
 					}				// xrad.
 					
-					if (bestscore >= (m.get_atom_count()*20)) break;
+					if (bestscore >= (m.get_atom_count()*13)) break;
 					#if _DBG_LONELINESS
 					cout << "Best score: " << bestscore << endl;
 					#endif
@@ -1113,6 +1225,7 @@ int main(int argc, char** argv)
             int iters_div = iters*0.259;
 
             Molecule* cfmols[SPHREACH_MAX+4];
+            for (i=0; i<SPHREACH_MAX+4; i++) cfmols[i] = nullptr;
             gcfmols = cfmols;
             i=0;
             m.movability = MOV_ALL;
@@ -1152,6 +1265,7 @@ int main(int argc, char** argv)
 
             char metrics[p.get_seq_length()+8][10];
             float mkJmol[p.get_seq_length()+8];
+            float mvdWrepl[p.get_seq_length()+8];
             int metcount=0;
             float btot=0;
 
@@ -1166,7 +1280,8 @@ int main(int argc, char** argv)
                 met->clear_atom_binding_energies();
                 float lb = m.get_intermol_binding(met);
                 strcpy(metrics[metcount], "Metals");
-                mkJmol[metcount++] = lb;
+                mkJmol[metcount] = lb;
+                mvdWrepl[metcount++] = m.get_total_vdW_repulsion();
                 btot += lb;
                 // cout << "Metal adds " << lb << " to btot, making " << btot << endl;
             }
@@ -1182,7 +1297,8 @@ int main(int argc, char** argv)
                 if (lb > 90) lb = 0;
                 sprintf(metrics[metcount], "%s%d", reaches_spheroid[nodeno][i]->get_3letter(), reaches_spheroid[nodeno][i]->get_residue_no());
                 // cout << metrics[metcount] << ": " << lb << " . ";
-                mkJmol[metcount++] = lb;
+                mkJmol[metcount] = lb;
+                mvdWrepl[metcount++] = m.get_total_vdW_repulsion();
                 btot += lb;
                 // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;
             }
@@ -1200,6 +1316,7 @@ int main(int argc, char** argv)
             dr[drcount][nodeno].kJmol = btot;
             dr[drcount][nodeno].metric = new char*[metcount+4];
             dr[drcount][nodeno].mkJmol = new float[metcount];
+            dr[drcount][nodeno].mvdWrepl = new float[metcount];
 			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
 			#endif
@@ -1218,6 +1335,7 @@ int main(int argc, char** argv)
                 dr[drcount][nodeno].metric[i] = new char[max(8,(int)strlen(metrics[i])+4)];
                 strcpy(dr[drcount][nodeno].metric[i], metrics[i]);
                 dr[drcount][nodeno].mkJmol[i] = mkJmol[i];
+                dr[drcount][nodeno].mvdWrepl[i] = mvdWrepl[i];
                 // cout << "*" << dr[drcount][nodeno].metric[i] << ": " << dr[drcount][nodeno].mkJmol[i] << endl;
             }
             
@@ -1328,6 +1446,8 @@ int main(int argc, char** argv)
                             cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
                             if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
                         }
+                        cout << endl;
+                        if (output) *output << endl;
 
                         for (l=0; l<_INTER_TYPES_LIMIT; l++)
                         {
@@ -1360,11 +1480,31 @@ int main(int argc, char** argv)
                             cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                             if (output) *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                         }
+                        cout << endl;
+                        if (output) *output << endl;
 						
 						_btyp_unassigned:
 
                         if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                         cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
+
+                        cout << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
+                        if (output) *output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
+                        for (	l=0;
+                        
+		                        dr[j][k].metric
+		                        && dr[j][k].metric[l]
+		                        && dr[j][k].metric[l][0];
+		                        
+		                        l++
+		                    )
+                        {
+                        	if (fabs(dr[j][k].mvdWrepl[l]) < 0.001) continue;
+                            cout << dr[j][k].metric[l] << ": " << -dr[j][k].mvdWrepl[l]*energy_mult << endl;
+                            if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mvdWrepl[l]*energy_mult << endl;
+                        }
+                        cout << endl;
+                        if (output) *output << endl;
 
                         if (!dr[j][k].pdbdat.length())
                         {

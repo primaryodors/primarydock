@@ -103,8 +103,10 @@
 #define allow_ligand_esp 1
 #define allow_linear_motion 1
 #define allow_tethered_rotations 1
+#define default_bestbind 0
 #define monte_carlo_axial 0
 #define monte_carlo_flex 1
+#define pocketcen_is_loneliest 1
 #define tumble_spheres_include_vdW 1
 #define use_exclusions 1
 

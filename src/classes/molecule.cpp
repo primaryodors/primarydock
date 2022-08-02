@@ -1623,7 +1623,7 @@ float Molecule::get_vdW_repulsion(Molecule* ligand)
 				float r = atoms[i]->distance_to(ligand->atoms[j]);
 				if (r < rlim)
 				{
-					retval += sphere_intersection(halflim, halflim, r) * kJmol / asphere;
+					retval += fabs(sphere_intersection(halflim, halflim, r) * kJmol / asphere);
 				}
 			}
 		}

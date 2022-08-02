@@ -69,6 +69,7 @@ class Protein
     Point get_region_center(int startres, int endres);
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size);
+    Point estimate_pocket_size(std::vector<AminoAcid*> ba);
 
     // Motion functions
     void move_piece(int start_res, int end_res, Point new_center);		// After calling this, you should reconnect the broken ends with conform_backbone().

@@ -1589,6 +1589,49 @@ float Molecule::get_internal_clashes()
     return clash-base_internal_clashes;
 }
 
+float Molecule::get_vdW_repulsion(Molecule* ligand)
+{
+	if (!ligand) return 0;
+	if (ligand == this) return 0;
+	if (!atoms || !ligand->atoms) return 0;
+	
+	int i, j;
+	float retval = 0;
+	
+	for (i=0; atoms[i]; i++)
+	{
+		float achg = atoms[i]->get_charge();
+		bool api = atoms[i]->is_pi();
+		
+		for (j=0; ligand->atoms[j]; j++)
+		{
+			float bchg = ligand->atoms[j]->get_charge();
+			bool bpi = ligand->atoms[j]->is_pi();
+			
+			if (!achg || !bchg)
+			{
+				// TODO: Hard coded values get from bindings.dat instead.
+				float rlim = 4, kJmol = 0.4;
+				if (api && bpi)
+				{
+					rlim = 3.87;
+					kJmol = 2;
+				}
+				float halflim = rlim/2;
+				float asphere = 4.0/3 * M_PI * halflim * halflim * halflim;
+				
+				float r = atoms[i]->distance_to(ligand->atoms[j]);
+				if (r < rlim)
+				{
+					retval += sphere_intersection(halflim, halflim, r) * kJmol / asphere;
+				}
+			}
+		}
+	}
+	
+	return retval;
+}
+
 float Molecule::get_intermol_clashes(Molecule* ligand)
 {
     Molecule * ligands[4];

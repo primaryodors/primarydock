@@ -1281,7 +1281,7 @@ int main(int argc, char** argv)
                 float lb = m.get_intermol_binding(met);
                 strcpy(metrics[metcount], "Metals");
                 mkJmol[metcount] = lb;
-                mvdWrepl[metcount++] = m.get_total_vdW_repulsion();
+                mvdWrepl[metcount++] = m.get_vdW_repulsion(met);		// TODO: Include repulsions with non-mcoord side chains.
                 btot += lb;
                 // cout << "Metal adds " << lb << " to btot, making " << btot << endl;
             }
@@ -1298,7 +1298,7 @@ int main(int argc, char** argv)
                 sprintf(metrics[metcount], "%s%d", reaches_spheroid[nodeno][i]->get_3letter(), reaches_spheroid[nodeno][i]->get_residue_no());
                 // cout << metrics[metcount] << ": " << lb << " . ";
                 mkJmol[metcount] = lb;
-                mvdWrepl[metcount++] = m.get_total_vdW_repulsion();
+                mvdWrepl[metcount++] = m.get_vdW_repulsion(reaches_spheroid[nodeno][i]);		// TODO: Include repulsions between side chains.
                 btot += lb;
                 // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;
             }

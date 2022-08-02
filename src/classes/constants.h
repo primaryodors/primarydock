@@ -94,7 +94,6 @@
 #define POLYPRO1_OMEGA fiftyseventh*113
 
 
-// Debugging stuff.
 #define allow_axial_tumble 1
 #define allow_bond_rots 1
 #define allow_drift 1
@@ -110,13 +109,15 @@
 #define tumble_spheres_include_vdW 1
 #define use_exclusions 1
 
-// Auto hydroxy makes d-limonene fail in OR1A1. So does pre-rotate side chains.
+// Auto hydroxy makes geraniol fail in OR1A1. So does pre-rotate side chains.
 #define allow_auto_hydroxy 0
 #define prerot_sidechains_from_ligand 0
 
+// Debugging stuff.
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TUMBLE_SPHERES 0
+#define output_tumble_debug_docs 0
 #define debug_break_on_move 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0

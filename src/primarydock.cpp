@@ -769,7 +769,9 @@ int main(int argc, char** argv)
 										tsdbgb = tsdbg;
 										
 										cout << "Tumble score " << score << " for ligand box " << m.get_bounding_box() << endl;
-										/*
+										
+										
+										#if output_tumble_debug_docs
 										int u, v, w;
 										char protfttl[1000];
 										strcpy(protfttl, protfname);
@@ -812,7 +814,7 @@ int main(int argc, char** argv)
 										}
 										tspdbdat << "END" << endl;
 										tspdbdat.close();
-										*/
+										#endif
 									#endif
 								}
 								

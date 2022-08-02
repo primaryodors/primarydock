@@ -1342,6 +1342,22 @@ Bond** Molecule::get_rotatable_bonds()
     return rotatable_bonds;
 }
 
+void Molecule::crumple(float theta)
+{
+	Bond** b = get_rotatable_bonds();
+	if (!b) return;
+	
+	float int_clsh = get_internal_clashes();
+	
+	int i;
+	for (i=0; b[i]; i++)
+	{
+		float ltheta = theta*randsgn();
+		b[i]->rotate(ltheta);
+		if (get_internal_clashes() > int_clsh*2) b[i]->rotate(-ltheta);
+	}
+}
+
 // TODO: There has to be a better way.
 Bond** AminoAcid::get_rotatable_bonds()
 {
@@ -1571,6 +1587,49 @@ float Molecule::get_internal_clashes()
     }
 
     return clash-base_internal_clashes;
+}
+
+float Molecule::get_vdW_repulsion(Molecule* ligand)
+{
+	if (!ligand) return 0;
+	if (ligand == this) return 0;
+	if (!atoms || !ligand->atoms) return 0;
+	
+	int i, j;
+	float retval = 0;
+	
+	for (i=0; atoms[i]; i++)
+	{
+		float achg = atoms[i]->get_charge();
+		bool api = atoms[i]->is_pi();
+		
+		for (j=0; ligand->atoms[j]; j++)
+		{
+			float bchg = ligand->atoms[j]->get_charge();
+			bool bpi = ligand->atoms[j]->is_pi();
+			
+			if (!achg || !bchg)
+			{
+				// TODO: Hard coded values get from bindings.dat instead.
+				float rlim = 4, kJmol = 0.4;
+				if (api && bpi)
+				{
+					rlim = 3.87;
+					kJmol = 2;
+				}
+				float halflim = rlim/2;
+				float asphere = 4.0/3 * M_PI * halflim * halflim * halflim;
+				
+				float r = atoms[i]->distance_to(ligand->atoms[j]);
+				if (r < rlim)
+				{
+					retval += fabs(sphere_intersection(halflim, halflim, r) * kJmol / asphere);
+				}
+			}
+		}
+	}
+	
+	return retval;
 }
 
 float Molecule::get_intermol_clashes(Molecule* ligand)

@@ -1342,6 +1342,22 @@ Bond** Molecule::get_rotatable_bonds()
     return rotatable_bonds;
 }
 
+void Molecule::crumple(float theta)
+{
+	Bond** b = get_rotatable_bonds();
+	if (!b) return;
+	
+	float int_clsh = get_internal_clashes();
+	
+	int i;
+	for (i=0; b[i]; i++)
+	{
+		float ltheta = theta*randsgn();
+		b[i]->rotate(ltheta);
+		if (get_internal_clashes() > int_clsh*2) b[i]->rotate(-ltheta);
+	}
+}
+
 // TODO: There has to be a better way.
 Bond** AminoAcid::get_rotatable_bonds()
 {

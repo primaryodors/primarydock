@@ -840,7 +840,10 @@ int main(int argc, char** argv)
 						m.rotate(xaxis, step);
 					}				// xrad.
 					
+					#if !pocketcen_is_loneliest
 					if (bestscore >= (m.get_atom_count()*13)) break;
+					#endif
+
 					#if _DBG_LONELINESS
 					cout << "Best score: " << bestscore << endl;
 					#endif

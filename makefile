@@ -114,9 +114,8 @@ point_report: test/point_test
 	./test/point_test >test/point_test.received.txt
 	diff --color --unified $(REPORT) test/point_test.received.txt
 
-molecule_report: REPORT="test/molecule_test1.approved.txt"
+REPORT="test/molecule_test1.approved.txt"
 molecule_report: test/molecule_test
-	# ./test/molecule_test 'C{C1}C(=O)[O-]' 'C{C1}[NH+](C)C' | sed '/^#/d' >test/molecule_test.received.txt # ignore lines starting with #
 	./test/molecule_test 'NCCCC=O' 'NCCCC=O' 10 | tee temp | sed '/^#/d' >test/molecule_test1.received.txt; cat temp # ignore lines starting with #
 	diff --color --unified $(REPORT) test/molecule_test1.received.txt
 

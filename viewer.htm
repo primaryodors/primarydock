@@ -801,6 +801,43 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
     };
 });
 
+var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+    	var elem = atom.atomType.element;
+        if (atom.resno <= 1)
+        {
+        	elem = atom.atomname.replace(/[^A-Za-z]/g, '');
+        	elem = elem.charAt(0).toUpperCase() + elem.slice(1).toLowerCase();
+    	}
+        switch (elem)
+        {
+        	case 'H': return 0xe1faff;
+        	case 'C': return 0xcfccc8;
+        	case 'N': return 0x0087FF;
+        	case 'O': return 0xFF2222;
+        	case 'P': return 0xff8add;
+        	case 'S': return 0xffe022;
+        	case 'Se': return 0xffb022;
+        	case 'Cl': return 0x339900;
+        	case 'Br': return 0x993300;
+        	case 'I': return 0x990033;
+        	case 'Cu': return 0xe5a072;
+        	case 'Zn': return 0x92b0cc;
+        	case 'Na': return 0xffcc00;
+        	case 'Mg': return 0x99ffcc;
+        	case 'K': return 0x9966ff;
+        	case 'Ca': return 0xf7f7f7;
+        	case 'Fe': return 0x845f42;
+
+        	default: return 0x99aabb;
+        }
+
+        return 0xcc00ff;
+    };
+});
+
 var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function(atom)
@@ -1456,7 +1493,7 @@ function loadFile(fileData, fileName = "")
                                 {
 									opacity: opc_ligand,
 									multipleBond: true,
-									colorScheme: PODefSchemeHilite,
+									colorScheme: PODefSchemeLigand,
                                     metalness: mtl_bs,
                                 };
 

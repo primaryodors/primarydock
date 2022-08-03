@@ -121,7 +121,6 @@
 #define debug_break_on_move 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0
-#define include_old_intermol_conforms 0
 
 #endif
 

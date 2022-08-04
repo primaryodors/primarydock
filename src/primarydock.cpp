@@ -596,9 +596,12 @@ int main(int argc, char** argv)
     	#if pre_ligand_multimol_radius
     	std::vector<AminoAcid*> preres = p.get_residues_near(pocketcen, pre_ligand_multimol_radius);
     	int qpr = preres.size();
-    	AminoAcid** preaa = &preres[0];
+    	AminoAcid* preaa[qpr+4];
+    	
+    	for (i=0; i<qpr+4; i++) preaa[i] = nullptr;
     	for (i=0; i<qpr; i++)
     	{
+    		preaa[i] = preres[i];
     		Atom* CA = preaa[i]->get_atom("CA");
     		if (!CA)
     		{

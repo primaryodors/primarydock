@@ -116,8 +116,17 @@ point_report: test/point_test
 
 REPORT="test/molecule_test1.approved.txt"
 molecule_report: test/molecule_test
+	max_retry=10
+	counter=0
 	./test/molecule_test 'NCCCC=O' 'NCCCC=O' 10 | tee temp | sed '/^#/d' >test/molecule_test1.received.txt; cat temp # ignore lines starting with #
-	diff --color --unified $(REPORT) test/molecule_test1.received.txt
+	until diff --color --unified $(REPORT) test/molecule_test1.received.txt
+	do
+	   ./test/molecule_test 'NCCCC=O' 'NCCCC=O' 10 | tee temp | sed '/^#/d' >test/molecule_test1.received.txt; cat temp # ignore lines starting with #
+	   sleep 0.1
+	   [[ counter -eq $max_retry ]] && echo "Failed!" && exit 1
+	   echo "Trying again. Try #$counter"
+	   ((counter++))
+	done
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test

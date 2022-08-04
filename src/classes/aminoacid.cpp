@@ -2119,6 +2119,15 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     return retval;
 }
 
+float AminoAcid::get_intermol_binding(AminoAcid* neighb, bool backbone_atoms_only)
+{
+	AminoAcid* neighbs[4];
+	int i;
+	for (i=0; i<4; i++) neighbs[i] = nullptr;
+	neighbs[0] = neighb;
+	return get_intermol_binding(neighbs, backbone_atoms_only);
+}
+
 float AminoAcid::get_intermol_binding(AminoAcid** neighbs, bool backbone_atoms_only)
 {
     if (!neighbs) return 0;

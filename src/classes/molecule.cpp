@@ -1959,6 +1959,7 @@ float Molecule::get_intermol_binding(Molecule** ligands)
             if (ligands[l] == this) continue;
             for (j=0; j<ligands[l]->atcount; j++)
             {
+            	if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone) continue;			// kludge to prevent adjacent residue false clashes.
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
                 {
@@ -2527,7 +2528,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             			 mm[i]->get_intermol_binding(mm[j])
                                     #if allow_ligand_esp
                             			 :  
-                            			 mm[i]->get_intermol_potential(mm[j]) - 10 * mm[i]->get_internal_clashes()
+                            			 mm[i]->get_intermol_potential(mm[j]) - 5 * mm[i]->get_internal_clashes()
                                     #endif
                             			 ;
                             		

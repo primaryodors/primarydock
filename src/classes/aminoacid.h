@@ -100,6 +100,7 @@ class AminoAcid : public Molecule
  	
 
  	// Intermol functions.
+ 	float get_intermol_binding(AminoAcid* neighbor, bool backbone_atoms_only = false);
  	float get_intermol_binding(AminoAcid** neighbors, bool backbone_atoms_only = false);
     float hydrophilicity();
 

@@ -274,6 +274,10 @@ void read_config_file(FILE* pf)
             {
                 kJmol_cutoff = -atof(fields[1]);
             }
+            else if (!strcmp(fields[0], "DIFF"))
+            {
+                differential_dock = true;
+            }
             else if (!strcmp(fields[0], "FLEX"))
             {
                 flex = (atoi(fields[1]) != 0);
@@ -1388,14 +1392,17 @@ int main(int argc, char** argv)
 			
 			for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 			
-			for (i=0; i<qpr+1; i++)
-			{
-				int resno = i ? (allres[i-1]->get_residue_no()) : 0;
-				for (j=0; j<qpr+1; j++)
+			if (differential_dock)
+        	{
+				for (i=0; i<qpr+1; i++)
 				{
-					if (j == i) continue;
-					final_binding[resno] += postaa[i]->get_intermol_binding(postaa[j]);
-					final_vdWrepl[resno] += postaa[i]->get_vdW_repulsion(postaa[j]);
+					int resno = i ? (allres[i-1]->get_residue_no()) : 0;
+					for (j=0; j<qpr+1; j++)
+					{
+						if (j == i) continue;
+						final_binding[resno] += postaa[i]->get_intermol_binding(postaa[j]);
+						final_vdWrepl[resno] += postaa[i]->get_vdW_repulsion(postaa[j]);
+					}
 				}
 			}
 			
@@ -1435,11 +1442,11 @@ int main(int argc, char** argv)
                 {
 		            mvdWrepl[metcount] = 0;
 		            mvdWrepl[metcount] += m.get_vdW_repulsion(reaches_spheroid[nodeno][i]);
-		            for (j=0; j<sphres; j++)
+		            /*for (j=0; j<sphres; j++)
 		            {
 		            	if (j == i) continue;
 		            	mvdWrepl[metcount] += reaches_spheroid[nodeno][i]->get_vdW_repulsion(reaches_spheroid[nodeno][j]);
-		            }
+		            }*/
                 }
                 
                 imvdWrepl[metcount] = initial_vdWrepl[resno];

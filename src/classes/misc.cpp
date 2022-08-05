@@ -13,7 +13,7 @@ float _INTERA_R_CUTOFF = _DEFAULT_INTERA_R_CUTOFF;
 const char* Greek = "ABGDEZHQIKLMNJOPRSTYFXCW";
 std::ofstream *debug = nullptr;
 bool last_iter = false;
-bool differential_dock = true;
+bool differential_dock = false;
 
 
 int in_array(void* needle, void** haystack)

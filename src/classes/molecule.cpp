@@ -2042,9 +2042,14 @@ void Molecule::minimize_internal_clashes()
 
 void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 {
+	multimol_conform(mm, nullptr, iters, cb);
+}
+
+void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int))
+{
     if (!mm) return;
 
-    int i, j, k, l, n, inplen, iter;
+    int i, j, k, l, n, inplen, bklen, alllen, iter;
     float rad, bestfrrad, bestfrb;
 
     for (i=0; mm[i]; i++)
@@ -2052,6 +2057,31 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
         mm[i]->reset_conformer_momenta();
     }
     inplen = i;
+    
+    if (!bkg) bklen = 0;
+    else
+    {
+		for (i=0; bkg[i]; i++);		// Get count.
+		bklen = i;
+    }
+    
+    alllen = inplen + bklen;
+    Molecule* all[alllen + 4];
+    
+    for (i=0; i < alllen + 4; i++) all[i] = nullptr;
+    
+    for (i=0; i<inplen; i++) all[i] = mm[i];
+    n = i;
+    for (i=0; i<bklen; i++)
+    {
+    	for (j=0; j<inplen; j++) if (mm[j] == bkg[i]) goto _already_mm;
+    	
+    	all[n++] = bkg[i];
+    	
+    	_already_mm:
+    	;
+    }
+    alllen = n;
 
     float improvement;
     for (iter=0; iter<iters; iter++)
@@ -2061,10 +2091,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
         last_iter = (iter == (iters-1));
         for (i=0; mm[i]; i++)
         {
-            bool nearby[inplen+4];
+            bool nearby[alllen+4];
             Point icen = mm[i]->get_barycenter();
 
-            for (j=0; mm[j]; j++)
+            for (j=0; all[j]; j++)
             {
                 /* if (j == i)
                 {
@@ -2072,9 +2102,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     continue;
                 } */
 
-                Point jcen = mm[j]->get_barycenter();
+                Point jcen = all[j]->get_barycenter();
                 Atom* ia = mm[i]->get_nearest_atom(jcen);
-                Atom* ja = mm[j]->get_nearest_atom(icen);
+                Atom* ja = all[j]->get_nearest_atom(icen);
 
                 if (ia->distance_to(ja) <= 4)
                 {
@@ -2089,7 +2119,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 if (nearby[j])
                 {
                     // get_intermol_binding includes clashes, so we don't have to check them here.
-                    bind += mm[i]->get_intermol_binding(mm[j]);
+                    bind += mm[i]->get_intermol_binding(all[j]);
                 }
             }
             mm[i]->lastbind = bind;
@@ -2108,10 +2138,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 Point pt(mm[i]->lmx, 0, 0);
                 mm[i]->move(pt);
                 bind1 = 0;
-                for (j=0; mm[j]; j++)
+                for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    bind1 += mm[i]->get_intermol_binding(mm[j]);
+                    bind1 += mm[i]->get_intermol_binding(all[j]);
                 }
                 if (bind1 < bind)
                 {
@@ -2132,10 +2162,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 pt.y = mm[i]->lmy;
                 mm[i]->move(pt);
                 bind1 = 0;
-                for (j=0; mm[j]; j++)
+                for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    bind1 += mm[i]->get_intermol_binding(mm[j]);
+                    bind1 += mm[i]->get_intermol_binding(all[j]);
                 }
                 if (bind1 < bind)
                 {
@@ -2154,10 +2184,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 pt.z = mm[i]->lmz;
                 mm[i]->move(pt);
                 bind1 = 0;
-                for (j=0; mm[j]; j++)
+                for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    bind1 += mm[i]->get_intermol_binding(mm[j]);
+                    bind1 += mm[i]->get_intermol_binding(all[j]);
                 }
                 if (bind1 < bind)
                 {
@@ -2221,10 +2251,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
-                        for (j=0; mm[j]; j++)
+                        for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(mm[j]) + intermol_ESP * mm[i]->get_intermol_potential(mm[j]);
+                            bind1 += mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                         }
                         
                         // cout << "x " << rad*fiftyseven << "deg " << bind1 << endl;
@@ -2250,10 +2280,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     mm[i]->rotate(&v, mm[i]->amx);
                     #endif
                     bind1 = 0;
-                    for (j=0; mm[j]; j++)
+                    for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        bind1 += mm[i]->get_intermol_binding(mm[j]);
+                        bind1 += mm[i]->get_intermol_binding(all[j]);
                     }
                     if (bind1 < bind)
                     {
@@ -2289,10 +2319,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
-                        for (j=0; mm[j]; j++)
+                        for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(mm[j]) + intermol_ESP * mm[i]->get_intermol_potential(mm[j]);
+                            bind1 += mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                         }
                         
                         // cout << "y " << rad*fiftyseven << "deg " << bind1 << endl;
@@ -2319,10 +2349,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     #endif
                     
                     bind1 = 0;
-                    for (j=0; mm[j]; j++)
+                    for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        bind1 += mm[i]->get_intermol_binding(mm[j]);
+                        bind1 += mm[i]->get_intermol_binding(all[j]);
                     }
                     if (bind1 < bind)
                     {
@@ -2359,10 +2389,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
-                        for (j=0; mm[j]; j++)
+                        for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(mm[j]) + intermol_ESP * mm[i]->get_intermol_potential(mm[j]);
+                            bind1 += mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                         }
                         
                         // cout << "z " << rad*fiftyseven << "deg " << bind1 << endl;
@@ -2389,10 +2419,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     #endif
                     
                     bind1 = 0;
-                    for (j=0; mm[j]; j++)
+                    for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        bind1 += mm[i]->get_intermol_binding(mm[j]);
+                        bind1 += mm[i]->get_intermol_binding(all[j]);
                     }
                     if (bind1 < bind)
                     {
@@ -2447,11 +2477,11 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 if (mm[i]->movability == MOV_FLEXONLY)
                 {
                     bind = 0;
-                    for (j=0; mm[j]; j++)
+                    for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
                         // cout << ".";
-                        bind += mm[i]->get_intermol_binding(mm[j]);
+                        bind += mm[i]->get_intermol_binding(all[j]);
                     }
                 }
                 mm[i]->lastbind = bind;
@@ -2516,7 +2546,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                                 if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
                                 	cout << endl << (rad*fiftyseven) << ": ";
                         		#endif
-                                for (j=0; mm[j]; j++)
+                                for (j=0; all[j]; j++)
                                 {
                                     if (!nearby[j]) continue;
                                     float lbind1 = 
@@ -2525,17 +2555,17 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             			 (mm[i]->mol_typ == MOLTYP_AMINOACID)
                             			 ?
                                     #endif
-                            			 mm[i]->get_intermol_binding(mm[j])
+                            			 mm[i]->get_intermol_binding(all[j])
                                     #if allow_ligand_esp
                             			 :  
-                            			 mm[i]->get_intermol_potential(mm[j]) - 5 * mm[i]->get_internal_clashes()
+                            			 mm[i]->get_intermol_potential(all[j]) - 5 * mm[i]->get_internal_clashes()
                                     #endif
                             			 ;
                             		
                                     bind1 += lbind1;
                                     #if DBG_BONDFLEX
                                     if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
-                                    	cout << mm[j]->name << " " << lbind1 << " ";
+                                    	cout << all[j]->name << " " << lbind1 << " ";
                         			#endif
                                 }
 
@@ -2564,10 +2594,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             mm[i]->rotatable_bonds[k]->rotate(ra);
 
                             bind1 = 0;
-                            for (j=0; mm[j]; j++)
+                            for (j=0; all[j]; j++)
                             {
                                 if (!nearby[j]) continue;
-                                bind1 += mm[i]->get_intermol_binding(mm[j]);
+                                bind1 += mm[i]->get_intermol_binding(all[j]);
                             }
                             if (bind1 < bind)
                             {

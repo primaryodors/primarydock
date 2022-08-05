@@ -1893,7 +1893,17 @@ Point Protein::estimate_pocket_size(std::vector<AminoAcid*> ba)
 	return size;
 }
 
-
+Molecule** Protein::all_residues_as_molecules()
+{
+	if (!residues) return nullptr;
+	Molecule** retval = new Molecule*[get_seq_length()+4];
+	
+	int i;
+	for (i=0; residues[i]; i++) retval[i] = reinterpret_cast<Molecule*>(residues[i]);
+	retval[i] = nullptr;
+	
+	return retval;
+}
 
 
 

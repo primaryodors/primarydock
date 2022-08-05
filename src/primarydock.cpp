@@ -579,6 +579,9 @@ int main(int argc, char** argv)
     
     srand(0xb00d1cca);
     // srand(time(NULL));
+	float initial_binding[seql+4];
+	float initial_vdWrepl[seql+4];
+	float init_total_binding_by_type[_INTER_TYPES_LIMIT];
     for (pose=1; pose<=poses; pose++)
     {
     	ligand->minimize_internal_clashes();
@@ -593,57 +596,55 @@ int main(int argc, char** argv)
 			fclose(pf);
     	}
     	
-    	#if pre_ligand_multimol_radius
-    	std::vector<AminoAcid*> preres = p.get_residues_near(pocketcen, pre_ligand_multimol_radius);
-    	qpr = preres.size();
-    	AminoAcid* preaa[seql+4];
-    	
-    	for (i=0; i<seql+4; i++) preaa[i] = nullptr;
-    	for (i=0; i<qpr; i++)
+    	if (differential_dock)
     	{
-    		preaa[i] = preres[i];
-    		Atom* CA = preaa[i]->get_atom("CA");
-    		if (!CA)
-    		{
-    			cout << "Residue " << preaa[i]->get_residue_no() << " is missing its CA." << endl;
-    			throw 0xbad12e5;
-    		}
-    		float r = CA->get_location().get_3d_distance(pocketcen);
-    		if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
-    		else preaa[i]->movability = MOV_FLEXONLY;
+			std::vector<AminoAcid*> preres = p.get_residues_near(pocketcen, pre_ligand_multimol_radius);
+			qpr = preres.size();
+			AminoAcid* preaa[seql+4];
+			
+			for (i=0; i<seql+4; i++) preaa[i] = nullptr;
+			for (i=0; i<qpr; i++)
+			{
+				preaa[i] = preres[i];
+				Atom* CA = preaa[i]->get_atom("CA");
+				if (!CA)
+				{
+					cout << "Residue " << preaa[i]->get_residue_no() << " is missing its CA." << endl;
+					throw 0xbad12e5;
+				}
+				float r = CA->get_location().get_3d_distance(pocketcen);
+				if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
+				else preaa[i]->movability = MOV_FLEXONLY;
+			}
+			
+			for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
+			
+			if (pre_ligand_iteration_ratio) Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), iters*pre_ligand_iteration_ratio);
+			
+			preres = p.get_residues_near(pocketcen, 10000);
+			qpr = preres.size();
+			for (i=0; i<qpr; i++)
+			{
+				preaa[i] = preres[i];
+			}
+			
+			for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
+			
+			for (i=0; i<qpr; i++)
+			{
+				int resno = preaa[i]->get_residue_no();
+				for (j=0; j<qpr; j++)
+				{
+					if (j == i) continue;
+					initial_binding[resno] += reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]));
+					initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
+				}
+			}
+			
+			for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = total_binding_by_type[i];
+			
+			for (i=0; i<qpr; i++) preaa[i]->movability = MOV_FLEXONLY;
     	}
-    	
-    	float initial_binding[seql+4];
-    	float initial_vdWrepl[seql+4];
-    	for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
-    	
-    	if (pre_ligand_iteration_ratio) Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), iters*pre_ligand_iteration_ratio);
-    	
-    	preres = p.get_residues_near(pocketcen, 10000);
-    	qpr = preres.size();
-    	for (i=0; i<qpr; i++)
-    	{
-    		preaa[i] = preres[i];
-    	}
-    	
-    	for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-    	
-    	for (i=0; i<qpr; i++)
-    	{
-    		int resno = preaa[i]->get_residue_no();
-    		for (j=0; j<qpr; j++)
-    		{
-    			if (j == i) continue;
-    			initial_binding[resno] += reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]));
-    			initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
-    		}
-    	}
-    	
-    	float init_total_binding_by_type[_INTER_TYPES_LIMIT];
-    	for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = total_binding_by_type[i];
-    	
-    	for (i=0; i<qpr; i++) preaa[i]->movability = MOV_FLEXONLY;
-    	#endif
     	
     	if (pose <= 1)
     	{
@@ -1306,22 +1307,25 @@ int main(int argc, char** argv)
                 cfmols[i] = NULL;
 
             // time_t preiter = time(NULL);
-            #if pre_ligand_multimol_radius
-            Molecule** delete_me;
-            Molecule::multimol_conform(
-                cfmols,
-                delete_me = p.all_residues_as_molecules(),
-                iters,
-                &iteration_callback
-            );
-            delete[] delete_me;
-            #else
-            Molecule::multimol_conform(
-                cfmols,
-                iters,
-                &iteration_callback
-            );
-            #endif
+            if (differential_dock)
+            {
+		        Molecule** delete_me;
+		        Molecule::multimol_conform(
+		            cfmols,
+		            delete_me = p.all_residues_as_molecules(),
+		            iters,
+		            &iteration_callback
+		        );
+		        delete[] delete_me;
+            }
+            else
+            {
+		        Molecule::multimol_conform(
+		            cfmols,
+		            iters,
+		            &iteration_callback
+		        );
+            }
             /*time_t jlgsux = time(NULL);
             cout << "\nIterations took: " << (jlgsux-preiter) << " seconds." << endl;*/
 
@@ -1407,16 +1411,15 @@ int main(int argc, char** argv)
                 reaches_spheroid[nodeno][i]->clear_atom_binding_energies();
                 int resno = reaches_spheroid[nodeno][i]->get_residue_no();
                 
-                #if pre_ligand_multimol_radius
-                float lb = final_binding[resno];
-                /*for (j=0; j<sphres; j++)
-                {
-                	if (j == i) continue;
-                	lb += reaches_spheroid[nodeno][i]->get_intermol_binding(reaches_spheroid[nodeno][j]);
-            	}*/
-            	#else
-            	float lb = m.get_intermol_binding(reaches_spheroid[nodeno][i]);
-            	#endif
+                float lb;
+                if (differential_dock)
+            	{
+            		lb = final_binding[resno];
+            	}
+            	else
+            	{
+            		lb = m.get_intermol_binding(reaches_spheroid[nodeno][i]);
+            	}
                 if (lb > 90) lb = 0;
                 
                 sprintf(metrics[metcount], "%s%d", reaches_spheroid[nodeno][i]->get_3letter(), resno);
@@ -1424,17 +1427,20 @@ int main(int argc, char** argv)
                 mkJmol[metcount] = lb;
                 imkJmol[metcount] = initial_binding[resno];
                 
-                #if pre_ligand_multimol_radius
-                mvdWrepl[metcount] = final_vdWrepl[resno];
-                #else
-                mvdWrepl[metcount] = 0;
-                mvdWrepl[metcount] += m.get_vdW_repulsion(reaches_spheroid[nodeno][i]);
-                for (j=0; j<sphres; j++)
-                {
-                	if (j == i) continue;
-                	mvdWrepl[metcount] += reaches_spheroid[nodeno][i]->get_vdW_repulsion(reaches_spheroid[nodeno][j]);
+                if (differential_dock)
+            	{
+            		mvdWrepl[metcount] = final_vdWrepl[resno];
                 }
-                #endif
+                else
+                {
+		            mvdWrepl[metcount] = 0;
+		            mvdWrepl[metcount] += m.get_vdW_repulsion(reaches_spheroid[nodeno][i]);
+		            for (j=0; j<sphres; j++)
+		            {
+		            	if (j == i) continue;
+		            	mvdWrepl[metcount] += reaches_spheroid[nodeno][i]->get_vdW_repulsion(reaches_spheroid[nodeno][j]);
+		            }
+                }
                 
                 imvdWrepl[metcount] = initial_vdWrepl[resno];
                 metcount++;
@@ -1578,11 +1584,14 @@ int main(int argc, char** argv)
                         cout << "Pose: " << i << endl << "Node: " << k << endl;
                         if (output) *output << "Pose: " << i << endl << "Node: " << k << endl;
 
-                        #if pre_ligand_multimol_radius
-                        cout << "# Binding energies: delta = with ligand - without ligand." << endl;
-                        #else
-                        cout << "# Binding energies:" << endl;
-                        #endif
+                        if (differential_dock)
+				    	{
+				    		cout << "# Binding energies: delta = with ligand - without ligand." << endl;
+                        }
+                        else
+                        {
+                        	cout << "# Binding energies:" << endl;
+                        }
                         cout << "BENERG:" << endl;
                         if (output) *output << "# Binding energies" << endl << "BENERG:" << endl;
                         for (	l=0;
@@ -1594,21 +1603,24 @@ int main(int argc, char** argv)
 		                        l++
 		                    )
                         {
-                        	#if pre_ligand_multimol_radius
-                        	cout << dr[j][k].metric[l]
-                        		 << ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult 
-                        		 << " = " << -dr[j][k].mkJmol[l]*energy_mult
-                        		 << " - " << -dr[j][k].imkJmol[l]*energy_mult
-                        		 << endl;
-                            if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
-                        		 << ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult 
-                        		 << " = " << -dr[j][k].mkJmol[l]*energy_mult
-                        		 << " - " << -dr[j][k].imkJmol[l]*energy_mult
-                        		 << endl;
-                        	#else
-                            cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
-                            if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
-                            #endif
+                        	if (differential_dock)
+							{
+								cout << dr[j][k].metric[l]
+		                    		 << ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult 
+		                    		 << " = " << -dr[j][k].mkJmol[l]*energy_mult
+		                    		 << " - " << -dr[j][k].imkJmol[l]*energy_mult
+		                    		 << endl;
+		                        if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
+		                    		 << ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult 
+		                    		 << " = " << -dr[j][k].mkJmol[l]*energy_mult
+		                    		 << " - " << -dr[j][k].imkJmol[l]*energy_mult
+		                    		 << endl;
+                        	}
+                        	else
+                        	{
+		                        cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
+		                        if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
+                            }
                         }
                         cout << endl;
                         if (output) *output << endl;
@@ -1642,45 +1654,53 @@ int main(int argc, char** argv)
                                 goto _btyp_unassigned;
                             }
                             
-                            #if pre_ligand_multimol_radius
-                            cout << lbtyp << -(dr[j][k].bytype[l] - dr[j][k].ibytype[l])*energy_mult 
-                            	 << " = " << -dr[j][k].bytype[l]*energy_mult
-                            	 << " - " << -dr[j][k].ibytype[l]*energy_mult
-                            	 << endl;
-                            if (output) *output << lbtyp << -(dr[j][k].bytype[l] - dr[j][k].ibytype[l])*energy_mult 
-                            	 << " = " << -dr[j][k].bytype[l]*energy_mult
-                            	 << " - " << -dr[j][k].ibytype[l]*energy_mult
-                            	 << endl;
-                            #else
-                            
-                            cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
-                            if (output) *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
-                            #endif
+                            if (differential_dock)
+							{
+								cout << lbtyp << -(dr[j][k].bytype[l] - dr[j][k].ibytype[l])*energy_mult 
+		                        	 << " = " << -dr[j][k].bytype[l]*energy_mult
+		                        	 << " - " << -dr[j][k].ibytype[l]*energy_mult
+		                        	 << endl;
+		                        if (output) *output << lbtyp << -(dr[j][k].bytype[l] - dr[j][k].ibytype[l])*energy_mult 
+		                        	 << " = " << -dr[j][k].bytype[l]*energy_mult
+		                        	 << " - " << -dr[j][k].ibytype[l]*energy_mult
+		                        	 << endl;
+                            }
+                            else
+                            {
+		                        cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
+		                        if (output) *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
+                            }
                         }
                         cout << endl;
                         if (output) *output << endl;
 						
 						_btyp_unassigned:
 
-                        #if pre_ligand_multimol_radius
-                        if (output) *output << "Total: " << -(dr[j][k].kJmol - dr[j][k].ikJmol)*energy_mult 
-                        	 << " = " << -dr[j][k].kJmol*energy_mult
-                        	 << " - " << -dr[j][k].ikJmol*energy_mult
-                        	 << endl << endl;
-                        cout << "Total: " << -(dr[j][k].kJmol - dr[j][k].ikJmol)*energy_mult 
-                        	 << " = " << -dr[j][k].kJmol*energy_mult
-                        	 << " - " << -dr[j][k].ikJmol*energy_mult
-                        	 << endl << endl;
-                        #else
-                        if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
-                        cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
-                        #endif
+                        if (differential_dock)
+						{
+							if (output) *output << "Total: " << -(dr[j][k].kJmol - dr[j][k].ikJmol)*energy_mult 
+		                    	 << " = " << -dr[j][k].kJmol*energy_mult
+		                    	 << " - " << -dr[j][k].ikJmol*energy_mult
+		                    	 << endl << endl;
+		                    cout << "Total: " << -(dr[j][k].kJmol - dr[j][k].ikJmol)*energy_mult 
+		                    	 << " = " << -dr[j][k].kJmol*energy_mult
+		                    	 << " - " << -dr[j][k].ikJmol*energy_mult
+		                    	 << endl << endl;
+                        }
+                        else
+                        {
+		                    if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
+		                    cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
+                        }
 
-                        #if pre_ligand_multimol_radius
-                        cout << "# van der Waals repulsion: delta = with ligand - without ligand." << endl;
-                        #else
-                        cout << "# van der Waals repulsion:" << endl;
-                        #endif
+                        if (differential_dock)
+						{
+							cout << "# van der Waals repulsion: delta = with ligand - without ligand." << endl;
+                        }
+                        else
+                        {
+                        	cout << "# van der Waals repulsion:" << endl;
+                        }
                         cout << "vdWRPL:" << endl;
                         if (output) *output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
                         for (	l=0;
@@ -1694,21 +1714,24 @@ int main(int argc, char** argv)
                         {
                         	if (fabs(dr[j][k].mvdWrepl[l]) < 0.001) continue;
                         	
-                        	#if pre_ligand_multimol_radius
-                            cout << dr[j][k].metric[l]
-                            	 << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
-                            	 << " = " << dr[j][k].mvdWrepl[l]*energy_mult
-                            	 << " - " << dr[j][k].imvdWrepl[l]*energy_mult
-                            	 << endl;
-                            if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
-                            	 << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
-                            	 << " = " << dr[j][k].mvdWrepl[l]*energy_mult
-                            	 << " - " << dr[j][k].imvdWrepl[l]*energy_mult
-                            	 << endl;
-                        	#else
-                            cout << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
-                            if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
-                            #endif
+                        	if (differential_dock)
+							{
+								cout << dr[j][k].metric[l]
+		                        	 << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
+		                        	 << " = " << dr[j][k].mvdWrepl[l]*energy_mult
+		                        	 << " - " << dr[j][k].imvdWrepl[l]*energy_mult
+		                        	 << endl;
+		                        if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
+		                        	 << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
+		                        	 << " = " << dr[j][k].mvdWrepl[l]*energy_mult
+		                        	 << " - " << dr[j][k].imvdWrepl[l]*energy_mult
+		                        	 << endl;
+                        	}
+                        	else
+                        	{
+		                        cout << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
+		                        if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
+                            }
                         }
                         cout << endl;
                         if (output) *output << endl;

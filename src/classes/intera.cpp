@@ -443,6 +443,8 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 
             case hbond:
                 // if (sgn(a->is_polar()) == -sgn(b->is_polar()))
+                if (a->get_family() == PNICTOGEN && (a->is_backbone || a->is_amide())) break;
+                if (b->get_family() == PNICTOGEN && (b->is_backbone || b->is_amide())) break;
                 retval[j++] = look[i];
                 break;
 

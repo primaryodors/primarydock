@@ -101,6 +101,7 @@ class Atom
     bool is_metal();
     int is_thio();							// -1 if atom is S; +1 if atom is H of a sulfhydryl.
     bool is_pi();
+    bool is_amide();
 
     // Setters.
     void set_aa_properties();

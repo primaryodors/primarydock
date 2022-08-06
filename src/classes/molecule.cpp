@@ -86,84 +86,84 @@ Molecule::Molecule(char const* lname, Atom** collection)
 
 Molecule::~Molecule()
 {
-	;
+    ;
 }
 
 
 Pose::Pose()
 {
-	reset();
+    reset();
 }
 
 Pose::Pose(Molecule* m)
 {
-	reset();
-	copy_state(m);
+    reset();
+    copy_state(m);
 }
 
 void Pose::reset()
 {
-	sz = 0;
-	saved_atom_locs = nullptr;
-	saved_from = nullptr;
+    sz = 0;
+    saved_atom_locs = nullptr;
+    saved_from = nullptr;
 }
 
 void Pose::copy_state(Molecule* m)
 {
-	if (!saved_atom_locs || saved_from != m)
-	{
-		if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete[] saved_atom_locs;
-		saved_from = m;
-		if (!m || !m->atoms) return;
-		
-		sz = m->get_atom_count();
-		saved_atom_locs = new Point[sz+16];
-	}
-	
-	int i;
-	for (i=0; m->atoms[i] && i<sz; i++)
-	{
-		saved_atom_locs[i] = m->atoms[i]->get_location();
-	}
+    if (!saved_atom_locs || saved_from != m)
+    {
+        if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete[] saved_atom_locs;
+        saved_from = m;
+        if (!m || !m->atoms) return;
+
+        sz = m->get_atom_count();
+        saved_atom_locs = new Point[sz+16];
+    }
+
+    int i;
+    for (i=0; m->atoms[i] && i<sz; i++)
+    {
+        saved_atom_locs[i] = m->atoms[i]->get_location();
+    }
 }
 
 void Pose::restore_state(Molecule* m)
-{	
-	if (!m || !m->atoms || !sz || m != saved_from) return;
-	
-	int i;
-	for (i=0; i<sz && m->atoms[i]; i++)
-	{
-		m->atoms[i]->move(saved_atom_locs[i]);
-	}
+{
+    if (!m || !m->atoms || !sz || m != saved_from) return;
+
+    int i;
+    for (i=0; i<sz && m->atoms[i]; i++)
+    {
+        m->atoms[i]->move(saved_atom_locs[i]);
+    }
 }
 
 
 
 void Molecule::delete_atom(Atom* a)
 {
-	if (!a) return;
-	// return;
-	int i, j;
-	
-	if (hasAtoms(atoms))
-	{
-		for (i=0; atoms[i]; i++)
-		{
-			if (atoms[i] == a)
-			{
-				a->unbond_all();
-				for (j=i+1; atoms[j]; j++) atoms[j-1] = atoms[j];
-				atoms[j-1] = nullptr;
-				rotatable_bonds = nullptr;
-				atcount--;
-				return;
-			}
-		}
-	}
-	
-	cout << "Attempt to delete atom " << a->name << " from a molecule it is not part of." << endl << flush;
-	throw 0xbada70b;
+    if (!a) return;
+    // return;
+    int i, j;
+
+    if (hasAtoms(atoms))
+    {
+        for (i=0; atoms[i]; i++)
+        {
+            if (atoms[i] == a)
+            {
+                a->unbond_all();
+                for (j=i+1; atoms[j]; j++) atoms[j-1] = atoms[j];
+                atoms[j-1] = nullptr;
+                rotatable_bonds = nullptr;
+                atcount--;
+                return;
+            }
+        }
+    }
+
+    cout << "Attempt to delete atom " << a->name << " from a molecule it is not part of." << endl << flush;
+    throw 0xbada70b;
 }
 
 void Molecule::reset_conformer_momenta()
@@ -231,7 +231,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
         Point pt;
         return add_atom(elemsym, aname, &pt, bondto, bcard);
     }
-    
+
     // cout << "Add new " << elemsym << " bonded to " << bondto->name << endl;
 
     SCoord v = bondto->get_next_free_geometry(bcard);
@@ -298,13 +298,13 @@ void Molecule::hydrogenate(bool steric_only)
 
         float valence = atoms[i]->get_valence();
         if (valence > 4) valence = 8 - valence;
-        
+
         // cout << atoms[i]->name << " has valence " << valence << endl;
 
         float bcardsum = 0;
 
         Bond** aib = atoms[i]->get_bonds();
-		int db = 0;
+        int db = 0;
         if (aib)
         {
             for (j=0; aib[j]; j++)
@@ -321,19 +321,19 @@ void Molecule::hydrogenate(bool steric_only)
 
         //cout << " given charge makes " << bcardsum << endl;
 
-		int h_to_add = round(valence - bcardsum);
+        int h_to_add = round(valence - bcardsum);
         for (j=0; j<h_to_add; j++)
         {
             char hname[5];
             sprintf(hname, "H%d", atcount+1);
             Atom* H = add_atom("H", hname, atoms[i], 1);
             //cout << "Adding " << hname << " to " << atoms[i]->name << " whose valence is " << valence << " and has " << bcardsum << " bonds already." << endl;
-            
+
             /*atoms[i]->clear_geometry_cache();
             SCoord v = atoms[i]->get_next_free_geometry(1);
             v.r = InteratomicForce::covalent_bond_radius(atoms[i], H, 1);
             H->move(atoms[i]->get_location().add(v));*/
-            
+
             if (atoms[i]->get_geometry() == 3)
             {
                 Bond* aib = atoms[i]->get_bond_by_idx(1);
@@ -342,13 +342,13 @@ void Molecule::hydrogenate(bool steric_only)
                     /*Bond* b0 = atoms[i]->get_bond_by_idx(0);
                     Bond* b1 = atoms[i]->get_bond_by_idx(1);
                     if (!b1 || !b1->btom) b1 = atoms[i]->get_bond_by_idx(2);*/
-                    
+
                     int k=0;
                     Bond* b0 = atoms[i]->get_bond_by_idx(k++);
                     if (!b0->btom || b0->btom == H) b0 = atoms[i]->get_bond_by_idx(k++);
                     Bond* b1 = atoms[i]->get_bond_by_idx(k++);
                     if (!b1->btom || b1->btom == H) b1 = atoms[i]->get_bond_by_idx(k++);
-                    
+
                     if (b0->btom && b1->btom)
                     {
                         Point source = atoms[i]->get_location();
@@ -362,17 +362,17 @@ void Molecule::hydrogenate(bool steric_only)
                         float r_wouldbe = visibly_moved.get_3d_distance(avoid);
 
                         if (r_is < r_wouldbe) H->move(visibly_moved);*/
-                        
+
                         Point movable = b1->btom->get_location();
                         /*cout << "Getting normal of " << atoms[i]->name << " - "
                         	 << b0->btom->name << " - " << b1->btom->name << endl;*/
                         SCoord axis = compute_normal(source, b0->btom->get_location(), b1->btom->get_location());
                         Point plus  = rotate3D(movable, source, axis,  triangular);
                         Point minus = rotate3D(movable, source, axis, -triangular);
-                        
+
                         float rp = plus.get_3d_distance(b0->btom->get_location());
                         float rm = minus.get_3d_distance(b0->btom->get_location());
-                        
+
                         Point pt = ((rp > rm) ? plus : minus).subtract(source);
                         pt.scale(InteratomicForce::covalent_bond_radius(atoms[i], H, 1));
                         H->move(pt.add(source));
@@ -410,22 +410,23 @@ Atom* Molecule::get_atom(char const* aname) const
 
 int Molecule::atom_idx_from_ptr(Atom* a)
 {
-	if (!atoms) return -1;
-	int i;
-	for (i=0; atoms[i]; i++) if (atoms[i] == a) return i;
-	
-	return -1;		// If not found.	
+    if (!atoms) return -1;
+    int i;
+    for (i=0; atoms[i]; i++) if (atoms[i] == a) return i;
+
+    return -1;		// If not found.
 }
 
 Point Molecule::get_atom_location(char const * aname)
-{	if (noAtoms(atoms))
-	{
-		Point pt;
-		return pt;
-	}
-	Atom* a = get_atom(aname);
-	if (!a) return get_barycenter();
-	return a->get_location();
+{
+    if (noAtoms(atoms))
+    {
+        Point pt;
+        return pt;
+    }
+    Atom* a = get_atom(aname);
+    if (!a) return get_barycenter();
+    return a->get_location();
 }
 
 Atom* Molecule::get_nearest_atom(Point loc) const
@@ -474,7 +475,7 @@ int Molecule::from_sdf(char const* sdf_dat)
     int i,j=0,lncount;
 
     immobile = false;
-    
+
     // cout << sdf_dat << endl;
 
     lines[j++] = sdf_dat;
@@ -530,7 +531,7 @@ int Molecule::from_sdf(char const* sdf_dat)
             atoms[atcount++] = a;
             atoms[atcount] = nullptr;
             added++;
-            
+
             // cout << "Added " << a->name << endl;
         }
         else
@@ -565,7 +566,7 @@ int Molecule::from_pdb(FILE* is)
     {
         fgets(buffer, 1003, is);
         char** fields = chop_spaced_fields(buffer);
-        
+
         if (fields)
         {
             if (!strcmp(fields[0], "ATOM")
@@ -670,17 +671,17 @@ bool Molecule::save_sdf(FILE* os, Molecule** lig)
 
     time_t now = time(0);
     tm *gmtm = gmtime(&now);
-    
+
     // If we used obabel or another third party app, give due credit.
     if (sdfgen_aboutline.length()) fprintf(os, "%s\n", sdfgen_aboutline.c_str());
     else
     {
-		fprintf(os, "  primarydock-%02d%02d%02d%02d%02d%02d3D\n", gmtm->tm_year % 100, gmtm->tm_mon+1, gmtm->tm_mday,
-		        gmtm->tm_hour, gmtm->tm_min, gmtm->tm_sec
-		       );
+        fprintf(os, "  primarydock-%02d%02d%02d%02d%02d%02d3D\n", gmtm->tm_year % 100, gmtm->tm_mon+1, gmtm->tm_mday,
+                gmtm->tm_hour, gmtm->tm_min, gmtm->tm_sec
+               );
 
-    	fprintf(os, "https://github.com/primaryodors/primarydock\n");
-	}
+        fprintf(os, "https://github.com/primaryodors/primarydock\n");
+    }
 
     int ac, bc, chargeds=0;
     ac = get_atom_count();
@@ -826,31 +827,31 @@ void Molecule::save_pdb(FILE* os, int atomno_offset)
 
 int Molecule::add_ring(Atom** atoms)
 {
-	int i, ringcount;
-	
-	if (rings)
-	{
-		for (i=0; rings[i]; i++);	// Get count.
-		ringcount = i;
-	}
-	else
-	{
-		ringcount=0;
-	}
-	
-	Ring** ringstmp = new Ring*[ringcount+4];
-	
-	if (rings)
-	{
-		for (i=0; i<ringcount; i++) ringstmp[i] = rings[i];
-		delete[] rings;
-	}
-	
-	ringstmp[ringcount++] = new Ring(atoms);
-	ringstmp[ringcount] = nullptr;
-	rings = ringstmp;
-	
-	return ringcount-1;
+    int i, ringcount;
+
+    if (rings)
+    {
+        for (i=0; rings[i]; i++);	// Get count.
+        ringcount = i;
+    }
+    else
+    {
+        ringcount=0;
+    }
+
+    Ring** ringstmp = new Ring*[ringcount+4];
+
+    if (rings)
+    {
+        for (i=0; i<ringcount; i++) ringstmp[i] = rings[i];
+        delete[] rings;
+    }
+
+    ringstmp[ringcount++] = new Ring(atoms);
+    ringstmp[ringcount] = nullptr;
+    rings = ringstmp;
+
+    return ringcount-1;
 }
 
 #define DBG_FND_RNGS 0
@@ -870,11 +871,11 @@ int Molecule::identify_rings()
     // Start at any atom, mark it "used".
     a = atoms[0];
     a->used = true;
-    
+
     #if DBG_FND_RNGS
     cout << "Identifying rings for " << (name ? name : "(no name molecule)") << "... " << endl;
     #endif
-    
+
     for (i=0; i<256; i++) ringstmp[i] = nullptr;
 
     // For each "unused" valence>1 atom attached to the start atom, mark it "used" and start a chain.
@@ -906,11 +907,13 @@ int Molecule::identify_rings()
     {
         active = 0;
 
-		#if DBG_FND_RNGS
+        #if DBG_FND_RNGS
         for (i=0; i<chains; i++)
             if (ringstmp[i][0])
             {
-                cout << "Begin chain " << i << ": "; Atom::dump_array(ringstmp[i]); cout << endl;
+                cout << "Begin chain " << i << ": ";
+                Atom::dump_array(ringstmp[i]);
+                cout << endl;
             }
         #endif
 
@@ -933,23 +936,23 @@ int Molecule::identify_rings()
                     #if DBG_FND_RNGS
                     cout << "Preparing to check chain " << i << " against chain " << l << " for bond convergence...\n";
                     #endif
-                    
+
                     if (l != i && chainlen[l] && ringstmp[l][chainlen[l]-1])
                     {
                         #if DBG_FND_RNGS
                         cout << "Checking chain " << i << " against chain " << l << " for bond convergence...\n";
                         #endif
-                        
+
                         // If two chains converge on a single atom, this is your one converging ato
                         if (ringstmp[l][chainlen[l]-1] == a)
                         {
                             cnva = a;
                             cnvb = 0;
-                            
+
                             #if DBG_FND_RNGS
                             cout << "****** Chains " << i << " and " << l << " converge on atom " << cnva->name << " ******" << endl;
                             #endif
-                            
+
                             cnvchain = l;
                             break;
                         }
@@ -958,17 +961,17 @@ int Molecule::identify_rings()
                         {
                             cnva = a;
                             cnvb = ringstmp[l][chainlen[l]-1];
-                            
+
                             #if DBG_FND_RNGS
                             cout << "***** Chains " << i << " and " << l << " converge on atoms " << cnva->name << " and " << cnvb->name << " *****" << endl;
                             #endif
-                            
+
                             cnvchain = l;
                             break;
                         }
                     }
                 }
-_done_l:
+            _done_l:
                 ;
             }
 
@@ -982,56 +985,60 @@ _done_l:
                 Atom* ring_atoms[n];
                 for (m=0; m<n; m++) ring_atoms[m] = nullptr;
                 n = 0;
-                
+
                 #if DBG_FND_RNGS
                 cout << "Counting backwards from " << chainlen[i]-1 << endl;
                 #endif
-                
+
                 for (m = chainlen[i]-1; m >= 0; m--)
                 {
                     ring_atoms[n++] = ringstmp[i][m];
-                    
+
                     #if DBG_FND_RNGS
                     cout << "m: " << ringstmp[i][m]->name << " ";
                     #endif
-                    
+
                     l = in_array(reinterpret_cast<void*>(ringstmp[i][m]),
                                  reinterpret_cast<void**>(ringstmp[cnvchain])
                                 );
                     if (l >= 0)
                     {
                         l++;
-                        
+
                         #if DBG_FND_RNGS
                         cout << "\nCounting forwards from " << l << endl;
                         #endif
-                        
+
                         for (; ringstmp[cnvchain][l]; l++)
                         {
                             #if DBG_FND_RNGS
                             cout << "l: " << ringstmp[cnvchain][l]->name << " ";
                             #endif
-                            
+
                             ring_atoms[n++] = ringstmp[cnvchain][l];
-                            
+
                             #if DBG_FND_RNGS
-                            cout << "Building " << n << " membered ring: "; Atom::dump_array(ring_atoms); cout << endl;
+                            cout << "Building " << n << " membered ring: ";
+                            Atom::dump_array(ring_atoms);
+                            cout << endl;
                             #endif
-                            
+
                             if (n >= 3 && (ringstmp[cnvchain][l] == cnva || ringstmp[cnvchain][l] == cnvb))
                             {
                                 #if DBG_FND_RNGS
-                                cout << "Found " << n << " membered ring: "; Atom::dump_array(ring_atoms); cout << endl;
+                                cout << "Found " << n << " membered ring: ";
+                                Atom::dump_array(ring_atoms);
+                                cout << endl;
                                 #endif
-                                
+
                                 ring_atoms[n] = 0;
 
                                 int nringid = add_ring(ring_atoms);
-#if _ALLOW_FLEX_RINGS
+                                #if _ALLOW_FLEX_RINGS
                                 if (!rings[nringid]->is_coplanar())
-#else
+                                #else
                                 if (1)
-#endif
+                                #endif
                                 {
                                     for (p=0; (ra = ring_atoms[p]); p++)
                                     {
@@ -1050,7 +1057,7 @@ _done_l:
                         }
                     }
                 }
-_exit_m:
+            _exit_m:
                 ;
 
                 // TODO: The algorithm can sometimes give incorrect results in polycyclic molecules
@@ -1081,11 +1088,13 @@ _exit_m:
                             is_ring[chains] = 0;
                             chainlen[chains] = chainlen[i];
                             b[j]->btom->used = true;
-                            
+
                             #if DBG_FND_RNGS
-                            cout << "Another new chain " << chains << ": "; Atom::dump_array(ringstmp[chains]); cout << endl;
+                            cout << "Another new chain " << chains << ": ";
+                            Atom::dump_array(ringstmp[chains]);
+                            cout << endl;
                             #endif
-                            
+
                             chains++;
                             k++;
                             // a = 0;
@@ -1097,9 +1106,11 @@ _exit_m:
                             ringstmp[i][chainlen[i]] = 0;
                             b[j]->btom->used = true;
                             k++;
-                            
+
                             #if DBG_FND_RNGS
-                            cout << "Chain " << i << ": "; Atom::dump_array(ringstmp[i]); cout << endl;
+                            cout << "Chain " << i << ": ";
+                            Atom::dump_array(ringstmp[i]);
+                            cout << endl;
                             #endif
                         }
                     }
@@ -1210,7 +1221,7 @@ void Molecule::identify_acidbase()
             }
             if (b) delete[] b;
         }
-_not_acidic:
+    _not_acidic:
         //if (b) delete[] b;
 
         // If it is a pnictogen,
@@ -1236,7 +1247,7 @@ _not_acidic:
             atoms[i]->set_acidbase(1);
 
         }
-_not_basic:
+    _not_basic:
         ;
     }
 }
@@ -1246,12 +1257,12 @@ Bond** Molecule::get_rotatable_bonds()
     if (noAtoms(atoms)) return 0;
     if (rotatable_bonds) return rotatable_bonds;
     if (mol_typ == MOLTYP_AMINOACID)
-    {	
-    	// TODO: There has to be a better way.
-    	Star s;
-    	s.pmol = this;
-    	rotatable_bonds = s.paa->get_rotatable_bonds();
-    	return rotatable_bonds;
+    {
+        // TODO: There has to be a better way.
+        Star s;
+        s.pmol = this;
+        rotatable_bonds = s.paa->get_rotatable_bonds();
+        return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
 
@@ -1267,24 +1278,24 @@ Bond** Molecule::get_rotatable_bonds()
             for (j=0; j<g && lb[j]; j++)
             {
                 if (lb[j]->count_moves_with_btom() > mwblimit) continue;
-                
+
                 if (!lb[j]->atom || !lb[j]->btom) continue;
-                
+
                 bool pia = lb[j]->atom->is_pi(),
-                	 pib = lb[j]->btom->is_pi();
-                
+                     pib = lb[j]->btom->is_pi();
+
                 int fa = lb[j]->atom->get_family(),
-                	fb = lb[j]->btom->get_family();
-                
+                    fb = lb[j]->btom->get_family();
+
                 // Generally, a single bond between pi atoms, or a bond from a pi atom to an amino group, cannot rotate.
                 if (	(pia && pib)
-                		||
-                		(pia && (fb == PNICTOGEN))
-                		||
-                		(pib && (fa == PNICTOGEN))
+                        ||
+                        (pia && (fb == PNICTOGEN))
+                        ||
+                        (pib && (fa == PNICTOGEN))
                    )
-                   lb[j]->can_rotate = false;
-                
+                    lb[j]->can_rotate = false;
+
                 if (lb[j]->btom
                         &&
                         lb[j]->atom < lb[j]->btom
@@ -1306,13 +1317,13 @@ Bond** Molecule::get_rotatable_bonds()
             for (j=0; j<g; j++)
             {
                 if (lb[j]->count_moves_with_btom() > mwblimit) continue;
-                
+
                 // Generally, a single bond between pi atoms cannot rotate.
                 if (lb[j]->atom && lb[j]->atom->is_pi()
-                	&&
-                	lb[j]->btom && lb[j]->btom->is_pi()
+                        &&
+                        lb[j]->btom && lb[j]->btom->is_pi()
                    )
-                   lb[j]->can_rotate = false;
+                    lb[j]->can_rotate = false;
 
                 if (lb[j]->can_rotate
                         &&
@@ -1344,18 +1355,18 @@ Bond** Molecule::get_rotatable_bonds()
 
 void Molecule::crumple(float theta)
 {
-	Bond** b = get_rotatable_bonds();
-	if (!b) return;
-	
-	float int_clsh = get_internal_clashes();
-	
-	int i;
-	for (i=0; b[i]; i++)
-	{
-		float ltheta = theta*randsgn();
-		b[i]->rotate(ltheta);
-		if (get_internal_clashes() > int_clsh*2) b[i]->rotate(-ltheta);
-	}
+    Bond** b = get_rotatable_bonds();
+    if (!b) return;
+
+    float int_clsh = get_internal_clashes();
+
+    int i;
+    for (i=0; b[i]; i++)
+    {
+        float ltheta = theta*randsgn();
+        b[i]->rotate(ltheta);
+        if (get_internal_clashes() > int_clsh*2) b[i]->rotate(-ltheta);
+    }
 }
 
 // TODO: There has to be a better way.
@@ -1368,97 +1379,97 @@ Bond** AminoAcid::get_rotatable_bonds()
     if (rotatable_bonds) return rotatable_bonds;
     if (aadef && aadef->proline_like)
     {
-    	// cout << "Proline-like! No rotbonds!" << endl;
-    	return nullptr;
-	}
+        // cout << "Proline-like! No rotbonds!" << endl;
+        return nullptr;
+    }
     Bond* btemp[65536];
-    
+
     int i,j, bonds=0;
     for (i=0; i<65536; i++) btemp[i] = nullptr;
     if (aadef && aadef->aabonds)
     {
-    	for (i=0; aadef->aabonds[i]; i++)
-    	{
-    		// cout << (name ? name : "(no name)") << "." << *(aadef->aabonds[i]) << endl;
-    		if (aadef->aabonds[i]->cardinality == 1
-    			&&
-    			aadef->aabonds[i]->can_rotate
-    		   )
-    		{
-    			Atom* la = get_atom(aadef->aabonds[i]->aname);
-    			if (la
-    				&& (!la->is_backbone || !strcmp(la->name, "CA"))
-    			   )
-    			{
-    				Bond* lb = la->get_bond_between(aadef->aabonds[i]->bname);
-    				if (!lb)
-    				{
-    					// TODO: Add the missing bond if possible.
-    					cout << "Warning: No bond between " << la->residue << ":" << la->name
-							 << " and " << aadef->aabonds[i]->bname
-							 << endl << flush;
-						
-						Bond** lbb = la->get_bonds();
-						if (lbb)
-						{
-							cout << la->name << " is bonded to:";
-							int o, ag = la->get_geometry();
-							for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
-							cout << "." << endl;
-						}
-						
-						Atom* lba = get_atom(aadef->aabonds[i]->bname);
-						if (lba)
-						{
-							lbb = lba->get_bonds();
-							if (lbb)
-							{
-								cout << lba->name << " is bonded to:";
-								int o, ag = lba->get_geometry();
-								for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
-								cout << "." << endl;
-							}
-						}
-						else cout << aadef->aabonds[i]->bname << " not found." << endl;
-					}
-    				else
-    				{
-    					// cout << (name ? name : "(no name)") << ":" << *(lb) << endl;
-    					// Generally, a single bond between pi atoms cannot rotate.
-						if (lb->atom->is_pi() && lb->btom && lb->btom->is_pi())
-						   aadef->aabonds[i]->can_rotate = false;
-    					
-						lb->can_rotate = aadef->aabonds[i]->can_rotate;
+        for (i=0; aadef->aabonds[i]; i++)
+        {
+            // cout << (name ? name : "(no name)") << "." << *(aadef->aabonds[i]) << endl;
+            if (aadef->aabonds[i]->cardinality == 1
+                    &&
+                    aadef->aabonds[i]->can_rotate
+               )
+            {
+                Atom* la = get_atom(aadef->aabonds[i]->aname);
+                if (la
+                        && (!la->is_backbone || !strcmp(la->name, "CA"))
+                   )
+                {
+                    Bond* lb = la->get_bond_between(aadef->aabonds[i]->bname);
+                    if (!lb)
+                    {
+                        // TODO: Add the missing bond if possible.
+                        cout << "Warning: No bond between " << la->residue << ":" << la->name
+                             << " and " << aadef->aabonds[i]->bname
+                             << endl << flush;
 
-						if ((!la->is_backbone || !strcmp(la->name, "CA"))
-							&&
-							la->get_Z() > 1
-				            &&
-				            (	greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)+1)
-				            	||
-				            	greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)-1)
-				            )
-		                   )
-		                {
-		                	// cout << "Included." << endl;
-		                	
-		                	if (greek_from_aname(la->name) < greek_from_aname(lb->btom->name))
-		                		btemp[bonds++] = la->get_bond_between(lb->btom);
-		                	else
-						    	btemp[bonds++] = lb->btom->get_bond_between(la);
-						    btemp[bonds] = 0;
-						    
-						    // cout << (name ? name : "(no name)") << ":" << *(btemp[bonds-1]) << endl;
-						}
-				    }
-				}
-    		}
-    	}
-    	
-    	goto _found_aadef;
+                        Bond** lbb = la->get_bonds();
+                        if (lbb)
+                        {
+                            cout << la->name << " is bonded to:";
+                            int o, ag = la->get_geometry();
+                            for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
+                            cout << "." << endl;
+                        }
+
+                        Atom* lba = get_atom(aadef->aabonds[i]->bname);
+                        if (lba)
+                        {
+                            lbb = lba->get_bonds();
+                            if (lbb)
+                            {
+                                cout << lba->name << " is bonded to:";
+                                int o, ag = lba->get_geometry();
+                                for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
+                                cout << "." << endl;
+                            }
+                        }
+                        else cout << aadef->aabonds[i]->bname << " not found." << endl;
+                    }
+                    else
+                    {
+                        // cout << (name ? name : "(no name)") << ":" << *(lb) << endl;
+                        // Generally, a single bond between pi atoms cannot rotate.
+                        if (lb->atom->is_pi() && lb->btom && lb->btom->is_pi())
+                            aadef->aabonds[i]->can_rotate = false;
+
+                        lb->can_rotate = aadef->aabonds[i]->can_rotate;
+
+                        if ((!la->is_backbone || !strcmp(la->name, "CA"))
+                                &&
+                                la->get_Z() > 1
+                                &&
+                                (	greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)+1)
+                                    ||
+                                    greek_from_aname(la->name) == (greek_from_aname(lb->btom->name)-1)
+                                )
+                           )
+                        {
+                            // cout << "Included." << endl;
+
+                            if (greek_from_aname(la->name) < greek_from_aname(lb->btom->name))
+                                btemp[bonds++] = la->get_bond_between(lb->btom);
+                            else
+                                btemp[bonds++] = lb->btom->get_bond_between(la);
+                            btemp[bonds] = 0;
+
+                            // cout << (name ? name : "(no name)") << ":" << *(btemp[bonds-1]) << endl;
+                        }
+                    }
+                }
+            }
+        }
+
+        goto _found_aadef;
     }
 
-	// cout << name << " ";
+    // cout << name << " ";
     for (i=0; atoms[i]; i++)
     {
         Bond** lb = atoms[i]->get_bonds();
@@ -1478,7 +1489,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                     lb[j]->btom->get_Z() > 1
                )
             {
-            	// cout << *lb[j] << " ";
+                // cout << *lb[j] << " ";
                 btemp[bonds++] = lb[j];
                 btemp[bonds] = 0;
             }
@@ -1488,7 +1499,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     }
     // cout << endl;
 
-	_found_aadef:
+_found_aadef:
     Bond** retval = new Bond*[bonds+8];
     for (i=0; i<=bonds; i++) retval[i] = btemp[i];
     retval[i] = 0;
@@ -1499,17 +1510,17 @@ Bond** AminoAcid::get_rotatable_bonds()
 
 float Molecule::hydrophilicity()
 {
-	int i, count;
-	float total;
-	for (i=0; atoms[i]; i++)
-	{
-		int Z = atoms[i]->get_Z();
-		if (Z==1) continue;
-		
-		total += atoms[i]->hydrophilicity_rule();
-		count++;
-	}
-	return count ? (total / count) : 0;
+    int i, count;
+    float total;
+    for (i=0; atoms[i]; i++)
+    {
+        int Z = atoms[i]->get_Z();
+        if (Z==1) continue;
+
+        total += atoms[i]->hydrophilicity_rule();
+        count++;
+    }
+    return count ? (total / count) : 0;
 }
 
 Bond** Molecule::get_all_bonds(bool unidirectional)
@@ -1570,18 +1581,18 @@ float Molecule::get_internal_clashes()
             {
                 float lclash = sphere_intersection(avdW, bvdW, r);
                 clash += lclash;
-                
+
                 if (false && lclash > 3)
                 {
-                	cout << atoms[i]->name << " clashes with " << atoms[j]->name << " by " << lclash << " cu. A. resulting in " << clash << endl;
-                	int g = atoms[i]->get_geometry();
-                	cout << "Geometry: " << g << endl;
-                	Bond** b = atoms[i]->get_bonds();
-                	int k;
-                	for (k=0; k<g; k++)
-                		cout << atoms[i]->name << " is bonded to " << hex << b[k]->btom << dec << " "
-                			 << (b[k]->btom ? b[k]->btom->name : "") << "." << endl;
-            	}
+                    cout << atoms[i]->name << " clashes with " << atoms[j]->name << " by " << lclash << " cu. A. resulting in " << clash << endl;
+                    int g = atoms[i]->get_geometry();
+                    cout << "Geometry: " << g << endl;
+                    Bond** b = atoms[i]->get_bonds();
+                    int k;
+                    for (k=0; k<g; k++)
+                        cout << atoms[i]->name << " is bonded to " << hex << b[k]->btom << dec << " "
+                             << (b[k]->btom ? b[k]->btom->name : "") << "." << endl;
+                }
             }
         }
     }
@@ -1591,45 +1602,45 @@ float Molecule::get_internal_clashes()
 
 float Molecule::get_vdW_repulsion(Molecule* ligand)
 {
-	if (!ligand) return 0;
-	if (ligand == this) return 0;
-	if (!atoms || !ligand->atoms) return 0;
-	
-	int i, j;
-	float retval = 0;
-	
-	for (i=0; atoms[i]; i++)
-	{
-		float achg = atoms[i]->get_charge();
-		bool api = atoms[i]->is_pi();
-		
-		for (j=0; ligand->atoms[j]; j++)
-		{
-			float bchg = ligand->atoms[j]->get_charge();
-			bool bpi = ligand->atoms[j]->is_pi();
-			
-			if (!achg || !bchg)
-			{
-				// TODO: Hard coded values get from bindings.dat instead.
-				float rlim = 4, kJmol = 0.4;
-				if (api && bpi)
-				{
-					rlim = 3.87;
-					kJmol = 2;
-				}
-				float halflim = rlim/2;
-				float asphere = 4.0/3 * M_PI * halflim * halflim * halflim;
-				
-				float r = atoms[i]->distance_to(ligand->atoms[j]);
-				if (r < rlim)
-				{
-					retval += fabs(sphere_intersection(halflim, halflim, r) * kJmol / asphere);
-				}
-			}
-		}
-	}
-	
-	return retval;
+    if (!ligand) return 0;
+    if (ligand == this) return 0;
+    if (!atoms || !ligand->atoms) return 0;
+
+    int i, j;
+    float retval = 0;
+
+    for (i=0; atoms[i]; i++)
+    {
+        float achg = atoms[i]->get_charge();
+        bool api = atoms[i]->is_pi();
+
+        for (j=0; ligand->atoms[j]; j++)
+        {
+            float bchg = ligand->atoms[j]->get_charge();
+            bool bpi = ligand->atoms[j]->is_pi();
+
+            if (!achg || !bchg)
+            {
+                // TODO: Hard coded values get from bindings.dat instead.
+                float rlim = 4, kJmol = 0.4;
+                if (api && bpi)
+                {
+                    rlim = 3.87;
+                    kJmol = 2;
+                }
+                float halflim = rlim/2;
+                float asphere = 4.0/3 * M_PI * halflim * halflim * halflim;
+
+                float r = atoms[i]->distance_to(ligand->atoms[j]);
+                if (r < rlim)
+                {
+                    retval += fabs(sphere_intersection(halflim, halflim, r) * kJmol / asphere);
+                }
+            }
+        }
+    }
+
+    return retval;
 }
 
 float Molecule::get_intermol_clashes(Molecule* ligand)
@@ -1671,14 +1682,14 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 r = pta.get_3d_distance(&ptb) + 1e-3;
                 if (r < avdW + bvdW)
                 {
-                	/*float confidence = 2.5;		// TODO: Get this from the PDB.
-					float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
-					
-					float allowable = give + confidence / sqrt(3);
-					
-					r += allowable;
-					if (r > (avdW + bvdW)) r = avdW + bvdW;*/
-    		
+                    /*float confidence = 2.5;		// TODO: Get this from the PDB.
+                    float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
+
+                    float allowable = give + confidence / sqrt(3);
+
+                    r += allowable;
+                    if (r > (avdW + bvdW)) r = avdW + bvdW;*/
+
                     float lclash = sphere_intersection(avdW, bvdW, r);
                     if (lclash > 0)
                     {
@@ -1746,28 +1757,28 @@ Point Molecule::get_barycenter(bool bond_weighted) const
 
     for (i=0; i<atcount; i++)
     {
-    	locs[i] = atoms[i]->get_location();
-		locs[i].weight = atoms[i]->get_atomic_weight();
-    	#if allow_tethered_rotations
-    	if (bond_weighted)
-    	{
-    		locs[i].weight += atoms[i]->last_bind_energy;
-    	}
-    	#endif
-	}
+        locs[i] = atoms[i]->get_location();
+        locs[i].weight = atoms[i]->get_atomic_weight();
+        #if allow_tethered_rotations
+        if (bond_weighted)
+        {
+            locs[i].weight += atoms[i]->last_bind_energy;
+        }
+        #endif
+    }
 
     return average_of_points(locs, atcount);
 }
 
 float Molecule::get_charge()
 {
-	int i;
-	float charge=0;
-	for (i=0; atoms[i]; i++)
-	{
-		charge += atoms[i]->get_charge();
-	}
-	return charge;
+    int i;
+    float charge=0;
+    for (i=0; atoms[i]; i++)
+    {
+        charge += atoms[i]->get_charge();
+    }
+    return charge;
 }
 
 void Molecule::recenter(Point nl)
@@ -1879,12 +1890,12 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
     return retval;
 }
 
-float Molecule::get_intermol_binding(Molecule* ligand)
+float Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
     ligands[1] = nullptr;
-    return get_intermol_binding(ligands);
+    return get_intermol_binding(ligands, subtract_clashes);
 }
 
 void Molecule::clear_atom_binding_energies()
@@ -1908,7 +1919,7 @@ float Molecule::get_intermol_potential(Molecule** ligands)
     if (!ligands[0]) return 0;
     int i, j, l, n;
     float kJmol = 0;
-    
+
     for (i=0; i<atcount; i++)
     {
         Point aloc = atoms[i]->get_location();
@@ -1922,14 +1933,14 @@ float Molecule::get_intermol_potential(Molecule** ligands)
                 InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], ligands[l]->atoms[j]);
 
                 if (iff) for (n=0; iff[n]; n++)
-                {
-                	if (iff[n]->get_type() == vdW) continue;
-                	
-                	if (r < iff[n]->get_distance())
-                		kJmol += iff[n]->get_kJmol();
-                	else
-                    	kJmol += iff[n]->get_kJmol()*f;
-                }
+                    {
+                        if (iff[n]->get_type() == vdW) continue;
+
+                        if (r < iff[n]->get_distance())
+                            kJmol += iff[n]->get_kJmol();
+                        else
+                            kJmol += iff[n]->get_kJmol()*f;
+                    }
                 delete[] iff;
             }
         }
@@ -1938,14 +1949,15 @@ float Molecule::get_intermol_potential(Molecule** ligands)
     return kJmol;
 }
 
-float Molecule::get_intermol_binding(Molecule** ligands)
+float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
 {
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
     int i, j, l;
     float kJmol = 0;
-    kJmol -= get_internal_clashes();
-    
+    if (!atoms) return 0;
+    if (subtract_clashes) kJmol -= get_internal_clashes();
+
     // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
 
     for (i=0; i<atcount; i++)
@@ -1959,6 +1971,22 @@ float Molecule::get_intermol_binding(Molecule** ligands)
             if (ligands[l] == this) continue;
             for (j=0; j<ligands[l]->atcount; j++)
             {
+                if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone
+                	&&
+                	(	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
+                			&&
+                			!strcmp(atoms[i]->name, "C")
+                			&&
+                			!strcmp(ligands[l]->atoms[j]->name, "N")
+                		)
+                		||
+                		(	atoms[i]->residue == ligands[l]->atoms[j]->residue + 1
+                			&&
+                			!strcmp(atoms[i]->name, "N")
+                			&&
+                			!strcmp(ligands[l]->atoms[j]->name, "C")
+                		)
+                   )) continue;			// kludge to prevent adjacent residue false clashes.
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
                 {
@@ -1972,7 +2000,8 @@ float Molecule::get_intermol_binding(Molecule** ligands)
                         {
                             kJmol += abind;
                             atoms[i]->last_bind_energy += abind;
-                            // cout << atoms[i]->name << " to " << ligands[l]->atoms[j]->name << ": " << r << " A; " << abind << " kJ/mol." << endl;
+                            /*if (atoms[i]->residue == 111 && ligands[l]->atoms[j]->residue <= 10)
+                            	cout << atoms[i]->name << " to " << ligands[l]->atoms[j]->name << ": " << r << " A; " << abind << " kJ/mol." << endl;*/
                         }
                     }
                 }
@@ -1988,8 +2017,9 @@ float Molecule::get_intermol_binding(Molecule** ligands)
 
 void Molecule::minimize_internal_clashes()
 {
-	// cout << (name ? name : "(no name)");
+    // cout << (name ? name : "(no name)");
     if (noAtoms(atoms)) return;
+    base_internal_clashes = 0;
 
     int i, j, iter;
     float clash = get_internal_clashes();
@@ -1999,9 +2029,9 @@ void Molecule::minimize_internal_clashes()
     Bond** b = get_rotatable_bonds();
     if (!b || !b[0])
     {
-    	base_internal_clashes = clash;
-    	return;		// No bonds to rotate.
-	}
+        base_internal_clashes = clash;
+        return;		// No bonds to rotate.
+    }
 
     int numrb = 0;
     for (i=0; b[i]; i++) numrb = i;
@@ -2041,9 +2071,14 @@ void Molecule::minimize_internal_clashes()
 
 void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 {
+    multimol_conform(mm, nullptr, iters, cb);
+}
+
+void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int))
+{
     if (!mm) return;
 
-    int i, j, k, l, n, inplen, iter;
+    int i, j, k, l, n, inplen, bklen, alllen, iter;
     float rad, bestfrrad, bestfrb;
 
     for (i=0; mm[i]; i++)
@@ -2051,6 +2086,31 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
         mm[i]->reset_conformer_momenta();
     }
     inplen = i;
+
+    if (!bkg) bklen = 0;
+    else
+    {
+        for (i=0; bkg[i]; i++);		// Get count.
+        bklen = i;
+    }
+
+    alllen = inplen + bklen;
+    Molecule* all[alllen + 4];
+
+    for (i=0; i < alllen + 4; i++) all[i] = nullptr;
+
+    for (i=0; i<inplen; i++) all[i] = mm[i];
+    n = i;
+    for (i=0; i<bklen; i++)
+    {
+        for (j=0; j<inplen; j++) if (mm[j] == bkg[i]) goto _already_mm;
+
+        all[n++] = bkg[i];
+
+    _already_mm:
+        ;
+    }
+    alllen = n;
 
     float improvement;
     for (iter=0; iter<iters; iter++)
@@ -2060,10 +2120,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
         last_iter = (iter == (iters-1));
         for (i=0; mm[i]; i++)
         {
-            bool nearby[inplen+4];
+            bool nearby[alllen+4];
             Point icen = mm[i]->get_barycenter();
 
-            for (j=0; mm[j]; j++)
+            for (j=0; all[j]; j++)
             {
                 /* if (j == i)
                 {
@@ -2071,9 +2131,9 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     continue;
                 } */
 
-                Point jcen = mm[j]->get_barycenter();
+                Point jcen = all[j]->get_barycenter();
                 Atom* ia = mm[i]->get_nearest_atom(jcen);
-                Atom* ja = mm[j]->get_nearest_atom(icen);
+                Atom* ja = all[j]->get_nearest_atom(icen);
 
                 if (ia->distance_to(ja) <= 4)
                 {
@@ -2088,7 +2148,7 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 if (nearby[j])
                 {
                     // get_intermol_binding includes clashes, so we don't have to check them here.
-                    bind += mm[i]->get_intermol_binding(mm[j]);
+                    bind += mm[i]->get_intermol_binding(all[j]);
                 }
             }
             mm[i]->lastbind = bind;
@@ -2100,28 +2160,28 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             #if allow_linear_motion
             if (mm[i]->movability >= MOV_ALL && iter >= 10)
             {
-            	#if debug_break_on_move
-            	mm[i]->set_atoms_break_on_move(false);
-            	#endif
-            	
+                #if debug_break_on_move
+                mm[i]->set_atoms_break_on_move(false);
+                #endif
+
                 Point pt(mm[i]->lmx, 0, 0);
                 mm[i]->move(pt);
                 bind1 = 0;
-                for (j=0; mm[j]; j++)
+                for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    bind1 += mm[i]->get_intermol_binding(mm[j]);
+                    bind1 += mm[i]->get_intermol_binding(all[j]);
                 }
                 if (bind1 < bind)
                 {
-                	// cout << bind << " vs " << bind1 << " x" << endl;
+                    // cout << bind << " vs " << bind1 << " x" << endl;
                     pt.x = -pt.x;
                     mm[i]->move(pt);
                     mm[i]->lmx *= reversal;
                 }
                 else
                 {
-                	// cout << bind << " vs " << bind1 << " +" << endl;
+                    // cout << bind << " vs " << bind1 << " +" << endl;
                     improvement += (bind1 - bind);
                     if (fabs(mm[i]->lmx) < 0.5) mm[i]->lmx *= accel;
                     bind = bind1;
@@ -2131,10 +2191,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 pt.y = mm[i]->lmy;
                 mm[i]->move(pt);
                 bind1 = 0;
-                for (j=0; mm[j]; j++)
+                for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    bind1 += mm[i]->get_intermol_binding(mm[j]);
+                    bind1 += mm[i]->get_intermol_binding(all[j]);
                 }
                 if (bind1 < bind)
                 {
@@ -2153,10 +2213,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 pt.z = mm[i]->lmz;
                 mm[i]->move(pt);
                 bind1 = 0;
-                for (j=0; mm[j]; j++)
+                for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    bind1 += mm[i]->get_intermol_binding(mm[j]);
+                    bind1 += mm[i]->get_intermol_binding(all[j]);
                 }
                 if (bind1 < bind)
                 {
@@ -2170,28 +2230,28 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                     if (fabs(mm[i]->lmz) < 0.5) mm[i]->lmz *= accel;
                     bind = bind1;
                 }
-                
+
                 Point lmpt(mm[i]->lmx, mm[i]->lmy, mm[i]->lmz);
                 if (lmpt.magnitude() > 1.5)
                 {
-                	float lmm = 0.5 / lmpt.magnitude();
-                	mm[i]->lmx *= lmm;
-                	mm[i]->lmy *= lmm;
-                	mm[i]->lmz *= lmm;
+                    float lmm = 0.5 / lmpt.magnitude();
+                    mm[i]->lmx *= lmm;
+                    mm[i]->lmy *= lmm;
+                    mm[i]->lmz *= lmm;
                 }
                 else
                 {
-                	float lmm = 0.97;
-                	mm[i]->lmx *= lmm;
-                	mm[i]->lmy *= lmm;
-                	mm[i]->lmz *= lmm;
+                    float lmm = 0.97;
+                    mm[i]->lmx *= lmm;
+                    mm[i]->lmy *= lmm;
+                    mm[i]->lmz *= lmm;
                 }
 
                 mm[i]->lastbind = bind;
 
-            	#if debug_break_on_move
-            	mm[i]->set_atoms_break_on_move(true);
-            	#endif
+                #if debug_break_on_move
+                mm[i]->set_atoms_break_on_move(true);
+                #endif
             }
             /**** End Linear Motion ****/
             #endif
@@ -2200,10 +2260,10 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
             /**** Axial Tumble ****/
             if (mm[i]->movability >= MOV_NORECEN)
             {
-            	#if debug_break_on_move
-            	mm[i]->set_atoms_break_on_move(false);
-            	#endif
-            	
+                #if debug_break_on_move
+                mm[i]->set_atoms_break_on_move(false);
+                #endif
+
                 Point pt(1,0,0);
                 SCoord v(pt);
 
@@ -2213,19 +2273,19 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 
                 if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
                 {
-                	// cout << endl;
+                    // cout << endl;
                     while ((M_PI*2-rad) > 1e-3)
                     {
                         mm[i]->rotate(&v, _fullrot_steprad);
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
-                        for (j=0; mm[j]; j++)
+                        for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(mm[j]) + intermol_ESP * mm[i]->get_intermol_potential(mm[j]);
+                            bind1 += mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                         }
-                        
+
                         // cout << "x " << rad*fiftyseven << "deg " << bind1 << endl;
 
                         if (bind1 > bestfrb)
@@ -2240,26 +2300,26 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
-                	#if monte_carlo_axial
-                	Pose putitback(mm[i]);
-                	float ra = fabs(mm[i]->amx);
-                	ra = frand(-ra, ra);
-                	mm[i]->rotate(&v, ra);
-                	#else
+                    #if monte_carlo_axial
+                    Pose putitback(mm[i]);
+                    float ra = fabs(mm[i]->amx);
+                    ra = frand(-ra, ra);
+                    mm[i]->rotate(&v, ra);
+                    #else
                     mm[i]->rotate(&v, mm[i]->amx);
                     #endif
                     bind1 = 0;
-                    for (j=0; mm[j]; j++)
+                    for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        bind1 += mm[i]->get_intermol_binding(mm[j]);
+                        bind1 += mm[i]->get_intermol_binding(all[j]);
                     }
                     if (bind1 < bind)
                     {
-                    	#if monte_carlo_axial
-                    	putitback.restore_state(mm[i]);
+                        #if monte_carlo_axial
+                        putitback.restore_state(mm[i]);
                         mm[i]->amx *= 0.98;
-                    	#else
+                        #else
                         mm[i]->rotate(&v, -mm[i]->amx);
                         mm[i]->amx *= reversal;
                         #endif
@@ -2288,12 +2348,12 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
-                        for (j=0; mm[j]; j++)
+                        for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(mm[j]) + intermol_ESP * mm[i]->get_intermol_potential(mm[j]);
+                            bind1 += mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                         }
-                        
+
                         // cout << "y " << rad*fiftyseven << "deg " << bind1 << endl;
 
                         if (bind1 > bestfrb)
@@ -2308,30 +2368,30 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
-                	#if monte_carlo_axial
-                	Pose putitback(mm[i]);
-                	float ra = fabs(mm[i]->amy);
-                	ra = frand(-ra, ra);
-                	mm[i]->rotate(&v, ra);
-                	#else
+                    #if monte_carlo_axial
+                    Pose putitback(mm[i]);
+                    float ra = fabs(mm[i]->amy);
+                    ra = frand(-ra, ra);
+                    mm[i]->rotate(&v, ra);
+                    #else
                     mm[i]->rotate(&v1, mm[i]->amy);
                     #endif
-                    
+
                     bind1 = 0;
-                    for (j=0; mm[j]; j++)
+                    for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        bind1 += mm[i]->get_intermol_binding(mm[j]);
+                        bind1 += mm[i]->get_intermol_binding(all[j]);
                     }
                     if (bind1 < bind)
                     {
-                    	#if monte_carlo_axial
-                    	putitback.restore_state(mm[i]);
+                        #if monte_carlo_axial
+                        putitback.restore_state(mm[i]);
                         mm[i]->amy *= 0.98;
-                    	#else
+                        #else
                         mm[i]->rotate(&v1, -mm[i]->amy);
                         mm[i]->amy *= reversal;
-                    	#endif
+                        #endif
                     }
                     else
                     {
@@ -2358,12 +2418,12 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
-                        for (j=0; mm[j]; j++)
+                        for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(mm[j]) + intermol_ESP * mm[i]->get_intermol_potential(mm[j]);
+                            bind1 += mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                         }
-                        
+
                         // cout << "z " << rad*fiftyseven << "deg " << bind1 << endl;
 
                         if (bind1 > bestfrb)
@@ -2378,27 +2438,27 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
                 else
                 {
-                	#if monte_carlo_axial
-                	Pose putitback(mm[i]);
-                	float ra = fabs(mm[i]->amz);
-                	ra = frand(-ra, ra);
-                	mm[i]->rotate(&v, ra);
-                	#else
+                    #if monte_carlo_axial
+                    Pose putitback(mm[i]);
+                    float ra = fabs(mm[i]->amz);
+                    ra = frand(-ra, ra);
+                    mm[i]->rotate(&v, ra);
+                    #else
                     mm[i]->rotate(&v2, mm[i]->amz);
                     #endif
-                    
+
                     bind1 = 0;
-                    for (j=0; mm[j]; j++)
+                    for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        bind1 += mm[i]->get_intermol_binding(mm[j]);
+                        bind1 += mm[i]->get_intermol_binding(all[j]);
                     }
                     if (bind1 < bind)
                     {
-                    	#if monte_carlo_axial
-                    	putitback.restore_state(mm[i]);
+                        #if monte_carlo_axial
+                        putitback.restore_state(mm[i]);
                         mm[i]->amz *= 0.98;
-                    	#else
+                        #else
                         mm[i]->rotate(&v2, -mm[i]->amz);
                         mm[i]->amz *= reversal;
                         //cout << "x";
@@ -2413,90 +2473,90 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                 }
 
                 mm[i]->lastbind = bind;
-                
-            	#if debug_break_on_move
-            	mm[i]->set_atoms_break_on_move(true);
-            	#endif
+
+                #if debug_break_on_move
+                mm[i]->set_atoms_break_on_move(true);
+                #endif
             }
             /**** End Axial Tumble ****/
             #endif
 
-			#if !monte_carlo_flex
+            #if !monte_carlo_flex
             if ((iter % _fullrot_every)) continue;
             #endif
 
-			#if allow_bond_rots
+            #if allow_bond_rots
             /**** Bond Flexion ****/
             // cout << mm[i]->name << ": " << mm[i]->movability << endl;
             if (mm[i]->movability >= MOV_FLEXONLY)
             {
-            	#if debug_break_on_move
-            	mm[i]->set_atoms_break_on_move(false);
-            	#endif
-            	
+                #if debug_break_on_move
+                mm[i]->set_atoms_break_on_move(false);
+                #endif
+
                 mm[i]->get_rotatable_bonds();
                 int residue = 0;
-                
-				#if DBG_BONDFLEX
+
+                #if DBG_BONDFLEX
                 if (mm[i]->rotatable_bonds && mm[i]->rotatable_bonds[0] && mm[i]->rotatable_bonds[0]->atom)
-                	residue = mm[i]->rotatable_bonds[0]->atom->residue;
+                    residue = mm[i]->rotatable_bonds[0]->atom->residue;
                 #endif
 
                 // Don't know why this is renecessary.
                 if (mm[i]->movability == MOV_FLEXONLY)
                 {
                     bind = 0;
-                    for (j=0; mm[j]; j++)
+                    for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
                         // cout << ".";
-                        bind += mm[i]->get_intermol_binding(mm[j]);
+                        bind += mm[i]->get_intermol_binding(all[j]);
                     }
                 }
                 mm[i]->lastbind = bind;
 
-				#if DBG_BONDFLEX
+                #if DBG_BONDFLEX
                 if (DBG_FLEXRES == residue)
-                	cout << "Iter" << iter << " " << mm[i]->name;
+                    cout << "Iter" << iter << " " << mm[i]->name;
                 #endif
-                
+
                 if (!iter && mm[i]->rings)
                 {
-                	for (l=0; mm[i]->rings[l]; l++)
-                	{
-                		for (n=0; mm[i]->atoms[n]; n++)
-                			mm[i]->atoms[n]->is_in_ring(mm[i]->rings[l]);
-                	}
+                    for (l=0; mm[i]->rings[l]; l++)
+                    {
+                        for (n=0; mm[i]->atoms[n]; n++)
+                            mm[i]->atoms[n]->is_in_ring(mm[i]->rings[l]);
+                    }
                 }
-                
-                
+
+
                 if (mm[i]->rotatable_bonds)
                 {
-                	#if monte_carlo_flex
-		            Pose putitback(mm[i]);
-		            #endif
-                	
-                	#if DBG_BONDFLEX
+                    #if monte_carlo_flex
+                    Pose putitback(mm[i]);
+                    #endif
+
+                    #if DBG_BONDFLEX
                     if (DBG_FLEXRES == residue)
-                    	cout << " has rotbonds ";
+                        cout << " has rotbonds ";
                     #endif
                     for (k=0; mm[i]->rotatable_bonds[k]; k++)
                     {
-                    	#if DBG_BONDFLEX
+                        #if DBG_BONDFLEX
                         if (DBG_FLEXRES == residue)
                         {
-                        	cout << k << ".) " << *mm[i]->rotatable_bonds[k] << " ";
-                        	Atom** mwb = mm[i]->rotatable_bonds[k]->get_moves_with_btom();
-                        	if (mwb)
-                        	{
-                        		cout << "bringing ";
-                        		for (j=0; mwb[j]; j++)
-                        		{
-                        			cout << mwb[j]->name << " ";
-                        		}
-                        		cout << endl;
-                    		}
-                		}
+                            cout << k << ".) " << *mm[i]->rotatable_bonds[k] << " ";
+                            Atom** mwb = mm[i]->rotatable_bonds[k]->get_moves_with_btom();
+                            if (mwb)
+                            {
+                                cout << "bringing ";
+                                for (j=0; mwb[j]; j++)
+                                {
+                                    cout << mwb[j]->name << " ";
+                                }
+                                cout << endl;
+                            }
+                        }
                         #endif
 
                         rad = 0;
@@ -2513,29 +2573,29 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                                 bind1 = 0;
                                 #if DBG_BONDFLEX
                                 if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
-                                	cout << endl << (rad*fiftyseven) << ": ";
-                        		#endif
-                                for (j=0; mm[j]; j++)
+                                    cout << endl << (rad*fiftyseven) << ": ";
+                                #endif
+                                for (j=0; all[j]; j++)
                                 {
                                     if (!nearby[j]) continue;
-                                    float lbind1 = 
-                                    
-                                    #if allow_ligand_esp
-                            			 (mm[i]->mol_typ == MOLTYP_AMINOACID)
-                            			 ?
-                                    #endif
-                            			 mm[i]->get_intermol_binding(mm[j])
-                                    #if allow_ligand_esp
-                            			 :  
-                            			 mm[i]->get_intermol_potential(mm[j]) - 10 * mm[i]->get_internal_clashes()
-                                    #endif
-                            			 ;
-                            		
+                                    float lbind1 =
+
+                                        #if allow_ligand_esp
+                                        (mm[i]->mol_typ == MOLTYP_AMINOACID)
+                                        ?
+                                        #endif
+                                        mm[i]->get_intermol_binding(all[j])
+                                        #if allow_ligand_esp
+                                        :
+                                        mm[i]->get_intermol_potential(all[j]) - 5 * mm[i]->get_internal_clashes()
+                                        #endif
+                                        ;
+
                                     bind1 += lbind1;
                                     #if DBG_BONDFLEX
                                     if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
-                                    	cout << mm[j]->name << " " << lbind1 << " ";
-                        			#endif
+                                        cout << all[j]->name << " " << lbind1 << " ";
+                                    #endif
                                 }
 
                                 if (bind1 > bestfrb)
@@ -2546,8 +2606,8 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                             }
                             #if DBG_BONDFLEX
                             if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
-                            	cout << endl << "(" << (bestfrrad*fiftyseven) << "deg) ";
-                			#endif
+                                cout << endl << "(" << (bestfrrad*fiftyseven) << "deg) ";
+                            #endif
 
                             if (!isnan(bestfrrad))
                                 mm[i]->rotatable_bonds[k]->rotate(bestfrrad);
@@ -2555,25 +2615,25 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                         else
                         {
                             float ra = mm[i]->rotatable_bonds[k]->angular_momentum;
-                            
+
                             #if monte_carlo_flex
                             ra = frand(-fabs(ra), fabs(ra));
                             #endif
-                            
+
                             mm[i]->rotatable_bonds[k]->rotate(ra);
 
                             bind1 = 0;
-                            for (j=0; mm[j]; j++)
+                            for (j=0; all[j]; j++)
                             {
                                 if (!nearby[j]) continue;
-                                bind1 += mm[i]->get_intermol_binding(mm[j]);
+                                bind1 += mm[i]->get_intermol_binding(all[j]);
                             }
                             if (bind1 < bind)
                             {
-                            	#if monte_carlo_flex
-                            	putitback.restore_state(mm[i]);
-                            	mm[i]->rotatable_bonds[k]->angular_momentum *= 0.98;
-                            	#else
+                                #if monte_carlo_flex
+                                putitback.restore_state(mm[i]);
+                                mm[i]->rotatable_bonds[k]->angular_momentum *= 0.98;
+                                #else
                                 mm[i]->rotatable_bonds[k]->rotate(-ra);
                                 mm[i]->rotatable_bonds[k]->angular_momentum *= reversal;
                                 #endif
@@ -2586,20 +2646,20 @@ void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
                                 putitback.copy_state(mm[i]);
                                 #endif
                                 if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) < 0.25)
-                                	mm[i]->rotatable_bonds[k]->angular_momentum *= accel;
+                                    mm[i]->rotatable_bonds[k]->angular_momentum *= accel;
                             }
                         }
                     }
                 }
                 #if DBG_BONDFLEX
                 if (DBG_FLEXRES == residue)
-                	cout << endl;
-    			#endif
+                    cout << endl;
+                #endif
                 mm[i]->lastbind = bind;
-                
-            	#if debug_break_on_move
-            	mm[i]->set_atoms_break_on_move(true);
-            	#endif
+
+                #if debug_break_on_move
+                mm[i]->set_atoms_break_on_move(true);
+                #endif
 
                 if (!(iter % _fullrot_every)) mm[i]->reset_conformer_momenta();
             }
@@ -2621,44 +2681,44 @@ bool ring_warned = false;
 
 bool Molecule::from_smiles(char const * smilesstr)
 {
-	if (!strchr(smilesstr, '{'))		// {AtomName} is a nonstandard feature and must be handled by POdock code, not a third party app.
-	{
-		// Check if OpenBabel is installed.
-		FILE* pf = popen(CMD_CHECK_INSTALLED_3P_SMILES_PARSER, "r");
-		if (pf)
-		{
-			char buffer[1024];
-			fgets(buffer, 1022, pf);
-			if (strlen(buffer))			// TODO: Change this to employ a regex.
-			{
-				fclose(pf);
-				std::string sdfdat = "";
-				
-				// Temporarily reuse buffer as the obabel command.
-				sprintf(buffer, CMD_CALL_3P_SMILES_PARSER, smilesstr);
-				pf = popen(buffer, "r");
-				
-				// Resume using buffer with fgets().
-				int lno = 0;
-				while (buffer[0] != '$')
-				{
-					fgets(buffer, 1022, pf);
-					lno++;
-					sdfdat += buffer;
-					
-					if (lno == 2) sdfgen_aboutline = buffer;
-				}
-				fclose(pf);
-				
-				int result = from_sdf(sdfdat.c_str());
-				return (result > 0);
-			}
-			buffer[0] = 0;
-			fclose(pf);
-		}
-	}
-	
-	if (strchr(smilesstr, '!')) ring_warned = true;
+    if (!strchr(smilesstr, '{'))		// {AtomName} is a nonstandard feature and must be handled by POdock code, not a third party app.
+    {
+        // Check if OpenBabel is installed.
+        FILE* pf = popen(CMD_CHECK_INSTALLED_3P_SMILES_PARSER, "r");
+        if (pf)
+        {
+            char buffer[1024];
+            fgets(buffer, 1022, pf);
+            if (strlen(buffer))			// TODO: Change this to employ a regex.
+            {
+                fclose(pf);
+                std::string sdfdat = "";
+
+                // Temporarily reuse buffer as the obabel command.
+                sprintf(buffer, CMD_CALL_3P_SMILES_PARSER, smilesstr);
+                pf = popen(buffer, "r");
+
+                // Resume using buffer with fgets().
+                int lno = 0;
+                while (buffer[0] != '$')
+                {
+                    fgets(buffer, 1022, pf);
+                    lno++;
+                    sdfdat += buffer;
+
+                    if (lno == 2) sdfgen_aboutline = buffer;
+                }
+                fclose(pf);
+
+                int result = from_sdf(sdfdat.c_str());
+                return (result > 0);
+            }
+            buffer[0] = 0;
+            fclose(pf);
+        }
+    }
+
+    if (strchr(smilesstr, '!')) ring_warned = true;
 
     smlen = strlen(smilesstr);
     paren = new SMILES_Parenthetical[smlen];
@@ -2666,7 +2726,7 @@ bool Molecule::from_smiles(char const * smilesstr)
 
     int i;
     for (i=0; i<10; i++) numbered[i] = 0;
-    
+
     bool retval = from_smiles(smilesstr, nullptr);
 
     for (i=0; i<spnum; i++)
@@ -2712,8 +2772,8 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
 
     for (i=0; i<len; i++)
     {
-    	if (smilesstr[i] == '!') continue;
-    	
+        if (smilesstr[i] == '!') continue;
+
         if (smilesstr[i] == '.')
         {
             card = 0;
@@ -2826,16 +2886,16 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
 
         if (smilesstr[i] >= '0' && smilesstr[i] <= '9')
         {
-        	if (!ring_warned)
-        	{
-        		cout << "WARNING: Native support of SMILES is still in development. ";
-        		cout << "Certain molecules containing rings might not render properly." << endl;
-        		cout << "If possible, it is recommended to install OpenBabel (e.g. sudo apt-get install openbabel) ";
-        		cout << "so the integration feature can be used and SMILES strings converted seamlessly to ";
-        		cout << "the corresponding molecular structures." << endl;
-        		ring_warned = true;
-        	}
-        	
+            if (!ring_warned)
+            {
+                cout << "WARNING: Native support of SMILES is still in development. ";
+                cout << "Certain molecules containing rings might not render properly." << endl;
+                cout << "If possible, it is recommended to install OpenBabel (e.g. sudo apt-get install openbabel) ";
+                cout << "so the integration feature can be used and SMILES strings converted seamlessly to ";
+                cout << "the corresponding molecular structures." << endl;
+                ring_warned = true;
+            }
+
             j = smilesstr[i] - 48;
             if (!numbered[j])
             {
@@ -2846,7 +2906,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
             }
             else
             {
-            	//cout << " connecting..." << endl;
+                //cout << " connecting..." << endl;
                 // Rotate bonds to close the loop.
                 bool allarom = true;
                 Atom* aloop[256];
@@ -2857,24 +2917,24 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                 }
                 aloop[l-sqidx[j]] = 0;
                 int ringsz = l-sqidx[j];
-                
+
                 /*
                 if (!ring_atoms)
                 {	ring_atoms = new Atom**[16];
                 	int n; for (n=0; n<16; n++) ring_atoms[n] = nullptr;
                 }
-                
+
                 if (!ring_aromatic)
                 {	ring_aromatic = new bool[16];
                 	int n; for (n=0; n<16; n++) ring_aromatic[n] = false;
                 }
-                
+
                 if (!ring_atoms[ringcount])
                 {	ring_atoms[ringcount] = new Atom*[ringsz+2];
                 	int n; for (n=0; n<ringsz; n++) ring_atoms[ringcount][n] = nullptr;
                 }*/
-                
-                add_ring(aloop);          
+
+                add_ring(aloop);
 
                 // Also default all unmarked double bonds to cis.
                 /*for (l=0; l<dbi; l++)
@@ -2945,8 +3005,8 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
                         sequence[sqidx[j]+l]->arom_center = &ringcen;
                         sequence[sqidx[j]+l]->clear_geometry_cache();
                     }
-					
-					ring_aromatic[ringcount-1] = true;
+
+                	ring_aromatic[ringcount-1] = true;
                     numbered[j] = 0;
                     card = 1;
 
@@ -3182,7 +3242,7 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
     	C.z = frand(-1, 1);
     	normal = compute_normal(&A, &B, &C);
     }
-    
+
     // TODO: Un-hardcode the bond lengths below.
     ringcen = A.subtract(&B);
     ringcen.scale(polygon_radius(allarom?1.40:1.54, ringsz));
@@ -3274,13 +3334,13 @@ float Molecule::close_loop(Atom** path, float lcard)
         for (j=0; j<geo; j++)
         {
             if (b[j]->btom
-                &&
-                (	b[j]->can_rotate
-                    ||
-                    b[j]->can_flip
-                )
-                &&
-                strcmp(b[j]->btom->name, "N")
+                    &&
+                    (	b[j]->can_rotate
+                        ||
+                        b[j]->can_flip
+                    )
+                    &&
+                    strcmp(b[j]->btom->name, "N")
                ) rotables[k++] = b[j];
         }
 
@@ -3313,20 +3373,20 @@ float Molecule::close_loop(Atom** path, float lcard)
     {
         for (i=0; rotables[i]; i++)
         {
-        	float rr = rotables[i]->atom->get_location().get_3d_distance(rotables[i]->btom->get_location());
-        	
-        	if (fabs(rr-bond_length) > 0.01)
-        	{
-        		Point aloc = rotables[i]->atom->get_location();
-        		Point bloc = rotables[i]->btom->get_location();
-        		
-        		bloc = bloc.subtract(aloc);
-        		bloc.scale(bond_length);
-        		bloc = bloc.add(aloc);
-        		
-        		rotables[i]->btom->move(bloc);
-        	}
-        	
+            float rr = rotables[i]->atom->get_location().get_3d_distance(rotables[i]->btom->get_location());
+
+            if (fabs(rr-bond_length) > 0.01)
+            {
+                Point aloc = rotables[i]->atom->get_location();
+                Point bloc = rotables[i]->btom->get_location();
+
+                bloc = bloc.subtract(aloc);
+                bloc.scale(bond_length);
+                bloc = bloc.add(aloc);
+
+                rotables[i]->btom->move(bloc);
+            }
+
             if (rotables[i]->rotate(bondrot[i]))
             {
                 float newanom = fsb_lsb_anomaly(first, last, lcard, bond_length);
@@ -3378,49 +3438,49 @@ Atom** Molecule::get_most_bindable(int max_count)
     int i, j=-1, k, l;
     float best[max_count+2];
     Atom** retval = new Atom*[max_count+2];
-    
+
     for (k=0; k<max_count; k++)
     {
-    	best[k]=0;
-    	retval[k]=0;
-	}
-    
+        best[k]=0;
+        retval[k]=0;
+    }
+
     for (i=0; atoms[i]; i++)
     {
-    	if (atoms[i]->is_backbone) continue;
-    	
-    	#if _DBG_MOLBB
-    	cout << "Probing atom " << atoms[i]->name << endl;
-    	#endif
-    	
+        if (atoms[i]->is_backbone) continue;
+
+        #if _DBG_MOLBB
+        cout << "Probing atom " << atoms[i]->name << endl;
+        #endif
+
         float score = 0;
         atoms[i]->clear_geometry_cache();
-        
+
         for (k=0; retval[k] && k<max_count; k++)
         {
-        	if (retval[k] == atoms[i])
-        	{
-				#if _DBG_MOLBB
-				cout << "Atom is already in return array." << endl;
-				#endif
-        		goto _resume;
-    		}
-        	if (retval[k]->is_bonded_to(atoms[i]) && best[k] >= 10)
-        	{
-				#if _DBG_MOLBB
-				cout << "Atom is bonded to " << retval[k]->name << ", already in return array." << endl;
-				#endif
-        		goto _resume;
-    		}
-        	if (retval[k]->shares_bonded_with(atoms[i]) && best[k] >= 10)
-        	{
-				#if _DBG_MOLBB
-				cout << "Atom shares a bond with " << retval[k]->name << ", already in return array." << endl;
-				#endif
-        		goto _resume;
-    		}
+            if (retval[k] == atoms[i])
+            {
+                #if _DBG_MOLBB
+                cout << "Atom is already in return array." << endl;
+                #endif
+                goto _resume;
+            }
+            if (retval[k]->is_bonded_to(atoms[i]) && best[k] >= 10)
+            {
+                #if _DBG_MOLBB
+                cout << "Atom is bonded to " << retval[k]->name << ", already in return array." << endl;
+                #endif
+                goto _resume;
+            }
+            if (retval[k]->shares_bonded_with(atoms[i]) && best[k] >= 10)
+            {
+                #if _DBG_MOLBB
+                cout << "Atom shares a bond with " << retval[k]->name << ", already in return array." << endl;
+                #endif
+                goto _resume;
+            }
         }
-        
+
         if (atoms[i]->get_charge() || atoms[i]->get_acidbase())
             score += 1000;
 
@@ -3436,38 +3496,38 @@ Atom** Molecule::get_most_bindable(int max_count)
             score += 50;
 
         if (!score) score += 5;		// van der Waals.
-        
-        #if _DBG_MOLBB
-    	cout << "Score is " << score << endl;
-    	#endif
 
-		for (k=0; k<max_count; k++)
-		{
-			if (score > best[k])
-		    {
-		    	#if _DBG_MOLBB
-				cout << "Score claims new #" << k << " spot." << endl;
-				#endif
-				
-		    	for (l=max_count; l>k; l--)
-		    	{
-		    		best[l] = best[l-1];
-		    		retval[l] = retval[l-1];
-	    		}
-		    	
-		        best[k] = score;
-		        retval[k] = atoms[i];
-		        if (!k) j = i;
-		        
-		        break;
-		    }
-		    #if _DBG_MOLBB
-			cout << "Score does not exceed previous #" << k << " spot of " << best[k] << endl;
-			#endif
-	    }
-	    
-	    _resume:
-	    ;
+        #if _DBG_MOLBB
+        cout << "Score is " << score << endl;
+        #endif
+
+        for (k=0; k<max_count; k++)
+        {
+            if (score > best[k])
+            {
+                #if _DBG_MOLBB
+                cout << "Score claims new #" << k << " spot." << endl;
+                #endif
+
+                for (l=max_count; l>k; l--)
+                {
+                    best[l] = best[l-1];
+                    retval[l] = retval[l-1];
+                }
+
+                best[k] = score;
+                retval[k] = atoms[i];
+                if (!k) j = i;
+
+                break;
+            }
+            #if _DBG_MOLBB
+            cout << "Score does not exceed previous #" << k << " spot of " << best[k] << endl;
+            #endif
+        }
+
+    _resume:
+        ;
     }
     retval[max_count] = 0;
 
@@ -3478,81 +3538,81 @@ Atom** Molecule::get_most_bindable(int max_count)
 #define DBG_BINDABLE 0
 Atom** Molecule::get_most_bindable(int max_num, Atom* for_atom)
 {
-	if (!atoms) return nullptr;
-	if (!for_atom) return nullptr;
-	
-	#if DBG_BINDABLE
-	cout << "Molecule::get_most_bindable( " << max_num << ", " << for_atom->name << " )" << endl;
-	#endif
-	
-	int mn2 = max_num+2;
-	
-	int i, j, k;
-	float bb[mn2];
-	Atom** bba = new Atom*[mn2];
-	
-	for (i=0; i<mn2; i++)
-	{
-		bb[i] = 0;
-		bba[i] = nullptr;
-	}
-	
-	for (i=0; atoms[i]; i++)
-	{
-		if (atoms[i]->is_backbone) continue;
-		InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], for_atom);
-		if (!iff) continue;
-		
-		float lbb = 0;
-		for (j=0; iff[j]; j++)
-		{
-			float kj = iff[j]->get_kJmol();
-			
-			if (atoms[i]->get_charge()) kj *= fabs(atoms[i]->get_charge());
-			if (for_atom->get_charge()) kj *= fabs(for_atom->get_charge());
-			
-			lbb += kj;
-		}
-		
-		#if DBG_BINDABLE
-		// Note: A competent programmer would not have to put these debugs all over the place every stinking function.
-		cout << "Binding potential for " << atoms[i]->name << " " << lbb << " kJ/mol." << endl;
-		#endif
-		
-		for (j=0; j<max_num; j++)
-		{
-			if (lbb > bb[j])
-			{
-				for (k=max_num-1; k>j; k--)
-				{
-					bba[k] = bba[k-1];
-					bb[k] = bb[k-1];
-				}
-				
-				bba[j] = atoms[i];
-				bb[j] = lbb;
-				
-				#if DBG_BINDABLE
-				cout << "Potential is better than previous result " << j << endl;
-				#endif
-				
-				break;
-			}
-		}
-	}
-	
-	#if DBG_BINDABLE
-	cout << "Returning:" << endl << flush;
-	for (i=0; i<max_num; i++)
-	{
-		cout << i << ": " << flush << bba[i] << flush << " ";
-		if (bba[i]) cout << bba[i]->name << flush;
-		cout << endl << flush;
-	}
-	cout << endl;
-	#endif
-	
-	return bba;
+    if (!atoms) return nullptr;
+    if (!for_atom) return nullptr;
+
+    #if DBG_BINDABLE
+    cout << "Molecule::get_most_bindable( " << max_num << ", " << for_atom->name << " )" << endl;
+    #endif
+
+    int mn2 = max_num+2;
+
+    int i, j, k;
+    float bb[mn2];
+    Atom** bba = new Atom*[mn2];
+
+    for (i=0; i<mn2; i++)
+    {
+        bb[i] = 0;
+        bba[i] = nullptr;
+    }
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], for_atom);
+        if (!iff) continue;
+
+        float lbb = 0;
+        for (j=0; iff[j]; j++)
+        {
+            float kj = iff[j]->get_kJmol();
+
+            if (atoms[i]->get_charge()) kj *= fabs(atoms[i]->get_charge());
+            if (for_atom->get_charge()) kj *= fabs(for_atom->get_charge());
+
+            lbb += kj;
+        }
+
+        #if DBG_BINDABLE
+        // Note: A competent programmer would not have to put these debugs all over the place every stinking function.
+        cout << "Binding potential for " << atoms[i]->name << " " << lbb << " kJ/mol." << endl;
+        #endif
+
+        for (j=0; j<max_num; j++)
+        {
+            if (lbb > bb[j])
+            {
+                for (k=max_num-1; k>j; k--)
+                {
+                    bba[k] = bba[k-1];
+                    bb[k] = bb[k-1];
+                }
+
+                bba[j] = atoms[i];
+                bb[j] = lbb;
+
+                #if DBG_BINDABLE
+                cout << "Potential is better than previous result " << j << endl;
+                #endif
+
+                break;
+            }
+        }
+    }
+
+    #if DBG_BINDABLE
+    cout << "Returning:" << endl << flush;
+    for (i=0; i<max_num; i++)
+    {
+        cout << i << ": " << flush << bba[i] << flush << " ";
+        if (bba[i]) cout << bba[i]->name << flush;
+        cout << endl << flush;
+    }
+    cout << endl;
+    #endif
+
+    return bba;
 }
 
 Point Molecule::get_bounding_box() const
@@ -3583,196 +3643,196 @@ Point Molecule::get_bounding_box() const
 
 bool Molecule::ring_is_coplanar(int ringid)
 {
-	if (!rings) return false;
-	return rings[ringid]->is_coplanar();
+    if (!rings) return false;
+    return rings[ringid]->is_coplanar();
 }
 
 bool Molecule::ring_is_aromatic(int ringid)
 {
-	if (!rings) return false;
-	return rings[ringid]->get_type() == AROMATIC;
+    if (!rings) return false;
+    return rings[ringid]->get_type() == AROMATIC;
 }
 
 Point Molecule::get_ring_center(int ringid)
 {
-	if (!rings) return Point(0,0,0);
-	return rings[ringid]->get_center();
+    if (!rings) return Point(0,0,0);
+    return rings[ringid]->get_center();
 }
 
 SCoord Molecule::get_ring_normal(int ringid)
 {
-	if (!rings) return SCoord(0,0,0);
-	return rings[ringid]->get_normal();
+    if (!rings) return SCoord(0,0,0);
+    return rings[ringid]->get_normal();
 }
 
 Atom** Molecule::get_ring_atoms(int ringid)
 {
-	if (!rings) return nullptr;
-	return rings[ringid]->get_atoms();
+    if (!rings) return nullptr;
+    return rings[ringid]->get_atoms();
 }
 
 int Molecule::get_ring_num_atoms(int ringid)
 {
-	if (!rings) return 0;
-	return rings[ringid]->get_atom_count();
+    if (!rings) return 0;
+    return rings[ringid]->get_atom_count();
 }
 
 
 void Molecule::recenter_ring(int ringid, Point new_ring_cen)
 {
-	if (!rings) return;
-	Point old_ring_cen = get_ring_center(ringid);
-	SCoord motion = new_ring_cen.subtract(old_ring_cen);
-	int i;
-	Atom** ring_atoms = rings[ringid]->get_atoms();
-	for (i=0; ring_atoms[i]; i++)
-		ring_atoms[i]->move_rel(&motion);
-	
-	delete[] ring_atoms;
+    if (!rings) return;
+    Point old_ring_cen = get_ring_center(ringid);
+    SCoord motion = new_ring_cen.subtract(old_ring_cen);
+    int i;
+    Atom** ring_atoms = rings[ringid]->get_atoms();
+    for (i=0; ring_atoms[i]; i++)
+        ring_atoms[i]->move_rel(&motion);
+
+    delete[] ring_atoms;
 }
 
 void Molecule::rotate_ring(int ringid, Rotation rot)
 {
-	if (!rings) return;
-	Point origin = get_ring_center(ringid);
-	int i;
-	Atom** ring_atoms = rings[ringid]->get_atoms();
-	for (i=0; ring_atoms[i]; i++)
-	{
-		Point aloc = ring_atoms[i]->get_location();
-		aloc = rotate3D(&aloc, &origin, &rot);
-		ring_atoms[i]->move(aloc);
-	}
-	
-	delete[] ring_atoms;
+    if (!rings) return;
+    Point origin = get_ring_center(ringid);
+    int i;
+    Atom** ring_atoms = rings[ringid]->get_atoms();
+    for (i=0; ring_atoms[i]; i++)
+    {
+        Point aloc = ring_atoms[i]->get_location();
+        aloc = rotate3D(&aloc, &origin, &rot);
+        ring_atoms[i]->move(aloc);
+    }
+
+    delete[] ring_atoms;
 }
 
 int Molecule::get_num_rings()
 {
-	if (!rings) return 0;
-	int i;
-	for (i=0; rings[i]; i++);	// Get count.
-	return i;
+    if (!rings) return 0;
+    int i;
+    for (i=0; rings[i]; i++);	// Get count.
+    return i;
 }
 
 bool Molecule::in_same_ring(Atom* a, Atom* b)
 {
-	int i;
-	Ring** r = a->get_rings();
-	if (!r) return false;
-	for (i=0; r[i]; i++)
-		if (b->is_in_ring(r[i]))
-		{
-			delete[] r;
-			return true;
-		}
-	
-	delete[] r;
-	return false;
+    int i;
+    Ring** r = a->get_rings();
+    if (!r) return false;
+    for (i=0; r[i]; i++)
+        if (b->is_in_ring(r[i]))
+        {
+            delete[] r;
+            return true;
+        }
+
+    delete[] r;
+    return false;
 }
 
 float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 {
-	int j;
-	float error = 0;
-	Point bloc;
-	Atom* btom;
-	Bond** b;
-	int g, bg;
-	float b_bond_angle;
-	LocatedVector lv;
-	
-	// Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
+    int j;
+    float error = 0;
+    Point bloc;
+    Atom* btom;
+    Bond** b;
+    int g, bg;
+    float b_bond_angle;
+    LocatedVector lv;
+
+    // Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
     b = atoms[i]->get_bonds();
     if (!b) return error;
-	btom = b[0]->btom;
-	if (!btom) return error;
-	
-	bloc = btom->get_location();
-	g = atoms[i]->get_geometry();
-	bg = btom->get_geometry();
-	b_bond_angle = btom->get_geometric_bond_angle();
-	
-	// Make an imaginary sphere around btom, whose radius equals the optimal bond distance.
-	lv.origin = bloc;
-	lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, b[0]->cardinality);
-	float thstep = fiftyseventh*5;
-	float besttheta = 0, bestphi = 0, bestscore = -1e9;
-	for (lv.theta = -square; lv.theta <= square; lv.theta += thstep)
-	{
-		float phstep = M_PI/(20.0*(sin(lv.theta) + 1));
-		for (lv.phi = 0; lv.phi < (M_PI*2); lv.phi += phstep)
-		{
-			// At many points along the sphere, evaluate the goodness-of-fit as a function of:
-			// Success in conforming to btom's geometry;
-			// Success in avoiding clashes with atoms not bonded to self or btom;
-			// Success in maintaining optimal binding distances to own bonded atoms.
-			// Later, we'll test edge cases where bond strain distorts the usual angles.
-			float score = 0;
-			
-			score -= _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
-			
-			// Avoid clashes with strangers.
-			for (j=0; atoms[j]; j++)
-			{
-				if (j == i) continue;
-				if (atoms[j]->is_bonded_to(atoms[i])) continue;
-				
-				float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
-				score -= _SANOM_CLASHES_WEIGHT/fabs(r+0.000000001);
-			}
-			
-			// Seek optimal bond radii.
-			for (j=1; b[j]; j++)
-			{
-				if (!b[j]->btom) continue;
-				float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
-				float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
-				
-				score -= _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
-			}
-			
-			if (score > bestscore)
-			{
-				besttheta = lv.theta;
-				bestphi = lv.phi;
-				bestscore = score;
-			}
-		}
-	}
-	
-	if (best_lv)
-	{
-		best_lv->origin = lv.origin;
-		best_lv->r = lv.r;
-		best_lv->theta = besttheta;
-		best_lv->phi = bestphi;
-	}
-	
-	lv = (SCoord)atoms[i]->get_location().subtract(bloc);
-	lv.origin = bloc;
-	
-	error += _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
-	
-	for (j=0; atoms[j]; j++)
-	{
-		if (j == i) continue;
-		if (atoms[j]->is_bonded_to(atoms[i])) continue;
-		
-		float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
-		error += _SANOM_CLASHES_WEIGHT/fabs(r+0.000000001);
-	}
-	 
-	for (j=1; b[j]; j++)
-	{
-		if (!b[j]->btom) continue;
-		float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
-		float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
-		
-		error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
-	}
-	
-	return error+bestscore;
+    btom = b[0]->btom;
+    if (!btom) return error;
+
+    bloc = btom->get_location();
+    g = atoms[i]->get_geometry();
+    bg = btom->get_geometry();
+    b_bond_angle = btom->get_geometric_bond_angle();
+
+    // Make an imaginary sphere around btom, whose radius equals the optimal bond distance.
+    lv.origin = bloc;
+    lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, b[0]->cardinality);
+    float thstep = fiftyseventh*5;
+    float besttheta = 0, bestphi = 0, bestscore = -1e9;
+    for (lv.theta = -square; lv.theta <= square; lv.theta += thstep)
+    {
+        float phstep = M_PI/(20.0*(sin(lv.theta) + 1));
+        for (lv.phi = 0; lv.phi < (M_PI*2); lv.phi += phstep)
+        {
+            // At many points along the sphere, evaluate the goodness-of-fit as a function of:
+            // Success in conforming to btom's geometry;
+            // Success in avoiding clashes with atoms not bonded to self or btom;
+            // Success in maintaining optimal binding distances to own bonded atoms.
+            // Later, we'll test edge cases where bond strain distorts the usual angles.
+            float score = 0;
+
+            score -= _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
+
+            // Avoid clashes with strangers.
+            for (j=0; atoms[j]; j++)
+            {
+                if (j == i) continue;
+                if (atoms[j]->is_bonded_to(atoms[i])) continue;
+
+                float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
+                score -= _SANOM_CLASHES_WEIGHT/fabs(r+0.000000001);
+            }
+
+            // Seek optimal bond radii.
+            for (j=1; b[j]; j++)
+            {
+                if (!b[j]->btom) continue;
+                float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+                float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
+
+                score -= _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
+            }
+
+            if (score > bestscore)
+            {
+                besttheta = lv.theta;
+                bestphi = lv.phi;
+                bestscore = score;
+            }
+        }
+    }
+
+    if (best_lv)
+    {
+        best_lv->origin = lv.origin;
+        best_lv->r = lv.r;
+        best_lv->theta = besttheta;
+        best_lv->phi = bestphi;
+    }
+
+    lv = (SCoord)atoms[i]->get_location().subtract(bloc);
+    lv.origin = bloc;
+
+    error += _SANOM_BOND_ANGLE_WEIGHT*btom->get_bond_angle_anomaly(lv, atoms[i]);
+
+    for (j=0; atoms[j]; j++)
+    {
+        if (j == i) continue;
+        if (atoms[j]->is_bonded_to(atoms[i])) continue;
+
+        float r = atoms[j]->get_location().get_3d_distance(lv.to_point());
+        error += _SANOM_CLASHES_WEIGHT/fabs(r+0.000000001);
+    }
+
+    for (j=1; b[j]; j++)
+    {
+        if (!b[j]->btom) continue;
+        float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+        float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
+
+        error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
+    }
+
+    return error+bestscore;
 }
 
 
@@ -3782,95 +3842,95 @@ float Molecule::correct_structure(int iters)
     if (noAtoms(atoms)) return 0;
     int iter, i, j, k;
     Point zero(0,0,0);
-	float error = 0;
-	Point aloc, bloc;
-	Atom* btom;
-	Bond** b;
-	int g, bg;
-	float b_bond_angle;
-	LocatedVector lv;
-    
-	#if _DEV_FIX_MSTRUCT
+    float error = 0;
+    Point aloc, bloc;
+    Atom* btom;
+    Bond** b;
+    int g, bg;
+    float b_bond_angle;
+    LocatedVector lv;
+
+    #if _DEV_FIX_MSTRUCT
     // TODO
     if (ringcount)
     {
-    	for (i=0; i<ringcount; i++)
-    	{
-    		if (ring_aromatic[i] || get_ring_num_atoms(i) < 6)
-    		{
-				make_coplanar_ring(ring_atoms[i], i);
-    		}
-    	}
+        for (i=0; i<ringcount; i++)
+        {
+            if (ring_aromatic[i] || get_ring_num_atoms(i) < 6)
+            {
+                make_coplanar_ring(ring_atoms[i], i);
+            }
+        }
     }
     else return 0;			// Non-ring structures work fine. The buggy algorithm is when rings are involved.
-	
+
     for (iter=0; iter<iters; iter++)
     {
-    	error = 0;
+        error = 0;
         for (i=0; atoms[i]; i++)
         {
-			// Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
-			b = atoms[i]->get_bonds();
-			if (!b) return error;
-			btom = b[0]->btom;
-			if (!btom) return error;
-			
-			// TODO
-    		if (atoms[i]->num_rings() && atoms[i]->is_pi() && in_same_ring(atoms[i], btom)) continue;
-	
-			error += get_atom_error(i, &lv);
-			if (!iter) continue;
-			
-			// Once a "best fit" point in space is found, move there.
-			if (atoms[i]->num_rings() && atoms[i]->is_pi())
-			{
-				for (j=0; j<ringcount; j++)
-				{
-					for (k=0; ring_atoms[j][k]; k++)
-					{
-						if (ring_atoms[j][k] == atoms[i])
-						{
-							// Get distance from atom to ring center.
-							Point rcen = get_ring_center(j);
-							Point aloc = atoms[i]->get_location();
-							float rad = rcen.get_3d_distance(aloc);
-							
-							// Center ring at combined distance from btom.
-							LocatedVector lvr = lv;
-							lvr.r += rad;
-							recenter_ring(j, lvr.to_point());
-							
-							// Rotate ring, and all assemblies, to align atom to btom.
-							Point atarget = lv.to_point();
-							aloc = atoms[i]->get_location();
-							rcen = get_ring_center(j);
-							Rotation rot = align_points_3d(&aloc, &atarget, &rcen);
-							rotate_ring(j, rot);
-							
-							break;
-						}
-					}
-				}
-			}
-			else
-			{
-				/*Point pt = lv.to_point();
-				atoms[i]->move_assembly(&pt, btom);*/
-				atoms[i]->move(lv.to_point());
-			}
-		}
-		// cout << error << " " << atcount << endl;
-		// if (error <= 10.0*atcount) break;
-	}
-	#endif
+            // Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
+            b = atoms[i]->get_bonds();
+            if (!b) return error;
+            btom = b[0]->btom;
+            if (!btom) return error;
 
-	error = 0;
+            // TODO
+            if (atoms[i]->num_rings() && atoms[i]->is_pi() && in_same_ring(atoms[i], btom)) continue;
+
+            error += get_atom_error(i, &lv);
+            if (!iter) continue;
+
+            // Once a "best fit" point in space is found, move there.
+            if (atoms[i]->num_rings() && atoms[i]->is_pi())
+            {
+                for (j=0; j<ringcount; j++)
+                {
+                    for (k=0; ring_atoms[j][k]; k++)
+                    {
+                        if (ring_atoms[j][k] == atoms[i])
+                        {
+                            // Get distance from atom to ring center.
+                            Point rcen = get_ring_center(j);
+                            Point aloc = atoms[i]->get_location();
+                            float rad = rcen.get_3d_distance(aloc);
+
+                            // Center ring at combined distance from btom.
+                            LocatedVector lvr = lv;
+                            lvr.r += rad;
+                            recenter_ring(j, lvr.to_point());
+
+                            // Rotate ring, and all assemblies, to align atom to btom.
+                            Point atarget = lv.to_point();
+                            aloc = atoms[i]->get_location();
+                            rcen = get_ring_center(j);
+                            Rotation rot = align_points_3d(&aloc, &atarget, &rcen);
+                            rotate_ring(j, rot);
+
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                /*Point pt = lv.to_point();
+                atoms[i]->move_assembly(&pt, btom);*/
+                atoms[i]->move(lv.to_point());
+            }
+        }
+        // cout << error << " " << atcount << endl;
+        // if (error <= 10.0*atcount) break;
+    }
+    #endif
+
+    error = 0;
     for (i=0; atoms[i]; i++)
     {
-    	error += get_atom_error(i, &lv);
+        error += get_atom_error(i, &lv);
     }
 
-	return error;
+    return error;
 }
 
 

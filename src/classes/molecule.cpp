@@ -1890,12 +1890,12 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
     return retval;
 }
 
-float Molecule::get_intermol_binding(Molecule* ligand)
+float Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
     ligands[1] = nullptr;
-    return get_intermol_binding(ligands);
+    return get_intermol_binding(ligands, subtract_clashes);
 }
 
 void Molecule::clear_atom_binding_energies()
@@ -1949,14 +1949,14 @@ float Molecule::get_intermol_potential(Molecule** ligands)
     return kJmol;
 }
 
-float Molecule::get_intermol_binding(Molecule** ligands)
+float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
 {
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
     int i, j, l;
     float kJmol = 0;
     if (!atoms) return 0;
-    if (!atoms[0]->residue) kJmol -= get_internal_clashes();
+    if (subtract_clashes) kJmol -= get_internal_clashes();
 
     // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
 
@@ -2019,6 +2019,7 @@ void Molecule::minimize_internal_clashes()
 {
     // cout << (name ? name : "(no name)");
     if (noAtoms(atoms)) return;
+    base_internal_clashes = 0;
 
     int i, j, iter;
     float clash = get_internal_clashes();

@@ -74,6 +74,7 @@ class AminoAcid : public Molecule
  	Atom* HN_or_substitute();
  	Point get_CA_location();
  	Point HN_or_substitute_location();
+ 	void establish_internal_clash_baseline();
 
  	// Serialization.
  	int from_pdb(FILE* instream);							// returns number of atoms loaded.

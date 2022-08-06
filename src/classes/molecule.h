@@ -117,8 +117,8 @@ class Molecule
     void minimize_internal_clashes();
     float get_intermol_clashes(Molecule* ligand);
     float get_intermol_clashes(Molecule** ligands);
-    float get_intermol_binding(Molecule* ligand);
-    float get_intermol_binding(Molecule** ligands);
+    float get_intermol_binding(Molecule* ligand, bool subtract_clashes = true);
+    float get_intermol_binding(Molecule** ligands, bool subtract_clashes = true);
     float get_intermol_potential(Molecule* ligand);
     float get_intermol_potential(Molecule** ligands);
     float hydrophilicity();

@@ -652,7 +652,7 @@ int main(int argc, char** argv)
                 for (j=0; j<qpr; j++)
                 {
                     if (j == i) continue;
-                    float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]));
+                    float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]), false /* j==0 */);
                     // if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
                     initial_binding[resno] += f;
                     initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
@@ -1429,7 +1429,7 @@ int main(int argc, char** argv)
                     for (j=0; j<qpr+1; j++)
                     {
                         if (j == i) continue;
-                        final_binding[resno] += postaa[i]->get_intermol_binding(postaa[j]);
+                        final_binding[resno] += postaa[i]->get_intermol_binding(postaa[j], false /* j==0 */);
                         final_vdWrepl[resno] += postaa[i]->get_vdW_repulsion(postaa[j]);
                     }
                 }
@@ -1454,7 +1454,7 @@ int main(int argc, char** argv)
                 }
                 else
                 {
-                    lb = m.get_intermol_binding(reaches_spheroid[nodeno][i]);
+                    lb = m.get_intermol_binding(reaches_spheroid[nodeno][i], false /* i==0 */);
                 }
                 if (lb > 90) lb = 0;
 

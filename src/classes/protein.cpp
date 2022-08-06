@@ -74,6 +74,8 @@ bool Protein::add_residue(const int resno, const char aaletter)
     	Point* pts = residues[i-1]->predict_next_NHCA();
     	residues[i] = new AminoAcid(aaletter, residues[i-1]);
     	
+    	residues[i]->establish_internal_clash_baseline();
+    	
     	Atom* a = residues[i]->get_atom("N");
     	if (a)
     	{
@@ -380,6 +382,7 @@ int Protein::load_pdb(FILE* is)
         try
         {
             residues[i] = restmp[i];
+            residues[i]->establish_internal_clash_baseline();
 
             Atom *atom = residues[i]->get_atom("N"), *btom;
             AminoAcid* prev = get_residue(residues[i]->get_residue_no()-1);

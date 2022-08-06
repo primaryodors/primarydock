@@ -616,6 +616,12 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 		immobile = true;
 	}
 }
+ 	
+void AminoAcid::establish_internal_clash_baseline()
+{
+	base_internal_clashes = 0;
+	base_internal_clashes = get_internal_clashes();
+}
 
 
 Point* AminoAcid::predict_previous_COCA()

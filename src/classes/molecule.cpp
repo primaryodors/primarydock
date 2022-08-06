@@ -1944,7 +1944,8 @@ float Molecule::get_intermol_binding(Molecule** ligands)
     if (!ligands[0]) return 0;
     int i, j, l;
     float kJmol = 0;
-    kJmol -= get_internal_clashes();
+    if (!atoms) return 0;
+    if (!atoms[0]->residue) kJmol -= get_internal_clashes();
     
     // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
 
@@ -1973,7 +1974,8 @@ float Molecule::get_intermol_binding(Molecule** ligands)
                         {
                             kJmol += abind;
                             atoms[i]->last_bind_energy += abind;
-                            // cout << atoms[i]->name << " to " << ligands[l]->atoms[j]->name << ": " << r << " A; " << abind << " kJ/mol." << endl;
+                            /*if (atoms[i]->residue == 111 && ligands[l]->atoms[j]->residue <= 10)
+                            	cout << atoms[i]->name << " to " << ligands[l]->atoms[j]->name << ": " << r << " A; " << abind << " kJ/mol." << endl;*/
                         }
                     }
                 }

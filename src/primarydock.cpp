@@ -623,7 +623,12 @@ int main(int argc, char** argv)
 			
 			for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
 			
-			if (pre_ligand_iteration_ratio) Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), iters*pre_ligand_iteration_ratio);
+			if (pre_ligand_iteration_ratio)
+			{
+				Molecule** delete_me;
+				Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), delete_me = p.all_residues_as_molecules(), iters*pre_ligand_iteration_ratio);
+				delete[] delete_me;
+			}
 			
 			preres = p.get_residues_near(pocketcen, 10000);
 			qpr = preres.size();
@@ -637,12 +642,16 @@ int main(int argc, char** argv)
 			for (i=0; i<qpr; i++)
 			{
 				int resno = preaa[i]->get_residue_no();
+				// std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
 				for (j=0; j<qpr; j++)
 				{
 					if (j == i) continue;
-					initial_binding[resno] += reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]));
+					float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]));
+					// if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
+					initial_binding[resno] += f;
 					initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
 				}
+				// if (fabs(initial_binding[resno]) >= 50) cout << ibdbg << endl;
 			}
 			
 			for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = total_binding_by_type[i];
@@ -1465,7 +1474,7 @@ int main(int argc, char** argv)
 			#endif
 
             // Allocate the array.
-            dr[drcount][nodeno].kJmol = btot;
+            dr[drcount][nodeno].kJmol = 0; //btot;
             dr[drcount][nodeno].ikJmol = 0;
             dr[drcount][nodeno].metric  = new char*[metcount+4];
             dr[drcount][nodeno].mkJmol   = new float[metcount];
@@ -1478,9 +1487,10 @@ int main(int argc, char** argv)
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++)
             {
-                dr[drcount][nodeno].bytype[i] = total_binding_by_type[i];
+                dr[drcount][nodeno].bytype[i] = fin_total_binding_by_type[i];
                 dr[drcount][nodeno].ibytype[i] = init_total_binding_by_type[i];
                 dr[drcount][nodeno].ikJmol += init_total_binding_by_type[i];
+                dr[drcount][nodeno].kJmol += fin_total_binding_by_type[i];
             }
 			#if _DBG_STEPBYSTEP
             if (debug) *debug << "Filled btypes." << endl;
@@ -1593,7 +1603,7 @@ int main(int argc, char** argv)
 
                         if (differential_dock)
 				    	{
-				    		cout << "# Binding energies: delta = with ligand - without ligand." << endl;
+				    		cout << "# Binding energies: delta = with ligand minus without ligand." << endl;
                         }
                         else
                         {
@@ -1615,12 +1625,12 @@ int main(int argc, char** argv)
 								cout << dr[j][k].metric[l]
 		                    		 << ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult 
 		                    		 << " = " << -dr[j][k].mkJmol[l]*energy_mult
-		                    		 << " - " << -dr[j][k].imkJmol[l]*energy_mult
+		                    		 << " minus " << -dr[j][k].imkJmol[l]*energy_mult
 		                    		 << endl;
 		                        if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
 		                    		 << ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult 
 		                    		 << " = " << -dr[j][k].mkJmol[l]*energy_mult
-		                    		 << " - " << -dr[j][k].imkJmol[l]*energy_mult
+		                    		 << " minus " << -dr[j][k].imkJmol[l]*energy_mult
 		                    		 << endl;
                         	}
                         	else
@@ -1665,11 +1675,11 @@ int main(int argc, char** argv)
 							{
 								cout << lbtyp << -(dr[j][k].bytype[l] - dr[j][k].ibytype[l])*energy_mult 
 		                        	 << " = " << -dr[j][k].bytype[l]*energy_mult
-		                        	 << " - " << -dr[j][k].ibytype[l]*energy_mult
+		                        	 << " minus " << -dr[j][k].ibytype[l]*energy_mult
 		                        	 << endl;
 		                        if (output) *output << lbtyp << -(dr[j][k].bytype[l] - dr[j][k].ibytype[l])*energy_mult 
 		                        	 << " = " << -dr[j][k].bytype[l]*energy_mult
-		                        	 << " - " << -dr[j][k].ibytype[l]*energy_mult
+		                        	 << " minus " << -dr[j][k].ibytype[l]*energy_mult
 		                        	 << endl;
                             }
                             else
@@ -1687,11 +1697,11 @@ int main(int argc, char** argv)
 						{
 							if (output) *output << "Total: " << -(dr[j][k].kJmol - dr[j][k].ikJmol)*energy_mult 
 		                    	 << " = " << -dr[j][k].kJmol*energy_mult
-		                    	 << " - " << -dr[j][k].ikJmol*energy_mult
+		                    	 << " minus " << -dr[j][k].ikJmol*energy_mult
 		                    	 << endl << endl;
 		                    cout << "Total: " << -(dr[j][k].kJmol - dr[j][k].ikJmol)*energy_mult 
 		                    	 << " = " << -dr[j][k].kJmol*energy_mult
-		                    	 << " - " << -dr[j][k].ikJmol*energy_mult
+		                    	 << " minus " << -dr[j][k].ikJmol*energy_mult
 		                    	 << endl << endl;
                         }
                         else
@@ -1702,7 +1712,7 @@ int main(int argc, char** argv)
 
                         if (differential_dock)
 						{
-							cout << "# van der Waals repulsion: delta = with ligand - without ligand." << endl;
+							cout << "# van der Waals repulsion: delta = with ligand minus without ligand." << endl;
                         }
                         else
                         {
@@ -1726,12 +1736,12 @@ int main(int argc, char** argv)
 								cout << dr[j][k].metric[l]
 		                        	 << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
 		                        	 << " = " << dr[j][k].mvdWrepl[l]*energy_mult
-		                        	 << " - " << dr[j][k].imvdWrepl[l]*energy_mult
+		                        	 << " minus " << dr[j][k].imvdWrepl[l]*energy_mult
 		                        	 << endl;
 		                        if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
 		                        	 << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
 		                        	 << " = " << dr[j][k].mvdWrepl[l]*energy_mult
-		                        	 << " - " << dr[j][k].imvdWrepl[l]*energy_mult
+		                        	 << " minus " << dr[j][k].imvdWrepl[l]*energy_mult
 		                        	 << endl;
                         	}
                         	else

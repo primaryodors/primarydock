@@ -152,6 +152,9 @@ C       Na     plpi     0.25  1.02       18.83			3
 C       K      plpi     0.25  1.38       13.25			3
 C       Rb     plpi     0.25  1.52       11.16			3
 
+# https://web.ics.purdue.edu/~gchopra/class/public/readings/Introduction_Lecture1/Levitt_JMB_88_Aromatic_Hbond.pdf
+C		H	   plpi		0.25  2.4		 12.55			3
+
 # C       N      plpi     0.25  2.8?        1.91?			3
 C       NH     plpi     0.25  2.8?        1.91?			3
 # C       O      plpi     0.25  2.9?        2.08?			3

@@ -915,6 +915,21 @@ bool Atom::is_pi()
     return false;
 }
 
+bool Atom::is_amide()
+{
+	if (family == PNICTOGEN)
+	{
+		Atom* C = is_bonded_to("C");
+		if (!C) return false;
+		Atom* O = C->is_bonded_to(CHALCOGEN, 2);
+		if (O) return true;
+		O = C->is_bonded_to(CHALCOGEN);
+		if (O && is_pi() && C->is_pi()) return true;
+	}
+	
+	return false;
+}
+
 void Atom::set_aa_properties()
 {
     if (!aaletter) return;

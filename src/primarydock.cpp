@@ -1575,7 +1575,15 @@ int main(int argc, char** argv)
                     int bestpose = pose;
                     for (i=0; i<drcount; i++)
                     {
-                        if (dr[i][0].kJmol < btot)
+                        if ((	differential_dock
+                        		&&
+                        		(dr[i][0].kJmol - dr[i][0].ikJmol) < (dr[drcount][nodeno].kJmol - dr[drcount][nodeno].ikJmol)
+                           )
+                           ||
+                           (	!differential_dock
+                        		&&
+                        		dr[i][0].kJmol < btot
+                           ))
                         {
                             if (dr[i][0].pose < bestpose || bestpose < 0) bestpose = dr[i][0].pose;
                             dr[i][0].pose++;
@@ -1648,10 +1656,10 @@ int main(int argc, char** argv)
                                      << " minus " << -dr[j][k].imkJmol[l]*energy_mult
                                      << endl;
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
-                                            << ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult
-                                            << " = " << -dr[j][k].mkJmol[l]*energy_mult
-                                            << " minus " << -dr[j][k].imkJmol[l]*energy_mult
-                                            << endl;
+									<< ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult
+									<< " = " << -dr[j][k].mkJmol[l]*energy_mult
+									<< " minus " << -dr[j][k].imkJmol[l]*energy_mult
+									<< endl;
                             }
                             else
                             {
@@ -1698,9 +1706,9 @@ int main(int argc, char** argv)
                                      << " minus " << -dr[j][k].ibytype[l]*energy_mult
                                      << endl;
                                 if (output) *output << lbtyp << -(dr[j][k].bytype[l] - dr[j][k].ibytype[l])*energy_mult
-                                                        << " = " << -dr[j][k].bytype[l]*energy_mult
-                                                        << " minus " << -dr[j][k].ibytype[l]*energy_mult
-                                                        << endl;
+                                    << " = " << -dr[j][k].bytype[l]*energy_mult
+                                    << " minus " << -dr[j][k].ibytype[l]*energy_mult
+                                    << endl;
                             }
                             else
                             {
@@ -1759,10 +1767,10 @@ int main(int argc, char** argv)
                                      << " minus " << dr[j][k].imvdWrepl[l]*energy_mult
                                      << endl;
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
-                                            << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
-                                            << " = " << dr[j][k].mvdWrepl[l]*energy_mult
-                                            << " minus " << dr[j][k].imvdWrepl[l]*energy_mult
-                                            << endl;
+                                    << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
+                                    << " = " << dr[j][k].mvdWrepl[l]*energy_mult
+                                    << " minus " << dr[j][k].imvdWrepl[l]*energy_mult
+                                    << endl;
                             }
                             else
                             {

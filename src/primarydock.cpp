@@ -362,6 +362,9 @@ int main(int argc, char** argv)
     read_config_file(pf);
     fclose(pf);
 
+    pre_ligand_flex_radius = size.magnitude();
+    pre_ligand_multimol_radius = pre_ligand_flex_radius + (default_pre_ligand_multimol_radius - default_pre_ligand_flex_radius);
+
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded config file." << endl;
     #endif
@@ -605,6 +608,7 @@ int main(int argc, char** argv)
             std::vector<AminoAcid*> preres = p.get_residues_near(pocketcen, pre_ligand_multimol_radius);
             qpr = preres.size();
             AminoAcid* preaa[seql+4];
+            MovabilityType aamov[seql+4];
 
             for (i=0; i<seql+4; i++) preaa[i] = nullptr;
             for (i=0; i<qpr; i++)
@@ -617,8 +621,10 @@ int main(int argc, char** argv)
                     throw 0xbad12e5;
                 }
                 float r = CA->get_location().get_3d_distance(pocketcen);
+                
+                aamov[i] = preaa[i]->movability;
+                
                 if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
-                else preaa[i]->movability = MOV_FLEXONLY;
             }
 
             for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
@@ -656,7 +662,7 @@ int main(int argc, char** argv)
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = total_binding_by_type[i];
 
-            for (i=0; i<qpr; i++) preaa[i]->movability = MOV_FLEXONLY;
+            for (i=0; i<qpr; i++) preaa[i]->movability = aamov[i];
         }
 
         if (pose <= 1)

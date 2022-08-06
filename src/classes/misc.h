@@ -75,6 +75,8 @@ extern const char* Greek;
 extern std::ofstream *debug;
 extern bool last_iter;
 extern bool differential_dock;
+extern float pre_ligand_multimol_radius;
+extern float pre_ligand_flex_radius;
 
 #endif
 

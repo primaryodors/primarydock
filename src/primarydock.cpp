@@ -67,6 +67,8 @@ bool kcal = false;
 float drift = 0.333;
 Molecule** gcfmols = NULL;
 
+std::string origbuff = "";
+
 // Switch to enable older "best binding" algorithm instead of newer "tumble spheres".
 // Generally, tumble spheres give better results but let's leave best bind code
 // in place because we'll be reviving it later.
@@ -184,6 +186,159 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
     }
 }
 
+int interpret_config_line(char** fields)
+{
+	int i;
+	
+	if (!strcmp(fields[0], "PROT"))
+    {
+        strcpy(protfname, fields[1]);
+        protset = true;
+        return 1;
+    }
+    else if (!strcmp(fields[0], "LIG"))
+    {
+        strcpy(ligfname, fields[1]);
+        ligset = true;
+        return 1;
+    }
+    else if (!strcmp(fields[0], "CEN"))
+    {
+        CEN_buf = origbuff;
+        return 0;
+    }
+    else if (!strcmp(fields[0], "EXCL"))
+    {
+        i=1;
+        int excls = atoi(fields[i++]);
+        int excle = atoi(fields[i++]);
+
+        for (i=excls; i<=excle; i++) exclusion.push_back(i);
+        return i-1;
+    }
+    else if (!strcmp(fields[0], "PATH"))
+    {
+        i=1;
+        if (!strcmp(fields[i], "ABS")) i++;
+        if (!strcmp(fields[i], "REL")) i++;
+        if (!strcmp(fields[i], "RES")) i++;
+
+        int nodeno = atoi(fields[i]);
+        if (nodeno > 255)
+        {
+            cout << "Binding path is limited to 255 nodes." << endl;
+            throw 0xbad90de;
+        }
+        if (nodeno)
+        {
+            if ((nodeno) > pathnodes) pathnodes = nodeno;
+
+            pathstrs.resize(nodeno+1);
+            pathstrs[nodeno] = origbuff;
+        }
+        return i-1;
+    }
+    else if (!strcmp(fields[0], "STATE"))
+    {
+        states.push_back(origbuff);
+        return 0;
+    }
+    else if (!strcmp(fields[0], "SIZE"))
+    {
+        size.x = atof(fields[1]);
+        if (fields[2])
+        {
+            size.y = atof(fields[2]);
+            size.z = atof(fields[3]);
+        }
+        else size.z = size.y = size.x;
+        if (!size.x || !size.y || !size.z)
+        {
+            cout << "Pocket size cannot be zero in any dimension." << endl;
+            throw 0xbad512e;
+        }
+        return 3;
+    }
+    else if (!strcmp(fields[0], "POSE"))
+    {
+        poses = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "EMIN"))
+    {
+        kJmol_cutoff = atof(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "ELIM"))
+    {
+        kJmol_cutoff = -atof(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "DIFF"))
+    {
+        differential_dock = true;
+    }
+    else if (!strcmp(fields[0], "FLEX"))
+    {
+        flex = (atoi(fields[1]) != 0);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "KCAL"))
+    {
+        kcal = true;
+        return 0;
+    }
+    else if (!strcmp(fields[0], "RLIM"))
+    {
+        _INTERA_R_CUTOFF = atof(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
+    {
+        iters = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "MCOORD"))
+    {
+        int j=0;
+        for (i=1; fields[i]; i++)
+        {
+        	if (fields[i][0] == '-' && fields[i][1] == '-') break;
+            mcoord_resno[j++] = atoi(fields[i]);
+        }
+        mcoord_resno[j] = 0;
+        return i-1;
+    }
+    else if (!strcmp(fields[0], "DEBUG"))
+    {
+        if (!fields[1])
+        {
+            cout << "Missing debug file name; check config file." << endl;
+            throw 0xbadf12e;
+        }
+        #if _DBG_STEPBYSTEP
+        cout << "Starting a debug outstream." << endl;
+        #endif
+        debug = new std::ofstream(fields[1], std::ofstream::out);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "OUT"))
+    {
+        if (!fields[1])
+        {
+            cout << "Missing output file name; check config file." << endl;
+            throw 0xbadf12e;
+        }
+        #if _DBG_STEPBYSTEP
+        cout << "Starting a file outstream." << endl;
+        #endif
+        output = new std::ofstream(fields[1], std::ofstream::out);
+        return 1;
+    }
+    
+    return 0;
+}
+
 void read_config_file(FILE* pf)
 {
     char buffer[65536];
@@ -191,7 +346,6 @@ void read_config_file(FILE* pf)
 
     while (!feof(pf))
     {
-        std::string origbuff;
         fgets(buffer, 1015, pf);
         origbuff = buffer;
         if (buffer[0] >= ' ' && buffer[0] != '#')
@@ -199,134 +353,7 @@ void read_config_file(FILE* pf)
             char** fields = chop_spaced_fields(buffer);
             if (!fields) continue;
 
-            if (!strcmp(fields[0], "PROT"))
-            {
-                strcpy(protfname, fields[1]);
-                protset = true;
-            }
-            else if (!strcmp(fields[0], "LIG"))
-            {
-                strcpy(ligfname, fields[1]);
-                ligset = true;
-            }
-            else if (!strcmp(fields[0], "CEN"))
-            {
-                CEN_buf = origbuff;
-            }
-            else if (!strcmp(fields[0], "EXCL"))
-            {
-                i=1;
-                int excls = atoi(fields[i++]);
-                int excle = atoi(fields[i++]);
-
-                for (i=excls; i<=excle; i++) exclusion.push_back(i);
-            }
-            else if (!strcmp(fields[0], "PATH"))
-            {
-                i=1;
-                if (!strcmp(fields[i], "ABS")) i++;
-                if (!strcmp(fields[i], "REL")) i++;
-                if (!strcmp(fields[i], "RES")) i++;
-
-                int nodeno = atoi(fields[i]);
-                if (nodeno > 255)
-                {
-                    cout << "Binding path is limited to 255 nodes." << endl;
-                    throw 0xbad90de;
-                }
-                if (nodeno)
-                {
-                    if ((nodeno) > pathnodes) pathnodes = nodeno;
-
-                    pathstrs.resize(nodeno+1);
-                    pathstrs[nodeno] = origbuff;
-                }
-
-            }
-            else if (!strcmp(fields[0], "STATE"))
-            {
-                states.push_back(origbuff);
-            }
-            else if (!strcmp(fields[0], "SIZE"))
-            {
-                size.x = atof(fields[1]);
-                if (fields[2])
-                {
-                    size.y = atof(fields[2]);
-                    size.z = atof(fields[3]);
-                }
-                else size.z = size.y = size.x;
-                if (!size.x || !size.y || !size.z)
-                {
-                    cout << "Pocket size cannot be zero in any dimension." << endl;
-                    throw 0xbad512e;
-                }
-            }
-            else if (!strcmp(fields[0], "POSE"))
-            {
-                poses = atoi(fields[1]);
-            }
-            else if (!strcmp(fields[0], "EMIN"))
-            {
-                kJmol_cutoff = atof(fields[1]);
-            }
-            else if (!strcmp(fields[0], "ELIM"))
-            {
-                kJmol_cutoff = -atof(fields[1]);
-            }
-            else if (!strcmp(fields[0], "DIFF"))
-            {
-                differential_dock = true;
-            }
-            else if (!strcmp(fields[0], "FLEX"))
-            {
-                flex = (atoi(fields[1]) != 0);
-            }
-            else if (!strcmp(fields[0], "KCAL"))
-            {
-                kcal = true;
-            }
-            else if (!strcmp(fields[0], "RLIM"))
-            {
-                _INTERA_R_CUTOFF = atof(fields[1]);
-            }
-            else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
-            {
-                iters = atoi(fields[1]);
-            }
-            else if (!strcmp(fields[0], "MCOORD"))
-            {
-                int j=0;
-                for (i=1; fields[i]; i++)
-                {
-                    mcoord_resno[j++] = atoi(fields[i]);
-                }
-                mcoord_resno[j] = 0;
-            }
-            else if (!strcmp(fields[0], "DEBUG"))
-            {
-                if (!fields[1])
-                {
-                    cout << "Missing debug file name; check config file." << endl;
-                    throw 0xbadf12e;
-                }
-                #if _DBG_STEPBYSTEP
-                cout << "Starting a debug outstream." << endl;
-                #endif
-                debug = new std::ofstream(fields[1], std::ofstream::out);
-            }
-            else if (!strcmp(fields[0], "OUT"))
-            {
-                if (!fields[1])
-                {
-                    cout << "Missing output file name; check config file." << endl;
-                    throw 0xbadf12e;
-                }
-                #if _DBG_STEPBYSTEP
-                cout << "Starting a file outstream." << endl;
-                #endif
-                output = new std::ofstream(fields[1], std::ofstream::out);
-            }
+            interpret_config_line(fields);
         }
         buffer[0] = 0;
     }
@@ -335,7 +362,7 @@ void read_config_file(FILE* pf)
 int main(int argc, char** argv)
 {
     char buffer[65536];
-    int i;
+    int i, j;
 
     for (i=0; i<65536; i++) buffer[i] = 0;
 
@@ -345,11 +372,22 @@ int main(int argc, char** argv)
     time_t began = time(NULL);
 
     strcpy(configfname, "primarydock.config");
-
-    if (argc > 1)
+    
+    for (i=1; i<argc; i++)
     {
-        strcpy(configfname, argv[1]);
-        configset = true;
+    	if (argv[i][0] == '-' && argv[i][1] == '-')
+    	{
+    		argv[i] += 2;
+    		for (j=0; argv[i][j]; j++) if (argv[i][j] >= 'a' && argv[i][j] <= 'z') argv[i][j] &= 0x5f;
+    		j = interpret_config_line(&argv[i]);
+    		argv[i] -= 2;
+    		i += j;
+    	}
+    	else
+    	{
+    		strcpy(configfname, argv[i]);
+        	configset = true;
+    	}
     }
 
     FILE* pf = fopen(configfname, "r");
@@ -361,6 +399,18 @@ int main(int argc, char** argv)
 
     read_config_file(pf);
     fclose(pf);
+
+    for (i=1; i<argc; i++)
+    {
+    	if (argv[i][0] == '-' && argv[i][1] == '-')
+    	{
+    		argv[i] += 2;
+    		for (j=0; argv[i][j]; j++) if (argv[i][j] >= 'a' && argv[i][j] <= 'z') argv[i][j] &= 0x5f;
+    		j = interpret_config_line(&argv[i]);
+    		argv[i] -= 2;
+    		i += j;
+    	}
+    }
 
     pre_ligand_flex_radius = size.magnitude();
     pre_ligand_multimol_radius = pre_ligand_flex_radius + (default_pre_ligand_multimol_radius - default_pre_ligand_flex_radius);
@@ -472,7 +522,7 @@ int main(int argc, char** argv)
     #endif
 
     // Identify the ligand atom with the greatest potential binding.
-    int j, k, l, n;
+    int k, l, n;
     Atom** ligbb = m.get_most_bindable(3);
     Atom** ligbbh = new Atom*[5];
     intera_type lig_inter_typ[5];
@@ -558,12 +608,18 @@ int main(int argc, char** argv)
     if (met) bclash += m.get_intermol_clashes(met);
     if (debug) *debug << "Initial clashes: " << bclash << endl;
 
-
     // TODO: Output some basic stats: receptor, ligand, etc.
     cout << "PDB file: " << protfname << endl;
     if (output) *output << "PDB file: " << protfname << endl;
-    cout << "Ligand: " << ligfname << endl << endl;
-    if (output) *output << "Ligand: " << ligfname << endl << endl;
+    cout << "Ligand: " << ligfname << endl;
+    if (output) *output << "Ligand: " << ligfname << endl;
+    if (differential_dock)
+    {
+    	cout << "Differential dock." << endl;
+    	if (output) *output << "Differential dock." << endl;
+    }
+    cout << endl;
+    if (output) *output << endl;
 
     if (use_bestbind_algorithm) for (i=0; i<3; i++)
         {

@@ -1679,7 +1679,9 @@ int main(int argc, char** argv)
                 if (debug) *debug << "Added pose to output array." << endl;
                 #endif
                 
+                #if _DBG_MAX_CLASHES
                 cout << "Pose " << dr[drcount][nodeno].pose << " maxclash " << maxclash << endl;
+                #endif
             }
 
             drcount = pose;

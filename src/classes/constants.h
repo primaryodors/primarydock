@@ -103,6 +103,7 @@
 #define allow_linear_motion 1
 #define allow_tethered_rotations 1
 #define default_bestbind 0
+#define individual_clash_limit 20
 #define monte_carlo_axial 0
 #define monte_carlo_flex 1
 #define pocketcen_is_loneliest 1
@@ -119,7 +120,9 @@
 // Debugging stuff.
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0
+#define _DBG_TOOLARGE_DIFFNUMS 0
 #define _DBG_TUMBLE_SPHERES 0
+#define _DBG_MAX_CLASHES 0
 #define output_tumble_debug_docs 0
 #define debug_break_on_move 0
 #define debug_stop_after_tumble_sphere 0

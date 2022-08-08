@@ -704,16 +704,26 @@ int main(int argc, char** argv)
             for (i=0; i<qpr; i++)
             {
                 int resno = preaa[i]->get_residue_no();
-                // std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
+                #if _DBG_TOOLARGE_DIFFNUMS
+                std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
+                #endif
+                
                 for (j=0; j<qpr; j++)
                 {
                     if (j == i) continue;
-                    float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]), false /* j==0 */);
-                    // if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
+                    float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]), j==0);
+                    
+                    #if _DBG_TOOLARGE_DIFFNUMS
+                    if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
+                    #endif
+                    
                     initial_binding[resno] += f;
                     initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
                 }
-                // if (fabs(initial_binding[resno]) >= 50) cout << ibdbg << endl;
+                
+                #if _DBG_TOOLARGE_DIFFNUMS
+                if (fabs(initial_binding[resno]) >= 200) cout << ibdbg << endl;
+                #endif
             }
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = total_binding_by_type[i];
@@ -1482,12 +1492,26 @@ int main(int argc, char** argv)
                 for (i=0; i<qpr+1; i++)
                 {
                     int resno = i ? (allres[i-1]->get_residue_no()) : 0;
+		            #if _DBG_TOOLARGE_DIFFNUMS
+		            std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
+		            #endif
+
                     for (j=0; j<qpr+1; j++)
                     {
                         if (j == i) continue;
-                        final_binding[resno] += postaa[i]->get_intermol_binding(postaa[j], false /* j==0 */);
+                        float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
+                        final_binding[resno] += f;
+                    
+		                #if _DBG_TOOLARGE_DIFFNUMS
+		                if (f) ibdbg += to_string(postaa[j]->get_atom(0)->residue) + (std::string)" " + to_string(f) + (std::string)"\n";
+		                #endif
+                    
                         final_vdWrepl[resno] += postaa[i]->get_vdW_repulsion(postaa[j]);
                     }
+                
+		            #if _DBG_TOOLARGE_DIFFNUMS
+		            if (fabs(final_binding[resno]) >= 200) cout << ibdbg << endl;
+		            #endif
                 }
             }
 
@@ -1496,6 +1520,7 @@ int main(int argc, char** argv)
 
             sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, mcoord_resno);
             // cout << "sphres " << sphres << endl;
+            float maxclash = 0;
             for (i=0; i<sphres; i++)
             {
                 if (!reaches_spheroid[nodeno][i]) continue;
@@ -1503,20 +1528,21 @@ int main(int argc, char** argv)
                 reaches_spheroid[nodeno][i]->clear_atom_binding_energies();
                 int resno = reaches_spheroid[nodeno][i]->get_residue_no();
 
-                float lb;
+                float lb = m.get_intermol_binding(reaches_spheroid[nodeno][i], false);
+                if (lb < -maxclash) maxclash -= lb;
+                
                 if (differential_dock)
                 {
-                    lb = final_binding[resno];
+                    mkJmol[metcount] = final_binding[resno];
                 }
                 else
                 {
-                    lb = m.get_intermol_binding(reaches_spheroid[nodeno][i], false /* i==0 */);
+                	if (lb > 90) lb = 0;
+                	mkJmol[metcount] = lb;
                 }
-                if (lb > 90) lb = 0;
 
                 sprintf(metrics[metcount], "%s%d", reaches_spheroid[nodeno][i]->get_3letter(), resno);
                 // cout << metrics[metcount] << ": " << lb << " . ";
-                mkJmol[metcount] = lb;
                 imkJmol[metcount] = initial_binding[resno];
 
                 if (differential_dock)
@@ -1542,7 +1568,8 @@ int main(int argc, char** argv)
             // cout << btot << endl;
 
             if (btot > 15*m.get_atom_count()) btot = 0;
-
+            if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
+            
             drcount = pose-1;
 
             #if _DBG_STEPBYSTEP
@@ -1550,7 +1577,7 @@ int main(int argc, char** argv)
             #endif
 
             // Allocate the array.
-            dr[drcount][nodeno].kJmol = 0; //btot;
+            dr[drcount][nodeno].kJmol = (differential_dock && (maxclash > individual_clash_limit)) ? -Avogadro : btot;
             dr[drcount][nodeno].ikJmol = 0;
             dr[drcount][nodeno].metric  = new char*[metcount+4];
             dr[drcount][nodeno].mkJmol   = new float[metcount];
@@ -1650,6 +1677,10 @@ int main(int argc, char** argv)
                 }
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added pose to output array." << endl;
+                #endif
+                
+                #if _DBG_MAX_CLASHES
+                cout << "Pose " << dr[drcount][nodeno].pose << " maxclash " << maxclash << " kJmol " << dr[drcount][nodeno].kJmol << endl;
                 #endif
             }
 

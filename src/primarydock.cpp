@@ -1568,7 +1568,7 @@ int main(int argc, char** argv)
             // cout << btot << endl;
 
             if (btot > 15*m.get_atom_count()) btot = 0;
-            if (maxclash > individual_clash_limit) btot = -Avogadro;
+            if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
             
             drcount = pose-1;
 
@@ -1577,7 +1577,7 @@ int main(int argc, char** argv)
             #endif
 
             // Allocate the array.
-            dr[drcount][nodeno].kJmol = (maxclash > individual_clash_limit) ? -Avogadro : 0; //btot;
+            dr[drcount][nodeno].kJmol = (differential_dock && (maxclash > individual_clash_limit)) ? -Avogadro : btot;
             dr[drcount][nodeno].ikJmol = 0;
             dr[drcount][nodeno].metric  = new char*[metcount+4];
             dr[drcount][nodeno].mkJmol   = new float[metcount];
@@ -1680,7 +1680,7 @@ int main(int argc, char** argv)
                 #endif
                 
                 #if _DBG_MAX_CLASHES
-                cout << "Pose " << dr[drcount][nodeno].pose << " maxclash " << maxclash << endl;
+                cout << "Pose " << dr[drcount][nodeno].pose << " maxclash " << maxclash << " kJmol " << dr[drcount][nodeno].kJmol << endl;
                 #endif
             }
 

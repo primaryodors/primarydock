@@ -23,9 +23,10 @@ function resno_from_bw($protid, $bw)
 }
 
 chdir(__DIR__);
-$prots = json_decode(file_get_contents("../data/receptor.json"));
+chdir("..");
+$prots = json_decode(file_get_contents("data/receptor.json"), true);
 
-if (!file_exists("temp")) mkdir("temp");
+if (!file_exists("tmp")) mkdir("tmp");
 
 foreach (@$argv as $a)
 {
@@ -34,6 +35,9 @@ foreach (@$argv as $a)
 }
 
 $protid = @$_REQUEST['prot'] ?: "OR1A1";
+
+if (substr($protid, 0, 2) == "OR") $fam = "OR".intval(substr($protid, 2));
+else $fam = substr($protid, 0, 4);
 
 $lockarom = resno_from_bw($protid, "6.40");
 $lockhphl = resno_from_bw($protid, "3.39");
@@ -45,10 +49,11 @@ $start6 = intval($prots[$protid]["region"]["TMR6"]["start"]);
 
 $midway = intval(($endof5+$start6)/2) + 2;
 $midwa1 = $midway+1;
+$startconn = $midway-5;
 
 $pdisdat = <<<heredoc
 
-LOAD "pdbs/OR1/$protid.rotated.pdb"
+LOAD "pdbs/$fam/$protid.rotated.pdb"
 
 LET &bendamt = 0.5
 LET &mbendamt = 0.0 - &bendamt
@@ -59,11 +64,11 @@ LET &best_energy = 0		# The final best energy should be a best binding and not a
 # Begin main loop.
 _loop:
 
-BRIDGE $lockarom $lockhphl1 100
-BENERG $lockhphl1 $lockarom &e
+BRIDGE $lockarom $lockhphl 100
+BENERG $lockhphl $lockarom &e
 ECHO &curr_angle " degrees, " &e " energy...     " ~
 
-LET \$file = "temp/" + \$PROTEIN + ".acv" + &curr_angle + ".pdb"
+LET \$file = "tmp/" + \$PROTEIN + ".acv" + &curr_angle + ".pdb"
 SAVE \$file
 
 IF &curr_angle < 10 GOTO _Ive_had_better
@@ -74,7 +79,6 @@ _Ive_had_better:
 
 BEND $pivot5 $midway "N-CA" &mbendamt
 BEND $pivot6 $midwa1 "C-CA" &mbendamt
-# CONNECT $endof5 $midwa1 50
 
 LET &curr_angle += &bendamt
 
@@ -82,18 +86,26 @@ IF &curr_angle < 35 GOTO _loop
 
 ECHO "Best binding energy " &best_energy " found at " &best_angle " degrees."
 
+LET \$file = "tmp/" + \$PROTEIN + ".acv" + &best_angle + ".pdb"
+LOAD \$file
+# CONNECT $startconn $midwa1 20
+SAVE "pdbs/$fam/$protid.active.pdb" QUIT
+
 heredoc;
 
-$f = fopen("temp/activate.pdis", "wb");
-if (!$f) die("File write error. Check temp folder is write enabled.\n");
+$f = fopen("tmp/activate.pdis", "wb");
+if (!$f) die("File write error. Check tmp folder is write enabled.\n");
 
 fwrite($f, $pdisdat);
 fclose($f);
 
 $outlines = [];
-exec("bin/interpreter temp/activate.pdis", $outlines);
+exec("bin/interpreter tmp/activate.pdis", $outlines);
 
-
+foreach ($outlines as $ln)
+{
+	if (false!==strpos($ln, "Best binding energy")) echo "$ln\n";
+}
 
 
 

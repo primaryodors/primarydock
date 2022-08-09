@@ -84,6 +84,25 @@ ECHO "Best binding energy " &best_energy " found at " &best_angle " degrees."
 
 heredoc;
 
+$f = fopen("temp/activate.pdis", "wb");
+if (!$f) die("File write error. Check temp folder is write enabled.\n");
+
+fwrite($f, $pdisdat);
+fclose($f);
+
+$outlines = [];
+exec("bin/interpreter temp/activate.pdis", $outlines);
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -36,7 +36,7 @@ foreach (@$argv as $a)
 
 $protid = @$_REQUEST['prot'] ?: "OR1A1";
 
-if (substr($protid, 0, 2) == "OR") $fam = "OR".intval(substr($protid, 2));
+if (substr($protid, 0, 2) == "OR") $fam = "OR".intval(substr($protid, 2, 2));
 else $fam = substr($protid, 0, 4);
 
 $lockarom = resno_from_bw($protid, "6.40");

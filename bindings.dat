@@ -15,7 +15,7 @@
 # Non-covalent bonds are treated as bonds with a cardinality of less than one.
 # The conjugate bonds of aromatic rings are treated as having a cardinality of one and one half.
 #
-# The first 5 columns must be filled or POdock will ignore the line.
+# The first 5 columns must be filled or PrimaryDock will ignore the line.
 # Uncertain values may be indicated with a question mark, e.g. NH - N hbond distance is given as "1.6?".
 #
 

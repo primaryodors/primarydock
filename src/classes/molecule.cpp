@@ -2681,7 +2681,7 @@ bool ring_warned = false;
 
 bool Molecule::from_smiles(char const * smilesstr)
 {
-    if (!strchr(smilesstr, '{'))		// {AtomName} is a nonstandard feature and must be handled by POdock code, not a third party app.
+    if (!strchr(smilesstr, '{'))		// {AtomName} is a nonstandard feature and must be handled by PrimaryDock code, not a third party app.
     {
         // Check if OpenBabel is installed.
         FILE* pf = popen(CMD_CHECK_INSTALLED_3P_SMILES_PARSER, "r");

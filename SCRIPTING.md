@@ -1,10 +1,10 @@
 
-# POdock Scripting Language Documentation
+# PrimaryDock Interpreted Script Documentation
 
-To run a protein editing script, after building POdock, please use the following command:
+To run a PrimaryDock interpreted script, after building PrimaryDock, please use the following command:
 
 ```
-bin/interpreter path/to/script.po
+bin/interpreter path/to/script.pdis
 ```
 
 # Variables
@@ -53,6 +53,53 @@ The next number is the averaging length from each end of the region. In the exam
 at each end will be averaged together, in this case 174-177 and 179-182, to determine the alignment. The piece will be moved so that the average of CA
 atom locations of residues 174-177 will now equal @location1, and the average of CA locations of residues 179-182 will fall along a straight line pointing
 from @location1 to @location2.
+
+
+# BEND
+Example:
+```
+BEND 206 218 "N-CA" 15
+```
+
+Effects a partial bend of the protein backbone at the start residue (first parameter) by rotating in the bond direction (third parameter) by the rotation
+angle (fourth parameter, degrees), moving all subsequent residues up to the end residue (second parameter). The result is a bend in the chain corresponding
+to either a phi or psi rotation of the start residue.
+
+Note that the end residue will be disconnected from its neighbor and will require to be reconnected.
+
+Valid bond directions are:
+N-CA		Keep the residue's N terminus stationary and rotate its C terminus about the N-CA (phi) bond;
+CA-C		Keep the residue's N terminus stationary and rotate its C terminus about the CA-C (psi) bond;
+CA-N		Keep the residue's C terminus stationary and rotate its N terminus about the CA-N (phi) bond;
+C-CA		Keep the residue's C terminus stationary and rotate its N terminus about the C-CA (psi) bond;
+
+Note if bending in the N-CA or CA-C direction, i.e. towards higher numbered residues, then the end residue must be greater than the start residue.
+If bending in the C-CA or CA-N direction, the start residue must be greater than the end residue.
+
+See here for an introduction to phi and psi bonds:
+https://proteopedia.org/wiki/index.php/Tutorial:Ramachandran_principle_and_phi_psi_angles
+
+
+# BENERG
+Example:
+```
+BEND 251 111 &binding
+```
+
+Reads the non-covalent energy level (negative for binding, positive for clashes) in kJ/mol between two protein residues, and writes that value to a
+specified float variable.
+
+
+# BRIDGE
+Example:
+```
+BRIDGE 251 111
+BRIDGE 251 111 50
+```
+
+Iteratively conform the side chains of two residues (parameters 1 and 2) to maximize their non-covalent bonding to each other. If the optional third
+parameter is given, it represents the number of iterations (default 50). More iterations give better results, but takes longer to process, and diminishing
+returns occur with large iteration values.
 
 
 # CONNECT
@@ -178,7 +225,7 @@ When using `IF` with `GOTO`, it is possible to create loops as seen in the last 
 Examples:
 ```
 LET %i = 1
-LET $name = "POdock"
+LET $name = "PrimaryDock"
 LET $range = $SEQUENCE FROM 174 FOR 20
 LET $sub = $name FROM 3 FOR 4
 LET &j = %i

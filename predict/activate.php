@@ -40,9 +40,9 @@ foreach (@$argv as $a)
 	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
 }
 
+_loop4all:
 $protid = @$_REQUEST['prot'] ?: "OR1A1";
 
-_loop4all:
 if ($protid == "next" || $protid == "all")
 {
 	foreach ($prots as $k => $v)
@@ -54,7 +54,7 @@ if ($protid == "next" || $protid == "all")
 	die("All finished!\n");
 	
 	_found_next:
-	;
+	echo "Processing $protid... ";
 }
 
 $fam = family_from_protid($protid);
@@ -107,7 +107,7 @@ IF &curr_angle < 35 GOTO _loop
 # IF &best_energy < 10 ECHO "Failed to find best binding energy. " &best_energy
 # IF &best_energy < 10 EXIT
 
-ECHO "$protid" "best binding energy " &best_energy " found at " &best_angle " degrees."
+ECHO "$protid" " best binding energy " &best_energy " found at " &best_angle " degrees."
 
 LET \$file = "tmp/" + \$PROTEIN + ".acv" + &best_angle + ".pdb"
 LOAD \$file

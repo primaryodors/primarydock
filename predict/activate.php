@@ -102,7 +102,7 @@ BEND $pivot6 $midwa1 "C-CA" &mbendamt
 
 LET &curr_angle += &bendamt
 
-IF &curr_angle < 35 GOTO _loop
+IF &curr_angle < 20 GOTO _loop
 
 # IF &best_energy < 10 ECHO "Failed to find best binding energy. " &best_energy
 # IF &best_energy < 10 EXIT

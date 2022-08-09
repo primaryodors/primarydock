@@ -22,6 +22,12 @@ function resno_from_bw($protid, $bw)
 	return $res50 + $offset - 50;
 }
 
+function family_from_protid($protid)
+{
+	if (substr($protid, 0, 2) == "OR") return "OR".intval(substr($protid, 2, 2));
+	else return substr($protid, 0, 4);
+}
+
 chdir(__DIR__);
 chdir("..");
 $prots = json_decode(file_get_contents("data/receptor.json"), true);
@@ -36,8 +42,22 @@ foreach (@$argv as $a)
 
 $protid = @$_REQUEST['prot'] ?: "OR1A1";
 
-if (substr($protid, 0, 2) == "OR") $fam = "OR".intval(substr($protid, 2, 2));
-else $fam = substr($protid, 0, 4);
+_loop4all:
+if ($protid == "next" || $protid == "all")
+{
+	foreach ($prots as $k => $v)
+	{
+		$protid = $k;
+		$fam = family_from_protid($protid);
+		if (!file_exists("pdbs/$fam/$protid.active.pdb")) goto _found_next;
+	}
+	die("All finished!\n");
+	
+	_found_next:
+	;
+}
+
+$fam = family_from_protid($protid);
 
 $lockarom = resno_from_bw($protid, "6.40");
 $lockhphl = resno_from_bw($protid, "3.39");
@@ -84,7 +104,10 @@ LET &curr_angle += &bendamt
 
 IF &curr_angle < 35 GOTO _loop
 
-ECHO "Best binding energy " &best_energy " found at " &best_angle " degrees."
+# IF &best_energy < 10 ECHO "Failed to find best binding energy. " &best_energy
+# IF &best_energy < 10 EXIT
+
+ECHO "$protid" "best binding energy " &best_energy " found at " &best_angle " degrees."
 
 LET \$file = "tmp/" + \$PROTEIN + ".acv" + &best_angle + ".pdb"
 LOAD \$file
@@ -100,14 +123,15 @@ fwrite($f, $pdisdat);
 fclose($f);
 
 $outlines = [];
+set_time_limit(300);
 exec("bin/interpreter tmp/activate.pdis", $outlines);
 
 foreach ($outlines as $ln)
 {
-	if (false!==strpos($ln, "Best binding energy")) echo "$ln\n";
+	if (false!==strpos($ln, "est binding energy")) echo "$ln\n";
 }
 
-
+if (@$_REQUEST['prot'] == "all") goto _loop4all;
 
 
 

@@ -1,7 +1,7 @@
 
 Glossary of Terms
 
-The following terms are used by POdock and generally in molecular docking/computational chemistry/biochemistry.
+The following terms are used by PrimaryDock and generally in molecular docking/computational chemistry/biochemistry.
 
 
 Activation
@@ -106,12 +106,12 @@ A functional group of a molecule; an atom or small collection of atoms capable o
 
 Node
 
-(Specific to POdock): An imaginary point in space, serving as the target location for the barycenter of a ligand at a certain point along a path.
+(Specific to PrimaryDock): An imaginary point in space, serving as the target location for the barycenter of a ligand at a certain point along a path.
 
 
 Path
 
-(Specific to POdock): An imaginary line, curve, or squiggle, defined by a series of nodes, that the ligand is induced to approximately follow during docking calculations.
+(Specific to PrimaryDock): An imaginary line, curve, or squiggle, defined by a series of nodes, that the ligand is induced to approximately follow during docking calculations.
 
 
 PDB

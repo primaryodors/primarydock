@@ -566,6 +566,97 @@ int main(int argc, char** argv)
 				
 			}	// SEARCH
 			
+			else if (!strcmp(fields[0], "BEND"))
+			{
+				int sr, er;
+				bb_rot_dir bbrotd;
+				float theta;
+				
+				l = 1;
+				if (!fields[l]) raise_error("Insufficient parameters given for BEND.");
+				sr = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for BEND.");
+				er = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for BEND.");
+				char* tmp = interpret_single_string(fields[l++]);
+				if (!strcmp(tmp, "N-CA")) bbrotd = N_asc;
+				else if (!strcmp(tmp, "CA-C")) bbrotd = CA_asc;
+				else if (!strcmp(tmp, "CA-N")) bbrotd = CA_desc;
+				else if (!strcmp(tmp, "C-CA")) bbrotd = C_desc;
+				else raise_error("Unknown direction parameter given for BEND.");
+				
+				if ((bbrotd == N_asc || bbrotd == CA_asc) && er < sr) raise_error("Cannot rotate ascending bond in the descending direction.");
+				if ((bbrotd == CA_desc || bbrotd == C_desc) && er > sr) raise_error("Cannot rotate descending bond in the ascending direction.");
+				
+				if (!fields[l]) raise_error("Insufficient parameters given for BEND.");
+				theta = interpret_single_float(fields[l++]) * fiftyseventh;
+				if (fields[l]) raise_error("Too many parameters given for BEND.");
+				
+				p.rotate_backbone_partial(sr, er, bbrotd, theta);
+				
+			}	// BEND
+			
+			else if (!strcmp(fields[0], "BRIDGE"))
+			{
+				int r1, r2, iters=50;
+				
+				l = 1;
+				if (!fields[l]) raise_error("Insufficient parameters given for BRIDGE.");
+				r1 = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for BRIDGE.");
+				r2 = interpret_single_int(fields[l++]);
+				if (fields[l]) iters = interpret_single_int(fields[l++]);
+				if (fields[l]) raise_error("Too many parameters given for BRIDGE.");
+				
+				Star a1, a2;
+				a1.paa = p.get_residue(r1);
+				if (!a1.n) raise_error((std::string)"Residue " + to_string(r1) + (std::string)" not found in protein.");
+				a2.paa = p.get_residue(r2);
+				if (!a1.n) raise_error((std::string)"Residue " + to_string(r2) + (std::string)" not found in protein.");
+				
+				Molecule* mm[5];
+				for (i=0; i<5; i++) mm[i] = nullptr;
+				mm[0] = a1.pmol;
+				mm[1] = a2.pmol;
+				
+				Molecule::multimol_conform(mm, iters);
+				
+			}	// BRIDGE
+			
+			else if (!strcmp(fields[0], "BENERG"))
+			{
+				// Read non-covalent binding strength between two side chains into a float var.
+				int r1, r2;
+				
+				l = 1;
+				if (!fields[l]) raise_error("Insufficient parameters given for BENERG.");
+				r1 = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for BENERG.");
+				r2 = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for BENERG.");
+				n = find_var_index(fields[l]);
+				if (n<0)
+				{
+					n = vars++;
+					script_var[n].name = fields[l];
+					script_var[n].vt = type_from_name(fields[l]);
+				}
+				int flags = n & _VARFLAGS_MASK;
+				n &= _VARNUM_MASK;
+				l++;
+				if (fields[l]) raise_error("Too many parameters given for BENERG.");
+				
+				if (script_var[n].vt != SV_FLOAT) raise_error("Wrong variable type given for BENERG; float required.");
+				
+				Star a1, a2;
+				a1.paa = p.get_residue(r1);
+				if (!a1.n) raise_error((std::string)"Residue " + to_string(r1) + (std::string)" not found in protein.");
+				a2.paa = p.get_residue(r2);
+				if (!a2.n) raise_error((std::string)"Residue " + to_string(r2) + (std::string)" not found in protein.");
+				
+				script_var[n].value.f = -(a1.pmol->get_intermol_binding(a2.pmol));
+			}
+			
 			else if (!strcmp(fields[0], "ALIGN"))
 			{
 				int sr, er, eachend;
@@ -886,7 +977,7 @@ int main(int argc, char** argv)
 			{
 				if (!fields[1]) raise_error("Insufficient parameters given for SAVE.");
 				psz = interpret_single_string(fields[1]);
-				if (fields[3]) raise_error("Too many parameters given for SAVE.");
+				if (fields[2] && fields[3]) raise_error("Too many parameters given for SAVE.");
 				
 				pf = fopen(psz, "wb");
 				if (!pf)
@@ -906,7 +997,7 @@ int main(int argc, char** argv)
 				{
 					if ( !strcmp("QUIT", fields[2]) || !strcmp("EXIT", fields[2]) || !strcmp("END", fields[2]) )
 						return 0;
-					else raise_error("Too many parameters given for SAVE.");
+					else raise_error((std::string)"Too many parameters given for SAVE: " + (std::string)fields[2]);
 				}
 			}
 			

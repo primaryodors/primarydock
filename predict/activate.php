@@ -8,8 +8,24 @@
 // php -f predict/activate.php prot=OR1A1
 //
 
+function resno_from_bw($protid, $bw)
+{
+	global $prots;
+	if (!isset($prots[$protid])) die("Protein not found: $protid.\n");
+	
+	$pettia = explode(".", $bw);
+	$tmrno = intval($pettia[0]);
+	$offset = intval($pettia[1]);
+	
+	$res50 = intval(@$prots[$protid]["bw"]["$tmrno.50"]) or die("Unknown Ballesteros-Weinstein number: $bw.\n");
+	
+	return $res50 + $offset - 50;
+}
+
 chdir(__DIR__);
 $prots = json_decode(file_get_contents("../data/receptor.json"));
+
+if (!file_exists("temp")) mkdir("temp");
 
 foreach (@$argv as $a)
 {
@@ -18,6 +34,17 @@ foreach (@$argv as $a)
 }
 
 $protid = @$_REQUEST['prot'] ?: "OR1A1";
+
+$lockarom = resno_from_bw($protid, "6.40");
+$lockhphl = resno_from_bw($protid, "3.39");
+$pivot5 = resno_from_bw($protid, "5.47");
+$pivot6 = $lockarom + 3;
+
+$endof5 = intval($prots[$protid]["region"]["TMR5"]["end"]);
+$start6 = intval($prots[$protid]["region"]["TMR6"]["start"]);
+
+$midway = intval(($endof5+$start6)/2) + 2;
+$midwa1 = $midway+1;
 
 $pdisdat = <<<heredoc
 
@@ -32,11 +59,11 @@ LET &best_energy = 0		# The final best energy should be a best binding and not a
 # Begin main loop.
 _loop:
 
-BRIDGE 251 111 100
-BENERG 111 251 &e
+BRIDGE $lockarom $lockhphl1 100
+BENERG $lockhphl1 $lockarom &e
 ECHO &curr_angle " degrees, " &e " energy...     " ~
 
-LET \$file = "output/" + \$PROTEIN + ".acv" + &curr_angle + ".pdb"
+LET \$file = "temp/" + \$PROTEIN + ".acv" + &curr_angle + ".pdb"
 SAVE \$file
 
 IF &curr_angle < 10 GOTO _Ive_had_better
@@ -45,9 +72,9 @@ LET &best_energy = &e
 LET &best_angle = &curr_angle
 _Ive_had_better:
 
-BEND 206 229 "N-CA" &mbendamt
-BEND 254 230 "C-CA" &mbendamt
-# CONNECT 218 230 50
+BEND $pivot5 $midway "N-CA" &mbendamt
+BEND $pivot6 $midwa1 "C-CA" &mbendamt
+# CONNECT $endof5 $midwa1 50
 
 LET &curr_angle += &bendamt
 
@@ -55,9 +82,10 @@ IF &curr_angle < 35 GOTO _loop
 
 ECHO "Best binding energy " &best_energy " found at " &best_angle " degrees."
 
-
-
 heredoc;
+
+
+
 
 
 

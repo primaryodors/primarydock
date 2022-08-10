@@ -57,6 +57,7 @@ if ($protid == "next" || $protid == "all")
 	echo "Processing $protid... ";
 }
 
+if (substr($protid, 0, 2) == "OR") die("Only ORs are currently supported.\n");
 $fam = family_from_protid($protid);
 
 $lockarom = resno_from_bw($protid, "6.40");
@@ -71,7 +72,7 @@ $midway = intval(($endof5+$start6)/2) + 2;
 $midwa1 = $midway+1;
 $startconn = $midway-5;
 
-$pdisdat = <<<heredoc
+$pepddat = <<<heredoc
 
 LOAD "pdbs/$fam/$protid.rotated.pdb"
 
@@ -116,15 +117,15 @@ SAVE "pdbs/$fam/$protid.active.pdb" QUIT
 
 heredoc;
 
-$f = fopen("tmp/activate.pdis", "wb");
+$f = fopen("tmp/activate.pepd", "wb");
 if (!$f) die("File write error. Check tmp folder is write enabled.\n");
 
-fwrite($f, $pdisdat);
+fwrite($f, $pepddat);
 fclose($f);
 
 $outlines = [];
 set_time_limit(300);
-exec("bin/interpreter tmp/activate.pdis", $outlines);
+exec("bin/peptiditor tmp/activate.pepd", $outlines);
 
 foreach ($outlines as $ln)
 {

@@ -372,8 +372,8 @@ int main(int argc, char** argv)
 	
 	if (/*!PDB_fname.length() ||*/ !script_fname.length())
 	{
-		/*cout << "Usage:" << endl << "interpreter protein.pdb script_filename" << endl;
-		cout << "interpreter script_filename protein.pdb" << endl;*/
+		/*cout << "Usage:" << endl << "peptiditor protein.pdb script_filename" << endl;
+		cout << "peptiditor script_filename protein.pdb" << endl;*/
 		cout << "Error: no script filename supplied." << endl;
 		cout << endl;
 		return 0;

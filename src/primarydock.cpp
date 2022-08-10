@@ -38,6 +38,7 @@ char* get_file_ext(char* filename)
 
 char configfname[256];
 char protfname[256];
+char protafname[256];
 char ligfname[256];
 Point pocketcen, loneliest, pocketsize, ligbbox;
 std::ofstream *output = NULL;
@@ -58,7 +59,7 @@ Molecule* ligand;
 Point ligcen_target;
 Point size(10,10,10);
 SCoord path[256];
-int pathnodes=1;		// The pocketcen is the initial node.
+int pathnodes=0;				// The pocketcen is the initial node.
 int poses = 10;
 int iters = 50;
 bool flex=true;
@@ -66,6 +67,7 @@ float kJmol_cutoff = 0.01;
 bool kcal = false;
 float drift = 0.333;
 Molecule** gcfmols = NULL;
+int activation_node = -1;		// Default is never.
 
 std::string origbuff = "";
 
@@ -238,6 +240,11 @@ int interpret_config_line(char** fields)
         }
         return i-1;
     }
+    else if (!strcmp(fields[0], "NODEPDB"))
+    {
+    	activation_node = atoi(fields[1]);
+    	strcpy(protafname, fields[2]);
+    }
     else if (!strcmp(fields[0], "STATE"))
     {
         states.push_back(origbuff);
@@ -367,7 +374,7 @@ int main(int argc, char** argv)
     for (i=0; i<65536; i++) buffer[i] = 0;
 
     for (i=0; i<256; i++)
-        configfname[i] = protfname[i] = ligfname[i] = 0;
+        configfname[i] = protfname[i] = protafname[i] = ligfname[i] = 0;
 
     time_t began = time(NULL);
 
@@ -1065,6 +1072,14 @@ int main(int argc, char** argv)
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
             if (pathstrs.size() < nodeno) break;
+            
+            if (strlen(protafname) && nodeno == activation_node)
+            {
+            	// TODO: Persist the flexions of the side chains, except for those residues whose positions are important to activation.
+            	pf = fopen(protafname, "r");
+		        p.load_pdb(pf);
+		        fclose(pf);
+            }
 
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;

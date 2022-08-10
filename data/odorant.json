@@ -102,6 +102,21 @@
                     "type": "vsa",
                     "ec50": "-3.7"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -247,6 +262,21 @@
                     "type": "sa",
                     "ec50": "-3.9"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -357,7 +387,14 @@
     "00e884588b8a6ba666fbdf29e9a75eda":
     {
         "full_name": "acrolein",
-        "smiles": "C=CC=O"
+        "smiles": "C=CC=O",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "acrid"
+            ]
+        }
     },
     "df5addac1ec506d1f56aa3a9c239b7f6":
     {
@@ -876,7 +913,19 @@
     "43d474643ba37a57ea04714b13b3b5dc":
     {
         "full_name": "alpha-hexyl cinnamaldehyde",
-        "smiles": "CCCCCC\/C(=C\\C1=CC=CC=C1)\/C=O"
+        "smiles": "CCCCCC\/C(=C\\C1=CC=CC=C1)\/C=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fresh",
+                "floral",
+                "green",
+                "jasmin",
+                "herbal",
+                "waxy"
+            ]
+        }
     },
     "611fdfbc7d3b479e1f2189b7ba7d13b1":
     {
@@ -1007,11 +1056,153 @@
     {
         "full_name": "alpha-santalol",
         "smiles": "C\/C(=C\/CCC1(C2CC3C1(C3C2)C)C)\/CO",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "sandalwood"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1038\/jid.2014.273":
             {
                 "OR2AT4":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "6c9eade146cf512fbf7744dc6a810121":
+    {
+        "full_name": "alpha-terpinene",
+        "smiles": "CC1=CC=C(CC1)C(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "terpenic",
+                "lemon",
+                "herbal",
+                "medicinal",
+                "citrus"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "28cbfe8e2f747e431567cd45a312f039":
+    {
+        "full_name": "amber butanol",
+        "smiles": "CCC(COC1CCCCC1C(C)(C)C)O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "amber",
+                "ambrette"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "c725403c407c7e7d2812c16d58b177d8":
+    {
+        "full_name": "amberketal",
+        "smiles": "CC1(CCCC2(C1CCC34C2CCC(O3)(OC4)C)C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "dry",
+                "amber",
+                "powdery",
+                "woody",
+                "musk"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "5438f147a71637285f057697f522fb10":
+    {
+        "full_name": "amber xtreme",
+        "smiles": "CC1C(C2CCC3CC(OC3C2C1(C)C)(C)C)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "animal",
+                "musk",
+                "woody",
+                "spicy"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "wa"
+                },
+                "OR5AN1":
                 {
                     "type": "na"
                 }
@@ -1099,6 +1290,54 @@
                 {
                     "type": "vwa"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "wa"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "5fd77d3826e4ad56d140257c474679fe":
+    {
+        "full_name": "ambrinol",
+        "smiles": "CC1(CCC=C2C1CCC(C2)(C)O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "amber",
+                "natural",
+                "musk",
+                "animal"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "vsa"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -1127,6 +1366,21 @@
             "https:\/\/dx.doi.org\/10.1371%2Fjournal.pone.0144704":
             {
                 "TAAR5":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
                 {
                     "type": "na"
                 }
@@ -1947,6 +2201,21 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -2294,6 +2563,21 @@
                     "type": "ma",
                     "ec50": "-3.95"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -2445,6 +2729,21 @@
                 {
                     "type": "sa"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -2527,7 +2826,7 @@
                 },
                 "OR5A2":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-3.5"
                 },
                 "OR5AN1":
@@ -2559,6 +2858,21 @@
                     "type": "na"
                 },
                 "OR7A5":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "vsa"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
                 {
                     "type": "na"
                 }
@@ -2683,6 +2997,13 @@
     {
         "full_name": "beta-santalol",
         "smiles": "C\/C(=C\/CC[C@@]1([C@H]2CC[C@H](C2)C1=C)C)\/CO",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1038\/jid.2014.273":
@@ -2714,6 +3035,41 @@
     {
         "full_name": "bis(methylthiomethyl) disulfide",
         "smiles": "CSCSSCSC"
+    },
+    "0cc62755633ce44c35247602a9ea892d":
+    {
+        "full_name": "boisambrene",
+        "smiles": "CCOCOC1CCCCCCCCCCC1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "cedar",
+                "ambergris",
+                "dry",
+                "dusty",
+                "amber"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
     },
     "ff10dad192f9e7aa3723f7f97a038aab":
     {
@@ -2748,6 +3104,24 @@
                 "pine",
                 "woody"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "1abb7a5a950a29be736ace3ce04028f1":
@@ -3025,6 +3399,13 @@
         },
         "activity":
         {
+            "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115":
+            {
+                "OR6Y1":
+                {
+                    "type": "na"
+                }
+            },
             "https:\/\/doi.org\/10.1038\/nature06162":
             {
                 "OR7D4":
@@ -3550,6 +3931,75 @@
             }
         }
     },
+    "ed63ea395381cf765bc75d9c5d035db5":
+    {
+        "full_name": "calone",
+        "smiles": "O=C1COc2c(OC1)cc(cc2)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fresh",
+                "watery",
+                "clean",
+                "melon",
+                "green",
+                "marine",
+                "ozone",
+                "phenolic"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "9432a7e76b0e9740e8c9cd9d47d36921":
+    {
+        "full_name": "camphene",
+        "smiles": "C1(=C)C(C)(C)C2CC1CC2",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "herbal",
+                "fir_needle"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "08cf9dd201083b82b348d694453218d4":
     {
         "full_name": "(-)-camphor",
@@ -3665,6 +4115,21 @@
                 "OR1G1":
                 {
                     "type": "vsa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -3895,6 +4360,21 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -3989,6 +4469,21 @@
                     "type": "na"
                 },
                 "OR5P3":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
                 {
                     "type": "na"
                 }
@@ -4330,6 +4825,21 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -4385,6 +4895,41 @@
                     "type": "na"
                 },
                 "OR5P3":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "3a0e3585a836381dc1abec00bfa68dcd":
+    {
+        "full_name": "1,4-cineol",
+        "smiles": "CC(C)C12CCC(O1)(CC2)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "cooling",
+                "pine",
+                "minty",
+                "camphoreous",
+                "terpenic",
+                "green"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
                 {
                     "type": "na"
                 }
@@ -4767,6 +5312,21 @@
                     "type": "vwa",
                     "ec50": "-3.2"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -4797,15 +5357,75 @@
             }
         }
     },
+    "2a696e83a2b91f970881aee10f43c8f8":
+    {
+        "full_name": "cis-3-hexenyl hexanoate",
+        "smiles": "CC\/C=C\\CCOC(=O)CCCCC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fruity",
+                "green",
+                "waxy",
+                "pear",
+                "winey",
+                "tropical",
+                "grassy",
+                "pineapple"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "a0aba5665399521a07fd7fbd6fc463e9":
     {
         "full_name": "cis-3-hexenyl salicylate",
-        "smiles": "CC\/C=C\\CCOC(=O)C1=CC=CC=C1O"
+        "smiles": "CC\/C=C\\CCOC(=O)C1=CC=CC=C1O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "floral",
+                "green",
+                "metallic",
+                "herbal",
+                "balsamic"
+            ]
+        }
     },
     "e49f842de770e882978c0d5f2edcea51":
     {
         "full_name": "cis-jasmone",
-        "smiles": "CC\/C=C\\CC1=C(CCC1=O)C"
+        "smiles": "CC\/C=C\\CC1=C(CCC1=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "herbal",
+                "floral",
+                "spicy",
+                "jasmin",
+                "celery"
+            ]
+        }
     },
     "c3bd6aab2c06b8e5a4c6661de8476423":
     {
@@ -5260,6 +5880,58 @@
                     "type": "vwa",
                     "ec50": "-2.75"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "ma"
+                }
+            }
+        }
+    },
+    "2174059724c683ee4b6ac68355a7ed50":
+    {
+        "full_name": "claritone",
+        "smiles": "CC(C)C(=O)C(C)(C)CC=C(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "herbal",
+                "clary",
+                "sage",
+                "bergamot",
+                "petitgrain",
+                "tropical",
+                "citrus"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -5472,6 +6144,21 @@
                 "OR5AN1":
                 {
                     "type": "vsa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "wa"
+                },
+                "OR5AN1":
+                {
+                    "type": "sa"
                 }
             }
         }
@@ -5888,10 +6575,44 @@
             }
         }
     },
+    "2d48571799c0d07143cb705bc93294e9":
+    {
+        "full_name": "cyclododecanone",
+        "smiles": "C1(=O)CCCCCCCCCCC1",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "109d08efc87b8fd3ed600b9e03beda48":
     {
         "full_name": "cyclohexanecarboxylic acid",
         "smiles": "C1CCC(CC1)C(=O)[O-]",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fruity",
+                "acidic",
+                "metallic",
+                "cheesy",
+                "tropical"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1002\/cbdv.201400083":
@@ -6126,6 +6847,21 @@
                 {
                     "type": "vwa"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -6156,6 +6892,21 @@
                     "type": "na"
                 },
                 "OR2J3":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "wa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
                 {
                     "type": "ma"
                 },
@@ -6207,6 +6958,21 @@
                 "OR2J3":
                 {
                     "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "ma"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "wa"
                 },
                 "OR5AN1":
                 {
@@ -6559,6 +7325,17 @@
                 {
                     "type": "sa"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -6663,6 +7440,21 @@
                 "VN1R5":
                 {
                     "type": "vsa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -6915,6 +7707,19 @@
     {
         "full_name": "delta-2-decenolactone",
         "smiles": "CCCCCC1CC=CC(=O)O1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "creamy",
+                "coconut",
+                "lactonic",
+                "peach",
+                "fruity",
+                "herbal"
+            ]
+        },
         "activity":
         {
             "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
@@ -6952,6 +7757,21 @@
                 {
                     "type": "ma",
                     "ec50": "-5.09"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -7116,6 +7936,14 @@
                 {
                     "type": "ma",
                     "ec50": "-1.6"
+                }
+            },
+            "https:\/\/www.pnas.org\/cgi\/doi\/10.1073\/pnas.1804106115":
+            {
+                "OR6Y1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.6"
                 }
             },
             "https:\/\/doi.org\/10.1038\/nature06162":
@@ -7339,6 +8167,18 @@
     {
         "full_name": "dihydroisojasmonate",
         "smiles": "COC(=O)C1CCC(=O)C1CCCCCC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "jasmin",
+                "floral",
+                "fresh",
+                "oily",
+                "herbal"
+            ]
+        },
         "activity":
         {
             "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
@@ -7749,6 +8589,18 @@
     {
         "full_name": "dimetol",
         "smiles": "CC(C)CCCC(C)(C)O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fresh",
+                "bois_de_rose",
+                "floral",
+                "woody",
+                "citrus",
+                "herbal"
+            ]
+        },
         "activity":
         {
             "https:\/\/https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/":
@@ -7927,6 +8779,21 @@
             "https:\/\/https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/":
             {
                 "OR51B4":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
                 {
                     "type": "na"
                 }
@@ -8139,6 +9006,21 @@
                 "OR52D1":
                 {
                     "type": "vwa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -8844,6 +9726,21 @@
                 "OR5AN1":
                 {
                     "type": "vwa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "wa"
                 }
             }
         }
@@ -9880,6 +10777,40 @@
             }
         }
     },
+    "c8d369fea9574abfdf23c19b13f6065d":
+    {
+        "full_name": "exaltolide",
+        "smiles": "O=C1CCCCCCCCCCCCCCO1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "musk",
+                "animal",
+                "powdery",
+                "natural",
+                "fruity"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "1bf8d63e1593909486c3f37956488442":
     {
         "full_name": "farnesol",
@@ -10152,6 +11083,21 @@
                     "type": "sa",
                     "ec50": "-5.9"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -10290,6 +11236,21 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -10384,6 +11345,21 @@
                     "type": "ma",
                     "ec50": "-3.75"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -10451,6 +11427,21 @@
                     "type": "ma",
                     "ec50": "-3.64"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -10484,6 +11475,21 @@
                     "type": "ma",
                     "ec50": "-4.32"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -10514,6 +11520,21 @@
                     "type": "ma",
                     "ec50": "-5.14"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -10532,6 +11553,24 @@
                 "warm",
                 "woody"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "d786a94526354eb20a50bca99de832e0":
@@ -10701,6 +11740,21 @@
                     "type": "ma",
                     "ec50": "-4"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -10726,11 +11780,11 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "floral",
                 "green",
                 "lavender",
                 "rose",
-                "waxy"
+                "waxy",
+                "floral"
             ]
         },
         "activity":
@@ -10998,6 +12052,21 @@
                 {
                     "type": "vsa"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "sa"
+                }
             }
         }
     },
@@ -11144,6 +12213,21 @@
                 "OR5AN1":
                 {
                     "type": "wa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -11353,6 +12437,17 @@
                     "type": "vsa",
                     "ec50": "-6.47"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -11383,6 +12478,21 @@
                 "OR2J3":
                 {
                     "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "vwa"
                 },
                 "OR5AN1":
                 {
@@ -11521,6 +12631,12 @@
         "smiles": "CCCCCCCS",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "sulfurous",
+                "rubbery",
+                "fusel"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "onion",
@@ -12152,6 +13268,17 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -12382,6 +13509,21 @@
                 {
                     "type": "sa",
                     "ec50": "-3.76"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -12678,12 +13820,36 @@
     "cda345961c8bfc7e290b099955f3bfaa":
     {
         "full_name": "hydrogen cyanide",
-        "smiles": "C#N"
+        "smiles": "C#N",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "almond",
+                "hazelnut",
+                "chemical",
+                "clean",
+                "plasticky",
+                "cocoa"
+            ]
+        }
     },
     "136a0f0bb2e431b47a2760c0511d4d31":
     {
         "full_name": "hydrogen selenide",
-        "smiles": "[SeH2]"
+        "smiles": "[SeH2]",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "horseradish",
+                "mayonnaise",
+                "chicken",
+                "stale",
+                "sulfurous",
+                "fecal"
+            ]
+        }
     },
     "52b0cebb98ffa8a5a22aae58d9cb579f":
     {
@@ -12885,22 +14051,6 @@
             ]
         }
     },
-    "7679de1295d78ef5bb613fa31b4f90b3":
-    {
-        "full_name": "1-(4-hydroxyphenyl)-2-butanone",
-        "smiles": "CCC(=O)CC1=CC=C(C=C1)O",
-        "activity":
-        {
-            "https:\/\/doi.org\/10.1002\/cbdv.201400083":
-            {
-                "OR2W1":
-                {
-                    "type": "sa",
-                    "ec50": "-4.8"
-                }
-            }
-        }
-    },
     "7dc6118a26544b9e2d5cc6910a0edf53":
     {
         "full_name": "hypo-lem",
@@ -13097,6 +14247,24 @@
                 "pear",
                 "banana"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "0127a30c8fa8582be06902e26cefab54":
@@ -13151,6 +14319,39 @@
             ]
         }
     },
+    "cbc32e2a2a0a0df8723bb086829d1088":
+    {
+        "full_name": "isoborneol",
+        "smiles": "CC1(C2CCC1(C(C2)O)C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "balsamic",
+                "camphoreous",
+                "herbal",
+                "woody"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "6ed14eab60fd46372d853fbdd8d61228":
     {
         "full_name": "isobornyl acetate",
@@ -13176,6 +14377,21 @@
                 {
                     "type": "vwa"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -13183,6 +14399,16 @@
     {
         "full_name": "isobornyl cyclohexanol",
         "smiles": "CC1C2CC(C1(C)C)CC2C3CCCC(C3)O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sandalwood",
+                "clean",
+                "sweet",
+                "woody"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1038\/jid.2014.273":
@@ -13496,6 +14722,24 @@
                 "phenolic",
                 "woody"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "a19c4a492c0c09dac10f0a734b369762":
@@ -13606,6 +14850,62 @@
                 {
                     "type": "ma",
                     "ec50": "-4.26"
+                }
+            }
+        }
+    },
+    "f10914e0806d450de259145ca2c3294b":
+    {
+        "full_name": "isolongifolanone",
+        "smiles": "CC1[C@@H]2[C@H]3[C@H]([C@@]1(CCCC3(C)C)C)CC2=O",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "07e75e8d3eb8584de175fe08416c5aab":
+    {
+        "full_name": "isomenthone",
+        "smiles": "CC1CCC(C(=O)C1)C(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "minty",
+                "cooling",
+                "peppermint",
+                "sweet"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -13773,6 +15073,17 @@
     {
         "full_name": "isovaleraldehyde",
         "smiles": "O=CCC(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "ethereal",
+                "aldehydic",
+                "chocolate",
+                "peach",
+                "fatty"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1111\/j.1471-4159.2006.03771.x":
@@ -13914,6 +15225,21 @@
                 {
                     "type": "ma"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -13952,6 +15278,44 @@
                 {
                     "type": "ma",
                     "ec50": "-4.12"
+                }
+            }
+        }
+    },
+    "5d8f5e4806ff84683a73cc57f40052d1":
+    {
+        "full_name": "jasmolactone delta",
+        "smiles": "O=C1CCCC(CCC=CC)O1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "oily",
+                "fruity",
+                "coconut",
+                "floral",
+                "petal",
+                "jasmin",
+                "tuberose",
+                "peach",
+                "apricot"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -14007,6 +15371,19 @@
     {
         "full_name": "javanol",
         "smiles": "C[C@]1(C[C@@H]1C[C@@H]2C[C@H]3C[C@]3(C2(C)C)C)CO",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "tropical",
+                "woody",
+                "fatty",
+                "sandalwood",
+                "herbal",
+                "cologne",
+                "floral"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1038\/jid.2014.273":
@@ -14818,6 +16195,38 @@
             }
         }
     },
+    "0f58a2420d79e2402b2d2416d56767c3":
+    {
+        "full_name": "melonal",
+        "smiles": "CC(CCC=C(C)C)C=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fresh",
+                "ozone",
+                "melon",
+                "watermelon",
+                "sweet",
+                "clean",
+                "green"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "e079ad580bd31e3912ac91ee1128f734":
     {
         "full_name": "(+)-menthol",
@@ -14979,6 +16388,21 @@
                 "OR7D4":
                 {
                     "type": "vwa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -15220,10 +16644,29 @@
             ]
         }
     },
-    "b4c4a919d93fc1caec34fd1fee86a2d4":
+    "d749da79b391570f22fc1c13b9fb3d9d":
     {
         "full_name": "methoxyfuraneol",
-        "smiles": "COC1=C(OC=C1)O",
+        "smiles": "CC1C(=O)C(=C(O1)C)OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "moldy",
+                "mushroom",
+                "vegetable",
+                "potato",
+                "burnt",
+                "sugar",
+                "nut",
+                "skin",
+                "wasabi",
+                "caramellic",
+                "fruity",
+                "brandy"
+            ]
+        },
         "activity":
         {
             "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
@@ -15583,6 +17026,21 @@
                 {
                     "type": "ma",
                     "ec50": "-4.49"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -16079,6 +17537,14 @@
                     "type": "vwa",
                     "ec50": "-4.53"
                 }
+            },
+            "https:\/\/doi.org\/10.1371\/journal.pgen.1009564":
+            {
+                "OR51B2":
+                {
+                    "type": "sa",
+                    "ec50": "-4.4"
+                }
             }
         }
     },
@@ -16486,6 +17952,41 @@
             }
         }
     },
+    "5e35d6c58a0412ba35328d64ab249bf5":
+    {
+        "full_name": "6-methyl quinoline",
+        "smiles": "CC1=CC2=C(C=C1)N=CC=C2",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "leathery",
+                "tonka",
+                "castoreum",
+                "tobacco",
+                "civet",
+                "fecal"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "ab5bc015c1a4101c314dca657e4a6205":
     {
         "full_name": "methyl salicylate",
@@ -16717,6 +18218,17 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -16907,6 +18419,21 @@
                 {
                     "type": "sa"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "wa"
+                },
+                "OR5AN1":
+                {
+                    "type": "ma"
+                }
             }
         }
     },
@@ -16965,6 +18492,21 @@
                 "OR5AN1":
                 {
                     "type": "sa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "wa"
+                },
+                "OR5AN1":
+                {
+                    "type": "ma"
                 }
             }
         }
@@ -17043,6 +18585,21 @@
                 {
                     "type": "vsa"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "ma"
+                }
             }
         }
     },
@@ -17118,6 +18675,21 @@
                 "OR5AN1":
                 {
                     "type": "vsa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "sa"
                 }
             }
         }
@@ -17256,7 +18828,19 @@
     "89a46491dcaf32f570ca7e03eaed37ca":
     {
         "full_name": "naphthalene",
-        "smiles": "C1=CC=C2C=CC=CC2=C1"
+        "smiles": "C1=CC=C2C=CC=CC2=C1",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "naphthyl",
+                "mothballs",
+                "chemical",
+                "minty",
+                "acrid",
+                "fecal"
+            ]
+        }
     },
     "4aeb7a3cfaeff2d914c61137954096f3":
     {
@@ -17294,18 +18878,18 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "magnolia",
-                "natural",
-                "neroli",
-                "spicy",
-                "sweet",
-                "waxy",
                 "citrus",
                 "floral",
                 "fresh",
                 "green",
                 "lemon",
-                "lime"
+                "lime",
+                "magnolia",
+                "natural",
+                "neroli",
+                "spicy",
+                "sweet",
+                "waxy"
             ]
         },
         "activity":
@@ -18445,6 +20029,17 @@
                     "type": "wa",
                     "ec50": "-3.29"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -18454,6 +20049,12 @@
         "smiles": "CCCCCCCCS",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "sulfurous",
+                "rubbery",
+                "mushroom"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sulfurous"
@@ -18808,6 +20409,21 @@
                 "VN1R2":
                 {
                     "type": "sa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -19356,6 +20972,29 @@
             }
         }
     },
+    "4537d2e9d4e542b4b9a952d0985c1665":
+    {
+        "full_name": "omega-dodecanolactam",
+        "smiles": "C1CCCCCC(=O)NCCCCC1",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "vwa"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "39156613d880f2e50d7c2af1b81ae8fb":
     {
         "full_name": "oranger crystals",
@@ -19448,6 +21087,55 @@
                     "type": "wa",
                     "ec50": "-3.8"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "e08187c07dd830d3311f6e04f7a94b61":
+    {
+        "full_name": "orris hexanone",
+        "smiles": "CCC(C)(C)C1CCC(=O)CC1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "dry",
+                "orris",
+                "earthy",
+                "camphoreous"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -19521,6 +21209,17 @@
     {
         "full_name": "p-anisyl formate",
         "smiles": "COC1=CC=C(C=C1)COC=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fruity",
+                "floral",
+                "anisic",
+                "vanilla",
+                "seaweed"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1111\/j.1471-4159.2006.03771.x":
@@ -19588,6 +21287,41 @@
                 "rhubarb",
                 "guava"
             ]
+        }
+    },
+    "919faae573a720f44b45106b7315228f":
+    {
+        "full_name": "p-cresyl phenyl acetate",
+        "smiles": "CC1=CC=C(C=C1)OC(=O)CC2=CC=CC=C2",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "animal",
+                "rose",
+                "honey",
+                "narcissus",
+                "lily",
+                "hyacinth"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "3a593753f3ceef5e0eec746b968670e1":
@@ -19725,6 +21459,21 @@
                 {
                     "type": "vwa"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -19747,6 +21496,21 @@
                 "OR5AN1":
                 {
                     "type": "vwa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -20097,6 +21861,21 @@
                     "type": "ma",
                     "ec50": "-3.91"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -20362,6 +22141,21 @@
             "https:\/\/chemistry-europe.onlinelibrary.wiley.com\/doi\/10.1002\/cplu.201300008":
             {
                 "OR7A5":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
                 {
                     "type": "na"
                 }
@@ -20764,6 +22558,21 @@
                 "OR3A1":
                 {
                     "type": "wa"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -21261,6 +23070,40 @@
             }
         }
     },
+    "c91e08d7eed5288e915b0a16929b4b1b":
+    {
+        "full_name": "p-t-butyl cyclohexanone",
+        "smiles": "CC(C)(C)C1CCC(=O)CC1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "minty",
+                "patchouli",
+                "musk",
+                "leathery"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "d3405a6950053d09c8cfc7a09d252c22":
     {
         "full_name": "putrescine",
@@ -21642,6 +23485,14 @@
         },
         "activity":
         {
+            "https:\/\/doi.org\/10.1002\/cbdv.201400083":
+            {
+                "OR2W1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.8"
+                }
+            },
             "https:\/\/doi.org\/10.1038\/jid.2014.273":
             {
                 "OR2AT4":
@@ -21653,6 +23504,21 @@
             "https:\/\/doi.org\/10.1111\/j.1471-4159.2006.03771.x":
             {
                 "OR3A1":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
                 {
                     "type": "na"
                 }
@@ -21824,6 +23690,21 @@
                     "type": "wa",
                     "ec50": "-3.5"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -21895,6 +23776,39 @@
             }
         }
     },
+    "c52985240a59e2ca7485d2c2396e6bd8":
+    {
+        "full_name": "romandolide",
+        "smiles": "CCC(=O)OCC(=O)OC(C)C1CCCC(C1)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "musk",
+                "ambrette",
+                "fruity",
+                "berry"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "wa"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "fd0dda2679e9a93319a850b3ce19bc01":
     {
         "full_name": "rosaphen",
@@ -21942,6 +23856,40 @@
             "https:\/\/https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/":
             {
                 "OR51B4":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "d782869563a958d2c427cd4eeba19745":
+    {
+        "full_name": "(R)-(+)-sclareolide",
+        "smiles": "C[C@]12CCCC([C@@H]1CC[C@@]3([C@@H]2CC(=O)O3)C)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "dry",
+                "paper",
+                "woody",
+                "ambergris",
+                "labdanum"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
                 {
                     "type": "na"
                 }
@@ -22151,6 +24099,42 @@
                 {
                     "type": "vsa",
                     "ec50": "-5.15"
+                }
+            }
+        }
+    },
+    "d435ecf4146ca87bddb13b0320edbb71":
+    {
+        "full_name": "santaliff",
+        "smiles": "CC1=CCC(C1(C)C)C\/C=C(\\C)\/CO",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sandalwood",
+                "creamy",
+                "woody",
+                "milky",
+                "waxy",
+                "greasy",
+                "musk"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -22546,6 +24530,18 @@
     {
         "full_name": "2-sec-butyl-3-methoxypyrazine",
         "smiles": "CCC(C)C1=NC=CN=C1OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "musty",
+                "green",
+                "pea",
+                "galbanum",
+                "bell",
+                "pepper"
+            ]
+        },
         "activity":
         {
             "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
@@ -22721,6 +24717,24 @@
                 "rhubarb",
                 "musty"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "af2961f8caeb12c93c58c303950fb1e2":
@@ -22778,6 +24792,21 @@
                 {
                     "type": "ma",
                     "ec50": "-4.84"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -23430,6 +25459,57 @@
                 {
                     "type": "vwa"
                 }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "a00c3d2eaaca6e91820c963b74b829dd":
+    {
+        "full_name": "tonka undecanone",
+        "smiles": "C\/C=C\/1\\CC2CC1C3C2OC(=O)CC3",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "spicy",
+                "balsamic",
+                "tonka",
+                "woody",
+                "tobacco",
+                "green"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -23994,7 +26074,17 @@
     "0a8731d32b745b9f38b6b27ec663db19":
     {
         "full_name": "2-undecenal",
-        "smiles": "CCCCCCCCC=CC=O"
+        "smiles": "CCCCCCCCC=CC=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fresh",
+                "fruity",
+                "orange",
+                "peel"
+            ]
+        }
     },
     "8f397776b643b5cb7df6346090fdfb23":
     {
@@ -24069,6 +26159,21 @@
                     "type": "na"
                 },
                 "OR5P3":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
                 {
                     "type": "na"
                 }
@@ -24277,15 +26382,107 @@
             ]
         }
     },
+    "f8fee0134119589ab63b6e7b8f8b61f5":
+    {
+        "full_name": "woody cyclohexanone",
+        "smiles": "CCOC(=C)C1C(CC(=O)CC1(C)C)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "old_wood",
+                "amber",
+                "tobacco",
+                "herbal"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "na"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "265bf7a75b9159c1efb34b4ff6562f66":
     {
         "full_name": "2,5-xylenol",
-        "smiles": "CC1=CC(=C(C=C1)C)O"
+        "smiles": "CC1=CC(=C(C=C1)C)O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "naphthyl",
+                "phenolic",
+                "smoky",
+                "bacon"
+            ]
+        }
     },
     "ddb569221ae57b9ffa00f87bbd726002":
     {
         "full_name": "2,6-xylenol",
-        "smiles": "CC1=C(C(=CC=C1)C)O"
+        "smiles": "CC1=C(C(=CC=C1)C)O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "medicinal",
+                "phenolic",
+                "rooty",
+                "coffee"
+            ]
+        }
+    },
+    "a172599c1f86e220d1a340ab18a4b967":
+    {
+        "full_name": "ysamber",
+        "smiles": "CC1(CCC2(C3C14CCC(C4)C3(C)C)OCCO2)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "dry",
+                "woody",
+                "vetiver",
+                "amber",
+                "powdery",
+                "musk",
+                "fruity"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
+            {
+                "OR5A1":
+                {
+                    "type": "wa"
+                },
+                "OR5A2":
+                {
+                    "type": "na"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
     },
     "3c9839dffd2a11e183c08ccf2bbb6c76":
     {

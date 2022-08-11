@@ -646,6 +646,9 @@ int main(int argc, char** argv)
     DockResult dr[poses+2][pathnodes+2];
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
     int drcount = 0, qpr;
+    
+    cout << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
+    if (output) *output << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
 
     srand(0xb00d1cca);
     // srand(time(NULL));
@@ -1726,7 +1729,15 @@ int main(int argc, char** argv)
                     for (k=0; k<=pathnodes; k++)
                     {
                         // If pathnode is not within kJ/mol cutoff, abandon it and all subsequent pathnodes of the same pose.
-                        if (dr[j][k].kJmol < kJmol_cutoff) break;
+                        if (dr[j][k].kJmol < kJmol_cutoff)
+                        {
+                        	if (k < pathnodes)
+                        	{
+		                    	cout << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
+		                    	if (output) *output << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
+	                    	}
+                        	break;
+                    	}
 
                         cout << "Pose: " << i << endl << "Node: " << k << endl;
                         if (output) *output << "Pose: " << i << endl << "Node: " << k << endl;

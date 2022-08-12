@@ -46,7 +46,8 @@ SIZE 6.0 7.5 5.5
 EXCL 1 $cyt1end		# Head, TMR1, and CYT1.
 EXCL $exr2start $exr2end	# EXR2 between TMR4 and TMR5.
 
-POSE 20
+POSE 5
+RETRY 3
 ITER 100
 
 DIFF

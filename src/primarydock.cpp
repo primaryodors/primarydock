@@ -69,6 +69,8 @@ bool kcal = false;
 float drift = 0.333;
 Molecule** gcfmols = NULL;
 int activation_node = -1;		// Default is never.
+int found_poses = 0;
+int triesleft = 0;				// Default is no retry.
 
 std::string origbuff = "";
 
@@ -275,6 +277,11 @@ int interpret_config_line(char** fields)
     else if (!strcmp(fields[0], "POSE"))
     {
         poses = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "RETRY"))
+    {
+        triesleft = atoi(fields[1]);
         return 1;
     }
     else if (!strcmp(fields[0], "EMIN"))
@@ -729,15 +736,16 @@ int main(int argc, char** argv)
             cout << endl;
         }
 
-    DockResult dr[poses+2][pathnodes+2];
+    DockResult dr[poses*(triesleft+1)+8][pathnodes+2];
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
     int drcount = 0, qpr;
     
     cout << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
     if (output) *output << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
 
-    srand(0xb00d1cca);
-    // srand(time(NULL));
+	_try_again:
+    // srand(0xb00d1cca);
+    srand(time(NULL));
     for (pose=1; pose<=poses; pose++)
     {
         ligand->minimize_internal_clashes();
@@ -1602,7 +1610,7 @@ int main(int argc, char** argv)
             if (btot > 15*m.get_atom_count()) btot = 0;
             if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
             
-            drcount = pose-1;
+            // drcount = pose-1+found_poses;
 
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared metrics." << endl;
@@ -1716,7 +1724,8 @@ int main(int argc, char** argv)
                 #endif
             }
 
-            drcount = pose;
+            // drcount = pose;
+            drcount++;
 
             // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
             // calculations for this pose.
@@ -1951,6 +1960,13 @@ int main(int argc, char** argv)
     }
 
 	_exitposes:
+	found_poses = i-1;
+	if (found_poses < poses && triesleft)
+	{
+		triesleft--;
+		goto _try_again;
+	}
+	
     cout << (i-1) << " pose(s) found." << endl;
     if (output) *output << (i-1) << " pose(s) found." << endl;
     if (debug) *debug << (i-1) << " pose(s) found." << endl;

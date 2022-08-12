@@ -52,6 +52,7 @@ std::vector<int> extra_wt;
 
 bool configset=false, protset=false, ligset=false, pktset=false;
 
+
 Protein* protein;
 int seql = 0;
 int mcoord_resno[256];
@@ -75,6 +76,10 @@ std::string origbuff = "";
 // Generally, tumble spheres give better results but let's leave best bind code
 // in place because we'll be reviving it later.
 bool use_bestbind_algorithm = default_bestbind;
+
+float* initial_binding;
+float* initial_vdWrepl;
+float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 
 void iteration_callback(int iter)
 {
@@ -221,11 +226,12 @@ int interpret_config_line(char** fields)
     else if (!strcmp(fields[0], "PATH"))
     {
         i=1;
+        int nodeno = atoi(fields[i]);
+        
         if (!strcmp(fields[i], "ABS")) i++;
         if (!strcmp(fields[i], "REL")) i++;
         if (!strcmp(fields[i], "RES")) i++;
-
-        int nodeno = atoi(fields[i]);
+        
         if (nodeno > 255)
         {
             cout << "Binding path is limited to 255 nodes." << endl;
@@ -363,6 +369,86 @@ void read_config_file(FILE* pf)
             interpret_config_line(fields);
         }
         buffer[0] = 0;
+    }
+}
+
+void prepare_initb()
+{
+	int i, j;
+	
+    if (differential_dock)
+    {
+    	initial_binding = new float[seql+4];
+    	initial_vdWrepl = new float[seql+4];
+
+        for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
+    	
+        std::vector<AminoAcid*> preres = protein->get_residues_near(pocketcen, pre_ligand_multimol_radius);
+        int qpr = preres.size();
+        AminoAcid* preaa[seql+4];
+        MovabilityType aamov[seql+4];
+
+        for (i=0; i<seql+4; i++) preaa[i] = nullptr;
+        for (i=0; i<qpr; i++)
+        {
+            preaa[i] = preres[i];
+            Atom* CA = preaa[i]->get_atom("CA");
+            if (!CA)
+            {
+                cout << "Residue " << preaa[i]->get_residue_no() << " is missing its CA." << endl;
+                throw 0xbad12e5;
+            }
+            float r = CA->get_location().get_3d_distance(pocketcen);
+            
+            aamov[i] = preaa[i]->movability;
+            
+            if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
+        }
+
+        if (pre_ligand_iteration_ratio)
+        {
+            Molecule** delete_me;
+            Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), delete_me = protein->all_residues_as_molecules(), iters*pre_ligand_iteration_ratio);
+            delete[] delete_me;
+        }
+
+        preres = protein->get_residues_near(pocketcen, 10000);
+        qpr = preres.size();
+        for (i=0; i<qpr; i++)
+        {
+            preaa[i] = preres[i];
+        }
+
+        for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
+
+        for (i=0; i<qpr; i++)
+        {
+            int resno = preaa[i]->get_residue_no();
+            #if _DBG_TOOLARGE_DIFFNUMS
+            std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
+            #endif
+            
+            for (j=0; j<qpr; j++)
+            {
+                if (j == i) continue;
+                float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]), j==0);
+                
+                #if _DBG_TOOLARGE_DIFFNUMS
+                if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
+                #endif
+                
+                initial_binding[resno] += f;
+                initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
+            }
+            
+            #if _DBG_TOOLARGE_DIFFNUMS
+            if (fabs(initial_binding[resno]) >= 200) cout << ibdbg << endl;
+            #endif
+        }
+
+        for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = total_binding_by_type[i];
+
+        for (i=0; i<qpr; i++) preaa[i]->movability = aamov[i];
     }
 }
 
@@ -652,9 +738,6 @@ int main(int argc, char** argv)
 
     srand(0xb00d1cca);
     // srand(time(NULL));
-    float initial_binding[seql+4];
-    float initial_vdWrepl[seql+4];
-    float init_total_binding_by_type[_INTER_TYPES_LIMIT];
     for (pose=1; pose<=poses; pose++)
     {
         ligand->minimize_internal_clashes();
@@ -669,77 +752,7 @@ int main(int argc, char** argv)
             fclose(pf);
         }
 
-        if (differential_dock)
-        {
-            std::vector<AminoAcid*> preres = p.get_residues_near(pocketcen, pre_ligand_multimol_radius);
-            qpr = preres.size();
-            AminoAcid* preaa[seql+4];
-            MovabilityType aamov[seql+4];
-
-            for (i=0; i<seql+4; i++) preaa[i] = nullptr;
-            for (i=0; i<qpr; i++)
-            {
-                preaa[i] = preres[i];
-                Atom* CA = preaa[i]->get_atom("CA");
-                if (!CA)
-                {
-                    cout << "Residue " << preaa[i]->get_residue_no() << " is missing its CA." << endl;
-                    throw 0xbad12e5;
-                }
-                float r = CA->get_location().get_3d_distance(pocketcen);
-                
-                aamov[i] = preaa[i]->movability;
-                
-                if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
-            }
-
-            for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
-
-            if (pre_ligand_iteration_ratio)
-            {
-                Molecule** delete_me;
-                Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), delete_me = p.all_residues_as_molecules(), iters*pre_ligand_iteration_ratio);
-                delete[] delete_me;
-            }
-
-            preres = p.get_residues_near(pocketcen, 10000);
-            qpr = preres.size();
-            for (i=0; i<qpr; i++)
-            {
-                preaa[i] = preres[i];
-            }
-
-            for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-
-            for (i=0; i<qpr; i++)
-            {
-                int resno = preaa[i]->get_residue_no();
-                #if _DBG_TOOLARGE_DIFFNUMS
-                std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
-                #endif
-                
-                for (j=0; j<qpr; j++)
-                {
-                    if (j == i) continue;
-                    float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]), j==0);
-                    
-                    #if _DBG_TOOLARGE_DIFFNUMS
-                    if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
-                    #endif
-                    
-                    initial_binding[resno] += f;
-                    initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
-                }
-                
-                #if _DBG_TOOLARGE_DIFFNUMS
-                if (fabs(initial_binding[resno]) >= 200) cout << ibdbg << endl;
-                #endif
-            }
-
-            for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = total_binding_by_type[i];
-
-            for (i=0; i<qpr; i++) preaa[i]->movability = aamov[i];
-        }
+        prepare_initb();
 
         if (pose <= 1)
         {
@@ -1082,8 +1095,9 @@ int main(int argc, char** argv)
             	pf = fopen(protafname, "r");
 		        p.load_pdb(pf);
 		        fclose(pf);
+		        prepare_initb();
             }
-
+            
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
             #endif
@@ -1124,8 +1138,8 @@ int main(int argc, char** argv)
                 // nodecen = nodecen.add(&path[nodeno]);
                 strcpy(buffer, pathstrs[nodeno].c_str());
                 fields = chop_spaced_fields(buffer);
-                nodecen = pocketcen_from_config_fields(fields, &nodecen);
-                if (!strcmp(fields[1], "RES"))
+                nodecen = pocketcen_from_config_fields(&fields[1], &nodecen);
+                if (!strcmp(fields[2], "RES"))
                 {
                     extra_wt.clear();
                     for (i=2; fields[i]; i++)
@@ -1551,7 +1565,7 @@ int main(int argc, char** argv)
                 
                 if (differential_dock)
                 {
-                    mkJmol[metcount] = final_binding[resno];
+                    mkJmol[metcount] = final_binding[resno] + lb;
                 }
                 else
                 {
@@ -1706,7 +1720,7 @@ int main(int argc, char** argv)
 
             // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
             // calculations for this pose.
-            if (btot < kJmol_cutoff) break;
+            if (btot < kJmol_cutoff && !differential_dock) break;
         }	// nodeno loop.
     } // pose loop.
     #if _DBG_STEPBYSTEP

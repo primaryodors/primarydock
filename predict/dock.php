@@ -37,7 +37,7 @@ PROT pdbs/$fam/$protid.rotated.pdb
 LIG sdf/geraniol.sdf
 
 CEN RES $cenr3_33 $cenr3_36 $cenr5_43 $cenr5_47 $cenr6_40 $cenr6_47
-PATH REL 1 0 0 0
+PATH 1 REL 0 0 0
 
 NODEPDB 1 pdbs/$fam/$protid.active.pdb
 
@@ -45,6 +45,9 @@ SIZE 6.0 7.5 5.5
 
 EXCL 1 $cyt1end		# Head, TMR1, and CYT1.
 EXCL $exr2start $exr2end	# EXR2 between TMR4 and TMR5.
+
+POSE 20
+ITER 100
 
 DIFF
 
@@ -63,6 +66,7 @@ set_time_limit(300);
 exec("bin/primarydock tmp/prediction.config", $outlines);
 
 echo implode("\n", $outlines);
+echo "\n\n";
 
 
 

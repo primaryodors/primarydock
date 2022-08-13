@@ -281,7 +281,7 @@ int interpret_config_line(char** fields)
     }
     else if (!strcmp(fields[0], "RETRY"))
     {
-        triesleft = atoi(fields[1]);
+        // triesleft = atoi(fields[1]);
         return 1;
     }
     else if (!strcmp(fields[0], "EMIN"))
@@ -770,6 +770,8 @@ int main(int argc, char** argv)
                 std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude()+4);
                 int tsphsz = tsphres.size();
                 float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
+                
+                for (i=0; i<tsphsz+4; i++) outer_sphere[i] = inner_sphere[i] = 0;
 
                 pocketsize = p.estimate_pocket_size(tsphres);
                 ligbbox = m.get_bounding_box();
@@ -1747,18 +1749,18 @@ int main(int argc, char** argv)
         {
             if (dr[j][0].pose == i)
             {
-                if (dr[j][0].kJmol >= kJmol_cutoff)
+                if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)
                 {
                     for (k=0; k<=pathnodes; k++)
                     {
                         // If pathnode is not within kJ/mol cutoff, abandon it and all subsequent pathnodes of the same pose.
                         if (dr[j][k].kJmol < kJmol_cutoff)
                         {
-                        	if (k < pathnodes)
-                        	{
+                        	/*if (k < pathnodes)
+                        	{*/
 		                    	cout << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
 		                    	if (output) *output << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
-	                    	}
+	                    	// }
                         	break;
                     	}
 

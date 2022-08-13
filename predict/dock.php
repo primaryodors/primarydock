@@ -10,6 +10,12 @@
 
 require("protutils.php");
 
+foreach (@$argv as $a)
+{
+	$a = explode('=',$a,2);
+	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
+}
+
 $protid = @$_REQUEST['prot'] ?: "OR1A1";
 $fam = family_from_protid($protid);
 
@@ -34,7 +40,7 @@ $configf = <<<heredoc
 
 PROT pdbs/$fam/$protid.rotated.pdb
 
-LIG sdf/geraniol.sdf
+LIG sdf/$ligname.sdf
 
 CEN RES $cenr3_33 $cenr3_36 $cenr5_43 $cenr5_47 $cenr6_40 $cenr6_47
 PATH 1 REL 0 0 0
@@ -48,9 +54,10 @@ EXCL $exr2start $exr2end	# EXR2 between TMR4 and TMR5.
 
 POSE 5
 RETRY 3
-ITER 100
+ITER 30
 
-DIFF
+# DIFF
+ELIM 1000
 
 OUT output/$protid-$ligname.pred.dock
 

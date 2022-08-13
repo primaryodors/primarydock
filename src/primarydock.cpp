@@ -1585,11 +1585,12 @@ int main(int argc, char** argv)
 
                 sprintf(metrics[metcount], "%s%d", reaches_spheroid[nodeno][i]->get_3letter(), resno);
                 // cout << metrics[metcount] << ": " << lb << " . ";
-                imkJmol[metcount] = initial_binding[resno];
 
                 if (differential_dock)
                 {
+                	imkJmol[metcount] = initial_binding[resno];
                     mvdWrepl[metcount] = final_vdWrepl[resno];
+                	imvdWrepl[metcount] = initial_vdWrepl[resno];
                 }
                 else
                 {
@@ -1600,9 +1601,9 @@ int main(int argc, char** argv)
                     	if (j == i) continue;
                     	mvdWrepl[metcount] += reaches_spheroid[nodeno][i]->get_vdW_repulsion(reaches_spheroid[nodeno][j]);
                     }*/
+                    imkJmol[metcount] = 0;
+                    imvdWrepl[metcount] = 0;
                 }
-
-                imvdWrepl[metcount] = initial_vdWrepl[resno];
                 metcount++;
                 btot += lb;
                 // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;

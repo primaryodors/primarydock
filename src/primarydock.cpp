@@ -1527,10 +1527,10 @@ int main(int argc, char** argv)
                 postaa[i+1] = reinterpret_cast<Molecule*>(allres[i]);
             }
 
-            for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-
             if (differential_dock)
             {
+                for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
+                
                 for (i=0; i<qpr+1; i++)
                 {
                     int resno = i ? (allres[i-1]->get_residue_no()) : 0;

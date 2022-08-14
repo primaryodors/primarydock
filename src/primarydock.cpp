@@ -1102,10 +1102,55 @@ int main(int argc, char** argv)
             if (strlen(protafname) && nodeno == activation_node)
             {
             	// TODO: Persist the flexions of the side chains, except for those residues whose positions are important to activation.
+                float* sidechain_bondrots[seql+4];
+                int sidechain_bondrotq[seql+4];
+                for (i=0; i<seql+4; i++)
+                {
+                    sidechain_bondrots[i] = nullptr;
+                    sidechain_bondrotq[i] = 0;
+                }
+                for (i=1; i<=seql; i++)
+                {
+                    Bond** b = p.get_residue(i)->get_rotatable_bonds();
+                    if (b)
+                    {
+                        int bq;
+                        for (bq=0; b[bq]; bq++);                // Get count.
+                        sidechain_bondrots[i] = new float[bq+2];
+                        for (j=0; j<bq; j++)
+                        {
+                            sidechain_bondrots[i][j] = b[j]->total_rotations;
+                        }
+                        sidechain_bondrotq[i] = j;
+
+                        delete[] b;
+                    }
+                }
+
             	pf = fopen(protafname, "r");
 		        p.load_pdb(pf);
 		        fclose(pf);
 		        prepare_initb();
+
+                for (i=1; i<=seql; i++)
+                {
+                    Bond** b = p.get_residue(i)->get_rotatable_bonds();
+                    if (b)
+                    {
+                        int bq;
+
+                        for (j=0; j<sidechain_bondrotq[i]; j++)
+                        {
+                            if (!b[j]) break;
+                            b[j]->clear_moves_with_cache();
+                            b[j]->rotate(sidechain_bondrots[i][j]);
+                        }
+
+                        delete[] b;
+                    }
+
+                    delete sidechain_bondrots[i];
+                }
             }
             
             #if _DBG_STEPBYSTEP
@@ -1444,8 +1489,7 @@ int main(int argc, char** argv)
                 if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
                 cfmols[i++] = reaches_spheroid[nodeno][j];
             }
-            for (; i<SPHREACH_MAX; i++)
-                cfmols[i] = NULL;
+            for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 
             // time_t preiter = time(NULL);
             if (differential_dock)
@@ -1461,11 +1505,14 @@ int main(int argc, char** argv)
             }
             else
             {
+                Molecule** delete_me;
                 Molecule::multimol_conform(
                     cfmols,
+                    delete_me = p.all_residues_as_molecules(),
                     iters,
                     &iteration_callback
                 );
+                delete[] delete_me;
             }
             /*time_t jlgsux = time(NULL);
             cout << "\nIterations took: " << (jlgsux-preiter) << " seconds." << endl;*/

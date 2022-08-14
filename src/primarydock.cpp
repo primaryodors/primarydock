@@ -1530,7 +1530,7 @@ int main(int argc, char** argv)
             if (differential_dock)
             {
                 for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-                
+
                 for (i=0; i<qpr+1; i++)
                 {
                     int resno = i ? (allres[i-1]->get_residue_no()) : 0;
@@ -1691,6 +1691,7 @@ int main(int argc, char** argv)
             }
 
             dr[drcount][nodeno].pdbdat = pdbdat.str();
+            // cout << "Attempt " << drcount << " node " << nodeno << " pdbdat is " << dr[drcount][nodeno].pdbdat.length() << " chars." << endl;
             if (debug) *debug << "Prepared the PDB strings." << endl;
 
             if (!nodeno)
@@ -1728,11 +1729,15 @@ int main(int argc, char** argv)
             }
 
             // drcount = pose;
-            drcount++;
+            if (nodeno == pathnodes) drcount++;
 
             // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
             // calculations for this pose.
-            if (btot < kJmol_cutoff && !differential_dock) break;
+            if (btot < kJmol_cutoff && !differential_dock)
+            {
+                drcount++;
+                break;
+            }
         }	// nodeno loop.
     } // pose loop.
     #if _DBG_STEPBYSTEP

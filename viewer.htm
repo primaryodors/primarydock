@@ -29,7 +29,7 @@ const aa3let =
 
 var opc_molecule = 1.0;
 var opc_ligand = 1.0;
-var opc_cartoon = 0.4;
+var opc_cartoon = 0.25;
 var opc_sidechain = 0.4;
 var opc_sidechain_active = 0.5;
 var opc_metal = 1.0;
@@ -351,12 +351,38 @@ Center:
 </div>
 </div>
 <center>
-<div id="viewport" style="width:1800px; height:880px; background-color: #100804;"></div>
+<div id="viewport" style="width:1800px; height:880px; background-color: #201008;"></div>
 </center>
 <script>
 
+function hsl_to_rgb(hue, sat, lum)
+{
+  sat /= 255;
+  lum /= 255;
+  const k = n => (n + hue / 30) % 12;
+  const a = sat * Math.min(lum, 1 - lum);
+  const f = n =>
+    lum - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  var r = 255 * f(0);
+  var g = 255 * f(8);
+  var b = 255 * f(4);
+  
+  return 0x10000*parseInt(r) + 0x100*parseInt(g) + parseInt(b);
+}
+
 // Can modify this array to your preferred TMR color scheme.
 var tmcolor =
+{
+    1: hsl_to_rgb(260,  64, 160),
+    2: hsl_to_rgb(200, 128, 160),
+    3: hsl_to_rgb(150, 192, 176),
+    4: hsl_to_rgb( 80,  64, 160),
+    5: hsl_to_rgb( 50, 192, 176),
+    6: hsl_to_rgb( 35, 192, 176),
+    7: hsl_to_rgb(340, 128, 160),
+};
+
+/*var tmcolor =
 {
     1: 0x887799,
     2: 0x0077ff,
@@ -365,7 +391,7 @@ var tmcolor =
     5: 0xffcc00,
     6: 0xff9900,
     7: 0xbb4466,
-};
+};*/
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 
@@ -840,9 +866,9 @@ stage.setParameters(
 {
 	'backgroundColor': '#080400',
 	'ambientColor': '#59f',
-    'ambientIntensity': 0.4,
+    'ambientIntensity': 0.5,
 	'lightColor': '#fc8',
-    'lightIntensity': 0.6,
+    'lightIntensity': 0.8,
 });
 
 // These do not work in Chrome on Linux.
@@ -1550,3 +1576,4 @@ $('#citefloat span')[0].innerText = nglcitation;
 
 <div id="seqdd" style="display: none;">
 </div>
+	

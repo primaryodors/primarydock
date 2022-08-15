@@ -741,7 +741,7 @@ int main(int argc, char** argv)
     int drcount = 0, qpr;
     
     cout << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
-    if (output) *output << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
+    if (output) *output << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
 
 	_try_again:
     // srand(0xb00d1cca);

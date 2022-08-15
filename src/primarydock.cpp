@@ -743,6 +743,7 @@ int main(int argc, char** argv)
     cout << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
     if (output) *output << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
 
+    found_poses = 0;
 	_try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
@@ -1680,7 +1681,7 @@ int main(int argc, char** argv)
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++)
             {
-                dr[drcount][nodeno].bytype[i] = fin_total_binding_by_type[i];
+                dr[drcount][nodeno].bytype[i] = differential_dock ? fin_total_binding_by_type[i] : total_binding_by_type[i];
                 dr[drcount][nodeno].ibytype[i] = init_total_binding_by_type[i];
                 dr[drcount][nodeno].ikJmol += init_total_binding_by_type[i];
                 dr[drcount][nodeno].kJmol += fin_total_binding_by_type[i];
@@ -1816,6 +1817,13 @@ int main(int argc, char** argv)
 	                    	// }
                         	break;
                     	}
+
+                        if (flex && !dr[j][k].pdbdat.length())
+                        {
+                            cout << "Pose " << j << " node " << k << " is missing." << endl;
+                            if (output) *output << "Pose " << j << " node " << k << " is missing." << endl;
+                            continue;
+                        }
 
                         cout << "Pose: " << i << endl << "Node: " << k << endl;
                         if (output) *output << "Pose: " << i << endl << "Node: " << k << endl;
@@ -1972,21 +1980,26 @@ int main(int argc, char** argv)
                         cout << endl;
                         if (output) *output << endl;
 
-                        if (!dr[j][k].pdbdat.length())
+                        if (flex)
                         {
-                            cout << "WARNING: Failed to generate PDB data." << endl;
-                            if (output) *output << "(Missing PDB data.)" << endl;
-                        }
-                        else
-                        {
-                            cout << "# PDB Data" << endl << "PDBDAT:" << endl;
-                            if (output) *output << "# PDB Data" << endl << "PDBDAT:" << endl;
+                            if (!dr[j][k].pdbdat.length())
+                            {
+                                cout << "WARNING: Failed to generate PDB data." << endl;
+                                if (output) *output << "(Missing PDB data.)" << endl;
+                            }
+                            else
+                            {
+                                cout << "# PDB Data" << endl << "PDBDAT:" << endl;
+                                if (output) *output << "# PDB Data" << endl << "PDBDAT:" << endl;
 
-                            if (output) *output << dr[j][k].pdbdat << endl;
-                            cout << dr[j][k].pdbdat << endl;
+                                if (output) *output << dr[j][k].pdbdat << endl;
+                                cout << dr[j][k].pdbdat << endl;
 
-                            cout << "TER" << endl << "END" << endl << endl << endl;
-                            if (output) *output << "TER" << endl << "END" << endl << endl << endl;
+                                cout << "TER" << endl << "END" << endl << endl << endl;
+                                if (output) *output << "TER" << endl << "END" << endl << endl << endl;
+
+                                if (!nodeno) found_poses++;
+                            }
                         }
                     }
                 }
@@ -2015,16 +2028,15 @@ int main(int argc, char** argv)
     }
 
 	_exitposes:
-	found_poses = i-1;
 	if (found_poses < poses && triesleft)
 	{
 		triesleft--;
 		goto _try_again;
 	}
 	
-    cout << (i-1) << " pose(s) found." << endl;
-    if (output) *output << (i-1) << " pose(s) found." << endl;
-    if (debug) *debug << (i-1) << " pose(s) found." << endl;
+    cout << found_poses << " pose(s) found." << endl;
+    if (output) *output << found_poses << " pose(s) found." << endl;
+    if (debug) *debug << found_poses << " pose(s) found." << endl;
 
     if (met) delete met;
 

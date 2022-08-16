@@ -96,7 +96,7 @@ void iteration_callback(int iter)
 
     #if allow_drift
     #if !pocketcen_is_loneliest
-    if (ligand->lastbind > 100)
+    if (ligand->lastbind <= -100)
     {
         ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
         ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
@@ -112,9 +112,12 @@ void iteration_callback(int iter)
     }
     else
     {
-        bary.x += (ligcen_target.x - bary.x) * drift;
-        bary.y += (ligcen_target.y - bary.y) * drift;
-        bary.z += (ligcen_target.z - bary.z) * drift;
+        if (ligand->lastbind <= -20)
+        {
+            bary.x += (ligcen_target.x - bary.x) * drift;
+            bary.y += (ligcen_target.y - bary.y) * drift;
+            bary.z += (ligcen_target.z - bary.z) * drift;
+        }
     }
 
     ligand->recenter(bary);
@@ -1918,7 +1921,7 @@ int main(int argc, char** argv)
                         cout << endl;
                         if (output) *output << endl;
 
-                    _btyp_unassigned:
+                        _btyp_unassigned:
 
                         if (differential_dock)
                         {
@@ -1997,10 +2000,10 @@ int main(int argc, char** argv)
 
                                 cout << "TER" << endl << "END" << endl << endl << endl;
                                 if (output) *output << "TER" << endl << "END" << endl << endl << endl;
-
-                                if (!nodeno) found_poses++;
                             }
                         }
+
+                        if (!nodeno) found_poses++;
                     }
                 }
                 else

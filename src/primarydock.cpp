@@ -112,17 +112,17 @@ void iteration_callback(int iter)
     }
     else
     {
-        if (ligand->lastbind <= -20)
+        if (ligand->lastbind < 0)
         {
             bary.x += (ligcen_target.x - bary.x) * drift;
             bary.y += (ligcen_target.y - bary.y) * drift;
             bary.z += (ligcen_target.z - bary.z) * drift;
         }
+        else drift *= (1.0 - 0.25/iters);
     }
 
     ligand->recenter(bary);
 
-    drift *= (1.0 - 0.5/iters);
     #endif
 
     if (gcfmols && seql)

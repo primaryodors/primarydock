@@ -2003,7 +2003,7 @@ int main(int argc, char** argv)
                             }
                         }
 
-                        if (!nodeno) found_poses++;
+                        if (!k) found_poses++;
                     }
                 }
                 else

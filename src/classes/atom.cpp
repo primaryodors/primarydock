@@ -1014,6 +1014,8 @@ void Bond::fill_moves_with_cache()
     int tmplen = 0;
     int i, j, k;
 
+    if (!btom) return;
+
     if (_DBGMOVES) cout << "What moves with " << btom->name << " when rotating about " << atom->name << "?" << endl;
 
     btom->used = true;
@@ -1120,6 +1122,7 @@ void Bond::enforce_moves_with_uniqueness()
 		return;
 	}
 	
+    if (!btom) return;
 	if (!moves_with_btom) return;
 	
 	int i, j, k;
@@ -1150,6 +1153,7 @@ void Bond::enforce_moves_with_uniqueness()
 
 bool Bond::rotate(float theta, bool allow_backbone)
 {
+    if (!btom) return false;
     if (!moves_with_btom) fill_moves_with_cache();
     enforce_moves_with_uniqueness();
     if (!moves_with_btom) return false;

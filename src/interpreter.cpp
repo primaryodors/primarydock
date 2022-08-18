@@ -372,8 +372,8 @@ int main(int argc, char** argv)
 	
 	if (/*!PDB_fname.length() ||*/ !script_fname.length())
 	{
-		/*cout << "Usage:" << endl << "interpreter protein.pdb script_filename" << endl;
-		cout << "interpreter script_filename protein.pdb" << endl;*/
+		/*cout << "Usage:" << endl << "peptiditor protein.pdb script_filename" << endl;
+		cout << "peptiditor script_filename protein.pdb" << endl;*/
 		cout << "Error: no script filename supplied." << endl;
 		cout << endl;
 		return 0;
@@ -613,6 +613,9 @@ int main(int argc, char** argv)
 				if (!a1.n) raise_error((std::string)"Residue " + to_string(r1) + (std::string)" not found in protein.");
 				a2.paa = p.get_residue(r2);
 				if (!a1.n) raise_error((std::string)"Residue " + to_string(r2) + (std::string)" not found in protein.");
+				
+				a1.pmol->movability = MOV_FLEXONLY;
+				a2.pmol->movability = MOV_FLEXONLY;
 				
 				Molecule* mm[5];
 				for (i=0; i<5; i++) mm[i] = nullptr;

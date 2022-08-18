@@ -38,6 +38,7 @@ char* get_file_ext(char* filename)
 
 char configfname[256];
 char protfname[256];
+char protafname[256];
 char ligfname[256];
 Point pocketcen, loneliest, pocketsize, ligbbox;
 std::ofstream *output = NULL;
@@ -51,6 +52,7 @@ std::vector<int> extra_wt;
 
 bool configset=false, protset=false, ligset=false, pktset=false;
 
+
 Protein* protein;
 int seql = 0;
 int mcoord_resno[256];
@@ -58,7 +60,7 @@ Molecule* ligand;
 Point ligcen_target;
 Point size(10,10,10);
 SCoord path[256];
-int pathnodes=1;		// The pocketcen is the initial node.
+int pathnodes=0;				// The pocketcen is the initial node.
 int poses = 10;
 int iters = 50;
 bool flex=true;
@@ -66,6 +68,9 @@ float kJmol_cutoff = 0.01;
 bool kcal = false;
 float drift = 0.333;
 Molecule** gcfmols = NULL;
+int activation_node = -1;		// Default is never.
+int found_poses = 0;
+int triesleft = 0;				// Default is no retry.
 
 std::string origbuff = "";
 
@@ -73,6 +78,10 @@ std::string origbuff = "";
 // Generally, tumble spheres give better results but let's leave best bind code
 // in place because we'll be reviving it later.
 bool use_bestbind_algorithm = default_bestbind;
+
+float* initial_binding;
+float* initial_vdWrepl;
+float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 
 void iteration_callback(int iter)
 {
@@ -87,7 +96,7 @@ void iteration_callback(int iter)
 
     #if allow_drift
     #if !pocketcen_is_loneliest
-    if (ligand->lastbind > 100)
+    if (ligand->lastbind <= -100)
     {
         ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
         ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
@@ -103,14 +112,17 @@ void iteration_callback(int iter)
     }
     else
     {
-        bary.x += (ligcen_target.x - bary.x) * drift;
-        bary.y += (ligcen_target.y - bary.y) * drift;
-        bary.z += (ligcen_target.z - bary.z) * drift;
+        if (ligand->lastbind < 0)
+        {
+            bary.x += (ligcen_target.x - bary.x) * drift;
+            bary.y += (ligcen_target.y - bary.y) * drift;
+            bary.z += (ligcen_target.z - bary.z) * drift;
+        }
+        else drift *= (1.0 - 0.25/iters);
     }
 
     ligand->recenter(bary);
 
-    drift *= (1.0 - 0.5/iters);
     #endif
 
     if (gcfmols && seql)
@@ -219,11 +231,12 @@ int interpret_config_line(char** fields)
     else if (!strcmp(fields[0], "PATH"))
     {
         i=1;
+        int nodeno = atoi(fields[i]);
+        
         if (!strcmp(fields[i], "ABS")) i++;
         if (!strcmp(fields[i], "REL")) i++;
         if (!strcmp(fields[i], "RES")) i++;
-
-        int nodeno = atoi(fields[i]);
+        
         if (nodeno > 255)
         {
             cout << "Binding path is limited to 255 nodes." << endl;
@@ -237,6 +250,11 @@ int interpret_config_line(char** fields)
             pathstrs[nodeno] = origbuff;
         }
         return i-1;
+    }
+    else if (!strcmp(fields[0], "NODEPDB"))
+    {
+    	activation_node = atoi(fields[1]);
+    	strcpy(protafname, fields[2]);
     }
     else if (!strcmp(fields[0], "STATE"))
     {
@@ -262,6 +280,11 @@ int interpret_config_line(char** fields)
     else if (!strcmp(fields[0], "POSE"))
     {
         poses = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "RETRY"))
+    {
+        // triesleft = atoi(fields[1]);
         return 1;
     }
     else if (!strcmp(fields[0], "EMIN"))
@@ -359,6 +382,86 @@ void read_config_file(FILE* pf)
     }
 }
 
+void prepare_initb()
+{
+	int i, j;
+	
+    if (differential_dock)
+    {
+    	initial_binding = new float[seql+4];
+    	initial_vdWrepl = new float[seql+4];
+
+        for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
+    	
+        std::vector<AminoAcid*> preres = protein->get_residues_near(pocketcen, pre_ligand_multimol_radius);
+        int qpr = preres.size();
+        AminoAcid* preaa[seql+4];
+        MovabilityType aamov[seql+4];
+
+        for (i=0; i<seql+4; i++) preaa[i] = nullptr;
+        for (i=0; i<qpr; i++)
+        {
+            preaa[i] = preres[i];
+            Atom* CA = preaa[i]->get_atom("CA");
+            if (!CA)
+            {
+                cout << "Residue " << preaa[i]->get_residue_no() << " is missing its CA." << endl;
+                throw 0xbad12e5;
+            }
+            float r = CA->get_location().get_3d_distance(pocketcen);
+            
+            aamov[i] = preaa[i]->movability;
+            
+            if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
+        }
+
+        if (pre_ligand_iteration_ratio)
+        {
+            Molecule** delete_me;
+            Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), delete_me = protein->all_residues_as_molecules(), iters*pre_ligand_iteration_ratio);
+            delete[] delete_me;
+        }
+
+        preres = protein->get_residues_near(pocketcen, 10000);
+        qpr = preres.size();
+        for (i=0; i<qpr; i++)
+        {
+            preaa[i] = preres[i];
+        }
+
+        for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
+
+        for (i=0; i<qpr; i++)
+        {
+            int resno = preaa[i]->get_residue_no();
+            #if _DBG_TOOLARGE_DIFFNUMS
+            std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
+            #endif
+            
+            for (j=0; j<qpr; j++)
+            {
+                if (j == i) continue;
+                float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]), j==0);
+                
+                #if _DBG_TOOLARGE_DIFFNUMS
+                if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
+                #endif
+                
+                initial_binding[resno] += f;
+                initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
+            }
+            
+            #if _DBG_TOOLARGE_DIFFNUMS
+            if (fabs(initial_binding[resno]) >= 200) cout << ibdbg << endl;
+            #endif
+        }
+
+        for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = total_binding_by_type[i];
+
+        for (i=0; i<qpr; i++) preaa[i]->movability = aamov[i];
+    }
+}
+
 int main(int argc, char** argv)
 {
     char buffer[65536];
@@ -367,7 +470,7 @@ int main(int argc, char** argv)
     for (i=0; i<65536; i++) buffer[i] = 0;
 
     for (i=0; i<256; i++)
-        configfname[i] = protfname[i] = ligfname[i] = 0;
+        configfname[i] = protfname[i] = protafname[i] = ligfname[i] = 0;
 
     time_t began = time(NULL);
 
@@ -636,15 +739,17 @@ int main(int argc, char** argv)
             cout << endl;
         }
 
-    DockResult dr[poses+2][pathnodes+2];
+    DockResult dr[poses*(triesleft+1)+8][pathnodes+2];
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
     int drcount = 0, qpr;
+    
+    cout << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
+    if (output) *output << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
 
-    srand(0xb00d1cca);
-    // srand(time(NULL));
-    float initial_binding[seql+4];
-    float initial_vdWrepl[seql+4];
-    float init_total_binding_by_type[_INTER_TYPES_LIMIT];
+    found_poses = 0;
+	_try_again:
+    // srand(0xb00d1cca);
+    srand(time(NULL));
     for (pose=1; pose<=poses; pose++)
     {
         ligand->minimize_internal_clashes();
@@ -659,77 +764,7 @@ int main(int argc, char** argv)
             fclose(pf);
         }
 
-        if (differential_dock)
-        {
-            std::vector<AminoAcid*> preres = p.get_residues_near(pocketcen, pre_ligand_multimol_radius);
-            qpr = preres.size();
-            AminoAcid* preaa[seql+4];
-            MovabilityType aamov[seql+4];
-
-            for (i=0; i<seql+4; i++) preaa[i] = nullptr;
-            for (i=0; i<qpr; i++)
-            {
-                preaa[i] = preres[i];
-                Atom* CA = preaa[i]->get_atom("CA");
-                if (!CA)
-                {
-                    cout << "Residue " << preaa[i]->get_residue_no() << " is missing its CA." << endl;
-                    throw 0xbad12e5;
-                }
-                float r = CA->get_location().get_3d_distance(pocketcen);
-                
-                aamov[i] = preaa[i]->movability;
-                
-                if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
-            }
-
-            for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
-
-            if (pre_ligand_iteration_ratio)
-            {
-                Molecule** delete_me;
-                Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), delete_me = p.all_residues_as_molecules(), iters*pre_ligand_iteration_ratio);
-                delete[] delete_me;
-            }
-
-            preres = p.get_residues_near(pocketcen, 10000);
-            qpr = preres.size();
-            for (i=0; i<qpr; i++)
-            {
-                preaa[i] = preres[i];
-            }
-
-            for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-
-            for (i=0; i<qpr; i++)
-            {
-                int resno = preaa[i]->get_residue_no();
-                #if _DBG_TOOLARGE_DIFFNUMS
-                std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
-                #endif
-                
-                for (j=0; j<qpr; j++)
-                {
-                    if (j == i) continue;
-                    float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]), j==0);
-                    
-                    #if _DBG_TOOLARGE_DIFFNUMS
-                    if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
-                    #endif
-                    
-                    initial_binding[resno] += f;
-                    initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
-                }
-                
-                #if _DBG_TOOLARGE_DIFFNUMS
-                if (fabs(initial_binding[resno]) >= 200) cout << ibdbg << endl;
-                #endif
-            }
-
-            for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = total_binding_by_type[i];
-
-            for (i=0; i<qpr; i++) preaa[i]->movability = aamov[i];
-        }
+        prepare_initb();
 
         if (pose <= 1)
         {
@@ -739,6 +774,8 @@ int main(int argc, char** argv)
                 std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude()+4);
                 int tsphsz = tsphres.size();
                 float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
+                
+                for (i=0; i<tsphsz+4; i++) outer_sphere[i] = inner_sphere[i] = 0;
 
                 pocketsize = p.estimate_pocket_size(tsphres);
                 ligbbox = m.get_bounding_box();
@@ -1065,7 +1102,61 @@ int main(int argc, char** argv)
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
             if (pathstrs.size() < nodeno) break;
+            
+            if (strlen(protafname) && nodeno == activation_node)
+            {
+            	// TODO: Persist the flexions of the side chains, except for those residues whose positions are important to activation.
+                float* sidechain_bondrots[seql+4];
+                int sidechain_bondrotq[seql+4];
+                for (i=0; i<seql+4; i++)
+                {
+                    sidechain_bondrots[i] = nullptr;
+                    sidechain_bondrotq[i] = 0;
+                }
+                for (i=1; i<=seql; i++)
+                {
+                    Bond** b = p.get_residue(i)->get_rotatable_bonds();
+                    if (b)
+                    {
+                        int bq;
+                        for (bq=0; b[bq]; bq++);                // Get count.
+                        sidechain_bondrots[i] = new float[bq+2];
+                        for (j=0; j<bq; j++)
+                        {
+                            sidechain_bondrots[i][j] = b[j]->total_rotations;
+                        }
+                        sidechain_bondrotq[i] = j;
 
+                        delete[] b;
+                    }
+                }
+
+            	pf = fopen(protafname, "r");
+		        p.load_pdb(pf);
+		        fclose(pf);
+		        prepare_initb();
+
+                for (i=1; i<=seql; i++)
+                {
+                    Bond** b = p.get_residue(i)->get_rotatable_bonds();
+                    if (b)
+                    {
+                        int bq;
+
+                        for (j=0; j<sidechain_bondrotq[i]; j++)
+                        {
+                            if (!b[j]) break;
+                            b[j]->clear_moves_with_cache();
+                            b[j]->rotate(sidechain_bondrots[i][j]);
+                        }
+
+                        delete[] b;
+                    }
+
+                    delete sidechain_bondrots[i];
+                }
+            }
+            
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
             #endif
@@ -1106,8 +1197,8 @@ int main(int argc, char** argv)
                 // nodecen = nodecen.add(&path[nodeno]);
                 strcpy(buffer, pathstrs[nodeno].c_str());
                 fields = chop_spaced_fields(buffer);
-                nodecen = pocketcen_from_config_fields(fields, &nodecen);
-                if (!strcmp(fields[1], "RES"))
+                nodecen = pocketcen_from_config_fields(&fields[1], &nodecen);
+                if (!strcmp(fields[2], "RES"))
                 {
                     extra_wt.clear();
                     for (i=2; fields[i]; i++)
@@ -1402,8 +1493,7 @@ int main(int argc, char** argv)
                 if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
                 cfmols[i++] = reaches_spheroid[nodeno][j];
             }
-            for (; i<SPHREACH_MAX; i++)
-                cfmols[i] = NULL;
+            for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 
             // time_t preiter = time(NULL);
             if (differential_dock)
@@ -1419,11 +1509,14 @@ int main(int argc, char** argv)
             }
             else
             {
+                Molecule** delete_me;
                 Molecule::multimol_conform(
                     cfmols,
+                    delete_me = p.all_residues_as_molecules(),
                     iters,
                     &iteration_callback
                 );
+                delete[] delete_me;
             }
             /*time_t jlgsux = time(NULL);
             cout << "\nIterations took: " << (jlgsux-preiter) << " seconds." << endl;*/
@@ -1485,10 +1578,10 @@ int main(int argc, char** argv)
                 postaa[i+1] = reinterpret_cast<Molecule*>(allres[i]);
             }
 
-            for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-
             if (differential_dock)
             {
+                for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
+
                 for (i=0; i<qpr+1; i++)
                 {
                     int resno = i ? (allres[i-1]->get_residue_no()) : 0;
@@ -1533,7 +1626,7 @@ int main(int argc, char** argv)
                 
                 if (differential_dock)
                 {
-                    mkJmol[metcount] = final_binding[resno];
+                    mkJmol[metcount] = final_binding[resno] + lb;
                 }
                 else
                 {
@@ -1543,11 +1636,12 @@ int main(int argc, char** argv)
 
                 sprintf(metrics[metcount], "%s%d", reaches_spheroid[nodeno][i]->get_3letter(), resno);
                 // cout << metrics[metcount] << ": " << lb << " . ";
-                imkJmol[metcount] = initial_binding[resno];
 
                 if (differential_dock)
                 {
+                	imkJmol[metcount] = initial_binding[resno];
                     mvdWrepl[metcount] = final_vdWrepl[resno];
+                	imvdWrepl[metcount] = initial_vdWrepl[resno];
                 }
                 else
                 {
@@ -1558,9 +1652,9 @@ int main(int argc, char** argv)
                     	if (j == i) continue;
                     	mvdWrepl[metcount] += reaches_spheroid[nodeno][i]->get_vdW_repulsion(reaches_spheroid[nodeno][j]);
                     }*/
+                    imkJmol[metcount] = 0;
+                    imvdWrepl[metcount] = 0;
                 }
-
-                imvdWrepl[metcount] = initial_vdWrepl[resno];
                 metcount++;
                 btot += lb;
                 // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;
@@ -1570,7 +1664,7 @@ int main(int argc, char** argv)
             if (btot > 15*m.get_atom_count()) btot = 0;
             if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
             
-            drcount = pose-1;
+            // drcount = pose-1+found_poses;
 
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared metrics." << endl;
@@ -1590,7 +1684,7 @@ int main(int argc, char** argv)
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++)
             {
-                dr[drcount][nodeno].bytype[i] = fin_total_binding_by_type[i];
+                dr[drcount][nodeno].bytype[i] = differential_dock ? fin_total_binding_by_type[i] : total_binding_by_type[i];
                 dr[drcount][nodeno].ibytype[i] = init_total_binding_by_type[i];
                 dr[drcount][nodeno].ikJmol += init_total_binding_by_type[i];
                 dr[drcount][nodeno].kJmol += fin_total_binding_by_type[i];
@@ -1648,6 +1742,7 @@ int main(int argc, char** argv)
             }
 
             dr[drcount][nodeno].pdbdat = pdbdat.str();
+            // cout << "Attempt " << drcount << " node " << nodeno << " pdbdat is " << dr[drcount][nodeno].pdbdat.length() << " chars." << endl;
             if (debug) *debug << "Prepared the PDB strings." << endl;
 
             if (!nodeno)
@@ -1684,11 +1779,16 @@ int main(int argc, char** argv)
                 #endif
             }
 
-            drcount = pose;
+            // drcount = pose;
+            if (nodeno == pathnodes) drcount++;
 
             // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
             // calculations for this pose.
-            if (btot < kJmol_cutoff) break;
+            if (btot < kJmol_cutoff && !differential_dock)
+            {
+                drcount++;
+                break;
+            }
         }	// nodeno loop.
     } // pose loop.
     #if _DBG_STEPBYSTEP
@@ -1706,12 +1806,27 @@ int main(int argc, char** argv)
         {
             if (dr[j][0].pose == i)
             {
-                if (dr[j][0].kJmol >= kJmol_cutoff)
+                if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)
                 {
                     for (k=0; k<=pathnodes; k++)
                     {
                         // If pathnode is not within kJ/mol cutoff, abandon it and all subsequent pathnodes of the same pose.
-                        if (dr[j][k].kJmol < kJmol_cutoff) break;
+                        if (dr[j][k].kJmol < kJmol_cutoff)
+                        {
+                        	/*if (k < pathnodes)
+                        	{*/
+		                    	cout << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
+		                    	if (output) *output << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
+	                    	// }
+                        	break;
+                    	}
+
+                        if (flex && !dr[j][k].pdbdat.length())
+                        {
+                            cout << "Pose " << j << " node " << k << " is missing." << endl;
+                            if (output) *output << "Pose " << j << " node " << k << " is missing." << endl;
+                            continue;
+                        }
 
                         cout << "Pose: " << i << endl << "Node: " << k << endl;
                         if (output) *output << "Pose: " << i << endl << "Node: " << k << endl;
@@ -1806,7 +1921,7 @@ int main(int argc, char** argv)
                         cout << endl;
                         if (output) *output << endl;
 
-                    _btyp_unassigned:
+                        _btyp_unassigned:
 
                         if (differential_dock)
                         {
@@ -1868,22 +1983,27 @@ int main(int argc, char** argv)
                         cout << endl;
                         if (output) *output << endl;
 
-                        if (!dr[j][k].pdbdat.length())
+                        if (flex)
                         {
-                            cout << "WARNING: Failed to generate PDB data." << endl;
-                            if (output) *output << "(Missing PDB data.)" << endl;
-                        }
-                        else
-                        {
-                            cout << "# PDB Data" << endl << "PDBDAT:" << endl;
-                            if (output) *output << "# PDB Data" << endl << "PDBDAT:" << endl;
+                            if (!dr[j][k].pdbdat.length())
+                            {
+                                cout << "WARNING: Failed to generate PDB data." << endl;
+                                if (output) *output << "(Missing PDB data.)" << endl;
+                            }
+                            else
+                            {
+                                cout << "# PDB Data" << endl << "PDBDAT:" << endl;
+                                if (output) *output << "# PDB Data" << endl << "PDBDAT:" << endl;
 
-                            if (output) *output << dr[j][k].pdbdat << endl;
-                            cout << dr[j][k].pdbdat << endl;
+                                if (output) *output << dr[j][k].pdbdat << endl;
+                                cout << dr[j][k].pdbdat << endl;
 
-                            cout << "TER" << endl << "END" << endl << endl << endl;
-                            if (output) *output << "TER" << endl << "END" << endl << endl << endl;
+                                cout << "TER" << endl << "END" << endl << endl << endl;
+                                if (output) *output << "TER" << endl << "END" << endl << endl << endl;
+                            }
                         }
+
+                        if (!nodeno) found_poses++;
                     }
                 }
                 else
@@ -1911,9 +2031,15 @@ int main(int argc, char** argv)
     }
 
 	_exitposes:
-    cout << (i-1) << " pose(s) found." << endl;
-    if (output) *output << (i-1) << " pose(s) found." << endl;
-    if (debug) *debug << (i-1) << " pose(s) found." << endl;
+	if (found_poses < poses && triesleft)
+	{
+		triesleft--;
+		goto _try_again;
+	}
+	
+    cout << found_poses << " pose(s) found." << endl;
+    if (output) *output << found_poses << " pose(s) found." << endl;
+    if (debug) *debug << found_poses << " pose(s) found." << endl;
 
     if (met) delete met;
 

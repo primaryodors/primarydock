@@ -1,10 +1,12 @@
 
-# PrimaryDock Interpreted Script Documentation
+# Peptiditor Documentation
 
-To run a PrimaryDock interpreted script, after building PrimaryDock, please use the following command:
+Peptiditor: The Scripted Peptide Editor.
+
+To run a Peptiditor script, after building PrimaryDock, please use the following command:
 
 ```
-bin/interpreter path/to/script.pdis
+bin/peptiditor path/to/script.pepd
 ```
 
 # Variables
@@ -68,10 +70,10 @@ to either a phi or psi rotation of the start residue.
 Note that the end residue will be disconnected from its neighbor and will require to be reconnected.
 
 Valid bond directions are:
-N-CA		Keep the residue's N terminus stationary and rotate its C terminus about the N-CA (phi) bond;
-CA-C		Keep the residue's N terminus stationary and rotate its C terminus about the CA-C (psi) bond;
-CA-N		Keep the residue's C terminus stationary and rotate its N terminus about the CA-N (phi) bond;
-C-CA		Keep the residue's C terminus stationary and rotate its N terminus about the C-CA (psi) bond;
+N-CA		Keep the residue's N terminus stationary and rotate its C terminus and subsequent residues about the N-CA (phi) bond;
+CA-C		Keep the residue's N terminus stationary and rotate its C terminus and subsequent residues about the CA-C (psi) bond;
+CA-N		Keep the residue's C terminus stationary and rotate its N terminus and preceding residues about the CA-N (phi) bond;
+C-CA		Keep the residue's C terminus stationary and rotate its N terminus and preceding residues about the C-CA (psi) bond;
 
 Note if bending in the N-CA or CA-C direction, i.e. towards higher numbered residues, then the end residue must be greater than the start residue.
 If bending in the C-CA or CA-N direction, the start residue must be greater than the end residue.

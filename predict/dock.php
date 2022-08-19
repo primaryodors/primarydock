@@ -10,6 +10,8 @@
 
 require("protutils.php");
 
+$dock_retries = 5;
+
 foreach (@$argv as $a)
 {
 	$a = explode('=',$a,2);
@@ -52,12 +54,11 @@ SIZE 6.0 7.5 5.5
 EXCL 1 $cyt1end		# Head, TMR1, and CYT1.
 EXCL $exr2start $exr2end	# EXR2 between TMR4 and TMR5.
 
-POSE 5
-RETRY 3
+POSE 10
 ITER 30
 
-# DIFF
-ELIM 1000
+DIFF
+ELIM 100
 
 OUT output/$protid-$ligname.pred.dock
 
@@ -70,19 +71,64 @@ fwrite($f, $configf);
 fclose($f);
 
 $outlines = [];
-set_time_limit(300);
-exec("bin/primarydock tmp/prediction.config", $outlines);
+if (@$_REQUEST['saved'])
+{
+	$outlines = explode("\n", file_get_contents($_REQUEST['saved']));
+}
+else
+{
+	for ($try = 0; $try < $dock_retries; $try++)
+	{
+		set_time_limit(300);
+		exec("bin/primarydock tmp/prediction.config", $outlines);
+		if (count($outlines) >= 100) break;
+	}
+}
+// echo implode("\n", $outlines) . "\n\n";
 
-echo implode("\n", $outlines);
-echo "\n\n";
+if (count($outlines) < 100) die("Docking FAILED.\n");
 
+$benerg = [];
+$pose = false;
+$node = -1;
 
+foreach ($outlines as $ln)
+{
+	if (substr($ln, 0, 6) == "Pose: ") $pose = intval(explode(" ", $ln)[1]);
+	if (substr($ln, 0, 6) == "Node: ") $node = intval(explode(" ", $ln)[1]);
+	if (trim($ln) == "TER")
+	{
+		$pose = false;
+		$node = -1;
+	}
+	
+	if ($pose && $node>=0 && substr($ln, 0, 7) == "Total: ") $benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
+}
 
+// print_r($benerg);
 
+$sum = [];
+$count = [];
+foreach ($benerg as $pose => $data)
+{
+	foreach ($data as $node => $value)
+	{
+		if (!isset($sum[$node]  )) $sum[$node] = 0.0;
+		if (!isset($count[$node])) $count[$node] = 0;
+		
+		$sum[$node] += $value;
+		$count[$node]++;
+	}
+}
 
+$average = [];
 
+foreach ($sum as $node => $value)
+{
+	$average[$node] = $value / (@$count[$node] ?: 1);
+}
 
-
+print_r($average);
 
 
 

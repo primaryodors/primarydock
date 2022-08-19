@@ -13,6 +13,13 @@ require("protutils.php");
 $dock_retries = 5;
 
 $dock_results = [];
+$json_file = "predict/dock_results.json";
+
+
+if (file_exists($json_file))
+{
+	$dock_results = json_decode(file_get_contents($json_file));
+}
 
 foreach (@$argv as $a)
 {
@@ -136,9 +143,10 @@ else
 {
 	$dock_results[$protid][$ligname] = $average;
 	
-	$f = fopen("predict/dock_results.json", "wb");
-	if (!f) die("File write FAILED.");
+	$f = fopen($json_file, "wb");
+	if (!f) die("File write FAILED. Make sure have access to write $json_file.");
 	fwrite($f, json_encode_pretty($dock_results));
+	fclose($f);
 }
 
 

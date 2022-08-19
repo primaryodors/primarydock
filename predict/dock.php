@@ -12,6 +12,8 @@ require("protutils.php");
 
 $dock_retries = 5;
 
+$dock_results = [];
+
 foreach (@$argv as $a)
 {
 	$a = explode('=',$a,2);
@@ -128,8 +130,16 @@ foreach ($sum as $node => $value)
 	$average[$node] = $value / (@$count[$node] ?: 1);
 }
 
-print_r($average);
-
+if (@$_REQUEST['saved'])
+	print_r($average);
+else
+{
+	$dock_results[$protid][$ligname] = $average;
+	
+	$f = fopen("predict/dock_results.json", "wb");
+	if (!f) die("File write FAILED.");
+	fwrite($f, json_encode_pretty($dock_results));
+}
 
 
 

@@ -294,6 +294,49 @@
                 "nutty",
                 "potato"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.28"
+                }
+            }
+        }
+    },
+    "bdbe8f05e97e670c73760cfda2a1bc59":
+    {
+        "full_name": "2-acetyl-3-methylpyrazine ",
+        "smiles": "CC1=NC=CN=C1C(=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "nutty",
+                "nut_flesh",
+                "hazelnut",
+                "roasted_hazelnut",
+                "grain",
+                "toasted_grain",
+                "corn_chip",
+                "vegetable",
+                "nut_skin",
+                "caramellic"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.27"
+                }
+            }
         }
     },
     "79f90c652e45fd4c5c7e1f6bc4dd1892":
@@ -878,6 +921,14 @@
                     "type": "sa",
                     "ec50": "-4.7"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
+            {
+                "OR2T11":
+                {
+                    "type": "na",
+                    "antagonist": "1"
+                }
             }
         }
     },
@@ -971,6 +1022,30 @@
                 "OR4D1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
+            {
+                "OR2T11":
+                {
+                    "type": "na",
+                    "antagonist": "1"
+                }
+            }
+        }
+    },
+    "8b16e36657a9f5be9eeb045ac6e4d47d":
+    {
+        "full_name": "alpha-isomethyl ionone",
+        "smiles": "CC(=O)C(\\C)=CC1C(C)=CCCC1(C)C",
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
+            {
+                "OR2T11":
+                {
+                    "type": "na",
+                    "antagonist": "1"
                 }
             }
         }
@@ -1304,6 +1379,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.64"
                 }
             }
         }
@@ -2622,6 +2705,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
+            {
+                "OR2T11":
+                {
+                    "type": "na",
+                    "antagonist": "1"
+                }
             }
         }
     },
@@ -2743,6 +2834,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
+            {
+                "OR2T11":
+                {
+                    "type": "na",
+                    "antagonist": "1"
                 }
             }
         }
@@ -2875,6 +2974,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
+            {
+                "OR2T11":
+                {
+                    "type": "na",
+                    "antagonist": "1"
                 }
             }
         }
@@ -4747,6 +4854,13 @@
                 {
                     "type": "vwa"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -5667,6 +5781,19 @@
                     "ec50": "-4.52"
                 }
             },
+            "https:\/\/pubmed.ncbi.nlm.nih.gov\/35350604\/":
+            {
+                "OR51A4":
+                {
+                    "type": "ma",
+                    "ec50": "-3.6"
+                },
+                "OR52B2":
+                {
+                    "type": "wa",
+                    "ec50": "-3.3"
+                }
+            },
             "https:\/\/https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/":
             {
                 "OR51B4":
@@ -5894,6 +6021,14 @@
                 "OR5AN1":
                 {
                     "type": "ma"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.06"
                 }
             }
         }
@@ -6978,6 +7113,14 @@
                 {
                     "type": "ma"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.43"
+                }
             }
         }
     },
@@ -7670,6 +7813,21 @@
             ]
         }
     },
+    "55faf7a234638b5a2a4edfd80dc6aee5":
+    {
+        "full_name": "delta-damascone",
+        "smiles": "CC1(C)C\\C=C\/C(C)C1C(=O)C=CC",
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
+            {
+                "OR2T11":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "b013143acfa662e12b38998c4c06679d":
     {
         "full_name": "delta-decalactone",
@@ -8074,6 +8232,14 @@
                 "OR5K1":
                 {
                     "type": "vsa"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.99"
                 }
             }
         }
@@ -8561,6 +8727,38 @@
                 {
                     "type": "sa",
                     "ec50": "-5.63"
+                }
+            }
+        }
+    },
+    "865f7f2e52aeed5ab40b709e9d1f2e4b":
+    {
+        "full_name": "2,6-dimethylpyrazine",
+        "smiles": "CC1=CN=CC(=N1)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "ethereal",
+                "cocoa",
+                "nutty",
+                "roasted",
+                "meaty",
+                "roasted_meaty",
+                "beefy",
+                "brown",
+                "coffee",
+                "buttermilk"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.26"
                 }
             }
         }
@@ -9657,6 +9855,30 @@
                 {
                     "type": "sa"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.52"
+                }
+            }
+        }
+    },
+    "f03a5ebabbbcbf008e908e0764a98c54":
+    {
+        "full_name": "2-ethyl-3_6-dimethylpyrazine",
+        "smiles": "CCC1=NC(=CN=C1C)C",
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.83"
+                }
             }
         }
     },
@@ -9741,6 +9963,14 @@
                 "OR5AN1":
                 {
                     "type": "wa"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "sa",
+                    "ec50": "-0.95"
                 }
             }
         }
@@ -10089,6 +10319,46 @@
                 "nutty",
                 "raw potato"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.01"
+                }
+            }
+        }
+    },
+    "2a53709a41f2d862689bd5f39567e527":
+    {
+        "full_name": "2-ethyl-3-methylpyrazine ",
+        "smiles": "CCC1=NC=CN=C1C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "nutty",
+                "peanut",
+                "musty",
+                "corn",
+                "raw",
+                "earthy",
+                "bready"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.27"
+                }
+            }
         }
     },
     "a52b32d487248685ee24b07447c3bac7":
@@ -11251,6 +11521,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "ma",
+                    "ec50": "-6.45"
+                }
             }
         }
     },
@@ -11780,11 +12058,11 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "floral",
                 "green",
                 "lavender",
                 "rose",
-                "waxy",
-                "floral"
+                "waxy"
             ]
         },
         "activity":
@@ -12229,6 +12507,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.66"
+                }
             }
         }
     },
@@ -12494,6 +12780,13 @@
                 {
                     "type": "vwa"
                 },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
                 "OR5AN1":
                 {
                     "type": "na"
@@ -13871,6 +14164,21 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
+            {
+                "OR2T1":
+                {
+                    "type": "vsa"
+                },
+                "OR2T11":
+                {
+                    "type": "vsa"
+                },
+                "OR2T6":
+                {
+                    "type": "vsa"
+                }
             }
         }
     },
@@ -14600,6 +14908,14 @@
                 {
                     "type": "ma"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.75"
+                }
             }
         }
     },
@@ -14736,6 +15052,13 @@
                     "type": "na"
                 },
                 "OR5AN1":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
+            {
+                "OR2T11":
                 {
                     "type": "na"
                 }
@@ -16629,6 +16952,21 @@
                 {
                     "type": "vwa"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
+            {
+                "OR2T1":
+                {
+                    "type": "ma"
+                },
+                "OR2T11":
+                {
+                    "type": "sa"
+                },
+                "OR2T6":
+                {
+                    "type": "ma"
+                }
             }
         }
     },
@@ -16700,6 +17038,14 @@
                 "OR5K1":
                 {
                     "type": "ma"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.84"
                 }
             }
         }
@@ -17285,6 +17631,14 @@
                 {
                     "type": "wa"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.21"
+                }
             }
         }
     },
@@ -17737,6 +18091,13 @@
                 "OR2W1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa"
                 }
             }
         }
@@ -18434,6 +18795,14 @@
                 {
                     "type": "ma"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.58"
+                }
             }
         }
     },
@@ -18507,6 +18876,14 @@
                 "OR5AN1":
                 {
                     "type": "ma"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.54"
                 }
             }
         }
@@ -18600,6 +18977,14 @@
                 {
                     "type": "ma"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.8"
+                }
             }
         }
     },
@@ -18630,6 +19015,14 @@
                 {
                     "type": "wa",
                     "ec50": "-2.92"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR5AN1":
+                {
+                    "type": "ma",
+                    "ec50": "-7.48"
                 }
             }
         }
@@ -19303,6 +19696,19 @@
                 {
                     "type": "vwa",
                     "ec50": "-1.71"
+                }
+            },
+            "https:\/\/pubmed.ncbi.nlm.nih.gov\/35350604\/":
+            {
+                "OR10G8":
+                {
+                    "type": "ma",
+                    "ec50": "-4.4"
+                },
+                "OR52A1":
+                {
+                    "type": "wa",
+                    "ec50": "-3.2"
                 }
             }
         }
@@ -23705,6 +24111,17 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR1A1":
+                {
+                    "type": "ma"
+                },
+                "OR5AN1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -24328,6 +24745,13 @@
                     "type": "ma",
                     "ec50": "-4.4"
                 }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
+            {
+                "OR1A1":
+                {
+                    "type": "wa"
+                }
             }
         }
     },
@@ -24598,6 +25022,17 @@
                 "pepper",
                 "raw"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.03"
+                }
+            }
         }
     },
     "e6d2c19d6b1604153ce7779e92c0d75d":
@@ -25161,6 +25596,7 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "woody",
                 "bois",
                 "citrus",
                 "de",
@@ -25171,8 +25607,7 @@
                 "oily",
                 "rind",
                 "rose",
-                "tea",
-                "woody"
+                "tea"
             ]
         },
         "activity":
@@ -25815,6 +26250,23 @@
     {
         "full_name": "2,3,5-trimethylpyrazine",
         "smiles": "CC1=CN=C(C(=N1)C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "nutty",
+                "nut_skin",
+                "earthy",
+                "powdery",
+                "cocoa",
+                "potato",
+                "baked_potato",
+                "peanut",
+                "roasted_peanut",
+                "hazelnut",
+                "musty"
+            ]
+        },
         "activity":
         {
             "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
@@ -25823,6 +26275,14 @@
                 {
                     "type": "ma",
                     "ec50": "-4"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.86"
                 }
             }
         }
@@ -26338,6 +26798,15 @@
                 "OR3A1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/pubmed.ncbi.nlm.nih.gov\/18603653\/":
+            {
+                "OR1G1":
+                {
+                    "type": "ma",
+                    "ec50": "-6.3",
+                    "antagonist": "1"
                 }
             }
         }

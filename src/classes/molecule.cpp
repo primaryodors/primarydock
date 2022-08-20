@@ -1255,7 +1255,6 @@ void Molecule::identify_acidbase()
 Bond** Molecule::get_rotatable_bonds()
 {
     if (noAtoms(atoms)) return 0;
-    if (rotatable_bonds) return rotatable_bonds;
     if (mol_typ == MOLTYP_AMINOACID)
     {
         // TODO: There has to be a better way.
@@ -1265,6 +1264,7 @@ Bond** Molecule::get_rotatable_bonds()
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
+    if (rotatable_bonds) return rotatable_bonds;
 
     Bond* btemp[65536];
     int mwblimit = atcount/2;						// Prevent rotations that move most of the molecule.
@@ -1369,6 +1369,11 @@ void Molecule::crumple(float theta)
     }
 }
 
+void Molecule::clear_cache()
+{
+    rotatable_bonds = nullptr;
+}
+
 // TODO: There has to be a better way.
 Bond** AminoAcid::get_rotatable_bonds()
 {
@@ -1376,7 +1381,10 @@ Bond** AminoAcid::get_rotatable_bonds()
     // Return ONLY side chain bonds, from lower to higher Greek. E.g. CA-CB but NOT CB-CA.
     // Exclude CA-N and CA-C as these will be managed by the Protein class.
     if (noAtoms(atoms)) return 0;
-    if (rotatable_bonds) return rotatable_bonds;
+
+    // TODO: Something is overwriting the cached rotatable_bonds, causing segfaults.
+    // So the cache is unusable for amino acids until the problem gets fixed.
+    // if (rotatable_bonds) return rotatable_bonds;
     if (aadef && aadef->proline_like)
     {
         // cout << "Proline-like! No rotbonds!" << endl;
@@ -1454,10 +1462,11 @@ Bond** AminoAcid::get_rotatable_bonds()
                             // cout << "Included." << endl;
 
                             if (greek_from_aname(la->name) < greek_from_aname(lb->btom->name))
-                                btemp[bonds++] = la->get_bond_between(lb->btom);
+                                btemp[bonds] = la->get_bond_between(lb->btom);
                             else
-                                btemp[bonds++] = lb->btom->get_bond_between(la);
-                            btemp[bonds] = 0;
+                                btemp[bonds] = lb->btom->get_bond_between(la);
+
+                            btemp[++bonds] = 0;
 
                             // cout << (name ? name : "(no name)") << ":" << *(btemp[bonds-1]) << endl;
                         }

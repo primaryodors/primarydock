@@ -18,7 +18,7 @@ $json_file = "predict/dock_results.json";
 
 if (file_exists($json_file))
 {
-	$dock_results = json_decode(file_get_contents($json_file));
+	$dock_results = json_decode(file_get_contents($json_file), true);
 }
 
 foreach (@$argv as $a)
@@ -27,10 +27,49 @@ foreach (@$argv as $a)
 	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
 }
 
-$protid = @$_REQUEST['prot'] ?: "OR1A1";
-$fam = family_from_protid($protid);
+if (@$_REQUEST['next'])
+{
+	$odors = json_decode(file_get_contents("data/odorant.json"), true);
+	
+	foreach ($odors as $o)
+	{
+		if (@$o['activity']) foreach ($o['activity'] as $ref => $acv)
+		{
+			foreach ($acv as $rcpid => $data)
+			{
+				if (!isset($dock_results[$rcpid][$o['full_name']]))
+				{
+					$protid = $rcpid;
+					$ligname = $o['full_name'];
+					
+					if (!file_exists("sdf/$ligname.sdf"))
+					{
+						$f = fopen("sdf/$ligname.sdf", "wb");
+						if (!$f) die("Unable to create sdf/$ligname.sdf, please ensure write access.\n");
+						$sdfdat = file_get_contents("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{$o['smiles']}/SDF?record_type=3d");
+						fwrite($f, $sdfdat);
+						fclose($f);
+					}
+					
+					goto found_next_pair;
+				}
+			}
+		}
+	}
+	die("All done!");
+	
+	found_next_pair:
+	;
+}
+else
+{
+	$protid = @$_REQUEST['prot'] ?: "OR1A1";
+	
+	$ligname = @$_REQUEST['lig'] ?: "geraniol";
+}
 
-$ligname = @$_REQUEST['lig'] ?: "geraniol";
+echo "Beginning dock of $ligname in $protid...\n\n";
+$fam = family_from_protid($protid);
 
 $cenr3_33 = resno_from_bw($protid, "3.33");
 $cenr3_36 = $cenr3_33 + 3;
@@ -70,6 +109,8 @@ DIFF
 ELIM 100
 
 OUT output/$protid-$ligname.pred.dock
+
+
 
 heredoc;
 
@@ -144,7 +185,7 @@ else
 	$dock_results[$protid][$ligname] = $average;
 	
 	$f = fopen($json_file, "wb");
-	if (!f) die("File write FAILED. Make sure have access to write $json_file.");
+	if (!$f) die("File write FAILED. Make sure have access to write $json_file.");
 	fwrite($f, json_encode_pretty($dock_results));
 	fclose($f);
 }

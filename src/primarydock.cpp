@@ -1153,7 +1153,7 @@ int main(int argc, char** argv)
                         delete[] b;
                     }
 
-                    delete sidechain_bondrots[i];
+                    delete[] sidechain_bondrots[i];
                 }
             }
             

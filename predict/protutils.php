@@ -29,7 +29,7 @@ function family_from_protid($protid)
 
 function json_encode_pretty($array)
 {
-	return preg_replace("/([ \t]*)([^\\s]*) {\n/", "\$1\$2\n\$1{\n", json_encode($array, JSON_PRETTY_PRINT));
+	return preg_replace("/([ \t]*)([^\\s]*) ([{\\[])\n/", "\$1\$2\n\$1\$3\n", json_encode($array, JSON_PRETTY_PRINT));
 }
 
 chdir(__DIR__);

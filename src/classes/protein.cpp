@@ -382,6 +382,7 @@ int Protein::load_pdb(FILE* is)
         try
         {
             residues[i] = restmp[i];
+            residues[i]->clear_cache();
             residues[i]->establish_internal_clash_baseline();
 
             Atom *atom = residues[i]->get_atom("N"), *btom;

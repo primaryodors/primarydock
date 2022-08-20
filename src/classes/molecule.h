@@ -61,6 +61,7 @@ class Molecule
     int from_pdb(FILE* inf);				// returns number of atoms loaded.
     void identify_acidbase();				// called within every load.
     bool from_smiles(char const * smilesstr);
+    void clear_cache();
 
     // Getters.
     const char* get_name() const	{	return name;	}

@@ -465,6 +465,26 @@ int main(int argc, char** argv)
 				
 			}	// HELIX
 			
+			else if (!strcmp(fields[0], "REGION"))
+			{
+				int sr, er;
+				l = 1;
+				if (!fields[l]) raise_error("Insufficient parameters given for REGION.");
+				psz = interpret_single_string(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for REGION.");
+				sr = interpret_single_int(fields[l++]);
+				if (!fields[l]) raise_error("Insufficient parameters given for REGION.");
+				er = interpret_single_int(fields[l++]);
+				if (fields[l]) raise_error("Too many parameters given for REGION.");
+
+				p.set_region(psz, sr, er);
+			}	// REGION
+			
+			else if (!strcmp(fields[0], "UPRIGHT"))
+			{
+				
+			}	// UPRIGHT
+			
 			else if (!strcmp(fields[0], "SEARCH"))
 			{
 				l = 1;

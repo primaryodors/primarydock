@@ -37,14 +37,22 @@ if (@$_REQUEST['next'])
 	if (!@$_REQUEST['force'] && trim(@$results[$max_simultaneous_docks-1])) die("Already running.\n".print_r($results, 1));
 	$skip = count($results);
 	
+	$protid = @$_REQUEST['prot'] ?: false;
+	$ligname = @$_REQUEST['lig'] ?: false;
+	
 	foreach ($odors as $o)
 	{
+		$full_name = str_replace(" ", "_", $o['full_name']);
+		if ($ligname && $ligname != $full_name) continue;
+		
 		if (@$o['activity']) foreach ($o['activity'] as $ref => $acv)
 		{
 			foreach ($acv as $rcpid => $data)
 			{
-				if (!isset($dock_results[$rcpid][$o['full_name']]))
+				if (!isset($dock_results[$rcpid][$full_name]))
 				{
+					if ($protid && $protid != $rcpid) continue;
+					
 					if ($skip)
 					{
 						$skip--;
@@ -52,7 +60,7 @@ if (@$_REQUEST['next'])
 					}
 					
 					$protid = $rcpid;
-					$ligname = str_replace(" ", "_", $o['full_name']);
+					$ligname = $full_name;
 					
 					if (!file_exists("sdf/$ligname.sdf"))
 					{

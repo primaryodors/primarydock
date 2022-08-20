@@ -114,6 +114,7 @@ OUT output/$protid-$ligname.pred.dock
 
 heredoc;
 
+if (!file_exists("tmp")) mkdir("tmp");
 $f = fopen("tmp/prediction.config", "wb");
 if (!$f) die("File write error. Check tmp folder is write enabled.\n");
 

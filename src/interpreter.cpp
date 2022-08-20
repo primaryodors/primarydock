@@ -84,6 +84,22 @@ int find_var_index(const char* varname)
 	return -1;
 }
 
+int set_variable(char* vname, Star vvalue)
+{
+	int n = find_var_index(vname);
+	if (n<0)
+	{
+		n = vars;
+		vars++;
+	}
+
+	script_var[n].name = vname;
+	script_var[n].vt = type_from_name(vname);
+	script_var[n].value = vvalue;
+
+	return n;
+}
+
 float interpret_single_float(const char* param);
 
 Point interpret_Cartesian_literal(const char* param)
@@ -478,6 +494,15 @@ int main(int argc, char** argv)
 				if (fields[l]) raise_error("Too many parameters given for REGION.");
 
 				p.set_region(psz, sr, er);
+
+				char lbuffer[256];
+				sprintf(lbuffer, "%s%s.s", "%", psz);
+				Star s;
+				s.n = sr;
+				set_variable(lbuffer, s);
+				sprintf(lbuffer, "%s%s.e", "%", psz);
+				s.n = er;
+				set_variable(lbuffer, s);
 			}	// REGION
 			
 			else if (!strcmp(fields[0], "UPRIGHT"))
@@ -979,18 +1004,30 @@ int main(int argc, char** argv)
 					char buffer1[1024];
 					strcpy(buffer, rem_hx[l].c_str());
 					char** fields = chop_spaced_fields(buffer);
+
+					Star sv;
 					
 					sprintf(buffer1, "%c%s.s", '%', fields[3]);
+					sv.n = atoi(fields[4]);
+					set_variable(buffer1, sv);
+
+					/*
 					script_var[vars].name = buffer1;
 					script_var[vars].vt = SV_INT;
 					script_var[vars].value.n = atoi(fields[4]);
 					vars++;
+					*/
 					
 					sprintf(buffer1, "%c%s.e", '%', fields[3]);
+					sv.n = atoi(fields[3]);
+					set_variable(buffer1, sv);
+
+					/*
 					script_var[vars].name = buffer1;
 					script_var[vars].vt = SV_INT;
 					script_var[vars].value.n = atoi(fields[5]);
 					vars++;
+					*/
 					
 					delete[] fields;
 				}

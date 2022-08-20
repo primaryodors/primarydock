@@ -197,6 +197,8 @@ void Molecule::reallocate()
         int ac1 = oac + _def_atc;
         Atom** latoms = new Atom*[ac1+10];
 
+        if (atcount) cout << "Molecule " << (name?name:"(no name)") << " has " << atcount << " atoms." << endl;
+
         int i;
         if (atoms && oac)
         {

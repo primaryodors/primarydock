@@ -230,6 +230,7 @@ int Protein::load_pdb(FILE* is)
         {
         	int told = ftell(is);
         	fgets(buffer, 1003, is);
+            buffer[16] = ' ';
         	
         	if (buffer[0] == 'A' &&
         		buffer[1] == 'T' &&
@@ -243,14 +244,12 @@ int Protein::load_pdb(FILE* is)
     			for (i=0; i<3; i++)
     				tmp3let[i] = buffer[17+i];
     			tmp3let[4] = 0;
-    			
-    			for (i=0; i<256; i++)
+
+                for (i=0; i<256; i++)
     			{
-    				// if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
-    				if (!aa_defs[i].loaded)
-    				{
+                    if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
+                    {
     					AminoAcid* aa = new AminoAcid(is, prevaa);
-						// cout << rescount << tmp3let << " " << flush;
 						restmp[rescount++] = aa;
 						restmp[rescount] = NULL;
 						prevaa = aa;

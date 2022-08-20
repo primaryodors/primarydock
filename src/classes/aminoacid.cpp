@@ -936,6 +936,7 @@ int AminoAcid::from_pdb(FILE* is)
     {
         lasttell = ftell(is);
         fgets(buffer, 1003, is);
+		buffer[16] = ' ';
         int thistell = ftell(is);
         strcpy(origbuf, buffer);
         char** fields = chop_spaced_fields(buffer);
@@ -944,6 +945,7 @@ int AminoAcid::from_pdb(FILE* is)
         {
 		    if (fields)
 		    {
+				int offset = 0;
 		    	// cout << fields[0] << endl;
 		        if (!strcmp(fields[0], "ATOM")
 		            /*||
@@ -951,7 +953,13 @@ int AminoAcid::from_pdb(FILE* is)
 		           )
 		        {
                     // cout << "Resno " << fields[4] << " vs old " << resno << endl;
-                    if (!residue_no) residue_no = atoi(fields[4]);
+					if (!atoi(fields[4]) && atoi(fields[5])) offset++;
+
+                    if (!residue_no)
+					{
+						residue_no = atoi(fields[4+offset]);
+					}
+
                     if (!res3let[0])
                     {
                         strcpy(res3let, fields[3]);
@@ -961,7 +969,7 @@ int AminoAcid::from_pdb(FILE* is)
 
                     if (strcmp(res3let, fields[3])
                         ||
-                        residue_no != atoi(fields[4])
+                        residue_no != atoi(fields[4+offset])
                        )
                     {
                     	/*cout << res3let << "/" << fields[3] << " | " << residue_no << "/" << fields[4] << " | "
@@ -986,7 +994,7 @@ int AminoAcid::from_pdb(FILE* is)
                     }
                     esym[1] &= 0x5f;
 
-                    Point aloc(atof(fields[5]), atof(fields[6]),atof(fields[7]));
+                    Point aloc(atof(fields[5+offset]), atof(fields[6+offset]),atof(fields[7+offset]));
 
                     Atom* a = add_atom(esym, fields[2], &aloc, 0, 0);
                     added++;
@@ -1000,7 +1008,7 @@ int AminoAcid::from_pdb(FILE* is)
                         a->is_backbone = true;
                     else a->is_backbone = false;
 
-                    a->residue = atoi(fields[4]);
+                    a->residue = atoi(fields[4+offset]);
                     strcpy(a->aa3let, fields[3]);
                     AADef* aaa=0;
 
@@ -1012,7 +1020,7 @@ int AminoAcid::from_pdb(FILE* is)
                             a->aaletter = aa_defs[i]._1let;
                             aaa = &aa_defs[i];
                             name = new char[10]; // aa_defs[i].name;
-                            sprintf(name, "%s%d", aa_defs[i]._3let, atoi(fields[4]));
+                            sprintf(name, "%s%d", aa_defs[i]._3let, atoi(fields[4+offset]));
                             break;
                         }
                     }

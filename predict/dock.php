@@ -11,6 +11,7 @@
 require("protutils.php");
 
 $dock_retries = 5;
+$max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to half the number of physical cores.
 
 $dock_results = [];
 $json_file = "predict/dock_results.json";
@@ -31,6 +32,11 @@ if (@$_REQUEST['next'])
 {
 	$odors = json_decode(file_get_contents("data/odorant.json"), true);
 	
+	$cmd = "ps -ef | grep ':[0-9][0-9] bin/primarydock' | grep -v grep";
+	exec($cmd, $results);
+	if (!@$_REQUEST['force'] && trim(@$results[$max_simultaneous_docks-1])) die("Already running.\n".print_r($results, 1));
+	$skip = count($results);
+	
 	foreach ($odors as $o)
 	{
 		if (@$o['activity']) foreach ($o['activity'] as $ref => $acv)
@@ -39,8 +45,14 @@ if (@$_REQUEST['next'])
 			{
 				if (!isset($dock_results[$rcpid][$o['full_name']]))
 				{
+					if ($skip)
+					{
+						$skip--;
+						continue;
+					}
+					
 					$protid = $rcpid;
-					$ligname = $o['full_name'];
+					$ligname = str_replace(" ", "_", $o['full_name']);
 					
 					if (!file_exists("sdf/$ligname.sdf"))
 					{

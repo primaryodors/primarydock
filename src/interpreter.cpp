@@ -669,7 +669,13 @@ int main(int argc, char** argv)
                     Point tmr1dir = average_of_points(tmr1, tmr1_n);
                     Point tmr4dir = average_of_points(tmr4, tmr4_n);
 
+
+                    tmr1dir.y = tmr4dir.y = 0;
+
                     rot = align_points_3d(&tmr4dir, new Point(0,0,1e9), &tmr1dir);
+
+                    p.rotate_piece(1, seql, rot, 0);
+
                 }
             }	// UPRIGHT
 

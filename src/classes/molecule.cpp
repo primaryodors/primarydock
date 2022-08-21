@@ -1974,21 +1974,21 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
             for (j=0; j<ligands[l]->atcount; j++)
             {
                 if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone
-                	&&
-                	(	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
-                			&&
-                			!strcmp(atoms[i]->name, "C")
-                			&&
-                			!strcmp(ligands[l]->atoms[j]->name, "N")
-                		)
-                		||
-                		(	atoms[i]->residue == ligands[l]->atoms[j]->residue + 1
-                			&&
-                			!strcmp(atoms[i]->name, "N")
-                			&&
-                			!strcmp(ligands[l]->atoms[j]->name, "C")
-                		)
-                   )) continue;			// kludge to prevent adjacent residue false clashes.
+                        &&
+                        (	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
+                                &&
+                                !strcmp(atoms[i]->name, "C")
+                                &&
+                                !strcmp(ligands[l]->atoms[j]->name, "N")
+                          )
+                            ||
+                            (	atoms[i]->residue == ligands[l]->atoms[j]->residue + 1
+                                &&
+                                !strcmp(atoms[i]->name, "N")
+                                &&
+                                !strcmp(ligands[l]->atoms[j]->name, "C")
+                            )
+                        )) continue;			// kludge to prevent adjacent residue false clashes.
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
                 {

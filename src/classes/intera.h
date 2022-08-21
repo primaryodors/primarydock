@@ -17,13 +17,28 @@ enum intera_type
 
 class InteratomicForce
 {
-	public:
+public:
     InteratomicForce();
-    intera_type get_type()	{	return type;	}
-    float get_arity()	{	return arity;	}
-    float get_distance()	{	return distance;	}
-    float get_kJmol()	{	return kJ_mol;	}
-    float get_dp()	{	return dirprop;	}
+    intera_type get_type()
+    {
+        return type;
+    }
+    float get_arity()
+    {
+        return arity;
+    }
+    float get_distance()
+    {
+        return distance;
+    }
+    float get_kJmol()
+    {
+        return kJ_mol;
+    }
+    float get_dp()
+    {
+        return dirprop;
+    }
 
     std::string get_config_string() const;
 
@@ -34,7 +49,7 @@ class InteratomicForce
     static float covalent_bond_radius(Atom* a, Atom* b, float cardinality);
     static float coordinate_bond_radius(Atom* a, Atom* b, intera_type btype);
 
-	protected:
+protected:
     int Za=0;
     int bZa=0;
     int Zb=0;
@@ -49,7 +64,7 @@ class InteratomicForce
 
     void read_dat_line(char* line);
     static void read_all_forces();
-    
+
     friend std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);
 };
 

@@ -259,9 +259,9 @@ float find_3d_angle(Point* A, Point* B, Point* source)
     float retval = acos(param);
     if (isnan(retval))
     {
-    	cout << "P12 " << P12 << " P13 " << P13 << " P23 " << P23 << endl;
-    	throw 0xbad9a9;
-	}
+        cout << "P12 " << P12 << " P13 " << P13 << " P23 " << P23 << endl;
+        throw 0xbad9a9;
+    }
     return retval;
 }
 
@@ -273,7 +273,7 @@ float find_3d_angle(Point A, Point B, Point source)
 
 float find_angle_along_vector(Point pt1, Point pt2, Point source, SCoord v)
 {
-	return find_angle_along_vector(&pt1, &pt2, &source, &v);
+    return find_angle_along_vector(&pt1, &pt2, &source, &v);
 }
 
 float find_angle_along_vector(Point* pt1, Point* pt2, Point* source, SCoord* v)
@@ -381,8 +381,8 @@ Rotation align_points_3d(Point* point, Point* align, Point* center)
         n = compute_normal(point, align, &pt);
         if (n.r < 0.1)
         {
-        	pt = Point(0,0,1);
-        	n = compute_normal(point, align, &pt);
+            pt = Point(0,0,1);
+            n = compute_normal(point, align, &pt);
         }
 
         rot.v = n;
@@ -600,15 +600,15 @@ LocatedVector LocRotation::get_lv()
 
 Point LocatedVector::to_point()
 {
-	return origin.add(this);
+    return origin.add(this);
 }
 
 bool Point::fits_inside(Point c)
 {
-	if (fabs(x) < fabs(c.x)) return false;
-	if (fabs(y) < fabs(c.y)) return false;
-	if (fabs(z) < fabs(c.z)) return false;
-	return true;
+    if (fabs(x) < fabs(c.x)) return false;
+    if (fabs(y) < fabs(c.y)) return false;
+    if (fabs(z) < fabs(c.z)) return false;
+    return true;
 }
 
 

@@ -172,7 +172,7 @@ void Atom::figure_out_valence()
         if (valence > 8) valence = 8;
     }
     origgeo = geometry;
-    
+
     if (valence > abs(geometry)) throw VALENCE_EXCEEDS_GEOMETRY;
 
     if (Z >=  21 && Z <=  30) family = HEAVYMETAL;
@@ -328,7 +328,7 @@ Atom::Atom(FILE* is)
 
                     figure_out_valence();
                     bonded_to = new Bond[abs(geometry)];
-				    for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
+                    for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
 
                     Point aloc(atof(fields[5]), atof(fields[6]),atof(fields[7]));
                     location = aloc;
@@ -391,7 +391,7 @@ Atom::~Atom()
 
 void Atom::unbond(Atom* btom)
 {
-	// if (btom) cout << "Unbonding " << btom->name << " from " << name << endl;
+    // if (btom) cout << "Unbonding " << btom->name << " from " << name << endl;
     if (bonded_to)
     {
         int i;
@@ -399,12 +399,12 @@ void Atom::unbond(Atom* btom)
         {
             if (bonded_to[i].btom == btom)
             {
-            	if (!reciprocity)
-            	{
-            		bonded_to[i].btom->reciprocity = true;
-            		bonded_to[i].btom->unbond(this);		// RECURSION!
-            		bonded_to[i].btom->reciprocity = false;
-        		}
+                if (!reciprocity)
+                {
+                    bonded_to[i].btom->reciprocity = true;
+                    bonded_to[i].btom->unbond(this);		// RECURSION!
+                    bonded_to[i].btom->reciprocity = false;
+                }
                 bonded_to[i].btom = NULL;
                 bonded_to[i].cardinality=0;
                 bonded_to[i].can_rotate=0;
@@ -415,20 +415,20 @@ void Atom::unbond(Atom* btom)
 
 void Atom::unbond_all()
 {
-	int i;
-	for (i=0; i<geometry; i++)
-	{
-		if (bonded_to[i].btom)
-		{
-			bonded_to[i].btom->reciprocity = true;
-    		bonded_to[i].btom->unbond(this);		// Potential for recursion!
-    		bonded_to[i].btom->reciprocity = false;
-    		
+    int i;
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom)
+        {
+            bonded_to[i].btom->reciprocity = true;
+            bonded_to[i].btom->unbond(this);		// Potential for recursion!
+            bonded_to[i].btom->reciprocity = false;
+
             bonded_to[i].btom = NULL;
             bonded_to[i].cardinality=0;
             bonded_to[i].can_rotate=0;
-		}
-	}
+        }
+    }
 }
 
 const char* Atom::get_elem_sym()
@@ -444,8 +444,8 @@ Point Atom::get_location()
 
 Atom** Bond::get_moves_with_btom()
 {
-	enforce_moves_with_uniqueness();
-	
+    enforce_moves_with_uniqueness();
+
     int i, cachesz=0;
     if (!moves_with_btom) fill_moves_with_cache();
     if (!moves_with_btom) return 0;
@@ -464,20 +464,20 @@ Atom** Bond::get_moves_with_btom()
 
 bool Atom::move(Point* pt)
 {
-	#if debug_break_on_move
-	if (break_on_move) throw 0xb16fa7012a96eca7;
-	#endif
+    #if debug_break_on_move
+    if (break_on_move) throw 0xb16fa7012a96eca7;
+    #endif
 
-	/*if (name && !strcmp(name, "CB"))
-	{
-		Bond* b = get_bond_between("CA");
-		if (b && b->btom)
-		{
-			float r = b->btom->get_location().get_3d_distance(pt);
-			if (r > 1.55) throw 0x7e57196;
-		}
-	}*/
-	
+    /*if (name && !strcmp(name, "CB"))
+    {
+    	Bond* b = get_bond_between("CA");
+    	if (b && b->btom)
+    	{
+    		float r = b->btom->get_location().get_3d_distance(pt);
+    		if (r > 1.55) throw 0x7e57196;
+    	}
+    }*/
+
     location = *pt;
     location.weight = at_wt;
     geov = NULL;
@@ -486,19 +486,19 @@ bool Atom::move(Point* pt)
 
 bool Atom::move_rel(SCoord* v)
 {
-	#if debug_break_on_move
-	if (break_on_move) throw 0xb16fa7012a96eca7;
-	#endif
+    #if debug_break_on_move
+    if (break_on_move) throw 0xb16fa7012a96eca7;
+    #endif
 
-	/*if (name && !strcmp(name, "CB"))
-	{
-		Bond* b = get_bond_between("CA");
-		if (b && b->btom)
-		{
-			float r = b->btom->get_location().get_3d_distance(location.add(v));
-			if (r > 1.55) throw 0x7e57196;
-		}
-	}*/
+    /*if (name && !strcmp(name, "CB"))
+    {
+    	Bond* b = get_bond_between("CA");
+    	if (b && b->btom)
+    	{
+    		float r = b->btom->get_location().get_3d_distance(location.add(v));
+    		if (r > 1.55) throw 0x7e57196;
+    	}
+    }*/
     location = location.add(v);
     geov = NULL;
     return true;
@@ -528,20 +528,20 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     Point a0loc = location;
     a0loc = a0loc.add(&mov);
     a0loc = rotate3D(&a0loc, pt, &rot);
-    
-	#if debug_break_on_move
-	if (break_on_move) throw 0xb16fa7012a96eca7;
-	#endif
-	
+
+    #if debug_break_on_move
+    if (break_on_move) throw 0xb16fa7012a96eca7;
+    #endif
+
     location = a0loc;
     atomct++;
     //cout << "Motion includes " << name << endl;
 
     for (i=0; atoms[i]; i++)
     {
-		#if debug_break_on_move
-		if (atoms[i]->break_on_move) throw 0xb16fa7012a96eca7;
-		#endif
+        #if debug_break_on_move
+        if (atoms[i]->break_on_move) throw 0xb16fa7012a96eca7;
+        #endif
 
         // atoms[i]->move_rel(mov);
         Point aloc = atoms[i]->location;
@@ -571,21 +571,21 @@ float Atom::get_charge()
 
 float Atom::hydrophilicity_rule()
 {
-	float total = 0;
-	
-	if (is_polar()) total += fabs(is_polar());
-	else if (Z == 7 || Z == 8) total += 1;
-	else if (Z == 15 || Z == 16) total += 0.5;
-	else if (family == PNICTOGEN) total += 0.25;
-	else if (family == CHALCOGEN) total += 0.25;
-	else if (family == HALOGEN)
-	{
-		if (is_bonded_to("H") || is_bonded_to(CHALCOGEN)) total += 1;
-	}
-	
-	total += fabs(get_charge());
-	
-	return total;
+    float total = 0;
+
+    if (is_polar()) total += fabs(is_polar());
+    else if (Z == 7 || Z == 8) total += 1;
+    else if (Z == 15 || Z == 16) total += 0.5;
+    else if (family == PNICTOGEN) total += 0.25;
+    else if (family == CHALCOGEN) total += 0.25;
+    else if (family == HALOGEN)
+    {
+        if (is_bonded_to("H") || is_bonded_to(CHALCOGEN)) total += 1;
+    }
+
+    total += fabs(get_charge());
+
+    return total;
 }
 
 Bond::Bond()
@@ -678,7 +678,7 @@ Atom* Atom::is_bonded_to(const char* element)
 
 int Atom::num_bonded_to(const char* element)
 {
-	if (!bonded_to) return 0;
+    if (!bonded_to) return 0;
     int i, j=0;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
@@ -728,8 +728,8 @@ Atom* Atom::is_bonded_to(const char* element, const int lcardinality)
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (!strcmp(bonded_to[i].btom->get_elem_sym(), element)
-				&&
-				bonded_to[i].cardinality == lcardinality
+                    &&
+                    bonded_to[i].cardinality == lcardinality
                )
                 return bonded_to[i].btom;
     return 0;
@@ -754,8 +754,8 @@ Atom* Atom::is_bonded_to(const int family, const int lcardinality)
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (bonded_to[i].btom->get_family() == family
-				&&
-				bonded_to[i].cardinality == lcardinality
+                    &&
+                    bonded_to[i].cardinality == lcardinality
                )
                 return bonded_to[i].btom;
     return 0;
@@ -763,9 +763,9 @@ Atom* Atom::is_bonded_to(const int family, const int lcardinality)
 
 bool Atom::bond_to(Atom* lbtom, float lcard)
 {
-	if (!lbtom) return false;
+    if (!lbtom) return false;
     int i;
-    
+
     // if (this < lbtom && Z > 1 && lbtom->Z > 1) cout << "Bond " << name << cardinality_printable(lcard) << lbtom->name << endl;
 
     geov = NULL;
@@ -802,40 +802,40 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
             {
                 switch (Z)
                 {
-                	case 7:
+                case 7:
                     polarity = -0.9;
                     lbtom->polarity = 0.9;
                     lbtom->acidbase = 1;
                     acidbase = 1;
                     break;
 
-                	case 15:
+                case 15:
                     polarity = -0.5;
                     lbtom->polarity = 0.5;
                     lbtom->acidbase = 0.75;
                     acidbase = 0.75;
                     break;
 
-		            case 8:
-		            case 9:
-		            case 17:
-		            case 35:
-		            case 53:
-		            case 85:
-		            case 117:
+                case 8:
+                case 9:
+                case 17:
+                case 35:
+                case 53:
+                case 85:
+                case 117:
                     polarity = -1;
                     lbtom->polarity = 1;
                     break;
 
-		            case 16:
-		            case 34:
+                case 16:
+                case 34:
                     polarity = -0.25;
                     lbtom->polarity = 0.25;
                     thiol = -1;
                     lbtom->thiol = 1;
                     break;
 
-                	default:
+                default:
                     break;
                 }
             }
@@ -858,7 +858,7 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
 
 float Atom::is_polar()
 {
-	if (charge) polarity = sgn(charge);
+    if (charge) polarity = sgn(charge);
     return polarity;
 }
 
@@ -917,17 +917,17 @@ bool Atom::is_pi()
 
 bool Atom::is_amide()
 {
-	if (family == PNICTOGEN)
-	{
-		Atom* C = is_bonded_to("C");
-		if (!C) return false;
-		Atom* O = C->is_bonded_to(CHALCOGEN, 2);
-		if (O) return true;
-		O = C->is_bonded_to(CHALCOGEN);
-		if (O && is_pi() && C->is_pi()) return true;
-	}
-	
-	return false;
+    if (family == PNICTOGEN)
+    {
+        Atom* C = is_bonded_to("C");
+        if (!C) return false;
+        Atom* O = C->is_bonded_to(CHALCOGEN, 2);
+        if (O) return true;
+        O = C->is_bonded_to(CHALCOGEN);
+        if (O && is_pi() && C->is_pi()) return true;
+    }
+
+    return false;
 }
 
 void Atom::set_aa_properties()
@@ -1005,7 +1005,7 @@ Bond* Atom::get_bond_by_idx(int bidx)
 
 void Atom::consolidate_bonds()
 {
-	
+
 }
 
 void Bond::fill_moves_with_cache()
@@ -1069,86 +1069,86 @@ void Bond::fill_moves_with_cache()
     btom->used = false;
 
     if (_DBGMOVES) cout << endl << endl;
-    
+
     enforce_moves_with_uniqueness();
 }
 
 void Bond::enforce_moves_with_uniqueness()
 {
-	/*if (!strcmp(atom->name, "CD1") && !strcmp(btom->name, "NE1"))
-	{
-		Ring** rr = atom->get_rings();
-		
-		cout << atom->name << " is a member of:" << endl;
-		if (rr)
-		{
-			int l;
-			
-			for (l=0; rr[l]; l++)
-			{
-				cout << *rr[l] << endl;
-			}
-			
-			delete[] rr;
-		}
-		else cout << "(no rings.)" << endl;
-		
-		rr = btom->get_rings();
-		
-		cout << btom->name << " is a member of:" << endl;
-		if (rr)
-		{
-			int l;
-			
-			for (l=0; rr[l]; l++)
-			{
-				cout << *rr[l] << endl;
-			}
-			
-			delete[] rr;
-		}
-		else cout << "(no rings.)" << endl;
-		
-		cout << endl;
-	}*/
-	
-	// Ring bond rotation is not supported currently.
-	if (atom && btom && atom->in_same_ring_as(btom))
-	{
-		can_rotate = false;
-		if (moves_with_btom) delete[] moves_with_btom;
-		moves_with_btom = nullptr;
-		// cout << atom->name << " is in the same ring as " << btom->name << "; no rotations allowed." << endl;
-		return;
-	}
-	
+    /*if (!strcmp(atom->name, "CD1") && !strcmp(btom->name, "NE1"))
+    {
+    	Ring** rr = atom->get_rings();
+
+    	cout << atom->name << " is a member of:" << endl;
+    	if (rr)
+    	{
+    		int l;
+
+    		for (l=0; rr[l]; l++)
+    		{
+    			cout << *rr[l] << endl;
+    		}
+
+    		delete[] rr;
+    	}
+    	else cout << "(no rings.)" << endl;
+
+    	rr = btom->get_rings();
+
+    	cout << btom->name << " is a member of:" << endl;
+    	if (rr)
+    	{
+    		int l;
+
+    		for (l=0; rr[l]; l++)
+    		{
+    			cout << *rr[l] << endl;
+    		}
+
+    		delete[] rr;
+    	}
+    	else cout << "(no rings.)" << endl;
+
+    	cout << endl;
+    }*/
+
+    // Ring bond rotation is not supported currently.
+    if (atom && btom && atom->in_same_ring_as(btom))
+    {
+        can_rotate = false;
+        if (moves_with_btom) delete[] moves_with_btom;
+        moves_with_btom = nullptr;
+        // cout << atom->name << " is in the same ring as " << btom->name << "; no rotations allowed." << endl;
+        return;
+    }
+
     if (!btom) return;
-	if (!moves_with_btom) return;
-	
-	int i, j, k;
-	
-	for (i=0; moves_with_btom[i]; i++)
-	{
-		for (j=i+1; moves_with_btom[j]; j++)
-		{
-			if (moves_with_btom[j] == moves_with_btom[i]
-				||
-				moves_with_btom[j]->is_backbone
-				||
-				moves_with_btom[j]->residue != btom->residue
-			   )
-			{
-				moves_with_btom[j] = 0;
-				break;
-				
-				for (k=j+1; moves_with_btom[k]; k++)
-				{
-					moves_with_btom[k-1] = moves_with_btom[k];
-				}
-				moves_with_btom[k-1] = 0;
-			}
-		}
-	}
+    if (!moves_with_btom) return;
+
+    int i, j, k;
+
+    for (i=0; moves_with_btom[i]; i++)
+    {
+        for (j=i+1; moves_with_btom[j]; j++)
+        {
+            if (moves_with_btom[j] == moves_with_btom[i]
+                    ||
+                    moves_with_btom[j]->is_backbone
+                    ||
+                    moves_with_btom[j]->residue != btom->residue
+               )
+            {
+                moves_with_btom[j] = 0;
+                break;
+
+                for (k=j+1; moves_with_btom[k]; k++)
+                {
+                    moves_with_btom[k-1] = moves_with_btom[k];
+                }
+                moves_with_btom[k-1] = 0;
+            }
+        }
+    }
 }
 
 bool Bond::rotate(float theta, bool allow_backbone)
@@ -1163,13 +1163,13 @@ bool Bond::rotate(float theta, bool allow_backbone)
         else return false;
     }
     // cout << "Rotate " << atom->name << cardinality_printable(cardinality) << btom->name << endl;
-    
+
     if (atom->residue && greek_from_aname(atom->name) > greek_from_aname(btom->name))
     {
-    	can_rotate = false;
-    	return false;
+        can_rotate = false;
+        return false;
     }
-    
+
     int i;
     Point cen = btom->get_location();
     Point bas = atom->get_location();
@@ -1180,32 +1180,32 @@ bool Bond::rotate(float theta, bool allow_backbone)
     rot.v = v;
     rot.a = theta;
     btom->rotate_geometry(rot);
-    
+
     #if allow_tethered_rotations
     // Whichever side has the lower sum of Atom::last_bind_energy values, rotate that side.
     float mwb_total_binding=0, mwbi_total_binding=0;
     Bond* inverse = btom->get_bond_between(atom);
-    
+
     if (!atom->residue && !btom->residue && inverse && inverse->can_rotate && !(inverse->moves_with_btom)) inverse->fill_moves_with_cache();
     if (!atom->residue && !btom->residue && inverse && inverse->can_rotate && inverse->moves_with_btom)
     {
-    	for (i=0; moves_with_btom[i]; i++)
-    	{
-    		if (moves_with_btom[i]->is_backbone) mwbi_total_binding += 1e9; // goto _cannot_reverse_bondrot;
-    		mwb_total_binding += moves_with_btom[i]->last_bind_energy;
-    	}
-    	for (i=0; inverse->moves_with_btom[i]; i++)
-    	{
-    		if (inverse->moves_with_btom[i]->is_backbone) goto _cannot_reverse_bondrot;
-    		mwbi_total_binding += inverse->moves_with_btom[i]->last_bind_energy;
-    	}
-    	
-    	if (mwb_total_binding < mwbi_total_binding)
-    		return inverse->rotate(-theta, allow_backbone);				// DANGER! RECURSION.
+        for (i=0; moves_with_btom[i]; i++)
+        {
+            if (moves_with_btom[i]->is_backbone) mwbi_total_binding += 1e9; // goto _cannot_reverse_bondrot;
+            mwb_total_binding += moves_with_btom[i]->last_bind_energy;
+        }
+        for (i=0; inverse->moves_with_btom[i]; i++)
+        {
+            if (inverse->moves_with_btom[i]->is_backbone) goto _cannot_reverse_bondrot;
+            mwbi_total_binding += inverse->moves_with_btom[i]->last_bind_energy;
+        }
+
+        if (mwb_total_binding < mwbi_total_binding)
+            return inverse->rotate(-theta, allow_backbone);				// DANGER! RECURSION.
     }
-    _cannot_reverse_bondrot:
+_cannot_reverse_bondrot:
     ;
-	#endif
+    #endif
 
     // cout << "Rotating " << atom->name << "-" << btom->name << "... ";
     for (i=0; moves_with_btom[i]; i++)
@@ -1222,7 +1222,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
         }
         if (moves_with_btom[i]->residue != btom->residue) continue;
         // cout << moves_with_btom[i]->name << " ";
-        
+
         /*cout << moves_with_btom[i]->residue << ":" << moves_with_btom[i]->name
         	 << " from "
         	 << atom->residue << ":" << atom->name
@@ -1232,12 +1232,12 @@ bool Bond::rotate(float theta, bool allow_backbone)
 
         Point loc = moves_with_btom[i]->get_location();
         Point nl  = rotate3D(&loc, &cen, &v, theta);
-        
+
         /*if (moves_with_btom[i]->residue == 203 && !strcmp(moves_with_btom[i]->name, "HB1"))
         	cout << "Moving " << moves_with_btom[i]->residue << ":" << moves_with_btom[i]->name << " about axis "
         		 << atom->residue << ":" << atom->name << " - " << btom->residue << ":" << btom->name
         		 << endl;*/
-        
+
         // cout << moves_with_btom[i]->name << loc << " " << (theta*fiftyseven) << " " << nl << endl;
         moves_with_btom[i]->move(&nl);
         moves_with_btom[i]->rotate_geometry(rot);
@@ -1246,7 +1246,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
 
     if (can_flip) flip_angle = -flip_angle;
     total_rotations += theta;
-    
+
     // cout << theta << endl;
 
     return true;
@@ -1423,73 +1423,77 @@ void Atom::swing_all(int startat)
 
 float Atom::get_bond_angle_anomaly(SCoord v, Atom* ignore)
 {
-	if (!bonded_to) return 0;
-	int i;
-	float anomaly = 0;
-	float lga = get_geometric_bond_angle();
-	
-	//cout << " -=- " << lga*fiftyseven << " | ";
-	for (i=0; i<geometry; i++)
-	{
-		if (bonded_to[i].btom && bonded_to[i].btom != ignore)
-		{
-			//cout << bonded_to[i].btom->location << " - " << location;
-			SCoord vb = bonded_to[i].btom->location.subtract(location);
-			//cout << " = " << (Point)vb << endl;
-			float theta = find_3d_angle(v, vb, Point(0,0,0));
-			anomaly += fabs(theta-lga);
-			/*cout << "Geometric anomaly for " << name << ": "
-				 << lga*fiftyseven << "deg - " << theta*fiftyseven << "deg difference of " << fabs(theta-lga)*fiftyseven << "deg."
-				 << endl;*/
-			//cout << " " << theta*fiftyseven;
-		}
-	}
-	//cout  << " -=- ";
-	
-	//cout << "Geometric bond angle for " << name << " is " << lga*fiftyseven << "deg." << endl;
-	return anomaly;
+    if (!bonded_to) return 0;
+    int i;
+    float anomaly = 0;
+    float lga = get_geometric_bond_angle();
+
+    //cout << " -=- " << lga*fiftyseven << " | ";
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom && bonded_to[i].btom != ignore)
+        {
+            //cout << bonded_to[i].btom->location << " - " << location;
+            SCoord vb = bonded_to[i].btom->location.subtract(location);
+            //cout << " = " << (Point)vb << endl;
+            float theta = find_3d_angle(v, vb, Point(0,0,0));
+            anomaly += fabs(theta-lga);
+            /*cout << "Geometric anomaly for " << name << ": "
+            	 << lga*fiftyseven << "deg - " << theta*fiftyseven << "deg difference of " << fabs(theta-lga)*fiftyseven << "deg."
+            	 << endl;*/
+            //cout << " " << theta*fiftyseven;
+        }
+    }
+    //cout  << " -=- ";
+
+    //cout << "Geometric bond angle for " << name << " is " << lga*fiftyseven << "deg." << endl;
+    return anomaly;
 }
 
 float Atom::get_geometric_bond_angle()
 {
-	int lgeo = origgeo;
-	
-	//cout << name << " " << origgeo << " ";
-	
-	int i, bonded_atoms = 0;
-	for (i=0; i<lgeo; i++) if (bonded_to[i].btom) bonded_atoms++;
-	
-	for (i=0; i<lgeo; i++)
-	{
-		float bcard = bonded_to[i].cardinality;
-		if (bonded_to[i].btom && bcard > 1)
-		{
-			lgeo -= ((i&1) ? floor(bcard-1) : ceil(bcard-1));		// lgeo is an integer so treat two 1.5 bonds the same as a 1 and a 2.
-			//cout << bonded_to[i].btom->name << "-" << bcard << " ";
-		}
-	}
-	if (lgeo < bonded_atoms) lgeo = bonded_atoms;
-	
-	//cout << lgeo << " ";
-	
-	switch (lgeo)
-	{
-		case 1:
-		case 2:
-		return M_PI;
-		
-		case 3:		return triangular;
-		case 4:		return tetrahedral;
-		case 5:		return (triangular*3 + square*2)/5;		// Irregular so just return an average.
-		case 6:		return square;
-		
-		case 7:
-		case 8:
-		return tetrahedral/2;
-		
-		default:
-		return tetrahedral;
-	}
+    int lgeo = origgeo;
+
+    //cout << name << " " << origgeo << " ";
+
+    int i, bonded_atoms = 0;
+    for (i=0; i<lgeo; i++) if (bonded_to[i].btom) bonded_atoms++;
+
+    for (i=0; i<lgeo; i++)
+    {
+        float bcard = bonded_to[i].cardinality;
+        if (bonded_to[i].btom && bcard > 1)
+        {
+            lgeo -= ((i&1) ? floor(bcard-1) : ceil(bcard-1));		// lgeo is an integer so treat two 1.5 bonds the same as a 1 and a 2.
+            //cout << bonded_to[i].btom->name << "-" << bcard << " ";
+        }
+    }
+    if (lgeo < bonded_atoms) lgeo = bonded_atoms;
+
+    //cout << lgeo << " ";
+
+    switch (lgeo)
+    {
+    case 1:
+    case 2:
+        return M_PI;
+
+    case 3:
+        return triangular;
+    case 4:
+        return tetrahedral;
+    case 5:
+        return (triangular*3 + square*2)/5;		// Irregular so just return an average.
+    case 6:
+        return square;
+
+    case 7:
+    case 8:
+        return tetrahedral/2;
+
+    default:
+        return tetrahedral;
+    }
 }
 
 SCoord* Atom::get_geometry_aligned_to_bonds()
@@ -1519,33 +1523,33 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
 
     if (num_conj_rings())
     {
-    	Point arom_center;
-    	
-    	if (get_count_pi_bonds())
-    	{
-		    geometry = 3;
+        Point arom_center;
+
+        if (get_count_pi_bonds())
+        {
+            geometry = 3;
         }
-        
+
         if (bonded_to[1].btom)
         {
-        	for (j=0; member_of[j]; j++)
-			{
-				if (bonded_to[0].btom->is_in_ring(member_of[j]) && bonded_to[1].btom->is_in_ring(member_of[j]))
-					arom_center = member_of[j]->get_center();
-			}
-        	
+            for (j=0; member_of[j]; j++)
+            {
+                if (bonded_to[0].btom->is_in_ring(member_of[j]) && bonded_to[1].btom->is_in_ring(member_of[j]))
+                    arom_center = member_of[j]->get_center();
+            }
+
             geov[0] = v_from_pt_sub(bonded_to[0].btom->get_location(), location);
             geov[1] = v_from_pt_sub(bonded_to[1].btom->get_location(), location);
             geov[2] = v_from_pt_sub(location, arom_center);
         }
         else
         {
-        	for (j=0; member_of[j]; j++)
-			{
-				if (bonded_to[0].btom->is_in_ring(member_of[j]))
-					arom_center = member_of[j]->get_center();
-			}
-        	
+            for (j=0; member_of[j]; j++)
+            {
+                if (bonded_to[0].btom->is_in_ring(member_of[j]))
+                    arom_center = member_of[j]->get_center();
+            }
+
             geov = get_basic_geometry();
             Point bond0v = bonded_to[0].btom->get_location().subtract(&location);
             Point vanticen = location.subtract(arom_center);
@@ -1626,11 +1630,11 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
     {
         if (geometry > 2)
         {
-        	j = 0;
-        	if (bonded_to[1].btom) j = 1;
-        	else if (bonded_to[2].btom) j = 2;
-        	int l;
-        	
+            j = 0;
+            if (bonded_to[1].btom) j = 1;
+            else if (bonded_to[2].btom) j = 2;
+            int l;
+
             if (j)
             {
                 Point g0(&geov[0]);
@@ -1658,7 +1662,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
                         geov[i] = v2;
                     }
                 }
-                
+
                 g0 = geov[0];
                 g1 = geov[1];
                 g0.scale(1);
@@ -1666,7 +1670,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
                 rots = align_2points_3d(&g1, &a1, &g0, &a0, &center);
                 rots[0].a /= 2;
                 rots[1].a /= 2;
-                
+
                 for (k=0; k<2; k++)
                 {
                     for (i=0; i<geometry; i++)
@@ -1678,7 +1682,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
                         geov[i] = v2;
                     }
                 }
-                
+
 
                 if (_DBGGEO) cout << name << " returns " << (j==1?"trans":"cis") << " double-aligned geometry (" << geometry << "):"
                                       << bonded_to[0].btom->name << ", " << bonded_to[1].btom->name << "."
@@ -1734,38 +1738,38 @@ SCoord Atom::get_next_free_geometry(float lcard)
 
         if (i >= geometry) i=0;
 
-		int j=i;
+        int j=i;
         if (geometry == 4 && swapped_chirality && i >= 2) i ^= 1;
         if (geometry == 3 && EZ_flip && i >= 1) i = 3-i;
         // if (bonded_to[i].btom) i=j;			// For some reason, this line makes everything go very wrong.
         if (geometry == 4 && chirality_unspecified)
         {
-        	if (!strcmp(name, "Tumbolia")) cout << endl;
-    		for (i=0; i<geometry; i++)
-    		{
-		    	Point pt = v[i];
-				pt.scale(1);
-				
-    			float closest = 81;
-		    	if (!strcmp(name, "Tumbolia")) cout << i << "*: " << (Point)v[i] << endl;
-		    	for (j=0; j<geometry; j++)
-		    	{
-		    		if (!bonded_to[j].btom) continue;
-		    		Point pt1 = bonded_to[j].btom->location.subtract(location);
-		    		pt1.scale(1);
-		    		float r = pt1.get_3d_distance(pt);
-		    		if (!strcmp(name, "Tumbolia")) cout << j << ":: " << pt1 << " " << r << endl;
-		    		if (r < closest) closest = r;
-		    	}
-		    	if (!strcmp(name, "Tumbolia")) cout << endl;
-		    	if (closest > 0.7) goto _successful;				// Slightly less than 1/sqrt(2).
-        	}
-        	return retval;
-    	}
+            if (!strcmp(name, "Tumbolia")) cout << endl;
+            for (i=0; i<geometry; i++)
+            {
+                Point pt = v[i];
+                pt.scale(1);
 
-		_successful:
+                float closest = 81;
+                if (!strcmp(name, "Tumbolia")) cout << i << "*: " << (Point)v[i] << endl;
+                for (j=0; j<geometry; j++)
+                {
+                    if (!bonded_to[j].btom) continue;
+                    Point pt1 = bonded_to[j].btom->location.subtract(location);
+                    pt1.scale(1);
+                    float r = pt1.get_3d_distance(pt);
+                    if (!strcmp(name, "Tumbolia")) cout << j << ":: " << pt1 << " " << r << endl;
+                    if (r < closest) closest = r;
+                }
+                if (!strcmp(name, "Tumbolia")) cout << endl;
+                if (closest > 0.7) goto _successful;				// Slightly less than 1/sqrt(2).
+            }
+            return retval;
+        }
+
+    _successful:
         retval = v[i];
-        
+
     }
     geometry = lgeo;
     return retval;
@@ -1787,13 +1791,13 @@ int Atom::get_idx_next_free_geometry()
 
 int Atom::get_count_pi_bonds()
 {
-	if (!bonded_to) return 0;
-	int i, retval=0;
-	for (i=0; i<geometry; i++)
-	{
-		if (bonded_to[i].btom && bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval++;
-	}
-	return retval;
+    if (!bonded_to) return 0;
+    int i, retval=0;
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom && bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval++;
+    }
+    return retval;
 }
 
 void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
@@ -1881,381 +1885,381 @@ int Bond::count_moves_with_btom()
 
 int Atom::num_rings()
 {
-	if (!member_of) return 0;
-	int i;
-	for (i=0; member_of[i]; i++);	// Get count.
-	return i;
+    if (!member_of) return 0;
+    int i;
+    for (i=0; member_of[i]; i++);	// Get count.
+    return i;
 }
 
 int Atom::num_conj_rings()
 {
-	if (!member_of) return 0;
-	int i, j=0;
-	for (i=0; member_of[i]; i++)
-		if (member_of[i]->is_conjugated()) j++;
-	return i;
+    if (!member_of) return 0;
+    int i, j=0;
+    for (i=0; member_of[i]; i++)
+        if (member_of[i]->is_conjugated()) j++;
+    return i;
 }
 
 Ring** Atom::get_rings()
 {
-	if (!member_of) return nullptr;
-	int i;
-	for (i=0; member_of[i]; i++);	// Get count.
-	Ring** retval = new Ring*[i+4];
-	
-	for (i=0; member_of[i]; i++) retval[i] = member_of[i];
-	retval[i] = nullptr;
-	
-	return retval;
+    if (!member_of) return nullptr;
+    int i;
+    for (i=0; member_of[i]; i++);	// Get count.
+    Ring** retval = new Ring*[i+4];
+
+    for (i=0; member_of[i]; i++) retval[i] = member_of[i];
+    retval[i] = nullptr;
+
+    return retval;
 }
 
 bool Atom::in_same_ring_as(Atom* b)
 {
-	if (!member_of) return false;
-	
-	int i;
-	for (i=0; member_of[i]; i++)
-		if (b->is_in_ring(member_of[i])) return true;
-	
-	return false;
+    if (!member_of) return false;
+
+    int i;
+    for (i=0; member_of[i]; i++)
+        if (b->is_in_ring(member_of[i])) return true;
+
+    return false;
 }
 
 bool Atom::is_in_ring(Ring* ring)
 {
-	if (!ring) return false;
-	
-	// if (!strcmp(name, "NE1")) cout << "Checking if " << aaletter << residue << ":" << name << " is part of ring " << *ring << endl;
-	
-	// Since the objects can't be trusted to keep the damn data that have been set...
-	Atom** ra = ring->get_atoms();
-	int i;
-	for (i=0; ra[i]; i++)
-	{
-		if (ra[i] == this)
-		{
-			// if (!strcmp(name, "NE1")) cout << "Yep!" << endl;
-			int j, n=0;
-			bool already = false;
-			if (member_of) for (n=0; member_of[n]; n++) if (member_of[n] == ring) already = true;		// Determine length.
-			if (!already)
-			{
-				Ring** array = new Ring*[4+n];
-				for (j=0; j<n+4; j++) array[j] = nullptr;
-				if (member_of)
-					for (j=0; j<n; j++)
-						array[j] = member_of[j];
-				array[n++] = ring;
-				array[n] = nullptr;
-				if (member_of) delete[] member_of;
-				member_of = array;
-			}
-		}
-	}
-	
-	/*if (!strcmp(name, "NE1"))
-	{
-		cout << "----" << endl;
-		for (i=0; member_of[i]; i++) cout << *member_of[i] << endl;
-		cout << "----" << endl << endl;
-	}*/
-	
-	if (!member_of) return false;
-	for (i=0; member_of[i]; i++)
-		if (member_of[i] == ring) return true;
-	
-	return false;
+    if (!ring) return false;
+
+    // if (!strcmp(name, "NE1")) cout << "Checking if " << aaletter << residue << ":" << name << " is part of ring " << *ring << endl;
+
+    // Since the objects can't be trusted to keep the damn data that have been set...
+    Atom** ra = ring->get_atoms();
+    int i;
+    for (i=0; ra[i]; i++)
+    {
+        if (ra[i] == this)
+        {
+            // if (!strcmp(name, "NE1")) cout << "Yep!" << endl;
+            int j, n=0;
+            bool already = false;
+            if (member_of) for (n=0; member_of[n]; n++) if (member_of[n] == ring) already = true;		// Determine length.
+            if (!already)
+            {
+                Ring** array = new Ring*[4+n];
+                for (j=0; j<n+4; j++) array[j] = nullptr;
+                if (member_of)
+                    for (j=0; j<n; j++)
+                        array[j] = member_of[j];
+                array[n++] = ring;
+                array[n] = nullptr;
+                if (member_of) delete[] member_of;
+                member_of = array;
+            }
+        }
+    }
+
+    /*if (!strcmp(name, "NE1"))
+    {
+    	cout << "----" << endl;
+    	for (i=0; member_of[i]; i++) cout << *member_of[i] << endl;
+    	cout << "----" << endl << endl;
+    }*/
+
+    if (!member_of) return false;
+    for (i=0; member_of[i]; i++)
+        if (member_of[i] == ring) return true;
+
+    return false;
 }
 
 Ring* Atom::closest_arom_ring_to(Point target)
 {
-	int j, k;
-	if (member_of)
-	{
-		k = -1;
-		float brr = 99999;
-		for (j=0; member_of[j]; j++)
-		{
-			Point rloc = member_of[j]->get_center();
-			float rr = rloc.get_3d_distance(target);
-			if (rr < brr)
-			{
-				k = j;
-				brr = rr;
-			}
-		}
-		
-		if (k >= 0)
-		{
-			return member_of[k];
-		}
-	}
-	
-	return nullptr;
+    int j, k;
+    if (member_of)
+    {
+        k = -1;
+        float brr = 99999;
+        for (j=0; member_of[j]; j++)
+        {
+            Point rloc = member_of[j]->get_center();
+            float rr = rloc.get_3d_distance(target);
+            if (rr < brr)
+            {
+                k = j;
+                brr = rr;
+            }
+        }
+
+        if (k >= 0)
+        {
+            return member_of[k];
+        }
+    }
+
+    return nullptr;
 }
 
 void Ring::fill_with_atoms(Atom** from_atoms)
 {
-	if (!from_atoms) return;
-	
-	int i;
-	for (i=0; from_atoms[i]; i++);	// Get count.
-	atcount = i;
-	
-	atoms = new Atom*[atcount+2];
-	for (i=0; i < atcount; i++)
-	{
-		atoms[i] = from_atoms[i];
-		if (!atoms[i]->member_of)
-		{
-			atoms[i]->member_of = new Ring*[4];
-			atoms[i]->member_of[0] = this;
-			atoms[i]->member_of[1] = atoms[i]->member_of[2] = atoms[i]->member_of[3] = nullptr;
-			/*if (atoms[i]->aaletter == 'W') cout << "Ring::Ring(Atom**): "
-				<< atoms[i]->aa3let << atoms[i]->residue << ":" << atoms[i]->name
-				<< " is a member of a ring. " << hex << this << dec << endl;*/
-		}
-		else
-		{
-			int j, n;
-			for (n=0; atoms[i]->member_of[n]; n++);		// Determine length.
-			Ring** array = new Ring*[4+n];
-			for (j=0; j<n+4; j++) array[j] = nullptr;
-			for (j=0; j<n; j++)
-				array[n] = atoms[i]->member_of[n];
-			array[n++] = this;
-			array[n] = nullptr;
-			delete[] atoms[i]->member_of;
-			atoms[i]->member_of = array;
-			/*if (atoms[i]->aaletter == 'W') cout << "Ring::Ring(Atom**): "
-				<< atoms[i]->aaletter << atoms[i]->residue << ":" << atoms[i]->name
-				<< " is a member of a ring. " << hex << this << dec << endl;*/
-		}
-	}
-	
-	atoms[atcount] = nullptr;
+    if (!from_atoms) return;
+
+    int i;
+    for (i=0; from_atoms[i]; i++);	// Get count.
+    atcount = i;
+
+    atoms = new Atom*[atcount+2];
+    for (i=0; i < atcount; i++)
+    {
+        atoms[i] = from_atoms[i];
+        if (!atoms[i]->member_of)
+        {
+            atoms[i]->member_of = new Ring*[4];
+            atoms[i]->member_of[0] = this;
+            atoms[i]->member_of[1] = atoms[i]->member_of[2] = atoms[i]->member_of[3] = nullptr;
+            /*if (atoms[i]->aaletter == 'W') cout << "Ring::Ring(Atom**): "
+            	<< atoms[i]->aa3let << atoms[i]->residue << ":" << atoms[i]->name
+            	<< " is a member of a ring. " << hex << this << dec << endl;*/
+        }
+        else
+        {
+            int j, n;
+            for (n=0; atoms[i]->member_of[n]; n++);		// Determine length.
+            Ring** array = new Ring*[4+n];
+            for (j=0; j<n+4; j++) array[j] = nullptr;
+            for (j=0; j<n; j++)
+                array[n] = atoms[i]->member_of[n];
+            array[n++] = this;
+            array[n] = nullptr;
+            delete[] atoms[i]->member_of;
+            atoms[i]->member_of = array;
+            /*if (atoms[i]->aaletter == 'W') cout << "Ring::Ring(Atom**): "
+            	<< atoms[i]->aaletter << atoms[i]->residue << ":" << atoms[i]->name
+            	<< " is a member of a ring. " << hex << this << dec << endl;*/
+        }
+    }
+
+    atoms[atcount] = nullptr;
 }
 
 Ring::Ring(Atom** from_atoms)
 {
-	fill_with_atoms(from_atoms);
-	determine_type();
+    fill_with_atoms(from_atoms);
+    determine_type();
 }
 
 Ring::Ring(Atom** from_atoms, RING_TYPE ltype)
 {
-	fill_with_atoms(from_atoms);
-	type = ltype;
+    fill_with_atoms(from_atoms);
+    type = ltype;
 }
 
 Atom* Ring::get_atom(int index)
 {
-	if (index < 0 || index >= atcount) return nullptr;
-	return atoms[index];
+    if (index < 0 || index >= atcount) return nullptr;
+    return atoms[index];
 }
 
 Atom** Ring::get_atoms() const
 {
-	if (!atcount) return nullptr;
-	Atom** retval = new Atom*[atcount+2];
-	int i;
-	
-	for (i=0; i<atcount; i++)
-	{
-		retval[i] = atoms[i];
-	}
-	retval[atcount] = nullptr;
-	
-	return retval;
+    if (!atcount) return nullptr;
+    Atom** retval = new Atom*[atcount+2];
+    int i;
+
+    for (i=0; i<atcount; i++)
+    {
+        retval[i] = atoms[i];
+    }
+    retval[atcount] = nullptr;
+
+    return retval;
 }
 
 RING_TYPE Ring::get_type()
 {
-	if (type == UNKNOWN) determine_type();
-	return type;
+    if (type == UNKNOWN) determine_type();
+    return type;
 }
 
 Point Ring::get_center()
 {
-	Point _4avg[atcount+2];
-	int i;
-	for (i=0; i < atcount; i++)
-	{
-		_4avg[i] = atoms[i]->location;
-	}
-	
-	return average_of_points(_4avg, atcount);
+    Point _4avg[atcount+2];
+    int i;
+    for (i=0; i < atcount; i++)
+    {
+        _4avg[i] = atoms[i]->location;
+    }
+
+    return average_of_points(_4avg, atcount);
 }
 
 SCoord Ring::get_normal()
 {
-	int i, j, k;
-	float w=0, x=0, y=0, z=0;
-	
-	for (i=0; i < atcount; i++)
-	{
-		for (j=i+1; j < atcount; j++)
-		{
-			for (k=j+1; k < atcount; k++)
-			{
-				// Note if the atoms are not in sequence, this approach will fail.
-				Point pt = compute_normal(atoms[i]->location, atoms[j]->location, atoms[k]->location);
-				w += pt.weight ? pt.weight : 1;
-				x += pt.x;
-				y += pt.y;
-				z += pt.z;
-			}
-		}
-	}
-	
-	Point pt1(x/w, y/w, z/w);
-	return (SCoord)pt1;
+    int i, j, k;
+    float w=0, x=0, y=0, z=0;
+
+    for (i=0; i < atcount; i++)
+    {
+        for (j=i+1; j < atcount; j++)
+        {
+            for (k=j+1; k < atcount; k++)
+            {
+                // Note if the atoms are not in sequence, this approach will fail.
+                Point pt = compute_normal(atoms[i]->location, atoms[j]->location, atoms[k]->location);
+                w += pt.weight ? pt.weight : 1;
+                x += pt.x;
+                y += pt.y;
+                z += pt.z;
+            }
+        }
+    }
+
+    Point pt1(x/w, y/w, z/w);
+    return (SCoord)pt1;
 }
 
 bool Ring::is_conjugated()
 {
-	if (!atoms) return false;
-	return atoms_are_conjugated(atoms);
+    if (!atoms) return false;
+    return atoms_are_conjugated(atoms);
 }
 
 bool Ring::is_coplanar()
 {
-	if (type != UNKNOWN)
-	{
-		return (type == AROMATIC || type == ANTIAROMATIC || type == COPLANAR);
-	}
-	else
-	{
-		if (!atoms) return false;
-		if (!atcount) return false;
-		if (atcount < 4) return true;
+    if (type != UNKNOWN)
+    {
+        return (type == AROMATIC || type == ANTIAROMATIC || type == COPLANAR);
+    }
+    else
+    {
+        if (!atoms) return false;
+        if (!atcount) return false;
+        if (atcount < 4) return true;
 
-		int i;
-		float anomaly;
-		for (i=3; i<atcount; i++)
-		{
-		    anomaly = are_points_planar(atoms[0]->get_location(),
-		                                atoms[1]->get_location(),
-		                                atoms[2]->get_location(),
-		                                atoms[i]->get_location()
-		                               );
-		}
+        int i;
+        float anomaly;
+        for (i=3; i<atcount; i++)
+        {
+            anomaly = are_points_planar(atoms[0]->get_location(),
+                                        atoms[1]->get_location(),
+                                        atoms[2]->get_location(),
+                                        atoms[i]->get_location()
+                                       );
+        }
 
-		return (anomaly < 0.1);
+        return (anomaly < 0.1);
     }
 }
 
 LocatedVector Ring::get_center_and_normal()
 {
-	LocatedVector retval;
-	retval.copy(get_normal());
-	retval.origin = get_center();
-	return retval;
+    LocatedVector retval;
+    retval.copy(get_normal());
+    retval.origin = get_center();
+    return retval;
 }
 
 bool Ring::Huckel()
 {
-	if (!atcount) return false;
-	int i;
-	int pi_electrons = 0;
-	int wiggle_room = 0;
-	
-	for (i=0; atoms[i]; i++)
-	{
-		if (atoms[i]->is_pi()) pi_electrons++;
-		
-		switch (atoms[i]->get_family())
-		{
-			case PNICTOGEN:
-			case CHALCOGEN:
-			wiggle_room += 2;
-			break;
-			
-			default:
-			;
-		}
-	}
-	
-	for (i=0; i<=wiggle_room; i+=2)
-	{
-		int n = pi_electrons + i;
-		n -= 2;
-		if (n && !(n % 4)) return true;
-	}
-	return false;
+    if (!atcount) return false;
+    int i;
+    int pi_electrons = 0;
+    int wiggle_room = 0;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_pi()) pi_electrons++;
+
+        switch (atoms[i]->get_family())
+        {
+        case PNICTOGEN:
+        case CHALCOGEN:
+            wiggle_room += 2;
+            break;
+
+        default:
+            ;
+        }
+    }
+
+    for (i=0; i<=wiggle_room; i+=2)
+    {
+        int n = pi_electrons + i;
+        n -= 2;
+        if (n && !(n % 4)) return true;
+    }
+    return false;
 }
 
 bool atoms_are_conjugated(Atom** atoms)
 {
-	int i;
-	
-	for (i=0; atoms[i]; i++)
-	{
-		if (i && !atoms[i]->is_bonded_to(atoms[i-1])) return false;
-		switch (atoms[i]->get_family())
-		{
-			case TETREL:
-			// cout << atoms[i]->name << "|" << atoms[i]->get_count_pi_bonds() << "|" << atoms[i]->get_charge() << endl;
-			if (atoms[i]->get_count_pi_bonds() != 1
-				&&
-				!atoms[i]->get_charge()
-				)
-				return false;
-			break;
-			
-			case TRIEL:
-			case PNICTOGEN:
-			case CHALCOGEN:
-			break;
-			
-			default:
-			return false;
-		}
-	}
-	
-	return true;
+    int i;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (i && !atoms[i]->is_bonded_to(atoms[i-1])) return false;
+        switch (atoms[i]->get_family())
+        {
+        case TETREL:
+            // cout << atoms[i]->name << "|" << atoms[i]->get_count_pi_bonds() << "|" << atoms[i]->get_charge() << endl;
+            if (atoms[i]->get_count_pi_bonds() != 1
+                    &&
+                    !atoms[i]->get_charge()
+               )
+                return false;
+            break;
+
+        case TRIEL:
+        case PNICTOGEN:
+        case CHALCOGEN:
+            break;
+
+        default:
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void Ring::determine_type()
 {
-	if (!atoms_are_conjugated(atoms))
-	{
-		type = OTHER;
-		return;
-	}
-	
-	if (!is_coplanar())
-	{
-		type = OTHER;
-		return;
-	}
-	
-	if (Huckel()) type = AROMATIC;
-	else if (0) type = ANTIAROMATIC;		// TODO
-	else type = COPLANAR;
+    if (!atoms_are_conjugated(atoms))
+    {
+        type = OTHER;
+        return;
+    }
+
+    if (!is_coplanar())
+    {
+        type = OTHER;
+        return;
+    }
+
+    if (Huckel()) type = AROMATIC;
+    else if (0) type = ANTIAROMATIC;		// TODO
+    else type = COPLANAR;
 }
 
 std::ostream& operator<<(std::ostream& os, const Bond& b)
 {
-	os << b.atom->name;
-	os << cardinality_printable(b.cardinality);
-	os << b.btom->name;
-	
-	return os;
+    os << b.atom->name;
+    os << cardinality_printable(b.cardinality);
+    os << b.btom->name;
+
+    return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const Ring& r)
 {
-	Atom** a = r.get_atoms();
-	if (!a) os << "[empty]";
-	else
-	{
-		os << "[";
-		int i;
-		for (i=0; a[i]; i++) os << a[i]->name << " ";
-		os << "]";
-	}
-	
-	return os;
+    Atom** a = r.get_atoms();
+    if (!a) os << "[empty]";
+    else
+    {
+        os << "[";
+        int i;
+        for (i=0; a[i]; i++) os << a[i]->name << " ";
+        os << "]";
+    }
+
+    return os;
 }
 
 

@@ -30,6 +30,35 @@ Casting a Cartesian back to float or integer obtains the magnitude of the Cartes
 
 The command line arguments are made available to the script as $arg1, $arg2, etc.
 
+
+Array functionality is available, though not implemented as true arrays. Each element is internally stored as its own discrete variable, for example
+if we define `LET $array[3] = "three"` then a string variable called `$array[3]` will be assigned the value of `three`. That means any reference to
+`$array` will obtain an empty string since that variable technically hasn't been set.
+
+Variables as array indices are possible because of nested variable names. If an integer `%i` is set, and has a value of `3`, then `$array[%i]` and `$array[3]` will be equivalent. Nested variables are limited to integer and string types, so while `$array[$element]` is allowed, 
+`$array[@location.x]` is not. If there is any ambiguity in variable names, the longest and earliest matching variable is used.
+
+This works similarly to the `$$` syntax of PHP, where if `$varname = "foo"` then `$$varname` is the same as `$foo`. However, unlike in PHP, the nested
+variable name can occur anywhere in a Peptiditor variable, there can be more than one nested variable, and variable names can be nested multiple levels
+deep, so for example `$array[%i][%array2[%j]]` is legal Peptiditor syntax as long as `%i`, `%j`, and `%array2[%j]` have all been set.
+
+This also means that square brackets are not required for array functionality, and one could just as easily define variable `$array[3]` as `$array3`,
+`$array(3)`, or `$arrayfoo3bar`, and the syntax of `%i` (or any other int variable) in place of `3` will still work.
+
+Example of how nested variable names work:
+
+```
+LET %sub = 3
+
+LET $array[3] = "three"
+ECHO $array[%sub]         # outputs three
+
+LET $$array[3] = "Yup!"   # same as LET $three = "Yup!" because $array[3] = "three".
+ECHO $$array[%sub]        # outputs Yup!
+ECHO $three               # outputs Yup!
+```
+
+
 The following "magic variables" are supplied upon loading a protein:
 - `$PDB` the path and name of the source PDB file.
 - `$PROTEIN` the name of the protein, derived from a `REMARK 6` record if present.
@@ -102,6 +131,15 @@ BRIDGE 251 111 50
 Iteratively conform the side chains of two residues (parameters 1 and 2) to maximize their non-covalent bonding to each other. If the optional third
 parameter is given, it represents the number of iterations (default 50). More iterations give better results, but takes longer to process, and diminishing
 returns occur with large iteration values.
+
+
+# CENTER
+Example:
+```
+CENTER
+```
+
+Centers the entire protein at [0, 0, 0]. Currently this command does not take any arguments.
 
 
 # CONNECT
@@ -231,7 +269,9 @@ LET $name = "PrimaryDock"
 LET $range = $SEQUENCE FROM 174 FOR 20
 LET $sub = $name FROM 3 FOR 4
 LET &j = %i
-LET @res174loc = 174
+LET @loc = [5, 3, -8]           # Literal XYZ coordinates.
+LET @loc = [5, &j, %i]
+LET @res174loc = 174            # Gets location of residue 174's alpha carbon.
 LET &j += @res174loc.y
 LET @loc3 = @loc1 + @loc2
 LET $message = "TMR4 ends on residue " + %TMR4.e + " and TMR5 starts on residue " + %TMR5.s + "."
@@ -282,6 +322,17 @@ Yar or YO before the metal symbol applies globally to the coordination residues.
 overriding the default or any global.
 
 
+# REGION
+Example:
+```
+REGION TMR5 202 238
+REGION "TMR5" 202 238
+REGION $region_name %start_res %end_res
+```
+
+Defines a region in the protein object, overwriting any existing region with the same name. Also creates the %region.s and %region.e variables.
+
+
 # SAVE
 Example:
 ```
@@ -316,8 +367,22 @@ which of two or more motifs a region has, for example it is possible to search a
 values and use an `IF` to take a different action depending which is the better match.
 
 
+# UPRIGHT
+Example:
+```
+UPRIGHT
+```
 
+Turns the protein "upright", so that the extracellular domain is in the +Y direction and the cytoplasmic domain is in the -Y direction.
+The entire protein will also be centered at [0, 0, 0].
 
+Valid only for transmembrane proteins with at least one transmembrane helix. The protein must have TMR1 through TMR{n} defined, where n <= 7.
+If the PDB does not contain suitable `REMARK 650 HELIX` records, then the TMRs must be defined with the `REGION` command.
+
+If the protein has a TMR4, it will be rotated to the +Z direction from TMR1. This affords a good view of the binding pocket of 7-helix GPCRs, but also
+maintains compatibility with MS4A proteins since it does not depend on the existence of a TMR5, TMR6, or TMR7.
+
+UPRIGHT takes no arguments.
 
 
 

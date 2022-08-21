@@ -22,33 +22,33 @@ enum MovabilityType
 
 enum MoleculeType
 {
-	MOLTYP_UNKNOWN,
-	MOLTYP_LIGAND,
-	MOLTYP_WATER,
-	MOLTYP_AMINOACID
+    MOLTYP_UNKNOWN,
+    MOLTYP_LIGAND,
+    MOLTYP_WATER,
+    MOLTYP_AMINOACID
 };
 
 class Pose
 {
-	public:
-	Pose();
-	Pose(Molecule* from_mol);
-	void copy_state(Molecule* from_mol);
-	void restore_state(Molecule* to_mol);
-	void reset();
-	
-	protected:
-	int sz = 0;
-	Point* saved_atom_locs = nullptr;
-	Molecule* saved_from = nullptr;
+public:
+    Pose();
+    Pose(Molecule* from_mol);
+    void copy_state(Molecule* from_mol);
+    void restore_state(Molecule* to_mol);
+    void reset();
+
+protected:
+    int sz = 0;
+    Point* saved_atom_locs = nullptr;
+    Molecule* saved_from = nullptr;
 };
 
 
 class Molecule
 {
-	friend class Pose;
-	
-	public:
+    friend class Pose;
+
+public:
     Molecule(const char* name);
     Molecule(const char* name, Atom** collection);
     virtual ~Molecule();
@@ -63,8 +63,14 @@ class Molecule
     bool from_smiles(char const * smilesstr);
 
     // Getters.
-    const char* get_name() const	{	return name;	}
-    int get_atom_count() const	{	return atcount;	}
+    const char* get_name() const
+    {
+        return name;
+    }
+    int get_atom_count() const
+    {
+        return atcount;
+    }
     int get_bond_count(bool unidirectional) const;
     Atom* get_nearest_atom(Point loc) const;
     Atom* get_nearest_atom(Point loc, intera_type capable_of) const;
@@ -88,7 +94,10 @@ class Molecule
     Atom* add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard);
     char** get_atom_names() const;
     Atom* get_atom(const char* aname) const;
-    Atom* get_atom(const int a_idx) const { return atoms[a_idx]; }
+    Atom* get_atom(const int a_idx) const
+    {
+        return atoms[a_idx];
+    }
     Point get_atom_location(const char* aname);
     int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);
@@ -122,7 +131,7 @@ class Molecule
     float get_intermol_potential(Molecule* ligand);
     float get_intermol_potential(Molecule** ligands);
     float hydrophilicity();
-    
+
     float get_vdW_repulsion(Molecule* ligand);
 
     static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);
@@ -134,19 +143,26 @@ class Molecule
     void reset_conformer_momenta();
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
     Atom** get_most_bindable(int max_num, Atom* for_atom);
-    
+
     // Debug stuff.
     #if debug_break_on_move
-    void set_atoms_break_on_move(bool break_on_move) { if (atoms) { int i; for (i=0; atoms[i]; i++) atoms[i]->break_on_move = break_on_move; } }
+    void set_atoms_break_on_move(bool break_on_move)
+    {
+        if (atoms)
+        {
+            int i;
+            for (i=0; atoms[i]; i++) atoms[i]->break_on_move = break_on_move;
+        }
+    }
     #endif
 
     bool echo_iters = false;
     MovabilityType movability = MOV_ALL;
     float lastbind = 0;
 
-	protected:
+protected:
     Molecule();
-    
+
     Atom** atoms = 0;
     int atcount = 0;
     char* name = 0;
@@ -157,7 +173,7 @@ class Molecule
     bool doing_bkbend = false;
     float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
     std::string sdfgen_aboutline = "";
-    
+
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.
     float amx=0,amy=0,amz=0;			// Angular momentum xyz.
@@ -166,7 +182,7 @@ class Molecule
     int smlen = 0;
     SMILES_Parenthetical* paren;
     int spnum = 0;
-	MoleculeType mol_typ = MOLTYP_UNKNOWN;
+    MoleculeType mol_typ = MOLTYP_UNKNOWN;
 
     int aidx(Atom* a);
     void reallocate();

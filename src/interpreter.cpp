@@ -58,6 +58,12 @@ VarType type_from_name(const char* varname)
 	return SV_NONE;	
 }
 
+int interpret_single_int(const char* param);
+
+float interpret_single_float(const char* param);
+
+char* interpret_single_string(const char* param);
+
 int find_var_index(const char* varname)
 {
 	int i;
@@ -71,9 +77,43 @@ int find_var_index(const char* varname)
 	char* c;
 	int flags = 0;
 	strcpy(buffer, varname);
+
+	c=strchr(buffer+1,'%');
+	if (!c) c=strchr(buffer+1,'$');
+	if (c > buffer)
+	{
+		char buffer1[256];
+		strcpy(buffer1, c);
+
+		while (c[1])
+		{
+			Star s;
+			if (*c == '%') s.n = interpret_single_int(buffer1);
+			if (*c == '$') s.psz = interpret_single_string(buffer1);
+
+			if (s.n)
+			{
+				char buffer2[512];
+				if (*c == '%') 
+				{
+					*c = 0;
+					sprintf(buffer2, "%s%d%s", buffer, s.n, &c[strlen(buffer1)]);
+				}
+				if (*c == '$') 
+				{
+					*c = 0;
+					sprintf(buffer2, "%s%s%s", buffer, s.psz, &c[strlen(buffer1)]);
+				}
+				strcpy(buffer, buffer2);
+				break;
+			}
+
+			buffer1[strlen(buffer1)-1] = 0;
+		}
+	}
 	
 	if (c=strchr(buffer,',')) *c=0;
-	else if (c=strchr(buffer,'.')) { flags |= _HAS_DOT; *c=0; }
+	else if (buffer[0] != '%') if (c=strchr(buffer,'.')) { flags |= _HAS_DOT; *c=0; }
 	else if (c=strchr(buffer,':')) *c=0;
 	
 	for (i=0; i<vars; i++)
@@ -99,8 +139,6 @@ int set_variable(char* vname, Star vvalue)
 
 	return n;
 }
-
-float interpret_single_float(const char* param);
 
 Point interpret_Cartesian_literal(const char* param)
 {

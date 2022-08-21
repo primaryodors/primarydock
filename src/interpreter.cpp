@@ -64,7 +64,7 @@ float interpret_single_float(const char* param);
 
 char* interpret_single_string(const char* param);
 
-int find_var_index(const char* varname)
+int find_var_index(const char* varname, char** out_varname = nullptr)
 {
 	int i;
 	
@@ -78,8 +78,14 @@ int find_var_index(const char* varname)
 	int flags = 0;
 	strcpy(buffer, varname);
 
-	c=strchr(buffer+1,'%');
-	if (!c) c=strchr(buffer+1,'$');
+	char* c1 = strchr(buffer+1,'%');
+	char* c2 = strchr(buffer+1,'$');
+
+	if (!c1 && !c2) c = c1;
+	if (!c1 &&  c2) c = c2;
+	if ( c1 && !c2) c = c1;
+	if ( c1 &&  c2) c = min(c1, c2);
+
 	if (c > buffer)
 	{
 		char buffer1[256];
@@ -105,6 +111,14 @@ int find_var_index(const char* varname)
 					sprintf(buffer2, "%s%s%s", buffer, s.psz, &c[strlen(buffer1)]);
 				}
 				strcpy(buffer, buffer2);
+
+				if (out_varname)
+				{
+					// delete[] *out_varname;
+					*out_varname = new char[strlen(buffer)+4];
+					strcpy(*out_varname, buffer);
+				}
+
 				break;
 			}
 
@@ -1104,7 +1118,7 @@ int main(int argc, char** argv)
 			else if (!strcmp(fields[0], "LET"))
 			{
 				if (!fields[1]) raise_error("No parameters given for LET.");
-				n = find_var_index(fields[1]);
+				n = find_var_index(fields[1], &fields[1]);
 				if (n<0)
 				{
 					n = vars++;

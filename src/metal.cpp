@@ -152,7 +152,7 @@ int main(int argc, char** argv)
         }
         fclose(pf);
         numres = j;
-        
+
         for (i=1; i<=7; i++)
         {
             char rgname[10];
@@ -183,18 +183,18 @@ int main(int argc, char** argv)
         startres = rgn.end+1;
         rgn = p.get_region("TMR5");
         endres = rgn.start-1;
-        
+
         aa = p.get_residue(endres);
         Cend = aa->get_atom("C");
         Oend = aa->get_atom("O");
-    	Cpt = Cend->get_location();
-    	Opt = Oend->get_location();
-        
+        Cpt = Cend->get_location();
+        Opt = Oend->get_location();
+
 
         //cout << "Extending strand." << endl;
         //p.conform_backbone(startres, endres, Cend, wayuphigh, 50);
         //save_transitional_pdb(&p);
-        
+
 
         cout << "Generating an alpha helix." << endl;
         p.make_helix(hxstart, hxend, endres, ALPHA_PHI, ALPHA_PSI);
@@ -221,7 +221,7 @@ int main(int argc, char** argv)
         foravg[avgi++] = p.get_atom_location(endres+4, "CA");
         Point pt5 = average_of_points(foravg, avgi);
         pt5.y += stepht*2;
-        
+
         int end3 = p.get_region_start("TMR3");
         avgi = 0;
         foravg[avgi++] = p.get_atom_location(end3, "CA");
@@ -230,20 +230,20 @@ int main(int argc, char** argv)
         foravg[avgi++] = p.get_atom_location(end3+3, "CA");
         Point pt3 = average_of_points(foravg, avgi);
         pt3.y += stepht*2;
-        
+
         avgi = 0;
         foravg[avgi++] = pt5;
         foravg[avgi++] = pt3;
         Point pt35 = average_of_points(foravg, avgi);
-        
-    	// p.conform_backbone(startres, endres, p.get_atom(hxstart, "CA"), pt5, 100);
-    	p.move_piece(hxstart, hxend, pt35);
+
+        // p.conform_backbone(startres, endres, p.get_atom(hxstart, "CA"), pt5, 100);
+        p.move_piece(hxstart, hxend, pt35);
         save_transitional_pdb(&p);
-        
+
         cout << "Extending strand..." << endl;
         p.conform_backbone(hxend+1, endres, p.get_atom(endres, "C"), wayuphigh, 100);
         save_transitional_pdb(&p);
-        
+
         cout << "Extending shelf..." << endl;
         Point extreme5 = pt5.subtract(pt3);
         extreme5.scale(100000);

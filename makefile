@@ -15,6 +15,7 @@ all: $(DIRS) \
 	 $(REPORTS)
 code: $(OBJS) $(TESTS) molecule_report $(APPS)
 primarydock: $(DIRS) $(OBJS) $(BINDIR)/primarydock
+peptiditor: $(DIRS) $(OBJS) $(BINDIR)/peptiditor
 
 CC=g++
 

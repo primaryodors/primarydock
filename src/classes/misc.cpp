@@ -59,21 +59,21 @@ char** chop_spaced_fields(char* line, char separator)
     char** retval = new char*[100];
     int i, j=0;
 
-	if (!line[0]) return nullptr;
-	
+    if (!line[0]) return nullptr;
+
     if (separator == ' ' && line[0] == '\t') line[0] = separator;
     if (line[0] != separator) retval[j++] = line;
     for (i=1; line[i] && (line[i] != '\n'); i++)
     {
-    	if (line[i] == '"')
-    	{
-    		retval[j++] = &line[i++];
-    		for (; line[i] && line[i] != '"'; i++);		// Get to next quote character.
-    		if (line[i] == '"') line[++i] = '\0';
-    		continue;
-    	}
-    	
-    	
+        if (line[i] == '"')
+        {
+            retval[j++] = &line[i++];
+            for (; line[i] && line[i] != '"'; i++);		// Get to next quote character.
+            if (line[i] == '"') line[++i] = '\0';
+            continue;
+        }
+
+
         if (separator == ' ' && line[i] == '\t') line[i] = separator;
         if (line[i-1] == separator && line[i] != separator) retval[j++] = line+i;
         else if (line[i-1] == 0 && line[i] != separator) retval[j++] = line+i;
@@ -218,34 +218,34 @@ float Pearson_correlation(float* xarr, float* yarr, int length)
 
 std::string cardinality_printable(float card)
 {
-	std::string retval = ".";
-	if (card > 1 && card < 2) retval = ":";
-	else switch ((int)card)
-	{
-		case 0:
-		break;
-		
-		case 1:
-		retval = "-";
-		break;
-		
-		case 2:
-		retval = "=";
-		break;
-		
-		case 3:
-		retval = "#";
-		break;
-		
-		case 4:
-		retval = "$";
-		break;
-		
-		default:
-		retval = "!?";
-	}
-	
-	return retval;
+    std::string retval = ".";
+    if (card > 1 && card < 2) retval = ":";
+    else switch ((int)card)
+        {
+        case 0:
+            break;
+
+        case 1:
+            retval = "-";
+            break;
+
+        case 2:
+            retval = "=";
+            break;
+
+        case 3:
+            retval = "#";
+            break;
+
+        case 4:
+            retval = "$";
+            break;
+
+        default:
+            retval = "!?";
+        }
+
+    return retval;
 }
 
 

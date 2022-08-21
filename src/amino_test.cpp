@@ -57,47 +57,47 @@ int main(int argc, char** argv)
         fclose(pf);
         cout << "Wrote " << outfn << endl;
 
-		char outfn2[50];
-		AADef* aad = firstaa->get_aa_definition();
-		if (aad) sprintf(outfn2, "%s.sdf", aad->name);
-		else strcpy(outfn2, "aatest.sdf");
-		pf = fopen(outfn2, "wb");
-		firstaa->save_sdf(pf);
-		fclose(pf);
-		cout << "Wrote " << outfn2 << endl;
+        char outfn2[50];
+        AADef* aad = firstaa->get_aa_definition();
+        if (aad) sprintf(outfn2, "%s.sdf", aad->name);
+        else strcpy(outfn2, "aatest.sdf");
+        pf = fopen(outfn2, "wb");
+        firstaa->save_sdf(pf);
+        fclose(pf);
+        cout << "Wrote " << outfn2 << endl;
     }
     else
     {
-    	if (argc>1) letter = argv[1][0];
+        if (argc>1) letter = argv[1][0];
         AminoAcid aa(letter);
-        
+
         cout << "Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? "
-        	 << (aa.is_tyrosine_like() ? "Y" : "N") << endl;
-        
+             << (aa.is_tyrosine_like() ? "Y" : "N") << endl;
+
         Bond** bb = aa.get_rotatable_bonds();
         if (bb && bb[0])
         {
-        	for (i=0; bb[i]; i++)
-        	{
-        		Atom** baa = bb[i]->get_moves_with_btom();
-        		cout << bb[i]->atom->name << "-" << bb[i]->btom->name << " can rotate, bringing ";
-        		
-        		if (baa)
-        		{
-        			for (j=0; baa[j]; j++)
-        			{
-        				cout << baa[j]->name << " ";
-        			}
-        			if (!j) cout << "zero atoms.";
-        		}
-        		else cout << "no atoms.";
-        		
-        		cout << endl;
-        		delete[] baa;
-        	}
+            for (i=0; bb[i]; i++)
+            {
+                Atom** baa = bb[i]->get_moves_with_btom();
+                cout << bb[i]->atom->name << "-" << bb[i]->btom->name << " can rotate, bringing ";
+
+                if (baa)
+                {
+                    for (j=0; baa[j]; j++)
+                    {
+                        cout << baa[j]->name << " ";
+                    }
+                    if (!j) cout << "zero atoms.";
+                }
+                else cout << "no atoms.";
+
+                cout << endl;
+                delete[] baa;
+            }
         }
         else cout << "No rotatable bonds." << endl;
-        
+
         cout << aa.get_name() << " hydrophilicity = " << aa.hydrophilicity() << endl;
         cout << "Similarity to A " << aa.similarity_to('A') << endl;
         cout << "Similarity to D " << aa.similarity_to('D') << endl;
@@ -112,11 +112,11 @@ int main(int argc, char** argv)
         fclose(pf);
         cout << "Wrote " << outfn << endl;
 
-		const char* outfn2 = "test.sdf";
-		pf = fopen(outfn2, "wb");
-		aa.save_sdf(pf);
-		fclose(pf);
-		cout << "Wrote " << outfn2 << endl;
+        const char* outfn2 = "test.sdf";
+        pf = fopen(outfn2, "wb");
+        aa.save_sdf(pf);
+        fclose(pf);
+        cout << "Wrote " << outfn2 << endl;
     }
 
     return 0;

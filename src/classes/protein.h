@@ -17,7 +17,7 @@ struct Region
 
 class Protein
 {
-	public:
+public:
     // Constructors.
     Protein(const char* name);
 
@@ -49,7 +49,10 @@ class Protein
     int get_region_start(std::string name);
     bool aa_ptr_in_range( AminoAcid* aaptr );
     Atom* get_atom(int resno, const char* aname);
-    std::string get_name() { return std::string(name); }
+    std::string get_name()
+    {
+        return std::string(name);
+    }
     Point get_atom_location(int resno, const char* aname);
     std::vector<std::string> get_remarks(std::string search_for = "");
 
@@ -75,7 +78,8 @@ class Protein
     // Motion functions
     void move_piece(int start_res, int end_res, Point new_center);		// After calling this, you should reconnect the broken ends with conform_backbone().
     void rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.
-    
+    void rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res);
+
     void rotate_backbone(int residue_no, bb_rot_dir direction, float angle);
     void conform_backbone(int startres, int endres, Atom* a, Point target, int iters = 50);
     void rotate_backbone_partial(int startres, int endres, bb_rot_dir direction, float angle);
@@ -88,9 +92,9 @@ class Protein
                           Atom* a3, Point target3,
                           int iters, bool backbone_atoms_only
                          );
-    
+
     void backconnect(int startres, int endres);
-    
+
     void make_helix(int startres, int endres, float phi, float psi);
     void make_helix(int startres, int endres, int stopat, float phi, float psi);
     float orient_helix
@@ -102,7 +106,7 @@ class Protein
 
     int* mcoord_resnos = NULL;
 
-	protected:
+protected:
     Atom** ca = nullptr;
     std::string name;
     char* sequence = nullptr;

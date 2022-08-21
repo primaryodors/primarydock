@@ -200,9 +200,9 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
 
 int interpret_config_line(char** fields)
 {
-	int i;
-	
-	if (!strcmp(fields[0], "PROT"))
+    int i;
+
+    if (!strcmp(fields[0], "PROT"))
     {
         strcpy(protfname, fields[1]);
         protset = true;
@@ -232,11 +232,11 @@ int interpret_config_line(char** fields)
     {
         i=1;
         int nodeno = atoi(fields[i]);
-        
+
         if (!strcmp(fields[i], "ABS")) i++;
         if (!strcmp(fields[i], "REL")) i++;
         if (!strcmp(fields[i], "RES")) i++;
-        
+
         if (nodeno > 255)
         {
             cout << "Binding path is limited to 255 nodes." << endl;
@@ -253,8 +253,8 @@ int interpret_config_line(char** fields)
     }
     else if (!strcmp(fields[0], "NODEPDB"))
     {
-    	activation_node = atoi(fields[1]);
-    	strcpy(protafname, fields[2]);
+        activation_node = atoi(fields[1]);
+        strcpy(protafname, fields[2]);
     }
     else if (!strcmp(fields[0], "STATE"))
     {
@@ -326,7 +326,7 @@ int interpret_config_line(char** fields)
         int j=0;
         for (i=1; fields[i]; i++)
         {
-        	if (fields[i][0] == '-' && fields[i][1] == '-') break;
+            if (fields[i][0] == '-' && fields[i][1] == '-') break;
             mcoord_resno[j++] = atoi(fields[i]);
         }
         mcoord_resno[j] = 0;
@@ -358,7 +358,7 @@ int interpret_config_line(char** fields)
         output = new std::ofstream(fields[1], std::ofstream::out);
         return 1;
     }
-    
+
     return 0;
 }
 
@@ -384,15 +384,15 @@ void read_config_file(FILE* pf)
 
 void prepare_initb()
 {
-	int i, j;
-	
+    int i, j;
+
     if (differential_dock)
     {
-    	initial_binding = new float[seql+4];
-    	initial_vdWrepl = new float[seql+4];
+        initial_binding = new float[seql+4];
+        initial_vdWrepl = new float[seql+4];
 
         for (i=0; i<seql+4; i++) initial_binding[i] = initial_vdWrepl[i] = 0;
-    	
+
         std::vector<AminoAcid*> preres = protein->get_residues_near(pocketcen, pre_ligand_multimol_radius);
         int qpr = preres.size();
         AminoAcid* preaa[seql+4];
@@ -409,9 +409,9 @@ void prepare_initb()
                 throw 0xbad12e5;
             }
             float r = CA->get_location().get_3d_distance(pocketcen);
-            
+
             aamov[i] = preaa[i]->movability;
-            
+
             if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
         }
 
@@ -437,20 +437,20 @@ void prepare_initb()
             #if _DBG_TOOLARGE_DIFFNUMS
             std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
             #endif
-            
+
             for (j=0; j<qpr; j++)
             {
                 if (j == i) continue;
                 float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]), j==0);
-                
+
                 #if _DBG_TOOLARGE_DIFFNUMS
                 if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
                 #endif
-                
+
                 initial_binding[resno] += f;
                 initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
             }
-            
+
             #if _DBG_TOOLARGE_DIFFNUMS
             if (fabs(initial_binding[resno]) >= 200) cout << ibdbg << endl;
             #endif
@@ -475,22 +475,22 @@ int main(int argc, char** argv)
     time_t began = time(NULL);
 
     strcpy(configfname, "primarydock.config");
-    
+
     for (i=1; i<argc; i++)
     {
-    	if (argv[i][0] == '-' && argv[i][1] == '-')
-    	{
-    		argv[i] += 2;
-    		for (j=0; argv[i][j]; j++) if (argv[i][j] >= 'a' && argv[i][j] <= 'z') argv[i][j] &= 0x5f;
-    		j = interpret_config_line(&argv[i]);
-    		argv[i] -= 2;
-    		i += j;
-    	}
-    	else
-    	{
-    		strcpy(configfname, argv[i]);
-        	configset = true;
-    	}
+        if (argv[i][0] == '-' && argv[i][1] == '-')
+        {
+            argv[i] += 2;
+            for (j=0; argv[i][j]; j++) if (argv[i][j] >= 'a' && argv[i][j] <= 'z') argv[i][j] &= 0x5f;
+            j = interpret_config_line(&argv[i]);
+            argv[i] -= 2;
+            i += j;
+        }
+        else
+        {
+            strcpy(configfname, argv[i]);
+            configset = true;
+        }
     }
 
     FILE* pf = fopen(configfname, "r");
@@ -505,14 +505,14 @@ int main(int argc, char** argv)
 
     for (i=1; i<argc; i++)
     {
-    	if (argv[i][0] == '-' && argv[i][1] == '-')
-    	{
-    		argv[i] += 2;
-    		for (j=0; argv[i][j]; j++) if (argv[i][j] >= 'a' && argv[i][j] <= 'z') argv[i][j] &= 0x5f;
-    		j = interpret_config_line(&argv[i]);
-    		argv[i] -= 2;
-    		i += j;
-    	}
+        if (argv[i][0] == '-' && argv[i][1] == '-')
+        {
+            argv[i] += 2;
+            for (j=0; argv[i][j]; j++) if (argv[i][j] >= 'a' && argv[i][j] <= 'z') argv[i][j] &= 0x5f;
+            j = interpret_config_line(&argv[i]);
+            argv[i] -= 2;
+            i += j;
+        }
     }
 
     pre_ligand_flex_radius = size.magnitude();
@@ -718,8 +718,8 @@ int main(int argc, char** argv)
     if (output) *output << "Ligand: " << ligfname << endl;
     if (differential_dock)
     {
-    	cout << "Differential dock." << endl;
-    	if (output) *output << "Differential dock." << endl;
+        cout << "Differential dock." << endl;
+        if (output) *output << "Differential dock." << endl;
     }
     cout << endl;
     if (output) *output << endl;
@@ -742,12 +742,12 @@ int main(int argc, char** argv)
     DockResult dr[poses*(triesleft+1)+8][pathnodes+2];
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
     int drcount = 0, qpr;
-    
+
     cout << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
     if (output) *output << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
 
     found_poses = 0;
-	_try_again:
+_try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
     for (pose=1; pose<=poses; pose++)
@@ -774,7 +774,7 @@ int main(int argc, char** argv)
                 std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude()+4);
                 int tsphsz = tsphres.size();
                 float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
-                
+
                 for (i=0; i<tsphsz+4; i++) outer_sphere[i] = inner_sphere[i] = 0;
 
                 pocketsize = p.estimate_pocket_size(tsphres);
@@ -1012,7 +1012,7 @@ int main(int argc, char** argv)
                                     #endif
                                 }
 
-                            	_xyzl_skip_loop:
+                            _xyzl_skip_loop:
 
                                 if (rb && rb[l])
                                 {
@@ -1102,10 +1102,10 @@ int main(int argc, char** argv)
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
             if (pathstrs.size() < nodeno) break;
-            
+
             if (strlen(protafname) && nodeno == activation_node)
             {
-            	// TODO: Persist the flexions of the side chains, except for those residues whose positions are important to activation.
+                // TODO: Persist the flexions of the side chains, except for those residues whose positions are important to activation.
                 float* sidechain_bondrots[seql+4];
                 int sidechain_bondrotq[seql+4];
                 for (i=0; i<seql+4; i++)
@@ -1131,10 +1131,10 @@ int main(int argc, char** argv)
                     }
                 }
 
-            	pf = fopen(protafname, "r");
-		        p.load_pdb(pf);
-		        fclose(pf);
-		        prepare_initb();
+                pf = fopen(protafname, "r");
+                p.load_pdb(pf);
+                fclose(pf);
+                prepare_initb();
 
                 for (i=1; i<=seql; i++)
                 {
@@ -1156,7 +1156,7 @@ int main(int argc, char** argv)
                     delete sidechain_bondrots[i];
                 }
             }
-            
+
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
             #endif
@@ -1279,69 +1279,69 @@ int main(int argc, char** argv)
                 // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
                 if (use_bestbind_algorithm) for (l=0; l<3; l++)
-                {
-                    if (!ligbb[l]) continue;
-                    float alignment_potential = 0;
-                    for (i=0; reaches_spheroid[nodeno][i]; i++)
                     {
-                        if (!p.aa_ptr_in_range(reaches_spheroid[nodeno][i]))
+                        if (!ligbb[l]) continue;
+                        float alignment_potential = 0;
+                        for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
-                            reaches_spheroid[nodeno][i] = NULL;
-                            continue;
-                        }
+                            if (!p.aa_ptr_in_range(reaches_spheroid[nodeno][i]))
+                            {
+                                reaches_spheroid[nodeno][i] = NULL;
+                                continue;
+                            }
 
-                        if (l && reaches_spheroid[nodeno][i] == alignment_aa[l-1]) continue;
-                        if (l>1 && reaches_spheroid[nodeno][i] == alignment_aa[l-2]) continue;
+                            if (l && reaches_spheroid[nodeno][i] == alignment_aa[l-1]) continue;
+                            if (l>1 && reaches_spheroid[nodeno][i] == alignment_aa[l-2]) continue;
 
-                        #if _DBG_STEPBYSTEP
-                        if (debug)
-                        {
-                            *debug << "Check capable of inter (" << i << ") ";
-                            *debug << lig_inter_typ[l];
-                            *debug << flush;
-                            Star s;
-                            s.paa = reaches_spheroid[nodeno][i];
-                            *debug << *s.paa << " " << flush;
-                            *debug << *reaches_spheroid[nodeno][i];
-                            *debug << endl;
-                        }
-                        #endif
+                            #if _DBG_STEPBYSTEP
+                            if (debug)
+                            {
+                                *debug << "Check capable of inter (" << i << ") ";
+                                *debug << lig_inter_typ[l];
+                                *debug << flush;
+                                Star s;
+                                s.paa = reaches_spheroid[nodeno][i];
+                                *debug << *s.paa << " " << flush;
+                                *debug << *reaches_spheroid[nodeno][i];
+                                *debug << endl;
+                            }
+                            #endif
 
-                        float pottmp = reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb[l]);
-                        if (ligbbh[l]) pottmp += reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh[l]);
+                            float pottmp = reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb[l]);
+                            if (ligbbh[l]) pottmp += reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh[l]);
 
-                        if (extra_wt.size()
-                                &&
-                                std::find(extra_wt.begin(), extra_wt.end(), reaches_spheroid[nodeno][i]->get_residue_no())!=extra_wt.end()
-                           )
-                        {
-                            pottmp *= 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+                            if (extra_wt.size()
+                                    &&
+                                    std::find(extra_wt.begin(), extra_wt.end(), reaches_spheroid[nodeno][i]->get_residue_no())!=extra_wt.end()
+                               )
+                            {
+                                pottmp *= 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+                            }
+                            else
+                            {
+                                pottmp /= pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter());
+                            }
+                            // cout << reaches_spheroid[nodeno][i]->get_3letter() << reaches_spheroid[nodeno][i]->get_residue_no() << " " << pottmp << endl;
+                            if (reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ[l])
+                                    &&
+                                    (	!alignment_aa[l]
+                                        ||
+                                        pottmp > alignment_potential
+                                        ||
+                                        ((pose>1) && pottmp > (0.9 * alignment_potential) && !(rand() % sphres))
+                                    )
+                               )
+                            {
+                                alignment_aa[l] = reaches_spheroid[nodeno][i];
+                                // alignment_name += std::to_string("|") + std::to_string(reaches_spheroid[nodeno][i]->get_residue_no());
+                                alignment_potential = pottmp;
+                                alignment_distance[l] = potential_distance;
+                            }
+                            #if _DBG_STEPBYSTEP
+                            if (debug) *debug << "Candidate alignment AA." << endl;
+                            #endif
                         }
-                        else
-                        {
-                            pottmp /= pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter());
-                        }
-                        // cout << reaches_spheroid[nodeno][i]->get_3letter() << reaches_spheroid[nodeno][i]->get_residue_no() << " " << pottmp << endl;
-                        if (reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ[l])
-                                &&
-                                (	!alignment_aa[l]
-                                    ||
-                                    pottmp > alignment_potential
-                                    ||
-                                    ((pose>1) && pottmp > (0.9 * alignment_potential) && !(rand() % sphres))
-                                )
-                           )
-                        {
-                            alignment_aa[l] = reaches_spheroid[nodeno][i];
-                            // alignment_name += std::to_string("|") + std::to_string(reaches_spheroid[nodeno][i]->get_residue_no());
-                            alignment_potential = pottmp;
-                            alignment_distance[l] = potential_distance;
-                        }
-                        #if _DBG_STEPBYSTEP
-                        if (debug) *debug << "Candidate alignment AA." << endl;
-                        #endif
                     }
-                }
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Selected an alignment AA." << endl;
                 #endif
@@ -1356,117 +1356,117 @@ int main(int argc, char** argv)
                 #endif
 
                 if (use_bestbind_algorithm)	for (l=0; l<3; l++)
-                {
-                    if (alignment_aa[l])
                     {
-                        cout << "Aligning " << ligbb[l]->name << " to " << alignment_aa[l]->get_name() << endl;
-                        Atom* alca;
-                        if (alignment_aa[l] == met)
-                            alca = alignment_aa[l]->get_nearest_atom(ligbb[l]->get_location());
-                        else
+                        if (alignment_aa[l])
                         {
-                            // alca = alignment_aa->get_atom("CA");
-                            alca = alignment_aa[l]->get_most_bindable(1)[0];
-                        }
-                        #if _DBG_STEPBYSTEP
-                        if (debug) *debug << "Got alignment atom." << endl;
-                        #endif
-
-                        if (alca)
-                        {
-                            Point pt, al, cen;
-                            pt	= ligbb[l]->get_location();
-                            if (ligbbh[l])
+                            cout << "Aligning " << ligbb[l]->name << " to " << alignment_aa[l]->get_name() << endl;
+                            Atom* alca;
+                            if (alignment_aa[l] == met)
+                                alca = alignment_aa[l]->get_nearest_atom(ligbb[l]->get_location());
+                            else
                             {
-                                Point pth = ligbbh[l]->get_location();
-                                pt.x += 0.5*(pth.x-pt.x);
-                                pt.y += 0.5*(pth.y-pt.y);
-                                pt.z += 0.5*(pth.z-pt.z);
+                                // alca = alignment_aa->get_atom("CA");
+                                alca = alignment_aa[l]->get_most_bindable(1)[0];
                             }
-                            al	= alca->get_location();
-                            cen	= (l==1) ? ligbb[0]->get_location() : m.get_barycenter();
+                            #if _DBG_STEPBYSTEP
+                            if (debug) *debug << "Got alignment atom." << endl;
+                            #endif
 
-                            Rotation rot;
-                            Point origin = ligbb[0]->get_location();
-                            SCoord axis;
-                            LocatedVector lv;
-                            float theta;
-                            float besttheta = 0, bestr = 100000;
-                            float rstep = fiftyseventh*30;
-                            switch (l)
+                            if (alca)
                             {
-                            case 0:
-                                // Pivot about molcen.
-                                rot = align_points_3d(&pt, &al, &cen);
-                                m.rotate(&rot.v, rot.a);
-                                cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
-
-                                if (!l)
+                                Point pt, al, cen;
+                                pt	= ligbb[l]->get_location();
+                                if (ligbbh[l])
                                 {
-                                    Point ptr = alca->get_location().subtract(pt);
-                                    SCoord v(ptr);
-                                    v.r -= alignment_distance[l];
-                                    v.r *= 0.5;
-                                    m.move(v);
-                                    cout << "# Moved ligand " << v.r << "A towards " << alignment_aa[l]->get_name()
-                                         << ":" << alca->name << "." << endl;
+                                    Point pth = ligbbh[l]->get_location();
+                                    pt.x += 0.5*(pth.x-pt.x);
+                                    pt.y += 0.5*(pth.y-pt.y);
+                                    pt.z += 0.5*(pth.z-pt.z);
                                 }
-                                break;
+                                al	= alca->get_location();
+                                cen	= (l==1) ? ligbb[0]->get_location() : m.get_barycenter();
 
-                            case 1:
-                                // Pivot about bb0.
-                                rot = align_points_3d(&pt, &al, &origin);
-                                lv.copy(rot.v);
-                                lv.origin = origin;
-                                m.rotate(lv, rot.a);
-                                cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
-                                break;
-
-                            case 2:
-                                // Rotisserie.
-                                axis = ligbb[1]->get_location().subtract(origin);
-
-                                for (theta=0; theta < M_PI*2; theta += rstep)
+                                Rotation rot;
+                                Point origin = ligbb[0]->get_location();
+                                SCoord axis;
+                                LocatedVector lv;
+                                float theta;
+                                float besttheta = 0, bestr = 100000;
+                                float rstep = fiftyseventh*30;
+                                switch (l)
                                 {
+                                case 0:
+                                    // Pivot about molcen.
+                                    rot = align_points_3d(&pt, &al, &cen);
+                                    m.rotate(&rot.v, rot.a);
+                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
+
+                                    if (!l)
+                                    {
+                                        Point ptr = alca->get_location().subtract(pt);
+                                        SCoord v(ptr);
+                                        v.r -= alignment_distance[l];
+                                        v.r *= 0.5;
+                                        m.move(v);
+                                        cout << "# Moved ligand " << v.r << "A towards " << alignment_aa[l]->get_name()
+                                             << ":" << alca->name << "." << endl;
+                                    }
+                                    break;
+
+                                case 1:
+                                    // Pivot about bb0.
+                                    rot = align_points_3d(&pt, &al, &origin);
+                                    lv.copy(rot.v);
+                                    lv.origin = origin;
+                                    m.rotate(lv, rot.a);
+                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
+                                    break;
+
+                                case 2:
+                                    // Rotisserie.
+                                    axis = ligbb[1]->get_location().subtract(origin);
+
+                                    for (theta=0; theta < M_PI*2; theta += rstep)
+                                    {
+                                        lv.copy(axis);
+                                        lv.origin = origin;
+                                        m.rotate(lv, rstep);
+
+                                        float r2 = alca->get_location().get_3d_distance(pt);
+                                        if (r2 < bestr)
+                                        {
+                                            bestr = r2;
+                                            besttheta = theta;
+                                        }
+                                    }
+
                                     lv.copy(axis);
                                     lv.origin = origin;
-                                    m.rotate(lv, rstep);
+                                    m.rotate(lv, besttheta);
+                                    cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
+                                         << "-" << ligbb[1]->name << " axis." << endl;
+                                    break;
 
-                                    float r2 = alca->get_location().get_3d_distance(pt);
-                                    if (r2 < bestr)
-                                    {
-                                        bestr = r2;
-                                        besttheta = theta;
-                                    }
+                                default:
+                                    ;
                                 }
 
-                                lv.copy(axis);
-                                lv.origin = origin;
-                                m.rotate(lv, besttheta);
-                                cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
-                                     << "-" << ligbb[1]->name << " axis." << endl;
-                                break;
-
-                            default:
-                                ;
+                                // Preemptively minimize intermol clashes.
+                                Molecule* mtmp[3];
+                                mtmp[0] = &m;
+                                mtmp[1] = alignment_aa[l];
+                                mtmp[2] = NULL;
+                                m.movability = MOV_ALL;
+                                alignment_aa[l]->movability = MOV_FLEXONLY;
+                                Molecule::multimol_conform(mtmp);
+                                // m.intermol_conform_norecen(alignment_aa[l], iters, reaches_spheroid[nodeno]);
+                                // alignment_aa[l]->intermol_conform_norecen(&m, iters, reaches_spheroid[nodeno]);
+                                if (debug) *debug << "Alignment atom " << l << " is "
+                                                      << alignment_aa[l]->get_name() << ":" << alca->name
+                                                      << " Z " << alca->get_Z() << endl;
                             }
-
-                            // Preemptively minimize intermol clashes.
-                            Molecule* mtmp[3];
-                            mtmp[0] = &m;
-                            mtmp[1] = alignment_aa[l];
-                            mtmp[2] = NULL;
-                            m.movability = MOV_ALL;
-                            alignment_aa[l]->movability = MOV_FLEXONLY;
-                            Molecule::multimol_conform(mtmp);
-                            // m.intermol_conform_norecen(alignment_aa[l], iters, reaches_spheroid[nodeno]);
-                            // alignment_aa[l]->intermol_conform_norecen(&m, iters, reaches_spheroid[nodeno]);
-                            if (debug) *debug << "Alignment atom " << l << " is "
-                                                  << alignment_aa[l]->get_name() << ":" << alca->name
-                                                  << " Z " << alca->get_Z() << endl;
                         }
                     }
-                }
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Aligned ligand to AA." << endl;
                 cout << endl;
@@ -1585,26 +1585,26 @@ int main(int argc, char** argv)
                 for (i=0; i<qpr+1; i++)
                 {
                     int resno = i ? (allres[i-1]->get_residue_no()) : 0;
-		            #if _DBG_TOOLARGE_DIFFNUMS
-		            std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
-		            #endif
+                    #if _DBG_TOOLARGE_DIFFNUMS
+                    std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
+                    #endif
 
                     for (j=0; j<qpr+1; j++)
                     {
                         if (j == i) continue;
                         float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
                         final_binding[resno] += f;
-                    
-		                #if _DBG_TOOLARGE_DIFFNUMS
-		                if (f) ibdbg += to_string(postaa[j]->get_atom(0)->residue) + (std::string)" " + to_string(f) + (std::string)"\n";
-		                #endif
-                    
+
+                        #if _DBG_TOOLARGE_DIFFNUMS
+                        if (f) ibdbg += to_string(postaa[j]->get_atom(0)->residue) + (std::string)" " + to_string(f) + (std::string)"\n";
+                        #endif
+
                         final_vdWrepl[resno] += postaa[i]->get_vdW_repulsion(postaa[j]);
                     }
-                
-		            #if _DBG_TOOLARGE_DIFFNUMS
-		            if (fabs(final_binding[resno]) >= 200) cout << ibdbg << endl;
-		            #endif
+
+                    #if _DBG_TOOLARGE_DIFFNUMS
+                    if (fabs(final_binding[resno]) >= 200) cout << ibdbg << endl;
+                    #endif
                 }
             }
 
@@ -1623,15 +1623,15 @@ int main(int argc, char** argv)
 
                 float lb = m.get_intermol_binding(reaches_spheroid[nodeno][i], false);
                 if (lb < -maxclash) maxclash -= lb;
-                
+
                 if (differential_dock)
                 {
                     mkJmol[metcount] = final_binding[resno] + lb;
                 }
                 else
                 {
-                	if (lb > 90) lb = 0;
-                	mkJmol[metcount] = lb;
+                    if (lb > 90) lb = 0;
+                    mkJmol[metcount] = lb;
                 }
 
                 sprintf(metrics[metcount], "%s%d", reaches_spheroid[nodeno][i]->get_3letter(), resno);
@@ -1639,9 +1639,9 @@ int main(int argc, char** argv)
 
                 if (differential_dock)
                 {
-                	imkJmol[metcount] = initial_binding[resno];
+                    imkJmol[metcount] = initial_binding[resno];
                     mvdWrepl[metcount] = final_vdWrepl[resno];
-                	imvdWrepl[metcount] = initial_vdWrepl[resno];
+                    imvdWrepl[metcount] = initial_vdWrepl[resno];
                 }
                 else
                 {
@@ -1663,7 +1663,7 @@ int main(int argc, char** argv)
 
             if (btot > 15*m.get_atom_count()) btot = 0;
             if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
-            
+
             // drcount = pose-1+found_poses;
 
             #if _DBG_STEPBYSTEP
@@ -1754,14 +1754,14 @@ int main(int argc, char** argv)
                     for (i=0; i<drcount; i++)
                     {
                         if ((	differential_dock
-                        		&&
-                        		(dr[i][0].kJmol - dr[i][0].ikJmol) < (dr[drcount][nodeno].kJmol - dr[drcount][nodeno].ikJmol)
-                           )
-                           ||
-                           (	!differential_dock
-                        		&&
-                        		dr[i][0].kJmol < btot
-                           ))
+                                &&
+                                (dr[i][0].kJmol - dr[i][0].ikJmol) < (dr[drcount][nodeno].kJmol - dr[drcount][nodeno].ikJmol)
+                            )
+                                ||
+                                (	!differential_dock
+                                    &&
+                                    dr[i][0].kJmol < btot
+                                ))
                         {
                             if (dr[i][0].pose < bestpose || bestpose < 0) bestpose = dr[i][0].pose;
                             dr[i][0].pose++;
@@ -1773,7 +1773,7 @@ int main(int argc, char** argv)
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added pose to output array." << endl;
                 #endif
-                
+
                 #if _DBG_MAX_CLASHES
                 cout << "Pose " << dr[drcount][nodeno].pose << " maxclash " << maxclash << " kJmol " << dr[drcount][nodeno].kJmol << endl;
                 #endif
@@ -1813,13 +1813,13 @@ int main(int argc, char** argv)
                         // If pathnode is not within kJ/mol cutoff, abandon it and all subsequent pathnodes of the same pose.
                         if (dr[j][k].kJmol < kJmol_cutoff)
                         {
-                        	/*if (k < pathnodes)
-                        	{*/
-		                    	cout << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
-		                    	if (output) *output << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
-	                    	// }
-                        	break;
-                    	}
+                            /*if (k < pathnodes)
+                            {*/
+                            cout << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
+                            if (output) *output << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
+                            // }
+                            break;
+                        }
 
                         if (flex && !dr[j][k].pdbdat.length())
                         {
@@ -1858,10 +1858,10 @@ int main(int argc, char** argv)
                                      << " minus " << -dr[j][k].imkJmol[l]*energy_mult
                                      << endl;
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
-									<< ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult
-									<< " = " << -dr[j][k].mkJmol[l]*energy_mult
-									<< " minus " << -dr[j][k].imkJmol[l]*energy_mult
-									<< endl;
+                                            << ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult
+                                            << " = " << -dr[j][k].mkJmol[l]*energy_mult
+                                            << " minus " << -dr[j][k].imkJmol[l]*energy_mult
+                                            << endl;
                             }
                             else
                             {
@@ -1908,9 +1908,9 @@ int main(int argc, char** argv)
                                      << " minus " << -dr[j][k].ibytype[l]*energy_mult
                                      << endl;
                                 if (output) *output << lbtyp << -(dr[j][k].bytype[l] - dr[j][k].ibytype[l])*energy_mult
-                                    << " = " << -dr[j][k].bytype[l]*energy_mult
-                                    << " minus " << -dr[j][k].ibytype[l]*energy_mult
-                                    << endl;
+                                                        << " = " << -dr[j][k].bytype[l]*energy_mult
+                                                        << " minus " << -dr[j][k].ibytype[l]*energy_mult
+                                                        << endl;
                             }
                             else
                             {
@@ -1921,7 +1921,7 @@ int main(int argc, char** argv)
                         cout << endl;
                         if (output) *output << endl;
 
-                        _btyp_unassigned:
+                    _btyp_unassigned:
 
                         if (differential_dock)
                         {
@@ -1969,10 +1969,10 @@ int main(int argc, char** argv)
                                      << " minus " << dr[j][k].imvdWrepl[l]*energy_mult
                                      << endl;
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
-                                    << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
-                                    << " = " << dr[j][k].mvdWrepl[l]*energy_mult
-                                    << " minus " << dr[j][k].imvdWrepl[l]*energy_mult
-                                    << endl;
+                                            << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
+                                            << " = " << dr[j][k].mvdWrepl[l]*energy_mult
+                                            << " minus " << dr[j][k].imvdWrepl[l]*energy_mult
+                                            << endl;
                             }
                             else
                             {
@@ -2030,13 +2030,13 @@ int main(int argc, char** argv)
         }
     }
 
-	_exitposes:
-	if (found_poses < poses && triesleft)
-	{
-		triesleft--;
-		goto _try_again;
-	}
-	
+_exitposes:
+    if (found_poses < poses && triesleft)
+    {
+        triesleft--;
+        goto _try_again;
+    }
+
     cout << found_poses << " pose(s) found." << endl;
     if (output) *output << found_poses << " pose(s) found." << endl;
     if (debug) *debug << found_poses << " pose(s) found." << endl;

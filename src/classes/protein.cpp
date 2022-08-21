@@ -22,18 +22,18 @@ bool Protein::add_residue(const int resno, const char aaletter)
 
     if (!residues)
     {
-    	int arrlimit = resno+256;
+        int arrlimit = resno+256;
         residues = new AminoAcid*[arrlimit];
         sequence = new char[arrlimit];
         ca = new Atom*[arrlimit];
         res_reach = new float[arrlimit];
-        
+
         for (i=0; i<arrlimit; i++)
         {
-        	residues[i] = NULL;
-        	sequence[i] = 0;
-        	ca[i] = NULL;
-        	res_reach[i] = 0;
+            residues[i] = NULL;
+            sequence[i] = 0;
+            ca[i] = NULL;
+            res_reach[i] = 0;
         }
     }
     else if (resno % 256)
@@ -47,15 +47,15 @@ bool Protein::add_residue(const int resno, const char aaletter)
         sequence = new char[arrlimit];
         ca = new Atom*[arrlimit];
         res_reach = new float[arrlimit];
-        
+
         for (i=0; i<arrlimit; i++)
         {
-        	residues[i] = NULL;
-        	sequence[i] = 0;
-        	ca[i] = NULL;
-        	res_reach[i] = 0;
+            residues[i] = NULL;
+            sequence[i] = 0;
+            ca[i] = NULL;
+            res_reach[i] = 0;
         }
-        
+
         for (i=0; oldres[i]; i++)
         {
             residues[i] = oldres[i];
@@ -68,39 +68,39 @@ bool Protein::add_residue(const int resno, const char aaletter)
     }
 
     i = resno-1;
-    
+
     if (i)
     {
-    	Point* pts = residues[i-1]->predict_next_NHCA();
-    	residues[i] = new AminoAcid(aaletter, residues[i-1]);
-    	
-    	residues[i]->establish_internal_clash_baseline();
-    	
-    	Atom* a = residues[i]->get_atom("N");
-    	if (a)
-    	{
-    		float r = pts[0].get_3d_distance(a->get_location());
-    		if (fabs(r) >= 0.01) cout << "Warning: Residue " << resno << " N location is off by " << r << "A." << endl;
-    		
-    		Atom* b = residues[i]->get_atom("HN");
-    		if (!b) b = residues[i]->get_atom("H");
-    		if (b)
-    		{
-    			Point HN = b->get_location().subtract(a->get_location());
-    			HN.scale(1);
-    			Point pt = pts[1].subtract(pts[0]);
-    			pt.scale(1);
-    			r = pt.get_3d_distance(HN);
-    			if (fabs(r) >= 0.01) cout << "Warning: Residue " << resno << " HN location is off by " << r << "A." << endl;
-			}
-    	}
-    	else cout << "Warning: Residue " << resno << " has no N atom." << endl << flush;
-    	
-    	delete[] pts;
+        Point* pts = residues[i-1]->predict_next_NHCA();
+        residues[i] = new AminoAcid(aaletter, residues[i-1]);
+
+        residues[i]->establish_internal_clash_baseline();
+
+        Atom* a = residues[i]->get_atom("N");
+        if (a)
+        {
+            float r = pts[0].get_3d_distance(a->get_location());
+            if (fabs(r) >= 0.01) cout << "Warning: Residue " << resno << " N location is off by " << r << "A." << endl;
+
+            Atom* b = residues[i]->get_atom("HN");
+            if (!b) b = residues[i]->get_atom("H");
+            if (b)
+            {
+                Point HN = b->get_location().subtract(a->get_location());
+                HN.scale(1);
+                Point pt = pts[1].subtract(pts[0]);
+                pt.scale(1);
+                r = pt.get_3d_distance(HN);
+                if (fabs(r) >= 0.01) cout << "Warning: Residue " << resno << " HN location is off by " << r << "A." << endl;
+            }
+        }
+        else cout << "Warning: Residue " << resno << " has no N atom." << endl << flush;
+
+        delete[] pts;
     }
     else
-    	residues[i] = new AminoAcid(aaletter, 0);
-    
+        residues[i] = new AminoAcid(aaletter, 0);
+
     sequence[i] = aaletter;
     ca[i] = residues[i]->get_atom("CA");
     res_reach[i] = residues[i]->get_aa_definition()->reach;
@@ -128,21 +128,23 @@ AminoAcid* Protein::get_residue(int resno)
 }
 
 Atom* Protein::get_atom(int resno, const char* aname)
-{	AminoAcid* aa = get_residue(resno);
-	
-	if (!aa) return NULL;
-	return aa->get_atom(aname);
+{
+    AminoAcid* aa = get_residue(resno);
+
+    if (!aa) return NULL;
+    return aa->get_atom(aname);
 }
 
 Point Protein::get_atom_location(int resno, const char* aname)
-{	AminoAcid* aa = get_residue(resno);
-	
-	if (!aa)
-	{
-		Point pt;
-		return pt;
-	}
-	return aa->get_atom_location(aname);
+{
+    AminoAcid* aa = get_residue(resno);
+
+    if (!aa)
+    {
+        Point pt;
+        return pt;
+    }
+    return aa->get_atom_location(aname);
 }
 
 bool Protein::add_sequence(const char* lsequence)
@@ -154,25 +156,25 @@ bool Protein::add_sequence(const char* lsequence)
     {
         add_residue(i+1, lsequence[i]);
     }
-    
+
     for (i=0; lsequence[i]; i++)
     {
-    	if (get_atom(i+1, "CB"))		// Don't check glycine.
-    	{
-		    float r = get_atom_location(i+1, "CA").get_3d_distance(get_atom_location(i+1, "CB"));
-		    if (fabs(r-1.54) > 0.5) cout << "Error: " << i+1 << lsequence[i] << ":CA-CB = " << r << endl;
+        if (get_atom(i+1, "CB"))		// Don't check glycine.
+        {
+            float r = get_atom_location(i+1, "CA").get_3d_distance(get_atom_location(i+1, "CB"));
+            if (fabs(r-1.54) > 0.5) cout << "Error: " << i+1 << lsequence[i] << ":CA-CB = " << r << endl;
         }
     }
-    
+
     int seql = get_seq_length();
     Molecule* aas[seql+4];
     for (i=1; i<=seql; i++)
     {
-    	aas[i-1] = get_residue(i);
-    	aas[i] = 0;
+        aas[i-1] = get_residue(i);
+        aas[i] = 0;
     }
     Molecule::multimol_conform(aas, 25);
-    
+
     set_clashables();
 
     return true;
@@ -182,14 +184,14 @@ void Protein::save_pdb(FILE* os)
 {
     int i, offset=0;
 
-	if (remarks.size())
-	{
-		for (i=0; i<remarks.size(); i++)
-		{
-			fprintf(os, "%s", remarks[i].c_str());
-		}
-	}
-	
+    if (remarks.size())
+    {
+        for (i=0; i<remarks.size(); i++)
+        {
+            fprintf(os, "%s", remarks[i].c_str());
+        }
+    }
+
     if (!residues) return;
     for (i=0; residues[i]; i++)
     {
@@ -218,47 +220,46 @@ int Protein::load_pdb(FILE* is)
     AminoAcid* restmp[65536];
     char buffer[1024];
     Atom* a;
-    
+
     AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file.
     AminoAcid* prevaa = nullptr;
-    
+
     int i, rescount=0;
 
     while (!feof(is))
     {
         try
         {
-        	int told = ftell(is);
-        	fgets(buffer, 1003, is);
-        	
-        	if (buffer[0] == 'A' &&
-        		buffer[1] == 'T' &&
-        		buffer[2] == 'O' &&
-        		buffer[3] == 'M'
-        		)
-    		{
-    			fseek(is, told, SEEK_SET);
-    			
-				char tmp3let[5];
-    			for (i=0; i<3; i++)
-    				tmp3let[i] = buffer[17+i];
-    			tmp3let[4] = 0;
-    			
-    			for (i=0; i<256; i++)
-    			{
-    				// if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
-    				if (!aa_defs[i].loaded)
-    				{
-    					AminoAcid* aa = new AminoAcid(is, prevaa);
-						// cout << rescount << tmp3let << " " << flush;
-						restmp[rescount++] = aa;
-						restmp[rescount] = NULL;
-						prevaa = aa;
-						goto _found_AA;
-    				}
-    			}
-    			
-    			// If no AA, load a metal.
+            int told = ftell(is);
+            fgets(buffer, 1003, is);
+
+            if (buffer[0] == 'A' &&
+                    buffer[1] == 'T' &&
+                    buffer[2] == 'O' &&
+                    buffer[3] == 'M'
+               )
+            {
+                buffer[16] = ' ';
+                fseek(is, told, SEEK_SET);
+
+                char tmp3let[5];
+                for (i=0; i<3; i++)
+                    tmp3let[i] = buffer[17+i];
+                tmp3let[4] = 0;
+
+                for (i=0; i<256; i++)
+                {
+                    if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
+                    {
+                        AminoAcid* aa = new AminoAcid(is, prevaa);
+                        restmp[rescount++] = aa;
+                        restmp[rescount] = NULL;
+                        prevaa = aa;
+                        goto _found_AA;
+                    }
+                }
+
+                // If no AA, load a metal.
                 if (!metcount % 16)
                 {
                     Atom** mtmp = new Atom*[metcount+20];
@@ -271,8 +272,8 @@ int Protein::load_pdb(FILE* is)
                     }
                     metals = mtmp;
                 }
-    			
-    			a = new Atom(is);
+
+                a = new Atom(is);
                 metals[metcount++] = a;
                 metals[metcount] = NULL;
                 // cout << "M" << metcount << " ";
@@ -285,30 +286,30 @@ int Protein::load_pdb(FILE* is)
                         break;
                     }
                 }
-    		}
-    		else
-    		{
-    			if (buffer[0] == 'R' &&
-            		buffer[1] == 'E' &&
-            		buffer[2] == 'M' &&
-            		buffer[3] == 'A' &&
-            		buffer[4] == 'R' &&
-            		buffer[5] == 'K'
-            		)
-            	{
-	            	remarks.push_back(buffer);
-	            	// cout << "Found remark " << buffer;
-	            	
-	            	if (buffer[7] == '6' && buffer[8] < '!')
-	            	{
-	            		char** fields = chop_spaced_fields(buffer);
-	            		if (fields[2] && !fields[3])
-	            			name = fields[2];
-	            	}
-            	}
-    		}
-        	
-            _found_AA:
+            }
+            else
+            {
+                if (buffer[0] == 'R' &&
+                        buffer[1] == 'E' &&
+                        buffer[2] == 'M' &&
+                        buffer[3] == 'A' &&
+                        buffer[4] == 'R' &&
+                        buffer[5] == 'K'
+                   )
+                {
+                    remarks.push_back(buffer);
+                    // cout << "Found remark " << buffer;
+
+                    if (buffer[7] == '6' && buffer[8] < '!')
+                    {
+                        char** fields = chop_spaced_fields(buffer);
+                        if (fields[2] && !fields[3])
+                            name = fields[2];
+                    }
+                }
+            }
+
+        _found_AA:
             ;
         }
         catch (int ex)
@@ -316,7 +317,7 @@ int Protein::load_pdb(FILE* is)
             // cout << "Exception " << ex << endl;
             switch (ex)
             {
-            	case ATOM_NOT_OF_AMINO_ACID:
+            case ATOM_NOT_OF_AMINO_ACID:
                 if (!metcount % 16)
                 {
                     Atom** mtmp = new Atom*[metcount+20];
@@ -344,37 +345,37 @@ int Protein::load_pdb(FILE* is)
                 }
                 break;
 
-            	case NOT_ATOM_RECORD:
-            	fgets(buffer, 1003, is);
-            	cout << buffer << endl;
-            	if (buffer[0] == 'R' &&
-            		buffer[1] == 'E' &&
-            		buffer[2] == 'M' &&
-            		buffer[3] == 'A' &&
-            		buffer[4] == 'R' &&
-            		buffer[5] == 'K'
-            		)
-	            	remarks.push_back(buffer);
-	            break;
-	            
-	            default:
-	            throw 0xbadca22;
+            case NOT_ATOM_RECORD:
+                fgets(buffer, 1003, is);
+                cout << buffer << endl;
+                if (buffer[0] == 'R' &&
+                        buffer[1] == 'E' &&
+                        buffer[2] == 'M' &&
+                        buffer[3] == 'A' &&
+                        buffer[4] == 'R' &&
+                        buffer[5] == 'K'
+                   )
+                    remarks.push_back(buffer);
+                break;
+
+            default:
+                throw 0xbadca22;
             }
         }
     }
 
-	int arrlimit = rescount+1;
+    int arrlimit = rescount+1;
     residues 	= new AminoAcid*[arrlimit];
     sequence 	= new char[arrlimit];
     ca       	= new Atom*[arrlimit];
     res_reach	= new float[arrlimit];
-    
+
     for (i=0; i<arrlimit; i++)
     {
-    	residues[i] = NULL;
-    	sequence[i] = 0;
-    	ca[i] = NULL;
-    	res_reach[i] = 0;
+        residues[i] = NULL;
+        sequence[i] = 0;
+        ca[i] = NULL;
+        res_reach[i] = 0;
     }
 
     for (i=0; i<rescount; i++)
@@ -425,8 +426,8 @@ int  Protein::get_seq_length()
 
 std::string Protein::get_sequence()
 {
-	if (!sequence) return 0;
-	return std::string(sequence);
+    if (!sequence) return 0;
+    return std::string(sequence);
 }
 
 int  Protein::get_start_resno()
@@ -437,15 +438,15 @@ int  Protein::get_start_resno()
 
 std::vector<std::string> Protein::get_remarks(std::string search_for)
 {
-	std::vector<string> retval;
-	int i;
-	for (i=0; i<remarks.size(); i++)
-	{
-		if (!search_for.length() || strstr(remarks[i].c_str(), search_for.c_str()))
-			retval.push_back(remarks[i]);
-	}
-	
-	return retval;
+    std::vector<string> retval;
+    int i;
+    for (i=0; i<remarks.size(); i++)
+    {
+        if (!search_for.length() || strstr(remarks[i].c_str(), search_for.c_str()))
+            retval.push_back(remarks[i]);
+    }
+
+    return retval;
 }
 
 void Protein::set_clashables()
@@ -491,7 +492,7 @@ void Protein::set_clashables()
     }
 
     res_can_clash[seqlen] = 0;
-    
+
     /*for (i=0; i<seqlen; i++)
     {
     	cout << i << ": ";
@@ -503,66 +504,66 @@ void Protein::set_clashables()
 
 std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool facing)
 {
-	std::vector<AminoAcid*> retval;
-	
-	float cb_tolerance_angle = 44 * fiftyseventh;
-	float tolerance_sine = sin(cb_tolerance_angle);
-	
-	if (!residues) return retval;
-	int i, j;
-	
-	#if _DBG_TUMBLE_SPHERES
-	cout << "Protein::get_residues_near(" << pt << ", " << maxr << ")" << endl;
-	#endif
-	
+    std::vector<AminoAcid*> retval;
+
+    float cb_tolerance_angle = 44 * fiftyseventh;
+    float tolerance_sine = sin(cb_tolerance_angle);
+
+    if (!residues) return retval;
+    int i, j;
+
+    #if _DBG_TUMBLE_SPHERES
+    cout << "Protein::get_residues_near(" << pt << ", " << maxr << ")" << endl;
+    #endif
+
     for (i=0; residues[i]; i++)
     {
-    	float r = pt.get_3d_distance(residues[i]->get_atom_location("CA"));
-    	
-    	if (facing && residues[i]->get_atom("CB"))
-    	{
-    		float r1 = pt.get_3d_distance(residues[i]->get_atom_location("CB"));
-    		float r2 = residues[i]->get_atom_location("CA").get_3d_distance(residues[i]->get_atom_location("CB"));
-    		float tolerance = r2 * tolerance_sine;
-    		if (r1 > r+tolerance) continue;
-    	}
-    	
-    	if (r <= maxr)
-    	{
-    		retval.push_back(residues[i]);
-    		#if _DBG_TUMBLE_SPHERES
-    		cout << residues[i]->get_3letter() << residues[i]->get_residue_no() << " ";
-    		#endif
-		}
+        float r = pt.get_3d_distance(residues[i]->get_atom_location("CA"));
+
+        if (facing && residues[i]->get_atom("CB"))
+        {
+            float r1 = pt.get_3d_distance(residues[i]->get_atom_location("CB"));
+            float r2 = residues[i]->get_atom_location("CA").get_3d_distance(residues[i]->get_atom_location("CB"));
+            float tolerance = r2 * tolerance_sine;
+            if (r1 > r+tolerance) continue;
+        }
+
+        if (r <= maxr)
+        {
+            retval.push_back(residues[i]);
+            #if _DBG_TUMBLE_SPHERES
+            cout << residues[i]->get_3letter() << residues[i]->get_residue_no() << " ";
+            #endif
+        }
     }
     #if _DBG_TUMBLE_SPHERES
     cout << endl << endl;
     #endif
-    
+
     return retval;
 }
 
 AminoAcid** Protein::get_residues_can_clash(int resno)
 {
     if (!residues) return 0;
-	if (!res_can_clash) set_clashables();
+    if (!res_can_clash) set_clashables();
 
     int i, j;
     for (i=0; residues[i]; i++)
     {
         if (residues[i]->get_residue_no() == resno)
         {
-        	if (!res_can_clash[i] || !res_can_clash[i][0]) set_clashables();
-        	/*cout << i << ": " << flush;
-        	if (res_can_clash[i] && res_can_clash[i][0])
-        	{
-        		cout << *res_can_clash[i][0] << endl;
-				for (j=0; res_can_clash[i][j]; j++)
-					cout << j << " " << flush;
-				cout << endl;
-			}*/
-        	return res_can_clash[i];
-    	}
+            if (!res_can_clash[i] || !res_can_clash[i][0]) set_clashables();
+            /*cout << i << ": " << flush;
+            if (res_can_clash[i] && res_can_clash[i][0])
+            {
+            	cout << *res_can_clash[i][0] << endl;
+            	for (j=0; res_can_clash[i][j]; j++)
+            		cout << j << " " << flush;
+            	cout << endl;
+            }*/
+            return res_can_clash[i];
+        }
     }
 
     return 0;
@@ -573,7 +574,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         const Point nodecen,
         const Point size,
         const int* mcoord_resno
-		)
+                                          )
 {
     int i, j, sphres = 0;
     int seql = get_seq_length();
@@ -599,14 +600,14 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
                     {
                         reaches_spheroid[sphres++] = aa;
                         resno_already[resno] = true;
-#if _DBG_REACHLIG
+                        #if _DBG_REACHLIG
                         if (debug)
                         {
                             Star s;
                             s.paa = aa;
                             *debug << std::hex << s.n << std::dec << " " << flush;
                         }
-#endif
+                        #endif
                     }
                     continue;
                 }
@@ -635,14 +636,14 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
                     {
                         reaches_spheroid[sphres++] = aa;
                         resno_already[resno] = true;
-#if _DBG_REACHLIG
+                        #if _DBG_REACHLIG
                         if (debug)
                         {
                             Star s;
                             s.paa = aa;
                             *debug << std::hex << s.n << std::dec << " " << flush;
                         }
-#endif
+                        #endif
                     }
                     continue;
                 }
@@ -669,14 +670,14 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
             {
                 reaches_spheroid[sphres++] = aa;
                 resno_already[resno] = true;
-#if _DBG_REACHLIG
+                #if _DBG_REACHLIG
                 if (debug)
                 {
                     Star s;
                     s.paa = aa;
                     *debug << std::hex << s.n << std::dec << " " << flush;
                 }
-#endif
+                #endif
             }
         }
 
@@ -684,9 +685,9 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
     }
 
     reaches_spheroid[sphres] = NULL;
-#if _DBG_REACHLIG
+    #if _DBG_REACHLIG
     if (debug) *debug << endl << flush;
-#endif
+    #endif
 
     return sphres;
 }
@@ -761,7 +762,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
 
 void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, float angle)
 {
-	if (startres == endres) return;
+    if (startres == endres) return;
     int inc = (dir == CA_desc || dir == C_desc) ? -1 : 1;
     if (sgn(endres - startres) != sgn(inc))
     {
@@ -785,7 +786,7 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
             if (i == endres) break;
         }
     }
-    
+
     set_clashables();
 }
 
@@ -819,41 +820,41 @@ void Protein::conform_backbone(int startres, int endres,
     int res, i, j, iter;
     bb_rot_dir dir1 = (inc>0) ? N_asc : CA_desc,
                dir2 = (inc>0) ? CA_asc : C_desc;
-    
+
     int am = abs(endres-startres), minres = (inc>0) ? startres : endres;
     float momenta1o[am+4], momenta2o[am+4], momenta1e[am+4], momenta2e[am+4];
     int eando_res[am+4];
     float eando_mult[am+4];
     float r = 0, lastr = 99999;
     int iters_since_improvement = 0;
-    
+
     for (res = startres; res; res += inc)
     {
-    	int residx = res-minres;
-    	momenta1o[residx] = randsgn()*_fullrot_steprad;
-    	momenta2o[residx] = randsgn()*_fullrot_steprad;
-    	momenta1e[residx] = randsgn()*_fullrot_steprad;
-    	momenta2e[residx] = randsgn()*_fullrot_steprad;
-    	eando_res[residx] = min(res + (rand() % 5) + 1, endres);
-    	if (eando_res[residx] == res) eando_res[residx] = 0;
-    	eando_mult[residx] = 1;
-    	if (res == endres) break;
+        int residx = res-minres;
+        momenta1o[residx] = randsgn()*_fullrot_steprad;
+        momenta2o[residx] = randsgn()*_fullrot_steprad;
+        momenta1e[residx] = randsgn()*_fullrot_steprad;
+        momenta2e[residx] = randsgn()*_fullrot_steprad;
+        eando_res[residx] = min(res + (rand() % 5) + 1, endres);
+        if (eando_res[residx] == res) eando_res[residx] = 0;
+        eando_mult[residx] = 1;
+        if (res == endres) break;
     }
 
-	set_clashables();
+    set_clashables();
     float tolerance = 1.2, alignfactor = 100, reversal = -0.81, enhance = 1.5;
     int ignore_clashes_until = iters*0.666;
     for (iter=0; iter<iters; iter++)
     {
-    	#if DBGCONF
+        #if DBGCONF
         // cout << "Iteration " << iter << endl;
         cout << " " << iter << flush;
         #endif
-        
+
         for (res = startres; res != endres; res += inc)
         {
-        	int residx = res-minres;
-        	
+            int residx = res-minres;
+
             // Get the preexisting nearby residues and inter-residue binding/clash value.
             // These will likely have changed since last iteration.
             float bind=0, bind1=0, angle;
@@ -878,8 +879,8 @@ void Protein::conform_backbone(int startres, int endres,
                 bind += alignfactor/(pt.get_3d_distance(target2)+0.001);
             }
 
-			if (reinterpret_cast<long>(get_residue(res)) < 0x1000) cout << "Warning missing residue " << res << endl << flush;
-			else if (strcmp(get_residue(res)->get_3letter(), "PRO"))		// TODO: Don't hard code this to proline, but check bond flexibility.
+            if (reinterpret_cast<long>(get_residue(res)) < 0x1000) cout << "Warning missing residue " << res << endl << flush;
+            else if (strcmp(get_residue(res)->get_3letter(), "PRO"))		// TODO: Don't hard code this to proline, but check bond flexibility.
             {
                 // Rotate the first bond a random amount. TODO: use angular momenta.
                 angle = (iter & 1) ? momenta1o[residx] : momenta1e[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);
@@ -892,7 +893,7 @@ void Protein::conform_backbone(int startres, int endres,
                     AminoAcid* aa = get_residue(i);
                     AminoAcid** rcc = get_residues_can_clash(i);
                     if (a1 && (iter >= ignore_clashes_until)) bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
-                	else bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                    else bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
                 }
                 if (a1)
                 {
@@ -940,7 +941,7 @@ void Protein::conform_backbone(int startres, int endres,
                 if (!aa) continue;
                 AminoAcid** rcc = get_residues_can_clash(i);
                 if (a1 && (iter >= ignore_clashes_until)) bind1 -= aa->get_intermol_clashes(AminoAcid::aas_to_mols(rcc));
-            	else bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
+                else bind1 += aa->get_intermol_binding(rcc, backbone_atoms_only);
             }
             if (a1)
             {
@@ -976,24 +977,24 @@ void Protein::conform_backbone(int startres, int endres,
             alignfactor *= 1.003;
             tolerance = ((tolerance-1)*0.97)+1;
         }
-        
+
         r = 0;
         if (a1)
         {
-        	Point pt = a1->get_location();
+            Point pt = a1->get_location();
             r += pt.get_3d_distance(target1);
         }
         if (a2)
         {
-        	Point pt = a2->get_location();
+            Point pt = a2->get_location();
             r += pt.get_3d_distance(target2);
         }
         if (a3)
         {
-        	Point pt = a3->get_location();
+            Point pt = a3->get_location();
             r += pt.get_3d_distance(target3);
         }
-        
+
         if (r < 0.999*lastr) iters_since_improvement = 0;
         else iters_since_improvement++;
         lastr = r;
@@ -1012,158 +1013,158 @@ void Protein::conform_backbone(int startres, int endres,
 #define _INCREMENTAL_BKCONN 1
 void Protein::backconnect(int startres, int endres)
 {
-	int i;
+    int i;
     int inc = sgn(endres-startres);
-    
+
     #if _INCREMENTAL_BKCONN
     int iter;
     for (iter=24; iter>=0; iter--)
     {
     #endif
-    
-		// Glom the last residue onto the target.
-		// Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
-		// Then do the same for the previous residue, and the one before, etc,
-		// all the way back to the starting residue.
-		// Give a warning if the starting residue has an anomaly > 0.1A.
-		AminoAcid *next, *curr, *prev;
-		int pointer = endres;
-		float movfactor = 1, decrement, anomaly = 0;
-		
-		decrement = 1.0 / fabs(endres - startres);		// if exterior is the opposite of interior, what's the opposite of increment?
-		
-		next = get_residue(endres+inc);
-		curr = get_residue(pointer);
-		prev = get_residue(pointer-inc);
-		
-		#if DBG_BCKCONN
-		cout << "backconnect( " << startres << ", " << endres << ")" << endl;
-		#endif
-		while (next && curr)
-		{
-			#if DBG_BCKCONN
-			cout << pointer << ":";
-			#endif
-			
-			Point* pts = (inc > 0) ? next->predict_previous_COCA() : next->predict_next_NHCA();
-			Point ptsc[4];
-			
-			#if _INCREMENTAL_BKCONN
-			ptsc[0] = (inc > 0) ? curr->get_atom_location("C") : curr->get_atom_location("N");
-			ptsc[1] = (inc > 0) ? curr->get_atom_location("O") : curr->HN_or_substitute_location();
-			ptsc[2] = curr->get_atom_location("CA");
-			
-			Point _4avg[3];
-			for (i=0; i<3; i++)
-			{
-				_4avg[0] = pts[i];
-				_4avg[1] = ptsc[i];
-				_4avg[0].weight = movfactor;
-				_4avg[1].weight = 1.0 - movfactor;
-				pts[i] = average_of_points(_4avg, 2);
-			}
-			#endif
-			
-			curr->glom(pts, inc > 0);
-			delete[] pts;
-			// break;
-			
-			#if DBG_BCKCONN
-			cout << "g";
-			#endif
-			
-			if (prev)
-			{
-				MovabilityType fmov = curr->movability;
-				curr->movability = MOV_ALL;
-				
-				#if DBG_BCKCONN
-				cout << "a";
-				#endif
-			
-				pts = (inc < 0) ? prev->predict_previous_COCA() : prev->predict_next_NHCA();
-				Point target_heavy = pts[0];
-				Point target_pole = pts[1];
-				delete[] pts;
-				
-				#if DBG_BCKCONN
-				cout << "b";
-				#endif
-				
-				float theta, step = fiftyseventh*1.0, r, btheta = 0, bestr;
-				for (theta=0; theta < M_PI*2; theta += step)
-				{
-					r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
-					// r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
-					if (inc > 0) r -= target_pole.get_3d_distance(curr->HN_or_substitute_location());
-					
-					if (!theta || (r < bestr))
-					{
-						bestr = r;
-						btheta = theta;
-					}
-					
-					curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , step );
-				}
-				curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc , btheta );
-				
-				#if DBG_BCKCONN
-				cout << "c";
-				#endif
-				
-				btheta=0;
-				for (theta=0; theta < M_PI*2; theta += step)
-				{
-					r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
-					// r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
-					if (inc < 0) r -= target_pole.get_3d_distance(curr->get_atom_location("O"));
-					
-					if (!theta || (r < bestr))
-					{
-						bestr = r;
-						btheta = theta;
-					}
-					
-					curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , step );
-				}
-				curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc , btheta );
-				anomaly = bestr;
-				
-				#if DBG_BCKCONN
-				cout << "d";
-				#endif
-			
-				curr->movability = fmov;
-			}
-			
-			if (pointer == startres)
-			{
-				#if DBG_BCKCONN
-				cout << ". ";
-				#endif
-				break;
-			}
-			
-			pointer -= inc;
-			next = curr;
-			curr = prev;
-			prev = get_residue(pointer-inc);
-			movfactor -= decrement;
-			
-			#if DBG_BCKCONN
-			cout << ", ";
-			#endif
-		};
-			
-		#if DBG_BCKCONN
-		cout << endl;
-		#endif
-		
-		/*if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
-								<< "# " << (startres-inc) << " anomaly: " << anomaly << endl;*/
-	#if _INCREMENTAL_BKCONN
-	}
-	#endif
+
+        // Glom the last residue onto the target.
+        // Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
+        // Then do the same for the previous residue, and the one before, etc,
+        // all the way back to the starting residue.
+        // Give a warning if the starting residue has an anomaly > 0.1A.
+        AminoAcid *next, *curr, *prev;
+        int pointer = endres;
+        float movfactor = 1, decrement, anomaly = 0;
+
+        decrement = 1.0 / fabs(endres - startres);		// if exterior is the opposite of interior, what's the opposite of increment?
+
+        next = get_residue(endres+inc);
+        curr = get_residue(pointer);
+        prev = get_residue(pointer-inc);
+
+        #if DBG_BCKCONN
+        cout << "backconnect( " << startres << ", " << endres << ")" << endl;
+        #endif
+        while (next && curr)
+        {
+            #if DBG_BCKCONN
+            cout << pointer << ":";
+            #endif
+
+            Point* pts = (inc > 0) ? next->predict_previous_COCA() : next->predict_next_NHCA();
+            Point ptsc[4];
+
+            #if _INCREMENTAL_BKCONN
+            ptsc[0] = (inc > 0) ? curr->get_atom_location("C") : curr->get_atom_location("N");
+            ptsc[1] = (inc > 0) ? curr->get_atom_location("O") : curr->HN_or_substitute_location();
+            ptsc[2] = curr->get_atom_location("CA");
+
+            Point _4avg[3];
+            for (i=0; i<3; i++)
+            {
+                _4avg[0] = pts[i];
+                _4avg[1] = ptsc[i];
+                _4avg[0].weight = movfactor;
+                _4avg[1].weight = 1.0 - movfactor;
+                pts[i] = average_of_points(_4avg, 2);
+            }
+            #endif
+
+            curr->glom(pts, inc > 0);
+            delete[] pts;
+            // break;
+
+            #if DBG_BCKCONN
+            cout << "g";
+            #endif
+
+            if (prev)
+            {
+                MovabilityType fmov = curr->movability;
+                curr->movability = MOV_ALL;
+
+                #if DBG_BCKCONN
+                cout << "a";
+                #endif
+
+                pts = (inc < 0) ? prev->predict_previous_COCA() : prev->predict_next_NHCA();
+                Point target_heavy = pts[0];
+                Point target_pole = pts[1];
+                delete[] pts;
+
+                #if DBG_BCKCONN
+                cout << "b";
+                #endif
+
+                float theta, step = fiftyseventh*1.0, r, btheta = 0, bestr;
+                for (theta=0; theta < M_PI*2; theta += step)
+                {
+                    r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
+                    // r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+                    if (inc > 0) r -= target_pole.get_3d_distance(curr->HN_or_substitute_location());
+
+                    if (!theta || (r < bestr))
+                    {
+                        bestr = r;
+                        btheta = theta;
+                    }
+
+                    curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc, step );
+                }
+                curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc, btheta );
+
+                #if DBG_BCKCONN
+                cout << "c";
+                #endif
+
+                btheta=0;
+                for (theta=0; theta < M_PI*2; theta += step)
+                {
+                    r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
+                    // r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
+                    if (inc < 0) r -= target_pole.get_3d_distance(curr->get_atom_location("O"));
+
+                    if (!theta || (r < bestr))
+                    {
+                        bestr = r;
+                        btheta = theta;
+                    }
+
+                    curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc, step );
+                }
+                curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc, btheta );
+                anomaly = bestr;
+
+                #if DBG_BCKCONN
+                cout << "d";
+                #endif
+
+                curr->movability = fmov;
+            }
+
+            if (pointer == startres)
+            {
+                #if DBG_BCKCONN
+                cout << ". ";
+                #endif
+                break;
+            }
+
+            pointer -= inc;
+            next = curr;
+            curr = prev;
+            prev = get_residue(pointer-inc);
+            movfactor -= decrement;
+
+            #if DBG_BCKCONN
+            cout << ", ";
+            #endif
+        };
+
+        #if DBG_BCKCONN
+        cout << endl;
+        #endif
+
+        /*if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
+        						<< "# " << (startres-inc) << " anomaly: " << anomaly << endl;*/
+        #if _INCREMENTAL_BKCONN
+    }
+        #endif
 }
 
 void Protein::make_helix(int startres, int endres, float phi, float psi)
@@ -1182,55 +1183,55 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
     bb_rot_dir dir1 = (inc>0) ? N_asc : CA_desc,
                dir2 = (inc>0) ? CA_asc : C_desc;
 
-	#if DBG_ASUNDER_HELICES
-	cout << "make_helix( " << startres << ", " << endres << ", " << stopat << ", " << phi << ", " << psi << " )" << endl;
-	#endif
+    #if DBG_ASUNDER_HELICES
+    cout << "make_helix( " << startres << ", " << endres << ", " << stopat << ", " << phi << ", " << psi << " )" << endl;
+    #endif
     for (res = startres; inc; res += inc)
     {
         AminoAcid* aa = get_residue(res);
-        
+
         LocRotation lr = aa->enforce_peptide_bond();
-        
+
         if (lr.v.r)
         {
             AminoAcid* movable;
 
             if (res != endres)
-            for (i=res+inc; movable = get_residue(i); i+=inc)
-            {
-                LocatedVector lv = lr.get_lv();
-                movable->rotate(lv, lr.a);
-				#if DBG_ASUNDER_HELICES
-				cout << i << " ";
-				#endif
-                if (i == stopat) break;
-            }
-			#if DBG_ASUNDER_HELICES
-			cout << endl;
-			#endif
+                for (i=res+inc; movable = get_residue(i); i+=inc)
+                {
+                    LocatedVector lv = lr.get_lv();
+                    movable->rotate(lv, lr.a);
+                    #if DBG_ASUNDER_HELICES
+                    cout << i << " ";
+                    #endif
+                    if (i == stopat) break;
+                }
+            #if DBG_ASUNDER_HELICES
+            cout << endl;
+            #endif
         }
 
         LocRotation* lr2 = aa->flatten();
 
         for (j=0; j<5; j++)
         {
-        	// cout << "Rotating " << *aa << " " << lr2[j].a*fiftyseven << " degrees." << endl;
+            // cout << "Rotating " << *aa << " " << lr2[j].a*fiftyseven << " degrees." << endl;
             if (lr2[j].v.r && lr2[j].a)
             {
                 AminoAcid* movable;
 
                 if (res != endres) for (i=res+1; movable = get_residue(i); i+=inc)
-                {
-                    LocatedVector lv = lr2[j].get_lv();
-                    movable->rotate(lv, lr2[j].a);
-					#if DBG_ASUNDER_HELICES
-					cout << i << " ";
-					#endif
-                    if (i == stopat) break;
-                }
-				#if DBG_ASUNDER_HELICES
-				cout << endl;
-				#endif
+                    {
+                        LocatedVector lv = lr2[j].get_lv();
+                        movable->rotate(lv, lr2[j].a);
+                        #if DBG_ASUNDER_HELICES
+                        cout << i << " ";
+                        #endif
+                        if (i == stopat) break;
+                    }
+                #if DBG_ASUNDER_HELICES
+                cout << endl;
+                #endif
 
                 int round_theta = (int)(lr2[j].a*fiftyseven+0.5);
                 while (round_theta < 0) round_theta += 360;
@@ -1242,8 +1243,8 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             }
         }
         delete[] lr2;
-        
-		// cout << "Rotating " << *aa << " phi " << (phi*fiftyseven) << " degrees." << endl;
+
+        // cout << "Rotating " << *aa << " phi " << (phi*fiftyseven) << " degrees." << endl;
         lr = aa->rotate_backbone_abs(dir1, phi);
 
         if (lr.v.r)
@@ -1251,18 +1252,18 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             AminoAcid* movable;
 
             if (res != endres) for (i=res+inc; movable = get_residue(i); i+=inc)
-            {
-            	// cout << i << " ";
-                LocatedVector lv = lr.get_lv();
-                movable->rotate(lv, lr.a);
-				#if DBG_ASUNDER_HELICES
-				cout << i << " ";
-				#endif
-                if (i == stopat) break;
-            }
-			#if DBG_ASUNDER_HELICES
-			cout << endl;
-			#endif
+                {
+                    // cout << i << " ";
+                    LocatedVector lv = lr.get_lv();
+                    movable->rotate(lv, lr.a);
+                    #if DBG_ASUNDER_HELICES
+                    cout << i << " ";
+                    #endif
+                    if (i == stopat) break;
+                }
+            #if DBG_ASUNDER_HELICES
+            cout << endl;
+            #endif
         }
         // cout << endl;
 
@@ -1274,18 +1275,18 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             AminoAcid* movable;
 
             if (res != endres) for (i=res+inc; movable = get_residue(i); i+=inc)
-            {
-                // cout << i << " ";
-                LocatedVector lv = lr.get_lv();
-                movable->rotate(lv, lr.a);
-				#if DBG_ASUNDER_HELICES
-				cout << i << " ";
-				#endif
-                if (i == stopat) break;
-            }
-			#if DBG_ASUNDER_HELICES
-			cout << endl;
-			#endif
+                {
+                    // cout << i << " ";
+                    LocatedVector lv = lr.get_lv();
+                    movable->rotate(lv, lr.a);
+                    #if DBG_ASUNDER_HELICES
+                    cout << i << " ";
+                    #endif
+                    if (i == stopat) break;
+                }
+            #if DBG_ASUNDER_HELICES
+            cout << endl;
+            #endif
         }
         // cout << endl;
 
@@ -1295,7 +1296,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
     // Hang onto this line, might want it later.
     // if (phi > 0.1 || psi > 0.1) conform_backbone(startres, endres, 20, true);
 
-#if 0
+    #if 0
     // This is for finding values of phi and psi for helices.
     for (j=0; j<=360; j++)
     {
@@ -1315,17 +1316,17 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
             cout << endl;
         }
     }
-#endif
-	
-	set_clashables();
-    
+    #endif
+
+    set_clashables();
+
     int seql = get_seq_length();
     Molecule* aas[seql+4];
     for (i=startres; i<=endres; i++)
     {
-    	aas[i-startres] = get_residue(i);
-    	aas[i-startres]->movability = MOV_FLEXONLY;
-    	aas[i-startres+1] = 0;
+        aas[i-startres] = get_residue(i);
+        aas[i-startres]->movability = MOV_FLEXONLY;
+        aas[i-startres+1] = 0;
     }
     aas[endres-startres+1] = 0;
     Molecule::multimol_conform(aas, 25);
@@ -1528,73 +1529,73 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     for (i=0; m_mcoord[j]->coord_res[i]; i++)
         m_mcoord[j]->coord_res[i]->movability = MOV_FLEXONLY;
 
-	// Flex the side chains to all be close to one another.
-	int iter;
-	for (iter=0; iter<10; iter++)
-	{
-		for (i=0; i<residues; i++)
-		{
-		    AminoAcid* aa = get_residue(resnos[i]);
-		    if (aa)
-		    {
-		    	Bond** bb = aa->get_rotatable_bonds();
-		    	if (bb)
-		    	{
-		    		float rad = 0, step = 10*fiftyseventh;
-		    		float bestrad, bestr, r;
-		    		
-		    		for (l=0; bb[l]; l++)
-		    		{
-		    			bestrad = 0;
-		    			bestr = 999999;
-		    			for (; rad < M_PI*2; rad += step)
-		    			{
-		    				bb[l]->rotate(step);
-		    				r = 0;
-		    				for (n=0; n<residues; n++)
-		    				{
-		    					if (resnos[n] == resnos[i]) continue;
-		    					r += get_atom_location(resnos[n], res_anames[n].c_str()).get_3d_distance(get_atom_location(resnos[i], res_anames[i].c_str()));
-		    				}
-		    				
-		    				/*cout << iter << " " << *aa << ":"
-		    					 << bb[l]->atom->name << "-" << bb[l]->btom->name
-		    					 << " " << rad*fiftyseven << "deg "
-		    					 << r << endl;*/
-		    				
-		    				if (r < bestr)
-		    				{
-		    					bestrad = rad;
-		    					bestr = r;
-		    				}
-		    			}
-		    		
-		    			if (bestrad) bb[l]->rotate(bestrad);
-		    			
-		    		}		// for (l=0; bb[l]; l++)
-		    	}		// if (bb)
-		    }		// if (aa)
-		}		// for (i=0; i<residues; i++)
-	}		// for iter
-	
-	// Move the metal to the new center of all coordinating atoms.
-	Point pt4avg[residues+2];
-	l=0;
-	for (n=0; n<residues; n++)
-	{
-		Point respt = get_atom_location(resnos[n], res_anames[n].c_str());
-		
-		if (n>0 && resnos[n] == resnos[n-1])
-		{
-			pt4avg[l-1].x = (pt4avg[l-1].x + respt.x)/2;
-			pt4avg[l-1].y = (pt4avg[l-1].y + respt.y)/2;
-			pt4avg[l-1].z = (pt4avg[l-1].z + respt.z)/2;
-		}
-		else
-			pt4avg[l++] = respt;
-	}
-	Point ptmtl = average_of_points(pt4avg, l);
-	metal->move(ptmtl);
+    // Flex the side chains to all be close to one another.
+    int iter;
+    for (iter=0; iter<10; iter++)
+    {
+        for (i=0; i<residues; i++)
+        {
+            AminoAcid* aa = get_residue(resnos[i]);
+            if (aa)
+            {
+                Bond** bb = aa->get_rotatable_bonds();
+                if (bb)
+                {
+                    float rad = 0, step = 10*fiftyseventh;
+                    float bestrad, bestr, r;
+
+                    for (l=0; bb[l]; l++)
+                    {
+                        bestrad = 0;
+                        bestr = 999999;
+                        for (; rad < M_PI*2; rad += step)
+                        {
+                            bb[l]->rotate(step);
+                            r = 0;
+                            for (n=0; n<residues; n++)
+                            {
+                                if (resnos[n] == resnos[i]) continue;
+                                r += get_atom_location(resnos[n], res_anames[n].c_str()).get_3d_distance(get_atom_location(resnos[i], res_anames[i].c_str()));
+                            }
+
+                            /*cout << iter << " " << *aa << ":"
+                            	 << bb[l]->atom->name << "-" << bb[l]->btom->name
+                            	 << " " << rad*fiftyseven << "deg "
+                            	 << r << endl;*/
+
+                            if (r < bestr)
+                            {
+                                bestrad = rad;
+                                bestr = r;
+                            }
+                        }
+
+                        if (bestrad) bb[l]->rotate(bestrad);
+
+                    }		// for (l=0; bb[l]; l++)
+                }		// if (bb)
+            }		// if (aa)
+        }		// for (i=0; i<residues; i++)
+    }		// for iter
+
+    // Move the metal to the new center of all coordinating atoms.
+    Point pt4avg[residues+2];
+    l=0;
+    for (n=0; n<residues; n++)
+    {
+        Point respt = get_atom_location(resnos[n], res_anames[n].c_str());
+
+        if (n>0 && resnos[n] == resnos[n-1])
+        {
+            pt4avg[l-1].x = (pt4avg[l-1].x + respt.x)/2;
+            pt4avg[l-1].y = (pt4avg[l-1].y + respt.y)/2;
+            pt4avg[l-1].z = (pt4avg[l-1].z + respt.z)/2;
+        }
+        else
+            pt4avg[l++] = respt;
+    }
+    Point ptmtl = average_of_points(pt4avg, l);
+    metal->move(ptmtl);
 
     // Multimol conform the array.
     gmprot = this;
@@ -1725,7 +1726,7 @@ float Protein::orient_helix(int startres, int endres, int stopat, float angle, i
 void Protein::set_region(std::string rgname, int start, int end)
 {
     int i;
-    for (i=0; i<PROT_MAX_RGN; i++) if (!regions[i].start) break;
+    for (i=0; i<PROT_MAX_RGN; i++) if (!regions[i].start || !strcmp(regions[i].name.c_str(), rgname.c_str())) break;
     if (i >= PROT_MAX_RGN) return;		// Nope.
 
     regions[i].name = rgname;
@@ -1743,169 +1744,189 @@ Region Protein::get_region(const std::string rgname)
 
 int Protein::get_region_start(const std::string name)
 {
-	Region rgn = get_region(name);
-	return rgn.start;
+    Region rgn = get_region(name);
+    return rgn.start;
 }
 
 int Protein::get_region_end(const std::string name)
 {
-	Region rgn = get_region(name);
-	return rgn.end;
+    Region rgn = get_region(name);
+    return rgn.end;
 }
 
 Point Protein::get_region_center(int startres, int endres)
 {
-	int rglen = endres-startres;
-	Point range[rglen+4];
-	
-	int i;
-	for (i=0; i<rglen; i++)
-	{
-		// This is slow but that's okay.
-		range[i] = get_residue(startres+i)->get_barycenter();
-	}
-	
-	return average_of_points(range, rglen);
+    int rglen = endres-startres;
+    Point range[rglen+4];
+
+    int i;
+    for (i=0; i<rglen; i++)
+    {
+        // This is slow but that's okay.
+        AminoAcid* aa = get_residue(startres+i);
+        if (!aa) continue;
+        range[i] = aa->get_barycenter();
+    }
+
+    return average_of_points(range, rglen);
 }
 
 void Protein::move_piece(int start_res, int end_res, Point new_center)
 {
-	Point old_center = get_region_center(start_res, end_res);
-	SCoord move_amt = new_center.subtract(old_center);
-	
-	int i;
-	for (i=start_res; i<=end_res; i++)
-	{
-		AminoAcid* aa = get_residue(i);
-		aa->aamove(move_amt);
-	}
+    Point old_center = get_region_center(start_res, end_res);
+    SCoord move_amt = new_center.subtract(old_center);
+
+    int i;
+    for (i=start_res; i<=end_res; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        if (!aa) continue;
+        MovabilityType mov = aa->movability;
+        aa->movability = MOV_ALL;
+        aa->aamove(move_amt);
+        aa->movability = mov;
+    }
 }
 
 void Protein::rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res)
 {
-	Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
-	Point align = get_residue(align_res)->get_barycenter();
-	Rotation rot = align_points_3d(&align, &align_target, &pivot);
-	
-	LocatedVector lv(rot.v);
-	lv.origin = pivot;
-	int i;
-	for (i=start_res; i<=end_res; i++)
-	{
-		AminoAcid* aa = get_residue(i);
-		aa->rotate(lv, rot.a);
-	}
+    Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
+    Point align = get_residue(align_res)->get_barycenter();
+    Rotation rot = align_points_3d(&align, &align_target, &pivot);
+    rotate_piece(start_res, end_res, rot, pivot_res);
+}
+
+void Protein::rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res)
+{
+    Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
+    LocatedVector lv(rot.v);
+    lv.origin = pivot;
+    int i;
+    for (i=start_res; i<=end_res; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        if (!aa) continue;
+        MovabilityType mov = aa->movability;
+        aa->movability = MOV_ALL;
+        aa->rotate(lv, rot.a);
+        aa->movability = mov;
+    }
 }
 
 
 
 Point Protein::find_loneliest_point(Point cen, Point sz)
 {
-	if (!residues) return cen;
-	
-	float x, y, z, xp, yp, zp, xa, ya, za, r, bestr = 0, step = 0.25;
-	int i;
-	Point retval = cen;
-	
-	sz.x /= 2; sz.y /= 2; sz.z /= 2;
-	
-	/*if (fabs(sz.x) > 4) sz.x = 4;
-	if (fabs(sz.y) > 4) sz.y = 4;
-	if (fabs(sz.z) > 4) sz.z = 4;*/
-	
-	for (x = -sz.x; x <= sz.x; x += step)
-	{
-		xp = x / sz.x; xp *= xp;
-		xa = cen.x + x;
-		for (y = -sz.y; y <= sz.y; y += step)
-		{
-			yp = y / sz.y; yp *= yp;
-			ya = cen.y + y;
-			for (z = -sz.z; z <= sz.z; z += step)
-			{
-				zp = z / sz.z; zp *= zp;
-				za = cen.z + z;
-				r = sqrt(xp+yp+zp);
-				if (r > 1) continue;
-				
-				Point maybe(xa, ya, za);
-				float minr = Avogadro;
-				
-				for (i=0; residues[i]; i++)
-				{
-					Atom* a = residues[i]->get_nearest_atom(maybe);
-					if (a)
-					{
-						r = a->get_location().get_3d_distance(maybe);
-						if (r < minr) minr = r;
-					}
-				}
-				
-				if (minr < 1e9 && minr > bestr)
-				{
-					retval = maybe;
-					bestr = minr;
-				}
-			}
-		}
-	}
-	
-	return retval;
+    if (!residues) return cen;
+
+    float x, y, z, xp, yp, zp, xa, ya, za, r, bestr = 0, step = 0.25;
+    int i;
+    Point retval = cen;
+
+    sz.x /= 2;
+    sz.y /= 2;
+    sz.z /= 2;
+
+    /*if (fabs(sz.x) > 4) sz.x = 4;
+    if (fabs(sz.y) > 4) sz.y = 4;
+    if (fabs(sz.z) > 4) sz.z = 4;*/
+
+    for (x = -sz.x; x <= sz.x; x += step)
+    {
+        xp = x / sz.x;
+        xp *= xp;
+        xa = cen.x + x;
+        for (y = -sz.y; y <= sz.y; y += step)
+        {
+            yp = y / sz.y;
+            yp *= yp;
+            ya = cen.y + y;
+            for (z = -sz.z; z <= sz.z; z += step)
+            {
+                zp = z / sz.z;
+                zp *= zp;
+                za = cen.z + z;
+                r = sqrt(xp+yp+zp);
+                if (r > 1) continue;
+
+                Point maybe(xa, ya, za);
+                float minr = Avogadro;
+
+                for (i=0; residues[i]; i++)
+                {
+                    Atom* a = residues[i]->get_nearest_atom(maybe);
+                    if (a)
+                    {
+                        r = a->get_location().get_3d_distance(maybe);
+                        if (r < minr) minr = r;
+                    }
+                }
+
+                if (minr < 1e9 && minr > bestr)
+                {
+                    retval = maybe;
+                    bestr = minr;
+                }
+            }
+        }
+    }
+
+    return retval;
 }
 
 Point Protein::estimate_pocket_size(std::vector<AminoAcid*> ba)
 {
-	int i, n = ba.size();
-	if (!n) return Point();
-	float cx, cy, cz;
-	
-	cx = cy = cz = 0;
-	for (i=0; i<n; i++)
-	{
-		Point pt = ba[i]->get_atom_location("CA");
-		cx += pt.x;
-		cy += pt.y;
-		cz += pt.z;
-	}
-	
-	Point center(cx/n, cy/n, cz/n);
-	
-	float sx, sy, sz, wx, wy, wz;
-	sx = sy = sz = wx = wy = wz = 0;
-	for (i=0; i<n; i++)
-	{
-		Point pt = ba[i]->get_atom_location("CA").subtract(center);
-		float mag = pt.magnitude();
-		mag -= 0.666 * ba[i]->get_reach();
-		pt.scale(mag);
-		float lwx = (fabs(pt.x) / sqrt(pt.y*pt.y + pt.z*pt.z)) / mag;
-		float lwy = (fabs(pt.y) / sqrt(pt.x*pt.x + pt.z*pt.z)) / mag;
-		float lwz = (fabs(pt.z) / sqrt(pt.x*pt.x + pt.y*pt.y)) / mag;
-		
-		sx += lwx * fabs(pt.x);
-		sy += lwy * fabs(pt.y);
-		sz += lwz * fabs(pt.z);
-		
-		wx += lwx;
-		wy += lwy;
-		wz += lwz;
-	}
-	
-	Point size(sx/wx, sy/wy, sz/wz);
-	
-	return size;
+    int i, n = ba.size();
+    if (!n) return Point();
+    float cx, cy, cz;
+
+    cx = cy = cz = 0;
+    for (i=0; i<n; i++)
+    {
+        Point pt = ba[i]->get_atom_location("CA");
+        cx += pt.x;
+        cy += pt.y;
+        cz += pt.z;
+    }
+
+    Point center(cx/n, cy/n, cz/n);
+
+    float sx, sy, sz, wx, wy, wz;
+    sx = sy = sz = wx = wy = wz = 0;
+    for (i=0; i<n; i++)
+    {
+        Point pt = ba[i]->get_atom_location("CA").subtract(center);
+        float mag = pt.magnitude();
+        mag -= 0.666 * ba[i]->get_reach();
+        pt.scale(mag);
+        float lwx = (fabs(pt.x) / sqrt(pt.y*pt.y + pt.z*pt.z)) / mag;
+        float lwy = (fabs(pt.y) / sqrt(pt.x*pt.x + pt.z*pt.z)) / mag;
+        float lwz = (fabs(pt.z) / sqrt(pt.x*pt.x + pt.y*pt.y)) / mag;
+
+        sx += lwx * fabs(pt.x);
+        sy += lwy * fabs(pt.y);
+        sz += lwz * fabs(pt.z);
+
+        wx += lwx;
+        wy += lwy;
+        wz += lwz;
+    }
+
+    Point size(sx/wx, sy/wy, sz/wz);
+
+    return size;
 }
 
 Molecule** Protein::all_residues_as_molecules()
 {
-	if (!residues) return nullptr;
-	Molecule** retval = new Molecule*[get_seq_length()+4];
-	
-	int i;
-	for (i=0; residues[i]; i++) retval[i] = reinterpret_cast<Molecule*>(residues[i]);
-	retval[i] = nullptr;
-	
-	return retval;
+    if (!residues) return nullptr;
+    Molecule** retval = new Molecule*[get_seq_length()+4];
+
+    int i;
+    for (i=0; residues[i]; i++) retval[i] = reinterpret_cast<Molecule*>(residues[i]);
+    retval[i] = nullptr;
+
+    return retval;
 }
 
 

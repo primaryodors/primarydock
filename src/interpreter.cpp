@@ -559,9 +559,17 @@ int main(int argc, char** argv)
 				set_variable(lbuffer, s);
 			}	// REGION
 			
+			else if (!strcmp(fields[0], "CENTER"))
+			{
+				l = 1;
+				if (fields[l]) raise_error("Too many parameters given for CENTER.");
+				p.move_piece(1, p.get_seq_length(), Point(0,0,0));
+			}	// CENTER
+			
 			else if (!strcmp(fields[0], "UPRIGHT"))
 			{
-				
+				p.move_piece(1, p.get_seq_length(), Point(0,0,0));
+
 			}	// UPRIGHT
 			
 			else if (!strcmp(fields[0], "SEARCH"))

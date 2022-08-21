@@ -133,6 +133,15 @@ parameter is given, it represents the number of iterations (default 50). More it
 returns occur with large iteration values.
 
 
+# CENTER
+Example:
+```
+CENTER
+```
+
+Centers the entire protein at [0, 0, 0]. Currently this command does not take any arguments.
+
+
 # CONNECT
 Examples:
 ```

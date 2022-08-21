@@ -1724,7 +1724,7 @@ float Protein::orient_helix(int startres, int endres, int stopat, float angle, i
 void Protein::set_region(std::string rgname, int start, int end)
 {
     int i;
-    for (i=0; i<PROT_MAX_RGN; i++) if (!regions[i].start) break;
+    for (i=0; i<PROT_MAX_RGN; i++) if (!regions[i].start || !strcmp(regions[i].name.c_str(), rgname.c_str())) break;
     if (i >= PROT_MAX_RGN) return;		// Nope.
 
     regions[i].name = rgname;

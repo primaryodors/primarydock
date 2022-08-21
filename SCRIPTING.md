@@ -282,6 +282,17 @@ Yar or YO before the metal symbol applies globally to the coordination residues.
 overriding the default or any global.
 
 
+# REGION
+Example:
+```
+REGION TMR5 202 238
+REGION "TMR5" 202 238
+REGION $region_name %start_res %end_res
+```
+
+Defines a region in the protein object, overwriting any existing region with the same name. Also creates the %region.s and %region.e variables.
+
+
 # SAVE
 Example:
 ```

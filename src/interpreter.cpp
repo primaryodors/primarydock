@@ -329,6 +329,7 @@ char* interpret_single_string(const char* param)
 		return buffer;
 		
 		default:
+		strcpy(buffer, param);
 		return buffer;
 	}
 }
@@ -486,7 +487,8 @@ int main(int argc, char** argv)
 				int sr, er;
 				l = 1;
 				if (!fields[l]) raise_error("Insufficient parameters given for REGION.");
-				psz = interpret_single_string(fields[l++]);
+				psz = interpret_single_string(fields[l++]);	
+				if (!psz[0]) psz = fields[l-1];
 				if (!fields[l]) raise_error("Insufficient parameters given for REGION.");
 				sr = interpret_single_int(fields[l++]);
 				if (!fields[l]) raise_error("Insufficient parameters given for REGION.");

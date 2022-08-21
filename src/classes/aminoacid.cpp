@@ -936,7 +936,13 @@ int AminoAcid::from_pdb(FILE* is)
     {
         lasttell = ftell(is);
         fgets(buffer, 1003, is);
-		buffer[16] = ' ';
+		if (buffer[0] == 'A' &&
+			buffer[1] == 'T' &&
+			buffer[2] == 'O' &&
+			buffer[3] == 'M'
+		   )
+			buffer[16] = ' ';
+
         int thistell = ftell(is);
         strcpy(origbuf, buffer);
         char** fields = chop_spaced_fields(buffer);

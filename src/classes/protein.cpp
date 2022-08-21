@@ -230,7 +230,6 @@ int Protein::load_pdb(FILE* is)
         {
         	int told = ftell(is);
         	fgets(buffer, 1003, is);
-            buffer[16] = ' ';
         	
         	if (buffer[0] == 'A' &&
         		buffer[1] == 'T' &&
@@ -238,6 +237,7 @@ int Protein::load_pdb(FILE* is)
         		buffer[3] == 'M'
         		)
     		{
+                buffer[16] = ' ';
     			fseek(is, told, SEEK_SET);
     			
 				char tmp3let[5];
@@ -1761,7 +1761,9 @@ Point Protein::get_region_center(int startres, int endres)
 	for (i=0; i<rglen; i++)
 	{
 		// This is slow but that's okay.
-		range[i] = get_residue(startres+i)->get_barycenter();
+        AminoAcid* aa = get_residue(startres+i);
+        if (!aa) continue;
+		range[i] = aa->get_barycenter();
 	}
 	
 	return average_of_points(range, rglen);
@@ -1776,6 +1778,7 @@ void Protein::move_piece(int start_res, int end_res, Point new_center)
 	for (i=start_res; i<=end_res; i++)
 	{
 		AminoAcid* aa = get_residue(i);
+        if (!aa) continue;
 		aa->aamove(move_amt);
 	}
 }
@@ -1796,6 +1799,7 @@ void Protein::rotate_piece(int start_res, int end_res, Rotation rot, int pivot_r
 	for (i=start_res; i<=end_res; i++)
 	{
 		AminoAcid* aa = get_residue(i);
+        if (!aa) continue;
 		aa->rotate(lv, rot.a);
 	}
 }

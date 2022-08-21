@@ -568,7 +568,11 @@ int main(int argc, char** argv)
 			
 			else if (!strcmp(fields[0], "UPRIGHT"))
 			{
-				p.move_piece(1, p.get_seq_length(), Point(0,0,0));
+				l = 1;
+				if (fields[l]) raise_error("Too many parameters given for UPRIGHT.");
+
+				int seql = p.get_seq_length();
+				p.move_piece(1, seql, Point(0,0,0));
 
 				Point extracellular[256], cytoplasmic[256];
 				int exr_n=0, cyt_n=0;
@@ -601,10 +605,35 @@ int main(int argc, char** argv)
 
 				Rotation rot = align_points_3d(&exrdir, new Point(0,1e9,0), &cytdir);
 
-				p.rotate_piece(1, p.get_seq_length(), rot, 0);
+				p.rotate_piece(1, seql, rot, 0);
 
 				// TODO: Rotate to place TMR4 +Z to TMR1.
+				int sr = p.get_region_start("TMR4");
+				if (sr)
+				{
+					int er = p.get_region_end("TMR4");
 
+					Point tmr1[64], tmr4[64];
+					int tmr1_n=0, tmr4_n=0;
+
+					for (i=sr; i<=er; i++)
+					{
+						tmr4[tmr4_n++] = p.get_atom_location(i, "CA");
+					}
+
+					sr = p.get_region_start("TMR1");
+					er = p.get_region_end("TMR1");
+
+					for (i=sr; i<=er; i++)
+					{
+						tmr1[tmr1_n++] = p.get_atom_location(i, "CA");
+					}
+
+					Point tmr1dir = average_of_points(tmr1, tmr1_n);
+					Point tmr4dir = average_of_points(tmr4, tmr4_n);
+
+					rot = align_points_3d(&tmr4dir, new Point(0,0,1e9), &tmr1dir);
+				}
 			}	// UPRIGHT
 			
 			else if (!strcmp(fields[0], "SEARCH"))

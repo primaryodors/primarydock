@@ -379,7 +379,10 @@ The entire protein will also be centered at [0, 0, 0].
 Valid only for transmembrane proteins with at least one transmembrane helix. The protein must have TMR1 through TMR{n} defined, where n <= 7.
 If the PDB does not contain suitable `REMARK 650 HELIX` records, then the TMRs must be defined with the `REGION` command.
 
+If the protein has a TMR4, it will be rotated to the +Z direction from TMR1. This affords a good view of the binding pocket of 7-helix GPCRs, but also
+maintains compatibility with MS4A proteins since it does not depend on the existence of a TMR5, TMR6, or TMR7.
 
+UPRIGHT takes no arguments.
 
 
 

@@ -23,7 +23,10 @@ struct Point
     Point(SCoord v);
     Point(SCoord* v);
     Point(float x, float y, float z);
-    Point add(Point add_to)    {        return add(&add_to);    }
+    Point add(Point add_to)
+    {
+        return add(&add_to);
+    }
     Point add(Point* add_to);
     Point add(SCoord* add_to);
     Point subtract(const Point subtracted);
@@ -34,7 +37,10 @@ struct Point
         return subtract(pt);
     }
     Point negate();
-    float get_3d_distance(const Point reference)    {        return get_3d_distance(&reference);    }
+    float get_3d_distance(const Point reference)
+    {
+        return get_3d_distance(&reference);
+    }
     float get_3d_distance(const Point* reference);
     Point multiply_3d_distance(const Point* reference, float r_mult);
     bool pt_in_bounding_box(const Point* corner1, const Point* corner2);
@@ -52,7 +58,10 @@ struct SCoord
 {
     float r=0, theta=0, phi=0;
 
-    SCoord()    {        r = theta = phi = 0;    }
+    SCoord()
+    {
+        r = theta = phi = 0;
+    }
     SCoord(const Point from);
     SCoord(const Point* from);
     SCoord(float r, float theta, float phi);
@@ -63,7 +72,10 @@ struct SCoord
         SCoord v(&pt);
         return v;
     }
-    SCoord add(SCoord v)    {        return add(&v);    };
+    SCoord add(SCoord v)
+    {
+        return add(&v);
+    };
     SCoord add(SCoord* v);
 
     std::string printable() const;
@@ -74,10 +86,21 @@ struct SCoord
 
 struct LocatedVector : public SCoord
 {
-	LocatedVector() { r = theta = phi = origin.x = origin.y = origin.z = 0; }
-	LocatedVector(SCoord sc) { copy(sc); }
-	void copy(SCoord sc) { r=sc.r; theta=sc.theta; phi=sc.phi; }
-	Point to_point();
+    LocatedVector()
+    {
+        r = theta = phi = origin.x = origin.y = origin.z = 0;
+    }
+    LocatedVector(SCoord sc)
+    {
+        copy(sc);
+    }
+    void copy(SCoord sc)
+    {
+        r=sc.r;
+        theta=sc.theta;
+        phi=sc.phi;
+    }
+    Point to_point();
     Point origin;
 };
 
@@ -85,9 +108,15 @@ struct Rotation
 {
     SCoord v;
     float a=0;
-    Rotation()	{	a = 0;	};
+    Rotation()
+    {
+        a = 0;
+    };
 
-    Rotation add(Rotation rot)	{	return add(&rot);	};
+    Rotation add(Rotation rot)
+    {
+        return add(&rot);
+    };
     Rotation add(Rotation* rot);
 
     char* printable();

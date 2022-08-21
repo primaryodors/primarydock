@@ -10,7 +10,7 @@
 class Atom;
 class Bond
 {
-	public:
+public:
     Atom* atom = 0;
     Atom* btom = 0;
     float cardinality=0;			// aromatic bonds = 1.5.
@@ -25,12 +25,15 @@ class Bond
     ~Bond();
 
     bool rotate(float angle_radians, bool allow_backbone = false);
-    void clear_moves_with_cache()	{	moves_with_btom = 0;	}
+    void clear_moves_with_cache()
+    {
+        moves_with_btom = 0;
+    }
     Atom** get_moves_with_btom();
     int count_moves_with_btom();
     void swing(SCoord newdir);		// Rotate btom, and all its moves_with atoms, about atom so that the bond points to newdir.
 
-	protected:
+protected:
     void fill_moves_with_cache();
     void enforce_moves_with_uniqueness();
     Atom** moves_with_btom = 0;
@@ -38,47 +41,50 @@ class Bond
 
 enum RING_TYPE
 {
-	AROMATIC,
-	ANTIAROMATIC,
-	COPLANAR,
-	OTHER,
-	UNKNOWN
+    AROMATIC,
+    ANTIAROMATIC,
+    COPLANAR,
+    OTHER,
+    UNKNOWN
 };
 
 class Ring
 {
-	public:
-	Ring() { ; }
-	Ring(Atom** from_atoms);
-	Ring(Atom** from_atoms, RING_TYPE type);
-	
-	int get_atom_count() { return atcount; }
-	Atom* get_atom(int index);
-	Atom** get_atoms() const;
-	RING_TYPE get_type();
-	Point get_center();
-	SCoord get_normal();
-	LocatedVector get_center_and_normal();
-	bool is_coplanar();
-	bool is_conjugated();
+public:
+    Ring() { ; }
+    Ring(Atom** from_atoms);
+    Ring(Atom** from_atoms, RING_TYPE type);
+
+    int get_atom_count()
+    {
+        return atcount;
+    }
+    Atom* get_atom(int index);
+    Atom** get_atoms() const;
+    RING_TYPE get_type();
+    Point get_center();
+    SCoord get_normal();
+    LocatedVector get_center_and_normal();
+    bool is_coplanar();
+    bool is_conjugated();
     bool Huckel();						// Compiler doesn't allow ü in an identifier - boo hiss!
-	
-	protected:
-	Atom** atoms = nullptr;
-	int atcount = 0;
-	RING_TYPE type = UNKNOWN;
-	
-	void fill_with_atoms(Atom** from_atoms);
-	void determine_type();
-	void make_coplanar();
+
+protected:
+    Atom** atoms = nullptr;
+    int atcount = 0;
+    RING_TYPE type = UNKNOWN;
+
+    void fill_with_atoms(Atom** from_atoms);
+    void determine_type();
+    void make_coplanar();
 };
 
 class Atom
 {
-	friend class Bond;
-	friend class Ring;
-	
-	public:
+    friend class Bond;
+    friend class Ring;
+
+public:
     // Constructors and destructors.
     Atom(const char* elem_sym);
     Atom(const char* elem_sym, const Point* location);
@@ -88,13 +94,31 @@ class Atom
 
     // Basic getters.
     const char* get_elem_sym();
-    int get_Z()    {        return Z;    }
-    int get_family()    {        return family;    }
-    int get_valence()    {        return valence;    }
-    int get_geometry()    {        return geometry;    }
+    int get_Z()
+    {
+        return Z;
+    }
+    int get_family()
+    {
+        return family;
+    }
+    int get_valence()
+    {
+        return valence;
+    }
+    int get_geometry()
+    {
+        return geometry;
+    }
     Point get_location();
-    float get_vdW_radius()    {        return vdW_rad;    }
-    float get_atomic_weight()    {        return at_wt;    }
+    float get_vdW_radius()
+    {
+        return vdW_rad;
+    }
+    float get_atomic_weight()
+    {
+        return at_wt;
+    }
     float get_acidbase();
     float get_charge();
     float is_polar();						// -1 if atom is H-bond acceptor; +1 if donor.
@@ -105,9 +129,15 @@ class Atom
 
     // Setters.
     void set_aa_properties();
-    void set_acidbase(float ab)    {        acidbase = ab;    }
+    void set_acidbase(float ab)
+    {
+        acidbase = ab;
+    }
     void clear_all_moves_cache();
-    void increment_charge(float lcharge)    {        charge += lcharge;    }
+    void increment_charge(float lcharge)
+    {
+        charge += lcharge;
+    }
 
     // Bond functions.
     Bond** get_bonds();
@@ -124,7 +154,7 @@ class Atom
     Atom* is_bonded_to(const char* element, const int cardinality);
     Atom* is_bonded_to(const int family);
     Atom* is_bonded_to(const int family, const int cardinality);
-    
+
     int num_bonded_to(const char* element);
 
     bool shares_bonded_with(Atom* btom);
@@ -133,35 +163,35 @@ class Atom
     Bond* get_bond_between(const char* bname);
     Bond* get_bond_by_idx(int bidx);
     int get_idx_bond_between(Atom* btom);
-    
+
     float hydrophilicity_rule();
-    
+
     // Ring membership.
     int num_rings();
     int num_conj_rings();
-	Ring** get_rings();
-	bool is_in_ring(Ring* ring);
-	Ring* closest_arom_ring_to(Point target);
-	bool in_same_ring_as(Atom* b);
+    Ring** get_rings();
+    bool is_in_ring(Ring* ring);
+    Ring* closest_arom_ring_to(Point target);
+    bool in_same_ring_as(Atom* b);
     void aromatize()
     {
         geometry=3;
         // if (valence>3) valence--;
         if (bonded_to)
         {
-		    int i;
-		    for (i=0; i<geometry; i++)
-		    {
-		    	if (bonded_to[i].cardinality > 1
-		    		||
-		    		(	bonded_to[i].cardinality == 1
-		    			&& bonded_to[i].btom->get_Z() > 1
-		    		)
-		    		)
-		    	{
-		    		bonded_to[i].cardinality = 1.5;
-		    	} 
-	    	}
+            int i;
+            for (i=0; i<geometry; i++)
+            {
+                if (bonded_to[i].cardinality > 1
+                        ||
+                        (	bonded_to[i].cardinality == 1
+                            && bonded_to[i].btom->get_Z() > 1
+                        )
+                   )
+                {
+                    bonded_to[i].cardinality = 1.5;
+                }
+            }
         }
         geov=0;
     }
@@ -172,7 +202,10 @@ class Atom
 
     // Spatial functions.
     bool move(Point* pt);
-    bool move(Point pt) { return move(&pt); }
+    bool move(Point pt)
+    {
+        return move(&pt);
+    }
     bool move_rel(SCoord* v);
     int move_assembly(Point* pt, Atom* excluding);			// Return number of atoms moved. Note excluding must be a bonded atom.
     SCoord* get_basic_geometry();
@@ -187,9 +220,16 @@ class Atom
     SCoord get_next_free_geometry(float lcard);
     int get_idx_next_free_geometry();
     void rotate_geometry(Rotation rot);			// Necessary for bond rotation.
-    void clear_geometry_cache() { geov=0; }
+    void clear_geometry_cache()
+    {
+        geov=0;
+    }
     void swing_all(int startat=0);
-    void swap_chirality() { swapped_chirality = !swapped_chirality; chirality_unspecified = false; }
+    void swap_chirality()
+    {
+        swapped_chirality = !swapped_chirality;
+        chirality_unspecified = false;
+    }
 
     // Static fuctions.
     static int Z_from_esym(const char* elem_sym);
@@ -213,12 +253,12 @@ class Atom
     bool dnh=false;					// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.
     bool EZ_flip = false;
     float last_bind_energy=0;
-    
+
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.
     #endif
 
-	protected:
+protected:
     int Z=0;
     Point location;
     int valence=0;
@@ -241,7 +281,7 @@ class Atom
     Rotation geo_rot_1, geo_rot_2;
     bool swapped_chirality = false;
     bool chirality_unspecified = true;
-	Ring** member_of = nullptr;
+    Ring** member_of = nullptr;
 
     static void read_elements();
     void figure_out_valence();

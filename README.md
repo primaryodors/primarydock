@@ -48,7 +48,7 @@ Once your .config file is ready, and the PrimaryDock code is compiled, simply cd
 
 ./bin/primarydock [config file]
 
-(...replacing "[config file]" with the actual name of the file you edited or created.)
+(...replacing "[config file]" with the actual name of your config file.)
 
 After a little while, depending on your config settings, PrimaryDock will output data about one or more poses, including binding energy
 per residue, binding energy per type, total binding energy, PDB data of the ligand, and (if flexing is enabled) PDB data of the binding

@@ -35,13 +35,13 @@ int main(int argc, char** argv)
 
     cout << "Minimizing internal clashes..." << endl;
     m.minimize_internal_clashes();
-    
+
     /*if (argc > 4)
     {
     	Atom* a = m.get_atom(argv[2]);
     	Atom* b = m.get_atom(argv[3]);
     	float theta = atof(argv[4])/fiftyseven;
-    	
+
     	if (a && b)
     	{
     		Bond* bn = a->get_bond_between(b);
@@ -49,8 +49,8 @@ int main(int argc, char** argv)
     	}
     }*/
 
-	float int_clsh = m.get_internal_clashes();
-	if (int_clsh < 1) cout << "# ";
+    float int_clsh = m.get_internal_clashes();
+    if (int_clsh < 1) cout << "# ";
     cout << "Internal clashes: " << int_clsh << " cu.A." << endl;
 
     char tstoutf[1024];
@@ -60,13 +60,13 @@ int main(int argc, char** argv)
     if (m.save_sdf(pf)) cout << "Saved " << tstoutf << endl;
     else cout << "Failed to save " << tstoutf << endl;
     fclose(pf);
-    
+
     /*const char* tstpdbf = "test.pdb";
     pf = fopen(tstpdbf, "wb");
     m.save_pdb(pf);
     cout << "Saved " << tstpdbf << endl;
     fclose(pf);*/
-    
+
     cout << endl;
 
     return 0;

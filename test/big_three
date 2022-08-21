@@ -1,0 +1,14 @@
+
+# These are the tests performed before approving a PR for merge.
+
+# The amino aldehyde test is part of make code. Otherwise the test would be: test/molecule_test "NCCCC=O" "NCCCC=O" 10
+# Optionally: use the viewer to ensure that the two aldehyde moieties are coordinated to the two amino moieties.
+clear; make code
+
+# Check the per-residue output and ensure that ASP111 and ASP201 both have strong binding values between -40 and -75.
+# Optionally, use the viewer to ensure that the two amino moieties of the ligand are coordinated to the aforementioned ASP residues.
+clear; bin/primarydock test/testTAAR8.config
+
+# It is sufficient to check for at least one successful binding pose with a total energy of less than zero.
+clear; bin/primarydock test/test1A1.config
+

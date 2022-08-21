@@ -131,7 +131,7 @@ IF %i <= 7 GOTO _loop4
 # Output the deltas.
 
 ECHO "# Activation Matrix."
-ECHO "ACVMX region N.x N.y N.z C.x C.y C.z"
+ECHO "# ACVMX region N.x N.y N.z C.x C.y C.z"
 
 LET %i = 1
 _loop2:

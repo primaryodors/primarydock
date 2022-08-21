@@ -97,11 +97,41 @@ LET @ic[%i] /= 4
 # ECHO "Got inactive start/end averages for TMR" %i "..."
 
 LET %i ++
-
 IF %i <= 7 GOTO _loop1
 
 
+# Center the data by subtracting the average.
+
+LET @avgdelta = 0
+
+LET %i = 1
+_loop3:
+
+LET @delta_n = @an[%i] - @in[%i]
+LET @delta_c = @ac[%i] - @ic[%i]
+
+LET @avgdelta += @delta_n
+LET @avgdelta += @delta_c
+
+LET %i ++
+IF %i <= 7 GOTO _loop3
+
+LET @avgdelta /= 14
+
+LET %i = 1
+_loop4:
+
+LET @an[%i] -= @avgdelta
+LET @ac[%i] -= @avgdelta
+
+LET %i ++
+IF %i <= 7 GOTO _loop4
+
+
 # Output the deltas.
+
+ECHO "# Activation Matrix."
+ECHO "ACVMX region N.x N.y N.z C.x C.y C.z"
 
 LET %i = 1
 _loop2:
@@ -110,7 +140,7 @@ LET @delta_n = @an[%i] - @in[%i]
 LET @delta_c = @ac[%i] - @ic[%i]
 
 # ECHO "TMR" %i ": Activation moves N terminus " @delta_n ", C terminus " @delta_c "."
-ECHO "TMR" %i "|N" @delta_n "|C" @delta_c
+ECHO "ACVMX TMR" %i " " @delta_n.x " " @delta_n.y " " @delta_n.z " " @delta_c.x " " @delta_c.y " " @delta_c.z
 
 LET %i ++
 

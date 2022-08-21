@@ -570,6 +570,41 @@ int main(int argc, char** argv)
 			{
 				p.move_piece(1, p.get_seq_length(), Point(0,0,0));
 
+				Point extracellular[256], cytoplasmic[256];
+				int exr_n=0, cyt_n=0;
+
+				for (i=1; i<=7; i++)
+				{
+					int sr = p.get_region_start((std::string)"TMR" + std::to_string(i));
+					if (!sr) continue;
+					int er = p.get_region_end((std::string)"TMR" + std::to_string(i));
+
+					for (j=0; j<4; j++)
+					{
+						if (i % 1)			// TMR1, TMR3, TMR5, TMR7 begin on the extracellular side and descend.
+						{
+							extracellular[exr_n++] = p.get_atom_location(sr+j, "CA");
+							cytoplasmic[cyt_n++] = p.get_atom_location(er-j, "CA");
+						}
+						else				// TMR2, TMR4, TMR6 ascend from the cytoplasmic side.
+						{
+							cytoplasmic[cyt_n++] = p.get_atom_location(sr+j, "CA");
+							extracellular[exr_n++] = p.get_atom_location(er-j, "CA");
+						}
+					}
+				}
+
+				if (!exr_n || !cyt_n) raise_error("Cannot UPRIGHT protein without transmembrane regions named TMR{n}.");
+
+				Point exrdir = average_of_points(extracellular, exr_n);
+				Point cytdir = average_of_points(cytoplasmic, cyt_n);
+
+				Rotation rot = align_points_3d(&exrdir, new Point(0,1e9,0), &cytdir);
+
+				p.rotate_piece(1, p.get_seq_length(), rot, 0);
+
+				// TODO: Rotate to place TMR4 +Z to TMR1.
+
 			}	// UPRIGHT
 			
 			else if (!strcmp(fields[0], "SEARCH"))

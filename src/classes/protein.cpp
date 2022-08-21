@@ -1785,7 +1785,11 @@ void Protein::rotate_piece(int start_res, int end_res, int align_res, Point alig
 	Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
 	Point align = get_residue(align_res)->get_barycenter();
 	Rotation rot = align_points_3d(&align, &align_target, &pivot);
-	
+}
+
+void Protein::rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res)
+{
+	Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
 	LocatedVector lv(rot.v);
 	lv.origin = pivot;
 	int i;

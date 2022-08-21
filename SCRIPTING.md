@@ -367,6 +367,17 @@ which of two or more motifs a region has, for example it is possible to search a
 values and use an `IF` to take a different action depending which is the better match.
 
 
+# UPRIGHT
+Example:
+```
+UPRIGHT
+```
+
+Turns the protein "upright", so that the extracellular domain is in the +Y direction and the cytoplasmic domain is in the -Y direction.
+The entire protein will also be centered at [0, 0, 0].
+
+Valid only for transmembrane proteins with at least one transmembrane helix. The protein must have TMR1 through TMR{n} defined, where n <= 7.
+If the PDB does not contain suitable `REMARK 650 HELIX` records, then the TMRs must be defined with the `REGION` command.
 
 
 

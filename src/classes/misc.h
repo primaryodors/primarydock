@@ -27,7 +27,7 @@ struct Rotation;
 
 union Star
 {
-    double n;
+    long long n;
     float f;
     char* psz;
     const char* cpsz;

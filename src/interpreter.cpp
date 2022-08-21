@@ -108,7 +108,7 @@ int find_var_index(const char* varname, char** out_varname = nullptr)
                 if (*c == '%')
                 {
                     *c = 0;
-                    sprintf(buffer2, "%s%d%s", buffer, s.n, &c[strlen(buffer1)]);
+                    sprintf(buffer2, "%s%lld%s", buffer, s.n, &c[strlen(buffer1)]);
                 }
                 if (*c == '$')
                 {
@@ -350,7 +350,7 @@ char* interpret_single_string(const char* param)
         n = find_var_index(param);
         if (n<0) return buffer;
         n &= _VARNUM_MASK;
-        sprintf(buffer, "%d", script_var[n].value.n);
+        sprintf(buffer, "%lld", script_var[n].value.n);
         return buffer;
 
     case '&':

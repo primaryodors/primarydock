@@ -1781,7 +1781,10 @@ void Protein::move_piece(int start_res, int end_res, Point new_center)
     {
         AminoAcid* aa = get_residue(i);
         if (!aa) continue;
+        MovabilityType mov = aa->movability;
+        aa->movability = MOV_ALL;
         aa->aamove(move_amt);
+        aa->movability = mov;
     }
 }
 
@@ -1790,6 +1793,7 @@ void Protein::rotate_piece(int start_res, int end_res, int align_res, Point alig
     Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
     Point align = get_residue(align_res)->get_barycenter();
     Rotation rot = align_points_3d(&align, &align_target, &pivot);
+    rotate_piece(start_res, end_res, rot, pivot_res);
 }
 
 void Protein::rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res)
@@ -1802,7 +1806,10 @@ void Protein::rotate_piece(int start_res, int end_res, Rotation rot, int pivot_r
     {
         AminoAcid* aa = get_residue(i);
         if (!aa) continue;
+        MovabilityType mov = aa->movability;
+        aa->movability = MOV_ALL;
         aa->rotate(lv, rot.a);
+        aa->movability = mov;
     }
 }
 

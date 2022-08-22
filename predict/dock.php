@@ -16,6 +16,8 @@ $max_simultaneous_docks = 4;	// If running this script as a cron, we recommend s
 $dock_results = [];
 $json_file = "predict/dock_results.json";
 
+$odors = json_decode(file_get_contents("data/odorant.json"), true);
+
 
 if (file_exists($json_file))
 {
@@ -29,9 +31,7 @@ foreach (@$argv as $a)
 }
 
 if (@$_REQUEST['next'])
-{
-	$odors = json_decode(file_get_contents("data/odorant.json"), true);
-	
+{	
 	$cmd = "ps -ef | grep ':[0-9][0-9] bin/primarydock' | grep -v grep";
 	exec($cmd, $results);
 	if (!@$_REQUEST['force'] && trim(@$results[$max_simultaneous_docks-1])) die("Already running.\n".print_r($results, 1));
@@ -208,8 +208,25 @@ $average = [];
 
 foreach ($sum as $node => $value)
 {
-	$average[$node] = $value / (@$count[$node] ?: 1);
+	$average[$node?"Active":"Inactive"] = $value / (@$count[$node] ?: 1);
 }
+
+if (min($average) > 0)
+{
+	$prediction = "Non-Agonist";
+}
+else
+{
+	if ($average["Active"] <= 1.333 * $average["Inactive"])
+		$prediction = "Agonist";
+	else if ($average["Inactive"] > 1.333 * $average["Active"])
+		$prediction = "Inverse Agonist";
+	else $prediction = "Non-Agonist";
+}
+
+$average["Prediction"] = $prediction;
+
+echo "Predicted ligand activity: $prediction\n";
 
 if (@$_REQUEST['saved'])
 	print_r($average);
@@ -222,6 +239,17 @@ else
 	fwrite($f, json_encode_pretty($dock_results));
 	fclose($f);
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

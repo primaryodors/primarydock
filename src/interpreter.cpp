@@ -1189,23 +1189,11 @@ int main(int argc, char** argv)
                     sv.n = atoi(fields[4]);
                     set_variable(buffer1, sv);
 
-                    /*
-                    script_var[vars].name = buffer1;
-                    script_var[vars].vt = SV_INT;
-                    script_var[vars].value.n = atoi(fields[4]);
-                    vars++;
-                    */
-
                     sprintf(buffer1, "%c%s.e", '%', fields[3]);
-                    sv.n = atoi(fields[3]);
+                    sv.n = atoi(fields[5]);
                     set_variable(buffer1, sv);
 
-                    /*
-                    script_var[vars].name = buffer1;
-                    script_var[vars].vt = SV_INT;
-                    script_var[vars].value.n = atoi(fields[5]);
-                    vars++;
-                    */
+					p.set_region(fields[3], fields[4], fields[5]);
 
                     delete[] fields;
                 }

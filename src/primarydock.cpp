@@ -83,6 +83,9 @@ float* initial_binding;
 float* initial_vdWrepl;
 float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 
+Point active_matrix_n[16], active_matrix_c[16];
+int active_matrix_count = 0, active_matrix_node = -1;
+
 void iteration_callback(int iter)
 {
     #if !allow_iter_cb
@@ -176,7 +179,7 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
     {
         if (!old_pocketcen)
         {
-            cout << "Error: relative coordinates not supported for CEN." << endl;
+            cout << "Error: relative coordinates not supported for CEN." << endl << flush;
             throw 0xbadb19d;
         }
         else
@@ -239,7 +242,7 @@ int interpret_config_line(char** fields)
 
         if (nodeno > 255)
         {
-            cout << "Binding path is limited to 255 nodes." << endl;
+            cout << "Binding path is limited to 255 nodes." << endl << flush;
             throw 0xbad90de;
         }
         if (nodeno)
@@ -261,6 +264,41 @@ int interpret_config_line(char** fields)
         states.push_back(origbuff);
         return 0;
     }
+    else if (!strcmp(fields[0], "ACVMX"))
+    {
+        if (!fields[1] || !fields[1][3])
+        {
+            cout << "Missing region identifier for active matrix." << endl << flush;
+            throw 0xbad512e;
+        }
+        if (    fields[1][0] != 'T'
+            ||  fields[1][1] != 'M'
+            ||  fields[1][2] != 'R'
+            )
+        {
+            cout << "Unknown region identifier for active matrix: " << fields[1] << endl << flush;
+            throw 0xbad512e;
+        }
+
+        if (!active_matrix_count)
+        {
+            for (i=0; i<16; i++) active_matrix_c[i] = active_matrix_n[i] = Point(0,0,0);
+        }
+
+        int n = atoi(&fields[1][3]);
+        if (n > active_matrix_count) active_matrix_count = n;
+
+        active_matrix_n[n].x = atof(fields[2]);
+        active_matrix_n[n].y = atof(fields[3]);
+        active_matrix_n[n].z = atof(fields[4]);
+        active_matrix_c[n].x = atof(fields[5]);
+        active_matrix_c[n].y = atof(fields[6]);
+        active_matrix_c[n].z = atof(fields[7]);
+    }
+    else if (!strcmp(fields[0], "ACVNODE"))
+    {
+        active_matrix_node = atoi(fields[1]);
+    }
     else if (!strcmp(fields[0], "SIZE"))
     {
         size.x = atof(fields[1]);
@@ -272,7 +310,7 @@ int interpret_config_line(char** fields)
         else size.z = size.y = size.x;
         if (!size.x || !size.y || !size.z)
         {
-            cout << "Pocket size cannot be zero in any dimension." << endl;
+            cout << "Pocket size cannot be zero in any dimension." << endl << flush;
             throw 0xbad512e;
         }
         return 3;
@@ -336,7 +374,7 @@ int interpret_config_line(char** fields)
     {
         if (!fields[1])
         {
-            cout << "Missing debug file name; check config file." << endl;
+            cout << "Missing debug file name; check config file." << endl << flush;
             throw 0xbadf12e;
         }
         #if _DBG_STEPBYSTEP
@@ -349,7 +387,7 @@ int interpret_config_line(char** fields)
     {
         if (!fields[1])
         {
-            cout << "Missing output file name; check config file." << endl;
+            cout << "Missing output file name; check config file." << endl << flush;
             throw 0xbadf12e;
         }
         #if _DBG_STEPBYSTEP
@@ -369,7 +407,7 @@ void read_config_file(FILE* pf)
 
     while (!feof(pf))
     {
-        fgets(buffer, 1015, pf);
+        char* wgas = fgets(buffer, 1015, pf);
         origbuff = buffer;
         if (buffer[0] >= ' ' && buffer[0] != '#')
         {
@@ -405,7 +443,7 @@ void prepare_initb()
             Atom* CA = preaa[i]->get_atom("CA");
             if (!CA)
             {
-                cout << "Residue " << preaa[i]->get_residue_no() << " is missing its CA." << endl;
+                cout << "Residue " << preaa[i]->get_residue_no() << " is missing its CA." << endl << flush;
                 throw 0xbad12e5;
             }
             float r = CA->get_location().get_3d_distance(pocketcen);
@@ -540,6 +578,20 @@ int main(int argc, char** argv)
     if (debug) *debug << "Loaded protein." << endl;
     #endif
 
+    int l;
+    std::vector<std::string> rem_hx = p.get_remarks("650 HELIX");
+    for (l=0; l<rem_hx.size(); l++)
+    {
+        char buffer[1024];
+        char buffer1[1024];
+        strcpy(buffer, rem_hx[l].c_str());
+        char** fields = chop_spaced_fields(buffer);
+
+        p.set_region(fields[3], atoi(fields[4]), atoi(fields[5]));
+
+        delete[] fields;
+    }
+
     if (!CEN_buf.length())
     {
         cout << "Error: no binding pocket center defined." << endl;
@@ -578,6 +630,8 @@ int main(int argc, char** argv)
     }
 
     for (i=0; i<65536; i++) buffer[i] = 0;
+
+    size_t wgaf;
     switch (ext[0])
     {
     case 's':
@@ -589,7 +643,7 @@ int main(int argc, char** argv)
             cout << "Error trying to read " << ligfname << endl;
             return 0xbadf12e;
         }
-        fread(buffer, 1, 65535, pf);
+        wgaf = fread(buffer, 1, 65535, pf);
         fclose(pf);
         m.from_sdf(buffer);
         break;
@@ -625,7 +679,7 @@ int main(int argc, char** argv)
     #endif
 
     // Identify the ligand atom with the greatest potential binding.
-    int k, l, n;
+    int k, n;
     Atom** ligbb = m.get_most_bindable(3);
     Atom** ligbbh = new Atom*[5];
     intera_type lig_inter_typ[5];
@@ -1154,6 +1208,32 @@ _try_again:
                     }
 
                     delete[] sidechain_bondrots[i];
+                }
+            }
+
+            if (nodeno == active_matrix_node)
+            {
+                // Each TMR:
+                for (i=1; i<=active_matrix_count; i++)
+                {
+                    std::string regname = (std::string)"TMR" + std::to_string(i);
+                    int sr = p.get_region_start(regname), er = p.get_region_end(regname);
+
+                    if (!sr || !er)
+                    {
+                        cout << "Cannot activate " << regname << "; region not found in protein." << endl << flush;
+                        throw 0xbadf12e;
+                    }
+
+                    // Move the entire helix by the values of active_matrix_n.
+                    p.move_piece(sr, er, active_matrix_n[i].add(p.get_region_center(sr, er)));
+
+                    // Get the CA location of the C-terminus of the helix;
+                    // Add the active_matrix_c to the result;
+                    Point calign = p.get_atom_location(er, "CA").add(active_matrix_c[i]);
+
+                    // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
+                    p.rotate_piece(sr, er, er, calign, sr);
                 }
             }
 

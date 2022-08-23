@@ -1233,7 +1233,11 @@ _try_again:
 
                     // Get the CA location of the C-terminus of the helix;
                     // Add the active_matrix_c to the result;
-                    Point calign = p.get_atom_location(er, "CA").add(active_matrix_c[i]);
+                    Point calign;
+                    if (i & 1)
+                        calign = p.get_atom_location(er, "CA").add(active_matrix_c[i]);
+                    else
+                        calign = p.get_atom_location(er, "CA").subtract(active_matrix_c[i]);
 
                     // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
                     p.rotate_piece(sr, er, er, calign, sr);

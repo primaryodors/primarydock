@@ -9,6 +9,7 @@
 //
 
 require("protutils.php");
+require("odorutils.php");
 
 $dock_retries = 5;
 $max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to half the number of physical cores.
@@ -238,9 +239,14 @@ else
 	else $prediction = "Non-Agonist";
 }
 
+$actual = best_empirical_pair($protid, $ligname);
+$actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
+
 $average["Prediction"] = $prediction;
+$average["Actual"] = $actual;
 
 echo "Predicted ligand activity: $prediction\n";
+echo "Empirical ligand activity: $actual\n";
 
 if (@$_REQUEST['saved'])
 	print_r($average);

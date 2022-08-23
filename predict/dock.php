@@ -91,12 +91,26 @@ else
 echo "Beginning dock of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);
 
-$cenr3_33 = resno_from_bw($protid, "3.33");
-$cenr3_36 = $cenr3_33 + 3;
-$cenr5_43 = resno_from_bw($protid, "5.43");
-$cenr5_47 = $cenr5_43 + 4;
-$cenr6_40 = resno_from_bw($protid, "6.40");
-$cenr6_47 = $cenr6_40 + 7;
+switch ($fam)
+{
+	case "TAAR":
+	$cenr3_32 = resno_from_bw($protid, "3.32");
+	$cenr5_43 = resno_from_bw($protid, "5.43");
+	$cenr6_48 = resno_from_bw($protid, "6.48");
+	
+	$cenres = "CEN RES $cenr3_32 $cenr5_43 $cenr6_48";
+	break;
+	
+	default:
+	$cenr3_33 = resno_from_bw($protid, "3.33");
+	$cenr3_36 = $cenr3_33 + 3;
+	$cenr5_43 = resno_from_bw($protid, "5.43");
+	$cenr5_47 = $cenr5_43 + 4;
+	$cenr6_40 = resno_from_bw($protid, "6.40");
+	$cenr6_47 = $cenr6_40 + 7;
+	
+	$cenres = "CEN RES $cenr3_33 $cenr3_36 $cenr5_43 $cenr5_47 $cenr6_40 $cenr6_47";
+}
 
 $tmr2start = $prots[$protid]['region']['TMR2']['start'];
 $cyt1end = $tmr2start - 1;
@@ -112,7 +126,7 @@ PROT pdbs/$fam/$protid.rotated.pdb
 
 LIG sdf/$ligname.sdf
 
-CEN RES $cenr3_33 $cenr3_36 $cenr5_43 $cenr5_47 $cenr6_40 $cenr6_47
+$cenres
 PATH 1 REL 0 0 0
 
 # NODEPDB 1 pdbs/$fam/$protid.active.pdb
@@ -135,9 +149,9 @@ EXCL 1 $cyt1end		# Head, TMR1, and CYT1.
 EXCL $exr2start $exr2end	# EXR2 between TMR4 and TMR5.
 
 POSE 10
-ITER 30
+ITER 50
 
-DIFF
+# DIFF
 ELIM 100
 
 OUT output/$protid-$ligname.pred.dock
@@ -211,7 +225,7 @@ foreach ($sum as $node => $value)
 	$average[$node?"Active":"Inactive"] = $value / (@$count[$node] ?: 1);
 }
 
-if (min($average) > 0)
+if (min($average) > 0 || !isset($average["Active"]) || !isset($average["Inactive"]))
 {
 	$prediction = "Non-Agonist";
 }
@@ -219,7 +233,7 @@ else
 {
 	if ($average["Active"] <= 1.333 * $average["Inactive"])
 		$prediction = "Agonist";
-	else if ($average["Inactive"] > 1.333 * $average["Active"])
+	else if ($average["Inactive"] <= 1.333 * $average["Active"])
 		$prediction = "Inverse Agonist";
 	else $prediction = "Non-Agonist";
 }
@@ -232,6 +246,8 @@ if (@$_REQUEST['saved'])
 	print_r($average);
 else
 {
+	// Reload to prevent overwriting another process' output.
+	if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
 	$dock_results[$protid][$ligname] = $average;
 	
 	$f = fopen($json_file, "wb");

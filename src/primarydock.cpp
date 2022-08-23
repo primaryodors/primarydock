@@ -66,7 +66,7 @@ int iters = 50;
 bool flex=true;
 float kJmol_cutoff = 0.01;
 bool kcal = false;
-float drift = 0.333;
+float drift = initial_drift;
 Molecule** gcfmols = NULL;
 int activation_node = -1;		// Default is never.
 int found_poses = 0;
@@ -453,12 +453,14 @@ void prepare_initb()
             if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
         }
 
+        #if preconform_protein
         if (pre_ligand_iteration_ratio)
         {
             Molecule** delete_me;
             Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), delete_me = protein->all_residues_as_molecules(), iters*pre_ligand_iteration_ratio);
             delete[] delete_me;
         }
+        #endif
 
         preres = protein->get_residues_near(pocketcen, 10000);
         qpr = preres.size();
@@ -1156,6 +1158,7 @@ _try_again:
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
             if (pathstrs.size() < nodeno) break;
+            drift = initial_drift;
 
             if (strlen(protafname) && nodeno == activation_node)
             {
@@ -1235,6 +1238,12 @@ _try_again:
                     // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
                     p.rotate_piece(sr, er, er, calign, sr);
                 }
+
+                loneliest = p.find_loneliest_point(pocketcen, size);
+
+                #if pocketcen_is_loneliest
+                pocketcen = loneliest;
+                #endif
             }
 
             #if _DBG_STEPBYSTEP

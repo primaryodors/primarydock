@@ -104,9 +104,11 @@
 #define allow_tethered_rotations 1
 #define default_bestbind 0
 #define individual_clash_limit 20
+#define initial_drift 0.333
 #define monte_carlo_axial 0
 #define monte_carlo_flex 1
 #define pocketcen_is_loneliest 1
+#define preconform_protein 0
 #define default_pre_ligand_multimol_radius 15
 #define default_pre_ligand_flex_radius 10
 #define pre_ligand_iteration_ratio 1

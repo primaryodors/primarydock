@@ -1239,11 +1239,19 @@ _try_again:
                     p.rotate_piece(sr, er, er, calign, sr);
                 }
 
-                loneliest = p.find_loneliest_point(pocketcen, size);
+                if (pose == 1)
+                {
+                    FILE* f = fopen("tmp/active.pdb", "wb");
+                    if (f)
+                    {
+                        p.save_pdb(f);
+                        p.end_pdb(f);
+                        fclose(f);
+                    }
+                }
 
-                #if pocketcen_is_loneliest
-                pocketcen = loneliest;
-                #endif
+                // TODO: #if !recenter_ligand_each_node, recenter the ligand here to keep up with the residues that it was coordinated to.
+                // Perhaps also multimol it for 10 or so iterations with all flexions (ligand and residue) globally disabled.
             }
 
             #if _DBG_STEPBYSTEP
@@ -1303,12 +1311,19 @@ _try_again:
             Point lastnodecen = nodecen;
             ligcen_target = nodecen;
 
+            loneliest = p.find_loneliest_point(nodecen, size);
+
+            #if pocketcen_is_loneliest
+            nodecen = loneliest;
+            #endif
+
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Saved last nodecen." << endl;
             #endif
 
+            #if recenter_ligand_each_node
             // Move the ligand to the new node center.
-            // m.recenter(nodecen);
+            m.recenter(nodecen);
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Molecule recenter (or not)." << endl;
             #endif
@@ -1316,7 +1331,7 @@ _try_again:
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Conformer momenta reset." << endl;
             #endif
-
+            #endif
 
             sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, mcoord_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;

@@ -112,6 +112,7 @@
 #define default_pre_ligand_multimol_radius 15
 #define default_pre_ligand_flex_radius 10
 #define pre_ligand_iteration_ratio 1
+#define recenter_ligand_each_node 0
 #define tumble_spheres_include_vdW 1
 #define use_exclusions 1
 

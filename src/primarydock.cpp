@@ -502,7 +502,7 @@ void prepare_initb()
     }
 }
 
-void do_tumble_spheres(Point l_pocket_cen, bool recenter_ligand = true)
+void do_tumble_spheres(Point l_pocket_cen)
 {
     int i, j, l, n;
     float lig_min_int_clsh = ligand->get_internal_clashes();
@@ -566,7 +566,7 @@ void do_tumble_spheres(Point l_pocket_cen, bool recenter_ligand = true)
     if (isnan(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
 
     #if pocketcen_is_loneliest
-    if (recenter_ligand)
+    if (1)
     {
         ligand->recenter(l_pocket_cen);
     #else
@@ -1323,7 +1323,7 @@ _try_again:
             ligcen_target = nodecen;
 
             loneliest = p.find_loneliest_point(nodecen, size);
-            if (nodeno == active_matrix_node) do_tumble_spheres(ligcen_target, false);
+            if (nodeno == active_matrix_node) do_tumble_spheres(ligcen_target);
 
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Saved last nodecen." << endl;

@@ -8,17 +8,54 @@
 // php -f predict/dock.php prot=OR1A1 lig=geraniol
 //
 
+// Includes
 require("protutils.php");
 require("odorutils.php");
 
+// Configurable variables
 $dock_retries = 5;
 $max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to half the number of physical cores.
 
+// Set the matrix to immutable constant values derived from the btRho activation.
+$matrix =
+[
+	"TMR1" => [ -1.432411, -2.746519,  2.509232,  2.363341, -3.109768, -3.402768 ],
+	"TMR2" => [  4.639589,  0.024734, -2.108768, -1.090161, -2.695269,  1.679482 ],
+	"TMR3" => [  0.167589, -2.024517,  3.395732,  4.231589,  1.114231, -4.413017 ],
+	"TMR4" => [  1.722089,  0.166982, -1.611769, -2.093911,  1.330481,  2.336232 ],
+	"TMR5" => [ -2.133661,  3.529982,  1.032483, -3.523911,  3.119732,  2.745732 ],
+	"TMR6" => [ -2.557410,  1.492481, -5.381518, -2.909160,  3.353733,  2.692482 ],
+	"TMR7" => [ -0.405411,  0.009982,  2.163982,  3.021839, -3.566268, -1.637518 ],
+];
+
+// Matrix adjustments
+// Adjust TMR6 to not clash with TMR5.
+$matrix["TMR6"][2] += 3;
+$matrix["TMR6"][5] += 1;
+
+// Equalize Y displacements.
+foreach ($matrix as $region => &$values)
+{
+	$y = ($values[1] + $values[4])/2;
+	$values[1] = $values[4] = $y;
+}
+
+// No increase in distance between TMR5 and TMR3 at the extracellular end.
+$matrix["TMR3"][0] -= 3;
+$matrix["TMR3"][2] -= 1;
+$matrix["TMR5"][0] += 3;
+$matrix["TMR5"][2] -= 1;
+
+// Prevent clash of TMR7 with TMR2 and TMR1. Bring TMR7 closer to TMR3.
+$matrix["TMR7"][3] -= 3;
+$matrix["TMR7"][5] -= 2;
+
+
+// Load data
 $dock_results = [];
 $json_file = "predict/dock_results.json";
 
 $odors = json_decode(file_get_contents("data/odorant.json"), true);
-
 
 if (file_exists($json_file))
 {
@@ -119,40 +156,6 @@ $tmr4end = $prots[$protid]['region']['TMR4']['end'];
 $tmr5start = $prots[$protid]['region']['TMR5']['start'];
 $exr2start = $tmr4end + 1;
 $exr2end = $tmr5start - 1;
-
-
-// Set the matrix to immutable constant values derived from the btRho activation.
-$matrix =
-[
-	"TMR1" => [ -1.432411, -2.746519,  2.509232,  2.363341, -3.109768, -3.402768 ],
-	"TMR2" => [  4.639589,  0.024734, -2.108768, -1.090161, -2.695269,  1.679482 ],
-	"TMR3" => [  0.167589, -2.024517,  3.395732,  4.231589,  1.114231, -4.413017 ],
-	"TMR4" => [  1.722089,  0.166982, -1.611769, -2.093911,  1.330481,  2.336232 ],
-	"TMR5" => [ -2.133661,  3.529982,  1.032483, -3.523911,  3.119732,  2.745732 ],
-	"TMR6" => [ -2.557410,  1.492481, -5.381518, -2.909160,  3.353733,  2.692482 ],
-	"TMR7" => [ -0.405411,  0.009982,  2.163982,  3.021839, -3.566268, -1.637518 ],
-];
-
-// Adjust TMR6 to not clash with TMR5.
-$matrix["TMR6"][2] += 3;
-$matrix["TMR6"][5] += 3;
-
-// Equalize Y displacements.
-foreach ($matrix as $region => &$values)
-{
-	$y = ($values[1] + $values[4])/2;
-	$values[1] = $values[4] = $y;
-}
-
-// No increase in distance between TMR5 and TMR3 at the extracellular end.
-$matrix["TMR3"][0] -= 1;
-$matrix["TMR3"][2] -= 2;
-$matrix["TMR5"][0] += 3;
-$matrix["TMR5"][2] -= 1;
-
-// Prevent clash of TMR7 with TMR2 and TMR1. Bring TMR7 closer to TMR3.
-$matrix["TMR7"][3] -= 3;
-$matrix["TMR7"][5] -= 2;
 
 
 $acv_matrix = "";

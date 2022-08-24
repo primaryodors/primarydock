@@ -1323,7 +1323,10 @@ _try_again:
             ligcen_target = nodecen;
 
             loneliest = p.find_loneliest_point(nodecen, size);
-            if (nodeno == active_matrix_node) do_tumble_spheres(ligcen_target);
+            if (nodeno == active_matrix_node)
+            {
+                if (!use_bestbind_algorithm) do_tumble_spheres(ligcen_target);
+            }
 
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Saved last nodecen." << endl;

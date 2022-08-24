@@ -502,6 +502,329 @@ void prepare_initb()
     }
 }
 
+void do_tumble_spheres(Point l_pocket_cen, bool recenter_ligand = true)
+{
+    int i, j, l, n;
+    float lig_min_int_clsh = ligand->get_internal_clashes();
+
+    // Begin tumble sphere behavior.
+    std::vector<AminoAcid*> tsphres = protein->get_residues_near(l_pocket_cen, size.magnitude()+4);
+    int tsphsz = tsphres.size();
+    float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
+
+    for (i=0; i<tsphsz+4; i++) outer_sphere[i] = inner_sphere[i] = 0;
+
+    pocketsize = protein->estimate_pocket_size(tsphres);
+    ligbbox = ligand->get_bounding_box();
+
+    for (i=0; !ligbbox.fits_inside(pocketsize) && i<100; i++)
+    {
+        ligand->crumple(fiftyseventh*30);
+    }
+
+    for (i=0; i<tsphsz; i++)
+    {
+        #if use_exclusions
+        if (exclusion.size()
+                &&
+                std::find(exclusion.begin(), exclusion.end(), tsphres[i]->get_residue_no())!=exclusion.end()
+        )
+        {
+            tsphres.erase(tsphres.begin()+i);
+            tsphsz--;
+            continue;
+        }
+        #endif
+
+        // TODO: Algorithmically determine more accurate values based on interaction type, etc.
+        outer_sphere[i] = tsphres[i]->get_reach() + 2.5;
+        inner_sphere[i] = tsphres[i]->get_reach() / 3 + 1;
+    }
+
+    const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
+    float loneliness, blone=0, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
+    const int ac = ligand->get_atom_count();
+    Pose besp(ligand);
+    #if _DBG_TUMBLE_SPHERES
+    std::string tsdbg = "", tsdbgb = "";
+    #endif
+
+    if (ligbbox.x > ligbbox.y && pocketsize.x < pocketsize.y) ligand->rotate(zaxis, square);
+    if (ligbbox.x > ligbbox.z && pocketsize.x < pocketsize.z) ligand->rotate(yaxis, square);
+    if (ligbbox.y > ligbbox.x && pocketsize.y < pocketsize.x) ligand->rotate(zaxis, square);
+    if (ligbbox.y > ligbbox.z && pocketsize.y < pocketsize.z) ligand->rotate(xaxis, square);
+    if (ligbbox.z > ligbbox.x && pocketsize.z < pocketsize.x) ligand->rotate(yaxis, square);
+    if (ligbbox.z > ligbbox.y && pocketsize.z < pocketsize.y) ligand->rotate(xaxis, square);
+
+    step = fiftyseventh*30;
+    bestscore = -Avogadro;
+    float lonely_step = 1.0 / loneliest.get_3d_distance(l_pocket_cen);
+    #if _DBG_LONELINESS
+    cout << "Loneliest point " << loneliest << " is " << loneliest.get_3d_distance(l_pocket_cen) << "A from pocketcen " << l_pocket_cen << "." << endl;
+    cout << "Pocket size is " << pocketsize << " vs. ligand bounding box " << ligbbox << endl;
+    #endif
+    if (isnan(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
+
+    #if pocketcen_is_loneliest
+    if (recenter_ligand)
+    {
+        ligand->recenter(l_pocket_cen);
+    #else
+    for (loneliness=0; loneliness <= 1; loneliness += lonely_step)
+    {
+        float centeredness = 1.0 - loneliness;
+        Point tmpcen(loneliest.x * loneliness + l_pocket_cen.x * centeredness,
+                     loneliest.y * loneliness + l_pocket_cen.y * centeredness,
+                     loneliest.z * loneliness + l_pocket_cen.z * centeredness
+                    );
+        ligand->recenter(tmpcen);
+    #endif
+
+        #if _DBG_LONELINESS && !pocketcen_is_loneliest
+        cout << "Ligand is " << loneliness << " lonely centered at " << tmpcen << "." << endl;
+        #endif
+
+        for (xrad=0; xrad <= M_PI*2; xrad += step)
+        {
+            for (yrad=0; yrad <= M_PI*2; yrad += step)
+            {
+                for (zrad=0; zrad <= M_PI*2; zrad += step)
+                {
+                    ligbbox = ligand->get_bounding_box();
+
+                    if (ligbbox.x > ligbbox.y && pocketsize.x < pocketsize.y) continue;
+                    if (ligbbox.x > ligbbox.z && pocketsize.x < pocketsize.z) continue;
+                    if (ligbbox.y > ligbbox.x && pocketsize.y < pocketsize.x) continue;
+                    if (ligbbox.y > ligbbox.z && pocketsize.y < pocketsize.z) continue;
+                    if (ligbbox.z > ligbbox.x && pocketsize.z < pocketsize.x) continue;
+                    if (ligbbox.z > ligbbox.y && pocketsize.z < pocketsize.y) continue;
+
+                    Bond** rb = ligand->get_rotatable_bonds();
+
+                    if (!rb) n = 0;
+                    else for (n=0; rb[n]; n++);		// Get count.
+
+                    l = 0;
+                    lrad = 0;
+                _xyzl_loop:
+                    if (ligand->get_internal_clashes() >= lig_min_int_clsh*5+5) goto _xyzl_skip_loop;
+
+                    score = 0;
+                    #if _DBG_TUMBLE_SPHERES
+                    tsdbg = "";
+                    // cout << ligand->get_internal_clashes() << " vs. " << lig_min_int_clsh << endl;
+                    #endif
+                    for (i=0; i<ac; i++)
+                    {
+                        Atom* a = ligand->get_atom(i);
+                        intera_type it = vdW;
+
+                        for (j=0; j<tsphsz; j++)
+                        {
+                            worth = 0.4;
+                            if (a->get_charge() && tsphres[j]->get_charge()
+                                    &&
+                                    sgn(a->get_charge()) == -sgn(tsphres[j]->get_charge())
+                            )
+                            {
+                                it = ionic;
+                                worth = 100;
+                            }
+                            else if (a->get_charge() || a->is_polar())
+                            {
+                                it = hbond;
+                                worth = 40;
+                            }
+                            else if (a->is_pi())
+                            {
+                                it = pi;
+                                worth = 7;
+                            }
+
+                            if (tsphres[j]->capable_of_inter(it))
+                            {
+                                float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));
+                                if (r <= outer_sphere[j])
+                                {
+                                    if (r > inner_sphere[j])
+                                    {
+                                        weight = 1;
+
+                                        if (extra_wt.size()
+                                                &&
+                                                std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
+                                        )
+                                        {
+                                            weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+                                        }
+
+                                        #if !tumble_spheres_include_vdW
+                                        if ((worth*weight) < 1) continue;
+                                        #endif
+
+                                        score += worth * weight;
+                                        #if _DBG_TUMBLE_SPHERES
+                                        tsdbg += std::string("+ ")
+                                                +  std::string(a->name) + std::string(" reaches ") + std::string(tsphres[j]->get_3letter())
+                                                +  std::to_string(tsphres[j]->get_residue_no()) + std::string(".  ");
+                                        #endif
+                                    }
+                                    else
+                                    {
+                                        score -= 200;
+                                        #if _DBG_TUMBLE_SPHERES
+                                        tsdbg += std::string("- ")
+                                                +  std::string(a->name) + std::string(" clashes ") + std::string(tsphres[j]->get_3letter())
+                                                +  std::to_string(tsphres[j]->get_residue_no()) + std::string(".  ");
+                                        #endif
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    #if !pocketcen_is_loneliest
+                    if (score > 0) score *= 1.0 + 0.1 * centeredness;
+                    #endif
+
+                    if (score > bestscore)
+                    {
+                        besp.copy_state(ligand);
+                        blone = loneliness;
+                        bestxr = xrad;
+                        bestyr = yrad;
+                        bestzr = zrad;
+                        bestscore = score;
+
+                        #if _DBG_TUMBLE_SPHERES
+                        tsdbgb = tsdbg;
+
+                        cout << "Tumble score " << score << " for ligand box " << m.get_bounding_box() << endl;
+
+
+                        #if output_tumble_debug_docs
+                        int u, v, w;
+                        char protfttl[1000];
+                        strcpy(protfttl, protfname);
+
+                        char** lfields = chop_spaced_fields(protfttl, '/');
+
+                        for (u=0; lfields[u]; u++);
+                        u--;
+
+                        char fname[1000];
+                        sprintf(fname, "output/tumble_%s_%d_%d_%d_%f.dock",
+                                lfields[u],
+                                (int)(xrad*fiftyseven),
+                                (int)(yrad*fiftyseven),
+                                (int)(zrad*fiftyseven),
+                                score);
+                        cout << fname << endl;
+                        std::ofstream tspdbdat(fname, std::ofstream::out);
+
+                        tspdbdat << "PDB file: " << protfname << endl;
+                        tspdbdat << "Pose: 1\nNode: 0\nPDBDAT:\n";
+
+                        int lac = ligand->get_atom_count();
+                        for (u=0; u<lac; u++) ligand->get_atom(u)->stream_pdb_line(tspdbdat, 9000+u);
+
+                        int pseql = p.get_seq_length();
+                        v = 1;
+                        for (u = 1; u < pseql; u++)
+                        {
+                            AminoAcid* dbgaa = protein->get_residue(u);
+                            if (dbgaa)
+                            {
+                                int aaac = dbgaa->get_atom_count();
+                                for (w=0; w<aaac; w++)
+                                {
+                                    Atom* dbga = dbgaa->get_atom(w);
+                                    if (!strcmp(dbga->name, "CA") || !strcmp(dbga->name, "CB")) dbga->stream_pdb_line(tspdbdat, v++);
+                                }
+                            }
+                        }
+                        tspdbdat << "END" << endl;
+                        tspdbdat.close();
+                        #endif
+                        #endif
+                    }
+
+                _xyzl_skip_loop:
+
+                    if (rb && rb[l])
+                    {
+                        rb[l]->rotate(step);
+
+                        lrad += step;
+                        if (lrad >= M_PI*2)
+                        {
+                            l++;
+                            if (l < n) goto _xyzl_loop;
+                        }
+                        else goto _xyzl_loop;
+                    }
+
+                    ligand->rotate(zaxis, step);
+                }		// zrad.
+                ligand->rotate(yaxis, step);
+            }			// yrad.
+            ligand->rotate(xaxis, step);
+        }				// xrad.
+
+        #if !pocketcen_is_loneliest
+        if (bestscore >= (ligand->get_atom_count()*13)) break;
+        #endif
+
+        #if _DBG_LONELINESS
+        cout << "Best score: " << bestscore << endl;
+        #endif
+    }					// loneliness.
+
+    #if _DBG_TUMBLE_SPHERES
+    cout << "Tumble sphere best score " << bestscore << " for "
+        << "x" << bestxr*fiftyseven << "deg, "
+        << "y" << bestyr*fiftyseven << "deg, "
+        << "z" << bestzr*fiftyseven << "deg."
+        << " (" << blone << " lonely)."
+        << endl;
+    cout << tsdbgb << endl;
+    #endif
+
+    // Load the best ligand conformer.
+    besp.restore_state(ligand);
+
+    // Minimize ligand clashes.
+    #if prerot_sidechains_from_ligand
+    for (i=0; i<tsphsz; i++)
+    {
+        Bond** tsphb = tsphres[i]->get_rotatable_bonds();
+        if (tsphb)
+        {
+            for (j=0; tsphb[j]; j++)
+            {
+                float rad=0, bestrad=0, clash, bestclash=6.25e24;
+                for (rad=0; rad < M_PI*2; rad += step)
+                {
+                    clash = tsphres[i]->get_intermol_clashes(&m);
+
+                    if (clash < bestclash)
+                    {
+                        bestrad = rad;
+                        bestclash = clash;
+                    }
+
+                    tsphb[j]->rotate(step);
+                }
+
+                tsphb[j]->rotate(bestrad);
+            }
+            // delete[] tsphb;
+        }
+    }
+    #endif
+    // End tumble sphere behavior.
+}
+
 int main(int argc, char** argv)
 {
     char buffer[65536];
@@ -809,7 +1132,7 @@ _try_again:
     for (pose=1; pose<=poses; pose++)
     {
         ligand->minimize_internal_clashes();
-        float lig_min_int_clsh = m.get_internal_clashes();
+        float lig_min_int_clsh = ligand->get_internal_clashes();
         ligand->crumple(fiftyseventh*44);
 
         if (pose > 1)
@@ -822,331 +1145,13 @@ _try_again:
 
         prepare_initb();
 
-        if (pose <= 1)
+        if (!use_bestbind_algorithm)
         {
-            if (!use_bestbind_algorithm)
-            {
-                // Begin tumble sphere behavior.
-                std::vector<AminoAcid*> tsphres = p.get_residues_near(pocketcen, size.magnitude()+4);
-                int tsphsz = tsphres.size();
-                float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
+            do_tumble_spheres(pocketcen);
 
-                for (i=0; i<tsphsz+4; i++) outer_sphere[i] = inner_sphere[i] = 0;
-
-                pocketsize = p.estimate_pocket_size(tsphres);
-                ligbbox = m.get_bounding_box();
-
-                for (i=0; !ligbbox.fits_inside(pocketsize) && i<100; i++)
-                {
-                    m.crumple(fiftyseventh*30);
-                }
-
-                for (i=0; i<tsphsz; i++)
-                {
-                    #if use_exclusions
-                    if (exclusion.size()
-                            &&
-                            std::find(exclusion.begin(), exclusion.end(), tsphres[i]->get_residue_no())!=exclusion.end()
-                       )
-                    {
-                        tsphres.erase(tsphres.begin()+i);
-                        tsphsz--;
-                        continue;
-                    }
-                    #endif
-
-                    // TODO: Algorithmically determine more accurate values based on interaction type, etc.
-                    outer_sphere[i] = tsphres[i]->get_reach() + 2.5;
-                    inner_sphere[i] = tsphres[i]->get_reach() / 3 + 1;
-                }
-
-                const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
-                float loneliness, blone=0, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
-                const int ac = m.get_atom_count();
-                Pose besp(&m);
-                #if _DBG_TUMBLE_SPHERES
-                std::string tsdbg = "", tsdbgb = "";
-                #endif
-
-                if (ligbbox.x > ligbbox.y && pocketsize.x < pocketsize.y) m.rotate(zaxis, square);
-                if (ligbbox.x > ligbbox.z && pocketsize.x < pocketsize.z) m.rotate(yaxis, square);
-                if (ligbbox.y > ligbbox.x && pocketsize.y < pocketsize.x) m.rotate(zaxis, square);
-                if (ligbbox.y > ligbbox.z && pocketsize.y < pocketsize.z) m.rotate(xaxis, square);
-                if (ligbbox.z > ligbbox.x && pocketsize.z < pocketsize.x) m.rotate(yaxis, square);
-                if (ligbbox.z > ligbbox.y && pocketsize.z < pocketsize.y) m.rotate(xaxis, square);
-
-                step = fiftyseventh*30;
-                bestscore = -Avogadro;
-                float lonely_step = 1.0 / loneliest.get_3d_distance(pocketcen);
-                #if _DBG_LONELINESS
-                cout << "Loneliest point " << loneliest << " is " << loneliest.get_3d_distance(pocketcen) << "A from pocketcen " << pocketcen << "." << endl;
-                cout << "Pocket size is " << pocketsize << " vs. ligand bounding box " << ligbbox << endl;
-                #endif
-                if (isnan(lonely_step) || lonely_step < 0.1) lonely_step = 0.1;
-
-                #if pocketcen_is_loneliest
-                if (1)
-                {
-                    m.recenter(pocketcen);
-                #else
-                for (loneliness=0; loneliness <= 1; loneliness += lonely_step)
-                {
-                    float centeredness = 1.0 - loneliness;
-                    Point tmpcen(loneliest.x * loneliness + pocketcen.x * centeredness,
-                                 loneliest.y * loneliness + pocketcen.y * centeredness,
-                                 loneliest.z * loneliness + pocketcen.z * centeredness
-                                );
-                    m.recenter(tmpcen);
-                #endif
-
-                    #if _DBG_LONELINESS && !pocketcen_is_loneliest
-                    cout << "Ligand is " << loneliness << " lonely centered at " << tmpcen << "." << endl;
-                    #endif
-
-                    for (xrad=0; xrad <= M_PI*2; xrad += step)
-                    {
-                        for (yrad=0; yrad <= M_PI*2; yrad += step)
-                        {
-                            for (zrad=0; zrad <= M_PI*2; zrad += step)
-                            {
-                                ligbbox = m.get_bounding_box();
-
-                                if (ligbbox.x > ligbbox.y && pocketsize.x < pocketsize.y) continue;
-                                if (ligbbox.x > ligbbox.z && pocketsize.x < pocketsize.z) continue;
-                                if (ligbbox.y > ligbbox.x && pocketsize.y < pocketsize.x) continue;
-                                if (ligbbox.y > ligbbox.z && pocketsize.y < pocketsize.z) continue;
-                                if (ligbbox.z > ligbbox.x && pocketsize.z < pocketsize.x) continue;
-                                if (ligbbox.z > ligbbox.y && pocketsize.z < pocketsize.y) continue;
-
-                                Bond** rb = m.get_rotatable_bonds();
-
-                                if (!rb) n = 0;
-                                else for (n=0; rb[n]; n++);		// Get count.
-
-                                l = 0;
-                                lrad = 0;
-                            _xyzl_loop:
-                                if (m.get_internal_clashes() >= lig_min_int_clsh*5+5) goto _xyzl_skip_loop;
-
-                                score = 0;
-                                #if _DBG_TUMBLE_SPHERES
-                                tsdbg = "";
-                                // cout << m.get_internal_clashes() << " vs. " << lig_min_int_clsh << endl;
-                                #endif
-                                for (i=0; i<ac; i++)
-                                {
-                                    Atom* a = m.get_atom(i);
-                                    intera_type it = vdW;
-
-                                    for (j=0; j<tsphsz; j++)
-                                    {
-                                        worth = 0.4;
-                                        if (a->get_charge() && tsphres[j]->get_charge()
-                                                &&
-                                                sgn(a->get_charge()) == -sgn(tsphres[j]->get_charge())
-                                           )
-                                        {
-                                            it = ionic;
-                                            worth = 100;
-                                        }
-                                        else if (a->get_charge() || a->is_polar())
-                                        {
-                                            it = hbond;
-                                            worth = 40;
-                                        }
-                                        else if (a->is_pi())
-                                        {
-                                            it = pi;
-                                            worth = 7;
-                                        }
-
-                                        if (tsphres[j]->capable_of_inter(it))
-                                        {
-                                            float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));
-                                            if (r <= outer_sphere[j])
-                                            {
-                                                if (r > inner_sphere[j])
-                                                {
-                                                    weight = 1;
-
-                                                    if (extra_wt.size()
-                                                            &&
-                                                            std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
-                                                       )
-                                                    {
-                                                        weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
-                                                    }
-
-                                                    #if !tumble_spheres_include_vdW
-                                                    if ((worth*weight) < 1) continue;
-                                                    #endif
-
-                                                    score += worth * weight;
-                                                    #if _DBG_TUMBLE_SPHERES
-                                                    tsdbg += std::string("+ ")
-                                                             +  std::string(a->name) + std::string(" reaches ") + std::string(tsphres[j]->get_3letter())
-                                                             +  std::to_string(tsphres[j]->get_residue_no()) + std::string(".  ");
-                                                    #endif
-                                                }
-                                                else
-                                                {
-                                                    score -= 200;
-                                                    #if _DBG_TUMBLE_SPHERES
-                                                    tsdbg += std::string("- ")
-                                                             +  std::string(a->name) + std::string(" clashes ") + std::string(tsphres[j]->get_3letter())
-                                                             +  std::to_string(tsphres[j]->get_residue_no()) + std::string(".  ");
-                                                    #endif
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                #if !pocketcen_is_loneliest
-                                if (score > 0) score *= 1.0 + 0.1 * centeredness;
-                                #endif
-
-                                if (score > bestscore)
-                                {
-                                    besp.copy_state(&m);
-                                    blone = loneliness;
-                                    bestxr = xrad;
-                                    bestyr = yrad;
-                                    bestzr = zrad;
-                                    bestscore = score;
-
-                                    #if _DBG_TUMBLE_SPHERES
-                                    tsdbgb = tsdbg;
-
-                                    cout << "Tumble score " << score << " for ligand box " << m.get_bounding_box() << endl;
-
-
-                                    #if output_tumble_debug_docs
-                                    int u, v, w;
-                                    char protfttl[1000];
-                                    strcpy(protfttl, protfname);
-
-                                    char** lfields = chop_spaced_fields(protfttl, '/');
-
-                                    for (u=0; lfields[u]; u++);
-                                    u--;
-
-                                    char fname[1000];
-                                    sprintf(fname, "output/tumble_%s_%d_%d_%d_%f.dock",
-                                            lfields[u],
-                                            (int)(xrad*fiftyseven),
-                                            (int)(yrad*fiftyseven),
-                                            (int)(zrad*fiftyseven),
-                                            score);
-                                    cout << fname << endl;
-                                    std::ofstream tspdbdat(fname, std::ofstream::out);
-
-                                    tspdbdat << "PDB file: " << protfname << endl;
-                                    tspdbdat << "Pose: 1\nNode: 0\nPDBDAT:\n";
-
-                                    int lac = m.get_atom_count();
-                                    for (u=0; u<lac; u++) m.get_atom(u)->stream_pdb_line(tspdbdat, 9000+u);
-
-                                    int pseql = p.get_seq_length();
-                                    v = 1;
-                                    for (u = 1; u < pseql; u++)
-                                    {
-                                        AminoAcid* dbgaa = p.get_residue(u);
-                                        if (dbgaa)
-                                        {
-                                            int aaac = dbgaa->get_atom_count();
-                                            for (w=0; w<aaac; w++)
-                                            {
-                                                Atom* dbga = dbgaa->get_atom(w);
-                                                if (!strcmp(dbga->name, "CA") || !strcmp(dbga->name, "CB")) dbga->stream_pdb_line(tspdbdat, v++);
-                                            }
-                                        }
-                                    }
-                                    tspdbdat << "END" << endl;
-                                    tspdbdat.close();
-                                    #endif
-                                    #endif
-                                }
-
-                            _xyzl_skip_loop:
-
-                                if (rb && rb[l])
-                                {
-                                    rb[l]->rotate(step);
-
-                                    lrad += step;
-                                    if (lrad >= M_PI*2)
-                                    {
-                                        l++;
-                                        if (l < n) goto _xyzl_loop;
-                                    }
-                                    else goto _xyzl_loop;
-                                }
-
-                                m.rotate(zaxis, step);
-                            }		// zrad.
-                            m.rotate(yaxis, step);
-                        }			// yrad.
-                        m.rotate(xaxis, step);
-                    }				// xrad.
-
-                    #if !pocketcen_is_loneliest
-                    if (bestscore >= (m.get_atom_count()*13)) break;
-                    #endif
-
-                    #if _DBG_LONELINESS
-                    cout << "Best score: " << bestscore << endl;
-                    #endif
-                }					// loneliness.
-
-                #if _DBG_TUMBLE_SPHERES
-                cout << "Tumble sphere best score " << bestscore << " for "
-                     << "x" << bestxr*fiftyseven << "deg, "
-                     << "y" << bestyr*fiftyseven << "deg, "
-                     << "z" << bestzr*fiftyseven << "deg."
-                     << " (" << blone << " lonely)."
-                     << endl;
-                cout << tsdbgb << endl;
-                #endif
-
-                // Load the best ligand conformer.
-                besp.restore_state(&m);
-
-                // Minimize ligand clashes.
-                #if prerot_sidechains_from_ligand
-                for (i=0; i<tsphsz; i++)
-                {
-                    Bond** tsphb = tsphres[i]->get_rotatable_bonds();
-                    if (tsphb)
-                    {
-                        for (j=0; tsphb[j]; j++)
-                        {
-                            float rad=0, bestrad=0, clash, bestclash=6.25e24;
-                            for (rad=0; rad < M_PI*2; rad += step)
-                            {
-                                clash = tsphres[i]->get_intermol_clashes(&m);
-
-                                if (clash < bestclash)
-                                {
-                                    bestrad = rad;
-                                    bestclash = clash;
-                                }
-
-                                tsphb[j]->rotate(step);
-                            }
-
-                            tsphb[j]->rotate(bestrad);
-                        }
-                        // delete[] tsphb;
-                    }
-                }
-                #endif
-
-                #if debug_stop_after_tumble_sphere
-                return 0;
-                #endif
-                // End tumble sphere behavior.
-            }
+            #if debug_stop_after_tumble_sphere
+            return 0;
+            #endif
         }
 
         #if _DBG_STEPBYSTEP
@@ -1309,14 +1314,16 @@ _try_again:
                 if (debug) *debug << "Added whatever points together." << endl;
                 #endif
             }
-            Point lastnodecen = nodecen;
-            ligcen_target = nodecen;
-
-            loneliest = p.find_loneliest_point(nodecen, size);
 
             #if pocketcen_is_loneliest
             nodecen = loneliest;
             #endif
+
+            Point lastnodecen = nodecen;
+            ligcen_target = nodecen;
+
+            loneliest = p.find_loneliest_point(nodecen, size);
+            if (nodeno == active_matrix_node) do_tumble_spheres(ligcen_target, false);
 
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Saved last nodecen." << endl;

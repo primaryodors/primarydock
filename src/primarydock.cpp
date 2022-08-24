@@ -1228,19 +1228,13 @@ _try_again:
                         throw 0xbadf12e;
                     }
 
-                    // Move the entire helix by the values of active_matrix_n.
-                    if (true || (i & 1))
-                        p.move_piece(sr, er, active_matrix_n[i].add(p.get_region_center(sr, er)));
-                    else
-                        p.move_piece(sr, er, p.get_region_center(sr, er).subtract(active_matrix_n[i]));
-
                     // Get the CA location of the C-terminus of the helix;
                     // Add the active_matrix_c to the result;
                     Point calign;
-                    if (true || (i & 1))
-                        calign = p.get_atom_location(er, "CA").add(active_matrix_c[i]);
-                    else
-                        calign = p.get_atom_location(er, "CA").subtract(active_matrix_c[i]);
+                    calign = p.get_atom_location(er, "CA").add(active_matrix_c[i]);
+
+                    // Move the entire helix by the values of active_matrix_n.
+                    p.move_piece(sr, er, active_matrix_n[i].add(p.get_region_center(sr, er)));
 
                     // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
                     p.rotate_piece(sr, er, er, calign, sr);

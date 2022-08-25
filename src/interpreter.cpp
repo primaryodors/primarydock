@@ -1183,6 +1183,8 @@ int main(int argc, char** argv)
                     strcpy(buffer, rem_hx[l].c_str());
                     char** fields = chop_spaced_fields(buffer);
 
+					if (!fields[3] || !fields[4] || !fields[5]) continue;
+
                     Star sv;
 
                     sprintf(buffer1, "%c%s.s", '%', fields[3]);
@@ -1193,7 +1195,7 @@ int main(int argc, char** argv)
                     sv.n = atoi(fields[5]);
                     set_variable(buffer1, sv);
 
-					p.set_region(fields[3], fields[4], fields[5]);
+					p.set_region(fields[3], atoi(fields[4]), atoi(fields[5]));
 
                     delete[] fields;
                 }

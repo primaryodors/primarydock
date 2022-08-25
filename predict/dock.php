@@ -135,8 +135,10 @@ switch ($fam)
 	$cenr3_32 = resno_from_bw($protid, "3.32");
 	$cenr5_43 = resno_from_bw($protid, "5.43");
 	$cenr6_48 = resno_from_bw($protid, "6.48");
+	$cenr6_52 = resno_from_bw($protid, "6.52");
+	$cenr7_43 = resno_from_bw($protid, "7.43");
 	
-	$cenres = "CEN RES $cenr3_32 $cenr5_43 $cenr6_48";
+	$cenres = "CEN RES $cenr3_32 $cenr5_43 $cenr6_52 $cenr7_43 $cenr6_48";
 	break;
 	
 	default:
@@ -183,11 +185,11 @@ SIZE 6.0 7.5 5.5
 EXCL 1 $cyt1end		# Head, TMR1, and CYT1.
 EXCL $exr2start $exr2end	# EXR2 between TMR4 and TMR5.
 
-POSE 10
+POSE 5
 ITER 50
 
 # DIFF
-ELIM 100
+# ELIM 100
 
 OUT output/$protid-$ligname.pred.dock
 

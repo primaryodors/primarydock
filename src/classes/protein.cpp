@@ -234,6 +234,12 @@ int Protein::load_pdb(FILE* is)
             fgets(buffer, 1003, is);
 
             if (buffer[0] == 'A' &&
+                    buffer[1] == 'N' &&
+                    buffer[2] == 'I' &&
+                    buffer[3] == 'S'
+               )
+                continue;
+            if (buffer[0] == 'A' &&
                     buffer[1] == 'T' &&
                     buffer[2] == 'O' &&
                     buffer[3] == 'M'

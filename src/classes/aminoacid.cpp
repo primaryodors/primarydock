@@ -926,6 +926,7 @@ int AminoAcid::from_pdb(FILE* is)
               1111111111222222222233333333334444444444555555555566666666667777777777
     01234567890123456789012345678901234567890123456789012345678901234567890123456789
     ATOM     55  SG  CYS     4       6.721  -8.103   4.542  1.00001.00           S
+	ATOM   1091  N   LYS A1000     -15.894 -46.862 -74.510  1.00104.21           N  
     */
     char buffer[1024], origbuf[1024], res3let[5];
     int added=0, lasttell=0;
@@ -945,21 +946,41 @@ int AminoAcid::from_pdb(FILE* is)
 
         int thistell = ftell(is);
         strcpy(origbuf, buffer);
-        char** fields = chop_spaced_fields(buffer);
+        // char** fields = chop_spaced_fields(buffer);
+
+		char** fields = new char*[20];
+		int places[20] = {0, 6, 11, 17, 21, 22, 30, 38, 46, 54, 60, 76};
+		int i, j, k;
+		for (i=11; i>=0; i--)
+		{
+			fields[i] = new char[35];
+			j = places[i];
+
+			// Ltrim.
+			while (buffer[j] == ' ' && buffer[j+1] > 0) j++;
+
+			k = j+1;
+			while (buffer[k]) k++;			// Find zero.
+			// Rtrim.
+			for (k--; buffer[k] == ' '; k--) buffer[k] = 0;
+			
+			strcpy(fields[i], &buffer[j]);
+			buffer[places[i]] = 0;
+		}
 
         try
         {
             if (fields)
             {
-                int offset = 0;
+                int offset = 1;
                 // cout << fields[0] << endl;
+				if (!strcmp(fields[0], "ANISOU")) continue;
                 if (!strcmp(fields[0], "ATOM")
                         /*||
                         !strcmp(fields[0], "HETATM")*/
                    )
                 {
                     // cout << "Resno " << fields[4] << " vs old " << resno << endl;
-                    if (!atoi(fields[4]) && atoi(fields[5])) offset++;
 
                     if (!residue_no)
                     {

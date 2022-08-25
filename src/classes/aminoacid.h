@@ -55,7 +55,7 @@ class AminoAcid : public Molecule
 {
 public:
     // Constructors.
-    AminoAcid(FILE* instream, AminoAcid* prev_res=0);
+    AminoAcid(FILE* instream, AminoAcid* prev_res=0, int resno_offset = 0);
     AminoAcid(const char letter, AminoAcid* prev_res=0);
 
     // Getters and setters.
@@ -101,7 +101,7 @@ public:
     void establish_internal_clash_baseline();
 
     // Serialization.
-    int from_pdb(FILE* instream);							// returns number of atoms loaded.
+    int from_pdb(FILE* instream, int resno_offset = 0);							// returns number of atoms loaded.
     void save_pdb(FILE* outstream, int atomno_offset=0);
 
     // Spatial functions.

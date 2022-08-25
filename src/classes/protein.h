@@ -34,7 +34,7 @@ public:
     void set_region(std::string name, int start, int end);
 
     // Serialization.
-    int load_pdb(FILE* infile);				// Returns number of residues loaded.
+    int load_pdb(FILE* infile, int resno_offset = 0);				// Returns number of residues loaded.
     void save_pdb(FILE* outfile);
     void end_pdb(FILE* outfile);
 

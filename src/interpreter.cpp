@@ -1134,7 +1134,9 @@ int main(int argc, char** argv)
             {
                 if (!fields[1]) raise_error("Insufficient parameters given for LOAD.");
                 psz = interpret_single_string(fields[1]);
-                if (fields[2]) raise_error("Too many parameters given for LOAD.");
+				n = 0;
+				if (fields[2]) n = atoi(fields[2]);
+                if (fields[2] && fields[3]) raise_error("Too many parameters given for LOAD.");
 
                 pf = fopen(psz, "rb");
                 if (!pf)
@@ -1142,7 +1144,7 @@ int main(int argc, char** argv)
                     raise_error( (std::string)"Failed to open " + (std::string)psz + (std::string)" for reading.");
                     return 0xbadf12e;
                 }
-                p.load_pdb(pf);
+                p.load_pdb(pf, n);
 
                 fclose(pf);
 

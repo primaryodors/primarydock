@@ -15,12 +15,12 @@ using namespace std;
 AADef aa_defs[256];
 char* override_aminos_dat=0;
 
-AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa)
+AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
 {
     if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
     movability = MOV_FLEXONLY;
-    from_pdb(instream);
+    from_pdb(instream, rno);
     base_internal_clashes = get_internal_clashes();
     mol_typ = MOLTYP_AMINOACID;
     prev_aa = prevaa;
@@ -920,7 +920,7 @@ void AminoAcid::save_pdb(FILE* os, int atomno_offset)
     }
 }
 
-int AminoAcid::from_pdb(FILE* is)
+int AminoAcid::from_pdb(FILE* is, int rno)
 {
     /*
               1111111111222222222233333333334444444444555555555566666666667777777777
@@ -980,11 +980,9 @@ int AminoAcid::from_pdb(FILE* is)
                         !strcmp(fields[0], "HETATM")*/
                    )
                 {
-                    // cout << "Resno " << fields[4] << " vs old " << resno << endl;
-
                     if (!residue_no)
                     {
-                        residue_no = atoi(fields[4+offset]);
+                        residue_no = atoi(fields[4+offset]) + rno;
                     }
 
                     if (!res3let[0])
@@ -996,11 +994,9 @@ int AminoAcid::from_pdb(FILE* is)
 
                     if (strcmp(res3let, fields[3])
                             ||
-                            residue_no != atoi(fields[4+offset])
+                            residue_no != (atoi(fields[4+offset])+rno)
                        )
                     {
-                        /*cout << res3let << "/" << fields[3] << " | " << residue_no << "/" << fields[4] << " | "
-                        	 << origbuf << endl << flush;*/
                         fseek(is, lasttell, SEEK_SET);
                         goto _return_added;
                     }
@@ -1035,7 +1031,7 @@ int AminoAcid::from_pdb(FILE* is)
                         a->is_backbone = true;
                     else a->is_backbone = false;
 
-                    a->residue = atoi(fields[4+offset]);
+                    a->residue = atoi(fields[4+offset])+rno;
                     strcpy(a->aa3let, fields[3]);
                     AADef* aaa=0;
 
@@ -1047,7 +1043,7 @@ int AminoAcid::from_pdb(FILE* is)
                             a->aaletter = aa_defs[i]._1let;
                             aaa = &aa_defs[i];
                             name = new char[10]; // aa_defs[i].name;
-                            sprintf(name, "%s%d", aa_defs[i]._3let, atoi(fields[4+offset]));
+                            sprintf(name, "%s%d", aa_defs[i]._3let, atoi(fields[4+offset])+rno);
                             break;
                         }
                     }

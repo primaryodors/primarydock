@@ -215,7 +215,7 @@ void Protein::end_pdb(FILE* os)
     fprintf(os, "END\n");
 }
 
-int Protein::load_pdb(FILE* is)
+int Protein::load_pdb(FILE* is, int rno)
 {
     AminoAcid* restmp[65536];
     char buffer[1024];
@@ -257,7 +257,7 @@ int Protein::load_pdb(FILE* is)
                 {
                     if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
                     {
-                        AminoAcid* aa = new AminoAcid(is, prevaa);
+                        AminoAcid* aa = new AminoAcid(is, prevaa, rno);
                         restmp[rescount++] = aa;
                         restmp[rescount] = NULL;
                         prevaa = aa;

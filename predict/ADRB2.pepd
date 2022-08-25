@@ -2,10 +2,7 @@
 #
 
 # Load the active protein.
-LOAD "pdbs/ADRB2/4ldo.pdb"
-
-DUMP
-QUIT
+LOAD "pdbs/ADRB2/4ldo.active.pdb" -851
 
 REGION TMR1 35 58
 REGION TMR2 72 95
@@ -53,7 +50,7 @@ IF %i <= 7 GOTO _loop
 
 
 # Load the inactive protein.
-LOAD "pdbs/ADRB2/2rh1.pdb"
+LOAD "pdbs/ADRB2/2rh1.inactive.pdb"
 
 REGION TMR1 35 58
 REGION TMR2 72 95

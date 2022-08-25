@@ -600,7 +600,7 @@ int main(int argc, char** argv)
             {
                 l = 1;
                 if (fields[l]) raise_error("Too many parameters given for CENTER.");
-                p.move_piece(1, p.get_seq_length(), Point(0,0,0));
+                p.move_piece(1, 9999, Point(0,0,0));
             }	// CENTER
 
             else if (!strcmp(fields[0], "UPRIGHT"))
@@ -609,7 +609,7 @@ int main(int argc, char** argv)
                 if (fields[l]) raise_error("Too many parameters given for UPRIGHT.");
 
                 int seql = p.get_seq_length();
-                p.move_piece(1, seql, Point(0,0,0));
+                p.move_piece(1, 9999, Point(0,0,0));
 
                 Point extracellular[256], cytoplasmic[256];
                 int exr_n=0, cyt_n=0;

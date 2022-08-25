@@ -28,7 +28,8 @@ $matrix =
 	"TMR7" => [ -0.405411,  0.009982,  2.163982,  3.021839, -3.566268, -1.637518 ],
 ];
 
-// Matrix adjustments
+
+// btRho matrix adjustments
 // Adjust TMR6 to not clash with TMR5.
 $matrix["TMR6"][2] += 3;
 $matrix["TMR6"][5] += 1;
@@ -49,6 +50,19 @@ $matrix["TMR5"][2] -= 1;
 // Prevent clash of TMR7 with TMR2 and TMR1. Bring TMR7 closer to TMR3.
 $matrix["TMR7"][3] -= 3;
 $matrix["TMR7"][5] -= 2;
+
+
+# Activation matrix from ADRB2.pepd:
+$matrix =
+[
+	'TMR1' => [  1.928375, -0.231194,  1.514458, -1.745764,  3.297985, -0.673183 ],
+	'TMR2' => [ -1.637074,  2.562085, -0.780735,  6.004886, -0.640827,  1.471912 ],
+	'TMR3' => [  3.991817,  1.599894,  0.494513, -4.396341, -0.118191, -2.558083 ],
+	'TMR4' => [ -3.715700,  4.363474, -0.580147,  4.709310,  0.645814,  0.620629 ],
+	'TMR5' => [  3.459619, -0.976376,  0.259171, -6.087701, -1.455206, -1.813480 ],
+	'TMR6' => [ -8.180727, -1.155262, -2.628376,  3.851160, -5.411479,  0.728764 ],
+	'TMR7' => [  4.153688, -3.598364,  1.721104, -2.335531,  1.117605,  2.223419 ],
+];
 
 
 // Load data
@@ -185,7 +199,7 @@ SIZE 6.0 7.5 5.5
 EXCL 1 $cyt1end		# Head, TMR1, and CYT1.
 EXCL $exr2start $exr2end	# EXR2 between TMR4 and TMR5.
 
-POSE 5
+POSE 10
 ITER 50
 
 # DIFF
@@ -268,7 +282,7 @@ if (min($average) > 0 || !isset($average["Active"]) || !isset($average["Inactive
 }
 else
 {
-	if ($average["Active"] <= 1.1 * $average["Inactive"])
+	if ($average["Active"] <= 1.05 * $average["Inactive"])
 		$prediction = "Agonist";
 	else if ($average["Inactive"] <= 1.1 * $average["Active"])
 		$prediction = "Inverse Agonist";

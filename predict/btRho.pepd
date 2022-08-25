@@ -130,8 +130,9 @@ IF %i <= 7 GOTO _loop4
 
 # Output the deltas.
 
-ECHO "# Activation Matrix."
-ECHO "# ACVMX region N.x N.y N.z C.x C.y C.z"
+ECHO "# Activation matrix from btRho.pepd:"
+ECHO "$matrix ="
+ECHO "["
 
 LET %i = 1
 _loop2:
@@ -139,11 +140,10 @@ _loop2:
 LET @delta_n = @an[%i] - @in[%i]
 LET @delta_c = @ac[%i] - @ic[%i]
 
-# ECHO "TMR" %i ": Activation moves N terminus " @delta_n ", C terminus " @delta_c "."
-ECHO "ACVMX TMR" %i " " @delta_n.x " " @delta_n.y " " @delta_n.z " " @delta_c.x " " @delta_c.y " " @delta_c.z
+ECHO "	'TMR" %i "' => [ " @delta_n.x ", " @delta_n.y ", " @delta_n.z ", " @delta_c.x ", " @delta_c.y ", " @delta_c.z " ],"
 
 LET %i ++
 
 IF %i <= 7 GOTO _loop2
-
+ECHO "];"
 # DUMP

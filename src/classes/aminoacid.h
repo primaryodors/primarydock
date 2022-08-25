@@ -99,6 +99,7 @@ public:
     Point get_CA_location();
     Point HN_or_substitute_location();
     void establish_internal_clash_baseline();
+    void renumber(int new_resno);
 
     // Serialization.
     int from_pdb(FILE* instream, int resno_offset = 0);							// returns number of atoms loaded.

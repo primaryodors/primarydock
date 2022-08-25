@@ -32,6 +32,7 @@ public:
     void delete_sidechains(int startres, int endres);
     MetalCoord* coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames);
     void set_region(std::string name, int start, int end);
+    void renumber_residues(int startres, int endres, int new_startres);
 
     // Serialization.
     int load_pdb(FILE* infile, int resno_offset = 0);				// Returns number of residues loaded.

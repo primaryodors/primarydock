@@ -2,7 +2,15 @@
 #
 
 # Load the active protein.
-LOAD "pdbs/ADRB2/4ldo.active.pdb" -851
+LOAD "pdbs/ADRB2/4ldo.active.pdb"
+
+DELETE 1 1028
+
+RENUMBER 1029 9999 29
+
+ECHO %SEQLEN
+ECHO $SEQUENCE
+ECHO ""
 
 REGION TMR1 35 58
 REGION TMR2 72 95
@@ -51,6 +59,10 @@ IF %i <= 7 GOTO _loop
 
 # Load the inactive protein.
 LOAD "pdbs/ADRB2/2rh1.inactive.pdb"
+
+ECHO %SEQLEN
+ECHO $SEQUENCE
+ECHO ""
 
 REGION TMR1 35 58
 REGION TMR2 72 95
@@ -144,3 +156,6 @@ LET %i ++
 IF %i <= 7 GOTO _loop2
 
 # DUMP
+
+
+

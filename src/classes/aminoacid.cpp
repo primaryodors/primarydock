@@ -1597,6 +1597,18 @@ void AminoAcid::rotate(LocatedVector SCoord, float theta)
     }
 }
 
+void AminoAcid::renumber(int new_resno)
+{
+	residue_no = new_resno;
+	if (!atoms) return;
+
+	int i;
+	for (i=0; atoms[i]; i++)
+	{
+		atoms[i]->residue = residue_no;
+	}
+}
+
 void AminoAcid::delete_sidechain()
 {
     Atom* latoms[get_atom_count()+4];

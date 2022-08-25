@@ -642,7 +642,7 @@ int main(int argc, char** argv)
 
                 Rotation rot = align_points_3d(&exrdir, new Point(0,1e9,0), &cytdir);
 
-                p.rotate_piece(1, seql, rot, 0);
+                p.rotate_piece(1, 9999, rot, 0);
 
                 // TODO: Rotate to place TMR4 +Z to TMR1.
                 int sr = p.get_region_start("TMR4");
@@ -674,7 +674,7 @@ int main(int argc, char** argv)
 
                     rot = align_points_3d(&tmr4dir, new Point(0,0,1e9), &tmr1dir);
 
-                    p.rotate_piece(1, seql, rot, 0);
+                    p.rotate_piece(1, 9999, rot, 0);
 
                 }
             }	// UPRIGHT

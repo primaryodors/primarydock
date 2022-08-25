@@ -22,6 +22,8 @@ REGION TMR7 306 329
 
 UPRIGHT
 
+SAVE "pdbs/ADRB2/ADRB2.active.pdb"
+
 
 # Obtain the active helix termini.
 
@@ -73,6 +75,8 @@ REGION TMR6 275 298
 REGION TMR7 306 329
 
 UPRIGHT
+
+SAVE "pdbs/ADRB2/ADRB2.inactive.pdb"
 
 
 # Obtain the inactive termini.

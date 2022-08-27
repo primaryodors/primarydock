@@ -819,8 +819,20 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         #if active_persistence
         if (partial > 0)
         {
-            if (a->residue && !b->residue) partial *= residue_binding_multiplier(a->residue);
-            else if (!a->residue && b->residue) partial *= residue_binding_multiplier(b->residue);
+            if (a->residue && !b->residue)
+            {
+                partial *= residue_binding_multiplier(a->residue);
+                #if _DBG_RESBMULT
+                if (residue_binding_multiplier(a->residue) > 1) std::cout << *a << "..." << *b << " partial " << partial << " multiplied." << endl;
+                #endif
+            }
+            else if (!a->residue && b->residue)
+            {
+                partial *= residue_binding_multiplier(b->residue);
+                #if _DBG_RESBMULT
+                if (residue_binding_multiplier(a->residue) > 1) std::cout << *a << "..." << *b << " partial " << partial << " multiplied." << endl;
+                #endif
+            }
         }
         #endif
 

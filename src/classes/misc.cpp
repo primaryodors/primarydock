@@ -21,6 +21,10 @@ float pre_ligand_flex_radius = default_pre_ligand_flex_radius;
 int active_persistence_resno[active_persistence_limit];
 #endif
 
+#if active_persistence_noflex
+bool allow_ligand_flex = true;
+#endif
+
 int in_array(void* needle, void** haystack)
 {
     int i;

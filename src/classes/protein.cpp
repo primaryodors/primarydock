@@ -318,7 +318,7 @@ int Protein::load_pdb(FILE* is, int rno)
         _found_AA:
             ;
         }
-        catch (int ex)
+        catch (unsigned int ex)
         {
             // cout << "Exception " << ex << endl;
             switch (ex)

@@ -1235,6 +1235,10 @@ _try_again:
             for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
             #endif
 
+            #if active_persistence_noflex
+            allow_ligand_flex = true;
+            #endif
+
             if (nodeno == active_matrix_node)
             {
                 #if active_persistence
@@ -1248,6 +1252,10 @@ _try_again:
                         if (j >= active_persistence_limit) break;
                     }
                 }
+                #endif
+
+                #if active_persistence_noflex
+                allow_ligand_flex = false;
                 #endif
 
                 // Each TMR:
@@ -1669,6 +1677,10 @@ _try_again:
 
             #if active_persistence
             for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
+            #endif
+            
+            #if active_persistence_noflex
+            allow_ligand_flex = true;
             #endif
 
             // Add the current pose/path sequentially to the dr[][] array.

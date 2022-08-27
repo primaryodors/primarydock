@@ -82,5 +82,9 @@ extern bool differential_dock;
 extern float pre_ligand_multimol_radius;
 extern float pre_ligand_flex_radius;
 
+#if active_persistence_noflex
+extern bool allow_ligand_flex;
+#endif
+
 #endif
 

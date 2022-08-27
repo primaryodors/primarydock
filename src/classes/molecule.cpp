@@ -288,6 +288,18 @@ void Molecule::clear_all_bond_caches()
     }
 }
 
+int Molecule::is_residue()
+{
+    if (noAtoms(atoms)) return 0;
+    int i;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->residue) return atoms[i]->residue;
+    }
+    return 0;
+}
+
 void Molecule::hydrogenate(bool steric_only)
 {
     if (noAtoms(atoms)) return;
@@ -2498,6 +2510,11 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
 
             #if allow_bond_rots
             /**** Bond Flexion ****/
+
+            #if active_persistence_noflex
+            if (!allow_ligand_flex && !mm[i]->is_residue()) continue;
+            #endif
+
             // cout << mm[i]->name << ": " << mm[i]->movability << endl;
             if (mm[i]->movability >= MOV_FLEXONLY)
             {

@@ -300,6 +300,7 @@ bool atoms_are_conjugated(Atom** atoms);
 
 static bool read_elem_syms = false;
 
+std::ostream& operator<<(std::ostream& os, const Atom& a);
 std::ostream& operator<<(std::ostream& os, const Bond& b);
 std::ostream& operator<<(std::ostream& os, const Ring& r);
 

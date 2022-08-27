@@ -641,6 +641,10 @@ void do_tumble_spheres(Point l_pocket_cen)
                                 worth = 7;
                             }
 
+                            #if active_persistence
+                            worth *= residue_binding_multiplier(tsphres[j]->get_residue_no());
+                            #endif
+
                             if (tsphres[j]->capable_of_inter(it))
                             {
                                 float r = a->get_location().get_3d_distance(tsphres[j]->get_atom_location("CA"));
@@ -831,6 +835,9 @@ int main(int argc, char** argv)
     int i, j;
 
     for (i=0; i<65536; i++) buffer[i] = 0;
+    #if active_persistence
+    for (i=0; i<active_persistence_limit; i++) active_persistence_resno[i] = 0;
+    #endif
 
     for (i=0; i<256; i++)
         configfname[i] = protfname[i] = protafname[i] = ligfname[i] = 0;
@@ -1125,6 +1132,11 @@ int main(int argc, char** argv)
     cout << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
     if (output) *output << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
 
+    #if active_persistence
+    float res_kJmol[seql+8];
+    for (i=0; i<seql+8; i++) res_kJmol[i] = 0;
+    #endif
+
     found_poses = 0;
 _try_again:
     // srand(0xb00d1cca);
@@ -1219,8 +1231,25 @@ _try_again:
                 }
             }
 
+            #if active_persistence
+            for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
+            #endif
+
             if (nodeno == active_matrix_node)
             {
+                #if active_persistence
+                j=0;
+                for (i=1; i<=seql; i++)
+                {
+                    if (res_kJmol[i] >= active_persistence_threshold)
+                    {
+                        active_persistence_resno[j] = i;
+                        j++;
+                        if (j >= active_persistence_limit) break;
+                    }
+                }
+                #endif
+
                 // Each TMR:
                 for (i=1; i<=active_matrix_count; i++)
                 {
@@ -1245,6 +1274,7 @@ _try_again:
                     p.rotate_piece(sr, er, er, calign, sr);
                 }
 
+                #if save_active_protein
                 if (pose == 1)
                 {
                     FILE* f = fopen("tmp/active.pdb", "wb");
@@ -1255,6 +1285,7 @@ _try_again:
                         fclose(f);
                     }
                 }
+                #endif
 
                 // TODO: #if !recenter_ligand_each_node, recenter the ligand here to keep up with the residues that it was coordinated to.
                 // Perhaps also multimol it for 10 or so iterations with all flexions (ligand and residue) globally disabled.
@@ -1636,6 +1667,10 @@ _try_again:
             /*time_t jlgsux = time(NULL);
             cout << "\nIterations took: " << (jlgsux-preiter) << " seconds." << endl;*/
 
+            #if active_persistence
+            for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
+            #endif
+
             // Add the current pose/path sequentially to the dr[][] array.
             // If the path node # is zero:
             // If it is the first (zeroth) entry, set the pose number to 1.
@@ -1726,6 +1761,10 @@ _try_again:
             float fin_total_binding_by_type[_INTER_TYPES_LIMIT];
             for (i=0; i<_INTER_TYPES_LIMIT; i++) fin_total_binding_by_type[i] = total_binding_by_type[i];
 
+            #if active_persistence
+            for (i=0; i<=seql; i++) res_kJmol[i] = 0;
+            #endif
+
             sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, mcoord_resno);
             // cout << "sphres " << sphres << endl;
             float maxclash = 0;
@@ -1748,6 +1787,10 @@ _try_again:
                     if (lb > 90) lb = 0;
                     mkJmol[metcount] = lb;
                 }
+
+                #if active_persistence
+                res_kJmol[resno] = lb;
+                #endif
 
                 sprintf(metrics[metcount], "%s%d", reaches_spheroid[nodeno][i]->get_3letter(), resno);
                 // cout << metrics[metcount] << ": " << lb << " . ";

@@ -94,6 +94,10 @@
 #define POLYPRO1_OMEGA fiftyseventh*113
 
 
+#define active_persistence 1
+#define active_persistence_limit 64
+#define active_persistence_ratio 10
+#define active_persistence_threshold 5
 #define allow_axial_tumble 1
 #define allow_bond_rots 1
 #define allow_drift 1
@@ -113,6 +117,7 @@
 #define default_pre_ligand_flex_radius 10
 #define pre_ligand_iteration_ratio 1
 #define recenter_ligand_each_node 0
+#define save_active_protein 0
 #define tumble_spheres_include_vdW 1
 #define use_exclusions 1
 

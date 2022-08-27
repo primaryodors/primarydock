@@ -79,6 +79,10 @@ std::ostream& operator<<(std::ostream& os, const intera_type& it);
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& f);
 extern float total_binding_by_type[_INTER_TYPES_LIMIT];
 
+#if active_persistence
+extern int active_persistence_resno[active_persistence_limit];
+#endif
+
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);
 
 #endif

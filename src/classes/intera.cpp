@@ -816,6 +816,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             throw 0xbadf0ace;
         }
 
+        #if active_persistence
+        if (partial > 0)
+        {
+            if (a->residue && !b->residue) partial *= residue_binding_multiplier(a->residue);
+            else if (!a->residue && b->residue) partial *= residue_binding_multiplier(b->residue);
+        }
+        #endif
+
         kJmol += partial;
         if (partial > 0.5 && forces[i]->distance < rbind) rbind = forces[i]->distance;
 

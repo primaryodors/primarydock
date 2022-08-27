@@ -194,7 +194,7 @@ $acv_matrix
 
 ACVNODE 1
 
-SIZE 6.0 7.5 5.5
+SIZE 7.0 7.5 7.0
 
 EXCL 1 $cyt1end		# Head, TMR1, and CYT1.
 EXCL $exr2start $exr2end	# EXR2 between TMR4 and TMR5.

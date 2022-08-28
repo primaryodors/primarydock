@@ -16,6 +16,7 @@
 using namespace std;
 
 float potential_distance = 0;
+float conformer_momenta_multiplier = 1;
 
 Molecule::Molecule(char const* lname)
 {
@@ -173,9 +174,9 @@ void Molecule::reset_conformer_momenta()
     lmx = _def_lin_momentum * sgn(0.5-(rand()&1));
     lmy = _def_lin_momentum * sgn(0.5-(rand()&1));
     lmz = _def_lin_momentum * sgn(0.5-(rand()&1));
-    amx = _def_ang_momentum * sgn(0.5-(rand()&1));
-    amy = _def_ang_momentum * sgn(0.5-(rand()&1));
-    amz = _def_ang_momentum * sgn(0.5-(rand()&1));
+    amx = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
+    amy = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
+    amz = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
 
     Bond** b = get_rotatable_bonds();
     int i;
@@ -184,7 +185,7 @@ void Molecule::reset_conformer_momenta()
     {
         for (i=0; b[i]; i++)
         {
-            b[i]->angular_momentum = _def_bnd_momentum * sgn(0.5-(rand()&1));
+            b[i]->angular_momentum = _def_bnd_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
         }
     }
 }

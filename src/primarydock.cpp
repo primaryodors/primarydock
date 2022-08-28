@@ -837,6 +837,10 @@ int main(int argc, char** argv)
     for (i=0; i<65536; i++) buffer[i] = 0;
     #if active_persistence
     for (i=0; i<active_persistence_limit; i++) active_persistence_resno[i] = 0;
+
+    #if _DBG_RESBMULT
+    cout << "Cleared active persistence resnos." << endl;
+    #endif
     #endif
 
     for (i=0; i<256; i++)
@@ -1177,6 +1181,8 @@ _try_again:
             if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 
+            conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
+
             if (strlen(protafname) && nodeno == activation_node)
             {
                 // TODO: Persist the flexions of the side chains, except for those residues whose positions are important to activation.
@@ -1233,6 +1239,10 @@ _try_again:
 
             #if active_persistence
             for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
+
+            #if _DBG_RESBMULT
+            cout << "Cleared active persistence resnos." << endl;
+            #endif
             #endif
 
             #if active_persistence_noflex
@@ -1245,9 +1255,15 @@ _try_again:
                 j=0;
                 for (i=1; i<=seql; i++)
                 {
+                    #if _DBG_RESBMULT
+                    cout << "res_kJmol[" << i << "] = " << res_kJmol[i] << endl << flush;
+                    #endif
                     if (res_kJmol[i] >= active_persistence_threshold)
                     {
                         active_persistence_resno[j] = i;
+                        #if _DBG_RESBMULT
+                        cout << "Added " << i << " to active persistence resnos." << endl << flush;
+                        #endif
                         j++;
                         if (j >= active_persistence_limit) break;
                     }
@@ -1354,6 +1370,8 @@ _try_again:
                 #endif
             }
 
+            loneliest = p.find_loneliest_point(nodecen, size);
+
             #if pocketcen_is_loneliest
             nodecen = loneliest;
             #endif
@@ -1361,11 +1379,12 @@ _try_again:
             Point lastnodecen = nodecen;
             ligcen_target = nodecen;
 
-            loneliest = p.find_loneliest_point(nodecen, size);
+            #if redo_tumble_spheres_on_activation
             if (nodeno == active_matrix_node)
             {
                 if (!use_bestbind_algorithm) do_tumble_spheres(ligcen_target);
             }
+            #endif
 
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Saved last nodecen." << endl;
@@ -1677,6 +1696,10 @@ _try_again:
 
             #if active_persistence
             for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
+
+            #if _DBG_RESBMULT
+            cout << "Cleared active persistence resnos." << endl;
+            #endif
             #endif
             
             #if active_persistence_noflex
@@ -2162,13 +2185,13 @@ _try_again:
                             }
                             else
                             {
-                                cout << "# PDB Data" << endl << "PDBDAT:" << endl;
+                                if (!output || echo_pdb_data) cout << "# PDB Data" << endl << "PDBDAT:" << endl;
                                 if (output) *output << "# PDB Data" << endl << "PDBDAT:" << endl;
 
                                 if (output) *output << dr[j][k].pdbdat << endl;
-                                cout << dr[j][k].pdbdat << endl;
+                                if (!output || echo_pdb_data) cout << dr[j][k].pdbdat << endl;
 
-                                cout << "TER" << endl << "END" << endl << endl << endl;
+                                if (!output || echo_pdb_data) cout << "TER" << endl << "END" << endl << endl << endl;
                                 if (output) *output << "TER" << endl << "END" << endl << endl << endl;
                             }
                         }

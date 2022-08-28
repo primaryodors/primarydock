@@ -98,10 +98,19 @@
 // bindings to the same residues post-activation as pre-activation. The noflex option
 // prevents rotating the ligand's bonds in the node immediately after activation.
 #define active_persistence 1
-#define active_persistence_limit 64
-#define active_persistence_noflex 1
-#define active_persistence_ratio 10
+#define active_persistence_limit 16
+#define active_persistence_noflex 0
+#define active_persistence_ratio 5
 #define active_persistence_threshold 5
+
+#define redo_tumble_spheres_on_activation 0
+
+// Amount to reduce momenta for path nodes beyond zero. Since the point of path based
+// docking is to keep as closely as possible the same ligand pose and move it through
+// the protein, we want to minimize the ligand's conformational changes from node to
+// node. Linear momenta are not affected by this number. Angular momenta are multiplied
+// by this number, and bond rotation momenta by the square of this number.
+#define internode_momentum_mult 0.25
 
 // Switches for conformational space search.
 #define allow_axial_tumble 1
@@ -160,6 +169,9 @@
 // Enable the EXCL feature of the config file.
 #define use_exclusions 1
 
+// Output PDB data to the command line even if an output file was specified.
+#define echo_pdb_data 0
+
 // Auto hydroxy makes geraniol fail in OR1A1. So does pre-rotate side chains.
 // Auto hydroxy was supposed to always point polar hydrogens towards nearby H-bond acceptors.
 // Prerot side chains was supposed to minimize clashes between the ligand and side chains after
@@ -177,6 +189,7 @@
 #define debug_break_on_move 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0
+#define _DBG_RESBMULT 1
 
 #endif
 

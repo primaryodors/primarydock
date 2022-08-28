@@ -202,7 +202,7 @@ protected:
 };
 
 extern float potential_distance;
-
+extern float conformer_momenta_multiplier;
 
 #endif
 

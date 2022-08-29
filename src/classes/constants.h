@@ -98,6 +98,7 @@
 // bindings to the same residues post-activation as pre-activation. The noflex option
 // prevents rotating the ligand's bonds in the node immediately after activation.
 #define active_persistence 1
+#define active_persistence_follow 1
 #define active_persistence_limit 16
 #define active_persistence_noflex 0
 #define active_persistence_ratio 5
@@ -124,8 +125,12 @@
 #define allow_drift 1
 #define initial_drift 0.333
 
-// Allows full 360 degree bond rotations to search for lower energy configurations.
+// Allows full 360 degree whole molecule rotations to search for lower energy configurations.
 #define allow_mol_fullrot_iter 1
+
+// Turn off the 360 degree rotations for all but the zeroth node of a path.
+#define nodes_no_ligand_360_tumble 1
+#define nodes_no_ligand_360_flex 1
 
 // Iteration callback function feature.
 #define allow_iter_cb 1
@@ -160,7 +165,7 @@
 #define recenter_ligand_each_node 0
 
 // Generate an output file called tmp/active.pdb containing the active matrix modified protein.
-#define save_active_protein 0
+#define save_active_protein 1
 
 // Whether to count van der Waals interactions towards the potential energies of candidate
 // starting poses in tumble spheres.
@@ -189,7 +194,7 @@
 #define debug_break_on_move 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0
-#define _DBG_RESBMULT 1
+#define _DBG_RESBMULT 0
 
 #endif
 

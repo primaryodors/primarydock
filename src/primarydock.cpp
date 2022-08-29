@@ -1183,6 +1183,9 @@ _try_again:
 
             conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
 
+            allow_ligand_360_tumble = nodes_no_ligand_360_tumble ? (nodeno == 0) : true;
+            allow_ligand_360_flex   = nodes_no_ligand_360_flex   ? (nodeno == 0) : true;
+
             if (strlen(protafname) && nodeno == activation_node)
             {
                 // TODO: Persist the flexions of the side chains, except for those residues whose positions are important to activation.
@@ -1243,10 +1246,10 @@ _try_again:
             #if _DBG_RESBMULT
             cout << "Cleared active persistence resnos." << endl;
             #endif
-            #endif
 
             #if active_persistence_noflex
             allow_ligand_flex = true;
+            #endif
             #endif
 
             if (nodeno == active_matrix_node)
@@ -1270,8 +1273,18 @@ _try_again:
                 }
                 #endif
 
-                #if active_persistence_noflex
+                #if active_persistence && active_persistence_noflex
                 allow_ligand_flex = false;
+                #endif
+
+                #if active_persistence_follow
+                Point residue_follow[active_persistence_limit];
+                for (i=0; active_persistence_resno[i]; i++)
+                {
+                    Atom* CA = p.get_atom(active_persistence_resno[i], "CA");
+                    if (!CA) residue_follow[i] = Point(0,0,0);
+                    else residue_follow[i] = CA->get_location();
+                }
                 #endif
 
                 // Each TMR:
@@ -1297,6 +1310,17 @@ _try_again:
                     // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
                     p.rotate_piece(sr, er, er, calign, sr);
                 }
+
+                #if active_persistence_follow
+                for (i=0; active_persistence_resno[i]; i++)
+                {
+                    Atom* CA = p.get_atom(active_persistence_resno[i], "CA");
+                    if (CA) residue_follow[i] = CA->get_location().subtract(residue_follow[i]);
+                }
+
+                Point catch_up = average_of_points(residue_follow, i);
+                ligand->move(catch_up);
+                #endif
 
                 #if save_active_protein
                 if (pose == 1)
@@ -2006,11 +2030,12 @@ _try_again:
                         // If pathnode is not within kJ/mol cutoff, abandon it and all subsequent pathnodes of the same pose.
                         if (dr[j][k].kJmol < kJmol_cutoff)
                         {
-                            /*if (k < pathnodes)
-                            {*/
-                            cout << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
-                            if (output) *output << "Node energy " << -dr[j][k].kJmol*energy_mult << " is outside of limit; aborting path nodes." << endl;
-                            // }
+                            cout << "Pose " << j << " node " << k
+                                 << " energy " << -dr[j][k].kJmol*energy_mult
+                                 << " is outside of limit; aborting path nodes." << endl;
+                            if (output) *output << "Pose " << j << " node " << k
+                                                << " energy " << -dr[j][k].kJmol*energy_mult
+                                                << " is outside of limit; aborting path nodes." << endl;
                             break;
                         }
 

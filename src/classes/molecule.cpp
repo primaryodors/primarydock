@@ -18,6 +18,9 @@ using namespace std;
 float potential_distance = 0;
 float conformer_momenta_multiplier = 1;
 
+bool allow_ligand_360_tumble = true;
+bool allow_ligand_360_flex = true;
+
 Molecule::Molecule(char const* lname)
 {
     name = new char[strlen(lname)+1];
@@ -185,7 +188,7 @@ void Molecule::reset_conformer_momenta()
     {
         for (i=0; b[i]; i++)
         {
-            b[i]->angular_momentum = _def_bnd_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
+            b[i]->angular_momentum = _def_bnd_momentum * conformer_momenta_multiplier * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
         }
     }
 }
@@ -2295,7 +2298,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && allow_ligand_360_tumble && !(iter % _fullrot_every))
                 {
                     // cout << endl;
                     while ((M_PI*2-rad) > 1e-3)
@@ -2364,7 +2367,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && allow_ligand_360_tumble && !(iter % _fullrot_every))
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
@@ -2434,7 +2437,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && allow_ligand_360_tumble && !(iter % _fullrot_every))
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
@@ -2592,7 +2595,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                         bestfrb = -10000;
                         bestfrrad = nanf("No good results.");
 
-                        if (!(iter % _fullrot_every))
+                        if (allow_ligand_360_flex && !(iter % _fullrot_every))
                         {
                             while ((M_PI*2-rad) > 1e-3)
                             {

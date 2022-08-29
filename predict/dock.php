@@ -194,7 +194,7 @@ $acv_matrix
 
 ACVNODE 1
 
-SIZE 7.0 7.5 7.0
+SIZE 8.0 8.5 8.0
 
 EXCL 1 $cyt1end		# Head, TMR1, and CYT1.
 EXCL $exr2start $exr2end	# EXR2 between TMR4 and TMR5.
@@ -232,7 +232,8 @@ else
 		if (count($outlines) >= 100) break;
 	}
 }
-// echo implode("\n", $outlines) . "\n\n";
+
+if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
 
 if (count($outlines) < 100) die("Docking FAILED.\n");
 

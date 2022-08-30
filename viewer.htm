@@ -544,6 +544,8 @@ var stage = new NGL.Stage("viewport");
 var gmodel = [], model = [], is_ligand = [], mrep = [], mrparams = [], mpos = [], mnod = [];
 var resmdl = [], mdlresno = [], restoggled = [];
 var acvmdl = false;
+var acvmatrix = [];
+var acvnode = -1;
 var curr_ligand = false, cen_ligand = false;
 var gpose = 1, gnode = 0;
 var orid;
@@ -1460,6 +1462,10 @@ function loadFile(fileData, fileName = "")
                     else if (ln.substr(0,4) == "ACV ")
                     {
                     	var fields = ln.split(" ");
+                    	if (fields.length < 10) continue;
+                    	
+                    	acvnode = n;
+                    	
                     	var j;
                     	if (!acvmdl)
                     	{
@@ -1471,6 +1477,35 @@ function loadFile(fileData, fileName = "")
 		                			break;
 		                		}
 		                	}
+                    	}
+                    	
+                    	var matrixln =
+                    	{
+                    		name: fields[1],
+                    		sr: parseInt(fields[2]),
+                    		er: parseInt(fields[3]),
+                    		nx: parseFloat(fields[4]),
+                    		ny: parseFloat(fields[5]),
+                    		nz: parseFloat(fields[6]),
+                    		cx: parseFloat(fields[7]),
+                    		cy: parseFloat(fields[8]),
+                    		cz: parseFloat(fields[9]),
+                    	};
+                    	
+                    	if (!acvmatrix.length) acvmatrix.push(matrixln);
+                    	else
+                    	{
+                    		var found = false;
+                    		for (j=0; j<acvmatrix.length; j++)
+                    		{
+                    			if (acvmatrix[j].name == matrixln.name)
+                    			{
+                    				acvmatrix[j] = matrixln;
+                    				found = true;
+                    				break;
+                    			}
+                    		}
+                    		if (!found) acvmatrix.push(matrixln);
                     	}
                     }
                     else if (ln.trim() == "PDBDAT:")
@@ -1552,6 +1587,15 @@ function loadFile(fileData, fileName = "")
                             protmp += ln + "\n";
                     }
                 }
+                
+                if (acvmdl)
+                {
+                	for (i=0; i<acvmatrix.length; i++)
+                	{
+                		// TODO: This is where you call the NGL functions to get the proxies etc.
+                	}
+                }
+                
                 window.setTimeout(function()
                 {
                     showPose(1);

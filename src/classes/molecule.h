@@ -61,6 +61,7 @@ public:
     int from_pdb(FILE* inf);				// returns number of atoms loaded.
     void identify_acidbase();				// called within every load.
     bool from_smiles(char const * smilesstr);
+    void clear_cache();
 
     // Getters.
     const char* get_name() const
@@ -76,6 +77,7 @@ public:
     Atom* get_nearest_atom(Point loc, intera_type capable_of) const;
     Point get_bounding_box() const;				// Return the +x+y+z vertex of a bounding box, including vdW radii, if center={0,0,0}.
     float get_charge();
+    int is_residue();
 
     // Spatial functions.
     Point get_barycenter(bool bond_weighted = false) const;
@@ -200,7 +202,9 @@ protected:
 };
 
 extern float potential_distance;
-
+extern float conformer_momenta_multiplier;
+extern bool allow_ligand_360_tumble;
+extern bool allow_ligand_360_flex;
 
 #endif
 

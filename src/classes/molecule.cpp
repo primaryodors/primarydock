@@ -16,6 +16,10 @@
 using namespace std;
 
 float potential_distance = 0;
+float conformer_momenta_multiplier = 1;
+
+bool allow_ligand_360_tumble = true;
+bool allow_ligand_360_flex = true;
 
 Molecule::Molecule(char const* lname)
 {
@@ -173,9 +177,9 @@ void Molecule::reset_conformer_momenta()
     lmx = _def_lin_momentum * sgn(0.5-(rand()&1));
     lmy = _def_lin_momentum * sgn(0.5-(rand()&1));
     lmz = _def_lin_momentum * sgn(0.5-(rand()&1));
-    amx = _def_ang_momentum * sgn(0.5-(rand()&1));
-    amy = _def_ang_momentum * sgn(0.5-(rand()&1));
-    amz = _def_ang_momentum * sgn(0.5-(rand()&1));
+    amx = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
+    amy = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
+    amz = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
 
     Bond** b = get_rotatable_bonds();
     int i;
@@ -184,7 +188,7 @@ void Molecule::reset_conformer_momenta()
     {
         for (i=0; b[i]; i++)
         {
-            b[i]->angular_momentum = _def_bnd_momentum * sgn(0.5-(rand()&1));
+            b[i]->angular_momentum = _def_bnd_momentum * conformer_momenta_multiplier * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
         }
     }
 }
@@ -286,6 +290,18 @@ void Molecule::clear_all_bond_caches()
         int i;
         for (i=0; b[i]; i++) b[i]->clear_moves_with_cache();
     }
+}
+
+int Molecule::is_residue()
+{
+    if (noAtoms(atoms)) return 0;
+    int i;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->residue) return atoms[i]->residue;
+    }
+    return 0;
 }
 
 void Molecule::hydrogenate(bool steric_only)
@@ -1257,7 +1273,6 @@ void Molecule::identify_acidbase()
 Bond** Molecule::get_rotatable_bonds()
 {
     if (noAtoms(atoms)) return 0;
-    if (rotatable_bonds) return rotatable_bonds;
     if (mol_typ == MOLTYP_AMINOACID)
     {
         // TODO: There has to be a better way.
@@ -1267,6 +1282,7 @@ Bond** Molecule::get_rotatable_bonds()
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
+    if (rotatable_bonds) return rotatable_bonds;
 
     Bond* btemp[65536];
     int mwblimit = atcount/2;						// Prevent rotations that move most of the molecule.
@@ -1371,6 +1387,11 @@ void Molecule::crumple(float theta)
     }
 }
 
+void Molecule::clear_cache()
+{
+    rotatable_bonds = nullptr;
+}
+
 // TODO: There has to be a better way.
 Bond** AminoAcid::get_rotatable_bonds()
 {
@@ -1378,7 +1399,10 @@ Bond** AminoAcid::get_rotatable_bonds()
     // Return ONLY side chain bonds, from lower to higher Greek. E.g. CA-CB but NOT CB-CA.
     // Exclude CA-N and CA-C as these will be managed by the Protein class.
     if (noAtoms(atoms)) return 0;
-    if (rotatable_bonds) return rotatable_bonds;
+
+    // TODO: Something is overwriting the cached rotatable_bonds, causing segfaults.
+    // So the cache is unusable for amino acids until the problem gets fixed.
+    // if (rotatable_bonds) return rotatable_bonds;
     if (aadef && aadef->proline_like)
     {
         // cout << "Proline-like! No rotbonds!" << endl;
@@ -1456,10 +1480,11 @@ Bond** AminoAcid::get_rotatable_bonds()
                             // cout << "Included." << endl;
 
                             if (greek_from_aname(la->name) < greek_from_aname(lb->btom->name))
-                                btemp[bonds++] = la->get_bond_between(lb->btom);
+                                btemp[bonds] = la->get_bond_between(lb->btom);
                             else
-                                btemp[bonds++] = lb->btom->get_bond_between(la);
-                            btemp[bonds] = 0;
+                                btemp[bonds] = lb->btom->get_bond_between(la);
+
+                            btemp[++bonds] = 0;
 
                             // cout << (name ? name : "(no name)") << ":" << *(btemp[bonds-1]) << endl;
                         }
@@ -2273,7 +2298,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && allow_ligand_360_tumble && !(iter % _fullrot_every))
                 {
                     // cout << endl;
                     while ((M_PI*2-rad) > 1e-3)
@@ -2342,7 +2367,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && allow_ligand_360_tumble && !(iter % _fullrot_every))
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
@@ -2412,7 +2437,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 bestfrb = 0;
                 bestfrrad = nanf("No good results.");
 
-                if (allow_mol_fullrot_iter && !(iter % _fullrot_every))
+                if (allow_mol_fullrot_iter && allow_ligand_360_tumble && !(iter % _fullrot_every))
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
@@ -2489,6 +2514,11 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
 
             #if allow_bond_rots
             /**** Bond Flexion ****/
+
+            #if active_persistence_noflex
+            if (!allow_ligand_flex && !mm[i]->is_residue()) continue;
+            #endif
+
             // cout << mm[i]->name << ": " << mm[i]->movability << endl;
             if (mm[i]->movability >= MOV_FLEXONLY)
             {
@@ -2565,7 +2595,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                         bestfrb = -10000;
                         bestfrrad = nanf("No good results.");
 
-                        if (!(iter % _fullrot_every))
+                        if (allow_ligand_360_flex && !(iter % _fullrot_every))
                         {
                             while ((M_PI*2-rad) > 1e-3)
                             {

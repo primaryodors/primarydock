@@ -1,0 +1,149 @@
+# Peptiditor script for deriving active-state conformational changes from bovine rhodopsin.
+#
+
+# Load the active protein.
+LOAD "pdbs/btRho/btRho.3dqb.active.pdb"
+
+REGION TMR1 34 63
+REGION TMR2 70 99
+REGION TMR3 110 140
+REGION TMR4 150 178
+REGION TMR5 202 238
+REGION TMR6 250 276
+REGION TMR7 285 310
+
+# UPRIGHT
+
+
+# Obtain the active helix termini.
+
+LET %i = 1
+_loop:
+
+LET %j = %TMR%i.s
+LET @an[%i]  = %j
+LET %j ++ 
+LET @an[%i] += %j
+LET %j ++ 
+LET @an[%i] += %j
+LET %j ++ 
+LET @an[%i] += %j
+
+LET @an[%i] /= 4
+
+# ECHO "TMR" %i ": Average of four residues starting at " %TMR%i.s " = " @an[%i]
+
+LET %j = %TMR%i.e
+LET @ac[%i]  = %j
+LET %j -- 
+LET @ac[%i] += %j
+LET %j -- 
+LET @ac[%i] += %j
+LET %j -- 
+LET @ac[%i] += %j
+
+LET @ac[%i] /= 4
+
+# ECHO "Got active start/end averages for TMR" %i "..."
+
+LET %i ++
+
+IF %i <= 7 GOTO _loop
+
+
+# Load the inactive protein.
+LOAD "pdbs/btRho/btRho.1u19.inactive.pdb"
+
+REGION TMR1 34 63
+REGION TMR2 70 99
+REGION TMR3 110 140
+REGION TMR4 150 178
+REGION TMR5 202 238
+REGION TMR6 250 276
+REGION TMR7 285 310
+
+# UPRIGHT
+
+
+# Obtain the inactive termini.
+
+LET %i = 1
+_loop1:
+
+LET %j = %TMR%i.s
+LET @in[%i]  = %j
+LET %j ++ 
+LET @in[%i] += %j
+LET %j ++ 
+LET @in[%i] += %j
+LET %j ++ 
+LET @in[%i] += %j
+
+LET @in[%i] /= 4
+
+# ECHO "TMR" %i ": Average of four residues starting at " %TMR%i.s " = " @in[%i]
+
+LET %j = %TMR%i.e
+LET @ic[%i]  = %j
+LET %j -- 
+LET @ic[%i] += %j
+LET %j -- 
+LET @ic[%i] += %j
+LET %j -- 
+LET @ic[%i] += %j
+
+LET @ic[%i] /= 4
+
+# ECHO "Got inactive start/end averages for TMR" %i "..."
+
+LET %i ++
+IF %i <= 7 GOTO _loop1
+
+
+# Center the data by subtracting the average.
+
+LET @avgdelta = 0
+
+LET %i = 1
+_loop3:
+
+LET @delta_n = @an[%i] - @in[%i]
+LET @delta_c = @ac[%i] - @ic[%i]
+
+LET @avgdelta += @delta_n
+LET @avgdelta += @delta_c
+
+LET %i ++
+IF %i <= 7 GOTO _loop3
+
+LET @avgdelta /= 14
+
+LET %i = 1
+_loop4:
+
+LET @an[%i] -= @avgdelta
+LET @ac[%i] -= @avgdelta
+
+LET %i ++
+IF %i <= 7 GOTO _loop4
+
+
+# Output the deltas.
+
+ECHO "# Activation matrix from btRho.pepd:"
+ECHO "$matrix ="
+ECHO "["
+
+LET %i = 1
+_loop2:
+
+LET @delta_n = @an[%i] - @in[%i]
+LET @delta_c = @ac[%i] - @ic[%i]
+
+ECHO "	'TMR" %i "' => [ " @delta_n.x ", " @delta_n.y ", " @delta_n.z ", " @delta_c.x ", " @delta_c.y ", " @delta_c.z " ],"
+
+LET %i ++
+
+IF %i <= 7 GOTO _loop2
+ECHO "];"
+# DUMP

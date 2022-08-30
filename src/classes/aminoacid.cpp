@@ -15,12 +15,12 @@ using namespace std;
 AADef aa_defs[256];
 char* override_aminos_dat=0;
 
-AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa)
+AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
 {
     if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
     movability = MOV_FLEXONLY;
-    from_pdb(instream);
+    from_pdb(instream, rno);
     base_internal_clashes = get_internal_clashes();
     mol_typ = MOLTYP_AMINOACID;
     prev_aa = prevaa;
@@ -920,12 +920,13 @@ void AminoAcid::save_pdb(FILE* os, int atomno_offset)
     }
 }
 
-int AminoAcid::from_pdb(FILE* is)
+int AminoAcid::from_pdb(FILE* is, int rno)
 {
     /*
               1111111111222222222233333333334444444444555555555566666666667777777777
     01234567890123456789012345678901234567890123456789012345678901234567890123456789
     ATOM     55  SG  CYS     4       6.721  -8.103   4.542  1.00001.00           S
+	ATOM   1091  N   LYS A1000     -15.894 -46.862 -74.510  1.00104.21           N  
     */
     char buffer[1024], origbuf[1024], res3let[5];
     int added=0, lasttell=0;
@@ -945,25 +946,43 @@ int AminoAcid::from_pdb(FILE* is)
 
         int thistell = ftell(is);
         strcpy(origbuf, buffer);
-        char** fields = chop_spaced_fields(buffer);
+        // char** fields = chop_spaced_fields(buffer);
+
+		char** fields = new char*[20];
+		int places[20] = {0, 6, 11, 17, 21, 22, 30, 38, 46, 54, 60, 76};
+		int i, j, k;
+		for (i=11; i>=0; i--)
+		{
+			fields[i] = new char[35];
+			j = places[i];
+
+			// Ltrim.
+			while (buffer[j] == ' ' && buffer[j+1] > 0) j++;
+
+			k = j+1;
+			while (buffer[k]) k++;			// Find zero.
+			// Rtrim.
+			for (k--; buffer[k] == ' '; k--) buffer[k] = 0;
+			
+			strcpy(fields[i], &buffer[j]);
+			buffer[places[i]] = 0;
+		}
 
         try
         {
             if (fields)
             {
-                int offset = 0;
+                int offset = 1;
                 // cout << fields[0] << endl;
+				if (!strcmp(fields[0], "ANISOU")) continue;
                 if (!strcmp(fields[0], "ATOM")
                         /*||
                         !strcmp(fields[0], "HETATM")*/
                    )
                 {
-                    // cout << "Resno " << fields[4] << " vs old " << resno << endl;
-                    if (!atoi(fields[4]) && atoi(fields[5])) offset++;
-
                     if (!residue_no)
                     {
-                        residue_no = atoi(fields[4+offset]);
+                        residue_no = atoi(fields[4+offset]) + rno;
                     }
 
                     if (!res3let[0])
@@ -975,11 +994,9 @@ int AminoAcid::from_pdb(FILE* is)
 
                     if (strcmp(res3let, fields[3])
                             ||
-                            residue_no != atoi(fields[4+offset])
+                            residue_no != (atoi(fields[4+offset])+rno)
                        )
                     {
-                        /*cout << res3let << "/" << fields[3] << " | " << residue_no << "/" << fields[4] << " | "
-                        	 << origbuf << endl << flush;*/
                         fseek(is, lasttell, SEEK_SET);
                         goto _return_added;
                     }
@@ -1014,7 +1031,7 @@ int AminoAcid::from_pdb(FILE* is)
                         a->is_backbone = true;
                     else a->is_backbone = false;
 
-                    a->residue = atoi(fields[4+offset]);
+                    a->residue = atoi(fields[4+offset])+rno;
                     strcpy(a->aa3let, fields[3]);
                     AADef* aaa=0;
 
@@ -1026,7 +1043,7 @@ int AminoAcid::from_pdb(FILE* is)
                             a->aaletter = aa_defs[i]._1let;
                             aaa = &aa_defs[i];
                             name = new char[10]; // aa_defs[i].name;
-                            sprintf(name, "%s%d", aa_defs[i]._3let, atoi(fields[4+offset]));
+                            sprintf(name, "%s%d", aa_defs[i]._3let, atoi(fields[4+offset])+rno);
                             break;
                         }
                     }
@@ -1578,6 +1595,18 @@ void AminoAcid::rotate(LocatedVector SCoord, float theta)
         Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
         m_mcoord->metal->move(&nl);
     }
+}
+
+void AminoAcid::renumber(int new_resno)
+{
+	residue_no = new_resno;
+	if (!atoms) return;
+
+	int i;
+	for (i=0; atoms[i]; i++)
+	{
+		atoms[i]->residue = residue_no;
+	}
 }
 
 void AminoAcid::delete_sidechain()

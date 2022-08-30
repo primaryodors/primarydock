@@ -215,7 +215,7 @@ void Protein::end_pdb(FILE* os)
     fprintf(os, "END\n");
 }
 
-int Protein::load_pdb(FILE* is)
+int Protein::load_pdb(FILE* is, int rno)
 {
     AminoAcid* restmp[65536];
     char buffer[1024];
@@ -234,6 +234,12 @@ int Protein::load_pdb(FILE* is)
             fgets(buffer, 1003, is);
 
             if (buffer[0] == 'A' &&
+                    buffer[1] == 'N' &&
+                    buffer[2] == 'I' &&
+                    buffer[3] == 'S'
+               )
+                continue;
+            if (buffer[0] == 'A' &&
                     buffer[1] == 'T' &&
                     buffer[2] == 'O' &&
                     buffer[3] == 'M'
@@ -251,7 +257,7 @@ int Protein::load_pdb(FILE* is)
                 {
                     if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
                     {
-                        AminoAcid* aa = new AminoAcid(is, prevaa);
+                        AminoAcid* aa = new AminoAcid(is, prevaa, rno);
                         restmp[rescount++] = aa;
                         restmp[rescount] = NULL;
                         prevaa = aa;
@@ -312,7 +318,7 @@ int Protein::load_pdb(FILE* is)
         _found_AA:
             ;
         }
-        catch (int ex)
+        catch (unsigned int ex)
         {
             // cout << "Exception " << ex << endl;
             switch (ex)
@@ -383,6 +389,7 @@ int Protein::load_pdb(FILE* is)
         try
         {
             residues[i] = restmp[i];
+            residues[i]->clear_cache();
             residues[i]->establish_internal_clash_baseline();
 
             Atom *atom = residues[i]->get_atom("N"), *btom;
@@ -416,7 +423,7 @@ int Protein::load_pdb(FILE* is)
     return rescount;
 }
 
-int  Protein::get_seq_length()
+int Protein::get_seq_length()
 {
     if (!sequence) return 0;
     int i;
@@ -430,7 +437,7 @@ std::string Protein::get_sequence()
     return std::string(sequence);
 }
 
-int  Protein::get_start_resno()
+int Protein::get_start_resno()
 {
     if (!residues) return 0;
     else return residues[0]->get_residue_no();
@@ -1335,7 +1342,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 void Protein::delete_residue(int resno)
 {
     if (!resno) return;
-    if (resno > get_seq_length()) return;
+    // if (resno > get_seq_length()) return;
     if (!residues) return;
 
     int i, j;
@@ -1346,6 +1353,7 @@ void Protein::delete_residue(int resno)
             for (j=i+1; residues[j-1]; j++)
             {
                 residues[j-1] = residues[j];
+                sequence[j-1] = sequence[j];
             }
             // TODO: sequence.
             ca = 0;
@@ -1362,10 +1370,20 @@ void Protein::delete_residues(int startres, int endres)
     for (i=startres; i<=endres; i++) delete_residue(i);
 }
 
+void Protein::renumber_residues(int startres, int endres, int new_startres)
+{
+    int i, j;
+    j = new_startres - startres;
+    for (i=0; residues[i]; i++) 
+    {
+        residues[i]->renumber(residues[i]->get_residue_no() + j);
+    }
+}
+
 void Protein::delete_sidechain(int resno)
 {
     if (!resno) return;
-    if (resno > get_seq_length()) return;
+    // if (resno > get_seq_length()) return;
     if (!residues) return;
 
     AminoAcid* aa = get_residue(resno);

@@ -57,9 +57,9 @@ foreach ($matrixADRB2 as $region => &$values)
 }
 
 // No increase in distance between TMR5 and TMR3 at the extracellular end.
-$matrixADRB2["TMR3"][0] -= 3;
+$matrixADRB2["TMR3"][0] -= 2;
 $matrixADRB2["TMR3"][2] -= 1;
-$matrixADRB2["TMR5"][0] += 3;
+$matrixADRB2["TMR5"][0] -= 1;
 $matrixADRB2["TMR5"][2] -= 1;
 
 

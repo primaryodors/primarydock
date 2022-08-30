@@ -543,6 +543,7 @@ function show_seqdd()
 var stage = new NGL.Stage("viewport");
 var gmodel = [], model = [], is_ligand = [], mrep = [], mrparams = [], mpos = [], mnod = [];
 var resmdl = [], mdlresno = [], restoggled = [];
+var acvmdl = false;
 var curr_ligand = false, cen_ligand = false;
 var gpose = 1, gnode = 0;
 var orid;
@@ -1352,7 +1353,7 @@ function loadFile(fileData, fileName = "")
 		                    var result = poresult.split("\n");
 		                    var lres = 0;
 		                    var tmpstr = "";
-		                    for (i=0; i<result.length; i++)
+		                    /*for (i=0; i<result.length; i++)
 		                    {
 		                        var ln = result[i];
 		                        var resno = parseInt(ln.substr(22,4));
@@ -1388,7 +1389,7 @@ function loadFile(fileData, fileName = "")
 		                        tmpstr += ln + "\n";
 		                        
 		                        $('#clip').trigger("input");
-		                    }
+		                    }*/
 				            if (tmpstr)
 				            {
 					        	var stringBlob5a = new Blob( [tmpstr], { type: 'text/plain'} );
@@ -1410,6 +1411,7 @@ function loadFile(fileData, fileName = "")
 									colorScheme: PODefRgnScheme,
 		                            metalness: mtl_cartoon,
 		                        });
+		                        comp3.setName("backbone");
 		                        gmodel.push(comp3);
 		                        $('#clip').trigger("input");
 			                });
@@ -1454,6 +1456,22 @@ function loadFile(fileData, fileName = "")
                     {
                         n = parseInt(ln.substr(6));
                         ligtmp += "REMARK 225 " + ln + "\n";
+                    }
+                    else if (ln.substr(0,4) == "ACV ")
+                    {
+                    	var fields = ln.split(" ");
+                    	var j;
+                    	if (!acvmdl)
+                    	{
+		                	for (j=0; j<gmodel.length; j++)
+		                	{
+		                		if (gmodel[j].name == "backbone")
+		                		{
+		                			acvmdl = JSON.parse(JSON.stringify(gmodel[j]));
+		                			break;
+		                		}
+		                	}
+                    	}
                     }
                     else if (ln.trim() == "PDBDAT:")
                     {

@@ -1299,6 +1299,16 @@ _try_again:
                         throw 0xbadf12e;
                     }
 
+                    // Output the activation for the viewer to recognize.
+                    cout << "ACV " << regname << " " << sr << " " << er
+                         << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
+                         << active_matrix_c[i].x << " " << active_matrix_c[i].y << " " << active_matrix_c[i].z
+                         << endl;
+                    if (output) *output << "ACV " << regname << " " << sr << " " << er
+                         << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
+                         << active_matrix_c[i].x << " " << active_matrix_c[i].y << " " << active_matrix_c[i].z
+                         << endl;
+
                     // Get the CA location of the C-terminus of the helix;
                     // Add the active_matrix_c to the result;
                     Point calign;

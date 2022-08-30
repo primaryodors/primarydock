@@ -2238,6 +2238,14 @@ void Ring::determine_type()
     else type = COPLANAR;
 }
 
+std::ostream& operator<<(std::ostream& os, const Atom& a)
+{
+    if (a.residue) os << a.residue << ":";
+    os << a.name;
+
+    return os;
+}
+
 std::ostream& operator<<(std::ostream& os, const Bond& b)
 {
     os << b.atom->name;

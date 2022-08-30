@@ -94,26 +94,93 @@
 #define POLYPRO1_OMEGA fiftyseventh*113
 
 
+// If using an activation matrix, active_persistence "rewards" the ligand for keeping
+// bindings to the same residues post-activation as pre-activation. The noflex option
+// prevents rotating the ligand's bonds in the node immediately after activation.
+#define active_persistence 1
+#define active_persistence_follow 1
+#define active_persistence_limit 16
+#define active_persistence_noflex 0
+#define active_persistence_ratio 5
+#define active_persistence_threshold 5
+
+#define redo_tumble_spheres_on_activation 0
+
+// Amount to reduce momenta for path nodes beyond zero. Since the point of path based
+// docking is to keep as closely as possible the same ligand pose and move it through
+// the protein, we want to minimize the ligand's conformational changes from node to
+// node. Linear momenta are not affected by this number. Angular momenta are multiplied
+// by this number, and bond rotation momenta by the square of this number.
+#define internode_momentum_mult 0.25
+
+// Switches for conformational space search.
 #define allow_axial_tumble 1
 #define allow_bond_rots 1
-#define allow_drift 1
-#define allow_mol_fullrot_iter 1
-#define allow_iter_cb 1
-#define allow_ligand_esp 1
 #define allow_linear_motion 1
-#define allow_tethered_rotations 1
-#define default_bestbind 0
-#define individual_clash_limit 20
 #define monte_carlo_axial 0
 #define monte_carlo_flex 1
+
+// Drift pulls the ligand towards the loneliest point if it encounters clashes.
+// Turning it off can cause the ligand to be ejected from the protein.
+#define allow_drift 1
+#define initial_drift 0.333
+
+// Allows full 360 degree whole molecule rotations to search for lower energy configurations.
+#define allow_mol_fullrot_iter 1
+
+// Turn off the 360 degree rotations for all but the zeroth node of a path.
+#define nodes_no_ligand_360_tumble 1
+#define nodes_no_ligand_360_flex 1
+
+// Iteration callback function feature.
+#define allow_iter_cb 1
+
+// Allows the ligand to "see through" shielding and anisotropy and seek the greatest
+// potential binding with residues, irrespective of whether the side chain is in an
+// optimum orientation in space.
+#define allow_ligand_esp 1
+
+// Uses the ligand's most strongly bound atom as the center for full molecule rotations,
+// instead of the barycenter, to prevent "letting go" of the strongest binding.
+#define allow_tethered_rotations 1
+
+// Reject any conformation where any single residue's total clashes exceed this threshold.
+#define individual_clash_limit 20
+
+// Overwrite the user supplied pocket center with the loneliest point as determined by
+// distances to the nearest residue atoms to the supplied pocket center.
 #define pocketcen_is_loneliest 1
+
+// Switches whether the best-binding algorithm is active by default, instead of tumble spheres.
+#define default_bestbind 0
+
+// For differential docking, whether to multimol_conform() all the protein's residues into an
+// optimized initial conformation before adding the ligand.
+#define preconform_protein 0
 #define default_pre_ligand_multimol_radius 15
 #define default_pre_ligand_flex_radius 10
 #define pre_ligand_iteration_ratio 1
+
+// Force the ligand to the new pocket center (or loneliest point) each node.
+#define recenter_ligand_each_node 0
+
+// Generate an output file called tmp/active.pdb containing the active matrix modified protein.
+#define save_active_protein 1
+
+// Whether to count van der Waals interactions towards the potential energies of candidate
+// starting poses in tumble spheres.
 #define tumble_spheres_include_vdW 1
+
+// Enable the EXCL feature of the config file.
 #define use_exclusions 1
 
+// Output PDB data to the command line even if an output file was specified.
+#define echo_pdb_data 0
+
 // Auto hydroxy makes geraniol fail in OR1A1. So does pre-rotate side chains.
+// Auto hydroxy was supposed to always point polar hydrogens towards nearby H-bond acceptors.
+// Prerot side chains was supposed to minimize clashes between the ligand and side chains after
+// choosing an initial candidate conformer from tumble spheres.
 #define allow_auto_hydroxy 0
 #define prerot_sidechains_from_ligand 0
 
@@ -127,6 +194,7 @@
 #define debug_break_on_move 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0
+#define _DBG_RESBMULT 0
 
 #endif
 

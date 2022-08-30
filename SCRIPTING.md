@@ -156,6 +156,15 @@ examples, the program will flex the range of 160-173 and attempt to reunite 173 
 default being 50.
 
 
+# DELETE
+Example:
+```
+DELETE 1 57     # Remove all residues before number 58.
+```
+
+Deletes a range of residues from the model of the protein in memory.
+
+
 # DUMP
 Example:
 ```
@@ -331,6 +340,17 @@ REGION $region_name %start_res %end_res
 ```
 
 Defines a region in the protein object, overwriting any existing region with the same name. Also creates the %region.s and %region.e variables.
+
+
+# RENUMBER
+Example:
+```
+RENUMBER 1058 9999 58   # Remove offset of 1000 from PDB data.
+```
+
+Renumbers all residues within the range specified by the first two arguments, so that the range will now start on the number given by the third
+argument. This is useful in cases where e.g. a chimeric peptide segment is prepended to a receptor, and the receptor's native residue numbers are offset 
+to compensate for the longer chain; after deleting the prepended segment, the remaining sequence can be restored to its original numbering.
 
 
 # SAVE

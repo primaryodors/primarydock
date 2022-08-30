@@ -108,7 +108,7 @@ int find_var_index(const char* varname, char** out_varname = nullptr)
                 if (*c == '%')
                 {
                     *c = 0;
-                    sprintf(buffer2, "%s%d%s", buffer, s.n, &c[strlen(buffer1)]);
+                    sprintf(buffer2, "%s%lld%s", buffer, s.n, &c[strlen(buffer1)]);
                 }
                 if (*c == '$')
                 {
@@ -350,7 +350,7 @@ char* interpret_single_string(const char* param)
         n = find_var_index(param);
         if (n<0) return buffer;
         n &= _VARNUM_MASK;
-        sprintf(buffer, "%d", script_var[n].value.n);
+        sprintf(buffer, "%lld", script_var[n].value.n);
         return buffer;
 
     case '&':
@@ -600,7 +600,7 @@ int main(int argc, char** argv)
             {
                 l = 1;
                 if (fields[l]) raise_error("Too many parameters given for CENTER.");
-                p.move_piece(1, p.get_seq_length(), Point(0,0,0));
+                p.move_piece(1, 9999, Point(0,0,0));
             }	// CENTER
 
             else if (!strcmp(fields[0], "UPRIGHT"))
@@ -609,7 +609,7 @@ int main(int argc, char** argv)
                 if (fields[l]) raise_error("Too many parameters given for UPRIGHT.");
 
                 int seql = p.get_seq_length();
-                p.move_piece(1, seql, Point(0,0,0));
+                p.move_piece(1, 9999, Point(0,0,0));
 
                 Point extracellular[256], cytoplasmic[256];
                 int exr_n=0, cyt_n=0;
@@ -642,7 +642,7 @@ int main(int argc, char** argv)
 
                 Rotation rot = align_points_3d(&exrdir, new Point(0,1e9,0), &cytdir);
 
-                p.rotate_piece(1, seql, rot, 0);
+                p.rotate_piece(1, 9999, rot, 0);
 
                 // TODO: Rotate to place TMR4 +Z to TMR1.
                 int sr = p.get_region_start("TMR4");
@@ -674,10 +674,25 @@ int main(int argc, char** argv)
 
                     rot = align_points_3d(&tmr4dir, new Point(0,0,1e9), &tmr1dir);
 
-                    p.rotate_piece(1, seql, rot, 0);
+                    p.rotate_piece(1, 9999, rot, 0);
 
                 }
             }	// UPRIGHT
+
+            else if (!strcmp(fields[0], "RENUMBER"))
+            {
+				l = 1;
+                int sr, er, nsr;
+                if (!fields[l]) raise_error((std::string)"Insufficient parameters given for " + (std::string)fields[0] + (std::string)".");
+                sr = interpret_single_int(fields[l++]);
+                if (!fields[l]) raise_error((std::string)"Insufficient parameters given for " + (std::string)fields[0] + (std::string)".");
+                er = interpret_single_int(fields[l++]);
+                if (!fields[l]) raise_error((std::string)"Insufficient parameters given for " + (std::string)fields[0] + (std::string)".");
+                nsr = interpret_single_int(fields[l++]);
+                if (fields[l]) raise_error((std::string)"Too many parameters given for " + (std::string)fields[0] + (std::string)".");
+
+				p.renumber_residues(sr, er, nsr);
+            }	// RENUMBER
 
             else if (!strcmp(fields[0], "SEARCH"))
             {
@@ -1017,6 +1032,18 @@ int main(int argc, char** argv)
 
                 if (er) p.delete_residues(sr, er);
                 else p.delete_residue(sr);
+
+				Star sv;
+
+                int seqlen = p.get_seq_length();
+                strcpy(buffer, "%SEQLEN");
+                sv.n = seqlen;
+				set_variable(buffer, sv);
+
+                strcpy(buffer, "$SEQUENCE");
+                sv.psz = new char[seqlen+4];
+                strcpy(sv.psz, p.get_sequence().c_str());
+				set_variable(buffer, sv);
             } // DELETE
 
             else if (!strcmp(fields[0], "MCOORD"))
@@ -1134,7 +1161,9 @@ int main(int argc, char** argv)
             {
                 if (!fields[1]) raise_error("Insufficient parameters given for LOAD.");
                 psz = interpret_single_string(fields[1]);
-                if (fields[2]) raise_error("Too many parameters given for LOAD.");
+				n = 0;
+				// if (fields[2]) n = atoi(fields[2]);
+                if (fields[2] /*&& fields[3]*/) raise_error("Too many parameters given for LOAD.");
 
                 pf = fopen(psz, "rb");
                 if (!pf)
@@ -1142,70 +1171,56 @@ int main(int argc, char** argv)
                     raise_error( (std::string)"Failed to open " + (std::string)psz + (std::string)" for reading.");
                     return 0xbadf12e;
                 }
-                p.load_pdb(pf);
+                p.load_pdb(pf, n);
 
                 fclose(pf);
 
             _prot_deets:
 
-                script_var[vars].name = "$PDB";
-                script_var[vars].value.psz = new char[strlen(psz)+4];
-                script_var[vars].vt = SV_STRING;
-                strcpy(script_var[vars].value.psz, psz);
-                vars++;
+				char buffer[1024];
+				char buffer1[1024];
+				Star sv;
+
+				strcpy(buffer, "$PDB");
+				sv.psz = new char[strlen(psz)+4];
+                strcpy(sv.psz, psz);
+				set_variable(buffer, sv);
 
                 const char* pname = p.get_name().c_str();
-                script_var[vars].name = "$PROTEIN";
-                script_var[vars].value.psz = new char[strlen(pname)+4];
-                script_var[vars].vt = SV_STRING;
-                strcpy(script_var[vars].value.psz, pname);
-                vars++;
+                strcpy(buffer, "$PROTEIN");
+                sv.psz = new char[strlen(pname)+4];
+                strcpy(sv.psz, pname);
+				set_variable(buffer, sv);
 
                 delete[] psz;
 
                 int seqlen = p.get_seq_length();
-                script_var[vars].name = "%SEQLEN";
-                script_var[vars].vt = SV_INT;
-                script_var[vars].value.n = seqlen;
-                vars++;
+                strcpy(buffer, "%SEQLEN");
+                sv.n = seqlen;
+				set_variable(buffer, sv);
 
-                script_var[vars].name = "$SEQUENCE";
-                script_var[vars].value.psz = new char[seqlen+4];
-                script_var[vars].vt = SV_STRING;
-                strcpy(script_var[vars].value.psz, p.get_sequence().c_str());
-                vars++;
+                strcpy(buffer, "$SEQUENCE");
+                sv.psz = new char[seqlen+4];
+                strcpy(sv.psz, p.get_sequence().c_str());
+				set_variable(buffer, sv);
 
                 std::vector<std::string> rem_hx = p.get_remarks("650 HELIX");
                 for (l=0; l<rem_hx.size(); l++)
                 {
-                    char buffer[1024];
-                    char buffer1[1024];
                     strcpy(buffer, rem_hx[l].c_str());
                     char** fields = chop_spaced_fields(buffer);
 
-                    Star sv;
+					if (!fields[3] || !fields[4] || !fields[5]) continue;
 
                     sprintf(buffer1, "%c%s.s", '%', fields[3]);
                     sv.n = atoi(fields[4]);
                     set_variable(buffer1, sv);
 
-                    /*
-                    script_var[vars].name = buffer1;
-                    script_var[vars].vt = SV_INT;
-                    script_var[vars].value.n = atoi(fields[4]);
-                    vars++;
-                    */
-
                     sprintf(buffer1, "%c%s.e", '%', fields[3]);
-                    sv.n = atoi(fields[3]);
+                    sv.n = atoi(fields[5]);
                     set_variable(buffer1, sv);
 
-                    /*
-                    script_var[vars].name = buffer1;
-                    script_var[vars].vt = SV_INT;
-                    script_var[vars].value.n = atoi(fields[5]);
-                    vars++;
-                    */
+					p.set_region(fields[3], atoi(fields[4]), atoi(fields[5]));
 
                     delete[] fields;
                 }

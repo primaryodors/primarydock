@@ -27,7 +27,7 @@ struct Rotation;
 
 union Star
 {
-    int n;
+    long long n;
     float f;
     char* psz;
     const char* cpsz;
@@ -58,6 +58,10 @@ enum STR_PAD {STR_PAD_RIGHT, STR_PAD_LEFT, STR_PAD_BOTH};
 std::string str_pad(const std::string &str, int pad_length, std::string pad_string=" ", STR_PAD pad_type=STR_PAD_RIGHT);
 std::string cardinality_printable(float card);
 
+#if active_persistence
+float residue_binding_multiplier(int resno);
+#endif
+
 // From here: https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
 template <typename T> int sgn(T val)
 {
@@ -77,6 +81,10 @@ extern bool last_iter;
 extern bool differential_dock;
 extern float pre_ligand_multimol_radius;
 extern float pre_ligand_flex_radius;
+
+#if active_persistence_noflex
+extern bool allow_ligand_flex;
+#endif
 
 #endif
 

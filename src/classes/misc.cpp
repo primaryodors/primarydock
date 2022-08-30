@@ -17,6 +17,13 @@ bool differential_dock = false;
 float pre_ligand_multimol_radius = default_pre_ligand_multimol_radius;
 float pre_ligand_flex_radius = default_pre_ligand_flex_radius;
 
+#if active_persistence
+int active_persistence_resno[active_persistence_limit];
+#endif
+
+#if active_persistence_noflex
+bool allow_ligand_flex = true;
+#endif
 
 int in_array(void* needle, void** haystack)
 {
@@ -248,7 +255,19 @@ std::string cardinality_printable(float card)
     return retval;
 }
 
+#if active_persistence
+float residue_binding_multiplier(int resno)
+{
+    int i;
+    for (i=0; i<active_persistence_limit; i++)
+    {
+        if (!active_persistence_resno[i]) return 1;
+        if (active_persistence_resno[i] == resno) return active_persistence_ratio;
+    }
 
+    return 1;
+}
+#endif
 
 
 

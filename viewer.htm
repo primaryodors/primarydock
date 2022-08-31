@@ -1129,6 +1129,10 @@ $("#clip").on("input", function (e, obj)
             obj.setParameters( { "clipNear": clipValue } );
         });
     }
+    if (acvmdl) acvmdl.eachRepresentation( function(obj)
+    {
+        obj.setParameters( { "clipNear": clipValue } );
+    });
     for (i=0; i<resmdl.length; i++)
     {
     	resmdl[i].eachRepresentation( function(obj)

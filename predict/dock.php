@@ -224,7 +224,7 @@ ITER 50
 # DIFF
 # ELIM 100
 
-OUT output/$protid-$ligname.pred.dock
+OUT output/$protid/$protid-$ligname.pred.dock
 
 
 

@@ -20,10 +20,10 @@ $matrixbtRho["TMR6"][2] += 3;
 $matrixbtRho["TMR6"][5] += 1;
 
 // Equalize Y displacements.
-foreach ($matrixbtRho as $region => &$values)
+foreach ($matrixbtRho as $region => $values)
 {
 	$y = ($values[1] + $values[4])/2;
-	$values[1] = $values[4] = $y;
+	$matrixbtRho[$region][1] = $matrixbtRho[$region][4] = $y;
 }
 
 // No increase in distance between TMR5 and TMR3 at the extracellular end.
@@ -50,10 +50,10 @@ $matrixADRB2 =
 ];
 
 // Equalize Y displacements.
-foreach ($matrixADRB2 as $region => &$values)
+foreach ($matrixADRB2 as $region => $values)
 {
 	$y = ($values[1] + $values[4])/2;
-	$values[1] = $values[4] = $y;
+	$matrixADRB2[$region][1] = $atrixADRB2[$region][4] = $y;
 }
 
 // No increase in distance between TMR5 and TMR3 at the extracellular end.

@@ -314,6 +314,50 @@ function getParameterByName(name, url)
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 /******************************************************************************/
+
+function rotate3D(point, source, axis, theta)
+{
+    // copied from http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
+
+    if (!source)
+    {
+        source = {x:0, y:0, z:0};
+    }
+
+    if (!axis.x && !axis.y && !axis.z) return point;
+
+    var x = point.x, y = point.y, z = point.z;
+    var axisr = Math.sqrt(axis.x*axis.x, axis.y*axis.y, axis.z*axis.z);
+    var u = axis.x / axisr, v = axis.y / axisr, w = axis.z / axisr;
+    var a, b, c;
+    if (source)
+    {
+        a = source.x;
+        b = source.y;
+        c = source.z;
+    }
+    else a = b = c = 0;
+    var u2 = u*u;
+    var v2 = v*v;
+    var w2 = w*w;
+    var sint = Math.sin(theta), cost = Math.cos(theta), _1_cost = (1.0 - cost);
+
+    var x1 = (a * (v2+w2) - u * (b*v + c*w - u*x - v*y - w*z)) * _1_cost
+           + x * cost
+           + (-c*v + b*w - w*y + v*z) * sint;
+
+    var y1 = (b * (u2+w2) - v * (a*u + c*w - u*x - v*y - w*z)) * _1_cost
+           + y * cost
+           + ( c*u - a*w + w*x - u*z) * sint;
+
+    var z1 = (c * (u2+v2) - w * (a*u + b*v - u*x - v*y - w*z)) * _1_cost
+           + z * cost
+           + (-b*u + a*v - v*x + u*y) * sint;
+
+    pt = {x:x1, y:y1, z:z1};
+    return pt;
+}
+
 </script>
 </head>
 <body bgcolor="#000">
@@ -544,7 +588,7 @@ var stage = new NGL.Stage("viewport");
 var gmodel = [], model = [], is_ligand = [], mrep = [], mrparams = [], mpos = [], mnod = [];
 var resmdl = [], mdlresno = [], restoggled = [];
 var acvmdl = false;
-var acvmatrix = [];
+var acvmatrix = [], acvrot8 = [];
 var acvnode = 387420489;
 var curr_ligand = false, cen_ligand = false;
 var gpose = 1, gnode = 0;
@@ -1449,7 +1493,62 @@ function loadFile(fileData, fileName = "")
 		                        gmodel.push(comp3);
 		                        $('#clip').trigger("input");
 		                        
-		                        if (acvmatrix.length)
+		                        if (acvrot8.length)
+		                        {
+						        	var j;
+						        	if (!acvmdl)
+						        	{
+								    	for (j=0; j<gmodel.length; j++)
+								    	{
+								    		if (gmodel[j].name == "backbone")
+								    		{
+								    			// acvmdl = JSON.parse(JSON.stringify(gmodel[j]));
+								    			stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp8 )
+		                    					{
+		                    						acvmdl = comp8;
+		                    						
+		                    						if (acvmdl)
+													{
+														// Call the NGL functions to get the proxies etc.
+														acvmdl.structure.eachResidue(function(res_proxy)
+														{
+															var i;
+															for (i=0; i<acvrot8.length; i++)
+															{
+																if (res_proxy.resno >= acvrot8[i].sr && res_proxy.resno <= acvrot8[i].er)
+																{
+																	var lrot8 = acvrot8[i];
+																	var ox = lrot8.ox, oy = lrot8.oy, oz = lrot8.oz;
+																	var ax = lrot8.ax, ay = lrot8.ay, az = lrot8.az;
+																	var origin = { x:ox, y:oy, z:oz };
+																	var axis   = { x:ax, y:ay, z:az };
+																	res_proxy.eachAtom(function(a_proxy)
+																	{
+																		var rotated = rotate3D( 
+																			{
+																				x:a_proxy.x + acvrot8[i].tx, 
+																				y:a_proxy.y + acvrot8[i].ty,
+																				z:a_proxy.z + acvrot8[i].tz
+																			},
+																			origin,
+																			axis,
+																			acvrot8[i].angle
+																		);
+																		a_proxy.x = rotated.x;
+																		a_proxy.y = rotated.y;
+																		a_proxy.z = rotated.z;
+																	});
+																}
+															}		// end each acvrot8.
+														});		// end each residue.
+													}		// end if acvmdl.
+		                    					});
+								    			break;
+								    		}		// end if name backbone.
+								    	}		// end for gmodel.
+						        	}		// end if not acvmdl.
+		                        }		// if acvrot8 length
+		                        else if (acvmatrix.length)
 		                		{
 						        	var j;
 						        	if (!acvmdl)
@@ -1541,7 +1640,7 @@ function loadFile(fileData, fileName = "")
                         n = parseInt(ln.substr(6));
                         ligtmp += "REMARK 225 " + ln + "\n";
                     }
-                    else if (ln.substr(0,4) == "ACV ")
+                    else if (ln.substr(0,4) == "ACM ")
                     {
                     	var fields = ln.split(" ");
                     	if (fields.length < 11) continue;
@@ -1578,6 +1677,49 @@ function loadFile(fileData, fileName = "")
                     		if (!found) acvmatrix.push(matrixln);
                     	}
                     }
+                    else if (ln.substr(0,4) == "ACR ")
+                    {
+                    	var fields = ln.split(" ");
+                    	if (fields.length < 11) continue;
+                    	
+                    	acvnode = parseInt(fields[1]);
+                    	
+                    	acvmatrix = [];
+                    	
+                    	var rot8ln =
+                    	{
+                    		name: fields[2],
+                    		sr: parseInt(fields[3]),
+                    		er: parseInt(fields[4]),
+                    		tx: parseFloat(fields[5]),			// transform xyz.
+                    		ty: parseFloat(fields[6]),
+                    		tz: parseFloat(fields[7]),
+                    		ox: parseFloat(fields[8]),			// origin xyz.
+                    		oy: parseFloat(fields[9]),
+                    		oz: parseFloat(fields[10]),
+                    		ax: parseFloat(fields[11]),			// axis xyz, relative to origin.
+                    		ay: parseFloat(fields[12]),
+                    		az: parseFloat(fields[13]),
+                    		angle: parseFloat(fields[14]),		// radians.
+                    	};
+                    	
+                    	if (!acvrot8.length) acvrot8.push(rot8ln);
+                    	else
+                    	{
+                    		var j;
+                    		var found = false;
+                    		for (j=0; j<acvrot8.length; j++)
+                    		{
+                    			if (acvrot8[j].name == rot8ln.name)
+                    			{
+                    				acvrot8[j] = rot8ln;
+                    				found = true;
+                    				break;
+                    			}
+                    		}
+                    		if (!found) acvrot8.push(rot8ln);
+                    	}
+                	}
                     else if (ln.trim() == "PDBDAT:")
                     {
                         if (p>0) writing = true;

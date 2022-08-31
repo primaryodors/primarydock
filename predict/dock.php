@@ -123,6 +123,67 @@ switch ($fam)
 	$cenres = "CEN RES $cenr3_33 $cenr3_36 $cenr5_43 $cenr5_47 $cenr6_40 $cenr6_47";
 }
 
+// If the matrix has a global skew, neutralize it.
+$up = [0.0,0.0,0.0];
+$dn = [0.0,0.0,0.0];
+$upq = $dnq = 0;
+foreach ($matrix as $region => $coords)
+{
+	if (substr($region, 0, 3) == "TMR")
+	{
+		$tmrno = intval(substr($region, 3));
+		if ($tmrno & 1)			// Odd numbered TMRs descend, so "up" is N-terminus and "down" is C-terminus.
+		{
+			for ($j=0; $j<2; $j++) $up[$j] += $coords[$j];
+			$upq++;
+			
+			if ($tmrno != 5)
+			{
+				for ($j=0; $j<2; $j++) $dn[$j] += $coords[$j+3];
+				$dnq++;
+			}
+		}
+		else					// Even numbered TMRs go the other way.
+		{
+			for ($j=0; $j<2; $j++) $up[$j] += $coords[$j+3];
+			$upq++;
+			
+			if ($tmrno != 6)
+			{
+				for ($j=0; $j<2; $j++) $dn[$j] += $coords[$j];
+				$dnq++;
+			}
+		}
+	}
+}
+
+if ($upq) for ($j=0; $j<2; $j++) $up[$j] /= $upq;
+if ($dnq) for ($j=0; $j<2; $j++) $dn[$j] /= $dnq;
+
+foreach ($matrix as $region => $coords)
+{
+	if (substr($region, 0, 3) == "TMR")
+	{
+		$tmrno = intval(substr($region, 3));
+		if ($tmrno & 1)
+		{
+			for ($j=0; $j<2; $j++) $matrix[$region][$j  ] -= $up[$j];
+			for ($j=0; $j<2; $j++) $matrix[$region][$j+3] -= $dn[$j];
+		}
+		else
+		{
+			for ($j=0; $j<2; $j++) $matrix[$region][$j  ] -= $dn[$j];
+			for ($j=0; $j<2; $j++) $matrix[$region][$j+3] -= $up[$j];
+		}
+		
+		// Flatten the motion to the XZ plane.
+		//$matrix[$region][1] = $matrix[$region][4] = 0;
+	}
+	
+	foreach ($coords as $i => $c) $matrix[$region][$i] = round($matrix[$region][$i], 3);
+}
+
+
 $tmr2start = $prots[$protid]['region']['TMR2']['start'];
 $cyt1end = $tmr2start - 1;
 $tmr4end = $prots[$protid]['region']['TMR4']['end'];

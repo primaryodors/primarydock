@@ -24,7 +24,7 @@ UPRIGHT
 
 SAVE "pdbs/ADRB2/ADRB2.active.pdb"
 
-LET %termin = 7
+LET %termin = 4
 
 # Obtain the active helix termini.
 
@@ -120,20 +120,21 @@ LET %i = 1
 _loop3:
 
 LET %odd = %i & 1
+LET %even = 1 - %odd
 
 LET @delta_n = @an[%i] - @in[%i]
 LET @delta_c = @ac[%i] - @ic[%i]
 
 IF %odd THEN LET @avgdeltae += @delta_n
-ELSE LET @avgdeltac += @delta_n
-IF %odd THEN LET @avgdeltac += @delta_c
-ELSE LET @avgdeltae += @delta_c
+IF %even THEN IF %i != 6 THEN LET @avgdeltac += @delta_n
+IF %odd THEN IF %i != 5 THEN LET @avgdeltac += @delta_c
+IF %even THEN LET @avgdeltae += @delta_c
 
 LET %i ++
 IF %i <= 7 GOTO _loop3
 
 LET @avgdeltae /= 7
-LET @avgdeltac /= 7
+LET @avgdeltac /= 5
 
 LET %i = 1
 _loop4:

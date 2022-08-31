@@ -483,6 +483,7 @@ int main(int argc, char** argv)
         char buffer1[1024];
         for (m=0; m<1024; m++) buffer[m] = buffer1[m] = '\0';
         strcpy(buffer, script_lines[program_counter].c_str());
+        if (buffer[0] == '#') continue;
         char** fields = chop_spaced_fields(buffer);
         char** ofields = fields;
         if (fields && fields[0] && fields[0][0] && fields[0][1])

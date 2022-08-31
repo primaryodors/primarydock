@@ -256,8 +256,9 @@ supported, i.e. straightforward comparison of two values, where either value can
 as A > B + 1 do not yet work.
 
 `IF` can be used to test a single variable, as in the `IF %var THEN` statement in the examples. For this syntax, the `THEN` keyword is required,
-otherwise the interpreter would treat the following statement (in this case `ECHO`) as an unrecognized operator and throw an error. All other
-times, the `THEN` keyword is optional.
+otherwise the interpreter would treat the following statement (in this case `ECHO`) as an unrecognized operator and throw an error. This also
+means `IF %foo AND %bar` will not work; the syntax instead would have to be `IF %foo THEN IF %bar THEN` [statement]. All other times, the `THEN`
+keyword is optional.
 
 `AND` and `OR` are supported, however parentheses are not, and while an unlimited number of `AND`s and/or `OR`s can be chained together, their
 evaluation will be entirely sequential and the chain will evaluate false as soon as any chain of `OR`ed expressions all evaluate false. Note that

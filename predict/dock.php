@@ -292,7 +292,7 @@ $average = [];
 
 foreach ($sum as $node => $value)
 {
-	$average[$node?"Active":"Inactive"] = $value / (@$count[$node] ?: 1);
+	$average[$node?"Active":"Inactive"] = round($value / (@$count[$node] ?: 1), 3);
 }
 
 if (min($average) > 0 || !isset($average["Active"]) || !isset($average["Inactive"]))

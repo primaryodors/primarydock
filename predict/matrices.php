@@ -65,11 +65,14 @@ foreach ($matrixADRB2 as $region => $values)
 	$matrixADRB2[$region][1] = $atrixADRB2[$region][4] = $y;
 }
 
-// No increase in distance between TMR5 and TMR3 at the extracellular end.
-$matrixADRB2["TMR3"][0] -= 2;
+// No increase in distance between TMR5 and TMR3 at the extracellular end
+// or TMR7 and TMR3 overall.
+// $matrixADRB2["TMR3"][0] -= 2;
 $matrixADRB2["TMR3"][2] -= 1;
-$matrixADRB2["TMR5"][0] -= 1;
+$matrixADRB2["TMR5"][0] += 1;
 $matrixADRB2["TMR5"][2] -= 1;
+$matrixADRB2["TMR7"][2] += 2;
+$matrixADRB2["TMR7"][5] += 2;
 
 
 

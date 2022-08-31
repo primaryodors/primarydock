@@ -33,8 +33,9 @@ _loop:
 
 LET %j = %TMR%i.s
 LET %n = 0
+LET @an[%i]  = 0
 _loopn:
-LET @an[%i]  = %j
+LET @an[%i] += %j
 LET %j ++ 
 LET %n ++
 IF %n < %termin GOTO _loopn
@@ -44,8 +45,9 @@ LET @an[%i] /= %n
 
 LET %j = %TMR%i.e
 LET %n = 0
+LET @ac[%i]  = 0
 _loopn1:
-LET @ac[%i]  = %j
+LET @ac[%i] += %j
 LET %j -- 
 LET %n ++
 IF %n < %termin GOTO _loopn1
@@ -85,8 +87,9 @@ _loop1:
 
 LET %j = %TMR%i.s
 LET %n = 0
+LET @in[%i]  = 0
 _loopn2:
-LET @in[%i]  = %j
+LET @in[%i] += %j
 LET %j ++ 
 LET %n ++
 IF %n < %termin GOTO _loopn2
@@ -97,8 +100,9 @@ LET @in[%i] /= %n
 
 LET %j = %TMR%i.e
 LET %n = 0
+LET @ic[%i]  = 0
 _loopn3:
-LET @ic[%i]  = %j
+LET @ic[%i] += %j
 LET %j -- 
 LET %n ++
 IF %n < %termin GOTO _loopn3

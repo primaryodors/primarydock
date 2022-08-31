@@ -111,7 +111,8 @@ switch ($fam)
 	break;
 	
 	default:
-	$matrix = $matrixbtRho;
+	// $matrix = $matrixbtRho;
+	$matrix = $matrixADRB2;
 	
 	$cenr3_33 = resno_from_bw($protid, "3.33");
 	$cenr3_36 = $cenr3_33 + 3;

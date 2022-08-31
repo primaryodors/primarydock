@@ -20,10 +20,10 @@ $matrixbtRho["TMR6"][2] += 3;
 $matrixbtRho["TMR6"][5] += 1;
 
 // Equalize Y displacements.
-foreach ($matrixbtRho as $region => &$values)
+foreach ($matrixbtRho as $region => $values)
 {
 	$y = ($values[1] + $values[4])/2;
-	$values[1] = $values[4] = $y;
+	$matrixbtRho[$region][1] = $matrixbtRho[$region][4] = $y;
 }
 
 // No increase in distance between TMR5 and TMR3 at the extracellular end.
@@ -40,6 +40,15 @@ $matrixbtRho["TMR7"][5] -= 2;
 # Immutable constant matrix values from ADRB2.pepd:
 $matrixADRB2 =
 [
+	'TMR1' => [ -2.085747,  0.999165,  0.541523,  1.020317,  1.053394, -0.199436 ],
+	'TMR2' => [  1.129009,  0.317494, -0.306988,  1.990764,  0.589531,  0.498978 ],
+	'TMR3' => [ -0.022305,  2.830252, -0.478422, -1.630260, -2.362782, -2.084335 ],
+	'TMR4' => [ -0.949617,  2.118883, -0.106400,  0.695188,  1.876172, -0.352305 ],
+	'TMR5' => [ -0.554503,  0.253982, -0.713764, -3.321620, -3.699797, -1.339733 ],
+	'TMR6' => [ -5.414646, -3.399853, -2.154629, -0.162962, -4.181121, -0.244171 ],
+	'TMR7' => [  0.139566, -2.368006,  0.748169,  0.430550, -1.126986,  2.697166 ],
+];
+/*[
 	'TMR1' => [  1.928375, -0.231194,  1.514458, -1.745764,  3.297985, -0.673183 ],
 	'TMR2' => [ -1.637074,  2.562085, -0.780735,  6.004886, -0.640827,  1.471912 ],
 	'TMR3' => [  3.991817,  1.599894,  0.494513, -4.396341, -0.118191, -2.558083 ],
@@ -47,20 +56,23 @@ $matrixADRB2 =
 	'TMR5' => [  3.459619, -0.976376,  0.259171, -6.087701, -1.455206, -1.813480 ],
 	'TMR6' => [ -8.180727, -1.155262, -2.628376,  3.851160, -5.411479,  0.728764 ],
 	'TMR7' => [  4.153688, -3.598364,  1.721104, -2.335531,  1.117605,  2.223419 ],
-];
+];*/
 
 // Equalize Y displacements.
-foreach ($matrixADRB2 as $region => &$values)
+foreach ($matrixADRB2 as $region => $values)
 {
 	$y = ($values[1] + $values[4])/2;
-	$values[1] = $values[4] = $y;
+	$matrixADRB2[$region][1] = $atrixADRB2[$region][4] = $y;
 }
 
-// No increase in distance between TMR5 and TMR3 at the extracellular end.
-$matrixADRB2["TMR3"][0] -= 2;
+// No increase in distance between TMR5 and TMR3 at the extracellular end
+// or TMR7 and TMR3 overall.
+// $matrixADRB2["TMR3"][0] -= 2;
 $matrixADRB2["TMR3"][2] -= 1;
-$matrixADRB2["TMR5"][0] -= 1;
+$matrixADRB2["TMR5"][0] += 1;
 $matrixADRB2["TMR5"][2] -= 1;
+$matrixADRB2["TMR7"][2] += 2;
+$matrixADRB2["TMR7"][5] += 2;
 
 
 

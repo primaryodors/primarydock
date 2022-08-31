@@ -1142,6 +1142,7 @@ int main(int argc, char** argv)
     #endif
 
     found_poses = 0;
+    int wrote_acvmx = -1;
 _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
@@ -1308,7 +1309,39 @@ _try_again:
                     p.move_piece(sr, er, active_matrix_n[i].add(p.get_region_center(sr, er)));
 
                     // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
-                    p.rotate_piece(sr, er, er, calign, sr);
+                    LocRotation lrot = p.rotate_piece(sr, er, er, calign, sr);
+                    lrot.v.r = 1;
+
+                    if (wrote_acvmx < i)
+                    {
+                        #if write_activation_matrix
+                        // Output the activation for the viewer to recognize.
+                        cout << "ACM " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                            << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
+                            << active_matrix_c[i].x << " " << active_matrix_c[i].y << " " << active_matrix_c[i].z
+                            << endl;
+                        if (output) *output << "ACM " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                            << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
+                            << active_matrix_c[i].x << " " << active_matrix_c[i].y << " " << active_matrix_c[i].z
+                            << endl;
+                        #endif
+
+                        #if write_active_rotation
+                        Point lrv(lrot.v);
+                        cout << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                            << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
+                            << lrot.origin.x << " " << lrot.origin.y << " " << lrot.origin.z << " "
+                            << lrv.x << " " << lrv.y << " " << lrv.z << " "
+                            << lrot.a << endl;
+                        if (output) *output << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                            << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
+                            << lrot.origin.x << " " << lrot.origin.y << " " << lrot.origin.z << " "
+                            << lrv.x << " " << lrv.y << " " << lrv.z << " "
+                            << lrot.a << endl;
+                        #endif
+
+                        wrote_acvmx = i;
+                    }
                 }
 
                 #if active_persistence_follow

@@ -503,6 +503,8 @@ int main(int argc, char** argv)
             for (n=0; fields[n]; n++) cout << (n?"|":"") << fields[n];
             cout << endl;*/
 
+            if (!fields[0]) goto _pc_continue;
+
             if (fields[0][strlen(fields[0])-1] == ':') goto _pc_continue;
 
         _interpret_command:
@@ -1277,6 +1279,8 @@ int main(int argc, char** argv)
                     else if (!strcmp(fields[2], "-=")) script_var[n].value.n -= interpret_single_int(fields[3]);
                     else if (!strcmp(fields[2], "*=")) script_var[n].value.n *= interpret_single_int(fields[3]);
                     else if (!strcmp(fields[2], "/=")) script_var[n].value.n /= interpret_single_int(fields[3]);
+                    else if (!strcmp(fields[2], "&=")) script_var[n].value.n &= interpret_single_int(fields[3]);
+                    else if (!strcmp(fields[2], "|=")) script_var[n].value.n |= interpret_single_int(fields[3]);
                     else if (!strcmp(fields[2], "++")) script_var[n].value.n++;
                     else if (!strcmp(fields[2], "--")) script_var[n].value.n--;
                     else
@@ -1440,6 +1444,8 @@ int main(int argc, char** argv)
                         else if (!strcmp(fields[4+l], "*")) script_var[n].value.n *= m;
                         else if (!strcmp(fields[4+l], "/")) script_var[n].value.n /= m;
                         else if (!strcmp(fields[4+l], "^")) script_var[n].value.n = pow(script_var[n].value.n, m);
+                        else if (!strcmp(fields[4+l], "&")) script_var[n].value.n &= m;
+                        else if (!strcmp(fields[4+l], "|")) script_var[n].value.n |= m;
                         else
                         {
                             raise_error( (std::string)"Bad operator " + (std::string)fields[4+l] + (std::string)" for int.");
@@ -1583,6 +1589,12 @@ int main(int argc, char** argv)
 
                 // If the operator is =, and both l-value and r-value are strings, do a direct comparison.
                 if (!fields[l]) raise_error("Insufficient parameters given for IF.");
+                if (!strcmp(fields[l], "THEN"))
+                {
+                    l--;
+                    if (interpret_single_float(fields[l])) goto _evaluated_true;
+                    else goto _evaluated_false;
+                }
                 if (!strcmp(fields[l], "="))
                 {
                     if (!fields[l+1]) raise_error("Insufficient parameters given for IF.");
@@ -1642,6 +1654,7 @@ int main(int argc, char** argv)
 
             _evaluated_true:
                 l += 2;
+                if (!strcmp(fields[l], "THEN")) l++;
                 fields = &fields[l];
 
                 if (!fields[0]) goto _pc_continue;

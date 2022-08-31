@@ -106,6 +106,15 @@
 
 #define redo_tumble_spheres_on_activation 0
 
+// Output the activation matrix or the transmembrane regions' active rotations so that
+// the viewer can update its cartoon backbone.
+// Only one of these switches is actually necessary.
+// If both sets of data are given, the viewer will ignore the matrix and use only the
+// rotation data.
+// Also, currently the code interlaces the two datasets which is not ideal.
+#define write_activation_matrix 0
+#define write_active_rotation 1
+
 // Amount to reduce momenta for path nodes beyond zero. Since the point of path based
 // docking is to keep as closely as possible the same ligand pose and move it through
 // the protein, we want to minimize the ligand's conformational changes from node to

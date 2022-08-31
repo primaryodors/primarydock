@@ -24,6 +24,7 @@ UPRIGHT
 
 SAVE "pdbs/ADRB2/ADRB2.active.pdb"
 
+LET %termin = 7
 
 # Obtain the active helix termini.
 
@@ -31,27 +32,25 @@ LET %i = 1
 _loop:
 
 LET %j = %TMR%i.s
+LET %n = 0
+_loopn:
 LET @an[%i]  = %j
 LET %j ++ 
-LET @an[%i] += %j
-LET %j ++ 
-LET @an[%i] += %j
-LET %j ++ 
-LET @an[%i] += %j
+LET %n ++
+IF %n < %termin GOTO _loopn
 
-LET @an[%i] /= 4
+LET @an[%i] /= %n
 
 
 LET %j = %TMR%i.e
+LET %n = 0
+_loopn1:
 LET @ac[%i]  = %j
 LET %j -- 
-LET @ac[%i] += %j
-LET %j -- 
-LET @ac[%i] += %j
-LET %j -- 
-LET @ac[%i] += %j
+LET %n ++
+IF %n < %termin GOTO _loopn1
 
-LET @ac[%i] /= 4
+LET @ac[%i] /= %n
 
 
 LET %i ++
@@ -85,28 +84,26 @@ LET %i = 1
 _loop1:
 
 LET %j = %TMR%i.s
+LET %n = 0
+_loopn2:
 LET @in[%i]  = %j
 LET %j ++ 
-LET @in[%i] += %j
-LET %j ++ 
-LET @in[%i] += %j
-LET %j ++ 
-LET @in[%i] += %j
+LET %n ++
+IF %n < %termin GOTO _loopn2
 
-LET @in[%i] /= 4
+LET @in[%i] /= %n
 
 # ECHO "TMR" %i ": Average of four residues starting at " %TMR%i.s " = " @in[%i]
 
 LET %j = %TMR%i.e
+LET %n = 0
+_loopn3:
 LET @ic[%i]  = %j
 LET %j -- 
-LET @ic[%i] += %j
-LET %j -- 
-LET @ic[%i] += %j
-LET %j -- 
-LET @ic[%i] += %j
+LET %n ++
+IF %n < %termin GOTO _loopn3
 
-LET @ic[%i] /= 4
+LET @ic[%i] /= %n
 
 # ECHO "Got inactive start/end averages for TMR" %i "..."
 
@@ -116,27 +113,37 @@ IF %i <= 7 GOTO _loop1
 
 # Center the data by subtracting the average.
 
-LET @avgdelta = 0
+LET @avgdeltae = 0
+LET @avgdeltac = 0
 
 LET %i = 1
 _loop3:
 
+LET %odd = %i & 1
+
 LET @delta_n = @an[%i] - @in[%i]
 LET @delta_c = @ac[%i] - @ic[%i]
 
-LET @avgdelta += @delta_n
-LET @avgdelta += @delta_c
+IF %odd THEN LET @avgdeltae += @delta_n
+ELSE LET @avgdeltac += @delta_n
+IF %odd THEN LET @avgdeltac += @delta_c
+ELSE LET @avgdeltae += @delta_c
 
 LET %i ++
 IF %i <= 7 GOTO _loop3
 
-LET @avgdelta /= 14
+LET @avgdeltae /= 7
+LET @avgdeltac /= 7
 
 LET %i = 1
 _loop4:
 
-LET @an[%i] -= @avgdelta
-LET @ac[%i] -= @avgdelta
+LET %odd = %i & 1
+
+IF %odd THEN LET @an[%i] -= @avgdeltae
+ELSE LET @an[%i] -= @avgdeltac
+IF %odd THEN LET @ac[%i] -= @avgdeltac
+ELSE LET @ac[%i] -= @avgdeltae
 
 LET %i ++
 IF %i <= 7 GOTO _loop4

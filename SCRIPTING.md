@@ -238,6 +238,7 @@ Phi and psi angles can also be manually specified as in the second example.
 Examples:
 ```
 IF %var >= 10 LET %var = 0
+IF %var THEN ECHO "Yep."
 IF &var1 > 0 AND &var1 < &var2 SAVE $name QUIT
 
 IF $match = "HFFCE" ECHO $message
@@ -251,8 +252,12 @@ IF %iter <= 10 GOTO loop
 ```
 
 The `IF` command evaluates a conditional expression and, if true, executes another command. Currently, only simple A = B type expressions are
-supported, i.e. straightforward comparison of two values, where either value can be a single variable or a single constant; such expressions as
-A = B + 1 do not yet work.
+supported, i.e. straightforward comparison of two values, where either value can be a single variable or a single constant; such expressions
+as A > B + 1 do not yet work.
+
+`IF` can be used to test a single variable, as in the `IF %var THEN` statement in the examples. For this syntax, the `THEN` keyword is required,
+otherwise the interpreter would treat the following statement (in this case `ECHO`) as an unrecognized operator and throw an error. All other
+times, the `THEN` keyword is optional.
 
 `AND` and `OR` are supported, however parentheses are not, and while an unlimited number of `AND`s and/or `OR`s can be chained together, their
 evaluation will be entirely sequential and the chain will evaluate false as soon as any chain of `OR`ed expressions all evaluate false. Note that
@@ -288,13 +293,15 @@ LET $message = "TMR4 ends on residue " + %TMR4.e + " and TMR5 starts on residue 
 
 Assigns a value to a new or existing variable.
 
-For assigning integer and float variables, the following operators are allowed: `=` `+=` `-=` `*=` `/=`.
+For assigning integer and float variables, the following operators are allowed: `=` `+=` `-=` `*=` `/=`. Integer assignments also support the bitwise
+`&=` (and) and `|=` (or) operators.
 
 Integer variables are also allowed `++` `--`, which do not take an r-value (a variable or literal value to apply to the variable assignment).
 
 For algebraic assignments, e.g. `LET &k = %i + &j`, the following operators are supported: `+` `-` `*` `/` `^`, the last being an exponent operator.
-Note parentheses are not currently supported. Also, the data type of the variable being assigned determines how all r-value variables are interpreted,
-so even though `%i` is an integer in the above statement, its value is cast to a float before `&j` is added to it.
+Integers also support the bitwise `&` (and) and `|` (or) operators. Note parentheses are not currently supported. Also, the data type of the variable
+being assigned determines how all r-value variables are interpreted, so even though `%i` is an integer in the above statement, its value is cast to a 
+float (the data type of `&k`) before the addition takes place.
 
 For strings, the operators `=` `+=` and `+` are allowed, with the plus sign indicating concatenation.
 Substrings are indicated with the word FROM and (optinally) FOR, e.g. `LET $end = $string FROM 10` or `LET $range = $SEQUENCE FROM %start FOR %length`.

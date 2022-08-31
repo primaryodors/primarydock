@@ -1310,6 +1310,7 @@ _try_again:
 
                     // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
                     LocRotation lrot = p.rotate_piece(sr, er, er, calign, sr);
+                    lrot.v.r = 1;
 
                     if (wrote_acvmx < i)
                     {

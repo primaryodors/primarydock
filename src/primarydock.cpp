@@ -1142,7 +1142,7 @@ int main(int argc, char** argv)
     #endif
 
     found_poses = 0;
-    int wrote_acvmx = 0;
+    int wrote_acvmx = -1;
 _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));

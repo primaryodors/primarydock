@@ -327,7 +327,7 @@ function rotate3D(point, source, axis, theta)
     if (!axis.x && !axis.y && !axis.z) return point;
 
     var x = point.x, y = point.y, z = point.z;
-    var axisr = Math.sqrt(axis.x*axis.x, axis.y*axis.y, axis.z*axis.z);
+    var axisr = Math.sqrt(axis.x*axis.x + axis.y*axis.y + axis.z*axis.z);
     var u = axis.x / axisr, v = axis.y / axisr, w = axis.z / axisr;
     var a, b, c;
     if (source)

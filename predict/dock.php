@@ -93,6 +93,7 @@ else
 	$ligname = @$_REQUEST['lig'] ?: "geraniol";
 }
 
+best_empirical_pair($protid, $ligname);
 echo "Beginning dock of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);
 
@@ -111,8 +112,7 @@ switch ($fam)
 	break;
 	
 	default:
-	// $matrix = $matrixbtRho;
-	$matrix = $matrixADRB2;
+	$matrix = $matrixbtRho;
 	
 	$cenr3_33 = resno_from_bw($protid, "3.33");
 	$cenr3_36 = $cenr3_33 + 3;
@@ -224,7 +224,7 @@ ITER 50
 # DIFF
 # ELIM 100
 
-OUT output/$protid/$protid-$ligname.pred.dock
+OUT output/$protid-$ligname.pred.dock
 
 
 
@@ -326,9 +326,14 @@ else
 	if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
 	$dock_results[$protid][$ligname] = $average;
 	
+	$keys = array_keys($dock_results);
+	natsort($keys);
+	$out_results = [];
+	foreach ($keys as $key) $out_results[$key] = $dock_results[$key];
+	
 	$f = fopen($json_file, "wb");
 	if (!$f) die("File write FAILED. Make sure have access to write $json_file.");
-	fwrite($f, json_encode_pretty($dock_results));
+	fwrite($f, json_encode_pretty($out_results));
 	fclose($f);
 }
 

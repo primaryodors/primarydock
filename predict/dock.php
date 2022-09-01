@@ -93,7 +93,6 @@ else
 	$ligname = @$_REQUEST['lig'] ?: "geraniol";
 }
 
-best_empirical_pair($protid, $ligname);
 echo "Beginning dock of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);
 

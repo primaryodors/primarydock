@@ -82,8 +82,14 @@ SAVE "pdbs/ADRB2/ADRB2.inactive.pdb"
 
 # Obtain the inactive termini.
 
+LET @icene = 0
+LET @icenc = 0
+
 LET %i = 1
 _loop1:
+
+LET %odd = %i & 1
+LET %even = 1 - %odd
 
 LET %j = %TMR%i.s
 LET %n = 0
@@ -97,6 +103,8 @@ IF %n < %termin GOTO _loopn2
 LET @in[%i] /= %n
 
 # ECHO "TMR" %i ": Average of four residues starting at " %TMR%i.s " = " @in[%i]
+IF %odd  THEN LET @icene += @in[%i]
+IF %even THEN LET @icenc += @in[%i]
 
 LET %j = %TMR%i.e
 LET %n = 0
@@ -108,11 +116,40 @@ LET %n ++
 IF %n < %termin GOTO _loopn3
 
 LET @ic[%i] /= %n
+IF %odd  THEN LET @icenc += @ic[%i]
+IF %even THEN LET @icene += @ic[%i]
 
 # ECHO "Got inactive start/end averages for TMR" %i "..."
 
 LET %i ++
 IF %i <= 7 GOTO _loop1
+
+
+LET @icenc /= 7
+LET @icene /= 7
+
+LET %i = 1
+_loop132:
+
+LET %odd = %i & 1
+LET %even = 1 - %odd
+
+IF %odd  THEN LET @in[%i] -= @icene
+IF %even THEN LET @in[%i] -= @icenc
+
+IF %odd  THEN LET @ic[%i] -= @icenc
+IF %even THEN LET @ic[%i] -= @icene
+
+IF %odd  THEN LET &r = @in[%i]
+IF %even THEN LET &r = @ic[%i]
+
+IF %odd  THEN LET @direction = @in[%i] / &r
+IF %even THEN LET @direction = @ic[%i] / &r
+
+ECHO "TMR" %i " direction: " @direction " distance: " &r 
+
+LET %i ++
+IF %i <= 7 GOTO _loop132
 
 
 # Center the data by subtracting the average.
@@ -166,7 +203,19 @@ _loop2:
 LET @delta_n = @an[%i] - @in[%i]
 LET @delta_c = @ac[%i] - @ic[%i]
 
-ECHO "	'TMR" %i "' => [ " @delta_n.x ", " @delta_n.y ", " @delta_n.z ", " @delta_c.x ", " @delta_c.y ", " @delta_c.z " ],"
+ECHO "	'TMR" %i "' => [ " ~
+IF @delta_n.x >= 0 ECHO " " ~
+ECHO @delta_n.x ", " ~
+IF @delta_n.y >= 0 ECHO " " ~
+ECHO @delta_n.y ", " ~
+IF @delta_n.z >= 0 ECHO " " ~
+ECHO @delta_n.z ", " ~
+IF @delta_c.x >= 0 ECHO " " ~
+ECHO @delta_c.x ", " ~
+IF @delta_c.y >= 0 ECHO " " ~
+ECHO @delta_c.y ", " ~
+IF @delta_c.z >= 0 ECHO " " ~
+ECHO @delta_c.z " ],"
 
 LET %i ++
 

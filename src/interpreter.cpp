@@ -1473,7 +1473,7 @@ int main(int argc, char** argv)
                         if (!strcmp(fields[4+l], "+")) *script_var[n].value.ppt = script_var[n].value.ppt->add(pt);
                         else if (!strcmp(fields[4+l], "-")) *script_var[n].value.ppt = script_var[n].value.ppt->subtract(pt);
                         else if (!strcmp(fields[4+l], "*")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() * pt.magnitude());
-                        else if (!strcmp(fields[4+l], "/")) script_var[n].value.ppt->scale(pt.magnitude());
+                        else if (!strcmp(fields[4+l], "/")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() / pt.magnitude());
                         else
                         {
                             // cout << "Bad operator " << fields[4+l] << " for point." << endl;

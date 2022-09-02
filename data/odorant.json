@@ -2008,6 +2008,11 @@
                     "type": "wa",
                     "ec50": "-3.3"
                 },
+                "OR51T1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.52"
+                },
                 "OR5K1":
                 {
                     "type": "wa",
@@ -4029,11 +4034,11 @@
             {
                 "TAAR6":
                 {
-                    "type": "wa"
+                    "type": "vsa"
                 },
                 "TAAR8":
                 {
-                    "type": "wa"
+                    "type": "vsa"
                 }
             }
         }
@@ -5425,6 +5430,11 @@
                 {
                     "type": "vwa",
                     "ec50": "-3.2"
+                },
+                "OR51T1":
+                {
+                    "type": "ma",
+                    "ec50": "-3.82"
                 }
             },
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
@@ -11199,6 +11209,29 @@
             ]
         }
     },
+    "cdd4338983df8d24e39402cb54ad461b":
+    {
+        "full_name": "firascone",
+        "smiles": "CC1C=CCC(C1C(=O)OC)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "floral",
+                "sweet",
+                "berry",
+                "rose",
+                "apple"
+            ],
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "rose",
+                "fruity",
+                "floral",
+                "saffron"
+            ]
+        }
+    },
     "b4d0ff4da953d39c2543943555f69306":
     {
         "full_name": "floralozone",
@@ -16143,6 +16176,11 @@
                 {
                     "type": "wa",
                     "ec50": "-2.8"
+                },
+                "OR51T1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.4"
                 }
             }
         }
@@ -18038,6 +18076,22 @@
                 "solvent",
                 "spicy"
             ]
+        }
+    },
+    "838ec03462de15227b8343df3be6e7b5":
+    {
+        "full_name": "methyl isoeugenol",
+        "smiles": "CC=CC1=CC(=C(C=C1)OC)OC",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1371\/journal.pone.0195263":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.05"
+                }
+            }
         }
     },
     "8b7f03b02e5a03396d51797eb90a6251":
@@ -21478,6 +21532,11 @@
                     "type": "ma",
                     "ec50": "-4.4"
                 },
+                "OR51T1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.15"
+                },
                 "OR5P3":
                 {
                     "type": "vsa",
@@ -21507,6 +21566,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1371\/journal.pone.0195263":
+            {
+                "OR2J3":
+                {
+                    "type": "wa",
+                    "ec50": "-4.7"
                 }
             }
         }
@@ -22281,6 +22348,19 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1371\/journal.pone.0195263":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "ec50": "-5.46"
+                },
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-5.82"
                 }
             }
         }
@@ -23527,11 +23607,11 @@
             {
                 "TAAR6":
                 {
-                    "type": "wa"
+                    "type": "vsa"
                 },
                 "TAAR8":
                 {
-                    "type": "wa"
+                    "type": "vsa"
                 }
             }
         }
@@ -24076,6 +24156,11 @@
                     "type": "ma",
                     "ec50": "-2.5"
                 },
+                "OR51T1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.4"
+                },
                 "OR5K1":
                 {
                     "type": "vwa",
@@ -24121,6 +24206,19 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1371\/journal.pone.0195263":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "8.5"
+                },
+                "OR5P3":
+                {
+                    "type": "vsa",
+                    "ec50": "30"
                 }
             }
         }
@@ -24740,6 +24838,11 @@
                     "type": "ma",
                     "ec50": "-2.5"
                 },
+                "OR51T1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.46"
+                },
                 "OR5P3":
                 {
                     "type": "ma",
@@ -25246,6 +25349,31 @@
             }
         }
     },
+    "41ba128c81016cff75b6fb440bf9c302":
+    {
+        "full_name": "sulfuryl acetate",
+        "smiles": "CC1=C(SC=N1)CCOC(=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "meaty",
+                "beef",
+                "juice",
+                "beefy"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1073\/pnas.0811089106":
+            {
+                "OR1D2":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "26d92c968c468fa196b6d5875440de09":
     {
         "full_name": "terpineol",
@@ -25596,6 +25724,10 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "oily",
+                "rind",
+                "rose",
+                "tea",
                 "woody",
                 "bois",
                 "citrus",
@@ -25603,11 +25735,7 @@
                 "fatty",
                 "floral",
                 "lilac",
-                "lily",
-                "oily",
-                "rind",
-                "rose",
-                "tea"
+                "lily"
             ]
         },
         "activity":
@@ -26252,6 +26380,15 @@
         "smiles": "CC1=CN=C(C(=N1)C)C",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "nutty",
+                "macadamia",
+                "peanut",
+                "hazelnut",
+                "rooty",
+                "potato"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "nutty",

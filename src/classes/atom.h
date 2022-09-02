@@ -233,9 +233,10 @@ public:
 
     // Static fuctions.
     static int Z_from_esym(const char* elem_sym);
-    static char* esym_from_Z(const int lZ)
+    static const char* esym_from_Z(const int lZ)
     {
         if (!lZ || lZ >= _ATOM_Z_LIMIT) return 0;
+        else if (lZ == any_element) return asterisk;
         else return elem_syms[lZ];
     }
     static void dump_array(Atom** aarr);

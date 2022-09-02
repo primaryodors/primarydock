@@ -22,13 +22,21 @@ function best_empirical_pair($protein, $aroma)
 	
 	foreach ($odors as $oid => $o)
 	{
-		if ($o['full_name'] == $aroma)
+		if ($o['full_name'] == $aroma
+			||
+			str_replace(" ", "_", $o['full_name']) == $aroma
+		)
 		{
 			foreach ($o['activity'] as $ref => $acv)
 			{
 				if (isset($acv[$protein]))
 				{
-					if ($sepyt[$acv[$protein]['type']] > $btyp || !$btyp) $btyp = $sepyt[$acv[$protein]['type']];
+					echo "Reference $ref says $aroma is a {$acv[$protein]['type']} for $protein.\n";
+					if ($sepyt[$acv[$protein]['type']] > $btyp || !$btyp)
+					{
+						$btyp = $sepyt[trim($acv[$protein]['type'])];
+						// echo "Ligand type set to $btyp.\n";
+					}
 				}
 			}
 			

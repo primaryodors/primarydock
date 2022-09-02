@@ -194,6 +194,8 @@ int Atom::Z_from_esym(const char* elem_sym)
 {
     read_elements();
 
+    if (!strcmp(elem_sym, "*")) return any_element;
+
     int i;
     for (i=1; elem_syms[i]; i++)
     {
@@ -670,7 +672,9 @@ Atom* Atom::is_bonded_to(const char* element)
     int i;
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
-            if (!strcmp(bonded_to[i].btom->get_elem_sym(), element)
+            if (!strcmp(element, "*")
+                ||
+                !strcmp(bonded_to[i].btom->get_elem_sym(), element)
                )
                 return bonded_to[i].btom;
     return 0;

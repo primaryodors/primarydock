@@ -34,7 +34,10 @@ void InteratomicForce::read_all_forces()
                 /*if (all_forces[ifcount]->type == mcoord)
                 	cout << all_forces[ifcount]->Za << "*M*" << all_forces[ifcount]->Zb << endl;*/
 
-                if (all_forces[ifcount]->Za < 36 && all_forces[ifcount]->Zb < 36)
+                if (all_forces[ifcount]->Za >= 1 && all_forces[ifcount]->Za < 36 
+                    &&
+                    all_forces[ifcount]->Zb >= 1 && all_forces[ifcount]->Zb < 36
+                )
                 {
                     if (!forces_by_Z[all_forces[ifcount]->Za][all_forces[ifcount]->Zb])
                     {
@@ -229,7 +232,7 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
     for (i=0; look[i]; i++)
     {
         if (look[i]->type == t)
-            if (look[i]->Za == Za || look[i]->Zb == Za)
+            if (look[i]->Za == Za || look[i]->Zb == Za || look[i]->Za == any_element || look[i]->Zb == any_element)
             {
                 switch (t)
                 {
@@ -385,7 +388,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 
     for (i=0; look[i]; i++)
     {
-        if (	(	look[i]->Za == Za
+        if (	(	(look[i]->Za == Za || look[i]->Za == any_element)
                     &&
                     (	!look[i]->bZa
                         ||
@@ -394,7 +397,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                         ( look[i]->aritybZa && a->is_bonded_to(Atom::esym_from_Z(look[i]->bZa), look[i]->aritybZa))
                     )
                     &&
-                    look[i]->Zb == Zb
+                    (look[i]->Zb == Zb || look[i]->Zb == any_element)
                     &&
                     (	!look[i]->bZb
                         ||
@@ -404,7 +407,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                     )
              )
                 ||
-                (	look[i]->Zb == Za
+                (	(look[i]->Zb == Za || look[i]->Zb == any_element)
                     &&
                     (	!look[i]->bZb
                         ||
@@ -413,7 +416,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                         ( look[i]->aritybZb && a->is_bonded_to(Atom::esym_from_Z(look[i]->bZb), look[i]->aritybZb))
                     )
                     &&
-                    look[i]->Za == Zb
+                    (look[i]->Za == Zb || look[i]->Za == any_element)
                     &&
                     (	!look[i]->bZa
                         ||

@@ -1435,7 +1435,7 @@ function loadFile(fileData, fileName = "")
 		                    var result = poresult.split("\n");
 		                    var lres = 0;
 		                    var tmpstr = "";
-		                    /*for (i=0; i<result.length; i++)
+		                    for (i=0; i<result.length; i++)
 		                    {
 		                        var ln = result[i];
 		                        var resno = parseInt(ln.substr(22,4));
@@ -1471,7 +1471,7 @@ function loadFile(fileData, fileName = "")
 		                        tmpstr += ln + "\n";
 		                        
 		                        $('#clip').trigger("input");
-		                    }*/
+		                    }
 				            if (tmpstr)
 				            {
 					        	var stringBlob5a = new Blob( [tmpstr], { type: 'text/plain'} );

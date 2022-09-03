@@ -128,5 +128,7 @@ protected:
 };
 
 
+SearchResult find_in_sequence(std::string needle, std::string haystack);
+
 #endif
 

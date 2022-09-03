@@ -284,5 +284,3 @@ float residue_binding_multiplier(int resno)
 
 
 
-
-

@@ -1952,6 +1952,55 @@ Molecule** Protein::all_residues_as_molecules()
 }
 
 
+SearchResult find_in_sequence(std::string needle, std::string haystack)
+{
+    SearchResult retval;
+
+    int i, j, k, l, m, n, sim, num_eq;
+    int slen = haystack.length() - needle.length();
+    if (slen < 1) return retval;
+
+    const char* psz = needle.c_str();
+    AminoAcid* aa[256];
+
+    for (i=0; i<256; i++) aa[i] = nullptr;
+
+    n = 0;
+    k = 0;
+    for (i=0; i<slen; i++)
+    {
+        m = num_eq = 0;
+        for (j=0; psz[j]; j++)
+        {
+            char c = psz[j], aac = haystack.c_str()[i+j];
+            if (c == 'X') c = aac;
+
+            if (!aa[aac]) aa[aac] = new AminoAcid(aac);
+            if (!aa[c  ]) aa[c  ] = new AminoAcid(c  );
+
+            if (c == aac) num_eq++;
+
+            sim = aa[aac]->similarity_to(c);
+            // cout << c << "/" << aac << " " << sim << "  ";
+
+            m += sim;
+        }
+        // cout << "___ m: " << m << ", n: " << n << endl;
+
+        if (m > n)
+        {
+            k = i;
+            n = m;
+        }
+    }
+
+    retval.position = k;
+    retval.similarity = n;
+
+    return retval;
+}
+
+
 
 
 

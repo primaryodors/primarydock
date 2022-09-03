@@ -1996,6 +1996,8 @@ SearchResult find_in_sequence(std::string needle, std::string haystack)
 
     retval.position = k;
     retval.similarity = n;
+    
+    for (i=0; i<256; i++) if (aa[i]) delete aa[i];
 
     return retval;
 }

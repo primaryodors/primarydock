@@ -8,7 +8,7 @@
 
 // One thousand is suitable for ORs. If desired, this limit can be increased for larger proteins.
 #define max_sequence_length 1000
-#define seek_len 7
+#define seek_len 20
 
 using namespace std;
 
@@ -129,9 +129,9 @@ int main(int argc, char** argv)
                         char newm = sequences[k].at(koff);
                         char cmpr = sequences[i].at(ioff);
 
-                        // TODO: Asses which aa is the closer fit, not simply equals.
-                        int incumbent = (cmpr == oldm) ? 1 : 0;
-                        int challenge = (cmpr == newm) ? 1 : 0;
+                        // Assess which aa is the closer fit, not simply equals.
+                        int incumbent = align_sim[i][ioff]; // (cmpr == oldm) ? 1 : 0;
+                        int challenge = sr.similarity; // (cmpr == newm) ? 1 : 0;
 
                         if (challenge > incumbent)
                         {
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
                     if (rel_align[i][j] < rel_align[i][j-1])
                     {
                         // TODO: Determine which is the better fit and realign.
-                        ;
+                        rel_align[i][j-1] = rel_align[i][j] - 1;
                     }
                     else if (rel_align[i][j] == rel_align[i][j-1])
                     {
@@ -179,26 +179,45 @@ int main(int argc, char** argv)
         }
     }
 
-    // Finally, output the results and return a success.
-    for (n = 0; n < max; n++)
+    cout << "Alignment length is " << max << endl;
+
+    // Debugging.
+    for (i=0; i<num_seq; i++)
     {
-        for (i=0; i<num_seq; i++)
+        int ilen = sequences[i].length();
+        cout << names[i] << "\t";
+
+        for (j=0; j<ilen; j++) cout << " " << rel_align[i][j];
+        cout << endl;
+    }
+
+    // Finally, output the results and return a success.
+    for (i=0; i<num_seq; i++)
+    {
+        int ilen = sequences[i].length();
+        cout << names[i] << "\t";
+
+        bool yet = false;
+        for (n = 0; n < max; n++)
         {
-            cout << names[i] << "\t";
-            int ilen = sequences[i].length();
-            bool yet = false;
+            bool found = false;
             for (j=0; j<ilen; j++)
             {
                 if (rel_align[i][j] == n)
                 {
                     cout << sequences[i].at(j);
-                    yet = (j >= ilen-1);
+                    yet = (j < ilen-1);
+                    found = true;
+                    break;
                 }
-                else if (yet) cout << "-";
+            }
+            if (!found)
+            {
+                if (yet) cout << "-";
                 else cout << " ";
             }
-            cout << endl;
         }
+        cout << endl;
     }
 
     return 0;

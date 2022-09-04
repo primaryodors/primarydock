@@ -105,10 +105,22 @@ int main(int argc, char** argv)
         if (k >= 0)
         {
             cout << names[i] << "'s closest Levenshtein match is " << names[k] << "." << endl;
+
+            int prealign_start = ilen / 10;
+            int prealign_length = ilen * 0.8;
+            string prealign = sequences[i].substr(prealign_start, prealign_length);
+            SearchResult presearch = find_in_sequence(prealign, sequences[k]);
+            presearch.position += prealign_start;
+
+            for (j=0; j<ilen; j++)
+            {
+                // lbound[i][j] = presearch.position + j - prealign_start - seek_len;
+                ubound[i][j] = presearch.position + j + seek_len;
+            }
         }
 
         int iter;
-        for (iter=0; iter<5; iter++)
+        for (iter=0; iter<10; iter++)
         {
             // Go letter by letter finding matches of whatever length substrings.
             for (j=0; j<ilen; j++)
@@ -124,6 +136,8 @@ int main(int argc, char** argv)
                     {
                         break;
                     }
+
+                    int lendiff = abs((int)sequences[i].length() - (int)sequences[k].length());
 
                     SearchResult sr = find_in_sequence(
                         sequences[i].substr(j, seek_len),
@@ -163,7 +177,7 @@ int main(int argc, char** argv)
                                 align_sim[i][ioff] = sr.similarity;
 
                                 m = sr.position;
-                                if (iter) for (n = ioff; n < ilen; n++) if (lbound[i][n] < m) lbound[i][n] = m;
+                                if (iter && abs(m-ioff) < 2*lendiff) for (n = ioff; n < ilen; n++) if (lbound[i][n] < m) lbound[i][n] = m;
                             }
                         }
                         else
@@ -172,7 +186,7 @@ int main(int argc, char** argv)
                             align_sim[i][ioff] = sr.similarity;
 
                             m = sr.position;
-                            if (iter) for (n = ioff; n < ilen; n++) if (lbound[i][n] < m) lbound[i][n] = m;
+                            if (iter && abs(m-ioff) < 2*lendiff) for (n = ioff; n < ilen; n++) if (lbound[i][n] < m) lbound[i][n] = m;
                         }
                     }
 
@@ -203,14 +217,15 @@ int main(int argc, char** argv)
             {
                 if (rel_align[i][j] < rel_align[i][j-1])
                 {
-                    m = rel_align[i][j];
+                    m = rel_align[i][j-1];
                     for (n = j; m && n >= 0 && rel_align[i][n] >= rel_align[i][j]; n--)
                     {
                         // rel_align[i][n] = m;
-                        align_sim[i][n] = -10000;
+                        align_sim[i][n] -= 100;
                         if (ubound[i][j] > m) ubound[i][j] = m;
                         m--;
                     }
+                    rel_align[i][j] = rel_align[i][j-1] + 1;
                 }
             }
         }       // end for iter
@@ -235,7 +250,7 @@ int main(int argc, char** argv)
         cout << names[i] << "\t";
 
         for (j=0; j<ilen; j++) cout << " " << rel_align[i][j];
-        cout << endl;
+        cout << endl << endl;
     }
 
     // Finally, output the results and return a success.

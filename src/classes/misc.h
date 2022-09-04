@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <math.h>
+#include <vector>
 
 #include "constants.h"
 
@@ -53,6 +54,7 @@ struct SearchResult
 
 int in_array(void* needle, void** haystack);
 int in_array(int needle, int* haystack);
+int in_array(int needle, std::vector<int> haystack);
 int in_array(Star needle, Star* haystack);
 Star* array_unique(Star* input_array);
 char** chop_spaced_fields(char* line, char separator = ' ');
@@ -63,8 +65,8 @@ float Pearson_correlation(float* xarr, float* yarr, int length);
 enum STR_PAD {STR_PAD_RIGHT, STR_PAD_LEFT, STR_PAD_BOTH};
 std::string str_pad(const std::string &str, int pad_length, std::string pad_string=" ", STR_PAD pad_type=STR_PAD_RIGHT);
 std::string cardinality_printable(float card);
-
-SearchResult find_in_sequence(std::string needle, std::string haystack);
+size_t levenshtein_distance(const char* s, size_t n, const char* t, size_t m);
+size_t levenshtein_distance(std::string s1, std::string s2);
 
 #if active_persistence
 float residue_binding_multiplier(int resno);

@@ -6,7 +6,7 @@ SDFDIR=sdf
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 TESTS=test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/backbone_test
-APPS=$(BINDIR)/primarydock $(BINDIR)/peptiditor
+APPS=$(BINDIR)/primarydock $(BINDIR)/peptiditor $(BINDIR)/oralign
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
 all: $(DIRS) \
 	 $(OBJS) \
@@ -16,6 +16,7 @@ all: $(DIRS) \
 code: $(OBJS) $(TESTS) molecule_report $(APPS)
 primarydock: $(DIRS) $(OBJS) $(BINDIR)/primarydock
 peptiditor: $(DIRS) $(OBJS) $(BINDIR)/peptiditor
+oralign: $(DIRS) $(OBJS) $(BINDIR)/oralign
 
 CC=g++
 
@@ -91,6 +92,9 @@ $(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDI
 
 $(BINDIR)/peptiditor: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 	$(CC) src/interpreter.cpp $(OBJS) -o $(BINDIR)/peptiditor $(CFLAGS)
+
+$(BINDIR)/oralign: src/oralign.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
+	$(CC) src/oralign.cpp $(OBJS) -o $(BINDIR)/oralign $(CFLAGS)
 
 performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.rotated.pdb testdata/CAD_ion.sdf
 	./$(BINDIR)/primarydock testdata/test_TAAR8.config

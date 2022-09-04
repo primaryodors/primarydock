@@ -5,6 +5,10 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <cstring>
+#include <cassert>
+#include <vector>
+
 #include "point.h"
 
 using namespace std;
@@ -44,6 +48,18 @@ int in_array(int needle, int* haystack)
     int i;
 
     for (i=0; haystack[i]; i++)
+    {
+        if (haystack[i] == needle) return i;
+    }
+
+    return -1;
+}
+
+int in_array(int needle, std::vector<int> haystack)
+{
+    int i;
+
+    for (i=0; i < haystack.size(); i++)
     {
         if (haystack[i] == needle) return i;
     }
@@ -272,9 +288,52 @@ float residue_binding_multiplier(int resno)
 #endif
 
 
+// Modified from here: https://gist.github.com/TheRayTracer/2644387
+size_t levenshtein_distance(const char* s, size_t n, const char* t, size_t m)
+{
+   ++n; ++m;
+   size_t* d = new size_t[n * m];
 
+   memset(d, 0, sizeof(size_t) * n * m);
 
+   for (size_t i = 1, im = 0; i < m; ++i, ++im)
+   {
+      for (size_t j = 1, jn = 0; j < n; ++j, ++jn)
+      {
+         if (s[jn] == t[im])
+         {
+            d[(i * n) + j] = d[((i - 1) * n) + (j - 1)];
+         }
+         else
+         {
+            d[(i * n) + j] =
+                min(d[(i - 1) * n + j] + 1, /* A deletion. */
+                min(d[i * n + (j - 1)] + 1, /* An insertion. */
+                d[(i - 1) * n + (j - 1)] + 1)); /* A substitution. */
+         }
+      }
+   }
 
+#ifdef debug_levenshtein
+   for (size_t i = 0; i < m; ++i)
+   {
+      for (size_t j = 0; j < n; ++j)
+      {
+         cout << d[(i * n) + j] << " ";
+      }
+      cout << endl;
+   }
+#endif
+
+   size_t r = d[n * m - 1];
+   delete [] d;
+   return r;
+}
+
+size_t levenshtein_distance(std::string s1, std::string s2)
+{
+    return levenshtein_distance(s1.c_str(), s1.length(), s2.c_str(), s2.length());
+}
 
 
 

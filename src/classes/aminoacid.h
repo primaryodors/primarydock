@@ -23,8 +23,9 @@ struct AABondDef
     bool can_rotate=false;
 };
 
-struct AADef
+class AADef
 {
+    public:
     char _1let = '\0';
     char _3let[4];
     char name[40];
@@ -39,6 +40,8 @@ struct AADef
     int charged = 0;
     bool loaded = false;
     bool isoleucine_fix = false;
+
+    int similarity_to(const char letter);
 };
 
 struct MetalCoord

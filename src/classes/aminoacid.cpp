@@ -1360,23 +1360,30 @@ int AminoAcid::similarity_to(const char letter)
     }
     if (!aadef) return 0;
 
+    return aadef->similarity_to(letter);
+}
+
+int AADef::similarity_to(const char letter)
+{
+    if (!aa_defs[letter].loaded) delete new AminoAcid(letter);
+
     int retval = 0;
-    if (aadef->hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD
-            &&
-            aa_defs[letter].hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD)
+    if (this->hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD
+        &&
+        aa_defs[letter].hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD)
     {
-        retval += fmin(aadef->hydrophilicity, aa_defs[letter].hydrophilicity)*2;
-        if (aadef->charged == aa_defs[letter].charged) retval += 1;
+        retval += fmin(this->hydrophilicity, aa_defs[letter].hydrophilicity)*2;
+        if (this->charged == aa_defs[letter].charged) retval += 1;
     }
-    if (aadef->hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD
-            &&
-            aa_defs[letter].hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD)
+    if (this->hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD
+        &&
+        aa_defs[letter].hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD)
         retval += 2;
-    // cout << aadef->hydrophilicity << "|" << aa_defs[letter].hydrophilicity << endl;
+    // cout << this->hydrophilicity << "|" << aa_defs[letter].hydrophilicity << endl;
     // return retval;
 
-    if (aadef->aromatic == aa_defs[letter].aromatic) retval += 2;
-    if (aadef->can_coord_metal == aa_defs[letter].can_coord_metal) retval += 1;
+    if (this->aromatic == aa_defs[letter].aromatic) retval += 2;
+    if (this->can_coord_metal == aa_defs[letter].can_coord_metal) retval += 1;
 
     return retval;
 }

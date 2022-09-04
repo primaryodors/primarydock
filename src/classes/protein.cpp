@@ -1975,12 +1975,13 @@ SearchResult find_in_sequence(std::string needle, std::string haystack)
             char c = psz[j], aac = haystack.c_str()[i+j];
             if (c == 'X') c = aac;
 
-            if (!aa[aac]) aa[aac] = new AminoAcid(aac);
-            if (!aa[c  ]) aa[c  ] = new AminoAcid(c  );
+            // if (!aa[aac]) aa[aac] = new AminoAcid(aac);
+            // if (!aa[c  ]) aa[c  ] = new AminoAcid(c  );
 
             if (c == aac) num_eq++;
 
-            sim = aa[aac]->similarity_to(c);
+            // sim = aa[aac]->similarity_to(c);
+            sim = aa_defs[aac].similarity_to(c);
             // cout << c << "/" << aac << " " << sim << "  ";
 
             m += sim;

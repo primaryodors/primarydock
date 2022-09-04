@@ -16,6 +16,8 @@ vector<string> names;
 vector<string> sequences;
 vector<vector<int>> rel_align;
 vector<vector<int>> align_sim;
+vector<vector<int>> lbound;
+vector<vector<int>> ubound;
 int num_seq = 0;
 
 void increment_since(int lowest_num_to_incr)
@@ -60,6 +62,8 @@ int main(int argc, char** argv)
                 sequences.push_back(fields[1]);
                 rel_align.push_back(std::vector<int>(sequences[num_seq].length() + 4));
                 align_sim.push_back(std::vector<int>(sequences[num_seq].length() + 4));
+                lbound.push_back(std::vector<int>(sequences[num_seq].length() + 4));
+                ubound.push_back(std::vector<int>(sequences[num_seq].length() + 4));
                 num_seq++;
             }
         }
@@ -74,6 +78,9 @@ int main(int argc, char** argv)
         for (j=0; j<=ilen; j++)
         {
             rel_align[i][j] = -1;
+            align_sim[i][j] = 0;
+            lbound[i][j] = 0;
+            ubound[i][j] = max_sequence_length;
         }
     }
 
@@ -100,73 +107,113 @@ int main(int argc, char** argv)
             cout << names[i] << "'s closest Levenshtein match is " << names[k] << "." << endl;
         }
 
-        // Go letter by letter finding matches of whatever length substrings.
-        for (j=0; j<ilen-seek_len; j++)
+        int iter;
+        for (iter=0; iter<5; iter++)
         {
-            if (k < 0)
+            // Go letter by letter finding matches of whatever length substrings.
+            for (j=0; j<ilen; j++)
             {
-                rel_align[i][j] = j;
-                align_sim[i][j] = 1000;
-            }
-            else
-            {
-                SearchResult sr = find_in_sequence(sequences[i].substr(j, seek_len), sequences[k]);
-
-                // Fill rel_align with sequence alignments. For example, if 100-110 of sequence 0 matches 120-130 of sequence 1, then
-                // rel_align[120] thru [130] will contain the values 100 thru 110.
-                // If an existing rel_align is nonzero, only overwrite it if the new aa is a better match.
-                // If the sequence has a deletion, there will be a gap in its numbers (e.g. 231, 232, 234, 235).
-                // If it has an insertion, the inserted residue will be zero (e.g. 231, 232, 0, 233, 234).
-                for (l = 0; l < seek_len; l++)
+                if (k < 0)
                 {
-                    int ioff = l + j;
-                    int koff = l + sr.position;
-                    if (ioff >= ilen || koff >= klen) break;
-
-                    if (rel_align[i][ioff] >= 0)
+                    rel_align[i][j] = j;
+                    align_sim[i][j] = 1000;
+                }
+                else
+                {
+                    if (lbound[i][j] > sequences[k].length())
                     {
-                        char oldm = sequences[k].at(in_array(rel_align[i][ioff], rel_align[k]));
-                        char newm = sequences[k].at(koff);
-                        char cmpr = sequences[i].at(ioff);
+                        break;
+                    }
 
-                        // Assess which aa is the closer fit, not simply equals.
-                        int incumbent = align_sim[i][ioff]; // (cmpr == oldm) ? 1 : 0;
-                        int challenge = sr.similarity; // (cmpr == newm) ? 1 : 0;
+                    SearchResult sr = find_in_sequence(
+                        sequences[i].substr(j, seek_len),
+                        sequences[k].substr(
+                            lbound[i][j],
+                            ubound[i][j] - lbound[i][j] + seek_len
+                            )
+                        );
+                    
+                    sr.position += lbound[i][j];
 
-                        if (challenge > incumbent)
+                    // Fill rel_align with sequence alignments. For example, if 100-110 of sequence 0 matches 120-130 of sequence 1, then
+                    // rel_align[120] thru [130] will contain the values 100 thru 110.
+                    // If an existing rel_align is nonzero, only overwrite it if the new aa is a better match.
+                    // If the sequence has a deletion, there will be a gap in its numbers (e.g. 231, 232, 234, 235).
+                    // If it has an insertion, the inserted residue will be zero (e.g. 231, 232, 0, 233, 234).
+                    for (l = 0; l < seek_len; l++)
+                    {
+                        int ioff = l + j;
+                        int koff = l + sr.position;
+                        if (ioff >= ilen || koff >= klen) break;
+
+                        if (rel_align[i][ioff] >= 0)
+                        {
+                            n = in_array(rel_align[i][ioff], rel_align[k]);
+                            char oldm = (n<0) ? '-' : sequences[k].at(n);
+                            char newm = sequences[k].at(koff);
+                            char cmpr = sequences[i].at(ioff);
+
+                            // Assess which aa is the closer fit, not simply equals.
+                            int incumbent = align_sim[i][ioff]; // (cmpr == oldm) ? 1 : 0;
+                            int challenge = sr.similarity; // (cmpr == newm) ? 1 : 0;
+
+                            if (challenge > incumbent)
+                            {
+                                rel_align[i][ioff] = rel_align[k][koff];
+                                align_sim[i][ioff] = sr.similarity;
+
+                                m = sr.position;
+                                if (iter) for (n = ioff; n < ilen; n++) if (lbound[i][n] < m) lbound[i][n] = m;
+                            }
+                        }
+                        else
                         {
                             rel_align[i][ioff] = rel_align[k][koff];
                             align_sim[i][ioff] = sr.similarity;
+
+                            m = sr.position;
+                            if (iter) for (n = ioff; n < ilen; n++) if (lbound[i][n] < m) lbound[i][n] = m;
                         }
                     }
-                    else
-                    {
-                        rel_align[i][ioff] = rel_align[k][koff];
-                        align_sim[i][ioff] = sr.similarity;
-                    }
-                }
 
-                // When detect an insertion, renumber all later positions across all alignments.
-                // Also try to match them with a different previous sequence.
-                // For instance if sequence 3 has 173, 174, 0, 175, then increment all sequences' >=175 and assign 175 to the zero in seq 3.
-                if (j > 0)
-                {
-                    if (rel_align[i][j] < rel_align[i][j-1])
+                    // When detect an insertion, renumber all later positions across all alignments.
+                    // Also try to match them with a different previous sequence.
+                    // For instance if sequence 3 has 173, 174, 0, 175, then increment all sequences' >=175 and assign 175 to the zero in seq 3.
+                    if (j > 0)
                     {
-                        // TODO: Determine which is the better fit and realign.
-                        rel_align[i][j-1] = rel_align[i][j] - 1;
+                        if (rel_align[i][j] < rel_align[i][j-1])
+                        {
+                            // TODO: Determine which is the better fit and realign.
+                            rel_align[i][j-1] = rel_align[i][j] - 1;
+                        }
+                        else if (rel_align[i][j] == rel_align[i][j-1])
+                        {
+                            // Insertion.
+                            if (align_sim[i][j] > align_sim[i][j-1])
+                                increment_since(rel_align[i][j]);
+                            else
+                                increment_since(rel_align[i][j-1]);
+                        }
                     }
-                    else if (rel_align[i][j] == rel_align[i][j-1])
+                }       // end if k >= 0
+            }       // end for j
+
+            // Fix out of sequence misalignments.
+            if (i && (k >= 0)) for (j=1; j<ilen; j++)
+            {
+                if (rel_align[i][j] < rel_align[i][j-1])
+                {
+                    m = rel_align[i][j];
+                    for (n = j; m && n >= 0 && rel_align[i][n] >= rel_align[i][j]; n--)
                     {
-                        // Insertion.
-                        if (align_sim[i][j] > align_sim[i][j-1])
-                            increment_since(rel_align[i][j]);
-                        else
-                            increment_since(rel_align[i][j-1]);
+                        // rel_align[i][n] = m;
+                        align_sim[i][n] = -10000;
+                        if (ubound[i][j] > m) ubound[i][j] = m;
+                        m--;
                     }
                 }
-            }       // end if k >= 0
-        }       // end for j
+            }
+        }       // end for iter
     }       // end for i
 
     int max = 0;

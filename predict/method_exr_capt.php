@@ -114,8 +114,8 @@ LIG sdf/$ligname.sdf
 
 CEN RES 184 185
 PATH 1 RES 185 191 193
-PATH 2 REL 0 -5 0
-PATH 3 RES 114 165
+PATH 2 REL 0 -7 -5
+PATH 3 RES 114 265
 
 SIZE 7.0 7.5 7.0
 
@@ -123,7 +123,7 @@ POSE 10
 ITER 50
 
 # DIFF
-# ELIM 100
+ELIM 30
 
 OUT output/$protid-$ligname.pred.dock
 
@@ -194,7 +194,7 @@ $average = [];
 
 foreach ($sum as $node => $value)
 {
-	$average[$node] = round($value / (@$count[$node] ?: 1), 3);
+	$average["Node $node"] = round($value / (@$count[$node] ?: 1), 3);
 }
 
 $prediction = "(insufficient data)";

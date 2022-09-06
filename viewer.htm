@@ -172,11 +172,6 @@ a:hover
 {	font-size: 20px!important;
 }
 
-input[type=file]
-{
-    /*width: 600px;*/
-}
-
 input, select
 {
 	background-color: #036;
@@ -425,17 +420,6 @@ var tmcolor =
     6: hsl_to_rgb( 25, 224, 160),
     7: hsl_to_rgb(340, 128, 160),
 };
-
-/*var tmcolor =
-{
-    1: 0x887799,
-    2: 0x0077ff,
-    3: 0x00ff66,
-    4: 0x99cc66,
-    5: 0xffcc00,
-    6: 0xff9900,
-    7: 0xbb4466,
-};*/
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 
@@ -900,6 +884,28 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
     };
 });
 
+var PODefSchemeRainbow = NGL.ColormakerRegistry.addScheme(function (params)
+{
+	/*var morceaux = this.structure.name.split("|");
+	if (morceaux.length < 2) return PODefSchemeLigand(params);
+
+    var i;
+    var nmax = 0;
+
+    for (i=0; i<model.length; i++)
+    {
+        if (mpos[i] == gpose && mnod[i] > nmax) nmax = mnod[i];
+    }
+
+	var nodeNo = morceaux[1];
+	this.structure.rnbPos = (0.5 + nodeNo) / (nmax + 1);*/
+
+	this.atomColor = function(atom) 
+	{
+		return hsl_to_rgb(parseInt(255*atom.structure.rnbPos), 32, 191); 
+	}
+});
+
 var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function(atom)
@@ -963,7 +969,7 @@ function showPose(p)
 
     var pnodz = $('#pnodz')[0];
     pnodz.innerHTML = "Node: ";
-    var pmax = 1;
+    var pmax = 1, nmax = 0;
 
     for (i=0; i<model.length; i++)
     {
@@ -977,18 +983,35 @@ function showPose(p)
 
         if (mpos[i] > pmax) pmax = mpos[i];
 
-        if (mpos[i] == p && $("#nodebtn"+mnod[i]).length == 0 )
-        {
-            var nodebtn = document.createElement("a");
-            nodebtn.className = "nodebtn";
-            if (mnod[i]==0) $(nodebtn).addClass("hilite");
-            nodebtn.innerText = mnod[i];
-            nodebtn.id = "nodebtn"+mnod[i];
-            nodebtn.setAttribute("onclick", "showNode("+mnod[i]+");");
+        if ($("#nodebtn"+mnod[i]).length == 0)
+		{
+			if (mpos[i] == p )
+			{
+				var nodebtn = document.createElement("a");
+				nodebtn.className = "nodebtn";
+				if (mnod[i]==0) $(nodebtn).addClass("hilite");
+				nodebtn.innerText = mnod[i];
+				nodebtn.id = "nodebtn"+mnod[i];
+				nodebtn.setAttribute("onclick", "showNode("+mnod[i]+");");
 
-            pnodz.appendChild(nodebtn);
-        }
+				pnodz.appendChild(nodebtn);
+
+				if (mnod[i] > nmax) nmax = mnod[i];
+			}
+		}
     }
+
+	if (nmax)
+	{
+		var rnbbtn = document.createElement("a");
+		rnbbtn.className = "nodebtn";
+		if (mnod[i]==0) $(rnbbtn).addClass("hilite");
+		rnbbtn.innerText = "🌈";
+		rnbbtn.id = "rnbbtn";
+		rnbbtn.setAttribute("onclick", "centerPocket(); rainbowNodes();");
+
+		pnodz.appendChild(rnbbtn);
+	}
 
     if (p < 1)
     {
@@ -1051,6 +1074,8 @@ function showNode(n)
     		break;
     	}
     }
+
+	// Cartoon for active protein conformational change.
     if (bbi >= 0 && acvmdl)
     {
 		if (n >= acvnode)
@@ -1084,6 +1109,35 @@ function showNode(n)
     if (curr_ligand) $('#ligbtn, #prsv').show();
     
     if (cen_ligand) curr_ligand.autoView();
+}
+
+function rainbowNodes()
+{
+    var i, bbi=-1;
+    var nmax = 0;
+
+    for (i=0; i<model.length; i++)
+    {
+        if (mpos[i] == gpose && mnod[i] > nmax) nmax = mnod[i];
+    }
+
+    for (i=0; i<model.length; i++)
+    {
+        if (mpos[i] == gpose)
+        {
+			model[i].structure.rnbPos = (0.5 + mnod[i]) / (nmax + 1);
+			var mrp = mrparams[i];
+			if (mrp.colorScheme == PODefSchemeLigand) mrp.colorScheme = PODefSchemeRainbow;
+			model[i].removeAllRepresentations();
+            model[i].addRepresentation( mrep[i], mrp );
+            if (is_ligand[i])
+			{
+				if (mnod[i] == 0) curr_ligand = model[i];
+			}
+        }
+        else
+            model[i].removeAllRepresentations();
+    }
 }
 
 $("body").on("keyup", function(e, obj)

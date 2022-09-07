@@ -67,15 +67,6 @@ if (@$_REQUEST['next'])
 					$protid = $rcpid;
 					$ligname = $full_name;
 					
-					if (!file_exists("sdf/$ligname.sdf"))
-					{
-						$f = fopen("sdf/$ligname.sdf", "wb");
-						if (!$f) die("Unable to create sdf/$ligname.sdf, please ensure write access.\n");
-						$sdfdat = file_get_contents("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{$o['smiles']}/SDF?record_type=3d");
-						fwrite($f, $sdfdat);
-						fclose($f);
-					}
-					
 					goto found_next_pair;
 				}
 			}
@@ -89,9 +80,10 @@ if (@$_REQUEST['next'])
 else
 {
 	$protid = @$_REQUEST['prot'] ?: "TAAR5";
-	
 	$ligname = @$_REQUEST['lig'] ?: "trimethylamine";
 }
+
+ensure_sdf_exists($ligname);
 
 echo "Beginning dock of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);
@@ -113,7 +105,7 @@ PROT pdbs/$fam/$protid.rotated.pdb
 LIG sdf/$ligname.sdf
 
 CEN RES 184 185
-PATH 1 RES 185 191 193
+PATH 1 RES 185 193 195
 PATH 2 RES 94 195
 PATH 3 RES 114 265
 
@@ -158,6 +150,7 @@ if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
 if (count($outlines) < 100) die("Docking FAILED.\n");
 
 $benerg = [];
+$lprox = [];
 $pose = false;
 $node = -1;
 
@@ -171,22 +164,27 @@ foreach ($outlines as $ln)
 		$node = -1;
 	}
 	
-	if ($pose && $node>=0 && substr($ln, 0, 7) == "Total: ") $benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
+	if ($pose && $node>=0 && substr($ln, 0,  7) == "Total: "    ) $benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
+	if ($pose && $node>=0 && substr($ln, 0, 11) == "Proximity: ") $lprox[ $pose][$node] = floatval(explode(" ", $ln)[1]);
 }
 
 // print_r($benerg);
 
 $sum = [];
+$sump = [];
 $count = [];
 foreach ($benerg as $pose => $data)
 {
 	foreach ($data as $node => $value)
 	{
 		if (!isset($sum[$node]  )) $sum[$node] = 0.0;
+		if (!isset($sump[$node] )) $sump[$node] = 0.0;
 		if (!isset($count[$node])) $count[$node] = 0;
 		
 		$sum[$node] += $value;
 		$count[$node]++;
+
+		$sump[$node] += $lprox[$pose][$node];
 	}
 }
 
@@ -195,9 +193,15 @@ $average = [];
 foreach ($sum as $node => $value)
 {
 	$average["Node $node"] = round($value / (@$count[$node] ?: 1), 3);
+	$average["Proximity $node"] = round($sump[$node] / (@$count[$node] ?: 1), 3);
 }
 
-$prediction = "(insufficient data)";
+$ratio = max(-$average["Node 0"], -$average["Node 1"], -$average["Node 2"]) / -$average["Node 3"];
+$heldback = max($average["Proximity 0"], $average["Proximity 1"], $average["Proximity 2"], $average["Proximity 3"]);
+
+$prediction = "Non-Agonist";
+if ($heldback > 6.5) $prediction = "Inverse Agonist";
+else if ($ratio < 1.5) $prediction = "Agonist";
 
 $actual = best_empirical_pair($protid, $ligname);
 $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
@@ -215,6 +219,8 @@ else
 	// Reload to prevent overwriting another process' output.
 	if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
 	$dock_results[$protid][$ligname] = $average;
+
+	ksort($dock_results[$protid]);
 	
 	$keys = array_keys($dock_results);
 	natsort($keys);

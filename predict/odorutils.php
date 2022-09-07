@@ -44,3 +44,36 @@ function best_empirical_pair($protein, $aroma)
 		}
 	}
 }
+
+function ensure_sdf_exists($ligname)
+{
+	global $odors;
+
+	foreach ($odors as $o)
+	{
+		$full_name = str_replace(" ", "_", $o['full_name']);
+		if ($ligname && $ligname != $full_name) continue;
+
+		if (!file_exists("sdf/$ligname.sdf"))
+		{
+			$obresult = [];
+			exec("which obabel", $obresult);
+			if (trim(@$obresult[0]))
+			{
+				exec("obabel -:'{$o['smiles']}' --gen3D -osdf -Osdf/$ligname.sdf");
+			}
+			else
+			{
+				$f = fopen("sdf/$ligname.sdf", "wb");
+				if (!$f) die("Unable to create sdf/$ligname.sdf, please ensure write access.\n");
+				$sdfdat = file_get_contents("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{$o['smiles']}/SDF?record_type=3d");
+				fwrite($f, $sdfdat);
+				fclose($f);
+			}
+		}
+		return;
+	}
+
+	die("Odorant not found $ligname.\n");
+}
+

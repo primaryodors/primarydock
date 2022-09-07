@@ -30,8 +30,8 @@ const aa3let =
 var opc_molecule = 1.0;
 var opc_ligand = 1.0;
 var opc_cartoon = 0.25;
-var opc_sidechain = 0.3;
-var opc_sidechain_active = 0.4;
+var opc_sidechain = 0.36;
+var opc_sidechain_active = 0.41;
 var opc_metal = 1.0;
 
 var mtl_bs = 0.0;
@@ -983,6 +983,8 @@ function showPose(p)
     {
         if (mpos[i] == p && mnod[i] == 0)
         {
+			if (mrparams[i].colorScheme == PODefSchemeRainbow) mrparams[i].colorScheme = PODefSchemeLigand;
+			model[i].removeAllRepresentations();
             model[i].addRepresentation( mrep[i], mrparams[i] );
             if (is_ligand[i]) curr_ligand = model[i];
         }
@@ -1054,6 +1056,7 @@ function showNode(n)
         if (mpos[i] == gpose && mnod[i] == n)
         {
 			if (mrparams[i].colorScheme == PODefSchemeRainbow) mrparams[i].colorScheme = PODefSchemeLigand;			// @#$% shallow copy.
+			model[i].removeAllRepresentations();
             model[i].addRepresentation( mrep[i], mrparams[i] );
             if (is_ligand[i]) curr_ligand = model[i];
         }

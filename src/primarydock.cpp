@@ -24,6 +24,7 @@ struct DockResult
     std::string pdbdat;
     float bytype[_INTER_TYPES_LIMIT];
     float ibytype[_INTER_TYPES_LIMIT];
+    float proximity;                    // How far the ligand center is from the node's center.
 };
 
 char* get_file_ext(char* filename)
@@ -1920,7 +1921,7 @@ _try_again:
             if (debug) *debug << "Prepared metrics." << endl;
             #endif
 
-            // Allocate the array.
+            // Set the dock result properties and allocate the arrays.
             dr[drcount][nodeno].kJmol = (differential_dock && (maxclash > individual_clash_limit)) ? -Avogadro : btot;
             dr[drcount][nodeno].ikJmol = 0;
             dr[drcount][nodeno].metric  = new char*[metcount+4];
@@ -1928,6 +1929,7 @@ _try_again:
             dr[drcount][nodeno].imkJmol   = new float[metcount];
             dr[drcount][nodeno].mvdWrepl   = new float[metcount];
             dr[drcount][nodeno].imvdWrepl   = new float[metcount];
+            dr[drcount][nodeno].proximity    = ligand->get_barycenter().get_3d_distance(nodecen);
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
@@ -2190,6 +2192,9 @@ _try_again:
                             if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                             cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                         }
+
+                        if (output) *output << "Proximity: " << dr[j][k].proximity << endl << endl;
+                        cout << "Proximity: " << dr[j][k].proximity << endl << endl;
 
                         if (differential_dock)
                         {

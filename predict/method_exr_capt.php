@@ -94,16 +94,16 @@ switch ($fam)
 	$capturer = resno_from_bw($protid, "45.50");
 	$shuttler = resno_from_bw($protid, "45.51");
 
-	$shelf1 = resno_from_bw($protid, "5.29");
-	$shelf2 = resno_from_bw($protid, "5.31");
+	$shelf1   = resno_from_bw($protid, "5.29");
+	$shelf2   = resno_from_bw($protid, "5.31");
 
-	$flank = resno_from_bw($protid, "2.64");
+	$flank    = resno_from_bw($protid, "2.64");
 
-	$acid = resno_from_bw($protid, "3.32");
-	$bind = resno_from_bw($protid, "5.40");
-	$toggle = resno_from_bw($protid, "6.50");
+	$acid     = resno_from_bw($protid, "3.32");
+	$bind     = ($protid == "TAAR6" || $protid == "TAAR8") ? resno_from_bw($protid, "5.40") : "";
+	$toggle   = resno_from_bw($protid, "6.50");
 
-	if ($protid == "TAAR2")							// TAAR2 and TAAR1 have an insertion in TMR3.
+	if ($protid == "TAAR1" || $protid == "TAAR2")							// TAAR2 and TAAR1 have an insertion in TMR3.
 	{
 		$shelf1--;
 		$shelf2--;

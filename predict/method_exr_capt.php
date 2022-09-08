@@ -212,8 +212,11 @@ $ratio = $capture / max(0.001, @-$average["Node 3"]);
 // $heldback = max($average["Proximity 0"], $average["Proximity 1"], $average["Proximity 2"], $average["Proximity 3"]);
 
 $prediction = "Non-Agonist";
-if ($capture >= 30) $prediction = "Inverse Agonist";
-else if ($completion >= 0.7 && $ratio < 1.5) $prediction = "Agonist";
+if ($capture >= 20 && $completion >= 0.7)
+{
+	if ($ratio > 1.5) $prediction = "Inverse Agonist";
+	else $prediction = "Agonist";
+}
 
 $actual = best_empirical_pair($protid, $ligname);
 $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");

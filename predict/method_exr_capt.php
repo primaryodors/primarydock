@@ -88,6 +88,46 @@ ensure_sdf_exists($ligname);
 echo "Beginning dock of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);
 
+switch ($fam)
+{
+	case "TAAR":	
+	$capturer = resno_from_bw($protid, "45.50");
+	$shuttler = resno_from_bw($protid, "45.51");
+
+	$shelf1 = resno_from_bw($protid, "5.29");
+	$shelf2 = resno_from_bw($protid, "5.31");
+
+	$flank = resno_from_bw($protid, "2.64");
+
+	$acid = resno_from_bw($protid, "3.32");
+	$bind = resno_from_bw($protid, "5.40");
+	$toggle = resno_from_bw($protid, "6.50");
+
+	if ($protid == "TAAR2")							// TAAR2 and TAAR1 have an insertion in TMR3.
+	{
+		$shelf1--;
+		$shelf2--;
+	}
+	
+	$cenres = "CEN RES $capturer $shuttler";
+	$path1 = "PATH 1 RES $shuttler $shelf1 $shelf2";
+	$path2 = "PATH 2 RES $flank $shelf2";
+	$path3 = "PATH 3 RES $acid $bind $toggle";
+	break;
+	
+	default:
+	die("OR predictions will not work until the EXR2 HxxCE motif has been helixed and metal bound.\n");
+	
+	$captmtl1 = resno_from_bw($protid, "45.47");
+	$captmtl2 = resno_from_bw($protid, "45.50");
+	$captmtl3 = resno_from_bw($protid, "45.51");
+	
+	$cenres = "CEN RES $captmtl1 $captmtl2 $captmtl3";
+	$path1 = "";
+	$path2 = "";
+	$path3 = "";
+}
+
 
 $tmr2start = $prots[$protid]['region']['TMR2']['start'];
 $cyt1end = $tmr2start - 1;
@@ -104,10 +144,10 @@ PROT pdbs/$fam/$protid.rotated.pdb
 
 LIG sdf/$ligname.sdf
 
-CEN RES 184 185
-PATH 1 RES 185 193 195
-PATH 2 RES 94 195
-PATH 3 RES 114 265
+$cenres
+$path1
+$path2
+$path3
 
 SIZE 7.0 7.5 7.0
 

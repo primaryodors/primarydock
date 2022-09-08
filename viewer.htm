@@ -908,8 +908,6 @@ var PODefSchemeRainbow = NGL.ColormakerRegistry.addScheme(function (params)
 
 		var rnbint = parseInt(255*atom.structure.rnbPos)
 		var acol = hsl_to_rgb(rnbint, 81, 173);
-		if (isNaN(acol)) console.log("ERROR: hsl_to_rgb("+rnbint+") returned NaN!");
-		console.log("Atom "+atom.atomname+" gets color #"+acol.toString(16));
 		return acol;
 	}
 });
@@ -1018,7 +1016,7 @@ function showPose(p)
 		if (mnod[i]==0) $(rnbbtn).addClass("hilite");
 		rnbbtn.innerText = "🌈";
 		rnbbtn.id = "rnbbtn";
-		rnbbtn.setAttribute("onclick", "gmodel[0].autoView(); cen_ligand = false; rainbowNodes();");
+		rnbbtn.setAttribute("onclick", "rainbowNodes();");
 
 		pnodz.appendChild(rnbbtn);
 	}
@@ -1128,6 +1126,11 @@ function rainbowNodes()
     var i, bbi=-1;
     var nmax = 0;
 
+	gmodel[0].autoView();
+	cen_ligand = false;
+
+	// var cc = new NGL.ComponentCollection();
+
     for (i=0; i<model.length; i++)
     {
         if (mpos[i] == gpose && mnod[i] > nmax) nmax = mnod[i];
@@ -1146,10 +1149,14 @@ function rainbowNodes()
 			{
 				if (mnod[i] == 0) curr_ligand = model[i];
 			}
+			// cc.list.push(model[i]);
         }
         else
             model[i].removeAllRepresentations();
     }
+
+	// cc.setSelection("*");
+	// cc.autoView();
 }
 
 $("body").on("keyup", function(e, obj)

@@ -153,6 +153,8 @@ $benerg = [];
 $lprox = [];
 $pose = false;
 $node = -1;
+$poses_found = 0;
+$full_poses = 0;
 
 foreach ($outlines as $ln)
 {
@@ -164,8 +166,13 @@ foreach ($outlines as $ln)
 		$node = -1;
 	}
 	
-	if ($pose && $node>=0 && substr($ln, 0,  7) == "Total: "    ) $benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
+	if ($pose && $node>=0 && substr($ln, 0,  7) == "Total: "    )
+	{
+		$benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
+		if ($pose && $node==3 && $benerg[$pose][$node] < 0) $full_poses++;
+	}
 	if ($pose && $node>=0 && substr($ln, 0, 11) == "Proximity: ") $lprox[ $pose][$node] = floatval(explode(" ", $ln)[1]);
+	if (false !== strpos($ln, "pose(s) found")) $poses_found = intval($ln);
 }
 
 // print_r($benerg);
@@ -190,18 +197,23 @@ foreach ($benerg as $pose => $data)
 
 $average = [];
 
+$average['Poses'] = $poses_found;
+$average['Full poses'] = $full_poses;
+
 foreach ($sum as $node => $value)
 {
 	$average["Node $node"] = round($value / (@$count[$node] ?: 1), 3);
-	$average["Proximity $node"] = round($sump[$node] / (@$count[$node] ?: 1), 3);
+	// $average["Proximity $node"] = round($sump[$node] / (@$count[$node] ?: 1), 3);
 }
 
-$ratio = max(-$average["Node 0"], -$average["Node 1"], -$average["Node 2"]) / -$average["Node 3"];
-$heldback = max($average["Proximity 0"], $average["Proximity 1"], $average["Proximity 2"], $average["Proximity 3"]);
+$capture = max(-$average["Node 0"], -$average["Node 1"], -$average["Node 2"]);
+$completion = floatval($full_poses) / $poses_found;
+$ratio = $capture / max(0.001, @-$average["Node 3"]);
+// $heldback = max($average["Proximity 0"], $average["Proximity 1"], $average["Proximity 2"], $average["Proximity 3"]);
 
 $prediction = "Non-Agonist";
-if ($heldback > 6.5) $prediction = "Inverse Agonist";
-else if ($ratio < 1.5) $prediction = "Agonist";
+if ($capture >= 30) $prediction = "Inverse Agonist";
+else if ($completion >= 0.7 && $ratio < 1.5) $prediction = "Agonist";
 
 $actual = best_empirical_pair($protid, $ligname);
 $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");

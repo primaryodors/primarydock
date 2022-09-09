@@ -27,6 +27,17 @@ struct DockResult
     float proximity;                    // How far the ligand center is from the node's center.
 };
 
+struct AcvBndRot
+{
+    int resno;
+    std::string aname;
+    std::string bname;
+    Atom* atom;
+    Atom* btom;
+    Bond* bond;
+    float theta;
+}
+
 char* get_file_ext(char* filename)
 {
     int i = strlen(filename)-1;
@@ -86,6 +97,7 @@ float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 
 Point active_matrix_n[16], active_matrix_c[16];
 int active_matrix_count = 0, active_matrix_node = -1;
+std::vector<AcvBndRot> active_bond_rots;
 
 void iteration_callback(int iter)
 {
@@ -295,6 +307,15 @@ int interpret_config_line(char** fields)
         active_matrix_c[n].x = atof(fields[5]);
         active_matrix_c[n].y = atof(fields[6]);
         active_matrix_c[n].z = atof(fields[7]);
+    }
+    else if (!strcmp(fields[0], "ACVBROT"))
+    {
+        AcvBndRot abr;
+        abr.resno = atoi(fields[1]);
+        abr.aname = fields[2];
+        abr.bname = fields[3];
+        abr.theta = atof(fields[4]) * fiftyseventh;
+        active_bond_rots.push_back(abr);
     }
     else if (!strcmp(fields[0], "ACVNODE"))
     {
@@ -915,6 +936,24 @@ int main(int argc, char** argv)
     if (debug) *debug << "Loaded protein." << endl;
     #endif
 
+    if (active_bond_rots.size())
+    {
+        for (i=0; i<active_bond_rots.size(); i++)
+        {
+            active_bond_rots[i].atom = p.get_atom(active_bond_rots[i].resno, active_bond_rots[i].aname.c_str());
+            active_bond_rots[i].btom = p.get_atom(active_bond_rots[i].resno, active_bond_rots[i].bname.c_str());
+
+            if (!active_bond_rots[i].atom) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].aname
+                << " not found in protein!" << endl;
+            if (!active_bond_rots[i].btom) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].bname
+                << " not found in protein!" << endl;
+
+            if (active_bond_rots[i].atom && active_bond_rots[i].btom)
+                active_bond_rots[i].bond = active_bond_rots[i].atom->is_bonded_to(active_bond_rots[i].btom);
+            else active_bond_rots[i].bond = nullptr;
+        }
+    }
+
     int l;
     std::vector<std::string> rem_hx = p.get_remarks("650 HELIX");
     for (l=0; l<rem_hx.size(); l++)
@@ -1325,6 +1364,19 @@ _try_again:
                     // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
                     LocRotation lrot = p.rotate_piece(sr, er, er, calign, sr);
                     lrot.v.r = 1;
+
+                    // If there are any active bond rotations, perform them but ensure the angle is relative to the *original* position
+                    // from the PDB file.
+                    if (active_bond_rots.size())
+                    {
+                        for (i=0; i<active_bond_rots.size(); i++)
+                        {
+                            if (active_bond_rots[i].bond)
+                            {
+                                active_bond_rots[i].bond->rotate(active_bond_rots[i].theta - active_bond_rots[i].bond->total_rotations);
+                            }
+                        }
+                    }
 
                     if (wrote_acvmx < i)
                     {

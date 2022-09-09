@@ -35,7 +35,7 @@ if ($protid == "next" || $protid == "all")
 	echo "Processing $protid... ";
 }
 
-if (substr($protid, 0, 2) == "OR") die("Only ORs are currently supported.\n");
+if (substr($protid, 0, 2) != "OR") die("Only ORs are currently supported.\n");
 $fam = family_from_protid($protid);
 
 $lockarom = resno_from_bw($protid, "6.40");

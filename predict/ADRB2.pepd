@@ -43,6 +43,19 @@ IF %n < %termin GOTO _loopn
 LET @an[%i] /= %n
 
 
+LET %j = %TMR%i.s + %TMR%i.e
+LET %j /= 2
+LET %n = 0
+LET @am[%i]  = 0
+_loopm:
+LET @am[%i] += %j
+LET %j ++ 
+LET %n ++
+# IF %n < %termin GOTO _loopm
+
+LET @am[%i] /= %n
+
+
 LET %j = %TMR%i.e
 LET %n = 0
 LET @ac[%i]  = 0
@@ -102,6 +115,20 @@ IF %n < %termin GOTO _loopn2
 
 LET @in[%i] /= %n
 
+
+LET %j = %TMR%i.s + %TMR%i.e
+LET %j /= 2
+LET %n = 0
+LET @im[%i]  = 0
+_loopmi:
+LET @im[%i] += %j
+LET %j ++ 
+LET %n ++
+# IF %n < %termin GOTO _loopmi
+
+LET @im[%i] /= %n
+
+
 # ECHO "TMR" %i ": Average of four residues starting at " %TMR%i.s " = " @in[%i]
 IF %odd  THEN LET @icene += @in[%i]
 IF %even THEN LET @icenc += @in[%i]
@@ -156,6 +183,7 @@ IF %i <= 7 GOTO _loop132
 
 LET @avgdeltae = 0
 LET @avgdeltac = 0
+LET @avgdeltam = 0
 
 LET %i = 1
 _loop3:
@@ -164,17 +192,20 @@ LET %odd = %i & 1
 LET %even = 1 - %odd
 
 LET @delta_n = @an[%i] - @in[%i]
+LET @delta_m = @am[%i] - @im[%i]
 LET @delta_c = @ac[%i] - @ic[%i]
 
 IF %odd THEN LET @avgdeltae += @delta_n
 IF %even THEN IF %i != 6 THEN LET @avgdeltac += @delta_n
 IF %odd THEN IF %i != 5 THEN LET @avgdeltac += @delta_c
 IF %even THEN LET @avgdeltae += @delta_c
+LET @avgdeltam += @delta_m
 
 LET %i ++
 IF %i <= 7 GOTO _loop3
 
 LET @avgdeltae /= 7
+LET @avgdeltam /= 7
 LET @avgdeltac /= 5
 
 LET %i = 1
@@ -182,10 +213,13 @@ _loop4:
 
 LET %odd = %i & 1
 
+
 IF %odd THEN LET @an[%i] -= @avgdeltae
 ELSE LET @an[%i] -= @avgdeltac
 IF %odd THEN LET @ac[%i] -= @avgdeltac
 ELSE LET @ac[%i] -= @avgdeltae
+LET @am[%i] -= @avgdeltam
+
 
 LET %i ++
 IF %i <= 7 GOTO _loop4
@@ -201,6 +235,7 @@ LET %i = 1
 _loop2:
 
 LET @delta_n = @an[%i] - @in[%i]
+LET @delta_m = @am[%i] - @im[%i]
 LET @delta_c = @ac[%i] - @ic[%i]
 
 ECHO "	'TMR" %i "' => [ " ~
@@ -210,6 +245,12 @@ IF @delta_n.y >= 0 ECHO " " ~
 ECHO @delta_n.y ", " ~
 IF @delta_n.z >= 0 ECHO " " ~
 ECHO @delta_n.z ", " ~
+IF @delta_m.x >= 0 ECHO " " ~
+ECHO @delta_m.x ", " ~
+IF @delta_m.y >= 0 ECHO " " ~
+ECHO @delta_m.y ", " ~
+IF @delta_m.z >= 0 ECHO " " ~
+ECHO @delta_m.z ", " ~
 IF @delta_c.x >= 0 ECHO " " ~
 ECHO @delta_c.x ", " ~
 IF @delta_c.y >= 0 ECHO " " ~

@@ -11,6 +11,7 @@ $types =
 	4 => "sa",
 	5 => "vsa",
    -1 => "ia",
+   -999 => "?",
 ];
 $sepyt = array_flip($types);
 
@@ -18,7 +19,7 @@ function best_empirical_pair($protein, $aroma)
 {
 	global $odors, $sepyt;
 	
-	$btyp = 0;
+	$btyp = $sepyt["?"];
 	
 	foreach ($odors as $oid => $o)
 	{
@@ -32,7 +33,7 @@ function best_empirical_pair($protein, $aroma)
 				if (isset($acv[$protein]))
 				{
 					echo "Reference $ref says $aroma is a {$acv[$protein]['type']} for $protein.\n";
-					if ($sepyt[$acv[$protein]['type']] > $btyp || !$btyp)
+					if ($sepyt[$acv[$protein]['type']] > $btyp || $btyp == $sepyt["?"])
 					{
 						$btyp = $sepyt[trim($acv[$protein]['type'])];
 						// echo "Ligand type set to $btyp.\n";

@@ -155,7 +155,7 @@ POSE 10
 ITER 50
 
 # DIFF
-ELIM 30
+ELIM 20
 
 OUT output/$protid-$ligname.pred.dock
 
@@ -252,14 +252,15 @@ $ratio = $capture / max(0.001, @-$average["Node 3"]);
 // $heldback = max($average["Proximity 0"], $average["Proximity 1"], $average["Proximity 2"], $average["Proximity 3"]);
 
 $prediction = "Non-Agonist";
-if ($capture >= 20 && $completion >= 0.7)
+if ($capture >= 20 && $completion >= 0.5)
 {
 	if ($ratio > 1.5) $prediction = "Inverse Agonist";
 	else $prediction = "Agonist";
 }
 
 $actual = best_empirical_pair($protid, $ligname);
-$actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
+if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
+else $actual = "(unknown)";
 
 $average["Prediction"] = $prediction;
 $average["Actual"] = $actual;

@@ -1183,14 +1183,23 @@ _try_again:
             if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 
+            #if internode_momentum_only_on_activation 
+            conformer_momenta_multiplier = 1;
+            #else
             conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
+            #endif
 
             allow_ligand_360_tumble = nodes_no_ligand_360_tumble ? (nodeno == 0) : true;
             allow_ligand_360_flex   = nodes_no_ligand_360_flex   ? (nodeno == 0) : true;
 
             if (strlen(protafname) && nodeno == activation_node)
             {
-                // TODO: Persist the flexions of the side chains, except for those residues whose positions are important to activation.
+                #if internode_momentum_only_on_activation 
+                conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
+                #endif
+                
+                // Persist the flexions of the side chains. 
+                // TODO: Do not persist those residues whose positions are important to activation.
                 float* sidechain_bondrots[seql+4];
                 int sidechain_bondrotq[seql+4];
                 for (i=0; i<seql+4; i++)
@@ -1256,6 +1265,10 @@ _try_again:
 
             if (nodeno == active_matrix_node)
             {
+                #if internode_momentum_only_on_activation 
+                conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
+                #endif
+
                 #if active_persistence
                 j=0;
                 for (i=1; i<=seql; i++)

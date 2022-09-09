@@ -123,6 +123,8 @@
 // by this number, and bond rotation momenta by the square of this number.
 #define internode_momentum_mult 0.25
 
+#define internode_momentum_only_on_activation 1
+
 // Switches for conformational space search.
 #define allow_axial_tumble 1
 #define allow_bond_rots 1

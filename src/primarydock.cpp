@@ -36,7 +36,7 @@ struct AcvBndRot
     Atom* btom;
     Bond* bond;
     float theta;
-}
+};
 
 char* get_file_ext(char* filename)
 {
@@ -95,8 +95,8 @@ float* initial_binding;
 float* initial_vdWrepl;
 float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 
-Point active_matrix_n[16], active_matrix_c[16];
-int active_matrix_count = 0, active_matrix_node = -1;
+Point active_matrix_n[16], active_matrix_c[16], active_matrix_m[16];
+int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0;
 std::vector<AcvBndRot> active_bond_rots;
 
 void iteration_callback(int iter)
@@ -295,7 +295,7 @@ int interpret_config_line(char** fields)
 
         if (!active_matrix_count)
         {
-            for (i=0; i<16; i++) active_matrix_c[i] = active_matrix_n[i] = Point(0,0,0);
+            for (i=0; i<16; i++) active_matrix_c[i] = active_matrix_n[i] = active_matrix_m[i] = Point(0,0,0);
         }
 
         int n = atoi(&fields[1][3]);
@@ -304,9 +304,23 @@ int interpret_config_line(char** fields)
         active_matrix_n[n].x = atof(fields[2]);
         active_matrix_n[n].y = atof(fields[3]);
         active_matrix_n[n].z = atof(fields[4]);
-        active_matrix_c[n].x = atof(fields[5]);
-        active_matrix_c[n].y = atof(fields[6]);
-        active_matrix_c[n].z = atof(fields[7]);
+        if (fields[8] && fields[9] && fields[10])
+        {
+            active_matrix_type = 9;
+            active_matrix_m[n].x = atof(fields[5]);
+            active_matrix_m[n].y = atof(fields[6]);
+            active_matrix_m[n].z = atof(fields[7]);
+            active_matrix_c[n].x = atof(fields[8]);
+            active_matrix_c[n].y = atof(fields[9]);
+            active_matrix_c[n].z = atof(fields[10]);
+        }
+        else
+        {
+            active_matrix_type = 6;
+            active_matrix_c[n].x = atof(fields[5]);
+            active_matrix_c[n].y = atof(fields[6]);
+            active_matrix_c[n].z = atof(fields[7]);
+        }
     }
     else if (!strcmp(fields[0], "ACVBROT"))
     {
@@ -949,7 +963,7 @@ int main(int argc, char** argv)
                 << " not found in protein!" << endl;
 
             if (active_bond_rots[i].atom && active_bond_rots[i].btom)
-                active_bond_rots[i].bond = active_bond_rots[i].atom->is_bonded_to(active_bond_rots[i].btom);
+                active_bond_rots[i].bond = active_bond_rots[i].atom->get_bond_between(active_bond_rots[i].btom);
             else active_bond_rots[i].bond = nullptr;
         }
     }
@@ -1353,17 +1367,36 @@ _try_again:
                         throw 0xbadf12e;
                     }
 
-                    // Get the CA location of the C-terminus of the helix;
-                    // Add the active_matrix_c to the result;
-                    Point calign;
-                    calign = p.get_atom_location(er, "CA").add(active_matrix_c[i]);
+                    LocRotation lrot, nlrot, clrot;
 
-                    // Move the entire helix by the values of active_matrix_n.
-                    p.move_piece(sr, er, active_matrix_n[i].add(p.get_region_center(sr, er)));
+                    if (active_matrix_type == 6)
+                    {
+                        // Get the CA location of the C-terminus of the helix;
+                        // Add the active_matrix_c to the result;
+                        Point calign;
+                        calign = p.get_atom_location(er, "CA").add(active_matrix_c[i]);
 
-                    // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
-                    LocRotation lrot = p.rotate_piece(sr, er, er, calign, sr);
-                    lrot.v.r = 1;
+                        // Move the entire helix by the values of active_matrix_n.
+                        p.move_piece(sr, er, active_matrix_n[i].add(p.get_region_center(sr, er)));
+
+                        // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
+                        lrot = p.rotate_piece(sr, er, er, calign, sr);
+                        lrot.v.r = 1;
+                    }
+                    else if (active_matrix_type == 9)
+                    {
+                        p.move_piece(sr, er, p.get_region_center(sr, er).add(active_matrix_m[i]));
+                        int half = (sr + er) / 2;
+
+                        Point calign, nalign;
+                        calign = p.get_atom_location(er, "CA").add(active_matrix_c[i]);
+                        nalign = p.get_atom_location(sr, "CA").add(active_matrix_n[i]);
+
+                        nlrot = p.rotate_piece(sr, half, sr, nalign, half);
+                        clrot = p.rotate_piece(half, er, er, calign, half);
+                        nlrot.v.r = 1;
+                        clrot.v.r = 1;
+                    }
 
                     // If there are any active bond rotations, perform them but ensure the angle is relative to the *original* position
                     // from the PDB file.
@@ -1393,17 +1426,48 @@ _try_again:
                         #endif
 
                         #if write_active_rotation
-                        Point lrv(lrot.v);
-                        cout << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
-                            << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
-                            << lrot.origin.x << " " << lrot.origin.y << " " << lrot.origin.z << " "
-                            << lrv.x << " " << lrv.y << " " << lrv.z << " "
-                            << lrot.a << endl;
-                        if (output) *output << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
-                            << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
-                            << lrot.origin.x << " " << lrot.origin.y << " " << lrot.origin.z << " "
-                            << lrv.x << " " << lrv.y << " " << lrv.z << " "
-                            << lrot.a << endl;
+                        if (active_matrix_type == 9)
+                        {
+                            int half = (sr + er) / 2;
+
+                            Point nlrv(nlrot.v);
+                            cout << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << half << " "
+                                << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
+                                << nlrot.origin.x << " " << nlrot.origin.y << " " << nlrot.origin.z << " "
+                                << nlrv.x << " " << nlrv.y << " " << nlrv.z << " "
+                                << nlrot.a << endl;
+                            if (output) *output << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << half << " "
+                                << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
+                                << nlrot.origin.x << " " << nlrot.origin.y << " " << nlrot.origin.z << " "
+                                << nlrv.x << " " << nlrv.y << " " << nlrv.z << " "
+                                << nlrot.a << endl;
+
+                            Point clrv(clrot.v);
+                            cout << "ACR " << active_matrix_node << " " << regname << " " << half << " " << er << " "
+                                << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
+                                << clrot.origin.x << " " << clrot.origin.y << " " << clrot.origin.z << " "
+                                << clrv.x << " " << clrv.y << " " << clrv.z << " "
+                                << clrot.a << endl;
+                            if (output) *output << "ACR " << active_matrix_node << " " << regname << " " << half << " " << er << " "
+                                << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
+                                << clrot.origin.x << " " << clrot.origin.y << " " << clrot.origin.z << " "
+                                << clrv.x << " " << clrv.y << " " << clrv.z << " "
+                                << clrot.a << endl;
+                        }
+                        else
+                        {
+                            Point lrv(lrot.v);
+                            cout << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                                << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
+                                << lrot.origin.x << " " << lrot.origin.y << " " << lrot.origin.z << " "
+                                << lrv.x << " " << lrv.y << " " << lrv.z << " "
+                                << lrot.a << endl;
+                            if (output) *output << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                                << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
+                                << lrot.origin.x << " " << lrot.origin.y << " " << lrot.origin.z << " "
+                                << lrv.x << " " << lrv.y << " " << lrv.z << " "
+                                << lrot.a << endl;
+                        }
                         #endif
 
                         wrote_acvmx = i;

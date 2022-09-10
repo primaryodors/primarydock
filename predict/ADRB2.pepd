@@ -1,4 +1,4 @@
-# Peptiditor script for deriving active-state conformational changes from bovine rhodopsin.
+# Peptiditor script for deriving active-state conformational changes from human β2 adrenergic receptor.
 #
 
 # Load the active protein.
@@ -8,9 +8,13 @@ DELETE 1 1028
 
 RENUMBER 1029 9999 29
 
-ECHO %SEQLEN
-ECHO $SEQUENCE
-ECHO ""
+SAVE "pdbs/ADRB2/ADRB2.active.pdb"
+
+LOAD "pdbs/ADRB2/ADRB2.active.pdb"
+
+# ECHO %SEQLEN
+# ECHO $SEQUENCE
+# ECHO ""
 
 REGION TMR1 35 58
 REGION TMR2 72 95

@@ -1402,11 +1402,11 @@ _try_again:
                     // from the PDB file.
                     if (active_bond_rots.size())
                     {
-                        for (i=0; i<active_bond_rots.size(); i++)
+                        for (j=0; j<active_bond_rots.size(); j++)
                         {
-                            if (active_bond_rots[i].bond)
+                            if (active_bond_rots[j].bond)
                             {
-                                active_bond_rots[i].bond->rotate(active_bond_rots[i].theta - active_bond_rots[i].bond->total_rotations);
+                                active_bond_rots[j].bond->rotate(active_bond_rots[j].theta - active_bond_rots[j].bond->total_rotations);
                             }
                         }
                     }

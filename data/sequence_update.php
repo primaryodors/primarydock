@@ -171,7 +171,7 @@ foreach ($lines as $i => $ln)
         $remarks[] = "REMARK 800";
         foreach ($rcpbw as $region => $bw50)
         {
-            $remarks[] = "REMARK 800 SITE BW $region.50 $bw";
+            $remarks[] = "REMARK 800 SITE BW $region.50 $bw50";
         }
 
         $remarks[] = "REMARK 800";
@@ -180,7 +180,7 @@ foreach ($lines as $i => $ln)
             $remarks[] = "REMARK 800 SITE LIGAND_BINDING $bsr";
         }
 
-        $pdbdat = implode("\n", $remarks) . implode("\n", $not_remarks) . "\n\n";
+        $pdbdat = implode("\n", $remarks) . "\n" . implode("\n", $not_remarks) . "\n\n";
 
         $f = fopen($pdbname, "wb");
         if (!$f) die("FAILED to open $pdbname for writing; ensure have access.\n");

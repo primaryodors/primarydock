@@ -197,7 +197,7 @@ foreach ($matrix as $region => $values) $acv_matrix .= "ACVMX $region " . implod
 
 $configf = <<<heredoc
 
-PROT pdbs/$fam/$protid.rotated.pdb
+PROT pdbs/$fam/$protid.upright.pdb
 
 LIG sdf/$ligname.sdf
 

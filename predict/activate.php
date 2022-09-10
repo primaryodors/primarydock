@@ -52,7 +52,7 @@ $startconn = $midway-5;
 
 $pepddat = <<<heredoc
 
-LOAD "pdbs/$fam/$protid.rotated.pdb"
+LOAD "pdbs/$fam/$protid.upright.pdb"
 
 LET &bendamt = 0.5
 LET &mbendamt = 0.0 - &bendamt

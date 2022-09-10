@@ -92,7 +92,7 @@ $(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDI
 $(BINDIR)/peptiditor: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
 	$(CC) src/interpreter.cpp $(OBJS) -o $(BINDIR)/peptiditor $(CFLAGS)
 
-performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.rotated.pdb testdata/CAD_ion.sdf
+performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.upright.pdb testdata/CAD_ion.sdf
 	./$(BINDIR)/primarydock testdata/test_TAAR8.config
 
 # low-tooling regression tests below

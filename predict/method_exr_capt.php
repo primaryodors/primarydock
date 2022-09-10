@@ -140,7 +140,7 @@ $exr2end = $tmr5start - 1;
 
 $configf = <<<heredoc
 
-PROT pdbs/$fam/$protid.rotated.pdb
+PROT pdbs/$fam/$protid.upright.pdb
 
 LIG sdf/$ligname.sdf
 

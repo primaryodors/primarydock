@@ -140,13 +140,15 @@ foreach ($lines as $i => $ln)
         // TODO: Read the PDB and then rewrite it with updated contents.
         $rcpid = explode(" ", trim(substr($ln, 0, 11)))[0];
         $subdir = substr($rcpid, 0, 4);
-        if (substr($rcpid, 0, 2) == "OR") $subdir = "OR".intval(substr($rcpid,2));
+        if (substr($rcpid, 0, 2) == "OR") $subdir = "OR".intval(substr($rcpid,2,2));
 
         chdir(__DIR__);
         $pdbname = "../pdbs/$subdir/$rcpid.upright.pdb";
         if (file_exists("../pdbs/$subdir/$rcpid.rotated.pdb"))
             rename("../pdbs/$subdir/$rcpid.rotated.pdb", $pdbname);
 
+        if (!file_exists($pdbname)) continue;
+        
         $pdbdat = explode("\n",file_get_contents($pdbname));
         $remarks = [];
         $not_remarks = [];
@@ -187,6 +189,6 @@ foreach ($lines as $i => $ln)
         fwrite($f, $pdbdat);
         fclose($f);
 
-        exit;       // debug step.
+        // exit;       // debug step.
     }
 }

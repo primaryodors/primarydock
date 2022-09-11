@@ -26,6 +26,12 @@ REGION TMR7 306 329
 
 UPRIGHT
 
+LET @e3 = [15.360,-16.429,-23.026]
+LET @sub = [-12.132,-48.350,17.054]
+LET @cen = @e3 - @sub
+
+CENTER @cen
+
 SAVE "pdbs/ADRB2/ADRB2.active.pdb"
 
 LET %termin = 4
@@ -155,6 +161,7 @@ IF %even THEN LET @icene += @ic[%i]
 LET %i ++
 IF %i <= 7 GOTO _loop1
 
+GOTO _do_output
 
 LET @icenc /= 7
 LET @icene /= 7
@@ -229,6 +236,7 @@ LET %i ++
 IF %i <= 7 GOTO _loop4
 
 
+_do_output:
 # Output the deltas.
 
 ECHO "# Activation matrix from ADRB2.pepd:"

@@ -601,8 +601,10 @@ int main(int argc, char** argv)
             else if (!strcmp(fields[0], "CENTER"))
             {
                 l = 1;
+                Point newcen(0,0,0);
+                if (fields[l]) newcen = interpret_single_point(fields[l++]);
                 if (fields[l]) raise_error("Too many parameters given for CENTER.");
-                p.move_piece(1, 9999, Point(0,0,0));
+                p.move_piece(1, 9999, newcen);
             }	// CENTER
 
             else if (!strcmp(fields[0], "UPRIGHT"))

@@ -137,9 +137,10 @@ returns occur with large iteration values.
 Example:
 ```
 CENTER
+CENTER [0,0,0]
 ```
 
-Centers the entire protein at [0, 0, 0]. Currently this command does not take any arguments.
+Centers the entire protein at the optional specified coordinates, or [0, 0, 0] if omitted.
 
 
 # CONNECT
@@ -284,8 +285,8 @@ LET $name = "PrimaryDock"
 LET $range = $SEQUENCE FROM 174 FOR 20
 LET $sub = $name FROM 3 FOR 4
 LET &j = %i
-LET @loc = [5, 3, -8]           # Literal XYZ coordinates.
-LET @loc = [5, &j, %i]
+LET @loc = [5,3,-8]             # Literal XYZ coordinates. Do not include spaces!
+LET @loc = [5,&j,%i]
 LET @res174loc = 174            # Gets location of residue 174's alpha carbon.
 LET &j += @res174loc.y
 LET @loc3 = @loc1 + @loc2

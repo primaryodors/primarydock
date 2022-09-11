@@ -190,7 +190,7 @@ else
 	for ($try = 0; $try < $dock_retries; $try++)
 	{
 		set_time_limit(300);
-		exec("bin/primarydock tmp/prediction.config 2>&1", $outlines);
+		passthru("bin/primarydock tmp/prediction.config 2>&1", $outlines);
 		if (count($outlines) >= 100) break;
 	}
 }

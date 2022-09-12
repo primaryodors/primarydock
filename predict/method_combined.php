@@ -190,7 +190,9 @@ else
 	for ($try = 0; $try < $dock_retries; $try++)
 	{
 		set_time_limit(300);
-		passthru("bin/primarydock tmp/prediction.config 2>&1", $outlines);
+		$outlines = [];
+		passthru("bin/primarydock tmp/prediction.config");
+		$outlines = explode("\n", file_get_contents("output/$protid-$ligname.pred.dock"));
 		if (count($outlines) >= 100) break;
 	}
 }

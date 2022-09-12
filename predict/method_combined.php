@@ -169,6 +169,7 @@ ELIM 20
 
 OUT output/$protid-$ligname.pred.dock
 
+ECHO
 
 
 heredoc;

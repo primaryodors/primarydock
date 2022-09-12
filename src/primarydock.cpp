@@ -543,6 +543,28 @@ void prepare_initb()
     }
 }
 
+void prepare_acv_bond_rots()
+{
+    int i;
+    if (active_bond_rots.size())
+    {
+        for (i=0; i<active_bond_rots.size(); i++)
+        {
+            active_bond_rots[i].atom = protein->get_atom(active_bond_rots[i].resno, active_bond_rots[i].aname.c_str());
+            active_bond_rots[i].btom = protein->get_atom(active_bond_rots[i].resno, active_bond_rots[i].bname.c_str());
+
+            if (!active_bond_rots[i].atom) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].aname
+                << " not found in protein!" << endl;
+            if (!active_bond_rots[i].btom) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].bname
+                << " not found in protein!" << endl;
+
+            if (active_bond_rots[i].atom && active_bond_rots[i].btom)
+                active_bond_rots[i].bond = active_bond_rots[i].atom->get_bond_between(active_bond_rots[i].btom);
+            else active_bond_rots[i].bond = nullptr;
+        }
+    }
+}
+
 void do_tumble_spheres(Point l_pocket_cen)
 {
     int i, j, l, n;
@@ -955,23 +977,7 @@ int main(int argc, char** argv)
     if (debug) *debug << "Loaded protein." << endl;
     #endif
 
-    if (active_bond_rots.size())
-    {
-        for (i=0; i<active_bond_rots.size(); i++)
-        {
-            active_bond_rots[i].atom = p.get_atom(active_bond_rots[i].resno, active_bond_rots[i].aname.c_str());
-            active_bond_rots[i].btom = p.get_atom(active_bond_rots[i].resno, active_bond_rots[i].bname.c_str());
-
-            if (!active_bond_rots[i].atom) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].aname
-                << " not found in protein!" << endl;
-            if (!active_bond_rots[i].btom) cout << "WARNING: " << active_bond_rots[i].resno << ":" << active_bond_rots[i].bname
-                << " not found in protein!" << endl;
-
-            if (active_bond_rots[i].atom && active_bond_rots[i].btom)
-                active_bond_rots[i].bond = active_bond_rots[i].atom->get_bond_between(active_bond_rots[i].btom);
-            else active_bond_rots[i].bond = nullptr;
-        }
-    }
+    prepare_acv_bond_rots();
 
     int l;
     std::vector<std::string> rem_hx = p.get_remarks("650 HELIX");
@@ -1217,6 +1223,8 @@ _try_again:
             pf = fopen(protfname, "r");
             p.load_pdb(pf);
             fclose(pf);
+
+            prepare_acv_bond_rots();
         }
 
         prepare_initb();

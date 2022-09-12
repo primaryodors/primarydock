@@ -1400,19 +1400,6 @@ _try_again:
                         clrot.v.r = 1;
                     }
 
-                    // If there are any active bond rotations, perform them but ensure the angle is relative to the *original* position
-                    // from the PDB file.
-                    if (active_bond_rots.size())
-                    {
-                        for (j=0; j<active_bond_rots.size(); j++)
-                        {
-                            if (active_bond_rots[j].bond)
-                            {
-                                active_bond_rots[j].bond->rotate(active_bond_rots[j].theta - active_bond_rots[j].bond->total_rotations);
-                            }
-                        }
-                    }
-
                     if (wrote_acvmx < i)
                     {
                         #if write_activation_matrix
@@ -1475,6 +1462,20 @@ _try_again:
                         wrote_acvmx = i;
                     }
                 }
+
+                // If there are any active bond rotations, perform them but ensure the angle is relative to the *original* position
+                // from the PDB file.
+                if (active_bond_rots.size())
+                {
+                    for (j=0; j<active_bond_rots.size(); j++)
+                    {
+                        if (active_bond_rots[j].bond)
+                        {
+                            active_bond_rots[j].bond->rotate(active_bond_rots[j].theta - active_bond_rots[j].bond->total_rotations);
+                        }
+                    }
+                }
+
 
                 #if active_persistence_follow
                 for (i=0; active_persistence_resno[i]; i++)

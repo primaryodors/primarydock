@@ -559,7 +559,12 @@ void prepare_acv_bond_rots()
                 << " not found in protein!" << endl;
 
             if (active_bond_rots[i].atom && active_bond_rots[i].btom)
+            {
                 active_bond_rots[i].bond = active_bond_rots[i].atom->get_bond_between(active_bond_rots[i].btom);
+                #if _debug_active_bond_rot
+                active_bond_rots[i].bond->echo_on_rotate = true;
+                #endif
+            }
             else active_bond_rots[i].bond = nullptr;
         }
     }

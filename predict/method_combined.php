@@ -101,7 +101,16 @@ switch ($fam)
 
 	$acid     = resno_from_bw($protid, "3.32");
 	$bind     = ($protid == "TAAR6" || $protid == "TAAR8") ? resno_from_bw($protid, "5.40") : "";
-	$toggle   = resno_from_bw($protid, "6.50");
+	$toggle   = resno_from_bw($protid, "6.48");
+
+	$res644   = resno_from_bw($protid, "6.44");
+	$res343   = resno_from_bw($protid, "3.43");
+
+	$acvbrots = <<<heredoc
+ACVBROT $toggle CB CG 180
+ACVBROT $res644 CA CB 60
+ACVBROT $res343 CA CB -60
+heredoc;
 
 	if ($protid == "TAAR1" || $protid == "TAAR2")							// TAAR2 and TAAR1 have an insertion in TMR3.
 	{
@@ -157,7 +166,7 @@ ACVNODE 4
 
 $acv_matrix
 
-ACVBROT $toggle CA CB 180
+$acvbrots
 
 SIZE 7.0 7.5 7.0
 

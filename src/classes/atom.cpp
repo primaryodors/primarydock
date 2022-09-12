@@ -1211,6 +1211,10 @@ _cannot_reverse_bondrot:
     ;
     #endif
 
+    #if _debug_active_bond_rot
+    if (echo_on_rotate) cout << "Rotating " << atom->residue << ":" << atom->name << "-" << btom->name << " by " << theta*fiftyseven << " degrees." << endl;
+    #endif
+
     // cout << "Rotating " << atom->name << "-" << btom->name << "... ";
     for (i=0; moves_with_btom[i]; i++)
     {

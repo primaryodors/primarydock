@@ -20,6 +20,10 @@ public:
     float angular_momentum=0;
     float total_rotations=0;
 
+    #if _debug_active_bond_rot
+    bool echo_on_rotate = false;
+    #endif
+
     Bond();
     Bond(Atom* a, Atom* b, int card);
     ~Bond();

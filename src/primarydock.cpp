@@ -83,6 +83,7 @@ Molecule** gcfmols = NULL;
 int activation_node = -1;		// Default is never.
 int found_poses = 0;
 int triesleft = 0;				// Default is no retry.
+bool echo_progress = false;
 
 std::string origbuff = "";
 
@@ -418,6 +419,10 @@ int interpret_config_line(char** fields)
         #endif
         debug = new std::ofstream(fields[1], std::ofstream::out);
         return 1;
+    }
+    else if (!strcmp(fields[0], "ECHO"))
+    {
+        echo_progress = true;
     }
     else if (!strcmp(fields[0], "OUT"))
     {
@@ -1236,7 +1241,7 @@ _try_again:
             if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 
-            cout << (time(NULL) - began) << " seconds: pose " << pose << " node " << nodeno << endl;
+            if (echo_progress) cout << (time(NULL) - began) << " seconds: pose " << pose << " node " << nodeno << endl;
 
             #if internode_momentum_only_on_activation 
             conformer_momenta_multiplier = 1;

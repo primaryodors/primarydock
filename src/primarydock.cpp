@@ -1420,24 +1420,24 @@ _try_again:
                             int half = (sr + er) / 2;
 
                             Point nlrv(nlrot.v);
-                            cout << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << half << " "
+                            cout << "ACR " << active_matrix_node << " " << regname << "n " << sr << " " << half << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << nlrot.origin.x << " " << nlrot.origin.y << " " << nlrot.origin.z << " "
                                 << nlrv.x << " " << nlrv.y << " " << nlrv.z << " "
                                 << nlrot.a << endl;
-                            if (output) *output << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << half << " "
+                            if (output) *output << "ACR " << active_matrix_node << " " << regname << "n " << sr << " " << half << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << nlrot.origin.x << " " << nlrot.origin.y << " " << nlrot.origin.z << " "
                                 << nlrv.x << " " << nlrv.y << " " << nlrv.z << " "
                                 << nlrot.a << endl;
 
                             Point clrv(clrot.v);
-                            cout << "ACR " << active_matrix_node << " " << regname << " " << half << " " << er << " "
+                            cout << "ACR " << active_matrix_node << " " << regname << "c " << half << " " << er << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << clrot.origin.x << " " << clrot.origin.y << " " << clrot.origin.z << " "
                                 << clrv.x << " " << clrv.y << " " << clrv.z << " "
                                 << clrot.a << endl;
-                            if (output) *output << "ACR " << active_matrix_node << " " << regname << " " << half << " " << er << " "
+                            if (output) *output << "ACR " << active_matrix_node << " " << regname << "c " << half << " " << er << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << clrot.origin.x << " " << clrot.origin.y << " " << clrot.origin.z << " "
                                 << clrv.x << " " << clrv.y << " " << clrv.z << " "

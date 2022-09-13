@@ -155,6 +155,8 @@ if (!file_exists("output/$fam")) mkdir("output/$fam");
 if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
 if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n");
 
+$outfname = "output/$fam/$protid/$protid-$ligname.pred.dock";
+
 $configf = <<<heredoc
 
 PROT pdbs/$fam/$protid.upright.pdb
@@ -181,7 +183,7 @@ ITER 50
 # DIFF
 ELIM 20
 
-OUT output/$fam/$protid/$protid-$ligname.pred.dock
+OUT $outfname
 
 ECHO
 
@@ -207,7 +209,7 @@ else
 		set_time_limit(300);
 		$outlines = [];
 		passthru("bin/primarydock tmp/prediction.config");
-		$outlines = explode("\n", file_get_contents("output/$protid-$ligname.pred.dock"));
+		$outlines = explode("\n", file_get_contents($outfname));
 		if (count($outlines) >= 100) break;
 	}
 }

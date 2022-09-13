@@ -148,7 +148,12 @@ $exr2end = $tmr5start - 1;
 $acv_matrix = "";
 foreach ($matrix as $region => $values) $acv_matrix .= "ACVMX $region " . implode(" ", $values)."\n";
 
-
+chdir(__DIR__);
+chdir("..");
+if (!file_exists("output")) mkdir("output");
+if (!file_exists("output/$fam")) mkdir("output/$fam");
+if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
+if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n");
 
 $configf = <<<heredoc
 
@@ -176,7 +181,7 @@ ITER 50
 # DIFF
 ELIM 20
 
-OUT output/$protid-$ligname.pred.dock
+OUT output/$fam/$protid/$protid-$ligname.pred.dock
 
 ECHO
 
@@ -270,13 +275,14 @@ foreach ($sum as $node => $value)
 
 $capture = max(-$average["Node 0"], -$average["Node 1"], -$average["Node 2"]);
 $completion = floatval($full_poses) / $poses_found;
-$ratio = $capture / max(0.001, @-$average["Node 3"]);
+$completion *= (max(0.001, @-$average["Node 3"]) / $capture);
 // $heldback = max($average["Proximity 0"], $average["Proximity 1"], $average["Proximity 2"], $average["Proximity 3"]);
+$acvratio = -$average["Node 4"] / (-$average["Node 3"] ?: 0.001);
 
 $prediction = "Non-Agonist";
-if ($capture >= 20 && $completion >= 0.5)
+if ($capture >= 20 && $completion >= 0.75)
 {
-	if ($ratio > 1.5) $prediction = "Inverse Agonist";
+	if ($acvratio < 0.75) $prediction = "Inverse Agonist";
 	else $prediction = "Agonist";
 }
 

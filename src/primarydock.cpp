@@ -1254,7 +1254,7 @@ _try_again:
             if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 
-            if (echo_progress) cout << (time(NULL) - began) << " seconds: pose " << pose << " node " << nodeno << endl;
+            if (echo_progress) cout << (time(NULL) - began) << " seconds: starting pose " << pose << " node " << nodeno << "..." << endl;
 
             #if internode_momentum_only_on_activation 
             conformer_momenta_multiplier = 1;

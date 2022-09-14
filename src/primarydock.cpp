@@ -457,7 +457,6 @@ void read_config_file(FILE* pf)
 
             interpret_config_line(fields);
 
-            for (i=0; fields[i]; i++) delete[] fields[i];
             delete[] fields;
         }
         buffer[0] = 0;

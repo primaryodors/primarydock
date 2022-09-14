@@ -236,6 +236,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                         }
                     }
                 }
+
+                delete[] ab;
             }
         }
 

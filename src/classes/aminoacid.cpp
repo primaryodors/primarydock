@@ -17,6 +17,10 @@ char* override_aminos_dat=0;
 
 AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
 {
+    #if stalk_and_snipe_these_cursed_memory_leaks
+    cout << "AminoAcid::AminoAcid(FILE*, " << (prevaa ? prevaa->name : "NULL") << ", " << rno << ")" << endl;
+    #endif
+
     if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
     movability = MOV_FLEXONLY;
@@ -29,6 +33,10 @@ AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
 
 AminoAcid::~AminoAcid()
 {
+    #if stalk_and_snipe_these_cursed_memory_leaks
+    cout << "AminoAcid::~AminoAcid() destroy " << (name ? name : "no name") << endl;
+    #endif
+
     // if (name) delete[] name;
     if (atoms) delete[] atoms;
     atoms = nullptr;
@@ -37,6 +45,10 @@ AminoAcid::~AminoAcid()
 #define _ALGORITHMIC_GREEK 1
 AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 {
+    #if stalk_and_snipe_these_cursed_memory_leaks
+    cout << "AminoAcid::AminoAcid(" << letter << ", " << (prevaa ? prevaa->name : "NULL") << ")" << endl;
+    #endif
+
     if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
     movability = MOV_FLEXONLY;

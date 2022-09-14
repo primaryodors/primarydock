@@ -23,6 +23,10 @@ bool allow_ligand_360_flex = true;
 
 Molecule::Molecule(char const* lname)
 {
+    #if stalk_and_snipe_these_cursed_memory_leaks
+    cout << "Molecule::Molecule(" << (lname ? lname : "NULL") << ")" << endl;
+    #endif
+
     name = new char[strlen(lname)+1];
     strcpy(name, lname);
 
@@ -36,6 +40,10 @@ Molecule::Molecule(char const* lname)
 
 Molecule::Molecule()
 {
+    #if stalk_and_snipe_these_cursed_memory_leaks
+    cout << "Molecule::Molecule()" << endl;
+    #endif
+
     atoms = nullptr;
     smiles = nullptr;
     rings = nullptr;
@@ -47,6 +55,10 @@ Molecule::Molecule()
 
 Molecule::~Molecule()
 {
+    #if stalk_and_snipe_these_cursed_memory_leaks
+    cout << "Molecule::~Molecule() destroy " << (name? name : "NULL") << endl;
+    #endif
+
     if (atoms)
     {
         // int i;
@@ -79,6 +91,10 @@ bool noAtoms(Atom** array)
 
 Molecule::Molecule(char const* lname, Atom** collection)
 {
+    #if stalk_and_snipe_these_cursed_memory_leaks
+    cout << "Molecule::Molecule(" << (lname ? lname : "NULL") << ", [atom collection])" << endl;
+    #endif
+
     if (!collection)
     {
         cout << "Temporary molecule creation attempted from nullptr atom pointer array." << endl;
@@ -1147,6 +1163,8 @@ int Molecule::identify_rings()
                 }
             }
 
+            delete[] b;
+
             // If there are no "unused" bonded atoms, delete the chain.
             if (!k) chainlen[i] = 0;
             else active++;
@@ -1192,14 +1210,22 @@ void Molecule::identify_acidbase()
             if (!b) goto _not_acidic;
             if (carbon)
             {
-                if (!atoms[i]->is_pi()) goto _not_acidic;
+                if (!atoms[i]->is_pi())
+                {
+                    delete[] b;
+                    goto _not_acidic;
+                }
                 for (j=0; b[j]; j++)
                 {
                     if (!b[j]->btom) continue;
                     if (b[j]->cardinality == 2)
                     {
                         int fam = b[j]->btom->get_family();
-                        if (fam != CHALCOGEN) goto _not_acidic;
+                        if (fam != CHALCOGEN)
+                        {
+                            delete[] b;
+                            goto _not_acidic;
+                        }
                     }
                 }
             }
@@ -1207,7 +1233,11 @@ void Molecule::identify_acidbase()
             {
                 if (!b[j]->btom) continue;
                 int fam = b[j]->btom->get_family();
-                if (carbon && fam == PNICTOGEN) goto _not_acidic;
+                if (carbon && fam == PNICTOGEN)
+                {
+                    delete[] b;
+                    goto _not_acidic;
+                }
                 //cout << "Fam: " << fam << endl;
                 if (fam == CHALCOGEN && b[j]->cardinality < 2)
                 {
@@ -1219,7 +1249,11 @@ void Molecule::identify_acidbase()
                     else
                     {
                         Bond** b1 = b[j]->btom->get_bonds();
-                        if (!b1) goto _not_acidic;
+                        if (!b1)
+                        {
+                            delete[] b;
+                            goto _not_acidic;
+                        }
                         for (k=0; b1[k]; k++)
                         {
                             if (!b1[k]->btom) continue;

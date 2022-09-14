@@ -1558,7 +1558,6 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
                     arom_center = member_of[j]->get_center();
             }
 
-            geov = get_basic_geometry();
             Point bond0v = bonded_to[0].btom->get_location().subtract(&location);
             Point vanticen = location.subtract(arom_center);
             bond0v.scale(1);
@@ -1963,6 +1962,8 @@ bool Atom::is_in_ring(Ring* ring)
             }
         }
     }
+
+    delete[] ra;
 
     /*if (!strcmp(name, "NE1"))
     {

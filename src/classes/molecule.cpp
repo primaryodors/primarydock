@@ -105,6 +105,11 @@ Pose::Pose(Molecule* m)
     copy_state(m);
 }
 
+Pose::~Pose()
+{
+    if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete[] saved_atom_locs;
+}
+
 void Pose::reset()
 {
     sz = 0;
@@ -1278,7 +1283,7 @@ Bond** Molecule::get_rotatable_bonds()
         // TODO: There has to be a better way.
         Star s;
         s.pmol = this;
-        rotatable_bonds = s.paa->get_rotatable_bonds();
+        if (!rotatable_bonds) rotatable_bonds = s.paa->get_rotatable_bonds();
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;

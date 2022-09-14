@@ -556,15 +556,17 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         // Anisotropy.
         SCoord* ageo = a->get_geometry_aligned_to_bonds();
         SCoord* bgeo = b->get_geometry_aligned_to_bonds();
+        bool del_ageo=true, del_bgeo=true;
         int ag = a->get_geometry();
         int bg = b->get_geometry();
         int abc = a->get_bonded_atoms_count();
         int bbc = b->get_bonded_atoms_count();
         float asum=0, bsum=0, aniso=1;
-        bool del_ageo=false, del_bgeo=false;
 
         if (forces[i]->type == pi && ag >= 3 && bg >= 3)
         {
+            if (del_ageo) delete[] ageo;
+            if (del_bgeo) delete[] bgeo;
             ageo = get_geometry_for_pi_stack(ageo);
             bgeo = get_geometry_for_pi_stack(bgeo);
             ag = bg = 5;
@@ -574,12 +576,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         {
             if (!a->is_polar())
             {
+                if (del_ageo) delete[] ageo;
                 ageo = get_geometry_for_pi_stack(ageo);
                 ag = 5;
                 del_ageo = true;
             }
             if (!b->is_polar())
             {
+                if (del_bgeo) delete[] bgeo;
                 bgeo = get_geometry_for_pi_stack(bgeo);
                 bg = 5;
                 del_bgeo = true;
@@ -624,6 +628,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             bvec[j] = SCoord(0,0,0);
         for (j=bnx; j<bg; j++)
             bvec[j-bnx] = bgeo[j];
+
+        if (del_ageo) delete[] ageo;
+        if (del_bgeo) delete[] bgeo;
 
         // When pi-bonding to a heavy atom of a conjugated coplanar ring, treat the entire ring as if it were one atom.
         if ((forces[i]->type == pi || forces[i]->type == polarpi)
@@ -844,9 +851,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         k = (forces[i]->type - covalent) % _INTER_TYPES_LIMIT;
         total_binding_by_type[k] += partial;
-
-        if (del_ageo) delete[] ageo;
-        if (del_bgeo) delete[] bgeo;
 
         if (forces[i]->type == ionic && achg && bchg) break;
     }

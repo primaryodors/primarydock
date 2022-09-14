@@ -45,6 +45,19 @@ Molecule::Molecule()
     paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
 }
 
+Molecule::~Molecule()
+{
+    if (atoms)
+    {
+        // int i;
+        // for (i=0; atoms[i]; i++) delete atoms[i];
+        delete[] atoms;
+    }
+    if (smiles) delete[] smiles;
+    if (rings) delete[] rings;
+    if (rotatable_bonds) delete[] rotatable_bonds;
+}
+
 int length(Atom** array)
 {
     int numAtoms;
@@ -87,12 +100,6 @@ Molecule::Molecule(char const* lname, Atom** collection)
     reset_conformer_momenta();
     rotatable_bonds = 0;
 }
-
-Molecule::~Molecule()
-{
-    ;
-}
-
 
 Pose::Pose()
 {

@@ -14,6 +14,12 @@ Protein::Protein(const char* lname)
 {
     name = lname;
     aaptrmin.n = aaptrmax.n = 0;
+
+    residues = nullptr;
+    sequence = nullptr;
+    ca = nullptr;
+    res_reach = nullptr;
+    metals = nullptr;
 }
 
 bool Protein::add_residue(const int resno, const char aaletter)
@@ -221,6 +227,12 @@ int Protein::load_pdb(FILE* is, int rno)
     char buffer[1024];
     Atom* a;
 
+    if (residues) delete[] residues;
+    if (sequence) delete[] sequence;
+    if (ca) delete[] ca;
+    if (res_reach) delete[] res_reach;
+    if (metals) delete[] metals;
+
     AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file.
     AminoAcid* prevaa = nullptr;
 
@@ -311,6 +323,7 @@ int Protein::load_pdb(FILE* is, int rno)
                         char** fields = chop_spaced_fields(buffer);
                         if (fields[2] && !fields[3])
                             name = fields[2];
+                        delete[] fields;
                     }
                 }
             }

@@ -382,6 +382,8 @@ Atom::~Atom()
     if (name) delete[] name;
     if (bonded_to) delete[] bonded_to;*/
 
+    if (geov) delete[] geov;
+
     if (bonded_to)
     {
         int i;

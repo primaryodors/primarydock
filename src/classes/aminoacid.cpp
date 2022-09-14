@@ -27,6 +27,13 @@ AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
     if (prevaa) prevaa->next_aa = this;
 }
 
+AminoAcid::~AminoAcid()
+{
+    // if (name) delete[] name;
+    if (atoms) delete[] atoms;
+    atoms = nullptr;
+}
+
 #define _ALGORITHMIC_GREEK 1
 AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 {
@@ -229,6 +236,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                         }
                     }
                 }
+
+                delete[] ab;
             }
         }
 
@@ -260,6 +269,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                             }
                         }
                     }
+
+                    delete[] ab;
                 }
             }
         }

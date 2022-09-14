@@ -57,6 +57,7 @@ public:
     // Constructors.
     AminoAcid(FILE* instream, AminoAcid* prev_res=0, int resno_offset = 0);
     AminoAcid(const char letter, AminoAcid* prev_res=0);
+    ~AminoAcid();
 
     // Getters and setters.
     AminoAcid* get_prev() const

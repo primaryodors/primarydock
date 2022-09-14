@@ -556,7 +556,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         // Anisotropy.
         SCoord* ageo = a->get_geometry_aligned_to_bonds();
         SCoord* bgeo = b->get_geometry_aligned_to_bonds();
-        bool del_ageo=true, del_bgeo=true;
+        bool del_ageo=false, del_bgeo=false;
         int ag = a->get_geometry();
         int bg = b->get_geometry();
         int abc = a->get_bonded_atoms_count();

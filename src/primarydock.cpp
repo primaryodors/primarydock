@@ -1497,8 +1497,11 @@ _try_again:
                     if (CA) residue_follow[i] = CA->get_location().subtract(residue_follow[i]);
                 }
 
-                Point catch_up = average_of_points(residue_follow, i);
-                ligand->move(catch_up);
+                if (i)
+                {
+                    Point catch_up = average_of_points(residue_follow, i);
+                    ligand->move(catch_up);
+                }
                 #endif
 
                 #if save_active_protein

@@ -112,7 +112,7 @@ ACVBROT $res644 CA CB 60
 ACVBROT $res343 CA CB -60
 heredoc;
 
-	if ($protid == "TAAR1" || $protid == "TAAR2")							// TAAR2 and TAAR1 have an insertion in TMR3.
+	if ($protid == "TAAR1" || $protid == "TAAR2")							// TAAR2 and TAAR1 have an insertion in TMR5.
 	{
 		$shelf1--;
 		$shelf2--;
@@ -120,8 +120,11 @@ heredoc;
 	
 	$cenres = "CEN RES $capturer $shuttler";
 	$path1 = "PATH 1 RES $shuttler $shelf1 $shelf2";
-	$path2 = "PATH 2 RES $flank $shelf2";
-	$path3 = "PATH 3 RES $acid $bind $toggle";
+	// $path2 = "PATH 2 RES $flank $shelf2";
+	$path2 = "";
+	$path3 = "PATH 2 RES $acid $bind $toggle";
+
+	$pocketnode = 2;
 	break;
 	
 	default:
@@ -135,8 +138,11 @@ heredoc;
 	$path1 = "";
 	$path2 = "";
 	$path3 = "";
+
+	$pocketnode = 3;
 }
 
+$activenode = $pocketnode + 1;
 
 $tmr2start = $prots[$protid]['region']['TMR2']['start'];
 $cyt1end = $tmr2start - 1;
@@ -167,9 +173,9 @@ $cenres
 $path1
 $path2
 $path3
-PATH 4 REL 0 0 0
+PATH $activenode REL 0 0 0
 
-ACVNODE 4
+ACVNODE $activenode
 
 $acv_matrix
 
@@ -238,7 +244,7 @@ foreach ($outlines as $ln)
 	if ($pose && $node>=0 && substr($ln, 0,  7) == "Total: "    )
 	{
 		$benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
-		if ($pose && $node==3 && $benerg[$pose][$node] < 0) $full_poses++;
+		if ($pose && $node==$pocketnode && $benerg[$pose][$node] < 0) $full_poses++;
 	}
 	if ($pose && $node>=0 && substr($ln, 0, 11) == "Proximity: ") $lprox[ $pose][$node] = floatval(explode(" ", $ln)[1]);
 	if (false !== strpos($ln, "pose(s) found")) $poses_found = intval($ln);
@@ -275,11 +281,11 @@ foreach ($sum as $node => $value)
 	// $average["Proximity $node"] = round($sump[$node] / (@$count[$node] ?: 1), 3);
 }
 
-$capture = max(-$average["Node 0"], -$average["Node 1"], -$average["Node 2"]);
+$capture = max(-$average["Node 0"], -$average["Node 1"]/*, -$average["Node 2"]*/);
 $completion = floatval($full_poses) / $poses_found;
-$completion *= (max(0.001, @-$average["Node 3"]) / $capture);
+$completion *= (max(0.001, @-$average["Node $pocketnode"]) / $capture);
 // $heldback = max($average["Proximity 0"], $average["Proximity 1"], $average["Proximity 2"], $average["Proximity 3"]);
-$acvratio = -$average["Node 4"] / (-$average["Node 3"] ?: 0.001);
+$acvratio = -$average["Node $activenode"] / (-$average["Node $pocketnode"] ?: 0.001);
 
 $prediction = "Non-Agonist";
 if ($capture >= 20 && $completion >= 0.75)

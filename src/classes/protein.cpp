@@ -263,6 +263,7 @@ int Protein::load_pdb(FILE* is, int rno)
                 char tmp3let[5];
                 for (i=0; i<3; i++)
                     tmp3let[i] = buffer[17+i];
+                tmp3let[3] = 0;
                 tmp3let[4] = 0;
 
                 for (i=0; i<256; i++)
@@ -432,6 +433,20 @@ int Protein::load_pdb(FILE* is, int rno)
     residues[rescount] = 0;
 
     set_clashables();
+
+    int l;
+    std::vector<std::string> rem_hx = get_remarks("650 HELIX");
+    for (l=0; l<rem_hx.size(); l++)
+    {
+        char buffer[1024];
+        char buffer1[1024];
+        strcpy(buffer, rem_hx[l].c_str());
+        char** fields = chop_spaced_fields(buffer);
+
+        set_region(fields[3], atoi(fields[4]), atoi(fields[5]));
+
+        delete[] fields;
+    }
 
     return rescount;
 }

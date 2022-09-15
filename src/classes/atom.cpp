@@ -472,6 +472,11 @@ bool Atom::move(Point* pt)
     if (break_on_move) throw 0xb16fa7012a96eca7;
     #endif
 
+    if (isnan(pt->x) || isnan(pt->y) || isnan(pt->z))
+    {
+        return false;
+    }
+
     /*if (name && !strcmp(name, "CB"))
     {
     	Bond* b = get_bond_between("CA");
@@ -495,6 +500,11 @@ bool Atom::move_rel(SCoord* v)
     if (break_on_move) throw 0xb16fa7012a96eca7;
     #endif
 
+    if (isnan(v->phi) || isnan(v->theta) || isnan(v->r))
+    {
+        return false;
+    }
+
     /*if (name && !strcmp(name, "CB"))
     {
     	Bond* b = get_bond_between("CA");
@@ -517,6 +527,11 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     Bond* palin = excluding->get_bond_between(this);
     Atom** atoms = palin->get_moves_with_btom();
     if (!atoms) return 0;
+
+    if (isnan(pt->x) || isnan(pt->y) || isnan(pt->z))
+    {
+        return false;
+    }
 
     //cout << "Moving assembly starting with " << name << " excluding " << excluding->name << endl;
 

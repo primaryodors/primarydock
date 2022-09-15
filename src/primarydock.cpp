@@ -802,7 +802,7 @@ void do_tumble_spheres(Point l_pocket_cen)
                         int lac = ligand->get_atom_count();
                         for (u=0; u<lac; u++) ligand->get_atom(u)->stream_pdb_line(tspdbdat, 9000+u);
 
-                        int pseql = p.get_seq_length();
+                        int pseql = protein->get_seq_length();
                         v = 1;
                         for (u = 1; u < pseql; u++)
                         {
@@ -970,15 +970,16 @@ int main(int argc, char** argv)
     drift = 1.0 / (iters/25+1);
 
     // Load the protein or return an error.
-    Protein p(protfname);
-    protein = &p;
+    /* Protein p(protfname);
+    protein = &p; */
+    protein = new Protein(protfname);
     pf = fopen(protfname, "r");
     if (!pf)
     {
         cout << "Error trying to read " << protfname << endl;
         return 0xbadf12e;
     }
-    p.load_pdb(pf);
+    protein->load_pdb(pf);
     fclose(pf);
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
@@ -987,18 +988,6 @@ int main(int argc, char** argv)
     prepare_acv_bond_rots();
 
     int l;
-    std::vector<std::string> rem_hx = p.get_remarks("650 HELIX");
-    for (l=0; l<rem_hx.size(); l++)
-    {
-        char buffer[1024];
-        char buffer1[1024];
-        strcpy(buffer, rem_hx[l].c_str());
-        char** fields = chop_spaced_fields(buffer);
-
-        p.set_region(fields[3], atoi(fields[4]), atoi(fields[5]));
-
-        delete[] fields;
-    }
 
     if (!CEN_buf.length())
     {
@@ -1010,7 +999,7 @@ int main(int argc, char** argv)
 
     char** fields = chop_spaced_fields(buffer);
     pocketcen = pocketcen_from_config_fields(fields, nullptr);
-    loneliest = p.find_loneliest_point(pocketcen, size);
+    loneliest = protein->find_loneliest_point(pocketcen, size);
 
     #if pocketcen_is_loneliest
     pocketcen = loneliest;
@@ -1025,7 +1014,7 @@ int main(int argc, char** argv)
     }
     pktset = true;
 
-    p.mcoord_resnos = mcoord_resno;
+    protein->mcoord_resnos = mcoord_resno;
 
     // Load the ligand or return an error.
     Molecule m(ligfname);
@@ -1138,8 +1127,8 @@ int main(int argc, char** argv)
 
     int pose, nodeno, iter;
     Point nodecen = pocketcen;
-    seql = p.get_seq_length();
-    int rstart = p.get_start_resno();
+    seql = protein->get_seq_length();
+    int rstart = protein->get_start_resno();
     AminoAcid* reaches_spheroid[pathnodes+2][SPHREACH_MAX];
     int sphres = 0;
 
@@ -1148,7 +1137,7 @@ int main(int argc, char** argv)
 
     // When docking with a metalloprotein, use this temporary Molecule for interactions the same as
     // we use AminoAcid objects, except don't attempt to flex the metals object.
-    Molecule* met = p.metals_as_molecule();
+    Molecule* met = protein->metals_as_molecule();
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Created metals molecule." << endl;
     #endif
@@ -1157,11 +1146,11 @@ int main(int argc, char** argv)
 
     for (l=0; l<seql; l++)
     {
-        AminoAcid* laa = p.get_residue(l+rstart);
+        AminoAcid* laa = protein->get_residue(l+rstart);
         if (!laa) continue;
         for (n=l+1; n<seql; n++)
         {
-            AminoAcid* naa = p.get_residue(n+rstart);
+            AminoAcid* naa = protein->get_residue(n+rstart);
             if (!naa) continue;
             bclash += laa->get_intermol_clashes(naa);
         }
@@ -1227,8 +1216,10 @@ _try_again:
         if (pose > 1)
         {
             // TODO: Revert to saved original locations for the side chain atoms instead of reloading the protein.
+            delete protein;
+            protein = new Protein(protfname);
             pf = fopen(protfname, "r");
-            p.load_pdb(pf);
+            protein->load_pdb(pf);
             fclose(pf);
 
             prepare_acv_bond_rots();
@@ -1284,7 +1275,7 @@ _try_again:
                 }
                 for (i=1; i<=seql; i++)
                 {
-                    Bond** b = p.get_residue(i)->get_rotatable_bonds();
+                    Bond** b = protein->get_residue(i)->get_rotatable_bonds();
                     if (b)
                     {
                         int bq;
@@ -1300,14 +1291,16 @@ _try_again:
                     }
                 }
 
+                delete protein;
+                protein = new Protein(protfname);
                 pf = fopen(protafname, "r");
-                p.load_pdb(pf);
+                protein->load_pdb(pf);
                 fclose(pf);
                 prepare_initb();
 
                 for (i=1; i<=seql; i++)
                 {
-                    Bond** b = p.get_residue(i)->get_rotatable_bonds();
+                    Bond** b = protein->get_residue(i)->get_rotatable_bonds();
                     if (b)
                     {
                         int bq;
@@ -1371,7 +1364,7 @@ _try_again:
                 Point residue_follow[active_persistence_limit];
                 for (i=0; active_persistence_resno[i]; i++)
                 {
-                    Atom* CA = p.get_atom(active_persistence_resno[i], "CA");
+                    Atom* CA = protein->get_atom(active_persistence_resno[i], "CA");
                     if (!CA) residue_follow[i] = Point(0,0,0);
                     else residue_follow[i] = CA->get_location();
                 }
@@ -1381,7 +1374,7 @@ _try_again:
                 for (i=1; i<=active_matrix_count; i++)
                 {
                     std::string regname = (std::string)"TMR" + std::to_string(i);
-                    int sr = p.get_region_start(regname), er = p.get_region_end(regname);
+                    int sr = protein->get_region_start(regname), er = protein->get_region_end(regname);
 
                     if (!sr || !er)
                     {
@@ -1396,26 +1389,26 @@ _try_again:
                         // Get the CA location of the C-terminus of the helix;
                         // Add the active_matrix_c to the result;
                         Point calign;
-                        calign = p.get_atom_location(er, "CA").add(active_matrix_c[i]);
+                        calign = protein->get_atom_location(er, "CA").add(active_matrix_c[i]);
 
                         // Move the entire helix by the values of active_matrix_n.
-                        p.move_piece(sr, er, active_matrix_n[i].add(p.get_region_center(sr, er)));
+                        protein->move_piece(sr, er, active_matrix_n[i].add(protein->get_region_center(sr, er)));
 
-                        // Call p.rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
-                        lrot = p.rotate_piece(sr, er, er, calign, sr);
+                        // Call protein->rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
+                        lrot = protein->rotate_piece(sr, er, er, calign, sr);
                         lrot.v.r = 1;
                     }
                     else if (active_matrix_type == 9)
                     {
-                        p.move_piece(sr, er, p.get_region_center(sr, er).add(active_matrix_m[i]));
+                        protein->move_piece(sr, er, protein->get_region_center(sr, er).add(active_matrix_m[i]));
                         int half = (sr + er) / 2;
 
                         Point calign, nalign;
-                        calign = p.get_atom_location(er, "CA").add(active_matrix_c[i]);
-                        nalign = p.get_atom_location(sr, "CA").add(active_matrix_n[i]);
+                        calign = protein->get_atom_location(er, "CA").add(active_matrix_c[i]);
+                        nalign = protein->get_atom_location(sr, "CA").add(active_matrix_n[i]);
 
-                        nlrot = p.rotate_piece(sr, half, sr, nalign, half);
-                        clrot = p.rotate_piece(half, er, er, calign, half);
+                        nlrot = protein->rotate_piece(sr, half, sr, nalign, half);
+                        clrot = protein->rotate_piece(half, er, er, calign, half);
                         nlrot.v.r = 1;
                         clrot.v.r = 1;
                     }
@@ -1500,7 +1493,7 @@ _try_again:
                 #if active_persistence_follow
                 for (i=0; active_persistence_resno[i]; i++)
                 {
-                    Atom* CA = p.get_atom(active_persistence_resno[i], "CA");
+                    Atom* CA = protein->get_atom(active_persistence_resno[i], "CA");
                     if (CA) residue_follow[i] = CA->get_location().subtract(residue_follow[i]);
                 }
 
@@ -1514,8 +1507,8 @@ _try_again:
                     FILE* f = fopen("tmp/active.pdb", "wb");
                     if (f)
                     {
-                        p.save_pdb(f);
-                        p.end_pdb(f);
+                        protein->save_pdb(f);
+                        protein->end_pdb(f);
                         fclose(f);
                     }
                 }
@@ -1539,8 +1532,8 @@ _try_again:
                         int sr = atoi(fields[2]), er = atoi(fields[3]);
                         float theta = atof(fields[4]) * fiftyseventh;
 
-                        Point sloc = p.get_atom_location(sr, "CA"),
-                              eloc = p.get_atom_location(er, "CA");
+                        Point sloc = protein->get_atom_location(sr, "CA"),
+                              eloc = protein->get_atom_location(er, "CA");
 
                         LocatedVector lv = (SCoord)(sloc.subtract(eloc));
                         lv.origin = sloc;
@@ -1548,7 +1541,7 @@ _try_again:
                         int resno;
                         for (resno = sr; resno <= er; resno++)
                         {
-                            AminoAcid* aa = p.get_residue(resno);
+                            AminoAcid* aa = protein->get_residue(resno);
                             if (aa)
                             {
                                 MovabilityType mt = aa->movability;
@@ -1580,7 +1573,7 @@ _try_again:
                 #endif
             }
 
-            loneliest = p.find_loneliest_point(nodecen, size);
+            loneliest = protein->find_loneliest_point(nodecen, size);
 
             #if pocketcen_is_loneliest
             nodecen = loneliest;
@@ -1612,7 +1605,7 @@ _try_again:
             #endif
             #endif
 
-            sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, mcoord_resno);
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, mcoord_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
 
             for (i=0; i<sphres; i++)
@@ -1667,7 +1660,7 @@ _try_again:
                         float alignment_potential = 0;
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
-                            if (!p.aa_ptr_in_range(reaches_spheroid[nodeno][i]))
+                            if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][i]))
                             {
                                 reaches_spheroid[nodeno][i] = NULL;
                                 continue;
@@ -1884,7 +1877,7 @@ _try_again:
                 Molecule** delete_me;
                 Molecule::multimol_conform(
                     cfmols,
-                    delete_me = p.all_residues_as_molecules(),
+                    delete_me = protein->all_residues_as_molecules(),
                     iters,
                     &iteration_callback
                 );
@@ -1895,7 +1888,7 @@ _try_again:
                 Molecule** delete_me;
                 Molecule::multimol_conform(
                     cfmols,
-                    delete_me = p.all_residues_as_molecules(),
+                    delete_me = protein->all_residues_as_molecules(),
                     iters,
                     &iteration_callback
                 );
@@ -1927,11 +1920,11 @@ _try_again:
             if (debug) *debug << "Preparing output." << endl;
             #endif
 
-            char metrics[p.get_seq_length()+8][10];
-            float mkJmol[p.get_seq_length()+8];
-            float imkJmol[p.get_seq_length()+8];
-            float mvdWrepl[p.get_seq_length()+8];
-            float imvdWrepl[p.get_seq_length()+8];
+            char metrics[protein->get_seq_length()+8][10];
+            float mkJmol[protein->get_seq_length()+8];
+            float imkJmol[protein->get_seq_length()+8];
+            float mvdWrepl[protein->get_seq_length()+8];
+            float imvdWrepl[protein->get_seq_length()+8];
             int metcount=0;
             float btot=0;
 
@@ -1964,7 +1957,7 @@ _try_again:
             float final_vdWrepl[seql+4];
             for (i=0; i<seql+4; i++) final_binding[i] = final_vdWrepl[i] = 0;
 
-            std::vector<AminoAcid*> allres = p.get_residues_near(pocketcen, 10000);
+            std::vector<AminoAcid*> allres = protein->get_residues_near(pocketcen, 10000);
             qpr = allres.size();
             Molecule* postaa[seql+8];
             postaa[0] = ligand;
@@ -2010,13 +2003,13 @@ _try_again:
             for (i=0; i<=seql; i++) res_kJmol[i] = 0;
             #endif
 
-            sphres = p.get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, mcoord_resno);
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, mcoord_resno);
             // cout << "sphres " << sphres << endl;
             float maxclash = 0;
             for (i=0; i<sphres; i++)
             {
                 if (!reaches_spheroid[nodeno][i]) continue;
-                if (!p.aa_ptr_in_range(reaches_spheroid[nodeno][i])) continue;
+                if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][i])) continue;
                 reaches_spheroid[nodeno][i]->clear_atom_binding_energies();
                 int resno = reaches_spheroid[nodeno][i]->get_residue_no();
 
@@ -2130,7 +2123,7 @@ _try_again:
             {
                 for (k=0; reaches_spheroid[nodeno][k]; k++)
                 {
-                    if (!p.aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;
+                    if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;
                     n = reaches_spheroid[nodeno][k]->get_atom_count();
                     for (l=0; l<n; l++)
                     {

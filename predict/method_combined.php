@@ -12,6 +12,7 @@
 require("protutils.php");
 require("odorutils.php");
 require("matrix9.php");
+require("dock_eval.php");
 
 // Configurable variables
 $dock_retries = 5;
@@ -281,18 +282,7 @@ foreach ($sum as $node => $value)
 	// $average["Proximity $node"] = round($sump[$node] / (@$count[$node] ?: 1), 3);
 }
 
-$capture = max(-$average["Node 0"], -$average["Node 1"]/*, -$average["Node 2"]*/);
-$completion = floatval($full_poses) / $poses_found;
-$completion *= (max(0.001, @-$average["Node $pocketnode"]) / $capture);
-// $heldback = max($average["Proximity 0"], $average["Proximity 1"], $average["Proximity 2"], $average["Proximity 3"]);
-$acvratio = -$average["Node $activenode"] / (-$average["Node $pocketnode"] ?: 0.001);
-
-$prediction = "Non-Agonist";
-if ($capture >= 20 && $completion >= 0.75)
-{
-	if ($acvratio < 0.75) $prediction = "Inverse Agonist";
-	else $prediction = "Agonist";
-}
+$prediction = evaluate_result($average, $pocketnode);
 
 $actual = best_empirical_pair($protid, $ligname);
 if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");

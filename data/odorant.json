@@ -55,6 +55,16 @@
         "smiles": "CC(=O)C1=CC=C(C=C1)OC",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "clean",
+                "sweet",
+                "plasticky",
+                "anisic",
+                "cherry",
+                "vanilla",
+                "powdery"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "acacia",
@@ -86,6 +96,10 @@
         "smiles": "CC(=O)[O-]",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "vinegar"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "acrid",
@@ -263,6 +277,13 @@
                     "ec50": "-3.9"
                 }
             },
+            "https:\/\/doi.org\/10.1093\/chemse\/bji015":
+            {
+                "OR1E3":
+                {
+                    "type": "wa"
+                }
+            },
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
             {
                 "OR5A1":
@@ -404,12 +425,16 @@
         "smiles": "c1cccc(C(=O)O)c1OC(=O)C",
         "aroma":
         {
-            "http:\/\/www.thegoodscentscompany.com":
+            "http:\/\/www.primaryodors.org":
             [
                 "aromatic",
                 "aspirin",
                 "dusty",
                 "phenolic"
+            ],
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                ""
             ]
         }
     },
@@ -471,7 +496,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "garlic"
+                ""
             ]
         }
     },
@@ -833,6 +858,19 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-8.3"
+                },
+                "OR51L1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.04"
+                }
             }
         }
     },
@@ -928,6 +966,21 @@
                 {
                     "type": "na",
                     "antagonist": "1"
+                }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "na"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -1031,6 +1084,22 @@
                     "type": "na",
                     "antagonist": "1"
                 }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.13"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -1038,6 +1107,21 @@
     {
         "full_name": "alpha-isomethyl ionone",
         "smiles": "CC(=O)C(\\C)=CC1C(C)=CCCC1(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "orris",
+                "woody",
+                "floral",
+                "dried",
+                "fruit",
+                "violet",
+                "jammy",
+                "powdery",
+                "tea"
+            ]
+        },
         "activity":
         {
             "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
@@ -1424,10 +1508,10 @@
             }
         }
     },
-    "49bab8abd9617a1dc301b3fdbe4e2fef":
+    "2de2ed1ab796f4f14292cb6198994497":
     {
         "full_name": "ambroxide",
-        "smiles": "CC1(CCC[C@]2([C@H]1CC[C@@]3([C@@H]2CCO3)C)C)C",
+        "smiles": "C[C@]12CCCC(C1CC[C@@]3([C@@H]2CCO3)C)(C)C",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -1950,6 +2034,14 @@
         "smiles": "COC1=CC=C(C=C1)C=O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "floral",
+                "earthy",
+                "wet",
+                "anisic",
+                "moldy"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "anisic",
@@ -2037,12 +2129,19 @@
         "smiles": "c1ccccc1OC",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "phenolic",
+                "sweet",
+                "gasoline",
+                "anisic"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "anise",
-                "ethereal",
+                "phenolic",
                 "gasoline",
-                "phenolic"
+                "ethereal",
+                "anise"
             ]
         },
         "activity":
@@ -2104,14 +2203,22 @@
         "smiles": "C1=CC=CC=C1C=O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "cherry",
+                "sweet",
+                "almond",
+                "fusel",
+                "fruity"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "almond",
-                "bitter",
-                "cherry",
-                "fruity",
                 "sharp",
-                "sweet"
+                "sweet",
+                "bitter",
+                "almond",
+                "cherry",
+                ""
             ]
         },
         "activity":
@@ -2370,6 +2477,18 @@
         "smiles": "n1c2ccccc2sc1",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "quinolinic",
+                "carpet",
+                "plushy",
+                "tobacco",
+                "medicinal",
+                "meaty",
+                "nutty",
+                "coffee",
+                "rubbery"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "coffee",
@@ -2474,6 +2593,14 @@
                     "type": "ma",
                     "ec50": "-3.94"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-5"
+                }
             }
         }
     },
@@ -2498,6 +2625,56 @@
                 {
                     "type": "ma",
                     "ec50": "-4.86"
+                }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "sa",
+                    "ec50": "-5.72"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.24"
+                }
+            }
+        }
+    },
+    "dd82ca089de8ad7766e65c365c84cb46":
+    {
+        "full_name": "benzyl alcohol",
+        "smiles": "c1ccccc1CO",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "floral",
+                "rose",
+                "phenolic",
+                "balsamic"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "na"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -2988,6 +3165,29 @@
                     "type": "na",
                     "antagonist": "1"
                 }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "na"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR5A1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.35"
+                }
             }
         }
     },
@@ -3262,6 +3462,16 @@
         "smiles": "CC(C)(C)C1=CC=C(C=C1)CCC=O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "muguet",
+                "cyclamen",
+                "watery",
+                "waxy",
+                "milky",
+                "sweaty",
+                "laundry"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cyclamen",
@@ -3661,6 +3871,15 @@
         "smiles": "CCCCOC(=O)C(C)OC(=O)CCC",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "buttery",
+                "creamy",
+                "cheesy",
+                "milky",
+                "malty",
+                "fermented"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "buttermilk",
@@ -4006,6 +4225,14 @@
                     "type": "ma",
                     "ec50": "-4.52"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.47"
+                }
             }
         }
     },
@@ -4292,6 +4519,14 @@
                     "type": "ma",
                     "ec50": "-5.01"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.01"
+                }
             }
         }
     },
@@ -4486,6 +4721,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR51L1":
+                {
+                    "type": "ma",
+                    "ec50": "-5"
                 }
             }
         }
@@ -4893,6 +5136,15 @@
         "smiles": "CCCC1CC(=CC(=O)C1)C",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "celery",
+                "green",
+                "curry",
+                "watery",
+                "ozone",
+                "acrid"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "celery",
@@ -5066,6 +5318,18 @@
         "smiles": "C1=CC=C(C=C1)C=CC=O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "cinnamon_candy",
+                "cinnamon",
+                "sweet",
+                "spicy",
+                "oily",
+                "waxy",
+                "balsamic",
+                "woody",
+                "minty"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cinnamon",
@@ -5234,6 +5498,23 @@
                     "type": "wa",
                     "ec50": "-3.47"
                 }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.88"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.07"
+                }
             }
         }
     },
@@ -5268,6 +5549,18 @@
         "smiles": "CC\\C=C\/CCO",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "green",
+                "stemmy",
+                "watery",
+                "waxy",
+                "grassy",
+                "leafy",
+                "fluorescent_marker",
+                "fusel",
+                "herbal"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "foliage",
@@ -5450,6 +5743,40 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "na"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "ma",
+                    "ec50": "-5.01"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2J2":
+                {
+                    "type": "sa",
+                    "ec50": "-5.7"
+                },
+                "OR2J3":
+                {
+                    "type": "sa",
+                    "ec50": "-5.61"
+                },
+                "OR2W1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.7"
                 }
             }
         }
@@ -5646,6 +5973,19 @@
         "smiles": "CC(=CCCC(=CC=O)C)C",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "citrus_peel",
+                "lemon",
+                "lime",
+                "leafy",
+                "sweet",
+                "waxy",
+                "oily",
+                "citronella",
+                "limnic",
+                "green"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -6559,6 +6899,19 @@
                 {
                     "type": "ia"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2J2":
+                {
+                    "type": "ma",
+                    "ec50": "-5"
+                },
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.3"
+                }
             }
         }
     },
@@ -6667,6 +7020,22 @@
         "smiles": "CC(C)c1ccc(cc1)CC(C)C=O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "muguet",
+                "waxy",
+                "watery",
+                "cyclamen",
+                "floral",
+                "oily",
+                "leafy",
+                "green",
+                "laundry",
+                "aldehydic",
+                "musty",
+                "limnic",
+                "sweaty"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cyclamen",
@@ -6693,6 +7062,22 @@
                 {
                     "type": "ma",
                     "ec50": "-4.95"
+                }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.02"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -6860,6 +7245,14 @@
                 {
                     "type": "vwa"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2J2":
+                {
+                    "type": "ma",
+                    "ec50": "-5"
+                }
             }
         }
     },
@@ -6947,6 +7340,15 @@
         "smiles": "C1CCCCC1OC(=O)c2ccccc2O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "salicylic",
+                "balsamic",
+                "floral",
+                "sweet",
+                "waxy",
+                "woody"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -7489,6 +7891,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR56A4":
+                {
+                    "type": "ma",
+                    "ec50": "-4.41"
+                }
             }
         }
     },
@@ -7844,6 +8254,17 @@
         "smiles": "CCCCCC1CCCC(=O)O1",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "sweet",
+                "peach",
+                "creamy",
+                "rubbery",
+                "lactonic",
+                "coconut",
+                "pear",
+                "milky"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "coconut",
@@ -7906,6 +8327,16 @@
         "smiles": "CCCCCCCC1CCCC(=O)O1",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "lactonic",
+                "watery",
+                "metallic",
+                "sweet",
+                "milky",
+                "oily",
+                "peach"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "buttery",
@@ -8250,6 +8681,14 @@
                 {
                     "type": "sa",
                     "ec50": "-5.99"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.9"
                 }
             }
         }
@@ -8816,6 +9255,13 @@
                 "OR51B4":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.3389%2Ffmolb.2015.00073":
+            {
+                "OR10J1":
+                {
+                    "type": "vsa"
                 }
             }
         }
@@ -9438,6 +9884,13 @@
                     "type": "ma",
                     "ec50": "-4.02"
                 }
+            },
+            "https:\/\/doi.org\/10.1074\/jbc.m110.211524":
+            {
+                "OR7A5":
+                {
+                    "type": "ma"
+                }
             }
         }
     },
@@ -9873,6 +10326,14 @@
                     "type": "ma",
                     "ec50": "-4.52"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-5.6"
+                }
             }
         }
     },
@@ -10121,6 +10582,14 @@
                 {
                     "type": "vwa"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR11A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-9"
+                }
             }
         }
     },
@@ -10130,6 +10599,16 @@
         "smiles": "CCCCCCC(=O)OCC",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "fruity",
+                "pineapple",
+                "grape",
+                "sweet",
+                "balsamic",
+                "rum",
+                "wine"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cognac",
@@ -10339,6 +10818,14 @@
                     "type": "ma",
                     "ec50": "-5.01"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-4"
+                }
             }
         }
     },
@@ -10368,6 +10855,14 @@
                     "type": "ma",
                     "ec50": "-4.27"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-3.8"
+                }
             }
         }
     },
@@ -10377,6 +10872,17 @@
         "smiles": "CCCCCCCCC(=O)OCC",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "fruity",
+                "fusel",
+                "waxy",
+                "balsamic",
+                "wine",
+                "rose",
+                "fermented",
+                "dragonfruit"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "fruity",
@@ -10504,10 +11010,65 @@
             }
         }
     },
+    "1ba917e190b6c0001bbb0fcf33c1f1ea":
+    {
+        "full_name": "2-ethyl pyrazine",
+        "smiles": "CCC1=NC=CN=C1",
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ia",
+                    "ec50": "-3.5"
+                }
+            }
+        }
+    },
+    "d93ab14b11db277c08c64cc03f57844f":
+    {
+        "full_name": "2-ethyl pyridine",
+        "smiles": "CCC1=CC=CC=N1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "grassy"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4"
+                }
+            }
+        }
+    },
     "43ab755478b4df3ad6ec5c06208fe6f5":
     {
         "full_name": "(ethylthio-)methanethiol",
         "smiles": "CCSCS"
+    },
+    "78c0cbf57c6e6658d77357c01ae1405e":
+    {
+        "full_name": "ethyl 3,5,5-trimethyl hexanoate",
+        "smiles": "CCOC(=O)CC(C)CC(C)(C)C",
+        "activity":
+        {
+            "https:\/\/etheses.bham.ac.uk\/\/id\/eprint\/3450\/1\/Correia_12_PhD.pdf":
+            {
+                "OR2AE1":
+                {
+                    "type": "ma"
+                }
+            }
+        }
     },
     "00cfa31cc62427e926867c63d36ee080":
     {
@@ -10529,9 +11090,9 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "caramellic",
-                "creamy",
                 "sweet",
-                "vanilla"
+                "vanilla",
+                "creamy"
             ]
         },
         "activity":
@@ -10664,6 +11225,14 @@
                     "type": "sa",
                     "ec50": "-4.9"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR10G3":
+                {
+                    "type": "ma",
+                    "ec50": "-5.01"
+                }
             }
         }
     },
@@ -10673,6 +11242,15 @@
         "smiles": "O2C1(CCC(CC1)C2(C)C)C",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "camphorous",
+                "eucalyptus",
+                "conifer",
+                "waxy",
+                "watery",
+                "minty"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "camphorous",
@@ -10894,6 +11472,14 @@
                 "TAAR5":
                 {
                     "type": "wa"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR10G7":
+                {
+                    "type": "vsa",
+                    "ec50": "-9"
                 }
             }
         }
@@ -11142,6 +11728,19 @@
         "smiles": "O=C1C(C)(C)C2CC1(C)CC2",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "citrus",
+                "camphorous",
+                "citrus_peel",
+                "tart",
+                "oily",
+                "lime",
+                "lemon",
+                "waxy",
+                "pine",
+                "conifer"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "camphoreous",
@@ -11625,6 +12224,16 @@
         "smiles": "CCCCCCC1CCC(=O)O1",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "peach",
+                "sweet",
+                "lactonic",
+                "milky",
+                "coconut",
+                "oily",
+                "balsamic"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "buttery",
@@ -11707,6 +12316,17 @@
         "smiles": "CCCCCC1CCC(=O)O1",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "sweet",
+                "lactonic",
+                "donuts",
+                "coconut",
+                "waxy",
+                "balsamic",
+                "oily",
+                "milky"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "buttery",
@@ -11762,6 +12382,15 @@
         "smiles": "CCCCC1CCC(=O)O1",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "lactonic",
+                "balsamic",
+                "creamy",
+                "malty",
+                "buttery",
+                "waxy"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "coconut",
@@ -11810,6 +12439,16 @@
         "smiles": "CCCCCCCC1CCC(=O)O1",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "clean",
+                "waxy",
+                "milky",
+                "vinyl",
+                "lactonic",
+                "coconut",
+                "peach"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "apricot",
@@ -12066,6 +12705,23 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.48"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "sa",
+                    "ec50": "-5.74"
+                }
             }
         }
     },
@@ -12229,6 +12885,19 @@
                 {
                     "type": "wa",
                     "ec50": "-2.91"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2A25":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.09"
+                },
+                "OR2J3":
+                {
+                    "type": "ma",
+                    "ec50": "-4.71"
                 }
             }
         }
@@ -12596,6 +13265,145 @@
                 {
                     "type": "ma"
                 }
+            },
+            "https:\/\/s-space.snu.ac.kr\/handle\/10371\/169429?mode=full":
+            {
+                "OR10AD1":
+                {
+                    "type": "vwa"
+                },
+                "OR10P1":
+                {
+                    "type": "vwa"
+                },
+                "OR10Z1":
+                {
+                    "type": "vwa"
+                },
+                "OR11G2":
+                {
+                    "type": "vwa"
+                },
+                "OR14I1":
+                {
+                    "type": "vwa"
+                },
+                "OR1A1":
+                {
+                    "type": "na"
+                },
+                "OR1M1":
+                {
+                    "type": "vwa"
+                },
+                "OR1S2":
+                {
+                    "type": "vwa"
+                },
+                "OR2A4":
+                {
+                    "type": "vwa"
+                },
+                "OR2A7":
+                {
+                    "type": "vwa"
+                },
+                "OR2T33":
+                {
+                    "type": "wa"
+                },
+                "OR2T35":
+                {
+                    "type": "vwa"
+                },
+                "OR4B1":
+                {
+                    "type": "vwa"
+                },
+                "OR4D1":
+                {
+                    "type": "wa"
+                },
+                "OR4F15":
+                {
+                    "type": "vwa"
+                },
+                "OR4K2":
+                {
+                    "type": "vwa"
+                },
+                "OR4P4":
+                {
+                    "type": "vwa"
+                },
+                "OR4X1":
+                {
+                    "type": "vwa"
+                },
+                "OR51E2":
+                {
+                    "type": "vwa"
+                },
+                "OR51F2":
+                {
+                    "type": "vwa"
+                },
+                "OR52E2":
+                {
+                    "type": "vwa"
+                },
+                "OR52E4":
+                {
+                    "type": "vwa"
+                },
+                "OR52N4":
+                {
+                    "type": "vwa"
+                },
+                "OR56A5":
+                {
+                    "type": "vwa"
+                },
+                "OR5AC2":
+                {
+                    "type": "vwa"
+                },
+                "OR5AP2":
+                {
+                    "type": "vwa"
+                },
+                "OR5B2":
+                {
+                    "type": "vwa"
+                },
+                "OR5M1":
+                {
+                    "type": "vwa"
+                },
+                "OR5T1":
+                {
+                    "type": "vwa"
+                },
+                "OR6A2":
+                {
+                    "type": "wa"
+                },
+                "OR6N2":
+                {
+                    "type": "vwa"
+                },
+                "OR7G2":
+                {
+                    "type": "vwa"
+                },
+                "OR8K1":
+                {
+                    "type": "vwa"
+                },
+                "OR9A2":
+                {
+                    "type": "vwa"
+                }
             }
         }
     },
@@ -12605,6 +13413,19 @@
         "smiles": "CC(CC1=CC2=C(C=C1)OCO2)C=O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "green",
+                "stemmy",
+                "floral",
+                "hay",
+                "jasmine",
+                "cyclamen",
+                "ozone",
+                "watery",
+                "malty",
+                "milky"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cyclamen",
@@ -12766,6 +13587,24 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.59"
+                },
+                "OR1A2":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.47"
+                },
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.01"
                 }
             }
         }
@@ -12947,6 +13786,19 @@
                 {
                     "type": "wa",
                     "ec50": "-2.71"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.49"
+                },
+                "OR1A2":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.77"
                 }
             }
         }
@@ -13364,6 +14216,14 @@
                     "type": "ma",
                     "ec50": "-3.78"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-7.52"
+                }
             }
         }
     },
@@ -13604,6 +14464,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.52"
                 }
             }
         }
@@ -14183,6 +15051,11 @@
         "smiles": "[SH2]",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "sulfurous",
+                "eggy"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "egg",
@@ -14252,6 +15125,18 @@
         "smiles": "CC(CCCC(C)(C)O)CC=O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "neroli",
+                "sweet",
+                "orange",
+                "floral",
+                "muguet",
+                "waxy",
+                "citronella",
+                "watery",
+                ""
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -14451,6 +15336,183 @@
                 {
                     "type": "wa"
                 }
+            },
+            "https:\/\/s-space.snu.ac.kr\/handle\/10371\/169429?mode=full":
+            {
+                "OR10A5":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.6"
+                },
+                "OR10A6":
+                {
+                    "type": "vwa",
+                    "ec50": "-6"
+                },
+                "OR10H1":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.6"
+                },
+                "OR10T2":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR10W1":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.9"
+                },
+                "OR11H6":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.1"
+                },
+                "OR1A1":
+                {
+                    "type": "na"
+                },
+                "OR1D5":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.5"
+                },
+                "OR1M1":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR2AG2":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR2AT4":
+                {
+                    "type": "vwa",
+                    "ec50": "-6.2"
+                },
+                "OR2D2":
+                {
+                    "type": "vwa",
+                    "ec50": "-5"
+                },
+                "OR2G6":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.9"
+                },
+                "OR2J2":
+                {
+                    "type": "vwa"
+                },
+                "OR2L2":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.6"
+                },
+                "OR2M3":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.9"
+                },
+                "OR4C12":
+                {
+                    "type": "vwa"
+                },
+                "OR4C46":
+                {
+                    "type": "vwa",
+                    "ec50": "-6.2"
+                },
+                "OR4C6":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR4K2":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR4K5":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR51B4":
+                {
+                    "type": "vwa"
+                },
+                "OR51E2":
+                {
+                    "type": "vwa",
+                    "ec50": "-5"
+                },
+                "OR51I2":
+                {
+                    "type": "vwa",
+                    "ec50": "-6.1"
+                },
+                "OR51J1":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.7"
+                },
+                "OR51S1":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.7"
+                },
+                "OR52B2":
+                {
+                    "type": "wa",
+                    "ec50": "-4.9"
+                },
+                "OR56A3":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.1"
+                },
+                "OR5H1":
+                {
+                    "type": "wa",
+                    "ec50": "-4.9"
+                },
+                "OR5I1":
+                {
+                    "type": "vwa",
+                    "ec50": "-5"
+                },
+                "OR6C1":
+                {
+                    "type": "wa",
+                    "ec50": "-5.2"
+                },
+                "OR6V1":
+                {
+                    "type": "vwa"
+                },
+                "OR6Y1":
+                {
+                    "type": "vwa"
+                },
+                "OR8B12":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.5"
+                },
+                "OR8K5":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.8"
+                },
+                "OR9A2":
+                {
+                    "type": "vwa",
+                    "ec50": "-5"
+                }
             }
         }
     },
@@ -14496,6 +15558,13 @@
                 "OR2AG1":
                 {
                     "type": "sa"
+                }
+            },
+            "https:\/\/doi.org\/10.1093\/chemse\/bji015":
+            {
+                "OR1G1":
+                {
+                    "type": "wa"
                 }
             },
             "https:\/\/doi.org\/10.1002\/chem.201402486":
@@ -14948,6 +16017,39 @@
                 {
                     "type": "ma",
                     "ec50": "-4.75"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.1"
+                }
+            }
+        }
+    },
+    "1c31ffea44510dd270f7681b3ec26870":
+    {
+        "full_name": "2-isobutyl-3-methylpyrazine",
+        "smiles": "CC1=NC=CN=C1CC(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "herbal",
+                "green",
+                "sugar"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "wa",
+                    "ec50": "-3.8"
                 }
             }
         }
@@ -15596,6 +16698,24 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR11H4":
+                {
+                    "type": "ma",
+                    "ec50": "-3.52"
+                },
+                "OR11H6":
+                {
+                    "type": "ma",
+                    "ec50": "-3.52"
+                },
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.82"
+                }
             }
         }
     },
@@ -15879,6 +16999,39 @@
             }
         }
     },
+    "dd05ac2161154126a22a8114fea385bc":
+    {
+        "full_name": "lavandulol",
+        "smiles": "CC(=CCC(CO)C(=C)C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "floral",
+                "waxy",
+                "mimosa",
+                "herbal"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "na"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "08cd0cbc96ac49fb3386a6a5cd54f634":
     {
         "full_name": "lenthionene",
@@ -15961,6 +17114,14 @@
                 }
             },
             "https:\/\/doi.org\/10.1021\/acschemneuro.5b00335":
+            {
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.19"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
                 "OR3A1":
                 {
@@ -16182,6 +17343,31 @@
                     "type": "ma",
                     "ec50": "-4.4"
                 }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.25"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "ma",
+                    "ec50": "-5.25"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1C1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.09"
+                }
             }
         }
     },
@@ -16229,6 +17415,15 @@
         "smiles": "CC(C)(CCCC1=CCC(CC1)C=O)O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "muguet",
+                "clean",
+                "cyclamen",
+                "watery",
+                "waxy",
+                "milky"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aquatic",
@@ -16403,6 +17598,30 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "sa",
+                    "ec50": "-5.59"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR10J5":
+                {
+                    "type": "ma",
+                    "ec50": "-5.14"
+                }
             }
         }
     },
@@ -16412,6 +17631,14 @@
         "smiles": "O=C1C=COC(C)=C1O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "sugary",
+                "sweet",
+                "cotton_candy",
+                "caramellic",
+                "bready"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "baked",
@@ -16552,6 +17779,54 @@
                 {
                     "type": "ma",
                     "ec50": "-4.66"
+                }
+            }
+        }
+    },
+    "ecc4ff544739a8b63a28dc9fd65dfea1":
+    {
+        "full_name": "melafleur",
+        "smiles": "CC1(CCCC2=C1CC(CC2)C=O)C",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "office_building",
+                "bland",
+                "dusty",
+                "dirty",
+                "fatty",
+                "ozone",
+                "floral",
+                "melon"
+            ],
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "floral",
+                "clean",
+                "muguet",
+                "ozone",
+                "marine",
+                "sandy",
+                "balsamic"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "sa",
+                    "ec50": "-5.73"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -16716,6 +17991,14 @@
                 "OR7D4":
                 {
                     "type": "vwa"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR8K3":
+                {
+                    "type": "ma",
+                    "ec50": "-5.32"
                 }
             }
         }
@@ -17020,6 +18303,56 @@
             ]
         }
     },
+    "a642592b62d67c1c184a0b464e1c5743":
+    {
+        "full_name": "methional",
+        "smiles": "CSCCC=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "vegetable",
+                "oily",
+                "creamy",
+                "tomato",
+                "potato",
+                "yeasty",
+                "bready",
+                "cheesy",
+                "limburger",
+                "cheese",
+                "savory",
+                "meaty",
+                "brothy"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.3389%2Ffmolb.2015.00073":
+            {
+                "OR2H1":
+                {
+                    "type": "sa"
+                }
+            }
+        }
+    },
+    "5f202994c411735594592732f7988785":
+    {
+        "full_name": "2-methoxy-3,5-dimethylpyrazine",
+        "smiles": "CC1=CN=C(C(=N1)C)OC",
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-7.7"
+                }
+            }
+        }
+    },
     "d749da79b391570f22fc1c13b9fb3d9d":
     {
         "full_name": "methoxyfuraneol",
@@ -17085,6 +18418,14 @@
                     "type": "ma",
                     "ec50": "-4.84"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-6.7"
+                }
             }
         }
     },
@@ -17102,6 +18443,32 @@
                 "green pea",
                 "raw potato"
             ]
+        }
+    },
+    "86bd1a10bf74d7227a7881822d7c57a2":
+    {
+        "full_name": "2-methoxy-3-methyl pyrazine",
+        "smiles": "CC1=NC=CN=C1OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "roasted",
+                "almond",
+                "hazelnut",
+                "peanut"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-5.2"
+                }
+            }
         }
     },
     "056c7884ba4f66df444b77efe3987015":
@@ -17677,6 +19044,14 @@
                     "type": "ma",
                     "ec50": "-5.21"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-8.22"
+                }
             }
         }
     },
@@ -18082,6 +19457,17 @@
     {
         "full_name": "methyl isoeugenol",
         "smiles": "CC=CC1=CC(=C(C=C1)OC)OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "spicy",
+                "clove",
+                "floral",
+                "carnation",
+                "woody"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1371\/journal.pone.0195263":
@@ -18553,6 +19939,33 @@
         "full_name": "(methylthio)methanethiol",
         "smiles": "CSCS"
     },
+    "57aa6bb2210215f3b9d7ec2131f9b391":
+    {
+        "full_name": "2-methylthio-3-methylpyrazine",
+        "smiles": "CC1=NC=CN=C1SC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "roasted",
+                "meaty",
+                "nutty",
+                "almond",
+                "vegetable"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-5"
+                }
+            }
+        }
+    },
     "ac320692ed06e5be395c62a38c3233a4":
     {
         "full_name": "3-(methylthio)-propylamine",
@@ -18781,6 +20194,14 @@
         "smiles": "CC(C)(CCC1=CC=CC=C1)O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "fresh",
+                "lavender",
+                "floral",
+                "muguet",
+                "waxy"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bois",
@@ -19287,6 +20708,248 @@
                 "acrid",
                 "fecal"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/s-space.snu.ac.kr\/handle\/10371\/169429?mode=full":
+            {
+                "OR10D3":
+                {
+                    "type": "wa"
+                },
+                "OR10G4":
+                {
+                    "type": "wa"
+                },
+                "OR10G6":
+                {
+                    "type": "wa"
+                },
+                "OR10G8":
+                {
+                    "type": "wa"
+                },
+                "OR10S1":
+                {
+                    "type": "wa"
+                },
+                "OR10V1":
+                {
+                    "type": "wa"
+                },
+                "OR11H2":
+                {
+                    "type": "wa"
+                },
+                "OR12D3":
+                {
+                    "type": "wa"
+                },
+                "OR13C3":
+                {
+                    "type": "vwa"
+                },
+                "OR13C4":
+                {
+                    "type": "wa"
+                },
+                "OR13C5":
+                {
+                    "type": "wa"
+                },
+                "OR14A2":
+                {
+                    "type": "wa"
+                },
+                "OR14I1":
+                {
+                    "type": "wa"
+                },
+                "OR1A1":
+                {
+                    "type": "na"
+                },
+                "OR1B1":
+                {
+                    "type": "wa"
+                },
+                "OR1C1":
+                {
+                    "type": "wa"
+                },
+                "OR1E2":
+                {
+                    "type": "wa"
+                },
+                "OR1L4":
+                {
+                    "type": "wa"
+                },
+                "OR1M1":
+                {
+                    "type": "wa"
+                },
+                "OR2AK2":
+                {
+                    "type": "wa"
+                },
+                "OR2C1":
+                {
+                    "type": "ma"
+                },
+                "OR2D3":
+                {
+                    "type": "wa"
+                },
+                "OR2F1":
+                {
+                    "type": "wa"
+                },
+                "OR2G3":
+                {
+                    "type": "wa"
+                },
+                "OR2K2":
+                {
+                    "type": "wa"
+                },
+                "OR2T29":
+                {
+                    "type": "wa"
+                },
+                "OR2T6":
+                {
+                    "type": "wa"
+                },
+                "OR4B1":
+                {
+                    "type": "ma"
+                },
+                "OR4C16":
+                {
+                    "type": "wa"
+                },
+                "OR4D1":
+                {
+                    "type": "ma"
+                },
+                "OR51A7":
+                {
+                    "type": "wa"
+                },
+                "OR51E1":
+                {
+                    "type": "wa"
+                },
+                "OR51F2":
+                {
+                    "type": "wa"
+                },
+                "OR51G2":
+                {
+                    "type": "wa"
+                },
+                "OR52A1":
+                {
+                    "type": "wa"
+                },
+                "OR52E6":
+                {
+                    "type": "wa"
+                },
+                "OR52H1":
+                {
+                    "type": "wa"
+                },
+                "OR52I2":
+                {
+                    "type": "wa"
+                },
+                "OR52L1":
+                {
+                    "type": "wa"
+                },
+                "OR52N4":
+                {
+                    "type": "wa"
+                },
+                "OR56A3":
+                {
+                    "type": "wa"
+                },
+                "OR5A1":
+                {
+                    "type": "ma"
+                },
+                "OR5A2":
+                {
+                    "type": "wa"
+                },
+                "OR5AP2":
+                {
+                    "type": "wa"
+                },
+                "OR5AU1":
+                {
+                    "type": "ma"
+                },
+                "OR5L1":
+                {
+                    "type": "wa"
+                },
+                "OR5M1":
+                {
+                    "type": "wa"
+                },
+                "OR5M3":
+                {
+                    "type": "wa"
+                },
+                "OR5V1":
+                {
+                    "type": "wa"
+                },
+                "OR6C76":
+                {
+                    "type": "vwa"
+                },
+                "OR6K3":
+                {
+                    "type": "ma"
+                },
+                "OR6N1":
+                {
+                    "type": "wa"
+                },
+                "OR8A1":
+                {
+                    "type": "ma"
+                },
+                "OR8G1":
+                {
+                    "type": "vsa"
+                },
+                "OR8G5":
+                {
+                    "type": "wa"
+                },
+                "OR8K3":
+                {
+                    "type": "wa"
+                },
+                "OR9G4":
+                {
+                    "type": "wa"
+                },
+                "OR9I1":
+                {
+                    "type": "wa"
+                },
+                "OR9Q1":
+                {
+                    "type": "wa"
+                }
+            }
         }
     },
     "4aeb7a3cfaeff2d914c61137954096f3":
@@ -19347,6 +21010,30 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.22"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "ma",
+                    "ec50": "-5.29"
+                }
+            },
+            "https:\/\/doi.org\/10.3389%2Ffmolb.2015.00073":
+            {
+                "OR2W3":
+                {
+                    "type": "wa"
+                }
             }
         }
     },
@@ -19356,6 +21043,14 @@
         "smiles": "CC(=CCC\\C(=C\\CCC(C)(C=C)O)\\C)C",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "waxy",
+                "floral",
+                "orange",
+                "tea",
+                "potato_skin"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -19495,6 +21190,37 @@
     {
         "full_name": "N,N-dimethylethylamine",
         "smiles": "CC[NH+](C)C"
+    },
+    "6c71a4749c2144a08f72c99b5df27526":
+    {
+        "full_name": "nonadecane",
+        "smiles": "CCCCCCCCCCCCCCCCCCC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "bland"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "ma",
+                    "ec50": "-4.92"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "na"
+                }
+            }
+        }
     },
     "5275978d29dfd72a5698f468f3a64906":
     {
@@ -19826,6 +21552,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2C1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.3"
+                }
             }
         }
     },
@@ -19974,6 +21708,14 @@
                 "OR5P3":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.3"
                 }
             }
         }
@@ -20650,6 +22392,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2C1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.52"
+                }
             }
         }
     },
@@ -20884,6 +22634,19 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2J2":
+                {
+                    "type": "vsa",
+                    "ec50": "-7"
+                },
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.52"
                 }
             }
         }
@@ -21144,6 +22907,15 @@
         "smiles": "OC(C=C)CCCCC",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "mushroom",
+                "waxy",
+                "juicy",
+                "orange",
+                "earthy",
+                "plasticky"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "mushroomy"
@@ -21432,6 +23204,36 @@
             }
         }
     },
+    "ea8db6e456685f34a4e23772cc833775":
+    {
+        "full_name": "o-ethyltoluene",
+        "smiles": "CCC1=CC=CC=C1C",
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "8c002bef0cfba4df75d13ce9a77bab8f":
+    {
+        "full_name": "o-isopropylanisole",
+        "smiles": "COc1ccccc1C(C)C",
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "vwa"
+                }
+            }
+        }
+    },
     "4537d2e9d4e542b4b9a952d0985c1665":
     {
         "full_name": "omega-dodecanolactam",
@@ -21710,6 +23512,14 @@
         "smiles": "COc1ccc(C=O)cc1",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "floral",
+                "earthy",
+                "wet",
+                "anisic",
+                "moldy"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "anisic",
@@ -22374,11 +24184,9 @@
             "http:\/\/www.primaryodors.org":
             [
                 "rose",
-                "floral",
-                "waxy",
-                "powdery",
-                "naphthyl",
-                "sweet"
+                "dried",
+                "fermented",
+                "solvent"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -22402,6 +24210,24 @@
                 "OR3A1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "ma",
+                    "ec50": "-4.94"
+                },
+                "OR11H4":
+                {
+                    "type": "sa",
+                    "ec50": "-5.69"
+                },
+                "OR2AG2":
+                {
+                    "type": "ma",
+                    "ec50": "-4.82"
                 }
             }
         }
@@ -22755,7 +24581,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "new carpet"
+                ""
             ]
         }
     },
@@ -22902,6 +24728,24 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "ma",
+                    "ec50": "-5.31"
+                },
+                "OR11H4":
+                {
+                    "type": "ma",
+                    "ec50": "-5.28"
+                },
+                "OR2AG2":
+                {
+                    "type": "ma",
+                    "ec50": "-4.99"
+                }
             }
         }
     },
@@ -22944,6 +24788,21 @@
                 "hay",
                 "musty"
             ]
+        }
+    },
+    "03775fcdddfab8fc9ed169731cf0dccd":
+    {
+        "full_name": "pi-23472",
+        "smiles": "CC1=CCC(C1(C)C)C2=CCCC(C2)C(C)=O",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1074\/jbc.m110.211524":
+            {
+                "OR4D1":
+                {
+                    "type": "ma"
+                }
+            }
         }
     },
     "6fb895ef826409c3e7c0ed50af71876c":
@@ -23596,6 +25455,14 @@
         "smiles": "[NH3+]CCCC[NH3+]",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "animal_fur",
+                "wet",
+                "raw_pasta",
+                "waxy",
+                "rotting_meat"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "putrid"
@@ -24219,6 +26086,19 @@
                 {
                     "type": "vsa",
                     "ec50": "30"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2Y1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.81"
+                },
+                "OR6X1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.66"
                 }
             }
         }
@@ -24855,6 +26735,14 @@
                 {
                     "type": "wa"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-8.54"
+                }
             }
         }
     },
@@ -24940,6 +26828,19 @@
                 "OR51B4":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.66"
+                },
+                "OR1A2":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.62"
                 }
             }
         }
@@ -25049,6 +26950,31 @@
                 {
                     "type": "ma",
                     "ec50": "-4.51"
+                }
+            },
+            "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.7"
+                },
+                "OR11H4":
+                {
+                    "type": "na"
+                },
+                "OR2AG2":
+                {
+                    "type": "sa",
+                    "ec50": "-5.87"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2M2":
+                {
+                    "type": "ma",
+                    "ec50": "-5"
                 }
             }
         }
@@ -25209,6 +27135,17 @@
         "smiles": "CC(C2C(OCC)=O)(O2)C1=CC=CC=C1",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "sweet",
+                "fruity",
+                "strawberry",
+                "grape",
+                "medicinal",
+                "jammy",
+                "powdery",
+                "raspberry"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cherry",
@@ -25724,18 +27661,18 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "oily",
-                "rind",
-                "rose",
-                "tea",
-                "woody",
                 "bois",
                 "citrus",
                 "de",
                 "fatty",
                 "floral",
                 "lilac",
-                "lily"
+                "lily",
+                "oily",
+                "rind",
+                "rose",
+                "tea",
+                "woody"
             ]
         },
         "activity":
@@ -25916,6 +27853,14 @@
         "smiles": "CC1=CC(=C(C=C1)C(C)C)O",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "herbal",
+                "thyme",
+                "oregano",
+                "camphorous",
+                "oily"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "camphorous",
@@ -26281,12 +28226,29 @@
             ]
         }
     },
+    "5ff70bd4e00179b536bfea12569b3272":
+    {
+        "full_name": "triethylamine",
+        "smiles": "CC[NH+](CC)CC"
+    },
     "e34317a434c2051c6117a038efea2051":
     {
         "full_name": "trifernal",
         "smiles": "C[C@@H](CC=O)C1=CC=CC=C1",
         "aroma":
         {
+            "http:\/\/www.primaryodors.org":
+            [
+                "green",
+                "stemmy",
+                "underripe",
+                "green_bean",
+                "squash",
+                "beany",
+                "oily",
+                "leafy",
+                "melon"
+            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "foliage",
@@ -26360,6 +28322,21 @@
         "full_name": "1,2,3-Trimethylbenzene",
         "smiles": "c1(cccc(c1C)C)C"
     },
+    "c6171874e786d41f2bc4bfeae1aac68c":
+    {
+        "full_name": "1,2,4-trimethylbenzene",
+        "smiles": "c1c(ccc(c1C)C)C",
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "44e1632ed311121e1c600fb9416af198":
     {
         "full_name": "trimethylphosphine",
@@ -26420,6 +28397,30 @@
                 {
                     "type": "ma",
                     "ec50": "-4.86"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-5"
+                }
+            }
+        }
+    },
+    "a1dbc3344e03f1590ae100ce52d77a29":
+    {
+        "full_name": "2,3,5-trimethylpyridine",
+        "smiles": "CC1=CC(=C(N=C1)C)C",
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4"
                 }
             }
         }
@@ -26546,13 +28547,13 @@
             [
                 "aldehydic",
                 "citrus",
-                "cloth",
                 "fatty",
-                "floral",
-                "green",
-                "laundered",
+                "cloth",
+                "waxy",
                 "soapy",
-                "waxy"
+                "green",
+                "floral",
+                "laundered"
             ]
         },
         "activity":
@@ -26706,13 +28707,13 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "acidic",
-                "cheesy",
-                "fruity",
-                "milky",
-                "sharp",
+                "tobacco",
                 "sour",
-                "tobacco"
+                "sharp",
+                "milky",
+                "fruity",
+                "cheesy",
+                "acidic"
             ]
         },
         "activity":
@@ -26786,14 +28787,14 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "beany",
-                "brown",
-                "creamy",
-                "dairy",
-                "milky",
-                "phenolic",
-                "powdery",
+                "vanilla",
                 "sweet",
-                "vanilla"
+                "powdery",
+                "phenolic",
+                "milky",
+                "dairy",
+                "creamy",
+                "brown"
             ]
         },
         "activity":
@@ -26956,11 +28957,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "floral",
-                "green",
-                "leaf",
+                "walnut",
                 "violet",
-                "walnut"
+                "green",
+                "floral",
+                "leaf"
             ]
         },
         "activity":
@@ -26982,9 +28983,9 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "spicy",
                 "sweet",
-                "woody"
+                "woody",
+                "spicy"
             ]
         }
     },
@@ -27102,6 +29103,54 @@
                 {
                     "type": "ma",
                     "ec50": "-4.95"
+                }
+            }
+        }
+    },
+    "d4a8c9545b23d13230bebc24c808d4df":
+    {
+        "full_name": "(Z)-4-nonenal",
+        "smiles": "CCCC\/C=C\\CCC=O",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1101\/2020.12.07.414714":
+            {
+                "OR10A6":
+                {
+                    "type": "ma",
+                    "ec50": "-5.32"
+                }
+            }
+        }
+    },
+    "d63851ed7dafc124c41a5567754bfe6f":
+    {
+        "full_name": "(Z)-4-undecenal",
+        "smiles": "CCCCCC\/C=C\\CCC=O",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1101\/2020.12.07.414714":
+            {
+                "OR10A6":
+                {
+                    "type": "sa",
+                    "ec50": "-5.55"
+                }
+            }
+        }
+    },
+    "98b53a93656cbe9cb4888249ea47875a":
+    {
+        "full_name": "(Z)-6-undecenal",
+        "smiles": "CCCC\/C=C\\CCCCC=O",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1101\/2020.12.07.414714":
+            {
+                "OR10A6":
+                {
+                    "type": "sa",
+                    "ec50": "-5.48"
                 }
             }
         }

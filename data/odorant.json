@@ -3180,8 +3180,6 @@
                 {
                     "type": "na"
                 }
-<<<<<<< HEAD
-=======
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
@@ -3190,7 +3188,6 @@
                     "type": "ma",
                     "ec50": "-5.35"
                 }
->>>>>>> stable
             }
         }
     },
@@ -5763,8 +5760,6 @@
                     "type": "ma",
                     "ec50": "-5.01"
                 }
-<<<<<<< HEAD
-=======
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
@@ -5783,7 +5778,6 @@
                     "type": "sa",
                     "ec50": "-5.7"
                 }
->>>>>>> stable
             }
         }
     },
@@ -11017,49 +11011,6 @@
         }
     },
     "1ba917e190b6c0001bbb0fcf33c1f1ea":
-<<<<<<< HEAD
-    {
-        "full_name": "2-ethyl pyrazine",
-        "smiles": "CCC1=NC=CN=C1",
-        "activity":
-        {
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "ia",
-                    "ec50": "-3.5"
-                }
-            }
-        }
-    },
-    "d93ab14b11db277c08c64cc03f57844f":
-    {
-        "full_name": "2-ethyl pyridine",
-        "smiles": "CCC1=CC=CC=N1",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "green",
-                "grassy"
-            ]
-        },
-        "activity":
-        {
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "vsa",
-                    "ec50": "-4"
-                }
-            }
-        }
-    },
-    "43ab755478b4df3ad6ec5c06208fe6f5":
-=======
->>>>>>> stable
     {
         "full_name": "2-ethyl pyrazine",
         "smiles": "CCC1=NC=CN=C1",
@@ -13314,50 +13265,6 @@
                 {
                     "type": "ma"
                 }
-<<<<<<< HEAD
-            }
-        }
-    },
-    "19adfda8770fcc2346a5e2c83c8ae1d5":
-    {
-        "full_name": "helional",
-        "smiles": "CC(CC1=CC2=C(C=C1)OCO2)C=O",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "green",
-                "stemmy",
-                "floral",
-                "hay",
-                "jasmine",
-                "cyclamen",
-                "ozone",
-                "watery",
-                "malty",
-                "milky"
-            ],
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "cyclamen",
-                "fresh",
-                "green",
-                "hay",
-                "ozone",
-                "watery"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/www.ncbi.nlm.nih.gov\/labs\/pmc\/articles\/PMC4412152\/":
-            {
-                "OR3A1":
-                {
-                    "type": "wa",
-                    "ec50": "-2.69"
-                }
-=======
->>>>>>> stable
             },
             "https:\/\/s-space.snu.ac.kr\/handle\/10371\/169429?mode=full":
             {
@@ -17453,8 +17360,6 @@
                     "type": "ma",
                     "ec50": "-5.25"
                 }
-<<<<<<< HEAD
-=======
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
@@ -17463,7 +17368,6 @@
                     "type": "vsa",
                     "ec50": "-6.09"
                 }
->>>>>>> stable
             }
         }
     },
@@ -17710,8 +17614,6 @@
                 {
                     "type": "na"
                 }
-<<<<<<< HEAD
-=======
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
@@ -17720,7 +17622,6 @@
                     "type": "ma",
                     "ec50": "-5.14"
                 }
->>>>>>> stable
             }
         }
     },
@@ -17888,8 +17789,6 @@
         "smiles": "CC1(CCCC2=C1CC(CC2)C=O)C",
         "aroma":
         {
-<<<<<<< HEAD
-=======
             "http:\/\/www.primaryodors.org":
             [
                 "office_building",
@@ -17901,7 +17800,6 @@
                 "floral",
                 "melon"
             ],
->>>>>>> stable
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -18405,8 +18303,6 @@
             ]
         }
     },
-<<<<<<< HEAD
-=======
     "a642592b62d67c1c184a0b464e1c5743":
     {
         "full_name": "methional",
@@ -18441,7 +18337,6 @@
             }
         }
     },
->>>>>>> stable
     "5f202994c411735594592732f7988785":
     {
         "full_name": "2-methoxy-3,5-dimethylpyrazine",
@@ -18531,14 +18426,6 @@
                     "type": "ma",
                     "ec50": "-6.7"
                 }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "ma",
-                    "ec50": "-6.7"
-                }
             }
         }
     },
@@ -18562,8 +18449,6 @@
     {
         "full_name": "2-methoxy-3-methyl pyrazine",
         "smiles": "CC1=NC=CN=C1OC",
-<<<<<<< HEAD
-=======
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -18574,7 +18459,6 @@
                 "peanut"
             ]
         },
->>>>>>> stable
         "activity":
         {
             "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
@@ -20059,8 +19943,6 @@
     {
         "full_name": "2-methylthio-3-methylpyrazine",
         "smiles": "CC1=NC=CN=C1SC",
-<<<<<<< HEAD
-=======
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -20072,7 +19954,6 @@
                 "vegetable"
             ]
         },
->>>>>>> stable
         "activity":
         {
             "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
@@ -21146,8 +21027,6 @@
                     "type": "ma",
                     "ec50": "-5.29"
                 }
-<<<<<<< HEAD
-=======
             },
             "https:\/\/doi.org\/10.3389%2Ffmolb.2015.00073":
             {
@@ -21155,7 +21034,6 @@
                 {
                     "type": "wa"
                 }
->>>>>>> stable
             }
         }
     },
@@ -23322,36 +23200,6 @@
                 {
                     "type": "ma",
                     "ec50": "-4.76"
-                }
-            }
-        }
-    },
-    "ea8db6e456685f34a4e23772cc833775":
-    {
-        "full_name": "o-ethyltoluene",
-        "smiles": "CCC1=CC=CC=C1C",
-        "activity":
-        {
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR5K1":
-                {
-                    "type": "na"
-                }
-            }
-        }
-    },
-    "8c002bef0cfba4df75d13ce9a77bab8f":
-    {
-        "full_name": "o-isopropylanisole",
-        "smiles": "COc1ccccc1C(C)C",
-        "activity":
-        {
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "vwa"
                 }
             }
         }
@@ -29109,19 +28957,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-<<<<<<< HEAD
-                "floral",
-                "green",
-                "leaf",
-                "walnut",
-                "violet"
-=======
                 "walnut",
                 "violet",
                 "green",
                 "floral",
                 "leaf"
->>>>>>> stable
             ]
         },
         "activity":

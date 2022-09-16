@@ -277,6 +277,13 @@
                     "ec50": "-3.9"
                 }
             },
+            "https:\/\/doi.org\/10.1093\/chemse\/bji015":
+            {
+                "OR1E3":
+                {
+                    "type": "wa"
+                }
+            },
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
             {
                 "OR5A1":
@@ -418,12 +425,16 @@
         "smiles": "c1cccc(C(=O)O)c1OC(=O)C",
         "aroma":
         {
-            "http:\/\/www.thegoodscentscompany.com":
+            "http:\/\/www.primaryodors.org":
             [
                 "aromatic",
                 "aspirin",
                 "dusty",
                 "phenolic"
+            ],
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                ""
             ]
         }
     },
@@ -485,7 +496,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "garlic"
+                ""
             ]
         }
     },
@@ -847,6 +858,19 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-8.3"
+                },
+                "OR51L1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.04"
+                }
             }
         }
     },
@@ -1083,6 +1107,21 @@
     {
         "full_name": "alpha-isomethyl ionone",
         "smiles": "CC(=O)C(\\C)=CC1C(C)=CCCC1(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "orris",
+                "woody",
+                "floral",
+                "dried",
+                "fruit",
+                "violet",
+                "jammy",
+                "powdery",
+                "tea"
+            ]
+        },
         "activity":
         {
             "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
@@ -2554,6 +2593,14 @@
                     "type": "ma",
                     "ec50": "-3.94"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-5"
+                }
             }
         }
     },
@@ -3133,6 +3180,17 @@
                 {
                     "type": "na"
                 }
+<<<<<<< HEAD
+=======
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR5A1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.35"
+                }
+>>>>>>> stable
             }
         }
     },
@@ -4170,6 +4228,14 @@
                     "type": "ma",
                     "ec50": "-4.52"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.47"
+                }
             }
         }
     },
@@ -4456,6 +4522,14 @@
                     "type": "ma",
                     "ec50": "-5.01"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.01"
+                }
             }
         }
     },
@@ -4650,6 +4724,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR51L1":
+                {
+                    "type": "ma",
+                    "ec50": "-5"
                 }
             }
         }
@@ -5681,6 +5763,27 @@
                     "type": "ma",
                     "ec50": "-5.01"
                 }
+<<<<<<< HEAD
+=======
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2J2":
+                {
+                    "type": "sa",
+                    "ec50": "-5.7"
+                },
+                "OR2J3":
+                {
+                    "type": "sa",
+                    "ec50": "-5.61"
+                },
+                "OR2W1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.7"
+                }
+>>>>>>> stable
             }
         }
     },
@@ -6802,6 +6905,19 @@
                 {
                     "type": "ia"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2J2":
+                {
+                    "type": "ma",
+                    "ec50": "-5"
+                },
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.3"
+                }
             }
         }
     },
@@ -7134,6 +7250,14 @@
                 "OR5AN1":
                 {
                     "type": "vwa"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2J2":
+                {
+                    "type": "ma",
+                    "ec50": "-5"
                 }
             }
         }
@@ -7772,6 +7896,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR56A4":
+                {
+                    "type": "ma",
+                    "ec50": "-4.41"
                 }
             }
         }
@@ -9130,6 +9262,13 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.3389%2Ffmolb.2015.00073":
+            {
+                "OR10J1":
+                {
+                    "type": "vsa"
+                }
             }
         }
     },
@@ -9750,6 +9889,13 @@
                 {
                     "type": "ma",
                     "ec50": "-4.02"
+                }
+            },
+            "https:\/\/doi.org\/10.1074\/jbc.m110.211524":
+            {
+                "OR7A5":
+                {
+                    "type": "ma"
                 }
             }
         }
@@ -10442,6 +10588,14 @@
                 {
                     "type": "vwa"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR11A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-9"
+                }
             }
         }
     },
@@ -10863,6 +11017,49 @@
         }
     },
     "1ba917e190b6c0001bbb0fcf33c1f1ea":
+<<<<<<< HEAD
+    {
+        "full_name": "2-ethyl pyrazine",
+        "smiles": "CCC1=NC=CN=C1",
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ia",
+                    "ec50": "-3.5"
+                }
+            }
+        }
+    },
+    "d93ab14b11db277c08c64cc03f57844f":
+    {
+        "full_name": "2-ethyl pyridine",
+        "smiles": "CCC1=CC=CC=N1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "grassy"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4"
+                }
+            }
+        }
+    },
+    "43ab755478b4df3ad6ec5c06208fe6f5":
+=======
+>>>>>>> stable
     {
         "full_name": "2-ethyl pyrazine",
         "smiles": "CCC1=NC=CN=C1",
@@ -10907,6 +11104,21 @@
         "full_name": "(ethylthio-)methanethiol",
         "smiles": "CCSCS"
     },
+    "78c0cbf57c6e6658d77357c01ae1405e":
+    {
+        "full_name": "ethyl 3,5,5-trimethyl hexanoate",
+        "smiles": "CCOC(=O)CC(C)CC(C)(C)C",
+        "activity":
+        {
+            "https:\/\/etheses.bham.ac.uk\/\/id\/eprint\/3450\/1\/Correia_12_PhD.pdf":
+            {
+                "OR2AE1":
+                {
+                    "type": "ma"
+                }
+            }
+        }
+    },
     "00cfa31cc62427e926867c63d36ee080":
     {
         "full_name": "ethyl vanillin",
@@ -10927,9 +11139,9 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "caramellic",
-                "creamy",
                 "sweet",
-                "vanilla"
+                "vanilla",
+                "creamy"
             ]
         },
         "activity":
@@ -11061,6 +11273,14 @@
                 {
                     "type": "sa",
                     "ec50": "-4.9"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR10G3":
+                {
+                    "type": "ma",
+                    "ec50": "-5.01"
                 }
             }
         }
@@ -11301,6 +11521,14 @@
                 "TAAR5":
                 {
                     "type": "wa"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR10G7":
+                {
+                    "type": "vsa",
+                    "ec50": "-9"
                 }
             }
         }
@@ -12707,6 +12935,19 @@
                     "type": "wa",
                     "ec50": "-2.91"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2A25":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.09"
+                },
+                "OR2J3":
+                {
+                    "type": "ma",
+                    "ec50": "-4.71"
+                }
             }
         }
     },
@@ -13073,6 +13314,189 @@
                 {
                     "type": "ma"
                 }
+<<<<<<< HEAD
+            }
+        }
+    },
+    "19adfda8770fcc2346a5e2c83c8ae1d5":
+    {
+        "full_name": "helional",
+        "smiles": "CC(CC1=CC2=C(C=C1)OCO2)C=O",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "green",
+                "stemmy",
+                "floral",
+                "hay",
+                "jasmine",
+                "cyclamen",
+                "ozone",
+                "watery",
+                "malty",
+                "milky"
+            ],
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "cyclamen",
+                "fresh",
+                "green",
+                "hay",
+                "ozone",
+                "watery"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.ncbi.nlm.nih.gov\/labs\/pmc\/articles\/PMC4412152\/":
+            {
+                "OR3A1":
+                {
+                    "type": "wa",
+                    "ec50": "-2.69"
+                }
+=======
+>>>>>>> stable
+            },
+            "https:\/\/s-space.snu.ac.kr\/handle\/10371\/169429?mode=full":
+            {
+                "OR10AD1":
+                {
+                    "type": "vwa"
+                },
+                "OR10P1":
+                {
+                    "type": "vwa"
+                },
+                "OR10Z1":
+                {
+                    "type": "vwa"
+                },
+                "OR11G2":
+                {
+                    "type": "vwa"
+                },
+                "OR14I1":
+                {
+                    "type": "vwa"
+                },
+                "OR1A1":
+                {
+                    "type": "na"
+                },
+                "OR1M1":
+                {
+                    "type": "vwa"
+                },
+                "OR1S2":
+                {
+                    "type": "vwa"
+                },
+                "OR2A4":
+                {
+                    "type": "vwa"
+                },
+                "OR2A7":
+                {
+                    "type": "vwa"
+                },
+                "OR2T33":
+                {
+                    "type": "wa"
+                },
+                "OR2T35":
+                {
+                    "type": "vwa"
+                },
+                "OR4B1":
+                {
+                    "type": "vwa"
+                },
+                "OR4D1":
+                {
+                    "type": "wa"
+                },
+                "OR4F15":
+                {
+                    "type": "vwa"
+                },
+                "OR4K2":
+                {
+                    "type": "vwa"
+                },
+                "OR4P4":
+                {
+                    "type": "vwa"
+                },
+                "OR4X1":
+                {
+                    "type": "vwa"
+                },
+                "OR51E2":
+                {
+                    "type": "vwa"
+                },
+                "OR51F2":
+                {
+                    "type": "vwa"
+                },
+                "OR52E2":
+                {
+                    "type": "vwa"
+                },
+                "OR52E4":
+                {
+                    "type": "vwa"
+                },
+                "OR52N4":
+                {
+                    "type": "vwa"
+                },
+                "OR56A5":
+                {
+                    "type": "vwa"
+                },
+                "OR5AC2":
+                {
+                    "type": "vwa"
+                },
+                "OR5AP2":
+                {
+                    "type": "vwa"
+                },
+                "OR5B2":
+                {
+                    "type": "vwa"
+                },
+                "OR5M1":
+                {
+                    "type": "vwa"
+                },
+                "OR5T1":
+                {
+                    "type": "vwa"
+                },
+                "OR6A2":
+                {
+                    "type": "wa"
+                },
+                "OR6N2":
+                {
+                    "type": "vwa"
+                },
+                "OR7G2":
+                {
+                    "type": "vwa"
+                },
+                "OR8K1":
+                {
+                    "type": "vwa"
+                },
+                "OR9A2":
+                {
+                    "type": "vwa"
+                }
             }
         }
     },
@@ -13257,6 +13681,24 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.59"
+                },
+                "OR1A2":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.47"
+                },
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.01"
+                }
             }
         }
     },
@@ -13437,6 +13879,19 @@
                 {
                     "type": "wa",
                     "ec50": "-2.71"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.49"
+                },
+                "OR1A2":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.77"
                 }
             }
         }
@@ -13854,6 +14309,14 @@
                     "type": "ma",
                     "ec50": "-3.78"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-7.52"
+                }
             }
         }
     },
@@ -14094,6 +14557,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.52"
                 }
             }
         }
@@ -14958,6 +15429,183 @@
                 {
                     "type": "wa"
                 }
+            },
+            "https:\/\/s-space.snu.ac.kr\/handle\/10371\/169429?mode=full":
+            {
+                "OR10A5":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.6"
+                },
+                "OR10A6":
+                {
+                    "type": "vwa",
+                    "ec50": "-6"
+                },
+                "OR10H1":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.6"
+                },
+                "OR10T2":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR10W1":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.9"
+                },
+                "OR11H6":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.1"
+                },
+                "OR1A1":
+                {
+                    "type": "na"
+                },
+                "OR1D5":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.5"
+                },
+                "OR1M1":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR2AG2":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR2AT4":
+                {
+                    "type": "vwa",
+                    "ec50": "-6.2"
+                },
+                "OR2D2":
+                {
+                    "type": "vwa",
+                    "ec50": "-5"
+                },
+                "OR2G6":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.9"
+                },
+                "OR2J2":
+                {
+                    "type": "vwa"
+                },
+                "OR2L2":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.6"
+                },
+                "OR2M3":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.9"
+                },
+                "OR4C12":
+                {
+                    "type": "vwa"
+                },
+                "OR4C46":
+                {
+                    "type": "vwa",
+                    "ec50": "-6.2"
+                },
+                "OR4C6":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR4K2":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR4K5":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.8"
+                },
+                "OR51B4":
+                {
+                    "type": "vwa"
+                },
+                "OR51E2":
+                {
+                    "type": "vwa",
+                    "ec50": "-5"
+                },
+                "OR51I2":
+                {
+                    "type": "vwa",
+                    "ec50": "-6.1"
+                },
+                "OR51J1":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.7"
+                },
+                "OR51S1":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.7"
+                },
+                "OR52B2":
+                {
+                    "type": "wa",
+                    "ec50": "-4.9"
+                },
+                "OR56A3":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.1"
+                },
+                "OR5H1":
+                {
+                    "type": "wa",
+                    "ec50": "-4.9"
+                },
+                "OR5I1":
+                {
+                    "type": "vwa",
+                    "ec50": "-5"
+                },
+                "OR6C1":
+                {
+                    "type": "wa",
+                    "ec50": "-5.2"
+                },
+                "OR6V1":
+                {
+                    "type": "vwa"
+                },
+                "OR6Y1":
+                {
+                    "type": "vwa"
+                },
+                "OR8B12":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.5"
+                },
+                "OR8K5":
+                {
+                    "type": "vwa",
+                    "ec50": "-5.8"
+                },
+                "OR9A2":
+                {
+                    "type": "vwa",
+                    "ec50": "-5"
+                }
             }
         }
     },
@@ -15003,6 +15651,13 @@
                 "OR2AG1":
                 {
                     "type": "sa"
+                }
+            },
+            "https:\/\/doi.org\/10.1093\/chemse\/bji015":
+            {
+                "OR1G1":
+                {
+                    "type": "wa"
                 }
             },
             "https:\/\/doi.org\/10.1002\/chem.201402486":
@@ -16136,6 +16791,24 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR11H4":
+                {
+                    "type": "ma",
+                    "ec50": "-3.52"
+                },
+                "OR11H6":
+                {
+                    "type": "ma",
+                    "ec50": "-3.52"
+                },
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.82"
+                }
             }
         }
     },
@@ -16540,6 +17213,14 @@
                     "type": "ma",
                     "ec50": "-5.19"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.19"
+                }
             }
         }
     },
@@ -16772,6 +17453,17 @@
                     "type": "ma",
                     "ec50": "-5.25"
                 }
+<<<<<<< HEAD
+=======
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1C1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.09"
+                }
+>>>>>>> stable
             }
         }
     },
@@ -17018,6 +17710,17 @@
                 {
                     "type": "na"
                 }
+<<<<<<< HEAD
+=======
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR10J5":
+                {
+                    "type": "ma",
+                    "ec50": "-5.14"
+                }
+>>>>>>> stable
             }
         }
     },
@@ -17185,6 +17888,20 @@
         "smiles": "CC1(CCCC2=C1CC(CC2)C=O)C",
         "aroma":
         {
+<<<<<<< HEAD
+=======
+            "http:\/\/www.primaryodors.org":
+            [
+                "office_building",
+                "bland",
+                "dusty",
+                "dirty",
+                "fatty",
+                "ozone",
+                "floral",
+                "melon"
+            ],
+>>>>>>> stable
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -17376,6 +18093,14 @@
                 "OR7D4":
                 {
                     "type": "vwa"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR8K3":
+                {
+                    "type": "ma",
+                    "ec50": "-5.32"
                 }
             }
         }
@@ -17680,6 +18405,43 @@
             ]
         }
     },
+<<<<<<< HEAD
+=======
+    "a642592b62d67c1c184a0b464e1c5743":
+    {
+        "full_name": "methional",
+        "smiles": "CSCCC=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "vegetable",
+                "oily",
+                "creamy",
+                "tomato",
+                "potato",
+                "yeasty",
+                "bready",
+                "cheesy",
+                "limburger",
+                "cheese",
+                "savory",
+                "meaty",
+                "brothy"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.3389%2Ffmolb.2015.00073":
+            {
+                "OR2H1":
+                {
+                    "type": "sa"
+                }
+            }
+        }
+    },
+>>>>>>> stable
     "5f202994c411735594592732f7988785":
     {
         "full_name": "2-methoxy-3,5-dimethylpyrazine",
@@ -17769,6 +18531,14 @@
                     "type": "ma",
                     "ec50": "-6.7"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-6.7"
+                }
             }
         }
     },
@@ -17792,6 +18562,19 @@
     {
         "full_name": "2-methoxy-3-methyl pyrazine",
         "smiles": "CC1=NC=CN=C1OC",
+<<<<<<< HEAD
+=======
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "roasted",
+                "almond",
+                "hazelnut",
+                "peanut"
+            ]
+        },
+>>>>>>> stable
         "activity":
         {
             "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
@@ -18377,6 +19160,14 @@
                     "type": "ma",
                     "ec50": "-5.21"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-8.22"
+                }
             }
         }
     },
@@ -18782,6 +19573,17 @@
     {
         "full_name": "methyl isoeugenol",
         "smiles": "CC=CC1=CC(=C(C=C1)OC)OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "spicy",
+                "clove",
+                "floral",
+                "carnation",
+                "woody"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1371\/journal.pone.0195263":
@@ -19257,6 +20059,20 @@
     {
         "full_name": "2-methylthio-3-methylpyrazine",
         "smiles": "CC1=NC=CN=C1SC",
+<<<<<<< HEAD
+=======
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "roasted",
+                "meaty",
+                "nutty",
+                "almond",
+                "vegetable"
+            ]
+        },
+>>>>>>> stable
         "activity":
         {
             "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
@@ -20011,6 +20827,248 @@
                 "acrid",
                 "fecal"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/s-space.snu.ac.kr\/handle\/10371\/169429?mode=full":
+            {
+                "OR10D3":
+                {
+                    "type": "wa"
+                },
+                "OR10G4":
+                {
+                    "type": "wa"
+                },
+                "OR10G6":
+                {
+                    "type": "wa"
+                },
+                "OR10G8":
+                {
+                    "type": "wa"
+                },
+                "OR10S1":
+                {
+                    "type": "wa"
+                },
+                "OR10V1":
+                {
+                    "type": "wa"
+                },
+                "OR11H2":
+                {
+                    "type": "wa"
+                },
+                "OR12D3":
+                {
+                    "type": "wa"
+                },
+                "OR13C3":
+                {
+                    "type": "vwa"
+                },
+                "OR13C4":
+                {
+                    "type": "wa"
+                },
+                "OR13C5":
+                {
+                    "type": "wa"
+                },
+                "OR14A2":
+                {
+                    "type": "wa"
+                },
+                "OR14I1":
+                {
+                    "type": "wa"
+                },
+                "OR1A1":
+                {
+                    "type": "na"
+                },
+                "OR1B1":
+                {
+                    "type": "wa"
+                },
+                "OR1C1":
+                {
+                    "type": "wa"
+                },
+                "OR1E2":
+                {
+                    "type": "wa"
+                },
+                "OR1L4":
+                {
+                    "type": "wa"
+                },
+                "OR1M1":
+                {
+                    "type": "wa"
+                },
+                "OR2AK2":
+                {
+                    "type": "wa"
+                },
+                "OR2C1":
+                {
+                    "type": "ma"
+                },
+                "OR2D3":
+                {
+                    "type": "wa"
+                },
+                "OR2F1":
+                {
+                    "type": "wa"
+                },
+                "OR2G3":
+                {
+                    "type": "wa"
+                },
+                "OR2K2":
+                {
+                    "type": "wa"
+                },
+                "OR2T29":
+                {
+                    "type": "wa"
+                },
+                "OR2T6":
+                {
+                    "type": "wa"
+                },
+                "OR4B1":
+                {
+                    "type": "ma"
+                },
+                "OR4C16":
+                {
+                    "type": "wa"
+                },
+                "OR4D1":
+                {
+                    "type": "ma"
+                },
+                "OR51A7":
+                {
+                    "type": "wa"
+                },
+                "OR51E1":
+                {
+                    "type": "wa"
+                },
+                "OR51F2":
+                {
+                    "type": "wa"
+                },
+                "OR51G2":
+                {
+                    "type": "wa"
+                },
+                "OR52A1":
+                {
+                    "type": "wa"
+                },
+                "OR52E6":
+                {
+                    "type": "wa"
+                },
+                "OR52H1":
+                {
+                    "type": "wa"
+                },
+                "OR52I2":
+                {
+                    "type": "wa"
+                },
+                "OR52L1":
+                {
+                    "type": "wa"
+                },
+                "OR52N4":
+                {
+                    "type": "wa"
+                },
+                "OR56A3":
+                {
+                    "type": "wa"
+                },
+                "OR5A1":
+                {
+                    "type": "ma"
+                },
+                "OR5A2":
+                {
+                    "type": "wa"
+                },
+                "OR5AP2":
+                {
+                    "type": "wa"
+                },
+                "OR5AU1":
+                {
+                    "type": "ma"
+                },
+                "OR5L1":
+                {
+                    "type": "wa"
+                },
+                "OR5M1":
+                {
+                    "type": "wa"
+                },
+                "OR5M3":
+                {
+                    "type": "wa"
+                },
+                "OR5V1":
+                {
+                    "type": "wa"
+                },
+                "OR6C76":
+                {
+                    "type": "vwa"
+                },
+                "OR6K3":
+                {
+                    "type": "ma"
+                },
+                "OR6N1":
+                {
+                    "type": "wa"
+                },
+                "OR8A1":
+                {
+                    "type": "ma"
+                },
+                "OR8G1":
+                {
+                    "type": "vsa"
+                },
+                "OR8G5":
+                {
+                    "type": "wa"
+                },
+                "OR8K3":
+                {
+                    "type": "wa"
+                },
+                "OR9G4":
+                {
+                    "type": "wa"
+                },
+                "OR9I1":
+                {
+                    "type": "wa"
+                },
+                "OR9Q1":
+                {
+                    "type": "wa"
+                }
+            }
         }
     },
     "4aeb7a3cfaeff2d914c61137954096f3":
@@ -20088,6 +21146,16 @@
                     "type": "ma",
                     "ec50": "-5.29"
                 }
+<<<<<<< HEAD
+=======
+            },
+            "https:\/\/doi.org\/10.3389%2Ffmolb.2015.00073":
+            {
+                "OR2W3":
+                {
+                    "type": "wa"
+                }
+>>>>>>> stable
             }
         }
     },
@@ -20606,6 +21674,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2C1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.3"
+                }
             }
         }
     },
@@ -20754,6 +21830,14 @@
                 "OR5P3":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.3"
                 }
             }
         }
@@ -21430,6 +22514,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2C1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.52"
+                }
             }
         }
     },
@@ -21664,6 +22756,19 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2J2":
+                {
+                    "type": "vsa",
+                    "ec50": "-7"
+                },
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.52"
                 }
             }
         }
@@ -22217,6 +23322,36 @@
                 {
                     "type": "ma",
                     "ec50": "-4.76"
+                }
+            }
+        }
+    },
+    "ea8db6e456685f34a4e23772cc833775":
+    {
+        "full_name": "o-ethyltoluene",
+        "smiles": "CCC1=CC=CC=C1C",
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "8c002bef0cfba4df75d13ce9a77bab8f":
+    {
+        "full_name": "o-isopropylanisole",
+        "smiles": "COc1ccccc1C(C)C",
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "vwa"
                 }
             }
         }
@@ -23598,7 +24733,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "new carpet"
+                ""
             ]
         }
     },
@@ -23805,6 +24940,21 @@
                 "hay",
                 "musty"
             ]
+        }
+    },
+    "03775fcdddfab8fc9ed169731cf0dccd":
+    {
+        "full_name": "pi-23472",
+        "smiles": "CC1=CCC(C1(C)C)C2=CCCC(C2)C(C)=O",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1074\/jbc.m110.211524":
+            {
+                "OR4D1":
+                {
+                    "type": "ma"
+                }
+            }
         }
     },
     "6fb895ef826409c3e7c0ed50af71876c":
@@ -25089,6 +26239,19 @@
                     "type": "vsa",
                     "ec50": "30"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2Y1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.81"
+                },
+                "OR6X1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.66"
+                }
             }
         }
     },
@@ -25724,6 +26887,14 @@
                 {
                     "type": "wa"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-8.54"
+                }
             }
         }
     },
@@ -25809,6 +26980,19 @@
                 "OR51B4":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.66"
+                },
+                "OR1A2":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.62"
                 }
             }
         }
@@ -25935,6 +27119,14 @@
                 {
                     "type": "sa",
                     "ec50": "-5.87"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/anie.201309508":
+            {
+                "OR2M2":
+                {
+                    "type": "ma",
+                    "ec50": "-5"
                 }
             }
         }
@@ -27474,7 +28666,7 @@
     "56d0a5f61d1993abe18f012abf4c222e":
     {
         "full_name": "tyramine",
-        "smiles": "Oc1ccccc1CC[NH3+]",
+        "smiles": "C1=CC(=CC=C1CC[NH3+])O",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -27507,13 +28699,13 @@
             [
                 "aldehydic",
                 "citrus",
-                "cloth",
                 "fatty",
-                "floral",
-                "green",
-                "laundered",
+                "cloth",
+                "waxy",
                 "soapy",
-                "waxy"
+                "green",
+                "floral",
+                "laundered"
             ]
         },
         "activity":
@@ -27667,13 +28859,13 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "acidic",
-                "cheesy",
-                "fruity",
-                "milky",
-                "sharp",
+                "tobacco",
                 "sour",
-                "tobacco"
+                "sharp",
+                "milky",
+                "fruity",
+                "cheesy",
+                "acidic"
             ]
         },
         "activity":
@@ -27747,14 +28939,14 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "beany",
-                "brown",
-                "creamy",
-                "dairy",
-                "milky",
-                "phenolic",
-                "powdery",
+                "vanilla",
                 "sweet",
-                "vanilla"
+                "powdery",
+                "phenolic",
+                "milky",
+                "dairy",
+                "creamy",
+                "brown"
             ]
         },
         "activity":
@@ -27917,11 +29109,19 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+<<<<<<< HEAD
                 "floral",
                 "green",
                 "leaf",
                 "walnut",
                 "violet"
+=======
+                "walnut",
+                "violet",
+                "green",
+                "floral",
+                "leaf"
+>>>>>>> stable
             ]
         },
         "activity":
@@ -28063,6 +29263,54 @@
                 {
                     "type": "ma",
                     "ec50": "-4.95"
+                }
+            }
+        }
+    },
+    "d4a8c9545b23d13230bebc24c808d4df":
+    {
+        "full_name": "(Z)-4-nonenal",
+        "smiles": "CCCC\/C=C\\CCC=O",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1101\/2020.12.07.414714":
+            {
+                "OR10A6":
+                {
+                    "type": "ma",
+                    "ec50": "-5.32"
+                }
+            }
+        }
+    },
+    "d63851ed7dafc124c41a5567754bfe6f":
+    {
+        "full_name": "(Z)-4-undecenal",
+        "smiles": "CCCCCC\/C=C\\CCC=O",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1101\/2020.12.07.414714":
+            {
+                "OR10A6":
+                {
+                    "type": "sa",
+                    "ec50": "-5.55"
+                }
+            }
+        }
+    },
+    "98b53a93656cbe9cb4888249ea47875a":
+    {
+        "full_name": "(Z)-6-undecenal",
+        "smiles": "CCCC\/C=C\\CCCCC=O",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1101\/2020.12.07.414714":
+            {
+                "OR10A6":
+                {
+                    "type": "sa",
+                    "ec50": "-5.48"
                 }
             }
         }

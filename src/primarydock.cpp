@@ -1874,6 +1874,8 @@ _try_again:
             }
             for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 
+            ligand->reset_conformer_momenta();
+
             // time_t preiter = time(NULL);
             if (differential_dock)
             {

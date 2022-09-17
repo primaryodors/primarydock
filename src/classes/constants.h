@@ -140,8 +140,8 @@
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
 #define allow_mol_fullrot_iter 1
 
-// Turn off the 360 degree rotations for all but the zeroth node of a path.
-#define nodes_no_ligand_360_tumble 1
+// Turns off the 360 degree rotations for all but the zeroth node of a path.
+#define nodes_no_ligand_360_tumble 0
 #define nodes_no_ligand_360_flex 1
 
 // Iteration callback function feature.

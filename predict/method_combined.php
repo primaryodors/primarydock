@@ -192,7 +192,7 @@ ELIM 20
 
 OUT $outfname
 
-# ECHO
+ECHO
 
 
 heredoc;

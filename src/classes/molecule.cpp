@@ -216,7 +216,7 @@ void Molecule::reset_conformer_momenta()
     {
         for (i=0; b[i]; i++)
         {
-            b[i]->angular_momentum = _def_bnd_momentum * conformer_momenta_multiplier /* * conformer_momenta_multiplier*/ * sgn(0.5-(rand()&1));
+            b[i]->angular_momentum = _def_bnd_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
         }
     }
 }

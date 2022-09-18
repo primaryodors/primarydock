@@ -99,6 +99,8 @@ switch ($fam)
 	$shelf2   = resno_from_bw($protid, "5.31");
 
 	$flank    = resno_from_bw($protid, "2.64");
+	$res732   = resno_from_bw($protid, "7.32");
+	$res736   = resno_from_bw($protid, "7.36");
 
 	$acid     = resno_from_bw($protid, "3.32");
 	$bind     = ($protid == "TAAR6" || $protid == "TAAR8") ? resno_from_bw($protid, "5.40") : "";
@@ -122,10 +124,10 @@ heredoc;
 	$cenres = "CEN RES $capturer $shuttler";
 	$path1 = "PATH 1 RES $shuttler $shelf1 $shelf2";
 	// $path2 = "PATH 2 RES $flank $shelf2";
-	$path2 = "";
-	$path3 = "PATH 2 RES $acid $bind $toggle";
+	$path2 = "PATH 2 RES $res732 $res736";
+	$path3 = "PATH 3 RES $acid $bind $toggle";
 
-	$pocketnode = 2;
+	$pocketnode = 3;
 	break;
 	
 	default:
@@ -188,7 +190,7 @@ POSE 10
 ITER 50
 
 # DIFF
-ELIM 20
+ELIM 50
 
 OUT $outfname
 

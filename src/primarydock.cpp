@@ -135,7 +135,7 @@ void iteration_callback(int iter)
             bary.y += (ligcen_target.y - bary.y) * drift;
             bary.z += (ligcen_target.z - bary.z) * drift;
         }
-        else drift *= (1.0 - 0.25/iters);
+        else drift *= (1.0 - drift_decay_rate/iters);
     }
 
     ligand->recenter(bary);
@@ -1263,6 +1263,10 @@ _try_again:
                 #if internode_momentum_only_on_activation 
                 conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
                 #endif
+
+                #if prevent_ligand_360_on_activate
+                allow_ligand_360_tumble = allow_ligand_360_flex = false;
+                #endif
                 
                 // Persist the flexions of the side chains. 
                 // TODO: Do not persist those residues whose positions are important to activation.
@@ -1335,6 +1339,10 @@ _try_again:
             {
                 #if internode_momentum_only_on_activation 
                 conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
+                #endif
+
+                #if prevent_ligand_360_on_activate
+                allow_ligand_360_tumble = allow_ligand_360_flex = false;
                 #endif
 
                 #if active_persistence

@@ -27,6 +27,13 @@ const aa3let =
 	'TRP', 'TYR', 'VAL',
 ];
 
+const aa_aliphatic = 0,
+	aa_aromatic = 1,
+	aa_hydrophilic = 2,
+	aa_acidic = 3,
+	aa_basic = 4,
+	aa_sulfur = 5;
+
 var opc_molecule = 1.0;
 var opc_ligand = 1.0;
 var opc_cartoon = 0.25;
@@ -539,6 +546,96 @@ function show_seqdd()
 	
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Aliphatic";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_aliphatic); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Aromatic";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_aromatic); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Hydrophilic";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_hydrophilic); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Acidic";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_acidic); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Basic";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_basic); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Sulfur";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_sulfur); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "None";
 	tgl.id = "seqddnone";
 	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
@@ -682,6 +779,60 @@ function hideAllSideChains()
 		$('#seqddtgl'+resno).removeClass('hilite');
 		resno++;
 		mdlidx = mdlresno.indexOf(resno);
+	}
+}
+
+function showSideChainsByType(show_type)
+{
+	var resdict = [];
+
+	for (var key in gmodel[0].structure.residueMap.dict)
+	{
+		// if (!gmodel[0].structure.residueMap.dict.hasOwnProperties(key)) continue;
+		resdict[gmodel[0].structure.residueMap.dict[key]] = key.split("|")[0];
+	}
+
+	var resno = 1;
+	while (typeof restoggled[resno] != "undefined")
+	{
+		var idx = gmodel[0].structure.residueStore.resno.indexOf(resno);
+		if (idx >= 0)
+		{
+			var aa = resdict[gmodel[0].structure.residueStore.residueTypeId[idx]];
+
+			var show_sc = false;
+			switch(aa)
+			{
+				case 'MET':
+					show_sc = (show_type == aa_aliphatic || show_type == aa_sulfur);
+					break;
+				case 'ALA': case 'ILE': case 'LEU': case 'VAL': case 'PRO': case 'GLY':
+					show_sc = (show_type == aa_aliphatic);
+					break;
+				case 'CYS':
+					show_sc = (show_type == aa_sulfur);
+					break;
+				case 'PHE': case 'TRP': case 'TYR':
+					show_sc = (show_type == aa_aromatic);
+					break;
+				case 'HIS':
+					show_sc = (show_type == aa_aromatic || show_type == aa_basic);
+					break;
+				case 'ARG': case 'LYS':
+					show_sc = (show_type == aa_basic);
+					break;
+				case 'ASP': case 'GLU':
+					show_sc = (show_type == aa_acidic);
+					break;
+				case 'SER': case 'THR': case 'ASN': case 'GLN':
+					show_sc = (show_type == aa_hydrophilic);
+					break;
+			}
+
+			if (show_sc) showSideChain(resno);
+		}
+
+		resno++;
 	}
 }
 

@@ -135,14 +135,16 @@
 // Drift pulls the ligand towards the loneliest point if it encounters clashes.
 // Turning it off can cause the ligand to be ejected from the protein.
 #define allow_drift 1
-#define initial_drift 0.333
+#define initial_drift 0.4
+#define drift_decay_rate 0.1
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
 #define allow_mol_fullrot_iter 1
 
 // Turns off the 360 degree rotations for all but the zeroth node of a path.
 #define nodes_no_ligand_360_tumble 0
-#define nodes_no_ligand_360_flex 1
+#define nodes_no_ligand_360_flex 0
+#define prevent_ligand_360_on_activate 1
 
 // Iteration callback function feature.
 #define allow_iter_cb 1

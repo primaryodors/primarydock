@@ -522,9 +522,24 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     // is calculated as a cosine and then raised to this exponent.
     Point center;
 
+    float achg = a->get_charge(), bchg = b->get_charge()
+        , apol = a->is_polar(), bpol = b->is_polar();
+    
+    if (!achg && a->get_Z() == 1)
+    {
+        Bond* lb = a->get_bond_by_idx(0);
+        if (lb && lb->btom) achg = lb->btom->get_charge();
+    }
+    if (!bchg && b->get_Z() == 1)
+    {
+        Bond* lb = b->get_bond_by_idx(0);
+        if (lb && lb->btom) bchg = lb->btom->get_charge();
+    }
+
     if (sgn(a->is_polar()) == sgn(b->is_polar())) kJmol -= 30 / pow(r, 2) * fabs(a->is_polar()) * fabs(b->is_polar());
     if (!forces)
     {
+        if (achg && bchg) kJmol -= 80.0 * achg*bchg / pow( (r<2) ? 1 : (r/2), 2 );
         goto _canstill_clash;
     }
 
@@ -797,9 +812,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                      << partial
                      << endl;
         }
-
-        float achg = a->get_charge(), bchg = b->get_charge()
-                                             , apol = a->is_polar(), bpol = b->is_polar();
 
         if (achg && bchg) partial = fabs(partial) * sgn(achg) * -sgn(bchg);
         if (achg && !bchg && bpol) partial = fabs(partial) * sgn(achg) * -sgn(bpol);

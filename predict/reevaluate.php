@@ -25,9 +25,7 @@ foreach ($dock_results as $protid => $docks)
     if (substr($protid, 0, 4) != "TAAR") continue;
     foreach ($docks as $ligand => $array)
     {
-        if (isset($array['Node 4'])) $pocketnode = 3;
-        else $pocketnode = 2;
-        $prediction = evaluate_result($array, $pocketnode);
+        $prediction = evaluate_result($array);
         if ($prediction == $array["Actual"]) $right++;
         else $wrong++;
 

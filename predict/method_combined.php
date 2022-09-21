@@ -95,8 +95,8 @@ switch ($fam)
 	$capturer = resno_from_bw($protid, "45.50");
 	$shuttler = resno_from_bw($protid, "45.51");
 
-	$shelf1   = resno_from_bw($protid, "5.29");
-	$shelf2   = resno_from_bw($protid, "5.31");
+	$shelf1   = resno_from_bw($protid, "5.27");
+	$shelf2   = resno_from_bw($protid, "5.29");
 
 	$flank    = resno_from_bw($protid, "2.64");
 	$res732   = resno_from_bw($protid, "7.32");
@@ -121,13 +121,15 @@ heredoc;
 		$shelf2--;
 	}
 	
+	$nodeno = 0;
+	$paths = [];
 	$cenres = "CEN RES $capturer $shuttler";
-	$path1 = "PATH 1 RES $shuttler $shelf1 $shelf2";
-	// $path2 = "PATH 2 RES $flank $shelf2";
-	$path2 = "PATH 2 RES $res732 $res736";
-	$path3 = "PATH 3 RES $acid $bind $toggle";
+	$nodeno++; $paths[] = "PATH $nodeno RES $shuttler $shelf1 $shelf2";
+	$nodeno++; $paths[] = "PATH $nodeno RES $shelf1 $shelf2 $res732";
+	$nodeno++; $paths[] = "PATH $nodeno RES $res732 $acid";
+	$nodeno++; $paths[] = "PATH $nodeno RES $acid $bind $toggle";
 
-	$pocketnode = 3;
+	$pocketnode = $nodeno;
 	break;
 	
 	default:
@@ -137,15 +139,17 @@ heredoc;
 	$captmtl2 = resno_from_bw($protid, "45.50");
 	$captmtl3 = resno_from_bw($protid, "45.51");
 	
+	$nodeno = 0;
+	$paths = [];	
 	$cenres = "CEN RES $captmtl1 $captmtl2 $captmtl3";
-	$path1 = "";
-	$path2 = "";
-	$path3 = "";
 
-	$pocketnode = 3;
+	$pocketnode = $nodeno;
 }
 
 $activenode = $pocketnode + 1;
+
+$paths[] = "PATH $activenode REL 0 0 0";
+$paths = implode("\n", $paths);
 
 $tmr2start = $prots[$protid]['region']['TMR2']['start'];
 $cyt1end = $tmr2start - 1;
@@ -173,10 +177,7 @@ PROT pdbs/$fam/$protid.upright.pdb
 LIG sdf/$ligname.sdf
 
 $cenres
-$path1
-$path2
-$path3
-PATH $activenode REL 0 0 0
+$paths
 
 ACVNODE $activenode
 
@@ -284,7 +285,7 @@ foreach ($sum as $node => $value)
 	// $average["Proximity $node"] = round($sump[$node] / (@$count[$node] ?: 1), 3);
 }
 
-$prediction = evaluate_result($average, $pocketnode);
+$prediction = evaluate_result($average);
 
 $actual = best_empirical_pair($protid, $ligname);
 if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");

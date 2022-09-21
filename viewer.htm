@@ -836,6 +836,8 @@ function showSideChainsByType(show_type)
 	}
 }
 
+var born = false;
+if (getParameterByName("born")) born = true;
 var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function(atom)
@@ -882,20 +884,20 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 
                 case 'ASP':
                 case 'GLU':
-                return 0xddbb99;
+                return born ? 0x99bbdd : 0xddbb99;
 
                 case 'HIS':
                 case 'LYS':
                 case 'ARG':
                 case 'PYL':
-                return 0x99bbdd;
+                return born ? 0xddbb99 : 0x99bbdd;
 
                 default:
                 return 0x666666;
             }
 
-        	case 'N': return atom.isBackbone() ? 0x000066 : 0x0066FF;
-        	case 'O': return atom.isBackbone() ? 0x660000 : 0xFF0000;
+        	case 'N': return born ? (atom.isBackbone() ? 0x660000 : 0xFF0000) : (atom.isBackbone() ? 0x000066 : 0x0066FF);
+        	case 'O': return born ? (atom.isBackbone() ? 0x000066 : 0x0066FF) : (atom.isBackbone() ? 0x660000 : 0xFF0000);
         	case 'P': return 0xff77c6;
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xffaa00;
@@ -963,20 +965,20 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
 
                 case 'ASP':
                 case 'GLU':
-                return 0xffddbb;
+                return born ? 0xbbddff : 0xffddbb;
 
                 case 'HIS':
                 case 'LYS':
                 case 'ARG':
                 case 'PYL':
-                return 0xbbddff;
+                return born ? 0xffddbb : 0xbbddff;
 
                 default:
                 return 0x777777;
             }
 
-        	case 'N': return atom.isBackbone() ? 0x000066 : 0x0087FF;
-        	case 'O': return atom.isBackbone() ? 0x660000 : 0xFF2222;
+        	case 'N': return born ? (atom.isBackbone() ? 0x660000 : 0xFF2222) : (atom.isBackbone() ? 0x000066 : 0x0087FF);
+        	case 'O': return born ? (atom.isBackbone() ? 0x000066 : 0x0087FF) : (atom.isBackbone() ? 0x660000 : 0xFF2222);
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
         	case 'Se': return 0xffb022;
@@ -1012,8 +1014,8 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
         {
         	case 'H': return 0xe1faff;
         	case 'C': return 0xcfccc8;
-        	case 'N': return 0x0087FF;
-        	case 'O': return 0xFF2222;
+        	case 'N': return born ? 0xFF2222 : 0x0087FF;
+        	case 'O': return born ? 0x0087FF : 0xFF2222;
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
         	case 'Se': return 0xffb022;
@@ -1111,6 +1113,7 @@ if (molid != "~")
 		        comp.addRepresentation( "ball+stick",
 		        {
 		        	multipleBond: true,
+					colorScheme: PODefSchemeLigand,
 		        	metalness: mtl_bs,
 		        } );
 		        gmodel.push(comp);
@@ -1553,6 +1556,7 @@ function loadFile(fileData, fileName = "")
                         comp.addRepresentation( "ball+stick",
                         {
                         	opacity: opc_molecule,
+							colorScheme: PODefSchemeLigand,
 							multipleBond: true,
                         	metalness: mtl_bs,
                         } );

@@ -1178,7 +1178,7 @@ void Bond::enforce_moves_with_uniqueness()
     }
 }
 
-bool Bond::rotate(float theta, bool allow_backbone)
+bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
 {
     if (!btom) return false;
     if (!moves_with_btom) fill_moves_with_cache();
@@ -1206,7 +1206,6 @@ bool Bond::rotate(float theta, bool allow_backbone)
     Rotation rot;
     rot.v = v;
     rot.a = theta;
-    btom->rotate_geometry(rot);
 
     #if allow_tethered_rotations
     // Whichever side has the lower sum of Atom::last_bind_energy values, rotate that side.
@@ -1214,7 +1213,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
     Bond* inverse = btom->get_bond_between(atom);
 
     if (!atom->residue && !btom->residue && inverse && inverse->can_rotate && !(inverse->moves_with_btom)) inverse->fill_moves_with_cache();
-    if (!atom->residue && !btom->residue && inverse && inverse->can_rotate && inverse->moves_with_btom)
+    if (!skip_inverse_check && !atom->residue && !btom->residue && inverse && inverse->can_rotate && inverse->moves_with_btom)
     {
         for (i=0; moves_with_btom[i]; i++)
         {
@@ -1228,7 +1227,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
         }
 
         if (mwb_total_binding < mwbi_total_binding)
-            return inverse->rotate(-theta, allow_backbone);				// DANGER! RECURSION.
+            return inverse->rotate(-theta, allow_backbone, true);				// DANGER! RECURSION.
     }
 _cannot_reverse_bondrot:
     ;
@@ -1238,7 +1237,8 @@ _cannot_reverse_bondrot:
     if (echo_on_rotate) cout << "Rotating " << atom->residue << ":" << atom->name << "-" << btom->name << " by " << theta*fiftyseven << " degrees." << endl;
     #endif
 
-    // cout << "Rotating " << atom->name << "-" << btom->name << "... ";
+    btom->rotate_geometry(rot);
+
     for (i=0; moves_with_btom[i]; i++)
     {
         if (!allow_backbone)
@@ -1252,24 +1252,10 @@ _cannot_reverse_bondrot:
             }
         }
         if (moves_with_btom[i]->residue != btom->residue) continue;
-        // cout << moves_with_btom[i]->name << " ";
-
-        /*cout << moves_with_btom[i]->residue << ":" << moves_with_btom[i]->name
-        	 << " from "
-        	 << atom->residue << ":" << atom->name
-        	 << "-"
-        	 << btom->residue << ":" << btom->name
-        	 << endl << flush;*/
 
         Point loc = moves_with_btom[i]->get_location();
         Point nl  = rotate3D(&loc, &cen, &v, theta);
 
-        /*if (moves_with_btom[i]->residue == 203 && !strcmp(moves_with_btom[i]->name, "HB1"))
-        	cout << "Moving " << moves_with_btom[i]->residue << ":" << moves_with_btom[i]->name << " about axis "
-        		 << atom->residue << ":" << atom->name << " - " << btom->residue << ":" << btom->name
-        		 << endl;*/
-
-        // cout << moves_with_btom[i]->name << loc << " " << (theta*fiftyseven) << " " << nl << endl;
         moves_with_btom[i]->move(&nl);
         moves_with_btom[i]->rotate_geometry(rot);
     }

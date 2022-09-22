@@ -28,7 +28,7 @@ public:
     Bond(Atom* a, Atom* b, int card);
     ~Bond();
 
-    bool rotate(float angle_radians, bool allow_backbone = false);
+    bool rotate(float angle_radians, bool allow_backbone = false, bool skip_inverse_check = false);
     void clear_moves_with_cache()
     {
         moves_with_btom = 0;

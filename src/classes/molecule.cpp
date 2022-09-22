@@ -2681,7 +2681,10 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                                     bestfrb = bind1;
                                     bestfrrad = rad;
                                 }
+                                if (!mm[i]->atoms[0]->residue) cout << (0.001*round(bind1 * 1000)) << " ";        // Delete this for production.
                             }
+                            if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
+
                             #if DBG_BONDFLEX
                             if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
                                 cout << endl << "(" << (bestfrrad*fiftyseven) << "deg) ";
@@ -2728,6 +2731,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                             }
                         }
                     }
+                    if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
                 }
                 #if DBG_BONDFLEX
                 if (DBG_FLEXRES == residue)

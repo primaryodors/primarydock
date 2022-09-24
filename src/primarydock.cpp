@@ -578,7 +578,7 @@ void do_tumble_spheres(Point l_pocket_cen)
     float lig_min_int_clsh = ligand->get_internal_clashes();
 
     // Begin tumble sphere behavior.
-    std::vector<AminoAcid*> tsphres = protein->get_residues_near(l_pocket_cen, size.magnitude()+4);
+    std::vector<AminoAcid*> tsphres = protein->get_residues_near(l_pocket_cen, size.magnitude()+6);
     int tsphsz = tsphres.size();
     float outer_sphere[tsphsz+4], inner_sphere[tsphsz+4];
 
@@ -1598,6 +1598,10 @@ _try_again:
             {
                 if (!use_bestbind_algorithm) do_tumble_spheres(ligcen_target);
             }
+            #endif
+
+            #if redo_tumble_spheres_every_node
+            if (!use_bestbind_algorithm && (!prevent_ligand_360_on_activate || (nodeno != active_matrix_node))) do_tumble_spheres(ligcen_target);
             #endif
 
             #if _DBG_STEPBYSTEP

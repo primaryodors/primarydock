@@ -2643,8 +2643,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
 
                         if (allow_ligand_360_flex && !(iter % _fullrot_every))
                         {
-                            if (!mm[i]->atoms[0]->residue) cout << mm[i]->rotatable_bonds[k]->atom->name << "-"
-                                << mm[i]->rotatable_bonds[k]->btom->name << ": ";        // Delete this for production.
+                            /*if (!mm[i]->atoms[0]->residue) cout << mm[i]->rotatable_bonds[k]->atom->name << "-"
+                                << mm[i]->rotatable_bonds[k]->btom->name << ": ";*/        // Delete this for production.
                             while ((M_PI*2-rad) > 1e-3)
                             {
                                 mm[i]->rotatable_bonds[k]->rotate(_fullrot_steprad);
@@ -2683,9 +2683,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                                     bestfrb = bind1;
                                     bestfrrad = rad;
                                 }
-                                if (!mm[i]->atoms[0]->residue) cout << (0.001*round(bind1 * 1000)) << " ";        // Delete this for production.
+                                //if (!mm[i]->atoms[0]->residue) cout << (0.001*round(bind1 * 1000)) << " ";        // Delete this for production.
                             }
-                            if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
+                            // if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
 
                             #if DBG_BONDFLEX
                             if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
@@ -2733,7 +2733,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                             }
                         }
                     }
-                    if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
+                    //if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
                 }
                 #if DBG_BONDFLEX
                 if (DBG_FLEXRES == residue)

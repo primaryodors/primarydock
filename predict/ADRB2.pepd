@@ -237,6 +237,53 @@ IF %i <= 7 GOTO _loop4
 
 
 _do_output:
+
+# Output the directionals.
+
+ECHO "# Directionals from ADRB2.pepd:"
+ECHO "$direction ="
+ECHO "["
+
+LET %i = 1
+_loop2a:
+
+ECHO "	'TMR" %i "' => [ " ~
+IF @in[%i].x >= 0 ECHO " " ~
+IF @in[%i].x < 10 AND @in[%i].x > -10 ECHO " " ~
+ECHO @in[%i].x ", " ~
+IF @in[%i].y >= 0 ECHO " " ~
+IF @in[%i].y < 10 AND @in[%i].y > -10 ECHO " " ~
+ECHO @in[%i].y ", " ~
+IF @in[%i].z >= 0 ECHO " " ~
+IF @in[%i].z < 10 AND @in[%i].z > -10 ECHO " " ~
+ECHO @in[%i].z ", " ~
+IF @im[%i].x >= 0 ECHO " " ~
+IF @im[%i].x < 10 AND @im[%i].x > -10 ECHO " " ~
+ECHO @im[%i].x ", " ~
+IF @im[%i].y >= 0 ECHO " " ~
+IF @im[%i].y < 10 AND @im[%i].y > -10 ECHO " " ~
+ECHO @im[%i].y ", " ~
+IF @im[%i].z >= 0 ECHO " " ~
+IF @im[%i].z < 10 AND @im[%i].z > -10 ECHO " " ~
+ECHO @im[%i].z ", " ~
+IF @ic[%i].x >= 0 ECHO " " ~
+IF @ic[%i].x < 10 AND @ic[%i].x > -10 ECHO " " ~
+ECHO @ic[%i].x ", " ~
+IF @ic[%i].y >= 0 ECHO " " ~
+IF @ic[%i].y < 10 AND @ic[%i].y > -10 ECHO " " ~
+ECHO @ic[%i].y ", " ~
+IF @ic[%i].z >= 0 ECHO " " ~
+IF @ic[%i].z < 10 AND @ic[%i].z > -10 ECHO " " ~
+ECHO @ic[%i].z " ],"
+
+LET %i ++
+
+IF %i <= 7 GOTO _loop2a
+ECHO "];"
+ECHO ""
+
+
+
 # Output the deltas.
 
 ECHO "# Activation matrix from ADRB2.pepd:"

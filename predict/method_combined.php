@@ -255,8 +255,6 @@ foreach ($outlines as $ln)
 	if (false !== strpos($ln, "pose(s) found")) $poses_found = intval($ln);
 }
 
-// print_r($benerg);
-
 $sum = [];
 $sump = [];
 $count = [];

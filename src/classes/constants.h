@@ -211,7 +211,6 @@
 #define _DORESPHRES 0
 #define _DBG_RESBMULT 0
 #define _debug_active_bond_rot 0
-#define stalk_and_snipe_these_cursed_memory_leaks 0
 
 #endif
 

@@ -23,10 +23,6 @@ bool allow_ligand_360_flex = true;
 
 Molecule::Molecule(char const* lname)
 {
-    #if stalk_and_snipe_these_cursed_memory_leaks
-    cout << "Molecule::Molecule(" << (lname ? lname : "NULL") << ")" << endl;
-    #endif
-
     name = new char[strlen(lname)+1];
     strcpy(name, lname);
 
@@ -40,10 +36,6 @@ Molecule::Molecule(char const* lname)
 
 Molecule::Molecule()
 {
-    #if stalk_and_snipe_these_cursed_memory_leaks
-    cout << "Molecule::Molecule()" << endl;
-    #endif
-
     atoms = nullptr;
     smiles = nullptr;
     rings = nullptr;
@@ -55,10 +47,6 @@ Molecule::Molecule()
 
 Molecule::~Molecule()
 {
-    #if stalk_and_snipe_these_cursed_memory_leaks
-    cout << "Molecule::~Molecule() destroy " << (name? name : "NULL") << endl;
-    #endif
-
     if (atoms)
     {
         // int i;
@@ -91,10 +79,6 @@ bool noAtoms(Atom** array)
 
 Molecule::Molecule(char const* lname, Atom** collection)
 {
-    #if stalk_and_snipe_these_cursed_memory_leaks
-    cout << "Molecule::Molecule(" << (lname ? lname : "NULL") << ", [atom collection])" << endl;
-    #endif
-
     if (!collection)
     {
         cout << "Temporary molecule creation attempted from nullptr atom pointer array." << endl;

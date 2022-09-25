@@ -382,6 +382,8 @@ Atom::~Atom()
     if (name) delete[] name;
     if (bonded_to) delete[] bonded_to;*/
 
+    if (geov) delete[] geov;
+
     if (bonded_to)
     {
         int i;
@@ -470,6 +472,11 @@ bool Atom::move(Point* pt)
     if (break_on_move) throw 0xb16fa7012a96eca7;
     #endif
 
+    if (isnan(pt->x) || isnan(pt->y) || isnan(pt->z))
+    {
+        return false;
+    }
+
     /*if (name && !strcmp(name, "CB"))
     {
     	Bond* b = get_bond_between("CA");
@@ -482,6 +489,7 @@ bool Atom::move(Point* pt)
 
     location = *pt;
     location.weight = at_wt;
+    if (geov) delete[] geov;
     geov = NULL;
     return true;
 }
@@ -491,6 +499,11 @@ bool Atom::move_rel(SCoord* v)
     #if debug_break_on_move
     if (break_on_move) throw 0xb16fa7012a96eca7;
     #endif
+
+    if (isnan(v->phi) || isnan(v->theta) || isnan(v->r))
+    {
+        return false;
+    }
 
     /*if (name && !strcmp(name, "CB"))
     {
@@ -502,6 +515,7 @@ bool Atom::move_rel(SCoord* v)
     	}
     }*/
     location = location.add(v);
+    if (geov) delete[] geov;
     geov = NULL;
     return true;
 }
@@ -513,6 +527,11 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     Bond* palin = excluding->get_bond_between(this);
     Atom** atoms = palin->get_moves_with_btom();
     if (!atoms) return 0;
+
+    if (isnan(pt->x) || isnan(pt->y) || isnan(pt->z))
+    {
+        return false;
+    }
 
     //cout << "Moving assembly starting with " << name << " excluding " << excluding->name << endl;
 
@@ -550,6 +569,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
         aloc = aloc.add(&mov);
         aloc = rotate3D(&aloc, pt, &rot);
         atoms[i]->location = aloc;
+        if (atoms[i]->geov) delete[] atoms[i]->geov;
         atoms[i]->geov = NULL;
         atomct++;
         //cout << "Motion includes " << atoms[i]->name << endl;
@@ -635,6 +655,7 @@ void Atom::clear_all_moves_cache()
     if (!bonded_to) return;
     int i;
     for (i=0; i<geometry; i++) bonded_to[i].clear_moves_with_cache();
+    if (geov) delete[] geov;
     geov = NULL;
 }
 
@@ -772,6 +793,7 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
 
     // if (this < lbtom && Z > 1 && lbtom->Z > 1) cout << "Bond " << name << cardinality_printable(lcard) << lbtom->name << endl;
 
+    if (geov) delete[] geov;
     geov = NULL;
 
     // TODO: This will fail if creating a nitrate or a sulfite.
@@ -779,6 +801,7 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
     {
         geometry -= (lcard-1);
         lbtom->geometry -= (lcard-1);
+        if (geov) delete[] geov;
         geov=0;
         lbtom->geov=0;
     }
@@ -1155,7 +1178,7 @@ void Bond::enforce_moves_with_uniqueness()
     }
 }
 
-bool Bond::rotate(float theta, bool allow_backbone)
+bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
 {
     if (!btom) return false;
     if (!moves_with_btom) fill_moves_with_cache();
@@ -1183,7 +1206,6 @@ bool Bond::rotate(float theta, bool allow_backbone)
     Rotation rot;
     rot.v = v;
     rot.a = theta;
-    btom->rotate_geometry(rot);
 
     #if allow_tethered_rotations
     // Whichever side has the lower sum of Atom::last_bind_energy values, rotate that side.
@@ -1191,7 +1213,7 @@ bool Bond::rotate(float theta, bool allow_backbone)
     Bond* inverse = btom->get_bond_between(atom);
 
     if (!atom->residue && !btom->residue && inverse && inverse->can_rotate && !(inverse->moves_with_btom)) inverse->fill_moves_with_cache();
-    if (!atom->residue && !btom->residue && inverse && inverse->can_rotate && inverse->moves_with_btom)
+    if (!skip_inverse_check && !atom->residue && !btom->residue && inverse && inverse->can_rotate && inverse->moves_with_btom)
     {
         for (i=0; moves_with_btom[i]; i++)
         {
@@ -1205,13 +1227,18 @@ bool Bond::rotate(float theta, bool allow_backbone)
         }
 
         if (mwb_total_binding < mwbi_total_binding)
-            return inverse->rotate(-theta, allow_backbone);				// DANGER! RECURSION.
+            return inverse->rotate(-theta, allow_backbone, true);				// DANGER! RECURSION.
     }
 _cannot_reverse_bondrot:
     ;
     #endif
 
-    // cout << "Rotating " << atom->name << "-" << btom->name << "... ";
+    #if _debug_active_bond_rot
+    if (echo_on_rotate) cout << "Rotating " << atom->residue << ":" << atom->name << "-" << btom->name << " by " << theta*fiftyseven << " degrees." << endl;
+    #endif
+
+    btom->rotate_geometry(rot);
+
     for (i=0; moves_with_btom[i]; i++)
     {
         if (!allow_backbone)
@@ -1225,24 +1252,10 @@ _cannot_reverse_bondrot:
             }
         }
         if (moves_with_btom[i]->residue != btom->residue) continue;
-        // cout << moves_with_btom[i]->name << " ";
-
-        /*cout << moves_with_btom[i]->residue << ":" << moves_with_btom[i]->name
-        	 << " from "
-        	 << atom->residue << ":" << atom->name
-        	 << "-"
-        	 << btom->residue << ":" << btom->name
-        	 << endl << flush;*/
 
         Point loc = moves_with_btom[i]->get_location();
         Point nl  = rotate3D(&loc, &cen, &v, theta);
 
-        /*if (moves_with_btom[i]->residue == 203 && !strcmp(moves_with_btom[i]->name, "HB1"))
-        	cout << "Moving " << moves_with_btom[i]->residue << ":" << moves_with_btom[i]->name << " about axis "
-        		 << atom->residue << ":" << atom->name << " - " << btom->residue << ":" << btom->name
-        		 << endl;*/
-
-        // cout << moves_with_btom[i]->name << loc << " " << (theta*fiftyseven) << " " << nl << endl;
         moves_with_btom[i]->move(&nl);
         moves_with_btom[i]->rotate_geometry(rot);
     }
@@ -1511,7 +1524,8 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
         {
             int i;
             for (i=0; i<bc; i++) geometry -= fmax(0,bonded_to[i].cardinality-1);
-            geov=NULL;
+            if (geov) delete[] geov;
+            geov = NULL;
         }
     }
 
@@ -1554,7 +1568,6 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
                     arom_center = member_of[j]->get_center();
             }
 
-            geov = get_basic_geometry();
             Point bond0v = bonded_to[0].btom->get_location().subtract(&location);
             Point vanticen = location.subtract(arom_center);
             bond0v.scale(1);
@@ -1667,6 +1680,8 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
                     }
                 }
 
+                delete[] rots;
+
                 g0 = geov[0];
                 g1 = geov[1];
                 g0.scale(1);
@@ -1687,6 +1702,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
                     }
                 }
 
+                delete[] rots;
 
                 if (_DBGGEO) cout << name << " returns " << (j==1?"trans":"cis") << " double-aligned geometry (" << geometry << "):"
                                       << bonded_to[0].btom->name << ", " << bonded_to[1].btom->name << "."
@@ -1730,6 +1746,7 @@ SCoord Atom::get_next_free_geometry(float lcard)
     if (lcard > 1)
     {
         geometry -= ceil(lcard-1);
+        if (geov) delete[] geov;
         geov = 0;
     }
     SCoord* v = get_geometry_aligned_to_bonds();
@@ -1959,6 +1976,8 @@ bool Atom::is_in_ring(Ring* ring)
             }
         }
     }
+
+    delete[] ra;
 
     /*if (!strcmp(name, "NE1"))
     {

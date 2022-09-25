@@ -79,7 +79,7 @@ int main(int argc, char** argv)
         cout << "metal -p {path/to/input.pdb} -r {resno}:{aname} -r {resno}:{aname} -r {resno}:{aname} -e {elem_sym} [-b {pocket.x} {pocket.y} {pocket.z}] -o {path/to/output.pdb}" << endl;
         cout << endl << "Example:" << endl;
         cout << "metal -p ";
-        cout << (inpfile ? inpfile : "../pdbs/OR1A1/OR1A1.rotated.pdb");
+        cout << (inpfile ? inpfile : "../pdbs/OR1A1/OR1A1.upright.pdb");
         cout << " -r 176:OD1 -r 179:SG -r 180:OD1 -o output/OR1A1.metal.pdb -b -4.93883 5.08067 -4.91533 -e Zn" << endl;
         cout << endl << "Optionally, you may indicate the metal's charge, e.g. -c 1 for a charge of +1. The default charge, if -c is omitted, is +2." << endl;
         cout << endl << "By default, a helix will be created and moved above the binding pocket. If this is not a helix-bound metal ion,"

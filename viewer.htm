@@ -27,11 +27,18 @@ const aa3let =
 	'TRP', 'TYR', 'VAL',
 ];
 
+const aa_aliphatic = 0,
+	aa_aromatic = 1,
+	aa_hydrophilic = 2,
+	aa_acidic = 3,
+	aa_basic = 4,
+	aa_sulfur = 5;
+
 var opc_molecule = 1.0;
 var opc_ligand = 1.0;
 var opc_cartoon = 0.25;
-var opc_sidechain = 0.4;
-var opc_sidechain_active = 0.5;
+var opc_sidechain = 0.36;
+var opc_sidechain_active = 0.41;
 var opc_metal = 1.0;
 
 var mtl_bs = 0.0;
@@ -170,11 +177,6 @@ a:hover
 
 .symbol
 {	font-size: 20px!important;
-}
-
-input[type=file]
-{
-    /*width: 600px;*/
 }
 
 input, select
@@ -426,17 +428,6 @@ var tmcolor =
     7: hsl_to_rgb(340, 128, 160),
 };
 
-/*var tmcolor =
-{
-    1: 0x887799,
-    2: 0x0077ff,
-    3: 0x00ff66,
-    4: 0x99cc66,
-    5: 0xffcc00,
-    6: 0xff9900,
-    7: 0xbb4466,
-};*/
-
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 
 function aa_1let_from_3let(laa3let)
@@ -553,6 +544,96 @@ function show_seqdd()
 	tgl.innerText = "|";
 	seqdd.appendChild(tgl);
 	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Aliphatic";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_aliphatic); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Aromatic";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_aromatic); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Hydrophilic";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_hydrophilic); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Acidic";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_acidic); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Basic";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_basic); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Sulfur";
+	tgl.id = "seqddaliph";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
+	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_sulfur); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "None";
@@ -701,6 +782,62 @@ function hideAllSideChains()
 	}
 }
 
+function showSideChainsByType(show_type)
+{
+	var resdict = [];
+
+	for (var key in gmodel[0].structure.residueMap.dict)
+	{
+		// if (!gmodel[0].structure.residueMap.dict.hasOwnProperties(key)) continue;
+		resdict[gmodel[0].structure.residueMap.dict[key]] = key.split("|")[0];
+	}
+
+	var resno = 1;
+	while (typeof restoggled[resno] != "undefined")
+	{
+		var idx = gmodel[0].structure.residueStore.resno.indexOf(resno);
+		if (idx >= 0)
+		{
+			var aa = resdict[gmodel[0].structure.residueStore.residueTypeId[idx]];
+
+			var show_sc = false;
+			switch(aa)
+			{
+				case 'MET':
+					show_sc = (show_type == aa_aliphatic || show_type == aa_sulfur);
+					break;
+				case 'ALA': case 'ILE': case 'LEU': case 'VAL': case 'PRO': case 'GLY':
+					show_sc = (show_type == aa_aliphatic);
+					break;
+				case 'CYS':
+					show_sc = (show_type == aa_sulfur);
+					break;
+				case 'PHE': case 'TRP': case 'TYR':
+					show_sc = (show_type == aa_aromatic);
+					break;
+				case 'HIS':
+					show_sc = (show_type == aa_aromatic || show_type == aa_basic);
+					break;
+				case 'ARG': case 'LYS':
+					show_sc = (show_type == aa_basic);
+					break;
+				case 'ASP': case 'GLU':
+					show_sc = (show_type == aa_acidic);
+					break;
+				case 'SER': case 'THR': case 'ASN': case 'GLN':
+					show_sc = (show_type == aa_hydrophilic);
+					break;
+			}
+
+			if (show_sc) showSideChain(resno);
+		}
+
+		resno++;
+	}
+}
+
+var born = false;
+if (getParameterByName("born")) born = true;
 var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function(atom)
@@ -747,20 +884,20 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 
                 case 'ASP':
                 case 'GLU':
-                return 0xddbb99;
+                return born ? 0x99bbdd : 0xddbb99;
 
                 case 'HIS':
                 case 'LYS':
                 case 'ARG':
                 case 'PYL':
-                return 0x99bbdd;
+                return born ? 0xddbb99 : 0x99bbdd;
 
                 default:
                 return 0x666666;
             }
 
-        	case 'N': return atom.isBackbone() ? 0x000066 : 0x0066FF;
-        	case 'O': return atom.isBackbone() ? 0x660000 : 0xFF0000;
+        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF0000) : (atom.isBackbone() ? 0x000066 : 0x0066FF);
+        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0066FF) : (atom.isBackbone() ? 0x660000 : 0xFF0000);
         	case 'P': return 0xff77c6;
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xffaa00;
@@ -828,20 +965,20 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
 
                 case 'ASP':
                 case 'GLU':
-                return 0xffddbb;
+                return born ? 0xbbddff : 0xffddbb;
 
                 case 'HIS':
                 case 'LYS':
                 case 'ARG':
                 case 'PYL':
-                return 0xbbddff;
+                return born ? 0xffddbb : 0xbbddff;
 
                 default:
                 return 0x777777;
             }
 
-        	case 'N': return atom.isBackbone() ? 0x000066 : 0x0087FF;
-        	case 'O': return atom.isBackbone() ? 0x660000 : 0xFF2222;
+        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF2222) : (atom.isBackbone() ? 0x000066 : 0x0087FF);
+        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0087FF) : (atom.isBackbone() ? 0x660000 : 0xFF2222);
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
         	case 'Se': return 0xffb022;
@@ -877,8 +1014,8 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
         {
         	case 'H': return 0xe1faff;
         	case 'C': return 0xcfccc8;
-        	case 'N': return 0x0087FF;
-        	case 'O': return 0xFF2222;
+        	case 'N': return born ? 0xFF2277 : 0x5555FF;
+        	case 'O': return born ? 0x00bbFF : 0xFF2222;
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
         	case 'Se': return 0xffb022;
@@ -898,6 +1035,34 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
 
         return 0xcc00ff;
     };
+});
+
+var PODefSchemeRainbow = NGL.ColormakerRegistry.addScheme(function (params)
+{
+	/**/
+
+	this.atomColor = function(atom) 
+	{
+		if (isNaN(atom.structure.rnbPos))
+		{
+			var morceaux = atom.structure.name.split("|");
+
+			var i;
+			var nmax = 0;
+
+			for (i=0; i<model.length; i++)
+			{
+				if (mpos[i] == gpose && mnod[i] > nmax) nmax = mnod[i];
+			}
+
+			var nodeNo = parseInt(morceaux[1]);
+			atom.structure.rnbPos = 0.9 + (0.02 + nodeNo) / (0.5+nmax);
+		}
+
+		var rnbint = parseInt(255*atom.structure.rnbPos)
+		var acol = hsl_to_rgb(rnbint, 81, 173);
+		return acol;
+	}
 });
 
 var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
@@ -948,6 +1113,7 @@ if (molid != "~")
 		        comp.addRepresentation( "ball+stick",
 		        {
 		        	multipleBond: true,
+					colorScheme: PODefSchemeLigand,
 		        	metalness: mtl_bs,
 		        } );
 		        gmodel.push(comp);
@@ -963,12 +1129,14 @@ function showPose(p)
 
     var pnodz = $('#pnodz')[0];
     pnodz.innerHTML = "Node: ";
-    var pmax = 1;
+    var pmax = 1, nmax = 0;
 
     for (i=0; i<model.length; i++)
     {
         if (mpos[i] == p && mnod[i] == 0)
         {
+			if (mrparams[i].colorScheme == PODefSchemeRainbow) mrparams[i].colorScheme = PODefSchemeLigand;
+			model[i].removeAllRepresentations();
             model[i].addRepresentation( mrep[i], mrparams[i] );
             if (is_ligand[i]) curr_ligand = model[i];
         }
@@ -977,18 +1145,35 @@ function showPose(p)
 
         if (mpos[i] > pmax) pmax = mpos[i];
 
-        if (mpos[i] == p && $("#nodebtn"+mnod[i]).length == 0 )
-        {
-            var nodebtn = document.createElement("a");
-            nodebtn.className = "nodebtn";
-            if (mnod[i]==0) $(nodebtn).addClass("hilite");
-            nodebtn.innerText = mnod[i];
-            nodebtn.id = "nodebtn"+mnod[i];
-            nodebtn.setAttribute("onclick", "showNode("+mnod[i]+");");
+        if ($("#nodebtn"+mnod[i]).length == 0)
+		{
+			if (mpos[i] == p )
+			{
+				var nodebtn = document.createElement("a");
+				nodebtn.className = "nodebtn";
+				if (mnod[i]==0) $(nodebtn).addClass("hilite");
+				nodebtn.innerText = mnod[i];
+				nodebtn.id = "nodebtn"+mnod[i];
+				nodebtn.setAttribute("onclick", "showNode("+mnod[i]+");");
 
-            pnodz.appendChild(nodebtn);
-        }
+				pnodz.appendChild(nodebtn);
+
+				if (mnod[i] > nmax) nmax = mnod[i];
+			}
+		}
     }
+
+	if (nmax)
+	{
+		var rnbbtn = document.createElement("a");
+		rnbbtn.className = "nodebtn";
+		if (mnod[i]==0) $(rnbbtn).addClass("hilite");
+		rnbbtn.innerText = "🌈";
+		rnbbtn.id = "rnbbtn";
+		rnbbtn.setAttribute("onclick", "rainbowNodes();");
+
+		pnodz.appendChild(rnbbtn);
+	}
 
     if (p < 1)
     {
@@ -1022,6 +1207,8 @@ function showNode(n)
     {
         if (mpos[i] == gpose && mnod[i] == n)
         {
+			if (mrparams[i].colorScheme == PODefSchemeRainbow) mrparams[i].colorScheme = PODefSchemeLigand;			// @#$% shallow copy.
+			model[i].removeAllRepresentations();
             model[i].addRepresentation( mrep[i], mrparams[i] );
             if (is_ligand[i]) curr_ligand = model[i];
         }
@@ -1051,6 +1238,8 @@ function showNode(n)
     		break;
     	}
     }
+
+	// Cartoon for active protein conformational change.
     if (bbi >= 0 && acvmdl)
     {
 		if (n >= acvnode)
@@ -1084,6 +1273,47 @@ function showNode(n)
     if (curr_ligand) $('#ligbtn, #prsv').show();
     
     if (cen_ligand) curr_ligand.autoView();
+}
+
+function rainbowNodes()
+{
+    var i, bbi=-1;
+    var nmax = 0;
+
+	gmodel[0].autoView();
+	cen_ligand = false;
+
+	$(".nodebtn").removeClass("hilite");
+	$("#rnbbtn").addClass("hilite");
+
+	// var cc = new NGL.ComponentCollection();
+
+    for (i=0; i<model.length; i++)
+    {
+        if (mpos[i] == gpose && mnod[i] > nmax) nmax = mnod[i];
+    }
+
+    for (i=0; i<model.length; i++)
+    {
+        if (mpos[i] == gpose)
+        {
+			// model[i].structure.rnbPos = (0.5 + mnod[i]) / (nmax + 1);
+			var mrp = mrparams[i];
+			if (mrp.colorScheme == PODefSchemeLigand) mrp.colorScheme = PODefSchemeRainbow;
+			model[i].removeAllRepresentations();
+            model[i].addRepresentation( mrep[i], mrp );
+            if (is_ligand[i])
+			{
+				if (mnod[i] == 0) curr_ligand = model[i];
+			}
+			// cc.list.push(model[i]);
+        }
+        else
+            model[i].removeAllRepresentations();
+    }
+
+	// cc.setSelection("*");
+	// cc.autoView();
 }
 
 $("body").on("keyup", function(e, obj)
@@ -1326,6 +1556,7 @@ function loadFile(fileData, fileName = "")
                         comp.addRepresentation( "ball+stick",
                         {
                         	opacity: opc_molecule,
+							colorScheme: PODefSchemeLigand,
 							multipleBond: true,
                         	metalness: mtl_bs,
                         } );

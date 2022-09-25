@@ -35,7 +35,7 @@ if ($protid == "next" || $protid == "all")
 	echo "Processing $protid... ";
 }
 
-if (substr($protid, 0, 2) == "OR") die("Only ORs are currently supported.\n");
+if (substr($protid, 0, 2) != "OR") die("Only ORs are currently supported.\n");
 $fam = family_from_protid($protid);
 
 $lockarom = resno_from_bw($protid, "6.40");
@@ -52,7 +52,7 @@ $startconn = $midway-5;
 
 $pepddat = <<<heredoc
 
-LOAD "pdbs/$fam/$protid.rotated.pdb"
+LOAD "pdbs/$fam/$protid.upright.pdb"
 
 LET &bendamt = 0.5
 LET &mbendamt = 0.0 - &bendamt

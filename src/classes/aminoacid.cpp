@@ -27,6 +27,13 @@ AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
     if (prevaa) prevaa->next_aa = this;
 }
 
+AminoAcid::~AminoAcid()
+{
+    // if (name) delete[] name;
+    if (atoms) delete[] atoms;
+    atoms = nullptr;
+}
+
 #define _ALGORITHMIC_GREEK 1
 AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 {
@@ -229,6 +236,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                         }
                     }
                 }
+
+                delete[] ab;
             }
         }
 
@@ -260,6 +269,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                             }
                         }
                     }
+
+                    delete[] ab;
                 }
             }
         }
@@ -484,7 +495,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 
         #endif
 
-        get_rotatable_bonds();
+        rotatable_bonds = get_rotatable_bonds();
     }	// if SMILES
     else
     {
@@ -552,6 +563,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     }
 
     // flatten();
+    rotatable_bonds = get_rotatable_bonds();
     minimize_internal_clashes();
 
 
@@ -948,12 +960,14 @@ int AminoAcid::from_pdb(FILE* is, int rno)
         strcpy(origbuf, buffer);
         // char** fields = chop_spaced_fields(buffer);
 
-		char** fields = new char*[20];
+        // TODO: Make this a vector of strings.
+		// char** fields = new char*[20];
+        std::vector<std::string> fields;
 		int places[20] = {0, 6, 11, 17, 21, 22, 30, 38, 46, 54, 60, 76};
 		int i, j, k;
 		for (i=11; i>=0; i--)
 		{
-			fields[i] = new char[35];
+			// fields[i] = new char[35];
 			j = places[i];
 
 			// Ltrim.
@@ -964,37 +978,39 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 			// Rtrim.
 			for (k--; buffer[k] == ' '; k--) buffer[k] = 0;
 			
-			strcpy(fields[i], &buffer[j]);
+			// strcpy(fields[i], &buffer[j]);
+            for (k=fields.size(); k<=j; k++) fields.push_back("");
+            fields[i] = &buffer[j];
 			buffer[places[i]] = 0;
 		}
 
         try
         {
-            if (fields)
+            if (fields.size())
             {
                 int offset = 1;
                 // cout << fields[0] << endl;
-				if (!strcmp(fields[0], "ANISOU")) continue;
-                if (!strcmp(fields[0], "ATOM")
+				if (!strcmp(fields[0].c_str(), "ANISOU")) continue;
+                if (!strcmp(fields[0].c_str(), "ATOM")
                         /*||
                         !strcmp(fields[0], "HETATM")*/
                    )
                 {
                     if (!residue_no)
                     {
-                        residue_no = atoi(fields[4+offset]) + rno;
+                        residue_no = atoi(fields[4+offset].c_str()) + rno;
                     }
 
                     if (!res3let[0])
                     {
-                        strcpy(res3let, fields[3]);
+                        strcpy(res3let, fields[3].c_str());
                     }
 
-                    if (!atno_offset) atno_offset = atoi(fields[1]);
+                    if (!atno_offset) atno_offset = atoi(fields[1].c_str());
 
-                    if (strcmp(res3let, fields[3])
+                    if (strcmp(res3let, fields[3].c_str())
                             ||
-                            residue_no != (atoi(fields[4+offset])+rno)
+                            residue_no != (atoi(fields[4+offset].c_str())+rno)
                        )
                     {
                         fseek(is, lasttell, SEEK_SET);
@@ -1002,10 +1018,10 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     }
 
                     char esym[7] = {0,0,0,0,0,0,0};
-                    if (fields[2][0] >= '0' && fields[2][0] <= '9')
-                        strcpy(esym, &fields[2][1]);
+                    if (fields[2].c_str()[0] >= '0' && fields[2].c_str()[0] <= '9')
+                        strcpy(esym, &fields[2].c_str()[1]);
                     else
-                        strcpy(esym, fields[2]);
+                        strcpy(esym, fields[2].c_str());
 
                     int i;
                     for (i=1; i<6; i++)
@@ -1017,9 +1033,9 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     }
                     esym[1] &= 0x5f;
 
-                    Point aloc(atof(fields[5+offset]), atof(fields[6+offset]),atof(fields[7+offset]));
+                    Point aloc(atof(fields[5+offset].c_str()), atof(fields[6+offset].c_str()),atof(fields[7+offset].c_str()));
 
-                    Atom* a = add_atom(esym, fields[2], &aloc, 0, 0);
+                    Atom* a = add_atom(esym, fields[2].c_str(), &aloc, 0, 0);
                     added++;
 
                     if (   !strcmp(a->name, "N")
@@ -1031,19 +1047,19 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         a->is_backbone = true;
                     else a->is_backbone = false;
 
-                    a->residue = atoi(fields[4+offset])+rno;
-                    strcpy(a->aa3let, fields[3]);
+                    a->residue = atoi(fields[4+offset].c_str())+rno;
+                    strcpy(a->aa3let, fields[3].c_str());
                     AADef* aaa=0;
 
                     name=0;
                     for (i=0; i<256; i++)
                     {
-                        if (aa_defs[i]._1let && !strcmp(aa_defs[i]._3let, fields[3]))
+                        if (aa_defs[i]._1let && !strcmp(aa_defs[i]._3let, fields[3].c_str()))
                         {
                             a->aaletter = aa_defs[i]._1let;
                             aaa = &aa_defs[i];
                             name = new char[10]; // aa_defs[i].name;
-                            sprintf(name, "%s%d", aa_defs[i]._3let, atoi(fields[4+offset])+rno);
+                            sprintf(name, "%s%d", aa_defs[i]._3let, atoi(fields[4+offset].c_str())+rno);
                             break;
                         }
                     }
@@ -1051,7 +1067,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     if (!aaa)
                     {
                         fseek(is, lasttell, SEEK_SET);
-                        delete[] fields;
+                        // delete[] fields;
                         goto _return_added;
                         //throw ATOM_NOT_OF_AMINO_ACID;
                     }
@@ -1145,9 +1161,11 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                 else
                 {
                     fseek(is, lasttell, SEEK_SET);
-                    delete[] fields;
+                    //if (fields) delete[] fields;
                     goto _return_added;
                 }
+
+                //if (fields) delete[] fields;
             }
             else goto _return_added;
         }
@@ -1158,11 +1176,10 @@ int AminoAcid::from_pdb(FILE* is, int rno)
         }
         buffer[0] = 0;
 
-        delete[] fields;
+        //if (fields) delete[] fields;
     }
 
 _return_added:
-
     if (aadef && aadef->aabonds)
     {
         int i, j;

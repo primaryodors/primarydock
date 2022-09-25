@@ -45,6 +45,19 @@ Molecule::Molecule()
     paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
 }
 
+Molecule::~Molecule()
+{
+    if (atoms)
+    {
+        // int i;
+        // for (i=0; atoms[i]; i++) delete atoms[i];
+        delete[] atoms;
+    }
+    if (smiles) delete[] smiles;
+    if (rings) delete[] rings;
+    if (rotatable_bonds) delete[] rotatable_bonds;
+}
+
 int length(Atom** array)
 {
     int numAtoms;
@@ -88,12 +101,6 @@ Molecule::Molecule(char const* lname, Atom** collection)
     rotatable_bonds = 0;
 }
 
-Molecule::~Molecule()
-{
-    ;
-}
-
-
 Pose::Pose()
 {
     reset();
@@ -103,6 +110,11 @@ Pose::Pose(Molecule* m)
 {
     reset();
     copy_state(m);
+}
+
+Pose::~Pose()
+{
+    if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete[] saved_atom_locs;
 }
 
 void Pose::reset()
@@ -188,7 +200,7 @@ void Molecule::reset_conformer_momenta()
     {
         for (i=0; b[i]; i++)
         {
-            b[i]->angular_momentum = _def_bnd_momentum * conformer_momenta_multiplier /* * conformer_momenta_multiplier*/ * sgn(0.5-(rand()&1));
+            b[i]->angular_momentum = _def_bnd_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
         }
     }
 }
@@ -1135,6 +1147,8 @@ int Molecule::identify_rings()
                 }
             }
 
+            delete[] b;
+
             // If there are no "unused" bonded atoms, delete the chain.
             if (!k) chainlen[i] = 0;
             else active++;
@@ -1180,14 +1194,22 @@ void Molecule::identify_acidbase()
             if (!b) goto _not_acidic;
             if (carbon)
             {
-                if (!atoms[i]->is_pi()) goto _not_acidic;
+                if (!atoms[i]->is_pi())
+                {
+                    delete[] b;
+                    goto _not_acidic;
+                }
                 for (j=0; b[j]; j++)
                 {
                     if (!b[j]->btom) continue;
                     if (b[j]->cardinality == 2)
                     {
                         int fam = b[j]->btom->get_family();
-                        if (fam != CHALCOGEN) goto _not_acidic;
+                        if (fam != CHALCOGEN)
+                        {
+                            delete[] b;
+                            goto _not_acidic;
+                        }
                     }
                 }
             }
@@ -1195,7 +1217,11 @@ void Molecule::identify_acidbase()
             {
                 if (!b[j]->btom) continue;
                 int fam = b[j]->btom->get_family();
-                if (carbon && fam == PNICTOGEN) goto _not_acidic;
+                if (carbon && fam == PNICTOGEN)
+                {
+                    delete[] b;
+                    goto _not_acidic;
+                }
                 //cout << "Fam: " << fam << endl;
                 if (fam == CHALCOGEN && b[j]->cardinality < 2)
                 {
@@ -1207,7 +1233,11 @@ void Molecule::identify_acidbase()
                     else
                     {
                         Bond** b1 = b[j]->btom->get_bonds();
-                        if (!b1) goto _not_acidic;
+                        if (!b1)
+                        {
+                            delete[] b;
+                            goto _not_acidic;
+                        }
                         for (k=0; b1[k]; k++)
                         {
                             if (!b1[k]->btom) continue;
@@ -1278,7 +1308,7 @@ Bond** Molecule::get_rotatable_bonds()
         // TODO: There has to be a better way.
         Star s;
         s.pmol = this;
-        rotatable_bonds = s.paa->get_rotatable_bonds();
+        if (!rotatable_bonds) rotatable_bonds = s.paa->get_rotatable_bonds();
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
@@ -2597,6 +2627,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
 
                         if (allow_ligand_360_flex && !(iter % _fullrot_every))
                         {
+                            /*if (!mm[i]->atoms[0]->residue) cout << mm[i]->rotatable_bonds[k]->atom->name << "-"
+                                << mm[i]->rotatable_bonds[k]->btom->name << ": ";*/        // Delete this for production.
                             while ((M_PI*2-rad) > 1e-3)
                             {
                                 mm[i]->rotatable_bonds[k]->rotate(_fullrot_steprad);
@@ -2635,7 +2667,10 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                                     bestfrb = bind1;
                                     bestfrrad = rad;
                                 }
+                                //if (!mm[i]->atoms[0]->residue) cout << (0.001*round(bind1 * 1000)) << " ";        // Delete this for production.
                             }
+                            // if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
+
                             #if DBG_BONDFLEX
                             if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
                                 cout << endl << "(" << (bestfrrad*fiftyseven) << "deg) ";
@@ -2682,6 +2717,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                             }
                         }
                     }
+                    //if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
                 }
                 #if DBG_BONDFLEX
                 if (DBG_FLEXRES == residue)

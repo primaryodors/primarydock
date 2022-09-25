@@ -106,6 +106,7 @@
 #define active_persistence_threshold 5
 
 #define redo_tumble_spheres_on_activation 0
+#define redo_tumble_spheres_every_node 1
 
 // Output the activation matrix or the transmembrane regions' active rotations so that
 // the viewer can update its cartoon backbone.
@@ -123,6 +124,8 @@
 // by this number, and bond rotation momenta by the square of this number.
 #define internode_momentum_mult 0.25
 
+#define internode_momentum_only_on_activation 1
+
 // Switches for conformational space search.
 #define allow_axial_tumble 1
 #define allow_bond_rots 1
@@ -133,14 +136,16 @@
 // Drift pulls the ligand towards the loneliest point if it encounters clashes.
 // Turning it off can cause the ligand to be ejected from the protein.
 #define allow_drift 1
-#define initial_drift 0.333
+#define initial_drift 0.5
+#define drift_decay_rate 0.05
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
 #define allow_mol_fullrot_iter 1
 
-// Turn off the 360 degree rotations for all but the zeroth node of a path.
-#define nodes_no_ligand_360_tumble 1
-#define nodes_no_ligand_360_flex 1
+// Turns off the 360 degree rotations for all but the zeroth node of a path.
+#define nodes_no_ligand_360_tumble 0
+#define nodes_no_ligand_360_flex 0
+#define prevent_ligand_360_on_activate 1
 
 // Iteration callback function feature.
 #define allow_iter_cb 1
@@ -175,11 +180,11 @@
 #define recenter_ligand_each_node 0
 
 // Generate an output file called tmp/active.pdb containing the active matrix modified protein.
-#define save_active_protein 1
+#define save_active_protein 0
 
 // Whether to count van der Waals interactions towards the potential energies of candidate
 // starting poses in tumble spheres.
-#define tumble_spheres_include_vdW 1
+#define tumble_spheres_include_vdW 0
 
 // Enable the EXCL feature of the config file.
 #define use_exclusions 1
@@ -205,6 +210,7 @@
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0
 #define _DBG_RESBMULT 0
+#define _debug_active_bond_rot 0
 
 #endif
 

@@ -33,6 +33,7 @@ class Pose
 public:
     Pose();
     Pose(Molecule* from_mol);
+    ~Pose();
     void copy_state(Molecule* from_mol);
     void restore_state(Molecule* to_mol);
     void reset();
@@ -170,7 +171,7 @@ protected:
     char* name = 0;
     char* smiles = 0;
     Ring** rings = nullptr;
-    Bond** rotatable_bonds = 0;
+    Bond** rotatable_bonds = nullptr;
     bool immobile = false;
     bool doing_bkbend = false;
     float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.

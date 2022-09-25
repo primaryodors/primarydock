@@ -1,11 +1,11 @@
 <?php
 
-// dock.php
+// method_gpcr_acv.php
 //
 // Performs a dock of an odorant in a receptor using both the inactive and active PDB files.
 //
 // Example call syntax:
-// php -f predict/dock.php prot=OR1A1 lig=geraniol
+// php -f predict/method_gpcr_acv.php prot=OR1A1 lig=geraniol
 //
 
 // Includes
@@ -197,7 +197,7 @@ foreach ($matrix as $region => $values) $acv_matrix .= "ACVMX $region " . implod
 
 $configf = <<<heredoc
 
-PROT pdbs/$fam/$protid.rotated.pdb
+PROT pdbs/$fam/$protid.upright.pdb
 
 LIG sdf/$ligname.sdf
 

@@ -14,6 +14,12 @@ Protein::Protein(const char* lname)
 {
     name = lname;
     aaptrmin.n = aaptrmax.n = 0;
+
+    residues = nullptr;
+    sequence = nullptr;
+    ca = nullptr;
+    res_reach = nullptr;
+    metals = nullptr;
 }
 
 bool Protein::add_residue(const int resno, const char aaletter)
@@ -221,6 +227,12 @@ int Protein::load_pdb(FILE* is, int rno)
     char buffer[1024];
     Atom* a;
 
+    if (residues) delete[] residues;
+    if (sequence) delete[] sequence;
+    if (ca) delete[] ca;
+    if (res_reach) delete[] res_reach;
+    if (metals) delete[] metals;
+
     AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file.
     AminoAcid* prevaa = nullptr;
 
@@ -251,6 +263,7 @@ int Protein::load_pdb(FILE* is, int rno)
                 char tmp3let[5];
                 for (i=0; i<3; i++)
                     tmp3let[i] = buffer[17+i];
+                tmp3let[3] = 0;
                 tmp3let[4] = 0;
 
                 for (i=0; i<256; i++)
@@ -311,6 +324,7 @@ int Protein::load_pdb(FILE* is, int rno)
                         char** fields = chop_spaced_fields(buffer);
                         if (fields[2] && !fields[3])
                             name = fields[2];
+                        delete[] fields;
                     }
                 }
             }
@@ -419,6 +433,20 @@ int Protein::load_pdb(FILE* is, int rno)
     residues[rescount] = 0;
 
     set_clashables();
+
+    int l;
+    std::vector<std::string> rem_hx = get_remarks("650 HELIX");
+    for (l=0; l<rem_hx.size(); l++)
+    {
+        char buffer[1024];
+        char buffer1[1024];
+        strcpy(buffer, rem_hx[l].c_str());
+        char** fields = chop_spaced_fields(buffer);
+
+        set_region(fields[3], atoi(fields[4]), atoi(fields[5]));
+
+        delete[] fields;
+    }
 
     return rescount;
 }

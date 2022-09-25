@@ -522,9 +522,24 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     // is calculated as a cosine and then raised to this exponent.
     Point center;
 
+    float achg = a->get_charge(), bchg = b->get_charge()
+        , apol = a->is_polar(), bpol = b->is_polar();
+    
+    if (!achg && a->get_Z() == 1)
+    {
+        Bond* lb = a->get_bond_by_idx(0);
+        if (lb && lb->btom) achg = lb->btom->get_charge();
+    }
+    if (!bchg && b->get_Z() == 1)
+    {
+        Bond* lb = b->get_bond_by_idx(0);
+        if (lb && lb->btom) bchg = lb->btom->get_charge();
+    }
+
     if (sgn(a->is_polar()) == sgn(b->is_polar())) kJmol -= 30 / pow(r, 2) * fabs(a->is_polar()) * fabs(b->is_polar());
     if (!forces)
     {
+        if (achg && bchg) kJmol -= 80.0 * achg*bchg / pow( (r<2) ? 1 : (r/2), 2 );
         goto _canstill_clash;
     }
 
@@ -556,15 +571,17 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         // Anisotropy.
         SCoord* ageo = a->get_geometry_aligned_to_bonds();
         SCoord* bgeo = b->get_geometry_aligned_to_bonds();
+        bool del_ageo=false, del_bgeo=false;
         int ag = a->get_geometry();
         int bg = b->get_geometry();
         int abc = a->get_bonded_atoms_count();
         int bbc = b->get_bonded_atoms_count();
         float asum=0, bsum=0, aniso=1;
-        bool del_ageo=false, del_bgeo=false;
 
         if (forces[i]->type == pi && ag >= 3 && bg >= 3)
         {
+            if (del_ageo) delete[] ageo;
+            if (del_bgeo) delete[] bgeo;
             ageo = get_geometry_for_pi_stack(ageo);
             bgeo = get_geometry_for_pi_stack(bgeo);
             ag = bg = 5;
@@ -574,12 +591,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         {
             if (!a->is_polar())
             {
+                if (del_ageo) delete[] ageo;
                 ageo = get_geometry_for_pi_stack(ageo);
                 ag = 5;
                 del_ageo = true;
             }
             if (!b->is_polar())
             {
+                if (del_bgeo) delete[] bgeo;
                 bgeo = get_geometry_for_pi_stack(bgeo);
                 bg = 5;
                 del_bgeo = true;
@@ -624,6 +643,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             bvec[j] = SCoord(0,0,0);
         for (j=bnx; j<bg; j++)
             bvec[j-bnx] = bgeo[j];
+
+        if (del_ageo) delete[] ageo;
+        if (del_bgeo) delete[] bgeo;
 
         // When pi-bonding to a heavy atom of a conjugated coplanar ring, treat the entire ring as if it were one atom.
         if ((forces[i]->type == pi || forces[i]->type == polarpi)
@@ -791,9 +813,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                      << endl;
         }
 
-        float achg = a->get_charge(), bchg = b->get_charge()
-                                             , apol = a->is_polar(), bpol = b->is_polar();
-
         if (achg && bchg) partial = fabs(partial) * sgn(achg) * -sgn(bchg);
         if (achg && !bchg && bpol) partial = fabs(partial) * sgn(achg) * -sgn(bpol);
         if (!achg && apol && bchg) partial = fabs(partial) * sgn(apol) * -sgn(bchg);
@@ -844,9 +863,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         k = (forces[i]->type - covalent) % _INTER_TYPES_LIMIT;
         total_binding_by_type[k] += partial;
-
-        if (del_ageo) delete[] ageo;
-        if (del_bgeo) delete[] bgeo;
 
         if (forces[i]->type == ionic && achg && bchg) break;
     }

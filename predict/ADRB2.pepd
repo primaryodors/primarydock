@@ -125,7 +125,11 @@ ALIGN 1 9999 %termin %TMR3.s @in[3] %TMR3.e @ic[3]
 
 
 
+
+
 # Obtain the active helix termini.
+
+LET @global = 0
 
 LET %i = 1
 _loop:
@@ -141,6 +145,9 @@ IF %n < %termin GOTO _loopn
 
 LET @an[%i] /= %n
 
+LET @temp = @an[%i] - @in[%i]
+LET @global += @temp
+
 
 LET %j = %TMR%i.s + %TMR%i.e
 LET %j /= 2
@@ -154,6 +161,9 @@ LET %n ++
 
 LET @am[%i] /= %n
 
+LET @temp = @am[%i] - @im[%i]
+LET @global += @temp
+
 
 LET %j = %TMR%i.e
 LET %n = 0
@@ -166,12 +176,27 @@ IF %n < %termin GOTO _loopn1
 
 LET @ac[%i] /= %n
 
+LET @temp = @ac[%i] - @ic[%i]
+LET @global += @temp
+
 
 LET %i ++
-
 IF %i <= 7 GOTO _loop
 
+LET @global /= 21
 
+
+# Remove global transform.
+
+LET %i = 1
+_loopgt:
+
+LET @an[%i] -= @global
+LET @am[%i] -= @global
+LET @ac[%i] -= @global
+
+LET %i ++
+IF %i <= 7 GOTO _loopgt
 
 
 # Output the directionals.

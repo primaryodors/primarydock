@@ -73,6 +73,7 @@ The following commands are supported:
 Example:
 ```
 ALIGN 174 182 4 @location1 @location2
+ALIGN 1 9999 4 174 @location1 182 @location2
 ```
 
 Repositions a piece of the protein so that the residues near the start resno occur at one location, and the residues near the end resno occur in the
@@ -82,8 +83,11 @@ The first two numbers are the starting and ending residue numbers. They define t
 
 The next number is the averaging length from each end of the region. In the example this number is 4, so the locations of the CA atoms of four residues
 at each end will be averaged together, in this case 174-177 and 179-182, to determine the alignment. The piece will be moved so that the average of CA
-atom locations of residues 174-177 will now equal @location1, and the average of CA locations of residues 179-182 will fall along a straight line pointing
-from @location1 to @location2.
+atom locations of residues 174-177 will now equal @location1, and the average of CA locations of residues 179-182 will fall along a straight line
+pointing from @location1 to @location2.
+
+The second example aligns residues 174-177 and 179-182 with the same two points, but affects the entire protein instead of just the region between
+the indicated residues.
 
 
 # BEND
@@ -93,8 +97,8 @@ BEND 206 218 "N-CA" 15
 ```
 
 Effects a partial bend of the protein backbone at the start residue (first parameter) by rotating in the bond direction (third parameter) by the rotation
-angle (fourth parameter, degrees), moving all subsequent residues up to the end residue (second parameter). The result is a bend in the chain corresponding
-to either a phi or psi rotation of the start residue.
+angle (fourth parameter, degrees), moving all subsequent residues up to the end residue (second parameter). The result is a bend in the chain
+corresponding to either a phi or psi rotation of the start residue.
 
 Note that the end residue will be disconnected from its neighbor and will require to be reconnected.
 

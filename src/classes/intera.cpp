@@ -536,10 +536,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (lb && lb->btom) bchg = lb->btom->get_charge();
     }
 
-    if (sgn(a->is_polar()) == sgn(b->is_polar())) kJmol -= 30 / pow(r, 2) * fabs(a->is_polar()) * fabs(b->is_polar());
+    if (sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2); // / pow( (r<2) ? 1 : (r/2), 2 );
+    if (sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
+
     if (!forces)
     {
-        if (achg && bchg) kJmol -= 80.0 * achg*bchg / pow( (r<2) ? 1 : (r/2), 2 );
         goto _canstill_clash;
     }
 

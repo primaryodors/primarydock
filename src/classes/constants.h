@@ -94,6 +94,9 @@
 #define POLYPRO1_PSI fiftyseventh*160
 #define POLYPRO1_OMEGA fiftyseventh*113
 
+#define polar_repulsion 30.0
+#define charge_repulsion 120.0
+
 
 // If using an activation matrix, active_persistence "rewards" the ligand for keeping
 // bindings to the same residues post-activation as pre-activation. The noflex option

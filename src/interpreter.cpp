@@ -904,7 +904,7 @@ int main(int argc, char** argv)
 
             else if (!strcmp(fields[0], "ALIGN"))
             {
-                int sr, er, eachend;
+                int sr, er, asr, aer, eachend;
                 Point sp, ep;
                 l = 1;
                 if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
@@ -914,17 +914,33 @@ int main(int argc, char** argv)
                 if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
                 eachend = interpret_single_int(fields[l++]);
                 if (!eachend) eachend = 1;
-                if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                sp = interpret_single_point(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                ep = interpret_single_point(fields[l++]);
+                if (fields[l+2] && fields[l+3])
+                {                   
+                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    asr = interpret_single_int(fields[l++]);                   
+                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    sp = interpret_single_point(fields[l++]);
+                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    aer = interpret_single_int(fields[l++]);   
+                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    ep = interpret_single_point(fields[l++]);
+                }
+                else
+                {
+                    asr = sr;
+                    aer = er;                    
+                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    sp = interpret_single_point(fields[l++]);
+                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    ep = interpret_single_point(fields[l++]);
+                }
                 if (fields[l]) raise_error("Too many parameters given for ALIGN.");
 
                 // From start and end residues inwards for a total of eachend, average the CA locations.
                 Point sl(0,0,0);
                 for (i=0; i<eachend; i++)	// It's actually easier to average manually than to screw around with object arrays.
                 {
-                    AminoAcid* aa = p.get_residue(sr+i);
+                    AminoAcid* aa = p.get_residue(asr+i);
                     if (aa) sl = sl.add(aa->get_CA_location());
                 }
 
@@ -949,7 +965,7 @@ int main(int argc, char** argv)
 
                 for (i=0; i<eachend; i++)
                 {
-                    AminoAcid* aa = p.get_residue(er-i);
+                    AminoAcid* aa = p.get_residue(aer-i);
                     if (aa) el = el.add(aa->get_CA_location());
                 }
 

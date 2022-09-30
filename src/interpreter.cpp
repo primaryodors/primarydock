@@ -919,15 +919,43 @@ int main(int argc, char** argv)
 
                 if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
                 Star s;
+                rot.v.r = 1;
                 Point p = rot.v;
                 s.ppt = &p;
                 set_variable(fields[l++], s);
 
                 if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
-                s.f = rot.a;
+                s.f = rot.a * fiftyseven;
                 set_variable(fields[l++], s);
 
                 if (fields[l]) raise_error("Too many parameters given for PTALIGN.");
+            }
+
+            else if (!strcmp(fields[0], "PTROTATE"))
+            {
+                Point point, origin, axis;
+                float theta;
+                l = 1;
+                if (!fields[l]) raise_error("Insufficient parameters given for PTROTATE.");
+                point = interpret_single_point(fields[l++]);
+
+                if (!fields[l]) raise_error("Insufficient parameters given for PTROTATE.");
+                origin = interpret_single_point(fields[l++]);
+
+                if (!fields[l]) raise_error("Insufficient parameters given for PTROTATE.");
+                axis = interpret_single_point(fields[l++]);
+
+                if (!fields[l]) raise_error("Insufficient parameters given for PTROTATE.");
+                theta = interpret_single_float(fields[l++]) * fiftyseventh;
+
+                Point result = rotate3D(point, origin, axis, theta);
+
+                if (!fields[l]) raise_error("Insufficient parameters given for PTROTATE.");
+                Star s;
+                s.ppt = &result;
+                set_variable(fields[l++], s);
+
+                if (fields[l]) raise_error("Too many parameters given for PTROTATE.");
             }
 
             else if (!strcmp(fields[0], "ALIGN"))

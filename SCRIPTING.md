@@ -344,6 +344,29 @@ Yar or YO before the metal symbol applies globally to the coordination residues.
 overriding the default or any global.
 
 
+# PTALIGN
+
+Example:
+```
+PTALIGN @point @target @origin @normal &angle
+```
+
+Finds the rotation axis and angle necessary to rotate `@point` about `@origin` to get as close as possible to `@target`. The `@normal` parameter
+is an output parameter; a variable must be used and its value will be set to the rotational axis _relative to the origin_. Note this is not a point
+in absolute space. The final parameter `&angle` is an output parameter that receives the necessary rotation angle in degrees.
+
+
+# PTROTATE
+
+Example:
+```
+PTROTATE @point @origin @axis &angle @result
+```
+
+Rotates `@point` in space about `@origin`, using `@axis` as a _relative_ rotation axis (i.e. add `@axis` to `@origin` to get an actual point in space
+along this imaginary line) by `&angle` degrees and stores the result in the output parameter `@result`.
+
+
 # REGION
 Example:
 ```

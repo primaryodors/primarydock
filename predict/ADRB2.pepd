@@ -1,6 +1,20 @@
 # Peptiditor script for deriving active-state conformational changes from human β2 adrenergic receptor.
 #
 
+LET %TMR1s =  35
+LET %TMR1e =  58
+LET %TMR2s =  72
+LET %TMR2e =  95
+LET %TMR3s = 107
+LET %TMR3e = 129
+LET %TMR4s = 151
+LET %TMR4e = 174
+LET %TMR5s = 197
+LET %TMR5e = 220
+LET %TMR6s = 275
+LET %TMR6e = 298
+LET %TMR7s = 306
+LET %TMR7e = 329
 
 # Load the inactive protein.
 LOAD "pdbs/ADRB2/2rh1.inactive.pdb"
@@ -9,18 +23,19 @@ ECHO %SEQLEN
 ECHO $SEQUENCE
 ECHO ""
 
-REGION TMR1 35 58
-REGION TMR2 72 95
-REGION TMR3 107 129
-REGION TMR4 151 174
-REGION TMR5 197 220
-REGION TMR6 275 298
-REGION TMR7 306 329
+REGION TMR1 %TMR1s %TMR1e
+REGION TMR2 %TMR2s %TMR2e
+REGION TMR3 %TMR3s %TMR3e
+REGION TMR4 %TMR4s %TMR4e
+REGION TMR5 %TMR5s %TMR5e
+REGION TMR6 %TMR6s %TMR6e
+REGION TMR7 %TMR7s %TMR7e
 
 UPRIGHT
 
 SAVE "pdbs/ADRB2/ADRB2.inactive.pdb"
 
+LET @i184 = 184
 
 # Obtain the inactive termini.
 
@@ -96,13 +111,13 @@ LOAD "pdbs/ADRB2/ADRB2.active.pdb"
 # ECHO $SEQUENCE
 # ECHO ""
 
-REGION TMR1 35 58
-REGION TMR2 72 95
-REGION TMR3 107 129
-REGION TMR4 151 174
-REGION TMR5 197 220
-REGION TMR6 275 298
-REGION TMR7 306 329
+REGION TMR1 %TMR1s %TMR1e
+REGION TMR2 %TMR2s %TMR2e
+REGION TMR3 %TMR3s %TMR3e
+REGION TMR4 %TMR4s %TMR4e
+REGION TMR5 %TMR5s %TMR5e
+REGION TMR6 %TMR6s %TMR6e
+REGION TMR7 %TMR7s %TMR7e
 
 UPRIGHT
 
@@ -110,9 +125,7 @@ LET @e3 = [15.360,-16.429,-23.026]
 LET @sub = [-12.132,-48.350,17.054]
 LET @cen = @e3 - @sub
 
-CENTER @cen
-
-SAVE "pdbs/ADRB2/ADRB2.active.pdb"
+# CENTER @cen
 
 LET %termin = 4
 
@@ -121,8 +134,10 @@ LET %termin = 4
 
 # Align active TMR3 to have the same n and c locations.
 
-ALIGN 1 9999 %termin %TMR3.s @in[3] %TMR3.e @ic[3]
+# ALIGN 1 9999 %termin %TMR3.s @in[3] %TMR3.e @ic[3]
+ALIGN 1 9999 1 184 @i184 %TMR3.e @ic[3]
 
+SAVE "pdbs/ADRB2/ADRB2.active.pdb"
 
 
 

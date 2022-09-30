@@ -902,6 +902,34 @@ int main(int argc, char** argv)
                 script_var[n].value.f = -(a1.pmol->get_intermol_binding(a2.pmol));
             }
 
+            else if (!strcmp(fields[0], "PTALIGN"))
+            {
+                Point point, align, center;
+                l = 1;
+                if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
+                point = interpret_single_point(fields[l++]);
+
+                if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
+                align = interpret_single_point(fields[l++]);
+
+                if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
+                center = interpret_single_point(fields[l++]);
+                
+                Rotation rot = align_points_3d(&point, &align, &center);
+
+                if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
+                Star s;
+                Point p = rot.v;
+                s.ppt = &p;
+                set_variable(fields[l++], s);
+
+                if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
+                s.f = rot.a;
+                set_variable(fields[l++], s);
+
+                if (fields[l]) raise_error("Too many parameters given for PTALIGN.");
+            }
+
             else if (!strcmp(fields[0], "ALIGN"))
             {
                 int sr, er, asr, aer, eachend;

@@ -370,6 +370,7 @@ IF @axis.z >= 0 ECHO " " ~
 ECHO @axis.z ", " ~
 
 ECHO &theta " ],"
+ECHO ""
 
 LET %i ++
 

@@ -231,64 +231,28 @@ int interpret_config_line(char** fields)
 {
     int i;
 
-    if (!strcmp(fields[0], "PROT"))
+    if (0) { ; }
+    else if (!strcmp(fields[0], "ACVBROT"))
     {
-        strcpy(protfname, fields[1]);
-        protset = true;
-        return 1;
+        AcvBndRot abr;
+        abr.resno = atoi(fields[1]);
+        abr.aname = fields[2];
+        abr.bname = fields[3];
+        abr.theta = atof(fields[4]) * fiftyseventh;
+        active_bond_rots.push_back(abr);
     }
-    else if (!strcmp(fields[0], "LIG"))
+    else if (!strcmp(fields[0], "ACVHXR"))
     {
-        strcpy(ligfname, fields[1]);
-        ligset = true;
-        return 1;
-    }
-    else if (!strcmp(fields[0], "CEN"))
-    {
-        CEN_buf = origbuff;
-        return 0;
-    }
-    else if (!strcmp(fields[0], "EXCL"))
-    {
-        i=1;
-        int excls = atoi(fields[i++]);
-        int excle = atoi(fields[i++]);
-
-        for (i=excls; i<=excle; i++) exclusion.push_back(i);
-        return i-1;
-    }
-    else if (!strcmp(fields[0], "PATH"))
-    {
-        i=1;
-        int nodeno = atoi(fields[i]);
-
-        if (!strcmp(fields[i], "ABS")) i++;
-        if (!strcmp(fields[i], "REL")) i++;
-        if (!strcmp(fields[i], "RES")) i++;
-
-        if (nodeno > 255)
-        {
-            cout << "Binding path is limited to 255 nodes." << endl << flush;
-            throw 0xbad90de;
-        }
-        if (nodeno)
-        {
-            if ((nodeno) > pathnodes) pathnodes = nodeno;
-
-            pathstrs.resize(nodeno+1);
-            pathstrs[nodeno] = origbuff;
-        }
-        return i-1;
-    }
-    else if (!strcmp(fields[0], "NODEPDB"))
-    {
-        activation_node = atoi(fields[1]);
-        strcpy(protafname, fields[2]);
-    }
-    else if (!strcmp(fields[0], "STATE"))
-    {
-        states.push_back(origbuff);
-        return 0;
+        AcvHxRot ahr;
+        int n = 1;
+        ahr.regname     = fields[n++];
+        ahr.start_resno = atoi(fields[n++]);
+        ahr.end_resno   = atoi(fields[n++]);
+        ahr.transform   = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
+        ahr.origin      = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
+        ahr.axis        = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
+        ahr.theta       = atof(fields[n++]) * fiftyseventh;
+        active_helix_rots.push_back(ahr);
     }
     else if (!strcmp(fields[0], "ACVMX"))
     {
@@ -335,41 +299,118 @@ int interpret_config_line(char** fields)
             active_matrix_c[n].z = atof(fields[7]);
         }
     }
-    else if (!strcmp(fields[0], "ACVHXR"))
-    {
-        AcvHxRot ahr;
-        int n = 1;
-        ahr.regname = fields[n++];
-        ahr.start_resno = atoi(fields[n++]);
-        ahr.end_resno = atoi(fields[n++]);
-        ahr.transform.x = atof(fields[n++]);
-        ahr.transform.y = atof(fields[n++]);
-        ahr.transform.z = atof(fields[n++]);
-        ahr.origin.x = atof(fields[n++]);
-        ahr.origin.y = atof(fields[n++]);
-        ahr.origin.z = atof(fields[n++]);
-        Point axis;
-        axis.x = atof(fields[n++]);
-        axis.y = atof(fields[n++]);
-        axis.z = atof(fields[n++]);
-        ahr.axis = axis;
-        ahr.theta = atof(fields[n++]) * fiftyseventh;
-        active_helix_rots.push_back(ahr);
-    }
-    else if (!strcmp(fields[0], "ACVBROT"))
-    {
-        AcvBndRot abr;
-        abr.resno = atoi(fields[1]);
-        abr.aname = fields[2];
-        abr.bname = fields[3];
-        abr.theta = atof(fields[4]) * fiftyseventh;
-        active_bond_rots.push_back(abr);
-    }
     else if (!strcmp(fields[0], "ACVNODE"))
     {
-        active_matrix_node = atoi(fields[1]);
+        strcpy(ligfname, fields[1]);
+        ligset = true;
+        return 1;
     }
-    else if (!strcmp(fields[0], "SIZE"))
+    else if (!strcmp(fields[0], "CEN"))
+    {
+        int j=0;
+        for (i=1; fields[i]; i++)
+        {
+            if (fields[i][0] == '-' && fields[i][1] == '-') break;
+            mcoord_resno[j++] = atoi(fields[i]);
+        }
+        mcoord_resno[j] = 0;
+        return i-1;
+    }
+    else if (!strcmp(fields[0], "DEBUG"))
+    {
+        kJmol_cutoff = -atof(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "DIFF"))
+    {
+        if (!fields[1])
+        {
+            cout << "Missing debug file name; check config file." << endl << flush;
+            throw 0xbadf12e;
+        }
+        #if _DBG_STEPBYSTEP
+        cout << "Starting a debug outstream." << endl;
+        #endif
+        debug = new std::ofstream(fields[1], std::ofstream::out);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "ECHO"))
+    {
+        kJmol_cutoff = atof(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "ELIM"))
+    {
+        // triesleft = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "EMIN"))
+    {
+        CEN_buf = origbuff;
+        return 0;
+    }
+    else if (!strcmp(fields[0], "EXCL"))
+    {
+        differential_dock = true;
+    }
+    else if (!strcmp(fields[0], "FLEX"))
+    {
+        _INTERA_R_CUTOFF = atof(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
+    {
+        flex = (atoi(fields[1]) != 0);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "KCAL"))
+    {
+        strcpy(protfname, fields[1]);
+        protset = true;
+        return 1;
+    }
+    else if (!strcmp(fields[0], "LIG"))
+    {
+        iters = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "MCOORD"))
+    {
+        i=1;
+        int nodeno = atoi(fields[i]);
+
+        if (!strcmp(fields[i], "ABS")) i++;
+        if (!strcmp(fields[i], "REL")) i++;
+        if (!strcmp(fields[i], "RES")) i++;
+
+        if (nodeno > 255)
+        {
+            cout << "Binding path is limited to 255 nodes." << endl << flush;
+            throw 0xbad90de;
+        }
+        if (nodeno)
+        {
+            if ((nodeno) > pathnodes) pathnodes = nodeno;
+
+            pathstrs.resize(nodeno+1);
+            pathstrs[nodeno] = origbuff;
+        }
+        return i-1;
+    }
+    else if (!strcmp(fields[0], "NODEPDB"))
+    {
+        echo_progress = true;
+    }
+    else if (!strcmp(fields[0], "OUT"))
+    {
+        i=1;
+        int excls = atoi(fields[i++]);
+        int excle = atoi(fields[i++]);
+
+        for (i=excls; i<=excle; i++) exclusion.push_back(i);
+        return i-1;
+    }
+    else if (!strcmp(fields[0], "PATH"))
     {
         size.x = atof(fields[1]);
         if (fields[2])
@@ -387,77 +428,29 @@ int interpret_config_line(char** fields)
     }
     else if (!strcmp(fields[0], "POSE"))
     {
+        active_matrix_node = atoi(fields[1]);
+    }
+    else if (!strcmp(fields[0], "PROT"))
+    {
         poses = atoi(fields[1]);
         return 1;
     }
     else if (!strcmp(fields[0], "RETRY"))
-    {
-        // triesleft = atoi(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "EMIN"))
-    {
-        kJmol_cutoff = atof(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "ELIM"))
-    {
-        kJmol_cutoff = -atof(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "DIFF"))
-    {
-        differential_dock = true;
-    }
-    else if (!strcmp(fields[0], "FLEX"))
-    {
-        flex = (atoi(fields[1]) != 0);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "KCAL"))
     {
         kcal = true;
         return 0;
     }
     else if (!strcmp(fields[0], "RLIM"))
     {
-        _INTERA_R_CUTOFF = atof(fields[1]);
-        return 1;
+        states.push_back(origbuff);
+        return 0;
     }
-    else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
+    else if (!strcmp(fields[0], "SIZE"))
     {
-        iters = atoi(fields[1]);
-        return 1;
+        activation_node = atoi(fields[1]);
+        strcpy(protafname, fields[2]);
     }
-    else if (!strcmp(fields[0], "MCOORD"))
-    {
-        int j=0;
-        for (i=1; fields[i]; i++)
-        {
-            if (fields[i][0] == '-' && fields[i][1] == '-') break;
-            mcoord_resno[j++] = atoi(fields[i]);
-        }
-        mcoord_resno[j] = 0;
-        return i-1;
-    }
-    else if (!strcmp(fields[0], "DEBUG"))
-    {
-        if (!fields[1])
-        {
-            cout << "Missing debug file name; check config file." << endl << flush;
-            throw 0xbadf12e;
-        }
-        #if _DBG_STEPBYSTEP
-        cout << "Starting a debug outstream." << endl;
-        #endif
-        debug = new std::ofstream(fields[1], std::ofstream::out);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "ECHO"))
-    {
-        echo_progress = true;
-    }
-    else if (!strcmp(fields[0], "OUT"))
+    else if (!strcmp(fields[0], "STATE"))
     {
         if (!fields[1])
         {

@@ -27,6 +27,16 @@ struct DockResult
     float proximity;                    // How far the ligand center is from the node's center.
 };
 
+struct AcvHxRot
+{
+    int start_resno;
+    int end_resno;
+    Point transform;
+    Point origin;
+    SCoord axis;
+    float theta;
+};
+
 struct AcvBndRot
 {
     int resno;
@@ -98,6 +108,7 @@ float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 
 Point active_matrix_n[16], active_matrix_c[16], active_matrix_m[16];
 int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0;
+std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 
 void iteration_callback(int iter)
@@ -322,6 +333,18 @@ int interpret_config_line(char** fields)
             active_matrix_c[n].y = atof(fields[6]);
             active_matrix_c[n].z = atof(fields[7]);
         }
+    }
+    else if (!strcmp(fields[0], "ACVHXR"))
+    {
+        AcvHxRot ahr;
+        int n = 1;
+        ahr.start_resno = atoi(fields[n++]);
+        ahr.end_resno = atoi(fields[n++]);
+        ahr.transform = Point( atof(fields[n++]), atof(fields[n++]), atof(fields[n++]) );
+        ahr.origin = Point( atof(fields[n++]), atof(fields[n++]), atof(fields[n++]) );
+        ahr.axis = Point( atof(fields[n++]), atof(fields[n++]), atof(fields[n++]) );
+        ahr.theta = atof(fields[n++]) * fiftyseventh;
+        active_helix_rots.push_back(ahr);
     }
     else if (!strcmp(fields[0], "ACVBROT"))
     {
@@ -1481,6 +1504,21 @@ _try_again:
                         #endif
 
                         wrote_acvmx = i;
+                    }
+                }
+
+                if (active_helix_rots.size())
+                {
+                    for (j=0; j<active_helix_rots.size(); j++)
+                    {
+                        int sr = active_helix_rots[j].start_resno;
+                        int er = active_helix_rots[j].end_resno;
+                        protein->move_piece(sr, er,
+                                protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
+                            );
+                        protein->rotate_piece(sr, er, active_helix_rots[j].origin, active_helix_rots[j].axis, active_helix_rots[j].theta);
+
+                        // TODO: Write an active matrix to the dock.
                     }
                 }
 

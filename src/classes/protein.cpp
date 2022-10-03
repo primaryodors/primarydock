@@ -1845,6 +1845,7 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, int align_res, Poi
 LocRotation Protein::rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res)
 {
     Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
+    /*
     LocatedVector lv(rot.v);
     lv.origin = pivot;
     int i;
@@ -1860,6 +1861,28 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Rotation rot, int 
 
     LocRotation retval(lv);
     retval.a = rot.a;
+    return retval;*/
+
+    return rotate_piece(start_res, end_res, pivot, rot.v, rot.a);
+}
+
+LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoord axis, float theta)
+{
+    LocatedVector lv(axis);
+    lv.origin = pivot;
+    int i;
+    for (i=start_res; i<=end_res; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        if (!aa) continue;
+        MovabilityType mov = aa->movability;
+        aa->movability = MOV_ALL;
+        aa->rotate(lv, theta);
+        aa->movability = mov;
+    }
+
+    LocRotation retval(lv);
+    retval.a = theta;
     return retval;
 }
 

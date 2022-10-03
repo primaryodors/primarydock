@@ -160,7 +160,8 @@ $exr2start = $tmr4end + 1;
 $exr2end = $tmr5start - 1;
 
 $acv_matrix = "";
-foreach ($matrix as $region => $values) $acv_matrix .= "ACVMX $region " . implode(" ", $values)."\n";
+// foreach ($matrix as $region => $values) $acv_matrix .= "ACVMX $region " . implode(" ", $values)."\n";
+foreach ($rotations as $region => $values) $acv_matrix .= "ACVHXR $region " . implode(" ", $values)."\n";
 
 chdir(__DIR__);
 chdir("..");

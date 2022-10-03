@@ -29,6 +29,7 @@ struct DockResult
 
 struct AcvHxRot
 {
+    std::string regname;
     int start_resno;
     int end_resno;
     Point transform;
@@ -338,6 +339,7 @@ int interpret_config_line(char** fields)
     {
         AcvHxRot ahr;
         int n = 1;
+        ahr.regname = fields[n++];
         ahr.start_resno = atoi(fields[n++]);
         ahr.end_resno = atoi(fields[n++]);
         ahr.transform = Point( atof(fields[n++]), atof(fields[n++]), atof(fields[n++]) );
@@ -1226,7 +1228,7 @@ int main(int argc, char** argv)
     #endif
 
     found_poses = 0;
-    int wrote_acvmx = -1;
+    int wrote_acvmx = -1, wrote_acvmr = -1;
 _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
@@ -1518,7 +1520,23 @@ _try_again:
                             );
                         protein->rotate_piece(sr, er, active_helix_rots[j].origin, active_helix_rots[j].axis, active_helix_rots[j].theta);
 
-                        // TODO: Write an active matrix to the dock.
+                        if (wrote_acvmr < j)
+                        {
+                            Point ptaxis = active_helix_rots[j].axis;
+                            // Write an active matrix to the dock.
+                            cout << "ACR " << active_matrix_node << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x << " " << active_helix_rots[j].transform.y << " " << active_helix_rots[j].transform.z << " "
+                                << active_helix_rots[j].origin.x << " " << active_helix_rots[j].origin.y << " " << active_helix_rots[j].origin.z << " "
+                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
+                                << active_helix_rots[j].theta << endl;
+                            if (output) *output << "ACR " << active_matrix_node << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x << " " << active_helix_rots[j].transform.y << " " << active_helix_rots[j].transform.z << " "
+                                << active_helix_rots[j].origin.x << " " << active_helix_rots[j].origin.y << " " << active_helix_rots[j].origin.z << " "
+                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
+                                << active_helix_rots[j].theta << endl;
+
+                            wrote_acvmr = j;
+                        }
                     }
                 }
 

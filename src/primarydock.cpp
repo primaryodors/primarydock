@@ -342,9 +342,17 @@ int interpret_config_line(char** fields)
         ahr.regname = fields[n++];
         ahr.start_resno = atoi(fields[n++]);
         ahr.end_resno = atoi(fields[n++]);
-        ahr.transform = Point( atof(fields[n++]), atof(fields[n++]), atof(fields[n++]) );
-        ahr.origin = Point( atof(fields[n++]), atof(fields[n++]), atof(fields[n++]) );
-        ahr.axis = Point( atof(fields[n++]), atof(fields[n++]), atof(fields[n++]) );
+        ahr.transform.x = atof(fields[n++]);
+        ahr.transform.y = atof(fields[n++]);
+        ahr.transform.z = atof(fields[n++]);
+        ahr.origin.x = atof(fields[n++]);
+        ahr.origin.y = atof(fields[n++]);
+        ahr.origin.z = atof(fields[n++]);
+        Point axis;
+        axis.x = atof(fields[n++]);
+        axis.y = atof(fields[n++]);
+        axis.z = atof(fields[n++]);
+        ahr.axis = axis;
         ahr.theta = atof(fields[n++]) * fiftyseventh;
         active_helix_rots.push_back(ahr);
     }

@@ -33,7 +33,7 @@ struct AcvHxRot
     int start_resno;
     int end_resno;
     Point transform;
-    Point origin;
+    int origin_resno;
     SCoord axis;
     float theta;
 };
@@ -245,13 +245,13 @@ int interpret_config_line(char** fields)
     {
         AcvHxRot ahr;
         int n = 1;
-        ahr.regname     = fields[n++];
-        ahr.start_resno = atoi(fields[n++]);
-        ahr.end_resno   = atoi(fields[n++]);
-        ahr.transform   = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
-        ahr.origin      = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
-        ahr.axis        = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
-        ahr.theta       = atof(fields[n++]) * fiftyseventh;
+        ahr.regname      = fields[n++];
+        ahr.start_resno  = atoi(fields[n++]);
+        ahr.end_resno    = atoi(fields[n++]);
+        ahr.origin_resno = atoi(fields[n++]);
+        ahr.transform    = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
+        ahr.axis         = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
+        ahr.theta        = atof(fields[n++]) * fiftyseventh;
         active_helix_rots.push_back(ahr);
     }
     else if (!strcmp(fields[0], "ACVMX"))
@@ -301,27 +301,14 @@ int interpret_config_line(char** fields)
     }
     else if (!strcmp(fields[0], "ACVNODE"))
     {
-        strcpy(ligfname, fields[1]);
-        ligset = true;
-        return 1;
+        active_matrix_node = atoi(fields[1]);
     }
     else if (!strcmp(fields[0], "CEN"))
     {
-        int j=0;
-        for (i=1; fields[i]; i++)
-        {
-            if (fields[i][0] == '-' && fields[i][1] == '-') break;
-            mcoord_resno[j++] = atoi(fields[i]);
-        }
-        mcoord_resno[j] = 0;
-        return i-1;
+        CEN_buf = origbuff;
+        return 0;
     }
     else if (!strcmp(fields[0], "DEBUG"))
-    {
-        kJmol_cutoff = -atof(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "DIFF"))
     {
         if (!fields[1])
         {
@@ -334,47 +321,84 @@ int interpret_config_line(char** fields)
         debug = new std::ofstream(fields[1], std::ofstream::out);
         return 1;
     }
+    else if (!strcmp(fields[0], "DIFF"))
+    {
+        differential_dock = true;
+    }
     else if (!strcmp(fields[0], "ECHO"))
+    {
+        echo_progress = true;
+    }
+    else if (!strcmp(fields[0], "ELIM"))
     {
         kJmol_cutoff = atof(fields[1]);
         return 1;
     }
-    else if (!strcmp(fields[0], "ELIM"))
-    {
-        // triesleft = atoi(fields[1]);
-        return 1;
-    }
     else if (!strcmp(fields[0], "EMIN"))
     {
-        CEN_buf = origbuff;
-        return 0;
+        kJmol_cutoff = -atof(fields[1]);
+        return 1;
     }
     else if (!strcmp(fields[0], "EXCL"))
     {
-        differential_dock = true;
+        i=1;
+        int excls = atoi(fields[i++]);
+        int excle = atoi(fields[i++]);
+
+        for (i=excls; i<=excle; i++) exclusion.push_back(i);
+        return i-1;
     }
     else if (!strcmp(fields[0], "FLEX"))
-    {
-        _INTERA_R_CUTOFF = atof(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
     {
         flex = (atoi(fields[1]) != 0);
         return 1;
     }
-    else if (!strcmp(fields[0], "KCAL"))
-    {
-        strcpy(protfname, fields[1]);
-        protset = true;
-        return 1;
-    }
-    else if (!strcmp(fields[0], "LIG"))
+    else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
     {
         iters = atoi(fields[1]);
         return 1;
     }
+    else if (!strcmp(fields[0], "KCAL"))
+    {
+        kcal = true;
+        return 0;
+    }
+    else if (!strcmp(fields[0], "LIG"))
+    {
+        strcpy(ligfname, fields[1]);
+        ligset = true;
+        return 1;
+    }
     else if (!strcmp(fields[0], "MCOORD"))
+    {
+        int j=0;
+        for (i=1; fields[i]; i++)
+        {
+            if (fields[i][0] == '-' && fields[i][1] == '-') break;
+            mcoord_resno[j++] = atoi(fields[i]);
+        }
+        mcoord_resno[j] = 0;
+        return i-1;
+    }
+    else if (!strcmp(fields[0], "NODEPDB"))
+    {
+        activation_node = atoi(fields[1]);
+        strcpy(protafname, fields[2]);
+    }
+    else if (!strcmp(fields[0], "OUT"))
+    {
+        if (!fields[1])
+        {
+            cout << "Missing output file name; check config file." << endl << flush;
+            throw 0xbadf12e;
+        }
+        #if _DBG_STEPBYSTEP
+        cout << "Starting a file outstream." << endl;
+        #endif
+        output = new std::ofstream(fields[1], std::ofstream::out);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "PATH"))
     {
         i=1;
         int nodeno = atoi(fields[i]);
@@ -397,20 +421,28 @@ int interpret_config_line(char** fields)
         }
         return i-1;
     }
-    else if (!strcmp(fields[0], "NODEPDB"))
+    else if (!strcmp(fields[0], "POSE"))
     {
-        echo_progress = true;
+        poses = atoi(fields[1]);
+        return 1;
     }
-    else if (!strcmp(fields[0], "OUT"))
+    else if (!strcmp(fields[0], "PROT"))
     {
-        i=1;
-        int excls = atoi(fields[i++]);
-        int excle = atoi(fields[i++]);
-
-        for (i=excls; i<=excle; i++) exclusion.push_back(i);
-        return i-1;
+        strcpy(protfname, fields[1]);
+        protset = true;
+        return 1;
     }
-    else if (!strcmp(fields[0], "PATH"))
+    else if (!strcmp(fields[0], "RETRY"))
+    {
+        // triesleft = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "RLIM"))
+    {
+        _INTERA_R_CUTOFF = atof(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "SIZE"))
     {
         size.x = atof(fields[1]);
         if (fields[2])
@@ -426,42 +458,10 @@ int interpret_config_line(char** fields)
         }
         return 3;
     }
-    else if (!strcmp(fields[0], "POSE"))
-    {
-        active_matrix_node = atoi(fields[1]);
-    }
-    else if (!strcmp(fields[0], "PROT"))
-    {
-        poses = atoi(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "RETRY"))
-    {
-        kcal = true;
-        return 0;
-    }
-    else if (!strcmp(fields[0], "RLIM"))
+    else if (!strcmp(fields[0], "STATE"))
     {
         states.push_back(origbuff);
         return 0;
-    }
-    else if (!strcmp(fields[0], "SIZE"))
-    {
-        activation_node = atoi(fields[1]);
-        strcpy(protafname, fields[2]);
-    }
-    else if (!strcmp(fields[0], "STATE"))
-    {
-        if (!fields[1])
-        {
-            cout << "Missing output file name; check config file." << endl << flush;
-            throw 0xbadf12e;
-        }
-        #if _DBG_STEPBYSTEP
-        cout << "Starting a file outstream." << endl;
-        #endif
-        output = new std::ofstream(fields[1], std::ofstream::out);
-        return 1;
     }
 
     return 0;
@@ -1516,23 +1516,25 @@ _try_again:
                     {
                         int sr = active_helix_rots[j].start_resno;
                         int er = active_helix_rots[j].end_resno;
+                        int mr = active_helix_rots[j].origin_resno;
                         protein->move_piece(sr, er,
                                 protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
                             );
-                        protein->rotate_piece(sr, er, active_helix_rots[j].origin, active_helix_rots[j].axis, active_helix_rots[j].theta);
+                        protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"), active_helix_rots[j].axis, active_helix_rots[j].theta);
 
                         if (wrote_acvmr < j)
                         {
                             Point ptaxis = active_helix_rots[j].axis;
+                            Point ptorigin = protein->get_atom_location(mr, "CA");
                             // Write an active matrix to the dock.
                             cout << "ACR " << active_matrix_node << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
                                 << active_helix_rots[j].transform.x << " " << active_helix_rots[j].transform.y << " " << active_helix_rots[j].transform.z << " "
-                                << active_helix_rots[j].origin.x << " " << active_helix_rots[j].origin.y << " " << active_helix_rots[j].origin.z << " "
+                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
                                 << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
                                 << active_helix_rots[j].theta << endl;
                             if (output) *output << "ACR " << active_matrix_node << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
                                 << active_helix_rots[j].transform.x << " " << active_helix_rots[j].transform.y << " " << active_helix_rots[j].transform.z << " "
-                                << active_helix_rots[j].origin.x << " " << active_helix_rots[j].origin.y << " " << active_helix_rots[j].origin.z << " "
+                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
                                 << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
                                 << active_helix_rots[j].theta << endl;
 

@@ -167,7 +167,6 @@ LET @global += @temp
 
 LET %j = %TMR%i.s + %TMR%i.e
 LET %j /= 2
-LET %mres[%i] = %j
 LET %n = 0
 LET @am[%i]  = 0
 _loopm:
@@ -328,21 +327,12 @@ PTALIGN @point @an[%i] @am[%i] @axis &theta
 
 ECHO "	'TMR" %i ".n' => [ " ~
 
-ECHO %TMR%i.s ", " %mres[%i] ", " ~
-
 IF @delta_m.x >= 0 ECHO " " ~
 ECHO @delta_m.x ", " ~
 IF @delta_m.y >= 0 ECHO " " ~
 ECHO @delta_m.y ", " ~
 IF @delta_m.z >= 0 ECHO " " ~
 ECHO @delta_m.z ", " ~
-
-IF @am[%i].x >= 0 ECHO " " ~
-ECHO @am[%i].x ", " ~
-IF @am[%i].y >= 0 ECHO " " ~
-ECHO @am[%i].y ", " ~
-IF @am[%i].z >= 0 ECHO " " ~
-ECHO @am[%i].z ", " ~
 
 IF @axis.x >= 0 ECHO " " ~
 ECHO @axis.x ", " ~
@@ -351,6 +341,7 @@ ECHO @axis.y ", " ~
 IF @axis.z >= 0 ECHO " " ~
 ECHO @axis.z ", " ~
 
+IF &theta > -10 AND &theta < 10 ECHO " " ~
 ECHO &theta " ],"
 
 LET @point = @ic[%i] + @delta_m
@@ -358,21 +349,12 @@ PTALIGN @point @ac[%i] @am[%i] @axis &theta
 
 ECHO "	'TMR" %i ".c' => [ " ~
 
-ECHO %mres[%i] ", " %TMR%i.e ", " ~
-
 IF @delta_m.x >= 0 ECHO " " ~
 ECHO @delta_m.x ", " ~
 IF @delta_m.y >= 0 ECHO " " ~
 ECHO @delta_m.y ", " ~
 IF @delta_m.z >= 0 ECHO " " ~
 ECHO @delta_m.z ", " ~
-
-IF @am[%i].x >= 0 ECHO " " ~
-ECHO @am[%i].x ", " ~
-IF @am[%i].y >= 0 ECHO " " ~
-ECHO @am[%i].y ", " ~
-IF @am[%i].z >= 0 ECHO " " ~
-ECHO @am[%i].z ", " ~
 
 IF @axis.x >= 0 ECHO " " ~
 ECHO @axis.x ", " ~
@@ -381,6 +363,7 @@ ECHO @axis.y ", " ~
 IF @axis.z >= 0 ECHO " " ~
 ECHO @axis.z ", " ~
 
+IF &theta > -10 AND &theta < 10 ECHO " " ~
 ECHO &theta " ],"
 ECHO ""
 

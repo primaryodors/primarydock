@@ -1485,7 +1485,7 @@ int main(int argc, char** argv)
                 set_variable(fields[l++], s);
 
                 if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
-                s.f = rot.a * fiftyseven;
+                s.f = -rot.a * fiftyseven;
                 set_variable(fields[l++], s);
 
                 if (fields[l]) raise_error("Too many parameters given for PTALIGN.");

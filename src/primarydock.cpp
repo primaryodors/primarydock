@@ -331,12 +331,12 @@ int interpret_config_line(char** fields)
     }
     else if (!strcmp(fields[0], "ELIM"))
     {
-        kJmol_cutoff = atof(fields[1]);
+        kJmol_cutoff = -atof(fields[1]);
         return 1;
     }
     else if (!strcmp(fields[0], "EMIN"))
     {
-        kJmol_cutoff = -atof(fields[1]);
+        kJmol_cutoff = atof(fields[1]);
         return 1;
     }
     else if (!strcmp(fields[0], "EXCL"))

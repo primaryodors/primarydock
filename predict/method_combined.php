@@ -124,9 +124,9 @@ heredoc;
 	$nodeno = 0;
 	$paths = [];
 	$cenres = "CEN RES $capturer $shuttler";
-	/*$nodeno++; $paths[] = "PATH $nodeno RES $shuttler $shelf1 $shelf2";
+	$nodeno++; $paths[] = "PATH $nodeno RES $shuttler $shelf1 $shelf2";
 	$nodeno++; $paths[] = "PATH $nodeno RES $shelf1 $shelf2 $res732";
-	$nodeno++; $paths[] = "PATH $nodeno RES $res732 $acid";*/
+	$nodeno++; $paths[] = "PATH $nodeno RES $res732 $acid";
 	$nodeno++; $paths[] = "PATH $nodeno RES $acid $bind $toggle";
 
 	$pocketnode = $nodeno;

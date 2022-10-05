@@ -9,7 +9,7 @@ function evaluate_result($array)
         if ($nodeno > $activenode) $activenode = $nodeno;
     }
     $pocketnode = $activenode - 1;
-    if ($pocketnode < 0) return "(unknown)";
+    if ($pocketnode < 0) return "Non-Agonist";
 
     $capture = 0.0;
     $capqty = 0;

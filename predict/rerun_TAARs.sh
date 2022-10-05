@@ -18,12 +18,12 @@ if make primarydock; then
     php -f predict/method_combined.php lig=trimethylamine
     php -f predict/method_combined.php lig=tyramine
 
-    php -f predict/method_combined.php prot=TAAR6 lig=putrescine
     php -f predict/method_combined.php prot=TAAR6 lig=cadaverine
+    php -f predict/method_combined.php prot=TAAR6 lig=putrescine
 
-    php -f predict/method_combined.php prot=TAAR8 lig=putrescine
-    php -f predict/method_combined.php prot=TAAR8 lig=cadaverine
     php -f predict/method_combined.php prot=TAAR8 lig=N-methylpiperidine
+    php -f predict/method_combined.php prot=TAAR8 lig=cadaverine
+    php -f predict/method_combined.php prot=TAAR8 lig=putrescine
 
     php -f predict/method_combined.php prot=TAAR9 lig=N-methylpiperidine
 fi

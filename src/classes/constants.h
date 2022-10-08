@@ -139,8 +139,8 @@
 // Drift pulls the ligand towards the loneliest point if it encounters clashes.
 // Turning it off can cause the ligand to be ejected from the protein.
 #define allow_drift 1
-#define initial_drift 0.5
-#define drift_decay_rate 0.05
+#define initial_drift 0.333
+#define drift_decay_rate 0.08
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
 #define allow_mol_fullrot_iter 1

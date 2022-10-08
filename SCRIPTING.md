@@ -73,6 +73,7 @@ The following commands are supported:
 Example:
 ```
 ALIGN 174 182 4 @location1 @location2
+ALIGN 1 9999 4 174 @location1 182 @location2
 ```
 
 Repositions a piece of the protein so that the residues near the start resno occur at one location, and the residues near the end resno occur in the
@@ -82,8 +83,11 @@ The first two numbers are the starting and ending residue numbers. They define t
 
 The next number is the averaging length from each end of the region. In the example this number is 4, so the locations of the CA atoms of four residues
 at each end will be averaged together, in this case 174-177 and 179-182, to determine the alignment. The piece will be moved so that the average of CA
-atom locations of residues 174-177 will now equal @location1, and the average of CA locations of residues 179-182 will fall along a straight line pointing
-from @location1 to @location2.
+atom locations of residues 174-177 will now equal @location1, and the average of CA locations of residues 179-182 will fall along a straight line
+pointing from @location1 to @location2.
+
+The second example aligns residues 174-177 and 179-182 with the same two points, but affects the entire protein instead of just the region between
+the indicated residues.
 
 
 # BEND
@@ -93,8 +97,8 @@ BEND 206 218 "N-CA" 15
 ```
 
 Effects a partial bend of the protein backbone at the start residue (first parameter) by rotating in the bond direction (third parameter) by the rotation
-angle (fourth parameter, degrees), moving all subsequent residues up to the end residue (second parameter). The result is a bend in the chain corresponding
-to either a phi or psi rotation of the start residue.
+angle (fourth parameter, degrees), moving all subsequent residues up to the end residue (second parameter). The result is a bend in the chain
+corresponding to either a phi or psi rotation of the start residue.
 
 Note that the end residue will be disconnected from its neighbor and will require to be reconnected.
 
@@ -338,6 +342,29 @@ the default can be overridden with YO to force oxygen coordination or YAr to for
 
 Yar or YO before the metal symbol applies globally to the coordination residues. Yar or YO directly before a residue number applies only to that residue,
 overriding the default or any global.
+
+
+# PTALIGN
+
+Example:
+```
+PTALIGN @point @target @origin @normal &angle
+```
+
+Finds the rotation axis and angle necessary to rotate `@point` about `@origin` to get as close as possible to `@target`. The `@normal` parameter
+is an output parameter; a variable must be used and its value will be set to the rotational axis _relative to the origin_. Note this is not a point
+in absolute space. The final parameter `&angle` is an output parameter that receives the necessary rotation angle in degrees.
+
+
+# PTROTATE
+
+Example:
+```
+PTROTATE @point @origin @axis &angle @result
+```
+
+Rotates `@point` in space about `@origin`, using `@axis` as a _relative_ rotation axis (i.e. add `@axis` to `@origin` to get an actual point in space
+along this imaginary line) by `&angle` degrees and stores the result in the output parameter `@result`.
 
 
 # REGION

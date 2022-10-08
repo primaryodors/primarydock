@@ -1,87 +1,20 @@
 # Peptiditor script for deriving active-state conformational changes from human β2 adrenergic receptor.
 #
 
-# Load the active protein.
-LOAD "pdbs/ADRB2/4ldo.active.pdb"
-
-DELETE 1 1028
-
-RENUMBER 1029 9999 29
-
-SAVE "pdbs/ADRB2/ADRB2.active.pdb"
-
-LOAD "pdbs/ADRB2/ADRB2.active.pdb"
-
-# ECHO %SEQLEN
-# ECHO $SEQUENCE
-# ECHO ""
-
-REGION TMR1 35 58
-REGION TMR2 72 95
-REGION TMR3 107 129
-REGION TMR4 151 174
-REGION TMR5 197 220
-REGION TMR6 275 298
-REGION TMR7 306 329
-
-UPRIGHT
-
-LET @e3 = [15.360,-16.429,-23.026]
-LET @sub = [-12.132,-48.350,17.054]
-LET @cen = @e3 - @sub
-
-CENTER @cen
-
-SAVE "pdbs/ADRB2/ADRB2.active.pdb"
-
-LET %termin = 4
-
-# Obtain the active helix termini.
-
-LET %i = 1
-_loop:
-
-LET %j = %TMR%i.s
-LET %n = 0
-LET @an[%i]  = 0
-_loopn:
-LET @an[%i] += %j
-LET %j ++ 
-LET %n ++
-IF %n < %termin GOTO _loopn
-
-LET @an[%i] /= %n
-
-
-LET %j = %TMR%i.s + %TMR%i.e
-LET %j /= 2
-LET %n = 0
-LET @am[%i]  = 0
-_loopm:
-LET @am[%i] += %j
-LET %j ++ 
-LET %n ++
-# IF %n < %termin GOTO _loopm
-
-LET @am[%i] /= %n
-
-
-LET %j = %TMR%i.e
-LET %n = 0
-LET @ac[%i]  = 0
-_loopn1:
-LET @ac[%i] += %j
-LET %j -- 
-LET %n ++
-IF %n < %termin GOTO _loopn1
-
-LET @ac[%i] /= %n
-
-
-LET %i ++
-
-IF %i <= 7 GOTO _loop
-
+LET %TMR1s =  35
+LET %TMR1e =  58
+LET %TMR2s =  72
+LET %TMR2e =  95
+LET %TMR3s = 107
+LET %TMR3e = 129
+LET %TMR4s = 151
+LET %TMR4e = 174
+LET %TMR5s = 197
+LET %TMR5e = 220
+LET %TMR6s = 275
+LET %TMR6e = 298
+LET %TMR7s = 306
+LET %TMR7e = 329
 
 # Load the inactive protein.
 LOAD "pdbs/ADRB2/2rh1.inactive.pdb"
@@ -90,17 +23,21 @@ ECHO %SEQLEN
 ECHO $SEQUENCE
 ECHO ""
 
-REGION TMR1 35 58
-REGION TMR2 72 95
-REGION TMR3 107 129
-REGION TMR4 151 174
-REGION TMR5 197 220
-REGION TMR6 275 298
-REGION TMR7 306 329
+REGION TMR1 %TMR1s %TMR1e
+REGION TMR2 %TMR2s %TMR2e
+REGION TMR3 %TMR3s %TMR3e
+REGION TMR4 %TMR4s %TMR4e
+REGION TMR5 %TMR5s %TMR5e
+REGION TMR6 %TMR6s %TMR6e
+REGION TMR7 %TMR7s %TMR7e
 
 UPRIGHT
 
 SAVE "pdbs/ADRB2/ADRB2.inactive.pdb"
+
+LET @i184 = 184
+
+LET %termin = 4
 
 
 # Obtain the inactive termini.
@@ -161,82 +98,125 @@ IF %even THEN LET @icene += @ic[%i]
 LET %i ++
 IF %i <= 7 GOTO _loop1
 
-GOTO _do_output
-
-LET @icenc /= 7
-LET @icene /= 7
-
-LET %i = 1
-_loop132:
-
-LET %odd = %i & 1
-LET %even = 1 - %odd
-
-IF %odd  THEN LET @in[%i] -= @icene
-IF %even THEN LET @in[%i] -= @icenc
-
-IF %odd  THEN LET @ic[%i] -= @icenc
-IF %even THEN LET @ic[%i] -= @icene
-
-IF %odd  THEN LET &r = @in[%i]
-IF %even THEN LET &r = @ic[%i]
-
-IF %odd  THEN LET @direction = @in[%i] / &r
-IF %even THEN LET @direction = @ic[%i] / &r
-
-ECHO "TMR" %i " direction: " @direction " distance: " &r 
-
-LET %i ++
-IF %i <= 7 GOTO _loop132
 
 
-# Center the data by subtracting the average.
+# Load the active protein.
+LOAD "pdbs/ADRB2/4ldo.active.pdb"
 
-LET @avgdeltae = 0
-LET @avgdeltac = 0
-LET @avgdeltam = 0
+DELETE 1 1028
 
-LET %i = 1
-_loop3:
+RENUMBER 1029 9999 29
 
-LET %odd = %i & 1
-LET %even = 1 - %odd
+SAVE "pdbs/ADRB2/ADRB2.active.pdb"
+LOAD "pdbs/ADRB2/ADRB2.active.pdb"
 
-LET @delta_n = @an[%i] - @in[%i]
-LET @delta_m = @am[%i] - @im[%i]
-LET @delta_c = @ac[%i] - @ic[%i]
+# ECHO %SEQLEN
+# ECHO $SEQUENCE
+# ECHO ""
 
-IF %odd THEN LET @avgdeltae += @delta_n
-IF %even THEN IF %i != 6 THEN LET @avgdeltac += @delta_n
-IF %odd THEN IF %i != 5 THEN LET @avgdeltac += @delta_c
-IF %even THEN LET @avgdeltae += @delta_c
-LET @avgdeltam += @delta_m
+REGION TMR1 %TMR1s %TMR1e
+REGION TMR2 %TMR2s %TMR2e
+REGION TMR3 %TMR3s %TMR3e
+REGION TMR4 %TMR4s %TMR4e
+REGION TMR5 %TMR5s %TMR5e
+REGION TMR6 %TMR6s %TMR6e
+REGION TMR7 %TMR7s %TMR7e
 
-LET %i ++
-IF %i <= 7 GOTO _loop3
+UPRIGHT
 
-LET @avgdeltae /= 7
-LET @avgdeltam /= 7
-LET @avgdeltac /= 5
+LET @e3 = [15.360,-16.429,-23.026]
+LET @sub = [-12.132,-48.350,17.054]
+LET @cen = @e3 - @sub
+
+# CENTER @cen
+
+
+
+
+# Align active TMR3 to have the same n and c locations.
+
+# ALIGN 1 9999 %termin %TMR3.s @in[3] %TMR3.e @ic[3]
+ALIGN 1 9999 1 184 @i184 %TMR3.e @ic[3]
+
+SAVE "pdbs/ADRB2/ADRB2.active.pdb"
+
+
+
+
+# Obtain the active helix termini.
+
+LET @global = 0
 
 LET %i = 1
-_loop4:
+_loop:
 
-LET %odd = %i & 1
+LET %j = %TMR%i.s
+LET %n = 0
+LET @an[%i]  = 0
+_loopn:
+LET @an[%i] += %j
+LET %j ++ 
+LET %n ++
+IF %n < %termin GOTO _loopn
+
+LET @an[%i] /= %n
+
+LET @temp = @an[%i] - @in[%i]
+LET @global += @temp
 
 
-IF %odd THEN LET @an[%i] -= @avgdeltae
-ELSE LET @an[%i] -= @avgdeltac
-IF %odd THEN LET @ac[%i] -= @avgdeltac
-ELSE LET @ac[%i] -= @avgdeltae
-LET @am[%i] -= @avgdeltam
+LET %j = %TMR%i.s + %TMR%i.e
+LET %j /= 2
+LET %n = 0
+LET @am[%i]  = 0
+_loopm:
+LET @am[%i] += %j
+LET %j ++ 
+LET %n ++
+# IF %n < %termin GOTO _loopm
+
+LET @am[%i] /= %n
+
+LET @temp = @am[%i] - @im[%i]
+LET @global += @temp
+
+
+LET %j = %TMR%i.e
+LET %n = 0
+LET @ac[%i]  = 0
+_loopn1:
+LET @ac[%i] += %j
+LET %j -- 
+LET %n ++
+IF %n < %termin GOTO _loopn1
+
+LET @ac[%i] /= %n
+
+LET @temp = @ac[%i] - @ic[%i]
+LET @global += @temp
 
 
 LET %i ++
-IF %i <= 7 GOTO _loop4
+IF %i <= 7 GOTO _loop
+
+LET @global /= 21
 
 
-_do_output:
+
+# Remove global transform.
+
+LET %i = 1
+_loopgt:
+
+LET @an[%i] -= @global
+LET @am[%i] -= @global
+LET @ac[%i] -= @global
+
+LET %i ++
+IF %i <= 7 GOTO _loopgt
+
+
+
 
 # Output the directionals.
 
@@ -321,6 +301,79 @@ LET %i ++
 
 IF %i <= 7 GOTO _loop2
 ECHO "];"
+
+
+
+# Output the rotations.
+
+ECHO "# Active rotations from ADRB2.pepd:"
+ECHO "$rotations ="
+ECHO "["
+
+LET %i = 1
+_looprot:
+
+# Origin will be the active m point.
+# Target will be the active n or c point.
+# Point will be the inactive n or c point plus the (active m minus inactive m).
+
+LET @delta_m = @am[%i] - @im[%i]
+# ECHO "Δm " @delta_m
+
+LET @point = @in[%i] + @delta_m
+# ECHO @point " = " @in[%i] " + " @delta_m
+PTALIGN @point @an[%i] @am[%i] @axis &theta
+# ECHO "ALIGN " @point " " @an[%i] " " @am[%i]
+
+ECHO "	'TMR" %i ".n' => [ " ~
+
+IF @delta_m.x >= 0 ECHO " " ~
+ECHO @delta_m.x ", " ~
+IF @delta_m.y >= 0 ECHO " " ~
+ECHO @delta_m.y ", " ~
+IF @delta_m.z >= 0 ECHO " " ~
+ECHO @delta_m.z ", " ~
+
+IF @axis.x >= 0 ECHO " " ~
+ECHO @axis.x ", " ~
+IF @axis.y >= 0 ECHO " " ~
+ECHO @axis.y ", " ~
+IF @axis.z >= 0 ECHO " " ~
+ECHO @axis.z ", " ~
+
+IF &theta > -10 AND &theta < 10 ECHO " " ~
+ECHO &theta " ],"
+
+LET @point = @ic[%i] + @delta_m
+PTALIGN @point @ac[%i] @am[%i] @axis &theta
+
+ECHO "	'TMR" %i ".c' => [ " ~
+
+IF @delta_m.x >= 0 ECHO " " ~
+ECHO @delta_m.x ", " ~
+IF @delta_m.y >= 0 ECHO " " ~
+ECHO @delta_m.y ", " ~
+IF @delta_m.z >= 0 ECHO " " ~
+ECHO @delta_m.z ", " ~
+
+IF @axis.x >= 0 ECHO " " ~
+ECHO @axis.x ", " ~
+IF @axis.y >= 0 ECHO " " ~
+ECHO @axis.y ", " ~
+IF @axis.z >= 0 ECHO " " ~
+ECHO @axis.z ", " ~
+
+IF &theta > -10 AND &theta < 10 ECHO " " ~
+ECHO &theta " ],"
+ECHO ""
+
+LET %i ++
+
+IF %i <= 7 GOTO _looprot
+ECHO "];"
+
+
+
 
 # DUMP
 

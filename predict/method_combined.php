@@ -128,7 +128,6 @@ heredoc;
 	$nodeno++; $paths[] = "PATH $nodeno RES $shelf1 $shelf2 $res732";
 	$nodeno++; $paths[] = "PATH $nodeno RES $res732 $acid";
 	$nodeno++; $paths[] = "PATH $nodeno RES $acid $bind $toggle";
-	// $nodeno++; $paths[] = "PATH $nodeno REL 0 0 0";
 
 	$pocketnode = $nodeno;
 	break;
@@ -160,7 +159,30 @@ $exr2start = $tmr4end + 1;
 $exr2end = $tmr5start - 1;
 
 $acv_matrix = "";
-foreach ($matrix as $region => $values) $acv_matrix .= "ACVMX $region " . implode(" ", $values)."\n";
+// foreach ($matrix as $region => $values) $acv_matrix .= "ACVMX $region " . implode(" ", $values)."\n";
+foreach ($rotations as $region => $values)
+{
+	$lregion = substr($region,0,4);
+	$sr = $prots[$protid]['region'][$lregion]['start'];
+	$er = $prots[$protid]['region'][$lregion]['end'];
+
+	switch($lregion)
+	{
+		case 'TMR2': $mr = resno_from_bw($protid, "2.53"); break;
+		case 'TMR3': $mr = resno_from_bw($protid, "3.36"); break;
+		case 'TMR4': $mr = resno_from_bw($protid, "4.57"); break;
+		case 'TMR5': $mr = resno_from_bw($protid, "5.43"); break;
+		case 'TMR6': $mr = resno_from_bw($protid, "6.48"); break;
+		case 'TMR7': $mr = resno_from_bw($protid, "7.46"); break;
+		
+		default:
+		$mr = intval(($sr + $er) / 2);
+	}
+
+	if (substr($region, -1) == 'n') $er = $mr;
+	if (substr($region, -1) == 'c') $sr = $mr;
+	$acv_matrix .= "ACVHXR $region $sr $er $mr " . implode(" ", $values)."\n";
+}
 
 chdir(__DIR__);
 chdir("..");

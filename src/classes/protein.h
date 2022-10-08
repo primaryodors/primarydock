@@ -80,6 +80,7 @@ public:
     void move_piece(int start_res, int end_res, Point new_center);		// After calling this, you should reconnect the broken ends with conform_backbone().
     LocRotation rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.
     LocRotation rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res);
+    LocRotation rotate_piece(int start_res, int end_res, Point origin, SCoord axis, float theta);
 
     void rotate_backbone(int residue_no, bb_rot_dir direction, float angle);
     void conform_backbone(int startres, int endres, Atom* a, Point target, int iters = 50);

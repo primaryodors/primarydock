@@ -33,6 +33,7 @@ union Star
     const char* cpsz;
     void* p;
     Point* ppt;
+    SCoord* pv;
     Atom* pa;
     Atom** ppa;
     Bond* pb;

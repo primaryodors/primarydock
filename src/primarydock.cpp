@@ -27,6 +27,17 @@ struct DockResult
     float proximity;                    // How far the ligand center is from the node's center.
 };
 
+struct AcvHxRot
+{
+    std::string regname;
+    int start_resno;
+    int end_resno;
+    Point transform;
+    int origin_resno;
+    SCoord axis;
+    float theta;
+};
+
 struct AcvBndRot
 {
     int resno;
@@ -98,6 +109,7 @@ float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 
 Point active_matrix_n[16], active_matrix_c[16], active_matrix_m[16];
 int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0;
+std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 
 void iteration_callback(int iter)
@@ -219,64 +231,28 @@ int interpret_config_line(char** fields)
 {
     int i;
 
-    if (!strcmp(fields[0], "PROT"))
+    if (0) { ; }
+    else if (!strcmp(fields[0], "ACVBROT"))
     {
-        strcpy(protfname, fields[1]);
-        protset = true;
-        return 1;
+        AcvBndRot abr;
+        abr.resno = atoi(fields[1]);
+        abr.aname = fields[2];
+        abr.bname = fields[3];
+        abr.theta = atof(fields[4]) * fiftyseventh;
+        active_bond_rots.push_back(abr);
     }
-    else if (!strcmp(fields[0], "LIG"))
+    else if (!strcmp(fields[0], "ACVHXR"))
     {
-        strcpy(ligfname, fields[1]);
-        ligset = true;
-        return 1;
-    }
-    else if (!strcmp(fields[0], "CEN"))
-    {
-        CEN_buf = origbuff;
-        return 0;
-    }
-    else if (!strcmp(fields[0], "EXCL"))
-    {
-        i=1;
-        int excls = atoi(fields[i++]);
-        int excle = atoi(fields[i++]);
-
-        for (i=excls; i<=excle; i++) exclusion.push_back(i);
-        return i-1;
-    }
-    else if (!strcmp(fields[0], "PATH"))
-    {
-        i=1;
-        int nodeno = atoi(fields[i]);
-
-        if (!strcmp(fields[i], "ABS")) i++;
-        if (!strcmp(fields[i], "REL")) i++;
-        if (!strcmp(fields[i], "RES")) i++;
-
-        if (nodeno > 255)
-        {
-            cout << "Binding path is limited to 255 nodes." << endl << flush;
-            throw 0xbad90de;
-        }
-        if (nodeno)
-        {
-            if ((nodeno) > pathnodes) pathnodes = nodeno;
-
-            pathstrs.resize(nodeno+1);
-            pathstrs[nodeno] = origbuff;
-        }
-        return i-1;
-    }
-    else if (!strcmp(fields[0], "NODEPDB"))
-    {
-        activation_node = atoi(fields[1]);
-        strcpy(protafname, fields[2]);
-    }
-    else if (!strcmp(fields[0], "STATE"))
-    {
-        states.push_back(origbuff);
-        return 0;
+        AcvHxRot ahr;
+        int n = 1;
+        ahr.regname      = fields[n++];
+        ahr.start_resno  = atoi(fields[n++]);
+        ahr.end_resno    = atoi(fields[n++]);
+        ahr.origin_resno = atoi(fields[n++]);
+        ahr.transform    = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
+        ahr.axis         = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
+        ahr.theta        = atof(fields[n++]) * fiftyseventh;
+        active_helix_rots.push_back(ahr);
     }
     else if (!strcmp(fields[0], "ACVMX"))
     {
@@ -323,18 +299,148 @@ int interpret_config_line(char** fields)
             active_matrix_c[n].z = atof(fields[7]);
         }
     }
-    else if (!strcmp(fields[0], "ACVBROT"))
-    {
-        AcvBndRot abr;
-        abr.resno = atoi(fields[1]);
-        abr.aname = fields[2];
-        abr.bname = fields[3];
-        abr.theta = atof(fields[4]) * fiftyseventh;
-        active_bond_rots.push_back(abr);
-    }
     else if (!strcmp(fields[0], "ACVNODE"))
     {
         active_matrix_node = atoi(fields[1]);
+    }
+    else if (!strcmp(fields[0], "CEN"))
+    {
+        CEN_buf = origbuff;
+        return 0;
+    }
+    else if (!strcmp(fields[0], "DEBUG"))
+    {
+        if (!fields[1])
+        {
+            cout << "Missing debug file name; check config file." << endl << flush;
+            throw 0xbadf12e;
+        }
+        #if _DBG_STEPBYSTEP
+        cout << "Starting a debug outstream." << endl;
+        #endif
+        debug = new std::ofstream(fields[1], std::ofstream::out);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "DIFF"))
+    {
+        differential_dock = true;
+    }
+    else if (!strcmp(fields[0], "ECHO"))
+    {
+        echo_progress = true;
+    }
+    else if (!strcmp(fields[0], "ELIM"))
+    {
+        kJmol_cutoff = -atof(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "EMIN"))
+    {
+        kJmol_cutoff = atof(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "EXCL"))
+    {
+        i=1;
+        int excls = atoi(fields[i++]);
+        int excle = atoi(fields[i++]);
+
+        for (i=excls; i<=excle; i++) exclusion.push_back(i);
+        return i-1;
+    }
+    else if (!strcmp(fields[0], "FLEX"))
+    {
+        flex = (atoi(fields[1]) != 0);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
+    {
+        iters = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "KCAL"))
+    {
+        kcal = true;
+        return 0;
+    }
+    else if (!strcmp(fields[0], "LIG"))
+    {
+        strcpy(ligfname, fields[1]);
+        ligset = true;
+        return 1;
+    }
+    else if (!strcmp(fields[0], "MCOORD"))
+    {
+        int j=0;
+        for (i=1; fields[i]; i++)
+        {
+            if (fields[i][0] == '-' && fields[i][1] == '-') break;
+            mcoord_resno[j++] = atoi(fields[i]);
+        }
+        mcoord_resno[j] = 0;
+        return i-1;
+    }
+    else if (!strcmp(fields[0], "NODEPDB"))
+    {
+        activation_node = atoi(fields[1]);
+        strcpy(protafname, fields[2]);
+    }
+    else if (!strcmp(fields[0], "OUT"))
+    {
+        if (!fields[1])
+        {
+            cout << "Missing output file name; check config file." << endl << flush;
+            throw 0xbadf12e;
+        }
+        #if _DBG_STEPBYSTEP
+        cout << "Starting a file outstream." << endl;
+        #endif
+        output = new std::ofstream(fields[1], std::ofstream::out);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "PATH"))
+    {
+        i=1;
+        int nodeno = atoi(fields[i]);
+
+        if (!strcmp(fields[i], "ABS")) i++;
+        if (!strcmp(fields[i], "REL")) i++;
+        if (!strcmp(fields[i], "RES")) i++;
+
+        if (nodeno > 255)
+        {
+            cout << "Binding path is limited to 255 nodes." << endl << flush;
+            throw 0xbad90de;
+        }
+        if (nodeno)
+        {
+            if ((nodeno) > pathnodes) pathnodes = nodeno;
+
+            pathstrs.resize(nodeno+1);
+            pathstrs[nodeno] = origbuff;
+        }
+        return i-1;
+    }
+    else if (!strcmp(fields[0], "POSE"))
+    {
+        poses = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "PROT"))
+    {
+        strcpy(protfname, fields[1]);
+        protset = true;
+        return 1;
+    }
+    else if (!strcmp(fields[0], "RETRY"))
+    {
+        // triesleft = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "RLIM"))
+    {
+        _INTERA_R_CUTOFF = atof(fields[1]);
+        return 1;
     }
     else if (!strcmp(fields[0], "SIZE"))
     {
@@ -352,90 +458,10 @@ int interpret_config_line(char** fields)
         }
         return 3;
     }
-    else if (!strcmp(fields[0], "POSE"))
+    else if (!strcmp(fields[0], "STATE"))
     {
-        poses = atoi(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "RETRY"))
-    {
-        // triesleft = atoi(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "EMIN"))
-    {
-        kJmol_cutoff = atof(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "ELIM"))
-    {
-        kJmol_cutoff = -atof(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "DIFF"))
-    {
-        differential_dock = true;
-    }
-    else if (!strcmp(fields[0], "FLEX"))
-    {
-        flex = (atoi(fields[1]) != 0);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "KCAL"))
-    {
-        kcal = true;
+        states.push_back(origbuff);
         return 0;
-    }
-    else if (!strcmp(fields[0], "RLIM"))
-    {
-        _INTERA_R_CUTOFF = atof(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
-    {
-        iters = atoi(fields[1]);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "MCOORD"))
-    {
-        int j=0;
-        for (i=1; fields[i]; i++)
-        {
-            if (fields[i][0] == '-' && fields[i][1] == '-') break;
-            mcoord_resno[j++] = atoi(fields[i]);
-        }
-        mcoord_resno[j] = 0;
-        return i-1;
-    }
-    else if (!strcmp(fields[0], "DEBUG"))
-    {
-        if (!fields[1])
-        {
-            cout << "Missing debug file name; check config file." << endl << flush;
-            throw 0xbadf12e;
-        }
-        #if _DBG_STEPBYSTEP
-        cout << "Starting a debug outstream." << endl;
-        #endif
-        debug = new std::ofstream(fields[1], std::ofstream::out);
-        return 1;
-    }
-    else if (!strcmp(fields[0], "ECHO"))
-    {
-        echo_progress = true;
-    }
-    else if (!strcmp(fields[0], "OUT"))
-    {
-        if (!fields[1])
-        {
-            cout << "Missing output file name; check config file." << endl << flush;
-            throw 0xbadf12e;
-        }
-        #if _DBG_STEPBYSTEP
-        cout << "Starting a file outstream." << endl;
-        #endif
-        output = new std::ofstream(fields[1], std::ofstream::out);
-        return 1;
     }
 
     return 0;
@@ -1203,7 +1229,7 @@ int main(int argc, char** argv)
     #endif
 
     found_poses = 0;
-    int wrote_acvmx = -1;
+    int wrote_acvmx = -1, wrote_acvmr = -1;
 _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
@@ -1481,6 +1507,39 @@ _try_again:
                         #endif
 
                         wrote_acvmx = i;
+                    }
+                }
+
+                if (active_helix_rots.size())
+                {
+                    for (j=0; j<active_helix_rots.size(); j++)
+                    {
+                        int sr = active_helix_rots[j].start_resno;
+                        int er = active_helix_rots[j].end_resno;
+                        int mr = active_helix_rots[j].origin_resno;
+                        protein->move_piece(sr, er,
+                                protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
+                            );
+                        protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"), active_helix_rots[j].axis, active_helix_rots[j].theta);
+
+                        if (wrote_acvmr < j)
+                        {
+                            Point ptaxis = active_helix_rots[j].axis;
+                            Point ptorigin = protein->get_atom_location(mr, "CA");
+                            // Write an active matrix to the dock.
+                            cout << "ACR " << active_matrix_node << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x << " " << active_helix_rots[j].transform.y << " " << active_helix_rots[j].transform.z << " "
+                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
+                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
+                                << active_helix_rots[j].theta << endl;
+                            if (output) *output << "ACR " << active_matrix_node << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x << " " << active_helix_rots[j].transform.y << " " << active_helix_rots[j].transform.z << " "
+                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
+                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
+                                << active_helix_rots[j].theta << endl;
+
+                            wrote_acvmr = j;
+                        }
                     }
                 }
 

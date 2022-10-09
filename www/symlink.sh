@@ -4,7 +4,7 @@
 # is /var/www/html/ but if your configuration is different or you are using another web server
 # package then you should modify this file to point to the correct path.
 #
-# Make sure to also install the latest php and php-gd.
+# The following packages are also required: php, php-gd, woff2.
 #
 
 # Obtain the correct working directory.

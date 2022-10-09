@@ -91,7 +91,7 @@ function find_odorant($aroma)
 	$aroma1 = preg_replace( "/^[a-z0-9]/", "", strtolower($aroma) );
 	foreach ($odors as $o)
 	{
-		if ( preg_replace( "/^[a-z0-9]/", "", $o['full_name'] ) == $aromal || $o['smiles'] == $aroma ) return $o;
+		if ( preg_replace( "/^[a-z0-9]/", "", $o['full_name'] ) == $aroma1 || $o['smiles'] == $aroma ) return $o;
 	}
 	return false;
 }

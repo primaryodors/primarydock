@@ -55,9 +55,17 @@ if (!file_exists($imgfname = "assets/pngs/$md5.png"))
     else die("Failed to open assets folder for writing!");
 }
 
+$page_title = $odor['full_name'];
+
 include("header.php");
 
 ?>
 <h1><?php echo $odor['full_name']; ?></h1>
 
-<img src="<?php echo $imgfname; ?>">
+<div class="scrollw">
+    <div>
+        <img class="skeletal" src="<?php echo $imgfname; ?>">
+        <img class="barchart" src="barchart.php?o=<?php echo $odor['full_name']; ?>">
+    </div>
+</div>
+

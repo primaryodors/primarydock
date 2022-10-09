@@ -57,6 +57,7 @@ a[href]:hover
     position: absolute;
     left: 81px;
     z-index: 1;
+    width: 90%;
 }
 
 #side:hover ul
@@ -84,4 +85,30 @@ a[href]:hover
 #side li a:hover 
 {
     text-decoration: none;
+}
+
+.scrollw
+{
+    overflow-x: auto;
+}
+
+.scrollw > div
+{
+    width: max-content;
+}
+
+.scrollw > div > *
+{
+    float: left;
+    display: block;
+}
+
+.skeletal
+{
+    display: block;
+}
+
+.barchart
+{
+    margin-left: 25px;
 }

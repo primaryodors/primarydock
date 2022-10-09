@@ -2,7 +2,11 @@
 
 global $odors;
 
+$cwd = getcwd();
+chdir(__DIR__);
+chdir("..");
 $odors = json_decode(file_get_contents("data/odorant.json"), true);
+chdir($cwd);
 
 $types =
 [
@@ -80,3 +84,14 @@ function ensure_sdf_exists($ligname)
 	die("Odorant not found $ligname.\n");
 }
 
+function find_odorant($aroma)
+{
+	global $odors;
+	if (!$aroma) return false;
+	$aroma1 = preg_replace( "/^[a-z0-9]/", "", strtolower($aroma) );
+	foreach ($odors as $o)
+	{
+		if ( preg_replace( "/^[a-z0-9]/", "", $o['full_name'] ) == $aromal || $o['smiles'] == $aroma ) return $o;
+	}
+	return false;
+}

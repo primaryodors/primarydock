@@ -36,14 +36,52 @@ a[href]:hover
     background-color: #18283d;
     padding: 5px;
     display: block;
-    float: left;
+    position: absolute;
+    left: 0px;
     height: 100%;
-    width: 53px;
+    width: 22px;
+    z-index: 10000;
+    overflow-x: hidden;
+}
+
+#side:hover
+{
+    width: fit-content;
+    padding-right: 5px;
+    z-index: 10000;
 }
 
 #main
 {
     display: block;
-    float: left;
-    margin-left: 25px;
+    position: absolute;
+    left: 81px;
+    z-index: 1;
+}
+
+#side:hover ul
+{
+    padding: 5px;
+}
+
+#side li
+{
+    display: block;
+    background-color: #324c6e;
+    border-top: 1px solid #6381a8;
+    border-left: 1px solid #57759c;
+    border-right: 1px solid #14263d;
+    border-bottom: 1px solid #152130;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
+#side li:hover 
+{
+    background-color: #31695b;
+}
+
+#side li a:hover 
+{
+    text-decoration: none;
 }

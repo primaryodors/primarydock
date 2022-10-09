@@ -2,6 +2,8 @@
 
 global $odors;
 
+$odors = json_decode(file_get_contents("data/odorant.json"), true);
+
 $types =
 [
 	0 => "na",

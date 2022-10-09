@@ -1,0 +1,49 @@
+
+/*
+    Hues used in this color scheme:
+    #6d7886 blue
+    #008967 green
+    #836daa purple
+*/
+
+body
+{
+    background-color: #2b3642;
+    color: #daceec;
+    margin: 0px;
+    overflow: hidden;
+}
+
+a[href], a:visited
+{
+    text-decoration: none;
+    color: #50cea8;
+}
+
+a[href]:hover
+{
+    text-decoration: underline;
+}
+
+#logo
+{
+    background-color: #22436d;
+    padding: 5px;
+}
+
+#side
+{
+    background-color: #18283d;
+    padding: 5px;
+    display: block;
+    float: left;
+    height: 100%;
+    width: 53px;
+}
+
+#main
+{
+    display: block;
+    float: left;
+    margin-left: 25px;
+}

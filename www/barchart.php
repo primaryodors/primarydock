@@ -60,6 +60,7 @@ $maxt = @max($t) ?: 1;
 $maxe = @max($e) ?: 0;
 $mine = @min($e) ?: -5;
 if ($maxe) $maxe += 0.5;
+$mine -= 1.1;
 
 if ($maxt < 0) $maxt = 1;
 
@@ -71,8 +72,10 @@ $tscale = floatval($h-$ybuf) / $maxt;
 $escale = floatval($h-$ybuf) / ($maxe-$mine);
 
 $red   = imagecolorallocate($im,255,32,64);
+$wine  = imagecolorallocate($im,96,32,48);
 $green = imagecolorallocate($im,0,225,96);
 $brown = imagecolorallocate($im,96,80,64);
+$yellow= imagecolorallocate($im,192,192,96);
 $blue  = imagecolorallocate($im,128,96,255);
 $cyan  = imagecolorallocate($im,32,96,104);
 $pink  = imagecolorallocate($im,192,176,218);
@@ -113,7 +116,7 @@ for ($top = 1; $top <= floor($maxt); $top += 1)
 {   
     $dy = intval($base-1 - $tscale*$top);
     
-    if (!($top & 1)) imageline($im, $xbuf/2,$dy, $w-$xbuf/3,$dy, $pink );
+    if (!($top & 1)) imageline($im, $xbuf/2,$dy, $w-$xbuf/3,$dy, $wine );
     imagestring($im, 3, $w-$xbuf/3,$dy-8, $top, $red);
 }
 
@@ -169,17 +172,18 @@ foreach (array_keys($prots) as $x => $orid)
     if ($dye >= $base) { $dye += $bsht; $base2 += $bsht; }
     
     $dy = $base;
-    if (false!==$dyt && false===$dye)   imagefilledrectangle($im, $dx,$base1, $dx+$res-2,$dy=$dyt, $rcpcol);
-    if (false!==$dye && false===$dyt)   imagefilledrectangle($im, $dx,$base2, $dx+$res-2,$dy=$dye, $rcpcol);
+    if (false!==$dyt && false===$dye)   imagefilledrectangle($im, $dx,$base1, $dx+$res-2,$dy=$dyt, $red);
+    if (false!==$dye && false===$dyt)   imagefilledrectangle($im, $dx,$base2, $dx+$res-2,$dy=$dye, $green);
     if (false!==$dye && false!==$dyt)
-    {   $dy = min($dye,$dyt);
+    {   
+        $dy = min($dye,$dyt);
         if ($dye < $dyt)
-        {   if ($t[$orid] >= 0) imagefilledrectangle($im, $dx,$base2, $dx+$res-3,$dye, $rcpcol /* $green */);
-            imagefilledrectangle($im, $dx,$base1, $dx+$res-2,$dyt, $rcpcol /* $brown */);
+        {   if ($t[$orid] >= 0) imagefilledrectangle($im, $dx,$base2, $dx+$res-3,$dye, $green);
+            imagefilledrectangle($im, $dx,$base1, $dx+$res-2,$dyt, $yellow);
         }
         else
-        {   imagefilledrectangle($im, $dx+1,$base1, $dx+$res-2,$dyt, $rcpcol /* $red */);
-            imagefilledrectangle($im, $dx,$base2, $dx+$res-2,$dye, $rcpcol /* $brown */);
+        {   imagefilledrectangle($im, $dx+1,$base1, $dx+$res-2,$dyt, $red);
+            imagefilledrectangle($im, $dx,$base2, $dx+$res-2,$dye, $yellow);
         }
     }
     

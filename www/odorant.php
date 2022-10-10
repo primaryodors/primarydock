@@ -14,7 +14,8 @@ if (!$odor)
 $md5 = md5($odor['smiles']);
 if (!file_exists($imgfname = "assets/pngs/$md5.png"))
 {
-    $oimage = file_get_contents($url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{$odor['smiles']}/PNG");
+    $smilesu = urlencode($odor['smiles']);
+    $oimage = file_get_contents($url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/$smilesu/PNG");
     if (!$oimage) die("Empty response from $url.");
 
     $im = imagecreatefromstring($oimage);
@@ -108,6 +109,7 @@ foreach ($odor['activity'] as $refurl => $acv)
     foreach ($acv as $rcpid => $a)
     {
         if (!isset($sorted[$rcpid])) $sorted[$rcpid] = 0.0;
+        $ssamples = 0;
         if (isset($a['adjusted_curve_top']))
         {
             if (!isset($tbltops[$rcpid])) $tbltops[$rcpid] = "";
@@ -115,6 +117,7 @@ foreach ($odor['activity'] as $refurl => $acv)
 
             $tbltops[$rcpid] .= round($a['adjusted_curve_top'], 4) . "<sup><a href=\"$refurl\">$refno</a></sup>";
             $sorted[$rcpid] += $a['adjusted_curve_top'];
+            $ssamples++;
         }
         if (isset($a['ec50']))
         {
@@ -123,14 +126,14 @@ foreach ($odor['activity'] as $refurl => $acv)
 
             $tblec50[$rcpid] .= round($a['ec50'], 4) . "<sup><a href=\"$refurl\">$refno</a></sup>";
             $sorted[$rcpid] -= $a['ec50'];
+            $ssamples++;
         }
-        
+        if ($ssamples) $sorted[$rcpid] /= $ssamples;
     }
     $refno++;
 }
 
 arsort($sorted);
-// print_r($sorted);
 
 
 foreach (array_keys($sorted) as $rcpid)

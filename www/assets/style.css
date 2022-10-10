@@ -136,9 +136,10 @@ a[href]:hover
 
 .rcplist
 {
-    width: 90%;
+    width: 95%;
     border-collapse: collapse;
     margin-left: 15px;
+    margin-top: 20px;
 }
 
 .rcplist th

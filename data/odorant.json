@@ -5535,9 +5535,10 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "cinnamon",
-                "spicy",
                 "sweet",
+                "spicy",
+                "candy",
+                "cinnamon",
                 "warm"
             ]
         },
@@ -11507,10 +11508,10 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "caramellic",
-                "sweet",
+                "creamy",
                 "vanilla",
-                "creamy"
+                "caramellic",
+                "sweet"
             ]
         },
         "activity":
@@ -29806,14 +29807,14 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
-                "citrus",
-                "fatty",
                 "cloth",
-                "waxy",
-                "soapy",
-                "green",
+                "fatty",
                 "floral",
-                "laundered"
+                "green",
+                "laundered",
+                "soapy",
+                "waxy",
+                "citrus"
             ]
         },
         "activity":
@@ -29975,9 +29976,9 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "sharp",
                 "tobacco",
                 "sour",
-                "sharp",
                 "milky",
                 "fruity",
                 "cheesy",
@@ -30238,11 +30239,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "green",
                 "walnut",
                 "violet",
-                "green",
-                "floral",
-                "leaf"
+                "leaf",
+                "floral"
             ]
         },
         "activity":
@@ -30264,9 +30265,9 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "spicy",
                 "sweet",
-                "woody",
-                "spicy"
+                "woody"
             ]
         }
     },

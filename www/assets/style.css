@@ -29,16 +29,22 @@ a[href]:hover
 {
     background-color: #22436d;
     padding: 5px;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    z-index: 20000;
 }
 
 #side
 {
     background-color: #18283d;
     padding: 5px;
+    padding-top: 47px;
     display: block;
     position: absolute;
     left: 0px;
-    height: 100%;
+    top: 0px;
+    bottom: 0px;
     width: 22px;
     z-index: 10000;
     overflow-x: hidden;
@@ -55,6 +61,7 @@ a[href]:hover
 {
     display: block;
     position: absolute;
+    top: 37px;
     left: 81px;
     z-index: 1;
     width: 90%;
@@ -111,4 +118,39 @@ a[href]:hover
 .barchart
 {
     margin-left: 25px;
+}
+
+.aromainfo
+{
+    display: block;
+    float: left;
+    width: 22%;
+}
+
+.scrollh
+{
+    height: 470px;
+    overflow-y: auto;
+    display: block;
+}
+
+.rcplist
+{
+    width: 90%;
+    border-collapse: collapse;
+    margin-left: 15px;
+}
+
+.rcplist th
+{
+    text-align: left;
+    background-color: #5595e9;
+    color: #111b27;
+}
+
+.rcplist th, td
+{
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+    padding: 0;
 }

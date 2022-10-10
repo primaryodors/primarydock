@@ -69,3 +69,81 @@ include("header.php");
     </div>
 </div>
 
+<p class="aromainfo">
+    <strong>Aroma Description:</strong>
+    <br>
+    <?php 
+    $refno = 1;
+    foreach ($odor['aroma'] as $refurl => $notes)
+    {
+        $comma = false;
+        foreach ($notes as $note)
+        {
+            if ($comma) echo ", ";
+            echo "$note";
+            $comma = true;
+        }
+        echo "<sup><a href=\"$refurl\">$refno</a></sup><br>";
+        $refno++;
+    }
+    ?>
+</p>
+
+<div class="scrollh">
+<table class="rcplist">
+
+<tr>
+    <th>Receptor</th>
+    <th>Adjusted Top</th>
+    <th>log10 ec<sub>50</sub></th>
+</tr>
+
+<?php
+
+$sorted = [];
+$tbltops = [];
+$tblec50 = [];
+foreach ($odor['activity'] as $refurl => $acv)
+{
+    foreach ($acv as $rcpid => $a)
+    {
+        if (!isset($sorted[$rcpid])) $sorted[$rcpid] = 0.0;
+        if (isset($a['adjusted_curve_top']))
+        {
+            if (!isset($tbltops[$rcpid])) $tbltops[$rcpid] = "";
+            else $tbltops[$rcpid] .= ", ";
+
+            $tbltops[$rcpid] .= round($a['adjusted_curve_top'], 4) . "<sup><a href=\"$refurl\">$refno</a></sup>";
+            $sorted[$rcpid] += $a['adjusted_curve_top'];
+        }
+        if (isset($a['ec50']))
+        {
+            if (!isset($tblec50[$rcpid])) $tblec50[$rcpid] = "";
+            else $tblec50[$rcpid] .= ", ";
+
+            $tblec50[$rcpid] .= round($a['ec50'], 4) . "<sup><a href=\"$refurl\">$refno</a></sup>";
+            $sorted[$rcpid] -= $a['ec50'];
+        }
+        
+    }
+    $refno++;
+}
+
+arsort($sorted);
+// print_r($sorted);
+
+
+foreach (array_keys($sorted) as $rcpid)
+{
+    echo "<tr>\n";
+    echo "<td><a href=\"receptor.php?r=$rcpid\">$rcpid</a></td>\n";
+
+    echo "<td>" . (@$tbltops[$rcpid] ?: "-") . "</td>\n";
+    echo "<td>" . (@$tblec50[$rcpid] ?: "-") . "</td>\n";
+
+    echo "</tr>\n";
+}
+
+?>
+</table>
+</div>

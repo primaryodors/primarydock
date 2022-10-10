@@ -17,6 +17,8 @@ function correlate_receptors_aromanotes()
     $xvals = [];            // 2-dimensional per-receptor, per-odorant activity of the given receptor.
     $yvals = [];            // 2 dimensional per-note, per-odorant presence or absence of each perceptual quality.
 
+    $ycount = [];
+
     foreach (array_keys($prots) as $rcpid)
     {
         $xvals[$rcpid] = [];
@@ -56,12 +58,17 @@ function correlate_receptors_aromanotes()
     foreach ($notes as $pq)
     {
         $yvals[$pq] = [];
+        $ycount[$pq] = 0;
         foreach ($odors as $oid => $odor)
         {
             $yvals[$pq][$oid] = 0;
             foreach ($odor['aroma'] as $refurl => $pqlist)
             {
-                if (in_array($pq, $pqlist)) $yvals[$pq][$oid] = 1;
+                if (in_array($pq, $pqlist))
+                {
+                    $yvals[$pq][$oid] = 1;
+                    $ycount[$pq]++;
+                }
             }
         }
     }
@@ -72,6 +79,8 @@ function correlate_receptors_aromanotes()
     {
         foreach ($yvals as $pq => $yv)
         {
+            if ($ycount[$pq] < 3) continue;
+            if ($pq == "donuts") die("".$ycount[$pq]);
             $corr = correlationCoefficient($xv, $yv);
             $correlations[$rcpid][$pq] = $corr;
         }

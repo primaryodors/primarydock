@@ -41,6 +41,8 @@ function best_empirical_pair($protein, $aroma, $as_object = false)
 				if (isset($acv[$protein]))
 				{
 					// echo "Reference $ref says $aroma is a {$acv[$protein]['type']} for $protein.\n";
+
+					// TODO: This is horribly inadequate for $as_object=true.
 					if ($sepyt[$acv[$protein]['type']] > $btyp || $btyp == $sepyt["?"])
 					{
 						$btyp = $as_object ? $acv[$protein] : $sepyt[trim($acv[$protein]['type'])];
@@ -53,6 +55,71 @@ function best_empirical_pair($protein, $aroma, $as_object = false)
 			return $btyp;
 		}
 	}
+}
+
+function all_empirical_pairs_for_receptor($protein)
+{
+	global $odors;
+
+	$array = [];
+	$sortable = [];
+	
+	foreach ($odors as $oid => $o)
+	{
+		foreach ($o['activity'] as $ref => $acv)
+		{
+			if (isset($acv[$protein]))
+			{
+				if (!isset($array[$oid]))
+				{
+					if ($acv[$protein]['type'] == 'na') $acv[$protein]['adjusted_curve_top'] = 0;
+					$array[$oid] = $acv[$protein];
+					if (isset($array[$oid]['adjusted_curve_top'])) $array[$oid]['top_ref'] = $ref;
+					if (isset($array[$oid]['ec50'])) $array[$oid]['ec50_ref'] = $ref;
+				}
+				else
+				{
+					if (@$acv[$protein]['adjusted_curve_top'] > $array[$oid]['adjusted_curve_top'])
+					{
+						$array[$oid]['adjusted_curve_top'] = $acv[$protein]['adjusted_curve_top'];
+						$array[$oid]['top_ref'] = $ref;
+					}
+					if (@$acv[$protein]['ec50'] < $array[$oid]['ec50'])
+					{
+						$array[$oid]['ec50'] = $acv[$protein]['ec50'];
+						$array[$oid]['ec50_ref'] = $ref;
+					}
+				}
+
+				$value = 0.0;
+				$samples = 0;
+				if ($array[$oid]['adjusted_curve_top'])
+				{
+					$value += $array[$oid]['adjusted_curve_top'];
+					$samples++;
+				}
+				if ($array[$oid]['ec50'] && $value >= 0)
+				{
+					$value -= $array[$oid]['ec50'];
+					$samples++;					
+				}
+
+				if ($samples) $value /= $samples;
+				$sortable[$oid] = $value;
+			}
+		}
+	}
+
+	arsort($sortable);
+
+	$retval = [];
+
+	foreach ($sortable as $oid => $value)
+	{
+		$retval[$oid] = $array[$oid];
+	}
+
+	return $retval;
 }
 
 function ensure_sdf_exists($ligname)
@@ -91,10 +158,13 @@ function find_odorant($aroma)
 {
 	global $odors;
 	if (!$aroma) return false;
+
+	if (isset($odors[$aroma])) return $odors[$aroma];
+
 	$aroma1 = preg_replace( "/^[a-z0-9]/", "", strtolower($aroma) );
 	foreach ($odors as $o)
 	{
-		if ( preg_replace( "/^[a-z0-9]/", "", $o['full_name'] ) == $aroma1 || $o['smiles'] == $aroma ) return $o;
+		if ( $o['smiles'] == $aroma || preg_replace( "/^[a-z0-9]/", "", $o['full_name'] ) == $aroma1 ) return $o;
 	}
 	return false;
 }

@@ -195,7 +195,7 @@ foreach (array_keys($prots) as $x => $orid)
 
 }
 
-if (!file_exists($fontfile = "assets/bcfont.ttf"))
+if (!file_exists($fontfile = "assets/Montserrat.ttf"))
 {
     $wofffile = str_replace(".ttf", ".woff2", $fontfile);
     $c = file_get_contents("https://fonts.gstatic.com/s/montserrat/v25/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw5aXo.woff2");

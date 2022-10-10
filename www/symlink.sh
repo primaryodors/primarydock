@@ -4,11 +4,14 @@
 # is /var/www/html/ but if your configuration is different or you are using another web server
 # package then you should modify this file to point to the correct path.
 #
-# The following packages are also required: php, php-gd, woff2.
+# The following packages are also required: php, php-gd, php-curl.
+#
+# You may have to run this script under root if you are installing it on a dedicated machine, vs.
+# for example a web host where you would have access to the public folder by default.
 #
 
 # Obtain the correct working directory.
 cd "$(dirname "$0")"
 
 # Create the symlink.
-sudo ln -s "$(pwd)" /var/www/html/primarydock
+ln -s "$(pwd)" /var/www/html/primarydock

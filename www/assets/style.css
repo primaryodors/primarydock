@@ -156,3 +156,13 @@ a[href]:hover
     padding: 0;
     min-width: 123px;
 }
+
+.pugrest_msg
+{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 11px;
+    clear: left!important;
+    width: 97%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

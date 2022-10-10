@@ -28,15 +28,27 @@ else
 }
 
 $md5 = md5($odor['smiles']);
-if (!file_exists($imgfname = "assets/pngs/$md5.png"))
+$imgfname = "assets/pngs/$md5.png";
+if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
 {
     $smilesu = urlencode($odor['smiles']);
-    $oimage = file_get_contents($url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/$smilesu/PNG");
+    $url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/PNG";
+
+    $ch = curl_init( $url );
+    curl_setopt( $ch, CURLOPT_POST, 1);
+    curl_setopt( $ch, CURLOPT_POSTFIELDS, "smiles=$smilesu");
+    curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt( $ch, CURLOPT_HEADER, 0);
+    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+
+    $oimage = curl_exec( $ch );
+
     if (!$oimage)
     {
         $im = imagecreatetruecolor(300, 300);
         imagestring($im, 4, 37, 130, "Empty response from PubChem.", imagecolorallocate($im, 255,255,255));
         $imgfname = "assets/pngs/noimg.png";
+        error_log("Empty response from $url");
     }
     else
     {
@@ -69,6 +81,7 @@ if (!file_exists($imgfname = "assets/pngs/$md5.png"))
             }
     }
 
+    chdir(__DIR__);
     if (!file_exists("assets/pngs")) mkdir("assets/pngs");
     $fp = fopen($imgfname, "wb");
     if ($fp)
@@ -76,7 +89,7 @@ if (!file_exists($imgfname = "assets/pngs/$md5.png"))
         imagepng($im, $fp);
         fclose($fp);
     }
-    else die("Failed to open assets folder for writing!");
+    else die("Failed to open $imgfname for writing!");
 }
 
 $page_title = $odor['full_name'];
@@ -89,7 +102,7 @@ include("header.php");
 <div class="scrollw">
     <div>
         <img class="skeletal" src="<?php echo $imgfname; ?>">
-        <img class="barchart" src="barchart.php?o=<?php echo urlencode($odor['full_name']); ?>">
+        <img class="barchart" src="barchart.php?o=<?php echo urlencode($odor['smiles']); ?>">
     </div>
 </div>
 
@@ -128,10 +141,16 @@ include("header.php");
 $sorted = [];
 $tbltops = [];
 $tblec50 = [];
+$agonist = [];
 foreach ($odor['activity'] as $refurl => $acv)
 {
+    $maxcurvtop = [];
+    $minec50 = [];
     foreach ($acv as $rcpid => $a)
     {
+        $maxcurvtop[$rcpid] = false;
+        $minec50[$rcpid] = false;
+
         if (!isset($sorted[$rcpid])) $sorted[$rcpid] = 0.0;
         $ssamples = 0;
         if (isset($a['adjusted_curve_top']))
@@ -139,22 +158,32 @@ foreach ($odor['activity'] as $refurl => $acv)
             if (!isset($tbltops[$rcpid])) $tbltops[$rcpid] = "";
             else $tbltops[$rcpid] .= ", ";
 
-            $tbltops[$rcpid] .= round($a['adjusted_curve_top'], 4) . "<sup><a href=\"$refurl\">$refno</a></sup>";
+            $tbltops[$rcpid] .= round($a['adjusted_curve_top'], 4) . " <sup><a href=\"$refurl\">$refno</a></sup>";
             $sorted[$rcpid] += $a['adjusted_curve_top'];
             $ssamples++;
+
+            if (false===$maxcurvtop[$rcpid] || $a['adjusted_curve_top'] > $maxcurvtop[$rcpid]) $maxcurvtop[$rcpid] = $a['adjusted_curve_top'];
         }
         if (isset($a['ec50']))
         {
             if (!isset($tblec50[$rcpid])) $tblec50[$rcpid] = "";
             else $tblec50[$rcpid] .= ", ";
 
-            $tblec50[$rcpid] .= round($a['ec50'], 4) . "<sup><a href=\"$refurl\">$refno</a></sup>";
+            $tblec50[$rcpid] .= round($a['ec50'], 4) . " <sup><a href=\"$refurl\">$refno</a></sup>";
             $sorted[$rcpid] -= $a['ec50'];
             $ssamples++;
+
+            if (false===$minec50[$rcpid] || $a['ec50'] < $minec50[$rcpid]) $minec50[$rcpid] = $a['ec50'];
         }
         if ($ssamples) $sorted[$rcpid] /= $ssamples;
     }
     $refno++;
+
+    foreach (array_keys($maxcurvtop) as $rcpid)
+    {
+        if ($maxcurvtop[$rcpid] > 0) $agonist[$rcpid] = true;
+        if ($maxcurvtop[$rcpid] >= 0 && $minec50[$rcpid] < 0) $agonist[$rcpid] = true;
+    }
 }
 
 arsort($sorted);
@@ -168,7 +197,7 @@ foreach (array_keys($sorted) as $rcpid)
     echo "<td>" . $dispec50 = (@$tblec50[$rcpid] ?: "-") . "</td>\n";
     echo "<td>" . $disptop = (@$tbltops[$rcpid] ?: "-") . "</td>\n";
 
-    if (floatval($disptop) > 0 || (floatval($dispec50) && floatval($disptop) >= 0))
+    if ($agonist[$rcpid])
         echo "<td>" . substr(get_notes_for_receptor($rcpid, $correlations), 0, 123) . "</td>\n";
     else
         echo "<td>&nbsp;</td>\n";

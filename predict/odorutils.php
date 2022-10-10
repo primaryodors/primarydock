@@ -44,6 +44,7 @@ function best_empirical_pair($protein, $aroma, $as_object = false)
 					if ($sepyt[$acv[$protein]['type']] > $btyp || $btyp == $sepyt["?"])
 					{
 						$btyp = $as_object ? $acv[$protein] : $sepyt[trim($acv[$protein]['type'])];
+						if ($as_object) $btyp['ref'] = $ref;
 						// echo "Ligand type set to $btyp.\n";
 					}
 				}

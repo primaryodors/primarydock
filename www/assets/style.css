@@ -134,7 +134,7 @@ a[href]:hover
     display: block;
 }
 
-.rcplist
+.rcplist, .liglist
 {
     width: 95%;
     border-collapse: collapse;
@@ -142,14 +142,14 @@ a[href]:hover
     margin-top: 20px;
 }
 
-.rcplist th
+.rcplist th, .liglist th
 {
     text-align: left;
     background-color: #5595e9;
     color: #111b27;
 }
 
-.rcplist th, td
+.rcplist th, .rcplist td, .liglist th, .liglist td
 {
     font-family: 'Times New Roman', Times, serif;
     font-size: 16px;

@@ -21,15 +21,17 @@ $types =
 ];
 $sepyt = array_flip($types);
 
-function best_empirical_pair($protein, $aroma)
+function best_empirical_pair($protein, $aroma, $as_object = false)
 {
 	global $odors, $sepyt;
 	
-	$btyp = $sepyt["?"];
+	$btyp = $as_object ? false : $sepyt["?"];
 	
 	foreach ($odors as $oid => $o)
 	{
-		if ($o['full_name'] == $aroma
+		if ($oid == $aroma
+			||
+			$o['full_name'] == $aroma
 			||
 			str_replace(" ", "_", $o['full_name']) == $aroma
 		)
@@ -38,10 +40,10 @@ function best_empirical_pair($protein, $aroma)
 			{
 				if (isset($acv[$protein]))
 				{
-					echo "Reference $ref says $aroma is a {$acv[$protein]['type']} for $protein.\n";
+					// echo "Reference $ref says $aroma is a {$acv[$protein]['type']} for $protein.\n";
 					if ($sepyt[$acv[$protein]['type']] > $btyp || $btyp == $sepyt["?"])
 					{
-						$btyp = $sepyt[trim($acv[$protein]['type'])];
+						$btyp = $as_object ? $acv[$protein] : $sepyt[trim($acv[$protein]['type'])];
 						// echo "Ligand type set to $btyp.\n";
 					}
 				}
@@ -95,3 +97,4 @@ function find_odorant($aroma)
 	}
 	return false;
 }
+

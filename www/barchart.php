@@ -71,9 +71,9 @@ if ($mine <= -3 && $maxt < 2) $maxt = 2;
 $tscale = floatval($h-$ybuf) / $maxt;
 $escale = floatval($h-$ybuf) / ($maxe-$mine);
 
-$red   = imagecolorallocate($im,255,32,64);
+$red   = imagecolorallocate($im,255,160,144);
 $wine  = imagecolorallocate($im,96,32,48);
-$green = imagecolorallocate($im,0,225,96);
+$green = imagecolorallocate($im,128,225,192);
 $brown = imagecolorallocate($im,96,80,64);
 $yellow= imagecolorallocate($im,192,192,96);
 $blue  = imagecolorallocate($im,128,96,255);

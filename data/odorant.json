@@ -440,10 +440,6 @@
                 "aspirin",
                 "dusty",
                 "phenolic"
-            ],
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                ""
             ]
         }
     },
@@ -500,14 +496,7 @@
     "6a4098653ac2327e62b3d0b6530f38a8":
     {
         "full_name": "allicin",
-        "smiles": "C=CCSS(=O)CC=C",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                ""
-            ]
-        }
+        "smiles": "C=CCSS(=O)CC=C"
     },
     "7b8682117637154204b3c9c446a80ab8":
     {
@@ -1022,7 +1011,7 @@
             "http:\/\/www.primaryodors.org":
             [
                 "citrus",
-                "camphorous",
+                "camphoraceous",
                 "sour",
                 "peel",
                 "pine",
@@ -1030,7 +1019,7 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphorous",
+                "camphoraceous",
                 "clean",
                 "cooling",
                 "eucalyptus",
@@ -1053,7 +1042,7 @@
                 "fresh",
                 "floral",
                 "green",
-                "jasmin",
+                "jasmine",
                 "herbal",
                 "waxy"
             ]
@@ -1201,7 +1190,7 @@
             "http:\/\/www.primaryodors.org":
             [
                 "pine",
-                "camphorous",
+                "camphoraceous",
                 "juniper",
                 "herbal",
                 "fruity",
@@ -1210,7 +1199,7 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphorous",
+                "camphoraceous",
                 "earthy",
                 "fresh",
                 "pine",
@@ -2308,8 +2297,7 @@
                 "sweet",
                 "bitter",
                 "almond",
-                "cherry",
-                ""
+                "cherry"
             ]
         },
         "activity":
@@ -2343,8 +2331,7 @@
                 "phenolic",
                 "chemical",
                 "solvent",
-                "aromatic",
-                ""
+                "aromatic"
             ]
         },
         "activity":
@@ -2802,7 +2789,7 @@
                 "apricot",
                 "fresh",
                 "fruity",
-                "jasmin",
+                "jasmine",
                 "loganberry",
                 "pineapple",
                 "sweet",
@@ -2886,7 +2873,7 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "fruity",
-                "jasmin",
+                "jasmine",
                 "juicy",
                 "oily",
                 "powdery",
@@ -2922,7 +2909,7 @@
                 "floral",
                 "fruity",
                 "jammy",
-                "jasmin",
+                "jasmine",
                 "sweet"
             ]
         },
@@ -3395,7 +3382,7 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "camphorous",
+                "camphoraceous",
                 "resinous",
                 "woody",
                 "pine",
@@ -3537,7 +3524,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphoreous",
+                "camphoraceous",
                 "peppery",
                 "pine",
                 "woody"
@@ -3753,7 +3740,7 @@
                 "beefy",
                 "coffee",
                 "cooked",
-                "egg_nog",
+                "eggnog",
                 "fatty",
                 "garlic",
                 "onion",
@@ -3850,7 +3837,7 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "acetone",
-                "camphoreous",
+                "camphoraceous",
                 "ethereal",
                 "fruity"
             ]
@@ -4558,7 +4545,7 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "camphorous",
+                "camphoraceous",
                 "waxy",
                 "minty",
                 "plasticky",
@@ -4566,7 +4553,7 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphorous"
+                "camphoraceous"
             ]
         },
         "activity":
@@ -5486,7 +5473,7 @@
                 "cooling",
                 "pine",
                 "minty",
-                "camphoreous",
+                "camphoraceous",
                 "terpenic",
                 "green"
             ]
@@ -6097,7 +6084,7 @@
                 "herbal",
                 "floral",
                 "spicy",
-                "jasmin",
+                "jasmine",
                 "celery"
             ]
         }
@@ -6633,7 +6620,7 @@
             [
                 "sweet",
                 "herbal",
-                "clary",
+                "clary_sage",
                 "sage",
                 "bergamot",
                 "petitgrain",
@@ -6821,9 +6808,8 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "bois",
+                "bois_de_rose",
                 "coriander",
-                "de",
                 "floral",
                 "rose"
             ]
@@ -7438,8 +7424,7 @@
             [
                 "solvent",
                 "fusel",
-                "minty",
-                "myroulinisic"
+                "minty"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -9124,7 +9109,7 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "green",
-                "jasmin",
+                "jasmine",
                 "floral",
                 "fresh",
                 "oily",
@@ -9165,7 +9150,7 @@
                 "floral",
                 "fresh",
                 "herbal",
-                "jasmin",
+                "jasmine",
                 "myrrh",
                 "outdoors",
                 "spicy",
@@ -10080,7 +10065,7 @@
                 "cedar",
                 "sweet",
                 "fruity",
-                "camphorous"
+                "camphoraceous"
             ]
         },
         "activity":
@@ -10869,14 +10854,14 @@
             [
                 "humus",
                 "earthy",
-                "camphorous",
+                "camphoraceous",
                 "tea",
                 "patchouli",
                 "rooty"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphorous",
+                "camphoraceous",
                 "earthy",
                 "humus",
                 "mushroom",
@@ -11157,8 +11142,7 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bergamot",
-                "bois",
-                "de",
+                "bois_de_rose",
                 "fresh",
                 "green",
                 "herbal",
@@ -11213,10 +11197,10 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "bell pepper",
+                "bell_pepper",
                 "earthy",
                 "nutty",
-                "raw potato"
+                "raw_potato"
             ]
         },
         "activity":
@@ -11503,15 +11487,14 @@
                 "sweet",
                 "waxy",
                 "green",
-                "balsamic",
-                ""
+                "balsamic"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "creamy",
                 "vanilla",
                 "caramellic",
-                "sweet"
+                "sweet",
+                "creamy"
             ]
         },
         "activity":
@@ -11679,7 +11662,7 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "camphorous",
+                "camphoraceous",
                 "eucalyptus",
                 "conifer",
                 "waxy",
@@ -11688,7 +11671,7 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphorous",
+                "camphoraceous",
                 "eucalyptus",
                 "herbal"
             ]
@@ -12162,7 +12145,7 @@
                 "dry",
                 "floral",
                 "fresh",
-                "linden flower",
+                "linden_flower",
                 "sweet"
             ]
         },
@@ -12200,7 +12183,7 @@
             "http:\/\/www.primaryodors.org":
             [
                 "citrus",
-                "camphorous",
+                "camphoraceous",
                 "citrus_peel",
                 "tart",
                 "oily",
@@ -12212,7 +12195,7 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphoreous",
+                "camphoraceous",
                 "earthy",
                 "herbal",
                 "woody"
@@ -12490,7 +12473,7 @@
             [
                 "floral",
                 "fruity",
-                "jasmin",
+                "jasmine",
                 "lactonic",
                 "peach"
             ]
@@ -13765,7 +13748,7 @@
             [
                 "floral",
                 "green",
-                "jasmin",
+                "jasmine",
                 "lactonic",
                 "natural",
                 "oily",
@@ -15753,8 +15736,7 @@
                 "muguet",
                 "waxy",
                 "citronella",
-                "watery",
-                ""
+                "watery"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -16427,7 +16409,7 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "balsamic",
-                "camphoreous",
+                "camphoraceous",
                 "herbal",
                 "woody"
             ]
@@ -16460,7 +16442,7 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "balsamic",
-                "camphoreous",
+                "camphoraceous",
                 "citrus",
                 "herbal",
                 "soapy",
@@ -17118,7 +17100,7 @@
             [
                 "aldehydic",
                 "berry",
-                "camphoreous",
+                "camphoraceous",
                 "cooling",
                 "earthy",
                 "floral",
@@ -17480,7 +17462,7 @@
             [
                 "floral",
                 "fruity",
-                "jasmin"
+                "jasmine"
             ]
         },
         "activity":
@@ -17508,7 +17490,7 @@
                 "coconut",
                 "floral",
                 "petal",
-                "jasmin",
+                "jasmine",
                 "tuberose",
                 "peach",
                 "apricot"
@@ -17553,7 +17535,7 @@
                 "floral",
                 "green",
                 "herbal",
-                "jasmin",
+                "jasmine",
                 "mushroom",
                 "oily"
             ]
@@ -17892,7 +17874,7 @@
                 "sweet",
                 "citrus",
                 "oily",
-                "camphorous"
+                "camphoraceous"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -17923,9 +17905,8 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "blueberry",
-                "bois",
+                "bois_de_rose",
                 "citrus",
-                "de",
                 "floral",
                 "green",
                 "rose",
@@ -19204,7 +19185,7 @@
                 "beany",
                 "chocolate",
                 "earthy",
-                "green pea",
+                "green_pea",
                 "nutty"
             ]
         },
@@ -19245,11 +19226,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "bell pepper",
+                "bell_pepper",
                 "earthy",
                 "galbanum",
-                "green pea",
-                "raw potato"
+                "green_pea",
+                "raw_potato"
             ]
         }
     },
@@ -19445,7 +19426,7 @@
                 "cider",
                 "cocoa",
                 "fusel",
-                "usty",
+                "musty",
                 "vegetable"
             ]
         },
@@ -19673,7 +19654,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "baked potato",
+                "baked_potato",
                 "coffee",
                 "corn",
                 "earthy",
@@ -19698,7 +19679,7 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "acetone",
-                "camphoreous",
+                "camphoraceous",
                 "ethereal",
                 "fruity"
             ]
@@ -20486,7 +20467,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "baked potato",
+                "baked_potato",
                 "earthy",
                 "peanut",
                 "roasted"
@@ -20883,8 +20864,7 @@
                 "waxy",
                 "citrus",
                 "lime",
-                "lemon",
-                ""
+                "lemon"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -21068,9 +21048,8 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "bois",
+                "bois_de_rose",
                 "clean",
-                "de",
                 "fresh",
                 "green",
                 "lily",
@@ -21162,8 +21141,7 @@
                 "fatty",
                 "powdery",
                 "animalic",
-                "sweet",
-                ""
+                "sweet"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -21519,7 +21497,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphoreous",
+                "camphoraceous",
                 "cinnamon",
                 "cooling",
                 "green",
@@ -23699,8 +23677,7 @@
             [
                 "banana",
                 "mushroom",
-                "solvent",
-                ""
+                "solvent"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -23970,7 +23947,7 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "mushroomy"
+                "mushroom"
             ]
         },
         "activity":
@@ -24024,7 +24001,7 @@
             [
                 "earthy",
                 "metallic",
-                "mushroomy"
+                "mushroom"
             ]
         },
         "activity":
@@ -24465,7 +24442,7 @@
                 "dry",
                 "orris",
                 "earthy",
-                "camphoreous"
+                "camphoraceous"
             ]
         },
         "activity":
@@ -24802,7 +24779,7 @@
                 "celery",
                 "fatty",
                 "fresh",
-                "jasmin",
+                "jasmine",
                 "oily",
                 "waxy"
             ]
@@ -25674,14 +25651,7 @@
     "671fb5f3cc105c1908c5fbceb8d4fc41":
     {
         "full_name": "4-phenylcyclohexene",
-        "smiles": "C1CC(CC=C1)C2=CC=CC=C2",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                ""
-            ]
-        }
+        "smiles": "C1CC(CC=C1)C2=CC=CC=C2"
     },
     "c75ee6e10aafdc388d52d4ecf7729a6d":
     {
@@ -26118,7 +26088,7 @@
                 "fresh",
                 "fruity",
                 "heliotrope",
-                "jasmin",
+                "jasmine",
                 "ripe",
                 "sweet"
             ]
@@ -26943,7 +26913,7 @@
                 "foliage",
                 "green",
                 "herbal",
-                "jasmin",
+                "jasmine",
                 "oily",
                 "rose"
             ]
@@ -27506,7 +27476,7 @@
                 "terpenic",
                 "green",
                 "oily",
-                "camphoreous"
+                "camphoraceous"
             ]
         }
     },
@@ -27518,7 +27488,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphoreous",
+                "camphoraceous",
                 "fresh",
                 "herbal",
                 "medicinal",
@@ -28234,7 +28204,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "bleu cheese",
+                "bleu_cheese",
                 "fatty",
                 "moldy",
                 "mushroom",
@@ -28695,7 +28665,7 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphor"
+                "camphoraceous"
             ]
         },
         "activity":
@@ -28879,9 +28849,8 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "bois",
+                "bois_de_rose",
                 "citrus",
-                "de",
                 "fatty",
                 "floral",
                 "lilac",
@@ -29081,12 +29050,12 @@
                 "herbal",
                 "thyme",
                 "oregano",
-                "camphorous",
+                "camphoraceous",
                 "oily"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "camphorous",
+                "camphoraceous",
                 "herbal",
                 "medicinal",
                 "phenolic",
@@ -29124,8 +29093,7 @@
                 "dry",
                 "powdery",
                 "floral",
-                "berry",
-                ""
+                "berry"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -29753,7 +29721,7 @@
                 "fresh",
                 "oily",
                 "green",
-                "jasmin",
+                "jasmine",
                 "herbal",
                 "spicy",
                 "privetblossom"
@@ -29807,14 +29775,14 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
+                "citrus",
                 "cloth",
                 "fatty",
                 "floral",
                 "green",
                 "laundered",
                 "soapy",
-                "waxy",
-                "citrus"
+                "waxy"
             ]
         },
         "activity":
@@ -29976,13 +29944,13 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "sharp",
-                "tobacco",
-                "sour",
-                "milky",
-                "fruity",
+                "acidic",
                 "cheesy",
-                "acidic"
+                "fruity",
+                "milky",
+                "sharp",
+                "sour",
+                "tobacco"
             ]
         },
         "activity":
@@ -30055,15 +30023,15 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "beany",
-                "vanilla",
-                "sweet",
-                "powdery",
-                "phenolic",
-                "milky",
-                "dairy",
+                "brown",
                 "creamy",
-                "brown"
+                "dairy",
+                "milky",
+                "phenolic",
+                "powdery",
+                "sweet",
+                "vanilla",
+                "beany"
             ]
         },
         "activity":
@@ -30115,8 +30083,8 @@
             [
                 "chocolate",
                 "creamy",
-                "sweet",
-                "vanilla"
+                "vanilla",
+                "sweet"
             ]
         },
         "activity":
@@ -30239,11 +30207,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "floral",
                 "green",
-                "walnut",
-                "violet",
                 "leaf",
-                "floral"
+                "violet",
+                "walnut"
             ]
         },
         "activity":

@@ -118,7 +118,7 @@ for ($top = 1; $top <= floor($maxt); $top += 1)
 {   
     $dy = intval($base-1 - $tscale*$top);
     
-    if (!($top & 1)) imageline($im, $xbuf/2,$dy, $w-$xbuf/3,$dy, $wine );
+    if (!($top & 1)) imageline($im, $xbuf/3,$dy, $w-$xbuf/2,$dy, $wine );
     imagestring($im, 3, $w-$xbuf/3,$dy-8, $top, $red);
 }
 
@@ -215,7 +215,7 @@ foreach ($texts as $t)
 {   
     imagettftext($im, 9, 35, $t[0], $t[1], $pink, $fontfile, $t[2]);
 
-    if ($t[0] >= $x && $t[0] <= $x1) $x = $t[0];
+    if ($t[0] >= $x && $t[0] <= $x1) $x = $t[0] + 50;
 }
 
 

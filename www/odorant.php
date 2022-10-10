@@ -89,7 +89,7 @@ include("header.php");
 <div class="scrollw">
     <div>
         <img class="skeletal" src="<?php echo $imgfname; ?>">
-        <img class="barchart" src="barchart.php?o=<?php echo $odor['full_name']; ?>">
+        <img class="barchart" src="barchart.php?o=<?php echo urlencode($odor['full_name']); ?>">
     </div>
 </div>
 

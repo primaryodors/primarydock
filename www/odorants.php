@@ -19,5 +19,6 @@ if (!file_exists($pqcorr = "../data/receptor_pq.json"))
 
 foreach ($odors as $odor)
 {
-    echo "<a href=\"odorant.php?o={$odor['full_name']}\">{$odor['full_name']}</a><br>\n";
+    $fnu = urlencode($odor['full_name']);
+    echo "<a href=\"odorant.php?o=$fnu\">{$odor['full_name']}</a><br>\n";
 }

@@ -36,15 +36,17 @@ foreach ($odor['activity'] as $ref => $acv)
             if ($t[$rcpid] < $act) $t[$rcpid] = $act;
         }
 
-        $ec50 = @$a['ec50'] ?: false;
+        $ec50 = @$a['ec50'] ?: 0;
         if (!isset($e[$rcpid])) $e[$rcpid] = $ec50;
         else
         {
-            if ($e[$rcpid] < $ec50) $e[$rcpid] = $ec50;
+            if ($ec50)
+            {
+                if (!$e[$rcpid] || $ec50 < $e[$rcpid]) $e[$rcpid] = $ec50;
+            }
         }
     }
 }
-
 
 $res = 3;
 $xbuf = 80;
@@ -58,9 +60,9 @@ imagefilledrectangle($im, 0,0, $w,$h, imagecolorallocate($im,$bkcolor[0],$bkcolo
 
 $maxt = @max($t) ?: 1;
 $maxe = @max($e) ?: 0;
-$mine = @min($e) ?: -5;
+$mine = @min($e) ?: -6;
 if ($maxe) $maxe += 0.5;
-$mine -= 1.1;
+$mine -= 0.5;
 
 if ($maxt < 0) $maxt = 1;
 

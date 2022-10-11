@@ -30,7 +30,6 @@ echo "<h1>$rcpid</h1>\n";
         <th>Odorant</th>
         <th>EC<sub>50</sub></th>
         <th>Adjusted Top</th>
-        <th>Reference</th>
         <th>Aroma Notes</th>
     </tr>
 

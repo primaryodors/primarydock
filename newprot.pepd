@@ -8,6 +8,8 @@ _haveparams:
 
 LOAD $arg2
 
+CENTER [0,0,0]
+
 REGION TMR1 $arg4 $arg5
 REGION TMR2 $arg6 $arg7
 REGION TMR3 $arg8 $arg9

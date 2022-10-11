@@ -310,7 +310,7 @@ being assigned determines how all r-value variables are interpreted, so even tho
 float (the data type of `&k`) before the addition takes place.
 
 For strings, the operators `=` `+=` and `+` are allowed, with the plus sign indicating concatenation.
-Substrings are indicated with the word FROM and (optinally) FOR, e.g. `LET $end = $string FROM 10` or `LET $range = $SEQUENCE FROM %start FOR %length`.
+Substrings are _one-based_ and are indicated with the word FROM and (optinally) FOR, e.g. `LET $end = $string FROM 10` or `LET $range = $SEQUENCE FROM %start FOR %length`.
 
 
 # LOAD

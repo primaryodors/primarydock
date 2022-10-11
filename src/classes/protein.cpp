@@ -1806,15 +1806,17 @@ Point Protein::get_region_center(int startres, int endres)
     Point range[rglen+4];
 
     int i;
+    int samples = 0;
     for (i=0; i<rglen; i++)
     {
         // This is slow but that's okay.
         AminoAcid* aa = get_residue(startres+i);
         if (!aa) continue;
-        range[i] = aa->get_barycenter();
+        range[samples] = aa->get_barycenter();
+        samples++;
     }
 
-    return average_of_points(range, rglen);
+    return average_of_points(range, samples);
 }
 
 void Protein::move_piece(int start_res, int end_res, Point new_center)

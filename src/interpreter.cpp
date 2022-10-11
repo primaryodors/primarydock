@@ -412,6 +412,7 @@ int main(int argc, char** argv)
     }
     vars = 0;
 
+    bool script_loaded = false;
     for (i=1; i<argc; i++)
     {
         script_var[vars].name = (string)"$arg" + std::to_string(i);
@@ -424,7 +425,7 @@ int main(int argc, char** argv)
         {
             // TODO:
         }
-        else
+        else if (!script_loaded)
         {
             if (pf = fopen(argv[i], "rb"))
             {
@@ -439,6 +440,8 @@ int main(int argc, char** argv)
                 else*/
                 if (!script_fname.length())
                     script_fname = argv[i];
+                
+                script_loaded = true;
             }
             else
             {

@@ -1,0 +1,39 @@
+
+LET %test = $arg17
+
+IF %test >= 260 GOTO _haveparams
+ECHO "Usage: bin/peptiditor newprot.pepd /path/to/file.pdb PROTNAME {integer TMR1 through TMR7 start and end residues}
+EXIT
+_haveparams:
+
+LOAD $arg2
+
+CENTER [0,0,0]
+
+REGION TMR1 $arg4 $arg5
+REGION TMR2 $arg6 $arg7
+REGION TMR3 $arg8 $arg9
+REGION TMR4 $arg10 $arg11
+REGION TMR5 $arg12 $arg13
+REGION TMR6 $arg14 $arg15
+REGION TMR7 $arg16 $arg17
+
+UPRIGHT
+
+LET $pdbname = $arg3
+
+LET $fam = $pdbname FROM 1 FOR 2
+IF $fam != "OR" LET $fam = $pdbname FROM 1 FOR 4
+IF $fam != "OR" GOTO _not_or
+LET $sub = $pdbname FROM 3 FOR 2
+LET %sub = $sub
+LET $fam += %sub
+_not_or:
+
+LET $path = "pdbs/" + $fam
+LET $path += "/"
+LET $pdbname = $path + $arg3
+LET $pdbname += ".upright.pdb"
+
+SAVE $pdbname
+

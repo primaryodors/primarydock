@@ -20688,6 +20688,61 @@
             }
         }
     },
+    "OR52B4":
+    {
+        "id": "OR52B4",
+        "uniprot_id": "Q8NGK2",
+        "sequence": "MPTVNHSGTSHTVFHLLGIPGLQDQHMWISIPFFISYVTALLGNSLLIFIILTKRSLHEPMYLFLCMLAGADIVLSTCTIPQALAIFWFRAGDISLDRCITQLFFIHSTFISESGILLVMAFDHYIAICYPLRYTTILTNALIKKICVTVSLRSYGTIFPIIFLLKRLTFCQNNIIPHTFCEHIGLAKYACNDIRINIWYGFSILMSTVVLDVVLIFISYMLILHAVFHMPSPDACHKALNTFGSHVCIIILFYGSGIFTILTQRFGRHIPPCIHIPLANVCILAPPMLNPIIYGIKTKQIQEQVVQFLFIKQK",
+        "bw":
+        {
+            "1.50": "44",
+            "2.50": "72",
+            "3.50": "124",
+            "4.50": "151",
+            "5.50": "212",
+            "6.50": "256",
+            "7.50": "291",
+            "45.50": "181"
+        },
+        "region":
+        {
+            "TMR1":
+            {
+                "start": "21",
+                "end": "52"
+            },
+            "TMR2":
+            {
+                "start": "60",
+                "end": "87"
+            },
+            "TMR3":
+            {
+                "start": "95",
+                "end": "130"
+            },
+            "TMR4":
+            {
+                "start": "140",
+                "end": "165"
+            },
+            "TMR5":
+            {
+                "start": "194",
+                "end": "230"
+            },
+            "TMR6":
+            {
+                "start": "233",
+                "end": "265"
+            },
+            "TMR7":
+            {
+                "start": "271",
+                "end": "297"
+            }
+        }
+    },
     "OR52D1":
     {
         "id": "OR52D1",

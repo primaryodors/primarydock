@@ -133,6 +133,18 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR12D2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -1583,6 +1595,26 @@
             }
         }
     },
+    "de4a73dd24dfd056b06c7070476e6f11":
+    {
+        "full_name": "2-aminoacetophenone",
+        "smiles": "CC(=O)C1=CC=CC=C1N",
+        "activity":
+        {
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4X2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "20"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "f688933a88c2a22394da6c11f3a32a69":
     {
         "full_name": "n-amyl acetate",
@@ -2069,6 +2101,18 @@
                     "type": "vsa",
                     "adjusted_curve_top": "10"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR1B1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "20"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -2197,6 +2241,18 @@
                     "ec50": "-4.2",
                     "adjusted_curve_top": "2.5882354582057"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR5I1":
+                {
+                    "type": "na"
+                },
+                "OR8B4":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "14"
+                }
             }
         }
     },
@@ -2313,6 +2369,18 @@
                 {
                     "type": "ma",
                     "adjusted_curve_top": "3.045685172081"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4K2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -3124,6 +3192,23 @@
                     "type": "na",
                     "antagonist": "1"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4C3":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                },
+                "OR5L1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                }
             }
         }
     },
@@ -3865,6 +3950,18 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR10C1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -4459,6 +4556,18 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR1B1":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "9"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -4891,6 +5000,18 @@
                     "type": "na"
                 }
             },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4P4":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
+            },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
                 "OR51L1":
@@ -5288,6 +5409,26 @@
             "https:\/\/www.biorxiv.org\/content\/10.1101\/2021.09.28.462154v1.full.pdf":
             {
                 "OR5AN1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "565890f1d334908fa82e7ebc631d5df1":
+    {
+        "full_name": "cedramber",
+        "smiles": "C[C@@H]1CC[C@@H]2[C@]13CC[C@]([C@H](C3)C2(C)C)(C)OC",
+        "activity":
+        {
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4K5":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
                 {
                     "type": "na"
                 }
@@ -5713,6 +5854,18 @@
                     "type": "vsa",
                     "ec50": "-6.07"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -5744,7 +5897,7 @@
     "7d23be27809d3a8a7615d6c3e15450b1":
     {
         "full_name": "cis-3-hexen-1-ol",
-        "smiles": "CC\/C=C\\CCO",
+        "smiles": "CC\\C=C\/CCO",
         "aroma":
         {
             "http:\/\/www.primaryodors.org":
@@ -6606,6 +6759,28 @@
                     "type": "sa",
                     "ec50": "-6.06",
                     "adjusted_curve_top": "9.285714507103"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR10Q1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                },
+                "OR4K2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                },
+                "OR4P4":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -12840,6 +13015,23 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4C16":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                },
+                "OR5L1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                }
             }
         }
     },
@@ -13012,6 +13204,21 @@
                 "musty",
                 "soil"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR52B4":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "01ff53bccb8a2adb613efbbfcfeb21b8":
@@ -13200,6 +13407,18 @@
                 {
                     "type": "sa",
                     "ec50": "-5.74"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4E2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -13539,6 +13758,22 @@
                     "type": "sa",
                     "adjusted_curve_top": "7"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4K2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                },
+                "OR4P4":
+                {
+                    "type": "na"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -13719,6 +13954,22 @@
                     "ec50": "-5.66",
                     "adjusted_curve_top": "5.7142858505249"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4K2":
+                {
+                    "type": "na"
+                },
+                "OR4P4":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "32"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -13768,6 +14019,18 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1.6243654493148"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR10C1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
                 }
             },
             "https:\/\/s-space.snu.ac.kr\/handle\/10371\/169429?mode=full":
@@ -15048,6 +15311,18 @@
                     "type": "na"
                 }
             },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR5I1":
+                {
+                    "type": "na"
+                },
+                "OR8B4":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "8"
+                }
+            },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
                 "OR2W1":
@@ -15308,6 +15583,23 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                },
+                "OR8D2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "9"
                 }
             }
         }
@@ -16783,6 +17075,18 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4K2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -17414,6 +17718,18 @@
                     "type": "na"
                 },
                 "OR5AN1":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR12D2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
                 {
                     "type": "na"
                 }
@@ -18416,6 +18732,18 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1.0152283906937"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR1B1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "35"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -20997,6 +21325,18 @@
                     "type": "vwa",
                     "adjusted_curve_top": "0.20000000298023"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4C3":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -21065,6 +21405,31 @@
                 {
                     "type": "ma",
                     "ec50": "-4.19"
+                }
+            }
+        }
+    },
+    "06885ed09931acc7222f9215a658a77b":
+    {
+        "full_name": "muguet propanol",
+        "smiles": "CC(C)(CC1=CC=CC=C1)CO",
+        "activity":
+        {
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR10A6":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                },
+                "OR8D2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "21"
                 }
             }
         }
@@ -21212,6 +21577,27 @@
                     "type": "sa",
                     "ec50": "-6.54",
                     "adjusted_curve_top": "9.285714507103"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR10Q1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                },
+                "OR4K2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "7"
+                },
+                "OR4P4":
+                {
+                    "type": "na"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -23233,6 +23619,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR5I1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                }
             }
         }
     },
@@ -24016,6 +24410,18 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR52B4":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -24763,6 +25169,29 @@
                 {
                     "type": "vwa",
                     "adjusted_curve_top": "0.40000000596046"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR10Q1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.96",
+                    "adjusted_curve_top": "52"
+                },
+                "OR4K2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "15"
+                },
+                "OR4P4":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -25760,6 +26189,26 @@
                 "leafy",
                 "storax"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4E2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR4K2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "68d615f78a28f8a895a512f37e33361e":
@@ -26504,6 +26953,18 @@
                     "type": "sa",
                     "ec50": "-3.6",
                     "adjusted_curve_top": "9.9999996721745"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR12D2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -27645,6 +28106,18 @@
                     "type": "sa",
                     "ec50": "-5.15",
                     "adjusted_curve_top": "9.9999996721745"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR52B4":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -29116,6 +29589,18 @@
                     "adjusted_curve_top": "-3",
                     "antagonist": "1"
                 }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR2L8":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -29356,6 +29841,23 @@
                 {
                     "type": "vsa",
                     "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR4E2":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR52B4":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -30336,6 +30838,23 @@
                     "type": "na"
                 },
                 "OR5AN1":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
+            {
+                "OR2L8":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR4K5":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR5I1":
                 {
                     "type": "na"
                 }

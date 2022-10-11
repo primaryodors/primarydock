@@ -1,0 +1,228 @@
+
+/*
+    Hues used in this color scheme:
+    #6d7886 blue
+    #008967 green
+    #836daa purple
+*/
+
+body
+{
+    background-color: #2b3642;
+    color: #daceec;
+    margin: 0px;
+    overflow: hidden;
+}
+
+::-webkit-scrollbar 
+{
+    width: 13px;
+}
+
+::-webkit-scrollbar-track 
+{
+    background: #283c57; 
+}
+
+::-webkit-scrollbar-thumb 
+{
+    background: #675c7a; 
+}
+
+::-webkit-scrollbar-thumb:hover 
+{
+    background: #679d8a;
+}
+
+a[href], a:visited
+{
+    text-decoration: none;
+    color: #50cea8;
+}
+
+a[href]:hover
+{
+    text-decoration: underline;
+}
+
+#logo
+{
+    background-color: #22436d;
+    padding: 5px;
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    z-index: 20000;
+}
+
+#side
+{
+    background-color: #18283d;
+    padding: 5px;
+    padding-top: 47px;
+    display: block;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    bottom: 0px;
+    width: 22px;
+    z-index: 10000;
+    overflow-x: hidden;
+}
+
+#side:hover
+{
+    width: fit-content;
+    padding-right: 5px;
+    z-index: 10000;
+}
+
+#main
+{
+    display: block;
+    position: absolute;
+    top: 37px;
+    left: 81px;
+    z-index: 1;
+    width: 90%;
+}
+
+#side:hover ul
+{
+    padding: 5px;
+}
+
+#side li
+{
+    display: block;
+    background-color: #324c6e;
+    border-top: 1px solid #6381a8;
+    border-left: 1px solid #57759c;
+    border-right: 1px solid #14263d;
+    border-bottom: 1px solid #152130;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
+#side li:hover 
+{
+    background-color: #31695b;
+}
+
+#side li a:hover 
+{
+    text-decoration: none;
+}
+
+.scrollw
+{
+    overflow-x: auto;
+}
+
+.scrollw > div
+{
+    width: max-content;
+}
+
+.scrollw > div > *
+{
+    float: left;
+    display: block;
+}
+
+.idxbuttons td
+{
+    padding: 25px;
+}
+
+.idxbuttons td img
+{
+    box-shadow: 0px 0px 15px #00c6d4;
+}
+
+.skeletal
+{
+    display: block;
+}
+
+.barchart
+{
+    margin-left: 25px;
+}
+
+.aromainfo
+{
+    display: block;
+    float: left;
+    width: 22%;
+}
+
+.scrollh
+{
+    height: 470px;
+    overflow-y: auto;
+    display: block;
+}
+
+.rcplist, .liglist
+{
+    width: 95%;
+    border-collapse: collapse;
+    margin-left: 15px;
+    margin-top: 20px;
+}
+
+.rcplist th, .liglist th
+{
+    text-align: left;
+    background-color: #5595e9;
+    color: #111b27;
+}
+
+.rcplist th, .rcplist td, .liglist th, .liglist td
+{
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+    padding: 0;
+    min-width: 123px;
+}
+
+.pugrest_msg
+{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 11px;
+    clear: left!important;
+    width: 97%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.odorlist
+{
+    float: left;
+    margin-right: 15px;
+}
+
+.rcptile
+{
+    display: inline-block;
+    border: 1px solid #6841ac;
+    background-color: #173f77;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 15px;
+    padding: 3px;
+}
+
+.fam
+{
+    float: none;
+    clear: left;
+    height: fit-content;
+    margin-bottom: 8px;
+}
+
+.fam a
+{
+    float: none!important;
+    display: inline!important;
+}

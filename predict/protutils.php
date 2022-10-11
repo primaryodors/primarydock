@@ -32,8 +32,9 @@ function json_encode_pretty($array)
 	return preg_replace("/([ \t]*)([^\\s]*) ([{\\[])\n/", "\$1\$2\n\$1\$3\n", json_encode($array, JSON_PRETTY_PRINT));
 }
 
+$cwd = getcwd();
 chdir(__DIR__);
 chdir("..");
 $prots = json_decode(file_get_contents("data/receptor.json"), true);
-
+chdir($cwd);
 

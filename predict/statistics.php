@@ -1,16 +1,16 @@
 <?php
 
 function sgn($num)
-{   if ($num < 0) return -1;
+{   
+    if ($num < 0) return -1;
     if ($num > 0) return 1;
     return 0;
 }
 
-
-
 // http://www.sjsu.edu/faculty/gerstman/StatPrimer/correlation.pdf
 function correlationCoefficient($xarr, $yarr)
-{   if (!is_array($xarr) || !is_array($yarr))   throw new Exception("correlationCoefficient requires two equal length arrays.");
+{   
+    if (!is_array($xarr) || !is_array($yarr))   throw new Exception("correlationCoefficient requires two equal length arrays.");
     if (count($xarr) != count($yarr))           throw new Exception("correlationCoefficient requires two equal length arrays.");
     if (!count($xarr) || !count($yarr))         throw new Exception("correlationCoefficient passed empty arrays.");
     
@@ -18,7 +18,8 @@ function correlationCoefficient($xarr, $yarr)
     $yarr = array_values($yarr);
     
     foreach ($xarr as $i => $x)
-    {   $y = $yarr[$i];
+    {   
+        $y = $yarr[$i];
         if (!is_numeric($x)) $xarr[$i] = (trim($x) == '' ? -500 : 500);
         if (!is_numeric($y)) $yarr[$i] = (trim($y) == '' ? -500 : 500);
     }
@@ -29,7 +30,8 @@ function correlationCoefficient($xarr, $yarr)
     $ssxx = 0.0; $ssyy = 0.0; $ssxy = 0.0;
     
     foreach ($xarr as $i => $x)
-    {   $y = $yarr[$i];
+    {   
+        $y = $yarr[$i];
         /*if (!is_numeric($x)) $x = (trim($x) == '' ? -500 : 500);
         if (!is_numeric($y)) $y = (trim($y) == '' ? -500 : 500);*/
         
@@ -45,10 +47,13 @@ function correlationCoefficient($xarr, $yarr)
 }
 
 function array_shuffle($arr)
-{   $arr1 = [];
+{   
+    $arr1 = [];
     foreach (array_values($arr) as $v) 
-    {   do
-        {   $k = rand(0,16777215);
+    {   
+        do
+        {   
+            $k = rand(0,16777215);
         } while (isset($arr1[$k]));
         $arr1[$k] = $v;
     }
@@ -58,11 +63,13 @@ function array_shuffle($arr)
 
 
 function hill($concn, $emax, $ec50, $nH = 2.0)
-{   return $emax / (1.0 + pow($ec50 / $concn, $nH));
+{   
+    return $emax / (1.0 + pow($ec50 / $concn, $nH));
 }
 
 function scatter_to_best_fit_hill($arr, $iters = 50)       // Index = concentration; value = observed response.
-{   $emin = min($arr);
+{   
+    $emin = min($arr);
     $emax = max($arr);
     
     foreach ($arr as &$a) $a -= $emin;
@@ -77,7 +84,8 @@ function scatter_to_best_fit_hill($arr, $iters = 50)       // Index = concentrat
     {
         $half = $iters/2;
         for ($i=0; $i<$iters; $i++)
-        {   $delta = 0.0;
+        {   
+            $delta = 0.0;
             foreach ($arr as $concn => $obs) $delta += abs($obs - hill(floatval($concn), $emax, $ec50, $nH));
             
             $ecold = $ec50;
@@ -106,16 +114,19 @@ function scatter_to_best_fit_hill($arr, $iters = 50)       // Index = concentrat
 }
 
 function median($arr)
-{   if (!is_array($arr)) return $arr;
+{   
+    if (!is_array($arr)) return $arr;
     
     sort($arr);
     $half = 0.5 * count($arr);
     
     if ($half == floor($half))
-    {   return 0.5*$arr[$half] + 0.5*$arr[$half-1];
+    {   
+        return 0.5*$arr[$half] + 0.5*$arr[$half-1];
     }
     else
-    {   return $arr[floor($half)];
+    {   
+        return $arr[floor($half)];
     }
 }
 

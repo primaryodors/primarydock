@@ -5744,7 +5744,7 @@
     "7d23be27809d3a8a7615d6c3e15450b1":
     {
         "full_name": "cis-3-hexen-1-ol",
-        "smiles": "CC\/C=C\\CCO",
+        "smiles": "CC\\C=C\/CCO",
         "aroma":
         {
             "http:\/\/www.primaryodors.org":
@@ -27221,13 +27221,13 @@
                 "OR1A1":
                 {
                     "type": "ma",
-                    "ec50": "8.5",
+                    "ec50": "-6.15",
                     "adjusted_curve_top": "2.333333350718"
                 },
                 "OR5P3":
                 {
                     "type": "ma",
-                    "ec50": "30",
+                    "ec50": "-5.4",
                     "adjusted_curve_top": "2.2222222387791"
                 }
             },

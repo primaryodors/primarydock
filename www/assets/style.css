@@ -130,6 +130,16 @@ a[href]:hover
     display: block;
 }
 
+.idxbuttons td
+{
+    padding: 25px;
+}
+
+.idxbuttons td img
+{
+    box-shadow: 0px 0px 15px #00c6d4;
+}
+
 .skeletal
 {
     display: block;

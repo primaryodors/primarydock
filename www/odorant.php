@@ -170,7 +170,7 @@ foreach ($odor['activity'] as $refurl => $acv)
             else $tblec50[$rcpid] .= ", ";
 
             $tblec50[$rcpid] .= round($a['ec50'], 4) . " <sup><a href=\"$refurl\">$refno</a></sup>";
-            $sorted[$rcpid] -= $a['ec50'];
+            $sorted[$rcpid] -= $a['ec50']*1.666;
             $ssamples++;
 
             if (false===$minec50[$rcpid] || $a['ec50'] < $minec50[$rcpid]) $minec50[$rcpid] = $a['ec50'];

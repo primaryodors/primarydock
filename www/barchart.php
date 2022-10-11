@@ -11,7 +11,7 @@ function lum($r, $g, $b)
     return $rcontrib*$r + $gcontrib*$g + $bcontrib*$b;
 }
 
-$bkcolor = [0x15, 0x1a, 0x1f];
+$bkcolor = [0x15, 0x1a, 0x37];
 $bklum = lum($bkcolor[0], $bkcolor[1], $bkcolor[2]);
 
 $odor = find_odorant(@$_REQUEST['o']);
@@ -84,25 +84,25 @@ $pink  = imagecolorallocate($im,192,176,218);
 $white = imagecolorallocate($im,240,240,240);
 
 $or1    = imagecolorallocate($im,0,0,0);
-$or2    = imagecolorallocate($im,255,255,255);
-$or3    = imagecolorallocate($im,255,0,0); 
-$or4    = imagecolorallocate($im,0,255,255);
-$or5    = imagecolorallocate($im,255,0,255);
-$or6    = imagecolorallocate($im,0,255,0); 
-$or7    = imagecolorallocate($im,0,0,255); 
-$or8    = imagecolorallocate($im,255,255,0); 
-$or9    = imagecolorallocate($im,255,128,0);
-$or10   = imagecolorallocate($im,128,64,32); 
-$or11   = imagecolorallocate($im,255,64,128);
+$or2    = imagecolorallocate($im,160,160,160);
+$or3    = imagecolorallocate($im,192,0,0); 
+$or4    = imagecolorallocate($im,0,160,160);
+$or5    = imagecolorallocate($im,176,0,208);
+$or6    = imagecolorallocate($im,0,160,0); 
+$or7    = imagecolorallocate($im,0,32,255); 
+$or8    = imagecolorallocate($im,176,160,0); 
+$or9    = imagecolorallocate($im,192,96,0);
+$or10   = imagecolorallocate($im,96,64,16); 
+$or11   = imagecolorallocate($im,192,64,128);
 $or12   = imagecolorallocate($im,128,128,128);
-$or13   = imagecolorallocate($im,128,255,128);
-$or14   = imagecolorallocate($im,128,128,255);
-$or51   = imagecolorallocate($im,0,255,192);
-$or52   = imagecolorallocate($im,96,192,128);
-$or56   = imagecolorallocate($im,96,255,0);
+$or13   = imagecolorallocate($im,96,160,96);
+$or14   = imagecolorallocate($im,96,96,240);
+$or51   = imagecolorallocate($im,0,160,96);
+$or52   = imagecolorallocate($im,128,144,32);
+$or56   = imagecolorallocate($im,128,208,0);
 $taar   = imagecolorallocate($im,255,160,96);
-$vn1r   = imagecolorallocate($im,192,96,255);
-$ms4a   = imagecolorallocate($im,96,64,255);
+$vn1r   = imagecolorallocate($im,192,128,255);
+$ms4a   = imagecolorallocate($im,64,128,255);
 
 $base = $h-$ybuf/2;
 $bsht = 8;

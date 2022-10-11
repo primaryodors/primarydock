@@ -14,6 +14,26 @@ body
     overflow: hidden;
 }
 
+::-webkit-scrollbar 
+{
+    width: 13px;
+}
+
+::-webkit-scrollbar-track 
+{
+    background: #283c57; 
+}
+
+::-webkit-scrollbar-thumb 
+{
+    background: #675c7a; 
+}
+
+::-webkit-scrollbar-thumb:hover 
+{
+    background: #679d8a;
+}
+
 a[href], a:visited
 {
     text-decoration: none;
@@ -165,4 +185,34 @@ a[href]:hover
     width: 97%;
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+.odorlist
+{
+    float: left;
+    margin-right: 15px;
+}
+
+.rcptile
+{
+    display: inline-block;
+    border: 1px solid #6841ac;
+    background-color: #173f77;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 15px;
+    padding: 3px;
+}
+
+.fam
+{
+    float: none;
+    clear: left;
+    height: fit-content;
+    margin-bottom: 8px;
+}
+
+.fam a
+{
+    float: none!important;
+    display: inline!important;
 }

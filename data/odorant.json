@@ -1599,6 +1599,15 @@
     {
         "full_name": "2-aminoacetophenone",
         "smiles": "CC(=O)C1=CC=CC=C1N",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "grape",
+                "sweet",
+                "musty"
+            ]
+        },
         "activity":
         {
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
@@ -5419,6 +5428,18 @@
     {
         "full_name": "cedramber",
         "smiles": "C[C@@H]1CC[C@@H]2[C@]13CC[C@]([C@H](C3)C2(C)C)(C)OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "dry",
+                "cedar",
+                "ambergris",
+                "earthy",
+                "vetiver"
+            ]
+        },
         "activity":
         {
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
@@ -8721,6 +8742,20 @@
     {
         "full_name": "delta-damascone",
         "smiles": "CC1(C)C\\C=C\/C(C)C1C(=O)C=CC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fruity",
+                "sweet",
+                "rose",
+                "natural",
+                "petal",
+                "currant_bud",
+                "black_currant_bud",
+                "tobacco"
+            ]
+        },
         "activity":
         {
             "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
@@ -11666,10 +11701,10 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "vanilla",
-                "caramellic",
                 "sweet",
-                "creamy"
+                "vanilla",
+                "creamy",
+                "caramellic"
             ]
         },
         "activity":
@@ -17316,6 +17351,19 @@
     {
         "full_name": "isolongifolanone",
         "smiles": "CC1[C@@H]2[C@H]3[C@H]([C@@]1(CCCC3(C)C)C)CC2=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "dry",
+                "woody",
+                "patchouli",
+                "cedar",
+                "earthy",
+                "tobacco",
+                "incense"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
@@ -21413,6 +21461,15 @@
     {
         "full_name": "muguet propanol",
         "smiles": "CC(C)(CC1=CC=CC=C1)CO",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "floral",
+                "lily_of_the_valley",
+                "woody"
+            ]
+        },
         "activity":
         {
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
@@ -29953,7 +30010,16 @@
     "5ff70bd4e00179b536bfea12569b3272":
     {
         "full_name": "triethylamine",
-        "smiles": "CC[NH+](CC)CC"
+        "smiles": "CC[NH+](CC)CC",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "ammonia",
+                "prawn",
+                "fishy"
+            ]
+        }
     },
     "e34317a434c2051c6117a038efea2051":
     {
@@ -29975,10 +30041,10 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "hyacinth",
                 "foliage",
                 "green",
-                "herbal",
-                "hyacinth"
+                "herbal"
             ]
         },
         "activity":
@@ -30251,10 +30317,10 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cooked",
-                "dirty",
-                "meaty",
+                "rubbery",
                 "phenolic",
-                "rubbery"
+                "meaty",
+                "dirty"
             ]
         },
         "activity":
@@ -30276,15 +30342,15 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "green",
+                "waxy",
+                "soapy",
+                "laundered",
+                "floral",
                 "aldehydic",
                 "citrus",
                 "cloth",
-                "fatty",
-                "floral",
-                "green",
-                "laundered",
-                "soapy",
-                "waxy"
+                "fatty"
             ]
         },
         "activity":
@@ -30525,15 +30591,15 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "brown",
-                "creamy",
-                "dairy",
-                "milky",
                 "phenolic",
-                "powdery",
                 "sweet",
                 "vanilla",
-                "beany"
+                "powdery",
+                "dairy",
+                "milky",
+                "beany",
+                "creamy",
+                "brown"
             ]
         },
         "activity":
@@ -30585,8 +30651,8 @@
             [
                 "chocolate",
                 "creamy",
-                "vanilla",
-                "sweet"
+                "sweet",
+                "vanilla"
             ]
         },
         "activity":
@@ -30709,11 +30775,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "floral",
                 "green",
                 "leaf",
                 "violet",
-                "walnut"
+                "walnut",
+                "floral"
             ]
         },
         "activity":
@@ -30736,8 +30802,8 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "spicy",
-                "sweet",
-                "woody"
+                "woody",
+                "sweet"
             ]
         }
     },

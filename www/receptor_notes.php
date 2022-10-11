@@ -64,6 +64,7 @@ function correlate_receptors_aromanotes()
             $yvals[$pq][$oid] = 0;
             foreach ($odor['aroma'] as $refurl => $pqlist)
             {
+                if ($refurl == "http://www.primaryodors.org") continue;
                 if (in_array($pq, $pqlist))
                 {
                     $yvals[$pq][$oid] = 1;
@@ -80,7 +81,6 @@ function correlate_receptors_aromanotes()
         foreach ($yvals as $pq => $yv)
         {
             if ($ycount[$pq] < 3) continue;
-            if ($pq == "donuts") die("".$ycount[$pq]);
             $corr = correlationCoefficient($xv, $yv);
             $correlations[$rcpid][$pq] = $corr;
         }

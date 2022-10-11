@@ -322,6 +322,36 @@
             }
         }
     },
+    "b5371872fa81d9c3083727fa417c8cc6":
+    {
+        "full_name": "2-acetyl-3,5-dimethyl pyrazine",
+        "smiles": "CC1=CN=C(C(=N1)C)C(=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "nutty",
+                "hazelnut",
+                "roasted_hazelnut"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.3",
+                    "adjusted_curve_top": "10.5"
+                }
+            }
+        }
+    },
     "13c1959e6517ccded6930e9189db639f":
     {
         "full_name": "2-acetyl-3-ethylpyrazine",
@@ -9218,6 +9248,19 @@
                     "ec50": "-6.9",
                     "adjusted_curve_top": "5.588235527277"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.8",
+                    "adjusted_curve_top": "9.6999998092651"
+                }
             }
         }
     },
@@ -9724,6 +9767,40 @@
             }
         }
     },
+    "16d913b992fca9bf08bf9ae087b10ac1":
+    {
+        "full_name": "2,5-dimethyl pyrazine",
+        "smiles": "CC1=CN=C(C=N1)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "cocoa",
+                "nutty",
+                "roasted",
+                "beefy",
+                "woody",
+                "grassy",
+                "medicinal"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-3.9",
+                    "adjusted_curve_top": "7"
+                }
+            }
+        }
+    },
     "865f7f2e52aeed5ab40b709e9d1f2e4b":
     {
         "full_name": "2,6-dimethylpyrazine",
@@ -9752,6 +9829,19 @@
                 {
                     "type": "ma",
                     "ec50": "-4.26"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-3.6",
+                    "adjusted_curve_top": "8.1999998092651"
                 }
             }
         }
@@ -10917,6 +11007,19 @@
                     "ec50": "-5.6",
                     "adjusted_curve_top": "6.1764708459377"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-5.5",
+                    "adjusted_curve_top": "11.699999809265"
+                }
             }
         }
     },
@@ -11431,6 +11534,21 @@
                     "ec50": "-4",
                     "adjusted_curve_top": "1.1764706373215"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-3.8",
+                    "adjusted_curve_top": "2.2000000476837"
+                },
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-5",
+                    "adjusted_curve_top": "11.39999961853"
+                }
             }
         }
     },
@@ -11468,6 +11586,19 @@
                     "type": "ma",
                     "ec50": "-3.8",
                     "adjusted_curve_top": "3.7058826197596"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-3.4",
+                    "adjusted_curve_top": "7.8000001907349"
                 }
             }
         }
@@ -11659,6 +11790,54 @@
                     "ec50": "-4",
                     "adjusted_curve_top": "10.000000417233"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-3.8",
+                    "adjusted_curve_top": "2"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.2",
+                    "adjusted_curve_top": "6.1999998092651"
+                }
+            }
+        }
+    },
+    "6715cb94caca72dffd757a662de8a4e3":
+    {
+        "full_name": "3-ethyl pyridine",
+        "smiles": "CCC1=CN=CC=C1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "tobacco",
+                "oakmoss",
+                "leathery",
+                "caramellic",
+                "roasted",
+                "hazelnut"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.5",
+                    "adjusted_curve_top": "5.6999998092651"
+                }
             }
         }
     },
@@ -11701,10 +11880,10 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "sweet",
-                "vanilla",
+                "caramellic",
                 "creamy",
-                "caramellic"
+                "sweet",
+                "vanilla"
             ]
         },
         "activity":
@@ -17035,6 +17214,21 @@
                     "ec50": "-6.1",
                     "adjusted_curve_top": "4.1176472306252"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "sa",
+                    "ec50": "-6",
+                    "adjusted_curve_top": "7.9000000953674"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.5",
+                    "adjusted_curve_top": "6.5999999046326"
+                }
             }
         }
     },
@@ -17061,6 +17255,21 @@
                     "ec50": "-3.8",
                     "adjusted_curve_top": "0.8823529779911"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-3",
+                    "adjusted_curve_top": "2.5"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-3.4",
+                    "adjusted_curve_top": "4"
+                }
             }
         }
     },
@@ -17080,6 +17289,43 @@
                 "rooty",
                 "vetiver"
             ]
+        }
+    },
+    "b759973a648fad5956f17c95d0f74c85":
+    {
+        "full_name": "2-isobutylthiazole",
+        "smiles": "CC(C)CC1=NC=CS1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "wasabi",
+                "privet",
+                "tomato",
+                "leaf",
+                "earthy",
+                "vegetable",
+                "metallic"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "wa",
+                    "ec50": "-4.2",
+                    "adjusted_curve_top": "1.3999999761581"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.5",
+                    "adjusted_curve_top": "3.2000000476837"
+                }
+            }
         }
     },
     "009a4e9b0c028a2fcb175db5a0e8ed6d":
@@ -17141,12 +17387,12 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "rancid",
+                "sour",
                 "acidic",
                 "buttery",
                 "cheesy",
-                "dairy",
-                "rancid",
-                "sour"
+                "dairy"
             ]
         },
         "activity":
@@ -18515,6 +18761,65 @@
             }
         }
     },
+    "212aa65d989058e4523ec43ccc081fdf":
+    {
+        "full_name": "2,4-lutidine",
+        "smiles": "CC1=CC(=NC=C1)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "smoky",
+                "phenolic"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.6",
+                    "adjusted_curve_top": "8.3999996185303"
+                }
+            }
+        }
+    },
+    "15be6f1d39eec79ced06e5fcdff0355d":
+    {
+        "full_name": "2,5-lutidine",
+        "smiles": "CC1=CN=C(C=C1)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "roasted",
+                "green",
+                "earthy"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.5",
+                    "adjusted_curve_top": "7.3000001907349"
+                }
+            }
+        }
+    },
     "b4bd27512f9429c13062d3747c0a3994":
     {
         "full_name": "lyral",
@@ -19512,6 +19817,19 @@
                     "ec50": "-7.7",
                     "adjusted_curve_top": "5.8823531866074"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-7.4",
+                    "adjusted_curve_top": "9.6999998092651"
+                }
             }
         }
     },
@@ -19591,6 +19909,21 @@
                     "ec50": "-6.7",
                     "adjusted_curve_top": "3.5294119119644"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.7",
+                    "adjusted_curve_top": "9.1999998092651"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-6",
+                    "adjusted_curve_top": "8.3000001907349"
+                }
             }
         }
     },
@@ -19633,6 +19966,19 @@
                     "type": "ma",
                     "ec50": "-5.2",
                     "adjusted_curve_top": "5.8823531866074"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.1",
+                    "adjusted_curve_top": "9.8999996185303"
                 }
             }
         }
@@ -20677,6 +21023,19 @@
                     "ec50": "-5.05",
                     "adjusted_curve_top": "0.5111111043228"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.7",
+                    "adjusted_curve_top": "5.3000001907349"
+                }
             }
         }
     },
@@ -20993,6 +21352,19 @@
                 {
                     "type": "na"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.7",
+                    "adjusted_curve_top": "7.5"
+                }
             }
         }
     },
@@ -21181,6 +21553,19 @@
                     "type": "ma",
                     "ec50": "-5",
                     "adjusted_curve_top": "5.2941178679466"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.8",
+                    "adjusted_curve_top": "9"
                 }
             }
         }
@@ -28706,6 +29091,21 @@
                     "type": "wa",
                     "adjusted_curve_top": "0.69999998807907"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.4",
+                    "adjusted_curve_top": "8.3000001907349"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.8",
+                    "adjusted_curve_top": "4.1999998092651"
+                }
             }
         }
     },
@@ -28763,6 +29163,21 @@
                 {
                     "type": "ma",
                     "ec50": "-5.03"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "wa",
+                    "ec50": "-3",
+                    "adjusted_curve_top": "0.80000001192093"
+                },
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.2",
+                    "adjusted_curve_top": "11.300000190735"
                 }
             }
         }
@@ -30041,10 +30456,10 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "hyacinth",
                 "foliage",
                 "green",
-                "herbal"
+                "herbal",
+                "hyacinth"
             ]
         },
         "activity":
@@ -30127,6 +30542,17 @@
                 {
                     "type": "na"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -30201,6 +30627,19 @@
                     "ec50": "-5",
                     "adjusted_curve_top": "6.1764708459377"
                 }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.7",
+                    "adjusted_curve_top": "11"
+                }
             }
         }
     },
@@ -30217,6 +30656,19 @@
                     "type": "ma",
                     "ec50": "-4",
                     "adjusted_curve_top": "2.3529412746429"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.1",
+                    "adjusted_curve_top": "4"
                 }
             }
         }
@@ -30317,10 +30769,10 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cooked",
-                "rubbery",
-                "phenolic",
+                "dirty",
                 "meaty",
-                "dirty"
+                "phenolic",
+                "rubbery"
             ]
         },
         "activity":
@@ -30342,15 +30794,15 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "green",
-                "waxy",
-                "soapy",
-                "laundered",
-                "floral",
                 "aldehydic",
                 "citrus",
                 "cloth",
-                "fatty"
+                "fatty",
+                "floral",
+                "green",
+                "laundered",
+                "soapy",
+                "waxy"
             ]
         },
         "activity":
@@ -30591,15 +31043,15 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "phenolic",
-                "sweet",
-                "vanilla",
-                "powdery",
+                "beany",
+                "brown",
+                "creamy",
                 "dairy",
                 "milky",
-                "beany",
-                "creamy",
-                "brown"
+                "phenolic",
+                "powdery",
+                "sweet",
+                "vanilla"
             ]
         },
         "activity":
@@ -30775,11 +31227,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "floral",
                 "green",
                 "leaf",
                 "violet",
-                "walnut",
-                "floral"
+                "walnut"
             ]
         },
         "activity":
@@ -30802,8 +31254,8 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "spicy",
-                "woody",
-                "sweet"
+                "sweet",
+                "woody"
             ]
         }
     },

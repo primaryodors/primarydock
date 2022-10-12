@@ -21,13 +21,17 @@ $page_title = $rcpid;
 $extra_js = ['js/tabs.js'];
 $extra_css = ['assets/tabs.css'];
 
+$pairs = all_empirical_pairs_for_receptor($rcpid);
+
 include("header.php");
 
 ?>
 <div class="tab" style="display: inline-block; margin-top: 30px;">
     <button class="tabstatic" id="tabGene"><?php echo $rcpid; ?></button>
-	<button class="tablinks" id="tabInfo" onclick="openTab(this, 'Info');">Info</button>
+	<button class="tablinks <?php if (!count($pairs)) echo "default"; ?>" id="tabInfo" onclick="openTab(this, 'Info');">Info</button>
+    <?php if (count($pairs)) { ?>
     <button class="tablinks default" id="tabLigands" onclick="openTab(this, 'Ligands');">Ligands</button>
+    <?php } ?>
 </div>
 
 <div id="Info" class="tabcontent">
@@ -248,6 +252,28 @@ include("header.php");
     ?>
     </table>
 
+    <?php
+    if ($uniprot = @$receptor['uniprot_id'])
+    {
+        $links[] = "<a href=\"https://www.uniprot.org/uniprot/$uniprot\" target=\"_top\">UniProt</a>";
+        if (preg_match("/^(OR[0-9]{1,2}[A-Z]{1,2}[0-9]{1,2})|(TAAR[0-9])|(VN1R[1-5])$/", $rcpid))
+            $links[] = "<a href=\"https://zhanggroup.org/GPCR-EXP/pdb/hgmod/$uniprot/{$uniprot}_results/\" target=\"_top\">I-TASSER</a>";
+        $links[] = "<a href=\"https://alphafold.ebi.ac.uk/entry/$uniprot\" target=\"_top\">AlphaFold</a>";
+    }
+
+    if (preg_match("/^OR[0-9]{1,2}[A-Z]{1,2}[0-9]{1,2}$/", $rcpid))
+    {
+        $links[] = "<a href=\"https://genome.weizmann.ac.il/horde/card/index/symbol:$rcpid\" target=\"_top\">HORDE</a>";
+    }
+
+    if (1)
+    {
+        $links[] = "<a href=\"https://www.genecards.org/cgi-bin/carddisp.pl?gene=$rcpid\" target=\"_top\">GeneCards</a>";
+    }
+
+    if (count($links)) echo implode(" | ", $links);
+    ?>
+
 </div>
 
 <div id="Ligands" class="tabcontent">
@@ -262,9 +288,6 @@ include("header.php");
     </tr>
 
 <?php 
-
-$pairs = all_empirical_pairs_for_receptor($rcpid);
-// die("<pre>".print_r($pairs,true));
 
 $refs = [];
 foreach ($pairs as $oid => $pair)

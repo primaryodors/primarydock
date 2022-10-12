@@ -911,6 +911,14 @@
                     "type": "na"
                 }
             },
+            "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
+            {
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.19"
+                }
+            },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
                 "OR2W1":
@@ -1121,6 +1129,14 @@
         },
         "activity":
         {
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "5"
+                }
+            },
             "https:\/\/www.oncotarget.com\/article\/13836\/text\/":
             {
                 "OR51E2":
@@ -2133,6 +2149,13 @@
                     "adjusted_curve_top": "10"
                 }
             },
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "na"
+                }
+            },
             "https:\/\/chemistry-europe.onlinelibrary.wiley.com\/doi\/10.1002\/cplu.201300008":
             {
                 "OR4D1":
@@ -2663,6 +2686,21 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/www.mdpi.com\/1422-0067\/22\/21\/11546":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-5",
+                    "adjusted_curve_top": "16"
+                },
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-5.9",
+                    "adjusted_curve_top": "24"
+                }
             }
         }
     },
@@ -2862,6 +2900,13 @@
         },
         "activity":
         {
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
+                }
+            },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
             {
                 "OR10A6":
@@ -3357,6 +3402,14 @@
                     "ec50": "-3"
                 }
             },
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "7"
+                }
+            },
             "https:\/\/www.oncotarget.com\/article\/13836\/text\/":
             {
                 "OR51E2":
@@ -3399,6 +3452,14 @@
                 {
                     "type": "na",
                     "antagonist": "1"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5999999046326"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -3584,6 +3645,21 @@
     {
         "full_name": "bis(methylthiomethyl) disulfide",
         "smiles": "CSCSSCSC"
+    },
+    "78568ba2fad53e6fa2b2308b554fa2f5":
+    {
+        "full_name": "1,4-bis(4-vinylphenoxy)butane",
+        "smiles": "C=CC1=CC=C(C=C1)OCCCCOC2=CC=C(C=C2)C=C",
+        "activity":
+        {
+            "https:\/\/www.mdpi.com\/1422-0067\/22\/21\/11546":
+            {
+                "OR2W1":
+                {
+                    "type": "na"
+                }
+            }
+        }
     },
     "0cc62755633ce44c35247602a9ea892d":
     {
@@ -5362,8 +5438,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "8.5"
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
                 },
                 "VN1R3":
                 {
@@ -5394,6 +5470,17 @@
                 "spearmint",
                 "spicy"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                }
+            }
         }
     },
     "a3229d0c17fdce0c53dc5f6fa8207690":
@@ -5817,6 +5904,29 @@
                 {
                     "type": "ma",
                     "ec50": "-4"
+                }
+            },
+            "https:\/\/sensors.myu-group.co.jp\/sm_pdf\/SM2756.pdf":
+            {
+                "OR10A5":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "7.5"
+                },
+                "OR2J2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "5"
+                },
+                "OR2J3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                },
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
                 }
             }
         }
@@ -6644,6 +6754,14 @@
                 "OR1A2":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.3000001907349"
                 }
             }
         }
@@ -8387,8 +8505,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "9.5"
+                    "type": "wa",
+                    "adjusted_curve_top": "0.80000001192093"
                 },
                 "VN1R3":
                 {
@@ -8399,6 +8517,14 @@
                 {
                     "type": "sa",
                     "adjusted_curve_top": "8"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.80000001192093"
                 }
             },
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
@@ -10061,6 +10187,15 @@
                     "adjusted_curve_top": "0.30000001192093"
                 }
             },
+            "https:\/\/www.mdpi.com\/1422-0067\/22\/21\/11546":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.5",
+                    "adjusted_curve_top": "10"
+                }
+            },
             "https:\/\/doi.org\/10.1093\/chemse\/bjw117":
             {
                 "OR1A1":
@@ -10735,6 +10870,34 @@
             ]
         }
     },
+    "e6593305cecf217bbf4c9b7c48d9faa4":
+    {
+        "full_name": "2-ethoxynaphthalene",
+        "smiles": "CCOC1=CC2=CC=CC=C2C=C1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "naphthyl",
+                "floral",
+                "orangeflower",
+                "powdery",
+                "grape"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.mdpi.com\/1422-0067\/22\/21\/11546":
+            {
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "ec50": "-5.7",
+                    "adjusted_curve_top": "14"
+                }
+            }
+        }
+    },
     "77e9a6b6cd74acc372c5cba6a80be17e":
     {
         "full_name": "2-ethoxythiazole",
@@ -10754,6 +10917,23 @@
                 "rubbery",
                 "vegetable"
             ]
+        }
+    },
+    "ca835932a2997e2a50d8e46ac98b8bd7":
+    {
+        "full_name": "ethyl 2-(3-bromophenyl)acetate",
+        "smiles": "CCOC(=O)CC1=CC(=CC=C1)Br",
+        "activity":
+        {
+            "https:\/\/www.mdpi.com\/1422-0067\/22\/21\/11546":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.8",
+                    "adjusted_curve_top": "12"
+                }
+            }
         }
     },
     "c04dcd7886d8470706eb2c0365e8c000":
@@ -12033,6 +12213,14 @@
                     "adjusted_curve_top": "9.5"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.4000000953674"
+                }
+            },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
                 "OR10G3":
@@ -12086,6 +12274,13 @@
                 {
                     "type": "vwa",
                     "adjusted_curve_top": "0.30000001192093"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -12302,6 +12497,14 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.0999999046326"
                 }
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
@@ -13606,6 +13809,14 @@
                     "type": "na"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.5"
+                }
+            },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
             {
                 "OR10A6":
@@ -14235,6 +14446,22 @@
                     "adjusted_curve_top": "1.6243654493148"
                 }
             },
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "24"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                }
+            },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
             {
                 "OR10C1":
@@ -14798,8 +15025,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "8"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.30000001192093"
                 },
                 "VN1R3":
                 {
@@ -14810,6 +15037,14 @@
                 {
                     "type": "sa",
                     "adjusted_curve_top": "8"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.30000001192093"
                 }
             },
             "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
@@ -17387,12 +17622,12 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "rancid",
-                "sour",
                 "acidic",
                 "buttery",
                 "cheesy",
-                "dairy"
+                "dairy",
+                "rancid",
+                "sour"
             ]
         },
         "activity":
@@ -18016,6 +18251,14 @@
                     "type": "na"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.20000000298023"
+                }
+            },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
             {
                 "OR12D2":
@@ -18460,6 +18703,14 @@
                     "ec50": "-5.19"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.7000000476837"
+                }
+            },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
                 "OR3A1":
@@ -18694,6 +18945,14 @@
                     "type": "ma",
                     "ec50": "-4.4",
                     "adjusted_curve_top": "3.8235295712948"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.40000000596046"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -19021,6 +19280,14 @@
                     "type": "na"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.7999999523163"
+                }
+            },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
             {
                 "OR10A6":
@@ -19085,6 +19352,14 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1.0152283906937"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
                 }
             },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
@@ -19531,6 +19806,14 @@
                     "type": "wa",
                     "adjusted_curve_top": "0.91370552741937"
                 }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.2000000476837"
+                }
             }
         }
     },
@@ -19572,6 +19855,19 @@
                 {
                     "type": "ma",
                     "ec50": "-5.14"
+                }
+            },
+            "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
+            {
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.39"
+                },
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.88"
                 }
             }
         }
@@ -19665,6 +19961,15 @@
                     "type": "vsa",
                     "ec50": "-3.4",
                     "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
+            {
+                "OR2M3":
+                {
+                    "type": "ma",
+                    "ec50": "-7.54",
+                    "adjusted_curve_top": "3.7000000476837"
                 }
             }
         }
@@ -21039,6 +21344,52 @@
             }
         }
     },
+    "b34ca7b041c2c7a844406f2d99a49016":
+    {
+        "full_name": "methyl jasmonate",
+        "smiles": "CCC=CCC1C(CCC1=O)CC(=O)OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "jasmin",
+                "floral",
+                "oily",
+                "green",
+                "petal",
+                "greasy",
+                "soft"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "8"
+                }
+            }
+        }
+    },
+    "53f4fbacff56ff295f56487e1e0089f7":
+    {
+        "full_name": "methyl (2-methylphenyl)acetate",
+        "smiles": "CC1=CC=CC=C1CC(=O)OC",
+        "activity":
+        {
+            "https:\/\/www.mdpi.com\/1422-0067\/22\/21\/11546":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.8",
+                    "adjusted_curve_top": "11"
+                }
+            }
+        }
+    },
     "8b7f03b02e5a03396d51797eb90a6251":
     {
         "full_name": "methyl nicotinate",
@@ -22344,8 +22695,16 @@
             {
                 "VN1R1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "7"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
                 }
             }
         }
@@ -22769,6 +23128,15 @@
                 "OR51B4":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "ec50": "-3.2",
+                    "adjusted_curve_top": "2.5999999046326"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -23221,8 +23589,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.10000000149012"
                 },
                 "VN1R3":
                 {
@@ -23238,6 +23606,13 @@
                 {
                     "type": "sa",
                     "adjusted_curve_top": "7"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "na"
                 }
             },
             "https:\/\/doi.org\/10.1093\/chemse\/bjw117":
@@ -24017,8 +24392,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "9"
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
                 },
                 "VN1R3":
                 {
@@ -24029,6 +24404,14 @@
                 {
                     "type": "sa",
                     "adjusted_curve_top": "9"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.neuroimage.2015.03.029":
+            {
+                "VN1R1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
                 }
             },
             "https:\/\/doi.org\/10.1093\/chemse\/bjw117":
@@ -26029,6 +26412,23 @@
             }
         }
     },
+    "b12df1c765c4fee79fb228dc8a4bfec4":
+    {
+        "full_name": "1,10-phenanthroline",
+        "smiles": "c1cc2ccc3cccnc3c2nc1",
+        "activity":
+        {
+            "https:\/\/www.mdpi.com\/1422-0067\/22\/21\/11546":
+            {
+                "OR1A1":
+                {
+                    "type": "ia",
+                    "ec50": "-3.9",
+                    "adjusted_curve_top": "-4"
+                }
+            }
+        }
+    },
     "c4a0dca7577b9cf364c8372b483ccce2":
     {
         "full_name": "phenethyl acetate",
@@ -26549,6 +26949,19 @@
                 {
                     "type": "ma",
                     "ec50": "-5.45"
+                }
+            },
+            "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
+            {
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.69"
+                },
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.42"
                 }
             }
         }
@@ -27608,6 +28021,13 @@
                     "type": "vwa",
                     "adjusted_curve_top": "0.30000001192093"
                 }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -27646,6 +28066,21 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "0.65989842974595"
+                }
+            }
+        }
+    },
+    "0a0944a50d1e3879019f77e548665679":
+    {
+        "full_name": "pyrrolidine",
+        "smiles": "C1CCC[NH ]1",
+        "activity":
+        {
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -28090,6 +28525,14 @@
                     "type": "wa",
                     "ec50": "-3.5",
                     "adjusted_curve_top": "0.52941177277004"
+                }
+            },
+            "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
+            {
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.9"
                 }
             },
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
@@ -29039,6 +29482,14 @@
                     "ec50": "-4.51"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.80000001192093"
+                }
+            },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
             {
                 "OR10A6":
@@ -29856,6 +30307,35 @@
             }
         }
     },
+    "d810d94908f732f0d83e46a0cedaf3a2":
+    {
+        "full_name": "tetramethylpyrazine",
+        "smiles": "CC1=C(N=C(C(=N1)C)C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "nutty",
+                "musty",
+                "chocolate",
+                "coffee",
+                "cocoa",
+                "brown",
+                "lard",
+                "burnt"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "7ae386f9c9ea72e8411dfab07643e94a":
     {
         "full_name": "thiacyclopentadecane-1-oxide",
@@ -30403,6 +30883,15 @@
                     "ec50": "-4.12",
                     "adjusted_curve_top": "10.000000238419"
                 }
+            },
+            "https:\/\/doi.org\/10.3389\/fphys.2021.676907":
+            {
+                "OR2H2":
+                {
+                    "type": "sa",
+                    "ec50": "-4.44",
+                    "adjusted_curve_top": "7"
+                }
             }
         }
     },
@@ -30434,6 +30923,16 @@
                 "prawn",
                 "fishy"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "e34317a434c2051c6117a038efea2051":

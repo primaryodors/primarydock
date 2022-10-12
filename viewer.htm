@@ -1092,7 +1092,8 @@ stage.mouseControls.remove( "scroll-alt" );
 stage.mouseControls.remove( "drag-ctrl-right ");
 stage.mouseControls.remove( "drag-ctrl-left ");
 
-var url = 'http://primaryodors.org/sdf.php';
+var url = getParameterByName('url') ? getParameterByName('url') : 'http://primaryodors.org/sdf.php';
+console.log(url);
 var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
 if (molid != "~")
 {

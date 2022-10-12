@@ -1,0 +1,76 @@
+/* Style the tab */
+.tab 
+{
+    overflow: hidden;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button.tablinks, .tab button.tabstatic
+{
+    background-color: #4e3d6e;
+    color: #ffffff;
+    float: left;
+    border: 0px;
+    border-bottom: 0px;
+    margin-right: 4px;
+    outline: none;
+    cursor: pointer;
+    padding: 6px 13px;
+    transition: 0.3s;
+}
+
+.tab button.tablinks
+{
+    border-radius: 15px 15px 0px 0px;
+}
+
+.tab button.tabstatic
+{
+    border-radius: 5px 5px 0px 0px;
+    border: 2px solid #0055e7;
+    border-bottom: 0px;
+}
+
+/* Change background color of buttons on hover */
+.tab button.tablinks:hover 
+{
+    background-color: #0c73a3;
+}
+
+/* Create an active/current tablink class */
+.tab button.tablinks.active 
+{
+    padding: 8px 13px;
+    
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#1656aa+0,244e82+50,2f4053+100 */
+    background: #1656aa; /* Old browsers */
+    background: -moz-linear-gradient(top,  #1656aa 0%, #244e82 50%, #2f4053 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top,  #1656aa 0%,#244e82 50%,#2f4053 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom,  #1656aa 0%,#244e82 50%,#2f4053 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1656aa', endColorstr='#2f4053',GradientType=0 ); /* IE6-9 */
+}
+
+/* Style the tab content */
+.tabcontent 
+{
+    display: none;
+    padding: 6px 12px;
+    border: none;
+    border-top: none;
+
+    background: #2f4053;
+}
+
+.tabcontent h1, .tabcontent h2, .tabcontent h3, .tabcontent h4
+{
+    margin-top: 0px;
+}
+
+.tabcontent iframe
+{
+    width: 100%;
+    height: 790px;
+    border: 0px;
+    margin: 0px;
+    padding: 0px;
+}

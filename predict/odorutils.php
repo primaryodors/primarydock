@@ -159,12 +159,22 @@ function find_odorant($aroma)
 	global $odors;
 	if (!$aroma) return false;
 
-	if (isset($odors[$aroma])) return $odors[$aroma];
+	if (isset($odors[$aroma]))
+	{
+		$retval = $odors[$aroma];
+		$retval['oid'] = $aroma;
+		return $retval;
+	}
 
 	$aroma1 = preg_replace( "/^[a-z0-9]/", "", strtolower($aroma) );
-	foreach ($odors as $o)
+	foreach ($odors as $oid => $o)
 	{
-		if ( $o['smiles'] == $aroma || preg_replace( "/^[a-z0-9]/", "", $o['full_name'] ) == $aroma1 ) return $o;
+		if ( $o['smiles'] == $aroma || preg_replace( "/^[a-z0-9]/", "", $o['full_name'] ) == $aroma1 )
+		{
+			$retval = $o;
+			$retval['oid'] = $oid;
+			return $retval;
+		}
 	}
 	return false;
 }

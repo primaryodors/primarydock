@@ -93,11 +93,55 @@ if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
 }
 
 $page_title = $odor['full_name'];
+$extra_js = ['js/tabs.js'];
+$extra_css = ['assets/tabs.css'];
 
 include("header.php");
 
 ?>
-<h1><?php echo $odor['full_name']; ?></h1>
+<script>
+var viewer_loaded = false;
+function load_viewer(obj)
+{
+    openTab(obj, 'Structure');
+    if (!viewer_loaded)
+    {
+        // $('#viewer')[0].src = 'plzw8.htm';
+        window.setTimeout( function()
+        {
+            $('#viewer')[0].src = '<?php echo "viewer.php?url=sdf.php&mol={$odor['oid']}"; ?>'; 
+        } ,259); 
+        viewer_loaded = true;
+    }
+}
+
+window.setTimeout( function()
+{
+    var boundary = parseInt($(".tab")[0].getClientRects()[0].bottom);
+    $(".tabcontent").css("position", "absolute")
+        .css("top", ""+boundary+"px")
+        .css("left", "41px")
+        .css("right", "0px")
+        .css("bottom", "0px")
+        ;
+
+    $("#tabAroma").click();
+}, 123);
+
+</script>
+<div class="tab" style="display: inline-block; margin-top: 30px;">
+    <button class="tabstatic" id="tabFullName"><?php echo $odor['full_name']; ?></button>
+	<button class="tablinks" id="tabAroma" onclick="openTab(this, 'Aroma');">Notes & Receptors</button>
+	<button	class="tablinks"
+			id="tabStructure"
+			onclick="load_viewer(this);"
+			>3D Structure</button>
+
+
+</div>
+</div>
+
+<div id="Aroma" class="tabcontent">
 
 <div class="scrollw">
     <div>
@@ -197,7 +241,7 @@ foreach (array_keys($sorted) as $rcpid)
     echo "<td>" . $dispec50 = (@$tblec50[$rcpid] ?: "-") . "</td>\n";
     echo "<td>" . $disptop = (@$tbltops[$rcpid] ?: "-") . "</td>\n";
 
-    if ($agonist[$rcpid])
+    if (@$agonist[$rcpid])
         echo "<td>" . substr(get_notes_for_receptor($rcpid, $correlations), 0, 123) . "</td>\n";
     else
         echo "<td>&nbsp;</td>\n";
@@ -207,4 +251,10 @@ foreach (array_keys($sorted) as $rcpid)
 
 ?>
 </table>
+</div>
+
+</div>
+
+<div id="Structure" class="tabcontent">
+    <iframe id="viewer"></iframe>
 </div>

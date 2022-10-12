@@ -911,6 +911,14 @@
                     "type": "na"
                 }
             },
+            "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
+            {
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.19"
+                }
+            },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
                 "OR2W1":
@@ -2862,6 +2870,13 @@
         },
         "activity":
         {
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
+                }
+            },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
             {
                 "OR10A6":
@@ -3399,6 +3414,14 @@
                 {
                     "type": "na",
                     "antagonist": "1"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5999999046326"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -5818,6 +5841,29 @@
                     "type": "ma",
                     "ec50": "-4"
                 }
+            },
+            "https:\/\/sensors.myu-group.co.jp\/sm_pdf\/SM2756.pdf":
+            {
+                "OR10A5":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "7.5"
+                },
+                "OR2J2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "5"
+                },
+                "OR2J3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                },
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                }
             }
         }
     },
@@ -6644,6 +6690,14 @@
                 "OR1A2":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.3000001907349"
                 }
             }
         }
@@ -10772,11 +10826,11 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "juicy",
+                "pineapple",
                 "cognac",
                 "fruit",
-                "fruity",
-                "juicy",
-                "pineapple"
+                "fruity"
             ]
         },
         "activity":
@@ -12033,6 +12087,14 @@
                     "adjusted_curve_top": "9.5"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.4000000953674"
+                }
+            },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
                 "OR10G3":
@@ -12086,6 +12148,13 @@
                 {
                     "type": "vwa",
                     "adjusted_curve_top": "0.30000001192093"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -12302,6 +12371,14 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.0999999046326"
                 }
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
@@ -13606,6 +13683,14 @@
                     "type": "na"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.5"
+                }
+            },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
             {
                 "OR10A6":
@@ -14233,6 +14318,14 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1.6243654493148"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
                 }
             },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
@@ -17387,12 +17480,12 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "rancid",
-                "sour",
                 "acidic",
                 "buttery",
                 "cheesy",
-                "dairy"
+                "dairy",
+                "rancid",
+                "sour"
             ]
         },
         "activity":
@@ -18016,6 +18109,14 @@
                     "type": "na"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.20000000298023"
+                }
+            },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
             {
                 "OR12D2":
@@ -18460,6 +18561,14 @@
                     "ec50": "-5.19"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.7000000476837"
+                }
+            },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
             {
                 "OR3A1":
@@ -18694,6 +18803,14 @@
                     "type": "ma",
                     "ec50": "-4.4",
                     "adjusted_curve_top": "3.8235295712948"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.40000000596046"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -19021,6 +19138,14 @@
                     "type": "na"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.7999999523163"
+                }
+            },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
             {
                 "OR10A6":
@@ -19085,6 +19210,14 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1.0152283906937"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
                 }
             },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
@@ -19531,6 +19664,14 @@
                     "type": "wa",
                     "adjusted_curve_top": "0.91370552741937"
                 }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.2000000476837"
+                }
             }
         }
     },
@@ -19572,6 +19713,19 @@
                 {
                     "type": "ma",
                     "ec50": "-5.14"
+                }
+            },
+            "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
+            {
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.39"
+                },
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.88"
                 }
             }
         }
@@ -19665,6 +19819,15 @@
                     "type": "vsa",
                     "ec50": "-3.4",
                     "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
+            {
+                "OR2M3":
+                {
+                    "type": "ma",
+                    "ec50": "-7.54",
+                    "adjusted_curve_top": "3.7000000476837"
                 }
             }
         }
@@ -22769,6 +22932,15 @@
                 "OR51B4":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "ma",
+                    "ec50": "-3.2",
+                    "adjusted_curve_top": "2.5999999046326"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -26550,6 +26722,19 @@
                     "type": "ma",
                     "ec50": "-5.45"
                 }
+            },
+            "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
+            {
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.69"
+                },
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.42"
+                }
             }
         }
     },
@@ -27608,6 +27793,13 @@
                     "type": "vwa",
                     "adjusted_curve_top": "0.30000001192093"
                 }
+            },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -27646,6 +27838,21 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "0.65989842974595"
+                }
+            }
+        }
+    },
+    "0a0944a50d1e3879019f77e548665679":
+    {
+        "full_name": "pyrrolidine",
+        "smiles": "C1CCC[NH ]1",
+        "activity":
+        {
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -28090,6 +28297,14 @@
                     "type": "wa",
                     "ec50": "-3.5",
                     "adjusted_curve_top": "0.52941177277004"
+                }
+            },
+            "https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC7256108\/":
+            {
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.9"
                 }
             },
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
@@ -29039,6 +29254,14 @@
                     "ec50": "-4.51"
                 }
             },
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.80000001192093"
+                }
+            },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
             {
                 "OR10A6":
@@ -29856,6 +30079,35 @@
             }
         }
     },
+    "d810d94908f732f0d83e46a0cedaf3a2":
+    {
+        "full_name": "tetramethylpyrazine",
+        "smiles": "CC1=C(N=C(C(=N1)C)C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "nutty",
+                "musty",
+                "chocolate",
+                "coffee",
+                "cocoa",
+                "brown",
+                "lard",
+                "burnt"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "7ae386f9c9ea72e8411dfab07643e94a":
     {
         "full_name": "thiacyclopentadecane-1-oxide",
@@ -30434,6 +30686,16 @@
                 "prawn",
                 "fishy"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
+            {
+                "OR2W3":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "e34317a434c2051c6117a038efea2051":

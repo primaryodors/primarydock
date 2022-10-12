@@ -21,3 +21,8 @@ function openTab(ctl, tabName)
     document.getElementById(tabName).style.display = "block";
     ctl.className += " active";
 }
+
+$( document ).ready( function()
+{
+    $(".tablinks.default").click();
+})

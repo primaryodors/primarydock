@@ -118,13 +118,6 @@ function load_viewer(obj)
 window.setTimeout( function()
 {
     var boundary = parseInt($(".tab")[0].getClientRects()[0].bottom);
-    $(".tabcontent").css("position", "absolute")
-        .css("top", ""+boundary+"px")
-        .css("left", "41px")
-        .css("right", "0px")
-        .css("bottom", "0px")
-        ;
-
     $("#tabAroma").click();
 }, 123);
 
@@ -136,9 +129,6 @@ window.setTimeout( function()
 			id="tabStructure"
 			onclick="load_viewer(this);"
 			>3D Structure</button>
-
-
-</div>
 </div>
 
 <div id="Aroma" class="tabcontent">

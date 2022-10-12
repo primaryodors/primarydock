@@ -78,7 +78,7 @@ include("header.php");
             $bold=1;
         }
 
-        if (($i+1) == $receptor['bw']["$nxtmr.50"]) 
+        if (($i+1) == resno_from_bw($rcpid, "$nxtmr.50")) // $receptor['bw']["$nxtmr.50"]) 
         $lets .= "<span style=\"background-color: #ddd; color: #000;\">".substr($seq,$i,1)."</span>";
         else
         $lets .= substr($seq,$i,1);
@@ -204,12 +204,12 @@ include("header.php");
                     // $col = aacolor($ch);
                     echo "<span ";
                     
-                    $bw = $rc[$tmr] + 50 - $receptor['bw']["$tmr.50"];
+                    $bw = bw_from_resno($rcpid, $rc[$tmr]); // $rc[$tmr] + 50 - $receptor['bw']["$tmr.50"];
                     
-                    if ($ch != ' ') echo "title=\"$tmr.$bw {$aminos[$ch]}{$rc[$tmr]}\" ";
+                    if ($ch != ' ') echo "title=\"$bw {$aminos[$ch]}{$rc[$tmr]}\" ";
                     echo "style=\"";
 
-                    if (isset($bsr["$tmr.$bw"]))
+                    if (isset($bsr["$bw"]))
                     {
                         if ($ch == 'F' || $ch == 'W' || $ch == 'Y') echo "background-color: #c9f; ";
                         if ($ch == 'S' || $ch == 'T' || $ch == 'N' || $ch == 'C' || $ch == 'Q' || $ch == 'Y') echo "color: #066; ";

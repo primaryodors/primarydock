@@ -66,7 +66,7 @@ function all_empirical_pairs_for_receptor($protein)
 	
 	foreach ($odors as $oid => $o)
 	{
-		foreach ($o['activity'] as $ref => $acv)
+		if (isset($o['activity'])) foreach ($o['activity'] as $ref => $acv)
 		{
 			if (isset($acv[$protein]))
 			{

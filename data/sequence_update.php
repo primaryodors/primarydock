@@ -54,7 +54,7 @@ foreach ($lines as $i => $ln)
             $lk = $k;
 		    $j  = strpos($ln, 'TMR', $k);
 		    if (!$j)
-		    {	
+		    {
                 $j = strlen($ln)+100;
 			    $rgns[$rgidx]  = [$lk, $j-1, $rgnames[$rgidx]];
 			    break;

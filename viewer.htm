@@ -1110,7 +1110,7 @@ if (protid)
 		success: function(result)
 		{
 			var lines = result.split("\n");
-			$('#posey')[0].innerText = protid;
+			$('#posey').hide();
 
 			for (i=0; i<lines.length; i++)
             {
@@ -1127,18 +1127,7 @@ if (protid)
 				}
 			}
 
-			var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
-		    stage.loadFile( stringBlob, { ext: "pdb" } ).then( function( comp )
-		    {
-		        comp.addRepresentation( "cartoon",
-		        {
-                	opacity: opc_cartoon,
-					colorScheme: PODefRgnScheme,
-		        	metalness: mtl_bs,
-		        } );
-		        gmodel.push(comp);
-		        comp.autoView();
-		    } );
+			loadFile(result, protid+'.pdb');
 		}
 	});
 }
@@ -1154,6 +1143,7 @@ else if (molid != "~")
 		},
 		success: function(result)
 		{
+			$('#posey').show();
 			$('#posey')[0].innerText = result.split("\n")[0];
 			var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
 		    stage.loadFile( stringBlob, { ext: "sdf" } ).then( function( comp )
@@ -1552,17 +1542,6 @@ function loadFile(fileData, fileName = "")
                         var ln = lines[i];
                         var resno = parseInt(ln.substr(22,4));
 
-						if (ln.substr(0, 6) == 'REMARK')
-						{
-							var pieces = ln.split(" ");
-							if (pieces[2] == 'HELIX' && pieces[3].substr(0,3) == 'TMR')
-							{
-								var tmrno = parseInt(pieces[3].substr(-1));
-								tmstart[tmrno] = parseInt(pieces[4]);
-								tmend[tmrno] = parseInt(pieces[5]);
-							}
-						}
-                        
                         if (lres != resno)
                         {
                         	if (ln.length > 20)
@@ -1604,7 +1583,8 @@ function loadFile(fileData, fileName = "")
                 
                 if (fext == 'sdf')
                 {
-                	$('#posey')[0].innerText = fileData.split("\n")[0];
+                	$('#posey').show();
+					$('#posey')[0].innerText = fileData.split("\n")[0];
             	}
                 
                 var stringBlob = new Blob( [ fileData ], { type: 'text/plain'} );
@@ -1658,7 +1638,7 @@ function loadFile(fileData, fileName = "")
                                ) subset.push(ln);
                             if (ln.substr(17,3) == "MTL") shiny.push(ln);
                         }
-                        var stringBlob1 = new Blob( [ subset.join("\n") ], { type: 'text/plain'} );
+                        /*var stringBlob1 = new Blob( [ subset.join("\n") ], { type: 'text/plain'} );
                         stage.loadFile( stringBlob1, { ext: 'pdb' } ).then( function( comp1 )
                         {
                             comp1.addRepresentation( "licorice",
@@ -1668,7 +1648,7 @@ function loadFile(fileData, fileName = "")
                                 metalness: mtl_licorice,
                             });
                             gmodel.push(comp1);
-                        });
+                        });*/
                         var stringBlob2 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
                         stage.loadFile( stringBlob2, { ext: 'pdb' } ).then( function( comp2 )
                         {
@@ -1912,6 +1892,7 @@ function loadFile(fileData, fileName = "")
 		            });		// end orpdb ajax.
 	            }		// end if orid.
 
+				$('#posey').show();
                 var posey = $('#posey')[0];
                 var i, writing=false, p=0, n=0;
                 var protmp = "", ligtmp = "";

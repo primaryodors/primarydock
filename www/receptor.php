@@ -55,6 +55,22 @@ function load_viewer(obj)
                 var filediv = $("#filediv", embdd.contentDocument)[0];
 
                 filediv.innerText = "<?php echo @$rcpid; ?>";
+
+                window.setTimeout( function()
+                {
+                    <?php
+                    $tmo = 81;
+                    foreach (array_keys($bsr) as $bw)
+                    {
+                        $resno = resno_from_bw($rcpid, $bw);
+                        echo "window.setTimeout( function()\n";
+                        echo "{\n";
+                        echo "embdd.contentWindow.showSideChain($resno);\n";
+                        echo "}, $tmo);\n";
+                        $tmo += 53;
+                    }
+                    ?>
+                }, 1234);
             });
             $('#viewer')[0].src = '<?php echo "viewer.php?url=pdb.php&prot=$rcpid"; ?>'; 
         }, 259); 

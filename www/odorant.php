@@ -109,8 +109,16 @@ function load_viewer(obj)
         // $('#viewer')[0].src = 'plzw8.htm';
         window.setTimeout( function()
         {
+            $('#viewer').on('load', function()
+            {
+                var embdd = $('#viewer')[0];
+                $("[type=file]", embdd.contentDocument).hide();
+                var filediv = $("#filediv", embdd.contentDocument)[0];
+                
+                filediv.innerText = "<?php echo @$odrow['full_name']; ?>";
+            });
             $('#viewer')[0].src = '<?php echo "viewer.php?url=sdf.php&mol={$odor['oid']}"; ?>'; 
-        } ,259); 
+        }, 259); 
         viewer_loaded = true;
     }
 }

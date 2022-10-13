@@ -78,7 +78,12 @@ function bw_from_resno($protid, $resno)
 
 				return "$tmrno.$offset";
 			}
-			else if ($tmrno > 1 && ($tmrno == 7 || ($resno < @$prot['region']['TMR'.($tmrno+1)]['start']) ) )
+			else if ($tmrno > 1
+					 &&
+					 $resno < $se['start']
+					 &&
+					 $resno > @$prot['region']['TMR'.($tmrno-1)]['end'] 
+					)
 			{
 				$tmr_1 = $tmrno-1;
 				if (isset($prot['bw']["{$tmr_1}{$tmrno}.50"]))
@@ -96,7 +101,7 @@ function bw_from_resno($protid, $resno)
 		}
 	}
 
-	return 0;
+	return "-";
 }
 
 function family_from_protid($protid)

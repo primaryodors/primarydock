@@ -130,7 +130,16 @@ function median($arr)
     }
 }
 
-
+function find_angle($dx, $dy)
+{
+    $d = sqrt(pow($dx,2)+pow($dy,2)); if ($d == 0) return 0;		// undefined
+	$dx /= $d;
+	$dy /= $d;
+	$as = asin($dx);
+	$ac = acos(-$dy);
+	if ($as > 0) return $ac;
+	else return pi()*2-$ac;
+}
 
 
 

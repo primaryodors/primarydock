@@ -2,6 +2,7 @@
 chdir(__DIR__);
 require_once("../predict/protutils.php");
 require_once("../predict/odorutils.php");
+require_once("../predict/statistics.php");
 
 $rcpid = @$_REQUEST['r'];
 if (!$rcpid)
@@ -16,6 +17,18 @@ if (!$receptor)
     header("Location: receptors.php");
     exit;
 }
+
+// Binding site residues from https://doi.org/10.1110%2Fps.03296404
+$bsr = array_flip(
+    [
+        "2.53",
+        "3.29", "3.32", "3.33", "3.36", "3.37", "3.40", "3.41",
+        "4.53", "4.57", "4.60",
+        "45.49", "45.52",
+        "5.39", "5.42", "5.43", "5.46", "5.47",
+        "6.48", "6.51",
+        "7.38", "7.39", "7.42",
+    ]);
 
 $page_title = $rcpid;
 $extra_js = ['js/tabs.js'];
@@ -111,6 +124,28 @@ include("header.php");
     </pre>
 
     <?php
+
+    $tmrstartoff = [];
+    for ($i=1; $i<=7; $i++)
+    {
+        $x = $y = 0.0;
+        foreach (array_keys($bsr) as $l => $bw)
+        {
+            if (substr($bw, 0, 2) == "$i.")
+            {
+                $resno = resno_from_bw($rcpid, $bw);
+                $offset = $resno - intval($receptor['region']["TMR$i"]['start']);
+                $angle = (pi()*4 / 7 * $offset) % (pi()*2);
+                $x += sin($angle);
+                $y += cos($angle);
+            }
+        }
+        $angle = find_angle($x, $y);
+        $tmrstartoff[$i] = intval(round($angle * 7 / (pi()*4)));
+    }
+
+    $tmrstartoff[6]++;
+
     $rgntext = [];
     foreach ($receptor['region'] as $rgn => $r)
     {
@@ -120,24 +155,25 @@ include("header.php");
         if (substr($rgn,0,3) == 'TMR')
         {
             $tmr = intval(substr($rgn,-1));
+            $tso = -$tmrstartoff[$tmr];
             for ($i=$st; $i<=$end; $i=$j)
             { 
                 $j = $i + 4;
                 if ($j > $end) 
                 { 
-                    $rgntext[$rgn][] = str_pad(substr($seq, $i-1, $end-$i+1), 4, ' ', STR_PAD_RIGHT);
+                    $rgntext[$rgn][] = str_pad(substr($seq, $i-1+$tso, $end-$i+1), 4, ' ', STR_PAD_RIGHT);
                     break;
                 }
-                else $rgntext[$rgn][] = substr($seq, $i-1, $j-$i);
-            
+                else $rgntext[$rgn][] = substr($seq, $i-1+$tso, $j-$i);
+
                 $i = $j;
                 $j = $i + 3;
                 if ($j > $end) 
                 { 
-                    $rgntext[$rgn][] = str_pad(substr($seq, $i-1, $end-$i+1), 3, ' ', STR_PAD_RIGHT);
+                    $rgntext[$rgn][] = str_pad(substr($seq, $i-1+$tso, $end-$i+1), 3, ' ', STR_PAD_RIGHT);
                     break;
                 }
-                else $rgntext[$rgn][] = substr($seq, $i-1, $j-$i);
+                else $rgntext[$rgn][] = substr($seq, $i-1+$tso, $j-$i);
             }
             
             if (!($tmr & 1))
@@ -149,24 +185,10 @@ include("header.php");
         else $rgntext[$rgn][] = substr($seq, $st-1, $end-$st+1);
     }
 
-    // Binding site residues from https://doi.org/10.1110%2Fps.03296404
-    $bsr = array_flip(
-    [
-        "2.53",
-        "3.29", "3.32", "3.33", "3.36", "3.37", "3.40", "3.41",
-        "4.53", "4.57", "4.60",
-        "45.49", "45.52",
-        "5.39", "5.42", "5.43", "5.46", "5.47",
-        "6.48", "6.51",
-        "7.38", "7.39", "7.42",
-    ]);
-
-    echo "<!-- ".print_r($bsr, true)." -->\n";
-
     ?>
 
     <h3>Transmembane Helices:</h3>
-    <pre style="backgroumnd-color: #def; padding: 5px;"><?php 
+    <pre style="padding: 5px;"><?php 
     $mxrt = 0; 
     foreach ($rgntext as $rgn => $text) if (substr($rgn,0,3) == 'TMR') 
     { 
@@ -189,6 +211,8 @@ include("header.php");
         6 =>  intval($receptor['region']['TMR6']['end']),
         7 =>  intval($receptor['region']['TMR7']['start']),
     ];
+
+    for ($i=1; $i<=7; $i++) $rc[$i] -= $tmrstartoff[$i];
 
     echo "<!-- ".print_r($rc, true)." -->\n";
 

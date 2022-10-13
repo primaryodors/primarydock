@@ -106,7 +106,6 @@ function load_viewer(obj)
     openTab(obj, 'Structure');
     if (!viewer_loaded)
     {
-        // $('#viewer')[0].src = 'plzw8.htm';
         window.setTimeout( function()
         {
             $('#viewer').on('load', function()

@@ -39,12 +39,37 @@ $pairs = all_empirical_pairs_for_receptor($rcpid);
 include("header.php");
 
 ?>
+<script>
+var viewer_loaded = false;
+function load_viewer(obj)
+{
+    openTab(obj, 'Structure');
+    if (!viewer_loaded)
+    {
+        window.setTimeout( function()
+        {
+            $('#viewer').on('load', function()
+            {
+                var embdd = $('#viewer')[0];
+                $("[type=file]", embdd.contentDocument).hide();
+                var filediv = $("#filediv", embdd.contentDocument)[0];
+
+                filediv.innerText = "<?php echo @$rcpid; ?>";
+            });
+            $('#viewer')[0].src = '<?php echo "viewer.php?url=pdb.php&prot=$rcpid"; ?>'; 
+        }, 259); 
+        viewer_loaded = true;
+    }
+}
+</script>
+
 <div class="tab" style="display: inline-block; margin-top: 30px;">
     <button class="tabstatic" id="tabGene"><?php echo $rcpid; ?></button>
 	<button class="tablinks <?php if (!count($pairs)) echo "default"; ?>" id="tabInfo" onclick="openTab(this, 'Info');">Info</button>
     <?php if (count($pairs)) { ?>
     <button class="tablinks default" id="tabLigands" onclick="openTab(this, 'Ligands');">Ligands</button>
     <?php } ?>
+    <button class="tablinks" id="tabStructure" onclick="load_viewer(this);">3D Structure</button>
 </div>
 
 <div id="Info" class="tabcontent">
@@ -351,3 +376,13 @@ foreach ($pairs as $oid => $pair)
     echo "<td>" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";
 }
+
+?>
+</table>
+</div>
+</div>
+
+
+<div id="Structure" class="tabcontent">
+    <iframe id="viewer"></iframe>
+</div>

@@ -1095,7 +1095,54 @@ stage.mouseControls.remove( "drag-ctrl-left ");
 var url = getParameterByName('url') ? getParameterByName('url') : 'http://primaryodors.org/sdf.php';
 console.log(url);
 var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
-if (molid != "~")
+var protid = getParameterByName('prot') ? getParameterByName('prot') : false;
+
+if (protid)
+{
+	$.ajax(
+	{
+		url: url,
+		cache: false,
+		data:
+		{
+			p: protid
+		},
+		success: function(result)
+		{
+			var lines = result.split("\n");
+			$('#posey')[0].innerText = protid;
+
+			for (i=0; i<lines.length; i++)
+            {
+                var ln = lines[i];
+				if (ln.substr(0, 6) == 'REMARK')
+				{
+					var pieces = ln.split(" ");
+					if (pieces[2] == 'HELIX' && pieces[3].substr(0,3) == 'TMR')
+					{
+						var tmrno = parseInt(pieces[3].substr(-1));
+						tmstart[tmrno] = parseInt(pieces[4]);
+						tmend[tmrno] = parseInt(pieces[5]);
+					}
+				}
+			}
+
+			var stringBlob = new Blob( [ result ], { type: 'text/plain'} );
+		    stage.loadFile( stringBlob, { ext: "pdb" } ).then( function( comp )
+		    {
+		        comp.addRepresentation( "cartoon",
+		        {
+                	opacity: opc_cartoon,
+					colorScheme: PODefRgnScheme,
+		        	metalness: mtl_bs,
+		        } );
+		        gmodel.push(comp);
+		        comp.autoView();
+		    } );
+		}
+	});
+}
+else if (molid != "~")
 {
 	$.ajax(
 	{
@@ -1504,6 +1551,17 @@ function loadFile(fileData, fileName = "")
                     {
                         var ln = lines[i];
                         var resno = parseInt(ln.substr(22,4));
+
+						if (ln.substr(0, 6) == 'REMARK')
+						{
+							var pieces = ln.split(" ");
+							if (pieces[2] == 'HELIX' && pieces[3].substr(0,3) == 'TMR')
+							{
+								var tmrno = parseInt(pieces[3].substr(-1));
+								tmstart[tmrno] = parseInt(pieces[4]);
+								tmend[tmrno] = parseInt(pieces[5]);
+							}
+						}
                         
                         if (lres != resno)
                         {

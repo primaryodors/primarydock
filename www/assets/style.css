@@ -226,3 +226,11 @@ a[href]:hover
     float: none!important;
     display: inline!important;
 }
+
+#protseq
+{
+    background-color: #142030;
+    color: #82769b;
+    width: fit-content;
+    padding: 8px;
+}

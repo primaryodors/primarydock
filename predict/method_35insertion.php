@@ -78,8 +78,8 @@ if (@$_REQUEST['next'])
 }
 else
 {
-	$protid = @$_REQUEST['prot'] ?: "TAAR5";
-	$ligname = @$_REQUEST['lig'] ?: "trimethylamine";
+	$protid = @$_REQUEST['prot'] ?: "OR11A1";
+	$ligname = @$_REQUEST['lig'] ?: "2-ethyl_fenchol";
 }
 
 ensure_sdf_exists($ligname);
@@ -88,6 +88,7 @@ echo "Beginning dock of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);
 $nodeno = 0;
 $paths = [];
+$acvbrots = "";
 
 switch ($fam)
 {
@@ -113,8 +114,7 @@ switch ($fam)
 	$cenres = "CEN RES $pkt1 $pkt2 $pkt3 $pkt4";
 	$pocketnode = $nodeno;
     $nodeno++;
-    $paths[$nodeno] = "PATH $activenode RES $ins1 $ins2 $ins3";
-
+    $paths[$nodeno] = "PATH $nodeno RES $ins1 $ins2 $ins3";
 }
 
 $activenode = $pocketnode + 1;

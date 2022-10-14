@@ -78,8 +78,8 @@ if (@$_REQUEST['next'])
 }
 else
 {
-	$protid = @$_REQUEST['prot'] ?: "OR11A1";
-	$ligname = @$_REQUEST['lig'] ?: "2-ethyl_fenchol";
+	$protid = @$_REQUEST['prot'] ?: "OR1A2";
+	$ligname = @$_REQUEST['lig'] ?: "geraniol";
 }
 
 ensure_sdf_exists($ligname);
@@ -107,14 +107,15 @@ switch ($fam)
     $pkt3 = resno_from_bw($protid, "4.60");
     $pkt4 = resno_from_bw($protid, "6.48");
 
-    $ins1 = resno_from_bw($protid, "3.36");
-    $ins2 = resno_from_bw($protid, "4.60");
-    $ins3 = resno_from_bw($protid, "5.46");
+	$ins1 = resno_from_bw($protid, "3.29");
+    $ins2 = resno_from_bw($protid, "3.37");
+    $ins3 = resno_from_bw($protid, "4.60");
+    $ins4 = resno_from_bw($protid, "5.46");
 	
 	$cenres = "CEN RES $pkt1 $pkt2 $pkt3 $pkt4";
 	$pocketnode = $nodeno;
     $nodeno++;
-    $paths[$nodeno] = "PATH $nodeno RES $ins1 $ins2 $ins3";
+    $paths[$nodeno] = "PATH $nodeno RES $ins1 $ins2 $ins3 $ins4";
 }
 
 $activenode = $pocketnode + 1;
@@ -135,6 +136,15 @@ foreach ($rotations as $region => $values)
 	$lregion = substr($region,0,4);
 	$sr = $prots[$protid]['region'][$lregion]['start'];
 	$er = $prots[$protid]['region'][$lregion]['end'];
+
+    if ($lregion == "TMR5")
+    {
+        $xformmult = 1.5;
+        $values[0] *= $xformmult;
+        $values[1] *= $xformmult;
+        $values[2] *= $xformmult;
+        $values[6] *= 1.5;
+    }
 
 	switch($lregion)
 	{
@@ -180,8 +190,8 @@ $acvbrots
 
 SIZE 7.0 7.5 7.0
 
-POSE 2
-ITER 20
+POSE 10
+ITER 200
 
 # DIFF
 ELIM 50
@@ -209,7 +219,7 @@ else
 {
 	for ($try = 0; $try < $dock_retries; $try++)
 	{
-		set_time_limit(300);
+		// set_time_limit(86400);
 		$outlines = [];
 		passthru("bin/primarydock tmp/prediction.config");
 		$outlines = explode("\n", file_get_contents($outfname));

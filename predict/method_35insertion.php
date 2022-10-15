@@ -55,6 +55,8 @@ if (@$_REQUEST['next'])
 			{
 				if (!isset($dock_results[$rcpid][$full_name]))
 				{
+					$fam = family_from_protid($rcpid);
+					if (file_exists("output/$fam/$rcpid/$rcpid-$full_name.pred.dock")) continue;
 					if ($protid && $protid != $rcpid) continue;
 					
 					if ($skip)

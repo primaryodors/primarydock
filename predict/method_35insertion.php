@@ -26,6 +26,7 @@ $json_file = "predict/dock_results.json";
 if (file_exists($json_file))
 {
 	$dock_results = json_decode(file_get_contents($json_file), true);
+	shuffle($dock_results);
 }
 
 foreach (@$argv as $a)

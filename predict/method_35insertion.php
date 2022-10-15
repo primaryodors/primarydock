@@ -21,12 +21,13 @@ $max_simultaneous_docks = 4;	// If running this script as a cron, we recommend s
 
 // Load data
 $dock_results = [];
+chdir(__DIR__);
+chdir("..");
 $json_file = "predict/dock_results.json";
 
 if (file_exists($json_file))
 {
 	$dock_results = json_decode(file_get_contents($json_file), true);
-	shuffle($dock_results);
 }
 
 foreach (@$argv as $a)
@@ -44,6 +45,8 @@ if (@$_REQUEST['next'])
 	
 	$protid = @$_REQUEST['prot'] ?: false;
 	$ligname = @$_REQUEST['lig'] ?: false;
+	
+	shuffle($odors);
 	
 	foreach ($odors as $o)
 	{

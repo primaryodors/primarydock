@@ -9,7 +9,7 @@ if ($extra_js  && !is_array($extra_js )) $extra_js  = [$extra_js ];
     <head>
         <title><?php echo @$page_title ?: "PrimaryDock Web App"; ?></title>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <link rel="stylesheet" href="assets/style.css">
+        <link rel="stylesheet" href="assets/style.css?<?php echo time();?>">
 
         <?php 
         if ($extra_js)

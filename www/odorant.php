@@ -235,11 +235,11 @@ foreach (array_keys($sorted) as $rcpid)
     echo "<tr>\n";
     echo "<td><a href=\"receptor.php?r=$rcpid\">$rcpid</a></td>\n";
 
-    echo "<td>" . $dispec50 = (@$tblec50[$rcpid] ?: "-") . "</td>\n";
-    echo "<td>" . $disptop = (@$tbltops[$rcpid] ?: "-") . "</td>\n";
+    echo "<td style=\"white-space: nowrap;\">" . $dispec50 = (@$tblec50[$rcpid] ?: "-") . "</td>\n";
+    echo "<td style=\"white-space: nowrap;\">" . $disptop = (@$tbltops[$rcpid] ?: "-") . "</td>\n";
 
     if (@$agonist[$rcpid])
-        echo "<td>" . substr(get_notes_for_receptor($rcpid, $correlations), 0, 123) . "</td>\n";
+        echo "<td style=\"white-space: nowrap;\">" . substr(get_notes_for_receptor($rcpid, $correlations), 0, 123) . "</td>\n";
     else
         echo "<td>&nbsp;</td>\n";
 

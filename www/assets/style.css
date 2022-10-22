@@ -45,6 +45,12 @@ a[href]:hover
     text-decoration: underline;
 }
 
+p
+{
+    font-family: Verdana, Arial, Sans-Serif;
+    font-size: 14px;
+}
+
 #logo
 {
     background-color: #22436d;

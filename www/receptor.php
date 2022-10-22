@@ -30,6 +30,19 @@ $bsr = array_flip(
         "7.38", "7.39", "7.42",
     ]);
 
+// Copper binding sites for e.g. OR2T11
+// http://pubs.acs.org/doi/abs/10.1021/jacs.6b06983
+$cub =
+[
+	"2.39" => "MCHDENQR",
+	"3.46" => "MCHDENQR",
+	"4.37" => "MCHDENQR",
+	"4.39" => "R",
+	"4.42" => "CHMDENQ",
+	"6.37" => "CHMDENQ",
+	"6.40" => "HCMDENQ",
+];
+
 $page_title = $rcpid;
 $extra_js = ['js/tabs.js'];
 $extra_css = ['assets/tabs.css'];
@@ -225,6 +238,30 @@ function load_viewer(obj)
         }
         else $rgntext[$rgn][] = substr($seq, $st-1, $end-$st+1);
     }
+
+$matched = 0;
+$lcub = [];
+foreach ($cub as $bw => $allowed)
+{
+	$res = "<span title=\"$bw\">";
+	$resno = resno_from_bw($rcpid, $bw);
+	$c = substr($seq, $resno-1, 1);
+	if (false !== strpos($allowed, $c))
+	{
+		$matched++;
+		$res .= "<b>$c</b>";
+	}
+	else $res .= $c;
+
+	$res .= "</span>";
+
+	$lcub[] = $res;
+}
+
+echo "<p>$matched residues match deep copper binding site: " . implode(" ",$lcub) . ". ";
+if ($matched == count($cub)) echo "This receptor is likely to respond to thiols that can access deep inside the ligand binding pocket.";
+echo "</p>";
+
 
     ?>
 

@@ -34,13 +34,13 @@ $bsr = array_flip(
 // http://pubs.acs.org/doi/abs/10.1021/jacs.6b06983
 $cub =
 [
-	"2.39",
-	"3.46",
-	"4.37",
-	"4.39",
-	"4.42",
-	"6.37",
-	"6.40",
+	"2.39" => "MCHDENQR",
+	"3.46" => "MCHDENQR",
+	"4.37" => "MCHDENQR",
+	"4.39" => "R",
+	"4.42" => "CHMDENQ",
+	"6.37" => "CHMDENQ",
+	"6.40" => "HCMDENQ",
 ];
 
 $page_title = $rcpid;
@@ -241,16 +241,21 @@ function load_viewer(obj)
 
 $matched = 0;
 $lcub = [];
-foreach ($cub as $bw)
+foreach ($cub as $bw => $allowed)
 {
+	$res = "<span title=\"$bw\">";
 	$resno = resno_from_bw($rcpid, $bw);
 	$c = substr($seq, $resno-1, 1);
-	if (false !== strpos("MCHR", $c)) 
+	if (false !== strpos($allowed, $c))
 	{
 		$matched++;
-		$lcub[] = "<b>$c</b>";
+		$res .= "<b>$c</b>";
 	}
-	else $lcub[] = $c;
+	else $res .= $c;
+
+	$res .= "</span>";
+
+	$lcub[] = $res;
 }
 
 echo "<p>$matched residues match deep copper binding site: " . implode(" ",$lcub) . ". ";

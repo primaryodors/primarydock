@@ -426,7 +426,7 @@ foreach ($pairs as $oid => $pair)
     echo "<td>" . $dispec50 = (@$pair['ec50'] ? ("{$pair['ec50']} <sup><a href=\"{$pair['ec50_ref']}\">$refno_ec50</a></sup>") : "-") . "</td>\n";
     echo "<td>" . $disptop = (@$pair['adjusted_curve_top'] ? (round(@$pair['adjusted_curve_top'], 4) . " <sup><a href=\"{$pair['top_ref']}\">$refno_top</a>") : "-") . "</sup></td>\n";
 
-    echo "<td>" . implode(", ",$pq) . "</td>\n";
+    echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";
 }
 

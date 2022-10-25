@@ -62,6 +62,8 @@ if (@$_REQUEST['next'])
 					$fam = family_from_protid($rcpid);
 					// if (file_exists("output/$fam/$rcpid/$rcpid-$full_name.pred.dock")) continue;
 					if ($protid && $protid != $rcpid) continue;
+					if ($fam == "TAAR") continue;
+					if ($fam == "VN1R") continue;
 					
 					if ($skip)
 					{
@@ -99,11 +101,11 @@ $acvbrots = "";
 switch ($fam)
 {
 	case "TAAR":	
-	die("3/5 insertion is not yet optimized for TAARs.");
+	die("3/5 insertion is not yet optimized for TAARs.\n");
 	break;
 
     case "VN1R":	
-    die("3/5 insertion is not yet optimized for VNRs.");
+    die("3/5 insertion is not yet optimized for VNRs.\n");
     break;
 	
 	default:

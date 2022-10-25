@@ -57,6 +57,54 @@ function best_empirical_pair($protein, $aroma, $as_object = false)
 	}
 }
 
+function empirical_response($protein, $odorobj)
+{
+	global $sepyt;
+	
+	$retval = false;
+	foreach ($odorobj['activity'] as $ref => $acv)
+	{
+		if (isset($acv[$protein]))
+		{
+			if (!$retval) $retval = $acv[$protein];
+			else
+			{
+				if (isset($acv[$protein]['adjusted_curve_top']) && $acv[$protein]['adjusted_curve_top'] > @$retval['adjusted_curve_top'])
+					$retval['adjusted_curve_top'] = $acv[$protein]['adjusted_curve_top'];
+				if (isset($acv[$protein]['ec50']) && $acv[$protein]['ec50'] < @$retval['ec50'])
+					$retval['ec50'] = $acv[$protein]['ec50'];
+				if (isset($acv[$protein]['type']) && isset($retval['type']) && $sepyt[$acv[$protein]['type']] > $sepyt[$retval['type']])
+					$retval['type'] = $acv[$protein]['type'];
+			}
+		}
+	}
+	
+	return $retval;
+}
+
+function is_agonist($response)
+{
+	if (isset($response['adjusted_curve_top']))
+	{
+		if ($response['adjusted_curve_top'] > 0) return 1;
+		else if ($response['adjusted_curve_top'] < 0) return -1;
+		else return 0;
+	}
+	if (isset($response['type']) && $response['type'] != '?')
+	{
+		if ($response['type'] == 'ia') return -1;
+		if ($response['type'] == 'na') return 0;
+		return 1;
+	}
+	if (isset($response['ec50']))
+	{
+		if ($response['ec50'] < 0) return 1;
+		else return 0;
+	}
+	
+	return 0;
+}
+
 function all_empirical_pairs_for_receptor($protein)
 {
 	global $odors;
@@ -130,19 +178,20 @@ function ensure_sdf_exists($ligname)
 	{
 		$full_name = str_replace(" ", "_", $o['full_name']);
 		if ($ligname && $ligname != $full_name) continue;
-
-		if (!file_exists("sdf/$ligname.sdf"))
+		
+		$sdfname = "sdf/$ligname.sdf";
+		if (!file_exists($sdfname) || filesize($sdfname) < 10)
 		{
 			$obresult = [];
 			exec("which obabel", $obresult);
 			if (trim(@$obresult[0]))
 			{
-				exec("obabel -:'{$o['smiles']}' --gen3D -osdf -Osdf/$ligname.sdf");
+				exec("obabel -:'{$o['smiles']}' --gen3D -osdf -O$sdfname");
 			}
 			else
 			{
-				$f = fopen("sdf/$ligname.sdf", "wb");
-				if (!$f) die("Unable to create sdf/$ligname.sdf, please ensure write access.\n");
+				$f = fopen($sdfname, "wb");
+				if (!$f) die("Unable to create $sdfname, please ensure write access.\n");
 				$sdfdat = file_get_contents("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{$o['smiles']}/SDF?record_type=3d");
 				fwrite($f, $sdfdat);
 				fclose($f);
@@ -166,10 +215,10 @@ function find_odorant($aroma)
 		return $retval;
 	}
 
-	$aroma1 = preg_replace( "/^[a-z0-9]/", "", strtolower($aroma) );
+	$aroma1 = preg_replace( "/[^a-z0-9]/", "", strtolower($aroma) );
 	foreach ($odors as $oid => $o)
 	{
-		if ( $o['smiles'] == $aroma || preg_replace( "/^[a-z0-9]/", "", $o['full_name'] ) == $aroma1 )
+		if ( $o['smiles'] == $aroma || preg_replace( "/[^a-z0-9]/", "", $o['full_name'] ) == $aroma1 )
 		{
 			$retval = $o;
 			$retval['oid'] = $oid;

@@ -46,7 +46,7 @@ if (@$_REQUEST['next'])
 	$protid = @$_REQUEST['prot'] ?: false;
 	$ligname = @$_REQUEST['lig'] ?: false;
 	
-	shuffle($odors);
+	// shuffle($odors);
 	
 	foreach ($odors as $o)
 	{
@@ -60,7 +60,7 @@ if (@$_REQUEST['next'])
 				if (!isset($dock_results[$rcpid][$full_name]))
 				{
 					$fam = family_from_protid($rcpid);
-					if (file_exists("output/$fam/$rcpid/$rcpid-$full_name.pred.dock")) continue;
+					// if (file_exists("output/$fam/$rcpid/$rcpid-$full_name.pred.dock")) continue;
 					if ($protid && $protid != $rcpid) continue;
 					
 					if ($skip)
@@ -197,7 +197,7 @@ $acvbrots
 SIZE 7.0 7.5 7.0
 
 POSE 10
-ITER 200
+ITER 50
 
 # DIFF
 ELIM 50

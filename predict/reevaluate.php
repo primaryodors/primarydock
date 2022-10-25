@@ -22,11 +22,23 @@ $right = 0;
 $wrong = 0;
 foreach ($dock_results as $protid => $docks)
 {
-    if (substr($protid, 0, 4) != "TAAR") continue;
     foreach ($docks as $ligand => $array)
     {
+    	$o = find_odorant($ligand);
+    	if (!$o)
+    	{
+    		echo "Warning: $ligand not found in odorants data.\n";
+    		continue;
+    	}
+    	
+    	$a = is_agonist(empirical_response($protid, $o));
+    	if ($a > 0) $actual = "Agonist";
+    	else if ($a < 0) $actual = "Inverse Agonist";
+    	else $actual = "Non-Agonist";
+    	$dock_results[$protid][$ligand]["Actual"] = $actual;
+    	
         $prediction = evaluate_result($array);
-        if ($prediction == $array["Actual"]) $right++;
+        if ($prediction == $actual) $right++;
         else $wrong++;
 
         $dock_results[$protid][$ligand]['Prediction'] = $prediction;

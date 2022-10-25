@@ -31,10 +31,17 @@ foreach ($dock_results as $protid => $docks)
     		continue;
     	}
     	
-    	$a = is_agonist(empirical_response($protid, $o));
-    	if ($a > 0) $actual = "Agonist";
-    	else if ($a < 0) $actual = "Inverse Agonist";
-    	else $actual = "Non-Agonist";
+    	$r = empirical_response($protid, $o);
+    	
+    	if (!$r)
+    		$actual = "(unknown)";
+    	else
+    	{
+			$a = is_agonist($r);
+			if ($a > 0) $actual = "Agonist";
+			else if ($a < 0) $actual = "Inverse Agonist";
+			else $actual = "Non-Agonist";
+    	}
     	$dock_results[$protid][$ligand]["Actual"] = $actual;
     	
         $prediction = evaluate_result($array);

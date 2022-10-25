@@ -33,6 +33,19 @@ $bsr = array_flip(
 $fam = family_from_protid($rcpid);
 if ($fam == 'TAAR') $bsr['5.42'] = count($bsr);
 
+// Copper binding sites for e.g. OR2T11
+// http://pubs.acs.org/doi/abs/10.1021/jacs.6b06983
+$cub =
+[
+	"2.39" => "MCHDENQR",
+	"3.46" => "MCHDENQR",
+	"4.37" => "MCHDENQR",
+	"4.39" => "R",
+	"4.42" => "CHMDENQ",
+	"6.37" => "CHMDENQ",
+	"6.40" => "HCMDENQ",
+];
+
 $page_title = $rcpid;
 $extra_js = ['js/tabs.js'];
 $extra_css = ['assets/tabs.css'];
@@ -229,6 +242,30 @@ function load_viewer(obj)
         else $rgntext[$rgn][] = substr($seq, $st-1, $end-$st+1);
     }
 
+$matched = 0;
+$lcub = [];
+foreach ($cub as $bw => $allowed)
+{
+	$res = "<span title=\"$bw\">";
+	$resno = resno_from_bw($rcpid, $bw);
+	$c = substr($seq, $resno-1, 1);
+	if (false !== strpos($allowed, $c))
+	{
+		$matched++;
+		$res .= "<b>$c</b>";
+	}
+	else $res .= $c;
+
+	$res .= "</span>";
+
+	$lcub[] = $res;
+}
+
+echo "<p>$matched residues match deep copper binding site: " . implode(" ",$lcub) . ". ";
+if ($matched == count($cub)) echo "This receptor is likely to respond to thiols that can access deep inside the ligand binding pocket.";
+echo "</p>";
+
+
     ?>
 
     <h3>Transmembane Helices:</h3>
@@ -392,7 +429,7 @@ foreach ($pairs as $oid => $pair)
     echo "<td>" . $dispec50 = (@$pair['ec50'] ? ("{$pair['ec50']} <sup><a href=\"{$pair['ec50_ref']}\">$refno_ec50</a></sup>") : "-") . "</td>\n";
     echo "<td>" . $disptop = (@$pair['adjusted_curve_top'] ? (round(@$pair['adjusted_curve_top'], 4) . " <sup><a href=\"{$pair['top_ref']}\">$refno_top</a>") : "-") . "</sup></td>\n";
 
-    echo "<td>" . implode(", ",$pq) . "</td>\n";
+    echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";
 }
 

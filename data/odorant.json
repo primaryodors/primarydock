@@ -1119,12 +1119,30 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "violet",
-                "floral",
-                "berry",
-                "fruity",
+                "",
+                "jammy",
+                "apple",
+                "purple",
                 "sweet",
-                "dusty"
+                "brown_sugar",
+                "sour",
+                "floral",
+                "rose",
+                "berry",
+                "amber",
+                "musk",
+                "estery",
+                "dry"
+            ],
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "woody",
+                "floral",
+                "violet",
+                "orris",
+                "tropical",
+                "fruity"
             ]
         },
         "activity":
@@ -7549,10 +7567,23 @@
         {
             "https:\/\/www.ncbi.nlm.nih.gov\/labs\/pmc\/articles\/PMC4412152\/":
             {
+                "OR10G6":
+                {
+                    "type": "vwa",
+                    "ec50": "-2.59",
+                    "adjusted_curve_top": "0.030433473250312"
+                },
                 "OR10G7":
                 {
-                    "type": "vsa",
-                    "ec50": "-6"
+                    "type": "sa",
+                    "ec50": "-6",
+                    "adjusted_curve_top": "9.9999996809298"
+                },
+                "OR5J2":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.59",
+                    "adjusted_curve_top": "0.23523608471812"
                 }
             },
             "https:\/\/doi.org\/10.1038\/nature06162":
@@ -8322,12 +8353,24 @@
             "http:\/\/www.primaryodors.org":
             [
                 "aldehydic",
-                "orange",
-                "peel",
-                "sweet",
                 "waxy",
+                "tallow",
                 "citrus",
-                "fatty"
+                "orange",
+                "lemon",
+                "citrus_peel",
+                "watery",
+                "clay",
+                "stemmy",
+                "rhubarb",
+                "clean",
+                "fresh",
+                "soapy",
+                "watermelon",
+                "musty",
+                "underripe",
+                "",
+                "limnic"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -8561,12 +8604,29 @@
         {
             "http:\/\/www.primaryodors.org":
             [
+                "limnic",
                 "dusty",
-                "watery",
+                "clay",
+                "stale",
                 "waxy",
+                "watery",
+                "",
+                "clean",
+                "aldehydic",
+                "ozone",
                 "muddy",
+                "earthy",
+                "musty",
+                "mousy",
+                "raw_pasta",
+                "moldy",
                 "solvent",
-                "earthy"
+                "soapy",
+                "metallic",
+                "plasticky",
+                "acrid",
+                "raw_potato",
+                "juicy"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -15206,11 +15266,26 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "solvent",
-                "mushroom",
-                "watery",
+                "fusel",
+                "waxy",
+                "banana",
+                "soft",
+                "chemical",
                 "fermented",
-                "green"
+                "medicinal",
+                "dark",
+                "greasy",
+                "oily",
+                "balsamic",
+                "ripe",
+                "rotten_fruit",
+                "solvent",
+                "acrid",
+                "green",
+                "cucumber",
+                "burnt_sugar",
+                "humus",
+                "tea"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -15655,12 +15730,30 @@
             "http:\/\/www.primaryodors.org":
             [
                 "green",
-                "grassy",
-                "aldehydic",
-                "leafy",
+                "watery",
+                "clean",
                 "sweaty",
-                "sour",
-                "bitter"
+                "bland",
+                "stale",
+                "clay",
+                "soft",
+                "grassy",
+                "leafy",
+                "stemmy",
+                "waxy",
+                "fatty",
+                "aldehydic",
+                "dill",
+                "moldy",
+                "acetic",
+                "rancid",
+                "fusel",
+                "celery",
+                "rooty",
+                "potato_skin",
+                "cucumber",
+                "squash",
+                "cardboard"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -15937,12 +16030,21 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "solvent",
-                "fermented",
+                "fusel",
+                "balsamic",
+                "chemical",
+                "green",
                 "oily",
+                "dark",
+                "rotten_fruit",
+                "ripe",
+                "cognac",
+                "alcoholic",
                 "acrid",
-                "orange",
-                "green"
+                "prune",
+                "",
+                "roasted",
+                "herbal"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -18543,12 +18645,41 @@
         {
             "http:\/\/www.primaryodors.org":
             [
+                "",
                 "aldehydic",
-                "soapy",
+                "dusty",
+                "laundered_cloth",
+                "stale",
+                "tallow",
                 "waxy",
+                "vinyl",
+                "warm",
+                "sweet",
+                "greasy",
+                "soapy",
+                "fishy",
+                "tropical",
+                "citrus_peel",
+                "cilantro",
+                "lactonic",
+                "lime",
+                "lemon",
+                "coumarinic",
+                "cozy",
                 "metallic",
-                "watery",
-                "green"
+                "acrid",
+                "amber",
+                "musk",
+                "powdery",
+                "floral",
+                "cyclamen",
+                "stemmy",
+                "old_wood",
+                "tobacco",
+                "cardboard",
+                "sweaty",
+                "charred",
+                "earthy"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -20988,47 +21119,6 @@
             }
         }
     },
-    "a1ac72aa94d05a2fa1098cf5f14ef746":
-    {
-        "full_name": "4-methyl guaiacol",
-        "smiles": "CC1=CC(=C(C=C1)O)OC",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "clove",
-                "leathery",
-                "medicinal",
-                "phenolic",
-                "spicy",
-                "vanilla"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/www.ncbi.nlm.nih.gov\/labs\/pmc\/articles\/PMC4412152\/":
-            {
-                "OR10G6":
-                {
-                    "type": "vwa",
-                    "ec50": "-2.59",
-                    "adjusted_curve_top": "0.030433473250312"
-                },
-                "OR10G7":
-                {
-                    "type": "sa",
-                    "ec50": "-3.18",
-                    "adjusted_curve_top": "9.9999996809298"
-                },
-                "OR5J2":
-                {
-                    "type": "vwa",
-                    "ec50": "-4.59",
-                    "adjusted_curve_top": "0.23523608471812"
-                }
-            }
-        }
-    },
     "61eea0b2541985b4ae65b5818744f2cf":
     {
         "full_name": "methyl heptanoate",
@@ -21971,12 +22061,29 @@
         {
             "http:\/\/www.primaryodors.org":
             [
+                "",
                 "aldehydic",
-                "sweet",
-                "waxy",
-                "citrus",
                 "lime",
-                "lemon"
+                "lemon",
+                "soapy",
+                "waxy",
+                "vinyl",
+                "laundered_cloth",
+                "clay",
+                "sweaty",
+                "greasy",
+                "watery",
+                "cyclamen",
+                "papery",
+                "soft",
+                "magnolia",
+                "guava",
+                "dragonfruit",
+                "metallic",
+                "tropical",
+                "oakmoss",
+                "underripe",
+                "grapefruit"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -22439,12 +22546,12 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "dry",
-                "fatty",
-                "floral",
                 "musk",
                 "powdery",
-                "soapy"
+                "soapy",
+                "dry",
+                "fatty",
+                "floral"
             ]
         },
         "activity":
@@ -23362,11 +23469,41 @@
         {
             "http:\/\/www.primaryodors.org":
             [
+                "",
                 "aldehydic",
                 "waxy",
+                "vinyl",
+                "rose",
                 "orange",
-                "citrus",
-                "rose"
+                "cilantro",
+                "cyclamen",
+                "watery",
+                "aquatic",
+                "guava",
+                "rhubarb",
+                "mushroom",
+                "dusty",
+                "clay",
+                "seaweed",
+                "marine",
+                "ozone",
+                "watermelon",
+                "melon",
+                "stemmy",
+                "carrot",
+                "celery",
+                "rancid",
+                "rooty",
+                "salicylic",
+                "medicinal",
+                "papery",
+                "office_building",
+                "soft",
+                "floral",
+                "acrid",
+                "tallow",
+                "fermented",
+                "musty"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -24277,12 +24414,31 @@
         {
             "http:\/\/www.primaryodors.org":
             [
+                "",
                 "aldehydic",
-                "citrus",
                 "waxy",
-                "sweet",
+                "coumarinic",
+                "lactonic",
+                "orange",
+                "rooty",
+                "grassy",
+                "green",
+                "leafy",
+                "citrus",
+                "ripe",
+                "tropical",
+                "mushroom",
+                "clay",
+                "carrot",
+                "pumpkin",
+                "hay",
+                "plasticky",
+                "soapy",
+                "pollen",
+                "tea",
+                "greasy",
                 "honey",
-                "orange"
+                "malty"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -24632,12 +24788,26 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "aldehydic",
+                "waxy",
+                "chemical",
                 "mushroom",
-                "citrus",
-                "green",
+                "rancid",
                 "orange",
-                "waxy"
+                "green",
+                "aldehydic",
+                "humus",
+                "fusel",
+                "greasy",
+                "solvent",
+                "dark",
+                "ripe",
+                "oily",
+                "cucumber",
+                "melon",
+                "shiitake",
+                "rubbery",
+                "hay",
+                "bready"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -24895,8 +25065,28 @@
             "http:\/\/www.primaryodors.org":
             [
                 "banana",
+                "orange",
+                "waxy",
                 "mushroom",
-                "solvent"
+                "solvent",
+                "soft",
+                "chemical",
+                "green",
+                "squash",
+                "musty",
+                "rooty",
+                "fusel",
+                "greasy",
+                "fatty",
+                "medicinal",
+                "vinyl",
+                "dry",
+                "clay",
+                "dusty",
+                "melon",
+                "pear",
+                "rotten_fruit",
+                "tropical"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
@@ -24936,10 +25126,33 @@
                 "orange",
                 "waxy",
                 "watery",
+                "limnic",
                 "musty",
                 "mushroom",
                 "green",
-                "citrus"
+                "citrus",
+                "vinyl",
+                "artificial",
+                "stale",
+                "soft",
+                "banana",
+                "melon",
+                "fermented",
+                "greasy",
+                "rooty",
+                "plasticky",
+                "aquatic",
+                "fresh",
+                "ripe",
+                "rancid",
+                "underripe",
+                "hay",
+                "",
+                "stemmy",
+                "fatty",
+                "brandy",
+                "rosinous",
+                "pear"
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [

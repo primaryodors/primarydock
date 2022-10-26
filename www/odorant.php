@@ -31,7 +31,8 @@ $md5 = md5($odor['smiles']);
 $imgfname = "assets/pngs/$md5.png";
 if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
 {
-    $smilesu = urlencode($odor['smiles']);
+	$smilesn = str_replace("[O-]", "O", $odor['smiles']);
+    $smilesu = urlencode($smilesn);
     $url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/PNG";
 
     $ch = curl_init( $url );
@@ -48,7 +49,7 @@ if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
         $im = imagecreatetruecolor(300, 300);
         imagestring($im, 4, 37, 130, "Empty response from PubChem.", imagecolorallocate($im, 255,255,255));
         $imgfname = "assets/pngs/noimg.png";
-        error_log("Empty response from $url");
+        error_log("Empty response from $url smiles=$smilesu");
     }
     else
     {
@@ -148,6 +149,9 @@ window.setTimeout( function()
 </div>
 
 <p class="aromainfo">
+	<strong>SMILES:</strong><br>
+	<?php echo $odor['smiles']; ?><br>
+	<br>
     <strong>Aroma Description:</strong>
     <br>
     <?php 

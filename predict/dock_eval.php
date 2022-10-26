@@ -9,7 +9,21 @@ function evaluate_result($array)
         if ($nodeno > $activenode) $activenode = $nodeno;
     }
     $pocketnode = $activenode - 1;
-    if ($pocketnode < 0) return "Non-Agonist";
+    if ($pocketnode <= 0)
+    {
+        $pocketnode = 0;
+        $activenode = $pocketnode + 1;
+
+        if (-$array["Node $pocketnode"] > 2*@-$array["Node $activenode"])
+        {
+            return "Inverse Agonist";
+        }
+        else if (-$array["Node $activenode"] > 0.95*@-$array["Node $pocketnode"])
+        {
+            return "Agonist";
+        }
+        else return "Non-Agonist";
+    }
 
     $capture = 0.0;
     $capqty = 0;

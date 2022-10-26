@@ -1976,8 +1976,9 @@ _try_again:
                 for (j=0; j<maxh2o; j++)
                 {
                     waters[j]->movability = MOV_ALL;
-                    float lclash = waters[j]->get_intermol_clashes(ligand);
-                    if (lclash < 1) cfmols[i++] = waters[j];
+                    waters[j]->reset_conformer_momenta();
+                    // float lclash = waters[j]->get_intermol_clashes(ligand);
+                    /* if (lclash < 1) */ cfmols[i++] = waters[j];
                 }
             }
             for (j=0; j<sphres; j++)

@@ -80,13 +80,15 @@ Protein* protein;
 int seql = 0;
 int mcoord_resno[256];
 Molecule* ligand;
+Molecule** waters = nullptr;
 Point ligcen_target;
 Point size(10,10,10);
 SCoord path[256];
-int pathnodes=0;				// The pocketcen is the initial node.
+int pathnodes = 0;				// The pocketcen is the initial node.
 int poses = 10;
 int iters = 50;
-bool flex=true;
+int maxh2o = 0;
+bool flex = true;
 float kJmol_cutoff = 0.01;
 bool kcal = false;
 float drift = initial_drift;
@@ -351,6 +353,24 @@ int interpret_config_line(char** fields)
     else if (!strcmp(fields[0], "FLEX"))
     {
         flex = (atoi(fields[1]) != 0);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "H2O"))
+    {
+        maxh2o = atoi(fields[1]);
+        if (maxh2o > 0)
+        {
+            waters = new Molecule*[maxh2o+2];
+            for (i=0; i<maxh2o; i++)
+            {
+                waters[i] = new Molecule("H2O");
+                waters[i]->from_smiles("O");
+
+                int j;
+                for (j=0; j<3; j++) strcpy(waters[i]->get_atom(j)->aa3let, "H2O");
+            }
+            waters[i] = nullptr;
+        }
         return 1;
     }
     else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
@@ -1030,6 +1050,19 @@ int main(int argc, char** argv)
     #if pocketcen_is_loneliest
     pocketcen = loneliest;
     #endif
+
+    if (waters)
+    {
+        float szscale = 0.5;
+        for (i=0; i<maxh2o; i++)
+        {
+            waters[i]->recenter(Point(
+                pocketcen.x + frand(-size.x * szscale, size.x * szscale),
+                pocketcen.y + frand(-size.y * szscale, size.y * szscale),
+                pocketcen.z + frand(-size.z * szscale, size.z * szscale)
+            ));
+        }
+    }
 
     if (!strcmp(fields[1], "RES"))
     {
@@ -1938,6 +1971,15 @@ _try_again:
                 met->movability = MOV_NONE;
                 cfmols[i++] = met;
             }
+            if (waters)
+            {
+                for (j=0; j<maxh2o; j++)
+                {
+                    waters[j]->movability = MOV_ALL;
+                    float lclash = waters[j]->get_intermol_clashes(ligand);
+                    if (lclash < 1) cfmols[i++] = waters[j];
+                }
+            }
             for (j=0; j<sphres; j++)
             {
                 if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
@@ -2190,10 +2232,19 @@ _try_again:
 
             // Prepare a partial PDB of the ligand atoms and all involved residue sidechains.
             n = m.get_atom_count();
+            int offset = n;
             for (l=0; l<n; l++) m.get_atom(l)->stream_pdb_line(pdbdat, 9000+l);
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared ligand PDB." << endl;
             #endif
+
+            if (waters)
+            {
+                for (k=0; k<maxh2o; k++)
+                {
+                    for (l=0; l<3; l++) waters[k]->get_atom(l)->stream_pdb_line(pdbdat, 9000+offset+l);
+                }
+            }
 
             if (flex)
             {

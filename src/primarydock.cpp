@@ -159,21 +159,27 @@ void iteration_callback(int iter)
     if (gcfmols && seql)
     {
         Star discrete[SPHREACH_MAX+4];
-        discrete[0].pmol = gcfmols[0];
-        discrete[1].pmol = gcfmols[1];
+        /*discrete[0].pmol = gcfmols[0];
+        discrete[1].pmol = gcfmols[1];*/
 
         int i;
+        int offset = 1;
+
+        if (waters) offset += maxh2o;
+
+        for (i=0; i<offset; i++) discrete[i].pmol = gcfmols[i];
+
         AminoAcid* resphres[SPHREACH_MAX+4];
         for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
         int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, mcoord_resno);
         //cout << "Sphres: " << sphres << endl;
         for (i=0; i<sphres; i++)
         {
-            discrete[i+2].paa = resphres[i];
+            discrete[i+offset].paa = resphres[i];
         }
-        discrete[sphres+2].n = 0;
+        discrete[sphres+offset].n = 0;
 
-        sphres += 2;
+        sphres += offset;
         for (i=0; i<sphres; i++) gcfmols[i] = discrete[i].pmol;
         gcfmols[sphres] = nullptr;
     }
@@ -542,21 +548,42 @@ void prepare_initb()
             if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
         }
 
-        #if preconform_protein
-        if (pre_ligand_iteration_ratio)
+        Molecule* prem[seql+maxh2o+4];
+        for (i=0; i<qpr; i++) prem[i] = reinterpret_cast<Molecule*>(preaa[i]);
+        if (waters)
         {
-            Molecule** delete_me;
-            Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), delete_me = protein->all_residues_as_molecules(), iters*pre_ligand_iteration_ratio);
-            delete[] delete_me;
+            for (i=0; i<maxh2o; i++) prem[i+qpr] = waters[i];
         }
+        int qpm = qpr + maxh2o;
+        prem[qpm] = nullptr;
+
+        bool preconform;
+
+        #if preconform_protein
+        preconform = true;
+        #else
+        preconform = (waters != nullptr) && differential_dock;
         #endif
 
+        if (preconform && pre_ligand_iteration_ratio)
+        {
+            Molecule** delete_me;
+            Molecule::multimol_conform(
+                prem /*reinterpret_cast<Molecule**>(preaa)*/,
+                delete_me = protein->all_residues_as_molecules(),
+                iters*pre_ligand_iteration_ratio
+            );
+            delete[] delete_me;
+        }
+
+        /*
         preres = protein->get_residues_near(pocketcen, 10000);
         qpr = preres.size();
         for (i=0; i<qpr; i++)
         {
             preaa[i] = preres[i];
         }
+        */
 
         for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 
@@ -567,17 +594,17 @@ void prepare_initb()
             std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
             #endif
 
-            for (j=0; j<qpr; j++)
+            for (j=0; j<qpm; j++)
             {
                 if (j == i) continue;
-                float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]), j==0);
+                float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(prem[j]), j==0);
 
                 #if _DBG_TOOLARGE_DIFFNUMS
                 if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
                 #endif
 
                 initial_binding[resno] += f;
-                initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
+                initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(prem[j]);
             }
 
             #if _DBG_TOOLARGE_DIFFNUMS
@@ -2243,7 +2270,7 @@ _try_again:
             {
                 for (k=0; k<maxh2o; k++)
                 {
-                    for (l=0; l<3; l++) waters[k]->get_atom(l)->stream_pdb_line(pdbdat, 9000+offset+l);
+                    for (l=0; l<3; l++) waters[k]->get_atom(l)->stream_pdb_line(pdbdat, 9000+offset+l+3*k);
                 }
             }
 

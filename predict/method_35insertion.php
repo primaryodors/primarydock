@@ -182,7 +182,7 @@ if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n"
 
 $outfname = "output/$fam/$protid/$protid-$ligname.pred.dock";
 
-$h2opts = $wet ? "H2O 20\nDIFF\n" : "";
+$h2opts = $wet ? "H2O 5\n" : "";
 
 $configf = <<<heredoc
 

@@ -16,7 +16,7 @@ require("dock_eval.php");
 
 // Configurable variables
 $dock_retries = 5;
-$max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to half the number of physical cores.
+$max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
 
 // Load data
 $dock_results = [];

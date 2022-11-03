@@ -95,7 +95,7 @@ function get_notes_for_receptor($rcpid, $correlations)
 {
     if (!isset($correlations[$rcpid])) return "(none)";
 
-    $maxcorr = max($correlations[$rcpid]);
+    $maxcorr = floatval(max($correlations[$rcpid]));
     $threshold = $maxcorr / 2;
     $retval = [];
     foreach ($correlations[$rcpid] as $pq => $corr)

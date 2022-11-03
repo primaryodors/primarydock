@@ -1,11 +1,12 @@
 <?php
 
-global $odors;
+global $odors, $refs;
 
 $cwd = getcwd();
 chdir(__DIR__);
 chdir("..");
 $odors = json_decode(file_get_contents("data/odorant.json"), true);
+$refs = json_decode(file_get_contents("data/reference.json"), true);
 chdir($cwd);
 
 $types =

@@ -133,6 +133,7 @@ window.setTimeout( function()
 <div class="tab" style="display: inline-block; margin-top: 30px;">
     <button class="tabstatic" id="tabFullName"><?php echo $odor['full_name']; ?></button>
 	<button class="tablinks" id="tabAroma" onclick="openTab(this, 'Aroma');">Notes & Receptors</button>
+    <button class="tablinks" id="tabRefs" onclick="openTab(this, 'Refs');">References</button>
 	<button	class="tablinks"
 			id="tabStructure"
 			onclick="load_viewer(this);"
@@ -156,6 +157,7 @@ window.setTimeout( function()
     <br>
     <?php 
     $refno = 1;
+    $lrefs = [];
     foreach ($odor['aroma'] as $refurl => $notes)
     {
         $comma = false;
@@ -165,7 +167,8 @@ window.setTimeout( function()
             echo "$note";
             $comma = true;
         }
-        echo "<sup><a href=\"$refurl\">$refno</a></sup><br>";
+        echo "<sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup><br>";
+        $lrefs[] = $refurl;
         $refno++;
     }
     ?>
@@ -191,6 +194,7 @@ foreach ($odor['activity'] as $refurl => $acv)
 {
     $maxcurvtop = [];
     $minec50 = [];
+    $lrefs[] = $refurl;
     foreach ($acv as $rcpid => $a)
     {
         $maxcurvtop[$rcpid] = false;
@@ -203,7 +207,7 @@ foreach ($odor['activity'] as $refurl => $acv)
             if (!isset($tbltops[$rcpid])) $tbltops[$rcpid] = "";
             else $tbltops[$rcpid] .= ", ";
 
-            $tbltops[$rcpid] .= round($a['adjusted_curve_top'], 4) . " <sup><a href=\"$refurl\">$refno</a></sup>";
+            $tbltops[$rcpid] .= round($a['adjusted_curve_top'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup>";
             $sorted[$rcpid] += $a['adjusted_curve_top'];
             $ssamples++;
 
@@ -214,7 +218,7 @@ foreach ($odor['activity'] as $refurl => $acv)
             if (!isset($tblec50[$rcpid])) $tblec50[$rcpid] = "";
             else $tblec50[$rcpid] .= ", ";
 
-            $tblec50[$rcpid] .= round($a['ec50'], 4) . " <sup><a href=\"$refurl\">$refno</a></sup>";
+            $tblec50[$rcpid] .= round($a['ec50'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup>";
             $sorted[$rcpid] -= $a['ec50']*1.666;
             $ssamples++;
 
@@ -254,6 +258,19 @@ foreach (array_keys($sorted) as $rcpid)
 </table>
 </div>
 
+</div>
+
+<div id="Refs" class="tabcontent">
+<?php
+foreach ($lrefs as $idx => $refurl)
+{
+    echo "<a href=\"$refurl\"><p>\n";
+    $idx1 = $idx + 1;
+    echo "$idx1.) ";
+    echo $refs[$refurl]['citation'];
+    echo "</p></a>\n";
+}
+?>
 </div>
 
 <div id="Structure" class="tabcontent">

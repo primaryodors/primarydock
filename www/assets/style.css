@@ -61,6 +61,23 @@ p
     z-index: 20000;
 }
 
+#logo h1
+{
+    margin-left: 21px;
+    margin-right: 53px;
+    margin-top: 2px;
+    font-size: 67px;
+    margin-bottom: 0px;
+    color: rgb(122, 157, 255);
+    font-style: italic;
+    float: left;
+}
+
+#logo h1:hover
+{
+    text-decoration: none!important;
+}
+
 #side
 {
     background-color: #18283d;

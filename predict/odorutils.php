@@ -20,6 +20,7 @@ $types =
    -1 => "ia",
    -999 => "?",
 ];
+
 $sepyt = array_flip($types);
 
 function best_empirical_pair($protein, $aroma, $as_object = false)

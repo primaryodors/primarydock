@@ -8,8 +8,12 @@ include("header.php");
 ?>
 <h1>Home</h1>
 
+<?php if (@$customizations['welcome']) echo $customizations['welcome'];
+else
+{ ?>
 <p>This web application provides visual representations of the JSON files located in the data subfolder.
 </p>
+<?php } ?>
 
 <center>
 <table class="idxbuttons">

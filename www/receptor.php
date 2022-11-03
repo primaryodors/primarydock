@@ -101,6 +101,7 @@ function load_viewer(obj)
     <?php if (count($pairs)) { ?>
     <button class="tablinks default" id="tabLigands" onclick="openTab(this, 'Ligands');">Ligands</button>
     <?php } ?>
+    <button class="tablinks" id="tabRefs" onclick="openTab(this, 'Refs');">References</button>
     <button class="tablinks" id="tabStructure" onclick="load_viewer(this);">3D Structure</button>
 </div>
 
@@ -394,27 +395,27 @@ echo "</p>";
 
 <?php 
 
-$refs = [];
+$lrefs = [];
 foreach ($pairs as $oid => $pair)
 {
     $odor = $odors[$oid];
 
     if (@$pair['ec50_ref'])
     {
-        $refno_ec50 = array_search($pair['ec50_ref'], $refs);
+        $refno_ec50 = array_search($pair['ec50_ref'], $lrefs);
         if (false === $refno_ec50)
         {
-            $refno_ec50 = count($refs)+1;
-            $refs[$refno_ec50] = $pair['ec50_ref'];
+            $refno_ec50 = count($lrefs)+1;
+            $lrefs[$refno_ec50] = $pair['ec50_ref'];
         }
     }
     if (@$pair['top_ref'])
     {
-        $refno_top = array_search($pair['top_ref'], $refs);
+        $refno_top = array_search($pair['top_ref'], $lrefs);
         if (false === $refno_top)
         {
-            $refno_top = count($refs)+1;
-            $refs[$refno_top] = $pair['top_ref'];
+            $refno_top = count($lrefs)+1;
+            $lrefs[$refno_top] = $pair['top_ref'];
         }
     }
 
@@ -438,6 +439,18 @@ foreach ($pairs as $oid => $pair)
 </div>
 </div>
 
+<div id="Refs" class="tabcontent">
+<?php
+foreach ($lrefs as $idx => $refurl)
+{
+    echo "<a href=\"$refurl\"><p>\n";
+    $idx1 = $idx + 1;
+    echo "$idx1.) ";
+    echo $refs[$refurl]['citation'];
+    echo "</p></a>\n";
+}
+?>
+</div>
 
 <div id="Structure" class="tabcontent">
     <iframe id="viewer"></iframe>

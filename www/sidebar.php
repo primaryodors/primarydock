@@ -7,6 +7,7 @@ if (file_exists('sidelinks.json')) $sidelinks = json_decode(file_get_contents('s
 chdir($cwd);
 
 ?>
+<span class="burger">&#9776;</span>
 <ul>
     <li><a href="index.php">Home</a></li>
     <li><a href="receptors.php">Receptors</a></li>

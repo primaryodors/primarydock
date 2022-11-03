@@ -143,6 +143,11 @@ p
     color: #9cc8ff;
 }
 
+#side:hover .burger
+{
+    display: none;
+}
+
 .scrollw
 {
     overflow-x: auto;

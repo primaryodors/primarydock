@@ -145,6 +145,17 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR3A1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -4222,6 +4233,17 @@
                 {
                     "type": "ma",
                     "adjusted_curve_top": "4.1624363050243"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR3A1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -10914,6 +10936,18 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR3A1":
+                {
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.10000000149012"
+                }
             }
         }
     },
@@ -13695,6 +13729,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
+            {
+                "OR51S1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.5"
+                }
             }
         }
     },
@@ -14917,6 +14959,26 @@
                     "type": "ma",
                     "ec50": "-5.01"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biomaterials.2011.11.044":
+            {
+                "OR3A1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.0999999046326"
+                }
             }
         }
     },
@@ -15126,6 +15188,106 @@
                 {
                     "type": "vsa",
                     "ec50": "-6.77"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/adhm.201300174":
+            {
+                "OR10C1":
+                {
+                    "type": "na"
+                },
+                "OR10G7":
+                {
+                    "type": "na"
+                },
+                "OR10H1":
+                {
+                    "type": "na"
+                },
+                "OR10H4":
+                {
+                    "type": "na"
+                },
+                "OR11G2":
+                {
+                    "type": "na"
+                },
+                "OR13C2":
+                {
+                    "type": "na"
+                },
+                "OR1A2":
+                {
+                    "type": "na"
+                },
+                "OR1E2":
+                {
+                    "type": "na"
+                },
+                "OR1G1":
+                {
+                    "type": "na"
+                },
+                "OR1J2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "9"
+                },
+                "OR2B2":
+                {
+                    "type": "na"
+                },
+                "OR2H2":
+                {
+                    "type": "na"
+                },
+                "OR2T4":
+                {
+                    "type": "na"
+                },
+                "OR3A1":
+                {
+                    "type": "na"
+                },
+                "OR4D9":
+                {
+                    "type": "na"
+                },
+                "OR4K14":
+                {
+                    "type": "na"
+                },
+                "OR4P4":
+                {
+                    "type": "na"
+                },
+                "OR4S1":
+                {
+                    "type": "na"
+                },
+                "OR4X1":
+                {
+                    "type": "na"
+                },
+                "OR51T1":
+                {
+                    "type": "na"
+                },
+                "OR52D1":
+                {
+                    "type": "na"
+                },
+                "OR56B4":
+                {
+                    "type": "na"
+                },
+                "OR5I1":
+                {
+                    "type": "na"
+                },
+                "OR6S1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -15872,6 +16034,14 @@
                     "type": "vsa",
                     "ec50": "-6.52"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/adhm.201300174":
+            {
+                "OR1J2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.5"
+                }
             }
         }
     },
@@ -16324,6 +16494,17 @@
                     "type": "vwa",
                     "adjusted_curve_top": "0.10000000149012"
                 }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR3A1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -16447,6 +16628,33 @@
                     "ec50": "-4.47",
                     "adjusted_curve_top": "-10",
                     "antagonist": "1"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biomaterials.2011.11.044":
+            {
+                "OR3A1":
+                {
+                    "type": "na",
+                    "antagonist": "1"
+                }
+            }
+        }
+    },
+    "3870b0f45c45810188f062c95a7fbe2b":
+    {
+        "full_name": "hydrogen chloride",
+        "smiles": "[Cl]",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR3A1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -17565,6 +17773,19 @@
                     "type": "ma",
                     "ec50": "-5.5",
                     "adjusted_curve_top": "6.5999999046326"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
+            {
+                "OR3A4":
+                {
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.30000001192093"
+                },
+                "OR51S1":
+                {
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.15000000596046"
                 }
             }
         }
@@ -20202,6 +20423,20 @@
             [
                 "alcoholic"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR3A1":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "a642592b62d67c1c184a0b464e1c5743":
@@ -20359,6 +20594,18 @@
                     "type": "sa",
                     "ec50": "-6",
                     "adjusted_curve_top": "8.3000001907349"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
+            {
+                "OR3A4":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.2999999523163"
+                },
+                "OR51S1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -20682,6 +20929,14 @@
                     "adjusted_curve_top": "-10",
                     "antagonist": "1"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biomaterials.2011.11.044":
+            {
+                "OR3A1":
+                {
+                    "type": "na",
+                    "antagonist": "1"
+                }
             }
         }
     },
@@ -20826,6 +21081,22 @@
                 "sweet",
                 "toasted"
             ]
+        }
+    },
+    "d403bea9b6efdc09cc5179f1e95261eb":
+    {
+        "full_name": "3,4-methylenedioxy dihydrocinnamic acid",
+        "smiles": "OC(=O)CCc1cc(OCO2)c2cc1",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.biomaterials.2011.11.044":
+            {
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.5999999046326"
+                }
+            }
         }
     },
     "9dea373714bf26fb56f16df79b9c4519":
@@ -21373,6 +21644,21 @@
                 "earthy",
                 "musty"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
+            {
+                "OR3A4":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4"
+                },
+                "OR51S1":
+                {
+                    "type": "na"
+                }
+            }
         }
     },
     "889748872983de7214334b637f8ad5b3":
@@ -22858,6 +23144,18 @@
                     "type": "vsa",
                     "adjusted_curve_top": "10"
                 }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5999999046326"
+                },
+                "OR3A1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -23784,6 +24082,14 @@
                     "type": "wa",
                     "ec50": "-3.2"
                 }
+            },
+            "https:\/\/doi.org\/10.1002\/adhm.201300174":
+            {
+                "OR1J2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.5"
+                }
             }
         }
     },
@@ -24607,6 +24913,14 @@
                 {
                     "type": "vsa",
                     "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/doi.org\/10.1002\/adhm.201300174":
+            {
+                "OR1J2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
                 }
             }
         }
@@ -27333,6 +27647,25 @@
                     "type": "ma",
                     "ec50": "-4.99"
                 }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biomaterials.2011.11.044":
+            {
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR3A1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -27420,6 +27753,25 @@
             },
             "https:\/\/doi.org\/10.1111\/j.1471-4159.2006.03771.x":
             {
+                "OR3A1":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biomaterials.2011.11.044":
+            {
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
                 "OR3A1":
                 {
                     "type": "na"
@@ -28031,6 +28383,25 @@
                     "adjusted_curve_top": "10"
                 },
                 "OR5I1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
+    "02ce640ea01b347991d0b988f6222306":
+    {
+        "full_name": "propyl butyrate",
+        "smiles": "CCCOC(=O)CCC",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR3A1":
                 {
                     "type": "na"
                 }
@@ -29102,6 +29473,25 @@
             },
             "https:\/\/doi.org\/10.1111\/j.1471-4159.2006.03771.x":
             {
+                "OR3A1":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.biomaterials.2011.11.044":
+            {
+                "OR3A1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.9000000953674"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
                 "OR3A1":
                 {
                     "type": "na"
@@ -31021,6 +31411,18 @@
                     "adjusted_curve_top": "10"
                 },
                 "OR5I1":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
+            {
+                "OR3A4":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.80000001192093"
+                },
+                "OR51S1":
                 {
                     "type": "na"
                 }

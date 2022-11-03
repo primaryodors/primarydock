@@ -1,6 +1,13 @@
 <?php 
 global $extra_css, $extra_js;
 
+$customizations = [];
+
+$cwd = getcwd();
+chdir(__DIR__);
+if (file_exists('custom.json')) $customizations = json_decode(file_get_contents('custom.json'), true);
+chdir($cwd);
+
 if ($extra_css && !is_array($extra_css)) $extra_css = [$extra_css];
 if ($extra_js  && !is_array($extra_js )) $extra_js  = [$extra_js ];
 
@@ -22,9 +29,16 @@ if ($extra_js  && !is_array($extra_js )) $extra_js  = [$extra_js ];
     </head>
     <body>
         <div id="logo">
-            <img src="assets/logo.png">
+            <?php if (@$customizations['logo']['href']) echo "<a href=\"{$customizations['logo']['href']}\">"; ?>
+            <img src="<?php echo @$customizations['logo']['url'] ?: "assets/logo.png"; ?>" style="float: left;">
+            <?php if (@$customizations['logo']['text']) echo "<h1>{$customizations['logo']['text']}</h1>"; ?>
+            <?php if (@$customizations['logo']['href']) echo "</a>"; ?>
         </div>
-        <div id="side">
+        <div id="side"<?php if (@$customizations['logo']['height'])
+        {
+            $offset = intval($customizations['logo']['height']) - 37;
+            echo " style=\"top: {$offset}px;\"";
+        } ?>>
             <?php include("sidebar.php"); ?>
         </div>
-        <div id="main">
+        <div id="main"<?php if (@$customizations['logo']['height']) echo " style=\"top: {$customizations['logo']['height']}px;\""; ?>>

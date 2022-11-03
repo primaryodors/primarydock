@@ -85,7 +85,7 @@ function correlate_receptors_aromanotes()
             if ($corr > 0) $correlations[$rcpid][$pq] = $corr;
         }
 
-        arsort($correlations[$rcpid]);
+        if ($correlations[$rcpid]) arsort($correlations[$rcpid]);
     }
 
     return $correlations;

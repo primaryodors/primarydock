@@ -82,10 +82,10 @@ function correlate_receptors_aromanotes()
         {
             if ($ycount[$pq] < 3) continue;
             $corr = correlationCoefficient($xv, $yv);
-            $correlations[$rcpid][$pq] = $corr;
+            if ($corr > 0) $correlations[$rcpid][$pq] = $corr;
         }
 
-        asort($correlations[$rcpid]);
+        arsort($correlations[$rcpid]);
     }
 
     return $correlations;

@@ -2004,8 +2004,7 @@ _try_again:
                 {
                     waters[j]->movability = MOV_ALL;
                     waters[j]->reset_conformer_momenta();
-                    // float lclash = waters[j]->get_intermol_clashes(ligand);
-                    /* if (lclash < 1) */ cfmols[i++] = waters[j];
+                    cfmols[i++] = waters[j];
                 }
             }
             for (j=0; j<sphres; j++)

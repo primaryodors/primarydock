@@ -1869,7 +1869,7 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
 
 void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
 {
-    os << "ATOM   ";
+    os << (residue ? "ATOM   " : "HETATM ");
     os << setw(4) << atomno << " ";
 
     if (strlen(name) < 4)

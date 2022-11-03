@@ -80,13 +80,15 @@ Protein* protein;
 int seql = 0;
 int mcoord_resno[256];
 Molecule* ligand;
+Molecule** waters = nullptr;
 Point ligcen_target;
 Point size(10,10,10);
 SCoord path[256];
-int pathnodes=0;				// The pocketcen is the initial node.
+int pathnodes = 0;				// The pocketcen is the initial node.
 int poses = 10;
 int iters = 50;
-bool flex=true;
+int maxh2o = 0;
+bool flex = true;
 float kJmol_cutoff = 0.01;
 bool kcal = false;
 float drift = initial_drift;
@@ -157,21 +159,27 @@ void iteration_callback(int iter)
     if (gcfmols && seql)
     {
         Star discrete[SPHREACH_MAX+4];
-        discrete[0].pmol = gcfmols[0];
-        discrete[1].pmol = gcfmols[1];
+        /*discrete[0].pmol = gcfmols[0];
+        discrete[1].pmol = gcfmols[1];*/
 
         int i;
+        int offset = 1;
+
+        if (waters) offset += maxh2o;
+
+        for (i=0; i<offset; i++) discrete[i].pmol = gcfmols[i];
+
         AminoAcid* resphres[SPHREACH_MAX+4];
         for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
         int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, mcoord_resno);
         //cout << "Sphres: " << sphres << endl;
         for (i=0; i<sphres; i++)
         {
-            discrete[i+2].paa = resphres[i];
+            discrete[i+offset].paa = resphres[i];
         }
-        discrete[sphres+2].n = 0;
+        discrete[sphres+offset].n = 0;
 
-        sphres += 2;
+        sphres += offset;
         for (i=0; i<sphres; i++) gcfmols[i] = discrete[i].pmol;
         gcfmols[sphres] = nullptr;
     }
@@ -353,6 +361,24 @@ int interpret_config_line(char** fields)
         flex = (atoi(fields[1]) != 0);
         return 1;
     }
+    else if (!strcmp(fields[0], "H2O"))
+    {
+        maxh2o = atoi(fields[1]);
+        if (maxh2o > 0)
+        {
+            waters = new Molecule*[maxh2o+2];
+            for (i=0; i<maxh2o; i++)
+            {
+                waters[i] = new Molecule("H2O");
+                waters[i]->from_smiles("O");
+
+                int j;
+                for (j=0; j<3; j++) strcpy(waters[i]->get_atom(j)->aa3let, "H2O");
+            }
+            waters[i] = nullptr;
+        }
+        return 1;
+    }
     else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
     {
         iters = atoi(fields[1]);
@@ -522,21 +548,42 @@ void prepare_initb()
             if (r > pre_ligand_flex_radius) preaa[i]->movability = MOV_NONE;
         }
 
-        #if preconform_protein
-        if (pre_ligand_iteration_ratio)
+        Molecule* prem[seql+maxh2o+4];
+        for (i=0; i<qpr; i++) prem[i] = reinterpret_cast<Molecule*>(preaa[i]);
+        if (waters)
         {
-            Molecule** delete_me;
-            Molecule::multimol_conform(reinterpret_cast<Molecule**>(preaa), delete_me = protein->all_residues_as_molecules(), iters*pre_ligand_iteration_ratio);
-            delete[] delete_me;
+            for (i=0; i<maxh2o; i++) prem[i+qpr] = waters[i];
         }
+        int qpm = qpr + maxh2o;
+        prem[qpm] = nullptr;
+
+        bool preconform;
+
+        #if preconform_protein
+        preconform = true;
+        #else
+        preconform = (waters != nullptr) && differential_dock;
         #endif
 
+        if (preconform && pre_ligand_iteration_ratio)
+        {
+            Molecule** delete_me;
+            Molecule::multimol_conform(
+                prem /*reinterpret_cast<Molecule**>(preaa)*/,
+                delete_me = protein->all_residues_as_molecules(),
+                iters*pre_ligand_iteration_ratio
+            );
+            delete[] delete_me;
+        }
+
+        /*
         preres = protein->get_residues_near(pocketcen, 10000);
         qpr = preres.size();
         for (i=0; i<qpr; i++)
         {
             preaa[i] = preres[i];
         }
+        */
 
         for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 
@@ -547,17 +594,17 @@ void prepare_initb()
             std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
             #endif
 
-            for (j=0; j<qpr; j++)
+            for (j=0; j<qpm; j++)
             {
                 if (j == i) continue;
-                float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(preaa[j]), j==0);
+                float f = reinterpret_cast<Molecule*>(preaa[i])->get_intermol_binding(reinterpret_cast<Molecule*>(prem[j]), j==0);
 
                 #if _DBG_TOOLARGE_DIFFNUMS
                 if (f) ibdbg += to_string(preaa[j]->get_residue_no()) + (std::string)" " + to_string(f) + (std::string)"\n";
                 #endif
 
                 initial_binding[resno] += f;
-                initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(preaa[j]);
+                initial_vdWrepl[resno] += preaa[i]->get_vdW_repulsion(prem[j]);
             }
 
             #if _DBG_TOOLARGE_DIFFNUMS
@@ -1030,6 +1077,19 @@ int main(int argc, char** argv)
     #if pocketcen_is_loneliest
     pocketcen = loneliest;
     #endif
+
+    if (waters)
+    {
+        float szscale = 0.5;
+        for (i=0; i<maxh2o; i++)
+        {
+            waters[i]->recenter(Point(
+                pocketcen.x + frand(-size.x * szscale, size.x * szscale),
+                pocketcen.y + frand(-size.y * szscale, size.y * szscale),
+                pocketcen.z + frand(-size.z * szscale, size.z * szscale)
+            ));
+        }
+    }
 
     if (!strcmp(fields[1], "RES"))
     {
@@ -1938,6 +1998,16 @@ _try_again:
                 met->movability = MOV_NONE;
                 cfmols[i++] = met;
             }
+            if (waters)
+            {
+                for (j=0; j<maxh2o; j++)
+                {
+                    waters[j]->movability = MOV_ALL;
+                    waters[j]->reset_conformer_momenta();
+                    // float lclash = waters[j]->get_intermol_clashes(ligand);
+                    /* if (lclash < 1) */ cfmols[i++] = waters[j];
+                }
+            }
             for (j=0; j<sphres; j++)
             {
                 if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
@@ -2190,10 +2260,19 @@ _try_again:
 
             // Prepare a partial PDB of the ligand atoms and all involved residue sidechains.
             n = m.get_atom_count();
+            int offset = n;
             for (l=0; l<n; l++) m.get_atom(l)->stream_pdb_line(pdbdat, 9000+l);
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared ligand PDB." << endl;
             #endif
+
+            if (waters)
+            {
+                for (k=0; k<maxh2o; k++)
+                {
+                    for (l=0; l<3; l++) waters[k]->get_atom(l)->stream_pdb_line(pdbdat, 9000+offset+l+3*k);
+                }
+            }
 
             if (flex)
             {

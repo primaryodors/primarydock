@@ -18,7 +18,7 @@ function evaluate_result($array)
         {
             return "Inverse Agonist";
         }
-        else if (-$array["Node $activenode"] > 0.95*@-$array["Node $pocketnode"])
+        else if (@-$array["Node $activenode"] > 0.95*@-$array["Node $pocketnode"])
         {
             return "Agonist";
         }

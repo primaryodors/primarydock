@@ -16,8 +16,7 @@ require("dock_eval.php");
 
 // Configurable variables
 $dock_retries = 5;
-$max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to half the number of physical cores.
-
+$max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
 
 // Load data
 $dock_results = [];
@@ -35,6 +34,8 @@ foreach (@$argv as $a)
 	$a = explode('=',$a,2);
 	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
 }
+
+$wet = isset($_REQUEST['wet']);
 
 if (@$_REQUEST['next'])
 {
@@ -181,6 +182,8 @@ if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n"
 
 $outfname = "output/$fam/$protid/$protid-$ligname.pred.dock";
 
+$h2opts = $wet ? "H2O 5\n" : "";
+
 $configf = <<<heredoc
 
 PROT pdbs/$fam/$protid.upright.pdb
@@ -197,6 +200,8 @@ $acv_matrix
 $acvbrots
 
 SIZE 7.0 7.5 7.0
+
+$h2opts
 
 POSE 10
 ITER 50

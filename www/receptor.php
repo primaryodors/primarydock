@@ -425,7 +425,7 @@ foreach ($pairs as $oid => $pair)
 
     $ufn = urlencode($odor['full_name']);
     echo "<tr>\n";
-    echo "<td><a href=\"odorant.php?o=$oid\">{$odor['full_name']}</a></td>\n";
+    echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\">{$odor['full_name']}</a></td>\n";
 
     echo "<td>" . 
         ($dispec50 = (@$pair['ec50']

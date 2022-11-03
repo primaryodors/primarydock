@@ -137,6 +137,12 @@ p
     text-decoration: none;
 }
 
+.burger
+{
+    font-size: 26px;
+    color: #9cc8ff;
+}
+
 .scrollw
 {
     overflow-x: auto;

@@ -427,8 +427,16 @@ foreach ($pairs as $oid => $pair)
     echo "<tr>\n";
     echo "<td><a href=\"odorant.php?o=$oid\">{$odor['full_name']}</a></td>\n";
 
-    echo "<td>" . $dispec50 = (@$pair['ec50'] ? ("{$pair['ec50']} <sup><a href=\"{$pair['ec50_ref']}\">$refno_ec50</a></sup>") : "-") . "</td>\n";
-    echo "<td>" . $disptop = (@$pair['adjusted_curve_top'] ? (round(@$pair['adjusted_curve_top'], 4) . " <sup><a href=\"{$pair['top_ref']}\">$refno_top</a>") : "-") . "</sup></td>\n";
+    echo "<td>" . 
+        ($dispec50 = (@$pair['ec50']
+            ? ("{$pair['ec50']} <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno_ec50</a></sup>")
+            : "-")
+        ) . "</td>\n";
+    echo "<td>" . 
+        ($disptop = (@$pair['adjusted_curve_top']
+            ? (round(@$pair['adjusted_curve_top'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno_top</a>")
+            : "-")
+        ) . "</sup></td>\n";
 
     echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";
@@ -444,8 +452,7 @@ foreach ($pairs as $oid => $pair)
 foreach ($lrefs as $idx => $refurl)
 {
     echo "<a href=\"$refurl\"><p>\n";
-    $idx1 = $idx + 1;
-    echo "$idx1.) ";
+    echo "$idx.) ";
     echo $refs[$refurl]['citation'];
     echo "</p></a>\n";
 }

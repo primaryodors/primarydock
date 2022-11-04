@@ -200,9 +200,14 @@ Examples:
 END
 EXIT
 QUIT
+DIE
+EXIT -1
+DIE "An error has occurred."
 ```
 
 Ceases script execution.
+
+Optionally, an integer return value may be passed, or a string to echo, but not both.
 
 
 # GEN

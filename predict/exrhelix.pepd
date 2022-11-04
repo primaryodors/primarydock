@@ -1,0 +1,32 @@
+
+LET $prot = "OR1A1"
+IF $arg2 THEN LET $prot = $arg2
+
+LET $sub = $prot FROM 1 FOR 4
+LET $fam = ""
+IF $sub = "TAAR" LET $fam = $sub
+IF $sub = "VN1R" LET $fam = $sub
+IF $fam THEN GOTO _notOR
+LET $sub = $sub FROM 3
+LET %sub = $sub
+LET $fam = "OR" + %sub
+_notOR:
+
+LET $path = "pdbs/" + $fam + "/" + $prot + ".upright.pdb"
+LOAD $path
+
+SEARCH %TMR4.e %TMR5.s "HFFCD" %exr_motif %similarity
+LET $found = $SEQUENCE FROM %exr_motif FOR 5
+
+LET $H = $found FROM 1 FOR 1
+LET $C = $found FROM 4 FOR 1
+LET $D = $found FROM 5 FOR 1
+
+IF "HNQDERM" =* $H GOTO _hasH
+DIE "Helix motif H not found."
+_hasH:
+IF $C != "C" DIE "Helix motif C not found."
+IF $D != "D" THEN IF $D != "E" DIE "Helix motif D/E not found."
+IF $found =* "P" DIE "Helix motif disrupted by proline."
+
+DUMP

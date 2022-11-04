@@ -820,8 +820,15 @@ int main(int argc, char** argv)
 
             else if (!strcmp(fields[0], "ELSE")) goto _pc_continue;
 
-            else if (!strcmp(fields[0], "END") || !strcmp(fields[0], "EXIT") || !strcmp(fields[0], "QUIT"))
+            else if (!strcmp(fields[0], "END") || !strcmp(fields[0], "EXIT") || !strcmp(fields[0], "QUIT") || !strcmp(fields[0], "DIE"))
             {
+                if (fields[1])
+                {
+                    l = interpret_single_int(fields[1]);
+                    if (l) return l;
+                    else psz = interpret_single_string(fields[1]);
+                    if (strlen(psz)) cout << psz << endl;
+                }
                 return 0;
             }	// END
 
@@ -935,9 +942,10 @@ int main(int argc, char** argv)
                 {
                     l--;
                     if (interpret_single_float(fields[l])) goto _evaluated_true;
+                    else if (strlen(interpret_single_string(fields[l]))) goto _evaluated_true;
                     else goto _evaluated_false;
                 }
-                if (!strcmp(fields[l], "="))
+                if (!strcmp(fields[l], "=") || !strcmp(fields[l], "!=") || !strcmp(fields[l], "=*"))
                 {
                     if (!fields[l+1]) raise_error("Insufficient parameters given for IF.");
                     if (fields[l-1][0] == fields[l+1][0]
@@ -949,8 +957,21 @@ int main(int argc, char** argv)
                     {
                         char *lvalue = interpret_single_string(fields[l-1]),
                               *rvalue = interpret_single_string(fields[l+1]);
-                        if (strcmp(lvalue, rvalue)) goto _evaluated_false;
-                        else goto _evaluated_true;
+                        if (!strcmp(fields[l], "="))
+                        {
+                            if (strcmp(lvalue, rvalue)) goto _evaluated_false;
+                            else goto _evaluated_true;
+                        }
+                        if (!strcmp(fields[l], "!="))
+                        {
+                            if (!strcmp(lvalue, rvalue)) goto _evaluated_false;
+                            else goto _evaluated_true;
+                        }
+                        if (!strcmp(fields[l], "=*"))
+                        {
+                            if (!strstr(lvalue, rvalue)) goto _evaluated_false;
+                            else goto _evaluated_true;
+                        }
                     }
                     else goto _just_interpret_floats;
                 }

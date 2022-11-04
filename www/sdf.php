@@ -8,11 +8,15 @@ header("Expires: 0");
 chdir(__DIR__);
 require_once("../predict/odorutils.php");
 
-$odor = find_odorant(@$_REQUEST['m']);
-if (!$odor)
+if (@$_REQUEST['m'] == "rand") $odor = $odors[array_keys($odors)[rand(0,count($odors)-1)]];
+else
 {
-    header("Location: odorants.php");
-    exit;
+	$odor = find_odorant(@$_REQUEST['m']);
+	if (!$odor)
+	{
+		header("Location: odorants.php");
+		exit;
+	}
 }
 
 chdir(__DIR__);

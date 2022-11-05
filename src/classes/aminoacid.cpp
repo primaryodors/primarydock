@@ -1837,6 +1837,9 @@ LocRotation* AminoAcid::flatten()
 
         if (proline) continue;
 
+        /*if (aadef) cout << aadef->_3let;
+        cout << residue_no;
+        cout << ":" << endl;*/
         float planar = 9999, r = 9999;
         for (i=0; i<250; i++)
         {
@@ -1912,12 +1915,13 @@ LocRotation* AminoAcid::flatten()
                 ;
             }
 
-            if ( (i >= 40 && j >= 3) ? (lr <= r) : (lplanar <= planar) )
+            if ( (i < 60 && j >= 3) ? (lr <= r) : (lplanar <= planar) )
             {
                 retval[j].a += ad[j];
                 if (retval[j].a > M_PI) retval[j].a -= M_PI*2;
-                if (fabs(ad[j]) < 0.5) ad[j] *= 1.05;
+                if (fabs(ad[j]) < 0.5) ad[j] *= 1.01;
                 planar = lplanar;
+                // cout << planar << " ";
                 r = lr;
             }
             else
@@ -1935,9 +1939,11 @@ LocRotation* AminoAcid::flatten()
                 default:
                     ;
                 }
-                ad[j] *= -0.5;
+                ad[j] *= -0.75;
+                // cout << "x ";
             }
         }
+        // cout << endl << endl;
 
         LocatedVector lv = retval[j].get_lv();
         switch(j)

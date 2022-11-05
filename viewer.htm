@@ -36,9 +36,9 @@ const aa_aliphatic = 0,
 
 var opc_molecule = 1.0;
 var opc_ligand = 1.0;
-var opc_cartoon = 0.25;
-var opc_sidechain = 0.36;
-var opc_sidechain_active = 0.41;
+var opc_cartoon = 0.35;
+var opc_sidechain = 0.4;
+var opc_sidechain_active = 0.44;
 var opc_metal = 1.0;
 
 var mtl_bs = 0.0;
@@ -1078,7 +1078,7 @@ stage.setParameters(
 {
 	'backgroundColor': '#080400',
 	'ambientColor': '#59f',
-    'ambientIntensity': 0.5,
+    'ambientIntensity': 0.6,
 	'lightColor': '#fc8',
     'lightIntensity': 0.8,
 });
@@ -1414,6 +1414,7 @@ $("#clip").on("input", function (e, obj)
 function getFileContents(event)
 {
     var ff = event.target.files;
+	if (!ff.length) return;
 
     var f = ff[0];
     var r = new FileReader();
@@ -1428,6 +1429,8 @@ function getFileContents(event)
         };
     })(f);
     r.readAsText(f);
+
+	event.target.value = "";
 }
 
 function loadFile(fileData, fileName = "")

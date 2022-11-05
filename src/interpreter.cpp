@@ -911,9 +911,9 @@ int main(int argc, char** argv)
 
                 else
                 {
-                    phi = interpret_single_float(fields[1]);
+                    phi = interpret_single_float(fields[1])*fiftyseventh;
                     if (!fields[2]) raise_error("Insufficient parameters given for HELIX.");
-                    psi = interpret_single_float(fields[2]);
+                    psi = interpret_single_float(fields[2])*fiftyseventh;
                     l++;
                 }
 

@@ -29,4 +29,10 @@ IF $C != "C" DIE "Helix motif C not found."
 IF $D != "D" THEN IF $D != "E" DIE "Helix motif D/E not found."
 IF $found =* "P" DIE "Helix motif disrupted by proline."
 
-DUMP
+LET %exr_motif_end = %exr_motif + 5
+# LET %exr_motif -= 10
+
+HELIX ALPHA %exr_motif %exr_motif_end
+
+LET $path = "pdbs/" + $fam + "/" + $prot + ".helix.pdb"
+SAVE $path

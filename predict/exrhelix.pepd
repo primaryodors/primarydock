@@ -33,6 +33,16 @@ LET %exr_motif_end = %exr_motif + 5
 # LET %exr_motif -= 10
 
 HELIX ALPHA %exr_motif %exr_motif_end
+# CONNECT %TMR5.s %exr_motif_end
 
 LET $path = "pdbs/" + $fam + "/" + $prot + ".helix.pdb"
+SAVE $path
+
+LET %H = %exr_motif
+LET %C = %exr_motif + 3
+LET %D = %exr_motif + 4
+
+MCOORD Th8 Zn 2 %H %C %D
+
+LET $path = "pdbs/" + $fam + "/" + $prot + ".metal.pdb"
 SAVE $path

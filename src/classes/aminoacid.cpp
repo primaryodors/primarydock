@@ -1982,7 +1982,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     // Get the location of the previous C, and the location of the local C.
     Atom *atom, *btom;
 
-    angle = M_PI+angle;
+    // angle = M_PI+angle;
 
     switch (dir)
     {
@@ -2028,6 +2028,8 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     }
     if (!m_mcoord) b->can_rotate = true;
 
+    b->clear_moves_with_cache();
+
     switch (dir)
     {
     case N_asc:
@@ -2048,7 +2050,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     }
 
     // Use the SCoord as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
-    int i, step=3;
+    int i, step=1;
     float bestrad=0, bestr;
 
     if (!atom || !btom)
@@ -2061,12 +2063,15 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     {
         b->rotate(fiftyseventh*step, true);
         float r = atom->get_location().get_3d_distance(btom->get_location());
+        // if (dir == N_asc) cout << b->atom->name << "-" << b->btom->name << " rotation " << i << ": " << atom->name << "-" << btom->name << " distance = " << r << endl;
         if (r < bestr)
         {
-            bestrad = fiftyseventh*i;
+            bestrad = fiftyseventh*(i+step);
             bestr = r;
         }
     }
+    // cout << "Best rotation = " << (bestrad*fiftyseven) << " degrees." << endl;
+    bestrad = 0;
 
     // To this maximum stretch angle, add the input angle and do the backbone rotation.
     // cout << "Calling " << *this << ".rotate_backbone( " << (bestrad*fiftyseven) << " + " << (angle*fiftyseven) << ")..." << endl;
@@ -2140,7 +2145,7 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     }
 
     Bond* b = rotcen->get_bond_between(btom);
-    if (!b || !b->can_rotate)
+    if (!b) // || !b->can_rotate)
     {
         // cout << "Non-rotatable bond " << *this << ":" << rotcen->name << "-" << btom->name << "; cannot rotate backbone." << endl;
         retval.r = 0;		// Fail condition.

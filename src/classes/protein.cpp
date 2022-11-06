@@ -1211,8 +1211,10 @@ void Protein::make_helix(int startres, int endres, float phi, float psi)
 void Protein::make_helix(int startres, int endres, int stopat, float phi, float psi)
 {
     int inc = sgn(endres-startres);
-    if (inc != sgn(stopat-startres)) return;
-    if (stopat < endres) endres = stopat;
+    if (!inc) inc = sgn(stopat-startres);
+    else if (inc != sgn(stopat-startres)) return;
+    if (inc > 0 && stopat < endres) endres = stopat;
+    if (inc < 0 && stopat > endres) endres = stopat;
     int res, i, j, iter;
     int phis[365], psis[365];
     bb_rot_dir dir1 = (inc>0) ? N_asc : CA_desc,

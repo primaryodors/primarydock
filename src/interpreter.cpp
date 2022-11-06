@@ -905,8 +905,8 @@ int main(int argc, char** argv)
                 }
                 else if (!strcmp(fields[1], "STRAIGHT"))
                 {
-                    phi = M_PI;
-                    psi = M_PI;
+                    phi = 0;
+                    psi = 0;
                 }
 
                 else
@@ -917,14 +917,15 @@ int main(int argc, char** argv)
                     l++;
                 }
 
-                int sr, er;
+                int sr, er, sa;
                 if (!fields[l]) raise_error("Insufficient parameters given for HELIX.");
                 sr = interpret_single_int(fields[l]);
                 if (!fields[l+1]) raise_error("Insufficient parameters given for HELIX.");
-                er = interpret_single_int(fields[l+1]);
-                if (fields[l+2]) raise_error("Too many parameters given for HELIX.");
+                sa = er = interpret_single_int(fields[l+1]);
+                if (fields[l+2]) sa = interpret_single_int(fields[l+2]);
+                if (fields[l+2] && fields[l+3]) raise_error("Too many parameters given for HELIX.");
 
-                p.make_helix(sr, er, phi, psi);
+                p.make_helix(sr, er, sa, phi, psi);
 
             }	// HELIX
 

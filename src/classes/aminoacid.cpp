@@ -1982,7 +1982,7 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     // Get the location of the previous C, and the location of the local C.
     Atom *atom, *btom;
 
-    // angle = M_PI+angle;
+    angle = M_PI+angle;
 
     switch (dir)
     {
@@ -2050,7 +2050,8 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     }
 
     // Use the SCoord as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
-    int i, step=1;
+    int i;
+    float theta, step = 3, oldstep = 360;
     float bestrad=0, bestr;
 
     if (!atom || !btom)
@@ -2058,20 +2059,30 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
         cout << "Not found reference atom for " << *this << "; cannot rotate backbone." << endl;
         return retval;
     }
-    bestr = atom->get_location().get_3d_distance(btom->get_location()) * 1000;
-    for (i=0; i<360; i+=step)
+
+    while (step > 0.01)
     {
-        b->rotate(fiftyseventh*step, true);
-        float r = atom->get_location().get_3d_distance(btom->get_location());
-        // if (dir == N_asc) cout << b->atom->name << "-" << b->btom->name << " rotation " << i << ": " << atom->name << "-" << btom->name << " distance = " << r << endl;
-        if (r < bestr)
+        bestr = atom->get_location().get_3d_distance(btom->get_location()) * 1000;
+        for (theta=bestrad-oldstep; theta<bestrad+oldstep; theta+=step)
         {
-            bestrad = fiftyseventh*(i+step);
-            bestr = r;
+            b->rotate(fiftyseventh*step, true);
+            float r = atom->get_location().get_3d_distance(btom->get_location());
+            #if 0
+            /*if (dir == N_asc)*/ cout << b->atom->name << "-" << b->btom->name << " rotation " << theta << ": "
+                << atom->name << "-" << btom->name << " distance = " << r << endl << flush;
+            #endif
+            if (r < bestr)
+            {
+                bestrad = fiftyseventh*(theta+step);
+                bestr = r;
+            }
         }
+
+        if (oldstep < 359.9999) b->rotate(fiftyseventh * -(oldstep+step), true);
+        oldstep = step;
+        step /= 10;
     }
     // cout << "Best rotation = " << (bestrad*fiftyseven) << " degrees." << endl;
-    bestrad = 0;
 
     // To this maximum stretch angle, add the input angle and do the backbone rotation.
     // cout << "Calling " << *this << ".rotate_backbone( " << (bestrad*fiftyseven) << " + " << (angle*fiftyseven) << ")..." << endl;

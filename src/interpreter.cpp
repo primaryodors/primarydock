@@ -838,7 +838,8 @@ int main(int argc, char** argv)
                 psz = interpret_single_string(fields[1]);
 
                 p.add_sequence(psz);
-                p.conform_backbone(1, p.get_seq_length(), 50);
+                // p.conform_backbone(1, p.get_seq_length(), 50); // Takes too long.
+                p.make_helix(1, p.get_seq_length(), M_PI, M_PI);
                 goto _prot_deets;
             } // GEN
 
@@ -905,8 +906,8 @@ int main(int argc, char** argv)
                 }
                 else if (!strcmp(fields[1], "STRAIGHT"))
                 {
-                    phi = 0;
-                    psi = 0;
+                    phi = M_PI;
+                    psi = M_PI;
                 }
 
                 else

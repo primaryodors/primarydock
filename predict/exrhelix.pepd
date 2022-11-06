@@ -22,6 +22,10 @@ LET $H = $found FROM 1 FOR 1
 LET $C = $found FROM 4 FOR 1
 LET $D = $found FROM 5 FOR 1
 
+# https://www.mdpi.com/2673-8392/1/1/24/htm
+# "The most common amino acids that provide nitrogen, oxygen, and sulfur ligands to Zn2+ are His, Glu, Asp, and Cys."
+# It may be that not all ORs harbor an extracellular Zn2+ ion, but some may utilize other ions such as Cu+ or Ca2+.
+
 IF "HNQDERM" =* $H GOTO _hasH
 DIE "Helix motif H not found."
 _hasH:

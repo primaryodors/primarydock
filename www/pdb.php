@@ -22,7 +22,10 @@ $fam = family_from_protid($protid);
 chdir(__DIR__);
 chdir("..");
 
-$pdbfn = "pdbs/$fam/$protid.upright.pdb";
+$mod = "upright";
+if (@$_REQUEST['mod'] == 'm') $mod = "metal";
+$pdbfn = "pdbs/$fam/$protid.$mod.pdb";
+if (!file_exists($pdbfn)) $pdbfn = "pdbs/$fam/$protid.upright.pdb";
 
 if (!file_exists($pdbfn))
 {

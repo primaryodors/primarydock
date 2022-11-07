@@ -163,7 +163,7 @@ void iteration_callback(int iter)
         discrete[1].pmol = gcfmols[1];*/
 
         int i;
-        int offset = 1;
+        int offset = 2;             // For some strange reason, if this is set to 1 the TAAR8 test fails.
 
         if (waters) offset += maxh2o;
 

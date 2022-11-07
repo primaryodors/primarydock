@@ -1,4 +1,10 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
 chdir(__DIR__);
 require_once("../predict/protutils.php");
 

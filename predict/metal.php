@@ -20,8 +20,8 @@ foreach ($prots as $k => $v)
 {
     $protid = $k;
     $fam = family_from_protid($protid);
-    if (!@$_REQUEST['force'] && !file_exists("pdbs/$fam/$protid.upright.pdb")) continue;
-    if (file_exists("pdbs/$fam/$protid.metal.pdb")) continue;
+    if (!file_exists("pdbs/$fam/$protid.upright.pdb")) continue;
+    if (!@$_REQUEST['force'] && file_exists("pdbs/$fam/$protid.metal.pdb")) continue;
     
     echo "Processing $protid...\n";
     chdir(__DIR__);

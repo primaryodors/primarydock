@@ -109,7 +109,7 @@ fclose($f);
 
 $outlines = [];
 set_time_limit(300);
-exec("bin/peptiditor tmp/activate.pepd", $outlines);
+exec("bin/pepteditor tmp/activate.pepd", $outlines);
 
 foreach ($outlines as $ln)
 {

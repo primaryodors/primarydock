@@ -2,7 +2,7 @@
 LET %test = $arg17
 
 IF %test >= 260 GOTO _haveparams
-ECHO "Usage: bin/peptiditor newprot.pepd /path/to/file.pdb PROTNAME {integer TMR1 through TMR7 start and end residues}
+ECHO "Usage: bin/pepteditor newprot.pepd /path/to/file.pdb PROTNAME {integer TMR1 through TMR7 start and end residues}
 EXIT
 _haveparams:
 

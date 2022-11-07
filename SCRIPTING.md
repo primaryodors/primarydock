@@ -1,12 +1,12 @@
 
-# Peptiditor Documentation
+# Pepteditor Documentation
 
-Peptiditor: The Scripted Peptide Editor.
+Pepteditor: The Scripted Peptide Editor.
 
-To run a Peptiditor script, after building PrimaryDock, please use the following command:
+To run a Pepteditor script, after building PrimaryDock, please use the following command:
 
 ```
-bin/peptiditor path/to/script.pepd
+bin/pepteditor path/to/script.pepd
 ```
 
 # Variables
@@ -39,8 +39,8 @@ Variables as array indices are possible because of nested variable names. If an 
 `$array[@location.x]` is not. If there is any ambiguity in variable names, the longest and earliest matching variable is used.
 
 This works similarly to the `$$` syntax of PHP, where if `$varname = "foo"` then `$$varname` is the same as `$foo`. However, unlike in PHP, the nested
-variable name can occur anywhere in a Peptiditor variable, there can be more than one nested variable, and variable names can be nested multiple levels
-deep, so for example `$array[%i][%array2[%j]]` is legal Peptiditor syntax as long as `%i`, `%j`, and `%array2[%j]` have all been set.
+variable name can occur anywhere in a pepteditor variable, there can be more than one nested variable, and variable names can be nested multiple levels
+deep, so for example `$array[%i][%array2[%j]]` is legal pepteditor syntax as long as `%i`, `%j`, and `%array2[%j]` have all been set.
 
 This also means that square brackets are not required for array functionality, and one could just as easily define variable `$array[3]` as `$array3`,
 `$array(3)`, or `$arrayfoo3bar`, and the syntax of `%i` (or any other int variable) in place of `3` will still work.

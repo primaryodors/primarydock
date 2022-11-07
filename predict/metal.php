@@ -27,6 +27,6 @@ foreach ($prots as $k => $v)
     chdir(__DIR__);
     chdir("..");
     set_time_limit(600);
-    passthru("bin/peptiditor predict/exrhelix.pepd $protid");
+    passthru("bin/pepteditor predict/exrhelix.pepd $protid");
     echo "\n";
 }

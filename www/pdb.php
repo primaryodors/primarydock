@@ -1,4 +1,10 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
 chdir(__DIR__);
 require_once("../predict/protutils.php");
 
@@ -16,7 +22,10 @@ $fam = family_from_protid($protid);
 chdir(__DIR__);
 chdir("..");
 
-$pdbfn = "pdbs/$fam/$protid.upright.pdb";
+$mod = "upright";
+if (@$_REQUEST['mod'] == 'm') $mod = "metal";
+$pdbfn = "pdbs/$fam/$protid.$mod.pdb";
+if (!file_exists($pdbfn)) $pdbfn = "pdbs/$fam/$protid.upright.pdb";
 
 if (!file_exists($pdbfn))
 {

@@ -1,0 +1,75 @@
+
+LET $prot = "OR1A1"
+IF $arg2 THEN LET $prot = $arg2
+
+LET $sub = $prot FROM 1 FOR 4
+LET $fam = ""
+IF $sub = "TAAR" LET $fam = $sub
+IF $sub = "VN1R" LET $fam = $sub
+IF $fam THEN GOTO _notOR
+LET $sub = $sub FROM 3
+LET %sub = $sub
+LET $fam = "OR" + %sub
+_notOR:
+
+LET $path = "pdbs/" + $fam + "/" + $prot + ".upright.pdb"
+LOAD $path
+
+IF %3.50 <= 0 THEN DIE "Input PDB is missing Ballesteros-Weinstein numbers.\nPlease ensure the records are in the format:\nREMARK 800 SITE BW {n}.50 {resno}."
+
+SEARCH %TMR4.e %TMR5.s "HFFCD" %exr_motif %similarity
+LET $found = $SEQUENCE FROM %exr_motif FOR 5
+
+LET $H = $found FROM 1 FOR 1
+LET $C = $found FROM 4 FOR 1
+LET $D = $found FROM 5 FOR 1
+
+# https://www.mdpi.com/2673-8392/1/1/24/htm
+# "The most common amino acids that provide nitrogen, oxygen, and sulfur ligands to Zn2+ are His, Glu, Asp, and Cys."
+# It may be that not all ORs harbor an extracellular Zn2+ ion, but some may utilize other ions such as Cu+ or Ca2+.
+
+IF "HNQDERM" =* $H GOTO _hasH
+DIE "Helix motif H not found."
+_hasH:
+IF $C != "C" DIE "Helix motif C not found."
+IF $D != "D" THEN IF $D != "E" DIE "Helix motif D/E not found."
+IF $found =* "P" DIE "Helix motif disrupted by proline."
+
+LET %exr_motif_end = %exr_motif + 5
+# LET %exr_motif -= 10
+
+HELIX ALPHA %exr_motif %exr_motif_end
+
+LET %3.29 = %3.50 - 21
+LET %4.60 = %4.50 + 10
+LET %5.39 = %5.50 - 11
+LET %6.51 = %6.50 +  1
+LET @pockettop  = %3.29
+LET @pockettop += %4.60
+LET @pockettop += %5.39
+LET @pockettop += %6.51
+LET @pockettop /= 4
+LET @pockettop.y += 15
+
+MOVE %exr_motif %exr_motif_end @pockettop
+
+# CONNECT %TMR5.s %exr_motif_end
+
+# LET $path = "pdbs/" + $fam + "/" + $prot + ".helix.pdb"
+# SAVE $path
+
+LET %H = %exr_motif
+LET %C = %exr_motif + 3
+LET %D = %exr_motif + 4
+
+MCOORD Th8 Zn 2 %H %C %D
+
+DELETE 1 %TMR1.s
+
+LET %em1 = %exr_motif - 1
+LET %em6 = %exr_motif + 5
+DELETE %TMR4.e %em1
+DELETE %em6 %TMR5.s
+
+LET $path = "pdbs/" + $fam + "/" + $prot + ".metal.pdb"
+SAVE $path

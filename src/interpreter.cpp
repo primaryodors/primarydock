@@ -453,8 +453,8 @@ int main(int argc, char** argv)
 
     if (/*!PDB_fname.length() ||*/ !script_fname.length())
     {
-        /*cout << "Usage:" << endl << "peptiditor protein.pdb script_filename" << endl;
-        cout << "peptiditor script_filename protein.pdb" << endl;*/
+        /*cout << "Usage:" << endl << "pepteditor protein.pdb script_filename" << endl;
+        cout << "pepteditor script_filename protein.pdb" << endl;*/
         cout << "Error: no script filename supplied." << endl;
         cout << endl;
         return 0;
@@ -820,8 +820,15 @@ int main(int argc, char** argv)
 
             else if (!strcmp(fields[0], "ELSE")) goto _pc_continue;
 
-            else if (!strcmp(fields[0], "END") || !strcmp(fields[0], "EXIT") || !strcmp(fields[0], "QUIT"))
+            else if (!strcmp(fields[0], "END") || !strcmp(fields[0], "EXIT") || !strcmp(fields[0], "QUIT") || !strcmp(fields[0], "DIE"))
             {
+                if (fields[1])
+                {
+                    l = interpret_single_int(fields[1]);
+                    if (l) return l;
+                    else psz = interpret_single_string(fields[1]);
+                    if (strlen(psz)) cout << psz << endl;
+                }
                 return 0;
             }	// END
 
@@ -831,7 +838,8 @@ int main(int argc, char** argv)
                 psz = interpret_single_string(fields[1]);
 
                 p.add_sequence(psz);
-                p.conform_backbone(1, p.get_seq_length(), 50);
+                // p.conform_backbone(1, p.get_seq_length(), 50); // Takes too long.
+                p.make_helix(1, p.get_seq_length(), M_PI, M_PI);
                 goto _prot_deets;
             } // GEN
 
@@ -904,20 +912,21 @@ int main(int argc, char** argv)
 
                 else
                 {
-                    phi = interpret_single_float(fields[1]);
+                    phi = interpret_single_float(fields[1])*fiftyseventh;
                     if (!fields[2]) raise_error("Insufficient parameters given for HELIX.");
-                    psi = interpret_single_float(fields[2]);
+                    psi = interpret_single_float(fields[2])*fiftyseventh;
                     l++;
                 }
 
-                int sr, er;
+                int sr, er, sa;
                 if (!fields[l]) raise_error("Insufficient parameters given for HELIX.");
                 sr = interpret_single_int(fields[l]);
                 if (!fields[l+1]) raise_error("Insufficient parameters given for HELIX.");
-                er = interpret_single_int(fields[l+1]);
-                if (fields[l+2]) raise_error("Too many parameters given for HELIX.");
+                sa = er = interpret_single_int(fields[l+1]);
+                if (fields[l+2]) sa = interpret_single_int(fields[l+2]);
+                if (fields[l+2] && fields[l+3]) raise_error("Too many parameters given for HELIX.");
 
-                p.make_helix(sr, er, phi, psi);
+                p.make_helix(sr, er, sa, phi, psi);
 
             }	// HELIX
 
@@ -935,9 +944,10 @@ int main(int argc, char** argv)
                 {
                     l--;
                     if (interpret_single_float(fields[l])) goto _evaluated_true;
+                    else if (strlen(interpret_single_string(fields[l]))) goto _evaluated_true;
                     else goto _evaluated_false;
                 }
-                if (!strcmp(fields[l], "="))
+                if (!strcmp(fields[l], "=") || !strcmp(fields[l], "!=") || !strcmp(fields[l], "=*"))
                 {
                     if (!fields[l+1]) raise_error("Insufficient parameters given for IF.");
                     if (fields[l-1][0] == fields[l+1][0]
@@ -949,8 +959,21 @@ int main(int argc, char** argv)
                     {
                         char *lvalue = interpret_single_string(fields[l-1]),
                               *rvalue = interpret_single_string(fields[l+1]);
-                        if (strcmp(lvalue, rvalue)) goto _evaluated_false;
-                        else goto _evaluated_true;
+                        if (!strcmp(fields[l], "="))
+                        {
+                            if (strcmp(lvalue, rvalue)) goto _evaluated_false;
+                            else goto _evaluated_true;
+                        }
+                        if (!strcmp(fields[l], "!="))
+                        {
+                            if (!strcmp(lvalue, rvalue)) goto _evaluated_false;
+                            else goto _evaluated_true;
+                        }
+                        if (!strcmp(fields[l], "=*"))
+                        {
+                            if (!strstr(lvalue, rvalue)) goto _evaluated_false;
+                            else goto _evaluated_true;
+                        }
                     }
                     else goto _just_interpret_floats;
                 }
@@ -1352,6 +1375,28 @@ int main(int argc, char** argv)
 
                     delete[] fields;
                 }
+
+                for (l=1; l<=7; l++)
+                {
+                    int bw50 = p.get_bw50(l);
+                    if (bw50 > 0)
+                    {
+                        sprintf(buffer1, "%c%d.50", '%', l);
+                        sv.n = bw50;
+                        set_variable(buffer1, sv);
+                    }
+                }
+
+                for (l=12; l<=67; l+=11)
+                {
+                    int bw50 = p.get_bw50(l);
+                    if (bw50 > 0)
+                    {
+                        sprintf(buffer1, "%c%d.50", '%', l);
+                        sv.n = bw50;
+                        set_variable(buffer1, sv);
+                    }
+                }
             }
 
             else if (!strcmp(fields[0], "MCOORD"))
@@ -1464,6 +1509,20 @@ int main(int argc, char** argv)
                 p.coordinate_metal(ma, ncr, resnos, cratoms);
 
             } // MCOORD
+
+            else if (!strcmp(fields[0], "MOVE"))
+            {
+                l = 1;
+                Point newcen(0,0,0);
+                int sr, er;
+                if (fields[l]) sr = interpret_single_int(fields[l++]);
+                else raise_error("Not enough parameters given for MOVE.");
+                if (fields[l]) er = interpret_single_int(fields[l++]);
+                else raise_error("Not enough parameters given for MOVE.");
+                if (fields[l]) newcen = interpret_single_point(fields[l++]);
+                if (fields[l]) raise_error("Too many parameters given for MOVE.");
+                p.move_piece(sr, er, newcen);
+            }	// MOVE
 
             else if (!strcmp(fields[0], "PTALIGN"))
             {

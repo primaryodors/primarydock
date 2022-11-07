@@ -7,6 +7,12 @@
 // Example call syntax:
 // php -f predict/activate.php prot=OR1A1
 //
+// May be run as a cron to generate active PDBs for all olfactory receptors, e.g.
+// php -f predict/activate.php next
+//
+// May be run on the entire set of receptors in one call, e.g.
+// php -f predict/activate.php all
+//
 
 require("protutils.php");
 
@@ -103,7 +109,7 @@ fclose($f);
 
 $outlines = [];
 set_time_limit(300);
-exec("bin/peptiditor tmp/activate.pepd", $outlines);
+exec("bin/pepteditor tmp/activate.pepd", $outlines);
 
 foreach ($outlines as $ln)
 {

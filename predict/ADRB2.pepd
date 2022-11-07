@@ -1,4 +1,4 @@
-# Peptiditor script for deriving active-state conformational changes from human β2 adrenergic receptor.
+# Pepteditor script for deriving active-state conformational changes from human β2 adrenergic receptor.
 #
 
 LET %TMR1s =  35

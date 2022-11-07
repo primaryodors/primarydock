@@ -448,7 +448,31 @@ int Protein::load_pdb(FILE* is, int rno)
         delete[] fields;
     }
 
+    std::vector<std::string> rem_st = get_remarks("800 SITE");
+    for (l=0; l<rem_st.size(); l++)
+    {
+        char buffer[1024];
+        char buffer1[1024];
+        strcpy(buffer, rem_st[l].c_str());
+        char** fields = chop_spaced_fields(buffer);
+
+        int f4 = atoi(fields[4]);
+        if (!strcmp(fields[3], "BW"))
+        {
+            while (Ballesteros_Weinstein.size() <= f4) Ballesteros_Weinstein.push_back(0);
+            Ballesteros_Weinstein[f4] = atoi(fields[5]);
+        }
+
+        delete[] fields;
+    }
+
     return rescount;
+}
+
+int Protein::get_bw50(int helixno)
+{
+    if (Ballesteros_Weinstein.size() <= helixno) return -1;
+    return Ballesteros_Weinstein[helixno];
 }
 
 int Protein::get_seq_length()
@@ -1211,8 +1235,10 @@ void Protein::make_helix(int startres, int endres, float phi, float psi)
 void Protein::make_helix(int startres, int endres, int stopat, float phi, float psi)
 {
     int inc = sgn(endres-startres);
-    if (inc != sgn(stopat-startres)) return;
-    if (stopat < endres) endres = stopat;
+    if (!inc) inc = sgn(stopat-startres);
+    else if (inc != sgn(stopat-startres)) return;
+    if (inc > 0 && stopat < endres) endres = stopat;
+    if (inc < 0 && stopat > endres) endres = stopat;
     int res, i, j, iter;
     int phis[365], psis[365];
     bb_rot_dir dir1 = (inc>0) ? N_asc : CA_desc,

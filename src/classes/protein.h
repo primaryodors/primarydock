@@ -56,6 +56,7 @@ public:
     }
     Point get_atom_location(int resno, const char* aname);
     std::vector<std::string> get_remarks(std::string search_for = "");
+    int get_bw50(int helixno);
 
     // Metrics functions.
     float get_internal_clashes();
@@ -121,6 +122,7 @@ protected:
     Region regions[PROT_MAX_RGN];
     std::vector<string> remarks;
     MetalCoord** m_mcoord = nullptr;
+    std::vector<int> Ballesteros_Weinstein;
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);

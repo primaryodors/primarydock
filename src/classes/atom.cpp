@@ -1050,7 +1050,7 @@ void Bond::fill_moves_with_cache()
     if (!b) return;
     for (i=0; b[i]; i++)
     {
-        if (b[i]->btom && b[i]->btom != atom)
+        if (b[i]->btom && b[i]->btom != atom && b[i]->btom->residue == btom->residue)
         {
             attmp[tmplen++] = b[i]->btom;
             b[i]->btom->used = true;
@@ -1070,7 +1070,7 @@ void Bond::fill_moves_with_cache()
                 for (i=0; b[i]; i++)
                 {
                     //if (b[i]->btom) cout << "(" << b[i]->btom->name << "?) ";
-                    if (b[i]->btom && !b[i]->btom->used && b[i]->btom != atom)
+                    if (b[i]->btom && !b[i]->btom->used && b[i]->btom != atom && b[i]->btom->residue == btom->residue)
                     {
                         attmp[tmplen++] = b[i]->btom;
                         b[i]->btom->used = true;
@@ -1159,10 +1159,8 @@ void Bond::enforce_moves_with_uniqueness()
         for (j=i+1; moves_with_btom[j]; j++)
         {
             if (moves_with_btom[j] == moves_with_btom[i]
-                    ||
-                    moves_with_btom[j]->is_backbone
-                    ||
-                    moves_with_btom[j]->residue != btom->residue
+                    // || moves_with_btom[j]->is_backbone
+                    || moves_with_btom[j]->residue != btom->residue
                )
             {
                 moves_with_btom[j] = 0;
@@ -1191,7 +1189,7 @@ bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
     }
     // cout << "Rotate " << atom->name << cardinality_printable(cardinality) << btom->name << endl;
 
-    if (atom->residue && greek_from_aname(atom->name) > greek_from_aname(btom->name))
+    if (atom->residue && !atom->is_backbone && greek_from_aname(atom->name) > greek_from_aname(btom->name))
     {
         can_rotate = false;
         return false;

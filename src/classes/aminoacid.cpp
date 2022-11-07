@@ -1837,6 +1837,9 @@ LocRotation* AminoAcid::flatten()
 
         if (proline) continue;
 
+        /*if (aadef) cout << aadef->_3let;
+        cout << residue_no;
+        cout << ":" << endl;*/
         float planar = 9999, r = 9999;
         for (i=0; i<250; i++)
         {
@@ -1912,12 +1915,13 @@ LocRotation* AminoAcid::flatten()
                 ;
             }
 
-            if ( (i >= 40 && j >= 3) ? (lr <= r) : (lplanar <= planar) )
+            if ( (i < 60 && j >= 3) ? (lr <= r) : (lplanar <= planar) )
             {
                 retval[j].a += ad[j];
                 if (retval[j].a > M_PI) retval[j].a -= M_PI*2;
-                if (fabs(ad[j]) < 0.5) ad[j] *= 1.05;
+                if (fabs(ad[j]) < 0.5) ad[j] *= 1.01;
                 planar = lplanar;
+                // cout << planar << " ";
                 r = lr;
             }
             else
@@ -1935,9 +1939,11 @@ LocRotation* AminoAcid::flatten()
                 default:
                     ;
                 }
-                ad[j] *= -0.5;
+                ad[j] *= -0.75;
+                // cout << "x ";
             }
         }
+        // cout << endl << endl;
 
         LocatedVector lv = retval[j].get_lv();
         switch(j)
@@ -2022,6 +2028,8 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     }
     if (!m_mcoord) b->can_rotate = true;
 
+    b->clear_moves_with_cache();
+
     switch (dir)
     {
     case N_asc:
@@ -2042,7 +2050,8 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
     }
 
     // Use the SCoord as the axis and make an imaginary circle, finding the angle that brings HN and O closest.
-    int i, step=3;
+    int i;
+    float theta, step = 3, oldstep = 360;
     float bestrad=0, bestr;
 
     if (!atom || !btom)
@@ -2050,17 +2059,30 @@ LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)
         cout << "Not found reference atom for " << *this << "; cannot rotate backbone." << endl;
         return retval;
     }
-    bestr = atom->get_location().get_3d_distance(btom->get_location()) * 1000;
-    for (i=0; i<360; i+=step)
+
+    while (step > 0.01)
     {
-        b->rotate(fiftyseventh*step, true);
-        float r = atom->get_location().get_3d_distance(btom->get_location());
-        if (r < bestr)
+        bestr = atom->get_location().get_3d_distance(btom->get_location()) * 1000;
+        for (theta=bestrad-oldstep; theta<bestrad+oldstep; theta+=step)
         {
-            bestrad = fiftyseventh*i;
-            bestr = r;
+            b->rotate(fiftyseventh*step, true);
+            float r = atom->get_location().get_3d_distance(btom->get_location());
+            #if 0
+            /*if (dir == N_asc)*/ cout << b->atom->name << "-" << b->btom->name << " rotation " << theta << ": "
+                << atom->name << "-" << btom->name << " distance = " << r << endl << flush;
+            #endif
+            if (r < bestr)
+            {
+                bestrad = fiftyseventh*(theta+step);
+                bestr = r;
+            }
         }
+
+        if (oldstep < 359.9999) b->rotate(fiftyseventh * -(oldstep+step), true);
+        oldstep = step;
+        step /= 10;
     }
+    // cout << "Best rotation = " << (bestrad*fiftyseven) << " degrees." << endl;
 
     // To this maximum stretch angle, add the input angle and do the backbone rotation.
     // cout << "Calling " << *this << ".rotate_backbone( " << (bestrad*fiftyseven) << " + " << (angle*fiftyseven) << ")..." << endl;
@@ -2134,7 +2156,7 @@ LocatedVector AminoAcid::rotate_backbone(bb_rot_dir direction, float angle)
     }
 
     Bond* b = rotcen->get_bond_between(btom);
-    if (!b || !b->can_rotate)
+    if (!b) // || !b->can_rotate)
     {
         // cout << "Non-rotatable bond " << *this << ":" << rotcen->name << "-" << btom->name << "; cannot rotate backbone." << endl;
         retval.r = 0;		// Fail condition.

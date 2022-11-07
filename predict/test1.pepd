@@ -1,0 +1,8 @@
+
+GEN "MAAACSAAAAMAYDRYVAIC"
+
+HELIX STRAIGHT 1 20
+SAVE "straight.pdb"
+
+HELIX -60 -50 2 20
+SAVE "scream.pdb"

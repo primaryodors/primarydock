@@ -15,6 +15,8 @@ _notOR:
 LET $path = "pdbs/" + $fam + "/" + $prot + ".upright.pdb"
 LOAD $path
 
+IF %3.50 <= 0 THEN DIE "Input PDB is missing Ballesteros-Weinstein numbers.\nPlease ensure the records are in the format:\nREMARK 800 SITE BW {n}.50 {resno}."
+
 SEARCH %TMR4.e %TMR5.s "HFFCD" %exr_motif %similarity
 LET $found = $SEQUENCE FROM %exr_motif FOR 5
 
@@ -37,16 +39,37 @@ LET %exr_motif_end = %exr_motif + 5
 # LET %exr_motif -= 10
 
 HELIX ALPHA %exr_motif %exr_motif_end
+
+LET %3.29 = %3.50 - 21
+LET %4.60 = %4.50 + 10
+LET %5.39 = %5.50 - 11
+LET %6.51 = %6.50 +  1
+LET @pockettop  = %3.29
+LET @pockettop += %4.60
+LET @pockettop += %5.39
+LET @pockettop += %6.51
+LET @pockettop /= 4
+LET @pockettop.y += 15
+
+MOVE %exr_motif %exr_motif_end @pockettop
+
 # CONNECT %TMR5.s %exr_motif_end
 
-LET $path = "pdbs/" + $fam + "/" + $prot + ".helix.pdb"
-SAVE $path
+# LET $path = "pdbs/" + $fam + "/" + $prot + ".helix.pdb"
+# SAVE $path
 
 LET %H = %exr_motif
 LET %C = %exr_motif + 3
 LET %D = %exr_motif + 4
 
 MCOORD Th8 Zn 2 %H %C %D
+
+DELETE 1 %TMR1.s
+
+LET %em1 = %exr_motif - 1
+LET %em6 = %exr_motif + 5
+DELETE %TMR4.e %em1
+DELETE %em6 %TMR5.s
 
 LET $path = "pdbs/" + $fam + "/" + $prot + ".metal.pdb"
 SAVE $path

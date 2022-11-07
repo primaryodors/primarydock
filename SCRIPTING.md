@@ -65,6 +65,7 @@ The following "magic variables" are supplied upon loading a protein:
 - `%SEQLEN` the length of the protein sequence.
 - `$SEQUENCE` the sequence of the protein in standard one-letter amino acid code.
 - Region start and end residue numbers from any `REMARK 650 HELIX` records, e.g. `%TMR3.s` and `%TMR3.e` for the start and end resnos of TMR3.
+- Ballesteros-Weinstein n.50 numbers e.g. `%1.50`, `%2.50` etc., from `REMARK 800 SITE BW` records of the PDB if present.
 
 The following commands are supported:
 
@@ -347,6 +348,17 @@ the default can be overridden with YO to force oxygen coordination or YAr to for
 
 Yar or YO before the metal symbol applies globally to the coordination residues. Yar or YO directly before a residue number applies only to that residue,
 overriding the default or any global.
+
+
+# MOVE
+
+Example:
+```
+MOVE %start_res %end_res @newcen
+MOVE 160 176 [0,25,0]
+```
+
+Recenters the indicated region at the indicated Cartesian location.
 
 
 # PTALIGN

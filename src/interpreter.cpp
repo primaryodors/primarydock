@@ -1375,6 +1375,28 @@ int main(int argc, char** argv)
 
                     delete[] fields;
                 }
+
+                for (l=1; l<=7; l++)
+                {
+                    int bw50 = p.get_bw50(l);
+                    if (bw50 > 0)
+                    {
+                        sprintf(buffer1, "%c%d.50", '%', l);
+                        sv.n = bw50;
+                        set_variable(buffer1, sv);
+                    }
+                }
+
+                for (l=12; l<=67; l+=11)
+                {
+                    int bw50 = p.get_bw50(l);
+                    if (bw50 > 0)
+                    {
+                        sprintf(buffer1, "%c%d.50", '%', l);
+                        sv.n = bw50;
+                        set_variable(buffer1, sv);
+                    }
+                }
             }
 
             else if (!strcmp(fields[0], "MCOORD"))
@@ -1487,6 +1509,20 @@ int main(int argc, char** argv)
                 p.coordinate_metal(ma, ncr, resnos, cratoms);
 
             } // MCOORD
+
+            else if (!strcmp(fields[0], "MOVE"))
+            {
+                l = 1;
+                Point newcen(0,0,0);
+                int sr, er;
+                if (fields[l]) sr = interpret_single_int(fields[l++]);
+                else raise_error("Not enough parameters given for MOVE.");
+                if (fields[l]) er = interpret_single_int(fields[l++]);
+                else raise_error("Not enough parameters given for MOVE.");
+                if (fields[l]) newcen = interpret_single_point(fields[l++]);
+                if (fields[l]) raise_error("Too many parameters given for MOVE.");
+                p.move_piece(sr, er, newcen);
+            }	// MOVE
 
             else if (!strcmp(fields[0], "PTALIGN"))
             {

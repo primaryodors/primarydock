@@ -4,6 +4,11 @@
         "short_name": "(own research)",
         "citation": "PrimaryOdors.org"
     },
+    "https:\/\/doi.org\/10.3389\/fonc.2018.00162":
+    {
+        "short_name": "Abaffy et al (2018)",
+        "citation": "Abaffy, T.; Bain, J.R.; Muehlbauer, M.J.; Spasojevic, I.; Lodha, S.; Bruguera, E.; O\u2019Neal, S.K.; Kim, S.Y.; Matsunami, H. A\r\nTestosterone Metabolite 19-Hydroxyandrostenedione Induces Neuroendocrine Trans-Differentiation of Prostate Cancer Cells via\r\nan Ectopic Olfactory Receptor. Front. Oncol. 2018, 8, 162"
+    },
     "https:\/\/doi.org\/10.1371\/journal.pgen.1002821":
     {
         "short_name": "Adipietro et al (2012)",
@@ -224,6 +229,11 @@
         "short_name": "Fukutani Koshizawa Yohda (2021)",
         "citation": "Fukutani, Y., Koshizawa, T., & Yohda, M. (2021). Application of Vapor Phase Stimulation Method for Screening of Human Odorant Receptors Responding to Cinnamaldehyde. Sensors and Materials, 33(12), 4203-4210."
     },
+    "https:\/\/doi.org\/10.1021\/acs.jafc.5b01884":
+    {
+        "short_name": "Geithe et al (2015)",
+        "citation": "Geithe, C.; Andersen, G.; Malki, A.; Krautwurst, D. A butter aroma recombinate activates human class-I odorant receptors.\r\nJ. Agric. Food Chem. 2015, 63, 9410\u20139420."
+    },
     "https:\/\/doi.org\/10.1007\/s00018-017-2576-z":
     {
         "short_name": "Geithe et al (2017)",
@@ -263,6 +273,11 @@
     {
         "short_name": "Greer et al (2016)",
         "citation": "Greer, Paul L et al. \u201cA Family of non-GPCR Chemosensors Defines an Alternative Logic for Mammalian Olfaction.\u201d Cell vol. 165,7 (2016): 1734-1748. doi:10.1016\/j.cell.2016.05.001"
+    },
+    "https:\/\/doi.org\/10.1165\/rcmb.2013-0199OC":
+    {
+        "short_name": "Gu et al (2014)",
+        "citation": "Gu, X., Karp, P. H., Brody, S. L., Pierce, R. A., Welsh, M. J., Holtzman, M. J., & Ben-Shahar, Y. (2014). Chemosensory functions for pulmonary neuroendocrine cells. American journal of respiratory cell and molecular biology, 50(3), 637-646."
     },
     "https:\/\/pubs.acs.org\/doi\/abs\/10.1021\/acs.jafc.1c03314":
     {
@@ -659,6 +674,11 @@
         "short_name": "Tcatchoff et al (2006)",
         "citation": "Lionel Tcatchoff, Claude Nespoulous, Jean-Claude Pernollet, Lo\u00efc Briand,\r\nA single lysyl residue defines the binding specificity of a human odorant-binding protein for aldehydes,\r\nFEBS Letters,\r\nVolume 580, Issue 8,\r\n2006,\r\nPages 2102-2108,\r\nISSN 0014-5793,\r\nhttps:\/\/doi.org\/10.1016\/j.febslet.2006.03.017.\r\n(https:\/\/www.sciencedirect.com\/science\/article\/pii\/S0014579306003188)\r\n"
     },
+    "https:\/\/doi.org\/10.1016\/j.jaci.2018.11.004":
+    {
+        "short_name": "Tham et al (2019)",
+        "citation": "Tham EH, Dyjack N, Kim BE, Rios C, Seibold MA, Leung DYM, Goleva E. Expression and function of the ectopic olfactory receptor OR10G7 in patients with atopic dermatitis. J Allergy Clin Immunol. 2019 May;143(5):1838-1848.e4. doi: 10.1016\/j.jaci.2018.11.004. Epub 2018 Nov 14. PMID: 30445058; PMCID: PMC6504602."
+    },
     "https:\/\/doi.org\/10.1038\/s41598-017-10379-x":
     {
         "short_name": "Tong et al (2017)",
@@ -773,6 +793,11 @@
     {
         "short_name": "ZhangLab GPCR-I-TASSER",
         "citation": "J Zhang, J Yang, R Jang, Y Zhang. GPCR-I-TASSER: A hybrid approach to G protein-coupled receptor structure modeling and the application to the human genome, Structure, 23: 1538-1549, 2015.\r\n\r\nhttps:\/\/doi.org\/10.1016\/j.str.2015.06.007"
+    },
+    "https:\/\/doi.org\/10.3233%2FJAD-121894":
+    {
+        "short_name": "Zhao et al (2013)",
+        "citation": "Zhao W, Ho L, Varghese M, Yemul S, Dams-O'Connor K, Gordon W, Knable L, Freire D, Haroutunian V, Pasinetti GM. Decreased level of olfactory receptors in blood cells following traumatic brain injury and potential association with tauopathy. J Alzheimers Dis. 2013;34(2):417-429. doi: 10.3233\/JAD-121894. PMID: 23241557; PMCID: PMC3968322."
     },
     "https:\/\/elifesciences.org\/articles\/50279":
     {

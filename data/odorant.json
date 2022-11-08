@@ -330,6 +330,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.3233%2FJAD-121894":
+            {
+                "OR4M1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "11"
+                }
             }
         }
     },
@@ -1754,6 +1762,14 @@
                     "type": "vwa",
                     "ec50": "-5.44",
                     "adjusted_curve_top": "0.33620628317443"
+                }
+            },
+            "https:\/\/www.nature.com\/articles\/nn.3598":
+            {
+                "OR4E2":
+                {
+                    "type": "wa",
+                    "ec50": "-3"
                 }
             }
         }
@@ -4109,10 +4125,17 @@
             }
         }
     },
-    "1d718168bb8b8e59bae6910fb8ac6dc6":
+    "31b075a7af8f6f22d8bfc566d36f73ee":
     {
-        "full_name": "2-butene-1-thiol",
-        "smiles": "CC=CS"
+        "full_name": "(E)-2-butene-1-thiol",
+        "smiles": "C\/C=C\/CS",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "onion"
+            ]
+        }
     },
     "152d2ffbc0e5d88d52d468a2c666fa81":
     {
@@ -4638,6 +4661,207 @@
                     "type": "ma",
                     "ec50": "-5.47"
                 }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.27",
+                    "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.jafc.5b01884":
+            {
+                "OR51A2":
+                {
+                    "type": "na"
+                },
+                "OR51A4":
+                {
+                    "type": "na"
+                },
+                "OR51A7":
+                {
+                    "type": "na"
+                },
+                "OR51B2":
+                {
+                    "type": "na"
+                },
+                "OR51B4":
+                {
+                    "type": "na"
+                },
+                "OR51B5":
+                {
+                    "type": "na"
+                },
+                "OR51B6":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                },
+                "OR51D1":
+                {
+                    "type": "na"
+                },
+                "OR51E1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                },
+                "OR51E2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                },
+                "OR51F1":
+                {
+                    "type": "na"
+                },
+                "OR51G1":
+                {
+                    "type": "na"
+                },
+                "OR51I2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.5"
+                },
+                "OR51L1":
+                {
+                    "type": "na"
+                },
+                "OR51M1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                },
+                "OR51Q1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.5"
+                },
+                "OR51S1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                },
+                "OR51T1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.5"
+                },
+                "OR51V1":
+                {
+                    "type": "na"
+                },
+                "OR52A1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                },
+                "OR52A4":
+                {
+                    "type": "na"
+                },
+                "OR52B2":
+                {
+                    "type": "na"
+                },
+                "OR52B4":
+                {
+                    "type": "na"
+                },
+                "OR52D1":
+                {
+                    "type": "na"
+                },
+                "OR52E2":
+                {
+                    "type": "na"
+                },
+                "OR52E4":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                },
+                "OR52E6":
+                {
+                    "type": "na"
+                },
+                "OR52E8":
+                {
+                    "type": "na"
+                },
+                "OR52H1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "5.5"
+                },
+                "OR52I2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.5"
+                },
+                "OR52K1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                },
+                "OR52K2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.5"
+                },
+                "OR52L1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                },
+                "OR52N4":
+                {
+                    "type": "na"
+                },
+                "OR52N5":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.5"
+                },
+                "OR52W1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.69999998807907"
+                },
+                "OR56A1":
+                {
+                    "type": "na"
+                },
+                "OR56A3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                },
+                "OR56A4":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                },
+                "OR56A5":
+                {
+                    "type": "na"
+                },
+                "OR56B1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                },
+                "OR56B4":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                }
             }
         }
     },
@@ -5024,6 +5248,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.5099999904633"
+                }
             }
         }
     },
@@ -5174,6 +5406,14 @@
                     "type": "ma",
                     "ec50": "-5"
                 }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "6.4899997711182"
+                }
             }
         }
     },
@@ -5291,6 +5531,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.4200000762939"
                 }
             }
         }
@@ -7736,6 +7984,23 @@
             }
         }
     },
+    "1bb498b6de0e799c2b34b04c601b03be":
+    {
+        "full_name": "cyclobutane carboxylic acid",
+        "smiles": "C1CCC1C(=O)O",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.6",
+                    "adjusted_curve_top": "7.7800002098083"
+                }
+            }
+        }
+    },
     "776e9330415348ed8df8aa91df3f2d21":
     {
         "full_name": "cyclodecanone",
@@ -8922,6 +9187,22 @@
             }
         }
     },
+    "15f5e2777091e11ba0e539557012b79f":
+    {
+        "full_name": "2-decenoic acid",
+        "smiles": "OC(=O)C=CCCCCCCC",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.5199999809265"
+                }
+            }
+        }
+    },
     "c8782b34f75f1ea211af35f43b9cd398":
     {
         "full_name": "9-decen-1-ol",
@@ -9045,6 +9326,203 @@
                 {
                     "type": "wa",
                     "ec50": "-2.99"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.jafc.5b01884":
+            {
+                "OR51A2":
+                {
+                    "type": "na"
+                },
+                "OR51A4":
+                {
+                    "type": "na"
+                },
+                "OR51A7":
+                {
+                    "type": "na"
+                },
+                "OR51B2":
+                {
+                    "type": "na"
+                },
+                "OR51B4":
+                {
+                    "type": "na"
+                },
+                "OR51B5":
+                {
+                    "type": "na"
+                },
+                "OR51B6":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "5"
+                },
+                "OR51D1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4"
+                },
+                "OR51E1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.5"
+                },
+                "OR51E2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                },
+                "OR51F1":
+                {
+                    "type": "na"
+                },
+                "OR51G1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4"
+                },
+                "OR51I2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                },
+                "OR51L1":
+                {
+                    "type": "na"
+                },
+                "OR51M1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                },
+                "OR51Q1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                },
+                "OR51S1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4"
+                },
+                "OR51T1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                },
+                "OR51V1":
+                {
+                    "type": "na"
+                },
+                "OR52A1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                },
+                "OR52A4":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "6"
+                },
+                "OR52B2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.5"
+                },
+                "OR52B4":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.5"
+                },
+                "OR52D1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR52E2":
+                {
+                    "type": "na"
+                },
+                "OR52E4":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                },
+                "OR52E6":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                },
+                "OR52E8":
+                {
+                    "type": "na"
+                },
+                "OR52H1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                },
+                "OR52I2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "6"
+                },
+                "OR52K1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR52K2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "5.5"
+                },
+                "OR52L1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "12"
+                },
+                "OR52N4":
+                {
+                    "type": "na"
+                },
+                "OR52N5":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10.5"
+                },
+                "OR52W1":
+                {
+                    "type": "na"
+                },
+                "OR56A1":
+                {
+                    "type": "na"
+                },
+                "OR56A3":
+                {
+                    "type": "na"
+                },
+                "OR56A4":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.5"
+                },
+                "OR56A5":
+                {
+                    "type": "na"
+                },
+                "OR56B1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                },
+                "OR56B4":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
                 }
             }
         }
@@ -9312,6 +9790,186 @@
                 {
                     "type": "vwa",
                     "adjusted_curve_top": "0.10000000149012"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acs.jafc.5b01884":
+            {
+                "OR51A2":
+                {
+                    "type": "na"
+                },
+                "OR51A4":
+                {
+                    "type": "na"
+                },
+                "OR51A7":
+                {
+                    "type": "na"
+                },
+                "OR51B2":
+                {
+                    "type": "na"
+                },
+                "OR51B4":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                },
+                "OR51B5":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4"
+                },
+                "OR51B6":
+                {
+                    "type": "na"
+                },
+                "OR51D1":
+                {
+                    "type": "na"
+                },
+                "OR51E1":
+                {
+                    "type": "na"
+                },
+                "OR51E2":
+                {
+                    "type": "na"
+                },
+                "OR51F1":
+                {
+                    "type": "na"
+                },
+                "OR51G1":
+                {
+                    "type": "na"
+                },
+                "OR51I2":
+                {
+                    "type": "na"
+                },
+                "OR51L1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2"
+                },
+                "OR51M1":
+                {
+                    "type": "na"
+                },
+                "OR51Q1":
+                {
+                    "type": "na"
+                },
+                "OR51S1":
+                {
+                    "type": "na"
+                },
+                "OR51T1":
+                {
+                    "type": "na"
+                },
+                "OR51V1":
+                {
+                    "type": "na"
+                },
+                "OR52A1":
+                {
+                    "type": "na"
+                },
+                "OR52A4":
+                {
+                    "type": "na"
+                },
+                "OR52B2":
+                {
+                    "type": "na"
+                },
+                "OR52B4":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                },
+                "OR52D1":
+                {
+                    "type": "na"
+                },
+                "OR52E2":
+                {
+                    "type": "na"
+                },
+                "OR52E4":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.5"
+                },
+                "OR52E6":
+                {
+                    "type": "na"
+                },
+                "OR52E8":
+                {
+                    "type": "na"
+                },
+                "OR52H1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.5"
+                },
+                "OR52I2":
+                {
+                    "type": "na"
+                },
+                "OR52K1":
+                {
+                    "type": "na"
+                },
+                "OR52K2":
+                {
+                    "type": "na"
+                },
+                "OR52L1":
+                {
+                    "type": "na"
+                },
+                "OR52N4":
+                {
+                    "type": "na"
+                },
+                "OR52N5":
+                {
+                    "type": "na"
+                },
+                "OR52W1":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "7"
+                },
+                "OR56A1":
+                {
+                    "type": "na"
+                },
+                "OR56A3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.80000001192093"
+                },
+                "OR56A4":
+                {
+                    "type": "na"
+                },
+                "OR56A5":
+                {
+                    "type": "na"
+                },
+                "OR56B1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                },
+                "OR56B4":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -10594,18 +11252,6 @@
                     "type": "na"
                 }
             }
-        }
-    },
-    "31b075a7af8f6f22d8bfc566d36f73ee":
-    {
-        "full_name": "(E)-2-butene-1-thiol",
-        "smiles": "C\/C=C\/CS",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "onion"
-            ]
         }
     },
     "c315c2c668d6b53478c0d84a68d14e04":
@@ -12029,6 +12675,21 @@
     {
         "full_name": "2-ethyl pyrazine",
         "smiles": "CCC1=NC=CN=C1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "peanut",
+                "butter",
+                "musty",
+                "nutty",
+                "woody",
+                "roasted",
+                "cocoa",
+                "fermented",
+                "meaty"
+            ]
+        },
         "activity":
         {
             "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
@@ -12124,6 +12785,18 @@
     {
         "full_name": "ethyl 3,5,5-trimethyl hexanoate",
         "smiles": "CCOC(=O)CC(C)CC(C)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fruity",
+                "green",
+                "apple",
+                "winey",
+                "yeasty",
+                "floral"
+            ]
+        },
         "activity":
         {
             "https:\/\/etheses.bham.ac.uk\/\/id\/eprint\/3450\/1\/Correia_12_PhD.pdf":
@@ -14747,6 +15420,13 @@
                     "type": "vwa",
                     "adjusted_curve_top": "0.1739977938317"
                 }
+            },
+            "https:\/\/doi.org\/10.3233%2FJAD-121894":
+            {
+                "OR4M1":
+                {
+                    "type": "na"
+                }
             }
         }
     },
@@ -15416,6 +16096,14 @@
                 "OR5P3":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.8499999046326"
                 }
             }
         }
@@ -16644,6 +17332,15 @@
     {
         "full_name": "hydrogen chloride",
         "smiles": "[Cl]",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "acrid",
+                "sour",
+                "meaty"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
@@ -17828,6 +18525,14 @@
                     "ec50": "-3.4",
                     "adjusted_curve_top": "4"
                 }
+            },
+            "https:\/\/doi.org\/10.3233%2FJAD-121894":
+            {
+                "OR4M1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "6"
+                }
             }
         }
     },
@@ -18610,6 +19315,15 @@
                 {
                     "type": "ma",
                     "ec50": "-4.82"
+                }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.8",
+                    "adjusted_curve_top": "9.2700004577637"
                 }
             }
         }
@@ -20174,6 +20888,35 @@
         "full_name": "2-mercapto-ethanethiol",
         "smiles": "SCCS"
     },
+    "f63c06c4b3bd3e6bca4224f6af961216":
+    {
+        "full_name": "3-mercapto-1-hexanol",
+        "smiles": "CCCC(CCO)S",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sulfurous",
+                "savory",
+                "chicken",
+                "meaty",
+                "roasted",
+                "coffee",
+                "fruity"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.3390\/pharmaceutics13081314":
+            {
+                "OR2T2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                }
+            }
+        }
+    },
     "5da93ba73e5b49853733b197c773ed8e":
     {
         "full_name": "3-mercaptohexyl acetate",
@@ -20478,6 +21221,13 @@
     {
         "full_name": "2-methoxy-3,5-dimethylpyrazine",
         "smiles": "CC1=CN=C(C(=N1)C)OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "earthy"
+            ]
+        },
         "activity":
         {
             "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
@@ -20814,6 +21564,14 @@
                     "type": "ma",
                     "ec50": "-1.78",
                     "adjusted_curve_top": "5.1764709164115"
+                }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "6.1700000762939"
                 }
             }
         }
@@ -21862,6 +22620,22 @@
             }
         }
     },
+    "0ad7c3780f1912f1ac63d2350cfb0aef":
+    {
+        "full_name": "4-methyl nonanoic acid",
+        "smiles": "OC(=O)CCC(C)CCCCC",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.4000000953674"
+                }
+            }
+        }
+    },
     "6ca0384cda8874590e9576bbc311d07d":
     {
         "full_name": "3-methyl-3-nonanol",
@@ -22440,6 +23214,14 @@
                     "type": "wa",
                     "ec50": "-3.3"
                 }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "5.6300001144409"
+                }
             }
         }
     },
@@ -22469,6 +23251,15 @@
                     "type": "sa",
                     "ec50": "-3.8",
                     "adjusted_curve_top": "9.9999997615814"
+                }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.47",
+                    "adjusted_curve_top": "7.8600001335144"
                 }
             }
         }
@@ -22513,6 +23304,15 @@
                 "OR5I1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.21",
+                    "adjusted_curve_top": "6.8600001335144"
                 }
             }
         }
@@ -22832,12 +23632,12 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "musk",
-                "powdery",
-                "soapy",
                 "dry",
                 "fatty",
-                "floral"
+                "floral",
+                "musk",
+                "powdery",
+                "soapy"
             ]
         },
         "activity":
@@ -24330,6 +25130,14 @@
                     "type": "ma",
                     "ec50": "-5.3"
                 }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.0500001907349"
+                }
             }
         }
     },
@@ -24661,6 +25469,22 @@
             }
         }
     },
+    "464508975dfa8cdc09783e322aacf481":
+    {
+        "full_name": "2-nonenoic acid",
+        "smiles": "OC(=O)C=CCCCCCC",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.4300000667572"
+                }
+            }
+        }
+    },
     "b4ed12b8b88385574066479172aaed5e":
     {
         "full_name": "norbornane-2-carboxylic acid",
@@ -24674,6 +25498,22 @@
                     "type": "ma",
                     "ec50": "-2.3",
                     "adjusted_curve_top": "4.2352941821603"
+                }
+            }
+        }
+    },
+    "44cc39cc1677985c95cbc746549ddd4b":
+    {
+        "full_name": "5-norbornene-2-carboxylic acid",
+        "smiles": "OC(=O)C1C[C@@H]2C[C@H]1C=C2",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "6.8499999046326"
                 }
             }
         }
@@ -25723,7 +26563,7 @@
     },
     "970ff08eab1621d8ef5aa6dea27b547a":
     {
-        "full_name": "7-octen1-ol",
+        "full_name": "7-octen-1-ol",
         "smiles": "C=CCCCCCCO",
         "activity":
         {
@@ -26660,10 +27500,10 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "fatty",
-                "meaty",
-                "roasted",
                 "sulfurous",
+                "fatty",
+                "roasted",
+                "meaty",
                 "vegetable"
             ]
         },
@@ -26681,6 +27521,19 @@
                 {
                     "type": "ma",
                     "adjusted_curve_top": "3.4999999403954"
+                }
+            },
+            "https:\/\/doi.org\/10.3390\/pharmaceutics13081314":
+            {
+                "OR2T2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                },
+                "OR2T8":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
                 }
             }
         }
@@ -28386,6 +29239,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.5199999809265"
+                }
             }
         }
     },
@@ -28393,6 +29254,18 @@
     {
         "full_name": "propyl butyrate",
         "smiles": "CCCOC(=O)CCC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fruity",
+                "sweet",
+                "apricot",
+                "pineapple",
+                "rancid",
+                "sweaty"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
@@ -28486,11 +29359,12 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "baked",
-                "earthy",
-                "peanut",
-                "potato",
-                "roasted"
+                "pungent",
+                "sweet",
+                "corn",
+                "roasted",
+                "hazelnut",
+                "barley"
             ]
         },
         "activity":
@@ -28612,6 +29486,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.3233%2FJAD-121894":
+            {
+                "OR4M1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "20"
+                }
             }
         }
     },
@@ -28654,10 +29536,22 @@
             }
         }
     },
-    "0a0944a50d1e3879019f77e548665679":
+    "c5a35a8f7af3abaad4e096da304ee31a":
     {
         "full_name": "pyrrolidine",
-        "smiles": "C1CCC[NH ]1",
+        "smiles": "C1CCCN1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "ammoniacal",
+                "animal",
+                "eggy",
+                "fishy",
+                "shellfish",
+                "seaweed"
+            ]
+        },
         "activity":
         {
             "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
@@ -29209,6 +30103,14 @@
                 "OR51B4":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.3233%2FJAD-121894":
+            {
+                "OR4M1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.5"
                 }
             }
         }
@@ -31641,7 +32543,7 @@
     },
     "d6d182dd9d7c37302467a4be3422590f":
     {
-        "full_name": "1,2,3-Trimethylbenzene",
+        "full_name": "1,2,3-trimethylbenzene",
         "smiles": "c1(cccc(c1C)C)C"
     },
     "c6171874e786d41f2bc4bfeae1aac68c":
@@ -32145,6 +33047,15 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
+            {
+                "OR51E1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.74",
+                    "adjusted_curve_top": "8.0699996948242"
                 }
             }
         }

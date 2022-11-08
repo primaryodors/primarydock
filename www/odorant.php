@@ -181,7 +181,7 @@ window.setTimeout( function()
     <th>Receptor</th>
     <th>log10 ec<sub>50</sub></th>
     <th>Adjusted Top</th>
-    <th>Associated Perceptual Qualities</th>
+    <th>Correlated Perceptual Qualities</th>
 </tr>
 
 <?php

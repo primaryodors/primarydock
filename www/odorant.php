@@ -181,6 +181,7 @@ window.setTimeout( function()
     <th>Receptor</th>
     <th>log10 ec<sub>50</sub></th>
     <th>Adjusted Top</th>
+    <th>Antagonist?</th>
     <th>Associated Perceptual Qualities</th>
 </tr>
 
@@ -190,6 +191,7 @@ $sorted = [];
 $tbltops = [];
 $tblec50 = [];
 $agonist = [];
+$antagonist = [];
 foreach ($odor['activity'] as $refurl => $acv)
 {
     $maxcurvtop = [];
@@ -199,6 +201,8 @@ foreach ($odor['activity'] as $refurl => $acv)
     {
         $maxcurvtop[$rcpid] = false;
         $minec50[$rcpid] = false;
+
+        if (@$a['antagonist']) $antagonist[$rcpid] = "Y";
 
         if (!isset($sorted[$rcpid])) $sorted[$rcpid] = 0.0;
         $ssamples = 0;
@@ -245,6 +249,9 @@ foreach (array_keys($sorted) as $rcpid)
 
     echo "<td style=\"white-space: nowrap;\">" . $dispec50 = (@$tblec50[$rcpid] ?: "-") . "</td>\n";
     echo "<td style=\"white-space: nowrap;\">" . $disptop = (@$tbltops[$rcpid] ?: "-") . "</td>\n";
+
+    if (@$antagonist[$rcpid]) echo "<td>Y</td>";
+    else echo "<td>&nbsp;</td>";
 
     if (@$agonist[$rcpid])
         echo "<td style=\"white-space: nowrap;\">" . substr(get_notes_for_receptor($rcpid, $correlations), 0, 123) . "</td>\n";

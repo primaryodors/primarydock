@@ -390,6 +390,7 @@ echo "</p>";
         <th>Odorant</th>
         <th>EC<sub>50</sub></th>
         <th>Adjusted Top</th>
+        <th>Antagonist?</th>
         <th>Aroma Notes</th>
     </tr>
 
@@ -437,6 +438,9 @@ foreach ($pairs as $oid => $pair)
             ? (round(@$pair['adjusted_curve_top'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno_top</a>")
             : "-")
         ) . "</sup></td>\n";
+    
+    if (@$pair['antagonist']) echo "<td>Y</td>";
+    else echo "<td>&nbsp;</td>";
 
     echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";

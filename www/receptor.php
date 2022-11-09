@@ -438,7 +438,7 @@ foreach ($pairs as $oid => $pair)
             ? (round(@$pair['adjusted_curve_top'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno_top</a>")
             : "-")
         ) . "</sup></td>\n";
-    
+
     if (@$pair['antagonist']) echo "<td>Y</td>";
     else echo "<td>&nbsp;</td>";
 

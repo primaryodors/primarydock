@@ -96,6 +96,8 @@ switch ($fam)
 	$shelf1   = resno_from_bw($protid, "5.27");
 	$shelf2   = resno_from_bw($protid, "5.29");
 
+	$res658   = resno_from_bw($protid, "6.58");
+
 	$flank    = resno_from_bw($protid, "2.64");
 	$res732   = resno_from_bw($protid, "7.32");
 	$res736   = resno_from_bw($protid, "7.36");
@@ -122,9 +124,12 @@ heredoc;
 	$nodeno = 0;
 	$paths = [];
 	$cenres = "CEN RES $capturer $shuttler";
-	$nodeno++; $paths[] = "PATH $nodeno RES $shuttler $shelf1 $shelf2";
-	$nodeno++; $paths[] = "PATH $nodeno RES $shelf1 $shelf2 $res732";
-	$nodeno++; $paths[] = "PATH $nodeno RES $res732 $acid";
+	$nodeno++; $paths[] = "PATH $nodeno RES $shuttler $res658";
+	$nodeno++; $paths[] = "PATH $nodeno RES $res658 $res736";
+	$nodeno++; $paths[] = "PATH $nodeno RES $res736 $acid";
+	// $nodeno++; $paths[] = "PATH $nodeno RES $shuttler $shelf1 $shelf2";
+	// $nodeno++; $paths[] = "PATH $nodeno RES $shelf1 $shelf2 $res732";
+	// $nodeno++; $paths[] = "PATH $nodeno RES $res732 $acid";
 	$nodeno++; $paths[] = "PATH $nodeno RES $acid $bind $toggle";
 
 	$pocketnode = $nodeno;

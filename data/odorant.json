@@ -1138,7 +1138,6 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "",
                 "jammy",
                 "apple",
                 "purple",
@@ -2237,6 +2236,17 @@
                 "mimosa",
                 "sweet"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1016\/j.cub.2020.09.012":
+            {
+                "OR6C70":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                }
+            }
         }
     },
     "d7315752c49d5c0473c6c0b5e24613f3":
@@ -8656,7 +8666,6 @@
                 "watermelon",
                 "musty",
                 "underripe",
-                "",
                 "limnic"
             ],
             "http:\/\/www.thegoodscentscompany.com":
@@ -8897,7 +8906,6 @@
                 "stale",
                 "waxy",
                 "watery",
-                "",
                 "clean",
                 "aldehydic",
                 "ozone",
@@ -16900,7 +16908,6 @@
                 "alcoholic",
                 "acrid",
                 "prune",
-                "",
                 "roasted",
                 "herbal"
             ],
@@ -19580,7 +19587,6 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "",
                 "aldehydic",
                 "dusty",
                 "laundered_cloth",
@@ -23121,7 +23127,6 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "",
                 "aldehydic",
                 "lime",
                 "lemon",
@@ -24567,7 +24572,6 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "",
                 "aldehydic",
                 "waxy",
                 "vinyl",
@@ -25560,7 +25564,6 @@
         {
             "http:\/\/www.primaryodors.org":
             [
-                "",
                 "aldehydic",
                 "waxy",
                 "coumarinic",
@@ -26301,7 +26304,6 @@
                 "rancid",
                 "underripe",
                 "hay",
-                "",
                 "stemmy",
                 "fatty",
                 "brandy",

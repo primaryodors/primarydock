@@ -75,8 +75,8 @@ option with valgrind or the equivalent switch in your utility of choice.
 
 # Web Application
 
-You may now host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It resembles very much
-the format and layout of the Primary Odors website.
+You may now host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It is the same web application
+as is used for the Primary Odors website.
 
 ![Web app screenshot](www/assets/webapp.png?raw=true "Web App")
 

@@ -20,11 +20,11 @@ $lln1 = '';
 foreach ($lines as $i => $ln)
 {	
 	$ln = strtoupper(str_replace("\t", '    ', $ln));
-	
+
 	if (substr($ln,0,1) == '#') continue;
-	
+
 	if (substr($ln,0,1) == '%') continue;               // TODO: Sequence alignment check.
-	
+
 	if (preg_match("/^[\sLSM]+$/", $ln))
 	{
         $ells = array(); $j = -1;
@@ -39,10 +39,10 @@ foreach ($lines as $i => $ln)
 			}
 		} while (count($jarr));
 		//print_r($ells);
-		
+
 		continue;
 	}
-	
+
 	if (preg_match('/TMR[0-9][-]+/', $ln))
 	{   
         $ln .= '     ';
@@ -60,33 +60,33 @@ foreach ($lines as $i => $ln)
 			    break;
 		    }
 		    $k = strpos($ln, ' ', $j);
-		    
+
 		    $l = strpos($ln, '|', $lk);
 		    if ($l > 0 && $l < $j) $ballwein[$rgnames[$rgidx]] = $l;
-		    
+
 		    $l = strpos($ln, '|', $j);
 		    if ($l > 0) $ballwein[$rgnames[$rgidx+1]] = $l;
-		    
+
 		    $rgns[$rgidx]  = [$lk, $j-1, $rgnames[$rgidx]];
 		    $rgidx++;
-		    
+
 		    $rgns[$rgidx]  = [$j, $k-1, $rgnames[$rgidx]];
 		    $rgidx++;
 	    } while ($k);
-	
+
 	    // print_r($rgns); exit;
 	    // print_r($ballwein); exit;
-		
+
 		continue;
 	}
-	
-	
+
+
 	$match = "/^(OR[0-9]{1,2}[A-Z]{1,2}[0-9]{1,2}\s+[.AC-IK-NP-TVWY]+)|(TAAR[0-9]\s+[.AC-IK-NP-TVWY]+)|(VN1R[0-9]\s+[.AC-IK-NP-TVWY]+)/";
-	
+
 	if (preg_match($match, $ln))
     {
 		$regionse = [];
-		
+
 		$r = 0; $pos1 = $posL = $posM = $posS = 0; $emmed = $spaced = $lastrgn = false; $lsites = array();
 		$or = trim(substr($ln, 0, 9));
 		if ($j = strpos($or, ' ')) $or = substr($or, 0, $j);
@@ -94,7 +94,7 @@ foreach ($lines as $i => $ln)
 
         $rcpbw = [];
         $rcpbs = [];
-		
+
 		foreach(str_split($ln) as $pos => $chr)
 		{	
 			if ($chr == ' ') $spaced = true;
@@ -112,15 +112,15 @@ foreach ($lines as $i => $ln)
 						break;
 					}
 				}
-				
+
 				if ($strgn != $lastrgn) $posL = $posM = $posS = 0;
-				
+
 				if (substr($strgn,0,3) == 'TMR' && $pos == @$ballwein[$strgn])
 				{
 					$tmrno = intval(substr($strgn, 3));
                     $rcpbw[$tmrno] = $r;
 				}
-				
+
 				if (substr($strgn,0,3) == 'EXR' && $pos == @$ballwein[$strgn])
 				{
 					$exrno = intval(substr($strgn, 3));
@@ -128,12 +128,11 @@ foreach ($lines as $i => $ln)
 					$b = $a + 1;
                     $rcpbw[$a.$b] = $r;
 				}
-				
+
 				if (isset($ells[$pos]) && $ells[$pos] != '') 
 				{				
                     $rcpbs[] = $r;
 				}
-
             }
         }
 
@@ -148,7 +147,7 @@ foreach ($lines as $i => $ln)
             rename("../pdbs/$subdir/$rcpid.rotated.pdb", $pdbname);
 
         if (!file_exists($pdbname)) continue;
-        
+
         $pdbdat = explode("\n",file_get_contents($pdbname));
         $remarks = [];
         $not_remarks = [];

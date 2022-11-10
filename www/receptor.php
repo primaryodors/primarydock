@@ -153,10 +153,14 @@ function load_viewer(obj)
             $bold=1;
         }
 
-        if (($i+1) == resno_from_bw($rcpid, "$nxtmr.50")) // $receptor['bw']["$nxtmr.50"]) 
-        $lets .= "<span style=\"background-color: #ddd; color: #000;\">".substr($seq,$i,1)."</span>";
+        $between = ($nxtmr-1)."$nxtmr.50";
+        if (($i+1) == resno_from_bw($rcpid, "$nxtmr.50")
+            ||
+            ( isset($prots[$rcpid]["bw"][$between]) && ($i+1) == resno_from_bw($rcpid, $between) )
+            )
+            $lets .= "<span style=\"background-color: #ddd; color: #000;\">".substr($seq,$i,1)."</span>";
         else
-        $lets .= substr($seq,$i,1);
+            $lets .= substr($seq,$i,1);
 
         if (($i+1) == $receptor['region']["TMR$nxtmr"]['end']) 
         {

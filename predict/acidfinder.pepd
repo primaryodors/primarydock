@@ -1,0 +1,15 @@
+
+LOAD $arg2
+
+LET %i = 49
+loop:
+LET %j = %45.50
+LET %j += %i
+LET %j -= 50
+LET $res = $SEQUENCE FROM %j FOR 1
+IF $res = "D" OR $res = "E" ECHO "45." %i
+LET %i ++
+IF %i <= 57 GOTO loop
+
+DUMP
+QUIT

@@ -1648,6 +1648,48 @@ int main(int argc, char** argv)
                 }
             }
 
+            else if (!strcmp(fields[0], "SCENV"))
+            {
+                l = 1;
+                if (!fields[l]) raise_error("Insufficient parameters given for SCENV.");
+                int resno = interpret_single_int(fields[l++]);
+
+                std::string result = "";
+
+                // Find all residues close enough to interact side chains with resno.
+                AminoAcid** nearby = p.get_residues_can_clash(resno);
+                AminoAcid* residue = p.get_residue(resno);
+                int ra = residue->get_atom_count();
+                if (nearby)
+                {
+                    // For each side chain atom of nearby residues, each side chain atom of resno,
+                    // if the atoms are close enough and the right kinds to interact,
+                    // concatenate the letter and residue number to the output string.
+                    for (i=0; nearby[i]; i++)
+                    {
+                        int na = nearby[j]->get_atom_count();
+                        for (j=0; j<na; j++)
+                        {
+                            Atom* a = nearby[j]->get_atom(j);
+                            if (a->is_backbone) continue;
+
+                            for (k=0; k<ra; k++)
+                            {
+                                Atom* b = residue->get_atom(k);
+                                if (b->is_backbone) continue;
+
+                                if (a->distance_to(b) < 5)
+                                {
+                                    // TODO:
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (fields[l]) raise_error("Too many parameters given for SCENV.");
+            }   // SCENV
+
             else if (!strcmp(fields[0], "SEARCH"))
             {
                 l = 1;

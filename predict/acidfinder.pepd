@@ -7,9 +7,54 @@ LET %j = %45.50
 LET %j += %i
 LET %j -= 50
 LET $res = $SEQUENCE FROM %j FOR 1
-IF $res = "D" OR $res = "E" ECHO "45." %i
+
+LET $scenv = ""
+IF $res != "D" AND $res != "E" GOTO _not_acid
+SCENV %j 4 $scenv
+IF $scenv = "" THEN ECHO "CAPTURE 45." %i " " $res %j
+
+_not_acid:
 LET %i ++
 IF %i <= 57 GOTO loop
 
-DUMP
-QUIT
+
+LET %j = %6.50 + 8
+LET $res = $SEQUENCE FROM %j FOR 1
+LET $scenv = ""
+IF $res != "D" AND $res != "E" GOTO _na658
+SCENV %j 4 $scenv
+IF $scenv = "" THEN ECHO "PATH 6.58 " $res %j
+_na658:
+
+LET %j = %6.50 + 4
+LET $res = $SEQUENCE FROM %j FOR 1
+LET $scenv = ""
+IF $res != "D" AND $res != "E" GOTO _na654
+SCENV %j 4 $scenv
+IF $scenv = "" THEN ECHO "PATH 6.54 " $res %j
+_na654:
+
+LET $out542 = ""
+LET %j = %5.50 - 7 # should be 8 but the two TAARs that have this have a deletion.
+LET $res = $SEQUENCE FROM %j FOR 1
+LET $scenv = ""
+IF $res != "D" AND $res != "E" GOTO _na542
+SCENV %j 4 $scenv
+LET $temp = $res + %j
+IF $scenv = "" THEN LET $out542 = "5.42 " + $temp
+IF $out542 THEN ECHO "PATH " $out542
+_na542:
+
+
+LET %j = %3.50 - 18
+LET $res = $SEQUENCE FROM %j FOR 1
+LET $scenv = ""
+IF $res != "D" AND $res != "E" GOTO _na332
+SCENV %j 4 $scenv
+IF $scenv = "" THEN ECHO "BIND 3.32 " $res %j
+_na332:
+IF $out542 THEN ECHO "BIND " $out542
+
+LET %j = %6.50 - 2
+LET $res = $SEQUENCE FROM %j FOR 1
+IF $res = "W" ECHO "BIND 6.48 " $res %j

@@ -78,12 +78,19 @@ function load_viewer(obj)
                     $tmo = 81;
                     foreach (array_keys($bsr) as $bw)
                     {
-                        $resno = resno_from_bw($rcpid, $bw);
-                        echo "window.setTimeout( function()\n";
-                        echo "{\n";
-                        echo "embdd.contentWindow.showSideChain($resno);\n";
-                        echo "}, $tmo);\n";
-                        $tmo += 53;
+                        try
+                        {
+                            $resno = resno_from_bw($rcpid, $bw);
+                            echo "window.setTimeout( function()\n";
+                            echo "{\n";
+                            echo "embdd.contentWindow.showSideChain($resno);\n";
+                            echo "}, $tmo);\n";
+                            $tmo += 53;
+                        }
+                        catch (Exception $ex)
+                        {
+                            ;
+                        }
                     }
                     ?>
                 }, 1234);

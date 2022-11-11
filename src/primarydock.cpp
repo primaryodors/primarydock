@@ -1719,6 +1719,11 @@ _try_again:
 
                 // nodecen = nodecen.add(&path[nodeno]);
                 strcpy(buffer, pathstrs[nodeno].c_str());
+                if (!strlen(buffer))
+                {
+                    cout << "Error in config file: path node " << nodeno << " is missing." << endl;
+                    return 0xbadc09f;
+                }
                 fields = chop_spaced_fields(buffer);
                 nodecen = pocketcen_from_config_fields(&fields[1], &nodecen);
                 if (!strcmp(fields[2], "RES"))

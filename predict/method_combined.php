@@ -89,23 +89,39 @@ $fam = family_from_protid($protid);
 
 switch ($fam)
 {
-	case "TAAR":	
-	$capturer = resno_from_bw($protid, "45.50");
-	$shuttler = resno_from_bw($protid, "45.51");
+	case "TAAR":
+	$cmd = "bin/pepteditor predict/acidfinder.pepd pdbs/$fam/$protid.upright.pdb";
 
-	$shelf1   = resno_from_bw($protid, "5.27");
-	$shelf2   = resno_from_bw($protid, "5.29");
+	$captures = [];
+	$pathres = [];
+	$binding = [];
+	$outlines = [];
 
-	$res658   = resno_from_bw($protid, "6.58");
+	exec($cmd, $outlines);
 
-	$flank    = resno_from_bw($protid, "2.64");
-	$res732   = resno_from_bw($protid, "7.32");
-	$res736   = resno_from_bw($protid, "7.36");
+	foreach ($outlines as $ol)
+	{
+		$ol = explode(" ", $ol);
+		switch ($ol[0])
+		{
+			case 'CAPTURE':
+			$captures[] = intval(substr(@$ol[2], 1));
+			break;
 
-	$acid     = resno_from_bw($protid, "3.32");
-	$bind     = ($protid == "TAAR6" || $protid == "TAAR8") ? resno_from_bw($protid, "5.40") : "";
+			case 'PATH':
+			$pathres[] = intval(substr(@$ol[2], 1));
+			break;
+
+			case 'BIND':
+			$binding[] = intval(substr(@$ol[2], 1));
+			break;
+
+			default:
+			;
+		}
+	}
+
 	$toggle   = resno_from_bw($protid, "6.48");
-
 	$res644   = resno_from_bw($protid, "6.44");
 	$res343   = resno_from_bw($protid, "3.43");
 
@@ -123,14 +139,18 @@ heredoc;
 	
 	$nodeno = 0;
 	$paths = [];
-	$cenres = "CEN RES $capturer $shuttler";
-	$nodeno++; $paths[] = "PATH $nodeno RES $shuttler $res658";
-	$nodeno++; $paths[] = "PATH $nodeno RES $res658 $res736";
-	$nodeno++; $paths[] = "PATH $nodeno RES $res736 $acid";
-	// $nodeno++; $paths[] = "PATH $nodeno RES $shuttler $shelf1 $shelf2";
-	// $nodeno++; $paths[] = "PATH $nodeno RES $shelf1 $shelf2 $res732";
-	// $nodeno++; $paths[] = "PATH $nodeno RES $res732 $acid";
-	$nodeno++; $paths[] = "PATH $nodeno RES $acid $bind $toggle";
+	$cenres = "CEN RES ".implode(" ", $captures);
+
+	$pathwas = $captures[count($captures)-1];
+	foreach ($pathres as $pr)
+	{
+		if ($pathwas)
+		{
+			$nodeno++; $paths[] = "PATH $nodeno RES $pathwas $pr ";
+		}
+		$pathwas = $pr;
+	}
+	$nodeno++; $paths[] = "PATH $nodeno RES ".implode(" ", $binding);
 
 	$pocketnode = $nodeno;
 	break;

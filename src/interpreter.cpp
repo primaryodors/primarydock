@@ -147,7 +147,7 @@ int find_var_index(const char* varname, char** out_varname = nullptr)
     return -1;
 }
 
-int set_variable(char* vname, Star vvalue)
+int set_variable(const char* vname, const Star vvalue)
 {
     int n = find_var_index(vname);
     if (n<0)
@@ -158,7 +158,13 @@ int set_variable(char* vname, Star vvalue)
 
     script_var[n].name = vname;
     script_var[n].vt = type_from_name(vname);
-    script_var[n].value = vvalue;
+    if (script_var[n].vt == SV_STRING)
+    {
+        if (script_var[n].value.psz) delete script_var[n].value.psz;
+        script_var[n].value.psz = new char[strlen(vvalue.psz)+4];
+        strcpy(script_var[n].value.psz, vvalue.psz);
+    }
+    else script_var[n].value = vvalue;
 
     return n;
 }
@@ -1653,8 +1659,10 @@ int main(int argc, char** argv)
                 l = 1;
                 if (!fields[l]) raise_error("Insufficient parameters given for SCENV.");
                 int resno = interpret_single_int(fields[l++]);
+                if (!fields[l]) raise_error("Insufficient parameters given for SCENV.");
 
                 std::string result = "";
+                int bitmask = fields[l+1] ? interpret_single_int(fields[l++]) : 0xffffffff;
 
                 // Find all residues close enough to interact side chains with resno.
                 AminoAcid** nearby = p.get_residues_can_clash(resno);
@@ -1667,10 +1675,11 @@ int main(int argc, char** argv)
                     // concatenate the letter and residue number to the output string.
                     for (i=0; nearby[i]; i++)
                     {
-                        int na = nearby[j]->get_atom_count();
+                        bool matched = false;
+                        int na = nearby[i]->get_atom_count();
                         for (j=0; j<na; j++)
                         {
-                            Atom* a = nearby[j]->get_atom(j);
+                            Atom* a = nearby[i]->get_atom(j);
                             if (a->is_backbone) continue;
 
                             for (k=0; k<ra; k++)
@@ -1678,14 +1687,70 @@ int main(int argc, char** argv)
                                 Atom* b = residue->get_atom(k);
                                 if (b->is_backbone) continue;
 
-                                if (a->distance_to(b) < 5)
+                                // For debugging.
+                                if (resno == 185 && nearby[i]->get_residue_no() == 193
+                                    // && !strcmp(a->name, "1HE2")
+                                    // && !strcmp(b->name, "OE2")
+                                    )
+                                {
+                                    // cout << a->name << " " << b->name << endl;
+                                }
+
+                                float r = a->distance_to(b);
+                                if (r < 7)
                                 {
                                     // TODO:
+                                    InteratomicForce** iff = InteratomicForce::get_applicable(a, b);
+                                    if (iff) for (m=0; iff[m]; m++)
+                                    {
+                                        if (r < 1.333 * iff[m]->get_distance())
+                                        {
+                                            // TODO: Implement a types bitmask.
+                                            switch (iff[m]->get_type())
+                                            {
+                                                case vdW:
+                                                if (bitmask & 0x01) matched = true;
+                                                break;
+
+                                                case hbond:
+                                                if (bitmask & 0x02) matched = true;
+                                                break;
+
+                                                case ionic:
+                                                case mcoord:
+                                                if (bitmask & 0x04) matched = true;
+                                                break;
+
+                                                case pi:
+                                                case polarpi:
+                                                if (bitmask & 0x08) matched = true;
+                                                break;
+
+                                                default:
+                                                ;
+                                            }
+                                            
+                                            if (matched) goto _exit_atomloop;
+                                        }
+                                    }
                                 }
                             }
                         }
+
+                        _exit_atomloop:
+                        if (matched)
+                        {
+                            sprintf(buffer, "%c%d ", nearby[i]->get_letter(), nearby[i]->get_residue_no());
+                            result += buffer;
+                        }
                     }
                 }
+                
+                Star sv;
+                strcpy(buffer, fields[l++]);
+                strcpy(buffer1, result.c_str());
+                sv.psz = buffer1;
+                set_variable(buffer, sv);
 
                 if (fields[l]) raise_error("Too many parameters given for SCENV.");
             }   // SCENV

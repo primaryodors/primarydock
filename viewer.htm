@@ -576,7 +576,7 @@ function show_seqdd()
 	
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
-	tgl.innerText = "Hydrophilic";
+	tgl.innerText = "Polar Uncharged";
 	tgl.id = "seqddaliph";
 	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_hydrophilic); return false;");

@@ -12,10 +12,16 @@ PrimaryDock is a lightweight stochastic molecular docking software package that 
 - Does not require CMake, but can be built on any recent *nix system using make, g++, and the C++14 Standard Library;
 - Interatomic parameters stored in flat text files that can be edited without recompiling the application.
 
-To Use PrimaryDock, please first clone the repository, then execute the following command:
+PrimaryDock comes with Pepteditor, a tool for editing proteins using a scripting language.
+
+PrimaryDock also offers a web interface that allows you to run a local copy of the same data explorer pages that power
+the PrimaryOdors website.
+
+To Use PrimaryDock and Pepteditor, please first clone the repository, then execute the following commands:
 
 ```
 make primarydock
+make pepteditor
 ```
 
 If you are a developer contributing to the project, you can use `make` to build everything and run the test reports, or 

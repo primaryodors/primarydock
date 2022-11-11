@@ -1284,7 +1284,18 @@ void Molecule::identify_acidbase()
             c = atoms[i]->is_bonded_to("C");
             if (c)
             {
-                if (c->is_bonded_to("O")) goto _not_basic;
+                Atom* bto = c->is_bonded_to("O");
+                if (bto)
+                {
+                    // Amides are weakly zwitterionic.
+                    float arity = c->is_bonded_to(bto);
+                    if (arity >= 1.5)
+                    {
+                        atoms[i]->increment_charge(0.25);
+                        bto->increment_charge(-0.25);
+                    }
+                    goto _not_basic;
+                }
             }
             if (atoms[i]->get_charge() <= 0)
             {
@@ -2018,7 +2029,11 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
 
     for (i=0; i<atcount; i++)
+    {
         atoms[i]->last_bind_energy = 0;
+        atoms[i]->strongest_bind_energy = 0;
+        atoms[i]->strongest_bind_atom = nullptr;
+    }
 
     for (i=0; i<atcount; i++)
     {
@@ -2057,8 +2072,11 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         {
                             kJmol += abind;
                             atoms[i]->last_bind_energy += abind;
-                            /*if (atoms[i]->residue == 111 && ligands[l]->atoms[j]->residue <= 10)
-                            	cout << atoms[i]->name << " to " << ligands[l]->atoms[j]->name << ": " << r << " A; " << abind << " kJ/mol." << endl;*/
+                            if (abind > atoms[i]->strongest_bind_energy)
+                            {
+                                atoms[i]->strongest_bind_energy = abind;
+                                atoms[i]->strongest_bind_atom = ligands[l]->atoms[j];
+                            }
                         }
                     }
                 }

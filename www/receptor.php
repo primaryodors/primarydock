@@ -78,12 +78,19 @@ function load_viewer(obj)
                     $tmo = 81;
                     foreach (array_keys($bsr) as $bw)
                     {
-                        $resno = resno_from_bw($rcpid, $bw);
-                        echo "window.setTimeout( function()\n";
-                        echo "{\n";
-                        echo "embdd.contentWindow.showSideChain($resno);\n";
-                        echo "}, $tmo);\n";
-                        $tmo += 53;
+                        try
+                        {
+                            $resno = resno_from_bw($rcpid, $bw);
+                            echo "window.setTimeout( function()\n";
+                            echo "{\n";
+                            echo "embdd.contentWindow.showSideChain($resno);\n";
+                            echo "}, $tmo);\n";
+                            $tmo += 53;
+                        }
+                        catch (Exception $ex)
+                        {
+                            ;
+                        }
                     }
                     ?>
                 }, 1234);
@@ -153,10 +160,14 @@ function load_viewer(obj)
             $bold=1;
         }
 
-        if (($i+1) == resno_from_bw($rcpid, "$nxtmr.50")) // $receptor['bw']["$nxtmr.50"]) 
-        $lets .= "<span style=\"background-color: #ddd; color: #000;\">".substr($seq,$i,1)."</span>";
+        $between = ($nxtmr-1)."$nxtmr.50";
+        if (($i+1) == resno_from_bw($rcpid, "$nxtmr.50")
+            ||
+            ( isset($prots[$rcpid]["bw"][$between]) && ($i+1) == resno_from_bw($rcpid, $between) )
+            )
+            $lets .= "<span style=\"background-color: #ddd; color: #000;\">".substr($seq,$i,1)."</span>";
         else
-        $lets .= substr($seq,$i,1);
+            $lets .= substr($seq,$i,1);
 
         if (($i+1) == $receptor['region']["TMR$nxtmr"]['end']) 
         {
@@ -390,6 +401,7 @@ echo "</p>";
         <th>Odorant</th>
         <th>EC<sub>50</sub></th>
         <th>Adjusted Top</th>
+        <th>Antagonist?</th>
         <th>Aroma Notes</th>
     </tr>
 
@@ -437,6 +449,9 @@ foreach ($pairs as $oid => $pair)
             ? (round(@$pair['adjusted_curve_top'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno_top</a>")
             : "-")
         ) . "</sup></td>\n";
+
+    if (@$pair['antagonist']) echo "<td>Y</td>";
+    else echo "<td>&nbsp;</td>";
 
     echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";

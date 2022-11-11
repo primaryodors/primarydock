@@ -75,7 +75,6 @@ std::vector<int> extra_wt;
 
 bool configset=false, protset=false, ligset=false, pktset=false;
 
-
 Protein* protein;
 int seql = 0;
 int mcoord_resno[256];
@@ -125,34 +124,68 @@ void iteration_callback(int iter)
 
     Point bary = ligand->get_barycenter();
 
-    #if allow_drift
-    #if !pocketcen_is_loneliest
-    if (ligand->lastbind <= -100)
-    {
-        ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
-        ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
-        ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
-    }
-    #endif
+    int ac = ligand->get_atom_count();
+    float bbest = 0;
+    Atom *atom, *btom;
 
-    if (bary.get_3d_distance(ligcen_target) > size.magnitude())
+    int i;
+    for (i=0; i < ac; i++)
     {
-        //cout << "Wrangle! " << bary << ": " << bary.get_3d_distance(ligcen_target) << " vs. " << size.magnitude() << endl;
-        bary = ligcen_target;
-        // ligand->reset_conformer_momenta();
+        if (ligand->get_atom(i)->strongest_bind_energy > bbest)
+        {
+            atom = ligand->get_atom(i);
+            bbest = atom->strongest_bind_energy;
+            btom = atom->strongest_bind_atom;
+        }
+    }
+
+    if (bbest >= 15)
+    {
+        Point A = btom->get_location();
+        Point B = bary;
+        Point C = ligcen_target;
+
+        SCoord N = compute_normal(A, B, C);
+
+        float theta = find_3d_angle(B, C, A);
+        theta /= 3;
+        LocatedVector lv = N;
+        lv.origin = A;
+        ligand->rotate(lv, theta);
+
+        bary = ligand->get_barycenter();
     }
     else
     {
-        if (ligand->lastbind < 0)
+        #if allow_drift
+        #if !pocketcen_is_loneliest
+        if (ligand->lastbind <= -100)
         {
-            bary.x += (ligcen_target.x - bary.x) * drift;
-            bary.y += (ligcen_target.y - bary.y) * drift;
-            bary.z += (ligcen_target.z - bary.z) * drift;
+            ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
+            ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
+            ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
         }
-        else drift *= (1.0 - drift_decay_rate/iters);
-    }
+        #endif
 
-    ligand->recenter(bary);
+        if (bary.get_3d_distance(ligcen_target) > size.magnitude())
+        {
+            //cout << "Wrangle! " << bary << ": " << bary.get_3d_distance(ligcen_target) << " vs. " << size.magnitude() << endl;
+            bary = ligcen_target;
+            // ligand->reset_conformer_momenta();
+        }
+        else
+        {
+            if (ligand->lastbind < 0)
+            {
+                bary.x += (ligcen_target.x - bary.x) * drift;
+                bary.y += (ligcen_target.y - bary.y) * drift;
+                bary.z += (ligcen_target.z - bary.z) * drift;
+            }
+            else drift *= (1.0 - drift_decay_rate/iters);
+        }
+
+        ligand->recenter(bary);
+    }
 
     #endif
 
@@ -162,7 +195,6 @@ void iteration_callback(int iter)
         /*discrete[0].pmol = gcfmols[0];
         discrete[1].pmol = gcfmols[1];*/
 
-        int i;
         int offset = 2;             // For some strange reason, if this is set to 1 the TAAR8 test fails.
 
         if (waters) offset += maxh2o;
@@ -1687,6 +1719,11 @@ _try_again:
 
                 // nodecen = nodecen.add(&path[nodeno]);
                 strcpy(buffer, pathstrs[nodeno].c_str());
+                if (!strlen(buffer))
+                {
+                    cout << "Error in config file: path node " << nodeno << " is missing." << endl;
+                    return 0xbadc09f;
+                }
                 fields = chop_spaced_fields(buffer);
                 nodecen = pocketcen_from_config_fields(&fields[1], &nodecen);
                 if (!strcmp(fields[2], "RES"))

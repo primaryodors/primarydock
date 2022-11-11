@@ -418,6 +418,36 @@ Saves the protein in working memory to the specified file path (can be a string 
 If `QUIT`, `EXIT`, or `END` follows the path parameter, script execution will terminate immediately after saving the protein.
 
 
+# SCENV
+Side Chain ENVironment.
+
+Example:
+```
+SCENV %resno $result
+SCENV 185 4 $result
+```
+
+Examines the local environment near the side chain of the indicated residue. Of all residues close enough to interact with the
+target residue, if any side chain atom forms a non-covalent bond with any atom of the residue's side chain, then the nearby residue's
+letter code and residue number will be added to the output. For example, if a protein has ASP200 and ARG254 forming a salt bridge,
+then `SCENV 200 $result` will place the value `R254 ` into the variable `$result`.
+
+If there are two arguments, then the first is the residue number and the second is a string variable in which to place the output
+data. If there are three arguments, then the middle argument is a bitmask that determines which types of interatomic binding to look
+for, using the following values:
+
+1 van der Waals bonding;
+2 hydrogen bonding;
+4 ionic bonding and metal coordination;
+8 pi stacking and polar-pi interactions.
+
+For example to only search for hydrogen bonds and ionic/metallic bonds on a given side chain, add the numbers 2 + 4 to get the
+bitmask value 6.
+
+Note Asn and Gln will register as charged side chains for the purpose of the search, because each amide group has a slight 
+zwitterionic charge.
+
+
 # SEARCH
 Example:
 ```

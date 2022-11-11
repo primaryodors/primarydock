@@ -148,6 +148,12 @@ p
     display: none;
 }
 
+p.ref
+{
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 18px;
+}
+
 .scrollw
 {
     overflow-x: auto;

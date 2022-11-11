@@ -257,7 +257,9 @@ public:
     bool flip_mirror=false;			// If true, do trans rather than cis bond conformation.
     bool dnh=false;					// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.
     bool EZ_flip = false;
-    float last_bind_energy=0;
+    float last_bind_energy = 0;
+    float strongest_bind_energy = 0;
+    Atom* strongest_bind_atom = nullptr;
 
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.

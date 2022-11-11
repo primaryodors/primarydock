@@ -67,7 +67,7 @@ may have missed.
 
 If you would like to contribute to this project:
 <ol><li>I would be sooo very grateful for the help!</li>
-<li>Please create a branch off of main, then submit a pull request;</li>
+<li>Please create a branch off of stable, then submit a pull request;</li>
 <li>Use whichever { style you prefer; as long as the code is readable and it works, that's all I care about.</li>
 <li>Have fun and try not to let the project vex you. (:</li>
 </ol>
@@ -81,8 +81,8 @@ option with valgrind or the equivalent switch in your utility of choice.
 
 # Web Application
 
-You may now host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It resembles very much
-the format and layout of the Primary Odors website.
+You may now host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It is the same web application
+as is used for the Primary Odors website.
 
 ![Web app screenshot](www/assets/webapp.png?raw=true "Web App")
 
@@ -91,7 +91,7 @@ To enable the web app, either set up a local web server or checkout primarydock 
 default it will show `/var/www/html/` which is usually correct for Apache2 installations), make sure you have write permissions in the 
 folder (or use `sudo`), and execute `www/symlink.sh` in a command line. If on a local server, you will now have an instance of the web app 
 at http://127.0.0.1/primarydock/ whereas if you are using a web host then you may have to configure your hosting to point one of your 
-registerd domains or subfolders to the `primarydock/www` folder.
+registered domains or subfolders to the `primarydock/www` folder.
 
 
 

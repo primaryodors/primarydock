@@ -429,6 +429,8 @@ var tmcolor =
 };
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
+var ligbs = [];
+var mcres = [];
 
 function aa_1let_from_3let(laa3let)
 {
@@ -531,21 +533,6 @@ function show_seqdd()
 	
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
-	tgl.innerText = "All";
-	tgl.id = "seqddall";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
-	tgl.setAttribute("onclick", "event.preventDefault(); showAllSideChains(); return false;");
-	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
-	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
-	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
-	seqdd.appendChild(tgl);
-	
-	tgl = document.createElement("span");
-	tgl.innerText = "|";
-	seqdd.appendChild(tgl);
-	
-	tgl = document.createElement("span");
-	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Aliphatic";
 	tgl.id = "seqddaliph";
 	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
@@ -562,7 +549,7 @@ function show_seqdd()
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Aromatic";
-	tgl.id = "seqddaliph";
+	tgl.id = "seqddaroma";
 	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_aromatic); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
@@ -577,7 +564,7 @@ function show_seqdd()
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Polar Uncharged";
-	tgl.id = "seqddaliph";
+	tgl.id = "seqddpolar";
 	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_hydrophilic); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
@@ -592,7 +579,7 @@ function show_seqdd()
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Acidic";
-	tgl.id = "seqddaliph";
+	tgl.id = "seqddacid";
 	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_acidic); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
@@ -607,7 +594,7 @@ function show_seqdd()
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Basic";
-	tgl.id = "seqddaliph";
+	tgl.id = "seqddbasic";
 	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_basic); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
@@ -622,9 +609,54 @@ function show_seqdd()
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Sulfur";
-	tgl.id = "seqddaliph";
+	tgl.id = "seqddsulfur";
 	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_sulfur); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("br");
+	// tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Ligand Binding";
+	tgl.id = "seqddligbs";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
+	tgl.setAttribute("onclick", "event.preventDefault(); showLigandSideChains(); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "Metal Coord";
+	tgl.id = "seqddligbs";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
+	tgl.setAttribute("onclick", "event.preventDefault(); showMetalSideChains(); return false;");
+	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.innerText = "|";
+	seqdd.appendChild(tgl);
+	
+	tgl = document.createElement("span");
+	tgl.className = "clickme nodebtn sctgbtn";
+	tgl.innerText = "All";
+	tgl.id = "seqddall";
+	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
+	tgl.setAttribute("onclick", "event.preventDefault(); showAllSideChains(); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
@@ -770,15 +802,18 @@ function showAllSideChains()
 
 function hideAllSideChains()
 {
-	var resno = 1;
+	/*var resno = 1;
 	var mdlidx = mdlresno.indexOf(resno);
-	while (typeof resmdl[mdlidx] != "undefined")
+	while (typeof resmdl[mdlidx] != "undefined")*/
+	var mdlidx;
+	for (mdlidx = 0; mdlidx < resmdl.length; mdlidx++)
 	{
+		resno = mdlresno[mdlidx];
 		resmdl[mdlidx].removeAllRepresentations();
 		restoggled[mdlidx] = 0;
 		$('#seqddtgl'+resno).removeClass('hilite');
-		resno++;
-		mdlidx = mdlresno.indexOf(resno);
+		/*resno++;
+		mdlidx = mdlresno.indexOf(resno);*/
 	}
 }
 
@@ -833,6 +868,24 @@ function showSideChainsByType(show_type)
 		}
 
 		resno++;
+	}
+}
+
+function showLigandSideChains()
+{
+	var i;
+	for (i=0; i<ligbs.length; i++)
+	{
+		showSideChain(ligbs[i]);
+	}
+}
+
+function showMetalSideChains()
+{
+	var i;
+	for (i=0; i<mcres.length; i++)
+	{
+		showSideChain(mcres[i]);
 	}
 }
 
@@ -1532,6 +1585,9 @@ function loadFile(fileData, fileName = "")
                 stage.removeAllComponents();
                 window.result = fileData;
                 cen_ligand = false;
+				tmstart = [];
+				tmend = [];
+				ligbs = [];
                 
                 sequence = "";
                 if (fext == 'pdb')
@@ -1565,6 +1621,26 @@ function loadFile(fileData, fileName = "")
 				                	while (sequence.length < resno-1) sequence += "-";
 		                    		sequence += aa1let;
                         		}
+								else if (ln.substr(0, 6) == 'REMARK')
+								{
+									var pieces = ln.split(" ");
+									if (pieces[2] == 'HELIX' && pieces[3].substr(0,3) == 'TMR')
+									{
+										var tmrno = parseInt(pieces[3].substr(-1));
+										tmstart[tmrno] = parseInt(pieces[4]);
+										tmend[tmrno] = parseInt(pieces[5]);
+									}
+									else if (pieces[3] == "LIGAND_BINDING")
+									{
+										var resno = parseInt(pieces[4]);
+										ligbs.push(resno);
+									}
+									else if (pieces[3] == "MCOORD")
+									{
+										var resno = parseInt(pieces[4]);
+										mcres.push(resno);
+									}
+								}
                     		}
                         }
                         if (ln.length < 20) continue;

@@ -1177,6 +1177,16 @@ if (protid)
 						tmstart[tmrno] = parseInt(pieces[4]);
 						tmend[tmrno] = parseInt(pieces[5]);
 					}
+					else if (pieces[3] == "LIGAND_BINDING")
+					{
+						var resno = parseInt(pieces[4]);
+						ligbs.push(resno);
+					}
+					else if (pieces[3] == "MCOORD")
+					{
+						var resno = parseInt(pieces[4]);
+						mcres.push(resno);
+					}
 				}
 			}
 
@@ -1588,6 +1598,7 @@ function loadFile(fileData, fileName = "")
 				tmstart = [];
 				tmend = [];
 				ligbs = [];
+				mcres = [];
                 
                 sequence = "";
                 if (fext == 'pdb')

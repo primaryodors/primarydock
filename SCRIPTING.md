@@ -275,7 +275,8 @@ keyword is optional.
 evaluation will be entirely sequential and the chain will evaluate false as soon as any chain of `OR`ed expressions all evaluate false. Note that
 any `ELSE` after such a statement will execute no matter which part of the chain evaluated to false.
 
-The operators available for `IF` are `=` `!=` `>` `<` `>=` `<=`. Note that `=` means comparison, not assignment.
+The operators available for `IF` are `=` `!=` `>` `<` `>=` `<=`. Note that `=` means comparison, not assignment. The operator `==` is a synonym
+of `=` for purposes of `IF` statements. Strings also support the `=*` operator, which means "contains", e.g. `"ABCDE" =* "BCD"` evaluates true.
 
 If the optional `ELSE` subcommand is provided, it occurs on the next line. `ELSE` without `IF`, or `ELSE` separated from its `IF` even if only by
 a blank line or a comment, will silently fail to execute so please be careful.

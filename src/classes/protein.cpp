@@ -1463,6 +1463,15 @@ void ext_mtl_coord_cnf_cb(int iter)
     gmprot->mtl_coord_cnf_cb(iter);
 }
 
+int Protein::get_metals_count()
+{
+    if (!metals) return 0;
+
+    int i;
+    for (i=0; metals[i]; i++);      // Get count.
+    return i;
+}
+
 MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames)
 {
     int i, j=0, k=0, l, n;
@@ -1509,6 +1518,11 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     {
         if (resnos[i] > maxres) maxres = resnos[i];
         if (!minres || resnos[i] < minres) minres = resnos[i];
+
+        char buffer[256];
+        sprintf(buffer, "REMARK 800 SITE MCOORD %d %s\n", resnos[i], metal->name);
+        remarks.push_back(buffer);
+
         m_mcoord[j]->coord_res[i] = get_residue(resnos[i]);
         if (!m_mcoord[j]->coord_res[i])
         {
@@ -1525,6 +1539,8 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     }
     m_mcoord[j]->coord_res[residues] = NULL;
     m_mcoord[j]->coord_atoms[residues] = NULL;
+
+    remarks.push_back("REMARK 800\n");
 
     // Get the plane of the coordinating atoms, then get the normal.
     Point ptarr[3] =

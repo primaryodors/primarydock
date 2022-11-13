@@ -46,6 +46,39 @@ var mtl_licorice = 0.0;
 var mtl_cartoon = 0.1;
 var mtl_metal = 0.5;
 
+var website = "www.primaryodors.org";
+var is_localhost = false;
+
+var test = "127.0.0.1";
+if (!is_localhost) $.ajax(
+{
+	url: "http://" + test + "/instcheck.php",
+	cache: false,
+	success: function(result)
+	{
+		if (result == "b00d1cca")
+		{
+			website = test;
+			is_localhost = true;
+		}
+	}
+});
+
+test = "127.0.0.1/primarydock";
+if (!is_localhost) $.ajax(
+{
+	url: "http://" + test + "/instcheck.php",
+	cache: false,
+	success: function(result)
+	{
+		if (result == "b00d1cca")
+		{
+			website = test;
+			is_localhost = true;
+		}
+	}
+});
+
 </script>
 <style>
 body
@@ -1145,7 +1178,7 @@ stage.mouseControls.remove( "scroll-alt" );
 stage.mouseControls.remove( "drag-ctrl-right ");
 stage.mouseControls.remove( "drag-ctrl-left ");
 
-var url = getParameterByName('url') ? getParameterByName('url') : 'http://primaryodors.org/sdf.php';
+var url = getParameterByName('url') ? getParameterByName('url') : 'http://'+website+'/sdf.php';
 console.log(url);
 var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
 var protid = getParameterByName('prot') ? getParameterByName('prot') : false;
@@ -1529,7 +1562,7 @@ function loadFile(fileData, fileName = "")
 
     $.ajax(
     {
-		url: "http://www.primaryodors.org/recepinfo.php",
+		url: "http://" + website + "/recepinfo.php",
 		data:
         {
 			recep: orid,
@@ -1570,10 +1603,10 @@ function loadFile(fileData, fileName = "")
                 	if (!pocket[0] && !pocket[1] && !pocket[2])		// Only care about the first one for now.
                 	{
                 		var fields = ln.split("|");
-                		var i;
-                		for (i=1; i<fields.length; i++)
+                		var j;
+                		for (j=1; j<fields.length; j++)
                 		{
-                			var kv = fields[i].split('=');
+                			var kv = fields[j].split('=');
                 			if (kv.length > 1)
                 			{
 		            			if (kv[0] == 'center_x') pocket[0] = parseFloat(kv[1]);
@@ -1769,7 +1802,7 @@ function loadFile(fileData, fileName = "")
                 
                 var i;
                 var mod = "m";
-                for (i=0; i<10; i++)
+                for (i=0; i<100; i++)
                 {
                 	if (lines[i].substr(0, 10) == "PDB file: ")
                 	{
@@ -1782,7 +1815,7 @@ function loadFile(fileData, fileName = "")
 				{
 		            $.ajax(
 		            {
-						url: "http://www.primaryodors.org/pdb.php",
+						url: "http://" + website + "/pdb.php",
 						data:
 		                {
 							"p": orid,

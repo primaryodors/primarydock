@@ -187,6 +187,7 @@ heredoc;
 	$captmtl2 = resno_from_bw($protid, "45.50");
 	$captmtl3 = resno_from_bw($protid, "45.51");
 
+	/*
 	$bsr2a = resno_from_bw($protid, "2.53");
 	$bsr3a = resno_from_bw($protid, "3.29");
 	$bsr3b = resno_from_bw($protid, "3.32");
@@ -207,6 +208,9 @@ heredoc;
 	$bsr7a = resno_from_bw($protid, "7.38");
 	$bsr7b = resno_from_bw($protid, "7.39");
 	$bsr7c = resno_from_bw($protid, "7.42");
+	*/
+
+	extract(binding_site($protid));
 	
 	$nodeno = 0;
 	$paths = [];	

@@ -188,7 +188,7 @@ function ensure_sdf_exists($ligname)
 			exec("which obabel", $obresult);
 			if (trim(@$obresult[0]))
 			{
-				exec("obabel -:'{$o['smiles']}' --gen3D -osdf -O$sdfname");
+				exec("obabel -:\"{$o['smiles']}\" --gen3D -osdf -O\"$sdfname\"");
 			}
 			else
 			{

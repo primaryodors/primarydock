@@ -187,29 +187,6 @@ heredoc;
 	$captmtl2 = resno_from_bw($protid, "45.50");
 	$captmtl3 = resno_from_bw($protid, "45.51");
 
-	/*
-	$bsr2a = resno_from_bw($protid, "2.53");
-	$bsr3a = resno_from_bw($protid, "3.29");
-	$bsr3b = resno_from_bw($protid, "3.32");
-	$bsr3c = resno_from_bw($protid, "3.33");
-	$bsr3d = resno_from_bw($protid, "3.36");
-	$bsr3e = resno_from_bw($protid, "3.37");
-	$bsr3f = resno_from_bw($protid, "3.40");
-	$bsr3g = resno_from_bw($protid, "3.41");
-	$bsr4a = resno_from_bw($protid, "4.53");
-	$bsr4b = resno_from_bw($protid, "4.57");
-	$bsr4c = resno_from_bw($protid, "4.60");
-	$bsr5a = resno_from_bw($protid, "5.39");
-	$bsr5b = resno_from_bw($protid, "5.43");
-	$bsr5c = resno_from_bw($protid, "5.46");
-	$bsr5d = resno_from_bw($protid, "5.47");
-	$bsr6a = resno_from_bw($protid, "6.48");
-	$bsr6b = resno_from_bw($protid, "6.51");
-	$bsr7a = resno_from_bw($protid, "7.38");
-	$bsr7b = resno_from_bw($protid, "7.39");
-	$bsr7c = resno_from_bw($protid, "7.42");
-	*/
-
 	extract(binding_site($protid));
 	
 	$nodeno = 0;

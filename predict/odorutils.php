@@ -129,12 +129,12 @@ function all_empirical_pairs_for_receptor($protein)
 				}
 				else
 				{
-					if (@$acv[$protein]['adjusted_curve_top'] > $array[$oid]['adjusted_curve_top'])
+					if (@$acv[$protein]['adjusted_curve_top'] > @$array[$oid]['adjusted_curve_top'])
 					{
 						$array[$oid]['adjusted_curve_top'] = $acv[$protein]['adjusted_curve_top'];
 						$array[$oid]['top_ref'] = $ref;
 					}
-					if (@$acv[$protein]['ec50'] < $array[$oid]['ec50'])
+					if (isset($acv[$protein]['ec50']) && isset($array[$oid]['ec50']) && @$acv[$protein]['ec50'] < $array[$oid]['ec50'])
 					{
 						$array[$oid]['ec50'] = $acv[$protein]['ec50'];
 						$array[$oid]['ec50_ref'] = $ref;

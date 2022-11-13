@@ -274,9 +274,9 @@ foreach ($cub as $bw => $allowed)
 	$lcub[] = $res;
 }
 
-echo "<p>$matched residues match deep copper binding site: " . implode(" ",$lcub) . ". ";
+/*echo "<p>$matched residues match deep copper binding site: " . implode(" ",$lcub) . ". ";
 if ($matched == count($cub)) echo "This receptor is likely to respond to thiols that can access deep inside the ligand binding pocket.";
-echo "</p>";
+echo "</p>";*/
 
 
     ?>

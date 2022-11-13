@@ -44,6 +44,30 @@ if (@$_REQUEST['next'])
 	$protid = @$_REQUEST['prot'] ?: false;
 	$ligname = @$_REQUEST['lig'] ?: false;
 	
+	foreach (array_keys($prots) as $rcpid)
+	{
+		if ($protid && $protid != $rcpid) continue;
+		$odorids = array_keys(all_empirical_pairs_for_receptor($rcpid));
+
+		foreach ($odorids as $oid)
+		{
+			$full_name = $odors[$oid]['full_name'];
+			if (!isset($dock_results[$rcpid][$full_name]))
+			{
+				if ($skip)
+				{
+					$skip--;
+					continue;
+				}
+				
+				$protid = $rcpid;
+				$ligname = $full_name;
+				
+				goto found_next_pair;
+			}
+		}
+	}
+	/*
 	foreach ($odors as $o)
 	{
 		$full_name = str_replace(" ", "_", $o['full_name']);
@@ -71,6 +95,7 @@ if (@$_REQUEST['next'])
 			}
 		}
 	}
+	*/
 	die("All done!");
 	
 	found_next_pair:
@@ -156,22 +181,46 @@ heredoc;
 	break;
 	
 	default:
-	die("OR predictions will not work until the EXR2 HxxCE motif has been helixed and metal bound.\n");
-	
+	$acvbrots = "";
+
 	$captmtl1 = resno_from_bw($protid, "45.47");
 	$captmtl2 = resno_from_bw($protid, "45.50");
 	$captmtl3 = resno_from_bw($protid, "45.51");
+
+	$bsr2a = resno_from_bw($protid, "2.53");
+	$bsr3a = resno_from_bw($protid, "3.29");
+	$bsr3b = resno_from_bw($protid, "3.32");
+	$bsr3c = resno_from_bw($protid, "3.33");
+	$bsr3d = resno_from_bw($protid, "3.36");
+	$bsr3e = resno_from_bw($protid, "3.37");
+	$bsr3f = resno_from_bw($protid, "3.40");
+	$bsr3g = resno_from_bw($protid, "3.41");
+	$bsr4a = resno_from_bw($protid, "4.53");
+	$bsr4b = resno_from_bw($protid, "4.57");
+	$bsr4c = resno_from_bw($protid, "4.60");
+	$bsr5a = resno_from_bw($protid, "5.39");
+	$bsr5b = resno_from_bw($protid, "5.43");
+	$bsr5c = resno_from_bw($protid, "5.46");
+	$bsr5d = resno_from_bw($protid, "5.47");
+	$bsr6a = resno_from_bw($protid, "6.48");
+	$bsr6b = resno_from_bw($protid, "6.51");
+	$bsr7a = resno_from_bw($protid, "7.38");
+	$bsr7b = resno_from_bw($protid, "7.39");
+	$bsr7c = resno_from_bw($protid, "7.42");
 	
 	$nodeno = 0;
 	$paths = [];	
 	$cenres = "CEN RES $captmtl1 $captmtl2 $captmtl3";
 
+	$nodeno++; $paths[] = "PATH $nodeno RES $bsr2a $bsr3a $bsr3b $bsr3c $bsr3d $bsr3e $bsr3f $bsr3g $bsr4a $bsr4b $bsr4c $bsr5a $bsr5b $bsr5c $bsr5d $bsr6a $bsr6b $bsr7a $bsr7b $bsr7c";
+	$nodeno++; $paths[] = "PATH $nodeno RES $bsr3a $bsr3b $bsr3c $bsr3d $bsr3e $bsr3f $bsr3g $bsr5a $bsr5b $bsr5c $bsr5d";
 	$pocketnode = $nodeno;
+	$activenode = $pocketnode + 1;
+	$paths[] = "PATH $activenode REL 0 0 0";
+
+	// TODO: Go deeper into the protein for e.g. OR2T11.
 }
 
-$activenode = $pocketnode + 1;
-
-$paths[] = "PATH $activenode REL 0 0 0";
 $paths = implode("\n", $paths);
 
 $tmr2start = $prots[$protid]['region']['TMR2']['start'];
@@ -214,11 +263,14 @@ if (!file_exists("output/$fam")) mkdir("output/$fam");
 if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
 if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n");
 
+$pdbfname = "pdbs/$fam/$protid.metal.pdb";
+if (!file_exists($pdbfname)) $pdbfname = "pdbs/$fam/$protid.upright.pdb";
+if (!file_exists($pdbfname)) die("Missing PDB.\n");
 $outfname = "output/$fam/$protid/$protid-$ligname.pred.dock";
 
 $configf = <<<heredoc
 
-PROT pdbs/$fam/$protid.upright.pdb
+PROT $pdbfname
 
 LIG sdf/$ligname.sdf
 

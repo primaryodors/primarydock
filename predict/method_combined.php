@@ -186,12 +186,14 @@ heredoc;
 	$captmtl1 = resno_from_bw($protid, "45.47");
 	$captmtl2 = resno_from_bw($protid, "45.50");
 	$captmtl3 = resno_from_bw($protid, "45.51");
+	$captbal1 = resno_from_bw($protid, "3.25");
+	$captbal2 = resno_from_bw($protid, "7.35");
 
 	extract(binding_site($protid));
 	
 	$nodeno = 0;
 	$paths = [];	
-	$cenres = "CEN RES $captmtl1 $captmtl2 $captmtl3";
+	$cenres = "CEN RES $captmtl1 $captmtl2 $captmtl3 $captbal1 $captbal2";
 
 	$nodeno++; $paths[] = "PATH $nodeno RES $bsr2a $bsr3a $bsr3b $bsr3c $bsr3d $bsr3e $bsr3f $bsr3g $bsr4a $bsr4b $bsr4c $bsr5a $bsr5b $bsr5c $bsr5d $bsr6a $bsr6b $bsr7a $bsr7b $bsr7c";
 	$nodeno++; $paths[] = "PATH $nodeno RES $bsr3a $bsr3b $bsr3c $bsr3d $bsr3e $bsr3f $bsr3g $bsr5a $bsr5b $bsr5c $bsr5d";

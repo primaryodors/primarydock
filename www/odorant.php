@@ -192,7 +192,7 @@ $tbltops = [];
 $tblec50 = [];
 $agonist = [];
 $antagonist = [];
-foreach ($odor['activity'] as $refurl => $acv)
+if (@$odor['activity']) foreach ($odor['activity'] as $refurl => $acv)
 {
     $maxcurvtop = [];
     $minec50 = [];

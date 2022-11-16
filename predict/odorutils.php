@@ -176,33 +176,34 @@ function ensure_sdf_exists($ligname)
 {
 	global $odors;
 
-	foreach ($odors as $o)
-	{
-		$full_name = str_replace(" ", "_", $o['full_name']);
-		if ($ligname && $ligname != $full_name) continue;
+	$o = find_odorant($ligname);
+	if (!$o) die("Odorant not found $ligname.\n");
 		
-		$sdfname = "sdf/$ligname.sdf";
-		if (!file_exists($sdfname) || filesize($sdfname) < 10)
+	$pwd = getcwd();
+	chdir(__DIR__);
+	chdir("..");
+	$sdfname = str_replace(" ", "_", "sdf/$ligname.sdf");
+	if (!file_exists($sdfname) || filesize($sdfname) < 10)
+	{
+		$obresult = [];
+		exec("which obabel", $obresult);
+		if (trim(@$obresult[0]))
 		{
-			$obresult = [];
-			exec("which obabel", $obresult);
-			if (trim(@$obresult[0]))
-			{
-				exec("obabel -:\"{$o['smiles']}\" --gen3D -osdf -O\"$sdfname\"");
-			}
-			else
-			{
-				$f = fopen($sdfname, "wb");
-				if (!$f) die("Unable to create $sdfname, please ensure write access.\n");
-				$sdfdat = file_get_contents("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{$o['smiles']}/SDF?record_type=3d");
-				fwrite($f, $sdfdat);
-				fclose($f);
-			}
+			$cmd = "obabel -:\"{$o['smiles']}\" --gen3D -osdf -O\"$sdfname\"";
+			// die("$cmd\n");
+			exec($cmd);
 		}
-		return;
+		else
+		{
+			$f = fopen($sdfname, "wb");
+			if (!$f) die("Unable to create $sdfname, please ensure write access.\n");
+			$sdfdat = file_get_contents("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{$o['smiles']}/SDF?record_type=3d");
+			fwrite($f, $sdfdat);
+			fclose($f);
+		}
 	}
-
-	die("Odorant not found $ligname.\n");
+	chdir($pwd);
+	return;	
 }
 
 function find_odorant($aroma)
@@ -220,7 +221,7 @@ function find_odorant($aroma)
 	$aroma1 = preg_replace( "/[^a-z0-9]/", "", strtolower($aroma) );
 	foreach ($odors as $oid => $o)
 	{
-		if ( $o['smiles'] == $aroma || preg_replace( "/[^a-z0-9]/", "", $o['full_name'] ) == $aroma1 )
+		if ( $o['smiles'] == $aroma || preg_replace( "/[^a-z0-9]/", "", strtolower($o['full_name']) ) == $aroma1 )
 		{
 			$retval = $o;
 			$retval['oid'] = $oid;

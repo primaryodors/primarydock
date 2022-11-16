@@ -16,13 +16,15 @@ require("dock_eval.php");
 
 // Configurable variables
 $dock_retries = 5;
-$max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to half the number of physical cores.
+$max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
 
 
 // Load data
 $dock_results = [];
 $json_file = "predict/dock_results.json";
 
+chdir(__DIR__);
+chdir("..");
 if (file_exists($json_file))
 {
 	$dock_results = json_decode(file_get_contents($json_file), true);
@@ -106,6 +108,7 @@ else
 	$protid = @$_REQUEST['prot'] ?: "TAAR5";
 	$ligname = @$_REQUEST['lig'] ?: "trimethylamine";
 }
+
 
 ensure_sdf_exists($ligname);
 
@@ -246,6 +249,7 @@ if (!file_exists("output/$fam")) mkdir("output/$fam");
 if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
 if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n");
 
+$ligname = str_replace(" ", "_", $ligname);
 $pdbfname = "pdbs/$fam/$protid.metal.pdb";
 if (!file_exists($pdbfname)) $pdbfname = "pdbs/$fam/$protid.upright.pdb";
 if (!file_exists($pdbfname)) die("Missing PDB.\n");
@@ -282,7 +286,9 @@ ECHO
 heredoc;
 
 if (!file_exists("tmp")) mkdir("tmp");
-$f = fopen("tmp/prediction.config", "wb");
+$lignospace = str_replace(" ", "", $ligname);
+$cnfname = "tmp/prediction.$protid.$lignospace.config";
+$f = fopen($cnfname, "wb");
 if (!$f) die("File write error. Check tmp folder is write enabled.\n");
 
 fwrite($f, $configf);
@@ -299,7 +305,7 @@ else
 	{
 		set_time_limit(300);
 		$outlines = [];
-		passthru("bin/primarydock tmp/prediction.config");
+		passthru("bin/primarydock \"$cnfname\"");
 		$outlines = explode("\n", file_get_contents($outfname));
 		if (count($outlines) >= 100) break;
 	}

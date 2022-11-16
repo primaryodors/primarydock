@@ -45,7 +45,7 @@ function evaluate_result($array)
     // echo "$capture, $completion, $cpl_weighted\n";
 
     $prediction = "Non-Agonist";
-    if ($capture >= 15 && (/*$completion >= 0.75 ||*/ $cpl_weighted >= 0.75))
+    if ($capture >= 15 && (/*$completion >= 0.75 ||*/ $cpl_weighted >= 0.5))
     {
         if ($acvratio < 0.75) $prediction = "Inverse Agonist";
         else $prediction = "Agonist";

@@ -450,10 +450,11 @@ int interpret_config_line(char** fields)
             cout << "Missing output file name; check config file." << endl << flush;
             throw 0xbadf12e;
         }
-        #if _DBG_STEPBYSTEP
-        cout << "Starting a file outstream." << endl;
+        #if _DBG_SPACEDOUT
+        cout << "Starting a file outstream: " << fields[1] << endl;
         #endif
         output = new std::ofstream(fields[1], std::ofstream::out);
+        if (!output) return -1;
         return 1;
     }
     else if (!strcmp(fields[0], "PATH"))

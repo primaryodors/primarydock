@@ -54,7 +54,8 @@ if (@$_REQUEST['next'])
 		foreach ($odorids as $oid)
 		{
 			$full_name = $odors[$oid]['full_name'];
-			if (!isset($dock_results[$rcpid][$full_name]))
+			$fnnospace = str_replace(" ", "_", $full_name);
+			if (!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
 			{
 				if ($skip)
 				{

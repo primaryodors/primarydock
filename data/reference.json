@@ -9,6 +9,11 @@
         "short_name": "Abaffy et al (2018)",
         "citation": "Abaffy, T.; Bain, J.R.; Muehlbauer, M.J.; Spasojevic, I.; Lodha, S.; Bruguera, E.; O\u2019Neal, S.K.; Kim, S.Y.; Matsunami, H. A\r\nTestosterone Metabolite 19-Hydroxyandrostenedione Induces Neuroendocrine Trans-Differentiation of Prostate Cancer Cells via\r\nan Ectopic Olfactory Receptor. Front. Oncol. 2018, 8, 162"
     },
+    "https:\/\/doi.org\/10.1038\/s41598-022-23176-y":
+    {
+        "short_name": "Achebouche et al (2022)",
+        "citation": "Achebouche, R., Tromelin, A., Audouze, K. et al. Application of artificial intelligence to decode the relationships between smell, olfactory receptors and small molecules. Sci Rep 12, 18817 (2022)."
+    },
     "https:\/\/doi.org\/10.1371\/journal.pgen.1002821":
     {
         "short_name": "Adipietro et al (2012)",
@@ -354,6 +359,46 @@
         "short_name": "Kalbe et al (2018)",
         "citation": "Kalbe B, Osterloh M, Schulz VM, Altm\u00fcller J, Becker C, Osterloh S, Hatt H. OR2H2 regulates the differentiation of human myoblast cells by its ligand aldehyde 13-13. Arch Biochem Biophys. 2018 May 1;645:72-80. doi: 10.1016\/j.abb.2018.03.017. Epub 2018 Mar 17. PMID: 29559321."
     },
+    "https:\/\/patents.google.com\/patent\/JP5982044B2\/en":
+    {
+        "short_name": "Kato and Saito (2015)",
+        "citation": "Aya Kato, Naoko Saito\r\nOdor control agent.\r\nJP5982044B2"
+    },
+    "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+    {
+        "short_name": "Kato and Saito (2015) a",
+        "citation": "Aya Kato, Naoko Saito\r\nOdor control agent.\r\nJP5798382B2"
+    },
+    "https:\/\/patents.google.com\/patent\/US9249453B2\/en":
+    {
+        "short_name": "Kato and Saito (2016)",
+        "citation": "Aya Kato, Naoko Saito\r\nMethod for identifying a malodor inhibitor\r\nUS9249453B2"
+    },
+    "https:\/\/patents.google.com\/patent\/JP6104058B2\/en":
+    {
+        "short_name": "Kato and Saito (2017)",
+        "citation": "Aya Kato, Naoko Saito\r\nSearch method for mold odor inhibitor\r\nJP6104058B2"
+    },
+    "https:\/\/patents.google.com\/patent\/JP6422665B2\/en":
+    {
+        "short_name": "Kato and Saito (2018)",
+        "citation": "Aya Kato, Naoko Saito\r\nSearch method for odor control agent\r\nJP6422665B2"
+    },
+    "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+    {
+        "short_name": "Kato et al (2015)",
+        "citation": "Aya Kato, Naoko Saito, Michiaki Inoue, Kayoko Nomizu\r\nMethod of identifying an agent for inhibiting odor of pyrazine derivatives\r\nUS9057090B2"
+    },
+    "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+    {
+        "short_name": "Kato et al (2016)",
+        "citation": "Aya Kato, Naoko Saito, Etsuji Wakisaka\r\nMethod for searching for malodor control agent, malodor control agent, and malodor control method.\r\nUS9526680B2"
+    },
+    "https:\/\/patents.google.com\/patent\/US10159655B2\/en":
+    {
+        "short_name": "Kato et al (2018)",
+        "citation": "Aya Kato, Naoko Saito, Michiaki Inoue, Kayoko Nomizu\r\nAgent for inhibiting odor of pyrazine derivatives\r\nUS10159655B2"
+    },
     "https:\/\/doi.org\/10.1038\/nature06162":
     {
         "short_name": "Keller et al (2007)",
@@ -426,8 +471,13 @@
     },
     "http:\/\/www.leffingwell.com\/chirality\/cyclic_terpenoid.htm":
     {
-        "short_name": "Leffingwell",
+        "short_name": "Leffingwell (chirality)",
         "citation": "leffingwell.com \r\nChirality & Odour Perception"
+    },
+    "http:\/\/www.leffingwell.com\/flavbase.htm":
+    {
+        "short_name": "Leffingwell Flavor-Base",
+        "citation": "Leffingwell Flavor-Base"
     },
     "https:\/\/dx.doi.org\/10.1208%2Faapsj080116":
     {
@@ -533,6 +583,26 @@
     {
         "short_name": "Moore, Forrester, Pelosi (1976)",
         "citation": "MOORE, J. E. A., FORRESTER, L. J., & PELOSI, P. (1976). SPECIFIC ANOSMIA TO ISOBUTYRALDEHYDE: THE MALTY PRIMARY ODOR. Chemical Senses, 2(1), 17\u201325. doi:10.1093\/chemse\/2.1.17\u00a0"
+    },
+    "https:\/\/patents.google.com\/patent\/JP2015211667A\/en":
+    {
+        "short_name": "Namba et al (2015)",
+        "citation": "Aya Namba, Naoko Saito, Keiichi Yoshikawa, Ichiro Mori\r\nSearch method of urine odor suppressor\r\nJP2015211667A"
+    },
+    "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+    {
+        "short_name": "Namba et al (2016)",
+        "citation": "Aya NAMBA, Naoko Saito, Michiaki Inoue, Tsuyoshi TOYABE\r\nInhibitor of odor caused by sotolone\r\nUS9254248B2"
+    },
+    "https:\/\/patents.google.com\/patent\/US9877927B2\/en":
+    {
+        "short_name": "Namba et al (2018)",
+        "citation": "Aya NAMBA, Naoko Saito, Michiaki Inoue, Tsuyoshi TOYABE\r\nInhibitor of odor caused by Furaneol.\r\nUS9877927B2"
+    },
+    "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+    {
+        "short_name": "Namba et al (2018) a",
+        "citation": "Aya Namba, Naoko Saito, Michiaki Inoue, Go Toriyabe\r\nSearch method of odor control agent by furaneol\r\nJP6276555B2"
     },
     "https:\/\/doi.org\/10.1093\/chemse\/bjj049":
     {
@@ -778,6 +848,16 @@
     {
         "short_name": "Yasunaga et al (2022)",
         "citation": "Motoki Yasunaga, Eiji Takai, Shoji Hattori, Kenji Tatematsu, Shun'ichi Kuroda, Effects of 3-octen-2-one on human olfactory receptor responses to vanilla flavor, Bioscience, Biotechnology, and Biochemistry, 2022;, zbac147, https:\/\/doi.org\/10.1093\/bbb\/zbac147"
+    },
+    "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
+    {
+        "short_name": "Yoshikawa and Saito (2016)",
+        "citation": "Keiichi Yoshikawa, Naoko Saito\r\nMethod for selecting odor-controlling substance\r\nEP3305898B1"
+    },
+    "https:\/\/patents.google.com\/patent\/WO2017090518A1\/en":
+    {
+        "short_name": "Yoshikawa et al (2017)",
+        "citation": "Keiichi Yoshikawa, Naoko Saito, Aya Namba, Ichiro Mori\r\nUrine odor suppressor\r\nWO2017090518A1"
     },
     "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
     {

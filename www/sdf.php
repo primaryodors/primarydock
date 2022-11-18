@@ -30,12 +30,14 @@ if (!file_exists($sdfname))
 
     $ch = curl_init( $url );
     curl_setopt( $ch, CURLOPT_POST, 1);
-    curl_setopt( $ch, CURLOPT_POSTFIELDS, "record_type=3d&smiles=$smilesu");
+    curl_setopt( $ch, CURLOPT_POSTFIELDS, $arg = "record_type=3d&smiles=$smilesu");
     curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
     curl_setopt( $ch, CURLOPT_HEADER, 0);
     curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
 
     $sdfdat = curl_exec( $ch );
+    $sdfln = explode("\n", $sdfdat);
+    if (false!==strpos($sdfln[0], "Status: ")) die("$arg\n\n$sdfdat");
 
     $fp = fopen($sdfname, "wb");
     if ($fp)
@@ -48,6 +50,8 @@ if (!file_exists($sdfname))
 else
 {
     $sdfdat = file_get_contents($sdfname);
+    $sdfln = explode("\n", $sdfdat);
+    if (false!==strpos($sdfln[0], "Status: ")) unlink($sdfname);
 }
 
 $sdfdat = explode("\n", $sdfdat);

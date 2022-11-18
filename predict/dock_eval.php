@@ -3,7 +3,8 @@
 function evaluate_result($array)
 {
     $activenode = 0;
-    foreach (array_keys($array) as $key) if (strtolower(substr($key, 0, 5)) == "node ")
+    if (@$array['Active node']) $activenode = intval($array['Active node']);
+    if (!$activenode) foreach (array_keys($array) as $key) if (strtolower(substr($key, 0, 5)) == "node ")
     {
         $nodeno = intval(explode(" ", $key)[1]);
         if ($nodeno > $activenode) $activenode = $nodeno;

@@ -377,6 +377,7 @@ $actual = best_empirical_pair($protid, $ligname);
 if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
 else $actual = "(unknown)";
 
+$average["Active node"] = $activenode;
 $average["Prediction"] = $prediction;
 $average["Actual"] = $actual;
 

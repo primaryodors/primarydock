@@ -19,3 +19,5 @@ obj/
 *.dSYM/
 build/
 *.received.txt
+www/assets/pngs/*.png
+

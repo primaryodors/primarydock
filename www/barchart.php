@@ -58,9 +58,9 @@ $h = 300;
 $im = imagecreatetruecolor($w, $h);
 imagefilledrectangle($im, 0,0, $w,$h, imagecolorallocate($im,$bkcolor[0],$bkcolor[1],$bkcolor[2]));
 
-$maxt = @max($t) ?: 1;
-$maxe = @max($e) ?: 0;
-$mine = @min($e) ?: -6;
+$maxt = count($t) ? ( @max($t) ?: 1 ) : 1;
+$maxe = count($e) ? ( @max($e) ?: 0 ) : 0;
+$mine = count($e) ? ( @min($e) ?: -6 ) : -6;
 if ($maxe) $maxe += 0.5;
 $mine -= 0.5;
 

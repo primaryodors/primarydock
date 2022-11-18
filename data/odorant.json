@@ -629,6 +629,24 @@
                     "type": "ma",
                     "ec50": "-4.19"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
             }
         }
     },
@@ -953,6 +971,47 @@
             }
         }
     },
+    "0eef0892fd900b8edd396ffd31d2c9be":
+    {
+        "full_name": "alpha,alpha-dimethyl phenethyl acetate",
+        "smiles": "CC(=O)OC(C)(C)CC1=CC=CC=C1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "floral",
+                "fruity",
+                "rose",
+                "green",
+                "pear",
+                "berry",
+                "jasmin",
+                "powdery"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                }
+            }
+        }
+    },
     "57fee22b6107a175e2f1d79690f85614":
     {
         "full_name": "alpha-cedrene",
@@ -1098,6 +1157,27 @@
                 "piney",
                 "woody"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
+            }
         }
     },
     "43d474643ba37a57ea04714b13b3b5dc":
@@ -1115,6 +1195,17 @@
                 "herbal",
                 "waxy"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2.7000000476837"
+                }
+            }
         }
     },
     "611fdfbc7d3b479e1f2189b7ba7d13b1":
@@ -1242,6 +1333,14 @@
                 {
                     "type": "na",
                     "antagonist": "1"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-4"
                 }
             }
         }
@@ -1412,6 +1511,37 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2.2000000476837"
                 }
             }
         }
@@ -1673,6 +1803,29 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
                 }
             }
         }
@@ -3348,6 +3501,14 @@
                     "type": "vsa",
                     "adjusted_curve_top": "10"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2.7999999523163"
+                }
             }
         }
     },
@@ -3538,6 +3699,32 @@
                 {
                     "type": "ma",
                     "ec50": "-5.35"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2.7999999523163"
                 }
             }
         }
@@ -3895,6 +4082,42 @@
                     "ec50": "-4.88",
                     "adjusted_curve_top": "-10",
                     "antagonist": "1"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR51E1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR51I2":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR51L1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
                 }
             }
         }
@@ -5424,6 +5647,39 @@
                     "type": "ma",
                     "adjusted_curve_top": "6.4899997711182"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR10A6":
+                {
+                    "type": "ma",
+                    "ec50": "-4.3",
+                    "adjusted_curve_top": "2.0999999046326"
+                },
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.22",
+                    "adjusted_curve_top": "2.9000000953674"
+                },
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.52",
+                    "adjusted_curve_top": "4.5999999046326"
+                },
+                "OR51I2":
+                {
+                    "type": "ma",
+                    "ec50": "-4.4",
+                    "adjusted_curve_top": "4.9000000953674"
+                },
+                "OR51L1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.3",
+                    "adjusted_curve_top": "3.0999999046326"
+                }
             }
         }
     },
@@ -6682,6 +6938,27 @@
                 "herbal",
                 "balsamic"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                }
+            }
         }
     },
     "e49f842de770e882978c0d5f2edcea51":
@@ -6699,6 +6976,27 @@
                 "jasmine",
                 "celery"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
+            }
         }
     },
     "c3bd6aab2c06b8e5a4c6661de8476423":
@@ -7079,6 +7377,76 @@
             }
         }
     },
+    "2f6799c1143d6c41263e18715640f328":
+    {
+        "full_name": "citronellal natural",
+        "smiles": "CC(CCC=C(C)C)CC=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "dry",
+                "floral",
+                "herbal",
+                "waxy",
+                "aldehydic",
+                "citrus"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1093\/chemse\/bji002":
+            {
+                "OR52D1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.116751253968"
+                }
+            },
+            "https:\/\/https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/":
+            {
+                "OR51B4":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.3233%2FJAD-121894":
+            {
+                "OR4M1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.5"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR51E1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
+            }
+        }
+    },
     "62368b4530db7fac68a7c8932e06d3aa":
     {
         "full_name": "citronellic acid",
@@ -7109,6 +7477,41 @@
                 "OR1A2":
                 {
                     "type": "na"
+                }
+            }
+        }
+    },
+    "4955937a42f5654f236b9c2a2700342d":
+    {
+        "full_name": "citronellyl acetate",
+        "smiles": "CC(CCC=C(C)C)CCOC(=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "floral",
+                "green",
+                "rose",
+                "fruity",
+                "citrus",
+                "woody",
+                "fruit",
+                "tropical_fruit"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
                 }
             }
         }
@@ -7248,6 +7651,29 @@
                 "OR5I1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
                 }
             }
         }
@@ -7924,6 +8350,17 @@
                 "herbal",
                 "spicy"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR51I2":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                }
+            }
         }
     },
     "c2b20d388361d6a452fcce1c3acc5d24":
@@ -7990,6 +8427,50 @@
                 "OR2AG2":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR51I2":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                }
+            }
+        }
+    },
+    "c6f6ec5f72597aef6bf5b4a37696d293":
+    {
+        "full_name": "cyclamen homoaldehyde",
+        "smiles": "CC(C)CC1=CC=C(C=C1)CC(C)C=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "floral",
+                "muguet",
+                "lily",
+                "green",
+                "tropical",
+                "oily",
+                "greasy",
+                "marine",
+                "balsamic"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
                 }
             }
         }
@@ -8266,6 +8747,51 @@
                     "type": "ma",
                     "ec50": "-5.08",
                     "adjusted_curve_top": "2.4705882261781"
+                }
+            }
+        }
+    },
+    "d9a2e452040486d8a9d3242d89f663da":
+    {
+        "full_name": "2-cyclohexylpropanal",
+        "smiles": "C1CCCCC1C(C)C=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "natural",
+                "fresh",
+                "green",
+                "dusty",
+                "fruity"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR51E1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
                 }
             }
         }
@@ -9199,6 +9725,13 @@
     {
         "full_name": "2-decenoic acid",
         "smiles": "OC(=O)C=CCCCCCCC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fatty"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
@@ -9290,6 +9823,29 @@
                 "OR2T11":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
                 }
             }
         }
@@ -9753,11 +10309,11 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "buttery",
                 "caramellic",
                 "creamy",
                 "pungent",
-                "sweet"
+                "sweet",
+                "buttery"
             ]
         },
         "activity":
@@ -10717,6 +11273,15 @@
                     "ec50": "-3.6",
                     "adjusted_curve_top": "8.1999998092651"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.4",
+                    "adjusted_curve_top": "70"
+                }
             }
         }
     },
@@ -11259,6 +11824,29 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                }
             }
         }
     },
@@ -11380,46 +11968,18 @@
             }
         }
     },
-    "8c4e66ed81fa78b1f3c563dfef733bdf":
+    "18aaeb32970f884dd544a3c4019484ac":
     {
-        "full_name": "empetal",
-        "smiles": "CC(=CCCC1=CCC(CC1)C=O)C",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "milky",
-                "fresh",
-                "clean",
-                "powdery",
-                "aquatic",
-                "orange"
-            ],
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "aldehydic",
-                "citrus",
-                "floral",
-                "greasy",
-                "marine"
-            ]
-        },
+        "full_name": "(5e)-3-methylcyclopenta-5-decen-1-one",
+        "smiles": "CC1C\/C=C\/CCCCCCCCCC(=O)C1",
         "activity":
         {
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
             {
-                "OR1D2":
+                "OR5K1":
                 {
-                    "type": "ma",
-                    "ec50": "-4.02"
-                }
-            },
-            "https:\/\/doi.org\/10.1074\/jbc.m110.211524":
-            {
-                "OR7A5":
-                {
-                    "type": "sa",
-                    "adjusted_curve_top": "8.3333331346512"
+                    "type": "ia",
+                    "adjusted_curve_top": "-2.5"
                 }
             }
         }
@@ -12400,6 +12960,44 @@
                 {
                     "type": "ma",
                     "ec50": "-4.47"
+                }
+            }
+        }
+    },
+    "669d8eb0017072979f4ec4693fcdae52":
+    {
+        "full_name": "ethyl linalyl ether",
+        "smiles": "CCOC(C)(CCC=C(C)C)C=C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "floral"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
                 }
             }
         }
@@ -13490,6 +14088,29 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                }
             }
         }
     },
@@ -13710,6 +14331,49 @@
             }
         }
     },
+    "db103dcd6b450007b8a3da0c138229af":
+    {
+        "full_name": "florhydral",
+        "smiles": "CC(C)C1=CC(=CC=C1)C(C)CC=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "floral",
+                "green",
+                "muguet",
+                "linden_flower",
+                "lily_of_the_valley",
+                "fresh"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR51E1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR51I2":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR51L1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
+            }
+        }
+    },
     "5942129d70bc741fc640919709081328":
     {
         "full_name": "floridile",
@@ -13826,6 +14490,34 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            }
+        }
+    },
+    "f59cf12588264cf39260334fe827b208":
+    {
+        "full_name": "fruity carboxylate",
+        "smiles": "CCOC(=O)[C@@]12CCC[C@@H]1[C@H]3CC[C@@H]2C3",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "fruity",
+                "rummy",
+                "candy",
+                "floral",
+                "ripe"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2.7999999523163"
                 }
             }
         }
@@ -13992,6 +14684,83 @@
                     "type": "wa",
                     "ec50": "-6.45",
                     "adjusted_curve_top": "1.4285714626312"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                }
+            }
+        }
+    },
+    "35ef8debab5db1a11fff886a9e0fabd8":
+    {
+        "full_name": "galbascone",
+        "smiles": "CC1(CCC=C(C1)C(=O)CCC=C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fresh",
+                "green",
+                "galbanum",
+                "earthy",
+                "weedy",
+                "pineapple",
+                "narcissus",
+                "hyacinth",
+                "fruity"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
                 }
             }
         }
@@ -14336,6 +15105,37 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2.7999999523163"
+                }
             }
         }
     },
@@ -14417,6 +15217,15 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1.5"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6104058B2\/en":
+            {
+                "OR11A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6",
+                    "adjusted_curve_top": "85"
                 }
             }
         }
@@ -14627,6 +15436,32 @@
                 "OR5I1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-4"
                 }
             }
         }
@@ -14982,6 +15817,19 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
             }
         }
     },
@@ -15004,6 +15852,44 @@
                 "tropical",
                 "woody"
             ]
+        }
+    },
+    "d7feaf45a3de0660eb96504837cafe8c":
+    {
+        "full_name": "grapefruit pentanol",
+        "smiles": "CC(CC(C)C1=CC=CC=C1)CO",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "vetiver",
+                "green",
+                "citrus",
+                "grapefruit",
+                "rhubarb",
+                "floral"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                }
+            }
         }
     },
     "4bbf4ab9cd90fef6ca37eef548c89f14":
@@ -15666,6 +16552,14 @@
                 {
                     "type": "ma",
                     "adjusted_curve_top": "2.0999999046326"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2.5"
                 }
             }
         }
@@ -17248,6 +18142,22 @@
                 "musk",
                 "citrus"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
+            }
         }
     },
     "a22519a14c73a758b9f273c65d5bfee4":
@@ -17531,6 +18441,42 @@
                     "type": "vsa",
                     "ec50": "-6.41"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR51E1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                },
+                "OR51I2":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                },
+                "OR51L1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
             }
         }
     },
@@ -17601,6 +18547,23 @@
                 {
                     "type": "ia",
                     "adjusted_curve_top": "-0.29411765933037"
+                }
+            }
+        }
+    },
+    "0301e2bc8f625dcc3011f979ceb3504c":
+    {
+        "full_name": "3-hydroxy-3-methyl hexanoic acid",
+        "smiles": "OC(=O)CC(C)(O)CCC",
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP6422665B2\/en":
+            {
+                "OR10A6":
+                {
+                    "type": "sa",
+                    "ec50": "-4",
+                    "adjusted_curve_top": "7"
                 }
             }
         }
@@ -17906,6 +18869,33 @@
                     "type": "vwa",
                     "ec50": "-5",
                     "adjusted_curve_top": "0.2423572752389"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.7",
+                    "adjusted_curve_top": "4"
+                },
+                "OR5K1":
+                {
+                    "type": "wa",
+                    "ec50": "-4.7",
+                    "adjusted_curve_top": "1.5"
+                },
+                "OR5P3":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.4",
+                    "adjusted_curve_top": "115"
+                },
+                "OR8H1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.22",
+                    "adjusted_curve_top": "2"
                 }
             }
         }
@@ -19332,6 +20322,21 @@
                     "ec50": "-4.8",
                     "adjusted_curve_top": "9.2700004577637"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR51E1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.82",
+                    "adjusted_curve_top": "11"
+                },
+                "OR51I2":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.4",
+                    "adjusted_curve_top": "10"
+                }
             }
         }
     },
@@ -19347,6 +20352,45 @@
                 "spicy",
                 "woody"
             ]
+        }
+    },
+    "dcf630fbb45a7cb745abf3cdb58a4272":
+    {
+        "full_name": "ivy carbaldehyde",
+        "smiles": "CC1C=CCCC1(C)C=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "aldehydic",
+                "weedy",
+                "herbal",
+                "cortex",
+                "privet",
+                "soapy"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
+            }
         }
     },
     "dce6fdfa30906995022c843d5568a9fe":
@@ -19484,6 +20528,40 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1.25"
+                }
+            }
+        }
+    },
+    "4c6bc1e9680aee29c1f03ee7a3678181":
+    {
+        "full_name": "labienoxime",
+        "smiles": "CC(C)\/C(=N\\O)\/C(C)(C)CC=C(\/C)C=C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "currant_bud",
+                "blackcurrant_bud",
+                "green",
+                "grapefruit",
+                "herbal",
+                "rose",
+                "sage"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
                 }
             }
         }
@@ -19789,6 +20867,50 @@
                 {
                     "type": "ma",
                     "ec50": "-5.19"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                },
+                "OR51I2":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2.4000000953674"
                 }
             }
         }
@@ -20569,6 +21691,14 @@
                     "type": "ma",
                     "ec50": "-4.66"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                }
             }
         }
     },
@@ -20616,6 +21746,29 @@
                 "OR2AG2":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
                 }
             }
         }
@@ -21219,6 +22372,61 @@
                 {
                     "type": "sa",
                     "adjusted_curve_top": "7"
+                }
+            }
+        }
+    },
+    "7238dab076ddb57fbf41086edeb763ca":
+    {
+        "full_name": "7-methoxycitronellal",
+        "smiles": "CC(CCCC(C)(C)OC)CC=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fresh",
+                "melon",
+                "floral",
+                "lily",
+                "sweet"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR51E1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR51L1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
                 }
             }
         }
@@ -22287,6 +23495,45 @@
                     "ec50": "-4.4",
                     "adjusted_curve_top": "10"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6422665B2\/en":
+            {
+                "OR10A6":
+                {
+                    "type": "ma",
+                    "ec50": "-3.92",
+                    "adjusted_curve_top": "3.7999999523163"
+                },
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-3.92",
+                    "adjusted_curve_top": "23"
+                },
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.22",
+                    "adjusted_curve_top": "4"
+                },
+                "OR51B2":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.7",
+                    "adjusted_curve_top": "50"
+                },
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.22",
+                    "adjusted_curve_top": "2.4000000953674"
+                },
+                "OR51I2":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.52",
+                    "adjusted_curve_top": "25"
+                }
             }
         }
     },
@@ -22397,6 +23644,49 @@
             }
         }
     },
+    "f427585da4558f6306d404ed34207874":
+    {
+        "full_name": "methyl ionone gamma",
+        "smiles": "CC1=CCCC(C1\/C=C(\\C)\/C(=O)C)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "violet",
+                "sweet",
+                "orris",
+                "powdery",
+                "floral",
+                "woody"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                }
+            }
+        }
+    },
     "558b05f2b0688fb1dd49fa536c1c26cc":
     {
         "full_name": "2-methylisoborneol",
@@ -22421,6 +23711,15 @@
                 "OR51S1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6104058B2\/en":
+            {
+                "OR2M3":
+                {
+                    "type": "sa",
+                    "ec50": "-4.4",
+                    "adjusted_curve_top": "9.5"
                 }
             }
         }
@@ -22509,6 +23808,24 @@
                 {
                     "type": "sa",
                     "adjusted_curve_top": "8"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
                 }
             }
         }
@@ -22630,6 +23947,18 @@
     {
         "full_name": "4-methyl nonanoic acid",
         "smiles": "OC(=O)CCC(C)CCCCC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "meaty",
+                "pork",
+                "lamb",
+                "chicken",
+                "fatty",
+                "goaty"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
@@ -23482,6 +24811,24 @@
                     "ec50": "-6.58",
                     "adjusted_curve_top": "5.3571429848671"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
             }
         }
     },
@@ -23805,6 +25152,102 @@
                 {
                     "type": "sa",
                     "adjusted_curve_top": "7.5"
+                }
+            }
+        }
+    },
+    "8c4e66ed81fa78b1f3c563dfef733bdf":
+    {
+        "full_name": "myrac aldehyde",
+        "smiles": "CC(=CCCC1=CCC(CC1)C=O)C",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "milky",
+                "fresh",
+                "clean",
+                "powdery",
+                "aquatic",
+                "orange"
+            ],
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "aldehydic",
+                "citrus",
+                "floral",
+                "greasy",
+                "marine"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
+            {
+                "OR1D2":
+                {
+                    "type": "ma",
+                    "ec50": "-4.02"
+                }
+            },
+            "https:\/\/doi.org\/10.1074\/jbc.m110.211524":
+            {
+                "OR7A5":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "8.3333331346512"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                }
+            }
+        }
+    },
+    "ad6461d1d2e7a3c328e5f6ad2d9e75dc":
+    {
+        "full_name": "myraldyl acetate",
+        "smiles": "CC(=CCCC1=CCC[C@@H](C1)COC(=O)C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fresh",
+                "lily",
+                "magnolia",
+                "sweet",
+                "citrus",
+                "freesia",
+                "green"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
                 }
             }
         }
@@ -24412,6 +25855,19 @@
                 {
                     "type": "ma",
                     "ec50": "-4"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
                 }
             }
         }
@@ -25142,6 +26598,24 @@
                     "type": "ma",
                     "adjusted_curve_top": "4.0500001907349"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR10A6":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "9.5"
+                },
+                "OR2W1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                },
+                "OR51E1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3"
+                }
             }
         }
     },
@@ -25477,6 +26951,14 @@
     {
         "full_name": "2-nonenoic acid",
         "smiles": "OC(=O)C=CCCCCCC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fatty",
+                "oily"
+            ]
+        },
         "activity":
         {
             "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
@@ -27027,6 +28509,14 @@
                     "ec50": "-4.7",
                     "adjusted_curve_top": "0.18888889559441"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-3.2000000476837"
+                }
             }
         }
     },
@@ -27223,6 +28713,44 @@
                 "rhubarb",
                 "guava"
             ]
+        }
+    },
+    "e968ff0db2d5e0d2d747520316854796":
+    {
+        "full_name": "patchouli hexanol",
+        "smiles": "CC(C)(C)C1CCC(CC1)O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "musty",
+                "patchouli",
+                "camphoreous",
+                "minty",
+                "leathery"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                }
+            }
         }
     },
     "919faae573a720f44b45106b7315228f":
@@ -27761,6 +29289,42 @@
                 {
                     "type": "sa",
                     "ec50": "-5.52"
+                }
+            }
+        }
+    },
+    "5a48dd1ede9e9ae2fff19e87a0b1648d":
+    {
+        "full_name": "perillic aldehyde",
+        "smiles": "O=C\\C1=CCC(C(=C)C)CC1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fresh",
+                "green",
+                "herbal",
+                "grassy",
+                "sweet",
+                "minty",
+                "cumin",
+                "spicy",
+                "citrus"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
                 }
             }
         }
@@ -29050,6 +30614,48 @@
             }
         }
     },
+    "bfe68d98a3d08e9190ef434c8063aeec":
+    {
+        "full_name": "3-(3-propen-2-yl phenyl) butanal",
+        "smiles": "O=CCC(c1cc(ccc1)\\C(=C)C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "ozone",
+                "cortex",
+                "green",
+                "floral",
+                "melon"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                }
+            }
+        }
+    },
     "1ff123ce259e6780a461b887cd9c4432":
     {
         "full_name": "propionic acid",
@@ -30093,26 +31699,6 @@
                 {
                     "type": "ma",
                     "adjusted_curve_top": "3.1472079143306"
-                },
-                "OR52D1":
-                {
-                    "type": "wa",
-                    "adjusted_curve_top": "1.116751253968"
-                }
-            },
-            "https:\/\/https:\/\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/www.ncbi.nlm.nih.gov\/pmc\/articles\/PMC5342199\/":
-            {
-                "OR51B4":
-                {
-                    "type": "na"
-                }
-            },
-            "https:\/\/doi.org\/10.3233%2FJAD-121894":
-            {
-                "OR4M1":
-                {
-                    "type": "ia",
-                    "adjusted_curve_top": "-0.5"
                 }
             }
         }
@@ -30146,6 +31732,46 @@
                 {
                     "type": "ma",
                     "ec50": "-5.09"
+                }
+            }
+        }
+    },
+    "b6c1b522e0d55c827462ba4dfbff1248":
+    {
+        "full_name": "(R)-3-mercapto-3-methylhexan-1-ol",
+        "smiles": "OCC[C@@H](S)(C)CCC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "passionfruit",
+                "currant",
+                "blackcurrant",
+                "green",
+                "fruity"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP6422665B2\/en":
+            {
+                "OR1A1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.96",
+                    "adjusted_curve_top": "40"
+                },
+                "OR2J3":
+                {
+                    "type": "ma",
+                    "ec50": "-5.22",
+                    "adjusted_curve_top": "2"
+                },
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.7",
+                    "adjusted_curve_top": "6"
                 }
             }
         }
@@ -30267,6 +31893,49 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            }
+        }
+    },
+    "fa8085bacc3866c6c81c250f100da9c2":
+    {
+        "full_name": "(R,S)-methyl cedryl ketone",
+        "smiles": "C[C@@H]1CC[C@@H]2C13CC[C@]([C@H](C3)C2(C)C)(C)C(=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "woody",
+                "vetiver",
+                "amber",
+                "leathery",
+                "musk",
+                "cedar"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
                 }
             }
         }
@@ -30546,6 +32215,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-3.2000000476837"
                 }
             }
         }
@@ -31153,6 +32830,76 @@
                 "fecal",
                 "naphthyl"
             ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.82",
+                    "adjusted_curve_top": "3.5"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.4",
+                    "adjusted_curve_top": "6"
+                },
+                "OR5P3":
+                {
+                    "type": "vsa",
+                    "ec50": "-5.1",
+                    "adjusted_curve_top": "123"
+                },
+                "OR8H1":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.22",
+                    "adjusted_curve_top": "24"
+                }
+            }
+        }
+    },
+    "150293eff9ed1a367c9bd69ad55c66be":
+    {
+        "full_name": "(S)-3-mercapto-3-methylhexan-1-ol",
+        "smiles": "OCC[C@H](S)(C)CCC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "passionfruit",
+                "currant",
+                "blackcurrant",
+                "green",
+                "fruity"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP6422665B2\/en":
+            {
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.96",
+                    "adjusted_curve_top": "5"
+                },
+                "OR2J3":
+                {
+                    "type": "sa",
+                    "ec50": "-4.82",
+                    "adjusted_curve_top": "7.5"
+                },
+                "OR2W1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.7",
+                    "adjusted_curve_top": "7"
+                }
+            }
         }
     },
     "f4eb989d5326d646cb4753b0474f8cdd":
@@ -31207,6 +32954,48 @@
             ]
         }
     },
+    "4b27c7710c1eb561dd690ae442c1b2cd":
+    {
+        "full_name": "spicy carbonate",
+        "smiles": "CCOC(=O)OC1CCCCC1C(C)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "spicy",
+                "woody",
+                "floral",
+                "green",
+                "herbal"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                }
+            }
+        }
+    },
     "9b5a8fc5b2f8fe299884a3256c4464b7":
     {
         "full_name": "strawberry glycidate",
@@ -31243,6 +33032,24 @@
                 {
                     "type": "wa",
                     "ec50": "-3.43"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
                 }
             }
         }
@@ -31731,6 +33538,29 @@
                     "type": "ma",
                     "ec50": "-4.78"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                }
             }
         }
     },
@@ -32007,6 +33837,29 @@
                 {
                     "type": "vwa",
                     "adjusted_curve_top": "0.050761420291087"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
                 }
             }
         }
@@ -32720,6 +34573,43 @@
             }
         }
     },
+    "2c003354d06febf2e5e08118688f824b":
+    {
+        "full_name": "triplal",
+        "smiles": "CC1C=C(CCC1C=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "aldehydic",
+                "leafy",
+                "cortex",
+                "tart",
+                "floral",
+                "peely"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
+            {
+                "OR51L1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-4.6999998092651"
+                }
+            }
+        }
+    },
     "3aab417e945376034389c6b65069a0b4":
     {
         "full_name": "tris-(methylthio)methane",
@@ -33242,6 +35132,73 @@
                     "ec50": "-6.3",
                     "adjusted_curve_top": "9.9999997615814",
                     "antagonist": "1"
+                }
+            }
+        }
+    },
+    "9b66ce282570d15a3cb4687defdb97d5":
+    {
+        "full_name": "verdyl acetate",
+        "smiles": "CC(=O)OC1CC2CC1C3C2C=CC3",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "floral",
+                "green",
+                "soapy",
+                "cedar",
+                "pine",
+                "woody"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR5P3":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-2"
+                },
+                "OR8H1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-5"
+                }
+            }
+        }
+    },
+    "4fcd0ae9ba14de7fcbe662fca15bdfe4":
+    {
+        "full_name": "violet decenol",
+        "smiles": "CCCCCC(\/C(=C\/CC)\/C)O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "oily",
+                "violet",
+                "lily",
+                "seedy",
+                "fruity",
+                "kiwi"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-3.7000000476837"
                 }
             }
         }

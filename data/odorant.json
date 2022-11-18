@@ -138,8 +138,8 @@
             {
                 "OR12D2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -335,8 +335,8 @@
             {
                 "OR4M1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "11"
+                    "type": "ma",
+                    "adjusted_curve_top": "5.5"
                 }
             }
         }
@@ -364,9 +364,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.3",
-                    "adjusted_curve_top": "10.5"
+                    "adjusted_curve_top": "8.9743590652943"
                 }
             }
         }
@@ -635,17 +635,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -997,17 +997,17 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -1165,17 +1165,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -1203,7 +1203,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.7000000476837"
+                    "adjusted_curve_top": "-0.38571430976902"
                 }
             }
         }
@@ -1261,7 +1261,7 @@
                 "VN1R1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "5"
+                    "adjusted_curve_top": "2.0833332836628"
                 }
             },
             "https:\/\/www.oncotarget.com\/article\/13836\/text\/":
@@ -1340,7 +1340,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-4"
+                    "adjusted_curve_top": "-0.57142859697342"
                 }
             }
         }
@@ -1518,22 +1518,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -1541,7 +1541,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.2000000476837"
+                    "adjusted_curve_top": "-0.31428573514734"
                 }
             }
         }
@@ -1810,22 +1810,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -1849,8 +1849,8 @@
             {
                 "OR4X2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "20"
+                    "type": "ma",
+                    "adjusted_curve_top": "3.8461539149284"
                 },
                 "OR5I1":
                 {
@@ -2365,8 +2365,8 @@
             {
                 "OR1B1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "20"
+                    "type": "ma",
+                    "adjusted_curve_top": "3.8461539149284"
                 },
                 "OR5I1":
                 {
@@ -2520,8 +2520,8 @@
                 },
                 "OR8B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "14"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.6923077404499"
                 }
             }
         }
@@ -2645,8 +2645,8 @@
             {
                 "OR4K2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -2899,15 +2899,15 @@
             {
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-5",
-                    "adjusted_curve_top": "16"
+                    "adjusted_curve_top": "6.6666665077209"
                 },
                 "OR2W1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-5.9",
-                    "adjusted_curve_top": "24"
+                    "adjusted_curve_top": "9.9999997615814"
                 }
             }
         }
@@ -3489,8 +3489,8 @@
             {
                 "OR4C3":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -3498,8 +3498,8 @@
                 },
                 "OR5L1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -3507,7 +3507,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.7999999523163"
+                    "adjusted_curve_top": "-0.40000001106943"
                 }
             }
         }
@@ -3622,8 +3622,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "7"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.9166665971279"
                 }
             },
             "https:\/\/www.oncotarget.com\/article\/13836\/text\/":
@@ -3675,7 +3675,7 @@
                 "OR2W3":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5999999046326"
+                    "adjusted_curve_top": "6.0465111898822"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -3706,17 +3706,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -3724,7 +3724,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.7999999523163"
+                    "adjusted_curve_top": "-0.40000001106943"
                 }
             }
         }
@@ -4089,22 +4089,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51L1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -4112,12 +4112,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -4348,8 +4348,8 @@
             {
                 "OR10C1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -4932,8 +4932,8 @@
                 },
                 "OR51B6":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR51D1":
                 {
@@ -4942,12 +4942,12 @@
                 "OR51E1":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "adjusted_curve_top": "0.83333331346512"
                 },
                 "OR51E2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR51F1":
                 {
@@ -4959,8 +4959,8 @@
                 },
                 "OR51I2":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR51L1":
                 {
@@ -4968,23 +4968,23 @@
                 },
                 "OR51M1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR51Q1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR51S1":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "adjusted_curve_top": "0.83333331346512"
                 },
                 "OR51T1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR51V1":
                 {
@@ -4993,7 +4993,7 @@
                 "OR52A1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR52A4":
                 {
@@ -5018,7 +5018,7 @@
                 "OR52E4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR52E6":
                 {
@@ -5031,27 +5031,27 @@
                 "OR52H1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "5.5"
+                    "adjusted_curve_top": "4.5833332240582"
                 },
                 "OR52I2":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR52K1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR52K2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3.5"
+                    "adjusted_curve_top": "2.9166665971279"
                 },
                 "OR52L1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR52N4":
                 {
@@ -5060,12 +5060,12 @@
                 "OR52N5":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "1.5"
+                    "adjusted_curve_top": "1.2499999701977"
                 },
                 "OR52W1":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "0.69999998807907"
+                    "adjusted_curve_top": "0.58333330949148"
                 },
                 "OR56A1":
                 {
@@ -5073,13 +5073,13 @@
                 },
                 "OR56A3":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR56A4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR56A5":
                 {
@@ -5087,13 +5087,13 @@
                 },
                 "OR56B1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR56B4":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 }
             }
         }
@@ -5173,8 +5173,8 @@
             {
                 "OR1B1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "9"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.7307692617178"
                 },
                 "OR5I1":
                 {
@@ -5624,8 +5624,8 @@
             {
                 "OR4P4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -5652,33 +5652,33 @@
             {
                 "OR10A6":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-4.3",
-                    "adjusted_curve_top": "2.0999999046326"
+                    "adjusted_curve_top": "1.9090908792886"
                 },
                 "OR2W1":
                 {
                     "type": "ma",
                     "ec50": "-4.22",
-                    "adjusted_curve_top": "2.9000000953674"
+                    "adjusted_curve_top": "2.6363638016311"
                 },
                 "OR51E1":
                 {
                     "type": "ma",
                     "ec50": "-4.52",
-                    "adjusted_curve_top": "4.5999999046326"
+                    "adjusted_curve_top": "4.1818182197484"
                 },
                 "OR51I2":
                 {
                     "type": "ma",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "4.9000000953674"
+                    "adjusted_curve_top": "4.4545456739989"
                 },
                 "OR51L1":
                 {
                     "type": "ma",
                     "ec50": "-4.3",
-                    "adjusted_curve_top": "3.0999999046326"
+                    "adjusted_curve_top": "2.8181818154725"
                 }
             }
         }
@@ -6031,8 +6031,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "0.83333331346512"
                 }
             }
         }
@@ -6117,8 +6117,8 @@
             {
                 "OR4K5":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -6574,8 +6574,8 @@
             {
                 "OR10A6":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -6946,17 +6946,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -6984,17 +6984,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -7356,8 +7356,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "4.3000001907349"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10.000000085942"
                 }
             }
         }
@@ -7416,7 +7416,7 @@
                 "OR4M1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-0.5"
+                    "adjusted_curve_top": "-0.25"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
@@ -7424,7 +7424,7 @@
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -7432,17 +7432,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -7506,12 +7506,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -7635,18 +7635,18 @@
             {
                 "OR10Q1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.19230769574642"
                 },
                 "OR4K2":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "type": "wa",
+                    "adjusted_curve_top": "0.57692308723927"
                 },
                 "OR4P4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.19230769574642"
                 },
                 "OR5I1":
                 {
@@ -7658,22 +7658,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -8358,7 +8358,7 @@
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             }
         }
@@ -8434,7 +8434,7 @@
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             }
         }
@@ -8465,12 +8465,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -8773,7 +8773,7 @@
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -8781,17 +8781,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -9388,8 +9388,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.80000001192093"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.3333333303531"
                 }
             },
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
@@ -9830,22 +9830,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -9921,22 +9921,22 @@
                 "OR51B6":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "5"
+                    "adjusted_curve_top": "4.1666665673256"
                 },
                 "OR51D1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.3333332538605"
                 },
                 "OR51E1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR51E2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR51F1":
                 {
@@ -9945,12 +9945,12 @@
                 "OR51G1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.3333332538605"
                 },
                 "OR51I2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR51L1":
                 {
@@ -9959,22 +9959,22 @@
                 "OR51M1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR51Q1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR51S1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.3333332538605"
                 },
                 "OR51T1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR51V1":
                 {
@@ -9983,27 +9983,27 @@
                 "OR52A1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR52A4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "6"
+                    "adjusted_curve_top": "4.9999998807907"
                 },
                 "OR52B2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR52B4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR52D1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.3333331346512"
                 },
                 "OR52E2":
                 {
@@ -10012,12 +10012,12 @@
                 "OR52E4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR52E6":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "adjusted_curve_top": "0.83333331346512"
                 },
                 "OR52E8":
                 {
@@ -10025,28 +10025,28 @@
                 },
                 "OR52H1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR52I2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "6"
+                    "adjusted_curve_top": "4.9999998807907"
                 },
                 "OR52K1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.3333331346512"
                 },
                 "OR52K2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "5.5"
+                    "adjusted_curve_top": "4.5833332240582"
                 },
                 "OR52L1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "12"
+                    "type": "sa",
+                    "adjusted_curve_top": "9.9999997615814"
                 },
                 "OR52N4":
                 {
@@ -10054,8 +10054,8 @@
                 },
                 "OR52N5":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10.5"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.7499997913837"
                 },
                 "OR52W1":
                 {
@@ -10072,7 +10072,7 @@
                 "OR56A4":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "1.5"
+                    "adjusted_curve_top": "1.2499999701977"
                 },
                 "OR56A5":
                 {
@@ -10080,13 +10080,13 @@
                 },
                 "OR56B1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR56B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.3333331346512"
                 }
             }
         }
@@ -10376,13 +10376,13 @@
                 },
                 "OR51B4":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR51B5":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.3333332538605"
                 },
                 "OR51B6":
                 {
@@ -10414,8 +10414,8 @@
                 },
                 "OR51L1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR51M1":
                 {
@@ -10452,7 +10452,7 @@
                 "OR52B4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR52D1":
                 {
@@ -10464,8 +10464,8 @@
                 },
                 "OR52E4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR52E6":
                 {
@@ -10478,7 +10478,7 @@
                 "OR52H1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "4.5"
+                    "adjusted_curve_top": "3.749999910593"
                 },
                 "OR52I2":
                 {
@@ -10506,8 +10506,8 @@
                 },
                 "OR52W1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "7"
+                    "type": "ma",
+                    "adjusted_curve_top": "5.8333331942558"
                 },
                 "OR56A1":
                 {
@@ -10516,7 +10516,7 @@
                 "OR56A3":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "0.80000001192093"
+                    "adjusted_curve_top": "0.6666666607062"
                 },
                 "OR56A4":
                 {
@@ -10529,7 +10529,7 @@
                 "OR56B1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR56B4":
                 {
@@ -10689,7 +10689,7 @@
                 {
                     "type": "sa",
                     "ec50": "-6.8",
-                    "adjusted_curve_top": "9.6999998092651"
+                    "adjusted_curve_top": "8.2905982115839"
                 }
             }
         }
@@ -11224,9 +11224,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "sa",
+                    "type": "ma",
                     "ec50": "-3.9",
-                    "adjusted_curve_top": "7"
+                    "adjusted_curve_top": "5.9829060435295"
                 }
             }
         }
@@ -11271,7 +11271,7 @@
                 {
                     "type": "sa",
                     "ec50": "-3.6",
-                    "adjusted_curve_top": "8.1999998092651"
+                    "adjusted_curve_top": "7.0085469165419"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -11280,7 +11280,7 @@
                 {
                     "type": "vsa",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "70"
+                    "adjusted_curve_top": "10.000000447035"
                 }
             }
         }
@@ -11504,9 +11504,9 @@
             {
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-4.5",
-                    "adjusted_curve_top": "10"
+                    "adjusted_curve_top": "4.1666665673256"
                 }
             },
             "https:\/\/doi.org\/10.1093\/chemse\/bjw117":
@@ -11830,22 +11830,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -11979,7 +11979,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.5"
+                    "adjusted_curve_top": "-0.35714287310839"
                 }
             }
         }
@@ -12160,7 +12160,7 @@
                 "OR3A1":
                 {
                     "type": "vwa",
-                    "adjusted_curve_top": "0.10000000149012"
+                    "adjusted_curve_top": "0.38461537934267"
                 }
             }
         }
@@ -12199,9 +12199,9 @@
             {
                 "OR2W1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-5.7",
-                    "adjusted_curve_top": "14"
+                    "adjusted_curve_top": "5.8333331942558"
                 }
             }
         }
@@ -12237,9 +12237,9 @@
             {
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-4.8",
-                    "adjusted_curve_top": "12"
+                    "adjusted_curve_top": "4.9999998807907"
                 }
             }
         }
@@ -12504,9 +12504,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-5.5",
-                    "adjusted_curve_top": "11.699999809265"
+                    "adjusted_curve_top": "9.9999999383066"
                 }
             }
         }
@@ -12982,22 +12982,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -13065,15 +13065,15 @@
             {
                 "OR2AG1":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-3.8",
-                    "adjusted_curve_top": "2.2000000476837"
+                    "adjusted_curve_top": "1.8803419401503"
                 },
                 "OR5K1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-5",
-                    "adjusted_curve_top": "11.39999961853"
+                    "adjusted_curve_top": "9.743589516277"
                 }
             }
         }
@@ -13122,9 +13122,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "sa",
+                    "type": "ma",
                     "ec50": "-3.4",
-                    "adjusted_curve_top": "7.8000001907349"
+                    "adjusted_curve_top": "6.6666668972398"
                 }
             }
         }
@@ -13336,15 +13336,15 @@
             {
                 "OR2AG1":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-3.8",
-                    "adjusted_curve_top": "2"
+                    "adjusted_curve_top": "1.7094017267227"
                 },
                 "OR5K1":
                 {
                     "type": "ma",
                     "ec50": "-4.2",
-                    "adjusted_curve_top": "6.1999998092651"
+                    "adjusted_curve_top": "5.2991451898192"
                 }
             }
         }
@@ -13377,7 +13377,7 @@
                 {
                     "type": "ma",
                     "ec50": "-4.5",
-                    "adjusted_curve_top": "5.6999998092651"
+                    "adjusted_curve_top": "4.8717947581385"
                 }
             }
         }
@@ -13590,8 +13590,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "3.4000000953674"
+                    "type": "sa",
+                    "adjusted_curve_top": "7.9069766831952"
                 }
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
@@ -13876,8 +13876,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "3.0999999046326"
+                    "type": "sa",
+                    "adjusted_curve_top": "7.2093018459719"
                 }
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
@@ -14094,22 +14094,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -14354,22 +14354,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51L1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 }
             }
         }
@@ -14517,7 +14517,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.7999999523163"
+                    "adjusted_curve_top": "-0.40000001106943"
                 }
             }
         }
@@ -14691,22 +14691,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -14737,22 +14737,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -14760,7 +14760,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.71428574621677"
                 }
             }
         }
@@ -14981,8 +14981,8 @@
             {
                 "OR4C16":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -14990,8 +14990,8 @@
                 },
                 "OR5L1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 }
             }
         }
@@ -15111,22 +15111,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -15134,7 +15134,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.7999999523163"
+                    "adjusted_curve_top": "-0.40000001106943"
                 }
             }
         }
@@ -15203,8 +15203,8 @@
             {
                 "OR52B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -15215,8 +15215,8 @@
             {
                 "OR51S1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1.5"
+                    "type": "ma",
+                    "adjusted_curve_top": "3.75"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP6104058B2\/en":
@@ -15225,7 +15225,7 @@
                 {
                     "type": "vsa",
                     "ec50": "-6",
-                    "adjusted_curve_top": "85"
+                    "adjusted_curve_top": "10.000000037253"
                 }
             }
         }
@@ -15405,8 +15405,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "3.5"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.1395345926285"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -15430,8 +15430,8 @@
             {
                 "OR4E2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -15443,17 +15443,17 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -15461,7 +15461,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-4"
+                    "adjusted_curve_top": "-0.57142859697342"
                 }
             }
         }
@@ -15806,8 +15806,8 @@
             {
                 "OR4K2":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.48076923936605"
                 },
                 "OR4P4":
                 {
@@ -15823,12 +15823,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -15877,17 +15877,17 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -16057,8 +16057,8 @@
                 },
                 "OR4P4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "32"
+                    "type": "ma",
+                    "adjusted_curve_top": "6.1538462638855"
                 },
                 "OR5I1":
                 {
@@ -16119,8 +16119,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "24"
+                    "type": "sa",
+                    "adjusted_curve_top": "9.9999997615814"
                 }
             },
             "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
@@ -16128,15 +16128,15 @@
                 "OR2W3":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "5.8139532804489"
                 }
             },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
             {
                 "OR10C1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -16550,8 +16550,8 @@
                 },
                 "OR3A1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.0999999046326"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.0769224790427"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -16559,7 +16559,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.5"
+                    "adjusted_curve_top": "-0.35714287310839"
                 }
             }
         }
@@ -16748,7 +16748,7 @@
                 "VN1R1":
                 {
                     "type": "vwa",
-                    "adjusted_curve_top": "0.30000001192093"
+                    "adjusted_curve_top": "0.12500000198682"
                 }
             },
             "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
@@ -16812,8 +16812,8 @@
                 },
                 "OR1J2":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "9"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10.000000476837"
                 },
                 "OR2B2":
                 {
@@ -17613,8 +17613,8 @@
                 },
                 "OR8B4":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "8"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.5384615659714"
                 }
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
@@ -17630,7 +17630,7 @@
                 "OR1J2":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "adjusted_curve_top": "0.55555558204651"
                 }
             }
         }
@@ -17899,8 +17899,8 @@
             {
                 "OR10A6":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -17908,8 +17908,8 @@
                 },
                 "OR8D2":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "9"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.7307692617178"
                 }
             }
         }
@@ -18150,12 +18150,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -18447,17 +18447,17 @@
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 },
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 },
                 "OR51L1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -18465,17 +18465,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -18561,9 +18561,9 @@
             {
                 "OR10A6":
                 {
-                    "type": "sa",
+                    "type": "wa",
                     "ec50": "-4",
-                    "adjusted_curve_top": "7"
+                    "adjusted_curve_top": "1.4000000208616"
                 }
             }
         }
@@ -18875,27 +18875,27 @@
             {
                 "OR2W1":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "0.32520323991776"
                 },
                 "OR5K1":
                 {
-                    "type": "wa",
+                    "type": "vwa",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "1.5"
+                    "adjusted_curve_top": "0.12195121496916"
                 },
                 "OR5P3":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "115"
+                    "adjusted_curve_top": "9.3495931476355"
                 },
                 "OR8H1":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-4.22",
-                    "adjusted_curve_top": "2"
+                    "adjusted_curve_top": "0.16260161995888"
                 }
             }
         }
@@ -19458,28 +19458,28 @@
             {
                 "OR2AG1":
                 {
-                    "type": "sa",
+                    "type": "ma",
                     "ec50": "-6",
-                    "adjusted_curve_top": "7.9000000953674"
+                    "adjusted_curve_top": "6.7521369020654"
                 },
                 "OR5K1":
                 {
                     "type": "ma",
                     "ec50": "-5.5",
-                    "adjusted_curve_top": "6.5999999046326"
+                    "adjusted_curve_top": "5.6410256166743"
                 }
             },
             "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
             {
                 "OR3A4":
                 {
-                    "type": "vwa",
-                    "adjusted_curve_top": "0.30000001192093"
+                    "type": "wa",
+                    "adjusted_curve_top": "0.75000002980232"
                 },
                 "OR51S1":
                 {
                     "type": "vwa",
-                    "adjusted_curve_top": "0.15000000596046"
+                    "adjusted_curve_top": "0.37500001490116"
                 }
             }
         }
@@ -19514,13 +19514,13 @@
                 {
                     "type": "ma",
                     "ec50": "-3",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.1367521584034"
                 },
                 "OR5K1":
                 {
                     "type": "ma",
                     "ec50": "-3.4",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.4188034534454"
                 }
             },
             "https:\/\/doi.org\/10.3233%2FJAD-121894":
@@ -19528,7 +19528,7 @@
                 "OR4M1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "6"
+                    "adjusted_curve_top": "3"
                 }
             }
         }
@@ -19577,13 +19577,13 @@
                 {
                     "type": "wa",
                     "ec50": "-4.2",
-                    "adjusted_curve_top": "1.3999999761581"
+                    "adjusted_curve_top": "1.1965811883282"
                 },
                 "OR5K1":
                 {
                     "type": "ma",
                     "ec50": "-4.5",
-                    "adjusted_curve_top": "3.2000000476837"
+                    "adjusted_curve_top": "2.7350428035117"
                 }
             }
         }
@@ -19621,8 +19621,8 @@
             {
                 "OR4K2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -20281,15 +20281,15 @@
                 "OR2W3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-0.20000000298023"
+                    "adjusted_curve_top": "-0.46511626936669"
                 }
             },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
             {
                 "OR12D2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -20329,13 +20329,13 @@
                 {
                     "type": "vsa",
                     "ec50": "-4.82",
-                    "adjusted_curve_top": "11"
+                    "adjusted_curve_top": "10.000000298023"
                 },
                 "OR51I2":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "10"
+                    "adjusted_curve_top": "9.0909093618393"
                 }
             }
         }
@@ -20378,17 +20378,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -20556,12 +20556,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -20858,7 +20858,7 @@
                 "OR2W3":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.7000000476837"
+                    "adjusted_curve_top": "6.2790696537772"
                 }
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
@@ -20874,12 +20874,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 },
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -20887,22 +20887,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -20910,7 +20910,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.4000000953674"
+                    "adjusted_curve_top": "-0.34285717180797"
                 }
             }
         }
@@ -21145,8 +21145,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "vwa",
-                    "adjusted_curve_top": "0.40000000596046"
+                    "type": "wa",
+                    "adjusted_curve_top": "0.93023253873337"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -21238,7 +21238,7 @@
                 {
                     "type": "sa",
                     "ec50": "-4.6",
-                    "adjusted_curve_top": "8.3999996185303"
+                    "adjusted_curve_top": "7.1794869261929"
                 }
             }
         }
@@ -21266,9 +21266,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "sa",
+                    "type": "ma",
                     "ec50": "-4.5",
-                    "adjusted_curve_top": "7.3000001907349"
+                    "adjusted_curve_top": "6.2393164655592"
                 }
             }
         }
@@ -21478,8 +21478,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1.7999999523163"
+                    "type": "ma",
+                    "adjusted_curve_top": "4.1860462510309"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -21552,16 +21552,16 @@
             {
                 "OR2W3":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.3255813121796"
                 }
             },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
             {
                 "OR1B1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "35"
+                    "type": "ma",
+                    "adjusted_curve_top": "6.7307693511248"
                 },
                 "OR5I1":
                 {
@@ -21697,7 +21697,7 @@
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -21753,22 +21753,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -22036,8 +22036,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1.2000000476837"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.7906976855078"
                 }
             }
         }
@@ -22070,8 +22070,8 @@
             {
                 "OR2T2":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
                 }
             }
         }
@@ -22221,9 +22221,9 @@
             {
                 "OR2M3":
                 {
-                    "type": "ma",
+                    "type": "vsa",
                     "ec50": "-7.54",
-                    "adjusted_curve_top": "3.7000000476837"
+                    "adjusted_curve_top": "10.000000343452"
                 }
             }
         }
@@ -22398,12 +22398,12 @@
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51L1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -22411,22 +22411,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -22463,7 +22463,7 @@
                 {
                     "type": "sa",
                     "ec50": "-7.4",
-                    "adjusted_curve_top": "9.6999998092651"
+                    "adjusted_curve_top": "8.2905982115839"
                 }
             }
         }
@@ -22551,21 +22551,21 @@
                 {
                     "type": "sa",
                     "ec50": "-6.7",
-                    "adjusted_curve_top": "9.1999998092651"
+                    "adjusted_curve_top": "7.8632477799032"
                 },
                 "OR5K1":
                 {
                     "type": "sa",
                     "ec50": "-6",
-                    "adjusted_curve_top": "8.3000001907349"
+                    "adjusted_curve_top": "7.0940173289205"
                 }
             },
             "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
             {
                 "OR3A4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1.2999999523163"
+                    "type": "ma",
+                    "adjusted_curve_top": "3.2499998807907"
                 },
                 "OR51S1":
                 {
@@ -22625,7 +22625,7 @@
                 {
                     "type": "sa",
                     "ec50": "-5.1",
-                    "adjusted_curve_top": "9.8999996185303"
+                    "adjusted_curve_top": "8.4615382212349"
                 }
             }
         }
@@ -23500,39 +23500,39 @@
             {
                 "OR10A6":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-3.92",
-                    "adjusted_curve_top": "3.7999999523163"
+                    "adjusted_curve_top": "0.76000000178814"
                 },
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-3.92",
-                    "adjusted_curve_top": "23"
+                    "adjusted_curve_top": "4.6000000685453"
                 },
                 "OR2W1":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-4.22",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "0.80000001192093"
                 },
                 "OR51B2":
                 {
                     "type": "vsa",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "50"
+                    "adjusted_curve_top": "10.000000149012"
                 },
                 "OR51E1":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-4.22",
-                    "adjusted_curve_top": "2.4000000953674"
+                    "adjusted_curve_top": "0.48000002622604"
                 },
                 "OR51I2":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-4.52",
-                    "adjusted_curve_top": "25"
+                    "adjusted_curve_top": "5.0000000745058"
                 }
             }
         }
@@ -23667,22 +23667,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -23705,8 +23705,8 @@
             {
                 "OR3A4":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "4"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
                 },
                 "OR51S1":
                 {
@@ -23717,9 +23717,9 @@
             {
                 "OR2M3":
                 {
-                    "type": "sa",
+                    "type": "wa",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "9.5"
+                    "adjusted_curve_top": "1.1176470629871"
                 }
             }
         }
@@ -23778,7 +23778,7 @@
                 {
                     "type": "ma",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "5.3000001907349"
+                    "adjusted_curve_top": "4.5299147388365"
                 }
             }
         }
@@ -23806,8 +23806,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "8"
+                    "type": "ma",
+                    "adjusted_curve_top": "3.3333332538605"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -23815,17 +23815,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -23840,9 +23840,9 @@
             {
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-4.8",
-                    "adjusted_curve_top": "11"
+                    "adjusted_curve_top": "4.5833332240582"
                 }
             }
         }
@@ -24197,9 +24197,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "sa",
+                    "type": "ma",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "7.5"
+                    "adjusted_curve_top": "6.4102564752102"
                 }
             }
         }
@@ -24401,7 +24401,7 @@
                 {
                     "type": "sa",
                     "ec50": "-4.8",
-                    "adjusted_curve_top": "9"
+                    "adjusted_curve_top": "7.6923077702522"
                 }
             }
         }
@@ -24632,8 +24632,8 @@
             {
                 "OR4C3":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -24739,8 +24739,8 @@
             {
                 "OR10A6":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -24748,8 +24748,8 @@
                 },
                 "OR8D2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "21"
+                    "type": "ma",
+                    "adjusted_curve_top": "4.0384616106749"
                 }
             }
         }
@@ -24817,17 +24817,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -24921,13 +24921,13 @@
             {
                 "OR10Q1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.19230769574642"
                 },
                 "OR4K2":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "7"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.346153870225"
                 },
                 "OR4P4":
                 {
@@ -25203,12 +25203,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -25237,17 +25237,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -25344,8 +25344,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.0416666418314"
                 }
             }
         }
@@ -25397,8 +25397,8 @@
             {
                 "OR2AG1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.5999999046326"
+                    "type": "sa",
+                    "adjusted_curve_top": "9.9999993470999"
                 },
                 "OR3A1":
                 {
@@ -25789,7 +25789,7 @@
                 {
                     "type": "ma",
                     "ec50": "-3.2",
-                    "adjusted_curve_top": "2.5999999046326"
+                    "adjusted_curve_top": "6.0465111898822"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -25862,12 +25862,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -26348,7 +26348,7 @@
                 "OR1J2":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "adjusted_curve_top": "0.55555558204651"
                 }
             }
         }
@@ -26604,17 +26604,17 @@
                 "OR10A6":
                 {
                     "type": "sa",
-                    "adjusted_curve_top": "9.5"
+                    "adjusted_curve_top": "8.6363638937473"
                 },
                 "OR2W1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "sa",
+                    "adjusted_curve_top": "9.0909093618393"
                 },
                 "OR51E1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.7272728085518"
                 }
             }
         }
@@ -27197,8 +27197,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 }
             },
             "https:\/\/doi.org\/10.1093\/chemse\/bjw117":
@@ -27236,8 +27236,8 @@
             {
                 "OR5I1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 }
             },
             "https:\/\/doi.org\/10.1002\/adhm.201300174":
@@ -27245,7 +27245,7 @@
                 "OR1J2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "3.3333334922791"
                 }
             }
         }
@@ -28091,8 +28091,8 @@
             {
                 "OR52B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -28515,7 +28515,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-3.2000000476837"
+                    "adjusted_curve_top": "-0.4571428843907"
                 }
             }
         }
@@ -28738,17 +28738,17 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -28899,17 +28899,17 @@
                 {
                     "type": "vsa",
                     "ec50": "-4.96",
-                    "adjusted_curve_top": "52"
+                    "adjusted_curve_top": "10.000000178814"
                 },
                 "OR4K2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "15"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.8846154361963"
                 },
                 "OR4P4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.19230769574642"
                 },
                 "OR5I1":
                 {
@@ -29057,13 +29057,13 @@
             {
                 "OR2T2":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
                 },
                 "OR2T8":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
                 }
             }
         }
@@ -29319,12 +29319,12 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -29370,7 +29370,7 @@
                 {
                     "type": "ia",
                     "ec50": "-3.9",
-                    "adjusted_curve_top": "-4"
+                    "adjusted_curve_top": "-1.6666666269302"
                 }
             }
         }
@@ -29997,13 +29997,13 @@
             {
                 "OR4E2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR4K2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -30636,22 +30636,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -30840,8 +30840,8 @@
             {
                 "OR12D2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -31100,7 +31100,7 @@
                 "OR4M1":
                 {
                     "type": "vsa",
-                    "adjusted_curve_top": "20"
+                    "adjusted_curve_top": "10"
                 }
             }
         }
@@ -31757,21 +31757,21 @@
             {
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.96",
-                    "adjusted_curve_top": "40"
+                    "adjusted_curve_top": "8.0000001192093"
                 },
                 "OR2J3":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-5.22",
-                    "adjusted_curve_top": "2"
+                    "adjusted_curve_top": "0.40000000596046"
                 },
                 "OR2W1":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-5.7",
-                    "adjusted_curve_top": "6"
+                    "adjusted_curve_top": "1.2000000178814"
                 }
             }
         }
@@ -31920,22 +31920,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -32173,8 +32173,8 @@
             {
                 "OR52B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -32222,7 +32222,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-3.2000000476837"
+                    "adjusted_curve_top": "-0.4571428843907"
                 }
             }
         }
@@ -32671,7 +32671,7 @@
                 "OR2W3":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "0.80000001192093"
+                    "adjusted_curve_top": "1.8604650774667"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -32733,13 +32733,13 @@
                 {
                     "type": "sa",
                     "ec50": "-6.4",
-                    "adjusted_curve_top": "8.3000001907349"
+                    "adjusted_curve_top": "7.0940173289205"
                 },
                 "OR5K1":
                 {
                     "type": "ma",
                     "ec50": "-4.8",
-                    "adjusted_curve_top": "4.1999998092651"
+                    "adjusted_curve_top": "3.5897434630965"
                 }
             }
         }
@@ -32806,13 +32806,13 @@
                 {
                     "type": "wa",
                     "ec50": "-3",
-                    "adjusted_curve_top": "0.80000001192093"
+                    "adjusted_curve_top": "0.68376070087792"
                 },
                 "OR5K1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.2",
-                    "adjusted_curve_top": "11.300000190735"
+                    "adjusted_curve_top": "9.6581199190046"
                 }
             }
         }
@@ -32837,27 +32837,27 @@
             {
                 "OR2W1":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-4.82",
-                    "adjusted_curve_top": "3.5"
+                    "adjusted_curve_top": "0.28455283492804"
                 },
                 "OR5K1":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "6"
+                    "adjusted_curve_top": "0.48780485987663"
                 },
                 "OR5P3":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-5.1",
-                    "adjusted_curve_top": "123"
+                    "adjusted_curve_top": "9.999999627471"
                 },
                 "OR8H1":
                 {
-                    "type": "vsa",
+                    "type": "wa",
                     "ec50": "-4.22",
-                    "adjusted_curve_top": "24"
+                    "adjusted_curve_top": "1.9512194395065"
                 }
             }
         }
@@ -32883,21 +32883,21 @@
             {
                 "OR1A1":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-4.96",
-                    "adjusted_curve_top": "5"
+                    "adjusted_curve_top": "1.0000000149012"
                 },
                 "OR2J3":
                 {
-                    "type": "sa",
+                    "type": "wa",
                     "ec50": "-4.82",
-                    "adjusted_curve_top": "7.5"
+                    "adjusted_curve_top": "1.5000000223517"
                 },
                 "OR2W1":
                 {
-                    "type": "sa",
+                    "type": "wa",
                     "ec50": "-5.7",
-                    "adjusted_curve_top": "7"
+                    "adjusted_curve_top": "1.4000000208616"
                 }
             }
         }
@@ -32976,22 +32976,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -33039,17 +33039,17 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -33544,22 +33544,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -33844,22 +33844,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -33906,8 +33906,8 @@
             {
                 "OR2L8":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -34159,13 +34159,13 @@
             {
                 "OR4E2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR52B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -34176,8 +34176,8 @@
             {
                 "OR3A4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.80000001192093"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.0000000298023"
                 },
                 "OR51S1":
                 {
@@ -34260,9 +34260,9 @@
             {
                 "OR2H2":
                 {
-                    "type": "sa",
+                    "type": "vsa",
                     "ec50": "-4.44",
-                    "adjusted_curve_top": "7"
+                    "adjusted_curve_top": "10.000000238419"
                 }
             }
         }
@@ -34507,9 +34507,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "11"
+                    "adjusted_curve_top": "9.4017094969749"
                 }
             }
         }
@@ -34539,7 +34539,7 @@
                 {
                     "type": "ma",
                     "ec50": "-4.1",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.4188034534454"
                 }
             }
         }
@@ -34597,7 +34597,7 @@
                 "OR51L1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -34605,7 +34605,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-4.6999998092651"
+                    "adjusted_curve_top": "-0.67142857419593"
                 }
             }
         }
@@ -35159,17 +35159,17 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -35198,7 +35198,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-3.7000000476837"
+                    "adjusted_curve_top": "-0.52857145901237"
                 }
             }
         }
@@ -35348,13 +35348,13 @@
             {
                 "OR2L8":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR4K5":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {

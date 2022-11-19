@@ -997,6 +997,46 @@
             }
         }
     },
+    "86bd1a10bf74d7227a7881822d7c57a2":
+    {
+        "full_name": "almond pyrazine",
+        "smiles": "CC1=NC=CN=C1OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "roasted",
+                "almond",
+                "hazelnut",
+                "peanut"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.2",
+                    "adjusted_curve_top": "5.8823531866074"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.1",
+                    "adjusted_curve_top": "8.4615382212349"
+                }
+            }
+        }
+    },
     "0eef0892fd900b8edd396ffd31d2c9be":
     {
         "full_name": "alpha,alpha-dimethyl phenethyl acetate",
@@ -2657,6 +2697,77 @@
                 {
                     "type": "wa",
                     "ec50": "-3.38"
+                }
+            }
+        }
+    },
+    "c5e95737ab5fbe023523f40f52ba4d9b":
+    {
+        "full_name": "bean pyrazine",
+        "smiles": "CC(C)C1=NC=CN=C1OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "beany",
+                "chocolate",
+                "earthy",
+                "green_pea",
+                "nutty"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.9000000953674"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.84"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-6.7",
+                    "adjusted_curve_top": "3.5294119119644"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.7",
+                    "adjusted_curve_top": "7.8632477799032"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-6",
+                    "adjusted_curve_top": "7.0940173289205"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
+            {
+                "OR3A4":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.2499998807907"
+                },
+                "OR51S1":
+                {
+                    "type": "na"
                 }
             }
         }
@@ -10774,68 +10885,6 @@
             }
         }
     },
-    "8a769b73663e73299abd855eb1faf777":
-    {
-        "full_name": "2,3-diethyl-5-methylpyrazine",
-        "smiles": "CCC1=NC=C(N=C1CC)C",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "earthy",
-                "green",
-                "hazelnut",
-                "meaty",
-                "musty",
-                "nutty",
-                "potato",
-                "roasted",
-                "toasted",
-                "vegetable"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
-            {
-                "OR5K1":
-                {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
-                }
-            },
-            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
-            {
-                "OR5K1":
-                {
-                    "type": "sa",
-                    "ec50": "-5.99"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-6.9",
-                    "adjusted_curve_top": "5.588235527277"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "na"
-                },
-                "OR5K1":
-                {
-                    "type": "sa",
-                    "ec50": "-6.8",
-                    "adjusted_curve_top": "8.2905982115839"
-                }
-            }
-        }
-    },
     "5fe99c881dd031c12b647f231c20ce19":
     {
         "full_name": "(+)-dihydrocarvone",
@@ -11942,6 +11991,66 @@
             ]
         }
     },
+    "363c1e0844dcd435f227669ae96f86a0":
+    {
+        "full_name": "earthy pyrazine",
+        "smiles": "CCC1=NC=CN=C1OC",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "humus",
+                "nutty",
+                "earthy",
+                "green",
+                "cocoa",
+                "sweet",
+                "bell_pepper"
+            ],
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "bell_pepper",
+                "earthy",
+                "nutty",
+                "raw_potato"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.01"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "wa",
+                    "ec50": "-4",
+                    "adjusted_curve_top": "1.1764706373215"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "wa",
+                    "ec50": "-3.8",
+                    "adjusted_curve_top": "1.8803419401503"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-5",
+                    "adjusted_curve_top": "9.743589516277"
+                }
+            }
+        }
+    },
     "6ff5f3ac319372990c0c6a65e4f913bf":
     {
         "full_name": "ebanol",
@@ -12598,7 +12707,7 @@
     },
     "b0ab4593de9cbc862684b0348b3437d3":
     {
-        "full_name": "2-ethyl-3_5-dimethylpyrazine",
+        "full_name": "2-ethyl-3,5-dimethylpyrazine",
         "smiles": "CCC1=NC=C(N=C1C)C",
         "aroma":
         {
@@ -12671,7 +12780,7 @@
     },
     "f03a5ebabbbcbf008e908e0764a98c54":
     {
-        "full_name": "2-ethyl-3_6-dimethylpyrazine",
+        "full_name": "2-ethyl-3,6-dimethylpyrazine",
         "smiles": "CCC1=NC(=CN=C1C)C",
         "activity":
         {
@@ -13174,117 +13283,6 @@
                 "muguet",
                 "waxy"
             ]
-        }
-    },
-    "363c1e0844dcd435f227669ae96f86a0":
-    {
-        "full_name": "2-ethyl-3-methoxypyrazine",
-        "smiles": "CCC1=NC=CN=C1OC",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "humus",
-                "nutty",
-                "earthy",
-                "green",
-                "cocoa",
-                "sweet",
-                "bell_pepper"
-            ],
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "bell_pepper",
-                "earthy",
-                "nutty",
-                "raw_potato"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-5.01"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "wa",
-                    "ec50": "-4",
-                    "adjusted_curve_top": "1.1764706373215"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "wa",
-                    "ec50": "-3.8",
-                    "adjusted_curve_top": "1.8803419401503"
-                },
-                "OR5K1":
-                {
-                    "type": "sa",
-                    "ec50": "-5",
-                    "adjusted_curve_top": "9.743589516277"
-                }
-            }
-        }
-    },
-    "2a53709a41f2d862689bd5f39567e527":
-    {
-        "full_name": "2-ethyl-3-methylpyrazine ",
-        "smiles": "CCC1=NC=CN=C1C",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "nutty",
-                "peanut",
-                "musty",
-                "corn",
-                "raw",
-                "earthy",
-                "bready"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-4.27"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-3.8",
-                    "adjusted_curve_top": "3.7058826197596"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "na"
-                },
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-3.4",
-                    "adjusted_curve_top": "6.6666668972398"
-                }
-            }
         }
     },
     "a52b32d487248685ee24b07447c3bac7":
@@ -14407,6 +14405,57 @@
             ]
         }
     },
+    "2a53709a41f2d862689bd5f39567e527":
+    {
+        "full_name": "filbert pyrazine ",
+        "smiles": "CCC1=NC=CN=C1C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "nutty",
+                "peanut",
+                "musty",
+                "corn",
+                "raw",
+                "earthy",
+                "bready"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.27"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-3.8",
+                    "adjusted_curve_top": "3.7058826197596"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-3.4",
+                    "adjusted_curve_top": "6.6666668972398"
+                }
+            }
+        }
+    },
     "cdd4338983df8d24e39402cb54ad461b":
     {
         "full_name": "firascone",
@@ -14874,6 +14923,89 @@
                 {
                     "type": "ia",
                     "adjusted_curve_top": "-0.65040647983551"
+                }
+            }
+        }
+    },
+    "8119ffabdbbc079f6505f1a29a8db2b1":
+    {
+        "full_name": "galbanum pyrazine",
+        "smiles": "n1c(CC(C)C)c(OC)ncc1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "pea",
+                "pepper"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1093\/chemse\/bji002":
+            {
+                "OR1G1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.4365482344845"
+                },
+                "OR52D1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.9441624298314"
+                }
+            },
+            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.7999999523163"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.75"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-6.1",
+                    "adjusted_curve_top": "4.1176472306252"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-6",
+                    "adjusted_curve_top": "6.7521369020654"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.5",
+                    "adjusted_curve_top": "5.6410256166743"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
+            {
+                "OR3A4":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.75000002980232"
+                },
+                "OR51S1":
+                {
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.37500001490116"
                 }
             }
         }
@@ -16254,6 +16386,68 @@
     {
         "full_name": "hashishene",
         "smiles": "C=CC(CCC12)(C(C)(C)1)C2"
+    },
+    "8a769b73663e73299abd855eb1faf777":
+    {
+        "full_name": "hazelnut pyrazine",
+        "smiles": "CCC1=NC=C(N=C1CC)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "earthy",
+                "green",
+                "hazelnut",
+                "meaty",
+                "musty",
+                "nutty",
+                "potato",
+                "roasted",
+                "toasted",
+                "vegetable"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
+            {
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.99"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-6.9",
+                    "adjusted_curve_top": "5.588235527277"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.8",
+                    "adjusted_curve_top": "8.2905982115839"
+                }
+            }
+        }
     },
     "74dedcb4b9d15289a42eb0b9c7d9446e":
     {
@@ -19584,89 +19778,6 @@
             }
         }
     },
-    "8119ffabdbbc079f6505f1a29a8db2b1":
-    {
-        "full_name": "2-isobutyl-3-methoxypyrazine",
-        "smiles": "n1c(CC(C)C)c(OC)ncc1",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "green",
-                "pea",
-                "pepper"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/doi.org\/10.1093\/chemse\/bji002":
-            {
-                "OR1G1":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.4365482344845"
-                },
-                "OR52D1":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.9441624298314"
-                }
-            },
-            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.7999999523163"
-                }
-            },
-            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-4.75"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "ma",
-                    "ec50": "-6.1",
-                    "adjusted_curve_top": "4.1176472306252"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "ma",
-                    "ec50": "-6",
-                    "adjusted_curve_top": "6.7521369020654"
-                },
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-5.5",
-                    "adjusted_curve_top": "5.6410256166743"
-                }
-            },
-            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
-            {
-                "OR3A4":
-                {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.75000002980232"
-                },
-                "OR51S1":
-                {
-                    "type": "vwa",
-                    "adjusted_curve_top": "0.37500001490116"
-                }
-            }
-        }
-    },
     "1c31ffea44510dd270f7681b3ec26870":
     {
         "full_name": "2-isobutyl-3-methylpyrazine",
@@ -22737,77 +22848,6 @@
             }
         }
     },
-    "c5e95737ab5fbe023523f40f52ba4d9b":
-    {
-        "full_name": "2-methoxy-3-isopropylpyrazine",
-        "smiles": "CC(C)C1=NC=CN=C1OC",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "beany",
-                "chocolate",
-                "earthy",
-                "green_pea",
-                "nutty"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "4.9000000953674"
-                }
-            },
-            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-4.84"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "ma",
-                    "ec50": "-6.7",
-                    "adjusted_curve_top": "3.5294119119644"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "sa",
-                    "ec50": "-6.7",
-                    "adjusted_curve_top": "7.8632477799032"
-                },
-                "OR5K1":
-                {
-                    "type": "sa",
-                    "ec50": "-6",
-                    "adjusted_curve_top": "7.0940173289205"
-                }
-            },
-            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
-            {
-                "OR3A4":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "3.2499998807907"
-                },
-                "OR51S1":
-                {
-                    "type": "na"
-                }
-            }
-        }
-    },
     "116ffcf2f04431986e92773d73cb9bae":
     {
         "full_name": "2-methoxy-5-isopropylpyrazine",
@@ -22822,46 +22862,6 @@
                 "green_pea",
                 "raw_potato"
             ]
-        }
-    },
-    "86bd1a10bf74d7227a7881822d7c57a2":
-    {
-        "full_name": "2-methoxy-3-methyl pyrazine",
-        "smiles": "CC1=NC=CN=C1OC",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "roasted",
-                "almond",
-                "hazelnut",
-                "peanut"
-            ]
-        },
-        "activity":
-        {
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-5.2",
-                    "adjusted_curve_top": "5.8823531866074"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "na"
-                },
-                "OR5K1":
-                {
-                    "type": "sa",
-                    "ec50": "-5.1",
-                    "adjusted_curve_top": "8.4615382212349"
-                }
-            }
         }
     },
     "056c7884ba4f66df444b77efe3987015":
@@ -23263,30 +23263,6 @@
                     "adjusted_curve_top": "1.7258883125891"
                 }
             }
-        }
-    },
-    "8bea9fe55ab0a43c9857d63eb20e52a5":
-    {
-        "full_name": "7-methyl-6,7-dihydro-5H-cyclopenta[b]pyrazine",
-        "smiles": "CC1CCC2=NC=CN=C12",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "baked_potato",
-                "coffee",
-                "corn",
-                "earthy",
-                "grain",
-                "meaty",
-                "nutty",
-                "peanut",
-                "potato",
-                "roasted",
-                "savory",
-                "sweet",
-                "toasted"
-            ]
         }
     },
     "d403bea9b6efdc09cc5179f1e95261eb":
@@ -27302,6 +27278,30 @@
                     "adjusted_curve_top": "6.8499999046326"
                 }
             }
+        }
+    },
+    "8bea9fe55ab0a43c9857d63eb20e52a5":
+    {
+        "full_name": "nutty pyrazine",
+        "smiles": "CC1CCC2=NC=CN=C12",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "baked_potato",
+                "coffee",
+                "corn",
+                "earthy",
+                "grain",
+                "meaty",
+                "nutty",
+                "peanut",
+                "potato",
+                "roasted",
+                "savory",
+                "sweet",
+                "toasted"
+            ]
         }
     },
     "c77ad39c9ac02810e04c8e0d6cbab75d":

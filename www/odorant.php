@@ -224,8 +224,11 @@ foreach ($odor['activity'] as $refurl => $acv)
             else $tblec50[$rcpid] .= ", ";
 
             $tblec50[$rcpid] .= round($a['ec50'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup>";
-            $sorted[$rcpid] -= $a['ec50']*1.666;
-            $ssamples++;
+            if (!isset($a['adjusted_curve_top']) || floatval($a['adjusted_curve_top']) > 0)
+            {
+              $sorted[$rcpid] -= $a['ec50']*1.666;
+              $ssamples++;
+            }
 
             if (false===$minec50[$rcpid] || $a['ec50'] < $minec50[$rcpid]) $minec50[$rcpid] = $a['ec50'];
         }

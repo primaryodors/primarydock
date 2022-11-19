@@ -29,14 +29,16 @@ function correlate_receptors_aromanotes()
             $samples = 0;
             if (is_array($pair))
             {
+                $adjustment = 1;
+                if ($odor['full_name'] == 'indole' || $odor['full_name'] == 'skatole') $adjustment = 0.25;        // Two odorants that are dominating lists they oughtn't.
                 if (isset($pair['adjusted_curve_top']))
                 {
-                    $xval += $pair['adjusted_curve_top'];
+                    $xval += $adjustment * min($pair['adjusted_curve_top'], 10);
                     $samples++;
                 }
                 if (isset($pair['ec50']))
                 {
-                    $xval -= $pair['ec50'];
+                    $xval -= $adjustment * $pair['ec50'];
                     $samples++;
                 }
                 if ($samples) $xval /= $samples;

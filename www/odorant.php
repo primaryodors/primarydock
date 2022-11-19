@@ -31,7 +31,7 @@ $md5 = md5($odor['smiles']);
 $imgfname = "assets/pngs/$md5.png";
 if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
 {
-	$smilesn = str_replace("[O-]", "O", $odor['smiles']);
+    $smilesn = str_replace("[O-]", "O", $odor['smiles']);
     $smilesu = urlencode($smilesn);
     $url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/PNG";
 
@@ -54,6 +54,7 @@ if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
     else
     {
         $im = imagecreatefromstring($oimage);
+        if (!$im) die("Bad image data: \n\n$oimage\n\nSMILES: {$odor['smiles']}");
         $sx = imagesx($im);
         $sy = imagesy($im);
         if (!imageistruecolor($im)) imagepalettetotruecolor($im);

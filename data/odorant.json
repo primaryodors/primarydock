@@ -345,6 +345,16 @@
     {
         "full_name": "acetylcedrene",
         "smiles": "C[C@@H]1CC[C@]2\\3C[C@H]1C([C@@H]2CC\/C3=C\/C(=O)C)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "warm",
+                "woody",
+                "amber",
+                "musk"
+            ]
+        },
         "activity":
         {
             "https:\/\/patents.google.com\/patent\/WO2017090518A1\/en":
@@ -4211,11 +4221,11 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "sandalwood",
                 "waxy",
                 "woody",
                 "herbal",
-                "nutty",
-                "sandalwood"
+                "nutty"
             ]
         },
         "activity":
@@ -10962,14 +10972,14 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "floral",
+                "fresh",
                 "herbal",
                 "jasmine",
                 "myrrh",
                 "outdoors",
                 "spicy",
-                "woody",
-                "floral",
-                "fresh"
+                "woody"
             ]
         },
         "activity":
@@ -20973,6 +20983,17 @@
     {
         "full_name": "lepidine",
         "smiles": "CC1=CC=NC2=CC=CC=C12",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "burnt",
+                "oily",
+                "herbal",
+                "floral",
+                "sweet"
+            ]
+        },
         "activity":
         {
             "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
@@ -29089,6 +29110,15 @@
     {
         "full_name": "p-cresyl acetate",
         "smiles": "CC1=CC=C(C=C1)OC(=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "narcissus",
+                "phenolic",
+                "animal"
+            ]
+        },
         "activity":
         {
             "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
@@ -29105,6 +29135,18 @@
     {
         "full_name": "p-cresyl isobutyrate",
         "smiles": "CC1=CC=C(C=C1)OC(=O)C(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "animal",
+                "floral",
+                "lily",
+                "narcissus",
+                "green",
+                "fruity"
+            ]
+        },
         "activity":
         {
             "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":

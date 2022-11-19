@@ -1,5 +1,5 @@
 <?php 
-global $extra_css, $extra_js;
+global $extra_css, $extra_js, $head_tags;
 
 $customizations = [];
 
@@ -25,6 +25,7 @@ if ($extra_js  && !is_array($extra_js )) $extra_js  = [$extra_js ];
         if ($extra_css)
             foreach ($extra_css as $css)
                 echo "<link rel=\"stylesheet\" href=\"$css\">\n";
+        if ($head_tags) echo "\n$head_tags\n\n\n";
         ?>
     </head>
     <body>

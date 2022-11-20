@@ -4,6 +4,7 @@ function evaluate_result($array)
 {
     $activenode = 0;
     if (@$array['Active node']) $activenode = intval($array['Active node']);
+
     if (!$activenode) foreach (array_keys($array) as $key) if (strtolower(substr($key, 0, 5)) == "node ")
     {
         $nodeno = intval(explode(" ", $key)[1]);
@@ -39,7 +40,8 @@ function evaluate_result($array)
     }
     if ($capqty) $capture /= $capqty;
 
-    $completion = floatval($array["Full poses"]) / $array["Poses"];
+    if (!isset($array["Node $activenode"])) return "Non-Agonist";
+    $completion = $array["Poses"] ? (floatval($array["Full poses"]) / $array["Poses"]) : 0;
     $cpl_weighted = $completion * (max(0.001, @-$array["Node $pocketnode"], -$array["Node $activenode"]) / $capture);
     $acvratio = -$array["Node $activenode"] / (-$array["Node $pocketnode"] ?: 0.001);
 
@@ -48,7 +50,7 @@ function evaluate_result($array)
     $prediction = "Non-Agonist";
     if ($capture >= 15 && (/*$completion >= 0.75 ||*/ $cpl_weighted >= 0.5))
     {
-        if ($acvratio < 0.75) $prediction = "Inverse Agonist";
+        if ($acvratio < 0.9) $prediction = "Inverse Agonist";
         else $prediction = "Agonist";
     }
 

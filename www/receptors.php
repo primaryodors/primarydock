@@ -58,7 +58,6 @@ foreach ($prots as $protid => $p)
         case 'o':                   // Orphan.
         $ep = all_empirical_pairs_for_receptor($protid, true);
         foreach ($ep as $k => $v) if ($v == 0) unset($ep[$k]);
-        //die("<pre>".print_r($ep, true));
         if (count($ep)) $disp = false;
         break;
 

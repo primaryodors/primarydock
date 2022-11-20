@@ -17,7 +17,7 @@ require("dock_eval.php");
 // Configurable variables
 $dock_retries = 5;
 $max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
-
+$dock_metals = false;
 
 // Load data
 $dock_results = [];
@@ -251,8 +251,9 @@ if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
 if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n");
 
 $ligname = str_replace(" ", "_", $ligname);
-$pdbfname = "pdbs/$fam/$protid.metal.pdb";
-if (!file_exists($pdbfname)) $pdbfname = "pdbs/$fam/$protid.upright.pdb";
+$suffix = ($dock_metals) ? "metal" : "upright";
+$pdbfname = "pdbs/$fam/$protid.$suffix.pdb";
+if ($dock_metals && !file_exists($pdbfname)) $pdbfname = "pdbs/$fam/$protid.upright.pdb";
 if (!file_exists($pdbfname)) die("Missing PDB.\n");
 $outfname = "output/$fam/$protid/$protid-$ligname.pred.dock";
 

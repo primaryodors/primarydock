@@ -29,14 +29,16 @@ function correlate_receptors_aromanotes()
             $samples = 0;
             if (is_array($pair))
             {
+                $adjustment = 1;
+                if ($odor['full_name'] == 'indole' || $odor['full_name'] == 'skatole') $adjustment = 0.25;        // Two odorants that are dominating lists they oughtn't.
                 if (isset($pair['adjusted_curve_top']))
                 {
-                    $xval += $pair['adjusted_curve_top'];
+                    $xval += $adjustment * min($pair['adjusted_curve_top'], 10);
                     $samples++;
                 }
                 if (isset($pair['ec50']))
                 {
-                    $xval -= $pair['ec50'];
+                    $xval -= $adjustment * $pair['ec50'];
                     $samples++;
                 }
                 if ($samples) $xval /= $samples;
@@ -62,9 +64,10 @@ function correlate_receptors_aromanotes()
         foreach ($odors as $oid => $odor)
         {
             $yvals[$pq][$oid] = 0;
-            foreach ($odor['aroma'] as $refurl => $pqlist)
+            $crefs = (isset($odor['aroma']) && is_array($odor['aroma'])) ? count($odor['aroma']) : 0;
+            if ($crefs) foreach ($odor['aroma'] as $refurl => $pqlist)
             {
-                if ($refurl == "http://www.primaryodors.org") continue;
+                if ($crefs > 1 && $refurl == "http://www.primaryodors.org") continue;
                 if (in_array($pq, $pqlist))
                 {
                     $yvals[$pq][$oid] = 1;

@@ -138,8 +138,8 @@
             {
                 "OR12D2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -335,8 +335,34 @@
             {
                 "OR4M1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "11"
+                    "type": "ma",
+                    "adjusted_curve_top": "5.5"
+                }
+            }
+        }
+    },
+    "d304826a4280c7fed3e7804728603ded":
+    {
+        "full_name": "acetylcedrene",
+        "smiles": "C[C@@H]1CC[C@]2\\3C[C@H]1C([C@@H]2CC\/C3=C\/C(=O)C)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "warm",
+                "woody",
+                "amber",
+                "musk"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/WO2017090518A1\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "na",
+                    "antagonist": "1"
                 }
             }
         }
@@ -364,9 +390,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.3",
-                    "adjusted_curve_top": "10.5"
+                    "adjusted_curve_top": "8.9743590652943"
                 }
             }
         }
@@ -635,17 +661,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -971,6 +997,46 @@
             }
         }
     },
+    "86bd1a10bf74d7227a7881822d7c57a2":
+    {
+        "full_name": "almond pyrazine",
+        "smiles": "CC1=NC=CN=C1OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "roasted",
+                "almond",
+                "hazelnut",
+                "peanut"
+            ]
+        },
+        "activity":
+        {
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.2",
+                    "adjusted_curve_top": "5.8823531866074"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.1",
+                    "adjusted_curve_top": "8.4615382212349"
+                }
+            }
+        }
+    },
     "0eef0892fd900b8edd396ffd31d2c9be":
     {
         "full_name": "alpha,alpha-dimethyl phenethyl acetate",
@@ -997,17 +1063,17 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -1165,17 +1231,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -1203,7 +1269,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.7000000476837"
+                    "adjusted_curve_top": "-0.38571430976902"
                 }
             }
         }
@@ -1261,7 +1327,7 @@
                 "VN1R1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "5"
+                    "adjusted_curve_top": "2.0833332836628"
                 }
             },
             "https:\/\/www.oncotarget.com\/article\/13836\/text\/":
@@ -1340,7 +1406,15 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-4"
+                    "adjusted_curve_top": "-0.57142859697342"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-15.652173199861"
                 }
             }
         }
@@ -1518,22 +1592,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -1541,7 +1615,15 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.2000000476837"
+                    "adjusted_curve_top": "-0.31428573514734"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2017090518A1\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "na",
+                    "antagonist": "1"
                 }
             }
         }
@@ -1724,6 +1806,22 @@
                     "ec50": "-5.64",
                     "adjusted_curve_top": "3.5714286565781"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+            {
+                "OR8D1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.20000000011462"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-9.9999996019446"
+                }
             }
         }
     },
@@ -1810,22 +1908,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -1849,8 +1947,8 @@
             {
                 "OR4X2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "20"
+                    "type": "ma",
+                    "adjusted_curve_top": "3.8461539149284"
                 },
                 "OR5I1":
                 {
@@ -2365,8 +2463,8 @@
             {
                 "OR1B1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "20"
+                    "type": "ma",
+                    "adjusted_curve_top": "3.8461539149284"
                 },
                 "OR5I1":
                 {
@@ -2520,8 +2618,8 @@
                 },
                 "OR8B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "14"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.6923077404499"
                 }
             }
         }
@@ -2603,6 +2701,77 @@
             }
         }
     },
+    "c5e95737ab5fbe023523f40f52ba4d9b":
+    {
+        "full_name": "bean pyrazine",
+        "smiles": "CC(C)C1=NC=CN=C1OC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "beany",
+                "chocolate",
+                "earthy",
+                "green_pea",
+                "nutty"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.9000000953674"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.84"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-6.7",
+                    "adjusted_curve_top": "3.5294119119644"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.7",
+                    "adjusted_curve_top": "7.8632477799032"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-6",
+                    "adjusted_curve_top": "7.0940173289205"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
+            {
+                "OR3A4":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.2499998807907"
+                },
+                "OR51S1":
+                {
+                    "type": "na"
+                }
+            }
+        }
+    },
     "42177fdcfe55d1a4f535b94d92bcdaa7":
     {
         "full_name": "benzaldehyde",
@@ -2645,8 +2814,8 @@
             {
                 "OR4K2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -2899,15 +3068,15 @@
             {
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-5",
-                    "adjusted_curve_top": "16"
+                    "adjusted_curve_top": "6.6666665077209"
                 },
                 "OR2W1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-5.9",
-                    "adjusted_curve_top": "24"
+                    "adjusted_curve_top": "9.9999997615814"
                 }
             }
         }
@@ -3489,8 +3658,8 @@
             {
                 "OR4C3":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -3498,8 +3667,8 @@
                 },
                 "OR5L1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -3507,7 +3676,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.7999999523163"
+                    "adjusted_curve_top": "-0.40000001106943"
                 }
             }
         }
@@ -3622,8 +3791,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "7"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.9166665971279"
                 }
             },
             "https:\/\/www.oncotarget.com\/article\/13836\/text\/":
@@ -3675,7 +3844,7 @@
                 "OR2W3":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5999999046326"
+                    "adjusted_curve_top": "6.0465111898822"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -3706,17 +3875,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -3724,7 +3893,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.7999999523163"
+                    "adjusted_curve_top": "-0.40000001106943"
                 }
             }
         }
@@ -4089,22 +4258,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51L1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -4112,12 +4281,36 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+            {
+                "OR8D1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.27692307990331"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP2015211667A\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "na",
+                    "antagonist": "1"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-15.652173199861"
                 }
             }
         }
@@ -4139,11 +4332,11 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "herbal",
-                "nutty",
                 "sandalwood",
                 "waxy",
-                "woody"
+                "woody",
+                "herbal",
+                "nutty"
             ]
         },
         "activity":
@@ -4348,8 +4541,8 @@
             {
                 "OR10C1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -4932,8 +5125,8 @@
                 },
                 "OR51B6":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR51D1":
                 {
@@ -4942,12 +5135,12 @@
                 "OR51E1":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "adjusted_curve_top": "0.83333331346512"
                 },
                 "OR51E2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR51F1":
                 {
@@ -4959,8 +5152,8 @@
                 },
                 "OR51I2":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR51L1":
                 {
@@ -4968,23 +5161,23 @@
                 },
                 "OR51M1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR51Q1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR51S1":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "adjusted_curve_top": "0.83333331346512"
                 },
                 "OR51T1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR51V1":
                 {
@@ -4993,7 +5186,7 @@
                 "OR52A1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR52A4":
                 {
@@ -5018,7 +5211,7 @@
                 "OR52E4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR52E6":
                 {
@@ -5031,27 +5224,27 @@
                 "OR52H1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "5.5"
+                    "adjusted_curve_top": "4.5833332240582"
                 },
                 "OR52I2":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR52K1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR52K2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3.5"
+                    "adjusted_curve_top": "2.9166665971279"
                 },
                 "OR52L1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR52N4":
                 {
@@ -5060,12 +5253,12 @@
                 "OR52N5":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "1.5"
+                    "adjusted_curve_top": "1.2499999701977"
                 },
                 "OR52W1":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "0.69999998807907"
+                    "adjusted_curve_top": "0.58333330949148"
                 },
                 "OR56A1":
                 {
@@ -5073,13 +5266,13 @@
                 },
                 "OR56A3":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR56A4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR56A5":
                 {
@@ -5087,13 +5280,13 @@
                 },
                 "OR56B1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR56B4":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 }
             }
         }
@@ -5173,8 +5366,8 @@
             {
                 "OR1B1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "9"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.7307692617178"
                 },
                 "OR5I1":
                 {
@@ -5624,8 +5817,8 @@
             {
                 "OR4P4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -5652,33 +5845,33 @@
             {
                 "OR10A6":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-4.3",
-                    "adjusted_curve_top": "2.0999999046326"
+                    "adjusted_curve_top": "1.9090908792886"
                 },
                 "OR2W1":
                 {
                     "type": "ma",
                     "ec50": "-4.22",
-                    "adjusted_curve_top": "2.9000000953674"
+                    "adjusted_curve_top": "2.6363638016311"
                 },
                 "OR51E1":
                 {
                     "type": "ma",
                     "ec50": "-4.52",
-                    "adjusted_curve_top": "4.5999999046326"
+                    "adjusted_curve_top": "4.1818182197484"
                 },
                 "OR51I2":
                 {
                     "type": "ma",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "4.9000000953674"
+                    "adjusted_curve_top": "4.4545456739989"
                 },
                 "OR51L1":
                 {
                     "type": "ma",
                     "ec50": "-4.3",
-                    "adjusted_curve_top": "3.0999999046326"
+                    "adjusted_curve_top": "2.8181818154725"
                 }
             }
         }
@@ -5937,6 +6130,15 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+            {
+                "OR8D1":
+                {
+                    "type": "vsa",
+                    "ec50": "-6.4",
+                    "adjusted_curve_top": "10.000000372529"
+                }
             }
         }
     },
@@ -6031,8 +6233,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "0.83333331346512"
                 }
             }
         }
@@ -6117,8 +6319,8 @@
             {
                 "OR4K5":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -6143,6 +6345,32 @@
                 "waxy",
                 "urinous"
             ]
+        }
+    },
+    "466776ce37a45d6fbe20c9ca348a2371":
+    {
+        "full_name": "cedryl acetate",
+        "smiles": "C[C@@H]1CC[C@@H]2C13CCC(C(C3)C2(C)C)(C)OC(=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "dry",
+                "woody",
+                "cedar",
+                "powdery"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-15.652173199861"
+                }
+            }
         }
     },
     "141340a1a1dab5d100281266f6a89929":
@@ -6574,8 +6802,8 @@
             {
                 "OR10A6":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -6857,6 +7085,15 @@
                     "type": "sa",
                     "ec50": "-5.7"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
+            {
+                "OR1A1":
+                {
+                    "type": "sa",
+                    "ec50": "-4.05",
+                    "adjusted_curve_top": "9.9999997615814"
+                }
             }
         }
     },
@@ -6946,17 +7183,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -6984,17 +7221,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -7281,6 +7518,22 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+            {
+                "OR8D1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.23076923936605"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-14.347825605973"
+                }
             }
         }
     },
@@ -7356,8 +7609,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "4.3000001907349"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10.000000085942"
                 }
             }
         }
@@ -7416,7 +7669,7 @@
                 "OR4M1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-0.5"
+                    "adjusted_curve_top": "-0.25"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9526680B2\/en":
@@ -7424,7 +7677,7 @@
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -7432,17 +7685,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -7506,12 +7759,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -7635,18 +7888,18 @@
             {
                 "OR10Q1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.19230769574642"
                 },
                 "OR4K2":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "type": "wa",
+                    "adjusted_curve_top": "0.57692308723927"
                 },
                 "OR4P4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.19230769574642"
                 },
                 "OR5I1":
                 {
@@ -7658,22 +7911,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -8358,7 +8611,7 @@
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             }
         }
@@ -8434,7 +8687,7 @@
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             }
         }
@@ -8465,12 +8718,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -8773,7 +9026,7 @@
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -8781,17 +9034,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -9388,8 +9641,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.80000001192093"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.3333333303531"
                 }
             },
             "https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1":
@@ -9830,22 +10083,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -9921,22 +10174,22 @@
                 "OR51B6":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "5"
+                    "adjusted_curve_top": "4.1666665673256"
                 },
                 "OR51D1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.3333332538605"
                 },
                 "OR51E1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR51E2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR51F1":
                 {
@@ -9945,12 +10198,12 @@
                 "OR51G1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.3333332538605"
                 },
                 "OR51I2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR51L1":
                 {
@@ -9959,22 +10212,22 @@
                 "OR51M1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR51Q1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR51S1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.3333332538605"
                 },
                 "OR51T1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR51V1":
                 {
@@ -9983,27 +10236,27 @@
                 "OR52A1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR52A4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "6"
+                    "adjusted_curve_top": "4.9999998807907"
                 },
                 "OR52B2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.0833332836628"
                 },
                 "OR52B4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR52D1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.3333331346512"
                 },
                 "OR52E2":
                 {
@@ -10012,12 +10265,12 @@
                 "OR52E4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR52E6":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "adjusted_curve_top": "0.83333331346512"
                 },
                 "OR52E8":
                 {
@@ -10025,28 +10278,28 @@
                 },
                 "OR52H1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR52I2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "6"
+                    "adjusted_curve_top": "4.9999998807907"
                 },
                 "OR52K1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.3333331346512"
                 },
                 "OR52K2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "5.5"
+                    "adjusted_curve_top": "4.5833332240582"
                 },
                 "OR52L1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "12"
+                    "type": "sa",
+                    "adjusted_curve_top": "9.9999997615814"
                 },
                 "OR52N4":
                 {
@@ -10054,8 +10307,8 @@
                 },
                 "OR52N5":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10.5"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.7499997913837"
                 },
                 "OR52W1":
                 {
@@ -10072,7 +10325,7 @@
                 "OR56A4":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "1.5"
+                    "adjusted_curve_top": "1.2499999701977"
                 },
                 "OR56A5":
                 {
@@ -10080,13 +10333,13 @@
                 },
                 "OR56B1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR56B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.3333331346512"
                 }
             }
         }
@@ -10309,11 +10562,11 @@
             ],
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "buttery",
                 "caramellic",
                 "creamy",
                 "pungent",
-                "sweet",
-                "buttery"
+                "sweet"
             ]
         },
         "activity":
@@ -10376,13 +10629,13 @@
                 },
                 "OR51B4":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR51B5":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.3333332538605"
                 },
                 "OR51B6":
                 {
@@ -10414,8 +10667,8 @@
                 },
                 "OR51L1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6666666269302"
                 },
                 "OR51M1":
                 {
@@ -10452,7 +10705,7 @@
                 "OR52B4":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR52D1":
                 {
@@ -10464,8 +10717,8 @@
                 },
                 "OR52E4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 },
                 "OR52E6":
                 {
@@ -10478,7 +10731,7 @@
                 "OR52H1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "4.5"
+                    "adjusted_curve_top": "3.749999910593"
                 },
                 "OR52I2":
                 {
@@ -10506,8 +10759,8 @@
                 },
                 "OR52W1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "7"
+                    "type": "ma",
+                    "adjusted_curve_top": "5.8333331942558"
                 },
                 "OR56A1":
                 {
@@ -10516,7 +10769,7 @@
                 "OR56A3":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "0.80000001192093"
+                    "adjusted_curve_top": "0.6666666607062"
                 },
                 "OR56A4":
                 {
@@ -10529,7 +10782,7 @@
                 "OR56B1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.4999999403954"
                 },
                 "OR56B4":
                 {
@@ -10628,68 +10881,6 @@
                 {
                     "type": "vwa",
                     "ec50": "-1.52"
-                }
-            }
-        }
-    },
-    "8a769b73663e73299abd855eb1faf777":
-    {
-        "full_name": "2,3-diethyl-5-methylpyrazine",
-        "smiles": "CCC1=NC=C(N=C1CC)C",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "earthy",
-                "green",
-                "hazelnut",
-                "meaty",
-                "musty",
-                "nutty",
-                "potato",
-                "roasted",
-                "toasted",
-                "vegetable"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
-            {
-                "OR5K1":
-                {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
-                }
-            },
-            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
-            {
-                "OR5K1":
-                {
-                    "type": "sa",
-                    "ec50": "-5.99"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-6.9",
-                    "adjusted_curve_top": "5.588235527277"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "na"
-                },
-                "OR5K1":
-                {
-                    "type": "sa",
-                    "ec50": "-6.8",
-                    "adjusted_curve_top": "9.6999998092651"
                 }
             }
         }
@@ -11224,9 +11415,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "sa",
+                    "type": "ma",
                     "ec50": "-3.9",
-                    "adjusted_curve_top": "7"
+                    "adjusted_curve_top": "5.9829060435295"
                 }
             }
         }
@@ -11271,7 +11462,7 @@
                 {
                     "type": "sa",
                     "ec50": "-3.6",
-                    "adjusted_curve_top": "8.1999998092651"
+                    "adjusted_curve_top": "7.0085469165419"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -11280,7 +11471,7 @@
                 {
                     "type": "vsa",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "70"
+                    "adjusted_curve_top": "10.000000447035"
                 }
             }
         }
@@ -11504,9 +11695,9 @@
             {
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-4.5",
-                    "adjusted_curve_top": "10"
+                    "adjusted_curve_top": "4.1666665673256"
                 }
             },
             "https:\/\/doi.org\/10.1093\/chemse\/bjw117":
@@ -11800,6 +11991,66 @@
             ]
         }
     },
+    "363c1e0844dcd435f227669ae96f86a0":
+    {
+        "full_name": "earthy pyrazine",
+        "smiles": "CCC1=NC=CN=C1OC",
+        "aroma":
+        {
+            "http:\/\/www.primaryodors.org":
+            [
+                "humus",
+                "nutty",
+                "earthy",
+                "green",
+                "cocoa",
+                "sweet",
+                "bell_pepper"
+            ],
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "bell_pepper",
+                "earthy",
+                "nutty",
+                "raw_potato"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.01"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "wa",
+                    "ec50": "-4",
+                    "adjusted_curve_top": "1.1764706373215"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "wa",
+                    "ec50": "-3.8",
+                    "adjusted_curve_top": "1.8803419401503"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-5",
+                    "adjusted_curve_top": "9.743589516277"
+                }
+            }
+        }
+    },
     "6ff5f3ac319372990c0c6a65e4f913bf":
     {
         "full_name": "ebanol",
@@ -11830,22 +12081,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -11970,16 +12221,32 @@
     },
     "18aaeb32970f884dd544a3c4019484ac":
     {
-        "full_name": "(5e)-3-methylcyclopenta-5-decen-1-one",
+        "full_name": "(5E)-3-methylcyclopenta-5-decen-1-one",
         "smiles": "CC1C\/C=C\/CCCCCCCCCC(=O)C1",
         "activity":
         {
+            "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+            {
+                "OR8D1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.25384615963468"
+                }
+            },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
             {
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.5"
+                    "adjusted_curve_top": "-0.35714287310839"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-11.304347195833"
                 }
             }
         }
@@ -12160,7 +12427,7 @@
                 "OR3A1":
                 {
                     "type": "vwa",
-                    "adjusted_curve_top": "0.10000000149012"
+                    "adjusted_curve_top": "0.38461537934267"
                 }
             }
         }
@@ -12199,9 +12466,9 @@
             {
                 "OR2W1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-5.7",
-                    "adjusted_curve_top": "14"
+                    "adjusted_curve_top": "5.8333331942558"
                 }
             }
         }
@@ -12237,9 +12504,9 @@
             {
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-4.8",
-                    "adjusted_curve_top": "12"
+                    "adjusted_curve_top": "4.9999998807907"
                 }
             }
         }
@@ -12440,7 +12707,7 @@
     },
     "b0ab4593de9cbc862684b0348b3437d3":
     {
-        "full_name": "2-ethyl-3_5-dimethylpyrazine",
+        "full_name": "2-ethyl-3,5-dimethylpyrazine",
         "smiles": "CCC1=NC=C(N=C1C)C",
         "aroma":
         {
@@ -12504,16 +12771,16 @@
                 },
                 "OR5K1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-5.5",
-                    "adjusted_curve_top": "11.699999809265"
+                    "adjusted_curve_top": "9.9999999383066"
                 }
             }
         }
     },
     "f03a5ebabbbcbf008e908e0764a98c54":
     {
-        "full_name": "2-ethyl-3_6-dimethylpyrazine",
+        "full_name": "2-ethyl-3,6-dimethylpyrazine",
         "smiles": "CCC1=NC(=CN=C1C)C",
         "activity":
         {
@@ -12982,22 +13249,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -13016,117 +13283,6 @@
                 "muguet",
                 "waxy"
             ]
-        }
-    },
-    "363c1e0844dcd435f227669ae96f86a0":
-    {
-        "full_name": "2-ethyl-3-methoxypyrazine",
-        "smiles": "CCC1=NC=CN=C1OC",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "humus",
-                "nutty",
-                "earthy",
-                "green",
-                "cocoa",
-                "sweet",
-                "bell_pepper"
-            ],
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "bell_pepper",
-                "earthy",
-                "nutty",
-                "raw_potato"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-5.01"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "wa",
-                    "ec50": "-4",
-                    "adjusted_curve_top": "1.1764706373215"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "ma",
-                    "ec50": "-3.8",
-                    "adjusted_curve_top": "2.2000000476837"
-                },
-                "OR5K1":
-                {
-                    "type": "vsa",
-                    "ec50": "-5",
-                    "adjusted_curve_top": "11.39999961853"
-                }
-            }
-        }
-    },
-    "2a53709a41f2d862689bd5f39567e527":
-    {
-        "full_name": "2-ethyl-3-methylpyrazine ",
-        "smiles": "CCC1=NC=CN=C1C",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "nutty",
-                "peanut",
-                "musty",
-                "corn",
-                "raw",
-                "earthy",
-                "bready"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-4.27"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-3.8",
-                    "adjusted_curve_top": "3.7058826197596"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "na"
-                },
-                "OR5K1":
-                {
-                    "type": "sa",
-                    "ec50": "-3.4",
-                    "adjusted_curve_top": "7.8000001907349"
-                }
-            }
         }
     },
     "a52b32d487248685ee24b07447c3bac7":
@@ -13336,15 +13492,15 @@
             {
                 "OR2AG1":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-3.8",
-                    "adjusted_curve_top": "2"
+                    "adjusted_curve_top": "1.7094017267227"
                 },
                 "OR5K1":
                 {
                     "type": "ma",
                     "ec50": "-4.2",
-                    "adjusted_curve_top": "6.1999998092651"
+                    "adjusted_curve_top": "5.2991451898192"
                 }
             }
         }
@@ -13377,7 +13533,7 @@
                 {
                     "type": "ma",
                     "ec50": "-4.5",
-                    "adjusted_curve_top": "5.6999998092651"
+                    "adjusted_curve_top": "4.8717947581385"
                 }
             }
         }
@@ -13590,8 +13746,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "3.4000000953674"
+                    "type": "sa",
+                    "adjusted_curve_top": "7.9069766831952"
                 }
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
@@ -13876,8 +14032,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "3.0999999046326"
+                    "type": "sa",
+                    "adjusted_curve_top": "7.2093018459719"
                 }
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
@@ -14094,22 +14250,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -14249,6 +14405,57 @@
             ]
         }
     },
+    "2a53709a41f2d862689bd5f39567e527":
+    {
+        "full_name": "filbert pyrazine ",
+        "smiles": "CCC1=NC=CN=C1C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "nutty",
+                "peanut",
+                "musty",
+                "corn",
+                "raw",
+                "earthy",
+                "bready"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.27"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-3.8",
+                    "adjusted_curve_top": "3.7058826197596"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-3.4",
+                    "adjusted_curve_top": "6.6666668972398"
+                }
+            }
+        }
+    },
     "cdd4338983df8d24e39402cb54ad461b":
     {
         "full_name": "firascone",
@@ -14354,22 +14561,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51L1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 }
             }
         }
@@ -14517,7 +14724,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.7999999523163"
+                    "adjusted_curve_top": "-0.40000001106943"
                 }
             }
         }
@@ -14599,6 +14806,15 @@
                 {
                     "type": "ma",
                     "adjusted_curve_top": "6"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-3.9",
+                    "adjusted_curve_top": "9.9999996019446"
                 }
             }
         }
@@ -14691,22 +14907,105 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
+                }
+            }
+        }
+    },
+    "8119ffabdbbc079f6505f1a29a8db2b1":
+    {
+        "full_name": "galbanum pyrazine",
+        "smiles": "n1c(CC(C)C)c(OC)ncc1",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "pea",
+                "pepper"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1093\/chemse\/bji002":
+            {
+                "OR1G1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.4365482344845"
+                },
+                "OR52D1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.9441624298314"
+                }
+            },
+            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.7999999523163"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.75"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-6.1",
+                    "adjusted_curve_top": "4.1176472306252"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "ma",
+                    "ec50": "-6",
+                    "adjusted_curve_top": "6.7521369020654"
+                },
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-5.5",
+                    "adjusted_curve_top": "5.6410256166743"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
+            {
+                "OR3A4":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.75000002980232"
+                },
+                "OR51S1":
+                {
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.37500001490116"
                 }
             }
         }
@@ -14737,22 +15036,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -14760,7 +15059,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.71428574621677"
                 }
             }
         }
@@ -14981,8 +15280,8 @@
             {
                 "OR4C16":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -14990,8 +15289,8 @@
                 },
                 "OR5L1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 }
             }
         }
@@ -15111,22 +15410,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -15134,7 +15433,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.7999999523163"
+                    "adjusted_curve_top": "-0.40000001106943"
                 }
             }
         }
@@ -15203,8 +15502,8 @@
             {
                 "OR52B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -15215,8 +15514,8 @@
             {
                 "OR51S1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1.5"
+                    "type": "ma",
+                    "adjusted_curve_top": "3.75"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP6104058B2\/en":
@@ -15225,7 +15524,7 @@
                 {
                     "type": "vsa",
                     "ec50": "-6",
-                    "adjusted_curve_top": "85"
+                    "adjusted_curve_top": "10.000000037253"
                 }
             }
         }
@@ -15405,8 +15704,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "3.5"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.1395345926285"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -15430,8 +15729,8 @@
             {
                 "OR4E2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -15443,17 +15742,17 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -15461,7 +15760,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-4"
+                    "adjusted_curve_top": "-0.57142859697342"
                 }
             }
         }
@@ -15806,8 +16105,8 @@
             {
                 "OR4K2":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.48076923936605"
                 },
                 "OR4P4":
                 {
@@ -15823,12 +16122,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -15877,17 +16176,17 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -16057,12 +16356,28 @@
                 },
                 "OR4P4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "32"
+                    "type": "ma",
+                    "adjusted_curve_top": "6.1538462638855"
                 },
                 "OR5I1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+            {
+                "OR8D1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.176923079846"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8.6956520080566"
                 }
             }
         }
@@ -16071,6 +16386,68 @@
     {
         "full_name": "hashishene",
         "smiles": "C=CC(CCC12)(C(C)(C)1)C2"
+    },
+    "8a769b73663e73299abd855eb1faf777":
+    {
+        "full_name": "hazelnut pyrazine",
+        "smiles": "CCC1=NC=C(N=C1CC)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "earthy",
+                "green",
+                "hazelnut",
+                "meaty",
+                "musty",
+                "nutty",
+                "potato",
+                "roasted",
+                "toasted",
+                "vegetable"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
+            {
+                "OR5K1":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
+            {
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-5.99"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
+            {
+                "OR5K1":
+                {
+                    "type": "ma",
+                    "ec50": "-6.9",
+                    "adjusted_curve_top": "5.588235527277"
+                }
+            },
+            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
+            {
+                "OR2AG1":
+                {
+                    "type": "na"
+                },
+                "OR5K1":
+                {
+                    "type": "sa",
+                    "ec50": "-6.8",
+                    "adjusted_curve_top": "8.2905982115839"
+                }
+            }
+        }
     },
     "74dedcb4b9d15289a42eb0b9c7d9446e":
     {
@@ -16119,8 +16496,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "24"
+                    "type": "sa",
+                    "adjusted_curve_top": "9.9999997615814"
                 }
             },
             "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
@@ -16128,15 +16505,15 @@
                 "OR2W3":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "5.8139532804489"
                 }
             },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
             {
                 "OR10C1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -16550,8 +16927,8 @@
                 },
                 "OR3A1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.0999999046326"
+                    "type": "sa",
+                    "adjusted_curve_top": "8.0769224790427"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -16559,7 +16936,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.5"
+                    "adjusted_curve_top": "-0.35714287310839"
                 }
             }
         }
@@ -16748,7 +17125,7 @@
                 "VN1R1":
                 {
                     "type": "vwa",
-                    "adjusted_curve_top": "0.30000001192093"
+                    "adjusted_curve_top": "0.12500000198682"
                 }
             },
             "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
@@ -16812,8 +17189,8 @@
                 },
                 "OR1J2":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "9"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10.000000476837"
                 },
                 "OR2B2":
                 {
@@ -17613,8 +17990,8 @@
                 },
                 "OR8B4":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "8"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.5384615659714"
                 }
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
@@ -17630,7 +18007,7 @@
                 "OR1J2":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "adjusted_curve_top": "0.55555558204651"
                 }
             }
         }
@@ -17899,8 +18276,8 @@
             {
                 "OR10A6":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -17908,8 +18285,8 @@
                 },
                 "OR8D2":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "9"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.7307692617178"
                 }
             }
         }
@@ -18150,12 +18527,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -18447,17 +18824,17 @@
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 },
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 },
                 "OR51L1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -18465,17 +18842,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -18561,9 +18938,9 @@
             {
                 "OR10A6":
                 {
-                    "type": "sa",
+                    "type": "wa",
                     "ec50": "-4",
-                    "adjusted_curve_top": "7"
+                    "adjusted_curve_top": "1.4000000208616"
                 }
             }
         }
@@ -18875,27 +19252,27 @@
             {
                 "OR2W1":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "0.32520323991776"
                 },
                 "OR5K1":
                 {
-                    "type": "wa",
+                    "type": "vwa",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "1.5"
+                    "adjusted_curve_top": "0.12195121496916"
                 },
                 "OR5P3":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "115"
+                    "adjusted_curve_top": "9.3495931476355"
                 },
                 "OR8H1":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-4.22",
-                    "adjusted_curve_top": "2"
+                    "adjusted_curve_top": "0.16260161995888"
                 }
             }
         }
@@ -19401,89 +19778,6 @@
             }
         }
     },
-    "8119ffabdbbc079f6505f1a29a8db2b1":
-    {
-        "full_name": "2-isobutyl-3-methoxypyrazine",
-        "smiles": "n1c(CC(C)C)c(OC)ncc1",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "green",
-                "pea",
-                "pepper"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/doi.org\/10.1093\/chemse\/bji002":
-            {
-                "OR1G1":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.4365482344845"
-                },
-                "OR52D1":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.9441624298314"
-                }
-            },
-            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.7999999523163"
-                }
-            },
-            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-4.75"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "ma",
-                    "ec50": "-6.1",
-                    "adjusted_curve_top": "4.1176472306252"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "sa",
-                    "ec50": "-6",
-                    "adjusted_curve_top": "7.9000000953674"
-                },
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-5.5",
-                    "adjusted_curve_top": "6.5999999046326"
-                }
-            },
-            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
-            {
-                "OR3A4":
-                {
-                    "type": "vwa",
-                    "adjusted_curve_top": "0.30000001192093"
-                },
-                "OR51S1":
-                {
-                    "type": "vwa",
-                    "adjusted_curve_top": "0.15000000596046"
-                }
-            }
-        }
-    },
     "1c31ffea44510dd270f7681b3ec26870":
     {
         "full_name": "2-isobutyl-3-methylpyrazine",
@@ -19514,13 +19808,13 @@
                 {
                     "type": "ma",
                     "ec50": "-3",
-                    "adjusted_curve_top": "2.5"
+                    "adjusted_curve_top": "2.1367521584034"
                 },
                 "OR5K1":
                 {
                     "type": "ma",
                     "ec50": "-3.4",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.4188034534454"
                 }
             },
             "https:\/\/doi.org\/10.3233%2FJAD-121894":
@@ -19528,7 +19822,7 @@
                 "OR4M1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "6"
+                    "adjusted_curve_top": "3"
                 }
             }
         }
@@ -19577,13 +19871,13 @@
                 {
                     "type": "wa",
                     "ec50": "-4.2",
-                    "adjusted_curve_top": "1.3999999761581"
+                    "adjusted_curve_top": "1.1965811883282"
                 },
                 "OR5K1":
                 {
                     "type": "ma",
                     "ec50": "-4.5",
-                    "adjusted_curve_top": "3.2000000476837"
+                    "adjusted_curve_top": "2.7350428035117"
                 }
             }
         }
@@ -19621,8 +19915,8 @@
             {
                 "OR4K2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -19885,6 +20179,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2017090518A1\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "na",
+                    "antagonist": "1"
                 }
             }
         }
@@ -20281,15 +20583,15 @@
                 "OR2W3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-0.20000000298023"
+                    "adjusted_curve_top": "-0.46511626936669"
                 }
             },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
             {
                 "OR12D2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -20329,13 +20631,13 @@
                 {
                     "type": "vsa",
                     "ec50": "-4.82",
-                    "adjusted_curve_top": "11"
+                    "adjusted_curve_top": "10.000000298023"
                 },
                 "OR51I2":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "10"
+                    "adjusted_curve_top": "9.0909093618393"
                 }
             }
         }
@@ -20378,17 +20680,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -20414,6 +20716,22 @@
                 {
                     "type": "ma",
                     "ec50": "-4.12"
+                }
+            }
+        }
+    },
+    "b6a4d70a4beeb751ffb2f46915f6d6bd":
+    {
+        "full_name": "jasminaldehyde",
+        "smiles": "CCCCC\/C(=C\/C1=CC=CC=C1)\/C=O",
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+            {
+                "OR8D1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.16923077920308"
                 }
             }
         }
@@ -20556,12 +20874,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -20772,6 +21090,33 @@
             ]
         }
     },
+    "1ff5728f55c838b6fcab7d0e80f914c5":
+    {
+        "full_name": "lepidine",
+        "smiles": "CC1=CC=NC2=CC=CC=C12",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "burnt",
+                "oily",
+                "herbal",
+                "floral",
+                "sweet"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "ma",
+                    "ec50": "-3.92"
+                }
+            }
+        }
+    },
     "2e4859776a44d062dd9e5b5fd3476738":
     {
         "full_name": "lilial",
@@ -20858,7 +21203,7 @@
                 "OR2W3":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "2.7000000476837"
+                    "adjusted_curve_top": "6.2790696537772"
                 }
             },
             "https:\/\/doi.org\/10.1002\/anie.201309508":
@@ -20874,12 +21219,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 },
                 "OR51I2":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -20887,22 +21232,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -20910,7 +21255,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2.4000000953674"
+                    "adjusted_curve_top": "-0.34285717180797"
                 }
             }
         }
@@ -21145,8 +21490,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "vwa",
-                    "adjusted_curve_top": "0.40000000596046"
+                    "type": "wa",
+                    "adjusted_curve_top": "0.93023253873337"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -21238,7 +21583,7 @@
                 {
                     "type": "sa",
                     "ec50": "-4.6",
-                    "adjusted_curve_top": "8.3999996185303"
+                    "adjusted_curve_top": "7.1794869261929"
                 }
             }
         }
@@ -21266,9 +21611,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "sa",
+                    "type": "ma",
                     "ec50": "-4.5",
-                    "adjusted_curve_top": "7.3000001907349"
+                    "adjusted_curve_top": "6.2393164655592"
                 }
             }
         }
@@ -21478,8 +21823,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1.7999999523163"
+                    "type": "ma",
+                    "adjusted_curve_top": "4.1860462510309"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -21552,16 +21897,16 @@
             {
                 "OR2W3":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.3255813121796"
                 }
             },
             "https:\/\/hss-opus.ub.ruhr-uni-bochum.de\/opus4\/frontdoor\/deliver\/index\/docId\/4483\/file\/diss.pdf":
             {
                 "OR1B1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "35"
+                    "type": "ma",
+                    "adjusted_curve_top": "6.7307693511248"
                 },
                 "OR5I1":
                 {
@@ -21697,7 +22042,7 @@
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -21753,22 +22098,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -22036,8 +22381,8 @@
             {
                 "OR2W3":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1.2000000476837"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.7906976855078"
                 }
             }
         }
@@ -22070,8 +22415,8 @@
             {
                 "OR2T2":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
                 }
             }
         }
@@ -22221,9 +22566,9 @@
             {
                 "OR2M3":
                 {
-                    "type": "ma",
+                    "type": "vsa",
                     "ec50": "-7.54",
-                    "adjusted_curve_top": "3.7000000476837"
+                    "adjusted_curve_top": "10.000000343452"
                 }
             }
         }
@@ -22398,12 +22743,12 @@
                 "OR51E1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 },
                 "OR51L1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-1.8181818723679"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -22411,22 +22756,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -22463,7 +22808,7 @@
                 {
                     "type": "sa",
                     "ec50": "-7.4",
-                    "adjusted_curve_top": "9.6999998092651"
+                    "adjusted_curve_top": "8.2905982115839"
                 }
             }
         }
@@ -22503,77 +22848,6 @@
             }
         }
     },
-    "c5e95737ab5fbe023523f40f52ba4d9b":
-    {
-        "full_name": "2-methoxy-3-isopropylpyrazine",
-        "smiles": "CC(C)C1=NC=CN=C1OC",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "beany",
-                "chocolate",
-                "earthy",
-                "green_pea",
-                "nutty"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/faseb.onlinelibrary.wiley.com\/doi\/pdf\/10.1096\/fj.202100224R":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "4.9000000953674"
-                }
-            },
-            "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.06.01.494157v1.full":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-4.84"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "ma",
-                    "ec50": "-6.7",
-                    "adjusted_curve_top": "3.5294119119644"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "sa",
-                    "ec50": "-6.7",
-                    "adjusted_curve_top": "9.1999998092651"
-                },
-                "OR5K1":
-                {
-                    "type": "sa",
-                    "ec50": "-6",
-                    "adjusted_curve_top": "8.3000001907349"
-                }
-            },
-            "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
-            {
-                "OR3A4":
-                {
-                    "type": "wa",
-                    "adjusted_curve_top": "1.2999999523163"
-                },
-                "OR51S1":
-                {
-                    "type": "na"
-                }
-            }
-        }
-    },
     "116ffcf2f04431986e92773d73cb9bae":
     {
         "full_name": "2-methoxy-5-isopropylpyrazine",
@@ -22588,46 +22862,6 @@
                 "green_pea",
                 "raw_potato"
             ]
-        }
-    },
-    "86bd1a10bf74d7227a7881822d7c57a2":
-    {
-        "full_name": "2-methoxy-3-methyl pyrazine",
-        "smiles": "CC1=NC=CN=C1OC",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "roasted",
-                "almond",
-                "hazelnut",
-                "peanut"
-            ]
-        },
-        "activity":
-        {
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2016\/12\/2016-%E2%80%9CSensorial-Chemistry%E2%80%9D-functional-characterization-and-structure-activity-relationship-understanding-of-OR5K1-and-OR2AG1-allow-to-design-and-synthetize-new-selective-compounds.pdf":
-            {
-                "OR5K1":
-                {
-                    "type": "ma",
-                    "ec50": "-5.2",
-                    "adjusted_curve_top": "5.8823531866074"
-                }
-            },
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
-            {
-                "OR2AG1":
-                {
-                    "type": "na"
-                },
-                "OR5K1":
-                {
-                    "type": "sa",
-                    "ec50": "-5.1",
-                    "adjusted_curve_top": "9.8999996185303"
-                }
-            }
         }
     },
     "056c7884ba4f66df444b77efe3987015":
@@ -23029,30 +23263,6 @@
                     "adjusted_curve_top": "1.7258883125891"
                 }
             }
-        }
-    },
-    "8bea9fe55ab0a43c9857d63eb20e52a5":
-    {
-        "full_name": "7-methyl-6,7-dihydro-5H-cyclopenta[b]pyrazine",
-        "smiles": "CC1CCC2=NC=CN=C12",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "baked_potato",
-                "coffee",
-                "corn",
-                "earthy",
-                "grain",
-                "meaty",
-                "nutty",
-                "peanut",
-                "potato",
-                "roasted",
-                "savory",
-                "sweet",
-                "toasted"
-            ]
         }
     },
     "d403bea9b6efdc09cc5179f1e95261eb":
@@ -23500,39 +23710,39 @@
             {
                 "OR10A6":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-3.92",
-                    "adjusted_curve_top": "3.7999999523163"
+                    "adjusted_curve_top": "0.76000000178814"
                 },
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-3.92",
-                    "adjusted_curve_top": "23"
+                    "adjusted_curve_top": "4.6000000685453"
                 },
                 "OR2W1":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-4.22",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "0.80000001192093"
                 },
                 "OR51B2":
                 {
                     "type": "vsa",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "50"
+                    "adjusted_curve_top": "10.000000149012"
                 },
                 "OR51E1":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-4.22",
-                    "adjusted_curve_top": "2.4000000953674"
+                    "adjusted_curve_top": "0.48000002622604"
                 },
                 "OR51I2":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-4.52",
-                    "adjusted_curve_top": "25"
+                    "adjusted_curve_top": "5.0000000745058"
                 }
             }
         }
@@ -23667,22 +23877,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -23705,8 +23915,8 @@
             {
                 "OR3A4":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "4"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
                 },
                 "OR51S1":
                 {
@@ -23717,9 +23927,9 @@
             {
                 "OR2M3":
                 {
-                    "type": "sa",
+                    "type": "wa",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "9.5"
+                    "adjusted_curve_top": "1.1176470629871"
                 }
             }
         }
@@ -23778,7 +23988,7 @@
                 {
                     "type": "ma",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "5.3000001907349"
+                    "adjusted_curve_top": "4.5299147388365"
                 }
             }
         }
@@ -23806,8 +24016,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "8"
+                    "type": "ma",
+                    "adjusted_curve_top": "3.3333332538605"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -23815,17 +24025,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -23840,9 +24050,9 @@
             {
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "ma",
                     "ec50": "-4.8",
-                    "adjusted_curve_top": "11"
+                    "adjusted_curve_top": "4.5833332240582"
                 }
             }
         }
@@ -24197,9 +24407,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "sa",
+                    "type": "ma",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "7.5"
+                    "adjusted_curve_top": "6.4102564752102"
                 }
             }
         }
@@ -24401,7 +24611,7 @@
                 {
                     "type": "sa",
                     "ec50": "-4.8",
-                    "adjusted_curve_top": "9"
+                    "adjusted_curve_top": "7.6923077702522"
                 }
             }
         }
@@ -24632,8 +24842,8 @@
             {
                 "OR4C3":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -24739,8 +24949,8 @@
             {
                 "OR10A6":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -24748,8 +24958,8 @@
                 },
                 "OR8D2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "21"
+                    "type": "ma",
+                    "adjusted_curve_top": "4.0384616106749"
                 }
             }
         }
@@ -24817,17 +25027,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -24921,13 +25131,13 @@
             {
                 "OR10Q1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.19230769574642"
                 },
                 "OR4K2":
                 {
-                    "type": "sa",
-                    "adjusted_curve_top": "7"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.346153870225"
                 },
                 "OR4P4":
                 {
@@ -24936,6 +25146,33 @@
                 "OR5I1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+            {
+                "OR8D1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.25384615963468"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
+            {
+                "OR10G4":
+                {
+                    "type": "na"
+                },
+                "OR9Q2":
+                {
+                    "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-13.043478012085"
                 }
             }
         }
@@ -25203,12 +25440,12 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -25237,17 +25474,17 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 }
             }
         }
@@ -25344,8 +25581,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.5"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.0416666418314"
                 }
             }
         }
@@ -25397,8 +25634,8 @@
             {
                 "OR2AG1":
                 {
-                    "type": "ma",
-                    "adjusted_curve_top": "2.5999999046326"
+                    "type": "sa",
+                    "adjusted_curve_top": "9.9999993470999"
                 },
                 "OR3A1":
                 {
@@ -25741,6 +25978,37 @@
             ]
         }
     },
+    "e77e5d61c7e9eef27b97ad49afaed42d":
+    {
+        "full_name": "nectaryl",
+        "smiles": "CC1=CCC(CC1)C(C)CC2CCCC2=O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fruity",
+                "tropical",
+                "lactonic",
+                "peach",
+                "apricot",
+                "oily",
+                "waxy",
+                "custard",
+                "coconut"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP2015211667A\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "na",
+                    "antagonist": "1"
+                }
+            }
+        }
+    },
     "0e2b7f9c8fcd5b25bd83c6dd0499802b":
     {
         "full_name": "nerol",
@@ -25789,7 +26057,7 @@
                 {
                     "type": "ma",
                     "ec50": "-3.2",
-                    "adjusted_curve_top": "2.5999999046326"
+                    "adjusted_curve_top": "6.0465111898822"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -25862,12 +26130,20 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2017090518A1\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "na",
+                    "antagonist": "1"
                 }
             }
         }
@@ -26348,7 +26624,7 @@
                 "OR1J2":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "0.5"
+                    "adjusted_curve_top": "0.55555558204651"
                 }
             }
         }
@@ -26604,17 +26880,17 @@
                 "OR10A6":
                 {
                     "type": "sa",
-                    "adjusted_curve_top": "9.5"
+                    "adjusted_curve_top": "8.6363638937473"
                 },
                 "OR2W1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "sa",
+                    "adjusted_curve_top": "9.0909093618393"
                 },
                 "OR51E1":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "2.7272728085518"
                 }
             }
         }
@@ -27004,6 +27280,30 @@
             }
         }
     },
+    "8bea9fe55ab0a43c9857d63eb20e52a5":
+    {
+        "full_name": "nutty pyrazine",
+        "smiles": "CC1CCC2=NC=CN=C12",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "baked_potato",
+                "coffee",
+                "corn",
+                "earthy",
+                "grain",
+                "meaty",
+                "nutty",
+                "peanut",
+                "potato",
+                "roasted",
+                "savory",
+                "sweet",
+                "toasted"
+            ]
+        }
+    },
     "c77ad39c9ac02810e04c8e0d6cbab75d":
     {
         "full_name": "ocimene",
@@ -27197,8 +27497,8 @@
             {
                 "VN1R1":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.41666665673256"
                 }
             },
             "https:\/\/doi.org\/10.1093\/chemse\/bjw117":
@@ -27236,8 +27536,8 @@
             {
                 "OR5I1":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 }
             },
             "https:\/\/doi.org\/10.1002\/adhm.201300174":
@@ -27245,7 +27545,7 @@
                 "OR1J2":
                 {
                     "type": "ma",
-                    "adjusted_curve_top": "3"
+                    "adjusted_curve_top": "3.3333334922791"
                 }
             }
         }
@@ -28091,8 +28391,8 @@
             {
                 "OR52B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -28515,7 +28815,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-3.2000000476837"
+                    "adjusted_curve_top": "-0.4571428843907"
                 }
             }
         }
@@ -28738,17 +29038,123 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
+                }
+            }
+        }
+    },
+    "5fe2b02edc6920b20eb3a6f6de510a3b":
+    {
+        "full_name": "p-cresol",
+        "smiles": "CC1=CC=C(C=C1)O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "phenolic",
+                "narcissus",
+                "animal",
+                "mimosa"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP2015211667A\/en":
+            {
+                "OR2W1":
+                {
+                    "type": "wa",
+                    "ec50": "-4.52",
+                    "adjusted_curve_top": "1.8666667640209"
+                },
+                "OR4S2":
+                {
+                    "type": "wa",
+                    "ec50": "-4.4",
+                    "adjusted_curve_top": "0.66666670143604"
+                },
+                "OR5P3":
+                {
+                    "type": "wa",
+                    "ec50": "-4.4",
+                    "adjusted_curve_top": "0.80000004172325"
+                },
+                "OR9Q2":
+                {
+                    "type": "ma",
+                    "ec50": "-5",
+                    "adjusted_curve_top": "2.9293333945572"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "ma",
+                    "ec50": "-4.82"
+                }
+            }
+        }
+    },
+    "7821cd37bbd8c082c08e1f181078ee64":
+    {
+        "full_name": "p-cresyl acetate",
+        "smiles": "CC1=CC=C(C=C1)OC(=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "narcissus",
+                "phenolic",
+                "animal"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "ma",
+                    "ec50": "-4.82"
+                }
+            }
+        }
+    },
+    "b0f628e63e6985f7ee4e3eba76da6c71":
+    {
+        "full_name": "p-cresyl isobutyrate",
+        "smiles": "CC1=CC=C(C=C1)OC(=O)C(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "animal",
+                "floral",
+                "lily",
+                "narcissus",
+                "green",
+                "fruity"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "ma",
+                    "ec50": "-4.1"
                 }
             }
         }
@@ -28899,17 +29305,17 @@
                 {
                     "type": "vsa",
                     "ec50": "-4.96",
-                    "adjusted_curve_top": "52"
+                    "adjusted_curve_top": "10.000000178814"
                 },
                 "OR4K2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "15"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.8846154361963"
                 },
                 "OR4P4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vwa",
+                    "adjusted_curve_top": "0.19230769574642"
                 },
                 "OR5I1":
                 {
@@ -29057,13 +29463,13 @@
             {
                 "OR2T2":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
                 },
                 "OR2T8":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "1"
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
                 }
             }
         }
@@ -29319,12 +29725,12 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -29370,7 +29776,7 @@
                 {
                     "type": "ia",
                     "ec50": "-3.9",
-                    "adjusted_curve_top": "-4"
+                    "adjusted_curve_top": "-1.6666666269302"
                 }
             }
         }
@@ -29518,6 +29924,15 @@
                 {
                     "type": "ma",
                     "ec50": "-4.82"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
+            {
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.3",
+                    "adjusted_curve_top": "6.6666665077209"
                 }
             }
         }
@@ -29997,13 +30412,13 @@
             {
                 "OR4E2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR4K2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -30636,22 +31051,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -30840,8 +31255,8 @@
             {
                 "OR12D2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -31100,7 +31515,7 @@
                 "OR4M1":
                 {
                     "type": "vsa",
-                    "adjusted_curve_top": "20"
+                    "adjusted_curve_top": "10"
                 }
             }
         }
@@ -31736,10 +32151,10 @@
             }
         }
     },
-    "b6c1b522e0d55c827462ba4dfbff1248":
+    "3e1b456be7fa086b2cc38cf45fbbb77e":
     {
         "full_name": "(R)-3-mercapto-3-methylhexan-1-ol",
-        "smiles": "OCC[C@@H](S)(C)CCC",
+        "smiles": "OCC[C@@](S)(C)CCC",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -31757,21 +32172,21 @@
             {
                 "OR1A1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.96",
-                    "adjusted_curve_top": "40"
+                    "adjusted_curve_top": "8.0000001192093"
                 },
                 "OR2J3":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-5.22",
-                    "adjusted_curve_top": "2"
+                    "adjusted_curve_top": "0.40000000596046"
                 },
                 "OR2W1":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-5.7",
-                    "adjusted_curve_top": "6"
+                    "adjusted_curve_top": "1.2000000178814"
                 }
             }
         }
@@ -31920,22 +32335,30 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+            {
+                "OR8D1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.24615385899177"
                 }
             }
         }
@@ -32173,12 +32596,20 @@
             {
                 "OR52B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2017090518A1\/en":
+            {
+                "OR9Q2":
+                {
+                    "type": "na",
+                    "antagonist": "1"
                 }
             }
         }
@@ -32222,7 +32653,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-3.2000000476837"
+                    "adjusted_curve_top": "-0.4571428843907"
                 }
             }
         }
@@ -32671,7 +33102,7 @@
                 "OR2W3":
                 {
                     "type": "wa",
-                    "adjusted_curve_top": "0.80000001192093"
+                    "adjusted_curve_top": "1.8604650774667"
                 }
             },
             "https:\/\/doi.org\/10.3390%2Fmolecules25204743":
@@ -32733,13 +33164,13 @@
                 {
                     "type": "sa",
                     "ec50": "-6.4",
-                    "adjusted_curve_top": "8.3000001907349"
+                    "adjusted_curve_top": "7.0940173289205"
                 },
                 "OR5K1":
                 {
                     "type": "ma",
                     "ec50": "-4.8",
-                    "adjusted_curve_top": "4.1999998092651"
+                    "adjusted_curve_top": "3.5897434630965"
                 }
             }
         }
@@ -32806,13 +33237,13 @@
                 {
                     "type": "wa",
                     "ec50": "-3",
-                    "adjusted_curve_top": "0.80000001192093"
+                    "adjusted_curve_top": "0.68376070087792"
                 },
                 "OR5K1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.2",
-                    "adjusted_curve_top": "11.300000190735"
+                    "adjusted_curve_top": "9.6581199190046"
                 }
             }
         }
@@ -32837,35 +33268,35 @@
             {
                 "OR2W1":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-4.82",
-                    "adjusted_curve_top": "3.5"
+                    "adjusted_curve_top": "0.28455283492804"
                 },
                 "OR5K1":
                 {
-                    "type": "ma",
+                    "type": "vwa",
                     "ec50": "-4.4",
-                    "adjusted_curve_top": "6"
+                    "adjusted_curve_top": "0.48780485987663"
                 },
                 "OR5P3":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-5.1",
-                    "adjusted_curve_top": "123"
+                    "adjusted_curve_top": "9.999999627471"
                 },
                 "OR8H1":
                 {
-                    "type": "vsa",
+                    "type": "wa",
                     "ec50": "-4.22",
-                    "adjusted_curve_top": "24"
+                    "adjusted_curve_top": "1.9512194395065"
                 }
             }
         }
     },
-    "150293eff9ed1a367c9bd69ad55c66be":
+    "5d76861fe0be39bf4a9f8d4daeb0dfe5":
     {
         "full_name": "(S)-3-mercapto-3-methylhexan-1-ol",
-        "smiles": "OCC[C@H](S)(C)CCC",
+        "smiles": "OCC[C@](S)(C)CCC",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -32883,21 +33314,21 @@
             {
                 "OR1A1":
                 {
-                    "type": "ma",
+                    "type": "wa",
                     "ec50": "-4.96",
-                    "adjusted_curve_top": "5"
+                    "adjusted_curve_top": "1.0000000149012"
                 },
                 "OR2J3":
                 {
-                    "type": "sa",
+                    "type": "wa",
                     "ec50": "-4.82",
-                    "adjusted_curve_top": "7.5"
+                    "adjusted_curve_top": "1.5000000223517"
                 },
                 "OR2W1":
                 {
-                    "type": "sa",
+                    "type": "wa",
                     "ec50": "-5.7",
-                    "adjusted_curve_top": "7"
+                    "adjusted_curve_top": "1.4000000208616"
                 }
             }
         }
@@ -32976,22 +33407,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -33039,17 +33470,17 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 }
             }
         }
@@ -33544,22 +33975,22 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 }
             }
         }
@@ -33844,22 +34275,30 @@
                 "OR2W1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-8"
+                    "adjusted_curve_top": "-0.65040647983551"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-14.347825605973"
                 }
             }
         }
@@ -33906,8 +34345,8 @@
             {
                 "OR2L8":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -33974,6 +34413,14 @@
                 "OR5AN1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
+            {
+                "OR5K1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-8.6956520080566"
                 }
             }
         }
@@ -34159,13 +34606,13 @@
             {
                 "OR4E2":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR52B4":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {
@@ -34176,8 +34623,8 @@
             {
                 "OR3A4":
                 {
-                    "type": "wa",
-                    "adjusted_curve_top": "0.80000001192093"
+                    "type": "ma",
+                    "adjusted_curve_top": "2.0000000298023"
                 },
                 "OR51S1":
                 {
@@ -34260,9 +34707,9 @@
             {
                 "OR2H2":
                 {
-                    "type": "sa",
+                    "type": "vsa",
                     "ec50": "-4.44",
-                    "adjusted_curve_top": "7"
+                    "adjusted_curve_top": "10.000000238419"
                 }
             }
         }
@@ -34507,9 +34954,9 @@
                 },
                 "OR5K1":
                 {
-                    "type": "vsa",
+                    "type": "sa",
                     "ec50": "-4.7",
-                    "adjusted_curve_top": "11"
+                    "adjusted_curve_top": "9.4017094969749"
                 }
             }
         }
@@ -34539,7 +34986,7 @@
                 {
                     "type": "ma",
                     "ec50": "-4.1",
-                    "adjusted_curve_top": "4"
+                    "adjusted_curve_top": "3.4188034534454"
                 }
             }
         }
@@ -34597,7 +35044,7 @@
                 "OR51L1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-1"
+                    "adjusted_curve_top": "-0.90909093618393"
                 }
             },
             "https:\/\/patents.google.com\/patent\/US9057090B2\/en":
@@ -34605,7 +35052,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-4.6999998092651"
+                    "adjusted_curve_top": "-0.67142857419593"
                 }
             }
         }
@@ -35159,17 +35606,100 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR5P3":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-2"
+                    "adjusted_curve_top": "-0.16260161995888"
                 },
                 "OR8H1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-5"
+                    "adjusted_curve_top": "-0.40650404989719"
+                }
+            }
+        }
+    },
+    "d28ba1d810c7bc8b1e99081eb0763c27":
+    {
+        "full_name": "vernolide",
+        "smiles": "CC1=CC2=C(C=C1C(=O)C)C(CCC2(C)C)(C)C",
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US9254248B2\/en":
+            {
+                "OR8D1":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.15384615957737"
+                }
+            }
+        }
+    },
+    "7624c74b7ed0493e40c44ad26e0d5f13":
+    {
+        "full_name": "4-vinylguaiacol",
+        "smiles": "Oc1ccc(cc1OC)C=C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "spicy",
+                "clove",
+                "carnation",
+                "phenolic",
+                "peppery",
+                "smoky",
+                "woody",
+                "powdery"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/JP2015211667A\/en":
+            {
+                "OR10G4":
+                {
+                    "type": "ma",
+                    "ec50": "-4.52",
+                    "adjusted_curve_top": "2.2666667848825"
+                },
+                "OR10G7":
+                {
+                    "type": "wa",
+                    "ec50": "-4.7",
+                    "adjusted_curve_top": "1.3333334028721"
+                },
+                "OR1A1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.3",
+                    "adjusted_curve_top": "2.0000001043081"
+                },
+                "OR2W1":
+                {
+                    "type": "ma",
+                    "ec50": "-4.4",
+                    "adjusted_curve_top": "3.3333335071802"
+                },
+                "OR5K1":
+                {
+                    "type": "wa",
+                    "ec50": "-4.3",
+                    "adjusted_curve_top": "0.66666670143604"
+                },
+                "OR5P3":
+                {
+                    "type": "vsa",
+                    "ec50": "-4.46",
+                    "adjusted_curve_top": "10.000000521541"
+                },
+                "OR8H1":
+                {
+                    "type": "vwa",
+                    "ec50": "-4.3",
+                    "adjusted_curve_top": "0.40000002086163"
                 }
             }
         }
@@ -35198,7 +35728,7 @@
                 "OR5K1":
                 {
                     "type": "ia",
-                    "adjusted_curve_top": "-3.7000000476837"
+                    "adjusted_curve_top": "-0.52857145901237"
                 }
             }
         }
@@ -35348,13 +35878,13 @@
             {
                 "OR2L8":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR4K5":
                 {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
+                    "type": "wa",
+                    "adjusted_curve_top": "1.9230769574642"
                 },
                 "OR5I1":
                 {

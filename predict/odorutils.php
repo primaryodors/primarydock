@@ -38,7 +38,7 @@ function best_empirical_pair($protein, $aroma, $as_object = false)
 			str_replace(" ", "_", $o['full_name']) == $aroma
 		)
 		{
-			foreach ($o['activity'] as $ref => $acv)
+			if (@$o['activity']) foreach ($o['activity'] as $ref => $acv)
 			{
 				if (isset($acv[$protein]))
 				{

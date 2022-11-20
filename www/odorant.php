@@ -31,7 +31,7 @@ $md5 = md5($odor['smiles']);
 $imgfname = "assets/pngs/$md5.png";
 if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
 {
-	$smilesn = str_replace("[O-]", "O", $odor['smiles']);
+    $smilesn = str_replace("[O-]", "O", $odor['smiles']);
     $smilesu = urlencode($smilesn);
     $url = "https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/PNG";
 
@@ -54,6 +54,7 @@ if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
     else
     {
         $im = imagecreatefromstring($oimage);
+        if (!$im) die("Bad image data: \n\n$oimage\n\nSMILES: {$odor['smiles']}");
         $sx = imagesx($im);
         $sy = imagesy($im);
         if (!imageistruecolor($im)) imagepalettetotruecolor($im);
@@ -223,8 +224,11 @@ if (@$odor['activity']) foreach ($odor['activity'] as $refurl => $acv)
             else $tblec50[$rcpid] .= ", ";
 
             $tblec50[$rcpid] .= round($a['ec50'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup>";
-            $sorted[$rcpid] -= $a['ec50']*1.666;
-            $ssamples++;
+            if (!isset($a['adjusted_curve_top']) || floatval($a['adjusted_curve_top']) > 0)
+            {
+              $sorted[$rcpid] -= $a['ec50']*1.666;
+              $ssamples++;
+            }
 
             if (false===$minec50[$rcpid] || $a['ec50'] < $minec50[$rcpid]) $minec50[$rcpid] = $a['ec50'];
         }

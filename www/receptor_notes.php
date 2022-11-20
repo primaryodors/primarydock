@@ -21,6 +21,10 @@ function correlate_receptors_aromanotes()
 
     foreach (array_keys($prots) as $rcpid)
     {
+        $ep = all_empirical_pairs_for_receptor($rcpid, true);
+        // foreach ($ep as $k => $v) if ($v <= 0) unset($ep[$k]);
+        if (count($ep) < 2) continue;
+
         $xvals[$rcpid] = [];
         foreach ($odors as $oid => $odor)
         {
@@ -96,7 +100,7 @@ function correlate_receptors_aromanotes()
 
 function get_notes_for_receptor($rcpid, $correlations)
 {
-    if (!isset($correlations[$rcpid])) return "(none)";
+    if (!isset($correlations[$rcpid])) return "(insufficient data)";
 
     $maxcorr = floatval(max($correlations[$rcpid]));
     $threshold = $maxcorr / 2;

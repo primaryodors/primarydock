@@ -20,6 +20,11 @@ body
     text-shadow: 0px 0px 5px #0cf;
 }
 
+.dim
+{
+    color: #8b8494;
+}
+
 ::-webkit-scrollbar 
 {
     width: 13px;

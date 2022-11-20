@@ -64,9 +64,10 @@ function correlate_receptors_aromanotes()
         foreach ($odors as $oid => $odor)
         {
             $yvals[$pq][$oid] = 0;
-            foreach ($odor['aroma'] as $refurl => $pqlist)
+            $crefs = (isset($odor['aroma']) && is_array($odor['aroma'])) ? count($odor['aroma']) : 0;
+            if ($crefs) foreach ($odor['aroma'] as $refurl => $pqlist)
             {
-                if ($refurl == "http://www.primaryodors.org") continue;
+                if ($crefs > 1 && $refurl == "http://www.primaryodors.org") continue;
                 if (in_array($pq, $pqlist))
                 {
                     $yvals[$pq][$oid] = 1;

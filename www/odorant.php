@@ -258,7 +258,14 @@ foreach (array_keys($sorted) as $rcpid)
     else echo "<td>&nbsp;</td>";
 
     if (@$agonist[$rcpid])
-        echo "<td style=\"white-space: nowrap;\">" . substr(get_notes_for_receptor($rcpid, $correlations), 0, 123) . "</td>\n";
+    {
+        $notes = substr(get_notes_for_receptor($rcpid, $correlations), 0, 123);
+        if (substr($notes, 0, 1) == '(')
+        {
+            $notes = "<i class=\"dim\">$notes</i>";
+        }
+        echo "<td style=\"white-space: nowrap;\">$notes</td>\n";
+    }
     else
         echo "<td>&nbsp;</td>\n";
 

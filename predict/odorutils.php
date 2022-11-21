@@ -107,7 +107,25 @@ function is_agonist($response)
 	return 0;
 }
 
-function all_empirical_pairs_for_receptor($protein)
+function has_antagonists($protein)
+{
+	global $odors;
+	
+	foreach ($odors as $oid => $o)
+	{
+		if (isset($o['activity'])) foreach ($o['activity'] as $ref => $acv)
+		{
+			if (isset($acv[$protein]))
+			{
+				if (@$acv[$protein]['antagonist']) return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+function all_empirical_pairs_for_receptor($protein, $return_1dim = false)
 {
 	global $odors;
 
@@ -161,6 +179,7 @@ function all_empirical_pairs_for_receptor($protein)
 	}
 
 	arsort($sortable);
+	if ($return_1dim) return $sortable;
 
 	$retval = [];
 

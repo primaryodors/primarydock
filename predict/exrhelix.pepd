@@ -37,6 +37,7 @@ IF $C != "C" LET $msg = "Helix motif C not found."
 IF $D != "D" THEN IF $D != "E" LET $msg = "Helix motif D/E not found."
 IF $found =* "P" LET $msg = "Helix motif disrupted by proline."
 IF $msg THEN ECHO $msg
+IF $msg THEN LET %exr_motif_= 0
 IF $msg THEN GOTO _no_exr_helix
 
 LET %exr_motif_end = %exr_motif + 5
@@ -127,10 +128,12 @@ IF %exrzn == 0 AND %site1 == 0 AND %site2 == 0 AND %sitetmr5 == 0 DIE "No sites 
 
 DELETE 1 %TMR1.s
 
+IF %exr_motif < %TMR4.e GOTO _no_delete;
 LET %em1 = %exr_motif - 1
 LET %em6 = %exr_motif + 5
 DELETE %TMR4.e %em1
 DELETE %em6 %TMR5.s
+_no_delete:
 
 LET $path = "pdbs/" + $fam + "/" + $prot + ".metal.pdb"
 SAVE $path

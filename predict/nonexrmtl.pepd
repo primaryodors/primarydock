@@ -1,0 +1,83 @@
+
+LET $prot = "OR1A1"
+IF $arg2 THEN LET $prot = $arg2
+
+LET $sub = $prot FROM 1 FOR 4
+LET $fam = ""
+IF $sub = "TAAR" LET $fam = $sub
+IF $sub = "VN1R" LET $fam = $sub
+IF $fam THEN GOTO _notOR
+LET $sub = $sub FROM 3
+LET %sub = $sub
+LET $fam = "OR" + %sub
+_notOR:
+
+LET $path = "pdbs/" + $fam + "/" + $prot + ".upright.pdb"
+LOAD $path
+
+IF %3.50 <= 0 THEN DIE "Input PDB is missing Ballesteros-Weinstein numbers.\nPlease ensure the records are in the format:\nREMARK 800 SITE BW {n}.50 {resno}."
+
+
+
+# Copper binding sites for e.g. OR2T11
+# http://pubs.acs.org/doi/abs/10.1021/jacs.6b06983
+
+# Site 1
+LET %3.46 = %3.50 -  4
+# LET %3.50
+LET %6.37 = %6.50 - 13
+LET %6.40 = %6.50 - 10
+LET $S1A = $SEQUENCE FROM %3.46 FOR 1
+LET $S1B = $SEQUENCE FROM %3.50 FOR 1
+LET $S1C = $SEQUENCE FROM %6.37 FOR 1
+LET $S1D = $SEQUENCE FROM %6.40 FOR 1
+
+LET %site1 = 0
+# ECHO $S1A $S1B $S1C $S1D
+IF "MCHDENQR" =* $S1A AND "HRC" =* $S1B AND "CHMDENQ" =* $S1C AND "HCMDENQ" =* $S1D THEN LET %site1 ++
+IF %site1 > 0 THEN MCOORD Th8 Cu 1 %3.46 %3.50 %6.37 %6.40
+
+# Site 2
+LET %2.39 = %2.50 - 11
+LET %4.37 = %4.50 - 13
+LET %4.39 = %4.50 - 11
+LET %4.42 = %4.50 -  8
+LET $S2A = $SEQUENCE FROM %2.50 FOR 1
+LET $S2B = $SEQUENCE FROM %4.37 FOR 1
+LET $S2C = $SEQUENCE FROM %4.39 FOR 1
+LET $S2D = $SEQUENCE FROM %4.42 FOR 1
+
+LET %site2 = 0
+# ECHO $S2A $S2B $S2C $S2D
+IF "MCHDENQR" =* $S2A AND "MCHDENQR" =* $S2B AND "R" =* $S2C AND "CHMDENQ" =* $S2D THEN LET %site2 ++
+IF %site2 > 0 THEN MCOORD Th8 Cu 1 %2.39 %4.37 %4.39 %4.42
+
+
+# TMR copper binding for e.g. OR2M3
+# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7256108/
+
+LET %sitetmr5 = 0
+
+LET %5.42 = %5.50 - 8
+LET %5.43 = %5.50 - 7
+LET %5.46 = %5.50 - 4 # Coordinate also to a nearby methionine since the article's results make the most sense this way.
+LET $S5A = $SEQUENCE FROM %5.42 FOR 1
+LET $S5B = $SEQUENCE FROM %5.43 FOR 1
+LET $S5C = $SEQUENCE FROM %5.46 FOR 1
+
+ECHO $S5A $S5B $S5C
+IF "C" == $S5A AND "C" == $S5B AND "M" == $S5C THEN LET %sitetmr5 ++
+IF %sitetmr5 > = THEN MCOORD Cu 1 %5.42 %5.43 %5.46
+
+
+IF %exrzn == 0 AND %site1 == 0 AND %site2 == 0 AND %sitetmr5 == 0 DIE "No sites for metal coordination."
+
+DELETE 1 %TMR1.s
+
+LET %em1 = %exr_motif - 1
+LET %em6 = %exr_motif + 5
+DELETE %TMR4.e %em1
+DELETE %em6 %TMR5.s
+
+LET $path = "pdbs/" + $fam + "/" + $prot + ".metal.pdb"
+SAVE $path

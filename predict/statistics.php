@@ -141,6 +141,13 @@ function find_angle($dx, $dy)
 	else return pi()*2-$ac;
 }
 
+function sigmoid($x)
+{
+    // https://en.wikipedia.org/wiki/Sigmoid_function
+    $emx = pow(M_E, -$x);
+    return 1.0 / (1+$emx);
+}
+
 
 
 

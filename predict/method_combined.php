@@ -16,7 +16,7 @@ require("dock_eval.php");
 
 // Configurable variables
 $dock_retries = 5;
-$max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
+$max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
 $dock_metals = false;
 
 // Load data
@@ -199,6 +199,7 @@ heredoc;
 	$paths = [];	
 	$cenres = "CEN RES $captmtl1 $captmtl2 $captmtl3 $captbal1 $captbal2";
 
+	$nodeno++; $paths[] = "PATH $nodeno REL 0 -7 0";
 	$nodeno++; $paths[] = "PATH $nodeno RES $bsr2a $bsr3a $bsr3b $bsr3c $bsr3d $bsr3e $bsr3f $bsr3g $bsr4a $bsr4b $bsr4c $bsr5a $bsr5b $bsr5c $bsr5d $bsr6a $bsr6b $bsr7a $bsr7b $bsr7c";
 	$nodeno++; $paths[] = "PATH $nodeno RES $bsr3a $bsr3b $bsr3c $bsr3d $bsr3e $bsr3f $bsr3g $bsr5a $bsr5b $bsr5c $bsr5d";
 	$pocketnode = $nodeno;
@@ -276,6 +277,8 @@ SIZE 7.0 7.5 7.0
 
 POSE 10
 ITER 50
+
+# EXCL $tmr4end $tmr5start
 
 # DIFF
 ELIM 50

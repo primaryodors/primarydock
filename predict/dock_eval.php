@@ -1,6 +1,11 @@
 <?php
 
-function evaluate_result($array)
+$pwd = getcwd();
+chdir(__DIR__);
+require_once("statistics.php");
+chdir($pwd);
+
+function get_active_node($array)
 {
     $activenode = 0;
     if (@$array['Active node']) $activenode = intval($array['Active node']);
@@ -10,6 +15,32 @@ function evaluate_result($array)
         $nodeno = intval(explode(" ", $key)[1]);
         if ($nodeno > $activenode) $activenode = $nodeno;
     }
+
+    return $activenode;
+}
+
+function path_dock_probability($array)
+{
+    $activenode = get_active_node($array);
+    $pocketnode = $activenode - 1;
+
+    $probability = 0;
+    for ($n = 1; $n < $pocketnode && isset($array["Node $n"]); $n++)
+    {
+        if ($n == 1) $probability = 1.0;
+        $m = $n - 1;
+        $ratio = -floatval($array["Node $n"]) / -floatval($array["Node $m"]);
+        $s = sigmoid(log($ratio));
+        $probability *= $s;
+    }
+
+    return $probability;
+}
+
+function evaluate_result($array)
+{
+    $activenode = get_active_node($array);
+    
     $pocketnode = $activenode - 1;
     if ($pocketnode <= 0)
     {
@@ -26,6 +57,7 @@ function evaluate_result($array)
         }
         else return "Non-Agonist";
     }
+
 
     $capture = 0.0;
     $capqty = 0;

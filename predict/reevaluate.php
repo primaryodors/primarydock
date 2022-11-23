@@ -32,9 +32,13 @@ foreach ($dock_results as $protid => $docks)
     		echo "Warning: $ligand not found in odorants data.\n";
     		continue;
     	}
-    	
+
+		$p = path_dock_probability($array);
+
+		$dock_results[$protid][$ligand]['Probability'] = $p;
+
     	$r = empirical_response($protid, $o);
-    	
+
     	if (!$r)
     		$actual = "(unknown)";
     	else
@@ -45,7 +49,7 @@ foreach ($dock_results as $protid => $docks)
 			else $actual = "Non-Agonist";
     	}
     	$dock_results[$protid][$ligand]["Actual"] = $actual;
-    	
+
         $prediction = evaluate_result($array);
         if ($prediction == $actual) $right++;
         else $wrong++;
@@ -54,9 +58,15 @@ foreach ($dock_results as $protid => $docks)
     }
 }
 
-if (!$right) die("No correct predictions made; exiting.\n");
+// if (!$right) die("No correct predictions made; exiting.\n");
 $percent = round(100.0 * $right / ($right+$wrong), 1);
 echo "$percent% success rate.\n";
+
+chdir(__DIR__);
+chdir("..");
+$bak_file = str_replace(".json", ".bak.json", $json_file);
+if (file_exists($bak_file)) unlink($bak_file);
+rename($json_file, $bak_file);
 
 $f = fopen($json_file, "wb");
 if (!$f) die("File write FAILED. Make sure have access to write $json_file.");

@@ -72,12 +72,6 @@ IF %sitetmr5 > = THEN MCOORD Cu 1 %5.42 %5.43 %5.46
 
 IF %exrzn == 0 AND %site1 == 0 AND %site2 == 0 AND %sitetmr5 == 0 DIE "No sites for metal coordination."
 
-DELETE 1 %TMR1.s
-
-LET %em1 = %exr_motif - 1
-LET %em6 = %exr_motif + 5
-DELETE %TMR4.e %em1
-DELETE %em6 %TMR5.s
 
 LET $path = "pdbs/" + $fam + "/" + $prot + ".metal.pdb"
 SAVE $path

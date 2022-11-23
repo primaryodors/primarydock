@@ -37,6 +37,18 @@ function path_dock_probability($array)
     return $probability;
 }
 
+function active_binding_ratio($array)
+{
+    $activenode = get_active_node($array);
+    if ($activenode)
+    {
+        $pocketnode = $activenode - 1;
+        $ratio = -floatval($array["Node $activenode"]) / -floatval($array["Node $pocketnode"]);
+        return max($ratio, 0);
+    }
+    else return 0;
+}
+
 function evaluate_result($array)
 {
     $activenode = get_active_node($array);
@@ -49,15 +61,23 @@ function evaluate_result($array)
 
         if (-$array["Node $pocketnode"] > 2*@-$array["Node $activenode"])
         {
-            return "Inverse Agonist";
+            $array['Prediction'] = "Inverse Agonist";
+            return $array;
         }
         else if (@-$array["Node $activenode"] > 0.95*@-$array["Node $pocketnode"])
         {
-            return "Agonist";
+            $array['Prediction'] =  "Agonist";
+            return $array;
         }
-        else return "Non-Agonist";
+        else
+        {
+            $array['Prediction'] = "Non-Agonist";
+            return $array;
+        }
     }
 
+    $probability = path_dock_probability($array);
+    $acvbndratio = active_binding_ratio($array);
 
     $capture = 0.0;
     $capqty = 0;
@@ -86,5 +106,9 @@ function evaluate_result($array)
         else $prediction = "Agonist";
     }
 
-    return $prediction;
+    $array['Prediction'] = $prediction;
+    $array['Probability'] = $probability;
+    $array['Activation Binding Ratio'] = $acvbndratio;
+
+    return $array;
 }

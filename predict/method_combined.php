@@ -17,7 +17,7 @@ require("dock_eval.php");
 // Configurable variables
 $dock_retries = 5;
 $max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
-$dock_metals = false;
+$dock_metals = true;
 
 // Load data
 $dock_results = [];
@@ -375,15 +375,15 @@ foreach ($sum as $node => $value)
 	// $average["Proximity $node"] = round($sump[$node] / (@$count[$node] ?: 1), 3);
 }
 
-$prediction = evaluate_result($average);
-
 $actual = best_empirical_pair($protid, $ligname);
 if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
 else $actual = "(unknown)";
 
 $average["Active node"] = $activenode;
-$average["Prediction"] = $prediction;
 $average["Actual"] = $actual;
+
+$average = evaluate_result($average);
+$prediction = @$array['Prediction'];
 
 echo "Predicted ligand activity: $prediction\n";
 echo "Empirical ligand activity: $actual\n";

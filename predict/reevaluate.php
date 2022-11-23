@@ -33,10 +33,6 @@ foreach ($dock_results as $protid => $docks)
     		continue;
     	}
 
-		$p = path_dock_probability($array);
-
-		$dock_results[$protid][$ligand]['Probability'] = $p;
-
     	$r = empirical_response($protid, $o);
 
     	if (!$r)
@@ -48,13 +44,14 @@ foreach ($dock_results as $protid => $docks)
 			else if ($a < 0) $actual = "Inverse Agonist";
 			else $actual = "Non-Agonist";
     	}
-    	$dock_results[$protid][$ligand]["Actual"] = $actual;
+    	$array["Actual"] = $actual;
 
-        $prediction = evaluate_result($array);
+        $array = evaluate_result($array);
+		$prediction = $array['Prediction'];
         if ($prediction == $actual) $right++;
         else $wrong++;
 
-        $dock_results[$protid][$ligand]['Prediction'] = $prediction;
+        $dock_results[$protid][$ligand] = $array;
     }
 }
 

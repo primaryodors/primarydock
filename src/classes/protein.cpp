@@ -1601,7 +1601,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     Molecule* lmols[maxres-minres+8];
     Molecule* lbkg[maxres-minres+8];
     int lmolc=0, lbkgc=0;
-    // lmols[lmolc++] = &m;
+    lmols[lmolc++] = &m;
     lbkg[lbkgc++] = &m;
     for (n=0; n<residues; n++)
     {
@@ -1720,7 +1720,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
     // Multimol conform the array.
     gmprot = this;
-    // Molecule::multimol_conform(lmols, lbkg, 50); //, &ext_mtl_coord_cnf_cb);
+    Molecule::multimol_conform(lmols, lbkg, 50); //, &ext_mtl_coord_cnf_cb);
     metal->move(ptmtl);
 
     // Set the coordinating residues' sidechains to immovable.

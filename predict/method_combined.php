@@ -278,7 +278,7 @@ SIZE 7.0 7.5 7.0
 POSE 10
 ITER 50
 
-# EXCL $tmr4end $tmr5start
+EXCL $tmr4end $tmr5start
 
 # DIFF
 ELIM 50

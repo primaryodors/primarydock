@@ -79,6 +79,11 @@
         "short_name": "Barratt et al (2005)",
         "citation": "Van der Waals Interactions Dominate Ligand-Protein Association in a Protein Binding Site Occluded from Solvent Water\r\nElizabeth Barratt, Richard J. Bingham, Daniel J. Warner, Charles A. Laughton, Simon E. V. Phillips, and Steve W. Homans\r\nJournal of the American Chemical Society 2005 127 (33), 11827-11834\r\nDOI: 10.1021\/ja0527525"
     },
+    "https:\/\/doi.org\/10.1093\/chemse\/bjx083":
+    {
+        "short_name": "Behrens et al (2018)",
+        "citation": "Maik Behrens, Lo\u00efc Briand, Claire A de March, Hiroaki Matsunami, Atsuko Yamashita, Wolfgang Meyerhof, Simone Weyand, Structure\u2013Function Relationships of Olfactory and Taste Receptors, Chemical Senses, Volume 43, Issue 2, February 2018, Pages 81\u201387, https:\/\/doi.org\/10.1093\/chemse\/bjx083"
+    },
     "https:\/\/pubmed.ncbi.nlm.nih.gov\/30453735\/":
     {
         "short_name": "Block (2018)",
@@ -203,6 +208,11 @@
     {
         "short_name": "Flegel et al (2016)",
         "citation": "Flegel C, Vogel F, Hofreuter A, Schreiner BS, Osthold S, Veitinger S, Becker C, Brockmeyer NH, Muschol M, Wennemuth G, Altm\u00fcller J, Hatt H, Gisselmann G. Characterization of the Olfactory Receptors Expressed in Human Spermatozoa. Front Mol Biosci. 2016 Jan 7;2:73. doi: 10.3389\/fmolb.2015.00073. PMID: 26779489; PMCID: PMC4703994."
+    },
+    "https:\/\/doi.org\/10.1073\/pnas.97.20.10712":
+    {
+        "short_name": "Floriano et al (2000)",
+        "citation": "Floriano, W. B., Vaidehi, N., Goddard III, W. A., Singer, M. S., & Shepherd, G. M. (2000). Molecular mechanisms underlying differential odor responses of a mouse olfactory receptor. Proceedings of the National Academy of Sciences, 97(20), 10712-10716."
     },
     "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2015-Functional-characterization-of-human-olfactory-receptors-responding-to-pyrazine-odorants.pdf":
     {
@@ -453,6 +463,11 @@
     {
         "short_name": "Lai et al (2014)",
         "citation": "Peter C. Lai, Brandon Guida, Jing Shi, Chiquito J. Crasto, Preferential Binding of an Odor Within Olfactory Receptors: A Precursor to Receptor Activation, Chemical Senses, Volume 39, Issue 2, February 2014, Pages 107\u2013123, https:\/\/doi.org\/10.1093\/chemse\/bjt060"
+    },
+    "https:\/\/doi.org\/10.1093\/chemse\/bjab016":
+    {
+        "short_name": "Laing, Epps, Jinks (2021)",
+        "citation": "David G Laing, Adrienne Epps, Anthony L Jinks, Chemosensory Loss during a Traumatic Brain Injury Suggests a Central Pathway for the Rehabilitation of Anosmia, Chemical Senses, Volume 46, 2021, bjab016 "
     },
     "http:\/\/www.lephar.com\/software.htm":
     {
@@ -863,6 +878,11 @@
     {
         "short_name": "Yoshikawa et al (2022)",
         "citation": "Keiichi Yoshikawa, Jun Deguchi, Hu Jieying et al. Diverse yet selective tuning of an odorant receptor for sensing four classes of musk compounds, 03 August 2022, PREPRINT (Version 1) available at Research Square [https:\/\/doi.org\/10.21203\/rs.3.rs-1916850\/v1]"
+    },
+    "https:\/\/doi.org\/10.1073\/pnas.1517510112":
+    {
+        "short_name": "Yu et al (2015)",
+        "citation": "Yiqun Yu, Claire A. de March, Mengjue J. Ni, Kaylin A. Adipietro, J\u00e9r\u00f4me Golebiowski, Hiroaki Matsunami, Minghong Ma\r\nResponsiveness of G protein-coupled odorant receptors is partially attributed to the activation mechanism.\r\nProceedings of the National Academy of Sciences,\r\n112:48 14966-14971 (2015)\r\ndoi: 10.1073\/pnas.1517510112"
     },
     "https:\/\/doi.org\/10.1021\/ci60005a013":
     {

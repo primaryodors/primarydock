@@ -22640,6 +22640,14 @@
                     "adjusted_curve_top": "0.20000000298023"
                 }
             },
+            "https:\/\/doi.org\/10.1093\/chemse\/bjq081":
+            {
+                "OR2M7":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                }
+            },
             "https:\/\/www.biorxiv.org\/content\/10.1101\/2022.08.02.502184v1.full":
             {
                 "OR2T1":

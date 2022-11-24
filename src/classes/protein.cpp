@@ -1619,7 +1619,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
     // Flex the side chains to all be close to one another.
     int iter;
-    for (iter=0; iter<10; iter++)
+    for (iter=0; iter<-10; iter++)
     {
         for (i=0; i<residues; i++)
         {
@@ -1671,7 +1671,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     l=0;
     for (n=0; n<residues; n++)
     {
-        Point respt = get_atom_location(resnos[n], res_anames[n].c_str());
+        Point respt = get_atom_location(resnos[n], "CA"); // res_anames[n].c_str());
 
         if (n>0 && resnos[n] == resnos[n-1])
         {
@@ -1687,7 +1687,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
     // Multimol conform the array.
     gmprot = this;
-    // Molecule::multimol_conform(lmols, 250, &ext_mtl_coord_cnf_cb);
+    Molecule::multimol_conform(lmols, 50, &ext_mtl_coord_cnf_cb);
 
     // Set the coordinating residues' sidechains to immovable.
     for (i=0; m_mcoord[j]->coord_res[i]; i++)

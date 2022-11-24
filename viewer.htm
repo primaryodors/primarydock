@@ -1521,12 +1521,17 @@ function getFileContents(event)
     {
         return function(e)
         {
+			window.setTimeout(function()
+			{
+				$("#clip").trigger("input");
+			}, 259);
             return loadFile(e.target.result, e.target.fname);
         };
     })(f);
     r.readAsText(f);
 
 	event.target.value = "";
+	$("#posey")[0].innerText = f.name;
 }
 
 function loadFile(fileData, fileName = "")
@@ -2212,9 +2217,11 @@ function loadFile(fileData, fileName = "")
             window.setTimeout(function()
             {
             	$("#pleasewait").hide();
-            	$('#clip').trigger("input");
                 curr_ligand.autoView();
+            	$('#clip').trigger("input");
         	}, 503);
+
+			$("#clip").trigger("input");
         }
     });
 }

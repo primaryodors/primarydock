@@ -202,6 +202,12 @@
 #define allow_auto_hydroxy 0
 #define prerot_sidechains_from_ligand 0
 
+// How much variance to allow in the strongest atom-to-atom binding energy when multimol conforming.
+// Decreasing this value requires any positional or rotational change to adhere more tightly to the
+// strongest interatomic interaction.
+#define strongest_loss_tolerance 0.25
+#define _slt1 (1.0 - strongest_loss_tolerance)
+
 // Debugging stuff.
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0

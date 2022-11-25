@@ -1463,6 +1463,15 @@ void ext_mtl_coord_cnf_cb(int iter)
     gmprot->mtl_coord_cnf_cb(iter);
 }
 
+int Protein::get_metals_count()
+{
+    if (!metals) return 0;
+
+    int i;
+    for (i=0; metals[i]; i++);      // Get count.
+    return i;
+}
+
 MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames)
 {
     int i, j=0, k=0, l, n;
@@ -1509,6 +1518,11 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     {
         if (resnos[i] > maxres) maxres = resnos[i];
         if (!minres || resnos[i] < minres) minres = resnos[i];
+
+        char buffer[256];
+        sprintf(buffer, "REMARK 800 SITE MCOORD %d %s\n", resnos[i], metal->name);
+        remarks.push_back(buffer);
+
         m_mcoord[j]->coord_res[i] = get_residue(resnos[i]);
         if (!m_mcoord[j]->coord_res[i])
         {
@@ -1525,6 +1539,8 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     }
     m_mcoord[j]->coord_res[residues] = NULL;
     m_mcoord[j]->coord_atoms[residues] = NULL;
+
+    remarks.push_back("REMARK 800\n");
 
     // Get the plane of the coordinating atoms, then get the normal.
     Point ptarr[3] =
@@ -1583,27 +1599,54 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     Molecule m("Metal", ma);
     m.movability = MOV_ALL;
     Molecule* lmols[maxres-minres+8];
-    int lmolc=0;
+    Molecule* lbkg[maxres-minres+8];
+    int lmolc=0, lbkgc=0;
     lmols[lmolc++] = &m;
+    lbkg[lbkgc++] = &m;
+    for (n=0; n<residues; n++)
+    {
+        if (n>0 && resnos[n] == resnos[n-1]) continue;
+        AminoAcid* aa = get_residue(i);
+        if (aa)
+        {
+            lmols[lmolc++] = aa;
+        }
+    }
     for (i=minres; i<=maxres; i++)
     {
         AminoAcid* aa = get_residue(i);
         if (aa)
         {
-            lmols[lmolc++] = aa;
+            lbkg[lbkgc++] = aa;
             if (i >= minres && i <= maxres)
                 aa->m_mcoord = m_mcoord[j];		// Sets the coordinating residues, and all in between residues, to backbone immovable.
         }
     }
-    lmols[lmolc] = NULL;
+    lmols[lmolc] = nullptr;
+    lbkg[lbkgc] = nullptr;
 
     // Make sure to set the coordinating residues so that their side chains are flexible.
     for (i=0; m_mcoord[j]->coord_res[i]; i++)
-        m_mcoord[j]->coord_res[i]->movability = MOV_FLEXONLY;
+        m_mcoord[j]->coord_res[i]->movability = MOV_FLEXONLY;    
 
-    // Flex the side chains to all be close to one another.
+    // Move the metal to the new center of all coordinating residues' CA.
+    Point pt4avg[residues+2];
+    l=0;
+    for (n=0; n<residues; n++)
+    {
+        Point respt = get_atom_location(resnos[n], "CA");
+
+        if (n>0 && resnos[n] == resnos[n-1]) continue;
+        else pt4avg[l++] = respt;
+
+        cout << resnos[n] << " ";
+    }
+    Point ptmtl = average_of_points(pt4avg, l);
+    metal->move(ptmtl);
+
+    // Flex the side chains to all be close to the alpha center.
     int iter;
-    for (iter=0; iter<10; iter++)
+    for (iter=0; iter<50; iter++)
     {
         for (i=0; i<residues; i++)
         {
@@ -1624,16 +1667,78 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
                         {
                             bb[l]->rotate(step);
                             r = 0;
+                            float clashes = 0;
                             for (n=0; n<residues; n++)
                             {
-                                if (resnos[n] == resnos[i]) continue;
-                                r += get_atom_location(resnos[n], res_anames[n].c_str()).get_3d_distance(get_atom_location(resnos[i], res_anames[i].c_str()));
-                            }
+                                // if (resnos[n] == resnos[i]) continue;
+                                // r += get_atom_location(resnos[n], res_anames[n].c_str()).get_3d_distance(get_atom_location(resnos[i], res_anames[i].c_str()));
+                                r += fabs(get_atom_location(resnos[n], res_anames[n].c_str()).get_3d_distance(ptmtl) - 2);      // VERY rough approximation.
+                                clashes += get_residue(resnos[n])->get_intermol_clashes(lbkg);
+                            }   // for n
 
                             /*cout << iter << " " << *aa << ":"
                             	 << bb[l]->atom->name << "-" << bb[l]->btom->name
-                            	 << " " << rad*fiftyseven << "deg "
-                            	 << r << endl;*/
+                            	 << " " << rad*fiftyseven << "deg, r=" << r
+                            	 << ", clash=" << clashes << endl;*/
+
+                            r += 0.05*clashes;
+
+                            if (r < bestr)
+                            {
+                                bestrad = rad;
+                                bestr = r;
+                            }
+                        }
+
+                        if (bestrad) bb[l]->rotate(bestrad);
+
+                    }		// for (l=0; bb[l]; l++)
+                }		// if (bb)
+            }		// if (aa)
+        }		// for (i=0; i<residues; i++)
+    }		// for iter
+
+    // Multimol conform the array.
+    gmprot = this;
+    Molecule::multimol_conform(lmols, lbkg, 50); // &ext_mtl_coord_cnf_cb);
+    // metal->move(ptmtl);
+
+    // Flex the side chains to all be close to the metal.
+    ptmtl = metal->get_location();
+    for (iter=0; iter<50; iter++)
+    {
+        for (i=0; i<residues; i++)
+        {
+            AminoAcid* aa = get_residue(resnos[i]);
+            if (aa)
+            {
+                Bond** bb = aa->get_rotatable_bonds();
+                if (bb)
+                {
+                    float rad = 0, step = 10*fiftyseventh;
+                    float bestrad, bestr, r;
+
+                    for (l=0; bb[l]; l++)
+                    {
+                        bestrad = 0;
+                        bestr = 999999;
+                        for (; rad < M_PI*2; rad += step)
+                        {
+                            bb[l]->rotate(step);
+                            r = 0;
+                            float clashes = 0;
+                            for (n=0; n<residues; n++)
+                            {
+                                r += fabs(get_atom_location(resnos[n], res_anames[n].c_str()).get_3d_distance(ptmtl) - 2);      // VERY rough approximation.
+                                clashes += get_residue(resnos[n])->get_intermol_clashes(lbkg);
+                            }   // for n
+
+                            /*cout << iter << " " << *aa << ":"
+                            	 << bb[l]->atom->name << "-" << bb[l]->btom->name
+                            	 << " " << rad*fiftyseven << "deg, r=" << r
+                            	 << ", clash=" << clashes << endl;*/
+
+                            r += 0.05*clashes;
 
                             if (r < bestr)
                             {
@@ -1651,7 +1756,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     }		// for iter
 
     // Move the metal to the new center of all coordinating atoms.
-    Point pt4avg[residues+2];
+    #if 0
     l=0;
     for (n=0; n<residues; n++)
     {
@@ -1666,12 +1771,11 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
         else
             pt4avg[l++] = respt;
     }
-    Point ptmtl = average_of_points(pt4avg, l);
+    ptmtl = average_of_points(pt4avg, l);
+    #endif
     metal->move(ptmtl);
 
-    // Multimol conform the array.
-    gmprot = this;
-    // Molecule::multimol_conform(lmols, 250, &ext_mtl_coord_cnf_cb);
+    // Molecule::multimol_conform(lmols, lbkg, 50, &ext_mtl_coord_cnf_cb);
 
     // Set the coordinating residues' sidechains to immovable.
     for (i=0; m_mcoord[j]->coord_res[i]; i++)

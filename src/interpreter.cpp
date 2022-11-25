@@ -953,6 +953,9 @@ int main(int argc, char** argv)
                     else if (strlen(interpret_single_string(fields[l]))) goto _evaluated_true;
                     else goto _evaluated_false;
                 }
+
+                if (!strcmp(fields[l], "==")) fields[l][1] = 0;
+
                 if (!strcmp(fields[l], "=") || !strcmp(fields[l], "!=") || !strcmp(fields[l], "=*"))
                 {
                     if (!fields[l+1]) raise_error("Insufficient parameters given for IF.");
@@ -1418,7 +1421,7 @@ int main(int argc, char** argv)
                 bool thiolate = false;
                 Atom** ba = nullptr;
 
-            _yes_I_used_goto_for_this:
+                _yes_I_used_goto_for_this:
                 if (!strcmp(fields[l], "YO"))
                 {
                     force_tyrosine_O = true;
@@ -1444,7 +1447,8 @@ int main(int argc, char** argv)
                 elem_charge = interpret_single_int(fields[l++]);
                 Point pt;
                 ma = new Atom(elem_sym.c_str(), &pt, elem_charge);
-                string mname = elem_sym.append("1");
+                n = p.get_metals_count() + 1;
+                string mname = elem_sym + std::to_string(n);
                 ma->name = new char[8];
                 strcpy(ma->name, mname.c_str());
                 strcpy(ma->aa3let, "MTL");
@@ -1455,7 +1459,7 @@ int main(int argc, char** argv)
                 {
                     bool local_O = force_tyrosine_O;
 
-                _another_goto:
+                    _another_goto:
                     if (!strcmp(fields[l], "YO"))
                     {
                         local_O = true;
@@ -1506,7 +1510,7 @@ int main(int argc, char** argv)
                     }
                     else raise_error((std::string)"No metal coordination atom found for " + (std::string)aa->get_3letter() + to_string(k));
 
-                _found_coord_atom:
+                    _found_coord_atom:
                     ;
 
                 }

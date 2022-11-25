@@ -111,6 +111,34 @@ function family_from_protid($protid)
 	else return substr($protid, 0, 4);
 }
 
+function binding_site($protid)
+{
+	$retval = [];
+
+	$retval['bsr2a'] = resno_from_bw($protid, "2.53");
+	$retval['bsr3a'] = resno_from_bw($protid, "3.29");
+	$retval['bsr3b'] = resno_from_bw($protid, "3.32");
+	$retval['bsr3c'] = resno_from_bw($protid, "3.33");
+	$retval['bsr3d'] = resno_from_bw($protid, "3.36");
+	$retval['bsr3e'] = resno_from_bw($protid, "3.37");
+	$retval['bsr3f'] = resno_from_bw($protid, "3.40");
+	$retval['bsr3g'] = resno_from_bw($protid, "3.41");
+	$retval['bsr4a'] = resno_from_bw($protid, "4.53");
+	$retval['bsr4b'] = resno_from_bw($protid, "4.57");
+	$retval['bsr4c'] = resno_from_bw($protid, "4.60");
+	$retval['bsr5a'] = resno_from_bw($protid, "5.39");
+	$retval['bsr5b'] = resno_from_bw($protid, "5.43");
+	$retval['bsr5c'] = resno_from_bw($protid, "5.46");
+	$retval['bsr5d'] = resno_from_bw($protid, "5.47");
+	$retval['bsr6a'] = resno_from_bw($protid, "6.48");
+	$retval['bsr6b'] = resno_from_bw($protid, "6.51");
+	$retval['bsr7a'] = resno_from_bw($protid, "7.38");
+	$retval['bsr7b'] = resno_from_bw($protid, "7.39");
+	$retval['bsr7c'] = resno_from_bw($protid, "7.42");
+
+	return $retval;
+}
+
 function json_encode_pretty($array)
 {
 	return preg_replace("/([ \t]*)([^\\s]*) ([{\\[])\n/", "\$1\$2\n\$1\$3\n", json_encode($array, JSON_PRETTY_PRINT));

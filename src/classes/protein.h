@@ -44,6 +44,7 @@ public:
     int get_start_resno();
     std::string get_sequence();
     Molecule* metals_as_molecule();
+    int get_metals_count();
     AminoAcid* get_residue(int resno);
     Region get_region(std::string name);
     int get_region_end(std::string name);

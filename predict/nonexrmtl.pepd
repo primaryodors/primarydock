@@ -17,60 +17,6 @@ LOAD $path
 
 IF %3.50 <= 0 THEN DIE "Input PDB is missing Ballesteros-Weinstein numbers.\nPlease ensure the records are in the format:\nREMARK 800 SITE BW {n}.50 {resno}."
 
-SEARCH %TMR4.e %TMR5.s "HFFCD" %exr_motif %similarity
-LET $found = $SEQUENCE FROM %exr_motif FOR 5
-
-LET $H = $found FROM 1 FOR 1
-LET $C = $found FROM 4 FOR 1
-LET $D = $found FROM 5 FOR 1
-
-# https://www.mdpi.com/2673-8392/1/1/24/htm
-# "The most common amino acids that provide nitrogen, oxygen, and sulfur ligands to Zn2+ are His, Glu, Asp, and Cys."
-# It may be that not all ORs harbor an extracellular Zn2+ ion, but some may utilize other ions such as Cu+ or Ca2+.
-
-LET %exrzn = 0
-LET $msg = ""
-IF "HNQDERM" =* $H GOTO _hasH
-LET $msg = "Helix motif H not found."
-_hasH:
-IF $C != "C" LET $msg = "Helix motif C not found."
-IF $D != "D" THEN IF $D != "E" LET $msg = "Helix motif D/E not found."
-IF $found =* "P" LET $msg = "Helix motif disrupted by proline."
-IF $msg THEN ECHO $msg
-IF $msg THEN LET %exr_motif_= 0
-IF $msg THEN GOTO _no_exr_helix
-
-LET %exr_motif_end = %exr_motif + 5
-# LET %exr_motif -= 10
-
-HELIX ALPHA %exr_motif %exr_motif_end
-
-LET %3.29 = %3.50 - 21
-LET %4.60 = %4.50 + 10
-LET %5.39 = %5.50 - 11
-LET %6.51 = %6.50 +  1
-LET @pockettop  = %3.29
-LET @pockettop += %4.60
-LET @pockettop += %5.39
-LET @pockettop += %6.51
-LET @pockettop /= 4
-LET @pockettop.y += 15
-
-MOVE %exr_motif %exr_motif_end @pockettop
-
-# CONNECT %TMR5.s %exr_motif_end
-
-# LET $path = "pdbs/" + $fam + "/" + $prot + ".helix.pdb"
-# SAVE $path
-
-LET %H = %exr_motif
-LET %C = %exr_motif + 3
-LET %D = %exr_motif + 4
-
-MCOORD Th8 Zn 2 %H %C %D
-LET %exrzn ++
-
-_no_exr_helix:
 
 
 # Copper binding sites for e.g. OR2T11
@@ -126,14 +72,6 @@ IF %sitetmr5 > = THEN MCOORD Cu 1 %5.42 %5.43 %5.46
 
 IF %exrzn == 0 AND %site1 == 0 AND %site2 == 0 AND %sitetmr5 == 0 DIE "No sites for metal coordination."
 
-DELETE 1 %TMR1.s
-
-IF %exr_motif < %TMR4.e GOTO _no_delete;
-LET %em1 = %exr_motif - 1
-LET %em6 = %exr_motif + 5
-DELETE %TMR4.e %em1
-DELETE %em6 %TMR5.s
-_no_delete:
 
 LET $path = "pdbs/" + $fam + "/" + $prot + ".metal.pdb"
 SAVE $path

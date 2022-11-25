@@ -487,6 +487,11 @@ bool Atom::move(Point* pt)
     	}
     }*/
 
+    if (Z > 16)
+    {
+        location.x += 0.000000000000000000000000000001;
+    }
+
     location = *pt;
     location.weight = at_wt;
     if (geov) delete[] geov;
@@ -514,9 +519,7 @@ bool Atom::move_rel(SCoord* v)
     		if (r > 1.55) throw 0x7e57196;
     	}
     }*/
-    location = location.add(v);
-    if (geov) delete[] geov;
-    geov = NULL;
+    move(location.add(v));
     return true;
 }
 
@@ -554,7 +557,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     if (break_on_move) throw 0xb16fa7012a96eca7;
     #endif
 
-    location = a0loc;
+    move(a0loc);
     atomct++;
     //cout << "Motion includes " << name << endl;
 
@@ -568,7 +571,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
         Point aloc = atoms[i]->location;
         aloc = aloc.add(&mov);
         aloc = rotate3D(&aloc, pt, &rot);
-        atoms[i]->location = aloc;
+        atoms[i]->move(aloc);
         if (atoms[i]->geov) delete[] atoms[i]->geov;
         atoms[i]->geov = NULL;
         atomct++;

@@ -305,8 +305,11 @@ $actual = best_empirical_pair($protid, $ligname);
 if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
 else $actual = "(unknown)";
 
-$average["Prediction"] = $prediction;
+$average["Active node"] = $activenode;
 $average["Actual"] = $actual;
+
+$average = evaluate_result($average);
+$prediction = @$array['Prediction'];
 
 echo "Predicted ligand activity: $prediction\n";
 echo "Empirical ligand activity: $actual\n";

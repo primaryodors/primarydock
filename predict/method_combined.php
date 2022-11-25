@@ -16,13 +16,15 @@ require("dock_eval.php");
 
 // Configurable variables
 $dock_retries = 5;
-$max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to half the number of physical cores.
-
+$max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
+$dock_metals = true;
 
 // Load data
 $dock_results = [];
 $json_file = "predict/dock_results.json";
 
+chdir(__DIR__);
+chdir("..");
 if (file_exists($json_file))
 {
 	$dock_results = json_decode(file_get_contents($json_file), true);
@@ -44,6 +46,31 @@ if (@$_REQUEST['next'])
 	$protid = @$_REQUEST['prot'] ?: false;
 	$ligname = @$_REQUEST['lig'] ?: false;
 	
+	foreach (array_keys($prots) as $rcpid)
+	{
+		if ($protid && $protid != $rcpid) continue;
+		$odorids = array_keys(all_empirical_pairs_for_receptor($rcpid));
+
+		foreach ($odorids as $oid)
+		{
+			$full_name = $odors[$oid]['full_name'];
+			$fnnospace = str_replace(" ", "_", $full_name);
+			if (!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
+			{
+				if ($skip)
+				{
+					$skip--;
+					continue;
+				}
+				
+				$protid = $rcpid;
+				$ligname = $full_name;
+				
+				goto found_next_pair;
+			}
+		}
+	}
+	/*
 	foreach ($odors as $o)
 	{
 		$full_name = str_replace(" ", "_", $o['full_name']);
@@ -71,6 +98,7 @@ if (@$_REQUEST['next'])
 			}
 		}
 	}
+	*/
 	die("All done!");
 	
 	found_next_pair:
@@ -81,6 +109,7 @@ else
 	$protid = @$_REQUEST['prot'] ?: "TAAR5";
 	$ligname = @$_REQUEST['lig'] ?: "trimethylamine";
 }
+
 
 ensure_sdf_exists($ligname);
 
@@ -156,22 +185,30 @@ heredoc;
 	break;
 	
 	default:
-	die("OR predictions will not work until the EXR2 HxxCE motif has been helixed and metal bound.\n");
-	
+	$acvbrots = "";
+
 	$captmtl1 = resno_from_bw($protid, "45.47");
 	$captmtl2 = resno_from_bw($protid, "45.50");
 	$captmtl3 = resno_from_bw($protid, "45.51");
+	$captbal1 = resno_from_bw($protid, "3.25");
+	$captbal2 = resno_from_bw($protid, "7.35");
+
+	extract(binding_site($protid));
 	
 	$nodeno = 0;
 	$paths = [];	
-	$cenres = "CEN RES $captmtl1 $captmtl2 $captmtl3";
+	$cenres = "CEN RES $captmtl1 $captmtl2 $captmtl3 $captbal1 $captbal2";
 
+	$nodeno++; $paths[] = "PATH $nodeno REL 0 -7 0";
+	$nodeno++; $paths[] = "PATH $nodeno RES $bsr2a $bsr3a $bsr3b $bsr3c $bsr3d $bsr3e $bsr3f $bsr3g $bsr4a $bsr4b $bsr4c $bsr5a $bsr5b $bsr5c $bsr5d $bsr6a $bsr6b $bsr7a $bsr7b $bsr7c";
+	$nodeno++; $paths[] = "PATH $nodeno RES $bsr3a $bsr3b $bsr3c $bsr3d $bsr3e $bsr3f $bsr3g $bsr5a $bsr5b $bsr5c $bsr5d";
 	$pocketnode = $nodeno;
+	$activenode = $pocketnode + 1;
+	$paths[] = "PATH $activenode REL 0 0 0";
+
+	// TODO: Go deeper into the protein for e.g. OR2T11.
 }
 
-$activenode = $pocketnode + 1;
-
-$paths[] = "PATH $activenode REL 0 0 0";
 $paths = implode("\n", $paths);
 
 $tmr2start = $prots[$protid]['region']['TMR2']['start'];
@@ -214,11 +251,16 @@ if (!file_exists("output/$fam")) mkdir("output/$fam");
 if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
 if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n");
 
+$ligname = str_replace(" ", "_", $ligname);
+$suffix = ($dock_metals) ? "metal" : "upright";
+$pdbfname = "pdbs/$fam/$protid.$suffix.pdb";
+if ($dock_metals && !file_exists($pdbfname)) $pdbfname = "pdbs/$fam/$protid.upright.pdb";
+if (!file_exists($pdbfname)) die("Missing PDB.\n");
 $outfname = "output/$fam/$protid/$protid-$ligname.pred.dock";
 
 $configf = <<<heredoc
 
-PROT pdbs/$fam/$protid.upright.pdb
+PROT $pdbfname
 
 LIG sdf/$ligname.sdf
 
@@ -236,6 +278,8 @@ SIZE 7.0 7.5 7.0
 POSE 10
 ITER 50
 
+EXCL $tmr4end $tmr5start
+
 # DIFF
 ELIM 50
 
@@ -247,7 +291,9 @@ ECHO
 heredoc;
 
 if (!file_exists("tmp")) mkdir("tmp");
-$f = fopen("tmp/prediction.config", "wb");
+$lignospace = str_replace(" ", "", $ligname);
+$cnfname = "tmp/prediction.$protid.$lignospace.config";
+$f = fopen($cnfname, "wb");
 if (!$f) die("File write error. Check tmp folder is write enabled.\n");
 
 fwrite($f, $configf);
@@ -264,7 +310,7 @@ else
 	{
 		set_time_limit(300);
 		$outlines = [];
-		passthru("bin/primarydock tmp/prediction.config");
+		passthru("bin/primarydock \"$cnfname\"");
 		$outlines = explode("\n", file_get_contents($outfname));
 		if (count($outlines) >= 100) break;
 	}
@@ -329,14 +375,15 @@ foreach ($sum as $node => $value)
 	// $average["Proximity $node"] = round($sump[$node] / (@$count[$node] ?: 1), 3);
 }
 
-$prediction = evaluate_result($average);
-
 $actual = best_empirical_pair($protid, $ligname);
 if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
 else $actual = "(unknown)";
 
-$average["Prediction"] = $prediction;
+$average["Active node"] = $activenode;
 $average["Actual"] = $actual;
+
+$average = evaluate_result($average);
+$prediction = @$array['Prediction'];
 
 echo "Predicted ligand activity: $prediction\n";
 echo "Empirical ligand activity: $actual\n";

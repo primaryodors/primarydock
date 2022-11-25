@@ -2190,7 +2190,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
     float improvement;
     for (iter=0; iter<iters; iter++)
     {
-        float bind = 0, bind1;
+        float bind = 0, bind1, maxb, fmaxb = 0;
         improvement=0;
         last_iter = (iter == (iters-1));
         for (i=0; mm[i]; i++)
@@ -2198,6 +2198,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
             bool nearby[alllen+4];
             Point icen = mm[i]->get_barycenter();
 
+            maxb = 0;
             for (j=0; all[j]; j++)
             {
                 /* if (j == i)
@@ -2223,10 +2224,13 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 if (nearby[j])
                 {
                     // get_intermol_binding includes clashes, so we don't have to check them here.
-                    bind += mm[i]->get_intermol_binding(all[j]);
+                    float lbind = mm[i]->get_intermol_binding(all[j]);
+                    bind += lbind;
+                    if (lbind > maxb) maxb = lbind;
                 }
             }
             mm[i]->lastbind = bind;
+            fmaxb = maxb;
 
             float reversal = -0.666; // TODO: Make this binding-energy dependent.
             float accel = 1.1;
@@ -2242,12 +2246,15 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 Point pt(mm[i]->lmx, 0, 0);
                 mm[i]->move(pt);
                 bind1 = 0;
+                maxb = 0;
                 for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    bind1 += mm[i]->get_intermol_binding(all[j]);
+                    float lbind = mm[i]->get_intermol_binding(all[j]);
+                    bind1 += lbind;
+                    if (lbind > maxb) maxb = lbind;
                 }
-                if (bind1 < bind)
+                if (bind1 < bind || maxb < _slt1 * fmaxb)
                 {
                     // cout << bind << " vs " << bind1 << " x" << endl;
                     pt.x = -pt.x;
@@ -2260,18 +2267,22 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     improvement += (bind1 - bind);
                     if (fabs(mm[i]->lmx) < 0.5) mm[i]->lmx *= accel;
                     bind = bind1;
+                    fmaxb = maxb;
                 }
 
                 pt.x = 0;
                 pt.y = mm[i]->lmy;
                 mm[i]->move(pt);
                 bind1 = 0;
+                maxb = 0;
                 for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    bind1 += mm[i]->get_intermol_binding(all[j]);
+                    float lbind = mm[i]->get_intermol_binding(all[j]);
+                    bind1 += lbind;
+                    if (lbind > maxb) maxb = lbind;
                 }
-                if (bind1 < bind)
+                if (bind1 < bind || maxb < _slt1 * fmaxb)
                 {
                     pt.y = -pt.y;
                     mm[i]->move(pt);
@@ -2282,18 +2293,22 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     improvement += (bind1 - bind);
                     if (fabs(mm[i]->lmy) < 0.5) mm[i]->lmy *= accel;
                     bind = bind1;
+                    fmaxb = maxb;
                 }
 
                 pt.y = 0;
                 pt.z = mm[i]->lmz;
                 mm[i]->move(pt);
                 bind1 = 0;
+                maxb = 0;
                 for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    bind1 += mm[i]->get_intermol_binding(all[j]);
+                    float lbind = mm[i]->get_intermol_binding(all[j]);
+                    bind1 += lbind;
+                    if (lbind > maxb) maxb = lbind;
                 }
-                if (bind1 < bind)
+                if (bind1 < bind || maxb < _slt1 * fmaxb)
                 {
                     pt.z = -pt.z;
                     mm[i]->move(pt);
@@ -2304,6 +2319,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     improvement += (bind1 - bind);
                     if (fabs(mm[i]->lmz) < 0.5) mm[i]->lmz *= accel;
                     bind = bind1;
+                    fmaxb = maxb;
                 }
 
                 Point lmpt(mm[i]->lmx, mm[i]->lmy, mm[i]->lmz);
@@ -2355,18 +2371,22 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
+                        maxb = 0;
                         for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            float lbind = mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            bind1 += lbind;
+                            if (lbind > maxb) maxb = lbind;
                         }
 
                         // cout << "x " << rad*fiftyseven << "deg " << bind1 << endl;
 
-                        if (bind1 > bestfrb)
+                        if (bind1 > bestfrb && maxb >= _slt1 * fmaxb)
                         {
                             bestfrb = bind1;
                             bestfrrad = rad;
+                            fmaxb = maxb;
                         }
                     }
 
@@ -2384,12 +2404,15 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     mm[i]->rotate(&v, mm[i]->amx);
                     #endif
                     bind1 = 0;
+                    maxb = 0;
                     for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        bind1 += mm[i]->get_intermol_binding(all[j]);
+                        float lbind = mm[i]->get_intermol_binding(all[j]);
+                        bind1 += lbind;
+                        if (lbind > maxb) maxb = lbind;
                     }
-                    if (bind1 < bind)
+                    if (bind1 < bind || maxb < _slt1 * fmaxb)
                     {
                         #if monte_carlo_axial
                         putitback.restore_state(mm[i]);
@@ -2403,6 +2426,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     {
                         improvement += (bind1 - bind);
                         bind = bind1;
+                        fmaxb = maxb;
                         if (fabs(mm[i]->amx) < 0.25) mm[i]->amx *= accel;
                     }
                 }
@@ -2423,18 +2447,22 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
+                        maxb = 0;
                         for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            float lbind = mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            bind1 += lbind;
+                            if (lbind > maxb) maxb = lbind;
                         }
 
                         // cout << "y " << rad*fiftyseven << "deg " << bind1 << endl;
 
-                        if (bind1 > bestfrb)
+                        if (bind1 > bestfrb && maxb >= _slt1 * fmaxb)
                         {
                             bestfrb = bind1;
                             bestfrrad = rad;
+                            fmaxb = maxb;
                         }
                     }
 
@@ -2453,12 +2481,15 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     #endif
 
                     bind1 = 0;
+                    maxb = 0;
                     for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        bind1 += mm[i]->get_intermol_binding(all[j]);
+                        float lbind = mm[i]->get_intermol_binding(all[j]);
+                        bind1 += lbind;
+                        if (lbind > maxb) maxb = lbind;
                     }
-                    if (bind1 < bind)
+                    if (bind1 < bind || maxb < _slt1 * fmaxb)
                     {
                         #if monte_carlo_axial
                         putitback.restore_state(mm[i]);
@@ -2472,6 +2503,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     {
                         improvement += (bind1 - bind);
                         bind = bind1;
+                        fmaxb = maxb;
                         if (fabs(mm[i]->amy) < 0.25) mm[i]->amy *= accel;
                     }
                 }
@@ -2493,17 +2525,21 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
+                        maxb = 0;
                         for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            bind1 += mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            float lbind = mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            bind1 += lbind;
+                            if (lbind > maxb) maxb = lbind;
                         }
 
                         // cout << "z " << rad*fiftyseven << "deg " << bind1 << endl;
 
-                        if (bind1 > bestfrb)
+                        if (bind1 > bestfrb && maxb >= _slt1 * fmaxb)
                         {
                             bestfrb = bind1;
+                            fmaxb = maxb;
                             bestfrrad = rad;
                         }
                     }
@@ -2523,12 +2559,15 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     #endif
 
                     bind1 = 0;
+                    maxb = 0;
                     for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        bind1 += mm[i]->get_intermol_binding(all[j]);
+                        float lbind = mm[i]->get_intermol_binding(all[j]);
+                        bind1 += lbind;
+                        if (lbind > maxb) maxb = lbind;
                     }
-                    if (bind1 < bind)
+                    if (bind1 < bind || maxb < _slt1 * fmaxb)
                     {
                         #if monte_carlo_axial
                         putitback.restore_state(mm[i]);
@@ -2543,6 +2582,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     {
                         improvement += (bind1 - bind);
                         bind = bind1;
+                        fmaxb = maxb;
                         if (fabs(mm[i]->amz) < 0.25) mm[i]->amz *= accel;
                     }
                 }
@@ -2653,6 +2693,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                                 rad += _fullrot_steprad;
 
                                 bind1 = 0;
+                                maxb = 0;
                                 #if DBG_BONDFLEX
                                 if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
                                     cout << endl << (rad*fiftyseven) << ": ";
@@ -2674,16 +2715,18 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                                         ;
 
                                     bind1 += lbind1;
+                                    if (lbind1 > maxb) maxb = lbind1;
                                     #if DBG_BONDFLEX
                                     if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
                                         cout << all[j]->name << " " << lbind1 << " ";
                                     #endif
                                 }
 
-                                if (bind1 > bestfrb)
+                                if (bind1 > bestfrb && maxb >= _slt1 * fmaxb)
                                 {
                                     bestfrb = bind1;
                                     bestfrrad = rad;
+                                    fmaxb = maxb;
                                 }
                                 //if (!mm[i]->atoms[0]->residue) cout << (0.001*round(bind1 * 1000)) << " ";        // Delete this for production.
                             }
@@ -2708,12 +2751,15 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                             mm[i]->rotatable_bonds[k]->rotate(ra);
 
                             bind1 = 0;
+                            maxb = 0;
                             for (j=0; all[j]; j++)
                             {
                                 if (!nearby[j]) continue;
-                                bind1 += mm[i]->get_intermol_binding(all[j]);
+                                float lbind = mm[i]->get_intermol_binding(all[j]);
+                                bind1 += lbind;
+                                if (lbind > maxb) maxb = lbind;
                             }
-                            if (bind1 < bind)
+                            if (bind1 < bind || maxb < _slt1 * fmaxb)
                             {
                                 #if monte_carlo_flex
                                 putitback.restore_state(mm[i]);
@@ -2727,6 +2773,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                             {
                                 improvement += (bind1 - bind);
                                 bind = bind1;
+                                fmaxb = maxb;
                                 #if monte_carlo_flex
                                 putitback.copy_state(mm[i]);
                                 #endif

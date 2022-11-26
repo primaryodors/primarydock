@@ -1630,6 +1630,12 @@ int main(int argc, char** argv)
 				p.renumber_residues(sr, er, nsr);
             }	// RENUMBER
 
+            else if (!strcmp(fields[0], "ROTBOND"))
+            {
+				l = 1;
+                raise_error((std::string)"Unimplemented command " + (std::string)fields[0] + (std::string)".");
+            }
+
             else if (!strcmp(fields[0], "SAVE"))
             {
                 if (!fields[1]) raise_error("Insufficient parameters given for SAVE.");

@@ -21,6 +21,7 @@ struct AABondDef
     float cardinality=0;
     float acharge=0;
     bool can_rotate=false;
+    bool can_flip=false;
 };
 
 struct AADef

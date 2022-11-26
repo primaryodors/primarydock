@@ -1392,6 +1392,16 @@ Bond** Molecule::get_rotatable_bonds()
                                         lb[j]->btom->get_family() == CHALCOGEN
                                     )
                                 )
+                                ||
+                                (   
+                                    !lb[j]->atom->is_bonded_to_pi(TETREL, false)
+                                    &&
+                                    (
+                                        lb[j]->atom->get_family() == PNICTOGEN
+                                        ||
+                                        lb[j]->atom->get_family() == CHALCOGEN
+                                    )
+                                )
                             )
                         )
                    )

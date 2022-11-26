@@ -535,6 +535,12 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                     strcpy(aabd[n]->bname, bb[j]->btom->name);
                     aabd[n]->cardinality = bb[j]->cardinality;
                     aabd[n]->acharge = bb[j]->atom->get_charge();
+
+                    if (!strcmp(bb[j]->atom->name, "OH") && !strcmp(bb[j]->btom->name, "CZ"))
+                    {
+                        aabd[n]->can_rotate = false;
+                    }
+                    
                     aabd[n]->can_rotate =
                         (	aabd[n]->cardinality <= 1.1
                             &&
@@ -548,6 +554,16 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                                 )
                                 ||
                                 bb[j]->btom->is_bonded_to_pi(TETREL, false)
+                            )
+                            &&
+                            (	!bb[j]->btom->is_pi()
+                                ||
+                                (   bb[j]->atom->get_family() != PNICTOGEN
+                                    &&
+                                    bb[j]->atom->get_family() != CHALCOGEN
+                                )
+                                ||
+                                bb[j]->atom->is_bonded_to_pi(TETREL, false)
                             )
                             &&
                             (	bb[j]->atom->get_family() != PNICTOGEN || !bb[j]->btom->is_pi()	)

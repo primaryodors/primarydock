@@ -1378,9 +1378,22 @@ Bond** Molecule::get_rotatable_bonds()
                 if (lb[j]->count_moves_with_btom() > mwblimit) continue;
 
                 // Generally, a single bond between pi atoms cannot rotate.
-                if (lb[j]->atom && lb[j]->atom->is_pi()
-                        &&
-                        lb[j]->btom && lb[j]->btom->is_pi()
+                // Same if pi atom bonded to a pnictogen or chalcogen without a single bond to other atoms.
+                if (lb[j]->atom && lb[j]->btom
+                    &&  (   lb[j]->atom->is_pi() &&
+                            (   lb[j]->btom->is_pi()
+                                ||
+                                (   
+                                    !lb[j]->btom->is_bonded_to_pi(TETREL, false)
+                                    &&
+                                    (
+                                        lb[j]->btom->get_family() == PNICTOGEN
+                                        ||
+                                        lb[j]->btom->get_family() == CHALCOGEN
+                                    )
+                                )
+                            )
+                        )
                    )
                     lb[j]->can_rotate = false;
 

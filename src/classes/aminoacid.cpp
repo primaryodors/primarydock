@@ -540,7 +540,15 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                             &&
                             (	!bb[j]->atom->is_pi() || !bb[j]->btom->is_pi()	)
                             &&
-                            (	!bb[j]->atom->is_pi() ||  bb[j]->btom->get_family() != PNICTOGEN	)
+                            (	!bb[j]->atom->is_pi()
+                                ||
+                                (   bb[j]->btom->get_family() != PNICTOGEN
+                                    &&
+                                    bb[j]->btom->get_family() != CHALCOGEN
+                                )
+                                ||
+                                bb[j]->btom->is_bonded_to_pi(TETREL, false)
+                            )
                             &&
                             (	bb[j]->atom->get_family() != PNICTOGEN || !bb[j]->btom->is_pi()	)
                         );

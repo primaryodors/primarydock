@@ -25,6 +25,7 @@ struct DockResult
     float bytype[_INTER_TYPES_LIMIT];
     float ibytype[_INTER_TYPES_LIMIT];
     float proximity;                    // How far the ligand center is from the node's center.
+    float tripswitch;                   // Effect of the ligand on the receptor's trip switch.
 };
 
 struct AcvHxRot
@@ -112,6 +113,7 @@ Point active_matrix_n[16], active_matrix_c[16], active_matrix_m[16];
 int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0;
 std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
+std::vector<int> tripswitch_clashables;
 
 void iteration_callback(int iter)
 {
@@ -520,6 +522,12 @@ int interpret_config_line(char** fields)
     else if (!strcmp(fields[0], "STATE"))
     {
         states.push_back(origbuff);
+        return 0;
+    }
+    else if (!strcmp(fields[0], "TRIP"))
+    {
+        for (i = 1; fields[i]; i++)
+            tripswitch_clashables.push_back(atoi(fields[i]));
         return 0;
     }
 
@@ -2054,29 +2062,22 @@ _try_again:
 
             ligand->reset_conformer_momenta();
 
-            // time_t preiter = time(NULL);
-            if (differential_dock)
-            {
-                Molecule** delete_me;
-                Molecule::multimol_conform(
-                    cfmols,
-                    delete_me = protein->all_residues_as_molecules(),
-                    iters,
-                    &iteration_callback
-                );
-                delete[] delete_me;
-            }
-            else
-            {
-                Molecule** delete_me;
-                Molecule::multimol_conform(
-                    cfmols,
-                    delete_me = protein->all_residues_as_molecules(),
-                    iters,
-                    &iteration_callback
-                );
-                delete[] delete_me;
-            }
+            Molecule** delete_me;
+            int trsz = tripswitch_clashables.size();
+            Molecule* trip[trsz+4];
+
+            for (j=0; j<trsz; j++)
+                trip[j] = (Molecule*)protein->get_residue(tripswitch_clashables[j]);
+
+            Molecule::multimol_conform(
+                cfmols,
+                delete_me = protein->all_residues_as_molecules(),
+                trip,
+                iters,
+                &iteration_callback
+            );
+            delete[] delete_me;
+
             /*time_t jlgsux = time(NULL);
             cout << "\nIterations took: " << (jlgsux-preiter) << " seconds." << endl;*/
 
@@ -2149,6 +2150,10 @@ _try_again:
                 postaa[i+1] = reinterpret_cast<Molecule*>(allres[i]);
             }
 
+
+            float tripclash = 0;
+
+
             if (differential_dock)
             {
                 for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
@@ -2160,10 +2165,34 @@ _try_again:
                     std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
                     #endif
 
+                    bool is_trip_i = false;
+                    for (n=0; n<tripswitch_clashables.size(); n++)
+                        if (tripswitch_clashables[n] == resno)
+                        {
+                            is_trip_i = true;
+                            break;
+                        }
+
                     for (j=0; j<qpr+1; j++)
                     {
                         if (j == i) continue;
+                        int jres = j ? allres[j-1]->get_residue_no() : 0;
+
+                        bool is_trip_j = false;
+                        if (is_trip_i && j)
+                            for (n=0; n<tripswitch_clashables.size(); n++)
+                                if (tripswitch_clashables[n] == jres)
+                                {
+                                    is_trip_j = true;
+                                    break;
+                                }
+
                         float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
+                        if (f < 0 && is_trip_j)
+                        {
+                            tripclash -= f;
+                            f = 0;
+                        }
                         final_binding[resno] += f;
 
                         #if _DBG_TOOLARGE_DIFFNUMS
@@ -2176,6 +2205,44 @@ _try_again:
                     #if _DBG_TOOLARGE_DIFFNUMS
                     if (fabs(final_binding[resno]) >= 200) cout << ibdbg << endl;
                     #endif
+                }
+            }
+            else
+            {                
+                for (i=0; i<qpr; i++)
+                {
+                    int resno = allres[i]->get_residue_no();
+
+                    bool is_trip_i = false;
+                    for (n=0; n<tripswitch_clashables.size(); n++)
+                        if (tripswitch_clashables[n] == resno)
+                        {
+                            is_trip_i = true;
+                            break;
+                        }
+
+                    for (j=0; j<qpr; j++)
+                    {
+                        if (j == i) continue;
+                        int jres = allres[j]->get_residue_no();
+
+                        bool is_trip_j = false;
+                        if (is_trip_i)
+                            for (n=0; n<tripswitch_clashables.size(); n++)
+                                if (tripswitch_clashables[n] == jres)
+                                {
+                                    is_trip_j = true;
+                                    break;
+                                }
+                        if (!is_trip_j) continue;
+
+                        float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
+                        if (f < 0)
+                        {
+                            tripclash -= f;
+                            f = 0;
+                        }
+                    }
                 }
             }
 
@@ -2257,7 +2324,8 @@ _try_again:
             dr[drcount][nodeno].imkJmol   = new float[metcount];
             dr[drcount][nodeno].mvdWrepl   = new float[metcount];
             dr[drcount][nodeno].imvdWrepl   = new float[metcount];
-            dr[drcount][nodeno].proximity    = ligand->get_barycenter().get_3d_distance(nodecen);
+            dr[drcount][nodeno].tripswitch   = tripclash;
+            dr[drcount][nodeno].proximity     = ligand->get_barycenter().get_3d_distance(nodecen);
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
@@ -2532,6 +2600,9 @@ _try_again:
 
                         if (output) *output << "Proximity: " << dr[j][k].proximity << endl << endl;
                         cout << "Proximity: " << dr[j][k].proximity << endl << endl;
+
+                        if (output) *output << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
+                        cout << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
 
                         if (differential_dock)
                         {

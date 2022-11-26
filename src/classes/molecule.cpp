@@ -2146,14 +2146,19 @@ void Molecule::minimize_internal_clashes()
 
 void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
 {
-    multimol_conform(mm, nullptr, iters, cb);
+    multimol_conform(mm, nullptr, nullptr, iters, cb);
 }
 
 void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int))
 {
+    multimol_conform(mm, bkg, nullptr, iters, cb);
+}
+
+void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, int iters, void (*cb)(int))
+{
     if (!mm) return;
 
-    int i, j, k, l, n, inplen, bklen, alllen, iter;
+    int i, j, k, l, n, inplen, bklen, alllen, aclen, iter;
     float rad, bestfrrad, bestfrb;
 
     for (i=0; mm[i]; i++)
@@ -2167,6 +2172,13 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
     {
         for (i=0; bkg[i]; i++);		// Get count.
         bklen = i;
+    }
+
+    if (!ac) aclen = 0;
+    else
+    {
+        for (i=0; ac[i]; i++);		// Get count.
+        aclen = i;
     }
 
     alllen = inplen + bklen;
@@ -2198,6 +2210,14 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
             bool nearby[alllen+4];
             Point icen = mm[i]->get_barycenter();
 
+            bool is_ac_i = false;
+            for (l=0; l<aclen; l++)
+                if (ac[l] == all[i])
+                {
+                    is_ac_i = true;
+                    break;
+                }
+
             maxb = 0;
             for (j=0; all[j]; j++)
             {
@@ -2206,6 +2226,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     nearby[j] = false;
                     continue;
                 } */
+
+                bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
 
                 Point jcen = all[j]->get_barycenter();
                 Atom* ia = mm[i]->get_nearest_atom(jcen);
@@ -2223,8 +2245,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
 
                 if (nearby[j])
                 {
-                    // get_intermol_binding includes clashes, so we don't have to check them here.
-                    float lbind = mm[i]->get_intermol_binding(all[j]);
+                    // get_intermol_binding includes clashes by default, so we don't have to calculate them separately.
+                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind += lbind;
                     if (lbind > maxb) maxb = lbind;
                 }
@@ -2250,7 +2272,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    float lbind = mm[i]->get_intermol_binding(all[j]);
+                    bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind1 += lbind;
                     if (lbind > maxb) maxb = lbind;
                 }
@@ -2278,7 +2301,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    float lbind = mm[i]->get_intermol_binding(all[j]);
+                    bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind1 += lbind;
                     if (lbind > maxb) maxb = lbind;
                 }
@@ -2304,7 +2328,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                 for (j=0; all[j]; j++)
                 {
                     if (!nearby[j]) continue;
-                    float lbind = mm[i]->get_intermol_binding(all[j]);
+                    bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind1 += lbind;
                     if (lbind > maxb) maxb = lbind;
                 }
@@ -2375,7 +2400,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                         for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            float lbind = mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                            float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
                             if (lbind > maxb) maxb = lbind;
                         }
@@ -2408,7 +2434,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        float lbind = mm[i]->get_intermol_binding(all[j]);
+                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
                         if (lbind > maxb) maxb = lbind;
                     }
@@ -2451,7 +2478,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                         for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            float lbind = mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                            float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
                             if (lbind > maxb) maxb = lbind;
                         }
@@ -2485,7 +2513,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        float lbind = mm[i]->get_intermol_binding(all[j]);
+                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
                         if (lbind > maxb) maxb = lbind;
                     }
@@ -2529,7 +2558,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                         for (j=0; all[j]; j++)
                         {
                             if (!nearby[j]) continue;
-                            float lbind = mm[i]->get_intermol_binding(all[j]) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                            float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
                             if (lbind > maxb) maxb = lbind;
                         }
@@ -2563,7 +2593,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     for (j=0; all[j]; j++)
                     {
                         if (!nearby[j]) continue;
-                        float lbind = mm[i]->get_intermol_binding(all[j]);
+                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
                         if (lbind > maxb) maxb = lbind;
                     }
@@ -2630,7 +2661,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                     {
                         if (!nearby[j]) continue;
                         // cout << ".";
-                        bind += mm[i]->get_intermol_binding(all[j]);
+                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                        bind += mm[i]->get_intermol_binding(all[j], !is_ac);
                     }
                 }
                 mm[i]->lastbind = bind;
@@ -2701,13 +2733,14 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                                 for (j=0; all[j]; j++)
                                 {
                                     if (!nearby[j]) continue;
+                                    bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                                     float lbind1 =
 
                                         #if allow_ligand_esp
                                         (mm[i]->mol_typ == MOLTYP_AMINOACID)
                                         ?
                                         #endif
-                                        mm[i]->get_intermol_binding(all[j])
+                                        mm[i]->get_intermol_binding(all[j], !is_ac)
                                         #if allow_ligand_esp
                                         :
                                         mm[i]->get_intermol_potential(all[j]) - 5 * mm[i]->get_internal_clashes()
@@ -2755,7 +2788,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
                             for (j=0; all[j]; j++)
                             {
                                 if (!nearby[j]) continue;
-                                float lbind = mm[i]->get_intermol_binding(all[j]);
+                                bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                                float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                                 bind1 += lbind;
                                 if (lbind > maxb) maxb = lbind;
                             }

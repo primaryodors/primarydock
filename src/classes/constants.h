@@ -208,6 +208,9 @@
 #define strongest_loss_tolerance 0.25
 #define _slt1 (1.0 - strongest_loss_tolerance)
 
+// Partial charge to add to a neutral pnictogen if a negatively charged atom is nearby.
+#define pnictogen_partial_protonation 0.25
+
 // Debugging stuff.
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0

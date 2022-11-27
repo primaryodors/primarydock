@@ -535,15 +535,40 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         Bond* lb = b->get_bond_by_idx(0);
         if (lb && lb->btom) bchg = lb->btom->get_charge();
     }
+    
+    // TODO: Increase this value if multiple negative charges are nearby; decrease if positive nearby.
+    // Also make the effect proportional to the inverse square of r.
+    if (!achg && bchg < 0 && (a->get_family() == PNICTOGEN || (a->get_Z() == 1 && a->is_bonded_to(PNICTOGEN) )))
+    {
+        achg = pnictogen_partial_protonation;
+        /* if (a->residue == 243) cout << "Partial protonation for " << a->residue << ":" << a->name
+            << " due to proximity of " << b->residue << ":" << b->name << endl; */
+    }
+    if (!bchg && achg < 0 && (b->get_family() == PNICTOGEN || (b->get_Z() == 1 && b->is_bonded_to(PNICTOGEN) )))
+    {
+        bchg = pnictogen_partial_protonation;
+        /* if (b->residue == 243) cout << "Partial protonation for " << b->residue << ":" << b->name
+            << " due to proximity of " << a->residue << ":" << a->name << endl; */
+    }
 
-    if (sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2); // / pow( (r<2) ? 1 : (r/2), 2 );
-    if (sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
+    if (sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r/2, 2); // / pow( (r<2) ? 1 : (r/2), 2 );
+    if (sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r/2, 2) * fabs(apol) * fabs(bpol);
 
     bool atoms_are_bonded = a->is_bonded_to(b);
 
     if (a->residue && b->residue && a->is_backbone && b->is_backbone)
         if (abs(a->residue - b->residue) == 1)
             atoms_are_bonded = true;
+
+    if (forces)
+        for (i=0; forces[i]; i++)
+        {
+            if (forces[i]->type == ionic) goto _has_ionic_already;
+        }
+
+    if (!atoms_are_bonded && sgn(achg) == -sgn(bchg)) kJmol += 60.0 * fabs(achg)*fabs(bchg) / pow(r/2, 2);
+
+    _has_ionic_already:
     
     if (!forces)
     {

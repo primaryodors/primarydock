@@ -535,14 +535,60 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                     strcpy(aabd[n]->bname, bb[j]->btom->name);
                     aabd[n]->cardinality = bb[j]->cardinality;
                     aabd[n]->acharge = bb[j]->atom->get_charge();
+
+                    if (!strcmp(bb[j]->atom->name, "OH") && !strcmp(bb[j]->btom->name, "CZ"))
+                    {
+                        aabd[n]->can_rotate = false;
+                    }
+                    
                     aabd[n]->can_rotate =
                         (	aabd[n]->cardinality <= 1.1
                             &&
                             (	!bb[j]->atom->is_pi() || !bb[j]->btom->is_pi()	)
                             &&
-                            (	!bb[j]->atom->is_pi() ||  bb[j]->btom->get_family() != PNICTOGEN	)
+                            (	!bb[j]->atom->is_pi()
+                                ||
+                                (   bb[j]->btom->get_family() != PNICTOGEN
+                                    &&
+                                    bb[j]->btom->get_family() != CHALCOGEN
+                                )
+                                ||
+                                bb[j]->btom->is_bonded_to_pi(TETREL, false)
+                            )
+                            &&
+                            (	!bb[j]->btom->is_pi()
+                                ||
+                                (   bb[j]->atom->get_family() != PNICTOGEN
+                                    &&
+                                    bb[j]->atom->get_family() != CHALCOGEN
+                                )
+                                ||
+                                bb[j]->atom->is_bonded_to_pi(TETREL, false)
+                            )
                             &&
                             (	bb[j]->atom->get_family() != PNICTOGEN || !bb[j]->btom->is_pi()	)
+                        );
+                    aabd[n]->can_flip =
+                        (	aabd[n]->cardinality <= 1.1
+                            &&
+                            (	!bb[j]->atom->is_pi() || !bb[j]->btom->is_pi()	)
+                            &&
+                            (	(
+                                    bb[j]->atom->is_pi()
+                                    &&
+                                    (   bb[j]->btom->get_family() == PNICTOGEN || bb[j]->btom->get_family() == CHALCOGEN    )
+                                    &&
+                                    !bb[j]->btom->is_bonded_to_pi(TETREL, false)
+                                )
+                                ||
+                                (
+                                    bb[j]->btom->is_pi()
+                                    &&
+                                    (   bb[j]->atom->get_family() == PNICTOGEN || bb[j]->atom->get_family() == CHALCOGEN    )
+                                    &&
+                                    !bb[j]->atom->is_bonded_to_pi(TETREL, false)
+                                )
+                            )
                         );
                     n++;
                 }
@@ -1100,8 +1146,10 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                     {
                                         Bond* b = a->get_bond_between(btom);
                                         if (b) b->can_rotate = false;
+                                        b->can_flip = aab->can_flip;
                                         b = btom->get_bond_between(a);
                                         if (b) b->can_rotate = false;
+                                        b->can_flip = aab->can_flip;
                                     }
                                 }
                             }

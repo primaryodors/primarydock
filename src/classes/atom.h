@@ -158,6 +158,7 @@ public:
     Atom* is_bonded_to(const char* element, const int cardinality);
     Atom* is_bonded_to(const int family);
     Atom* is_bonded_to(const int family, const int cardinality);
+    Atom* is_bonded_to_pi(const int family, const bool other_atoms_pi);
 
     int num_bonded_to(const char* element);
 

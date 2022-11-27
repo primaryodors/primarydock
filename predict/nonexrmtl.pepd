@@ -17,6 +17,12 @@ LOAD $path
 
 IF %3.50 <= 0 THEN DIE "Input PDB is missing Ballesteros-Weinstein numbers.\nPlease ensure the records are in the format:\nREMARK 800 SITE BW {n}.50 {resno}."
 
+LET %6.48 = %6.50 - 2
+LET %5.47 = %5.50 - 3
+BRIDGE %6.48 %5.47
+
+LET $path = "pdbs/" + $fam + "/" + $prot + ".upright1.pdb"
+SAVE $path
 
 
 # Copper binding sites for e.g. OR2T11

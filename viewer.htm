@@ -1,8 +1,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 <title>Viewer - PrimaryDock</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/ngl@0.10.4/dist/ngl.js"></script>
 
 <script>
 var nglcitation
@@ -84,6 +86,8 @@ if (!is_localhost) $.ajax(
 body
 {
 	color: #69c;
+	width: 100%;
+	height: 100%;
 	overflow: hidden;
 }
 
@@ -293,7 +297,6 @@ option.unknown
 }
 
 </style>
-<script src="https://unpkg.com/ngl@0.10.4/dist/ngl.js"></script>
 <script>
 
 // https://www.w3schools.com/jsref/met_element_exitfullscreen.asp
@@ -2247,4 +2250,3 @@ $('#citefloat span')[0].innerText = nglcitation;
 
 <div id="seqdd" style="display: none;">
 </div>
-	

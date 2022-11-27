@@ -2176,7 +2176,7 @@ void Molecule::minimize_internal_clashes()
 
 
 #define DBG_BONDFLEX 0
-#define DBG_FLEXRES 203
+#define DBG_FLEXRES 243
 #define DBG_FLEXROTB 0
 
 void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
@@ -2796,9 +2796,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                     bestfrrad = rad;
                                     fmaxb = maxb;
                                 }
-                                //if (!mm[i]->atoms[0]->residue) cout << (0.001*round(bind1 * 1000)) << " ";        // Delete this for production.
                             }
-                            // if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
 
                             #if DBG_BONDFLEX
                             if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)

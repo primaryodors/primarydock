@@ -632,8 +632,8 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         Molecule* ligand,
         const Point nodecen,
         const Point size,
-        const int* mcoord_resno
-                                          )
+        const int* addl_resno
+        )
 {
     int i, j, sphres = 0;
     int seql = get_seq_length();
@@ -649,11 +649,11 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 
         int resno = aa->get_residue_no();
 
-        if (mcoord_resno)
+        if (addl_resno)
         {
-            for (j=0; mcoord_resno[j]; j++)
+            for (j=0; addl_resno[j]; j++)
             {
-                if (mcoord_resno[j] == resno)
+                if (addl_resno[j] == resno)
                 {
                     if (!resno_already[resno])
                     {

@@ -79,6 +79,7 @@ bool configset=false, protset=false, ligset=false, pktset=false;
 Protein* protein;
 int seql = 0;
 int mcoord_resno[256];
+int addl_resno[256];
 Molecule* ligand;
 Molecule** waters = nullptr;
 Point ligcen_target;
@@ -205,7 +206,7 @@ void iteration_callback(int iter)
 
         AminoAcid* resphres[SPHREACH_MAX+4];
         for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
-        int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, mcoord_resno);
+        int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);
         //cout << "Sphres: " << sphres << endl;
         for (i=0; i<sphres; i++)
         {
@@ -1143,6 +1144,10 @@ int main(int argc, char** argv)
 
     protein->mcoord_resnos = mcoord_resno;
 
+    for (i=0; mcoord_resno[i]; i++) addl_resno[i] = mcoord_resno[i];
+    for (l=0; l < tripswitch_clashables.size(); l++) addl_resno[i+l] = tripswitch_clashables[l];
+    addl_resno[i+l] = 0;
+
     // Load the ligand or return an error.
     Molecule m(ligfname);
     ligand = &m;
@@ -1785,7 +1790,7 @@ _try_again:
             #endif
             #endif
 
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, mcoord_resno);
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, addl_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
 
             for (i=0; i<sphres; i++)
@@ -2253,7 +2258,7 @@ _try_again:
             for (i=0; i<=seql; i++) res_kJmol[i] = 0;
             #endif
 
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, mcoord_resno);
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, addl_resno);
             // cout << "sphres " << sphres << endl;
             float maxclash = 0;
             for (i=0; i<sphres; i++)

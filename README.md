@@ -17,7 +17,7 @@ PrimaryDock comes with Pepteditor, a tool for editing proteins using a scripting
 PrimaryDock also offers a web interface that allows you to run a local copy of the same data explorer pages that power
 the PrimaryOdors website.
 
-To Use PrimaryDock and Pepteditor, please first clone the repository, then execute the following commands:
+To use PrimaryDock and Pepteditor, please first clone the repository, then execute the following commands:
 
 ```
 make primarydock

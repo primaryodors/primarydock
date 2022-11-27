@@ -519,7 +519,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float rbind = avdW+bvdW;
 
     float dp = 2;			// Directional propensity. The anisotropic component from each single vertex
-    // is calculated as a cosine and then raised to this exponent.
+                            // is calculated as a cosine and then raised to this exponent.
     Point center;
 
     float achg = a->get_charge(), bchg = b->get_charge()
@@ -539,6 +539,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2); // / pow( (r<2) ? 1 : (r/2), 2 );
     if (sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
 
+    bool atoms_are_bonded = a->is_bonded_to(b);
+
+    if (a->residue && b->residue && a->is_backbone && b->is_backbone)
+        if (abs(a->residue - b->residue) == 1)
+            atoms_are_bonded = true;
+    
     if (!forces)
     {
         goto _canstill_clash;
@@ -878,7 +884,7 @@ _canstill_clash:
 
     r += allowable;*/
 
-    if (r < rbind)
+    if (r < rbind && !atoms_are_bonded)
     {
         float f = rbind/(avdW+bvdW);
         kJmol -= pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);

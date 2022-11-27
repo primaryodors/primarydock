@@ -2176,7 +2176,7 @@ void Molecule::minimize_internal_clashes()
 
 
 #define DBG_BONDFLEX 0
-#define DBG_FLEXRES 243
+#define DBG_FLEXRES 111
 #define DBG_FLEXROTB 0
 
 void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
@@ -2268,7 +2268,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 Atom* ia = mm[i]->get_nearest_atom(jcen);
                 Atom* ja = all[j]->get_nearest_atom(icen);
 
-                if (ia->distance_to(ja) <= 4)
+                if (ia->distance_to(ja) <= 7)
                 {
                     nearby[j] = true;
                 }
@@ -2683,10 +2683,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 mm[i]->get_rotatable_bonds();
                 int residue = 0;
 
-                #if DBG_BONDFLEX
                 if (mm[i]->rotatable_bonds && mm[i]->rotatable_bonds[0] && mm[i]->rotatable_bonds[0]->atom)
                     residue = mm[i]->rotatable_bonds[0]->atom->residue;
-                #endif
 
                 // Don't know why this is renecessary.
                 if (mm[i]->movability == MOV_FLEXONLY)
@@ -2750,10 +2748,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bestfrb = -10000;
                         bestfrrad = nanf("No good results.");
 
-                        if (allow_ligand_360_flex && !(iter % _fullrot_every))
+                        if ((residue || allow_ligand_360_flex) && !(iter % _fullrot_every))
                         {
-                            /*if (!mm[i]->atoms[0]->residue) cout << mm[i]->rotatable_bonds[k]->atom->name << "-"
-                                << mm[i]->rotatable_bonds[k]->btom->name << ": ";*/        // Delete this for production.
                             while ((M_PI*2-rad) > 1e-3)
                             {
                                 mm[i]->rotatable_bonds[k]->rotate(_fullrot_steprad);
@@ -2786,7 +2782,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                     if (lbind1 > maxb) maxb = lbind1;
                                     #if DBG_BONDFLEX
                                     if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
-                                        cout << all[j]->name << " " << lbind1 << " ";
+                                        cout << "\n\t" << all[j]->name << " " << lbind1 << " ";
                                     #endif
                                 }
 
@@ -2841,6 +2837,12 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 improvement += (bind1 - bind);
                                 bind = bind1;
                                 fmaxb = maxb;
+
+                                #if DBG_BONDFLEX
+                                if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
+                                    cout << "" << (ra*fiftyseven) << "deg improves by " << (bind1 - bind) << "." << endl;
+                                #endif
+
                                 #if monte_carlo_flex
                                 putitback.copy_state(mm[i]);
                                 #endif

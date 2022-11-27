@@ -1638,8 +1638,6 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
         if (n>0 && resnos[n] == resnos[n-1]) continue;
         else pt4avg[l++] = respt;
-
-        cout << resnos[n] << " ";
     }
     Point ptmtl = average_of_points(pt4avg, l);
     metal->move(ptmtl);

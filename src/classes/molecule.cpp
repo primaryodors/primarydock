@@ -2235,11 +2235,13 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
     alllen = n;
 
     float improvement;
+    float search_expansion = 3.0/iters;
     for (iter=0; iter<iters; iter++)
     {
         float bind = 0, bind1, maxb, fmaxb = 0;
         improvement=0;
         last_iter = (iter == (iters-1));
+        float search_radius = search_expansion*iter + 4;
         for (i=0; mm[i]; i++)
         {
             bool nearby[alllen+4];
@@ -2268,7 +2270,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 Atom* ia = mm[i]->get_nearest_atom(jcen);
                 Atom* ja = all[j]->get_nearest_atom(icen);
 
-                if (ia->distance_to(ja) <= 7)
+                if (ia->distance_to(ja) <= search_radius)
                 {
                     nearby[j] = true;
                 }

@@ -210,6 +210,7 @@
 
 // Partial charge to add to a neutral pnictogen if a negatively charged atom is nearby.
 #define pnictogen_partial_protonation 0.25
+#define _ALLOW_PROTONATE_PNICTOGENS 1
 
 // Debugging stuff.
 #define _DBG_LONELINESS 0

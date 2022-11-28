@@ -536,23 +536,24 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (lb && lb->btom) bchg = lb->btom->get_charge();
     }
     
+    #if _ALLOW_PROTONATE_PNICTOGENS
     // TODO: Increase this value if multiple negative charges are nearby; decrease if positive nearby.
-    // Also make the effect proportional to the inverse square of r.
     if (!achg && bchg < 0 && (a->get_family() == PNICTOGEN || (a->get_Z() == 1 && a->is_bonded_to(PNICTOGEN) )))
     {
-        achg = pnictogen_partial_protonation;
+        achg = pnictogen_partial_protonation * fabs(bchg) / pow(fabs(r-1.5)+1, 2);
         /* if (a->residue == 243) cout << "Partial protonation for " << a->residue << ":" << a->name
             << " due to proximity of " << b->residue << ":" << b->name << endl; */
     }
     if (!bchg && achg < 0 && (b->get_family() == PNICTOGEN || (b->get_Z() == 1 && b->is_bonded_to(PNICTOGEN) )))
     {
-        bchg = pnictogen_partial_protonation;
+        bchg = pnictogen_partial_protonation * fabs(achg) / pow(fabs(r-1.5)+1, 2);
         /* if (b->residue == 243) cout << "Partial protonation for " << b->residue << ":" << b->name
             << " due to proximity of " << a->residue << ":" << a->name << endl; */
     }
+    #endif
 
-    if (sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r/2, 2); // / pow( (r<2) ? 1 : (r/2), 2 );
-    if (sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r/2, 2) * fabs(apol) * fabs(bpol);
+    if (achg && sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2); // / pow( (r<2) ? 1 : (r/2), 2 );
+    if (apol && sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
 
     bool atoms_are_bonded = a->is_bonded_to(b);
 
@@ -560,6 +561,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (abs(a->residue - b->residue) == 1)
             atoms_are_bonded = true;
 
+    #if _ALLOW_PROTONATE_PNICTOGENS
     if (forces)
         for (i=0; forces[i]; i++)
         {
@@ -567,6 +569,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         }
 
     if (!atoms_are_bonded && sgn(achg) == -sgn(bchg)) kJmol += 60.0 * fabs(achg)*fabs(bchg) / pow(r/2, 2);
+    #endif
 
     _has_ionic_already:
     

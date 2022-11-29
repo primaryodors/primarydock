@@ -537,14 +537,27 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     }
     
     #if _ALLOW_PROTONATE_PNICTOGENS
+    Atom* aheavy = a;
+    if (aheavy->get_Z() == 1)
+    {
+        Bond** tmpb = a->get_bonds();
+        if (tmpb && tmpb[0] && tmpb[0]->btom) aheavy = tmpb[0]->btom;
+    }
     // TODO: Increase this value if multiple negative charges are nearby; decrease if positive nearby.
-    if (!achg && bchg < 0 && (a->get_family() == PNICTOGEN || (a->get_Z() == 1 && a->is_bonded_to(PNICTOGEN) )))
+    if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !isnan(aheavy->pK) && aheavy->pK > pn_protonation_pKa_min) // || (a->get_Z() == 1 && a->is_bonded_to(PNICTOGEN) )))
     {
         achg = pnictogen_partial_protonation * fabs(bchg) / pow(fabs(r-1.5)+1, 2);
         /* if (a->residue == 243) cout << "Partial protonation for " << a->residue << ":" << a->name
             << " due to proximity of " << b->residue << ":" << b->name << endl; */
     }
-    if (!bchg && achg < 0 && (b->get_family() == PNICTOGEN || (b->get_Z() == 1 && b->is_bonded_to(PNICTOGEN) )))
+    Atom* bheavy = b;
+    if (bheavy->get_Z() == 1)
+    {
+        Bond** tmpb = b->get_bonds();
+        if (tmpb && tmpb[0] && tmpb[0]->btom) bheavy = tmpb[0]->btom;
+    }
+    // if (!bchg && achg < 0 && (b->get_family() == PNICTOGEN || (b->get_Z() == 1 && b->is_bonded_to(PNICTOGEN) )))
+    if (!bchg && achg < 0 && bheavy->get_family() == PNICTOGEN && !isnan(bheavy->pK) && bheavy->pK > pn_protonation_pKa_min)
     {
         bchg = pnictogen_partial_protonation * fabs(achg) / pow(fabs(r-1.5)+1, 2);
         /* if (b->residue == 243) cout << "Partial protonation for " << b->residue << ":" << b->name

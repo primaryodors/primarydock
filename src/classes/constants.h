@@ -208,9 +208,11 @@
 #define strongest_loss_tolerance 0.25
 #define _slt1 (1.0 - strongest_loss_tolerance)
 
-// Partial charge to add to a neutral pnictogen if a negatively charged atom is nearby.
-#define pnictogen_partial_protonation 0.25
+// Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,
+// if a negatively charged atom is nearby.
 #define _ALLOW_PROTONATE_PNICTOGENS 1
+#define pnictogen_partial_protonation 0.25
+#define pn_protonation_pKa_min 5
 
 // Debugging stuff.
 #define _DBG_LONELINESS 0

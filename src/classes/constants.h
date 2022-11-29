@@ -10,7 +10,7 @@
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 1.0
+#define _kJmol_cuA 0.5
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -207,6 +207,12 @@
 // strongest interatomic interaction.
 #define strongest_loss_tolerance 0.25
 #define _slt1 (1.0 - strongest_loss_tolerance)
+
+// Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,
+// if a negatively charged atom is nearby.
+#define _ALLOW_PROTONATE_PNICTOGENS 1
+#define pnictogen_partial_protonation 0.25
+#define pn_protonation_pKa_min 5
 
 // Debugging stuff.
 #define _DBG_LONELINESS 0

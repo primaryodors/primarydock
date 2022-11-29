@@ -69,7 +69,7 @@ public:
         Molecule* ligand,
         const Point nodecen,
         const Point size,
-        const int* mcoord_resno
+        const int* addl_resno
     );
     std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
     Molecule** all_residues_as_molecules();

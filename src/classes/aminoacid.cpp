@@ -612,8 +612,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     rotatable_bonds = get_rotatable_bonds();
     minimize_internal_clashes();
 
-
-
     identify_acidbase();
     identify_rings();
 
@@ -641,6 +639,19 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                 aa_defs[idx].aromatic = true;
                 break;
             }
+        }
+    }
+
+    if (!isnan(aa_defs[idx].sidechain_pKa))
+    {
+        float chg = get_charge();
+        for (i=0; atoms[i]; i++)
+        {
+            if (atoms[i]->is_backbone) continue;
+            int fam = atoms[i]->get_family();
+            if (fam != PNICTOGEN && fam != CHALCOGEN) continue;
+            if (atoms[i]->get_charge() || !chg)
+                atoms[i]->pK = aa_defs[idx].sidechain_pKa;
         }
     }
 
@@ -1355,11 +1366,15 @@ void AminoAcid::load_aa_defs()
                         if (!strcmp(aa_defs[idx].name, "isoleucine")) aa_defs[idx].isoleucine_fix = true;
                     }
 
-
                     if (fields[3])
                     {
                         aa_defs[idx].SMILES = fields[3];
                         if (strstr(aa_defs[idx].SMILES.c_str(), "N1")) aa_defs[idx].proline_like = proline_like = true;
+                    }
+
+                    if (fields[4])
+                    {
+                        aa_defs[idx].sidechain_pKa = atof(fields[4]);
                     }
 
                     tbdctr++;

@@ -40,6 +40,7 @@ struct AADef
     int charged = 0;
     bool loaded = false;
     bool isoleucine_fix = false;
+    float sidechain_pKa = nanf("n/a");
 };
 
 struct MetalCoord

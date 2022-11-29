@@ -519,7 +519,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float rbind = avdW+bvdW;
 
     float dp = 2;			// Directional propensity. The anisotropic component from each single vertex
-    // is calculated as a cosine and then raised to this exponent.
+                            // is calculated as a cosine and then raised to this exponent.
     Point center;
 
     float achg = a->get_charge(), bchg = b->get_charge()
@@ -535,10 +535,57 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         Bond* lb = b->get_bond_by_idx(0);
         if (lb && lb->btom) bchg = lb->btom->get_charge();
     }
+    
+    #if _ALLOW_PROTONATE_PNICTOGENS
+    Atom* aheavy = a;
+    if (aheavy->get_Z() == 1)
+    {
+        Bond** tmpb = a->get_bonds();
+        if (tmpb && tmpb[0] && tmpb[0]->btom) aheavy = tmpb[0]->btom;
+    }
+    // TODO: Increase this value if multiple negative charges are nearby; decrease if positive nearby.
+    if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !isnan(aheavy->pK) && aheavy->pK > pn_protonation_pKa_min) // || (a->get_Z() == 1 && a->is_bonded_to(PNICTOGEN) )))
+    {
+        achg = pnictogen_partial_protonation * fabs(bchg) / pow(fabs(r-1.5)+1, 2);
+        /* if (a->residue == 243) cout << "Partial protonation for " << a->residue << ":" << a->name
+            << " due to proximity of " << b->residue << ":" << b->name << endl; */
+    }
+    Atom* bheavy = b;
+    if (bheavy->get_Z() == 1)
+    {
+        Bond** tmpb = b->get_bonds();
+        if (tmpb && tmpb[0] && tmpb[0]->btom) bheavy = tmpb[0]->btom;
+    }
+    // if (!bchg && achg < 0 && (b->get_family() == PNICTOGEN || (b->get_Z() == 1 && b->is_bonded_to(PNICTOGEN) )))
+    if (!bchg && achg < 0 && bheavy->get_family() == PNICTOGEN && !isnan(bheavy->pK) && bheavy->pK > pn_protonation_pKa_min)
+    {
+        bchg = pnictogen_partial_protonation * fabs(achg) / pow(fabs(r-1.5)+1, 2);
+        /* if (b->residue == 243) cout << "Partial protonation for " << b->residue << ":" << b->name
+            << " due to proximity of " << a->residue << ":" << a->name << endl; */
+    }
+    #endif
 
-    if (sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2); // / pow( (r<2) ? 1 : (r/2), 2 );
-    if (sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
+    if (achg && sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2); // / pow( (r<2) ? 1 : (r/2), 2 );
+    if (apol && sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
 
+    bool atoms_are_bonded = a->is_bonded_to(b);
+
+    if (a->residue && b->residue && a->is_backbone && b->is_backbone)
+        if (abs(a->residue - b->residue) == 1)
+            atoms_are_bonded = true;
+
+    #if _ALLOW_PROTONATE_PNICTOGENS
+    if (forces)
+        for (i=0; forces[i]; i++)
+        {
+            if (forces[i]->type == ionic) goto _has_ionic_already;
+        }
+
+    if (!atoms_are_bonded && sgn(achg) == -sgn(bchg)) kJmol += 60.0 * fabs(achg)*fabs(bchg) / pow(r/2, 2);
+    #endif
+
+    _has_ionic_already:
+    
     if (!forces)
     {
         goto _canstill_clash;
@@ -878,7 +925,7 @@ _canstill_clash:
 
     r += allowable;*/
 
-    if (r < rbind)
+    if (r < rbind && !atoms_are_bonded)
     {
         float f = rbind/(avdW+bvdW);
         kJmol -= pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);

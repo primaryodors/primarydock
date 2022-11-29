@@ -14,9 +14,11 @@ require("odorutils.php");
 require("matrix9.php");
 require("dock_eval.php");
 
+echo date("Y-m-d H:i:s.u\n");
+
 // Configurable variables
 $dock_retries = 5;
-$max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
+$max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
 $dock_metals = true;
 
 // Load data
@@ -50,6 +52,7 @@ if (@$_REQUEST['next'])
 	{
 		if ($protid && $protid != $rcpid) continue;
 		$odorids = array_keys(all_empirical_pairs_for_receptor($rcpid));
+		shuffle($odorids);
 
 		foreach ($odorids as $oid)
 		{
@@ -388,6 +391,7 @@ $prediction = @$array['Prediction'];
 echo "Predicted ligand activity: $prediction\n";
 echo "Empirical ligand activity: $actual\n";
 
+
 if (@$_REQUEST['saved'])
 	print_r($average);
 else
@@ -396,12 +400,16 @@ else
 	if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
 	$dock_results[$protid][$ligname] = $average;
 
+	echo "Loaded $json_file with ".count($dock_results)." records.\n";
+
 	ksort($dock_results[$protid]);
 	
 	$keys = array_keys($dock_results);
 	natsort($keys);
 	$out_results = [];
 	foreach ($keys as $key) $out_results[$key] = $dock_results[$key];
+
+	echo "Writing $json_file with ".count($dock_results)." records.\n";
 	
 	$f = fopen($json_file, "wb");
 	if (!$f) die("File write FAILED. Make sure have access to write $json_file.");

@@ -44,7 +44,7 @@ foreach ($prots as $protid => $p)
         $ep = all_empirical_pairs_for_receptor($protid, true);
         foreach ($ep as $k => $v) if ($v <= 0) unset($ep[$k]);
         if (!count($ep)) $disp = false;
-        if ($fnum && count($ep) < $fnum) $disp = false;
+        else if ($fnum && count($ep) < $fnum) $disp = false;
         else if (max($ep) <= 0) $disp = false;
         break;
 

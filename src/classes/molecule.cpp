@@ -2235,7 +2235,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
     alllen = n;
 
     float improvement;
-    float search_expansion = 2.0/iters;
+    float search_expansion = 3.0/iters;
     for (iter=0; iter<iters; iter++)
     {
         float bind = 0, bind1, maxb, fmaxb = 0;

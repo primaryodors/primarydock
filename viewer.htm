@@ -426,7 +426,8 @@ Clip:
 </div>
 
 <div id="affichage">
-<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
+	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a>
+	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
 </div>
 
 <div id="center">
@@ -757,6 +758,25 @@ var sequence = "";
 var pocket = [0,0,0];
 
 $("#affichage").hide();
+
+var gmdl_shown = true;
+function show_hide_gmdl()
+{
+	if (gmdl_shown)
+	{
+		gmodel[0].removeAllRepresentations();
+	}
+	else
+	{
+		gmodel[0].addRepresentation( "cartoon",
+		{
+			opacity: opc_cartoon,
+			colorScheme: PODefRgnScheme,
+			metalness: mtl_cartoon,
+		});
+	}
+	gmdl_shown = !gmdl_shown;
+}
 
 window.onresize = function()
 {

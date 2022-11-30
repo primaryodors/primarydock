@@ -23,7 +23,7 @@ echo "<h1>Receptors</h1>\n";
 |
 <a href="receptors.php?f=a60" class="<?php if ($filter == 'a' && $fnum == 60) echo "hilite" ?>">Big Five</a>
 |
-<a href="receptors.php?f=i" class="<?php if ($filter == 'i') echo "hilite" ?>">Having Antgonists</a>
+<a href="receptors.php?f=i" class="<?php if ($filter == 'i') echo "hilite" ?>">Having Antagonists</a>
 |
 <a href="receptors.php?f=o" class="<?php if ($filter == 'o') echo "hilite" ?>">Orphans</a>
 </p>

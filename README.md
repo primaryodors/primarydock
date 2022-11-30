@@ -68,7 +68,8 @@ may have missed.
 If you would like to contribute to this project:
 <ol><li>I would be sooo very grateful for the help!</li>
 <li>Please create a branch off of stable, then submit a pull request;</li>
-<li>All PRs that change primarydock C++ code must pass Big Three (see the test/big_three file), and receive an all clear 🟩🟩🟩 message, before merge.</li>
+<li>All PRs that change the C++ classes or the primarydock app must pass the Big Three test (see the test/big_three file),
+and receive an all clear 🟩🟩🟩 message, before merge.</li>
 <li>Use whichever { style you prefer; as long as the code is readable and it works, that's all I care about.</li>
 <li>Have fun and try not to let the project vex you. (:</li>
 </ol>

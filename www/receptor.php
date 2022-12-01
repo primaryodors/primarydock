@@ -113,9 +113,9 @@ if (substr($fam, 0, 2) == "OR")
 {
     echo "Olfactory receptor ";
     $fmn = intval(preg_replace("/[^0-9]/", "", $fam));
-    echo "family $fmn, ";
+    echo "<a href=\"receptors.php?f=sOR$fmn\">family $fmn</a>, ";
     $sub = preg_replace("/[^A-Z]/", "", substr($rcpid, strlen($fam)) );
-    echo "subfamily $sub, ";
+    echo "<a href=\"receptors.php?f=sOR$fmn$sub\">subfamily $sub</a>, ";
     $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
     echo "member $mbr";
 }
@@ -439,7 +439,8 @@ echo "</p>";*/
 
 <div id="Ligands" class="tabcontent">
 
-<div class="scrollh" style="height: 780px;">
+<div class="box">
+<div class="row content scrollh">
 <table class="liglist">
     <tr>
         <th>Odorant</th>
@@ -505,8 +506,11 @@ foreach ($pairs as $oid => $pair)
 </table>
 </div>
 </div>
+</div>
 
 <div id="Refs" class="tabcontent">
+<div class="box">
+<div class="row content scrollh">
 <?php
 foreach ($lrefs as $idx => $refurl)
 {
@@ -516,6 +520,8 @@ foreach ($lrefs as $idx => $refurl)
     echo "</p></a>\n";
 }
 ?>
+</div>
+</div>
 </div>
 
 <div id="Structure" class="tabcontent">

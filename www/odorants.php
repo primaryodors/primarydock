@@ -8,7 +8,9 @@ include("header.php");
 ?>
 <h1>Odorants List</h1>
 
-<div class="scrollh" style="height: 780px;">
+
+<div class="box">
+<div class="row content scrollh">
 <?php
 
 if (!file_exists($pqcorr = "../data/receptor_pq.json"))

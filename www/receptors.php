@@ -12,6 +12,9 @@ include("header.php");
 echo "<h1>Receptors</h1>\n";
 
 ?>
+
+<div class="box">
+<div class="row header">
 <p>
 <a href="receptors.php" class="<?php if ($filter == '') echo "hilite" ?>">All</a>
 |
@@ -27,15 +30,20 @@ echo "<h1>Receptors</h1>\n";
 |
 <a href="receptors.php?f=o" class="<?php if ($filter == 'o') echo "hilite" ?>">Orphans</a>
 </p>
-
-<div class="scrollw"><div class="fam">
+</div>
+<div class="row content scrollh"><div class="fam">
 <?php
 
 $ffam = "OR1";
+$echoed = 0;
 foreach ($prots as $protid => $p)
 {
     $fam = family_from_protid($protid);
-    if ($fam != $ffam) echo "</div><div class=\"fam\">\n";
+    if ($echoed && $fam != $ffam)
+    {
+        echo "</div><hr><div class=\"fam\">\n";
+        $echoed = 0;
+    }
 
     $disp = true;
     switch ($filter)
@@ -61,6 +69,11 @@ foreach ($prots as $protid => $p)
         if (count($ep)) $disp = false;
         break;
 
+        case 's':
+        $ftxt = substr($_REQUEST['f'], 1);
+        if (substr($protid, 0, strlen($ftxt)) != $ftxt) $disp = false;
+        break;
+
         case '':
         break;
 
@@ -68,6 +81,10 @@ foreach ($prots as $protid => $p)
         $disp = false;
     }
 
-    if ($disp) echo "<a class=\"rcptile\" href=\"receptor.php?r=$protid\">$protid</a>\n";
+    if ($disp)
+    {
+        echo "<a class=\"rcptile\" href=\"receptor.php?r=$protid\">$protid</a>\n";
+        $echoed++;
+    }
     $ffam = $fam;
 }

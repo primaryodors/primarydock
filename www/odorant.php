@@ -175,7 +175,8 @@ window.setTimeout( function()
     ?>
 </p>
 
-<div class="scrollh">
+<div class="box">
+<div class="row content scrollh">
 <table class="rcplist">
 
 <tr>
@@ -280,10 +281,13 @@ foreach (array_keys($sorted) as $rcpid)
 ?>
 </table>
 </div>
+</div>
 
 </div>
 
 <div id="Refs" class="tabcontent">
+<div class="box">
+<div class="row content scrollh">
 <?php
 foreach ($lrefs as $idx => $refurl)
 {
@@ -294,6 +298,8 @@ foreach ($lrefs as $idx => $refurl)
     echo "</p></a>\n";
 }
 ?>
+</div>
+</div>
 </div>
 
 <div id="Structure" class="tabcontent">

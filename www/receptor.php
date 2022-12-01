@@ -104,7 +104,50 @@ function load_viewer(obj)
 </script>
 
 <div class="tab" style="display: inline-block; margin-top: 30px;">
-    <button class="tabstatic" id="tabGene"><?php echo $rcpid; ?></button>
+    <button class="tabstatic" id="tabGene"><b><?php echo $rcpid; ?></b>:
+
+
+<?php
+
+if (substr($fam, 0, 2) == "OR")
+{
+    echo "Olfactory receptor ";
+    $fmn = intval(preg_replace("/[^0-9]/", "", $fam));
+    echo "family $fmn, ";
+    $sub = preg_replace("/[^A-Z]/", "", substr($rcpid, strlen($fam)) );
+    echo "subfamily $sub, ";
+    $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
+    echo "member $mbr";
+}
+else
+{
+    switch ($fam)
+    {
+        case 'TAAR':
+        echo "Trace amine-associated receptor ";
+        $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
+        echo "$mbr";
+        break;
+
+        case 'VN1R':
+        echo "Vomeronasal type 1 receptor ";
+        $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
+        echo "$mbr";
+        break;
+
+        case 'MS4A':
+        echo "Membrane-spanning 4A receptor ";
+        $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
+        echo "$mbr";
+        break;
+
+        default:
+        ;
+    }
+}
+
+?>
+    </button>
 	<button class="tablinks <?php if (!count($pairs)) echo "default"; ?>" id="tabInfo" onclick="openTab(this, 'Info');">Info</button>
     <?php if (count($pairs)) { ?>
     <button class="tablinks default" id="tabLigands" onclick="openTab(this, 'Ligands');">Ligands</button>
@@ -446,7 +489,7 @@ foreach ($pairs as $oid => $pair)
             : "-")
         ) . "</td>\n";
     echo "<td>" . 
-        ($disptop = (@$pair['adjusted_curve_top']
+        ($disptop = ((@$pair['adjusted_curve_top'] || !@$pair['ec50'])
             ? (round(@$pair['adjusted_curve_top'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno_top</a>")
             : "-")
         ) . "</sup></td>\n";

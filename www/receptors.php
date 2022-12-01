@@ -15,7 +15,7 @@ echo "<h1>Receptors</h1>\n";
 <p>
 <a href="receptors.php" class="<?php if ($filter == '') echo "hilite" ?>">All</a>
 |
-<a href="receptors.php?f=a60" class="<?php if ($filter == 'a' && $fnum == 60) echo "hilite" ?>">Big Five</a>
+<a href="receptors.php?f=a55" class="<?php if ($filter == 'a' && $fnum == 55) echo "hilite" ?>">Big Five</a>
 |
 <a href="receptors.php?f=a" class="<?php if ($filter == 'a' && $fnum <= 1) echo "hilite" ?>">Having Agonists</a>
 |

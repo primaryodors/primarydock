@@ -175,7 +175,8 @@ window.setTimeout( function()
     ?>
 </p>
 
-<div class="scrollh">
+<div class="box">
+<div class="row content scrollh">
 <table class="rcplist">
 
 <tr>
@@ -207,6 +208,7 @@ if (@$odor['activity']) foreach ($odor['activity'] as $refurl => $acv)
 
         if (!isset($sorted[$rcpid])) $sorted[$rcpid] = 0.0;
         $ssamples = 0;
+        if (!isset($a['adjusted_curve_top']) && @$a['type'] == 'na') $a['adjusted_curve_top'] = 0;
         if (isset($a['adjusted_curve_top']))
         {
             if (!isset($tbltops[$rcpid])) $tbltops[$rcpid] = "";
@@ -226,7 +228,7 @@ if (@$odor['activity']) foreach ($odor['activity'] as $refurl => $acv)
             $tblec50[$rcpid] .= round($a['ec50'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup>";
             if (!isset($a['adjusted_curve_top']) || floatval($a['adjusted_curve_top']) > 0)
             {
-              $sorted[$rcpid] -= $a['ec50']*1.666;
+              $sorted[$rcpid] -= ($a['ec50']+3.7)*5.3;
               $ssamples++;
             }
 
@@ -245,14 +247,18 @@ if (@$odor['activity']) foreach ($odor['activity'] as $refurl => $acv)
 
 arsort($sorted);
 
-
 foreach (array_keys($sorted) as $rcpid)
 {
     echo "<tr>\n";
     echo "<td><a href=\"receptor.php?r=$rcpid\">$rcpid</a></td>\n";
 
     echo "<td style=\"white-space: nowrap;\">" . $dispec50 = (@$tblec50[$rcpid] ?: "-") . "</td>\n";
-    echo "<td style=\"white-space: nowrap;\">" . $disptop = (@$tbltops[$rcpid] ?: "-") . "</td>\n";
+    echo "<td style=\"white-space: nowrap;\">" . $disptop =
+    (
+        (floatval(@$tbltops[$rcpid]) || !floatval(@$tblec50[$rcpid]))
+        ? @$tbltops[$rcpid]
+        : "-"
+    ) . "</td>\n";
 
     if (@$antagonist[$rcpid]) echo "<td>Y</td>";
     else echo "<td>&nbsp;</td>";
@@ -275,10 +281,13 @@ foreach (array_keys($sorted) as $rcpid)
 ?>
 </table>
 </div>
+</div>
 
 </div>
 
 <div id="Refs" class="tabcontent">
+<div class="box">
+<div class="row content scrollh">
 <?php
 foreach ($lrefs as $idx => $refurl)
 {
@@ -289,6 +298,8 @@ foreach ($lrefs as $idx => $refurl)
     echo "</p></a>\n";
 }
 ?>
+</div>
+</div>
 </div>
 
 <div id="Structure" class="tabcontent">

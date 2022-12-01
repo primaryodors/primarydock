@@ -71,7 +71,7 @@ foreach ($mixture as $oid => $amtww)
     $mixtbl[$oid] = $r;
 }
 
-$moldiv = 100.0 / $ttlmol;
+$moldiv = $ttlmol ? (100.0 / $ttlmol) : 1;
 foreach ($mixtbl as $k => $r) $mixtbl[$k][3] = round( $r[3] * $moldiv, 2 );
 
 foreach ($mixtbl as $r) echo "<tr><td>".implode("</td><td>", $r)."</td></tr>\n";

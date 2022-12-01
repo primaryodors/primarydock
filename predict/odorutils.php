@@ -209,7 +209,6 @@ function ensure_sdf_exists($ligname)
 		if (trim(@$obresult[0]))
 		{
 			$cmd = "obabel -:\"{$o['smiles']}\" --gen3D -osdf -O\"$sdfname\"";
-			// die("$cmd\n");
 			exec($cmd);
 		}
 		else
@@ -223,6 +222,57 @@ function ensure_sdf_exists($ligname)
 	}
 	chdir($pwd);
 	return;	
+}
+
+function get_at_wt($element)
+{
+	static $elements = [];
+	if (!count($elements))
+	{
+		$cwd = getcwd();
+		chdir(__DIR__);
+		chdir("..");
+		$c = file_get_contents("elements.dat");
+		$c = explode("\n", $c);
+		for ($i=1; $i<256; $i++)
+		{
+			if (!isset($c[$i])) break;
+			$ln = explode(" ", preg_replace("/\\s+/", " ", trim($c[$i])));
+
+			$esym = $ln[1];
+			$elements[$esym] = $ln;
+		}
+		chdir($cwd);
+	}
+
+	if (!isset($elements[$element])) return 0;
+	return $elements[$element][4];
+}
+
+function get_mol_wt($odorant)
+{
+	$o = find_odorant($odorant);
+	ensure_sdf_exists($o['full_name']);
+	$sdfname = str_replace(" ", "_", "sdf/{$o['full_name']}.sdf");
+
+	$cwd = getcwd();
+	chdir(__DIR__);
+	chdir("..");
+	$c = file_get_contents($sdfname) or die("FAILED to open $sdfname for reading.");
+
+	$retval = 0.0;
+	$c = explode("\n", $c);
+	$meta = explode(" ", preg_replace("/\\s+/", " ", trim($c[3])));
+	$j = intval($meta[0]) + 4;
+	for ($i=4; $i<$j; $i++)
+	{
+		$ln = explode(" ", preg_replace("/\\s+/", " ", trim($c[$i])));
+		$atwt = get_at_wt($ln[3]);
+		$retval += $atwt;
+	}
+
+	chdir($cwd);
+	return $retval;
 }
 
 function find_odorant($aroma)

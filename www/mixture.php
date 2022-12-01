@@ -205,7 +205,8 @@ foreach ($rcptbl as $rcpid => $r)
 {
     $r[1] = round($r[1], 3);
     $r[2] = round($r[2], 3);
-    echo "<tr onclick=\"$('.hidable_$rcpid').show();\"><td>".implode("</td><td>", $r)."</td></tr>\n";
+    $bk = $r[3] ? "background-color: #2b2622;" : "";
+    echo "<tr onclick=\"$('.hidable_$rcpid').show();\" style=\"$bk\"><td>".implode("</td><td>", $r)."</td></tr>\n";
 
     if (count($agby[$rcpid]))
     {

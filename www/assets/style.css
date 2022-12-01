@@ -14,6 +14,15 @@ body
     overflow: hidden;
 }
 
+input, select
+{
+    border-radius: 4px;
+    background-color: #aabbb7;
+    color: #08101b;
+    border: 1px solid #214577;
+    margin: 2px;
+}
+
 .hilite
 {
     font-weight: bold;

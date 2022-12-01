@@ -15,13 +15,13 @@ echo "<h1>Receptors</h1>\n";
 <p>
 <a href="receptors.php" class="<?php if ($filter == '') echo "hilite" ?>">All</a>
 |
+<a href="receptors.php?f=a60" class="<?php if ($filter == 'a' && $fnum == 60) echo "hilite" ?>">Big Five</a>
+|
 <a href="receptors.php?f=a" class="<?php if ($filter == 'a' && $fnum <= 1) echo "hilite" ?>">Having Agonists</a>
 |
 <a href="receptors.php?f=a2" class="<?php if ($filter == 'a' && $fnum == 2) echo "hilite" ?>">Having Multiple Agonists</a>
 |
 <a href="receptors.php?f=a10" class="<?php if ($filter == 'a' && $fnum == 10) echo "hilite" ?>">Having Many Agonists</a>
-|
-<a href="receptors.php?f=a60" class="<?php if ($filter == 'a' && $fnum == 60) echo "hilite" ?>">Big Five</a>
 |
 <a href="receptors.php?f=i" class="<?php if ($filter == 'i') echo "hilite" ?>">Having Antagonists</a>
 |

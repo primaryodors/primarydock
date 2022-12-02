@@ -194,7 +194,6 @@ foreach ($outlines as $ln)
 	if ($pose && $node>=0 && substr($ln, 0,  7) == "Total: "    )
 	{
 		$benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
-		if ($pose && $node==$pocketnode && $benerg[$pose][$node] < 0) $full_poses++;
 	}
 
 	if (false !== strpos($ln, "pose(s) found")) $poses_found = intval($ln);
@@ -213,7 +212,7 @@ foreach ($outlines as $ln)
         switch ($aname)
         {
             case 'N': case 'H': case 'HN': case 'HA': case 'HB': case 'C': case 'O':
-            continue;
+            break;
 
             case 'CA':
             $ca_loc[$resno] = [$x,$y,$z];
@@ -253,7 +252,7 @@ foreach ($ca_loc as $resno => $a)
 {
     $bw = bw_from_resno($protid, $resno);
 
-    $sc_avg[] = $sc_qty[$resno] > 0 ?
+    $sc_avg[$bw] = $sc_qty[$resno] > 0 ?
     [
         $sc_loc[$resno][0] / $sc_qty[$resno],
         $sc_loc[$resno][1] / $sc_qty[$resno],
@@ -271,7 +270,7 @@ foreach ($sum as $node => $value)
 	$average["Node $node"] = round($value / (@$count[$node] ?: 1), 3);
 }
 
-foreach ($sc_loc as $bw => $xyz)
+foreach ($sc_avg as $bw => $xyz)
 {
     $average["SCW $bw"] = $xyz;
 }

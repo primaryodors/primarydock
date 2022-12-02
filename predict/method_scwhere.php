@@ -254,9 +254,9 @@ foreach ($ca_loc as $resno => $a)
 
     $sc_avg[$bw] = $sc_qty[$resno] > 0 ?
     [
-        $sc_loc[$resno][0] / $sc_qty[$resno],
-        $sc_loc[$resno][1] / $sc_qty[$resno],
-        $sc_loc[$resno][2] / $sc_qty[$resno]
+        round($sc_loc[$resno][0] / $sc_qty[$resno], 3),
+        round($sc_loc[$resno][1] / $sc_qty[$resno], 3),
+        round($sc_loc[$resno][2] / $sc_qty[$resno], 3)
     ]
     : [0,0,0];
 }
@@ -269,6 +269,8 @@ foreach ($sum as $node => $value)
 {
 	$average["Node $node"] = round($value / (@$count[$node] ?: 1), 3);
 }
+
+ksort($sc_avg);
 
 foreach ($sc_avg as $bw => $xyz)
 {

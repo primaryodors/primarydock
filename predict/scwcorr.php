@@ -19,6 +19,8 @@ foreach ($scw_data as $rcp => $ligs)
     {
         $idx = "$rcp|$ligand";
 
+        $kJmol = @floatval($pair['Node 0']) ?: 0;
+
         switch (@$pair['Actual'])
         {
             case 'Agonist':
@@ -42,9 +44,9 @@ foreach ($scw_data as $rcp => $ligs)
             if (substr($k, 0, 4) == "SCW ")
             {
                 $bw = substr($k, 4);
-                $yvals["$bw.x"][$idx] = $v[0];
-                $yvals["$bw.y"][$idx] = $v[1];
-                $yvals["$bw.z"][$idx] = $v[2];
+                $yvals["$bw.x"][$idx] = $v[0] * $kJmol;
+                $yvals["$bw.y"][$idx] = $v[1] * $kJmol;
+                $yvals["$bw.z"][$idx] = $v[2] * $kJmol;
             }
         }
     }
@@ -72,7 +74,7 @@ foreach ($yvals as $metric => $ly)
     if (count($x) >= 10 && count($y) >= 10)
     {
         $corr = correlationCoefficient($x, $y);
-        if (abs($corr) > 0.25) $corrs[$metric] = $corr;
+        if (abs($corr) > 0.33333) $corrs[$metric] = $corr;
     }
 }
 

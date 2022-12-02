@@ -1,11 +1,11 @@
 <?php
 
-// method_exr_capt.php
+// method_combined.php
 //
 // Performs a dock of an odorant in a receptor using both the inactive and active PDB files.
 //
 // Example call syntax:
-// php -f predict/method_exr_capt.php prot=TAAR5 lig=trimethylamine
+// php -f predict/method_combined.php prot=TAAR5 lig=trimethylamine
 //
 
 // Includes
@@ -44,6 +44,7 @@ if (@$_REQUEST['next'])
 	exec($cmd, $results);
 	if (!@$_REQUEST['force'] && trim(@$results[$max_simultaneous_docks-1])) die("Already running.\n".print_r($results, 1));
 	$skip = count($results);
+	$already = implode("\n", $results);
 	
 	$protid = @$_REQUEST['prot'] ?: false;
 	$ligname = @$_REQUEST['lig'] ?: false;
@@ -58,9 +59,11 @@ if (@$_REQUEST['next'])
 		{
 			$full_name = $odors[$oid]['full_name'];
 			$fnnospace = str_replace(" ", "_", $full_name);
+			$lignospace = str_replace(" ", "", $full_name);
 			if (!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
 			{
-				if ($skip)
+				// if ($skip)
+				if (false!==strpos($already, $lignospace))
 				{
 					$skip--;
 					continue;

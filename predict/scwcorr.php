@@ -44,15 +44,15 @@ foreach ($scw_data as $rcp => $ligs)
             if (substr($k, 0, 4) == "SCW ")
             {
                 $bw = substr($k, 4);
-                $yvals["$bw.x"][$idx] = $v[0] * $kJmol;
-                $yvals["$bw.y"][$idx] = $v[1] * $kJmol;
-                $yvals["$bw.z"][$idx] = $v[2] * $kJmol;
+                $yvals["$bw.x"][$idx] = $v[0];// * $kJmol;
+                $yvals["$bw.y"][$idx] = $v[1];// * $kJmol;
+                $yvals["$bw.z"][$idx] = $v[2];// * $kJmol;
             }
         }
-    }
 
-    _skip_pair:
-    ;
+        _skip_pair:
+        ;
+    }
 }
 
 set_time_limit(600);

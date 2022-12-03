@@ -24,13 +24,15 @@ $dock_metals = true;
 $dock_results = [];
 $json_file = "predict/dock_results_scwhere.json";
 
+// Version
 chdir(__DIR__);
+$version = filemtime("method_scwhere.php");
+
 chdir("..");
 if (file_exists($json_file))
 {
 	$dock_results = json_decode(file_get_contents($json_file), true);
 }
-
 
 foreach (@$argv as $a)
 {
@@ -60,7 +62,12 @@ if (@$_REQUEST['next'])
 			$full_name = $odors[$oid]['full_name'];
 			$fnnospace = str_replace(" ", "_", $full_name);
 			$lignospace = str_replace(" ", "", $full_name);
-			if (!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
+			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
+                ||
+                @$dock_results[$rcpid][$full_name]['version'] < $version
+                ||
+                @$dock_results[$rcpid][$fnnospace]['version'] < $version
+                )
 			{
 				// if ($skip)
 				if (false!==strpos($already, $lignospace))
@@ -262,7 +269,7 @@ foreach ($ca_loc as $resno => $a)
 }
 
 $average = [];
-
+$average['version'] = $version;
 $average['Poses'] = $poses_found;
 
 foreach ($sum as $node => $value)

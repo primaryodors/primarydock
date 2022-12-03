@@ -75,7 +75,7 @@ foreach ($yvals as $metric => $ly)
     {
         $corr = correlationCoefficient($x, $y);
         $p = calculate_p($x, $y, $corr, 100);
-        if ($p <= 0.2 && abs($corr) > 0.5) $corrs[$metric] = $corr;
+        if ($p <= 0.1 && abs($corr) > 0.333) $corrs[$metric] = $corr;
     }
 }
 

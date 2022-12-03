@@ -262,13 +262,12 @@ foreach ($ca_loc as $resno => $a)
 {
     $bw = bw_from_resno($protid, $resno);
 
-    $sc_avg[$bw] = $sc_qty[$resno] > 0 ?
+    if ($sc_qty[$resno]) $sc_avg[$bw] =
     [
         round($sc_loc[$resno][0] / $sc_qty[$resno], 3),
         round($sc_loc[$resno][1] / $sc_qty[$resno], 3),
         round($sc_loc[$resno][2] / $sc_qty[$resno], 3)
-    ]
-    : [0,0,0];
+    ];
 }
 
 $average = [];

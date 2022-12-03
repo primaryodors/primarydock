@@ -17,8 +17,9 @@ echo date("Y-m-d H:i:s.u\n");
 
 // Configurable variables
 $dock_retries = 5;
-$max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
+$max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
 $dock_metals = true;
+$bias_by_energy = true;
 
 // Load data
 $dock_results = [];
@@ -231,10 +232,11 @@ foreach ($outlines as $ln)
             break;
 
             default:
-            $sc_loc[$resno][0] += ($x - $ca_loc[$resno][0]);
-            $sc_loc[$resno][1] += ($y - $ca_loc[$resno][1]);
-            $sc_loc[$resno][2] += ($z - $ca_loc[$resno][2]);
-            $sc_qty[$resno]++;
+            $bias = $bias_by_energy ? $benerg[$pose][$node] : 1;
+            $sc_loc[$resno][0] += ($x - $ca_loc[$resno][0]) * $bias;
+            $sc_loc[$resno][1] += ($y - $ca_loc[$resno][1]) * $bias;
+            $sc_loc[$resno][2] += ($z - $ca_loc[$resno][2]) * $bias;
+            $sc_qty[$resno] += $bias;
         }
     }
 }

@@ -89,8 +89,8 @@ foreach ($yvals as $metric => $ly)
     if (count($x) >= 5 && count($y) >= 5)
     {
         $corr = correlationCoefficient($x, $y);
-        $p = calculate_p($x, $y, $corr, 100);
-        if ($p <= 0.05 && abs($corr) > 0.25) $corrs[$metric] = round($corr, 3);
+        $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
+        if ($p <= 0.05 && abs($corr) > 0.5) $corrs[$metric] = round($corr, 3);
     }
 }
 
@@ -103,7 +103,7 @@ function corrrsort($a, $b)
 uasort($corrs, 'corrrsort');
 
 $cc = count($corrs);
-$maxnatc = $cc ? (max(max($corrs), -min($corrs))) : 0.25;
+$maxnatc = $cc ? (max(max($corrs), -min($corrs))) : 0.5;
 
 for ($bits=0; $bits < 4096; $bits++)
 {

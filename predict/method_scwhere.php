@@ -203,6 +203,8 @@ foreach ($outlines as $ln)
 	{
 		$benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
 	}
+    
+    $bias = $bias_by_energy ? max(-$benerg[$pose][$node], 1) : 1;
 
 	if (false !== strpos($ln, "pose(s) found")) $poses_found = intval($ln);
 
@@ -232,7 +234,6 @@ foreach ($outlines as $ln)
             break;
 
             default:
-            $bias = $bias_by_energy ? $benerg[$pose][$node] : 1;
             $sc_loc[$resno][0] += ($x - $ca_loc[$resno][0]) * $bias;
             $sc_loc[$resno][1] += ($y - $ca_loc[$resno][1]) * $bias;
             $sc_loc[$resno][2] += ($z - $ca_loc[$resno][2]) * $bias;

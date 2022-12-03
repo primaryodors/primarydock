@@ -12,11 +12,18 @@ if (file_exists($json_file))
 }
 
 $utd = 0;
-if (count($scw_data))
+$ttl = 0;
+if ($scw_data && count($scw_data))
 {
-    foreach ($scw_data as $d) if (@$d['version'] == $version) $utd++;
-    echo round(100.0*$utd/count($scw_data), 2) . "% up to date.\n\n";
+    foreach ($scw_data as $scw) foreach ($scw as $d)
+    {
+        $ttl++;
+        if (@$d['version'] == $version) $utd++;
+    }
+    if (!$ttl) $ttl = 1;
+    echo round(100.0*$utd/$ttl, 2) . "% ($utd of $ttl) up to date with version $version.\n\n";
 }
+else goto _nodata;
 
 $xvals = [];
 $yvals = [];
@@ -79,7 +86,7 @@ foreach ($yvals as $metric => $ly)
         }
     }
 
-    if (count($x) >= 10 && count($y) >= 10)
+    if (count($x) >= 5 && count($y) >= 5)
     {
         $corr = correlationCoefficient($x, $y);
         $p = calculate_p($x, $y, $corr, 100);
@@ -95,8 +102,8 @@ function corrrsort($a, $b)
 
 uasort($corrs, 'corrrsort');
 
-$maxnatc = max(max($corrs), -min($corrs));
 $cc = count($corrs);
+$maxnatc = $cc ? (max(max($corrs), -min($corrs))) : 0.25;
 
 for ($bits=0; $bits < 4096; $bits++)
 {
@@ -139,5 +146,7 @@ for ($bits=0; $bits < 4096; $bits++)
 echo "Correlations: ";
 print_r($corrs);
 echo "\n\n";
+
+_nodata:
 
 passthru("ps -ef | grep ':[0-9][0-9] bin/primarydock' | grep -v grep");

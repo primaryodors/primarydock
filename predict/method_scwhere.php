@@ -218,8 +218,8 @@ foreach ($outlines as $ln)
             $ca_loc[$resno] = [$x,$y,$z];
             if (!isset($sc_loc[$resno]))
             {
-                $sc_loc[$resno] = [0,0,0];
-                $sc_qty[$resno] = 0;
+                $sc_loc[$resno] = [0.0,0.0,0.0];
+                $sc_qty[$resno] = 0.0;
             }
             break;
 

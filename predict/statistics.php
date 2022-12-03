@@ -61,6 +61,17 @@ function array_shuffle($arr)
     return array_values($arr1);
 }
 
+function calculate_p($xarr, $yarr, $corr, $iters=100)
+{
+    $p = 0.0;
+    for ($i=0; $i<$iters; $i++)
+    {
+        $yl = array_shuffle($yarr);
+        $lcorr = correlationCoefficient($xarr, $yl);
+        if (abs($lcorr) >= abs($corr)) $p += (1.0/$iters);
+    }
+    return $p;
+}
 
 function hill($concn, $emax, $ec50, $nH = 2.0)
 {   

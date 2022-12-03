@@ -12,13 +12,10 @@ include("header.php");
 echo "<h1>Receptors</h1>\n";
 
 ?>
-
-<div class="box">
-<div class="row header">
 <p>
 <a href="receptors.php" class="<?php if ($filter == '') echo "hilite" ?>">All</a>
 |
-<a href="receptors.php?f=a55" class="<?php if ($filter == 'a' && $fnum == 55) echo "hilite" ?>">Big Five</a>
+<a href="receptors.php?f=a60" class="<?php if ($filter == 'a' && $fnum == 60) echo "hilite" ?>">Big Five</a>
 |
 <a href="receptors.php?f=a" class="<?php if ($filter == 'a' && $fnum <= 1) echo "hilite" ?>">Having Agonists</a>
 |
@@ -30,20 +27,15 @@ echo "<h1>Receptors</h1>\n";
 |
 <a href="receptors.php?f=o" class="<?php if ($filter == 'o') echo "hilite" ?>">Orphans</a>
 </p>
-</div>
-<div class="row content scrollh"><div class="fam">
+
+<div class="scrollw"><div class="fam">
 <?php
 
 $ffam = "OR1";
-$echoed = 0;
 foreach ($prots as $protid => $p)
 {
     $fam = family_from_protid($protid);
-    if ($echoed && $fam != $ffam)
-    {
-        echo "</div><hr><div class=\"fam\">\n";
-        $echoed = 0;
-    }
+    if ($fam != $ffam) echo "</div><div class=\"fam\">\n";
 
     $disp = true;
     switch ($filter)
@@ -69,11 +61,6 @@ foreach ($prots as $protid => $p)
         if (count($ep)) $disp = false;
         break;
 
-        case 's':
-        $ftxt = substr($_REQUEST['f'], 1);
-        if (substr($protid, 0, strlen($ftxt)) != $ftxt) $disp = false;
-        break;
-
         case '':
         break;
 
@@ -81,10 +68,6 @@ foreach ($prots as $protid => $p)
         $disp = false;
     }
 
-    if ($disp)
-    {
-        echo "<a class=\"rcptile\" href=\"receptor.php?r=$protid\">$protid</a>\n";
-        $echoed++;
-    }
+    if ($disp) echo "<a class=\"rcptile\" href=\"receptor.php?r=$protid\">$protid</a>\n";
     $ffam = $fam;
 }

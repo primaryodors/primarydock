@@ -136,12 +136,12 @@ foreach ($mixtbl as $oid => $r)
         {
             $f = floatval($a['ec50']);
             $ec50 = $f;
-            $top = -($f+3.7)*5.3;
+            $top = -1.5*$f;
         }
         else if (isset($a['adjusted_curve_top']))
         {
             $top = floatval($a['adjusted_curve_top']);
-            $ec50 = -abs($top/5.3 - 3.7);
+            $ec50 = -abs($top/1.5);
         }
 
         if ($top > 0 || $ec50 < 0)

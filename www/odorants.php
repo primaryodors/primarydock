@@ -8,9 +8,7 @@ include("header.php");
 ?>
 <h1>Odorants List</h1>
 
-
-<div class="box">
-<div class="row content scrollh">
+<div class="scrollh" style="height: 780px;">
 <?php
 
 if (!file_exists($pqcorr = "../data/receptor_pq.json"))
@@ -28,8 +26,7 @@ foreach ($odors as $oid => $odor)
     $fns = str_replace("gamma-",   "", $fns);
     $fns = str_replace("delta-",   "", $fns);
     $fns = str_replace("epsilon-", "", $fns);
-    $fns = str_replace("omega-",   "", $fns);
-    $fns = preg_replace("/([(][A-Za-z0-9,+-]+[)],?)+-/", "", $fns);
+    $fns = preg_replace("/([(][A-Za-z0-9+-][)],?)+-/", "", $fns);
     $fns = preg_replace("/[(]([0-9]+[rs],?)+[)]-/", "", $fns);
     $fns = preg_replace("/[A-Za-z](,[A-Za-z])*-/", "", $fns);
     $fns = preg_replace("/^[a-zA-Z]-/", "", $fns);
@@ -37,12 +34,11 @@ foreach ($odors as $oid => $odor)
     $fns = preg_replace("/([0-9]+,?)+-/", "", $fns);
     $fns = preg_replace("/[^A-Za-z]/", "", $fns);   
     
-    $fns1 = preg_replace("/alpha([,-])/",   "&#x3B1;$1", $fns1);
-    $fns1 = preg_replace("/beta([,-])/",    "&#x3B2;$1", $fns1);
-    $fns1 = preg_replace("/gamma([,-])/",   "&#x3B3;$1", $fns1);
-    $fns1 = preg_replace("/delta([,-])/",   "&#x3B4;$1", $fns1);
-    $fns1 = preg_replace("/epsilon([,-])/", "&#x3B5;$1", $fns1);
-    $fns1 = preg_replace("/omega([,-])/",   "&#x3C9;$1", $fns1);
+    $fns1 = str_replace("alpha-",   "&#x3B1;-", $fns1);
+    $fns1 = str_replace("beta-",    "&#x3B2;-", $fns1);
+    $fns1 = str_replace("gamma-",   "&#x3B3;-", $fns1);
+    $fns1 = str_replace("delta-",   "&#x3B4;-", $fns1);
+    $fns1 = str_replace("epsilon-", "&#x3B5;-", $fns1);
 
     if (!$fns) $fns = $fns1;
 
@@ -60,8 +56,7 @@ foreach (array_keys($sortable) as $oid)
     $odor = $odors[$oid];
     $fnu = urlencode($odor['full_name']);
     // echo "<!-- {$sortable[$oid]} -->\n";
-    $pettia = explode(" ~ ", $sortable[$oid]);
-    echo "<a href=\"odorant.php?o=$oid\">{$pettia[1]}</a><br>\n";
+    echo "<a href=\"odorant.php?o=$oid\">{$odor['full_name']}</a><br>\n";
 
     $i++;
     if ($i > $limit)

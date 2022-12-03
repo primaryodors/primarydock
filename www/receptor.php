@@ -104,50 +104,7 @@ function load_viewer(obj)
 </script>
 
 <div class="tab" style="display: inline-block; margin-top: 30px;">
-    <button class="tabstatic" id="tabGene"><b><?php echo $rcpid; ?></b>:
-
-
-<?php
-
-if (substr($fam, 0, 2) == "OR")
-{
-    echo "Olfactory receptor ";
-    $fmn = intval(preg_replace("/[^0-9]/", "", $fam));
-    echo "<a href=\"receptors.php?f=sOR$fmn\">family $fmn</a>, ";
-    $sub = preg_replace("/[^A-Z]/", "", substr($rcpid, strlen($fam)) );
-    echo "<a href=\"receptors.php?f=sOR$fmn$sub\">subfamily $sub</a>, ";
-    $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-    echo "member $mbr";
-}
-else
-{
-    switch ($fam)
-    {
-        case 'TAAR':
-        echo "Trace amine-associated receptor ";
-        $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-        echo "$mbr";
-        break;
-
-        case 'VN1R':
-        echo "Vomeronasal type 1 receptor ";
-        $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-        echo "$mbr";
-        break;
-
-        case 'MS4A':
-        echo "Membrane-spanning 4A receptor ";
-        $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-        echo "$mbr";
-        break;
-
-        default:
-        ;
-    }
-}
-
-?>
-    </button>
+    <button class="tabstatic" id="tabGene"><?php echo $rcpid; ?></button>
 	<button class="tablinks <?php if (!count($pairs)) echo "default"; ?>" id="tabInfo" onclick="openTab(this, 'Info');">Info</button>
     <?php if (count($pairs)) { ?>
     <button class="tablinks default" id="tabLigands" onclick="openTab(this, 'Ligands');">Ligands</button>
@@ -439,8 +396,7 @@ echo "</p>";*/
 
 <div id="Ligands" class="tabcontent">
 
-<div class="box">
-<div class="row content scrollh">
+<div class="scrollh" style="height: 780px;">
 <table class="liglist">
     <tr>
         <th>Odorant</th>
@@ -490,7 +446,7 @@ foreach ($pairs as $oid => $pair)
             : "-")
         ) . "</td>\n";
     echo "<td>" . 
-        ($disptop = ((@$pair['adjusted_curve_top'] || !@$pair['ec50'])
+        ($disptop = (@$pair['adjusted_curve_top']
             ? (round(@$pair['adjusted_curve_top'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno_top</a>")
             : "-")
         ) . "</sup></td>\n";
@@ -506,11 +462,8 @@ foreach ($pairs as $oid => $pair)
 </table>
 </div>
 </div>
-</div>
 
 <div id="Refs" class="tabcontent">
-<div class="box">
-<div class="row content scrollh">
 <?php
 foreach ($lrefs as $idx => $refurl)
 {
@@ -520,8 +473,6 @@ foreach ($lrefs as $idx => $refurl)
     echo "</p></a>\n";
 }
 ?>
-</div>
-</div>
 </div>
 
 <div id="Structure" class="tabcontent">

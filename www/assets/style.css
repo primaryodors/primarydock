@@ -14,11 +14,6 @@ body
     overflow: hidden;
 }
 
-html, body 
-{
-    height: 100%;
-}
-
 input, select
 {
     border-radius: 4px;
@@ -26,29 +21,6 @@ input, select
     color: #08101b;
     border: 1px solid #214577;
     margin: 2px;
-}
-
-hr
-{
-    border: 1px solid #2e6859;
-    border-style: dashed;
-}
-
-.box
-{
-    display: flex;
-    flex-flow: column;
-    height: 100%;
-}
-
-.box .row.header
-{
-    flex: 0 1 auto;
-}
-
-.box .row.content
-{
-    flex: 1 1 auto;
 }
 
 .hilite
@@ -156,7 +128,6 @@ p
     left: 81px;
     z-index: 1;
     width: 90%;
-    height: 79%;
 }
 
 #side:hover ul

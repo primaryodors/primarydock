@@ -17,7 +17,7 @@ echo date("Y-m-d H:i:s.u\n");
 
 // Configurable variables
 $dock_retries = 5;
-$max_simultaneous_docks = 4;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
+$max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
 $dock_metals = true;
 $bias_by_energy = true;
 
@@ -40,6 +40,8 @@ foreach (@$argv as $a)
 	$a = explode('=',$a,2);
 	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
 }
+
+if (@$_REQUEST['simul']) $max_simultaneous_docks = intval($_REQUEST['simul']) ?: 2;
 
 if (@$_REQUEST['next'])
 {

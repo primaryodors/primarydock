@@ -149,7 +149,7 @@ foreach ($mixtbl as $oid => $r)
             // The way a dose-response curve works is you have a sigmoid function where the logarithm of the concentration
             // determines the response, with the sigmoid crossing 50% at the ec50. You multiply this sigmoid by the curve
             // top, and that's your estimated activation level.
-            $concn = 1.0e-3 * $molarp;            // Ideally we would base the multiplier off the vapor pressure.
+            $concn = 1.3e-3 * $molarp;            // Ideally we would base the multiplier off the vapor pressure.
             $p[1] += hill($concn, $top, pow(10.0, $ec50));
         }
 

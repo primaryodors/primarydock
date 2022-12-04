@@ -1930,6 +1930,8 @@ bool Molecule::shielded(Atom* a, Atom* b) const
     float r6 = r*1.26, r125 = 1.25*r;
     if (r < 2) return false;
 
+    a->shielding_angle = b->shielding_angle = 0;
+
     Point aloc = a->get_location(), bloc = b->get_location();
     for (i=0; i<atcount; i++)
     {
@@ -1942,6 +1944,7 @@ bool Molecule::shielded(Atom* a, Atom* b) const
         if ((rai+rbi) > r125) continue;
         Point sloc = ai->get_location();
         float f3da = find_3d_angle(&aloc, &bloc, &sloc);
+        if (f3da > a->shielding_angle) a->shielding_angle = b->shielding_angle = f3da;
         if (f3da > _shield_angle)
         {
             if (last_iter && (a->residue == 114 || b->residue == 114) && ((a->residue + b->residue) == 114))

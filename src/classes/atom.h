@@ -262,6 +262,7 @@ public:
     float last_bind_energy = 0;
     float strongest_bind_energy = 0;
     Atom* strongest_bind_atom = nullptr;
+    float shielding_angle = 0;
 
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.

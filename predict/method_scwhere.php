@@ -46,7 +46,6 @@ if (@$_REQUEST['next'])
 	$cmd = "ps -ef | grep ':[0-9][0-9] bin/primarydock' | grep -v grep";
 	exec($cmd, $results);
 	if (!@$_REQUEST['force'] && trim(@$results[$max_simultaneous_docks-1])) die("Already running.\n".print_r($results, 1));
-	$skip = count($results);
 	$already = implode("\n", $results);
 	
 	$protid = @$_REQUEST['prot'] ?: false;
@@ -56,13 +55,13 @@ if (@$_REQUEST['next'])
 	{
 		if ($protid && $protid != $rcpid) continue;
 		$odorids = array_keys(all_empirical_pairs_for_receptor($rcpid));
-		shuffle($odorids);
+		// shuffle($odorids);
 
 		foreach ($odorids as $oid)
 		{
 			$full_name = $odors[$oid]['full_name'];
 			$fnnospace = str_replace(" ", "_", $full_name);
-			$lignospace = str_replace(" ", "", $full_name);
+			$lignospace = str_replace(" ", "_", $full_name);
 			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
                 ||
                 @$dock_results[$rcpid][$full_name]['version'] < $version
@@ -70,10 +69,8 @@ if (@$_REQUEST['next'])
                 @$dock_results[$rcpid][$fnnospace]['version'] < $version
                 )
 			{
-				// if ($skip)
 				if (false!==strpos($already, $lignospace))
 				{
-					$skip--;
 					continue;
 				}
 				
@@ -222,6 +219,9 @@ foreach ($outlines as $ln)
         switch ($aname)
         {
             case 'N': case 'H': case 'HN': case 'HA': case 'HB': case 'C': case 'O':
+            break;
+
+            case 'CB': case 'HB': case 'HB1': case 'HB2': case 'HB3':
             break;
 
             case 'CA':

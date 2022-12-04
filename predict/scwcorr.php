@@ -1,6 +1,7 @@
 <?php
 
 chdir(__DIR__);
+require_once("protutils.php");
 require_once("statistics.php");
 $version = filemtime("method_scwhere.php");
 
@@ -72,6 +73,8 @@ foreach ($scw_data as $rcp => $ligs)
 
 set_time_limit(600);
 
+$cxv = count($xvals);
+$threshold = 0.75 * $cxv;
 $corrs = [];
 foreach ($yvals as $metric => $ly)
 {
@@ -86,8 +89,9 @@ foreach ($yvals as $metric => $ly)
         }
     }
 
-    if (count($x) >= 5 && count($y) >= 5)
+    if (count($x) >= $threshold && count($y) >= $threshold && (max($y) - min($y)) > 0.1 )
     {
+        // if ($metric == "7.46.y") print_r($y);
         $corr = correlationCoefficient($x, $y);
         $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
         if ($p <= 0.05 && abs($corr) > 0.5) $corrs[$metric] = round($corr, 3);
@@ -139,12 +143,30 @@ for ($bits=0; $bits < 4096; $bits++)
     {
         $corr = correlationCoefficient($x, $y);
         // $p = calculate_p($x, $y, $corr, 100);
-        if (/* $p <= 0.1 &&*/ abs($corr) > $maxnatc) $corrs[$metstr] = round($corr, 3);
+        if (/* $p <= 0.1 &&*/ abs($corr) > max($corrs)) $corrs[$metstr] = round($corr, 3);
+
+        if (count($corrs) > 40) break;
     }
 }
 
-echo "Correlations: ";
-print_r($corrs);
+echo "Correlations (residues of $rcp):\n";
+// print_r($corrs);
+foreach ($corrs as $metric => $corr)
+{
+    echo str_pad($metric, 10);
+
+    if (false===strpos($metric, " + ") && false===strpos($metric, " - "))
+    {
+        $pettia = explode('.', $metric);
+        $resno = resno_from_bw($rcp, "{$pettia[0]}.{$pettia[1]}");
+        $aa = substr($prots[$rcp]['sequence'], $resno-1, 1);
+        echo str_pad("$aa$resno", 7);
+    }
+
+    if ($corr >= 0) echo ' ';
+    echo $corr;
+    echo "\n";
+}
 echo "\n\n";
 
 _nodata:

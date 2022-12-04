@@ -112,8 +112,8 @@ foreach ($mixtbl as $oid => $r)
             if (!isset($lacv[$rcpid])) $lacv[$rcpid] = $a;
             else
             {
-                if (@$a['adjusted_curve_top'] > $lacv[$rcpid]['adjusted_curve_top']) $lacv[$rcpid]['adjusted_curve_top'] = $a['adjusted_curve_top'];
-                if (@$a['ec50'] && $a['ec50'] < $lacv[$rcpid]['ec50']) $lacv[$rcpid]['ec50'] = $a['ec50'];
+                if (@$a['adjusted_curve_top'] > (@$lacv[$rcpid]['adjusted_curve_top']?:0)) $lacv[$rcpid]['adjusted_curve_top'] = $a['adjusted_curve_top'];
+                if (@$a['ec50'] && $a['ec50'] < (@$lacv[$rcpid]['ec50']?:0)) $lacv[$rcpid]['ec50'] = $a['ec50'];
                 if (@$a['antagonist']) $lacv[$rcpid]['antagonist'] = 1;
             }
         }

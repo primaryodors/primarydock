@@ -175,7 +175,7 @@ window.setTimeout( function()
     ?>
 </p>
 
-<div class="box">
+<div class="box" style="height: auto!important;">
 <div class="row content scrollh">
 <table class="rcplist">
 
@@ -228,7 +228,7 @@ if (@$odor['activity']) foreach ($odor['activity'] as $refurl => $acv)
             $tblec50[$rcpid] .= round($a['ec50'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup>";
             if (!isset($a['adjusted_curve_top']) || floatval($a['adjusted_curve_top']) > 0)
             {
-              $sorted[$rcpid] -= ($a['ec50']+3.7)*5.3;
+              $sorted[$rcpid] -= $a['ec50']*2;
               $ssamples++;
             }
 

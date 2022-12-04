@@ -168,7 +168,7 @@ function all_empirical_pairs_for_receptor($protein, $return_1dim = false)
 				}
 				if (@$array[$oid]['ec50'] && $value >= 0)
 				{
-					$value -= ($array[$oid]['ec50']+3.7)*5.3;
+					$value -= $array[$oid]['ec50']*2;
 					$samples++;					
 				}
 

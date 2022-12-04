@@ -184,6 +184,7 @@ uasort($rcptbl, 'rcpsort');
 <?php
 foreach ($rcptbl as $rcpid => $r)
 {
+    $r[0] = "<a href=\"receptor.php?r={$r[0]}\" target=\"_rcp\">{$r[0]}</a>";
     $r[1] = round($r[1], 3);
     $bk = $r[2] ? "background-color: #2b2622;" : "";
     echo "<tr onclick=\"$('.hidable_$rcpid').show();\" style=\"$bk\"><td>".implode("</td><td>", $r)."</td></tr>\n";

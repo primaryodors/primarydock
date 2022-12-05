@@ -18,7 +18,7 @@ echo date("Y-m-d H:i:s.u\n");
 // Configurable variables
 $dock_retries = 5;
 $max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
-$dock_metals = true;
+$dock_metals = false;
 $bias_by_energy = true;
 
 // Load data
@@ -66,9 +66,7 @@ if (@$_REQUEST['next'])
 			$lignospace = str_replace(" ", "_", $full_name);
 			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
                 ||
-                @$dock_results[$rcpid][$full_name]['version'] < $version
-                ||
-                @$dock_results[$rcpid][$fnnospace]['version'] < $version
+                max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version
                 )
 			{
 				if (false!==strpos($already, $lignospace))
@@ -138,6 +136,7 @@ LIG sdf/$ligname.sdf
 $cenres
 SIZE 7.0 7.5 7.0
 EXCL $tmr4end $tmr5start
+H2O 10
 
 POSE 10
 ITER 50

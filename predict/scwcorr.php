@@ -94,7 +94,7 @@ foreach ($yvals as $metric => $ly)
         // if ($metric == "7.46.y") print_r($y);
         $corr = correlationCoefficient($x, $y);
         $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
-        if ($p <= 0.05 && abs($corr) > 0.5) $corrs[$metric] = round($corr, 3);
+        if ($p <= 0.05 && abs($corr) > 0.25) $corrs[$metric] = round($corr, 3);
     }
 }
 

@@ -56,6 +56,7 @@
 #define _def_atc 100
 #define _ALLOW_FLEX_RINGS 0
 #define _shield_angle (130.0 * fiftyseventh)
+#define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (120.0 * fiftyseventh)
 #define _fullrot_stepdeg 30
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)

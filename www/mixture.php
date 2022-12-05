@@ -72,7 +72,7 @@ foreach ($mixture as $oid => $amtww)
 }
 
 $moldiv = $ttlmol ? (100.0 / $ttlmol) : 1;
-foreach ($mixtbl as $k => $r) $mixtbl[$k][3] = round( $r[3] * $moldiv, 2 );
+foreach ($mixtbl as $k => $r) $mixtbl[$k][3] = round( $r[3] * $moldiv, 5 );
 
 foreach ($mixtbl as $r) echo "<tr><td>".implode("</td><td>", $r)."</td></tr>\n";
 ?>
@@ -112,8 +112,8 @@ foreach ($mixtbl as $oid => $r)
             if (!isset($lacv[$rcpid])) $lacv[$rcpid] = $a;
             else
             {
-                if (@$a['adjusted_curve_top'] > $lacv[$rcpid]['adjusted_curve_top']) $lacv[$rcpid]['adjusted_curve_top'] = $a['adjusted_curve_top'];
-                if (@$a['ec50'] && $a['ec50'] < $lacv[$rcpid]['ec50']) $lacv[$rcpid]['ec50'] = $a['ec50'];
+                if (@$a['adjusted_curve_top'] > (@$lacv[$rcpid]['adjusted_curve_top']?:0)) $lacv[$rcpid]['adjusted_curve_top'] = $a['adjusted_curve_top'];
+                if (@$a['ec50'] && $a['ec50'] < (@$lacv[$rcpid]['ec50']?:0)) $lacv[$rcpid]['ec50'] = $a['ec50'];
                 if (@$a['antagonist']) $lacv[$rcpid]['antagonist'] = 1;
             }
         }
@@ -121,7 +121,7 @@ foreach ($mixtbl as $oid => $r)
 
     foreach ($lacv as $rcpid => $a)
     {
-        $p = @$rcptbl[$rcpid] ?: [$rcpid, 0, 0, "", substr(get_notes_for_receptor($rcpid, $correlations), 0, 123)];
+        $p = @$rcptbl[$rcpid] ?: [$rcpid, 0.0, "", substr(get_notes_for_receptor($rcpid, $correlations), 0, 123)];
 
         if (!isset($agby[$rcpid])) $agby[$rcpid] = [];
         if (!isset($antby[$rcpid])) $antby[$rcpid] = [];
@@ -136,42 +136,26 @@ foreach ($mixtbl as $oid => $r)
         {
             $f = floatval($a['ec50']);
             $ec50 = $f;
-            $top = -($f+3.7)*5.3;
+            $top = 10; // -($f+3.7)*5.3;
         }
         else if (isset($a['adjusted_curve_top']))
         {
             $top = floatval($a['adjusted_curve_top']);
-            $ec50 = -abs($top/5.3 - 3.7);
+            $ec50 = -5; // -abs($top/5.3 - 3.7);
         }
 
         if ($top > 0 || $ec50 < 0)
         {
-            if ($p[1])
-            {
-                $f = pow(10, $ec50) / $molarp;
-                $e = pow(10, $p[1]);
-                if ($dbgec50) echo "$rcpid already {$p[1]} $e {$odor['full_name']} $ec50 $f ";
-                $p[1] = min(log10( 1.0 / (1.0/$e + 1.0/$f)), 0);
-                if ($dbgec50) echo "{$p[1]} <br>\n";
-            }
-            else
-            {
-                $f = pow(10, $ec50) / $molarp;
-                if ($dbgec50) echo "$rcpid new {$odor['full_name']} $ec50 $molarp $f ";
-                $p[1] = min(log10( pow(10, $ec50) / $molarp ), 0);
-                if ($dbgec50) echo "{$p[1]} <br>\n";
-            }
-
-            if ($p[2])
-            {
-                $p[2] += max($top * $molarp, 0);
-            }
-            else $p[2] = max($top * $molarp, 0);
+            // The way a dose-response curve works is you have a sigmoid function where the logarithm of the concentration
+            // determines the response, with the sigmoid crossing 50% at the ec50. You multiply this sigmoid by the curve
+            // top, and that's your estimated activation level.
+            $concn = 1.3e-3 * $molarp;            // Ideally we would base the multiplier off the vapor pressure.
+            $p[1] += hill($concn, $top, pow(10.0, $ec50));
         }
 
         if ($top < 0 || @$a['antagonist'])
         {
-            $p[3] = "Y";
+            $p[2] = "Y";
             $antby[$rcpid][] = $odor['full_name'];
         }
         else if ($top > 0 || $ec50 < 0) $agby[$rcpid][] = $odor['full_name'];
@@ -182,10 +166,8 @@ foreach ($mixtbl as $oid => $r)
 
 function rcpsort($a, $b)
 {
-    $a = $a[2]-1.666*$a[1];
-    $b = $b[2]-1.666*$b[1];
-    if ($a == $b) return 0;
-    else return ($a < $b) ? 1 : -1;
+    if ($a[1] == $b[1]) return 0;
+    else return ($a[1] < $b[1]) ? 1 : -1;
 }
 
 uasort($rcptbl, 'rcpsort');
@@ -195,17 +177,16 @@ uasort($rcptbl, 'rcpsort');
 <table class="rcplist">
 <tr>
     <th>Receptor</th>
-    <th>Est. EC<sub>50</sub></th>
-    <th>Est. Top</th>
+    <th>Est. Activity</th>
     <th>Antagonized?</th>
     <th>Correlated Notes</th>
 </tr>
 <?php
 foreach ($rcptbl as $rcpid => $r)
 {
+    $r[0] = "<a href=\"receptor.php?r={$r[0]}\" target=\"_rcp\">{$r[0]}</a>";
     $r[1] = round($r[1], 3);
-    $r[2] = round($r[2], 3);
-    $bk = $r[3] ? "background-color: #2b2622;" : "";
+    $bk = $r[2] ? "background-color: #2b2622;" : "";
     echo "<tr onclick=\"$('.hidable_$rcpid').show();\" style=\"$bk\"><td>".implode("</td><td>", $r)."</td></tr>\n";
 
     if (count($agby[$rcpid]))

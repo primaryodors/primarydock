@@ -57,6 +57,11 @@ foreach ($scw_data as $rcp => $ligs)
 
         foreach ($pair as $k => $v)
         {
+            if (substr($k, 0, 7) == "BEnerg ")
+            {
+                $bw = substr($k, 7);
+                $yvals["$bw.e"][$idx] = $v;
+            }
             if (substr($k, 0, 4) == "SCW ")
             {
                 $bw = substr($k, 4);
@@ -109,7 +114,7 @@ uasort($corrs, 'corrrsort');
 $cc = count($corrs);
 $maxnatc = $cc ? (max(max($corrs), -min($corrs))) : 0.5;
 
-for ($bits=0; $bits < 4096; $bits++)
+for ($bits=0; $bits < 16384; $bits++)
 {
     if ($bits >= pow(2, $cc)) break;
     $x = [];

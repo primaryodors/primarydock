@@ -181,6 +181,8 @@ if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
 if (count($outlines) < 100) die("Docking FAILED.\n");
 
 $benerg = [];
+$scenerg = [];
+$dosce = false;
 $pose = false;
 $node = -1;
 $poses_found = 0;
@@ -189,6 +191,7 @@ $sc_loc = [];
 $sc_qty = [];
 foreach ($outlines as $ln)
 {
+	if (!strlen(trim($ln))) $dosce = false;
 	if (substr($ln, 0, 6) == "Pose: ") $pose = intval(explode(" ", $ln)[1]);
 	if (substr($ln, 0, 6) == "Node: ") $node = intval(explode(" ", $ln)[1]);
 	if (trim($ln) == "TER")
@@ -196,10 +199,23 @@ foreach ($outlines as $ln)
 		$pose = false;
 		$node = -1;
 	}
+
+	if ($dosce)
+	{
+		$pettia = explode(": ", $ln);
+		$resno = intval(substr($pettia[0], 3));
+		$e = floatval($pettia[1]);
+		$scenerg[$pose][$node][$resno] = $e;
+		continue;
+	}
+
+	if (substr($ln, 0, 7) == 'BENERG:') $dosce = true;
 	
 	if ($pose && $node>=0 && substr($ln, 0,  7) == "Total: "    )
 	{
 		$benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
+		$dosce = false;
+		continue;
 	}
     
     $bias = $bias_by_energy ? max(-$benerg[$pose][$node], 1) : 1;
@@ -245,6 +261,8 @@ foreach ($outlines as $ln)
 
 $sum = [];
 $count = [];
+$ssce = [];
+$rsum = [];
 foreach ($benerg as $pose => $data)
 {
 	foreach ($data as $node => $value)
@@ -254,11 +272,19 @@ foreach ($benerg as $pose => $data)
 		
 		$sum[$node] += $value;
 		$count[$node]++;
+
+		foreach ($scenerg[$pose][$node] as $resno => $e)
+		{
+			if (!isset($ssce[$resno])) $ssce[$resno] = floatval($rsum[$resno] = 0);
+			$ssce[$resno] += $e;
+			$rsum[$resno]++;
+		}
 	}
 }
 
 $sc_avg = [];
 
+$sce = [];
 foreach ($ca_loc as $resno => $a)
 {
     $bw = bw_from_resno($protid, $resno);
@@ -269,11 +295,18 @@ foreach ($ca_loc as $resno => $a)
         round($sc_loc[$resno][1] / $sc_qty[$resno], 3),
         round($sc_loc[$resno][2] / $sc_qty[$resno], 3)
     ];
+
+	if (@$ssce[$resno] && $rsum[$resno]) $sce[$bw] = $ssce[$resno] / $rsum[$resno];
 }
 
 $average = [];
 $average['version'] = $version;
 $average['Poses'] = $poses_found;
+
+foreach ($sce as $bw => $e)
+{
+	$average["BEnerg $bw"] = $e;
+}
 
 foreach ($sum as $node => $value)
 {

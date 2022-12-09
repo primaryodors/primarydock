@@ -40,15 +40,15 @@ foreach ($scw_data as $rcp => $ligs)
         switch (@$pair['Actual'])
         {
             case 'Agonist':
-            $xvals[$idx] = 1;
+            $xvals[$rcp][$idx] = 1;
             break;
 
             case 'Non-Agonist':
-            $xvals[$idx] = 0;
+            $xvals[$rcp][$idx] = 0;
             break;
 
             case 'Inverse Agonist':
-            $xvals[$idx] = -1;
+            $xvals[$rcp][$idx] = -1;
             break;
 
             default:
@@ -60,14 +60,14 @@ foreach ($scw_data as $rcp => $ligs)
             if (substr($k, 0, 7) == "BEnerg ")
             {
                 $bw = substr($k, 7);
-                $yvals["$bw.e"][$idx] = $v;
+                $yvals[$rcp]["$bw.e"][$idx] = $v;
             }
             if (substr($k, 0, 4) == "SCW ")
             {
                 $bw = substr($k, 4);
-                $yvals["$bw.x"][$idx] = $v[0] * $kJmol;
-                $yvals["$bw.y"][$idx] = $v[1] * $kJmol;
-                $yvals["$bw.z"][$idx] = $v[2] * $kJmol;
+                $yvals[$rcp]["$bw.x"][$idx] = $v[0] * $kJmol;
+                $yvals[$rcp]["$bw.y"][$idx] = $v[1] * $kJmol;
+                $yvals[$rcp]["$bw.z"][$idx] = $v[2] * $kJmol;
             }
         }
 
@@ -78,28 +78,32 @@ foreach ($scw_data as $rcp => $ligs)
 
 set_time_limit(600);
 
-$cxv = count($xvals);
-$threshold = 0.75 * $cxv;
 $corrs = [];
-foreach ($yvals as $metric => $ly)
-{
-    $x = [];
-    $y = [];
-    foreach ($xvals as $idx => $lx)
-    {
-        if (isset($ly[$idx]))
-        {
-            $x[] = $lx;
-            $y[] = $ly[$idx];
-        }
-    }
+foreach ($yvals as $rcp => $yv)
+{   
+    $cxv = count($xvals[$rcp]);
+    $threshold = 0.75 * $cxv;
 
-    if (count($x) >= $threshold && count($y) >= $threshold && (max($y) - min($y)) > 0.1 )
+    foreach ($yv as $metric => $ly)
     {
-        // if ($metric == "7.46.y") print_r($y);
-        $corr = correlationCoefficient($x, $y);
-        $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
-        if ($p <= 0.05 && abs($corr) > 0.25) $corrs[$metric] = round($corr, 3);
+        $x = [];
+        $y = [];
+        foreach ($xvals[$rcp] as $idx => $lx)
+        {
+            if (isset($ly[$idx]))
+            {
+                $x[] = $lx;
+                $y[] = $ly[$idx];
+            }
+        }
+
+        if (count($x) >= $threshold && count($y) >= $threshold && (max($y) - min($y)) > 0.1 )
+        {
+            // if ($metric == "7.46.y") print_r($y);
+            $corr = correlationCoefficient($x, $y);
+            $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
+            if ($p <= 0.05 && abs($corr) > 0.25) $corrs[$rcp][$metric] = round($corr, 3);
+        }
     }
 }
 
@@ -109,71 +113,85 @@ function corrrsort($a, $b)
     return (abs($a) > abs($b)) ? -1 : 1;
 }
 
-uasort($corrs, 'corrrsort');
-
-$cc = count($corrs);
-$maxnatc = $cc ? (max(max($corrs), -min($corrs))) : 0.5;
-
-for ($bits=0; $bits < 16384; $bits++)
+foreach ($corrs as $rcp => $c)
 {
-    if ($bits >= pow(2, $cc)) break;
-    $x = [];
-    $y = [];
-    $metstr = "";
-    for ($i=0; $i<$cc; $i++)
+    $cxv = count($xvals[$rcp]);
+    if ($cxv < 5) continue;
+
+    uasort($c, 'corrrsort');
+
+    $cc = count($c);
+    $maxnatc = $cc ? (max(max($c), -min($c))) : 0.5;
+
+    for ($bits=0; $bits < 16384; $bits++)
     {
-        $sci = sgn(array_values($corrs)[$i]);
-        $pi = pow(2, $i);
-        if ($pi > $bits) break;
-        if ($bits & $pi)
+        if ($bits >= pow(2, $cc)) break;
+        $x = [];
+        $y = [];
+        $metstr = "";
+        for ($i=0; $i<$cc; $i++)
         {
-            $metric = array_keys($corrs)[$i];
-            $ly = $yvals[$metric];
-            foreach ($xvals as $idx => $lx)
+            $sci = sgn(array_values($c)[$i]);
+            $pi = pow(2, $i);
+            if ($pi > $bits) break;
+            if ($bits & $pi)
             {
-                if (isset($ly[$idx]))
+                $metric = array_keys($c)[$i];
+                $ly = $yvals[$rcp][$metric];
+                foreach ($xvals[$rcp] as $idx => $lx)
                 {
-                    if (!isset($y[$idx])) $y[$idx] = 0.0;
-                    $y[$idx] += $ly[$idx] * $sci;
+                    if (isset($ly[$idx]))
+                    {
+                        if (!isset($y[$idx])) $y[$idx] = 0.0;
+                        $y[$idx] += $ly[$idx] * $sci;
+                    }
                 }
+                if ($metstr) $metstr .= ($sci < 0 ? " - " : " + ");
+                $metstr .= $metric;
             }
-            if ($metstr) $metstr .= ($sci < 0 ? " - " : " + ");
-            $metstr .= $metric;
+        }
+
+        foreach ($y as $idx => $ly) $x[$idx] = $xvals[$rcp][$idx];
+
+        if (count($x) >= 10 && count($y) >= 10)
+        {
+            $corr = correlationCoefficient($x, $y);
+            // $p = calculate_p($x, $y, $corr, 100);
+            if (/* $p <= 0.1 &&*/ abs($corr) > max($c)) $c[$metstr] = round($corr, 3);
+
+            if (count($c) > 40) break;
         }
     }
 
-    foreach ($y as $idx => $ly) $x[$idx] = $xvals[$idx];
+    uasort($c, 'corrrsort');
+    $cc = count($c);
+    $maxallc = $cc ? (max(max($c), -min($c))) : 0.5;
 
-    if (count($x) >= 10 && count($y) >= 10)
+    echo "Correlations (residues of $rcp, $cxv ligands):\n";
+    $j = 0;
+    foreach ($c as $metric => $corr)
     {
-        $corr = correlationCoefficient($x, $y);
-        // $p = calculate_p($x, $y, $corr, 100);
-        if (/* $p <= 0.1 &&*/ abs($corr) > max($corrs)) $corrs[$metstr] = round($corr, 3);
+        if ($corr < 0.5*$maxallc) continue;
+        $j++;
+        if ($j > 5) break;
+        echo str_pad($metric, 10);
 
-        if (count($corrs) > 40) break;
+        if (false===strpos($metric, " + ") && false===strpos($metric, " - "))
+        {
+            $pettia = explode('.', $metric);
+            $resno = resno_from_bw($rcp, "{$pettia[0]}.{$pettia[1]}");
+            $aa = substr($prots[$rcp]['sequence'], $resno-1, 1);
+            echo str_pad("$aa$resno", 7);
+        }
+
+        if ($corr >= 0) echo ' ';
+        echo $corr;
+        echo "\n";
     }
+    echo "\n\n";
 }
-
-echo "Correlations (residues of $rcp):\n";
-// print_r($corrs);
-foreach ($corrs as $metric => $corr)
-{
-    echo str_pad($metric, 10);
-
-    if (false===strpos($metric, " + ") && false===strpos($metric, " - "))
-    {
-        $pettia = explode('.', $metric);
-        $resno = resno_from_bw($rcp, "{$pettia[0]}.{$pettia[1]}");
-        $aa = substr($prots[$rcp]['sequence'], $resno-1, 1);
-        echo str_pad("$aa$resno", 7);
-    }
-
-    if ($corr >= 0) echo ' ';
-    echo $corr;
-    echo "\n";
-}
-echo "\n\n";
 
 _nodata:
+;
 
 passthru("ps -ef | grep ':[0-9][0-9] bin/primarydock' | grep -v grep");

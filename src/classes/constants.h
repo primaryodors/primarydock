@@ -217,8 +217,12 @@
 
 // Whether to move water molecules around that are clashing or are not forming intermolecular bonds.
 #define _teleport_dissatisfied_waters 1
-#define _water_satisfaction_threshold -5
+#define _water_satisfaction_threshold -10
 #define _water_teleport_tries 10
+
+// How strong an intermolecular bond is required to prevent a histidine hydrogen from flipping
+// to a less favorable state.
+#define _hisflip_binding_threshold 10
 
 // Debugging stuff.
 #define _DBG_LONELINESS 0

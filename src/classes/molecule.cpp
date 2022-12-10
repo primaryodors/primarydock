@@ -2182,7 +2182,19 @@ void Molecule::minimize_internal_clashes()
     // cout << " base internal clashes: " << base_internal_clashes << endl;
 }
 
+void Molecule::do_histidine_flip(histidine_flip* hf)
+{
+    Point ptC  = hf->C->get_location();
+    Point ptN1 = hf->N1->get_location();
+    Point ptN2 = hf->N2->get_location();
+    Point ptH  = hf->H->get_location();
 
+    Point arr[2] = {ptN1, ptN2};
+    Point Navg = average_of_points(arr, 2);
+
+    Point newloc = rotate3D(ptH, Navg, ptC.subtract(Navg), M_PI);
+    hf->H->move(newloc);
+}
 
 #define DBG_BONDFLEX 0
 #define DBG_FLEXRES 111
@@ -2417,6 +2429,35 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             }
             /**** End Linear Motion ****/
             #endif
+
+            /**** Histidine flip ****/
+            if (mm[i]->hisflips)
+            {
+                for (l=0; mm[i]->hisflips[l]; l++)
+                {
+                    mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
+
+                    bind1 = 0;
+                    maxb = 0;
+                    for (j=0; all[j]; j++)
+                    {
+                        if (!nearby[j]) continue;
+                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                        bind1 += lbind;
+                        if (lbind > maxb) maxb = lbind;
+                    }
+                    if (bind1 >= bind || (bind < _hisflip_binding_threshold && frand(0,1) < 0.29))
+                    {
+                        ;
+                    }
+                    else
+                    {
+                        mm[i]->do_histidine_flip(mm[i]->hisflips[l]);               // put it back.
+                    }
+                }
+            }
+            /**** End histidine flip ****/
 
             #if allow_axial_tumble
             /**** Axial Tumble ****/

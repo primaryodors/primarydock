@@ -132,6 +132,10 @@ void delete_water(Molecule* mol)
             }
             waters[j-1] = nullptr;
             maxh2o--;
+
+            #if _DBG_H2O_TELEPORT
+            cout << "Deleted water molecule " << mol << endl;
+            #endif
         }
         break;
     }
@@ -148,7 +152,7 @@ float teleport_water(Molecule* mol)
     
     if (!waters[j]) return -1000;
 
-    for (i=0; i<25; i++)
+    for (i=0; i<_water_teleport_tries; i++)
     {
         Point teleport(
             ligcen_target.x + frand(-size.x, size.x),
@@ -157,9 +161,12 @@ float teleport_water(Molecule* mol)
                       );
         waters[j]->recenter(teleport);
         e = -waters[j]->get_intermol_binding(gcfmols);
-        if (e < 10) break;
+        if (e < _water_satisfaction_threshold) break;
     }
-    if (e > 10) delete_water(mol);
+    if (e > _water_satisfaction_threshold) delete_water(mol);
+    #if _DBG_H2O_TELEPORT
+    else cout << "Teleported water molecule " << mol << endl;
+    #endif
 
     return e;
 }
@@ -240,7 +247,8 @@ void iteration_callback(int iter)
 
     #endif
 
-    if (waters)
+    #if _teleport_dissatisfied_waters
+    if ((iter % 10) == 9 && waters)
     {
         for (i=0; waters[i]; i++)
         {
@@ -250,9 +258,10 @@ void iteration_callback(int iter)
             {
                 if (!j || waters[i]->lastbind_history[j] < e) e = waters[i]->lastbind_history[j];
             }
-            if (e > 10) teleport_water(waters[i]);
+            if (e > _water_satisfaction_threshold) teleport_water(waters[i]);
         }
     }
+    #endif
 
     if (gcfmols && seql)
     {

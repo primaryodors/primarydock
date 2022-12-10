@@ -163,6 +163,7 @@ public:
     bool echo_iters = false;
     MovabilityType movability = MOV_ALL;
     float lastbind = 0;
+    float lastbind_history[10];
 
 protected:
     Molecule();

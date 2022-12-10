@@ -32,6 +32,9 @@ Molecule::Molecule(char const* lname)
     atcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = nullptr;
+
+    int j;
+    for (j=0; j<10; j++) lastbind_history[j] = 0;
 }
 
 Molecule::Molecule()
@@ -42,7 +45,10 @@ Molecule::Molecule()
     atcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = 0;
-    paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
+    paren = nullptr;
+
+    int j;
+    for (j=0; j<10; j++) lastbind_history[j] = 0;
 }
 
 Molecule::~Molecule()
@@ -2873,6 +2879,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             /**** End Bond Flexion ****/
             #endif
 
+            for (j=1; j<10; j++) mm[i]->lastbind_history[j-1] = mm[i]->lastbind_history[j];
+            mm[i]->lastbind_history[j-1] = mm[i]->lastbind;
+
         }	// for i = 0 to iters
         // cout << "Iteration " << iter << " improvement " << improvement << endl;
 
@@ -2976,6 +2985,9 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     int EZgiven[numdb+4];
     Atom* EZatom0[numdb+4];
     Atom* EZatom1[numdb+4];
+
+    smlen = strlen(smilesstr);
+    paren = new SMILES_Parenthetical[smlen];
 
     for (i=0; i<len; i++)
     {
@@ -3394,6 +3406,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
         prevarom = aromatic;
     }
     atoms[atcount]=0;
+    delete[] paren;
 
     return true;
 }

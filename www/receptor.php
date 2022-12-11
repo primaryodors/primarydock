@@ -361,12 +361,13 @@ echo "</p>";*/
             if (isset($text[$i]))
             {
                 $tl = strlen($text[$i]);
+                $tl1 = strlen(trim($text[$i]));
                 if ($tl==3 || @$ltl[$rgn] == 4) echo " ";
                 
                 if ($tmr & 1)
                 {
                     $text[$i] = strrev($text[$i]);
-                    $rc[$tmr] += $tl - 1;
+                    $rc[$tmr] += $tl1 - 1;
                 }
 
                 for ($j=0; $j<$tl; $j++) 
@@ -413,7 +414,7 @@ echo "</p>";*/
             
             echo " ";
         
-            if ($tmr & 1) $rc[$tmr] += $tl+1;
+            if ($tmr & 1) $rc[$tmr] += $tl1+1;
         }
     
         echo "\n";

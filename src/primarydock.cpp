@@ -83,6 +83,7 @@ int mcoord_resno[256];
 int addl_resno[256];
 Molecule* ligand;
 Molecule** waters = nullptr;
+Molecule** owaters = nullptr;
 Point ligcen_target;
 Point size(10,10,10);
 SCoord path[256];
@@ -90,6 +91,7 @@ int pathnodes = 0;				// The pocketcen is the initial node.
 int poses = 10;
 int iters = 50;
 int maxh2o = 0;
+int omaxh2o = 0;
 bool flex = true;
 float kJmol_cutoff = 0.01;
 bool kcal = false;
@@ -483,19 +485,22 @@ int interpret_config_line(char** fields)
     }
     else if (!strcmp(fields[0], "H2O"))
     {
-        maxh2o = atoi(fields[1]);
+        maxh2o = omaxh2o = atoi(fields[1]);
         if (maxh2o > 0)
         {
             waters = new Molecule*[maxh2o+2];
+            owaters = new Molecule*[maxh2o+2];
             for (i=0; i<maxh2o; i++)
             {
                 waters[i] = new Molecule("H2O");
                 waters[i]->from_smiles("O");
+                owaters[i] = waters[i];
 
                 int j;
                 for (j=0; j<3; j++) strcpy(waters[i]->get_atom(j)->aa3let, "H2O");
             }
             waters[i] = nullptr;
+            owaters[i] = nullptr;
         }
         optsecho = "Water molecules: " + to_string(maxh2o);
         return 1;
@@ -1447,11 +1452,20 @@ int main(int argc, char** argv)
 _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
-    for (pose=1; pose<=poses; pose++)
+    for (pose = 1; pose <= poses; pose++)
     {
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
         ligand->crumple(fiftyseventh*44);
+
+        if (waters)
+        {
+            for (i = 0; i <= omaxh2o; i++)
+            {
+                waters[i] = owaters[i];
+            }
+            maxh2o = omaxh2o;
+        }
 
         if (pose > 1)
         {

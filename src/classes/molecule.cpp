@@ -2194,6 +2194,10 @@ void Molecule::do_histidine_flip(histidine_flip* hf)
 
     Point newloc = rotate3D(ptH, Navg, ptC.subtract(Navg), M_PI);
     hf->H->move(newloc);
+
+    #if _DBG_HISFLIP
+    cout << hf->H->name << " moved from " << ptH << " to " << newloc << endl;
+    #endif
 }
 
 #define DBG_BONDFLEX 0
@@ -2435,6 +2439,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             {
                 for (l=0; mm[i]->hisflips[l]; l++)
                 {
+                    #if _DBG_HISFLIP
+                    cout << "Flipping " << mm[i]->name << endl;
+                    #endif
                     mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
 
                     bind1 = 0;
@@ -2447,13 +2454,17 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bind1 += lbind;
                         if (lbind > maxb) maxb = lbind;
                     }
-                    if (bind1 >= bind || (bind < _hisflip_binding_threshold && frand(0,1) < 0.29))
+                    if (bind1 >= bind || (bind < _hisflip_binding_threshold && frand(0,1) < 0.53))
                     {
-                        ;
+                        bind = bind1;
                     }
                     else
                     {
                         mm[i]->do_histidine_flip(mm[i]->hisflips[l]);               // put it back.
+
+                        #if _DBG_HISFLIP
+                        cout << "Putting it back." << endl;
+                        #endif
                     }
                 }
             }

@@ -222,7 +222,7 @@
 
 // How strong an intermolecular bond is required to prevent a histidine hydrogen from flipping
 // to a less favorable state.
-#define _hisflip_binding_threshold 10
+#define _hisflip_binding_threshold 25
 
 // Debugging stuff.
 #define _DBG_LONELINESS 0
@@ -237,7 +237,8 @@
 #define _DBG_RESBMULT 0
 #define _debug_active_bond_rot 0
 #define _DBG_SPACEDOUT 0
-#define _DBG_H2O_TELEPORT 1
+#define _DBG_H2O_TELEPORT 0
+#define _DBG_HISFLIP 0
 
 #endif
 

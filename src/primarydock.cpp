@@ -250,7 +250,7 @@ void iteration_callback(int iter)
     #endif
 
     #if _teleport_dissatisfied_waters
-    if ((iter % 10) == 9 && waters)
+    if (waters && (iter % 5) == 4)
     {
         for (i=0; waters[i]; i++)
         {
@@ -262,9 +262,9 @@ void iteration_callback(int iter)
                 int j;
                 for (j=0; j<10; j++)
                 {
-                    if (!j || waters[i]->lastbind_history[j] < e) e = waters[i]->lastbind_history[j];
+                    if (!j || waters[i]->lastbind_history[j] > e) e = waters[i]->lastbind_history[j];
                 }
-                if (e > _water_satisfaction_threshold) teleport_water(waters[i]);
+                if (e < _water_satisfaction_threshold) teleport_water(waters[i]);
             }
         }
     }
@@ -463,7 +463,7 @@ int interpret_config_line(char** fields)
     else if (!strcmp(fields[0], "ELIM"))
     {
         kJmol_cutoff = -atof(fields[1]);
-        optsecho = "Energy limit: " + to_string(kJmol_cutoff);
+        optsecho = "Energy limit: " + to_string(-kJmol_cutoff);
         return 1;
     }
     else if (!strcmp(fields[0], "EMIN"))
@@ -1503,7 +1503,7 @@ _try_again:
                 }
                 maxh2o = omaxh2o;
             }
-            
+
             if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 

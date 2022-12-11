@@ -254,13 +254,18 @@ void iteration_callback(int iter)
     {
         for (i=0; waters[i]; i++)
         {
-            float e = 0;
-            int j;
-            for (j=0; j<10; j++)
+            float r = waters[i]->get_barycenter().get_3d_distance(ligcen_target);
+            if (r > size.magnitude()) teleport_water(waters[i]);
+            else
             {
-                if (!j || waters[i]->lastbind_history[j] < e) e = waters[i]->lastbind_history[j];
+                float e = 0;
+                int j;
+                for (j=0; j<10; j++)
+                {
+                    if (!j || waters[i]->lastbind_history[j] < e) e = waters[i]->lastbind_history[j];
+                }
+                if (e > _water_satisfaction_threshold) teleport_water(waters[i]);
             }
-            if (e > _water_satisfaction_threshold) teleport_water(waters[i]);
         }
     }
     #endif

@@ -886,6 +886,30 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
                     break;
                 }
             }
+            else
+            {
+                // Non-hydrogen magic.
+                switch (lbtom->get_family())
+                {
+                    case TETREL:
+                    if (family == CHALCOGEN) polarity = -0.8;
+                    if (family == PNICTOGEN) polarity = -0.75;
+                    break;
+
+                    case PNICTOGEN:
+                    if (family == CHALCOGEN) polarity = -1;
+                    if (family == TETREL) lbtom->polarity = -0.75;
+                    break;
+
+                    case CHALCOGEN:
+                    if (family == PNICTOGEN) lbtom->polarity = -1;
+                    if (family == TETREL) lbtom->polarity = -0.8;
+                    break;
+
+                    default:
+                    ;
+                }
+            }
 
             if (!reciprocity)
             {

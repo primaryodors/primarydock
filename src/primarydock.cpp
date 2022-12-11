@@ -607,6 +607,25 @@ int interpret_config_line(char** fields)
         optsecho = "Interatomic radius limit: " + to_string(_INTERA_R_CUTOFF);
         return 1;
     }
+    else if (!strcmp(fields[0], "SEARCH"))
+    {
+        if (!fields[1]) return 0;       // Stay with default.
+        if (!strcmp(fields[1], "BB"))
+        {
+            use_bestbind_algorithm = true;
+            return 2;
+        }
+        else if (!strcmp(fields[1], "TS"))
+        {
+            use_bestbind_algorithm = false;
+            return 2;
+        }
+        else
+        {
+            cout << "Unknown search method " << fields[1] << endl;
+            throw 0xbad5eec;
+        }
+    }
     else if (!strcmp(fields[0], "SIZE"))
     {
         size.x = atof(fields[1]);

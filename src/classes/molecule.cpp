@@ -3702,7 +3702,6 @@ float Molecule::close_loop(Atom** path, float lcard)
     return anomaly;
 }
 
-#define _DBG_MOLBB 0
 Atom** Molecule::get_most_bindable(int max_count)
 {
     if (noAtoms(atoms)) return 0;

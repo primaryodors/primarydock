@@ -2609,6 +2609,7 @@ _try_again:
     if (output) *output << endl;
 
     const float energy_mult = kcal ? _kcal_per_kJ : 1;
+    pose = 1;
     for (i=1; i<=poses; i++)
     {
         for (j=0; j<poses; j++)
@@ -2622,24 +2623,24 @@ _try_again:
                         // If pathnode is not within kJ/mol cutoff, abandon it and all subsequent pathnodes of the same pose.
                         if (dr[j][k].kJmol < kJmol_cutoff)
                         {
-                            cout << "Pose " << j << " node " << k
+                            cout << "Pose " << pose << " node " << k
                                  << " energy " << -dr[j][k].kJmol*energy_mult
                                  << " is outside of limit; aborting path nodes." << endl;
-                            if (output) *output << "Pose " << j << " node " << k
+                            if (output) *output << "Pose " << pose << " node " << k
                                                 << " energy " << -dr[j][k].kJmol*energy_mult
                                                 << " is outside of limit; aborting path nodes." << endl;
                             break;
                         }
 
-                        if (flex && !dr[j][k].pdbdat.length())
+                        /*if (flex && !dr[j][k].pdbdat.length())
                         {
                             cout << "Pose " << j << " node " << k << " is missing." << endl;
                             if (output) *output << "Pose " << j << " node " << k << " is missing." << endl;
                             continue;
-                        }
+                        }*/
 
-                        cout << "Pose: " << i << endl << "Node: " << k << endl;
-                        if (output) *output << "Pose: " << i << endl << "Node: " << k << endl;
+                        cout << "Pose: " << pose << endl << "Node: " << k << endl;
+                        if (output) *output << "Pose: " << pose << endl << "Node: " << k << endl;
 
                         if (differential_dock)
                         {
@@ -2821,6 +2822,7 @@ _try_again:
 
                         if (!k) found_poses++;
                     }
+                    pose++;
                 }
                 else
                 {

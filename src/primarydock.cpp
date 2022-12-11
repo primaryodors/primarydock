@@ -1463,15 +1463,6 @@ _try_again:
         float lig_min_int_clsh = ligand->get_internal_clashes();
         ligand->crumple(fiftyseventh*44);
 
-        if (waters)
-        {
-            for (i = 0; i <= omaxh2o; i++)
-            {
-                waters[i] = owaters[i];
-            }
-            maxh2o = omaxh2o;
-        }
-
         if (pose > 1)
         {
             // TODO: Revert to saved original locations for the side chain atoms instead of reloading the protein.
@@ -1503,6 +1494,16 @@ _try_again:
 
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
+
+            if (waters)
+            {
+                for (i = 0; i <= omaxh2o; i++)
+                {
+                    waters[i] = owaters[i];
+                }
+                maxh2o = omaxh2o;
+            }
+            
             if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 

@@ -439,7 +439,7 @@ Center:
 </div>
 </div>
 <center>
-<div id="viewport" style="width:1800px; height:880px; background-color: #201008;"></div>
+<div id="viewport" style="width:1800px; height:880px; background-color: #020408;"></div>
 </center>
 <script>
 
@@ -1195,7 +1195,7 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 
 stage.setParameters(
 {
-	'backgroundColor': '#080400',
+	'backgroundColor': '#020408',
 	'ambientColor': '#59f',
     'ambientIntensity': 0.6,
 	'lightColor': '#fc8',
@@ -1616,6 +1616,7 @@ function loadFile(fileData, fileName = "")
 		success: function(poresult)
         {
             poresult = poresult.split("\n");
+			bw50r = new Array(99).fill(0);
 
             var i;
             for (i=0; i<poresult.length; i++)
@@ -1641,6 +1642,12 @@ function loadFile(fileData, fileName = "")
                         tmstart[tmr] = parseInt(fields[2]);
                         tmend[tmr] = parseInt(fields[3]);
                     }
+                }
+                if (ln.substr(0, 3) == "BW|")
+                {
+                    var fields = ln.split("|");
+					var tmr = parseInt(fields[1].split('.')[0]);
+					bw50r[tmr] = parseInt(fields[2]);
                 }
                 if (ln.substr(0, 7) == "POCKET|")
                 {

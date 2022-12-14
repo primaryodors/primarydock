@@ -27,6 +27,17 @@ foreach ($rcp['region'] as $rgname => $se)
     echo "\n";
 }
 
+if (@$rcp["bw"])
+{
+    foreach ($rcp["bw"] as $tmr => $bw50)
+    {
+        echo "BW|";
+        echo "$tmr|";
+        echo "$bw50|";
+        echo "\n";
+    }
+}
+
 // TODO: Metal coordination.
 
 $bsr = array_flip(binding_site($protid));

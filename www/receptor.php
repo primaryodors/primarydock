@@ -361,8 +361,15 @@ echo "</p>";*/
             if (isset($text[$i]))
             {
                 $tl = strlen($text[$i]);
+                $tl1 = strlen(trim($text[$i]));
                 if ($tl==3 || @$ltl[$rgn] == 4) echo " ";
                 
+                if ($tmr & 1)
+                {
+                    $text[$i] = strrev($text[$i]);
+                    $rc[$tmr] += $tl1 - 1;
+                }
+
                 for ($j=0; $j<$tl; $j++) 
                 { 
                     $ch = substr($text[$i],$j,1);
@@ -395,8 +402,8 @@ echo "</p>";*/
                     
                     if ($ch != ' ')
                     { 
-                        if ($tmr & 1) $rc[$tmr]++;
-                        else          $rc[$tmr]--;
+                        /*if ($tmr & 1) $rc[$tmr]++;
+                        else*/          $rc[$tmr]--;
                     }
                 }
                 if ($tl==3 || @$ltl[$rgn] == 4) echo " ";
@@ -406,6 +413,8 @@ echo "</p>";*/
             else echo "        ";
             
             echo " ";
+        
+            if ($tmr & 1) $rc[$tmr] += $tl1+1;
         }
     
         echo "\n";

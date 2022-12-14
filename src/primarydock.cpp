@@ -64,6 +64,7 @@ char configfname[256];
 char protfname[256];
 char protafname[256];
 char ligfname[256];
+char outfname[256];
 Point pocketcen, loneliest, pocketsize, ligbbox;
 std::ofstream *output = NULL;
 
@@ -82,6 +83,7 @@ int mcoord_resno[256];
 int addl_resno[256];
 Molecule* ligand;
 Molecule** waters = nullptr;
+Molecule** owaters = nullptr;
 Point ligcen_target;
 Point size(10,10,10);
 SCoord path[256];
@@ -89,6 +91,7 @@ int pathnodes = 0;				// The pocketcen is the initial node.
 int poses = 10;
 int iters = 50;
 int maxh2o = 0;
+int omaxh2o = 0;
 bool flex = true;
 float kJmol_cutoff = 0.01;
 bool kcal = false;
@@ -100,6 +103,7 @@ int triesleft = 0;				// Default is no retry.
 bool echo_progress = false;
 
 std::string origbuff = "";
+std::string optsecho = "";
 
 // Switch to enable older "best binding" algorithm instead of newer "tumble spheres".
 // Generally, tumble spheres give better results but let's leave best bind code
@@ -117,6 +121,59 @@ int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0;
 std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
+
+void delete_water(Molecule* mol)
+{
+    if (!waters) return;
+    int i, j;
+    for (i=0; waters[i]; i++)
+    {
+        if (waters[i] == mol)
+        {
+            for (j=i+1; waters[j]; j++)
+            {
+                waters[j-1] = waters[j];
+            }
+            waters[j-1] = nullptr;
+            maxh2o--;
+
+            #if _DBG_H2O_TELEPORT
+            cout << "Deleted water molecule " << mol << endl;
+            #endif
+        }
+        break;
+    }
+}
+
+float teleport_water(Molecule* mol)
+{
+    if (!waters) return -1000;
+
+    int i, j;
+    float e;
+    for (j=0; waters[j]; j++)
+        if (waters[j] == mol) break;
+    
+    if (!waters[j]) return -1000;
+
+    for (i=0; i<_water_teleport_tries; i++)
+    {
+        Point teleport(
+            ligcen_target.x + frand(-size.x, size.x),
+            ligcen_target.y + frand(-size.y, size.y),
+            ligcen_target.z + frand(-size.z, size.z)
+                      );
+        waters[j]->recenter(teleport);
+        e = -waters[j]->get_intermol_binding(gcfmols);
+        if (e < _water_satisfaction_threshold) break;
+    }
+    if (e > _water_satisfaction_threshold) delete_water(mol);
+    #if _DBG_H2O_TELEPORT
+    else cout << "Teleported water molecule " << mol << endl;
+    #endif
+
+    return e;
+}
 
 void iteration_callback(int iter)
 {
@@ -192,6 +249,27 @@ void iteration_callback(int iter)
         ligand->recenter(bary);
     }
 
+    #endif
+
+    #if _teleport_dissatisfied_waters
+    if (waters && (iter % 5) == 4)
+    {
+        for (i=0; waters[i]; i++)
+        {
+            float r = waters[i]->get_barycenter().get_3d_distance(ligcen_target);
+            if (r > size.magnitude()) teleport_water(waters[i]);
+            else
+            {
+                float e = 0;
+                int j;
+                for (j=0; j<10; j++)
+                {
+                    if (!j || waters[i]->lastbind_history[j] > e) e = waters[i]->lastbind_history[j];
+                }
+                if (e < _water_satisfaction_threshold) teleport_water(waters[i]);
+            }
+        }
+    }
     #endif
 
     if (gcfmols && seql)
@@ -276,6 +354,8 @@ int interpret_config_line(char** fields)
 {
     int i;
 
+    optsecho = "";
+
     if (0) { ; }
     else if (!strcmp(fields[0], "ACVBROT"))
     {
@@ -285,6 +365,7 @@ int interpret_config_line(char** fields)
         abr.bname = fields[3];
         abr.theta = atof(fields[4]) * fiftyseventh;
         active_bond_rots.push_back(abr);
+        optsecho = (std::string)"Active bond rotation " + (std::string)fields[2] + (std::string)"-" + (std::string)fields[3];
     }
     else if (!strcmp(fields[0], "ACVHXR"))
     {
@@ -298,6 +379,7 @@ int interpret_config_line(char** fields)
         ahr.axis         = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
         ahr.theta        = atof(fields[n++]) * fiftyseventh;
         active_helix_rots.push_back(ahr);
+        optsecho = (std::string)"Active helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
     else if (!strcmp(fields[0], "ACVMX"))
     {
@@ -343,14 +425,17 @@ int interpret_config_line(char** fields)
             active_matrix_c[n].y = atof(fields[6]);
             active_matrix_c[n].z = atof(fields[7]);
         }
+        optsecho = (std::string)"Active matrix for TMR" + to_string(n);
     }
     else if (!strcmp(fields[0], "ACVNODE"))
     {
         active_matrix_node = atoi(fields[1]);
+        optsecho = (std::string)"Active node is " + to_string(active_matrix_node);
     }
     else if (!strcmp(fields[0], "CEN"))
     {
         CEN_buf = origbuff;
+        optsecho = (std::string)"Center " + CEN_buf;
         return 0;
     }
     else if (!strcmp(fields[0], "DEBUG"))
@@ -364,24 +449,29 @@ int interpret_config_line(char** fields)
         cout << "Starting a debug outstream." << endl;
         #endif
         debug = new std::ofstream(fields[1], std::ofstream::out);
+        optsecho = "Debug file: " + (std::string)fields[1];
         return 1;
     }
     else if (!strcmp(fields[0], "DIFF"))
     {
         differential_dock = true;
+        optsecho = "Differential dock.";
     }
     else if (!strcmp(fields[0], "ECHO"))
     {
         echo_progress = true;
+        optsecho = "Echo on.";
     }
     else if (!strcmp(fields[0], "ELIM"))
     {
         kJmol_cutoff = -atof(fields[1]);
+        optsecho = "Energy limit: " + to_string(-kJmol_cutoff);
         return 1;
     }
     else if (!strcmp(fields[0], "EMIN"))
     {
         kJmol_cutoff = atof(fields[1]);
+        optsecho = "Energy limit: " + to_string(kJmol_cutoff);
         return 1;
     }
     else if (!strcmp(fields[0], "EXCL"))
@@ -391,54 +481,65 @@ int interpret_config_line(char** fields)
         int excle = atoi(fields[i++]);
 
         for (i=excls; i<=excle; i++) exclusion.push_back(i);
+        optsecho = "Exclude range " + to_string(excls) + (std::string)"-" + to_string(excle);
         return i-1;
     }
     else if (!strcmp(fields[0], "FLEX"))
     {
         flex = (atoi(fields[1]) != 0);
+        optsecho = "Flex: " + (std::string)(flex ? "ON" : "OFF");
         return 1;
     }
     else if (!strcmp(fields[0], "H2O"))
     {
-        maxh2o = atoi(fields[1]);
+        maxh2o = omaxh2o = atoi(fields[1]);
         if (maxh2o > 0)
         {
             waters = new Molecule*[maxh2o+2];
+            owaters = new Molecule*[maxh2o+2];
             for (i=0; i<maxh2o; i++)
             {
                 waters[i] = new Molecule("H2O");
                 waters[i]->from_smiles("O");
+                owaters[i] = waters[i];
 
                 int j;
                 for (j=0; j<3; j++) strcpy(waters[i]->get_atom(j)->aa3let, "H2O");
             }
             waters[i] = nullptr;
+            owaters[i] = nullptr;
         }
+        optsecho = "Water molecules: " + to_string(maxh2o);
         return 1;
     }
     else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
     {
         iters = atoi(fields[1]);
+        optsecho = "Iterations: " + to_string(iters);
         return 1;
     }
     else if (!strcmp(fields[0], "KCAL"))
     {
         kcal = true;
+        optsecho = "Output units switched to kcal/mol.";
         return 0;
     }
     else if (!strcmp(fields[0], "LIG"))
     {
         strcpy(ligfname, fields[1]);
+        // optsecho = "Ligand file is " + (std::string)ligfname;
         ligset = true;
         return 1;
     }
     else if (!strcmp(fields[0], "MCOORD"))
     {
         int j=0;
+        optsecho = "Metal coordination on residues ";
         for (i=1; fields[i]; i++)
         {
             if (fields[i][0] == '-' && fields[i][1] == '-') break;
             mcoord_resno[j++] = atoi(fields[i]);
+            optsecho += to_string(atoi(fields[i])) + (std::string)" ";
         }
         mcoord_resno[j] = 0;
         return i-1;
@@ -447,6 +548,7 @@ int interpret_config_line(char** fields)
     {
         activation_node = atoi(fields[1]);
         strcpy(protafname, fields[2]);
+        optsecho = "Active PDB " + (std::string)protafname + " for node " + to_string(activation_node);
     }
     else if (!strcmp(fields[0], "OUT"))
     {
@@ -455,11 +557,8 @@ int interpret_config_line(char** fields)
             cout << "Missing output file name; check config file." << endl << flush;
             throw 0xbadf12e;
         }
-        #if _DBG_SPACEDOUT
-        cout << "Starting a file outstream: " << fields[1] << endl;
-        #endif
-        output = new std::ofstream(fields[1], std::ofstream::out);
-        if (!output) return -1;
+        strcpy(outfname, fields[1]);
+        optsecho = "Output file is " + (std::string)outfname;
         return 1;
     }
     else if (!strcmp(fields[0], "PATH"))
@@ -483,11 +582,13 @@ int interpret_config_line(char** fields)
             pathstrs.resize(nodeno+1);
             pathstrs[nodeno] = origbuff;
         }
+        optsecho = "Path node set #" + to_string(nodeno);
         return i-1;
     }
     else if (!strcmp(fields[0], "POSE"))
     {
         poses = atoi(fields[1]);
+        optsecho = "Number of poses: " + to_string(poses);
         return 1;
     }
     else if (!strcmp(fields[0], "PREALIGN"))
@@ -500,6 +601,7 @@ int interpret_config_line(char** fields)
     {
         strcpy(protfname, fields[1]);
         protset = true;
+        // optsecho = "Protein file is " + (std::string)protfname;
         return 1;
     }
     else if (!strcmp(fields[0], "RETRY"))
@@ -510,7 +612,27 @@ int interpret_config_line(char** fields)
     else if (!strcmp(fields[0], "RLIM"))
     {
         _INTERA_R_CUTOFF = atof(fields[1]);
+        optsecho = "Interatomic radius limit: " + to_string(_INTERA_R_CUTOFF);
         return 1;
+    }
+    else if (!strcmp(fields[0], "SEARCH"))
+    {
+        if (!fields[1]) return 0;       // Stay with default.
+        if (!strcmp(fields[1], "BB"))
+        {
+            use_bestbind_algorithm = true;
+            return 2;
+        }
+        else if (!strcmp(fields[1], "TS"))
+        {
+            use_bestbind_algorithm = false;
+            return 2;
+        }
+        else
+        {
+            cout << "Unknown search method " << fields[1] << endl;
+            throw 0xbad5eec;
+        }
     }
     else if (!strcmp(fields[0], "SIZE"))
     {
@@ -526,18 +648,25 @@ int interpret_config_line(char** fields)
             cout << "Pocket size cannot be zero in any dimension." << endl << flush;
             throw 0xbad512e;
         }
+        optsecho = "Interatomic radius limit: " + to_string(size.x) + (std::string)"," + to_string(size.y) + (std::string)"," + to_string(size.z);
         return 3;
     }
     else if (!strcmp(fields[0], "STATE"))
     {
         states.push_back(origbuff);
+        optsecho = "Added state " + (std::string)origbuff;
         return 0;
     }
     else if (!strcmp(fields[0], "TRIP"))
     {
+        optsecho = "Added trip clashables ";
         for (i = 1; fields[i]; i++)
+        {
+            if (fields[i][0] == '-' && fields[i][1] == '-') break;
             tripswitch_clashables.push_back(atoi(fields[i]));
-        return 0;
+            optsecho += (std::string)fields[i] + (std::string)" ";
+        }
+        return i-1;
     }
 
     return 0;
@@ -1050,6 +1179,7 @@ int main(int argc, char** argv)
             argv[i] += 2;
             for (j=0; argv[i][j]; j++) if (argv[i][j] >= 'a' && argv[i][j] <= 'z') argv[i][j] &= 0x5f;
             j = interpret_config_line(&argv[i]);
+            // if (optsecho.size()) cout << optsecho << endl;
             argv[i] -= 2;
             i += j;
         }
@@ -1077,10 +1207,17 @@ int main(int argc, char** argv)
             argv[i] += 2;
             for (j=0; argv[i][j]; j++) if (argv[i][j] >= 'a' && argv[i][j] <= 'z') argv[i][j] &= 0x5f;
             j = interpret_config_line(&argv[i]);
+            if (optsecho.size()) cout << optsecho << endl;
             argv[i] -= 2;
             i += j;
         }
     }
+
+    #if _DBG_SPACEDOUT
+    cout << "Starting a file outstream: " << outfname << endl;
+    #endif
+    output = new std::ofstream(outfname, std::ofstream::out);
+    if (!output) return -1;
 
     pre_ligand_flex_radius = size.magnitude();
     pre_ligand_multimol_radius = pre_ligand_flex_radius + (default_pre_ligand_multimol_radius - default_pre_ligand_flex_radius);
@@ -1382,7 +1519,7 @@ int main(int argc, char** argv)
 _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
-    for (pose=1; pose<=poses; pose++)
+    for (pose = 1; pose <= poses; pose++)
     {
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
@@ -1419,6 +1556,16 @@ _try_again:
 
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
+
+            if (waters)
+            {
+                for (i = 0; i <= omaxh2o; i++)
+                {
+                    waters[i] = owaters[i];
+                }
+                maxh2o = omaxh2o;
+            }
+
             if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 
@@ -2508,6 +2655,7 @@ _try_again:
     if (output) *output << endl;
 
     const float energy_mult = kcal ? _kcal_per_kJ : 1;
+    pose = 1;
     for (i=1; i<=poses; i++)
     {
         for (j=0; j<poses; j++)
@@ -2521,24 +2669,24 @@ _try_again:
                         // If pathnode is not within kJ/mol cutoff, abandon it and all subsequent pathnodes of the same pose.
                         if (dr[j][k].kJmol < kJmol_cutoff)
                         {
-                            cout << "Pose " << j << " node " << k
+                            cout << "Pose " << pose << " node " << k
                                  << " energy " << -dr[j][k].kJmol*energy_mult
                                  << " is outside of limit; aborting path nodes." << endl;
-                            if (output) *output << "Pose " << j << " node " << k
+                            if (output) *output << "Pose " << pose << " node " << k
                                                 << " energy " << -dr[j][k].kJmol*energy_mult
                                                 << " is outside of limit; aborting path nodes." << endl;
                             break;
                         }
 
-                        if (flex && !dr[j][k].pdbdat.length())
+                        /*if (flex && !dr[j][k].pdbdat.length())
                         {
                             cout << "Pose " << j << " node " << k << " is missing." << endl;
                             if (output) *output << "Pose " << j << " node " << k << " is missing." << endl;
                             continue;
-                        }
+                        }*/
 
-                        cout << "Pose: " << i << endl << "Node: " << k << endl;
-                        if (output) *output << "Pose: " << i << endl << "Node: " << k << endl;
+                        cout << "Pose: " << pose << endl << "Node: " << k << endl;
+                        if (output) *output << "Pose: " << pose << endl << "Node: " << k << endl;
 
                         if (differential_dock)
                         {
@@ -2720,6 +2868,7 @@ _try_again:
 
                         if (!k) found_poses++;
                     }
+                    pose++;
                 }
                 else
                 {

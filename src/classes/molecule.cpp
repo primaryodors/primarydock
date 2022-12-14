@@ -33,6 +33,9 @@ Molecule::Molecule(char const* lname)
     atcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = nullptr;
+
+    int j;
+    for (j=0; j<10; j++) lastbind_history[j] = 0;
 }
 
 Molecule::Molecule()
@@ -43,7 +46,10 @@ Molecule::Molecule()
     atcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = 0;
-    paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
+    paren = nullptr;
+
+    int j;
+    for (j=0; j<10; j++) lastbind_history[j] = 0;
 }
 
 Molecule::~Molecule()
@@ -2177,7 +2183,23 @@ void Molecule::minimize_internal_clashes()
     // cout << " base internal clashes: " << base_internal_clashes << endl;
 }
 
+void Molecule::do_histidine_flip(histidine_flip* hf)
+{
+    Point ptC  = hf->C->get_location();
+    Point ptN1 = hf->N1->get_location();
+    Point ptN2 = hf->N2->get_location();
+    Point ptH  = hf->H->get_location();
 
+    Point arr[2] = {ptN1, ptN2};
+    Point Navg = average_of_points(arr, 2);
+
+    Point newloc = rotate3D(ptH, Navg, ptC.subtract(Navg), M_PI);
+    hf->H->move(newloc);
+
+    #if _DBG_HISFLIP
+    cout << hf->H->name << " moved from " << ptH << " to " << newloc << endl;
+    #endif
+}
 
 #define DBG_BONDFLEX 0
 #define DBG_FLEXRES 111
@@ -2412,6 +2434,42 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             }
             /**** End Linear Motion ****/
             #endif
+
+            /**** Histidine flip ****/
+            if (mm[i]->hisflips)
+            {
+                for (l=0; mm[i]->hisflips[l]; l++)
+                {
+                    #if _DBG_HISFLIP
+                    cout << "Flipping " << mm[i]->name << endl;
+                    #endif
+                    mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
+
+                    bind1 = 0;
+                    maxb = 0;
+                    for (j=0; all[j]; j++)
+                    {
+                        if (!nearby[j]) continue;
+                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                        bind1 += lbind;
+                        if (lbind > maxb) maxb = lbind;
+                    }
+                    if (bind1 >= bind || (bind < _hisflip_binding_threshold && frand(0,1) < 0.53))
+                    {
+                        bind = bind1;
+                    }
+                    else
+                    {
+                        mm[i]->do_histidine_flip(mm[i]->hisflips[l]);               // put it back.
+
+                        #if _DBG_HISFLIP
+                        cout << "Putting it back." << endl;
+                        #endif
+                    }
+                }
+            }
+            /**** End histidine flip ****/
 
             #if allow_axial_tumble
             /**** Axial Tumble ****/
@@ -2875,6 +2933,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             #endif
 
             if (mm[i]->movability <= MOV_NORECEN) mm[i]->recenter(icen);
+            
+            for (j=1; j<10; j++) mm[i]->lastbind_history[j-1] = mm[i]->lastbind_history[j];
+            mm[i]->lastbind_history[j-1] = mm[i]->lastbind;
 
         }	// for i = 0 to iters
         // cout << "Iteration " << iter << " improvement " << improvement << endl;
@@ -2979,6 +3040,9 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     int EZgiven[numdb+4];
     Atom* EZatom0[numdb+4];
     Atom* EZatom1[numdb+4];
+
+    smlen = strlen(smilesstr);
+    paren = new SMILES_Parenthetical[smlen];
 
     for (i=0; i<len; i++)
     {
@@ -3397,6 +3461,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
         prevarom = aromatic;
     }
     atoms[atcount]=0;
+    delete[] paren;
 
     return true;
 }
@@ -3640,7 +3705,6 @@ float Molecule::close_loop(Atom** path, float lcard)
     return anomaly;
 }
 
-#define _DBG_MOLBB 0
 Atom** Molecule::get_most_bindable(int max_count)
 {
     if (noAtoms(atoms)) return 0;

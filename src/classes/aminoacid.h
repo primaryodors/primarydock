@@ -151,6 +151,7 @@ public:
 protected:
     void load_aa_defs();
     void copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs, bool proline_like);
+    void find_his_flips();
 
     int residue_no=0;
     char region[25];

@@ -218,6 +218,16 @@
 #define prealign_iters 50
 #define prealign_momenta_mult 0
 
+// Whether to move water molecules around that are clashing or are not forming intermolecular bonds.
+#define _teleport_dissatisfied_waters 1
+// Threshold is positive for binding, negative for clashes.
+#define _water_satisfaction_threshold 5
+#define _water_teleport_tries 25
+
+// How strong an intermolecular bond is required to prevent a histidine hydrogen from flipping
+// to a less favorable state.
+#define _hisflip_binding_threshold 25
+
 // Debugging stuff.
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0
@@ -230,7 +240,10 @@
 #define _DORESPHRES 0
 #define _DBG_RESBMULT 0
 #define _debug_active_bond_rot 0
-#define _DBG_SPACEDOUT 1
+#define _DBG_SPACEDOUT 0
+#define _DBG_H2O_TELEPORT 0
+#define _DBG_HISFLIP 0
+#define _DBG_MOLBB 0
 
 #endif
 

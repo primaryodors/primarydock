@@ -12,6 +12,14 @@ struct SMILES_Parenthetical
     char* smilesstr=0;
 };
 
+struct histidine_flip
+{
+    Atom* H;
+    Atom* C;
+    Atom* N1;
+    Atom* N2;
+};
+
 enum MovabilityType
 {
     MOV_ALL			= 1000,
@@ -112,6 +120,7 @@ public:
     Bond** get_all_bonds(bool unidirectional);
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
     bool rotate_bond(const Bond* rot8b, const float angle);
+    void do_histidine_flip(histidine_flip* hf);
 
     // Ring functions.
     int identify_rings();
@@ -163,6 +172,9 @@ public:
     bool echo_iters = false;
     MovabilityType movability = MOV_ALL;
     float lastbind = 0;
+    float lastbind_history[10];
+
+    histidine_flip** hisflips = nullptr;
 
 protected:
     Molecule();

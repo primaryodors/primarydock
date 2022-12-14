@@ -2432,7 +2432,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     // cout << endl;
                     while ((M_PI*2-rad) > 1e-3)
                     {
-                        mm[i]->rotate(&v, _fullrot_steprad);
+                        mm[i]->rotate(&v, _fullrot_steprad, mm[i]->movability > MOV_NORECEN);
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
@@ -2457,7 +2457,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     }
 
                     if (!isnan(bestfrrad))
-                        mm[i]->rotate(&v, bestfrrad);
+                        mm[i]->rotate(&v, bestfrrad, mm[i]->movability > MOV_NORECEN);
                 }
                 else
                 {
@@ -2467,7 +2467,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     ra = frand(-ra, ra);
                     mm[i]->rotate(&v, ra);
                     #else
-                    mm[i]->rotate(&v, mm[i]->amx);
+                    mm[i]->rotate(&v, mm[i]->amx, mm[i]->movability > MOV_NORECEN);
                     #endif
                     bind1 = 0;
                     maxb = 0;
@@ -2485,7 +2485,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         putitback.restore_state(mm[i]);
                         mm[i]->amx *= 0.98;
                         #else
-                        mm[i]->rotate(&v, -mm[i]->amx);
+                        mm[i]->rotate(&v, -mm[i]->amx, mm[i]->movability > MOV_NORECEN);
                         mm[i]->amx *= reversal;
                         #endif
                     }
@@ -2510,7 +2510,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
-                        mm[i]->rotate(&v1, _fullrot_steprad);
+                        mm[i]->rotate(&v1, _fullrot_steprad, mm[i]->movability > MOV_NORECEN);
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
@@ -2535,7 +2535,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     }
 
                     if (!isnan(bestfrrad))
-                        mm[i]->rotate(&v1, bestfrrad);
+                        mm[i]->rotate(&v1, bestfrrad, mm[i]->movability > MOV_NORECEN);
                 }
                 else
                 {
@@ -2545,7 +2545,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     ra = frand(-ra, ra);
                     mm[i]->rotate(&v, ra);
                     #else
-                    mm[i]->rotate(&v1, mm[i]->amy);
+                    mm[i]->rotate(&v1, mm[i]->amy, mm[i]->movability > MOV_NORECEN);
                     #endif
 
                     bind1 = 0;
@@ -2564,7 +2564,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         putitback.restore_state(mm[i]);
                         mm[i]->amy *= 0.98;
                         #else
-                        mm[i]->rotate(&v1, -mm[i]->amy);
+                        mm[i]->rotate(&v1, -mm[i]->amy, mm[i]->movability > MOV_NORECEN);
                         mm[i]->amy *= reversal;
                         #endif
                     }
@@ -2590,7 +2590,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 {
                     while ((M_PI*2-rad) > 1e-3)
                     {
-                        mm[i]->rotate(&v2, _fullrot_steprad);
+                        mm[i]->rotate(&v2, _fullrot_steprad, mm[i]->movability > MOV_NORECEN);
                         rad += _fullrot_steprad;
 
                         bind1 = 0;
@@ -2615,7 +2615,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     }
 
                     if (!isnan(bestfrrad))
-                        mm[i]->rotate(&v2, bestfrrad);
+                        mm[i]->rotate(&v2, bestfrrad, mm[i]->movability > MOV_NORECEN);
                 }
                 else
                 {
@@ -2625,7 +2625,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     ra = frand(-ra, ra);
                     mm[i]->rotate(&v, ra);
                     #else
-                    mm[i]->rotate(&v2, mm[i]->amz);
+                    mm[i]->rotate(&v2, mm[i]->amz, mm[i]->movability > MOV_NORECEN);
                     #endif
 
                     bind1 = 0;
@@ -2644,7 +2644,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         putitback.restore_state(mm[i]);
                         mm[i]->amz *= 0.98;
                         #else
-                        mm[i]->rotate(&v2, -mm[i]->amz);
+                        mm[i]->rotate(&v2, -mm[i]->amz, mm[i]->movability > MOV_NORECEN);
                         mm[i]->amz *= reversal;
                         //cout << "x";
                         #endif
@@ -2872,6 +2872,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             }
             /**** End Bond Flexion ****/
             #endif
+
+            if (mm[i]->movability <= MOV_NORECEN) mm[i]->recenter(icen);
 
         }	// for i = 0 to iters
         // cout << "Iteration " << iter << " improvement " << improvement << endl;

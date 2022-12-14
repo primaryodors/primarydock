@@ -105,6 +105,8 @@ std::string origbuff = "";
 // Generally, tumble spheres give better results but let's leave best bind code
 // in place because we'll be reviving it later.
 bool use_bestbind_algorithm = default_bestbind;
+bool use_prealign = false;
+std::string prealign_residues = "";
 
 float* initial_binding;
 float* initial_vdWrepl;
@@ -486,6 +488,12 @@ int interpret_config_line(char** fields)
     else if (!strcmp(fields[0], "POSE"))
     {
         poses = atoi(fields[1]);
+        return 1;
+    }
+    else if (!strcmp(fields[0], "PREALIGN"))
+    {
+        use_prealign = true;
+        prealign_residues = origbuff;
         return 1;
     }
     else if (!strcmp(fields[0], "PROT"))
@@ -1213,6 +1221,41 @@ int main(int argc, char** argv)
     Atom** ligbbh = new Atom*[5];
     intera_type lig_inter_typ[5];
 
+    if (use_prealign) use_bestbind_algorithm = false;
+
+    if (use_prealign)
+    {        
+        strcpy(buffer, prealign_residues.c_str());
+        fields = chop_spaced_fields(buffer);
+
+        for (n=0; fields[n]; n++);      // Get length.
+
+        Molecule** prealign_res = new Molecule*[n+4];
+        Molecule** lig_grp = new Molecule*[n+4];
+
+        for (i=0; i<n; i++)
+        {
+            int resno = atoi(fields[i]);
+            prealign_res[i] = protein->get_residue(resno);
+        }
+
+        ligand->recenter(pocketcen);
+
+        // First line up ligand to stationary residues.
+        lig_grp[0] = ligand;
+        lig_grp[1] = nullptr;
+        ligand->movability = MOV_NORECEN;
+        Molecule::multimol_conform(lig_grp, prealign_res, prealign_iters, nullptr);
+
+        // Then line up residues to ligand.
+        Molecule::multimol_conform(prealign_res, lig_grp, prealign_iters, nullptr);
+        ligand->movability = MOV_ALL;
+
+        delete[] fields;
+        delete prealign_res;
+        delete lig_grp;
+    }
+
     if (use_bestbind_algorithm)
     {
         for (i=0; i<5; i++)
@@ -1359,7 +1402,7 @@ _try_again:
 
         prepare_initb();
 
-        if (!use_bestbind_algorithm)
+        if (!use_bestbind_algorithm && !use_prealign)
         {
             do_tumble_spheres(pocketcen);
 
@@ -1387,8 +1430,10 @@ _try_again:
             conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
             #endif
 
-            allow_ligand_360_tumble = nodes_no_ligand_360_tumble ? (nodeno == 0) : true;
+            allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && !use_prealign;
             allow_ligand_360_flex   = nodes_no_ligand_360_flex   ? (nodeno == 0) : true;
+
+            if (use_prealign) conformer_momenta_multiplier *= prealign_momenta_mult;
 
             if (strlen(protafname) && nodeno == activation_node)
             {
@@ -1766,12 +1811,12 @@ _try_again:
             #if redo_tumble_spheres_on_activation
             if (nodeno == active_matrix_node)
             {
-                if (!use_bestbind_algorithm) do_tumble_spheres(ligcen_target);
+                if (!use_bestbind_algorithm && !use_prealign) do_tumble_spheres(ligcen_target);
             }
             #endif
 
             #if redo_tumble_spheres_every_node
-            if (!use_bestbind_algorithm && (!prevent_ligand_360_on_activate || (nodeno != active_matrix_node))) do_tumble_spheres(ligcen_target);
+            if (!use_bestbind_algorithm && !use_prealign && (!prevent_ligand_360_on_activate || (nodeno != active_matrix_node))) do_tumble_spheres(ligcen_target);
             #endif
 
             #if _DBG_STEPBYSTEP

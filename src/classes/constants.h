@@ -215,6 +215,9 @@
 #define pnictogen_partial_protonation 0.25
 #define pn_protonation_pKa_min 5
 
+#define prealign_iters 50
+#define prealign_momenta_mult 0.1
+
 // Debugging stuff.
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0

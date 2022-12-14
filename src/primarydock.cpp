@@ -1429,11 +1429,12 @@ _try_again:
             #else
             conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
             #endif
+            conformer_tumble_multiplier = 1;
 
             allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && !use_prealign;
             allow_ligand_360_flex   = nodes_no_ligand_360_flex   ? (nodeno == 0) : true;
 
-            if (use_prealign) conformer_momenta_multiplier *= prealign_momenta_mult;
+            if (use_prealign) conformer_tumble_multiplier *= prealign_momenta_mult;
 
             if (strlen(protafname) && nodeno == activation_node)
             {

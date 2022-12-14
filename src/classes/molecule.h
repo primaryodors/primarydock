@@ -205,6 +205,7 @@ protected:
 
 extern float potential_distance;
 extern float conformer_momenta_multiplier;
+extern float conformer_tumble_multiplier;
 extern bool allow_ligand_360_tumble;
 extern bool allow_ligand_360_flex;
 

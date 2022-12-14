@@ -17,6 +17,7 @@ using namespace std;
 
 float potential_distance = 0;
 float conformer_momenta_multiplier = 1;
+float conformer_tumble_multiplier = 1;
 
 bool allow_ligand_360_tumble = true;
 bool allow_ligand_360_flex = true;
@@ -189,9 +190,9 @@ void Molecule::reset_conformer_momenta()
     lmx = _def_lin_momentum * sgn(0.5-(rand()&1));
     lmy = _def_lin_momentum * sgn(0.5-(rand()&1));
     lmz = _def_lin_momentum * sgn(0.5-(rand()&1));
-    amx = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
-    amy = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
-    amz = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
+    amx = _def_ang_momentum * conformer_momenta_multiplier * conformer_tumble_multiplier * sgn(0.5-(rand()&1));
+    amy = _def_ang_momentum * conformer_momenta_multiplier * conformer_tumble_multiplier * sgn(0.5-(rand()&1));
+    amz = _def_ang_momentum * conformer_momenta_multiplier * conformer_tumble_multiplier * sgn(0.5-(rand()&1));
 
     Bond** b = get_rotatable_bonds();
     int i;

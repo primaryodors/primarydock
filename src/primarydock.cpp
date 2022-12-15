@@ -2101,8 +2101,14 @@ _try_again:
                                 retain_bindings[l].btom = coi;
                                 retain_bindings[l].cardinality = 0.25;
                                 retain_bindings[l].type = lig_inter_typ[l];
-                                retain_bindings[l].optimal_radius = InteratomicForce::coordinate_bond_radius(ligbb[l], coi, lig_inter_typ[l]);
-                                goto _found_alignaa;
+                                try
+                                {
+                                    retain_bindings[l].optimal_radius = InteratomicForce::coordinate_bond_radius(ligbb[l], coi, lig_inter_typ[l]);
+                                }
+                                catch (int ex)
+                                {
+                                    ;                   // In C++ you can swallow your ex.
+                                }
                             }
                             #if _DBG_STEPBYSTEP
                             if (debug) *debug << "Candidate alignment AA." << endl;

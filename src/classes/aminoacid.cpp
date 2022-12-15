@@ -1647,7 +1647,7 @@ Atom* AminoAcid::capable_of_inter(intera_type inter)
             }*/
     }
 
-    return atoms[i];
+    return retval;
 }
 
 float AminoAcid::hydrophilicity()

@@ -2181,6 +2181,10 @@ _try_again:
                             if (alca)
                             {
                                 Point pt, al, cen;
+                                al	= alca->get_location();
+
+                                cen	= (l==1) ? ligbb[0]->get_location() : m.get_barycenter();
+
                                 pt	= ligbb[l]->get_location();
                                 if (ligbbh[l])
                                 {
@@ -2190,8 +2194,6 @@ _try_again:
                                     pt.z += 0.5*(pth.z-pt.z);
                                 }
                                 
-                                al	= alca->get_location();
-                                cen	= (l==1) ? ligbb[0]->get_location() : m.get_barycenter();
 
                                 Rotation rot;
                                 Point origin = ligbb[0]->get_location();
@@ -2213,7 +2215,7 @@ _try_again:
                                     ligand->recenter(cen);
                                     cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
 
-                                    if (!l)
+                                    if (false && !l)
                                     {
                                         Point ptr = alca->get_location().subtract(pt);
                                         SCoord v(ptr);
@@ -2225,7 +2227,7 @@ _try_again:
                                     }
                                     break;
 
-                                case 11:
+                                case 1:
                                     // Pivot about bb0.
 
                                     /*
@@ -2246,7 +2248,7 @@ _try_again:
                                     cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
                                     break;
 
-                                case 12:
+                                case 2:
                                     // Rotisserie.
                                     axis = ligbb[1]->get_location().subtract(origin);
 
@@ -2281,7 +2283,7 @@ _try_again:
                                 mtmp[0] = &m;
                                 mtmp[1] = alignment_aa[l];
                                 mtmp[2] = NULL;
-                                m.movability = MOV_NORECEN;
+                                m.movability = MOV_NONE;
                                 alignment_aa[l]->movability = MOV_FLEXONLY;
                                 Molecule::multimol_conform(mtmp);
                                 m.movability = MOV_ALL;
@@ -2291,6 +2293,7 @@ _try_again:
                                                       << alignment_aa[l]->get_name() << ":" << alca->name
                                                       << " Z " << alca->get_Z() << endl;
                                 #endif
+
                             }
                         }
                     }

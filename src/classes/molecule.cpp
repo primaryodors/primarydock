@@ -1893,6 +1893,7 @@ float Molecule::get_charge()
 
 void Molecule::recenter(Point nl)
 {
+    if (movability <= MOV_NORECEN) return;
     Point loc = get_barycenter();
     Point rel = nl.subtract(&loc);
     SCoord v(&rel);
@@ -1904,6 +1905,8 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     if (noAtoms(atoms)) return;
     // cout << name << " Molecule::rotate()" << endl;
 
+    if (movability <= MOV_FLEXONLY) return;
+    if (movability <= MOV_NORECEN) bond_weighted = false;
     Point cen = get_barycenter(bond_weighted);
 
     int i;
@@ -1919,6 +1922,9 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
 void Molecule::rotate(LocatedVector lv, float theta)
 {
     if (noAtoms(atoms)) return;
+
+    if (movability <= MOV_FLEXONLY) return;
+    if (movability <= MOV_NORECEN) lv.origin = get_barycenter();
 
     int i;
     for (i=0; i<atcount; i++)

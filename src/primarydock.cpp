@@ -123,6 +123,22 @@ std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
 
+std::vector<Atom> dummies;
+
+void append_dummy(Point pt)
+{
+    Atom a("Ne");
+    a.move(pt);
+
+    a.name = new char[8];
+    int i=dummies.size()+1;
+    sprintf(a.name, "NE%i", i);
+
+    strcpy(a.aa3let, "DMY");
+
+    dummies.push_back(a);
+}
+
 void delete_water(Molecule* mol)
 {
     if (!waters) return;
@@ -1560,6 +1576,8 @@ _try_again:
         nodecen = pocketcen;
         nodecen.weight = 1;
 
+        dummies.clear();
+
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
 
@@ -1584,10 +1602,11 @@ _try_again:
             #endif
             conformer_tumble_multiplier = 1;
 
-            allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && !use_prealign;
+            allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && !use_prealign && !use_bestbind_algorithm;
             allow_ligand_360_flex   =  nodes_no_ligand_360_flex   ? (nodeno == 0) : true;
 
             if (use_prealign) conformer_tumble_multiplier *= prealign_momenta_mult;
+            if (use_bestbind_algorithm) conformer_tumble_multiplier *= prealign_momenta_mult;
 
             if (strlen(protafname) && nodeno == activation_node)
             {
@@ -2143,12 +2162,17 @@ _try_again:
                         {
                             cout << "Aligning " << ligbb[l]->name << " to " << alignment_aa[l]->get_name() << endl;
                             Atom* alca;
-                            if (alignment_aa[l] == met)
-                                alca = alignment_aa[l]->get_nearest_atom(ligbb[l]->get_location());
+
+                            if (retain_bindings[l].btom) alca = retain_bindings[l].btom;
                             else
                             {
-                                // alca = alignment_aa->get_atom("CA");
-                                alca = alignment_aa[l]->get_most_bindable(1)[0];
+                                if (alignment_aa[l] == met)
+                                    alca = alignment_aa[l]->get_nearest_atom(ligbb[l]->get_location());
+                                else
+                                {
+                                    // alca = alignment_aa->get_atom("CA");
+                                    alca = alignment_aa[l]->get_most_bindable(1)[0];
+                                }
                             }
                             #if _DBG_STEPBYSTEP
                             if (debug) *debug << "Got alignment atom." << endl;
@@ -2165,6 +2189,7 @@ _try_again:
                                     pt.y += 0.5*(pth.y-pt.y);
                                     pt.z += 0.5*(pth.z-pt.z);
                                 }
+                                
                                 al	= alca->get_location();
                                 cen	= (l==1) ? ligbb[0]->get_location() : m.get_barycenter();
 
@@ -2179,9 +2204,13 @@ _try_again:
                                 {
                                 case 0:
                                     // Pivot about molcen.
+                                    append_dummy(pt);
+                                    append_dummy(al);
+                                    append_dummy(cen);
                                     rot = align_points_3d(&pt, &al, &cen);
+                                    // rot.a /= 2;
                                     m.rotate(&rot.v, rot.a);
-                                    ligand->recenter(loneliest);
+                                    ligand->recenter(cen);
                                     cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
 
                                     if (!l)
@@ -2196,17 +2225,28 @@ _try_again:
                                     }
                                     break;
 
-                                case 1:
+                                case 11:
                                     // Pivot about bb0.
+
+                                    /*
                                     rot = align_points_3d(&pt, &al, &origin);
                                     lv.copy(rot.v);
                                     lv.origin = origin;
                                     m.rotate(lv, rot.a);
-                                    ligand->recenter(loneliest);
+                                    */
+
+                                    origin = ligbb[0]->get_location();
+                                    lv = (SCoord)origin.subtract(ligand->get_barycenter());
+                                    lv.origin = origin;
+                                    rot.a = -find_angle_along_vector(pt, al, origin, (SCoord)lv);
+                                    m.rotate(lv, rot.a);
+                                    
+
+                                    // ligand->recenter(loneliest);
                                     cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
                                     break;
 
-                                case 2:
+                                case 12:
                                     // Rotisserie.
                                     axis = ligbb[1]->get_location().subtract(origin);
 
@@ -2227,7 +2267,7 @@ _try_again:
                                     lv.copy(axis);
                                     lv.origin = origin;
                                     m.rotate(lv, besttheta);
-                                    ligand->recenter(loneliest);
+                                    ligand->recenter(cen);
                                     cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
                                          << "-" << ligbb[1]->name << " axis." << endl;
                                     break;
@@ -2254,6 +2294,8 @@ _try_again:
                             }
                         }
                     }
+
+                    cout << endl;
                 }
                 
                 #if _DBG_STEPBYSTEP
@@ -2609,6 +2651,14 @@ _try_again:
                 for (k=0; k<maxh2o; k++)
                 {
                     for (l=0; l<3; l++) waters[k]->get_atom(l)->stream_pdb_line(pdbdat, 9000+offset+l+3*k);
+                }
+            }
+
+            if (dummies.size())
+            {
+                for (k=0; k<dummies.size(); k++)
+                {
+                    dummies[k].stream_pdb_line(pdbdat, 9900+offset+l+3*k);
                 }
             }
 

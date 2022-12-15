@@ -1916,7 +1916,7 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     }
 }
 
-void Molecule::rotate(LocatedVector SCoord, float theta)
+void Molecule::rotate(LocatedVector lv, float theta)
 {
     if (noAtoms(atoms)) return;
 
@@ -1925,7 +1925,7 @@ void Molecule::rotate(LocatedVector SCoord, float theta)
     {
         // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
-        Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
+        Point nl  = rotate3D(&loc, &lv.origin, &lv, theta);
         atoms[i]->move(&nl);
     }
 }

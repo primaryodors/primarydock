@@ -2218,6 +2218,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
 void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, int iters, void (*cb)(int))
 {
     if (!mm) return;
+    if (!iters) return;
 
     int i, j, k, l, n, inplen, bklen, alllen, aclen, iter;
     float rad, bestfrrad, bestfrb;
@@ -2933,7 +2934,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             #endif
 
             if (mm[i]->movability <= MOV_NORECEN) mm[i]->recenter(icen);
-            
+
             for (j=1; j<10; j++) mm[i]->lastbind_history[j-1] = mm[i]->lastbind_history[j];
             mm[i]->lastbind_history[j-1] = mm[i]->lastbind;
 

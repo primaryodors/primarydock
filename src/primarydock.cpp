@@ -1424,9 +1424,9 @@ int main(int argc, char** argv)
                     (ligbbh[i] && ligbbh[i]->get_acidbase())
                )
                 lig_inter_typ[i] = ionic;
-            else if (fabs(ligbb[i]->is_polar()) >= 1
+            else if (fabs(ligbb[i]->is_polar()) >= 0.5
                      ||
-                     (ligbbh[i] && fabs(ligbbh[i]->is_polar()) >= 1)
+                     (ligbbh[i] && fabs(ligbbh[i]->is_polar()) >= 0.5)
                     )
                 lig_inter_typ[i] = hbond;
             else if (ligbb[i]->is_pi())
@@ -1492,8 +1492,10 @@ int main(int argc, char** argv)
         {
             if (ligbb[i])
             {
-                cout << "# Best binding heavy atom " << i << " of ligand" << endl << "# LBBA: " << ligbb[i]->name << endl;
-                if (output) *output << "# Best binding heavy atom " << i << " of ligand" << endl << "LBBA: " << ligbb[i]->name << endl;
+                cout << "# Best binding heavy atom " << i << " of ligand" << endl << "# LBBA: " << ligbb[i]->name
+                    << " type: " << lig_inter_typ[i] << endl;
+                if (output) *output << "# Best binding heavy atom " << i << " of ligand" << endl << "LBBA: " << ligbb[i]->name
+                    << " type: " << lig_inter_typ[i] << endl;
             }
             if (ligbbh[i])
             {
@@ -2123,6 +2125,8 @@ _try_again:
 
                 if (use_bestbind_algorithm && met)
                 {
+                    alignment_aa[2] = alignment_aa[1];
+                    alignment_aa[1] = alignment_aa[0];
                     alignment_aa[0] = met;
                     // alignment_name = "metal";
                 }
@@ -2130,7 +2134,10 @@ _try_again:
                 if (debug) *debug << "Alignment AA." << endl;
                 #endif
 
-                if (use_bestbind_algorithm)	for (l=0; l<3; l++)
+                if (use_bestbind_algorithm)
+                {
+                    ligand->recenter(loneliest);
+                    for (l=0; l<3; l++)
                     {
                         if (alignment_aa[l])
                         {
@@ -2174,6 +2181,7 @@ _try_again:
                                     // Pivot about molcen.
                                     rot = align_points_3d(&pt, &al, &cen);
                                     m.rotate(&rot.v, rot.a);
+                                    ligand->recenter(loneliest);
                                     cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
 
                                     if (!l)
@@ -2194,6 +2202,7 @@ _try_again:
                                     lv.copy(rot.v);
                                     lv.origin = origin;
                                     m.rotate(lv, rot.a);
+                                    ligand->recenter(loneliest);
                                     cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
                                     break;
 
@@ -2218,6 +2227,7 @@ _try_again:
                                     lv.copy(axis);
                                     lv.origin = origin;
                                     m.rotate(lv, besttheta);
+                                    ligand->recenter(loneliest);
                                     cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
                                          << "-" << ligbb[1]->name << " axis." << endl;
                                     break;
@@ -2226,22 +2236,26 @@ _try_again:
                                     ;
                                 }
 
-                                // Preemptively minimize intermol clashes.
+                                #if preemptively_minimize_intermol_clashes
                                 Molecule* mtmp[3];
                                 mtmp[0] = &m;
                                 mtmp[1] = alignment_aa[l];
                                 mtmp[2] = NULL;
-                                m.movability = MOV_ALL;
+                                m.movability = MOV_NORECEN;
                                 alignment_aa[l]->movability = MOV_FLEXONLY;
                                 Molecule::multimol_conform(mtmp);
+                                m.movability = MOV_ALL;
                                 // m.intermol_conform_norecen(alignment_aa[l], iters, reaches_spheroid[nodeno]);
                                 // alignment_aa[l]->intermol_conform_norecen(&m, iters, reaches_spheroid[nodeno]);
                                 if (debug) *debug << "Alignment atom " << l << " is "
                                                       << alignment_aa[l]->get_name() << ":" << alca->name
                                                       << " Z " << alca->get_Z() << endl;
+                                #endif
                             }
                         }
                     }
+                }
+                
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Aligned ligand to AA." << endl;
                 cout << endl;

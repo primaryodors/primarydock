@@ -111,6 +111,7 @@ std::string optsecho = "";
 bool use_bestbind_algorithm = default_bestbind;
 bool use_prealign = false;
 std::string prealign_residues = "";
+Bond retain_bindings[3];
 
 float* initial_binding;
 float* initial_vdWrepl;
@@ -621,12 +622,12 @@ int interpret_config_line(char** fields)
         if (!strcmp(fields[1], "BB"))
         {
             use_bestbind_algorithm = true;
-            return 2;
+            return 1;
         }
         else if (!strcmp(fields[1], "TS"))
         {
             use_bestbind_algorithm = false;
-            return 2;
+            return 1;
         }
         else
         {
@@ -1539,6 +1540,9 @@ _try_again:
 
         prepare_initb();
 
+        ligand->recenter(pocketcen);
+        cout << "Centered ligand at " << pocketcen << endl;
+
         if (!use_bestbind_algorithm && !use_prealign)
         {
             do_tumble_spheres(pocketcen);
@@ -1948,6 +1952,7 @@ _try_again:
             }
 
             loneliest = protein->find_loneliest_point(nodecen, size);
+            cout << "Loneliest is " << loneliest << endl;
 
             #if pocketcen_is_loneliest
             nodecen = loneliest;
@@ -2034,7 +2039,9 @@ _try_again:
                 std::string alignment_name = "";
                 if (use_bestbind_algorithm) for (l=0; l<3; l++)
                     {
+                        retain_bindings[l].cardinality = 0;
                         if (!ligbb[l]) continue;
+                        retain_bindings[l].atom = ligbb[l];
                         float alignment_potential = 0;
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
@@ -2076,7 +2083,8 @@ _try_again:
                                 pottmp /= pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter());
                             }
                             // cout << reaches_spheroid[nodeno][i]->get_3letter() << reaches_spheroid[nodeno][i]->get_residue_no() << " " << pottmp << endl;
-                            if (reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ[l])
+                            Atom* coi = reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ[l]);
+                            if (coi
                                     &&
                                     (	!alignment_aa[l]
                                         ||
@@ -2090,11 +2098,18 @@ _try_again:
                                 // alignment_name += std::to_string("|") + std::to_string(reaches_spheroid[nodeno][i]->get_residue_no());
                                 alignment_potential = pottmp;
                                 alignment_distance[l] = potential_distance;
+                                retain_bindings[l].btom = coi;
+                                retain_bindings[l].cardinality = 0.25;
+                                retain_bindings[l].type = lig_inter_typ[l];
+                                retain_bindings[l].optimal_radius = InteratomicForce::coordinate_bond_radius(ligbb[l], coi, lig_inter_typ[l]);
+                                goto _found_alignaa;
                             }
                             #if _DBG_STEPBYSTEP
                             if (debug) *debug << "Candidate alignment AA." << endl;
                             #endif
                         }
+                        _found_alignaa:
+                        ;
                     }
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Selected an alignment AA." << endl;

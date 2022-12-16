@@ -232,6 +232,8 @@
 #define _hisflip_binding_threshold 25
 
 // Debugging stuff.
+#define _dummy_atoms_for_debug 0
+
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0

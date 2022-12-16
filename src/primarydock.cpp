@@ -123,10 +123,13 @@ std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
 
+#if _dummy_atoms_for_debug
 std::vector<Atom> dummies;
+#endif
 
 void append_dummy(Point pt)
 {
+    #if _dummy_atoms_for_debug
     Atom a("Ne");
     a.move(pt);
 
@@ -137,6 +140,7 @@ void append_dummy(Point pt)
     strcpy(a.aa3let, "DMY");
 
     dummies.push_back(a);
+    #endif
 }
 
 void delete_water(Molecule* mol)
@@ -1576,7 +1580,9 @@ _try_again:
         nodecen = pocketcen;
         nodecen.weight = 1;
 
+        #if _dummy_atoms_for_debug
         dummies.clear();
+        #endif
 
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
@@ -2673,6 +2679,7 @@ _try_again:
                 }
             }
 
+            #if _dummy_atoms_for_debug
             if (dummies.size())
             {
                 for (k=0; k<dummies.size(); k++)
@@ -2680,6 +2687,7 @@ _try_again:
                     dummies[k].stream_pdb_line(pdbdat, 9900+offset+l+3*k);
                 }
             }
+            #endif
 
             if (flex)
             {

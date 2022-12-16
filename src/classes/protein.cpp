@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string>
 #include <math.h>
+#include <strings.h>
 #include "protein.h"
 
 #define _DBG_REACHLIG true
@@ -268,7 +269,7 @@ int Protein::load_pdb(FILE* is, int rno)
 
                 for (i=0; i<256; i++)
                 {
-                    if (aa_defs[i].name[0] && !strcmp(aa_defs[i]._3let, tmp3let))
+                    if (aa_defs[i].name[0] && !strcasecmp(aa_defs[i]._3let, tmp3let))
                     {
                         AminoAcid* aa = new AminoAcid(is, prevaa, rno);
                         restmp[rescount++] = aa;
@@ -299,7 +300,7 @@ int Protein::load_pdb(FILE* is, int rno)
 
                 for (i=0; i<26; i++)
                 {
-                    if (aa_defs[i]._1let && !strcmp(aa_defs[i]._3let, a->aa3let ))
+                    if (aa_defs[i]._1let && !strcasecmp(aa_defs[i]._3let, a->aa3let ))
                     {
                         a->aaletter = aa_defs[i]._1let;
                         break;
@@ -357,7 +358,7 @@ int Protein::load_pdb(FILE* is, int rno)
 
                 for (i=0; i<26; i++)
                 {
-                    if (aa_defs[i]._1let && !strcmp(aa_defs[i]._3let, a->aa3let ))
+                    if (aa_defs[i]._1let && !strcasecmp(aa_defs[i]._3let, a->aa3let ))
                     {
                         a->aaletter = aa_defs[i]._1let;
                         break;
@@ -939,7 +940,7 @@ void Protein::conform_backbone(int startres, int endres,
             }
 
             if (reinterpret_cast<long>(get_residue(res)) < 0x1000) cout << "Warning missing residue " << res << endl << flush;
-            else if (strcmp(get_residue(res)->get_3letter(), "PRO"))		// TODO: Don't hard code this to proline, but check bond flexibility.
+            else if (strcmp(get_residue(res)->get_3letter(), "Pro"))		// TODO: Don't hard code this to proline, but check bond flexibility.
             {
                 // Rotate the first bond a random amount. TODO: use angular momenta.
                 angle = (iter & 1) ? momenta1o[residx] : momenta1e[residx]; // frand(-_fullrot_steprad, _fullrot_steprad);

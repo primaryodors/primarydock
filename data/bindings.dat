@@ -1,0 +1,212 @@
+
+# Bindings definitions for interatomic forces.
+# You may edit this file to add new definitions or to correct or expand upon existing values.
+# Use only spaces to separate values.
+#
+# The available types are:
+# coval = covalent bond;
+# hbond = hydrogen bond or halogen bond;
+# ionic = ionic bond, acid-base, salt bridge, etc;
+# pi    = pi stacking, including cation-pi;
+# plpi  = pi - polar interaction;
+# coord = metal coordination/chelation, e.g. metal to N, O, S;
+# vdW   = van der Waals forces, e.g. between aliphatic molecules - this MUST come last.
+#
+# Non-covalent bonds are treated as bonds with a cardinality of less than one.
+# The conjugate bonds of aromatic rings are treated as having a cardinality of one and one half.
+#
+# The first 5 columns must be filled or PrimaryDock will ignore the line.
+# Uncertain values may be indicated with a question mark, e.g. NH - N hbond distance is given as "1.6?".
+#
+
+# Some data from:
+# https://hydra.pharm.monash.edu/modules/mod2/bondlen.html
+# https://www2.chemistry.msu.edu/faculty/reusch/virttxtjml/questions/bndenrgy.htm
+
+#Elem.1 Elem.2 Type     Card. Distance   kJ/mol       Dir.
+H       H      coval    1     0.74       436.0
+Be      C      coval    1     1.93
+B       C      coval    1     1.56
+C       H      coval    1     1.09
+C       C      coval    1     1.54
+C       C      coval    1.5   1.40
+C       C      coval    2     1.34
+C       C      coval    3     1.20
+C       N      coval    1     1.47
+C       N      coval    1.5   1.34
+C       N      coval    2     1.28
+C       N      coval    3     1.16
+C       O      coval    1     1.43
+C       O      coval    1.5   1.29
+C       O      coval    2     1.20
+C       O      coval    3     1.13
+C       F      coval    1     1.34
+C       Mg     coval    1     2.07
+C       Al     coval    1     2.24
+C       Si     coval    1     1.86
+C       P      coval    1     1.84
+C       P      coval    1.5   1.72?
+C       P      coval    2     1.66?
+C       P      coval    3     1.55
+C       S      coval    1     1.82
+C       S      coval    2     1.538
+C       Cl     coval    1     1.76
+C       Cr     coval    1     1.92
+C       As     coval    1     1.98
+C       Se     coval    1     1.98
+C       Br     coval    1     1.93
+C       Mo     coval    1     2.08
+C       In     coval    1     2.16
+C       Sn     coval    1     2.14
+C       Sb     coval    1     2.20
+C       Te     coval    1     2.05
+C       I      coval    1     2.13
+C       W      coval    1     2.06
+C       Pb     coval    1     2.29
+C       Bi     coval    1     2.30
+N       H      coval    1     1.00
+N       N      coval    1     1.45
+N       N      coval    1.5   1.35
+N       N      coval    2     1.23
+N       N      coval    3     1.10
+N       O      coval    1     1.24
+N       O      coval    2     1.24
+O       H      coval    1     0.97
+O       O      coval    1     1.45
+O       O      coval    2     1.21
+F       H      coval    1     0.92
+F       F      coval    1     1.42
+Cl      Cl     coval    1     1.99
+Br      Br     coval    1     2.28
+I       I      coval    1     2.67
+Si      H      coval    1     1.514     384
+P       H      coval    1     1.411
+S       H      coval    1     1.34
+S       O      coval    1     1.525
+S       O      coval    2     1.404
+S       S      coval    1     2.07
+Ga      As     coval    4     2.45
+Se      H	   coval	1	  1.488
+
+# Make sure to list ionic bonds before hydrogen bonds, because the former supersedes the latter.
+NH      O      ionic    0.5   1.53       30           1.6?
+
+NH      N      hbond    0.5   1.6?       13           3.5
+NH      O      hbond    0.5   1.66        8           1.6
+OH      N      hbond    0.5   1.88       29           3.5
+OH      O      hbond    0.5   1.97       21           1.6
+OH      S      hbond    0.25  2.8?        4?          5
+SH      S      hbond    0.25  2.8?        4?          5
+FH      F      hbond    0.5   2.0?      161.5         ?
+
+# https://pubs.acs.org/doi/abs/10.1021/jz502150d?source=cen
+OH      P      hbond    0.5   2.6        18           11?
+
+# https://www.mdpi.com/2304-6740/7/2/19/htm#app1-inorganics-07-00019 supplementary materials
+CCl		HO 	   hbond    0.5   2.936       7.20
+CCl     C=O    hbond    0.5   3.047       9.29
+CCl     C#N    hbond    0.5   3.144       5.61
+CCl     C=S    hbond    0.5   3.402	      9.54
+CCl     HN     hbond    0.5   3.054       9.41
+CCl     HS     hbond    0.5   3.515       2.13
+CBr     HO     hbond    0.5   2.903      12.55
+CBr     C=O    hbond    0.5   2.919      13.51
+CBr     C#N    hbond    0.5   3.04       10.25
+CBr     C=S    hbond    0.5   3.359      13.77
+CBr     HN     hbond    0.5   2.952      17.36
+CBr     HS     hbond    0.5   3.496       4.06
+CI      HO     hbond    0.5   2.953      18.25
+CI      C=O    hbond    0.5   2.954      18.49
+CI      C#N    hbond    0.5   3.078      15.31
+CI      C=S    hbond    0.5   3.4        18.70
+CI      HN     hbond    0.5   2.964      26.28
+CI      HS     hbond    0.5   3.561       6.02
+CCl     S=O    hbond    0.5   3.318      13.89
+CBr     S=O    hbond    0.5   2.998      16.95
+CI      S=O    hbond    0.5   2.989      24.94
+
+# Placeholders until real data.
+CCl     C-O    hbond    0.5   3.047       9.
+CCl     C-N    hbond    0.5   3.144       5.
+CCl     C=N    hbond    0.5   3.144       5.
+CCl     C-S    hbond    0.5   3.402	      9.
+CBr     C-O    hbond    0.5   2.919      13.
+CBr     C-N    hbond    0.5   3.04       10.
+CBr     C=N    hbond    0.5   3.04       10.
+CBr     C-S    hbond    0.5   3.359      13.
+CI      C-O    hbond    0.5   2.954      18.
+CI      C-N    hbond    0.5   3.078      15.
+CI      C=N    hbond    0.5   3.078      15.
+CI      C-S    hbond    0.5   3.4        18.
+
+
+CH      C      pi       0.25  3.87        1.33			3
+NH		C	   pi 		0.25  3.87		  1.33			3
+C       C      pi       0.25  3.87        2.0			3
+C       N      pi       0.25  3.87        1.5			3
+C       O      pi       0.25  3.87        1.4			3
+C       P      pi       0.25  5.3         1.8			3
+C       S      pi       0.25  5.3         1.9			3
+C       Li     plpi     0.25  0.76       26.5			3
+C       Na     plpi     0.25  1.02       18.83			3
+C       K      plpi     0.25  1.38       13.25			3
+C       Rb     plpi     0.25  1.52       11.16			3
+
+# https://web.ics.purdue.edu/~gchopra/class/public/readings/Introduction_Lecture1/Levitt_JMB_88_Aromatic_Hbond.pdf
+C		H	   plpi		0.25  2.4		 12.55			3
+
+# C       N      plpi     0.25  2.8?        1.91?			3
+C       NH     plpi     0.25  2.8?        1.91?			3
+# C       O      plpi     0.25  2.9?        2.08?			3
+C       OH     plpi     0.25  2.9?        2.08?			3
+
+# Based on 57.8 * (2.5-electronegativity) / (vdW_radius^2). Multiply by the number of carbons and the charge of the ion.
+C       Fe     plpi     0.25  0.595      15.9			3
+C       Co     plpi     0.25  0.57       15.5			3
+C       Ni     plpi     0.25  0.64       12.8			3
+C       Cu     plpi     0.25  0.50       17.7			3
+C       Zn     plpi     0.25  0.49       25.4			3
+
+# https://chem.libretexts.org/Bookshelves/General_Chemistry/Book%3A_Chem1_(Lower)/09%3A_Chemical_Bonding_and_Molecular_Structure/9.09%3A_Bonding_in_Coordination_Complexes
+N       Mg     coord    0.5   2.1
+
+# https://pubs.acs.org/doi/10.1021/ic971462p
+# Cannot find good numbers on coordination binding energies,
+# so these energies are based on 970/(vdW_rad(a) ^2) * (elecn(a) - elecn(b) / (vdW_rad(b) ^2).
+N       Mn     coord    0.5   1.86       38.7
+N       Fe     coord    0.5   1.82       33.5
+N       Co     coord    0.5   1.79       33.8
+N       Ni     coord    0.5   1.74       28.6
+N       Cu     coord    0.5   1.76       39.1
+N       Zn     coord    0.5   1.77       48.4
+O       Mn     coord    0.5   1.75       51
+O       Fe     coord    0.5   1.71       46.3
+O       Co     coord    0.5   1.68       47.2
+O       Ni     coord    0.5   1.63       40.3
+O       Cu     coord    0.5   1.65       55.
+O       Zn     coord    0.5   1.66       64.8
+Cl      Mn     coord    0.5   2.12       
+Cl      Fe     coord    0.5   2.08       
+Cl      Co     coord    0.5   2.05       
+Cl      Ni     coord    0.5   2.01       
+Cl      Cu     coord    0.5   2.03       
+Cl      Zn     coord    0.5   2.04       
+
+# https://onlinelibrary.wiley.com/doi/pdf/10.1002/9783527616091.app1
+# More predicted energies.
+S       Cu     coord    0.5   2.29       17.3
+S       Zn     coord    0.5   2.43       24.0
+
+# To be expanded later.
+# Keep these last or the code will erroneously add them to the other bindings.
+CH      CH     vdW      0.1   4.0         0.4
+*		CH	   vdW		0.1	  4.0		  0.4
+
+
+
+
+
+
+
+
+

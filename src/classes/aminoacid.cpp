@@ -1611,19 +1611,31 @@ std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 }
 
 
-bool AminoAcid::capable_of_inter(intera_type inter)
+Atom* AminoAcid::capable_of_inter(intera_type inter)
 {
-    if (!atoms) return false;
+    if (!atoms) return nullptr;
 
     // Lysine and arginine cannot coordinate metals. Histidine is not normally protonated so it is free for metal coordination.
     // We see real world instances where a mutation of H to R in a metal binding site renders the entire protein nonfunctional.
-    if (inter == mcoord && get_charge() > 0) return false;
+    if (inter == mcoord && get_charge() > 0) return nullptr;
+
+    Atom* retval = nullptr;
+    float cadist = 0;
+    Point caloc = get_atom("CA")->get_location();
 
     int i, j;
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
-        if (InteratomicForce::atom_is_capable_of(atoms[i], inter)) return true;
+        if (InteratomicForce::atom_is_capable_of(atoms[i], inter)) // return atoms[i];
+        {
+            float r = atoms[i]->get_location().get_3d_distance(caloc);
+            if (r > cadist)
+            {
+                retval = atoms[i];
+                cadist = r;
+            }
+        }
         /*InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], atoms[i]);
         if (!iff) continue;
         for (j=0; iff[j]; j++)
@@ -1635,7 +1647,7 @@ bool AminoAcid::capable_of_inter(intera_type inter)
             }*/
     }
 
-    return false;
+    return retval;
 }
 
 float AminoAcid::hydrophilicity()

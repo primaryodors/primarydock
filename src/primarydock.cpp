@@ -109,6 +109,9 @@ std::string optsecho = "";
 // Generally, tumble spheres give better results but let's leave best bind code
 // in place because we'll be reviving it later.
 bool use_bestbind_algorithm = default_bestbind;
+bool use_prealign = false;
+std::string prealign_residues = "";
+Bond retain_bindings[4];
 
 float* initial_binding;
 float* initial_vdWrepl;
@@ -119,6 +122,26 @@ int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0;
 std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
+
+#if _dummy_atoms_for_debug
+std::vector<Atom> dummies;
+#endif
+
+void append_dummy(Point pt)
+{
+    #if _dummy_atoms_for_debug
+    Atom a("Ne");
+    a.move(pt);
+
+    a.name = new char[8];
+    int i=dummies.size()+1;
+    sprintf(a.name, "NE%i", i);
+
+    strcpy(a.aa3let, "DMY");
+
+    dummies.push_back(a);
+    #endif
+}
 
 void delete_water(Molecule* mol)
 {
@@ -589,6 +612,12 @@ int interpret_config_line(char** fields)
         optsecho = "Number of poses: " + to_string(poses);
         return 1;
     }
+    else if (!strcmp(fields[0], "PREALIGN"))
+    {
+        use_prealign = true;
+        prealign_residues = origbuff;
+        return 1;
+    }
     else if (!strcmp(fields[0], "PROT"))
     {
         strcpy(protfname, fields[1]);
@@ -613,12 +642,12 @@ int interpret_config_line(char** fields)
         if (!strcmp(fields[1], "BB"))
         {
             use_bestbind_algorithm = true;
-            return 2;
+            return 1;
         }
         else if (!strcmp(fields[1], "TS"))
         {
             use_bestbind_algorithm = false;
-            return 2;
+            return 1;
         }
         else
         {
@@ -1350,6 +1379,41 @@ int main(int argc, char** argv)
     Atom** ligbbh = new Atom*[5];
     intera_type lig_inter_typ[5];
 
+    if (use_prealign) use_bestbind_algorithm = false;
+
+    if (use_prealign)
+    {        
+        strcpy(buffer, prealign_residues.c_str());
+        fields = chop_spaced_fields(buffer);
+
+        for (n=0; fields[n]; n++);      // Get length.
+
+        Molecule** prealign_res = new Molecule*[n+4];
+        Molecule** lig_grp = new Molecule*[n+4];
+
+        for (i=0; i<n; i++)
+        {
+            int resno = atoi(fields[i]);
+            prealign_res[i] = protein->get_residue(resno);
+        }
+
+        ligand->recenter(pocketcen);
+
+        // First line up ligand to stationary residues.
+        lig_grp[0] = ligand;
+        lig_grp[1] = nullptr;
+        ligand->movability = MOV_NORECEN;
+        Molecule::multimol_conform(lig_grp, prealign_res, prealign_iters, nullptr);
+
+        // Then line up residues to ligand.
+        Molecule::multimol_conform(prealign_res, lig_grp, prealign_iters, nullptr);
+        ligand->movability = MOV_ALL;
+
+        delete[] fields;
+        delete prealign_res;
+        delete lig_grp;
+    }
+
     if (use_bestbind_algorithm)
     {
         for (i=0; i<5; i++)
@@ -1380,9 +1444,9 @@ int main(int argc, char** argv)
                     (ligbbh[i] && ligbbh[i]->get_acidbase())
                )
                 lig_inter_typ[i] = ionic;
-            else if (fabs(ligbb[i]->is_polar()) >= 1
+            else if (fabs(ligbb[i]->is_polar()) >= 0.5
                      ||
-                     (ligbbh[i] && fabs(ligbbh[i]->is_polar()) >= 1)
+                     (ligbbh[i] && fabs(ligbbh[i]->is_polar()) >= 0.5)
                     )
                 lig_inter_typ[i] = hbond;
             else if (ligbb[i]->is_pi())
@@ -1448,8 +1512,10 @@ int main(int argc, char** argv)
         {
             if (ligbb[i])
             {
-                cout << "# Best binding heavy atom " << i << " of ligand" << endl << "# LBBA: " << ligbb[i]->name << endl;
-                if (output) *output << "# Best binding heavy atom " << i << " of ligand" << endl << "LBBA: " << ligbb[i]->name << endl;
+                cout << "# Best binding heavy atom " << i << " of ligand" << endl << "# LBBA: " << ligbb[i]->name
+                    << " type: " << lig_inter_typ[i] << endl;
+                if (output) *output << "# Best binding heavy atom " << i << " of ligand" << endl << "LBBA: " << ligbb[i]->name
+                    << " type: " << lig_inter_typ[i] << endl;
             }
             if (ligbbh[i])
             {
@@ -1496,7 +1562,10 @@ _try_again:
 
         prepare_initb();
 
-        if (!use_bestbind_algorithm)
+        ligand->recenter(pocketcen);
+        // cout << "Centered ligand at " << pocketcen << endl;
+
+        if (!use_bestbind_algorithm && !use_prealign)
         {
             do_tumble_spheres(pocketcen);
 
@@ -1510,6 +1579,10 @@ _try_again:
         #endif
         nodecen = pocketcen;
         nodecen.weight = 1;
+
+        #if _dummy_atoms_for_debug
+        dummies.clear();
+        #endif
 
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
@@ -1533,9 +1606,13 @@ _try_again:
             #else
             conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
             #endif
+            conformer_tumble_multiplier = 1;
 
-            allow_ligand_360_tumble = nodes_no_ligand_360_tumble ? (nodeno == 0) : true;
-            allow_ligand_360_flex   = nodes_no_ligand_360_flex   ? (nodeno == 0) : true;
+            allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && !use_prealign && !use_bestbind_algorithm;
+            allow_ligand_360_flex   = (nodes_no_ligand_360_flex   ? (nodeno == 0) : true) && !use_bestbind_algorithm;
+
+            if (use_prealign) conformer_tumble_multiplier *= prealign_momenta_mult;
+            if (use_bestbind_algorithm) conformer_tumble_multiplier *= prealign_momenta_mult;
 
             if (strlen(protafname) && nodeno == activation_node)
             {
@@ -1902,6 +1979,7 @@ _try_again:
             }
 
             loneliest = protein->find_loneliest_point(nodecen, size);
+            // cout << "Loneliest is " << loneliest << endl;
 
             #if pocketcen_is_loneliest
             nodecen = loneliest;
@@ -1913,12 +1991,12 @@ _try_again:
             #if redo_tumble_spheres_on_activation
             if (nodeno == active_matrix_node)
             {
-                if (!use_bestbind_algorithm) do_tumble_spheres(ligcen_target);
+                if (!use_bestbind_algorithm && !use_prealign) do_tumble_spheres(ligcen_target);
             }
             #endif
 
             #if redo_tumble_spheres_every_node
-            if (!use_bestbind_algorithm && (!prevent_ligand_360_on_activate || (nodeno != active_matrix_node))) do_tumble_spheres(ligcen_target);
+            if (!use_bestbind_algorithm && !use_prealign && (!prevent_ligand_360_on_activate || (nodeno != active_matrix_node))) do_tumble_spheres(ligcen_target);
             #endif
 
             #if _DBG_STEPBYSTEP
@@ -1988,7 +2066,11 @@ _try_again:
                 std::string alignment_name = "";
                 if (use_bestbind_algorithm) for (l=0; l<3; l++)
                     {
+                        retain_bindings[l].cardinality = 0;
                         if (!ligbb[l]) continue;
+                        retain_bindings[l].atom = ligbb[l];
+                        ligand->springy_bonds = retain_bindings;
+                        ligand->springy_bondct = l+1;
                         float alignment_potential = 0;
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
@@ -2030,7 +2112,8 @@ _try_again:
                                 pottmp /= pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter());
                             }
                             // cout << reaches_spheroid[nodeno][i]->get_3letter() << reaches_spheroid[nodeno][i]->get_residue_no() << " " << pottmp << endl;
-                            if (reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ[l])
+                            Atom* coi = reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ[l]);
+                            if (coi
                                     &&
                                     (	!alignment_aa[l]
                                         ||
@@ -2044,11 +2127,27 @@ _try_again:
                                 // alignment_name += std::to_string("|") + std::to_string(reaches_spheroid[nodeno][i]->get_residue_no());
                                 alignment_potential = pottmp;
                                 alignment_distance[l] = potential_distance;
+                                retain_bindings[l].btom = coi;
+                                retain_bindings[l].cardinality = 0.25;
+                                retain_bindings[l].type = lig_inter_typ[l];
+                                try
+                                {
+                                    retain_bindings[l].optimal_radius = InteratomicForce::coordinate_bond_radius(ligbb[l], coi, lig_inter_typ[l]);
+                                }
+                                catch (int ex)
+                                {
+                                    ;
+                                }
+
+                                alignment_aa[l]->springy_bonds = retain_bindings;
+                                alignment_aa[l]->springy_bondct = l+1;
                             }
                             #if _DBG_STEPBYSTEP
                             if (debug) *debug << "Candidate alignment AA." << endl;
                             #endif
                         }
+                        _found_alignaa:
+                        ;
                     }
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Selected an alignment AA." << endl;
@@ -2056,6 +2155,8 @@ _try_again:
 
                 if (use_bestbind_algorithm && met)
                 {
+                    alignment_aa[2] = alignment_aa[1];
+                    alignment_aa[1] = alignment_aa[0];
                     alignment_aa[0] = met;
                     // alignment_name = "metal";
                 }
@@ -2063,18 +2164,26 @@ _try_again:
                 if (debug) *debug << "Alignment AA." << endl;
                 #endif
 
-                if (use_bestbind_algorithm)	for (l=0; l<3; l++)
+                if (use_bestbind_algorithm)
+                {
+                    ligand->recenter(loneliest);
+                    for (l=0; l<3; l++)
                     {
                         if (alignment_aa[l])
                         {
-                            cout << "Aligning " << ligbb[l]->name << " to " << alignment_aa[l]->get_name() << endl;
+                            cout << "# Aligning " << ligbb[l]->name << " to " << alignment_aa[l]->get_name() << "..." << endl;
                             Atom* alca;
-                            if (alignment_aa[l] == met)
-                                alca = alignment_aa[l]->get_nearest_atom(ligbb[l]->get_location());
+
+                            if (retain_bindings[l].btom) alca = retain_bindings[l].btom;
                             else
                             {
-                                // alca = alignment_aa->get_atom("CA");
-                                alca = alignment_aa[l]->get_most_bindable(1)[0];
+                                if (alignment_aa[l] == met)
+                                    alca = alignment_aa[l]->get_nearest_atom(ligbb[l]->get_location());
+                                else
+                                {
+                                    // alca = alignment_aa->get_atom("CA");
+                                    alca = alignment_aa[l]->get_most_bindable(1)[0];
+                                }
                             }
                             #if _DBG_STEPBYSTEP
                             if (debug) *debug << "Got alignment atom." << endl;
@@ -2083,6 +2192,10 @@ _try_again:
                             if (alca)
                             {
                                 Point pt, al, cen;
+                                al	= alca->get_location();
+
+                                cen	= (l==1) ? ligbb[0]->get_location() : m.get_barycenter();
+
                                 pt	= ligbb[l]->get_location();
                                 if (ligbbh[l])
                                 {
@@ -2091,8 +2204,7 @@ _try_again:
                                     pt.y += 0.5*(pth.y-pt.y);
                                     pt.z += 0.5*(pth.z-pt.z);
                                 }
-                                al	= alca->get_location();
-                                cen	= (l==1) ? ligbb[0]->get_location() : m.get_barycenter();
+                                
 
                                 Rotation rot;
                                 Point origin = ligbb[0]->get_location();
@@ -2105,11 +2217,15 @@ _try_again:
                                 {
                                 case 0:
                                     // Pivot about molcen.
+                                    /*append_dummy(pt);
+                                    append_dummy(al);
+                                    append_dummy(cen);*/
                                     rot = align_points_3d(&pt, &al, &cen);
                                     m.rotate(&rot.v, rot.a);
-                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
+                                    ligand->recenter(cen);
+                                    // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
 
-                                    if (!l)
+                                    if (false && !l)
                                     {
                                         Point ptr = alca->get_location().subtract(pt);
                                         SCoord v(ptr);
@@ -2123,11 +2239,12 @@ _try_again:
 
                                 case 1:
                                     // Pivot about bb0.
-                                    rot = align_points_3d(&pt, &al, &origin);
-                                    lv.copy(rot.v);
+                                    origin = ligbb[0]->get_location();
+                                    lv = (SCoord)origin.subtract(ligand->get_barycenter());
                                     lv.origin = origin;
+                                    rot.a = -find_angle_along_vector(pt, al, origin, (SCoord)lv);
                                     m.rotate(lv, rot.a);
-                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
+                                    // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
                                     break;
 
                                 case 2:
@@ -2151,30 +2268,49 @@ _try_again:
                                     lv.copy(axis);
                                     lv.origin = origin;
                                     m.rotate(lv, besttheta);
-                                    cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
-                                         << "-" << ligbb[1]->name << " axis." << endl;
+                                    ligand->recenter(cen);
+                                    /*cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
+                                         << "-" << ligbb[1]->name << " axis." << endl;*/
                                     break;
 
                                 default:
                                     ;
                                 }
 
-                                // Preemptively minimize intermol clashes.
+                                #if preemptively_minimize_intermol_clashes
                                 Molecule* mtmp[3];
                                 mtmp[0] = &m;
                                 mtmp[1] = alignment_aa[l];
                                 mtmp[2] = NULL;
-                                m.movability = MOV_ALL;
+                                m.movability = MOV_FLEXONLY;
                                 alignment_aa[l]->movability = MOV_FLEXONLY;
                                 Molecule::multimol_conform(mtmp);
+                                m.movability = MOV_ALL;
                                 // m.intermol_conform_norecen(alignment_aa[l], iters, reaches_spheroid[nodeno]);
                                 // alignment_aa[l]->intermol_conform_norecen(&m, iters, reaches_spheroid[nodeno]);
                                 if (debug) *debug << "Alignment atom " << l << " is "
                                                       << alignment_aa[l]->get_name() << ":" << alca->name
                                                       << " Z " << alca->get_Z() << endl;
+                                #endif
+
                             }
                         }
                     }
+
+                    Molecule* mtmp[4], *mbkg[2];
+                    mbkg[0] = ligand;
+                    mbkg[1] = nullptr;
+                    mtmp[0] = alignment_aa[0];
+                    mtmp[1] = alignment_aa[1];
+                    mtmp[2] = alignment_aa[2];
+                    mtmp[3] = nullptr;
+                    m.movability = MOV_FLEXONLY;
+                    Molecule::multimol_conform(mtmp);
+                    m.movability = MOV_ALL;
+
+                    cout << endl;
+                }
+                
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Aligned ligand to AA." << endl;
                 cout << endl;
@@ -2530,6 +2666,16 @@ _try_again:
                     for (l=0; l<3; l++) waters[k]->get_atom(l)->stream_pdb_line(pdbdat, 9000+offset+l+3*k);
                 }
             }
+
+            #if _dummy_atoms_for_debug
+            if (dummies.size())
+            {
+                for (k=0; k<dummies.size(); k++)
+                {
+                    dummies[k].stream_pdb_line(pdbdat, 9900+offset+l+3*k);
+                }
+            }
+            #endif
 
             if (flex)
             {

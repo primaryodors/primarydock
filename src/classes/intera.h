@@ -4,17 +4,6 @@
 #ifndef _INTERATOMIC
 #define _INTERATOMIC
 
-enum intera_type
-{
-    covalent,
-    ionic,
-    hbond,
-    pi,
-    polarpi,
-    mcoord,
-    vdW
-};
-
 class InteratomicForce
 {
 public:

@@ -2077,6 +2077,8 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     if (!atoms) return 0;
     if (subtract_clashes) kJmol -= get_internal_clashes();
 
+    lastshielded = 0;
+
     // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
 
     for (i=0; i<atcount; i++)
@@ -2130,6 +2132,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             }
                         }
                     }
+                    else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                 }
             }
         }
@@ -2327,6 +2330,11 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             float reversal = -0.666; // TODO: Make this binding-energy dependent.
             float accel = 1.1;
 
+            if (!mm[i]->is_residue())
+            {
+                accel += 0.0000001;
+            }
+
             /**** Linear Motion ****/
             #if allow_linear_motion
             if (mm[i]->movability >= MOV_ALL && iter >= 10)
@@ -2509,6 +2517,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
+                            bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                             if (lbind > maxb) maxb = lbind;
                         }
 
@@ -2525,7 +2534,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     if (!isnan(bestfrrad))
                         mm[i]->rotate(&v, bestfrrad, mm[i]->movability > MOV_NORECEN);
                 }
-                else
+                else if (mm[i]->amx)
                 {
                     #if monte_carlo_axial
                     Pose putitback(mm[i]);
@@ -2543,6 +2552,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                         float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
+                        bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                         if (lbind > maxb) maxb = lbind;
                     }
                     if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2587,6 +2597,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
+                            bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                             if (lbind > maxb) maxb = lbind;
                         }
 
@@ -2603,7 +2614,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     if (!isnan(bestfrrad))
                         mm[i]->rotate(&v1, bestfrrad, mm[i]->movability > MOV_NORECEN);
                 }
-                else
+                else if (mm[i]->amy)
                 {
                     #if monte_carlo_axial
                     Pose putitback(mm[i]);
@@ -2622,6 +2633,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                         float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
+                        bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                         if (lbind > maxb) maxb = lbind;
                     }
                     if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2667,6 +2679,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
+                            bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                             if (lbind > maxb) maxb = lbind;
                         }
 
@@ -2683,7 +2696,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     if (!isnan(bestfrrad))
                         mm[i]->rotate(&v2, bestfrrad, mm[i]->movability > MOV_NORECEN);
                 }
-                else
+                else if (mm[i]->amz)
                 {
                     #if monte_carlo_axial
                     Pose putitback(mm[i]);
@@ -2702,6 +2715,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                         float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
+                        bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                         if (lbind > maxb) maxb = lbind;
                     }
                     if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2767,6 +2781,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         // cout << ".";
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                         bind += mm[i]->get_intermol_binding(all[j], !is_ac);
+                        bind -= mm[i]->lastshielded * shielding_avoidance_factor;
                     }
                 }
                 mm[i]->lastbind = bind;
@@ -2850,6 +2865,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                         ;
 
                                     bind1 += lbind1;
+                                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                                     if (lbind1 > maxb) maxb = lbind1;
                                     #if DBG_BONDFLEX
                                     if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
@@ -2891,6 +2907,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                                 float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                                 bind1 += lbind;
+                                bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                                 if (lbind > maxb) maxb = lbind;
                             }
                             if (bind1 < bind || maxb < _slt1 * fmaxb)

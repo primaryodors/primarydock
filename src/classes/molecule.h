@@ -173,6 +173,7 @@ public:
     MovabilityType movability = MOV_ALL;
     float lastbind = 0;
     float lastbind_history[10];
+    float lastshielded = 0;
 
     histidine_flip** hisflips = nullptr;
 

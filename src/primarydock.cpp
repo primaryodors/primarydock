@@ -2221,7 +2221,6 @@ _try_again:
                                     append_dummy(al);
                                     append_dummy(cen);*/
                                     rot = align_points_3d(&pt, &al, &cen);
-                                    // rot.a /= 2;
                                     m.rotate(&rot.v, rot.a);
                                     ligand->recenter(cen);
                                     // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
@@ -2240,22 +2239,11 @@ _try_again:
 
                                 case 1:
                                     // Pivot about bb0.
-
-                                    /*
-                                    rot = align_points_3d(&pt, &al, &origin);
-                                    lv.copy(rot.v);
-                                    lv.origin = origin;
-                                    m.rotate(lv, rot.a);
-                                    */
-
                                     origin = ligbb[0]->get_location();
                                     lv = (SCoord)origin.subtract(ligand->get_barycenter());
                                     lv.origin = origin;
                                     rot.a = -find_angle_along_vector(pt, al, origin, (SCoord)lv);
                                     m.rotate(lv, rot.a);
-                                    
-
-                                    // ligand->recenter(loneliest);
                                     // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
                                     break;
 

@@ -194,4 +194,5 @@ foreach ($corrs as $rcp => $c)
 _nodata:
 ;
 
+echo "Processes running:\n";
 passthru("ps -ef | grep ':[0-9][0-9] bin/primarydock' | grep -v grep");

@@ -233,7 +233,7 @@ function get_at_wt($element)
 		$cwd = getcwd();
 		chdir(__DIR__);
 		chdir("..");
-		$c = file_get_contents("elements.dat");
+		$c = file_get_contents("data/elements.dat");
 		$c = explode("\n", $c);
 		for ($i=1; $i<256; $i++)
 		{

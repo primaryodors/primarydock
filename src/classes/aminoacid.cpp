@@ -1341,7 +1341,7 @@ void AminoAcid::copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbd
 
 void AminoAcid::load_aa_defs()
 {
-    FILE* pf = fopen(override_aminos_dat ?: "aminos.dat", "rb");
+    FILE* pf = fopen(override_aminos_dat ?: "data/aminos.dat", "rb");
     if (!pf)
     {
         cout << "ERROR failed to open aminos.dat, please verify file exists and you have permissions." << endl;

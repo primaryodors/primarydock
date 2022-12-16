@@ -17,7 +17,7 @@ void InteratomicForce::read_all_forces()
     int i, ifcount = 0;
     init_nulls(all_forces, _MAX_NUM_FORCES);
 
-    FILE* pf = fopen("bindings.dat", "rb");
+    FILE* pf = fopen("data/bindings.dat", "rb");
     if (!pf)
         cout << "ERROR failed to open bindings.dat, please verify file exists and you have permissions." << endl;
     else

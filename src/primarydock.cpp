@@ -1559,7 +1559,7 @@ _try_again:
         prepare_initb();
 
         ligand->recenter(pocketcen);
-        cout << "Centered ligand at " << pocketcen << endl;
+        // cout << "Centered ligand at " << pocketcen << endl;
 
         if (!use_bestbind_algorithm && !use_prealign)
         {
@@ -1973,7 +1973,7 @@ _try_again:
             }
 
             loneliest = protein->find_loneliest_point(nodecen, size);
-            cout << "Loneliest is " << loneliest << endl;
+            // cout << "Loneliest is " << loneliest << endl;
 
             #if pocketcen_is_loneliest
             nodecen = loneliest;
@@ -2165,7 +2165,7 @@ _try_again:
                     {
                         if (alignment_aa[l])
                         {
-                            cout << "Aligning " << ligbb[l]->name << " to " << alignment_aa[l]->get_name() << endl;
+                            cout << "# Aligning " << ligbb[l]->name << " to " << alignment_aa[l]->get_name() << "..." << endl;
                             Atom* alca;
 
                             if (retain_bindings[l].btom) alca = retain_bindings[l].btom;
@@ -2218,7 +2218,7 @@ _try_again:
                                     // rot.a /= 2;
                                     m.rotate(&rot.v, rot.a);
                                     ligand->recenter(cen);
-                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
+                                    // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
 
                                     if (false && !l)
                                     {
@@ -2250,7 +2250,7 @@ _try_again:
                                     
 
                                     // ligand->recenter(loneliest);
-                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
+                                    // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
                                     break;
 
                                 case 2:
@@ -2275,8 +2275,8 @@ _try_again:
                                     lv.origin = origin;
                                     m.rotate(lv, besttheta);
                                     ligand->recenter(cen);
-                                    cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
-                                         << "-" << ligbb[1]->name << " axis." << endl;
+                                    /*cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
+                                         << "-" << ligbb[1]->name << " axis." << endl;*/
                                     break;
 
                                 default:

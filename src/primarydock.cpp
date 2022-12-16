@@ -2136,7 +2136,7 @@ _try_again:
                                 }
                                 catch (int ex)
                                 {
-                                    ;                   // In C++ you can swallow your ex.
+                                    ;
                                 }
 
                                 alignment_aa[l]->springy_bonds = retain_bindings;

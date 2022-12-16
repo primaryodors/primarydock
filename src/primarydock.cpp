@@ -1603,7 +1603,7 @@ _try_again:
             conformer_tumble_multiplier = 1;
 
             allow_ligand_360_tumble = (nodes_no_ligand_360_tumble ? (nodeno == 0) : true) && !use_prealign && !use_bestbind_algorithm;
-            allow_ligand_360_flex   = (nodes_no_ligand_360_flex   ? (nodeno == 0) : true) /*&& !use_bestbind_algorithm*/;
+            allow_ligand_360_flex   = (nodes_no_ligand_360_flex   ? (nodeno == 0) : true) && !use_bestbind_algorithm;
 
             if (use_prealign) conformer_tumble_multiplier *= prealign_momenta_mult;
             if (use_bestbind_algorithm) conformer_tumble_multiplier *= prealign_momenta_mult;
@@ -2206,9 +2206,9 @@ _try_again:
                                 {
                                 case 0:
                                     // Pivot about molcen.
-                                    append_dummy(pt);
+                                    /*append_dummy(pt);
                                     append_dummy(al);
-                                    append_dummy(cen);
+                                    append_dummy(cen);*/
                                     rot = align_points_3d(&pt, &al, &cen);
                                     // rot.a /= 2;
                                     m.rotate(&rot.v, rot.a);

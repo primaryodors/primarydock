@@ -158,7 +158,7 @@
 // potential binding with residues, irrespective of whether the side chain is in an
 // optimum orientation in space.
 #define allow_ligand_esp 1
-#define shielding_avoidance_factor 0.5
+#define shielding_avoidance_factor 2.5
 
 // Uses the ligand's most strongly bound atom as the center for full molecule rotations,
 // instead of the barycenter, to prevent "letting go" of the strongest binding.

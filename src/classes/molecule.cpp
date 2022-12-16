@@ -2807,6 +2807,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     Pose putitback(mm[i]);
                     #endif
 
+                    bool skip_inverse_check = mm[i]->movability <= MOV_NORECEN;
+
                     #if DBG_BONDFLEX
                     if (DBG_FLEXRES == residue)
                         cout << " has rotbonds ";
@@ -2838,7 +2840,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         {
                             while ((M_PI*2-rad) > 1e-3)
                             {
-                                mm[i]->rotatable_bonds[k]->rotate(_fullrot_steprad);
+                                mm[i]->rotatable_bonds[k]->rotate(_fullrot_steprad, false, skip_inverse_check);
                                 rad += _fullrot_steprad;
 
                                 bind1 = 0;
@@ -2887,7 +2889,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             #endif
 
                             if (!isnan(bestfrrad))
-                                mm[i]->rotatable_bonds[k]->rotate(bestfrrad);
+                                mm[i]->rotatable_bonds[k]->rotate(bestfrrad, false, skip_inverse_check);
                         }
                         else
                         {
@@ -2897,7 +2899,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             ra = frand(-fabs(ra), fabs(ra));
                             #endif
 
-                            mm[i]->rotatable_bonds[k]->rotate(ra);
+                            mm[i]->rotatable_bonds[k]->rotate(ra, false, skip_inverse_check);
 
                             bind1 = 0;
                             maxb = 0;
@@ -2916,7 +2918,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 putitback.restore_state(mm[i]);
                                 mm[i]->rotatable_bonds[k]->angular_momentum *= 0.98;
                                 #else
-                                mm[i]->rotatable_bonds[k]->rotate(-ra);
+                                mm[i]->rotatable_bonds[k]->rotate(-ra, false, skip_inverse_check);
                                 mm[i]->rotatable_bonds[k]->angular_momentum *= reversal;
                                 #endif
                             }

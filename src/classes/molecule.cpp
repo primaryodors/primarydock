@@ -17,6 +17,7 @@ using namespace std;
 
 float potential_distance = 0;
 float conformer_momenta_multiplier = 1;
+float conformer_tumble_multiplier = 1;
 
 bool allow_ligand_360_tumble = true;
 bool allow_ligand_360_flex = true;
@@ -32,6 +33,9 @@ Molecule::Molecule(char const* lname)
     atcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = nullptr;
+
+    int j;
+    for (j=0; j<10; j++) lastbind_history[j] = 0;
 }
 
 Molecule::Molecule()
@@ -42,7 +46,10 @@ Molecule::Molecule()
     atcount = 0;
     reset_conformer_momenta();
     rotatable_bonds = 0;
-    paren = nullptr; // not sure what a good default is here, but it was not initialized (warning from clang)
+    paren = nullptr;
+
+    int j;
+    for (j=0; j<10; j++) lastbind_history[j] = 0;
 }
 
 Molecule::~Molecule()
@@ -189,9 +196,9 @@ void Molecule::reset_conformer_momenta()
     lmx = _def_lin_momentum * sgn(0.5-(rand()&1));
     lmy = _def_lin_momentum * sgn(0.5-(rand()&1));
     lmz = _def_lin_momentum * sgn(0.5-(rand()&1));
-    amx = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
-    amy = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
-    amz = _def_ang_momentum * conformer_momenta_multiplier * sgn(0.5-(rand()&1));
+    amx = _def_ang_momentum * conformer_momenta_multiplier * conformer_tumble_multiplier * sgn(0.5-(rand()&1));
+    amy = _def_ang_momentum * conformer_momenta_multiplier * conformer_tumble_multiplier * sgn(0.5-(rand()&1));
+    amz = _def_ang_momentum * conformer_momenta_multiplier * conformer_tumble_multiplier * sgn(0.5-(rand()&1));
 
     Bond** b = get_rotatable_bonds();
     int i;
@@ -1886,6 +1893,7 @@ float Molecule::get_charge()
 
 void Molecule::recenter(Point nl)
 {
+    if (movability <= MOV_NORECEN) return;
     Point loc = get_barycenter();
     Point rel = nl.subtract(&loc);
     SCoord v(&rel);
@@ -1897,6 +1905,8 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     if (noAtoms(atoms)) return;
     // cout << name << " Molecule::rotate()" << endl;
 
+    if (movability <= MOV_FLEXONLY) return;
+    if (movability <= MOV_NORECEN) bond_weighted = false;
     Point cen = get_barycenter(bond_weighted);
 
     int i;
@@ -1909,16 +1919,19 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     }
 }
 
-void Molecule::rotate(LocatedVector SCoord, float theta)
+void Molecule::rotate(LocatedVector lv, float theta)
 {
     if (noAtoms(atoms)) return;
+
+    if (movability <= MOV_FLEXONLY) return;
+    if (movability <= MOV_NORECEN) lv.origin = get_barycenter();
 
     int i;
     for (i=0; i<atcount; i++)
     {
         // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
-        Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
+        Point nl  = rotate3D(&loc, &lv.origin, &lv, theta);
         atoms[i]->move(&nl);
     }
 }
@@ -2064,6 +2077,8 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     if (!atoms) return 0;
     if (subtract_clashes) kJmol -= get_internal_clashes();
 
+    lastshielded = 0;
+
     // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
 
     for (i=0; i<atcount; i++)
@@ -2117,6 +2132,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             }
                         }
                     }
+                    else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                 }
             }
         }
@@ -2176,7 +2192,41 @@ void Molecule::minimize_internal_clashes()
     // cout << " base internal clashes: " << base_internal_clashes << endl;
 }
 
+void Molecule::do_histidine_flip(histidine_flip* hf)
+{
+    Point ptC  = hf->C->get_location();
+    Point ptN1 = hf->N1->get_location();
+    Point ptN2 = hf->N2->get_location();
+    Point ptH  = hf->H->get_location();
 
+    Point arr[2] = {ptN1, ptN2};
+    Point Navg = average_of_points(arr, 2);
+
+    Point newloc = rotate3D(ptH, Navg, ptC.subtract(Navg), M_PI);
+    hf->H->move(newloc);
+
+    #if _DBG_HISFLIP
+    cout << hf->H->name << " moved from " << ptH << " to " << newloc << endl;
+    #endif
+}
+
+float Molecule::get_springy_bond_satisfaction()
+{
+    if (!springy_bonds) return 0;
+
+    float retval = 0;
+    int i;
+    for (i=0; i<springy_bondct; i++)
+    {
+        if (!springy_bonds[i].atom || !springy_bonds[i].btom || !springy_bonds[i].optimal_radius) continue;
+        float r = springy_bonds[i].atom->get_location().get_3d_distance(springy_bonds[i].btom->get_location());
+        r /= springy_bonds[i].optimal_radius;
+        if (r < 1) retval += r;
+        else retval += 1.0/(r*r);
+    }
+
+    return retval;
+}
 
 #define DBG_BONDFLEX 0
 #define DBG_FLEXRES 111
@@ -2195,6 +2245,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (
 void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, int iters, void (*cb)(int))
 {
     if (!mm) return;
+    if (!iters) return;
 
     int i, j, k, l, n, inplen, bklen, alllen, aclen, iter;
     float rad, bestfrrad, bestfrb;
@@ -2288,6 +2339,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     // get_intermol_binding includes clashes by default, so we don't have to calculate them separately.
                     float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind += lbind;
+                    bind -= mm[i]->lastshielded * shielding_avoidance_factor;
+                    bind += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
             }
@@ -2315,6 +2368,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                     float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind1 += lbind;
+                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
                 if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2344,6 +2399,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                     float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind1 += lbind;
+                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
                 if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2371,6 +2428,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                     float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind1 += lbind;
+                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
                 if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2412,6 +2471,42 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             /**** End Linear Motion ****/
             #endif
 
+            /**** Histidine flip ****/
+            if (mm[i]->hisflips)
+            {
+                for (l=0; mm[i]->hisflips[l]; l++)
+                {
+                    #if _DBG_HISFLIP
+                    cout << "Flipping " << mm[i]->name << endl;
+                    #endif
+                    mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
+
+                    bind1 = 0;
+                    maxb = 0;
+                    for (j=0; all[j]; j++)
+                    {
+                        if (!nearby[j]) continue;
+                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                        bind1 += lbind;
+                        if (lbind > maxb) maxb = lbind;
+                    }
+                    if (bind1 >= bind || (bind < _hisflip_binding_threshold && frand(0,1) < 0.53))
+                    {
+                        bind = bind1;
+                    }
+                    else
+                    {
+                        mm[i]->do_histidine_flip(mm[i]->hisflips[l]);               // put it back.
+
+                        #if _DBG_HISFLIP
+                        cout << "Putting it back." << endl;
+                        #endif
+                    }
+                }
+            }
+            /**** End histidine flip ****/
+
             #if allow_axial_tumble
             /**** Axial Tumble ****/
             if (mm[i]->movability >= MOV_NORECEN)
@@ -2443,6 +2538,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
+                            bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                            bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                             if (lbind > maxb) maxb = lbind;
                         }
 
@@ -2459,7 +2556,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     if (!isnan(bestfrrad))
                         mm[i]->rotate(&v, bestfrrad);
                 }
-                else
+                else if (mm[i]->amx)
                 {
                     #if monte_carlo_axial
                     Pose putitback(mm[i]);
@@ -2477,6 +2574,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                         float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
+                        bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                        bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                         if (lbind > maxb) maxb = lbind;
                     }
                     if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2521,6 +2620,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
+                            bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                            bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                             if (lbind > maxb) maxb = lbind;
                         }
 
@@ -2537,7 +2638,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     if (!isnan(bestfrrad))
                         mm[i]->rotate(&v1, bestfrrad);
                 }
-                else
+                else if (mm[i]->amy)
                 {
                     #if monte_carlo_axial
                     Pose putitback(mm[i]);
@@ -2556,6 +2657,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                         float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
+                        bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                        bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                         if (lbind > maxb) maxb = lbind;
                     }
                     if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2601,6 +2704,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
+                            bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                            bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                             if (lbind > maxb) maxb = lbind;
                         }
 
@@ -2617,7 +2722,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     if (!isnan(bestfrrad))
                         mm[i]->rotate(&v2, bestfrrad);
                 }
-                else
+                else if (mm[i]->amz)
                 {
                     #if monte_carlo_axial
                     Pose putitback(mm[i]);
@@ -2636,6 +2741,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                         float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
+                        bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                        bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                         if (lbind > maxb) maxb = lbind;
                     }
                     if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2701,6 +2808,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         // cout << ".";
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                         bind += mm[i]->get_intermol_binding(all[j], !is_ac);
+                        bind -= mm[i]->lastshielded * shielding_avoidance_factor;
+                        bind += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     }
                 }
                 mm[i]->lastbind = bind;
@@ -2725,6 +2834,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     #if monte_carlo_flex
                     Pose putitback(mm[i]);
                     #endif
+
+                    bool skip_inverse_check = mm[i]->movability <= MOV_NORECEN;
 
                     #if DBG_BONDFLEX
                     if (DBG_FLEXRES == residue)
@@ -2757,7 +2868,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         {
                             while ((M_PI*2-rad) > 1e-3)
                             {
-                                mm[i]->rotatable_bonds[k]->rotate(_fullrot_steprad);
+                                mm[i]->rotatable_bonds[k]->rotate(_fullrot_steprad, false, skip_inverse_check);
                                 rad += _fullrot_steprad;
 
                                 bind1 = 0;
@@ -2784,6 +2895,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                         ;
 
                                     bind1 += lbind1;
+                                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                                     if (lbind1 > maxb) maxb = lbind1;
                                     #if DBG_BONDFLEX
                                     if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
@@ -2805,7 +2918,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             #endif
 
                             if (!isnan(bestfrrad))
-                                mm[i]->rotatable_bonds[k]->rotate(bestfrrad);
+                                mm[i]->rotatable_bonds[k]->rotate(bestfrrad, false, skip_inverse_check);
                         }
                         else
                         {
@@ -2815,7 +2928,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             ra = frand(-fabs(ra), fabs(ra));
                             #endif
 
-                            mm[i]->rotatable_bonds[k]->rotate(ra);
+                            mm[i]->rotatable_bonds[k]->rotate(ra, false, skip_inverse_check);
 
                             bind1 = 0;
                             maxb = 0;
@@ -2825,6 +2938,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                                 float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                                 bind1 += lbind;
+                                bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                                bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                                 if (lbind > maxb) maxb = lbind;
                             }
                             if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2833,7 +2948,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 putitback.restore_state(mm[i]);
                                 mm[i]->rotatable_bonds[k]->angular_momentum *= 0.98;
                                 #else
-                                mm[i]->rotatable_bonds[k]->rotate(-ra);
+                                mm[i]->rotatable_bonds[k]->rotate(-ra, false, skip_inverse_check);
                                 mm[i]->rotatable_bonds[k]->angular_momentum *= reversal;
                                 #endif
                             }
@@ -2872,6 +2987,11 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             }
             /**** End Bond Flexion ****/
             #endif
+
+            if (mm[i]->movability <= MOV_NORECEN) mm[i]->recenter(icen);
+
+            for (j=1; j<10; j++) mm[i]->lastbind_history[j-1] = mm[i]->lastbind_history[j];
+            mm[i]->lastbind_history[j-1] = mm[i]->lastbind;
 
         }	// for i = 0 to iters
         // cout << "Iteration " << iter << " improvement " << improvement << endl;
@@ -2976,6 +3096,9 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     int EZgiven[numdb+4];
     Atom* EZatom0[numdb+4];
     Atom* EZatom1[numdb+4];
+
+    smlen = strlen(smilesstr);
+    paren = new SMILES_Parenthetical[smlen];
 
     for (i=0; i<len; i++)
     {
@@ -3394,6 +3517,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
         prevarom = aromatic;
     }
     atoms[atcount]=0;
+    delete[] paren;
 
     return true;
 }
@@ -3637,7 +3761,6 @@ float Molecule::close_loop(Atom** path, float lcard)
     return anomaly;
 }
 
-#define _DBG_MOLBB 0
 Atom** Molecule::get_most_bindable(int max_count)
 {
     if (noAtoms(atoms)) return 0;

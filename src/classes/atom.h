@@ -7,6 +7,17 @@
 #ifndef _ATOM
 #define _ATOM
 
+enum intera_type
+{
+    covalent,
+    ionic,
+    hbond,
+    pi,
+    polarpi,
+    mcoord,
+    vdW
+};
+
 class Atom;
 class Bond
 {
@@ -19,6 +30,8 @@ public:
     float flip_angle=0;				// signed.
     float angular_momentum=0;
     float total_rotations=0;
+    intera_type type = covalent;
+    float optimal_radius = 1;
 
     #if _debug_active_bond_rot
     bool echo_on_rotate = false;

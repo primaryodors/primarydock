@@ -15,6 +15,40 @@ using namespace std;
 AADef aa_defs[256];
 char* override_aminos_dat=0;
 
+void AminoAcid::find_his_flips()
+{
+    if (!atoms) return;
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->get_family() == TETREL)
+        {
+            Atom* a = atoms[i]->is_bonded_to(PNICTOGEN, 2);
+            if (a)
+            {
+                Atom* b = atoms[i]->is_bonded_to(a->get_elem_sym(), 1);
+                if (b)
+                {
+                    Atom* h = b->is_bonded_to("H");
+                    if (!h) h = a->is_bonded_to("H");
+
+                    if (h)
+                    {
+                        hisflips = new histidine_flip*[4];
+                        hisflips[0] = new histidine_flip;
+                        hisflips[0]->C  = atoms[i];
+                        hisflips[0]->N1 = a;
+                        hisflips[0]->N2 = b;
+                        hisflips[0]->H  = h;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+}
+
 AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
 {
     if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
@@ -25,11 +59,12 @@ AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
     mol_typ = MOLTYP_AMINOACID;
     prev_aa = prevaa;
     if (prevaa) prevaa->next_aa = this;
+    find_his_flips();
 }
 
 AminoAcid::~AminoAcid()
 {
-    // if (name) delete[] name;
+    if (hisflips) delete[] hisflips;
     if (atoms) delete[] atoms;
     atoms = nullptr;
 }
@@ -657,13 +692,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 
     aa_defs[idx].loaded = true;
 
-    /*cout << "Hydrophilic? " << ((aa_defs[idx].hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD) ? "Y" : "N") << " (" << aa_defs[idx].hydrophilicity << ")" << endl;
-    cout << "Metal coord? " << (aa_defs[idx].can_coord_metal ? "Y" : "N") << endl;
-    cout << "Charge? " << aa_defs[idx].charged << endl;
-    cout << "Aromatic? " << (aa_defs[idx].aromatic ? "Y" : "N") << endl;*/
-
-
-
     Atom* CA = get_atom("CA");
     Atom* CB = get_atom("CB");
 
@@ -684,6 +712,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
         movability = MOV_FLEXONLY;
         immobile = true;
     }
+
+    find_his_flips();
 }
 
 void AminoAcid::establish_internal_clash_baseline()
@@ -1581,19 +1611,31 @@ std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 }
 
 
-bool AminoAcid::capable_of_inter(intera_type inter)
+Atom* AminoAcid::capable_of_inter(intera_type inter)
 {
-    if (!atoms) return false;
+    if (!atoms) return nullptr;
 
     // Lysine and arginine cannot coordinate metals. Histidine is not normally protonated so it is free for metal coordination.
     // We see real world instances where a mutation of H to R in a metal binding site renders the entire protein nonfunctional.
-    if (inter == mcoord && get_charge() > 0) return false;
+    if (inter == mcoord && get_charge() > 0) return nullptr;
+
+    Atom* retval = nullptr;
+    float cadist = 0;
+    Point caloc = get_atom("CA")->get_location();
 
     int i, j;
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
-        if (InteratomicForce::atom_is_capable_of(atoms[i], inter)) return true;
+        if (InteratomicForce::atom_is_capable_of(atoms[i], inter)) // return atoms[i];
+        {
+            float r = atoms[i]->get_location().get_3d_distance(caloc);
+            if (r > cadist)
+            {
+                retval = atoms[i];
+                cadist = r;
+            }
+        }
         /*InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], atoms[i]);
         if (!iff) continue;
         for (j=0; iff[j]; j++)
@@ -1605,7 +1647,7 @@ bool AminoAcid::capable_of_inter(intera_type inter)
             }*/
     }
 
-    return false;
+    return retval;
 }
 
 float AminoAcid::hydrophilicity()

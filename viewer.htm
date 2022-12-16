@@ -439,7 +439,7 @@ Center:
 </div>
 </div>
 <center>
-<div id="viewport" style="width:1800px; height:880px; background-color: #201008;"></div>
+<div id="viewport" style="width:1800px; height:880px; background-color: #020408;"></div>
 </center>
 <script>
 
@@ -970,6 +970,8 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
         switch (elem)
         {
         	case 'H': return atom.isBackbone() ? 0x79949b : 0xd1f5ff;
+			case 'He': return 0xfcaa93;
+			case 'Ne': return 0xff4e00;
             
         	case 'C':
             if (atom.isBackbone()) return 0x666666;
@@ -1051,6 +1053,8 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
         switch (elem)
         {
         	case 'H': return atom.isBackbone() ? 0x79949b : 0xe1faff;
+			case 'He': return 0xfcaa93;
+			case 'Ne': return 0xff4e00;
             
         	case 'C':
             if (atom.isBackbone()) return 0x666666;
@@ -1132,9 +1136,11 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
         switch (elem)
         {
         	case 'H': return 0xe1faff;
+			case 'He': return 0xfcaa93;
         	case 'C': return 0xa7ada4;
         	case 'N': return born ? 0xCC3366 : 0x5555FF;
         	case 'O': return born ? 0x0066FF : 0xFF2222;
+			case 'Ne': return 0xff4e00;
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
         	case 'Se': return 0xffb022;
@@ -1195,7 +1201,7 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 
 stage.setParameters(
 {
-	'backgroundColor': '#080400',
+	'backgroundColor': '#020408',
 	'ambientColor': '#59f',
     'ambientIntensity': 0.6,
 	'lightColor': '#fc8',
@@ -1616,6 +1622,7 @@ function loadFile(fileData, fileName = "")
 		success: function(poresult)
         {
             poresult = poresult.split("\n");
+			bw50r = new Array(99).fill(0);
 
             var i;
             for (i=0; i<poresult.length; i++)
@@ -1641,6 +1648,12 @@ function loadFile(fileData, fileName = "")
                         tmstart[tmr] = parseInt(fields[2]);
                         tmend[tmr] = parseInt(fields[3]);
                     }
+                }
+                if (ln.substr(0, 3) == "BW|")
+                {
+                    var fields = ln.split("|");
+					var tmr = parseInt(fields[1].split('.')[0]);
+					bw50r[tmr] = parseInt(fields[2]);
                 }
                 if (ln.substr(0, 7) == "POCKET|")
                 {

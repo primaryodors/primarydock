@@ -127,7 +127,7 @@ public:
     // Bond functions.
     bool disulfide_bond(const AminoAcid* bond_to);
     Bond** get_rotatable_bonds();
-    bool capable_of_inter(intera_type inter);
+    Atom* capable_of_inter(intera_type inter);
     LocRotation enforce_peptide_bond(bool cis = false);				// Peptide bonds should almost always be in the trans (E) configuration.
 
 
@@ -151,6 +151,7 @@ public:
 protected:
     void load_aa_defs();
     void copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbdefs, bool proline_like);
+    void find_his_flips();
 
     int residue_no=0;
     char region[25];

@@ -12,6 +12,14 @@ struct SMILES_Parenthetical
     char* smilesstr=0;
 };
 
+struct histidine_flip
+{
+    Atom* H;
+    Atom* C;
+    Atom* N1;
+    Atom* N2;
+};
+
 enum MovabilityType
 {
     MOV_ALL			= 1000,
@@ -112,6 +120,7 @@ public:
     Bond** get_all_bonds(bool unidirectional);
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
     bool rotate_bond(const Bond* rot8b, const float angle);
+    void do_histidine_flip(histidine_flip* hf);
 
     // Ring functions.
     int identify_rings();
@@ -144,6 +153,8 @@ public:
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
 
+    float get_springy_bond_satisfaction();
+
     void reset_conformer_momenta();
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
     Atom** get_most_bindable(int max_num, Atom* for_atom);
@@ -163,6 +174,11 @@ public:
     bool echo_iters = false;
     MovabilityType movability = MOV_ALL;
     float lastbind = 0;
+    float lastbind_history[10];
+    float lastshielded = 0;
+    histidine_flip** hisflips = nullptr;
+    Bond* springy_bonds = nullptr;
+    int springy_bondct = 0;
 
 protected:
     Molecule();
@@ -205,6 +221,7 @@ protected:
 
 extern float potential_distance;
 extern float conformer_momenta_multiplier;
+extern float conformer_tumble_multiplier;
 extern bool allow_ligand_360_tumble;
 extern bool allow_ligand_360_flex;
 

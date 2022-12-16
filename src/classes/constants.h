@@ -159,7 +159,6 @@
 // optimum orientation in space.
 #define allow_ligand_esp 1
 #define shielding_avoidance_factor 2.5
-#define bestbind_springiness 10
 
 // Uses the ligand's most strongly bound atom as the center for full molecule rotations,
 // instead of the barycenter, to prevent "letting go" of the strongest binding.
@@ -173,8 +172,9 @@
 #define pocketcen_is_loneliest 1
 
 // Switches whether the best-binding algorithm is active by default, instead of tumble spheres.
-#define default_bestbind 0
+#define default_bestbind 1
 #define preemptively_minimize_intermol_clashes 0
+#define bestbind_springiness 10
 
 // For differential docking, whether to multimol_conform() all the protein's residues into an
 // optimized initial conformation before adding the ligand.

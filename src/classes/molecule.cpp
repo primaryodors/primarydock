@@ -2350,11 +2350,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             float reversal = -0.666; // TODO: Make this binding-energy dependent.
             float accel = 1.1;
 
-            if (!mm[i]->is_residue())
-            {
-                accel += 0.0000001;
-            }
-
             /**** Linear Motion ****/
             #if allow_linear_motion
             if (mm[i]->movability >= MOV_ALL && iter >= 10)

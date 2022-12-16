@@ -2283,7 +2283,7 @@ _try_again:
                                 mtmp[0] = &m;
                                 mtmp[1] = alignment_aa[l];
                                 mtmp[2] = NULL;
-                                m.movability = MOV_NONE;
+                                m.movability = MOV_FLEXONLY;
                                 alignment_aa[l]->movability = MOV_FLEXONLY;
                                 Molecule::multimol_conform(mtmp);
                                 m.movability = MOV_ALL;
@@ -2297,6 +2297,17 @@ _try_again:
                             }
                         }
                     }
+
+                    Molecule* mtmp[4], *mbkg[2];
+                    mbkg[0] = ligand;
+                    mbkg[1] = nullptr;
+                    mtmp[0] = alignment_aa[0];
+                    mtmp[1] = alignment_aa[1];
+                    mtmp[2] = alignment_aa[2];
+                    mtmp[3] = nullptr;
+                    m.movability = MOV_FLEXONLY;
+                    Molecule::multimol_conform(mtmp);
+                    m.movability = MOV_ALL;
 
                     cout << endl;
                 }

@@ -111,7 +111,7 @@ std::string optsecho = "";
 bool use_bestbind_algorithm = default_bestbind;
 bool use_prealign = false;
 std::string prealign_residues = "";
-Bond retain_bindings[3];
+Bond retain_bindings[4];
 
 float* initial_binding;
 float* initial_vdWrepl;
@@ -2063,6 +2063,8 @@ _try_again:
                         retain_bindings[l].cardinality = 0;
                         if (!ligbb[l]) continue;
                         retain_bindings[l].atom = ligbb[l];
+                        ligand->springy_bonds = retain_bindings;
+                        ligand->springy_bondct = l+1;
                         float alignment_potential = 0;
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
@@ -2130,6 +2132,9 @@ _try_again:
                                 {
                                     ;                   // In C++ you can swallow your ex.
                                 }
+
+                                alignment_aa[l]->springy_bonds = retain_bindings;
+                                alignment_aa[l]->springy_bondct = l+1;
                             }
                             #if _DBG_STEPBYSTEP
                             if (debug) *debug << "Candidate alignment AA." << endl;

@@ -2210,6 +2210,24 @@ void Molecule::do_histidine_flip(histidine_flip* hf)
     #endif
 }
 
+float Molecule::get_springy_bond_satisfaction()
+{
+    if (!springy_bonds) return 0;
+
+    float retval = 0;
+    int i;
+    for (i=0; i<springy_bondct; i++)
+    {
+        if (!springy_bonds[i].atom || !springy_bonds[i].btom || !springy_bonds[i].optimal_radius) continue;
+        float r = springy_bonds[i].atom->get_location().get_3d_distance(springy_bonds[i].btom->get_location());
+        r /= springy_bonds[i].optimal_radius;
+        if (r < 1) retval += r;
+        else retval += 1.0/(r*r);
+    }
+
+    return retval;
+}
+
 #define DBG_BONDFLEX 0
 #define DBG_FLEXRES 111
 #define DBG_FLEXROTB 0
@@ -2321,6 +2339,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     // get_intermol_binding includes clashes by default, so we don't have to calculate them separately.
                     float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind += lbind;
+                    bind -= mm[i]->lastshielded * shielding_avoidance_factor;
+                    bind += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
             }
@@ -2353,6 +2373,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                     float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind1 += lbind;
+                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
                 if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2382,6 +2404,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                     float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind1 += lbind;
+                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
                 if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2409,6 +2433,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                     float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                     bind1 += lbind;
+                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
                 if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2518,6 +2544,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
                             bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                            bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                             if (lbind > maxb) maxb = lbind;
                         }
 
@@ -2553,6 +2580,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
                         bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                        bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                         if (lbind > maxb) maxb = lbind;
                     }
                     if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2598,6 +2626,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
                             bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                            bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                             if (lbind > maxb) maxb = lbind;
                         }
 
@@ -2634,6 +2663,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
                         bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                        bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                         if (lbind > maxb) maxb = lbind;
                     }
                     if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2680,6 +2710,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
                             bind1 += lbind;
                             bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                            bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                             if (lbind > maxb) maxb = lbind;
                         }
 
@@ -2716,6 +2747,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind1 += lbind;
                         bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                        bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                         if (lbind > maxb) maxb = lbind;
                     }
                     if (bind1 < bind || maxb < _slt1 * fmaxb)
@@ -2782,6 +2814,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                         bind += mm[i]->get_intermol_binding(all[j], !is_ac);
                         bind -= mm[i]->lastshielded * shielding_avoidance_factor;
+                        bind += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     }
                 }
                 mm[i]->lastbind = bind;
@@ -2868,6 +2901,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
 
                                     bind1 += lbind1;
                                     bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                                     if (lbind1 > maxb) maxb = lbind1;
                                     #if DBG_BONDFLEX
                                     if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
@@ -2910,6 +2944,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
                                 bind1 += lbind;
                                 bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
+                                bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                                 if (lbind > maxb) maxb = lbind;
                             }
                             if (bind1 < bind || maxb < _slt1 * fmaxb)

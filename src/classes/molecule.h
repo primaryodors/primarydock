@@ -153,6 +153,8 @@ public:
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
 
+    float get_springy_bond_satisfaction();
+
     void reset_conformer_momenta();
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
     Atom** get_most_bindable(int max_num, Atom* for_atom);
@@ -174,8 +176,9 @@ public:
     float lastbind = 0;
     float lastbind_history[10];
     float lastshielded = 0;
-
     histidine_flip** hisflips = nullptr;
+    Bond* springy_bonds = nullptr;
+    int springy_bondct = 0;
 
 protected:
     Molecule();

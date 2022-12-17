@@ -155,7 +155,9 @@ function process_dock()
     
     $benerg = [];
     $scenerg = [];
+    $vdwrpl = [];
     $dosce = false;
+    $dovdw = false;
     $pose = false;
     $node = -1;
     $poses_found = 0;
@@ -165,7 +167,11 @@ function process_dock()
     foreach ($outlines as $ln)
     {
         if (!strlen(trim($ln))) $dosce = false;
-        if (substr($ln, 0, 6) == "Pose: ") $pose = intval(explode(" ", $ln)[1]);
+        if (substr($ln, 0, 6) == "Pose: ")
+        {
+            $pose = intval(explode(" ", $ln)[1]);
+            $dovdw = false;
+        }
         if (substr($ln, 0, 6) == "Node: ") $node = intval(explode(" ", $ln)[1]);
         if (trim($ln) == "TER")
         {
@@ -181,8 +187,18 @@ function process_dock()
             $scenerg[$pose][$node][$resno] = $e;
             continue;
         }
+
+        if ($dovdw)
+        {
+            $pettia = explode(": ", $ln);
+            $resno = intval(substr($pettia[0], 3));
+            $v = floatval($pettia[1]);
+            $vdwrpl[$pose][$node][$resno] = $v;
+            continue;
+        }
     
         if (substr($ln, 0, 7) == 'BENERG:') $dosce = true;
+        if (substr($ln, 0, 7) == 'vdWRPL:') $dovdw = true;
         
         if ($pose && $node>=0 && substr($ln, 0,  7) == "Total: "    )
         {
@@ -235,7 +251,9 @@ function process_dock()
     $sum = [];
     $count = [];
     $ssce = [];
+    $svdw = [];
     $rsum = [];
+    $rsumv = [];
     foreach ($benerg as $pose => $data)
     {
         foreach ($data as $node => $value)
@@ -252,12 +270,20 @@ function process_dock()
                 $ssce[$resno] += $e;
                 $rsum[$resno]++;
             }
+    
+            foreach ($vdwrpl[$pose][$node] as $resno => $v)
+            {
+                if (!isset($svdw[$resno])) $svdw[$resno] = floatval($rsumv[$resno] = 0);
+                $svdw[$resno] += $v;
+                $rsumv[$resno]++;
+            }
         }
     }
     
     $sc_avg = [];
     
     $sce = [];
+    $vdw = [];
     foreach ($ca_loc as $resno => $a)
     {
         $bw = bw_from_resno($protid, $resno);
@@ -269,8 +295,10 @@ function process_dock()
             round($sc_loc[$resno][2] / $sc_qty[$resno], 3)
         ];
     
-        if (@$ssce[$resno] && $rsum[$resno]) $sce[$bw] = $ssce[$resno] / $rsum[$resno];
+        if (@$ssce[$resno] && $rsum[$resno ]) $sce[$bw] = $ssce[$resno] / $rsum[$resno];
+        if (@$svdw[$resno] && $rsumv[$resno]) $vdw[$bw] = $svdw[$resno] / $rsumv[$resno];
     }
+
     
     $average = [];
     $average['version'] = $version;
@@ -279,6 +307,11 @@ function process_dock()
     foreach ($sce as $bw => $e)
     {
         $average["BEnerg $bw"] = $e;
+    }
+    
+    foreach ($vdw as $bw => $v)
+    {
+        $average["vdWrpl $bw"] = $v;
     }
     
     foreach ($sum as $node => $value)

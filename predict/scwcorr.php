@@ -62,6 +62,11 @@ foreach ($scw_data as $rcp => $ligs)
                 $bw = substr($k, 7);
                 $yvals[$rcp]["$bw.e"][$idx] = $v;
             }
+            if (substr($k, 0, 7) == "vdWrpl ")
+            {
+                $bw = substr($k, 7);
+                $yvals[$rcp]["$bw.v"][$idx] = $v;
+            }
             if (substr($k, 0, 4) == "SCW ")
             {
                 $bw = substr($k, 4);

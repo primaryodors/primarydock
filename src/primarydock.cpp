@@ -2083,6 +2083,11 @@ _try_again:
                             if (l && reaches_spheroid[nodeno][i] == alignment_aa[l-1]) continue;
                             if (l>1 && reaches_spheroid[nodeno][i] == alignment_aa[l-2]) continue;
 
+                            if (lig_inter_typ[l] == vdW && reaches_spheroid[nodeno][i]->hydrophilicity() > 0.5) continue;
+
+                            // I hate hard coding these, but glycine is the only AA to do this:
+                            if (!strcasecmp(reaches_spheroid[nodeno][i]->get_3letter(), "Gly")) continue;
+
                             #if _DBG_STEPBYSTEP
                             if (debug)
                             {

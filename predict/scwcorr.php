@@ -3,6 +3,23 @@
 chdir(__DIR__);
 require_once("protutils.php");
 require_once("statistics.php");
+
+function set_color($r, $g, $b)
+{
+    $lr =intval( max(0,min(5,$r*6)));
+    $lg = intval(max(0,min(5,$g*6)));
+    $lb = intval(max(0,min(5,$b*6)));
+
+    $ccode = intval(16 + $lb + 6*$lg + 36*$lr);
+
+    echo "\x1b[48;5;{$ccode}m";
+}
+
+function clear_color()
+{
+    echo "\x1b[49m";
+}
+
 $version = filemtime("method_scwhere.php");
 
 $json_file = "dock_results_scwhere.json";
@@ -40,7 +57,7 @@ foreach ($scw_data as $rcp => $ligs)
         switch (@$pair['Actual'])
         {
             case 'Agonist':
-            $xvals[$rcp][$idx] = 1;
+            $xvals[$rcp][$idx] = 10;
             break;
 
             case 'Non-Agonist':
@@ -194,6 +211,71 @@ foreach ($corrs as $rcp => $c)
         echo "\n";
     }
     echo "\n\n";
+
+    $idx = array_keys($c)[0];
+    if (!@$yvals[$rcp][$idx]) continue;
+
+    $xk = array_unique($xvals[$rcp]);
+    rsort($xk);
+
+    $maxyv = max( 
+        max($yvals[$rcp][$idx]),
+        -min($yvals[$rcp][$idx])
+                );
+    $matrix = [];
+    /*foreach ($xvals[$rcp] as $oid => $xv)
+    {
+        foreach ($xk as $xv) $matrix[$xv][$oid] = 0;
+    }*/
+    for ($y=0; $y<=10; $y++) foreach ($xk as $xv) $matrix[$xv][$y] = 0;
+    foreach ($xvals[$rcp] as $oid => $xv)
+    {
+        if (isset($yvals[$rcp][$idx][$oid]))
+        {
+            // $matrix[$xv][$oid] = $yvals[$rcp][$idx][$oid];
+            $y = intval(abs($yvals[$rcp][$idx][$oid]) * 10.0/$maxyv);
+            $matrix[$xv][$y]++;
+        }
+    }
+
+    $maxyv = 0;
+    // for ($xv = -1; $xv <= 1; $xv++)
+    foreach ($xk as $xv)
+    {
+        if (@$matrix[$xv])
+        {
+            $m = max(max($matrix[$xv]), -min($matrix[$xv]));
+            if ($m > $maxyv) $maxyv = $m;
+        }
+    }
+
+    // for ($xv = 1; $xv >= -1; $xv--)
+    foreach ($xk as $xv)
+    {
+        $j = 0;
+        if (@$matrix[$xv])
+        foreach (array_values($matrix[$xv]) as $i)
+        {
+            $k = abs($i);
+            if ($maxyv) $k /= $maxyv;
+            // echo intval($k*9.999)."";
+            $red = $green = $blue = $k;
+
+            $k *= M_PI*2;
+            $blue  = max(0, sin($k+0.17));
+            $red   = max(0, sin($k-1));
+            $green = max(0, sin($k-2));
+            $red = max($red, $green);
+
+            set_color($red, $green, $blue);
+            echo " ";
+            clear_color();
+            $j++;
+            if ($j > 99) break;
+        }
+        echo "\n";
+    }
+    echo "\n";
 }
 
 _nodata:

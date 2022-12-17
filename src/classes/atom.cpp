@@ -28,7 +28,7 @@ int Atom::geometries[_ATOM_Z_LIMIT];
 void Atom::read_elements()
 {
     if (read_elem_syms) return;
-    FILE* pf = fopen("elements.dat", "rb");
+    FILE* pf = fopen("data/elements.dat", "rb");
     if (pf)
     {
         char buffer[1024];

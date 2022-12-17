@@ -7,6 +7,7 @@
 #include <ctime>
 #include <stdint.h>
 #include <cassert>
+#include <strings.h>
 #include "molecule.h"
 #include "aminoacid.h"
 
@@ -334,7 +335,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                 if (!atom_isheavy[i]) continue;
 
                 // I hate doing these nonce kludges. It's nonce hence!
-                if (!strcmp(aa_defs[idx]._3let, "TRP") && atom_Greek[i] == 7)
+                if (!strcmp(aa_defs[idx]._3let, "Trp") && atom_Greek[i] == 7)
                 {
                     atom_append[i] = 2;
                     continue;
@@ -1091,11 +1092,13 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     if (!res3let[0])
                     {
                         strcpy(res3let, fields[3].c_str());
+                        res3let[1] |= 0x20;
+                        res3let[2] |= 0x20;
                     }
 
                     if (!atno_offset) atno_offset = atoi(fields[1].c_str());
 
-                    if (strcmp(res3let, fields[3].c_str())
+                    if (strcasecmp(res3let, fields[3].c_str())
                             ||
                             residue_no != (atoi(fields[4+offset].c_str())+rno)
                        )
@@ -1141,7 +1144,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     name=0;
                     for (i=0; i<256; i++)
                     {
-                        if (aa_defs[i]._1let && !strcmp(aa_defs[i]._3let, fields[3].c_str()))
+                        if (aa_defs[i]._1let && !strcasecmp(aa_defs[i]._3let, fields[3].c_str()))
                         {
                             a->aaletter = aa_defs[i]._1let;
                             aaa = &aa_defs[i];
@@ -1187,10 +1190,10 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                     {
                                         Bond* b = a->get_bond_between(btom);
                                         if (b) b->can_rotate = false;
-                                        b->can_flip = aab->can_flip;
+                                        if (b) b->can_flip = aab->can_flip;
                                         b = btom->get_bond_between(a);
                                         if (b) b->can_rotate = false;
-                                        b->can_flip = aab->can_flip;
+                                        if (b) b->can_flip = aab->can_flip;
                                     }
                                 }
                             }
@@ -1341,7 +1344,7 @@ void AminoAcid::copy_loaded_to_object(char letter, int tbdctr, AABondDef** tmpbd
 
 void AminoAcid::load_aa_defs()
 {
-    FILE* pf = fopen(override_aminos_dat ?: "aminos.dat", "rb");
+    FILE* pf = fopen(override_aminos_dat ?: "data/aminos.dat", "rb");
     if (!pf)
     {
         cout << "ERROR failed to open aminos.dat, please verify file exists and you have permissions." << endl;
@@ -1392,6 +1395,9 @@ void AminoAcid::load_aa_defs()
                         strcpy(aa_defs[idx]._3let, fields[1]);
                         strcpy(aa_defs[idx].name, fields[2]);
                         aa_defs[idx].reach = 1.09;
+
+                        aa_defs[idx]._3let[1] |= 0x20;
+                        aa_defs[idx]._3let[2] |= 0x20;
 
                         if (!strcmp(aa_defs[idx].name, "isoleucine")) aa_defs[idx].isoleucine_fix = true;
                     }

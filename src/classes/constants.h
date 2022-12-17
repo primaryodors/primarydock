@@ -209,7 +209,7 @@
 // How much variance to allow in the strongest atom-to-atom binding energy when multimol conforming.
 // Decreasing this value requires any positional or rotational change to adhere more tightly to the
 // strongest interatomic interaction.
-#define strongest_loss_tolerance 0.25
+#define strongest_loss_tolerance 0.333
 #define _slt1 (1.0 - strongest_loss_tolerance)
 
 // Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,

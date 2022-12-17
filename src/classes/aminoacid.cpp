@@ -1190,10 +1190,10 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                     {
                                         Bond* b = a->get_bond_between(btom);
                                         if (b) b->can_rotate = false;
-                                        b->can_flip = aab->can_flip;
+                                        if (b) b->can_flip = aab->can_flip;
                                         b = btom->get_bond_between(a);
                                         if (b) b->can_rotate = false;
-                                        b->can_flip = aab->can_flip;
+                                        if (b) b->can_flip = aab->can_flip;
                                     }
                                 }
                             }

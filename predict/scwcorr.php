@@ -2,6 +2,7 @@
 
 chdir(__DIR__);
 require_once("protutils.php");
+require_once("odorutils.php");
 require_once("statistics.php");
 
 function set_color($r, $g, $b)
@@ -57,7 +58,20 @@ foreach ($scw_data as $rcp => $ligs)
         switch (@$pair['Actual'])
         {
             case 'Agonist':
-            $xvals[$rcp][$idx] = 10;
+            $emp = best_empirical_pair($rcp, $ligand, true);
+            // print_r($emp); exit;
+            if ($emp)
+            {
+                if (isset($emp['adjusted_curve_top']) && isset($emp['ec50']))
+                    $x = (floatval($emp['adjusted_curve_top']) - min(10, -2.0*floatval($emp['ec50']))) / 2;
+                else if (isset($emp['ec50']))
+                    $x = min(10, -2.0*floatval($emp['ec50']));
+                else if (isset($emp['adjusted_curve_top']))
+                    $x = floatval($emp['adjusted_curve_top']);
+                else $x = 1;
+            }
+            else $x = 1;
+            $xvals[$rcp][$idx] = $x;
             break;
 
             case 'Non-Agonist':
@@ -71,6 +85,8 @@ foreach ($scw_data as $rcp => $ligs)
             default:
             goto _skip_pair;
         }
+
+        // print_r($pair);
 
         foreach ($pair as $k => $v)
         {
@@ -98,6 +114,9 @@ foreach ($scw_data as $rcp => $ligs)
     }
 }
 
+// echo "yvals: "; print_r($yvals);
+// echo "xvals: "; print_r($xvals);
+
 set_time_limit(600);
 
 $corrs = [];
@@ -119,10 +138,12 @@ foreach ($yvals as $rcp => $yv)
             }
         }
 
+        // echo "Count x: " . count($x) . "; count y: " . count($y) . "\n";
         if (count($x) >= $threshold && count($y) >= $threshold && (max($y) - min($y)) > 0.1 )
         {
             // if ($metric == "7.46.y") print_r($y);
             $corr = correlationCoefficient($x, $y);
+            echo "Correlation: $corr\n";
             $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
             if ($p <= 0.05 && abs($corr) > 0.25) $corrs[$rcp][$metric] = round($corr, 3);
         }
@@ -135,6 +156,8 @@ function corrrsort($a, $b)
     return (abs($a) > abs($b)) ? -1 : 1;
 }
 
+if (!count($corrs)) echo "Insufficient data for correlation processing.\n\n";
+else
 foreach ($corrs as $rcp => $c)
 {
     $cxv = count($xvals[$rcp]);

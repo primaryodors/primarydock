@@ -143,9 +143,10 @@ function process_dock()
         {
             set_time_limit(300);
             $outlines = [];
+            echo "bin/primarydock \"$cnfname\"\n";
             passthru("bin/primarydock \"$cnfname\"");
             $outlines = explode("\n", file_get_contents($outfname));
-            if (count($outlines) >= 100) break;
+            if (count($outlines) >= 200) break;
         }
     }
     
@@ -166,7 +167,9 @@ function process_dock()
     $sc_qty = [];
     foreach ($outlines as $ln)
     {
-        if (!strlen(trim($ln))) $dosce = false;
+        // echo "$ln\n";
+        if (substr($ln, 0, 4) == 'ATOM' || substr($ln, 0, 6) == 'HETATM') $dosce = $dovdw = false;
+        if (!strlen(trim($ln))) $dosce = $dovdw = false;
         if (substr($ln, 0, 6) == "Pose: ")
         {
             $pose = intval(explode(" ", $ln)[1]);
@@ -182,6 +185,7 @@ function process_dock()
         if ($dosce)
         {
             $pettia = explode(": ", $ln);
+            if (count($pettia) < 2) die("dosce pettia ".print_r($pettia, true));
             $resno = intval(substr($pettia[0], 3));
             $e = floatval($pettia[1]);
             $scenerg[$pose][$node][$resno] = $e;
@@ -191,21 +195,24 @@ function process_dock()
         if ($dovdw)
         {
             $pettia = explode(": ", $ln);
+            if (count($pettia) < 2) die("dovdw pettia ".print_r($pettia, true));
             $resno = intval(substr($pettia[0], 3));
             $v = floatval($pettia[1]);
             $vdwrpl[$pose][$node][$resno] = $v;
             continue;
         }
     
-        if (substr($ln, 0, 7) == 'BENERG:') $dosce = true;
+        if (substr($ln, 0, 7) == 'BENERG:') { $dosce = true; echo "Doing side chain energies, pose $pose, node $node.\n"; }
         if (substr($ln, 0, 7) == 'vdWRPL:') $dovdw = true;
         
-        if ($pose && $node>=0 && substr($ln, 0,  7) == "Total: "    )
+        if ($pose && $node>=0 && substr($ln, 0, 5) == "Total")
         {
             $benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
             $dosce = false;
             continue;
         }
+
+        if (!isset($benerg[$pose][$node])) continue;
         
         $bias = $bias_by_energy ? max(-$benerg[$pose][$node], 1) : 1;
     
@@ -247,6 +254,8 @@ function process_dock()
             }
         }
     }
+
+    // echo "vdwrpl: "; print_r($vdwrpl); exit;
     
     $sum = [];
     $count = [];
@@ -281,6 +290,8 @@ function process_dock()
     }
     
     $sc_avg = [];
+
+    // echo "ca_loc: "; print_r($ca_loc); exit;
     
     $sce = [];
     $vdw = [];
@@ -288,16 +299,22 @@ function process_dock()
     {
         $bw = bw_from_resno($protid, $resno);
     
-        if ($sc_qty[$resno]) $sc_avg[$bw] =
-        [
-            round($sc_loc[$resno][0] / $sc_qty[$resno], 3),
-            round($sc_loc[$resno][1] / $sc_qty[$resno], 3),
-            round($sc_loc[$resno][2] / $sc_qty[$resno], 3)
-        ];
+        if ($sc_qty[$resno]) 
+        {
+            $sc_avg[$bw] =
+            [
+                round($sc_loc[$resno][0] / $sc_qty[$resno], 3),
+                round($sc_loc[$resno][1] / $sc_qty[$resno], 3),
+                round($sc_loc[$resno][2] / $sc_qty[$resno], 3)
+            ];
+        }
     
+        echo "Resno $resno ssce {$ssce[$resno]} / rsum {$rsum[$resno]}.\n";
         if (@$ssce[$resno] && $rsum[$resno ]) $sce[$bw] = $ssce[$resno] / $rsum[$resno];
         if (@$svdw[$resno] && $rsumv[$resno]) $vdw[$bw] = $svdw[$resno] / $rsumv[$resno];
     }
+
+    // echo "sce: "; print_r($sce); exit;
 
     
     $average = [];

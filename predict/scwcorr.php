@@ -293,41 +293,28 @@ foreach ($corrs as $rcp => $c)
         -min($yvals[$rcp][$idx])
                 );
     $matrix = [];
-    /*foreach ($xvals[$rcp] as $oid => $xv)
-    {
-        foreach ($xk as $xv) $matrix[$xv][$oid] = 0;
-    }*/
-    for ($y=0; $y<=10; $y++) foreach ($xk as $xv) $matrix[$xv][$y] = 0;
+    for ($yv=0; $yv<=10; $yv++) for ($xv=0; $xv<=10; $xv++) $matrix[$yv][$xv] = 0;
+
+    $xmin = min($xvals[$rcp]);
+    $xmax = max($xvals[$rcp]);
+    $xscl = 10.0 / (($xmax-$xmin)?:1);
+    $yscl =  5.0 / ($maxyv ?: 1);
+
     foreach ($xvals[$rcp] as $oid => $xv)
     {
+        $x = ($xv-$xmin)*$xscl;
         if (isset($yvals[$rcp][$idx][$oid]))
         {
-            // $matrix[$xv][$oid] = $yvals[$rcp][$idx][$oid];
-            $y = intval(abs($yvals[$rcp][$idx][$oid]) * 10.0/$maxyv);
-            $matrix[$xv][$y]++;
-        }
-    }
-
-    $maxyv = 0;
-    // for ($xv = -1; $xv <= 1; $xv++)
-    foreach ($xk as $xv)
-    {
-        if (@$matrix[$xv])
-        {
-            $m = max(max($matrix[$xv]), -min($matrix[$xv]));
-            if ($m > $maxyv) $maxyv = $m;
+            $y = $yvals[$rcp][$idx][$oid]*$yscl+5;
+            $matrix[$y][$x]++;
         }
     }
 
     echo "Plot:\n";
-    foreach ($xk as $xv)
+    foreach ($matrix as $y => $ln)
     {
-        $j = 0;
-        if (@$matrix[$xv])
-        foreach (array_values($matrix[$xv]) as $i)
+        foreach ($ln as $x => $k)
         {
-            $k = abs($i);
-            if ($maxyv) $k /= $maxyv;
             fire_color($k);            
             echo " ";
             clear_color();

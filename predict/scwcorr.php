@@ -316,10 +316,8 @@ foreach ($corrs as $rcp => $c)
         foreach ($ln as $x => $k)
         {
             fire_color($k);            
-            echo " ";
+            echo ($y==5?'-':" ");
             clear_color();
-            $j++;
-            if ($j > 99) break;
         }
         echo "\n";
     }

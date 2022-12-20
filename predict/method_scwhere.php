@@ -40,7 +40,7 @@ EXCL $tmr4end $tmr5start
 H2O 5
 
 POSE 10
-ITER 50
+ITER 200
 ELIM -0.001
 
 OUT $outfname

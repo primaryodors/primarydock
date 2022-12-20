@@ -16,10 +16,52 @@ function set_color($r, $g, $b)
     echo "\x1b[48;5;{$ccode}m";
 }
 
+function fire_color($f)
+{
+    $k = $f * 4.2;
+    $blue  = max(0, sin(($k+0.17)*1.15));
+    $red   = pow(max(0, sin($k-1.0)), 0.666);
+    $green = pow(max(0, sin($k-2.6)), 0.666);
+    $red = max($red, $green);
+
+    if ($k > 6) $red = $green = $blue = 1;
+    else if ($k > 3.5)
+    {
+        $w     = max(0, sin(($k-3.5)*2));
+        $red   = max($red, $w);
+        $green = max($green, $w);
+        $blue  = max($blue, $w);
+    }
+
+    set_color($red, $green, $blue);
+}
+
 function clear_color()
 {
     echo "\x1b[49m";
 }
+
+function corrrsort($a, $b)
+{
+    if (abs($a) == abs($b)) return 0;
+    return (abs($a) > abs($b)) ? -1 : 1;
+}
+
+foreach (@$argv as $a)
+{
+	$a = explode('=',$a,2);
+	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
+}
+
+/*
+for ($j=0; $j<=1; $j += 0.01)
+{
+    fire_color($j);
+    echo " ";
+    clear_color();
+}
+echo "\n\n";
+exit;*/
 
 $version = filemtime("method_scwhere.php");
 
@@ -51,6 +93,7 @@ foreach ($scw_data as $rcp => $ligs)
 {
     foreach ($ligs as $ligand => $pair)
     {
+        if (@$pair['version'] < $version) continue;
         $idx = "$rcp|$ligand";
 
         $kJmol = @floatval($pair['Node 0']) ?: 0;
@@ -120,6 +163,7 @@ foreach ($scw_data as $rcp => $ligs)
 set_time_limit(600);
 
 $corrs = [];
+$bestcorr = 0.0;
 foreach ($yvals as $rcp => $yv)
 {   
     $cxv = count($xvals[$rcp]);
@@ -142,21 +186,20 @@ foreach ($yvals as $rcp => $yv)
         if (count($x) >= $threshold && count($y) >= $threshold && (max($y) - min($y)) > 0.1 )
         {
             // if ($metric == "7.46.y") print_r($y);
-            $corr = correlationCoefficient($x, $y);
-            echo "Correlation: $corr\n";
+            $corr = round(correlationCoefficient($x, $y), 3);
+            // echo "Correlation: $corr\n";
+            if ($corr > $bestcorr) $bestcorr = $corr;
             $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
             if ($p <= 0.05 && abs($corr) > 0.25) $corrs[$rcp][$metric] = round($corr, 3);
         }
     }
 }
 
-function corrrsort($a, $b)
+if (!count($corrs))
 {
-    if (abs($a) == abs($b)) return 0;
-    return (abs($a) > abs($b)) ? -1 : 1;
+    if ($bestcorr) echo "Best correlation so far is only $bestcorr.\n\n";
+    else           echo "Insufficient data for correlation processing.\n\n";
 }
-
-if (!count($corrs)) echo "Insufficient data for correlation processing.\n\n";
 else
 foreach ($corrs as $rcp => $c)
 {
@@ -196,7 +239,11 @@ foreach ($corrs as $rcp => $c)
             }
         }
 
-        foreach ($y as $idx => $ly) $x[$idx] = $xvals[$rcp][$idx];
+        foreach ($y as $idx => $ly)
+        {
+            $x[$idx] = $xvals[$rcp][$idx];
+            $yvals[$rcp][$metstr][$idx] = $y[$idx];
+        }
 
         if (count($x) >= 10 && count($y) >= 10)
         {
@@ -272,7 +319,7 @@ foreach ($corrs as $rcp => $c)
         }
     }
 
-    // for ($xv = 1; $xv >= -1; $xv--)
+    echo "Plot:\n";
     foreach ($xk as $xv)
     {
         $j = 0;
@@ -281,16 +328,7 @@ foreach ($corrs as $rcp => $c)
         {
             $k = abs($i);
             if ($maxyv) $k /= $maxyv;
-            // echo intval($k*9.999)."";
-            $red = $green = $blue = $k;
-
-            $k *= M_PI*2;
-            $blue  = max(0, sin($k+0.17));
-            $red   = max(0, sin($k-1));
-            $green = max(0, sin($k-2));
-            $red = max($red, $green);
-
-            set_color($red, $green, $blue);
+            fire_color($k);            
             echo " ";
             clear_color();
             $j++;

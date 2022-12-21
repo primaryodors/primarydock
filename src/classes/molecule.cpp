@@ -2344,6 +2344,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     if (lbind > maxb) maxb = lbind;
                 }
             }
+            if (mm[i]->initial_binding > bind) bind = mm[i]->initial_binding;
             mm[i]->lastbind = bind;
             fmaxb = maxb;
 

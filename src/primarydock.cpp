@@ -2827,7 +2827,11 @@ _try_again:
                             }
                             else
                             {
-                                cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
+                                int resno = atoi(&dr[j][k].metric[l][3]);
+                                AminoAcid* aa = protein->get_residue(resno);
+                                cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult;
+                                // if (aa) cout << " (originally " << -aa->initial_binding*energy_mult << ").";
+                                cout << endl;
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
                             }
                         }

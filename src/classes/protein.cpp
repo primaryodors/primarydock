@@ -225,6 +225,8 @@ void Protein::end_pdb(FILE* os)
 
 void Protein::find_residue_initial_bindings()
 {
+    if (!residues) return;
+    
     int i;
     for (i=0; residues[i]; i++)
     {
@@ -396,8 +398,6 @@ int Protein::load_pdb(FILE* is, int rno)
         }
     }
 
-    find_residue_initial_bindings();
-
     int arrlimit = rescount+1;
     residues 	= new AminoAcid*[arrlimit];
     sequence 	= new char[arrlimit];
@@ -447,6 +447,7 @@ int Protein::load_pdb(FILE* is, int rno)
     residues[rescount] = 0;
 
     set_clashables();
+    find_residue_initial_bindings();
 
     int l;
     std::vector<std::string> rem_hx = get_remarks("650 HELIX");

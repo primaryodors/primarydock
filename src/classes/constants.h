@@ -174,7 +174,7 @@
 // Switches whether the best-binding algorithm is active by default, instead of tumble spheres.
 #define default_bestbind 1
 #define preemptively_minimize_intermol_clashes 0
-#define bestbind_springiness 10
+#define bestbind_springiness 15
 
 // For differential docking, whether to multimol_conform() all the protein's residues into an
 // optimized initial conformation before adding the ligand.

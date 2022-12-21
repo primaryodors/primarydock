@@ -2220,9 +2220,17 @@ float Molecule::get_springy_bond_satisfaction()
     {
         if (!springy_bonds[i].atom || !springy_bonds[i].btom || !springy_bonds[i].optimal_radius) continue;
         float r = springy_bonds[i].atom->get_location().get_3d_distance(springy_bonds[i].btom->get_location());
-        r /= springy_bonds[i].optimal_radius;
-        if (r < 1) retval += r;
-        else retval += 1.0/(r*r);
+        float r1 = r / springy_bonds[i].optimal_radius;
+        if (r1 < 1)
+            retval += r1
+                   - pow(fabs      (
+                        sphere_intersection(
+                            springy_bonds[i].atom->get_vdW_radius(),
+                            springy_bonds[i].btom->get_vdW_radius(),
+                            r              )
+                        *_kJmol_cuA), 4
+                        );
+        else retval += 1.0/(r1*r1);
     }
 
     return retval;

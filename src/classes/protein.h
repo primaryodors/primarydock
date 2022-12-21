@@ -129,6 +129,7 @@ protected:
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);
     friend void ext_mtl_coord_cnf_cb(int iter);
     void mtl_coord_cnf_cb(int iter);
+    void find_residue_initial_bindings();
 };
 
 

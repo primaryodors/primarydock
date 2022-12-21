@@ -183,6 +183,7 @@ bool Protein::add_sequence(const char* lsequence)
     Molecule::multimol_conform(aas, 25);
 
     set_clashables();
+    find_residue_initial_bindings();
 
     return true;
 }
@@ -220,6 +221,16 @@ void Protein::save_pdb(FILE* os)
 void Protein::end_pdb(FILE* os)
 {
     fprintf(os, "END\n");
+}
+
+void Protein::find_residue_initial_bindings()
+{
+    int i;
+    for (i=0; residues[i]; i++)
+    {
+        AminoAcid** aa = get_residues_can_clash(residues[i]->get_residue_no());
+        residues[i]->initial_binding = residues[i]->get_intermol_binding(aa);
+    }
 }
 
 int Protein::load_pdb(FILE* is, int rno)
@@ -384,6 +395,8 @@ int Protein::load_pdb(FILE* is, int rno)
             }
         }
     }
+
+    find_residue_initial_bindings();
 
     int arrlimit = rescount+1;
     residues 	= new AminoAcid*[arrlimit];

@@ -37,10 +37,10 @@ LIG sdf/$ligname.sdf
 $cenres
 SIZE 7.0 7.5 7.0
 EXCL $tmr4end $tmr5start
-H2O 5
+H2O 1
 
 POSE 10
-ITER 200
+ITER 80
 ELIM -0.001
 
 OUT $outfname

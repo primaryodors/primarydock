@@ -5,6 +5,8 @@ require_once("protutils.php");
 require_once("odorutils.php");
 require_once("statistics.php");
 
+define('_PALLETE_TEST', false);
+
 function set_color($r, $g, $b)
 {
     $lr =intval( max(0,min(5,$r*6)));
@@ -53,15 +55,17 @@ foreach (@$argv as $a)
 	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
 }
 
-/*
-for ($j=0; $j<=1; $j += 0.01)
+if (_PALLETE_TEST)
 {
-    fire_color($j);
-    echo " ";
-    clear_color();
+    for ($j=0; $j<=1; $j += 0.01)
+    {
+        fire_color($j);
+        echo " ";
+        clear_color();
+    }
+    echo "\n\n";
+    exit;
 }
-echo "\n\n";
-exit;*/
 
 $version = filemtime("method_scwhere.php");
 

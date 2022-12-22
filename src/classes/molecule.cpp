@@ -2351,6 +2351,16 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 {
                     // get_intermol_binding includes clashes by default, so we don't have to calculate them separately.
                     float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+
+                    if (lbind < 0)      // Clash!
+                    {
+                        Point nudge = mm[i]->get_barycenter().subtract(all[j]->get_barycenter());
+                        nudge.scale(0.25);
+                        mm[i]->lmx += nudge.x;
+                        mm[i]->lmy += nudge.y;
+                        mm[i]->lmz += nudge.z;
+                    }
+
                     bind += lbind;
                     bind -= mm[i]->lastshielded * shielding_avoidance_factor;
                     bind += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;

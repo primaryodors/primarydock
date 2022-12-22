@@ -2290,14 +2290,13 @@ _try_again:
                                 m.movability = MOV_FLEXONLY;
                                 alignment_aa[l]->movability = MOV_FLEXONLY;
                                 Molecule::multimol_conform(mtmp);
-                                m.movability = MOV_ALL;
                                 // m.intermol_conform_norecen(alignment_aa[l], iters, reaches_spheroid[nodeno]);
                                 // alignment_aa[l]->intermol_conform_norecen(&m, iters, reaches_spheroid[nodeno]);
                                 if (debug) *debug << "Alignment atom " << l << " is "
                                                       << alignment_aa[l]->get_name() << ":" << alca->name
                                                       << " Z " << alca->get_Z() << endl;
                                 #endif
-
+                                m.movability = MOV_ALL;
                             }
                         }
                     }

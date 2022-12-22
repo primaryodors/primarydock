@@ -2319,6 +2319,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     is_ac_i = true;
                     break;
                 }
+            
+            bool is_residue = mm[i]->is_residue() ? true : false;
 
             maxb = 0;
             for (j=0; all[j]; j++)
@@ -2356,7 +2358,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 }
             }
             mm[i]->lastbind = bind;
-            // if (mm[i]->initial_binding > mm[i]->lastbind) mm[i]->lastbind = mm[i]->initial_binding;
             fmaxb = maxb;
 
             float reversal = -0.666; // TODO: Make this binding-energy dependent.
@@ -2384,7 +2385,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
-                if (bind1 < bind || (bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
+                if (bind1 < bind || (is_residue && bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
                 {
                     // cout << bind << " vs " << bind1 << " x" << endl;
                     pt.x = -pt.x;
@@ -2415,7 +2416,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
-                if (bind1 < bind || (bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
+                if (bind1 < bind || (is_residue && bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
                 {
                     pt.y = -pt.y;
                     mm[i]->move(pt);
@@ -2444,7 +2445,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     if (lbind > maxb) maxb = lbind;
                 }
-                if (bind1 < bind || (bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
+                if (bind1 < bind || (is_residue && bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
                 {
                     pt.z = -pt.z;
                     mm[i]->move(pt);
@@ -2557,7 +2558,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
 
                         // cout << "x " << rad*fiftyseven << "deg " << bind1 << endl;
 
-                        if (bind1 > bestfrb && (bind < 0 || bind1 > mm[i]->initial_binding) && maxb >= _slt1 * fmaxb)
+                        if (bind1 > bestfrb && (!is_residue || bind < 0 || bind1 > mm[i]->initial_binding) && maxb >= _slt1 * fmaxb)
                         {
                             bestfrb = bind1;
                             bestfrrad = rad;
@@ -2590,7 +2591,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                         if (lbind > maxb) maxb = lbind;
                     }
-                    if (bind1 < bind || (bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
+                    if (bind1 < bind || (is_residue && bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
                     {
                         #if monte_carlo_axial
                         putitback.restore_state(mm[i]);
@@ -2639,7 +2640,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
 
                         // cout << "y " << rad*fiftyseven << "deg " << bind1 << endl;
 
-                        if (bind1 > bestfrb && (bind < 0 || bind1 > mm[i]->initial_binding) && maxb >= _slt1 * fmaxb)
+                        if (bind1 > bestfrb && (!is_residue || bind < 0 || bind1 > mm[i]->initial_binding) && maxb >= _slt1 * fmaxb)
                         {
                             bestfrb = bind1;
                             bestfrrad = rad;
@@ -2673,7 +2674,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                         if (lbind > maxb) maxb = lbind;
                     }
-                    if (bind1 < bind || (bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
+                    if (bind1 < bind || (is_residue && bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
                     {
                         #if monte_carlo_axial
                         putitback.restore_state(mm[i]);
@@ -2723,7 +2724,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
 
                         // cout << "z " << rad*fiftyseven << "deg " << bind1 << endl;
 
-                        if (bind1 > bestfrb && (bind < 0 || bind1 > mm[i]->initial_binding) && maxb >= _slt1 * fmaxb)
+                        if (bind1 > bestfrb && (!is_residue || bind < 0 || bind1 > mm[i]->initial_binding) && maxb >= _slt1 * fmaxb)
                         {
                             bestfrb = bind1;
                             fmaxb = maxb;
@@ -2757,7 +2758,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                         if (lbind > maxb) maxb = lbind;
                     }
-                    if (bind1 < bind || (bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
+                    if (bind1 < bind || (is_residue && bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
                     {
                         #if monte_carlo_axial
                         putitback.restore_state(mm[i]);
@@ -2916,7 +2917,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                     #endif
                                 }
 
-                                if (bind1 > bestfrb && (bind < 0 || bind1 > mm[i]->initial_binding) && maxb >= _slt1 * fmaxb)
+                                if (bind1 > bestfrb && (!is_residue || bind < 0 || bind1 > mm[i]->initial_binding) && maxb >= _slt1 * fmaxb)
                                 {
                                     bestfrb = bind1;
                                     bestfrrad = rad;
@@ -2954,7 +2955,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                                 if (lbind > maxb) maxb = lbind;
                             }
-                            if (bind1 < bind || (bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
+                            if (bind1 < bind || (is_residue && bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
                             {
                                 #if monte_carlo_flex
                                 putitback.restore_state(mm[i]);

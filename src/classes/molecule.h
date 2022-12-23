@@ -25,6 +25,7 @@ enum MovabilityType
     MOV_ALL			= 1000,
     MOV_NORECEN		=  200,
     MOV_FLEXONLY	=   50,
+    MOV_PINNED      =    1,
     MOV_NONE		=    0
 };
 

@@ -98,6 +98,7 @@ public:
                          );
 
     void backconnect(int startres, int endres);
+    void find_residue_initial_bindings();
 
     void make_helix(int startres, int endres, float phi, float psi);
     void make_helix(int startres, int endres, int stopat, float phi, float psi);

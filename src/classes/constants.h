@@ -142,6 +142,7 @@
 #define allow_drift 1
 #define initial_drift 0.333
 #define drift_decay_rate 0.08
+#define multimol_clash_nudge 0.75
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
 #define allow_mol_fullrot_iter 1
@@ -158,6 +159,7 @@
 // potential binding with residues, irrespective of whether the side chain is in an
 // optimum orientation in space.
 #define allow_ligand_esp 1
+#define allow_shielding_avoidance 1
 #define shielding_avoidance_factor 2.5
 
 // Uses the ligand's most strongly bound atom as the center for full molecule rotations,
@@ -174,6 +176,7 @@
 // Switches whether the best-binding algorithm is active by default, instead of tumble spheres.
 #define default_bestbind 1
 #define preemptively_minimize_intermol_clashes 0
+#define allow_bestbind_springiness 1
 #define bestbind_springiness 15
 
 // For differential docking, whether to multimol_conform() all the protein's residues into an
@@ -249,6 +252,7 @@
 #define _DBG_H2O_TELEPORT 0
 #define _DBG_HISFLIP 0
 #define _DBG_MOLBB 0
+#define _debug_wtf_is_going_on_with_springy_bonds 0
 
 #endif
 

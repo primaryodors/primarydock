@@ -36,6 +36,30 @@ enum MoleculeType
     MOLTYP_AMINOACID
 };
 
+enum multimol_phase
+{
+    mmlmx,
+    mmlmy,
+    mmlmz,
+    mmamx,
+    mmamy,
+    mmamz,
+    mmflex
+};
+
+struct multimol_local
+{
+    multimol_phase phase;
+    float bind;
+    float bind1;
+    Molecule* mmi;
+    Molecule** all;
+    float reversal;
+    bool is_residue;
+    float maxb;
+    float fmaxb;
+};
+
 class Pose
 {
 public:
@@ -175,6 +199,7 @@ public:
     MovabilityType movability = MOV_ALL;
     float lastbind = 0;
     float lastbind_history[10];
+    float lastclash = 0;
     float lastshielded = 0;
     histidine_flip** hisflips = nullptr;
     Bond* springy_bonds = nullptr;
@@ -218,6 +243,9 @@ protected:
     void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
+
+    // TODO:
+    void multimol_unit(multimol_local* local);
 };
 
 extern float potential_distance;

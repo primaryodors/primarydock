@@ -177,7 +177,7 @@
 #define default_bestbind 1
 #define preemptively_minimize_intermol_clashes 0
 #define allow_bestbind_springiness 1
-#define bestbind_springiness 15
+#define bestbind_springiness 10
 
 // For differential docking, whether to multimol_conform() all the protein's residues into an
 // optimized initial conformation before adding the ligand.
@@ -253,7 +253,7 @@
 #define _DBG_HISFLIP 0
 #define _DBG_MOLBB 0
 #define _debug_wtf_is_going_on_with_springy_bonds 0
-#define _debug_asp111 1
+#define _debug_asp111 0
 
 #endif
 

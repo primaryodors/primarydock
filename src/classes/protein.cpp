@@ -231,7 +231,7 @@ void Protein::find_residue_initial_bindings()
     for (i=0; residues[i]; i++)
     {
         AminoAcid** aa = residues; // get_residues_can_clash(residues[i]->get_residue_no());
-        residues[i]->initial_binding = residues[i]->get_intermol_binding(aa)*2;
+        residues[i]->initial_binding = residues[i]->get_intermol_binding(aa);
 
         #if _debug_asp111
         if (residues[i]->get_residue_no() == 111)

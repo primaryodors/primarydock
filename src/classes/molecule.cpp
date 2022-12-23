@@ -3069,12 +3069,14 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 bind = bind1;
                                 fmaxb = maxb;
 
+                                #if _debug_asp111
                                 if (residue == 111)
                                 {
                                     cout << "Incremental rotation of Asp111 allowed because bind1 = " << bind1 
                                             << " and initial binding = " << mm[i]->initial_binding
                                             << endl;
                                 }
+                                #endif
 
                                 #if DBG_BONDFLEX
                                 if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)

@@ -253,6 +253,7 @@
 #define _DBG_HISFLIP 0
 #define _DBG_MOLBB 0
 #define _debug_wtf_is_going_on_with_springy_bonds 0
+#define _debug_asp111 1
 
 #endif
 

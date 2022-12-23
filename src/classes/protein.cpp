@@ -244,7 +244,11 @@ void Protein::find_residue_initial_bindings()
                 {
                     Atom* a = aa[j]->get_atom(k);
                     if ( !a->is_backbone && a->get_family() == PNICTOGEN && !a->get_charge() )
-                        a->increment_charge(0.75);
+                    {
+                        Atom* C = a->is_bonded_to(TETREL, 1);
+                        if (C && C->is_bonded_to(CHALCOGEN, 2)) continue;
+                        else a->increment_charge(0.75);
+                    }
                 }
             }
         }

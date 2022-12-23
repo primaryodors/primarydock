@@ -2362,6 +2362,7 @@ _try_again:
             for (j=0; j<trsz; j++)
                 trip[j] = (Molecule*)protein->get_residue(tripswitch_clashables[j]);
 
+            protein->find_residue_initial_bindings();
             Molecule::multimol_conform(
                 cfmols,
                 delete_me = protein->all_residues_as_molecules(),

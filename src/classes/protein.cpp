@@ -255,12 +255,12 @@ void Protein::find_residue_initial_bindings()
 
         residues[i]->initial_binding = residues[i]->get_intermol_binding(aa);
 
-        #if _debug_asp111
-        if (residues[i]->get_residue_no() == 111)
+        #if _debug_locks
+        if (residues[i]->get_residue_no() == _dbg_lock_res)
         {
             for (j=0; aa[j]; j++)
             {
-                cout << "111 - " << aa[j]->get_residue_no() << ": " << residues[i]->get_intermol_binding(aa[j]) << endl;
+                cout << _dbg_lock_res << " - " << aa[j]->get_residue_no() << ": " << residues[i]->get_intermol_binding(aa[j]) << endl;
             }
         }
         #endif

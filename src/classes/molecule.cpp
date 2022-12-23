@@ -2897,6 +2897,13 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 }
                 mm[i]->lastbind = bind;
 
+                #if _debug_locks
+                if (residue == _dbg_lock_res)
+                {
+                    cout << residue << " bind = " << bind << " vs. initial binding " << mm[i]->initial_binding << endl;
+                }
+                #endif
+
                 #if DBG_BONDFLEX
                 if (DBG_FLEXRES == residue)
                     cout << "Iter" << iter << " " << mm[i]->name;
@@ -2962,7 +2969,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                     cout << endl << (rad*fiftyseven) << ": ";
                                 #endif
 
-                                #if _debug_asp111
+                                #if _debug_locks
                                 std::string dbgreal = "";
                                 #endif
                                 for (j=0; all[j]; j++)
@@ -2970,8 +2977,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                     if (!nearby[j]) continue;
                                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                                     float lbind1_real = mm[i]->get_intermol_binding(all[j], !is_ac);
-                                    #if _debug_asp111
-                                    if (residue == 111) dbgreal += (std::string)all[j]->get_name() + ": " + std::to_string(lbind1_real) + (std::string)"\n";
+                                    #if _debug_locks
+                                    if (residue == _dbg_lock_res) dbgreal += (std::string)all[j]->get_name() + ": " + std::to_string(lbind1_real) + (std::string)"\n";
                                     #endif
                                     float lbind1 =
 
@@ -3001,16 +3008,16 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                     #endif
                                 }
 
-                                if (bind1 > bestfrb && (!is_residue || bind < 0 || bind1_real > mm[i]->initial_binding) && maxb >= _slt1 * fmaxb)
+                                if (bind1 > bestfrb && (!is_residue || mm[i]->lastclash > 0.1 || bind1_real > mm[i]->initial_binding) && maxb >= _slt1 * fmaxb)
                                 {
                                     bestfrb = bind1;
                                     bestfrrad = rad;
                                     fmaxb = maxb;
 
-                                    #if _debug_asp111
-                                    if (residue == 111)
+                                    #if _debug_locks
+                                    if (residue == _dbg_lock_res)
                                     {
-                                        cout << "360deg rotation of Asp111 allowed because bind1_real = " << bind1_real 
+                                        cout << "360deg rotation of " << _dbg_lock_res << " allowed because bind1_real = " << bind1_real 
                                              << " and initial binding = " << mm[i]->initial_binding
                                              << ":" << endl << dbgreal
                                              << endl;
@@ -3053,7 +3060,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 #endif
                                 if (lbind > maxb) maxb = lbind;
                             }
-                            if (bind1 < bind || (is_residue && bind >= 0 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
+                            if (bind1 < bind || (is_residue && mm[i]->lastclash < 0.2 && mm[i]->initial_binding > 0 && bind1 <= mm[i]->initial_binding) || maxb < _slt1 * fmaxb)
                             {
                                 #if monte_carlo_flex
                                 putitback.restore_state(mm[i]);
@@ -3069,10 +3076,10 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 bind = bind1;
                                 fmaxb = maxb;
 
-                                #if _debug_asp111
-                                if (residue == 111)
+                                #if _debug_locks
+                                if (residue == _dbg_lock_res)
                                 {
-                                    cout << "Incremental rotation of Asp111 allowed because bind1 = " << bind1 
+                                    cout << "Incremental rotation of " << _dbg_lock_res << " allowed because bind1 = " << bind1 
                                             << " and initial binding = " << mm[i]->initial_binding
                                             << endl;
                                 }

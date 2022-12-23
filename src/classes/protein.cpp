@@ -227,16 +227,33 @@ void Protein::find_residue_initial_bindings()
 {
     if (!residues) return;
     
-    int i;
+    int i, j, k;
     for (i=0; residues[i]; i++)
     {
         AminoAcid** aa = residues; // get_residues_can_clash(residues[i]->get_residue_no());
+
+        // If the current residue has one or more negatively charged non-backbone atoms,
+        // and a nearby residue has one or more neutral non-backbone pnictogen atoms not part of an amide,
+        // put a positive charge on the pnictogen(s).
+        if (residues[i]->get_charge() < -0.5)
+        {
+            for (j=0; aa[j]; j++)
+            {
+                int ac = aa[j]->get_atom_count();
+                for (k=0; k<ac; k++)
+                {
+                    Atom* a = aa[j]->get_atom(k);
+                    if ( !a->is_backbone && a->get_family() == PNICTOGEN && !a->get_charge() )
+                        a->increment_charge(0.75);
+                }
+            }
+        }
+
         residues[i]->initial_binding = residues[i]->get_intermol_binding(aa);
 
         #if _debug_asp111
         if (residues[i]->get_residue_no() == 111)
         {
-            int j;
             for (j=0; aa[j]; j++)
             {
                 cout << "111 - " << aa[j]->get_residue_no() << ": " << residues[i]->get_intermol_binding(aa[j]) << endl;

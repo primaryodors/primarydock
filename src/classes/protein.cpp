@@ -253,7 +253,7 @@ void Protein::find_residue_initial_bindings()
         }
 
         float ib = residues[i]->get_intermol_binding(aa);
-        if (ib >= 5) residues[i]->movability = MOV_NONE;
+        if (ib >= 5) residues[i]->movability = MOV_PINNED;
 
         #if _debug_locks
         if (residues[i]->get_residue_no() == _dbg_lock_res)

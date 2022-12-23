@@ -9,6 +9,7 @@ clear; make code
 # Optionally, use the viewer to ensure that the two amino groups of the ligand are coordinated to the aforementioned ASP residues.
 clear; bin/primarydock test/testTAAR8.config
 
-# Limonene test: It is sufficient to check for at least one successful binding pose with a total energy of less than zero.
+# Limonene test: Check for at least one successful binding pose with a total energy of less than zero; if #180 has been merged, 
+# also check visually using the viewer that Asp111 is not pulled awway from its salt bridge configuration with His243.
 clear; bin/primarydock test/test1A1.config
 

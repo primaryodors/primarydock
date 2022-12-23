@@ -2346,6 +2346,11 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             }
             mm[i]->lastbind = bind;
             fmaxb = maxb;
+            if (mm[i]->movability == MOV_PINNED
+                &&
+                mm[i]->get_intermol_clashes(all) >= 1
+               )
+                mm[i]->movability = MOV_FLEXONLY;               // TODO: Prevent this if molecule is a metal bound residue.
 
             float reversal = -0.666; // TODO: Make this binding-energy dependent.
             float accel = 1.1;

@@ -2135,13 +2135,38 @@ _try_again:
                                 retain_bindings[l].btom = coi;
                                 retain_bindings[l].cardinality = 0.25;
                                 retain_bindings[l].type = lig_inter_typ[l];
+                                
+                                bool opml_known = false;
                                 try
                                 {
                                     retain_bindings[l].optimal_radius = InteratomicForce::coordinate_bond_radius(ligbb[l], coi, lig_inter_typ[l]);
+                                    retain_bindings[l].optimal_radius = InteratomicForce::coordinate_bond_radius(
+                                        retain_bindings[l].atom,
+                                        retain_bindings[l].btom,
+                                        retain_bindings[l].type
+                                        );
+                                    opml_known = true;
                                 }
                                 catch (int ex)
                                 {
                                     ;
+                                }
+                                if (!opml_known && ligbbh[l] && (retain_bindings[l].btom->get_Z() > 1 || retain_bindings[l].type == vdW))
+                                {
+                                    try
+                                    {
+                                        retain_bindings[l].optimal_radius = InteratomicForce::coordinate_bond_radius(
+                                            ligbbh[l],
+                                            retain_bindings[l].btom,
+                                            retain_bindings[l].type
+                                            );
+                                        retain_bindings[l].atom = ligbbh[l];
+                                        opml_known = true;
+                                    }
+                                    catch (int ex)
+                                    {
+                                        retain_bindings[l].optimal_radius = 2.5;
+                                    }
                                 }
 
                                 alignment_aa[l]->springy_bonds = retain_bindings;
@@ -2362,6 +2387,7 @@ _try_again:
             for (j=0; j<trsz; j++)
                 trip[j] = (Molecule*)protein->get_residue(tripswitch_clashables[j]);
 
+            protein->find_residue_initial_bindings();
             Molecule::multimol_conform(
                 cfmols,
                 delete_me = protein->all_residues_as_molecules(),

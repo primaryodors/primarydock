@@ -6,6 +6,7 @@ require_once("odorutils.php");
 require_once("statistics.php");
 
 define('_PALLETE_TEST', false);
+define('_EC50MUL', 1.3);
 
 function set_color($r, $g, $b)
 {
@@ -110,9 +111,9 @@ foreach ($scw_data as $rcp => $ligs)
             if ($emp)
             {
                 if (isset($emp['adjusted_curve_top']) && isset($emp['ec50']))
-                    $x = (floatval($emp['adjusted_curve_top']) - min(10, -2.0*floatval($emp['ec50']))) / 2;
+                    $x = (floatval($emp['adjusted_curve_top']) - min(10, -_EC50MUL*floatval($emp['ec50']))) / 2;
                 else if (isset($emp['ec50']))
-                    $x = min(10, -2.0*floatval($emp['ec50']));
+                    $x = min(10, -_EC50MUL*floatval($emp['ec50']));
                 else if (isset($emp['adjusted_curve_top']))
                     $x = floatval($emp['adjusted_curve_top']);
                 else $x = 1;
@@ -293,7 +294,7 @@ foreach ($corrs as $rcp => $c)
     rsort($xk);
 
     $maxyv = max( 
-        max($yvals[$rcp][$idx]),
+         max($yvals[$rcp][$idx]),
         -min($yvals[$rcp][$idx])
                 );
     $matrix = [];

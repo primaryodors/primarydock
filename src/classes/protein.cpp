@@ -238,15 +238,22 @@ void Protein::find_residue_initial_bindings()
         {
             for (j=0; aa[j]; j++)
             {
-                int ac = aa[j]->get_atom_count();
-                for (k=0; k<ac; k++)
+                Atom* a = residues[i]->get_nearest_atom(aa[j]->get_barycenter());
+                Atom* b = aa[j]->get_nearest_atom(a->get_location());
+                float r = a->distance_to(b);
+
+                if (r < 4)
                 {
-                    Atom* a = aa[j]->get_atom(k);
-                    if ( !a->is_backbone && a->get_family() == PNICTOGEN && !a->get_charge() )
+                    int ac = aa[j]->get_atom_count();
+                    for (k=0; k<ac; k++)
                     {
-                        Atom* C = a->is_bonded_to(TETREL, 1);
-                        if (C && C->is_bonded_to(CHALCOGEN, 2)) continue;
-                        else a->increment_charge(0.75);
+                        Atom* a = aa[j]->get_atom(k);
+                        if ( !a->is_backbone && a->get_family() == PNICTOGEN && !a->get_charge() )
+                        {
+                            Atom* C = a->is_bonded_to(TETREL, 1);
+                            if (C && C->is_bonded_to(CHALCOGEN, 2)) continue;
+                            else a->increment_charge(0.75);
+                        }
                     }
                 }
             }

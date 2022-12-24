@@ -2087,8 +2087,7 @@ _try_again:
                             if (lig_inter_typ[l] == vdW && reaches_spheroid[nodeno][i]->hydrophilicity() >= 0.3) continue;
                             if (lig_inter_typ[l] == hbond && reaches_spheroid[nodeno][i]->hydrophilicity() < 0.2) continue;
 
-                            // I hate hard coding these, but glycine is the only AA to do this:
-                            if (!strcasecmp(reaches_spheroid[nodeno][i]->get_3letter(), "Gly")) continue;
+                            if (reaches_spheroid[nodeno][i]->is_glycine()) continue;
 
                             #if _DBG_STEPBYSTEP
                             if (debug)

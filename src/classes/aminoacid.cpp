@@ -1600,6 +1600,18 @@ bool AminoAcid::is_tyrosine_like()
     return false;
 }
 
+bool AminoAcid::is_glycine()
+{
+    if (!atoms) return false;
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->get_Z() > 1) return false;
+    }
+    return true;
+}
+
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 {
     if (!&aa) return os;

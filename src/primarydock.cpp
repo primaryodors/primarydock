@@ -1234,6 +1234,32 @@ int main(int argc, char** argv)
         }
     }
 
+    char* pcntp = strstr(outfname, "%p");
+    if (pcntp)
+    {
+        char tmp[512], protn[64];
+        *(pcntp++) = 0;
+        *(pcntp++) = 0;
+        strcpy(protn, strrchr(protfname, '/')+1);
+        char* dot = strchr(protn, '.');
+        if (dot) *dot = 0;
+        sprintf(tmp, "%s%s%s", outfname, protn, pcntp);
+        strcpy(outfname, tmp);
+    }
+
+    char* pcntl = strstr(outfname, "%l");
+    if (pcntl)
+    {
+        char tmp[512], lign[64];
+        *(pcntl++) = 0;
+        *(pcntl++) = 0;
+        strcpy(lign, strrchr(ligfname, '/')+1);
+        char* dot = strchr(lign, '.');
+        if (dot) *dot = 0;
+        sprintf(tmp, "%s%s%s", outfname, lign, pcntl);
+        strcpy(outfname, tmp);
+    }
+
     #if _DBG_SPACEDOUT
     cout << "Starting a file outstream: " << outfname << endl;
     #endif

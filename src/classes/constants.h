@@ -250,7 +250,7 @@
 #define _DORESPHRES 0
 #define _DBG_RESBMULT 0
 #define _debug_active_bond_rot 0
-#define _DBG_SPACEDOUT 0
+#define _DBG_SPACEDOUT 1
 #define _DBG_H2O_TELEPORT 0
 #define _DBG_HISFLIP 0
 #define _DBG_MOLBB 0

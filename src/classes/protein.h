@@ -73,6 +73,7 @@ public:
     );
     std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
     Molecule** all_residues_as_molecules();
+    Molecule** all_residues_as_molecules_except(Molecule** mm);
     Point get_region_center(int startres, int endres);
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size);
@@ -125,6 +126,7 @@ protected:
     std::vector<string> remarks;
     MetalCoord** m_mcoord = nullptr;
     std::vector<int> Ballesteros_Weinstein;
+    std::vector<AABridge> aabridges;
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);

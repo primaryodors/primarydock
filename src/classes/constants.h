@@ -176,6 +176,11 @@
 #define preemptively_minimize_intermol_clashes 0
 #define bestbind_springiness 15
 
+// In the best-binding algorithm, how strongly to associate hydrophilic features of the ligand
+// with hydrophilicity of the side chains.
+#define hydrophilicity_boost 5
+#define best_binding_stochastic 0.3
+
 // For differential docking, whether to multimol_conform() all the protein's residues into an
 // optimized initial conformation before adding the ligand.
 #define preconform_protein 0

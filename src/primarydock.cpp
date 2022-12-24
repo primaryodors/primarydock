@@ -2062,6 +2062,7 @@ _try_again:
                 if (debug) *debug << "Initialize null AA pointer." << endl;
                 #endif
 
+                // Best-Binding Algorithm
                 // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
                 if (use_bestbind_algorithm) for (l=0; l<3; l++)
@@ -2083,7 +2084,8 @@ _try_again:
                             if (l && reaches_spheroid[nodeno][i] == alignment_aa[l-1]) continue;
                             if (l>1 && reaches_spheroid[nodeno][i] == alignment_aa[l-2]) continue;
 
-                            if (lig_inter_typ[l] == vdW && reaches_spheroid[nodeno][i]->hydrophilicity() > 0.5) continue;
+                            if (lig_inter_typ[l] == vdW && reaches_spheroid[nodeno][i]->hydrophilicity() >= 0.3) continue;
+                            if (lig_inter_typ[l] == hbond && reaches_spheroid[nodeno][i]->hydrophilicity() < 0.2) continue;
 
                             // I hate hard coding these, but glycine is the only AA to do this:
                             if (!strcasecmp(reaches_spheroid[nodeno][i]->get_3letter(), "Gly")) continue;
@@ -2104,6 +2106,17 @@ _try_again:
 
                             float pottmp = reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb[l]);
                             if (ligbbh[l]) pottmp += reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh[l]);
+
+                            if (lig_inter_typ[l] == hbond)
+                            {
+                                pottmp *= (1.0 + reaches_spheroid[nodeno][i]->hydrophilicity() * hydrophilicity_boost);
+                            }
+                            else if (lig_inter_typ[l] == pi || lig_inter_typ[l] == vdW)
+                            {
+                                pottmp *= fmax(0, 1.0 - reaches_spheroid[nodeno][i]->hydrophilicity() * hydrophilicity_boost);
+                            }
+
+                            pottmp *= (1.0 + frand(-best_binding_stochastic, best_binding_stochastic) );
 
                             if (extra_wt.size()
                                     &&

@@ -321,6 +321,25 @@ void iteration_callback(int iter)
     }
 }
 
+int interpret_resno(char* field)
+{
+    char* dot = strchr(field, '.');
+    if (dot)
+    {
+        *(dot++) = 0;
+        int b = atoi(field);
+        int w = atoi(dot);
+        int _50 = protein->get_bw50(b);
+        if (_50 < 1)
+        {
+            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW fields." << endl;
+            throw 0xbad12e5;
+        }
+        return _50 + w - 50;
+    }
+    else return atoi(field);
+}
+
 Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
 {
     int i=1;
@@ -331,7 +350,7 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
         std::vector<int> resnos;
         for (; fields[i]; i++)
         {
-            int j = atoi(fields[i]);
+            int j = interpret_resno(fields[i]);
             if (!j) break;
             resnos.push_back(j);
         }

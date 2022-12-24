@@ -47,7 +47,7 @@ struct AABridge
 {
     AminoAcid* aa1;
     AminoAcid* aa2;
-}
+};
 
 struct MetalCoord
 {

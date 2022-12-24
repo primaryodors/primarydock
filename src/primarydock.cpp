@@ -321,6 +321,25 @@ void iteration_callback(int iter)
     }
 }
 
+int interpret_resno(char* field)
+{
+    char* dot = strchr(field, '.');
+    if (dot)
+    {
+        *(dot++) = 0;
+        int b = atoi(field);
+        int w = atoi(dot);
+        int _50 = protein->get_bw50(b);
+        if (_50 < 1)
+        {
+            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW fields." << endl;
+            throw 0xbad12e5;
+        }
+        return _50 + w - 50;
+    }
+    else return atoi(field);
+}
+
 Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
 {
     int i=1;
@@ -331,7 +350,7 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
         std::vector<int> resnos;
         for (; fields[i]; i++)
         {
-            int j = atoi(fields[i]);
+            int j = interpret_resno(fields[i]);
             if (!j) break;
             resnos.push_back(j);
         }
@@ -1234,6 +1253,32 @@ int main(int argc, char** argv)
         }
     }
 
+    char* pcntp = strstr(outfname, "%p");
+    if (pcntp)
+    {
+        char tmp[512], protn[64];
+        *(pcntp++) = 0;
+        *(pcntp++) = 0;
+        strcpy(protn, strrchr(protfname, '/')+1);
+        char* dot = strchr(protn, '.');
+        if (dot) *dot = 0;
+        sprintf(tmp, "%s%s%s", outfname, protn, pcntp);
+        strcpy(outfname, tmp);
+    }
+
+    char* pcntl = strstr(outfname, "%l");
+    if (pcntl)
+    {
+        char tmp[512], lign[64];
+        *(pcntl++) = 0;
+        *(pcntl++) = 0;
+        strcpy(lign, strrchr(ligfname, '/')+1);
+        char* dot = strchr(lign, '.');
+        if (dot) *dot = 0;
+        sprintf(tmp, "%s%s%s", outfname, lign, pcntl);
+        strcpy(outfname, tmp);
+    }
+
     #if _DBG_SPACEDOUT
     cout << "Starting a file outstream: " << outfname << endl;
     #endif
@@ -2087,8 +2132,7 @@ _try_again:
                             if (lig_inter_typ[l] == vdW && reaches_spheroid[nodeno][i]->hydrophilicity() >= 0.3) continue;
                             if (lig_inter_typ[l] == hbond && reaches_spheroid[nodeno][i]->hydrophilicity() < 0.2) continue;
 
-                            // I hate hard coding these, but glycine is the only AA to do this:
-                            if (!strcasecmp(reaches_spheroid[nodeno][i]->get_3letter(), "Gly")) continue;
+                            if (reaches_spheroid[nodeno][i]->is_glycine()) continue;
 
                             #if _DBG_STEPBYSTEP
                             if (debug)

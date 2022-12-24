@@ -2283,7 +2283,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
 
         all[n++] = bkg[i];
 
-    _already_mm:
+        _already_mm:
         ;
     }
     alllen = n;

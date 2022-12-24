@@ -43,6 +43,12 @@ struct AADef
     float sidechain_pKa = nanf("n/a");
 };
 
+struct AABridge
+{
+    AminoAcid* aa1;
+    AminoAcid* aa2;
+}
+
 struct MetalCoord
 {
     Atom* metal;

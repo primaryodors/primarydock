@@ -2390,7 +2390,7 @@ _try_again:
             protein->find_residue_initial_bindings();
             Molecule::multimol_conform(
                 cfmols,
-                delete_me = protein->all_residues_as_molecules(),
+                delete_me = protein->all_residues_as_molecules_except(cfmols),
                 trip,
                 iters,
                 &iteration_callback

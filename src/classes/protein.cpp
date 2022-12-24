@@ -225,6 +225,8 @@ void Protein::end_pdb(FILE* os)
 void Protein::find_residue_initial_bindings()
 {
     if (!residues) return;
+
+    aabridges.clear();
     
     int i, j, k;
     for (i=0; residues[i]; i++)
@@ -259,8 +261,25 @@ void Protein::find_residue_initial_bindings()
             }
         }
 
-        float ib = residues[i]->get_intermol_binding(aa);
-        if (ib >= 5) residues[i]->movability = MOV_PINNED;
+        float ib = 0, maxb = 0;
+        AABridge aab;
+        aab.aa1 = residues[i];
+        for (j=0; aa[j]; j++)
+        {
+            float f = residues[i]->get_intermol_binding(aa[j]);
+            ib += f;
+            if (j > i && f > maxb)
+            {
+                aab.aa2 = aa[j];
+                maxb = f;
+            }
+        }
+
+        if (ib >= 5)
+        {
+            residues[i]->movability = MOV_PINNED;
+            if (maxb >= 5) aabridges.push_back(aab);
+        }
 
         #if _debug_locks
         if (residues[i]->get_residue_no() == _dbg_lock_res)
@@ -2183,6 +2202,31 @@ Molecule** Protein::all_residues_as_molecules()
     int i;
     for (i=0; residues[i]; i++) retval[i] = reinterpret_cast<Molecule*>(residues[i]);
     retval[i] = nullptr;
+
+    return retval;
+}
+
+Molecule** Protein::all_residues_as_molecules_except(Molecule** mm)
+{
+    if (!residues) return nullptr;
+    Molecule** retval = new Molecule*[get_seq_length()+4];
+
+    int i, j, k;
+    k=0;
+    for (i=0; residues[i]; i++)
+    {
+        if (mm)
+        {
+            for (j=0; mm[j]; j++)
+            {
+                if (mm[j] == residues[i]) goto _exclude;
+            }
+        }
+        retval[k++] = reinterpret_cast<Molecule*>(residues[i]);
+        _exclude:
+        ;
+    }
+    retval[k] = nullptr;
 
     return retval;
 }

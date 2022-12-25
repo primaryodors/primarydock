@@ -1,6 +1,6 @@
 <?php
 
-global $dock_metals, $bias_by_energy, $dock_results, $pdbfname;
+global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam;
 
 // Includes
 require("protutils.php");

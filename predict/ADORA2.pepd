@@ -1,0 +1,37 @@
+# Pepteditor script for deriving active-state conformational changes from human adenosine receptor.
+#
+
+LET %TMR1s =   8
+LET %TMR1e =  32
+LET %TMR2s =  43
+LET %TMR2e =  66
+LET %TMR3s =  78
+LET %TMR3e = 100
+LET %TMR4s = 121
+LET %TMR4e = 143
+LET %TMR5s = 174
+LET %TMR5e = 198
+LET %TMR6s = 235
+LET %TMR6e = 258
+LET %TMR7s = 267
+LET %TMR7e = 290
+
+# Load the inactive protein.
+LOAD "pdbs/3rfm ADORA2 antag.pdb"
+
+ECHO %SEQLEN
+ECHO $SEQUENCE
+ECHO ""
+
+REGION TMR1 %TMR1s %TMR1e
+REGION TMR2 %TMR2s %TMR2e
+REGION TMR3 %TMR3s %TMR3e
+REGION TMR4 %TMR4s %TMR4e
+REGION TMR5 %TMR5s %TMR5e
+REGION TMR6 %TMR6s %TMR6e
+REGION TMR7 %TMR7s %TMR7e
+
+UPRIGHT
+
+SAVE "pdbs/ADORA2.inactive.pdb"
+

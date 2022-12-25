@@ -126,12 +126,12 @@ function process_dock()
     $cnfname = "tmp/prediction.$protid.$lignospace.config";
     $f = fopen($cnfname, "wb");
     if (!$f) die("File write error. Check tmp folder is write enabled.\n");
-    
+
     // echo $configf;
 
     fwrite($f, $configf);
     fclose($f);
-    
+
     $outlines = [];
     if (@$_REQUEST['saved'])
     {
@@ -149,11 +149,11 @@ function process_dock()
             if (count($outlines) >= 200) break;
         }
     }
-    
+
     if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
-    
+
     if (count($outlines) < 100) die("Docking FAILED.\n");
-    
+
     $benerg = [];
     $scenerg = [];
     $vdwrpl = [];
@@ -181,7 +181,7 @@ function process_dock()
             $pose = false;
             $node = -1;
         }
-    
+
         if ($dosce)
         {
             $pettia = explode(": ", $ln);
@@ -201,10 +201,10 @@ function process_dock()
             $vdwrpl[$pose][$node][$resno] = $v;
             continue;
         }
-    
+
         if (substr($ln, 0, 7) == 'BENERG:') { $dosce = true; echo "Doing side chain energies, pose $pose, node $node.\n"; }
         if (substr($ln, 0, 7) == 'vdWRPL:') $dovdw = true;
-        
+
         if ($pose && $node>=0 && substr($ln, 0, 5) == "Total")
         {
             $benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
@@ -213,11 +213,11 @@ function process_dock()
         }
 
         if (!isset($benerg[$pose][$node])) continue;
-        
+
         $bias = $bias_by_energy ? max(-$benerg[$pose][$node], 1) : 1;
-    
+
         if (false !== strpos($ln, "pose(s) found")) $poses_found = intval($ln);
-    
+
         if (substr($ln, 0, 5) == 'ATOM ')
         {
             $ln = preg_replace("/\\s+/", " ", trim($ln));
@@ -256,7 +256,7 @@ function process_dock()
     }
 
     // echo "vdwrpl: "; print_r($vdwrpl); exit;
-    
+
     $sum = [];
     $count = [];
     $ssce = [];

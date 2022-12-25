@@ -199,6 +199,15 @@ void Protein::save_pdb(FILE* os)
         }
     }
 
+    if (regions_from == rgn_manual && regions)
+    {
+        for (i=0; i<PROT_MAX_RGN; i++)
+        {
+            if (!regions[i].start || regions[i].end <= regions[i].start) break;
+            fprintf(os, "REMARK 650 HELIX %s %d %d\n", regions[i].name.c_str(), regions[i].start, regions[i].end);
+        }
+    }
+
     if (!residues) return;
     for (i=0; residues[i]; i++)
     {
@@ -518,6 +527,7 @@ int Protein::load_pdb(FILE* is, int rno)
         char** fields = chop_spaced_fields(buffer);
 
         set_region(fields[3], atoi(fields[4]), atoi(fields[5]));
+        regions_from = rgn_pdb;
 
         delete[] fields;
     }
@@ -529,6 +539,8 @@ int Protein::load_pdb(FILE* is, int rno)
         char buffer1[1024];
         strcpy(buffer, rem_st[l].c_str());
         char** fields = chop_spaced_fields(buffer);
+
+        if (!fields[0] || !fields[1] || !fields[2] || !fields[3] || !fields[4]) continue;
 
         int f4 = atoi(fields[4]);
         if (!strcmp(fields[3], "BW"))
@@ -1980,6 +1992,7 @@ void Protein::set_region(std::string rgname, int start, int end)
     regions[i].name = rgname;
     regions[i].start = start;
     regions[i].end = end;
+    regions_from = rgn_manual;
 }
 
 Region Protein::get_region(const std::string rgname)

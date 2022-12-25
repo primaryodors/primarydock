@@ -8,6 +8,13 @@
 
 void ext_mtl_coord_cnf_cb(int iter);
 
+enum region_source
+{
+    rgn_none,
+    rgn_pdb,
+    rgn_manual
+};
+
 struct Region
 {
     int start=0;
@@ -123,6 +130,7 @@ protected:
     int metcount = 0;
     Star aaptrmin, aaptrmax;
     Region regions[PROT_MAX_RGN];
+    region_source regions_from = rgn_none;
     std::vector<string> remarks;
     MetalCoord** m_mcoord = nullptr;
     std::vector<int> Ballesteros_Weinstein;

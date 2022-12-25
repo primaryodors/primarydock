@@ -1327,6 +1327,8 @@ Bond** Molecule::get_rotatable_bonds()
         Star s;
         s.pmol = this;
         if (!rotatable_bonds) rotatable_bonds = s.paa->get_rotatable_bonds();
+        else if (rotatable_bonds[0] && rotatable_bonds[1] && rotatable_bonds[0]->atom == rotatable_bonds[1]->atom) rotatable_bonds = s.paa->get_rotatable_bonds();
+        else if (rotatable_bonds[0] && abs(rotatable_bonds[0]->atom - rotatable_bonds[0]->btom) >= 524288) rotatable_bonds = s.paa->get_rotatable_bonds();
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;

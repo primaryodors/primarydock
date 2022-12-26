@@ -262,7 +262,12 @@ foreach ($corrs as $rcp => $c)
         if ($j > 5) break;
         echo str_pad($metric, 10);
 
-        if (false===strpos($metric, " + ") && false===strpos($metric, " - "))
+        if (false===strpos($metric, " + ")
+            &&
+            false===strpos($metric, " - ")
+            &&
+            preg_match("/^[0-9]+[.][0-9]+/", $metric)
+           )
         {
             $pettia = explode('.', $metric);
             $resno = resno_from_bw($rcp, "{$pettia[0]}.{$pettia[1]}");

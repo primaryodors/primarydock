@@ -57,15 +57,25 @@ foreach ($prots as $protid => $p)
     $infname = "pdbs/$fam/".substr($url, strrpos($url, "/")+2);
     $outfname = "pdbs/$fam/$protid.upright.pdb";
 
-    echo ($cmd = "wget -O \"$infname\" \"$url\"");
-    echo "\n";
-    passthru($cmd);
+    $antitax_server = true;
+    if (!file_exists($infname))
+    {
+        echo ($cmd = "wget -O \"$infname\" \"$url\"");
+        echo "\n";
+        passthru($cmd);
+    }
+    else $antitax_server = false;
+
     if (filesize($infname) < 100000) die("File too short: $infname\n");
 
     $editf = <<<heredoc
     LOAD $infname
     $rgns
     UPRIGHT
+    HYDRO
+    REMARK   1
+    REMARK   1 This file has been modified for PrimaryDock compatibility.
+    REMARK   1
     SAVE $outfname
 
 heredoc;
@@ -77,7 +87,10 @@ heredoc;
 
     passthru("bin/pepteditor $pepdname");
 
-    sleep(1);
-    usleep(1048576 + rand(0, 524288));
-    // exit;
+    if ($antitax_server)
+    {
+        sleep(1);
+        usleep(1048576 + rand(0, 524288));
+    }
+    exit;
 }

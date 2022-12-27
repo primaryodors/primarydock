@@ -113,7 +113,7 @@ public:
     Point get_atom_location(const char* aname);
     int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);
-    void hydrogenate(bool steric_only = false);
+    virtual void hydrogenate(bool steric_only = false);
     void clear_atom_binding_energies();
 
     // Bond functions.

@@ -136,6 +136,7 @@ public:
     Bond** get_rotatable_bonds();
     Atom* capable_of_inter(intera_type inter);
     LocRotation enforce_peptide_bond(bool cis = false);				// Peptide bonds should almost always be in the trans (E) configuration.
+    void hydrogenate(bool steric_only = false);
 
 
     // Intermol functions.

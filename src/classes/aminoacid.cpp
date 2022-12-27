@@ -1686,6 +1686,59 @@ float AminoAcid::hydrophilicity()
     return count ? (total / count) : 0;
 }
 
+void AminoAcid::hydrogenate(bool steric_only)
+{
+    if (!atoms) return;
+    Molecule::hydrogenate(steric_only);
+    int already[7][4];
+    const char* alpha = "ABGDEZH";
+
+    int i, j, k, n;
+    for (i=0; i<7; i++) for (j=0; j<4; j++) already[i][j] = 0;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->get_Z() > 1) continue;
+        Bond** bt = atoms[i]->get_bonds();
+        if (!bt) continue;
+        Bond* bb = bt[0];
+        if (!bb) continue;
+        Atom* heavy = bb->btom;
+        if (!heavy) continue;
+
+        atoms[i]->residue  = heavy->residue;
+        atoms[i]->aaletter = heavy->aaletter;
+        strcpy(atoms[i]->aa3let, heavy->aa3let);
+
+        if (heavy->is_backbone && heavy->get_family() == PNICTOGEN)
+            strcpy(atoms[i]->name, "HN");
+        else
+        {
+            char greek = heavy->name[1];
+            if (greek >= 'a') greek = heavy->name[2];
+            const char* gramma = strchr(alpha, greek);
+            if (gramma)
+            {
+                j = gramma - alpha;
+                n = 0;
+                for (k=1; heavy->name[k]; k++) if (heavy->name[k] >= '0' && heavy->name[k] <= '9')
+                {
+                    n = atoi(&heavy->name[k]);
+                    break;
+                }
+
+                k = ++already[j][n];
+                char aname[10];
+                if (n) sprintf(aname, "%dH%c%d", k, greek, n);
+                else   sprintf(aname, "H%c%d", greek, k);
+                aname[4] = 0;       // Molecule class imposes a 4-char limit.
+
+                strcpy(atoms[i]->name, aname);
+            }
+        }
+    }
+}
+
 Point AminoAcid::get_CA_location()
 {
     Atom* a = get_atom("CA");

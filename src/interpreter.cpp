@@ -936,6 +936,13 @@ int main(int argc, char** argv)
 
             }	// HELIX
 
+            else if (!strcmp(fields[0], "HYDRO"))
+            {
+                int resno, endres = p.get_end_resno();
+                for (resno=1; resno<=endres; resno++)
+                    p.get_residue(resno)->hydrogenate();
+            }   // HYDRO
+
             else if (!strcmp(fields[0], "IF"))
             {
                 if (!fields[1]) raise_error("Insufficient parameters given for IF.");
@@ -1614,6 +1621,13 @@ int main(int argc, char** argv)
                 s.n = er;
                 set_variable(lbuffer, s);
             }	// REGION
+
+            else if (!strcmp(fields[0], "REMARK"))
+            {
+                sprintf(buffer1, "%s\n", script_lines[program_counter].c_str());
+                for (l=0; buffer1[l] != 'R'; l++);
+                p.add_remark(buffer1+l);
+            }   // REMARK
 
             else if (!strcmp(fields[0], "RENUMBER"))
             {

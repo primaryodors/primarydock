@@ -1698,9 +1698,13 @@ function loadFile(fileData, fileName = "")
                 	var lines = fileData.split("\n");
                     var lres = 0;
                     var tmpstr = "";
+					var ligtmp = "";
                     for (i=0; i<lines.length; i++)
                     {
                         var ln = lines[i];
+
+                        if (ln.substr(0, 6) == "HETATM" || ln.substr(17,3) == "LIG")
+                            ligtmp += ln + "\n";
 
 						if (ln.substr(0, 6) == 'REMARK')
 						{
@@ -1770,6 +1774,34 @@ function loadFile(fileData, fileName = "")
 	            		});
 	            		mdlresno.push(resno);
     				}
+
+					if (ligtmp.length)
+					{
+						var stringBlob6b = new Blob( [ ligtmp ], { type: 'text/plain'} );
+						stage.loadFile( stringBlob6b, { ext: 'pdb', name: "ligand" } ).then( function( comp6b )
+						{
+							var rparam =
+							{
+								opacity: opc_ligand,
+								multipleBond: true,
+								colorScheme: PODefSchemeLigand,
+								metalness: mtl_bs,
+							};
+
+							model.push(comp6b);
+							mrep.push("ball+stick");
+							mrparams.push(rparam);
+							is_ligand.push(1);
+							curr_ligand = comp6b;
+
+							var lpn = comp6b.name.split("|");
+							mpos.push(parseInt(lpn[0]));
+							mnod.push(parseInt(lpn[1]));
+							$('#clip').trigger("input");
+
+							curr_ligand.addRepresentation( "ball+stick", rparam );
+						} );
+					}
                     
                 }
                 
@@ -2260,7 +2292,7 @@ function loadFile(fileData, fileName = "")
                     }
                     else if (writing)
                     {
-                        if (ln.substr(17,3) == "LIG")
+                        if (ln.substr(0,6) == "HETATM" || ln.substr(17,3) == "LIG")
                             ligtmp += ln + "\n";
                         else
                             protmp += ln + "\n";

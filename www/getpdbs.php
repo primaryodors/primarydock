@@ -60,7 +60,7 @@ foreach ($prots as $protid => $p)
     echo ($cmd = "wget -O \"$infname\" \"$url\"");
     echo "\n";
     passthru($cmd);
-    
+    if (filesize($infname) < 100000) die("File too short: $infname\n");
 
     $editf = <<<heredoc
     LOAD $infname
@@ -77,6 +77,7 @@ heredoc;
 
     passthru("bin/pepteditor $pepdname");
 
-    usleep(1048576 + rand(0, 262144));
+    sleep(1);
+    usleep(1048576 + rand(0, 524288));
     // exit;
 }

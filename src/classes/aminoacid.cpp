@@ -1175,11 +1175,22 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
                     if (aaa->_1let == 'T')
                     {
-                        // cout << fields[2] << endl;
+                        // Have to hard code this because the side chain's chirality forces the numbering system to differ from both
+                        // AlphaFold and ZhangLab, even though they agree.
+                        if (!strcmp(a->name, "CG2" )) strcpy(a->name, "CG1" );
+                        if (!strcmp(a->name, "OG1" )) strcpy(a->name, "OG2" );
+                        if (!strcmp(a->name, "HG1" )) strcpy(a->name, "HG2" );
+                        if (!strcmp(a->name, "1HG2")) strcpy(a->name, "1HG1");
+                        if (!strcmp(a->name, "2HG2")) strcpy(a->name, "2HG1");
+                        if (!strcmp(a->name, "3HG2")) strcpy(a->name, "3HG1");
+                    }
 
-                        // Hate having to hard code $#!+ because AlphaFold and ZhangLab have to use different 4^(%ing numbering systems.
-                        if (!strcmp(a->name, "CG2")) strcpy(a->name, "CG1");
-                        if (!strcmp(a->name, "OG1")) strcpy(a->name, "OG2");
+                    if (aaa->_1let == 'I')
+                    {
+                        // Plus d'marde du code dur.
+                        if (!strcmp(a->name, "1HD1")) strcpy(a->name, "HD1");
+                        if (!strcmp(a->name, "2HD1")) strcpy(a->name, "HD2");
+                        if (!strcmp(a->name, "3HD1")) strcpy(a->name, "HD3");
                     }
 
                     if (aaa && aaa->aabonds)
@@ -1702,12 +1713,6 @@ float AminoAcid::hydrophilicity()
 void AminoAcid::hydrogenate(bool steric_only)
 {
     if (!atoms) return;
-
-    if (aadef && aadef->_1let == 'I')
-    {
-        int z;
-        z++;
-    }
 
     Molecule::hydrogenate(steric_only);
     int already[128][4];

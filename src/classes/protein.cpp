@@ -1997,7 +1997,6 @@ void Protein::set_region(std::string rgname, int start, int end)
     regions[i].start = start;
     regions[i].end = end;
 
-    // REMARK 650 HELIX TMR1 20 50
     char buffer[256];
     sprintf(buffer, "REMARK 650 HELIX %s %d %d\n", rgname.c_str(), start, end);
     remarks.push_back(buffer);

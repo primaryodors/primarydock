@@ -303,12 +303,6 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
 
 void Molecule::clear_all_bond_caches()
 {
-    /*Bond** b = get_rotatable_bonds();
-    if (b)
-    {
-        int i;
-        for (i=0; b[i]; i++) b[i]->clear_moves_with_cache();
-    }*/
     if (!atoms) return;
     int i, j;
     for (i=0; atoms[i]; i++)
@@ -378,7 +372,6 @@ void Molecule::hydrogenate(bool steric_only)
             if (C)
             {
                 atoms[i]->aromatize();
-                // TODO: Rotate atoms[i] geometry to coplanar with pi bond.
                 Atom* D;
                 Bond** bb = C->get_bonds();
                 if (bb) for (j=0; bb[j]; j++)
@@ -391,6 +384,7 @@ void Molecule::hydrogenate(bool steric_only)
                 }
                 delete[] bb;
 
+                // Rotate atoms[i] geometry to coplanar with pi bond.
                 if (D)
                 {
                     Rotation rot;

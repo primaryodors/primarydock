@@ -1040,9 +1040,9 @@ int AminoAcid::from_pdb(FILE* is, int rno)
         lasttell = ftell(is);
         fgets(buffer, 1003, is);
         if (buffer[0] == 'A' &&
-                buffer[1] == 'T' &&
-                buffer[2] == 'O' &&
-                buffer[3] == 'M'
+            buffer[1] == 'T' &&
+            buffer[2] == 'O' &&
+            buffer[3] == 'M'
            )
             buffer[16] = ' ';
 
@@ -1081,10 +1081,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                 int offset = 1;
                 // cout << fields[0] << endl;
 				if (!strcmp(fields[0].c_str(), "ANISOU")) continue;
-                if (!strcmp(fields[0].c_str(), "ATOM")
-                        /*||
-                        !strcmp(fields[0], "HETATM")*/
-                   )
+                if (!strcmp(fields[0].c_str(), "ATOM"))
                 {
                     if (!residue_no)
                     {
@@ -1714,6 +1711,13 @@ void AminoAcid::hydrogenate(bool steric_only)
 {
     if (!atoms) return;
 
+    Atom* oxt = get_atom("OXT");
+    if (oxt)
+    {
+        Atom* C = get_atom("C");
+        if (!oxt->get_bond_between(C)) oxt->bond_to(C, 1);
+    }
+
     Molecule::hydrogenate(steric_only);
     int already[128][4];
     Atom* onlyone[128][4];
@@ -1861,7 +1865,6 @@ void AminoAcid::hydrogenate(bool steric_only)
     cursor = get_atom("OXT");
     if (cursor)
     {
-        // cursor->Z = 8;
         atomtmp[l++] = cursor;
         for (i=0; atoms[i]; i++)
             if (atoms[i]->get_Z() == 1)

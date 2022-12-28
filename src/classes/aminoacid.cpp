@@ -1171,6 +1171,15 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         delete tempaa;
                     }
 
+                    if (aaa->_1let == 'T')
+                    {
+                        // cout << fields[2] << endl;
+
+                        // Hate having to hard code $#!+ because AlphaFold and ZhangLab have to use different 4^(%ing numbering systems.
+                        if (!strcmp(a->name, "CG2")) strcpy(a->name, "CG1");
+                        if (!strcmp(a->name, "OG1")) strcpy(a->name, "OG2");
+                    }
+
                     if (aaa && aaa->aabonds)
                     {
                         for (i=0; aaa->aabonds[i]; i++)
@@ -1691,6 +1700,13 @@ float AminoAcid::hydrophilicity()
 void AminoAcid::hydrogenate(bool steric_only)
 {
     if (!atoms) return;
+
+    if (aadef && aadef->_1let == 'T')
+    {
+        int z;
+        z++;
+    }
+
     Molecule::hydrogenate(steric_only);
     int already[128][4];
     Atom* onlyone[128][4];
@@ -1759,8 +1775,17 @@ void AminoAcid::hydrogenate(bool steric_only)
     {
         if (onlyone[i][j])
         {
-            for (k=0; onlyone[i][j]->name[k] && onlyone[i][j]->name[k] != '1'; k++);
-            onlyone[i][j]->name[k] = 0;
+            if (onlyone[i][j]->name[0] == '1')
+            {
+                char tmpbuf[10];
+                strcpy(tmpbuf, &onlyone[i][j]->name[1]);
+                strcpy(onlyone[i][j]->name, tmpbuf);
+            }
+            else
+            {
+                for (k=1; onlyone[i][j]->name[k] && onlyone[i][j]->name[k] != '1'; k++);
+                onlyone[i][j]->name[k] = 0;
+            }
         }
     }
 

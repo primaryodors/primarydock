@@ -36,6 +36,21 @@ foreach ($prots as $protid => $p)
         $rgns .= "REGION $rgname {$se['start']} {$se['end']}\n";
     }
 
+    $rems = "";
+    if (isset($p['bw']))
+    {
+        foreach ($p['bw'] as $b => $w)
+        {
+            $rems .= "REMARK 800 SITE BW $b $w\n";
+        }
+    }
+
+    $bsr = binding_site($protid);
+    foreach ($bsr as $resno)
+    {
+        $rems .= "REMARK 800 SITE LIGAND_BINDING $resno\n";
+    }
+
     $uid = $p['uniprot_id'];
 
     switch ($source)
@@ -69,14 +84,18 @@ foreach ($prots as $protid => $p)
     if (filesize($infname) < 100000) die("File too short: $infname\n");
 
     $editf = <<<heredoc
-    LOAD $infname
-    $rgns
-    UPRIGHT
-    HYDRO
-    REMARK   1
-    REMARK   1 This file has been modified for PrimaryDock compatibility.
-    REMARK   1
-    SAVE $outfname
+LOAD $infname
+REMARK   1
+REMARK   1 This file has been modified for PrimaryDock compatibility.
+REMARK   1
+REMARK 600
+$rgns
+UPRIGHT
+HYDRO
+REMARK 800
+$rems
+REMARK 800
+SAVE $outfname
 
 heredoc;
 
@@ -92,5 +111,5 @@ heredoc;
         sleep(1);
         usleep(1048576 + rand(0, 524288));
     }
-    exit;
+    // exit;
 }

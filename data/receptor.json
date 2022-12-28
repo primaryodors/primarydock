@@ -18714,7 +18714,56 @@
     {
         "id": "OR9G9",
         "uniprot_id": "P0C7N8",
-        "sequence": "MQRSNHTVTEFILLGFTTDPGMQLGLFVVFLGVYSLTVVGNSTLIVLICNDSHLHTPMYFVVGNLSFLDLWYSSVYTPKILVICISEDKSISFAGCLCQFFFSAGLAYSECCLLAAMAYDRYVAISKPLLYAQAMSIKLCALLVAVSYCGGFINSSIITKKTFSFNFCCENIIDDFFCDLLPLVKLACGEKGCYKFLMYFLLASNVICPAVLILASYLFIITSVLRISSSQGRLKAFSTCSSHLTSVTLYYGSILYIYALPRSSYSFDMDKIVSTFYTEVLPMLNPMIYSLRNKDVKEAL"
+        "sequence": "MQRSNHTVTEFILLGFTTDPGMQLGLFVVFLGVYSLTVVGNSTLIVLICNDSHLHTPMYFVVGNLSFLDLWYSSVYTPKILVICISEDKSISFAGCLCQFFFSAGLAYSECCLLAAMAYDRYVAISKPLLYAQAMSIKLCALLVAVSYCGGFINSSIITKKTFSFNFCCENIIDDFFCDLLPLVKLACGEKGCYKFLMYFLLASNVICPAVLILASYLFIITSVLRISSSQGRLKAFSTCSSHLTSVTLYYGSILYIYALPRSSYSFDMDKIVSTFYTEVLPMLNPMIYSLRNKDVKEAL",
+        "bw":
+        {
+            "1.50": "41",
+            "2.50": "69",
+            "3.50": "121",
+            "4.50": "148",
+            "5.50": "209",
+            "6.50": "253",
+            "7.50": "286",
+            "45.50": "178"
+        },
+        "region":
+        {
+            "TMR1":
+            {
+                "start": "28",
+                "end": "48"
+            },
+            "TMR2":
+            {
+                "start": "65",
+                "end": "85"
+            },
+            "TMR3":
+            {
+                "start": "97",
+                "end": "117"
+            },
+            "TMR4":
+            {
+                "start": "139",
+                "end": "159"
+            },
+            "TMR5":
+            {
+                "start": "201",
+                "end": "221"
+            },
+            "TMR6":
+            {
+                "start": "240",
+                "end": "260"
+            },
+            "TMR7":
+            {
+                "start": "272",
+                "end": "291"
+            }
+        }
     },
     "OR9I1":
     {

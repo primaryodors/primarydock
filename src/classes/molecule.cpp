@@ -358,6 +358,18 @@ void Molecule::hydrogenate(bool steric_only)
 
         //cout << " given charge makes " << bcardsum << endl;
 
+        int fam = atoms[i]->get_family();
+        if (fam == PNICTOGEN || fam == CHALCOGEN)
+        {
+            Atom* C = atoms[i]->is_bonded_to_pi(TETREL, true);
+            if (!C) C = atoms[i]->is_bonded_to_pi(PNICTOGEN, true);
+            if (C)
+            {
+                atoms[i]->aromatize();
+                // TODO: Rotate atoms[i] geometry to coplanar with pi bond.
+            }
+        }
+
         int h_to_add = round(valence - bcardsum);
         for (j=0; j<h_to_add; j++)
         {

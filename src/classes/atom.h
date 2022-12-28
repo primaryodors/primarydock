@@ -317,6 +317,8 @@ protected:
     static float atomic_weights[_ATOM_Z_LIMIT];
     static int valences[_ATOM_Z_LIMIT];
     static int geometries[_ATOM_Z_LIMIT];
+
+    friend class AminoAcid;
 };
 
 bool atoms_are_conjugated(Atom** atoms);

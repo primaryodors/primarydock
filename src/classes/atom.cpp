@@ -325,6 +325,7 @@ Atom::Atom(FILE* is)
                     strcpy(name, fields[2]);
 
                     Z = Z_from_esym(esym);
+                    if (!Z && !strcmp(name, "OXT")) Z = 8;
 
                     reciprocity = used = false;
 

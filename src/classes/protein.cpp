@@ -581,6 +581,15 @@ int Protein::get_start_resno()
     else return residues[0]->get_residue_no();
 }
 
+int Protein::get_end_resno()
+{
+    int retval = 0;
+    if (!residues) return retval;
+    int i;
+    for (i=0; residues[i]; i++) retval = residues[i]->get_residue_no();
+    return retval;
+}
+
 std::vector<std::string> Protein::get_remarks(std::string search_for)
 {
     std::vector<string> retval;
@@ -592,6 +601,13 @@ std::vector<std::string> Protein::get_remarks(std::string search_for)
     }
 
     return retval;
+}
+
+void Protein::add_remark(std::string new_remark)
+{
+    remarks.push_back(new_remark);
+
+    // TODO: Sort remarks by number, becarefuling to preserve the sequence of same numbered remarks.
 }
 
 void Protein::set_clashables()
@@ -1993,6 +2009,10 @@ void Protein::set_region(std::string rgname, int start, int end)
     regions[i].start = start;
     regions[i].end = end;
     regions_from = rgn_manual;
+
+    char buffer[256];
+    sprintf(buffer, "REMARK 650 HELIX %s %d %d\n", rgname.c_str(), start, end);
+    remarks.push_back(buffer);
 }
 
 Region Protein::get_region(const std::string rgname)

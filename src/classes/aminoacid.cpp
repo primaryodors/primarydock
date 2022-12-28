@@ -214,6 +214,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 
                                 if (N->num_bonded_to("H") > 1)		// Proline conditional.
                                 {
+                                    if (ab) delete[] ab;
                                     ab = N->get_bonds();
                                     l = 0;
                                     int n;
@@ -241,6 +242,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                             }
                         }
                     }
+                    delete[] ab;
                 }
             }
         }
@@ -1038,9 +1040,9 @@ int AminoAcid::from_pdb(FILE* is, int rno)
         lasttell = ftell(is);
         fgets(buffer, 1003, is);
         if (buffer[0] == 'A' &&
-                buffer[1] == 'T' &&
-                buffer[2] == 'O' &&
-                buffer[3] == 'M'
+            buffer[1] == 'T' &&
+            buffer[2] == 'O' &&
+            buffer[3] == 'M'
            )
             buffer[16] = ' ';
 
@@ -1079,10 +1081,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                 int offset = 1;
                 // cout << fields[0] << endl;
 				if (!strcmp(fields[0].c_str(), "ANISOU")) continue;
-                if (!strcmp(fields[0].c_str(), "ATOM")
-                        /*||
-                        !strcmp(fields[0], "HETATM")*/
-                   )
+                if (!strcmp(fields[0].c_str(), "ATOM"))
                 {
                     if (!residue_no)
                     {
@@ -1112,6 +1111,8 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         strcpy(esym, &fields[2].c_str()[1]);
                     else
                         strcpy(esym, fields[2].c_str());
+
+                    if (!strcmp(fields[2].c_str(), "OXT")) strcpy(esym, "O");
 
                     int i;
                     for (i=1; i<6; i++)
@@ -1167,6 +1168,26 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     {
                         AminoAcid* tempaa = new AminoAcid(aaa->_1let);
                         delete tempaa;
+                    }
+
+                    if (aaa->_1let == 'T')
+                    {
+                        // Have to hard code this because the side chain's chirality forces the numbering system to differ from both
+                        // AlphaFold and ZhangLab, even though they agree.
+                        if (!strcmp(a->name, "CG2" )) strcpy(a->name, "CG1" );
+                        if (!strcmp(a->name, "OG1" )) strcpy(a->name, "OG2" );
+                        if (!strcmp(a->name, "HG1" )) strcpy(a->name, "HG2" );
+                        if (!strcmp(a->name, "1HG2")) strcpy(a->name, "1HG1");
+                        if (!strcmp(a->name, "2HG2")) strcpy(a->name, "2HG1");
+                        if (!strcmp(a->name, "3HG2")) strcpy(a->name, "3HG1");
+                    }
+
+                    if (aaa->_1let == 'I')
+                    {
+                        // Plus d'marde du code dur.
+                        if (!strcmp(a->name, "1HD1")) strcpy(a->name, "HD1");
+                        if (!strcmp(a->name, "2HD1")) strcpy(a->name, "HD2");
+                        if (!strcmp(a->name, "3HD1")) strcpy(a->name, "HD3");
                     }
 
                     if (aaa && aaa->aabonds)
@@ -1686,6 +1707,185 @@ float AminoAcid::hydrophilicity()
     return count ? (total / count) : 0;
 }
 
+void AminoAcid::hydrogenate(bool steric_only)
+{
+    if (!atoms) return;
+
+    Atom* oxt = get_atom("OXT");
+    if (oxt)
+    {
+        Atom* C = get_atom("C");
+        if (!oxt->get_bond_between(C)) oxt->bond_to(C, 1);
+    }
+
+    Molecule::hydrogenate(steric_only);
+    int already[128][4];
+    Atom* onlyone[128][4];
+    const char* alpha = "ABGDEZH";
+
+    int i, j, k, l, n;
+    for (i=0; i<24; i++) for (j=0; j<4; j++)
+    {
+        already[i][j] = 0;
+        onlyone[i][j] = nullptr;
+    }
+
+    Bond** bt;
+    Bond* bb;
+    Atom* heavy;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->get_Z() > 1) continue;
+        bt = atoms[i]->get_bonds();
+        if (!bt) continue;
+        bb = bt[0];
+        delete[] bt;
+        if (!bb) continue;
+        heavy = bb->btom;
+        if (!heavy) continue;
+
+        atoms[i]->residue  = heavy->residue;
+        atoms[i]->aaletter = heavy->aaletter;
+        strcpy(atoms[i]->aa3let, heavy->aa3let);
+
+        if (heavy->is_backbone && heavy->get_family() == PNICTOGEN)
+            strcpy(atoms[i]->name, "HN");
+        else
+        {
+            char greek = heavy->name[1];
+            if (greek >= 'a') greek = heavy->name[2];
+            const char* gramma = strchr(alpha, greek);
+            if (gramma)
+            {
+                j = gramma - alpha;
+                n = 0;
+                for (k=1; heavy->name[k]; k++) if (heavy->name[k] >= '0' && heavy->name[k] <= '9')
+                {
+                    n = atoi(&heavy->name[k]);
+                    break;
+                }
+
+                k = ++(already[j][n]);
+                if (residue_no == 309)
+                {
+                    onlyone[j][n]++;
+                }
+                if (k == 1) onlyone[j][n] = atoms[i];
+                else onlyone[j][n] = nullptr;
+                char aname[10];
+                if (n) sprintf(aname, "%dH%c%d", k, greek, n);
+                else   sprintf(aname, "H%c%d", greek, k);
+                aname[4] = 0;       // Molecule class imposes a 4-char limit.
+
+                strcpy(atoms[i]->name, aname);
+            }
+        }
+    }
+
+    for (i=0; i<7; i++) for (j=0; j<4; j++)
+    {
+        if (onlyone[i][j])
+        {
+            if (onlyone[i][j]->name[0] == '1')
+            {
+                char tmpbuf[10];
+                strcpy(tmpbuf, &onlyone[i][j]->name[1]);
+                strcpy(onlyone[i][j]->name, tmpbuf);
+            }
+            else
+            {
+                for (k=1; onlyone[i][j]->name[k] && onlyone[i][j]->name[k] != '1'; k++);
+                onlyone[i][j]->name[k] = 0;
+            }
+        }
+    }
+
+    Atom* atomtmp[get_atom_count()+8];
+    l = 0;
+    Atom* cursor = get_atom("N");
+    if (cursor)
+    {
+        atomtmp[l++] = cursor;
+        for (i=0; atoms[i]; i++)
+            if (atoms[i]->get_Z() == 1)
+            {
+                bt = atoms[i]->get_bonds();
+                if (bt)
+                {
+                    bb = bt[0];
+                    if (bb && bb->btom == cursor)
+                        atomtmp[l++] = atoms[i];
+                }
+                delete[] bt;
+            }
+    }
+
+    for (j=0; alpha[j]; j++)
+    {
+        for (i=0; atoms[i]; i++)
+        {
+            if (atoms[i]->get_Z() > 1)
+            {
+                if (atoms[i]->is_backbone && strcmp(atoms[i]->name, "CA")) continue;
+
+                char greek = atoms[i]->name[1];
+                if (greek >= 'a') greek = atoms[i]->name[2];
+                const char* gramma = strchr(alpha, greek);
+                if (gramma && *gramma == alpha[j])
+                {
+                    cursor = atoms[i];
+                    if (cursor)
+                    {
+                        atomtmp[l++] = cursor;
+                        for (k=0; atoms[k]; k++)
+                            if (atoms[k]->get_Z() == 1)
+                            {
+                                bt = atoms[k]->get_bonds();
+                                if (bt)
+                                {
+                                    bb = bt[0];
+                                    if (bb && bb->btom == cursor)
+                                        atomtmp[l++] = atoms[k];
+                                }
+                                delete[] bt;
+                            }
+                    }
+                }
+            }
+        }
+    }
+
+    cursor = get_atom("C");
+    if (cursor) atomtmp[l++] = cursor;
+
+    cursor = get_atom("O");
+    if (cursor) atomtmp[l++] = cursor;
+
+    cursor = get_atom("OXT");
+    if (cursor)
+    {
+        atomtmp[l++] = cursor;
+        for (i=0; atoms[i]; i++)
+            if (atoms[i]->get_Z() == 1)
+            {
+                bt = atoms[i]->get_bonds();
+                if (bt)
+                {
+                    bb = bt[0];
+                    if (bb && bb->btom == cursor)
+                        atomtmp[l++] = atoms[i];
+                }
+                delete[] bt;
+            }
+    }
+
+    atomtmp[l] = 0;
+
+    for (i=0; i<l; i++) atoms[i] = atomtmp[i];
+    atoms[i] = nullptr;
+}
+
 Point AminoAcid::get_CA_location()
 {
     Atom* a = get_atom("CA");
@@ -1819,6 +2019,7 @@ Atom* AminoAcid::HN_or_substitute()
         {
             if (bb[i]->btom && strcmp(bb[i]->btom->name, "CA")) return bb[i]->btom;
         }
+        delete[] bb;
     }
     return retval;
 }

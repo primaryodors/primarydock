@@ -69,7 +69,10 @@ foreach ($prots as $protid => $p)
     }
 
     $fam = family_from_protid($protid);
-    $infname = "pdbs/$fam/".substr($url, strrpos($url, "/")+2);
+    if (!file_exists("pdbs")) mkdir("pdbs");
+    if (!file_exists("pdbs/$fam")) mkdir("pdbs/$fam");
+    if (!file_exists("pdbs/$fam/import")) mkdir("pdbs/$fam/import");
+    $infname = "pdbs/$fam/import/".substr($url, strrpos($url, "/")+2);
     $outfname = "pdbs/$fam/$protid.upright.pdb";
 
     $antitax_server = true;

@@ -214,6 +214,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 
                                 if (N->num_bonded_to("H") > 1)		// Proline conditional.
                                 {
+                                    if (ab) delete[] ab;
                                     ab = N->get_bonds();
                                     l = 0;
                                     int n;
@@ -241,6 +242,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
                             }
                         }
                     }
+                    delete[] ab;
                 }
             }
         }
@@ -1701,7 +1703,7 @@ void AminoAcid::hydrogenate(bool steric_only)
 {
     if (!atoms) return;
 
-    if (aadef && aadef->_1let == 'T')
+    if (aadef && aadef->_1let == 'I')
     {
         int z;
         z++;
@@ -1729,6 +1731,7 @@ void AminoAcid::hydrogenate(bool steric_only)
         bt = atoms[i]->get_bonds();
         if (!bt) continue;
         bb = bt[0];
+        delete[] bt;
         if (!bb) continue;
         heavy = bb->btom;
         if (!heavy) continue;
@@ -1805,6 +1808,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                     if (bb && bb->btom == cursor)
                         atomtmp[l++] = atoms[i];
                 }
+                delete[] bt;
             }
     }
 
@@ -1835,6 +1839,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                                     if (bb && bb->btom == cursor)
                                         atomtmp[l++] = atoms[k];
                                 }
+                                delete[] bt;
                             }
                     }
                 }
@@ -1863,6 +1868,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                     if (bb && bb->btom == cursor)
                         atomtmp[l++] = atoms[i];
                 }
+                delete[] bt;
             }
     }
 
@@ -2005,6 +2011,7 @@ Atom* AminoAcid::HN_or_substitute()
         {
             if (bb[i]->btom && strcmp(bb[i]->btom->name, "CA")) return bb[i]->btom;
         }
+        delete[] bb;
     }
     return retval;
 }

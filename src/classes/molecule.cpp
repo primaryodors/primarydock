@@ -303,11 +303,22 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
 
 void Molecule::clear_all_bond_caches()
 {
-    Bond** b = get_rotatable_bonds();
+    /*Bond** b = get_rotatable_bonds();
     if (b)
     {
         int i;
         for (i=0; b[i]; i++) b[i]->clear_moves_with_cache();
+    }*/
+    if (!atoms) return;
+    int i, j;
+    for (i=0; atoms[i]; i++)
+    {
+        Bond** b = atoms[i]->get_bonds();
+        if (b)
+        {
+            for (j=0; b[j]; j++) b[j]->clear_moves_with_cache();
+            delete[] b;
+        }
     }
 }
 
@@ -349,6 +360,7 @@ void Molecule::hydrogenate(bool steric_only)
                 if (aib[j]->btom) bcardsum += aib[j]->cardinality;
                 if (aib[j]->cardinality > 1) db++;
             }
+            delete[] aib;
         }
         if (!db && steric_only) continue;
 
@@ -377,6 +389,7 @@ void Molecule::hydrogenate(bool steric_only)
                         break;
                     }
                 }
+                delete[] bb;
 
                 if (D)
                 {
@@ -1568,6 +1581,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                             int o, ag = la->get_geometry();
                             for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
                             cout << "." << endl;
+                            delete[] lbb;
                         }
 
                         Atom* lba = get_atom(aadef->aabonds[i]->bname);
@@ -1580,6 +1594,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                                 int o, ag = lba->get_geometry();
                                 for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
                                 cout << "." << endl;
+                                delete[] lbb;
                             }
                         }
                         else cout << aadef->aabonds[i]->bname << " not found." << endl;
@@ -1745,6 +1760,7 @@ float Molecule::get_internal_clashes()
                     for (k=0; k<g; k++)
                         cout << atoms[i]->name << " is bonded to " << hex << b[k]->btom << dec << " "
                              << (b[k]->btom ? b[k]->btom->name : "") << "." << endl;
+                    delete[] b;
                 }
             }
         }
@@ -3724,6 +3740,7 @@ float Molecule::close_loop(Atom** path, float lcard)
         }
 
         last = path[i];
+        delete[] b;
     }
     rotables[k] = 0;
 
@@ -4124,6 +4141,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
     b = atoms[i]->get_bonds();
     if (!b) return error;
     btom = b[0]->btom;
+    delete[] b;
     if (!btom) return error;
 
     bloc = btom->get_location();
@@ -4251,6 +4269,7 @@ float Molecule::correct_structure(int iters)
             b = atoms[i]->get_bonds();
             if (!b) return error;
             btom = b[0]->btom;
+            delete[] b;
             if (!btom) return error;
 
             // TODO

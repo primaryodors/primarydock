@@ -303,11 +303,16 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
 
 void Molecule::clear_all_bond_caches()
 {
-    Bond** b = get_rotatable_bonds();
-    if (b)
+    if (!atoms) return;
+    int i, j;
+    for (i=0; atoms[i]; i++)
     {
-        int i;
-        for (i=0; b[i]; i++) b[i]->clear_moves_with_cache();
+        Bond** b = atoms[i]->get_bonds();
+        if (b)
+        {
+            for (j=0; b[j]; j++) b[j]->clear_moves_with_cache();
+            delete[] b;
+        }
     }
 }
 
@@ -349,6 +354,7 @@ void Molecule::hydrogenate(bool steric_only)
                 if (aib[j]->btom) bcardsum += aib[j]->cardinality;
                 if (aib[j]->cardinality > 1) db++;
             }
+            delete[] aib;
         }
         if (!db && steric_only) continue;
 
@@ -357,6 +363,50 @@ void Molecule::hydrogenate(bool steric_only)
         bcardsum -= atoms[i]->get_charge();
 
         //cout << " given charge makes " << bcardsum << endl;
+
+        int fam = atoms[i]->get_family();
+        if (fam == PNICTOGEN || fam == CHALCOGEN)
+        {
+            Atom* C = atoms[i]->is_bonded_to_pi(TETREL, true);
+            if (!C) C = atoms[i]->is_bonded_to_pi(PNICTOGEN, true);
+            if (C)
+            {
+                atoms[i]->aromatize();
+                Atom* D;
+                Bond** bb = C->get_bonds();
+                if (bb) for (j=0; bb[j]; j++)
+                {
+                    if (bb[j]->btom && bb[j]->btom != atoms[i])
+                    {
+                        D = bb[j]->btom;
+                        break;
+                    }
+                }
+                delete[] bb;
+
+                // Rotate atoms[i] geometry to coplanar with pi bond.
+                if (D)
+                {
+                    Rotation rot;
+                    rot.v = atoms[i]->get_location().subtract(C->get_location());
+                    rot.a = 0.25;
+                    float best = are_points_planar(atoms[i]->get_location(), C->get_location(), D->get_location(), atoms[i]->get_location().add(atoms[i]->get_next_free_geometry(1)));
+                    for (j=0; j<200; j++)
+                    {
+                        atoms[i]->rotate_geometry(rot);
+                        float f = are_points_planar(atoms[i]->get_location(), C->get_location(), D->get_location(), atoms[i]->get_location().add(atoms[i]->get_next_free_geometry(1)));
+                        if (f < best)
+                            best = f;
+                        else
+                        {
+                            rot.a *= -1;
+                            atoms[i]->rotate_geometry(rot);
+                            rot.a *= 0.5;
+                        }
+                    }
+                }
+            }
+        }
 
         int h_to_add = round(valence - bcardsum);
         for (j=0; j<h_to_add; j++)
@@ -1525,6 +1575,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                             int o, ag = la->get_geometry();
                             for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
                             cout << "." << endl;
+                            delete[] lbb;
                         }
 
                         Atom* lba = get_atom(aadef->aabonds[i]->bname);
@@ -1537,6 +1588,7 @@ Bond** AminoAcid::get_rotatable_bonds()
                                 int o, ag = lba->get_geometry();
                                 for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
                                 cout << "." << endl;
+                                delete[] lbb;
                             }
                         }
                         else cout << aadef->aabonds[i]->bname << " not found." << endl;
@@ -1702,6 +1754,7 @@ float Molecule::get_internal_clashes()
                     for (k=0; k<g; k++)
                         cout << atoms[i]->name << " is bonded to " << hex << b[k]->btom << dec << " "
                              << (b[k]->btom ? b[k]->btom->name : "") << "." << endl;
+                    delete[] b;
                 }
             }
         }
@@ -3681,6 +3734,7 @@ float Molecule::close_loop(Atom** path, float lcard)
         }
 
         last = path[i];
+        delete[] b;
     }
     rotables[k] = 0;
 
@@ -4081,6 +4135,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
     b = atoms[i]->get_bonds();
     if (!b) return error;
     btom = b[0]->btom;
+    delete[] b;
     if (!btom) return error;
 
     bloc = btom->get_location();
@@ -4208,6 +4263,7 @@ float Molecule::correct_structure(int iters)
             b = atoms[i]->get_bonds();
             if (!b) return error;
             btom = b[0]->btom;
+            delete[] b;
             if (!btom) return error;
 
             // TODO

@@ -1219,6 +1219,198 @@ stage.mouseControls.remove( "scroll-alt" );
 stage.mouseControls.remove( "drag-ctrl-right ");
 stage.mouseControls.remove( "drag-ctrl-left ");
 
+function apply_pdb(poresult)
+{
+	var i;
+	var shiny = [];
+	var result = poresult.split("\n");
+	var lres = 0;
+	var tmpstr = "";
+	for (i=0; i<result.length; i++)
+	{
+		var ln = result[i];
+		var resno = parseInt(ln.substr(22,4));
+		var aname = ln.substr(12,4).trim();
+		if (ln.substr(17,3) == "MTL") shiny.push(ln);
+		
+		if (lres != resno)
+		{
+			if (ln.length > 20)
+			{
+				var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
+				if (aa1let != '?')
+				{
+					var stringBlob5 = new Blob( [tmpstr], { type: 'text/plain'} );
+					stage.loadFile( stringBlob5, { ext: 'pdb' } ).then( function( comp5 )
+					{
+						resmdl.push(comp5);
+						restoggled.push(0);
+					});
+					mdlresno.push(resno);
+					
+					lres = resno;
+					tmpstr = "";
+					
+					sequence += aa1let;
+					
+					$('#clip').trigger("input");
+				}
+			}
+		}
+		if (ln.length < 20) continue;
+		
+		tmpstr += ln + "\n";
+		
+		$('#clip').trigger("input");
+	}
+	if (tmpstr)
+	{
+		var stringBlob5a = new Blob( [tmpstr], { type: 'text/plain'} );
+		stage.loadFile( stringBlob5a, { ext: 'pdb' } ).then( function( comp5a )
+		{
+			resmdl.push(comp5a);
+			restoggled.push(0);
+			$('#clip').trigger("input");
+		});
+		mdlresno.push(resno);
+	}
+
+	var stringBlob3 = new Blob( [ poresult ], { type: 'text/plain'} );
+	stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp3 )
+	{
+		comp3.addRepresentation( "cartoon",
+		{
+			opacity: opc_cartoon,
+			colorScheme: PODefRgnScheme,
+			metalness: mtl_cartoon,
+		});
+		comp3.setName("backbone");
+		gmodel.push(comp3);
+		$('#clip').trigger("input");
+		
+		if (acvrot8.length)
+		{
+			var j;
+			if (!acvmdl)
+			{
+				for (j=0; j<gmodel.length; j++)
+				{
+					if (gmodel[j].name == "backbone")
+					{
+						// acvmdl = JSON.parse(JSON.stringify(gmodel[j]));
+						stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp8 )
+						{
+							acvmdl = comp8;
+							
+							if (acvmdl)
+							{
+								// Call the NGL functions to get the proxies etc.
+								acvmdl.structure.eachResidue(function(res_proxy)
+								{
+									var i;
+									for (i=0; i<acvrot8.length; i++)
+									{
+										if (res_proxy.resno >= acvrot8[i].sr && res_proxy.resno <= acvrot8[i].er)
+										{
+											var lrot8 = acvrot8[i];
+											var ox = lrot8.ox, oy = lrot8.oy, oz = lrot8.oz;
+											var ax = lrot8.ax, ay = lrot8.ay, az = lrot8.az;
+											var origin = { x:ox, y:oy, z:oz };
+											var axis   = { x:ax, y:ay, z:az };
+											res_proxy.eachAtom(function(a_proxy)
+											{
+												var rotated = rotate3D( 
+													{
+														x:a_proxy.x + acvrot8[i].tx, 
+														y:a_proxy.y + acvrot8[i].ty,
+														z:a_proxy.z + acvrot8[i].tz
+													},
+													origin,
+													axis,
+													acvrot8[i].angle
+												);
+												a_proxy.x = rotated.x;
+												a_proxy.y = rotated.y;
+												a_proxy.z = rotated.z;
+											});
+										}
+									}		// end each acvrot8.
+								});		// end each residue.
+							}		// end if acvmdl.
+						});
+						break;
+					}		// end if name backbone.
+				}		// end for gmodel.
+			}		// end if not acvmdl.
+		}		// if acvrot8 length
+		else if (acvmatrix.length)
+		{
+			var j;
+			if (!acvmdl)
+			{
+				for (j=0; j<gmodel.length; j++)
+				{
+					if (gmodel[j].name == "backbone")
+					{
+						// acvmdl = JSON.parse(JSON.stringify(gmodel[j]));
+						stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp8 )
+						{
+							acvmdl = comp8;
+							
+							if (acvmdl)
+							{
+								// Call the NGL functions to get the proxies etc.
+								acvmdl.structure.eachResidue(function(res_proxy)
+								{
+									var i;
+									for (i=0; i<acvmatrix.length; i++)
+									{
+										if (res_proxy.resno >= acvmatrix[i].sr && res_proxy.resno <= acvmatrix[i].er)
+										{
+											var f = parseFloat(res_proxy.resno - acvmatrix[i].sr) / (acvmatrix[i].er - acvmatrix[i].sr);
+											var mx = f * acvmatrix[i].cx + (1.0-f) * acvmatrix[i].nx;
+											var my = f * acvmatrix[i].cy + (1.0-f) * acvmatrix[i].ny;
+											var mz = f * acvmatrix[i].cz + (1.0-f) * acvmatrix[i].nz;
+											
+											res_proxy.eachAtom(function(a_proxy)
+											{
+												a_proxy.x += mx;
+												a_proxy.y += my;
+												a_proxy.z += mz;
+											});
+										}
+									}		// end each acvmatrix.
+								});		// end each residue.
+							}		// end if acvmdl.
+						});
+						break;
+					}		// end if name backbone.
+				}		// end for gmodel.
+			}		// end if not acvmdl.
+
+			
+		}		// end if acvmatrix length.
+	});
+
+	if (shiny.length)
+	{
+		var stringBlob4 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
+		stage.loadFile( stringBlob4, { ext: 'pdb' } ).then( function( comp4 )
+		{
+			comp4.addRepresentation( "spacefill",
+			{
+				opacity: opc_metal,
+				colorScheme: PODefScheme,
+				metalness: mtl_metal,
+			});
+			gmodel.push(comp4);
+			$('#clip').trigger("input");
+		});
+	}
+	
+	
+}
+
 var url = getParameterByName('url') ? getParameterByName('url') : 'http://'+website+'/sdf.php';
 console.log(url);
 var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
@@ -1915,6 +2107,18 @@ function loadFile(fileData, fileName = "")
             		}
                 }
 
+				var lln = lines.length;
+				for (i=0; i<lln; i++)
+				{
+					if (lines[i] == "Original PDB:")
+					{
+						orid = false;
+						var pdbdat = "";
+						for (i++; i<lln; i++) pdbdat += lines[i] + "\n";
+						apply_pdb(pdbdat);
+					}
+				}
+
 				if (orid)
 				{
 		            $.ajax(
@@ -1927,194 +2131,7 @@ function loadFile(fileData, fileName = "")
 		                },
 						success: function(poresult)
 		                {
-		                    var i;
-		                    var shiny = [];
-		                    var result = poresult.split("\n");
-		                    var lres = 0;
-		                    var tmpstr = "";
-		                    for (i=0; i<result.length; i++)
-		                    {
-		                        var ln = result[i];
-		                        var resno = parseInt(ln.substr(22,4));
-		                        var aname = ln.substr(12,4).trim();
-		                        if (ln.substr(17,3) == "MTL") shiny.push(ln);
-		                        
-		                        if (lres != resno)
-				                {
-				                	if (ln.length > 20)
-				                	{
-				                		var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
-				                		if (aa1let != '?')
-				                		{
-								        	var stringBlob5 = new Blob( [tmpstr], { type: 'text/plain'} );
-						                	stage.loadFile( stringBlob5, { ext: 'pdb' } ).then( function( comp5 )
-						            		{
-						            			resmdl.push(comp5);
-						        				restoggled.push(0);
-						            		});
-						            		mdlresno.push(resno);
-								    		
-								        	lres = resno;
-								        	tmpstr = "";
-								        	
-						            		sequence += aa1let;
-						            		
-						            		$('#clip').trigger("input");
-				                		}
-				            		}
-				                }
-				                if (ln.length < 20) continue;
-		                        
-		                        tmpstr += ln + "\n";
-		                        
-		                        $('#clip').trigger("input");
-		                    }
-				            if (tmpstr)
-				            {
-					        	var stringBlob5a = new Blob( [tmpstr], { type: 'text/plain'} );
-					        	stage.loadFile( stringBlob5a, { ext: 'pdb' } ).then( function( comp5a )
-					    		{
-					    			resmdl.push(comp5a);
-					    			restoggled.push(0);
-					    			$('#clip').trigger("input");
-					    		});
-					    		mdlresno.push(resno);
-							}
-
-		                    var stringBlob3 = new Blob( [ poresult ], { type: 'text/plain'} );
-		                    stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp3 )
-		                    {
-		                        comp3.addRepresentation( "cartoon",
-		                        {
-		                            opacity: opc_cartoon,
-									colorScheme: PODefRgnScheme,
-		                            metalness: mtl_cartoon,
-		                        });
-		                        comp3.setName("backbone");
-		                        gmodel.push(comp3);
-		                        $('#clip').trigger("input");
-		                        
-		                        if (acvrot8.length)
-		                        {
-						        	var j;
-						        	if (!acvmdl)
-						        	{
-								    	for (j=0; j<gmodel.length; j++)
-								    	{
-								    		if (gmodel[j].name == "backbone")
-								    		{
-								    			// acvmdl = JSON.parse(JSON.stringify(gmodel[j]));
-								    			stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp8 )
-		                    					{
-		                    						acvmdl = comp8;
-		                    						
-		                    						if (acvmdl)
-													{
-														// Call the NGL functions to get the proxies etc.
-														acvmdl.structure.eachResidue(function(res_proxy)
-														{
-															var i;
-															for (i=0; i<acvrot8.length; i++)
-															{
-																if (res_proxy.resno >= acvrot8[i].sr && res_proxy.resno <= acvrot8[i].er)
-																{
-																	var lrot8 = acvrot8[i];
-																	var ox = lrot8.ox, oy = lrot8.oy, oz = lrot8.oz;
-																	var ax = lrot8.ax, ay = lrot8.ay, az = lrot8.az;
-																	var origin = { x:ox, y:oy, z:oz };
-																	var axis   = { x:ax, y:ay, z:az };
-																	res_proxy.eachAtom(function(a_proxy)
-																	{
-																		var rotated = rotate3D( 
-																			{
-																				x:a_proxy.x + acvrot8[i].tx, 
-																				y:a_proxy.y + acvrot8[i].ty,
-																				z:a_proxy.z + acvrot8[i].tz
-																			},
-																			origin,
-																			axis,
-																			acvrot8[i].angle
-																		);
-																		a_proxy.x = rotated.x;
-																		a_proxy.y = rotated.y;
-																		a_proxy.z = rotated.z;
-																	});
-																}
-															}		// end each acvrot8.
-														});		// end each residue.
-													}		// end if acvmdl.
-		                    					});
-								    			break;
-								    		}		// end if name backbone.
-								    	}		// end for gmodel.
-						        	}		// end if not acvmdl.
-		                        }		// if acvrot8 length
-		                        else if (acvmatrix.length)
-		                		{
-						        	var j;
-						        	if (!acvmdl)
-						        	{
-								    	for (j=0; j<gmodel.length; j++)
-								    	{
-								    		if (gmodel[j].name == "backbone")
-								    		{
-								    			// acvmdl = JSON.parse(JSON.stringify(gmodel[j]));
-								    			stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp8 )
-		                    					{
-		                    						acvmdl = comp8;
-		                    						
-		                    						if (acvmdl)
-													{
-														// Call the NGL functions to get the proxies etc.
-														acvmdl.structure.eachResidue(function(res_proxy)
-														{
-															var i;
-															for (i=0; i<acvmatrix.length; i++)
-															{
-																if (res_proxy.resno >= acvmatrix[i].sr && res_proxy.resno <= acvmatrix[i].er)
-																{
-																	var f = parseFloat(res_proxy.resno - acvmatrix[i].sr) / (acvmatrix[i].er - acvmatrix[i].sr);
-																	var mx = f * acvmatrix[i].cx + (1.0-f) * acvmatrix[i].nx;
-																	var my = f * acvmatrix[i].cy + (1.0-f) * acvmatrix[i].ny;
-																	var mz = f * acvmatrix[i].cz + (1.0-f) * acvmatrix[i].nz;
-																	
-																	res_proxy.eachAtom(function(a_proxy)
-																	{
-																		a_proxy.x += mx;
-																		a_proxy.y += my;
-																		a_proxy.z += mz;
-																	});
-																}
-															}		// end each acvmatrix.
-														});		// end each residue.
-													}		// end if acvmdl.
-		                    					});
-								    			break;
-								    		}		// end if name backbone.
-								    	}		// end for gmodel.
-						        	}		// end if not acvmdl.
-				        
-									
-								}		// end if acvmatrix length.
-			                });
-
-		                    if (shiny.length)
-		                    {
-		                        var stringBlob4 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
-		                        stage.loadFile( stringBlob4, { ext: 'pdb' } ).then( function( comp4 )
-		                        {
-		                            comp4.addRepresentation( "spacefill",
-		                            {
-		                                opacity: opc_metal,
-										colorScheme: PODefScheme,
-		                                metalness: mtl_metal,
-		                            });
-		                            gmodel.push(comp4);
-		                            $('#clip').trigger("input");
-		                        });
-		                    }
-                    		
-                    		
+							apply_pdb(poresult);
 		                }		// end orpdb success.
 		            });		// end orpdb ajax.
 	            }		// end if orid.

@@ -940,7 +940,10 @@ int main(int argc, char** argv)
             {
                 int resno, endres = p.get_end_resno();
                 for (resno=1; resno<=endres; resno++)
-                    p.get_residue(resno)->hydrogenate();
+                {
+                    AminoAcid* res = p.get_residue(resno);
+                    if (res) res->hydrogenate();
+                }
             }   // HYDRO
 
             else if (!strcmp(fields[0], "IF"))

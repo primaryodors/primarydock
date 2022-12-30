@@ -3128,6 +3128,7 @@ _exitposes:
             FILE* pf = fopen(outfname, "ab");
             protein->save_pdb(pf);
             fclose(pf);
+            cout << endl << "Original PDB:" << endl;
             cout << (hydrogenate_pdb ? "Hydrogenated " : "Original ") << "PDB appended to output file." << endl;
         }
         else cout << "ERROR: Append PDB can only be used when specifying an output file." << endl;

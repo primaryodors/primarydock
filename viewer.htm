@@ -2145,9 +2145,10 @@ function loadFile(fileData, fileName = "")
                 is_ligand = [];
                 mpos = [];
                 mnod = [];
-                for (i=0; i<lines.length; i++)
+                for (i=0; i<lln; i++)
                 {
                     var ln = lines[i];
+					if (ln == "Original PDB:") break;
 
                     if (ln.substr(0,6) == "Pose: ")
                     {
@@ -2300,6 +2301,15 @@ function loadFile(fileData, fileName = "")
                                 mrep.push("ball+stick");
                                 mrparams.push(rparam);
                                 is_ligand.push(1);
+								if (!curr_ligand)
+								{
+									curr_ligand = comp7b;
+									window.setTimeout(function()
+									{
+										showPose(1);
+										// curr_ligand.autoView();
+									}, 259);
+								}
 
                                 var lpn = comp7b.name.split("|");
                                 mpos.push(parseInt(lpn[0]));
@@ -2333,9 +2343,10 @@ function loadFile(fileData, fileName = "")
             window.setTimeout(function()
             {
             	$("#pleasewait").hide();
-                curr_ligand.autoView();
+                if (curr_ligand) curr_ligand.autoView();
             	$('#clip').trigger("input");
-        	}, 503);
+				showPose(1);
+        	}, 916);
 
 			$("#clip").trigger("input");
         }

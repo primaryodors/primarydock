@@ -474,7 +474,7 @@ int interpret_config_line(char** fields)
         active_matrix_node = atoi(fields[1]);
         optsecho = (std::string)"Active node is " + to_string(active_matrix_node);
     }
-    else if (!strcmp(fields[0], "APPENDPROT"))
+    else if (!strcmp(fields[0], "APPENDPROT") || !strcmp(fields[0], "OPEND"))
     {
         append_pdb = true;
     }

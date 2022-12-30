@@ -3120,8 +3120,20 @@ _exitposes:
     if (output) *output << "\nCalculation took: " << (finished-began) << " seconds." << endl;
     if (debug) *debug << "\nCalculation took: " << (finished-began) << " seconds." << endl;
 
-    if (debug) debug->close();
     if (output) output->close();
+    if (append_pdb)
+    {
+        if (output)
+        {
+            FILE* pf = fopen(outfname, "ab");
+            protein->save_pdb(pf);
+            fclose(pf);
+            cout << (hydrogenate_pdb ? "Hydrogenated " : "Original ") << "PDB appended to output file." << endl;
+        }
+        else cout << "ERROR: Append PDB can only be used when specifying an output file." << endl;
+    }
+
+    if (debug) debug->close();
 
     return 0;
 }

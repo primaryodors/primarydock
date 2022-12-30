@@ -49,6 +49,7 @@ public:
     // Getters.
     int get_seq_length();
     int get_start_resno();
+    int get_end_resno();
     std::string get_sequence();
     Molecule* metals_as_molecule();
     int get_metals_count();
@@ -64,6 +65,7 @@ public:
     }
     Point get_atom_location(int resno, const char* aname);
     std::vector<std::string> get_remarks(std::string search_for = "");
+    void add_remark(std::string new_remark);
     int get_bw50(int helixno);
 
     // Metrics functions.

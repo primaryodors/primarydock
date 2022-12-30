@@ -101,6 +101,8 @@ int activation_node = -1;		// Default is never.
 int found_poses = 0;
 int triesleft = 0;				// Default is no retry.
 bool echo_progress = false;
+bool hydrogenate_pdb = false;
+bool append_pdb = false;
 
 std::string origbuff = "";
 std::string optsecho = "";
@@ -472,6 +474,10 @@ int interpret_config_line(char** fields)
         active_matrix_node = atoi(fields[1]);
         optsecho = (std::string)"Active node is " + to_string(active_matrix_node);
     }
+    else if (!strcmp(fields[0], "APPENDPROT"))
+    {
+        append_pdb = true;
+    }
     else if (!strcmp(fields[0], "CEN"))
     {
         CEN_buf = origbuff;
@@ -551,6 +557,10 @@ int interpret_config_line(char** fields)
         }
         optsecho = "Water molecules: " + to_string(maxh2o);
         return 1;
+    }
+    else if (!strcmp(fields[0], "HYDRO"))
+    {
+        hydrogenate_pdb = true;
     }
     else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
     {
@@ -1310,6 +1320,15 @@ int main(int argc, char** argv)
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
     #endif
+    if (hydrogenate_pdb)
+    {
+        int resno, endres = protein->get_end_resno();
+        for (resno=1; resno<=endres; resno++)
+        {
+            AminoAcid* res = protein->get_residue(resno);
+            if (res) res->hydrogenate();
+        }
+    }
 
     prepare_acv_bond_rots();
 
@@ -2131,6 +2150,7 @@ _try_again:
 
                             if (lig_inter_typ[l] == vdW && reaches_spheroid[nodeno][i]->hydrophilicity() >= 0.3) continue;
                             if (lig_inter_typ[l] == hbond && reaches_spheroid[nodeno][i]->hydrophilicity() < 0.2) continue;
+                            if (lig_inter_typ[l] == ionic && reaches_spheroid[nodeno][i]->hydrophilicity() < 0.3) continue;
 
                             if (reaches_spheroid[nodeno][i]->is_glycine()) continue;
 
@@ -3100,8 +3120,20 @@ _exitposes:
     if (output) *output << "\nCalculation took: " << (finished-began) << " seconds." << endl;
     if (debug) *debug << "\nCalculation took: " << (finished-began) << " seconds." << endl;
 
-    if (debug) debug->close();
     if (output) output->close();
+    if (append_pdb)
+    {
+        if (output)
+        {
+            FILE* pf = fopen(outfname, "ab");
+            protein->save_pdb(pf);
+            fclose(pf);
+            cout << (hydrogenate_pdb ? "Hydrogenated " : "Original ") << "PDB appended to output file." << endl;
+        }
+        else cout << "ERROR: Append PDB can only be used when specifying an output file." << endl;
+    }
+
+    if (debug) debug->close();
 
     return 0;
 }

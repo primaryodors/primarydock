@@ -2151,6 +2151,12 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
             if (ligands[l] == this) continue;
             for (j=0; j<ligands[l]->atcount; j++)
             {
+                // TODO: Fix this in the hydrogenate function, but for now we'll fix it here and hope for the best. 🤞🏼
+                if (!ligands[l]->atoms[j])
+                {
+                    ligands[l]->atcount = j;
+                    break;
+                }
                 if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone
                         &&
                         (	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1

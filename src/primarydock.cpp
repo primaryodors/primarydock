@@ -3030,8 +3030,11 @@ _try_again:
                         if (output) *output << "Proximity: " << dr[j][k].proximity << endl << endl;
                         cout << "Proximity: " << dr[j][k].proximity << endl << endl;
 
-                        if (output) *output << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
-                        cout << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
+                        if (tripswitch_clashables.size())
+                        {
+                            if (output) *output << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
+                            cout << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
+                        }
 
                         if (differential_dock)
                         {

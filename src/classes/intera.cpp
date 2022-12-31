@@ -601,286 +601,321 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         float r1 = r / forces[i]->distance;
 
         if (forces[i]->type == covalent) continue;
-
-        if (forces[i]->type == vdW
-                ||
-                forces[i]->type == pi
-                ||
-                forces[i]->type == polarpi
-           )
-        {
-            if (r1 > 2.5) continue;
-            if (forces[i]->type == vdW && r > 6) continue;
-        }
-        else if (r1 > 4) continue;
-
-        if (forces[i]->type == pi && (a->shielding_angle >= _shield_angle_pi || b->shielding_angle >= _shield_angle_pi)) continue;
-
-        dp = 2;
-        if (forces[i]->type == vdW) dp = 1;					// van der Waals forces are non-directional, but the C-H bond still shields.
-        else if (forces[i]->get_dp()) dp = forces[i]->get_dp();
-
-        // Anisotropy.
-        SCoord* ageo = a->get_geometry_aligned_to_bonds();
-        SCoord* bgeo = b->get_geometry_aligned_to_bonds();
-        bool del_ageo=false, del_bgeo=false;
-        int ag = a->get_geometry();
-        int bg = b->get_geometry();
-        int abc = a->get_bonded_atoms_count();
-        int bbc = b->get_bonded_atoms_count();
+        
+        float partial, rdecayed;
         float asum=0, bsum=0, aniso=1;
+        bool stacked_pi_rings = false;
 
-        if (forces[i]->type == pi && ag >= 3 && bg >= 3)
+        if (forces[i]->type == pi && a->is_pi() && b->is_pi())
         {
-            if (del_ageo) delete[] ageo;
-            if (del_bgeo) delete[] bgeo;
-            ageo = get_geometry_for_pi_stack(ageo);
-            bgeo = get_geometry_for_pi_stack(bgeo);
-            ag = bg = 5;
-            del_ageo = del_bgeo = true;
+            Ring** ar = a->get_rings();
+            Ring** br = b->get_rings();
+
+            if (ar && br)
+            {
+                for (j=0; ar[j]; j++)
+                {
+                    if (!ar[j]->is_conjugated() || !ar[j]->is_coplanar()) continue;
+
+                    SCoord anorm = ar[j]->get_normal();
+                    for (k=0; br[k]; k++)
+                    {
+                        if (!br[k]->is_conjugated() || !br[k]->is_coplanar()) continue;
+                        float lpart = 0;
+
+                        SCoord bnorm = br[k]->get_normal();
+                        lpart = forces[i]->kJ_mol * pow(cos(find_3d_angle(anorm, bnorm, Point(0,0,0))), forces[i]->get_dp());
+
+                        // TODO: Sandwiched and parallel displaced stacking. https://pubs.acs.org/doi/10.1021/jp912094q
+
+                        // TODO: T-shaped stacking. https://en.wikipedia.org/wiki/Stacking_(chemistry)
+
+                        partial += lpart;
+                    }
+                }
+            }
         }
-        else if ((forces[i]->type == polarpi || forces[i]->type == mcoord) && ag >= 3 && bg >= 3)
+
+        if (!stacked_pi_rings)
         {
-            if (!a->is_polar())
+            if (forces[i]->type == vdW
+                    ||
+                    forces[i]->type == pi
+                    ||
+                    forces[i]->type == polarpi
+            )
+            {
+                if (r1 > 2.5) continue;
+                if (forces[i]->type == vdW && r > 6) continue;
+            }
+            else if (r1 > 4) continue;
+
+            if (forces[i]->type == pi && (a->shielding_angle >= _shield_angle_pi || b->shielding_angle >= _shield_angle_pi)) continue;
+
+            dp = 2;
+            if (forces[i]->type == vdW) dp = 1;					// van der Waals forces are non-directional, but the C-H bond still shields.
+            else if (forces[i]->get_dp()) dp = forces[i]->get_dp();
+
+            // Anisotropy.
+            SCoord* ageo = a->get_geometry_aligned_to_bonds();
+            SCoord* bgeo = b->get_geometry_aligned_to_bonds();
+            bool del_ageo=false, del_bgeo=false;
+            int ag = a->get_geometry();
+            int bg = b->get_geometry();
+            int abc = a->get_bonded_atoms_count();
+            int bbc = b->get_bonded_atoms_count();
+
+            if (forces[i]->type == pi && ag >= 3 && bg >= 3)
             {
                 if (del_ageo) delete[] ageo;
-                ageo = get_geometry_for_pi_stack(ageo);
-                ag = 5;
-                del_ageo = true;
-            }
-            if (!b->is_polar())
-            {
                 if (del_bgeo) delete[] bgeo;
+                ageo = get_geometry_for_pi_stack(ageo);
                 bgeo = get_geometry_for_pi_stack(bgeo);
-                bg = 5;
-                del_bgeo = true;
+                ag = bg = 5;
+                del_ageo = del_bgeo = true;
             }
-        }
-
-        float dpa, dpb;
-
-        dpa = dpb = dp;
-
-        if (forces[i]->type == ionic || forces[i]->type == hbond || forces[i]->type == mcoord)
-        {
-            if (a->is_polar() < 0 && b->is_polar() >= 0)
+            else if ((forces[i]->type == polarpi || forces[i]->type == mcoord) && ag >= 3 && bg >= 3)
             {
-                dpa = dp;
-                dpb = 3;		// Assume same for all donors.
+                if (!a->is_polar())
+                {
+                    if (del_ageo) delete[] ageo;
+                    ageo = get_geometry_for_pi_stack(ageo);
+                    ag = 5;
+                    del_ageo = true;
+                }
+                if (!b->is_polar())
+                {
+                    if (del_bgeo) delete[] bgeo;
+                    bgeo = get_geometry_for_pi_stack(bgeo);
+                    bg = 5;
+                    del_bgeo = true;
+                }
             }
-            else if (b->is_polar() < 0 && a->is_polar() >= 0)
+
+            float dpa, dpb;
+
+            dpa = dpb = dp;
+
+            if (forces[i]->type == ionic || forces[i]->type == hbond || forces[i]->type == mcoord)
             {
-                dpb = dp;
-                dpa = 3;
+                if (a->is_polar() < 0 && b->is_polar() >= 0)
+                {
+                    dpa = dp;
+                    dpb = 3;		// Assume same for all donors.
+                }
+                else if (b->is_polar() < 0 && a->is_polar() >= 0)
+                {
+                    dpb = dp;
+                    dpa = 3;
+                }
+                else dpa = dpb = dp;
             }
-            else dpa = dpb = dp;
-        }
 
-        Point aloc = a->get_location();
-        Point bloc = b->get_location();
+            Point aloc = a->get_location();
+            Point bloc = b->get_location();
 
-        int anx = a->get_idx_next_free_geometry();
-        int bnx = b->get_idx_next_free_geometry();
+            int anx = a->get_idx_next_free_geometry();
+            int bnx = b->get_idx_next_free_geometry();
 
-        SCoord avec[ag], bvec[ag];
+            SCoord avec[ag], bvec[ag];
 
-        Ring *ar = nullptr, *br = nullptr;
+            Ring *ar = nullptr, *br = nullptr;
 
-        for (j=0; j<ag; j++)
-            avec[j] = SCoord(0,0,0);
-        for (j=anx; j<ag; j++)
-            avec[j-anx] = ageo[j];
-
-        for (j=0; j<bg; j++)
-            bvec[j] = SCoord(0,0,0);
-        for (j=bnx; j<bg; j++)
-            bvec[j-bnx] = bgeo[j];
-
-        if (del_ageo) delete[] ageo;
-        if (del_bgeo) delete[] bgeo;
-
-        // When pi-bonding to a heavy atom of a conjugated coplanar ring, treat the entire ring as if it were one atom.
-        if ((forces[i]->type == pi || forces[i]->type == polarpi)
-                &&
-                a->get_Z() > 1
-                &&
-                a->num_conj_rings()
-           )
-        {
-            // Find the coplanar ring closest to bloc, if any.
-            ar = a->closest_arom_ring_to(bloc);
-            if (ar)
-            {
-                aloc = ar->get_center();
-                avec[0] = ar->get_normal();
-                avec[1] = avec[0];
-                avec[1] = avec[1].negate();
-                for (j=2; j<ag; j++) avec[j] = SCoord(0,0,0);
-                ag = 2;
-            }
-        }
-
-        if ((forces[i]->type == pi || forces[i]->type == polarpi)
-                &&
-                b->get_Z() > 1
-                &&
-                b->num_conj_rings()
-           )
-        {
-            // Find the coplanar ring closest to aloc, if any.
-            br = b->closest_arom_ring_to(aloc);
-            if (br)
-            {
-                bloc = br->get_center();
-                bvec[0] = br->get_normal();
-                bvec[1] = bvec[0];
-                bvec[1] = bvec[1].negate();
-                for (j=2; j<ag; j++) bvec[j] = SCoord(0,0,0);
-                bg = 2;
-            }
-        }
-
-        if (forces[i]->type != ionic)
-        {
-            if (a->get_bonded_atoms_count() == ag || b->get_bonded_atoms_count() == bg)
-                continue;
-
-            // Sum up the anisotropic contribution from each geometry vertex of a.
             for (j=0; j<ag; j++)
-            {
-                if (!avec[j].r) continue;
-                Point pt(&avec[j]);
-                pt.scale(r);
-                pt = pt.add(aloc);
-                float theta = find_3d_angle(&bloc, &pt, &aloc);
-                if (theta > M_PI/2) continue;
-                float contrib = pow(fmax(0,cos(theta)), dpa);
-                if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
-                // else cout << "Bad contrib! " << cos(theta) << " = cos(" << (theta*180.0/M_PI) << ") exp=" << dpa << endl;
-                // if (fabs(contrib) > 10000) cout << "Bad contrib! " << cos(theta) << " = cos(" << (theta*180.0/M_PI) << ") exp=" << dpa << endl;
-            }
+                avec[j] = SCoord(0,0,0);
+            for (j=anx; j<ag; j++)
+                avec[j-anx] = ageo[j];
 
-            // Sum up the anisotropic contribution from each geometry vertex of b.
             for (j=0; j<bg; j++)
+                bvec[j] = SCoord(0,0,0);
+            for (j=bnx; j<bg; j++)
+                bvec[j-bnx] = bgeo[j];
+
+            if (del_ageo) delete[] ageo;
+            if (del_bgeo) delete[] bgeo;
+
+            // When pi-bonding to a heavy atom of a conjugated coplanar ring, treat the entire ring as if it were one atom.
+            if ((forces[i]->type == pi || forces[i]->type == polarpi)
+                    &&
+                    a->get_Z() > 1
+                    &&
+                    a->num_conj_rings()
+            )
             {
-                if (!bvec[j].r) continue;
-                Point pt(&bvec[j]);
-                pt.scale(r);
-                pt = pt.add(bloc);
-                float theta = find_3d_angle(&aloc, &pt, &bloc);
-                if (theta > M_PI/2) continue;
-                float contrib = pow(fmax(0,cos(theta)), dpb);
-                if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
+                // Find the coplanar ring closest to bloc, if any.
+                ar = a->closest_arom_ring_to(bloc);
+                if (ar)
+                {
+                    aloc = ar->get_center();
+                    avec[0] = ar->get_normal();
+                    avec[1] = avec[0];
+                    avec[1] = avec[1].negate();
+                    for (j=2; j<ag; j++) avec[j] = SCoord(0,0,0);
+                    ag = 2;
+                }
             }
 
-            if (asum > 1) asum = 1;
-            if (bsum > 1) bsum = 1;
+            if ((forces[i]->type == pi || forces[i]->type == polarpi)
+                    &&
+                    b->get_Z() > 1
+                    &&
+                    b->num_conj_rings()
+            )
+            {
+                // Find the coplanar ring closest to aloc, if any.
+                br = b->closest_arom_ring_to(aloc);
+                if (br)
+                {
+                    bloc = br->get_center();
+                    bvec[0] = br->get_normal();
+                    bvec[1] = bvec[0];
+                    bvec[1] = bvec[1].negate();
+                    for (j=2; j<ag; j++) bvec[j] = SCoord(0,0,0);
+                    bg = 2;
+                }
+            }
 
-            if (!asum) asum = 1;
-            if (!bsum) bsum = 1;
+            if (forces[i]->type != ionic)
+            {
+                if (a->get_bonded_atoms_count() == ag || b->get_bonded_atoms_count() == bg)
+                    continue;
 
-            // Multiply the two sums.
-            aniso = asum * bsum;
-            // if (!aniso) aniso = 0.707;
+                // Sum up the anisotropic contribution from each geometry vertex of a.
+                for (j=0; j<ag; j++)
+                {
+                    if (!avec[j].r) continue;
+                    Point pt(&avec[j]);
+                    pt.scale(r);
+                    pt = pt.add(aloc);
+                    float theta = find_3d_angle(&bloc, &pt, &aloc);
+                    if (theta > M_PI/2) continue;
+                    float contrib = pow(fmax(0,cos(theta)), dpa);
+                    if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
+                    // else cout << "Bad contrib! " << cos(theta) << " = cos(" << (theta*180.0/M_PI) << ") exp=" << dpa << endl;
+                    // if (fabs(contrib) > 10000) cout << "Bad contrib! " << cos(theta) << " = cos(" << (theta*180.0/M_PI) << ") exp=" << dpa << endl;
+                }
+
+                // Sum up the anisotropic contribution from each geometry vertex of b.
+                for (j=0; j<bg; j++)
+                {
+                    if (!bvec[j].r) continue;
+                    Point pt(&bvec[j]);
+                    pt.scale(r);
+                    pt = pt.add(bloc);
+                    float theta = find_3d_angle(&aloc, &pt, &bloc);
+                    if (theta > M_PI/2) continue;
+                    float contrib = pow(fmax(0,cos(theta)), dpb);
+                    if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
+                }
+
+                if (asum > 1) asum = 1;
+                if (bsum > 1) bsum = 1;
+
+                if (!asum) asum = 1;
+                if (!bsum) bsum = 1;
+
+                // Multiply the two sums.
+                aniso = asum * bsum;
+                // if (!aniso) aniso = 0.707;
+            }
+
+            if (r1 >= 1)
+            {
+                rdecayed = (forces[i]->type == vdW
+                            ||
+                            forces[i]->type == pi
+                            ||
+                            forces[i]->type == polarpi
+                        )
+                        ? r1*r1*r1*r1*r1*r1
+                        : r1*r1;
+                partial = aniso * forces[i]->kJ_mol / rdecayed;
+            }
+            else
+            {
+                /*float confidence = 2.5;		// TODO: Get this from the PDB.
+                float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
+
+                float allowable = give + confidence / sqrt(3);
+
+                r += allowable;
+                if (r > forces[i]->distance) r = forces[i]->distance;
+                r1 = r / forces[i]->distance;*/
+
+                rdecayed = r1 * r1 * r1;
+                partial = aniso * forces[i]->kJ_mol * rdecayed;
+                // partial = aniso * forces[i]->kJ_mol;
+
+                // This isn't clashes.
+                /*if (a->residue == 105)
+                cout << "Clash! "
+                    << (a->residue ? std::to_string(a->residue).c_str() : "") << (a->residue ? ":":"") << a->name
+                    << "..."
+                    << (b->residue ? std::to_string(b->residue).c_str() : "") << (b->residue ? ":":"") << b->name
+                    << " r = " << r << " vs. optimal " << forces[i]->distance
+                    << endl;*/
+            }
+
+            // if (partial < 0) partial = 0;
+
+            // Divide each ring by its number of atoms.
+            if (ar) partial /= ar->get_atom_count();
+            if (br) partial /= br->get_atom_count();
+
+            /*if (fabs(partial) >= 10000)
+            // if (isnan(partial) || isinf(partial))
+            {	cout << "Invalid partial! " << a->name << ":" << b->name << " r=" << r
+                    << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
+                    << " aniso=" << aniso << " (" << asum << "*" << bsum << ")" << endl;
+            }*/
+
+            if (fabs(partial) > fabs(forces[i]->kJ_mol) || partial >= 500)
+            {
+                cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
+                    << a->name << "..." << b->name << " r=" << r
+                    << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
+                    << " aniso=" << aniso << " (" << asum << "*" << bsum << ")" << endl;
+                throw 0xbadf0ace;
+            }
+
+            if (forces[i]->type == polarpi || forces[i]->type == mcoord)
+            {
+                if (a->is_metal()) partial *= a->get_charge();
+                if (b->is_metal()) partial *= b->get_charge();
+            }
+
+            if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
+            {
+                partial *= fabs((a->get_charge()) * -(b->get_charge()));
+
+                if (0 && (a->residue == 114 || b->residue == 114))
+                    cout << "Ionic interaction between "
+                        << a->name << " (" << a->get_charge() << ") and "
+                        << b->name << " ("  << b->get_charge() << ")"
+                        << " r=" << r
+                        << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
+                        << " aniso=" << aniso << " (" << asum << "*" << bsum << ") = "
+                        << partial
+                        << endl;
+            }
+
+            if (achg && bchg) partial = fabs(partial) * sgn(achg) * -sgn(bchg);
+            if (achg && !bchg && bpol) partial = fabs(partial) * sgn(achg) * -sgn(bpol);
+            if (!achg && apol && bchg) partial = fabs(partial) * sgn(apol) * -sgn(bchg);
+            if (!achg && apol && !bchg && bpol) partial = fabs(partial) * sgn(apol) * -sgn(bpol);
+
+            # if 0
+            //if (forces[i]->type == polarpi || forces[i]->type == mcoord)
+            if (forces[i]->type == hbond)
+            {
+                cout << a->name << " ... " << b->name << " " << forces[i]->type << " partial " << partial
+                    << " (" << *forces[i] << ") "
+                    << " rdecayed " << rdecayed << " aniso " << aniso << " ag " << ag << " bg " << bg
+                    << endl;
+            }
+            #endif
         }
-
-        float partial, rdecayed;
-        if (r1 >= 1)
-        {
-            rdecayed = (forces[i]->type == vdW
-                        ||
-                        forces[i]->type == pi
-                        ||
-                        forces[i]->type == polarpi
-                       )
-                       ? r1*r1*r1*r1*r1*r1
-                       : r1*r1;
-            partial = aniso * forces[i]->kJ_mol / rdecayed;
-        }
-        else
-        {
-            /*float confidence = 2.5;		// TODO: Get this from the PDB.
-            float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
-
-            float allowable = give + confidence / sqrt(3);
-
-            r += allowable;
-            if (r > forces[i]->distance) r = forces[i]->distance;
-            r1 = r / forces[i]->distance;*/
-
-            rdecayed = r1 * r1 * r1;
-            partial = aniso * forces[i]->kJ_mol * rdecayed;
-            // partial = aniso * forces[i]->kJ_mol;
-
-            // This isn't clashes.
-            /*if (a->residue == 105)
-            cout << "Clash! "
-            	 << (a->residue ? std::to_string(a->residue).c_str() : "") << (a->residue ? ":":"") << a->name
-            	 << "..."
-            	 << (b->residue ? std::to_string(b->residue).c_str() : "") << (b->residue ? ":":"") << b->name
-            	 << " r = " << r << " vs. optimal " << forces[i]->distance
-            	 << endl;*/
-        }
-
-        // if (partial < 0) partial = 0;
-
-        // Divide each ring by its number of atoms.
-        if (ar) partial /= ar->get_atom_count();
-        if (br) partial /= br->get_atom_count();
-
-        /*if (fabs(partial) >= 10000)
-        // if (isnan(partial) || isinf(partial))
-        {	cout << "Invalid partial! " << a->name << ":" << b->name << " r=" << r
-        		 << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
-        		 << " aniso=" << aniso << " (" << asum << "*" << bsum << ")" << endl;
-        }*/
-
-        if (fabs(partial) > fabs(forces[i]->kJ_mol) || partial >= 500)
-        {
-            cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
-                 << a->name << "..." << b->name << " r=" << r
-                 << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
-                 << " aniso=" << aniso << " (" << asum << "*" << bsum << ")" << endl;
-            throw 0xbadf0ace;
-        }
-
-        if (forces[i]->type == polarpi || forces[i]->type == mcoord)
-        {
-            if (a->is_metal()) partial *= a->get_charge();
-            if (b->is_metal()) partial *= b->get_charge();
-        }
-
-        if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
-        {
-            partial *= fabs((a->get_charge()) * -(b->get_charge()));
-
-            if (0 && (a->residue == 114 || b->residue == 114))
-                cout << "Ionic interaction between "
-                     << a->name << " (" << a->get_charge() << ") and "
-                     << b->name << " ("  << b->get_charge() << ")"
-                     << " r=" << r
-                     << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
-                     << " aniso=" << aniso << " (" << asum << "*" << bsum << ") = "
-                     << partial
-                     << endl;
-        }
-
-        if (achg && bchg) partial = fabs(partial) * sgn(achg) * -sgn(bchg);
-        if (achg && !bchg && bpol) partial = fabs(partial) * sgn(achg) * -sgn(bpol);
-        if (!achg && apol && bchg) partial = fabs(partial) * sgn(apol) * -sgn(bchg);
-        if (!achg && apol && !bchg && bpol) partial = fabs(partial) * sgn(apol) * -sgn(bpol);
-
-        # if 0
-        //if (forces[i]->type == polarpi || forces[i]->type == mcoord)
-        if (forces[i]->type == hbond)
-        {
-            cout << a->name << " ... " << b->name << " " << forces[i]->type << " partial " << partial
-                 << " (" << *forces[i] << ") "
-                 << " rdecayed " << rdecayed << " aniso " << aniso << " ag " << ag << " bg " << bg
-                 << endl;
-        }
-        #endif
-
+        
         if (fabs(partial) >= 500)
         {
             cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "

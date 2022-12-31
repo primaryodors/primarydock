@@ -67,6 +67,7 @@
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
+#define pi_HT_dkytw 0.002657
 
 #define _voxel_resolution 0.1
 #define USE_VOXEL_ARRAY false

@@ -627,7 +627,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
                         SCoord bnorm = br[k]->get_normal();
                         dp = forces[i]->get_dp();
-                        lpart = forces[i]->kJ_mol * pow(0.5+0.5*cos(find_3d_angle(anorm, bnorm, Point(0,0,0))*2), dp);
+                        float norm_theta = find_3d_angle(anorm, bnorm, Point(0,0,0));
+                        lpart = forces[i]->kJ_mol * pow(0.5+0.5*cos(norm_theta*2), dp);
                         lpart /= pi_mult_dkytw;
 
                         // Sandwiched and parallel displaced stacking. https://pubs.acs.org/doi/10.1021/jp912094q
@@ -642,11 +643,30 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                             Point proj2 = a->get_location().subtract(projnorm);
                             float disp = fmin(b->get_location().get_3d_distance(proj1), b->get_location().get_3d_distance(proj2));
 
-                            // lpart *= pi_mult_dkytw / pow(1.0+disp, dp*2);
                             lpart *= fmax(0, 1.0-disp) * pi_mult_dkytw * pi_CH_dkytw;
                         }
 
-                        // TODO: T-shaped stacking, ibid.
+                        // T-shaped stacking, ibid.
+                        if (a->get_Z() == 1 && b->get_Z() > 1 && norm_theta > 60*fiftyseventh)
+                        {
+                            Point bcen = br[k]->get_center();
+                            SCoord proj = a->get_location().subtract(aheavy->get_location());
+                            proj.r = bcen.get_3d_distance(a->get_location());
+
+                            float disp = a->get_location().add(proj).get_3d_distance(bcen);
+
+                            lpart += forces[i]->kJ_mol * fmax(0, 1.0-disp) * pi_mult_dkytw * pi_HT_dkytw;
+                        }
+                        else if (b->get_Z() == 1 && a->get_Z() > 1 && norm_theta > 60*fiftyseventh)
+                        {
+                            Point acen = ar[j]->get_center();
+                            SCoord proj = b->get_location().subtract(bheavy->get_location());
+                            proj.r = acen.get_3d_distance(b->get_location());
+
+                            float disp = b->get_location().add(proj).get_3d_distance(acen);
+
+                            lpart += forces[i]->kJ_mol * fmax(0, 1.0-disp) * pi_mult_dkytw * pi_HT_dkytw;
+                        }
 
                         stacked_pi_rings = true;
                         rbind = forces[i]->distance;

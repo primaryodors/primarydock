@@ -3072,8 +3072,8 @@ _try_again:
                         cout << endl;
                         if (output) *output << endl;
 
-                        if (flex)
-                        {
+                        /*if (flex)
+                        {*/
                             if (!dr[j][k].pdbdat.length())
                             {
                                 cout << "WARNING: Failed to generate PDB data." << endl;
@@ -3090,7 +3090,7 @@ _try_again:
                                 if (!output || echo_pdb_data) cout << "TER" << endl << "END" << endl << endl << endl;
                                 if (output) *output << "TER" << endl << "END" << endl << endl << endl;
                             }
-                        }
+                        // }
 
                         if (!k) found_poses++;
                     }

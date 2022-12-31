@@ -789,9 +789,9 @@ void prepare_initb()
         bool preconform;
 
         #if preconform_protein
-        preconform = true;
+        preconform = flex;
         #else
-        preconform = (waters != nullptr) && differential_dock;
+        preconform = flex && (waters != nullptr) && differential_dock;
         #endif
 
         if (preconform && pre_ligand_iteration_ratio)
@@ -1470,7 +1470,7 @@ int main(int argc, char** argv)
         Molecule::multimol_conform(lig_grp, prealign_res, prealign_iters, nullptr);
 
         // Then line up residues to ligand.
-        Molecule::multimol_conform(prealign_res, lig_grp, prealign_iters, nullptr);
+        if (flex) Molecule::multimol_conform(prealign_res, lig_grp, prealign_iters, nullptr);
         ligand->movability = MOV_ALL;
 
         delete[] fields;
@@ -2405,8 +2405,8 @@ _try_again:
                                 #if preemptively_minimize_intermol_clashes
                                 Molecule* mtmp[3];
                                 mtmp[0] = &m;
-                                mtmp[1] = alignment_aa[l];
-                                mtmp[2] = NULL;
+                                mtmp[1] = flex ? alignment_aa[l] : nullptr;
+                                mtmp[2] = nullptr;
                                 m.movability = MOV_FLEXONLY;
                                 alignment_aa[l]->movability = MOV_FLEXONLY;
                                 Molecule::multimol_conform(mtmp);
@@ -2430,7 +2430,7 @@ _try_again:
                     mtmp[2] = alignment_aa[2];
                     mtmp[3] = nullptr;
                     m.movability = MOV_FLEXONLY;
-                    Molecule::multimol_conform(mtmp);
+                    if (flex) Molecule::multimol_conform(mtmp);
                     m.movability = MOV_ALL;
 
                     cout << endl;
@@ -2466,10 +2466,14 @@ _try_again:
                     cfmols[i++] = waters[j];
                 }
             }
-            for (j=0; j<sphres; j++)
+
+            if (flex)
             {
-                if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
-                cfmols[i++] = reaches_spheroid[nodeno][j];
+                for (j=0; j<sphres; j++)
+                {
+                    if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
+                    cfmols[i++] = reaches_spheroid[nodeno][j];
+                }
             }
             for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 

@@ -608,8 +608,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         if (forces[i]->type == pi && a->is_pi() && b->is_pi())
         {
-            Ring** ar = a->get_rings();
-            Ring** br = b->get_rings();
+            Ring** ar = aheavy->get_rings();
+            Ring** br = bheavy->get_rings();
 
             partial = 0;
 
@@ -626,9 +626,23 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         float lpart = 0;
 
                         SCoord bnorm = br[k]->get_normal();
-                        lpart = forces[i]->kJ_mol / 58.333 * pow(cos(find_3d_angle(anorm, bnorm, Point(0,0,0))), forces[i]->get_dp());
+                        dp = forces[i]->get_dp();
+                        lpart = forces[i]->kJ_mol * pow(0.5+0.5*cos(find_3d_angle(anorm, bnorm, Point(0,0,0))*2), dp);
+                        lpart /= pi_mult_dkytw;
 
-                        // TODO: Sandwiched and parallel displaced stacking. https://pubs.acs.org/doi/10.1021/jp912094q
+                        // Sandwiched and parallel displaced stacking. https://pubs.acs.org/doi/10.1021/jp912094q
+                        if ((a->get_Z() == 1 && b->get_Z() >  1)
+                            ||
+                            (a->get_Z() >  1 && b->get_Z() == 1)
+                           )
+                        {
+                            Point proj1 = a->get_location().add(anorm);
+                            Point proj2 = a->get_location().subtract(anorm);
+                            float disp = fmin(b->get_location().get_3d_distance(proj1), b->get_location().get_3d_distance(proj2));
+
+                            // lpart *= pi_mult_dkytw / pow(1.0+disp, dp*2);
+                            lpart *= fmax(0, 1.0-disp) * pi_mult_dkytw * pi_CH_dkytw;
+                        }
 
                         // TODO: T-shaped stacking. https://en.wikipedia.org/wiki/Stacking_(chemistry)
 

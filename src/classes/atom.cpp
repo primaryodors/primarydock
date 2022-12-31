@@ -979,6 +979,12 @@ bool Atom::is_metal()
 bool Atom::is_pi()
 {
     if (!bonded_to) return false;
+
+    if (Z == 1)
+    {
+        if (bonded_to[0].btom) return bonded_to[0].btom->is_pi();
+    }
+
     int i;
     for (i=0; i<valence; i++)
     {

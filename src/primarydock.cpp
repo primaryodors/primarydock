@@ -1620,6 +1620,15 @@ _try_again:
             pf = fopen(protfname, "r");
             protein->load_pdb(pf);
             fclose(pf);
+            if (hydrogenate_pdb)
+            {
+                int resno, endres = protein->get_end_resno();
+                for (resno=1; resno<=endres; resno++)
+                {
+                    AminoAcid* res = protein->get_residue(resno);
+                    if (res) res->hydrogenate();
+                }
+            }
 
             prepare_acv_bond_rots();
         }
@@ -1720,6 +1729,15 @@ _try_again:
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
                 fclose(pf);
+                if (hydrogenate_pdb)
+                {
+                    int resno, endres = protein->get_end_resno();
+                    for (resno=1; resno<=endres; resno++)
+                    {
+                        AminoAcid* res = protein->get_residue(resno);
+                        if (res) res->hydrogenate();
+                    }
+                }
                 prepare_initb();
 
                 for (i=1; i<=seql; i++)

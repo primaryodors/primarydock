@@ -66,7 +66,7 @@
 #define _def_bnd_momentum (_fullrot_steprad/2)
 
 #define pi_mult_dkytw 264
-#define pi_CH_dkytw 0.414
+#define pi_CH_dkytw 0.0766
 
 #define _voxel_resolution 0.1
 #define USE_VOXEL_ARRAY false

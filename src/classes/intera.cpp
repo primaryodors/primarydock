@@ -636,15 +636,17 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                             (a->get_Z() >  1 && b->get_Z() == 1)
                            )
                         {
-                            Point proj1 = a->get_location().add(anorm);
-                            Point proj2 = a->get_location().subtract(anorm);
+                            Point projnorm = anorm;
+                            projnorm.scale(r);
+                            Point proj1 = a->get_location().add(projnorm);
+                            Point proj2 = a->get_location().subtract(projnorm);
                             float disp = fmin(b->get_location().get_3d_distance(proj1), b->get_location().get_3d_distance(proj2));
 
                             // lpart *= pi_mult_dkytw / pow(1.0+disp, dp*2);
                             lpart *= fmax(0, 1.0-disp) * pi_mult_dkytw * pi_CH_dkytw;
                         }
 
-                        // TODO: T-shaped stacking. https://en.wikipedia.org/wiki/Stacking_(chemistry)
+                        // TODO: T-shaped stacking, ibid.
 
                         stacked_pi_rings = true;
                         rbind = forces[i]->distance;

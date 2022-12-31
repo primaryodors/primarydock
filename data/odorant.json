@@ -5545,11 +5545,6 @@
             }
         }
     },
-    "f47d7457a28643ee736fe4af9b0fb6e8":
-    {
-        "full_name": "cannabidiol",
-        "smiles": "CCCCCC1=CC(=C(C(=C1)O)[C@@H]2C=C(CC[C@H]2C(=C)C)C)O"
-    },
     "9a87e7c90094c2a95230b8faf8524b2f":
     {
         "full_name": "foliaver",
@@ -28437,11 +28432,6 @@
             ]
         }
     },
-    "5a16ab40d530aaa71f09642afde4ff37":
-    {
-        "full_name": "octopamine",
-        "smiles": "OC(c1ccc(O)cc1)C[NH3+]"
-    },
     "9430015b98c092f9788e63c66c247c58":
     {
         "full_name": "3-octyl acetate",
@@ -33916,16 +33906,6 @@
                 }
             }
         }
-    },
-    "f2c9e2eb3bf36dc3744006daab861b20":
-    {
-        "full_name": "tetraethyl lead",
-        "smiles": "CC[Pb](CC)(CC)CC"
-    },
-    "e256b1fdef21fba3914eeb8fbab68fe8":
-    {
-        "full_name": "tetrahydrocannabinol",
-        "smiles": "CCCCCC1=CC(=C2C3C=C(CCC3C(OC2=C1)(C)C)C)O"
     },
     "b6a37b273a91550e9b98240591eb1223":
     {

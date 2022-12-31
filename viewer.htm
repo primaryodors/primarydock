@@ -963,6 +963,7 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function(atom)
     {
+		if (typeof atom.atomType == "undefined") return 0xff99ff;
     	var elem = atom.element;
         if (atom.resno <= 1)
         {
@@ -1046,6 +1047,7 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function(atom)
     {
+		if (typeof atom.atomType == "undefined") return 0xff99ff;
     	var elem = atom.atomType.element;
         if (atom.resno <= 1)
         {
@@ -1129,6 +1131,7 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function(atom)
     {
+		if (typeof atom.atomType == "undefined") return 0xff99ff;
     	var elem = atom.atomType.element;
         if (atom.resno <= 1)
         {

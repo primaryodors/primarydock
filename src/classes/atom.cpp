@@ -1864,6 +1864,18 @@ int Atom::get_count_pi_bonds()
     return retval;
 }
 
+float Atom::get_sum_pi_bonds()
+{
+    if (!bonded_to) return 0;
+    int i;
+    float retval=0;
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom && bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval += bonded_to[i].cardinality;
+    }
+    return retval;
+}
+
 void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
 {
     /*
@@ -2265,7 +2277,7 @@ bool atoms_are_conjugated(Atom** atoms)
         {
         case TETREL:
             // cout << atoms[i]->name << "|" << atoms[i]->get_count_pi_bonds() << "|" << atoms[i]->get_charge() << endl;
-            if (atoms[i]->get_count_pi_bonds() != 1
+            if (fabs(atoms[i]->get_sum_pi_bonds() - 2.65) > 0.4
                     &&
                     !atoms[i]->get_charge()
                )

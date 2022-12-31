@@ -627,7 +627,7 @@ int Molecule::from_sdf(char const* sdf_dat)
             int a2i = atoi(fields[1]);
 
             if (!a1i || !a2i) break;
-            atoms[a1i-1]->bond_to(atoms[a2i-1], atoi(fields[2]));
+            atoms[a1i-1]->bond_to(atoms[a2i-1], atof(fields[2]));
             // cout << "Bonded " << atoms[a1i-1]->name << " to " << atoms[a2i-1]->name << endl;
         }
 

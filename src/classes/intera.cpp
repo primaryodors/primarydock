@@ -316,6 +316,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         j++;
     }
 
+    #if allow_auto_hydroxy
     Atom *H = nullptr, *O = nullptr;
     Bond *brot = nullptr;
     if (a->get_Z() == 1 && b->get_Z() == 8)
@@ -365,7 +366,6 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         }
     }
 
-    #if allow_auto_hydroxy
     if (H && O && brot)
     {
         float rad, step = 30*fiftyseventh, bestr=999999, bestrad=0;
@@ -611,6 +611,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             Ring** ar = a->get_rings();
             Ring** br = b->get_rings();
 
+            partial = 0;
+
             if (ar && br)
             {
                 for (j=0; ar[j]; j++)
@@ -624,13 +626,20 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         float lpart = 0;
 
                         SCoord bnorm = br[k]->get_normal();
-                        lpart = forces[i]->kJ_mol * pow(cos(find_3d_angle(anorm, bnorm, Point(0,0,0))), forces[i]->get_dp());
+                        lpart = forces[i]->kJ_mol / 58.333 * pow(cos(find_3d_angle(anorm, bnorm, Point(0,0,0))), forces[i]->get_dp());
 
                         // TODO: Sandwiched and parallel displaced stacking. https://pubs.acs.org/doi/10.1021/jp912094q
 
                         // TODO: T-shaped stacking. https://en.wikipedia.org/wiki/Stacking_(chemistry)
 
+                        stacked_pi_rings = true;
+                        rbind = forces[i]->distance;
+
+                        if (r >= rbind) lpart /= pow(r/rbind, 2);
+                        else lpart *= (r/rbind);
                         partial += lpart;
+
+                        // cout << "Partial: " << lpart << endl;
                     }
                 }
             }

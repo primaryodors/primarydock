@@ -271,6 +271,8 @@ option.unknown
 	padding: 10px;
 	border: 1px solid #249;
 	border-radius: 15px;
+	overflow-y: auto;
+	max-height: 81%;
 }
 
 .sctgbtn
@@ -426,7 +428,7 @@ Clip:
 </div>
 
 <div id="affichage">
-	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a>
+	<a id="ptbbbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a>
 	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
 </div>
 
@@ -1017,8 +1019,8 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
                 return 0x666666;
             }
 
-        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xCC3366) : (atom.isBackbone() ? 0x000066 : 0x0066FF);
-        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0066FF) : (atom.isBackbone() ? 0x660000 : 0xFF0000);
+        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF2C00) : (atom.isBackbone() ? 0x000066 : 0x0066FF);
+        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0062FF) : (atom.isBackbone() ? 0x660000 : 0xFF0000);
         	case 'P': return 0xff77c6;
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xffaa00;
@@ -1100,8 +1102,8 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
                 return 0x777777;
             }
 
-        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xCC3366) : (atom.isBackbone() ? 0x000066 : 0x0087FF);
-        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0066FF) : (atom.isBackbone() ? 0x660000 : 0xFF2222);
+        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF2C00) : (atom.isBackbone() ? 0x000066 : 0x0087FF);
+        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0062FF) : (atom.isBackbone() ? 0x660000 : 0xFF2222);
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
         	case 'Se': return 0xffb022;
@@ -1138,8 +1140,8 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
         	case 'H': return 0xe1faff;
 			case 'He': return 0xfcaa93;
         	case 'C': return 0xa7ada4;
-        	case 'N': return born ? 0xCC3366 : 0x5555FF;
-        	case 'O': return born ? 0x0066FF : 0xFF2222;
+        	case 'N': return born ? 0xFF2C00 : 0x5555FF;
+        	case 'O': return born ? 0x0062FF : 0xFF2222;
 			case 'Ne': return 0xff4e00;
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
@@ -1698,9 +1700,13 @@ function loadFile(fileData, fileName = "")
                 	var lines = fileData.split("\n");
                     var lres = 0;
                     var tmpstr = "";
+					var ligtmp = "";
                     for (i=0; i<lines.length; i++)
                     {
                         var ln = lines[i];
+
+                        if (ln.substr(0, 6) == "HETATM" || ln.substr(17,3) == "LIG")
+                            ligtmp += ln + "\n";
 
 						if (ln.substr(0, 6) == 'REMARK')
 						{
@@ -1770,6 +1776,35 @@ function loadFile(fileData, fileName = "")
 	            		});
 	            		mdlresno.push(resno);
     				}
+
+					if (ligtmp.length)
+					{
+						var stringBlob6b = new Blob( [ ligtmp ], { type: 'text/plain'} );
+						stage.loadFile( stringBlob6b, { ext: 'pdb', name: "ligand" } ).then( function( comp6b )
+						{
+							var rparam =
+							{
+								opacity: opc_ligand,
+								multipleBond: true,
+								colorScheme: PODefSchemeLigand,
+								metalness: mtl_bs,
+							};
+
+							model.push(comp6b);
+							mrep.push("ball+stick");
+							mrparams.push(rparam);
+							is_ligand.push(1);
+							curr_ligand = comp6b;
+
+							var lpn = comp6b.name.split("|");
+							mpos.push(parseInt(lpn[0]));
+							mnod.push(parseInt(lpn[1]));
+							$('#clip').trigger("input");
+
+							curr_ligand.addRepresentation( "ball+stick", rparam );
+						} );
+						ligtmp = "";
+					}
                     
                 }
                 
@@ -2260,7 +2295,7 @@ function loadFile(fileData, fileName = "")
                     }
                     else if (writing)
                     {
-                        if (ln.substr(17,3) == "LIG")
+                        if (ln.substr(0,6) == "HETATM" || ln.substr(17,3) == "LIG")
                             ligtmp += ln + "\n";
                         else
                             protmp += ln + "\n";

@@ -574,20 +574,44 @@ else
     print_r($arr);
     echo "</pre>";*/
 
+    $xvals = [];
+
     $arrnotes = [];
+    $allnotes = [];
+    $notefreq = [];
     foreach ($arr as $oid => $vals)
     {
+        $xvals[$oid] = @$vals[1] - @$vals[0];
         $notes = [];
         if (@$odors[$oid]['aroma'])
         {
             foreach ($odors[$oid]['aroma'] as $ref => $a)
             {
                 if (false!==strpos($ref, "primaryodors")) continue;
-                foreach ($a as $n) $notes[$n] = $n;
+                foreach ($a as $n)
+                {
+                    $notes[$n] = $n;
+                    $allnotes[$n] = $n;
+
+                    if (isset($notefreq[$n])) $notefreq[$n]++;
+                    else $notefreq[$n] = 1;
+                }
             }
         }
         $arrnotes[$oid] = $notes;
     }
+
+    $notecorrs = [];
+    foreach ($allnotes as $note)
+    {
+        if ($notefreq[$note] < 5) continue;
+        $yvals = [];
+        foreach ($arrnotes as $oid => $an) $yvals[$oid] = in_array($note, $an) ? 1 : 0;
+        $corr = correlationCoefficient($xvals, $yvals);
+        $notecorrs[$note] = $corr;
+    }
+
+    // print_r($notecorrs);
 
     ?><table>
         <tr>
@@ -600,7 +624,14 @@ else
     <?php
     foreach ($arr as $oid => $vals)
     {
-        if (!max($vals)) continue;
+        if (max($vals) <= 0) continue;
+
+        foreach ($vals as $i => $v)
+            if ($v < 0)
+            {
+                $vals[1-$i] += $v;
+                $vals[$i] -= $v;
+            }
         ?>
         <tr>
             <td style="text-align: left;">
@@ -616,7 +647,29 @@ else
             for ($i=0; $i<$vals[1]; $i += 0.5) echo "&block;";
             ?></td>
             <?php
-            $notes = implode(", ", $arrnotes[$oid]);
+            $notes = $arrnotes[$oid];
+
+            foreach ($notes as $k => $n)
+            {
+                if (@$notecorrs[$n] > 0)
+                {
+                    if ($notecorrs[$n] >= 0.75) $notes[$k] = "<b style=\"color: #f00;\">$n</b>";
+                    else if ($notecorrs[$n] >= 0.5) $notes[$k] = "<b style=\"color: #f60;\">$n</b>";
+                    else if ($notecorrs[$n] >= 0.25) $notes[$k] = "<b style=\"color: #f90;\">$n</b>";
+                    else if ($notecorrs[$n] >= 0.1) $notes[$k] = "<span style=\"color: #f93;\">$n</span>";
+                    else if ($notecorrs[$n] >= 0.05) $notes[$k] = "<span style=\"color: #b97;\">$n</span>";
+                }
+                else if (@$notecorrs[$n] < 0)
+                {
+                    if ($notecorrs[$n] <= -0.75) $notes[$k] = "<b style=\"color: #00f;\">$n</b>";
+                    else if ($notecorrs[$n] <= -0.5) $notes[$k] = "<b style=\"color: #06f;\">$n</b>";
+                    else if ($notecorrs[$n] <= -0.25) $notes[$k] = "<b style=\"color: #09f;\">$n</b>";
+                    else if ($notecorrs[$n] <= -0.1) $notes[$k] = "<span style=\"color: #39f;\">$n</span>";
+                    else if ($notecorrs[$n] <= -0.05) $notes[$k] = "<span style=\"color: #79b;\">$n</span>";
+                }
+            }
+
+            $notes = implode(", ", $notes);
             echo "<td>$notes</td>\n";
             ?>
         </tr>

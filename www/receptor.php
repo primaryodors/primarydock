@@ -580,6 +580,7 @@ else
             <th style="text-align: right;"><?php echo $rcpid; ?></th>
             <th style="text-align: center;">|</th>
             <th style="text-align: left;"><?php echo $cmp; ?></th>
+            <th style="text-align: left;">Notes</th>
         </tr>
     <?php
     foreach ($arr as $oid => $vals)
@@ -599,6 +600,19 @@ else
             <td style="text-align: left; color: #983;"><?php
             for ($i=0; $i<$vals[1]; $i += 0.5) echo "&block;";
             ?></td>
+            <?php
+            $notes = [];
+            if (@$odors[$oid]['aroma'])
+            {
+                foreach ($odors[$oid]['aroma'] as $ref => $a)
+                {
+                    if (false!==strpos($ref, "primaryodors")) continue;
+                    foreach ($a as $n) $notes[$n] = $n;
+                }
+            }
+            $notes = implode(", ", $notes);
+            echo "<td>$notes</td>\n";
+            ?>
         </tr>
         <?php
     }

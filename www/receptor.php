@@ -151,6 +151,7 @@ else
 	<button class="tablinks <?php if (!count($pairs)) echo "default"; ?>" id="tabInfo" onclick="openTab(this, 'Info');">Info</button>
     <?php if (count($pairs)) { ?>
     <button class="tablinks default" id="tabLigands" onclick="openTab(this, 'Ligands');">Ligands</button>
+    <button class="tablinks <?php if (@$_REQUEST['cmp']) echo "default"; ?>" id="tabComparison" onclick="openTab(this, 'Comparison');">Comparison</button>
     <?php } ?>
     <button class="tablinks" id="tabRefs" onclick="openTab(this, 'Refs');">References</button>
     <button class="tablinks" id="tabStructure" onclick="load_viewer(this);">3D Structure</button>
@@ -513,6 +514,99 @@ foreach ($pairs as $oid => $pair)
 
 ?>
 </table>
+</div>
+</div>
+</div>
+
+<div id="Comparison" class="tabcontent">
+<div class="box">
+<div class="row content scrollh">
+
+<?php
+if (!@$_REQUEST['cmp'])
+{
+    ?><form action="" method="GET"><?php
+    foreach ($_REQUEST as $k => $v)
+    {
+        if ($k != "cmp") echo "<input type=\"hidden\" name=\"$k\" value=\"$v\">\n";
+    }
+    ?><select name="cmp">
+        <?php
+            foreach ($prots as $protid => $p)
+            {
+                if ($protid == $rcpid) continue;
+                echo "<option value=\"$protid\">$protid</option>\n";
+            }
+        ?>
+    </select>
+    <input type="submit" value="Compare">
+    </form>
+    <?php
+}
+else
+{
+    $cmp = $_REQUEST['cmp'];
+    $tode  = all_empirical_pairs_for_receptor($rcpid, true);
+    $touto = all_empirical_pairs_for_receptor($cmp,   true);
+    /*echo "<pre>";
+    print_r($touto);
+    echo "</pre>";*/
+
+    $max = max(max($tode), max($touto));
+
+    $arr = [];
+    foreach ($tode as $k => $v) $arr[$k] = [$v, 0];
+    foreach ($touto as $k => $v) $arr[$k][1] = $v;
+
+    function cmpcmp($a, $b)
+    {
+        $aa = @$a[1] - @$a[0];
+        $bb = @$b[1] - @$b[0];
+
+        if ($aa > $bb) return 1;
+        else if ($bb > $aa) return -1;
+        else return 0;
+    }
+
+    uasort($arr, "cmpcmp");
+
+    /*echo "<pre>";
+    print_r($arr);
+    echo "</pre>";*/
+
+    ?><table>
+        <tr>
+            <th style="text-align: left;">Odorant</th>
+            <th style="text-align: right;"><?php echo $rcpid; ?></th>
+            <th style="text-align: center;">|</th>
+            <th style="text-align: left;"><?php echo $cmp; ?></th>
+        </tr>
+    <?php
+    foreach ($arr as $oid => $vals)
+    {
+        if (!max($vals)) continue;
+        ?>
+        <tr>
+            <td style="text-align: left;">
+                <a href="odorant.php?o=<?php echo $oid; ?>">
+                    <?php echo @$odors[$oid]['full_name']; ?>
+                </a>
+            </td>
+            <td style="text-align: right; color: #39f;"><?php
+            for ($i=0; $i<$vals[0]; $i += 0.5) echo "&block;";
+            ?></td>
+            <td style="text-align: center;">|</td>
+            <td style="text-align: left; color: #983;"><?php
+            for ($i=0; $i<$vals[1]; $i += 0.5) echo "&block;";
+            ?></td>
+        </tr>
+        <?php
+    }
+
+    ?></table><?php
+}
+?>
+
 </div>
 </div>
 </div>

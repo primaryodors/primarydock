@@ -574,6 +574,21 @@ else
     print_r($arr);
     echo "</pre>";*/
 
+    $arrnotes = [];
+    foreach ($arr as $oid => $vals)
+    {
+        $notes = [];
+        if (@$odors[$oid]['aroma'])
+        {
+            foreach ($odors[$oid]['aroma'] as $ref => $a)
+            {
+                if (false!==strpos($ref, "primaryodors")) continue;
+                foreach ($a as $n) $notes[$n] = $n;
+            }
+        }
+        $arrnotes[$oid] = $notes;
+    }
+
     ?><table>
         <tr>
             <th style="text-align: left;">Odorant</th>
@@ -601,16 +616,7 @@ else
             for ($i=0; $i<$vals[1]; $i += 0.5) echo "&block;";
             ?></td>
             <?php
-            $notes = [];
-            if (@$odors[$oid]['aroma'])
-            {
-                foreach ($odors[$oid]['aroma'] as $ref => $a)
-                {
-                    if (false!==strpos($ref, "primaryodors")) continue;
-                    foreach ($a as $n) $notes[$n] = $n;
-                }
-            }
-            $notes = implode(", ", $notes);
+            $notes = implode(", ", $arrnotes[$oid]);
             echo "<td>$notes</td>\n";
             ?>
         </tr>

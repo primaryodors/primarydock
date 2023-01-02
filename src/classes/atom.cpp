@@ -1875,6 +1875,8 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     if (atomno<  10) fprintf(pf," ");
     fprintf(pf, "%d ", atomno);
 
+    pdbidx = atomno;
+
     if (strlen(name) < 4)
         fprintf(pf, " ");
 

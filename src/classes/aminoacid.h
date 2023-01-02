@@ -130,14 +130,12 @@ public:
     Point* predict_next_NHCA();
     void glom(Point* predicted, bool CO = false);		// Glom the AA by moving its NHCA or COCA to the result of a predict().
 
-
     // Bond functions.
     bool disulfide_bond(const AminoAcid* bond_to);
     Bond** get_rotatable_bonds();
     Atom* capable_of_inter(intera_type inter);
     LocRotation enforce_peptide_bond(bool cis = false);				// Peptide bonds should almost always be in the trans (E) configuration.
     void hydrogenate(bool steric_only = false);
-
 
     // Intermol functions.
     float get_intermol_binding(AminoAcid* neighbor, bool backbone_atoms_only = false);

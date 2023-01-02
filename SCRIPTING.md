@@ -171,6 +171,21 @@ DELETE 1 57     # Remove all residues before number 58.
 Deletes a range of residues from the model of the protein in memory.
 
 
+# DISULF
+Example:
+```
+DISULF
+DISULF 97 179
+```
+
+Creates disulfide bonds between residues that have sulfhydryl side chains, such as cysteine or homocysteine. If called with two parameters,
+`DISULF` will attempt to join the two residues and generate a warning if the attempt fails. If called without parameters, the command will try
+all combinations of sulfhydryl side chains, and output only the ones it was able to successfully join.
+
+Note that for `DISULF` to work, the two sulfur atoms must already be moved into position, and the side chains must be hydrogenated. No attempt
+will be made to flex bonds to bring the sulfurs into proximity, and if the sulfurs are not already bound to hydrogens, the command will fail.
+
+
 # DUMP
 Example:
 ```

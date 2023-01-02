@@ -151,9 +151,11 @@ else
 	<button class="tablinks <?php if (!count($pairs)) echo "default"; ?>" id="tabInfo" onclick="openTab(this, 'Info');">Info</button>
     <?php if (count($pairs)) { ?>
     <button class="tablinks default" id="tabLigands" onclick="openTab(this, 'Ligands');">Ligands</button>
-    <button class="tablinks <?php if (@$_REQUEST['cmp']) echo "default"; ?>" id="tabComparison" onclick="openTab(this, 'Comparison');">Comparison</button>
     <?php } ?>
     <button class="tablinks" id="tabRefs" onclick="openTab(this, 'Refs');">References</button>
+    <?php if (count($pairs)) { ?>
+    <button class="tablinks <?php if (@$_REQUEST['cmp']) echo "default"; ?>" id="tabComparison" onclick="openTab(this, 'Comparison');">Comparison</button>
+    <?php } ?>
     <button class="tablinks" id="tabStructure" onclick="load_viewer(this);">3D Structure</button>
 </div>
 

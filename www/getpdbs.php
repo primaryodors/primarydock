@@ -115,5 +115,5 @@ heredoc;
         sleep(1);
         usleep(1048576 + rand(0, 524288));
     }
-    exit;
+    // exit;
 }

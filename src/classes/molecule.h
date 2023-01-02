@@ -88,6 +88,7 @@ public:
     Point get_bounding_box() const;				// Return the +x+y+z vertex of a bounding box, including vdW radii, if center={0,0,0}.
     float get_charge();
     int is_residue();
+    bool is_thiol();
 
     // Spatial functions.
     Point get_barycenter(bool bond_weighted = false) const;

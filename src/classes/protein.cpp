@@ -2251,9 +2251,58 @@ Molecule** Protein::all_residues_as_molecules_except(Molecule** mm)
     return retval;
 }
 
+bool Protein::disulfide_bond(int resno1, int resno2)
+{
+    AminoAcid* res1, *res2;
 
+    res1 = get_residue(resno1);
+    res2 = get_residue(resno2);
 
+    if (!res1 || !res2) return false;
 
+    int i, j, k, l;
+    Atom *S1 = nullptr, *S2 = nullptr, *H1 = nullptr, *H2 = nullptr;
+    bool result = false;
+
+    j = res1->get_atom_count();
+    l = res2->get_atom_count();
+    for (i=0; i<j; i++)
+    {
+        S1 = res1->get_atom(i);
+        if (!S1) continue;
+        if (S1->get_Z() == 16)
+        {
+            H1 = S1->is_bonded_to("H");
+            if (H1)
+            {
+                for (k=0; k<l; k++)
+                {
+                    S2 = res2->get_atom(k);
+                    if (!S2) continue;
+                    if (S2->get_Z() == 16)
+                    {
+                        H2 = S2->is_bonded_to("H");
+                        if (H2)
+                        {
+                            float r = S1->get_location().get_3d_distance(S2->get_location());
+                            if (fabs(r - 2.07) < 0.25)
+                            {
+                                res1->delete_atom(H1);
+                                res2->delete_atom(H2);
+                                if (S1->bond_to(S2, 1)) result = true;
+                                goto _next_S1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        _next_S1:
+        ;
+    }
+
+    return result;
+}
 
 
 

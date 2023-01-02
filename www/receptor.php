@@ -550,9 +550,6 @@ else
     $cmp = $_REQUEST['cmp'];
     $tode  = all_empirical_pairs_for_receptor($rcpid, true);
     $touto = all_empirical_pairs_for_receptor($cmp,   true);
-    /*echo "<pre>";
-    print_r($touto);
-    echo "</pre>";*/
 
     $max = max(max($tode), max($touto));
 
@@ -571,10 +568,6 @@ else
     }
 
     uasort($arr, "cmpcmp");
-
-    /*echo "<pre>";
-    print_r($arr);
-    echo "</pre>";*/
 
     $xvals = [];
 
@@ -612,8 +605,6 @@ else
         $corr = correlationCoefficient($xvals, $yvals);
         $notecorrs[$note] = $corr;
     }
-
-    // print_r($notecorrs);
 
     ?><table>
         <tr>

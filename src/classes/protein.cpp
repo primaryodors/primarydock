@@ -214,6 +214,31 @@ void Protein::save_pdb(FILE* os)
         }
     }
 
+    // Example CONECT syntax:
+    // CONECT  487 1056
+    if (connections.size())
+    {
+        for (i=0; i<connections.size(); i++)
+        {
+            if (!connections[i]->atom || !connections[i]->btom) continue;
+
+            fprintf(os, "CONECT ");
+            int a, b;
+            a = connections[i]->atom->pdbidx;
+            b = connections[i]->btom->pdbidx;
+
+            if (a < 1000) fprintf(os, " ");
+            if (a <  100) fprintf(os, " ");
+            if (a <   10) fprintf(os, " ");
+            fprintf(os, "%d ", a);
+
+            if (b < 1000) fprintf(os, " ");
+            if (b <  100) fprintf(os, " ");
+            if (b <   10) fprintf(os, " ");
+            fprintf(os, "%d \n", b);
+        }
+    }
+
     fprintf(os, "\nTER\n");
 }
 
@@ -2289,7 +2314,11 @@ bool Protein::disulfide_bond(int resno1, int resno2)
                             {
                                 res1->delete_atom(H1);
                                 res2->delete_atom(H2);
-                                if (S1->bond_to(S2, 1)) result = true;
+                                if (S1->bond_to(S2, 1))
+                                {
+                                    connections.push_back(S1->get_bond_between(S2));
+                                    result = true;
+                                }
                                 goto _next_S1;
                             }
                         }

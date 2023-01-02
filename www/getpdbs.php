@@ -94,8 +94,8 @@ REMARK   1
 REMARK 600
 $rgns
 UPRIGHT
-DISULF
 HYDRO
+DISULF
 REMARK 800
 $rems
 REMARK 800
@@ -115,5 +115,5 @@ heredoc;
         sleep(1);
         usleep(1048576 + rand(0, 524288));
     }
-    // exit;
+    exit;
 }

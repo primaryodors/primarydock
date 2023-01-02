@@ -130,6 +130,7 @@ protected:
     MetalCoord** m_mcoord = nullptr;
     std::vector<int> Ballesteros_Weinstein;
     std::vector<AABridge> aabridges;
+    std::vector<Bond*> connections;
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);

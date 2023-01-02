@@ -1127,6 +1127,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     Point aloc(atof(fields[5+offset].c_str()), atof(fields[6+offset].c_str()),atof(fields[7+offset].c_str()));
 
                     Atom* a = add_atom(esym, fields[2].c_str(), &aloc, 0, 0);
+                    a->pdbidx = atoi(fields[1].c_str());
                     added++;
 
                     if (   !strcmp(a->name, "N")

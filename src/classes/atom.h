@@ -261,7 +261,8 @@ public:
     static void dump_array(Atom** aarr);
 
     // Public member vars.
-    float pK = nanf("n/a");         // To be managed and used by the AminoAcid class.
+    float pK = nanf("n/a");         // To be managed and used by external classes.
+    int pdbidx=0;                   // "
     int residue=0;					// "
     char aaletter;					// "
     char aa3let[4];					// "

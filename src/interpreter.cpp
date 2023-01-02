@@ -780,6 +780,36 @@ int main(int argc, char** argv)
 				set_variable(buffer, sv);
             } // DELETE
 
+            else if (!strcmp(fields[0], "DISULF"))
+            {
+                if (fields[1])
+                {
+                    if (!fields[2]) raise_error("DISULF takes either zero or two parameters.");
+                    if ( fields[3]) raise_error("DISULF takes either zero or two parameters.");
+                    j = interpret_single_int(fields[1]);
+                    k = interpret_single_int(fields[2]);
+                    bool result = p.disulfide_bond(j, k);
+                    if (!result) cout << "WARNING: Failed to form disulfide bond between " << j << " and " << k << "." << endl;
+                }
+                else
+                {
+                    n = p.get_end_resno();
+                    for (j=1; j<n; j++)
+                    {
+                        AminoAcid* resj = p.get_residue(j);
+                        if (!resj->is_thiol()) continue;
+                        for (k=j+1; k<=n; k++)
+                        {
+                            AminoAcid* resk = p.get_residue(k);
+                            if (resk->is_thiol())
+                            {
+                                if (p.disulfide_bond(j, k)) cout << "Disulfide bonded " << *resj << "-" << *resk << "." << endl;
+                            }
+                        }
+                    }
+                }
+            } // DISULF
+
             else if (!strcmp(fields[0], "DUMP"))
             {
                 for (j=0; j<vars; j++)

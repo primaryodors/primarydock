@@ -4332,6 +4332,22 @@ float Molecule::correct_structure(int iters)
     return error;
 }
 
+bool Molecule::is_thiol()
+{
+    if (!atoms) return false;
+    int i, j;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->get_Z() == 16)
+        {
+            Atom* H = atoms[i]->is_bonded_to("H");
+            if (H) return true;
+        }
+    }
+
+    return false;
+}
 
 
 

@@ -153,6 +153,9 @@ else
     <button class="tablinks default" id="tabLigands" onclick="openTab(this, 'Ligands');">Ligands</button>
     <?php } ?>
     <button class="tablinks" id="tabRefs" onclick="openTab(this, 'Refs');">References</button>
+    <?php if (count($pairs)) { ?>
+    <button class="tablinks <?php if (@$_REQUEST['cmp']) echo "default"; ?>" id="tabComparison" onclick="openTab(this, 'Comparison');">Comparison</button>
+    <?php } ?>
     <button class="tablinks" id="tabStructure" onclick="load_viewer(this);">3D Structure</button>
 </div>
 
@@ -513,6 +516,163 @@ foreach ($pairs as $oid => $pair)
 
 ?>
 </table>
+</div>
+</div>
+</div>
+
+<div id="Comparison" class="tabcontent">
+<div class="box">
+<div class="row content scrollh">
+
+<?php
+if (!@$_REQUEST['cmp'])
+{
+    ?><form action="" method="GET"><?php
+    foreach ($_REQUEST as $k => $v)
+    {
+        if ($k != "cmp") echo "<input type=\"hidden\" name=\"$k\" value=\"$v\">\n";
+    }
+    ?><select name="cmp">
+        <?php
+            foreach ($prots as $protid => $p)
+            {
+                if ($protid == $rcpid) continue;
+                echo "<option value=\"$protid\">$protid</option>\n";
+            }
+        ?>
+    </select>
+    <input type="submit" value="Compare">
+    </form>
+    <?php
+}
+else
+{
+    $cmp = $_REQUEST['cmp'];
+    $tode  = all_empirical_pairs_for_receptor($rcpid, true);
+    $touto = all_empirical_pairs_for_receptor($cmp,   true);
+
+    $max = max(max($tode), max($touto));
+
+    $arr = [];
+    foreach ($tode as $k => $v) $arr[$k] = [$v, 0];
+    foreach ($touto as $k => $v) $arr[$k][1] = $v;
+
+    function cmpcmp($a, $b)
+    {
+        $aa = @$a[1] - @$a[0];
+        $bb = @$b[1] - @$b[0];
+
+        if ($aa > $bb) return 1;
+        else if ($bb > $aa) return -1;
+        else return 0;
+    }
+
+    uasort($arr, "cmpcmp");
+
+    $xvals = [];
+
+    $arrnotes = [];
+    $allnotes = [];
+    $notefreq = [];
+    foreach ($arr as $oid => $vals)
+    {
+        $xvals[$oid] = @$vals[1] - @$vals[0];
+        $notes = [];
+        if (@$odors[$oid]['aroma'])
+        {
+            foreach ($odors[$oid]['aroma'] as $ref => $a)
+            {
+                if (false!==strpos($ref, "primaryodors")) continue;
+                foreach ($a as $n)
+                {
+                    $notes[$n] = $n;
+                    $allnotes[$n] = $n;
+
+                    if (isset($notefreq[$n])) $notefreq[$n]++;
+                    else $notefreq[$n] = 1;
+                }
+            }
+        }
+        $arrnotes[$oid] = $notes;
+    }
+
+    $notecorrs = [];
+    foreach ($allnotes as $note)
+    {
+        if ($notefreq[$note] < 5) continue;
+        $yvals = [];
+        foreach ($arrnotes as $oid => $an) $yvals[$oid] = in_array($note, $an) ? 1 : 0;
+        $corr = correlationCoefficient($xvals, $yvals);
+        $notecorrs[$note] = $corr;
+    }
+
+    ?><table>
+        <tr>
+            <th style="text-align: left;">Odorant</th>
+            <th style="text-align: right;"><?php echo $rcpid; ?></th>
+            <th style="text-align: center;">|</th>
+            <th style="text-align: left;"><?php echo $cmp; ?></th>
+            <th style="text-align: left;">Notes</th>
+        </tr>
+    <?php
+    foreach ($arr as $oid => $vals)
+    {
+        if (max($vals) <= 0) continue;
+
+        foreach ($vals as $i => $v)
+            if ($v < 0)
+            {
+                $vals[1-$i] += $v;
+                $vals[$i] -= $v;
+            }
+        ?>
+        <tr>
+            <td style="text-align: left;">
+                <a href="odorant.php?o=<?php echo $oid; ?>">
+                    <?php echo @$odors[$oid]['full_name']; ?>
+                </a>
+            </td>
+            <td style="text-align: right; color: #39f;"><?php
+            for ($i=0; $i<$vals[0]; $i += 0.5) echo "&block;";
+            ?></td>
+            <td style="text-align: center;">|</td>
+            <td style="text-align: left; color: #983;"><?php
+            for ($i=0; $i<$vals[1]; $i += 0.5) echo "&block;";
+            ?></td>
+            <?php
+            $notes = $arrnotes[$oid];
+
+            foreach ($notes as $k => $n)
+            {
+                if (@$notecorrs[$n] > 0)
+                {
+                    if ($notecorrs[$n] >= 0.75) $notes[$k] = "<b style=\"color: #f00;\">$n</b>";
+                    else if ($notecorrs[$n] >= 0.5) $notes[$k] = "<b style=\"color: #f60;\">$n</b>";
+                    else if ($notecorrs[$n] >= 0.25) $notes[$k] = "<b style=\"color: #f90;\">$n</b>";
+                    else if ($notecorrs[$n] >= 0.1) $notes[$k] = "<span style=\"color: #f93;\">$n</span>";
+                    else if ($notecorrs[$n] >= 0.05) $notes[$k] = "<span style=\"color: #b97;\">$n</span>";
+                }
+                else if (@$notecorrs[$n] < 0)
+                {
+                    if ($notecorrs[$n] <= -0.75) $notes[$k] = "<b style=\"color: #00f;\">$n</b>";
+                    else if ($notecorrs[$n] <= -0.5) $notes[$k] = "<b style=\"color: #06f;\">$n</b>";
+                    else if ($notecorrs[$n] <= -0.25) $notes[$k] = "<b style=\"color: #09f;\">$n</b>";
+                    else if ($notecorrs[$n] <= -0.1) $notes[$k] = "<span style=\"color: #39f;\">$n</span>";
+                    else if ($notecorrs[$n] <= -0.05) $notes[$k] = "<span style=\"color: #79b;\">$n</span>";
+                }
+            }
+
+            $notes = implode(", ", $notes);
+            echo "<td>$notes</td>\n";
+            ?>
+        </tr>
+        <?php
+    }
+
+    ?></table><?php
+}
+?>
+
 </div>
 </div>
 </div>

@@ -332,10 +332,15 @@ int Protein::load_pdb(FILE* is, int rno)
     if (res_reach) delete[] res_reach;
     if (metals) delete[] metals;
 
+    connections.clear();
+    Atom* pdba[65536];
+
     AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file.
     AminoAcid* prevaa = nullptr;
 
-    int i, rescount=0;
+    int i, j, rescount=0;
+
+    for (i=0; i<65536; i++) pdba[i] = nullptr;
 
     while (!feof(is))
     {
@@ -345,15 +350,15 @@ int Protein::load_pdb(FILE* is, int rno)
             fgets(buffer, 1003, is);
 
             if (buffer[0] == 'A' &&
-                    buffer[1] == 'N' &&
-                    buffer[2] == 'I' &&
-                    buffer[3] == 'S'
+                buffer[1] == 'N' &&
+                buffer[2] == 'I' &&
+                buffer[3] == 'S'
                )
                 continue;
-            if (buffer[0] == 'A' &&
-                    buffer[1] == 'T' &&
-                    buffer[2] == 'O' &&
-                    buffer[3] == 'M'
+            else if (buffer[0] == 'A' &&
+                     buffer[1] == 'T' &&
+                     buffer[2] == 'O' &&
+                     buffer[3] == 'M'
                )
             {
                 buffer[16] = ' ';
@@ -370,6 +375,14 @@ int Protein::load_pdb(FILE* is, int rno)
                     if (aa_defs[i].name[0] && !strcasecmp(aa_defs[i]._3let, tmp3let))
                     {
                         AminoAcid* aa = new AminoAcid(is, prevaa, rno);
+
+                        int n = aa->get_atom_count();
+                        for (j=0; j<n; j++)
+                        {
+                            Atom* la = aa->get_atom(j);
+                            if (la && la->pdbidx) pdba[la->pdbidx] = la;
+                        }
+
                         restmp[rescount++] = aa;
                         restmp[rescount] = NULL;
                         prevaa = aa;
@@ -405,28 +418,44 @@ int Protein::load_pdb(FILE* is, int rno)
                     }
                 }
             }
-            else
+            else if (buffer[0] == 'R' &&
+                     buffer[1] == 'E' &&
+                     buffer[2] == 'M' &&
+                     buffer[3] == 'A' &&
+                     buffer[4] == 'R' &&
+                     buffer[5] == 'K'
+                )
             {
-                if (buffer[0] == 'R' &&
-                        buffer[1] == 'E' &&
-                        buffer[2] == 'M' &&
-                        buffer[3] == 'A' &&
-                        buffer[4] == 'R' &&
-                        buffer[5] == 'K'
-                   )
-                {
-                    remarks.push_back(buffer);
-                    // cout << "Found remark " << buffer;
+                remarks.push_back(buffer);
+                // cout << "Found remark " << buffer;
 
-                    if (buffer[7] == '6' && buffer[8] < '!')
-                    {
-                        char** fields = chop_spaced_fields(buffer);
-                        if (fields[2] && !fields[3])
-                            name = fields[2];
-                        delete[] fields;
-                    }
+                if (buffer[7] == '6' && buffer[8] < '!')
+                {
+                    char** fields = chop_spaced_fields(buffer);
+                    if (fields[2] && !fields[3])
+                        name = fields[2];
+                    delete[] fields;
                 }
             }
+            else if (buffer[0] == 'C'
+                  && buffer[1] == 'O'
+                  && buffer[2] == 'N'
+                  && buffer[3] == 'E'
+                  && buffer[4] == 'C'
+                  && buffer[5] == 'T'
+                    )
+            {
+                buffer[6] = buffer[11] = buffer[16] = 0;
+                int a1 = atoi(&buffer[7]);
+                int a2 = atoi(&buffer[12]);
+                if (pdba[a1] && pdba[a2])
+                {
+                    pdba[a1]->bond_to(pdba[a2], 1);
+                    Bond* b = pdba[a1]->get_bond_between(pdba[a2]);
+                    if (b) connections.push_back(b);
+                }
+            }
+            
 
         _found_AA:
             ;

@@ -115,6 +115,11 @@ bool use_prealign = false;
 std::string prealign_residues = "";
 Bond retain_bindings[4];
 
+Atom** ligbb = nullptr;
+Atom** ligbbh = nullptr;
+intera_type lig_inter_typ[5];
+Molecule* alignment_aa[5];
+
 float* initial_binding;
 float* initial_vdWrepl;
 float init_total_binding_by_type[_INTER_TYPES_LIMIT];
@@ -206,6 +211,27 @@ void iteration_callback(int iter)
 
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     if (iter == (iters-1)) return;
+
+    int l;
+
+    #if _dbg_bb_pullaway
+    if (ligbb)
+    {
+        for (l=0; l<3; l++)
+        {
+            if (ligbb[l] && alignment_aa[l])
+            {
+                Atom** mbb = alignment_aa[l]->get_most_bindable(1, ligbb[l]);
+                Atom* alca = mbb[0];
+                delete mbb;             // Delete the pointer array, but not the pointers.
+
+                float r = alca->get_location().get_3d_distance(ligbb[l]->get_location());
+                cout << alignment_aa[l]->get_name() << ":" << alca->name << " " << r << "A from " << ligbb[l]->name << "... ";
+            }
+        }
+        cout << endl;
+    }
+    #endif
 
     Point bary = ligand->get_barycenter();
 
@@ -1350,6 +1376,11 @@ int main(int argc, char** argv)
     pocketcen = loneliest;
     #endif
 
+    for (i=0; i<3; i++)
+    {
+        alignment_aa[i] = nullptr;
+    }
+
     if (waters)
     {
         float szscale = 0.5;
@@ -1439,9 +1470,6 @@ int main(int argc, char** argv)
 
     // Identify the ligand atom with the greatest potential binding.
     int k, n;
-    Atom** ligbb = m.get_most_bindable(3);
-    Atom** ligbbh = new Atom*[5];
-    intera_type lig_inter_typ[5];
 
     if (use_prealign) use_bestbind_algorithm = false;
 
@@ -1480,9 +1508,12 @@ int main(int argc, char** argv)
 
     if (use_bestbind_algorithm)
     {
+        ligbb = m.get_most_bindable(3);
+        ligbbh = new Atom*[5];
+        
         for (i=0; i<5; i++)
         {
-            ligbbh[i] = NULL;
+            ligbbh[i] = nullptr;
             lig_inter_typ[i] = vdW;
         }
 
@@ -2127,7 +2158,6 @@ _try_again:
 
             if (!nodeno)
             {
-                Molecule* alignment_aa[5];
                 float alignment_distance[5];
                 for (l=0; l<3; l++)
                 {
@@ -2147,7 +2177,9 @@ _try_again:
                 // Best-Binding Algorithm
                 // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
-                if (use_bestbind_algorithm) for (l=0; l<3; l++)
+                if (use_bestbind_algorithm)
+                {
+                    for (l=0; l<3; l++)
                     {
                         retain_bindings[l].cardinality = 0;
                         if (!ligbb[l]) continue;
@@ -2274,6 +2306,8 @@ _try_again:
                         _found_alignaa:
                         ;
                     }
+                }
+                
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Selected an alignment AA." << endl;
                 #endif
@@ -2306,8 +2340,9 @@ _try_again:
                                     alca = alignment_aa[l]->get_nearest_atom(ligbb[l]->get_location());
                                 else
                                 {
-                                    // alca = alignment_aa->get_atom("CA");
-                                    alca = alignment_aa[l]->get_most_bindable(1)[0];
+                                    Atom** mbb = alignment_aa[l]->get_most_bindable(1);
+                                    alca = mbb[0];
+                                    delete mbb;             // Delete the pointer array, but not the pointers.
                                 }
                             }
                             #if _DBG_STEPBYSTEP
@@ -2365,7 +2400,6 @@ _try_again:
                                 case 1:
                                     // Pivot about bb0.
                                     origin = ligbb[0]->get_location();
-                                    // lv = (SCoord)origin.subtract(ligand->get_barycenter());
                                     lv = compute_normal(pt, al, origin);
                                     lv.origin = origin;
                                     rot.a = -find_angle_along_vector(pt, al, origin, (SCoord)lv);

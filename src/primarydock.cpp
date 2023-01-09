@@ -2365,10 +2365,11 @@ _try_again:
                                 case 1:
                                     // Pivot about bb0.
                                     origin = ligbb[0]->get_location();
-                                    lv = (SCoord)origin.subtract(ligand->get_barycenter());
+                                    // lv = (SCoord)origin.subtract(ligand->get_barycenter());
+                                    lv = compute_normal(pt, al, origin);
                                     lv.origin = origin;
                                     rot.a = -find_angle_along_vector(pt, al, origin, (SCoord)lv);
-                                    m.rotate(lv, rot.a);
+                                    m.rotate(lv, -rot.a);
                                     // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
                                     break;
 

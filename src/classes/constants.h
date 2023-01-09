@@ -259,7 +259,7 @@
 #define _DBG_HISFLIP 0
 #define _DBG_MOLBB 0
 #define _dbg_bb_rots 1
-#define _dbg_bb_pullaway 0
+#define _dbg_bb_pullaway 1
 
 #endif
 

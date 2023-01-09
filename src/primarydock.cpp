@@ -120,6 +120,9 @@ Atom** ligbbh = nullptr;
 intera_type lig_inter_typ[5];
 Molecule* alignment_aa[5];
 
+Pose pullaway_undo;
+float last_ttl_bb_dist = 0;
+
 float* initial_binding;
 float* initial_vdWrepl;
 float init_total_binding_by_type[_INTER_TYPES_LIMIT];
@@ -214,9 +217,10 @@ void iteration_callback(int iter)
 
     int l;
 
-    #if _dbg_bb_pullaway
+    
     if (ligbb)
     {
+        float ttl_bb_dist = 0;
         for (l=0; l<3; l++)
         {
             if (ligbb[l] && alignment_aa[l])
@@ -226,12 +230,26 @@ void iteration_callback(int iter)
                 delete mbb;             // Delete the pointer array, but not the pointers.
 
                 float r = alca->get_location().get_3d_distance(ligbb[l]->get_location());
+                ttl_bb_dist += r;
+                #if _dbg_bb_pullaway
                 cout << alignment_aa[l]->get_name() << ":" << alca->name << " " << r << "A from " << ligbb[l]->name << "... ";
+                #endif
             }
         }
+        #if _dbg_bb_pullaway
         cout << endl;
+        #endif
+
+        if (!iter || ttl_bb_dist < 1.25*last_ttl_bb_dist)
+        {
+            pullaway_undo.copy_state(ligand);
+            last_ttl_bb_dist = ttl_bb_dist;
+        }
+        else
+        {
+            pullaway_undo.restore_state(ligand);
+        }
     }
-    #endif
 
     Point bary = ligand->get_barycenter();
 
@@ -1639,6 +1657,7 @@ _try_again:
     srand(time(NULL));
     for (pose = 1; pose <= poses; pose++)
     {
+        last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
         ligand->crumple(fiftyseventh*44);
@@ -2351,6 +2370,33 @@ _try_again:
 
                             if (alca)
                             {
+                                // If alignment aa is not pinned, and flexion is enabled,
+                                // flex alignment aa so that alca is nearest to loneliest.
+                                if (flex && alignment_aa[l]->movability >= MOV_FLEXONLY)
+                                {
+                                    Bond** rbb = alignment_aa[l]->get_rotatable_bonds();
+                                    if (rbb)
+                                    {
+                                        float br = alca->get_location().get_3d_distance(loneliest);
+                                        float brad = 0;
+                                        for(j=0; rbb[j]; j++)
+                                        {
+                                            float rad;
+                                            for (rad=0; rad<M_PI*2; rad += square)
+                                            {
+                                                rbb[j]->rotate(square);
+                                                float lr = alca->get_location().get_3d_distance(loneliest);
+                                                if (lr < br)
+                                                {
+                                                    brad = rad;
+                                                    br = lr;
+                                                }
+                                            }
+                                            if (brad) rbb[j]->rotate(brad);
+                                        }
+                                    }
+                                }
+
                                 Point pt, al, cen;
                                 al	= alca->get_location();
 
@@ -2404,8 +2450,8 @@ _try_again:
                                     origin = ligbb[0]->get_location();
                                     lv = compute_normal(pt, al, origin);
                                     lv.origin = origin;
-                                    rot.a = -find_angle_along_vector(pt, al, origin, (SCoord)lv);
-                                    m.rotate(lv, -rot.a);
+                                    rot.a = find_angle_along_vector(pt, al, origin, (SCoord)lv);
+                                    m.rotate(lv, rot.a);
                                     #if _dbg_bb_rots
                                     cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
                                     #endif

@@ -240,7 +240,7 @@ void iteration_callback(int iter)
         cout << endl;
         #endif
 
-        if (!iter || ttl_bb_dist < 1.25*last_ttl_bb_dist)
+        if (!iter || ttl_bb_dist < 1.1*last_ttl_bb_dist)
         {
             pullaway_undo.copy_state(ligand);
             last_ttl_bb_dist = ttl_bb_dist;

@@ -679,6 +679,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     }
                 }
             }
+
+            if (ar) delete[] ar;
+            if (br) delete[] br;
         }
 
         if (!stacked_pi_rings)

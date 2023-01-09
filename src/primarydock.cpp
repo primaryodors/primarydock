@@ -215,9 +215,7 @@ void iteration_callback(int iter)
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     if (iter == (iters-1)) return;
 
-    int l;
-
-    
+    int l;    
     if (ligbb)
     {
         float ttl_bb_dist = 0;
@@ -229,11 +227,14 @@ void iteration_callback(int iter)
                 Atom* alca = mbb[0];
                 delete mbb;             // Delete the pointer array, but not the pointers.
 
-                float r = alca->get_location().get_3d_distance(ligbb[l]->get_location());
-                ttl_bb_dist += r;
-                #if _dbg_bb_pullaway
-                cout << alignment_aa[l]->get_name() << ":" << alca->name << " " << r << "A from " << ligbb[l]->name << "... ";
-                #endif
+                if (alca)
+                {
+                    float r = alca->get_location().get_3d_distance(ligbb[l]->get_location());
+                    ttl_bb_dist += r;
+                    #if _dbg_bb_pullaway
+                    cout << alignment_aa[l]->get_name() << ":" << alca->name << " " << r << "A from " << ligbb[l]->name << "... ";
+                    #endif
+                }
             }
         }
         #if _dbg_bb_pullaway
@@ -2568,7 +2569,9 @@ _try_again:
 
             Molecule** delete_me;
             int trsz = tripswitch_clashables.size();
-            Molecule* trip[trsz+4];
+            Molecule* trip[j = trsz+4];
+
+            for (; j; j--) trip[j-1] = nullptr;
 
             for (j=0; j<trsz; j++)
                 trip[j] = (Molecule*)protein->get_residue(tripswitch_clashables[j]);

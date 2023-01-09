@@ -2383,7 +2383,9 @@ _try_again:
                                     rot = align_points_3d(&pt, &al, &cen);
                                     m.rotate(&rot.v, rot.a);
                                     ligand->recenter(cen);
-                                    // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
+                                    #if _dbg_bb_rots
+                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
+                                    #endif
 
                                     if (false && !l)
                                     {
@@ -2404,7 +2406,9 @@ _try_again:
                                     lv.origin = origin;
                                     rot.a = -find_angle_along_vector(pt, al, origin, (SCoord)lv);
                                     m.rotate(lv, -rot.a);
-                                    // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
+                                    #if _dbg_bb_rots
+                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
+                                    #endif
                                     break;
 
                                 case 2:
@@ -2417,7 +2421,7 @@ _try_again:
                                         lv.origin = origin;
                                         m.rotate(lv, rstep);
 
-                                        float r2 = alca->get_location().get_3d_distance(pt);
+                                        float r2 = alca->get_location().get_3d_distance(ligbb[l]->get_location());
                                         if (r2 < bestr)
                                         {
                                             bestr = r2;
@@ -2429,8 +2433,10 @@ _try_again:
                                     lv.origin = origin;
                                     m.rotate(lv, besttheta);
                                     ligand->recenter(cen);
-                                    /*cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
-                                         << "-" << ligbb[1]->name << " axis." << endl;*/
+                                    #if _dbg_bb_rots
+                                    cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
+                                         << "-" << ligbb[1]->name << " axis." << endl;
+                                    #endif
                                     break;
 
                                 default:

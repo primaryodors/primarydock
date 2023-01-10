@@ -10,7 +10,7 @@
 
 
 // Configurable variables
-$dock_metals = true;
+$dock_metals = false;
 $bias_by_energy = true;
 
 require("methods_common.php");

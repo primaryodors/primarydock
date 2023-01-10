@@ -1836,6 +1836,7 @@ _try_again:
                )
             {
                 float acvdirection = (nodeno == active_matrix_node) ? 1 : -1;
+                int wroteoff = (nodeno == deactivate_node) ? 100 : 0;
 
                 #if internode_momentum_only_on_activation 
                 conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
@@ -1940,66 +1941,66 @@ _try_again:
                         clrot.v.r = 1;
                     }
 
-                    if (wrote_acvmx < i)
+                    if (wrote_acvmx < i+wroteoff)
                     {
                         #if write_activation_matrix
                         // Output the activation for the viewer to recognize.
-                        cout << "ACM " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                        cout << "ACM " << nodeno << " " << regname << " " << sr << " " << er << " "
                             << active_matrix_n[i].x*acvdirection << " " << active_matrix_n[i].y*acvdirection << " " << active_matrix_n[i].z*acvdirection << " "
                             << active_matrix_c[i].x*acvdirection << " " << active_matrix_c[i].y*acvdirection << " " << active_matrix_c[i].z*acvdirection
                             << endl;
-                        if (output) *output << "ACM " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                        if (output) *output << "ACM " << nodeno << " " << regname << " " << sr << " " << er << " "
                             << active_matrix_n[i].x*acvdirection << " " << active_matrix_n[i].y*acvdirection << " " << active_matrix_n[i].z*acvdirection << " "
                             << active_matrix_c[i].x*acvdirection << " " << active_matrix_c[i].y*acvdirection << " " << active_matrix_c[i].z*acvdirection
                             << endl;
                         #endif
 
                         #if write_active_rotation
-                        if (active_matrix_type == 9 && acvdirection>0)
+                        if (active_matrix_type == 9)
                         {
                             int half = (sr + er) / 2;
 
                             Point nlrv(nlrot.v);
-                            cout << "ACR " << active_matrix_node << " " << regname << "n " << sr << " " << half << " "
+                            cout << "ACR " << nodeno << " " << regname << "n " << sr << " " << half << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << nlrot.origin.x << " " << nlrot.origin.y << " " << nlrot.origin.z << " "
                                 << nlrv.x << " " << nlrv.y << " " << nlrv.z << " "
-                                << nlrot.a << endl;
-                            if (output) *output << "ACR " << active_matrix_node << " " << regname << "n " << sr << " " << half << " "
+                                << nlrot.a*acvdirection << endl;
+                            if (output) *output << "ACR " << nodeno << " " << regname << "n " << sr << " " << half << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << nlrot.origin.x << " " << nlrot.origin.y << " " << nlrot.origin.z << " "
                                 << nlrv.x << " " << nlrv.y << " " << nlrv.z << " "
-                                << nlrot.a << endl;
+                                << nlrot.a*acvdirection << endl;
 
                             Point clrv(clrot.v);
-                            cout << "ACR " << active_matrix_node << " " << regname << "c " << half << " " << er << " "
+                            cout << "ACR " << nodeno << " " << regname << "c " << half << " " << er << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << clrot.origin.x << " " << clrot.origin.y << " " << clrot.origin.z << " "
                                 << clrv.x << " " << clrv.y << " " << clrv.z << " "
-                                << clrot.a << endl;
-                            if (output) *output << "ACR " << active_matrix_node << " " << regname << "c " << half << " " << er << " "
+                                << clrot.a*acvdirection << endl;
+                            if (output) *output << "ACR " << nodeno << " " << regname << "c " << half << " " << er << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << clrot.origin.x << " " << clrot.origin.y << " " << clrot.origin.z << " "
                                 << clrv.x << " " << clrv.y << " " << clrv.z << " "
-                                << clrot.a << endl;
+                                << clrot.a*acvdirection << endl;
                         }
                         else
                         {
                             Point lrv(lrot.v);
-                            cout << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                            cout << "ACR " << nodeno << " " << regname << " " << sr << " " << er << " "
                                 << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
                                 << lrot.origin.x << " " << lrot.origin.y << " " << lrot.origin.z << " "
                                 << lrv.x << " " << lrv.y << " " << lrv.z << " "
-                                << lrot.a << endl;
-                            if (output) *output << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                                << lrot.a*acvdirection << endl;
+                            if (output) *output << "ACR " << nodeno << " " << regname << " " << sr << " " << er << " "
                                 << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
                                 << lrot.origin.x << " " << lrot.origin.y << " " << lrot.origin.z << " "
                                 << lrv.x << " " << lrv.y << " " << lrv.z << " "
-                                << lrot.a << endl;
+                                << lrot.a*acvdirection << endl;
                         }
                         #endif
 
-                        wrote_acvmx = i;
+                        wrote_acvmx = i+wroteoff;
                     }
                 }
 

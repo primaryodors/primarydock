@@ -51,11 +51,11 @@ EXCL $tmr4end $tmr5start
 $acv_matrix
 ACVNODE 0
 
-NODEPDB 1 pdbs/$fam/$protid.active.pdb
+DEACVNODE 1
 
 POSE 10
 ITER 50
-ELIM -0.001
+ELIM 50
 
 OUT $outfname
 ECHO

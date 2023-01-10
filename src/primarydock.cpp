@@ -128,7 +128,7 @@ float* initial_vdWrepl;
 float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 
 Point active_matrix_n[16], active_matrix_c[16], active_matrix_m[16];
-int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0;
+int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0, deactivate_node = -1;
 std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
@@ -215,7 +215,8 @@ void iteration_callback(int iter)
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     if (iter == (iters-1)) return;
 
-    int l;    
+    int l;
+    
     if (ligbb)
     {
         float ttl_bb_dist = 0;
@@ -528,6 +529,11 @@ int interpret_config_line(char** fields)
         CEN_buf = origbuff;
         optsecho = (std::string)"Center " + CEN_buf;
         return 0;
+    }
+    else if (!strcmp(fields[0], "DEACVNODE"))
+    {
+        deactivate_node = atoi(fields[1]);
+        optsecho = (std::string)"Active node is " + to_string(deactivate_node);
     }
     else if (!strcmp(fields[0], "DEBUG"))
     {
@@ -1824,8 +1830,13 @@ _try_again:
             #endif
             #endif
 
-            if (nodeno == active_matrix_node)
+            if (nodeno == active_matrix_node
+                ||
+                (nodeno == deactivate_node && active_matrix_node >= 0 && deactivate_node > active_matrix_node)
+               )
             {
+                float acvdirection = (nodeno == active_matrix_node) ? 1 : -1;
+
                 #if internode_momentum_only_on_activation 
                 conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
                 #endif
@@ -1886,10 +1897,17 @@ _try_again:
                         // Get the CA location of the C-terminus of the helix;
                         // Add the active_matrix_c to the result;
                         Point calign;
-                        calign = protein->get_atom_location(er, "CA").add(active_matrix_c[i]);
+                        calign = (acvdirection > 0)
+                            ? protein->get_atom_location(er, "CA").add(active_matrix_c[i])
+                            : protein->get_atom_location(er, "CA").subtract(active_matrix_c[i])
+                            ;
 
                         // Move the entire helix by the values of active_matrix_n.
-                        protein->move_piece(sr, er, active_matrix_n[i].add(protein->get_region_center(sr, er)));
+                        protein->move_piece(sr, er,
+                            (acvdirection > 0)
+                            ? active_matrix_n[i].add(protein->get_region_center(sr, er))
+                            : active_matrix_n[i].subtract(protein->get_region_center(sr, er))
+                            );
 
                         // Call protein->rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
                         lrot = protein->rotate_piece(sr, er, er, calign, sr);
@@ -1897,12 +1915,24 @@ _try_again:
                     }
                     else if (active_matrix_type == 9)
                     {
-                        protein->move_piece(sr, er, protein->get_region_center(sr, er).add(active_matrix_m[i]));
+                        protein->move_piece(sr, er,
+                            (acvdirection > 0)
+                            ? protein->get_region_center(sr, er).add(active_matrix_m[i])
+                            : protein->get_region_center(sr, er).subtract(active_matrix_m[i])
+                            );
                         int half = (sr + er) / 2;
 
                         Point calign, nalign;
-                        calign = protein->get_atom_location(er, "CA").add(active_matrix_c[i]);
-                        nalign = protein->get_atom_location(sr, "CA").add(active_matrix_n[i]);
+                        if (acvdirection > 0)
+                        {
+                            calign = protein->get_atom_location(er, "CA").add(active_matrix_c[i]);
+                            nalign = protein->get_atom_location(sr, "CA").add(active_matrix_n[i]);
+                        }
+                        else
+                        {
+                            calign = protein->get_atom_location(er, "CA").subtract(active_matrix_c[i]);
+                            nalign = protein->get_atom_location(sr, "CA").subtract(active_matrix_n[i]);
+                        }
 
                         nlrot = protein->rotate_piece(sr, half, sr, nalign, half);
                         clrot = protein->rotate_piece(half, er, er, calign, half);
@@ -1915,17 +1945,17 @@ _try_again:
                         #if write_activation_matrix
                         // Output the activation for the viewer to recognize.
                         cout << "ACM " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
-                            << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
-                            << active_matrix_c[i].x << " " << active_matrix_c[i].y << " " << active_matrix_c[i].z
+                            << active_matrix_n[i].x*acvdirection << " " << active_matrix_n[i].y*acvdirection << " " << active_matrix_n[i].z*acvdirection << " "
+                            << active_matrix_c[i].x*acvdirection << " " << active_matrix_c[i].y*acvdirection << " " << active_matrix_c[i].z*acvdirection
                             << endl;
                         if (output) *output << "ACM " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
-                            << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
-                            << active_matrix_c[i].x << " " << active_matrix_c[i].y << " " << active_matrix_c[i].z
+                            << active_matrix_n[i].x*acvdirection << " " << active_matrix_n[i].y*acvdirection << " " << active_matrix_n[i].z*acvdirection << " "
+                            << active_matrix_c[i].x*acvdirection << " " << active_matrix_c[i].y*acvdirection << " " << active_matrix_c[i].z*acvdirection
                             << endl;
                         #endif
 
                         #if write_active_rotation
-                        if (active_matrix_type == 9)
+                        if (active_matrix_type == 9 && acvdirection>0)
                         {
                             int half = (sr + er) / 2;
 
@@ -1981,11 +2011,14 @@ _try_again:
                         int er = active_helix_rots[j].end_resno;
                         int mr = active_helix_rots[j].origin_resno;
                         protein->move_piece(sr, er,
-                                protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
+                                (acvdirection > 0)
+                                ? protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
+                                : protein->get_region_center(sr, er).subtract(active_helix_rots[j].transform)
                             );
-                        protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"), active_helix_rots[j].axis, active_helix_rots[j].theta);
+                        protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
+                            active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
 
-                        if (wrote_acvmr < j)
+                        if (wrote_acvmr < j && acvdirection>0)
                         {
                             Point ptaxis = active_helix_rots[j].axis;
                             Point ptorigin = protein->get_atom_location(mr, "CA");
@@ -2014,7 +2047,7 @@ _try_again:
                     {
                         if (active_bond_rots[j].bond)
                         {
-                            active_bond_rots[j].bond->rotate(active_bond_rots[j].theta - active_bond_rots[j].bond->total_rotations);
+                            active_bond_rots[j].bond->rotate(active_bond_rots[j].theta*acvdirection - active_bond_rots[j].bond->total_rotations);
                         }
                     }
                 }
@@ -2035,7 +2068,7 @@ _try_again:
                 #endif
 
                 #if save_active_protein
-                if (pose == 1)
+                if (pose == 1 && acvdirection>0)
                 {
                     FILE* f = fopen("tmp/active.pdb", "wb");
                     if (f)
@@ -2051,6 +2084,7 @@ _try_again:
                 // Perhaps also multimol it for 10 or so iterations with all flexions (ligand and residue) globally disabled.
             }
 
+            
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
             #endif

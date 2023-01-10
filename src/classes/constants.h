@@ -10,7 +10,7 @@
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 1
+#define _kJmol_cuA 0.8
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -99,7 +99,7 @@
 #define POLYPRO1_PSI fiftyseventh*160
 #define POLYPRO1_OMEGA fiftyseventh*113
 
-#define polar_repulsion 30.0
+#define polar_repulsion 60.0
 #define charge_repulsion 120.0
 
 

@@ -177,14 +177,14 @@ foreach ($yvals as $rcp => $yv)
         }
 
         // echo "Count x: " . count($x) . "; count y: " . count($y) . "\n";
-        if (count($x) >= $threshold && count($y) >= $threshold && (max($y) - min($y)) > 0.1 )
+        if ((count($x) >= $threshold && count($y) >= $threshold && (max($y) - min($y)) > 0.1 ) || $metric == 'acv.d')
         {
             // if ($metric == "7.46.y") print_r($y);
             $corr = round(correlationCoefficient($x, $y), 3);
             // echo "Correlation: $corr\n";
             if ($corr > $bestcorr) $bestcorr = $corr;
             $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
-            if ($p <= 0.05 && abs($corr) > 0.25) $corrs[$rcp][$metric] = round($corr, 3);
+            if (($p <= 0.05 && abs($corr) > 0.25) || $metric == 'acv.d') $corrs[$rcp][$metric] = round($corr, 3);
         }
     }
 }
@@ -257,9 +257,9 @@ foreach ($corrs as $rcp => $c)
     $j = 0;
     foreach ($c as $metric => $corr)
     {
-        if ($corr < 0.5*$maxallc) continue;
+        if (($corr < 0.5*$maxallc) && $metric != 'acv.d') continue;
         $j++;
-        if ($j > 5) break;
+        if (($j > 5) && $metric != 'acv.d') continue;
         echo str_pad($metric, 10);
 
         if (false===strpos($metric, " + ")

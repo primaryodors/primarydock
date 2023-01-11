@@ -10,7 +10,8 @@
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 0.8
+#define _kJmol_cuA 0.7
+#define vdw_clash_allowance 0.9
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -102,6 +103,7 @@
 #define polar_repulsion 60.0
 #define charge_repulsion 120.0
 
+#define _enhanced_pi_stacking 1
 
 // If using an activation matrix, active_persistence "rewards" the ligand for keeping
 // bindings to the same residues post-activation as pre-activation. The noflex option
@@ -218,7 +220,7 @@
 // How much variance to allow in the strongest atom-to-atom binding energy when multimol conforming.
 // Decreasing this value requires any positional or rotational change to adhere more tightly to the
 // strongest interatomic interaction.
-#define strongest_loss_tolerance 0.333
+#define strongest_loss_tolerance 0.25
 #define _slt1 (1.0 - strongest_loss_tolerance)
 
 // Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,

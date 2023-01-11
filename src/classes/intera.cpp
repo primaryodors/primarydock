@@ -515,7 +515,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float kJmol = 0;
 
     float r = a->distance_to(b);
-    float avdW = a->get_vdW_radius(), bvdW = b->get_vdW_radius();
+    float avdW = a->get_vdW_radius()*vdw_clash_allowance, bvdW = b->get_vdW_radius()*vdw_clash_allowance;
     float rbind = avdW+bvdW;
 
     float dp = 2;			// Directional propensity. The anisotropic component from each single vertex
@@ -606,6 +606,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         float asum=0, bsum=0, aniso=1;
         bool stacked_pi_rings = false;
 
+        #if _enhanced_pi_stacking
         if (forces[i]->type == pi && a->is_pi() && b->is_pi())
         {
             Ring** ar = aheavy->get_rings();
@@ -683,6 +684,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (ar) delete[] ar;
             if (br) delete[] br;
         }
+        #endif
 
         if (!stacked_pi_rings)
         {

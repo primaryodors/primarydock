@@ -1830,7 +1830,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
     for (i=0; atoms[i]; i++)
     {
         Point pta = atoms[i]->get_location();
-        float avdW = atoms[i]->get_vdW_radius();
+        float avdW = atoms[i]->get_vdW_radius()*vdw_clash_allowance;
         for (l=0; ligands[l]; l++)
         {
             if (!ligands[l]->atoms) continue;
@@ -1842,7 +1842,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 if (atoms[i]->shares_bonded_with(ligands[l]->atoms[j])) continue;
 
                 Point ptb = ligands[l]->atoms[j]->get_location();
-                float bvdW = ligands[l]->atoms[j]->get_vdW_radius();
+                float bvdW = ligands[l]->atoms[j]->get_vdW_radius()*vdw_clash_allowance;
 
                 r = pta.get_3d_distance(&ptb) + 1e-3;
                 if (r < avdW + bvdW)

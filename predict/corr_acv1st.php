@@ -259,7 +259,7 @@ foreach ($corrs as $rcp => $c)
     {
         if (($corr < 0.5*$maxallc) && $metric != 'acv.d') continue;
         $j++;
-        if (($j > 5) && $metric != 'acv.d') continue;
+        if (($j > 10) && $metric != 'acv.d') continue;
         echo str_pad($metric, 10);
 
         if (false===strpos($metric, " + ")

@@ -139,14 +139,19 @@ function process_dock()
     }
     else
     {
+    	$elim = 0;
         for ($try = 0; $try < $dock_retries; $try++)
         {
             set_time_limit(300);
             $outlines = [];
-            echo "bin/primarydock \"$cnfname\"\n";
-            passthru("bin/primarydock \"$cnfname\"");
+            $cmd = "bin/primarydock \"$cnfname\"";
+            if ($elim) $cmd .= " --elim $elim";
+            echo "$cmd\n";
+            passthru($cmd);
             $outlines = explode("\n", file_get_contents($outfname));
             if (count($outlines) >= 200) break;
+            if (!$elim) $elim = 99;
+            else $elim *= 2;
         }
     }
 

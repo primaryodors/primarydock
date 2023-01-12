@@ -246,6 +246,7 @@
 #define _hisflip_binding_threshold 25
 
 // Debugging stuff.
+#define _output_each_iter 1
 #define _dummy_atoms_for_debug 0
 
 #define _DBG_LONELINESS 0

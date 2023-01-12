@@ -369,6 +369,17 @@ void iteration_callback(int iter)
         for (i=0; i<sphres; i++) gcfmols[i] = discrete[i].pmol;
         gcfmols[sphres] = nullptr;
     }
+
+    #if _output_each_iter
+    std::string outfname = (std::string)"tmp/iter" + to_string(iter) + (std::string)".pdb";
+    FILE* fp = fopen(outfname.c_str(), "wb");
+    if (fp)
+    {
+        protein->save_pdb(fp, ligand);
+        protein->end_pdb(fp);
+        fclose(fp);
+    }
+    #endif
 }
 
 int interpret_resno(char* field)
@@ -3004,6 +3015,10 @@ _try_again:
                 break;
             }
         }	// nodeno loop.
+
+        #if _output_each_iter
+        break;
+        #endif
     } // pose loop.
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Finished poses." << endl;

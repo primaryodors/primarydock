@@ -44,7 +44,7 @@ public:
 
     // Serialization.
     int load_pdb(FILE* infile, int resno_offset = 0);				// Returns number of residues loaded.
-    void save_pdb(FILE* outfile);
+    void save_pdb(FILE* outfile, Molecule* ligand = nullptr);
     void end_pdb(FILE* outfile);
 
     // Getters.

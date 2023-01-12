@@ -187,7 +187,7 @@ bool Protein::add_sequence(const char* lsequence)
     return true;
 }
 
-void Protein::save_pdb(FILE* os)
+void Protein::save_pdb(FILE* os, Molecule* lig)
 {
     int i, offset=0;
 
@@ -220,6 +220,16 @@ void Protein::save_pdb(FILE* os)
         {
             cout << "Saving " << m_mcoord[i]->metal->name << endl;
             m_mcoord[i]->metal->save_pdb_line(os, ++offset);
+        }
+    }
+
+    if (lig)
+    {
+        int ac = lig->get_atom_count();
+        for (i=0; i<ac; i++)
+        {
+            Atom* a = lig->get_atom(i);
+            if (a) a->save_pdb_line(os, ++offset);
         }
     }
 

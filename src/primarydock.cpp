@@ -217,6 +217,7 @@ void iteration_callback(int iter)
 
     int l;
     
+    #if enforce_no_bb_pullaway
     if (ligbb)
     {
         float ttl_bb_dist = 0;
@@ -242,7 +243,7 @@ void iteration_callback(int iter)
         cout << endl;
         #endif
 
-        if (!iter || ttl_bb_dist < 1.1*last_ttl_bb_dist)
+        if (!iter || ttl_bb_dist < (1.0+bb_pullaway_allowance)*last_ttl_bb_dist)
         {
             pullaway_undo.copy_state(ligand);
             last_ttl_bb_dist = ttl_bb_dist;
@@ -252,6 +253,7 @@ void iteration_callback(int iter)
             pullaway_undo.restore_state(ligand);
         }
     }
+    #endif
 
     Point bary = ligand->get_barycenter();
 
@@ -2406,6 +2408,7 @@ _try_again:
 
                             if (alca)
                             {
+                                #if _preflex_alignment_res
                                 // If alignment aa is not pinned, and flexion is enabled,
                                 // flex alignment aa so that alca is nearest to loneliest.
                                 if (flex && alignment_aa[l]->movability >= MOV_FLEXONLY)
@@ -2432,6 +2435,7 @@ _try_again:
                                         }
                                     }
                                 }
+                                #endif
 
                                 Point pt, al, cen;
                                 al	= alca->get_location();

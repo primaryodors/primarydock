@@ -10,8 +10,8 @@
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 0.7
-#define vdw_clash_allowance 0.9
+#define _kJmol_cuA 0.5
+#define vdw_clash_allowance 1.0
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -104,6 +104,9 @@
 #define charge_repulsion 120.0
 
 #define _enhanced_pi_stacking 1
+#define _preflex_alignment_res 0
+#define enforce_no_bb_pullaway 0
+#define bb_pullaway_allowance 0.15
 
 // If using an activation matrix, active_persistence "rewards" the ligand for keeping
 // bindings to the same residues post-activation as pre-activation. The noflex option

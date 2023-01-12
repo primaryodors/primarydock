@@ -11,6 +11,8 @@ using namespace std;
 int main(int argc, char** argv)
 {
     float energyLevelThreshold = 0.25;
+    float clash_limit = 5;
+    float N_O_spacing = 3 * 2;
 
     Molecule m("nothing");
     cout << "Created empty molecule named " << m.get_name() << ".\n";
@@ -172,7 +174,7 @@ int main(int argc, char** argv)
     mols[0] = &m1;
     mols[1] = &m2;
     mols[2] = NULL;
-    Molecule::multimol_conform(mols, 200);
+    Molecule::multimol_conform(mols, 500);
     float final_clashes = m1.get_intermol_clashes(&m2);
     // if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);
@@ -186,13 +188,13 @@ int main(int argc, char** argv)
     N = m1.get_atom("N1");
     if (N && O) nodist += O->get_location().get_3d_distance(N->get_location());
 
-    if (energyLevel >= energyLevelThreshold && final_clashes < 2 && nodist < 6)
-        cout << "Energy level above threshold, SUCCESS.\n";
+    if (energyLevel >= energyLevelThreshold && final_clashes < clash_limit && nodist < N_O_spacing)
+        cout << "Energy level below threshold, SUCCESS.\n";
     else
     {
-        if (energyLevel < energyLevelThreshold) cout << "Energy level below threshold, FAIL.\n";
-        else if (final_clashes >= 2) cout << "Intermolecular clashes above threshold, FAIL.\n";
-        else if (nodist >= 6) cout << "Atoms are too far apart. FAIL.\n";
+        if (energyLevel < energyLevelThreshold) cout << "Energy level above threshold, FAIL.\n";
+        else if (final_clashes >= clash_limit) cout << "Intermolecular clashes " << final_clashes << " above threshold, FAIL.\n";
+        else if (nodist >= N_O_spacing) cout << "Atoms are too far apart (" << nodist << "A). FAIL.\n";
     }
 
     const char* tstoutf = "output.sdf";

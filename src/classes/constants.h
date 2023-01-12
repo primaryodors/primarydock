@@ -62,9 +62,9 @@
 #define _fullrot_stepdeg 30
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
-#define _def_lin_momentum 0.25
-#define _def_ang_momentum (_fullrot_steprad*5)
-#define _def_bnd_momentum (_fullrot_steprad*5)
+#define _def_lin_momentum 0.1
+#define _def_ang_momentum (_fullrot_steprad/2)
+#define _def_bnd_momentum (_fullrot_steprad/2)
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -102,7 +102,7 @@
 
 // Warning - increasing these constants significantly above their stable branch values
 // will cause docking fails in the Big Three tests.
-#define polar_repulsion 30.0
+#define polar_repulsion 35.0
 #define charge_repulsion 120.0
 
 #define lmpush 0.001

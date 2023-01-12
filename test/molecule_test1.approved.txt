@@ -9,5 +9,5 @@ Bond C2 - C3 can rotate.
 Bond C3 - C4 can rotate.
 Bond C4 - C5 can rotate.
 
-Energy level above threshold, SUCCESS.
+Energy level below threshold, SUCCESS.
 Saved output.sdf

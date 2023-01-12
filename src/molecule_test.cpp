@@ -178,10 +178,22 @@ int main(int argc, char** argv)
     float energyLevel = m1.get_intermol_binding(&m2);
     cout << "\n# Post-conformation intermol energy level: " << -energyLevel << " kJ/mol." << endl;
 
-    if(energyLevel > energyLevelThreshold)
+    float nodist = 0;
+    Atom* O = m1.get_atom("O6");
+    Atom* N = m2.get_atom("N1");
+    if (N && O) nodist += O->get_location().get_3d_distance(N->get_location());
+    O = m2.get_atom("O6");
+    N = m1.get_atom("N1");
+    if (N && O) nodist += O->get_location().get_3d_distance(N->get_location());
+
+    if (energyLevel >= energyLevelThreshold && final_clashes < 2 && nodist < 6)
         cout << "Energy level above threshold, SUCCESS.\n";
     else
-        cout << "Energy level below threshold, FAIL.\n";
+    {
+        if (energyLevel < energyLevelThreshold) cout << "Energy level below threshold, FAIL.\n";
+        else if (final_clashes >= 2) cout << "Intermolecular clashes above threshold, FAIL.\n";
+        else if (nodist >= 6) cout << "Atoms are too far apart. FAIL.\n";
+    }
 
     const char* tstoutf = "output.sdf";
     pf = fopen(tstoutf, "wb");

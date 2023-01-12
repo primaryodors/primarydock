@@ -50,7 +50,7 @@ int in_array(void* needle, void** haystack);
 int in_array(int needle, int* haystack);
 int in_array(Star needle, Star* haystack);
 Star* array_unique(Star* input_array);
-char** chop_spaced_fields(char* line, char separator = ' ');
+char** chop_spaced_words(char* line, char separator = ' ');
 int greek_from_aname(const char* aname);
 int randsgn();
 float frand(float min, float max);

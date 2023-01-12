@@ -92,96 +92,96 @@ InteratomicForce::InteratomicForce()
 
 void InteratomicForce::read_dat_line(char* line)
 {
-    char** fields = chop_spaced_fields(line);
-    if (!fields) return;
-    if (fields[0]
-            && fields[1]
-            && fields[2]
-            && fields[3]
-            && fields[4]
+    char** words = chop_spaced_words(line);
+    if (!words) return;
+    if (words[0]
+            && words[1]
+            && words[2]
+            && words[3]
+            && words[4]
        )
     {
         char ea[3], eab[3], eb[3], ebb[3];
 
-        if (fields[0][1] >= 'A' && fields[0][1] <= 'Z')
+        if (words[0][1] >= 'A' && words[0][1] <= 'Z')
         {
-            eab[0] = fields[0][0];
+            eab[0] = words[0][0];
             eab[1] = 0;
-            strcpy(ea, fields[0]+1);
+            strcpy(ea, words[0]+1);
         }
-        else if (fields[0][1] > 0 && fields[0][1] < 'A')
+        else if (words[0][1] > 0 && words[0][1] < 'A')
         {
-            if (fields[0][1] == '-') aritybZa = 1;
-            if (fields[0][1] == '=') aritybZa = 2;
-            if (fields[0][1] == '#') aritybZa = 3;
-            if (fields[0][1] == '$') aritybZa = 4;
-            eab[0] = fields[0][0];
+            if (words[0][1] == '-') aritybZa = 1;
+            if (words[0][1] == '=') aritybZa = 2;
+            if (words[0][1] == '#') aritybZa = 3;
+            if (words[0][1] == '$') aritybZa = 4;
+            eab[0] = words[0][0];
             eab[1] = 0;
-            strcpy(ea, fields[0]+2);
+            strcpy(ea, words[0]+2);
         }
-        else if (fields[0][2] >= 'A' && fields[0][2] <= 'Z')
+        else if (words[0][2] >= 'A' && words[0][2] <= 'Z')
         {
-            eab[0] = fields[0][0];
-            eab[1] = fields[0][1];
+            eab[0] = words[0][0];
+            eab[1] = words[0][1];
             eab[2] = 0;
-            strcpy(ea, fields[0]+2);
+            strcpy(ea, words[0]+2);
         }
-        else if (fields[0][2] > 0 && fields[0][2] < 'A')
+        else if (words[0][2] > 0 && words[0][2] < 'A')
         {
-            if (fields[0][2] == '-') aritybZa = 1;
-            if (fields[0][2] == '=') aritybZa = 2;
-            if (fields[0][2] == '#') aritybZa = 3;
-            if (fields[0][2] == '$') aritybZa = 4;
-            eab[0] = fields[0][0];
-            eab[1] = fields[0][1];
+            if (words[0][2] == '-') aritybZa = 1;
+            if (words[0][2] == '=') aritybZa = 2;
+            if (words[0][2] == '#') aritybZa = 3;
+            if (words[0][2] == '$') aritybZa = 4;
+            eab[0] = words[0][0];
+            eab[1] = words[0][1];
             eab[2] = 0;
-            strcpy(ea, fields[0]+3);
+            strcpy(ea, words[0]+3);
         }
         else
         {
             eab[0] = 0;
-            strcpy(ea, fields[0]);
+            strcpy(ea, words[0]);
         }
 
 
-        if (fields[1][1] >= 'A' && fields[1][1] <= 'Z')
+        if (words[1][1] >= 'A' && words[1][1] <= 'Z')
         {
-            ebb[0] = fields[1][0];
+            ebb[0] = words[1][0];
             ebb[1] = 0;
-            strcpy(eb, fields[1]+1);
+            strcpy(eb, words[1]+1);
         }
-        else if (fields[1][1] > 0 && fields[1][1] < 'A')
+        else if (words[1][1] > 0 && words[1][1] < 'A')
         {
-            if (fields[1][1] == '-') aritybZb = 1;
-            if (fields[1][1] == '=') aritybZb = 2;
-            if (fields[1][1] == '#') aritybZb = 3;
-            if (fields[1][1] == '$') aritybZb = 4;
-            ebb[0] = fields[1][0];
+            if (words[1][1] == '-') aritybZb = 1;
+            if (words[1][1] == '=') aritybZb = 2;
+            if (words[1][1] == '#') aritybZb = 3;
+            if (words[1][1] == '$') aritybZb = 4;
+            ebb[0] = words[1][0];
             ebb[1] = 0;
-            strcpy(eb, fields[1]+2);
+            strcpy(eb, words[1]+2);
         }
-        else if (fields[1][2] >= 'A' && fields[1][2] <= 'Z')
+        else if (words[1][2] >= 'A' && words[1][2] <= 'Z')
         {
-            ebb[0] = fields[1][0];
-            ebb[1] = fields[1][1];
+            ebb[0] = words[1][0];
+            ebb[1] = words[1][1];
             ebb[2] = 0;
-            strcpy(eb, fields[1]+2);
+            strcpy(eb, words[1]+2);
         }
-        else if (fields[1][2] > 0 && fields[1][2] < 'A')
+        else if (words[1][2] > 0 && words[1][2] < 'A')
         {
-            if (fields[1][2] == '-') aritybZb = 1;
-            if (fields[1][2] == '=') aritybZb = 2;
-            if (fields[1][2] == '#') aritybZb = 3;
-            if (fields[1][2] == '$') aritybZb = 4;
-            ebb[0] = fields[1][0];
-            ebb[1] = fields[1][1];
+            if (words[1][2] == '-') aritybZb = 1;
+            if (words[1][2] == '=') aritybZb = 2;
+            if (words[1][2] == '#') aritybZb = 3;
+            if (words[1][2] == '$') aritybZb = 4;
+            ebb[0] = words[1][0];
+            ebb[1] = words[1][1];
             ebb[2] = 0;
-            strcpy(eb, fields[1]+3);
+            strcpy(eb, words[1]+3);
         }
         else
         {
             ebb[0] = 0;
-            strcpy(eb, fields[1]);
+            strcpy(eb, words[1]);
         }
 
 
@@ -191,26 +191,26 @@ void InteratomicForce::read_dat_line(char* line)
         bZb = Atom::Z_from_esym(ebb);			// There is only ebb, no flow. Cope.
 
 
-        if (!strcmp(fields[2], "coval"))	type = covalent;
-        if (!strcmp(fields[2], "ionic"))	type = ionic;
-        if (!strcmp(fields[2], "hbond"))	type = hbond;
-        if (!strcmp(fields[2], "pi"   ))	type = pi;
-        if (!strcmp(fields[2], "plpi" ))	type = polarpi;
-        if (!strcmp(fields[2], "coord"))	type = mcoord;
-        if (!strcmp(fields[2], "vdW"  ))	type = vdW;
+        if (!strcmp(words[2], "coval"))	type = covalent;
+        if (!strcmp(words[2], "ionic"))	type = ionic;
+        if (!strcmp(words[2], "hbond"))	type = hbond;
+        if (!strcmp(words[2], "pi"   ))	type = pi;
+        if (!strcmp(words[2], "plpi" ))	type = polarpi;
+        if (!strcmp(words[2], "coord"))	type = mcoord;
+        if (!strcmp(words[2], "vdW"  ))	type = vdW;
 
-        if (fields[3])
+        if (words[3])
         {
-            arity = atof(fields[3]);
-            if (fields[4])
+            arity = atof(words[3]);
+            if (words[4])
             {
-                distance = atof(fields[4]);
-                if (fields[5])
+                distance = atof(words[4]);
+                if (words[5])
                 {
-                    kJ_mol = atof(fields[5]);
-                    if (fields[6])
+                    kJ_mol = atof(words[5]);
+                    if (words[6])
                     {
-                        dirprop = atof(fields[6]);
+                        dirprop = atof(words[6]);
                     }
                     else dirprop = 2;
                 }
@@ -221,7 +221,7 @@ void InteratomicForce::read_dat_line(char* line)
 
         // cout << *this << endl;
     }
-    delete[] fields;
+    delete[] words;
 }
 
 bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)

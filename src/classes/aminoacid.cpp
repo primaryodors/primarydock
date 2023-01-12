@@ -1048,16 +1048,16 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
         int thistell = ftell(is);
         strcpy(origbuf, buffer);
-        // char** fields = chop_spaced_fields(buffer);
+        // char** words = chop_spaced_words(buffer);
 
         // TODO: Make this a vector of strings.
-		// char** fields = new char*[20];
-        std::vector<std::string> fields;
+		// char** words = new char*[20];
+        std::vector<std::string> words;
 		int places[20] = {0, 6, 11, 17, 21, 22, 30, 38, 46, 54, 60, 76};
 		int i, j, k;
 		for (i=11; i>=0; i--)
 		{
-			// fields[i] = new char[35];
+			// words[i] = new char[35];
 			j = places[i];
 
 			// Ltrim.
@@ -1068,38 +1068,38 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 			// Rtrim.
 			for (k--; buffer[k] == ' '; k--) buffer[k] = 0;
 			
-			// strcpy(fields[i], &buffer[j]);
-            for (k=fields.size(); k<=j; k++) fields.push_back("");
-            fields[i] = &buffer[j];
+			// strcpy(words[i], &buffer[j]);
+            for (k=words.size(); k<=j; k++) words.push_back("");
+            words[i] = &buffer[j];
 			buffer[places[i]] = 0;
 		}
 
         try
         {
-            if (fields.size())
+            if (words.size())
             {
                 int offset = 1;
-                // cout << fields[0] << endl;
-				if (!strcmp(fields[0].c_str(), "ANISOU")) continue;
-                if (!strcmp(fields[0].c_str(), "ATOM"))
+                // cout << words[0] << endl;
+				if (!strcmp(words[0].c_str(), "ANISOU")) continue;
+                if (!strcmp(words[0].c_str(), "ATOM"))
                 {
                     if (!residue_no)
                     {
-                        residue_no = atoi(fields[4+offset].c_str()) + rno;
+                        residue_no = atoi(words[4+offset].c_str()) + rno;
                     }
 
                     if (!res3let[0])
                     {
-                        strcpy(res3let, fields[3].c_str());
+                        strcpy(res3let, words[3].c_str());
                         res3let[1] |= 0x20;
                         res3let[2] |= 0x20;
                     }
 
-                    if (!atno_offset) atno_offset = atoi(fields[1].c_str());
+                    if (!atno_offset) atno_offset = atoi(words[1].c_str());
 
-                    if (strcasecmp(res3let, fields[3].c_str())
+                    if (strcasecmp(res3let, words[3].c_str())
                             ||
-                            residue_no != (atoi(fields[4+offset].c_str())+rno)
+                            residue_no != (atoi(words[4+offset].c_str())+rno)
                        )
                     {
                         fseek(is, lasttell, SEEK_SET);
@@ -1107,12 +1107,12 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     }
 
                     char esym[7] = {0,0,0,0,0,0,0};
-                    if (fields[2].c_str()[0] >= '0' && fields[2].c_str()[0] <= '9')
-                        strcpy(esym, &fields[2].c_str()[1]);
+                    if (words[2].c_str()[0] >= '0' && words[2].c_str()[0] <= '9')
+                        strcpy(esym, &words[2].c_str()[1]);
                     else
-                        strcpy(esym, fields[2].c_str());
+                        strcpy(esym, words[2].c_str());
 
-                    if (!strcmp(fields[2].c_str(), "OXT")) strcpy(esym, "O");
+                    if (!strcmp(words[2].c_str(), "OXT")) strcpy(esym, "O");
 
                     int i;
                     for (i=1; i<6; i++)
@@ -1124,10 +1124,10 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     }
                     esym[1] &= 0x5f;
 
-                    Point aloc(atof(fields[5+offset].c_str()), atof(fields[6+offset].c_str()),atof(fields[7+offset].c_str()));
+                    Point aloc(atof(words[5+offset].c_str()), atof(words[6+offset].c_str()),atof(words[7+offset].c_str()));
 
-                    Atom* a = add_atom(esym, fields[2].c_str(), &aloc, 0, 0);
-                    a->pdbidx = atoi(fields[1].c_str());
+                    Atom* a = add_atom(esym, words[2].c_str(), &aloc, 0, 0);
+                    a->pdbidx = atoi(words[1].c_str());
                     added++;
 
                     if (   !strcmp(a->name, "N")
@@ -1139,19 +1139,19 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         a->is_backbone = true;
                     else a->is_backbone = false;
 
-                    a->residue = atoi(fields[4+offset].c_str())+rno;
-                    strcpy(a->aa3let, fields[3].c_str());
+                    a->residue = atoi(words[4+offset].c_str())+rno;
+                    strcpy(a->aa3let, words[3].c_str());
                     AADef* aaa=0;
 
                     name=0;
                     for (i=0; i<256; i++)
                     {
-                        if (aa_defs[i]._1let && !strcasecmp(aa_defs[i]._3let, fields[3].c_str()))
+                        if (aa_defs[i]._1let && !strcasecmp(aa_defs[i]._3let, words[3].c_str()))
                         {
                             a->aaletter = aa_defs[i]._1let;
                             aaa = &aa_defs[i];
                             name = new char[10]; // aa_defs[i].name;
-                            sprintf(name, "%s%d", aa_defs[i]._3let, atoi(fields[4+offset].c_str())+rno);
+                            sprintf(name, "%s%d", aa_defs[i]._3let, atoi(words[4+offset].c_str())+rno);
                             break;
                         }
                     }
@@ -1159,7 +1159,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     if (!aaa)
                     {
                         fseek(is, lasttell, SEEK_SET);
-                        // delete[] fields;
+                        // delete[] words;
                         goto _return_added;
                         //throw ATOM_NOT_OF_AMINO_ACID;
                     }
@@ -1275,11 +1275,11 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                 else
                 {
                     fseek(is, lasttell, SEEK_SET);
-                    //if (fields) delete[] fields;
+                    //if (words) delete[] words;
                     goto _return_added;
                 }
 
-                //if (fields) delete[] fields;
+                //if (words) delete[] words;
             }
             else goto _return_added;
         }
@@ -1290,7 +1290,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
         }
         buffer[0] = 0;
 
-        //if (fields) delete[] fields;
+        //if (words) delete[] words;
     }
 
 _return_added:
@@ -1377,8 +1377,8 @@ void AminoAcid::load_aa_defs()
         Star lastgrk;
         const Star Hellenic = { .cpsz = Greek };
         char buffer[1024];
-        char* lastfields[16];
-        lastfields[0] = 0;
+        char* lastwords[16];
+        lastwords[0] = 0;
         AABondDef** tmpbdefs=0;
         int tbdctr=0;
         char lastletter = '\0';
@@ -1389,19 +1389,19 @@ void AminoAcid::load_aa_defs()
             fgets(buffer, 1011, pf);
             if (buffer[0] != '#' && buffer[0] != '\n')
             {
-                char** fields = chop_spaced_fields(buffer);
-                if (!fields) continue;
+                char** words = chop_spaced_words(buffer);
+                if (!words) continue;
 
                 try
                 {
-                    for (i=0; fields[i]; i++) if (fields[i][0] == '%')
+                    for (i=0; words[i]; i++) if (words[i][0] == '%')
                         {
-                            fields[i] = lastfields[i];
+                            words[i] = lastwords[i];
                         }
 
-                    int idx = fields[0][0];
+                    int idx = words[0][0];
 
-                    if (!lastletter || fields[0][0] != lastletter)
+                    if (!lastletter || words[0][0] != lastletter)
                     {
                         copy_loaded_to_object(lastletter, tbdctr, tmpbdefs, proline_like);
                         tbdctr = 0;
@@ -1414,8 +1414,8 @@ void AminoAcid::load_aa_defs()
                     {
                         aa_defs[idx]._1let = idx;
                         // cout << aa_defs[idx]._1let;
-                        strcpy(aa_defs[idx]._3let, fields[1]);
-                        strcpy(aa_defs[idx].name, fields[2]);
+                        strcpy(aa_defs[idx]._3let, words[1]);
+                        strcpy(aa_defs[idx].name, words[2]);
                         aa_defs[idx].reach = 1.09;
 
                         aa_defs[idx]._3let[1] |= 0x20;
@@ -1424,20 +1424,20 @@ void AminoAcid::load_aa_defs()
                         if (!strcmp(aa_defs[idx].name, "isoleucine")) aa_defs[idx].isoleucine_fix = true;
                     }
 
-                    if (fields[3])
+                    if (words[3])
                     {
-                        aa_defs[idx].SMILES = fields[3];
+                        aa_defs[idx].SMILES = words[3];
                         if (strstr(aa_defs[idx].SMILES.c_str(), "N1")) aa_defs[idx].proline_like = proline_like = true;
                     }
 
-                    if (fields[4])
+                    if (words[4])
                     {
-                        aa_defs[idx].sidechain_pKa = atof(fields[4]);
+                        aa_defs[idx].sidechain_pKa = atof(words[4]);
                     }
 
                     tbdctr++;
 
-                    lastletter = fields[0][0];
+                    lastletter = words[0][0];
                 }
                 catch (int e)
                 {
@@ -1445,16 +1445,16 @@ void AminoAcid::load_aa_defs()
                     throw 0xbadaadef;
                 }
 
-                if (!lastfields[0])
+                if (!lastwords[0])
                     for (i=0; i<16; i++)
-                        lastfields[i] = new char[256];
+                        lastwords[i] = new char[256];
 
-                for (i=0; fields[i]; i++)
+                for (i=0; words[i]; i++)
                 {
-                    if (lastfields[i] != fields[i]) strcpy(lastfields[i], fields[i]);
+                    if (lastwords[i] != words[i]) strcpy(lastwords[i], words[i]);
                 }
 
-                delete[] fields;
+                delete[] words;
             }
             buffer[0] = 0;
         }

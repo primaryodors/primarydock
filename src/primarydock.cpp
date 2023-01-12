@@ -409,7 +409,7 @@ int interpret_resno(char* field)
         int _50 = protein->get_bw50(b);
         if (_50 < 1)
         {
-            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW fields." << endl;
+            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW words." << endl;
             throw 0xbad12e5;
         }
         return _50 + w - 50;
@@ -417,17 +417,17 @@ int interpret_resno(char* field)
     else return atoi(field);
 }
 
-Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
+Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
 {
     int i=1;
     Point local_pocketcen;
-    if (!strcmp(fields[i], "RES"))
+    if (!strcmp(words[i], "RES"))
     {
         i++;
         std::vector<int> resnos;
-        for (; fields[i]; i++)
+        for (; words[i]; i++)
         {
-            int j = interpret_resno(fields[i]);
+            int j = interpret_resno(words[i]);
             if (!j) break;
             resnos.push_back(j);
         }
@@ -441,7 +441,7 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
 
         return average_of_points(foravg, sz);
     }
-    else if (!strcmp(fields[i], "REL"))
+    else if (!strcmp(words[i], "REL"))
     {
         if (!old_pocketcen)
         {
@@ -451,66 +451,66 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
         else
         {
             i++;
-            local_pocketcen.x = old_pocketcen->x + atof(fields[i++]);
-            local_pocketcen.y = old_pocketcen->y + atof(fields[i++]);
-            local_pocketcen.z = old_pocketcen->z + atof(fields[i++]);
+            local_pocketcen.x = old_pocketcen->x + atof(words[i++]);
+            local_pocketcen.y = old_pocketcen->y + atof(words[i++]);
+            local_pocketcen.z = old_pocketcen->z + atof(words[i++]);
             return local_pocketcen;
         }
     }
     else
     {
-        if (!strcmp(fields[i], "ABS")) i++;
-        local_pocketcen.x = atof(fields[i++]);
-        local_pocketcen.y = atof(fields[i++]);
-        local_pocketcen.z = atof(fields[i++]);
+        if (!strcmp(words[i], "ABS")) i++;
+        local_pocketcen.x = atof(words[i++]);
+        local_pocketcen.y = atof(words[i++]);
+        local_pocketcen.z = atof(words[i++]);
         return local_pocketcen;
     }
 }
 
-int interpret_config_line(char** fields)
+int interpret_config_line(char** words)
 {
     int i;
 
     optsecho = "";
 
     if (0) { ; }
-    else if (!strcmp(fields[0], "ACVBROT"))
+    else if (!strcmp(words[0], "ACVBROT"))
     {
         AcvBndRot abr;
-        abr.resno = atoi(fields[1]);
-        abr.aname = fields[2];
-        abr.bname = fields[3];
-        abr.theta = atof(fields[4]) * fiftyseventh;
+        abr.resno = atoi(words[1]);
+        abr.aname = words[2];
+        abr.bname = words[3];
+        abr.theta = atof(words[4]) * fiftyseventh;
         active_bond_rots.push_back(abr);
-        optsecho = (std::string)"Active bond rotation " + (std::string)fields[2] + (std::string)"-" + (std::string)fields[3];
+        optsecho = (std::string)"Active bond rotation " + (std::string)words[2] + (std::string)"-" + (std::string)words[3];
     }
-    else if (!strcmp(fields[0], "ACVHXR"))
+    else if (!strcmp(words[0], "ACVHXR"))
     {
         AcvHxRot ahr;
         int n = 1;
-        ahr.regname      = fields[n++];
-        ahr.start_resno  = atoi(fields[n++]);
-        ahr.end_resno    = atoi(fields[n++]);
-        ahr.origin_resno = atoi(fields[n++]);
-        ahr.transform    = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
-        ahr.axis         = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
-        ahr.theta        = atof(fields[n++]) * fiftyseventh;
+        ahr.regname      = words[n++];
+        ahr.start_resno  = atoi(words[n++]);
+        ahr.end_resno    = atoi(words[n++]);
+        ahr.origin_resno = atoi(words[n++]);
+        ahr.transform    = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.axis         = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.theta        = atof(words[n++]) * fiftyseventh;
         active_helix_rots.push_back(ahr);
         optsecho = (std::string)"Active helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
-    else if (!strcmp(fields[0], "ACVMX"))
+    else if (!strcmp(words[0], "ACVMX"))
     {
-        if (!fields[1] || !fields[1][3])
+        if (!words[1] || !words[1][3])
         {
             cout << "Missing region identifier for active matrix." << endl << flush;
             throw 0xbad512e;
         }
-        if (    fields[1][0] != 'T'
-            ||  fields[1][1] != 'M'
-            ||  fields[1][2] != 'R'
+        if (    words[1][0] != 'T'
+            ||  words[1][1] != 'M'
+            ||  words[1][2] != 'R'
             )
         {
-            cout << "Unknown region identifier for active matrix: " << fields[1] << endl << flush;
+            cout << "Unknown region identifier for active matrix: " << words[1] << endl << flush;
             throw 0xbad512e;
         }
 
@@ -519,54 +519,54 @@ int interpret_config_line(char** fields)
             for (i=0; i<16; i++) active_matrix_c[i] = active_matrix_n[i] = active_matrix_m[i] = Point(0,0,0);
         }
 
-        int n = atoi(&fields[1][3]);
+        int n = atoi(&words[1][3]);
         if (n > active_matrix_count) active_matrix_count = n;
 
-        active_matrix_n[n].x = atof(fields[2]);
-        active_matrix_n[n].y = atof(fields[3]);
-        active_matrix_n[n].z = atof(fields[4]);
-        if (fields[8] && fields[9] && fields[10])
+        active_matrix_n[n].x = atof(words[2]);
+        active_matrix_n[n].y = atof(words[3]);
+        active_matrix_n[n].z = atof(words[4]);
+        if (words[8] && words[9] && words[10])
         {
             active_matrix_type = 9;
-            active_matrix_m[n].x = atof(fields[5]);
-            active_matrix_m[n].y = atof(fields[6]);
-            active_matrix_m[n].z = atof(fields[7]);
-            active_matrix_c[n].x = atof(fields[8]);
-            active_matrix_c[n].y = atof(fields[9]);
-            active_matrix_c[n].z = atof(fields[10]);
+            active_matrix_m[n].x = atof(words[5]);
+            active_matrix_m[n].y = atof(words[6]);
+            active_matrix_m[n].z = atof(words[7]);
+            active_matrix_c[n].x = atof(words[8]);
+            active_matrix_c[n].y = atof(words[9]);
+            active_matrix_c[n].z = atof(words[10]);
         }
         else
         {
             active_matrix_type = 6;
-            active_matrix_c[n].x = atof(fields[5]);
-            active_matrix_c[n].y = atof(fields[6]);
-            active_matrix_c[n].z = atof(fields[7]);
+            active_matrix_c[n].x = atof(words[5]);
+            active_matrix_c[n].y = atof(words[6]);
+            active_matrix_c[n].z = atof(words[7]);
         }
         optsecho = (std::string)"Active matrix for TMR" + to_string(n);
     }
-    else if (!strcmp(fields[0], "ACVNODE"))
+    else if (!strcmp(words[0], "ACVNODE"))
     {
-        active_matrix_node = atoi(fields[1]);
+        active_matrix_node = atoi(words[1]);
         optsecho = (std::string)"Active node is " + to_string(active_matrix_node);
     }
-    else if (!strcmp(fields[0], "APPENDPROT") || !strcmp(fields[0], "OPEND"))
+    else if (!strcmp(words[0], "APPENDPROT") || !strcmp(words[0], "OPEND"))
     {
         append_pdb = true;
     }
-    else if (!strcmp(fields[0], "CEN"))
+    else if (!strcmp(words[0], "CEN"))
     {
         CEN_buf = origbuff;
         optsecho = (std::string)"Center " + CEN_buf;
         return 0;
     }
-    else if (!strcmp(fields[0], "DEACVNODE"))
+    else if (!strcmp(words[0], "DEACVNODE"))
     {
-        deactivate_node = atoi(fields[1]);
+        deactivate_node = atoi(words[1]);
         optsecho = (std::string)"Active node is " + to_string(deactivate_node);
     }
-    else if (!strcmp(fields[0], "DEBUG"))
+    else if (!strcmp(words[0], "DEBUG"))
     {
-        if (!fields[1])
+        if (!words[1])
         {
             cout << "Missing debug file name; check config file." << endl << flush;
             throw 0xbadf12e;
@@ -574,51 +574,51 @@ int interpret_config_line(char** fields)
         #if _DBG_STEPBYSTEP
         cout << "Starting a debug outstream." << endl;
         #endif
-        debug = new std::ofstream(fields[1], std::ofstream::out);
-        optsecho = "Debug file: " + (std::string)fields[1];
+        debug = new std::ofstream(words[1], std::ofstream::out);
+        optsecho = "Debug file: " + (std::string)words[1];
         return 1;
     }
-    else if (!strcmp(fields[0], "DIFF"))
+    else if (!strcmp(words[0], "DIFF"))
     {
         differential_dock = true;
         optsecho = "Differential dock.";
     }
-    else if (!strcmp(fields[0], "ECHO"))
+    else if (!strcmp(words[0], "ECHO"))
     {
         echo_progress = true;
         optsecho = "Echo on.";
     }
-    else if (!strcmp(fields[0], "ELIM"))
+    else if (!strcmp(words[0], "ELIM"))
     {
-        kJmol_cutoff = -atof(fields[1]);
+        kJmol_cutoff = -atof(words[1]);
         optsecho = "Energy limit: " + to_string(-kJmol_cutoff);
         return 1;
     }
-    else if (!strcmp(fields[0], "EMIN"))
+    else if (!strcmp(words[0], "EMIN"))
     {
-        kJmol_cutoff = atof(fields[1]);
+        kJmol_cutoff = atof(words[1]);
         optsecho = "Energy limit: " + to_string(kJmol_cutoff);
         return 1;
     }
-    else if (!strcmp(fields[0], "EXCL"))
+    else if (!strcmp(words[0], "EXCL"))
     {
         i=1;
-        int excls = atoi(fields[i++]);
-        int excle = atoi(fields[i++]);
+        int excls = atoi(words[i++]);
+        int excle = atoi(words[i++]);
 
         for (i=excls; i<=excle; i++) exclusion.push_back(i);
         optsecho = "Exclude range " + to_string(excls) + (std::string)"-" + to_string(excle);
         return i-1;
     }
-    else if (!strcmp(fields[0], "FLEX"))
+    else if (!strcmp(words[0], "FLEX"))
     {
-        flex = (atoi(fields[1]) != 0);
+        flex = (atoi(words[1]) != 0);
         optsecho = "Flex: " + (std::string)(flex ? "ON" : "OFF");
         return 1;
     }
-    else if (!strcmp(fields[0], "H2O"))
+    else if (!strcmp(words[0], "H2O"))
     {
-        maxh2o = omaxh2o = atoi(fields[1]);
+        maxh2o = omaxh2o = atoi(words[1]);
         if (maxh2o > 0)
         {
             waters = new Molecule*[maxh2o+2];
@@ -638,67 +638,67 @@ int interpret_config_line(char** fields)
         optsecho = "Water molecules: " + to_string(maxh2o);
         return 1;
     }
-    else if (!strcmp(fields[0], "HYDRO"))
+    else if (!strcmp(words[0], "HYDRO"))
     {
         hydrogenate_pdb = true;
     }
-    else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
+    else if (!strcmp(words[0], "ITER") || !strcmp(words[0], "ITERS"))
     {
-        iters = atoi(fields[1]);
+        iters = atoi(words[1]);
         optsecho = "Iterations: " + to_string(iters);
         return 1;
     }
-    else if (!strcmp(fields[0], "KCAL"))
+    else if (!strcmp(words[0], "KCAL"))
     {
         kcal = true;
         optsecho = "Output units switched to kcal/mol.";
         return 0;
     }
-    else if (!strcmp(fields[0], "LIG"))
+    else if (!strcmp(words[0], "LIG"))
     {
-        strcpy(ligfname, fields[1]);
+        strcpy(ligfname, words[1]);
         // optsecho = "Ligand file is " + (std::string)ligfname;
         ligset = true;
         return 1;
     }
-    else if (!strcmp(fields[0], "MCOORD"))
+    else if (!strcmp(words[0], "MCOORD"))
     {
         int j=0;
         optsecho = "Metal coordination on residues ";
-        for (i=1; fields[i]; i++)
+        for (i=1; words[i]; i++)
         {
-            if (fields[i][0] == '-' && fields[i][1] == '-') break;
-            mcoord_resno[j++] = atoi(fields[i]);
-            optsecho += to_string(atoi(fields[i])) + (std::string)" ";
+            if (words[i][0] == '-' && words[i][1] == '-') break;
+            mcoord_resno[j++] = atoi(words[i]);
+            optsecho += to_string(atoi(words[i])) + (std::string)" ";
         }
         mcoord_resno[j] = 0;
         return i-1;
     }
-    else if (!strcmp(fields[0], "NODEPDB"))
+    else if (!strcmp(words[0], "NODEPDB"))
     {
-        activation_node = atoi(fields[1]);
-        strcpy(protafname, fields[2]);
+        activation_node = atoi(words[1]);
+        strcpy(protafname, words[2]);
         optsecho = "Active PDB " + (std::string)protafname + " for node " + to_string(activation_node);
     }
-    else if (!strcmp(fields[0], "OUT"))
+    else if (!strcmp(words[0], "OUT"))
     {
-        if (!fields[1])
+        if (!words[1])
         {
             cout << "Missing output file name; check config file." << endl << flush;
             throw 0xbadf12e;
         }
-        strcpy(outfname, fields[1]);
+        strcpy(outfname, words[1]);
         optsecho = "Output file is " + (std::string)outfname;
         return 1;
     }
-    else if (!strcmp(fields[0], "PATH"))
+    else if (!strcmp(words[0], "PATH"))
     {
         i=1;
-        int nodeno = atoi(fields[i]);
+        int nodeno = atoi(words[i]);
 
-        if (!strcmp(fields[i], "ABS")) i++;
-        if (!strcmp(fields[i], "REL")) i++;
-        if (!strcmp(fields[i], "RES")) i++;
+        if (!strcmp(words[i], "ABS")) i++;
+        if (!strcmp(words[i], "REL")) i++;
+        if (!strcmp(words[i], "RES")) i++;
 
         if (nodeno > 255)
         {
@@ -715,62 +715,62 @@ int interpret_config_line(char** fields)
         optsecho = "Path node set #" + to_string(nodeno);
         return i-1;
     }
-    else if (!strcmp(fields[0], "POSE"))
+    else if (!strcmp(words[0], "POSE"))
     {
-        poses = atoi(fields[1]);
+        poses = atoi(words[1]);
         optsecho = "Number of poses: " + to_string(poses);
         return 1;
     }
-    else if (!strcmp(fields[0], "PREALIGN"))
+    else if (!strcmp(words[0], "PREALIGN"))
     {
         use_prealign = true;
         prealign_residues = origbuff;
         return 1;
     }
-    else if (!strcmp(fields[0], "PROT"))
+    else if (!strcmp(words[0], "PROT"))
     {
-        strcpy(protfname, fields[1]);
+        strcpy(protfname, words[1]);
         protset = true;
         // optsecho = "Protein file is " + (std::string)protfname;
         return 1;
     }
-    else if (!strcmp(fields[0], "RETRY"))
+    else if (!strcmp(words[0], "RETRY"))
     {
-        // triesleft = atoi(fields[1]);
+        // triesleft = atoi(words[1]);
         return 1;
     }
-    else if (!strcmp(fields[0], "RLIM"))
+    else if (!strcmp(words[0], "RLIM"))
     {
-        _INTERA_R_CUTOFF = atof(fields[1]);
+        _INTERA_R_CUTOFF = atof(words[1]);
         optsecho = "Interatomic radius limit: " + to_string(_INTERA_R_CUTOFF);
         return 1;
     }
-    else if (!strcmp(fields[0], "SEARCH"))
+    else if (!strcmp(words[0], "SEARCH"))
     {
-        if (!fields[1]) return 0;       // Stay with default.
-        if (!strcmp(fields[1], "BB"))
+        if (!words[1]) return 0;       // Stay with default.
+        if (!strcmp(words[1], "BB"))
         {
             use_bestbind_algorithm = true;
             return 1;
         }
-        else if (!strcmp(fields[1], "TS"))
+        else if (!strcmp(words[1], "TS"))
         {
             use_bestbind_algorithm = false;
             return 1;
         }
         else
         {
-            cout << "Unknown search method " << fields[1] << endl;
+            cout << "Unknown search method " << words[1] << endl;
             throw 0xbad5eec;
         }
     }
-    else if (!strcmp(fields[0], "SIZE"))
+    else if (!strcmp(words[0], "SIZE"))
     {
-        size.x = atof(fields[1]);
-        if (fields[2])
+        size.x = atof(words[1]);
+        if (words[2])
         {
-            size.y = atof(fields[2]);
-            size.z = atof(fields[3]);
+            size.y = atof(words[2]);
+            size.z = atof(words[3]);
         }
         else size.z = size.y = size.x;
         if (!size.x || !size.y || !size.z)
@@ -781,20 +781,20 @@ int interpret_config_line(char** fields)
         optsecho = "Interatomic radius limit: " + to_string(size.x) + (std::string)"," + to_string(size.y) + (std::string)"," + to_string(size.z);
         return 3;
     }
-    else if (!strcmp(fields[0], "STATE"))
+    else if (!strcmp(words[0], "STATE"))
     {
         states.push_back(origbuff);
         optsecho = "Added state " + (std::string)origbuff;
         return 0;
     }
-    else if (!strcmp(fields[0], "TRIP"))
+    else if (!strcmp(words[0], "TRIP"))
     {
         optsecho = "Added trip clashables ";
-        for (i = 1; fields[i]; i++)
+        for (i = 1; words[i]; i++)
         {
-            if (fields[i][0] == '-' && fields[i][1] == '-') break;
-            tripswitch_clashables.push_back(atoi(fields[i]));
-            optsecho += (std::string)fields[i] + (std::string)" ";
+            if (words[i][0] == '-' && words[i][1] == '-') break;
+            tripswitch_clashables.push_back(atoi(words[i]));
+            optsecho += (std::string)words[i] + (std::string)" ";
         }
         return i-1;
     }
@@ -813,12 +813,12 @@ void read_config_file(FILE* pf)
         origbuff = buffer;
         if (buffer[0] >= ' ' && buffer[0] != '#')
         {
-            char** fields = chop_spaced_fields(buffer);
-            if (!fields) continue;
+            char** words = chop_spaced_words(buffer);
+            if (!words) continue;
 
-            interpret_config_line(fields);
+            interpret_config_line(words);
 
-            delete[] fields;
+            delete[] words;
         }
         buffer[0] = 0;
     }
@@ -1163,14 +1163,14 @@ void do_tumble_spheres(Point l_pocket_cen)
                         char protfttl[1000];
                         strcpy(protfttl, protfname);
 
-                        char** lfields = chop_spaced_fields(protfttl, '/');
+                        char** lwords = chop_spaced_words(protfttl, '/');
 
-                        for (u=0; lfields[u]; u++);
+                        for (u=0; lwords[u]; u++);
                         u--;
 
                         char fname[1000];
                         sprintf(fname, "output/tumble_%s_%d_%d_%d_%f.dock",
-                                lfields[u],
+                                lwords[u],
                                 (int)(xrad*fiftyseven),
                                 (int)(yrad*fiftyseven),
                                 (int)(zrad*fiftyseven),
@@ -1430,8 +1430,8 @@ int main(int argc, char** argv)
 
     strcpy(buffer, CEN_buf.c_str());
 
-    char** fields = chop_spaced_fields(buffer);
-    pocketcen = pocketcen_from_config_fields(fields, nullptr);
+    char** words = chop_spaced_words(buffer);
+    pocketcen = pocketcen_from_config_words(words, nullptr);
     loneliest = protein->find_loneliest_point(pocketcen, size);
 
     #if pocketcen_is_loneliest
@@ -1456,11 +1456,11 @@ int main(int argc, char** argv)
         }
     }
 
-    if (!strcmp(fields[1], "RES"))
+    if (!strcmp(words[1], "RES"))
     {
-        for (i=2; fields[i]; i++)
+        for (i=2; words[i]; i++)
         {
-            extra_wt.push_back(atoi(fields[i]));
+            extra_wt.push_back(atoi(words[i]));
         }
     }
     pktset = true;
@@ -1538,16 +1538,16 @@ int main(int argc, char** argv)
     if (use_prealign)
     {        
         strcpy(buffer, prealign_residues.c_str());
-        fields = chop_spaced_fields(buffer);
+        words = chop_spaced_words(buffer);
 
-        for (n=0; fields[n]; n++);      // Get length.
+        for (n=0; words[n]; n++);      // Get length.
 
         Molecule** prealign_res = new Molecule*[n+4];
         Molecule** lig_grp = new Molecule*[n+4];
 
         for (i=0; i<n; i++)
         {
-            int resno = atoi(fields[i]);
+            int resno = atoi(words[i]);
             prealign_res[i] = protein->get_residue(resno);
         }
 
@@ -1563,7 +1563,7 @@ int main(int argc, char** argv)
         if (flex) Molecule::multimol_conform(prealign_res, lig_grp, prealign_iters, nullptr);
         ligand->movability = MOV_ALL;
 
-        delete[] fields;
+        delete[] words;
         delete prealign_res;
         delete lig_grp;
     }
@@ -2135,11 +2135,11 @@ _try_again:
                 for (i=0; i<states.size(); i++)
                 {
                     strcpy(buffer, states[i].c_str());
-                    fields = chop_spaced_fields(buffer);
-                    if (atoi(fields[1]) == nodeno)
+                    words = chop_spaced_words(buffer);
+                    if (atoi(words[1]) == nodeno)
                     {
-                        int sr = atoi(fields[2]), er = atoi(fields[3]);
-                        float theta = atof(fields[4]) * fiftyseventh;
+                        int sr = atoi(words[2]), er = atoi(words[3]);
+                        float theta = atof(words[4]) * fiftyseventh;
 
                         Point sloc = protein->get_atom_location(sr, "CA"),
                               eloc = protein->get_atom_location(er, "CA");
@@ -2171,14 +2171,14 @@ _try_again:
                     cout << "Error in config file: path node " << nodeno << " is missing." << endl;
                     return 0xbadc09f;
                 }
-                fields = chop_spaced_fields(buffer);
-                nodecen = pocketcen_from_config_fields(&fields[1], &nodecen);
-                if (!strcmp(fields[2], "RES"))
+                words = chop_spaced_words(buffer);
+                nodecen = pocketcen_from_config_words(&words[1], &nodecen);
+                if (!strcmp(words[2], "RES"))
                 {
                     extra_wt.clear();
-                    for (i=2; fields[i]; i++)
+                    for (i=2; words[i]; i++)
                     {
-                        extra_wt.push_back(atoi(fields[i]));
+                        extra_wt.push_back(atoi(words[i]));
                     }
                 }
 

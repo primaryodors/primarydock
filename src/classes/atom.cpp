@@ -37,40 +37,40 @@ void Atom::read_elements()
             fgets(buffer, 1003, pf);
             if (buffer[0] != '#')
             {
-                char** fields = chop_spaced_fields(buffer);
-                if (!fields) continue;
+                char** words = chop_spaced_words(buffer);
+                if (!words) continue;
 
-                if (fields[0])
+                if (words[0])
                 {
-                    int lZ = atoi(fields[0]);
-                    if (lZ && fields[1])
+                    int lZ = atoi(words[0]);
+                    if (lZ && words[1])
                     {
                         elem_syms[lZ] = new char[3];
-                        strcpy(elem_syms[lZ], fields[1]);
-                        // cout << fields[6] << endl;
+                        strcpy(elem_syms[lZ], words[1]);
+                        // cout << words[6] << endl;
 
-                        if (fields[2]) vdW_radii[lZ] = atof(fields[2]);
-                        if (fields[3]) electronegativities[lZ] = atof(fields[3]);
-                        if (fields[4]) atomic_weights[lZ] = atof(fields[4]);
-                        if (fields[5]) valences[lZ] = atoi(fields[5]);
-                        if (fields[6])
+                        if (words[2]) vdW_radii[lZ] = atof(words[2]);
+                        if (words[3]) electronegativities[lZ] = atof(words[3]);
+                        if (words[4]) atomic_weights[lZ] = atof(words[4]);
+                        if (words[5]) valences[lZ] = atoi(words[5]);
+                        if (words[6])
                         {
-                            geometries[lZ] = atoi(fields[6]);
-                            if (fields[6][1] == 'p') geometries[lZ] = -geometries[lZ];
+                            geometries[lZ] = atoi(words[6]);
+                            if (words[6][1] == 'p') geometries[lZ] = -geometries[lZ];
 
-                            if (fields[7])
+                            if (words[7])
                             {
-                                ioniz_energies[lZ] = atof(fields[7]);
-                                if (fields[8])
+                                ioniz_energies[lZ] = atof(words[7]);
+                                if (words[8])
                                 {
-                                    elec_affinities[lZ] = atof(fields[8]);
+                                    elec_affinities[lZ] = atof(words[8]);
                                 }
                             }
                         }
                     }
                 }
 
-                delete[] fields;
+                delete[] words;
             }
             buffer[0] = 0;
         }
@@ -274,38 +274,38 @@ Atom::Atom(FILE* is)
     while (1)
     {
         fgets(buffer, 1022, is);
-        char** fields = chop_spaced_fields(buffer);
+        char** words = chop_spaced_words(buffer);
 
-        if (fields)
+        if (words)
         {
-            if (!strcmp(fields[0], "ATOM")
+            if (!strcmp(words[0], "ATOM")
                     ||
-                    !strcmp(fields[0], "HETATM")
+                    !strcmp(words[0], "HETATM")
                )
             {
                 try
                 {
-                    resno = atoi(fields[4]);
-                    strcpy(res3let, fields[3]);
+                    resno = atoi(words[4]);
+                    strcpy(res3let, words[3]);
 
                     char esym[7] = {0,0,0,0,0,0,0};
-                    if (fields[2][0] >= '0' && fields[2][0] <= '9')
-                        strcpy(esym, &fields[2][1]);
+                    if (words[2][0] >= '0' && words[2][0] <= '9')
+                        strcpy(esym, &words[2][1]);
                     else
-                        strcpy(esym, fields[2]);
+                        strcpy(esym, words[2]);
 
                     int i;
-                    if (fields[10])
+                    if (words[10])
                     {
-                        esym[0] = fields[10][0];
-                        esym[1] = fields[10][1] | 0x20;
+                        esym[0] = words[10][0];
+                        esym[1] = words[10][1] | 0x20;
                         if (esym[1] < 'a') esym[1] = 0;
                         else esym[2] = 0;
                     }
-                    else if (fields[9] && fields[9][0] >= 'A')
+                    else if (words[9] && words[9][0] >= 'A')
                     {
-                        esym[0] = fields[9][0];
-                        esym[1] = fields[9][1] | 0x20;
+                        esym[0] = words[9][0];
+                        esym[1] = words[9][1] | 0x20;
                         if (esym[1] < 'a') esym[1] = 0;
                         else esym[2] = 0;
                     }
@@ -322,7 +322,7 @@ Atom::Atom(FILE* is)
                     }
 
                     name = new char[5];
-                    strcpy(name, fields[2]);
+                    strcpy(name, words[2]);
 
                     Z = Z_from_esym(esym);
                     if (!Z && !strcmp(name, "OXT")) Z = 8;
@@ -333,23 +333,23 @@ Atom::Atom(FILE* is)
                     bonded_to = new Bond[abs(geometry)];
                     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
 
-                    Point aloc(atof(fields[5]), atof(fields[6]),atof(fields[7]));
+                    Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
                     location = aloc;
 
                     char* strcharge = 0;
                     int chgoff = strlen(esym);
-                    if (fields[10])
+                    if (words[10])
                     {
-                        if (fields[10][chgoff-1] && fields[10][chgoff]) strcharge = &fields[10][chgoff];
+                        if (words[10][chgoff-1] && words[10][chgoff]) strcharge = &words[10][chgoff];
                     }
-                    else if (fields[9])
+                    else if (words[9])
                     {
-                        if (fields[9][0] == esym[0]
+                        if (words[9][0] == esym[0]
                                 &&
-                                fields[9][chgoff-1]
+                                words[9][chgoff-1]
                                 &&
-                                fields[9][chgoff]
-                           ) strcharge = &fields[9][chgoff];
+                                words[9][chgoff]
+                           ) strcharge = &words[9][chgoff];
                     }
                     if (strcharge)
                     {
@@ -360,8 +360,8 @@ Atom::Atom(FILE* is)
                         else if (atoi(strcharge)) charge = atoi(strcharge);
                     }
 
-                    residue = atoi(fields[4]);
-                    strcpy(aa3let, fields[3]);
+                    residue = atoi(words[4]);
+                    strcpy(aa3let, words[3]);
 
                     return;
                 }

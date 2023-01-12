@@ -108,43 +108,43 @@ int main(int argc, char** argv)
             fgets(buffer, 16361, pf);
             if (buffer[0] >= ' ')
             {
-                char** fields = chop_spaced_fields(buffer, '|');
+                char** words = chop_spaced_words(buffer, '|');
 
-                if (!strcmp(fields[0], "REGION"))
+                if (!strcmp(words[0], "REGION"))
                 {
-                    p.set_region(fields[1], atoi(fields[2]), atoi(fields[3]));
+                    p.set_region(words[1], atoi(words[2]), atoi(words[3]));
                 }
-                else if (!strcmp(fields[0], "METAL") && !j)
+                else if (!strcmp(words[0], "METAL") && !j)
                 {
-                    esym = new char[strlen(fields[1])+4];
-                    strcpy(esym, fields[1]);
+                    esym = new char[strlen(words[1])+4];
+                    strcpy(esym, words[1]);
 
-                    for (i=2; fields[i]; i++)
+                    for (i=2; words[i]; i++)
                     {
-                        if (strstr(fields[i], ":"))
+                        if (strstr(words[i], ":"))
                         {
-                            mcoordres[j] = atoi(&fields[i][3]);
+                            mcoordres[j] = atoi(&words[i][3]);
                             mcoorda[j] = new char[8];
-                            strcpy(mcoorda[j], strstr(fields[i], ":")+1);
+                            strcpy(mcoorda[j], strstr(words[i], ":")+1);
                             j++;
                             mcoordres[j] = 0;
                             mcoorda[j] = NULL;
                         }
-                        else if (strstr(fields[i], "HELIX="))
+                        else if (strstr(words[i], "HELIX="))
                         {
-                            dohelix = (fields[i][6] - '0');
+                            dohelix = (words[i][6] - '0');
                         }
                     }
                 }
-                else if (!strcmp(fields[0], "POCKET") && fields[1])
+                else if (!strcmp(words[0], "POCKET") && words[1])
                 {
-                    if (!strcmp(fields[1], "type=A"))
+                    if (!strcmp(words[1], "type=A"))
                     {
-                        char* pktf = strstr(fields[2], "=")+1;
+                        char* pktf = strstr(words[2], "=")+1;
                         pocketcen.x = atof(pktf);
-                        pktf = strstr(fields[3], "=")+1;
+                        pktf = strstr(words[3], "=")+1;
                         pocketcen.y = atof(pktf);
-                        pktf = strstr(fields[4], "=")+1;
+                        pktf = strstr(words[4], "=")+1;
                         pocketcen.z = atof(pktf);
                     }
                 }

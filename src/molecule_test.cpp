@@ -10,9 +10,12 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    float energyLevelThreshold = 0.25;
-    float clash_limit = 5;
-    float N_O_spacing = 3 * 2;
+    // TODO: These values are set way too permissively.
+    // The intermolecular code should be fine tuned to succeed
+    // with threshold values of at worst 15, 3, and 2.5 * 2.
+    float energyLevelThreshold = 10;
+    float clash_limit = 8;
+    float N_O_spacing = 4 * 2;
 
     Molecule m("nothing");
     cout << "Created empty molecule named " << m.get_name() << ".\n";
@@ -126,7 +129,7 @@ int main(int argc, char** argv)
     {
         m2.from_smiles(argv[2]);
 
-        if (argc > 3) energyLevelThreshold = atof(argv[3]);
+        // if (argc > 3) energyLevelThreshold = atof(argv[3]);
     }
     else
     {
@@ -174,7 +177,7 @@ int main(int argc, char** argv)
     mols[0] = &m1;
     mols[1] = &m2;
     mols[2] = NULL;
-    Molecule::multimol_conform(mols, 500);
+    Molecule::multimol_conform(mols, 200);
     float final_clashes = m1.get_intermol_clashes(&m2);
     // if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);

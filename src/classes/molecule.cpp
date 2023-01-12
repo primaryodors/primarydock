@@ -578,42 +578,42 @@ int Molecule::from_sdf(char const* sdf_dat)
 
     int na, nb;
     int added=0;
-    char** fields;
+    char** words;
 
     for (j=3; j<lncount; j++)
     {
         char line[1024];
         strncpy(line, lines[j], 1023);
-        fields = chop_spaced_fields(line);
+        words = chop_spaced_words(line);
 
-        if (!fields || !fields[0] || !fields[1]) break;
-        if (!strcmp(fields[1], "END")) break;
+        if (!words || !words[0] || !words[1]) break;
+        if (!strcmp(words[1], "END")) break;
 
-        if (!strcmp(fields[1], "CHG"))
+        if (!strcmp(words[1], "CHG"))
         {
-            for (i=3; fields[i] && fields[i+1]; i+=2)
+            for (i=3; words[i] && words[i+1]; i+=2)
             {
-                int aidx = atoi(fields[i]);
-                atoms[aidx-1]->increment_charge(atof(fields[i+1]));
+                int aidx = atoi(words[i]);
+                atoms[aidx-1]->increment_charge(atof(words[i+1]));
             }
         }
 
         if (j == 3)
         {
-            na = atoi(fields[0]);
-            nb = atoi(fields[1]);
+            na = atoi(words[0]);
+            nb = atoi(words[1]);
 
             atoms = new Atom*[na+4];
             // cout << "Allocated " << na << " atoms." << endl;
         }
         else if (added < na)
         {
-            Point* loc = new Point(atof(fields[0]), atof(fields[1]), atof(fields[2]));
-            if (fields[3][0] >= 'a' && fields[3][0] <= 'z') fields[3][0] -= 0x20;
-            Atom* a = new Atom(fields[3], loc);
+            Point* loc = new Point(atof(words[0]), atof(words[1]), atof(words[2]));
+            if (words[3][0] >= 'a' && words[3][0] <= 'z') words[3][0] -= 0x20;
+            Atom* a = new Atom(words[3], loc);
             delete loc;
             a->name = new char[16];
-            sprintf(a->name, "%s%d", fields[3], added+1);
+            sprintf(a->name, "%s%d", words[3], added+1);
             a->residue = 0;
             atoms[atcount++] = a;
             atoms[atcount] = nullptr;
@@ -623,18 +623,18 @@ int Molecule::from_sdf(char const* sdf_dat)
         }
         else
         {
-            int a1i = atoi(fields[0]);
-            int a2i = atoi(fields[1]);
+            int a1i = atoi(words[0]);
+            int a2i = atoi(words[1]);
 
             if (!a1i || !a2i) break;
-            atoms[a1i-1]->bond_to(atoms[a2i-1], atof(fields[2]));
+            atoms[a1i-1]->bond_to(atoms[a2i-1], atof(words[2]));
             // cout << "Bonded " << atoms[a1i-1]->name << " to " << atoms[a2i-1]->name << endl;
         }
 
-        if (fields) delete[] fields;
+        if (words) delete[] words;
     }
     atoms[atcount] = 0;
-    if (fields) delete[] fields;
+    if (words) delete[] words;
 
     identify_rings();
     identify_acidbase();
@@ -652,22 +652,22 @@ int Molecule::from_pdb(FILE* is)
     while (!feof(is))
     {
         fgets(buffer, 1003, is);
-        char** fields = chop_spaced_fields(buffer);
+        char** words = chop_spaced_words(buffer);
 
-        if (fields)
+        if (words)
         {
-            if (!strcmp(fields[0], "ATOM")
+            if (!strcmp(words[0], "ATOM")
                     ||
-                    !strcmp(fields[0], "HETATM")
+                    !strcmp(words[0], "HETATM")
                )
             {
                 try
                 {
                     char esym[7];
-                    if (fields[2][0] >= '0' && fields[2][0] <= '9')
-                        strcpy(esym, &fields[2][1]);
+                    if (words[2][0] >= '0' && words[2][0] <= '9')
+                        strcpy(esym, &words[2][1]);
                     else
-                        strcpy(esym, fields[2]);
+                        strcpy(esym, words[2]);
 
                     int i;
                     for (i=1; i<6; i++)
@@ -679,12 +679,12 @@ int Molecule::from_pdb(FILE* is)
                     }
                     esym[1] &= 0x5f;
 
-                    Point aloc(atof(fields[5]), atof(fields[6]),atof(fields[7]));
+                    Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
 
-                    Atom* a = add_atom(esym, fields[2], &aloc, 0, 0);
+                    Atom* a = add_atom(esym, words[2], &aloc, 0, 0);
                     added++;
 
-                    // a->residue = atoi(fields[4]);
+                    // a->residue = atoi(words[4]);
 
                     for (i=0; atoms[i]; i++)
                     {
@@ -706,7 +706,7 @@ int Molecule::from_pdb(FILE* is)
         }
         buffer[0] = 0;
 
-        delete[] fields;
+        delete[] words;
     }
 
     return added;

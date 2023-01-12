@@ -1831,40 +1831,40 @@ function loadFile(fileData, fileName = "")
                 var ln = poresult[i];
                 if (ln.substr(0, 6) == "METAL|")
                 {
-                    var fields = ln.split("|");
+                    var words = ln.split("|");
                     var j;
-                    for (j=1; j<fields.length; j++)
+                    for (j=1; j<words.length; j++)
                     {
-                        var m = fields[j].match(/[0-9]{3}[:]/);
+                        var m = words[j].match(/[0-9]{3}[:]/);
                         if (m && m.length)
                             mtlcoord.push(parseInt(m[0]));
                     }
                 }
                 if (ln.substr(0, 7) == "REGION|")
                 {
-                    var fields = ln.split("|");
-                    if (fields[1].substr(0, 3) == "TMR")
+                    var words = ln.split("|");
+                    if (words[1].substr(0, 3) == "TMR")
                     {
-                        var tmr = parseInt(fields[1].substr(3));
-                        tmstart[tmr] = parseInt(fields[2]);
-                        tmend[tmr] = parseInt(fields[3]);
+                        var tmr = parseInt(words[1].substr(3));
+                        tmstart[tmr] = parseInt(words[2]);
+                        tmend[tmr] = parseInt(words[3]);
                     }
                 }
                 if (ln.substr(0, 3) == "BW|")
                 {
-                    var fields = ln.split("|");
-					var tmr = parseInt(fields[1].split('.')[0]);
-					bw50r[tmr] = parseInt(fields[2]);
+                    var words = ln.split("|");
+					var tmr = parseInt(words[1].split('.')[0]);
+					bw50r[tmr] = parseInt(words[2]);
                 }
                 if (ln.substr(0, 7) == "POCKET|")
                 {
                 	if (!pocket[0] && !pocket[1] && !pocket[2])		// Only care about the first one for now.
                 	{
-                		var fields = ln.split("|");
+                		var words = ln.split("|");
                 		var j;
-                		for (j=1; j<fields.length; j++)
+                		for (j=1; j<words.length; j++)
                 		{
-                			var kv = fields[j].split('=');
+                			var kv = words[j].split('=');
                 			if (kv.length > 1)
                 			{
 		            			if (kv[0] == 'center_x') pocket[0] = parseFloat(kv[1]);
@@ -2169,22 +2169,22 @@ function loadFile(fileData, fileName = "")
                     }
                     else if (ln.substr(0,4) == "ACM ")
                     {
-                    	var fields = ln.split(" ");
-                    	if (fields.length < 11) continue;
+                    	var words = ln.split(" ");
+                    	if (words.length < 11) continue;
                     	
-                    	acvnode = parseInt(fields[1]);
+                    	acvnode = parseInt(words[1]);
                     	
                     	var matrixln =
                     	{
-                    		name: fields[2],
-                    		sr: parseInt(fields[3]),
-                    		er: parseInt(fields[4]),
-                    		nx: parseFloat(fields[5]),
-                    		ny: parseFloat(fields[6]),
-                    		nz: parseFloat(fields[7]),
-                    		cx: parseFloat(fields[8]),
-                    		cy: parseFloat(fields[9]),
-                    		cz: parseFloat(fields[10]),
+                    		name: words[2],
+                    		sr: parseInt(words[3]),
+                    		er: parseInt(words[4]),
+                    		nx: parseFloat(words[5]),
+                    		ny: parseFloat(words[6]),
+                    		nz: parseFloat(words[7]),
+                    		cx: parseFloat(words[8]),
+                    		cy: parseFloat(words[9]),
+                    		cz: parseFloat(words[10]),
                     	};
                     	
                     	if (!acvmatrix.length) acvmatrix.push(matrixln);
@@ -2206,28 +2206,28 @@ function loadFile(fileData, fileName = "")
                     }
                     else if (ln.substr(0,4) == "ACR ")
                     {
-                    	var fields = ln.split(" ");
-                    	if (fields.length < 11) continue;
+                    	var words = ln.split(" ");
+                    	if (words.length < 11) continue;
                     	
-                    	acvnode = parseInt(fields[1]);
+                    	acvnode = parseInt(words[1]);
                     	
                     	acvmatrix = [];
                     	
                     	var rot8ln =
                     	{
-                    		name: fields[2],
-                    		sr: parseInt(fields[3]),
-                    		er: parseInt(fields[4]),
-                    		tx: parseFloat(fields[5]),			// transform xyz.
-                    		ty: parseFloat(fields[6]),
-                    		tz: parseFloat(fields[7]),
-                    		ox: parseFloat(fields[8]),			// origin xyz.
-                    		oy: parseFloat(fields[9]),
-                    		oz: parseFloat(fields[10]),
-                    		ax: parseFloat(fields[11]),			// axis xyz, relative to origin.
-                    		ay: parseFloat(fields[12]),
-                    		az: parseFloat(fields[13]),
-                    		angle: parseFloat(fields[14]),		// radians.
+                    		name: words[2],
+                    		sr: parseInt(words[3]),
+                    		er: parseInt(words[4]),
+                    		tx: parseFloat(words[5]),			// transform xyz.
+                    		ty: parseFloat(words[6]),
+                    		tz: parseFloat(words[7]),
+                    		ox: parseFloat(words[8]),			// origin xyz.
+                    		oy: parseFloat(words[9]),
+                    		oz: parseFloat(words[10]),
+                    		ax: parseFloat(words[11]),			// axis xyz, relative to origin.
+                    		ay: parseFloat(words[12]),
+                    		az: parseFloat(words[13]),
+                    		angle: parseFloat(words[14]),		// radians.
                     	};
                     	
                     	if (!acvrot8.length) acvrot8.push(rot8ln);

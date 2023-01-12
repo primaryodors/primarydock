@@ -1978,7 +1978,7 @@ _try_again:
                         clrot.v.r = 1;
                     }
 
-                    if (wrote_acvmx < i+wroteoff)
+                    if (wrote_acvmx < (i+wroteoff))
                     {
                         #if write_activation_matrix
                         // Output the activation for the viewer to recognize.
@@ -2056,23 +2056,27 @@ _try_again:
                         protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
                             active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
 
-                        if (wrote_acvmr < j && acvdirection>0)
+                        if (wrote_acvmr < (j+wroteoff) )
                         {
                             Point ptaxis = active_helix_rots[j].axis;
                             Point ptorigin = protein->get_atom_location(mr, "CA");
                             // Write an active matrix to the dock.
-                            cout << "ACR " << active_matrix_node << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
-                                << active_helix_rots[j].transform.x << " " << active_helix_rots[j].transform.y << " " << active_helix_rots[j].transform.z << " "
+                            cout << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x*acvdirection << " "
+                                << active_helix_rots[j].transform.y*acvdirection << " "
+                                << active_helix_rots[j].transform.z*acvdirection << " "
                                 << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
                                 << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
-                                << active_helix_rots[j].theta << endl;
-                            if (output) *output << "ACR " << active_matrix_node << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
-                                << active_helix_rots[j].transform.x << " " << active_helix_rots[j].transform.y << " " << active_helix_rots[j].transform.z << " "
+                                << active_helix_rots[j].theta*acvdirection << endl;
+                            if (output) *output << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x*acvdirection << " "
+                                << active_helix_rots[j].transform.y*acvdirection << " "
+                                << active_helix_rots[j].transform.z*acvdirection << " "
                                 << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
                                 << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
-                                << active_helix_rots[j].theta << endl;
+                                << active_helix_rots[j].theta*acvdirection << endl;
 
-                            wrote_acvmr = j;
+                            wrote_acvmr = j+wroteoff;
                         }
                     }
                 }

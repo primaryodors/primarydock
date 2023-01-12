@@ -105,7 +105,7 @@
 #define polar_repulsion 35.0
 #define charge_repulsion 120.0
 
-#define lmpush 0.001
+#define lmpush 0.0005
 
 #define _enhanced_pi_stacking 1
 #define _preflex_alignment_res 1

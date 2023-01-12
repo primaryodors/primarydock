@@ -371,12 +371,15 @@ void iteration_callback(int iter)
     }
 
     #if _output_each_iter
-    std::string outfname = (std::string)"tmp/iter" + to_string(iter) + (std::string)".pdb";
-    FILE* fp = fopen(outfname.c_str(), "wb");
+    // std::string outfname = (std::string)"tmp/iter" + to_string(iter) + (std::string)".pdb";
+    // FILE* fp = fopen(outfname.c_str(), "a");
+    FILE* fp = fopen("tmp/iters.dock", (iter == 1 ? "wb" : "ab") );
     if (fp)
     {
+        fprintf(fp, "Pose: 1\nNode: %d\n\nPDBDAT:\n", iter-1);
         protein->save_pdb(fp, ligand);
         protein->end_pdb(fp);
+        fprintf(fp, "\n\n");
         fclose(fp);
     }
     #endif

@@ -2193,7 +2193,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 atoms[i]->strongest_bind_atom = ligands[l]->atoms[j];
                             }
 
-                            if (abind < 0 && movability >= MOV_ALL)
+                            if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
                                 lmx += lmpush * sgn(ptd.x);

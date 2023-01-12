@@ -178,7 +178,7 @@
 #define allow_tethered_rotations 1
 
 // Reject any conformation where any single residue's total clashes exceed this threshold.
-#define individual_clash_limit 20
+#define individual_clash_limit 5
 
 // Overwrite the user supplied pocket center with the loneliest point as determined by
 // distances to the nearest residue atoms to the supplied pocket center.

@@ -427,10 +427,14 @@ Clip:
 </span>
 </div>
 
+&nbsp;|&nbsp;
+
 <div id="affichage">
 	<a id="ptbbbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a>
 	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
 </div>
+<a id="spinon" class="nodebtn clickme symbol" onclick="stage.setSpin(true); $(this).hide(); $('#spinoff').show();">&#x1F310;</a>
+<a id="spinoff" class="nodebtn clickme symbol" onclick="stage.setSpin(false); $(this).hide(); $('#spinon').show();" style="display: none;">&#x1F9F1;</a>
 
 <div id="center">
 <a id="fsbtn" class="nodebtn clickme" onclick="if (is_fullscreen) exitFullscreen(); else openFullscreen(document.body); is_fullscreen = !is_fullscreen">&#x26F6;</a>

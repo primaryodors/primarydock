@@ -232,6 +232,7 @@ void iteration_callback(int iter)
                 if (alca)
                 {
                     float r = alca->get_location().get_3d_distance(ligbb[l]->get_location());
+                    if (r < 2.5) r = 2.5;
                     ttl_bb_dist += r;
                     #if _dbg_bb_pullaway
                     cout << alignment_aa[l]->get_name() << ":" << alca->name << " " << r << "A from " << ligbb[l]->name << "... ";
@@ -371,15 +372,27 @@ void iteration_callback(int iter)
     }
 
     #if _output_each_iter
-    // std::string outfname = (std::string)"tmp/iter" + to_string(iter) + (std::string)".pdb";
-    // FILE* fp = fopen(outfname.c_str(), "a");
-    FILE* fp = fopen("tmp/iters.dock", (iter == 1 ? "wb" : "ab") );
+    std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
+    FILE* fp = fopen(itersfname.c_str(), (iter == 1 ? "wb" : "ab") );
     if (fp)
     {
         fprintf(fp, "Pose: 1\nNode: %d\n\nPDBDAT:\n", iter-1);
-        protein->save_pdb(fp, ligand);
-        protein->end_pdb(fp);
-        fprintf(fp, "\n\n");
+        /*protein->save_pdb(fp, ligand);
+        protein->end_pdb(fp);*/
+
+        AminoAcid* reaches_spheroid[SPHREACH_MAX];
+        int sphres = 0;
+        sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, pocketcen, size, addl_resno);
+        int foff = 0;
+
+        for (i=0; i<sphres; i++)
+        {
+            reaches_spheroid[i]->save_pdb(fp, foff);
+            foff += reaches_spheroid[i]->get_atom_count();
+        }
+
+        ligand->save_pdb(fp, foff);
+
         fclose(fp);
     }
     #endif
@@ -1375,7 +1388,15 @@ int main(int argc, char** argv)
     // Load the protein or return an error.
     /* Protein p(protfname);
     protein = &p; */
-    protein = new Protein(protfname);
+
+    char protid[255];
+    char* slash = strrchr(protfname, '/');
+    if (!slash) slash = strrchr(protfname, '\\');
+    strcpy(protid, slash ? slash+1 : protfname );
+    char* dot = strchr(protid, '.');
+    if (dot) *dot = 0;
+
+    protein = new Protein(protid);
     pf = fopen(protfname, "r");
     if (!pf)
     {

@@ -67,7 +67,7 @@ public:
     int from_sdf(const char* sdf_dat);		// returns number of atoms loaded.
     bool save_sdf(FILE* outf);
     bool save_sdf(FILE* outf, Molecule** included_ligands);
-    void save_pdb(FILE* outf, int atomno_offset=0);
+    void save_pdb(FILE* outf, int atomno_offset=0, bool endpdb = true);
     int from_pdb(FILE* inf);				// returns number of atoms loaded.
     void identify_acidbase();				// called within every load.
     bool from_smiles(char const * smilesstr);

@@ -2423,7 +2423,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 mm[i]->movability = MOV_FLEXONLY;               // TODO: Prevent this if molecule is a metal bound residue.
 
             float reversal = -0.999;
-            float lreversal = pow(0.1, 5.0/iters);
+            float lreversal = -pow(0.1, 2.0/iters);
             float accel = 1.01;
 
             /**** Linear Motion ****/

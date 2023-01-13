@@ -67,7 +67,6 @@ LIG sdf/$ligname.sdf
 $cenres
 $paths
 SIZE 7.0 7.5 7.0
-EXCL $tmr4end $tmr5start
 # H2O 1
 
 # Activation Matrix.

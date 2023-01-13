@@ -1,6 +1,6 @@
 <?php
 
-global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam;
+global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere;
 
 // Includes
 require("protutils.php");
@@ -16,6 +16,7 @@ $method = explode(".", $method)[0];
 // Configurable variables
 $dock_retries = 5;
 $max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
+if (!isset($do_scwhere)) $do_scwhere = false;
 
 // Load data
 $dock_results = [];
@@ -120,7 +121,7 @@ function prepare_outputs()
 
 function process_dock()
 {
-    global $ligname, $protid, $configf, $dock_retries, $outfname, $bias_by_energy, $version, $sepyt, $json_file;
+    global $ligname, $protid, $configf, $dock_retries, $outfname, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere;
     if (!file_exists("tmp")) mkdir("tmp");
     $lignospace = str_replace(" ", "", $ligname);
     $cnfname = "tmp/prediction.$protid.$lignospace.config";
@@ -304,7 +305,7 @@ function process_dock()
     {
         $bw = bw_from_resno($protid, $resno);
     
-        if ($sc_qty[$resno]) 
+        if ($do_scwhere && $sc_qty[$resno]) 
         {
             $sc_avg[$bw] =
             [

@@ -99,6 +99,13 @@ imagefilledrectangle($im, 0,0, $w-1,$h-1, $black);
 
 // Each bw number, get the OR1A1 resno, get its xyz coords, plot its azimuth and y value,
 // and draw a filled circle of the TMR color with a size proportional to the perturbation.
+$maxptbn = 0.0;
+foreach ($array['all'] as $tmrno => $tdat)
+	foreach ($tdat as $bw => $perturbation)
+		if ($perturbation > $maxptbn) $maxptbn = $perturbation;
+
+$ptbm = 53.81 / sqrt($maxptbn);
+
 foreach ($array['all'] as $tmrno => $tdat)
 {
     if ($tmrno < 1 || $tmrno > 7) continue;
@@ -115,7 +122,7 @@ foreach ($array['all'] as $tmrno => $tdat)
 
         $x = intval(3 * (180.0 / pi()) * $azimuth + $pad);
         $y = ($h/2) + $xyz[1]*20 + $pad;
-        $r = sqrt($perturbation)/3;
+        $r = sqrt($perturbation)*$ptbm;
 
         imagefilledellipse($im, $x,$y, $r,$r, $ltmcol);
     }

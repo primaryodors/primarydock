@@ -155,6 +155,8 @@ function process_dock()
             else $elim *= 2;
         }
     }
+    
+    unlink($cnfname);
 
     if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
 

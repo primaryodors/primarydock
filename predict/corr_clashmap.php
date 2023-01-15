@@ -5,7 +5,7 @@ require_once("statistics.php");
 require_once("protutils.php");
 
 $inpfile = "dock_results_clashmap.json";
-$rplstrength = 100;
+$rplstrength = 3;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -23,7 +23,12 @@ foreach ($data as $rcp => $rdat)
         {
             $valmult = 0;
 
-            if (substr($metric, 0, 7) == "BEnerg ") $valmult = 1;
+            if (substr($metric, 0, 7) == "BEnerg ")
+            {
+            	$valmult = 1;
+            	$mdat = floatval($mdat);
+            	if ($mdat > 0) $mdat = pow($mdat, 1.0/3);
+        	}
             if (substr($metric, 0, 7) == "vdWrpl ") $valmult = $rplstrength;
 
             if ($valmult)
@@ -88,10 +93,10 @@ $im = imagecreatetruecolor($w, $h);
 $black = imagecolorallocate($im, 0,0,0);
 $tm1col = imagecolorallocate($im, 64,64,64);
 $tm2col = imagecolorallocate($im, 0,128,255);
-$tm3col = imagecolorallocate($im, 0,255,96);
-$tm4col = imagecolorallocate($im, 160,192,0);
-$tm5col = imagecolorallocate($im, 255,225,0);
-$tm6col = imagecolorallocate($im, 255,128,0);
+$tm3col = imagecolorallocate($im, 0,255,128);
+$tm4col = imagecolorallocate($im, 128,192,0);
+$tm5col = imagecolorallocate($im, 255,192,0);
+$tm6col = imagecolorallocate($im, 255,104,0);
 $tm7col = imagecolorallocate($im, 225,0,32);
 
 imagefilledrectangle($im, 0,0, $w-1,$h-1, $black);

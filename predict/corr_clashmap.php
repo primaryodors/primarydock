@@ -19,6 +19,8 @@ foreach ($data as $rcp => $rdat)
     if (!isset($array[$rcp])) $array[$rcp] = [];
 
     foreach ($rdat as $ligand => $ldat)
+    {
+    	$sign = (@$ldat['Actual'] == 'Agonist') ? 1 : -1;
         foreach ($ldat as $metric => $mdat)
         {
             $valmult = 0;
@@ -42,13 +44,14 @@ foreach ($data as $rcp => $rdat)
                 $bw = intval($morceaux[1]);
                 if (!$tmrno || !$bw) continue;
 
-                if (!isset($array[$rcp][$tmrno][$bw])) $array[$rcp][$tmrno][$bw] = floatval($mdat) * $valmult;
-                else $array[$rcp][$tmrno][$bw] += floatval($mdat) * $valmult;
+                if (!isset($array[$rcp][$tmrno][$bw])) $array[$rcp][$tmrno][$bw] = floatval($mdat) * $valmult * $sign;
+                else $array[$rcp][$tmrno][$bw] += floatval($mdat) * $valmult * $sign;
 
-                if (!isset($array['all'][$tmrno][$bw])) $array['all'][$tmrno][$bw] = floatval($mdat) * $valmult;
-                else $array['all'][$tmrno][$bw] += floatval($mdat) * $valmult;
+                if (!isset($array['all'][$tmrno][$bw])) $array['all'][$tmrno][$bw] = floatval($mdat) * $valmult * $sign;
+                else $array['all'][$tmrno][$bw] += floatval($mdat) * $valmult * $sign;
             }
         }
+    }
 }
 
 foreach ($array as $rcp => $rdat) foreach ($rdat as $tmrno => $tdat) ksort($array[$rcp][$tmrno]);
@@ -118,8 +121,6 @@ foreach ($array['all'] as $tmrno => $tdat)
     $ltmcol = $$ltmcol;
     foreach ($tdat as $bw => $perturbation)
     {
-        if ($perturbation <= 0) continue;
-
         $resno = resno_from_bw($orid, "$tmrno.$bw");
         $xyz = $resxyz[$orid][$resno];
         $azimuth = find_angle($xyz[0], -$xyz[2]) + 0.3 - pi();
@@ -127,9 +128,17 @@ foreach ($array['all'] as $tmrno => $tdat)
 
         $x = intval(3 * (180.0 / pi()) * $azimuth + $pad);
         $y = ($h/2) + $xyz[1]*20 + $pad;
-        $r = sqrt($perturbation)*$ptbm;
-
-        imagefilledellipse($im, $x,$y, $r,$r, $ltmcol);
+        
+        if ($perturbation < 0)
+        {
+        	$r = sqrt(-$perturbation)*$ptbm;
+        	imageellipse($im, $x,$y, $r,$r, $ltmcol);
+        }
+        else
+        {
+        	$r = sqrt($perturbation)*$ptbm;
+        	imagefilledellipse($im, $x,$y, $r,$r, $ltmcol);
+    	}
     }
 }
 

@@ -561,6 +561,7 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
 
     float result = 0;
     int i;
+    float c;
     for (i=0; atoms[i]; i++)
     {
         if (!ib && atoms[i]->is_backbone) continue;
@@ -572,7 +573,7 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
             break;
 
             case ionic:
-            float c = atoms[i]->get_charge();
+            c = atoms[i]->get_charge();
             if (c) result += c;
             else
             {

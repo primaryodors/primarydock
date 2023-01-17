@@ -50,6 +50,55 @@ struct AcvBndRot
     float theta;
 };
 
+struct AtomGlom
+{
+    Atom** atoms = nullptr;
+
+    Point get_center()
+    {
+        if (!atoms) return Point(0,0,0);
+        int i;
+        float mass = 0;
+        Point result(0,0,0);
+        for (i=0; atoms[i]; i++)
+        {
+            Point pt = atoms[i]->get_location();
+            float m = atoms[i]->get_atomic_weight();
+            pt.scale(pt.magnitude() * m);
+            result.add(pt);
+            mass += m;
+        }
+        if (mass) result.scale(result.magnitude() / mass);
+        return result;
+    }
+};
+
+struct ResidueGlom
+{
+    AminoAcid** aminos = nullptr;
+
+    Point get_center()
+    {
+        if (!aminos) return Point(0,0,0);
+        int i, j;
+        j = 0;
+        Point result(0,0,0);
+        for (i=0; aminos[i]; i++)
+        {
+            Atom* a = aminos[i]->get_atom("CB");
+            if (!a) a = aminos[i]->get_atom("CA");      // even though glycine probably shouldn't be part of a glom.
+            if (a)
+            {
+                Point pt = a->get_location();
+                result.add(pt);
+                j++;
+            }
+        }
+        if (j) result.scale(result.magnitude() / j);
+        return result;
+    }
+};
+
 char* get_file_ext(char* filename)
 {
     int i = strlen(filename)-1;

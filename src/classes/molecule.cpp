@@ -555,6 +555,90 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
     return atoms[j];
 }
 
+float Molecule::bindability_by_type(intera_type t, bool ib)
+{
+    if (!atoms) return 0;
+
+    float result = 0;
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        if (!ib && atoms[i]->is_backbone) continue;
+        switch (t)
+        {
+            case covalent:
+            // TODO
+            ;
+            break;
+
+            case ionic:
+            float c = atoms[i]->get_charge();
+            if (c) result += c;
+            else
+            {
+                if (atoms[i]->get_family() == PNICTOGEN)
+                {
+                    Bond** bb = atoms[i]->get_bonds();
+                    if (bb)
+                    {
+                        int j;
+                        for (j=0; bb[j]; j++)
+                        {
+                            if (bb[j]->btom && bb[j]->btom->get_Z() > 1)
+                            {
+                                int fam = bb[j]->btom->get_family();
+                                if (fam != TETREL) break;
+                                if (bb[j]->btom->is_bonded_to(CHALCOGEN)) break;
+                                result += 0.5;
+                            }
+                        }
+                        delete bb;          // Not delete[] because we preserve the individual objects.
+                    }
+                }
+            }
+            break;
+
+            case hbond:
+            result += fabs(atoms[i]->is_polar());
+            break;
+
+            case pi:
+            result += fabs(atoms[i]->is_pi());
+            break;
+
+            case polarpi:
+            result += fabs(atoms[i]->is_polar()) + fabs(atoms[i]->is_pi());
+            break;
+
+            case mcoord:
+            if (atoms[i]->is_metal())
+            {
+                result += atoms[i]->get_charge();
+            }
+            else
+            {
+                int fam = atoms[i]->get_family();
+                int Z = atoms[i]->get_Z();
+
+                if (fam == PNICTOGEN && Z <= 15)
+                    result -= (atoms[i]->is_pi() ? 0.5 : 1);
+
+                if (fam == CHALCOGEN && Z <= 35)
+                    result -= (atoms[i]->is_pi() ? 0.25 : 1);
+            }
+
+            break;
+
+            case vdW:
+            default:
+            result += 1;
+            break;
+        }
+    }
+
+    return result;
+}
+
 int Molecule::from_sdf(char const* sdf_dat)
 {
     if (!sdf_dat) return 0;

@@ -10475,35 +10475,6 @@
             }
         }
     },
-    "6c00f48a8c161845dad6a139b579efe3":
-    {
-        "full_name": "dihydromyrcenol",
-        "smiles": "CC(CCCC(C)(C)O)C=C",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "citrus",
-                "clean",
-                "cologne",
-                "floral",
-                "fresh",
-                "lime",
-                "weedy"
-            ]
-        },
-        "activity":
-        {
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
-            {
-                "OR1D2":
-                {
-                    "type": "ma",
-                    "ec50": "-4.51"
-                }
-            }
-        }
-    },
     "90a7ca147ff08a0beea4bf1ac2111805":
     {
         "full_name": "2,5-dihydro-2,4,5-trimethylthiazoline",
@@ -10753,7 +10724,7 @@
     },
     "0e12cf654a550eef497a5e63c6cac567":
     {
-        "full_name": "2,6-dimethyl-7-octen-2-ol",
+        "full_name": "dihydromyrcenol",
         "smiles": "C[C@H](CCCC(C)(C)O)C=C",
         "aroma":
         {

@@ -148,6 +148,8 @@ public:
 
     float get_vdW_repulsion(Molecule* ligand);
 
+    float bindability_by_type(intera_type type, bool include_backbone = false);
+
     static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);
     static void multimol_conform(Molecule** interactors, Molecule** background, int iters = 50, void (*iter_callback)(int) = NULL);
     static void multimol_conform(Molecule** interactors, Molecule** background, Molecule** allow_clashes, int iters = 50, void (*iter_callback)(int) = NULL);

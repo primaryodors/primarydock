@@ -53,15 +53,16 @@ struct AcvBndRot
 #if _use_gloms
 struct AtomGlom
 {
-    Atom** atoms = nullptr;
+    std::vector<Atom*> atoms;
 
     Point get_center()
     {
-        if (!atoms) return Point(0,0,0);
         int i;
         float mass = 0;
         Point result(0,0,0);
-        for (i=0; atoms[i]; i++)
+        int atct = atoms.size();
+        if (!atct) return Point(0,0,0);
+        for (i=0; i<atct; i++)
         {
             Point pt = atoms[i]->get_location();
             float m = atoms[i]->get_atomic_weight();
@@ -75,10 +76,11 @@ struct AtomGlom
 
     float get_pi()
     {
-        if (!atoms) return 0;
+        int atct = atoms.size();
+        if (!atct) return 0;
         int i;
         float result = 0;
-        for (i=0; atoms[i]; i++)
+        for (i=0; i<atct; i++)
         {
             if (atoms[i]->is_pi()) result += 1;
         }
@@ -87,10 +89,11 @@ struct AtomGlom
 
     float get_polarity()
     {
-        if (!atoms) return 0;
+        int atct = atoms.size();
+        if (!atct) return 0;
         int i;
         float result = 0;
-        for (i=0; atoms[i]; i++)
+        for (i=0; i<atct; i++)
         {
             result += fabs(atoms[i]->is_polar());
         }
@@ -99,10 +102,11 @@ struct AtomGlom
 
     float get_ionic()
     {
-        if (!atoms) return 0;
+        int atct = atoms.size();
+        if (!atct) return 0;
         int i;
         float result = 0;
-        for (i=0; atoms[i]; i++)
+        for (i=0; i<atct; i++)
         {
             float c = atoms[i]->get_charge();
             if (c) result += c;
@@ -113,6 +117,25 @@ struct AtomGlom
                     result += 0.5;
                 }
             }
+        }
+        return result;
+    }
+
+    float get_sum()
+    {
+        return get_ionic()+get_polarity()+get_pi();
+    }
+
+    float distance_to(Point pt)
+    {
+        int atct = atoms.size();
+        if (!atct) return -1;
+        int i;
+        float result = 0;
+        for (i=0; i<atct; i++)
+        {
+            float f = atoms[i]->get_location().get_3d_distance(pt);
+            if (!i || !f || f < result) result = f;
         }
         return result;
     }
@@ -1678,7 +1701,57 @@ int main(int argc, char** argv)
     if (use_bestbind_algorithm)
     {
         #if _use_gloms
-        // TODO
+        AtomGlom glomi, glomh, glompi;
+
+        int lac = ligand->get_atom_count();
+        bool dirty[lac+4];
+        for (i=0; i<lac; i++) dirty[i] = false;
+        for (i=0; i<lac; i++)
+        {
+            if (dirty[i]) continue;
+
+            Atom* a = ligand->get_atom(i);
+            float ac = a->get_charge();
+
+            glomi.atoms.clear();
+            glomi.atoms.push_back(a);
+
+            if (ac)
+            {
+                for (j=i+1; j<lac; j++)
+                {
+                    if (dirty[j]) continue;
+
+                    Atom* b = ligand->get_atom(j);
+                    float rab = a->get_location().get_3d_distance(b->get_location());
+                    if (rab < 2.6 && sgn(b->get_charge()) == sgn(ac))
+                    {
+                        glomi.atoms.push_back(b);
+                        dirty[j] = true;
+                    }
+                }
+            }
+
+            dirty[i] = true;
+        }
+
+        float tsum = glomi.get_sum();
+        if (fabs(tsum) > fabs(ligand_gloms[0].get_sum()))
+        {
+            ligand_gloms[2] = ligand_gloms[1];
+            ligand_gloms[1] = ligand_gloms[0];
+            ligand_gloms[0] = glomi;
+        }
+        else if (fabs(tsum) > fabs(ligand_gloms[1].get_sum()))
+        {
+            ligand_gloms[2] = ligand_gloms[1];
+            ligand_gloms[1] = glomi;
+        }
+        else if (fabs(tsum) > fabs(ligand_gloms[2].get_sum()))
+        {
+            ligand_gloms[2] = glomi;
+        }
+
         #else
         ligbb = m.get_most_bindable(3);
         ligbbh = new Atom*[5];

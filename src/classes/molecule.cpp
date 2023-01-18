@@ -577,24 +577,9 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
             if (c) result += c;
             else
             {
-                if (atoms[i]->get_family() == PNICTOGEN)
+                if (atoms[i]->get_family() == PNICTOGEN && !atoms[i]->is_amide())
                 {
-                    Bond** bb = atoms[i]->get_bonds();
-                    if (bb)
-                    {
-                        int j;
-                        for (j=0; bb[j]; j++)
-                        {
-                            if (bb[j]->btom && bb[j]->btom->get_Z() > 1)
-                            {
-                                int fam = bb[j]->btom->get_family();
-                                if (fam != TETREL) break;
-                                if (bb[j]->btom->is_bonded_to(CHALCOGEN)) break;
-                                result += 0.5;
-                            }
-                        }
-                        delete bb;          // Not delete[] because we preserve the individual objects.
-                    }
+                    result += 0.5;
                 }
             }
             break;

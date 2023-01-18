@@ -50,6 +50,7 @@ struct AcvBndRot
     float theta;
 };
 
+#if _use_gloms
 struct AtomGlom
 {
     Atom** atoms = nullptr;
@@ -69,6 +70,50 @@ struct AtomGlom
             mass += m;
         }
         if (mass) result.scale(result.magnitude() / mass);
+        return result;
+    }
+
+    float get_pi()
+    {
+        if (!atoms) return 0;
+        int i;
+        float result = 0;
+        for (i=0; atoms[i]; i++)
+        {
+            if (atoms[i]->is_pi()) result += 1;
+        }
+        return result;
+    }
+
+    float get_polarity()
+    {
+        if (!atoms) return 0;
+        int i;
+        float result = 0;
+        for (i=0; atoms[i]; i++)
+        {
+            result += fabs(atoms[i]->is_polar());
+        }
+        return result;
+    }
+
+    float get_ionic()
+    {
+        if (!atoms) return 0;
+        int i;
+        float result = 0;
+        for (i=0; atoms[i]; i++)
+        {
+            float c = atoms[i]->get_charge();
+            if (c) result += c;
+            else
+            {
+                if (atoms[i]->get_family() == PNICTOGEN && !atoms[i]->is_amide())
+                {
+                    result += 0.5;
+                }
+            }
+        }
         return result;
     }
 };
@@ -98,6 +143,8 @@ struct ResidueGlom
         return result;
     }
 };
+
+#endif
 
 char* get_file_ext(char* filename)
 {
@@ -156,18 +203,22 @@ bool append_pdb = false;
 std::string origbuff = "";
 std::string optsecho = "";
 
-// Switch to enable older "best binding" algorithm instead of newer "tumble spheres".
-// Generally, tumble spheres give better results but let's leave best bind code
-// in place because we'll be reviving it later.
+// Switch to enable "best-binding" algorithm rather than "tumble spheres" algorithm.
 bool use_bestbind_algorithm = default_bestbind;
 bool use_prealign = false;
 std::string prealign_residues = "";
 Bond retain_bindings[4];
 
+#if _use_gloms
+AtomGlom ligand_gloms[3];
+ResidueGlom sc_gloms[3];
+#else
 Atom** ligbb = nullptr;
 Atom** ligbbh = nullptr;
+
 intera_type lig_inter_typ[5];
 Molecule* alignment_aa[5];
+#endif
 
 Pose pullaway_undo;
 float last_ttl_bb_dist = 0;
@@ -267,6 +318,9 @@ void iteration_callback(int iter)
     int l;
     
     #if enforce_no_bb_pullaway
+    #if _use_gloms
+    // TODO
+    #else
     if (ligbb)
     {
         float ttl_bb_dist = 0;
@@ -303,6 +357,7 @@ void iteration_callback(int iter)
             pullaway_undo.restore_state(ligand);
         }
     }
+    #endif
     #endif
 
     Point bary = ligand->get_barycenter();
@@ -1487,10 +1542,12 @@ int main(int argc, char** argv)
     pocketcen = loneliest;
     #endif
 
+    #if !_use_gloms
     for (i=0; i<3; i++)
     {
         alignment_aa[i] = nullptr;
     }
+    #endif
 
     if (waters)
     {
@@ -1617,11 +1674,15 @@ int main(int argc, char** argv)
         delete lig_grp;
     }
 
+    // Best-Binding Code
     if (use_bestbind_algorithm)
     {
+        #if _use_gloms
+        // TODO
+        #else
         ligbb = m.get_most_bindable(3);
         ligbbh = new Atom*[5];
-        
+
         for (i=0; i<5; i++)
         {
             ligbbh[i] = nullptr;
@@ -1658,6 +1719,7 @@ int main(int argc, char** argv)
             else if (ligbb[i]->is_pi())
                 lig_inter_typ[i] = pi;
         }
+        #endif
     }
 
     #if _DBG_STEPBYSTEP
@@ -1716,6 +1778,9 @@ int main(int argc, char** argv)
 
     if (use_bestbind_algorithm) for (i=0; i<3; i++)
         {
+            #if _use_gloms
+            // TODO
+            #else
             if (ligbb[i])
             {
                 cout << "# Best binding heavy atom " << i << " of ligand" << endl << "# LBBA: " << ligbb[i]->name
@@ -1729,6 +1794,7 @@ int main(int argc, char** argv)
                 if (output) *output << "# Best binding hydrogen " << i << " of ligand" << endl << "LBBH: " << ligbbh[i]->name << endl;
             }
             cout << endl;
+            #endif
         }
 
     DockResult dr[poses*(triesleft+1)+8][pathnodes+2];
@@ -2306,7 +2372,9 @@ _try_again:
                 float alignment_distance[5];
                 for (l=0; l<3; l++)
                 {
+                    #if !_use_gloms
                     alignment_aa[l]=0;
+                    #endif
                     alignment_distance[l]=0;
                 }
 
@@ -2326,6 +2394,9 @@ _try_again:
                 {
                     for (l=0; l<3; l++)
                     {
+                        #if _use_gloms
+                        // TODO
+                        #else
                         retain_bindings[l].cardinality = 0;
                         if (!ligbb[l]) continue;
                         retain_bindings[l].atom = ligbb[l];
@@ -2448,6 +2519,7 @@ _try_again:
                             if (debug) *debug << "Candidate alignment AA." << endl;
                             #endif
                         }
+                        #endif
                         _found_alignaa:
                         ;
                     }
@@ -2459,9 +2531,11 @@ _try_again:
 
                 if (use_bestbind_algorithm && met)
                 {
+                    #if !_use_gloms
                     alignment_aa[2] = alignment_aa[1];
                     alignment_aa[1] = alignment_aa[0];
                     alignment_aa[0] = met;
+                    #endif
                     // alignment_name = "metal";
                 }
                 #if _DBG_STEPBYSTEP
@@ -2473,6 +2547,9 @@ _try_again:
                     ligand->recenter(loneliest);
                     for (l=0; l<3; l++)
                     {
+                        #if _use_gloms
+                        // TODO
+                        #else
                         if (alignment_aa[l])
                         {
                             cout << "# Aligning " << ligbb[l]->name << " to " << alignment_aa[l]->get_name() << "..." << endl;
@@ -2635,8 +2712,10 @@ _try_again:
 
                             }
                         }
+                        #endif
                     }
 
+                    #if !_use_gloms
                     Molecule* mtmp[4], *mbkg[2];
                     mbkg[0] = ligand;
                     mbkg[1] = nullptr;
@@ -2647,6 +2726,7 @@ _try_again:
                     m.movability = MOV_FLEXONLY;
                     if (flex) Molecule::multimol_conform(mtmp);
                     m.movability = MOV_ALL;
+                    #endif
 
                     cout << endl;
                 }

@@ -997,12 +997,27 @@ bool Atom::is_amide()
 {
     if (family == PNICTOGEN)
     {
-        Atom* C = is_bonded_to("C");
-        if (!C) return false;
-        Atom* O = C->is_bonded_to(CHALCOGEN, 2);
-        if (O) return true;
-        O = C->is_bonded_to(CHALCOGEN);
-        if (O && is_pi() && C->is_pi()) return true;
+        if (bonded_to)
+        {
+            int i;
+            for (i=0; i<geometry; i++)
+            {
+                Atom* C = bonded_to[i].btom;
+                if (C)
+                {
+                    int fam = C->get_family();
+                    int Z = C->get_Z();
+                    if (Z != 1 && fam != TETREL) return false;
+                    else
+                    {
+                        Atom* O = C->is_bonded_to(CHALCOGEN, 2);
+                        if (O) return true;
+                        O = C->is_bonded_to(CHALCOGEN);
+                        if (O && is_pi() && C->is_pi()) return true;
+                    }
+                }
+            }
+        }
     }
 
     return false;

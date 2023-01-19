@@ -67,7 +67,7 @@ struct AtomGlom
             Point pt = atoms[i]->get_location();
             float m = atoms[i]->get_atomic_weight();
             pt.scale(pt.magnitude() * m);
-            result.add(pt);
+            result = result.add(pt);
             mass += m;
         }
         if (mass) result.scale(result.magnitude() / mass);
@@ -175,6 +175,15 @@ struct AtomGlom
         
         float result = 0;
         float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
+
+        if (aa->hydrophilicity() > 0.25)
+        {
+            if ((lgh / atct) < 0.25) return 0;
+        }
+        else
+        {
+            if ((lgh / atct) > 0.25) return 0;
+        }
         
         if (lgi) result += lgi * -aa->bindability_by_type(ionic) * 60;
         if (lgh) result += fabs(lgh) * fabs(aa->bindability_by_type(hbond)) * 30;
@@ -202,7 +211,7 @@ struct ResidueGlom
             if (a)
             {
                 Point pt = a->get_location();
-                result.add(pt);
+                result = result.add(pt);
                 j++;
             }
         }
@@ -2651,7 +2660,7 @@ _try_again:
                                     if (!cb) continue;
                                     if (frand(0,1) < 0.123) continue;                       // stochastic component.
                                     float r = glomtmp.distance_to(cb->get_location());
-                                    r -= (reaches_spheroid[nodeno][j]->get_reach() / 2);
+                                    r -= (reaches_spheroid[nodeno][j]->get_reach() + 1.5);
                                     if (r < ligand_gloms[l].bounds())
                                     {
                                         glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);
@@ -2662,7 +2671,7 @@ _try_again:
                             bool toosame = false;
                             for (j=0; j<l; j++)
                             {
-                                if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) toosame = true;
+                                // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) toosame = true;
                             }
 
                             if (!toosame)
@@ -2857,7 +2866,9 @@ _try_again:
                                 xform = xform.add(ptmp);
                             }
 
+                            ligand->movability = MOV_ALL;
                             ligand->move(xform);
+                            // l += 10;
                             break;
 
                             case 1:

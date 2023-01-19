@@ -560,11 +560,12 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
     if (!atoms) return 0;
 
     float result = 0;
-    int i;
+    int i, heavy = 0;
     float c;
     for (i=0; atoms[i]; i++)
     {
         if (!ib && atoms[i]->is_backbone) continue;
+        if (atoms[i]->get_Z() > 1) heavy++;
         switch (t)
         {
             case covalent:
@@ -621,6 +622,8 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
             break;
         }
     }
+
+    if (heavy) result /= heavy;
 
     return result;
 }

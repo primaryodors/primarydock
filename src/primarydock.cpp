@@ -2672,6 +2672,9 @@ _try_again:
                             for (j=0; j<l; j++)
                             {
                                 // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) toosame = true;
+                                float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
+                                float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
+                                if (rsg < 0.9 * rlg) toosame = true;
                             }
 
                             if (!toosame)

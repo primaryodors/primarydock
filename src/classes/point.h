@@ -158,6 +158,7 @@ Point rotate3D(Point point, Point source, SCoord axis, float theta);
 Point rotate3D(Point* point, Point* source, Rotation* rot);
 
 Rotation align_points_3d(Point* point, Point* align, Point* center);
+Rotation align_points_3d(Point point, Point align, Point center);
 Rotation* align_2points_3d(Point* point1, Point* align1, Point* point2, Point* align2, Point* center);
 
 SCoord compute_normal(Point* pt1, Point* pt2, Point* pt3);

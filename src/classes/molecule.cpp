@@ -1306,7 +1306,7 @@ void Molecule::identify_acidbase()
 
     for (i=0; atoms[i]; i++)
     {
-        // If it is a carbon, double-bonded to any atom, not bonded to a pnictogen,
+        // If it is a carbon, pi-bonded to a chalcogen, not bonded to a pnictogen,
         // Or if it is a heavier tetrel, a pnictogen, a chalcogen, or a halogen,
         // And it is single-bonded to at least one chalcogen,
         // And the single-bonded chalcogen is either bonded to a hydrogen or carries a negative charge:
@@ -1322,7 +1322,7 @@ void Molecule::identify_acidbase()
             if (!b) goto _not_acidic;
             if (carbon)
             {
-                if (!atoms[i]->is_pi())
+                if (!atoms[i]->is_pi() || !atoms[i]->is_bonded_to_pi(CHALCOGEN, true))
                 {
                     delete[] b;
                     goto _not_acidic;

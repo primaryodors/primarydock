@@ -185,6 +185,8 @@ public:
 
     float hydrophilicity_rule();
 
+    bool is_conjugated_to(Atom* a, Atom* break_if_reach = nullptr, Atom* caller = nullptr);
+
     // Ring membership.
     int num_rings();
     int num_conj_rings();
@@ -307,6 +309,7 @@ protected:
     bool swapped_chirality = false;
     bool chirality_unspecified = true;
     Ring** member_of = nullptr;
+    int recursion_counter = 0;
 
     static void read_elements();
     void figure_out_valence();

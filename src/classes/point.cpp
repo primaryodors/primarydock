@@ -355,6 +355,11 @@ Point rotate3D(Point* point, Point* source, SCoord* axis, float theta)
     return pt;
 }
 
+Rotation align_points_3d(Point point, Point align, Point center)
+{
+    return align_points_3d(&point, &align, &center);
+}
+
 Rotation align_points_3d(Point* point, Point* align, Point* center)
 {
     SCoord n = compute_normal(point, align, center);

@@ -123,7 +123,7 @@ struct AtomGlom
 
     float get_sum()
     {
-        return get_ionic()+get_polarity()+get_pi();
+        return get_ionic()*60 + get_polarity()*30 + get_pi()*2;
     }
 
     float distance_to(Point pt)
@@ -139,19 +139,63 @@ struct AtomGlom
         }
         return result;
     }
+
+    float bounds()
+    {
+        int atct = atoms.size();
+        if (!atct) return -1;
+        int i;
+        Point ptmin(0,0,0), ptmax(0,0,0);
+        for (i=0; i<atct; i++)
+        {
+            Point aloc = atoms[i]->get_location();
+            if (!i)
+            {
+                ptmin = aloc;
+                ptmax = aloc;
+            }
+            else
+            {
+                if (aloc.x < ptmin.x) ptmin.x = aloc.x;
+                if (aloc.y < ptmin.y) ptmin.y = aloc.y;
+                if (aloc.z < ptmin.z) ptmin.z = aloc.z;
+                if (aloc.x > ptmax.x) ptmax.x = aloc.x;
+                if (aloc.y > ptmax.y) ptmax.y = aloc.y;
+                if (aloc.z > ptmax.z) ptmax.z = aloc.z;
+            }
+        }
+
+        return ptmax.get_3d_distance(ptmin);
+    }
+
+    float compatibility(AminoAcid* aa)
+    {
+        int atct = atoms.size();
+        if (!atct) return 0;
+        
+        float result = 0;
+        float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
+        
+        if (lgi) result += lgi * -aa->bindability_by_type(ionic) * 60;
+        if (lgh) result += fabs(lgh) * fabs(aa->bindability_by_type(hbond)) * 30;
+        if (lgp) result += aa->bindability_by_type(pi);
+
+        return result;
+    }
 };
 
 struct ResidueGlom
 {
-    AminoAcid** aminos = nullptr;
+    std::vector<AminoAcid*> aminos;
 
     Point get_center()
     {
-        if (!aminos) return Point(0,0,0);
+        int amsz = aminos.size();
+        if (!amsz) return Point(0,0,0);
         int i, j;
         j = 0;
         Point result(0,0,0);
-        for (i=0; aminos[i]; i++)
+        for (i=0; i<amsz; i++)
         {
             Atom* a = aminos[i]->get_atom("CB");
             if (!a) a = aminos[i]->get_atom("CA");      // even though glycine probably shouldn't be part of a glom.
@@ -163,6 +207,25 @@ struct ResidueGlom
             }
         }
         if (j) result.scale(result.magnitude() / j);
+        return result;
+    }
+
+    float distance_to(Point pt)
+    {
+        return pt.get_3d_distance(get_center());
+    }
+
+    float compatibility(AtomGlom* ag)
+    {
+        int amsz = aminos.size();
+        if (!amsz) return 0;
+        float result = 0;
+        int i;
+        for (i=0; i<amsz; i++)
+        {
+            result += ag->compatibility(aminos[i]);
+        }
+
         return result;
     }
 };
@@ -1701,57 +1764,140 @@ int main(int argc, char** argv)
     if (use_bestbind_algorithm)
     {
         #if _use_gloms
-        AtomGlom glomi, glomh, glompi;
+        AtomGlom glomtmp;
+        int types[3] = { ionic, hbond, pi };
 
         int lac = ligand->get_atom_count();
-        bool dirty[lac+4];
-        for (i=0; i<lac; i++) dirty[i] = false;
-        for (i=0; i<lac; i++)
+        bool dirty[lac+4], dirttmp[lac+4];
+
+        for (n=0; n<3; n++)
         {
-            if (dirty[i]) continue;
-
-            Atom* a = ligand->get_atom(i);
-            float ac = a->get_charge();
-
-            glomi.atoms.clear();
-            glomi.atoms.push_back(a);
-
-            if (ac)
+            for (i=0; i<lac; i++) dirty[i] = false;
+            for (i=0; i<lac; i++)
             {
-                for (j=i+1; j<lac; j++)
+                if (dirty[i]) continue;
+                for (j=i+1; j<lac; j++) dirttmp[j] = false;
+
+                Atom* a = ligand->get_atom(i);
+                Atom* b;
+                float ac = a->get_charge();
+                float apol = a->is_polar();
+                float api = a->is_pi() && (a->get_Z() > 1);
+                float rab;
+
+                glomtmp.atoms.clear();
+
+                switch (types[n])
                 {
-                    if (dirty[j]) continue;
-
-                    Atom* b = ligand->get_atom(j);
-                    float rab = a->get_location().get_3d_distance(b->get_location());
-                    if (rab < 2.6 && sgn(b->get_charge()) == sgn(ac))
+                    case ionic:
+                    if (ac)
                     {
-                        glomi.atoms.push_back(b);
-                        dirty[j] = true;
+                        glomtmp.atoms.push_back(a);
+                        dirttmp[i] = true;
+
+                        for (j=i+1; j<lac; j++)
+                        {
+                            if (dirty[j] || dirttmp[j]) continue;
+
+                            b = ligand->get_atom(j);
+                            rab = glomtmp.distance_to(b->get_location());
+                            if ((sgn(b->get_charge()) == sgn(ac))
+                                &&
+                                rab < 2.6
+                               )
+                            {
+                                glomtmp.atoms.push_back(b);
+                                dirttmp[j] = true;
+                            }
+                        }
                     }
+                    break;
+
+                    case hbond:
+                    if (apol)
+                    {
+                        glomtmp.atoms.push_back(a);
+                        dirttmp[i] = true;
+
+                        for (j=i+1; j<lac; j++)
+                        {
+                            if (dirty[j] || dirttmp[j]) continue;
+
+                            b = ligand->get_atom(j);
+                            rab = glomtmp.distance_to(b->get_location());
+                            if (b->is_polar()
+                                &&
+                                (
+                                    rab < 2.6
+                                    ||
+                                    (
+                                        rab < 3.7
+                                        &&
+                                        !b->is_pi()
+                                    )
+                                )
+                               )
+                            {
+                                glomtmp.atoms.push_back(b);
+                                dirttmp[j] = true;
+                            }
+                        }
+                    }
+                    break;
+
+                    case pi:
+                    if (api)
+                    {
+                        glomtmp.atoms.push_back(a);
+                        dirttmp[i] = true;
+
+                        for (j=i+1; j<lac; j++)
+                        {
+                            if (dirty[j] || dirttmp[j]) continue;
+
+                            b = ligand->get_atom(j);
+                            if (b->get_Z() == 1) continue;
+                            rab = glomtmp.distance_to(b->get_location());
+                            if (b->is_pi()
+                                &&
+                                b->is_conjugated_to(a)
+                               )
+                            {
+                                glomtmp.atoms.push_back(b);
+                                dirttmp[j] = true;
+                            }
+                        }
+                    }
+                    break;
+
+                    default:
+                    ;
                 }
-            }
 
-            dirty[i] = true;
+                float tsum = glomtmp.get_sum();
+                if (fabs(tsum) > fabs(ligand_gloms[0].get_sum()))
+                {
+                    ligand_gloms[2] = ligand_gloms[1];
+                    ligand_gloms[1] = ligand_gloms[0];
+                    ligand_gloms[0] = glomtmp;
+                    dirty[i] = true;
+                    for (j=0; j<lac; j++) if (dirttmp[j]) dirty[j] = true;
+                }
+                else if (fabs(tsum) > fabs(ligand_gloms[1].get_sum()))
+                {
+                    ligand_gloms[2] = ligand_gloms[1];
+                    ligand_gloms[1] = glomtmp;
+                    dirty[i] = true;
+                    for (j=0; j<lac; j++) if (dirttmp[j]) dirty[j] = true;
+                }
+                else if (fabs(tsum) > fabs(ligand_gloms[2].get_sum()))
+                {
+                    ligand_gloms[2] = glomtmp;
+                    dirty[i] = true;
+                    for (j=0; j<lac; j++) if (dirttmp[j]) dirty[j] = true;
+                }
+            }            
         }
-
-        float tsum = glomi.get_sum();
-        if (fabs(tsum) > fabs(ligand_gloms[0].get_sum()))
-        {
-            ligand_gloms[2] = ligand_gloms[1];
-            ligand_gloms[1] = ligand_gloms[0];
-            ligand_gloms[0] = glomi;
-        }
-        else if (fabs(tsum) > fabs(ligand_gloms[1].get_sum()))
-        {
-            ligand_gloms[2] = ligand_gloms[1];
-            ligand_gloms[1] = glomi;
-        }
-        else if (fabs(tsum) > fabs(ligand_gloms[2].get_sum()))
-        {
-            ligand_gloms[2] = glomi;
-        }
-
         #else
         ligbb = m.get_most_bindable(3);
         ligbbh = new Atom*[5];
@@ -1852,7 +1998,28 @@ int main(int argc, char** argv)
     if (use_bestbind_algorithm) for (i=0; i<3; i++)
         {
             #if _use_gloms
-            // TODO
+            cout << "Ligand's ";
+            if (i == 0) cout << "primary";
+            else if (i == 1) cout << "secondary";
+            else if (i == 2) cout << "tertiary";
+            else cout << "accessory";
+            int lgsz = ligand_gloms[i].atoms.size();
+            cout << " atom group has " << lgsz << " atoms." << endl;
+
+            if (lgsz)
+            {
+                for (j = 0; j < lgsz; j++)
+                {
+                    cout << ligand_gloms[i].atoms[j]->name << " ";
+                }
+                cout << endl;
+            }
+
+            cout << "Ionic: " << ligand_gloms[i].get_ionic()
+                 << " H-bond: " << ligand_gloms[i].get_polarity()
+                 << " pi-stack: " << ligand_gloms[i].get_pi()
+                ;
+            cout << endl << endl;
             #else
             if (ligbb[i])
             {
@@ -2467,8 +2634,51 @@ _try_again:
                 {
                     for (l=0; l<3; l++)
                     {
+                        sc_gloms[l].aminos.clear();
                         #if _use_gloms
-                        // TODO
+                        // Find the strongest loneliest suitable side chain glom for ligand_gloms[l] and set sc_gloms[l] to equal it.
+                        ResidueGlom glomtmp;
+                        for (i=0; reaches_spheroid[nodeno][i]; i++)
+                        {
+                            glomtmp.aminos.clear();
+                            if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
+                            {
+                                glomtmp.aminos.push_back(reaches_spheroid[nodeno][i]);
+                                for (j=i+1; reaches_spheroid[nodeno][j]; j++)
+                                {
+                                    if (!ligand_gloms[l].compatibility(reaches_spheroid[nodeno][j])) continue;
+                                    Atom* cb = reaches_spheroid[nodeno][j]->get_atom("CB");
+                                    if (!cb) continue;
+                                    if (frand(0,1) < 0.123) continue;                       // stochastic component.
+                                    float r = glomtmp.distance_to(cb->get_location());
+                                    r -= (reaches_spheroid[nodeno][j]->get_reach() / 2);
+                                    if (r < ligand_gloms[l].bounds())
+                                    {
+                                        glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);
+                                    }
+                                }
+                            }
+
+                            bool toosame = false;
+                            for (j=0; j<l; j++)
+                            {
+                                if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) toosame = true;
+                            }
+
+                            if (!toosame)
+                            {
+                                float r = glomtmp.distance_to(loneliest);
+                                float rr = sc_gloms[l].distance_to(loneliest);
+                                float rg = ligand_gloms[l].distance_to(ligand->get_barycenter());
+
+                                r -= rg; if (r < 1) r = 1;
+                                rr -= rg; if (rr < 1) rr = 1;
+
+                                float tcptbl = glomtmp.compatibility(&ligand_gloms[l]) / (r*r);
+                                if (!i || tcptbl > (sc_gloms[l].compatibility(&ligand_gloms[l]) / (rr*rr)) ) sc_gloms[l] = glomtmp;
+                            }
+                        }
+
                         #else
                         retain_bindings[l].cardinality = 0;
                         if (!ligbb[l]) continue;
@@ -2621,7 +2831,75 @@ _try_again:
                     for (l=0; l<3; l++)
                     {
                         #if _use_gloms
-                        // TODO
+                        Point xform;
+                        Point zcen;
+                        Point axis;
+                        LocatedVector lv;
+                        Rotation rot;
+                        float theta;
+                        switch (l)
+                        {
+                            case 0:
+                            // Move ligand to center ligand_gloms[0] at the center of sc_gloms[0].
+                            // If there is only one residue in the sc glom, then move the ligand
+                            // 2A towards loneliest.
+                            n = sc_gloms[l].aminos.size();
+                            if (!n) goto _deadglob;
+                            cout << "Moving primary atom group to vicinity of";
+                            for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            cout << "." << endl;
+
+                            xform = sc_gloms[l].get_center().subtract(ligand_gloms[l].get_center());
+                            if (n < 2)
+                            {
+                                Point ptmp = loneliest.subtract(xform);
+                                ptmp.scale(2);
+                                xform = xform.add(ptmp);
+                            }
+
+                            ligand->move(xform);
+                            break;
+
+                            case 1:
+                            // Rotate ligand about ligand_gloms[0] center to get ligand_gloms[1] center
+                            // as close as possible to sc_gloms[1] center.
+                            n = sc_gloms[l].aminos.size();
+                            if (!n) goto _deadglob;
+                            cout << "Aligning secondary atom group towards";
+                            for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            cout << "." << endl;
+
+                            zcen = ligand_gloms[0].get_center();
+                            rot = align_points_3d(ligand_gloms[l].get_center(), sc_gloms[l].get_center(), zcen);
+                            lv = rot.v;
+                            lv.origin = zcen;
+                            ligand->rotate(lv, rot.a);
+                            break;
+
+                            case 2:
+                            // "Rotisserie" rotate ligand about the imaginary line between
+                            // ligand_gloms[0] center and ligand_gloms[1] center, to bring
+                            // ligand_gloms[2] center as close as possible to sc_gloms[2] center.
+                            n = sc_gloms[l].aminos.size();
+                            if (!n) goto _deadglob;
+                            cout << "\"Rotisserie\"-aligning tertiary atom group towards";
+                            for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            cout << "." << endl;
+
+                            zcen = ligand_gloms[0].get_center();
+                            axis = ligand_gloms[1].get_center().subtract(zcen);
+                            lv = (SCoord)axis;
+                            lv.origin = zcen;
+                            theta = find_angle_along_vector(ligand_gloms[l].get_center(), sc_gloms[l].get_center(), zcen, axis);
+                            ligand->rotate(lv, theta);
+                            break;
+
+                            default:
+                            ;
+                        }
+
+                        _deadglob:
+                        ;
                         #else
                         if (alignment_aa[l])
                         {

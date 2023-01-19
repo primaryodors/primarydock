@@ -2098,6 +2098,43 @@ Ring* Atom::closest_arom_ring_to(Point target)
     return nullptr;
 }
 
+bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
+{
+    if (!this || !a) return false;
+    if (!is_pi() || !a->is_pi()) return false;
+    if (a == bir) return false;
+    if (!bir) bir = this;
+
+    bir->recursion_counter++;
+
+    if (is_bonded_to(a)) return true;
+    else
+    {
+        int i;
+        for (i=0; i<geometry; i++)
+        {
+            if (bonded_to[i].btom
+                &&
+                bonded_to[i].btom != c
+                &&
+                bonded_to[i].btom != bir
+                &&
+                // DANGER: RECURSION.
+                bonded_to[i].btom->is_conjugated_to(a, bir, this)
+               )
+            {
+                bir->recursion_counter = 0;
+                return true;
+            }
+        }
+    }
+
+    if (bir == this) recursion_counter = 0;
+    else bir->recursion_counter--;
+
+    return false;
+}
+
 void Ring::fill_with_atoms(Atom** from_atoms)
 {
     if (!from_atoms) return;

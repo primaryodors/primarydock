@@ -428,15 +428,32 @@ void iteration_callback(int iter)
     
     #if enforce_no_bb_pullaway
     #if _use_gloms
-    // TODO
+    if (ligand_gloms[0].atoms.size())
     #else
     if (ligbb)
+    #endif
     {
         float ttl_bb_dist = 0;
         for (l=0; l<3; l++)
         {
+            #if _use_gloms
+            if (ligand_gloms[l].atoms.size() && sc_gloms[l].aminos.size())
+            #else
             if (ligbb[l] && alignment_aa[l])
+            #endif
             {
+                #if _use_gloms
+                float r = ligand_gloms[l].distance_to(sc_gloms[l].get_center());
+                if (r < 2.5) r = 2.5;
+                ttl_bb_dist += r;
+                #if _dbg_bb_pullaway
+                cout << "Ligand atoms ";
+                for (i=0; i<ligand_gloms[l].atoms.size(); i++) cout << ligand_gloms[l].atoms[i]->name << " ";
+                cout << "are " << r << " A from residues";
+                for (i=0; i<sc_gloms[l].aminos.size(); i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                cout << "." << endl;
+                #endif
+                #else
                 Atom** mbb = alignment_aa[l]->get_most_bindable(1, ligbb[l]);
                 Atom* alca = mbb[0];
                 delete mbb;             // Delete the pointer array, but not the pointers.
@@ -450,6 +467,7 @@ void iteration_callback(int iter)
                     cout << alignment_aa[l]->get_name() << ":" << alca->name << " " << r << "A from " << ligbb[l]->name << "... ";
                     #endif
                 }
+                #endif
             }
         }
         #if _dbg_bb_pullaway
@@ -466,7 +484,6 @@ void iteration_callback(int iter)
             pullaway_undo.restore_state(ligand);
         }
     }
-    #endif
     #endif
     
     bary = ligand->get_barycenter();
@@ -2690,7 +2707,10 @@ _try_again:
                                     if (!cb) continue;
                                     if (frand(0,1) < bb_stochastic) continue;                       // stochastic component.
                                     float r = glomtmp.distance_to(cb->get_location());
-                                    r -= (reaches_spheroid[nodeno][j]->get_reach() + 2.5);
+                                    if (reaches_spheroid[nodeno][j]->hydrophilicity() >= 0.333)
+                                        r -= (reaches_spheroid[nodeno][j]->get_reach() + 2.5);
+                                    else
+                                        r -= 3.5;
                                     if (r < ligand_gloms[l].bounds())
                                     {
                                         glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);
@@ -3109,6 +3129,20 @@ _try_again:
                         }
                         #endif
                     }
+
+                    #if enforce_no_bb_pullaway && _use_gloms
+                    last_ttl_bb_dist = 0;
+                    for (l=0; l<_bb_maxglom; l++)
+                    {
+                        if (ligand_gloms[l].atoms.size() && sc_gloms[l].aminos.size())
+                        {
+                            float r = ligand_gloms[l].distance_to(sc_gloms[l].get_center());
+                            if (r < 2.5) r = 2.5;
+                            last_ttl_bb_dist += r;
+                        }
+                    }
+                    pullaway_undo.copy_state(ligand);
+                    #endif
 
                     #if !_use_gloms
                     Molecule* mtmp[4], *mbkg[2];

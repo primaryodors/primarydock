@@ -232,10 +232,14 @@ struct ResidueGlom
         if (!amsz) return 0;
         float result = 0;
         int i;
+        bool has_acids = false, has_his = false;
         for (i=0; i<amsz; i++)
         {
+            if (aminos[i]->get_charge() < 0) has_acids = true;
+            if (aminos[i]->conditionally_basic()) has_his = true;
             result += ag->compatibility(aminos[i]);
         }
+        if (has_acids && has_his && ag->get_ionic() > 0) result -= ag->get_ionic()*30;
 
         return result;
     }
@@ -2664,17 +2668,29 @@ _try_again:
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
                             glomtmp.aminos.clear();
+                            // Debug trap.
+                            if (l == 2 && reaches_spheroid[nodeno][i]->get_letter() == 'A')
+                            {
+                                l++;
+                                l--;
+                            }
                             if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
                             {
+                                // Debug trap.
+                                if (reaches_spheroid[nodeno][i]->is_residue() == 169)
+                                {
+                                    l++;
+                                    l--;
+                                }
                                 glomtmp.aminos.push_back(reaches_spheroid[nodeno][i]);
                                 for (j=i+1; reaches_spheroid[nodeno][j]; j++)
                                 {
                                     if (!ligand_gloms[l].compatibility(reaches_spheroid[nodeno][j])) continue;
                                     Atom* cb = reaches_spheroid[nodeno][j]->get_atom("CB");
                                     if (!cb) continue;
-                                    if (frand(0,1) < 0.123) continue;                       // stochastic component.
+                                    if (frand(0,1) < bb_stochastic) continue;                       // stochastic component.
                                     float r = glomtmp.distance_to(cb->get_location());
-                                    r -= (reaches_spheroid[nodeno][j]->get_reach() + 1.5);
+                                    r -= (reaches_spheroid[nodeno][j]->get_reach() + 2.5);
                                     if (r < ligand_gloms[l].bounds())
                                     {
                                         glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);

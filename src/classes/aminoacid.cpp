@@ -1634,6 +1634,23 @@ bool AminoAcid::is_glycine()
     return true;
 }
 
+bool AminoAcid::conditionally_basic()
+{
+    if (!atoms) return false;
+    if (!aadef || !aadef->sidechain_pKa) return false;
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->get_Z() == 1) continue;
+        if (atoms[i]->get_family() == PNICTOGEN)
+        {
+            if (aadef->sidechain_pKa >= 4 && aadef->sidechain_pKa < 7) return true;
+        }
+    }
+    return false;
+}
+
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 {
     if (!&aa) return os;
@@ -1746,9 +1763,10 @@ void AminoAcid::hydrogenate(bool steric_only)
         heavy = bb->btom;
         if (!heavy) continue;
 
-        atoms[i]->residue  = heavy->residue;
+        atoms[i]->residue = heavy->residue;
         atoms[i]->aaletter = heavy->aaletter;
         strcpy(atoms[i]->aa3let, heavy->aa3let);
+        atoms[i]->is_backbone = heavy->is_backbone;
 
         if (heavy->is_backbone && heavy->get_family() == PNICTOGEN)
             strcpy(atoms[i]->name, "HN");

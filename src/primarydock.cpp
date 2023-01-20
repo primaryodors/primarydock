@@ -172,7 +172,7 @@ struct AtomGlom
     {
         int atct = atoms.size();
         if (!atct) return 0;
-        
+
         float result = 0;
         float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
 
@@ -182,10 +182,10 @@ struct AtomGlom
         }
         else
         {
-            if ((lgh / atct) > 0.25) return 0;
+            if ((lgh / atct) > 0.33333) return 0;
         }
-        
-        if (lgi) result += lgi * -aa->bindability_by_type(ionic) * 60;
+ 
+        if (lgi) result += lgi * -aa->bindability_by_type(ionic) * 1000;
         if (lgh) result += fabs(lgh) * fabs(aa->bindability_by_type(hbond)) * 30;
         if (lgp) result += aa->bindability_by_type(pi);
 
@@ -206,8 +206,10 @@ struct ResidueGlom
         Point result(0,0,0);
         for (i=0; i<amsz; i++)
         {
-            Atom* a = aminos[i]->get_atom("CB");
-            if (!a) a = aminos[i]->get_atom("CA");      // even though glycine probably shouldn't be part of a glom.
+            Atom** aa = aminos[i]->get_most_bindable(1);
+            Atom* a = aa[0]; // = aminos[i]->get_atom("CB");
+            delete aa;
+            // if (!a) a = aminos[i]->get_atom("CA");      // even though glycine probably shouldn't be part of a glom.
             if (a)
             {
                 Point pt = a->get_location();
@@ -408,9 +410,17 @@ void iteration_callback(int iter)
     #endif
 
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
-    if (iter == (iters-1)) return;
-
     int l;
+
+    Point bary = ligand->get_barycenter();
+
+    int ac = ligand->get_atom_count();
+    float bbest = 0;
+    Atom *atom, *btom;
+    int i;
+
+    if (!iter) goto _oei;
+    if (iter == (iters-1)) goto _oei;
     
     #if enforce_no_bb_pullaway
     #if _use_gloms
@@ -454,14 +464,9 @@ void iteration_callback(int iter)
     }
     #endif
     #endif
+    
+    bary = ligand->get_barycenter();
 
-    Point bary = ligand->get_barycenter();
-
-    int ac = ligand->get_atom_count();
-    float bbest = 0;
-    Atom *atom, *btom;
-
-    int i;
     for (i=0; i < ac; i++)
     {
         if (ligand->get_atom(i)->strongest_bind_energy > bbest)
@@ -570,12 +575,14 @@ void iteration_callback(int iter)
         gcfmols[sphres] = nullptr;
     }
 
+    _oei:
+    ;
     #if _output_each_iter
     std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
     FILE* fp = fopen(itersfname.c_str(), (iter == 1 ? "wb" : "ab") );
     if (fp)
     {
-        fprintf(fp, "Pose: 1\nNode: %d\n\nPDBDAT:\n", iter-1);
+        fprintf(fp, "Pose: 1\nNode: %d\n\nPDBDAT:\n", iter);
         /*protein->save_pdb(fp, ligand);
         protein->end_pdb(fp);*/
 
@@ -1809,6 +1816,7 @@ int main(int argc, char** argv)
                             if (dirty[j] || dirttmp[j]) continue;
 
                             b = ligand->get_atom(j);
+                            if (b->is_pi() != api) continue;
                             rab = glomtmp.distance_to(b->get_location());
                             if ((sgn(b->get_charge()) == sgn(ac))
                                 &&
@@ -1823,7 +1831,7 @@ int main(int argc, char** argv)
                     break;
 
                     case hbond:
-                    if (apol)
+                    if (apol && !ac)
                     {
                         glomtmp.atoms.push_back(a);
                         dirttmp[i] = true;
@@ -1833,6 +1841,8 @@ int main(int argc, char** argv)
                             if (dirty[j] || dirttmp[j]) continue;
 
                             b = ligand->get_atom(j);
+                            if (b->is_pi() != api) continue;
+                            if (b->get_charge()) continue;
                             rab = glomtmp.distance_to(b->get_location());
                             if (b->is_polar()
                                 &&
@@ -1882,6 +1892,10 @@ int main(int argc, char** argv)
                     default:
                     ;
                 }
+
+                bool taken = false;
+                for (j=0; j<3; j++) if (glomtmp.atoms == ligand_gloms[j].atoms) taken = true;
+                if (taken) continue;
 
                 float tsum = glomtmp.get_sum();
                 if (fabs(tsum) > fabs(ligand_gloms[0].get_sum()))
@@ -2840,7 +2854,7 @@ _try_again:
                 if (use_bestbind_algorithm)
                 {
                     ligand->recenter(loneliest);
-                    for (l=0; l<3; l++)
+                    for (l=0; l<_bb_maxglom; l++)
                     {
                         #if _use_gloms
                         Point xform;
@@ -2871,7 +2885,7 @@ _try_again:
 
                             ligand->movability = MOV_ALL;
                             ligand->move(xform);
-                            // l += 10;
+                            // ligand->get_atom("N9")->get_location().get_3d_distance(sc_gloms[l].get_center())
                             break;
 
                             case 1:

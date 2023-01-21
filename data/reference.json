@@ -264,6 +264,11 @@
         "short_name": "Gelis et al (2012)",
         "citation": "Gelis L, Wolf S, Hatt H, Neuhaus EM, Gerwert K. Prediction of a ligand-binding niche within a human olfactory receptor by combining site-directed mutagenesis with dynamic homology modeling. Angew Chem Int Ed Engl. 2012 Jan 27;51(5):1274-8. doi: 10.1002\/anie.201103980. Epub 2011 Dec 5. PMID: 22144177."
     },
+    "https:\/\/doi.org\/10.1110\/ps.8.5.969":
+    {
+        "short_name": "Pilpel, Y. and Lancet, D. (1999)",
+        "citation": "Pilpel, Y. and Lancet, D. (1999), The variable and conserved interfaces of modeled olfactory receptor proteins. Protein Science, 8: 969-977. https://doi.org/10.1110/ps.8.5.969"
+    },
     "https:\/\/doi.org\/10.3390\/ijms20123018":
     {
         "short_name": "Genva et al (2018)",

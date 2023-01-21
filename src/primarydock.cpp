@@ -1925,15 +1925,15 @@ int main(int argc, char** argv)
                 for (j=0; j<3; j++) if (glomtmp.atoms == ligand_gloms[j].atoms) taken = true;
                 if (taken) continue;
 
-                bool toosame = false;
+                bool too_similar = false;
                 for (j=0; j<n; j++)
                 {
                     if (!ligand_gloms[j].atoms.size()) continue;
                     // if (glomtmp.get_pi() >= 3.0*ligand_gloms[j].get_pi()) continue;
                     float r = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
-                    if (r < 2) toosame = true;
+                    if (r < 2) too_similar = true;
                 }
-                if (toosame) continue;
+                if (too_similar) continue;
 
                 float tsum = glomtmp.get_sum();
                 if (fabs(tsum) > fabs(ligand_gloms[0].get_sum()))
@@ -2735,27 +2735,27 @@ _try_again:
                                 }
                             }
 
-                            bool toosame = false;
+                            bool too_similar = false;
                             for (j=0; j<l; j++)
                             {
-                                if (sc_gloms[j].aminos == glomtmp.aminos) toosame = true;
+                                if (sc_gloms[j].aminos == glomtmp.aminos) too_similar = true;
                                 if (sc_gloms[j].aminos.size() == 1
                                     &&
                                     std::find(glomtmp.aminos.begin(), glomtmp.aminos.end(), sc_gloms[j].aminos[0]) != glomtmp.aminos.end()
                                    )
-                                    toosame = true;
+                                    too_similar = true;
                                 if (glomtmp.aminos.size() == 1
                                     &&
                                     std::find(sc_gloms[j].aminos.begin(), sc_gloms[j].aminos.end(), glomtmp.aminos[0]) != sc_gloms[j].aminos.end()
                                    )
-                                    toosame = true;
-                                // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) toosame = true;
+                                    too_similar = true;
+                                // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) too_similar = true;
                                 float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
                                 float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
-                                if (rsg < 0.9 * rlg) toosame = true;
+                                if (rsg < 0.9 * rlg) too_similar = true;
                             }
 
-                            if (!toosame)
+                            if (!too_similar)
                             {
                                 float r = glomtmp.distance_to(loneliest);
                                 float rr = sc_gloms[l].distance_to(loneliest);

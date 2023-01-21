@@ -11,6 +11,7 @@
 
 #define _kcal_per_kJ 0.239006
 #define _kJmol_cuA 0.5
+#define vdw_clash_allowance 1.0
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -57,13 +58,17 @@
 #define _ALLOW_FLEX_RINGS 0
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
-#define _can_clash_angle (120.0 * fiftyseventh)
+#define _can_clash_angle (180.0 * fiftyseventh)
 #define _fullrot_stepdeg 30
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (_fullrot_steprad/2)
 #define _def_bnd_momentum (_fullrot_steprad/2)
+
+#define pi_mult_dkytw 264
+#define pi_CH_dkytw 0.0766
+#define pi_HT_dkytw 0.002657
 
 #define _voxel_resolution 0.1
 #define USE_VOXEL_ARRAY false
@@ -95,9 +100,18 @@
 #define POLYPRO1_PSI fiftyseventh*160
 #define POLYPRO1_OMEGA fiftyseventh*113
 
-#define polar_repulsion 30.0
+// Warning - increasing these constants significantly above their stable branch values
+// will cause docking fails in the Big Three tests.
+#define polar_repulsion 35.0
 #define charge_repulsion 120.0
 
+#define lmpush 0.0005
+
+#define _enhanced_pi_stacking 1
+#define _preflex_alignment_res 1
+#define bb_stochastic 0.15
+#define enforce_no_bb_pullaway 1
+#define bb_pullaway_allowance 0.13
 
 // If using an activation matrix, active_persistence "rewards" the ligand for keeping
 // bindings to the same residues post-activation as pre-activation. The noflex option
@@ -120,6 +134,8 @@
 // Also, currently the code interlaces the two datasets which is not ideal.
 #define write_activation_matrix 0
 #define write_active_rotation 1
+
+#define _use_gloms 1
 
 // Amount to reduce momenta for path nodes beyond zero. Since the point of path based
 // docking is to keep as closely as possible the same ligand pose and move it through
@@ -144,7 +160,7 @@
 #define drift_decay_rate 0.08
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
-#define allow_mol_fullrot_iter 1
+#define allow_mol_fullrot_iter 0
 
 // Turns off the 360 degree rotations for all but the zeroth node of a path.
 #define nodes_no_ligand_360_tumble 0
@@ -165,7 +181,7 @@
 #define allow_tethered_rotations 1
 
 // Reject any conformation where any single residue's total clashes exceed this threshold.
-#define individual_clash_limit 20
+#define individual_clash_limit 5
 
 // Overwrite the user supplied pocket center with the loneliest point as determined by
 // distances to the nearest residue atoms to the supplied pocket center.
@@ -214,7 +230,7 @@
 // How much variance to allow in the strongest atom-to-atom binding energy when multimol conforming.
 // Decreasing this value requires any positional or rotational change to adhere more tightly to the
 // strongest interatomic interaction.
-#define strongest_loss_tolerance 0.333
+#define strongest_loss_tolerance 0.25
 #define _slt1 (1.0 - strongest_loss_tolerance)
 
 // Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,
@@ -237,6 +253,7 @@
 #define _hisflip_binding_threshold 25
 
 // Debugging stuff.
+#define _bb_maxglom 3
 #define _dummy_atoms_for_debug 0
 
 #define _DBG_LONELINESS 0
@@ -254,6 +271,8 @@
 #define _DBG_H2O_TELEPORT 0
 #define _DBG_HISFLIP 0
 #define _DBG_MOLBB 0
+#define _dbg_bb_rots 0
+#define _dbg_bb_pullaway 0
 
 #endif
 

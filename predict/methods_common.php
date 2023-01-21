@@ -1,6 +1,6 @@
 <?php
 
-global $dock_metals, $bias_by_energy, $dock_results, $pdbfname;
+global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere;
 
 // Includes
 require("protutils.php");
@@ -16,6 +16,7 @@ $method = explode(".", $method)[0];
 // Configurable variables
 $dock_retries = 5;
 $max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
+if (!isset($do_scwhere)) $do_scwhere = false;
 
 // Load data
 $dock_results = [];
@@ -120,18 +121,18 @@ function prepare_outputs()
 
 function process_dock()
 {
-    global $ligname, $protid, $configf, $dock_retries, $outfname, $bias_by_energy, $version, $sepyt, $json_file;
+    global $ligname, $protid, $configf, $dock_retries, $outfname, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere;
     if (!file_exists("tmp")) mkdir("tmp");
     $lignospace = str_replace(" ", "", $ligname);
     $cnfname = "tmp/prediction.$protid.$lignospace.config";
     $f = fopen($cnfname, "wb");
     if (!$f) die("File write error. Check tmp folder is write enabled.\n");
-    
+
     // echo $configf;
 
     fwrite($f, $configf);
     fclose($f);
-    
+
     $outlines = [];
     if (@$_REQUEST['saved'])
     {
@@ -139,21 +140,28 @@ function process_dock()
     }
     else
     {
+    	$elim = 0;
         for ($try = 0; $try < $dock_retries; $try++)
         {
             set_time_limit(300);
             $outlines = [];
-            echo "bin/primarydock \"$cnfname\"\n";
-            passthru("bin/primarydock \"$cnfname\"");
+            $cmd = "bin/primarydock \"$cnfname\"";
+            if ($elim) $cmd .= " --elim $elim";
+            echo "$cmd\n";
+            passthru($cmd);
             $outlines = explode("\n", file_get_contents($outfname));
             if (count($outlines) >= 200) break;
+            if (!$elim) $elim = 99;
+            else $elim *= 2;
         }
     }
     
+    unlink($cnfname);
+
     if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
-    
+
     if (count($outlines) < 100) die("Docking FAILED.\n");
-    
+
     $benerg = [];
     $scenerg = [];
     $vdwrpl = [];
@@ -181,7 +189,7 @@ function process_dock()
             $pose = false;
             $node = -1;
         }
-    
+
         if ($dosce)
         {
             $pettia = explode(": ", $ln);
@@ -201,10 +209,10 @@ function process_dock()
             $vdwrpl[$pose][$node][$resno] = $v;
             continue;
         }
-    
+
         if (substr($ln, 0, 7) == 'BENERG:') { $dosce = true; echo "Doing side chain energies, pose $pose, node $node.\n"; }
         if (substr($ln, 0, 7) == 'vdWRPL:') $dovdw = true;
-        
+
         if ($pose && $node>=0 && substr($ln, 0, 5) == "Total")
         {
             $benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
@@ -213,11 +221,11 @@ function process_dock()
         }
 
         if (!isset($benerg[$pose][$node])) continue;
-        
+
         $bias = $bias_by_energy ? max(-$benerg[$pose][$node], 1) : 1;
-    
+
         if (false !== strpos($ln, "pose(s) found")) $poses_found = intval($ln);
-    
+
         if (substr($ln, 0, 5) == 'ATOM ')
         {
             $ln = preg_replace("/\\s+/", " ", trim($ln));
@@ -256,7 +264,7 @@ function process_dock()
     }
 
     // echo "vdwrpl: "; print_r($vdwrpl); exit;
-    
+
     $sum = [];
     $count = [];
     $ssce = [];
@@ -299,7 +307,7 @@ function process_dock()
     {
         $bw = bw_from_resno($protid, $resno);
     
-        if ($sc_qty[$resno]) 
+        if ($do_scwhere && $sc_qty[$resno]) 
         {
             $sc_avg[$bw] =
             [

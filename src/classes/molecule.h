@@ -67,7 +67,7 @@ public:
     int from_sdf(const char* sdf_dat);		// returns number of atoms loaded.
     bool save_sdf(FILE* outf);
     bool save_sdf(FILE* outf, Molecule** included_ligands);
-    void save_pdb(FILE* outf, int atomno_offset=0);
+    void save_pdb(FILE* outf, int atomno_offset=0, bool endpdb = true);
     int from_pdb(FILE* inf);				// returns number of atoms loaded.
     void identify_acidbase();				// called within every load.
     bool from_smiles(char const * smilesstr);
@@ -147,6 +147,8 @@ public:
     float hydrophilicity();
 
     float get_vdW_repulsion(Molecule* ligand);
+
+    float bindability_by_type(intera_type type, bool include_backbone = false);
 
     static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);
     static void multimol_conform(Molecule** interactors, Molecule** background, int iters = 50, void (*iter_callback)(int) = NULL);

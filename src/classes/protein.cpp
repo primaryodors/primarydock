@@ -187,7 +187,7 @@ bool Protein::add_sequence(const char* lsequence)
     return true;
 }
 
-void Protein::save_pdb(FILE* os)
+void Protein::save_pdb(FILE* os, Molecule* lig)
 {
     int i, offset=0;
 
@@ -196,6 +196,15 @@ void Protein::save_pdb(FILE* os)
         for (i=0; i<remarks.size(); i++)
         {
             fprintf(os, "%s", remarks[i].c_str());
+        }
+    }
+
+    if (regions_from == rgn_manual && regions)
+    {
+        for (i=0; i<PROT_MAX_RGN; i++)
+        {
+            if (!regions[i].start || regions[i].end <= regions[i].start) break;
+            fprintf(os, "REMARK 650 HELIX %s %d %d\n", regions[i].name.c_str(), regions[i].start, regions[i].end);
         }
     }
 
@@ -211,6 +220,16 @@ void Protein::save_pdb(FILE* os)
         {
             cout << "Saving " << m_mcoord[i]->metal->name << endl;
             m_mcoord[i]->metal->save_pdb_line(os, ++offset);
+        }
+    }
+
+    if (lig)
+    {
+        int ac = lig->get_atom_count();
+        for (i=0; i<ac; i++)
+        {
+            Atom* a = lig->get_atom(i);
+            if (a) a->save_pdb_line(os, ++offset);
         }
     }
 
@@ -431,10 +450,10 @@ int Protein::load_pdb(FILE* is, int rno)
 
                 if (buffer[7] == '6' && buffer[8] < '!')
                 {
-                    char** fields = chop_spaced_fields(buffer);
-                    if (fields[2] && !fields[3])
-                        name = fields[2];
-                    delete[] fields;
+                    char** words = chop_spaced_words(buffer);
+                    if (words[2] && !words[3])
+                        name = words[2];
+                    delete[] words;
                 }
             }
             else if (buffer[0] == 'C'
@@ -569,11 +588,12 @@ int Protein::load_pdb(FILE* is, int rno)
         char buffer[1024];
         char buffer1[1024];
         strcpy(buffer, rem_hx[l].c_str());
-        char** fields = chop_spaced_fields(buffer);
+        char** words = chop_spaced_words(buffer);
 
-        set_region(fields[3], atoi(fields[4]), atoi(fields[5]));
+        set_region(words[3], atoi(words[4]), atoi(words[5]));
+        regions_from = rgn_pdb;
 
-        delete[] fields;
+        delete[] words;
     }
 
     std::vector<std::string> rem_st = get_remarks("800 SITE");
@@ -582,16 +602,18 @@ int Protein::load_pdb(FILE* is, int rno)
         char buffer[1024];
         char buffer1[1024];
         strcpy(buffer, rem_st[l].c_str());
-        char** fields = chop_spaced_fields(buffer);
+        char** words = chop_spaced_words(buffer);
 
-        int f4 = atoi(fields[4]);
-        if (!strcmp(fields[3], "BW"))
+        if (!words[0] || !words[1] || !words[2] || !words[3] || !words[4]) continue;
+
+        int f4 = atoi(words[4]);
+        if (!strcmp(words[3], "BW"))
         {
             while (Ballesteros_Weinstein.size() <= f4) Ballesteros_Weinstein.push_back(0);
-            Ballesteros_Weinstein[f4] = atoi(fields[5]);
+            Ballesteros_Weinstein[f4] = atoi(words[5]);
         }
 
-        delete[] fields;
+        delete[] words;
     }
 
     return rescount;
@@ -2050,6 +2072,7 @@ void Protein::set_region(std::string rgname, int start, int end)
     regions[i].name = rgname;
     regions[i].start = start;
     regions[i].end = end;
+    regions_from = rgn_manual;
 
     char buffer[256];
     sprintf(buffer, "REMARK 650 HELIX %s %d %d\n", rgname.c_str(), start, end);

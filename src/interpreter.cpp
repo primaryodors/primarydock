@@ -492,29 +492,29 @@ int main(int argc, char** argv)
         char buffer1[1024];
         for (m=0; m<1024; m++) buffer[m] = buffer1[m] = '\0';
         strcpy(buffer, script_lines[program_counter].c_str());
-        char** fields = chop_spaced_fields(buffer);
-        char** ofields = fields;
-        if (fields && fields[0] && fields[0][0] && fields[0][1])
+        char** words = chop_spaced_words(buffer);
+        char** owords = words;
+        if (words && words[0] && words[0][0] && words[0][1])
         {
-            for (k=0; fields[k]; k++)
+            for (k=0; words[k]; k++)
             {
-                if (fields[k][0] == '#')
+                if (words[k][0] == '#')
                 {
-                    // cout << "Ignoring comment " << fields[k] << endl << flush;
-                    fields[k] = nullptr;
+                    // cout << "Ignoring comment " << words[k] << endl << flush;
+                    words[k] = nullptr;
                     break;
                 }
             }
-            // cout << "command " << fields[0] << endl << flush;
+            // cout << "command " << words[0] << endl << flush;
 
             // Debug cout.
-            /*cout << endl << "***Line: " << buffer << endl << "***Fields: ";
-            for (n=0; fields[n]; n++) cout << (n?"|":"") << fields[n];
+            /*cout << endl << "***Line: " << buffer << endl << "***words: ";
+            for (n=0; words[n]; n++) cout << (n?"|":"") << words[n];
             cout << endl;*/
 
-            if (!fields[0]) goto _pc_continue;
+            if (!words[0]) goto _pc_continue;
 
-            if (fields[0][strlen(fields[0])-1] == ':') goto _pc_continue;
+            if (words[0][strlen(words[0])-1] == ':') goto _pc_continue;
 
         _interpret_command:
 
@@ -523,39 +523,39 @@ int main(int argc, char** argv)
             {
                 ;
             }
-            else if (!strcmp(fields[0], "ALIGN"))
+            else if (!strcmp(words[0], "ALIGN"))
             {
                 int sr, er, asr, aer, eachend;
                 Point sp, ep;
                 l = 1;
-                if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                sr = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                er = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                eachend = interpret_single_int(fields[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                sr = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                er = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                eachend = interpret_single_int(words[l++]);
                 if (!eachend) eachend = 1;
-                if (fields[l+2] && fields[l+3])
+                if (words[l+2] && words[l+3])
                 {                   
-                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                    asr = interpret_single_int(fields[l++]);                   
-                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                    sp = interpret_single_point(fields[l++]);
-                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                    aer = interpret_single_int(fields[l++]);   
-                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                    ep = interpret_single_point(fields[l++]);
+                    if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    asr = interpret_single_int(words[l++]);                   
+                    if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    sp = interpret_single_point(words[l++]);
+                    if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    aer = interpret_single_int(words[l++]);   
+                    if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    ep = interpret_single_point(words[l++]);
                 }
                 else
                 {
                     asr = sr;
                     aer = er;                    
-                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                    sp = interpret_single_point(fields[l++]);
-                    if (!fields[l]) raise_error("Insufficient parameters given for ALIGN.");
-                    ep = interpret_single_point(fields[l++]);
+                    if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    sp = interpret_single_point(words[l++]);
+                    if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    ep = interpret_single_point(words[l++]);
                 }
-                if (fields[l]) raise_error("Too many parameters given for ALIGN.");
+                if (words[l]) raise_error("Too many parameters given for ALIGN.");
 
                 // From start and end residues inwards for a total of eachend, average the CA locations.
                 Point sl(0,0,0);
@@ -612,19 +612,19 @@ int main(int argc, char** argv)
 
             }	// ALIGN
 
-            else if (!strcmp(fields[0], "BEND"))
+            else if (!strcmp(words[0], "BEND"))
             {
                 int sr, er;
                 bb_rot_dir bbrotd;
                 float theta;
 
                 l = 1;
-                if (!fields[l]) raise_error("Insufficient parameters given for BEND.");
-                sr = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for BEND.");
-                er = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for BEND.");
-                char* tmp = interpret_single_string(fields[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for BEND.");
+                sr = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for BEND.");
+                er = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for BEND.");
+                char* tmp = interpret_single_string(words[l++]);
                 if (!strcmp(tmp, "N-CA")) bbrotd = N_asc;
                 else if (!strcmp(tmp, "CA-C")) bbrotd = CA_asc;
                 else if (!strcmp(tmp, "CA-N")) bbrotd = CA_desc;
@@ -634,36 +634,36 @@ int main(int argc, char** argv)
                 if ((bbrotd == N_asc || bbrotd == CA_asc) && er < sr) raise_error("Cannot rotate ascending bond in the descending direction.");
                 if ((bbrotd == CA_desc || bbrotd == C_desc) && er > sr) raise_error("Cannot rotate descending bond in the ascending direction.");
 
-                if (!fields[l]) raise_error("Insufficient parameters given for BEND.");
-                theta = interpret_single_float(fields[l++]) * fiftyseventh;
-                if (fields[l]) raise_error("Too many parameters given for BEND.");
+                if (!words[l]) raise_error("Insufficient parameters given for BEND.");
+                theta = interpret_single_float(words[l++]) * fiftyseventh;
+                if (words[l]) raise_error("Too many parameters given for BEND.");
 
                 p.rotate_backbone_partial(sr, er, bbrotd, theta);
 
             }	// BEND
 
-            else if (!strcmp(fields[0], "BENERG"))
+            else if (!strcmp(words[0], "BENERG"))
             {
                 // Read non-covalent binding strength between two side chains into a float var.
                 int r1, r2;
 
                 l = 1;
-                if (!fields[l]) raise_error("Insufficient parameters given for BENERG.");
-                r1 = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for BENERG.");
-                r2 = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for BENERG.");
-                n = find_var_index(fields[l]);
+                if (!words[l]) raise_error("Insufficient parameters given for BENERG.");
+                r1 = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for BENERG.");
+                r2 = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for BENERG.");
+                n = find_var_index(words[l]);
                 if (n<0)
                 {
                     n = vars++;
-                    script_var[n].name = fields[l];
-                    script_var[n].vt = type_from_name(fields[l]);
+                    script_var[n].name = words[l];
+                    script_var[n].vt = type_from_name(words[l]);
                 }
                 int flags = n & _VARFLAGS_MASK;
                 n &= _VARNUM_MASK;
                 l++;
-                if (fields[l]) raise_error("Too many parameters given for BENERG.");
+                if (words[l]) raise_error("Too many parameters given for BENERG.");
 
                 if (script_var[n].vt != SV_FLOAT) raise_error("Wrong variable type given for BENERG; float required.");
 
@@ -676,17 +676,17 @@ int main(int argc, char** argv)
                 script_var[n].value.f = -(a1.pmol->get_intermol_binding(a2.pmol));
             }
 
-            else if (!strcmp(fields[0], "BRIDGE"))
+            else if (!strcmp(words[0], "BRIDGE"))
             {
                 int r1, r2, iters=50;
 
                 l = 1;
-                if (!fields[l]) raise_error("Insufficient parameters given for BRIDGE.");
-                r1 = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for BRIDGE.");
-                r2 = interpret_single_int(fields[l++]);
-                if (fields[l]) iters = interpret_single_int(fields[l++]);
-                if (fields[l]) raise_error("Too many parameters given for BRIDGE.");
+                if (!words[l]) raise_error("Insufficient parameters given for BRIDGE.");
+                r1 = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for BRIDGE.");
+                r2 = interpret_single_int(words[l++]);
+                if (words[l]) iters = interpret_single_int(words[l++]);
+                if (words[l]) raise_error("Too many parameters given for BRIDGE.");
 
                 Star a1, a2;
                 a1.paa = p.get_residue(r1);
@@ -706,25 +706,25 @@ int main(int argc, char** argv)
 
             }	// BRIDGE
 
-            else if (!strcmp(fields[0], "CENTER"))
+            else if (!strcmp(words[0], "CENTER"))
             {
                 l = 1;
                 Point newcen(0,0,0);
-                if (fields[l]) newcen = interpret_single_point(fields[l++]);
-                if (fields[l]) raise_error("Too many parameters given for CENTER.");
+                if (words[l]) newcen = interpret_single_point(words[l++]);
+                if (words[l]) raise_error("Too many parameters given for CENTER.");
                 p.move_piece(1, 9999, newcen);
             }	// CENTER
 
-            else if (!strcmp(fields[0], "CONNECT"))
+            else if (!strcmp(words[0], "CONNECT"))
             {
                 l=1;
                 int sr, er, ct, iters=250;
-                if (!fields[l]) raise_error("Insufficient parameters given for CONNECT.");
-                sr = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for CONNECT.");
-                ct = interpret_single_int(fields[l++]);
-                if (fields[l]) iters = interpret_single_int(fields[l++]);
-                if (fields[l]) raise_error("Too many parameters given for CONNECT.");
+                if (!words[l]) raise_error("Insufficient parameters given for CONNECT.");
+                sr = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for CONNECT.");
+                ct = interpret_single_int(words[l++]);
+                if (words[l]) iters = interpret_single_int(words[l++]);
+                if (words[l]) raise_error("Too many parameters given for CONNECT.");
                 er = ct - sgn(ct-sr);
 
                 Atom *a1, *a2, *a3;
@@ -757,12 +757,12 @@ int main(int argc, char** argv)
                 goto _pc_continue;
             }	// CONNECT
 
-            else if (!strcmp(fields[0], "DELETE"))
+            else if (!strcmp(words[0], "DELETE"))
             {
-                if (!fields[1]) raise_error("Insufficient parameters given for DELETE.");
-                int sr = interpret_single_int(fields[1]), er=0;
-                if (fields[2]) er = interpret_single_int(fields[2]);
-                if (fields[3]) raise_error("Too many parameters given for DELETE.");
+                if (!words[1]) raise_error("Insufficient parameters given for DELETE.");
+                int sr = interpret_single_int(words[1]), er=0;
+                if (words[2]) er = interpret_single_int(words[2]);
+                if (words[3]) raise_error("Too many parameters given for DELETE.");
 
                 if (er) p.delete_residues(sr, er);
                 else p.delete_residue(sr);
@@ -780,14 +780,14 @@ int main(int argc, char** argv)
 				set_variable(buffer, sv);
             } // DELETE
 
-            else if (!strcmp(fields[0], "DISULF"))
+            else if (!strcmp(words[0], "DISULF"))
             {
-                if (fields[1])
+                if (words[1])
                 {
-                    if (!fields[2]) raise_error("DISULF takes either zero or two parameters.");
-                    if ( fields[3]) raise_error("DISULF takes either zero or two parameters.");
-                    j = interpret_single_int(fields[1]);
-                    k = interpret_single_int(fields[2]);
+                    if (!words[2]) raise_error("DISULF takes either zero or two parameters.");
+                    if ( words[3]) raise_error("DISULF takes either zero or two parameters.");
+                    j = interpret_single_int(words[1]);
+                    k = interpret_single_int(words[2]);
                     bool result = p.disulfide_bond(j, k);
                     if (!result) cout << "WARNING: Failed to form disulfide bond between " << j << " and " << k << "." << endl;
                 }
@@ -810,7 +810,7 @@ int main(int argc, char** argv)
                 }
             } // DISULF
 
-            else if (!strcmp(fields[0], "DUMP"))
+            else if (!strcmp(words[0], "DUMP"))
             {
                 for (j=0; j<vars; j++)
                 {
@@ -836,14 +836,14 @@ int main(int argc, char** argv)
                 }
             }	// DUMP
 
-            else if (!strcmp(fields[0], "ECHO"))
+            else if (!strcmp(words[0], "ECHO"))
             {
-                for (l=1; fields[l]; l++)
+                for (l=1; words[l]; l++)
                 {
-                    if (!strcmp(fields[l], "~")) goto _no_newline_on_echo;
+                    if (!strcmp(words[l], "~")) goto _no_newline_on_echo;
                     else
                     {
-                        psz = interpret_single_string(fields[l]);
+                        psz = interpret_single_string(words[l]);
                         cout << psz;
                         delete[] psz;
                     }
@@ -854,24 +854,24 @@ int main(int argc, char** argv)
                 ;
             }	// ECHO
 
-            else if (!strcmp(fields[0], "ELSE")) goto _pc_continue;
+            else if (!strcmp(words[0], "ELSE")) goto _pc_continue;
 
-            else if (!strcmp(fields[0], "END") || !strcmp(fields[0], "EXIT") || !strcmp(fields[0], "QUIT") || !strcmp(fields[0], "DIE"))
+            else if (!strcmp(words[0], "END") || !strcmp(words[0], "EXIT") || !strcmp(words[0], "QUIT") || !strcmp(words[0], "DIE"))
             {
-                if (fields[1])
+                if (words[1])
                 {
-                    l = interpret_single_int(fields[1]);
+                    l = interpret_single_int(words[1]);
                     if (l) return l;
-                    else psz = interpret_single_string(fields[1]);
+                    else psz = interpret_single_string(words[1]);
                     if (strlen(psz)) cout << psz << endl;
                 }
                 return 0;
             }	// END
 
-            else if (!strcmp(fields[0], "GEN"))
+            else if (!strcmp(words[0], "GEN"))
             {
-                if (!fields[1]) raise_error("No sequence given for GEN.");
-                psz = interpret_single_string(fields[1]);
+                if (!words[1]) raise_error("No sequence given for GEN.");
+                psz = interpret_single_string(words[1]);
 
                 p.add_sequence(psz);
                 // p.conform_backbone(1, p.get_seq_length(), 50); // Takes too long.
@@ -879,10 +879,10 @@ int main(int argc, char** argv)
                 goto _prot_deets;
             } // GEN
 
-            else if (!strcmp(fields[0], "GOTO"))
+            else if (!strcmp(words[0], "GOTO"))
             {
-                if (!fields[1]) raise_error("Insufficient parameters given for GOTO.");
-                sprintf(buffer1, "%s:", fields[1]);
+                if (!words[1]) raise_error("Insufficient parameters given for GOTO.");
+                sprintf(buffer1, "%s:", words[1]);
                 for (n=0; n<script_lines.size(); n++)
                 {
                     psz = new char[256];
@@ -902,45 +902,45 @@ int main(int argc, char** argv)
                 continue;
             }	// GOTO
 
-            else if (!strcmp(fields[0], "HELIX"))
+            else if (!strcmp(words[0], "HELIX"))
             {
                 float phi, psi;
                 l = 2;
 
-                if (!fields[1]) raise_error("No parameters given for HELIX.");
-                if (!strcmp(fields[1], "ALPHA"))
+                if (!words[1]) raise_error("No parameters given for HELIX.");
+                if (!strcmp(words[1], "ALPHA"))
                 {
                     phi = ALPHA_PHI;
                     psi = ALPHA_PSI;
                 }
-                else if (!strcmp(fields[1], "PI"))
+                else if (!strcmp(words[1], "PI"))
                 {
                     phi = PI_PHI;
                     psi = PI_PSI;
                 }
-                else if (!strcmp(fields[1], "3.10"))
+                else if (!strcmp(words[1], "3.10"))
                 {
                     phi = _310_PHI;
                     psi = _310_PSI;
                 }
-                else if (!strcmp(fields[1], "PPRO1"))
+                else if (!strcmp(words[1], "PPRO1"))
                 {
                     phi = POLYPRO1_PHI;
                     psi = POLYPRO1_PSI;
                 }
-                else if (!strcmp(fields[1], "PPRO2"))
+                else if (!strcmp(words[1], "PPRO2"))
                 {
                     phi = POLYPRO2_PHI;
                     psi = POLYPRO2_PSI;
                 }
 
                 // Not technically helices, but included for consistency.
-                else if (!strcmp(fields[1], "BETA"))
+                else if (!strcmp(words[1], "BETA"))
                 {
                     phi = BETA_PHI;
                     psi = BETA_PSI;
                 }
-                else if (!strcmp(fields[1], "STRAIGHT"))
+                else if (!strcmp(words[1], "STRAIGHT"))
                 {
                     phi = M_PI;
                     psi = M_PI;
@@ -948,74 +948,77 @@ int main(int argc, char** argv)
 
                 else
                 {
-                    phi = interpret_single_float(fields[1])*fiftyseventh;
-                    if (!fields[2]) raise_error("Insufficient parameters given for HELIX.");
-                    psi = interpret_single_float(fields[2])*fiftyseventh;
+                    phi = interpret_single_float(words[1])*fiftyseventh;
+                    if (!words[2]) raise_error("Insufficient parameters given for HELIX.");
+                    psi = interpret_single_float(words[2])*fiftyseventh;
                     l++;
                 }
 
                 int sr, er, sa;
-                if (!fields[l]) raise_error("Insufficient parameters given for HELIX.");
-                sr = interpret_single_int(fields[l]);
-                if (!fields[l+1]) raise_error("Insufficient parameters given for HELIX.");
-                sa = er = interpret_single_int(fields[l+1]);
-                if (fields[l+2]) sa = interpret_single_int(fields[l+2]);
-                if (fields[l+2] && fields[l+3]) raise_error("Too many parameters given for HELIX.");
+                if (!words[l]) raise_error("Insufficient parameters given for HELIX.");
+                sr = interpret_single_int(words[l]);
+                if (!words[l+1]) raise_error("Insufficient parameters given for HELIX.");
+                sa = er = interpret_single_int(words[l+1]);
+                if (words[l+2]) sa = interpret_single_int(words[l+2]);
+                if (words[l+2] && words[l+3]) raise_error("Too many parameters given for HELIX.");
 
                 p.make_helix(sr, er, sa, phi, psi);
 
             }	// HELIX
 
-            else if (!strcmp(fields[0], "HYDRO"))
+            else if (!strcmp(words[0], "HYDRO"))
             {
                 int resno, endres = p.get_end_resno();
                 for (resno=1; resno<=endres; resno++)
-                    p.get_residue(resno)->hydrogenate();
+                {
+                    AminoAcid* res = p.get_residue(resno);
+                    if (res) res->hydrogenate();
+                }
             }   // HYDRO
 
-            else if (!strcmp(fields[0], "IF"))
+            else if (!strcmp(words[0], "IF"))
             {
-                if (!fields[1]) raise_error("Insufficient parameters given for IF.");
-                if (!fields[2]) raise_error("Insufficient parameters given for IF.");
+                if (!words[1]) raise_error("Insufficient parameters given for IF.");
+                if (!words[2]) raise_error("Insufficient parameters given for IF.");
 
                 // TODO: NOT operator and IF %var GOTO blah.
                 l = 2;
 
                 // If the operator is =, and both l-value and r-value are strings, do a direct comparison.
-                if (!fields[l]) raise_error("Insufficient parameters given for IF.");
-                if (!strcmp(fields[l], "THEN"))
+                if (!words[l]) raise_error("Insufficient parameters given for IF.");
+                if (!strcmp(words[l], "THEN"))
                 {
                     l--;
-                    if (interpret_single_float(fields[l])) goto _evaluated_true;
-                    else if (strlen(interpret_single_string(fields[l]))) goto _evaluated_true;
+                    if (interpret_single_float(words[l])) goto _evaluated_true;
+                    else if (strlen(interpret_single_string(words[l]))) goto _evaluated_true;
                     else goto _evaluated_false;
                 }
 
-                if (!strcmp(fields[l], "==")) fields[l][1] = 0;
+                if (!strcmp(words[l], "==")) words[l][1] = 0;
 
-                if (!strcmp(fields[l], "=") || !strcmp(fields[l], "!=") || !strcmp(fields[l], "=*"))
+                if (!strcmp(words[l], "=") || !strcmp(words[l], "!=") || !strcmp(words[l], "=*"))
                 {
-                    if (!fields[l+1]) raise_error("Insufficient parameters given for IF.");
-                    if (fields[l-1][0] == fields[l+1][0]
+                    if (!words[l+1]) raise_error("Insufficient parameters given for IF.");
+                    if (words[l-1][0] == words[l+1][0]
                             ||
-                            fields[l-1][0] == '$' && fields[l+1][0] == '"'
+                            words[l-1][0] == '$' && words[l+1][0] == '"'
                             ||
-                            fields[l-1][0] == '"' && fields[l+1][0] == '$'
+                            words[l-1][0] == '"' && words[l+1][0] == '$'
                        )
                     {
-                        char *lvalue = interpret_single_string(fields[l-1]),
-                              *rvalue = interpret_single_string(fields[l+1]);
-                        if (!strcmp(fields[l], "="))
+                        char *lvalue = interpret_single_string(words[l-1]),
+                              *rvalue = interpret_single_string(words[l+1]);
+                        if (!strcmp(words[l], "="))
                         {
                             if (strcmp(lvalue, rvalue)) goto _evaluated_false;
                             else goto _evaluated_true;
                         }
-                        if (!strcmp(fields[l], "!="))
+                        if (!strcmp(words[l], "!="))
                         {
                             if (!strcmp(lvalue, rvalue)) goto _evaluated_false;
                             else goto _evaluated_true;
                         }
-                        if (!strcmp(fields[l], "=*"))
+                        if (!strcmp(words[l], "=*"))
                         {
                             if (!strstr(lvalue, rvalue)) goto _evaluated_false;
                             else goto _evaluated_true;
@@ -1027,121 +1030,121 @@ int main(int argc, char** argv)
                 {
                     // Otherwise, interpret both values as floats.
                 _just_interpret_floats:
-                    float lvalue = interpret_single_float(fields[l-1]),
-                          rvalue = interpret_single_float(fields[l+1]);
+                    float lvalue = interpret_single_float(words[l-1]),
+                          rvalue = interpret_single_float(words[l+1]);
 
-                    if (!strcmp(fields[l], "="))
+                    if (!strcmp(words[l], "="))
                     {
                         if (lvalue == rvalue) goto _evaluated_true;
                         else goto _evaluated_false;
                     }
-                    else if (!strcmp(fields[l], "!="))
+                    else if (!strcmp(words[l], "!="))
                     {
                         if (lvalue != rvalue) goto _evaluated_true;
                         else goto _evaluated_false;
                     }
-                    else if (!strcmp(fields[l], ">"))
+                    else if (!strcmp(words[l], ">"))
                     {
                         if (lvalue > rvalue) goto _evaluated_true;
                         else goto _evaluated_false;
                     }
-                    else if (!strcmp(fields[l], "<"))
+                    else if (!strcmp(words[l], "<"))
                     {
                         if (lvalue < rvalue) goto _evaluated_true;
                         else goto _evaluated_false;
                     }
-                    else if (!strcmp(fields[l], ">="))
+                    else if (!strcmp(words[l], ">="))
                     {
                         if (lvalue >=rvalue) goto _evaluated_true;
                         else goto _evaluated_false;
                     }
-                    else if (!strcmp(fields[l], "<="))
+                    else if (!strcmp(words[l], "<="))
                     {
                         if (lvalue <= rvalue) goto _evaluated_true;
                         else goto _evaluated_false;
                     }
-                    else raise_error( (std::string)"Unknown operator " + (std::string)fields[l] + (std::string)" for comparison.");
+                    else raise_error( (std::string)"Unknown operator " + (std::string)words[l] + (std::string)" for comparison.");
                 }
 
             _evaluated_true:
                 l += 2;
-                if (!strcmp(fields[l], "THEN")) l++;
-                fields = &fields[l];
+                if (!strcmp(words[l], "THEN")) l++;
+                words = &words[l];
 
-                if (!fields[0]) goto _pc_continue;
+                if (!words[0]) goto _pc_continue;
 
-                while (!strcmp(fields[0], "OR"))
+                while (!strcmp(words[0], "OR"))
                 {
-                    fields = &fields[4];
-                    if (!fields[0]) goto _pc_continue;
+                    words = &words[4];
+                    if (!words[0]) goto _pc_continue;
                 }
 
-                if (!strcmp(fields[0], "AND")) strcpy(fields[0], "IF");
+                if (!strcmp(words[0], "AND")) strcpy(words[0], "IF");
                 goto _interpret_command;
 
             _evaluated_false:
-                if (fields[l+2] && !strcmp(fields[l+2], "OR"))
+                if (words[l+2] && !strcmp(words[l+2], "OR"))
                 {
                     l += 2;
-                    fields = &fields[l];
-                    strcpy(fields[0], "IF");
+                    words = &words[l];
+                    strcpy(words[0], "IF");
                     goto _interpret_command;
                 }
 
                 program_counter++;
                 strcpy(buffer, script_lines[program_counter].c_str());
-                fields = chop_spaced_fields(buffer);
-                if (!fields || !fields[0]) goto _pc_continue;
-                if (strcmp(fields[0], "ELSE")) continue;
+                words = chop_spaced_words(buffer);
+                if (!words || !words[0]) goto _pc_continue;
+                if (strcmp(words[0], "ELSE")) continue;
 
-                fields = &fields[1];
+                words = &words[1];
                 goto _interpret_command;
             }	// IF
 
-            else if (!strcmp(fields[0], "LET"))
+            else if (!strcmp(words[0], "LET"))
             {
-                if (!fields[1]) raise_error("No parameters given for LET.");
-                n = find_var_index(fields[1], &fields[1]);
+                if (!words[1]) raise_error("No parameters given for LET.");
+                n = find_var_index(words[1], &words[1]);
                 if (n<0)
                 {
                     n = vars++;
-                    script_var[n].name = fields[1];
-                    script_var[n].vt = type_from_name(fields[1]);
+                    script_var[n].name = words[1];
+                    script_var[n].vt = type_from_name(words[1]);
                 }
                 int flags = n & _VARFLAGS_MASK;
                 n &= _VARNUM_MASK;
 
-                if (!fields[2]) raise_error("No operator given for LET.");
-                if (!fields[3] && strcmp(fields[2], "++") && strcmp(fields[2], "--") ) raise_error("No rvalue given for LET.");
+                if (!words[2]) raise_error("No operator given for LET.");
+                if (!words[3] && strcmp(words[2], "++") && strcmp(words[2], "--") ) raise_error("No rvalue given for LET.");
                 switch (script_var[n].vt)
                 {
                 case SV_INT:
-                    if (!strcmp(fields[2], "=")) script_var[n].value.n = interpret_single_int(fields[3]);
-                    else if (!strcmp(fields[2], "+=")) script_var[n].value.n += interpret_single_int(fields[3]);
-                    else if (!strcmp(fields[2], "-=")) script_var[n].value.n -= interpret_single_int(fields[3]);
-                    else if (!strcmp(fields[2], "*=")) script_var[n].value.n *= interpret_single_int(fields[3]);
-                    else if (!strcmp(fields[2], "/=")) script_var[n].value.n /= interpret_single_int(fields[3]);
-                    else if (!strcmp(fields[2], "&=")) script_var[n].value.n &= interpret_single_int(fields[3]);
-                    else if (!strcmp(fields[2], "|=")) script_var[n].value.n |= interpret_single_int(fields[3]);
-                    else if (!strcmp(fields[2], "++")) script_var[n].value.n++;
-                    else if (!strcmp(fields[2], "--")) script_var[n].value.n--;
+                    if (!strcmp(words[2], "=")) script_var[n].value.n = interpret_single_int(words[3]);
+                    else if (!strcmp(words[2], "+=")) script_var[n].value.n += interpret_single_int(words[3]);
+                    else if (!strcmp(words[2], "-=")) script_var[n].value.n -= interpret_single_int(words[3]);
+                    else if (!strcmp(words[2], "*=")) script_var[n].value.n *= interpret_single_int(words[3]);
+                    else if (!strcmp(words[2], "/=")) script_var[n].value.n /= interpret_single_int(words[3]);
+                    else if (!strcmp(words[2], "&=")) script_var[n].value.n &= interpret_single_int(words[3]);
+                    else if (!strcmp(words[2], "|=")) script_var[n].value.n |= interpret_single_int(words[3]);
+                    else if (!strcmp(words[2], "++")) script_var[n].value.n++;
+                    else if (!strcmp(words[2], "--")) script_var[n].value.n--;
                     else
                     {
-                        raise_error( (std::string)"Unimplemented operator " + (std::string)fields[2] + (std::string)" for int assignment.");
+                        raise_error( (std::string)"Unimplemented operator " + (std::string)words[2] + (std::string)" for int assignment.");
                         return 0x51974c5;
                     }
                     l=0;
                     break;
 
                 case SV_FLOAT:
-                    if (!strcmp(fields[2], "=")) script_var[n].value.f = interpret_single_float(fields[3]);
-                    else if (!strcmp(fields[2], "+=")) script_var[n].value.f += interpret_single_float(fields[3]);
-                    else if (!strcmp(fields[2], "-=")) script_var[n].value.f -= interpret_single_float(fields[3]);
-                    else if (!strcmp(fields[2], "*=")) script_var[n].value.f *= interpret_single_float(fields[3]);
-                    else if (!strcmp(fields[2], "/=")) script_var[n].value.f /= interpret_single_float(fields[3]);
+                    if (!strcmp(words[2], "=")) script_var[n].value.f = interpret_single_float(words[3]);
+                    else if (!strcmp(words[2], "+=")) script_var[n].value.f += interpret_single_float(words[3]);
+                    else if (!strcmp(words[2], "-=")) script_var[n].value.f -= interpret_single_float(words[3]);
+                    else if (!strcmp(words[2], "*=")) script_var[n].value.f *= interpret_single_float(words[3]);
+                    else if (!strcmp(words[2], "/=")) script_var[n].value.f /= interpret_single_float(words[3]);
                     else
                     {
-                        raise_error( (std::string)"Unimplemented operator " + (std::string)fields[2] + (std::string)" for float assignment.");
+                        raise_error( (std::string)"Unimplemented operator " + (std::string)words[2] + (std::string)" for float assignment.");
                         return 0x51974c5;
                     }
                     l=0;
@@ -1152,7 +1155,7 @@ int main(int argc, char** argv)
                     {
                         float* ff = nullptr;
 
-                        char* param = strchr(fields[1], '.');
+                        char* param = strchr(words[1], '.');
                         if (!param) raise_error( (std::string)"Missing member after dot.");
                         param++;
                         if (!strcmp(param, "x")) ff = &(script_var[n].value.ppt->x);
@@ -1169,14 +1172,14 @@ int main(int argc, char** argv)
 
                         if (ff)
                         {
-                            if (!strcmp(fields[2], "=")) *ff = interpret_single_float(fields[3]);
-                            else if (!strcmp(fields[2], "+=")) *ff += interpret_single_float(fields[3]);
-                            else if (!strcmp(fields[2], "-=")) *ff -= interpret_single_float(fields[3]);
-                            else if (!strcmp(fields[2], "*=")) *ff *= interpret_single_float(fields[3]);
-                            else if (!strcmp(fields[2], "/=")) *ff /= interpret_single_float(fields[3]);
+                            if (!strcmp(words[2], "=")) *ff = interpret_single_float(words[3]);
+                            else if (!strcmp(words[2], "+=")) *ff += interpret_single_float(words[3]);
+                            else if (!strcmp(words[2], "-=")) *ff -= interpret_single_float(words[3]);
+                            else if (!strcmp(words[2], "*=")) *ff *= interpret_single_float(words[3]);
+                            else if (!strcmp(words[2], "/=")) *ff /= interpret_single_float(words[3]);
                             else
                             {
-                                raise_error( (std::string) "Unimplemented operator " + (std::string)fields[2] + (std::string)" for float assignment.");
+                                raise_error( (std::string) "Unimplemented operator " + (std::string)words[2] + (std::string)" for float assignment.");
                                 return 0x51974c5;
                             }
                             l = 0;
@@ -1186,30 +1189,30 @@ int main(int argc, char** argv)
                     }
                     else
                     {
-                        if (!strcmp(fields[2], "="))
+                        if (!strcmp(words[2], "="))
                         {
                             script_var[n].value.ppt = new Point();
-                            *(script_var[n].value.ppt) = interpret_single_point(fields[3]);
+                            *(script_var[n].value.ppt) = interpret_single_point(words[3]);
                         }
-                        else if (!strcmp(fields[2], "+=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->add(interpret_single_point(fields[3]));
-                        else if (!strcmp(fields[2], "-=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->subtract(interpret_single_point(fields[3]));
-                        else if (!strcmp(fields[2], "*="))
+                        else if (!strcmp(words[2], "+=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->add(interpret_single_point(words[3]));
+                        else if (!strcmp(words[2], "-=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->subtract(interpret_single_point(words[3]));
+                        else if (!strcmp(words[2], "*="))
                         {
-                            f = interpret_single_float(fields[3]);
+                            f = interpret_single_float(words[3]);
                             script_var[n].value.ppt->x *= f;
                             script_var[n].value.ppt->y *= f;
                             script_var[n].value.ppt->z *= f;
                         }
-                        else if (!strcmp(fields[2], "/="))
+                        else if (!strcmp(words[2], "/="))
                         {
-                            f = interpret_single_float(fields[3]);
+                            f = interpret_single_float(words[3]);
                             script_var[n].value.ppt->x /= f;
                             script_var[n].value.ppt->y /= f;
                             script_var[n].value.ppt->z /= f;
                         }
                         else
                         {
-                            raise_error( (std::string)"Unimplemented operator " + (std::string)fields[2] + (std::string)" for Cartesian assignment.");
+                            raise_error( (std::string)"Unimplemented operator " + (std::string)words[2] + (std::string)" for Cartesian assignment.");
                             return 0x51974c5;
                         }
                     }
@@ -1220,14 +1223,14 @@ int main(int argc, char** argv)
 
                 case SV_STRING:
 
-                    psz = interpret_single_string(fields[3]);
+                    psz = interpret_single_string(words[3]);
 
                     l = m = 0;
-                    if (fields[4] && !strcmp(fields[4], "FROM"))
+                    if (words[4] && !strcmp(words[4], "FROM"))
                     {
                         l+=2;
-                        if (!fields[5]) raise_error("Insufficient parameters given for LET.");
-                        m = interpret_single_int(fields[5]);
+                        if (!words[5]) raise_error("Insufficient parameters given for LET.");
+                        m = interpret_single_int(words[5]);
                         if (m < 0) m = 0;
                         if (m)
                         {
@@ -1236,23 +1239,23 @@ int main(int argc, char** argv)
                             {
                                 m--;
                                 psz += m;
-                                if (fields[6] && !strcmp(fields[6], "FOR"))
+                                if (words[6] && !strcmp(words[6], "FOR"))
                                 {
                                     l+=2;
-                                    if (!fields[7]) raise_error("Insufficient parameters given for LET.");
-                                    k = interpret_single_int(fields[7]);
+                                    if (!words[7]) raise_error("Insufficient parameters given for LET.");
+                                    k = interpret_single_int(words[7]);
                                     if (k >= 0 && k < strlen(psz)) psz[k] = 0;
                                 }
                             }
                         }
                     }
 
-                    if (!strcmp(fields[2], "="))
+                    if (!strcmp(words[2], "="))
                     {
                         script_var[n].value.psz = new char[65536];
                         strcpy(script_var[n].value.psz, psz);
                     }
-                    else if (!strcmp(fields[2], "+="))
+                    else if (!strcmp(words[2], "+="))
                     {
                         builder = script_var[n].value.psz;
                         builder.append(psz);
@@ -1263,7 +1266,7 @@ int main(int argc, char** argv)
                     {
                         psz -= m;
                         delete[] psz;
-                        raise_error( (std::string)"Unimplemented operator " + (std::string)fields[2] + (std::string)" for string assignment.");
+                        raise_error( (std::string)"Unimplemented operator " + (std::string)words[2] + (std::string)" for string assignment.");
                         return 0x51974c5;		// If you use your imagination, that says "syntax".
                     }
                     psz -= m;
@@ -1274,74 +1277,74 @@ int main(int argc, char** argv)
                     ;
                 }	// switch (script_var[n].vt)
 
-                while (n >= 0 && fields[3+l] && fields[4+l] && fields[5+l])
+                while (n >= 0 && words[3+l] && words[4+l] && words[5+l])
                 {
-                    if (!fields[5+l]) raise_error("Insufficient parameters given for LET.");
+                    if (!words[5+l]) raise_error("Insufficient parameters given for LET.");
                     switch (script_var[n].vt)
                     {
                     case SV_INT:
-                        m = interpret_single_int(fields[5+l]);
-                        if (!strcmp(fields[4+l], "+")) script_var[n].value.n += m;
-                        else if (!strcmp(fields[4+l], "-")) script_var[n].value.n -= m;
-                        else if (!strcmp(fields[4+l], "*")) script_var[n].value.n *= m;
-                        else if (!strcmp(fields[4+l], "/")) script_var[n].value.n /= m;
-                        else if (!strcmp(fields[4+l], "^")) script_var[n].value.n = pow(script_var[n].value.n, m);
-                        else if (!strcmp(fields[4+l], "&")) script_var[n].value.n &= m;
-                        else if (!strcmp(fields[4+l], "|")) script_var[n].value.n |= m;
+                        m = interpret_single_int(words[5+l]);
+                        if (!strcmp(words[4+l], "+")) script_var[n].value.n += m;
+                        else if (!strcmp(words[4+l], "-")) script_var[n].value.n -= m;
+                        else if (!strcmp(words[4+l], "*")) script_var[n].value.n *= m;
+                        else if (!strcmp(words[4+l], "/")) script_var[n].value.n /= m;
+                        else if (!strcmp(words[4+l], "^")) script_var[n].value.n = pow(script_var[n].value.n, m);
+                        else if (!strcmp(words[4+l], "&")) script_var[n].value.n &= m;
+                        else if (!strcmp(words[4+l], "|")) script_var[n].value.n |= m;
                         else
                         {
-                            raise_error( (std::string)"Bad operator " + (std::string)fields[4+l] + (std::string)" for int.");
+                            raise_error( (std::string)"Bad operator " + (std::string)words[4+l] + (std::string)" for int.");
                             return 0x51974c5;
                         }
                         break;
 
                     case SV_FLOAT:
-                        f = interpret_single_float(fields[5+l]);
-                        if (!strcmp(fields[4+l], "+")) script_var[n].value.f += f;
-                        else if (!strcmp(fields[4+l], "-")) script_var[n].value.f -= f;
-                        else if (!strcmp(fields[4+l], "*")) script_var[n].value.f *= f;
-                        else if (!strcmp(fields[4+l], "/")) script_var[n].value.f /= f;
-                        else if (!strcmp(fields[4+l], "^")) script_var[n].value.f = pow(script_var[n].value.f, f);
+                        f = interpret_single_float(words[5+l]);
+                        if (!strcmp(words[4+l], "+")) script_var[n].value.f += f;
+                        else if (!strcmp(words[4+l], "-")) script_var[n].value.f -= f;
+                        else if (!strcmp(words[4+l], "*")) script_var[n].value.f *= f;
+                        else if (!strcmp(words[4+l], "/")) script_var[n].value.f /= f;
+                        else if (!strcmp(words[4+l], "^")) script_var[n].value.f = pow(script_var[n].value.f, f);
                         else
                         {
-                            // cout << "Bad operator " << fields[4+l] << " for float." << endl;
-                            raise_error( (std::string)"Bad operator " + (std::string)fields[4+l] + (std::string)" for float.");
+                            // cout << "Bad operator " << words[4+l] << " for float." << endl;
+                            raise_error( (std::string)"Bad operator " + (std::string)words[4+l] + (std::string)" for float.");
                             return 0x51974c5;
                         }
                         break;
 
                     case SV_POINT:
-                        pt = interpret_single_point(fields[5+l]);
-                        if (!strcmp(fields[4+l], "+")) *script_var[n].value.ppt = script_var[n].value.ppt->add(pt);
-                        else if (!strcmp(fields[4+l], "-")) *script_var[n].value.ppt = script_var[n].value.ppt->subtract(pt);
-                        else if (!strcmp(fields[4+l], "*")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() * pt.magnitude());
-                        else if (!strcmp(fields[4+l], "/")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() / pt.magnitude());
+                        pt = interpret_single_point(words[5+l]);
+                        if (!strcmp(words[4+l], "+")) *script_var[n].value.ppt = script_var[n].value.ppt->add(pt);
+                        else if (!strcmp(words[4+l], "-")) *script_var[n].value.ppt = script_var[n].value.ppt->subtract(pt);
+                        else if (!strcmp(words[4+l], "*")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() * pt.magnitude());
+                        else if (!strcmp(words[4+l], "/")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() / pt.magnitude());
                         else
                         {
-                            // cout << "Bad operator " << fields[4+l] << " for point." << endl;
-                            raise_error( (std::string)"Bad operator " + (std::string)fields[4+l] + (std::string)" for point.");
+                            // cout << "Bad operator " << words[4+l] << " for point." << endl;
+                            raise_error( (std::string)"Bad operator " + (std::string)words[4+l] + (std::string)" for point.");
                             return 0x51974c5;
                         }
                         break;
 
                     case SV_STRING:
                         builder = script_var[n].value.psz;
-                        psz = interpret_single_string(fields[5+l]);
-                        if (!strcmp(fields[4+l], "+"))
+                        psz = interpret_single_string(words[5+l]);
+                        if (!strcmp(words[4+l], "+"))
                         {
                             builder.append(psz);
                             script_var[n].value.psz = new char[65536];
                             strcpy(script_var[n].value.psz, builder.c_str());
                         }
-                        else if (!strcmp(fields[4+l], "FOR"))
+                        else if (!strcmp(words[4+l], "FOR"))
                         {
                             l += 2;
                             continue;
                         }
                         else
                         {
-                            // cout << "Bad operator " << fields[4+l] << " for string." << endl;
-                            raise_error( (std::string)"Bad operator " + (std::string)fields[4+l] + (std::string)" for string.");
+                            // cout << "Bad operator " << words[4+l] << " for string." << endl;
+                            raise_error( (std::string)"Bad operator " + (std::string)words[4+l] + (std::string)" for string.");
                             return 0x51974c5;
                         }
                         break;
@@ -1354,13 +1357,13 @@ int main(int argc, char** argv)
                 }
             }	// LET
 
-            else if (!strcmp(fields[0], "LOAD"))
+            else if (!strcmp(words[0], "LOAD"))
             {
-                if (!fields[1]) raise_error("Insufficient parameters given for LOAD.");
-                psz = interpret_single_string(fields[1]);
+                if (!words[1]) raise_error("Insufficient parameters given for LOAD.");
+                psz = interpret_single_string(words[1]);
 				n = 0;
-				// if (fields[2]) n = atoi(fields[2]);
-                if (fields[2] /*&& fields[3]*/) raise_error("Too many parameters given for LOAD.");
+				// if (words[2]) n = atoi(words[2]);
+                if (words[2] /*&& words[3]*/) raise_error("Too many parameters given for LOAD.");
 
                 pf = fopen(psz, "rb");
                 if (!pf)
@@ -1405,21 +1408,21 @@ int main(int argc, char** argv)
                 for (l=0; l<rem_hx.size(); l++)
                 {
                     strcpy(buffer, rem_hx[l].c_str());
-                    char** fields = chop_spaced_fields(buffer);
+                    char** words = chop_spaced_words(buffer);
 
-					if (!fields[3] || !fields[4] || !fields[5]) continue;
+					if (!words[3] || !words[4] || !words[5]) continue;
 
-                    sprintf(buffer1, "%c%s.s", '%', fields[3]);
-                    sv.n = atoi(fields[4]);
+                    sprintf(buffer1, "%c%s.s", '%', words[3]);
+                    sv.n = atoi(words[4]);
                     set_variable(buffer1, sv);
 
-                    sprintf(buffer1, "%c%s.e", '%', fields[3]);
-                    sv.n = atoi(fields[5]);
+                    sprintf(buffer1, "%c%s.e", '%', words[3]);
+                    sv.n = atoi(words[5]);
                     set_variable(buffer1, sv);
 
-					p.set_region(fields[3], atoi(fields[4]), atoi(fields[5]));
+					p.set_region(words[3], atoi(words[4]), atoi(words[5]));
 
-                    delete[] fields;
+                    delete[] words;
                 }
 
                 for (l=1; l<=7; l++)
@@ -1445,7 +1448,7 @@ int main(int argc, char** argv)
                 }
             }
 
-            else if (!strcmp(fields[0], "MCOORD"))
+            else if (!strcmp(words[0], "MCOORD"))
             {
                 l = 1;
                 Atom* ma;
@@ -1459,29 +1462,29 @@ int main(int argc, char** argv)
                 Atom** ba = nullptr;
 
                 _yes_I_used_goto_for_this:
-                if (!strcmp(fields[l], "YO"))
+                if (!strcmp(words[l], "YO"))
                 {
                     force_tyrosine_O = true;
                     l++;
                     goto _yes_I_used_goto_for_this;
                 }
-                else if (!strcmp(fields[l], "YAr"))
+                else if (!strcmp(words[l], "YAr"))
                 {
                     force_tyrosine_O = false;
                     l++;
                     goto _yes_I_used_goto_for_this;
                 }
-                else if (!strcmp(fields[l], "Th8"))
+                else if (!strcmp(words[l], "Th8"))
                 {
                     thiolate = true;
                     l++;
                     goto _yes_I_used_goto_for_this;
                 }
 
-                if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
-                elem_sym = fields[l++];
-                if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
-                elem_charge = interpret_single_int(fields[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for MCOORD.");
+                elem_sym = words[l++];
+                if (!words[l]) raise_error("Insufficient parameters given for MCOORD.");
+                elem_charge = interpret_single_int(words[l++]);
                 Point pt;
                 ma = new Atom(elem_sym.c_str(), &pt, elem_charge);
                 n = p.get_metals_count() + 1;
@@ -1491,27 +1494,27 @@ int main(int argc, char** argv)
                 strcpy(ma->aa3let, "MTL");
                 ma->residue = 0;
 
-                if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
-                for (; fields[l]; l++)
+                if (!words[l]) raise_error("Insufficient parameters given for MCOORD.");
+                for (; words[l]; l++)
                 {
                     bool local_O = force_tyrosine_O;
 
                     _another_goto:
-                    if (!strcmp(fields[l], "YO"))
+                    if (!strcmp(words[l], "YO"))
                     {
                         local_O = true;
                         l++;
                         goto _another_goto;
                     }
-                    else if (!strcmp(fields[l], "YAr"))
+                    else if (!strcmp(words[l], "YAr"))
                     {
                         local_O = false;
                         l++;
                         goto _another_goto;
                     }
 
-                    if (!fields[l]) raise_error("Insufficient parameters given for MCOORD.");
-                    k = interpret_single_int(fields[l]);
+                    if (!words[l]) raise_error("Insufficient parameters given for MCOORD.");
+                    k = interpret_single_int(words[l]);
                     AminoAcid* aa = p.get_residue(k);
                     resnos[ncr] = k;
 
@@ -1557,88 +1560,88 @@ int main(int argc, char** argv)
 
             } // MCOORD
 
-            else if (!strcmp(fields[0], "MOVE"))
+            else if (!strcmp(words[0], "MOVE"))
             {
                 l = 1;
                 Point newcen(0,0,0);
                 int sr, er;
-                if (fields[l]) sr = interpret_single_int(fields[l++]);
+                if (words[l]) sr = interpret_single_int(words[l++]);
                 else raise_error("Not enough parameters given for MOVE.");
-                if (fields[l]) er = interpret_single_int(fields[l++]);
+                if (words[l]) er = interpret_single_int(words[l++]);
                 else raise_error("Not enough parameters given for MOVE.");
-                if (fields[l]) newcen = interpret_single_point(fields[l++]);
-                if (fields[l]) raise_error("Too many parameters given for MOVE.");
+                if (words[l]) newcen = interpret_single_point(words[l++]);
+                if (words[l]) raise_error("Too many parameters given for MOVE.");
                 p.move_piece(sr, er, newcen);
             }	// MOVE
 
-            else if (!strcmp(fields[0], "PTALIGN"))
+            else if (!strcmp(words[0], "PTALIGN"))
             {
                 Point point, align, center;
                 l = 1;
-                if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
-                point = interpret_single_point(fields[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for PTALIGN.");
+                point = interpret_single_point(words[l++]);
 
-                if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
-                align = interpret_single_point(fields[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for PTALIGN.");
+                align = interpret_single_point(words[l++]);
 
-                if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
-                center = interpret_single_point(fields[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for PTALIGN.");
+                center = interpret_single_point(words[l++]);
                 
                 Rotation rot = align_points_3d(&point, &align, &center);
 
-                if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
+                if (!words[l]) raise_error("Insufficient parameters given for PTALIGN.");
                 Star s;
                 rot.v.r = 1;
                 Point p = rot.v;
                 s.ppt = &p;
-                set_variable(fields[l++], s);
+                set_variable(words[l++], s);
 
-                if (!fields[l]) raise_error("Insufficient parameters given for PTALIGN.");
+                if (!words[l]) raise_error("Insufficient parameters given for PTALIGN.");
                 s.f = -rot.a * fiftyseven;
-                set_variable(fields[l++], s);
+                set_variable(words[l++], s);
 
-                if (fields[l]) raise_error("Too many parameters given for PTALIGN.");
+                if (words[l]) raise_error("Too many parameters given for PTALIGN.");
             }
 
-            else if (!strcmp(fields[0], "PTROTATE"))
+            else if (!strcmp(words[0], "PTROTATE"))
             {
                 Point point, origin, axis;
                 float theta;
                 l = 1;
-                if (!fields[l]) raise_error("Insufficient parameters given for PTROTATE.");
-                point = interpret_single_point(fields[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for PTROTATE.");
+                point = interpret_single_point(words[l++]);
 
-                if (!fields[l]) raise_error("Insufficient parameters given for PTROTATE.");
-                origin = interpret_single_point(fields[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for PTROTATE.");
+                origin = interpret_single_point(words[l++]);
 
-                if (!fields[l]) raise_error("Insufficient parameters given for PTROTATE.");
-                axis = interpret_single_point(fields[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for PTROTATE.");
+                axis = interpret_single_point(words[l++]);
 
-                if (!fields[l]) raise_error("Insufficient parameters given for PTROTATE.");
-                theta = interpret_single_float(fields[l++]) * fiftyseventh;
+                if (!words[l]) raise_error("Insufficient parameters given for PTROTATE.");
+                theta = interpret_single_float(words[l++]) * fiftyseventh;
 
                 Point result = rotate3D(point, origin, axis, theta);
 
-                if (!fields[l]) raise_error("Insufficient parameters given for PTROTATE.");
+                if (!words[l]) raise_error("Insufficient parameters given for PTROTATE.");
                 Star s;
                 s.ppt = &result;
-                set_variable(fields[l++], s);
+                set_variable(words[l++], s);
 
-                if (fields[l]) raise_error("Too many parameters given for PTROTATE.");
+                if (words[l]) raise_error("Too many parameters given for PTROTATE.");
             }
 
-            else if (!strcmp(fields[0], "REGION"))
+            else if (!strcmp(words[0], "REGION"))
             {
                 int sr, er;
                 l = 1;
-                if (!fields[l]) raise_error("Insufficient parameters given for REGION.");
-                psz = interpret_single_string(fields[l++]);
-                if (!psz[0]) psz = fields[l-1];
-                if (!fields[l]) raise_error("Insufficient parameters given for REGION.");
-                sr = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for REGION.");
-                er = interpret_single_int(fields[l++]);
-                if (fields[l]) raise_error("Too many parameters given for REGION.");
+                if (!words[l]) raise_error("Insufficient parameters given for REGION.");
+                psz = interpret_single_string(words[l++]);
+                if (!psz[0]) psz = words[l-1];
+                if (!words[l]) raise_error("Insufficient parameters given for REGION.");
+                sr = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for REGION.");
+                er = interpret_single_int(words[l++]);
+                if (words[l]) raise_error("Too many parameters given for REGION.");
 
                 p.set_region(psz, sr, er);
 
@@ -1652,39 +1655,39 @@ int main(int argc, char** argv)
                 set_variable(lbuffer, s);
             }	// REGION
 
-            else if (!strcmp(fields[0], "REMARK"))
+            else if (!strcmp(words[0], "REMARK"))
             {
                 sprintf(buffer1, "%s\n", script_lines[program_counter].c_str());
                 for (l=0; buffer1[l] != 'R'; l++);
                 p.add_remark(buffer1+l);
             }   // REMARK
 
-            else if (!strcmp(fields[0], "RENUMBER"))
+            else if (!strcmp(words[0], "RENUMBER"))
             {
 				l = 1;
                 int sr, er, nsr;
-                if (!fields[l]) raise_error((std::string)"Insufficient parameters given for " + (std::string)fields[0] + (std::string)".");
-                sr = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error((std::string)"Insufficient parameters given for " + (std::string)fields[0] + (std::string)".");
-                er = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error((std::string)"Insufficient parameters given for " + (std::string)fields[0] + (std::string)".");
-                nsr = interpret_single_int(fields[l++]);
-                if (fields[l]) raise_error((std::string)"Too many parameters given for " + (std::string)fields[0] + (std::string)".");
+                if (!words[l]) raise_error((std::string)"Insufficient parameters given for " + (std::string)words[0] + (std::string)".");
+                sr = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error((std::string)"Insufficient parameters given for " + (std::string)words[0] + (std::string)".");
+                er = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error((std::string)"Insufficient parameters given for " + (std::string)words[0] + (std::string)".");
+                nsr = interpret_single_int(words[l++]);
+                if (words[l]) raise_error((std::string)"Too many parameters given for " + (std::string)words[0] + (std::string)".");
 
 				p.renumber_residues(sr, er, nsr);
             }	// RENUMBER
 
-            else if (!strcmp(fields[0], "ROTBOND"))
+            else if (!strcmp(words[0], "ROTBOND"))
             {
 				l = 1;
-                raise_error((std::string)"Unimplemented command " + (std::string)fields[0] + (std::string)".");
+                raise_error((std::string)"Unimplemented command " + (std::string)words[0] + (std::string)".");
             }
 
-            else if (!strcmp(fields[0], "SAVE"))
+            else if (!strcmp(words[0], "SAVE"))
             {
-                if (!fields[1]) raise_error("Insufficient parameters given for SAVE.");
-                psz = interpret_single_string(fields[1]);
-                if (fields[2] && fields[3]) raise_error("Too many parameters given for SAVE.");
+                if (!words[1]) raise_error("Insufficient parameters given for SAVE.");
+                psz = interpret_single_string(words[1]);
+                if (words[2] && words[3]) raise_error("Too many parameters given for SAVE.");
 
                 pf = fopen(psz, "wb");
                 if (!pf)
@@ -1700,23 +1703,23 @@ int main(int argc, char** argv)
                 fclose(pf);
                 delete[] psz;
 
-                if (fields[2])
+                if (words[2])
                 {
-                    if ( !strcmp("QUIT", fields[2]) || !strcmp("EXIT", fields[2]) || !strcmp("END", fields[2]) )
+                    if ( !strcmp("QUIT", words[2]) || !strcmp("EXIT", words[2]) || !strcmp("END", words[2]) )
                         return 0;
-                    else raise_error((std::string)"Too many parameters given for SAVE: " + (std::string)fields[2]);
+                    else raise_error((std::string)"Too many parameters given for SAVE: " + (std::string)words[2]);
                 }
             }
 
-            else if (!strcmp(fields[0], "SCENV"))
+            else if (!strcmp(words[0], "SCENV"))
             {
                 l = 1;
-                if (!fields[l]) raise_error("Insufficient parameters given for SCENV.");
-                int resno = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for SCENV.");
+                if (!words[l]) raise_error("Insufficient parameters given for SCENV.");
+                int resno = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for SCENV.");
 
                 std::string result = "";
-                int bitmask = fields[l+1] ? interpret_single_int(fields[l++]) : 0xffffffff;
+                int bitmask = words[l+1] ? interpret_single_int(words[l++]) : 0xffffffff;
 
                 // Find all residues close enough to interact side chains with resno.
                 AminoAcid** nearby = p.get_residues_can_clash(resno);
@@ -1801,35 +1804,35 @@ int main(int argc, char** argv)
                 }
                 
                 Star sv;
-                strcpy(buffer, fields[l++]);
+                strcpy(buffer, words[l++]);
                 strcpy(buffer1, result.c_str());
                 sv.psz = buffer1;
                 set_variable(buffer, sv);
 
-                if (fields[l]) raise_error("Too many parameters given for SCENV.");
+                if (words[l]) raise_error("Too many parameters given for SCENV.");
             }   // SCENV
 
-            else if (!strcmp(fields[0], "SEARCH"))
+            else if (!strcmp(words[0], "SEARCH"))
             {
                 l = 1;
                 int sr, er, esr, sim;
-                if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
-                sr = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
-                er = interpret_single_int(fields[l++]);
-                if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
-                psz = interpret_single_string(fields[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for SEARCH.");
+                sr = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for SEARCH.");
+                er = interpret_single_int(words[l++]);
+                if (!words[l]) raise_error("Insufficient parameters given for SEARCH.");
+                psz = interpret_single_string(words[l++]);
                 esr = er - strlen(psz);
 
                 int threshold = -1;
                 int num_eq;
 
-                if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
-                // if (fields[l+1]) threshold = interpret_single_int(fields[l++]);
-                if (!strcmp(fields[l], "TH"))
+                if (!words[l]) raise_error("Insufficient parameters given for SEARCH.");
+                // if (words[l+1]) threshold = interpret_single_int(words[l++]);
+                if (!strcmp(words[l], "TH"))
                 {
                     l++;
-                    threshold = interpret_single_int(fields[l++]);
+                    threshold = interpret_single_int(words[l++]);
                 }
 
                 n = 0;
@@ -1861,13 +1864,13 @@ int main(int argc, char** argv)
 
                 delete[] psz;
 
-                n = find_var_index(fields[l]);
+                n = find_var_index(words[l]);
                 if (n<0) n = vars++;
                 n &= _VARNUM_MASK;
-                if (!fields[l]) raise_error("Insufficient parameters given for SEARCH.");
-                if (fields[l+1] && fields[l+2]) raise_error("Too many parameters given for SEARCH.");
-                script_var[n].name = fields[l];
-                script_var[n].vt = type_from_name(fields[l]);
+                if (!words[l]) raise_error("Insufficient parameters given for SEARCH.");
+                if (words[l+1] && words[l+2]) raise_error("Too many parameters given for SEARCH.");
+                script_var[n].name = words[l];
+                script_var[n].vt = type_from_name(words[l]);
 
                 switch (script_var[n].vt)
                 {
@@ -1889,13 +1892,13 @@ int main(int argc, char** argv)
                 }
 
                 l++;
-                if (fields[l])
+                if (words[l])
                 {
-                    n = find_var_index(fields[l]);
+                    n = find_var_index(words[l]);
                     if (n<0) n = vars++;
                     n &= _VARNUM_MASK;
-                    script_var[n].name = fields[l];
-                    script_var[n].vt = type_from_name(fields[l]);
+                    script_var[n].name = words[l];
+                    script_var[n].vt = type_from_name(words[l]);
 
                     switch (script_var[n].vt)
                     {
@@ -1919,10 +1922,10 @@ int main(int argc, char** argv)
 
             }	// SEARCH
 
-            else if (!strcmp(fields[0], "UPRIGHT"))
+            else if (!strcmp(words[0], "UPRIGHT"))
             {
                 l = 1;
-                if (fields[l]) raise_error("Too many parameters given for UPRIGHT.");
+                if (words[l]) raise_error("Too many parameters given for UPRIGHT.");
 
                 int seql = p.get_seq_length();
                 p.move_piece(1, 9999, Point(0,0,0));
@@ -1997,13 +2000,13 @@ int main(int argc, char** argv)
 
             else
             {
-                raise_error( (std::string)"Unimplemented command: \"" + (std::string)fields[0] + (std::string)"\"");
+                raise_error( (std::string)"Unimplemented command: \"" + (std::string)words[0] + (std::string)"\"");
                 return 0x51974c5;
             }
         }
 
     _pc_continue:
-        delete[] ofields;
+        delete[] owords;
         program_counter++;
     }
 

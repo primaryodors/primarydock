@@ -10,7 +10,12 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    float energyLevelThreshold = 0.25;
+    // TODO: These values are set way too permissively.
+    // The intermolecular code should be fine tuned to succeed
+    // with threshold values of at worst 15, 3, and 2.5 * 2.
+    float energyLevelThreshold = 10;
+    float clash_limit = 8;
+    float N_O_spacing = 4 * 2;
 
     Molecule m("nothing");
     cout << "Created empty molecule named " << m.get_name() << ".\n";
@@ -124,7 +129,7 @@ int main(int argc, char** argv)
     {
         m2.from_smiles(argv[2]);
 
-        if (argc > 3) energyLevelThreshold = atof(argv[3]);
+        // if (argc > 3) energyLevelThreshold = atof(argv[3]);
     }
     else
     {
@@ -178,10 +183,22 @@ int main(int argc, char** argv)
     float energyLevel = m1.get_intermol_binding(&m2);
     cout << "\n# Post-conformation intermol energy level: " << -energyLevel << " kJ/mol." << endl;
 
-    if(energyLevel > energyLevelThreshold)
-        cout << "Energy level above threshold, SUCCESS.\n";
+    float nodist = 0;
+    Atom* O = m1.get_atom("O6");
+    Atom* N = m2.get_atom("N1");
+    if (N && O) nodist += O->get_location().get_3d_distance(N->get_location());
+    O = m2.get_atom("O6");
+    N = m1.get_atom("N1");
+    if (N && O) nodist += O->get_location().get_3d_distance(N->get_location());
+
+    if (energyLevel >= energyLevelThreshold && final_clashes < clash_limit && nodist < N_O_spacing)
+        cout << "Energy level below threshold, SUCCESS.\n";
     else
-        cout << "Energy level below threshold, FAIL.\n";
+    {
+        if (energyLevel < energyLevelThreshold) cout << "Energy level above threshold, FAIL.\n";
+        else if (final_clashes >= clash_limit) cout << "Intermolecular clashes " << final_clashes << " above threshold, FAIL.\n";
+        else if (nodist >= N_O_spacing) cout << "Atoms are too far apart (" << nodist << "A). FAIL.\n";
+    }
 
     const char* tstoutf = "output.sdf";
     pf = fopen(tstoutf, "wb");

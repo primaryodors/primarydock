@@ -5,7 +5,7 @@ SDFDIR=sdf
 
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
-TESTS=test/point_test test/atom_test test/molecule_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/backbone_test
+TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/amino_test test/aniso_test test/protein_test test/backbone_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
 all: $(DIRS) \
@@ -21,7 +21,6 @@ CC=g++
 
 # Default CFLAG - no code coverage
 CFLAGS=-g -Wwrite-strings -fextended-identifiers -std=c++14
-
 
 # For code coverage instrumentation, switch to these CFLAGS (slower performance):
 #CFLAGS=-g -Wwrite-strings -fextended-identifiers -std=c++14 -fprofile-arcs -ftest-coverage
@@ -71,6 +70,9 @@ test/atom_test: src/atom_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o
 test/molecule_test: src/molecule_test.cpp $(OBJS)
 	$(CC) src/molecule_test.cpp $(OBJS) -o test/molecule_test $(CFLAGS)
 
+test/pi_stack_test: src/pi_stack_test.cpp $(OBJS)
+	$(CC) src/pi_stack_test.cpp $(OBJS) -o test/pi_stack_test $(CFLAGS)
+
 test/aniso_test: src/aniso_test.cpp $(OBJS)
 	$(CC) src/aniso_test.cpp $(OBJS) -o test/aniso_test $(CFLAGS)
 
@@ -117,7 +119,7 @@ point_report: test/point_test
 
 molecule_report: REPORT="test/molecule_test1.approved.txt"
 molecule_report: test/molecule_test
-	./test/molecule_test 'NCCCC=O' 'NCCCC=O' 10 | tee temp | sed '/^#/d' >test/molecule_test1.received.txt; cat temp # ignore lines starting with #
+	./test/molecule_test 'NCCCC=O' 'NCCCC=O' | tee temp | sed '/^#/d' >test/molecule_test1.received.txt; cat temp # ignore lines starting with #
 	diff --color --unified $(REPORT) test/molecule_test1.received.txt
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"

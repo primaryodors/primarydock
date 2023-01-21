@@ -160,6 +160,7 @@ public:
     Bond** get_bonds();
     int get_bonded_atoms_count();
     int get_count_pi_bonds();
+    float get_sum_pi_bonds();
 
     bool bond_to(Atom* btom, float cardinality);
     void unbond(Atom* btom);
@@ -183,6 +184,8 @@ public:
     int get_idx_bond_between(Atom* btom);
 
     float hydrophilicity_rule();
+
+    bool is_conjugated_to(Atom* a, Atom* break_if_reach = nullptr, Atom* caller = nullptr);
 
     // Ring membership.
     int num_rings();
@@ -306,6 +309,7 @@ protected:
     bool swapped_chirality = false;
     bool chirality_unspecified = true;
     Ring** member_of = nullptr;
+    int recursion_counter = 0;
 
     static void read_elements();
     void figure_out_valence();

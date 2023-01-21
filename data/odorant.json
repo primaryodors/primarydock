@@ -56,16 +56,6 @@
         "smiles": "CC(=O)C1=CC=C(C=C1)OC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "clean",
-                "sweet",
-                "plasticky",
-                "anisic",
-                "cherry",
-                "vanilla",
-                "powdery"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "acacia",
@@ -97,10 +87,6 @@
         "smiles": "CC(=O)[O-]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "vinegar"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "acrid",
@@ -211,15 +197,6 @@
         "smiles": "CC(=O)C1=CC=CC=C1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "phenolic",
-                "chemical",
-                "naphthyl",
-                "acrid",
-                "cherry",
-                "almond"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sweet",
@@ -519,16 +496,7 @@
     {
         "full_name": "acetylsalicylic acid",
         "smiles": "c1cccc(C(=O)O)c1OC(=O)C",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "aromatic",
-                "aspirin",
-                "dusty",
-                "phenolic"
-            ]
-        }
+        "aroma": []
     },
     "71bad9a1d81a156ceca401b531902a27":
     {
@@ -548,13 +516,7 @@
     {
         "full_name": "acrolein",
         "smiles": "C=CC=O",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "acrid"
-            ]
-        }
+        "aroma": []
     },
     "df5addac1ec506d1f56aa3a9c239b7f6":
     {
@@ -738,18 +700,7 @@
     {
         "full_name": "allyl hexanoate",
         "smiles": "C=CCOC(=O)CCCCC",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "pineapple",
-                "fruity",
-                "plastic",
-                "fluorescent_marker",
-                "fermented",
-                "buttery"
-            ]
-        }
+        "aroma": []
     },
     "133c67e241ae1616afcbd35823e685dd":
     {
@@ -804,13 +755,6 @@
         "smiles": "C=CCOC(=O)COC1=CC=CC=C1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "honey",
-                "tarry",
-                "fermented",
-                "chemical"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sweet",
@@ -1110,17 +1054,6 @@
         "smiles": "C\/C=C\/C(=O)C1C(=CCCC1(C)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "jammy",
-                "floral",
-                "fruity",
-                "apple",
-                "rose",
-                "berry",
-                "waxy",
-                "sweet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "apple",
@@ -1202,15 +1135,6 @@
         "smiles": "C[C@]12CC[C@H](C1)C([C@H]2O)(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "citrus",
-                "camphoraceous",
-                "sour",
-                "peel",
-                "pine",
-                "herbal"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "camphoraceous",
@@ -1278,14 +1202,7 @@
     {
         "full_name": "alpha-hexyl cinnamic acid",
         "smiles": "CCCCCC\/C(=C\\C1=CC=CC=C1)\/C(=O)[O-]",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "cardboard",
-                "tarry"
-            ]
-        }
+        "aroma": []
     },
     "663b02f9a091b68b2b12ac695e8d5a82":
     {
@@ -1293,22 +1210,6 @@
         "smiles": "CC1=CCCC(C1\/C=C\/C(=O)C)(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "jammy",
-                "apple",
-                "purple",
-                "sweet",
-                "brown_sugar",
-                "sour",
-                "floral",
-                "rose",
-                "berry",
-                "amber",
-                "musk",
-                "estery",
-                "dry"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sweet",
@@ -1425,17 +1326,6 @@
         "smiles": "CC1=CCC(C=C1)C(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "terpenic",
-                "thyme",
-                "citrus",
-                "herbal",
-                "phenolic",
-                "sweet",
-                "black_pepper",
-                "woody"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "black",
@@ -1454,16 +1344,6 @@
         "smiles": "C\\1=C(\\[C@@H]2C[C@H](C\/1)C2(C)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "pine",
-                "camphoraceous",
-                "juniper",
-                "herbal",
-                "fruity",
-                "aquatic",
-                "woody"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "camphoraceous",
@@ -1709,14 +1589,6 @@
                 "dry",
                 "musk",
                 "powdery"
-            ],
-            "http:\/\/www.primaryodors.org":
-            [
-                "musk",
-                "powdery",
-                "warm",
-                "cloth",
-                "waxy"
             ]
         },
         "activity":
@@ -1963,15 +1835,6 @@
         "smiles": "CCCCCOC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "banana",
-                "solvent",
-                "artificial",
-                "fruity",
-                "candy",
-                "fermented"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "banana",
@@ -2511,14 +2374,6 @@
         "smiles": "COC1=CC=C(C=C1)C=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "floral",
-                "earthy",
-                "wet",
-                "anisic",
-                "moldy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "anisic",
@@ -2630,13 +2485,6 @@
         "smiles": "c1ccccc1OC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "phenolic",
-                "sweet",
-                "gasoline",
-                "anisic"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "phenolic",
@@ -2778,14 +2626,6 @@
         "smiles": "C1=CC=CC=C1C=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "cherry",
-                "sweet",
-                "almond",
-                "fusel",
-                "fruity"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sharp",
@@ -2828,19 +2668,7 @@
     {
         "full_name": "benzene",
         "smiles": "C1=CC=CC=C1",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "gasoline",
-                "cinnamon",
-                "oily",
-                "phenolic",
-                "chemical",
-                "solvent",
-                "aromatic"
-            ]
-        },
+        "aroma": [],
         "activity":
         {
             "https:\/\/www.ncbi.nlm.nih.gov\/labs\/pmc\/articles\/PMC4412152\/":
@@ -3087,18 +2915,6 @@
         "smiles": "n1c2ccccc2sc1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "quinolinic",
-                "carpet",
-                "plushy",
-                "tobacco",
-                "medicinal",
-                "meaty",
-                "nutty",
-                "coffee",
-                "rubbery"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "coffee",
@@ -3133,15 +2949,6 @@
         "smiles": "C1=CC=CC=C1COC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fermented",
-                "stale",
-                "solvent",
-                "fruity",
-                "peach",
-                "waxy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -3369,18 +3176,6 @@
         "smiles": "c1ccccc1COC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fruity",
-                "pear",
-                "peach",
-                "cherry",
-                "tea",
-                "floral",
-                "solvent",
-                "almond",
-                "dark"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -3527,16 +3322,6 @@
         "smiles": "O=C(\\C1=C(\\CCCC1(C)C)C)\\C=C\\C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "jammy",
-                "berry",
-                "floral",
-                "plum",
-                "waxy",
-                "sweet",
-                "tobacco"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "berry",
@@ -3687,18 +3472,6 @@
         "smiles": "CC1=C(C(CCC1)(C)C)C=CC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "purple",
-                "berry",
-                "sour",
-                "dry",
-                "floral",
-                "sweet",
-                "ethereal",
-                "fruity",
-                "tobacco"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "beeswax",
@@ -3976,15 +3749,6 @@
         "smiles": "CC1=CCC2CC1C2(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "camphoraceous",
-                "resinous",
-                "woody",
-                "pine",
-                "hay",
-                "urinous"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "dry",
@@ -4040,17 +3804,7 @@
     {
         "full_name": "bicyclononalactone",
         "smiles": "C1CCC2C(C1)CCC(=O)O2",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "coumarinic",
-                "green",
-                "powdery",
-                "hay",
-                "malty"
-            ]
-        }
+        "aroma": []
     },
     "d0a6910e697722b693023d286f5e8c4d":
     {
@@ -4186,16 +3940,6 @@
         "smiles": "CC(C)(C)C1=CC=C(C=C1)CCC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "muguet",
-                "cyclamen",
-                "watery",
-                "waxy",
-                "milky",
-                "sweaty",
-                "laundry"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cyclamen",
@@ -4321,15 +4065,6 @@
         "smiles": "CC1=CCC(C1(C)C)CCC(C)CO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sandalwood",
-                "woody",
-                "resinous",
-                "pine",
-                "sulfurous",
-                "sweet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sandalwood",
@@ -4437,14 +4172,6 @@
         "smiles": "CCCCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fermented",
-                "sweet",
-                "creamy",
-                "balsamic",
-                "whiskey"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "balsamic",
@@ -4703,15 +4430,6 @@
         "smiles": "CCCCOC(=O)C(C)OC(=O)CCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "buttery",
-                "creamy",
-                "cheesy",
-                "milky",
-                "malty",
-                "fermented"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "buttermilk",
@@ -4903,15 +4621,6 @@
         "smiles": "CCCC(=O)[O-]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fermented",
-                "sour",
-                "fruity",
-                "buttery",
-                "vinegar",
-                "vomit"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "acetic",
@@ -5297,14 +5006,6 @@
         "smiles": "[NH3+]CCCCC[NH3+]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "putrid",
-                "rotting_meat",
-                "animalic",
-                "wet",
-                "mousy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "putrid"
@@ -5457,14 +5158,6 @@
         "smiles": "CC1(C)C2CCC1(C)C(=O)C2",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "camphoraceous",
-                "waxy",
-                "minty",
-                "plasticky",
-                "naphthyl"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "camphoraceous"
@@ -5686,14 +5379,6 @@
         "smiles": "CCCCCC(=O)[O-]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sweaty",
-                "animalic",
-                "cheesy",
-                "waxy",
-                "fecal"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cheesy",
@@ -6003,16 +5688,6 @@
         "smiles": "CC1C(=C(C(=O)O1)O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "curry",
-                "caramellic",
-                "sweet",
-                "sugar",
-                "roasted",
-                "coffee",
-                "burnt"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "burnt",
@@ -6328,19 +6003,7 @@
     {
         "full_name": "cedrene",
         "smiles": "CC1CCC2C13CC=C(C(C3)C2(C)C)C",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "juicy",
-                "woody",
-                "cedar",
-                "pine",
-                "fruity",
-                "waxy",
-                "urinous"
-            ]
-        }
+        "aroma": []
     },
     "466776ce37a45d6fbe20c9ca348a2371":
     {
@@ -6374,15 +6037,6 @@
         "smiles": "CCCC1CC(=CC(=O)C1)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "celery",
-                "green",
-                "curry",
-                "watery",
-                "ozone",
-                "acrid"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "celery",
@@ -6564,18 +6218,6 @@
         "smiles": "C1=CC=C(C=C1)C=CC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "cinnamon_candy",
-                "cinnamon",
-                "sweet",
-                "spicy",
-                "oily",
-                "waxy",
-                "balsamic",
-                "woody",
-                "minty"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sweet",
@@ -6838,18 +6480,6 @@
         "smiles": "CC\\C=C\/CCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "green",
-                "stemmy",
-                "watery",
-                "waxy",
-                "grassy",
-                "leafy",
-                "fluorescent_marker",
-                "fusel",
-                "herbal"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "foliage",
@@ -7270,14 +6900,6 @@
         "smiles": "CC\/C=C\\CCCCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "mushroom",
-                "cucumber",
-                "watery",
-                "fish_fillet",
-                "green"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "earthy",
@@ -7326,19 +6948,6 @@
         "smiles": "CC(=CCCC(=CC=O)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "citrus_peel",
-                "lemon",
-                "lime",
-                "leafy",
-                "sweet",
-                "waxy",
-                "oily",
-                "citronella",
-                "limnic",
-                "green"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -7826,13 +7435,6 @@
         "smiles": "O=C1CCCCCCC\/C=C\\CCCCCCC1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "musk",
-                "clean",
-                "powdery",
-                "sweet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "animal",
@@ -8114,14 +7716,6 @@
         "smiles": "CC(C)(CCC1CCCCC1)O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "powdery",
-                "floral",
-                "sweet",
-                "blueberry",
-                "coriander"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bois_de_rose",
@@ -8248,17 +7842,6 @@
         "smiles": "C1=CC=C2C(=C1)C=CC(=O)O2",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "coumarinic",
-                "hay",
-                "waxy",
-                "sweet",
-                "warm",
-                "orange",
-                "green",
-                "grassy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "coumarinic",
@@ -8492,18 +8075,6 @@
         "smiles": "Oc1ccc(C)cc1OC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "leathery",
-                "rosin",
-                "barbecue",
-                "oily",
-                "spicy",
-                "anisic",
-                "roasty",
-                "woody",
-                "vanilla"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "burnt",
@@ -8556,13 +8127,6 @@
         "smiles": "CC1=CC=C(C=C1)OC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "ylang",
-                "anisic",
-                "powdery",
-                "naphthyl"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "naphthyl",
@@ -8617,22 +8181,6 @@
         "smiles": "CC(C)c1ccc(cc1)CC(C)C=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "muguet",
-                "waxy",
-                "watery",
-                "cyclamen",
-                "floral",
-                "oily",
-                "leafy",
-                "green",
-                "laundry",
-                "aldehydic",
-                "musty",
-                "limnic",
-                "sweaty"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cyclamen",
@@ -8821,12 +8369,6 @@
         "smiles": "C1CCC(=O)CC1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "solvent",
-                "fusel",
-                "minty"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "acetone",
@@ -8923,15 +8465,7 @@
     {
         "full_name": "cyclohexylamine",
         "smiles": "C1CCCCC1[NH3+]",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "ammonia",
-                "brothy",
-                "fish_fillet"
-            ]
-        },
+        "aroma": [],
         "activity":
         {
             "https:\/\/doi.org\/10.1038\/nature05066":
@@ -9050,15 +8584,6 @@
         "smiles": "C1CCCCC1OC(=O)c2ccccc2O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "salicylic",
-                "balsamic",
-                "floral",
-                "sweet",
-                "waxy",
-                "woody"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -9188,14 +8713,6 @@
         "smiles": "O=C1CCCCCCCCCCCCCC1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "musk",
-                "waxy",
-                "animalic",
-                "laundry",
-                "sweet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "animal",
@@ -9306,17 +8823,6 @@
         "smiles": "CC1C(=O)C(=O)CC1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "curry",
-                "sweet",
-                "sugar",
-                "burnt",
-                "bready",
-                "maple",
-                "coffee",
-                "caramellic"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bready",
@@ -9358,18 +8864,7 @@
     {
         "full_name": "damascenone",
         "smiles": "CC=CC(=O)C1=C(C=CCC1(C)C)C",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "floral",
-                "waxy",
-                "jammy",
-                "plum",
-                "raisin",
-                "green"
-            ]
-        }
+        "aroma": []
     },
     "baa1a64927633c9c9d5706fc6777bec9":
     {
@@ -9421,27 +8916,6 @@
         "smiles": "CCCCCCCCCC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "aldehydic",
-                "waxy",
-                "tallow",
-                "citrus",
-                "orange",
-                "lemon",
-                "citrus_peel",
-                "watery",
-                "clay",
-                "stemmy",
-                "rhubarb",
-                "clean",
-                "fresh",
-                "soapy",
-                "watermelon",
-                "musty",
-                "underripe",
-                "limnic"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
@@ -9672,31 +9146,6 @@
         "smiles": "CCCCCCCCCCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "limnic",
-                "dusty",
-                "clay",
-                "stale",
-                "waxy",
-                "watery",
-                "clean",
-                "aldehydic",
-                "ozone",
-                "muddy",
-                "earthy",
-                "musty",
-                "mousy",
-                "raw_pasta",
-                "moldy",
-                "solvent",
-                "soapy",
-                "metallic",
-                "plasticky",
-                "acrid",
-                "raw_potato",
-                "juicy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
@@ -10033,18 +9482,7 @@
     {
         "full_name": "decyl acetate",
         "smiles": "CC(=O)OCCCCCCCCCC",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "powdery",
-                "rancid",
-                "potato",
-                "woody",
-                "cloth",
-                "watery"
-            ]
-        }
+        "aroma": []
     },
     "55faf7a234638b5a2a4edfd80dc6aee5":
     {
@@ -10104,17 +9542,6 @@
         "smiles": "CCCCCC1CCCC(=O)O1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sweet",
-                "peach",
-                "creamy",
-                "rubbery",
-                "lactonic",
-                "coconut",
-                "pear",
-                "milky"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "coconut",
@@ -10374,16 +9801,6 @@
         "smiles": "CCCCCCCC1CCCC(=O)O1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "lactonic",
-                "watery",
-                "metallic",
-                "sweet",
-                "milky",
-                "oily",
-                "peach"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "buttery",
@@ -10546,15 +9963,6 @@
         "smiles": "CC(=O)C(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "buttery",
-                "sweaty",
-                "creamy",
-                "fermented",
-                "caramellic",
-                "sweet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "buttery",
@@ -11003,17 +10411,6 @@
         "smiles": "CCCCCC1=C(CCC1=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fresh",
-                "honey",
-                "clay",
-                "plastic",
-                "floral",
-                "green",
-                "powdery",
-                "fruity"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -11074,35 +10471,6 @@
                 "OR5P3":
                 {
                     "type": "na"
-                }
-            }
-        }
-    },
-    "6c00f48a8c161845dad6a139b579efe3":
-    {
-        "full_name": "dihydromyrcenol",
-        "smiles": "CC(CCCC(C)(C)O)C=C",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "citrus",
-                "clean",
-                "cologne",
-                "floral",
-                "fresh",
-                "lime",
-                "weedy"
-            ]
-        },
-        "activity":
-        {
-            "http:\/\/chemcom.be\/wp-content\/uploads\/2014\/12\/2014-OR1D2-is-a-broadly-tuned-human-olfactory-receptor.pdf":
-            {
-                "OR1D2":
-                {
-                    "type": "ma",
-                    "ec50": "-4.51"
                 }
             }
         }
@@ -11356,7 +10724,7 @@
     },
     "0e12cf654a550eef497a5e63c6cac567":
     {
-        "full_name": "2,6-dimethyl-7-octen-2-ol",
+        "full_name": "dihydromyrcenol",
         "smiles": "C[C@H](CCCC(C)(C)O)C=C",
         "aroma":
         {
@@ -11532,16 +10900,6 @@
         "smiles": "c1ccccc1Oc2ccccc2",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "vinyl",
-                "geranium",
-                "waxy",
-                "plastic",
-                "stale",
-                "green",
-                "phenolic"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "geranium",
@@ -11568,13 +10926,6 @@
         "smiles": "CC1=CC[C@@H](CC1)C(=C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "orange",
-                "oily",
-                "ethereal",
-                "waxy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -11841,14 +11192,6 @@
         "smiles": "CCCCCCCCCCCC(=O)[O-]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fatty",
-                "rancid",
-                "lard",
-                "tallow",
-                "vomit"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bay",
@@ -11901,18 +11244,6 @@
         "smiles": "CCCCCCCCCCCCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "watery",
-                "wet",
-                "dusty",
-                "waxy",
-                "earthy",
-                "aldehydic",
-                "floral",
-                "geranium",
-                "green"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
@@ -11992,16 +11323,6 @@
         "smiles": "CCC1=NC=CN=C1OC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "humus",
-                "nutty",
-                "earthy",
-                "green",
-                "cocoa",
-                "sweet",
-                "bell_pepper"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bell_pepper",
@@ -12050,18 +11371,7 @@
     {
         "full_name": "ebanol",
         "smiles": "CC1=CCC(C1(C)C)\/C=C\\C(C)C(C)O",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "woody",
-                "sandalwood",
-                "cedar",
-                "sweet",
-                "fruity",
-                "camphoraceous"
-            ]
-        },
+        "aroma": [],
         "activity":
         {
             "https:\/\/doi.org\/10.1038\/jid.2014.273":
@@ -12292,14 +11602,6 @@
         "smiles": "COc1ccc(CC=C)cc1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "anisic",
-                "fennel",
-                "sweet",
-                "herbal",
-                "basil"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "anise",
@@ -12512,14 +11814,6 @@
         "smiles": "CCCC(=O)OCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "cognac",
-                "buttery",
-                "fruity",
-                "pineapple",
-                "grape"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cognac",
@@ -12706,18 +12000,6 @@
         "smiles": "CCC1=NC=C(N=C1C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "plushy",
-                "cocoa",
-                "sweet",
-                "caramellic",
-                "nutty",
-                "roasty",
-                "almond",
-                "coffee",
-                "earthy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "almond",
@@ -12795,16 +12077,6 @@
         "smiles": "C1CCCCCC(=O)OCCOC(=O)CCCCC1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "musk",
-                "sweet",
-                "powdery",
-                "amber",
-                "human_skin",
-                "woody",
-                "citrus"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "ambrette",
@@ -12913,15 +12185,6 @@
         "smiles": "CC1(C2CCC(C2)(C1OCC)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "humus",
-                "earthy",
-                "camphoraceous",
-                "tea",
-                "patchouli",
-                "rooty"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "camphoraceous",
@@ -13050,16 +12313,6 @@
         "smiles": "CCCCCCC(=O)OCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fruity",
-                "pineapple",
-                "grape",
-                "sweet",
-                "balsamic",
-                "rum",
-                "wine"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cognac",
@@ -13268,17 +12521,7 @@
     {
         "full_name": "ethyl maltol",
         "smiles": "CCC1=C(C(=O)C=CO1)O",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sugar",
-                "burnt",
-                "caramel",
-                "muguet",
-                "waxy"
-            ]
-        }
+        "aroma": []
     },
     "a52b32d487248685ee24b07447c3bac7":
     {
@@ -13286,17 +12529,6 @@
         "smiles": "CCCCCCCCC(=O)OCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fruity",
-                "fusel",
-                "waxy",
-                "balsamic",
-                "wine",
-                "rose",
-                "fermented",
-                "dragonfruit"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "fruity",
@@ -13572,16 +12804,6 @@
         "smiles": "CCOC1=C(C=CC(=C1)C=O)O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "ice_cream",
-                "creamy",
-                "vanilla",
-                "sweet",
-                "waxy",
-                "green",
-                "balsamic"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "caramellic",
@@ -13761,15 +12983,6 @@
         "smiles": "O2C1(CCC(CC1)C2(C)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "camphoraceous",
-                "eucalyptus",
-                "conifer",
-                "waxy",
-                "watery",
-                "minty"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "camphoraceous",
@@ -13815,16 +13028,6 @@
         "smiles": "COC1=C(C=CC(=C1)CC=C)O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "clove",
-                "spicy",
-                "sweet",
-                "warm",
-                "balsamic",
-                "gummy",
-                "woody"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "clove",
@@ -14047,15 +13250,6 @@
         "smiles": "COC1=C(C=CC(=C1)CC=C)OC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "floral",
-                "powdery",
-                "sweet",
-                "gummy",
-                "carnation",
-                "peony"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "carnation",
@@ -14271,13 +13465,6 @@
         "smiles": "OCC=C(CCC=C(CC\\C=C(\/C)C)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "earthy",
-                "green",
-                "potato",
-                "waxy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "angelica",
@@ -14319,19 +13506,6 @@
         "smiles": "O=C1C(C)(C)C2CC1(C)CC2",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "citrus",
-                "camphoraceous",
-                "citrus_peel",
-                "tart",
-                "oily",
-                "lime",
-                "lemon",
-                "waxy",
-                "pine",
-                "conifer"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "camphoraceous",
@@ -14457,14 +13631,6 @@
         "smiles": "CC1C=CCC(C1C(=O)OC)(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "floral",
-                "sweet",
-                "berry",
-                "rose",
-                "apple"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "rose",
@@ -14480,17 +13646,6 @@
         "smiles": "CCC1=CC=C(C=C1)CC(C)(C)C=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "clean",
-                "watery",
-                "ozone",
-                "green",
-                "plastic",
-                "peony",
-                "floral",
-                "bubblegum"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "clean",
@@ -14635,16 +13790,6 @@
         "smiles": "CC1(OCCO1)CC(OCC)=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fruity",
-                "sweet",
-                "minty",
-                "powdery",
-                "apple",
-                "banana",
-                "peach"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "apple",
@@ -14756,17 +13901,6 @@
         "smiles": "O=C1C(\\O)=C(\/OC1C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "brown_sugar",
-                "sugar",
-                "burnt",
-                "sweet",
-                "caramellic",
-                "fruity",
-                "strawberry",
-                "apple"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sweet",
@@ -14832,14 +13966,6 @@
         "smiles": "CC1COCC2=CC3=C(C=C12)C(C(C3(C)C)C)(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "musk",
-                "purple",
-                "plushy",
-                "sweet",
-                "waxy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -15119,16 +14245,6 @@
         "smiles": "CCCCCCC1CCC(=O)O1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "peach",
-                "sweet",
-                "lactonic",
-                "milky",
-                "coconut",
-                "oily",
-                "balsamic"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "buttery",
@@ -15213,17 +14329,6 @@
         "smiles": "CCCCCC1CCC(=O)O1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sweet",
-                "lactonic",
-                "donuts",
-                "coconut",
-                "waxy",
-                "balsamic",
-                "oily",
-                "milky"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "buttery",
@@ -15296,15 +14401,6 @@
         "smiles": "CCCCC1CCC(=O)O1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "lactonic",
-                "balsamic",
-                "creamy",
-                "malty",
-                "buttery",
-                "waxy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "coconut",
@@ -15353,16 +14449,6 @@
         "smiles": "CCCCCCCC1CCC(=O)O1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "clean",
-                "waxy",
-                "milky",
-                "vinyl",
-                "lactonic",
-                "coconut",
-                "peach"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "apricot",
@@ -15474,15 +14560,6 @@
         "smiles": "O[C@]12[C@H](CCC[C@]2(CCCC1)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "humus",
-                "earthy",
-                "juicy",
-                "soil",
-                "green",
-                "wet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "earthy",
@@ -15530,17 +14607,6 @@
         "smiles": "CC(=CCCC(=CCO)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "geranium",
-                "floral",
-                "rose",
-                "alliaceous",
-                "citrus",
-                "waxy",
-                "juicy",
-                "sweet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -15766,20 +14832,6 @@
         "smiles": "CC(=CCC\/C(=C\/COC(=O)C)\/C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "floral",
-                "rose",
-                "geranium",
-                "waxy",
-                "juicy",
-                "peony",
-                "green",
-                "leafy",
-                "acetic",
-                "oily",
-                "sweet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -16192,16 +15244,6 @@
         "smiles": "COc1ccccc1O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "smoky",
-                "rosinous",
-                "barbecue",
-                "woody",
-                "balsamic",
-                "spicy",
-                "clove"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "phenolic",
@@ -16275,17 +15317,6 @@
         "smiles": "C1CCCCCCOC(=O)\/C=C\/CCCCC1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "musk",
-                "green",
-                "warm",
-                "chili_pepper",
-                "cloth",
-                "milky",
-                "roasted",
-                "coriander"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "animal",
@@ -16450,17 +15481,6 @@
         "smiles": "O=C(OC)CC1C(C(=O)CC1)CCCCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "cozy",
-                "oily",
-                "earthy",
-                "waxy",
-                "black_pepper",
-                "green",
-                "sweet",
-                "floral"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -16702,19 +15722,6 @@
         "smiles": "CC(CC1=CC2=C(C=C1)OCO2)C=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "green",
-                "stemmy",
-                "floral",
-                "hay",
-                "jasmine",
-                "cyclamen",
-                "ozone",
-                "watery",
-                "malty",
-                "milky"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cyclamen",
@@ -17252,12 +16259,6 @@
         "smiles": "CCCCCCCS",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sulfurous",
-                "rubbery",
-                "fusel"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "onion",
@@ -17290,13 +16291,6 @@
         "smiles": "CCCCCCC(=O)[O-]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "cheesy",
-                "waxy",
-                "rancid",
-                "sweaty"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cheesy",
@@ -17388,29 +16382,6 @@
         "smiles": "CCCCCCCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fusel",
-                "waxy",
-                "banana",
-                "soft",
-                "chemical",
-                "fermented",
-                "medicinal",
-                "dark",
-                "greasy",
-                "oily",
-                "balsamic",
-                "ripe",
-                "rotten_fruit",
-                "solvent",
-                "acrid",
-                "green",
-                "cucumber",
-                "burnt_sugar",
-                "humus",
-                "tea"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "apple",
@@ -17527,17 +16498,6 @@
         "smiles": "CCCCCC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "stale",
-                "solvent",
-                "fusel",
-                "banana",
-                "waxy",
-                "fruity",
-                "floral",
-                "creamy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "banana",
@@ -17851,34 +16811,6 @@
         "smiles": "CCCCCC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "green",
-                "watery",
-                "clean",
-                "sweaty",
-                "bland",
-                "stale",
-                "clay",
-                "soft",
-                "grassy",
-                "leafy",
-                "stemmy",
-                "waxy",
-                "fatty",
-                "aldehydic",
-                "dill",
-                "moldy",
-                "acetic",
-                "rancid",
-                "fusel",
-                "celery",
-                "rooty",
-                "potato_skin",
-                "cucumber",
-                "squash",
-                "cardboard"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
@@ -18160,23 +17092,6 @@
         "smiles": "CCCCCCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fusel",
-                "balsamic",
-                "chemical",
-                "green",
-                "oily",
-                "dark",
-                "rotten_fruit",
-                "ripe",
-                "cognac",
-                "alcoholic",
-                "acrid",
-                "prune",
-                "roasted",
-                "herbal"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "alcoholic",
@@ -18344,14 +17259,6 @@
         "smiles": "CC(=O)OCCCCCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "banana",
-                "fusel",
-                "apple",
-                "solvent",
-                "fruity"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "apple",
@@ -18502,19 +17409,7 @@
     {
         "full_name": "hexyl salicylate",
         "smiles": "CCCCCCOC(=O)C1=CC=CC=C1O",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "woody",
-                "salicylic",
-                "powdery",
-                "floral",
-                "rose",
-                "musk",
-                "citrus"
-            ]
-        },
+        "aroma": [],
         "activity":
         {
             "https:\/\/patents.google.com\/patent\/JP5798382B2\/en":
@@ -18621,15 +17516,7 @@
     {
         "full_name": "hydrogen chloride",
         "smiles": "[Cl]",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "acrid",
-                "sour",
-                "meaty"
-            ]
-        },
+        "aroma": [],
         "activity":
         {
             "https:\/\/doi.org\/10.1021\/acs.nanolett.5b02286":
@@ -18649,35 +17536,13 @@
     {
         "full_name": "hydrogen cyanide",
         "smiles": "C#N",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "almond",
-                "hazelnut",
-                "chemical",
-                "clean",
-                "plasticky",
-                "cocoa"
-            ]
-        }
+        "aroma": []
     },
     "136a0f0bb2e431b47a2760c0511d4d31":
     {
         "full_name": "hydrogen selenide",
         "smiles": "[SeH2]",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "horseradish",
-                "mayonnaise",
-                "chicken",
-                "stale",
-                "sulfurous",
-                "fecal"
-            ]
-        }
+        "aroma": []
     },
     "52b0cebb98ffa8a5a22aae58d9cb579f":
     {
@@ -18685,11 +17550,6 @@
         "smiles": "[SH2]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sulfurous",
-                "eggy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "egg",
@@ -18764,17 +17624,6 @@
         "smiles": "CC(CCCC(C)(C)O)CC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "neroli",
-                "sweet",
-                "orange",
-                "floral",
-                "muguet",
-                "waxy",
-                "citronella",
-                "watery"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -19001,13 +17850,6 @@
         "smiles": "C12=C(C=CN2)C=CC=C1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fecal",
-                "naphthyl",
-                "jasmine",
-                "floral"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "animal",
@@ -19304,16 +18146,6 @@
         "smiles": "CC(C)CCOC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "banana",
-                "solvent",
-                "fruity",
-                "sweet",
-                "creamy",
-                "ethereal",
-                "pear"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "banana",
@@ -19429,14 +18261,6 @@
         "smiles": "CCCC(=O)OCCC(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "solvent",
-                "ethereal",
-                "pear",
-                "leafy",
-                "apple"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "fruity",
@@ -19471,13 +18295,6 @@
         "smiles": "CC(C)CC(=O)OCCC(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "solvent",
-                "leafy",
-                "fruity",
-                "apple"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sweet",
@@ -19926,14 +18743,6 @@
         "smiles": "CC(C)C(=O)[O-]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sour",
-                "sweaty",
-                "fruity",
-                "buttery",
-                "rancid"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "acidic",
@@ -19975,15 +18784,6 @@
         "smiles": "CC(=O)[C@]1(C)CC2=C(C[C@H]1C)CCCC2(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "purple",
-                "muguet",
-                "sweet",
-                "grape",
-                "woody",
-                "fruity"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "ambergris",
@@ -20027,16 +18827,6 @@
         "smiles": "C\\C=C\\C1=CC(=C(C=C1)O)OC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "clove",
-                "nutmeg",
-                "eggnog",
-                "sweet",
-                "balsamic",
-                "spicy",
-                "gummy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "carnation",
@@ -20415,14 +19205,6 @@
         "smiles": "CC(C)CC(=O)[O-]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sweaty",
-                "milky",
-                "sour",
-                "fruity",
-                "cheesy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cheesy",
@@ -20775,15 +19557,6 @@
         "smiles": "CCCCCC1COCCC1OC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "jasmine",
-                "green",
-                "floral",
-                "mushroom",
-                "celery",
-                "oily"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -20976,43 +19749,6 @@
         "smiles": "CCCCCCCCCCCC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "aldehydic",
-                "dusty",
-                "laundered_cloth",
-                "stale",
-                "tallow",
-                "waxy",
-                "vinyl",
-                "warm",
-                "sweet",
-                "greasy",
-                "soapy",
-                "fishy",
-                "tropical",
-                "citrus_peel",
-                "cilantro",
-                "lactonic",
-                "lime",
-                "lemon",
-                "coumarinic",
-                "cozy",
-                "metallic",
-                "acrid",
-                "amber",
-                "musk",
-                "powdery",
-                "floral",
-                "cyclamen",
-                "stemmy",
-                "old_wood",
-                "tobacco",
-                "cardboard",
-                "sweaty",
-                "charred",
-                "earthy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
@@ -21118,15 +19854,6 @@
         "smiles": "CC(CC1=CC=C(C=C1)C(C)(C)C)C=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "muguet",
-                "fresh",
-                "waxy",
-                "watery",
-                "aldehydic",
-                "soapy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cumin",
@@ -21261,16 +19988,6 @@
         "smiles": "CC1(CCCC(O1)(C)C=C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "tart",
-                "sparkly",
-                "lime",
-                "sweet",
-                "citrus",
-                "oily",
-                "camphoraceous"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -21287,16 +20004,6 @@
         "smiles": "CC(=CCCC(C)(C=C)O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "lavender",
-                "papery",
-                "waxy",
-                "lemon",
-                "milky",
-                "tobacco",
-                "blueberry"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "blueberry",
@@ -21522,13 +20229,6 @@
         "smiles": "CC1=CC[C@H](CC1)C(=C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "pine",
-                "citrus",
-                "lemon",
-                "oily"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "herbal",
@@ -21619,15 +20319,6 @@
         "smiles": "CC(C)(CCCC1=CCC(CC1)C=O)O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "muguet",
-                "clean",
-                "cyclamen",
-                "watery",
-                "waxy",
-                "milky"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aquatic",
@@ -21854,14 +20545,6 @@
         "smiles": "O=C1C=COC(C)=C1O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sugary",
-                "sweet",
-                "cotton_candy",
-                "caramellic",
-                "bready"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "baked",
@@ -21964,14 +20647,6 @@
         "smiles": "CCCC(C)C(=O)OCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "apple",
-                "fruity",
-                "sparkly",
-                "pineapple",
-                "melon"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "apple",
@@ -22048,17 +20723,6 @@
         "smiles": "CC1(CCCC2=C1CC(CC2)C=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "office_building",
-                "bland",
-                "dusty",
-                "dirty",
-                "fatty",
-                "ozone",
-                "floral",
-                "melon"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -22151,14 +20815,6 @@
         "smiles": "CC1CCC(C(C1)O)C(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "minty",
-                "camphoraceous",
-                "waxy",
-                "musty",
-                "juicy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cooling",
@@ -22920,16 +21576,6 @@
         "smiles": "COC(=O)c1c(N)cccc1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "waxy",
-                "grape",
-                "phenolic",
-                "cherry",
-                "bubblegum",
-                "chemical",
-                "naphthyl"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "fruity",
@@ -23083,16 +21729,6 @@
         "smiles": "CCCCOC(=O)C(C)CCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "chamomile",
-                "pollen",
-                "powdery",
-                "floral",
-                "fruity",
-                "sweet",
-                "incense"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aromatic",
@@ -23155,16 +21791,6 @@
         "smiles": "COC(=O)C=Cc1ccccc1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "strawberry",
-                "gummy",
-                "fruity",
-                "sweet",
-                "powdery",
-                "cherry",
-                "berry"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "balsamic",
@@ -23305,16 +21931,6 @@
         "smiles": "COc1cc(ccc1OC)CC=C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "powdery",
-                "new_carpet",
-                "clean",
-                "shampoo",
-                "barbecue",
-                "clove",
-                "spicy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "carnation",
@@ -24330,16 +22946,6 @@
         "smiles": "n1c(C)cncc1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "nutty",
-                "earthy",
-                "green",
-                "hazelnut",
-                "roasted",
-                "musty",
-                "cocoa"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "chocolate",
@@ -24423,14 +23029,6 @@
         "smiles": "COC(=O)C1=CC=CC=C1O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "minty",
-                "waxy",
-                "salicylic",
-                "juicy",
-                "phenolic"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "minty",
@@ -24667,31 +23265,6 @@
         "smiles": "O=CC(C)CCCCCCCCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "aldehydic",
-                "lime",
-                "lemon",
-                "soapy",
-                "waxy",
-                "vinyl",
-                "laundered_cloth",
-                "clay",
-                "sweaty",
-                "greasy",
-                "watery",
-                "cyclamen",
-                "papery",
-                "soft",
-                "magnolia",
-                "guava",
-                "dragonfruit",
-                "metallic",
-                "tropical",
-                "oakmoss",
-                "underripe",
-                "grapefruit"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
@@ -24902,14 +23475,6 @@
         "smiles": "CC(C)(CCC1=CC=CC=C1)O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fresh",
-                "lavender",
-                "floral",
-                "muguet",
-                "waxy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bois_de_rose",
@@ -25051,14 +23616,6 @@
         "smiles": "C[C@@H]1CCCCCCCCCCCCC(=O)C1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "musk",
-                "fatty",
-                "powdery",
-                "animalic",
-                "sweet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "animal",
@@ -25213,15 +23770,6 @@
         "smiles": "CC1=C(C(=C(C(=C1[N+](=O)[O-])C(C)(C)C)[N+](=O)[O-])C)C(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "musk",
-                "powdery",
-                "strawberry",
-                "fruity",
-                "waxy",
-                "shampoo"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "dry",
@@ -25402,15 +23950,6 @@
         "smiles": "CC(=CCCC1=CCC(CC1)C=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "milky",
-                "fresh",
-                "clean",
-                "powdery",
-                "aquatic",
-                "orange"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
@@ -25498,16 +24037,6 @@
         "smiles": "CC(=CCCC(=C)C=C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "plastic",
-                "citrus",
-                "peel",
-                "lemon",
-                "cilantro",
-                "patchouli",
-                "herbal"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "balsamic",
@@ -25651,18 +24180,7 @@
     {
         "full_name": "naphthalene",
         "smiles": "C1=CC=C2C=CC=CC2=C1",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "naphthyl",
-                "mothballs",
-                "chemical",
-                "minty",
-                "acrid",
-                "fecal"
-            ]
-        },
+        "aroma": [],
         "activity":
         {
             "https:\/\/s-space.snu.ac.kr\/handle\/10371\/169429?mode=full":
@@ -26018,17 +24536,6 @@
         "smiles": "CC(=CCC\/C(=C\\CO)\/C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "citrus",
-                "magnolia",
-                "powdery",
-                "papery",
-                "waxy",
-                "herbal",
-                "lemon",
-                "sweet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -26096,14 +24603,6 @@
         "smiles": "CC(=CCC\\C(=C\\CCC(C)(C=C)O)\\C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "waxy",
-                "floral",
-                "orange",
-                "tea",
-                "potato_skin"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -26185,16 +24684,6 @@
         "smiles": "CC(=CCC\/C(=C\\COC(=O)C)\/C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "fresh",
-                "citrus",
-                "floral",
-                "pear",
-                "tart",
-                "soapy",
-                "fruity"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -26305,43 +24794,6 @@
         "smiles": "CCCCCCCCC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "aldehydic",
-                "waxy",
-                "vinyl",
-                "rose",
-                "orange",
-                "cilantro",
-                "cyclamen",
-                "watery",
-                "aquatic",
-                "guava",
-                "rhubarb",
-                "mushroom",
-                "dusty",
-                "clay",
-                "seaweed",
-                "marine",
-                "ozone",
-                "watermelon",
-                "melon",
-                "stemmy",
-                "carrot",
-                "celery",
-                "rancid",
-                "rooty",
-                "salicylic",
-                "medicinal",
-                "papery",
-                "office_building",
-                "soft",
-                "floral",
-                "acrid",
-                "tallow",
-                "fermented",
-                "musty"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
@@ -27347,33 +25799,6 @@
         "smiles": "CCCCCCCC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "aldehydic",
-                "waxy",
-                "coumarinic",
-                "lactonic",
-                "orange",
-                "rooty",
-                "grassy",
-                "green",
-                "leafy",
-                "citrus",
-                "ripe",
-                "tropical",
-                "mushroom",
-                "clay",
-                "carrot",
-                "pumpkin",
-                "hay",
-                "plasticky",
-                "soapy",
-                "pollen",
-                "tea",
-                "greasy",
-                "honey",
-                "malty"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
@@ -27559,12 +25984,6 @@
         "smiles": "CCCCCCCCS",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sulfurous",
-                "rubbery",
-                "mushroom"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sulfurous"
@@ -27728,29 +26147,6 @@
         "smiles": "CCCCCCCCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "waxy",
-                "chemical",
-                "mushroom",
-                "rancid",
-                "orange",
-                "green",
-                "aldehydic",
-                "humus",
-                "fusel",
-                "greasy",
-                "solvent",
-                "dark",
-                "ripe",
-                "oily",
-                "cucumber",
-                "melon",
-                "shiitake",
-                "rubbery",
-                "hay",
-                "bready"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
@@ -28004,32 +26400,6 @@
         "smiles": "CCCCCCC(O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "banana",
-                "orange",
-                "waxy",
-                "mushroom",
-                "solvent",
-                "soft",
-                "chemical",
-                "green",
-                "squash",
-                "musty",
-                "rooty",
-                "fusel",
-                "greasy",
-                "fatty",
-                "medicinal",
-                "vinyl",
-                "dry",
-                "clay",
-                "dusty",
-                "melon",
-                "pear",
-                "rotten_fruit",
-                "tropical"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "earthy",
@@ -28063,38 +26433,6 @@
         "smiles": "CCCCCC(O)CC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "orange",
-                "waxy",
-                "watery",
-                "limnic",
-                "musty",
-                "mushroom",
-                "green",
-                "citrus",
-                "vinyl",
-                "artificial",
-                "stale",
-                "soft",
-                "banana",
-                "melon",
-                "fermented",
-                "greasy",
-                "rooty",
-                "plasticky",
-                "aquatic",
-                "fresh",
-                "ripe",
-                "rancid",
-                "underripe",
-                "hay",
-                "stemmy",
-                "fatty",
-                "brandy",
-                "rosinous",
-                "pear"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "earthy",
@@ -28157,16 +26495,6 @@
         "smiles": "CCCCCCC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "banana",
-                "solvent",
-                "green",
-                "fruity",
-                "creamy",
-                "orange",
-                "hay"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "earthy",
@@ -28309,15 +26637,6 @@
         "smiles": "OC(C=C)CCCCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "mushroom",
-                "waxy",
-                "juicy",
-                "orange",
-                "earthy",
-                "plasticky"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "mushroom"
@@ -28410,16 +26729,6 @@
         "smiles": "CCCCCC(C=C)OC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "potato",
-                "acetic",
-                "humus",
-                "earthy",
-                "green",
-                "musty",
-                "herbal"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "earthy",
@@ -28473,16 +26782,6 @@
         "smiles": "CC(=O)OCCCCCCCC",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "powdery",
-                "waxy",
-                "earthy",
-                "musty",
-                "green",
-                "fruity",
-                "orange"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "apple",
@@ -28680,16 +26979,6 @@
         "smiles": "CC(=O)C1=CC2=CC=CC=C2C=C1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sweet",
-                "powdery",
-                "strawberry",
-                "fruity",
-                "neroli",
-                "tangerine",
-                "naphthyl"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "honey",
@@ -28951,14 +27240,6 @@
         "smiles": "COc1ccc(C=O)cc1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "floral",
-                "earthy",
-                "wet",
-                "anisic",
-                "moldy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "anisic",
@@ -28993,16 +27274,6 @@
         "smiles": "CCC(CC)C(=O)N(C)c1cccc(c1)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "bitter",
-                "grapefruit",
-                "waxy",
-                "guava",
-                "fruity",
-                "melon",
-                "aquatic"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bitter",
@@ -29101,6 +27372,38 @@
                     "type": "ma",
                     "ec50": "-4.82"
                 }
+            },
+            "https:\/\/doi.org\/10.1038\/s41598-023-27937-1":
+            {
+                "OR9Q2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "29",
+                    "ec50": "-3.9"
+                },
+                "OR2W1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.2",
+                    "ec50": "-3.5"
+                },
+                "OR4S2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.8",
+                    "ec50": "-3.2"
+                },
+                "OR5P3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "3",
+                    "ec50": "-3.2"
+                },
+                "OR1A1":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0.1"
+                }
             }
         }
     },
@@ -29125,6 +27428,30 @@
                 {
                     "type": "ma",
                     "ec50": "-4.82"
+                }
+            },
+            "https:\/\/doi.org\/10.1038\/s41598-023-27937-1":
+            {
+                "OR9Q2":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                },
+                "OR1A1":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "9",
+                    "ec50": "-3.4"
+                },
+                "OR5P3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.8"
+                },
+                "OR2W1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "2.2"
                 }
             }
         }
@@ -29198,16 +27525,6 @@
         "smiles": "c1cc(ccc1C(C)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "herbal",
-                "green",
-                "phenolic",
-                "woody",
-                "watery",
-                "aquatic",
-                "citrus"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -29243,18 +27560,7 @@
     {
         "full_name": "p-dichlorobenzene",
         "smiles": "Clc1ccc(Cl)cc1",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "aromatic",
-                "carpet",
-                "clean",
-                "fresh",
-                "minty",
-                "phenolic"
-            ]
-        }
+        "aroma": []
     },
     "1f633b7a97d558a2a2aa887c6a17fc9c":
     {
@@ -29785,16 +28091,6 @@
         "smiles": "CC(=O)OCCC1=CC=CC=C1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "floral",
-                "honey",
-                "rose",
-                "gummy",
-                "sweet",
-                "incense",
-                "cinnamon"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -29874,13 +28170,6 @@
         "smiles": "C1=CC=C(C=C1)CCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "rose",
-                "dried",
-                "fermented",
-                "solvent"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "dried_rose",
@@ -29975,16 +28264,6 @@
         "smiles": "CC(C)C(=O)OCCOC1=CC=CC=C1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "powdery",
-                "pineapple",
-                "waxy",
-                "fruity",
-                "floral",
-                "sweet",
-                "rose"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "floral",
@@ -30030,15 +28309,6 @@
         "smiles": "C1=CC=CC=C1CC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "green",
-                "sweet",
-                "tarry",
-                "floral",
-                "fermented",
-                "moldy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "clover",
@@ -30431,15 +28701,6 @@
         "smiles": "C1=CC=C(C=C1)CCCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "balsamic",
-                "rose",
-                "cinnamon",
-                "waxy",
-                "woody",
-                "sweet"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "balsamic",
@@ -30704,17 +28965,6 @@
         "smiles": "CC(C)(C)C(=O)OCCC1=CC=CC=C1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "powdery",
-                "rose",
-                "floral",
-                "waxy",
-                "creamy",
-                "berry",
-                "blueberry",
-                "geranium"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "blueberry",
@@ -30740,18 +28990,7 @@
     {
         "full_name": "polysantol",
         "smiles": "CC1=CCC(C1(C)C)\/C=C\/C(C)(C)C(C)O",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "woody",
-                "sandalwood",
-                "creamy",
-                "cocoa",
-                "sweet",
-                "fruity"
-            ]
-        },
+        "aroma": [],
         "activity":
         {
             "https:\/\/doi.org\/10.1038\/jid.2014.273":
@@ -30769,19 +29008,6 @@
         "smiles": "CC(=CCOC(=O)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "ethereal",
-                "solvent",
-                "floral",
-                "creamy",
-                "fruity",
-                "banana",
-                "purple",
-                "acetic",
-                "leafy",
-                "berry"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "balsamic",
@@ -31075,13 +29301,6 @@
         "smiles": "CCC(=O)[O-]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sour",
-                "vinegar",
-                "waxy",
-                "cheesy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "acidic",
@@ -31342,14 +29561,6 @@
         "smiles": "[NH3+]CCCC[NH3+]",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "animal_fur",
-                "wet",
-                "raw_pasta",
-                "waxy",
-                "rotting_meat"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "putrid"
@@ -31595,16 +29806,6 @@
         "smiles": "C1=CC=C2C(=C1)C=CC=N2",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "tobacco",
-                "plushy",
-                "warm",
-                "phenolic",
-                "burnt",
-                "earthy",
-                "rubbery"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "earthy",
@@ -31773,15 +29974,6 @@
         "smiles": "O=C(CCc1ccc(O)cc1)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "raspberry",
-                "fruity",
-                "powdery",
-                "oily",
-                "strawberry",
-                "naphthyl"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "berry",
@@ -31843,14 +30035,6 @@
         "smiles": "CC1=CC[C@H](CC1=O)C(=C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "spearmint",
-                "minty",
-                "herbal",
-                "sweet",
-                "gummy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "herbal",
@@ -32382,16 +30566,6 @@
         "smiles": "CC(C)C12CCC(=C)C1C2",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "herbal",
-                "spicy",
-                "terpenic",
-                "clove",
-                "pine",
-                "waxy",
-                "woody"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "woody",
@@ -32513,16 +30687,6 @@
         "smiles": "CC1=CCC(C1(C)C)CCC(C)C(C)O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sandalwood",
-                "sulfurous",
-                "woody",
-                "waxy",
-                "greasy",
-                "creamy",
-                "cedar"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sandalwood",
@@ -32552,15 +30716,6 @@
         "smiles": "CC\/C(=CCC1CC=C(C1(C)C)C)\/CO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "woody",
-                "oily",
-                "waxy",
-                "sandalwood",
-                "creamy",
-                "sulfurous"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "woody",
@@ -32662,16 +30817,6 @@
         "smiles": "CC1=CC[C@@H](CC1=O)C(=C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "caraway",
-                "herbal",
-                "spicy",
-                "bready",
-                "malty",
-                "sweet",
-                "curry"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bready",
@@ -32889,15 +31034,6 @@
         "smiles": "C[C@@H](CCC=C(C)C)CC=O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "citronella",
-                "aldehydic",
-                "citrus",
-                "floral",
-                "muguet",
-                "alliaceous"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -32991,17 +31127,6 @@
         "smiles": "C[C@@H](CCC=C(C)C)CCO",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "stale",
-                "floral",
-                "rose",
-                "waxy",
-                "green",
-                "citrus",
-                "leathery",
-                "alliaceous"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -33431,17 +31556,6 @@
         "smiles": "CC(C2C(OCC)=O)(O2)C1=CC=CC=C1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sweet",
-                "fruity",
-                "strawberry",
-                "grape",
-                "medicinal",
-                "jammy",
-                "powdery",
-                "raspberry"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "cherry",
@@ -33489,15 +31603,6 @@
         "smiles": "CC(C1=CC=CC=C1)OC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "tarry",
-                "almond",
-                "nutty",
-                "roasty",
-                "coriander",
-                "earthy"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "green",
@@ -33676,17 +31781,6 @@
         "smiles": "CC1=CCC(CC1)C(C)(C)OC(=O)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "floral",
-                "sweet",
-                "citrus",
-                "lavender",
-                "grape",
-                "prune",
-                "tart",
-                "lime"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bergamot",
@@ -33989,16 +32083,6 @@
         "smiles": "CCC(C)(CCCC(C)C)O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "papery",
-                "floral",
-                "fruity",
-                "blueberry",
-                "sweet",
-                "oily",
-                "tobacco"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "bois_de_rose",
@@ -34032,15 +32116,6 @@
         "smiles": "CCC(C)CCCC(C)(C)O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "floral",
-                "oily",
-                "sweet",
-                "blueberry",
-                "fruity",
-                "citrus"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "citrus",
@@ -34175,15 +32250,6 @@
         "smiles": "C(C(=O)O)S",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "sulfurous",
-                "skunk",
-                "eggy",
-                "vinegar",
-                "horseradish",
-                "acetic"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "sulfurous"
@@ -34226,14 +32292,6 @@
         "smiles": "CC1=CC(=C(C=C1)C(C)C)O",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "herbal",
-                "thyme",
-                "oregano",
-                "camphoraceous",
-                "oily"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "camphoraceous",
@@ -34297,16 +32355,6 @@
         "smiles": "OC(CCC)CCC1C(CCCC1(C)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "conifer",
-                "woody",
-                "tart",
-                "dry",
-                "powdery",
-                "floral",
-                "berry"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "amber",
@@ -34349,16 +32397,6 @@
         "smiles": "CC1CC(C2=C(C1(C)C)C=C(C(=C2)C(=O)C)C)(C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "musk",
-                "powdery",
-                "human_skin",
-                "sweet",
-                "fruity",
-                "woody",
-                "animalic"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "amber",
@@ -34706,31 +32744,13 @@
     {
         "full_name": "2-tridecenal",
         "smiles": "CCCCCCCCCCC=CC=O",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "aldehydic",
-                "waxy",
-                "cilantro",
-                "milky",
-                "powdery"
-            ]
-        }
+        "aroma": []
     },
     "5ff70bd4e00179b536bfea12569b3272":
     {
         "full_name": "triethylamine",
         "smiles": "CC[NH+](CC)CC",
-        "aroma":
-        {
-            "http:\/\/www.primaryodors.org":
-            [
-                "ammonia",
-                "prawn",
-                "fishy"
-            ]
-        },
+        "aroma": [],
         "activity":
         {
             "https:\/\/www.pnas.org\/doi\/full\/10.1073\/pnas.2003111117":
@@ -34748,18 +32768,6 @@
         "smiles": "C[C@@H](CC=O)C1=CC=CC=C1",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "green",
-                "stemmy",
-                "underripe",
-                "green_bean",
-                "squash",
-                "beany",
-                "oily",
-                "leafy",
-                "melon"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "foliage",
@@ -34882,15 +32890,6 @@
         "smiles": "CC1=CN=C(C(=N1)C)C",
         "aroma":
         {
-            "http:\/\/www.primaryodors.org":
-            [
-                "nutty",
-                "macadamia",
-                "peanut",
-                "hazelnut",
-                "rooty",
-                "potato"
-            ],
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "nutty",

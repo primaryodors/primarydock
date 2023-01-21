@@ -63,7 +63,7 @@ int in_array(Star needle, Star* haystack)
     return -1;
 }
 
-char** chop_spaced_fields(char* line, char separator)
+char** chop_spaced_words(char* line, char separator)
 {
     char** retval = new char*[100];
     int i, j=0;

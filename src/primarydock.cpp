@@ -50,6 +50,203 @@ struct AcvBndRot
     float theta;
 };
 
+#if _use_gloms
+struct AtomGlom
+{
+    std::vector<Atom*> atoms;
+
+    Point get_center()
+    {
+        int i;
+        float mass = 0;
+        Point result(0,0,0);
+        int atct = atoms.size();
+        if (!atct) return Point(0,0,0);
+        for (i=0; i<atct; i++)
+        {
+            Point pt = atoms[i]->get_location();
+            float m = atoms[i]->get_atomic_weight();
+            pt.scale(pt.magnitude() * m);
+            result = result.add(pt);
+            mass += m;
+        }
+        if (mass) result.scale(result.magnitude() / mass);
+        return result;
+    }
+
+    float get_pi()
+    {
+        int atct = atoms.size();
+        if (!atct) return 0;
+        int i;
+        float result = 0;
+        for (i=0; i<atct; i++)
+        {
+            if (atoms[i]->is_pi()) result += 1;
+        }
+        return result;
+    }
+
+    float get_polarity()
+    {
+        int atct = atoms.size();
+        if (!atct) return 0;
+        int i;
+        float result = 0;
+        for (i=0; i<atct; i++)
+        {
+            result += fabs(atoms[i]->is_polar());
+        }
+        return result;
+    }
+
+    float get_ionic()
+    {
+        int atct = atoms.size();
+        if (!atct) return 0;
+        int i;
+        float result = 0;
+        for (i=0; i<atct; i++)
+        {
+            float c = atoms[i]->get_charge();
+            if (c) result += c;
+            else
+            {
+                if (atoms[i]->get_family() == PNICTOGEN && !atoms[i]->is_amide())
+                {
+                    result += 0.5;
+                }
+            }
+        }
+        return result;
+    }
+
+    float get_sum()
+    {
+        return get_ionic()*60 + get_polarity()*25 + get_pi()*2;
+    }
+
+    float distance_to(Point pt)
+    {
+        int atct = atoms.size();
+        if (!atct) return -1;
+        int i;
+        float result = 0;
+        for (i=0; i<atct; i++)
+        {
+            float f = atoms[i]->get_location().get_3d_distance(pt);
+            if (!i || !f || f < result) result = f;
+        }
+        return result;
+    }
+
+    float bounds()
+    {
+        int atct = atoms.size();
+        if (!atct) return -1;
+        int i;
+        Point ptmin(0,0,0), ptmax(0,0,0);
+        for (i=0; i<atct; i++)
+        {
+            Point aloc = atoms[i]->get_location();
+            if (!i)
+            {
+                ptmin = aloc;
+                ptmax = aloc;
+            }
+            else
+            {
+                if (aloc.x < ptmin.x) ptmin.x = aloc.x;
+                if (aloc.y < ptmin.y) ptmin.y = aloc.y;
+                if (aloc.z < ptmin.z) ptmin.z = aloc.z;
+                if (aloc.x > ptmax.x) ptmax.x = aloc.x;
+                if (aloc.y > ptmax.y) ptmax.y = aloc.y;
+                if (aloc.z > ptmax.z) ptmax.z = aloc.z;
+            }
+        }
+
+        return ptmax.get_3d_distance(ptmin);
+    }
+
+    float compatibility(AminoAcid* aa)
+    {
+        int atct = atoms.size();
+        if (!atct) return 0;
+
+        float result = 0;
+        float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
+
+        if (aa->hydrophilicity() > 0.25)
+        {
+            if ((lgh / atct) < 0.19) return 0;
+        }
+        else
+        {
+            if ((lgh / atct) > 0.33333) return 0;
+        }
+ 
+        if (lgi) result += lgi * -aa->bindability_by_type(ionic) * 1000;
+        if (lgh) result += fabs(lgh) * fabs(aa->bindability_by_type(hbond)) * 30;
+        if (lgp) result += aa->bindability_by_type(pi);
+
+        return result;
+    }
+};
+
+struct ResidueGlom
+{
+    std::vector<AminoAcid*> aminos;
+
+    Point get_center()
+    {
+        int amsz = aminos.size();
+        if (!amsz) return Point(0,0,0);
+        int i, j;
+        j = 0;
+        Point result(0,0,0);
+        for (i=0; i<amsz; i++)
+        {
+            Atom** aa = aminos[i]->get_most_bindable(1);
+            Atom* a = aa[0]; // = aminos[i]->get_atom("CB");
+            delete aa;
+            // if (!a) a = aminos[i]->get_atom("CA");      // even though glycine probably shouldn't be part of a glom.
+            if (a)
+            {
+                Point pt = a->get_location();
+                result = result.add(pt);
+                j++;
+            }
+        }
+        if (j) result.scale(result.magnitude() / j);
+        return result;
+    }
+
+    float distance_to(Point pt)
+    {
+        return pt.get_3d_distance(get_center());
+    }
+
+    float compatibility(AtomGlom* ag)
+    {
+        int amsz = aminos.size();
+        if (!amsz) return 0;
+        float result = 0;
+        int i;
+        bool has_acids = false, has_his = false;
+        for (i=0; i<amsz; i++)
+        {
+            if (aminos[i]->get_charge() < 0) has_acids = true;
+            if (aminos[i]->conditionally_basic()) has_his = true;
+            result += ag->compatibility(aminos[i]);
+        }
+        if (has_acids && has_his && ag->get_ionic() > 0) result -= ag->get_ionic()*30;
+
+        return result;
+    }
+};
+
+#endif
+
 char* get_file_ext(char* filename)
 {
     int i = strlen(filename)-1;
@@ -60,6 +257,7 @@ char* get_file_ext(char* filename)
     return 0;
 }
 
+bool output_each_iter = false;
 char configfname[256];
 char protfname[256];
 char protafname[256];
@@ -101,24 +299,38 @@ int activation_node = -1;		// Default is never.
 int found_poses = 0;
 int triesleft = 0;				// Default is no retry.
 bool echo_progress = false;
+bool hydrogenate_pdb = false;
+bool append_pdb = false;
 
 std::string origbuff = "";
 std::string optsecho = "";
 
-// Switch to enable older "best binding" algorithm instead of newer "tumble spheres".
-// Generally, tumble spheres give better results but let's leave best bind code
-// in place because we'll be reviving it later.
+// Switch to enable "best-binding" algorithm rather than "tumble spheres" algorithm.
 bool use_bestbind_algorithm = default_bestbind;
 bool use_prealign = false;
 std::string prealign_residues = "";
 Bond retain_bindings[4];
+
+#if _use_gloms
+AtomGlom ligand_gloms[3];
+ResidueGlom sc_gloms[3];
+#else
+Atom** ligbb = nullptr;
+Atom** ligbbh = nullptr;
+
+intera_type lig_inter_typ[5];
+Molecule* alignment_aa[5];
+#endif
+
+Pose pullaway_undo;
+float last_ttl_bb_dist = 0;
 
 float* initial_binding;
 float* initial_vdWrepl;
 float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 
 Point active_matrix_n[16], active_matrix_c[16], active_matrix_m[16];
-int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0;
+int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0, deactivate_node = -1;
 std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
@@ -203,15 +415,81 @@ void iteration_callback(int iter)
     #endif
 
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
-    if (iter == (iters-1)) return;
+    int l;
 
     Point bary = ligand->get_barycenter();
 
     int ac = ligand->get_atom_count();
     float bbest = 0;
     Atom *atom, *btom;
-
     int i;
+
+    if (!iter) goto _oei;
+    if (iter == (iters-1)) goto _oei;
+    
+    #if enforce_no_bb_pullaway
+    #if _use_gloms
+    if (ligand_gloms[0].atoms.size())
+    #else
+    if (ligbb)
+    #endif
+    {
+        float ttl_bb_dist = 0;
+        for (l=0; l<3; l++)
+        {
+            #if _use_gloms
+            if (ligand_gloms[l].atoms.size() && sc_gloms[l].aminos.size())
+            #else
+            if (ligbb[l] && alignment_aa[l])
+            #endif
+            {
+                #if _use_gloms
+                float r = ligand_gloms[l].distance_to(sc_gloms[l].get_center());
+                if (r < 2.5) r = 2.5;
+                if (r > _INTERA_R_CUTOFF) r = _INTERA_R_CUTOFF;
+                ttl_bb_dist += r;
+                #if _dbg_bb_pullaway
+                cout << "Ligand atoms ";
+                for (i=0; i<ligand_gloms[l].atoms.size(); i++) cout << ligand_gloms[l].atoms[i]->name << " ";
+                cout << "are " << r << " A from residues";
+                for (i=0; i<sc_gloms[l].aminos.size(); i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                cout << "." << endl;
+                #endif
+                #else
+                Atom** mbb = alignment_aa[l]->get_most_bindable(1, ligbb[l]);
+                Atom* alca = mbb[0];
+                delete mbb;             // Delete the pointer array, but not the pointers.
+
+                if (alca)
+                {
+                    float r = alca->get_location().get_3d_distance(ligbb[l]->get_location());
+                    if (r < 2.5) r = 2.5;
+                    ttl_bb_dist += r;
+                    #if _dbg_bb_pullaway
+                    cout << alignment_aa[l]->get_name() << ":" << alca->name << " " << r << "A from " << ligbb[l]->name << "... ";
+                    #endif
+                }
+                #endif
+            }
+        }
+        #if _dbg_bb_pullaway
+        cout << endl;
+        #endif
+
+        if (!iter || ttl_bb_dist < (1.0+bb_pullaway_allowance)*last_ttl_bb_dist)
+        {
+            pullaway_undo.copy_state(ligand);
+            last_ttl_bb_dist = ttl_bb_dist;
+        }
+        else
+        {
+            pullaway_undo.restore_state(ligand);
+        }
+    }
+    #endif
+    
+    bary = ligand->get_barycenter();
+
     for (i=0; i < ac; i++)
     {
         if (ligand->get_atom(i)->strongest_bind_energy > bbest)
@@ -319,6 +597,35 @@ void iteration_callback(int iter)
         for (i=0; i<sphres; i++) gcfmols[i] = discrete[i].pmol;
         gcfmols[sphres] = nullptr;
     }
+
+    _oei:
+    ;
+    if (output_each_iter)
+    {
+        std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
+        FILE* fp = fopen(itersfname.c_str(), (iter == 1 ? "wb" : "ab") );
+        if (fp)
+        {
+            fprintf(fp, "Pose: 1\nNode: %d\n\nPDBDAT:\n", iter);
+            /*protein->save_pdb(fp, ligand);
+            protein->end_pdb(fp);*/
+
+            AminoAcid* reaches_spheroid[SPHREACH_MAX];
+            int sphres = 0;
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, pocketcen, size, addl_resno);
+            int foff = 0;
+
+            for (i=0; i<sphres; i++)
+            {
+                reaches_spheroid[i]->save_pdb(fp, foff);
+                foff += reaches_spheroid[i]->get_atom_count();
+            }
+
+            ligand->save_pdb(fp, foff);
+
+            fclose(fp);
+        }
+    }
 }
 
 int interpret_resno(char* field)
@@ -332,7 +639,7 @@ int interpret_resno(char* field)
         int _50 = protein->get_bw50(b);
         if (_50 < 1)
         {
-            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW fields." << endl;
+            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW words." << endl;
             throw 0xbad12e5;
         }
         return _50 + w - 50;
@@ -340,17 +647,17 @@ int interpret_resno(char* field)
     else return atoi(field);
 }
 
-Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
+Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
 {
     int i=1;
     Point local_pocketcen;
-    if (!strcmp(fields[i], "RES"))
+    if (!strcmp(words[i], "RES"))
     {
         i++;
         std::vector<int> resnos;
-        for (; fields[i]; i++)
+        for (; words[i]; i++)
         {
-            int j = interpret_resno(fields[i]);
+            int j = interpret_resno(words[i]);
             if (!j) break;
             resnos.push_back(j);
         }
@@ -364,7 +671,7 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
 
         return average_of_points(foravg, sz);
     }
-    else if (!strcmp(fields[i], "REL"))
+    else if (!strcmp(words[i], "REL"))
     {
         if (!old_pocketcen)
         {
@@ -374,66 +681,66 @@ Point pocketcen_from_config_fields(char** fields, Point* old_pocketcen)
         else
         {
             i++;
-            local_pocketcen.x = old_pocketcen->x + atof(fields[i++]);
-            local_pocketcen.y = old_pocketcen->y + atof(fields[i++]);
-            local_pocketcen.z = old_pocketcen->z + atof(fields[i++]);
+            local_pocketcen.x = old_pocketcen->x + atof(words[i++]);
+            local_pocketcen.y = old_pocketcen->y + atof(words[i++]);
+            local_pocketcen.z = old_pocketcen->z + atof(words[i++]);
             return local_pocketcen;
         }
     }
     else
     {
-        if (!strcmp(fields[i], "ABS")) i++;
-        local_pocketcen.x = atof(fields[i++]);
-        local_pocketcen.y = atof(fields[i++]);
-        local_pocketcen.z = atof(fields[i++]);
+        if (!strcmp(words[i], "ABS")) i++;
+        local_pocketcen.x = atof(words[i++]);
+        local_pocketcen.y = atof(words[i++]);
+        local_pocketcen.z = atof(words[i++]);
         return local_pocketcen;
     }
 }
 
-int interpret_config_line(char** fields)
+int interpret_config_line(char** words)
 {
     int i;
 
     optsecho = "";
 
     if (0) { ; }
-    else if (!strcmp(fields[0], "ACVBROT"))
+    else if (!strcmp(words[0], "ACVBROT"))
     {
         AcvBndRot abr;
-        abr.resno = atoi(fields[1]);
-        abr.aname = fields[2];
-        abr.bname = fields[3];
-        abr.theta = atof(fields[4]) * fiftyseventh;
+        abr.resno = atoi(words[1]);
+        abr.aname = words[2];
+        abr.bname = words[3];
+        abr.theta = atof(words[4]) * fiftyseventh;
         active_bond_rots.push_back(abr);
-        optsecho = (std::string)"Active bond rotation " + (std::string)fields[2] + (std::string)"-" + (std::string)fields[3];
+        optsecho = (std::string)"Active bond rotation " + (std::string)words[2] + (std::string)"-" + (std::string)words[3];
     }
-    else if (!strcmp(fields[0], "ACVHXR"))
+    else if (!strcmp(words[0], "ACVHXR"))
     {
         AcvHxRot ahr;
         int n = 1;
-        ahr.regname      = fields[n++];
-        ahr.start_resno  = atoi(fields[n++]);
-        ahr.end_resno    = atoi(fields[n++]);
-        ahr.origin_resno = atoi(fields[n++]);
-        ahr.transform    = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
-        ahr.axis         = Point( atof(fields[n]), atof(fields[n+1]), atof(fields[n+2]) ); n += 3;
-        ahr.theta        = atof(fields[n++]) * fiftyseventh;
+        ahr.regname      = words[n++];
+        ahr.start_resno  = atoi(words[n++]);
+        ahr.end_resno    = atoi(words[n++]);
+        ahr.origin_resno = atoi(words[n++]);
+        ahr.transform    = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.axis         = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.theta        = atof(words[n++]) * fiftyseventh;
         active_helix_rots.push_back(ahr);
         optsecho = (std::string)"Active helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
-    else if (!strcmp(fields[0], "ACVMX"))
+    else if (!strcmp(words[0], "ACVMX"))
     {
-        if (!fields[1] || !fields[1][3])
+        if (!words[1] || !words[1][3])
         {
             cout << "Missing region identifier for active matrix." << endl << flush;
             throw 0xbad512e;
         }
-        if (    fields[1][0] != 'T'
-            ||  fields[1][1] != 'M'
-            ||  fields[1][2] != 'R'
+        if (    words[1][0] != 'T'
+            ||  words[1][1] != 'M'
+            ||  words[1][2] != 'R'
             )
         {
-            cout << "Unknown region identifier for active matrix: " << fields[1] << endl << flush;
+            cout << "Unknown region identifier for active matrix: " << words[1] << endl << flush;
             throw 0xbad512e;
         }
 
@@ -442,45 +749,54 @@ int interpret_config_line(char** fields)
             for (i=0; i<16; i++) active_matrix_c[i] = active_matrix_n[i] = active_matrix_m[i] = Point(0,0,0);
         }
 
-        int n = atoi(&fields[1][3]);
+        int n = atoi(&words[1][3]);
         if (n > active_matrix_count) active_matrix_count = n;
 
-        active_matrix_n[n].x = atof(fields[2]);
-        active_matrix_n[n].y = atof(fields[3]);
-        active_matrix_n[n].z = atof(fields[4]);
-        if (fields[8] && fields[9] && fields[10])
+        active_matrix_n[n].x = atof(words[2]);
+        active_matrix_n[n].y = atof(words[3]);
+        active_matrix_n[n].z = atof(words[4]);
+        if (words[8] && words[9] && words[10])
         {
             active_matrix_type = 9;
-            active_matrix_m[n].x = atof(fields[5]);
-            active_matrix_m[n].y = atof(fields[6]);
-            active_matrix_m[n].z = atof(fields[7]);
-            active_matrix_c[n].x = atof(fields[8]);
-            active_matrix_c[n].y = atof(fields[9]);
-            active_matrix_c[n].z = atof(fields[10]);
+            active_matrix_m[n].x = atof(words[5]);
+            active_matrix_m[n].y = atof(words[6]);
+            active_matrix_m[n].z = atof(words[7]);
+            active_matrix_c[n].x = atof(words[8]);
+            active_matrix_c[n].y = atof(words[9]);
+            active_matrix_c[n].z = atof(words[10]);
         }
         else
         {
             active_matrix_type = 6;
-            active_matrix_c[n].x = atof(fields[5]);
-            active_matrix_c[n].y = atof(fields[6]);
-            active_matrix_c[n].z = atof(fields[7]);
+            active_matrix_c[n].x = atof(words[5]);
+            active_matrix_c[n].y = atof(words[6]);
+            active_matrix_c[n].z = atof(words[7]);
         }
         optsecho = (std::string)"Active matrix for TMR" + to_string(n);
     }
-    else if (!strcmp(fields[0], "ACVNODE"))
+    else if (!strcmp(words[0], "ACVNODE"))
     {
-        active_matrix_node = atoi(fields[1]);
+        active_matrix_node = atoi(words[1]);
         optsecho = (std::string)"Active node is " + to_string(active_matrix_node);
     }
-    else if (!strcmp(fields[0], "CEN"))
+    else if (!strcmp(words[0], "APPENDPROT") || !strcmp(words[0], "OPEND"))
+    {
+        append_pdb = true;
+    }
+    else if (!strcmp(words[0], "CEN"))
     {
         CEN_buf = origbuff;
         optsecho = (std::string)"Center " + CEN_buf;
         return 0;
     }
-    else if (!strcmp(fields[0], "DEBUG"))
+    else if (!strcmp(words[0], "DEACVNODE"))
     {
-        if (!fields[1])
+        deactivate_node = atoi(words[1]);
+        optsecho = (std::string)"Active node is " + to_string(deactivate_node);
+    }
+    else if (!strcmp(words[0], "DEBUG"))
+    {
+        if (!words[1])
         {
             cout << "Missing debug file name; check config file." << endl << flush;
             throw 0xbadf12e;
@@ -488,51 +804,51 @@ int interpret_config_line(char** fields)
         #if _DBG_STEPBYSTEP
         cout << "Starting a debug outstream." << endl;
         #endif
-        debug = new std::ofstream(fields[1], std::ofstream::out);
-        optsecho = "Debug file: " + (std::string)fields[1];
+        debug = new std::ofstream(words[1], std::ofstream::out);
+        optsecho = "Debug file: " + (std::string)words[1];
         return 1;
     }
-    else if (!strcmp(fields[0], "DIFF"))
+    else if (!strcmp(words[0], "DIFF"))
     {
         differential_dock = true;
         optsecho = "Differential dock.";
     }
-    else if (!strcmp(fields[0], "ECHO"))
+    else if (!strcmp(words[0], "ECHO"))
     {
         echo_progress = true;
         optsecho = "Echo on.";
     }
-    else if (!strcmp(fields[0], "ELIM"))
+    else if (!strcmp(words[0], "ELIM"))
     {
-        kJmol_cutoff = -atof(fields[1]);
+        kJmol_cutoff = -atof(words[1]);
         optsecho = "Energy limit: " + to_string(-kJmol_cutoff);
         return 1;
     }
-    else if (!strcmp(fields[0], "EMIN"))
+    else if (!strcmp(words[0], "EMIN"))
     {
-        kJmol_cutoff = atof(fields[1]);
+        kJmol_cutoff = atof(words[1]);
         optsecho = "Energy limit: " + to_string(kJmol_cutoff);
         return 1;
     }
-    else if (!strcmp(fields[0], "EXCL"))
+    else if (!strcmp(words[0], "EXCL"))
     {
         i=1;
-        int excls = atoi(fields[i++]);
-        int excle = atoi(fields[i++]);
+        int excls = atoi(words[i++]);
+        int excle = atoi(words[i++]);
 
         for (i=excls; i<=excle; i++) exclusion.push_back(i);
         optsecho = "Exclude range " + to_string(excls) + (std::string)"-" + to_string(excle);
         return i-1;
     }
-    else if (!strcmp(fields[0], "FLEX"))
+    else if (!strcmp(words[0], "FLEX"))
     {
-        flex = (atoi(fields[1]) != 0);
+        flex = (atoi(words[1]) != 0);
         optsecho = "Flex: " + (std::string)(flex ? "ON" : "OFF");
         return 1;
     }
-    else if (!strcmp(fields[0], "H2O"))
+    else if (!strcmp(words[0], "H2O"))
     {
-        maxh2o = omaxh2o = atoi(fields[1]);
+        maxh2o = omaxh2o = atoi(words[1]);
         if (maxh2o > 0)
         {
             waters = new Molecule*[maxh2o+2];
@@ -552,63 +868,71 @@ int interpret_config_line(char** fields)
         optsecho = "Water molecules: " + to_string(maxh2o);
         return 1;
     }
-    else if (!strcmp(fields[0], "ITER") || !strcmp(fields[0], "ITERS"))
+    else if (!strcmp(words[0], "HYDRO"))
     {
-        iters = atoi(fields[1]);
+        hydrogenate_pdb = true;
+    }
+    else if (!strcmp(words[0], "ITER") || !strcmp(words[0], "ITERS"))
+    {
+        iters = atoi(words[1]);
         optsecho = "Iterations: " + to_string(iters);
         return 1;
     }
-    else if (!strcmp(fields[0], "KCAL"))
+    else if (!strcmp(words[0], "KCAL"))
     {
         kcal = true;
         optsecho = "Output units switched to kcal/mol.";
         return 0;
     }
-    else if (!strcmp(fields[0], "LIG"))
+    else if (!strcmp(words[0], "LIG"))
     {
-        strcpy(ligfname, fields[1]);
+        strcpy(ligfname, words[1]);
         // optsecho = "Ligand file is " + (std::string)ligfname;
         ligset = true;
         return 1;
     }
-    else if (!strcmp(fields[0], "MCOORD"))
+    else if (!strcmp(words[0], "MCOORD"))
     {
         int j=0;
         optsecho = "Metal coordination on residues ";
-        for (i=1; fields[i]; i++)
+        for (i=1; words[i]; i++)
         {
-            if (fields[i][0] == '-' && fields[i][1] == '-') break;
-            mcoord_resno[j++] = atoi(fields[i]);
-            optsecho += to_string(atoi(fields[i])) + (std::string)" ";
+            if (words[i][0] == '-' && words[i][1] == '-') break;
+            mcoord_resno[j++] = atoi(words[i]);
+            optsecho += to_string(atoi(words[i])) + (std::string)" ";
         }
         mcoord_resno[j] = 0;
         return i-1;
     }
-    else if (!strcmp(fields[0], "NODEPDB"))
+    else if (!strcmp(words[0], "MOVIE"))
     {
-        activation_node = atoi(fields[1]);
-        strcpy(protafname, fields[2]);
+        output_each_iter = true;
+    }
+    else if (!strcmp(words[0], "NODEPDB"))
+    {
+        activation_node = atoi(words[1]);
+        strcpy(protafname, words[2]);
         optsecho = "Active PDB " + (std::string)protafname + " for node " + to_string(activation_node);
     }
-    else if (!strcmp(fields[0], "OUT"))
+    else if (!strcmp(words[0], "OUT"))
     {
-        if (!fields[1])
+        if (!words[1])
         {
             cout << "Missing output file name; check config file." << endl << flush;
             throw 0xbadf12e;
         }
-        strcpy(outfname, fields[1]);
+        strcpy(outfname, words[1]);
         optsecho = "Output file is " + (std::string)outfname;
         return 1;
     }
-    else if (!strcmp(fields[0], "PATH"))
+    else if (!strcmp(words[0], "PATH"))
     {
         i=1;
-        int nodeno = atoi(fields[i]);
+        int nodeno = atoi(words[i]);
 
-        if (!strcmp(fields[i], "ABS")) i++;
-        if (!strcmp(fields[i], "REL")) i++;
-        if (!strcmp(fields[i], "RES")) i++;
+        if (!strcmp(words[i], "ABS")) i++;
+        if (!strcmp(words[i], "REL")) i++;
+        if (!strcmp(words[i], "RES")) i++;
 
         if (nodeno > 255)
         {
@@ -625,62 +949,62 @@ int interpret_config_line(char** fields)
         optsecho = "Path node set #" + to_string(nodeno);
         return i-1;
     }
-    else if (!strcmp(fields[0], "POSE"))
+    else if (!strcmp(words[0], "POSE"))
     {
-        poses = atoi(fields[1]);
+        poses = atoi(words[1]);
         optsecho = "Number of poses: " + to_string(poses);
         return 1;
     }
-    else if (!strcmp(fields[0], "PREALIGN"))
+    else if (!strcmp(words[0], "PREALIGN"))
     {
         use_prealign = true;
         prealign_residues = origbuff;
         return 1;
     }
-    else if (!strcmp(fields[0], "PROT"))
+    else if (!strcmp(words[0], "PROT"))
     {
-        strcpy(protfname, fields[1]);
+        strcpy(protfname, words[1]);
         protset = true;
         // optsecho = "Protein file is " + (std::string)protfname;
         return 1;
     }
-    else if (!strcmp(fields[0], "RETRY"))
+    else if (!strcmp(words[0], "RETRY"))
     {
-        // triesleft = atoi(fields[1]);
+        // triesleft = atoi(words[1]);
         return 1;
     }
-    else if (!strcmp(fields[0], "RLIM"))
+    else if (!strcmp(words[0], "RLIM"))
     {
-        _INTERA_R_CUTOFF = atof(fields[1]);
+        _INTERA_R_CUTOFF = atof(words[1]);
         optsecho = "Interatomic radius limit: " + to_string(_INTERA_R_CUTOFF);
         return 1;
     }
-    else if (!strcmp(fields[0], "SEARCH"))
+    else if (!strcmp(words[0], "SEARCH"))
     {
-        if (!fields[1]) return 0;       // Stay with default.
-        if (!strcmp(fields[1], "BB"))
+        if (!words[1]) return 0;       // Stay with default.
+        if (!strcmp(words[1], "BB"))
         {
             use_bestbind_algorithm = true;
             return 1;
         }
-        else if (!strcmp(fields[1], "TS"))
+        else if (!strcmp(words[1], "TS"))
         {
             use_bestbind_algorithm = false;
             return 1;
         }
         else
         {
-            cout << "Unknown search method " << fields[1] << endl;
+            cout << "Unknown search method " << words[1] << endl;
             throw 0xbad5eec;
         }
     }
-    else if (!strcmp(fields[0], "SIZE"))
+    else if (!strcmp(words[0], "SIZE"))
     {
-        size.x = atof(fields[1]);
-        if (fields[2])
+        size.x = atof(words[1]);
+        if (words[2])
         {
-            size.y = atof(fields[2]);
-            size.z = atof(fields[3]);
+            size.y = atof(words[2]);
+            size.z = atof(words[3]);
         }
         else size.z = size.y = size.x;
         if (!size.x || !size.y || !size.z)
@@ -691,20 +1015,20 @@ int interpret_config_line(char** fields)
         optsecho = "Interatomic radius limit: " + to_string(size.x) + (std::string)"," + to_string(size.y) + (std::string)"," + to_string(size.z);
         return 3;
     }
-    else if (!strcmp(fields[0], "STATE"))
+    else if (!strcmp(words[0], "STATE"))
     {
         states.push_back(origbuff);
         optsecho = "Added state " + (std::string)origbuff;
         return 0;
     }
-    else if (!strcmp(fields[0], "TRIP"))
+    else if (!strcmp(words[0], "TRIP"))
     {
         optsecho = "Added trip clashables ";
-        for (i = 1; fields[i]; i++)
+        for (i = 1; words[i]; i++)
         {
-            if (fields[i][0] == '-' && fields[i][1] == '-') break;
-            tripswitch_clashables.push_back(atoi(fields[i]));
-            optsecho += (std::string)fields[i] + (std::string)" ";
+            if (words[i][0] == '-' && words[i][1] == '-') break;
+            tripswitch_clashables.push_back(atoi(words[i]));
+            optsecho += (std::string)words[i] + (std::string)" ";
         }
         return i-1;
     }
@@ -723,12 +1047,12 @@ void read_config_file(FILE* pf)
         origbuff = buffer;
         if (buffer[0] >= ' ' && buffer[0] != '#')
         {
-            char** fields = chop_spaced_fields(buffer);
-            if (!fields) continue;
+            char** words = chop_spaced_words(buffer);
+            if (!words) continue;
 
-            interpret_config_line(fields);
+            interpret_config_line(words);
 
-            delete[] fields;
+            delete[] words;
         }
         buffer[0] = 0;
     }
@@ -779,9 +1103,9 @@ void prepare_initb()
         bool preconform;
 
         #if preconform_protein
-        preconform = true;
+        preconform = flex;
         #else
-        preconform = (waters != nullptr) && differential_dock;
+        preconform = flex && (waters != nullptr) && differential_dock;
         #endif
 
         if (preconform && pre_ligand_iteration_ratio)
@@ -1073,14 +1397,14 @@ void do_tumble_spheres(Point l_pocket_cen)
                         char protfttl[1000];
                         strcpy(protfttl, protfname);
 
-                        char** lfields = chop_spaced_fields(protfttl, '/');
+                        char** lwords = chop_spaced_words(protfttl, '/');
 
-                        for (u=0; lfields[u]; u++);
+                        for (u=0; lwords[u]; u++);
                         u--;
 
                         char fname[1000];
                         sprintf(fname, "output/tumble_%s_%d_%d_%d_%f.dock",
-                                lfields[u],
+                                lwords[u],
                                 (int)(xrad*fiftyseven),
                                 (int)(yrad*fiftyseven),
                                 (int)(zrad*fiftyseven),
@@ -1298,7 +1622,15 @@ int main(int argc, char** argv)
     // Load the protein or return an error.
     /* Protein p(protfname);
     protein = &p; */
-    protein = new Protein(protfname);
+
+    char protid[255];
+    char* slash = strrchr(protfname, '/');
+    if (!slash) slash = strrchr(protfname, '\\');
+    strcpy(protid, slash ? slash+1 : protfname );
+    char* dot = strchr(protid, '.');
+    if (dot) *dot = 0;
+
+    protein = new Protein(protid);
     pf = fopen(protfname, "r");
     if (!pf)
     {
@@ -1310,6 +1642,15 @@ int main(int argc, char** argv)
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
     #endif
+    if (hydrogenate_pdb)
+    {
+        int resno, endres = protein->get_end_resno();
+        for (resno=1; resno<=endres; resno++)
+        {
+            AminoAcid* res = protein->get_residue(resno);
+            if (res) res->hydrogenate();
+        }
+    }
 
     prepare_acv_bond_rots();
 
@@ -1323,12 +1664,19 @@ int main(int argc, char** argv)
 
     strcpy(buffer, CEN_buf.c_str());
 
-    char** fields = chop_spaced_fields(buffer);
-    pocketcen = pocketcen_from_config_fields(fields, nullptr);
+    char** words = chop_spaced_words(buffer);
+    pocketcen = pocketcen_from_config_words(words, nullptr);
     loneliest = protein->find_loneliest_point(pocketcen, size);
 
     #if pocketcen_is_loneliest
     pocketcen = loneliest;
+    #endif
+
+    #if !_use_gloms
+    for (i=0; i<3; i++)
+    {
+        alignment_aa[i] = nullptr;
+    }
     #endif
 
     if (waters)
@@ -1344,11 +1692,11 @@ int main(int argc, char** argv)
         }
     }
 
-    if (!strcmp(fields[1], "RES"))
+    if (!strcmp(words[1], "RES"))
     {
-        for (i=2; fields[i]; i++)
+        for (i=2; words[i]; i++)
         {
-            extra_wt.push_back(atoi(fields[i]));
+            extra_wt.push_back(atoi(words[i]));
         }
     }
     pktset = true;
@@ -1420,25 +1768,22 @@ int main(int argc, char** argv)
 
     // Identify the ligand atom with the greatest potential binding.
     int k, n;
-    Atom** ligbb = m.get_most_bindable(3);
-    Atom** ligbbh = new Atom*[5];
-    intera_type lig_inter_typ[5];
 
     if (use_prealign) use_bestbind_algorithm = false;
 
     if (use_prealign)
     {        
         strcpy(buffer, prealign_residues.c_str());
-        fields = chop_spaced_fields(buffer);
+        words = chop_spaced_words(buffer);
 
-        for (n=0; fields[n]; n++);      // Get length.
+        for (n=0; words[n]; n++);      // Get length.
 
         Molecule** prealign_res = new Molecule*[n+4];
         Molecule** lig_grp = new Molecule*[n+4];
 
         for (i=0; i<n; i++)
         {
-            int resno = atoi(fields[i]);
+            int resno = atoi(words[i]);
             prealign_res[i] = protein->get_residue(resno);
         }
 
@@ -1451,19 +1796,176 @@ int main(int argc, char** argv)
         Molecule::multimol_conform(lig_grp, prealign_res, prealign_iters, nullptr);
 
         // Then line up residues to ligand.
-        Molecule::multimol_conform(prealign_res, lig_grp, prealign_iters, nullptr);
+        if (flex) Molecule::multimol_conform(prealign_res, lig_grp, prealign_iters, nullptr);
         ligand->movability = MOV_ALL;
 
-        delete[] fields;
+        delete[] words;
         delete prealign_res;
         delete lig_grp;
     }
 
+    // Best-Binding Code
     if (use_bestbind_algorithm)
     {
+        #if _use_gloms
+        AtomGlom glomtmp;
+        int types[3] = { pi, ionic, hbond };
+
+        int lac = ligand->get_atom_count();
+        bool dirty[lac+4], dirttmp[lac+4];
+
+        for (n=0; n<3; n++)
+        {
+            for (i=0; i<lac; i++) dirty[i] = false;
+            for (i=0; i<lac; i++)
+            {
+                if (dirty[i]) continue;
+                for (j=i+1; j<lac; j++) dirttmp[j] = false;
+
+                Atom* a = ligand->get_atom(i);
+                Atom* b;
+                float ac = a->get_charge();
+                float apol = a->is_polar();
+                float api = a->is_pi() && (a->get_Z() > 1);
+                float rab;
+
+                glomtmp.atoms.clear();
+
+                switch (types[n])
+                {
+                    case ionic:
+                    if (ac)
+                    {
+                        glomtmp.atoms.push_back(a);
+                        dirttmp[i] = true;
+
+                        for (j=i+1; j<lac; j++)
+                        {
+                            if (dirty[j] || dirttmp[j]) continue;
+
+                            b = ligand->get_atom(j);
+                            if (b->is_pi() != api) continue;
+                            rab = glomtmp.distance_to(b->get_location());
+                            if ((sgn(b->get_charge()) == sgn(ac))
+                                &&
+                                rab < 2.6
+                               )
+                            {
+                                glomtmp.atoms.push_back(b);
+                                dirttmp[j] = true;
+                            }
+                        }
+                    }
+                    break;
+
+                    case hbond:
+                    if (apol && !ac)
+                    {
+                        glomtmp.atoms.push_back(a);
+                        dirttmp[i] = true;
+
+                        for (j=i+1; j<lac; j++)
+                        {
+                            if (dirty[j] || dirttmp[j]) continue;
+
+                            b = ligand->get_atom(j);
+                            if (b->is_pi() != api) continue;
+                            if (b->get_charge()) continue;
+                            rab = glomtmp.distance_to(b->get_location());
+                            if (b->is_polar()
+                                &&
+                                (
+                                    rab < 2.6
+                                    ||
+                                    (
+                                        rab < 3.7
+                                        &&
+                                        !b->is_pi()
+                                    )
+                                )
+                               )
+                            {
+                                glomtmp.atoms.push_back(b);
+                                dirttmp[j] = true;
+                            }
+                        }
+                    }
+                    break;
+
+                    case pi:
+                    if (api)
+                    {
+                        glomtmp.atoms.push_back(a);
+                        dirttmp[i] = true;
+
+                        for (j=i+1; j<lac; j++)
+                        {
+                            if (dirty[j] || dirttmp[j]) continue;
+
+                            b = ligand->get_atom(j);
+                            if (b->get_Z() == 1) continue;
+                            rab = glomtmp.distance_to(b->get_location());
+                            if (b->is_pi()
+                                &&
+                                b->is_conjugated_to(a)
+                               )
+                            {
+                                glomtmp.atoms.push_back(b);
+                                dirttmp[j] = true;
+                            }
+                        }
+                    }
+                    break;
+
+                    default:
+                    ;
+                }
+
+                bool taken = false;
+                for (j=0; j<3; j++) if (glomtmp.atoms == ligand_gloms[j].atoms) taken = true;
+                if (taken) continue;
+
+                bool too_similar = false;
+                for (j=0; j<n; j++)
+                {
+                    if (!ligand_gloms[j].atoms.size()) continue;
+                    // if (glomtmp.get_pi() >= 3.0*ligand_gloms[j].get_pi()) continue;
+                    float r = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
+                    if (r < 2) too_similar = true;
+                }
+                if (too_similar) continue;
+
+                float tsum = glomtmp.get_sum();
+                if (fabs(tsum) > fabs(ligand_gloms[0].get_sum()))
+                {
+                    ligand_gloms[2] = ligand_gloms[1];
+                    ligand_gloms[1] = ligand_gloms[0];
+                    ligand_gloms[0] = glomtmp;
+                    dirty[i] = true;
+                    for (j=0; j<lac; j++) if (dirttmp[j]) dirty[j] = true;
+                }
+                else if (fabs(tsum) > fabs(ligand_gloms[1].get_sum()))
+                {
+                    ligand_gloms[2] = ligand_gloms[1];
+                    ligand_gloms[1] = glomtmp;
+                    dirty[i] = true;
+                    for (j=0; j<lac; j++) if (dirttmp[j]) dirty[j] = true;
+                }
+                else if (fabs(tsum) > fabs(ligand_gloms[2].get_sum()))
+                {
+                    ligand_gloms[2] = glomtmp;
+                    dirty[i] = true;
+                    for (j=0; j<lac; j++) if (dirttmp[j]) dirty[j] = true;
+                }
+            }            
+        }
+        #else
+        ligbb = m.get_most_bindable(3);
+        ligbbh = new Atom*[5];
+
         for (i=0; i<5; i++)
         {
-            ligbbh[i] = NULL;
+            ligbbh[i] = nullptr;
             lig_inter_typ[i] = vdW;
         }
 
@@ -1497,6 +1999,7 @@ int main(int argc, char** argv)
             else if (ligbb[i]->is_pi())
                 lig_inter_typ[i] = pi;
         }
+        #endif
     }
 
     #if _DBG_STEPBYSTEP
@@ -1555,6 +2058,30 @@ int main(int argc, char** argv)
 
     if (use_bestbind_algorithm) for (i=0; i<3; i++)
         {
+            #if _use_gloms
+            cout << "Ligand's ";
+            if (i == 0) cout << "primary";
+            else if (i == 1) cout << "secondary";
+            else if (i == 2) cout << "tertiary";
+            else cout << "accessory";
+            int lgsz = ligand_gloms[i].atoms.size();
+            cout << " atom group has " << lgsz << " atoms." << endl;
+
+            if (lgsz)
+            {
+                for (j = 0; j < lgsz; j++)
+                {
+                    cout << ligand_gloms[i].atoms[j]->name << " ";
+                }
+                cout << endl;
+            }
+
+            cout << "Ionic: " << ligand_gloms[i].get_ionic()
+                 << " H-bond: " << ligand_gloms[i].get_polarity()
+                 << " pi-stack: " << ligand_gloms[i].get_pi()
+                ;
+            cout << endl << endl;
+            #else
             if (ligbb[i])
             {
                 cout << "# Best binding heavy atom " << i << " of ligand" << endl << "# LBBA: " << ligbb[i]->name
@@ -1568,6 +2095,7 @@ int main(int argc, char** argv)
                 if (output) *output << "# Best binding hydrogen " << i << " of ligand" << endl << "LBBH: " << ligbbh[i]->name << endl;
             }
             cout << endl;
+            #endif
         }
 
     DockResult dr[poses*(triesleft+1)+8][pathnodes+2];
@@ -1589,6 +2117,7 @@ _try_again:
     srand(time(NULL));
     for (pose = 1; pose <= poses; pose++)
     {
+        last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
         ligand->crumple(fiftyseventh*44);
@@ -1601,6 +2130,15 @@ _try_again:
             pf = fopen(protfname, "r");
             protein->load_pdb(pf);
             fclose(pf);
+            if (hydrogenate_pdb)
+            {
+                int resno, endres = protein->get_end_resno();
+                for (resno=1; resno<=endres; resno++)
+                {
+                    AminoAcid* res = protein->get_residue(resno);
+                    if (res) res->hydrogenate();
+                }
+            }
 
             prepare_acv_bond_rots();
         }
@@ -1701,6 +2239,15 @@ _try_again:
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
                 fclose(pf);
+                if (hydrogenate_pdb)
+                {
+                    int resno, endres = protein->get_end_resno();
+                    for (resno=1; resno<=endres; resno++)
+                    {
+                        AminoAcid* res = protein->get_residue(resno);
+                        if (res) res->hydrogenate();
+                    }
+                }
                 prepare_initb();
 
                 for (i=1; i<=seql; i++)
@@ -1736,8 +2283,14 @@ _try_again:
             #endif
             #endif
 
-            if (nodeno == active_matrix_node)
+            if (nodeno == active_matrix_node
+                ||
+                (nodeno == deactivate_node && active_matrix_node >= 0 && deactivate_node > active_matrix_node)
+               )
             {
+                float acvdirection = (nodeno == active_matrix_node) ? 1 : -1;
+                int wroteoff = (nodeno == deactivate_node) ? 100 : 0;
+
                 #if internode_momentum_only_on_activation 
                 conformer_momenta_multiplier = nodeno ? internode_momentum_mult : 1;
                 #endif
@@ -1798,10 +2351,17 @@ _try_again:
                         // Get the CA location of the C-terminus of the helix;
                         // Add the active_matrix_c to the result;
                         Point calign;
-                        calign = protein->get_atom_location(er, "CA").add(active_matrix_c[i]);
+                        calign = (acvdirection > 0)
+                            ? protein->get_atom_location(er, "CA").add(active_matrix_c[i])
+                            : protein->get_atom_location(er, "CA").subtract(active_matrix_c[i])
+                            ;
 
                         // Move the entire helix by the values of active_matrix_n.
-                        protein->move_piece(sr, er, active_matrix_n[i].add(protein->get_region_center(sr, er)));
+                        protein->move_piece(sr, er,
+                            (acvdirection > 0)
+                            ? active_matrix_n[i].add(protein->get_region_center(sr, er))
+                            : active_matrix_n[i].subtract(protein->get_region_center(sr, er))
+                            );
 
                         // Call protein->rotate_piece() to align the C-terminus residue with the result, using the N-terminus residue as the pivot res.
                         lrot = protein->rotate_piece(sr, er, er, calign, sr);
@@ -1809,12 +2369,24 @@ _try_again:
                     }
                     else if (active_matrix_type == 9)
                     {
-                        protein->move_piece(sr, er, protein->get_region_center(sr, er).add(active_matrix_m[i]));
+                        protein->move_piece(sr, er,
+                            (acvdirection > 0)
+                            ? protein->get_region_center(sr, er).add(active_matrix_m[i])
+                            : protein->get_region_center(sr, er).subtract(active_matrix_m[i])
+                            );
                         int half = (sr + er) / 2;
 
                         Point calign, nalign;
-                        calign = protein->get_atom_location(er, "CA").add(active_matrix_c[i]);
-                        nalign = protein->get_atom_location(sr, "CA").add(active_matrix_n[i]);
+                        if (acvdirection > 0)
+                        {
+                            calign = protein->get_atom_location(er, "CA").add(active_matrix_c[i]);
+                            nalign = protein->get_atom_location(sr, "CA").add(active_matrix_n[i]);
+                        }
+                        else
+                        {
+                            calign = protein->get_atom_location(er, "CA").subtract(active_matrix_c[i]);
+                            nalign = protein->get_atom_location(sr, "CA").subtract(active_matrix_n[i]);
+                        }
 
                         nlrot = protein->rotate_piece(sr, half, sr, nalign, half);
                         clrot = protein->rotate_piece(half, er, er, calign, half);
@@ -1822,17 +2394,17 @@ _try_again:
                         clrot.v.r = 1;
                     }
 
-                    if (wrote_acvmx < i)
+                    if (wrote_acvmx < (i+wroteoff))
                     {
                         #if write_activation_matrix
                         // Output the activation for the viewer to recognize.
-                        cout << "ACM " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
-                            << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
-                            << active_matrix_c[i].x << " " << active_matrix_c[i].y << " " << active_matrix_c[i].z
+                        cout << "ACM " << nodeno << " " << regname << " " << sr << " " << er << " "
+                            << active_matrix_n[i].x*acvdirection << " " << active_matrix_n[i].y*acvdirection << " " << active_matrix_n[i].z*acvdirection << " "
+                            << active_matrix_c[i].x*acvdirection << " " << active_matrix_c[i].y*acvdirection << " " << active_matrix_c[i].z*acvdirection
                             << endl;
-                        if (output) *output << "ACM " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
-                            << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
-                            << active_matrix_c[i].x << " " << active_matrix_c[i].y << " " << active_matrix_c[i].z
+                        if (output) *output << "ACM " << nodeno << " " << regname << " " << sr << " " << er << " "
+                            << active_matrix_n[i].x*acvdirection << " " << active_matrix_n[i].y*acvdirection << " " << active_matrix_n[i].z*acvdirection << " "
+                            << active_matrix_c[i].x*acvdirection << " " << active_matrix_c[i].y*acvdirection << " " << active_matrix_c[i].z*acvdirection
                             << endl;
                         #endif
 
@@ -1842,46 +2414,46 @@ _try_again:
                             int half = (sr + er) / 2;
 
                             Point nlrv(nlrot.v);
-                            cout << "ACR " << active_matrix_node << " " << regname << "n " << sr << " " << half << " "
+                            cout << "ACR " << nodeno << " " << regname << "n " << sr << " " << half << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << nlrot.origin.x << " " << nlrot.origin.y << " " << nlrot.origin.z << " "
                                 << nlrv.x << " " << nlrv.y << " " << nlrv.z << " "
-                                << nlrot.a << endl;
-                            if (output) *output << "ACR " << active_matrix_node << " " << regname << "n " << sr << " " << half << " "
+                                << nlrot.a*acvdirection << endl;
+                            if (output) *output << "ACR " << nodeno << " " << regname << "n " << sr << " " << half << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << nlrot.origin.x << " " << nlrot.origin.y << " " << nlrot.origin.z << " "
                                 << nlrv.x << " " << nlrv.y << " " << nlrv.z << " "
-                                << nlrot.a << endl;
+                                << nlrot.a*acvdirection << endl;
 
                             Point clrv(clrot.v);
-                            cout << "ACR " << active_matrix_node << " " << regname << "c " << half << " " << er << " "
+                            cout << "ACR " << nodeno << " " << regname << "c " << half << " " << er << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << clrot.origin.x << " " << clrot.origin.y << " " << clrot.origin.z << " "
                                 << clrv.x << " " << clrv.y << " " << clrv.z << " "
-                                << clrot.a << endl;
-                            if (output) *output << "ACR " << active_matrix_node << " " << regname << "c " << half << " " << er << " "
+                                << clrot.a*acvdirection << endl;
+                            if (output) *output << "ACR " << nodeno << " " << regname << "c " << half << " " << er << " "
                                 << active_matrix_m[i].x << " " << active_matrix_m[i].y << " " << active_matrix_m[i].z << " "
                                 << clrot.origin.x << " " << clrot.origin.y << " " << clrot.origin.z << " "
                                 << clrv.x << " " << clrv.y << " " << clrv.z << " "
-                                << clrot.a << endl;
+                                << clrot.a*acvdirection << endl;
                         }
                         else
                         {
                             Point lrv(lrot.v);
-                            cout << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                            cout << "ACR " << nodeno << " " << regname << " " << sr << " " << er << " "
                                 << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
                                 << lrot.origin.x << " " << lrot.origin.y << " " << lrot.origin.z << " "
                                 << lrv.x << " " << lrv.y << " " << lrv.z << " "
-                                << lrot.a << endl;
-                            if (output) *output << "ACR " << active_matrix_node << " " << regname << " " << sr << " " << er << " "
+                                << lrot.a*acvdirection << endl;
+                            if (output) *output << "ACR " << nodeno << " " << regname << " " << sr << " " << er << " "
                                 << active_matrix_n[i].x << " " << active_matrix_n[i].y << " " << active_matrix_n[i].z << " "
                                 << lrot.origin.x << " " << lrot.origin.y << " " << lrot.origin.z << " "
                                 << lrv.x << " " << lrv.y << " " << lrv.z << " "
-                                << lrot.a << endl;
+                                << lrot.a*acvdirection << endl;
                         }
                         #endif
 
-                        wrote_acvmx = i;
+                        wrote_acvmx = i+wroteoff;
                     }
                 }
 
@@ -1893,27 +2465,34 @@ _try_again:
                         int er = active_helix_rots[j].end_resno;
                         int mr = active_helix_rots[j].origin_resno;
                         protein->move_piece(sr, er,
-                                protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
+                                (acvdirection > 0)
+                                ? protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
+                                : protein->get_region_center(sr, er).subtract(active_helix_rots[j].transform)
                             );
-                        protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"), active_helix_rots[j].axis, active_helix_rots[j].theta);
+                        protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
+                            active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
 
-                        if (wrote_acvmr < j)
+                        if (wrote_acvmr < (j+wroteoff) )
                         {
                             Point ptaxis = active_helix_rots[j].axis;
                             Point ptorigin = protein->get_atom_location(mr, "CA");
                             // Write an active matrix to the dock.
-                            cout << "ACR " << active_matrix_node << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
-                                << active_helix_rots[j].transform.x << " " << active_helix_rots[j].transform.y << " " << active_helix_rots[j].transform.z << " "
+                            cout << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x*acvdirection << " "
+                                << active_helix_rots[j].transform.y*acvdirection << " "
+                                << active_helix_rots[j].transform.z*acvdirection << " "
                                 << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
                                 << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
-                                << active_helix_rots[j].theta << endl;
-                            if (output) *output << "ACR " << active_matrix_node << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
-                                << active_helix_rots[j].transform.x << " " << active_helix_rots[j].transform.y << " " << active_helix_rots[j].transform.z << " "
+                                << active_helix_rots[j].theta*acvdirection << endl;
+                            if (output) *output << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x*acvdirection << " "
+                                << active_helix_rots[j].transform.y*acvdirection << " "
+                                << active_helix_rots[j].transform.z*acvdirection << " "
                                 << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
                                 << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
-                                << active_helix_rots[j].theta << endl;
+                                << active_helix_rots[j].theta*acvdirection << endl;
 
-                            wrote_acvmr = j;
+                            wrote_acvmr = j+wroteoff;
                         }
                     }
                 }
@@ -1926,7 +2505,7 @@ _try_again:
                     {
                         if (active_bond_rots[j].bond)
                         {
-                            active_bond_rots[j].bond->rotate(active_bond_rots[j].theta - active_bond_rots[j].bond->total_rotations);
+                            active_bond_rots[j].bond->rotate(active_bond_rots[j].theta*acvdirection - active_bond_rots[j].bond->total_rotations);
                         }
                     }
                 }
@@ -1947,7 +2526,7 @@ _try_again:
                 #endif
 
                 #if save_active_protein
-                if (pose == 1)
+                if (pose == 1 && acvdirection>0)
                 {
                     FILE* f = fopen("tmp/active.pdb", "wb");
                     if (f)
@@ -1963,6 +2542,7 @@ _try_again:
                 // Perhaps also multimol it for 10 or so iterations with all flexions (ligand and residue) globally disabled.
             }
 
+            
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
             #endif
@@ -1971,11 +2551,11 @@ _try_again:
                 for (i=0; i<states.size(); i++)
                 {
                     strcpy(buffer, states[i].c_str());
-                    fields = chop_spaced_fields(buffer);
-                    if (atoi(fields[1]) == nodeno)
+                    words = chop_spaced_words(buffer);
+                    if (atoi(words[1]) == nodeno)
                     {
-                        int sr = atoi(fields[2]), er = atoi(fields[3]);
-                        float theta = atof(fields[4]) * fiftyseventh;
+                        int sr = atoi(words[2]), er = atoi(words[3]);
+                        float theta = atof(words[4]) * fiftyseventh;
 
                         Point sloc = protein->get_atom_location(sr, "CA"),
                               eloc = protein->get_atom_location(er, "CA");
@@ -2007,14 +2587,14 @@ _try_again:
                     cout << "Error in config file: path node " << nodeno << " is missing." << endl;
                     return 0xbadc09f;
                 }
-                fields = chop_spaced_fields(buffer);
-                nodecen = pocketcen_from_config_fields(&fields[1], &nodecen);
-                if (!strcmp(fields[2], "RES"))
+                words = chop_spaced_words(buffer);
+                nodecen = pocketcen_from_config_words(&words[1], &nodecen);
+                if (!strcmp(words[2], "RES"))
                 {
                     extra_wt.clear();
-                    for (i=2; fields[i]; i++)
+                    for (i=2; words[i]; i++)
                     {
-                        extra_wt.push_back(atoi(fields[i]));
+                        extra_wt.push_back(atoi(words[i]));
                     }
                 }
 
@@ -2090,11 +2670,12 @@ _try_again:
 
             if (!nodeno)
             {
-                Molecule* alignment_aa[5];
                 float alignment_distance[5];
                 for (l=0; l<3; l++)
                 {
+                    #if !_use_gloms
                     alignment_aa[l]=0;
+                    #endif
                     alignment_distance[l]=0;
                 }
 
@@ -2110,8 +2691,85 @@ _try_again:
                 // Best-Binding Algorithm
                 // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
-                if (use_bestbind_algorithm) for (l=0; l<3; l++)
+                if (use_bestbind_algorithm)
+                {
+                    for (l=0; l<3; l++)
                     {
+                        sc_gloms[l].aminos.clear();
+                        #if _use_gloms
+                        // Find the strongest loneliest suitable side chain glom for ligand_gloms[l] and set sc_gloms[l] to equal it.
+                        ResidueGlom glomtmp;
+                        for (i=0; reaches_spheroid[nodeno][i]; i++)
+                        {
+                            glomtmp.aminos.clear();
+                            // Debug trap.
+                            if (l == 2 && reaches_spheroid[nodeno][i]->get_letter() == 'A')
+                            {
+                                l++;
+                                l--;
+                            }
+                            if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
+                            {
+                                // Debug trap.
+                                if (reaches_spheroid[nodeno][i]->is_residue() == 169)
+                                {
+                                    l++;
+                                    l--;
+                                }
+                                glomtmp.aminos.push_back(reaches_spheroid[nodeno][i]);
+                                for (j=i+1; reaches_spheroid[nodeno][j]; j++)
+                                {
+                                    if (!ligand_gloms[l].compatibility(reaches_spheroid[nodeno][j])) continue;
+                                    Atom* cb = reaches_spheroid[nodeno][j]->get_atom("CB");
+                                    if (!cb) continue;
+                                    if (frand(0,1) < bb_stochastic) continue;                       // stochastic component.
+                                    float r = glomtmp.distance_to(cb->get_location());
+                                    if (reaches_spheroid[nodeno][j]->hydrophilicity() >= 0.333)
+                                        r -= (reaches_spheroid[nodeno][j]->get_reach() + 2.5);
+                                    else
+                                        r -= 3.5;
+                                    if (r < ligand_gloms[l].bounds())
+                                    {
+                                        glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);
+                                    }
+                                }
+                            }
+
+                            bool too_similar = false;
+                            for (j=0; j<l; j++)
+                            {
+                                if (sc_gloms[j].aminos == glomtmp.aminos) too_similar = true;
+                                if (sc_gloms[j].aminos.size() == 1
+                                    &&
+                                    std::find(glomtmp.aminos.begin(), glomtmp.aminos.end(), sc_gloms[j].aminos[0]) != glomtmp.aminos.end()
+                                   )
+                                    too_similar = true;
+                                if (glomtmp.aminos.size() == 1
+                                    &&
+                                    std::find(sc_gloms[j].aminos.begin(), sc_gloms[j].aminos.end(), glomtmp.aminos[0]) != sc_gloms[j].aminos.end()
+                                   )
+                                    too_similar = true;
+                                // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) too_similar = true;
+                                float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
+                                float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
+                                if (rsg < 0.9 * rlg) too_similar = true;
+                            }
+
+                            if (!too_similar)
+                            {
+                                float r = glomtmp.distance_to(loneliest);
+                                float rr = sc_gloms[l].distance_to(loneliest);
+                                float rg = ligand_gloms[l].distance_to(ligand->get_barycenter());
+
+                                r -= rg; if (r < 1) r = 1;
+                                rr -= rg; if (rr < 1) rr = 1;
+
+                                float tcptbl = glomtmp.compatibility(&ligand_gloms[l]) / (r*r);
+                                if (!i || tcptbl > (sc_gloms[l].compatibility(&ligand_gloms[l]) / (rr*rr)) ) sc_gloms[l] = glomtmp;
+                            }
+                        }
+
+                        #else
                         retain_bindings[l].cardinality = 0;
                         if (!ligbb[l]) continue;
                         retain_bindings[l].atom = ligbb[l];
@@ -2234,18 +2892,23 @@ _try_again:
                             if (debug) *debug << "Candidate alignment AA." << endl;
                             #endif
                         }
+                        #endif
                         _found_alignaa:
                         ;
                     }
+                }
+                
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Selected an alignment AA." << endl;
                 #endif
 
                 if (use_bestbind_algorithm && met)
                 {
+                    #if !_use_gloms
                     alignment_aa[2] = alignment_aa[1];
                     alignment_aa[1] = alignment_aa[0];
                     alignment_aa[0] = met;
+                    #endif
                     // alignment_name = "metal";
                 }
                 #if _DBG_STEPBYSTEP
@@ -2255,8 +2918,120 @@ _try_again:
                 if (use_bestbind_algorithm)
                 {
                     ligand->recenter(loneliest);
-                    for (l=0; l<3; l++)
+                    for (l=0; l<_bb_maxglom; l++)
                     {
+                        #if _use_gloms
+                        Point xform;
+                        Point zcen;
+                        Point axis;
+                        LocatedVector lv;
+                        Rotation rot;
+                        float theta;
+
+                        Atom* alca;
+                        Atom** alcaa;
+                        if (flex && sc_gloms[l].aminos.size())
+                        {
+                            for (i=0; i<sc_gloms[l].aminos.size(); i++)
+                            {
+                                if (sc_gloms[l].aminos[i]->movability >= MOV_FLEXONLY)
+                                {
+                                    Bond** rbb = sc_gloms[l].aminos[i]->get_rotatable_bonds();
+                                    if (rbb)
+                                    {
+                                        alcaa = sc_gloms[l].aminos[i]->get_most_bindable(1);
+                                        if (!alcaa) continue;
+                                        alca = alcaa[0];
+                                        delete alcaa;
+
+                                        float br = alca->get_location().get_3d_distance(loneliest);
+                                        float brad = 0;
+                                        for(j=0; rbb[j]; j++)
+                                        {
+                                            float rad;
+                                            for (rad=0; rad<M_PI*2; rad += square)
+                                            {
+                                                rbb[j]->rotate(square);
+                                                float lr = alca->get_location().get_3d_distance(loneliest);
+                                                if (lr < br)
+                                                {
+                                                    brad = rad;
+                                                    br = lr;
+                                                }
+                                            }
+                                            if (brad) rbb[j]->rotate(brad);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        switch (l)
+                        {
+                            case 0:
+                            // Move ligand to center ligand_gloms[0] at the center of sc_gloms[0].
+                            // If there is only one residue in the sc glom, then move the ligand
+                            // 2A towards loneliest.
+                            n = sc_gloms[l].aminos.size();
+                            if (!n) goto _deadglob;
+                            cout << "Moving primary atom group to vicinity of";
+                            for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            cout << "." << endl;
+
+                            xform = sc_gloms[l].get_center().subtract(ligand_gloms[l].get_center());
+                            if (n < 2)
+                            {
+                                Point ptmp = loneliest.subtract(xform);
+                                ptmp.scale(2);
+                                xform = xform.add(ptmp);
+                            }
+
+                            ligand->movability = MOV_ALL;
+                            ligand->move(xform);
+                            // ligand->get_atom("N9")->get_location().get_3d_distance(sc_gloms[l].get_center())
+                            break;
+
+                            case 1:
+                            // Rotate ligand about ligand_gloms[0] center to get ligand_gloms[1] center
+                            // as close as possible to sc_gloms[1] center.
+                            n = sc_gloms[l].aminos.size();
+                            if (!n) goto _deadglob;
+                            cout << "Aligning secondary atom group towards";
+                            for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            cout << "." << endl;
+
+                            zcen = ligand_gloms[0].get_center();
+                            rot = align_points_3d(ligand_gloms[l].get_center(), sc_gloms[l].get_center(), zcen);
+                            lv = rot.v;
+                            lv.origin = zcen;
+                            ligand->rotate(lv, rot.a);
+                            break;
+
+                            case 2:
+                            // "Rotisserie" rotate ligand about the imaginary line between
+                            // ligand_gloms[0] center and ligand_gloms[1] center, to bring
+                            // ligand_gloms[2] center as close as possible to sc_gloms[2] center.
+                            n = sc_gloms[l].aminos.size();
+                            if (!n) goto _deadglob;
+                            cout << "\"Rotisserie\"-aligning tertiary atom group towards";
+                            for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            cout << "." << endl;
+
+                            zcen = ligand_gloms[0].get_center();
+                            axis = ligand_gloms[1].get_center().subtract(zcen);
+                            lv = (SCoord)axis;
+                            lv.origin = zcen;
+                            theta = find_angle_along_vector(ligand_gloms[l].get_center(), sc_gloms[l].get_center(), zcen, axis);
+                            ligand->rotate(lv, theta);
+                            break;
+
+                            default:
+                            ;
+                        }
+
+                        _deadglob:
+                        ;
+                        #else
                         if (alignment_aa[l])
                         {
                             cout << "# Aligning " << ligbb[l]->name << " to " << alignment_aa[l]->get_name() << "..." << endl;
@@ -2269,8 +3044,9 @@ _try_again:
                                     alca = alignment_aa[l]->get_nearest_atom(ligbb[l]->get_location());
                                 else
                                 {
-                                    // alca = alignment_aa->get_atom("CA");
-                                    alca = alignment_aa[l]->get_most_bindable(1)[0];
+                                    Atom** mbb = alignment_aa[l]->get_most_bindable(1);
+                                    alca = mbb[0];
+                                    delete mbb;             // Delete the pointer array, but not the pointers.
                                 }
                             }
                             #if _DBG_STEPBYSTEP
@@ -2279,6 +3055,35 @@ _try_again:
 
                             if (alca)
                             {
+                                #if _preflex_alignment_res
+                                // If alignment aa is not pinned, and flexion is enabled,
+                                // flex alignment aa so that alca is nearest to loneliest.
+                                if (flex && alignment_aa[l]->movability >= MOV_FLEXONLY)
+                                {
+                                    Bond** rbb = alignment_aa[l]->get_rotatable_bonds();
+                                    if (rbb)
+                                    {
+                                        float br = alca->get_location().get_3d_distance(loneliest);
+                                        float brad = 0;
+                                        for(j=0; rbb[j]; j++)
+                                        {
+                                            float rad;
+                                            for (rad=0; rad<M_PI*2; rad += square)
+                                            {
+                                                rbb[j]->rotate(square);
+                                                float lr = alca->get_location().get_3d_distance(loneliest);
+                                                if (lr < br)
+                                                {
+                                                    brad = rad;
+                                                    br = lr;
+                                                }
+                                            }
+                                            if (brad) rbb[j]->rotate(brad);
+                                        }
+                                    }
+                                }
+                                #endif
+
                                 Point pt, al, cen;
                                 al	= alca->get_location();
 
@@ -2311,7 +3116,9 @@ _try_again:
                                     rot = align_points_3d(&pt, &al, &cen);
                                     m.rotate(&rot.v, rot.a);
                                     ligand->recenter(cen);
-                                    // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
+                                    #if _dbg_bb_rots
+                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
+                                    #endif
 
                                     if (false && !l)
                                     {
@@ -2328,11 +3135,13 @@ _try_again:
                                 case 1:
                                     // Pivot about bb0.
                                     origin = ligbb[0]->get_location();
-                                    lv = (SCoord)origin.subtract(ligand->get_barycenter());
+                                    lv = compute_normal(pt, al, origin);
                                     lv.origin = origin;
-                                    rot.a = -find_angle_along_vector(pt, al, origin, (SCoord)lv);
+                                    rot.a = find_angle_along_vector(pt, al, origin, (SCoord)lv);
                                     m.rotate(lv, rot.a);
-                                    // cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
+                                    #if _dbg_bb_rots
+                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
+                                    #endif
                                     break;
 
                                 case 2:
@@ -2345,7 +3154,7 @@ _try_again:
                                         lv.origin = origin;
                                         m.rotate(lv, rstep);
 
-                                        float r2 = alca->get_location().get_3d_distance(pt);
+                                        float r2 = alca->get_location().get_3d_distance(ligbb[l]->get_location());
                                         if (r2 < bestr)
                                         {
                                             bestr = r2;
@@ -2357,8 +3166,10 @@ _try_again:
                                     lv.origin = origin;
                                     m.rotate(lv, besttheta);
                                     ligand->recenter(cen);
-                                    /*cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
-                                         << "-" << ligbb[1]->name << " axis." << endl;*/
+                                    #if _dbg_bb_rots
+                                    cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
+                                         << "-" << ligbb[1]->name << " axis." << endl;
+                                    #endif
                                     break;
 
                                 default:
@@ -2368,8 +3179,8 @@ _try_again:
                                 #if preemptively_minimize_intermol_clashes
                                 Molecule* mtmp[3];
                                 mtmp[0] = &m;
-                                mtmp[1] = alignment_aa[l];
-                                mtmp[2] = NULL;
+                                mtmp[1] = flex ? alignment_aa[l] : nullptr;
+                                mtmp[2] = nullptr;
                                 m.movability = MOV_FLEXONLY;
                                 alignment_aa[l]->movability = MOV_FLEXONLY;
                                 Molecule::multimol_conform(mtmp);
@@ -2383,8 +3194,24 @@ _try_again:
 
                             }
                         }
+                        #endif
                     }
 
+                    #if enforce_no_bb_pullaway && _use_gloms
+                    last_ttl_bb_dist = 0;
+                    for (l=0; l<_bb_maxglom; l++)
+                    {
+                        if (ligand_gloms[l].atoms.size() && sc_gloms[l].aminos.size())
+                        {
+                            float r = ligand_gloms[l].distance_to(sc_gloms[l].get_center());
+                            if (r < 2.5) r = 2.5;
+                            last_ttl_bb_dist += r;
+                        }
+                    }
+                    pullaway_undo.copy_state(ligand);
+                    #endif
+
+                    #if !_use_gloms
                     Molecule* mtmp[4], *mbkg[2];
                     mbkg[0] = ligand;
                     mbkg[1] = nullptr;
@@ -2393,8 +3220,9 @@ _try_again:
                     mtmp[2] = alignment_aa[2];
                     mtmp[3] = nullptr;
                     m.movability = MOV_FLEXONLY;
-                    Molecule::multimol_conform(mtmp);
+                    if (flex) Molecule::multimol_conform(mtmp);
                     m.movability = MOV_ALL;
+                    #endif
 
                     cout << endl;
                 }
@@ -2429,10 +3257,14 @@ _try_again:
                     cfmols[i++] = waters[j];
                 }
             }
-            for (j=0; j<sphres; j++)
+
+            if (flex)
             {
-                if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
-                cfmols[i++] = reaches_spheroid[nodeno][j];
+                for (j=0; j<sphres; j++)
+                {
+                    if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
+                    cfmols[i++] = reaches_spheroid[nodeno][j];
+                }
             }
             for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 
@@ -2440,7 +3272,9 @@ _try_again:
 
             Molecule** delete_me;
             int trsz = tripswitch_clashables.size();
-            Molecule* trip[trsz+4];
+            Molecule* trip[j = trsz+4];
+
+            for (; j; j--) trip[j-1] = nullptr;
 
             for (j=0; j<trsz; j++)
                 trip[j] = (Molecule*)protein->get_residue(tripswitch_clashables[j]);
@@ -2834,6 +3668,8 @@ _try_again:
                 break;
             }
         }	// nodeno loop.
+
+        if (output_each_iter) break;
     } // pose loop.
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Finished poses." << endl;
@@ -2989,8 +3825,11 @@ _try_again:
                         if (output) *output << "Proximity: " << dr[j][k].proximity << endl << endl;
                         cout << "Proximity: " << dr[j][k].proximity << endl << endl;
 
-                        if (output) *output << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
-                        cout << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
+                        if (tripswitch_clashables.size())
+                        {
+                            if (output) *output << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
+                            cout << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
+                        }
 
                         if (differential_dock)
                         {
@@ -3035,8 +3874,8 @@ _try_again:
                         cout << endl;
                         if (output) *output << endl;
 
-                        if (flex)
-                        {
+                        /*if (flex)
+                        {*/
                             if (!dr[j][k].pdbdat.length())
                             {
                                 cout << "WARNING: Failed to generate PDB data." << endl;
@@ -3053,7 +3892,7 @@ _try_again:
                                 if (!output || echo_pdb_data) cout << "TER" << endl << "END" << endl << endl << endl;
                                 if (output) *output << "TER" << endl << "END" << endl << endl << endl;
                             }
-                        }
+                        // }
 
                         if (!k) found_poses++;
                     }
@@ -3101,8 +3940,21 @@ _exitposes:
     if (output) *output << "\nCalculation took: " << (finished-began) << " seconds." << endl;
     if (debug) *debug << "\nCalculation took: " << (finished-began) << " seconds." << endl;
 
-    if (debug) debug->close();
     if (output) output->close();
+    if (append_pdb)
+    {
+        if (output)
+        {
+            FILE* pf = fopen(outfname, "ab");
+            fprintf(pf, "\nOriginal PDB:\n");
+            protein->save_pdb(pf);
+            fclose(pf);
+            cout << (hydrogenate_pdb ? "Hydrogenated " : "Original ") << "PDB appended to output file." << endl;
+        }
+        else cout << "ERROR: Append PDB can only be used when specifying an output file." << endl;
+    }
+
+    if (debug) debug->close();
 
     return 0;
 }

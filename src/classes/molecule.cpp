@@ -555,6 +555,79 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
     return atoms[j];
 }
 
+float Molecule::bindability_by_type(intera_type t, bool ib)
+{
+    if (!atoms) return 0;
+
+    float result = 0;
+    int i, heavy = 0;
+    float c;
+    for (i=0; atoms[i]; i++)
+    {
+        if (!ib && atoms[i]->is_backbone) continue;
+        if (atoms[i]->get_Z() > 1) heavy++;
+        switch (t)
+        {
+            case covalent:
+            // TODO
+            ;
+            break;
+
+            case ionic:
+            c = atoms[i]->get_charge();
+            if (c) result += c;
+            else
+            {
+                if (atoms[i]->get_family() == PNICTOGEN && !atoms[i]->is_amide())
+                {
+                    result += 0.5;
+                }
+            }
+            break;
+
+            case hbond:
+            result += fabs(atoms[i]->is_polar());
+            break;
+
+            case pi:
+            result += fabs(atoms[i]->is_pi());
+            break;
+
+            case polarpi:
+            result += fabs(atoms[i]->is_polar()) + fabs(atoms[i]->is_pi());
+            break;
+
+            case mcoord:
+            if (atoms[i]->is_metal())
+            {
+                result += atoms[i]->get_charge();
+            }
+            else
+            {
+                int fam = atoms[i]->get_family();
+                int Z = atoms[i]->get_Z();
+
+                if (fam == PNICTOGEN && Z <= 15)
+                    result -= (atoms[i]->is_pi() ? 0.5 : 1);
+
+                if (fam == CHALCOGEN && Z <= 35)
+                    result -= (atoms[i]->is_pi() ? 0.25 : 1);
+            }
+
+            break;
+
+            case vdW:
+            default:
+            result += 1;
+            break;
+        }
+    }
+
+    if (heavy) result /= heavy;
+
+    return result;
+}
+
 int Molecule::from_sdf(char const* sdf_dat)
 {
     if (!sdf_dat) return 0;
@@ -578,42 +651,42 @@ int Molecule::from_sdf(char const* sdf_dat)
 
     int na, nb;
     int added=0;
-    char** fields;
+    char** words;
 
     for (j=3; j<lncount; j++)
     {
         char line[1024];
         strncpy(line, lines[j], 1023);
-        fields = chop_spaced_fields(line);
+        words = chop_spaced_words(line);
 
-        if (!fields || !fields[0] || !fields[1]) break;
-        if (!strcmp(fields[1], "END")) break;
+        if (!words || !words[0] || !words[1]) break;
+        if (!strcmp(words[1], "END")) break;
 
-        if (!strcmp(fields[1], "CHG"))
+        if (!strcmp(words[1], "CHG"))
         {
-            for (i=3; fields[i] && fields[i+1]; i+=2)
+            for (i=3; words[i] && words[i+1]; i+=2)
             {
-                int aidx = atoi(fields[i]);
-                atoms[aidx-1]->increment_charge(atof(fields[i+1]));
+                int aidx = atoi(words[i]);
+                atoms[aidx-1]->increment_charge(atof(words[i+1]));
             }
         }
 
         if (j == 3)
         {
-            na = atoi(fields[0]);
-            nb = atoi(fields[1]);
+            na = atoi(words[0]);
+            nb = atoi(words[1]);
 
             atoms = new Atom*[na+4];
             // cout << "Allocated " << na << " atoms." << endl;
         }
         else if (added < na)
         {
-            Point* loc = new Point(atof(fields[0]), atof(fields[1]), atof(fields[2]));
-            if (fields[3][0] >= 'a' && fields[3][0] <= 'z') fields[3][0] -= 0x20;
-            Atom* a = new Atom(fields[3], loc);
+            Point* loc = new Point(atof(words[0]), atof(words[1]), atof(words[2]));
+            if (words[3][0] >= 'a' && words[3][0] <= 'z') words[3][0] -= 0x20;
+            Atom* a = new Atom(words[3], loc);
             delete loc;
             a->name = new char[16];
-            sprintf(a->name, "%s%d", fields[3], added+1);
+            sprintf(a->name, "%s%d", words[3], added+1);
             a->residue = 0;
             atoms[atcount++] = a;
             atoms[atcount] = nullptr;
@@ -623,18 +696,18 @@ int Molecule::from_sdf(char const* sdf_dat)
         }
         else
         {
-            int a1i = atoi(fields[0]);
-            int a2i = atoi(fields[1]);
+            int a1i = atoi(words[0]);
+            int a2i = atoi(words[1]);
 
             if (!a1i || !a2i) break;
-            atoms[a1i-1]->bond_to(atoms[a2i-1], atoi(fields[2]));
+            atoms[a1i-1]->bond_to(atoms[a2i-1], atof(words[2]));
             // cout << "Bonded " << atoms[a1i-1]->name << " to " << atoms[a2i-1]->name << endl;
         }
 
-        if (fields) delete[] fields;
+        if (words) delete[] words;
     }
     atoms[atcount] = 0;
-    if (fields) delete[] fields;
+    if (words) delete[] words;
 
     identify_rings();
     identify_acidbase();
@@ -652,22 +725,22 @@ int Molecule::from_pdb(FILE* is)
     while (!feof(is))
     {
         fgets(buffer, 1003, is);
-        char** fields = chop_spaced_fields(buffer);
+        char** words = chop_spaced_words(buffer);
 
-        if (fields)
+        if (words)
         {
-            if (!strcmp(fields[0], "ATOM")
+            if (!strcmp(words[0], "ATOM")
                     ||
-                    !strcmp(fields[0], "HETATM")
+                    !strcmp(words[0], "HETATM")
                )
             {
                 try
                 {
                     char esym[7];
-                    if (fields[2][0] >= '0' && fields[2][0] <= '9')
-                        strcpy(esym, &fields[2][1]);
+                    if (words[2][0] >= '0' && words[2][0] <= '9')
+                        strcpy(esym, &words[2][1]);
                     else
-                        strcpy(esym, fields[2]);
+                        strcpy(esym, words[2]);
 
                     int i;
                     for (i=1; i<6; i++)
@@ -679,12 +752,12 @@ int Molecule::from_pdb(FILE* is)
                     }
                     esym[1] &= 0x5f;
 
-                    Point aloc(atof(fields[5]), atof(fields[6]),atof(fields[7]));
+                    Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
 
-                    Atom* a = add_atom(esym, fields[2], &aloc, 0, 0);
+                    Atom* a = add_atom(esym, words[2], &aloc, 0, 0);
                     added++;
 
-                    // a->residue = atoi(fields[4]);
+                    // a->residue = atoi(words[4]);
 
                     for (i=0; atoms[i]; i++)
                     {
@@ -706,7 +779,7 @@ int Molecule::from_pdb(FILE* is)
         }
         buffer[0] = 0;
 
-        delete[] fields;
+        delete[] words;
     }
 
     return added;
@@ -900,7 +973,7 @@ bool Molecule::save_sdf(FILE* os, Molecule** lig)
     return true;
 }
 
-void Molecule::save_pdb(FILE* os, int atomno_offset)
+void Molecule::save_pdb(FILE* os, int atomno_offset, bool endpdb)
 {
     int i;
 
@@ -909,7 +982,8 @@ void Molecule::save_pdb(FILE* os, int atomno_offset)
         atoms[i]->save_pdb_line(os, i+1+atomno_offset);
     }
 
-    fprintf(os, "\nTER\nEND\n");
+    if (endpdb) fprintf(os, "\nTER\nEND\n\n");
+    else fprintf(os, "\n\n");
 }
 
 int Molecule::add_ring(Atom** atoms)
@@ -1235,7 +1309,7 @@ void Molecule::identify_acidbase()
 
     for (i=0; atoms[i]; i++)
     {
-        // If it is a carbon, double-bonded to any atom, not bonded to a pnictogen,
+        // If it is a carbon, pi-bonded to a chalcogen, not bonded to a pnictogen,
         // Or if it is a heavier tetrel, a pnictogen, a chalcogen, or a halogen,
         // And it is single-bonded to at least one chalcogen,
         // And the single-bonded chalcogen is either bonded to a hydrogen or carries a negative charge:
@@ -1251,7 +1325,7 @@ void Molecule::identify_acidbase()
             if (!b) goto _not_acidic;
             if (carbon)
             {
-                if (!atoms[i]->is_pi())
+                if (!atoms[i]->is_pi() || !atoms[i]->is_bonded_to_pi(CHALCOGEN, true))
                 {
                     delete[] b;
                     goto _not_acidic;
@@ -1377,6 +1451,8 @@ Bond** Molecule::get_rotatable_bonds()
         Star s;
         s.pmol = this;
         if (!rotatable_bonds) rotatable_bonds = s.paa->get_rotatable_bonds();
+        else if (rotatable_bonds[0] && rotatable_bonds[1] && rotatable_bonds[0]->atom == rotatable_bonds[1]->atom) rotatable_bonds = s.paa->get_rotatable_bonds();
+        else if (rotatable_bonds[0] && abs(rotatable_bonds[0]->atom - rotatable_bonds[0]->btom) >= 524288) rotatable_bonds = s.paa->get_rotatable_bonds();
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
@@ -1828,7 +1904,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
     for (i=0; atoms[i]; i++)
     {
         Point pta = atoms[i]->get_location();
-        float avdW = atoms[i]->get_vdW_radius();
+        float avdW = atoms[i]->get_vdW_radius()*vdw_clash_allowance;
         for (l=0; ligands[l]; l++)
         {
             if (!ligands[l]->atoms) continue;
@@ -1840,7 +1916,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 if (atoms[i]->shares_bonded_with(ligands[l]->atoms[j])) continue;
 
                 Point ptb = ligands[l]->atoms[j]->get_location();
-                float bvdW = ligands[l]->atoms[j]->get_vdW_radius();
+                float bvdW = ligands[l]->atoms[j]->get_vdW_radius()*vdw_clash_allowance;
 
                 r = pta.get_3d_distance(&ptb) + 1e-3;
                 if (r < avdW + bvdW)
@@ -2149,6 +2225,12 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
             if (ligands[l] == this) continue;
             for (j=0; j<ligands[l]->atcount; j++)
             {
+                // TODO: Fix this in the hydrogenate function, but for now we'll fix it here and hope for the best. 🤞🏼
+                if (!ligands[l]->atoms[j])
+                {
+                    ligands[l]->atcount = j;
+                    break;
+                }
                 if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone
                         &&
                         (	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
@@ -2182,6 +2264,14 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             {
                                 atoms[i]->strongest_bind_energy = abind;
                                 atoms[i]->strongest_bind_atom = ligands[l]->atoms[j];
+                            }
+
+                            if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
+                            {
+                                Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
+                                lmx += lmpush * sgn(ptd.x);
+                                lmy += lmpush * sgn(ptd.y);
+                                lmz += lmpush * sgn(ptd.z);
                             }
                         }
                     }
@@ -2405,8 +2495,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                )
                 mm[i]->movability = MOV_FLEXONLY;               // TODO: Prevent this if molecule is a metal bound residue.
 
-            float reversal = -0.666; // TODO: Make this binding-energy dependent.
-            float accel = 1.1;
+            float reversal = -0.999;
+            float lreversal = -pow(0.1, 2.0/iters);
+            float accel = 1.01;
 
             /**** Linear Motion ****/
             #if allow_linear_motion
@@ -2416,7 +2507,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 mm[i]->set_atoms_break_on_move(false);
                 #endif
 
-                Point pt(mm[i]->lmx, 0, 0);
+                Point pt(mm[i]->lmx*frand(0.001, 1), 0, 0);
                 mm[i]->move(pt);
                 bind1 = 0;
                 maxb = 0;
@@ -2434,8 +2525,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 {
                     // cout << bind << " vs " << bind1 << " x" << endl;
                     pt.x = -pt.x;
-                    mm[i]->move(pt);
-                    mm[i]->lmx *= reversal;
+                    //mm[i]->move(pt);
+                    mm[i]->lmx *= lreversal;
                 }
                 else
                 {
@@ -2447,7 +2538,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 }
 
                 pt.x = 0;
-                pt.y = mm[i]->lmy;
+                pt.y = mm[i]->lmy*frand(0.001, 1);
                 mm[i]->move(pt);
                 bind1 = 0;
                 maxb = 0;
@@ -2464,8 +2555,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 if (bind1 < bind || maxb < _slt1 * fmaxb)
                 {
                     pt.y = -pt.y;
-                    mm[i]->move(pt);
-                    mm[i]->lmy *= reversal;
+                    //mm[i]->move(pt);
+                    mm[i]->lmy *= lreversal;
                 }
                 else
                 {
@@ -2476,7 +2567,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 }
 
                 pt.y = 0;
-                pt.z = mm[i]->lmz;
+                pt.z = mm[i]->lmz*frand(0.001, 1);
                 mm[i]->move(pt);
                 bind1 = 0;
                 maxb = 0;
@@ -2493,8 +2584,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 if (bind1 < bind || maxb < _slt1 * fmaxb)
                 {
                     pt.z = -pt.z;
-                    mm[i]->move(pt);
-                    mm[i]->lmz *= reversal;
+                    //mm[i]->move(pt);
+                    mm[i]->lmz *= lreversal;
                 }
                 else
                 {
@@ -2622,7 +2713,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     ra = frand(-ra, ra);
                     mm[i]->rotate(&v, ra);
                     #else
-                    mm[i]->rotate(&v, mm[i]->amx);
+                    float lam = mm[i]->amx*frand(0.001, 1);
+                    mm[i]->rotate(&v, lam);
                     #endif
                     bind1 = 0;
                     maxb = 0;
@@ -2642,7 +2734,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         putitback.restore_state(mm[i]);
                         mm[i]->amx *= 0.98;
                         #else
-                        mm[i]->rotate(&v, -mm[i]->amx);
+                        mm[i]->rotate(&v, -lam);
                         mm[i]->amx *= reversal;
                         #endif
                     }
@@ -2704,7 +2796,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     ra = frand(-ra, ra);
                     mm[i]->rotate(&v, ra);
                     #else
-                    mm[i]->rotate(&v1, mm[i]->amy);
+                    float lam = mm[i]->amy*frand(0.001, 1);
+                    mm[i]->rotate(&v1, lam);
                     #endif
 
                     bind1 = 0;
@@ -2725,7 +2818,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         putitback.restore_state(mm[i]);
                         mm[i]->amy *= 0.98;
                         #else
-                        mm[i]->rotate(&v1, -mm[i]->amy);
+                        mm[i]->rotate(&v1, -lam);
                         mm[i]->amy *= reversal;
                         #endif
                     }
@@ -2788,7 +2881,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     ra = frand(-ra, ra);
                     mm[i]->rotate(&v, ra);
                     #else
-                    mm[i]->rotate(&v2, mm[i]->amz);
+                    float lam = mm[i]->amz*frand(0.001, 1);
+                    mm[i]->rotate(&v2, lam);
                     #endif
 
                     bind1 = 0;
@@ -2809,7 +2903,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         putitback.restore_state(mm[i]);
                         mm[i]->amz *= 0.98;
                         #else
-                        mm[i]->rotate(&v2, -mm[i]->amz);
+                        mm[i]->rotate(&v2, -lam);
                         mm[i]->amz *= reversal;
                         //cout << "x";
                         #endif
@@ -2899,8 +2993,14 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     if (DBG_FLEXRES == residue)
                         cout << " has rotbonds ";
                     #endif
+
+                    int mmiac = mm[i]->get_atom_count();
                     for (k=0; mm[i]->rotatable_bonds[k]; k++)
                     {
+                        Bond* bnd = mm[i]->rotatable_bonds[k];
+                        if (!bnd->atom || !bnd->btom) continue;
+                        if (bnd->count_moves_with_btom() > 0.5*mmiac) bnd = bnd->btom->get_bond_between(bnd->atom);
+
                         #if DBG_BONDFLEX
                         if (DBG_FLEXRES == residue)
                         {

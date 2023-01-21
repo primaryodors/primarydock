@@ -123,7 +123,7 @@ struct AtomGlom
 
     float get_sum()
     {
-        return get_ionic()*60 + get_polarity()*30 + get_pi()*2;
+        return get_ionic()*60 + get_polarity()*25 + get_pi()*2;
     }
 
     float distance_to(Point pt)
@@ -178,7 +178,7 @@ struct AtomGlom
 
         if (aa->hydrophilicity() > 0.25)
         {
-            if ((lgh / atct) < 0.25) return 0;
+            if ((lgh / atct) < 0.19) return 0;
         }
         else
         {
@@ -257,6 +257,7 @@ char* get_file_ext(char* filename)
     return 0;
 }
 
+bool output_each_iter = false;
 char configfname[256];
 char protfname[256];
 char protafname[256];
@@ -445,6 +446,7 @@ void iteration_callback(int iter)
                 #if _use_gloms
                 float r = ligand_gloms[l].distance_to(sc_gloms[l].get_center());
                 if (r < 2.5) r = 2.5;
+                if (r > _INTERA_R_CUTOFF) r = _INTERA_R_CUTOFF;
                 ttl_bb_dist += r;
                 #if _dbg_bb_pullaway
                 cout << "Ligand atoms ";
@@ -598,31 +600,32 @@ void iteration_callback(int iter)
 
     _oei:
     ;
-    #if _output_each_iter
-    std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
-    FILE* fp = fopen(itersfname.c_str(), (iter == 1 ? "wb" : "ab") );
-    if (fp)
+    if (output_each_iter)
     {
-        fprintf(fp, "Pose: 1\nNode: %d\n\nPDBDAT:\n", iter);
-        /*protein->save_pdb(fp, ligand);
-        protein->end_pdb(fp);*/
-
-        AminoAcid* reaches_spheroid[SPHREACH_MAX];
-        int sphres = 0;
-        sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, pocketcen, size, addl_resno);
-        int foff = 0;
-
-        for (i=0; i<sphres; i++)
+        std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
+        FILE* fp = fopen(itersfname.c_str(), (iter == 1 ? "wb" : "ab") );
+        if (fp)
         {
-            reaches_spheroid[i]->save_pdb(fp, foff);
-            foff += reaches_spheroid[i]->get_atom_count();
+            fprintf(fp, "Pose: 1\nNode: %d\n\nPDBDAT:\n", iter);
+            /*protein->save_pdb(fp, ligand);
+            protein->end_pdb(fp);*/
+
+            AminoAcid* reaches_spheroid[SPHREACH_MAX];
+            int sphres = 0;
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, pocketcen, size, addl_resno);
+            int foff = 0;
+
+            for (i=0; i<sphres; i++)
+            {
+                reaches_spheroid[i]->save_pdb(fp, foff);
+                foff += reaches_spheroid[i]->get_atom_count();
+            }
+
+            ligand->save_pdb(fp, foff);
+
+            fclose(fp);
         }
-
-        ligand->save_pdb(fp, foff);
-
-        fclose(fp);
     }
-    #endif
 }
 
 int interpret_resno(char* field)
@@ -900,6 +903,10 @@ int interpret_config_line(char** words)
         }
         mcoord_resno[j] = 0;
         return i-1;
+    }
+    else if (!strcmp(words[0], "MOVIE"))
+    {
+        output_each_iter = true;
     }
     else if (!strcmp(words[0], "NODEPDB"))
     {
@@ -1802,7 +1809,7 @@ int main(int argc, char** argv)
     {
         #if _use_gloms
         AtomGlom glomtmp;
-        int types[3] = { ionic, hbond, pi };
+        int types[3] = { pi, ionic, hbond };
 
         int lac = ligand->get_atom_count();
         bool dirty[lac+4], dirttmp[lac+4];
@@ -1917,6 +1924,16 @@ int main(int argc, char** argv)
                 bool taken = false;
                 for (j=0; j<3; j++) if (glomtmp.atoms == ligand_gloms[j].atoms) taken = true;
                 if (taken) continue;
+
+                bool toosame = false;
+                for (j=0; j<n; j++)
+                {
+                    if (!ligand_gloms[j].atoms.size()) continue;
+                    // if (glomtmp.get_pi() >= 3.0*ligand_gloms[j].get_pi()) continue;
+                    float r = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
+                    if (r < 2) toosame = true;
+                }
+                if (toosame) continue;
 
                 float tsum = glomtmp.get_sum();
                 if (fabs(tsum) > fabs(ligand_gloms[0].get_sum()))
@@ -2721,6 +2738,17 @@ _try_again:
                             bool toosame = false;
                             for (j=0; j<l; j++)
                             {
+                                if (sc_gloms[j].aminos == glomtmp.aminos) toosame = true;
+                                if (sc_gloms[j].aminos.size() == 1
+                                    &&
+                                    std::find(glomtmp.aminos.begin(), glomtmp.aminos.end(), sc_gloms[j].aminos[0]) != glomtmp.aminos.end()
+                                   )
+                                    toosame = true;
+                                if (glomtmp.aminos.size() == 1
+                                    &&
+                                    std::find(sc_gloms[j].aminos.begin(), sc_gloms[j].aminos.end(), glomtmp.aminos[0]) != sc_gloms[j].aminos.end()
+                                   )
+                                    toosame = true;
                                 // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) toosame = true;
                                 float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
                                 float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
@@ -2899,6 +2927,45 @@ _try_again:
                         LocatedVector lv;
                         Rotation rot;
                         float theta;
+
+                        Atom* alca;
+                        Atom** alcaa;
+                        if (flex && sc_gloms[l].aminos.size())
+                        {
+                            for (i=0; i<sc_gloms[l].aminos.size(); i++)
+                            {
+                                if (sc_gloms[l].aminos[i]->movability >= MOV_FLEXONLY)
+                                {
+                                    Bond** rbb = sc_gloms[l].aminos[i]->get_rotatable_bonds();
+                                    if (rbb)
+                                    {
+                                        alcaa = sc_gloms[l].aminos[i]->get_most_bindable(1);
+                                        if (!alcaa) continue;
+                                        alca = alcaa[0];
+                                        delete alcaa;
+
+                                        float br = alca->get_location().get_3d_distance(loneliest);
+                                        float brad = 0;
+                                        for(j=0; rbb[j]; j++)
+                                        {
+                                            float rad;
+                                            for (rad=0; rad<M_PI*2; rad += square)
+                                            {
+                                                rbb[j]->rotate(square);
+                                                float lr = alca->get_location().get_3d_distance(loneliest);
+                                                if (lr < br)
+                                                {
+                                                    brad = rad;
+                                                    br = lr;
+                                                }
+                                            }
+                                            if (brad) rbb[j]->rotate(brad);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         switch (l)
                         {
                             case 0:
@@ -3602,9 +3669,7 @@ _try_again:
             }
         }	// nodeno loop.
 
-        #if _output_each_iter
-        break;
-        #endif
+        if (output_each_iter) break;
     } // pose loop.
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Finished poses." << endl;

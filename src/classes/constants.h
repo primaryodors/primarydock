@@ -111,7 +111,7 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
 #define enforce_no_bb_pullaway 1
-#define bb_pullaway_allowance 0.15
+#define bb_pullaway_allowance 0.13
 
 // If using an activation matrix, active_persistence "rewards" the ligand for keeping
 // bindings to the same residues post-activation as pre-activation. The noflex option
@@ -253,7 +253,6 @@
 #define _hisflip_binding_threshold 25
 
 // Debugging stuff.
-#define _output_each_iter 0
 #define _bb_maxglom 3
 #define _dummy_atoms_for_debug 0
 

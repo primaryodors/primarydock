@@ -218,7 +218,14 @@ a:hover
 }
 
 .symbol
-{	font-size: 20px!important;
+{
+	font-size: 20px!important;
+}
+
+.symbol.smaller
+{
+	font-size: 16px!important;
+	line-height: 31px;
 }
 
 input, select
@@ -433,8 +440,8 @@ Clip:
 	<a id="ptbbbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a>
 	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
 </div>
-<a id="spinon" class="nodebtn clickme symbol" onclick="stage.setSpin(true); $(this).hide(); $('#spinoff').show();">&#x1F310;</a>
-<a id="spinoff" class="nodebtn clickme symbol" onclick="stage.setSpin(false); $(this).hide(); $('#spinon').show();" style="display: none;">&#x1F9F1;</a>
+<a id="spinon" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(true); $(this).hide(); $('#spinoff').show();">&#x1F310;</a>
+<a id="spinoff" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(false); $(this).hide(); $('#spinon').show();" style="display: none;">&#x1F9F1;</a>
 
 <div id="center">
 <a id="fsbtn" class="nodebtn clickme" onclick="if (is_fullscreen) exitFullscreen(); else openFullscreen(document.body); is_fullscreen = !is_fullscreen">&#x26F6;</a>
@@ -467,13 +474,13 @@ function hsl_to_rgb(hue, sat, lum)
 // Can modify this array to your preferred TMR color scheme.
 var tmcolor =
 {
-    1: hsl_to_rgb(260,  64, 160),
-    2: hsl_to_rgb(200, 128, 160),
-    3: hsl_to_rgb(150, 192, 176),
-    4: hsl_to_rgb( 80,  64, 160),
-    5: hsl_to_rgb( 50, 192, 176),
-    6: hsl_to_rgb( 25, 224, 160),
-    7: hsl_to_rgb(340, 128, 160),
+    1: hsl_to_rgb(350,  16, 128),
+    2: hsl_to_rgb(200, 144, 160),
+    3: hsl_to_rgb(150, 240, 176),
+    4: hsl_to_rgb( 70,  96,  96),
+    5: hsl_to_rgb( 60, 255, 176),
+    6: hsl_to_rgb( 25, 240, 160),
+    7: hsl_to_rgb(340, 225, 160),
 };
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
@@ -814,11 +821,22 @@ function centerPocket()
 	});
 }
 
+function get_clip_value()
+{
+	var v = parseFloat($("#clip")[0].value);
+	v /= 50;
+	v -= 1;
+	v = Math.sign(v) * Math.pow(Math.abs(v), 3);
+	v += 1;
+	v *= 50;
+	return v;
+}
+
 function showSideChain(resno)
 {
 	try
 	{
-		var clipValue = parseFloat($("#clip")[0].value);
+		var clipValue = get_clip_value();
 		if (!restoggled[resno])
 		{
 			var mdlidx = mdlresno.indexOf(resno);
@@ -1721,7 +1739,7 @@ $("body").on("keyup", function(e, obj)
 $("#clip").on("input", function (e, obj)
 {
     var i;
-    var clipValue = parseFloat($("#clip")[0].value);
+    var clipValue = get_clip_value();
     for (i=0; i<model.length; i++)
     {
         model[i].eachRepresentation( function(obj)

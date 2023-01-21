@@ -264,11 +264,6 @@
         "short_name": "Gelis et al (2012)",
         "citation": "Gelis L, Wolf S, Hatt H, Neuhaus EM, Gerwert K. Prediction of a ligand-binding niche within a human olfactory receptor by combining site-directed mutagenesis with dynamic homology modeling. Angew Chem Int Ed Engl. 2012 Jan 27;51(5):1274-8. doi: 10.1002\/anie.201103980. Epub 2011 Dec 5. PMID: 22144177."
     },
-    "https:\/\/doi.org\/10.1110\/ps.8.5.969":
-    {
-        "short_name": "Pilpel, Y. and Lancet, D. (1999)",
-        "citation": "Pilpel, Y. and Lancet, D. (1999), The variable and conserved interfaces of modeled olfactory receptor proteins. Protein Science, 8: 969-977. https://doi.org/10.1110/ps.8.5.969"
-    },
     "https:\/\/doi.org\/10.3390\/ijms20123018":
     {
         "short_name": "Genva et al (2018)",
@@ -659,6 +654,11 @@
         "short_name": "Pelchat Bykowski Duke Reed (2011)",
         "citation": "Pelchat ML, Bykowski C, Duke FF, Reed DR. Excretion and perception of a characteristic odor in urine after asparagus ingestion: a psychophysical and genetic study. Chem Senses. 2011;36(1):9-17. doi:10.1093\/chemse\/bjq081"
     },
+    "https:\/\/doi.org\/10.1110\/ps.8.5.969":
+    {
+        "short_name": "Pilpel, Y. and Lancet, D. (1999)",
+        "citation": "Pilpel, Y. and Lancet, D. (1999), The variable and conserved interfaces of modeled olfactory receptor proteins. Protein Science, 8: 969-977. https://doi.org/10.1110/ps.8.5.969"
+    },
     "https:\/\/www.ars.usda.gov\/ARSUserFiles\/66210000\/reprint962.pdf":
     {
         "short_name": "Plotto et al (2006)",
@@ -743,6 +743,11 @@
     {
         "short_name": "Silva Teixeira Silva Ferreira Cerqueira (2016)",
         "citation": "Silva Teixeira CS, Silva Ferreira AC, Cerqueira NM. Studying Haloanisoles Interaction with Olfactory Receptors. ACS Chem Neurosci. 2016 Jul 20;7(7):870-85. doi: 10.1021\/acschemneuro.5b00335. Epub 2016 May 9. PMID: 27092849."
+    },
+    "https:\/\/europepmc.org\/article\/med\/9014237":
+    {
+        "short_name": "Singer et al (1996)",
+        "citation": "Singer MS, Weisinger-Lewin Y, Lancet D, Shepherd GM. Positive selection moments identify potential functional residues in human olfactory receptors. Receptors & Channels. 1996 ;4(3):141-147. PMID: 9014237."
     },
     "https:\/\/doi.org\/10.1016\/j.bios.2015.06.053":
     {

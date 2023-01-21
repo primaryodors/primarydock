@@ -27372,6 +27372,38 @@
                     "type": "ma",
                     "ec50": "-4.82"
                 }
+            },
+            "https:\/\/doi.org\/10.1038\/s41598-023-27937-1":
+            {
+                "OR9Q2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "29",
+                    "ec50": "-3.9"
+                },
+                "OR2W1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.2",
+                    "ec50": "-3.5"
+                },
+                "OR4S2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.8",
+                    "ec50": "-3.2"
+                },
+                "OR5P3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "3",
+                    "ec50": "-3.2"
+                },
+                "OR1A1":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0.1"
+                }
             }
         }
     },
@@ -27396,6 +27428,30 @@
                 {
                     "type": "ma",
                     "ec50": "-4.82"
+                }
+            },
+            "https:\/\/doi.org\/10.1038\/s41598-023-27937-1":
+            {
+                "OR9Q2":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                },
+                "OR1A1":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "9",
+                    "ec50": "-3.4"
+                },
+                "OR5P3":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.8"
+                },
+                "OR2W1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "2.2"
                 }
             }
         }

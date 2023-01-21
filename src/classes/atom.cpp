@@ -2104,6 +2104,7 @@ bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
     if (!is_pi() || !a->is_pi()) return false;
     if (a == bir) return false;
     if (!bir) bir = this;
+    if (bir->recursion_counter > 10) return false;
 
     bir->recursion_counter++;
 

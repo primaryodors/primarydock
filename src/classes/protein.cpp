@@ -266,6 +266,53 @@ void Protein::end_pdb(FILE* os)
     fprintf(os, "END\n");
 }
 
+float Protein::get_internal_clashes()
+{
+    if (!residues) return 0;
+    int i, j;
+    float result = 0;
+    for (i=0; residues[i]; i++)
+    {
+        for (j=i; residues[j]; j++)
+        {
+            if (j==i) result += residues[i]->get_internal_clashes();
+            else result += residues[i]->get_intermol_clashes(residues[j]);
+        }
+    }
+    return result;
+}
+
+float Protein::get_intermol_clashes(Molecule* ligand)
+{
+    AminoAcid* laminos[100];
+    Point size(0,0,0);
+    int cres = get_residues_can_clash_ligand(laminos, ligand, ligand->get_barycenter(), size, nullptr);
+    if (!cres) return 0;
+    int i;
+    float result = 0;
+    for (i=0; i<cres; i++)
+    {
+        result += laminos[i]->Molecule::get_intermol_clashes(ligand);
+    }
+    return result;
+}
+
+float Protein::get_intermol_binding(Molecule* ligand)
+{
+    AminoAcid** laminos = new AminoAcid*[SPHREACH_MAX];
+    Point size(0,0,0);
+    int cres = get_residues_can_clash_ligand(laminos, ligand, ligand->get_barycenter(), size, nullptr);
+    if (!cres) return 0;
+    int i;
+    float result = 0;
+    for (i=0; i<cres; i++)
+    {
+        result += laminos[i]->Molecule::get_intermol_binding(ligand);
+    }
+    delete laminos;
+    return result;
+}
+
 void Protein::find_residue_initial_bindings()
 {
     if (!residues) return;
@@ -350,6 +397,7 @@ int Protein::load_pdb(FILE* is, int rno)
     if (ca) delete[] ca;
     if (res_reach) delete[] res_reach;
     if (metals) delete[] metals;
+    origpdb_residues.clear();
 
     connections.clear();
     Atom* pdba[65536];
@@ -405,6 +453,10 @@ int Protein::load_pdb(FILE* is, int rno)
                         restmp[rescount++] = aa;
                         restmp[rescount] = NULL;
                         prevaa = aa;
+                        Pose aap, filler;
+                        aap.copy_state(aa);
+                        for (; origpdb_residues.size() < aa->get_residue_no(); origpdb_residues.push_back(filler));
+                        origpdb_residues.push_back(aap);
                         goto _found_AA;
                     }
                 }
@@ -617,6 +669,20 @@ int Protein::load_pdb(FILE* is, int rno)
     }
 
     return rescount;
+}
+
+void Protein::revert_to_pdb()
+{
+    if (!residues) return;
+    int i, n;
+    n = origpdb_residues.size();
+    if (!n) return;
+
+    for (i=1; i<n; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        if (aa) origpdb_residues[i].restore_state(aa);
+    }
 }
 
 int Protein::get_bw50(int helixno)
@@ -2118,11 +2184,38 @@ Point Protein::get_region_center(int startres, int endres)
     return average_of_points(range, samples);
 }
 
+SCoord Protein::get_region_axis(int startres, int endres)
+{
+    int rglen = endres-startres;
+    if (rglen < 4) throw 0xbadc0de;     // TODO
+    Point N[4], C[4];
+    int i;
+    for (i=0; i<4; i++)
+    {
+        AminoAcid* aa = get_residue(startres + i);
+        if (!aa) throw 0xdeadac1d;      // TODO
+        N[i] = aa->get_CA_location();
+
+        aa = get_residue(endres - i);
+        if (!aa) throw 0xdeadac1d;      // TODO
+        C[i] = aa->get_CA_location();
+    }
+
+    Point nterm = average_of_points(N, 4), cterm = average_of_points(C, 4);
+
+    return (SCoord)(cterm.subtract(nterm));
+}
+
 void Protein::move_piece(int start_res, int end_res, Point new_center)
 {
     Point old_center = get_region_center(start_res, end_res);
     SCoord move_amt = new_center.subtract(old_center);
 
+    move_piece(start_res, end_res, move_amt);
+}
+
+void Protein::move_piece(int start_res, int end_res, SCoord move_amt)
+{
     int i;
     for (i=start_res; i<=end_res; i++)
     {

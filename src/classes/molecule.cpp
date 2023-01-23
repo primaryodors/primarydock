@@ -121,7 +121,7 @@ Pose::Pose(Molecule* m)
 
 Pose::~Pose()
 {
-    if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete[] saved_atom_locs;
+    // if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete saved_atom_locs;
 }
 
 void Pose::reset()

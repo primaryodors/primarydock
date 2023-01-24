@@ -176,6 +176,10 @@ struct AtomGlom
         float result = 0;
         float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
 
+        float aachg = aa->get_charge();
+        if (aa->conditionally_basic()) aachg += 0.5;
+        if (sgn(lgi) != -sgn(aachg)) return 0;
+
         if (aa->hydrophilicity() > 0.25)
         {
             if ((lgh / atct) < 0.19) return 0;
@@ -2932,20 +2936,8 @@ _try_again:
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
                             glomtmp.aminos.clear();
-                            // Debug trap.
-                            if (l == 2 && reaches_spheroid[nodeno][i]->get_letter() == 'A')
-                            {
-                                l++;
-                                l--;
-                            }
                             if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
                             {
-                                // Debug trap.
-                                if (reaches_spheroid[nodeno][i]->is_residue() == 169)
-                                {
-                                    l++;
-                                    l--;
-                                }
                                 glomtmp.aminos.push_back(reaches_spheroid[nodeno][i]);
                                 for (j=i+1; reaches_spheroid[nodeno][j]; j++)
                                 {
@@ -3209,10 +3201,10 @@ _try_again:
                             cout << "." << endl;
 
                             xform = sc_gloms[l].get_center().subtract(ligand_gloms[l].get_center());
-                            if (n < 2)
+                            if (n < 4)
                             {
                                 Point ptmp = loneliest.subtract(xform);
-                                ptmp.scale(2);
+                                ptmp.scale(n+1);
                                 xform = xform.add(ptmp);
                             }
 
@@ -3225,7 +3217,16 @@ _try_again:
                             // Rotate ligand about ligand_gloms[0] center to get ligand_gloms[1] center
                             // as close as possible to sc_gloms[1] center.
                             n = sc_gloms[l].aminos.size();
-                            if (!n) goto _deadglob;
+                            if (!n)
+                            {
+                                cout << "Aligning center of ligand towards center of pocket.";
+                                zcen = ligand_gloms[0].get_center();
+                                rot = align_points_3d(ligand->get_barycenter(), loneliest, zcen);
+                                lv = rot.v;
+                                lv.origin = zcen;
+                                ligand->rotate(lv, rot.a);
+                                goto _deadglob;
+                            }
                             cout << "Aligning secondary atom group towards";
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
@@ -3242,16 +3243,7 @@ _try_again:
                             // ligand_gloms[0] center and ligand_gloms[1] center, to bring
                             // ligand_gloms[2] center as close as possible to sc_gloms[2] center.
                             n = sc_gloms[l].aminos.size();
-                            if (!n)
-                            {
-                                cout << "Aligning center of ligand towards center of pocket.";
-                                zcen = ligand_gloms[0].get_center();
-                                rot = align_points_3d(ligand->get_barycenter(), loneliest, zcen);
-                                lv = rot.v;
-                                lv.origin = zcen;
-                                ligand->rotate(lv, rot.a);
-                                goto _deadglob;
-                            }
+                            if (!n) goto _deadglob;
                             cout << "\"Rotisserie\"-aligning tertiary atom group towards";
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;

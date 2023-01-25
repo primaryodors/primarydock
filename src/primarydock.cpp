@@ -3148,7 +3148,7 @@ _try_again:
                         Point axis;
                         LocatedVector lv;
                         Rotation rot;
-                        float theta;
+                        float theta, clash;
 
                         Atom* alca;
                         Atom** alcaa;
@@ -3161,7 +3161,7 @@ _try_again:
                                     Bond** rbb = sc_gloms[l].aminos[i]->get_rotatable_bonds();
                                     if (rbb)
                                     {
-                                        alcaa = sc_gloms[l].aminos[i]->get_most_bindable(1);
+                                        alcaa = sc_gloms[l].aminos[i]->get_most_bindable(1, ligand_gloms[i].atoms[0]);
                                         if (!alcaa) continue;
                                         alca = alcaa[0];
                                         delete alcaa;
@@ -3171,7 +3171,7 @@ _try_again:
                                         for(j=0; rbb[j]; j++)
                                         {
                                             float rad;
-                                            for (rad=0; rad<M_PI*2; rad += square)
+                                            for (rad=0; rad<M_PI*2; rad += square/4)
                                             {
                                                 rbb[j]->rotate(square);
                                                 float lr = alca->get_location().get_3d_distance(loneliest);
@@ -3200,17 +3200,30 @@ _try_again:
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
 
-                            xform = sc_gloms[l].get_center().subtract(ligand_gloms[l].get_center());
+                            xform = sc_gloms[l].get_center();
                             if (n < 4)
                             {
                                 Point ptmp = loneliest.subtract(xform);
                                 ptmp.scale(n+1);
                                 xform = xform.add(ptmp);
                             }
+                            xform = xform.subtract(ligand_gloms[l].get_center());
 
                             ligand->movability = MOV_ALL;
                             ligand->move(xform);
-                            // ligand->get_atom("N9")->get_location().get_3d_distance(sc_gloms[l].get_center())
+                            
+                            // Slowly back the ligand away from whatever it may be clashing into.
+                            reaches_spheroid[nodeno][sphres] = nullptr;
+                            clash = ligand->get_intermol_clashes(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+                            n = 15;
+                            while (clash > 50)
+                            {
+                                xform = loneliest.subtract(ligand->get_barycenter());
+                                xform.scale(0.1);
+                                ligand->move(xform);
+                                n--;
+                                if (!n) break;          // Prevent infinite loops.
+                            }
                             break;
 
                             case 1:

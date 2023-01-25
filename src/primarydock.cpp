@@ -4124,6 +4124,7 @@ _try_again:
 
                         if (soft_pocket)
                         {
+                            cout << "Soft transformations:" << endl;
                             for (l=0; l<soft_rgns.size(); l++)
                             {
                                 cout << soft_rgns[l].name << ".Δr: " << rgnxform_r[l] << endl;

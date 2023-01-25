@@ -428,7 +428,7 @@ void iteration_callback(int iter)
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     int l;
 
-    if (soft_pocket)
+    if (soft_pocket && iter >= 10)
     {
         int sz = soft_rgns.size();
         if (sz)

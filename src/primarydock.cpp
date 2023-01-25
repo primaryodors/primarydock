@@ -759,7 +759,9 @@ void iteration_callback(int iter)
     }
 
     _oei:
-    ;
+    cout << "." << flush;
+    if (iter == iters-1) cout << endl << endl;
+
     if (output_each_iter)
     {
         std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
@@ -2174,6 +2176,24 @@ int main(int argc, char** argv)
                 }
             }            
         }
+        
+        if (ligand_gloms[2].atoms.size())
+        {
+            Point a = ligand_gloms[0].get_center();
+            Point b = ligand_gloms[1].get_center();
+            Point c = ligand_gloms[2].get_center();
+
+            float rab = a.get_3d_distance(b);
+            float rac = a.get_3d_distance(c);
+
+            if (rab < 0.75*rac)
+            {
+                glomtmp = ligand_gloms[1];
+                ligand_gloms[1] = ligand_gloms[2];
+                ligand_gloms[2] = glomtmp;
+            }
+        }
+
         #else
         ligbb = m.get_most_bindable(3);
         ligbbh = new Atom*[5];
@@ -4125,6 +4145,7 @@ _try_again:
                         if (soft_pocket)
                         {
                             cout << "Soft transformations:" << endl;
+                            if (output) *output << "Soft transformations:" << endl;
                             for (l=0; l<soft_rgns.size(); l++)
                             {
                                 cout << soft_rgns[l].name << ".Δr: " << rgnxform_r[l] << endl;

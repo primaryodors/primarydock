@@ -3161,7 +3161,7 @@ _try_again:
                                     Bond** rbb = sc_gloms[l].aminos[i]->get_rotatable_bonds();
                                     if (rbb)
                                     {
-                                        alcaa = sc_gloms[l].aminos[i]->get_most_bindable(1, ligand_gloms[i].atoms[0]);
+                                        alcaa = sc_gloms[l].aminos[i]->get_most_bindable(1, ligand_gloms[l].atoms[0]);
                                         if (!alcaa) continue;
                                         alca = alcaa[0];
                                         delete alcaa;

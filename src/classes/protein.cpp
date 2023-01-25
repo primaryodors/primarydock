@@ -313,6 +313,53 @@ float Protein::get_intermol_binding(Molecule* ligand)
     return result;
 }
 
+float Protein::get_internal_clashes()
+{
+    if (!residues) return 0;
+    int i, j;
+    float result = 0;
+    for (i=0; residues[i]; i++)
+    {
+        for (j=i; residues[j]; j++)
+        {
+            if (j==i) result += residues[i]->get_internal_clashes();
+            else result += residues[i]->get_intermol_clashes(residues[j]);
+        }
+    }
+    return result;
+}
+
+float Protein::get_intermol_clashes(Molecule* ligand)
+{
+    AminoAcid* laminos[100];
+    Point size(0,0,0);
+    int cres = get_residues_can_clash_ligand(laminos, ligand, ligand->get_barycenter(), size, nullptr);
+    if (!cres) return 0;
+    int i;
+    float result = 0;
+    for (i=0; i<cres; i++)
+    {
+        result += laminos[i]->Molecule::get_intermol_clashes(ligand);
+    }
+    return result;
+}
+
+float Protein::get_intermol_binding(Molecule* ligand)
+{
+    AminoAcid** laminos = new AminoAcid*[SPHREACH_MAX];
+    Point size(0,0,0);
+    int cres = get_residues_can_clash_ligand(laminos, ligand, ligand->get_barycenter(), size, nullptr);
+    if (!cres) return 0;
+    int i;
+    float result = 0;
+    for (i=0; i<cres; i++)
+    {
+        result += laminos[i]->Molecule::get_intermol_binding(ligand);
+    }
+    delete laminos;
+    return result;
+}
+
 void Protein::find_residue_initial_bindings()
 {
     if (!residues) return;
@@ -2127,6 +2174,28 @@ float Protein::orient_helix(int startres, int endres, int stopat, float angle, i
     cout << " ";
 
     return ha;
+}
+
+SCoord Protein::get_region_axis(int startres, int endres)
+{
+    int rglen = endres-startres;
+    if (rglen < 4) throw 0xbadc0de;     // TODO
+    Point N[4], C[4];
+    int i;
+    for (i=0; i<4; i++)
+    {
+        AminoAcid* aa = get_residue(startres + i);
+        if (!aa) throw 0xdeadac1d;      // TODO
+        N[i] = aa->get_CA_location();
+
+        aa = get_residue(endres - i);
+        if (!aa) throw 0xdeadac1d;      // TODO
+        C[i] = aa->get_CA_location();
+    }
+
+    Point nterm = average_of_points(N, 4), cterm = average_of_points(C, 4);
+
+    return (SCoord)(cterm.subtract(nterm));
 }
 
 void Protein::set_region(std::string rgname, int start, int end)

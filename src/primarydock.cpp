@@ -427,6 +427,7 @@ void iteration_callback(int iter)
 
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     int l;
+    float prebind;
 
     if (soft_pocket && iter >= 10)
     {
@@ -435,7 +436,7 @@ void iteration_callback(int iter)
         {
             for (l=0; l<sz; l++)
             {
-                float prebind = protein->get_intermol_binding(ligand) - protein->get_internal_clashes()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
+                if (!l) prebind = protein->get_intermol_binding(ligand)*soft_ligand_importance - protein->get_internal_clashes()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
                 #if _dbg_soft
                 cout << iter << ": from " << prebind;
                 #endif
@@ -486,7 +487,7 @@ void iteration_callback(int iter)
                     ;
                 }
 
-                float postbind = protein->get_intermol_binding(ligand) - protein->get_internal_clashes()*_kJmol_cuA;
+                float postbind = protein->get_intermol_binding(ligand)*soft_ligand_importance - protein->get_internal_clashes()*_kJmol_cuA;
                 #if _dbg_soft
                 cout << " to " << postbind;
                 #endif
@@ -565,6 +566,9 @@ void iteration_callback(int iter)
                     default:
                     ;
                 }
+
+                if (postbind > prebind) prebind = postbind;
+
                 #if _dbg_soft
                 cout << endl;
                 #endif

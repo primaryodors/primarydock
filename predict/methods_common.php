@@ -289,21 +289,23 @@ function process_dock()
             if (!isset($sum[$node]  )) $sum[$node] = 0.0;
             if (!isset($count[$node])) $count[$node] = 0;
             
-            $sum[$node] += $value;
-            $count[$node]++;
+            $sum[$node] += $value * $bias;
+            $count[$node] += $bias;
     
+            if (@$scenerg[$pose][$node])
             foreach ($scenerg[$pose][$node] as $resno => $e)
             {
                 if (!isset($ssce[$resno])) $ssce[$resno] = floatval($rsum[$resno] = 0);
-                $ssce[$resno] += $e;
-                $rsum[$resno]++;
+                $ssce[$resno] += $e * $bias;
+                $rsum[$resno] += $bias;
             }
     
+            if (@$vdwrpl[$pose][$node])
             foreach ($vdwrpl[$pose][$node] as $resno => $v)
             {
                 if (!isset($svdw[$resno])) $svdw[$resno] = floatval($rsumv[$resno] = 0);
-                $svdw[$resno] += $v;
-                $rsumv[$resno]++;
+                $svdw[$resno] += $v * $bias;
+                $rsumv[$resno] += $bias;
             }
 
             if (function_exists("dockline_callback"))
@@ -312,9 +314,9 @@ function process_dock()
                 foreach ($raw as $k => $v)
                 {
                     if (!isset($cbvals[$k])) $cbvals[$k] = $v;
-                    else $cbvals[$k] += $v;
-                    if (!isset($cbcounts[$k])) $cbcounts[$k] = 1;
-                    else $cbcounts[$k]++;
+                    else $cbvals[$k] += $v * $bias;
+                    if (!isset($cbcounts[$k])) $cbcounts[$k] = $bias;
+                    else $cbcounts[$k] += $bias;
                 }
             }
         }

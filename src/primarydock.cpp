@@ -3190,23 +3190,26 @@ _try_again:
                                         alca = alcaa[0];
                                         delete alcaa;
 
-                                        float br = alca->get_location().get_3d_distance(loneliest);
-                                        float brad = 0;
-                                        for(j=0; rbb[j]; j++)
+                                        if (alca)
                                         {
-                                            float rad;
-                                            for (rad=0; rad<M_PI*2; rad += square/4)
-                                            {
-                                                rbb[j]->rotate(square);
-                                                float lr = alca->get_location().get_3d_distance(loneliest);
-                                                if (lr < br)
-                                                {
-                                                    brad = rad;
-                                                    br = lr;
-                                                }
-                                            }
-                                            if (brad) rbb[j]->rotate(brad);
-                                        }
+                                        	float br = alca->get_location().get_3d_distance(loneliest);
+		                                    float brad = 0;
+		                                    for(j=0; rbb[j]; j++)
+		                                    {
+		                                        float rad;
+		                                        for (rad=0; rad<M_PI*2; rad += square/4)
+		                                        {
+		                                            rbb[j]->rotate(square);
+		                                            float lr = alca->get_location().get_3d_distance(loneliest);
+		                                            if (lr < br)
+		                                            {
+		                                                brad = rad;
+		                                                br = lr;
+		                                            }
+		                                        }
+		                                        if (brad) rbb[j]->rotate(brad);
+		                                    }
+		                                }
                                     }
                                 }
                             }

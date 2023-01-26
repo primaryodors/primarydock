@@ -161,7 +161,7 @@ $bestcorr = 0.0;
 foreach ($yvals as $rcp => $yv)
 {   
     $cxv = count($xvals[$rcp]);
-    $threshold = max(0.75 * $cxv, 5);
+    $threshold = max(0.5 * $cxv, 5);
 
     foreach ($yv as $metric => $ly)
     {

@@ -137,7 +137,7 @@
 
 #define _use_gloms 1
 
-#define soft_ligand_importance 50
+#define soft_ligand_importance 20
 
 // Amount to reduce momenta for path nodes beyond zero. Since the point of path based
 // docking is to keep as closely as possible the same ligand pose and move it through

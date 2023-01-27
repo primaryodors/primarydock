@@ -178,7 +178,7 @@ struct AtomGlom
 
         float aachg = aa->get_charge();
         if (aa->conditionally_basic()) aachg += 0.5;
-        if (sgn(lgi) != -sgn(aachg)) return 0;
+        if (lgi && aachg && sgn(lgi) != -sgn(aachg)) return 0;
 
         if (aa->hydrophilicity() > 0.25)
         {

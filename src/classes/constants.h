@@ -277,6 +277,7 @@
 #define _dbg_bb_rots 0
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
+#define _dbg_glomsel 1
 
 #endif
 

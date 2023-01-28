@@ -2962,6 +2962,9 @@ _try_again:
                             glomtmp.aminos.clear();
                             if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
                             {
+                                #if _dbg_glomsel
+                                cout << "Considering " << reaches_spheroid[nodeno][i]->get_name() << " for glom " << l << "..." << endl;
+                                #endif
                                 glomtmp.aminos.push_back(reaches_spheroid[nodeno][i]);
                                 for (j=i+1; reaches_spheroid[nodeno][j]; j++)
                                 {
@@ -2977,41 +2980,63 @@ _try_again:
                                     if (r < ligand_gloms[l].bounds())
                                     {
                                         glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);
+                                        #if _dbg_glomsel
+                                        cout << "Adding " << reaches_spheroid[nodeno][j]->get_name() << " to candidate." << endl;
+                                        #endif
                                     }
                                 }
-                            }
 
-                            bool too_similar = false;
-                            for (j=0; j<l; j++)
-                            {
-                                if (sc_gloms[j].aminos == glomtmp.aminos) too_similar = true;
-                                if (sc_gloms[j].aminos.size() == 1
-                                    &&
-                                    std::find(glomtmp.aminos.begin(), glomtmp.aminos.end(), sc_gloms[j].aminos[0]) != glomtmp.aminos.end()
-                                   )
-                                    too_similar = true;
-                                if (glomtmp.aminos.size() == 1
-                                    &&
-                                    std::find(sc_gloms[j].aminos.begin(), sc_gloms[j].aminos.end(), glomtmp.aminos[0]) != sc_gloms[j].aminos.end()
-                                   )
-                                    too_similar = true;
-                                // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) too_similar = true;
-                                float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
-                                float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
-                                if (rsg < 0.9 * rlg) too_similar = true;
-                            }
+                                bool too_similar = false;
+                                for (j=0; j<l; j++)
+                                {
+                                    if (sc_gloms[j].aminos == glomtmp.aminos) too_similar = true;
+                                    if (sc_gloms[j].aminos.size() == 1
+                                        &&
+                                        std::find(glomtmp.aminos.begin(), glomtmp.aminos.end(), sc_gloms[j].aminos[0]) != glomtmp.aminos.end()
+                                    )
+                                        too_similar = true;
+                                    if (glomtmp.aminos.size() == 1
+                                        &&
+                                        std::find(sc_gloms[j].aminos.begin(), sc_gloms[j].aminos.end(), glomtmp.aminos[0]) != sc_gloms[j].aminos.end()
+                                    )
+                                        too_similar = true;
+                                    // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) too_similar = true;
+                                    float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
+                                    float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
+                                    if (rsg < 0.9 * rlg) too_similar = true;
+                                }
 
-                            if (!too_similar)
-                            {
-                                float r = glomtmp.distance_to(loneliest);
-                                float rr = sc_gloms[l].distance_to(loneliest);
-                                float rg = ligand_gloms[l].distance_to(ligand->get_barycenter());
+                                #if _dbg_glomsel
+                                if (too_similar) cout << "Too similar to an existing glom." << endl << endl;
+                                #endif
 
-                                r -= rg; if (r < 1) r = 1;
-                                rr -= rg; if (rr < 1) rr = 1;
+                                if (!too_similar)
+                                {
+                                    float r = glomtmp.distance_to(loneliest);
+                                    float rr = sc_gloms[l].distance_to(loneliest);
+                                    float rg = ligand_gloms[l].distance_to(ligand->get_barycenter());
 
-                                float tcptbl = glomtmp.compatibility(&ligand_gloms[l]) / (r*r);
-                                if (!i || tcptbl > (sc_gloms[l].compatibility(&ligand_gloms[l]) / (rr*rr)) ) sc_gloms[l] = glomtmp;
+                                    r -= rg; if (r < 1) r = 1;
+                                    rr -= rg; if (rr < 1) rr = 1;
+
+                                    float tcptbl = glomtmp.compatibility(&ligand_gloms[l]) / (r*r);
+                                    float ptcptbl = sc_gloms[l].compatibility(&ligand_gloms[l]) / (rr*rr);
+                                    if (!i || tcptbl > ptcptbl)
+                                    {
+                                        sc_gloms[l] = glomtmp;
+                                        #if _dbg_glomsel
+                                        cout << "Accepted with compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
+                                            << " squared = " << tcptbl << "." << endl << endl;
+                                        #endif
+                                    }
+                                    #if _dbg_glomsel
+                                    else
+                                    {
+                                        cout << "Rejected because compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
+                                            << " squared is " << tcptbl << " not greater than previous value of " << ptcptbl << "." << endl << endl;
+                                    }
+                                    #endif
+                                }
                             }
                         }
 

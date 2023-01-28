@@ -586,7 +586,11 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
             break;
 
             case hbond:
-            result += fabs(atoms[i]->is_polar());
+             if (atoms[i]->get_Z() > 1)
+             {
+                 result += fabs(atoms[i]->is_polar());
+                 result += fabs(atoms[i]->get_charge());
+             }
             break;
 
             case pi:
@@ -624,6 +628,10 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
     }
 
     if (heavy) result /= heavy;
+    if (t == hbond)
+    {
+        if (result < 0.3) result = 0;
+    }
 
     return result;
 }

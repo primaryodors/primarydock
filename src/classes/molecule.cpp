@@ -636,6 +636,34 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
     return result;
 }
 
+int Molecule::has_hbond_donors()
+{
+    if (!atoms) return 0;
+
+    int i, result=0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->is_polar() > 0) result++;
+    }
+
+    return result;
+}
+
+int Molecule::has_hbond_acceptors()
+{
+    if (!atoms) return 0;
+
+    int i, result=0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->is_polar() < 0) result++;
+    }
+
+    return result;
+}
+
 int Molecule::from_sdf(char const* sdf_dat)
 {
     if (!sdf_dat) return 0;

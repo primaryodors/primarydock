@@ -116,6 +116,8 @@ public:
     void delete_atom(Atom* a);
     virtual void hydrogenate(bool steric_only = false);
     void clear_atom_binding_energies();
+    int has_hbond_donors();
+    int has_hbond_acceptors();                    // N+ is not an h-bond acceptor.
 
     // Bond functions.
     Bond** get_rotatable_bonds();

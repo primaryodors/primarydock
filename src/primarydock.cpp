@@ -188,6 +188,30 @@ struct AtomGlom
         {
             if ((lgh / atct) > 0.33333) return 0;
         }
+
+        if (lgh)
+        {
+            int i;
+            int atct = atoms.size();
+            if (!aa->has_hbond_acceptors())
+            {
+                lgh = 0;
+                if (atct)
+                for (i=0; i<atct; i++)
+                {
+                    if (atoms[i]->is_polar() < 0) lgh++;
+                }
+            }
+            else if (!aa->has_hbond_donors())
+            {
+                lgh = 0;
+                if (atct)
+                for (i=0; i<atct; i++)
+                {
+                    if (atoms[i]->is_polar() > 0) lgh++;
+                }
+            }
+        }
  
         if (lgi) result += lgi * -aa->bindability_by_type(ionic) * 1000;
         if (lgh) result += fabs(lgh) * fabs(aa->bindability_by_type(hbond)) * 30;

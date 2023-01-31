@@ -124,13 +124,22 @@ foreach ($array['all'] as $tmrno => $tdat)
 
     $yavg = 0.0;
     $ydiv = 0;
+    $azc = [];
+    $yc = [];
     foreach ($tdat as $bw => $perturbation)
     {
         $resno = resno_from_bw($orid, "$tmrno.$bw");
         $xyz = $resxyz[$orid][$resno];
         $yavg += $xyz[1];
         $ydiv++;
+
+        $azimuth = find_angle($xyz[0], -$xyz[2]) + 0.3 - pi();
+        if ($tmrno != 7 && $azimuth < 0) $azimuth += pi()*2;
+        $azc[$bw] = $azimuth;
+        $yc[$bw] = $xyz[1];
     }
+
+    $lrgr = regression_line($yc, $azc);
 
     if ($ydiv) $yavg /= $ydiv;
 
@@ -140,10 +149,11 @@ foreach ($array['all'] as $tmrno => $tdat)
         $xyz = $resxyz[$orid][$resno];
         $azimuth = find_angle($xyz[0], -$xyz[2]) + 0.3 - pi();
         if ($azimuth < 0) $azimuth += pi()*2;
+        $adjaz = $azimuth - (/*$lrgr[1] +*/ $lrgr[0]*$xyz[1]);
 
-        $vals['az'][$bw] = -$azimuth;
+        $vals['az'][$bw] = -$adjaz;
         $vals['y'][$bw] = $xyz[1];
-        $vals['azy'][$bw] = $azimuth * ($xyz[1] - $yavg);
+        $vals['azy'][$bw] = $adjaz * ($xyz[1] - $yavg);
 
         $x = intval(3 * (180.0 / pi()) * $azimuth + $pad);
         $y = ($h/2) + $xyz[1]*20 + $pad;

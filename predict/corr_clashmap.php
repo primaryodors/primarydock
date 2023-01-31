@@ -113,6 +113,7 @@ foreach ($array['all'] as $tmrno => $tdat)
 		if ($perturbation > $maxptbn) $maxptbn = $perturbation;
 
 $ptbm = 53.81 / sqrt($maxptbn);
+$outjson = [];
 foreach ($array['all'] as $tmrno => $tdat)
 {
     if ($tmrno < 1 || $tmrno > 7) continue;
@@ -180,7 +181,17 @@ foreach ($array['all'] as $tmrno => $tdat)
     echo "TMR$tmrno centrifugal rocking: $throt8\n";
     echo "TMR$tmrno torsional rocking: $rrot8\n";
     echo "\n";
+
+    $outjson[$tmrno]['rxform'] = $rxform;
+    $outjson[$tmrno]['thxform'] = $thxform;
+    $outjson[$tmrno]['throt8'] = $throt8;
+    $outjson[$tmrno]['rrot8'] = $rrot8;
 }
 
 imagepng($im, "../tmp/clashmap.png");
+
+$fp = fopen("clashmap_bias.json", "w");
+if (!$fp) die("FAILED to open JSON file for writing!\n");
+fwrite($fp, json_encode_pretty($outjson));
+fclose($fp);
 

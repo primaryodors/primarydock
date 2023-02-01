@@ -440,8 +440,8 @@ Clip:
 	<a id="ptbbbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a>
 	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
 </div>
-<a id="colcpk" title="Colors: CPK" class="nodebtn clickme symbol smaller" onclick="born=true; spcfill ? spaceFill() : ballAndStick(); $(this).hide(); $('#colborn').show();">CPK</a>
-<a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; spcfill ? spaceFill() : ballAndStick(); $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
+<a id="colcpk" title="Colors: CPK" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } $(this).hide(); $('#colborn').show();">CPK</a>
+<a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
 <a id="spinon" title="Spin On" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(true); $(this).hide(); $('#spinoff').show();">&#x1F310;</a>
 <a id="spinoff" title="Spin Off" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(false); $(this).hide(); $('#spinon').show();" style="display: none;">&#x1F9F1;</a>
 <a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); $(this).hide(); $('#bstick').show();">&#x1F388;</a>
@@ -762,7 +762,7 @@ function show_seqdd()
 }
 
 var stage = new NGL.Stage("viewport");
-var gmodel = [], model = [], is_ligand = [], mrep = [], mrparams = [], mpos = [], mnod = [];
+var gmodel = [], model = [], is_ligand = [], mrep = [], gmrep = [], mrparams = [], gmrparams = [], mpos = [], mnod = [];
 var resmdl = [], mdlresno = [], restoggled = [];
 var acvmdl = false;
 var acvmatrix = [], acvrot8 = [];
@@ -986,12 +986,12 @@ function showMetalSideChains()
 function ballAndStick()
 {
 	var i;
-	for (i=0; i<gmodel.length && i<mrparams.length && i<mrep.length; i++)
+	for (i=0; i<gmodel.length && i<gmrparams.length && i<gmrep.length; i++)
 	{
-		if (mrep[i] == "ball+stick")
+		if (gmrep[i] == "ball+stick")
 		{
 			gmodel[i].removeAllRepresentations();
-			gmodel[0].addRepresentation(mrep[i], mrparams[0]);
+			gmodel[0].addRepresentation(gmrep[i], gmrparams[0]);
 		}
 	}
 	spcfill = false;
@@ -1000,12 +1000,12 @@ function ballAndStick()
 function spaceFill()
 {
 	var i;
-	for (i=0; i<gmodel.length && i<mrparams.length && i<mrep.length; i++)
+	for (i=0; i<gmodel.length && i<gmrparams.length && i<gmrep.length; i++)
 	{
-		if (mrep[i] == "ball+stick")
+		if (gmrep[i] == "ball+stick")
 		{
 			gmodel[i].removeAllRepresentations();
-			gmodel[0].addRepresentation("spacefill", mrparams[0]);
+			gmodel[0].addRepresentation("spacefill", gmrparams[0]);
 		}
 	}
 	spcfill = true;
@@ -1015,17 +1015,20 @@ function disable_spacefill()
 {
 	$('#spcfill').hide();
 	$('#bstick').hide();
+	sfenable = false;
 }
 
 function enable_spacefill()
 {
-	$('#spcfill').show();
-	$('#bstick').hide();
-	ballAndStick();
+	spcfill ? $('#spcfill').hide() : $('#spcfill').show();
+	spcfill ? $('#bstick').show() : $('#bstick').hide();
+	spcfill ? spaceFill() : ballAndStick();
+	sfenable = true;
 }
 
 var born = false;
 var spcfill = false;
+var sfenable = true;
 if (getParameterByName("born")) born = true;
 var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
@@ -1088,7 +1091,7 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
                 return 0x666666;
             }
 
-        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0066FF);
+        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0033FF);
         	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF0000);
         	case 'P': return 0xff77c6;
         	case 'S': return 0xffdd00;
@@ -1172,7 +1175,7 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
                 return 0x777777;
             }
 
-        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0087FF);
+        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0033FF);
         	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF2222);
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
@@ -1351,14 +1354,17 @@ function apply_pdb(poresult)
 	var stringBlob3 = new Blob( [ poresult ], { type: 'text/plain'} );
 	stage.loadFile( stringBlob3, { ext: 'pdb' } ).then( function( comp3 )
 	{
-		comp3.addRepresentation( "cartoon",
+		var rp =
 		{
 			opacity: opc_cartoon,
 			colorScheme: PODefRgnScheme,
 			metalness: mtl_cartoon,
-		});
+		};
+		comp3.addRepresentation( "cartoon", rp);
 		comp3.setName("backbone");
 		gmodel.push(comp3);
+		gmrep.push("cartoon");
+		gmrparams.push(rp);
 		disable_spacefill();
 		$('#clip').trigger("input");
 		
@@ -1471,13 +1477,16 @@ function apply_pdb(poresult)
 		var stringBlob4 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
 		stage.loadFile( stringBlob4, { ext: 'pdb' } ).then( function( comp4 )
 		{
-			comp4.addRepresentation( "spacefill",
+			var rp = 
 			{
 				opacity: opc_metal,
 				colorScheme: PODefScheme,
 				metalness: mtl_metal,
-			});
+			};
+			comp4.addRepresentation( "spacefill", rp);
 			gmodel.push(comp4);
+			gmrep.push("spacefill");
+			gmrparams.push(rp);
 			disable_spacefill();
 			$('#clip').trigger("input");
 		});
@@ -1565,8 +1574,8 @@ else if (molid != "~")
 		        }
 		        comp.addRepresentation("ball+stick", rparam);
 		        gmodel.push(comp);
-				mrep.push("ball+stick");
-				mrparams.push(rparam);
+				gmrep.push("ball+stick");
+				gmrparams.push(rparam);
 		        comp.autoView();
 		    } );
 		}
@@ -1860,8 +1869,12 @@ function loadFile(fileData, fileName = "")
 	
 	$("#affichage").hide();
 	
-    model = []
+    model = [];
+	mrep = [];
+	mrparams = [];
     gmodel = [];
+	gmrep = [];
+	gmrparams = [];
     curr_ligand = false;
 	resmdl = [];
 	mdlresno = [];
@@ -2090,28 +2103,34 @@ function loadFile(fileData, fileName = "")
                 {
                     if (fext == 'sdf')
                     {
-                        comp.addRepresentation( "ball+stick",
+						var rp =
                         {
                         	opacity: opc_molecule,
 							colorScheme: PODefSchemeHilite,
 							multipleBond: true,
                         	metalness: mtl_bs,
-                        } );
+                        };
+                        comp.addRepresentation( "ball+stick", rp);
                         gmodel.push(comp);
+						gmrep.push("ball+stick");
+						gmrparams.push(rp);
 
                     	comp.autoView();
                     }
 
                     if (fext == 'pdb')
                     {
-                        comp.addRepresentation( "cartoon",
+						var rp =
                         {
                             opacity: opc_cartoon,
 							colorScheme: PODefRgnScheme,
                             // colorScale: 'rainbow',
                             metalness: mtl_cartoon,
-                        });
+                        };
+                        comp.addRepresentation( "cartoon", rp);
                         gmodel.push(comp);
+						gmrep.push("cartoon");
+						gmrparams.push(rp);
 
                         var i;
                         var subset = [], shiny = [];
@@ -2150,13 +2169,16 @@ function loadFile(fileData, fileName = "")
                         var stringBlob2 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
                         stage.loadFile( stringBlob2, { ext: 'pdb' } ).then( function( comp2 )
                         {
-                            comp2.addRepresentation( "spacefill",
+							var rp =
                             {
                                 opacity: opc_metal,
 								colorScheme: PODefScheme,
                                 metalness: mtl_metal,
-                            });
+                            };
+                            comp2.addRepresentation( "spacefill", rp);
                             gmodel.push(comp2);
+							gmrep.push("spacefill");
+							gmrparams.push(rp);
                         });
 
                     	comp.autoView();

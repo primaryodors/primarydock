@@ -12,11 +12,32 @@
 $dock_metals = false;
 $bias_by_energy = true;
 
+chdir(__DIR__);
 require("methods_common.php");
+chdir(__DIR__);
 
 $cenres = "CEN RES $bsr2a $bsr3a $bsr3b $bsr3c $bsr3d $bsr3e $bsr3f $bsr3g $bsr4a $bsr4b $bsr4c $bsr5a $bsr5b $bsr5c $bsr5d $bsr6a $bsr6b $bsr7a $bsr7b $bsr7c";
 
 $outfname = str_replace(".dock", "_soft.dock", $outfname);
+
+$biases = [];
+if (file_exists("clashmap_bias.json"))
+{
+    $cbias = json_decode(file_get_contents("clashmap_bias.json"), true);
+    foreach ($cbias as $tmrno => $data)
+    {
+        $radxf = floatval(@$data['rxform']) ?: 0;
+        $angxf = floatval(@$data['thxform']) ?: 0;
+        $vtxf  = floatval(@$data['vxform']) ?: 0;
+
+        $haxrot = floatval(@$data['hxrot8']) ?: 0;
+        $torrot = floatval(@$data['rrot8']) ?: 0;
+        $xvsrot = floatval(@$data['throt8']) ?: 0;
+
+        $biases[] = "SOFTBIAS TMR$tmrno $radxf $angxf $vtxf $haxrot $torrot $xvsrot";
+    }
+}
+$biases = implode("\n", $biases);
 
 prepare_outputs();
 
@@ -32,7 +53,7 @@ POSE 5
 ITER 50
 ELIM 99
 SOFT TMR2 TMR4 TMR5 TMR6 TMR7
-SOFTBIAS TMR2 $radxf $angxf $vtxf $haxrot $torrot $xvsrot
+$biases
 
 OUT $outfname
 ECHO

@@ -529,8 +529,8 @@ void iteration_callback(int iter)
                 if (isnan(amount) || !amount) amount = frand(-1, 1);
                 else
                 {
-                    if (amount > 0) amount = frand(0, amount);
-                    else amount = frand(amount, 0);
+                    if (amount > 0) amount = frand(-amount*soft_bias_overlap, amount);
+                    else amount = frand(amount, -amount*soft_bias_overlap);
                 }
 
                 Point ptrgn = protein->get_region_center(soft_rgns[l].start, soft_rgns[l].end);

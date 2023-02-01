@@ -32,6 +32,7 @@ POSE 5
 ITER 50
 ELIM 99
 SOFT TMR2 TMR4 TMR5 TMR6 TMR7
+SOFTBIAS TMR2 $radxf $angxf $vtxf $haxrot $torrot $xvsrot
 
 OUT $outfname
 ECHO

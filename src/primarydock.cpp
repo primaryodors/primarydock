@@ -50,6 +50,17 @@ struct AcvBndRot
     float theta;
 };
 
+struct SoftBias
+{
+    std::string region_name;
+    float radial_transform = 0;                 // Motion away from or towards the pocket center.
+    float angular_transform = 0;                // Motion towards and away from neighboring helices.
+    float vertical_transform = 0;               // Motion in the extracelllar or cytoplasmic direction.
+    float helical_rotation = 0;                 // Rotation about the helical axis.
+    float radial_rotation = 0;                  // Rotation about the imaginary line to the pocket center.
+    float transverse_rotation = 0;              // Rotation about the imaginary line perpendicular to the pocket center.
+};
+
 #if _use_gloms
 struct AtomGlom
 {
@@ -366,6 +377,7 @@ std::vector<int> tripswitch_clashables;
 bool soft_pocket = false;
 std::string soft_names;
 std::vector<Region> soft_rgns;
+std::vector<SoftBias> soft_biases;
 
 float rgnxform_r[PROT_MAX_RGN], rgnxform_theta[PROT_MAX_RGN], rgnxform_y[PROT_MAX_RGN];
 float rgnrot_alpha[PROT_MAX_RGN], rgnrot_w[PROT_MAX_RGN], rgnrot_u[PROT_MAX_RGN];
@@ -443,6 +455,18 @@ float teleport_water(Molecule* mol)
     return e;
 }
 
+SoftBias* get_soft_bias_from_region(const char* region)
+{
+    int sz = soft_biases.size();
+    if (!sz) return nullptr;
+    int i;
+    for (i=0; i<sz; i++)
+    {
+        if (soft_biases[i].region_name == (std::string)region) return &soft_biases[i];
+    }
+    return nullptr;
+}
+
 void iteration_callback(int iter)
 {
     #if !allow_iter_cb
@@ -460,13 +484,54 @@ void iteration_callback(int iter)
         {
             for (l=0; l<sz; l++)
             {
+                SoftBias* sb = get_soft_bias_from_region(soft_rgns[l].name.c_str());
                 if (!l) prebind = protein->get_intermol_binding(ligand)*soft_ligand_importance - protein->get_internal_clashes()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
                 #if _dbg_soft
                 cout << iter << ": from " << prebind;
                 #endif
 
                 int tweak = rand() % 6;
-                float amount = frand(-1, 1);
+                float amount = nanf("unbiased");
+
+                if (sb)
+                {
+                    switch (tweak)
+                    {
+                        case 0:
+                        amount = sb->radial_transform;
+                        break;
+
+                        case 1:
+                        amount = sb->angular_transform;
+                        break;
+
+                        case 2:
+                        amount = sb->vertical_transform;
+                        break;
+
+                        case 3:
+                        amount = sb->helical_rotation;
+                        break;
+
+                        case 4:
+                        amount = sb->radial_rotation;
+                        break;
+
+                        case 5:
+                        amount = sb->transverse_rotation;
+                        break;
+
+                        default:
+                        ;
+                    }
+                }
+
+                if (isnan(amount) || !amount) amount = frand(-1, 1);
+                else
+                {
+                    if (amount > 0) amount = frand(0, amount);
+                    else amount = frand(amount, 0);
+                }
 
                 Point ptrgn = protein->get_region_center(soft_rgns[l].start, soft_rgns[l].end);
                 SCoord r = ptrgn.subtract(loneliest);
@@ -1212,6 +1277,30 @@ int interpret_config_line(char** words)
             soft_names += (std::string)words[i] + (std::string)" ";
         }
         optsecho += soft_names + (std::string)" ";
+        return i-1;
+    }
+    else if (!strcmp(words[0], "SOFTBIAS"))
+    {
+        SoftBias lbias;
+        i=1;
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.region_name = words[i++];
+
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.radial_transform = atof(words[i++]);
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.angular_transform = atof(words[i++]);
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.vertical_transform = atof(words[i++]);
+
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.helical_rotation = atof(words[i++]);
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.radial_rotation = atof(words[i++]);
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.transverse_rotation = atof(words[i++]);
+
+        soft_biases.push_back(lbias);
         return i-1;
     }
     else if (!strcmp(words[0], "STATE"))

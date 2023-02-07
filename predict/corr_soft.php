@@ -92,13 +92,14 @@ foreach ($dock_data as $rcp => $ligs)
     {
         if (@$pair['version'] < $version) continue;
         $idx = "$rcp|$ligand";
+        $gidx = "All|$ligand";
 
         switch (@$pair['Actual'])
         {
             case 'Agonist':
             $emp = best_empirical_pair($rcp, $ligand, true);
             // print_r($emp); exit;
-            if ($emp)
+            if ($emp && false)
             {
                 if (isset($emp['adjusted_curve_top']) && isset($emp['ec50']))
                     $x = (floatval($emp['adjusted_curve_top']) - min(10, -_EC50MUL*floatval($emp['ec50']))) / 2;
@@ -110,14 +111,17 @@ foreach ($dock_data as $rcp => $ligs)
             }
             else $x = 1;
             $xvals[$rcp][$idx] = $x;
+            $xvals["All"][$idx] = $x;
             break;
 
             case 'Non-Agonist':
             $xvals[$rcp][$idx] = 0;
+            $xvals["All"][$idx] = 0;
             break;
 
             case 'Inverse Agonist':
             $xvals[$rcp][$idx] = -1;
+            $xvals["All"][$idx] = -1;
             break;
 
             default:
@@ -126,7 +130,7 @@ foreach ($dock_data as $rcp => $ligs)
 
         foreach ($pair as $k => $v)
         {
-            if (substr($k, 0, 7) == "BEnerg ")
+            /*if (substr($k, 0, 7) == "BEnerg ")
             {
                 $bw = substr($k, 7);
                 $yvals[$rcp]["$bw.e"][$idx] = $v;
@@ -136,12 +140,13 @@ foreach ($dock_data as $rcp => $ligs)
             {
                 $bw = substr($k, 7);
                 $yvals[$rcp]["$bw.v"][$idx] = $v;
-            }
+            }*/
             
             if (substr($k, 0, 3) == "TMR")
             {
                 $bw = substr($k, 7);
                 $yvals[$rcp][$k][$idx] = $v;
+                $yvals["All"][$k][$idx] = $v;
             }
         }
 
@@ -162,6 +167,7 @@ foreach ($yvals as $rcp => $yv)
 {   
     $cxv = count($xvals[$rcp]);
     $threshold = max(0.5 * $cxv, 5);
+    if ($rcp == "All") $threshold = 0.1;
 
     foreach ($yv as $metric => $ly)
     {

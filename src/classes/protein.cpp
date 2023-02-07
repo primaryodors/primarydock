@@ -282,6 +282,23 @@ float Protein::get_internal_clashes()
     return result;
 }
 
+float Protein::get_internal_binding()
+{
+    if (!residues) return 0;
+    int i, j;
+    float result = 0;
+    for (i=0; residues[i]; i++)
+    {
+        for (j=i; residues[j]; j++)
+        {
+            /*if (j==i) result += residues[i]->get_internal_binding();
+            else*/ result += residues[i]->get_intermol_binding(residues[j]);
+        }
+    }
+    result += initial_int_clashes;              // Compensate for AminoAcid::get_intermol_binding() which factors in clashes.
+    return result;
+}
+
 float Protein::get_intermol_clashes(Molecule* ligand)
 {
     AminoAcid* laminos[100];
@@ -667,6 +684,8 @@ int Protein::load_pdb(FILE* is, int rno)
 
         delete[] words;
     }
+
+    initial_int_clashes = get_internal_clashes();
 
     return rescount;
 }

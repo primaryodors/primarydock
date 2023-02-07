@@ -73,6 +73,7 @@ public:
 
     // Metrics functions.
     float get_internal_clashes();
+    float get_internal_binding();
     float get_intermol_clashes(Molecule* ligand);
     float get_intermol_binding(Molecule* ligand);
     AminoAcid** get_residues_can_clash(int resno);
@@ -137,6 +138,7 @@ protected:
     Atom** metals = nullptr;
     int metcount = 0;
     Star aaptrmin, aaptrmax;
+    float initial_int_clashes = 0;
     Region regions[PROT_MAX_RGN];
     region_source regions_from = rgn_none;
     std::vector<string> remarks;

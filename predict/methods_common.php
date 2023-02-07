@@ -53,6 +53,7 @@ if (@$_REQUEST['next'])
 	foreach (array_keys($prots) as $rcpid)
 	{
 		if ($protid && $protid != $rcpid) continue;
+		if (!$protid && $rcpid == 'OR1A1') continue;
 		$odorids = array_keys(all_empirical_pairs_for_receptor($rcpid));
 		// shuffle($odorids);
 

@@ -42,7 +42,7 @@ foreach ($dock_data as $prot => $ligdat)
         $odor = find_odorant($lig);
         $oid = $odor[$oid];
         $dock_data_by_oid[$prot][$oid] = $data;
-        
+
         if (isset($data['Actual']))
         {
             if ((intval(substr($oid, 12, 1)) & 1)
@@ -53,10 +53,10 @@ foreach ($dock_data as $prot => $ligdat)
                 $arrvar = "training_set";
             }
             else $arrvar = "evaluation_set";
-            
+
             $$arrvar["$prot.$oid"] = $data['Actual'];
         }
-        
+
         foreach ($data as $key => $value)
         {
             if (substr($key, 0, 3) == "TMR")
@@ -78,6 +78,14 @@ else
 }
 
 
+// set_time_limit(1800);
+// $mlp->partialTrain( [ array_values($sample) ], [ $labels[$i] ]);
+
+// $modelManager = new ModelManager();
+
+// $modelManager->saveToFile($mlp, $file);
+
+// $mlp->predict([array_values($sample)]);
 
 
 

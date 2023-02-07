@@ -34,12 +34,14 @@ if (file_exists($json_file))
 }
 
 $metrics = [];
+$dock_data_by_oid = [];
 foreach ($dock_data as $prot => $ligdat)
 {
     foreach ($ligdat as $lig => $data)
     {
         $odor = find_odorant($lig);
         $oid = $odor[$oid];
+        $dock_data_by_oid[$prot][$oid] = $data;
         
         if (isset($data['Actual']))
         {
@@ -57,7 +59,10 @@ foreach ($dock_data as $prot => $ligdat)
         
         foreach ($data as $key => $value)
         {
-            $metrics[$key] = $key;
+            if (substr($key, 0, 3) == "TMR")
+            {
+                $metrics[$key] = $key;
+            }
         }
     }
 }

@@ -21,9 +21,9 @@ $training_set   = [];
 $evaluation_set = [];
 $prediction_set = [];
 
-$clsss = ['na',                   // Non-agonist.
-          'a',                    // Agonist.
-          'ia'                    // Inverse agonist.
+$clsss = ['Non-Agonist',
+          'Agonist',
+          'Inverse Agonist'
          ];
 
 $json_file = "dock_results_soft.json";
@@ -40,6 +40,21 @@ foreach ($dock_data as $prot => $ligdat)
     {
         $odor = find_odorant($lig);
         $oid = $odor[$oid];
+        
+        if (isset($data['Actual']))
+        {
+            if ((intval(substr($oid, 12, 1)) & 1)
+                &&
+                (intval(substr($oid, 24, 1)) & 1)
+               )
+            {
+                $arrvar = "training_set";
+            }
+            else $arrvar = "evaluation_set";
+            
+            $$arrvar["$prot.$oid"] = $data['Actual'];
+        }
+        
         foreach ($data as $key => $value)
         {
             $metrics[$key] = $key;

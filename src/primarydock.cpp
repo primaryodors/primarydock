@@ -848,8 +848,10 @@ void iteration_callback(int iter)
     }
 
     _oei:
+    #if _dbg_glomsel
     cout << "." << flush;
     if (iter == iters-1) cout << endl << endl;
+    #endif
 
     if (output_each_iter)
     {
@@ -2407,13 +2409,19 @@ int main(int argc, char** argv)
     if (use_bestbind_algorithm) for (i=0; i<3; i++)
         {
             #if _use_gloms
+            #if _dbg_glomsel
             cout << "Ligand's ";
             if (i == 0) cout << "primary";
             else if (i == 1) cout << "secondary";
             else if (i == 2) cout << "tertiary";
             else cout << "accessory";
+            #endif
+
             int lgsz = ligand_gloms[i].atoms.size();
+
+            #if _dbg_glomsel
             cout << " atom group has " << lgsz << " atoms." << endl;
+            #endif
 
             if (lgsz)
             {
@@ -2424,11 +2432,13 @@ int main(int argc, char** argv)
                 cout << endl;
             }
 
+            #if _dbg_glomsel
             cout << "Ionic: " << ligand_gloms[i].get_ionic()
                  << " H-bond: " << ligand_gloms[i].get_polarity()
                  << " pi-stack: " << ligand_gloms[i].get_pi()
                 ;
             cout << endl << endl;
+            #endif
             #else
             if (ligbb[i])
             {
@@ -3361,9 +3371,11 @@ _try_again:
                             // 2A towards loneliest.
                             n = sc_gloms[l].aminos.size();
                             if (!n) goto _deadglob;
+                            #if _dbg_glomsel
                             cout << "Moving primary atom group to vicinity of";
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
+                            #endif
 
                             xform = sc_gloms[l].get_center();
                             if (n < 4)
@@ -3397,7 +3409,9 @@ _try_again:
                             n = sc_gloms[l].aminos.size();
                             if (!n)
                             {
+                                #if _dbg_glomsel
                                 cout << "Aligning center of ligand towards center of pocket.";
+                                #endif
                                 zcen = ligand_gloms[0].get_center();
                                 rot = align_points_3d(ligand->get_barycenter(), loneliest, zcen);
                                 lv = rot.v;
@@ -3405,9 +3419,11 @@ _try_again:
                                 ligand->rotate(lv, rot.a);
                                 goto _deadglob;
                             }
+                            #if _dbg_glomsel
                             cout << "Aligning secondary atom group towards";
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
+                            #endif
 
                             zcen = ligand_gloms[0].get_center();
                             rot = align_points_3d(ligand_gloms[l].get_center(), sc_gloms[l].get_center(), zcen);
@@ -3422,9 +3438,11 @@ _try_again:
                             // ligand_gloms[2] center as close as possible to sc_gloms[2] center.
                             n = sc_gloms[l].aminos.size();
                             if (!n) goto _deadglob;
+                            #if _dbg_glomsel
                             cout << "\"Rotisserie\"-aligning tertiary atom group towards";
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
+                            #endif
 
                             zcen = ligand_gloms[0].get_center();
                             axis = ligand_gloms[1].get_center().subtract(zcen);

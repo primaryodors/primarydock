@@ -442,7 +442,11 @@ int Protein::load_pdb(FILE* is, int rno)
             else if (buffer[0] == 'A' &&
                      buffer[1] == 'T' &&
                      buffer[2] == 'O' &&
-                     buffer[3] == 'M'
+                     buffer[3] == 'M' &&
+                     (buffer[22] == ' ' || (buffer[22] >= '0' && buffer[22] <= '9')) &&
+                     (buffer[23] == ' ' || (buffer[23] >= '0' && buffer[23] <= '9')) &&
+                     (buffer[24] == ' ' || (buffer[24] >= '0' && buffer[24] <= '9')) &&
+                     (buffer[25] == ' ' || (buffer[25] >= '0' && buffer[25] <= '9'))
                )
             {
                 buffer[16] = ' ';

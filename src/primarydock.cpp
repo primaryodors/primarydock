@@ -2421,7 +2421,6 @@ int main(int argc, char** argv)
 
             #if _dbg_glomsel
             cout << " atom group has " << lgsz << " atoms." << endl;
-            #endif
 
             if (lgsz)
             {
@@ -2431,6 +2430,7 @@ int main(int argc, char** argv)
                 }
                 cout << endl;
             }
+            #endif
 
             #if _dbg_glomsel
             cout << "Ionic: " << ligand_gloms[i].get_ionic()

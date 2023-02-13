@@ -113,18 +113,48 @@ foreach ($array['all'] as $tmrno => $tdat)
 		if ($perturbation > $maxptbn) $maxptbn = $perturbation;
 
 $ptbm = 53.81 / sqrt($maxptbn);
-
+$outjson = [];
 foreach ($array['all'] as $tmrno => $tdat)
 {
     if ($tmrno < 1 || $tmrno > 7) continue;
     $ltmcol = "tm{$tmrno}col";
     $ltmcol = $$ltmcol;
+
+    $vals = [];
+    $avgpert = array_sum($tdat) / (count($tdat) ?: 1);
+
+    $yavg = 0.0;
+    $ydiv = 0;
+    $azc = [];
+    $yc = [];
+    foreach ($tdat as $bw => $perturbation)
+    {
+        $resno = resno_from_bw($orid, "$tmrno.$bw");
+        $xyz = $resxyz[$orid][$resno];
+        $yavg += $xyz[1];
+        $ydiv++;
+
+        $azimuth = find_angle($xyz[0], -$xyz[2]) + 0.3 - pi();
+        if ($tmrno != 7 && $azimuth < 0) $azimuth += pi()*2;
+        $azc[$bw] = $azimuth;
+        $yc[$bw] = $xyz[1];
+    }
+
+    $lrgr = regression_line($yc, $azc);
+
+    if ($ydiv) $yavg /= $ydiv;
+
     foreach ($tdat as $bw => $perturbation)
     {
         $resno = resno_from_bw($orid, "$tmrno.$bw");
         $xyz = $resxyz[$orid][$resno];
         $azimuth = find_angle($xyz[0], -$xyz[2]) + 0.3 - pi();
         if ($azimuth < 0) $azimuth += pi()*2;
+        $adjaz = $azimuth - (/*$lrgr[1] +*/ $lrgr[0]*$xyz[1]);
+
+        $vals['az'][$bw] = -$adjaz;
+        $vals['y'][$bw] = $xyz[1];
+        $vals['azy'][$bw] = $adjaz * ($xyz[1] - $yavg);
 
         $x = intval(3 * (180.0 / pi()) * $azimuth + $pad);
         $y = ($h/2) + $xyz[1]*20 + $pad;
@@ -140,7 +170,28 @@ foreach ($array['all'] as $tmrno => $tdat)
         	imagefilledellipse($im, $x,$y, $r,$r, $ltmcol);
     	}
     }
+
+    $rxform = $avgpert;
+    $thxform = correlationCoefficient($tdat, $vals['az']);
+    $throt8 = correlationCoefficient($tdat, $vals['y']);
+    $rrot8 = correlationCoefficient($tdat, $vals['azy']);
+
+    echo "TMR$tmrno radial transformation: $rxform\n";
+    echo "TMR$tmrno angular transformation: $thxform\n";
+    echo "TMR$tmrno centrifugal rocking: $throt8\n";
+    echo "TMR$tmrno torsional rocking: $rrot8\n";
+    echo "\n";
+
+    $outjson[$tmrno]['rxform'] = $rxform;
+    $outjson[$tmrno]['thxform'] = $thxform;
+    $outjson[$tmrno]['throt8'] = $throt8;
+    $outjson[$tmrno]['rrot8'] = $rrot8;
 }
 
 imagepng($im, "../tmp/clashmap.png");
+
+$fp = fopen("clashmap_bias.json", "w");
+if (!$fp) die("FAILED to open JSON file for writing!\n");
+fwrite($fp, json_encode_pretty($outjson));
+fclose($fp);
 

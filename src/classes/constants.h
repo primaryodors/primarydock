@@ -137,6 +137,9 @@
 
 #define _use_gloms 1
 
+#define soft_ligand_importance 20
+#define soft_bias_overlap 0.1
+
 // Amount to reduce momenta for path nodes beyond zero. Since the point of path based
 // docking is to keep as closely as possible the same ligand pose and move it through
 // the protein, we want to minimize the ligand's conformational changes from node to
@@ -161,6 +164,7 @@
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
 #define allow_mol_fullrot_iter 0
+#define sidechain_fullrot_lig_bmult 3
 
 // Turns off the 360 degree rotations for all but the zeroth node of a path.
 #define nodes_no_ligand_360_tumble 0
@@ -273,6 +277,8 @@
 #define _DBG_MOLBB 0
 #define _dbg_bb_rots 0
 #define _dbg_bb_pullaway 0
+#define _dbg_soft 0
+#define _dbg_glomsel 0
 
 #endif
 

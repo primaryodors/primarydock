@@ -46,6 +46,7 @@ public:
     int load_pdb(FILE* infile, int resno_offset = 0);				// Returns number of residues loaded.
     void save_pdb(FILE* outfile, Molecule* ligand = nullptr);
     void end_pdb(FILE* outfile);
+    void revert_to_pdb();
 
     // Getters.
     int get_seq_length();
@@ -56,6 +57,7 @@ public:
     int get_metals_count();
     AminoAcid* get_residue(int resno);
     Region get_region(std::string name);
+    const Region* get_regions() { return regions; }
     int get_region_end(std::string name);
     int get_region_start(std::string name);
     bool aa_ptr_in_range( AminoAcid* aaptr );
@@ -71,8 +73,9 @@ public:
 
     // Metrics functions.
     float get_internal_clashes();
-    float get_intermol_clashes(const Molecule* ligand);
-    float get_intermol_binding(const Molecule* ligand);
+    float get_internal_binding();
+    float get_intermol_clashes(Molecule* ligand);
+    float get_intermol_binding(Molecule* ligand);
     AminoAcid** get_residues_can_clash(int resno);
     int get_residues_can_clash_ligand
     (	AminoAcid** reaches_spheroid,
@@ -81,16 +84,19 @@ public:
         const Point size,
         const int* addl_resno
     );
+
     std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
     Molecule** all_residues_as_molecules();
     Molecule** all_residues_as_molecules_except(Molecule** mm);
     Point get_region_center(int startres, int endres);
+    SCoord get_region_axis(int startres, int endres);
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size);
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
 
     // Motion functions
     void move_piece(int start_res, int end_res, Point new_center);		// After calling this, you should reconnect the broken ends with conform_backbone().
+    void move_piece(int start_res, int end_res, SCoord move_amt);       // "
     LocRotation rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.
     LocRotation rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res);
     LocRotation rotate_piece(int start_res, int end_res, Point origin, SCoord axis, float theta);
@@ -132,6 +138,7 @@ protected:
     Atom** metals = nullptr;
     int metcount = 0;
     Star aaptrmin, aaptrmax;
+    float initial_int_clashes = 0;
     Region regions[PROT_MAX_RGN];
     region_source regions_from = rgn_none;
     std::vector<string> remarks;
@@ -139,6 +146,7 @@ protected:
     std::vector<int> Ballesteros_Weinstein;
     std::vector<AABridge> aabridges;
     std::vector<Bond*> connections;
+    std::vector<Pose> origpdb_residues;
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);

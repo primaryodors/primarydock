@@ -53,6 +53,7 @@ if (@$_REQUEST['next'])
 	foreach (array_keys($prots) as $rcpid)
 	{
 		if ($protid && $protid != $rcpid) continue;
+		if (!$protid && $rcpid == 'OR1A1') continue;
 		$odorids = array_keys(all_empirical_pairs_for_receptor($rcpid));
 		// shuffle($odorids);
 
@@ -173,14 +174,23 @@ function process_dock()
     $ca_loc = [];
     $sc_loc = [];
     $sc_qty = [];
+    $pnlines = [];
     foreach ($outlines as $ln)
     {
         // echo "$ln\n";
         if (substr($ln, 0, 4) == 'ATOM' || substr($ln, 0, 6) == 'HETATM') $dosce = $dovdw = false;
         if (!strlen(trim($ln))) $dosce = $dovdw = false;
+
+        if ($pose > 0 && $node >= 0)
+        {
+            if (!isset($pnlines[$pose][$node])) $pnlines[$pose][$node] = [];
+            $pnlines[$pose][$node][] = $ln;
+        }
+
         if (substr($ln, 0, 6) == "Pose: ")
         {
             $pose = intval(explode(" ", $ln)[1]);
+            $node = -1;
             $dovdw = false;
         }
         if (substr($ln, 0, 6) == "Node: ") $node = intval(explode(" ", $ln)[1]);
@@ -271,6 +281,8 @@ function process_dock()
     $svdw = [];
     $rsum = [];
     $rsumv = [];
+    $cbvals = [];
+    $cbcounts = [];
     foreach ($benerg as $pose => $data)
     {
         foreach ($data as $node => $value)
@@ -278,21 +290,35 @@ function process_dock()
             if (!isset($sum[$node]  )) $sum[$node] = 0.0;
             if (!isset($count[$node])) $count[$node] = 0;
             
-            $sum[$node] += $value;
-            $count[$node]++;
+            $sum[$node] += $value * $bias;
+            $count[$node] += $bias;
     
+            if (@$scenerg[$pose][$node])
             foreach ($scenerg[$pose][$node] as $resno => $e)
             {
                 if (!isset($ssce[$resno])) $ssce[$resno] = floatval($rsum[$resno] = 0);
-                $ssce[$resno] += $e;
-                $rsum[$resno]++;
+                $ssce[$resno] += $e * $bias;
+                $rsum[$resno] += $bias;
             }
     
+            if (@$vdwrpl[$pose][$node])
             foreach ($vdwrpl[$pose][$node] as $resno => $v)
             {
                 if (!isset($svdw[$resno])) $svdw[$resno] = floatval($rsumv[$resno] = 0);
-                $svdw[$resno] += $v;
-                $rsumv[$resno]++;
+                $svdw[$resno] += $v * $bias;
+                $rsumv[$resno] += $bias;
+            }
+
+            if (function_exists("dockline_callback"))
+            {
+                $raw = dockline_callback($pnlines[$pose][$node]);
+                foreach ($raw as $k => $v)
+                {
+                    if (!isset($cbvals[$k])) $cbvals[$k] = $v;
+                    else $cbvals[$k] += $v * $bias;
+                    if (!isset($cbcounts[$k])) $cbcounts[$k] = $bias;
+                    else $cbcounts[$k] += $bias;
+                }
             }
         }
     }
@@ -317,47 +343,53 @@ function process_dock()
             ];
         }
     
-        echo "Resno $resno ssce {$ssce[$resno]} / rsum {$rsum[$resno]}.\n";
+        // echo "Resno $resno ssce {$ssce[$resno]} / rsum {$rsum[$resno]}.\n";
         if (@$ssce[$resno] && $rsum[$resno ]) $sce[$bw] = $ssce[$resno] / $rsum[$resno];
         if (@$svdw[$resno] && $rsumv[$resno]) $vdw[$bw] = $svdw[$resno] / $rsumv[$resno];
     }
 
     // echo "sce: "; print_r($sce); exit;
 
-    
     $average = [];
     $average['version'] = $version;
     $average['Poses'] = $poses_found;
-    
+
     foreach ($sce as $bw => $e)
     {
         $average["BEnerg $bw"] = $e;
     }
-    
+
     foreach ($vdw as $bw => $v)
     {
         $average["vdWrpl $bw"] = $v;
     }
-    
+
     foreach ($sum as $node => $value)
     {
         $average["Node $node"] = round($value / (@$count[$node] ?: 1), 3);
     }
-    
+
+    foreach ($cbvals as $k => $v)
+    {
+        if (@$cbcounts[$k]) $v /= $cbcounts[$k];
+        $average[$k] = $v;
+    }
+
+    /*
     ksort($sc_avg);
-    
+
     foreach ($sc_avg as $bw => $xyz)
     {
         $average["SCW $bw"] = $xyz;
-    }
-    
+    }*/
+
     $actual = best_empirical_pair($protid, $ligname);
     if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
     else $actual = "(unknown)";
-    
+
     $average["Actual"] = $actual;
-    
-    
+
+
     // Reload to prevent overwriting another process' output.
     if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
     $dock_results[$protid][$ligname] = $average;

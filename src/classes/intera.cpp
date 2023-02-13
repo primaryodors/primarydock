@@ -540,9 +540,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     Atom* aheavy = a;
     if (aheavy->get_Z() == 1)
     {
-        Bond** tmpb = a->get_bonds();
+        /*Bond** tmpb = a->get_bonds();
         if (tmpb && tmpb[0] && tmpb[0]->btom) aheavy = tmpb[0]->btom;
-        if (tmpb) delete[] tmpb;
+        if (tmpb) delete[] tmpb;*/
+        Bond* ab = a->get_bond_by_idx(0);
+        if (ab->btom && ab->btom->get_Z() > 1) aheavy = ab->btom;
     }
     // TODO: Increase this value if multiple negative charges are nearby; decrease if positive nearby.
     if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !isnan(aheavy->pK) && aheavy->pK > pn_protonation_pKa_min) // || (a->get_Z() == 1 && a->is_bonded_to(PNICTOGEN) )))

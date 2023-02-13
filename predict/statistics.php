@@ -73,6 +73,33 @@ function calculate_p($xarr, $yarr, $corr, $iters=100)
     return $p;
 }
 
+function standard_deviation($arr)
+{
+    $avg = array_sum($arr) / (count($arr) ?: 1);
+    $result = 0.0;
+    foreach ($arr as $v) $result += pow($v - $avg, 2);
+    $result /= (count($arr) ?: 1);
+    return pow($result, 0.5);
+}
+
+function regression_line($xvals, $yvals)
+{
+    if (!is_array($xvals) || !is_array($yvals))   throw new Exception("regression_line requires two equal length arrays.");
+    if (count($xvals) != count($yvals))           throw new Exception("regression_line requires two equal length arrays.");
+    if (!count($xvals) || !count($yvals))         throw new Exception("regression_line passed empty arrays.");
+
+    $mx = array_sum($xvals) / (count($xvals) ?: 1);
+    $my = array_sum($yvals) / (count($yvals) ?: 1);
+    $sx = standard_deviation($xvals);
+    $sy = standard_deviation($yvals);
+    $r  = correlationCoefficient($xvals, $yvals);
+
+    $m = $r * ($sy / $sx);
+    $b = $my - $m*$mx;
+
+    return [$m, $b];
+}
+
 function hill($concn, $emax, $ec50, $nH = 2.0)
 {   
     return $emax / (1.0 + pow($ec50 / $concn, $nH));

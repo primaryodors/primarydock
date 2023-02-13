@@ -1048,10 +1048,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
         int thistell = ftell(is);
         strcpy(origbuf, buffer);
-        // char** words = chop_spaced_words(buffer);
 
-        // TODO: Make this a vector of strings.
-		// char** words = new char*[20];
         std::vector<std::string> words;
 		int places[20] = {0, 6, 11, 17, 21, 22, 30, 38, 46, 54, 60, 76};
 		int i, j, k;

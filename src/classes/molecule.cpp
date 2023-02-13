@@ -121,7 +121,7 @@ Pose::Pose(Molecule* m)
 
 Pose::~Pose()
 {
-    if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete[] saved_atom_locs;
+    // if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete saved_atom_locs;
 }
 
 void Pose::reset()
@@ -586,7 +586,11 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
             break;
 
             case hbond:
-            result += fabs(atoms[i]->is_polar());
+             if (atoms[i]->get_Z() > 1)
+             {
+                 result += fabs(atoms[i]->is_polar());
+                 result += fabs(atoms[i]->get_charge());
+             }
             break;
 
             case pi:
@@ -624,6 +628,38 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
     }
 
     if (heavy) result /= heavy;
+    if (t == hbond)
+    {
+        if (result < 0.3) result = 0;
+    }
+
+    return result;
+}
+
+int Molecule::has_hbond_donors()
+{
+    if (!atoms) return 0;
+
+    int i, result=0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->is_polar() > 0) result++;
+    }
+
+    return result;
+}
+
+int Molecule::has_hbond_acceptors()
+{
+    if (!atoms) return 0;
+
+    int i, result=0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->is_polar() < 0) result++;
+    }
 
     return result;
 }
@@ -2950,7 +2986,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 if (mm[i]->rotatable_bonds && mm[i]->rotatable_bonds[0] && mm[i]->rotatable_bonds[0]->atom)
                     residue = mm[i]->rotatable_bonds[0]->atom->residue;
 
-                // Don't know why this is renecessary.
                 if (mm[i]->movability == MOV_FLEXONLY)
                 {
                     bind = 0;
@@ -2959,7 +2994,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         if (!nearby[j]) continue;
                         // cout << ".";
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        bind += mm[i]->get_intermol_binding(all[j], !is_ac);
+                        float f = mm[i]->get_intermol_binding(all[j], !is_ac);
+                        if (mm[i]->is_residue() && !all[j]->is_residue()) f *= sidechain_fullrot_lig_bmult;
+                        bind += f;
                         bind -= mm[i]->lastshielded * shielding_avoidance_factor;
                         bind += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
                     }
@@ -3039,6 +3076,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 {
                                     if (!nearby[j]) continue;
                                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                                    
                                     float lbind1 =
 
                                         #if allow_ligand_esp
@@ -3052,6 +3090,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                         #endif
                                         ;
 
+                                    if (mm[i]->is_residue() && !all[j]->is_residue()) lbind1 *= sidechain_fullrot_lig_bmult;
                                     bind1 += lbind1;
                                     bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                                     bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;

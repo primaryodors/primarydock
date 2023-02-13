@@ -50,6 +50,17 @@ struct AcvBndRot
     float theta;
 };
 
+struct SoftBias
+{
+    std::string region_name;
+    float radial_transform = 0;                 // Motion away from or towards the pocket center.
+    float angular_transform = 0;                // Motion towards and away from neighboring helices.
+    float vertical_transform = 0;               // Motion in the extracelllar or cytoplasmic direction.
+    float helical_rotation = 0;                 // Rotation about the helical axis.
+    float radial_rotation = 0;                  // Rotation about the imaginary line to the pocket center.
+    float transverse_rotation = 0;              // Rotation about the imaginary line perpendicular to the pocket center.
+};
+
 #if _use_gloms
 struct AtomGlom
 {
@@ -176,6 +187,10 @@ struct AtomGlom
         float result = 0;
         float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
 
+        float aachg = aa->get_charge();
+        if (aa->conditionally_basic()) aachg += 0.5;
+        if (lgi && aachg && sgn(lgi) != -sgn(aachg)) return 0;
+
         if (aa->hydrophilicity() > 0.25)
         {
             if ((lgh / atct) < 0.19) return 0;
@@ -183,6 +198,30 @@ struct AtomGlom
         else
         {
             if ((lgh / atct) > 0.33333) return 0;
+        }
+
+        if (lgh)
+        {
+            int i;
+            int atct = atoms.size();
+            if (!aa->has_hbond_acceptors())
+            {
+                lgh = 0;
+                if (atct)
+                for (i=0; i<atct; i++)
+                {
+                    if (atoms[i]->is_polar() < 0) lgh++;
+                }
+            }
+            else if (!aa->has_hbond_donors())
+            {
+                lgh = 0;
+                if (atct)
+                for (i=0; i<atct; i++)
+                {
+                    if (atoms[i]->is_polar() > 0) lgh++;
+                }
+            }
         }
  
         if (lgi) result += lgi * -aa->bindability_by_type(ionic) * 1000;
@@ -335,6 +374,14 @@ std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
 
+bool soft_pocket = false;
+std::string soft_names;
+std::vector<Region> soft_rgns;
+std::vector<SoftBias> soft_biases;
+
+float rgnxform_r[PROT_MAX_RGN], rgnxform_theta[PROT_MAX_RGN], rgnxform_y[PROT_MAX_RGN];
+float rgnrot_alpha[PROT_MAX_RGN], rgnrot_w[PROT_MAX_RGN], rgnrot_u[PROT_MAX_RGN];
+
 #if _dummy_atoms_for_debug
 std::vector<Atom> dummies;
 #endif
@@ -408,6 +455,18 @@ float teleport_water(Molecule* mol)
     return e;
 }
 
+SoftBias* get_soft_bias_from_region(const char* region)
+{
+    int sz = soft_biases.size();
+    if (!sz) return nullptr;
+    int i;
+    for (i=0; i<sz; i++)
+    {
+        if (soft_biases[i].region_name == (std::string)region) return &soft_biases[i];
+    }
+    return nullptr;
+}
+
 void iteration_callback(int iter)
 {
     #if !allow_iter_cb
@@ -416,6 +475,196 @@ void iteration_callback(int iter)
 
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     int l;
+    float prebind;
+
+    if (soft_pocket && iter >= 10)
+    {
+        int sz = soft_rgns.size();
+        if (sz)
+        {
+            for (l=0; l<sz; l++)
+            {
+                SoftBias* sb = get_soft_bias_from_region(soft_rgns[l].name.c_str());
+                if (!l) prebind = protein->get_intermol_binding(ligand)*soft_ligand_importance + protein->get_internal_binding()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
+                #if _dbg_soft
+                cout << iter << ": from " << prebind;
+                #endif
+
+                int tweak = rand() % 6;
+                float amount = nanf("unbiased");
+
+                if (sb)
+                {
+                    switch (tweak)
+                    {
+                        case 0:
+                        amount = sb->radial_transform;
+                        break;
+
+                        case 1:
+                        amount = sb->angular_transform;
+                        break;
+
+                        case 2:
+                        amount = sb->vertical_transform;
+                        break;
+
+                        case 3:
+                        amount = sb->helical_rotation;
+                        break;
+
+                        case 4:
+                        amount = sb->radial_rotation;
+                        break;
+
+                        case 5:
+                        amount = sb->transverse_rotation;
+                        break;
+
+                        default:
+                        ;
+                    }
+                }
+
+                if (isnan(amount) || !amount) amount = frand(-1, 1);
+                else
+                {
+                    if (amount > 0) amount = frand(-amount*soft_bias_overlap, amount);
+                    else amount = frand(amount, -amount*soft_bias_overlap);
+                }
+
+                Point ptrgn = protein->get_region_center(soft_rgns[l].start, soft_rgns[l].end);
+                SCoord r = ptrgn.subtract(loneliest);
+                r.theta = 0;
+                r.r = amount;
+                Point pr1 = loneliest.add(r);
+                Point pr2 = pr1;
+                pr2.y += 20;
+                SCoord normal = compute_normal(loneliest, pr1, pr2);
+                normal.r = amount;
+                SCoord alpha = protein->get_region_axis(soft_rgns[l].start, soft_rgns[l].end);
+                alpha.r = amount;
+                Point rgncen = protein->get_region_center(soft_rgns[l].start, soft_rgns[l].end);
+
+                switch (tweak)
+                {
+                    case 0:
+                    protein->move_piece(soft_rgns[l].start, soft_rgns[l].end, r);
+                    break;
+
+                    case 1:
+                    protein->move_piece(soft_rgns[l].start, soft_rgns[l].end, normal);
+                    break;
+
+                    case 2:
+                    protein->move_piece(soft_rgns[l].start, soft_rgns[l].end, alpha);
+                    break;
+
+                    case 3:
+                    protein->rotate_piece(soft_rgns[l].start, soft_rgns[l].end, rgncen, alpha, amount/10);
+                    break;
+
+                    case 4:
+                    protein->rotate_piece(soft_rgns[l].start, soft_rgns[l].end, rgncen, r, amount/50);
+                    break;
+
+                    case 5:
+                    protein->rotate_piece(soft_rgns[l].start, soft_rgns[l].end, rgncen, normal, amount/30);
+                    break;
+
+                    default:
+                    ;
+                }
+
+                float postbind = protein->get_intermol_binding(ligand)*soft_ligand_importance + protein->get_internal_binding()*_kJmol_cuA;
+                #if _dbg_soft
+                cout << " to " << postbind;
+                #endif
+
+                switch (tweak)
+                {
+                    case 0:
+                    if (postbind > prebind) rgnxform_r[l] += amount;
+                    else
+                    {
+                        r.r = -r.r;
+                        protein->move_piece(soft_rgns[l].start, soft_rgns[l].end, r);
+                        #if _dbg_soft
+                        cout << " reverting.";
+                        #endif
+                    }
+                    break;
+
+                    case 1:
+                    if (postbind > prebind) rgnxform_theta[l] += amount;
+                    else
+                    {
+                        normal.r = -normal.r;
+                        protein->move_piece(soft_rgns[l].start, soft_rgns[l].end, normal);
+                        #if _dbg_soft
+                        cout << " reverting.";
+                        #endif
+                    }
+                    break;
+
+                    case 2:
+                    if (postbind > prebind) rgnxform_y[l] += amount;
+                    else
+                    {
+                        alpha.r = -alpha.r;
+                        protein->move_piece(soft_rgns[l].start, soft_rgns[l].end, alpha);
+                        #if _dbg_soft
+                        cout << " reverting.";
+                        #endif
+                    }
+                    break;
+
+                    case 3:
+                    if (postbind > prebind) rgnrot_alpha[l] += amount/10;
+                    else
+                    {
+                        protein->rotate_piece(soft_rgns[l].start, soft_rgns[l].end, rgncen, alpha, -amount/10);
+                        #if _dbg_soft
+                        cout << " reverting.";
+                        #endif
+                    }
+                    break;
+
+                    case 4:
+                    if (postbind > prebind) rgnrot_w[l] += amount/50;
+                    else
+                    {
+                        protein->rotate_piece(soft_rgns[l].start, soft_rgns[l].end, rgncen, r, -amount/50);
+                        #if _dbg_soft
+                        cout << " reverting.";
+                        #endif
+                    }
+                    break;
+
+                    case 5:
+                    if (postbind > prebind) rgnrot_u[l] += amount/30;
+                    else
+                    {
+                        protein->rotate_piece(soft_rgns[l].start, soft_rgns[l].end, rgncen, normal, -amount/30);
+                        #if _dbg_soft
+                        cout << " reverting.";
+                        #endif
+                    }
+                    break;
+
+                    default:
+                    ;
+                }
+
+                if (postbind > prebind) prebind = postbind;
+
+                #if _dbg_soft
+                cout << endl;
+                #endif
+            }
+        }
+    }
+
 
     Point bary = ligand->get_barycenter();
 
@@ -599,7 +848,11 @@ void iteration_callback(int iter)
     }
 
     _oei:
-    ;
+    #if _dbg_glomsel
+    cout << "." << flush;
+    if (iter == iters-1) cout << endl << endl;
+    #endif
+
     if (output_each_iter)
     {
         std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
@@ -1014,6 +1267,43 @@ int interpret_config_line(char** words)
         }
         optsecho = "Interatomic radius limit: " + to_string(size.x) + (std::string)"," + to_string(size.y) + (std::string)"," + to_string(size.z);
         return 3;
+    }
+    else if (!strcmp(words[0], "SOFT"))
+    {
+        soft_pocket = true;
+        optsecho = "Soft regions ";
+        soft_names = "";
+        for (i=1; words[i]; i++)
+        {
+            if (words[i][0] == '-' && words[i][1] == '-') break;
+            soft_names += (std::string)words[i] + (std::string)" ";
+        }
+        optsecho += soft_names + (std::string)" ";
+        return i-1;
+    }
+    else if (!strcmp(words[0], "SOFTBIAS"))
+    {
+        SoftBias lbias;
+        i=1;
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.region_name = words[i++];
+
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.radial_transform = atof(words[i++]);
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.angular_transform = atof(words[i++]);
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.vertical_transform = atof(words[i++]);
+
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.helical_rotation = atof(words[i++]);
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.radial_rotation = atof(words[i++]);
+        if (!words[i]) throw 0xbad50f7e;
+        lbias.transverse_rotation = atof(words[i++]);
+
+        soft_biases.push_back(lbias);
+        return i-1;
     }
     else if (!strcmp(words[0], "STATE"))
     {
@@ -1656,6 +1946,48 @@ int main(int argc, char** argv)
 
     int l;
 
+    if (soft_pocket)
+    {
+        if (soft_names.size())
+        {
+            char lbuff[soft_names.size()+4];
+            strcpy(lbuff, soft_names.c_str());
+            char** words = chop_spaced_words(lbuff);
+            const Region* prgn = protein->get_regions();
+            for (i=0; i<PROT_MAX_RGN; i++)
+            {
+                if (!prgn[i].start || !prgn[i].end) break;
+                for (l=0; words[l]; l++)
+                {
+                    if (!strcmp(words[l], prgn[i].name.c_str())) soft_rgns.push_back(prgn[i]);
+                }
+            }
+        }
+        else
+        {
+            const Region* prgn = protein->get_regions();
+            for (i=0; i<PROT_MAX_RGN; i++)
+            {
+                if (!prgn[i].start || !prgn[i].end) break;
+                soft_rgns.push_back(prgn[i]);
+            }
+        }
+
+        if (!soft_rgns.size())
+        {
+            cout << "Error: no regions in PDB or specified regions not found." << endl;
+            throw 0xbad5e697;
+        }
+
+        for (i=0; i<PROT_MAX_RGN; i++)
+        {
+            rgnxform_r[i] = rgnxform_theta[i] = rgnxform_y[i]
+                = rgnrot_alpha[i] = rgnrot_u[i] = rgnrot_w[i]
+                = 0;
+        }
+    }
+
+
     if (!CEN_buf.length())
     {
         cout << "Error: no binding pocket center defined." << endl;
@@ -1959,6 +2291,24 @@ int main(int argc, char** argv)
                 }
             }            
         }
+        
+        if (ligand_gloms[2].atoms.size())
+        {
+            Point a = ligand_gloms[0].get_center();
+            Point b = ligand_gloms[1].get_center();
+            Point c = ligand_gloms[2].get_center();
+
+            float rab = a.get_3d_distance(b);
+            float rac = a.get_3d_distance(c);
+
+            if (rab < 0.75*rac)
+            {
+                glomtmp = ligand_gloms[1];
+                ligand_gloms[1] = ligand_gloms[2];
+                ligand_gloms[2] = glomtmp;
+            }
+        }
+
         #else
         ligbb = m.get_most_bindable(3);
         ligbbh = new Atom*[5];
@@ -2059,12 +2409,17 @@ int main(int argc, char** argv)
     if (use_bestbind_algorithm) for (i=0; i<3; i++)
         {
             #if _use_gloms
+            #if _dbg_glomsel
             cout << "Ligand's ";
             if (i == 0) cout << "primary";
             else if (i == 1) cout << "secondary";
             else if (i == 2) cout << "tertiary";
             else cout << "accessory";
+            #endif
+
             int lgsz = ligand_gloms[i].atoms.size();
+
+            #if _dbg_glomsel
             cout << " atom group has " << lgsz << " atoms." << endl;
 
             if (lgsz)
@@ -2075,12 +2430,15 @@ int main(int argc, char** argv)
                 }
                 cout << endl;
             }
+            #endif
 
+            #if _dbg_glomsel
             cout << "Ionic: " << ligand_gloms[i].get_ionic()
                  << " H-bond: " << ligand_gloms[i].get_polarity()
                  << " pi-stack: " << ligand_gloms[i].get_pi()
                 ;
             cout << endl << endl;
+            #endif
             #else
             if (ligbb[i])
             {
@@ -2124,23 +2482,46 @@ _try_again:
 
         if (pose > 1)
         {
-            // TODO: Revert to saved original locations for the side chain atoms instead of reloading the protein.
-            delete protein;
-            protein = new Protein(protfname);
-            pf = fopen(protfname, "r");
-            protein->load_pdb(pf);
-            fclose(pf);
-            if (hydrogenate_pdb)
+            // Revert to saved original locations for the side chain atoms instead of reloading the protein.
+            protein->revert_to_pdb();
+
+            // prepare_acv_bond_rots();
+
+            if (soft_pocket)
             {
-                int resno, endres = protein->get_end_resno();
-                for (resno=1; resno<=endres; resno++)
+                for (i=0; i<PROT_MAX_RGN; i++)
                 {
-                    AminoAcid* res = protein->get_residue(resno);
-                    if (res) res->hydrogenate();
+                    int maxresno = protein->get_end_resno();
+
+                    if (i < soft_rgns.size())
+                    {
+                        Point ptrgn = protein->get_region_center(soft_rgns[i].start, soft_rgns[i].end);
+                        SCoord r = ptrgn.subtract(loneliest);
+                        r.theta = 0;
+                        r.r = -rgnxform_r[i];
+                        Point pr1 = loneliest.add(r);
+                        Point pr2 = pr1;
+                        pr2.y += 20;
+                        SCoord normal = compute_normal(loneliest, pr1, pr2);
+                        normal.r = -rgnxform_theta[i];
+                        SCoord alpha = protein->get_region_axis(soft_rgns[i].start, soft_rgns[i].end);
+                        alpha.r = -rgnxform_y[i];
+                        Point rgncen = protein->get_region_center(soft_rgns[i].start, soft_rgns[i].end);
+
+                        if (rgnxform_r[i])      protein->move_piece(soft_rgns[i].start, soft_rgns[i].end, r);
+                        if (rgnxform_theta[i])  protein->move_piece(soft_rgns[i].start, soft_rgns[i].end, normal);
+                        if (rgnxform_y[i])      protein->move_piece(soft_rgns[i].start, soft_rgns[i].end, alpha);
+                        r.r = normal.r = alpha.r = 1;
+                        if (rgnrot_alpha[i])    protein->rotate_piece(soft_rgns[i].start, soft_rgns[i].end, rgncen, alpha, -rgnrot_alpha[i]);
+                        if (rgnrot_w[i])        protein->rotate_piece(soft_rgns[i].start, soft_rgns[i].end, rgncen, r, -rgnrot_w[i]);
+                        if (rgnrot_u[i])        protein->rotate_piece(soft_rgns[i].start, soft_rgns[i].end, rgncen, normal, -rgnrot_u[i]);
+                    }
+
+                    rgnxform_r[i] = rgnxform_theta[i] = rgnxform_y[i]
+                        = rgnrot_alpha[i] = rgnrot_u[i] = rgnrot_w[i]
+                        = 0;
                 }
             }
-
-            prepare_acv_bond_rots();
         }
 
         prepare_initb();
@@ -2702,20 +3083,11 @@ _try_again:
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
                             glomtmp.aminos.clear();
-                            // Debug trap.
-                            if (l == 2 && reaches_spheroid[nodeno][i]->get_letter() == 'A')
-                            {
-                                l++;
-                                l--;
-                            }
                             if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
                             {
-                                // Debug trap.
-                                if (reaches_spheroid[nodeno][i]->is_residue() == 169)
-                                {
-                                    l++;
-                                    l--;
-                                }
+                                #if _dbg_glomsel
+                                cout << "Considering " << reaches_spheroid[nodeno][i]->get_name() << " for glom " << l << "..." << endl;
+                                #endif
                                 glomtmp.aminos.push_back(reaches_spheroid[nodeno][i]);
                                 for (j=i+1; reaches_spheroid[nodeno][j]; j++)
                                 {
@@ -2731,41 +3103,63 @@ _try_again:
                                     if (r < ligand_gloms[l].bounds())
                                     {
                                         glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);
+                                        #if _dbg_glomsel
+                                        cout << "Adding " << reaches_spheroid[nodeno][j]->get_name() << " to candidate." << endl;
+                                        #endif
                                     }
                                 }
-                            }
 
-                            bool too_similar = false;
-                            for (j=0; j<l; j++)
-                            {
-                                if (sc_gloms[j].aminos == glomtmp.aminos) too_similar = true;
-                                if (sc_gloms[j].aminos.size() == 1
-                                    &&
-                                    std::find(glomtmp.aminos.begin(), glomtmp.aminos.end(), sc_gloms[j].aminos[0]) != glomtmp.aminos.end()
-                                   )
-                                    too_similar = true;
-                                if (glomtmp.aminos.size() == 1
-                                    &&
-                                    std::find(sc_gloms[j].aminos.begin(), sc_gloms[j].aminos.end(), glomtmp.aminos[0]) != sc_gloms[j].aminos.end()
-                                   )
-                                    too_similar = true;
-                                // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) too_similar = true;
-                                float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
-                                float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
-                                if (rsg < 0.9 * rlg) too_similar = true;
-                            }
+                                bool too_similar = false;
+                                for (j=0; j<l; j++)
+                                {
+                                    if (sc_gloms[j].aminos == glomtmp.aminos) too_similar = true;
+                                    if (sc_gloms[j].aminos.size() == 1
+                                        &&
+                                        std::find(glomtmp.aminos.begin(), glomtmp.aminos.end(), sc_gloms[j].aminos[0]) != glomtmp.aminos.end()
+                                    )
+                                        too_similar = true;
+                                    if (glomtmp.aminos.size() == 1
+                                        &&
+                                        std::find(sc_gloms[j].aminos.begin(), sc_gloms[j].aminos.end(), glomtmp.aminos[0]) != sc_gloms[j].aminos.end()
+                                    )
+                                        too_similar = true;
+                                    // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) too_similar = true;
+                                    float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
+                                    float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
+                                    if (rsg < 0.9 * rlg) too_similar = true;
+                                }
 
-                            if (!too_similar)
-                            {
-                                float r = glomtmp.distance_to(loneliest);
-                                float rr = sc_gloms[l].distance_to(loneliest);
-                                float rg = ligand_gloms[l].distance_to(ligand->get_barycenter());
+                                #if _dbg_glomsel
+                                if (too_similar) cout << "Too similar to an existing glom." << endl << endl;
+                                #endif
 
-                                r -= rg; if (r < 1) r = 1;
-                                rr -= rg; if (rr < 1) rr = 1;
+                                if (!too_similar)
+                                {
+                                    float r = glomtmp.distance_to(loneliest);
+                                    float rr = sc_gloms[l].distance_to(loneliest);
+                                    float rg = ligand_gloms[l].distance_to(ligand->get_barycenter());
 
-                                float tcptbl = glomtmp.compatibility(&ligand_gloms[l]) / (r*r);
-                                if (!i || tcptbl > (sc_gloms[l].compatibility(&ligand_gloms[l]) / (rr*rr)) ) sc_gloms[l] = glomtmp;
+                                    r -= rg; if (r < 1) r = 1;
+                                    rr -= rg; if (rr < 1) rr = 1;
+
+                                    float tcptbl = glomtmp.compatibility(&ligand_gloms[l]) / (r*r);
+                                    float ptcptbl = sc_gloms[l].compatibility(&ligand_gloms[l]) / (rr*rr);
+                                    if (!i || tcptbl > ptcptbl)
+                                    {
+                                        sc_gloms[l] = glomtmp;
+                                        #if _dbg_glomsel
+                                        cout << "Accepted with compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
+                                            << " squared = " << tcptbl << "." << endl << endl;
+                                        #endif
+                                    }
+                                    #if _dbg_glomsel
+                                    else
+                                    {
+                                        cout << "Rejected because compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
+                                            << " squared is " << tcptbl << " not greater than previous value of " << ptcptbl << "." << endl << endl;
+                                    }
+                                    #endif
+                                }
                             }
                         }
 
@@ -2926,7 +3320,7 @@ _try_again:
                         Point axis;
                         LocatedVector lv;
                         Rotation rot;
-                        float theta;
+                        float theta, clash;
 
                         Atom* alca;
                         Atom** alcaa;
@@ -2939,28 +3333,31 @@ _try_again:
                                     Bond** rbb = sc_gloms[l].aminos[i]->get_rotatable_bonds();
                                     if (rbb)
                                     {
-                                        alcaa = sc_gloms[l].aminos[i]->get_most_bindable(1);
+                                        alcaa = sc_gloms[l].aminos[i]->get_most_bindable(1, ligand_gloms[l].atoms[0]);
                                         if (!alcaa) continue;
                                         alca = alcaa[0];
                                         delete alcaa;
 
-                                        float br = alca->get_location().get_3d_distance(loneliest);
-                                        float brad = 0;
-                                        for(j=0; rbb[j]; j++)
+                                        if (alca)
                                         {
-                                            float rad;
-                                            for (rad=0; rad<M_PI*2; rad += square)
-                                            {
-                                                rbb[j]->rotate(square);
-                                                float lr = alca->get_location().get_3d_distance(loneliest);
-                                                if (lr < br)
-                                                {
-                                                    brad = rad;
-                                                    br = lr;
-                                                }
-                                            }
-                                            if (brad) rbb[j]->rotate(brad);
-                                        }
+                                        	float br = alca->get_location().get_3d_distance(loneliest);
+		                                    float brad = 0;
+		                                    for(j=0; rbb[j]; j++)
+		                                    {
+		                                        float rad;
+		                                        for (rad=0; rad<M_PI*2; rad += square/4)
+		                                        {
+		                                            rbb[j]->rotate(square);
+		                                            float lr = alca->get_location().get_3d_distance(loneliest);
+		                                            if (lr < br)
+		                                            {
+		                                                brad = rad;
+		                                                br = lr;
+		                                            }
+		                                        }
+		                                        if (brad) rbb[j]->rotate(brad);
+		                                    }
+		                                }
                                     }
                                 }
                             }
@@ -2974,31 +3371,59 @@ _try_again:
                             // 2A towards loneliest.
                             n = sc_gloms[l].aminos.size();
                             if (!n) goto _deadglob;
+                            #if _dbg_glomsel
                             cout << "Moving primary atom group to vicinity of";
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
+                            #endif
 
-                            xform = sc_gloms[l].get_center().subtract(ligand_gloms[l].get_center());
-                            if (n < 2)
+                            xform = sc_gloms[l].get_center();
+                            if (n < 4)
                             {
                                 Point ptmp = loneliest.subtract(xform);
-                                ptmp.scale(2);
+                                ptmp.scale(n+1);
                                 xform = xform.add(ptmp);
                             }
+                            xform = xform.subtract(ligand_gloms[l].get_center());
 
                             ligand->movability = MOV_ALL;
                             ligand->move(xform);
-                            // ligand->get_atom("N9")->get_location().get_3d_distance(sc_gloms[l].get_center())
+                            
+                            // Slowly back the ligand away from whatever it may be clashing into.
+                            reaches_spheroid[nodeno][sphres] = nullptr;
+                            clash = ligand->get_intermol_clashes(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+                            n = 15;
+                            while (clash > 50)
+                            {
+                                xform = loneliest.subtract(ligand->get_barycenter());
+                                xform.scale(0.1);
+                                ligand->move(xform);
+                                n--;
+                                if (!n) break;          // Prevent infinite loops.
+                            }
                             break;
 
                             case 1:
                             // Rotate ligand about ligand_gloms[0] center to get ligand_gloms[1] center
                             // as close as possible to sc_gloms[1] center.
                             n = sc_gloms[l].aminos.size();
-                            if (!n) goto _deadglob;
+                            if (!n)
+                            {
+                                #if _dbg_glomsel
+                                cout << "Aligning center of ligand towards center of pocket.";
+                                #endif
+                                zcen = ligand_gloms[0].get_center();
+                                rot = align_points_3d(ligand->get_barycenter(), loneliest, zcen);
+                                lv = rot.v;
+                                lv.origin = zcen;
+                                ligand->rotate(lv, rot.a);
+                                goto _deadglob;
+                            }
+                            #if _dbg_glomsel
                             cout << "Aligning secondary atom group towards";
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
+                            #endif
 
                             zcen = ligand_gloms[0].get_center();
                             rot = align_points_3d(ligand_gloms[l].get_center(), sc_gloms[l].get_center(), zcen);
@@ -3013,9 +3438,11 @@ _try_again:
                             // ligand_gloms[2] center as close as possible to sc_gloms[2] center.
                             n = sc_gloms[l].aminos.size();
                             if (!n) goto _deadglob;
+                            #if _dbg_glomsel
                             cout << "\"Rotisserie\"-aligning tertiary atom group towards";
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
+                            #endif
 
                             zcen = ligand_gloms[0].get_center();
                             axis = ligand_gloms[1].get_center().subtract(zcen);
@@ -3873,6 +4300,29 @@ _try_again:
                         }
                         cout << endl;
                         if (output) *output << endl;
+
+                        if (soft_pocket)
+                        {
+                            cout << "Soft transformations:" << endl;
+                            if (output) *output << "Soft transformations:" << endl;
+                            for (l=0; l<soft_rgns.size(); l++)
+                            {
+                                cout << soft_rgns[l].name << ".Δr: " << rgnxform_r[l] << endl;
+                                cout << soft_rgns[l].name << ".Δθ: " << rgnxform_theta[l] << endl;
+                                cout << soft_rgns[l].name << ".Δy: " << rgnxform_y[l] << endl;
+                                cout << soft_rgns[l].name << ".Δα: " << rgnrot_alpha[l]*fiftyseven << endl;
+                                cout << soft_rgns[l].name << ".Δφw: " << rgnrot_w[l]*fiftyseven << endl;
+                                cout << soft_rgns[l].name << ".Δφu: " << rgnrot_u[l]*fiftyseven << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δr: " << rgnxform_r[l] << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δθ: " << rgnxform_theta[l] << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δy: " << rgnxform_y[l] << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δα: " << rgnrot_alpha[l]*fiftyseven << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δφw: " << rgnrot_w[l]*fiftyseven << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δφu: " << rgnrot_u[l]*fiftyseven << endl;
+                            }
+                            cout << endl;
+                            if (output) *output << endl;
+                        }
 
                         /*if (flex)
                         {*/

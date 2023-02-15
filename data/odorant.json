@@ -3105,6 +3105,19 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1093\/chemse\/bji002":
+            {
+                "OR1G1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.5532993674278"
+                },
+                "OR52D1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.5685277581215"
+                }
             }
         }
     },
@@ -28610,37 +28623,6 @@
                 "rubbery",
                 "sulfurous"
             ]
-        }
-    },
-    "7a740fd9f3e0cd7b2e67d57f296c2d6c":
-    {
-        "full_name": "phenylmethanol",
-        "smiles": "C1=CC=CC=C1CO",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "balsamic",
-                "floral",
-                "phenolic",
-                "rose"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/doi.org\/10.1093\/chemse\/bji002":
-            {
-                "OR1G1":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "3.5532993674278"
-                },
-                "OR52D1":
-                {
-                    "type": "ma",
-                    "adjusted_curve_top": "4.5685277581215"
-                }
-            }
         }
     },
     "7bd9be1122eae430ae2f32aa2f5562fc":

@@ -26,6 +26,7 @@ struct DockResult
     float ibytype[_INTER_TYPES_LIMIT];
     float proximity;                    // How far the ligand center is from the node's center.
     float tripswitch;                   // Effect of the ligand on the receptor's trip switch.
+    std::string misc;
 };
 
 struct AcvHxRot
@@ -477,6 +478,9 @@ void iteration_callback(int iter)
     int l;
     float prebind;
 
+    if (iter == 1) ligand->movability = MOV_FLEXONLY;
+    else if (iter == 10) ligand->movability = MOV_ALL;
+
     if (soft_pocket && iter >= 10)
     {
         int sz = soft_rgns.size();
@@ -795,9 +799,9 @@ void iteration_callback(int iter)
         }
 
         ligand->recenter(bary);
-    }
 
-    #endif
+        #endif
+    }
 
     #if _teleport_dissatisfied_waters
     if (waters && (iter % 5) == 4)
@@ -3100,7 +3104,7 @@ _try_again:
                                         r -= (reaches_spheroid[nodeno][j]->get_reach() + 2.5);
                                     else
                                         r -= 3.5;
-                                    if (r < ligand_gloms[l].bounds())
+                                    if (r < ligand_gloms[l].bounds()+2)
                                     {
                                         glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);
                                         #if _dbg_glomsel
@@ -3139,8 +3143,8 @@ _try_again:
                                     float rr = sc_gloms[l].distance_to(loneliest);
                                     float rg = ligand_gloms[l].distance_to(ligand->get_barycenter());
 
-                                    r -= rg; if (r < 1) r = 1;
-                                    rr -= rg; if (rr < 1) rr = 1;
+                                    r = fabs(r - rg); if (r < 1) r = 1;
+                                    rr = fabs(rr - rg); if (rr < 1) rr = 1;
 
                                     float tcptbl = glomtmp.compatibility(&ligand_gloms[l]) / (r*r);
                                     float ptcptbl = sc_gloms[l].compatibility(&ligand_gloms[l]) / (rr*rr);
@@ -3371,6 +3375,7 @@ _try_again:
                             // 2A towards loneliest.
                             n = sc_gloms[l].aminos.size();
                             if (!n) goto _deadglob;
+
                             #if _dbg_glomsel
                             cout << "Moving primary atom group to vicinity of";
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
@@ -3378,13 +3383,29 @@ _try_again:
                             #endif
 
                             xform = sc_gloms[l].get_center();
-                            if (n < 4)
+
+                            #if _dbg_glomsel
+                            cout << "Sidechain glom is located at " << xform << "." << endl;
+                            #endif
+
+                            if (n < 3)
                             {
                                 Point ptmp = loneliest.subtract(xform);
-                                ptmp.scale(n+1);
+                                ptmp.scale(1.25/n);
                                 xform = xform.add(ptmp);
+
+                                #if _dbg_glomsel
+                                cout << "Target point moved to " << xform << "." << endl;
+                                #endif
                             }
+
                             xform = xform.subtract(ligand_gloms[l].get_center());
+
+                            #if _dbg_glomsel
+                            cout << "Ligand glom is located at " << ligand_gloms[l].get_center()
+                                 << " so relative motion is "
+                                 << xform << "." << endl;
+                            #endif
 
                             ligand->movability = MOV_ALL;
                             ligand->move(xform);
@@ -3401,11 +3422,13 @@ _try_again:
                                 n--;
                                 if (!n) break;          // Prevent infinite loops.
                             }
+                            ligand->movability = MOV_NONE;
                             break;
 
                             case 1:
                             // Rotate ligand about ligand_gloms[0] center to get ligand_gloms[1] center
                             // as close as possible to sc_gloms[1] center.
+                            ligand->movability = MOV_ALL;
                             n = sc_gloms[l].aminos.size();
                             if (!n)
                             {
@@ -3422,14 +3445,31 @@ _try_again:
                             #if _dbg_glomsel
                             cout << "Aligning secondary atom group towards";
                             for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
-                            cout << "." << endl;
+                            cout << " centered at " << sc_gloms[l].get_center() << "." << endl;
                             #endif
 
                             zcen = ligand_gloms[0].get_center();
-                            rot = align_points_3d(ligand_gloms[l].get_center(), sc_gloms[l].get_center(), zcen);
+                            xform = sc_gloms[l].get_center();
+
+                            if (l)
+                            {
+                                Point ptmp = loneliest.subtract(xform);
+                                ptmp.scale(2.5);
+                                xform = xform.add(ptmp);
+
+                                #if _dbg_glomsel
+                                cout << "Target point moved to " << xform << "." << endl;
+                                #endif
+                            }
+
+                            rot = align_points_3d(ligand_gloms[l].get_center(), xform, zcen);
                             lv = rot.v;
                             lv.origin = zcen;
                             ligand->rotate(lv, rot.a);
+                            ligand->movability = MOV_NONE;
+                            #if _dbg_glomsel
+                            cout << "Primary ligand glom was at " << zcen << " now " << ligand_gloms[0].get_center() << "." << endl;
+                            #endif
                             break;
 
                             case 2:
@@ -3444,12 +3484,14 @@ _try_again:
                             cout << "." << endl;
                             #endif
 
+                            ligand->movability = MOV_ALL;
                             zcen = ligand_gloms[0].get_center();
                             axis = ligand_gloms[1].get_center().subtract(zcen);
                             lv = (SCoord)axis;
                             lv.origin = zcen;
                             theta = find_angle_along_vector(ligand_gloms[l].get_center(), sc_gloms[l].get_center(), zcen, axis);
                             ligand->rotate(lv, theta);
+                            ligand->movability = MOV_NONE;
                             break;
 
                             default:
@@ -3894,8 +3936,16 @@ _try_again:
             sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, addl_resno);
             // cout << "sphres " << sphres << endl;
             float maxclash = 0;
+            #if _dbg_binding_type
+            std::string misc = "";
+            #endif
             for (i=0; i<sphres; i++)
             {
+                #if _dbg_binding_type
+                float tmp_binding[_INTER_TYPES_LIMIT+2];
+                for (l=0; l<_INTER_TYPES_LIMIT; l++) tmp_binding[l] = total_binding_by_type[l];
+                #endif
+
                 if (!reaches_spheroid[nodeno][i]) continue;
                 if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][i])) continue;
                 reaches_spheroid[nodeno][i]->clear_atom_binding_energies();
@@ -3903,6 +3953,43 @@ _try_again:
 
                 float lb = m.get_intermol_binding(reaches_spheroid[nodeno][i], false);
                 if (lb < -maxclash) maxclash -= lb;
+
+                #if _dbg_binding_type
+                for (l=0; l<_INTER_TYPES_LIMIT; l++)
+                {
+                    float d = tmp_binding[l] - total_binding_by_type[l];
+                    misc += (std::string)reaches_spheroid[nodeno][i]->get_3letter();
+                    misc += std::to_string(reaches_spheroid[nodeno][i]->get_residue_no());
+                    misc += (std::string)" ";
+                    switch (l+covalent)
+                    {
+                        case covalent:
+                        continue; /*strcpy(lbtyp, "Total covalent: ");		break;*/
+                        case ionic:
+                        misc += (std::string)"ionic: ";
+                        break;
+                        case hbond:
+                        misc += (std::string)"h-bond: ";
+                        break;
+                        case pi:
+                        misc += (std::string)"pi stack: ";
+                        break;
+                        case polarpi:
+                        misc += (std::string)"polar-pi and cation-pi: ";
+                        break;
+                        case mcoord:
+                        misc += (std::string)"metal coordination: ";
+                        break;
+                        case vdW:
+                        misc += (std::string)"van der Waals: ";
+                        break;
+                        default:
+                        ;
+                    }
+                    misc += std::to_string(d);
+                    misc += (std::string)"\n";
+                }
+                #endif
 
                 if (differential_dock)
                 {
@@ -3964,6 +4051,9 @@ _try_again:
             dr[drcount][nodeno].imvdWrepl   = new float[metcount];
             dr[drcount][nodeno].tripswitch   = tripclash;
             dr[drcount][nodeno].proximity     = ligand->get_barycenter().get_3d_distance(nodecen);
+            #if _dbg_binding_type
+            dr[drcount][nodeno].misc = misc;
+            #endif
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
@@ -4186,27 +4276,27 @@ _try_again:
                             char lbtyp[64];
                             switch (l+covalent)
                             {
-                            case covalent:
+                                case covalent:
                                 continue; /*strcpy(lbtyp, "Total covalent: ");		break;*/
-                            case ionic:
+                                case ionic:
                                 strcpy(lbtyp, "Total ionic: ");
                                 break;
-                            case hbond:
+                                case hbond:
                                 strcpy(lbtyp, "Total H-bond: ");
                                 break;
-                            case pi:
+                                case pi:
                                 strcpy(lbtyp, "Total pi stack: ");
                                 break;
-                            case polarpi:
+                                case polarpi:
                                 strcpy(lbtyp, "Total polar-pi and cation-pi: ");
                                 break;
-                            case mcoord:
+                                case mcoord:
                                 strcpy(lbtyp, "Total metal coordination: ");
                                 break;
-                            case vdW:
+                                case vdW:
                                 strcpy(lbtyp, "Total van der Waals: ");
                                 break;
-                            default:
+                                default:
                                 goto _btyp_unassigned;
                             }
 
@@ -4229,6 +4319,10 @@ _try_again:
                         }
                         cout << endl;
                         if (output) *output << endl;
+
+                        #if _dbg_binding_type
+                        cout << dr[j][k].misc << endl << endl;
+                        #endif
 
                     _btyp_unassigned:
 

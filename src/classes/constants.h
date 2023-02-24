@@ -109,7 +109,7 @@
 
 #define _enhanced_pi_stacking 1
 #define _preflex_alignment_res 1
-#define bb_stochastic 0.15
+#define bb_stochastic 0.25
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.13
 
@@ -150,7 +150,7 @@
 #define internode_momentum_only_on_activation 1
 
 // Switches for conformational space search.
-#define allow_axial_tumble 1
+#define allow_axial_tumble 0
 #define allow_bond_rots 1
 #define allow_linear_motion 1
 #define monte_carlo_axial 0
@@ -166,6 +166,9 @@
 #define allow_mol_fullrot_iter 0
 #define sidechain_fullrot_lig_bmult 3
 
+// Extra weight given to sidechain-ligand binding strengths during conformer search.
+#define dock_ligand_bias 0.5
+
 // Turns off the 360 degree rotations for all but the zeroth node of a path.
 #define nodes_no_ligand_360_tumble 0
 #define nodes_no_ligand_360_flex 0
@@ -177,7 +180,7 @@
 // Allows the ligand to "see through" shielding and anisotropy and seek the greatest
 // potential binding with residues, irrespective of whether the side chain is in an
 // optimum orientation in space.
-#define allow_ligand_esp 1
+#define allow_ligand_esp 0
 #define shielding_avoidance_factor 2.5
 
 // Uses the ligand's most strongly bound atom as the center for full molecule rotations,
@@ -257,8 +260,10 @@
 #define _hisflip_binding_threshold 25
 
 // Debugging stuff.
-#define _bb_maxglom 3
 #define _dummy_atoms_for_debug 0
+
+// This one is normally 3.
+#define _bb_maxglom 2
 
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0
@@ -278,7 +283,8 @@
 #define _dbg_bb_rots 0
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
-#define _dbg_glomsel 0
+#define _dbg_glomsel 1
+#define _dbg_binding_type 1
 
 #endif
 

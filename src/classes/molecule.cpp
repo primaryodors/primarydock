@@ -2515,8 +2515,10 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
 
                 if (nearby[j])
                 {
+                    float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
+
                     // get_intermol_binding includes clashes by default, so we don't have to calculate them separately.
-                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
                     bind += lbind;
                     bind -= mm[i]->lastshielded * shielding_avoidance_factor;
                     bind += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
@@ -2551,7 +2553,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 {
                     if (!nearby[j]) continue;
                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                    float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
+                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
                     bind1 += lbind;
                     bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                     bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
@@ -2582,7 +2585,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 {
                     if (!nearby[j]) continue;
                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                    float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
+                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
                     bind1 += lbind;
                     bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                     bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
@@ -2611,7 +2615,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 {
                     if (!nearby[j]) continue;
                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                    float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
+                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
                     bind1 += lbind;
                     bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                     bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
@@ -2672,7 +2677,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     {
                         if (!nearby[j]) continue;
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                        float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
+                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
                         bind1 += lbind;
                         if (lbind > maxb) maxb = lbind;
                     }
@@ -2721,7 +2727,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         {
                             if (!nearby[j]) continue;
                             bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                            float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            lbind *= lbias;
                             bind1 += lbind;
                             bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                             bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
@@ -2758,7 +2766,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     {
                         if (!nearby[j]) continue;
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                        float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
+                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
                         bind1 += lbind;
                         bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                         bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
@@ -2804,7 +2813,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         {
                             if (!nearby[j]) continue;
                             bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                            float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            lbind *= lbias;
                             bind1 += lbind;
                             bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                             bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
@@ -2842,7 +2853,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     {
                         if (!nearby[j]) continue;
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                        float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
+                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
                         bind1 += lbind;
                         bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                         bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
@@ -2889,7 +2901,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         {
                             if (!nearby[j]) continue;
                             bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                            float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
                             float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
+                            lbind *= lbias;
                             bind1 += lbind;
                             bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                             bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
@@ -2927,7 +2941,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     {
                         if (!nearby[j]) continue;
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                        float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
+                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
                         bind1 += lbind;
                         bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                         bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
@@ -2994,7 +3009,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         if (!nearby[j]) continue;
                         // cout << ".";
                         bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        float f = mm[i]->get_intermol_binding(all[j], !is_ac);
+                        float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
+                        float f = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
                         if (mm[i]->is_residue() && !all[j]->is_residue()) f *= sidechain_fullrot_lig_bmult;
                         bind += f;
                         bind -= mm[i]->lastshielded * shielding_avoidance_factor;
@@ -3076,6 +3092,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 {
                                     if (!nearby[j]) continue;
                                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                                    float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
                                     
                                     float lbind1 =
 
@@ -3090,6 +3107,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                         #endif
                                         ;
 
+                                    lbind1 *= lbias;
                                     if (mm[i]->is_residue() && !all[j]->is_residue()) lbind1 *= sidechain_fullrot_lig_bmult;
                                     bind1 += lbind1;
                                     bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
@@ -3133,7 +3151,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             {
                                 if (!nearby[j]) continue;
                                 bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                                float lbind = mm[i]->get_intermol_binding(all[j], !is_ac);
+                                float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
+                                float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
                                 bind1 += lbind;
                                 bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
                                 bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;

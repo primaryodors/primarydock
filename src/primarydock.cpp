@@ -3454,7 +3454,7 @@ _try_again:
                             if (l)
                             {
                                 Point ptmp = loneliest.subtract(xform);
-                                ptmp.scale(2.5);
+                                ptmp.scale(2);
                                 xform = xform.add(ptmp);
 
                                 #if _dbg_glomsel
@@ -3466,6 +3466,10 @@ _try_again:
                             lv = rot.v;
                             lv.origin = zcen;
                             ligand->rotate(lv, rot.a);
+
+                            // TODO: Look for clashes between the ligand and the secondary sidechain glom, and rotate about lv.origin
+                            // until clashes are less than some threshold tolerance value.
+                            
                             ligand->movability = MOV_NONE;
                             #if _dbg_glomsel
                             cout << "Primary ligand glom was at " << zcen << " now " << ligand_gloms[0].get_center() << "." << endl;

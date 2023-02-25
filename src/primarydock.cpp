@@ -38,6 +38,9 @@ struct AcvHxRot
     int origin_resno;
     SCoord axis;
     float theta;
+    std::string start_resno_str;
+    std::string end_resno_str;
+    std::string origin_resno_str;
 };
 
 struct AcvBndRot
@@ -135,7 +138,8 @@ struct AtomGlom
 
     float get_sum()
     {
-        return get_ionic()*60 + get_polarity()*25 + get_pi()*2;
+        float hydrophobic = get_polarity() ? 0 : atoms.size();
+        return get_ionic()*60 + get_polarity()*25 + get_pi()*2 + hydrophobic;
     }
 
     float distance_to(Point pt)
@@ -199,6 +203,7 @@ struct AtomGlom
         else
         {
             if ((lgh / atct) > 0.33333) return 0;
+            else if (!aa->hydrophilicity() && !lgh) return atct + aa->get_atom_count() - 6;
         }
 
         if (lgh)
@@ -899,13 +904,15 @@ void iteration_callback(int iter)
     }
 }
 
-int interpret_resno(char* field)
+int interpret_resno(const char* field)
 {
-    char* dot = strchr(field, '.');
+    char buffer[strlen(field)+4];
+    strcpy(buffer, field);
+    char* dot = strchr(buffer, '.');
     if (dot)
     {
         *(dot++) = 0;
-        int b = atoi(field);
+        int b = atoi(buffer);
         int w = atoi(dot);
         int _50 = protein->get_bw50(b);
         if (_50 < 1)
@@ -915,7 +922,7 @@ int interpret_resno(char* field)
         }
         return _50 + w - 50;
     }
-    else return atoi(field);
+    else return atoi(buffer);
 }
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
@@ -989,13 +996,16 @@ int interpret_config_line(char** words)
     {
         AcvHxRot ahr;
         int n = 1;
-        ahr.regname      = words[n++];
-        ahr.start_resno  = atoi(words[n++]);
-        ahr.end_resno    = atoi(words[n++]);
-        ahr.origin_resno = atoi(words[n++]);
-        ahr.transform    = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.axis         = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.theta        = atof(words[n++]) * fiftyseventh;
+        ahr.regname             = words[n++];
+        ahr.start_resno_str     = words[n];
+        ahr.start_resno         = atoi(words[n++]);
+        ahr.end_resno_str       = words[n];
+        ahr.end_resno           = atoi(words[n++]);
+        ahr.origin_resno_str    = words[n];
+        ahr.origin_resno        = atoi(words[n++]);
+        ahr.transform           = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.axis                = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.theta               = atof(words[n++]) * fiftyseventh;
         active_helix_rots.push_back(ahr);
         optsecho = (std::string)"Active helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
@@ -2159,12 +2169,12 @@ int main(int argc, char** argv)
     {
         #if _use_gloms
         AtomGlom glomtmp;
-        int types[3] = { pi, ionic, hbond };
+        int types[4] = { pi, ionic, hbond, vdW };
 
         int lac = ligand->get_atom_count();
         bool dirty[lac+4], dirttmp[lac+4];
 
-        for (n=0; n<3; n++)
+        for (n=0; n<4; n++)
         {
             for (i=0; i<lac; i++) dirty[i] = false;
             for (i=0; i<lac; i++)
@@ -2172,8 +2182,8 @@ int main(int argc, char** argv)
                 if (dirty[i]) continue;
                 for (j=i+1; j<lac; j++) dirttmp[j] = false;
 
-                Atom* a = ligand->get_atom(i);
-                Atom* b;
+                Atom *a = ligand->get_atom(i);
+                Atom *b, *c = nullptr;
                 float ac = a->get_charge();
                 float apol = a->is_polar();
                 float api = a->is_pi() && (a->get_Z() > 1);
@@ -2254,7 +2264,7 @@ int main(int argc, char** argv)
 
                             b = ligand->get_atom(j);
                             if (b->get_Z() == 1) continue;
-                            rab = glomtmp.distance_to(b->get_location());
+                            // rab = glomtmp.distance_to(b->get_location());
                             if (b->is_pi()
                                 &&
                                 b->is_conjugated_to(a)
@@ -2266,6 +2276,36 @@ int main(int argc, char** argv)
                         }
                     }
                     break;
+
+                    case vdW:
+                    if (!apol)
+                    {
+                        glomtmp.atoms.push_back(a);
+                        dirttmp[i] = true;
+
+                        for (j=i+1; j<lac; j++)
+                        {
+                            if (dirty[j] || dirttmp[j]) continue;
+
+                            b = ligand->get_atom(j);
+                            // if (b->get_Z() == 1) continue;
+                            rab = glomtmp.distance_to(b->get_location());
+                            if (c)
+                            {
+                                float rbc = b->distance_to(c);
+                                if (rbc < rab) rab = rbc;
+                            }
+                            if (!b->is_polar()
+                                &&
+                                rab < 3.7
+                               )
+                            {
+                                glomtmp.atoms.push_back(b);
+                                dirttmp[j] = true;
+                                c = b;
+                            }
+                        }
+                    }
 
                     default:
                     ;
@@ -2860,6 +2900,9 @@ _try_again:
                 {
                     for (j=0; j<active_helix_rots.size(); j++)
                     {
+                        active_helix_rots[j].start_resno  = interpret_resno(active_helix_rots[j].start_resno_str.c_str());
+                        active_helix_rots[j].end_resno    = interpret_resno(active_helix_rots[j].end_resno_str.c_str());
+                        active_helix_rots[j].origin_resno = interpret_resno(active_helix_rots[j].origin_resno_str.c_str());
                         int sr = active_helix_rots[j].start_resno;
                         int er = active_helix_rots[j].end_resno;
                         int mr = active_helix_rots[j].origin_resno;

@@ -284,7 +284,7 @@
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
 #define _dbg_glomsel 1
-#define _dbg_binding_type 1
+#define _dbg_binding_type 0
 
 #endif
 

@@ -283,6 +283,20 @@ struct ResidueGlom
 
         return result;
     }
+
+    float get_clashes(Molecule* lligand)
+    {
+        int i, j;
+        int scsz = aminos.size();
+
+        float result = 0;
+        for (i=0; i<scsz; i++)
+        {
+            result += aminos[i]->get_intermol_clashes(lligand);
+        }
+
+        return result;
+    }
 };
 
 #endif
@@ -3451,7 +3465,7 @@ _try_again:
                             zcen = ligand_gloms[0].get_center();
                             xform = sc_gloms[l].get_center();
 
-                            if (l)
+                            if (l)          // Trick to get around the compiler throwing a fit when a damn variable is declared inside a switch case.
                             {
                                 Point ptmp = loneliest.subtract(xform);
                                 ptmp.scale(2);
@@ -3467,9 +3481,30 @@ _try_again:
                             lv.origin = zcen;
                             ligand->rotate(lv, rot.a);
 
-                            // TODO: Look for clashes between the ligand and the secondary sidechain glom, and rotate about lv.origin
+                            // Look for clashes between the ligand and the secondary sidechain glom, and rotate about lv.origin
                             // until clashes are less than some threshold tolerance value.
-                            
+                            if (l)
+                            {
+                                float clashy = sc_gloms[l].get_clashes(ligand);
+                                rot.a = hexagonal * sgn(rot.a);
+                                for (n=0; n<1000; n++)
+                                {
+                                    ligand->rotate(lv, rot.a);
+                                    float clash1 = sc_gloms[l].get_clashes(ligand);
+                                    if (clash1 < clashy)
+                                    {
+                                        clashy = clash1;
+                                        cout << "Clash fucking " << clash1 << endl;
+                                    }
+                                    else
+                                    {
+                                        ligand->rotate(lv, -rot.a);
+                                        rot.a *= -.666;
+                                    }
+                                    if (!clashy) break;
+                                }
+                            }
+
                             ligand->movability = MOV_NONE;
                             #if _dbg_glomsel
                             cout << "Primary ligand glom was at " << zcen << " now " << ligand_gloms[0].get_center() << "." << endl;

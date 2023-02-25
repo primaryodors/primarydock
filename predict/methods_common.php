@@ -120,7 +120,7 @@ function prepare_outputs()
     $outfname = "output/$fam/$protid/$protid-$ligname.dock";
 }
 
-function process_dock()
+function process_dock($metrics_prefix = "")
 {
     global $ligname, $protid, $configf, $dock_retries, $outfname, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere;
     if (!file_exists("tmp")) mkdir("tmp");
@@ -356,17 +356,17 @@ function process_dock()
 
     foreach ($sce as $bw => $e)
     {
-        $average["BEnerg $bw"] = $e;
+        $average["{$metrics_prefix}BEnerg $bw"] = $e;
     }
 
     foreach ($vdw as $bw => $v)
     {
-        $average["vdWrpl $bw"] = $v;
+        $average["{$metrics_prefix}vdWrpl $bw"] = $v;
     }
 
     foreach ($sum as $node => $value)
     {
-        $average["Node $node"] = round($value / (@$count[$node] ?: 1), 3);
+        $average["{$metrics_prefix}Node $node"] = round($value / (@$count[$node] ?: 1), 3);
     }
 
     foreach ($cbvals as $k => $v)

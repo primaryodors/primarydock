@@ -142,6 +142,15 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1101\/2022.12.20.520951":
+            {
+                "OR51E2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "3.2",
+                    "ec50": "-3"
+                }
             }
         }
     },
@@ -5010,6 +5019,15 @@
                     "type": "wa",
                     "adjusted_curve_top": "1.6666666269302"
                 }
+            },
+            "https:\/\/doi.org\/10.1101\/2022.12.20.520951":
+            {
+                "OR51E2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.7",
+                    "ec50": "-2.5"
+                }
             }
         }
     },
@@ -5383,6 +5401,14 @@
                     "type": "ma",
                     "adjusted_curve_top": "3.5099999904633"
                 }
+            },
+            "https:\/\/doi.org\/10.1101\/2022.12.20.520951":
+            {
+                "OR51E2":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                }
             }
         }
     },
@@ -5566,6 +5592,14 @@
                     "ec50": "-4.3",
                     "adjusted_curve_top": "2.8181818154725"
                 }
+            },
+            "https:\/\/doi.org\/10.1101\/2022.12.20.520951":
+            {
+                "OR51E2":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                }
             }
         }
     },
@@ -5691,6 +5725,14 @@
                 {
                     "type": "ma",
                     "adjusted_curve_top": "4.4200000762939"
+                }
+            },
+            "https:\/\/doi.org\/10.1101\/2022.12.20.520951":
+            {
+                "OR51E2":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
                 }
             }
         }
@@ -16386,6 +16428,14 @@
                     "type": "ma",
                     "adjusted_curve_top": "4.8499999046326"
                 }
+            },
+            "https:\/\/doi.org\/10.1101\/2022.12.20.520951":
+            {
+                "OR51E2":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                }
             }
         }
     },
@@ -25360,6 +25410,14 @@
                     "type": "ma",
                     "adjusted_curve_top": "2.7272728085518"
                 }
+            },
+            "https:\/\/doi.org\/10.1101\/2022.12.20.520951":
+            {
+                "OR51E2":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                }
             }
         }
     },
@@ -29469,6 +29527,15 @@
                     "type": "ma",
                     "adjusted_curve_top": "3.5199999809265"
                 }
+            },
+            "https:\/\/doi.org\/10.1101\/2022.12.20.520951":
+            {
+                "OR51E2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "3.4",
+                    "ec50": "-3"
+                }
             }
         }
     },
@@ -33364,6 +33431,14 @@
                     "type": "sa",
                     "ec50": "-4.74",
                     "adjusted_curve_top": "8.0699996948242"
+                }
+            },
+            "https:\/\/doi.org\/10.1101\/2022.12.20.520951":
+            {
+                "OR51E2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.4"
                 }
             }
         }

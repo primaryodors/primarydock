@@ -3537,7 +3537,6 @@ _try_again:
                                     if (clash1 < clashy)
                                     {
                                         clashy = clash1;
-                                        cout << "Clash fucking " << clash1 << endl;
                                     }
                                     else
                                     {

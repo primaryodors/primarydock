@@ -20,9 +20,9 @@ chdir(__DIR__);
 
 $cenres = "CEN RES 3.33 4.57 4.60 45.52 45.53 5.39 5.43 6.55 6.59";
 
-$outfname = str_replace(".dock", "_rock6.dock", $outfname);
-
 prepare_outputs();
+
+$outfname = str_replace(".dock", "_rock6a.dock", $outfname);
 
 $configf = <<<heredoc
 
@@ -53,5 +53,7 @@ heredoc;
 
 process_dock("active_");
 
+$outfnamei = str_replace("_rock6a.dock", "_rock6i.dock", $outfname);
 $configf = str_replace("ACVNODE 0", "ACVNODE 9999", $configf);
+$configf = str_replace("OUT $outfname", "OUT $outfnamei", $configf);
 process_dock("inactive_", true);

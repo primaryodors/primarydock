@@ -56,4 +56,5 @@ process_dock("active_");
 $outfnamei = str_replace("_rock6a.dock", "_rock6i.dock", $outfname);
 $configf = str_replace("ACVNODE 0", "ACVNODE 9999", $configf);
 $configf = str_replace("OUT $outfname", "OUT $outfnamei", $configf);
+$outfname = $outfnamei;
 process_dock("inactive_", true);

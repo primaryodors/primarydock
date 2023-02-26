@@ -4114,7 +4114,7 @@ _try_again:
             }
             // cout << btot << endl;
 
-            if (btot > 15*m.get_atom_count()) btot = 0;
+            if (btot > 60*m.get_atom_count()) btot = 0;
             if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
 
             // drcount = pose-1+found_poses;

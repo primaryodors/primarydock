@@ -120,7 +120,7 @@ function prepare_outputs()
     $outfname = "output/$fam/$protid/$protid-$ligname.dock";
 }
 
-function process_dock($metrics_prefix = "")
+function process_dock($metrics_prefix = "", $noclobber = false)
 {
     global $ligname, $protid, $configf, $dock_retries, $outfname, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere;
     if (!file_exists("tmp")) mkdir("tmp");
@@ -350,7 +350,8 @@ function process_dock($metrics_prefix = "")
 
     // echo "sce: "; print_r($sce); exit;
 
-    $average = [];
+    if ($noclobber) $average = @$dock_results[$protid][$ligname] ?: [];
+    else $average = [];
     $average['version'] = $version;
     $average['Poses'] = $poses_found;
 

@@ -54,4 +54,4 @@ heredoc;
 process_dock("active_");
 
 $configf = str_replace("ACVNODE 0", "ACVNODE 9999", $configf);
-process_dock("inactive_");
+process_dock("inactive_", true);

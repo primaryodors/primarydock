@@ -350,7 +350,11 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     // echo "sce: "; print_r($sce); exit;
 
-    if ($noclobber) $average = @$dock_results[$protid][$ligname] ?: [];
+    if ($noclobber)
+    {
+        if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
+        $average = @$dock_results[$protid][$ligname] ?: [];
+    }
     else $average = [];
     $average['version'] = $version;
     $average['Poses'] = $poses_found;

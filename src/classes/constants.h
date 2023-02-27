@@ -10,7 +10,7 @@
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 0.5
+#define _kJmol_cuA 1.5
 #define vdw_clash_allowance 1.0
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
@@ -258,6 +258,8 @@
 // How strong an intermolecular bond is required to prevent a histidine hydrogen from flipping
 // to a less favorable state.
 #define _hisflip_binding_threshold 25
+
+#define subtract_protein_clashes_from_result 0
 
 // Debugging stuff.
 #define _dummy_atoms_for_debug 0

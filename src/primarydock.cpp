@@ -1956,6 +1956,7 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
     protein->load_pdb(pf);
+    float pinitc = protein->get_internal_clashes();
     fclose(pf);
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
@@ -4115,6 +4116,11 @@ _try_again:
 
             if (btot > 60*m.get_atom_count()) btot = 0;
             if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
+
+            #if subtract_protein_clashes_from_result
+            float pc = protein->get_internal_clashes() - pinitc;
+            if (pc > 0) btot -= _kJmol_cuA * pc;
+            #endif
 
             // drcount = pose-1+found_poses;
 

@@ -16,6 +16,7 @@ struct DockResult
     int pose;
     float kJmol;
     float ikJmol;
+    float polsat;
     char** metric;
     float* mkJmol;
     float* imkJmol;
@@ -193,19 +194,31 @@ struct AtomGlom
 
         float result = 0;
         float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
+        float apol = aa->hydrophilicity();
 
-        float aachg = aa->get_charge();
-        if (aa->conditionally_basic()) aachg += 0.5;
-        if (lgi && aachg && sgn(lgi) != -sgn(aachg)) return 0;
-
-        if (aa->hydrophilicity() > 0.25)
+        if ((lgh/atct) < 0.2)
         {
-            if ((lgh / atct) < 0.19) return 0;
+            if (apol < 0.333333333) result += polar_sat_influence_for_bb;
+            else result -= polar_sat_influence_for_bb;
         }
         else
         {
-            if ((lgh / atct) > 0.33333) return 0;
-            else if (!aa->hydrophilicity()) return atct + aa->get_atom_count() - 6;
+            if (apol < 0.333333333) result -= polar_sat_influence_for_bb;
+            else result += polar_sat_influence_for_bb;
+        }
+
+        float aachg = aa->get_charge();
+        if (aa->conditionally_basic()) aachg += 0.5;
+        if (lgi && aachg && sgn(lgi) != -sgn(aachg)) return result;
+
+        if (apol > 0.25)
+        {
+            if ((lgh / atct) < 0.19) return result;
+        }
+        else
+        {
+            if ((lgh / atct) > 0.33333) return result;
+            else if (!apol) return result + atct + aa->get_atom_count() - 6;
         }
 
         if (lgh)
@@ -292,7 +305,7 @@ struct ResidueGlom
                     std::find(extra_wt.begin(), extra_wt.end(), aminos[i]->get_residue_no())!=extra_wt.end()
             )
             {
-                f = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+                f *= 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
             }
 
             result += f;
@@ -3157,7 +3170,7 @@ _try_again:
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
                             glomtmp.aminos.clear();
-                            if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
+                            if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]) > 0)
                             {
                                 #if _dbg_glomsel
                                 cout << "Considering " << reaches_spheroid[nodeno][i]->get_name() << " for glom " << l << "..." << endl;
@@ -3165,7 +3178,7 @@ _try_again:
                                 glomtmp.aminos.push_back(reaches_spheroid[nodeno][i]);
                                 for (j=i+1; reaches_spheroid[nodeno][j]; j++)
                                 {
-                                    if (!ligand_gloms[l].compatibility(reaches_spheroid[nodeno][j])) continue;
+                                    if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][j]) <= 0) continue;
                                     Atom* cb = reaches_spheroid[nodeno][j]->get_atom("CB");
                                     if (!cb) continue;
                                     if (frand(0,1) < bb_stochastic) continue;                       // stochastic component.
@@ -3455,7 +3468,7 @@ _try_again:
                             xform = sc_gloms[l].get_center();
 
                             #if _dbg_glomsel
-                            cout << "Sidechain glom is located at " << xform << "." << endl;
+                            // cout << "Sidechain glom is located at " << xform << "." << endl;
                             #endif
 
                             if (n < 3)
@@ -3465,16 +3478,16 @@ _try_again:
                                 xform = xform.add(ptmp);
 
                                 #if _dbg_glomsel
-                                cout << "Target point moved to " << xform << "." << endl;
+                                // cout << "Target point moved to " << xform << "." << endl;
                                 #endif
                             }
 
                             xform = xform.subtract(ligand_gloms[l].get_center());
 
                             #if _dbg_glomsel
-                            cout << "Ligand glom is located at " << ligand_gloms[l].get_center()
+                            /*cout << "Ligand glom is located at " << ligand_gloms[l].get_center()
                                  << " so relative motion is "
-                                 << xform << "." << endl;
+                                 << xform << "." << endl;*/
                             #endif
 
                             ligand->movability = MOV_ALL;
@@ -3528,7 +3541,7 @@ _try_again:
                                 xform = xform.add(ptmp);
 
                                 #if _dbg_glomsel
-                                cout << "Target point moved to " << xform << "." << endl;
+                                // cout << "Target point moved to " << xform << "." << endl;
                                 #endif
                             }
 
@@ -3562,7 +3575,7 @@ _try_again:
 
                             ligand->movability = MOV_NONE;
                             #if _dbg_glomsel
-                            cout << "Primary ligand glom was at " << zcen << " now " << ligand_gloms[0].get_center() << "." << endl;
+                            // cout << "Primary ligand glom was at " << zcen << " now " << ligand_gloms[0].get_center() << "." << endl;
                             #endif
                             break;
 
@@ -3883,8 +3896,9 @@ _try_again:
             float imkJmol[protein->get_seq_length()+8];
             float mvdWrepl[protein->get_seq_length()+8];
             float imvdWrepl[protein->get_seq_length()+8];
-            int metcount=0;
-            float btot=0;
+            int metcount = 0;
+            float btot = 0;
+            float pstot = 0;
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 
@@ -3908,7 +3922,6 @@ _try_again:
                 metcount++;
 
                 btot += lb;
-                // cout << "Metal adds " << lb << " to btot, making " << btot << endl;
             }
 
             float final_binding[seql+4];
@@ -4123,6 +4136,8 @@ _try_again:
                 metcount++;
                 btot += lb;
                 // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;
+
+                pstot += m.get_intermol_polar_sat(reaches_spheroid[nodeno][i]);
             }
             // cout << btot << endl;
 
@@ -4143,13 +4158,14 @@ _try_again:
             // Set the dock result properties and allocate the arrays.
             dr[drcount][nodeno].kJmol = (differential_dock && (maxclash > individual_clash_limit)) ? -Avogadro : btot;
             dr[drcount][nodeno].ikJmol = 0;
-            dr[drcount][nodeno].metric  = new char*[metcount+4];
-            dr[drcount][nodeno].mkJmol   = new float[metcount];
-            dr[drcount][nodeno].imkJmol   = new float[metcount];
-            dr[drcount][nodeno].mvdWrepl   = new float[metcount];
-            dr[drcount][nodeno].imvdWrepl   = new float[metcount];
-            dr[drcount][nodeno].tripswitch   = tripclash;
-            dr[drcount][nodeno].proximity     = ligand->get_barycenter().get_3d_distance(nodecen);
+            dr[drcount][nodeno].polsat  = pstot;
+            dr[drcount][nodeno].metric   = new char*[metcount+4];
+            dr[drcount][nodeno].mkJmol    = new float[metcount];
+            dr[drcount][nodeno].imkJmol    = new float[metcount];
+            dr[drcount][nodeno].mvdWrepl    = new float[metcount];
+            dr[drcount][nodeno].imvdWrepl    = new float[metcount];
+            dr[drcount][nodeno].tripswitch    = tripclash;
+            dr[drcount][nodeno].proximity      = ligand->get_barycenter().get_3d_distance(nodecen);
             #if _dbg_binding_type
             dr[drcount][nodeno].misc = misc;
             #endif
@@ -4249,12 +4265,16 @@ _try_again:
                     {
                         if ((	differential_dock
                                 &&
-                                (dr[i][0].kJmol - dr[i][0].ikJmol) < (dr[drcount][nodeno].kJmol - dr[drcount][nodeno].ikJmol)
+                                (dr[i][0].kJmol - dr[i][0].ikJmol + dr[i][0].polsat * polar_sat_influence_for_scoring)
+                                <
+                                (dr[drcount][nodeno].kJmol - dr[drcount][nodeno].ikJmol + dr[drcount][nodeno].polsat * polar_sat_influence_for_scoring)
                             )
                                 ||
                                 (	!differential_dock
                                     &&
-                                    dr[i][0].kJmol < btot
+                                    (dr[i][0].kJmol + dr[i][0].polsat * polar_sat_influence_for_scoring)
+                                    <
+                                    (btot + pstot * polar_sat_influence_for_scoring)
                                 ))
                         {
                             if (dr[i][0].pose < bestpose || bestpose < 0) bestpose = dr[i][0].pose;
@@ -4416,6 +4436,11 @@ _try_again:
                                 if (output) *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                             }
                         }
+                        cout << endl;
+                        if (output) *output << endl;
+
+                        cout << "Ligand polar satisfaction: " << -dr[j][k].polsat << endl;
+                        if (output && dr[j][k].metric[l]) *output << "Ligand polar satisfaction: " << -dr[j][k].polsat << endl;
                         cout << endl;
                         if (output) *output << endl;
 

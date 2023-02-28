@@ -12,7 +12,7 @@
 #define _kcal_per_kJ 0.239006
 #define _kJmol_cuA 1.5
 #define vdw_clash_allowance 1.0
-#define _DEFAULT_INTERA_R_CUTOFF 8
+#define _DEFAULT_INTERA_R_CUTOFF 10
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
 
@@ -261,12 +261,14 @@
 
 #define subtract_protein_clashes_from_result 0
 #define polar_sat_influence_for_dock 0
+#define polar_sat_influence_for_bb 30
+#define polar_sat_influence_for_scoring 30
 
 // Debugging stuff.
 #define _dummy_atoms_for_debug 0
 
 // This one is normally 3.
-#define _bb_maxglom 2
+#define _bb_maxglom 3
 
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0

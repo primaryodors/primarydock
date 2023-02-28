@@ -985,6 +985,8 @@ bool Atom::is_pi()
         if (bonded_to[0].btom) return bonded_to[0].btom->is_pi();
     }
 
+    if (family == PNICTOGEN && is_bonded_to_pi(TETREL, true)) return true;
+
     int i;
     for (i=0; i<valence; i++)
     {

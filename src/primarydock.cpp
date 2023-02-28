@@ -65,6 +65,8 @@ struct SoftBias
     float transverse_rotation = 0;              // Rotation about the imaginary line perpendicular to the pocket center.
 };
 
+std::vector<int> extra_wt;
+
 #if _use_gloms
 struct AtomGlom
 {
@@ -203,7 +205,7 @@ struct AtomGlom
         else
         {
             if ((lgh / atct) > 0.33333) return 0;
-            else if (!aa->hydrophilicity() && !lgh) return atct + aa->get_atom_count() - 6;
+            else if (!aa->hydrophilicity()) return atct + aa->get_atom_count() - 6;
         }
 
         if (lgh)
@@ -282,7 +284,18 @@ struct ResidueGlom
         {
             if (aminos[i]->get_charge() < 0) has_acids = true;
             if (aminos[i]->conditionally_basic()) has_his = true;
-            result += ag->compatibility(aminos[i]);
+
+            float f = ag->compatibility(aminos[i]);
+
+            if (extra_wt.size()
+                    &&
+                    std::find(extra_wt.begin(), extra_wt.end(), aminos[i]->get_residue_no())!=extra_wt.end()
+            )
+            {
+                f = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+            }
+
+            result += f;
         }
         if (has_acids && has_his && ag->get_ionic() > 0) result -= ag->get_ionic()*30;
 
@@ -330,7 +343,6 @@ std::vector<int> exclusion;
 std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
-std::vector<int> extra_wt;
 
 bool configset=false, protset=false, ligset=false, pktset=false;
 

@@ -260,7 +260,7 @@
 #define _hisflip_binding_threshold 25
 
 #define subtract_protein_clashes_from_result 0
-#define polar_sat_influence_for_dock 10
+#define polar_sat_influence_for_dock 0.1
 
 // Debugging stuff.
 #define _dummy_atoms_for_debug 0

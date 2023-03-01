@@ -164,6 +164,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     if (count($outlines) < 100) die("Docking FAILED.\n");
 
     $benerg = [];
+    $polsat = [];
     $scenerg = [];
     $vdwrpl = [];
     $dosce = false;
@@ -230,6 +231,13 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             continue;
         }
 
+        if ($pose && $node>=0 && substr($ln, 0, 25) == "Ligand polar satisfaction")
+        {
+            $polsat[$pose][$node] = floatval(explode(" ", $ln)[1]);
+            $dosce = false;
+            continue;
+        }
+
         if (!isset($benerg[$pose][$node])) continue;
 
         $bias = $bias_by_energy ? max(-$benerg[$pose][$node], 1) : 1;
@@ -276,6 +284,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     // echo "vdwrpl: "; print_r($vdwrpl); exit;
 
     $sum = [];
+    $sumps = [];
     $count = [];
     $ssce = [];
     $svdw = [];
@@ -291,6 +300,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             if (!isset($count[$node])) $count[$node] = 0;
             
             $sum[$node] += $value * $bias;
+            $sumps[$node] = $polsat[$pose][$node];
             $count[$node] += $bias;
     
             if (@$scenerg[$pose][$node])
@@ -372,6 +382,11 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     foreach ($sum as $node => $value)
     {
         $average["{$metrics_prefix}Node $node"] = round($value / (@$count[$node] ?: 1), 3);
+    }
+
+    foreach ($sumps as $node => $value)
+    {
+        $average["{$metrics_prefix}PolSat $node"] = round($value / (@$count[$node] ?: 1), 3);
     }
 
     foreach ($cbvals as $k => $v)

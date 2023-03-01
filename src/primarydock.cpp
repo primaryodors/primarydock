@@ -4439,11 +4439,6 @@ _try_again:
                         cout << endl;
                         if (output) *output << endl;
 
-                        cout << "Ligand polar satisfaction: " << -dr[j][k].polsat << endl;
-                        if (output && dr[j][k].metric[l]) *output << "Ligand polar satisfaction: " << -dr[j][k].polsat << endl;
-                        cout << endl;
-                        if (output) *output << endl;
-
                         #if _dbg_binding_type
                         cout << dr[j][k].misc << endl << endl;
                         #endif
@@ -4466,6 +4461,11 @@ _try_again:
                             if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                             cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                         }
+
+                        cout << "Ligand polar satisfaction: " << -dr[j][k].polsat << endl;
+                        if (output && dr[j][k].metric[l]) *output << "Ligand polar satisfaction: " << -dr[j][k].polsat << endl;
+                        cout << endl;
+                        if (output) *output << endl;
 
                         if (output) *output << "Proximity: " << dr[j][k].proximity << endl << endl;
                         cout << "Proximity: " << dr[j][k].proximity << endl << endl;

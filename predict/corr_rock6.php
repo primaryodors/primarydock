@@ -130,6 +130,24 @@ foreach ($dock_data as $rcp => $ligs)
 
         foreach ($pair as $k => $v)
         {
+            $jk = explode("_", $k);
+            if (count($jk) > 1)
+            {
+                $ia = (strtolower($jk[0]) == 'active') ? "a" : "i";
+                $k1 = $jk[1];
+
+                if (substr($k1, 0, 7) == "BEnerg ")
+                {
+                    $bw = substr($k1, 7);
+                    $yvals[$rcp]["$ia.$bw.e"][$idx] = $v;
+                }
+            
+                if (substr($k1, 0, 5) == "Node ")
+                {
+                    $yvals[$rcp]["$ia.$k1"][$idx] = $v;
+                }
+            }
+            
             if (substr($k, 0, 7) == "active_")
             {
                 $k1 = "in$k";
@@ -139,13 +157,13 @@ foreach ($dock_data as $rcp => $ligs)
             }
             else continue;
 
-            /*if (substr($k2, 0, 7) == "BEnerg ")
+            if (substr($k2, 0, 7) == "BEnerg ")
             {
                 $bw = substr($k2, 7);
                 $yvals[$rcp]["$bw.e"][$idx] = $v2;
             }
             
-            if (substr($k2, 0, 7) == "vdWrpl ")
+            /*if (substr($k2, 0, 7) == "vdWrpl ")
             {
                 $bw = substr($k2, 7);
                 $yvals[$rcp]["$bw.v"][$idx] = $v2;

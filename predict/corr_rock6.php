@@ -98,30 +98,28 @@ foreach ($dock_data as $rcp => $ligs)
         {
             case 'Agonist':
             $emp = best_empirical_pair($rcp, $ligand, true);
-            // print_r($emp); exit;
-            if ($emp)
-            {
-                if (isset($emp['adjusted_curve_top']) && isset($emp['ec50']))
-                    $x = (floatval($emp['adjusted_curve_top']) - min(10, -_EC50MUL*floatval($emp['ec50']))) / 2;
-                else if (isset($emp['ec50']))
-                    $x = min(10, -_EC50MUL*floatval($emp['ec50']));
-                else if (isset($emp['adjusted_curve_top']))
-                    $x = floatval($emp['adjusted_curve_top']);
-                else $x = 1;
-            }
-            else $x = 1;
-            $xvals[$rcp][$idx] = $x;
-            $xvals["All"][$idx] = $x;
+            $xvals["is_ag"][$rcp][$idx] = 1;
+            if (isset($emp['ec50'])) $xvals["ec50"][$rcp][$idx] = floatval($emp['ec50']);
+            if (isset($emp['adjusted_curve_top'])) $xvals["top"][$rcp][$idx] = floatval($emp['adjusted_curve_top']);
+            $xvals["is_ag"]["All"][$idx] = 1;
+            if (isset($emp['ec50'])) $xvals["ec50"]["All"][$idx] = floatval($emp['ec50']);
+            if (isset($emp['adjusted_curve_top'])) $xvals["top"]["All"][$idx] = floatval($emp['adjusted_curve_top']);
             break;
 
             case 'Non-Agonist':
-            $xvals[$rcp][$idx] = 0;
-            $xvals["All"][$idx] = 0;
+            $xvals["is_ag"][$rcp][$idx] = 0;
+            $xvals["top"][$rcp][$idx] = 0;
+            $xvals["is_ag"]["All"][$idx] = 0;
+            $xvals["top"]["All"][$idx] = 0;
             break;
 
             case 'Inverse Agonist':
-            $xvals[$rcp][$idx] = -1;
-            $xvals["All"][$idx] = -1;
+            $xvals["is_ag"][$rcp][$idx] = 0; // -1;
+            $xvals["top"][$rcp][$idx] = floatval($emp['adjusted_curve_top']) ?: 0;
+            if (isset($emp['ec50'])) $xvals["ec50"][$rcp][$idx] = floatval($emp['ec50']);
+            $xvals["is_ag"]["All"][$idx] = -1;
+            $xvals["top"]["All"][$idx] = floatval($emp['adjusted_curve_top']) ?: 0;
+            if (isset($emp['ec50'])) $xvals["ec50"]["All"][$idx] = floatval($emp['ec50']);
             break;
 
             default:
@@ -136,11 +134,11 @@ foreach ($dock_data as $rcp => $ligs)
                 $ia = (strtolower($jk[0]) == 'active') ? "a" : "i";
                 $k1 = $jk[1];
 
-                if (substr($k1, 0, 7) == "BEnerg ")
+                /*if (substr($k1, 0, 7) == "BEnerg ")
                 {
                     $bw = substr($k1, 7);
                     $yvals[$rcp]["$ia.$bw.e"][$idx] = $v;
-                }
+                }*/
             
                 if (substr($k1, 0, 5) == "Node ")
                 {
@@ -152,16 +150,17 @@ foreach ($dock_data as $rcp => $ligs)
             {
                 $k1 = "in$k";
                 if (!isset($pair[$k1])) continue;
+                $v1 = floatval($v) + floatval($pair[$k1]);
                 $v2 = floatval($v) - floatval($pair[$k1]);
                 $k2 = substr($k, 7);
             }
             else continue;
 
-            if (substr($k2, 0, 7) == "BEnerg ")
+            /*if (substr($k2, 0, 7) == "BEnerg ")
             {
                 $bw = substr($k2, 7);
                 $yvals[$rcp]["$bw.e"][$idx] = $v2;
-            }
+            }*/
             
             /*if (substr($k2, 0, 7) == "vdWrpl ")
             {
@@ -178,7 +177,8 @@ foreach ($dock_data as $rcp => $ligs)
             
             if (substr($k2, 0, 5) == "Node ")
             {
-                $yvals[$rcp][$k2][$idx] = $v2;
+                $yvals[$rcp]["s.$k2"][$idx] = $v1;
+                $yvals[$rcp]["d.$k2"][$idx] = $v2;
             }
         }
 
@@ -196,33 +196,36 @@ set_time_limit(600);
 $corrs = [];
 $bestcorr = 0.0;
 foreach ($yvals as $rcp => $yv)
-{   
-    $cxv = count($xvals[$rcp]);
-    $threshold = max(0.5 * $cxv, 5);
-    if ($rcp == "All") $threshold = 0.1;
-
-    foreach ($yv as $metric => $ly)
+{
+    foreach ($xvals as $xmet => $lxv)
     {
-        $x = [];
-        $y = [];
-        foreach ($xvals[$rcp] as $idx => $lx)
-        {
-            if (isset($ly[$idx]))
-            {
-                $x[] = $lx;
-                $y[] = $ly[$idx];
-            }
-        }
+        $cxv = count($lxv[$rcp]);
+        $threshold = max(0.5 * $cxv, 5);
+        if ($rcp == "All") $threshold = 0.1;
 
-        // echo "Count x: " . count($x) . "; count y: " . count($y) . "\n";
-        if ((count($x) >= $threshold && count($y) >= $threshold && (max($y) - min($y)) > 0.1 ) || $metric == 'acv.d')
+        foreach ($yv as $metric => $ly)
         {
-            // if ($metric == "7.46.y") print_r($y);
-            $corr = round(correlationCoefficient($x, $y), 3);
-            // echo "$metric correlation: $corr\n";
-            if ($corr > $bestcorr) $bestcorr = $corr;
-            $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
-            if (($p <= 0.05 && abs($corr) > 0.25) || $metric == 'acv.d') $corrs[$rcp][$metric] = round($corr, 3);
+            $x = [];
+            $y = [];
+            foreach ($lxv[$rcp] as $idx => $lx)
+            {
+                if (isset($ly[$idx]))
+                {
+                    $x[] = $lx;
+                    $y[] = $ly[$idx];
+                }
+            }
+
+            // echo "Count x: " . count($x) . "; count y: " . count($y) . "\n";
+            if ((count($x) >= $threshold && count($y) >= $threshold && (max($y) - min($y)) > 0.1 ) || $metric == 'acv.d')
+            {
+                // if ($metric == "7.46.y") print_r($y);
+                $corr = round(correlationCoefficient($x, $y), 3);
+                echo "$xmet - $metric correlation: $corr\n";
+                if ($corr > $bestcorr) $bestcorr = $corr;
+                $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
+                if (($p <= 0.05 && abs($corr) > 0.25) || $metric == 'acv.d') $corrs[$rcp][$metric] = round($corr, 3);
+            }
         }
     }
 }
@@ -232,133 +235,138 @@ foreach ($yvals as $rcp => $yv)
 if (count($yvals))  echo "Best single-metric correlation: $bestcorr.\n\n";
 else                echo "Insufficient data for correlation processing.\n\n";
 
+exit;
+
 if (count($corrs))
 foreach ($corrs as $rcp => $c)
 {
-    $cxv = count($xvals[$rcp]);
-    if ($cxv < 5) continue;
-
-    uasort($c, 'corrrsort');
-
-    $cc = count($c);
-    $maxnatc = $cc ? (max(max($c), -min($c))) : 0.5;
-
-    for ($bits=0; $bits < 16384; $bits++)
+    foreach ($xvals as $xmet => $lxv)
     {
-        if ($bits >= pow(2, $cc)) break;
-        $x = [];
-        $y = [];
-        $metstr = "";
-        for ($i=0; $i<$cc; $i++)
+        $cxv = count($lxv[$rcp]);
+        if ($cxv < 5) continue;
+
+        uasort($c, 'corrrsort');
+
+        $cc = count($c);
+        $maxnatc = $cc ? (max(max($c), -min($c))) : 0.5;
+
+        for ($bits=0; $bits < 16384; $bits++)
         {
-            $sci = sgn(array_values($c)[$i]);
-            $pi = pow(2, $i);
-            if ($pi > $bits) break;
-            if ($bits & $pi)
+            if ($bits >= pow(2, $cc)) break;
+            $x = [];
+            $y = [];
+            $metstr = "";
+            for ($i=0; $i<$cc; $i++)
             {
-                $metric = array_keys($c)[$i];
-                $ly = $yvals[$rcp][$metric];
-                foreach ($xvals[$rcp] as $idx => $lx)
+                $sci = sgn(array_values($c)[$i]);
+                $pi = pow(2, $i);
+                if ($pi > $bits) break;
+                if ($bits & $pi)
                 {
-                    if (isset($ly[$idx]))
+                    $metric = array_keys($c)[$i];
+                    $ly = $yvals[$rcp][$metric];
+                    foreach ($lxv[$rcp] as $idx => $lx)
                     {
-                        if (!isset($y[$idx])) $y[$idx] = 0.0;
-                        $y[$idx] += $ly[$idx] * $sci;
+                        if (isset($ly[$idx]))
+                        {
+                            if (!isset($y[$idx])) $y[$idx] = 0.0;
+                            $y[$idx] += $ly[$idx] * $sci;
+                        }
                     }
+                    if ($metstr) $metstr .= ($sci < 0 ? " - " : " + ");
+                    $metstr .= $metric;
                 }
-                if ($metstr) $metstr .= ($sci < 0 ? " - " : " + ");
-                $metstr .= $metric;
+            }
+
+            foreach ($y as $idx => $ly)
+            {
+                $x[$idx] = $lxv[$rcp][$idx];
+                $yvals[$rcp][$metstr][$idx] = $y[$idx];
+            }
+
+            if (count($x) >= 10 && count($y) >= 10)
+            {
+                $corr = correlationCoefficient($x, $y);
+                // $p = calculate_p($x, $y, $corr, 100);
+                if (/* $p <= 0.1 &&*/ abs($corr) > max($c)) $c[$metstr] = round($corr, 3);
+
+                if (count($c) > 40) break;
             }
         }
 
-        foreach ($y as $idx => $ly)
+        uasort($c, 'corrrsort');
+        $cc = count($c);
+        $maxallc = $cc ? (max(max($c), -min($c))) : 0.5;
+
+        echo "Correlations (residues of $rcp, $cxv ligands):\n";
+        $j = 0;
+        foreach ($c as $metric => $corr)
         {
-            $x[$idx] = $xvals[$rcp][$idx];
-            $yvals[$rcp][$metstr][$idx] = $y[$idx];
+            if (($corr < 0.5*$maxallc) && $metric != 'acv.d') continue;
+            $j++;
+            if (($j > 10) && $metric != 'acv.d') continue;
+            echo str_pad($metric, 10);
+
+            if (false===strpos($metric, " + ")
+                &&
+                false===strpos($metric, " - ")
+                &&
+                preg_match("/^[0-9]+[.][0-9]+/", $metric)
+               )
+            {
+                $pettia = explode('.', $metric);
+                $resno = resno_from_bw($rcp, "{$pettia[0]}.{$pettia[1]}");
+                $aa = substr($prots[$rcp]['sequence'], $resno-1, 1);
+                echo str_pad("$aa$resno", 7);
+            }
+
+            if ($corr >= 0) echo ' ';
+            echo $corr;
+            echo "\n";
+        }
+        echo "\n\n";
+
+        $idx = array_keys($c)[0];
+        if (!@$yvals[$rcp][$idx]) continue;
+
+        $xk = array_unique($lxv[$rcp]);
+        rsort($xk);
+
+        $maxyv = max( 
+             max($yvals[$rcp][$idx]),
+            -min($yvals[$rcp][$idx])
+                    );
+        $matrix = [];
+        for ($yv=0; $yv<=$plotsz; $yv++) for ($xv=0; $xv<=$plotsz; $xv++) $matrix[$yv][$xv] = 0;
+
+        $xmin = min($lxv[$rcp]);
+        $xmax = max($lxv[$rcp]);
+        $xscl = floatval($plotsz) / (($xmax-$xmin)?:1);
+        $yscl = floatval($plot2) / ($maxyv ?: 1);
+
+        foreach ($lxv[$rcp] as $oid => $xv)
+        {
+            $x = ($xv-$xmin)*$xscl;
+            if (isset($yvals[$rcp][$idx][$oid]))
+            {
+                $y = $yvals[$rcp][$idx][$oid]*$yscl+$plot2;
+                $matrix[$y][$x]++;
+            }
         }
 
-        if (count($x) >= 10 && count($y) >= 10)
+        echo "Plot:\n";
+        foreach ($matrix as $y => $ln)
         {
-            $corr = correlationCoefficient($x, $y);
-            // $p = calculate_p($x, $y, $corr, 100);
-            if (/* $p <= 0.1 &&*/ abs($corr) > max($c)) $c[$metstr] = round($corr, 3);
-
-            if (count($c) > 40) break;
-        }
-    }
-
-    uasort($c, 'corrrsort');
-    $cc = count($c);
-    $maxallc = $cc ? (max(max($c), -min($c))) : 0.5;
-
-    echo "Correlations (residues of $rcp, $cxv ligands):\n";
-    $j = 0;
-    foreach ($c as $metric => $corr)
-    {
-        if (($corr < 0.5*$maxallc) && $metric != 'acv.d') continue;
-        $j++;
-        if (($j > 10) && $metric != 'acv.d') continue;
-        echo str_pad($metric, 10);
-
-        if (false===strpos($metric, " + ")
-            &&
-            false===strpos($metric, " - ")
-            &&
-            preg_match("/^[0-9]+[.][0-9]+/", $metric)
-           )
-        {
-            $pettia = explode('.', $metric);
-            $resno = resno_from_bw($rcp, "{$pettia[0]}.{$pettia[1]}");
-            $aa = substr($prots[$rcp]['sequence'], $resno-1, 1);
-            echo str_pad("$aa$resno", 7);
-        }
-
-        if ($corr >= 0) echo ' ';
-        echo $corr;
-        echo "\n";
-    }
-    echo "\n\n";
-
-    $idx = array_keys($c)[0];
-    if (!@$yvals[$rcp][$idx]) continue;
-
-    $xk = array_unique($xvals[$rcp]);
-    rsort($xk);
-
-    $maxyv = max( 
-         max($yvals[$rcp][$idx]),
-        -min($yvals[$rcp][$idx])
-                );
-    $matrix = [];
-    for ($yv=0; $yv<=$plotsz; $yv++) for ($xv=0; $xv<=$plotsz; $xv++) $matrix[$yv][$xv] = 0;
-
-    $xmin = min($xvals[$rcp]);
-    $xmax = max($xvals[$rcp]);
-    $xscl = floatval($plotsz) / (($xmax-$xmin)?:1);
-    $yscl = floatval($plot2) / ($maxyv ?: 1);
-
-    foreach ($xvals[$rcp] as $oid => $xv)
-    {
-        $x = ($xv-$xmin)*$xscl;
-        if (isset($yvals[$rcp][$idx][$oid]))
-        {
-            $y = $yvals[$rcp][$idx][$oid]*$yscl+$plot2;
-            $matrix[$y][$x]++;
-        }
-    }
-
-    echo "Plot:\n";
-    foreach ($matrix as $y => $ln)
-    {
-        foreach ($ln as $x => $k)
-        {
-            fire_color($k);            
-            echo ($y==$plot2?'-':" ");
-            clear_color();
+            foreach ($ln as $x => $k)
+            {
+                fire_color($k);            
+                echo ($y==$plot2?'-':" ");
+                clear_color();
+            }
+            echo "\n";
         }
         echo "\n";
     }
-    echo "\n";
 }
 
 _nodata:

@@ -2336,6 +2336,7 @@ float Molecule::get_intermol_polar_sat(Molecule* ligand)
         for (j=0; j<ligand->atcount; j++)
         {
             float r = ligand->atoms[j]->get_location().get_3d_distance(&aloc);
+            if (r > 5) continue;
             float abpol = fabs(ligand->atoms[j]->is_polar());
             float f = (aapol >= 0.5 ? 2 : 1) + (abpol >= 0.5 ? 2 : 1);
             if (!f) continue;

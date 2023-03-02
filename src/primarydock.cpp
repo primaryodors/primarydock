@@ -4137,7 +4137,9 @@ _try_again:
                 btot += lb;
                 // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;
 
-                pstot += m.get_intermol_polar_sat(reaches_spheroid[nodeno][i]);
+                float lf = m.get_intermol_polar_sat(reaches_spheroid[nodeno][i]);
+                pstot += lf;
+                cout << *(reaches_spheroid[nodeno][i]) << " adds " << lf << " to pstot, making " << pstot << endl;
             }
             // cout << btot << endl;
 

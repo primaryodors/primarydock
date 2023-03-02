@@ -99,7 +99,7 @@ foreach ($dock_data as $rcp => $ligs)
             case 'Agonist':
             $emp = best_empirical_pair($rcp, $ligand, true);
             // print_r($emp); exit;
-            if ($emp && false)
+            if ($emp)
             {
                 if (isset($emp['adjusted_curve_top']) && isset($emp['ec50']))
                     $x = (floatval($emp['adjusted_curve_top']) - min(10, -_EC50MUL*floatval($emp['ec50']))) / 2;
@@ -219,7 +219,7 @@ foreach ($yvals as $rcp => $yv)
         {
             // if ($metric == "7.46.y") print_r($y);
             $corr = round(correlationCoefficient($x, $y), 3);
-            // echo "Correlation: $corr\n";
+            // echo "$metric correlation: $corr\n";
             if ($corr > $bestcorr) $bestcorr = $corr;
             $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
             if (($p <= 0.05 && abs($corr) > 0.25) || $metric == 'acv.d') $corrs[$rcp][$metric] = round($corr, 3);
@@ -229,7 +229,7 @@ foreach ($yvals as $rcp => $yv)
 
 // print_r($corrs);
 
-if (count($yvals))  echo "Best correlation: $bestcorr.\n\n";
+if (count($yvals))  echo "Best single-metric correlation: $bestcorr.\n\n";
 else                echo "Insufficient data for correlation processing.\n\n";
 
 if (count($corrs))

@@ -233,7 +233,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
         if ($pose && $node>=0 && substr($ln, 0, 25) == "Ligand polar satisfaction")
         {
-            $polsat[$pose][$node] = floatval(explode(" ", $ln)[1]);
+            $polsat[$pose][$node] = floatval(explode(": ", $ln)[1]);
             $dosce = false;
             continue;
         }

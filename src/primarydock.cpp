@@ -4464,8 +4464,8 @@ _try_again:
                             cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                         }
 
-                        cout << "Ligand polar satisfaction: " << -dr[j][k].polsat << endl;
-                        if (output && dr[j][k].metric[l]) *output << "Ligand polar satisfaction: " << -dr[j][k].polsat << endl;
+                        cout << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
+                        if (output && dr[j][k].metric[l]) *output << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
                         cout << endl;
                         if (output) *output << endl;
 

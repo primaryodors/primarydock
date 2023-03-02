@@ -18,7 +18,7 @@ chdir(__DIR__);
 require("methods_common.php");
 chdir(__DIR__);
 
-$cenres = "CEN RES 3.33 4.57 4.60 45.52 45.53 5.39 5.43 6.55 6.59";
+$cenres = "CEN RES 4.57 4.60 5.39 5.43";
 
 prepare_outputs();
 

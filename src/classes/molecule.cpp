@@ -2322,6 +2322,41 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     return kJmol;
 }
 
+float Molecule::get_intermol_polar_sat(Molecule* ligand)
+{
+    if (!ligand) return 0;
+    if (!atoms) return 0;
+    int i, j, l, n;
+    float result = 0;
+
+    for (i=0; i<atcount; i++)
+    {
+        Point aloc = atoms[i]->get_location();
+        float aapol = fabs(atoms[i]->is_polar());
+        for (j=0; j<ligand->atcount; j++)
+        {
+            float r = ligand->atoms[j]->get_location().get_3d_distance(&aloc);
+            if (r > 5) continue;
+            float abpol = fabs(ligand->atoms[j]->is_polar());
+            float f = (aapol >= 0.5 ? 2 : 1) + (abpol >= 0.5 ? 2 : 1);
+            if (!f) continue;
+            f = 1.0 / pow(fmax(1,r/f),2);
+
+            if (aapol < 0.2)
+            {
+                if (abpol < 0.2) result += f;
+                else if (abpol >= 0.5) result -= f;
+            }
+            else if (aapol >= 0.5)
+            {
+                if (abpol < 0.2) result -= f;
+                else if (abpol >= 0.5) result += f;
+            }
+        }
+    }
+
+    return result;
+}
 
 void Molecule::minimize_internal_clashes()
 {

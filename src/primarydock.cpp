@@ -26,6 +26,7 @@ struct DockResult
     float ibytype[_INTER_TYPES_LIMIT];
     float proximity;                    // How far the ligand center is from the node's center.
     float tripswitch;                   // Effect of the ligand on the receptor's trip switch.
+    float polsat;
 };
 
 struct AcvHxRot
@@ -3759,8 +3760,9 @@ _try_again:
             float imkJmol[protein->get_seq_length()+8];
             float mvdWrepl[protein->get_seq_length()+8];
             float imvdWrepl[protein->get_seq_length()+8];
-            int metcount=0;
-            float btot=0;
+            int metcount = 0;
+            float btot = 0;
+            float pstot = 0;
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 
@@ -3954,6 +3956,13 @@ _try_again:
                 metcount++;
                 btot += lb;
                 // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;
+
+                float lf = m.get_intermol_polar_sat(reaches_spheroid[nodeno][i]);
+                pstot += lf;
+
+                #if _dbg_polsat
+                cout << *(reaches_spheroid[nodeno][i]) << " adds " << lf << " to pstot, making " << pstot << endl;
+                #endif
             }
             // cout << btot << endl;
 
@@ -3969,13 +3978,14 @@ _try_again:
             // Set the dock result properties and allocate the arrays.
             dr[drcount][nodeno].kJmol = (differential_dock && (maxclash > individual_clash_limit)) ? -Avogadro : btot;
             dr[drcount][nodeno].ikJmol = 0;
-            dr[drcount][nodeno].metric  = new char*[metcount+4];
-            dr[drcount][nodeno].mkJmol   = new float[metcount];
-            dr[drcount][nodeno].imkJmol   = new float[metcount];
-            dr[drcount][nodeno].mvdWrepl   = new float[metcount];
-            dr[drcount][nodeno].imvdWrepl   = new float[metcount];
-            dr[drcount][nodeno].tripswitch   = tripclash;
-            dr[drcount][nodeno].proximity     = ligand->get_barycenter().get_3d_distance(nodecen);
+            dr[drcount][nodeno].polsat  = pstot;
+            dr[drcount][nodeno].metric   = new char*[metcount+4];
+            dr[drcount][nodeno].mkJmol    = new float[metcount];
+            dr[drcount][nodeno].imkJmol    = new float[metcount];
+            dr[drcount][nodeno].mvdWrepl    = new float[metcount];
+            dr[drcount][nodeno].imvdWrepl    = new float[metcount];
+            dr[drcount][nodeno].tripswitch    = tripclash;
+            dr[drcount][nodeno].proximity      = ligand->get_barycenter().get_3d_distance(nodecen);
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
@@ -4072,13 +4082,17 @@ _try_again:
                     {
                         if ((	differential_dock
                                 &&
-                                (dr[i][0].kJmol - dr[i][0].ikJmol) < (dr[drcount][nodeno].kJmol - dr[drcount][nodeno].ikJmol)
+                                (dr[i][0].kJmol - dr[i][0].ikJmol + dr[i][0].polsat * polar_sat_influence_for_scoring)
+                                <
+                                (dr[drcount][nodeno].kJmol - dr[drcount][nodeno].ikJmol + dr[drcount][nodeno].polsat * polar_sat_influence_for_scoring)
                             )
-                                ||
-                                (	!differential_dock
-                                    &&
-                                    dr[i][0].kJmol < btot
-                                ))
+                            ||
+                            (	!differential_dock
+                                &&
+                                (dr[i][0].kJmol + dr[i][0].polsat * polar_sat_influence_for_scoring)
+                                <
+                                (btot + pstot * polar_sat_influence_for_scoring)
+                            ))
                         {
                             if (dr[i][0].pose < bestpose || bestpose < 0) bestpose = dr[i][0].pose;
                             dr[i][0].pose++;
@@ -4260,6 +4274,11 @@ _try_again:
                             if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                             cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                         }
+
+                        cout << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
+                        if (output && dr[j][k].metric[l]) *output << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
+                        cout << endl;
+                        if (output) *output << endl;
 
                         if (output) *output << "Proximity: " << dr[j][k].proximity << endl << endl;
                         cout << "Proximity: " << dr[j][k].proximity << endl << endl;

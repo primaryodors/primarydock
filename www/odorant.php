@@ -182,8 +182,9 @@ window.setTimeout( function()
 <tr>
     <th>Receptor</th>
     <th>log10 ec<sub>50</sub></th>
-    <th>Adjusted Top</th>
-    <th>Antagonist?</th>
+    <th>Adj. Top</th>
+    <th>Antag.?</th>
+    <th>Hypoth.</th>
     <th>Associated Perceptual Qualities</th>
 </tr>
 
@@ -265,6 +266,9 @@ foreach (array_keys($sorted) as $rcpid)
 
     if (@$agonist[$rcpid])
     {
+        if (@$prots[$rcpid]['hypothesized']) echo "<td style=\"white-space: nowrap;\">{$prots[$rcpid]['hypothesized']}</td>\n";
+        else echo "<td>&nbsp;</td>\n";
+
         $notes = substr(get_notes_for_receptor($rcpid, $correlations), 0, 123);
         if (substr($notes, 0, 1) == '(')
         {
@@ -273,7 +277,10 @@ foreach (array_keys($sorted) as $rcpid)
         echo "<td style=\"white-space: nowrap;\">$notes</td>\n";
     }
     else
+    {
         echo "<td>&nbsp;</td>\n";
+        echo "<td>&nbsp;</td>\n";
+    }    
 
     echo "</tr>\n";
 }

@@ -4369,7 +4369,7 @@
     "5bf00300c04892199930ee7b21ac99ac":
     {
         "full_name": "butyl anthranilate",
-        "smiles": "CCCCOC(=O)C1=CC=CC=C1[NH3+]",
+        "smiles": "CCCCOC(=O)C1=CC=CC=C1N",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

@@ -229,7 +229,11 @@ foreach ($yvals as $rcp => $yv)
             {
                 // if ($metric == "7.46.y") print_r($y);
                 $corr = round(correlationCoefficient($x, $y), 3);
+                
+                fire_color(abs($corr));
                 echo "$rcp: $xmet - $metric correlation: $corr\n";
+                clear_color();
+                
                 if (abs($corr) > abs($bestcorr)) $bestcorr = $corr;
                 $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
                 if (($p <= 0.05 && abs($corr) > 0.25) || $metric == 'acv.d') $corrs[$rcp][$metric] = round($corr, 3);

@@ -153,7 +153,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             $outlines = explode("\n", file_get_contents($outfname));
             if (count($outlines) >= 200) break;
             if (!$elim) $elim = 99;
-            else $elim *= 2;
+            else $elim *= 1.333;
         }
     }
     

@@ -20,7 +20,7 @@
 #define Avogadro 6.25e+23
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.
-#define intermol_ESP 0.05
+#define intermol_ESP 0.1
 
 #if defined(__linux__) || defined(__sun) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
     #define CMD_CHECK_INSTALLED_3P_SMILES_PARSER "which obabel"
@@ -163,7 +163,7 @@
 #define drift_decay_rate 0.08
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
-#define allow_mol_fullrot_iter 0
+#define allow_mol_fullrot_iter 1
 #define sidechain_fullrot_lig_bmult 3
 
 // Extra weight given to sidechain-ligand binding strengths during conformer search.
@@ -180,7 +180,7 @@
 // Allows the ligand to "see through" shielding and anisotropy and seek the greatest
 // potential binding with residues, irrespective of whether the side chain is in an
 // optimum orientation in space.
-#define allow_ligand_esp 0
+#define allow_ligand_esp 1
 #define shielding_avoidance_factor 2.5
 
 // Uses the ligand's most strongly bound atom as the center for full molecule rotations,
@@ -288,7 +288,7 @@
 #define _dbg_bb_rots 0
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
-#define _dbg_glomsel 1
+#define _dbg_glomsel 0
 #define _dbg_binding_type 0
 
 #endif

@@ -2446,7 +2446,7 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
 {
     float lbias = 1.0 + (sgn(is_residue()) == sgn(om->is_residue()) ? 0 : dock_ligand_bias);
     float lbind = get_intermol_binding(om, !is_ac) * lbias;
-    if (!is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
+    if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
     return lbind;
 }
 
@@ -3167,7 +3167,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                         (mm[i]->mol_typ == MOLTYP_AMINOACID)
                                         ?
                                         #endif
-                                        mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
+                                        mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac)
                                         #if allow_ligand_esp
                                         :
                                         mm[i]->get_intermol_potential(all[j]) - 5 * mm[i]->get_internal_clashes()

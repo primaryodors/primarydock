@@ -37,6 +37,9 @@ struct AcvHxRot
     int origin_resno;
     SCoord axis;
     float theta;
+    std::string start_resno_str;
+    std::string end_resno_str;
+    std::string origin_resno_str;
 };
 
 struct AcvBndRot
@@ -795,9 +798,9 @@ void iteration_callback(int iter)
         }
 
         ligand->recenter(bary);
-    }
 
-    #endif
+        #endif
+    }
 
     #if _teleport_dissatisfied_waters
     if (waters && (iter % 5) == 4)
@@ -881,13 +884,15 @@ void iteration_callback(int iter)
     }
 }
 
-int interpret_resno(char* field)
+int interpret_resno(const char* field)
 {
-    char* dot = strchr(field, '.');
+    char buffer[strlen(field)+4];
+    strcpy(buffer, field);
+    char* dot = strchr(buffer, '.');
     if (dot)
     {
         *(dot++) = 0;
-        int b = atoi(field);
+        int b = atoi(buffer);
         int w = atoi(dot);
         int _50 = protein->get_bw50(b);
         if (_50 < 1)
@@ -897,7 +902,7 @@ int interpret_resno(char* field)
         }
         return _50 + w - 50;
     }
-    else return atoi(field);
+    else return atoi(buffer);
 }
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
@@ -971,13 +976,16 @@ int interpret_config_line(char** words)
     {
         AcvHxRot ahr;
         int n = 1;
-        ahr.regname      = words[n++];
-        ahr.start_resno  = atoi(words[n++]);
-        ahr.end_resno    = atoi(words[n++]);
-        ahr.origin_resno = atoi(words[n++]);
-        ahr.transform    = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.axis         = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.theta        = atof(words[n++]) * fiftyseventh;
+        ahr.regname             = words[n++];
+        ahr.start_resno_str     = words[n];
+        ahr.start_resno         = atoi(words[n++]);
+        ahr.end_resno_str       = words[n];
+        ahr.end_resno           = atoi(words[n++]);
+        ahr.origin_resno_str    = words[n];
+        ahr.origin_resno        = atoi(words[n++]);
+        ahr.transform           = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.axis                = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.theta               = atof(words[n++]) * fiftyseventh;
         active_helix_rots.push_back(ahr);
         optsecho = (std::string)"Active helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
@@ -2842,14 +2850,20 @@ _try_again:
                 {
                     for (j=0; j<active_helix_rots.size(); j++)
                     {
+                        active_helix_rots[j].start_resno  = interpret_resno(active_helix_rots[j].start_resno_str.c_str());
+                        active_helix_rots[j].end_resno    = interpret_resno(active_helix_rots[j].end_resno_str.c_str());
+                        active_helix_rots[j].origin_resno = interpret_resno(active_helix_rots[j].origin_resno_str.c_str());
+
                         int sr = active_helix_rots[j].start_resno;
                         int er = active_helix_rots[j].end_resno;
                         int mr = active_helix_rots[j].origin_resno;
+
                         protein->move_piece(sr, er,
                                 (acvdirection > 0)
                                 ? protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
                                 : protein->get_region_center(sr, er).subtract(active_helix_rots[j].transform)
                             );
+
                         protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
                             active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
 
@@ -3945,7 +3959,7 @@ _try_again:
             }
             // cout << btot << endl;
 
-            if (btot > 15*m.get_atom_count()) btot = 0;
+            if (btot > 60*m.get_atom_count()) btot = 0;
             if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
 
             // drcount = pose-1+found_poses;

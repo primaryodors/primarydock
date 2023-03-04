@@ -86,10 +86,12 @@ else goto _nodata;
 $xvals = [];
 $yvals = [];
 
-$a = $na = $va = 0;
+$a = []; $na = []; $va = [];
 
 foreach ($dock_data as $rcp => $ligs)
 {
+    $a[$rcp] = $na[$rcp] = $va[$rcp] = 0;
+
     foreach ($ligs as $ligand => $pair)
     {
         if (@$pair['version'] < $version) continue;
@@ -106,7 +108,8 @@ foreach ($dock_data as $rcp => $ligs)
             $xvals["is_ag"]["All"][$idx] = 1;
             if (isset($emp['ec50'])) $xvals["ec50"]["All"][$idx] = floatval($emp['ec50']);
             if (isset($emp['adjusted_curve_top'])) $xvals["top"]["All"][$idx] = floatval($emp['adjusted_curve_top']);
-            $a++;
+            
+            $a[$rcp]++;
             break;
 
             case 'Non-Agonist':
@@ -114,7 +117,7 @@ foreach ($dock_data as $rcp => $ligs)
             $xvals["top"][$rcp][$idx] = 0;
             $xvals["is_ag"]["All"][$idx] = 0;
             $xvals["top"]["All"][$idx] = 0;
-            $na++;
+            $na[$rcp]++;
             break;
 
             case 'Inverse Agonist':
@@ -124,7 +127,7 @@ foreach ($dock_data as $rcp => $ligs)
             $xvals["is_ag"]["All"][$idx] = -1;
             $xvals["top"]["All"][$idx] = floatval($emp['adjusted_curve_top']) ?: 0;
             if (isset($emp['ec50'])) $xvals["ec50"]["All"][$idx] = floatval($emp['ec50']);
-            $va++;
+            $va[$rcp]++;
             break;
 
             default:
@@ -233,11 +236,12 @@ foreach ($yvals as $rcp => $yv)
             }
         }
     }
+    if (isset($a[$rcp])) echo "\n$rcp: {$a[$rcp]} agonists, {$na[$rcp]} non-agonists, {$va[$rcp]} inverse agonists.\n";
+    echo "\n";
 }
 
 // print_r($corrs);
 
-echo "\n$a agonists, $na non-agonists, $va inverse agonists.\n";
 
 if (count($yvals))  echo "Best single-metric correlation: $bestcorr.\n\n";
 else                echo "Insufficient data for correlation processing.\n\n";

@@ -35,6 +35,7 @@ PROT $pdbfname
 LIG sdf/$ligname.sdf
 
 $cenres
+$path
 SIZE 8.0 4.0 8.0
 
 ACVNODE $acvnode

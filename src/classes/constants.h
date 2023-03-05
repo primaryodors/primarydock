@@ -287,6 +287,7 @@
 #define _dbg_soft 0
 #define _dbg_glomsel 0
 #define _dbg_polsat 0
+#define _dbg_softrock 1
 
 #endif
 

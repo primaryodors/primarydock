@@ -709,18 +709,40 @@ void iteration_callback(int iter)
                 int er = active_helix_rots[i].end_resno;
                 int mr = active_helix_rots[i].origin_resno;
 
+                #if _dbg_softrock
+                Point wasat = protein->get_atom_location(sr, "CA");
+                #endif
+
                 protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
                     active_helix_rots[i].axis, active_helix_rots[i].dtheta);
+
+                #if _dbg_softrock
+                cout << "Rotating residues " << sr << "-" << er << " by "
+                        << (active_helix_rots[i].dtheta * fiftyseven) << "deg." << endl;
+                cout << sr << ":CA moved from " << wasat << " to " << protein->get_atom_location(sr, "CA") << endl;
+                #endif
 
                 float after = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
 
                 if (after > before)
                 {
                     active_helix_rots[i].theta += active_helix_rots[i].dtheta;
+                    #if _dbg_softrock
+                    cout << "Ligand binding improved from " << before << " to " << after << ". "
+                         << active_helix_rots[i].regname << " rock updated to " << (active_helix_rots[i].theta*fiftyseven)
+                         << "deg." << endl;
+                    #endif
                 }
                 else
                 {
+                    protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
+                        active_helix_rots[i].axis, -active_helix_rots[i].dtheta);
                     active_helix_rots[i].dtheta *= -0.666;
+                    #if _dbg_softrock
+                    cout << "Ligand binding was " << before << " now " << after << ". "
+                         << active_helix_rots[i].regname << " rock maintained at " << (active_helix_rots[i].theta*fiftyseven)
+                         << "deg." << endl;
+                    #endif
                 }
             }
         }
@@ -4060,8 +4082,11 @@ _try_again:
                     {
                         dr[drcount][nodeno].softrock += active_helix_rots[i].regname;
                         dr[drcount][nodeno].softrock += " active theta: ";
-                        dr[drcount][nodeno].softrock += std::to_string(active_helix_rots[i].theta);
-                        dr[drcount][nodeno].softrock += "\n";
+                        float deg = active_helix_rots[i].theta * fiftyseven * 100;
+                        deg = round(deg);
+                        deg /= 100;
+                        dr[drcount][nodeno].softrock += std::to_string(deg);
+                        dr[drcount][nodeno].softrock += " degrees\n";
                     }
                 }
             }

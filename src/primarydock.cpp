@@ -21,6 +21,7 @@ struct DockResult
     float* imkJmol;
     float* mvdWrepl;
     float* imvdWrepl;
+    std::string softrock;
     std::string pdbdat;
     float bytype[_INTER_TYPES_LIMIT];
     float ibytype[_INTER_TYPES_LIMIT];
@@ -4050,6 +4051,21 @@ _try_again:
             if (debug) *debug << "Allocated memory." << endl;
             #endif
 
+            int ahsz = active_helix_rots.size();
+            if (l)
+            {
+                for (i=0; i<ahsz; i++)
+                {
+                    if (active_helix_rots[i].soft)
+                    {
+                        dr[drcount][nodeno].softrock += active_helix_rots[i].regname;
+                        dr[drcount][nodeno].softrock += " active theta: ";
+                        dr[drcount][nodeno].softrock += std::to_string(active_helix_rots[i].theta);
+                        dr[drcount][nodeno].softrock += "\n";
+                    }
+                }
+            }
+
             for (i=0; i<_INTER_TYPES_LIMIT; i++)
             {
                 dr[drcount][nodeno].bytype[i] = differential_dock ? fin_total_binding_by_type[i] : total_binding_by_type[i];
@@ -4335,8 +4351,16 @@ _try_again:
                             cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                         }
 
+                        if (dr[j][k].softrock.size())
+                        {
+                            cout << "Active Helix Soft Rotations:" << endl
+                                 << dr[j][k].softrock << endl;
+                            if (output ) *output << "Active Helix Soft Rotations:" << endl
+                                 << dr[j][k].softrock << endl;
+                        }
+
                         cout << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
-                        if (output && dr[j][k].metric[l]) *output << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
+                        if (output) *output << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
                         cout << endl;
                         if (output) *output << endl;
 

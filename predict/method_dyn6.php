@@ -20,9 +20,9 @@ chdir(__DIR__);
 
 $cenres = "CEN RES 6.59";
 $path = [];
-$path[] = "PATH ".(count($path)+1)." RES 5.40 5.43 5.44 5.47 6.51";
-$path[] = "PATH ".(count($path)+1)." RES 3.33 45.52"; $acvnode = count($path);
-$path[] = "PATH ".(count($path)+1)." RES 4.57 4.60 5.43";
+$path[] = "PATH ".(count($path)+1)." RES 5.40 5.43 5.44 5.47 6.51 6.59";
+$path[] = "PATH ".(count($path)+1)." RES 3.33 45.52 6.55 6.59"; $acvnode = count($path);
+$path[] = "PATH ".(count($path)+1)." RES 4.57 4.60 5.43 6.55 6.59";
 $path = implode("\n", $path);
 
 prepare_outputs();

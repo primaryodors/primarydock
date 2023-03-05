@@ -2472,8 +2472,16 @@ int main(int argc, char** argv)
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
     int drcount = 0, qpr;
 
-    cout << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
-    if (output) *output << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
+    if (pathnodes)
+    {
+        cout << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
+        if (output) *output << pathnodes << " path node" << (pathnodes == 1 ? "" : "s") << "." << endl;
+    }
+    else
+    {
+        cout << "Static dock - no path nodes." << endl;
+        if (output) *output << "Static dock - no path nodes." << endl;
+    }
 
     #if active_persistence
     float res_kJmol[seql+8];

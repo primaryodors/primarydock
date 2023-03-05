@@ -1941,7 +1941,7 @@ int main(int argc, char** argv)
 
                     for (j=0; j<4; j++)
                     {
-                        if (i % 1)			// TMR1, TMR3, TMR5, TMR7 begin on the extracellular side and descend.
+                        if (i & 1)			// TMR1, TMR3, TMR5, TMR7 begin on the extracellular side and descend.
                         {
                             extracellular[exr_n++] = p.get_atom_location(sr+j, "CA");
                             cytoplasmic[cyt_n++] = p.get_atom_location(er-j, "CA");
@@ -1959,7 +1959,7 @@ int main(int argc, char** argv)
                 Point exrdir = average_of_points(extracellular, exr_n);
                 Point cytdir = average_of_points(cytoplasmic, cyt_n);
 
-                Rotation rot = align_points_3d(&exrdir, new Point(0,1e9,0), &cytdir);
+                Rotation rot = align_points_3d(&exrdir, new Point(0,1e6,0), &cytdir);
 
                 p.rotate_piece(1, 9999, rot, 0);
 

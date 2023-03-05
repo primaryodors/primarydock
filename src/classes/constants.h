@@ -255,6 +255,10 @@
 #define _water_satisfaction_threshold 5
 #define _water_teleport_tries 25
 
+#define polar_sat_influence_for_dock 30
+#define polar_sat_influence_for_bb 30
+#define polar_sat_influence_for_scoring 30
+
 // How strong an intermolecular bond is required to prevent a histidine hydrogen from flipping
 // to a less favorable state.
 #define _hisflip_binding_threshold 25
@@ -282,6 +286,7 @@
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
 #define _dbg_glomsel 0
+#define _dbg_polsat 0
 
 #endif
 

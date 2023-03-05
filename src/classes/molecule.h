@@ -147,6 +147,7 @@ public:
     float get_intermol_potential(Molecule* ligand);
     float get_intermol_potential(Molecule** ligands);
     float hydrophilicity();
+    float get_intermol_polar_sat(Molecule* ligand);
 
     float get_vdW_repulsion(Molecule* ligand);
 

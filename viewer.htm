@@ -1418,6 +1418,7 @@ function apply_pdb(poresult)
 								});		// end each residue.
 							}		// end if acvmdl.
 						});
+						if (!acvnode) showNode(0);
 						break;
 					}		// end if name backbone.
 				}		// end for gmodel.
@@ -1463,6 +1464,7 @@ function apply_pdb(poresult)
 								});		// end each residue.
 							}		// end if acvmdl.
 						});
+						if (!acvnode) showNode(0);
 						break;
 					}		// end if name backbone.
 				}		// end for gmodel.
@@ -1598,6 +1600,7 @@ function showPose(p)
 			model[i].removeAllRepresentations();
             model[i].addRepresentation( mrep[i], mrparams[i] );
             if (is_ligand[i]) curr_ligand = model[i];
+			if (!acvnode) showNode(0);
         }
         else
             model[i].removeAllRepresentations();
@@ -2218,6 +2221,7 @@ function loadFile(fileData, fileName = "")
 						var pdbdat = "";
 						for (i++; i<lln; i++) pdbdat += lines[i] + "\n";
 						apply_pdb(pdbdat);
+						if (!acvnode) showNode(0);
 					}
 				}
 
@@ -2234,6 +2238,7 @@ function loadFile(fileData, fileName = "")
 						success: function(poresult)
 		                {
 							apply_pdb(poresult);
+							if (!acvnode) showNode(0);
 		                }		// end orpdb success.
 		            });		// end orpdb ajax.
 	            }		// end if orid.

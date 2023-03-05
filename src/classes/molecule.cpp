@@ -3282,7 +3282,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
         }	// for i = 0 to iters
         // cout << "Iteration " << iter << " improvement " << improvement << endl;
 
+        #if allow_iter_cb
         if (cb) cb(iter);
+        #endif
     }	// for iter.
 }
 

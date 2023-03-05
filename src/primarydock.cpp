@@ -38,6 +38,8 @@ struct AcvHxRot
     int origin_resno;
     SCoord axis;
     float theta;
+    bool soft;
+    float dtheta;
     std::string start_resno_str;
     std::string end_resno_str;
     std::string origin_resno_str;
@@ -347,6 +349,7 @@ int maxh2o = 0;
 int omaxh2o = 0;
 bool flex = true;
 float kJmol_cutoff = 0.01;
+int pose, nodeno, iter;
 bool kcal = false;
 float drift = initial_drift;
 Molecule** gcfmols = NULL;
@@ -356,6 +359,9 @@ int triesleft = 0;				// Default is no retry.
 bool echo_progress = false;
 bool hydrogenate_pdb = false;
 bool append_pdb = false;
+
+AminoAcid*** reaches_spheroid = nullptr;
+int sphres = 0;
 
 std::string origbuff = "";
 std::string optsecho = "";
@@ -485,10 +491,6 @@ SoftBias* get_soft_bias_from_region(const char* region)
 
 void iteration_callback(int iter)
 {
-    #if !allow_iter_cb
-    return;
-    #endif
-
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     int l;
     float prebind;
@@ -689,6 +691,40 @@ void iteration_callback(int iter)
     Atom *atom, *btom;
     int i;
 
+    l = active_helix_rots.size();
+    if (l && nodeno >= active_matrix_node)
+    {
+        for (i=0; i<l; i++)
+        {
+            if (active_helix_rots[i].soft)
+            {
+                /*AminoAcid* resphres[SPHREACH_MAX+4];
+                for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
+                int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);*/
+
+                float before = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+
+                int sr = active_helix_rots[i].start_resno;
+                int er = active_helix_rots[i].end_resno;
+                int mr = active_helix_rots[i].origin_resno;
+
+                protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
+                    active_helix_rots[i].axis, active_helix_rots[i].dtheta);
+
+                float after = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+
+                if (after > before)
+                {
+                    active_helix_rots[i].theta += active_helix_rots[i].dtheta;
+                }
+                else
+                {
+                    active_helix_rots[i].dtheta *= -0.666;
+                }
+            }
+        }
+    }
+
     if (!iter) goto _oei;
     if (iter == (iters-1)) goto _oei;
     
@@ -848,13 +884,13 @@ void iteration_callback(int iter)
 
         for (i=0; i<offset; i++) discrete[i].pmol = gcfmols[i];
 
-        AminoAcid* resphres[SPHREACH_MAX+4];
+        /*AminoAcid* resphres[SPHREACH_MAX+4];
         for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
-        int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);
+        int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);*/
         //cout << "Sphres: " << sphres << endl;
         for (i=0; i<sphres; i++)
         {
-            discrete[i+offset].paa = resphres[i];
+            discrete[i+offset].paa = reaches_spheroid[nodeno][i];
         }
         discrete[sphres+offset].n = 0;
 
@@ -879,15 +915,15 @@ void iteration_callback(int iter)
             /*protein->save_pdb(fp, ligand);
             protein->end_pdb(fp);*/
 
-            AminoAcid* reaches_spheroid[SPHREACH_MAX];
+            /*AminoAcid* reaches_spheroid[SPHREACH_MAX];
             int sphres = 0;
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, pocketcen, size, addl_resno);
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, pocketcen, size, addl_resno);*/
             int foff = 0;
 
             for (i=0; i<sphres; i++)
             {
-                reaches_spheroid[i]->save_pdb(fp, foff);
-                foff += reaches_spheroid[i]->get_atom_count();
+                reaches_spheroid[nodeno][i]->save_pdb(fp, foff);
+                foff += reaches_spheroid[nodeno][i]->get_atom_count();
             }
 
             ligand->save_pdb(fp, foff);
@@ -989,16 +1025,18 @@ int interpret_config_line(char** words)
     {
         AcvHxRot ahr;
         int n = 1;
-        ahr.regname             = words[n++];
-        ahr.start_resno_str     = words[n];
-        ahr.start_resno         = atoi(words[n++]);
-        ahr.end_resno_str       = words[n];
-        ahr.end_resno           = atoi(words[n++]);
-        ahr.origin_resno_str    = words[n];
-        ahr.origin_resno        = atoi(words[n++]);
-        ahr.transform           = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.axis                = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.theta               = atof(words[n++]) * fiftyseventh;
+        ahr.regname              = words[n++];
+        ahr.start_resno_str      = words[n];
+        ahr.start_resno          = atoi(words[n++]);
+        ahr.end_resno_str        = words[n];
+        ahr.end_resno            = atoi(words[n++]);
+        ahr.origin_resno_str     = words[n];
+        ahr.origin_resno         = atoi(words[n++]);
+        ahr.transform            = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.axis                 = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.theta                = atof(words[n]) * fiftyseventh;
+        ahr.soft                 = strchr(words[n++], '?') ? true : false;
+        if (ahr.soft) ahr.dtheta = 0.1;
         active_helix_rots.push_back(ahr);
         optsecho = (std::string)"Active helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
@@ -2377,12 +2415,9 @@ int main(int argc, char** argv)
     if (debug) *debug << "Identified best binding ligand atoms." << endl;
     #endif
 
-    int pose, nodeno, iter;
     Point nodecen = pocketcen;
     seql = protein->get_seq_length();
     int rstart = protein->get_start_resno();
-    AminoAcid* reaches_spheroid[pathnodes+2][SPHREACH_MAX];
-    int sphres = 0;
 
     // Filter residues according to which ones are close enough to the spheroid to "reach" it.
     nodecen = pocketcen;
@@ -2491,6 +2526,9 @@ int main(int argc, char** argv)
         cout << "Static dock - no path nodes." << endl;
         if (output) *output << "Static dock - no path nodes." << endl;
     }
+
+    reaches_spheroid = new AminoAcid**[pathnodes+2];
+    for (i=0; i<=pathnodes; i++) reaches_spheroid[i] = new AminoAcid*[SPHREACH_MAX];
 
     #if active_persistence
     float res_kJmol[seql+8];

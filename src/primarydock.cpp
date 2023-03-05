@@ -703,6 +703,9 @@ void iteration_callback(int iter)
                 for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
                 int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);*/
 
+                // TODO: Check that any residues of reaches_spheroid[nodeno] are in range for rocking motion
+                // and output a warning if not.
+
                 float before = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
 
                 int sr = active_helix_rots[i].start_resno;

@@ -221,7 +221,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             continue;
         }
 
-        if (substr($ln, 0, 7) == 'BENERG:') { $dosce = true; echo "Doing side chain energies, pose $pose, node $node.\n"; }
+        if (substr($ln, 0, 7) == 'BENERG:') { $dosce = true; echo "Reading side chain energies, pose $pose, node $node.\n"; }
         if (substr($ln, 0, 7) == 'vdWRPL:') $dovdw = true;
 
         if ($pose && $node>=0 && substr($ln, 0, 5) == "Total")

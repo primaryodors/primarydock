@@ -23,6 +23,7 @@ $path = [];
 $path[] = "PATH ".(count($path)+1)." RES 5.40 5.43 5.44 5.47 6.51";
 $path[] = "PATH ".(count($path)+1)." RES 3.33 45.52"; $acvnode = count($path);
 $path[] = "PATH ".(count($path)+1)." RES 4.57 4.60 5.43";
+$path = implode("\n", $path);
 
 prepare_outputs();
 
@@ -34,7 +35,7 @@ PROT $pdbfname
 LIG sdf/$ligname.sdf
 
 $cenres
-SIZE 5.0 4.0 5.0
+SIZE 8.0 4.0 8.0
 
 ACVNODE $acvnode
 ACVHXR TMR6 6.26 6.60 6.48 0 0 0 -0.5448 0 0.8385 13

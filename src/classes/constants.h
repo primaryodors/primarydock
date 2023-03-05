@@ -166,6 +166,9 @@
 #define allow_mol_fullrot_iter 0
 #define sidechain_fullrot_lig_bmult 3
 
+// Extra weight given to sidechain-ligand binding strengths during conformer search.
+#define dock_ligand_bias 0.5
+
 // Turns off the 360 degree rotations for all but the zeroth node of a path.
 #define nodes_no_ligand_360_tumble 0
 #define nodes_no_ligand_360_flex 0
@@ -252,6 +255,10 @@
 #define _water_satisfaction_threshold 5
 #define _water_teleport_tries 25
 
+#define polar_sat_influence_for_dock 30
+#define polar_sat_influence_for_bb 30
+#define polar_sat_influence_for_scoring 30
+
 // How strong an intermolecular bond is required to prevent a histidine hydrogen from flipping
 // to a less favorable state.
 #define _hisflip_binding_threshold 25
@@ -279,6 +286,7 @@
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
 #define _dbg_glomsel 0
+#define _dbg_polsat 0
 
 #endif
 

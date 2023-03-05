@@ -26,10 +26,10 @@ void AminoAcid::find_his_flips()
         if (atoms[i]->get_family() == TETREL)
         {
             Atom* a = atoms[i]->is_bonded_to(PNICTOGEN, 2);
-            if (a)
+            if (a && !a->get_charge())
             {
                 Atom* b = atoms[i]->is_bonded_to(a->get_elem_sym(), 1);
-                if (b)
+                if (b && !b->get_charge())
                 {
                     Atom* h = b->is_bonded_to("H");
                     if (!h) h = a->is_bonded_to("H");

@@ -708,8 +708,10 @@ void iteration_callback(int iter)
 
                 float before = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
                 // before -= protein->get_internal_clashes() * _kJmol_cuA;
-                for (j=0; j<sphres; j++) 
-                    before -= reaches_spheroid[nodeno][j]->get_intermol_clashes(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])) * _kJmol_cuA;
+                for (j=0; j<sphres; j++)
+                    if (reaches_spheroid[nodeno][j])
+                        before -= reaches_spheroid[nodeno][j]->get_intermol_clashes(
+                            reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])) * _kJmol_cuA;
 
                 int sr = active_helix_rots[i].start_resno;
                 int er = active_helix_rots[i].end_resno;
@@ -731,7 +733,9 @@ void iteration_callback(int iter)
                 float after = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
                 // after -= protein->get_internal_clashes() * _kJmol_cuA;
                 for (j=0; j<sphres; j++)
-                    after -= reaches_spheroid[nodeno][j]->get_intermol_clashes(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])) * _kJmol_cuA;
+                    if (reaches_spheroid[nodeno][j])
+                        after -= reaches_spheroid[nodeno][j]->get_intermol_clashes(
+                            reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])) * _kJmol_cuA;
 
                 if (after > before)
                 {

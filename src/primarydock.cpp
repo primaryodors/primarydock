@@ -690,7 +690,7 @@ void iteration_callback(int iter)
     int ac = ligand->get_atom_count();
     float bbest = 0;
     Atom *atom, *btom;
-    int i;
+    int i, j;
 
     l = active_helix_rots.size();
     if (l && nodeno >= active_matrix_node)
@@ -707,6 +707,9 @@ void iteration_callback(int iter)
                 // and output a warning if not.
 
                 float before = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+                // before -= protein->get_internal_clashes() * _kJmol_cuA;
+                for (j=0; j<sphres; j++) 
+                    before -= reaches_spheroid[nodeno][j]->get_intermol_clashes(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])) * _kJmol_cuA;
 
                 int sr = active_helix_rots[i].start_resno;
                 int er = active_helix_rots[i].end_resno;
@@ -726,6 +729,9 @@ void iteration_callback(int iter)
                 #endif
 
                 float after = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+                // after -= protein->get_internal_clashes() * _kJmol_cuA;
+                for (j=0; j<sphres; j++)
+                    after -= reaches_spheroid[nodeno][j]->get_intermol_clashes(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])) * _kJmol_cuA;
 
                 if (after > before)
                 {

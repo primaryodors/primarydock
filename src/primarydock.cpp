@@ -692,6 +692,10 @@ void iteration_callback(int iter)
     Atom *atom, *btom;
     int i, j;
 
+    float progress = (float)iter / iters;
+    // float lsrca = (1.0 - progress) * soft_rock_clash_allowance;
+    float lsrca = (progress < 0.5) ? soft_rock_clash_allowance : 0;
+
     l = active_helix_rots.size();
     if (l && nodeno >= active_matrix_node)
     {
@@ -755,7 +759,7 @@ void iteration_callback(int iter)
                 {
                     protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
                         active_helix_rots[i].axis, -active_helix_rots[i].dtheta);
-                    active_helix_rots[i].dtheta *= -0.666;
+                    active_helix_rots[i].dtheta *= -0.8;
                     #if _dbg_softrock
                     cout << "Ligand binding was " << before << " now " << after << ". "
                          << active_helix_rots[i].regname << " rock maintained at " << (active_helix_rots[i].theta*fiftyseven)

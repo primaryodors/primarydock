@@ -710,9 +710,11 @@ void iteration_callback(int iter)
                 // before -= protein->get_internal_clashes() * _kJmol_cuA;
                 for (j=0; j<sphres; j++)
                     if (reaches_spheroid[nodeno][j])
-                        before -= reaches_spheroid[nodeno][j]->get_intermol_clashes(
+                    {
+                        float lclash = reaches_spheroid[nodeno][j]->get_intermol_clashes(
                             reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])) * _kJmol_cuA;
-
+                        if (lclash > soft_rock_clash_allowance) before -= (lclash - soft_rock_clash_allowance);
+                    }
                 int sr = active_helix_rots[i].start_resno;
                 int er = active_helix_rots[i].end_resno;
                 int mr = active_helix_rots[i].origin_resno;
@@ -734,8 +736,11 @@ void iteration_callback(int iter)
                 // after -= protein->get_internal_clashes() * _kJmol_cuA;
                 for (j=0; j<sphres; j++)
                     if (reaches_spheroid[nodeno][j])
-                        after -= reaches_spheroid[nodeno][j]->get_intermol_clashes(
+                    {
+                        float lclash = reaches_spheroid[nodeno][j]->get_intermol_clashes(
                             reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])) * _kJmol_cuA;
+                        if (lclash > soft_rock_clash_allowance) after -= (lclash - soft_rock_clash_allowance);
+                    }
 
                 if (after > before)
                 {

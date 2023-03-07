@@ -234,14 +234,17 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
         if ($pose && $node>=0 && substr($ln, 0, 25) == "Ligand polar satisfaction")
         {
+            // echo "$ln\n";
             $polsat[$pose][$node] = floatval(explode(": ", $ln)[1]);
             $dosce = false;
             continue;
         }
 
-        if ($pose && $node>=0 && strpos($ln, " active theta "))
+        if ($pose && $node>=0 && strpos($ln, " active theta: "))
         {
+            // echo "$ln\n";
             $pettias = explode(':', $ln);
+            // print_r($pettias);
             if (count($pettias) > 1)
             {
                 $morceaux = explode(' ', $pettias[0]);
@@ -293,11 +296,13 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     }
 
     // echo "vdwrpl: "; print_r($vdwrpl); exit;
+    // echo "acvth: "; print_r($acvth); exit;
 
     $sum = [];
     $sumps = [];
     $sumat = [];
     $count = [];
+    $countat = [];
     $ssce = [];
     $svdw = [];
     $rsum = [];
@@ -313,13 +318,16 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             if (!isset($count[$node])) $count[$node] = 0;
             
             $sum[$node] += $value * $bias;
-            $sumps[$node] += $polsat[$pose][$node];
+            $sumps[$node] += $polsat[$pose][$node] * $bias;
             $count[$node] += $bias;
 
+            if (@$acvth[$pose][$node])
             foreach ($acvth[$pose][$node] as $reg => $theta)
             {
-                if (!isset($sumat[$node][$reg])) $sumat[$node][$reg] = $theta;
-                else $sumat[$node][$reg] += $theta;
+                if (!isset($sumat[$node][$reg])) $sumat[$node][$reg] = $theta * $bias;
+                else $sumat[$node][$reg] += $theta * $bias;
+                if (!isset($countat[$node][$reg])) $countat[$node][$reg] = $bias;
+                else $countat[$node][$reg] += $bias;
             }
     
             if (@$scenerg[$pose][$node])
@@ -411,7 +419,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     foreach ($sumat as $node => $values)
     {
         foreach ($values as $reg => $v)
-            $average["{$metrics_prefix}AcvTheta.$reg.$node"] = round($value / (@$count[$node] ?: 1), 3);
+            $average["{$metrics_prefix}AcvTheta.$reg.$node"] = round($v / (@$countat[$node][$reg] ?: 1), 3);
     }
 
     foreach ($cbvals as $k => $v)

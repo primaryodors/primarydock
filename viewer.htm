@@ -95,6 +95,7 @@ a
 {	color: #2af;
 	text-decoration: none;
 }
+
 a:hover
 {
 	text-decoration: underline;
@@ -268,7 +269,7 @@ option.unknown
 
 #seqdd
 {
-	background-color: #235;
+	background-color: #223355cc;
 	position: absolute;
 	display: block;
 	top: 25px;
@@ -440,10 +441,10 @@ Clip:
 	<a id="ptbbbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a>
 	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
 </div>
-<a id="colcpk" title="Colors: CPK" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } $(this).hide(); $('#colborn').show();">CPK</a>
-<a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
-<a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); $(this).hide(); $('#bstick').show();">&#x1F388;</a>
-<a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="ballAndStick(); $(this).hide(); $('#spcfill').show();" style="display: none;">&#x1F9B4;</a>
+<a id="colcpk" title="Colors: CPK Standard" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colborn').show();">CPK</a>
+<a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
+<a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#bstick').show();">&#x1F388;</a>
+<a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="ballAndStick(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#spcfill').show();" style="display: none;">&#x1F9B4;</a>
 <a id="spinon" title="Spin On" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(true); $(this).hide(); $('#spinoff').show();">&#x1F310;</a>
 <a id="spinoff" title="Spin Off" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(false); $(this).hide(); $('#spinon').show();" style="display: none;">&#x1F9F1;</a>
 
@@ -703,7 +704,7 @@ function show_seqdd()
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Metal Coord";
-	tgl.id = "seqddligbs";
+	tgl.id = "seqddmcoord";
 	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
 	tgl.setAttribute("onclick", "event.preventDefault(); showMetalSideChains(); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
@@ -844,9 +845,9 @@ function showSideChain(resno)
 		if (!restoggled[resno])
 		{
 			var mdlidx = mdlresno.indexOf(resno);
-			resmdl[mdlidx].addRepresentation( "licorice",
+			resmdl[mdlidx].addRepresentation( spcfill ? "spacefill" : "licorice",
             {
-                "opacity": opc_sidechain,
+                "opacity": spcfill ? 1 : opc_sidechain,
 				"colorScheme": PODefScheme,
                 "metalness": mtl_licorice,
                 "clipNear": clipValue,
@@ -876,6 +877,33 @@ function toggleSideChain(resno)
 		else
 		{
 			showSideChain(resno);
+		}
+	}
+	catch (ex)
+	{
+		;
+	}
+}
+
+function refreshSideChainsVisible()
+{
+	try
+	{
+		var clipValue = get_clip_value();
+		var i;
+		for (i=0; i<restoggled.length; i++)
+		{
+			if (restoggled[i])
+			{
+				resmdl[i].removeAllRepresentations();
+				resmdl[i].addRepresentation( spcfill ? "spacefill" : "licorice",
+				{
+					"opacity": spcfill ? 1 : opc_sidechain,
+					"colorScheme": PODefScheme,
+					"metalness": mtl_licorice,
+					"clipNear": clipValue,
+				});
+			}
 		}
 	}
 	catch (ex)
@@ -1013,6 +1041,7 @@ function spaceFill()
 
 function disable_spacefill()
 {
+	return;
 	$('#spcfill').hide();
 	$('#bstick').hide();
 	sfenable = false;
@@ -1029,7 +1058,12 @@ function enable_spacefill()
 var born = false;
 var spcfill = false;
 var sfenable = true;
-if (getParameterByName("born")) born = true;
+if (getParameterByName("born"))
+{
+	born = true;
+	$("#colborn").show();
+	$("#colcpk").hide();
+}
 var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function(atom)
@@ -1596,7 +1630,10 @@ function showPose(p)
         {
 			if (mrparams[i].colorScheme == PODefSchemeRainbow) mrparams[i].colorScheme = PODefSchemeLigand;
 			model[i].removeAllRepresentations();
-            model[i].addRepresentation( mrep[i], mrparams[i] );
+			var lrep = spcfill ? "spacefill" : mrep[i];
+			var lparam = Object.assign({}, mrparams[i]);
+			if (spcfill) lparam.opacity = 1;
+            model[i].addRepresentation( lrep, lparam );
             if (is_ligand[i]) curr_ligand = model[i];
         }
         else
@@ -1668,7 +1705,10 @@ function showNode(n)
         {
 			if (mrparams[i].colorScheme == PODefSchemeRainbow) mrparams[i].colorScheme = PODefSchemeLigand;			// @#$% shallow copy.
 			model[i].removeAllRepresentations();
-            model[i].addRepresentation( mrep[i], mrparams[i] );
+			var lrep = spcfill ? "spacefill" : mrep[i];
+			var lparam = Object.assign({}, mrparams[i]);
+			if (spcfill) lparam.opacity = 1;
+            model[i].addRepresentation( lrep, lparam );
             if (is_ligand[i]) curr_ligand = model[i];
         }
         else

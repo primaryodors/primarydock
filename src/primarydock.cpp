@@ -505,6 +505,7 @@ void iteration_callback(int iter)
             {
                 SoftBias* sb = get_soft_bias_from_region(soft_rgns[l].name.c_str());
                 if (!l) prebind = protein->get_intermol_binding(ligand)*soft_ligand_importance + protein->get_internal_binding()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
+                
                 #if _dbg_soft
                 cout << iter << ": from " << prebind;
                 #endif
@@ -711,7 +712,8 @@ void iteration_callback(int iter)
                 // and output a warning if not.
 
                 float before = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                // before -= protein->get_internal_clashes() * _kJmol_cuA;
+                before -= protein->get_internal_clashes() * _kJmol_cuA;
+                
                 for (j=0; j<sphres; j++)
                     if (reaches_spheroid[nodeno][j])
                     {
@@ -737,7 +739,8 @@ void iteration_callback(int iter)
                 #endif
 
                 float after = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                // after -= protein->get_internal_clashes() * _kJmol_cuA;
+                after -= protein->get_internal_clashes() * _kJmol_cuA;
+                
                 for (j=0; j<sphres; j++)
                     if (reaches_spheroid[nodeno][j])
                     {

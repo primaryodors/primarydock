@@ -394,6 +394,7 @@ float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 Point active_matrix_n[16], active_matrix_c[16], active_matrix_m[16];
 int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0, deactivate_node = -1;
 std::vector<AcvHxRot> active_helix_rots;
+std::vector<AcvHxRot> orig_active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
 
@@ -712,7 +713,8 @@ void iteration_callback(int iter)
                 // and output a warning if not.
 
                 float before = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                before -= protein->get_internal_clashes() * _kJmol_cuA;
+                float pic = protein->get_internal_clashes();
+                before -= pic * _kJmol_cuA * soft_rock_clash_penalty;
                 
                 for (j=0; j<sphres; j++)
                     if (reaches_spheroid[nodeno][j])
@@ -739,7 +741,13 @@ void iteration_callback(int iter)
                 #endif
 
                 float after = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                after -= protein->get_internal_clashes() * _kJmol_cuA;
+                float pic1 = protein->get_internal_clashes();
+                pic1 -= soft_rock_clash_allowance;
+                after -= pic1 * _kJmol_cuA * soft_rock_clash_penalty;
+                #if _dbg_rock_pic
+                cout << "Iteration " << iter << " angle " << ((active_helix_rots[i].theta + active_helix_rots[i].dtheta) * fiftyseven)
+                     << " internal clashes was " << pic << " now " << pic1 << endl;
+                #endif
                 
                 for (j=0; j<sphres; j++)
                     if (reaches_spheroid[nodeno][j])
@@ -1084,8 +1092,9 @@ int interpret_config_line(char** words)
         ahr.axis                 = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
         ahr.theta                = atof(words[n]) * fiftyseventh;
         ahr.soft                 = strchr(words[n++], '?') ? true : false;
-        if (ahr.soft) ahr.dtheta = 0.1;
+        if (ahr.soft) ahr.dtheta = 0.01;
         active_helix_rots.push_back(ahr);
+        orig_active_helix_rots.push_back(ahr);
         optsecho = (std::string)"Active helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
     else if (!strcmp(words[0], "ACVMX"))
@@ -2603,6 +2612,10 @@ _try_again:
         {
             // Revert to saved original locations for the side chain atoms instead of reloading the protein.
             protein->revert_to_pdb();
+            for (i=0; i<orig_active_helix_rots.size(); i++)
+            {
+                active_helix_rots[i] = orig_active_helix_rots[i];
+            }
 
             // prepare_acv_bond_rots();
 

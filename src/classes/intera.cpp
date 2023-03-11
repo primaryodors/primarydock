@@ -11,6 +11,8 @@
 using namespace std;
 
 float total_binding_by_type[_INTER_TYPES_LIMIT];
+bool dummy_hydrophobic_force = false;
+InteratomicForce* lif = nullptr;
 
 void InteratomicForce::read_all_forces()
 {
@@ -19,7 +21,10 @@ void InteratomicForce::read_all_forces()
 
     FILE* pf = fopen("data/bindings.dat", "rb");
     if (!pf)
+    {
         cout << "ERROR failed to open bindings.dat, please verify file exists and you have permissions." << endl;
+        throw 0xbadf12e;
+    }
     else
     {
         reading_forces = true;
@@ -385,6 +390,20 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         if (bestrad) brot->rotate(bestrad);
     }
     #endif
+    
+    if (dummy_hydrophobic_force)
+    {
+        if (!lif)
+        {
+            lif = new InteratomicForce();
+            lif->type = hbond;
+            lif->distance = 4;
+            lif->kJ_mol = 21;
+            lif->dirprop = 1;
+        }
+        retval[j++] = lif;
+    }
+
 
     for (i=0; look[i]; i++)
     {

@@ -221,7 +221,7 @@ foreach ($yvals as $rcp => $yv)
                 // if ($metric == "7.46.y") print_r($y);
                 $corr = round(correlationCoefficient($x, $y), 3);
                 // echo "Correlation: $corr\n";
-                if ($corr > $bestcorr) $bestcorr = $corr;
+                if (abs($corr) > abs($bestcorr)) $bestcorr = $corr;
                 $p = (count($x) >= 20) ? calculate_p($x, $y, $corr, 100) : 0;
                 if (($p <= 0.05 && abs($corr) > 0.25) || is_priority($metric)) $corrs[$rcp][$metric] = round($corr, 3);
             }
@@ -299,7 +299,7 @@ foreach ($corrs as $rcp => $c)
         $j = 0;
         foreach ($c as $metric => $corr)
         {
-            if (($corr < 0.5*$maxallc) && !is_priority($metric)) continue;
+            if ((abs($corr) < 0.5*$maxallc) && !is_priority($metric)) continue;
             $j++;
             if (($j > 10) && !is_priority($metric)) continue;
             echo str_pad($metric, 10);
@@ -322,6 +322,8 @@ foreach ($corrs as $rcp => $c)
             echo "\n";
         }
         echo "\n\n";
+        
+        // print_r($c);
 
         $idx = array_keys($c)[0];
         if (!@$yvals[$rcp][$idx]) continue;

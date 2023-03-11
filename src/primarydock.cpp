@@ -760,6 +760,7 @@ void iteration_callback(int iter)
                 if (after > before)
                 {
                     active_helix_rots[i].theta += active_helix_rots[i].dtheta;
+                    active_helix_rots[i].dtheta *= 1.1;
                     #if _dbg_softrock
                     cout << "Ligand binding improved from " << before << " to " << after << ". "
                          << active_helix_rots[i].regname << " rock updated to " << (active_helix_rots[i].theta*fiftyseven)

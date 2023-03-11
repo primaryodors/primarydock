@@ -59,6 +59,7 @@ function is_priority($metric)
 {
     if ($metric == "4<->6") return true;
     if (substr($metric, 0, 8) == "AcvTheta") return true;
+    // if (substr($metric, 0, 3) == "TMR") return true;
     return false;
 }
 
@@ -147,18 +148,18 @@ foreach ($dock_data as $rcp => $ligs)
                 $bw = substr($k, 7);
                 if (false !== strpos($bw, '.'))
                 {
-                    $yvals[$rcp]["$bw.e"][$idx] = $v;
+                    // $yvals[$rcp]["$bw.e"][$idx] = $v;
                 
                     $tmr = intval($bw);
-                    if (!isset($yvals[$rcp]["TMR$tmr.e"])) $yvals[$rcp]["TMR$tmr.e"] = $v;
-                    else $yvals[$rcp]["TMR$tmr.e"] += $v;
+                    if (!isset($yvals[$rcp]["TMR$tmr.e"][$idx])) $yvals[$rcp]["TMR$tmr.e"][$idx] = $v;
+                    else $yvals[$rcp]["TMR$tmr.e"][$idx] += $v;
                 }
             }
             else
             if (substr($k, 0, 6) == "vdWrpl")
             {
                 $bw = substr($k, 7);
-                $yvals[$rcp]["$bw.v"][$idx] = $v;
+                // $yvals[$rcp]["$bw.v"][$idx] = $v;
             }
             else
             if (substr($k, 0, 4) == "Node "
@@ -178,7 +179,12 @@ foreach ($dock_data as $rcp => $ligs)
         ;
     }
     
-    $yvals[$rcp]["4<->6"] = (@$yvals[$rcp]["TMR4.e"] ?: 0) * (@$yvals[$rcp]["TMR6.e"] ?: 0);
+    foreach ($ligs as $ligand => $pair)
+    {
+        if (@$pair['version'] < $version) continue;
+        $idx = "$rcp|$ligand";
+        $yvals[$rcp]["4<->6"][$idx] = (@$yvals[$rcp]["TMR4.e"][$idx] ?: 0) * (@$yvals[$rcp]["TMR6.e"][$idx] ?: 0);
+    }
 }
 
 
@@ -355,7 +361,7 @@ foreach ($corrs as $rcp => $c)
             }
         }
 
-        echo "Plot ($rcp:$xmet vs. $idx):\n";
+        echo "Plot ($rcp: $xmet vs. $idx):\n";
         foreach ($matrix as $y => $ln)
         {
             foreach ($ln as $x => $k)

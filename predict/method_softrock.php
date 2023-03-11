@@ -40,6 +40,7 @@ ELIM 99
 
 FLEX 1
 # H2O 15
+WET
 
 ITERS 50
 

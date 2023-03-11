@@ -1426,6 +1426,10 @@ int interpret_config_line(char** words)
         }
         return i-1;
     }
+    else if (!strcmp(words[0], "WET"))
+    {
+        dummy_hydrophobic_force = true;
+    }
 
     return 0;
 }

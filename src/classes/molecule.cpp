@@ -3192,6 +3192,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                     bestfrb = bind1;
                                     bestfrrad = rad;
                                     fmaxb = maxb;
+                                    mm[i]->been_flexed = true;
                                 }
                             }
 
@@ -3243,6 +3244,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 improvement += (bind1 - bind);
                                 bind = bind1;
                                 fmaxb = maxb;
+                                mm[i]->been_flexed = true;
 
                                 #if DBG_BONDFLEX
                                 if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)

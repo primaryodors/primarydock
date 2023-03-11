@@ -4194,15 +4194,28 @@ _try_again:
 
             if (flex)
             {
-                for (k=0; reaches_spheroid[nodeno][k]; k++)
+                int en = protein->get_end_resno();
+                int resno;
+                for (resno = protein->get_start_resno(); resno <= en; resno++)
                 {
-                    if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;
-                    n = reaches_spheroid[nodeno][k]->get_atom_count();
+                    AminoAcid* laa = protein->get_residue(resno);
+                    if (!laa) continue;
+                    if (!laa->been_flexed)
+                    {
+                        for (k=0; reaches_spheroid[nodeno][k]; k++)
+                        {
+                            if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;
+                            if (reaches_spheroid[nodeno][k] == laa) goto _afterall;
+                        }
+                        continue;
+                    }
+                    _afterall:
+                    n = laa->get_atom_count();
                     for (l=0; l<n; l++)
                     {
-                        reaches_spheroid[nodeno][k]->get_atom(l)->stream_pdb_line(
+                        laa->get_atom(l)->stream_pdb_line(
                             pdbdat,
-                            reaches_spheroid[nodeno][k]->atno_offset+l
+                            laa->atno_offset+l
                         );
                     }
                 }

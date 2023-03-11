@@ -713,7 +713,7 @@ void iteration_callback(int iter)
                 // and output a warning if not.
 
                 float before = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                float pic = protein->get_internal_clashes();
+                float pic = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, true);
                 before -= pic * _kJmol_cuA * soft_rock_clash_penalty;
                 
                 for (j=0; j<sphres; j++)
@@ -741,7 +741,7 @@ void iteration_callback(int iter)
                 #endif
 
                 float after = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                float pic1 = protein->get_internal_clashes();
+                float pic1 = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, true);
                 pic1 -= soft_rock_clash_allowance;
                 after -= pic1 * _kJmol_cuA * soft_rock_clash_penalty;
                 #if _dbg_rock_pic

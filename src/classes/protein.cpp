@@ -269,7 +269,7 @@ void Protein::end_pdb(FILE* os)
 float Protein::get_internal_clashes(int sr, int er, bool repack)
 {
     if (!residues) return 0;
-    int i, j;
+    int i, j, l;
     float result = 0;
     for (i=0; residues[i]; i++)
     {
@@ -285,8 +285,16 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                 int n;
                 for (n=0; laa[n]; n++);         // Get count.
                 Molecule* interactors[n+4];
-                interactors[0] = residues[i];
-                for (j=0; j<n; j++) interactors[j+1] = laa[j];
+
+                l = 0;
+                interactors[l++] = residues[i];
+                for (j=0; j<n; j++)
+                {
+                    if (residues[i]->get_intermol_clashes(laa[j]) > 5)
+                        interactors[l++] = laa[j];
+                }
+
+                interactors[l] = nullptr;
 
                 Molecule::multimol_conform(interactors, 5);
             }

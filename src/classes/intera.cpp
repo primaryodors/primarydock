@@ -397,8 +397,8 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         {
             lif = new InteratomicForce();
             lif->type = hbond;
-            lif->kJ_mol = 21;
-            lif->dirprop = 1;
+            lif->kJ_mol = 1;
+            lif->dirprop = 2;
         }
         lif->distance = a->get_vdW_radius() + b->get_vdW_radius();
         retval[j++] = lif;

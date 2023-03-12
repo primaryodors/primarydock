@@ -390,20 +390,19 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         if (bestrad) brot->rotate(bestrad);
     }
     #endif
-    
+
     if (dummy_hydrophobic_force)
     {
         if (!lif)
         {
             lif = new InteratomicForce();
             lif->type = hbond;
-            lif->distance = 4;
             lif->kJ_mol = 21;
             lif->dirprop = 1;
         }
+        lif->distance = a->get_vdW_radius() + b->get_vdW_radius();
         retval[j++] = lif;
     }
-
 
     for (i=0; look[i]; i++)
     {

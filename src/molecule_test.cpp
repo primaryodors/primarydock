@@ -17,6 +17,8 @@ int main(int argc, char** argv)
     float clash_limit = 8;
     float N_O_spacing = 4 * 2;
 
+    wet_environment = true;
+
     Molecule m("nothing");
     cout << "Created empty molecule named " << m.get_name() << ".\n";
 

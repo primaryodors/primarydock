@@ -21,6 +21,7 @@ float conformer_tumble_multiplier = 1;
 
 bool allow_ligand_360_tumble = true;
 bool allow_ligand_360_flex = true;
+bool wet_environment = false;
 
 Molecule::Molecule(char const* lname)
 {
@@ -2478,7 +2479,7 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     float lbias = 1.0 + (sgn(is_residue()) == sgn(om->is_residue()) ? 0 : dock_ligand_bias);
     float lbind = get_intermol_binding(om, !is_ac) * lbias;
     // if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
-    lbind += get_intermol_contact_area(om, true) * oxytocin;
+    if (wet_environment) lbind += get_intermol_contact_area(om, true) * oxytocin;
     return lbind;
 }
 

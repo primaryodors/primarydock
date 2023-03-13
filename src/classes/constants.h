@@ -10,7 +10,7 @@
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 1.0
+#define _kJmol_cuA 0.5
 #define vdw_clash_allowance 1.0
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10

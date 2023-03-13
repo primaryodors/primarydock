@@ -291,7 +291,7 @@
 #define _dbg_glomsel 0
 #define _dbg_polsat 0
 #define _dbg_softrock 0
-#define _dbg_rock_pic 1
+#define _dbg_rock_pic 0
 
 #endif
 

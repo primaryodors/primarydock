@@ -140,6 +140,9 @@
 #define soft_ligand_importance 20
 #define soft_bias_overlap 0.1
 
+#define soft_rock_clash_allowance 0
+#define soft_rock_clash_penalty 0.1
+
 // Amount to reduce momenta for path nodes beyond zero. Since the point of path based
 // docking is to keep as closely as possible the same ligand pose and move it through
 // the protein, we want to minimize the ligand's conformational changes from node to
@@ -287,6 +290,8 @@
 #define _dbg_soft 0
 #define _dbg_glomsel 0
 #define _dbg_polsat 0
+#define _dbg_softrock 0
+#define _dbg_rock_pic 1
 
 #endif
 

@@ -11,6 +11,7 @@
 using namespace std;
 
 float total_binding_by_type[_INTER_TYPES_LIMIT];
+InteratomicForce* lif = nullptr;
 
 void InteratomicForce::read_all_forces()
 {
@@ -19,7 +20,10 @@ void InteratomicForce::read_all_forces()
 
     FILE* pf = fopen("data/bindings.dat", "rb");
     if (!pf)
+    {
         cout << "ERROR failed to open bindings.dat, please verify file exists and you have permissions." << endl;
+        throw 0xbadf12e;
+    }
     else
     {
         reading_forces = true;

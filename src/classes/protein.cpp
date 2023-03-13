@@ -266,17 +266,54 @@ void Protein::end_pdb(FILE* os)
     fprintf(os, "END\n");
 }
 
-float Protein::get_internal_clashes()
+float Protein::get_internal_clashes(int sr, int er, bool repack)
 {
     if (!residues) return 0;
-    int i, j;
+    int i, j, l;
     float result = 0;
     for (i=0; residues[i]; i++)
     {
+        int resno = residues[i]->get_residue_no();
+        if (sr && resno < sr) continue;
+        if (er && resno > er) continue;
+
+        if (repack)
+        {
+            AminoAcid** laa = get_residues_can_clash(resno);
+            if (laa)
+            {
+                int n;
+                for (n=0; laa[n]; n++);         // Get count.
+                Molecule* interactors[n+4];
+
+                l = 0;
+                interactors[l++] = residues[i];
+                for (j=0; j<n; j++)
+                {
+                    if (residues[i]->get_intermol_clashes(laa[j]) > 5)
+                        interactors[l++] = laa[j];
+                }
+
+                interactors[l] = nullptr;
+
+                Molecule::multimol_conform(interactors, 5);
+            }
+        }
+
         for (j=i; residues[j]; j++)
         {
             if (j==i) result += residues[i]->get_internal_clashes();
-            else result += residues[i]->get_intermol_clashes(residues[j]);
+            else
+            {
+                if (repack)
+                {
+                    float r = residues[i]->get_CA_location().get_3d_distance(residues[j]->get_CA_location());
+                    float rr = residues[i]->get_reach() + residues[j]->get_reach();
+                    if (r > rr) continue;
+                }
+
+                result += residues[i]->get_intermol_clashes(residues[j]);
+            }
         }
     }
     return result;

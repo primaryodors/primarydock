@@ -186,6 +186,7 @@ public:
     histidine_flip** hisflips = nullptr;
     Bond* springy_bonds = nullptr;
     int springy_bondct = 0;
+    bool been_flexed = false;
 
 protected:
     Molecule();

@@ -21,6 +21,7 @@ struct DockResult
     float* imkJmol;
     float* mvdWrepl;
     float* imvdWrepl;
+    std::string softrock;
     std::string pdbdat;
     float bytype[_INTER_TYPES_LIMIT];
     float ibytype[_INTER_TYPES_LIMIT];
@@ -38,6 +39,8 @@ struct AcvHxRot
     int origin_resno;
     SCoord axis;
     float theta;
+    bool soft;
+    float dtheta;
     std::string start_resno_str;
     std::string end_resno_str;
     std::string origin_resno_str;
@@ -347,6 +350,7 @@ int maxh2o = 0;
 int omaxh2o = 0;
 bool flex = true;
 float kJmol_cutoff = 0.01;
+int pose, nodeno, iter;
 bool kcal = false;
 float drift = initial_drift;
 Molecule** gcfmols = NULL;
@@ -356,6 +360,9 @@ int triesleft = 0;				// Default is no retry.
 bool echo_progress = false;
 bool hydrogenate_pdb = false;
 bool append_pdb = false;
+
+AminoAcid*** reaches_spheroid = nullptr;
+int sphres = 0;
 
 std::string origbuff = "";
 std::string optsecho = "";
@@ -387,6 +394,7 @@ float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 Point active_matrix_n[16], active_matrix_c[16], active_matrix_m[16];
 int active_matrix_count = 0, active_matrix_node = -1, active_matrix_type = 0, deactivate_node = -1;
 std::vector<AcvHxRot> active_helix_rots;
+std::vector<AcvHxRot> orig_active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
 
@@ -485,10 +493,6 @@ SoftBias* get_soft_bias_from_region(const char* region)
 
 void iteration_callback(int iter)
 {
-    #if !allow_iter_cb
-    return;
-    #endif
-
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     int l;
     float prebind;
@@ -502,6 +506,7 @@ void iteration_callback(int iter)
             {
                 SoftBias* sb = get_soft_bias_from_region(soft_rgns[l].name.c_str());
                 if (!l) prebind = protein->get_intermol_binding(ligand)*soft_ligand_importance + protein->get_internal_binding()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
+                
                 #if _dbg_soft
                 cout << iter << ": from " << prebind;
                 #endif
@@ -687,7 +692,95 @@ void iteration_callback(int iter)
     int ac = ligand->get_atom_count();
     float bbest = 0;
     Atom *atom, *btom;
-    int i;
+    int i, j;
+
+    float progress = (float)iter / iters;
+    // float lsrca = (1.0 - progress) * soft_rock_clash_allowance;
+    float lsrca = (progress < 0.5) ? soft_rock_clash_allowance : 0;
+
+    l = active_helix_rots.size();
+    if (l && nodeno >= active_matrix_node)
+    {
+        for (i=0; i<l; i++)
+        {
+            if (active_helix_rots[i].soft)
+            {
+                /*AminoAcid* resphres[SPHREACH_MAX+4];
+                for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
+                int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);*/
+
+                // TODO: Check that any residues of reaches_spheroid[nodeno] are in range for rocking motion
+                // and output a warning if not.
+
+                float before = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+                float pic = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, true);
+                before -= pic * _kJmol_cuA * soft_rock_clash_penalty;
+                
+                for (j=0; j<sphres; j++)
+                    if (reaches_spheroid[nodeno][j])
+                    {
+                        float lclash = reaches_spheroid[nodeno][j]->get_intermol_clashes(
+                            reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])) * _kJmol_cuA;
+                        if (lclash > soft_rock_clash_allowance) before -= (lclash - soft_rock_clash_allowance);
+                    }
+                int sr = active_helix_rots[i].start_resno;
+                int er = active_helix_rots[i].end_resno;
+                int mr = active_helix_rots[i].origin_resno;
+
+                #if _dbg_softrock
+                Point wasat = protein->get_atom_location(sr, "CA");
+                #endif
+
+                protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
+                    active_helix_rots[i].axis, active_helix_rots[i].dtheta);
+
+                #if _dbg_softrock
+                cout << "Rotating residues " << sr << "-" << er << " by "
+                        << (active_helix_rots[i].dtheta * fiftyseven) << "deg." << endl;
+                cout << sr << ":CA moved from " << wasat << " to " << protein->get_atom_location(sr, "CA") << endl;
+                #endif
+
+                float after = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
+                float pic1 = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, true);
+                pic1 -= soft_rock_clash_allowance;
+                after -= pic1 * _kJmol_cuA * soft_rock_clash_penalty;
+                #if _dbg_rock_pic
+                cout << "Iteration " << iter << " angle " << ((active_helix_rots[i].theta + active_helix_rots[i].dtheta) * fiftyseven)
+                     << " internal clashes was " << pic << " now " << pic1 << endl;
+                #endif
+                
+                for (j=0; j<sphres; j++)
+                    if (reaches_spheroid[nodeno][j])
+                    {
+                        float lclash = reaches_spheroid[nodeno][j]->get_intermol_clashes(
+                            reinterpret_cast<Molecule**>(reaches_spheroid[nodeno])) * _kJmol_cuA;
+                        if (lclash > soft_rock_clash_allowance) after -= (lclash - soft_rock_clash_allowance);
+                    }
+
+                if (after > before)
+                {
+                    active_helix_rots[i].theta += active_helix_rots[i].dtheta;
+                    active_helix_rots[i].dtheta *= 1.1;
+                    #if _dbg_softrock
+                    cout << "Ligand binding improved from " << before << " to " << after << ". "
+                         << active_helix_rots[i].regname << " rock updated to " << (active_helix_rots[i].theta*fiftyseven)
+                         << "deg." << endl;
+                    #endif
+                }
+                else
+                {
+                    protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
+                        active_helix_rots[i].axis, -active_helix_rots[i].dtheta);
+                    active_helix_rots[i].dtheta *= -0.8;
+                    #if _dbg_softrock
+                    cout << "Ligand binding was " << before << " now " << after << ". "
+                         << active_helix_rots[i].regname << " rock maintained at " << (active_helix_rots[i].theta*fiftyseven)
+                         << "deg." << endl;
+                    #endif
+                }
+            }
+        }
+    }
 
     if (!iter) goto _oei;
     if (iter == (iters-1)) goto _oei;
@@ -848,13 +941,13 @@ void iteration_callback(int iter)
 
         for (i=0; i<offset; i++) discrete[i].pmol = gcfmols[i];
 
-        AminoAcid* resphres[SPHREACH_MAX+4];
+        /*AminoAcid* resphres[SPHREACH_MAX+4];
         for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
-        int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);
+        int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);*/
         //cout << "Sphres: " << sphres << endl;
         for (i=0; i<sphres; i++)
         {
-            discrete[i+offset].paa = resphres[i];
+            discrete[i+offset].paa = reaches_spheroid[nodeno][i];
         }
         discrete[sphres+offset].n = 0;
 
@@ -879,15 +972,15 @@ void iteration_callback(int iter)
             /*protein->save_pdb(fp, ligand);
             protein->end_pdb(fp);*/
 
-            AminoAcid* reaches_spheroid[SPHREACH_MAX];
+            /*AminoAcid* reaches_spheroid[SPHREACH_MAX];
             int sphres = 0;
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, pocketcen, size, addl_resno);
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, pocketcen, size, addl_resno);*/
             int foff = 0;
 
             for (i=0; i<sphres; i++)
             {
-                reaches_spheroid[i]->save_pdb(fp, foff);
-                foff += reaches_spheroid[i]->get_atom_count();
+                reaches_spheroid[nodeno][i]->save_pdb(fp, foff);
+                foff += reaches_spheroid[nodeno][i]->get_atom_count();
             }
 
             ligand->save_pdb(fp, foff);
@@ -989,17 +1082,20 @@ int interpret_config_line(char** words)
     {
         AcvHxRot ahr;
         int n = 1;
-        ahr.regname             = words[n++];
-        ahr.start_resno_str     = words[n];
-        ahr.start_resno         = atoi(words[n++]);
-        ahr.end_resno_str       = words[n];
-        ahr.end_resno           = atoi(words[n++]);
-        ahr.origin_resno_str    = words[n];
-        ahr.origin_resno        = atoi(words[n++]);
-        ahr.transform           = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.axis                = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.theta               = atof(words[n++]) * fiftyseventh;
+        ahr.regname              = words[n++];
+        ahr.start_resno_str      = words[n];
+        ahr.start_resno          = atoi(words[n++]);
+        ahr.end_resno_str        = words[n];
+        ahr.end_resno            = atoi(words[n++]);
+        ahr.origin_resno_str     = words[n];
+        ahr.origin_resno         = atoi(words[n++]);
+        ahr.transform            = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.axis                 = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.theta                = atof(words[n]) * fiftyseventh;
+        ahr.soft                 = strchr(words[n++], '?') ? true : false;
+        if (ahr.soft) ahr.dtheta = 0.01;
         active_helix_rots.push_back(ahr);
+        orig_active_helix_rots.push_back(ahr);
         optsecho = (std::string)"Active helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
     else if (!strcmp(words[0], "ACVMX"))
@@ -2377,12 +2473,9 @@ int main(int argc, char** argv)
     if (debug) *debug << "Identified best binding ligand atoms." << endl;
     #endif
 
-    int pose, nodeno, iter;
     Point nodecen = pocketcen;
     seql = protein->get_seq_length();
     int rstart = protein->get_start_resno();
-    AminoAcid* reaches_spheroid[pathnodes+2][SPHREACH_MAX];
-    int sphres = 0;
 
     // Filter residues according to which ones are close enough to the spheroid to "reach" it.
     nodecen = pocketcen;
@@ -2492,6 +2585,9 @@ int main(int argc, char** argv)
         if (output) *output << "Static dock - no path nodes." << endl;
     }
 
+    reaches_spheroid = new AminoAcid**[pathnodes+2];
+    for (i=0; i<=pathnodes; i++) reaches_spheroid[i] = new AminoAcid*[SPHREACH_MAX];
+
     #if active_persistence
     float res_kJmol[seql+8];
     for (i=0; i<seql+8; i++) res_kJmol[i] = 0;
@@ -2513,6 +2609,10 @@ _try_again:
         {
             // Revert to saved original locations for the side chain atoms instead of reloading the protein.
             protein->revert_to_pdb();
+            for (i=0; i<orig_active_helix_rots.size(); i++)
+            {
+                active_helix_rots[i] = orig_active_helix_rots[i];
+            }
 
             // prepare_acv_bond_rots();
 
@@ -4012,6 +4112,24 @@ _try_again:
             if (debug) *debug << "Allocated memory." << endl;
             #endif
 
+            int ahsz = active_helix_rots.size();
+            if (l)
+            {
+                for (i=0; i<ahsz; i++)
+                {
+                    if (active_helix_rots[i].soft)
+                    {
+                        dr[drcount][nodeno].softrock += active_helix_rots[i].regname;
+                        dr[drcount][nodeno].softrock += " active theta: ";
+                        float deg = active_helix_rots[i].theta * fiftyseven * 100;
+                        deg = round(deg);
+                        deg /= 100;
+                        dr[drcount][nodeno].softrock += std::to_string(deg);
+                        dr[drcount][nodeno].softrock += " degrees\n";
+                    }
+                }
+            }
+
             for (i=0; i<_INTER_TYPES_LIMIT; i++)
             {
                 dr[drcount][nodeno].bytype[i] = differential_dock ? fin_total_binding_by_type[i] : total_binding_by_type[i];
@@ -4073,15 +4191,28 @@ _try_again:
 
             if (flex)
             {
-                for (k=0; reaches_spheroid[nodeno][k]; k++)
+                int en = protein->get_end_resno();
+                int resno;
+                for (resno = protein->get_start_resno(); resno <= en; resno++)
                 {
-                    if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;
-                    n = reaches_spheroid[nodeno][k]->get_atom_count();
+                    AminoAcid* laa = protein->get_residue(resno);
+                    if (!laa) continue;
+                    if (!laa->been_flexed)
+                    {
+                        for (k=0; reaches_spheroid[nodeno][k]; k++)
+                        {
+                            if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;
+                            if (reaches_spheroid[nodeno][k] == laa) goto _afterall;
+                        }
+                        continue;
+                    }
+                    _afterall:
+                    n = laa->get_atom_count();
                     for (l=0; l<n; l++)
                     {
-                        reaches_spheroid[nodeno][k]->get_atom(l)->stream_pdb_line(
+                        laa->get_atom(l)->stream_pdb_line(
                             pdbdat,
-                            reaches_spheroid[nodeno][k]->atno_offset+l
+                            laa->atno_offset+l
                         );
                     }
                 }
@@ -4297,8 +4428,16 @@ _try_again:
                             cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                         }
 
+                        if (dr[j][k].softrock.size())
+                        {
+                            cout << "Active Helix Soft Rotations:" << endl
+                                 << dr[j][k].softrock << endl;
+                            if (output ) *output << "Active Helix Soft Rotations:" << endl
+                                 << dr[j][k].softrock << endl;
+                        }
+
                         cout << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
-                        if (output && dr[j][k].metric[l]) *output << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
+                        if (output) *output << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
                         cout << endl;
                         if (output) *output << endl;
 

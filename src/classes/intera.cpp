@@ -11,7 +11,6 @@
 using namespace std;
 
 float total_binding_by_type[_INTER_TYPES_LIMIT];
-bool dummy_hydrophobic_force = false;
 InteratomicForce* lif = nullptr;
 
 void InteratomicForce::read_all_forces()
@@ -390,19 +389,6 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         if (bestrad) brot->rotate(bestrad);
     }
     #endif
-
-    if (dummy_hydrophobic_force)
-    {
-        if (!lif)
-        {
-            lif = new InteratomicForce();
-            lif->type = hbond;
-            lif->kJ_mol = 1;
-            lif->dirprop = 2;
-        }
-        lif->distance = a->get_vdW_radius() + b->get_vdW_radius();
-        retval[j++] = lif;
-    }
 
     for (i=0; look[i]; i++)
     {

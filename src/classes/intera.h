@@ -72,8 +72,6 @@ extern float total_binding_by_type[_INTER_TYPES_LIMIT];
 extern int active_persistence_resno[active_persistence_limit];
 #endif
 
-extern bool dummy_hydrophobic_force;
-
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);
 
 #endif

@@ -4395,7 +4395,7 @@ _try_again:
                             }
                             else
                             {
-                                if (output && do_output_colors) colorize(dr[j][k].mkJmol[l]*energy_mult);
+                                if (output && do_output_colors) colorize(dr[j][k].mkJmol[l]);
                                 cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
                                 if (do_output_colors) colorless();
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
@@ -4449,7 +4449,7 @@ _try_again:
                                 if (output)
                                 {
                                     *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
-                                    if (do_output_colors) colorize(dr[j][k].bytype[l]*energy_mult);
+                                    if (do_output_colors) colorize(dr[j][k].bytype[l]);
                                     cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
                                     if (do_output_colors) colorless();
                                 }
@@ -4478,7 +4478,9 @@ _try_again:
                         else
                         {
                             if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
+                            if (output && do_output_colors) colorize(dr[j][k].kJmol);
                             cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
+                            if (output && do_output_colors) colorless();
                         }
 
                         if (dr[j][k].softrock.size())

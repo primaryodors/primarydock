@@ -495,6 +495,12 @@ float sphere_intersection(float r1, float r2, float d)
            / (12*d);
 }
 
+float sphere_inter_area(float r1, float r2, float d)
+{
+    // https://mathworld.wolfram.com/Sphere-SphereIntersection.html
+    float a = 1.0 / (d*2) * sqrt(4.0 * d*d * r1*r1 - pow(d*d - r2*r2 + r1*r1, 2));
+    return M_PI * a*a;
+}
 
 SCoord v_from_pt_sub(Point distal, Point reference)
 {

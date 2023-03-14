@@ -448,12 +448,12 @@ void colorless()
 void append_dummy(Point pt)
 {
     #if _dummy_atoms_for_debug
-    Atom a("Ne");
+    Atom a("He");
     a.move(pt);
 
     a.name = new char[8];
     int i=dummies.size()+1;
-    sprintf(a.name, "NE%i", i);
+    sprintf(a.name, "HE%i", i);
 
     strcpy(a.aa3let, "DMY");
 

@@ -261,7 +261,7 @@
 
 #define polar_sat_influence_for_dock 30
 #define polar_sat_influence_for_bb 30
-#define polar_sat_influence_for_scoring 30
+#define polar_sat_influence_for_scoring 0
 
 // How strong an intermolecular bond is required to prevent a histidine hydrogen from flipping
 // to a less favorable state.

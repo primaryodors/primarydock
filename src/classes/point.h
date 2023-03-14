@@ -166,7 +166,9 @@ SCoord compute_normal(Point pt1, Point pt2, Point pt3);
 
 float are_points_planar(Point p1, Point p2, Point p3, Point p4);
 float polygon_radius(float side_length, int num_sides);
-float sphere_intersection(float r1, float r2, float d);
+
+float sphere_intersection(float r1, float r2, float d);         // Volume of the lens composed of the two caps.
+float sphere_inter_area(float r1, float r2, float d);           // Area of the circle formed by the spheres' intersection.
 
 SCoord v_from_pt_sub(Point distal, Point reference);
 

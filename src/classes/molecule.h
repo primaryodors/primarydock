@@ -148,6 +148,7 @@ public:
     float get_intermol_potential(Molecule** ligands);
     float hydrophilicity();
     float get_intermol_polar_sat(Molecule* ligand);
+    float get_intermol_contact_area(Molecule* ligand, bool hydrophobic_only = false);
 
     float get_vdW_repulsion(Molecule* ligand);
 
@@ -233,6 +234,7 @@ extern float conformer_momenta_multiplier;
 extern float conformer_tumble_multiplier;
 extern bool allow_ligand_360_tumble;
 extern bool allow_ligand_360_flex;
+extern bool wet_environment;
 
 #endif
 

@@ -21,6 +21,7 @@ float conformer_tumble_multiplier = 1;
 
 bool allow_ligand_360_tumble = true;
 bool allow_ligand_360_flex = true;
+bool wet_environment = false;
 
 Molecule::Molecule(char const* lname)
 {
@@ -2322,6 +2323,37 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     return kJmol;
 }
 
+float Molecule::get_intermol_contact_area(Molecule* ligand, bool hpho)
+{
+    if (!ligand) return 0;
+    if (!atoms) return 0;
+    int i, j;
+    float result = 0;
+
+    for (i=0; i<atcount; i++)
+    {
+        Point aloc = atoms[i]->get_location();
+        float avdw = atoms[i]->get_vdW_radius();
+
+        if (hpho && atoms[i]->is_polar()) continue;
+
+        for (j=0; j<ligand->atcount; j++)
+        {
+            if (hpho && ligand->atoms[j]->is_polar()) continue;
+
+            float r = ligand->atoms[j]->get_location().get_3d_distance(&aloc);
+            if (!r) continue;
+            float bvdw = ligand->atoms[j]->get_vdW_radius();
+            if (r > avdw+bvdw) continue;
+
+            float f = sphere_inter_area(avdw, bvdw, r);
+            if (!isnan(f)) result += f;
+        }
+    }
+
+    return result;
+}
+
 float Molecule::get_intermol_polar_sat(Molecule* ligand)
 {
     if (!ligand) return 0;
@@ -2447,6 +2479,7 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     float lbias = 1.0 + (sgn(is_residue()) == sgn(om->is_residue()) ? 0 : dock_ligand_bias);
     float lbind = get_intermol_binding(om, !is_ac) * lbias;
     // if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
+    if (wet_environment) lbind += get_intermol_contact_area(om, true) * oxytocin;
     return lbind;
 }
 

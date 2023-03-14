@@ -279,6 +279,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
 
         if (repack)
         {
+            set_clashables(resno);
             AminoAcid** laa = get_residues_can_clash(resno);
             if (laa)
             {
@@ -800,36 +801,47 @@ void Protein::add_remark(std::string new_remark)
     // TODO: Sort remarks by number, becarefuling to preserve the sequence of same numbered remarks.
 }
 
-void Protein::set_clashables()
+void Protein::set_clashables(int resno)
 {
     int i, j, k;
 
+    if (resno < 0) resno = 0;
+
+    int resmin = resno ? resno : get_start_resno();
+    int resmax = resno ? resno : get_end_resno();
+
     // cout << "Setting clashables." << endl;
 
-    if (res_can_clash)
+    if (!resno)
     {
-        delete[] res_can_clash;
-    }
+        if (res_can_clash)
+        {
+            delete[] res_can_clash;
+        }
 
-    int seqlen = get_seq_length();
-    res_can_clash = new AminoAcid**[seqlen+1];
+        res_can_clash = new AminoAcid**[resmax+1];
+        for (i=0; i<resmax; i++) res_can_clash[i] = nullptr;
+    }
 
     // cout << "seqlen is " << seqlen << endl;
 
-    for (i=0; i<seqlen; i++)
+    for (i=resmin; i<resmax; i++)
     {
+        if (!get_residue(i)) continue;
         if (debug) *debug << endl << "Testing residue " << residues[i]->get_residue_no() << endl;
-        AminoAcid* temp[seqlen+1];
+        AminoAcid* temp[resmax+1];
         k=0;
-        for (j=0; j<seqlen; j++)
+        for (j=resmin; j<resmax; j++)
         {
             if (j == i) continue;
+            if (!get_residue(j)) continue;
             if (residues[i]->can_reach(residues[j]))
             {
                 temp[k++] = residues[j];
                 if (debug) *debug << *residues[j] << " can reach " << *residues[i] << endl;
             }
         }
+        if (res_can_clash[i]) delete res_can_clash[i];
         res_can_clash[i] = new AminoAcid*[k+1];
         for (j=0; j<k; j++)
         {
@@ -842,9 +854,9 @@ void Protein::set_clashables()
         res_can_clash[i][k] = 0;
     }
 
-    res_can_clash[seqlen] = 0;
+    res_can_clash[resmax] = 0;
 
-    /*for (i=0; i<seqlen; i++)
+    /*for (i=0; i<resmax; i++)
     {
     	cout << i << ": ";
     	for (j=0; res_can_clash[i][j]; j++)
@@ -904,7 +916,7 @@ AminoAcid** Protein::get_residues_can_clash(int resno)
     {
         if (residues[i]->get_residue_no() == resno)
         {
-            if (!res_can_clash[i] || !res_can_clash[i][0]) set_clashables();
+            if (!res_can_clash[i] || !res_can_clash[i][0]) set_clashables(resno);
             /*cout << i << ": " << flush;
             if (res_can_clash[i] && res_can_clash[i][0])
             {

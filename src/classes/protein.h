@@ -32,7 +32,7 @@ public:
     bool add_residue(const int resno, const char aaletter);
     bool add_sequence(const char* sequence);
     bool add_residue(const char* pdbdata);
-    void set_clashables();
+    void set_clashables(int resno = 0);
     void delete_residue(int resno);
     void delete_sidechain(int resno);
     void delete_residues(int startres, int endres);

@@ -360,6 +360,7 @@ int triesleft = 0;				// Default is no retry.
 bool echo_progress = false;
 bool hydrogenate_pdb = false;
 bool append_pdb = false;
+bool do_output_colors = false;
 
 AminoAcid*** reaches_spheroid = nullptr;
 int sphres = 0;
@@ -409,6 +410,40 @@ float rgnrot_alpha[PROT_MAX_RGN], rgnrot_w[PROT_MAX_RGN], rgnrot_u[PROT_MAX_RGN]
 #if _dummy_atoms_for_debug
 std::vector<Atom> dummies;
 #endif
+
+void colorize(float f)
+{
+    float red, green, blue;
+
+    if (f >= 0)
+    {
+        f = sqrt(f/5);
+        blue = 128 + 128 * f;
+        green = fmax(48, (f-1) * 255);
+        red = fmax(64, (f-2) * 255);
+    }
+    else
+    {
+        f = sqrt(-f)*3;
+        f = fmax(0,fmin(128,f*16));
+        red = 128+f;
+        blue = 128-f;
+        green = 0.333 * red + 0.666 * blue;
+    }
+
+    int r, g, b;
+
+    r = max(0, min(255, (int)red));
+    g = max(0, min(255, (int)green));
+    b = max(0, min(255, (int)blue));
+
+    cout << "\x1b[38;2;" << r << ";" << g << ";" << b << "m";
+}
+
+void colorless()
+{
+    cout << "\x1b[0m";
+}
 
 void append_dummy(Point pt)
 {
@@ -1157,6 +1192,11 @@ int interpret_config_line(char** words)
     {
         CEN_buf = origbuff;
         optsecho = (std::string)"Center " + CEN_buf;
+        return 0;
+    }
+    else if (!strcmp(words[0], "COLORS"))
+    {
+        do_output_colors = true;
         return 0;
     }
     else if (!strcmp(words[0], "DEACVNODE"))
@@ -3790,7 +3830,9 @@ _try_again:
                     m.movability = MOV_ALL;
                     #endif
 
+                    #if _DBG_STEPBYSTEP
                     cout << endl;
+                    #endif
                 }
                 
                 #if _DBG_STEPBYSTEP
@@ -4357,7 +4399,9 @@ _try_again:
                             }
                             else
                             {
+                                if (output && do_output_colors) colorize(dr[j][k].mkJmol[l]);
                                 cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
+                                if (do_output_colors) colorless();
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
                             }
                         }
@@ -4406,8 +4450,17 @@ _try_again:
                             }
                             else
                             {
-                                cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
-                                if (output) *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
+                                if (output)
+                                {
+                                    *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
+                                    if (do_output_colors) colorize(dr[j][k].bytype[l]);
+                                    cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
+                                    if (do_output_colors) colorless();
+                                }
+                                else
+                                {
+                                    cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
+                                }
                             }
                         }
                         cout << endl;
@@ -4429,7 +4482,9 @@ _try_again:
                         else
                         {
                             if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
+                            if (output && do_output_colors) colorize(dr[j][k].kJmol);
                             cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
+                            if (output && do_output_colors) colorless();
                         }
 
                         if (dr[j][k].softrock.size())

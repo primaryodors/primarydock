@@ -1135,27 +1135,6 @@ int interpret_config_line(char** words)
         orig_active_helix_rots.push_back(ahr);
         optsecho = (std::string)"Active helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
-    else if (!strcmp(words[0], "HXR"))
-    {
-        AcvHxRot ahr;
-        int n = 1;
-        ahr.nodeno               = atoi(words[n++]);
-        ahr.regname              = words[n++];
-        ahr.start_resno_str      = words[n];
-        ahr.start_resno          = atoi(words[n++]);
-        ahr.end_resno_str        = words[n];
-        ahr.end_resno            = atoi(words[n++]);
-        ahr.origin_resno_str     = words[n];
-        ahr.origin_resno         = atoi(words[n++]);
-        ahr.transform            = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.axis                 = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.theta                = atof(words[n]) * fiftyseventh;
-        ahr.soft                 = strchr(words[n++], '?') ? true : false;
-        if (ahr.soft) ahr.dtheta = 0.01;
-        active_helix_rots.push_back(ahr);
-        orig_active_helix_rots.push_back(ahr);
-        optsecho = (std::string)"Helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
-    }
     else if (!strcmp(words[0], "ACVMX"))
     {
         if (!words[1] || !words[1][3])
@@ -1224,8 +1203,8 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "DEACVNODE"))
     {
-        deactivate_node = atoi(words[1]);
-        optsecho = (std::string)"Active node is " + to_string(deactivate_node);
+        echo << "Notice: DEACVNODE has been deprecated in favor of the HXR option. Please update your config files." << endl;
+        return 0;
     }
     else if (!strcmp(words[0], "DEBUG"))
     {
@@ -1300,6 +1279,27 @@ int interpret_config_line(char** words)
         }
         optsecho = "Water molecules: " + to_string(maxh2o);
         return 1;
+    }
+    else if (!strcmp(words[0], "HXR"))
+    {
+        AcvHxRot ahr;
+        int n = 1;
+        ahr.nodeno               = atoi(words[n++]);
+        ahr.regname              = words[n++];
+        ahr.start_resno_str      = words[n];
+        ahr.start_resno          = atoi(words[n++]);
+        ahr.end_resno_str        = words[n];
+        ahr.end_resno            = atoi(words[n++]);
+        ahr.origin_resno_str     = words[n];
+        ahr.origin_resno         = atoi(words[n++]);
+        ahr.transform            = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.axis                 = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.theta                = atof(words[n]) * fiftyseventh;
+        ahr.soft                 = strchr(words[n++], '?') ? true : false;
+        if (ahr.soft) ahr.dtheta = 0.01;
+        active_helix_rots.push_back(ahr);
+        orig_active_helix_rots.push_back(ahr);
+        optsecho = (std::string)"Helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
     else if (!strcmp(words[0], "HYDRO"))
     {

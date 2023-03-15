@@ -33,6 +33,7 @@ struct DockResult
 struct AcvHxRot
 {
     std::string regname;
+    int nodeno;
     int start_resno;
     int end_resno;
     Point transform;
@@ -1118,6 +1119,7 @@ int interpret_config_line(char** words)
         AcvHxRot ahr;
         int n = 1;
         ahr.regname              = words[n++];
+        ahr.nodeno               = -1;
         ahr.start_resno_str      = words[n];
         ahr.start_resno          = atoi(words[n++]);
         ahr.end_resno_str        = words[n];
@@ -1132,6 +1134,27 @@ int interpret_config_line(char** words)
         active_helix_rots.push_back(ahr);
         orig_active_helix_rots.push_back(ahr);
         optsecho = (std::string)"Active helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
+    }
+    else if (!strcmp(words[0], "HXR"))
+    {
+        AcvHxRot ahr;
+        int n = 1;
+        ahr.nodeno               = atoi(words[n++]);
+        ahr.regname              = words[n++];
+        ahr.start_resno_str      = words[n];
+        ahr.start_resno          = atoi(words[n++]);
+        ahr.end_resno_str        = words[n];
+        ahr.end_resno            = atoi(words[n++]);
+        ahr.origin_resno_str     = words[n];
+        ahr.origin_resno         = atoi(words[n++]);
+        ahr.transform            = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.axis                 = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        ahr.theta                = atof(words[n]) * fiftyseventh;
+        ahr.soft                 = strchr(words[n++], '?') ? true : false;
+        if (ahr.soft) ahr.dtheta = 0.01;
+        active_helix_rots.push_back(ahr);
+        orig_active_helix_rots.push_back(ahr);
+        optsecho = (std::string)"Helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
     else if (!strcmp(words[0], "ACVMX"))
     {
@@ -2655,6 +2678,7 @@ _try_again:
             protein->revert_to_pdb();
             for (i=0; i<orig_active_helix_rots.size(); i++)
             {
+                if (orig_active_helix_rots[i].nodeno == -1) orig_active_helix_rots[i].nodeno = active_matrix_node;
                 active_helix_rots[i] = orig_active_helix_rots[i];
             }
 
@@ -2837,6 +2861,60 @@ _try_again:
             #endif
             #endif
 
+
+            if (active_helix_rots.size())
+            {
+                for (j=0; j<active_helix_rots.size(); j++)
+                {
+                    if (active_helix_rots[j].nodeno == -1) active_helix_rots[j].nodeno = active_matrix_node;
+                    if (active_helix_rots[j].nodeno == nodeno)
+                    {
+                        float acvdirection = 1;
+                        int wroteoff = 0;
+
+                        active_helix_rots[j].start_resno  = interpret_resno(active_helix_rots[j].start_resno_str.c_str());
+                        active_helix_rots[j].end_resno    = interpret_resno(active_helix_rots[j].end_resno_str.c_str());
+                        active_helix_rots[j].origin_resno = interpret_resno(active_helix_rots[j].origin_resno_str.c_str());
+
+                        int sr = active_helix_rots[j].start_resno;
+                        int er = active_helix_rots[j].end_resno;
+                        int mr = active_helix_rots[j].origin_resno;
+
+                        protein->move_piece(sr, er,
+                                (acvdirection > 0)
+                                ? protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
+                                : protein->get_region_center(sr, er).subtract(active_helix_rots[j].transform)
+                            );
+
+                        protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
+                            active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
+
+                        if (wrote_acvmr < (j+wroteoff) )
+                        {
+                            Point ptaxis = active_helix_rots[j].axis;
+                            Point ptorigin = protein->get_atom_location(mr, "CA");
+                            // Write an active matrix to the dock.
+                            cout << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x*acvdirection << " "
+                                << active_helix_rots[j].transform.y*acvdirection << " "
+                                << active_helix_rots[j].transform.z*acvdirection << " "
+                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
+                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
+                                << active_helix_rots[j].theta*acvdirection << endl;
+                            if (output) *output << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x*acvdirection << " "
+                                << active_helix_rots[j].transform.y*acvdirection << " "
+                                << active_helix_rots[j].transform.z*acvdirection << " "
+                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
+                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
+                                << active_helix_rots[j].theta*acvdirection << endl;
+
+                            wrote_acvmr = j+wroteoff;
+                        }
+                    }
+                }
+            }
+
             if (nodeno == active_matrix_node
                 ||
                 (nodeno == deactivate_node && active_matrix_node >= 0 && deactivate_node > active_matrix_node)
@@ -3008,52 +3086,6 @@ _try_again:
                         #endif
 
                         wrote_acvmx = i+wroteoff;
-                    }
-                }
-
-                if (active_helix_rots.size())
-                {
-                    for (j=0; j<active_helix_rots.size(); j++)
-                    {
-                        active_helix_rots[j].start_resno  = interpret_resno(active_helix_rots[j].start_resno_str.c_str());
-                        active_helix_rots[j].end_resno    = interpret_resno(active_helix_rots[j].end_resno_str.c_str());
-                        active_helix_rots[j].origin_resno = interpret_resno(active_helix_rots[j].origin_resno_str.c_str());
-
-                        int sr = active_helix_rots[j].start_resno;
-                        int er = active_helix_rots[j].end_resno;
-                        int mr = active_helix_rots[j].origin_resno;
-
-                        protein->move_piece(sr, er,
-                                (acvdirection > 0)
-                                ? protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
-                                : protein->get_region_center(sr, er).subtract(active_helix_rots[j].transform)
-                            );
-
-                        protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
-                            active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
-
-                        if (wrote_acvmr < (j+wroteoff) )
-                        {
-                            Point ptaxis = active_helix_rots[j].axis;
-                            Point ptorigin = protein->get_atom_location(mr, "CA");
-                            // Write an active matrix to the dock.
-                            cout << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
-                                << active_helix_rots[j].transform.x*acvdirection << " "
-                                << active_helix_rots[j].transform.y*acvdirection << " "
-                                << active_helix_rots[j].transform.z*acvdirection << " "
-                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
-                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
-                                << active_helix_rots[j].theta*acvdirection << endl;
-                            if (output) *output << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
-                                << active_helix_rots[j].transform.x*acvdirection << " "
-                                << active_helix_rots[j].transform.y*acvdirection << " "
-                                << active_helix_rots[j].transform.z*acvdirection << " "
-                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
-                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
-                                << active_helix_rots[j].theta*acvdirection << endl;
-
-                            wrote_acvmr = j+wroteoff;
-                        }
                     }
                 }
 

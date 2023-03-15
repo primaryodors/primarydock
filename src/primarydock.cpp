@@ -1203,7 +1203,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "DEACVNODE"))
     {
-        echo << "Notice: DEACVNODE has been deprecated in favor of the HXR option. Please update your config files." << endl;
+        cout << "Notice: DEACVNODE has been deprecated in favor of the HXR option. Please update your config files." << endl;
         return 0;
     }
     else if (!strcmp(words[0], "DEBUG"))

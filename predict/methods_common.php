@@ -304,6 +304,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     $count = [];
     $countat = [];
     $ssce = [];
+    $ssceh = [];
     $svdw = [];
     $rsum = [];
     $rsumv = [];
@@ -336,6 +337,14 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                 if (!isset($ssce[$resno])) $ssce[$resno] = floatval($rsum[$resno] = 0);
                 $ssce[$resno] += $e * $bias;
                 $rsum[$resno] += $bias;
+
+                $bw = bw_from_resno($protid, $resno);
+                $tm = intval($bw);
+                if ($tm > 1)
+                {
+                    if (!isset($ssceh[$tm][$node])) $ssceh[$tm][$node] = $e * $bias;
+                    else $ssceh[$tm][$node] += $e * $bias;
+                }
             }
     
             if (@$vdwrpl[$pose][$node])
@@ -398,12 +407,27 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     foreach ($sce as $bw => $e)
     {
-        $average["{$metrics_prefix}BEnerg.$bw"] = $e;
+        // $average["{$metrics_prefix}BEnerg.$bw"] = $e;
+        $tm = intval($bw);
+        $idx = "{$metrics_prefix}BEnerg.TMR$tm";
+        if (!isset($average[$idx])) $average[$idx] = floatval($e);
+        else $average[$idx] += $e;
     }
+
+    foreach ($ssceh as $tm => $vals)
+        foreach ($vals as $node => $v)
+        {
+            $idx = "BEnerg.TMR$tm.Node$node";
+            $average[$idx] = $v;
+        }
 
     foreach ($vdw as $bw => $v)
     {
-        $average["{$metrics_prefix}vdWrpl.$bw"] = $v;
+        // $average["{$metrics_prefix}vdWrpl.$bw"] = $v;
+        $tm = intval($bw);
+        $idx = "{$metrics_prefix}vdWrpl.TMR$tm";
+        if (!isset($average[$idx])) $average[$idx] = floatval($e);
+        else $average[$idx] += $e;
     }
 
     foreach ($sum as $node => $value)

@@ -46,6 +46,27 @@ function correlationCoefficient($xarr, $yarr)
     return $r;
 }
 
+function partial_derivative($xarr, $yarr)
+{
+    if (!is_array($xarr) || !is_array($yarr))   throw new Exception("partial_derivative requires two equal length arrays.");
+    if (count($xarr) != count($yarr))           throw new Exception("partial_derivative requires two equal length arrays.");
+    if (!count($xarr) || !count($yarr))         throw new Exception("partial_derivative passed empty arrays.");
+    
+    $xarr = array_values($xarr);
+    $yarr = array_values($yarr);
+
+    $result = 0.0;
+    foreach ($xarr as $i => $v)
+    {
+        if (!$i) continue;
+        $j = $i - 1;
+        $result += ($yarr[$i] - $yarr[$j]) / ($xarr[$i] - $xarr[$j]);
+    }
+
+    $result /= count($xarr);
+    return $result;
+}
+
 function array_shuffle($arr)
 {   
     $arr1 = [];

@@ -3134,7 +3134,6 @@ _try_again:
                 // Perhaps also multimol it for 10 or so iterations with all flexions (ligand and residue) globally disabled.
             }
 
-            
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
             #endif

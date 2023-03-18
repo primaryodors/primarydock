@@ -24812,13 +24812,34 @@
                     "type": "sa",
                     "adjusted_curve_top": "8.8000001907349"
                 }
+            },
+            "https:\/\/theses.hal.science\/tel-04026629":
+            {
+                "TAAR5":
+                {
+                    "type": "wa",
+                    "ec50": "-4",
+                    "adjusted_curve_top": "1.85"
+                }
             }
         }
     },
     "2174f5c5da81d342ead106c2f33e114c":
     {
         "full_name": "N,N-dimethylethylamine",
-        "smiles": "CC[NH+](C)C"
+        "smiles": "CC[NH+](C)C",
+        "activity":
+        {
+            "https:\/\/theses.hal.science\/tel-04026629":
+            {
+                "TAAR5":
+                {
+                    "type": "sa",
+                    "ec50": "-3.9",
+                    "adjusted_curve_top": "7.4"
+                }
+            }
+        }
     },
     "6c71a4749c2144a08f72c99b5df27526":
     {
@@ -32883,6 +32904,15 @@
                 {
                     "type": "vsa",
                     "ec50": "-5",
+                    "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/theses.hal.science\/tel-04026629":
+            {
+                "TAAR5":
+                {
+                    "type": "vsa",
+                    "ec50": "-4",
                     "adjusted_curve_top": "10"
                 }
             }

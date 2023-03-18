@@ -1633,6 +1633,7 @@ bool AminoAcid::is_glycine()
 
 bool AminoAcid::conditionally_basic()
 {
+    #if _allow_conditional_basicity
     if (!atoms) return false;
     if (!aadef || !aadef->sidechain_pKa) return false;
     int i;
@@ -1645,6 +1646,7 @@ bool AminoAcid::conditionally_basic()
             if (aadef->sidechain_pKa >= 4 && aadef->sidechain_pKa < 7) return true;
         }
     }
+    #endif
     return false;
 }
 

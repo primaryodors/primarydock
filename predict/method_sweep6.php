@@ -22,6 +22,8 @@ prepare_outputs();
 
 $outfname = str_replace(".dock", "_sweep6.dock", $outfname);
 
+$rot_target = "region TMR2";
+
 $configf = <<<heredoc
 
 PROT $pdbfname
@@ -39,13 +41,13 @@ PATH 7 RES 4.57 4.60 5.39 6.59
 SIZE 8.0 4.0 8.0
 
 HXR 0 TMR6 6.26 6.60 6.48 0 1 0 0.5015 0 0.8651 0
-HXR 1 TMR6 6.26 6.60 6.48 0 0 0 0.5015 0 0.8651 3
-HXR 2 TMR6 6.26 6.60 6.48 0 0 0 0.5015 0 0.8651 3
-HXR 3 TMR6 6.26 6.60 6.48 0 0 0 0.5015 0 0.8651 3
-HXR 4 TMR6 6.26 6.60 6.48 0 0 0 0.5015 0 0.8651 3
-HXR 5 TMR6 6.26 6.60 6.48 0 0 0 0.5015 0 0.8651 3
-HXR 6 TMR6 6.26 6.60 6.48 0 0 0 0.5015 0 0.8651 3
-HXR 7 TMR6 6.26 6.60 6.48 0 0 0 0.5015 0 0.8651 3
+HXR 1 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 2 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 3 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 4 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 5 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 6 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 7 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 

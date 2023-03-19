@@ -294,6 +294,7 @@
 #define _dbg_polsat 0
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0
+#define _dbg_hxrax 1
 
 #endif
 

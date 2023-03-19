@@ -837,6 +837,8 @@ void Protein::set_clashables(int resno, bool recursed)
                 if (debug) *debug << *resj << " can reach " << *resi << endl;
             }
         }
+
+        if (res_can_clash[i]) delete res_can_clash[i];
         res_can_clash[i] = new AminoAcid*[k+1];
         for (j=0; j<k; j++)
         {
@@ -1118,6 +1120,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
         {
             // cout << "Rotating " << i << endl;
             movable->rotate(lv, angle);
+            set_clashables(i);
         }
     }
 }
@@ -2296,6 +2299,7 @@ void Protein::move_piece(int start_res, int end_res, SCoord move_amt)
         aa->movability = MOV_ALL;
         aa->aamove(move_amt);
         aa->movability = mov;
+        set_clashables(i);
     }
 }
 
@@ -2344,6 +2348,7 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoor
         aa->movability = MOV_ALL;
         aa->rotate(lv, theta);
         aa->movability = mov;
+        set_clashables(i);
     }
 
     LocRotation retval(lv);

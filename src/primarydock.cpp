@@ -30,6 +30,14 @@ struct DockResult
     float polsat;
 };
 
+enum HxRotAxisType
+{
+    hxrat_Cartesian,
+    hxrat_region,
+    hxrat_BW,
+    hxrat_atom
+};
+
 struct AcvHxRot
 {
     std::string regname;
@@ -42,9 +50,11 @@ struct AcvHxRot
     float theta;
     bool soft;
     float dtheta;
+    HxRotAxisType axis_type = hxrat_Cartesian;
     std::string start_resno_str;
     std::string end_resno_str;
     std::string origin_resno_str;
+    std::string axis_str;
 };
 
 struct AcvBndRot
@@ -1293,7 +1303,29 @@ int interpret_config_line(char** words)
         ahr.origin_resno_str     = words[n];
         ahr.origin_resno         = atoi(words[n++]);
         ahr.transform            = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
-        ahr.axis                 = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        if (!strcmp(words[n], "region"))
+        {
+            ahr.axis_type = hxrat_region;
+            ahr.axis_str = words[n+1];
+            n += 2;
+        }
+        else if (!strcmp(words[n], "bw"))
+        {
+            ahr.axis_type = hxrat_BW;
+            ahr.axis_str = words[n+1];
+            n += 2;
+        }
+        else if (!strcmp(words[n], "atom"))
+        {
+            ahr.axis_type = hxrat_atom;
+            ahr.axis_str = words[n+1];
+            n += 2;
+        }
+        else
+        {
+            ahr.axis             = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) );
+            n += 3;
+        }
         ahr.theta                = atof(words[n]) * fiftyseventh;
         ahr.soft                 = strchr(words[n++], '?') ? true : false;
         if (ahr.soft) ahr.dtheta = 0.01;
@@ -2875,6 +2907,70 @@ _try_again:
                         active_helix_rots[j].start_resno  = interpret_resno(active_helix_rots[j].start_resno_str.c_str());
                         active_helix_rots[j].end_resno    = interpret_resno(active_helix_rots[j].end_resno_str.c_str());
                         active_helix_rots[j].origin_resno = interpret_resno(active_helix_rots[j].origin_resno_str.c_str());
+
+                        if (active_helix_rots[j].axis_type == hxrat_region)
+                        {
+                            int sr = protein->get_region_start( active_helix_rots[j].axis_str );
+                            int er = protein->get_region_end( active_helix_rots[j].axis_str );
+
+                            Point pt = protein->get_region_center(sr, er);
+                            Point rel = pt.subtract(protein->get_region_center(active_helix_rots[j].start_resno, active_helix_rots[j].end_resno));
+
+                            rel.y = 0;
+                            active_helix_rots[j].axis = rotate3D(rel, Point(0,0,0), Point(0,1,0), square);
+                            #if _dbg_hxrax
+                            cout << "Helix rotation set for axis " << (Point)active_helix_rots[j].axis << endl;
+                            #endif
+                        }
+                        else if (active_helix_rots[j].axis_type == hxrat_BW)
+                        {
+                            const char* bwno = active_helix_rots[j].axis_str.c_str();
+                            const char* bwdot = strchr(bwno, '.');
+                            int bw50 = protein->get_bw50(atoi(bwno));
+                            int pettia = atoi(bwdot+1);
+                            int resno = bw50 + pettia - 50;
+
+                            AminoAcid* aa = protein->get_residue(resno);
+                            if (!aa)
+                            {
+                                cout << "Bad helix rotation axis " << bwno << endl;
+                                throw 0xbad12e5;
+                            }
+
+                            Point pt = aa->get_atom_location("CA");
+                            Point rel = pt.subtract(protein->get_region_center(active_helix_rots[j].start_resno, active_helix_rots[j].end_resno));
+
+                            rel.y = 0;
+                            active_helix_rots[j].axis = rotate3D(rel, Point(0,0,0), Point(0,1,0), square);
+                            #if _dbg_hxrax
+                            cout << "Helix rotation set for axis " << (Point)active_helix_rots[j].axis << endl;
+                            #endif
+                        }
+                        else if (active_helix_rots[j].axis_type == hxrat_atom)
+                        {
+                            const char* bwno = active_helix_rots[j].axis_str.c_str();
+                            const char* bwdot = strchr(bwno, '.');
+                            const char* colon = strchr(bwno, ':');
+                            int bw50 = protein->get_bw50(atoi(bwno));
+                            int pettia = atoi(bwdot+1);
+                            int resno = bw50 + pettia - 50;
+
+                            AminoAcid* aa = protein->get_residue(resno);
+                            if (!aa)
+                            {
+                                cout << "Bad helix rotation axis " << bwno << endl;
+                                throw 0xbad12e5;
+                            }
+
+                            Point pt = aa->get_atom_location(colon+1);
+                            Point rel = pt.subtract(protein->get_region_center(active_helix_rots[j].start_resno, active_helix_rots[j].end_resno));
+
+                            rel.y = 0;
+                            active_helix_rots[j].axis = rotate3D(rel, Point(0,0,0), Point(0,1,0), -square);
+                            #if _dbg_hxrax
+                            cout << "Helix rotation set for axis " << (Point)active_helix_rots[j].axis << endl;
+                            #endif
+                        }
 
                         int sr = active_helix_rots[j].start_resno;
                         int er = active_helix_rots[j].end_resno;

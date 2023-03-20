@@ -806,15 +806,16 @@ void Protein::set_clashables(int resno, bool recursed)
 
     // cout << "Setting clashables." << endl;
 
-    if (res_can_clash)
+
+    int maxres = get_end_resno();
+    if (resno <= 0)
     {
-        delete[] res_can_clash;
+        if (res_can_clash)
+        {
+            delete[] res_can_clash;
+        }
+        res_can_clash = new AminoAcid**[maxres+1];
     }
-
-    int seqlen = get_seq_length();
-    res_can_clash = new AminoAcid**[seqlen+1];
-
-    // cout << "seqlen is " << seqlen << endl;
 
     int sr = get_start_resno(), er = get_end_resno();
     int sr1 = sr, er1 = er;
@@ -825,7 +826,7 @@ void Protein::set_clashables(int resno, bool recursed)
         if (!resi) continue;
 
         if (debug) *debug << endl << "Testing residue " << resi->get_residue_no() << endl;
-        AminoAcid* temp[seqlen+1];
+        AminoAcid* temp[maxres+1];
         k=0;
         for (j=sr1; j<=er1; j++)
         {
@@ -855,9 +856,9 @@ void Protein::set_clashables(int resno, bool recursed)
         res_can_clash[i][k] = 0;
     }
 
-    res_can_clash[seqlen] = 0;
+    res_can_clash[maxres+1] = 0;
 
-    /*for (i=0; i<seqlen; i++)
+    /*for (i=0; i<=maxres; i++)
     {
     	cout << i << ": ";
     	for (j=0; res_can_clash[i][j]; j++)

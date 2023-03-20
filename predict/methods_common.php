@@ -461,24 +461,23 @@ function process_dock($metrics_prefix = "", $noclobber = false)
         $average["SCW $bw"] = $xyz;
     }*/
 
-    $tm4e = [];
-    $tm6e = [];
+    $tme = [];
     foreach ($average as $k => $v)
     {
-        if ( preg_match("/^BEnerg.TMR4.Node/", $k) )
+        for ($t = 2; $t <= 7; $t++)
         {
-            $node = intval(substr($k, 16));
-            $tm4e[$node] = floatval($v);
-        }
-        else if ( preg_match("/^BEnerg.TMR6.Node/", $k) )
-        {
-            $node = intval(substr($k, 16));
-            $tm6e[$node] = floatval($v);
+            if ( preg_match("/^BEnerg.TMR$t.Node/", $k) )
+            {
+                $node = intval(substr($k, 16));
+                $tme[$t][$node] = floatval($v);
+            }
         }
     }
 
-    if (count($tm4e)) $average["TM4_d"] = partial_derivative(array_keys($tm4e), $tm4e) * abs(correlationCoefficient(array_keys($tm4e), $tm4e));
-    if (count($tm6e)) $average["TM6_d"] = partial_derivative(array_keys($tm6e), $tm6e) * abs(correlationCoefficient(array_keys($tm6e), $tm6e));
+    for ($t = 2; $t <= 7; $t++)
+    {
+        if (@$tme[$t] && count($tme[$t])) $average["TM{$t}_d"] = partial_derivative(array_keys($tme[$t]), $tme[$t]) * abs(correlationCoefficient(array_keys($tme[$t]), $tme[$t]));
+    }
 
     $actual = best_empirical_pair($protid, $ligname);
     if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");

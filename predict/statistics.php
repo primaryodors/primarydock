@@ -56,14 +56,19 @@ function partial_derivative($xarr, $yarr)
     $yarr = array_values($yarr);
 
     $result = 0.0;
-    foreach ($xarr as $i => $v)
+    $xk = array_keys($xarr);
+    $divisor = 0;
+    foreach ($xk as $i)
     {
-        if (!$i) continue;
-        $j = $i - 1;
-        $result += ($yarr[$i] - $yarr[$j]) / ($xarr[$i] - $xarr[$j]);
+        foreach ($xk as $j)
+        {
+            if ($j <= $i) continue;
+            $result += ($yarr[$i] - $yarr[$j]) / ($xarr[$i] - $xarr[$j]);
+            $divisor++;
+        }
     }
 
-    $result /= count($xarr);
+    if ($divisor) $result /= $divisor;
     return $result;
 }
 

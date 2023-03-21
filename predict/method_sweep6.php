@@ -51,7 +51,7 @@ HXR 7 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
-POSE 5
+POSE 10
 ELIM 99
 
 FLEX 1

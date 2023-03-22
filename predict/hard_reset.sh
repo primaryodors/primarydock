@@ -1,5 +1,5 @@
 sudo pkill php
 sudo pkill primarydock
-sudo rm predict/dock_results_softrock.json
+sudo rm predict/dock_results_sweep6.json
 make primarydock && /bin/bash predict/progress.sh
 

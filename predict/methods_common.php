@@ -6,6 +6,7 @@ global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwher
 require("protutils.php");
 require("odorutils.php");
 require("dock_eval.php");
+require_once("statistics.php");
 
 echo date("Y-m-d H:i:s.u\n");
 
@@ -137,7 +138,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     $outlines = [];
     if (@$_REQUEST['saved'])
     {
-        $outlines = explode("\n", file_get_contents($_REQUEST['saved']));
+        $outlines = explode("\n", file_get_contents($outfname)); // $_REQUEST['saved']));
     }
     else
     {
@@ -304,6 +305,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     $count = [];
     $countat = [];
     $ssce = [];
+    $ssceh = [];
     $svdw = [];
     $rsum = [];
     $rsumv = [];
@@ -336,6 +338,14 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                 if (!isset($ssce[$resno])) $ssce[$resno] = floatval($rsum[$resno] = 0);
                 $ssce[$resno] += $e * $bias;
                 $rsum[$resno] += $bias;
+
+                $bw = bw_from_resno($protid, $resno);
+                $tm = intval($bw);
+                if ($tm > 1)
+                {
+                    if (!isset($ssceh[$tm][$node])) $ssceh[$tm][$node] = $e * $bias;
+                    else $ssceh[$tm][$node] += $e * $bias;
+                }
             }
     
             if (@$vdwrpl[$pose][$node])
@@ -398,12 +408,27 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     foreach ($sce as $bw => $e)
     {
-        $average["{$metrics_prefix}BEnerg.$bw"] = $e;
+        // $average["{$metrics_prefix}BEnerg.$bw"] = $e;
+        $tm = intval($bw);
+        $idx = "{$metrics_prefix}BEnerg.TMR$tm";
+        if (!isset($average[$idx])) $average[$idx] = floatval($e);
+        else $average[$idx] += $e;
     }
+
+    foreach ($ssceh as $tm => $vals)
+        foreach ($vals as $node => $v)
+        {
+            $idx = "BEnerg.TMR$tm.Node$node";
+            $average[$idx] = $v;
+        }
 
     foreach ($vdw as $bw => $v)
     {
-        $average["{$metrics_prefix}vdWrpl.$bw"] = $v;
+        // $average["{$metrics_prefix}vdWrpl.$bw"] = $v;
+        $tm = intval($bw);
+        $idx = "{$metrics_prefix}vdWrpl.TMR$tm";
+        if (!isset($average[$idx])) $average[$idx] = floatval($e);
+        else $average[$idx] += $e;
     }
 
     foreach ($sum as $node => $value)
@@ -435,6 +460,24 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     {
         $average["SCW $bw"] = $xyz;
     }*/
+
+    $tme = [];
+    foreach ($average as $k => $v)
+    {
+        for ($t = 2; $t <= 7; $t++)
+        {
+            if ( preg_match("/^BEnerg.TMR$t.Node/", $k) )
+            {
+                $node = intval(substr($k, 16));
+                $tme[$t][$node] = floatval($v);
+            }
+        }
+    }
+
+    for ($t = 2; $t <= 7; $t++)
+    {
+        if (@$tme[$t] && count($tme[$t])) $average["TM{$t}_d"] = partial_derivative(array_keys($tme[$t]), $tme[$t]) * abs(correlationCoefficient(array_keys($tme[$t]), $tme[$t]));
+    }
 
     $actual = best_empirical_pair($protid, $ligname);
     if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");

@@ -800,40 +800,54 @@ void Protein::add_remark(std::string new_remark)
     // TODO: Sort remarks by number, becarefuling to preserve the sequence of same numbered remarks.
 }
 
-void Protein::set_clashables()
+void Protein::set_clashables(int resno, bool recursed)
 {
     int i, j, k;
 
     // cout << "Setting clashables." << endl;
 
-    if (res_can_clash)
+
+    int maxres = get_end_resno();
+    if (resno <= 0)
     {
-        delete[] res_can_clash;
+        if (res_can_clash)
+        {
+            delete[] res_can_clash;
+        }
+        res_can_clash = new AminoAcid**[maxres+1];
     }
 
-    int seqlen = get_seq_length();
-    res_can_clash = new AminoAcid**[seqlen+1];
-
-    // cout << "seqlen is " << seqlen << endl;
-
-    for (i=0; i<seqlen; i++)
+    int sr = get_start_resno(), er = get_end_resno();
+    int sr1 = sr, er1 = er;
+    if (resno > 0) sr = er = resno;
+    for (i=sr; i<=er; i++)
     {
-        if (debug) *debug << endl << "Testing residue " << residues[i]->get_residue_no() << endl;
-        AminoAcid* temp[seqlen+1];
+        AminoAcid* resi = get_residue(i);
+        if (!resi) continue;
+
+        if (debug) *debug << endl << "Testing residue " << resi->get_residue_no() << endl;
+        AminoAcid* temp[maxres+1];
         k=0;
-        for (j=0; j<seqlen; j++)
+        for (j=sr1; j<=er1; j++)
         {
             if (j == i) continue;
-            if (residues[i]->can_reach(residues[j]))
+            AminoAcid* resj = get_residue(j);
+            if (resi->can_reach(resj))
             {
-                temp[k++] = residues[j];
-                if (debug) *debug << *residues[j] << " can reach " << *residues[i] << endl;
+                temp[k++] = resj;
+                if (debug) *debug << *resj << " can reach " << *resi << endl;
             }
         }
+
+        if (res_can_clash[i]) delete res_can_clash[i];
         res_can_clash[i] = new AminoAcid*[k+1];
         for (j=0; j<k; j++)
         {
             res_can_clash[i][j] = temp[j];
+            if (resno > 0 && !recursed)
+            {
+                set_clashables(temp[j]->get_residue_no(), true);
+            }
             /*cout << residues[i]->get_aa_definition()->_3let << residues[i]->get_residue_no()
             	 << " can clash with "
             	 << res_can_clash[i][j]->get_aa_definition()->_3let << res_can_clash[i][j]->get_residue_no()
@@ -842,9 +856,9 @@ void Protein::set_clashables()
         res_can_clash[i][k] = 0;
     }
 
-    res_can_clash[seqlen] = 0;
+    res_can_clash[maxres+1] = 0;
 
-    /*for (i=0; i<seqlen; i++)
+    /*for (i=0; i<=maxres; i++)
     {
     	cout << i << ": ";
     	for (j=0; res_can_clash[i][j]; j++)
@@ -1107,6 +1121,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
         {
             // cout << "Rotating " << i << endl;
             movable->rotate(lv, angle);
+            set_clashables(i);
         }
     }
 }
@@ -2285,6 +2300,7 @@ void Protein::move_piece(int start_res, int end_res, SCoord move_amt)
         aa->movability = MOV_ALL;
         aa->aamove(move_amt);
         aa->movability = mov;
+        set_clashables(i);
     }
 }
 
@@ -2333,6 +2349,7 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoor
         aa->movability = MOV_ALL;
         aa->rotate(lv, theta);
         aa->movability = mov;
+        set_clashables(i);
     }
 
     LocRotation retval(lv);

@@ -30,9 +30,18 @@ struct DockResult
     float polsat;
 };
 
+enum HxRotAxisType
+{
+    hxrat_Cartesian,
+    hxrat_region,
+    hxrat_BW,
+    hxrat_atom
+};
+
 struct AcvHxRot
 {
     std::string regname;
+    int nodeno;
     int start_resno;
     int end_resno;
     Point transform;
@@ -41,9 +50,11 @@ struct AcvHxRot
     float theta;
     bool soft;
     float dtheta;
+    HxRotAxisType axis_type = hxrat_Cartesian;
     std::string start_resno_str;
     std::string end_resno_str;
     std::string origin_resno_str;
+    std::string axis_str;
 };
 
 struct AcvBndRot
@@ -1118,6 +1129,7 @@ int interpret_config_line(char** words)
         AcvHxRot ahr;
         int n = 1;
         ahr.regname              = words[n++];
+        ahr.nodeno               = -1;
         ahr.start_resno_str      = words[n];
         ahr.start_resno          = atoi(words[n++]);
         ahr.end_resno_str        = words[n];
@@ -1201,8 +1213,8 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "DEACVNODE"))
     {
-        deactivate_node = atoi(words[1]);
-        optsecho = (std::string)"Active node is " + to_string(deactivate_node);
+        cout << "Notice: DEACVNODE has been deprecated in favor of the HXR option. Please update your config files." << endl;
+        return 0;
     }
     else if (!strcmp(words[0], "DEBUG"))
     {
@@ -1277,6 +1289,49 @@ int interpret_config_line(char** words)
         }
         optsecho = "Water molecules: " + to_string(maxh2o);
         return 1;
+    }
+    else if (!strcmp(words[0], "HXR"))
+    {
+        AcvHxRot ahr;
+        int n = 1;
+        ahr.nodeno               = atoi(words[n++]);
+        ahr.regname              = words[n++];
+        ahr.start_resno_str      = words[n];
+        ahr.start_resno          = atoi(words[n++]);
+        ahr.end_resno_str        = words[n];
+        ahr.end_resno            = atoi(words[n++]);
+        ahr.origin_resno_str     = words[n];
+        ahr.origin_resno         = atoi(words[n++]);
+        ahr.transform            = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) ); n += 3;
+        if (!strcmp(words[n], "region"))
+        {
+            ahr.axis_type = hxrat_region;
+            ahr.axis_str = words[n+1];
+            n += 2;
+        }
+        else if (!strcmp(words[n], "bw"))
+        {
+            ahr.axis_type = hxrat_BW;
+            ahr.axis_str = words[n+1];
+            n += 2;
+        }
+        else if (!strcmp(words[n], "atom"))
+        {
+            ahr.axis_type = hxrat_atom;
+            ahr.axis_str = words[n+1];
+            n += 2;
+        }
+        else
+        {
+            ahr.axis             = Point( atof(words[n]), atof(words[n+1]), atof(words[n+2]) );
+            n += 3;
+        }
+        ahr.theta                = atof(words[n]) * fiftyseventh;
+        ahr.soft                 = strchr(words[n++], '?') ? true : false;
+        if (ahr.soft) ahr.dtheta = 0.01;
+        active_helix_rots.push_back(ahr);
+        orig_active_helix_rots.push_back(ahr);
+        optsecho = (std::string)"Helix rotation " + to_string(ahr.start_resno) + (std::string)"-" + to_string(ahr.end_resno);
     }
     else if (!strcmp(words[0], "HYDRO"))
     {
@@ -2655,6 +2710,7 @@ _try_again:
             protein->revert_to_pdb();
             for (i=0; i<orig_active_helix_rots.size(); i++)
             {
+                if (orig_active_helix_rots[i].nodeno == -1) orig_active_helix_rots[i].nodeno = active_matrix_node;
                 active_helix_rots[i] = orig_active_helix_rots[i];
             }
 
@@ -2837,6 +2893,124 @@ _try_again:
             #endif
             #endif
 
+
+            if (active_helix_rots.size())
+            {
+                for (j=0; j<active_helix_rots.size(); j++)
+                {
+                    if (active_helix_rots[j].nodeno == -1) active_helix_rots[j].nodeno = active_matrix_node;
+                    if (active_helix_rots[j].nodeno == nodeno)
+                    {
+                        float acvdirection = 1;
+                        int wroteoff = 0;
+
+                        active_helix_rots[j].start_resno  = interpret_resno(active_helix_rots[j].start_resno_str.c_str());
+                        active_helix_rots[j].end_resno    = interpret_resno(active_helix_rots[j].end_resno_str.c_str());
+                        active_helix_rots[j].origin_resno = interpret_resno(active_helix_rots[j].origin_resno_str.c_str());
+
+                        if (active_helix_rots[j].axis_type == hxrat_region)
+                        {
+                            int sr = protein->get_region_start( active_helix_rots[j].axis_str );
+                            int er = protein->get_region_end( active_helix_rots[j].axis_str );
+
+                            Point pt = protein->get_region_center(sr, er);
+                            Point rel = pt.subtract(protein->get_region_center(active_helix_rots[j].start_resno, active_helix_rots[j].end_resno));
+
+                            rel.y = 0;
+                            active_helix_rots[j].axis = rotate3D(rel, Point(0,0,0), Point(0,1,0), square);
+                            #if _dbg_hxrax
+                            cout << "Helix rotation set for axis " << (Point)active_helix_rots[j].axis << endl;
+                            #endif
+                        }
+                        else if (active_helix_rots[j].axis_type == hxrat_BW)
+                        {
+                            const char* bwno = active_helix_rots[j].axis_str.c_str();
+                            const char* bwdot = strchr(bwno, '.');
+                            int bw50 = protein->get_bw50(atoi(bwno));
+                            int pettia = atoi(bwdot+1);
+                            int resno = bw50 + pettia - 50;
+
+                            AminoAcid* aa = protein->get_residue(resno);
+                            if (!aa)
+                            {
+                                cout << "Bad helix rotation axis " << bwno << endl;
+                                throw 0xbad12e5;
+                            }
+
+                            Point pt = aa->get_atom_location("CA");
+                            Point rel = pt.subtract(protein->get_region_center(active_helix_rots[j].start_resno, active_helix_rots[j].end_resno));
+
+                            rel.y = 0;
+                            active_helix_rots[j].axis = rotate3D(rel, Point(0,0,0), Point(0,1,0), square);
+                            #if _dbg_hxrax
+                            cout << "Helix rotation set for axis " << (Point)active_helix_rots[j].axis << endl;
+                            #endif
+                        }
+                        else if (active_helix_rots[j].axis_type == hxrat_atom)
+                        {
+                            const char* bwno = active_helix_rots[j].axis_str.c_str();
+                            const char* bwdot = strchr(bwno, '.');
+                            const char* colon = strchr(bwno, ':');
+                            int bw50 = protein->get_bw50(atoi(bwno));
+                            int pettia = atoi(bwdot+1);
+                            int resno = bw50 + pettia - 50;
+
+                            AminoAcid* aa = protein->get_residue(resno);
+                            if (!aa)
+                            {
+                                cout << "Bad helix rotation axis " << bwno << endl;
+                                throw 0xbad12e5;
+                            }
+
+                            Point pt = aa->get_atom_location(colon+1);
+                            Point rel = pt.subtract(protein->get_region_center(active_helix_rots[j].start_resno, active_helix_rots[j].end_resno));
+
+                            rel.y = 0;
+                            active_helix_rots[j].axis = rotate3D(rel, Point(0,0,0), Point(0,1,0), -square);
+                            #if _dbg_hxrax
+                            cout << "Helix rotation set for axis " << (Point)active_helix_rots[j].axis << endl;
+                            #endif
+                        }
+
+                        int sr = active_helix_rots[j].start_resno;
+                        int er = active_helix_rots[j].end_resno;
+                        int mr = active_helix_rots[j].origin_resno;
+
+                        protein->move_piece(sr, er,
+                                (acvdirection > 0)
+                                ? protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
+                                : protein->get_region_center(sr, er).subtract(active_helix_rots[j].transform)
+                            );
+
+                        protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
+                            active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
+
+                        if (wrote_acvmr < (j+wroteoff) )
+                        {
+                            Point ptaxis = active_helix_rots[j].axis;
+                            Point ptorigin = protein->get_atom_location(mr, "CA");
+                            // Write an active matrix to the dock.
+                            cout << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x*acvdirection << " "
+                                << active_helix_rots[j].transform.y*acvdirection << " "
+                                << active_helix_rots[j].transform.z*acvdirection << " "
+                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
+                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
+                                << active_helix_rots[j].theta*acvdirection << endl;
+                            if (output) *output << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
+                                << active_helix_rots[j].transform.x*acvdirection << " "
+                                << active_helix_rots[j].transform.y*acvdirection << " "
+                                << active_helix_rots[j].transform.z*acvdirection << " "
+                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
+                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
+                                << active_helix_rots[j].theta*acvdirection << endl;
+
+                            wrote_acvmr = j+wroteoff;
+                        }
+                    }
+                }
+            }
+
             if (nodeno == active_matrix_node
                 ||
                 (nodeno == deactivate_node && active_matrix_node >= 0 && deactivate_node > active_matrix_node)
@@ -3011,52 +3185,6 @@ _try_again:
                     }
                 }
 
-                if (active_helix_rots.size())
-                {
-                    for (j=0; j<active_helix_rots.size(); j++)
-                    {
-                        active_helix_rots[j].start_resno  = interpret_resno(active_helix_rots[j].start_resno_str.c_str());
-                        active_helix_rots[j].end_resno    = interpret_resno(active_helix_rots[j].end_resno_str.c_str());
-                        active_helix_rots[j].origin_resno = interpret_resno(active_helix_rots[j].origin_resno_str.c_str());
-
-                        int sr = active_helix_rots[j].start_resno;
-                        int er = active_helix_rots[j].end_resno;
-                        int mr = active_helix_rots[j].origin_resno;
-
-                        protein->move_piece(sr, er,
-                                (acvdirection > 0)
-                                ? protein->get_region_center(sr, er).add(active_helix_rots[j].transform)
-                                : protein->get_region_center(sr, er).subtract(active_helix_rots[j].transform)
-                            );
-
-                        protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
-                            active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
-
-                        if (wrote_acvmr < (j+wroteoff) )
-                        {
-                            Point ptaxis = active_helix_rots[j].axis;
-                            Point ptorigin = protein->get_atom_location(mr, "CA");
-                            // Write an active matrix to the dock.
-                            cout << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
-                                << active_helix_rots[j].transform.x*acvdirection << " "
-                                << active_helix_rots[j].transform.y*acvdirection << " "
-                                << active_helix_rots[j].transform.z*acvdirection << " "
-                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
-                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
-                                << active_helix_rots[j].theta*acvdirection << endl;
-                            if (output) *output << "ACR " << nodeno << " " << active_helix_rots[j].regname << " " << sr << " " << er << " "
-                                << active_helix_rots[j].transform.x*acvdirection << " "
-                                << active_helix_rots[j].transform.y*acvdirection << " "
-                                << active_helix_rots[j].transform.z*acvdirection << " "
-                                << ptorigin.x << " " << ptorigin.y << " " << ptorigin.z << " "
-                                << ptaxis.x << " " << ptaxis.y << " " << ptaxis.z << " "
-                                << active_helix_rots[j].theta*acvdirection << endl;
-
-                            wrote_acvmr = j+wroteoff;
-                        }
-                    }
-                }
-
                 // If there are any active bond rotations, perform them but ensure the angle is relative to the *original* position
                 // from the PDB file.
                 if (active_bond_rots.size())
@@ -3102,7 +3230,6 @@ _try_again:
                 // Perhaps also multimol it for 10 or so iterations with all flexions (ligand and residue) globally disabled.
             }
 
-            
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Pose " << pose << endl << "Node " << nodeno << endl;
             #endif

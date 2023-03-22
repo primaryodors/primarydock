@@ -154,7 +154,7 @@
 #define internode_momentum_only_on_activation 1
 
 // Switches for conformational space search.
-#define allow_axial_tumble 1
+#define allow_axial_tumble 0
 #define allow_bond_rots 1
 #define allow_linear_motion 1
 #define monte_carlo_axial 0
@@ -249,6 +249,7 @@
 #define _ALLOW_PROTONATE_PNICTOGENS 1
 #define pnictogen_partial_protonation 0.2
 #define pn_protonation_pKa_min 5
+#define _allow_conditional_basicity 0
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0
@@ -267,10 +268,15 @@
 // to a less favorable state.
 #define _hisflip_binding_threshold 25
 
-// Debugging stuff.
-#define _bb_maxglom 3
-#define _dummy_atoms_for_debug 0
+//////////////////////////////////////////////////////////////////////////////////////////////
 
+// Debugging stuff.
+
+// Should normally be 3:
+#define _bb_maxglom 3
+
+// Should normally be false or zero:
+#define _dummy_atoms_for_debug 0
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0
@@ -293,6 +299,7 @@
 #define _dbg_polsat 0
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0
+#define _dbg_hxrax 0
 
 #endif
 

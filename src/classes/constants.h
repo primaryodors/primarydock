@@ -167,7 +167,7 @@
 #define drift_decay_rate 0.08
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
-#define allow_mol_fullrot_iter 1
+#define allow_mol_fullrot_iter 0
 #define sidechain_fullrot_lig_bmult 3
 
 // Extra weight given to sidechain-ligand binding strengths during conformer search.

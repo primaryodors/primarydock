@@ -6838,6 +6838,13 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US20220034866A1\/en":
+            {
+                "OR2L3":
+                {
+                    "antagonist": "1"
+                }
             }
         }
     },
@@ -30896,6 +30903,13 @@
                     "type": "ia",
                     "adjusted_curve_top": "-0.4571428843907"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US20220034866A1\/en":
+            {
+                "OR2L3":
+                {
+                    "antagonist": "1"
+                }
             }
         }
     },
@@ -31832,6 +31846,17 @@
     {
         "full_name": "4-terpineol",
         "smiles": "CC1=CCC(CC1)(C(C)C)O",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "peppery",
+                "woody",
+                "earthy",
+                "musty",
+                "sweet"
+            ]
+        },
         "activity":
         {
             "https:\/\/patents.google.com\/patent\/US20220034866A1\/en":
@@ -32510,6 +32535,13 @@
                 "OR5I1":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US20220034866A1\/en":
+            {
+                "OR2L3":
+                {
+                    "antagonist": "1"
                 }
             }
         }

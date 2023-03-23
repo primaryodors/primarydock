@@ -18174,6 +18174,15 @@
                     "ec50": "-4.22",
                     "adjusted_curve_top": "0.16260161995888"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US20220034866A1\/en":
+            {
+                "OR2L3":
+                {
+                    "type": "sa",
+                    "ec50": "-3.4",
+                    "adjusted_curve_top": "1.9"
+                }
             }
         }
     },
@@ -21609,12 +21618,12 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "acacia",
-                "cherry",
-                "coumarinic",
                 "hawthorn",
+                "sweet",
                 "mimosa",
-                "sweet"
+                "coumarinic",
+                "cherry",
+                "acacia"
             ]
         },
         "activity":
@@ -21629,6 +21638,15 @@
                 {
                     "type": "ma",
                     "ec50": "-4.82"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US20220034866A1\/en":
+            {
+                "OR2L3":
+                {
+                    "type": "sa",
+                    "ec50": "-3.6",
+                    "adjusted_curve_top": "5.2"
                 }
             }
         }
@@ -31483,6 +31501,15 @@
                     "ec50": "-4.22",
                     "adjusted_curve_top": "1.9512194395065"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/US20220034866A1\/en":
+            {
+                "OR2L3":
+                {
+                    "type": "sa",
+                    "ec50": "-3.9",
+                    "adjusted_curve_top": "1.6"
+                }
             }
         }
     },
@@ -31801,10 +31828,27 @@
             }
         }
     },
-    "26d92c968c468fa196b6d5875440de09":
+    "2a05c613b349dbc58e211bd14225a4ce":
     {
-        "full_name": "terpineol",
-        "smiles": "CC1=CCC(CC1)C(C)(C)O",
+        "full_name": "4-terpineol",
+        "smiles": "CC1=CCC(CC1)(C(C)C)O",
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/US20220034866A1\/en":
+            {
+                "OR2L3":
+                {
+                    "type": "sa",
+                    "ec50": "-3.2",
+                    "adjusted_curve_top": "5.5"
+                }
+            }
+        }
+    },
+    "17c6f28f393a41d39f403331225a72fc":
+    {
+        "full_name": "alpha-terpineol",
+        "smiles": "C\\C1=C\\CC(CC1)C(O)(C)C",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -31841,6 +31885,15 @@
                 "OR51B4":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/US20220034866A1\/en":
+            {
+                "OR2L3":
+                {
+                    "type": "vsa",
+                    "ec50": "-3.2",
+                    "adjusted_curve_top": "10"
                 }
             }
         }

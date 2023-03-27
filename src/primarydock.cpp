@@ -11,6 +11,26 @@
 
 using namespace std;
 
+struct ResiduePlaceholder
+{
+    int resno = 0;
+    std::string bw;
+
+    void set(const char* str)
+    {
+        if (strchr(str, '.')) bw = str;
+        else resno = atoi(str);
+    }
+
+    void resolve_resno(Protein* prot)
+    {
+        int hxno = atoi(bw.c_str());
+        const char* dot = strchr(bw.c_str(), '.');
+        int bwpos = atoi(dot+1);
+        resno = prot->get_bw50(hxno) + bwpos - 50;
+    }
+};
+
 struct DockResult
 {
     int pose;
@@ -409,6 +429,7 @@ std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvHxRot> orig_active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
+std::vector<ResiduePlaceholder> required_contacts;
 
 bool soft_pocket = false;
 std::string soft_names;
@@ -1433,6 +1454,17 @@ int interpret_config_line(char** words)
         // optsecho = "Protein file is " + (std::string)protfname;
         return 1;
     }
+    else if (!strcmp(words[0], "REQSR"))
+    {
+        for (i=1; words[i]; i++)
+        {
+            if (words[i][0] == '-' && words[i][1] == '-') break;
+            ResiduePlaceholder rp;
+            rp.set(words[i]);
+            required_contacts.push_back(rp);
+        }
+        return i-1;
+    }
     else if (!strcmp(words[0], "RETRY"))
     {
         // triesleft = atoi(words[1]);
@@ -2160,6 +2192,11 @@ int main(int argc, char** argv)
 
     prepare_acv_bond_rots();
 
+    for (i=0; i<required_contacts.size(); i++)
+    {
+        required_contacts[i].resolve_resno(protein);
+    }
+
     int l;
 
     if (soft_pocket)
@@ -2302,6 +2339,20 @@ int main(int argc, char** argv)
     }
 
     m.minimize_internal_clashes();
+
+    int rcn = required_contacts.size();
+    if (rcn)
+    {
+        ligand->mandatory_connection = new Molecule*[rcn+4];
+
+        for (i=0; i<rcn; i++)
+        {
+            Star s;
+            s.paa = protein->get_residue(required_contacts[i].resno);
+            if (s.n) ligand->mandatory_connection[i] = s.pmol;
+        }
+        ligand->mandatory_connection[rcn] = nullptr;
+    }
 
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded ligand." << endl;

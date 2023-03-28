@@ -13,6 +13,7 @@ using namespace std;
 
 struct ResiduePlaceholder
 {
+    int node = 0;
     int resno = 0;
     std::string bw;
 
@@ -1456,11 +1457,13 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "REQSR"))
     {
-        for (i=1; words[i]; i++)
+        int reqrnode = atoi(words[1]);
+        for (i=2; words[i]; i++)
         {
             if (words[i][0] == '-' && words[i][1] == '-') break;
             ResiduePlaceholder rp;
             rp.set(words[i]);
+            rp.node = reqrnode;
             required_contacts.push_back(rp);
         }
         return i-1;
@@ -2339,20 +2342,6 @@ int main(int argc, char** argv)
     }
 
     m.minimize_internal_clashes();
-
-    int rcn = required_contacts.size();
-    if (rcn)
-    {
-        ligand->mandatory_connection = new Molecule*[rcn+4];
-
-        for (i=0; i<rcn; i++)
-        {
-            Star s;
-            s.paa = protein->get_residue(required_contacts[i].resno);
-            if (s.n) ligand->mandatory_connection[i] = s.pmol;
-        }
-        ligand->mandatory_connection[rcn] = nullptr;
-    }
 
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded ligand." << endl;
@@ -4064,6 +4053,22 @@ _try_again:
 
             for (j=0; j<trsz; j++)
                 trip[j] = (Molecule*)protein->get_residue(tripswitch_clashables[j]);
+            
+            int rcn = required_contacts.size();
+            if (rcn)
+            {
+                ligand->delete_mandatory_connections();
+                ligand->mandatory_connection = new Molecule*[rcn+4];
+
+                for (i=0; i<rcn; i++)
+                {
+                    if (required_contacts[i].node != nodeno) continue;
+                    Star s;
+                    s.paa = protein->get_residue(required_contacts[i].resno);
+                    if (s.n) ligand->mandatory_connection[i] = s.pmol;
+                }
+                ligand->mandatory_connection[rcn] = nullptr;
+            }
 
             protein->find_residue_initial_bindings();
             Molecule::multimol_conform(

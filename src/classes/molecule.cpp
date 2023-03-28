@@ -2474,6 +2474,14 @@ float Molecule::get_springy_bond_satisfaction()
     return retval;
 }
 
+void Molecule::delete_mandatory_connections()
+{
+    if (last_mc_binding) delete last_mc_binding;
+    last_mc_binding = nullptr;
+    if (mandatory_connection) delete mandatory_connection;
+    mandatory_connection = nullptr;
+}
+
 float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
 {
     float lbias = 1.0 + (sgn(is_residue()) == sgn(om->is_residue()) ? 0 : dock_ligand_bias);

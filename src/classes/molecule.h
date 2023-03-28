@@ -167,6 +167,8 @@ public:
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
     Atom** get_most_bindable(int max_num, Atom* for_atom);
 
+    void delete_mandatory_connections();
+
     // Debug stuff.
     #if debug_break_on_move
     void set_atoms_break_on_move(bool break_on_move)

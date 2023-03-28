@@ -2474,6 +2474,14 @@ float Molecule::get_springy_bond_satisfaction()
     return retval;
 }
 
+void Molecule::zero_mandatory_connection_cache()
+{
+    if (!last_mc_binding) return;
+    if (!mandatory_connection) return;
+    int i;
+    for (i=0; mandatory_connection[i]; i++) last_mc_binding[i] = 0;
+}
+
 void Molecule::delete_mandatory_connections()
 {
     if (last_mc_binding) delete last_mc_binding;
@@ -2586,6 +2594,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
         {
             bool nearby[alllen+4];
             Point icen = mm[i]->get_barycenter();
+
+            mm[i]->zero_mandatory_connection_cache();
 
             bool is_ac_i = false;
             for (l=0; l<aclen; l++)

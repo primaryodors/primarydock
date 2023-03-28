@@ -2480,6 +2480,29 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     float lbind = get_intermol_binding(om, !is_ac) * lbias;
     // if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
     if (wet_environment) lbind += get_intermol_contact_area(om, true) * oxytocin;
+
+    if (mandatory_connection)
+    {
+        int i;
+        if (!last_mc_binding)
+        {
+            for (i=0; mandatory_connection[i]; i++);            // Get count.
+            last_mc_binding = new float[i+4];
+            for (i=0; mandatory_connection[i]; i++) last_mc_binding[i] = -Avogadro;
+        }
+        for (i=0; mandatory_connection[i]; i++)
+        {
+            if (mandatory_connection[i] == om)
+            {
+                if (lbind < last_mc_binding[i] && lbind < mandatory_coordination_threshold)
+                {
+                    return -1e9;
+                }
+                else last_mc_binding[i] = lbind;
+            }
+        }
+    }
+
     return lbind;
 }
 

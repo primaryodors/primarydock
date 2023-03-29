@@ -2653,7 +2653,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             bool nearby[alllen+4];
             Point icen = mm[i]->get_barycenter();
 
-            mm[i]->zero_mandatory_connection_cache();
+            // mm[i]->zero_mandatory_connection_cache();
 
             bool is_ac_i = false;
             for (l=0; l<aclen; l++)

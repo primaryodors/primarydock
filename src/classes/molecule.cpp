@@ -2489,11 +2489,22 @@ void Molecule::add_mandatory_connection(Molecule* addmol)
     int i;
     for (i=0; mandatory_connection[i]; i++)                 // get count.
     {
-        if (mandatory_connection[i] == addmol) return;      // already have it.
+        if (mandatory_connection[i] == addmol)
+        {
+            #if _dbg_mand_conn
+            cout << "Already have mandatory connection " << addmol->name;
+            if (last_mc_binding) cout << " last binding " << last_mc_binding[i];
+            cout << endl;
+            #endif
+            return;      // already have it.
+        }
     }
     mandatory_connection[i] = addmol;
     mandatory_connection[i+1] = nullptr;
     if (last_mc_binding) last_mc_binding[i] = 0;
+    #if _dbg_mand_conn
+    cout << "Add mandatory connection " << addmol->name << endl;
+    #endif
 }
 
 void Molecule::zero_mandatory_connection_cache()
@@ -2518,7 +2529,10 @@ void Molecule::remove_mandatory_connection(Molecule* rmvmol)
                 mandatory_connection[j] = mandatory_connection[j+1];
                 last_mc_binding[j] = last_mc_binding[j+1];
             }
-            break;
+            #if _dbg_mand_conn
+            cout << "Remove mandatory connection " << rmvmol->name << endl;
+            #endif
+            return;
         }
     }
 }
@@ -2529,6 +2543,9 @@ void Molecule::delete_mandatory_connections()
     last_mc_binding = nullptr;
     if (mandatory_connection) delete mandatory_connection;
     mandatory_connection = nullptr;
+    #if _dbg_mand_conn
+    cout << "No more mandatory connections." << endl;
+    #endif
 }
 
 float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)

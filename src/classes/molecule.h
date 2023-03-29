@@ -167,6 +167,9 @@ public:
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
     Atom** get_most_bindable(int max_num, Atom* for_atom);
 
+    void allocate_mandatory_connections(int mcmax);
+    void add_mandatory_connection(Molecule* addmol);
+    void remove_mandatory_connection(Molecule* rmvmol);
     void zero_mandatory_connection_cache();
     void delete_mandatory_connections();
 
@@ -191,7 +194,6 @@ public:
     Bond* springy_bonds = nullptr;
     int springy_bondct = 0;
     bool been_flexed = false;
-    Molecule** mandatory_connection = nullptr;
 
 protected:
     Molecule();
@@ -206,6 +208,7 @@ protected:
     bool doing_bkbend = false;
     float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
     std::string sdfgen_aboutline = "";
+    Molecule** mandatory_connection = nullptr;
     float* last_mc_binding = nullptr;
 
     // For intermol conformer optimization:

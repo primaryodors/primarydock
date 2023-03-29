@@ -115,7 +115,7 @@
 #define bb_pullaway_allowance 0.13
 
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
-#define mandatory_coordination_threshold 5
+#define mandatory_coordination_threshold 2
 
 // If using an activation matrix, active_persistence "rewards" the ligand for keeping
 // bindings to the same residues post-activation as pre-activation. The noflex option

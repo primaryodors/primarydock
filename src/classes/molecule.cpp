@@ -2474,12 +2474,53 @@ float Molecule::get_springy_bond_satisfaction()
     return retval;
 }
 
+void Molecule::allocate_mandatory_connections(int mcmax)
+{
+    delete_mandatory_connections();
+    mandatory_connection = new Molecule*[mcmax+4];
+    mandatory_connection[0] = nullptr;
+    last_mc_binding = new float[mcmax+4];
+    int i;
+    for (i=0; i<mcmax; i++) last_mc_binding[i] = 0;
+}
+
+void Molecule::add_mandatory_connection(Molecule* addmol)
+{
+    int i;
+    for (i=0; mandatory_connection[i]; i++)                 // get count.
+    {
+        if (mandatory_connection[i] == addmol) return;      // already have it.
+    }
+    mandatory_connection[i] = addmol;
+    mandatory_connection[i+1] = nullptr;
+    if (last_mc_binding) last_mc_binding[i] = 0;
+}
+
 void Molecule::zero_mandatory_connection_cache()
 {
     if (!last_mc_binding) return;
     if (!mandatory_connection) return;
     int i;
     for (i=0; mandatory_connection[i]; i++) last_mc_binding[i] = 0;
+}
+
+void Molecule::remove_mandatory_connection(Molecule* rmvmol)
+{
+    if (!last_mc_binding) return;
+    if (!mandatory_connection) return;
+    int i, j;
+    for (i=0; mandatory_connection[i]; i++)
+    {
+        if (mandatory_connection[i] == rmvmol)
+        {
+            for (j=i; mandatory_connection[j]; j++)
+            {
+                mandatory_connection[j] = mandatory_connection[j+1];
+                last_mc_binding[j] = last_mc_binding[j+1];
+            }
+            break;
+        }
+    }
 }
 
 void Molecule::delete_mandatory_connections()

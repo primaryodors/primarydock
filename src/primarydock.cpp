@@ -1458,6 +1458,7 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "REQSR"))
     {
         int reqrnode = atoi(words[1]);
+        if (!strcmp(words[1], "all") || !strcmp(words[1], "ALL")) reqrnode = -1;
         for (i=2; words[i]; i++)
         {
             if (words[i][0] == '-' && words[i][1] == '-') break;
@@ -2743,6 +2744,21 @@ _try_again:
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
         ligand->crumple(fiftyseventh*44);
+
+        int rcn = required_contacts.size();
+        if (rcn)
+        {
+            ligand->delete_mandatory_connections();
+            ligand->allocate_mandatory_connections(rcn);
+
+            for (i=0; i<rcn; i++)
+            {
+                if (required_contacts[i].node >= 0 && required_contacts[i].node != nodeno) continue;
+                Star s;
+                s.paa = protein->get_residue(required_contacts[i].resno);
+                if (s.n) ligand->add_mandatory_connection(s.pmol);
+            }
+        }
 
         if (pose > 1)
         {
@@ -4054,20 +4070,15 @@ _try_again:
             for (j=0; j<trsz; j++)
                 trip[j] = (Molecule*)protein->get_residue(tripswitch_clashables[j]);
             
-            int rcn = required_contacts.size();
             if (rcn)
             {
-                ligand->delete_mandatory_connections();
-                ligand->mandatory_connection = new Molecule*[rcn+4];
-
                 for (i=0; i<rcn; i++)
                 {
-                    if (required_contacts[i].node != nodeno) continue;
                     Star s;
                     s.paa = protein->get_residue(required_contacts[i].resno);
-                    if (s.n) ligand->mandatory_connection[i] = s.pmol;
+                    if (required_contacts[i].node >= 0 && required_contacts[i].node != nodeno) ligand->remove_mandatory_connection(s.pmol);
+                    else ligand->add_mandatory_connection(s.pmol);
                 }
-                ligand->mandatory_connection[rcn] = nullptr;
             }
 
             protein->find_residue_initial_bindings();

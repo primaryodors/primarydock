@@ -2551,11 +2551,12 @@ void Molecule::delete_mandatory_connections()
 float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
 {
     float lbias = 1.0 + (sgn(is_residue()) == sgn(om->is_residue()) ? 0 : dock_ligand_bias);
-    float lbind = get_intermol_binding(om, !is_ac) * lbias;
+    float rawbind = get_intermol_binding(om, !is_ac);
+    float lbind = rawbind * lbias;
     // if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
     if (wet_environment) lbind += get_intermol_contact_area(om, true) * oxytocin;
 
-    if (mandatory_connection)
+    if (mandatory_connection && rawbind >= 0)                   // Allow pullaway if mols are clashing.
     {
         int i;
         if (!last_mc_binding)
@@ -2653,8 +2654,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             bool nearby[alllen+4];
             Point icen = mm[i]->get_barycenter();
 
-            // mm[i]->zero_mandatory_connection_cache();
-
             bool is_ac_i = false;
             for (l=0; l<aclen; l++)
                 if (ac[l] == all[i])
@@ -2666,12 +2665,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             maxb = 0;
             for (j=0; all[j]; j++)
             {
-                /* if (j == i)
-                {
-                    nearby[j] = false;
-                    continue;
-                } */
-
                 bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
 
                 Point jcen = all[j]->get_barycenter();

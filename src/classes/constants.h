@@ -303,7 +303,7 @@
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0
 #define _dbg_hxrax 0
-#define _dbg_mand_conn 1
+#define _dbg_mand_conn 0
 
 #endif
 

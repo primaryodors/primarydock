@@ -1017,12 +1017,6 @@ void iteration_callback(int iter)
         if (fp)
         {
             fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
-            /*protein->save_pdb(fp, ligand);
-            protein->end_pdb(fp);*/
-
-            /*AminoAcid* reaches_spheroid[SPHREACH_MAX];
-            int sphres = 0;
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, pocketcen, size, addl_resno);*/
             int foff = 0;
 
             for (i=0; reaches_spheroid[nodeno][i]; i++)

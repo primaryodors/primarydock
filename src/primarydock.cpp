@@ -1016,7 +1016,7 @@ void iteration_callback(int iter)
         FILE* fp = fopen(itersfname.c_str(), (liter == 1 ? "wb" : "ab") );
         if (fp)
         {
-            fprintf(fp, "Pose: 1\nNode: %d\n\nPDBDAT:\n", liter);
+            fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
             /*protein->save_pdb(fp, ligand);
             protein->end_pdb(fp);*/
 
@@ -2781,7 +2781,7 @@ _try_again:
 
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
-            movie_offset = iters * (nodeno + (pose-1)*pathnodes);
+            movie_offset = iters * (nodeno + (pose-1)*(pathnodes+1));
 
             if (waters)
             {

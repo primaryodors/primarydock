@@ -328,6 +328,7 @@ char* get_file_ext(char* filename)
 }
 
 bool output_each_iter = false;
+int movie_offset = 0;
 char configfname[256];
 char protfname[256];
 char protafname[256];
@@ -1011,10 +1012,11 @@ void iteration_callback(int iter)
     if (output_each_iter)
     {
         std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
-        FILE* fp = fopen(itersfname.c_str(), (iter == 1 ? "wb" : "ab") );
+        int liter = iter + movie_offset;
+        FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
         if (fp)
         {
-            fprintf(fp, "Pose: 1\nNode: %d\n\nPDBDAT:\n", iter);
+            fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
             /*protein->save_pdb(fp, ligand);
             protein->end_pdb(fp);*/
 
@@ -1023,7 +1025,7 @@ void iteration_callback(int iter)
             sphres = protein->get_residues_can_clash_ligand(reaches_spheroid, ligand, pocketcen, size, addl_resno);*/
             int foff = 0;
 
-            for (i=0; i<sphres; i++)
+            for (i=0; reaches_spheroid[nodeno][i]; i++)
             {
                 reaches_spheroid[nodeno][i]->save_pdb(fp, foff);
                 foff += reaches_spheroid[nodeno][i]->get_atom_count();
@@ -2779,6 +2781,7 @@ _try_again:
 
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
+            movie_offset = iters * (nodeno /*+ (pose-1)*(pathnodes+1)*/);
 
             if (waters)
             {
@@ -4447,8 +4450,6 @@ _try_again:
                 break;
             }
         }	// nodeno loop.
-
-        if (output_each_iter) break;
     } // pose loop.
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Finished poses." << endl;

@@ -1013,7 +1013,7 @@ void iteration_callback(int iter)
     {
         std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
         int liter = iter + movie_offset;
-        FILE* fp = fopen(itersfname.c_str(), ((liter == 1 && pose == 1) ? "wb" : "ab") );
+        FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
         if (fp)
         {
             fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);

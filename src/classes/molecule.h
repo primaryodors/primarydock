@@ -243,6 +243,7 @@ extern float conformer_tumble_multiplier;
 extern bool allow_ligand_360_tumble;
 extern bool allow_ligand_360_flex;
 extern bool wet_environment;
+extern float _momentum_rad_ceiling;
 
 #endif
 

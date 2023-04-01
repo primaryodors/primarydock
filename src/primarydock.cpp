@@ -2068,6 +2068,8 @@ int main(int argc, char** argv)
     char buffer[65536];
     int i, j;
 
+    _momentum_rad_ceiling = fiftyseventh * 5;
+
     for (i=0; i<65536; i++) buffer[i] = 0;
     #if active_persistence
     for (i=0; i<active_persistence_limit; i++) active_persistence_resno[i] = 0;

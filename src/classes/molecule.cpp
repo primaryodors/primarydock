@@ -23,6 +23,8 @@ bool allow_ligand_360_tumble = true;
 bool allow_ligand_360_flex = true;
 bool wet_environment = false;
 
+float _momentum_rad_ceiling = fiftyseventh * 30;
+
 Molecule::Molecule(char const* lname)
 {
     name = new char[strlen(lname)+1];

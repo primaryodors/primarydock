@@ -2743,7 +2743,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 {
                     // cout << bind << " vs " << bind1 << " +" << endl;
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmx) < 0.5) mm[i]->lmx *= accel;
+                    if (fabs(mm[i]->lmx) < _momentum_rad_ceiling) mm[i]->lmx *= accel;
                     bind = bind1;
                     fmaxb = maxb;
                 }
@@ -2775,7 +2775,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 else
                 {
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmy) < 0.5) mm[i]->lmy *= accel;
+                    if (fabs(mm[i]->lmy) < _momentum_rad_ceiling) mm[i]->lmy *= accel;
                     bind = bind1;
                     fmaxb = maxb;
                 }
@@ -2807,7 +2807,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 else
                 {
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmz) < 0.5) mm[i]->lmz *= accel;
+                    if (fabs(mm[i]->lmz) < _momentum_rad_ceiling) mm[i]->lmz *= accel;
                     bind = bind1;
                     fmaxb = maxb;
                 }
@@ -2970,7 +2970,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         improvement += (bind1 - bind);
                         bind = bind1;
                         fmaxb = maxb;
-                        if (fabs(mm[i]->amx) < 0.25) mm[i]->amx *= accel;
+                        if (fabs(mm[i]->amx) < _momentum_rad_ceiling) mm[i]->amx *= accel;
                     }
                 }
 
@@ -3061,7 +3061,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         improvement += (bind1 - bind);
                         bind = bind1;
                         fmaxb = maxb;
-                        if (fabs(mm[i]->amy) < 0.25) mm[i]->amy *= accel;
+                        if (fabs(mm[i]->amy) < _momentum_rad_ceiling) mm[i]->amy *= accel;
                     }
                 }
 
@@ -3154,7 +3154,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         improvement += (bind1 - bind);
                         bind = bind1;
                         fmaxb = maxb;
-                        if (fabs(mm[i]->amz) < 0.25) mm[i]->amz *= accel;
+                        if (fabs(mm[i]->amz) < _momentum_rad_ceiling) mm[i]->amz *= accel;
                     }
                 }
 
@@ -3379,7 +3379,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 #if monte_carlo_flex
                                 putitback.copy_state(mm[i]);
                                 #endif
-                                if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) < 0.25)
+                                if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) < _momentum_rad_ceiling)
                                     mm[i]->rotatable_bonds[k]->angular_momentum *= accel;
                             }
                         }
@@ -3396,7 +3396,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 mm[i]->set_atoms_break_on_move(true);
                 #endif
 
-                if (!(iter % _fullrot_every)) mm[i]->reset_conformer_momenta();
+                // if (!(iter % _fullrot_every)) mm[i]->reset_conformer_momenta();
             }
             /**** End Bond Flexion ****/
             #endif

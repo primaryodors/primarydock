@@ -31,13 +31,27 @@ LIG sdf/$ligname.sdf
 
 CEN RES 4.57 4.60 5.39
 PATH 1 RES 4.57 4.60 5.39 6.59
+PATH 2 REL 0 0 0
+PATH 3 REL 0 0 0
+PATH 4 REL 0 0 0
+PATH 5 REL 0 0 0
+PATH 6 REL 0 0 0
+PATH 7 REL 0 0 0
+PATH 8 REL 0 0 0
 
 REQSR ALL 4.57 4.60 5.39
 
 SIZE 8.0 6.0 8.0
 
 HXR 0 TMR6 6.26 6.60 6.48 0 1 0 0.5015 0 0.8651 0
-HXR 1 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 15
+HXR 1 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 2 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 3 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 4 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 5 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 6 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 7 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
+HXR 8 TMR6 6.26 6.60 6.48 0 0 0 $rot_target 3
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
@@ -46,6 +60,7 @@ ELIM 199
 
 FLEX 1
 WET
+MOVIE
 
 ITERS 50
 

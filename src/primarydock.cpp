@@ -1038,6 +1038,10 @@ void iteration_callback(int iter)
         FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
         if (fp)
         {
+            if (!liter && (pose == 1))
+            {
+                fprintf(fp, "PDB file: %s\n", protfname);
+            }
             fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
             /*protein->save_pdb(fp, ligand);
             protein->end_pdb(fp);*/

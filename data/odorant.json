@@ -9483,7 +9483,7 @@
     "15f5e2777091e11ba0e539557012b79f":
     {
         "full_name": "2-decenoic acid",
-        "smiles": "OC(=O)C=CCCCCCCC",
+        "smiles": "[O-]C(=O)C=CCCCCCCC",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -25798,7 +25798,7 @@
     "464508975dfa8cdc09783e322aacf481":
     {
         "full_name": "2-nonenoic acid",
-        "smiles": "OC(=O)C=CCCCCCC",
+        "smiles": "[O-]C(=O)C=CCCCCCC",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

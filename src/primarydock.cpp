@@ -3398,7 +3398,12 @@ _try_again:
                     if (mvaa) mvaa->movability = min(MOV_FLXDESEL, mvaa->movability);
                 }
 
+                #if _dbg_null_flexions
+                bool another_flex = false;
+                #else
                 bool another_flex = (frand(0,1) < 0.6);
+                #endif
+
                 while (another_flex)
                 {
                     for (j=0; j<100; j++)

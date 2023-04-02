@@ -306,6 +306,7 @@
 #define _dbg_hxrax 0
 #define _dbg_mand_conn 0
 #define _dbg_flexion_selection 1
+#define _dbg_null_flexions 1
 
 #endif
 

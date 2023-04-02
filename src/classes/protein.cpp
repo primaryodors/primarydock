@@ -422,7 +422,7 @@ void Protein::find_residue_initial_bindings()
 
         if (ib >= 5)
         {
-            residues[i]->movability = max(residues[i]->movability, MOV_PINNED);
+            residues[i]->movability = min(residues[i]->movability, MOV_PINNED);
             if (maxb >= 5) aabridges.push_back(aab);
         }
 

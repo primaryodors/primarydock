@@ -71,7 +71,7 @@ AminoAcid::~AminoAcid()
 }
 
 #define _ALGORITHMIC_GREEK 1
-AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
+AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 {
     if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
@@ -469,7 +469,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
         if (N) new_atoms[l++] = N;
         if (HN) new_atoms[l++] = HN;
 
-        minimize_internal_clashes();
+        if (minintc) minimize_internal_clashes();
         for (i=0; atoms[i]; i++)
         {
             if (atom_Greek[i] <= 0) continue;
@@ -648,7 +648,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 
     // flatten();
     rotatable_bonds = get_rotatable_bonds();
-    minimize_internal_clashes();
+    if (minintc) minimize_internal_clashes();
 
     identify_acidbase();
     identify_rings();
@@ -701,7 +701,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     if (CA && CB)
     {
         Bond* b = CA->get_bond_between(CB);
-        if (b) b->rotate(triangular);
+        if (b && minintc) b->rotate(triangular);
     }
 
     if (prevaa)
@@ -1164,7 +1164,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
                     if (aaa && !aaa->aabonds)
                     {
-                        AminoAcid* tempaa = new AminoAcid(aaa->_1let);
+                        AminoAcid* tempaa = new AminoAcid(aaa->_1let, 0, false);
                         delete tempaa;
                     }
 

@@ -65,7 +65,7 @@ class AminoAcid : public Molecule
 public:
     // Constructors.
     AminoAcid(FILE* instream, AminoAcid* prev_res=0, int resno_offset = 0);
-    AminoAcid(const char letter, AminoAcid* prev_res=0);
+    AminoAcid(const char letter, AminoAcid* prev_res=0, bool minimize_internal_clashes = true);
     ~AminoAcid();
 
     // Getters and setters.

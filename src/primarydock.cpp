@@ -3414,11 +3414,6 @@ _try_again:
                             if (reaches_spheroid[nodeno][i]->movability != MOV_FLXDESEL) continue;
                             float weight = reaches_spheroid[nodeno][i]->get_aa_definition()->flexion_probability;
 
-                            if (reaches_spheroid[nodeno][i]->get_residue_no() == 262)
-                            {
-                                int slipknot = 1;           // A history lesson about boats is more important than solving olfaction.
-                            }
-
                             // Multiply weight by unrealized ligand binding potential.
                             float potential = reaches_spheroid[nodeno][i]->get_intermol_potential(ligand, true);
                             float adjusted_potential = fmin(1, potential / 1000);
@@ -3430,11 +3425,6 @@ _try_again:
                             float nearr = fmax(1, nearest1->distance_to(nearest2) / 2);
                             adjusted_potential *= nearr;
                             weight = (1.0 - ((1.0 - weight) / adjusted_potential)) / 2;
-
-                            #if _dbg_flexion_selection
-                            if (reaches_spheroid[nodeno][i]->get_residue_no() == 262)
-                                cout << reaches_spheroid[nodeno][i]->get_name() << " has weight " << weight << endl;
-                            #endif
 
                             if ( frand(0,100) < 1 && frand(0,1) < weight )
                             {

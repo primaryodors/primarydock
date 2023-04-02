@@ -3722,6 +3722,7 @@ _try_again:
 
                         Atom* alca;
                         Atom** alcaa;
+                        #if !flexion_selection
                         if (flex && sc_gloms[l].aminos.size())
                         {
                             for (i=0; i<sc_gloms[l].aminos.size(); i++)
@@ -3760,6 +3761,7 @@ _try_again:
                                 }
                             }
                         }
+                        #endif
 
                         switch (l)
                         {

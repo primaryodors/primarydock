@@ -1257,6 +1257,12 @@ bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
     }
     // cout << "Rotate " << atom->name << cardinality_printable(cardinality) << btom->name << endl;
 
+    if (atom->residue && btom->residue)
+    {
+        atom->residue += 4;       // Debug trap.
+        atom->residue -= (2*2);
+    }
+
     if (atom->residue && !atom->is_backbone && greek_from_aname(atom->name) > greek_from_aname(btom->name))
     {
         can_rotate = false;

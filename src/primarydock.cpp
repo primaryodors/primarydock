@@ -3416,12 +3416,12 @@ _try_again:
 
                             if (reaches_spheroid[nodeno][i]->get_residue_no() == 262)
                             {
-                                int slipknot = 1;
+                                int slipknot = 1;           // A history lesson about boats is more important than solving olfaction.
                             }
 
                             // Multiply weight by unrealized ligand binding potential.
                             float potential = reaches_spheroid[nodeno][i]->get_intermol_potential(ligand, true);
-                            float adjusted_potential = fmin(1, potential / 500);
+                            float adjusted_potential = fmin(1, potential / 1000);
                             Atom *nearest1, *nearest2;
                             nearest1 = reaches_spheroid[nodeno][i]->get_nearest_atom(ligand->get_barycenter());
                             if (!nearest1) throw 0xbadd157;
@@ -3429,7 +3429,7 @@ _try_again:
                             if (!nearest2) throw 0xbadd157;
                             float nearr = fmax(1, nearest1->distance_to(nearest2) / 2);
                             adjusted_potential *= nearr;
-                            weight = 1.0 - ((1.0 - weight) / adjusted_potential);
+                            weight = (1.0 - ((1.0 - weight) / adjusted_potential)) / 2;
 
                             #if _dbg_flexion_selection
                             if (reaches_spheroid[nodeno][i]->get_residue_no() == 262)

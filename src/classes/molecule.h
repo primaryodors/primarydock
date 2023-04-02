@@ -22,12 +22,12 @@ struct histidine_flip
 
 enum MovabilityType
 {
-    MOV_ALL			= 1000,
-    MOV_NORECEN		=  200,
-    MOV_FLEXONLY	=   50,
-    MOV_FLXDESEL    =    2,
-    MOV_PINNED      =    1,
-    MOV_NONE		=    0
+    MOV_ALL			= 0x1000,
+    MOV_NORECEN		=  0x200,
+    MOV_FLEXONLY	=   0x80,
+    MOV_PINNED      =   0x7f,
+    MOV_FLXDESEL    =    0x8,
+    MOV_NONE		=    0x0
 };
 
 enum MoleculeType

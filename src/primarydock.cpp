@@ -1643,6 +1643,7 @@ void prepare_initb()
         int qpm = qpr + maxh2o;
         prem[qpm] = nullptr;
 
+        #if !flexion_selection
         bool preconform;
 
         #if preconform_protein
@@ -1661,15 +1662,7 @@ void prepare_initb()
             );
             delete[] delete_me;
         }
-
-        /*
-        preres = protein->get_residues_near(pocketcen, 10000);
-        qpr = preres.size();
-        for (i=0; i<qpr; i++)
-        {
-            preaa[i] = preres[i];
-        }
-        */
+        #endif
 
         for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 
@@ -2361,6 +2354,8 @@ int main(int argc, char** argv)
     // Identify the ligand atom with the greatest potential binding.
     int k, n;
 
+    #if !flexion_selection
+
     if (use_prealign) use_bestbind_algorithm = false;
 
     if (use_prealign)
@@ -2395,6 +2390,8 @@ int main(int argc, char** argv)
         delete prealign_res;
         delete lig_grp;
     }
+
+    #endif
 
     // Best-Binding Code
     if (use_bestbind_algorithm)
@@ -3394,7 +3391,7 @@ _try_again:
             if (flex && !nodeno)
             {
                 flexible_resnos.clear();
-                for (i=0; i<sphres; i++) reaches_spheroid[nodeno][i]->movability = max(MOV_FLXDESEL, reaches_spheroid[nodeno][i]->movability);
+                for (i=0; i<sphres; i++) reaches_spheroid[nodeno][i]->movability = min(MOV_FLXDESEL, reaches_spheroid[nodeno][i]->movability);
 
                 bool another_flex = (frand(0,1) < 0.6);
                 while (another_flex)
@@ -4090,11 +4087,18 @@ _try_again:
 
             if (flex)
             {
+                #if flexion_selection
+                for (j=0; j<flexible_resnos.size(); j++)
+                {
+                    cfmols[i++] = protein->get_residue(flexible_resnos[j]);
+                }
+                #else
                 for (j=0; j<sphres; j++)
                 {
                     if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
                     cfmols[i++] = reaches_spheroid[nodeno][j];
                 }
+                #endif
             }
             for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 

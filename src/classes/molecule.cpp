@@ -2192,15 +2192,15 @@ void Molecule::clear_atom_binding_energies()
         atoms[i]->last_bind_energy = 0;
 }
 
-float Molecule::get_intermol_potential(Molecule* ligand)
+float Molecule::get_intermol_potential(Molecule* ligand, bool pure)
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
     ligands[1] = nullptr;
-    return get_intermol_potential(ligands);
+    return get_intermol_potential(ligands, pure);
 }
 
-float Molecule::get_intermol_potential(Molecule** ligands)
+float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
 {
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
@@ -2223,7 +2223,7 @@ float Molecule::get_intermol_potential(Molecule** ligands)
                     {
                         if (iff[n]->get_type() == vdW) continue;
 
-                        if (r < iff[n]->get_distance())
+                        if (pure || r < iff[n]->get_distance())
                             kJmol += iff[n]->get_kJmol();
                         else
                             kJmol += iff[n]->get_kJmol()*f;

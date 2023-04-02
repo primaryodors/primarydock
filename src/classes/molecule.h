@@ -145,8 +145,8 @@ public:
     float get_intermol_clashes(Molecule** ligands);
     float get_intermol_binding(Molecule* ligand, bool subtract_clashes = true);
     float get_intermol_binding(Molecule** ligands, bool subtract_clashes = true);
-    float get_intermol_potential(Molecule* ligand);
-    float get_intermol_potential(Molecule** ligands);
+    float get_intermol_potential(Molecule* ligand, bool disregard_distance = false);
+    float get_intermol_potential(Molecule** ligands, bool disregard_distance = false);
     float hydrophilicity();
     float get_intermol_polar_sat(Molecule* ligand);
     float get_intermol_contact_area(Molecule* ligand, bool hydrophobic_only = false);

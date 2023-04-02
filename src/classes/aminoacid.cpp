@@ -1465,6 +1465,45 @@ void AminoAcid::load_aa_defs()
     }
 }
 
+bool AminoAcid::can_reach(Atom* other) const
+{
+    Atom* ca1;
+    float r;
+
+    ca1 = get_atom("CA");
+
+    if (!ca1 || !other)
+    {
+        cout << "Warning: Could not determine reach of " << *this << " - " << *other << " to avoid possibility of clash." << endl;
+        return false;
+    }
+
+    r = ca1->get_location().get_3d_distance(other->get_location());
+
+    if (r <= 1.15 * (get_reach())) return true;
+    else return false;
+}
+
+bool AminoAcid::can_reach(Molecule* other) const
+{
+    Atom* ca1, *ca2;
+    float r;
+
+    ca1 = get_atom("CA");
+    ca2 = other->get_nearest_atom(ca1->get_location());
+
+    if (!ca1 || !ca2)
+    {
+        cout << "Warning: Could not determine reach of " << *this << " - " << other->get_name() << " to avoid possibility of clash." << endl;
+        return false;
+    }
+
+    r = ca1->get_location().get_3d_distance(ca2->get_location());
+
+    if (r <= 1.15 * (get_reach())) return true;
+    else return false;
+}
+
 bool AminoAcid::can_reach(AminoAcid* other) const
 {
     Atom* ca1, *ca2;
@@ -1479,11 +1518,7 @@ bool AminoAcid::can_reach(AminoAcid* other) const
         return false;
     }
 
-    //cout << aadef->_3let << residue_no << " vs " << other->aadef->_3let << other->residue_no;
-
     r = ca1->get_location().get_3d_distance(ca2->get_location());
-
-    //cout << ": " << r << " vs. " << get_reach() << " + " << other->get_reach() << endl;
 
     if (r <= 1.15 * (get_reach() + other->get_reach())) return true;
     else return false;

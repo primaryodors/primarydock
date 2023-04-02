@@ -100,6 +100,8 @@ public:
     {
         return aadef ? aadef->reach : 2.5;
     }
+    bool can_reach(Atom* other) const;
+    bool can_reach(Molecule* other) const;
     bool can_reach(AminoAcid* other) const;
     void set_region(const char* regname)
     {

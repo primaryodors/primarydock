@@ -114,6 +114,7 @@
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.13
 #define flexion_selection 1
+#define no_zero_flexions 1
 
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5

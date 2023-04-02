@@ -3400,36 +3400,43 @@ _try_again:
 
                 #if _dbg_null_flexions
                 bool another_flex = false;
+                #elif no_zero_flexions
+                bool another_flex = true;
                 #else
                 bool another_flex = (frand(0,1) < 0.6);
                 #endif
 
                 while (another_flex)
                 {
-                    for (j=0; j<100; j++)
+                    for (j=0; j<1000; j++)
                         for (i=0; i<sphres; i++)
                         {
                             if (reaches_spheroid[nodeno][i]->movability != MOV_FLXDESEL) continue;
                             float weight = reaches_spheroid[nodeno][i]->get_aa_definition()->flexion_probability;
 
+                            if (reaches_spheroid[nodeno][i]->get_residue_no() == 262)
+                            {
+                                int slipknot = 1;
+                            }
+
                             // Multiply weight by unrealized ligand binding potential.
                             float potential = reaches_spheroid[nodeno][i]->get_intermol_potential(ligand, true);
-                            float adjusted_potential = fmin(1, potential / 200);
+                            float adjusted_potential = fmin(1, potential / 500);
                             Atom *nearest1, *nearest2;
                             nearest1 = reaches_spheroid[nodeno][i]->get_nearest_atom(ligand->get_barycenter());
                             if (!nearest1) throw 0xbadd157;
                             nearest2 = ligand->get_nearest_atom(nearest1->get_location());
                             if (!nearest2) throw 0xbadd157;
-                            float nearr = fmin(1, nearest1->distance_to(nearest2) / 2);
-                            adjusted_potential = 1.0 - ((1.0 - adjusted_potential) / nearr);
-                            weight *= adjusted_potential;
+                            float nearr = fmax(1, nearest1->distance_to(nearest2) / 2);
+                            adjusted_potential *= nearr;
+                            weight = 1.0 - ((1.0 - weight) / adjusted_potential);
 
                             #if _dbg_flexion_selection
                             if (reaches_spheroid[nodeno][i]->get_residue_no() == 262)
                                 cout << reaches_spheroid[nodeno][i]->get_name() << " has weight " << weight << endl;
                             #endif
 
-                            if (frand(0,1) < weight)
+                            if ( frand(0,100) < 1 && frand(0,1) < weight )
                             {
                                 reaches_spheroid[nodeno][i]->movability = MOV_FLEXONLY;
                                 flexible_resnos.push_back(reaches_spheroid[nodeno][i]->get_residue_no());

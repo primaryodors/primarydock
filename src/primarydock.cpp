@@ -3425,7 +3425,7 @@ _try_again:
                             float nearr = fmax(1, nearest1->distance_to(nearest2) / 2);
                             adjusted_potential *= nearr;
 
-                            // TODO: If residue is within any ACVHX region, double the adjusted potential.
+                            // TODO: If residue is within any active_helix_rots region, double the adjusted potential.
 
                             weight = (1.0 - ((1.0 - weight) / adjusted_potential)) / 2;
 

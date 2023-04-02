@@ -23,6 +23,8 @@ bool allow_ligand_360_tumble = true;
 bool allow_ligand_360_flex = true;
 bool wet_environment = false;
 
+float _momentum_rad_ceiling = fiftyseventh * 30;
+
 Molecule::Molecule(char const* lname)
 {
     name = new char[strlen(lname)+1];
@@ -2474,12 +2476,110 @@ float Molecule::get_springy_bond_satisfaction()
     return retval;
 }
 
+void Molecule::allocate_mandatory_connections(int mcmax)
+{
+    delete_mandatory_connections();
+    mandatory_connection = new Molecule*[mcmax+4];
+    mandatory_connection[0] = nullptr;
+    last_mc_binding = new float[mcmax+4];
+    int i;
+    for (i=0; i<mcmax; i++) last_mc_binding[i] = 0;
+}
+
+void Molecule::add_mandatory_connection(Molecule* addmol)
+{
+    int i;
+    for (i=0; mandatory_connection[i]; i++)                 // get count.
+    {
+        if (mandatory_connection[i] == addmol)
+        {
+            #if _dbg_mand_conn
+            cout << "Already have mandatory connection " << addmol->name;
+            if (last_mc_binding) cout << " last binding " << last_mc_binding[i];
+            cout << endl;
+            #endif
+            return;      // already have it.
+        }
+    }
+    mandatory_connection[i] = addmol;
+    mandatory_connection[i+1] = nullptr;
+    if (last_mc_binding) last_mc_binding[i] = 0;
+    #if _dbg_mand_conn
+    cout << "Add mandatory connection " << addmol->name << endl;
+    #endif
+}
+
+void Molecule::zero_mandatory_connection_cache()
+{
+    if (!last_mc_binding) return;
+    if (!mandatory_connection) return;
+    int i;
+    for (i=0; mandatory_connection[i]; i++) last_mc_binding[i] = 0;
+}
+
+void Molecule::remove_mandatory_connection(Molecule* rmvmol)
+{
+    if (!last_mc_binding) return;
+    if (!mandatory_connection) return;
+    int i, j;
+    for (i=0; mandatory_connection[i]; i++)
+    {
+        if (mandatory_connection[i] == rmvmol)
+        {
+            for (j=i; mandatory_connection[j]; j++)
+            {
+                mandatory_connection[j] = mandatory_connection[j+1];
+                last_mc_binding[j] = last_mc_binding[j+1];
+            }
+            #if _dbg_mand_conn
+            cout << "Remove mandatory connection " << rmvmol->name << endl;
+            #endif
+            return;
+        }
+    }
+}
+
+void Molecule::delete_mandatory_connections()
+{
+    if (last_mc_binding) delete last_mc_binding;
+    last_mc_binding = nullptr;
+    if (mandatory_connection) delete mandatory_connection;
+    mandatory_connection = nullptr;
+    #if _dbg_mand_conn
+    cout << "No more mandatory connections." << endl;
+    #endif
+}
+
 float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
 {
     float lbias = 1.0 + (sgn(is_residue()) == sgn(om->is_residue()) ? 0 : dock_ligand_bias);
-    float lbind = get_intermol_binding(om, !is_ac) * lbias;
+    float rawbind = get_intermol_binding(om, !is_ac);
+    float lbind = rawbind * lbias;
     // if (!is_residue() && om->is_residue()) lbind += get_intermol_polar_sat(om) * polar_sat_influence_for_dock;
     if (wet_environment) lbind += get_intermol_contact_area(om, true) * oxytocin;
+
+    if (mandatory_connection && rawbind >= 0)                   // Allow pullaway if mols are clashing.
+    {
+        int i;
+        if (!last_mc_binding)
+        {
+            for (i=0; mandatory_connection[i]; i++);            // Get count.
+            last_mc_binding = new float[i+4];
+            for (i=0; mandatory_connection[i]; i++) last_mc_binding[i] = -Avogadro;
+        }
+        for (i=0; mandatory_connection[i]; i++)
+        {
+            if (mandatory_connection[i] == om)
+            {
+                if (lbind < last_mc_binding[i] && lbind < mandatory_coordination_threshold)
+                {
+                    return -1e9;
+                }
+                else last_mc_binding[i] = lbind;
+            }
+        }
+    }
+
     return lbind;
 }
 
@@ -2567,12 +2667,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             maxb = 0;
             for (j=0; all[j]; j++)
             {
-                /* if (j == i)
-                {
-                    nearby[j] = false;
-                    continue;
-                } */
-
                 bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
 
                 Point jcen = all[j]->get_barycenter();
@@ -2651,7 +2745,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 {
                     // cout << bind << " vs " << bind1 << " +" << endl;
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmx) < 0.5) mm[i]->lmx *= accel;
+                    if (fabs(mm[i]->lmx) < _momentum_rad_ceiling) mm[i]->lmx *= accel;
                     bind = bind1;
                     fmaxb = maxb;
                 }
@@ -2683,7 +2777,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 else
                 {
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmy) < 0.5) mm[i]->lmy *= accel;
+                    if (fabs(mm[i]->lmy) < _momentum_rad_ceiling) mm[i]->lmy *= accel;
                     bind = bind1;
                     fmaxb = maxb;
                 }
@@ -2715,7 +2809,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 else
                 {
                     improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmz) < 0.5) mm[i]->lmz *= accel;
+                    if (fabs(mm[i]->lmz) < _momentum_rad_ceiling) mm[i]->lmz *= accel;
                     bind = bind1;
                     fmaxb = maxb;
                 }
@@ -2878,7 +2972,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         improvement += (bind1 - bind);
                         bind = bind1;
                         fmaxb = maxb;
-                        if (fabs(mm[i]->amx) < 0.25) mm[i]->amx *= accel;
+                        if (fabs(mm[i]->amx) < _momentum_rad_ceiling) mm[i]->amx *= accel;
                     }
                 }
 
@@ -2969,7 +3063,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         improvement += (bind1 - bind);
                         bind = bind1;
                         fmaxb = maxb;
-                        if (fabs(mm[i]->amy) < 0.25) mm[i]->amy *= accel;
+                        if (fabs(mm[i]->amy) < _momentum_rad_ceiling) mm[i]->amy *= accel;
                     }
                 }
 
@@ -3062,7 +3156,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         improvement += (bind1 - bind);
                         bind = bind1;
                         fmaxb = maxb;
-                        if (fabs(mm[i]->amz) < 0.25) mm[i]->amz *= accel;
+                        if (fabs(mm[i]->amz) < _momentum_rad_ceiling) mm[i]->amz *= accel;
                     }
                 }
 
@@ -3287,7 +3381,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                 #if monte_carlo_flex
                                 putitback.copy_state(mm[i]);
                                 #endif
-                                if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) < 0.25)
+                                if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) < _momentum_rad_ceiling)
                                     mm[i]->rotatable_bonds[k]->angular_momentum *= accel;
                             }
                         }
@@ -3303,8 +3397,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 #if debug_break_on_move
                 mm[i]->set_atoms_break_on_move(true);
                 #endif
-
-                if (!(iter % _fullrot_every)) mm[i]->reset_conformer_momenta();
             }
             /**** End Bond Flexion ****/
             #endif

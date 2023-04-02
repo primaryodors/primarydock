@@ -168,6 +168,12 @@ public:
     Atom** get_most_bindable(int max_num = 3);						// Return the atoms with the greatest potential intermol binding.
     Atom** get_most_bindable(int max_num, Atom* for_atom);
 
+    void allocate_mandatory_connections(int mcmax);
+    void add_mandatory_connection(Molecule* addmol);
+    void remove_mandatory_connection(Molecule* rmvmol);
+    void zero_mandatory_connection_cache();
+    void delete_mandatory_connections();
+
     // Debug stuff.
     #if debug_break_on_move
     void set_atoms_break_on_move(bool break_on_move)
@@ -203,6 +209,8 @@ protected:
     bool doing_bkbend = false;
     float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.
     std::string sdfgen_aboutline = "";
+    Molecule** mandatory_connection = nullptr;
+    float* last_mc_binding = nullptr;
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.
@@ -236,6 +244,7 @@ extern float conformer_tumble_multiplier;
 extern bool allow_ligand_360_tumble;
 extern bool allow_ligand_360_flex;
 extern bool wet_environment;
+extern float _momentum_rad_ceiling;
 
 #endif
 

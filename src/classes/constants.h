@@ -64,8 +64,8 @@
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
 #define _def_lin_momentum 0.1
-#define _def_ang_momentum (_fullrot_steprad/2)
-#define _def_bnd_momentum (_fullrot_steprad/2)
+#define _def_ang_momentum (_fullrot_steprad/3)
+#define _def_bnd_momentum (_fullrot_steprad/3)
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -113,6 +113,9 @@
 #define bb_stochastic 0.15
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.13
+
+// Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
+#define mandatory_coordination_threshold 5
 
 // If using an activation matrix, active_persistence "rewards" the ligand for keeping
 // bindings to the same residues post-activation as pre-activation. The noflex option
@@ -174,8 +177,8 @@
 #define dock_ligand_bias 0.5
 
 // Turns off the 360 degree rotations for all but the zeroth node of a path.
-#define nodes_no_ligand_360_tumble 0
-#define nodes_no_ligand_360_flex 0
+#define nodes_no_ligand_360_tumble 1
+#define nodes_no_ligand_360_flex 1
 #define prevent_ligand_360_on_activate 1
 
 // Iteration callback function feature.
@@ -300,6 +303,7 @@
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0
 #define _dbg_hxrax 0
+#define _dbg_mand_conn 0
 #define _dbg_flexion_selection 1
 
 #endif

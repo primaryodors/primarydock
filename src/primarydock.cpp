@@ -415,6 +415,7 @@ bool soft_pocket = false;
 std::string soft_names;
 std::vector<Region> soft_rgns;
 std::vector<SoftBias> soft_biases;
+std::vector<int>flexible_resnos;
 
 float rgnxform_r[PROT_MAX_RGN], rgnxform_theta[PROT_MAX_RGN], rgnxform_y[PROT_MAX_RGN];
 float rgnrot_alpha[PROT_MAX_RGN], rgnrot_w[PROT_MAX_RGN], rgnrot_u[PROT_MAX_RGN];
@@ -3326,6 +3327,41 @@ _try_again:
 
             sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, addl_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
+
+            // Flexion Selection
+            if (flex && !nodeno)
+            {
+                flexible_resnos.clear();
+                for (i=0; i<sphres; i++) reaches_spheroid[nodeno][i]->movability = max(MOV_FLXDESEL, reaches_spheroid[nodeno][i]->movability);
+
+                bool another_flex = (frand(0,1) < 0.6);
+                while (another_flex)
+                {
+                    for (j=0; j<100; j++)
+                        for (i=0; i<sphres; i++)
+                        {
+                            if (reaches_spheroid[nodeno][i]->movability != MOV_FLXDESEL) continue;
+                            float weight = reaches_spheroid[nodeno][i]->get_aa_definition()->flexion_probability;
+                            // TODO: Multiply weight by unrealized ligand binding potential.
+                            if (frand(0,1) < weight)
+                            {
+                                reaches_spheroid[nodeno][i]->movability = MOV_FLEXONLY;
+                                flexible_resnos.push_back(reaches_spheroid[nodeno][i]->get_residue_no());
+                                #if _dbg_flexion_selection
+                                cout << "Selected " << reaches_spheroid[nodeno][i]->get_name()
+                                     << " for flexion with a weight of " << weight << endl;
+                                #endif
+                                goto _flexion_selected;
+                            }
+                        }
+                    _flexion_selected:
+                    another_flex = (frand(0,1) < 0.6);
+                }
+                
+                #if _dbg_flexion_selection
+                cout << flexible_resnos.size() << " residues selected for flexion." << endl << endl;
+                #endif
+            }
 
             for (i=0; i<sphres; i++)
             {

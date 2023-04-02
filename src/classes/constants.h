@@ -300,6 +300,7 @@
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0
 #define _dbg_hxrax 0
+#define _dbg_flexion_selection 1
 
 #endif
 

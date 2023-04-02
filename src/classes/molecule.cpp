@@ -3397,8 +3397,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 #if debug_break_on_move
                 mm[i]->set_atoms_break_on_move(true);
                 #endif
-
-                // if (!(iter % _fullrot_every)) mm[i]->reset_conformer_momenta();
             }
             /**** End Bond Flexion ****/
             #endif

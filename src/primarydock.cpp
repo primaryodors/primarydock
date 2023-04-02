@@ -11,6 +11,27 @@
 
 using namespace std;
 
+struct ResiduePlaceholder
+{
+    int node = 0;
+    int resno = 0;
+    std::string bw;
+
+    void set(const char* str)
+    {
+        if (strchr(str, '.')) bw = str;
+        else resno = atoi(str);
+    }
+
+    void resolve_resno(Protein* prot)
+    {
+        int hxno = atoi(bw.c_str());
+        const char* dot = strchr(bw.c_str(), '.');
+        int bwpos = atoi(dot+1);
+        resno = prot->get_bw50(hxno) + bwpos - 50;
+    }
+};
+
 struct DockResult
 {
     int pose;
@@ -410,6 +431,7 @@ std::vector<AcvHxRot> active_helix_rots;
 std::vector<AcvHxRot> orig_active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
+std::vector<ResiduePlaceholder> required_contacts;
 
 bool soft_pocket = false;
 std::string soft_names;
@@ -1016,6 +1038,10 @@ void iteration_callback(int iter)
         FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
         if (fp)
         {
+            if (!liter && (pose == 1))
+            {
+                fprintf(fp, "PDB file: %s\n", protfname);
+            }
             fprintf(fp, "Pose: %d\nNode: %d\n\nPDBDAT:\n", pose, liter);
             int foff = 0;
 
@@ -1428,6 +1454,20 @@ int interpret_config_line(char** words)
         protset = true;
         // optsecho = "Protein file is " + (std::string)protfname;
         return 1;
+    }
+    else if (!strcmp(words[0], "REQSR"))
+    {
+        int reqrnode = atoi(words[1]);
+        if (!strcmp(words[1], "all") || !strcmp(words[1], "ALL")) reqrnode = -1;
+        for (i=2; words[i]; i++)
+        {
+            if (words[i][0] == '-' && words[i][1] == '-') break;
+            ResiduePlaceholder rp;
+            rp.set(words[i]);
+            rp.node = reqrnode;
+            required_contacts.push_back(rp);
+        }
+        return i-1;
     }
     else if (!strcmp(words[0], "RETRY"))
     {
@@ -2022,6 +2062,8 @@ int main(int argc, char** argv)
     char buffer[65536];
     int i, j;
 
+    _momentum_rad_ceiling = fiftyseventh * 5;
+
     for (i=0; i<65536; i++) buffer[i] = 0;
     #if active_persistence
     for (i=0; i<active_persistence_limit; i++) active_persistence_resno[i] = 0;
@@ -2155,6 +2197,11 @@ int main(int argc, char** argv)
     }
 
     prepare_acv_bond_rots();
+
+    for (i=0; i<required_contacts.size(); i++)
+    {
+        required_contacts[i].resolve_resno(protein);
+    }
 
     int l;
 
@@ -2699,6 +2746,21 @@ _try_again:
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
         ligand->crumple(fiftyseventh*44);
+
+        int rcn = required_contacts.size();
+        if (rcn)
+        {
+            ligand->delete_mandatory_connections();
+            ligand->allocate_mandatory_connections(rcn);
+
+            for (i=0; i<rcn; i++)
+            {
+                if (required_contacts[i].node >= 0 && required_contacts[i].node != nodeno) continue;
+                Star s;
+                s.paa = protein->get_residue(required_contacts[i].resno);
+                if (s.n) ligand->add_mandatory_connection(s.pmol);
+            }
+        }
 
         if (pose > 1)
         {
@@ -4010,6 +4072,17 @@ _try_again:
 
             for (j=0; j<trsz; j++)
                 trip[j] = (Molecule*)protein->get_residue(tripswitch_clashables[j]);
+            
+            if (rcn)
+            {
+                for (i=0; i<rcn; i++)
+                {
+                    Star s;
+                    s.paa = protein->get_residue(required_contacts[i].resno);
+                    if (required_contacts[i].node >= 0 && required_contacts[i].node != nodeno) ligand->remove_mandatory_connection(s.pmol);
+                    else ligand->add_mandatory_connection(s.pmol);
+                }
+            }
 
             protein->find_residue_initial_bindings();
             Molecule::multimol_conform(

@@ -1432,6 +1432,11 @@ void AminoAcid::load_aa_defs()
                         aa_defs[idx].sidechain_pKa = atof(words[4]);
                     }
 
+                    if (words[5])
+                    {
+                        aa_defs[idx].flexion_probability = atof(words[5]);
+                    }
+
                     tbdctr++;
 
                     lastletter = words[0][0];

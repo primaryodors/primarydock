@@ -41,6 +41,7 @@ struct AADef
     bool loaded = false;
     bool isoleucine_fix = false;
     float sidechain_pKa = nanf("n/a");
+    float flexion_probability = 0;
 };
 
 struct AABridge

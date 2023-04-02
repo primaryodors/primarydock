@@ -3391,7 +3391,12 @@ _try_again:
             if (flex && !nodeno)
             {
                 flexible_resnos.clear();
-                for (i=0; i<sphres; i++) reaches_spheroid[nodeno][i]->movability = min(MOV_FLXDESEL, reaches_spheroid[nodeno][i]->movability);
+                j = protein->get_end_resno();
+                for (i=protein->get_start_resno(); i<=j; i++)
+                {
+                    AminoAcid* mvaa = protein->get_residue(i);
+                    if (mvaa) mvaa->movability = min(MOV_FLXDESEL, mvaa->movability);
+                }
 
                 bool another_flex = (frand(0,1) < 0.6);
                 while (another_flex)

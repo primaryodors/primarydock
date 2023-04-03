@@ -3410,7 +3410,7 @@ _try_again:
                 {
                     float bestwt = 0;
                     int besti = -1;
-                    for (j=0; j<100; j++)
+                    for (j=0; j<3; j++)
                         for (i=0; i<sphres; i++)
                         {
                             if (reaches_spheroid[nodeno][i]->movability != MOV_FLXDESEL) continue;

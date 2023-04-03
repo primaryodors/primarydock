@@ -3408,7 +3408,9 @@ _try_again:
 
                 while (another_flex)
                 {
-                    for (j=0; j<1000; j++)
+                    float bestwt = 0;
+                    int besti = -1;
+                    for (j=0; j<100; j++)
                         for (i=0; i<sphres; i++)
                         {
                             if (reaches_spheroid[nodeno][i]->movability != MOV_FLXDESEL) continue;
@@ -3425,22 +3427,41 @@ _try_again:
                             float nearr = fmax(1, nearest1->distance_to(nearest2) / 2);
                             adjusted_potential *= nearr;
 
-                            // TODO: If residue is within any active_helix_rots region, double the adjusted potential.
-
                             weight = (1.0 - ((1.0 - weight) / adjusted_potential)) / 2;
 
-                            if ( frand(0,100) < 1 && frand(0,1) < weight )
+                            // If residue is within any active_helix_rots region, increase the odds.
+                            if (active_helix_rots.size())
                             {
-                                reaches_spheroid[nodeno][i]->movability = MOV_FLEXONLY;
-                                flexible_resnos.push_back(reaches_spheroid[nodeno][i]->get_residue_no());
-                                #if _dbg_flexion_selection
-                                cout << "Selected " << reaches_spheroid[nodeno][i]->get_name()
-                                     << " for flexion with a weight of " << weight << endl;
-                                #endif
-                                goto _flexion_selected;
+                                int l, n = active_helix_rots.size(), resno = reaches_spheroid[nodeno][i]->get_residue_no();
+                                for (l=0; l<n; l++)
+                                {
+                                    if (resno >= active_helix_rots[l].start_resno && resno <= active_helix_rots[l].end_resno)
+                                    {
+                                        weight *= 2;
+                                    }
+                                }
+                            }
+
+                            #if _dbg_flexion_selection
+                            /*if (reaches_spheroid[nodeno][i]->get_residue_no() == 262)
+                                cout << reaches_spheroid[nodeno][i]->get_name() << " has weight " << weight << endl;*/
+                            #endif
+
+                            if ( weight >= bestwt && frand(0,1) < weight )
+                            {
+                                besti = i;
+                                bestwt = weight;
                             }
                         }
-                    _flexion_selected:
+                    if (besti >= 0)
+                    {
+                        reaches_spheroid[nodeno][besti]->movability = MOV_FLEXONLY;
+                        flexible_resnos.push_back(reaches_spheroid[nodeno][besti]->get_residue_no());
+                        #if _dbg_flexion_selection
+                        cout << "Selected " << reaches_spheroid[nodeno][besti]->get_name()
+                                << " for flexion with a weight of " << bestwt << endl;
+                        #endif
+                    }
                     another_flex = (frand(0,1) < 0.6);
                 }
                 

@@ -285,18 +285,27 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                 int n;
                 for (n=0; laa[n]; n++);         // Get count.
                 Molecule* interactors[n+4];
+                MovabilityType wasmov[n+4];
 
                 l = 0;
                 interactors[l++] = residues[i];
                 for (j=0; j<n; j++)
                 {
                     if (residues[i]->get_intermol_clashes(laa[j]) > 5)
-                        interactors[l++] = laa[j];
+                    {
+                        interactors[l] = laa[j];
+                        wasmov[l] = laa[j]->movability;
+                        laa[j]->movability = MOV_FLEXONLY;
+                        l++;
+                    }
                 }
 
                 interactors[l] = nullptr;
 
                 Molecule::multimol_conform(interactors, 5);
+
+                for (l=0; interactors[l]; l++)
+                    interactors[l]->movability = wasmov[l];
             }
         }
 

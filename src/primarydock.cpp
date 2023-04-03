@@ -3415,6 +3415,7 @@ _try_again:
                         {
                             if (reaches_spheroid[nodeno][i]->movability != MOV_FLXDESEL) continue;
                             float weight = reaches_spheroid[nodeno][i]->get_aa_definition()->flexion_probability;
+                            if (!weight) continue;
 
                             // Multiply weight by unrealized ligand binding potential.
                             float potential = reaches_spheroid[nodeno][i]->get_intermol_potential(ligand, true);

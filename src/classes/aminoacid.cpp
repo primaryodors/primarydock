@@ -1432,6 +1432,7 @@ void AminoAcid::load_aa_defs()
                             if (words[5])
                             {
                                 aa_defs[idx].flexion_probability = atof(words[5]);
+                                if (aa_defs[idx].flexion_probability < 0 || aa_defs[idx].flexion_probability > 1) throw 0xbadf1ec5;
                             }
                         }
                     }

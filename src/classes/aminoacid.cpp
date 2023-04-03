@@ -1425,16 +1425,15 @@ void AminoAcid::load_aa_defs()
                     {
                         aa_defs[idx].SMILES = words[3];
                         if (strstr(aa_defs[idx].SMILES.c_str(), "N1")) aa_defs[idx].proline_like = proline_like = true;
-                    }
 
-                    if (words[4])
-                    {
-                        aa_defs[idx].sidechain_pKa = atof(words[4]);
-                    }
-
-                    if (words[5])
-                    {
-                        aa_defs[idx].flexion_probability = atof(words[5]);
+                        if (words[4])
+                        {
+                            aa_defs[idx].sidechain_pKa = atof(words[4]);
+                            if (words[5])
+                            {
+                                aa_defs[idx].flexion_probability = atof(words[5]);
+                            }
+                        }
                     }
 
                     tbdctr++;

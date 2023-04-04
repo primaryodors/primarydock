@@ -77,12 +77,20 @@ foreach ($data as $rcpid => $ligdata)
         if ($r["Actual"] == "Agonist")
         {
             $agonists++;
-            if ($r["Actual"] != $data[$rcpid][$ligand]["Predicted"]) $fn++;
+            if ($r["Actual"] != $data[$rcpid][$ligand]["Predicted"])
+            {
+                $fn++;
+                echo "False negative: $rcpid - $ligand\n";
+            }
         }
         else
         {
             $nonagonists++;
-            if ($r["Actual"] != $data[$rcpid][$ligand]["Predicted"]) $fp++;
+            if ($r["Actual"] != $data[$rcpid][$ligand]["Predicted"])
+            {
+                $fp++;
+                echo "False positive: $rcpid - $ligand\n";
+            }
         }
     }
 }

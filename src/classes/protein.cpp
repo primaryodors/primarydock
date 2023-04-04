@@ -269,7 +269,7 @@ void Protein::end_pdb(FILE* os)
 float Protein::get_internal_clashes(int sr, int er, bool repack)
 {
     if (!residues) return 0;
-    int i, j, l;
+    int i, j, l, m;
     float result = 0;
     for (i=0; residues[i]; i++)
     {
@@ -285,36 +285,44 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                 int n;
                 for (n=0; laa[n]; n++);         // Get count.
                 Molecule* interactors[n+4];
+                Molecule* backdrop[n+4];
                 MovabilityType wasmov[n+4];
 
-                l = 0;
+                l = m = 0;
                 interactors[l++] = residues[i];
                 #if _dbg_repack
-                //
+                std::string dbgresstr;
                 #endif
                 for (j=0; j<n; j++)
                 {
                     if (residues[i]->get_intermol_clashes(laa[j]) > 3)
                     {
-                        interactors[l] = laa[j];
                         #if _dbg_repack
-                        if (l == 1) cout << "Repacking " << residues[i]->get_name() << " with ";
-                        cout << laa[j]->get_name() << " ";
+                        dbgresstr += (std::string)" " + (std::string)laa[j]->get_name();
                         #endif
+                        interactors[l] = laa[j];
                         wasmov[l] = laa[j]->movability;
                         laa[j]->movability = MOV_FLEXONLY;
                         l++;
                     }
+                    else
+                    {
+                        #if _dbg_repack
+                        dbgresstr += (std::string)" [" + (std::string)laa[j]->get_name() + (std::string)"]";
+                        #endif
+                        backdrop[m++] = laa[j];
+                    }
                 }
 
                 interactors[l] = nullptr;
+                backdrop[m] = nullptr;
                 if (l > 1)
                 {
                     #if _dbg_repack
-                    cout << "..." << endl;
+                    cout << "Repacking " << residues[i]->get_name() << " with" << dbgresstr << "..." << endl;
                     #endif
 
-                    Molecule::multimol_conform(interactors, 15);
+                    Molecule::multimol_conform(interactors, backdrop, 15);
                 }
 
                 for (l=0; interactors[l]; l++)

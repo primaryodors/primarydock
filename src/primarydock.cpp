@@ -3042,6 +3042,8 @@ _try_again:
                         protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
                             active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
 
+                        protein->get_internal_clashes(active_helix_rots[j].start_resno, active_helix_rots[j].end_resno, true);
+
                         if (wrote_acvmr < (j+wroteoff) )
                         {
                             Point ptaxis = active_helix_rots[j].axis;

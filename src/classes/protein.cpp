@@ -289,11 +289,17 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
 
                 l = 0;
                 interactors[l++] = residues[i];
+                #if _dbg_repack
+                cout << "Repacking " << residues[i]->get_name() << " with ";
+                #endif
                 for (j=0; j<n; j++)
                 {
                     if (residues[i]->get_intermol_clashes(laa[j]) > 5)
                     {
                         interactors[l] = laa[j];
+                        #if _dbg_repack
+                        cout << laa[j]->get_name() << " ";
+                        #endif
                         wasmov[l] = laa[j]->movability;
                         laa[j]->movability = MOV_FLEXONLY;
                         l++;
@@ -301,8 +307,11 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                 }
 
                 interactors[l] = nullptr;
+                #if _dbg_repack
+                cout << "..." << endl;
+                #endif
 
-                Molecule::multimol_conform(interactors, 5);
+                Molecule::multimol_conform(interactors, 15);
 
                 for (l=0; interactors[l]; l++)
                     interactors[l]->movability = wasmov[l];

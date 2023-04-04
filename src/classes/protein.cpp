@@ -307,10 +307,14 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                     }
                     else
                     {
-                        #if _dbg_repack
-                        dbgresstr += (std::string)" [" + (std::string)laa[j]->get_name() + (std::string)"]";
-                        #endif
-                        backdrop[m++] = laa[j];
+                        Atom* laaa = laa[j]->get_nearest_atom(residues[i]->get_CA_location());
+                        if (laaa->distance_to(residues[i]->get_atom("CA")) < residues[i]->get_reach())
+                        {
+                            #if _dbg_repack
+                            dbgresstr += (std::string)" [" + (std::string)laa[j]->get_name() + (std::string)"]";
+                            #endif
+                            backdrop[m++] = laa[j];
+                        }
                     }
                 }
 

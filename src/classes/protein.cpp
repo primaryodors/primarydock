@@ -349,6 +349,11 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
     return result;
 }
 
+float Protein::get_rel_int_clashes()
+{
+    return get_internal_clashes(0, 0, false) - initial_int_clashes;
+}
+
 float Protein::get_internal_binding()
 {
     if (!residues) return 0;

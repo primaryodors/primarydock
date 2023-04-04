@@ -166,6 +166,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     $benerg = [];
     $polsat = [];
+    $pclash = [];
     $acvth = [];
     $scenerg = [];
     $vdwrpl = [];
@@ -241,6 +242,14 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             continue;
         }
 
+        if ($pose && $node>=0 && substr($ln, 0, 15) == "Protein clashes")
+        {
+            // echo "$ln\n";
+            $pclash[$pose][$node] = floatval(explode(": ", $ln)[1]);
+            $dosce = false;
+            continue;
+        }
+
         if ($pose && $node>=0 && strpos($ln, " active theta: "))
         {
             // echo "$ln\n";
@@ -301,6 +310,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     $sum = [];
     $sumps = [];
+    $sumpc = [];
     $sumat = [];
     $count = [];
     $countat = [];
@@ -321,6 +331,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             
             $sum[$node] += $value * $bias;
             $sumps[$node] += $polsat[$pose][$node] * $bias;
+            $sumpc[$node] += $pclash[$pose][$node] * $bias;
             $count[$node] += $bias;
 
             if (@$acvth[$pose][$node])
@@ -439,6 +450,11 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     foreach ($sumps as $node => $value)
     {
         $average["{$metrics_prefix}PolSat.$node"] = round($value / (@$count[$node] ?: 1), 3);
+    }
+
+    foreach ($sumpc as $node => $value)
+    {
+        $average["{$metrics_prefix}PClash.$node"] = round($value / (@$count[$node] ?: 1), 3);
     }
 
     foreach ($sumat as $node => $values)

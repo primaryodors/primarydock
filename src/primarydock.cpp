@@ -49,6 +49,7 @@ struct DockResult
     float proximity;                    // How far the ligand center is from the node's center.
     float tripswitch;                   // Effect of the ligand on the receptor's trip switch.
     float polsat;
+    float protclash;
 };
 
 enum HxRotAxisType
@@ -4442,8 +4443,9 @@ _try_again:
             dr[drcount][nodeno].imkJmol    = new float[metcount];
             dr[drcount][nodeno].mvdWrepl    = new float[metcount];
             dr[drcount][nodeno].imvdWrepl    = new float[metcount];
-            dr[drcount][nodeno].tripswitch    = tripclash;
-            dr[drcount][nodeno].proximity      = ligand->get_barycenter().get_3d_distance(nodecen);
+            dr[drcount][nodeno].tripswitch  = tripclash;
+            dr[drcount][nodeno].proximity  = ligand->get_barycenter().get_3d_distance(nodecen);
+            dr[drcount][nodeno].protclash = protein->get_rel_int_clashes();
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
@@ -4790,6 +4792,9 @@ _try_again:
 
                         if (output) *output << "Proximity: " << dr[j][k].proximity << endl << endl;
                         cout << "Proximity: " << dr[j][k].proximity << endl << endl;
+
+                        if (output) *output << "Protein clashes: " << dr[j][k].protclash << endl << endl;
+                        cout << "Protein clashes: " << dr[j][k].protclash << endl << endl;
 
                         if (tripswitch_clashables.size())
                         {

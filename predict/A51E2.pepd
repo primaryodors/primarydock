@@ -283,6 +283,8 @@ LET @point = @in[%i] + @delta_m
 PTALIGN @point @an[%i] @am[%i] @axis &theta
 # ECHO "ALIGN " @point " " @an[%i] " " @am[%i]
 
+&theta *= -1
+
 ECHO "	'TMR" %i ".n' => [ " ~
 
 IF @delta_m.x >= 0 ECHO " " ~
@@ -304,6 +306,8 @@ ECHO &theta " ],"
 
 LET @point = @ic[%i] + @delta_m
 PTALIGN @point @ac[%i] @am[%i] @axis &theta
+
+&theta *= -1
 
 ECHO "	'TMR" %i ".c' => [ " ~
 

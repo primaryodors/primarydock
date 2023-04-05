@@ -57,7 +57,8 @@ enum HxRotAxisType
     hxrat_Cartesian,
     hxrat_region,
     hxrat_BW,
-    hxrat_atom
+    hxrat_atom,
+    hxrat_helical
 };
 
 struct AcvHxRot
@@ -1344,6 +1345,11 @@ int interpret_config_line(char** words)
             ahr.axis_type = hxrat_atom;
             ahr.axis_str = words[n+1];
             n += 2;
+        }
+        else if (!strcmp(words[n], "helical"))
+        {
+            ahr.axis_type = hxrat_helical;
+            n += 1;
         }
         else
         {
@@ -3028,6 +3034,47 @@ _try_again:
                             #if _dbg_hxrax
                             cout << "Helix rotation set for axis " << (Point)active_helix_rots[j].axis << endl;
                             #endif
+                        }
+                        else if (active_helix_rots[j].axis_type == hxrat_helical)
+                        {
+                            Point Navg, Cavg;
+                            int Ndiv=0, Cdiv=0;
+                            int lres;
+
+                            for (lres = active_helix_rots[j].start_resno+3; lres >= active_helix_rots[j].start_resno; lres--)
+                            {
+                                AminoAcid* aa = protein->get_residue(lres);
+                                if (aa)
+                                {
+                                    Navg = Navg.add(aa->get_CA_location());
+                                    Ndiv++;
+                                }
+                            }
+                            if (!Ndiv)
+                            {
+                                cout << "Not enough N terminus residues for helical rotation." << endl;
+                                throw 0xbad1207;
+                            }
+                            else Navg.scale(Navg.magnitude() / Ndiv);
+
+                            for (lres = active_helix_rots[j].end_resno-3; lres <= active_helix_rots[j].end_resno; lres++)
+                            {
+                                AminoAcid* aa = protein->get_residue(lres);
+                                if (aa)
+                                {
+                                    Cavg = Cavg.add(aa->get_CA_location());
+                                    Cdiv++;
+                                }
+                            }
+                            if (!Cdiv)
+                            {
+                                cout << "Not enough C terminus residues for helical rotation." << endl;
+                                throw 0xbad1207;
+                            }
+                            else Cavg.scale(Cavg.magnitude() / Cdiv);
+
+                            active_helix_rots[j].axis = Cavg.subtract(Navg);
+                            CC%2FC%3DCCC%2FC%3DC%2FC%23N
                         }
 
                         int sr = active_helix_rots[j].start_resno;

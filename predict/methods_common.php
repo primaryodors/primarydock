@@ -13,6 +13,11 @@ echo date("Y-m-d H:i:s.u\n");
 $method = explode("_", $_SERVER['PHP_SELF'])[1];
 $method = explode(".", $method)[0];
 
+$result = $output = false;
+chdir(__DIR__);
+chdir("..");
+exec("make primarydock", $output, $result);
+if ($result) die("Build fail.\n".print_r($output, true));
 
 // Configurable variables
 $dock_retries = 5;
@@ -135,6 +140,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     fwrite($f, $configf);
     fclose($f);
 
+    $retvar = 0;
+
     $outlines = [];
     if (@$_REQUEST['saved'])
     {
@@ -150,19 +157,19 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             $cmd = "bin/primarydock \"$cnfname\"";
             if ($elim) $cmd .= " --elim $elim";
             echo "$cmd\n";
-            passthru($cmd);
+            passthru($cmd, $retvar);
             $outlines = explode("\n", file_get_contents($outfname));
             if (count($outlines) >= 200) break;
             if (!$elim) $elim = 99;
             else $elim *= 1.333;
         }
     }
-    
-    unlink($cnfname);
 
     if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
 
-    if (count($outlines) < 100) die("Docking FAILED.\n");
+    if ($retvar || (count($outlines) < 100)) die("Docking FAILED.\n");
+    
+    unlink($cnfname);
 
     $benerg = [];
     $polsat = [];

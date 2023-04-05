@@ -81,7 +81,7 @@ PROT $pdbfname
 LIG sdf/$ligname.sdf
 
 CEN RES 4.57 4.60 5.39
-PATH 1 REL 0 0 0
+PATH 1 RES 4.57 4.60 5.39 6.59
 
 REQSR ALL 4.57 4.60 5.39
 

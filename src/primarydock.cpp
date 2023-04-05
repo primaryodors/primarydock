@@ -2282,7 +2282,7 @@ int main(int argc, char** argv)
     {
         for (i=2; words[i]; i++)
         {
-            extra_wt.push_back(atoi(words[i]));
+            extra_wt.push_back(interpret_resno(words[i]));
         }
     }
     pktset = true;
@@ -3341,7 +3341,7 @@ _try_again:
                     extra_wt.clear();
                     for (i=2; words[i]; i++)
                     {
-                        extra_wt.push_back(atoi(words[i]));
+                        extra_wt.push_back(interpret_resno(words[i]));
                     }
                 }
 
@@ -3413,7 +3413,7 @@ _try_again:
                 {
                     float bestwt = 0;
                     int besti = -1;
-                    for (j=0; j<3; j++)
+                    for (j=0; j<100; j++)
                         for (i=0; i<sphres; i++)
                         {
                             if (reaches_spheroid[nodeno][i]->movability != MOV_FLXDESEL) continue;
@@ -3431,7 +3431,8 @@ _try_again:
                             float nearr = fmax(1, nearest1->distance_to(nearest2) / 2);
                             adjusted_potential *= nearr;
 
-                            weight = (1.0 - ((1.0 - weight) / adjusted_potential)) / 2;
+                            // weight = (1.0 - ((1.0 - weight) / adjusted_potential)) / 2;
+                            weight *= sqrt(adjusted_potential);
 
                             // If residue is within any active_helix_rots region, increase the odds.
                             if (active_helix_rots.size())
@@ -3441,17 +3442,32 @@ _try_again:
                                 {
                                     if (resno >= active_helix_rots[l].start_resno && resno <= active_helix_rots[l].end_resno)
                                     {
-                                        weight *= 2;
+                                        weight *= 1.5;
+                                    }
+                                }
+                            }
+
+                            if (extra_wt.size())
+                            {
+                                int l, n = extra_wt.size(), resno = reaches_spheroid[nodeno][i]->get_residue_no();
+                                for (l=0; l<n; l++)
+                                {
+                                    if (resno == extra_wt[l])
+                                    {
+                                        weight *= 20;
+                                        #if _dbg_flexion_selection
+                                        // cout << resno << " boosted." << endl;
+                                        #endif
                                     }
                                 }
                             }
 
                             #if _dbg_flexion_selection
-                            /*if (reaches_spheroid[nodeno][i]->get_residue_no() == 262)
-                                cout << reaches_spheroid[nodeno][i]->get_name() << " has weight " << weight << endl;*/
+                            if (reaches_spheroid[nodeno][i]->get_residue_no() == 9262)
+                                cout << reaches_spheroid[nodeno][i]->get_name() << " has weight " << weight << endl;
                             #endif
 
-                            if ( weight >= bestwt && frand(0,1) < weight )
+                            if ( /*weight >= bestwt &&*/ frand(0,100) < weight )
                             {
                                 besti = i;
                                 bestwt = weight;

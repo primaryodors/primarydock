@@ -440,6 +440,8 @@ std::string soft_names;
 std::vector<Region> soft_rgns;
 std::vector<SoftBias> soft_biases;
 std::vector<int>flexible_resnos;
+std::vector<ResiduePlaceholder>forced_flexible_resnos;
+std::vector<ResiduePlaceholder>forced_static_resnos;
 
 float rgnxform_r[PROT_MAX_RGN], rgnxform_theta[PROT_MAX_RGN], rgnxform_y[PROT_MAX_RGN];
 float rgnrot_alpha[PROT_MAX_RGN], rgnrot_w[PROT_MAX_RGN], rgnrot_u[PROT_MAX_RGN];
@@ -1292,6 +1294,30 @@ int interpret_config_line(char** words)
         flex = (atoi(words[1]) != 0);
         optsecho = "Flex: " + (std::string)(flex ? "ON" : "OFF");
         return 1;
+    }
+    else if (!strcmp(words[0], "FLXR"))
+    {
+        i = 1;
+        while (words[i])
+        {
+            ResiduePlaceholder rph;
+            rph.set(words[i]);
+            forced_flexible_resnos.push_back(rph);
+            i++;
+        }
+        return i-1;
+    }
+    else if (!strcmp(words[0], "STCR"))
+    {
+        i = 1;
+        while (words[i])
+        {
+            ResiduePlaceholder rph;
+            rph.set(words[i]);
+            forced_static_resnos.push_back(rph);
+            i++;
+        }
+        return i-1;
     }
     else if (!strcmp(words[0], "H2O"))
     {
@@ -3439,6 +3465,22 @@ _try_again:
             // Flexion Selection
             if (flex && !nodeno)
             {
+                if (forced_static_resnos.size())
+                {
+                    for (i=0; i<forced_static_resnos.size(); i++)
+                    {
+                        forced_static_resnos[i].resolve_resno(protein);
+                        AminoAcid* mvaa = protein->get_residue(forced_static_resnos[i].resno);
+                        if (mvaa)
+                        {
+                            mvaa->movability = MOV_NONE;
+                            #if _dbg_flexion_selection
+                            cout << mvaa->get_name() << " forced static." << endl;
+                            #endif
+                        }
+                    }
+                }
+
                 flexible_resnos.clear();
                 j = protein->get_end_resno();
                 for (i=protein->get_start_resno(); i<=j; i++)
@@ -3532,9 +3574,29 @@ _try_again:
                 }
                 
                 #if _dbg_flexion_selection
-                cout << flexible_resnos.size() << " residues selected for flexion." << endl << endl;
+                cout << flexible_resnos.size() << " residues selected for flexion." << endl;
                 #endif
+
+                if (forced_flexible_resnos.size())
+                {
+                    for (i=0; i<forced_flexible_resnos.size(); i++)
+                    {
+                        forced_flexible_resnos[i].resolve_resno(protein);
+                        AminoAcid* mvaa = protein->get_residue(forced_flexible_resnos[i].resno);
+                        if (mvaa)
+                        {
+                            mvaa->movability = MOV_FLEXONLY;
+                            #if _dbg_flexion_selection
+                            cout << mvaa->get_name() << " forced flexible." << endl;
+                            #endif
+                        }
+                    }
+                }
             }
+
+            #if _dbg_flexion_selection
+            cout << endl;
+            #endif
 
             for (i=0; i<sphres; i++)
             {

@@ -330,8 +330,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             if (!isset($count[$node])) $count[$node] = 0;
             
             $sum[$node] += $value * $bias;
-            $sumps[$node] += $polsat[$pose][$node] * $bias;
-            $sumpc[$node] += $pclash[$pose][$node] * $bias;
+            $sumps[$node] += @$polsat[$pose][$node] * $bias;
+            $sumpc[$node] += @$pclash[$pose][$node] * $bias;
             $count[$node] += $bias;
 
             if (@$acvth[$pose][$node])

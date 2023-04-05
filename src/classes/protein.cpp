@@ -728,6 +728,7 @@ int Protein::load_pdb(FILE* is, int rno)
     // cout << "Read residue " << *residues[rescount] << endl;
     residues[rescount] = 0;
 
+    res_can_clash = nullptr;
     set_clashables();
 
     int l;
@@ -854,6 +855,7 @@ void Protein::set_clashables(int resno, bool recursed)
             delete[] res_can_clash;
         }
         res_can_clash = new AminoAcid**[maxres+1];
+        for (i=0; i<=maxres; i++) res_can_clash[i] = nullptr;
     }
 
     int sr = get_start_resno(), er = get_end_resno();

@@ -308,7 +308,7 @@
 #define _dbg_mand_conn 0
 #define _dbg_flexion_selection 0
 #define _dbg_null_flexions 0
-#define _dbg_repack 1
+#define _dbg_repack 0
 
 #endif
 

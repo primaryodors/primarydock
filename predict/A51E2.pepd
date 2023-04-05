@@ -1,0 +1,339 @@
+# Pepteditor script for deriving active-state conformational changes from human β2 adrenergic receptor.
+#
+
+# Load the inactive protein.
+LOAD "pdbs/OR51/OR51E2.upright.pdb"
+
+ECHO %SEQLEN
+ECHO $SEQUENCE
+ECHO ""
+
+LET %anchor = %TMR3.s / 2
+LET %anchor += %TMR3.e / 2
+LET @anchor = %anchor
+
+LET %termin = 4
+
+DELETE 1 3
+DELETE 306 9999
+
+# Obtain the inactive termini.
+
+LET @icene = 0
+LET @icenc = 0
+
+LET %i = 1
+_loop1:
+
+LET %odd = %i & 1
+LET %even = 1 - %odd
+
+LET %j = %TMR%i.s
+LET %n = 0
+LET @in[%i]  = 0
+_loopn2:
+LET @in[%i] += %j
+LET %j ++ 
+LET %n ++
+IF %n < %termin GOTO _loopn2
+
+LET @in[%i] /= %n
+
+
+LET %j = %TMR%i.s + %TMR%i.e
+LET %j /= 2
+LET %n = 0
+LET @im[%i]  = 0
+_loopmi:
+LET @im[%i] += %j
+LET %j ++ 
+LET %n ++
+# IF %n < %termin GOTO _loopmi
+
+LET @im[%i] /= %n
+
+
+# ECHO "TMR" %i ": Average of four residues starting at " %TMR%i.s " = " @in[%i]
+IF %odd  THEN LET @icene += @in[%i]
+IF %even THEN LET @icenc += @in[%i]
+
+LET %j = %TMR%i.e
+LET %n = 0
+LET @ic[%i]  = 0
+_loopn3:
+LET @ic[%i] += %j
+LET %j -- 
+LET %n ++
+IF %n < %termin GOTO _loopn3
+
+LET @ic[%i] /= %n
+IF %odd  THEN LET @icenc += @ic[%i]
+IF %even THEN LET @icene += @ic[%i]
+
+# ECHO "Got inactive start/end averages for TMR" %i "..."
+
+LET %i ++
+IF %i <= 7 GOTO _loop1
+
+
+
+# Load the active protein.
+LOAD "pdbs/OR51/OR51E2.8f76.pdb"
+
+ECHO %SEQLEN
+ECHO $SEQUENCE
+ECHO ""
+
+UPRIGHT
+
+LET @e3 = [15.360,-16.429,-23.026]
+LET @sub = [-12.132,-48.350,17.054]
+LET @cen = @e3 - @sub
+
+# CENTER @cen
+
+
+
+# Align active TMR3 to have the same n and c locations.
+
+# ALIGN 1 9999 %termin %TMR3.s @in[3] %TMR3.e @ic[3]
+ALIGN 1 9999 1 %anchor @anchor %TMR3.e @ic[3]
+
+
+
+# Obtain the active helix termini.
+
+LET @global = 0
+
+LET %i = 1
+_loop:
+
+LET %j = %TMR%i.s
+LET %n = 0
+LET @an[%i]  = 0
+_loopn:
+LET @an[%i] += %j
+LET %j ++ 
+LET %n ++
+IF %n < %termin GOTO _loopn
+
+LET @an[%i] /= %n
+
+LET @temp = @an[%i] - @in[%i]
+LET @global += @temp
+
+
+LET %j = %TMR%i.s + %TMR%i.e
+LET %j /= 2
+LET %n = 0
+LET @am[%i]  = 0
+_loopm:
+LET @am[%i] += %j
+LET %j ++ 
+LET %n ++
+# IF %n < %termin GOTO _loopm
+
+LET @am[%i] /= %n
+
+LET @temp = @am[%i] - @im[%i]
+LET @global += @temp
+
+
+LET %j = %TMR%i.e
+LET %n = 0
+LET @ac[%i]  = 0
+_loopn1:
+LET @ac[%i] += %j
+LET %j -- 
+LET %n ++
+IF %n < %termin GOTO _loopn1
+
+LET @ac[%i] /= %n
+
+LET @temp = @ac[%i] - @ic[%i]
+LET @global += @temp
+
+
+LET %i ++
+IF %i <= 7 GOTO _loop
+
+LET @global /= 21
+
+
+
+# Remove global transform.
+
+LET %i = 1
+_loopgt:
+
+LET @an[%i] -= @global
+LET @am[%i] -= @global
+LET @ac[%i] -= @global
+
+LET %i ++
+IF %i <= 7 GOTO _loopgt
+
+
+
+
+# Output the directionals.
+
+ECHO "# Directionals from A51E2.pepd:"
+ECHO "$direction ="
+ECHO "["
+
+LET %i = 1
+_loop2a:
+
+ECHO "	'TMR" %i "' => [ " ~
+IF @in[%i].x >= 0 ECHO " " ~
+IF @in[%i].x < 10 AND @in[%i].x > -10 ECHO " " ~
+ECHO @in[%i].x ", " ~
+IF @in[%i].y >= 0 ECHO " " ~
+IF @in[%i].y < 10 AND @in[%i].y > -10 ECHO " " ~
+ECHO @in[%i].y ", " ~
+IF @in[%i].z >= 0 ECHO " " ~
+IF @in[%i].z < 10 AND @in[%i].z > -10 ECHO " " ~
+ECHO @in[%i].z ", " ~
+IF @im[%i].x >= 0 ECHO " " ~
+IF @im[%i].x < 10 AND @im[%i].x > -10 ECHO " " ~
+ECHO @im[%i].x ", " ~
+IF @im[%i].y >= 0 ECHO " " ~
+IF @im[%i].y < 10 AND @im[%i].y > -10 ECHO " " ~
+ECHO @im[%i].y ", " ~
+IF @im[%i].z >= 0 ECHO " " ~
+IF @im[%i].z < 10 AND @im[%i].z > -10 ECHO " " ~
+ECHO @im[%i].z ", " ~
+IF @ic[%i].x >= 0 ECHO " " ~
+IF @ic[%i].x < 10 AND @ic[%i].x > -10 ECHO " " ~
+ECHO @ic[%i].x ", " ~
+IF @ic[%i].y >= 0 ECHO " " ~
+IF @ic[%i].y < 10 AND @ic[%i].y > -10 ECHO " " ~
+ECHO @ic[%i].y ", " ~
+IF @ic[%i].z >= 0 ECHO " " ~
+IF @ic[%i].z < 10 AND @ic[%i].z > -10 ECHO " " ~
+ECHO @ic[%i].z " ],"
+
+LET %i ++
+
+IF %i <= 7 GOTO _loop2a
+ECHO "];"
+ECHO ""
+
+
+
+# Output the deltas.
+
+ECHO "# Activation matrix from A51E2.pepd:"
+ECHO "$matrix ="
+ECHO "["
+
+LET %i = 1
+_loop2:
+
+LET @delta_n = @an[%i] - @in[%i]
+LET @delta_m = @am[%i] - @im[%i]
+LET @delta_c = @ac[%i] - @ic[%i]
+
+ECHO "	'TMR" %i "' => [ " ~
+IF @delta_n.x >= 0 ECHO " " ~
+ECHO @delta_n.x ", " ~
+IF @delta_n.y >= 0 ECHO " " ~
+ECHO @delta_n.y ", " ~
+IF @delta_n.z >= 0 ECHO " " ~
+ECHO @delta_n.z ", " ~
+IF @delta_m.x >= 0 ECHO " " ~
+ECHO @delta_m.x ", " ~
+IF @delta_m.y >= 0 ECHO " " ~
+ECHO @delta_m.y ", " ~
+IF @delta_m.z >= 0 ECHO " " ~
+ECHO @delta_m.z ", " ~
+IF @delta_c.x >= 0 ECHO " " ~
+ECHO @delta_c.x ", " ~
+IF @delta_c.y >= 0 ECHO " " ~
+ECHO @delta_c.y ", " ~
+IF @delta_c.z >= 0 ECHO " " ~
+ECHO @delta_c.z " ],"
+
+LET %i ++
+
+IF %i <= 7 GOTO _loop2
+ECHO "];"
+
+
+
+# Output the rotations.
+
+ECHO "# Active rotations from A51E2.pepd:"
+ECHO "$rotations ="
+ECHO "["
+
+LET %i = 1
+_looprot:
+
+# Origin will be the active m point.
+# Target will be the active n or c point.
+# Point will be the inactive n or c point plus the (active m minus inactive m).
+
+LET @delta_m = @am[%i] - @im[%i]
+# ECHO "Δm " @delta_m
+
+LET @point = @in[%i] + @delta_m
+# ECHO @point " = " @in[%i] " + " @delta_m
+PTALIGN @point @an[%i] @am[%i] @axis &theta
+# ECHO "ALIGN " @point " " @an[%i] " " @am[%i]
+
+ECHO "	'TMR" %i ".n' => [ " ~
+
+IF @delta_m.x >= 0 ECHO " " ~
+ECHO @delta_m.x ", " ~
+IF @delta_m.y >= 0 ECHO " " ~
+ECHO @delta_m.y ", " ~
+IF @delta_m.z >= 0 ECHO " " ~
+ECHO @delta_m.z ", " ~
+
+IF @axis.x >= 0 ECHO " " ~
+ECHO @axis.x ", " ~
+IF @axis.y >= 0 ECHO " " ~
+ECHO @axis.y ", " ~
+IF @axis.z >= 0 ECHO " " ~
+ECHO @axis.z ", " ~
+
+IF &theta > -10 AND &theta < 10 ECHO " " ~
+ECHO &theta " ],"
+
+LET @point = @ic[%i] + @delta_m
+PTALIGN @point @ac[%i] @am[%i] @axis &theta
+
+ECHO "	'TMR" %i ".c' => [ " ~
+
+IF @delta_m.x >= 0 ECHO " " ~
+ECHO @delta_m.x ", " ~
+IF @delta_m.y >= 0 ECHO " " ~
+ECHO @delta_m.y ", " ~
+IF @delta_m.z >= 0 ECHO " " ~
+ECHO @delta_m.z ", " ~
+
+IF @axis.x >= 0 ECHO " " ~
+ECHO @axis.x ", " ~
+IF @axis.y >= 0 ECHO " " ~
+ECHO @axis.y ", " ~
+IF @axis.z >= 0 ECHO " " ~
+ECHO @axis.z ", " ~
+
+IF &theta > -10 AND &theta < 10 ECHO " " ~
+ECHO &theta " ],"
+ECHO ""
+
+LET %i ++
+
+IF %i <= 7 GOTO _looprot
+ECHO "];"
+
+
+
+
+# DUMP
+
+
+

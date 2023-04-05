@@ -3074,7 +3074,6 @@ _try_again:
                             else Cavg.scale(Cavg.magnitude() / Cdiv);
 
                             active_helix_rots[j].axis = Cavg.subtract(Navg);
-                            CC%2FC%3DCCC%2FC%3DC%2FC%23N
                         }
 
                         int sr = active_helix_rots[j].start_resno;

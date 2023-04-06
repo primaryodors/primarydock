@@ -573,7 +573,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     }
     #endif
 
-    if (achg && sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2); // / pow( (r<2) ? 1 : (r/2), 2 );
+    if (achg && sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2);
     if (apol>0 && sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
 
     bool atoms_are_bonded = a->is_bonded_to(b);

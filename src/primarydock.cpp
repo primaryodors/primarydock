@@ -3480,6 +3480,7 @@ _try_again:
                         }
                     }
                 }
+                #if flexion_selection
 
                 flexible_resnos.clear();
                 j = protein->get_end_resno();
@@ -3592,6 +3593,7 @@ _try_again:
                         }
                     }
                 }
+                #endif
             }
 
             #if _dbg_flexion_selection

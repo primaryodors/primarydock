@@ -104,7 +104,7 @@
 // Warning - increasing these constants significantly above their stable branch values
 // will cause docking fails in the Big Three tests.
 #define polar_repulsion 35.0
-#define charge_repulsion 120.0
+#define charge_repulsion 30.0
 
 #define lmpush 0.0005
 

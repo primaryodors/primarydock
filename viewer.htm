@@ -1638,7 +1638,7 @@ function showPose(p)
             if (is_ligand[i]) curr_ligand = model[i];
         }
         else
-            model[i].removeAllRepresentations();
+            if (model[i].name != 'ligand') model[i].removeAllRepresentations();
 
         if (mpos[i] > pmax) pmax = mpos[i];
 
@@ -1713,7 +1713,7 @@ function showNode(n)
             if (is_ligand[i]) curr_ligand = model[i];
         }
         else
-            model[i].removeAllRepresentations();
+		if (model[i].name != 'ligand') model[i].removeAllRepresentations();
 
         if (mpos[i] == gpose && mnod[i] > nmax) nmax = mnod[i];
     }

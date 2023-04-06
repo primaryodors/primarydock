@@ -2654,7 +2654,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
         for (i = 0; mm[i]; i++)
         {
             #if _dbg_multiflex
-            cout << mm[i]->name << endl;
+            // cout << iter << ":" << mm[i]->name << endl;
             #endif
 
             bool nearby[alllen+4];
@@ -3246,20 +3246,20 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     #endif
 
                     #if multiflex
-                    if (residue && !iter) // !(iter % _fullrot_every))
+                    if (residue && iter == _fullrot_every)
                     {
                         #if _dbg_multiflex
                         cout << "Iter " << iter << " multiflexing " << mm[i]->get_name() << endl;
                         #endif
 
                         int k1, k2, k3, k4;
-                        int kn;
-                        for (kn=0; mm[i]->rotatable_bonds[kn]; kn++);   // get count.
-                        int l1 = (kn>=1 ? _multiflex_stepdiv : 0),
-                            l2 = (kn>=2 ? _multiflex_stepdiv : 0),
-                            l3 = (kn>=3 ? _multiflex_stepdiv : 0),
-                            l4 = (kn>=4 ? _multiflex_stepdiv : 0);
-                        
+                        int kn=0;
+                        for (k=0; mm[i]->rotatable_bonds[k]; k++);   // get count.
+                        int l1 = ((kn>=1 && mm[i]->rotatable_bonds[0]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0),
+                            l2 = ((kn>=2 && mm[i]->rotatable_bonds[1]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0),
+                            l3 = ((kn>=3 && mm[i]->rotatable_bonds[2]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0),
+                            l4 = ((kn>=4 && mm[i]->rotatable_bonds[3]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0);
+
                         bind = 0;
                         for (j=0; all[j]; j++)
                         {

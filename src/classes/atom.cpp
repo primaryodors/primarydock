@@ -1990,6 +1990,17 @@ int Bond::count_moves_with_btom()
     return i;
 }
 
+int Bond::count_heavy_moves_with_btom()
+{
+    if (!moves_with_btom) return 0;
+    int i, j=0;
+    for (i=0; moves_with_btom[i]; i++)
+    {
+        if (moves_with_btom[i]->get_Z() > 1) j++;
+    }
+    return j;
+}
+
 int Atom::num_rings()
 {
     if (!member_of) return 0;

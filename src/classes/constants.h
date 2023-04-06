@@ -164,6 +164,10 @@
 #define allow_linear_motion 1
 #define monte_carlo_axial 0
 #define monte_carlo_flex 1
+#define multiflex 1
+#define _multiflex_stepdiv 5
+#define _multiflex_stepdeg (360.0/_multiflex_stepdiv)
+#define _multiflex_steprad (fiftyseventh*_multiflex_stepdeg)
 
 // Drift pulls the ligand towards the loneliest point if it encounters clashes.
 // Turning it off can cause the ligand to be ejected from the protein.
@@ -309,6 +313,7 @@
 #define _dbg_flexion_selection 0
 #define _dbg_null_flexions 0
 #define _dbg_repack 0
+#define _dbg_multiflex 1
 
 #endif
 

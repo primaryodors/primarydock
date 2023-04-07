@@ -82,8 +82,6 @@ foreach ($rotations as $region => $values)
 		$mr = intval(($sr + $er) / 2);
 	}
 
-	if (substr($region, -1) == 'n') $er = $mr;
-	if (substr($region, -1) == 'c') $sr = $mr;
 	$acv_matrix .= "ACVHXR $region $sr $er $mr " . implode(" ", $values)."\n";
 }
 

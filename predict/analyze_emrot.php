@@ -1,15 +1,5 @@
 <?php
 
-/*
-// Axial tumble
-// No mol fullrot iter
-$filename = "dock_results_sweep6.twcuog.json";
-$threshold = 100;
-$leniency  = 500;
-// OR51E2: 9 correct predictions out of 11 total (6 agonists / 5 other), 1 false positives / 1 false negatives, 81.82% accuracy.
-
-*/
-
 $filename = "dock_results_emrots.json";
 $threshold = 100;
 $leniency  = 500;

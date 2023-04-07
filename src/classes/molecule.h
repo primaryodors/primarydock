@@ -24,6 +24,7 @@ enum MovabilityType
 {
     MOV_ALL			= 0x1000,
     MOV_NORECEN		=  0x200,
+    MOV_FORCEFLEX   =   0xc0,
     MOV_FLEXONLY	=   0x80,
     MOV_PINNED      =   0x7f,
     MOV_FLXDESEL    =    0x8,

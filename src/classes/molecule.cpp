@@ -2653,10 +2653,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
         float search_radius = search_expansion*iter + 4;
         for (i = 0; mm[i]; i++)
         {
-            #if _dbg_multiflex
-            // cout << iter << ":" << mm[i]->name << endl;
-            #endif
-
             bool nearby[alllen+4];
             Point icen = mm[i]->get_barycenter();
 
@@ -2712,6 +2708,11 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             float reversal = -0.999;
             float lreversal = -pow(0.1, 2.0/iters);
             float accel = 1.01;
+
+
+            #if _dbg_multiflex
+            // cout << iter << ":" << mm[i]->name << " " << mm[i]->movability << endl;
+            #endif
 
             /**** Linear Motion ****/
             #if allow_linear_motion
@@ -3197,7 +3198,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 if (mm[i]->rotatable_bonds && mm[i]->rotatable_bonds[0] && mm[i]->rotatable_bonds[0]->atom)
                     residue = mm[i]->rotatable_bonds[0]->atom->residue;
 
-                if (mm[i]->movability == MOV_FLEXONLY)
+                if (mm[i]->movability < MOV_NORECEN)
                 {
                     bind = 0;
                     for (j=0; all[j]; j++)
@@ -3246,7 +3247,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     #endif
 
                     #if multiflex
-                    if (residue && iter == _fullrot_every)
+                    if (residue && iter == multiflex_iter)
                     {
                         #if _dbg_multiflex
                         cout << "Iter " << iter << " multiflexing " << mm[i]->get_name() << endl;

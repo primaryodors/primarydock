@@ -326,7 +326,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                     cout << "Repacking " << residues[i]->get_name() << " with" << dbgresstr << "..." << endl;
                     #endif
 
-                    Molecule::multimol_conform(interactors, backdrop, 15);
+                    Molecule::multimol_conform(interactors, backdrop, 13);
                 }
 
                 for (l=0; interactors[l]; l++)
@@ -450,6 +450,7 @@ void Protein::find_residue_initial_bindings()
         aab.aa1 = residues[i];
         for (j=0; aa[j]; j++)
         {
+            if (aa[j] == residues[i]) continue;
             float f = residues[i]->get_intermol_binding(aa[j]);
             ib += f;
             if (j > i && f > maxb)
@@ -461,7 +462,7 @@ void Protein::find_residue_initial_bindings()
 
         if (ib >= 5)
         {
-            residues[i]->movability = min(residues[i]->movability, MOV_PINNED);
+            if (residues[i]->movability != MOV_FORCEFLEX) residues[i]->movability = min(residues[i]->movability, MOV_PINNED);
             if (maxb >= 5) aabridges.push_back(aab);
         }
 

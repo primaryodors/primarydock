@@ -787,7 +787,7 @@ void iteration_callback(int iter)
                 // and output a warning if not.
 
                 float before = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                float pic = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, true);
+                float pic = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, repack_on_hxr);
                 before -= pic * _kJmol_cuA * soft_rock_clash_penalty;
                 
                 for (j=0; j<sphres; j++)
@@ -815,7 +815,7 @@ void iteration_callback(int iter)
                 #endif
 
                 float after = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                float pic1 = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, true);
+                float pic1 = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, repack_on_hxr);
                 pic1 -= soft_rock_clash_allowance;
                 after -= pic1 * _kJmol_cuA * soft_rock_clash_penalty;
                 #if _dbg_rock_pic
@@ -3115,7 +3115,7 @@ _try_again:
                         protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
                             active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
 
-                        protein->get_internal_clashes(active_helix_rots[j].start_resno, active_helix_rots[j].end_resno, true);
+                        protein->get_internal_clashes(active_helix_rots[j].start_resno, active_helix_rots[j].end_resno, repack_on_hxr);
 
                         if (wrote_acvmr < (j+wroteoff) )
                         {
@@ -3586,7 +3586,7 @@ _try_again:
                         AminoAcid* mvaa = protein->get_residue(forced_flexible_resnos[i].resno);
                         if (mvaa)
                         {
-                            mvaa->movability = MOV_FLEXONLY;
+                            mvaa->movability = MOV_FORCEFLEX;
                             #if _dbg_flexion_selection
                             cout << mvaa->get_name() << " forced flexible." << endl;
                             #endif

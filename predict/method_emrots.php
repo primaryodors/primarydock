@@ -87,7 +87,7 @@ REQSR ALL 4.57 4.60 5.39
 SIZE 7.5 6.0 7.5
 
 # Correct for slight misalignment in AlphaFold model
-HXR 1 TMR6 6.49 6.60 6.49 0 0 0 helical -10
+HXR 1 TMR6 6.49 6.60 6.49 0 0 0 helical -20
 
 # Activation Matrix.
 $acv_matrix

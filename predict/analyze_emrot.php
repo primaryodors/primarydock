@@ -91,22 +91,3 @@ if (!$total) echo "Not enough data processed.\n\n";
 else echo "$correct correct predictions out of $total total ($agonists agonists / $nonagonists other), $fp false positives / $fn false negatives, "
   . round(100.0 * $correct / $total, 2) . "% accuracy.\n\n";
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

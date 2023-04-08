@@ -2709,11 +2709,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             float lreversal = -pow(0.1, 2.0/iters);
             float accel = 1.01;
 
-
-            #if _dbg_multiflex
-            // cout << iter << ":" << mm[i]->name << " " << mm[i]->movability << endl;
-            #endif
-
             /**** Linear Motion ****/
             #if allow_linear_motion
             if (mm[i]->movability >= MOV_ALL && iter >= 10)

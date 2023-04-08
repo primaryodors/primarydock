@@ -243,7 +243,6 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
         if ($pose && $node>=0 && substr($ln, 0, 25) == "Ligand polar satisfaction")
         {
-            // echo "$ln\n";
             $polsat[$pose][$node] = floatval(explode(": ", $ln)[1]);
             $dosce = false;
             continue;
@@ -251,7 +250,6 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
         if ($pose && $node>=0 && substr($ln, 0, 15) == "Protein clashes")
         {
-            // echo "$ln\n";
             $pclash[$pose][$node] = floatval(explode(": ", $ln)[1]);
             $dosce = false;
             continue;
@@ -259,9 +257,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
         if ($pose && $node>=0 && strpos($ln, " active theta: "))
         {
-            // echo "$ln\n";
             $pettias = explode(':', $ln);
-            // print_r($pettias);
             if (count($pettias) > 1)
             {
                 $morceaux = explode(' ', $pettias[0]);

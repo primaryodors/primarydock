@@ -504,7 +504,7 @@
     "cd56aaf93bc028e0c8bccd557cd44ff0":
     {
         "full_name": "acetylsalicylic acid",
-        "smiles": "c1cccc(C(=O)O)c1OC(=O)C",
+        "smiles": "c1cccc(C(=O)[O-])c1OC(=O)C",
         "aroma": []
     },
     "71bad9a1d81a156ceca401b531902a27":
@@ -3891,7 +3891,7 @@
     "706087dc19d604fa4a9b517df206f8b5":
     {
         "full_name": "bornane-2-carboxylic acid",
-        "smiles": "CC1(C2CCC1(C(C2)C(=O)O)C)C",
+        "smiles": "CC1(C2CCC1(C(C2)C(=O)[O-])C)C",
         "activity":
         {
             "https:\/\/doi.org\/10.1002\/cbdv.201400083":
@@ -8336,7 +8336,7 @@
     "1bb498b6de0e799c2b34b04c601b03be":
     {
         "full_name": "cyclobutane carboxylic acid",
-        "smiles": "C1CCC1C(=O)O",
+        "smiles": "C1CCC1C(=O)[O-]",
         "activity":
         {
             "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
@@ -8860,7 +8860,7 @@
     "65e2c456543ffa6a5efc88c4169ba392":
     {
         "full_name": "cyclopropanecarboxylic acid",
-        "smiles": "C1CC1C(=O)O ",
+        "smiles": "C1CC1C(=O)[O-]",
         "activity":
         {
             "https:\/\/doi.org\/10.1002\/cbdv.201400083":
@@ -13827,7 +13827,7 @@
     "530ca4abd8217873de5f01b52f026915":
     {
         "full_name": "formic acid",
-        "smiles": "C(=O)O",
+        "smiles": "C(=O)[O-]",
         "activity":
         {
             "https:\/\/www.nature.com\/articles\/srep38231":
@@ -17845,7 +17845,7 @@
     "0301e2bc8f625dcc3011f979ceb3504c":
     {
         "full_name": "3-hydroxy-3-methyl hexanoic acid",
-        "smiles": "OC(=O)CC(C)(O)CCC",
+        "smiles": "[O-]C(=O)CC(C)(O)CCC",
         "activity":
         {
             "https:\/\/patents.google.com\/patent\/JP6422665B2\/en":
@@ -21985,7 +21985,7 @@
     "d403bea9b6efdc09cc5179f1e95261eb":
     {
         "full_name": "3,4-methylenedioxy dihydrocinnamic acid",
-        "smiles": "OC(=O)CCc1cc(OCO2)c2cc1",
+        "smiles": "[O-]C(=O)CCc1cc(OCO2)c2cc1",
         "activity":
         {
             "https:\/\/doi.org\/10.1016\/j.biomaterials.2011.11.044":
@@ -22863,7 +22863,7 @@
     "0ad7c3780f1912f1ac63d2350cfb0aef":
     {
         "full_name": "4-methyl nonanoic acid",
-        "smiles": "OC(=O)CCC(C)CCCCC",
+        "smiles": "[O-]C(=O)CCC(C)CCCCC",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -25839,7 +25839,7 @@
     "44cc39cc1677985c95cbc746549ddd4b":
     {
         "full_name": "5-norbornene-2-carboxylic acid",
-        "smiles": "OC(=O)C1C[C@@H]2C[C@H]1C=C2",
+        "smiles": "[O-]C(=O)C1C[C@@H]2C[C@H]1C=C2",
         "activity":
         {
             "https:\/\/doi.org\/10.1152\/ajprenal.00624.2018":
@@ -28522,7 +28522,7 @@
     "a276ab392949e6a20f3aeeebbc9ebb92":
     {
         "full_name": "phenylacetic acid",
-        "smiles": "c1ccccc1CC(=O)O",
+        "smiles": "c1ccccc1CC(=O)[O-]",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -30765,7 +30765,7 @@
     "a3e764a15599cc959e7cf54dc0ee7a3e":
     {
         "full_name": "salicylic acid",
-        "smiles": "c1cccc(C(=O)O)c1O",
+        "smiles": "c1cccc(C(=O)[O-])c1O",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -32395,7 +32395,7 @@
     "7e886b72de8bbe463aa87b928184c77d":
     {
         "full_name": "thioglycolic acid",
-        "smiles": "C(C(=O)O)S",
+        "smiles": "C(C(=O)[O-])S",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -33561,7 +33561,7 @@
     "b02ed7a2443e975b632d12a75a3004d9":
     {
         "full_name": "vanillic acid",
-        "smiles": "COC1=C(C=CC(=C1)C(=O)O)O",
+        "smiles": "COC1=C(C=CC(=C1)C(=O)[O-])O",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

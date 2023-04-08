@@ -2718,7 +2718,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 mm[i]->set_atoms_break_on_move(false);
                 #endif
 
-                Point pt(mm[i]->lmx*frand(0.001, 1), 0, 0);
+                Point pt(mm[i]->lmx*frand(0.25, 1), 0, 0);
                 mm[i]->move(pt);
                 bind1 = 0;
                 maxb = 0;
@@ -3305,10 +3305,26 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         cout << "Best results for " << b1 << ", " << b2 << ", " << b3 << ", " << b4 << endl;
                         #endif
 
-                        if (b1) mm[i]->rotatable_bonds[0]->rotate(_multiflex_steprad*b1, false, skip_inverse_check);
-                        if (b2) mm[i]->rotatable_bonds[1]->rotate(_multiflex_steprad*b2, false, skip_inverse_check);
-                        if (b3) mm[i]->rotatable_bonds[2]->rotate(_multiflex_steprad*b3, false, skip_inverse_check);
-                        if (b4) mm[i]->rotatable_bonds[3]->rotate(_multiflex_steprad*b4, false, skip_inverse_check);
+                        if (b1) 
+                        {
+                            mm[i]->rotatable_bonds[0]->rotate(_multiflex_steprad*b1, false, skip_inverse_check);
+                            mm[i]->rotatable_bonds[0]->angular_momentum = _def_bnd_momentum;
+                        }
+                        if (b2) 
+                        {
+                            mm[i]->rotatable_bonds[1]->rotate(_multiflex_steprad*b2, false, skip_inverse_check);
+                            mm[i]->rotatable_bonds[1]->angular_momentum = _def_bnd_momentum;
+                        }
+                        if (b3) 
+                        {
+                            mm[i]->rotatable_bonds[2]->rotate(_multiflex_steprad*b3, false, skip_inverse_check);
+                            mm[i]->rotatable_bonds[2]->angular_momentum = _def_bnd_momentum;
+                        }
+                        if (b4) 
+                        {
+                            mm[i]->rotatable_bonds[3]->rotate(_multiflex_steprad*b4, false, skip_inverse_check);
+                            mm[i]->rotatable_bonds[3]->angular_momentum = _def_bnd_momentum;
+                        }
 
                         goto _end_flexions;
                     }
@@ -3405,7 +3421,10 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             #endif
 
                             if (!isnan(bestfrrad))
+                            {
                                 mm[i]->rotatable_bonds[k]->rotate(bestfrrad, false, skip_inverse_check);
+                                mm[i]->rotatable_bonds[k]->angular_momentum = _def_bnd_momentum;
+                            }
                         }
                         else
                         {

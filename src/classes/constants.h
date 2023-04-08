@@ -60,12 +60,12 @@
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (180.0 * fiftyseventh)
-#define _fullrot_stepdeg 30
+#define _fullrot_stepdeg 45
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
 #define _def_lin_momentum 0.1
-#define _def_ang_momentum (_fullrot_steprad/3)
-#define _def_bnd_momentum (_fullrot_steprad/3)
+#define _def_ang_momentum (_fullrot_steprad/1.5)
+#define _def_bnd_momentum (_fullrot_steprad/1.5)
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -106,7 +106,7 @@
 #define polar_repulsion 35.0
 #define charge_repulsion 30.0
 
-#define lmpush 0.0001
+#define lmpush 0.00002
 #define speed_limit 2.5
 #define lmdecay 0.666
 
@@ -165,7 +165,7 @@
 #define allow_bond_rots 1
 #define allow_linear_motion 1
 #define monte_carlo_axial 0
-#define monte_carlo_flex 1
+#define monte_carlo_flex 0
 #define multiflex 0
 #define multiflex_iter 25
 #define _multiflex_stepdiv 8
@@ -197,7 +197,7 @@
 // Allows the ligand to "see through" shielding and anisotropy and seek the greatest
 // potential binding with residues, irrespective of whether the side chain is in an
 // optimum orientation in space.
-#define allow_ligand_esp 1
+#define allow_ligand_esp 0
 #define esp_amount 0.1
 #define shielding_avoidance_factor 2.5
 

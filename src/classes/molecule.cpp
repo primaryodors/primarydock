@@ -2260,6 +2260,8 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
         for (l=0; ligands[l]; l++)
         {
             if (ligands[l] == this) continue;
+            Point rel = get_barycenter().subtract(ligands[l]->get_barycenter());
+            rel.scale(0.5);
             for (j=0; j<ligands[l]->atcount; j++)
             {
                 // TODO: Fix this in the hydrogenate function, but for now we'll fix it here and hope for the best. 🤞🏼
@@ -2306,9 +2308,9 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             if (abind < 0 && ligands[l] != this /*&& ligands[l]->is_residue()*/ && movability >= MOV_ALL)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
-                                lmx += lmpush * sgn(ptd.x) * fabs(abind);
-                                lmy += lmpush * sgn(ptd.y) * fabs(abind);
-                                lmz += lmpush * sgn(ptd.z) * fabs(abind);
+                                lmx += lmpush * (sgn(ptd.x)+rel.x) * fabs(abind);
+                                lmy += lmpush * (sgn(ptd.y)+rel.y) * fabs(abind);
+                                lmz += lmpush * (sgn(ptd.z)+rel.z) * fabs(abind);
                                 // cout << "Mistake " << lmx << ", " << lmpush << ", " << sgn(ptd.x) * fabs(abind) << endl;
                             }
                         }
@@ -2710,7 +2712,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
 
             /**** Linear Motion ****/
             #if allow_linear_motion
-            if (mm[i]->movability >= MOV_ALL && iter >= 10)
+            if (mm[i]->movability >= MOV_ALL /*&& iter >= 10*/)
             {
                 #if debug_break_on_move
                 mm[i]->set_atoms_break_on_move(false);
@@ -2823,7 +2825,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 }
                 else
                 {
-                    float lmm = 0.97;
+                    float lmm = lmdecay;
                     mm[i]->lmx *= lmm;
                     mm[i]->lmy *= lmm;
                     mm[i]->lmz *= lmm;

@@ -164,7 +164,7 @@
 #define allow_linear_motion 1
 #define monte_carlo_axial 0
 #define monte_carlo_flex 1
-#define multiflex 1
+#define multiflex 0
 #define multiflex_iter 25
 #define _multiflex_stepdiv 8
 #define _multiflex_stepdeg (360.0/_multiflex_stepdiv)

@@ -283,10 +283,16 @@ LET @xform.x /= 2
 LET @xform.y /= 2
 LET @xform.z /= 2
 
-LET @point = @ic[%i] + @delta_n
-PTALIGN @point @ac[%i] @an[%i] @axis &theta
+LET @cen = @ac[%i] + @an[%i]
 
-LET &theta *= -1
+LET @cen.x /= 2
+LET @cen.y /= 2
+LET @cen.z /= 2
+
+LET @point = @ic[%i] + @delta_n
+PTALIGN @point @ac[%i] @cen @axis &theta
+
+LET &theta *= -0.5
 
 ECHO "	'TMR" %i "' => [ " ~
 

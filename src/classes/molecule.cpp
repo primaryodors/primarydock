@@ -2247,8 +2247,6 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
 
     lastshielded = 0;
 
-    // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
-
     for (i=0; i<atcount; i++)
     {
         atoms[i]->last_bind_energy = 0;
@@ -2271,21 +2269,21 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                     break;
                 }
                 if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone
-                        &&
-                        (	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
-                                &&
-                                !strcmp(atoms[i]->name, "C")
-                                &&
-                                !strcmp(ligands[l]->atoms[j]->name, "N")
-                          )
-                            ||
-                            (	atoms[i]->residue == ligands[l]->atoms[j]->residue + 1
-                                &&
-                                !strcmp(atoms[i]->name, "N")
-                                &&
-                                !strcmp(ligands[l]->atoms[j]->name, "C")
-                            )
-                        )) continue;			// kludge to prevent adjacent residue false clashes.
+                    &&
+                    (	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
+                            &&
+                            !strcmp(atoms[i]->name, "C")
+                            &&
+                            !strcmp(ligands[l]->atoms[j]->name, "N")
+                        )
+                        ||
+                        (	atoms[i]->residue == ligands[l]->atoms[j]->residue + 1
+                            &&
+                            !strcmp(atoms[i]->name, "N")
+                            &&
+                            !strcmp(ligands[l]->atoms[j]->name, "C")
+                        )
+                    )) continue;			// kludge to prevent adjacent residue false clashes.
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
                 {
@@ -2308,9 +2306,9 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
-                                lmx += lmpush * sgn(ptd.x);
-                                lmy += lmpush * sgn(ptd.y);
-                                lmz += lmpush * sgn(ptd.z);
+                                lmx += lmpush * sgn(ptd.x) * fabs(abind);
+                                lmy += lmpush * sgn(ptd.y) * fabs(abind);
+                                lmz += lmpush * sgn(ptd.z) * fabs(abind);
                             }
                         }
                     }

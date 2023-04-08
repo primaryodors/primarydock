@@ -8,6 +8,20 @@
 
 using namespace std;
 
+Molecule *emm1, *emm2;
+
+void iteration_cb(int iter)
+{
+    const char* tstoutf = "tmp/moliter.txt";
+    FILE* pf = fopen(tstoutf, iter ? "ab" : "wb");
+    fprintf(pf, "Pose: 1\nNode: %d\nPDBDAT:\n", iter);
+    int l = 0;
+    emm1->save_pdb(pf, l, false);
+    l += emm1->get_atom_count();
+    emm2->save_pdb(pf, l, true);
+    fclose(pf);
+}
+
 int main(int argc, char** argv)
 {
     // TODO: These values are set way too permissively.
@@ -179,7 +193,9 @@ int main(int argc, char** argv)
     mols[0] = &m1;
     mols[1] = &m2;
     mols[2] = NULL;
-    Molecule::multimol_conform(mols, 200);
+    emm1 = &m1;
+    emm2 = &m2;
+    Molecule::multimol_conform(mols, 200, &iteration_cb);
     float final_clashes = m1.get_intermol_clashes(&m2);
     // if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);

@@ -1255,7 +1255,6 @@ bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
         if (can_flip) theta = flip_angle;
         else return false;
     }
-    // cout << "Rotate " << atom->name << cardinality_printable(cardinality) << btom->name << endl;
 
     if (atom->residue && !atom->is_backbone && greek_from_aname(atom->name) > greek_from_aname(btom->name))
     {
@@ -1982,6 +1981,17 @@ int Bond::count_moves_with_btom()
     int i;
     for (i=0; moves_with_btom[i]; i++);	// Get count.
     return i;
+}
+
+int Bond::count_heavy_moves_with_btom()
+{
+    if (!moves_with_btom) return 0;
+    int i, j=0;
+    for (i=0; moves_with_btom[i]; i++)
+    {
+        if (moves_with_btom[i]->get_Z() > 1) j++;
+    }
+    return j;
 }
 
 int Atom::num_rings()

@@ -48,6 +48,7 @@ public:
     }
     Atom** get_moves_with_btom();
     int count_moves_with_btom();
+    int count_heavy_moves_with_btom();
     void swing(SCoord newdir);		// Rotate btom, and all its moves_with atoms, about atom so that the bond points to newdir.
 
 protected:

@@ -49,6 +49,7 @@ struct DockResult
     float proximity;                    // How far the ligand center is from the node's center.
     float tripswitch;                   // Effect of the ligand on the receptor's trip switch.
     float polsat;
+    float protclash;
 };
 
 enum HxRotAxisType
@@ -56,7 +57,8 @@ enum HxRotAxisType
     hxrat_Cartesian,
     hxrat_region,
     hxrat_BW,
-    hxrat_atom
+    hxrat_atom,
+    hxrat_helical
 };
 
 struct AcvHxRot
@@ -437,6 +439,9 @@ bool soft_pocket = false;
 std::string soft_names;
 std::vector<Region> soft_rgns;
 std::vector<SoftBias> soft_biases;
+std::vector<int>flexible_resnos;
+std::vector<ResiduePlaceholder>forced_flexible_resnos;
+std::vector<ResiduePlaceholder>forced_static_resnos;
 
 float rgnxform_r[PROT_MAX_RGN], rgnxform_theta[PROT_MAX_RGN], rgnxform_y[PROT_MAX_RGN];
 float rgnrot_alpha[PROT_MAX_RGN], rgnrot_w[PROT_MAX_RGN], rgnrot_u[PROT_MAX_RGN];
@@ -782,7 +787,7 @@ void iteration_callback(int iter)
                 // and output a warning if not.
 
                 float before = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                float pic = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, true);
+                float pic = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, repack_on_hxr);
                 before -= pic * _kJmol_cuA * soft_rock_clash_penalty;
                 
                 for (j=0; j<sphres; j++)
@@ -810,7 +815,7 @@ void iteration_callback(int iter)
                 #endif
 
                 float after = ligand->get_intermol_binding(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                float pic1 = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, true);
+                float pic1 = protein->get_internal_clashes(active_helix_rots[i].start_resno, active_helix_rots[i].end_resno, repack_on_hxr);
                 pic1 -= soft_rock_clash_allowance;
                 after -= pic1 * _kJmol_cuA * soft_rock_clash_penalty;
                 #if _dbg_rock_pic
@@ -1290,6 +1295,30 @@ int interpret_config_line(char** words)
         optsecho = "Flex: " + (std::string)(flex ? "ON" : "OFF");
         return 1;
     }
+    else if (!strcmp(words[0], "FLXR"))
+    {
+        i = 1;
+        while (words[i])
+        {
+            ResiduePlaceholder rph;
+            rph.set(words[i]);
+            forced_flexible_resnos.push_back(rph);
+            i++;
+        }
+        return i-1;
+    }
+    else if (!strcmp(words[0], "STCR"))
+    {
+        i = 1;
+        while (words[i])
+        {
+            ResiduePlaceholder rph;
+            rph.set(words[i]);
+            forced_static_resnos.push_back(rph);
+            i++;
+        }
+        return i-1;
+    }
     else if (!strcmp(words[0], "H2O"))
     {
         maxh2o = omaxh2o = atoi(words[1]);
@@ -1342,6 +1371,11 @@ int interpret_config_line(char** words)
             ahr.axis_type = hxrat_atom;
             ahr.axis_str = words[n+1];
             n += 2;
+        }
+        else if (!strcmp(words[n], "helical"))
+        {
+            ahr.axis_type = hxrat_helical;
+            n += 1;
         }
         else
         {
@@ -1642,6 +1676,7 @@ void prepare_initb()
         int qpm = qpr + maxh2o;
         prem[qpm] = nullptr;
 
+        #if !flexion_selection
         bool preconform;
 
         #if preconform_protein
@@ -1660,15 +1695,7 @@ void prepare_initb()
             );
             delete[] delete_me;
         }
-
-        /*
-        preres = protein->get_residues_near(pocketcen, 10000);
-        qpr = preres.size();
-        for (i=0; i<qpr; i++)
-        {
-            preaa[i] = preres[i];
-        }
-        */
+        #endif
 
         for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 
@@ -2287,7 +2314,7 @@ int main(int argc, char** argv)
     {
         for (i=2; words[i]; i++)
         {
-            extra_wt.push_back(atoi(words[i]));
+            extra_wt.push_back(interpret_resno(words[i]));
         }
     }
     pktset = true;
@@ -2360,6 +2387,8 @@ int main(int argc, char** argv)
     // Identify the ligand atom with the greatest potential binding.
     int k, n;
 
+    #if !flexion_selection
+
     if (use_prealign) use_bestbind_algorithm = false;
 
     if (use_prealign)
@@ -2394,6 +2423,8 @@ int main(int argc, char** argv)
         delete prealign_res;
         delete lig_grp;
     }
+
+    #endif
 
     // Best-Binding Code
     if (use_bestbind_algorithm)
@@ -3030,6 +3061,46 @@ _try_again:
                             cout << "Helix rotation set for axis " << (Point)active_helix_rots[j].axis << endl;
                             #endif
                         }
+                        else if (active_helix_rots[j].axis_type == hxrat_helical)
+                        {
+                            Point Navg, Cavg;
+                            int Ndiv=0, Cdiv=0;
+                            int lres;
+
+                            for (lres = active_helix_rots[j].start_resno+3; lres >= active_helix_rots[j].start_resno; lres--)
+                            {
+                                AminoAcid* aa = protein->get_residue(lres);
+                                if (aa)
+                                {
+                                    Navg = Navg.add(aa->get_CA_location());
+                                    Ndiv++;
+                                }
+                            }
+                            if (!Ndiv)
+                            {
+                                cout << "Not enough N terminus residues for helical rotation." << endl;
+                                throw 0xbad1207;
+                            }
+                            else Navg.scale(Navg.magnitude() / Ndiv);
+
+                            for (lres = active_helix_rots[j].end_resno-3; lres <= active_helix_rots[j].end_resno; lres++)
+                            {
+                                AminoAcid* aa = protein->get_residue(lres);
+                                if (aa)
+                                {
+                                    Cavg = Cavg.add(aa->get_CA_location());
+                                    Cdiv++;
+                                }
+                            }
+                            if (!Cdiv)
+                            {
+                                cout << "Not enough C terminus residues for helical rotation." << endl;
+                                throw 0xbad1207;
+                            }
+                            else Cavg.scale(Cavg.magnitude() / Cdiv);
+
+                            active_helix_rots[j].axis = Cavg.subtract(Navg);
+                        }
 
                         int sr = active_helix_rots[j].start_resno;
                         int er = active_helix_rots[j].end_resno;
@@ -3043,6 +3114,8 @@ _try_again:
 
                         protein->rotate_piece(sr, er, protein->get_atom_location(mr, "CA"),
                             active_helix_rots[j].axis, active_helix_rots[j].theta*acvdirection);
+
+                        protein->get_internal_clashes(active_helix_rots[j].start_resno, active_helix_rots[j].end_resno, repack_on_hxr);
 
                         if (wrote_acvmr < (j+wroteoff) )
                         {
@@ -3340,7 +3413,7 @@ _try_again:
                     extra_wt.clear();
                     for (i=2; words[i]; i++)
                     {
-                        extra_wt.push_back(atoi(words[i]));
+                        extra_wt.push_back(interpret_resno(words[i]));
                     }
                 }
 
@@ -3388,6 +3461,144 @@ _try_again:
 
             sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, addl_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
+
+            // Flexion Selection
+            if (flex && !nodeno)
+            {
+                if (forced_static_resnos.size())
+                {
+                    for (i=0; i<forced_static_resnos.size(); i++)
+                    {
+                        forced_static_resnos[i].resolve_resno(protein);
+                        AminoAcid* mvaa = protein->get_residue(forced_static_resnos[i].resno);
+                        if (mvaa)
+                        {
+                            mvaa->movability = MOV_NONE;
+                            #if _dbg_flexion_selection
+                            cout << mvaa->get_name() << " forced static." << endl;
+                            #endif
+                        }
+                    }
+                }
+                #if flexion_selection
+
+                flexible_resnos.clear();
+                j = protein->get_end_resno();
+                for (i=protein->get_start_resno(); i<=j; i++)
+                {
+                    AminoAcid* mvaa = protein->get_residue(i);
+                    if (mvaa) mvaa->movability = min(MOV_FLXDESEL, mvaa->movability);
+                }
+
+                #if _dbg_null_flexions
+                bool another_flex = false;
+                #elif no_zero_flexions
+                bool another_flex = true;
+                #else
+                bool another_flex = (frand(0,1) < 0.6);
+                #endif
+
+                while (another_flex)
+                {
+                    float bestwt = 0;
+                    int besti = -1;
+                    for (j=0; j<100; j++)
+                        for (i=0; i<sphres; i++)
+                        {
+                            if (reaches_spheroid[nodeno][i]->movability != MOV_FLXDESEL) continue;
+                            float weight = reaches_spheroid[nodeno][i]->get_aa_definition()->flexion_probability;
+                            if (!weight) continue;
+
+                            // Multiply weight by unrealized ligand binding potential.
+                            float potential = reaches_spheroid[nodeno][i]->get_intermol_potential(ligand, true);
+                            float adjusted_potential = fmin(1, potential / 1000);
+                            Atom *nearest1, *nearest2;
+                            nearest1 = reaches_spheroid[nodeno][i]->get_nearest_atom(ligand->get_barycenter());
+                            if (!nearest1) throw 0xbadd157;
+                            nearest2 = ligand->get_nearest_atom(nearest1->get_location());
+                            if (!nearest2) throw 0xbadd157;
+                            float nearr = fmax(1, nearest1->distance_to(nearest2) / 2);
+                            adjusted_potential *= nearr;
+
+                            // weight = (1.0 - ((1.0 - weight) / adjusted_potential)) / 2;
+                            weight *= sqrt(adjusted_potential);
+
+                            // If residue is within any active_helix_rots region, increase the odds.
+                            if (active_helix_rots.size())
+                            {
+                                int l, n = active_helix_rots.size(), resno = reaches_spheroid[nodeno][i]->get_residue_no();
+                                for (l=0; l<n; l++)
+                                {
+                                    if (resno >= active_helix_rots[l].start_resno && resno <= active_helix_rots[l].end_resno)
+                                    {
+                                        weight *= 1.5;
+                                    }
+                                }
+                            }
+
+                            if (extra_wt.size())
+                            {
+                                int l, n = extra_wt.size(), resno = reaches_spheroid[nodeno][i]->get_residue_no();
+                                for (l=0; l<n; l++)
+                                {
+                                    if (resno == extra_wt[l])
+                                    {
+                                        weight *= 20;
+                                        #if _dbg_flexion_selection
+                                        // cout << resno << " boosted." << endl;
+                                        #endif
+                                    }
+                                }
+                            }
+
+                            #if _dbg_flexion_selection
+                            if (reaches_spheroid[nodeno][i]->get_residue_no() == 9262)
+                                cout << reaches_spheroid[nodeno][i]->get_name() << " has weight " << weight << endl;
+                            #endif
+
+                            if ( /*weight >= bestwt &&*/ frand(0,100) < weight )
+                            {
+                                besti = i;
+                                bestwt = weight;
+                            }
+                        }
+                    if (besti >= 0)
+                    {
+                        reaches_spheroid[nodeno][besti]->movability = MOV_FLEXONLY;
+                        flexible_resnos.push_back(reaches_spheroid[nodeno][besti]->get_residue_no());
+                        #if _dbg_flexion_selection
+                        cout << "Selected " << reaches_spheroid[nodeno][besti]->get_name()
+                                << " for flexion with a weight of " << bestwt << endl;
+                        #endif
+                    }
+                    another_flex = (frand(0,1) < 0.6);
+                }
+                
+                #if _dbg_flexion_selection
+                cout << flexible_resnos.size() << " residues selected for flexion." << endl;
+                #endif
+
+                if (forced_flexible_resnos.size())
+                {
+                    for (i=0; i<forced_flexible_resnos.size(); i++)
+                    {
+                        forced_flexible_resnos[i].resolve_resno(protein);
+                        AminoAcid* mvaa = protein->get_residue(forced_flexible_resnos[i].resno);
+                        if (mvaa)
+                        {
+                            mvaa->movability = MOV_FORCEFLEX;
+                            #if _dbg_flexion_selection
+                            cout << mvaa->get_name() << " forced flexible." << endl;
+                            #endif
+                        }
+                    }
+                }
+                #endif
+            }
+
+            #if _dbg_flexion_selection
+            cout << endl;
+            #endif
 
             for (i=0; i<sphres; i++)
             {
@@ -3689,6 +3900,7 @@ _try_again:
 
                         Atom* alca;
                         Atom** alcaa;
+                        #if !flexion_selection
                         if (flex && sc_gloms[l].aminos.size())
                         {
                             for (i=0; i<sc_gloms[l].aminos.size(); i++)
@@ -3727,6 +3939,7 @@ _try_again:
                                 }
                             }
                         }
+                        #endif
 
                         switch (l)
                         {
@@ -4054,11 +4267,18 @@ _try_again:
 
             if (flex)
             {
+                #if flexion_selection
+                for (j=0; j<flexible_resnos.size(); j++)
+                {
+                    cfmols[i++] = protein->get_residue(flexible_resnos[j]);
+                }
+                #else
                 for (j=0; j<sphres; j++)
                 {
                     if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
                     cfmols[i++] = reaches_spheroid[nodeno][j];
                 }
+                #endif
             }
             for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 
@@ -4349,8 +4569,9 @@ _try_again:
             dr[drcount][nodeno].imkJmol    = new float[metcount];
             dr[drcount][nodeno].mvdWrepl    = new float[metcount];
             dr[drcount][nodeno].imvdWrepl    = new float[metcount];
-            dr[drcount][nodeno].tripswitch    = tripclash;
-            dr[drcount][nodeno].proximity      = ligand->get_barycenter().get_3d_distance(nodecen);
+            dr[drcount][nodeno].tripswitch  = tripclash;
+            dr[drcount][nodeno].proximity  = ligand->get_barycenter().get_3d_distance(nodecen);
+            dr[drcount][nodeno].protclash = protein->get_rel_int_clashes();
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
@@ -4697,6 +4918,9 @@ _try_again:
 
                         if (output) *output << "Proximity: " << dr[j][k].proximity << endl << endl;
                         cout << "Proximity: " << dr[j][k].proximity << endl << endl;
+
+                        if (output) *output << "Protein clashes: " << dr[j][k].protclash << endl << endl;
+                        cout << "Protein clashes: " << dr[j][k].protclash << endl << endl;
 
                         if (tripswitch_clashables.size())
                         {

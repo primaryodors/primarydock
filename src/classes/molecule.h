@@ -22,11 +22,13 @@ struct histidine_flip
 
 enum MovabilityType
 {
-    MOV_ALL			= 1000,
-    MOV_NORECEN		=  200,
-    MOV_FLEXONLY	=   50,
-    MOV_PINNED      =    1,
-    MOV_NONE		=    0
+    MOV_ALL			= 0x1000,
+    MOV_NORECEN		=  0x200,
+    MOV_FORCEFLEX   =   0xc0,
+    MOV_FLEXONLY	=   0x80,
+    MOV_PINNED      =   0x7f,
+    MOV_FLXDESEL    =    0x8,
+    MOV_NONE		=    0x0
 };
 
 enum MoleculeType
@@ -144,8 +146,8 @@ public:
     float get_intermol_clashes(Molecule** ligands);
     float get_intermol_binding(Molecule* ligand, bool subtract_clashes = true);
     float get_intermol_binding(Molecule** ligands, bool subtract_clashes = true);
-    float get_intermol_potential(Molecule* ligand);
-    float get_intermol_potential(Molecule** ligands);
+    float get_intermol_potential(Molecule* ligand, bool disregard_distance = false);
+    float get_intermol_potential(Molecule** ligands, bool disregard_distance = false);
     float hydrophilicity();
     float get_intermol_polar_sat(Molecule* ligand);
     float get_intermol_contact_area(Molecule* ligand, bool hydrophobic_only = false);

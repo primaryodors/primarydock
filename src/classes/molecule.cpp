@@ -2192,15 +2192,15 @@ void Molecule::clear_atom_binding_energies()
         atoms[i]->last_bind_energy = 0;
 }
 
-float Molecule::get_intermol_potential(Molecule* ligand)
+float Molecule::get_intermol_potential(Molecule* ligand, bool pure)
 {
     Molecule* ligands[4];
     ligands[0] = ligand;
     ligands[1] = nullptr;
-    return get_intermol_potential(ligands);
+    return get_intermol_potential(ligands, pure);
 }
 
-float Molecule::get_intermol_potential(Molecule** ligands)
+float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
 {
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
@@ -2223,7 +2223,7 @@ float Molecule::get_intermol_potential(Molecule** ligands)
                     {
                         if (iff[n]->get_type() == vdW) continue;
 
-                        if (r < iff[n]->get_distance())
+                        if (pure || r < iff[n]->get_distance())
                             kJmol += iff[n]->get_kJmol();
                         else
                             kJmol += iff[n]->get_kJmol()*f;
@@ -2651,7 +2651,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
         improvement=0;
         last_iter = (iter == (iters-1));
         float search_radius = search_expansion*iter + 4;
-        for (i=0; mm[i]; i++)
+        for (i = 0; mm[i]; i++)
         {
             bool nearby[alllen+4];
             Point icen = mm[i]->get_barycenter();
@@ -3193,7 +3193,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 if (mm[i]->rotatable_bonds && mm[i]->rotatable_bonds[0] && mm[i]->rotatable_bonds[0]->atom)
                     residue = mm[i]->rotatable_bonds[0]->atom->residue;
 
-                if (mm[i]->movability == MOV_FLEXONLY)
+                if (mm[i]->movability < MOV_NORECEN)
                 {
                     bind = 0;
                     for (j=0; all[j]; j++)
@@ -3239,6 +3239,78 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     #if DBG_BONDFLEX
                     if (DBG_FLEXRES == residue)
                         cout << " has rotbonds ";
+                    #endif
+
+                    #if multiflex
+                    if (residue && iter == multiflex_iter)
+                    {
+                        #if _dbg_multiflex
+                        cout << "Iter " << iter << " multiflexing " << mm[i]->get_name() << endl;
+                        #endif
+
+                        int k1, k2, k3, k4;
+                        int kn=0;
+                        for (k=0; mm[i]->rotatable_bonds[k]; k++);   // get count.
+                        int l1 = ((kn>=1 && mm[i]->rotatable_bonds[0]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0),
+                            l2 = ((kn>=2 && mm[i]->rotatable_bonds[1]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0),
+                            l3 = ((kn>=3 && mm[i]->rotatable_bonds[2]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0),
+                            l4 = ((kn>=4 && mm[i]->rotatable_bonds[3]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0);
+
+                        bind = 0;
+                        for (j=0; all[j]; j++)
+                        {
+                            if (!nearby[j]) continue;
+                            float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], true);
+                            bind += lbind;
+                        }
+
+                        int b1=0, b2=0, b3=0, b4=0;
+
+                        for (k1=0; k1<=l1; k1++)
+                        {
+                            for (k2=0; k2<=l2; k2++)
+                            {
+                                for (k3=0; k3<=l3; k3++)
+                                {
+                                    for (k4=0; k4<=l4; k4++)
+                                    {
+                                        if (l4) mm[i]->rotatable_bonds[3]->rotate(_multiflex_steprad, false, skip_inverse_check);
+
+                                        float newbind = 0;
+                                        for (j=0; all[j]; j++)
+                                        {
+                                            if (!nearby[j]) continue;
+                                            float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], true);
+                                            newbind += lbind;
+                                        }
+
+                                        if (newbind > bind)
+                                        {
+                                            bind = newbind;
+                                            b1 = k1; b2 = k2; b3 = k3; b4 = k4;
+                                        }
+                                    }
+
+                                    if (l3) mm[i]->rotatable_bonds[2]->rotate(_multiflex_steprad, false, skip_inverse_check);
+                                }
+
+                                if (l2) mm[i]->rotatable_bonds[1]->rotate(_multiflex_steprad, false, skip_inverse_check);
+                            }
+
+                            if (l1) mm[i]->rotatable_bonds[0]->rotate(_multiflex_steprad, false, skip_inverse_check);
+                        }
+
+                        #if _dbg_multiflex
+                        cout << "Best results for " << b1 << ", " << b2 << ", " << b3 << ", " << b4 << endl;
+                        #endif
+
+                        if (b1) mm[i]->rotatable_bonds[0]->rotate(_multiflex_steprad*b1, false, skip_inverse_check);
+                        if (b2) mm[i]->rotatable_bonds[1]->rotate(_multiflex_steprad*b2, false, skip_inverse_check);
+                        if (b3) mm[i]->rotatable_bonds[2]->rotate(_multiflex_steprad*b3, false, skip_inverse_check);
+                        if (b4) mm[i]->rotatable_bonds[3]->rotate(_multiflex_steprad*b4, false, skip_inverse_check);
+
+                        goto _end_flexions;
+                    }
                     #endif
 
                     int mmiac = mm[i]->get_atom_count();
@@ -3388,6 +3460,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     }
                     //if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
                 }
+                _end_flexions:
                 #if DBG_BONDFLEX
                 if (DBG_FLEXRES == residue)
                     cout << endl;

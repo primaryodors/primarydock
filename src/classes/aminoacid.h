@@ -41,6 +41,7 @@ struct AADef
     bool loaded = false;
     bool isoleucine_fix = false;
     float sidechain_pKa = nanf("n/a");
+    float flexion_probability = 0;
 };
 
 struct AABridge
@@ -64,7 +65,7 @@ class AminoAcid : public Molecule
 public:
     // Constructors.
     AminoAcid(FILE* instream, AminoAcid* prev_res=0, int resno_offset = 0);
-    AminoAcid(const char letter, AminoAcid* prev_res=0);
+    AminoAcid(const char letter, AminoAcid* prev_res=0, bool minimize_internal_clashes = true);
     ~AminoAcid();
 
     // Getters and setters.
@@ -99,6 +100,8 @@ public:
     {
         return aadef ? aadef->reach : 2.5;
     }
+    bool can_reach(Atom* other) const;
+    bool can_reach(Molecule* other) const;
     bool can_reach(AminoAcid* other) const;
     void set_region(const char* regname)
     {

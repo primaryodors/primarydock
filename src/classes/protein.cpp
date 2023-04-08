@@ -269,7 +269,7 @@ void Protein::end_pdb(FILE* os)
 float Protein::get_internal_clashes(int sr, int er, bool repack)
 {
     if (!residues) return 0;
-    int i, j, l;
+    int i, j, l, m;
     float result = 0;
     for (i=0; residues[i]; i++)
     {
@@ -285,18 +285,52 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                 int n;
                 for (n=0; laa[n]; n++);         // Get count.
                 Molecule* interactors[n+4];
+                Molecule* backdrop[n+4];
+                MovabilityType wasmov[n+4];
 
-                l = 0;
+                l = m = 0;
                 interactors[l++] = residues[i];
+                #if _dbg_repack
+                std::string dbgresstr;
+                #endif
                 for (j=0; j<n; j++)
                 {
-                    if (residues[i]->get_intermol_clashes(laa[j]) > 5)
-                        interactors[l++] = laa[j];
+                    if (residues[i]->get_intermol_clashes(laa[j]) > 3)
+                    {
+                        #if _dbg_repack
+                        dbgresstr += (std::string)" " + (std::string)laa[j]->get_name();
+                        #endif
+                        interactors[l] = laa[j];
+                        wasmov[l] = laa[j]->movability;
+                        laa[j]->movability = MOV_FLEXONLY;
+                        l++;
+                    }
+                    else
+                    {
+                        Atom* laaa = laa[j]->get_nearest_atom(residues[i]->get_CA_location());
+                        if (laaa->distance_to(residues[i]->get_atom("CA")) < residues[i]->get_reach())
+                        {
+                            #if _dbg_repack
+                            dbgresstr += (std::string)" [" + (std::string)laa[j]->get_name() + (std::string)"]";
+                            #endif
+                            backdrop[m++] = laa[j];
+                        }
+                    }
                 }
 
                 interactors[l] = nullptr;
+                backdrop[m] = nullptr;
+                if (l > 1)
+                {
+                    #if _dbg_repack
+                    cout << "Repacking " << residues[i]->get_name() << " with" << dbgresstr << "..." << endl;
+                    #endif
 
-                Molecule::multimol_conform(interactors, 5);
+                    Molecule::multimol_conform(interactors, backdrop, 13);
+                }
+
+                for (l=0; interactors[l]; l++)
+                    interactors[l]->movability = wasmov[l];
             }
         }
 
@@ -317,6 +351,11 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
         }
     }
     return result;
+}
+
+float Protein::get_rel_int_clashes()
+{
+    return get_internal_clashes(0, 0, false) - initial_int_clashes;
 }
 
 float Protein::get_internal_binding()
@@ -411,6 +450,7 @@ void Protein::find_residue_initial_bindings()
         aab.aa1 = residues[i];
         for (j=0; aa[j]; j++)
         {
+            if (aa[j] == residues[i]) continue;
             float f = residues[i]->get_intermol_binding(aa[j]);
             ib += f;
             if (j > i && f > maxb)
@@ -422,7 +462,7 @@ void Protein::find_residue_initial_bindings()
 
         if (ib >= 5)
         {
-            residues[i]->movability = MOV_PINNED;
+            if (residues[i]->movability != MOV_FORCEFLEX) residues[i]->movability = min(residues[i]->movability, MOV_PINNED);
             if (maxb >= 5) aabridges.push_back(aab);
         }
 
@@ -689,6 +729,7 @@ int Protein::load_pdb(FILE* is, int rno)
     // cout << "Read residue " << *residues[rescount] << endl;
     residues[rescount] = 0;
 
+    res_can_clash = nullptr;
     set_clashables();
 
     int l;
@@ -815,6 +856,7 @@ void Protein::set_clashables(int resno, bool recursed)
             delete[] res_can_clash;
         }
         res_can_clash = new AminoAcid**[maxres+1];
+        for (i=0; i<=maxres; i++) res_can_clash[i] = nullptr;
     }
 
     int sr = get_start_resno(), er = get_end_resno();

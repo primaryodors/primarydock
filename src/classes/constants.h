@@ -104,7 +104,7 @@
 // Warning - increasing these constants significantly above their stable branch values
 // will cause docking fails in the Big Three tests.
 #define polar_repulsion 35.0
-#define charge_repulsion 120.0
+#define charge_repulsion 30.0
 
 #define lmpush 0.0005
 
@@ -113,6 +113,8 @@
 #define bb_stochastic 0.15
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.13
+#define flexion_selection 1
+#define no_zero_flexions 1
 
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5
@@ -162,6 +164,12 @@
 #define allow_linear_motion 1
 #define monte_carlo_axial 0
 #define monte_carlo_flex 1
+#define multiflex 0
+#define multiflex_iter 25
+#define _multiflex_stepdiv 8
+#define _multiflex_stepdeg (360.0/_multiflex_stepdiv)
+#define _multiflex_steprad (fiftyseventh*_multiflex_stepdeg)
+#define repack_on_hxr false
 
 // Drift pulls the ligand towards the loneliest point if it encounters clashes.
 // Turning it off can cause the ligand to be ejected from the protein.
@@ -304,6 +312,10 @@
 #define _dbg_rock_pic 0
 #define _dbg_hxrax 0
 #define _dbg_mand_conn 0
+#define _dbg_flexion_selection 0
+#define _dbg_null_flexions 0
+#define _dbg_repack 0
+#define _dbg_multiflex 0
 
 #endif
 

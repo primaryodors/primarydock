@@ -13,6 +13,11 @@ echo date("Y-m-d H:i:s.u\n");
 $method = explode("_", $_SERVER['PHP_SELF'])[1];
 $method = explode(".", $method)[0];
 
+$result = $output = false;
+chdir(__DIR__);
+chdir("..");
+exec("make primarydock", $output, $result);
+if ($result) die("Build fail.\n".print_r($output, true));
 
 // Configurable variables
 $dock_retries = 5;
@@ -135,6 +140,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     fwrite($f, $configf);
     fclose($f);
 
+    $retvar = 0;
+
     $outlines = [];
     if (@$_REQUEST['saved'])
     {
@@ -150,22 +157,23 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             $cmd = "bin/primarydock \"$cnfname\"";
             if ($elim) $cmd .= " --elim $elim";
             echo "$cmd\n";
-            passthru($cmd);
+            passthru($cmd, $retvar);
             $outlines = explode("\n", file_get_contents($outfname));
             if (count($outlines) >= 200) break;
             if (!$elim) $elim = 99;
             else $elim *= 1.333;
         }
     }
-    
-    unlink($cnfname);
 
     if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
 
-    if (count($outlines) < 100) die("Docking FAILED.\n");
+    if ($retvar || (count($outlines) < 100)) die("Docking FAILED.\n");
+    
+    unlink($cnfname);
 
     $benerg = [];
     $polsat = [];
+    $pclash = [];
     $acvth = [];
     $scenerg = [];
     $vdwrpl = [];
@@ -235,17 +243,21 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
         if ($pose && $node>=0 && substr($ln, 0, 25) == "Ligand polar satisfaction")
         {
-            // echo "$ln\n";
             $polsat[$pose][$node] = floatval(explode(": ", $ln)[1]);
+            $dosce = false;
+            continue;
+        }
+
+        if ($pose && $node>=0 && substr($ln, 0, 15) == "Protein clashes")
+        {
+            $pclash[$pose][$node] = floatval(explode(": ", $ln)[1]);
             $dosce = false;
             continue;
         }
 
         if ($pose && $node>=0 && strpos($ln, " active theta: "))
         {
-            // echo "$ln\n";
             $pettias = explode(':', $ln);
-            // print_r($pettias);
             if (count($pettias) > 1)
             {
                 $morceaux = explode(' ', $pettias[0]);
@@ -301,6 +313,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     $sum = [];
     $sumps = [];
+    $sumpc = [];
     $sumat = [];
     $count = [];
     $countat = [];
@@ -320,7 +333,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             if (!isset($count[$node])) $count[$node] = 0;
             
             $sum[$node] += $value * $bias;
-            $sumps[$node] += $polsat[$pose][$node] * $bias;
+            $sumps[$node] += (@$polsat[$pose][$node] ?: 0) * $bias;
+            $sumpc[$node] += (@$pclash[$pose][$node] ?: 0) * $bias;
             $count[$node] += $bias;
 
             if (@$acvth[$pose][$node])
@@ -439,6 +453,11 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     foreach ($sumps as $node => $value)
     {
         $average["{$metrics_prefix}PolSat.$node"] = round($value / (@$count[$node] ?: 1), 3);
+    }
+
+    foreach ($sumpc as $node => $value)
+    {
+        $average["{$metrics_prefix}PClash.$node"] = round($value / (@$count[$node] ?: 1), 3);
     }
 
     foreach ($sumat as $node => $values)

@@ -71,7 +71,7 @@ AminoAcid::~AminoAcid()
 }
 
 #define _ALGORITHMIC_GREEK 1
-AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
+AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 {
     if (!aa_defs[0x41]._1let) AminoAcid::load_aa_defs();
     immobile = false; // true;
@@ -469,7 +469,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
         if (N) new_atoms[l++] = N;
         if (HN) new_atoms[l++] = HN;
 
-        minimize_internal_clashes();
+        if (minintc) minimize_internal_clashes();
         for (i=0; atoms[i]; i++)
         {
             if (atom_Greek[i] <= 0) continue;
@@ -648,7 +648,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
 
     // flatten();
     rotatable_bonds = get_rotatable_bonds();
-    minimize_internal_clashes();
+    if (minintc) minimize_internal_clashes();
 
     identify_acidbase();
     identify_rings();
@@ -701,7 +701,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa)
     if (CA && CB)
     {
         Bond* b = CA->get_bond_between(CB);
-        if (b) b->rotate(triangular);
+        if (b && minintc) b->rotate(triangular);
     }
 
     if (prevaa)
@@ -1164,7 +1164,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
                     if (aaa && !aaa->aabonds)
                     {
-                        AminoAcid* tempaa = new AminoAcid(aaa->_1let);
+                        AminoAcid* tempaa = new AminoAcid(aaa->_1let, 0, false);
                         delete tempaa;
                     }
 
@@ -1425,11 +1425,16 @@ void AminoAcid::load_aa_defs()
                     {
                         aa_defs[idx].SMILES = words[3];
                         if (strstr(aa_defs[idx].SMILES.c_str(), "N1")) aa_defs[idx].proline_like = proline_like = true;
-                    }
 
-                    if (words[4])
-                    {
-                        aa_defs[idx].sidechain_pKa = atof(words[4]);
+                        if (words[4])
+                        {
+                            aa_defs[idx].sidechain_pKa = atof(words[4]);
+                            if (words[5])
+                            {
+                                aa_defs[idx].flexion_probability = atof(words[5]);
+                                if (aa_defs[idx].flexion_probability < 0 || aa_defs[idx].flexion_probability > 1) throw 0xbadf1ec5;
+                            }
+                        }
                     }
 
                     tbdctr++;
@@ -1460,6 +1465,45 @@ void AminoAcid::load_aa_defs()
     }
 }
 
+bool AminoAcid::can_reach(Atom* other) const
+{
+    Atom* ca1;
+    float r;
+
+    ca1 = get_atom("CA");
+
+    if (!ca1 || !other)
+    {
+        cout << "Warning: Could not determine reach of " << *this << " - " << *other << " to avoid possibility of clash." << endl;
+        return false;
+    }
+
+    r = ca1->get_location().get_3d_distance(other->get_location());
+
+    if (r <= 1.15 * (get_reach())) return true;
+    else return false;
+}
+
+bool AminoAcid::can_reach(Molecule* other) const
+{
+    Atom* ca1, *ca2;
+    float r;
+
+    ca1 = get_atom("CA");
+    ca2 = other->get_nearest_atom(ca1->get_location());
+
+    if (!ca1 || !ca2)
+    {
+        cout << "Warning: Could not determine reach of " << *this << " - " << other->get_name() << " to avoid possibility of clash." << endl;
+        return false;
+    }
+
+    r = ca1->get_location().get_3d_distance(ca2->get_location());
+
+    if (r <= 1.15 * (get_reach())) return true;
+    else return false;
+}
+
 bool AminoAcid::can_reach(AminoAcid* other) const
 {
     Atom* ca1, *ca2;
@@ -1474,11 +1518,7 @@ bool AminoAcid::can_reach(AminoAcid* other) const
         return false;
     }
 
-    //cout << aadef->_3let << residue_no << " vs " << other->aadef->_3let << other->residue_no;
-
     r = ca1->get_location().get_3d_distance(ca2->get_location());
-
-    //cout << ": " << r << " vs. " << get_reach() << " + " << other->get_reach() << endl;
 
     if (r <= 1.15 * (get_reach() + other->get_reach())) return true;
     else return false;

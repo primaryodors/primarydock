@@ -2303,12 +2303,13 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 atoms[i]->strongest_bind_atom = ligands[l]->atoms[j];
                             }
 
-                            if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
+                            if (abind < 0 && ligands[l] != this /*&& ligands[l]->is_residue()*/ && movability >= MOV_ALL)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
                                 lmx += lmpush * sgn(ptd.x) * fabs(abind);
                                 lmy += lmpush * sgn(ptd.y) * fabs(abind);
                                 lmz += lmpush * sgn(ptd.z) * fabs(abind);
+                                // cout << "Mistake " << lmx << ", " << lmpush << ", " << sgn(ptd.x) * fabs(abind) << endl;
                             }
                         }
                     }
@@ -2813,9 +2814,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 }
 
                 Point lmpt(mm[i]->lmx, mm[i]->lmy, mm[i]->lmz);
-                if (lmpt.magnitude() > 1.5)
+                if (lmpt.magnitude() > speed_limit)
                 {
-                    float lmm = 0.5 / lmpt.magnitude();
+                    float lmm = speed_limit / lmpt.magnitude();
                     mm[i]->lmx *= lmm;
                     mm[i]->lmy *= lmm;
                     mm[i]->lmz *= lmm;
@@ -3358,9 +3359,12 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                     bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
                                     float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
                                     
-                                    float lbind1 =
+                                    float lbind1 = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
+                                    #if allow_ligand_esp
+                                    lbind1 += mm[i]->get_intermol_potential(all[j]) * esp_amount;
+                                    #endif
 
-                                        #if allow_ligand_esp
+                                    /*    #if allow_ligand_esp
                                         (mm[i]->mol_typ == MOLTYP_AMINOACID)
                                         ?
                                         #endif
@@ -3369,7 +3373,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                         :
                                         mm[i]->get_intermol_potential(all[j]) - 5 * mm[i]->get_internal_clashes()
                                         #endif
-                                        ;
+                                        ;*/
                                     
                                     /*if (!mm[i]->is_residue()) lbind1 += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;
                                     lbind1 *= lbias;*/

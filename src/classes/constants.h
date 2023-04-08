@@ -106,7 +106,8 @@
 #define polar_repulsion 35.0
 #define charge_repulsion 30.0
 
-#define lmpush 0.05
+#define lmpush 0.01
+#define speed_limit 2.5
 
 #define _enhanced_pi_stacking 1
 #define _preflex_alignment_res 1
@@ -196,6 +197,7 @@
 // potential binding with residues, irrespective of whether the side chain is in an
 // optimum orientation in space.
 #define allow_ligand_esp 1
+#define esp_amount 0.1
 #define shielding_avoidance_factor 2.5
 
 // Uses the ligand's most strongly bound atom as the center for full molecule rotations,

@@ -66,6 +66,7 @@
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (_fullrot_steprad/2)
 #define _def_bnd_momentum (_fullrot_steprad/1.5)
+#define _min_ang_momentum (fiftyseventh*10)
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766

@@ -10,7 +10,7 @@
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 0.5
+#define _kJmol_cuA 0.75
 #define vdw_clash_allowance 1.0
 #define oxytocin 0.007
 #define _DEFAULT_INTERA_R_CUTOFF 8
@@ -60,11 +60,11 @@
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (180.0 * fiftyseventh)
-#define _fullrot_stepdeg 45
+#define _fullrot_stepdeg 30
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
 #define _def_lin_momentum 0.1
-#define _def_ang_momentum (_fullrot_steprad/1.5)
+#define _def_ang_momentum (_fullrot_steprad/2)
 #define _def_bnd_momentum (_fullrot_steprad/1.5)
 
 #define pi_mult_dkytw 264
@@ -106,8 +106,8 @@
 #define polar_repulsion 35.0
 #define charge_repulsion 30.0
 
-#define lmpush 0.00002
-#define speed_limit 2.5
+#define lmpush (0.0002 * _kJmol_cuA)
+#define speed_limit 1.5
 #define lmdecay 0.666
 
 #define _enhanced_pi_stacking 1
@@ -161,12 +161,12 @@
 #define internode_momentum_only_on_activation 1
 
 // Switches for conformational space search.
-#define allow_axial_tumble 0
+#define allow_axial_tumble 1
 #define allow_bond_rots 1
 #define allow_linear_motion 1
-#define monte_carlo_axial 0
+#define monte_carlo_axial 1
 #define monte_carlo_flex 0
-#define multiflex 0
+#define multiflex 1
 #define multiflex_iter 25
 #define _multiflex_stepdiv 8
 #define _multiflex_stepdeg (360.0/_multiflex_stepdiv)
@@ -181,6 +181,7 @@
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
 #define allow_mol_fullrot_iter 0
+#define allow_mol_fullrot_flex 0
 #define sidechain_fullrot_lig_bmult 3
 
 // Extra weight given to sidechain-ligand binding strengths during conformer search.
@@ -266,7 +267,7 @@
 #define _allow_conditional_basicity 0
 
 #define prealign_iters 50
-#define prealign_momenta_mult 0
+#define prealign_momenta_mult 0.5
 
 // Whether to move water molecules around that are clashing or are not forming intermolecular bonds.
 #define _teleport_dissatisfied_waters 1

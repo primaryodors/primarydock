@@ -196,7 +196,9 @@ int main(int argc, char** argv)
     emm1 = &m1;
     emm2 = &m2;
     // allow_ligand_360_flex = false;
-    Molecule::multimol_conform(mols, 200, &iteration_cb);
+    m1.reset_conformer_momenta();
+    m2.reset_conformer_momenta();
+    Molecule::multimol_conform(mols, 50, &iteration_cb);
     float final_clashes = m1.get_intermol_clashes(&m2);
     // if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);

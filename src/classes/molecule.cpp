@@ -2708,7 +2708,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
 
             float reversal = -0.999;
             float lreversal = -pow(0.1, 2.0/iters);
-            float accel = 1.01;
+            float accel = 1.25;
 
             /**** Linear Motion ****/
             #if allow_linear_motion
@@ -2717,6 +2717,8 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 #if debug_break_on_move
                 mm[i]->set_atoms_break_on_move(false);
                 #endif
+
+                mm[i]->enforce_speed_limit();
 
                 Point pt(mm[i]->lmx*frand(0.25, 1), 0, 0);
                 mm[i]->move(pt);
@@ -2815,21 +2817,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     fmaxb = maxb;
                 }
 
-                Point lmpt(mm[i]->lmx, mm[i]->lmy, mm[i]->lmz);
-                if (lmpt.magnitude() > speed_limit)
-                {
-                    float lmm = speed_limit / lmpt.magnitude();
-                    mm[i]->lmx *= lmm;
-                    mm[i]->lmy *= lmm;
-                    mm[i]->lmz *= lmm;
-                }
-                else
-                {
-                    float lmm = lmdecay;
-                    mm[i]->lmx *= lmm;
-                    mm[i]->lmy *= lmm;
-                    mm[i]->lmz *= lmm;
-                }
+                mm[i]->enforce_speed_limit();
 
                 mm[i]->lastbind = bind;
 
@@ -3171,7 +3159,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
             #endif
 
             #if !monte_carlo_flex
-            if ((iter % _fullrot_every)) continue;
+            // if ((iter % _fullrot_every)) continue;
             #endif
 
             #if allow_bond_rots
@@ -3216,7 +3204,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
 
                 #if DBG_BONDFLEX
                 if (DBG_FLEXRES == residue)
+                {
                     cout << "Iter" << iter << " " << mm[i]->name;
+                }
                 #endif
 
                 if (!iter && mm[i]->rings)
@@ -3239,7 +3229,9 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
 
                     #if DBG_BONDFLEX
                     if (DBG_FLEXRES == residue)
+                    {
                         cout << " has rotbonds ";
+                    }
                     #endif
 
                     #if multiflex
@@ -3358,7 +3350,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                         bestfrb = -10000;
                         bestfrrad = nanf("No good results.");
 
-                        if ((residue || allow_ligand_360_flex) && !(iter % _fullrot_every))
+                        if (allow_mol_fullrot_flex && (residue || allow_ligand_360_flex) && !(iter % _fullrot_every))
                         {
                             while ((M_PI*2-rad) > 1e-3)
                             {
@@ -3382,19 +3374,6 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                                     lbind1 += mm[i]->get_intermol_potential(all[j]) * esp_amount;
                                     #endif
 
-                                    /*    #if allow_ligand_esp
-                                        (mm[i]->mol_typ == MOLTYP_AMINOACID)
-                                        ?
-                                        #endif
-                                        mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac)
-                                        #if allow_ligand_esp
-                                        :
-                                        mm[i]->get_intermol_potential(all[j]) - 5 * mm[i]->get_internal_clashes()
-                                        #endif
-                                        ;*/
-                                    
-                                    /*if (!mm[i]->is_residue()) lbind1 += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;
-                                    lbind1 *= lbias;*/
                                     if (mm[i]->is_residue() && !all[j]->is_residue()) lbind1 *= sidechain_fullrot_lig_bmult;
                                     bind1 += lbind1;
                                     bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
@@ -3434,6 +3413,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             ra = frand(-fabs(ra), fabs(ra));
                             #endif
 
+                            // cout << "ra " << ra << endl;
                             mm[i]->rotatable_bonds[k]->rotate(ra, false, skip_inverse_check);
 
                             bind1 = 0;
@@ -3511,6 +3491,25 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
     }	// for iter.
 }
 
+
+void Molecule::enforce_speed_limit()
+{
+    Point lmpt(lmx, lmy, lmz);
+    if (lmpt.magnitude() > speed_limit)
+    {
+        float lmm = speed_limit / lmpt.magnitude();
+        lmx *= lmm;
+        lmy *= lmm;
+        lmz *= lmm;
+    }
+    else
+    {
+        float lmm = lmdecay;
+        lmx *= lmm;
+        lmy *= lmm;
+        lmz *= lmm;
+    }
+}
 
 
 Atom* numbered[10];

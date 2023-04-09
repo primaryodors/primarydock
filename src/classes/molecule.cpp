@@ -2950,10 +2950,11 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     {
                         #if monte_carlo_axial
                         putitback.restore_state(mm[i]);
-                        mm[i]->amx *= 0.98;
+                        if (fabs(mm[i]->amx) > fiftyseventh*10) mm[i]->amx *= 0.98;
                         #else
                         mm[i]->rotate(&v, -lam);
-                        mm[i]->amx *= reversal;
+                        if (fabs(mm[i]->amx) > fiftyseventh*10) mm[i]->amx *= reversal;
+                        else mm[i]->amx *= -1;
                         #endif
                     }
                     else
@@ -3041,10 +3042,11 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     {
                         #if monte_carlo_axial
                         putitback.restore_state(mm[i]);
-                        mm[i]->amy *= 0.98;
+                        if (fabs(mm[i]->amy) > fiftyseventh*10) mm[i]->amy *= 0.98;
                         #else
                         mm[i]->rotate(&v1, -lam);
-                        mm[i]->amy *= reversal;
+                        if (fabs(mm[i]->amy) > fiftyseventh*10) mm[i]->amy *= reversal;
+                        else mm[i]->amy *= -1;
                         #endif
                     }
                     else
@@ -3133,10 +3135,11 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     {
                         #if monte_carlo_axial
                         putitback.restore_state(mm[i]);
-                        mm[i]->amz *= 0.98;
+                        if (fabs(mm[i]->amz) > fiftyseventh*10) mm[i]->amz *= 0.98;
                         #else
                         mm[i]->rotate(&v2, -lam);
-                        mm[i]->amz *= reversal;
+                        if (fabs(mm[i]->amz) > fiftyseventh*10) mm[i]->amz *= reversal;
+                        else mm[i]->amz *= -1;
                         //cout << "x";
                         #endif
                     }
@@ -3435,10 +3438,12 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                             {
                                 #if monte_carlo_flex
                                 putitback.restore_state(mm[i]);
-                                mm[i]->rotatable_bonds[k]->angular_momentum *= 0.98;
+                                if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) > fiftyseventh*10)
+                                    mm[i]->rotatable_bonds[k]->angular_momentum *= 0.98;
                                 #else
                                 mm[i]->rotatable_bonds[k]->rotate(-ra, false, skip_inverse_check);
-                                mm[i]->rotatable_bonds[k]->angular_momentum *= reversal;
+                                if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) > fiftyseventh*10)
+                                    mm[i]->rotatable_bonds[k]->angular_momentum *= reversal;
                                 #endif
                             }
                             else

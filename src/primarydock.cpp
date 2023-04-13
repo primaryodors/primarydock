@@ -2743,7 +2743,9 @@ int main(int argc, char** argv)
             #endif
         }
 
-    DockResult dr[poses*(triesleft+1)+8][pathnodes+2];
+    i = poses*(triesleft+1)+8;
+    DockResult dr[i][pathnodes+2];
+    // cout << "dr[" << i << "] allocated." << endl;
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
     int drcount = 0, qpr;
 
@@ -4594,13 +4596,17 @@ _try_again:
                 }
             }
 
-            for (i=0; i<_INTER_TYPES_LIMIT; i++)
+            int itn;
+            for (itn=0; itn<_INTER_TYPES_LIMIT; itn++)
             {
+                i = itn;
                 dr[drcount][nodeno].bytype[i] = differential_dock ? fin_total_binding_by_type[i] : total_binding_by_type[i];
                 dr[drcount][nodeno].ibytype[i] = init_total_binding_by_type[i];
                 dr[drcount][nodeno].ikJmol += init_total_binding_by_type[i];
                 dr[drcount][nodeno].kJmol += fin_total_binding_by_type[i];
+                // cout << drcount << "|" << i << " ";
             }
+            // cout << endl;
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Filled btypes." << endl;
             #endif
@@ -4727,9 +4733,6 @@ _try_again:
                 #endif
             }
 
-            // drcount = pose;
-            if (nodeno == pathnodes) drcount++;
-
             // For performance reasons, once a path node (including #0) fails to meet the binding energy threshold, discontinue further
             // calculations for this pose.
             if (btot < kJmol_cutoff && !differential_dock)
@@ -4737,6 +4740,7 @@ _try_again:
                 drcount++;
                 break;
             }
+            else if (nodeno == pathnodes) drcount++;
         }	// nodeno loop.
     } // pose loop.
     #if _DBG_STEPBYSTEP

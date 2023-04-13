@@ -4606,7 +4606,7 @@ _try_again:
                 dr[drcount][nodeno].kJmol += fin_total_binding_by_type[i];
                 // cout << drcount << "|" << i << " ";
             }
-            cout << endl;
+            // cout << endl;
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Filled btypes." << endl;
             #endif

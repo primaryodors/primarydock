@@ -281,12 +281,13 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
         atoms[atcount] = nullptr;
         a->bond_to(bondto, bcard);
 
+        clear_all_bond_caches();
+
         if ((atcount & 1) && bondto->get_bonded_atoms_count() == 2)
         {
             Bond* b = bondto->get_bond_between(a);
             if (b && b->can_rotate)
             {
-                b->clear_moves_with_cache();
                 b->rotate(M_PI);
             }
         }

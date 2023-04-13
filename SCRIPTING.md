@@ -28,7 +28,7 @@ Casting an integer to a Cartesian obtains the location of the CA atom for that r
 
 Casting a Cartesian back to float or integer obtains the magnitude of the Cartesian, equal to sqrt(x^2 + y^2 + z^2).
 
-The command line arguments are made available to the script as $arg1, $arg2, etc.
+The command line arguments are made available to the script as $arg1, $arg2, etc. Normally, $arg1 will be the .pepd script filename.
 
 
 Array functionality is available, though not implemented as true arrays. Each element is internally stored as its own discrete variable, for example
@@ -301,6 +301,15 @@ to write a series of `ELSE IF`s, or to combine `IF`s, e.g. `IF &var1 > 0 IF &var
 in exactly this way by transparently replacing `AND` with `IF` behind the scenes.
 
 When using `IF` with `GOTO`, it is possible to create loops as seen in the last example above.
+
+
+# HYDRO
+Examples:
+```
+HYDRO
+```
+
+Hydrogenates the protein.
 
 
 # LET

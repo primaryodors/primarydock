@@ -5069,6 +5069,15 @@ _exitposes:
     {
         if (output)
         {
+            hydrogenate_pdb = false;
+            pf = fopen(protfname, "r");
+            if (!pf)
+            {
+                cout << "Error trying to read " << protfname << endl;
+                return 0xbadf12e;
+            }
+            protein->load_pdb(pf);
+            fclose(pf);
             FILE* pf = fopen(outfname, "ab");
             fprintf(pf, "\nOriginal PDB:\n");
             protein->save_pdb(pf);

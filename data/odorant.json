@@ -13838,6 +13838,14 @@
     {
         "full_name": "formic acid",
         "smiles": "C(=O)[O-]",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "pungent",
+                "vinegar"
+            ]
+        },
         "activity":
         {
             "https:\/\/www.nature.com\/articles\/srep38231":

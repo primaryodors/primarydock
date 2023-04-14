@@ -2816,7 +2816,7 @@ _try_again:
         }
         else
         {
-            pf = fopen(protafname, "r");
+            pf = fopen(protfname, "r");
             protein->load_pdb(pf);
             fclose(pf);
         }
@@ -2923,7 +2923,7 @@ _try_again:
                 #if prevent_ligand_360_on_activate
                 allow_ligand_360_tumble = allow_ligand_360_flex = false;
                 #endif
-                
+
                 // Persist the flexions of the side chains. 
                 // TODO: Do not persist those residues whose positions are important to activation.
                 float* sidechain_bondrots[seql+4];
@@ -2950,6 +2950,15 @@ _try_again:
                         delete[] b;
                     }
                 }
+
+                delete protein;
+                protein = new Protein(protafname);
+                
+                pf = fopen(protafname, "r");
+                protein->load_pdb(pf);
+                fclose(pf);
+
+                prepare_initb();
 
                 for (i=1; i<=seql; i++)
                 {

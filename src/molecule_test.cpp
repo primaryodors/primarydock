@@ -72,7 +72,7 @@ int main(int argc, char** argv)
         }
 
         Point rc = m1.get_ring_center(i);
-        cout << "Ring centered at [" << rc.x << "," << rc.y << "," << rc.z << "]." << endl;
+        cout << "# Ring centered at [" << rc.x << "," << rc.y << "," << rc.z << "]." << endl;
 
         if (cp)
         {

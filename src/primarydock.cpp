@@ -394,6 +394,7 @@ int found_poses = 0;
 int triesleft = 0;				// Default is no retry.
 bool echo_progress = false;
 bool hydrogenate_pdb = false;
+std::string temp_pdb_file;
 bool append_pdb = false;
 bool do_output_colors = false;
 
@@ -2221,6 +2222,12 @@ int main(int argc, char** argv)
             AminoAcid* res = protein->get_residue(resno);
             if (res) res->hydrogenate();
         }
+
+        temp_pdb_file = "tmp/hydro.pdb";
+
+        pf = fopen(temp_pdb_file.c_str(), "wb");
+        protein->save_pdb(pf);
+        fclose(pf);
     }
 
     prepare_acv_bond_rots();
@@ -2795,18 +2802,28 @@ _try_again:
             }
         }
 
+
+        delete protein;
+        protein = new Protein(protfname);
+        
+        if (hydrogenate_pdb)
+        {
+            cout << "Pose " << pose << " node " << nodeno << ": loading " << temp_pdb_file << "." << endl;
+
+            pf = fopen(temp_pdb_file.c_str(), "r");
+            protein->load_pdb(pf);
+            fclose(pf);
+        }
+        else
+        {
+            pf = fopen(protfname, "r");
+            protein->load_pdb(pf);
+            fclose(pf);
+        }
+        prepare_initb();
+
         if (pose > 1)
         {
-            // Revert to saved original locations for the side chain atoms instead of reloading the protein.
-            protein->revert_to_pdb();
-            for (i=0; i<orig_active_helix_rots.size(); i++)
-            {
-                if (orig_active_helix_rots[i].nodeno == -1) orig_active_helix_rots[i].nodeno = active_matrix_node;
-                active_helix_rots[i] = orig_active_helix_rots[i];
-            }
-
-            // prepare_acv_bond_rots();
-
             if (soft_pocket)
             {
                 for (i=0; i<PROT_MAX_RGN; i++)
@@ -2843,8 +2860,6 @@ _try_again:
                 }
             }
         }
-
-        prepare_initb();
 
         ligand->recenter(pocketcen);
         // cout << "Centered ligand at " << pocketcen << endl;
@@ -2908,7 +2923,7 @@ _try_again:
                 #if prevent_ligand_360_on_activate
                 allow_ligand_360_tumble = allow_ligand_360_flex = false;
                 #endif
-                
+
                 // Persist the flexions of the side chains. 
                 // TODO: Do not persist those residues whose positions are important to activation.
                 float* sidechain_bondrots[seql+4];
@@ -2937,19 +2952,12 @@ _try_again:
                 }
 
                 delete protein;
-                protein = new Protein(protfname);
+                protein = new Protein(protafname);
+                
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
                 fclose(pf);
-                if (hydrogenate_pdb)
-                {
-                    int resno, endres = protein->get_end_resno();
-                    for (resno=1; resno<=endres; resno++)
-                    {
-                        AminoAcid* res = protein->get_residue(resno);
-                        if (res) res->hydrogenate();
-                    }
-                }
+
                 prepare_initb();
 
                 for (i=1; i<=seql; i++)
@@ -5069,6 +5077,15 @@ _exitposes:
     {
         if (output)
         {
+            hydrogenate_pdb = false;
+            pf = fopen(protfname, "r");
+            if (!pf)
+            {
+                cout << "Error trying to read " << protfname << endl;
+                return 0xbadf12e;
+            }
+            protein->load_pdb(pf);
+            fclose(pf);
             FILE* pf = fopen(outfname, "ab");
             fprintf(pf, "\nOriginal PDB:\n");
             protein->save_pdb(pf);

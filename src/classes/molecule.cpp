@@ -281,12 +281,13 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
         atoms[atcount] = nullptr;
         a->bond_to(bondto, bcard);
 
+        clear_all_bond_caches();
+
         if ((atcount & 1) && bondto->get_bonded_atoms_count() == 2)
         {
             Bond* b = bondto->get_bond_between(a);
             if (b && b->can_rotate)
             {
-                b->clear_moves_with_cache();
                 b->rotate(M_PI);
             }
         }
@@ -470,8 +471,9 @@ void Molecule::hydrogenate(bool steric_only)
                 }
             }
         }
-
     }
+
+    for (atcount=0; atoms[atcount]; atcount++);     // Update count.
 
     clear_all_bond_caches();
 }
@@ -2117,6 +2119,7 @@ bool Molecule::shielded(Atom* a, Atom* b) const
     for (i=0; i<atcount; i++)
     {
         Atom* ai = atoms[i];
+        if (!ai) break;
         if (ai == a || ai == b) continue;
         float rai = ai->distance_to(a);
         if (rai > r6) continue;
@@ -2209,12 +2212,14 @@ float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
 
     for (i=0; i<atcount; i++)
     {
+        if (!atoms[i]) continue;
         Point aloc = atoms[i]->get_location();
         for (l=0; ligands[l]; l++)
         {
             if (ligands[l] == this) continue;
             for (j=0; j<ligands[l]->atcount; j++)
             {
+                if (!ligands[l]->atoms[j]) continue;
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 float f = 1.0 / r;		// Regular invert rather than inv square so that actual bonding will take over at short range.
                 InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], ligands[l]->atoms[j]);

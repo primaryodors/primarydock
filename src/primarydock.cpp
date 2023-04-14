@@ -2808,8 +2808,6 @@ _try_again:
         
         if (hydrogenate_pdb)
         {
-            cout << "Pose " << pose << " node " << nodeno << ": loading " << temp_pdb_file << "." << endl;
-
             pf = fopen(temp_pdb_file.c_str(), "r");
             protein->load_pdb(pf);
             fclose(pf);

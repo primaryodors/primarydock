@@ -1,13 +1,9 @@
 Created empty molecule named nothing.
-Created molecule named NCCCC=O.
-Loaded 0 atoms of NCCCC=O into molecule.
-Atom N1 has basicity 1
-Atom H7 has basicity 1
-Atom H8 has basicity 1
-Bond N1 - C2 can rotate.
-Bond C2 - C3 can rotate.
-Bond C3 - C4 can rotate.
-Bond C4 - C5 can rotate.
+Created molecule named c1ccccc1.
+Loaded 0 atoms of c1ccccc1 into molecule.
+Found 1 ring(s).
+Ring atoms: C5 C6 C1 C2 C3 C4 
+
 
 Energy level below threshold, SUCCESS.
 Saved output.sdf

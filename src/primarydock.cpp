@@ -444,8 +444,8 @@ std::vector<int>flexible_resnos;
 std::vector<ResiduePlaceholder>forced_flexible_resnos;
 std::vector<ResiduePlaceholder>forced_static_resnos;
 
-float rgnxform_r[PROT_MAX_RGN], rgnxform_theta[PROT_MAX_RGN], rgnxform_y[PROT_MAX_RGN];
-float rgnrot_alpha[PROT_MAX_RGN], rgnrot_w[PROT_MAX_RGN], rgnrot_u[PROT_MAX_RGN];
+float *g_rgnxform_r = nullptr, *g_rgnxform_theta = nullptr, *g_rgnxform_y = nullptr;
+float *g_rgnrot_alpha = nullptr, *g_rgnrot_w = nullptr, *g_rgnrot_u = nullptr;
 
 #if _dummy_atoms_for_debug
 std::vector<Atom> dummies;
@@ -572,7 +572,7 @@ void iteration_callback(int iter)
     int l;
     float prebind;
 
-    if (soft_pocket && iter >= 10)
+    if (soft_pocket && iter >= 10 && g_rgnrot_alpha && g_rgnrot_u && g_rgnrot_w && g_rgnxform_r && g_rgnxform_theta && g_rgnxform_y)
     {
         int sz = soft_rgns.size();
         if (sz)
@@ -680,70 +680,70 @@ void iteration_callback(int iter)
                 switch (tweak)
                 {
                     case 0:
-                    if (postbind > prebind) rgnxform_r[l] += amount;
+                    if (postbind > prebind) g_rgnxform_r[l] += amount;
                     else
                     {
                         r.r = -r.r;
                         protein->move_piece(soft_rgns[l].start, soft_rgns[l].end, r);
                         #if _dbg_soft
-                        cout << " reverting.";
+                        cout << " reverting r.";
                         #endif
                     }
                     break;
 
                     case 1:
-                    if (postbind > prebind) rgnxform_theta[l] += amount;
+                    if (postbind > prebind) g_rgnxform_theta[l] += amount;
                     else
                     {
                         normal.r = -normal.r;
                         protein->move_piece(soft_rgns[l].start, soft_rgns[l].end, normal);
                         #if _dbg_soft
-                        cout << " reverting.";
+                        cout << " reverting normal.";
                         #endif
                     }
                     break;
 
                     case 2:
-                    if (postbind > prebind) rgnxform_y[l] += amount;
+                    if (postbind > prebind) g_rgnxform_y[l] += amount;
                     else
                     {
                         alpha.r = -alpha.r;
                         protein->move_piece(soft_rgns[l].start, soft_rgns[l].end, alpha);
                         #if _dbg_soft
-                        cout << " reverting.";
+                        cout << " reverting alpha.";
                         #endif
                     }
                     break;
 
                     case 3:
-                    if (postbind > prebind) rgnrot_alpha[l] += amount/10;
+                    if (postbind > prebind) g_rgnrot_alpha[l] += amount/10;
                     else
                     {
                         protein->rotate_piece(soft_rgns[l].start, soft_rgns[l].end, rgncen, alpha, -amount/10);
                         #if _dbg_soft
-                        cout << " reverting.";
+                        cout << " reverting alpha rot.";
                         #endif
                     }
                     break;
 
                     case 4:
-                    if (postbind > prebind) rgnrot_w[l] += amount/50;
+                    if (postbind > prebind) g_rgnrot_w[l] += amount/50;
                     else
                     {
                         protein->rotate_piece(soft_rgns[l].start, soft_rgns[l].end, rgncen, r, -amount/50);
                         #if _dbg_soft
-                        cout << " reverting.";
+                        cout << " reverting r rot.";
                         #endif
                     }
                     break;
 
                     case 5:
-                    if (postbind > prebind) rgnrot_u[l] += amount/30;
+                    if (postbind > prebind) g_rgnrot_u[l] += amount/30;
                     else
                     {
                         protein->rotate_piece(soft_rgns[l].start, soft_rgns[l].end, rgncen, normal, -amount/30);
                         #if _dbg_soft
-                        cout << " reverting.";
+                        cout << " reverting normal rot.";
                         #endif
                     }
                     break;
@@ -2272,12 +2272,14 @@ int main(int argc, char** argv)
             throw 0xbad5e697;
         }
 
+        #if softpocket_mistake
         for (i=0; i<PROT_MAX_RGN; i++)
         {
             rgnxform_r[i] = rgnxform_theta[i] = rgnxform_y[i]
                 = rgnrot_alpha[i] = rgnrot_u[i] = rgnrot_w[i]
                 = 0;
         }
+        #endif
     }
 
 
@@ -2754,6 +2756,10 @@ int main(int argc, char** argv)
     DockResult dr[i][pathnodes+2];
     // cout << "dr[" << i << "] allocated." << endl;
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
+
+    float rgnxform_r[i][pathnodes+2][PROT_MAX_RGN], rgnxform_theta[i][pathnodes+2][PROT_MAX_RGN], rgnxform_y[i][pathnodes+2][PROT_MAX_RGN];
+    float rgnrot_alpha[i][pathnodes+2][PROT_MAX_RGN], rgnrot_w[i][pathnodes+2][PROT_MAX_RGN], rgnrot_u[i][pathnodes+2][PROT_MAX_RGN];
+
     int drcount = 0, qpr;
 
     if (pathnodes)
@@ -2805,7 +2811,7 @@ _try_again:
 
         delete protein;
         protein = new Protein(protfname);
-        
+
         if (hydrogenate_pdb)
         {
             pf = fopen(temp_pdb_file.c_str(), "r");
@@ -2820,6 +2826,7 @@ _try_again:
         }
         prepare_initb();
 
+        #if softpocket_mistake
         if (pose > 1)
         {
             if (soft_pocket)
@@ -2858,6 +2865,7 @@ _try_again:
                 }
             }
         }
+        #endif
 
         ligand->recenter(pocketcen);
         // cout << "Centered ligand at " << pocketcen << endl;
@@ -2884,6 +2892,23 @@ _try_again:
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
             movie_offset = iters * (nodeno /*+ (pose-1)*(pathnodes+1)*/);
+
+            if (soft_pocket)
+            {
+                for (i=0; i<PROT_MAX_RGN; i++)
+                {
+                    rgnxform_r[pose][nodeno][i] = rgnxform_theta[pose][nodeno][i] = rgnxform_y[pose][nodeno][i]
+                        = rgnrot_alpha[pose][nodeno][i] = rgnrot_u[pose][nodeno][i] = rgnrot_w[pose][nodeno][i]
+                        = 0;
+                }
+    
+                g_rgnxform_r = rgnxform_r[pose][nodeno];
+                g_rgnxform_theta = rgnxform_theta[pose][nodeno];
+                g_rgnxform_y = rgnxform_y[pose][nodeno];
+                g_rgnrot_alpha = rgnrot_alpha[pose][nodeno];
+                g_rgnrot_u = rgnrot_u[pose][nodeno];
+                g_rgnrot_w = rgnrot_w[pose][nodeno];
+            }
 
             if (waters)
             {
@@ -4987,18 +5012,18 @@ _try_again:
                             if (output) *output << "Soft transformations:" << endl;
                             for (l=0; l<soft_rgns.size(); l++)
                             {
-                                cout << soft_rgns[l].name << ".Δr: " << rgnxform_r[l] << endl;
-                                cout << soft_rgns[l].name << ".Δθ: " << rgnxform_theta[l] << endl;
-                                cout << soft_rgns[l].name << ".Δy: " << rgnxform_y[l] << endl;
-                                cout << soft_rgns[l].name << ".Δα: " << rgnrot_alpha[l]*fiftyseven << endl;
-                                cout << soft_rgns[l].name << ".Δφw: " << rgnrot_w[l]*fiftyseven << endl;
-                                cout << soft_rgns[l].name << ".Δφu: " << rgnrot_u[l]*fiftyseven << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δr: " << rgnxform_r[l] << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δθ: " << rgnxform_theta[l] << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δy: " << rgnxform_y[l] << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δα: " << rgnrot_alpha[l]*fiftyseven << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δφw: " << rgnrot_w[l]*fiftyseven << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δφu: " << rgnrot_u[l]*fiftyseven << endl;
+                                cout << soft_rgns[l].name << ".Δr: " << rgnxform_r[j][k][l] << endl;
+                                cout << soft_rgns[l].name << ".Δθ: " << rgnxform_theta[j][k][l] << endl;
+                                cout << soft_rgns[l].name << ".Δy: " << rgnxform_y[j][k][l] << endl;
+                                cout << soft_rgns[l].name << ".Δα: " << rgnrot_alpha[j][k][l]*fiftyseven << endl;
+                                cout << soft_rgns[l].name << ".Δφw: " << rgnrot_w[j][k][l]*fiftyseven << endl;
+                                cout << soft_rgns[l].name << ".Δφu: " << rgnrot_u[j][k][l]*fiftyseven << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δr: " << rgnxform_r[j][k][l] << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δθ: " << rgnxform_theta[j][k][l] << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δy: " << rgnxform_y[j][k][l] << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δα: " << rgnrot_alpha[j][k][l]*fiftyseven << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δφw: " << rgnrot_w[j][k][l]*fiftyseven << endl;
+                                if (output) *output << soft_rgns[l].name << ".Δφu: " << rgnrot_u[j][k][l]*fiftyseven << endl;
                             }
                             cout << endl;
                             if (output) *output << endl;

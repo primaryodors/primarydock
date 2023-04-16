@@ -2271,15 +2271,6 @@ int main(int argc, char** argv)
             cout << "Error: no regions in PDB or specified regions not found." << endl;
             throw 0xbad5e697;
         }
-
-        #if softpocket_mistake
-        for (i=0; i<PROT_MAX_RGN; i++)
-        {
-            rgnxform_r[i] = rgnxform_theta[i] = rgnxform_y[i]
-                = rgnrot_alpha[i] = rgnrot_u[i] = rgnrot_w[i]
-                = 0;
-        }
-        #endif
     }
 
 
@@ -2825,47 +2816,6 @@ _try_again:
             fclose(pf);
         }
         prepare_initb();
-
-        #if softpocket_mistake
-        if (pose > 1)
-        {
-            if (soft_pocket)
-            {
-                for (i=0; i<PROT_MAX_RGN; i++)
-                {
-                    int maxresno = protein->get_end_resno();
-
-                    if (i < soft_rgns.size())
-                    {
-                        Point ptrgn = protein->get_region_center(soft_rgns[i].start, soft_rgns[i].end);
-                        SCoord r = ptrgn.subtract(loneliest);
-                        r.theta = 0;
-                        r.r = -rgnxform_r[i];
-                        Point pr1 = loneliest.add(r);
-                        Point pr2 = pr1;
-                        pr2.y += 20;
-                        SCoord normal = compute_normal(loneliest, pr1, pr2);
-                        normal.r = -rgnxform_theta[i];
-                        SCoord alpha = protein->get_region_axis(soft_rgns[i].start, soft_rgns[i].end);
-                        alpha.r = -rgnxform_y[i];
-                        Point rgncen = protein->get_region_center(soft_rgns[i].start, soft_rgns[i].end);
-
-                        if (rgnxform_r[i])      protein->move_piece(soft_rgns[i].start, soft_rgns[i].end, r);
-                        if (rgnxform_theta[i])  protein->move_piece(soft_rgns[i].start, soft_rgns[i].end, normal);
-                        if (rgnxform_y[i])      protein->move_piece(soft_rgns[i].start, soft_rgns[i].end, alpha);
-                        r.r = normal.r = alpha.r = 1;
-                        if (rgnrot_alpha[i])    protein->rotate_piece(soft_rgns[i].start, soft_rgns[i].end, rgncen, alpha, -rgnrot_alpha[i]);
-                        if (rgnrot_w[i])        protein->rotate_piece(soft_rgns[i].start, soft_rgns[i].end, rgncen, r, -rgnrot_w[i]);
-                        if (rgnrot_u[i])        protein->rotate_piece(soft_rgns[i].start, soft_rgns[i].end, rgncen, normal, -rgnrot_u[i]);
-                    }
-
-                    rgnxform_r[i] = rgnxform_theta[i] = rgnxform_y[i]
-                        = rgnrot_alpha[i] = rgnrot_u[i] = rgnrot_w[i]
-                        = 0;
-                }
-            }
-        }
-        #endif
 
         ligand->recenter(pocketcen);
         // cout << "Centered ligand at " << pocketcen << endl;

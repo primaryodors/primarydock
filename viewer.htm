@@ -159,6 +159,16 @@ a:hover
     padding-right: 5px;
 }
 
+#dspsett
+{
+	position: absolute;
+	top: 53px;
+	border: 1px solid #039;
+    padding: 5px;
+    background-color: rgba(0, 32, 96, 0.67);
+    border-radius: 13px;
+}
+
 .clickme, .clickme:hover
 {
 	cursor: pointer;
@@ -263,9 +273,9 @@ option.unknown
 	color: #999;
 }
 
-#clip
+#clip, #bbvis, #lght
 {
-    width: 400px;
+    width: 503px;
 }
 
 #seqdd
@@ -428,17 +438,10 @@ function rotate3D(point, source, axis, theta)
      >&nbsp;
 </div>
 
-<div id="clipslide">
-Clip:
-<input type="range" id="clip" min="0" max="100" step="1" value="0" class="slider" onkeyup="this.blur();">
-<span id="prsv" style="display: none;">
-<input type="checkbox" id="preserve" checked onchange="$('#clip').trigger('input');"> Preserve Ligand
-</span>
-</div>
-
 &nbsp;|&nbsp;
 
 <div id="affichage">
+	<a id="settbtn" class="nodebtn clickme symbol" onclick="show_hide_sett();" title="View Settings">&#9881;</a>
 	<a id="ptbbbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a>
 	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
 </div>
@@ -457,6 +460,21 @@ Center:
 <a class="posebtn clickme" onclick="curr_ligand.autoView(); cen_ligand = true;" id="ligbtn" style="display: none;">Ligand</a>
 </div>
 </div>
+
+<div id="dspsett" style="display: none;">
+Clip:
+<input type="range" id="clip" min="0" max="100" step="1" value="0" class="slider" onkeyup="this.blur();">
+<span id="prsv">
+<input type="checkbox" id="preserve" checked onchange="$('#clip').trigger('input');"> Preserve Ligand
+</span>
+<br>
+Backbone:
+<input type="range" id="bbvis" min="0" max="100" step="1" value="25" class="slider" onkeyup="this.blur();">
+<br>
+Lighting:
+<input type="range" id="lght" min="0" max="170" step="1" value="80" class="slider" onkeyup="this.blur();">
+</div>
+
 <center>
 <div id="viewport" style="width:1800px; height:880px; background-color: #020408;"></div>
 </center>
@@ -795,6 +813,43 @@ function show_hide_gmdl()
 		});
 	}
 	gmdl_shown = !gmdl_shown;
+}
+
+function set_gmdl_opacity()
+{
+	var opc = parseFloat($("#bbvis")[0].value) / 100;
+	if (gmdl_shown)
+	{
+		gmodel[0].removeAllRepresentations();
+		gmodel[0].addRepresentation( "cartoon",
+		{
+			opacity: opc,
+			colorScheme: PODefRgnScheme,
+			metalness: mtl_cartoon,
+		});
+	}
+}
+
+function show_hide_sett()
+{
+	var sett = $("#dspsett");
+	var rect = $("#ctrls")[0].getClientRects()[0];
+	sett[0].style.top = (parseInt(rect.bottom)+5) + "px";
+	rect = $("#settbtn")[0].getClientRects()[0];
+	sett[0].style.left = (parseInt(rect.left)+0) + "px";
+	sett.toggle().on("mouseleave", function()
+	{
+		if (tmoid) window.clearTimeout(tmoid);
+		tmoid = window.setTimeout(function()
+		{
+			$('#dspsett').hide();
+		}, 1000);
+	}).on("mousemove", function()
+	{
+		if (tmoid) window.clearTimeout(tmoid);
+	});
+
+	sett.show();
 }
 
 window.onresize = function()
@@ -1873,6 +1928,20 @@ $("#clip").on("input", function (e, obj)
     stage.setParameters( { "fogNear": (clipValue), "fogFar": Math.max(25+clipValue, 200-clipValue*3), } );
 });
 
+$("#bbvis").on("input", function (e, obj)
+{
+	set_gmdl_opacity();
+});
+
+$("#lght").on("input", function (e, obj)
+{
+	var lint = parseFloat($("#lght")[0].value) / 100;
+	stage.setParameters(
+	{
+		'lightIntensity': lint,
+	});
+});
+
 function getFileContents(event)
 {
     var ff = event.target.files;
@@ -2224,9 +2293,9 @@ function loadFile(fileData, fileName = "")
 
                     	comp.autoView();
                         
-                        const quaternion = new THREE.Quaternion();
+                        /*const quaternion = new THREE.Quaternion();
 						quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
-						stage.animationControls.rotate(quaternion);
+						stage.animationControls.rotate(quaternion);*/
                     }
                 } );
                 $("#affichage").show();

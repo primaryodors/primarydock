@@ -9,6 +9,14 @@ $odors = json_decode(file_get_contents("data/odorant.json"), true);
 $refs = json_decode(file_get_contents("data/reference.json"), true);
 chdir($cwd);
 
+foreach ($odors as $oid => $odor)
+{
+	if (!empty($odor["activity"])) foreach ($odor["activity"] as $url => $acv)
+	{
+		if (@$refs[$url]["hidden"]) unset($odors[$oid]["activity"][$url]);
+	}
+}
+
 $types =
 [
 	0 => "na",

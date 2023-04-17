@@ -12,7 +12,6 @@ $json_file = "predict/dock_results.json";
 
 chdir(__DIR__);
 chdir("..");
-$odors = json_decode(file_get_contents("data/odorant.json"), true);
 
 if (file_exists($json_file))
 {

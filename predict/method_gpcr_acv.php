@@ -22,8 +22,6 @@ $max_simultaneous_docks = 4;	// If running this script as a cron, we recommend s
 $dock_results = [];
 $json_file = "predict/dock_results.json";
 
-$odors = json_decode(file_get_contents("data/odorant.json"), true);
-
 if (file_exists($json_file))
 {
 	$dock_results = json_decode(file_get_contents($json_file), true);

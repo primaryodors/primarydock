@@ -35,7 +35,7 @@ Array functionality is available, though not implemented as true arrays. Each el
 if we define `LET $array[3] = "three"` then a string variable called `$array[3]` will be assigned the value of `three`. That means any reference to
 `$array` will obtain an empty string since that variable technically hasn't been set.
 
-Variables as array indices are possible because of nested variable names. If an integer `%i` is set, and has a value of `3`, then `$array[%i]` and `$array[3]` will be equivalent. Nested variables are limited to integer and string types, so while `$array[$element]` is allowed, 
+Variables as array indices are possible because of nested variable names. If an integer `%i` is set, and has a value of `3`, then `$array[%i]` and `$array[3]` will be equivalent. Nested variables are limited to integer and string types, so while `$array[$key]` and `@array[$key]` are allowed, 
 `$array[@location.x]` is not. If there is any ambiguity in variable names, the longest and earliest matching variable is used.
 
 This works similarly to the `$$` syntax of PHP, where if `$varname = "foo"` then `$$varname` is the same as `$foo`. However, unlike in PHP, the nested

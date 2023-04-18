@@ -9017,8 +9017,8 @@
     },
     "66f5442bbfde5b89a686df5fe8b80985":
     {
-        "full_name": "decanal",
-        "name1": "aldehyde C-10",
+        "iupac": "decanal",
+        "full_name": "aldehyde C-10",
         "smiles": "CCCCCCCCCC=O",
         "aroma":
         {
@@ -10359,7 +10359,7 @@
     },
     "a0d19b67358ae73e7c19d0042026abef":
     {
-        "full_name": "methylene chlorids",
+        "full_name": "methylene chloride",
         "iupac": "dichloromethane",
         "smiles": "[Cl]C[Cl]"
     },
@@ -11585,7 +11585,7 @@
     },
     "a86c389b5db44acad6bbdf008841e48e":
     {
-        "full_name": "(e),(e)-2,4-decadienal",
+        "full_name": "(E),(E)-2,4-decadienal",
         "smiles": "CCCCC\/C=C\/C=C\/C=O",
         "aroma":
         {
@@ -11619,7 +11619,7 @@
     },
     "7545920ed593b49a522a4a2e09526126":
     {
-        "full_name": "(e)-2-heptenal",
+        "full_name": "(E)-2-heptenal",
         "smiles": "CCCC\/C=C\/C=O",
         "aroma":
         {
@@ -11682,7 +11682,7 @@
     },
     "7455b2ec07972ab2d0ff3e11528549df":
     {
-        "full_name": "(e)-2-nonenal",
+        "full_name": "(E)-2-nonenal",
         "smiles": "CCCCCC\/C=C\/C=O",
         "aroma":
         {
@@ -30780,6 +30780,7 @@
     "fa8085bacc3866c6c81c250f100da9c2":
     {
         "full_name": "(R,S)-methyl cedryl ketone",
+        "name1": "vertofix",
         "smiles": "C[C@@H]1CC[C@@H]2C13CC[C@]([C@H](C3)C2(C)C)(C)C(=O)C",
         "aroma":
         {
@@ -30996,6 +30997,7 @@
     "561739682e1f29534c4c2020fe07cbc8":
     {
         "full_name": "sandranol",
+        "name1": "bacdanol",
         "smiles": "CC\/C(=CCC1CC=C(C1(C)C)C)\/CO",
         "aroma":
         {
@@ -31053,6 +31055,10 @@
     "d435ecf4146ca87bddb13b0320edbb71":
     {
         "full_name": "santaliff",
+        "name1": "hindinol",
+        "name2": "sandal mysore",
+        "name3": "sandafleur",
+        "name4": "sandal butenol",
         "smiles": "CC1=CCC(C1(C)C)C\/C=C(\\C)\/CO",
         "aroma":
         {
@@ -31624,6 +31630,7 @@
     "9258a8a4b4ada348d97f257b3346ccfd":
     {
         "full_name": "shoyu pyrazine",
+        "iupac": "2,3-diethylpyrazine",
         "smiles": "CCC1=NC=CN=C1CC",
         "aroma":
         {
@@ -32311,7 +32318,8 @@
     },
     "173d9a34baabaab64949f8217c0fbbb7":
     {
-        "full_name": "tetradecanoic acid",
+        "full_name": "myristic acid",
+        "iupac": "tetradecanoic acid",
         "smiles": "CCCCCCCCCCCCCC(=O)[O-]",
         "aroma":
         {
@@ -32688,6 +32696,8 @@
     "205815e6ade49371b1ef06511691e855":
     {
         "full_name": "timberol",
+        "name1": "norlimbanol",
+        "name2": "karmawood",
         "smiles": "OC(CCC)CCC1C(CCCC1(C)C)C",
         "aroma":
         {
@@ -32797,6 +32807,7 @@
     "a00c3d2eaaca6e91820c963b74b829dd":
     {
         "full_name": "tonka undecanone",
+        "name1": "florex",
         "smiles": "C\/C=C\/1\\CC2CC1C3C2OC(=O)CC3",
         "aroma":
         {
@@ -33427,6 +33438,7 @@
     "c0fa22d4575dddc533baf75fdb8ff59b":
     {
         "full_name": "troenan",
+        "name1": "privet dioxane",
         "smiles": "CCCC(C)C1OCC(CO1)(C)CCC",
         "aroma":
         {
@@ -33933,6 +33945,7 @@
     "9b66ce282570d15a3cb4687defdb97d5":
     {
         "full_name": "verdyl acetate",
+        "name1": "jasmacyclene",
         "smiles": "CC(=O)OC1CC2CC1C3C2C=CC3",
         "aroma":
         {

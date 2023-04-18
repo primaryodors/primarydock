@@ -11,10 +11,44 @@ chdir($cwd);
 
 foreach ($odors as $oid => $odor)
 {
+	$odors[$oid]["oid"] = $oid;
 	if (!empty($odor["activity"])) foreach ($odor["activity"] as $url => $acv)
 	{
 		if (@$refs[$url]["hidden"]) unset($odors[$oid]["activity"][$url]);
 	}
+}
+
+function trim_prefixes($what)
+{
+	return
+		preg_replace("/[()]/", "",
+		preg_replace(
+		"/^(([0-9-]*[(][ERSZ0-9, +-]+[)]?[-,]?)|(([0-9A-Z,]+|[a-z])-)|((alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|o|ortho|m|meta|p|para|cis|trans)-))+/"
+		, "", $what));
+}
+
+function odorcmp($a, $b)
+{
+	$A = strtolower(trim_prefixes($a["full_name"]));
+	$B = strtolower(trim_prefixes($b["full_name"]));
+
+	if ($A == $B)
+	{
+		$A = $a["full_name"];
+		$B = $b["full_name"];
+	}
+
+	if ($A == $B) return 0;
+	else return ($A > $B) ? 1 : -1;
+}
+
+usort($odors, "odorcmp");
+
+foreach ($odors as $k => $odor)
+{
+	$oid = $odor["oid"];
+	$odors[$oid] = $odor;
+	unset($odors[$k]);
 }
 
 $types =
@@ -30,6 +64,17 @@ $types =
 ];
 
 $sepyt = array_flip($types);
+
+function hellenicize($what)
+{
+	$what = preg_replace("/alpha([,-])/",   "&#x3B1;$1", $what);
+    $what = preg_replace("/beta([,-])/",    "&#x3B2;$1", $what);
+    $what = preg_replace("/gamma([,-])/",   "&#x3B3;$1", $what);
+    $what = preg_replace("/delta([,-])/",   "&#x3B4;$1", $what);
+    $what = preg_replace("/epsilon([,-])/", "&#x3B5;$1", $what);
+    $what = preg_replace("/omega([,-])/",   "&#x3C9;$1", $what);
+	return $what;
+}
 
 function best_empirical_pair($protein, $aroma, $as_object = false)
 {

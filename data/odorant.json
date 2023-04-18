@@ -504,6 +504,7 @@
     "cd56aaf93bc028e0c8bccd557cd44ff0":
     {
         "full_name": "acetylsalicylic acid",
+        "name1": "aspirin",
         "smiles": "c1cccc(C(=O)[O-])c1OC(=O)C",
         "aroma": []
     },
@@ -524,6 +525,7 @@
     "00e884588b8a6ba666fbdf29e9a75eda":
     {
         "full_name": "acrolein",
+        "iupac": "prop-2-enal",
         "smiles": "C=CC=O",
         "aroma": []
     },
@@ -709,7 +711,21 @@
     {
         "full_name": "allyl hexanoate",
         "smiles": "C=CCOC(=O)CCCCC",
-        "aroma": []
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "fruity",
+                "pineapple",
+                "tropical",
+                "ethereal",
+                "rummy",
+                "arrack",
+                "fatty",
+                "cognac"
+            ]
+        }
     },
     "133c67e241ae1616afcbd35823e685dd":
     {
@@ -953,6 +969,7 @@
     "86bd1a10bf74d7227a7881822d7c57a2":
     {
         "full_name": "almond pyrazine",
+        "iupac": "2-methoxy-3-methyl pyrazine",
         "smiles": "CC1=NC=CN=C1OC",
         "aroma":
         {
@@ -1588,6 +1605,8 @@
     "7ad7b885f37cb8c0d7fee3bec249d918":
     {
         "full_name": "velvione",
+        "name1": "ambretone",
+        "name2": "musk amberol",
         "smiles": "C1CCCCCC(=O)CCCC=CCCCC1",
         "aroma":
         {
@@ -2034,6 +2053,7 @@
     "5b7e5f44704758a0b162949545f0e249":
     {
         "full_name": "amyl laurate",
+        "iupac": "pentyl tetradecanoate",
         "smiles": "CCCCCCCCCCCC(=O)OCCCCC",
         "aroma":
         {
@@ -2561,6 +2581,7 @@
     "c5e95737ab5fbe023523f40f52ba4d9b":
     {
         "full_name": "bean pyrazine",
+        "iupac": "2-methoxy-3-isopropylpyrazine",
         "smiles": "CC(C)C1=NC=CN=C1OC",
         "aroma":
         {
@@ -3080,6 +3101,7 @@
     "dd82ca089de8ad7766e65c365c84cb46":
     {
         "full_name": "benzyl alcohol",
+        "iupac": "phenylmethanol",
         "smiles": "c1ccccc1CO",
         "aroma":
         {
@@ -3133,11 +3155,13 @@
     "1be8907c0096dbaafb7be897eaff6849":
     {
         "full_name": "benzylamine",
+        "iupac": "phenylmethylamine",
         "smiles": "c1ccccc1C[NH3+]"
     },
     "7989b000c9c5b1e098038703c60f4b61":
     {
         "full_name": "benzyl butyrate",
+        "iupac": "phenylmethyl butanoate",
         "smiles": "c1ccccc1COC(=O)CCC",
         "aroma":
         {
@@ -3195,6 +3219,7 @@
     "a77498adebe125330f7fc44751007123":
     {
         "full_name": "benzyl formate",
+        "iupac": "phenylmethyl formate",
         "smiles": "c1ccccc1COC=O",
         "aroma":
         {
@@ -3213,6 +3238,7 @@
     "3f763f1a700ccb2dc4ee23a9f83dc90d":
     {
         "full_name": "benzyl isobutyrate",
+        "iupac": "phenylmethyl 2-methylpropanoate",
         "smiles": "c1ccccc1COC(=O)C(C)C",
         "aroma":
         {
@@ -3244,6 +3270,7 @@
     "d187dbf0112107d2183cccbb9c47742b":
     {
         "full_name": "benzyl propionate",
+        "iupac": "phenylmethyl propanoate",
         "smiles": "c1ccccc1COC(=O)CC",
         "aroma":
         {
@@ -4261,6 +4288,7 @@
     "6a1c9106752537596b4ed05459834a8e":
     {
         "full_name": "2-butanone",
+        "alt_name": "methyl ethyl ketone",
         "smiles": "CC(=O)CC",
         "aroma":
         {
@@ -5072,6 +5100,7 @@
     "ed63ea395381cf765bc75d9c5d035db5":
     {
         "full_name": "calone",
+        "name2": "watermelon ketone",
         "smiles": "O=C1COc2c(OC1)cc(cc2)C",
         "aroma":
         {
@@ -5282,6 +5311,7 @@
     "9a87e7c90094c2a95230b8faf8524b2f":
     {
         "full_name": "foliaver",
+        "name1": "canthoxal",
         "smiles": "CC(CC1=CC=C(C=C1)OC)C=O",
         "aroma":
         {
@@ -5334,6 +5364,7 @@
     "28c1256869a1b671970feda9b3a06c31":
     {
         "full_name": "capric acid",
+        "iupac": "decanoic acid",
         "smiles": "CCCCCCCCCC(=O)[O-]",
         "aroma":
         {
@@ -5425,6 +5456,7 @@
     "2a4af7e243b2c9cc5eb2a629dffb193f":
     {
         "full_name": "caproic acid",
+        "iupac": "hexanoic acid",
         "smiles": "CCCCCC(=O)[O-]",
         "aroma":
         {
@@ -5615,7 +5647,8 @@
     },
     "fc2315068badd8c95ac0534f747eefaf":
     {
-        "full_name": "octanoic acid",
+        "full_name": "caprylic acid",
+        "iupac": "octanoic acid",
         "smiles": "CCCCCCCC(=O)[O-]",
         "aroma":
         {
@@ -5749,7 +5782,8 @@
     },
     "2cb1e8f9df11e35e3246d7a9b343ee78":
     {
-        "full_name": "sotolone",
+        "full_name": "caramel furanone",
+        "name2": "sotolone",
         "smiles": "CC1C(=C(C(=O)O1)O)C",
         "aroma":
         {
@@ -6272,11 +6306,6 @@
             }
         }
     },
-    "dc8f6d38cf2b492507ca69273ba61e78":
-    {
-        "full_name": "cineole",
-        "smiles": "CC1(C2CCC(O1)(CC2)C)C"
-    },
     "69fceb91b4585f75c2eb932cb963d0e8":
     {
         "full_name": "cinnamaldehyde",
@@ -6542,6 +6571,7 @@
     "7d23be27809d3a8a7615d6c3e15450b1":
     {
         "full_name": "cis-3-hexen-1-ol",
+        "name1": "leaf alcohol",
         "smiles": "CC\\C=C\/CCO",
         "aroma":
         {
@@ -7666,7 +7696,8 @@
     },
     "b477f0448f6abaad3633fda25e630903":
     {
-        "full_name": "difurfuryl disulfide",
+        "full_name": "coffee difuran",
+        "name1": "difurfuryl disulfide",
         "smiles": "C1=COC(=C1)CSSCC2=CC=CO2",
         "aroma":
         {
@@ -8250,6 +8281,7 @@
     "c2b20d388361d6a452fcce1c3acc5d24":
     {
         "full_name": "cyclamal",
+        "name1": "cyclamen aldehyde",
         "smiles": "CC(C)c1ccc(cc1)CC(C)C=O",
         "aroma":
         {
@@ -8892,6 +8924,7 @@
     "42c11696d6fa57e09a0c5ac869d0b86b":
     {
         "full_name": "cyclotene",
+        "name1": "maple lactone",
         "smiles": "CC1C(=O)C(=O)CC1",
         "aroma":
         {
@@ -8985,6 +9018,7 @@
     "66f5442bbfde5b89a686df5fe8b80985":
     {
         "full_name": "decanal",
+        "name1": "aldehyde C-10",
         "smiles": "CCCCCCCCCC=O",
         "aroma":
         {
@@ -9553,8 +9587,22 @@
     "b984499508e50402f1998274a7eac486":
     {
         "full_name": "decyl acetate",
+        "name1": "acetate C-10",
         "smiles": "CC(=O)OCCCCCCCCCC",
-        "aroma": []
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "waxy",
+                "clean",
+                "fresh",
+                "cloth",
+                "laundered",
+                "cloth",
+                "citrus",
+                "soapy"
+            ]
+        }
     },
     "55faf7a234638b5a2a4edfd80dc6aee5":
     {
@@ -10311,7 +10359,8 @@
     },
     "a0d19b67358ae73e7c19d0042026abef":
     {
-        "full_name": "dichloromethane",
+        "full_name": "methylene chlorids",
+        "iupac": "dichloromethane",
         "smiles": "[Cl]C[Cl]"
     },
     "865c6d4085b0d00a81cf4d98140da208":
@@ -10969,6 +11018,7 @@
     "d89587b807d7d412d9c620bd7626e809":
     {
         "full_name": "diphenyl ether",
+        "name1": "diphenyl oxide",
         "smiles": "c1ccccc1Oc2ccccc2",
         "aroma":
         {
@@ -11260,7 +11310,8 @@
     },
     "07b43db36064dd10fff11816ab8e3b63":
     {
-        "full_name": "dodecanoic acid",
+        "full_name": "lauric acid",
+        "iupac": "dodecanoic acid",
         "smiles": "CCCCCCCCCCCC(=O)[O-]",
         "aroma":
         {
@@ -11392,6 +11443,7 @@
     "363c1e0844dcd435f227669ae96f86a0":
     {
         "full_name": "earthy pyrazine",
+        "iupac": "2-ethyl-3-methoxypyrazine",
         "smiles": "CCC1=NC=CN=C1OC",
         "aroma":
         {
@@ -11671,6 +11723,7 @@
     "8725e833ad2e8695fc0199a7d9020462":
     {
         "full_name": "estragole",
+        "name1": "methyl chavicol",
         "smiles": "COc1ccc(CC=C)cc1",
         "aroma":
         {
@@ -11734,6 +11787,7 @@
     "01c401e3e42a0217b362e491ca1cbae7":
     {
         "full_name": "ethanethiol",
+        "name1": "ethyl mercaptan",
         "smiles": "CCS",
         "aroma":
         {
@@ -11816,7 +11870,9 @@
     },
     "e6593305cecf217bbf4c9b7c48d9faa4":
     {
-        "full_name": "2-ethoxynaphthalene",
+        "full_name": "beta-naphthyl ethyl ether",
+        "name1": "nerolin bromelia",
+        "iupac": "2-ethoxynaphthalene",
         "smiles": "CCOC1=CC2=CC=CC=C2C=C1",
         "aroma":
         {
@@ -11915,6 +11971,7 @@
     "f163ec4e34e78cf462e76d7467f54c90":
     {
         "full_name": "ethyl caproate",
+        "iupac": "ethyl hexanoate",
         "smiles": "CCCCCC(=O)OCC",
         "aroma":
         {
@@ -12053,7 +12110,8 @@
     },
     "bb6d2bf09800274302f20ff7d7500d81":
     {
-        "full_name": "8-ethyl-1,5-dimethylbicyclo[3.2.1]octan-8-ol",
+        "full_name": "huminol M",
+        "iupac": "8-ethyl-1,5-dimethylbicyclo[3.2.1]octan-8-ol",
         "smiles": "CCC1(C2(CCCC1(CC2)C)C)O",
         "aroma":
         {
@@ -12254,6 +12312,8 @@
     "d2a8c5bd54f5a8d35653227ca8fdabfe":
     {
         "full_name": "2-ethyl fenchol",
+        "name1": "terrasol",
+        "iupac": "6-ethyl-1,5,5-trimethylbicyclo[2.2.1]heptan-6-ol",
         "smiles": "CC1(C2CCC(C2)(C1OCC)C)C",
         "aroma":
         {
@@ -12381,7 +12441,8 @@
     },
     "801403bb70eafdc9644f50b64e618deb":
     {
-        "full_name": "ethyl heptanoate",
+        "full_name": "ethyl oenanthate",
+        "iupac": "ethyl heptanoate",
         "smiles": "CCCCCCC(=O)OCC",
         "aroma":
         {
@@ -12597,7 +12658,8 @@
     },
     "a52b32d487248685ee24b07447c3bac7":
     {
-        "full_name": "ethyl nonanoate",
+        "full_name": "ethyl pelargonate",
+        "iupac": "ethyl nonanoate",
         "smiles": "CCCCCCCCC(=O)OCC",
         "aroma":
         {
@@ -12631,7 +12693,8 @@
     },
     "767ecdc6b332266653feaf3dd8e1673b":
     {
-        "full_name": "ethyl octanoate",
+        "full_name": "ethyl caprylate",
+        "iupac": "ethyl octanoate",
         "smiles": "CCCCCCCC(=O)OCC",
         "aroma":
         {
@@ -13052,6 +13115,7 @@
     "e8cc82283104f62e857df9a27e284b5a":
     {
         "full_name": "eucalyptol",
+        "name1": "cineole",
         "smiles": "O2C1(CCC(CC1)C2(C)C)C",
         "aroma":
         {
@@ -13648,7 +13712,8 @@
     },
     "2a53709a41f2d862689bd5f39567e527":
     {
-        "full_name": "filbert pyrazine ",
+        "full_name": "filbert pyrazine",
+        "iupac": "2-ethyl-3-methylpyrazine",
         "smiles": "CCC1=NC=CN=C1C",
         "aroma":
         {
@@ -14131,6 +14196,7 @@
     "8119ffabdbbc079f6505f1a29a8db2b1":
     {
         "full_name": "galbanum pyrazine",
+        "iupac": "2-isobutyl-3-methoxypyrazine",
         "smiles": "n1c(CC(C)C)c(OC)ncc1",
         "aroma":
         {
@@ -15262,6 +15328,8 @@
     "4f5b57f081dd759616cb67727d79616a":
     {
         "full_name": "grapefruit mercaptan",
+        "name1": "1-p-menthene-8-thiol",
+        "name2": "thioterpineol",
         "smiles": "SC(C)(C)[C@@H]1CCC(C)=CC1",
         "aroma":
         {
@@ -15321,6 +15389,7 @@
     "4bbf4ab9cd90fef6ca37eef548c89f14":
     {
         "full_name": "guaiacol",
+        "name1": "O-methylcatechol",
         "smiles": "COc1ccccc1O",
         "aroma":
         {
@@ -15496,6 +15565,7 @@
     "8a769b73663e73299abd855eb1faf777":
     {
         "full_name": "hazelnut pyrazine",
+        "iupac": "2,3-diethyl-5-methylpyrazine",
         "smiles": "CCC1=NC=C(N=C1CC)C",
         "aroma":
         {
@@ -15558,6 +15628,7 @@
     "74dedcb4b9d15289a42eb0b9c7d9446e":
     {
         "full_name": "hedione",
+        "name1": "methyl dihydrojasmonate",
         "smiles": "O=C(OC)CC1C(C(=O)CC1)CCCCC",
         "aroma":
         {
@@ -16367,16 +16438,21 @@
     },
     "8af195107ab4c26419e3aa32c936b524":
     {
-        "full_name": "heptanoic acid",
+        "full_name": "oenanthic acid",
+        "iupac": "heptanoic acid",
         "smiles": "CCCCCCC(=O)[O-]",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "cheesy",
                 "rancid",
                 "sour",
-                "sweaty"
+                "cheesy",
+                "sweaty",
+                "waxy",
+                "fermented",
+                "pineapple",
+                "fruity"
             ]
         },
         "activity":
@@ -16871,7 +16947,8 @@
     },
     "8df44dcfeb1f036aa4ec084a0dc4a5dc":
     {
-        "full_name": "hexadecanoic acid",
+        "full_name": "palmitic acid",
+        "iupac": "hexadecanoic acid",
         "smiles": "CCCCCCCCCCCCCCCC(=O)[O-]",
         "aroma":
         {
@@ -16896,6 +16973,7 @@
     "2c6f7255f1ecfad29aa80f068975842e":
     {
         "full_name": "hexanal",
+        "name1": "aldehyde C-6",
         "smiles": "CCCCCC=O",
         "aroma":
         {
@@ -17602,8 +17680,9 @@
     },
     "3870b0f45c45810188f062c95a7fbe2b":
     {
-        "full_name": "hydrogen chloride",
-        "smiles": "[Cl]",
+        "full_name": "hydrochloric acid",
+        "iupac": "hydrogen chloride",
+        "smiles": "[Cl-]",
         "aroma": [],
         "activity":
         {
@@ -19218,7 +19297,8 @@
     },
     "1916a20faa0a8d09931d736ca94a6164":
     {
-        "full_name": "isopropanol",
+        "full_name": "isopropyl alcohol",
+        "iupac": "isopropanol",
         "smiles": "CC(C)O",
         "aroma":
         {
@@ -19843,6 +19923,8 @@
     "c988f457db2d46231a5a046df95b00ae":
     {
         "full_name": "lauric aldehyde",
+        "name1": "aldehyde C-12 lauric",
+        "iupac": "dodecanal",
         "smiles": "CCCCCCCCCCCC=O",
         "aroma":
         {
@@ -21221,7 +21303,7 @@
     },
     "f44cff1c608d5570a73ef568eb15d7f2":
     {
-        "full_name": "3-Mercapto-2-methylbutan-1-ol",
+        "full_name": "3-mercapto-2-methylbutan-1-ol",
         "smiles": "CC(C(C)CO)S",
         "aroma":
         {
@@ -21247,7 +21329,7 @@
     },
     "bd89bbf315c1e70421b349f6177789ce":
     {
-        "full_name": "3-Mercapto-3-methylbutan-1-ol",
+        "full_name": "3-mercapto-3-methylbutan-1-ol",
         "smiles": "CC(C)(CCO)S",
         "aroma":
         {
@@ -21352,6 +21434,7 @@
     },
     "8d7e99c73cd5a10adaaf4c9f9a520368":
     {
+        "name1": "methyl mercaptan",
         "full_name": "methanethiol",
         "smiles": "CS",
         "aroma":
@@ -21418,7 +21501,8 @@
     },
     "42983b05e2f2cc22822e30beb7bdd668":
     {
-        "full_name": "methanol",
+        "full_name": "methyl alcohol",
+        "iupac": "methanol",
         "smiles": "CO",
         "aroma":
         {
@@ -22019,6 +22103,7 @@
     "9dea373714bf26fb56f16df79b9c4519":
     {
         "full_name": "methyl ethyl ketone",
+        "iupac": "2-butanone",
         "smiles": "CCC(=O)C",
         "aroma":
         {
@@ -22034,6 +22119,7 @@
     "0c52c1e03c4ef5c126a97c70a2e8343b":
     {
         "full_name": "methyl eugenol",
+        "name1": "eugenol methyl ether",
         "smiles": "COc1cc(ccc1OC)CC=C",
         "aroma":
         {
@@ -22299,7 +22385,8 @@
     },
     "61eea0b2541985b4ae65b5818744f2cf":
     {
-        "full_name": "methyl heptanoate",
+        "full_name": "methyl oenanthate",
+        "iupac": "methyl heptanoate",
         "smiles": "CCCCCCC(=O)OC",
         "aroma":
         {
@@ -22365,7 +22452,8 @@
     },
     "2254c46f94502e7cfff9c28983d0e75e":
     {
-        "full_name": "methyl hexanoate",
+        "full_name": "methyl caproate",
+        "iupac": "methyl hexanoate",
         "smiles": "CCCCCC(=O)OC",
         "aroma":
         {
@@ -22847,7 +22935,8 @@
     },
     "ef0caa0b3f9b360cc1532f018c81ce72":
     {
-        "full_name": "methyl nonanoate",
+        "full_name": "methyl pelargonate",
+        "iupac": "methyl nonanoate",
         "smiles": "CCCCCCCCC(=O)OC",
         "aroma":
         {
@@ -22924,7 +23013,8 @@
     },
     "25c1849826563abde91aee7452163663":
     {
-        "full_name": "methyl octanoate",
+        "full_name": "methyl caprylate",
+        "iupac": "methyl octanoate",
         "smiles": "CCCCCCCC(=O)OC",
         "aroma":
         {
@@ -23367,22 +23457,22 @@
     },
     "a4ab9878b90e5cc5ece9d53bff1b3703":
     {
-        "full_name": "2-methylundecanal",
+        "full_name": "aldehyde MNA",
+        "iupac": "2-methylundecanal",
         "smiles": "O=CC(C)CCCCCCCCC",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "aldehydic",
-                "amber",
-                "citrus",
-                "coumarinic",
                 "fresh",
-                "gassy",
-                "metallic",
+                "amber",
+                "aldehydic",
                 "mossy",
+                "citrus",
                 "tuberose",
-                "waxy"
+                "metallic",
+                "waxy",
+                "coumarinic"
             ]
         },
         "activity":
@@ -23546,21 +23636,20 @@
     "dec3a04b5aaf4d5a7ac7b7582b6c095c":
     {
         "full_name": "milk lactone",
-        "smiles": "CCCCCCCC=CC(=O)[O-]",
+        "iupac": "5(6)-decenoic acid",
+        "smiles": "CCCCC=CCCCC(=O)[O-]",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "waxy",
                 "buttery",
-                "cheesy",
+                "oily",
                 "creamy",
                 "dairy",
-                "fatty",
                 "green",
                 "lactonic",
-                "oily",
-                "plum_skin",
-                "waxy"
+                "plum_skin"
             ]
         },
         "activity":
@@ -24053,6 +24142,7 @@
     "8c4e66ed81fa78b1f3c563dfef733bdf":
     {
         "full_name": "myrac aldehyde",
+        "name1": "empetal",
         "smiles": "CC(=CCCC1=CCC(CC1)C=O)C",
         "aroma":
         {
@@ -24917,7 +25007,8 @@
     },
     "5275978d29dfd72a5698f468f3a64906":
     {
-        "full_name": "nonanal",
+        "full_name": "aldehyde C-9",
+        "iupac": "nonanal",
         "smiles": "CCCCCCCCC=O",
         "aroma":
         {
@@ -25213,7 +25304,8 @@
     },
     "d719fac5dce4f2b13e317f21dc7975e7":
     {
-        "full_name": "nonanedioic acid",
+        "full_name": "azelaic acid",
+        "iupac": "nonanedioic acid",
         "smiles": "C(CCCC(=O)O)CCCC(=O)[O-]",
         "activity":
         {
@@ -25287,7 +25379,8 @@
     },
     "ae2fb03b006ca5a141676fa9b7266be0":
     {
-        "full_name": "nonanoic acid",
+        "full_name": "pelargonic acid",
+        "iupac": "nonanoic acid",
         "smiles": "CCCCCCCCC(=O)[O-]",
         "aroma":
         {
@@ -25873,6 +25966,7 @@
     "8bea9fe55ab0a43c9857d63eb20e52a5":
     {
         "full_name": "nutty pyrazine",
+        "iupac": "5-methyl-6,7-dihydro-5H-cyclopentapyrazine",
         "smiles": "CC1CCC2=NC=CN=C12",
         "aroma":
         {
@@ -25930,7 +26024,8 @@
     },
     "90ba0a98060f887bac95703791beebf8":
     {
-        "full_name": "octanal",
+        "full_name": "aldehyde C-8",
+        "iupac": "octanal",
         "smiles": "CCCCCCCC=O",
         "aroma":
         {
@@ -26858,6 +26953,76 @@
             }
         }
     },
+    "60a33d3f79a7dc12881f290d2684eb6e":
+    {
+        "full_name": "3-octen-2-one",
+        "smiles": "CCCCC=CC(=O)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "earthy",
+                "spicy",
+                "herbal",
+                "sweet",
+                "mushroom",
+                "hay",
+                "blueberry"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1093\/bbb\/zbac147":
+            {
+                "OR1A1":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": 6
+                },
+                "OR1D2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": 1
+                },
+                "OR2J2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": 7
+                },
+                "OR2J3":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": 3
+                },
+                "OR2W1":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": 8
+                },
+                "OR5K1":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": 0,
+                    "antagonist": 1
+                },
+                "OR5P3":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": 10
+                },
+                "OR10G4":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": 0
+                },
+                "OR10G7":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": 0
+                }
+            }
+        }
+    },
     "b7b8f39601e2f80e4c8211987f426ffc":
     {
         "full_name": "1-octen-3-yl acetate",
@@ -27111,6 +27276,7 @@
     "39156613d880f2e50d7c2af1b81ae8fb":
     {
         "full_name": "oranger crystals",
+        "name1": "beta-naphthyl methyl ketone",
         "smiles": "CC(=O)C1=CC2=CC=CC=C2C=C1",
         "aroma":
         {
@@ -28396,6 +28562,7 @@
     "4594774382f02ff1ef37794d0cf40a15":
     {
         "full_name": "phenirate",
+        "iupac": "2-phenoxyethyl isobutyrate",
         "smiles": "CC(C)C(=O)OCCOC1=CC=CC=C1",
         "aroma":
         {
@@ -29066,6 +29233,7 @@
     "6b0312f86e95330750badec0ce38ed17":
     {
         "full_name": "pivarose",
+        "name1": "phenethyl pivalate",
         "smiles": "CC(C)(C)C(=O)OCCC1=CC=CC=C1",
         "aroma":
         {
@@ -29192,6 +29360,7 @@
     "15c5746a1ecaeef36c6e7ea86b3a4abf":
     {
         "full_name": "propanal",
+        "name1": "propionaldehyde",
         "smiles": "CCC=O",
         "aroma":
         {
@@ -29402,6 +29571,7 @@
     "1ff123ce259e6780a461b887cd9c4432":
     {
         "full_name": "propionic acid",
+        "iupac": "propanoic acid",
         "smiles": "CCC(=O)[O-]",
         "aroma":
         {

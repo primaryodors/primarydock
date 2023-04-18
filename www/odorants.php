@@ -19,9 +19,6 @@ if (!file_exists($pqcorr = "../data/receptor_pq.json"))
     echo " This calculation takes a few moments.<br><br>";
 }
 
-$limit = count($odors) / 3;
-$i = 0;
-
 echo "<div class=\"odorlist\">\n";
 for ($l = 1; $l < 28; $l++)
 {
@@ -37,14 +34,6 @@ for ($l = 1; $l < 28; $l++)
         echo "<a href=\"odorant.php?o=$oid\">".hellenicize($odor['full_name'])."</a> ";
         // echo trim_prefixes($odor['full_name']);
         echo "<br>\n";
-
-        /*$i++;
-        if ($i > $limit)
-        {
-            echo "</div>\n";
-            echo "<div class=\"odorlist\">\n";
-            $i = 0;
-        }*/
     }
     echo "<hr>";
 }

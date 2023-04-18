@@ -10,9 +10,9 @@
 
 using namespace std;
 
-#define _HAS_DOT 0x8000
-#define _VARNUM_MASK 0xff
-#define _VARFLAGS_MASK 0xff00
+#define _HAS_DOT 0x800000
+#define _VARNUM_MASK 0xffff
+#define _VARFLAGS_MASK 0xff0000
 
 enum VarType
 {
@@ -32,7 +32,7 @@ struct ScriptVar
 
 string script_fname = "";
 std::vector<string> script_lines;
-ScriptVar script_var[256];
+ScriptVar script_var[_VARNUM_MASK+1];
 int vars = 0;
 int program_counter = 0;
 
@@ -411,7 +411,7 @@ int main(int argc, char** argv)
     string PDB_fname = "";
     FILE* pf;
 
-    for (i=0; i<256; i++)
+    for (i=0; i<=_VARNUM_MASK; i++)
     {
         script_var[i].name = "";
         script_var[i].value.n = 0;
@@ -824,7 +824,8 @@ int main(int argc, char** argv)
                         cout << "float " << script_var[j].value.f << endl;
                         break;
                     case SV_POINT:
-                        cout << "point " << *script_var[j].value.ppt << endl;
+                        if (script_var[j].value.ppt) cout << "point " << *script_var[j].value.ppt << endl;
+                        else cout << "(empty)" << endl;
                         break;
                     case SV_STRING:
                         cout << "string " << script_var[j].value.psz << endl;
@@ -1107,6 +1108,10 @@ int main(int argc, char** argv)
                 n = find_var_index(words[1], &words[1]);
                 if (n<0)
                 {
+                    if (vars > 250)
+                    {
+                        n = 666;
+                    }
                     n = vars++;
                     script_var[n].name = words[1];
                     script_var[n].vt = type_from_name(words[1]);

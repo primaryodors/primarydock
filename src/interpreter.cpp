@@ -1108,10 +1108,6 @@ int main(int argc, char** argv)
                 n = find_var_index(words[1], &words[1]);
                 if (n<0)
                 {
-                    if (vars > 250)
-                    {
-                        n = 666;
-                    }
                     n = vars++;
                     script_var[n].name = words[1];
                     script_var[n].vt = type_from_name(words[1]);

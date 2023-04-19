@@ -1093,6 +1093,7 @@ int main(int argc, char** argv)
                 }
 
                 program_counter++;
+                if (!script_lines[program_counter].c_str()) break;
                 strcpy(buffer, script_lines[program_counter].c_str());
                 words = chop_spaced_words(buffer);
                 if (!words || !words[0]) goto _pc_continue;

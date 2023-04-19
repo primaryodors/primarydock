@@ -681,7 +681,7 @@ int Protein::load_pdb(FILE* is, int rno)
         }
     }
 
-    int arrlimit = rescount+16;
+    int arrlimit = rescount+1;
     residues 	= new AminoAcid*[arrlimit];
     sequence 	= new char[arrlimit];
     ca       	= new Atom*[arrlimit];

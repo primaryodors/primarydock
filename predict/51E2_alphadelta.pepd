@@ -1,0 +1,135 @@
+# Pepteditor script for deriving active-state conformational changes from cryo-EM model vs. AlphaFold.
+#
+
+# Load the inactive protein.
+LOAD "pdbs/OR51/OR51E2.upright.pdb"
+
+ECHO $SEQUENCE
+ECHO ""
+
+LET %i = 1
+LET %lastresno = 0
+
+_loop13:
+LET @CA = %i
+IF @CA.x == 0 AND @CA.y == 0 AND @CA.z == 0 THEN GOTO _nope18
+    LET @ica[%i] = @CA
+    LET %lastresno = %i
+_nope18:
+LET %i ++
+IF %i <= %SEQLEN GOTO _loop13
+
+
+# Load the active protein.
+LOAD "pdbs/OR51/OR51E2.8f76.pdb"
+
+ECHO %SEQLEN
+ECHO $SEQUENCE
+ECHO ""
+
+UPRIGHT
+
+
+LET %i = 1
+
+_loop35:
+LET @CA = %i
+IF @CA.x == 0 AND @CA.y == 0 AND @CA.z == 0 GOTO _nope40
+    LET @aca[%i] = @CA
+_nope40:
+LET %i ++
+IF %i <= %lastresno GOTO _loop35
+
+
+# For every resno that has an entry in both arrays,
+# find the Cartesian delta between CA locations.
+# Then average the deltas and transform the active
+# CA locations by that delta.
+
+LET @delta = [0,0,0]
+LET %divisor = 0
+LET %i = 1
+
+_loop51:
+IF @ica[%i].x == 0 AND @ica[%i].y == 0 AND @ica[%i].z == 0 GOTO _nope61
+IF @aca[%i].x == 0 AND @aca[%i].y == 0 AND @aca[%i].z == 0 GOTO _nope61
+
+LET @diff = @ica[%i] - @aca[%i]
+LET @delta += @diff
+LET %divisor ++
+
+_nope61:
+LET %i ++
+IF %i <= %lastresno GOTO _loop51
+
+IF %divisor == 0 DIE "No matching resnos between proteins."
+LET @delta /= %divisor
+ECHO "Whole active protein to be transformed by:" @delta
+
+LET %i = 1
+
+_loop70:
+IF @aca[%i].x != 0 OR @aca[%i].y != 0 OR @aca[%i].z != 0 LET @aca[%i] += @delta
+LET %i ++
+IF %i <= %lastresno GOTO _loop70
+
+
+# Now obtain the average y-axis rotational angle to align the active
+# config residues to the inactive.
+
+LET @origin = [0,0,0]
+LET @normal = [0,1,0]
+LET &angle = 0
+
+LET &theta = 0
+LET %divisor = 0
+
+LET %i = 1
+
+_loop89:
+IF @aca[%i].x == 0 AND @aca[%i].y == 0 AND @aca[%i].z == 0 GOTO _nope104
+IF @ica[%i].x == 0 AND @ica[%i].y == 0 AND @ica[%i].z == 0 GOTO _nope104
+
+LET @lac = @aca[%i]
+LET @lic = @ica[%i]
+LET @lac.y = 0
+LET @lic.y = 0
+
+PTALIGN @lac @lic @origin @normal &angle
+IF @normal.y < 0 LET &angle *= -1
+
+LET &theta += &angle
+LET %divisor ++
+
+_nope104:
+LET %i ++
+IF %i <= %lastresno GOTO _loop89
+
+LET &theta /= %divisor
+ECHO "Active protein to be rotated by " &theta " degrees about the +Y axis."
+
+
+# Now do the rotations.
+LET @normal = [0,1,0]
+LET %i = 1
+
+_loop116:
+IF @aca[%i].x == 0 AND @aca[%i].y == 0 AND @aca[%i].z == 0 GOTO _nope119
+PTROTATE @aca[%i] @origin @normal &theta @aca[%i]
+_nope119:
+LET %i ++
+IF %i <= %lastresno GOTO _loop116
+
+
+# Finally, output the Cartesian deltas for all residues.
+ECHO
+
+LET %i = 1
+_loop126:
+IF @aca[%i].x == 0 AND @aca[%i].y == 0 AND @aca[%i].z == 0 GOTO _nope130
+LET @delta = @aca[%i] - @ica[%i]
+ECHO %i ": " @delta
+_nope130:
+LET %i ++
+IF %i <= %lastresno GOTO _loop126
+

@@ -17,7 +17,7 @@ IF @CA.x == 0 AND @CA.y == 0 AND @CA.z == 0 THEN GOTO _nope18
     LET %lastresno = %i
 _nope18:
 LET %i ++
-IF %i <= %SEQLEN GOTO _loop13
+IF %i <= %TMR7.e GOTO _loop13
 
 
 # Load the active protein.

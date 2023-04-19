@@ -40,6 +40,9 @@ _nope40:
 LET %i ++
 IF %i <= %lastresno GOTO _loop35
 
+LET %iter = 0
+_loop_iter:
+
 
 # For every resno that has an entry in both arrays,
 # find the Cartesian delta between CA locations.
@@ -47,15 +50,18 @@ IF %i <= %lastresno GOTO _loop35
 # CA locations by that delta.
 
 LET @delta = [0,0,0]
+LET @origin = [0,0,0]
 LET %divisor = 0
 LET %i = 1
 
 _loop51:
+IF %i >= %TMR6.s AND %i <= %TMR6.e GOTO _nope61
 IF @ica[%i].x == 0 AND @ica[%i].y == 0 AND @ica[%i].z == 0 GOTO _nope61
 IF @aca[%i].x == 0 AND @aca[%i].y == 0 AND @aca[%i].z == 0 GOTO _nope61
 
 LET @diff = @ica[%i] - @aca[%i]
 LET @delta += @diff
+LET @origin += @ica[%i]
 LET %divisor ++
 
 _nope61:
@@ -64,6 +70,7 @@ IF %i <= %lastresno GOTO _loop51
 
 IF %divisor == 0 DIE "No matching resnos between proteins."
 LET @delta /= %divisor
+LET @origin /= %divisor
 ECHO "Whole active protein to be transformed by:" @delta
 
 LET %i = 1
@@ -77,7 +84,6 @@ IF %i <= %lastresno GOTO _loop70
 # Now obtain the average y-axis rotational angle to align the active
 # config residues to the inactive.
 
-LET @origin = [0,0,0]
 LET @normal = [0,1,0]
 LET &angle = 0
 
@@ -87,13 +93,14 @@ LET %divisor = 0
 LET %i = 1
 
 _loop89:
+IF %i >= %TMR6.s AND %i <= %TMR6.e GOTO _nope104
 IF @aca[%i].x == 0 AND @aca[%i].y == 0 AND @aca[%i].z == 0 GOTO _nope104
 IF @ica[%i].x == 0 AND @ica[%i].y == 0 AND @ica[%i].z == 0 GOTO _nope104
 
 LET @lac = @aca[%i]
 LET @lic = @ica[%i]
-LET @lac.y = 0
-LET @lic.y = 0
+LET @lac.y = @origin.y
+LET @lic.y = @origin.y
 
 PTALIGN @lac @lic @origin @normal &angle
 IF @normal.y < 0 LET &angle *= -1
@@ -106,6 +113,7 @@ LET %i ++
 IF %i <= %lastresno GOTO _loop89
 
 LET &theta /= %divisor
+LET &theta *= -1
 ECHO "Active protein to be rotated by " &theta " degrees about the +Y axis."
 
 
@@ -115,10 +123,16 @@ LET %i = 1
 
 _loop116:
 IF @aca[%i].x == 0 AND @aca[%i].y == 0 AND @aca[%i].z == 0 GOTO _nope119
-PTROTATE @aca[%i] @origin @normal &theta @aca[%i]
+LET @pt = @aca[%i]
+PTROTATE @aca[%i] @origin @normal &theta @pt
+LET @aca[%i] = @pt
 _nope119:
 LET %i ++
 IF %i <= %lastresno GOTO _loop116
+
+
+# LET %iter ++
+# IF %iter < 100 GOTO _loop_iter
 
 
 # Finally, output the Cartesian deltas for all residues.

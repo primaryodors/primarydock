@@ -2597,7 +2597,10 @@ bool Protein::disulfide_bond(int resno1, int resno2)
     return result;
 }
 
-
+void Protein::homology_conform(Protein* target_structure)
+{
+    //
+}
 
 
 

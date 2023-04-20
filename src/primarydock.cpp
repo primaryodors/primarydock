@@ -2236,7 +2236,13 @@ int main(int argc, char** argv)
         ptemplt->load_pdb(pf);
         fclose(pf);
 
-        // TODO
+        protein->homology_conform(ptemplt);
+
+        temp_pdb_file = "tmp/homolog.pdb";
+
+        pf = fopen(temp_pdb_file.c_str(), "wb");
+        protein->save_pdb(pf);
+        fclose(pf);
     }
 
     if (hydrogenate_pdb)
@@ -2828,7 +2834,7 @@ _try_again:
         delete protein;
         protein = new Protein(protfname);
 
-        if (hydrogenate_pdb)
+        if (hydrogenate_pdb || tplset)
         {
             pf = fopen(temp_pdb_file.c_str(), "r");
             protein->load_pdb(pf);
@@ -5076,7 +5082,7 @@ _exitposes:
         if (output)
         {
             hydrogenate_pdb = false;
-            pf = fopen(protfname, "r");
+            pf = fopen(tplset ? temp_pdb_file.c_str() : protfname, "r");
             if (!pf)
             {
                 cout << "Error trying to read " << protfname << endl;
@@ -5088,7 +5094,7 @@ _exitposes:
             fprintf(pf, "\nOriginal PDB:\n");
             protein->save_pdb(pf);
             fclose(pf);
-            cout << (hydrogenate_pdb ? "Hydrogenated " : "Original ") << "PDB appended to output file." << endl;
+            cout << (tplset ? "Homologized " : "Original ") << "PDB appended to output file." << endl;
         }
         else cout << "ERROR: Append PDB can only be used when specifying an output file." << endl;
     }

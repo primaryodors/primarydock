@@ -127,6 +127,8 @@ public:
         int iterations
     );
 
+    void homology_conform(Protein* target_structure);
+
     int* mcoord_resnos = NULL;
 
 protected:

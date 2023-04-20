@@ -355,6 +355,7 @@ int movie_offset = 0;
 char configfname[256];
 char protfname[256];
 char protafname[256];
+char tplfname[256];
 char ligfname[256];
 char outfname[256];
 Point pocketcen, loneliest, pocketsize, ligbbox;
@@ -366,9 +367,10 @@ std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
-bool configset=false, protset=false, ligset=false, pktset=false;
+bool configset=false, protset=false, tplset=false, ligset=false, pktset=false;
 
 Protein* protein;
+Protein* ptemplt;
 int seql = 0;
 int mcoord_resno[256];
 int addl_resno[256];
@@ -1594,6 +1596,13 @@ int interpret_config_line(char** words)
         optsecho = "Added state " + (std::string)origbuff;
         return 0;
     }
+    else if (!strcmp(words[0], "TEMPLATE"))
+    {
+        strcpy(tplfname, words[1]);
+        tplset = true;
+        // optsecho = "Protein file is " + (std::string)protfname;
+        return 1;
+    }
     else if (!strcmp(words[0], "TRIP"))
     {
         optsecho = "Added trip clashables ";
@@ -2214,6 +2223,22 @@ int main(int argc, char** argv)
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
     #endif
+
+    if (tplset)
+    {
+        ptemplt = new Protein("template");
+        pf = fopen(tplfname, "r");
+        if (!pf)
+        {
+            cout << "Error trying to read " << tplfname << endl;
+            return 0xbadf12e;
+        }
+        ptemplt->load_pdb(pf);
+        fclose(pf);
+
+        // TODO
+    }
+
     if (hydrogenate_pdb)
     {
         int resno, endres = protein->get_end_resno();

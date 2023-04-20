@@ -2597,9 +2597,27 @@ bool Protein::disulfide_bond(int resno1, int resno2)
     return result;
 }
 
-void Protein::homology_conform(Protein* target_structure)
+void Protein::homology_conform(Protein* target)
 {
-    //
+    // Check that TM helices and BW numbers are set. If not, error out.
+
+    // Get the average location delta for all CA atoms in the TM helices. Match them by BW number.
+
+    // Transform the target to bring its TM center to coincide with that of the current protein.
+
+    // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
+    // the TM CA atoms as closely as possible.
+
+    // Perform the rotation.
+
+    // Find the rotations and transformations for each TM region to bring its CA atoms as close as
+    // possible to those of the target.
+
+    // Perform the TM region transformations and rotations.
+
+    // Repack the TM regions, then adjust their locations and rotations to minimize clashes.
+
+    // TODO: Should figure out how to do homology for the EXR and CYT loops. At minimum the EXR.
 }
 
 

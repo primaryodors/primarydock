@@ -2599,11 +2599,41 @@ bool Protein::disulfide_bond(int resno1, int resno2)
 
 void Protein::homology_conform(Protein* target)
 {
-    // Check that TM helices and BW numbers are set. If not, error out.
+    // Check that both proteins have TM helices and BW numbers set. If not, error out.
+    if (!get_region_start("TMR6") || !target->get_region_start("TMR6")) throw 0xbadbeb7;
+    if (!Ballesteros_Weinstein.size() || !target->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
 
     // Get the average location delta for all CA atoms in the TM helices. Match them by BW number.
+    // Include only BW numbers that are inside a TMR for both proteins.
+    int hxno, resno1, resno2;
+    char buffer[256];
+    Point xform_delta(0,0,0);
+    int count = 0;
+
+    for (hxno = 1; hxno <= 7; hxno++)
+    {
+        sprintf(buffer, "TMR%d", hxno);
+        int rgend1 = get_region_end(buffer);
+        int rgstart2 = target->get_region_start(buffer);
+        int rgend2 = target->get_region_end(buffer);
+        int bw50a = get_bw50(hxno), bw50b = target->get_bw50(hxno);
+        for (resno1 = get_region_start(buffer); resno1 <= rgend1; resno1++)
+        {
+            int i = resno1 - bw50a;
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                Point ptdiff = get_atom_location(resno1, "CA").subtract(target->get_atom_location(resno2, "CA"));
+                xform_delta = xform_delta.add(ptdiff);
+                count++;
+            }
+        }
+    }
+    if (count) xform_delta.scale(xform_delta.magnitude() / count);
 
     // Transform the target to bring its TM center to coincide with that of the current protein.
+    SCoord move_amt = xform_delta;
+    target->move_piece(1, 9999, move_amt);
 
     // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
     // the TM CA atoms as closely as possible.

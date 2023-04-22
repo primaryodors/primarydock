@@ -2607,8 +2607,10 @@ void Protein::homology_conform(Protein* target)
     // Include only BW numbers that are inside a TMR for both proteins.
     int hxno, resno1, resno2;
     char buffer[256];
-    Point xform_delta(0,0,0);
+    Point xform_delta(0,0,0), center(0,0,0);
     int count = 0;
+
+    std::vector<int> resnos1, resnos2;
 
     for (hxno = 1; hxno <= 7; hxno++)
     {
@@ -2623,13 +2625,22 @@ void Protein::homology_conform(Protein* target)
             resno2 = bw50b + i;
             if (resno2 >= rgstart2 && resno2 <= rgend2)
             {
-                Point ptdiff = get_atom_location(resno1, "CA").subtract(target->get_atom_location(resno2, "CA"));
+                Point caloc = get_atom_location(resno1, "CA");
+                Point ptdiff = caloc.subtract(target->get_atom_location(resno2, "CA"));
                 xform_delta = xform_delta.add(ptdiff);
+                center = center.add(caloc);
                 count++;
+
+                resnos1.push_back(resno1);
+                resnos2.push_back(resno2);
             }
         }
     }
-    if (count) xform_delta.scale(xform_delta.magnitude() / count);
+    if (count)
+    {
+        xform_delta.scale(xform_delta.magnitude() / count);
+        center.scale(center.magnitude() / count);
+    }
 
     // Transform the target to bring its TM center to coincide with that of the current protein.
     SCoord move_amt = xform_delta;
@@ -2637,8 +2648,27 @@ void Protein::homology_conform(Protein* target)
 
     // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
     // the TM CA atoms as closely as possible.
+    int i;
+    float theta = 0;
+    Point axis(0,1,0);
+    count = 0;
+    for (i=0; i<resnos1.size(); i++)
+    {
+        resno1 = resnos1[i];
+        resno2 = resnos2[i];
+        Point pt1 = get_atom_location(resno1, "CA"), pt2 = target->get_atom_location(resno2, "CA");
+        pt1.y = pt2.y = 0;
+        Rotation rot = align_points_3d(pt2, pt1, center);
+        Point rotv = rot.v;
+        if (rotv.y < 0) theta -= rot.a;
+        else theta += rot.a;
+        count++;
+    }
+
+    if (count) theta /= count;
 
     // Perform the rotation.
+    target->rotate_piece(1, 9999, center, axis, theta);
 
     // Find the rotations and transformations for each TM region to bring its CA atoms as close as
     // possible to those of the target.

@@ -23,3 +23,9 @@ function returns all non-covalent forces possible between any two atoms, taking 
 its parent molecule. The static `InteratomicForce::total_binding()` function returns a number representing the total binding
 energy between two atoms. Note positive means attractive binding energy while negative means repulsive forces and clashes.
 
+The Molecule class contains an Atom* named `atoms`, containing pointers to all the atoms of that molecule. These atoms and
+their bonds exist as separate objects from their Molecule object. Also, the Atom class keeps track of Bond objects, so the
+Molecule class doesn't actually have its own list of bonds, though it does keep an array of pointers to rotatable bonds.
+The Molecule class contains various serialization functions, getters, motion and flexion functions, atom addition/removal/access
+functions, and ring functions, but the biggest piece of its functionality is the static `Molecule::multimol_conform()` function,
+whose overloaded declarations accept one or more Molecule** 

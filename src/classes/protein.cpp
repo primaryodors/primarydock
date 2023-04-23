@@ -2672,10 +2672,78 @@ void Protein::homology_conform(Protein* target)
 
     // Find the rotations and transformations for each TM region to bring its CA atoms as close as
     // possible to those of the target.
+    for (hxno = 1; hxno <= 7; hxno++)
+    {
+        sprintf(buffer, "TMR%d", hxno);
+        int rgstart1 = get_region_start(buffer);
+        int rgend1 = get_region_end(buffer);
+        int rgstart2 = target->get_region_start(buffer);
+        int rgend2 = target->get_region_end(buffer);
+        int bw50a = get_bw50(hxno), bw50b = target->get_bw50(hxno);
+        Point rcen1(0,0,0);
+        Point rcen2(0,0,0);
+        count = 0;
+        for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
+        {
+            int i = resno1 - bw50a;
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                rcen1 = rcen1.add(get_atom_location(resno1, "CA"));
+                rcen2 = rcen2.add(target->get_atom_location(resno2, "CA"));
+                count++;
+            }
+        }
 
-    // Perform the TM region transformations and rotations.
+        if (count)
+        {
+            rcen1.scale(rcen1.magnitude()/count);
+            rcen2.scale(rcen2.magnitude()/count);
+        }
+
+        // Perform the TM region transformation.
+        move_piece(rgstart1, rgend1, (SCoord)rcen2.subtract(rcen1));
+
+        Point axis(0,0,0);
+        float theta;
+        count = 0;
+        for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
+        {
+            int i = resno1 - bw50a;
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                Point caloc1 = get_atom_location(resno1, "CA"),
+                      caloc2 = target->get_atom_location(resno2, "CA");
+                Rotation rot = align_points_3d(caloc1, caloc2, rcen);
+
+                axis = axis.add(rot.v);
+                theta += rot.a;
+                count++;
+            }
+        }
+
+        if (count)
+        {
+            axis.scale(axis.magnitude()/count);
+            theta/=count;
+        }
+
+        // Perform the TM region rotation.
+        rotate_piece(rgstart1, rgend1, get_region_center(rgstart1, rgend1), axis, theta);
+    }
 
     // Repack the TM regions, then adjust their locations and rotations to minimize clashes.
+    for (hxno = 1; hxno <= 7; hxno++)
+    {
+        sprintf(buffer, "TMR%d", hxno);
+        int rgstart1 = get_region_start(buffer);
+        int rgend1 = get_region_end(buffer);
+
+        get_internal_clashes(rgstart1, rgend1, true);
+
+        // TODO: "soft"-manipulate the region to minimize clashes.
+    }
 
     // TODO: Should figure out how to do homology for the EXR and CYT loops. At minimum the EXR.
 }

@@ -967,6 +967,21 @@ int main(int argc, char** argv)
 
             }	// HELIX
 
+            else if (!strcmp(words[0], "HOMOLOGY"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters given for HOMOLOGY.");
+                Protein tpl("template");
+                FILE* fp = fopen(words[1], "rb");
+                if (!fp) raise_error("File not found.");
+                else
+                {
+                    tpl.load_pdb(fp);
+                    fclose(fp);
+
+                    p.homology_conform(&tpl);
+                }
+            }   // HOMOLOGY
+
             else if (!strcmp(words[0], "HYDRO"))
             {
                 int resno, endres = p.get_end_resno();

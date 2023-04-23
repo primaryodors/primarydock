@@ -2705,6 +2705,7 @@ void Protein::homology_conform(Protein* target)
         move_piece(rgstart1, rgend1, (SCoord)rcen2.subtract(rcen1));
 
         Point axis(0,0,0);
+        Point rcen = get_region_center(rgstart1, rgend1);
         float theta;
         count = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
@@ -2730,7 +2731,7 @@ void Protein::homology_conform(Protein* target)
         }
 
         // Perform the TM region rotation.
-        rotate_piece(rgstart1, rgend1, get_region_center(rgstart1, rgend1), axis, theta);
+        rotate_piece(rgstart1, rgend1, rcen, axis, theta);
     }
 
     // Repack the TM regions, then adjust their locations and rotations to minimize clashes.

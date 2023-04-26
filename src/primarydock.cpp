@@ -351,6 +351,7 @@ char* get_file_ext(char* filename)
 }
 
 bool output_each_iter = false;
+bool progressbar = false;
 int movie_offset = 0;
 char configfname[256];
 char protfname[256];
@@ -1063,18 +1064,21 @@ void iteration_callback(int iter)
         }
     }
 
-    int ni = (pathnodes+1) * iters, pni = poses * ni;
-    float percentage = (float)((pose-1) * ni + nodeno * iters + iter) / pni * 100;
-
-    cout << "\033[A|";
-    for (i=0; i<80; i++)
+    if (progressbar)
     {
-        float cmpi = 1.25*i;
-        if (cmpi <= percentage) cout << "\u2588";
-        else cout << "-";
+        int ni = (pathnodes+1) * iters, pni = poses * ni;
+        float percentage = (float)((pose-1) * ni + nodeno * iters + iter) / pni * 100;
+
+        cout << "\033[A|";
+        for (i=0; i<80; i++)
+        {
+            float cmpi = 1.25*i;
+            if (cmpi <= percentage) cout << "\u2588";
+            else cout << "-";
+        }
+        i = iter % 4;
+        cout << ("|/-\\")[i] << " " << (int)percentage << "%.               " << endl;
     }
-    i = iter % 4;
-    cout << ("|/-\\")[i] << " " << (int)percentage << "%.               " << endl;
 }
 
 int interpret_resno(const char* field)
@@ -1495,6 +1499,12 @@ int interpret_config_line(char** words)
         use_prealign = true;
         prealign_residues = origbuff;
         return 1;
+    }
+    else if (!strcmp(words[0], "PROGRESS"))
+    {
+        progressbar = true;
+        // optsecho = "Protein file is " + (std::string)protfname;
+        return 0;
     }
     else if (!strcmp(words[0], "PROT"))
     {

@@ -1,5 +1,11 @@
 
 # These are the tests performed before approving a PR for merge.
+#
+# If the `play chime.mp3` command causes an error after the OR1A1 and TAAR8 tests, you can fix it by omitting the play command or by
+# installing sox, for example using the following on Debian-based systems:
+#
+# sudo apt-get install sox libsox-fmt-all
+#
 
 # The amino aldehyde test is part of make code. Otherwise the test would be: test/molecule_test "NCCCC=O" "NCCCC=O" 10
 # Optionally: use the viewer to ensure that the two aldehyde groups are coordinated to the two amino groups.

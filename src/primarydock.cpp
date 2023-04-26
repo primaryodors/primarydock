@@ -1073,7 +1073,7 @@ void iteration_callback(int iter)
         for (i=0; i<80; i++)
         {
             float cmpi = 1.25*i;
-            if (cmpi <= percentage) cout << "\u2593";
+            if (cmpi <= percentage) cout << "\u2592";
             else cout << "-";
         }
         i = iter % 4;
@@ -4749,6 +4749,11 @@ _try_again:
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Finished poses." << endl;
     #endif
+
+    if (progressbar)
+    {
+        cout << "\033[A\033[K";
+    }
 
     // Output the dr[][] array in order of increasing pose number.
     cout << endl;

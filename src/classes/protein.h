@@ -129,6 +129,7 @@ public:
     );
 
     void homology_conform(Protein* target_structure);
+    void bridge(int resno1, int resno2);
 
     int* mcoord_resnos = NULL;
 

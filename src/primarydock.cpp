@@ -437,6 +437,7 @@ std::vector<AcvHxRot> orig_active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
 std::vector<ResiduePlaceholder> required_contacts;
+std::vector<std::string> bridges;
 
 bool soft_pocket = false;
 std::string soft_names;
@@ -1229,6 +1230,13 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "APPENDPROT") || !strcmp(words[0], "OPEND"))
     {
         append_pdb = true;
+    }
+    else if (!strcmp(words[0], "BRIDGE"))
+    {
+        std::string str = words[1];
+        str += (std::string)"|" + (std::string)words[2];
+        bridges.push_back(str);
+        return 2;
     }
     else if (!strcmp(words[0], "CEN"))
     {
@@ -2261,14 +2269,28 @@ int main(int argc, char** argv)
         fclose(pf);
     }
 
+    int l;
+
+    if (bridges.size())
+    {
+        for (i=0; i<bridges.size(); i++)
+        {
+            int resno1 = interpret_resno(bridges[i].c_str());
+            const char* r2 = strchr(bridges[i].c_str(), '|');
+            if (!r2) throw 0xbadc0de;
+            r2++;
+            int resno2 = interpret_resno(r2);
+
+            protein->bridge(resno1, resno2);
+        }
+    }
+
     prepare_acv_bond_rots();
 
     for (i=0; i<required_contacts.size(); i++)
     {
         required_contacts[i].resolve_resno(protein);
     }
-
-    int l;
 
     if (soft_pocket)
     {

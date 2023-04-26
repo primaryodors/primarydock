@@ -1073,7 +1073,7 @@ void iteration_callback(int iter)
         for (i=0; i<80; i++)
         {
             float cmpi = 1.25*i;
-            if (cmpi <= percentage) cout << "\u2588";
+            if (cmpi <= percentage) cout << "\u2593";
             else cout << "-";
         }
         i = iter % 4;
@@ -1503,7 +1503,6 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "PROGRESS"))
     {
         progressbar = true;
-        // optsecho = "Protein file is " + (std::string)protfname;
         return 0;
     }
     else if (!strcmp(words[0], "PROT"))

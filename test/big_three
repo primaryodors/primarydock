@@ -10,6 +10,6 @@ clear; make code
 clear; bin/primarydock test/testTAAR8.config && play chime.mp3
 
 # Limonene test: Check for at least one successful binding pose with a total energy of less than zero.
-# *If using the ZhangLab PDB*, do a visual check using the viewer that Asp111 is not pulled awway from its salt bridge configuration with His243.
+# *If using the ZhangLab PDB*, do a visual check using the viewer that Asp111 is not pulled away from its salt bridge configuration with His243.
 clear; bin/primarydock test/test1A1.config && play chime.mp3
 

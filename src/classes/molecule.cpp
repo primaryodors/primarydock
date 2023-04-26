@@ -332,6 +332,18 @@ int Molecule::is_residue()
     return 0;
 }
 
+int Molecule::get_hydrogen_count()
+{
+    if (noAtoms(atoms)) return 0;
+    int i, retval=0;
+
+    for (i=0; atoms[i]; i++)
+        if (atoms[i]->get_Z() == 1)
+            retval++;
+    
+    return retval;
+}
+
 void Molecule::hydrogenate(bool steric_only)
 {
     if (noAtoms(atoms)) return;

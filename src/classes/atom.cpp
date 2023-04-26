@@ -478,21 +478,6 @@ bool Atom::move(Point* pt)
         return false;
     }
 
-    /*if (name && !strcmp(name, "CB"))
-    {
-    	Bond* b = get_bond_between("CA");
-    	if (b && b->btom)
-    	{
-    		float r = b->btom->get_location().get_3d_distance(pt);
-    		if (r > 1.55) throw 0x7e57196;
-    	}
-    }*/
-
-    if (Z > 16)
-    {
-        location.x += 0.000000000000000000000000000001;
-    }
-
     location = *pt;
     location.weight = at_wt;
     if (geov) delete[] geov;

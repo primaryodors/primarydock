@@ -96,6 +96,7 @@ public:
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
 
     // Motion functions
+    void upright();
     void move_piece(int start_res, int end_res, Point new_center);		// After calling this, you should reconnect the broken ends with conform_backbone().
     void move_piece(int start_res, int end_res, SCoord move_amt);       // "
     LocRotation rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.

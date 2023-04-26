@@ -881,7 +881,7 @@ void Protein::set_clashables(int resno, bool recursed)
             }
         }
 
-        if (res_can_clash[i]) delete res_can_clash[i];
+        if (res_can_clash[0] && res_can_clash[i]) delete res_can_clash[i];
         res_can_clash[i] = new AminoAcid*[k+1];
         for (j=0; j<k; j++)
         {
@@ -2597,11 +2597,86 @@ bool Protein::disulfide_bond(int resno1, int resno2)
     return result;
 }
 
+void Protein::upright()
+{
+    move_piece(1, 9999, Point(0,0,0));
+
+    Point extracellular[256], cytoplasmic[256];
+    int i, j, exr_n=0, cyt_n=0;
+
+    for (i=1; i<=7; i++)
+    {
+        int sr = get_region_start((std::string)"TMR" + std::to_string(i));
+        if (!sr) continue;
+        int er = get_region_end((std::string)"TMR" + std::to_string(i));
+
+        for (j=0; j<4; j++)
+        {
+            if (i & 1)			// TMR1, TMR3, TMR5, TMR7 begin on the extracellular side and descend.
+            {
+                extracellular[exr_n++] = get_atom_location(sr+j, "CA");
+                cytoplasmic[cyt_n++] = get_atom_location(er-j, "CA");
+            }
+            else				// TMR2, TMR4, TMR6 ascend from the cytoplasmic side.
+            {
+                cytoplasmic[cyt_n++] = get_atom_location(sr+j, "CA");
+                extracellular[exr_n++] = get_atom_location(er-j, "CA");
+            }
+        }
+    }
+
+    if (!exr_n || !cyt_n) throw 0xbad7312;
+
+    Point exrdir = average_of_points(extracellular, exr_n);
+    Point cytdir = average_of_points(cytoplasmic, cyt_n);
+
+    Rotation rot = align_points_3d(&exrdir, new Point(0,1e6,0), &cytdir);
+
+    rotate_piece(1, 9999, rot, 0);
+
+    // Rotate to place TMR4 in the +Z direction relative to TMR1.
+    int sr = get_region_start("TMR4");
+    if (sr)
+    {
+        int er = get_region_end("TMR4");
+
+        Point tmr1[64], tmr4[64];
+        int tmr1_n=0, tmr4_n=0;
+
+        for (i=sr; i<=er; i++)
+        {
+            tmr4[tmr4_n++] = get_atom_location(i, "CA");
+        }
+
+        sr = get_region_start("TMR1");
+        er = get_region_end("TMR1");
+
+        for (i=sr; i<=er; i++)
+        {
+            tmr1[tmr1_n++] = get_atom_location(i, "CA");
+        }
+
+        Point tmr1dir = average_of_points(tmr1, tmr1_n);
+        Point tmr4dir = average_of_points(tmr4, tmr4_n);
+
+
+        tmr1dir.y = tmr4dir.y = 0;
+
+        rot = align_points_3d(&tmr4dir, new Point(0,0,1e9), &tmr1dir);
+
+        rotate_piece(1, 9999, rot, 0);
+    }
+
+}
+
 void Protein::homology_conform(Protein* target)
 {
     // Check that both proteins have TM helices and BW numbers set. If not, error out.
     if (!get_region_start("TMR6") || !target->get_region_start("TMR6")) throw 0xbadbeb7;
     if (!Ballesteros_Weinstein.size() || !target->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
+
+    upright();
+    target->upright();
 
     // Get the average location delta for all CA atoms in the TM helices. Match them by BW number.
     // Include only BW numbers that are inside a TMR for both proteins.
@@ -2734,16 +2809,146 @@ void Protein::homology_conform(Protein* target)
         rotate_piece(rgstart1, rgend1, rcen, axis, theta);
     }
 
-    // Repack the TM regions, then adjust their locations and rotations to minimize clashes.
+    // Prepare for clash minimization.
+    float dx[10], dy[10], dz[10];
+    float target_clash[10], attained[10];
+
+    if (!target->get_residue(target->get_region_start("TMR3"))->get_hydrogen_count())
+    {
+        #if _dbg_homology
+        cout << "Hydrogenating target..." << endl;
+        #endif
+        //
+        for (i=1; i<=target->get_end_resno(); i++)
+        {
+            AminoAcid* aa = target->get_residue(i);
+            if (aa) aa->hydrogenate();
+        }
+    }
+
     for (hxno = 1; hxno <= 7; hxno++)
     {
+        dx[hxno] = dy[hxno] = dz[hxno] = 0.5;
+        attained[hxno] = false;
+    
         sprintf(buffer, "TMR%d", hxno);
-        int rgstart1 = get_region_start(buffer);
-        int rgend1 = get_region_end(buffer);
+        int rgstart2 = target->get_region_start(buffer);
+        int rgend2 = target->get_region_end(buffer);
+        target_clash[hxno] = target->get_internal_clashes(rgstart2, rgend2, false);
+    }
 
-        get_internal_clashes(rgstart1, rgend1, true);
+    return;
 
-        // TODO: "soft"-manipulate the region to minimize clashes.
+    // Repack the TM regions, then adjust their locations and rotations to minimize clashes.
+    Pose putitback[get_end_resno()+10];
+    for (i=0; i<100; i++)
+    {
+        bool repack = (i < 10 || i >= 90);
+        int num_attained = 0;
+        for (hxno = 1; hxno <= 7; hxno++)
+        {
+            if (attained[hxno])
+            {
+                num_attained++;
+                continue;
+            }
+
+            sprintf(buffer, "TMR%d", hxno);
+            int rgstart1 = get_region_start(buffer);
+            int rgend1 = get_region_end(buffer);
+
+            float before = get_internal_clashes(rgstart1, rgend1, repack);
+            int j;
+            for (j=rgstart1; j <= rgend1; j++)
+            {
+                AminoAcid* aa = get_residue(j);
+                if (aa) putitback[j].copy_state((Molecule*)aa);
+            }
+
+            // "soft"-manipulate the region to minimize clashes.
+            Point ptx(dx[hxno], 0, 0);
+            move_piece(rgstart1, rgend1, (SCoord)ptx);
+            float after = get_internal_clashes(rgstart1, rgend1, repack);
+
+            if (after > before)
+            {
+                ptx.x *= -1;
+                // move_piece(rgstart1, rgend1, (SCoord)ptx);
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].restore_state((Molecule*)aa);
+                }
+                dx[hxno] *= -0.666;
+            }
+            else
+            {
+                before = after;
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].copy_state((Molecule*)aa);
+                }
+            }
+
+            Point pty(0, dy[hxno], 0);
+            move_piece(rgstart1, rgend1, (SCoord)pty);
+            after = get_internal_clashes(rgstart1, rgend1, repack);
+
+            if (after > before)
+            {
+                pty.y *= -1;
+                // move_piece(rgstart1, rgend1, (SCoord)pty);
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].restore_state((Molecule*)aa);
+                }
+                dy[hxno] *= -0.666;
+            }
+            else
+            {
+                before = after;
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].copy_state((Molecule*)aa);
+                }
+            }
+
+            Point ptz(0, 0, dz[hxno]);
+            move_piece(rgstart1, rgend1, (SCoord)ptz);
+            after = get_internal_clashes(rgstart1, rgend1, repack);
+
+            if (after > before)
+            {
+                ptz.z *= -1;
+                // move_piece(rgstart1, rgend1, (SCoord)ptz);
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].restore_state((Molecule*)aa);
+                }
+                dz[hxno] *= -0.666;
+            }
+            else
+            {
+                before = after;
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].copy_state((Molecule*)aa);
+                }
+            }
+
+            #if _dbg_homology
+            cout << "Homology iteration " << i << " helix " << hxno << " clashes " << before << " vs. target " << target_clash[hxno] << endl;
+            #endif
+
+            if (before <= target_clash[hxno]) attained[hxno] = true;
+        }
+
+        if (num_attained == 7) break;
     }
 
     // TODO: Should figure out how to do homology for the EXR and CYT loops. At minimum the EXR.

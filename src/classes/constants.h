@@ -316,6 +316,7 @@
 #define _dbg_null_flexions 0
 #define _dbg_repack 0
 #define _dbg_multiflex 0
+#define _dbg_homology 1
 
 #endif
 

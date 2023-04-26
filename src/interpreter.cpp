@@ -1944,74 +1944,14 @@ int main(int argc, char** argv)
                 l = 1;
                 if (words[l]) raise_error("Too many parameters given for UPRIGHT.");
 
-                int seql = p.get_seq_length();
-                p.move_piece(1, 9999, Point(0,0,0));
-
-                Point extracellular[256], cytoplasmic[256];
-                int exr_n=0, cyt_n=0;
-
-                for (i=1; i<=7; i++)
+                try
                 {
-                    int sr = p.get_region_start((std::string)"TMR" + std::to_string(i));
-                    if (!sr) continue;
-                    int er = p.get_region_end((std::string)"TMR" + std::to_string(i));
-
-                    for (j=0; j<4; j++)
-                    {
-                        if (i & 1)			// TMR1, TMR3, TMR5, TMR7 begin on the extracellular side and descend.
-                        {
-                            extracellular[exr_n++] = p.get_atom_location(sr+j, "CA");
-                            cytoplasmic[cyt_n++] = p.get_atom_location(er-j, "CA");
-                        }
-                        else				// TMR2, TMR4, TMR6 ascend from the cytoplasmic side.
-                        {
-                            cytoplasmic[cyt_n++] = p.get_atom_location(sr+j, "CA");
-                            extracellular[exr_n++] = p.get_atom_location(er-j, "CA");
-                        }
-                    }
+                    p.upright();
                 }
-
-                if (!exr_n || !cyt_n) raise_error("Cannot UPRIGHT protein without transmembrane regions named TMR{n}.");
-
-                Point exrdir = average_of_points(extracellular, exr_n);
-                Point cytdir = average_of_points(cytoplasmic, cyt_n);
-
-                Rotation rot = align_points_3d(&exrdir, new Point(0,1e6,0), &cytdir);
-
-                p.rotate_piece(1, 9999, rot, 0);
-
-                // TODO: Rotate to place TMR4 +Z to TMR1.
-                int sr = p.get_region_start("TMR4");
-                if (sr)
+                catch (int ex)
                 {
-                    int er = p.get_region_end("TMR4");
-
-                    Point tmr1[64], tmr4[64];
-                    int tmr1_n=0, tmr4_n=0;
-
-                    for (i=sr; i<=er; i++)
-                    {
-                        tmr4[tmr4_n++] = p.get_atom_location(i, "CA");
-                    }
-
-                    sr = p.get_region_start("TMR1");
-                    er = p.get_region_end("TMR1");
-
-                    for (i=sr; i<=er; i++)
-                    {
-                        tmr1[tmr1_n++] = p.get_atom_location(i, "CA");
-                    }
-
-                    Point tmr1dir = average_of_points(tmr1, tmr1_n);
-                    Point tmr4dir = average_of_points(tmr4, tmr4_n);
-
-
-                    tmr1dir.y = tmr4dir.y = 0;
-
-                    rot = align_points_3d(&tmr4dir, new Point(0,0,1e9), &tmr1dir);
-
-                    p.rotate_piece(1, 9999, rot, 0);
-
+                    if (ex == 0xbad7312) raise_error("Cannot UPRIGHT protein without transmembrane regions named TMR{n}.");
+                    else raise_error("Unknown error.");
                 }
             }	// UPRIGHT
 

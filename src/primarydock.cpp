@@ -1062,6 +1062,19 @@ void iteration_callback(int iter)
             fclose(fp);
         }
     }
+
+    int ni = (pathnodes+1) * iters, pni = poses * ni;
+    float percentage = (float)((pose-1) * ni + nodeno * iters + iter) / pni * 100;
+
+    cout << "\033[A|";
+    for (i=0; i<80; i++)
+    {
+        float cmpi = 1.25*i;
+        if (cmpi <= percentage) cout << "\u2588";
+        else cout << "-";
+    }
+    i = iter % 4;
+    cout << ("|/-\\")[i] << " " << (int)percentage << "%.               " << endl;
 }
 
 int interpret_resno(const char* field)

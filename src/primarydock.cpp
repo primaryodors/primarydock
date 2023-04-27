@@ -2310,8 +2310,32 @@ int main(int argc, char** argv)
             protein->bridge(resno1, resno2);
 
             AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
-            if (aa1) aa1->movability = MOV_FLXDESEL;
-            if (aa2) aa2->movability = MOV_FLXDESEL;
+            if (aa1)
+            {
+                aa1->movability = MOV_FLXDESEL;
+                Bond** bb = aa1->get_rotatable_bonds();
+                if (bb)
+                {
+                    for (l=0; bb[l]; l++)
+                    {
+                        bb[l]->can_rotate = false;
+                    }
+                    delete bb;
+                }
+            }
+            if (aa2)
+            {
+                aa2->movability = MOV_FLXDESEL;
+                Bond** bb = aa2->get_rotatable_bonds();
+                if (bb)
+                {
+                    for (l=0; bb[l]; l++)
+                    {
+                        bb[l]->can_rotate = false;
+                    }
+                    delete bb;
+                }
+            }
 
             #if _dbg_bridges
             if (!aa1) cout << resno1 << " not found." << endl;
@@ -4382,6 +4406,7 @@ _try_again:
             }
 
             protein->find_residue_initial_bindings();
+
             Molecule::multimol_conform(
                 cfmols,
                 delete_me = protein->all_residues_as_molecules_except(cfmols),

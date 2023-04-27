@@ -317,6 +317,7 @@
 #define _dbg_repack 0
 #define _dbg_multiflex 0
 #define _dbg_homology 1
+#define _dbg_bridges 1
 
 #endif
 

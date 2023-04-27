@@ -2303,7 +2303,25 @@ int main(int argc, char** argv)
             r2++;
             int resno2 = interpret_resno(r2);
 
+            #if _dbg_bridges
+            cout << "Bridging " << resno1 << " and " << resno2 << "..." << endl;
+            #endif
+
             protein->bridge(resno1, resno2);
+
+            AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
+            if (aa1) aa1->movability = MOV_FLXDESEL;
+            if (aa2) aa2->movability = MOV_FLXDESEL;
+
+            #if _dbg_bridges
+            if (!aa1) cout << resno1 << " not found." << endl;
+            if (!aa2) cout << resno2 << " not found." << endl;
+            if (aa1 && aa2)
+            {
+                float tb = -aa1->get_intermol_binding(aa2);
+                cout << "Bridge energy " << tb << " kJ/mol." << endl;
+            }
+            #endif
         }
     }
 
@@ -3622,7 +3640,8 @@ _try_again:
                         }
                     if (besti >= 0)
                     {
-                        reaches_spheroid[nodeno][besti]->movability = MOV_FLEXONLY;
+                        if (reaches_spheroid[nodeno][besti]->movability != MOV_FLXDESEL)
+                            reaches_spheroid[nodeno][besti]->movability = MOV_FLEXONLY;
                         flexible_resnos.push_back(reaches_spheroid[nodeno][besti]->get_residue_no());
                         #if _dbg_flexion_selection
                         cout << "Selected " << reaches_spheroid[nodeno][besti]->get_name()

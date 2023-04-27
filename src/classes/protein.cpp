@@ -302,7 +302,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                         #endif
                         interactors[l] = laa[j];
                         wasmov[l] = laa[j]->movability;
-                        laa[j]->movability = MOV_FLEXONLY;
+                        if (laa[j]->movability != MOV_FLXDESEL) laa[j]->movability = MOV_FLEXONLY;
                         l++;
                     }
                     else
@@ -2959,7 +2959,7 @@ void Protein::bridge(int resno1, int resno2)
     AminoAcid *aa1 = get_residue(resno1), *aa2 = get_residue(resno2);
     if (!aa1 || !aa2) return;
 
-    MovabilityType mt1 = aa1->movability, mt2 = aa2->movability;
+    // MovabilityType mt1 = aa1->movability, mt2 = aa2->movability;
     aa1->movability = aa2->movability = MOV_FLEXONLY;
 
     Molecule** mols = new Molecule*[3];
@@ -2979,8 +2979,8 @@ void Protein::bridge(int resno1, int resno2)
 
     delete mols;
 
-    aa1->movability = mt1;
-    aa2->movability = mt2;
+    aa1->movability = MOV_FLXDESEL;
+    aa2->movability = MOV_FLXDESEL;
 }
 
 

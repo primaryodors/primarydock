@@ -1247,6 +1247,11 @@ bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
         return false;
     }
 
+    if (atom->residue == 264 || btom->residue == 264)
+    {
+        theta += 0.00000000000001;
+    }
+
     int i;
     Point cen = btom->get_location();
     Point bas = atom->get_location();

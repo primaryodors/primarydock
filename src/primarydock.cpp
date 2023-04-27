@@ -1674,6 +1674,51 @@ void read_config_file(FILE* pf)
     }
 }
 
+void freeze_bridged_residues()
+{
+    int i, l;
+
+    if (bridges.size())
+    {
+        for (i=0; i<bridges.size(); i++)
+        {
+            int resno1 = interpret_resno(bridges[i].c_str());
+            const char* r2 = strchr(bridges[i].c_str(), '|');
+            if (!r2) throw 0xbadc0de;
+            r2++;
+            int resno2 = interpret_resno(r2);
+            
+            AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
+            if (aa1)
+            {
+                aa1->movability = MOV_FLXDESEL;
+                Bond** bb = aa1->get_rotatable_bonds();
+                if (bb)
+                {
+                    for (l=0; bb[l]; l++)
+                    {
+                        bb[l]->can_rotate = false;
+                    }
+                    delete bb;
+                }
+            }
+            if (aa2)
+            {
+                aa2->movability = MOV_FLXDESEL;
+                Bond** bb = aa2->get_rotatable_bonds();
+                if (bb)
+                {
+                    for (l=0; bb[l]; l++)
+                    {
+                        bb[l]->can_rotate = false;
+                    }
+                    delete bb;
+                }
+            }
+        }
+    }
+}
+
 void prepare_initb()
 {
     int i, j;
@@ -2293,6 +2338,8 @@ int main(int argc, char** argv)
 
     int l;
 
+    
+
     if (bridges.size())
     {
         for (i=0; i<bridges.size(); i++)
@@ -2310,32 +2357,8 @@ int main(int argc, char** argv)
             protein->bridge(resno1, resno2);
 
             AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
-            if (aa1)
-            {
-                aa1->movability = MOV_FLXDESEL;
-                Bond** bb = aa1->get_rotatable_bonds();
-                if (bb)
-                {
-                    for (l=0; bb[l]; l++)
-                    {
-                        bb[l]->can_rotate = false;
-                    }
-                    delete bb;
-                }
-            }
-            if (aa2)
-            {
-                aa2->movability = MOV_FLXDESEL;
-                Bond** bb = aa2->get_rotatable_bonds();
-                if (bb)
-                {
-                    for (l=0; bb[l]; l++)
-                    {
-                        bb[l]->can_rotate = false;
-                    }
-                    delete bb;
-                }
-            }
+            if (aa1) aa1->movability = MOV_FLXDESEL;
+            if (aa2) aa2->movability = MOV_FLXDESEL; 
 
             #if _dbg_bridges
             if (!aa1) cout << resno1 << " not found." << endl;
@@ -2348,6 +2371,8 @@ int main(int argc, char** argv)
             #endif
         }
     }
+
+    freeze_bridged_residues();
 
     prepare_acv_bond_rots();
 
@@ -2932,6 +2957,8 @@ _try_again:
             protein->load_pdb(pf);
             fclose(pf);
         }
+
+        freeze_bridged_residues();
         prepare_initb();
 
         ligand->recenter(pocketcen);
@@ -3048,6 +3075,7 @@ _try_again:
                 protein->load_pdb(pf);
                 fclose(pf);
 
+                freeze_bridged_residues();
                 prepare_initb();
 
                 for (i=1; i<=seql; i++)
@@ -3241,6 +3269,8 @@ _try_again:
                         }
                     }
                 }
+
+                freeze_bridged_residues();
             }
 
             if (nodeno == active_matrix_node
@@ -3417,6 +3447,7 @@ _try_again:
                     }
                 }
 
+                freeze_bridged_residues();
                 // If there are any active bond rotations, perform them but ensure the angle is relative to the *original* position
                 // from the PDB file.
                 if (active_bond_rots.size())
@@ -3460,6 +3491,9 @@ _try_again:
 
                 // TODO: #if !recenter_ligand_each_node, recenter the ligand here to keep up with the residues that it was coordinated to.
                 // Perhaps also multimol it for 10 or so iterations with all flexions (ligand and residue) globally disabled.
+
+
+                freeze_bridged_residues();
             }
 
             #if _DBG_STEPBYSTEP
@@ -3678,6 +3712,8 @@ _try_again:
                 #if _dbg_flexion_selection
                 cout << flexible_resnos.size() << " residues selected for flexion." << endl;
                 #endif
+
+                freeze_bridged_residues();
 
                 if (forced_flexible_resnos.size())
                 {
@@ -4339,6 +4375,8 @@ _try_again:
                 if (debug) *debug << "Aligned ligand to AA." << endl;
                 cout << endl;
                 #endif
+
+                freeze_bridged_residues();
             }
 
             // float driftamt = 1.0 / (iters/25+1);
@@ -4406,7 +4444,7 @@ _try_again:
             }
 
             protein->find_residue_initial_bindings();
-
+            freeze_bridged_residues();
             Molecule::multimol_conform(
                 cfmols,
                 delete_me = protein->all_residues_as_molecules_except(cfmols),

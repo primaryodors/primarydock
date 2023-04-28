@@ -2336,9 +2336,7 @@ int main(int argc, char** argv)
         fclose(pf);
     }
 
-    int l;
-
-    
+    int l;  
 
     if (bridges.size())
     {
@@ -2370,9 +2368,15 @@ int main(int argc, char** argv)
             }
             #endif
         }
-    }
 
-    freeze_bridged_residues();
+        freeze_bridged_residues();
+
+        temp_pdb_file = "tmp/bridged.pdb";
+
+        pf = fopen(temp_pdb_file.c_str(), "wb");
+        protein->save_pdb(pf);
+        fclose(pf);
+    }
 
     prepare_acv_bond_rots();
 

@@ -1,4 +1,8 @@
-# Ignore build arfifacts
+# Ignore build arfifacts and other misc files.
+*
+!/**/
+!*.*
+
 *.o
 *_test
 metal
@@ -20,4 +24,26 @@ obj/
 build/
 *.received.txt
 www/assets/pngs/*.png
-
+predict/*.json
+predict/*.ai
+composer.*
+vendor
+.vscode
+www/assets/*.woff2
+www/assets/primaryod*
+data/*.bkp.json
+data/receptor_pq.json
+output
+OR*.png
+tmp
+temp
+test.*
+*.pepd
+data/seq*
+data/*.php
+www/assets/image.png
+www/custom.json
+www/*.bak.php
+predict/training_set.txt
+www/security.json
+www/sidelinks.json

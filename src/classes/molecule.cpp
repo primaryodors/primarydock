@@ -2690,7 +2690,7 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                 Atom* ia = mm[i]->get_nearest_atom(jcen);
                 Atom* ja = all[j]->get_nearest_atom(icen);
 
-                if (ia->distance_to(ja) <= search_radius)
+                if (inplen <= 5 || ia->distance_to(ja) <= search_radius)
                 {
                     nearby[j] = true;
                 }

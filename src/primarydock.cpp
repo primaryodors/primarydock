@@ -2103,26 +2103,6 @@ int main(int argc, char** argv)
 
         protein->homology_conform(ptemplt);
 
-        cout << "Adjusting helix positions...";
-
-        // TODO: This section should be moved to the Protein::homology_conform() ftn.
-        std::vector<Region> helices;
-        for (i=1; i<=7; i++)
-        {
-            sprintf(buffer, "TMR%d", i);
-            Region rgn;
-            rgn.end = protein->get_region_end(buffer);
-            rgn.name = buffer;
-            rgn.start = protein->get_region_start(buffer);
-            helices.push_back(rgn);
-        }
-
-        for (i=0; i<20; i++)
-        {
-            protein->soft_iteration(helices, nullptr);
-        }
-        // End section for code move.
-
         temp_pdb_file = "tmp/homolog.pdb";
 
         pf = fopen(temp_pdb_file.c_str(), "wb");

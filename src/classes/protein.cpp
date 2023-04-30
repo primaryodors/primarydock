@@ -2952,6 +2952,23 @@ void Protein::homology_conform(Protein* target)
     }
 
     // TODO: Should figure out how to do homology for the EXR and CYT loops. At minimum the EXR.
+
+
+    std::vector<Region> helices;
+    for (i=1; i<=7; i++)
+    {
+        sprintf(buffer, "TMR%d", i);
+        Region rgn;
+        rgn.end = get_region_end(buffer);
+        rgn.name = buffer;
+        rgn.start = get_region_start(buffer);
+        helices.push_back(rgn);
+    }
+
+    for (i=0; i<20; i++)
+    {
+        soft_iteration(helices, nullptr);
+    }
 }
 
 void Protein::bridge(int resno1, int resno2)

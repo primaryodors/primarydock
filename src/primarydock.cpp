@@ -3290,7 +3290,6 @@ _try_again:
                 // Perhaps also multimol it for 10 or so iterations with all flexions (ligand and residue) globally disabled.
 
 
-                freeze_bridged_residues();
             }
 
             #if _DBG_STEPBYSTEP

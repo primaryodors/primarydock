@@ -344,10 +344,16 @@ function find_odorant($aroma)
 	$aroma1 = preg_replace( "/[^a-z0-9]/", "", strtolower($aroma) );
 	foreach ($odors as $oid => $o)
 	{
-		if ( $o['smiles'] == $aroma || preg_replace( "/[^a-z0-9]/", "", strtolower($o['full_name']) ) == $aroma1 )
+		if ( $o['smiles'] == $aroma
+			 || preg_replace( "/[^a-z0-9]/", "", strtolower($o['full_name']) ) == $aroma1
+			 || @$o['iupac'] == $aroma
+			 || @$o['name1'] == $aroma
+			 || @$o['name2'] == $aroma
+			)
 		{
 			$retval = $o;
 			$retval['oid'] = $oid;
+			print_r($retval);
 			return $retval;
 		}
 	}

@@ -1417,9 +1417,8 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "TEMPLATE"))
     {
-        strcpy(tplfname, words[1]);
-        tplset = true;
-        // optsecho = "Protein file is " + (std::string)protfname;
+        tplset = !strcmp(words[1], "off") && !strcmp(words[1], "OFF");
+        if (tplset) strcpy(tplfname, words[1]);
         return 1;
     }
     else if (!strcmp(words[0], "TRIP"))
@@ -2100,6 +2099,10 @@ int main(int argc, char** argv)
         }
         ptemplt->load_pdb(pf);
         fclose(pf);
+
+        #if _dbg_homology
+        cout << "Homology template is " << tplfname << endl;
+        #endif
 
         protein->homology_conform(ptemplt);
 

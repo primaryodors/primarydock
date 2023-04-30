@@ -11,6 +11,9 @@
 
 using namespace std;
 
+float *g_rgnxform_r = nullptr, *g_rgnxform_theta = nullptr, *g_rgnxform_y = nullptr;
+float *g_rgnrot_alpha = nullptr, *g_rgnrot_w = nullptr, *g_rgnrot_u = nullptr;
+
 Protein::Protein(const char* lname)
 {
     name = lname;
@@ -302,7 +305,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                         #endif
                         interactors[l] = laa[j];
                         wasmov[l] = laa[j]->movability;
-                        laa[j]->movability = MOV_FLEXONLY;
+                        if (laa[j]->movability != MOV_FLXDESEL) laa[j]->movability = MOV_FLEXONLY;
                         l++;
                     }
                     else
@@ -881,7 +884,7 @@ void Protein::set_clashables(int resno, bool recursed)
             }
         }
 
-        if (res_can_clash[i]) delete res_can_clash[i];
+        if (res_can_clash[0] && res_can_clash[i]) delete res_can_clash[i];
         res_can_clash[i] = new AminoAcid*[k+1];
         for (j=0; j<k; j++)
         {
@@ -2597,8 +2600,609 @@ bool Protein::disulfide_bond(int resno1, int resno2)
     return result;
 }
 
+void Protein::upright()
+{
+    move_piece(1, 9999, Point(0,0,0));
+
+    Point extracellular[256], cytoplasmic[256];
+    int i, j, exr_n=0, cyt_n=0;
+
+    for (i=1; i<=7; i++)
+    {
+        int sr = get_region_start((std::string)"TMR" + std::to_string(i));
+        if (!sr) continue;
+        int er = get_region_end((std::string)"TMR" + std::to_string(i));
+
+        for (j=0; j<4; j++)
+        {
+            if (i & 1)			// TMR1, TMR3, TMR5, TMR7 begin on the extracellular side and descend.
+            {
+                extracellular[exr_n++] = get_atom_location(sr+j, "CA");
+                cytoplasmic[cyt_n++] = get_atom_location(er-j, "CA");
+            }
+            else				// TMR2, TMR4, TMR6 ascend from the cytoplasmic side.
+            {
+                cytoplasmic[cyt_n++] = get_atom_location(sr+j, "CA");
+                extracellular[exr_n++] = get_atom_location(er-j, "CA");
+            }
+        }
+    }
+
+    if (!exr_n || !cyt_n) throw 0xbad7312;
+
+    Point exrdir = average_of_points(extracellular, exr_n);
+    Point cytdir = average_of_points(cytoplasmic, cyt_n);
+
+    Rotation rot = align_points_3d(&exrdir, new Point(0,1e6,0), &cytdir);
+
+    rotate_piece(1, 9999, rot, 0);
+
+    // Rotate to place TMR4 in the +Z direction relative to TMR1.
+    int sr = get_region_start("TMR4");
+    if (sr)
+    {
+        int er = get_region_end("TMR4");
+
+        Point tmr1[64], tmr4[64];
+        int tmr1_n=0, tmr4_n=0;
+
+        for (i=sr; i<=er; i++)
+        {
+            tmr4[tmr4_n++] = get_atom_location(i, "CA");
+        }
+
+        sr = get_region_start("TMR1");
+        er = get_region_end("TMR1");
+
+        for (i=sr; i<=er; i++)
+        {
+            tmr1[tmr1_n++] = get_atom_location(i, "CA");
+        }
+
+        Point tmr1dir = average_of_points(tmr1, tmr1_n);
+        Point tmr4dir = average_of_points(tmr4, tmr4_n);
 
 
+        tmr1dir.y = tmr4dir.y = 0;
 
+        rot = align_points_3d(&tmr4dir, new Point(0,0,1e9), &tmr1dir);
+
+        rotate_piece(1, 9999, rot, 0);
+    }
+
+}
+
+void Protein::homology_conform(Protein* target)
+{
+    // Check that both proteins have TM helices and BW numbers set. If not, error out.
+    if (!get_region_start("TMR6") || !target->get_region_start("TMR6")) throw 0xbadbeb7;
+    if (!Ballesteros_Weinstein.size() || !target->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
+
+    upright();
+    target->upright();
+
+    // Get the average location delta for all CA atoms in the TM helices. Match them by BW number.
+    // Include only BW numbers that are inside a TMR for both proteins.
+    int hxno, resno1, resno2;
+    char buffer[256];
+    Point xform_delta(0,0,0), center(0,0,0);
+    int count = 0;
+
+    std::vector<int> resnos1, resnos2;
+
+    for (hxno = 1; hxno <= 7; hxno++)
+    {
+        sprintf(buffer, "TMR%d", hxno);
+        int rgend1 = get_region_end(buffer);
+        int rgstart2 = target->get_region_start(buffer);
+        int rgend2 = target->get_region_end(buffer);
+        int bw50a = get_bw50(hxno), bw50b = target->get_bw50(hxno);
+        for (resno1 = get_region_start(buffer); resno1 <= rgend1; resno1++)
+        {
+            int i = resno1 - bw50a;
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                Point caloc = get_atom_location(resno1, "CA");
+                Point ptdiff = caloc.subtract(target->get_atom_location(resno2, "CA"));
+                xform_delta = xform_delta.add(ptdiff);
+                center = center.add(caloc);
+                count++;
+
+                resnos1.push_back(resno1);
+                resnos2.push_back(resno2);
+            }
+        }
+    }
+    if (count)
+    {
+        xform_delta.scale(xform_delta.magnitude() / count);
+        center.scale(center.magnitude() / count);
+    }
+
+    // Transform the target to bring its TM center to coincide with that of the current protein.
+    SCoord move_amt = xform_delta;
+    target->move_piece(1, 9999, move_amt);
+
+    // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
+    // the TM CA atoms as closely as possible.
+    int i;
+    float theta = 0;
+    Point axis(0,1,0);
+    count = 0;
+    for (i=0; i<resnos1.size(); i++)
+    {
+        resno1 = resnos1[i];
+        resno2 = resnos2[i];
+        Point pt1 = get_atom_location(resno1, "CA"), pt2 = target->get_atom_location(resno2, "CA");
+        pt1.y = pt2.y = 0;
+        Rotation rot = align_points_3d(pt2, pt1, center);
+        Point rotv = rot.v;
+        if (rotv.y < 0) theta -= rot.a;
+        else theta += rot.a;
+        count++;
+    }
+
+    if (count) theta /= count;
+
+    // Perform the rotation.
+    target->rotate_piece(1, 9999, center, axis, theta);
+
+    // Find the rotations and transformations for each TM region to bring its CA atoms as close as
+    // possible to those of the target.
+    for (hxno = 1; hxno <= 7; hxno++)
+    {
+        sprintf(buffer, "TMR%d", hxno);
+        int rgstart1 = get_region_start(buffer);
+        int rgend1 = get_region_end(buffer);
+        int rgstart2 = target->get_region_start(buffer);
+        int rgend2 = target->get_region_end(buffer);
+        int bw50a = get_bw50(hxno), bw50b = target->get_bw50(hxno);
+        Point rcen1(0,0,0);
+        Point rcen2(0,0,0);
+        count = 0;
+        for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
+        {
+            int i = resno1 - bw50a;
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                rcen1 = rcen1.add(get_atom_location(resno1, "CA"));
+                rcen2 = rcen2.add(target->get_atom_location(resno2, "CA"));
+                count++;
+            }
+        }
+
+        if (count)
+        {
+            rcen1.scale(rcen1.magnitude()/count);
+            rcen2.scale(rcen2.magnitude()/count);
+        }
+
+        // Perform the TM region transformation.
+        move_piece(rgstart1, rgend1, (SCoord)rcen2.subtract(rcen1));
+
+        Point axis(0,0,0);
+        Point rcen = get_region_center(rgstart1, rgend1);
+        float theta;
+        count = 0;
+        for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
+        {
+            int i = resno1 - bw50a;
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                Point caloc1 = get_atom_location(resno1, "CA"),
+                      caloc2 = target->get_atom_location(resno2, "CA");
+                Rotation rot = align_points_3d(caloc1, caloc2, rcen);
+
+                axis = axis.add(rot.v);
+                theta += rot.a;
+                count++;
+            }
+        }
+
+        if (count)
+        {
+            axis.scale(axis.magnitude()/count);
+            theta/=count;
+        }
+
+        // Perform the TM region rotation.
+        rotate_piece(rgstart1, rgend1, rcen, axis, theta);
+    }
+
+    // Prepare for clash minimization.
+    float dx[10], dy[10], dz[10];
+    float target_clash[10], attained[10];
+
+    if (!target->get_residue(target->get_region_start("TMR3"))->get_hydrogen_count())
+    {
+        #if _dbg_homology
+        cout << "Hydrogenating target..." << endl;
+        #endif
+        //
+        for (i=1; i<=target->get_end_resno(); i++)
+        {
+            AminoAcid* aa = target->get_residue(i);
+            if (aa) aa->hydrogenate();
+        }
+    }
+
+    for (hxno = 1; hxno <= 7; hxno++)
+    {
+        dx[hxno] = dy[hxno] = dz[hxno] = 0.5;
+        attained[hxno] = false;
+    
+        sprintf(buffer, "TMR%d", hxno);
+        int rgstart2 = target->get_region_start(buffer);
+        int rgend2 = target->get_region_end(buffer);
+        target_clash[hxno] = target->get_internal_clashes(rgstart2, rgend2, false);
+    }
+
+    return;
+
+    // Repack the TM regions, then adjust their locations and rotations to minimize clashes.
+    Pose putitback[get_end_resno()+10];
+    for (i=0; i<100; i++)
+    {
+        bool repack = (i < 10 || i >= 90);
+        int num_attained = 0;
+        for (hxno = 1; hxno <= 7; hxno++)
+        {
+            if (attained[hxno])
+            {
+                num_attained++;
+                continue;
+            }
+
+            sprintf(buffer, "TMR%d", hxno);
+            int rgstart1 = get_region_start(buffer);
+            int rgend1 = get_region_end(buffer);
+
+            float before = get_internal_clashes(rgstart1, rgend1, repack);
+            int j;
+            for (j=rgstart1; j <= rgend1; j++)
+            {
+                AminoAcid* aa = get_residue(j);
+                if (aa) putitback[j].copy_state((Molecule*)aa);
+            }
+
+            // "soft"-manipulate the region to minimize clashes.
+            Point ptx(dx[hxno], 0, 0);
+            move_piece(rgstart1, rgend1, (SCoord)ptx);
+            float after = get_internal_clashes(rgstart1, rgend1, repack);
+
+            if (after > before)
+            {
+                ptx.x *= -1;
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].restore_state((Molecule*)aa);
+                }
+                dx[hxno] *= -0.666;
+            }
+            else
+            {
+                before = after;
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].copy_state((Molecule*)aa);
+                }
+            }
+
+            Point pty(0, dy[hxno], 0);
+            move_piece(rgstart1, rgend1, (SCoord)pty);
+            after = get_internal_clashes(rgstart1, rgend1, repack);
+
+            if (after > before)
+            {
+                pty.y *= -1;
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].restore_state((Molecule*)aa);
+                }
+                dy[hxno] *= -0.666;
+            }
+            else
+            {
+                before = after;
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].copy_state((Molecule*)aa);
+                }
+            }
+
+            Point ptz(0, 0, dz[hxno]);
+            move_piece(rgstart1, rgend1, (SCoord)ptz);
+            after = get_internal_clashes(rgstart1, rgend1, repack);
+
+            if (after > before)
+            {
+                ptz.z *= -1;
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].restore_state((Molecule*)aa);
+                }
+                dz[hxno] *= -0.666;
+            }
+            else
+            {
+                before = after;
+                for (j=rgstart1; j <= rgend1; j++)
+                {
+                    AminoAcid* aa = get_residue(j);
+                    if (aa) putitback[j].copy_state((Molecule*)aa);
+                }
+            }
+
+            #if _dbg_homology
+            cout << "Homology iteration " << i << " helix " << hxno << " clashes " << before << " vs. target " << target_clash[hxno] << endl;
+            #endif
+
+            if (before <= target_clash[hxno]) attained[hxno] = true;
+        }
+
+        if (num_attained == 7) break;
+    }
+
+    // TODO: Should figure out how to do homology for the EXR and CYT loops. At minimum the EXR.
+
+
+    std::vector<Region> helices;
+    for (i=1; i<=7; i++)
+    {
+        sprintf(buffer, "TMR%d", i);
+        Region rgn;
+        rgn.end = get_region_end(buffer);
+        rgn.name = buffer;
+        rgn.start = get_region_start(buffer);
+        helices.push_back(rgn);
+    }
+
+    for (i=0; i<20; i++)
+    {
+        soft_iteration(helices, nullptr);
+    }
+}
+
+void Protein::bridge(int resno1, int resno2)
+{
+    AminoAcid *aa1 = get_residue(resno1), *aa2 = get_residue(resno2);
+    if (!aa1 || !aa2) return;
+
+    aa1->movability = aa2->movability = MOV_FLEXONLY;
+
+    Molecule** mols = new Molecule*[3];
+    mols[0] = aa1;
+    mols[1] = aa2;
+    mols[2] = nullptr;
+
+    Molecule::multimol_conform(mols, 25);
+
+    Molecule** mols2;
+
+    mols2 = (Molecule**)get_residues_can_clash(resno1);
+    Molecule::multimol_conform(mols, mols2, 25);
+
+    mols2 = (Molecule**)get_residues_can_clash(resno2);
+    Molecule::multimol_conform(mols, mols2, 25);
+
+    delete mols;
+
+    aa1->movability = MOV_FLXDESEL;
+    aa2->movability = MOV_FLXDESEL;
+}
+
+SoftBias* Protein::get_soft_bias_from_region(const char* region)
+{
+    int sz = soft_biases.size();
+    if (!sz) return nullptr;
+    int i;
+    for (i=0; i<sz; i++)
+    {
+        if (soft_biases[i].region_name == (std::string)region) return &soft_biases[i];
+    }
+    return nullptr;
+}
+
+void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
+{
+    //
+    int l;
+    float prebind;
+
+    int sz = l_soft_rgns.size();
+    if (sz)
+    {
+        for (l=0; l<sz; l++)
+        {
+            SoftBias* sb = get_soft_bias_from_region(l_soft_rgns[l].name.c_str());
+            if (!l) prebind = (ligand ? get_intermol_binding(ligand)*soft_ligand_importance : 0) + get_internal_binding()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
+            
+            #if _dbg_soft
+            cout << iter << ": from " << prebind;
+            #endif
+
+            int tweak = rand() % 6;
+            float amount = nanf("unbiased");
+
+            if (sb)
+            {
+                switch (tweak)
+                {
+                    case 0:
+                    amount = sb->radial_transform;
+                    break;
+
+                    case 1:
+                    amount = sb->angular_transform;
+                    break;
+
+                    case 2:
+                    amount = sb->vertical_transform;
+                    break;
+
+                    case 3:
+                    amount = sb->helical_rotation;
+                    break;
+
+                    case 4:
+                    amount = sb->radial_rotation;
+                    break;
+
+                    case 5:
+                    amount = sb->transverse_rotation;
+                    break;
+
+                    default:
+                    ;
+                }
+            }
+
+            if (isnan(amount) || !amount) amount = frand(-1, 1);
+            else
+            {
+                if (amount > 0) amount = frand(-amount*soft_bias_overlap, amount);
+                else amount = frand(amount, -amount*soft_bias_overlap);
+            }
+
+            Point bary = get_region_center(1, 9999);
+            Point ptrgn = get_region_center(l_soft_rgns[l].start, l_soft_rgns[l].end);
+            SCoord r = ptrgn.subtract(bary);
+            r.theta = 0;
+            r.r = amount;
+            Point pr1 = bary.add(r);
+            Point pr2 = pr1;
+            pr2.y += 20;
+            SCoord normal = compute_normal(bary, pr1, pr2);
+            normal.r = amount;
+            SCoord alpha = get_region_axis(l_soft_rgns[l].start, l_soft_rgns[l].end);
+            alpha.r = amount;
+            Point rgncen = get_region_center(l_soft_rgns[l].start, l_soft_rgns[l].end);
+
+            switch (tweak)
+            {
+                case 0:
+                move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, r);
+                break;
+
+                case 1:
+                move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, normal);
+                break;
+
+                case 2:
+                move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, alpha);
+                break;
+
+                case 3:
+                rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, alpha, amount/10);
+                break;
+
+                case 4:
+                rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, r, amount/50);
+                break;
+
+                case 5:
+                rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, normal, amount/30);
+                break;
+
+                default:
+                ;
+            }
+
+            float postbind = (ligand ? get_intermol_binding(ligand)*soft_ligand_importance : 0) + get_internal_binding()*_kJmol_cuA;
+            #if _dbg_soft
+            cout << " to " << postbind;
+            #endif
+
+            switch (tweak)
+            {
+                case 0:
+                if (ligand && postbind > prebind) g_rgnxform_r[l] += amount;
+                else
+                {
+                    r.r = -r.r;
+                    move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, r);
+                    #if _dbg_soft
+                    cout << " reverting r.";
+                    #endif
+                }
+                break;
+
+                case 1:
+                if (ligand && postbind > prebind) g_rgnxform_theta[l] += amount;
+                else
+                {
+                    normal.r = -normal.r;
+                    move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, normal);
+                    #if _dbg_soft
+                    cout << " reverting normal.";
+                    #endif
+                }
+                break;
+
+                case 2:
+                if (ligand && postbind > prebind) g_rgnxform_y[l] += amount;
+                else
+                {
+                    alpha.r = -alpha.r;
+                    move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, alpha);
+                    #if _dbg_soft
+                    cout << " reverting alpha.";
+                    #endif
+                }
+                break;
+
+                case 3:
+                if (ligand && postbind > prebind) g_rgnrot_alpha[l] += amount/10;
+                else
+                {
+                    rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, alpha, -amount/10);
+                    #if _dbg_soft
+                    cout << " reverting alpha rot.";
+                    #endif
+                }
+                break;
+
+                case 4:
+                if (ligand && postbind > prebind) g_rgnrot_w[l] += amount/50;
+                else
+                {
+                    rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, r, -amount/50);
+                    #if _dbg_soft
+                    cout << " reverting r rot.";
+                    #endif
+                }
+                break;
+
+                case 5:
+                if (ligand && postbind > prebind) g_rgnrot_u[l] += amount/30;
+                else
+                {
+                    rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, normal, -amount/30);
+                    #if _dbg_soft
+                    cout << " reverting normal rot.";
+                    #endif
+                }
+                break;
+
+                default:
+                ;
+            }
+
+            if (postbind > prebind) prebind = postbind;
+
+            #if _dbg_soft
+            cout << endl;
+            #endif
+        }
+    }
+}
 
 

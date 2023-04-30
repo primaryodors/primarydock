@@ -11,6 +11,9 @@
 
 using namespace std;
 
+float *g_rgnxform_r = nullptr, *g_rgnxform_theta = nullptr, *g_rgnxform_y = nullptr;
+float *g_rgnrot_alpha = nullptr, *g_rgnrot_w = nullptr, *g_rgnrot_u = nullptr;
+
 Protein::Protein(const char* lname)
 {
     name = lname;
@@ -2979,5 +2982,210 @@ void Protein::bridge(int resno1, int resno2)
     aa2->movability = MOV_FLXDESEL;
 }
 
+SoftBias* Protein::get_soft_bias_from_region(const char* region)
+{
+    int sz = soft_biases.size();
+    if (!sz) return nullptr;
+    int i;
+    for (i=0; i<sz; i++)
+    {
+        if (soft_biases[i].region_name == (std::string)region) return &soft_biases[i];
+    }
+    return nullptr;
+}
+
+void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
+{
+    //
+    int l;
+    float prebind;
+
+    int sz = l_soft_rgns.size();
+    if (sz)
+    {
+        for (l=0; l<sz; l++)
+        {
+            SoftBias* sb = get_soft_bias_from_region(l_soft_rgns[l].name.c_str());
+            if (!l) prebind = (ligand ? get_intermol_binding(ligand)*soft_ligand_importance : 0) + get_internal_binding()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
+            
+            #if _dbg_soft
+            cout << iter << ": from " << prebind;
+            #endif
+
+            int tweak = rand() % 6;
+            float amount = nanf("unbiased");
+
+            if (sb)
+            {
+                switch (tweak)
+                {
+                    case 0:
+                    amount = sb->radial_transform;
+                    break;
+
+                    case 1:
+                    amount = sb->angular_transform;
+                    break;
+
+                    case 2:
+                    amount = sb->vertical_transform;
+                    break;
+
+                    case 3:
+                    amount = sb->helical_rotation;
+                    break;
+
+                    case 4:
+                    amount = sb->radial_rotation;
+                    break;
+
+                    case 5:
+                    amount = sb->transverse_rotation;
+                    break;
+
+                    default:
+                    ;
+                }
+            }
+
+            if (isnan(amount) || !amount) amount = frand(-1, 1);
+            else
+            {
+                if (amount > 0) amount = frand(-amount*soft_bias_overlap, amount);
+                else amount = frand(amount, -amount*soft_bias_overlap);
+            }
+
+            Point bary = get_region_center(1, 9999);
+            Point ptrgn = get_region_center(l_soft_rgns[l].start, l_soft_rgns[l].end);
+            SCoord r = ptrgn.subtract(bary);
+            r.theta = 0;
+            r.r = amount;
+            Point pr1 = bary.add(r);
+            Point pr2 = pr1;
+            pr2.y += 20;
+            SCoord normal = compute_normal(bary, pr1, pr2);
+            normal.r = amount;
+            SCoord alpha = get_region_axis(l_soft_rgns[l].start, l_soft_rgns[l].end);
+            alpha.r = amount;
+            Point rgncen = get_region_center(l_soft_rgns[l].start, l_soft_rgns[l].end);
+
+            switch (tweak)
+            {
+                case 0:
+                move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, r);
+                break;
+
+                case 1:
+                move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, normal);
+                break;
+
+                case 2:
+                move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, alpha);
+                break;
+
+                case 3:
+                rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, alpha, amount/10);
+                break;
+
+                case 4:
+                rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, r, amount/50);
+                break;
+
+                case 5:
+                rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, normal, amount/30);
+                break;
+
+                default:
+                ;
+            }
+
+            float postbind = (ligand ? get_intermol_binding(ligand)*soft_ligand_importance : 0) + get_internal_binding()*_kJmol_cuA;
+            #if _dbg_soft
+            cout << " to " << postbind;
+            #endif
+
+            switch (tweak)
+            {
+                case 0:
+                if (ligand && postbind > prebind) g_rgnxform_r[l] += amount;
+                else
+                {
+                    r.r = -r.r;
+                    move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, r);
+                    #if _dbg_soft
+                    cout << " reverting r.";
+                    #endif
+                }
+                break;
+
+                case 1:
+                if (ligand && postbind > prebind) g_rgnxform_theta[l] += amount;
+                else
+                {
+                    normal.r = -normal.r;
+                    move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, normal);
+                    #if _dbg_soft
+                    cout << " reverting normal.";
+                    #endif
+                }
+                break;
+
+                case 2:
+                if (ligand && postbind > prebind) g_rgnxform_y[l] += amount;
+                else
+                {
+                    alpha.r = -alpha.r;
+                    move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, alpha);
+                    #if _dbg_soft
+                    cout << " reverting alpha.";
+                    #endif
+                }
+                break;
+
+                case 3:
+                if (ligand && postbind > prebind) g_rgnrot_alpha[l] += amount/10;
+                else
+                {
+                    rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, alpha, -amount/10);
+                    #if _dbg_soft
+                    cout << " reverting alpha rot.";
+                    #endif
+                }
+                break;
+
+                case 4:
+                if (ligand && postbind > prebind) g_rgnrot_w[l] += amount/50;
+                else
+                {
+                    rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, r, -amount/50);
+                    #if _dbg_soft
+                    cout << " reverting r rot.";
+                    #endif
+                }
+                break;
+
+                case 5:
+                if (ligand && postbind > prebind) g_rgnrot_u[l] += amount/30;
+                else
+                {
+                    rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, normal, -amount/30);
+                    #if _dbg_soft
+                    cout << " reverting normal rot.";
+                    #endif
+                }
+                break;
+
+                default:
+                ;
+            }
+
+            if (postbind > prebind) prebind = postbind;
+
+            #if _dbg_soft
+            cout << endl;
+            #endif
+        }
+    }
+}
 
 

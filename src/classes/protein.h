@@ -22,6 +22,17 @@ struct Region
     std::string name="";
 };
 
+struct SoftBias
+{
+    std::string region_name;
+    float radial_transform = 0;                 // Motion away from or towards the pocket center.
+    float angular_transform = 0;                // Motion towards and away from neighboring helices.
+    float vertical_transform = 0;               // Motion in the extracelllar or cytoplasmic direction.
+    float helical_rotation = 0;                 // Rotation about the helical axis.
+    float radial_rotation = 0;                  // Rotation about the imaginary line to the pocket center.
+    float transverse_rotation = 0;              // Rotation about the imaginary line perpendicular to the pocket center.
+};
+
 class Protein
 {
 public:
@@ -128,10 +139,13 @@ public:
         int iterations
     );
 
+    SoftBias* get_soft_bias_from_region(const char* region);
     void homology_conform(Protein* target_structure);
     void bridge(int resno1, int resno2);
+    void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
 
     int* mcoord_resnos = NULL;
+    std::vector<SoftBias> soft_biases;
 
 protected:
     Atom** ca = nullptr;
@@ -158,6 +172,8 @@ protected:
     friend void ext_mtl_coord_cnf_cb(int iter);
     void mtl_coord_cnf_cb(int iter);
 };
+
+extern float *g_rgnxform_r, *g_rgnxform_theta, *g_rgnxform_y, *g_rgnrot_alpha, *g_rgnrot_w, *g_rgnrot_u;
 
 
 #endif

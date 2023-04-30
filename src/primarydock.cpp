@@ -91,17 +91,6 @@ struct AcvBndRot
     float theta;
 };
 
-struct SoftBias
-{
-    std::string region_name;
-    float radial_transform = 0;                 // Motion away from or towards the pocket center.
-    float angular_transform = 0;                // Motion towards and away from neighboring helices.
-    float vertical_transform = 0;               // Motion in the extracelllar or cytoplasmic direction.
-    float helical_rotation = 0;                 // Rotation about the helical axis.
-    float radial_rotation = 0;                  // Rotation about the imaginary line to the pocket center.
-    float transverse_rotation = 0;              // Rotation about the imaginary line perpendicular to the pocket center.
-};
-
 std::vector<int> extra_wt;
 
 #if _use_gloms
@@ -438,18 +427,15 @@ std::vector<AcvHxRot> orig_active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
 std::vector<ResiduePlaceholder> required_contacts;
+std::vector<SoftBias> soft_biases;
 std::vector<std::string> bridges;
 
 bool soft_pocket = false;
 std::string soft_names;
 std::vector<Region> soft_rgns;
-std::vector<SoftBias> soft_biases;
 std::vector<int>flexible_resnos;
 std::vector<ResiduePlaceholder>forced_flexible_resnos;
 std::vector<ResiduePlaceholder>forced_static_resnos;
-
-float *g_rgnxform_r = nullptr, *g_rgnxform_theta = nullptr, *g_rgnxform_y = nullptr;
-float *g_rgnrot_alpha = nullptr, *g_rgnrot_w = nullptr, *g_rgnrot_u = nullptr;
 
 #if _dummy_atoms_for_debug
 std::vector<Atom> dummies;
@@ -558,210 +544,6 @@ float teleport_water(Molecule* mol)
     return e;
 }
 
-SoftBias* get_soft_bias_from_region(const char* region)
-{
-    int sz = soft_biases.size();
-    if (!sz) return nullptr;
-    int i;
-    for (i=0; i<sz; i++)
-    {
-        if (soft_biases[i].region_name == (std::string)region) return &soft_biases[i];
-    }
-    return nullptr;
-}
-
-void soft_iteration(std::vector<Region> l_soft_rgns, bool include_ligand = true)
-{
-    //
-    int l;
-    float prebind;
-
-    int sz = l_soft_rgns.size();
-    if (sz)
-    {
-        for (l=0; l<sz; l++)
-        {
-            SoftBias* sb = get_soft_bias_from_region(l_soft_rgns[l].name.c_str());
-            if (!l) prebind = (include_ligand ? protein->get_intermol_binding(ligand)*soft_ligand_importance : 0) + protein->get_internal_binding()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
-            
-            #if _dbg_soft
-            cout << iter << ": from " << prebind;
-            #endif
-
-            int tweak = rand() % 6;
-            float amount = nanf("unbiased");
-
-            if (sb)
-            {
-                switch (tweak)
-                {
-                    case 0:
-                    amount = sb->radial_transform;
-                    break;
-
-                    case 1:
-                    amount = sb->angular_transform;
-                    break;
-
-                    case 2:
-                    amount = sb->vertical_transform;
-                    break;
-
-                    case 3:
-                    amount = sb->helical_rotation;
-                    break;
-
-                    case 4:
-                    amount = sb->radial_rotation;
-                    break;
-
-                    case 5:
-                    amount = sb->transverse_rotation;
-                    break;
-
-                    default:
-                    ;
-                }
-            }
-
-            if (isnan(amount) || !amount) amount = frand(-1, 1);
-            else
-            {
-                if (amount > 0) amount = frand(-amount*soft_bias_overlap, amount);
-                else amount = frand(amount, -amount*soft_bias_overlap);
-            }
-
-            Point ptrgn = protein->get_region_center(l_soft_rgns[l].start, l_soft_rgns[l].end);
-            SCoord r = ptrgn.subtract(loneliest);
-            r.theta = 0;
-            r.r = amount;
-            Point pr1 = loneliest.add(r);
-            Point pr2 = pr1;
-            pr2.y += 20;
-            SCoord normal = compute_normal(loneliest, pr1, pr2);
-            normal.r = amount;
-            SCoord alpha = protein->get_region_axis(l_soft_rgns[l].start, l_soft_rgns[l].end);
-            alpha.r = amount;
-            Point rgncen = protein->get_region_center(l_soft_rgns[l].start, l_soft_rgns[l].end);
-
-            switch (tweak)
-            {
-                case 0:
-                protein->move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, r);
-                break;
-
-                case 1:
-                protein->move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, normal);
-                break;
-
-                case 2:
-                protein->move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, alpha);
-                break;
-
-                case 3:
-                protein->rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, alpha, amount/10);
-                break;
-
-                case 4:
-                protein->rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, r, amount/50);
-                break;
-
-                case 5:
-                protein->rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, normal, amount/30);
-                break;
-
-                default:
-                ;
-            }
-
-            float postbind = (include_ligand ? protein->get_intermol_binding(ligand)*soft_ligand_importance : 0) + protein->get_internal_binding()*_kJmol_cuA;
-            #if _dbg_soft
-            cout << " to " << postbind;
-            #endif
-
-            switch (tweak)
-            {
-                case 0:
-                if (include_ligand && postbind > prebind) g_rgnxform_r[l] += amount;
-                else
-                {
-                    r.r = -r.r;
-                    protein->move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, r);
-                    #if _dbg_soft
-                    cout << " reverting r.";
-                    #endif
-                }
-                break;
-
-                case 1:
-                if (include_ligand && postbind > prebind) g_rgnxform_theta[l] += amount;
-                else
-                {
-                    normal.r = -normal.r;
-                    protein->move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, normal);
-                    #if _dbg_soft
-                    cout << " reverting normal.";
-                    #endif
-                }
-                break;
-
-                case 2:
-                if (include_ligand && postbind > prebind) g_rgnxform_y[l] += amount;
-                else
-                {
-                    alpha.r = -alpha.r;
-                    protein->move_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, alpha);
-                    #if _dbg_soft
-                    cout << " reverting alpha.";
-                    #endif
-                }
-                break;
-
-                case 3:
-                if (include_ligand && postbind > prebind) g_rgnrot_alpha[l] += amount/10;
-                else
-                {
-                    protein->rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, alpha, -amount/10);
-                    #if _dbg_soft
-                    cout << " reverting alpha rot.";
-                    #endif
-                }
-                break;
-
-                case 4:
-                if (include_ligand && postbind > prebind) g_rgnrot_w[l] += amount/50;
-                else
-                {
-                    protein->rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, r, -amount/50);
-                    #if _dbg_soft
-                    cout << " reverting r rot.";
-                    #endif
-                }
-                break;
-
-                case 5:
-                if (include_ligand && postbind > prebind) g_rgnrot_u[l] += amount/30;
-                else
-                {
-                    protein->rotate_piece(l_soft_rgns[l].start, l_soft_rgns[l].end, rgncen, normal, -amount/30);
-                    #if _dbg_soft
-                    cout << " reverting normal rot.";
-                    #endif
-                }
-                break;
-
-                default:
-                ;
-            }
-
-            if (postbind > prebind) prebind = postbind;
-
-            #if _dbg_soft
-            cout << endl;
-            #endif
-        }
-    }
-}
 
 void iteration_callback(int iter)
 {
@@ -770,7 +552,7 @@ void iteration_callback(int iter)
 
     if (soft_pocket && iter >= 10 && g_rgnrot_alpha && g_rgnrot_u && g_rgnrot_w && g_rgnxform_r && g_rgnxform_theta && g_rgnxform_y)
     {
-        soft_iteration(soft_rgns, true);
+        protein->soft_iteration(soft_rgns, ligand);
     }
 
     Point bary = ligand->get_barycenter();
@@ -2301,6 +2083,7 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
     protein->load_pdb(pf);
+    protein->soft_biases = soft_biases;
     fclose(pf);
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
@@ -2336,7 +2119,7 @@ int main(int argc, char** argv)
 
         for (i=0; i<20; i++)
         {
-            soft_iteration(helices, false);
+            protein->soft_iteration(helices, nullptr);
         }
         // End section for code move.
 
@@ -2981,12 +2764,14 @@ _try_again:
             pf = fopen(temp_pdb_file.c_str(), "r");
             protein->load_pdb(pf);
             fclose(pf);
+            protein->soft_biases = soft_biases;
         }
         else
         {
             pf = fopen(protfname, "r");
             protein->load_pdb(pf);
             fclose(pf);
+            protein->soft_biases = soft_biases;
         }
 
         freeze_bridged_residues();
@@ -3104,6 +2889,7 @@ _try_again:
                 
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
+                protein->soft_biases = soft_biases;
                 fclose(pf);
 
                 freeze_bridged_residues();
@@ -5251,6 +5037,7 @@ _exitposes:
                 return 0xbadf12e;
             }
             protein->load_pdb(pf);
+            protein->soft_biases = soft_biases;
             fclose(pf);
             FILE* pf = fopen(outfname, "ab");
             fprintf(pf, "\nOriginal PDB:\n");

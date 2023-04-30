@@ -5023,7 +5023,7 @@ _exitposes:
             fprintf(pf, "\nOriginal PDB:\n");
             protein->save_pdb(pf);
             fclose(pf);
-            cout << (tplset ? "Homologized " : "Original ") << "PDB appended to output file." << endl;
+            cout << "PDB appended to output file." << endl;
         }
         else cout << "ERROR: Append PDB can only be used when specifying an output file." << endl;
     }

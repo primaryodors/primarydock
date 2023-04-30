@@ -2873,7 +2873,6 @@ void Protein::homology_conform(Protein* target)
             if (after > before)
             {
                 ptx.x *= -1;
-                // move_piece(rgstart1, rgend1, (SCoord)ptx);
                 for (j=rgstart1; j <= rgend1; j++)
                 {
                     AminoAcid* aa = get_residue(j);
@@ -2898,7 +2897,6 @@ void Protein::homology_conform(Protein* target)
             if (after > before)
             {
                 pty.y *= -1;
-                // move_piece(rgstart1, rgend1, (SCoord)pty);
                 for (j=rgstart1; j <= rgend1; j++)
                 {
                     AminoAcid* aa = get_residue(j);
@@ -2923,7 +2921,6 @@ void Protein::homology_conform(Protein* target)
             if (after > before)
             {
                 ptz.z *= -1;
-                // move_piece(rgstart1, rgend1, (SCoord)ptz);
                 for (j=rgstart1; j <= rgend1; j++)
                 {
                     AminoAcid* aa = get_residue(j);
@@ -2959,7 +2956,6 @@ void Protein::bridge(int resno1, int resno2)
     AminoAcid *aa1 = get_residue(resno1), *aa2 = get_residue(resno2);
     if (!aa1 || !aa2) return;
 
-    // MovabilityType mt1 = aa1->movability, mt2 = aa2->movability;
     aa1->movability = aa2->movability = MOV_FLEXONLY;
 
     Molecule** mols = new Molecule*[3];

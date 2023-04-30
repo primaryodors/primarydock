@@ -386,7 +386,7 @@ int found_poses = 0;
 int triesleft = 0;				// Default is no retry.
 bool echo_progress = false;
 bool hydrogenate_pdb = false;
-std::string temp_pdb_file;
+std::string temp_pdb_file = "";
 bool append_pdb = false;
 bool do_output_colors = false;
 
@@ -2739,7 +2739,7 @@ _try_again:
         delete protein;
         protein = new Protein(protfname);
 
-        if (hydrogenate_pdb || tplset)
+        if (temp_pdb_file.length())
         {
             pf = fopen(temp_pdb_file.c_str(), "r");
             protein->load_pdb(pf);
@@ -5009,8 +5009,7 @@ _exitposes:
     {
         if (output)
         {
-            hydrogenate_pdb = false;
-            pf = fopen(tplset ? temp_pdb_file.c_str() : protfname, "r");
+            pf = fopen(temp_pdb_file.length() ? temp_pdb_file.c_str() : protfname, "r");
             if (!pf)
             {
                 cout << "Error trying to read " << protfname << endl;

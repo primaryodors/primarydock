@@ -353,7 +353,6 @@ function find_odorant($aroma)
 		{
 			$retval = $o;
 			$retval['oid'] = $oid;
-			print_r($retval);
 			return $retval;
 		}
 	}

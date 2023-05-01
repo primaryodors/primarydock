@@ -262,6 +262,7 @@ function ensure_sdf_exists($ligname)
 		exec("which obabel", $obresult);
 		if (trim(@$obresult[0]))
 		{
+			echo "Running obabel for SMILES {$o['smiles']}...\n";
 			$cmd = "obabel -:\"{$o['smiles']}\" --gen3D -osdf -O\"$sdfname\"";
 			exec($cmd);
 		}
@@ -344,11 +345,16 @@ function find_odorant($aroma)
 	$aroma1 = preg_replace( "/[^a-z0-9]/", "", strtolower($aroma) );
 	foreach ($odors as $oid => $o)
 	{
+		$namematch = false;
+		for ($i=1; isset($o["name$i"]); $i++)
+		{
+			if ($o["name$i"] == $aroma) $namematch = true;
+		}
+
 		if ( $o['smiles'] == $aroma
 			 || preg_replace( "/[^a-z0-9]/", "", strtolower($o['full_name']) ) == $aroma1
 			 || @$o['iupac'] == $aroma
-			 || @$o['name1'] == $aroma
-			 || @$o['name2'] == $aroma
+			 || $namematch
 			)
 		{
 			$retval = $o;

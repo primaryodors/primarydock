@@ -1051,7 +1051,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 str += (std::string)"unk";
             }
 
-            str += (std::string)" " + to_string(partial);
+            str += (std::string)" " + to_string(-partial);
 
             interaudit.push_back(str);
         }
@@ -1076,7 +1076,22 @@ _canstill_clash:
     if (r < rbind && !atoms_are_bonded)
     {
         float f = rbind/(avdW+bvdW);
-        kJmol -= pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);
+        float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);
+        kJmol -= clash;
+        
+        #if _peratom_audit
+        if (interauditing)
+        {
+            std::string str;
+            if (a->residue) str += (std::string)a->aa3let + to_string(a->residue) + (std::string)":";
+            str += (std::string)a->name + (std::string)"-";
+            if (b->residue) str += (std::string)b->aa3let + to_string(b->residue) + (std::string)":";
+            str += (std::string)b->name + (std::string)" ";
+            str += (std::string)"clash " + to_string(clash);
+
+            interaudit.push_back(str);
+        }
+        #endif
     }
 
     delete[] forces;

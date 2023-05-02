@@ -4498,6 +4498,7 @@ _try_again:
 
             #if _peratom_audit
             cout << endl << "Interatomic Audit:" << endl;
+            cout << "Total energy: " << -btot << endl;
             int ian = interaudit.size(), iai;
             for (iai=0; iai<ian; iai++) cout << interaudit[iai] << endl;
             cout << endl << endl;

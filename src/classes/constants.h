@@ -287,7 +287,7 @@
 #define _bb_maxglom 3
 
 // For auditing binding energies between individual atoms:
-#define _peratom_audit 1
+#define _peratom_audit 0
 
 // Should normally be false or zero:
 #define _dummy_atoms_for_debug 0

@@ -1,5 +1,6 @@
 
 #include "atom.h"
+#include <vector>
 
 #ifndef _INTERATOMIC
 #define _INTERATOMIC
@@ -73,6 +74,11 @@ extern int active_persistence_resno[active_persistence_limit];
 #endif
 
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);
+
+#if _peratom_audit
+extern std::vector<std::string> interaudit;
+extern bool interauditing;
+#endif
 
 #endif
 

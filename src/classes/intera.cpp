@@ -13,6 +13,11 @@ using namespace std;
 float total_binding_by_type[_INTER_TYPES_LIMIT];
 InteratomicForce* lif = nullptr;
 
+#if _peratom_audit
+std::vector<std::string> interaudit;
+bool interauditing = false;
+#endif
+
 void InteratomicForce::read_all_forces()
 {
     int i, ifcount = 0;
@@ -1003,6 +1008,54 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         kJmol += partial;
         if (partial > 0.5 && forces[i]->distance < rbind) rbind = forces[i]->distance;
+
+        #if _peratom_audit
+        if (interauditing)
+        {
+            std::string str;
+            if (a->residue) str += (std::string)a->aa3let + to_string(a->residue) + (std::string)":";
+            str += (std::string)a->name + (std::string)"-";
+            if (b->residue) str += (std::string)b->aa3let + to_string(b->residue) + (std::string)":";
+            str += (std::string)b->name + (std::string)" ";
+            switch (forces[i]->type)
+            {
+                case covalent:
+                str += (std::string)"cov";
+                break;
+
+                case ionic:
+                str += (std::string)"ion";
+                break;
+
+                case hbond:
+                str += (std::string)"hb";
+                break;
+
+                case pi:
+                str += (std::string)"pi";
+                break;
+
+                case polarpi:
+                str += (std::string)"ppi";
+                break;
+
+                case mcoord:
+                str += (std::string)"mtl";
+                break;
+
+                case vdW:
+                str += (std::string)"vdw";
+                break;
+
+                default:
+                str += (std::string)"unk";
+            }
+
+            str += (std::string)" " + to_string(partial);
+
+            interaudit.push_back(str);
+        }
+        #endif
 
         k = (forces[i]->type - covalent) % _INTER_TYPES_LIMIT;
         total_binding_by_type[k] += partial;

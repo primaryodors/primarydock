@@ -182,7 +182,7 @@ void Molecule::delete_atom(Atom* a)
                 for (j=i+1; atoms[j]; j++) atoms[j-1] = atoms[j];
                 atoms[j-1] = nullptr;
                 rotatable_bonds = nullptr;
-                atcount--;
+                for (atcount=0; atoms[atcount]; atcount++);     // Get count.
                 return;
             }
         }
@@ -235,6 +235,21 @@ void Molecule::reallocate()
         atoms = latoms;
     }
     rotatable_bonds = nullptr;
+}
+
+void Molecule::add_existing_atom(Atom* a)
+{
+    if (!atoms) atcount = 0;
+    else for (atcount=0; atoms[atcount]; atcount++);     // Get count.
+
+    atcount++;
+    reallocate();
+    atoms[atcount-1] = a;
+    atoms[atcount] = nullptr;
+
+    strcpy(a->aa3let, atoms[0]->aa3let);
+    a->residue = atoms[0]->residue;
+    a->aaletter = atoms[0]->aaletter;
 }
 
 Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard)

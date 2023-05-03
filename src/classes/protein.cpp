@@ -1882,11 +1882,14 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
             throw 0xbad12e5d;
         }
         m_mcoord[j]->coord_res[i]->m_mcoord = m_mcoord[j];
-        m_mcoord[j]->coord_atoms[i] = m_mcoord[j]->coord_res[i]->get_atom(res_anames[i].c_str());
-        if (!m_mcoord[j]->coord_atoms[i])
+        if (i < res_anames.size())
         {
-            cout << "Attempt to bind metal to " << resnos[i] << ":" << res_anames[i] << " not found in protein!" << endl;
-            throw 0xbada70b;
+            m_mcoord[j]->coord_atoms[i] = m_mcoord[j]->coord_res[i]->get_atom(res_anames[i].c_str());
+            if (!m_mcoord[j]->coord_atoms[i])
+            {
+                cout << "Attempt to bind metal to " << resnos[i] << ":" << res_anames[i] << " not found in protein!" << endl;
+                throw 0xbada70b;
+            }
         }
     }
     m_mcoord[j]->coord_res[residues] = NULL;

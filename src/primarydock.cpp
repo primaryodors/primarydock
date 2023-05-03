@@ -32,6 +32,14 @@ struct ResiduePlaceholder
     }
 };
 
+struct MCoord
+{
+    int Z = 29;
+    int charge = 2;
+    Atom* mtl = nullptr;
+    std::vector<ResiduePlaceholder> coordres;
+};
+
 struct DockResult
 {
     int pose;
@@ -351,6 +359,7 @@ char outfname[256];
 Point pocketcen, loneliest, pocketsize, ligbbox;
 std::ofstream *output = NULL;
 
+std::vector<MCoord> mtlcoords;
 std::vector<int> exclusion;
 
 std::string CEN_buf = "";
@@ -1232,14 +1241,28 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "MCOORD"))
     {
         int j=0;
-        optsecho = "Metal coordination on residues ";
-        for (i=1; words[i]; i++)
+        // optsecho = "Metal coordination on residues ";
+        MCoord mcr;
+        i=1; if (!words[i]) throw 0xbad372;
+        mcr.Z = Atom::Z_from_esym(words[1]);
+        if (!mcr.Z) throw 0xbad372;
+
+        i++; if (!words[i]) throw 0xbad372;
+        mcr.charge = atoi(words[i]);
+
+        i++; if (!words[i]) throw 0xbad372;
+        for (; words[i]; i++)
         {
             if (words[i][0] == '-' && words[i][1] == '-') break;
-            mcoord_resno[j++] = atoi(words[i]);
-            optsecho += to_string(atoi(words[i])) + (std::string)" ";
+            // mcoord_resno[j++] = atoi(words[i]);
+            // optsecho += to_string(atoi(words[i])) + (std::string)" ";
+            ResiduePlaceholder rp;
+            rp.set(words[i]);
+            mcr.coordres.push_back(rp);
         }
-        mcoord_resno[j] = 0;
+        // mcoord_resno[j] = 0;
+        mtlcoords.push_back(mcr);
+
         return i-1;
     }
     else if (!strcmp(words[0], "MOVIE"))
@@ -1302,6 +1325,11 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "PROGRESS"))
     {
         progressbar = true;
+        return 0;
+    }
+    else if (!strcmp(words[0], "CONGRESS"))
+    {
+        progressbar = false;
         return 0;
     }
     else if (!strcmp(words[0], "PROT"))
@@ -2129,7 +2157,79 @@ int main(int argc, char** argv)
         fclose(pf);
     }
 
-    int l;  
+    int l;
+
+    if (mtlcoords.size())
+    {
+        for (i=0; i<mtlcoords.size(); i++)
+        {
+            Point lpt;
+            Molecule** lmc = new Molecule*[mtlcoords[i].coordres.size()+4];
+            lmc[0] = new Molecule("lcm");
+            Atom* lmtl = lmc[0]->add_atom(Atom::esym_from_Z(mtlcoords[i].Z), Atom::esym_from_Z(mtlcoords[i].Z), nullptr, 0);
+            lmtl->increment_charge(mtlcoords[i].charge);
+            mtlcoords[i].mtl = lmtl;
+            lmc[0]->movability = MOV_ALL;
+
+            l = 1;
+            for (j=0; j<mtlcoords[i].coordres.size(); j++)
+            {
+                mtlcoords[i].coordres[j].resolve_resno(protein);
+                AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
+                if (aa)
+                {
+                    aa->movability = MOV_FLEXONLY;
+                    lmc[l++] = (Molecule*)aa;
+                    Atom** Ss = aa->get_most_bindable(1, lmtl);
+                    lpt = lpt.add((Ss && Ss[0]) ? Ss[0]->get_location() : aa->get_barycenter());
+
+                    // If cysteine, make thiolate form.
+                    if (aa->is_thiol())
+                    {
+                        if (Ss)
+                        {
+                            Atom* S = Ss[0];
+                            Atom* H = S->is_bonded_to("H");
+                            if (H)
+                            {
+                                aa->delete_atom(H);
+                                S->increment_charge(-1);
+                            }
+                        }
+                    }
+
+                    if (l <= 2) aa->add_existing_atom(lmtl);
+                }
+            }
+            lmc[l] = nullptr;
+            if (l > 1)
+            {
+                l--;
+                lpt.x /= l; lpt.y /= l; lpt.z /= l;
+                l++;
+
+                lmtl->move(lpt);
+            }
+
+            lmtl->aaletter = '\0';
+            strcpy(lmtl->aa3let, "MTL");
+            lmtl->residue = 0;
+
+            Molecule::multimol_conform(lmc, 50);
+
+            for (j=0; j<mtlcoords[i].coordres.size(); j++)
+            {
+                AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
+                if (aa) aa->movability = MOV_FLXDESEL;
+            }
+        }
+
+        temp_pdb_file = "tmp/metal.pdb";
+
+        pf = fopen(temp_pdb_file.c_str(), "wb");
+        protein->save_pdb(pf);
+        fclose(pf);
+    }
 
     if (bridges.size())
     {
@@ -4626,6 +4726,17 @@ _try_again:
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Prepared flex PDBs." << endl;
                 #endif
+            }
+
+            if (mtlcoords.size())
+            {
+                for (l=0; l<mtlcoords.size(); l++)
+                {
+                    mtlcoords[l].mtl->stream_pdb_line(
+                        pdbdat,
+                        9900+l
+                    );
+                }
             }
 
             dr[drcount][nodeno].pdbdat = pdbdat.str();

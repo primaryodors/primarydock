@@ -4532,6 +4532,12 @@ _try_again:
             sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, addl_resno);
             // cout << "sphres " << sphres << endl;
             float maxclash = 0;
+
+            #if _peratom_audit
+            interaudit.clear();
+            interauditing = true;
+            #endif
+
             for (i=0; i<sphres; i++)
             {
                 if (!reaches_spheroid[nodeno][i]) continue;
@@ -4589,6 +4595,15 @@ _try_again:
                 #endif
             }
             // cout << btot << endl;
+
+            #if _peratom_audit
+            cout << endl << "Interatomic Audit:" << endl;
+            cout << "Total energy: " << -btot << endl;
+            int ian = interaudit.size(), iai;
+            for (iai=0; iai<ian; iai++) cout << interaudit[iai] << endl;
+            cout << endl << endl;
+            interauditing = false;
+            #endif
 
             if (btot > 60*m.get_atom_count()) btot = 0;
             if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;

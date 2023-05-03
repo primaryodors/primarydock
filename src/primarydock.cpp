@@ -1445,7 +1445,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "TEMPLATE"))
     {
-        tplset = !strcmp(words[1], "off") && !strcmp(words[1], "OFF");
+        tplset = (strcmp(words[1], "off") != 0) && (strcmp(words[1], "OFF") != 0);
         if (tplset) strcpy(tplfname, words[1]);
         return 1;
     }

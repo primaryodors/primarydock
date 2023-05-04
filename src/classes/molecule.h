@@ -114,6 +114,7 @@ public:
     {
         return atoms[a_idx];
     }
+    int count_atoms_by_element(const char* esym);
     Point get_atom_location(const char* aname);
     int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);

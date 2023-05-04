@@ -358,6 +358,19 @@ int Molecule::get_hydrogen_count()
     return retval;
 }
 
+int Molecule::count_atoms_by_element(const char* esym)
+{
+    if (noAtoms(atoms)) return 0;
+    int findZ = Atom::Z_from_esym(esym);
+    int i, retval=0;
+
+    for (i=0; atoms[i]; i++)
+        if (atoms[i]->get_Z() == findZ)
+            retval++;
+    
+    return retval;
+}
+
 void Molecule::hydrogenate(bool steric_only)
 {
     if (noAtoms(atoms)) return;

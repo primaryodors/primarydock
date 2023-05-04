@@ -191,6 +191,19 @@ struct AtomGlom
         return get_ionic()*60 + get_polarity()*25 + get_pi()*2;
     }
 
+    int contains_element(const char* esym)
+    {
+        int i;
+        int findZ = Atom::Z_from_esym(esym);
+        int atct = atoms.size();
+        int result = 0;
+        for (i=0; i<atct; i++)
+        {
+            if (atoms[i]->get_Z() == findZ) result++;
+        }
+        return result;
+    }
+
     float distance_to(Point pt)
     {
         int atct = atoms.size();
@@ -3750,12 +3763,16 @@ _try_again:
                                     AminoAcid* aa = protein->get_residue(lmc->coordres[j].resno);
                                     if (aa) glomtmp.aminos.push_back(aa);
                                 }
-                                // TODO: If ligand contains sulfur, and this glom does not, then mark the metal coord as incompatible.
-                                glomtmp.metallic = true;
-                                gloms_compatible = true;
-                                #if _dbg_glomsel
-                                cout << "Considering metal coordination site for glom " << l << "..." << endl;
-                                #endif
+
+                                // If ligand contains sulfur, and this ligand glom does not, then mark the metal coord as incompatible.
+                                if (!ligand->count_atoms_by_element("S") || ligand_gloms[l].contains_element("S"))
+                                {
+                                    glomtmp.metallic = true;
+                                    gloms_compatible = true;
+                                    #if _dbg_glomsel
+                                    cout << "Considering metal coordination site for glom " << l << "..." << endl;
+                                    #endif
+                                }
                             }
                             else if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
                             {

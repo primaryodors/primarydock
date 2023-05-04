@@ -762,12 +762,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 if (a->is_polar() < 0 && b->is_polar() >= 0)
                 {
                     dpa = dp;
-                    dpb = 3;		// Assume same for all donors.
+                    dpb = (forces[i]->type == hbond) ? 3 : 1;
                 }
                 else if (b->is_polar() < 0 && a->is_polar() >= 0)
                 {
                     dpb = dp;
-                    dpa = 3;
+                    dpa = (forces[i]->type == hbond) ? 3 : 1;
                 }
                 else dpa = dpb = dp;
             }

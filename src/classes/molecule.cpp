@@ -242,9 +242,8 @@ void Molecule::add_existing_atom(Atom* a)
     if (!atoms) atcount = 0;
     else for (atcount=0; atoms[atcount]; atcount++);     // Get count.
 
-    atcount++;
     reallocate();
-    atoms[atcount-1] = a;
+    atoms[atcount++] = a;
     atoms[atcount] = nullptr;
 
     strcpy(a->aa3let, atoms[0]->aa3let);
@@ -2303,21 +2302,21 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                     break;
                 }
                 if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone
-                        &&
-                        (	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
-                                &&
-                                !strcmp(atoms[i]->name, "C")
-                                &&
-                                !strcmp(ligands[l]->atoms[j]->name, "N")
-                          )
-                            ||
-                            (	atoms[i]->residue == ligands[l]->atoms[j]->residue + 1
-                                &&
-                                !strcmp(atoms[i]->name, "N")
-                                &&
-                                !strcmp(ligands[l]->atoms[j]->name, "C")
-                            )
-                        )) continue;			// kludge to prevent adjacent residue false clashes.
+                    &&
+                    (	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
+                            &&
+                            !strcmp(atoms[i]->name, "C")
+                            &&
+                            !strcmp(ligands[l]->atoms[j]->name, "N")
+                        )
+                        ||
+                        (	atoms[i]->residue == ligands[l]->atoms[j]->residue + 1
+                            &&
+                            !strcmp(atoms[i]->name, "N")
+                            &&
+                            !strcmp(ligands[l]->atoms[j]->name, "C")
+                        )
+                    )) continue;			// kludge to prevent adjacent residue false clashes.
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
                 {

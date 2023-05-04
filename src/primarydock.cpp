@@ -172,6 +172,20 @@ struct AtomGlom
         return result;
     }
 
+    float get_mcoord()
+    {
+        int atct = atoms.size();
+        if (!atct) return 0;
+        int i;
+        float result = 0;
+        for (i=0; i<atct; i++)
+        {
+            if (atoms[i]->get_family() == PNICTOGEN && atoms[i]->get_charge() <= 0) result += 1;
+            if (atoms[i]->get_family() == CHALCOGEN) result += 1;
+        }
+        return result;
+    }
+
     float get_sum()
     {
         return get_ionic()*60 + get_polarity()*25 + get_pi()*2;
@@ -275,6 +289,7 @@ struct AtomGlom
 struct ResidueGlom
 {
     std::vector<AminoAcid*> aminos;
+    bool metallic = false;
 
     Point get_center()
     {
@@ -330,6 +345,14 @@ struct ResidueGlom
             result += f;
         }
         if (has_acids && has_his && ag->get_ionic() > 0) result -= ag->get_ionic()*30;
+
+        if (metallic)
+        {
+            result += 9.0 * fabs(ag->get_mcoord());
+            result += 5.0 * fmax(0, -ag->get_ionic());
+            // result += 2.0 * fabs(ag->get_polarity());
+            result += 1.0 * fabs(ag->get_pi());
+        }
 
         return result;
     }
@@ -553,6 +576,23 @@ float teleport_water(Molecule* mol)
     return e;
 }
 
+MCoord* search_mtlcoords_for_residue(AminoAcid* aa)
+{
+    int m, n;
+    if (!(n = mtlcoords.size())) return nullptr;
+
+    int i, j;
+    for (i=0; i<n; i++)
+    {
+        m = mtlcoords[i].coordres.size();
+        for (j=0; j<m; j++)
+        {
+            if (mtlcoords[i].coordres[j].resno == aa->is_residue()) return &mtlcoords[i];
+        }
+    }
+
+    return nullptr;
+}
 
 void iteration_callback(int iter)
 {
@@ -874,8 +914,8 @@ void iteration_callback(int iter)
         for (i=0; i<80; i++)
         {
             float cmpi = 1.25*i;
-            if (cmpi <= percentage) cout << "\u2592";
-            else cout << "-";
+            if (cmpi <= percentage) cout << "\u2593";
+            else cout << "\u2591";
         }
         i = iter % 4;
         cout << ("|/-\\")[i] << " " << (int)percentage << "%.               " << endl;
@@ -3689,13 +3729,31 @@ _try_again:
                     for (l=0; l<3; l++)
                     {
                         sc_gloms[l].aminos.clear();
+                        sc_gloms[l].metallic = false;
                         #if _use_gloms
                         // Find the strongest loneliest suitable side chain glom for ligand_gloms[l] and set sc_gloms[l] to equal it.
                         ResidueGlom glomtmp;
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
                             glomtmp.aminos.clear();
-                            if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
+                            bool gloms_compatible = false;
+
+                            // If the residue belongs to a mtlcoords element, and the ligand glom is capable of mcoord or cation-pi,
+                            // then glomtmp automatically becomes the residues of that mtlcoords element, with a flag to indicate that
+                            // it's a metallic glom.
+                            MCoord* lmc = search_mtlcoords_for_residue(reaches_spheroid[nodeno][i]);
+                            if (lmc && (ligand_gloms[l].get_polarity() || ligand_gloms[l].get_ionic() || ligand_gloms[l].get_pi()) )
+                            {
+                                int ljlim = lmc->coordres.size();
+                                for (j=0; j<ljlim; j++)
+                                {
+                                    AminoAcid* aa = protein->get_residue(lmc->coordres[j].resno);
+                                    if (aa) glomtmp.aminos.push_back(aa);
+                                }
+                                glomtmp.metallic = true;
+                                gloms_compatible = true;
+                            }
+                            else if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
                             {
                                 #if _dbg_glomsel
                                 cout << "Considering " << reaches_spheroid[nodeno][i]->get_name() << " for glom " << l << "..." << endl;
@@ -3720,8 +3778,12 @@ _try_again:
                                         #endif
                                     }
                                 }
+                                gloms_compatible = true;
+                            }
 
-                                bool too_similar = false;
+                            bool too_similar = false;
+                            if (gloms_compatible)
+                            {
                                 for (j=0; j<l; j++)
                                 {
                                     if (sc_gloms[j].aminos == glomtmp.aminos) too_similar = true;
@@ -4318,6 +4380,7 @@ _try_again:
                 }
                 #endif
             }
+            int cfmolqty = i;
             for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 
             ligand->reset_conformer_momenta();
@@ -4340,6 +4403,21 @@ _try_again:
                     if (required_contacts[i].node >= 0 && required_contacts[i].node != nodeno) ligand->remove_mandatory_connection(s.pmol);
                     else ligand->add_mandatory_connection(s.pmol);
                 }
+            }
+
+            int mcn;
+            Molecule lm("MTL");
+            if (mcn = mtlcoords.size())         // Assignment, not comparison.
+            {
+                for (i=0; i<mcn; i++)
+                {
+                    if (!mtlcoords[i].mtl) continue;                    
+                    lm.add_existing_atom(mtlcoords[i].mtl);
+                }
+
+                lm.movability = MOV_NONE;
+                cfmols[cfmolqty++] = &lm;
+                cfmols[cfmolqty] = nullptr;
             }
 
             protein->find_residue_initial_bindings();
@@ -4595,6 +4673,18 @@ _try_again:
                 #endif
             }
             // cout << btot << endl;
+
+            if (mcn = mtlcoords.size())         // Assignment, not comparison.
+            {
+                for (i=0; i<mcn; i++)
+                {
+                    if (!mtlcoords[i].mtl) continue;
+                    Molecule lm("MTL");
+                    lm.add_existing_atom(mtlcoords[i].mtl);
+                    float f = m.get_intermol_binding(&lm);
+                    btot += f;
+                }
+            }
 
             #if _peratom_audit
             cout << endl << "Interatomic Audit:" << endl;

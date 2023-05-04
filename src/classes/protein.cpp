@@ -2996,6 +2996,8 @@ void Protein::bridge(int resno1, int resno2)
     mols2 = (Molecule**)get_residues_can_clash(resno2);
     Molecule::multimol_conform(mols, mols2, 25);
 
+    Molecule::multimol_conform(mols, 25);
+
     delete mols;
 
     aa1->movability = MOV_FLXDESEL;

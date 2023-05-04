@@ -350,7 +350,7 @@ struct ResidueGlom
         {
             result += 9.0 * fabs(ag->get_mcoord());
             result += 5.0 * fmax(0, -ag->get_ionic());
-            // result += 2.0 * fabs(ag->get_polarity());
+            result -= 7.0 * fabs(ag->get_polarity());
             result += 1.0 * fabs(ag->get_pi());
         }
 
@@ -3750,8 +3750,12 @@ _try_again:
                                     AminoAcid* aa = protein->get_residue(lmc->coordres[j].resno);
                                     if (aa) glomtmp.aminos.push_back(aa);
                                 }
+                                // TODO: If ligand contains sulfur, and this glom does not, then mark the metal coord as incompatible.
                                 glomtmp.metallic = true;
                                 gloms_compatible = true;
+                                #if _dbg_glomsel
+                                cout << "Considering metal coordination site for glom " << l << "..." << endl;
+                                #endif
                             }
                             else if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
                             {
@@ -3762,6 +3766,7 @@ _try_again:
                                 for (j=i+1; reaches_spheroid[nodeno][j]; j++)
                                 {
                                     if (!ligand_gloms[l].compatibility(reaches_spheroid[nodeno][j])) continue;
+                                    if (search_mtlcoords_for_residue(reaches_spheroid[nodeno][j])) continue;
                                     Atom* cb = reaches_spheroid[nodeno][j]->get_atom("CB");
                                     if (!cb) continue;
                                     if (frand(0,1) < bb_stochastic) continue;                       // stochastic component.

@@ -352,7 +352,7 @@ struct ResidueGlom
                     std::find(extra_wt.begin(), extra_wt.end(), aminos[i]->get_residue_no())!=extra_wt.end()
             )
             {
-                f *= 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+                f *= 2;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
             }
 
             result += f;
@@ -486,6 +486,15 @@ std::vector<ResiduePlaceholder>forced_static_resnos;
 std::vector<Atom> dummies;
 #endif
 
+void colorrgb(int r, int g, int b)
+{
+    r = max(0, min(255, r));
+    g = max(0, min(255, g));
+    b = max(0, min(255, b));
+
+    cout << "\x1b[38;2;" << r << ";" << g << ";" << b << "m";
+}
+
 void colorize(float f)
 {
     float red, green, blue;
@@ -506,13 +515,7 @@ void colorize(float f)
         green = 0.333 * red + 0.666 * blue;
     }
 
-    int r, g, b;
-
-    r = max(0, min(255, (int)red));
-    g = max(0, min(255, (int)green));
-    b = max(0, min(255, (int)blue));
-
-    cout << "\x1b[38;2;" << r << ";" << g << ";" << b << "m";
+    colorrgb(red, green, blue);
 }
 
 void colorless()
@@ -3789,9 +3792,9 @@ _try_again:
                                     if (frand(0,1) < bb_stochastic) continue;                       // stochastic component.
                                     float r = glomtmp.distance_to(cb->get_location());
                                     if (reaches_spheroid[nodeno][j]->hydrophilicity() >= 0.333)
-                                        r -= (reaches_spheroid[nodeno][j]->get_reach() + 2.5);
+                                        r -= (reaches_spheroid[nodeno][j]->get_reach() + 1.5);
                                     else
-                                        r -= 3.5;
+                                        r -= 2.5;
                                     if (r < ligand_gloms[l].bounds())
                                     {
                                         glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);
@@ -3844,20 +3847,30 @@ _try_again:
                                     {
                                         sc_gloms[l] = glomtmp;
                                         #if _dbg_glomsel
-                                        cout << "Accepted with compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
+                                        colorrgb(0, 255, 0);
+                                        cout << "Accepted";
+                                        colorless();
+                                        cout << " with compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
                                             << " squared = " << tcptbl << "." << endl << endl;
                                         #endif
                                     }
                                     #if _dbg_glomsel
                                     else
                                     {
-                                        cout << "Rejected because compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
+                                        colorrgb(255, 0, 0);
+                                        cout << "Rejected";
+                                        colorless();
+                                        cout << " because compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
                                             << " squared is " << tcptbl << " not greater than previous value of " << ptcptbl << "." << endl << endl;
                                     }
                                     #endif
                                 }
                             }
                         }
+
+                        #if _dbg_glomsel
+                        cout << "------------------------------------------" << endl;
+                        #endif
 
                         #else
                         retain_bindings[l].cardinality = 0;
@@ -4321,6 +4334,10 @@ _try_again:
                         }
                         #endif
                     }
+
+                    #if _dbg_glomsel
+                    cout << endl << endl;
+                    #endif
 
                     #if enforce_no_bb_pullaway && _use_gloms
                     last_ttl_bb_dist = 0;

@@ -309,7 +309,7 @@
 #define _dbg_bb_rots 0
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
-#define _dbg_glomsel 1
+#define _dbg_glomsel 0
 #define _dbg_polsat 0
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0

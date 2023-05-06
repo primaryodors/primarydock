@@ -2877,7 +2877,7 @@ _try_again:
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
-        ligand->crumple(hexagonal);
+        ligand->crumple(triangular);
 
         int rcn = required_contacts.size();
         if (rcn)

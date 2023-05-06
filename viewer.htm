@@ -813,10 +813,12 @@ function show_hide_gmdl()
 		});
 	}
 	gmdl_shown = !gmdl_shown;
+	set_gmdl_opacity();
 }
 
 function set_gmdl_opacity()
 {
+	if (typeof gmodel[0] == 'undefined') return;
 	var opc = parseFloat($("#bbvis")[0].value) / 100;
 	if (gmdl_shown)
 	{
@@ -916,7 +918,7 @@ function showSideChain(resno)
 	{
 		;
 	}
-		
+	set_gmdl_opacity();
 }
 
 function toggleSideChain(resno)
@@ -939,6 +941,7 @@ function toggleSideChain(resno)
 	{
 		;
 	}
+	set_gmdl_opacity();
 }
 
 function refreshSideChainsVisible()
@@ -1101,6 +1104,7 @@ function disable_spacefill()
 	$('#spcfill').hide();
 	$('#bstick').hide();
 	sfenable = false;
+	set_gmdl_opacity();
 }
 
 function enable_spacefill()
@@ -1109,6 +1113,7 @@ function enable_spacefill()
 	spcfill ? $('#bstick').show() : $('#bstick').hide();
 	spcfill ? spaceFill() : ballAndStick();
 	sfenable = true;
+	set_gmdl_opacity();
 }
 
 var born = false;
@@ -1582,7 +1587,7 @@ function apply_pdb(poresult)
 		});
 	}
 	
-	
+	set_gmdl_opacity();
 }
 
 var url = getParameterByName('url') ? getParameterByName('url') : 'http://'+website+'/sdf.php';
@@ -1749,6 +1754,7 @@ function showPose(p)
     if (curr_ligand) $('#ligbtn, #prsv').show();
     
     // if (cen_ligand) curr_ligand.autoView();
+	set_gmdl_opacity();
 }
 
 function showNode(n)
@@ -1828,6 +1834,7 @@ function showNode(n)
     if (curr_ligand) $('#ligbtn, #prsv').show();
     
     // if (cen_ligand) curr_ligand.autoView();
+	set_gmdl_opacity();
 }
 
 function rainbowNodes()
@@ -1869,6 +1876,7 @@ function rainbowNodes()
 
 	// cc.setSelection("*");
 	// cc.autoView();
+	set_gmdl_opacity();
 }
 
 $("body").on("keyup", function(e, obj)

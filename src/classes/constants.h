@@ -18,7 +18,7 @@
 #define BOND_DEF_NOT_FOUND 0xbadb09d
 
 #define any_element -5141
-#define Avogadro 6.25e+23
+#define Avogadro 6.02214076e+23
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.
 #define intermol_ESP 0.05

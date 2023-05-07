@@ -922,7 +922,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
             if (forces[i]->type == mcoord)
             {
-                partial *= (0.5 + 0.5 * cos((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25));
+                partial *= (1.0 + 1.0 * cos((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25));
             }
 
             // if (partial < 0) partial = 0;
@@ -938,7 +938,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     << " aniso=" << aniso << " (" << asum << "*" << bsum << ")" << endl;
             }*/
 
-            if (fabs(partial) > fabs(forces[i]->kJ_mol) || partial >= 500)
+            if (fabs(partial) > fabs(forces[i]->kJ_mol*2) || partial >= 500)
             {
                 cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
                     << a->name << "..." << b->name << " r=" << r

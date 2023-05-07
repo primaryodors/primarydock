@@ -334,6 +334,9 @@ struct ResidueGlom
     {
         int amsz = aminos.size();
         if (!amsz) return Point(0,0,0);
+
+        if (metallic) return metal->get_location();
+
         int i, j;
         j = 0;
         Point result(0,0,0);
@@ -3798,6 +3801,8 @@ _try_again:
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
                             glomtmp.aminos.clear();
+                            glomtmp.metallic = false;
+                            glomtmp.metal = nullptr;
                             bool gloms_compatible = false;
 
                             // If the residue belongs to a mtlcoords element, and the ligand glom is capable of mcoord or cation-pi,

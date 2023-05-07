@@ -4141,10 +4141,12 @@ _try_again:
                             // If there is only one residue in the sc glom, then move the ligand
                             // 2A towards loneliest.
                             n = sc_gloms[l].aminos.size();
+                            if (sc_gloms[l].metallic) n = 1;
                             if (!n) goto _deadglob;
                             #if _dbg_glomsel
                             cout << "Moving primary atom group to vicinity of";
-                            for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            if (sc_gloms[l].metallic) cout << " " << sc_gloms[l].metal->name;
+                            else for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
                             #endif
 

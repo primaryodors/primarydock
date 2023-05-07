@@ -100,6 +100,7 @@ struct AcvBndRot
 };
 
 std::vector<int> extra_wt;
+std::vector<MCoord> mtlcoords;
 
 #if _use_gloms
 struct AtomGlom
@@ -188,7 +189,9 @@ struct AtomGlom
 
     float get_sum()
     {
-        return get_ionic()*60 + get_polarity()*25 + get_pi()*2;
+        float retval = get_ionic()*60 + get_polarity()*25 + get_pi()*2;
+        if (mtlcoords.size()) retval += get_mcoord()*50;
+        return retval;
     }
 
     float get_avg_elecn()
@@ -299,7 +302,7 @@ struct AtomGlom
                 if (atct)
                 for (i=0; i<atct; i++)
                 {
-                    if (atoms[i]->is_polar() < 0) lgh++;
+                    if (atoms[i]->is_polar() < 0.333) lgh++;
                 }
             }
             else if (!aa->has_hbond_donors())
@@ -308,7 +311,7 @@ struct AtomGlom
                 if (atct)
                 for (i=0; i<atct; i++)
                 {
-                    if (atoms[i]->is_polar() > 0) lgh++;
+                    if (atoms[i]->is_polar() > 0.333) lgh++;
                 }
             }
         }
@@ -391,7 +394,7 @@ struct ResidueGlom
             // lmc -= 1.0 * fabs(ag->get_polarity());
 
             float kmims = (ag->get_avg_elecn() + metal->get_electronegativity()) / 2 - 2.25;
-            float lmm = pow(0.5 + 0.5 * cos(kmims*3), 3);
+            float lmm = cos(kmims*2);
             lmc *= lmm;
 
             #if _dbg_glomsel
@@ -430,7 +433,6 @@ char outfname[256];
 Point pocketcen, loneliest, pocketsize, ligbbox;
 std::ofstream *output = NULL;
 
-std::vector<MCoord> mtlcoords;
 std::vector<int> exclusion;
 
 std::string CEN_buf = "";
@@ -2558,12 +2560,14 @@ int main(int argc, char** argv)
     {
         #if _use_gloms
         AtomGlom glomtmp;
-        int types[3] = { pi, ionic, hbond };
+        int types[5] = { pi, ionic, hbond, 0, 0 };
+
+        if (mtlcoords.size()) types[3] = mcoord;
 
         int lac = ligand->get_atom_count();
         bool dirty[lac+4], dirttmp[lac+4];
 
-        for (n=0; n<3; n++)
+        for (n=0; types[n]; n++)
         {
             for (i=0; i<lac; i++) dirty[i] = false;
             for (i=0; i<lac; i++)
@@ -2576,6 +2580,7 @@ int main(int argc, char** argv)
                 float ac = a->get_charge();
                 float apol = a->is_polar();
                 float api = a->is_pi() && (a->get_Z() > 1);
+                int afam = a->get_family();
                 float rab;
 
                 glomtmp.atoms.clear();
@@ -2604,6 +2609,14 @@ int main(int argc, char** argv)
                                 dirttmp[j] = true;
                             }
                         }
+                    }
+                    break;
+
+                    case mcoord:
+                    if (afam == PNICTOGEN || afam == CHALCOGEN || (afam == HALOGEN && apol))
+                    {
+                        glomtmp.atoms.push_back(a);
+                        dirttmp[i] = true;
                     }
                     break;
 

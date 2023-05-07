@@ -920,6 +920,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             // TODO: Replace this with a more generalized model of competitive h-bonding as well as ionic, mcoord, etc.
             if (forces[i]->type == hbond && a->is_backbone != b->is_backbone) partial *= 0.666;
 
+            if (forces[i]->type == mcoord)
+            {
+                partial *= (0.5 + 0.5 * cos((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25));
+            }
+
             // if (partial < 0) partial = 0;
 
             // Divide each ring by its number of atoms.

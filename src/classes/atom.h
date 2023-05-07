@@ -137,6 +137,10 @@ public:
     {
         return at_wt;
     }
+    float get_electronegativity()
+    {
+        return elecn;
+    }
     float get_acidbase();
     float get_charge();
     float is_polar();						// -1 if atom is H-bond acceptor; +1 if donor.

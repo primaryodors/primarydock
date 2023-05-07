@@ -183,7 +183,7 @@ O       Mn     coord    0.5   1.75       51
 O       Fe     coord    0.5   1.71       46.3
 O       Co     coord    0.5   1.68       47.2
 O       Ni     coord    0.5   1.63       40.3
-# O       Cu     coord    0.5   1.65       55.
+O       Cu     coord    0.5   1.65       55.
 O       Zn     coord    0.5   1.66       64.8
 Cl      Mn     coord    0.5   2.12       
 Cl      Fe     coord    0.5   2.08       

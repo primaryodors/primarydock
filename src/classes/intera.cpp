@@ -918,7 +918,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
 
             // TODO: Replace this with a more generalized model of competitive h-bonding as well as ionic, mcoord, etc.
-            if (forces[i]->type == hbond && a->is_backbone != b->is_backbone) partial *= 0.666;
+            if (forces[i]->type == hbond && a->is_backbone != b->is_backbone) partial *= 0.5;
 
             if (forces[i]->type == mcoord)
             {

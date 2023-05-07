@@ -190,7 +190,7 @@ struct AtomGlom
     float get_sum()
     {
         float retval = get_ionic()*60 + get_polarity()*25 + get_pi()*2;
-        if (mtlcoords.size()) retval += get_mcoord()*50;
+        if (mtlcoords.size()) retval += get_mcoord()*60 - get_polarity()*40;
         return retval;
     }
 

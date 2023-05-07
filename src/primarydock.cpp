@@ -191,6 +191,28 @@ struct AtomGlom
         return get_ionic()*60 + get_polarity()*25 + get_pi()*2;
     }
 
+    float get_avg_elecn()
+    {
+        int atct = atoms.size();
+        if (!atct) return 0;
+        int i, j=0;
+        float result = 0;
+        for (i=0; i<atct; i++)
+        {
+            int aif = atoms[i]->get_family();
+            if (aif == PNICTOGEN || aif == CHALCOGEN || (aif == HALOGEN && atoms[i]->is_polar()))
+            {
+                result += atoms[i]->get_electronegativity();
+                j++;
+                #if _dbg_glomsel
+                cout << atoms[i]->name << " has electronegativity " << atoms[i]->get_electronegativity() << endl;
+                #endif
+            }
+        }
+        if (j) result /= j;
+        return result;
+    }
+
     int contains_element(const char* esym)
     {
         int i;
@@ -303,6 +325,7 @@ struct ResidueGlom
 {
     std::vector<AminoAcid*> aminos;
     bool metallic = false;
+    Atom* metal = nullptr;
 
     Point get_center()
     {
@@ -361,10 +384,22 @@ struct ResidueGlom
 
         if (metallic)
         {
-            result += 9.0 * fabs(ag->get_mcoord());
-            result += 5.0 * fmax(0, -ag->get_ionic());
-            result -= 7.0 * fabs(ag->get_polarity());
-            result += 1.0 * fabs(ag->get_pi());
+            result /= 10;
+            float lmc = 0;
+            lmc += 20.0 * fabs(ag->get_mcoord());
+            // lmc += 1.0 * fmax(0, -ag->get_ionic());
+            // lmc -= 1.0 * fabs(ag->get_polarity());
+
+            float kmims = (ag->get_avg_elecn() + metal->get_electronegativity()) / 2 - 2.25;
+            float lmm = pow(0.5 + 0.5 * cos(kmims*3), 3);
+            lmc *= lmm;
+
+            #if _dbg_glomsel
+            cout << "Metal multiplier: " << lmm << " from kmims " << kmims << endl;
+            #endif
+
+            lmc += 1.0 * fabs(ag->get_pi());
+            result += lmc;
         }
 
         return result;
@@ -890,10 +925,7 @@ void iteration_callback(int iter)
     }
 
     _oei:
-    #if _dbg_glomsel
-    cout << "." << flush;
-    if (iter == iters-1) cout << endl << endl;
-    #endif
+    ;
 
     if (output_each_iter)
     {
@@ -3746,6 +3778,7 @@ _try_again:
                     {
                         sc_gloms[l].aminos.clear();
                         sc_gloms[l].metallic = false;
+                        sc_gloms[l].metal = nullptr;
                         #if _use_gloms
                         // Find the strongest loneliest suitable side chain glom for ligand_gloms[l] and set sc_gloms[l] to equal it.
                         ResidueGlom glomtmp;
@@ -3767,15 +3800,12 @@ _try_again:
                                     if (aa) glomtmp.aminos.push_back(aa);
                                 }
 
-                                // If ligand contains sulfur, and this ligand glom does not, then mark the metal coord as incompatible.
-                                if (!ligand->count_atoms_by_element("S") || ligand_gloms[l].contains_element("S"))
-                                {
-                                    glomtmp.metallic = true;
-                                    gloms_compatible = true;
-                                    #if _dbg_glomsel
-                                    cout << "Considering metal coordination site for glom " << l << "..." << endl;
-                                    #endif
-                                }
+                                glomtmp.metallic = true;
+                                glomtmp.metal = lmc->mtl;
+                                gloms_compatible = true;
+                                #if _dbg_glomsel
+                                cout << "Considering metal coordination site for glom " << l << "..." << endl;
+                                #endif
                             }
                             else if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
                             {
@@ -3811,26 +3841,38 @@ _try_again:
                             {
                                 for (j=0; j<l; j++)
                                 {
-                                    if (sc_gloms[j].aminos == glomtmp.aminos) too_similar = true;
+                                    if (sc_gloms[j].aminos == glomtmp.aminos)
+                                    {
+                                        too_similar = true;
+                                        #if _dbg_glomsel
+                                        if (too_similar) cout << "Identical to an existing glom." << endl << endl;
+                                        #endif
+                                    }
                                     if (sc_gloms[j].aminos.size() == 1
                                         &&
                                         std::find(glomtmp.aminos.begin(), glomtmp.aminos.end(), sc_gloms[j].aminos[0]) != glomtmp.aminos.end()
                                     )
+                                    {   
                                         too_similar = true;
+                                        #if _dbg_glomsel
+                                        if (too_similar) cout << "Potential glom contains an already assigned residue." << endl << endl;
+                                        #endif
+                                    }
                                     if (glomtmp.aminos.size() == 1
                                         &&
                                         std::find(sc_gloms[j].aminos.begin(), sc_gloms[j].aminos.end(), glomtmp.aminos[0]) != sc_gloms[j].aminos.end()
                                     )
+                                    {
                                         too_similar = true;
-                                    // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) too_similar = true;
-                                    float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
+                                        #if _dbg_glomsel
+                                        if (too_similar) cout << "Residue belongs to an existing glom." << endl << endl;
+                                        #endif
+                                    }
+                                    // TODO: WTF was this for??????
+                                    /*float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
                                     float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
-                                    if (rsg < 0.9 * rlg) too_similar = true;
+                                    if (rsg < 0.9 * rlg) too_similar = true;*/
                                 }
-
-                                #if _dbg_glomsel
-                                if (too_similar) cout << "Too similar to an existing glom." << endl << endl;
-                                #endif
 
                                 if (!too_similar)
                                 {

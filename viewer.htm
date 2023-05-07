@@ -819,6 +819,7 @@ function show_hide_gmdl()
 function set_gmdl_opacity()
 {
 	if (typeof gmodel[0] == 'undefined') return;
+	if ($("#affichage")[0].style.display == 'none') return;
 	var opc = parseFloat($("#bbvis")[0].value) / 100;
 	if (gmdl_shown)
 	{
@@ -1104,7 +1105,6 @@ function disable_spacefill()
 	$('#spcfill').hide();
 	$('#bstick').hide();
 	sfenable = false;
-	set_gmdl_opacity();
 }
 
 function enable_spacefill()
@@ -1113,7 +1113,6 @@ function enable_spacefill()
 	spcfill ? $('#bstick').show() : $('#bstick').hide();
 	spcfill ? spaceFill() : ballAndStick();
 	sfenable = true;
-	set_gmdl_opacity();
 }
 
 var born = false;
@@ -2306,7 +2305,7 @@ function loadFile(fileData, fileName = "")
 						stage.animationControls.rotate(quaternion);*/
                     }
                 } );
-                $("#affichage").show();
+                if (fext != 'sdf') $("#affichage").show();
                 break;
 
             	case 'txt':

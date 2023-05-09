@@ -243,6 +243,7 @@ public:
         if (!btom) return -1;
         else return location.get_3d_distance(&btom->location);
     };
+    float similarity_to(Atom* btom);
     SCoord get_next_free_geometry(float lcard);
     int get_idx_next_free_geometry();
     void rotate_geometry(Rotation rot);			// Necessary for bond rotation.

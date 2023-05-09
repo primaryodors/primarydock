@@ -2406,7 +2406,23 @@ std::ostream& operator<<(std::ostream& os, const Ring& r)
     return os;
 }
 
-
+float Atom::similarity_to(Atom* b)
+{
+    float similarity = 0;
+    bool apb = (fabs(is_polar()) > .333), bpb = (fabs(b->is_polar()) > .333);
+    if (apb == bpb) similarity += 10;
+    if (is_pi() && b->is_pi()) similarity += 5;
+    if (abs(is_thio()) && abs (b->is_thio())) similarity += 8;
+    if (is_metal() && b->is_metal()) similarity += 15;
+    similarity += 10.0 / (fabs(get_electronegativity() - b->get_electronegativity()) / 3 + 1);
+    if (is_bonded_to(b) || is_conjugated_to(b)) similarity += 7;
+    if (sgn(get_charge()))
+    {
+        if (sgn(get_charge()) == sgn(b->get_charge())) similarity += 15;
+        else if (sgn(get_charge()) == -sgn(b->get_charge())) similarity -= 15;
+    }
+    return similarity;
+}
 
 
 

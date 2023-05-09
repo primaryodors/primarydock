@@ -317,3 +317,68 @@ float ResidueGlom::compatibility(AtomGlom* ag)
     return result;
 }
 
+std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
+{
+    std::vector<AtomGlom> retval;
+    if (!mol) return retval;
+    int n = mol->get_atom_count();
+    if (!n) return retval;
+
+    int i, j;
+    bool dirty[n+4], dirttmp[n+4];
+    for (i=0; i<n; i++) dirty[i] = dirttmp[i] = false;
+
+    for (i=0; i<n; i++)
+    {
+        if (dirty[i]) continue;
+        AtomGlom g;
+        Atom* a = mol->get_atom(i);
+        if (!a) continue;
+        Atom* a_ = a;
+        g.atoms.push_back(a);
+        #if _dbg_glomsel
+        cout << "Creating glom from " << a->name << "..." << endl;
+        #endif
+
+        dirty[i] = true;
+        for (j=i+1; j<n; j++)
+        {
+            Atom* b = mol->get_atom(j);
+            if (!b) continue;
+
+            float r = fmax(0, g.get_center().get_3d_distance(b->get_location()) - 1.5);
+            if (r > 2.5)
+            {
+                continue;
+                #if _dbg_glomsel
+                cout << "Rejected " << b->name << " too far away." << endl;
+                #endif
+            }
+            float simil = fmax(a->similarity_to(b), a_->similarity_to(b));
+
+            if (simil >= 20)
+            {
+                g.atoms.push_back(b);
+                #if _dbg_glomsel
+                cout << "Adding " << b->name << " with distance " << r << " and similarity " << simil << endl;
+                #endif
+                a_ = b;
+                dirty[j] = true;
+            }
+            else
+            {
+                ;
+                #if _dbg_glomsel
+                cout << "Rejected " << b->name << " similarity " << simil << endl;
+                #endif
+            }
+        }
+
+        retval.push_back(g);
+        #if _dbg_glomsel
+        cout << "Glom complete." << endl << endl;
+        #endif
+    }
+
+    return retval;
+}

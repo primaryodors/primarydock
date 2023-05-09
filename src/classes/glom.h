@@ -38,9 +38,11 @@ class AtomGlom
     float distance_to(Point pt);
     float bounds();
     float compatibility(AminoAcid* aa);
+
+    static std::vector<AtomGlom> get_potential_ligand_gloms(Molecule* mol);
 };
 
-struct ResidueGlom
+class ResidueGlom
 {
     public:
     std::vector<AminoAcid*> aminos;
@@ -50,6 +52,17 @@ struct ResidueGlom
     Point get_center();
     float distance_to(Point pt);
     float compatibility(AtomGlom* ag);
+
+    static std::vector<ResidueGlom> get_potential_side_chain_gloms(AminoAcid** aalist);
+};
+
+class GlomPair
+{
+    public:
+    AtomGlom* ag;
+    ResidueGlom* scg;
+
+    static std::vector<GlomPair> pair_gloms(std::vector<AtomGlom> agloms, std::vector<ResidueGlom> scgloms);
 };
 
 extern std::vector<int> extra_wt;

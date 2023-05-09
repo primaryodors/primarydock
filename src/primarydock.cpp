@@ -2170,6 +2170,8 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
 
+    std::vector<AtomGlom> agc = AtomGlom::get_potential_ligand_gloms(ligand);
+
     m.minimize_internal_clashes();
 
     #if _DBG_STEPBYSTEP

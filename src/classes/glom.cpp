@@ -581,6 +581,9 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
         gp.ag = &ag[i];
         gp.scg = &scg[j1];
 
+        adirty[i] = true;
+        sdirty[j1] = true;
+
         #if _dbg_glomsel
         cout << "Strongest match for " << ag[i] << " is " << scg[j1] << endl;
         #endif

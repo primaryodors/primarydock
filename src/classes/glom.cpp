@@ -418,6 +418,7 @@ std::vector<ResidueGlom> ResidueGlom::get_potential_side_chain_gloms(AminoAcid**
 
         for (j=i+1; j<n; j++)
         {
+            if (dirty[j]) continue;
             AminoAcid* bb = aalist[j];
 
             if (aa->coordmtl && aa->coordmtl == bb->coordmtl)
@@ -520,12 +521,26 @@ float GlomPair::get_potential()
         for (i=0; i<m; i++)
         {
             Atom* a = ag->atoms[i];
+            if (a->get_Z() == 6 && !a->is_polar()) continue;
+            int tyrosines = 0;
             for (j=0; j<n; j++)
             {
                 AminoAcid* aa = scg->aminos[j];
                 float partial;
-                if (aa->coordmtl) partial += InteratomicForce::potential_binding(a, aa->coordmtl);
-                else partial = aa->get_atom_mol_bind_potential(a);
+                if (aa->coordmtl) partial = InteratomicForce::potential_binding(a, aa->coordmtl);
+                else
+                {
+                    partial = aa->get_atom_mol_bind_potential(a);
+                    if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like())
+                    {
+                        if (tyrosines) partial = 0;
+                        tyrosines++;
+                    }
+
+                    #if _dbg_glomsel
+                    cout << "Potential for " << *a << "..." << *aa << " = " << partial << endl;
+                    #endif
+                }
                 potential += partial;
                 q++;
             }
@@ -567,6 +582,10 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
             gp.pocketcen = pcen;
 
             float p1 = gp.get_potential() * frand(1.0-best_binding_stochastic, 1.0+best_binding_stochastic);
+
+            #if _dbg_glomsel
+            cout << "Potential for " << ag[i] << "-" << scg[j] << " = " << p1 << endl << endl;
+            #endif
 
             if (p1 > p)
             {

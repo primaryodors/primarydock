@@ -2209,6 +2209,8 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
                 partial = ifs[j]->get_kJmol();
             }
 
+            if (ifs[j]->get_type() == polarpi) partial /= 6;            // Config is for benzene rings.
+
             if (ifs[j]->get_type() == mcoord)
             {
                 partial *= (1.0 + 1.0 * cos((a->get_electronegativity() + atoms[i]->get_electronegativity()) / 2 - 2.25));

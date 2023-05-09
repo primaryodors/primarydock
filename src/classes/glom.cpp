@@ -325,8 +325,8 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
     if (!n) return retval;
 
     int i, j;
-    bool dirty[n+4], dirttmp[n+4];
-    for (i=0; i<n; i++) dirty[i] = dirttmp[i] = false;
+    bool dirty[n+4];
+    for (i=0; i<n; i++) dirty[i] = false;
 
     for (i=0; i<n; i++)
     {
@@ -351,7 +351,7 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
             {
                 continue;
                 #if _dbg_glomsel
-                cout << "Rejected " << b->name << " too far away." << endl;
+                //cout << "Rejected " << b->name << " too far away." << endl;
                 #endif
             }
             float simil = fmax(a->similarity_to(b), a_->similarity_to(b));
@@ -369,7 +369,7 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
             {
                 ;
                 #if _dbg_glomsel
-                cout << "Rejected " << b->name << " similarity " << simil << endl;
+                //cout << "Rejected " << b->name << " similarity " << simil << endl;
                 #endif
             }
         }
@@ -378,6 +378,85 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
         #if _dbg_glomsel
         cout << "Glom complete." << endl << endl;
         #endif
+    }
+
+    return retval;
+}
+
+std::vector<ResidueGlom> ResidueGlom::get_potential_side_chain_gloms(AminoAcid** aalist)
+{
+    std::vector<ResidueGlom> retval;
+    if (!aalist) return retval;
+    int i, j, n;
+    for (n=0; aalist[n]; n++);          // Get count.
+    bool dirty[n+4];
+    for (i=0; i<n; i++) dirty[i] = false;
+
+    for (i=0; i<n; i++)
+    {
+        if (dirty[i]) continue;
+
+        ResidueGlom g;
+        AminoAcid* aa = aalist[i];
+        g.aminos.push_back(aa);
+        dirty[i] = true;
+        #if _dbg_glomsel
+        cout << "Building side chain glom from " << aa->get_name() << endl;
+        #endif
+
+        for (j=i+1; j<n; j++)
+        {
+            AminoAcid* bb = aalist[j];
+
+            if (aa->coordmtl && aa->coordmtl == bb->coordmtl)
+            {
+                g.aminos.push_back(bb);
+                dirty[j] = true;
+                #if _dbg_glomsel
+                cout << "Adding " << bb->get_name() << " because metal coord." << endl;
+                #endif
+                continue;
+            }
+            else if (aa->coordmtl || bb->coordmtl)
+            {
+                #if _dbg_glomsel
+                cout << "Rejected " << bb->get_name() << " metal coord mismatch." << endl;
+                #endif
+                continue;
+            }
+
+            float r = fmax(0, aa->get_CA_location().get_3d_distance(bb->get_CA_location()) - fmax(aa->get_reach(), bb->get_reach()));
+            if (r > 2.5)
+            {
+                #if _dbg_glomsel
+                // cout << "Rejected " << bb->get_name() << " distance " << r << endl;
+                #endif
+                continue;
+            }
+
+            float simil = aa->similarity_to(bb);
+            if (simil >= 4)
+            {
+                g.aminos.push_back(bb);
+                dirty[j] = true;
+                #if _dbg_glomsel
+                cout << "Adding " << bb->get_name() << " distance " << r << " similarity " << simil << endl;
+                #endif
+            }
+            else
+            {
+                ;
+                #if _dbg_glomsel
+                cout << "Rejected " << bb->get_name() << " similarity " << simil << endl;
+                #endif
+            }
+        }
+
+        #if _dbg_glomsel
+        cout << "Completed glom." << endl << endl;
+        #endif
+
+        retval.push_back(g);
     }
 
     return retval;

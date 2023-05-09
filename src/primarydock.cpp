@@ -1958,6 +1958,7 @@ int main(int argc, char** argv)
                     }
 
                     if (l <= 2) aa->add_existing_atom(lmtl);
+                    aa->coordmtl = lmtl;
                 }
             }
             lmc[l] = nullptr;
@@ -2621,6 +2622,21 @@ _try_again:
             protein->load_pdb(pf);
             fclose(pf);
             protein->soft_biases = soft_biases;
+
+            if (mtlcoords.size())
+            {
+                for (i=0; i<mtlcoords.size(); i++)
+                {
+                    for (j=0; j<mtlcoords[i].coordres.size(); j++)
+                    {
+                        AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
+                        if (aa)
+                        {
+                            aa->coordmtl = mtlcoords[i].mtl;
+                        }
+                    }
+                }
+            }
         }
         else
         {
@@ -3453,6 +3469,8 @@ _try_again:
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Initialize null AA pointer." << endl;
                 #endif
+
+                std::vector<ResidueGlom> grg = ResidueGlom::get_potential_side_chain_gloms(reaches_spheroid[nodeno]);
 
                 // Best-Binding Algorithm
                 // Find a binding pocket feature with a strong potential binding to the ligand.

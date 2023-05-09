@@ -516,6 +516,30 @@ SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
     return retval;
 }
 
+float InteratomicForce::potential_binding(Atom* a, Atom* b)
+{
+    InteratomicForce** forces = get_applicable(a, b);
+
+    int i;
+    float potential = 0;
+
+    for (i=0; forces[i]; i++)
+    {
+        if (!forces[i]->distance) continue;
+
+        float partial = forces[i]->kJ_mol;
+
+        if (forces[i]->type == mcoord)
+        {
+            partial *= (1.0 + 1.0 * cos((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25));
+        }
+
+        potential += partial;
+    }
+
+    return potential;
+}
+
 float InteratomicForce::total_binding(Atom* a, Atom* b)
 {
     InteratomicForce** forces = get_applicable(a, b);

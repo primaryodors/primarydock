@@ -462,6 +462,40 @@ std::vector<ResidueGlom> ResidueGlom::get_potential_side_chain_gloms(AminoAcid**
     return retval;
 }
 
+std::ostream& operator<<(std::ostream& os, const AtomGlom& ag)
+{
+    if (!&ag) return os;
+    try
+    {
+        os << "atom_glom[ ";
+        int i;
+        for (i=0; i<ag.atoms.size(); i++) os << *ag.atoms[i] << " ";
+        os << "]";
+    }
+    catch (int ex)
+    {
+        ;
+    }
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const ResidueGlom& scg)
+{
+    if (!&scg) return os;
+    try
+    {
+        os << "residue_glom[ ";
+        int i;
+        for (i=0; i<scg.aminos.size(); i++) os << *scg.aminos[i] << " ";
+        os << "]";
+    }
+    catch (int ex)
+    {
+        ;
+    }
+    return os;
+}
+
 float GlomPair::get_potential()
 {
     if (potential) return potential;
@@ -470,17 +504,22 @@ float GlomPair::get_potential()
         int m = ag->atoms.size(), n = scg->aminos.size();
         if (!m || !n) return 0;
 
-        int i, j;
+        int i, j, q=0;
         for (i=0; i<m; i++)
         {
             Atom* a = ag->atoms[i];
             for (j=0; j<n; j++)
             {
                 AminoAcid* aa = scg->aminos[j];
-                float partial = aa->get_atom_mol_bind_potential(a);
+                float partial;
+                if (aa->coordmtl) partial += InteratomicForce::potential_binding(a, aa->coordmtl);
+                else partial = aa->get_atom_mol_bind_potential(a);
                 potential += partial;
+                q++;
             }
         }
+
+        if (q) potential /= q;
 
         float r = ag->get_center().get_3d_distance(scg->get_center());
         potential /= fmax(1, r-1.5);
@@ -514,7 +553,9 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
             gp.ag = &ag[i];
             gp.scg = &scg[j];
 
-            if (gp.get_potential() > p)
+            float p1 = gp.get_potential() * frand(1.0-best_binding_stochastic, 1.0+best_binding_stochastic);
+
+            if (p1 > p)
             {
                 j1 = j;
                 p = gp.potential;
@@ -526,10 +567,21 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
         GlomPair gp;
         gp.ag = &ag[i];
         gp.scg = &scg[j1];
+
+        #if _dbg_glomsel
+        cout << "Strongest match for " << ag[i] << " is " << scg[j1] << endl;
+        #endif
         
+        bool added = false;
         int r = retval.size();
         if (!r)
+        {
             retval.push_back(gp);
+            added = true;
+            #if _dbg_glomsel
+            cout << "Beginning result with " << *gp.ag << "-" << *gp.scg << endl;
+            #endif
+        }
         else for (l=0; l<r; l++)
         {
             if (gp.get_potential() > retval[l].get_potential())
@@ -537,9 +589,32 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
                 std::vector<GlomPair>::iterator it;
                 it = retval.begin();
                 retval.insert(it+l, gp);
+                added = true;
+                
+                #if _dbg_glomsel
+                cout << "Inserting " << *gp.ag << "-" << *gp.scg << " before " << *retval[l+1].ag << "-" << *retval[l+1].scg << endl;
+                #endif
+
+                break;
             }
         }
+        if (!added)
+        {
+            retval.push_back(gp);
+            added = true;
+            #if _dbg_glomsel
+            cout << "Appending to result " << *gp.ag << "-" << *gp.scg << endl;
+            #endif
+        }
     }
+
+    #if _dbg_glomsel
+    cout << endl << endl << "Final pair assignments:" << endl;
+    for (i=0; i<retval.size(); i++)
+    {
+        cout << *retval[i].ag << "-" << *retval[i].scg << endl;
+    }
+    #endif
 
     return retval;
 }

@@ -70,6 +70,9 @@ class GlomPair
     float potential = 0;
 };
 
+std::ostream& operator<<(std::ostream& os, const AtomGlom& ag);
+std::ostream& operator<<(std::ostream& os, const ResidueGlom& scg);
+
 extern std::vector<int> extra_wt;
 extern std::vector<MCoord> mtlcoords;
 

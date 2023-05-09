@@ -586,7 +586,8 @@ float Atom::hydrophilicity_rule()
 
     if (is_polar()) total += fabs(is_polar());
     else if (Z == 7 || Z == 8) total += 1;
-    else if (Z == 15 || Z == 16) total += 0.5;
+    else if (Z == 15) total += 0.666;
+    else if (Z == 16 && is_bonded_to("H")) total += 0.5;
     else if (family == PNICTOGEN) total += 0.25;
     else if (family == CHALCOGEN) total += 0.25;
     else if (family == HALOGEN)

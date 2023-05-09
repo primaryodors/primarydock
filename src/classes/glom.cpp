@@ -482,6 +482,9 @@ float GlomPair::get_potential()
             }
         }
 
+        float r = ag->get_center().get_3d_distance(scg->get_center());
+        potential /= fmax(1, r-1.5);
+
         return potential;
     }
 }

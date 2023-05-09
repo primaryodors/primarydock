@@ -516,6 +516,15 @@ SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
     return retval;
 }
 
+float InteratomicForce::metal_compatibility(Atom* a, Atom* b)
+{
+    float f = (1.0 + 1.0 * cos(fmin(fabs(((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25)*6), M_PI)));
+    #if _dbg_glomsel
+    cout << "Metal compatibility for " << *a << "..." << *b << " = " << f << endl;
+    #endif
+    return f;
+}
+
 float InteratomicForce::potential_binding(Atom* a, Atom* b)
 {
     InteratomicForce** forces = get_applicable(a, b);
@@ -531,10 +540,19 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
 
         if (forces[i]->type == mcoord)
         {
-            partial *= (1.0 + 1.0 * cos((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25));
+            partial *= metal_compatibility(a, b);
         }
 
         potential += partial;
+    }
+
+    // Oil and water don't mix.
+    if ((fabs(a->is_polar()) < 0.333 && (fabs(b->is_polar()) >= 0.333 || fabs(b->get_charge())))
+        ||
+        (fabs(b->is_polar()) < 0.333 && (fabs(a->is_polar()) >= 0.333 || fabs(a->get_charge())))
+        )
+    {
+        potential -= ((fabs(a->is_polar()) < 0.333 && a->is_pi()) || (fabs(b->is_polar()) < 0.333 && b->is_pi())) ? 40 : 60;
     }
 
     return potential;
@@ -946,7 +964,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
             if (forces[i]->type == mcoord)
             {
-                partial *= (1.0 + 1.0 * cos((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25));
+                partial *= metal_compatibility(a, b);
             }
 
             // if (partial < 0) partial = 0;

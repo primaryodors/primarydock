@@ -64,10 +64,11 @@ class GlomPair
 
     float get_potential();
 
-    static std::vector<GlomPair> pair_gloms(std::vector<AtomGlom> agloms, std::vector<ResidueGlom> scgloms);
+    static std::vector<GlomPair> pair_gloms(std::vector<AtomGlom> agloms, std::vector<ResidueGlom> scgloms, Point pocketcen);
 
     protected:
     float potential = 0;
+    Point pocketcen;
 };
 
 std::ostream& operator<<(std::ostream& os, const AtomGlom& ag);

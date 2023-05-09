@@ -324,7 +324,7 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
     int n = mol->get_atom_count();
     if (!n) return retval;
 
-    int i, j;
+    int i, j, l;
     bool dirty[n+4];
     for (i=0; i<n; i++) dirty[i] = false;
 
@@ -374,7 +374,19 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
             }
         }
 
-        retval.push_back(g);
+        bool added = false;
+        for (l=0; l < retval.size(); l++)
+        {
+            if (g.get_sum() > retval[l].get_sum())
+            {
+                std::vector<AtomGlom>::iterator it;
+                it = retval.begin();
+                retval.insert(it+l, g);
+                added = true;
+                break;
+            }
+        }
+        if (!added) retval.push_back(g);
         #if _dbg_glomsel
         cout << "Glom complete." << endl << endl;
         #endif
@@ -521,14 +533,14 @@ float GlomPair::get_potential()
 
         if (q) potential /= q;
 
-        float r = ag->get_center().get_3d_distance(scg->get_center());
+        float r = pocketcen.get_3d_distance(scg->get_center());
         potential /= fmax(1, r-1.5);
 
         return potential;
     }
 }
 
-std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector<ResidueGlom> scg)
+std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector<ResidueGlom> scg, Point pcen)
 {
     std::vector<GlomPair> retval;
 
@@ -552,6 +564,7 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
             GlomPair gp;
             gp.ag = &ag[i];
             gp.scg = &scg[j];
+            gp.pocketcen = pcen;
 
             float p1 = gp.get_potential() * frand(1.0-best_binding_stochastic, 1.0+best_binding_stochastic);
 

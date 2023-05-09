@@ -461,3 +461,85 @@ std::vector<ResidueGlom> ResidueGlom::get_potential_side_chain_gloms(AminoAcid**
 
     return retval;
 }
+
+float GlomPair::get_potential()
+{
+    if (potential) return potential;
+    else
+    {
+        int m = ag->atoms.size(), n = scg->aminos.size();
+        if (!m || !n) return 0;
+
+        int i, j;
+        for (i=0; i<m; i++)
+        {
+            Atom* a = ag->atoms[i];
+            for (j=0; j<n; j++)
+            {
+                AminoAcid* aa = scg->aminos[j];
+                float partial = aa->get_atom_mol_bind_potential(a);
+                potential += partial;
+            }
+        }
+
+        return potential;
+    }
+}
+
+std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector<ResidueGlom> scg)
+{
+    std::vector<GlomPair> retval;
+
+    int m = ag.size(), n = scg.size();
+    if (!m || !n) return retval;
+
+    int i, j, l;
+    bool adirty[m+4], sdirty[n+4];
+
+    for (i=0; i<m; i++) adirty[i] = false;
+    for (j=0; j<n; j++) sdirty[j] = false;
+
+    for (i=0; i<m; i++)
+    {
+        if (adirty[i]) continue;
+        int j1 = -1;
+        float p = 0;
+        for (j=0; j<n; j++)
+        {
+            if (sdirty[j]) continue;
+            GlomPair gp;
+            gp.ag = &ag[i];
+            gp.scg = &scg[j];
+
+            if (gp.get_potential() > p)
+            {
+                j1 = j;
+                p = gp.potential;
+            }
+        }
+
+        if (j1 < 0) continue;
+
+        GlomPair gp;
+        gp.ag = &ag[i];
+        gp.scg = &scg[j1];
+        
+        int r = retval.size();
+        if (!r)
+            retval.push_back(gp);
+        else for (l=0; l<r; l++)
+        {
+            if (gp.get_potential() > retval[l].get_potential())
+            {
+                std::vector<GlomPair>::iterator it;
+                it = retval.begin();
+                retval.insert(it+l, gp);
+            }
+        }
+    }
+
+    return retval;
+}
+
+
+

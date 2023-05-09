@@ -62,7 +62,12 @@ class GlomPair
     AtomGlom* ag;
     ResidueGlom* scg;
 
+    float get_potential();
+
     static std::vector<GlomPair> pair_gloms(std::vector<AtomGlom> agloms, std::vector<ResidueGlom> scgloms);
+
+    protected:
+    float potential = 0;
 };
 
 extern std::vector<int> extra_wt;

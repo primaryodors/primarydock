@@ -2198,16 +2198,23 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
         if (!ifs) continue;
         for (j=0; ifs[j]; j++)
         {
+            float partial;
             if (ifs[j]->get_type() == ionic)
             {
                 if (sgn(a->get_charge()) != -sgn(atoms[i]->get_charge())) continue;
-                retval += 60;
+                partial = 60;
             }
             else
-                retval += ifs[j]->get_kJmol();
-            /*cout << a->name << " can " << ifs[j]->get_type() << " strength " << ifs[j]->get_kJmol()
-            	 << " with " << (atoms[i]->aa3let ? atoms[i]->aa3let : "") << atoms[i]->residue << ":"
-            	 << atoms[i]->name << endl;*/
+            {
+                partial = ifs[j]->get_kJmol();
+            }
+
+            if (ifs[j]->get_type() == mcoord)
+            {
+                partial *= (1.0 + 1.0 * cos((a->get_electronegativity() + atoms[i]->get_electronegativity()) / 2 - 2.25));
+            }
+
+            retval += partial;
 
             potential_distance += ifs[j]->get_distance();
         }

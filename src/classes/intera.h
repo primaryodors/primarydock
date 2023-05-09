@@ -34,6 +34,7 @@ public:
 
     static bool atom_is_capable_of(Atom* a, intera_type t);
     static InteratomicForce** get_applicable(Atom* a, Atom* b);
+    static float potential_binding(Atom* a, Atom* b);
     static float total_binding(Atom* a, Atom* b);
     static float distance_anomaly(Atom* a, Atom* b);
     static float covalent_bond_radius(Atom* a, Atom* b, float cardinality);

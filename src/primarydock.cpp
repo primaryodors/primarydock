@@ -3470,7 +3470,7 @@ _try_again:
                 if (debug) *debug << "Initialize null AA pointer." << endl;
                 #endif
 
-                std::vector<ResidueGlom> grg = ResidueGlom::get_potential_side_chain_gloms(reaches_spheroid[nodeno]);
+                std::vector<ResidueGlom> scg = ResidueGlom::get_potential_side_chain_gloms(reaches_spheroid[nodeno]);
 
                 // Best-Binding Algorithm
                 // Find a binding pocket feature with a strong potential binding to the ligand.

@@ -12,8 +12,8 @@ Molecule* mols[3];
 
 void iteration_callback(int iter)
 {
-    float f = -mols[0]->get_intermol_binding(mols[1]);
-    cout << f << endl;
+    /*float f = -mols[0]->get_intermol_binding(mols[1]);
+    cout << f << endl;*/
 
     char buffer[256];
     sprintf(buffer, "tmp/frame%d.sdf", iter);
@@ -31,14 +31,14 @@ int main(int argc, char** argv)
     // TODO: These values are set way too permissively.
     // The intermolecular code should be fine tuned to succeed
     // with threshold values of at worst 15, 3, and 2.5 * 2.
-    float energyLevelThreshold = 10;
+    float energyLevelThreshold = 15;
     float clash_limit = 8;
     float N_O_spacing = 4 * 2;
 
     wet_environment = true;
 
     Molecule m("nothing");
-    cout << "Created empty molecule named " << m.get_name() << ".\n";
+    cout << "# Created empty molecule named " << m.get_name() << ".\n";
 
     char buffer[65536];
     char tstname[1024] = "BZN.sdf";
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
     if (argc > 1) strcpy(tstname, argv[1]);
 
     Molecule m1(tstname);
-    cout << "Created molecule named " << m1.get_name() << ".\n";
+    cout << "# Created molecule named " << m1.get_name() << ".\n";
     int nloaded;
 
     FILE* pf = fopen(tstname, "rb");
@@ -63,15 +63,15 @@ int main(int argc, char** argv)
     }
 
 
-    cout << "Loaded " << nloaded << " atoms of " << tstname << " into molecule.\n";
+    cout << "# Loaded " << nloaded << " atoms of " << tstname << " into molecule.\n";
 
     int rc = m1.get_num_rings();
-    if (rc) cout << "Found " << rc << " ring(s)." << endl;
+    if (rc) cout << "# Found " << rc << " ring(s)." << endl;
 
     int i;
     for (i=0; i<rc; i++)
     {
-        cout << "Ring atoms: ";
+        cout << "# Ring atoms: ";
         Atom** ra = m1.get_ring_atoms(i);
         Atom::dump_array(ra);
         cout << endl;
@@ -80,12 +80,12 @@ int main(int argc, char** argv)
         bool cp = false;
         if (m1.ring_is_aromatic(i))
         {
-            cout << "Ring " << i << " is aromatic." << endl;
+            cout << "# Ring " << i << " is aromatic." << endl;
             cp = true;
         }
         else if (m1.ring_is_coplanar(i))
         {
-            cout << "Ring " << i << " is coplanar." << endl;
+            cout << "# Ring " << i << " is coplanar." << endl;
             cp = true;
         }
 
@@ -114,19 +114,19 @@ int main(int argc, char** argv)
             if (a)
             {
                 float ab = a->get_acidbase();
-                if (ab) cout << "Atom " << anames[i] << " has basicity " << ab << endl;
+                if (ab) cout << "# Atom " << anames[i] << " has basicity " << ab << endl;
             }
         }
         delete[] anames;
     }
-    else cout << "No names.\n";
+    else cout << "# No names.\n";
 
     Bond** b = m1.get_rotatable_bonds();
     if (b)
     {
         for (i=0; b[i]; i++)
         {
-            cout << "Bond " << b[i]->atom->name << " - " << b[i]->btom->name << " can rotate." << endl;
+            cout << "# Bond " << b[i]->atom->name << " - " << b[i]->btom->name << " can rotate." << endl;
             b[i]->rotate(30.0 * M_PI / 180);
         }
     }

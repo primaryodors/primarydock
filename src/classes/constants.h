@@ -64,7 +64,7 @@
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
 #define _def_lin_momentum 0.1
-#define _def_ang_momentum (fiftyseventh*1)
+#define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
 
 #define pi_mult_dkytw 264

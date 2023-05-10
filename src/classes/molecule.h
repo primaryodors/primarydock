@@ -22,20 +22,22 @@ struct histidine_flip
 
 enum MovabilityType
 {
-    MOV_CAN_RECEN   = 0x8000,           // Molecule can move through space.
-    MOV_CAN_AXIAL   =  0x800,           // Whole molecule can rotate in space.
-    MOV_MC_AXIAL    =  0x400,           // Monte Carlo whole molecule rotations allowed.
-    MOV_MUST_FLEX   =   0x80,           // Molecule's rotatable bonds are guaranteed free to rotate.
-    MOV_MC_FLEX     =   0x40,           // Monte Carlo flexion is allowed.
-    MOV_CAN_FLEX    =   0x20,           // Molecule's rotatable bonds may rotate if selected for flexion.
-    MOV_ALL			= 0xfff0,
-    MOV_NORECEN		= 0x0ff0,
-    MOV_NOAXIAL     = 0xf0f0,
-    MOV_FORCEFLEX   =   0xf0,
-    MOV_FLEXONLY	=   0x70,
-    MOV_PINNED      =   0x04,
-    MOV_FLXDESEL    =   0x02,
-    MOV_NONE		=   0x00
+    MOV_CAN_RECEN   =   0x8000,           // Molecule can move through space.
+    MOV_CAN_AXIAL   =    0x800,           // Whole molecule can rotate in space.
+    MOV_MC_AXIAL    =    0x400,           // Monte Carlo whole molecule rotations allowed.
+    MOV_MUST_FLEX   =     0x80,           // Molecule's rotatable bonds are guaranteed free to rotate.
+    MOV_MC_FLEX     =     0x40,           // Monte Carlo flexion is allowed.
+    MOV_CAN_FLEX    =     0x20,           // Molecule's rotatable bonds may rotate if selected for flexion.
+    MOV_ALL			=   0xfff0,
+    MOV_NORECEN		=   0x0ff0,
+    MOV_NOAXIAL     =   0xf0f0,
+    MOV_FORCEFLEX   =     0xf0,
+    MOV_FLEXONLY	=     0x70,
+    MOV_PINNED      =     0x04,
+    MOV_FLXDESEL    =     0x02,
+    MOV_NONE		=     0x00,
+    MOV_BKGRND      = 0x020000,
+    MOV_CAN_CLASH   = 0x100000
 };
 
 enum MoleculeType

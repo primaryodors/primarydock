@@ -2672,7 +2672,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                 if (f < 0 && (a->movability & MOV_CAN_RECEN) )
                 {
                     Point motion = aloc.subtract(bloc);
-                    motion.scale(fmin(1, motion.magnitude()));
+                    motion.scale(fmin(0.25, motion.magnitude()));
                     a->move(motion);
                 }
                 else
@@ -2742,10 +2742,12 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 
             if (a->movability & MOV_CAN_AXIAL)
             {
+                pib.copy_state(a);
                 Point ptrnd(frand(-1,1), frand(-1,1), frand(-1,1));
                 if (ptrnd.magnitude())
                 {
-                    SCoord axis = ptrnd;
+                    LocatedVector axis = (SCoord)ptrnd;
+                    axis.origin = a->get_barycenter(true);
                     float theta;
 
                     if (a->movability & MOV_MC_AXIAL && frand(0,1) < 0.2) theta = frand(-M_PI, M_PI);
@@ -2769,6 +2771,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 
             if (a->movability & MOV_CAN_FLEX)
             {
+                pib.copy_state(a);
                 Bond** bb = a->get_rotatable_bonds();
                 if (bb)
                 {
@@ -2794,7 +2797,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                         }
                     }
                 }
-            }
+            }       // Can flex.
+
+            if (!i) cout << benerg << endl;
         }       // for i
 
         #if allow_iter_cb

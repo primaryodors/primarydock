@@ -594,7 +594,7 @@ void iteration_callback(int iter)
 
     if (output_each_iter)
     {
-        std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
+        std::string itersfname = (std::string)"tmp/" /*+ (std::string)protein->get_name()*/ + (std::string)"_iters.dock";
         int liter = iter + movie_offset;
         FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
         if (fp)
@@ -3412,6 +3412,7 @@ _try_again:
                         if (mvaa)
                         {
                             mvaa->movability = MOV_FORCEFLEX;
+                            flexible_resnos.push_back(mvaa->get_residue_no());
                             #if _dbg_flexion_selection
                             cout << mvaa->get_name() << " forced flexible." << endl;
                             #endif
@@ -4158,7 +4159,7 @@ _try_again:
 
             if (flex)
             {
-                #if flexion_selection
+                #if false && flexion_selection
                 for (j=0; j<flexible_resnos.size(); j++)
                 {
                     cfmols[i++] = protein->get_residue(flexible_resnos[j]);
@@ -4213,13 +4214,15 @@ _try_again:
 
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
-            Molecule::multimol_conform(
+            /*Molecule::multimol_conform(
                 cfmols,
                 delete_me = protein->all_residues_as_molecules_except(cfmols),
                 trip,
                 iters,
                 &iteration_callback
-            );
+            );*/
+            ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
+            Molecule::conform_molecules(cfmols, iters, &iteration_callback);
             delete[] delete_me;
 
             /*time_t jlgsux = time(NULL);

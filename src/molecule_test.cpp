@@ -8,6 +8,21 @@
 
 using namespace std;
 
+Molecule* mols[3];
+
+void iteration_callback(int iter)
+{
+    char buffer[256];
+    sprintf(buffer, "tmp/frame%d.sdf", iter);
+
+    FILE* pf = fopen(buffer, "wb");
+    Molecule* ligands[2];
+    ligands[0] = mols[1];
+    ligands[1] = 0;
+    mols[0]->save_sdf(pf, ligands);
+    fclose(pf);
+}
+
 int main(int argc, char** argv)
 {
     // TODO: These values are set way too permissively.
@@ -175,11 +190,10 @@ int main(int argc, char** argv)
 
     m1.reset_conformer_momenta();
     m2.reset_conformer_momenta();
-    Molecule* mols[3];
     mols[0] = &m1;
     mols[1] = &m2;
     mols[2] = NULL;
-    Molecule::multimol_conform(mols, 500);
+    Molecule::multimol_conform(mols, 500, &iteration_callback);
     float final_clashes = m1.get_intermol_clashes(&m2);
     // if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);

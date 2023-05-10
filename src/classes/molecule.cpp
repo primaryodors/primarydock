@@ -2765,8 +2765,36 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                         pib.restore_state(a);
                     }
                 }
-                
             }       // If can axial rotate.
+
+            if (a->movability & MOV_CAN_FLEX)
+            {
+                Bond** bb = a->get_rotatable_bonds();
+                if (bb)
+                {
+                    int q;
+                    for (q=0; bb[q]; q++)
+                    {
+                        float theta;
+                        if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI);
+                        else theta = frand(-5, 5)*fiftyseventh;
+
+                        bb[q]->rotate(theta, false);
+                        tryenerg = 0;
+                        for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+
+                        if (tryenerg > benerg)
+                        {
+                            benerg = tryenerg;
+                            pib.copy_state(a);
+                        }
+                        else
+                        {
+                            pib.restore_state(a);
+                        }
+                    }
+                }
+            }
         }       // for i
 
         #if allow_iter_cb

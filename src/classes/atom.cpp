@@ -2333,12 +2333,6 @@ bool atoms_are_conjugated(Atom** atoms)
 {
     int i;
 
-    // Debug trap.
-    if (atoms[0]->aaletter == 'Y')
-    {
-        i = 0;
-    }
-
     for (i=0; atoms[i]; i++)
     {
         if (i && !atoms[i]->is_bonded_to(atoms[i-1])) return false;

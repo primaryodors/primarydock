@@ -63,8 +63,8 @@
 #define _fullrot_stepdeg 10
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
-#define _def_lin_momentum 0.25
-#define _def_ang_momentum (fiftyseventh*15)
+#define _def_lin_momentum 0.1
+#define _def_ang_momentum (fiftyseventh*1)
 #define _def_bnd_momentum (fiftyseventh*15)
 
 #define pi_mult_dkytw 264
@@ -252,7 +252,7 @@
 // How much variance to allow in the strongest atom-to-atom binding energy when multimol conforming.
 // Decreasing this value requires any positional or rotational change to adhere more tightly to the
 // strongest interatomic interaction.
-#define strongest_loss_tolerance 0.001
+#define strongest_loss_tolerance 0.05
 #define _slt1 (1.0 - strongest_loss_tolerance)
 
 // Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,

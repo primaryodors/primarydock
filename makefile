@@ -122,7 +122,7 @@ point_report: test/point_test
 
 molecule_report: REPORT="test/molecule_test1.approved.txt"
 molecule_report: test/molecule_test
-	./test/molecule_test 'c1ccccc1' 'c1ccccc1' | tee temp | sed '/^#/d' >test/molecule_test1.received.txt; cat temp # ignore lines starting with #
+	./test/molecule_test 'NCCCC=O' 'NCCCC=O' | tee temp | sed '/^#/d' >test/molecule_test1.received.txt; cat temp # ignore lines starting with #
 	diff --color --unified $(REPORT) test/molecule_test1.received.txt
 
 mol_assem_report: REPORT="test/mol_assem_test.approved.txt"

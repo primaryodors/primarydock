@@ -9,18 +9,16 @@ using namespace std;
 
 void set_color(float r, float g, float b)
 {
-    int lr = fmax(0,fmin(5,r*6));
-    int lg = fmax(0,fmin(5,g*6));
-    int lb = fmax(0,fmin(5,b*6));
+    int lr = max(0, min(255, (int)(r*255)));
+    int lg = max(0, min(255, (int)(g*255)));
+    int lb = max(0, min(255, (int)(b*255)));
 
-    int ccode = 16 + lb + 6*lg + 36*lr;
-
-    cout << "\x1b[48;5;" << ccode << "m";
+    cout << "\x1b[48;2;" << lr << ";" << lg << ";" << lb << "m";
 }
 
 void clear_color()
 {
-    cout << "\x1b[49m";
+    cout << "\x1b[0m";
 }
 
 int main(int argc, char** argv)
@@ -29,7 +27,7 @@ int main(int argc, char** argv)
     cout << "Created empty molecule named " << m.get_name() << ".\n";
 
     Atom* anisoa;
-    bool colors = false;
+    bool colors = true;
 
     if (argc > 1)
     {
@@ -65,7 +63,7 @@ int main(int argc, char** argv)
         }
     }
 
-    if (argc > 4 && !strcmp(argv[4], "colors")) colors = true;
+    // if (argc > 4 && !strcmp(argv[4], "colors")) colors = true;
 
     const int size=22;
     const float ar = 2.1;		// Aspect ratio.

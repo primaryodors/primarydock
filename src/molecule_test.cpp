@@ -179,7 +179,7 @@ int main(int argc, char** argv)
     mols[0] = &m1;
     mols[1] = &m2;
     mols[2] = NULL;
-    Molecule::multimol_conform(mols, 200);
+    Molecule::multimol_conform(mols, 500);
     float final_clashes = m1.get_intermol_clashes(&m2);
     // if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);

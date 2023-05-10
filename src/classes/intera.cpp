@@ -891,7 +891,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     pt.scale(r);
                     pt = pt.add(aloc);
                     float theta = find_3d_angle(&bloc, &pt, &aloc);
-                    if (theta > M_PI/2) continue;
+                    if (fabs(theta) > M_PI/2) continue;
                     float contrib = pow(fmax(0,cos(theta)), dpa);
                     if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
                     // else cout << "Bad contrib! " << cos(theta) << " = cos(" << (theta*180.0/M_PI) << ") exp=" << dpa << endl;
@@ -906,7 +906,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     pt.scale(r);
                     pt = pt.add(bloc);
                     float theta = find_3d_angle(&aloc, &pt, &bloc);
-                    if (theta > M_PI/2) continue;
+                    if (fabs(theta) > M_PI/2) continue;
                     float contrib = pow(fmax(0,cos(theta)), dpb);
                     if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
                 }
@@ -914,8 +914,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 if (asum > 1) asum = 1;
                 if (bsum > 1) bsum = 1;
 
-                if (!asum) asum = 1;
-                if (!bsum) bsum = 1;
+                /*if (!asum) asum = 1;
+                if (!bsum) bsum = 1;*/
 
                 // Multiply the two sums.
                 aniso = asum * bsum;

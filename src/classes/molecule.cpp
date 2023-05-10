@@ -246,9 +246,12 @@ void Molecule::add_existing_atom(Atom* a)
     atoms[atcount++] = a;
     atoms[atcount] = nullptr;
 
-    strcpy(a->aa3let, atoms[0]->aa3let);
-    a->residue = atoms[0]->residue;
-    a->aaletter = atoms[0]->aaletter;
+    if (atcount > 1)
+    {
+        strcpy(a->aa3let, atoms[0]->aa3let);
+        a->residue = atoms[0]->residue;
+        a->aaletter = atoms[0]->aaletter;
+    }
 }
 
 Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard)
@@ -3571,7 +3574,7 @@ bool Molecule::from_smiles(char const * smilesstr)
                 {
                     fgets(buffer, 1022, pf);
                     lno++;
-                    sdfdat += buffer;
+                    sdfdat += (std::string)buffer;
 
                     if (lno == 2) sdfgen_aboutline = buffer;
                 }

@@ -1613,6 +1613,9 @@ bool AminoAcid::is_tyrosine_like()
     for (i=0; rings[i]; i++)
     {
         if (rings[i]->get_type() == AROMATIC) has_aromatic_ring = true;
+        #if DBG_TYRLIKE
+        cout << "Ring " << i << " type " << rings[i]->get_type() << endl;
+        #endif
     }
 
     if (!has_aromatic_ring)

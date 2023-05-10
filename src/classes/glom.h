@@ -2,6 +2,7 @@
 #ifndef _GLOMCLS
 #define _GLOMCLS
 
+#include <memory>
 #include <algorithm>
 #include "protein.h"
 
@@ -39,7 +40,7 @@ class AtomGlom
     float bounds();
     float compatibility(AminoAcid* aa);
 
-    static std::vector<AtomGlom> get_potential_ligand_gloms(Molecule* mol);
+    static std::vector<std::shared_ptr<AtomGlom>> get_potential_ligand_gloms(Molecule* mol);
 };
 
 class ResidueGlom
@@ -52,19 +53,21 @@ class ResidueGlom
     Point get_center();
     float distance_to(Point pt);
     float compatibility(AtomGlom* ag);
+    float glom_reach();
 
-    static std::vector<ResidueGlom> get_potential_side_chain_gloms(AminoAcid** aalist);
+    static std::vector<std::shared_ptr<ResidueGlom>> get_potential_side_chain_gloms(AminoAcid** aalist, Point pocketcen);
 };
 
 class GlomPair
 {
     public:
-    AtomGlom* ag;
-    ResidueGlom* scg;
+    std::shared_ptr<AtomGlom> ag;
+    std::shared_ptr<ResidueGlom> scg;
 
     float get_potential();
 
-    static std::vector<GlomPair> pair_gloms(std::vector<AtomGlom> agloms, std::vector<ResidueGlom> scgloms, Point pocketcen);
+    static std::vector<std::shared_ptr<GlomPair>> pair_gloms(std::vector<std::shared_ptr<AtomGlom>> agloms, std::vector<std::shared_ptr<ResidueGlom>> scgloms, Point pocketcen);
+    static void align_gloms(Molecule* ligand, std::vector<std::shared_ptr<GlomPair>> glom_pairs);    // Assumes the ligand is already centered in the pocket.
 
     protected:
     float potential = 0;

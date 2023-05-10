@@ -2171,7 +2171,7 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
 
-    std::vector<AtomGlom> agc = AtomGlom::get_potential_ligand_gloms(ligand);
+    std::vector<std::shared_ptr<AtomGlom>> agc = AtomGlom::get_potential_ligand_gloms(ligand);
 
     m.minimize_internal_clashes();
 
@@ -3470,13 +3470,15 @@ _try_again:
                 if (debug) *debug << "Initialize null AA pointer." << endl;
                 #endif
 
-                std::vector<ResidueGlom> scg = ResidueGlom::get_potential_side_chain_gloms(reaches_spheroid[nodeno]);
-                std::vector<GlomPair> gp = GlomPair::pair_gloms(agc, scg, ligcen_target);
+                std::vector<std::shared_ptr<ResidueGlom>> scg = ResidueGlom::get_potential_side_chain_gloms(reaches_spheroid[nodeno], ligcen_target);
+                std::vector<std::shared_ptr<GlomPair>> gp = GlomPair::pair_gloms(agc, scg, ligcen_target);
+                ligand->recenter(ligcen_target);
+                GlomPair::align_gloms(ligand, gp);
 
                 // Best-Binding Algorithm
                 // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
-                if (use_bestbind_algorithm)
+                if (false && use_bestbind_algorithm)
                 {
                     for (l=0; l<3; l++)
                     {
@@ -3766,7 +3768,7 @@ _try_again:
                 if (debug) *debug << "Alignment AA." << endl;
                 #endif
 
-                if (use_bestbind_algorithm)
+                if (false && use_bestbind_algorithm)
                 {
                     ligand->recenter(loneliest);
                     for (l=0; l<_bb_maxglom; l++)

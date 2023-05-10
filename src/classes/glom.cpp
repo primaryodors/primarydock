@@ -317,9 +317,25 @@ float ResidueGlom::compatibility(AtomGlom* ag)
     return result;
 }
 
-std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
+float ResidueGlom::glom_reach()
 {
-    std::vector<AtomGlom> retval;
+    int n = aminos.size();
+    if (!n) return 0;
+    if (metallic) return 0;
+    int i;
+    float retval = 0;
+    for (i=0; i<n; i++)
+    {
+        float r = aminos[i]->get_reach();
+        if (r > retval) retval = r;
+    }
+
+    return retval;
+}
+
+std::vector<std::shared_ptr<AtomGlom>> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
+{
+    std::vector<std::shared_ptr<AtomGlom>> retval;
     if (!mol) return retval;
     int n = mol->get_atom_count();
     if (!n) return retval;
@@ -331,11 +347,11 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
     for (i=0; i<n; i++)
     {
         if (dirty[i]) continue;
-        AtomGlom g;
+        std::shared_ptr<AtomGlom> g(new AtomGlom());
         Atom* a = mol->get_atom(i);
         if (!a) continue;
         Atom* a_ = a;
-        g.atoms.push_back(a);
+        g->atoms.push_back(a);
         #if _dbg_glomsel
         cout << "Creating glom from " << a->name << "..." << endl;
         #endif
@@ -346,7 +362,7 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
             Atom* b = mol->get_atom(j);
             if (!b) continue;
 
-            float r = fmax(0, g.get_center().get_3d_distance(b->get_location()) - 1.5);
+            float r = fmax(0, g->get_center().get_3d_distance(b->get_location()) - 1.5);
             if (r > 2.5)
             {
                 continue;
@@ -358,7 +374,7 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
 
             if (simil >= 20)
             {
-                g.atoms.push_back(b);
+                g->atoms.push_back(b);
                 #if _dbg_glomsel
                 cout << "Adding " << b->name << " with distance " << r << " and similarity " << simil << endl;
                 #endif
@@ -377,9 +393,9 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
         bool added = false;
         for (l=0; l < retval.size(); l++)
         {
-            if (g.get_sum() > retval[l].get_sum())
+            if (g->get_sum() > retval[l]->get_sum())
             {
-                std::vector<AtomGlom>::iterator it;
+                std::vector<std::shared_ptr<AtomGlom>>::iterator it;
                 it = retval.begin();
                 retval.insert(it+l, g);
                 added = true;
@@ -395,9 +411,9 @@ std::vector<AtomGlom> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
     return retval;
 }
 
-std::vector<ResidueGlom> ResidueGlom::get_potential_side_chain_gloms(AminoAcid** aalist)
+std::vector<std::shared_ptr<ResidueGlom>> ResidueGlom::get_potential_side_chain_gloms(AminoAcid** aalist, Point pcen)
 {
-    std::vector<ResidueGlom> retval;
+    std::vector<std::shared_ptr<ResidueGlom>> retval;
     if (!aalist) return retval;
     int i, j, n;
     for (n=0; aalist[n]; n++);          // Get count.
@@ -408,9 +424,21 @@ std::vector<ResidueGlom> ResidueGlom::get_potential_side_chain_gloms(AminoAcid**
     {
         if (dirty[i]) continue;
 
-        ResidueGlom g;
+        std::shared_ptr<ResidueGlom> g(new ResidueGlom());
         AminoAcid* aa = aalist[i];
-        g.aminos.push_back(aa);
+
+        Atom* CB = aa->get_atom("CB");
+        if (CB)
+        {
+            float a3d = find_3d_angle(CB->get_location(), pcen, aa->get_CA_location());
+            if (a3d > fiftyseventh*120)
+            {
+                dirty[i] = true;
+                continue;
+            }
+        }
+
+        g->aminos.push_back(aa);
         dirty[i] = true;
         #if _dbg_glomsel
         cout << "Building side chain glom from " << aa->get_name() << endl;
@@ -421,10 +449,29 @@ std::vector<ResidueGlom> ResidueGlom::get_potential_side_chain_gloms(AminoAcid**
             if (dirty[j]) continue;
             AminoAcid* bb = aalist[j];
 
+            // Debug trap.
+            if (bb->get_residue_no() == 106)
+            {
+                dirty[j] = false;
+            }
+
+            CB = bb->get_atom("CB");
+            if (CB)
+            {
+                float a3d = find_3d_angle(CB->get_location(), pcen, bb->get_CA_location());
+                if (a3d > fiftyseventh*120)
+                {
+                    dirty[j] = true;
+                    continue;
+                }
+            }
+
             if (aa->coordmtl && aa->coordmtl == bb->coordmtl)
             {
-                g.aminos.push_back(bb);
+                g->aminos.push_back(bb);
                 dirty[j] = true;
+                g->metallic = true;
+                g->metal = aa->coordmtl;
                 #if _dbg_glomsel
                 cout << "Adding " << bb->get_name() << " because metal coord." << endl;
                 #endif
@@ -450,7 +497,7 @@ std::vector<ResidueGlom> ResidueGlom::get_potential_side_chain_gloms(AminoAcid**
             float simil = aa->similarity_to(bb);
             if (simil >= 4)
             {
-                g.aminos.push_back(bb);
+                g->aminos.push_back(bb);
                 dirty[j] = true;
                 #if _dbg_glomsel
                 cout << "Adding " << bb->get_name() << " distance " << r << " similarity " << simil << endl;
@@ -522,7 +569,6 @@ float GlomPair::get_potential()
         {
             Atom* a = ag->atoms[i];
             if (a->get_Z() == 6 && !a->is_polar()) continue;
-            int tyrosines = 0;
             for (j=0; j<n; j++)
             {
                 AminoAcid* aa = scg->aminos[j];
@@ -531,10 +577,14 @@ float GlomPair::get_potential()
                 else
                 {
                     partial = aa->get_atom_mol_bind_potential(a);
-                    if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like())
+                    if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like()) partial /= 3;
+
+                    if (extra_wt.size()
+                            &&
+                            std::find(extra_wt.begin(), extra_wt.end(), aa->get_residue_no())!=extra_wt.end()
+                    )
                     {
-                        if (tyrosines) partial = 0;
-                        tyrosines++;
+                        partial *= 2.5;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
                     }
 
                     #if _dbg_glomsel
@@ -555,9 +605,9 @@ float GlomPair::get_potential()
     }
 }
 
-std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector<ResidueGlom> scg, Point pcen)
+std::vector<std::shared_ptr<GlomPair>> GlomPair::pair_gloms(std::vector<std::shared_ptr<AtomGlom>> ag, std::vector<std::shared_ptr<ResidueGlom>> scg, Point pcen)
 {
-    std::vector<GlomPair> retval;
+    std::vector<std::shared_ptr<GlomPair>> retval;
 
     int m = ag.size(), n = scg.size();
     if (!m || !n) return retval;
@@ -577,14 +627,27 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
         {
             if (sdirty[j]) continue;
             GlomPair gp;
-            gp.ag = &ag[i];
-            gp.scg = &scg[j];
+            gp.ag = ag[i];
+            gp.scg = scg[j];
             gp.pocketcen = pcen;
 
             float p1 = gp.get_potential() * frand(1.0-best_binding_stochastic, 1.0+best_binding_stochastic);
 
+            int r = retval.size();
+            for (l=0; l<r; l++)
+            {
+                float ra = retval[l]->ag->get_center().get_3d_distance(ag[i]->get_center());
+                float rs = retval[l]->scg->get_center().get_3d_distance(scg[j]->get_center());
+                float dr = fabs(ra - rs);
+                float deff = fmax(1, dr-scg[j]->glom_reach());
+                #if _dbg_glomsel
+                cout << "Glom spacing for " << *ag[i] << "-" << *scg[j] << " has delta " << dr << " effectively " << deff << endl;
+                #endif
+                p1 /= deff;
+            }
+
             #if _dbg_glomsel
-            cout << "Potential for " << ag[i] << "-" << scg[j] << " = " << p1 << endl << endl;
+            cout << "Potential for " << *ag[i] << "-" << *scg[j] << " = " << p1 << endl << endl;
             #endif
 
             if (p1 > p)
@@ -596,15 +659,15 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
 
         if (j1 < 0) continue;
 
-        GlomPair gp;
-        gp.ag = &ag[i];
-        gp.scg = &scg[j1];
+        std::shared_ptr<GlomPair> gp(new GlomPair());
+        gp->ag = ag[i];
+        gp->scg = scg[j1];
 
         adirty[i] = true;
         sdirty[j1] = true;
 
         #if _dbg_glomsel
-        cout << "Strongest match for " << ag[i] << " is " << scg[j1] << endl;
+        cout << "Strongest match for " << *ag[i] << " is " << *scg[j1] << endl;
         #endif
         
         bool added = false;
@@ -614,20 +677,20 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
             retval.push_back(gp);
             added = true;
             #if _dbg_glomsel
-            cout << "Beginning result with " << *gp.ag << "-" << *gp.scg << endl;
+            cout << "Beginning result with " << *gp->ag << "-" << *gp->scg << endl;
             #endif
         }
         else for (l=0; l<r; l++)
         {
-            if (gp.get_potential() > retval[l].get_potential())
+            if (gp->get_potential() > retval[l]->get_potential())
             {
-                std::vector<GlomPair>::iterator it;
+                std::vector<std::shared_ptr<GlomPair>>::iterator it;
                 it = retval.begin();
                 retval.insert(it+l, gp);
                 added = true;
                 
                 #if _dbg_glomsel
-                cout << "Inserting " << *gp.ag << "-" << *gp.scg << " before " << *retval[l+1].ag << "-" << *retval[l+1].scg << endl;
+                cout << "Inserting " << *gp->ag << "-" << *gp->scg << " before " << *retval[l+1]->ag << "-" << *retval[l+1]->scg << endl;
                 #endif
 
                 break;
@@ -638,7 +701,7 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
             retval.push_back(gp);
             added = true;
             #if _dbg_glomsel
-            cout << "Appending to result " << *gp.ag << "-" << *gp.scg << endl;
+            cout << "Appending to result " << *gp->ag << "-" << *gp->scg << endl;
             #endif
         }
     }
@@ -647,7 +710,7 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
     cout << endl << endl << "Final pair assignments:" << endl;
     for (i=0; i<retval.size(); i++)
     {
-        cout << *retval[i].ag << "-" << *retval[i].scg << endl;
+        cout << *retval[i]->ag << "-" << *retval[i]->scg << endl;
     }
     #endif
 
@@ -655,4 +718,50 @@ std::vector<GlomPair> GlomPair::pair_gloms(std::vector<AtomGlom> ag, std::vector
 }
 
 
+void GlomPair::align_gloms(Molecule* lig, std::vector<std::shared_ptr<GlomPair>> gp)
+{
+    int n = gp.size();
+
+    if (n < 1) return;
+    Rotation rot = align_points_3d(gp[0]->ag->get_center(), gp[0]->scg->get_center(), lig->get_barycenter());
+    LocatedVector lv = rot.v;
+    lv.origin = lig->get_barycenter();
+    #if _dbg_glomsel
+    cout << "Rotating " << *gp[0]->ag << " in the direction of " << *gp[0]->scg << endl;
+    #endif
+    lig->rotate(lv, rot.a);
+
+
+    // Scooch.
+    float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->glom_reach();
+    if (r > 0)
+    {
+        Point rel = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
+        rel.scale(r);
+        #if _dbg_glomsel
+        cout << "Scooching " << *gp[0]->ag << " " << r << "Å into the reach of " << *gp[0]->scg << endl;
+        #endif
+        lig->move(rel);
+    }
+
+    if (n < 2) return;
+    rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
+    lv = rot.v;
+    lv.origin = gp[0]->ag->get_center();
+    #if _dbg_glomsel
+    cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
+    #endif
+    lig->rotate(lv, rot.a);
+
+    if (n < 3) return;
+    Point zcen = gp[0]->ag->get_center();
+    SCoord axis = gp[1]->ag->get_center().subtract(zcen);
+    lv = (SCoord)axis;
+    lv.origin = zcen;
+    float theta = find_angle_along_vector(gp[2]->ag->get_center(), gp[2]->scg->get_center(), zcen, axis);
+    #if _dbg_glomsel
+    cout << "\"Rotisserie\" aligning " << *gp[2]->ag << " in the direction of " << *gp[2]->scg << endl;
+    #endif
+    lig->rotate(lv, theta);
+}
 

@@ -1879,7 +1879,11 @@ float Atom::get_sum_pi_bonds()
     float retval=0;
     for (i=0; i<geometry; i++)
     {
-        if (bonded_to[i].btom && bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval += bonded_to[i].cardinality;
+        if (bonded_to[i].btom && bonded_to[i].btom->Z > 1)
+        {
+            if (bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval += bonded_to[i].cardinality;
+            else if (bonded_to[i].btom->is_pi()) retval += bonded_to[i].cardinality;
+        }
     }
     return retval;
 }
@@ -2328,6 +2332,12 @@ bool Ring::Huckel()
 bool atoms_are_conjugated(Atom** atoms)
 {
     int i;
+
+    // Debug trap.
+    if (atoms[0]->aaletter == 'Y')
+    {
+        i = 0;
+    }
 
     for (i=0; atoms[i]; i++)
     {

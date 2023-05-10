@@ -858,7 +858,7 @@ void Protein::set_clashables(int resno, bool recursed)
         {
             delete[] res_can_clash;
         }
-        res_can_clash = new AminoAcid**[maxres+1];
+        res_can_clash = new AminoAcid**[maxres+8];
         for (i=0; i<=maxres; i++) res_can_clash[i] = nullptr;
     }
 
@@ -885,7 +885,7 @@ void Protein::set_clashables(int resno, bool recursed)
         }
 
         if (res_can_clash[0] && res_can_clash[i]) delete res_can_clash[i];
-        res_can_clash[i] = new AminoAcid*[k+1];
+        res_can_clash[i] = new AminoAcid*[k+8];
         for (j=0; j<k; j++)
         {
             res_can_clash[i][j] = temp[j];

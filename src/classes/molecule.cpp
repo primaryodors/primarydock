@@ -2639,6 +2639,142 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     return lbind;
 }
 
+void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
+{
+    if (!mm) return;
+    int i, j, l, n, iter;
+
+    for (n=0; mm[n]; n++);      // Get count.
+
+    Molecule* nearby[n+8];
+
+    for (iter=1; iter<=iters; iter++)
+    {
+        for (i=0; i<n; i++)
+        {
+            Molecule* a = mm[i];
+            Point aloc = a->get_barycenter();
+
+            float benerg = 0;
+            l = 0;
+            for (j=0; j<n; j++)
+            {
+                if (j==i) continue;
+                Molecule* b = mm[j];
+                Point bloc = b->get_barycenter();
+
+                float r = a->get_nearest_atom(bloc)->distance_to(b->get_nearest_atom(aloc));
+                if (r > _DEFAULT_INTERA_R_CUTOFF) continue;
+
+                nearby[l++] = b;
+
+                float f = a->intermol_bind_for_multimol_dock(b, false);
+                if (f < 0 && (a->movability & MOV_CAN_RECEN) )
+                {
+                    Point motion = aloc.subtract(bloc);
+                    motion.scale(fmin(1, motion.magnitude()));
+                    a->move(motion);
+                }
+                else
+                {
+                    benerg += f;
+                }
+            }
+            nearby[l] = 0;
+
+            float tryenerg;
+            Pose pib;
+            pib.copy_state(a);
+
+            if (a->movability & MOV_CAN_RECEN)
+            {
+                int xyz;
+                for (xyz=0; xyz<3; xyz++)
+                {
+                    Point motion(0, 0, 0);
+
+                    switch(xyz)
+                    {
+                        case 0: motion.x = frand(-1,1); break;
+                        case 1: motion.y = frand(-1,1); break;
+                        case 2: motion.z = frand(-1,1); break;
+                        default:
+                        ;
+                    }
+
+                    a->move(motion);
+
+                    tryenerg = 0;
+                    for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+
+                    if (tryenerg > benerg)
+                    {
+                        benerg = tryenerg;
+                        pib.copy_state(a);
+                    }
+                    else
+                    {
+                        switch(xyz)
+                        {
+                            case 0: motion.x *= -2; break;
+                            case 1: motion.y *= -2; break;
+                            case 2: motion.z *= -2; break;
+                            default:
+                            ;
+                        }
+                        a->move(motion);
+
+                        tryenerg = 0;
+                        for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+
+                        if (tryenerg > benerg)
+                        {
+                            benerg = tryenerg;
+                            pib.copy_state(a);
+                        }
+                        else
+                        {
+                            pib.restore_state(a);
+                        }
+                    }
+                }
+            }       // If can recenter.
+
+            if (a->movability & MOV_CAN_AXIAL)
+            {
+                Point ptrnd(frand(-1,1), frand(-1,1), frand(-1,1));
+                if (ptrnd.magnitude())
+                {
+                    SCoord axis = ptrnd;
+                    float theta;
+
+                    if (a->movability & MOV_MC_AXIAL && frand(0,1) < 0.2) theta = frand(-M_PI, M_PI);
+                    else theta = frand(-5, 5)*fiftyseventh;
+
+                    a->rotate(&axis, theta);
+                    tryenerg = 0;
+                    for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+
+                    if (tryenerg > benerg)
+                    {
+                        benerg = tryenerg;
+                        pib.copy_state(a);
+                    }
+                    else
+                    {
+                        pib.restore_state(a);
+                    }
+                }
+                
+            }       // If can axial rotate.
+        }       // for i
+
+        #if allow_iter_cb
+        if (cb) cb(iter);
+        #endif
+    }       // for iter
+}
+
 #define DBG_BONDFLEX 0
 #define DBG_FLEXRES 111
 #define DBG_FLEXROTB 0

@@ -12,6 +12,9 @@ Molecule* mols[3];
 
 void iteration_callback(int iter)
 {
+    float f = -mols[0]->get_intermol_binding(mols[1]);
+    cout << f << endl;
+
     char buffer[256];
     sprintf(buffer, "tmp/frame%d.sdf", iter);
 
@@ -193,7 +196,8 @@ int main(int argc, char** argv)
     mols[0] = &m1;
     mols[1] = &m2;
     mols[2] = NULL;
-    Molecule::multimol_conform(mols, 500, &iteration_callback);
+    // Molecule::multimol_conform(mols, 500, &iteration_callback);
+    Molecule::conform_molecules(mols, 50, &iteration_callback);
     float final_clashes = m1.get_intermol_clashes(&m2);
     // if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);

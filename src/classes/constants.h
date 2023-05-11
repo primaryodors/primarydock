@@ -66,6 +66,7 @@
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
+#define speed_limit 0.1
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -321,6 +322,7 @@
 #define _dbg_multiflex 0
 #define _dbg_homology 0
 #define _dbg_bridges 0
+#define _dbg_fitness_plummet 1
 
 #endif
 

@@ -350,6 +350,9 @@ std::vector<std::shared_ptr<AtomGlom>> AtomGlom::get_potential_ligand_gloms(Mole
         std::shared_ptr<AtomGlom> g(new AtomGlom());
         Atom* a = mol->get_atom(i);
         if (!a) continue;
+
+        if (!a->is_polar() && !a->get_charge() && !a->is_pi()) continue;
+
         Atom* a_ = a;
         g->atoms.push_back(a);
         #if _dbg_glomsel
@@ -357,8 +360,10 @@ std::vector<std::shared_ptr<AtomGlom>> AtomGlom::get_potential_ligand_gloms(Mole
         #endif
 
         dirty[i] = true;
-        for (j=i+1; j<n; j++)
+        for (j=0; j<n; j++)
         {
+            if (j==i) continue;
+
             Atom* b = mol->get_atom(j);
             if (!b) continue;
 

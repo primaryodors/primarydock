@@ -2669,18 +2669,13 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                 nearby[l++] = b;
 
                 float f = a->intermol_bind_for_multimol_dock(b, false);
-                if (f < 0 && (a->movability & MOV_CAN_RECEN) )
-                {
-                    Point motion = aloc.subtract(bloc);
-                    motion.scale(fmin(0.25, motion.magnitude()));
-                    a->move(motion);
-                }
-                else
-                {
-                    benerg += f;
-                }
+                benerg += f;
             }
             nearby[l] = 0;
+
+            #if _dbg_fitness_plummet
+            if (!i) cout << benerg << " ";
+            #endif
 
             float tryenerg;
             Pose pib;
@@ -2695,9 +2690,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 
                     switch(xyz)
                     {
-                        case 0: motion.x = frand(-1,1); break;
-                        case 1: motion.y = frand(-1,1); break;
-                        case 2: motion.z = frand(-1,1); break;
+                        case 0: motion.x = frand(-speed_limit,speed_limit); break;
+                        case 1: motion.y = frand(-speed_limit,speed_limit); break;
+                        case 2: motion.z = frand(-speed_limit,speed_limit); break;
                         default:
                         ;
                     }
@@ -2706,6 +2701,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 
                     tryenerg = 0;
                     for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+
+                    #if _dbg_fitness_plummet
+                    if (!i) cout << "(" << tryenerg << ") ";
+                    #endif
 
                     if (tryenerg > benerg)
                     {
@@ -2740,6 +2739,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                 }
             }       // If can recenter.
 
+            #if _dbg_fitness_plummet
+            if (!i) cout << benerg << " ";
+            #endif
+
             if (a->movability & MOV_CAN_AXIAL)
             {
                 pib.copy_state(a);
@@ -2768,6 +2771,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                     }
                 }
             }       // If can axial rotate.
+
+            #if _dbg_fitness_plummet
+            if (!i) cout << benerg << " ";
+            #endif
 
             if (a->movability & MOV_CAN_FLEX)
             {
@@ -2799,7 +2806,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                 }
             }       // Can flex.
 
+            #if _dbg_fitness_plummet
             if (!i) cout << benerg << endl;
+            #endif
         }       // for i
 
         #if allow_iter_cb

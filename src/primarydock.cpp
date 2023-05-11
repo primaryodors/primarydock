@@ -583,7 +583,7 @@ void iteration_callback(int iter)
             discrete[i+offset].paa = reaches_spheroid[nodeno][i];
         }
 
-        int mcn;
+        /*int mcn;
         Molecule lm("MTL");
         if (mcn = mtlcoords.size())         // Assignment, not comparison.
         {
@@ -596,6 +596,15 @@ void iteration_callback(int iter)
             lm.movability = MOV_NONE;
             discrete[i+offset].pmol = &lm;
             i++;
+        }*/
+
+        for (j=0; gcfmols[j]; j++)
+        {
+            if (!strcmp(gcfmols[j]->get_name(), "MTL"))
+            {
+                discrete[i+offset].pmol = gcfmols[j];
+                i++;
+            }
         }
 
         discrete[i+offset].n = 0;

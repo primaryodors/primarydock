@@ -966,9 +966,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (forces[i]->type == mcoord)
             {
                 partial *= metal_compatibility(a, b);
-                #if _dbg_anemia
-                if (a->get_Z() == 16 || b->get_Z() == 16) cout << "Metal partial = " << partial << " because sulfur compat " << metal_compatibility(a, b) << endl;
-                #endif
             }
 
             // if (partial < 0) partial = 0;

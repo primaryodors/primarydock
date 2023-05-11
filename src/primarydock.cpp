@@ -568,43 +568,33 @@ void iteration_callback(int iter)
         /*discrete[0].pmol = gcfmols[0];
         discrete[1].pmol = gcfmols[1];*/
 
-        int offset = 2;             // For some strange reason, if this is set to 1 the TAAR8 test fails.
+        int offset = 0;
 
-        if (waters) offset += maxh2o;
+        #if _dbg_anemia
+        cout << iter << ": ";
+        #endif
+        for (i=0; gcfmols[i]; i++)
+        {
+            if (!gcfmols[i]->is_residue() || !strcmp(gcfmols[i]->get_name(), "MTL") )
+            {
+                discrete[offset++].pmol = gcfmols[i];
+                #if _dbg_anemia
+                cout << discrete[offset-1].pmol->get_name() << " ";
+                #endif
+            }
+        }
+        #if _dbg_anemia
+        cout << endl;
+        progressbar = false;
+        #endif
 
-        for (i=0; i<offset; i++) discrete[i].pmol = gcfmols[i];
-
-        /*AminoAcid* resphres[SPHREACH_MAX+4];
+        AminoAcid* resphres[SPHREACH_MAX+4];
         for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
-        int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);*/
+        sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);
         //cout << "Sphres: " << sphres << endl;
         for (i=0; i<sphres; i++)
         {
             discrete[i+offset].paa = reaches_spheroid[nodeno][i];
-        }
-
-        /*int mcn;
-        Molecule lm("MTL");
-        if (mcn = mtlcoords.size())         // Assignment, not comparison.
-        {
-            for (j=0; j<mcn; j++)
-            {
-                if (!mtlcoords[j].mtl) continue;                    
-                lm.add_existing_atom(mtlcoords[j].mtl);
-            }
-
-            lm.movability = MOV_NONE;
-            discrete[i+offset].pmol = &lm;
-            i++;
-        }*/
-
-        for (j=0; gcfmols[j]; j++)
-        {
-            if (!strcmp(gcfmols[j]->get_name(), "MTL"))
-            {
-                discrete[i+offset].pmol = gcfmols[j];
-                i++;
-            }
         }
 
         discrete[i+offset].n = 0;

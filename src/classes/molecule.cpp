@@ -2663,24 +2663,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                 Point bloc = b->get_barycenter();
 
                 float r = a->get_nearest_atom(bloc)->distance_to(b->get_nearest_atom(aloc));
-
-                #if _dbg_anemia
-                if (a->count_atoms_by_element("S") || b->count_atoms_by_element("S"))
-                {
-                    cout << iter << ": " << a->name << "---" << b->name << " r " << r << endl;
-                }
-                #endif
-
                 if (r > _DEFAULT_INTERA_R_CUTOFF) continue;
-
                 nearby[l++] = b;
-
-                #if _dbg_anemia
-                if (a->count_atoms_by_element("S") || b->count_atoms_by_element("S"))
-                {
-                    cout << iter << ": " << a->name << "---" << b->name << " made it." << endl;
-                }
-                #endif
 
                 float f = a->intermol_bind_for_multimol_dock(b, false);
                 benerg += f;

@@ -564,7 +564,7 @@ void iteration_callback(int iter)
 
     if (gcfmols && seql)
     {
-        Star discrete[SPHREACH_MAX+4];
+        Star discrete[SPHREACH_MAX+8];
         /*discrete[0].pmol = gcfmols[0];
         discrete[1].pmol = gcfmols[1];*/
 
@@ -582,11 +582,27 @@ void iteration_callback(int iter)
         {
             discrete[i+offset].paa = reaches_spheroid[nodeno][i];
         }
-        discrete[sphres+offset].n = 0;
 
-        sphres += offset;
-        for (i=0; i<sphres; i++) gcfmols[i] = discrete[i].pmol;
-        gcfmols[sphres] = nullptr;
+        int mcn;
+        Molecule lm("MTL");
+        if (mcn = mtlcoords.size())         // Assignment, not comparison.
+        {
+            for (j=0; j<mcn; j++)
+            {
+                if (!mtlcoords[j].mtl) continue;                    
+                lm.add_existing_atom(mtlcoords[j].mtl);
+            }
+
+            lm.movability = MOV_NONE;
+            discrete[i+offset].pmol = &lm;
+            i++;
+        }
+
+        discrete[i+offset].n = 0;
+
+        sphres = i;
+        for (i=0; discrete[i].n; i++) gcfmols[i] = discrete[i].pmol;
+        gcfmols[i] = nullptr;
     }
 
     _oei:

@@ -323,6 +323,7 @@
 #define _dbg_homology 0
 #define _dbg_bridges 0
 #define _dbg_fitness_plummet 0
+#define _dbg_anemia 1
 
 #endif
 

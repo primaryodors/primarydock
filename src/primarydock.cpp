@@ -4167,7 +4167,9 @@ _try_again:
                 #else
                 for (j=0; j<sphres; j++)
                 {
+                    #if ! flexion_selection
                     if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
+                    #endif
                     cfmols[i++] = reaches_spheroid[nodeno][j];
                 }
                 #endif

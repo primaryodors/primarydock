@@ -1224,6 +1224,19 @@
             }
         }
     },
+    "4d5bb30a063e11ec925e3e2204920ec8":
+    {
+        "full_name": "3-mercapto-2-methylpropan-1-ol",
+        "smiles": "C(C(C)CO)S",
+        "aroma":
+        {
+            "http://www.leffingwell.com/chirality/3-mercapto-2-methylpropanol.htm":
+            [
+                "broth",
+                "sweaty"
+            ]
+        }
+    },
     "611fdfbc7d3b479e1f2189b7ba7d13b1":
     {
         "full_name": "alpha-hexyl cinnamic acid",

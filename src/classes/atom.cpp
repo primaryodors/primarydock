@@ -1362,26 +1362,31 @@ void Bond::swing(SCoord newdir)
 
 SCoord* Atom::get_basic_geometry()
 {
-    SCoord* retval = new SCoord[geometry+2];
+    SCoord* retval = new SCoord[abs(geometry)+2];
 
     int i, j;
     float x, y, z;
 
-    if (geometry == 1)
+    if (geometry < 0)
+    {
+        for (i=0; i<-geometry; i++)
+        {
+            retval[i] = new SCoord(1, 0, M_PI/abs(geometry/2)*i);
+        }
+    }
+    else if (geometry == 1)
     {
         SCoord v1(1, M_PI/2, 0);
         retval[0] = v1;
     }
-
-    if (geometry == 2)
+    else if (geometry == 2)
     {
         SCoord v1(1, M_PI*0.5, 0);
         SCoord v2(1, M_PI*1.5, 0);
         retval[0] = v1;
         retval[1] = v2;
     }
-
-    if (geometry == 3)
+    else if (geometry == 3)
     {
         for (i=0; i<geometry; i++)
         {
@@ -1389,8 +1394,7 @@ SCoord* Atom::get_basic_geometry()
             retval[i] = v;
         }
     }
-
-    if (geometry == 4)
+    else if (geometry == 4)
     {
         SCoord v1(1, M_PI/2, 0);
         retval[0] = v1;
@@ -1401,8 +1405,7 @@ SCoord* Atom::get_basic_geometry()
             retval[i] = v;
         }
     }
-
-    if (geometry == 5)
+    else if (geometry == 5)
     {
         SCoord v1(1, M_PI*0.5, 0);
         SCoord v2(1, M_PI*1.5, 0);
@@ -1416,8 +1419,7 @@ SCoord* Atom::get_basic_geometry()
 
         retval[geometry-1] = v2;
     }
-
-    if (geometry == 6)
+    else if (geometry == 6)
     {
         SCoord v1(1, M_PI*0.5, 0);
         SCoord v2(1, M_PI*1.5, 0);
@@ -1431,8 +1433,7 @@ SCoord* Atom::get_basic_geometry()
 
         retval[geometry-1] = v2;
     }
-
-    if (geometry == 7)
+    else if (geometry == 7)
     {
         for (i=0; i<3; i++)
         {
@@ -1445,8 +1446,7 @@ SCoord* Atom::get_basic_geometry()
             retval[i] = v;
         }
     }
-
-    if (geometry == 8)
+    else if (geometry == 8)
     {
         for (i=0; i<4; i++)
         {
@@ -1459,8 +1459,7 @@ SCoord* Atom::get_basic_geometry()
             retval[i] = v;
         }
     }
-
-    if (geometry == 10)
+    else if (geometry == 10)
     {
         for (i=0; i<5; i++)
         {
@@ -1473,7 +1472,6 @@ SCoord* Atom::get_basic_geometry()
             retval[i] = v;
         }
     }
-
 
     return retval;
 }

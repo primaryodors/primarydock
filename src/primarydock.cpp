@@ -1990,7 +1990,7 @@ int main(int argc, char** argv)
             strcpy(lmtl->aa3let, "MTL");
             lmtl->residue = 0;
 
-            Molecule::multimol_conform(lmc, 50);
+            Molecule::conform_molecules(lmc, 50);
 
             for (j=0; j<mtlcoords[i].coordres.size(); j++)
             {
@@ -4089,7 +4089,7 @@ _try_again:
                                 mtmp[2] = nullptr;
                                 m.movability = MOV_FLEXONLY;
                                 alignment_aa[l]->movability = MOV_FLEXONLY;
-                                Molecule::multimol_conform(mtmp);
+                                Molecule::conform_molecules(mtmp);
                                 m.movability = MOV_ALL;
                                 // m.intermol_conform_norecen(alignment_aa[l], iters, reaches_spheroid[nodeno]);
                                 // alignment_aa[l]->intermol_conform_norecen(&m, iters, reaches_spheroid[nodeno]);
@@ -4130,7 +4130,7 @@ _try_again:
                     mtmp[2] = alignment_aa[2];
                     mtmp[3] = nullptr;
                     m.movability = MOV_FLEXONLY;
-                    if (flex) Molecule::multimol_conform(mtmp);
+                    if (flex) Molecule::conform_molecules(mtmp);
                     m.movability = MOV_ALL;
                     #endif
 

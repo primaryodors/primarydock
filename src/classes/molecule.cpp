@@ -2679,6 +2679,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
             Pose pib;
             pib.copy_state(a);
 
+            /**** Linear Motion ****/
+            #if allow_linear_motion
             if (a->movability & MOV_CAN_RECEN)
             {
                 int xyz;
@@ -2736,11 +2738,39 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                     }
                 }
             }       // If can recenter.
+            #endif
 
             #if _dbg_fitness_plummet
             if (!i) cout << benerg << " ";
             #endif
 
+            /**** Histidine flip ****/
+            if (mm[i]->hisflips)
+            {
+                for (l=0; mm[i]->hisflips[l]; l++)
+                {
+                    #if _DBG_HISFLIP
+                    cout << "Flipping " << mm[i]->name << endl;
+                    #endif
+                    mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
+
+                    tryenerg = 0;
+                    for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+
+                    if (tryenerg > benerg)
+                    {
+                        benerg = tryenerg;
+                        pib.copy_state(a);
+                    }
+                    else
+                    {
+                        mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
+                    }
+                }
+            }
+            /**** End histidine flip ****/
+
+            #if allow_axial_tumble
             if (a->movability & MOV_CAN_AXIAL)
             {
                 pib.copy_state(a);
@@ -2769,11 +2799,13 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                     }
                 }
             }       // If can axial rotate.
+            #endif
 
             #if _dbg_fitness_plummet
             if (!i) cout << benerg << " ";
             #endif
 
+            #if allow_bond_rots
             if (a->movability & MOV_CAN_FLEX)
             {
                 pib.copy_state(a);
@@ -2803,6 +2835,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                     }
                 }
             }       // Can flex.
+            #endif
 
             #if _dbg_fitness_plummet
             if (!i) cout << benerg << endl;

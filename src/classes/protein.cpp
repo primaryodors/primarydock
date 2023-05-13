@@ -183,7 +183,7 @@ bool Protein::add_sequence(const char* lsequence)
         aas[i-1] = get_residue(i);
         aas[i] = 0;
     }
-    Molecule::multimol_conform(aas, 25);
+    Molecule::conform_molecules(aas, 25);
 
     set_clashables();
 
@@ -1742,7 +1742,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         aas[i-startres+1] = 0;
     }
     aas[endres-startres+1] = 0;
-    Molecule::multimol_conform(aas, 25);
+    Molecule::conform_molecules(aas, 25);
 }
 
 void Protein::delete_residue(int resno)
@@ -2127,8 +2127,6 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     ptmtl = average_of_points(pt4avg, l);
     #endif
     metal->move(ptmtl);
-
-    // Molecule::multimol_conform(lmols, lbkg, 50, &ext_mtl_coord_cnf_cb);
 
     // Set the coordinating residues' sidechains to immovable.
     for (i=0; m_mcoord[j]->coord_res[i]; i++)
@@ -2986,7 +2984,7 @@ void Protein::bridge(int resno1, int resno2)
     mols[1] = aa2;
     mols[2] = nullptr;
 
-    Molecule::multimol_conform(mols, 25);
+    Molecule::conform_molecules(mols, 25);
 
     Molecule** mols2;
 
@@ -2996,7 +2994,7 @@ void Protein::bridge(int resno1, int resno2)
     mols2 = (Molecule**)get_residues_can_clash(resno2);
     Molecule::multimol_conform(mols, mols2, 25);
 
-    Molecule::multimol_conform(mols, 25);
+    Molecule::conform_molecules(mols, 25);
 
     delete mols;
 

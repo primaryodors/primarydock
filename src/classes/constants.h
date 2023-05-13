@@ -160,7 +160,7 @@
 #define internode_momentum_only_on_activation 1
 
 // Switches for conformational space search.
-#define allow_axial_tumble 0
+#define allow_axial_tumble 1
 #define allow_bond_rots 1
 #define allow_linear_motion 1
 #define monte_carlo_axial 0
@@ -323,7 +323,7 @@
 #define _dbg_homology 0
 #define _dbg_bridges 0
 #define _dbg_fitness_plummet 0
-#define _dbg_anemia 1
+#define _dbg_anemia 0
 
 #endif
 

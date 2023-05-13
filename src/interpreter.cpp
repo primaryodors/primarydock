@@ -702,7 +702,7 @@ int main(int argc, char** argv)
                 mm[0] = a1.pmol;
                 mm[1] = a2.pmol;
 
-                Molecule::multimol_conform(mm, iters);
+                Molecule::conform_molecules(mm, iters);
 
             }	// BRIDGE
 

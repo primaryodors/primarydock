@@ -820,7 +820,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             int anx = a->get_idx_next_free_geometry();
             int bnx = b->get_idx_next_free_geometry();
 
-            SCoord avec[ag], bvec[ag];
+            ag = abs(ag);
+            bg = abs(bg);
+            SCoord avec[ag], bvec[bg];
 
             Ring *ar = nullptr, *br = nullptr;
 

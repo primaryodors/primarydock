@@ -1525,7 +1525,7 @@ void Molecule::identify_acidbase()
     }
 }
 
-Bond** Molecule::get_rotatable_bonds()
+Bond** Molecule::get_rotatable_bonds(bool ih)
 {
     if (noAtoms(atoms)) return 0;
     if (mol_typ == MOLTYP_AMINOACID)
@@ -1553,6 +1553,8 @@ Bond** Molecule::get_rotatable_bonds()
             for (j=0; j<g && lb[j]; j++)
             {
                 if (lb[j]->count_moves_with_btom() > mwblimit) continue;
+
+                if (!ih && lb[j]->count_heavy_moves_with_btom()) continue;
 
                 if (!lb[j]->atom || !lb[j]->btom) continue;
 
@@ -1711,7 +1713,7 @@ Bond** AminoAcid::get_rotatable_bonds()
             // cout << (name ? name : "(no name)") << "." << *(aadef->aabonds[i]) << endl;
             if (aadef->aabonds[i]->cardinality == 1
                     &&
-                    aadef->aabonds[i]->can_rotate
+                    (aadef->aabonds[i]->can_rotate || aadef->aabonds[i]->can_flip)
                )
             {
                 Atom* la = get_atom(aadef->aabonds[i]->aname);
@@ -2806,35 +2808,32 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
             #endif
 
             #if allow_bond_rots
-            if (a->movability & MOV_CAN_FLEX)
+            pib.copy_state(a);
+            Bond** bb = a->get_rotatable_bonds(a->movability & MOV_CAN_FLEX);
+            if (bb)
             {
-                pib.copy_state(a);
-                Bond** bb = a->get_rotatable_bonds();
-                if (bb)
+                int q;
+                for (q=0; bb[q]; q++)
                 {
-                    int q;
-                    for (q=0; bb[q]; q++)
+                    float theta;
+                    if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI);
+                    else theta = frand(-5, 5)*fiftyseventh;
+
+                    bb[q]->rotate(theta, false);
+                    tryenerg = 0;
+                    for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+
+                    if (tryenerg > benerg)
                     {
-                        float theta;
-                        if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI);
-                        else theta = frand(-5, 5)*fiftyseventh;
-
-                        bb[q]->rotate(theta, false);
-                        tryenerg = 0;
-                        for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
-
-                        if (tryenerg > benerg)
-                        {
-                            benerg = tryenerg;
-                            pib.copy_state(a);
-                        }
-                        else
-                        {
-                            pib.restore_state(a);
-                        }
+                        benerg = tryenerg;
+                        pib.copy_state(a);
+                    }
+                    else
+                    {
+                        pib.restore_state(a);
                     }
                 }
-            }       // Can flex.
+            }       // Rotatable bonds.
             #endif
 
             #if _dbg_fitness_plummet

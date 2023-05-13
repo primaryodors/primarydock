@@ -1236,6 +1236,7 @@ bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
     if (!moves_with_btom) fill_moves_with_cache();
     enforce_moves_with_uniqueness();
     if (!moves_with_btom) return false;
+
     if (!can_rotate)
     {
         if (can_flip) theta = flip_angle;

@@ -251,6 +251,7 @@ protected:
     void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
+    static float cfmol_multibind(Molecule* mol, Molecule** nearby_mols);
 };
 
 extern float potential_distance;

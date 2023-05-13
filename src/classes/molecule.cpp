@@ -2641,6 +2641,18 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     return lbind;
 }
 
+float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
+{
+    float tryenerg = 0;
+    int j;
+    for (j=0; nearby[j]; j++)
+    {
+        float f = a->intermol_bind_for_multimol_dock(nearby[j], false);
+        tryenerg += f;
+    }
+    return tryenerg;
+}
+
 void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 {
     if (!mm) return;
@@ -2674,7 +2686,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
             nearby[l] = 0;
 
             #if _dbg_fitness_plummet
-            if (!i) cout << benerg << " ";
+            if (!i) cout << "# " << a->name << " " << iter << ": " << benerg << " ";
             #endif
 
             float tryenerg;
@@ -2701,8 +2713,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 
                     a->move(motion);
 
-                    tryenerg = 0;
-                    for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+                    tryenerg = cfmol_multibind(a, nearby);
 
                     #if _dbg_fitness_plummet
                     if (!i) cout << "(" << tryenerg << ") ";
@@ -2725,8 +2736,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                         }
                         a->move(motion);
 
-                        tryenerg = 0;
-                        for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+                        tryenerg = cfmol_multibind(a, nearby);
 
                         if (tryenerg > benerg)
                         {
@@ -2756,8 +2766,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                     #endif
                     mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
 
-                    tryenerg = 0;
-                    for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+                    tryenerg = cfmol_multibind(a, nearby);
 
                     if (tryenerg > benerg)
                     {
@@ -2784,11 +2793,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                     float theta;
 
                     if (a->movability & MOV_MC_AXIAL && frand(0,1) < 0.2) theta = frand(-M_PI, M_PI);
-                    else theta = frand(-5, 5)*fiftyseventh;
+                    else theta = frand(-0.25, 0.25)*fiftyseventh*min(20, iter);
 
                     a->rotate(&axis, theta);
-                    tryenerg = 0;
-                    for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+                    tryenerg = cfmol_multibind(a, nearby);
 
                     if (tryenerg > benerg)
                     {
@@ -2817,11 +2825,11 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                 {
                     float theta;
                     if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI);
-                    else theta = frand(-5, 5)*fiftyseventh;
+                    else if (!bb[q]->count_heavy_moves_with_btom()) theta = frand(-M_PI, M_PI);
+                    else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
 
                     bb[q]->rotate(theta, false);
-                    tryenerg = 0;
-                    for (j=0; nearby[j]; j++) tryenerg += a->intermol_bind_for_multimol_dock(nearby[j], false);
+                    tryenerg = cfmol_multibind(a, nearby);
 
                     if (tryenerg > benerg)
                     {

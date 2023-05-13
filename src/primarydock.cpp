@@ -1187,6 +1187,10 @@ int interpret_config_line(char** words)
         optsecho += soft_names + (std::string)" ";
         return i-1;
     }
+    else if (!strcmp(words[0], "HARD"))
+    {
+        soft_pocket = false;
+    }
     else if (!strcmp(words[0], "SOFTBIAS"))
     {
         SoftBias lbias;
@@ -4768,7 +4772,9 @@ _try_again:
 
                                 dr[j][k].metric
                                 && dr[j][k].metric[l]
-                                && dr[j][k].metric[l][0];
+                                && dr[j][k].metric[l][0]
+                                && dr[j][k].mkJmol
+                                ;
 
                                 l++
                             )

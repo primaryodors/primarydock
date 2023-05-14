@@ -2979,6 +2979,9 @@ void Protein::bridge(int resno1, int resno2)
 
     aa1->movability = aa2->movability = MOV_FLEXONLY;
 
+    _INTERA_R_CUTOFF = aa1->get_CA_location().get_3d_distance(aa2->get_CA_location())
+        + aa1->get_reach() + aa2->get_reach() + _DEFAULT_INTERA_R_CUTOFF;
+
     Molecule** mols = new Molecule*[3];
     mols[0] = aa1;
     mols[1] = aa2;
@@ -3000,6 +3003,8 @@ void Protein::bridge(int resno1, int resno2)
 
     aa1->movability = MOV_FLXDESEL;
     aa2->movability = MOV_FLXDESEL;
+
+    _INTERA_R_CUTOFF = _DEFAULT_INTERA_R_CUTOFF;
 }
 
 SoftBias* Protein::get_soft_bias_from_region(const char* region)

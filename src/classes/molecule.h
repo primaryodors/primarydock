@@ -172,10 +172,6 @@ public:
     static void conform_molecules(Molecule** molecules, Molecule** background, int iterations = 50, void (*callback)(int) = nullptr);
     static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int) = nullptr);
 
-    static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);
-    static void multimol_conform(Molecule** interactors, Molecule** background, int iters = 50, void (*iter_callback)(int) = NULL);
-    static void multimol_conform(Molecule** interactors, Molecule** background, Molecule** allow_clashes, int iters = 50, void (*iter_callback)(int) = NULL);
-
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
 

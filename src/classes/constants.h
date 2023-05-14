@@ -220,7 +220,7 @@
 #define hydrophilicity_boost 5
 #define best_binding_stochastic 0.3
 
-// For differential docking, whether to multimol_conform() all the protein's residues into an
+// For differential docking, whether to conform_molecules() all the protein's residues into an
 // optimized initial conformation before adding the ligand.
 #define preconform_protein 0
 #define default_pre_ligand_multimol_radius 15

@@ -168,7 +168,9 @@ public:
 
     float bindability_by_type(intera_type type, bool include_backbone = false);
 
-    static void conform_molecules(Molecule** molecules, int iterations = 20, void (*callback)(int) = nullptr);
+    static void conform_molecules(Molecule** molecules, int iterations = 50, void (*callback)(int) = nullptr);
+    static void conform_molecules(Molecule** molecules, Molecule** background, int iterations = 50, void (*callback)(int) = nullptr);
+    static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int) = nullptr);
 
     static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);
     static void multimol_conform(Molecule** interactors, Molecule** background, int iters = 50, void (*iter_callback)(int) = NULL);

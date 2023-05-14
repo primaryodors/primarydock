@@ -329,7 +329,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                     cout << "Repacking " << residues[i]->get_name() << " with" << dbgresstr << "..." << endl;
                     #endif
 
-                    Molecule::multimol_conform(interactors, backdrop, 13);
+                    Molecule::conform_molecules(interactors, backdrop, 13);
                 }
 
                 for (l=0; interactors[l]; l++)
@@ -2053,7 +2053,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
     // Multimol conform the array.
     gmprot = this;
-    Molecule::multimol_conform(lmols, lbkg, 50); // &ext_mtl_coord_cnf_cb);
+    Molecule::conform_molecules(lmols, lbkg, 50); // &ext_mtl_coord_cnf_cb);
     // metal->move(ptmtl);
 
     // Flex the side chains to all be close to the metal.
@@ -2989,10 +2989,10 @@ void Protein::bridge(int resno1, int resno2)
     Molecule** mols2;
 
     mols2 = (Molecule**)get_residues_can_clash(resno1);
-    Molecule::multimol_conform(mols, mols2, 25);
+    Molecule::conform_molecules(mols, mols2, 25);
 
     mols2 = (Molecule**)get_residues_can_clash(resno2);
-    Molecule::multimol_conform(mols, mols2, 25);
+    Molecule::conform_molecules(mols, mols2, 25);
 
     Molecule::conform_molecules(mols, 25);
 

@@ -2653,6 +2653,55 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     return tryenerg;
 }
 
+void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int))
+{
+    int m, n;
+
+    if (!mm) m=0;
+    else for (m=0; mm[m]; m++);         // Get count.
+
+    if (!bkg) n=0;
+    else for (n=0; bkg[n]; n++);        // Get count.
+
+    Molecule* all[m+n+8];
+    int i, j, l=0;
+
+    for (i=0; i<m; i++)
+    {
+        bool duplicate = false;
+        for (j=0; j<l; j++)
+        {
+            if (all[j] == mm[i]) duplicate = true;
+        }
+        if (duplicate) continue;
+
+        all[l++] = mm[i];
+        mm[i]->movability = static_cast<MovabilityType>(static_cast<int>(mm[i]->movability & !MOV_BKGRND));
+    }
+
+    for (i=0; i<n; i++)
+    {
+        bool duplicate = false;
+        for (j=0; j<l; j++)
+        {
+            if (all[j] == bkg[i]) duplicate = true;
+        }
+        if (duplicate) continue;
+
+        all[l++] = bkg[i];
+        bkg[i]->movability = static_cast<MovabilityType>(static_cast<int>(bkg[i]->movability | MOV_BKGRND));
+    }
+
+    all[l] = nullptr;
+
+    conform_molecules(all, iters, cb);
+
+    for (i=0; i<n; i++)
+    {
+        bkg[i]->movability = static_cast<MovabilityType>(static_cast<int>(bkg[i]->movability & !MOV_BKGRND));
+    }
+}
+
 void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 {
     if (!mm) return;
@@ -2666,6 +2715,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
         for (i=0; i<n; i++)
         {
             Molecule* a = mm[i];
+
+            if (a->movability & MOV_BKGRND) continue;
+
             Point aloc = a->get_barycenter();
 
             float benerg = 0;

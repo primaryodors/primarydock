@@ -1367,7 +1367,7 @@ void prepare_initb()
         if (preconform && pre_ligand_iteration_ratio)
         {
             Molecule** delete_me;
-            Molecule::multimol_conform(
+            Molecule::conform_molecules(
                 prem /*reinterpret_cast<Molecule**>(preaa)*/,
                 delete_me = protein->all_residues_as_molecules(),
                 iters*pre_ligand_iteration_ratio
@@ -2234,10 +2234,10 @@ int main(int argc, char** argv)
         lig_grp[0] = ligand;
         lig_grp[1] = nullptr;
         ligand->movability = MOV_NORECEN;
-        Molecule::multimol_conform(lig_grp, prealign_res, prealign_iters, nullptr);
+        Molecule::conform_molecules(lig_grp, prealign_res, prealign_iters, nullptr);
 
         // Then line up residues to ligand.
-        if (flex) Molecule::multimol_conform(prealign_res, lig_grp, prealign_iters, nullptr);
+        if (flex) Molecule::conform_molecules(prealign_res, lig_grp, prealign_iters, nullptr);
         ligand->movability = MOV_ALL;
 
         delete[] words;
@@ -4198,7 +4198,7 @@ _try_again:
 
             ligand->reset_conformer_momenta();
 
-            Molecule** delete_me;
+            // Molecule** delete_me;
             int trsz = tripswitch_clashables.size();
             Molecule* trip[j = trsz+4];
 
@@ -4244,7 +4244,7 @@ _try_again:
             );*/
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
             Molecule::conform_molecules(cfmols, iters, &iteration_callback);
-            delete[] delete_me;
+            // delete[] delete_me;
 
             /*time_t jlgsux = time(NULL);
             cout << "\nIterations took: " << (jlgsux-preiter) << " seconds." << endl;*/

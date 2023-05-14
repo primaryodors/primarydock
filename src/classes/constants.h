@@ -270,7 +270,7 @@
 #define _teleport_dissatisfied_waters 1
 // Threshold is positive for binding, negative for clashes.
 #define _water_satisfaction_threshold 5
-#define _water_teleport_tries 25
+#define _water_teleport_tries 200
 
 #define polar_sat_influence_for_dock 30
 #define polar_sat_influence_for_bb 30
@@ -322,7 +322,7 @@
 #define _dbg_multiflex 0
 #define _dbg_homology 0
 #define _dbg_bridges 0
-#define _dbg_fitness_plummet 1
+#define _dbg_fitness_plummet 0
 #define _dbg_anemia 0
 
 #endif

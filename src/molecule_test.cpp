@@ -12,8 +12,7 @@ Molecule* mols[3];
 
 void iteration_callback(int iter)
 {
-    /*float f = -mols[0]->get_intermol_binding(mols[1]);
-    cout << f << endl;*/
+    #if _dbg_mol_frames
 
     char buffer[256];
     sprintf(buffer, "tmp/frame%d.sdf", iter);
@@ -24,6 +23,8 @@ void iteration_callback(int iter)
     ligands[1] = 0;
     mols[0]->save_sdf(pf, ligands);
     fclose(pf);
+
+    #endif
 }
 
 int main(int argc, char** argv)

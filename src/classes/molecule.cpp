@@ -2707,7 +2707,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
     if (!mm) return;
     int i, j, l, n, iter;
 
-    minimum_searching_aniso = 0.25;
+    minimum_searching_aniso = 0.5;
 
     for (iter=1; iter<=iters; iter++)
     {
@@ -2907,7 +2907,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
         if (cb) cb(iter);
         #endif
 
-        minimum_searching_aniso *= 0.97;
+        minimum_searching_aniso *= 0.99;
     }       // for iter
 
     minimum_searching_aniso = 0;

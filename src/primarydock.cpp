@@ -102,7 +102,7 @@ std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
-bool configset=false, protset=false, tplset=false, ligset=false, smset = false, pktset=false;
+bool configset=false, protset=false, tplset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
 Protein* protein;
 Protein* ptemplt;
@@ -1004,6 +1004,7 @@ int interpret_config_line(char** words)
         strcpy(ligfname, words[1]);
         // optsecho = "Ligand file is " + (std::string)ligfname;
         ligset = true;
+        if (ligcmd) smset = smcmd;
         return 1;
     }
     else if (!strcmp(words[0], "SMILES"))
@@ -1786,6 +1787,7 @@ int main(int argc, char** argv)
 
     strcpy(configfname, "primarydock.config");
 
+    smcmd = false;
     for (i=1; i<argc; i++)
     {
         if (argv[i][0] == '-' && argv[i][1] == '-')
@@ -1793,6 +1795,8 @@ int main(int argc, char** argv)
             argv[i] += 2;
             for (j=0; argv[i][j]; j++) if (argv[i][j] >= 'a' && argv[i][j] <= 'z') argv[i][j] &= 0x5f;
             j = interpret_config_line(&argv[i]);
+            if (ligset) ligcmd = true;
+            if (smset) smcmd = true;
             // if (optsecho.size()) cout << optsecho << endl;
             argv[i] -= 2;
             i += j;

@@ -418,7 +418,7 @@ void Molecule::hydrogenate(bool steric_only)
             if (C)
             {
                 atoms[i]->aromatize();
-                Atom* D;
+                Atom* D = nullptr;
                 Bond** bb = C->get_bonds();
                 if (bb) for (j=0; bb[j]; j++)
                 {
@@ -1833,8 +1833,8 @@ _found_aadef:
 
 float Molecule::hydrophilicity()
 {
-    int i, count;
-    float total;
+    int i, count = 0;
+    float total = 0;
     for (i=0; atoms[i]; i++)
     {
         int Z = atoms[i]->get_Z();
@@ -2707,6 +2707,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
     if (!mm) return;
     int i, j, l, n, iter;
 
+    minimum_searching_aniso = 0.25;
+
     for (iter=1; iter<=iters; iter++)
     {
         for (n=0; mm[n]; n++);      // Get count.
@@ -2904,7 +2906,11 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
         #if allow_iter_cb
         if (cb) cb(iter);
         #endif
+
+        minimum_searching_aniso *= 0.97;
     }       // for iter
+
+    minimum_searching_aniso = 0;
 }
 
 Atom* numbered[10];
@@ -3981,6 +3987,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
     b = atoms[i]->get_bonds();
     if (!b) return error;
     btom = b[0]->btom;
+    float card = b[0]->cardinality;
     delete[] b;
     if (!btom) return error;
 
@@ -3991,7 +3998,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 
     // Make an imaginary sphere around btom, whose radius equals the optimal bond distance.
     lv.origin = bloc;
-    lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, b[0]->cardinality);
+    lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, card);
     float thstep = fiftyseventh*5;
     float besttheta = 0, bestphi = 0, bestscore = -1e9;
     for (lv.theta = -square; lv.theta <= square; lv.theta += thstep)

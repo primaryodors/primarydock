@@ -79,7 +79,7 @@ int find_var_index(const char* varname, char** out_varname = nullptr)
     }
 
     char buffer[256];
-    char* c;
+    char* c = nullptr;
     int flags = 0;
     strcpy(buffer, varname);
 

@@ -2785,7 +2785,7 @@ void Protein::homology_conform(Protein* target)
 
         Point axis(0,0,0);
         Point rcen = get_region_center(rgstart1, rgend1);
-        float theta;
+        float theta = 0;
         count = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
         {

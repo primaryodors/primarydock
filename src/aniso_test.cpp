@@ -72,6 +72,7 @@ int main(int argc, char** argv)
     int asciilen = 10;
 
     Atom probe((argc > 3) ? argv[3] : "H");
+    if (probe.is_metal()) probe.increment_charge(probe.get_valence());
     int pz = probe.get_Z();
     Atom oxy(pz == 1 ? "O" : "C");
     probe.bond_to(&oxy, 1);
@@ -91,13 +92,16 @@ int main(int argc, char** argv)
     }
 
     InteratomicForce* hb=0;
+    float strongest = 0;
     for (x=0; ifs[x]; x++)
     {
         cout << ifs[x]->get_type() << endl;
-        if (ifs[x]->get_type() == hbond)
+        //if (ifs[x]->get_type() == hbond)
+        if (ifs[x]->get_kJmol() > strongest)
         {
             hb = ifs[x];
-            break;
+            strongest = ifs[x]->get_kJmol();
+            // break;
         }
     }
 
@@ -171,7 +175,8 @@ int main(int argc, char** argv)
                 oxy.clear_geometry_cache();
 
                 float tb = InteratomicForce::total_binding(anisoa, &probe);
-                tb /= hb->get_kJmol();	// This is not working.
+                tb /= hb->get_kJmol() * 1.5;
+                // cout << tb;
                 if (tb<0) tb=0;
 
                 if (!colors)
@@ -188,7 +193,7 @@ int main(int argc, char** argv)
                     clear_color();
                 }
 
-                if (!x && !y)
+                /*if (!x && !y)
                 {
                     int anisg = anisoa->get_geometry();
                     SCoord* anisgeo = anisoa->get_geometry_aligned_to_bonds();
@@ -209,7 +214,7 @@ int main(int argc, char** argv)
                     ligands[1] = NULL;
                     m.save_sdf(pf, ligands);
                     fclose(pf);
-                }
+                }*/
             }
         }
         cout << endl;

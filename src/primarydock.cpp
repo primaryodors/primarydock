@@ -65,9 +65,9 @@ struct AcvBndRot
     int resno;
     std::string aname;
     std::string bname;
-    Atom* atom;
-    Atom* btom;
-    Bond* bond;
+    Atom* atom = nullptr;
+    Atom* btom = nullptr;
+    Bond* bond = nullptr;
     float theta;
 };
 
@@ -1476,7 +1476,7 @@ void do_tumble_spheres(Point l_pocket_cen)
     }
 
     const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
-    float loneliness, blone=0, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
+    float loneliness=0, blone=0, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
     const int ac = ligand->get_atom_count();
     Pose besp(ligand);
     #if _DBG_TUMBLE_SPHERES

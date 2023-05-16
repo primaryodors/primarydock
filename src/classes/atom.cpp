@@ -1878,8 +1878,6 @@ float Atom::get_sum_pi_bonds()
     float retval=0;
     for (i=0; i<geometry; i++)
     {
-        // Aromatic ring fix breaks molecule test.
-        // if (bonded_to[i].btom && bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval += bonded_to[i].cardinality;
         if (bonded_to[i].btom && bonded_to[i].btom->Z > 1)
         {
             if (bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval += bonded_to[i].cardinality;

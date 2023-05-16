@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     // TODO: These values are set way too permissively.
     // The intermolecular code should be fine tuned to succeed
     // with threshold values of at worst 15, 3, and 2.5 * 2.
-    float energyLevelThreshold = 15;
+    float energyLevelThreshold = 10;
     float clash_limit = 8;
     float N_O_spacing = 4 * 2;
 
@@ -133,7 +133,7 @@ int main(int argc, char** argv)
     }
 
     Point pt1(0.2,-0.5,-0.3);
-    m1.recenter(pt1);
+    m1.move(pt1);
     Point loc = m1.get_barycenter();
     cout << "# Molecule moved to [" << loc.x << "," << loc.y << "," << loc.z << "]." << endl;
 
@@ -149,6 +149,12 @@ int main(int argc, char** argv)
     if (argc > 2)
     {
         m2.from_smiles(argv[2]);
+        pt1.x = pt1.y = pt1.z = 0.5;
+        while (m1.get_intermol_clashes(&m2) > 10)
+        {
+            m2.move(pt1);
+            cout << "# " << m2.get_barycenter() << endl;
+        }
 
         // if (argc > 3) energyLevelThreshold = atof(argv[3]);
     }

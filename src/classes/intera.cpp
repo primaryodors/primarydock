@@ -11,6 +11,7 @@
 using namespace std;
 
 float total_binding_by_type[_INTER_TYPES_LIMIT];
+float minimum_searching_aniso = 0;
 InteratomicForce* lif = nullptr;
 
 #if _peratom_audit
@@ -454,7 +455,6 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                 break;
 
             case hbond:
-                // if (sgn(a->is_polar()) == -sgn(b->is_polar()))
                 if (a->get_family() == PNICTOGEN && (a->is_backbone || a->is_amide())) break;
                 if (b->get_family() == PNICTOGEN && (b->is_backbone || b->is_amide())) break;
                 retval[j++] = look[i];
@@ -896,8 +896,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     if (forces[i]->type != pi && forces[i]->type != polarpi) if (theta > M_PI/2) continue;
                     float contrib = pow(fmax(0,cos(theta)), dpa);
                     if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
-                    // else cout << "Bad contrib! " << cos(theta) << " = cos(" << (theta*180.0/M_PI) << ") exp=" << dpa << endl;
-                    // if (fabs(contrib) > 10000) cout << "Bad contrib! " << cos(theta) << " = cos(" << (theta*180.0/M_PI) << ") exp=" << dpa << endl;
                 }
 
                 // Sum up the anisotropic contribution from each geometry vertex of b.
@@ -913,16 +911,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
                 }
 
-                if (asum > 1) asum = 1;
-                if (bsum > 1) bsum = 1;
-
-                // Removing these two lines fixes anisotropy but breaks the molecule test.
-                if (!asum) asum = 1;
-                if (!bsum) bsum = 1;
+                asum = fmin(1, fmax(0, fabs(asum)));
+                bsum = fmin(1, fmax(0, fabs(bsum)));
 
                 // Multiply the two sums.
-                aniso = asum * bsum;
-                // if (!aniso) aniso = 0.707;
+                aniso = fmax(minimum_searching_aniso, asum * bsum);
             }
 
             if (r1 >= 1)
@@ -939,27 +932,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
             else
             {
-                /*float confidence = 2.5;		// TODO: Get this from the PDB.
-                float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
-
-                float allowable = give + confidence / sqrt(3);
-
-                r += allowable;
-                if (r > forces[i]->distance) r = forces[i]->distance;
-                r1 = r / forces[i]->distance;*/
-
                 rdecayed = r1 * r1 * r1;
                 partial = aniso * forces[i]->kJ_mol * rdecayed;
-                // partial = aniso * forces[i]->kJ_mol;
-
-                // This isn't clashes.
-                /*if (a->residue == 105)
-                cout << "Clash! "
-                    << (a->residue ? std::to_string(a->residue).c_str() : "") << (a->residue ? ":":"") << a->name
-                    << "..."
-                    << (b->residue ? std::to_string(b->residue).c_str() : "") << (b->residue ? ":":"") << b->name
-                    << " r = " << r << " vs. optimal " << forces[i]->distance
-                    << endl;*/
             }
 
             // TODO: Replace this with a more generalized model of competitive h-bonding as well as ionic, mcoord, etc.

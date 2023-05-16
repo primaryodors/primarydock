@@ -1675,7 +1675,7 @@ void Molecule::crumple(float theta)
     int i;
     for (i=0; b[i]; i++)
     {
-        float ltheta = frand(-theta, theta); // theta*randsgn();
+        float ltheta = frand(-theta, theta);
         b[i]->rotate(ltheta);
         if (get_internal_clashes() > int_clsh*2) b[i]->rotate(-ltheta);
     }

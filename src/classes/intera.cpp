@@ -741,18 +741,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         if (!stacked_pi_rings)
         {
-            /*if (forces[i]->type == vdW
-                    ||
-                    forces[i]->type == pi
-                    ||
-                    forces[i]->type == polarpi
-            )
-            {
-                if (r1 > 2.5) continue;
-                if (forces[i]->type == vdW && r > 6) continue;
-            }
-            else if (r1 > 4) continue;*/
-
             if (forces[i]->type == pi && (a->shielding_angle >= _shield_angle_pi || b->shielding_angle >= _shield_angle_pi)) continue;
 
             dp = 2;

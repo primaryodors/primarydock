@@ -3596,10 +3596,6 @@ _try_again:
                                         if (too_similar) cout << "Residue belongs to an existing glom." << endl << endl;
                                         #endif
                                     }
-                                    // TODO: WTF was this for??????
-                                    /*float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
-                                    float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
-                                    if (rsg < 0.9 * rlg) too_similar = true;*/
                                 }
 
                                 if (!too_similar)
@@ -4095,8 +4091,7 @@ _try_again:
                                 alignment_aa[l]->movability = MOV_FLEXONLY;
                                 Molecule::conform_molecules(mtmp);
                                 m.movability = MOV_ALL;
-                                // m.intermol_conform_norecen(alignment_aa[l], iters, reaches_spheroid[nodeno]);
-                                // alignment_aa[l]->intermol_conform_norecen(&m, iters, reaches_spheroid[nodeno]);
+
                                 if (debug) *debug << "Alignment atom " << l << " is "
                                                       << alignment_aa[l]->get_name() << ":" << alca->name
                                                       << " Z " << alca->get_Z() << endl;
@@ -4245,9 +4240,6 @@ _try_again:
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
             Molecule::conform_molecules(cfmols, iters, &iteration_callback);
             // delete[] delete_me;
-
-            /*time_t jlgsux = time(NULL);
-            cout << "\nIterations took: " << (jlgsux-preiter) << " seconds." << endl;*/
 
             #if active_persistence
             for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
@@ -4660,7 +4652,6 @@ _try_again:
             }
 
             dr[drcount][nodeno].pdbdat = pdbdat.str();
-            // cout << "Attempt " << drcount << " node " << nodeno << " pdbdat is " << dr[drcount][nodeno].pdbdat.length() << " chars." << endl;
             if (debug) *debug << "Prepared the PDB strings." << endl;
 
             if (!nodeno)

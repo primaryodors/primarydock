@@ -1752,7 +1752,6 @@ function showPose(p)
     $("#clip").trigger("input");
     if (curr_ligand) $('#ligbtn, #prsv').show();
     
-    // if (cen_ligand) curr_ligand.autoView();
 	set_gmdl_opacity();
 }
 
@@ -1831,8 +1830,7 @@ function showNode(n)
 
     $("#clip").trigger("input");
     if (curr_ligand) $('#ligbtn, #prsv').show();
-    
-    // if (cen_ligand) curr_ligand.autoView();
+
 	set_gmdl_opacity();
 }
 
@@ -1858,7 +1856,6 @@ function rainbowNodes()
     {
         if (mpos[i] == gpose)
         {
-			// model[i].structure.rnbPos = (0.5 + mnod[i]) / (nmax + 1);
 			var mrp = mrparams[i];
 			if (mrp.colorScheme == PODefSchemeLigand) mrp.colorScheme = PODefSchemeRainbow;
 			model[i].removeAllRepresentations();
@@ -1867,14 +1864,11 @@ function rainbowNodes()
 			{
 				if (mnod[i] == 0) curr_ligand = model[i];
 			}
-			// cc.list.push(model[i]);
         }
         else
             model[i].removeAllRepresentations();
     }
 
-	// cc.setSelection("*");
-	// cc.autoView();
 	set_gmdl_opacity();
 }
 

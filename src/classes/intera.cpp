@@ -935,8 +935,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             // if (partial < 0) partial = 0;
 
             // Divide each ring by its number of atoms.
-            if (ar) partial /= ar->get_atom_count();
-            if (br) partial /= br->get_atom_count();
+            if (forces[i]->type == pi)
+            {
+                if (ar) partial /= ar->get_atom_count();
+                else partial /= 6;
+
+                if (br) partial /= br->get_atom_count();
+                else partial /= 6;
+            }
 
             /*if (fabs(partial) >= 10000)
             // if (isnan(partial) || isinf(partial))

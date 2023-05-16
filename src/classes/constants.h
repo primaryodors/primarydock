@@ -109,7 +109,7 @@
 
 #define lmpush 0.0005
 
-#define _enhanced_pi_stacking 1
+#define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
 #define enforce_no_bb_pullaway 1

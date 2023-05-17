@@ -1530,7 +1530,7 @@ void Molecule::identify_acidbase()
 Bond** Molecule::get_rotatable_bonds(bool ih)
 {
     if (noAtoms(atoms)) return 0;
-    if (mol_typ == MOLTYP_AMINOACID)
+    if (ih && mol_typ == MOLTYP_AMINOACID)
     {
         // TODO: There has to be a better way.
         Star s;
@@ -1541,7 +1541,8 @@ Bond** Molecule::get_rotatable_bonds(bool ih)
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
-    if (rotatable_bonds) return rotatable_bonds;
+    if (ih && rotatable_bonds) return rotatable_bonds;
+    if (!ih && rotatable_bonds_nh) return rotatable_bonds_nh;
 
     Bond* btemp[65536];
     int mwblimit = atcount/2;						// Prevent rotations that move most of the molecule.
@@ -1659,12 +1660,22 @@ Bond** Molecule::get_rotatable_bonds(bool ih)
             if (lb) delete[] lb;
         }
 
-    // cout << (name ? name : "") << " has " << bonds << " rotatable bond(s)." << endl;
-    rotatable_bonds = new Bond*[bonds+1];
-    for (i=0; i<=bonds; i++) rotatable_bonds[i] = btemp[i];
-    rotatable_bonds[bonds] = 0;
+    if (ih)
+    {
+        rotatable_bonds = new Bond*[bonds+1];
+        for (i=0; i<=bonds; i++) rotatable_bonds[i] = btemp[i];
+        rotatable_bonds[bonds] = 0;
 
-    return rotatable_bonds;
+        return rotatable_bonds;
+    }
+    else
+    {
+        rotatable_bonds_nh = new Bond*[bonds+1];
+        for (i=0; i<=bonds; i++) rotatable_bonds_nh[i] = btemp[i];
+        rotatable_bonds_nh[bonds] = 0;
+
+        return rotatable_bonds_nh;
+    }
 }
 
 void Molecule::crumple(float theta)

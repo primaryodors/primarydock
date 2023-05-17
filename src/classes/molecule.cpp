@@ -252,6 +252,8 @@ void Molecule::add_existing_atom(Atom* a)
         a->residue = atoms[0]->residue;
         a->aaletter = atoms[0]->aaletter;
     }
+
+    clear_all_bond_caches();
 }
 
 Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard)

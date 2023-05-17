@@ -1029,15 +1029,12 @@ int interpret_config_line(char** words)
         for (; words[i]; i++)
         {
             if (words[i][0] == '-' && words[i][1] == '-') break;
-            // mcoord_resno[j++] = atoi(words[i]);
-            // optsecho += to_string(atoi(words[i])) + (std::string)" ";
             ResiduePlaceholder rp;
             rp.set(words[i]);
             mcr.coordres.push_back(rp);
         }
-        // mcoord_resno[j] = 0;
-        mtlcoords.push_back(mcr);
 
+        mtlcoords.push_back(mcr);
         return i-1;
     }
     else if (!strcmp(words[0], "MOVIE"))

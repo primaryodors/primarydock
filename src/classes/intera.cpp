@@ -550,7 +550,7 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
     if ((fabs(a->is_polar()) < 0.333 && (fabs(b->is_polar()) >= 0.333 || fabs(b->get_charge())))
         ||
         (fabs(b->is_polar()) < 0.333 && (fabs(a->is_polar()) >= 0.333 || fabs(a->get_charge())))
-        )
+       )
     {
         potential -= ((fabs(a->is_polar()) < 0.333 && a->is_pi()) || (fabs(b->is_polar()) < 0.333 && b->is_pi())) ? 66 : 99;
     }
@@ -932,8 +932,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 partial *= metal_compatibility(a, b);
             }
 
-            // if (partial < 0) partial = 0;
-
             // Divide each ring by its number of atoms.
             if (forces[i]->type == pi)
             {
@@ -943,13 +941,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 if (br) partial /= br->get_atom_count();
                 else partial /= 6;
             }
-
-            /*if (fabs(partial) >= 10000)
-            // if (isnan(partial) || isinf(partial))
-            {	cout << "Invalid partial! " << a->name << ":" << b->name << " r=" << r
-                    << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
-                    << " aniso=" << aniso << " (" << asum << "*" << bsum << ")" << endl;
-            }*/
 
             if (fabs(partial) > fabs(forces[i]->kJ_mol*2) || partial >= 500)
             {

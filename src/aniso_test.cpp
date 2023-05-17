@@ -96,12 +96,10 @@ int main(int argc, char** argv)
     for (x=0; ifs[x]; x++)
     {
         cout << ifs[x]->get_type() << endl;
-        //if (ifs[x]->get_type() == hbond)
         if (ifs[x]->get_kJmol() > strongest)
         {
             hb = ifs[x];
             strongest = ifs[x]->get_kJmol();
-            // break;
         }
     }
 
@@ -176,7 +174,6 @@ int main(int argc, char** argv)
 
                 float tb = InteratomicForce::total_binding(anisoa, &probe);
                 tb /= hb->get_kJmol() * 1.5;
-                // cout << tb;
                 if (tb<0) tb=0;
 
                 if (!colors)

@@ -94,7 +94,7 @@ test/backbone_test: src/backbone_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR
 $(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/glom.o
 	$(CC) src/primarydock.cpp $(OBJS) -o $(BINDIR)/primarydock $(CFLAGS)
 
-$(BINDIR)/pepteditor: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o
+$(BINDIR)/pepteditor: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/glom.o
 	$(CC) src/interpreter.cpp $(OBJS) -o $(BINDIR)/pepteditor $(CFLAGS)
 
 performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.upright.pdb testdata/CAD_ion.sdf

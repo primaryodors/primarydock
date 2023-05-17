@@ -7,8 +7,10 @@
 # sudo apt-get install sox libsox-fmt-all
 #
 
-# The amino aldehyde test is part of make code. Otherwise the test would be: test/molecule_test "NCCCC=O" "NCCCC=O" 10
+# The amino aldehyde test was part of make code. Otherwise the test would be: test/molecule_test "NCCCC=O" "NCCCC=O" 10
 # Optionally: use the viewer to ensure that the two aldehyde groups are coordinated to the two amino groups.
+
+# In lieu of amino aldehydes, we are doing a simpler test these days.
 clear; make code
 
 # TAAR8 test: Check the per-residue output and ensure that ASP111 and ASP201 both have strong binding values between -40 and -75.

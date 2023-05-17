@@ -183,7 +183,7 @@ bool Protein::add_sequence(const char* lsequence)
         aas[i-1] = get_residue(i);
         aas[i] = 0;
     }
-    Molecule::multimol_conform(aas, 25);
+    Molecule::conform_molecules(aas, 25);
 
     set_clashables();
 
@@ -329,7 +329,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                     cout << "Repacking " << residues[i]->get_name() << " with" << dbgresstr << "..." << endl;
                     #endif
 
-                    Molecule::multimol_conform(interactors, backdrop, 13);
+                    Molecule::conform_molecules(interactors, backdrop, 13);
                 }
 
                 for (l=0; interactors[l]; l++)
@@ -858,7 +858,7 @@ void Protein::set_clashables(int resno, bool recursed)
         {
             delete[] res_can_clash;
         }
-        res_can_clash = new AminoAcid**[maxres+1];
+        res_can_clash = new AminoAcid**[maxres+8];
         for (i=0; i<=maxres; i++) res_can_clash[i] = nullptr;
     }
 
@@ -885,7 +885,7 @@ void Protein::set_clashables(int resno, bool recursed)
         }
 
         if (res_can_clash[0] && res_can_clash[i]) delete res_can_clash[i];
-        res_can_clash[i] = new AminoAcid*[k+1];
+        res_can_clash[i] = new AminoAcid*[k+8];
         for (j=0; j<k; j++)
         {
             res_can_clash[i][j] = temp[j];
@@ -1742,7 +1742,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         aas[i-startres+1] = 0;
     }
     aas[endres-startres+1] = 0;
-    Molecule::multimol_conform(aas, 25);
+    Molecule::conform_molecules(aas, 25);
 }
 
 void Protein::delete_residue(int resno)
@@ -1882,11 +1882,14 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
             throw 0xbad12e5d;
         }
         m_mcoord[j]->coord_res[i]->m_mcoord = m_mcoord[j];
-        m_mcoord[j]->coord_atoms[i] = m_mcoord[j]->coord_res[i]->get_atom(res_anames[i].c_str());
-        if (!m_mcoord[j]->coord_atoms[i])
+        if (i < res_anames.size())
         {
-            cout << "Attempt to bind metal to " << resnos[i] << ":" << res_anames[i] << " not found in protein!" << endl;
-            throw 0xbada70b;
+            m_mcoord[j]->coord_atoms[i] = m_mcoord[j]->coord_res[i]->get_atom(res_anames[i].c_str());
+            if (!m_mcoord[j]->coord_atoms[i])
+            {
+                cout << "Attempt to bind metal to " << resnos[i] << ":" << res_anames[i] << " not found in protein!" << endl;
+                throw 0xbada70b;
+            }
         }
     }
     m_mcoord[j]->coord_res[residues] = NULL;
@@ -2050,7 +2053,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
     // Multimol conform the array.
     gmprot = this;
-    Molecule::multimol_conform(lmols, lbkg, 50); // &ext_mtl_coord_cnf_cb);
+    Molecule::conform_molecules(lmols, lbkg, 50); // &ext_mtl_coord_cnf_cb);
     // metal->move(ptmtl);
 
     // Flex the side chains to all be close to the metal.
@@ -2124,8 +2127,6 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     ptmtl = average_of_points(pt4avg, l);
     #endif
     metal->move(ptmtl);
-
-    // Molecule::multimol_conform(lmols, lbkg, 50, &ext_mtl_coord_cnf_cb);
 
     // Set the coordinating residues' sidechains to immovable.
     for (i=0; m_mcoord[j]->coord_res[i]; i++)
@@ -2784,7 +2785,7 @@ void Protein::homology_conform(Protein* target)
 
         Point axis(0,0,0);
         Point rcen = get_region_center(rgstart1, rgend1);
-        float theta;
+        float theta = 0;
         count = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
         {
@@ -2978,25 +2979,32 @@ void Protein::bridge(int resno1, int resno2)
 
     aa1->movability = aa2->movability = MOV_FLEXONLY;
 
+    _INTERA_R_CUTOFF = aa1->get_CA_location().get_3d_distance(aa2->get_CA_location())
+        + aa1->get_reach() + aa2->get_reach() + _DEFAULT_INTERA_R_CUTOFF;
+
     Molecule** mols = new Molecule*[3];
     mols[0] = aa1;
     mols[1] = aa2;
     mols[2] = nullptr;
 
-    Molecule::multimol_conform(mols, 25);
+    Molecule::conform_molecules(mols, 25);
 
     Molecule** mols2;
 
     mols2 = (Molecule**)get_residues_can_clash(resno1);
-    Molecule::multimol_conform(mols, mols2, 25);
+    Molecule::conform_molecules(mols, mols2, 25);
 
     mols2 = (Molecule**)get_residues_can_clash(resno2);
-    Molecule::multimol_conform(mols, mols2, 25);
+    Molecule::conform_molecules(mols, mols2, 25);
+
+    Molecule::conform_molecules(mols, 25);
 
     delete mols;
 
     aa1->movability = MOV_FLXDESEL;
     aa2->movability = MOV_FLXDESEL;
+
+    _INTERA_R_CUTOFF = _DEFAULT_INTERA_R_CUTOFF;
 }
 
 SoftBias* Protein::get_soft_bias_from_region(const char* region)

@@ -34,6 +34,8 @@ public:
 
     static bool atom_is_capable_of(Atom* a, intera_type t);
     static InteratomicForce** get_applicable(Atom* a, Atom* b);
+    static float metal_compatibility(Atom* a, Atom* b);
+    static float potential_binding(Atom* a, Atom* b);
     static float total_binding(Atom* a, Atom* b);
     static float distance_anomaly(Atom* a, Atom* b);
     static float covalent_bond_radius(Atom* a, Atom* b, float cardinality);
@@ -68,6 +70,7 @@ static bool reading_forces = false;
 std::ostream& operator<<(std::ostream& os, const intera_type& it);
 std::ostream& operator<<(std::ostream& os, const InteratomicForce& f);
 extern float total_binding_by_type[_INTER_TYPES_LIMIT];
+extern float minimum_searching_aniso;                       // Should be a small positive number for searching, and zero for scoring.
 
 #if active_persistence
 extern int active_persistence_resno[active_persistence_limit];

@@ -194,8 +194,8 @@ Cl      Zn     coord    0.5   2.04
 
 # https://onlinelibrary.wiley.com/doi/pdf/10.1002/9783527616091.app1
 # More predicted energies.
-S       Cu     coord    0.5   2.29       17.3
-S       Zn     coord    0.5   2.43       24.0
+S       Cu     coord    0.5   2.29       17.3           1.5
+S       Zn     coord    0.5   2.43       24.0           2.5
 
 # To be expanded later.
 # Keep these last or the code will erroneously add them to the other bindings.

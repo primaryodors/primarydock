@@ -22,13 +22,22 @@ struct histidine_flip
 
 enum MovabilityType
 {
-    MOV_ALL			= 0x1000,
-    MOV_NORECEN		=  0x200,
-    MOV_FORCEFLEX   =   0xc0,
-    MOV_FLEXONLY	=   0x80,
-    MOV_PINNED      =   0x7f,
-    MOV_FLXDESEL    =    0x8,
-    MOV_NONE		=    0x0
+    MOV_CAN_RECEN   =   0x8000,           // Molecule can move through space.
+    MOV_CAN_AXIAL   =    0x800,           // Whole molecule can rotate in space.
+    MOV_MC_AXIAL    =    0x400,           // Monte Carlo whole molecule rotations allowed.
+    MOV_MUST_FLEX   =     0x80,           // Molecule's rotatable bonds are guaranteed free to rotate.
+    MOV_MC_FLEX     =     0x40,           // Monte Carlo flexion is allowed.
+    MOV_CAN_FLEX    =     0x20,           // Molecule's rotatable bonds may rotate if selected for flexion.
+    MOV_ALL			=   0xfff0,
+    MOV_NORECEN		=   0x0ff0,
+    MOV_NOAXIAL     =   0xf0f0,
+    MOV_FORCEFLEX   =     0xf0,
+    MOV_FLEXONLY	=     0x70,
+    MOV_PINNED      =     0x04,
+    MOV_FLXDESEL    =     0x02,
+    MOV_NONE		=     0x00,
+    MOV_BKGRND      = 0x020000,
+    MOV_CAN_CLASH   = 0x100000
 };
 
 enum MoleculeType
@@ -107,12 +116,14 @@ public:
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
     Atom* add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard);
+    void add_existing_atom(Atom* to_add);
     char** get_atom_names() const;
     Atom* get_atom(const char* aname) const;
     Atom* get_atom(const int a_idx) const
     {
         return atoms[a_idx];
     }
+    int count_atoms_by_element(const char* esym);
     Point get_atom_location(const char* aname);
     int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);
@@ -123,7 +134,7 @@ public:
     int has_hbond_acceptors();                    // N+ is not an h-bond acceptor.
 
     // Bond functions.
-    Bond** get_rotatable_bonds();
+    Bond** get_rotatable_bonds(bool include_heavy = true);
     Bond** get_all_bonds(bool unidirectional);
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
     bool rotate_bond(const Bond* rot8b, const float angle);
@@ -157,9 +168,9 @@ public:
 
     float bindability_by_type(intera_type type, bool include_backbone = false);
 
-    static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);
-    static void multimol_conform(Molecule** interactors, Molecule** background, int iters = 50, void (*iter_callback)(int) = NULL);
-    static void multimol_conform(Molecule** interactors, Molecule** background, Molecule** allow_clashes, int iters = 50, void (*iter_callback)(int) = NULL);
+    static void conform_molecules(Molecule** molecules, int iterations = 50, void (*callback)(int) = nullptr);
+    static void conform_molecules(Molecule** molecules, Molecule** background, int iterations = 50, void (*callback)(int) = nullptr);
+    static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int) = nullptr);
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
@@ -238,6 +249,7 @@ protected:
     void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
+    static float cfmol_multibind(Molecule* mol, Molecule** nearby_mols);
 };
 
 extern float potential_distance;

@@ -182,7 +182,7 @@ void Molecule::delete_atom(Atom* a)
                 for (j=i+1; atoms[j]; j++) atoms[j-1] = atoms[j];
                 atoms[j-1] = nullptr;
                 rotatable_bonds = nullptr;
-                atcount--;
+                for (atcount=0; atoms[atcount]; atcount++);     // Get count.
                 return;
             }
         }
@@ -235,6 +235,25 @@ void Molecule::reallocate()
         atoms = latoms;
     }
     rotatable_bonds = nullptr;
+}
+
+void Molecule::add_existing_atom(Atom* a)
+{
+    if (!atoms) atcount = 0;
+    else for (atcount=0; atoms[atcount]; atcount++);     // Get count.
+
+    reallocate();
+    atoms[atcount++] = a;
+    atoms[atcount] = nullptr;
+
+    if (atcount > 1)
+    {
+        strcpy(a->aa3let, atoms[0]->aa3let);
+        a->residue = atoms[0]->residue;
+        a->aaletter = atoms[0]->aaletter;
+    }
+
+    clear_all_bond_caches();
 }
 
 Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard)
@@ -344,6 +363,19 @@ int Molecule::get_hydrogen_count()
     return retval;
 }
 
+int Molecule::count_atoms_by_element(const char* esym)
+{
+    if (noAtoms(atoms)) return 0;
+    int findZ = Atom::Z_from_esym(esym);
+    int i, retval=0;
+
+    for (i=0; atoms[i]; i++)
+        if (atoms[i]->get_Z() == findZ)
+            retval++;
+    
+    return retval;
+}
+
 void Molecule::hydrogenate(bool steric_only)
 {
     if (noAtoms(atoms)) return;
@@ -388,7 +420,7 @@ void Molecule::hydrogenate(bool steric_only)
             if (C)
             {
                 atoms[i]->aromatize();
-                Atom* D;
+                Atom* D = nullptr;
                 Bond** bb = C->get_bonds();
                 if (bb) for (j=0; bb[j]; j++)
                 {
@@ -1495,7 +1527,7 @@ void Molecule::identify_acidbase()
     }
 }
 
-Bond** Molecule::get_rotatable_bonds()
+Bond** Molecule::get_rotatable_bonds(bool ih)
 {
     if (noAtoms(atoms)) return 0;
     if (mol_typ == MOLTYP_AMINOACID)
@@ -1523,6 +1555,8 @@ Bond** Molecule::get_rotatable_bonds()
             for (j=0; j<g && lb[j]; j++)
             {
                 if (lb[j]->count_moves_with_btom() > mwblimit) continue;
+
+                if (!ih && lb[j]->count_heavy_moves_with_btom()) continue;
 
                 if (!lb[j]->atom || !lb[j]->btom) continue;
 
@@ -1643,7 +1677,7 @@ void Molecule::crumple(float theta)
     int i;
     for (i=0; b[i]; i++)
     {
-        float ltheta = theta*randsgn();
+        float ltheta = frand(-theta, theta);
         b[i]->rotate(ltheta);
         if (get_internal_clashes() > int_clsh*2) b[i]->rotate(-ltheta);
     }
@@ -1681,7 +1715,7 @@ Bond** AminoAcid::get_rotatable_bonds()
             // cout << (name ? name : "(no name)") << "." << *(aadef->aabonds[i]) << endl;
             if (aadef->aabonds[i]->cardinality == 1
                     &&
-                    aadef->aabonds[i]->can_rotate
+                    (aadef->aabonds[i]->can_rotate || aadef->aabonds[i]->can_flip)
                )
             {
                 Atom* la = get_atom(aadef->aabonds[i]->aname);
@@ -1801,8 +1835,8 @@ _found_aadef:
 
 float Molecule::hydrophilicity()
 {
-    int i, count;
-    float total;
+    int i, count = 0;
+    float total = 0;
     for (i=0; atoms[i]; i++)
     {
         int Z = atoms[i]->get_Z();
@@ -2171,16 +2205,25 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
         if (!ifs) continue;
         for (j=0; ifs[j]; j++)
         {
+            float partial;
             if (ifs[j]->get_type() == ionic)
             {
                 if (sgn(a->get_charge()) != -sgn(atoms[i]->get_charge())) continue;
-                retval += 60;
+                partial = 60;
             }
             else
-                retval += ifs[j]->get_kJmol();
-            /*cout << a->name << " can " << ifs[j]->get_type() << " strength " << ifs[j]->get_kJmol()
-            	 << " with " << (atoms[i]->aa3let ? atoms[i]->aa3let : "") << atoms[i]->residue << ":"
-            	 << atoms[i]->name << endl;*/
+            {
+                partial = ifs[j]->get_kJmol();
+            }
+
+            if (ifs[j]->get_type() == polarpi) partial /= 6;            // Config is for benzene rings.
+
+            if (ifs[j]->get_type() == mcoord)
+            {
+                partial *= (1.0 + 1.0 * cos((a->get_electronegativity() + atoms[i]->get_electronegativity()) / 2 - 2.25));
+            }
+
+            retval += partial;
 
             potential_distance += ifs[j]->get_distance();
         }
@@ -2288,21 +2331,21 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                     break;
                 }
                 if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone
-                        &&
-                        (	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
-                                &&
-                                !strcmp(atoms[i]->name, "C")
-                                &&
-                                !strcmp(ligands[l]->atoms[j]->name, "N")
-                          )
-                            ||
-                            (	atoms[i]->residue == ligands[l]->atoms[j]->residue + 1
-                                &&
-                                !strcmp(atoms[i]->name, "N")
-                                &&
-                                !strcmp(ligands[l]->atoms[j]->name, "C")
-                            )
-                        )) continue;			// kludge to prevent adjacent residue false clashes.
+                    &&
+                    (	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
+                            &&
+                            !strcmp(atoms[i]->name, "C")
+                            &&
+                            !strcmp(ligands[l]->atoms[j]->name, "N")
+                        )
+                        ||
+                        (	atoms[i]->residue == ligands[l]->atoms[j]->residue + 1
+                            &&
+                            !strcmp(atoms[i]->name, "N")
+                            &&
+                            !strcmp(ligands[l]->atoms[j]->name, "C")
+                        )
+                    )) continue;			// kludge to prevent adjacent residue false clashes.
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
                 {
@@ -2600,260 +2643,173 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
     return lbind;
 }
 
-#define DBG_BONDFLEX 0
-#define DBG_FLEXRES 111
-#define DBG_FLEXROTB 0
-
-void Molecule::multimol_conform(Molecule** mm, int iters, void (*cb)(int))
+float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
 {
-    multimol_conform(mm, nullptr, nullptr, iters, cb);
+    float tryenerg = 0;
+    int j;
+    for (j=0; nearby[j]; j++)
+    {
+        float f = a->intermol_bind_for_multimol_dock(nearby[j], false);
+        tryenerg += f;
+    }
+    return tryenerg;
 }
 
-void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int))
+void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int))
 {
-    multimol_conform(mm, bkg, nullptr, iters, cb);
+    int m, n;
+
+    if (!mm) m=0;
+    else for (m=0; mm[m]; m++);         // Get count.
+
+    if (!bkg) n=0;
+    else for (n=0; bkg[n]; n++);        // Get count.
+
+    Molecule* all[m+n+8];
+    int i, j, l=0;
+
+    for (i=0; i<m; i++)
+    {
+        bool duplicate = false;
+        for (j=0; j<l; j++)
+        {
+            if (all[j] == mm[i]) duplicate = true;
+        }
+        if (duplicate) continue;
+
+        all[l++] = mm[i];
+        mm[i]->movability = static_cast<MovabilityType>(static_cast<int>(mm[i]->movability & !MOV_BKGRND));
+    }
+
+    for (i=0; i<n; i++)
+    {
+        bool duplicate = false;
+        for (j=0; j<l; j++)
+        {
+            if (all[j] == bkg[i]) duplicate = true;
+        }
+        if (duplicate) continue;
+
+        all[l++] = bkg[i];
+        bkg[i]->movability = static_cast<MovabilityType>(static_cast<int>(bkg[i]->movability | MOV_BKGRND));
+    }
+
+    all[l] = nullptr;
+
+    conform_molecules(all, iters, cb);
+
+    for (i=0; i<n; i++)
+    {
+        bkg[i]->movability = static_cast<MovabilityType>(static_cast<int>(bkg[i]->movability & !MOV_BKGRND));
+    }
 }
 
-void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, int iters, void (*cb)(int))
+void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 {
     if (!mm) return;
-    if (!iters) return;
+    int i, j, l, n, iter;
 
-    int i, j, k, l, n, inplen, bklen, alllen, aclen, iter;
-    float rad, bestfrrad, bestfrb;
+    minimum_searching_aniso = 0.5;
 
-    for (i=0; mm[i]; i++)
+    for (iter=1; iter<=iters; iter++)
     {
-        mm[i]->reset_conformer_momenta();
-    }
-    inplen = i;
+        for (n=0; mm[n]; n++);      // Get count.
+        Molecule* nearby[n+8];
 
-    if (!bkg) bklen = 0;
-    else
-    {
-        for (i=0; bkg[i]; i++);		// Get count.
-        bklen = i;
-    }
-
-    if (!ac) aclen = 0;
-    else
-    {
-        for (i=0; ac[i]; i++);		// Get count.
-        aclen = i;
-    }
-
-    alllen = inplen + bklen;
-    Molecule* all[alllen + 4];
-
-    for (i=0; i < alllen + 4; i++) all[i] = nullptr;
-
-    for (i=0; i<inplen; i++) all[i] = mm[i];
-    n = i;
-    for (i=0; i<bklen; i++)
-    {
-        for (j=0; j<inplen; j++) if (mm[j] == bkg[i]) goto _already_mm;
-
-        all[n++] = bkg[i];
-
-        _already_mm:
-        ;
-    }
-    alllen = n;
-
-    float improvement;
-    float search_expansion = 3.0/iters;
-    for (iter=0; iter<iters; iter++)
-    {
-        float bind = 0, bind1, maxb, fmaxb = 0;
-        improvement=0;
-        last_iter = (iter == (iters-1));
-        float search_radius = search_expansion*iter + 4;
-        for (i = 0; mm[i]; i++)
+        for (i=0; i<n; i++)
         {
-            bool nearby[alllen+4];
-            Point icen = mm[i]->get_barycenter();
+            Molecule* a = mm[i];
 
-            bool is_ac_i = false;
-            for (l=0; l<aclen; l++)
-                if (ac[l] == all[i])
-                {
-                    is_ac_i = true;
-                    break;
-                }
+            if (a->movability & MOV_BKGRND) continue;
 
-            maxb = 0;
-            for (j=0; all[j]; j++)
+            Point aloc = a->get_barycenter();
+
+            float benerg = 0;
+            l = 0;
+            for (j=0; j<n; j++)
             {
-                bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
+                if (j==i) continue;
+                Molecule* b = mm[j];
+                Point bloc = b->get_barycenter();
 
-                Point jcen = all[j]->get_barycenter();
-                Atom* ia = mm[i]->get_nearest_atom(jcen);
-                Atom* ja = all[j]->get_nearest_atom(icen);
+                float r = a->get_nearest_atom(bloc)->distance_to(b->get_nearest_atom(aloc));
+                if (r > _INTERA_R_CUTOFF) continue;
+                nearby[l++] = b;
 
-                if (inplen <= 5 || ia->distance_to(ja) <= search_radius)
-                {
-                    nearby[j] = true;
-                }
-                else
-                {
-                    nearby[j] = false;
-                    continue;
-                }
-
-                if (nearby[j])
-                {
-                    float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-
-                    // get_intermol_binding includes clashes by default, so we don't have to calculate them separately.
-                    /*float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
-                    if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;*/
-                    float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                    bind += lbind;
-                    bind -= mm[i]->lastshielded * shielding_avoidance_factor;
-                    bind += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                    if (lbind > maxb) maxb = lbind;
-                }
+                float f = a->intermol_bind_for_multimol_dock(b, false);
+                benerg += f;
             }
-            mm[i]->lastbind = bind;
-            fmaxb = maxb;
-            if (mm[i]->movability == MOV_PINNED
-                &&
-                mm[i]->get_intermol_clashes(all) >= 1
-               )
-                mm[i]->movability = MOV_FLEXONLY;               // TODO: Prevent this if molecule is a metal bound residue.
+            nearby[l] = 0;
 
-            float reversal = -0.999;
-            float lreversal = -pow(0.1, 2.0/iters);
-            float accel = 1.01;
+            #if _dbg_fitness_plummet
+            if (!i) cout << "# " << a->name << " " << iter << ": " << benerg << " ";
+            #endif
+
+            float tryenerg;
+            Pose pib;
+            pib.copy_state(a);
 
             /**** Linear Motion ****/
             #if allow_linear_motion
-            if (mm[i]->movability >= MOV_ALL && iter >= 10)
+            if (a->movability & MOV_CAN_RECEN)
             {
-                #if debug_break_on_move
-                mm[i]->set_atoms_break_on_move(false);
-                #endif
+                int xyz;
+                for (xyz=0; xyz<3; xyz++)
+                {
+                    Point motion(0, 0, 0);
 
-                Point pt(mm[i]->lmx*frand(0.001, 1), 0, 0);
-                mm[i]->move(pt);
-                bind1 = 0;
-                maxb = 0;
-                for (j=0; all[j]; j++)
-                {
-                    if (!nearby[j]) continue;
-                    bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                    /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
-                    if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;*/
-                    float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                    bind1 += lbind;
-                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                    if (lbind > maxb) maxb = lbind;
-                }
-                if (bind1 < bind || maxb < _slt1 * fmaxb)
-                {
-                    // cout << bind << " vs " << bind1 << " x" << endl;
-                    pt.x = -pt.x;
-                    //mm[i]->move(pt);
-                    mm[i]->lmx *= lreversal;
-                }
-                else
-                {
-                    // cout << bind << " vs " << bind1 << " +" << endl;
-                    improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmx) < _momentum_rad_ceiling) mm[i]->lmx *= accel;
-                    bind = bind1;
-                    fmaxb = maxb;
-                }
+                    switch(xyz)
+                    {
+                        case 0: motion.x = frand(-speed_limit,speed_limit); break;
+                        case 1: motion.y = frand(-speed_limit,speed_limit); break;
+                        case 2: motion.z = frand(-speed_limit,speed_limit); break;
+                        default:
+                        ;
+                    }
 
-                pt.x = 0;
-                pt.y = mm[i]->lmy*frand(0.001, 1);
-                mm[i]->move(pt);
-                bind1 = 0;
-                maxb = 0;
-                for (j=0; all[j]; j++)
-                {
-                    if (!nearby[j]) continue;
-                    bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                    /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
-                    if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;*/
-                    float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                    bind1 += lbind;
-                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                    if (lbind > maxb) maxb = lbind;
-                }
-                if (bind1 < bind || maxb < _slt1 * fmaxb)
-                {
-                    pt.y = -pt.y;
-                    //mm[i]->move(pt);
-                    mm[i]->lmy *= lreversal;
-                }
-                else
-                {
-                    improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmy) < _momentum_rad_ceiling) mm[i]->lmy *= accel;
-                    bind = bind1;
-                    fmaxb = maxb;
-                }
+                    a->move(motion);
 
-                pt.y = 0;
-                pt.z = mm[i]->lmz*frand(0.001, 1);
-                mm[i]->move(pt);
-                bind1 = 0;
-                maxb = 0;
-                for (j=0; all[j]; j++)
-                {
-                    if (!nearby[j]) continue;
-                    bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                    /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                    float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
-                    if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;*/
-                    float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                    bind1 += lbind;
-                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                    if (lbind > maxb) maxb = lbind;
-                }
-                if (bind1 < bind || maxb < _slt1 * fmaxb)
-                {
-                    pt.z = -pt.z;
-                    //mm[i]->move(pt);
-                    mm[i]->lmz *= lreversal;
-                }
-                else
-                {
-                    improvement += (bind1 - bind);
-                    if (fabs(mm[i]->lmz) < _momentum_rad_ceiling) mm[i]->lmz *= accel;
-                    bind = bind1;
-                    fmaxb = maxb;
-                }
+                    tryenerg = cfmol_multibind(a, nearby);
 
-                Point lmpt(mm[i]->lmx, mm[i]->lmy, mm[i]->lmz);
-                if (lmpt.magnitude() > 1.5)
-                {
-                    float lmm = 0.5 / lmpt.magnitude();
-                    mm[i]->lmx *= lmm;
-                    mm[i]->lmy *= lmm;
-                    mm[i]->lmz *= lmm;
-                }
-                else
-                {
-                    float lmm = 0.97;
-                    mm[i]->lmx *= lmm;
-                    mm[i]->lmy *= lmm;
-                    mm[i]->lmz *= lmm;
-                }
+                    #if _dbg_fitness_plummet
+                    if (!i) cout << "(" << tryenerg << ") ";
+                    #endif
 
-                mm[i]->lastbind = bind;
+                    if (tryenerg > benerg)
+                    {
+                        benerg = tryenerg;
+                        pib.copy_state(a);
+                    }
+                    else
+                    {
+                        switch(xyz)
+                        {
+                            case 0: motion.x *= -2; break;
+                            case 1: motion.y *= -2; break;
+                            case 2: motion.z *= -2; break;
+                            default:
+                            ;
+                        }
+                        a->move(motion);
 
-                #if debug_break_on_move
-                mm[i]->set_atoms_break_on_move(true);
-                #endif
-            }
-            /**** End Linear Motion ****/
+                        tryenerg = cfmol_multibind(a, nearby);
+
+                        if (tryenerg > benerg)
+                        {
+                            benerg = tryenerg;
+                            pib.copy_state(a);
+                        }
+                        else
+                        {
+                            pib.restore_state(a);
+                        }
+                    }
+                }
+            }       // If can recenter.
+            #endif
+
+            #if _dbg_fitness_plummet
+            if (!i) cout << benerg << " ";
             #endif
 
             /**** Histidine flip ****/
@@ -2866,646 +2822,98 @@ void Molecule::multimol_conform(Molecule** mm, Molecule** bkg, Molecule** ac, in
                     #endif
                     mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
 
-                    bind1 = 0;
-                    maxb = 0;
-                    for (j=0; all[j]; j++)
+                    tryenerg = cfmol_multibind(a, nearby);
+
+                    if (tryenerg > benerg)
                     {
-                        if (!nearby[j]) continue;
-                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
-                        if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;*/
-                        float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                        bind1 += lbind;
-                        if (lbind > maxb) maxb = lbind;
-                    }
-                    if (bind1 >= bind || (bind < _hisflip_binding_threshold && frand(0,1) < 0.53))
-                    {
-                        bind = bind1;
+                        benerg = tryenerg;
+                        pib.copy_state(a);
                     }
                     else
                     {
-                        mm[i]->do_histidine_flip(mm[i]->hisflips[l]);               // put it back.
-
-                        #if _DBG_HISFLIP
-                        cout << "Putting it back." << endl;
-                        #endif
+                        mm[i]->do_histidine_flip(mm[i]->hisflips[l]);
                     }
                 }
             }
             /**** End histidine flip ****/
 
             #if allow_axial_tumble
-            /**** Axial Tumble ****/
-            if (mm[i]->movability >= MOV_NORECEN)
+            if (a->movability & MOV_CAN_AXIAL)
             {
-                #if debug_break_on_move
-                mm[i]->set_atoms_break_on_move(false);
-                #endif
-
-                Point pt(1,0,0);
-                SCoord v(pt);
-
-                rad = 0;
-                bestfrb = 0;
-                bestfrrad = nanf("No good results.");
-
-                if (allow_mol_fullrot_iter && allow_ligand_360_tumble && !(iter % _fullrot_every))
+                pib.copy_state(a);
+                Point ptrnd(frand(-1,1), frand(-1,1), frand(-1,1));
+                if (ptrnd.magnitude())
                 {
-                    // cout << endl;
-                    while ((M_PI*2-rad) > 1e-3)
+                    LocatedVector axis = (SCoord)ptrnd;
+                    axis.origin = a->get_barycenter(true);
+                    float theta;
+
+                    if (a->movability & MOV_MC_AXIAL && frand(0,1) < 0.2) theta = frand(-M_PI, M_PI);
+                    else theta = frand(-0.25, 0.25)*fiftyseventh*min(20, iter);
+
+                    a->rotate(&axis, theta);
+                    tryenerg = cfmol_multibind(a, nearby);
+
+                    if (tryenerg > benerg)
                     {
-                        mm[i]->rotate(&v, _fullrot_steprad);
-                        rad += _fullrot_steprad;
-
-                        bind1 = 0;
-                        maxb = 0;
-                        for (j=0; all[j]; j++)
-                        {
-                            if (!nearby[j]) continue;
-                            bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                            /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                            float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
-                            if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;
-                            lbind *= lbias;*/
-                            float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                            bind1 += lbind;
-                            bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                            bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                            if (lbind > maxb) maxb = lbind;
-                        }
-
-                        // cout << "x " << rad*fiftyseven << "deg " << bind1 << endl;
-
-                        if (bind1 > bestfrb && maxb >= _slt1 * fmaxb)
-                        {
-                            bestfrb = bind1;
-                            bestfrrad = rad;
-                            fmaxb = maxb;
-                        }
-                    }
-
-                    if (!isnan(bestfrrad))
-                        mm[i]->rotate(&v, bestfrrad);
-                }
-                else if (mm[i]->amx)
-                {
-                    #if monte_carlo_axial
-                    Pose putitback(mm[i]);
-                    float ra = fabs(mm[i]->amx);
-                    ra = frand(-ra, ra);
-                    mm[i]->rotate(&v, ra);
-                    #else
-                    float lam = mm[i]->amx*frand(0.001, 1);
-                    mm[i]->rotate(&v, lam);
-                    #endif
-                    bind1 = 0;
-                    maxb = 0;
-                    for (j=0; all[j]; j++)
-                    {
-                        if (!nearby[j]) continue;
-                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
-                        if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;*/
-                        float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                        bind1 += lbind;
-                        bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                        bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                        if (lbind > maxb) maxb = lbind;
-                    }
-                    if (bind1 < bind || maxb < _slt1 * fmaxb)
-                    {
-                        #if monte_carlo_axial
-                        putitback.restore_state(mm[i]);
-                        mm[i]->amx *= 0.98;
-                        #else
-                        mm[i]->rotate(&v, -lam);
-                        mm[i]->amx *= reversal;
-                        #endif
+                        benerg = tryenerg;
+                        pib.copy_state(a);
                     }
                     else
                     {
-                        improvement += (bind1 - bind);
-                        bind = bind1;
-                        fmaxb = maxb;
-                        if (fabs(mm[i]->amx) < _momentum_rad_ceiling) mm[i]->amx *= accel;
+                        pib.restore_state(a);
                     }
                 }
-
-                pt.x=0;
-                pt.y=1;
-                SCoord v1(pt);
-
-                rad = 0;
-                bestfrb = 0;
-                bestfrrad = nanf("No good results.");
-
-                if (allow_mol_fullrot_iter && allow_ligand_360_tumble && !(iter % _fullrot_every))
-                {
-                    while ((M_PI*2-rad) > 1e-3)
-                    {
-                        mm[i]->rotate(&v1, _fullrot_steprad);
-                        rad += _fullrot_steprad;
-
-                        bind1 = 0;
-                        maxb = 0;
-                        for (j=0; all[j]; j++)
-                        {
-                            if (!nearby[j]) continue;
-                            bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                            /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                            float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
-                            if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;
-                            lbind *= lbias;*/
-                            float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                            bind1 += lbind;
-                            bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                            bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                            if (lbind > maxb) maxb = lbind;
-                        }
-
-                        // cout << "y " << rad*fiftyseven << "deg " << bind1 << endl;
-
-                        if (bind1 > bestfrb && maxb >= _slt1 * fmaxb)
-                        {
-                            bestfrb = bind1;
-                            bestfrrad = rad;
-                            fmaxb = maxb;
-                        }
-                    }
-
-                    if (!isnan(bestfrrad))
-                        mm[i]->rotate(&v1, bestfrrad);
-                }
-                else if (mm[i]->amy)
-                {
-                    #if monte_carlo_axial
-                    Pose putitback(mm[i]);
-                    float ra = fabs(mm[i]->amy);
-                    ra = frand(-ra, ra);
-                    mm[i]->rotate(&v, ra);
-                    #else
-                    float lam = mm[i]->amy*frand(0.001, 1);
-                    mm[i]->rotate(&v1, lam);
-                    #endif
-
-                    bind1 = 0;
-                    maxb = 0;
-                    for (j=0; all[j]; j++)
-                    {
-                        if (!nearby[j]) continue;
-                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
-                        if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;*/
-                        float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                        bind1 += lbind;
-                        bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                        bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                        if (lbind > maxb) maxb = lbind;
-                    }
-                    if (bind1 < bind || maxb < _slt1 * fmaxb)
-                    {
-                        #if monte_carlo_axial
-                        putitback.restore_state(mm[i]);
-                        mm[i]->amy *= 0.98;
-                        #else
-                        mm[i]->rotate(&v1, -lam);
-                        mm[i]->amy *= reversal;
-                        #endif
-                    }
-                    else
-                    {
-                        improvement += (bind1 - bind);
-                        bind = bind1;
-                        fmaxb = maxb;
-                        if (fabs(mm[i]->amy) < _momentum_rad_ceiling) mm[i]->amy *= accel;
-                    }
-                }
-
-
-                pt.y=0;
-                pt.z=1;
-                SCoord v2(pt);
-
-                rad = 0;
-                bestfrb = 0;
-                bestfrrad = nanf("No good results.");
-
-                if (allow_mol_fullrot_iter && allow_ligand_360_tumble && !(iter % _fullrot_every))
-                {
-                    while ((M_PI*2-rad) > 1e-3)
-                    {
-                        mm[i]->rotate(&v2, _fullrot_steprad);
-                        rad += _fullrot_steprad;
-
-                        bind1 = 0;
-                        maxb = 0;
-                        for (j=0; all[j]; j++)
-                        {
-                            if (!nearby[j]) continue;
-                            bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                            /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                            float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) + intermol_ESP * mm[i]->get_intermol_potential(all[j]);
-                            if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;
-                            lbind *= lbias;*/
-                            float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                            bind1 += lbind;
-                            bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                            bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                            if (lbind > maxb) maxb = lbind;
-                        }
-
-                        // cout << "z " << rad*fiftyseven << "deg " << bind1 << endl;
-
-                        if (bind1 > bestfrb && maxb >= _slt1 * fmaxb)
-                        {
-                            bestfrb = bind1;
-                            fmaxb = maxb;
-                            bestfrrad = rad;
-                        }
-                    }
-
-                    if (!isnan(bestfrrad))
-                        mm[i]->rotate(&v2, bestfrrad);
-                }
-                else if (mm[i]->amz)
-                {
-                    #if monte_carlo_axial
-                    Pose putitback(mm[i]);
-                    float ra = fabs(mm[i]->amz);
-                    ra = frand(-ra, ra);
-                    mm[i]->rotate(&v, ra);
-                    #else
-                    float lam = mm[i]->amz*frand(0.001, 1);
-                    mm[i]->rotate(&v2, lam);
-                    #endif
-
-                    bind1 = 0;
-                    maxb = 0;
-                    for (j=0; all[j]; j++)
-                    {
-                        if (!nearby[j]) continue;
-                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                        float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
-                        if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;*/
-                        float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                        bind1 += lbind;
-                        bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                        bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                        if (lbind > maxb) maxb = lbind;
-                    }
-                    if (bind1 < bind || maxb < _slt1 * fmaxb)
-                    {
-                        #if monte_carlo_axial
-                        putitback.restore_state(mm[i]);
-                        mm[i]->amz *= 0.98;
-                        #else
-                        mm[i]->rotate(&v2, -lam);
-                        mm[i]->amz *= reversal;
-                        //cout << "x";
-                        #endif
-                    }
-                    else
-                    {
-                        improvement += (bind1 - bind);
-                        bind = bind1;
-                        fmaxb = maxb;
-                        if (fabs(mm[i]->amz) < _momentum_rad_ceiling) mm[i]->amz *= accel;
-                    }
-                }
-
-                mm[i]->lastbind = bind;
-
-                #if debug_break_on_move
-                mm[i]->set_atoms_break_on_move(true);
-                #endif
-            }
-            /**** End Axial Tumble ****/
+            }       // If can axial rotate.
             #endif
 
-            #if !monte_carlo_flex
-            if ((iter % _fullrot_every)) continue;
+            #if _dbg_fitness_plummet
+            if (!i) cout << benerg << " ";
             #endif
 
             #if allow_bond_rots
-            /**** Bond Flexion ****/
-
-            #if active_persistence_noflex
-            if (!allow_ligand_flex && !mm[i]->is_residue()) continue;
-            #endif
-
-            // cout << mm[i]->name << ": " << mm[i]->movability << endl;
-            if (mm[i]->movability >= MOV_FLEXONLY)
+            pib.copy_state(a);
+            Bond** bb = a->get_rotatable_bonds(a->movability & MOV_CAN_FLEX);
+            if (bb)
             {
-                #if debug_break_on_move
-                mm[i]->set_atoms_break_on_move(false);
-                #endif
-
-                mm[i]->get_rotatable_bonds();
-                int residue = 0;
-
-                if (mm[i]->rotatable_bonds && mm[i]->rotatable_bonds[0] && mm[i]->rotatable_bonds[0]->atom)
-                    residue = mm[i]->rotatable_bonds[0]->atom->residue;
-
-                if (mm[i]->movability < MOV_NORECEN)
+                int q;
+                for (q=0; bb[q]; q++)
                 {
-                    bind = 0;
-                    for (j=0; all[j]; j++)
+                    float theta;
+                    if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI);
+                    else if (!bb[q]->count_heavy_moves_with_btom()) theta = frand(-M_PI, M_PI);
+                    else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
+
+                    bb[q]->rotate(theta, false);
+                    tryenerg = cfmol_multibind(a, nearby);
+
+                    if (tryenerg > benerg)
                     {
-                        if (!nearby[j]) continue;
-                        // cout << ".";
-                        bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                        /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                        float f = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
-                        if (!mm[i]->is_residue()) f += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;*/
-                        float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                        if (mm[i]->is_residue() && !all[j]->is_residue()) lbind *= sidechain_fullrot_lig_bmult;
-                        bind += lbind;
-                        bind -= mm[i]->lastshielded * shielding_avoidance_factor;
-                        bind += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
+                        benerg = tryenerg;
+                        pib.copy_state(a);
+                    }
+                    else
+                    {
+                        pib.restore_state(a);
                     }
                 }
-                mm[i]->lastbind = bind;
-
-                #if DBG_BONDFLEX
-                if (DBG_FLEXRES == residue)
-                    cout << "Iter" << iter << " " << mm[i]->name;
-                #endif
-
-                if (!iter && mm[i]->rings)
-                {
-                    for (l=0; mm[i]->rings[l]; l++)
-                    {
-                        for (n=0; mm[i]->atoms[n]; n++)
-                            mm[i]->atoms[n]->is_in_ring(mm[i]->rings[l]);
-                    }
-                }
-
-
-                if (mm[i]->rotatable_bonds)
-                {
-                    #if monte_carlo_flex
-                    Pose putitback(mm[i]);
-                    #endif
-
-                    bool skip_inverse_check = mm[i]->movability <= MOV_NORECEN;
-
-                    #if DBG_BONDFLEX
-                    if (DBG_FLEXRES == residue)
-                        cout << " has rotbonds ";
-                    #endif
-
-                    #if multiflex
-                    if (residue && iter == multiflex_iter)
-                    {
-                        #if _dbg_multiflex
-                        cout << "Iter " << iter << " multiflexing " << mm[i]->get_name() << endl;
-                        #endif
-
-                        int k1, k2, k3, k4;
-                        int kn=0;
-                        for (k=0; mm[i]->rotatable_bonds[k]; k++);   // get count.
-                        int l1 = ((kn>=1 && mm[i]->rotatable_bonds[0]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0),
-                            l2 = ((kn>=2 && mm[i]->rotatable_bonds[1]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0),
-                            l3 = ((kn>=3 && mm[i]->rotatable_bonds[2]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0),
-                            l4 = ((kn>=4 && mm[i]->rotatable_bonds[3]->count_heavy_moves_with_btom()) ? _multiflex_stepdiv : 0);
-
-                        bind = 0;
-                        for (j=0; all[j]; j++)
-                        {
-                            if (!nearby[j]) continue;
-                            float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], true);
-                            bind += lbind;
-                        }
-
-                        int b1=0, b2=0, b3=0, b4=0;
-
-                        for (k1=0; k1<=l1; k1++)
-                        {
-                            for (k2=0; k2<=l2; k2++)
-                            {
-                                for (k3=0; k3<=l3; k3++)
-                                {
-                                    for (k4=0; k4<=l4; k4++)
-                                    {
-                                        if (l4) mm[i]->rotatable_bonds[3]->rotate(_multiflex_steprad, false, skip_inverse_check);
-
-                                        float newbind = 0;
-                                        for (j=0; all[j]; j++)
-                                        {
-                                            if (!nearby[j]) continue;
-                                            float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], true);
-                                            newbind += lbind;
-                                        }
-
-                                        if (newbind > bind)
-                                        {
-                                            bind = newbind;
-                                            b1 = k1; b2 = k2; b3 = k3; b4 = k4;
-                                        }
-                                    }
-
-                                    if (l3) mm[i]->rotatable_bonds[2]->rotate(_multiflex_steprad, false, skip_inverse_check);
-                                }
-
-                                if (l2) mm[i]->rotatable_bonds[1]->rotate(_multiflex_steprad, false, skip_inverse_check);
-                            }
-
-                            if (l1) mm[i]->rotatable_bonds[0]->rotate(_multiflex_steprad, false, skip_inverse_check);
-                        }
-
-                        #if _dbg_multiflex
-                        cout << "Best results for " << b1 << ", " << b2 << ", " << b3 << ", " << b4 << endl;
-                        #endif
-
-                        if (b1) mm[i]->rotatable_bonds[0]->rotate(_multiflex_steprad*b1, false, skip_inverse_check);
-                        if (b2) mm[i]->rotatable_bonds[1]->rotate(_multiflex_steprad*b2, false, skip_inverse_check);
-                        if (b3) mm[i]->rotatable_bonds[2]->rotate(_multiflex_steprad*b3, false, skip_inverse_check);
-                        if (b4) mm[i]->rotatable_bonds[3]->rotate(_multiflex_steprad*b4, false, skip_inverse_check);
-
-                        goto _end_flexions;
-                    }
-                    #endif
-
-                    int mmiac = mm[i]->get_atom_count();
-                    for (k=0; mm[i]->rotatable_bonds[k]; k++)
-                    {
-                        Bond* bnd = mm[i]->rotatable_bonds[k];
-                        if (!bnd->atom || !bnd->btom) continue;
-                        if (bnd->count_moves_with_btom() > 0.5*mmiac) bnd = bnd->btom->get_bond_between(bnd->atom);
-
-                        #if DBG_BONDFLEX
-                        if (DBG_FLEXRES == residue)
-                        {
-                            cout << k << ".) " << *mm[i]->rotatable_bonds[k] << " ";
-                            Atom** mwb = mm[i]->rotatable_bonds[k]->get_moves_with_btom();
-                            if (mwb)
-                            {
-                                cout << "bringing ";
-                                for (j=0; mwb[j]; j++)
-                                {
-                                    cout << mwb[j]->name << " ";
-                                }
-                                cout << endl;
-                            }
-                        }
-                        #endif
-
-                        rad = 0;
-                        bestfrb = -10000;
-                        bestfrrad = nanf("No good results.");
-
-                        if ((residue || allow_ligand_360_flex) && !(iter % _fullrot_every))
-                        {
-                            while ((M_PI*2-rad) > 1e-3)
-                            {
-                                mm[i]->rotatable_bonds[k]->rotate(_fullrot_steprad, false, skip_inverse_check);
-                                rad += _fullrot_steprad;
-
-                                bind1 = 0;
-                                maxb = 0;
-                                #if DBG_BONDFLEX
-                                if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
-                                    cout << endl << (rad*fiftyseven) << ": ";
-                                #endif
-                                for (j=0; all[j]; j++)
-                                {
-                                    if (!nearby[j]) continue;
-                                    bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                                    float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                                    
-                                    float lbind1 =
-
-                                        #if allow_ligand_esp
-                                        (mm[i]->mol_typ == MOLTYP_AMINOACID)
-                                        ?
-                                        #endif
-                                        mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac)
-                                        #if allow_ligand_esp
-                                        :
-                                        mm[i]->get_intermol_potential(all[j]) - 5 * mm[i]->get_internal_clashes()
-                                        #endif
-                                        ;
-                                    
-                                    /*if (!mm[i]->is_residue()) lbind1 += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;
-                                    lbind1 *= lbias;*/
-                                    if (mm[i]->is_residue() && !all[j]->is_residue()) lbind1 *= sidechain_fullrot_lig_bmult;
-                                    bind1 += lbind1;
-                                    bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                                    bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                                    if (lbind1 > maxb) maxb = lbind1;
-                                    #if DBG_BONDFLEX
-                                    if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
-                                        cout << "\n\t" << all[j]->name << " " << lbind1 << " ";
-                                    #endif
-                                }
-
-                                if (bind1 > bestfrb && maxb >= _slt1 * fmaxb)
-                                {
-                                    bestfrb = bind1;
-                                    bestfrrad = rad;
-                                    fmaxb = maxb;
-                                    mm[i]->been_flexed = true;
-                                }
-                            }
-
-                            #if DBG_BONDFLEX
-                            if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
-                                cout << endl << "(" << (bestfrrad*fiftyseven) << "deg) ";
-                            #endif
-
-                            if (!isnan(bestfrrad))
-                                mm[i]->rotatable_bonds[k]->rotate(bestfrrad, false, skip_inverse_check);
-                        }
-                        else
-                        {
-                            float ra = mm[i]->rotatable_bonds[k]->angular_momentum;
-
-                            #if monte_carlo_flex
-                            ra = frand(-fabs(ra), fabs(ra));
-                            #endif
-
-                            mm[i]->rotatable_bonds[k]->rotate(ra, false, skip_inverse_check);
-
-                            bind1 = 0;
-                            maxb = 0;
-                            for (j=0; all[j]; j++)
-                            {
-                                if (!nearby[j]) continue;
-                                bool is_ac = false; if (is_ac_i) for (l=0; l<aclen; l++) if (ac[l] == all[j]) { is_ac = true; break; }
-                                /*float lbias = 1.0 + (sgn(mm[i]->is_residue()) == sgn(all[j]->is_residue()) ? 0 : dock_ligand_bias);
-                                float lbind = mm[i]->get_intermol_binding(all[j], !is_ac) * lbias;
-                                if (!mm[i]->is_residue()) lbind += mm[i]->get_intermol_polar_sat(all[j]) * polar_sat_influence_for_dock;*/
-                                float lbind = mm[i]->intermol_bind_for_multimol_dock(all[j], is_ac);
-                                bind1 += lbind;
-                                bind1 -= mm[i]->lastshielded * shielding_avoidance_factor;
-                                bind1 += mm[i]->get_springy_bond_satisfaction() * bestbind_springiness;
-                                if (lbind > maxb) maxb = lbind;
-                            }
-                            if (bind1 < bind || maxb < _slt1 * fmaxb)
-                            {
-                                #if monte_carlo_flex
-                                putitback.restore_state(mm[i]);
-                                mm[i]->rotatable_bonds[k]->angular_momentum *= 0.98;
-                                #else
-                                mm[i]->rotatable_bonds[k]->rotate(-ra, false, skip_inverse_check);
-                                mm[i]->rotatable_bonds[k]->angular_momentum *= reversal;
-                                #endif
-                            }
-                            else
-                            {
-                                improvement += (bind1 - bind);
-                                bind = bind1;
-                                fmaxb = maxb;
-                                mm[i]->been_flexed = true;
-
-                                #if DBG_BONDFLEX
-                                if (DBG_FLEXROTB == k && DBG_FLEXRES == residue)
-                                    cout << "" << (ra*fiftyseven) << "deg improves by " << (bind1 - bind) << "." << endl;
-                                #endif
-
-                                #if monte_carlo_flex
-                                putitback.copy_state(mm[i]);
-                                #endif
-                                if (fabs(mm[i]->rotatable_bonds[k]->angular_momentum) < _momentum_rad_ceiling)
-                                    mm[i]->rotatable_bonds[k]->angular_momentum *= accel;
-                            }
-                        }
-                    }
-                    //if (!mm[i]->atoms[0]->residue) cout << endl;        // Delete this for production.
-                }
-                _end_flexions:
-                #if DBG_BONDFLEX
-                if (DBG_FLEXRES == residue)
-                    cout << endl;
-                #endif
-                mm[i]->lastbind = bind;
-
-                #if debug_break_on_move
-                mm[i]->set_atoms_break_on_move(true);
-                #endif
-            }
-            /**** End Bond Flexion ****/
+            }       // Rotatable bonds.
             #endif
 
-            if (mm[i]->movability <= MOV_NORECEN) mm[i]->recenter(icen);
-
-            for (j=1; j<10; j++) mm[i]->lastbind_history[j-1] = mm[i]->lastbind_history[j];
-            mm[i]->lastbind_history[j-1] = mm[i]->lastbind;
-
-        }	// for i = 0 to iters
-        // cout << "Iteration " << iter << " improvement " << improvement << endl;
+            #if _dbg_fitness_plummet
+            if (!i) cout << benerg << endl;
+            #endif
+        }       // for i
 
         #if allow_iter_cb
         if (cb) cb(iter);
         #endif
-    }	// for iter.
+
+        minimum_searching_aniso *= 0.99;
+    }       // for iter
+
+    minimum_searching_aniso = 0;
 }
-
-
 
 Atom* numbered[10];
 bool ring_warned = false;
@@ -3535,7 +2943,7 @@ bool Molecule::from_smiles(char const * smilesstr)
                 {
                     fgets(buffer, 1022, pf);
                     lno++;
-                    sdfdat += buffer;
+                    sdfdat += (std::string)buffer;
 
                     if (lno == 2) sdfgen_aboutline = buffer;
                 }
@@ -4581,6 +3989,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
     b = atoms[i]->get_bonds();
     if (!b) return error;
     btom = b[0]->btom;
+    float card = b[0]->cardinality;
     delete[] b;
     if (!btom) return error;
 
@@ -4591,7 +4000,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 
     // Make an imaginary sphere around btom, whose radius equals the optimal bond distance.
     lv.origin = bloc;
-    lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, b[0]->cardinality);
+    lv.r = InteratomicForce::covalent_bond_radius(atoms[i], btom, card);
     float thstep = fiftyseventh*5;
     float besttheta = 0, bestphi = 0, bestscore = -1e9;
     for (lv.theta = -square; lv.theta <= square; lv.theta += thstep)

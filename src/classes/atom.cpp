@@ -586,7 +586,8 @@ float Atom::hydrophilicity_rule()
 
     if (is_polar()) total += fabs(is_polar());
     else if (Z == 7 || Z == 8) total += 1;
-    else if (Z == 15 || Z == 16) total += 0.5;
+    else if (Z == 15) total += 0.666;
+    else if (Z == 16 && is_bonded_to("H")) total += 0.5;
     else if (family == PNICTOGEN) total += 0.25;
     else if (family == CHALCOGEN) total += 0.25;
     else if (family == HALOGEN)
@@ -1235,6 +1236,7 @@ bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
     if (!moves_with_btom) fill_moves_with_cache();
     enforce_moves_with_uniqueness();
     if (!moves_with_btom) return false;
+
     if (!can_rotate)
     {
         if (can_flip) theta = flip_angle;
@@ -1361,26 +1363,31 @@ void Bond::swing(SCoord newdir)
 
 SCoord* Atom::get_basic_geometry()
 {
-    SCoord* retval = new SCoord[geometry+2];
+    SCoord* retval = new SCoord[abs(geometry)+2];
 
     int i, j;
     float x, y, z;
 
-    if (geometry == 1)
+    if (geometry < 0)
+    {
+        for (i=0; i<-geometry; i++)
+        {
+            retval[i] = new SCoord(1, 0, M_PI/abs(geometry/2)*i);
+        }
+    }
+    else if (geometry == 1)
     {
         SCoord v1(1, M_PI/2, 0);
         retval[0] = v1;
     }
-
-    if (geometry == 2)
+    else if (geometry == 2)
     {
         SCoord v1(1, M_PI*0.5, 0);
         SCoord v2(1, M_PI*1.5, 0);
         retval[0] = v1;
         retval[1] = v2;
     }
-
-    if (geometry == 3)
+    else if (geometry == 3)
     {
         for (i=0; i<geometry; i++)
         {
@@ -1388,8 +1395,7 @@ SCoord* Atom::get_basic_geometry()
             retval[i] = v;
         }
     }
-
-    if (geometry == 4)
+    else if (geometry == 4)
     {
         SCoord v1(1, M_PI/2, 0);
         retval[0] = v1;
@@ -1400,8 +1406,7 @@ SCoord* Atom::get_basic_geometry()
             retval[i] = v;
         }
     }
-
-    if (geometry == 5)
+    else if (geometry == 5)
     {
         SCoord v1(1, M_PI*0.5, 0);
         SCoord v2(1, M_PI*1.5, 0);
@@ -1415,8 +1420,7 @@ SCoord* Atom::get_basic_geometry()
 
         retval[geometry-1] = v2;
     }
-
-    if (geometry == 6)
+    else if (geometry == 6)
     {
         SCoord v1(1, M_PI*0.5, 0);
         SCoord v2(1, M_PI*1.5, 0);
@@ -1430,8 +1434,7 @@ SCoord* Atom::get_basic_geometry()
 
         retval[geometry-1] = v2;
     }
-
-    if (geometry == 7)
+    else if (geometry == 7)
     {
         for (i=0; i<3; i++)
         {
@@ -1444,8 +1447,7 @@ SCoord* Atom::get_basic_geometry()
             retval[i] = v;
         }
     }
-
-    if (geometry == 8)
+    else if (geometry == 8)
     {
         for (i=0; i<4; i++)
         {
@@ -1458,8 +1460,7 @@ SCoord* Atom::get_basic_geometry()
             retval[i] = v;
         }
     }
-
-    if (geometry == 10)
+    else if (geometry == 10)
     {
         for (i=0; i<5; i++)
         {
@@ -1472,7 +1473,6 @@ SCoord* Atom::get_basic_geometry()
             retval[i] = v;
         }
     }
-
 
     return retval;
 }
@@ -1566,7 +1566,7 @@ float Atom::get_geometric_bond_angle()
 SCoord* Atom::get_geometry_aligned_to_bonds()
 {
     int bc = get_bonded_atoms_count();
-    if (origgeo>4 && bc && bc <= 4)
+    if (origgeo == 5 && bc && bc <= 4)
     {
         geometry=4;
         if (is_pi()) geometry--;
@@ -1878,7 +1878,11 @@ float Atom::get_sum_pi_bonds()
     float retval=0;
     for (i=0; i<geometry; i++)
     {
-        if (bonded_to[i].btom && bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval += bonded_to[i].cardinality;
+        if (bonded_to[i].btom && bonded_to[i].btom->Z > 1)
+        {
+            if (bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2.1) retval += bonded_to[i].cardinality;
+            else if (bonded_to[i].cardinality == 1 && bonded_to[i].btom->is_pi()) retval += bonded_to[i].cardinality;
+        }
     }
     return retval;
 }
@@ -2406,7 +2410,23 @@ std::ostream& operator<<(std::ostream& os, const Ring& r)
     return os;
 }
 
-
+float Atom::similarity_to(Atom* b)
+{
+    float similarity = 0;
+    bool apb = (fabs(is_polar()) > .333), bpb = (fabs(b->is_polar()) > .333);
+    if (apb == bpb) similarity += 10;
+    if (is_pi() && b->is_pi()) similarity += 5;
+    if (abs(is_thio()) && abs (b->is_thio())) similarity += 8;
+    if (is_metal() && b->is_metal()) similarity += 15;
+    similarity += 10.0 / (fabs(get_electronegativity() - b->get_electronegativity()) / 3 + 1);
+    if (is_bonded_to(b) || is_conjugated_to(b)) similarity += 7;
+    if (sgn(get_charge()))
+    {
+        if (sgn(get_charge()) == sgn(b->get_charge())) similarity += 15;
+        else if (sgn(get_charge()) == -sgn(b->get_charge())) similarity -= 15;
+    }
+    return similarity;
+}
 
 
 

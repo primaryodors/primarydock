@@ -9,18 +9,16 @@ using namespace std;
 
 void set_color(float r, float g, float b)
 {
-    int lr = fmax(0,fmin(5,r*6));
-    int lg = fmax(0,fmin(5,g*6));
-    int lb = fmax(0,fmin(5,b*6));
+    int lr = max(0, min(255, (int)(r*255)));
+    int lg = max(0, min(255, (int)(g*255)));
+    int lb = max(0, min(255, (int)(b*255)));
 
-    int ccode = 16 + lb + 6*lg + 36*lr;
-
-    cout << "\x1b[48;5;" << ccode << "m";
+    cout << "\x1b[48;2;" << lr << ";" << lg << ";" << lb << "m";
 }
 
 void clear_color()
 {
-    cout << "\x1b[49m";
+    cout << "\x1b[0m";
 }
 
 int main(int argc, char** argv)
@@ -29,7 +27,7 @@ int main(int argc, char** argv)
     cout << "Created empty molecule named " << m.get_name() << ".\n";
 
     Atom* anisoa;
-    bool colors = false;
+    bool colors = true;
 
     if (argc > 1)
     {
@@ -65,7 +63,7 @@ int main(int argc, char** argv)
         }
     }
 
-    if (argc > 4 && !strcmp(argv[4], "colors")) colors = true;
+    // if (argc > 4 && !strcmp(argv[4], "colors")) colors = true;
 
     const int size=22;
     const float ar = 2.1;		// Aspect ratio.
@@ -74,6 +72,7 @@ int main(int argc, char** argv)
     int asciilen = 10;
 
     Atom probe((argc > 3) ? argv[3] : "H");
+    if (probe.is_metal()) probe.increment_charge(probe.get_valence());
     int pz = probe.get_Z();
     Atom oxy(pz == 1 ? "O" : "C");
     probe.bond_to(&oxy, 1);
@@ -93,13 +92,14 @@ int main(int argc, char** argv)
     }
 
     InteratomicForce* hb=0;
+    float strongest = 0;
     for (x=0; ifs[x]; x++)
     {
         cout << ifs[x]->get_type() << endl;
-        if (ifs[x]->get_type() == hbond)
+        if (ifs[x]->get_kJmol() > strongest)
         {
             hb = ifs[x];
-            break;
+            strongest = ifs[x]->get_kJmol();
         }
     }
 
@@ -173,7 +173,7 @@ int main(int argc, char** argv)
                 oxy.clear_geometry_cache();
 
                 float tb = InteratomicForce::total_binding(anisoa, &probe);
-                tb /= hb->get_kJmol();	// This is not working.
+                tb /= hb->get_kJmol() * 1.5;
                 if (tb<0) tb=0;
 
                 if (!colors)
@@ -194,6 +194,11 @@ int main(int argc, char** argv)
                 {
                     int anisg = anisoa->get_geometry();
                     SCoord* anisgeo = anisoa->get_geometry_aligned_to_bonds();
+                    Molecule mptemp("Very temporary");
+
+                    int n = mp.get_atom_count();
+                    for (i=0; i<n; i++) mptemp.add_existing_atom(mp.get_atom(i));
+
                     if (anisgeo)
                         for (i=0; i<anisg; i++)
                         {
@@ -202,12 +207,12 @@ int main(int argc, char** argv)
                             pt = pt.add(aloc);
                             char buffer[10];
                             sprintf(buffer, "He%d", i);
-                            mp.add_atom("He", buffer, &pt, NULL, 0);
+                            mptemp.add_atom("He", buffer, &pt, NULL, 0);
                         }
 
                     FILE* pf = fopen("aniso.sdf", "wb");
                     Molecule* ligands[3];
-                    ligands[0] = &mp;
+                    ligands[0] = &mptemp;
                     ligands[1] = NULL;
                     m.save_sdf(pf, ligands);
                     fclose(pf);

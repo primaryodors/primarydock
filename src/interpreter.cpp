@@ -7,6 +7,7 @@
 #include <time.h>
 #include <sstream>
 #include "classes/protein.h"
+#include "classes/glom.h"
 
 using namespace std;
 
@@ -79,7 +80,7 @@ int find_var_index(const char* varname, char** out_varname = nullptr)
     }
 
     char buffer[256];
-    char* c;
+    char* c = nullptr;
     int flags = 0;
     strcpy(buffer, varname);
 
@@ -702,7 +703,7 @@ int main(int argc, char** argv)
                 mm[0] = a1.pmol;
                 mm[1] = a2.pmol;
 
-                Molecule::multimol_conform(mm, iters);
+                Molecule::conform_molecules(mm, iters);
 
             }	// BRIDGE
 

@@ -8,6 +8,25 @@
 
 using namespace std;
 
+Molecule* mols[3];
+
+void iteration_callback(int iter)
+{
+    #if _dbg_mol_frames
+
+    char buffer[256];
+    sprintf(buffer, "tmp/frame%d.sdf", iter);
+
+    FILE* pf = fopen(buffer, "wb");
+    Molecule* ligands[2];
+    ligands[0] = mols[1];
+    ligands[1] = 0;
+    mols[0]->save_sdf(pf, ligands);
+    fclose(pf);
+
+    #endif
+}
+
 int main(int argc, char** argv)
 {
     // TODO: These values are set way too permissively.
@@ -20,7 +39,7 @@ int main(int argc, char** argv)
     wet_environment = true;
 
     Molecule m("nothing");
-    cout << "Created empty molecule named " << m.get_name() << ".\n";
+    cout << "# Created empty molecule named " << m.get_name() << ".\n";
 
     char buffer[65536];
     char tstname[1024] = "BZN.sdf";
@@ -28,7 +47,7 @@ int main(int argc, char** argv)
     if (argc > 1) strcpy(tstname, argv[1]);
 
     Molecule m1(tstname);
-    cout << "Created molecule named " << m1.get_name() << ".\n";
+    cout << "# Created molecule named " << m1.get_name() << ".\n";
     int nloaded;
 
     FILE* pf = fopen(tstname, "rb");
@@ -45,15 +64,15 @@ int main(int argc, char** argv)
     }
 
 
-    cout << "Loaded " << nloaded << " atoms of " << tstname << " into molecule.\n";
+    cout << "# Loaded " << nloaded << " atoms of " << tstname << " into molecule.\n";
 
     int rc = m1.get_num_rings();
-    if (rc) cout << "Found " << rc << " ring(s)." << endl;
+    if (rc) cout << "# Found " << rc << " ring(s)." << endl;
 
     int i;
     for (i=0; i<rc; i++)
     {
-        cout << "Ring atoms: ";
+        cout << "# Ring atoms: ";
         Atom** ra = m1.get_ring_atoms(i);
         Atom::dump_array(ra);
         cout << endl;
@@ -62,12 +81,12 @@ int main(int argc, char** argv)
         bool cp = false;
         if (m1.ring_is_aromatic(i))
         {
-            cout << "Ring " << i << " is aromatic." << endl;
+            cout << "# Ring " << i << " is aromatic." << endl;
             cp = true;
         }
         else if (m1.ring_is_coplanar(i))
         {
-            cout << "Ring " << i << " is coplanar." << endl;
+            cout << "# Ring " << i << " is coplanar." << endl;
             cp = true;
         }
 
@@ -96,25 +115,25 @@ int main(int argc, char** argv)
             if (a)
             {
                 float ab = a->get_acidbase();
-                if (ab) cout << "Atom " << anames[i] << " has basicity " << ab << endl;
+                if (ab) cout << "# Atom " << anames[i] << " has basicity " << ab << endl;
             }
         }
         delete[] anames;
     }
-    else cout << "No names.\n";
+    else cout << "# No names.\n";
 
     Bond** b = m1.get_rotatable_bonds();
     if (b)
     {
         for (i=0; b[i]; i++)
         {
-            cout << "Bond " << b[i]->atom->name << " - " << b[i]->btom->name << " can rotate." << endl;
+            cout << "# Bond " << b[i]->atom->name << " - " << b[i]->btom->name << " can rotate." << endl;
             b[i]->rotate(30.0 * M_PI / 180);
         }
     }
 
     Point pt1(0.2,-0.5,-0.3);
-    m1.recenter(pt1);
+    m1.move(pt1);
     Point loc = m1.get_barycenter();
     cout << "# Molecule moved to [" << loc.x << "," << loc.y << "," << loc.z << "]." << endl;
 
@@ -130,6 +149,12 @@ int main(int argc, char** argv)
     if (argc > 2)
     {
         m2.from_smiles(argv[2]);
+        pt1.x = pt1.y = pt1.z = 0.5;
+        while (m1.get_intermol_clashes(&m2) > 10)
+        {
+            m2.move(pt1);
+            cout << "# " << m2.get_barycenter() << endl;
+        }
 
         // if (argc > 3) energyLevelThreshold = atof(argv[3]);
     }
@@ -175,11 +200,10 @@ int main(int argc, char** argv)
 
     m1.reset_conformer_momenta();
     m2.reset_conformer_momenta();
-    Molecule* mols[3];
     mols[0] = &m1;
     mols[1] = &m2;
     mols[2] = NULL;
-    Molecule::multimol_conform(mols, 200);
+    Molecule::conform_molecules(mols, 200, &iteration_callback);
     float final_clashes = m1.get_intermol_clashes(&m2);
     // if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);

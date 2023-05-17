@@ -65,10 +65,10 @@ int in_array(Star needle, Star* haystack)
 
 char** chop_spaced_words(char* line, char separator)
 {
+    if (!line[0]) return nullptr;
+
     char** retval = new char*[100];
     int i, j=0;
-
-    if (!line[0]) return nullptr;
 
     if (separator == ' ' && line[0] == '\t') line[0] = separator;
     if (line[0] != separator) retval[j++] = line;

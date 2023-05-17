@@ -150,6 +150,7 @@ public:
     void delete_sidechain();
     static Molecule** aas_to_mols(AminoAcid** aas);
     int similarity_to(const char letter);
+    int similarity_to(const AminoAcid* aa) { return similarity_to(aa->get_letter()); }
     Ring* get_most_distal_arom_ring();
     std::string printable();
 
@@ -157,6 +158,7 @@ public:
     int strand;
     int atno_offset=0;
     MetalCoord* m_mcoord=0;
+    Atom* coordmtl = nullptr;
 
 protected:
     void load_aa_defs();

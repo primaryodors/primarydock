@@ -60,12 +60,13 @@
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (180.0 * fiftyseventh)
-#define _fullrot_stepdeg 30
+#define _fullrot_stepdeg 10
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
 #define _fullrot_every 10
 #define _def_lin_momentum 0.1
-#define _def_ang_momentum (_fullrot_steprad/3)
-#define _def_bnd_momentum (_fullrot_steprad/3)
+#define _def_ang_momentum (fiftyseventh*5)
+#define _def_bnd_momentum (fiftyseventh*15)
+#define speed_limit 0.1
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -108,7 +109,7 @@
 
 #define lmpush 0.0005
 
-#define _enhanced_pi_stacking 1
+#define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
 #define enforce_no_bb_pullaway 1
@@ -159,7 +160,7 @@
 #define internode_momentum_only_on_activation 1
 
 // Switches for conformational space search.
-#define allow_axial_tumble 0
+#define allow_axial_tumble 1
 #define allow_bond_rots 1
 #define allow_linear_motion 1
 #define monte_carlo_axial 0
@@ -219,7 +220,7 @@
 #define hydrophilicity_boost 5
 #define best_binding_stochastic 0.3
 
-// For differential docking, whether to multimol_conform() all the protein's residues into an
+// For differential docking, whether to conform_molecules() all the protein's residues into an
 // optimized initial conformation before adding the ligand.
 #define preconform_protein 0
 #define default_pre_ligand_multimol_radius 15
@@ -252,7 +253,7 @@
 // How much variance to allow in the strongest atom-to-atom binding energy when multimol conforming.
 // Decreasing this value requires any positional or rotational change to adhere more tightly to the
 // strongest interatomic interaction.
-#define strongest_loss_tolerance 0.25
+#define strongest_loss_tolerance 0.05
 #define _slt1 (1.0 - strongest_loss_tolerance)
 
 // Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,
@@ -269,7 +270,7 @@
 #define _teleport_dissatisfied_waters 1
 // Threshold is positive for binding, negative for clashes.
 #define _water_satisfaction_threshold 5
-#define _water_teleport_tries 25
+#define _water_teleport_tries 200
 
 #define polar_sat_influence_for_dock 30
 #define polar_sat_influence_for_bb 30
@@ -297,7 +298,6 @@
 #define _DBG_TUMBLE_SPHERES 0
 #define _DBG_MAX_CLASHES 0
 #define output_tumble_debug_docs 0
-#define debug_break_on_move 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0
 #define _DBG_RESBMULT 0
@@ -321,6 +321,9 @@
 #define _dbg_multiflex 0
 #define _dbg_homology 0
 #define _dbg_bridges 0
+#define _dbg_mol_frames 0
+#define _dbg_fitness_plummet 0
+#define _dbg_anemia 0
 
 #endif
 

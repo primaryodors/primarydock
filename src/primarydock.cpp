@@ -8,29 +8,9 @@
 #include <sstream>
 #include <algorithm>
 #include "classes/protein.h"
+#include "classes/glom.h"
 
 using namespace std;
-
-struct ResiduePlaceholder
-{
-    int node = 0;
-    int resno = 0;
-    std::string bw;
-
-    void set(const char* str)
-    {
-        if (strchr(str, '.')) bw = str;
-        else resno = atoi(str);
-    }
-
-    void resolve_resno(Protein* prot)
-    {
-        int hxno = atoi(bw.c_str());
-        const char* dot = strchr(bw.c_str(), '.');
-        int bwpos = atoi(dot+1);
-        resno = prot->get_bw50(hxno) + bwpos - 50;
-    }
-};
 
 struct DockResult
 {
@@ -85,249 +65,13 @@ struct AcvBndRot
     int resno;
     std::string aname;
     std::string bname;
-    Atom* atom;
-    Atom* btom;
-    Bond* bond;
+    Atom* atom = nullptr;
+    Atom* btom = nullptr;
+    Bond* bond = nullptr;
     float theta;
 };
 
-std::vector<int> extra_wt;
 
-#if _use_gloms
-struct AtomGlom
-{
-    std::vector<Atom*> atoms;
-
-    Point get_center()
-    {
-        int i;
-        float mass = 0;
-        Point result(0,0,0);
-        int atct = atoms.size();
-        if (!atct) return Point(0,0,0);
-        for (i=0; i<atct; i++)
-        {
-            Point pt = atoms[i]->get_location();
-            float m = atoms[i]->get_atomic_weight();
-            pt.scale(pt.magnitude() * m);
-            result = result.add(pt);
-            mass += m;
-        }
-        if (mass) result.scale(result.magnitude() / mass);
-        return result;
-    }
-
-    float get_pi()
-    {
-        int atct = atoms.size();
-        if (!atct) return 0;
-        int i;
-        float result = 0;
-        for (i=0; i<atct; i++)
-        {
-            if (atoms[i]->is_pi()) result += 1;
-        }
-        return result;
-    }
-
-    float get_polarity()
-    {
-        int atct = atoms.size();
-        if (!atct) return 0;
-        int i;
-        float result = 0;
-        for (i=0; i<atct; i++)
-        {
-            result += fabs(atoms[i]->is_polar());
-        }
-        return result;
-    }
-
-    float get_ionic()
-    {
-        int atct = atoms.size();
-        if (!atct) return 0;
-        int i;
-        float result = 0;
-        for (i=0; i<atct; i++)
-        {
-            float c = atoms[i]->get_charge();
-            if (c) result += c;
-            else
-            {
-                if (atoms[i]->get_family() == PNICTOGEN && !atoms[i]->is_amide())
-                {
-                    result += 0.5;
-                }
-            }
-        }
-        return result;
-    }
-
-    float get_sum()
-    {
-        return get_ionic()*60 + get_polarity()*25 + get_pi()*2;
-    }
-
-    float distance_to(Point pt)
-    {
-        int atct = atoms.size();
-        if (!atct) return -1;
-        int i;
-        float result = 0;
-        for (i=0; i<atct; i++)
-        {
-            float f = atoms[i]->get_location().get_3d_distance(pt);
-            if (!i || !f || f < result) result = f;
-        }
-        return result;
-    }
-
-    float bounds()
-    {
-        int atct = atoms.size();
-        if (!atct) return -1;
-        int i;
-        Point ptmin(0,0,0), ptmax(0,0,0);
-        for (i=0; i<atct; i++)
-        {
-            Point aloc = atoms[i]->get_location();
-            if (!i)
-            {
-                ptmin = aloc;
-                ptmax = aloc;
-            }
-            else
-            {
-                if (aloc.x < ptmin.x) ptmin.x = aloc.x;
-                if (aloc.y < ptmin.y) ptmin.y = aloc.y;
-                if (aloc.z < ptmin.z) ptmin.z = aloc.z;
-                if (aloc.x > ptmax.x) ptmax.x = aloc.x;
-                if (aloc.y > ptmax.y) ptmax.y = aloc.y;
-                if (aloc.z > ptmax.z) ptmax.z = aloc.z;
-            }
-        }
-
-        return ptmax.get_3d_distance(ptmin);
-    }
-
-    float compatibility(AminoAcid* aa)
-    {
-        int atct = atoms.size();
-        if (!atct) return 0;
-
-        float result = 0;
-        float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
-
-        float aachg = aa->get_charge();
-        if (aa->conditionally_basic()) aachg += 0.5;
-        if (lgi && aachg && sgn(lgi) != -sgn(aachg)) return 0;
-
-        if (aa->hydrophilicity() > 0.25)
-        {
-            if ((lgh / atct) < 0.19) return 0;
-        }
-        else
-        {
-            if ((lgh / atct) > 0.33333) return 0;
-        }
-
-        if (lgh)
-        {
-            int i;
-            int atct = atoms.size();
-            if (!aa->has_hbond_acceptors())
-            {
-                lgh = 0;
-                if (atct)
-                for (i=0; i<atct; i++)
-                {
-                    if (atoms[i]->is_polar() < 0) lgh++;
-                }
-            }
-            else if (!aa->has_hbond_donors())
-            {
-                lgh = 0;
-                if (atct)
-                for (i=0; i<atct; i++)
-                {
-                    if (atoms[i]->is_polar() > 0) lgh++;
-                }
-            }
-        }
- 
-        if (lgi) result += lgi * -aa->bindability_by_type(ionic) * 1000;
-        if (lgh) result += fabs(lgh) * fabs(aa->bindability_by_type(hbond)) * 30;
-        if (lgp) result += aa->bindability_by_type(pi);
-
-        return result;
-    }
-};
-
-struct ResidueGlom
-{
-    std::vector<AminoAcid*> aminos;
-
-    Point get_center()
-    {
-        int amsz = aminos.size();
-        if (!amsz) return Point(0,0,0);
-        int i, j;
-        j = 0;
-        Point result(0,0,0);
-        for (i=0; i<amsz; i++)
-        {
-            Atom** aa = aminos[i]->get_most_bindable(1);
-            Atom* a = aa[0]; // = aminos[i]->get_atom("CB");
-            delete aa;
-            // if (!a) a = aminos[i]->get_atom("CA");      // even though glycine probably shouldn't be part of a glom.
-            if (a)
-            {
-                Point pt = a->get_location();
-                result = result.add(pt);
-                j++;
-            }
-        }
-        if (j) result.scale(result.magnitude() / j);
-        return result;
-    }
-
-    float distance_to(Point pt)
-    {
-        return pt.get_3d_distance(get_center());
-    }
-
-    float compatibility(AtomGlom* ag)
-    {
-        int amsz = aminos.size();
-        if (!amsz) return 0;
-        float result = 0;
-        int i;
-        bool has_acids = false, has_his = false;
-        for (i=0; i<amsz; i++)
-        {
-            if (aminos[i]->get_charge() < 0) has_acids = true;
-            if (aminos[i]->conditionally_basic()) has_his = true;
-
-            float f = ag->compatibility(aminos[i]);
-
-            if (extra_wt.size()
-                    &&
-                    std::find(extra_wt.begin(), extra_wt.end(), aminos[i]->get_residue_no())!=extra_wt.end()
-            )
-            {
-                f *= 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
-            }
-
-            result += f;
-        }
-        if (has_acids && has_his && ag->get_ionic() > 0) result -= ag->get_ionic()*30;
-
-        return result;
-    }
-};
-
-#endif
 
 char* get_file_ext(char* filename)
 {
@@ -347,6 +91,7 @@ char protfname[256];
 char protafname[256];
 char tplfname[256];
 char ligfname[256];
+char smiles[256];
 char outfname[256];
 Point pocketcen, loneliest, pocketsize, ligbbox;
 std::ofstream *output = NULL;
@@ -357,7 +102,7 @@ std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
-bool configset=false, protset=false, tplset=false, ligset=false, pktset=false;
+bool configset=false, protset=false, tplset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
 Protein* protein;
 Protein* ptemplt;
@@ -441,6 +186,15 @@ std::vector<ResiduePlaceholder>forced_static_resnos;
 std::vector<Atom> dummies;
 #endif
 
+void colorrgb(int r, int g, int b)
+{
+    r = max(0, min(255, r));
+    g = max(0, min(255, g));
+    b = max(0, min(255, b));
+
+    cout << "\x1b[38;2;" << r << ";" << g << ";" << b << "m";
+}
+
 void colorize(float f)
 {
     float red, green, blue;
@@ -461,13 +215,7 @@ void colorize(float f)
         green = 0.333 * red + 0.666 * blue;
     }
 
-    int r, g, b;
-
-    r = max(0, min(255, (int)red));
-    g = max(0, min(255, (int)green));
-    b = max(0, min(255, (int)blue));
-
-    cout << "\x1b[38;2;" << r << ";" << g << ";" << b << "m";
+    colorrgb(red, green, blue);
 }
 
 void colorless()
@@ -544,6 +292,23 @@ float teleport_water(Molecule* mol)
     return e;
 }
 
+MCoord* search_mtlcoords_for_residue(AminoAcid* aa)
+{
+    int m, n;
+    if (!(n = mtlcoords.size())) return nullptr;
+
+    int i, j;
+    for (i=0; i<n; i++)
+    {
+        m = mtlcoords[i].coordres.size();
+        for (j=0; j<m; j++)
+        {
+            if (mtlcoords[i].coordres[j].resno == aa->is_residue()) return &mtlcoords[i];
+        }
+    }
+
+    return nullptr;
+}
 
 void iteration_callback(int iter)
 {
@@ -799,40 +564,52 @@ void iteration_callback(int iter)
 
     if (gcfmols && seql)
     {
-        Star discrete[SPHREACH_MAX+4];
+        Star discrete[SPHREACH_MAX+8];
         /*discrete[0].pmol = gcfmols[0];
         discrete[1].pmol = gcfmols[1];*/
 
-        int offset = 2;             // For some strange reason, if this is set to 1 the TAAR8 test fails.
+        int offset = 0;
 
-        if (waters) offset += maxh2o;
+        #if _dbg_anemia
+        cout << iter << ": ";
+        #endif
+        for (i=0; gcfmols[i]; i++)
+        {
+            if (!gcfmols[i]->is_residue() || !strcmp(gcfmols[i]->get_name(), "MTL") )
+            {
+                discrete[offset++].pmol = gcfmols[i];
+                #if _dbg_anemia
+                cout << discrete[offset-1].pmol->get_name() << " ";
+                #endif
+            }
+        }
+        #if _dbg_anemia
+        cout << endl;
+        progressbar = false;
+        #endif
 
-        for (i=0; i<offset; i++) discrete[i].pmol = gcfmols[i];
-
-        /*AminoAcid* resphres[SPHREACH_MAX+4];
+        AminoAcid* resphres[SPHREACH_MAX+4];
         for (i=0; i<SPHREACH_MAX+4; i++) resphres[i] = nullptr;
-        int sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);*/
+        sphres = protein->get_residues_can_clash_ligand(resphres, ligand, bary, size, addl_resno);
         //cout << "Sphres: " << sphres << endl;
         for (i=0; i<sphres; i++)
         {
             discrete[i+offset].paa = reaches_spheroid[nodeno][i];
         }
-        discrete[sphres+offset].n = 0;
 
-        sphres += offset;
-        for (i=0; i<sphres; i++) gcfmols[i] = discrete[i].pmol;
-        gcfmols[sphres] = nullptr;
+        discrete[i+offset].n = 0;
+
+        sphres = i;
+        for (i=0; discrete[i].n; i++) gcfmols[i] = discrete[i].pmol;
+        gcfmols[i] = nullptr;
     }
 
     _oei:
-    #if _dbg_glomsel
-    cout << "." << flush;
-    if (iter == iters-1) cout << endl << endl;
-    #endif
+    ;
 
     if (output_each_iter)
     {
-        std::string itersfname = (std::string)"tmp/" + (std::string)protein->get_name() + (std::string)"_iters.dock";
+        std::string itersfname = (std::string)"tmp/" /*+ (std::string)protein->get_name()*/ + (std::string)"_iters.dock";
         int liter = iter + movie_offset;
         FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
         if (fp)
@@ -865,8 +642,8 @@ void iteration_callback(int iter)
         for (i=0; i<80; i++)
         {
             float cmpi = 1.25*i;
-            if (cmpi <= percentage) cout << "\u2592";
-            else cout << "-";
+            if (cmpi <= percentage) cout << "\u2593";
+            else cout << "\u2591";
         }
         i = iter % 4;
         cout << ("|/-\\")[i] << " " << (int)percentage << "%.               " << endl;
@@ -1227,19 +1004,37 @@ int interpret_config_line(char** words)
         strcpy(ligfname, words[1]);
         // optsecho = "Ligand file is " + (std::string)ligfname;
         ligset = true;
+        if (ligcmd) smset = smcmd;
+        return 1;
+    }
+    else if (!strcmp(words[0], "SMILES"))
+    {
+        strcpy(smiles, words[1]);
+        smset = true;
         return 1;
     }
     else if (!strcmp(words[0], "MCOORD"))
     {
         int j=0;
-        optsecho = "Metal coordination on residues ";
-        for (i=1; words[i]; i++)
+        // optsecho = "Metal coordination on residues ";
+        MCoord mcr;
+        i=1; if (!words[i]) throw 0xbad372;
+        mcr.Z = Atom::Z_from_esym(words[1]);
+        if (!mcr.Z) throw 0xbad372;
+
+        i++; if (!words[i]) throw 0xbad372;
+        mcr.charge = atoi(words[i]);
+
+        i++; if (!words[i]) throw 0xbad372;
+        for (; words[i]; i++)
         {
             if (words[i][0] == '-' && words[i][1] == '-') break;
-            mcoord_resno[j++] = atoi(words[i]);
-            optsecho += to_string(atoi(words[i])) + (std::string)" ";
+            ResiduePlaceholder rp;
+            rp.set(words[i]);
+            mcr.coordres.push_back(rp);
         }
-        mcoord_resno[j] = 0;
+
+        mtlcoords.push_back(mcr);
         return i-1;
     }
     else if (!strcmp(words[0], "MOVIE"))
@@ -1302,6 +1097,11 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "PROGRESS"))
     {
         progressbar = true;
+        return 0;
+    }
+    else if (!strcmp(words[0], "CONGRESS"))
+    {
+        progressbar = false;
         return 0;
     }
     else if (!strcmp(words[0], "PROT"))
@@ -1385,6 +1185,10 @@ int interpret_config_line(char** words)
         optsecho += soft_names + (std::string)" ";
         return i-1;
     }
+    else if (!strcmp(words[0], "HARD"))
+    {
+        soft_pocket = false;
+    }
     else if (!strcmp(words[0], "SOFTBIAS"))
     {
         SoftBias lbias;
@@ -1417,7 +1221,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "TEMPLATE"))
     {
-        tplset = !strcmp(words[1], "off") && !strcmp(words[1], "OFF");
+        tplset = (strcmp(words[1], "off") != 0) && (strcmp(words[1], "OFF") != 0);
         if (tplset) strcpy(tplfname, words[1]);
         return 1;
     }
@@ -1561,7 +1365,7 @@ void prepare_initb()
         if (preconform && pre_ligand_iteration_ratio)
         {
             Molecule** delete_me;
-            Molecule::multimol_conform(
+            Molecule::conform_molecules(
                 prem /*reinterpret_cast<Molecule**>(preaa)*/,
                 delete_me = protein->all_residues_as_molecules(),
                 iters*pre_ligand_iteration_ratio
@@ -1670,7 +1474,7 @@ void do_tumble_spheres(Point l_pocket_cen)
     }
 
     const SCoord xaxis = Point(1,0,0), yaxis = Point(0,1,0), zaxis = Point(0,0,1);
-    float loneliness, blone=0, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
+    float loneliness=0, blone=0, xrad, yrad, zrad, lrad, step, bestxr, bestyr, bestzr, score, worth, weight, bestscore;
     const int ac = ligand->get_atom_count();
     Pose besp(ligand);
     #if _DBG_TUMBLE_SPHERES
@@ -1980,6 +1784,7 @@ int main(int argc, char** argv)
 
     strcpy(configfname, "primarydock.config");
 
+    smcmd = false;
     for (i=1; i<argc; i++)
     {
         if (argv[i][0] == '-' && argv[i][1] == '-')
@@ -1987,6 +1792,8 @@ int main(int argc, char** argv)
             argv[i] += 2;
             for (j=0; argv[i][j]; j++) if (argv[i][j] >= 'a' && argv[i][j] <= 'z') argv[i][j] &= 0x5f;
             j = interpret_config_line(&argv[i]);
+            if (ligset) ligcmd = true;
+            if (smset) smcmd = true;
             // if (optsecho.size()) cout << optsecho << endl;
             argv[i] -= 2;
             i += j;
@@ -2129,7 +1936,80 @@ int main(int argc, char** argv)
         fclose(pf);
     }
 
-    int l;  
+    int l;
+
+    if (mtlcoords.size())
+    {
+        for (i=0; i<mtlcoords.size(); i++)
+        {
+            Point lpt;
+            Molecule** lmc = new Molecule*[mtlcoords[i].coordres.size()+4];
+            lmc[0] = new Molecule("lcm");
+            Atom* lmtl = lmc[0]->add_atom(Atom::esym_from_Z(mtlcoords[i].Z), Atom::esym_from_Z(mtlcoords[i].Z), nullptr, 0);
+            lmtl->increment_charge(mtlcoords[i].charge);
+            mtlcoords[i].mtl = lmtl;
+            lmc[0]->movability = MOV_ALL;
+
+            l = 1;
+            for (j=0; j<mtlcoords[i].coordres.size(); j++)
+            {
+                mtlcoords[i].coordres[j].resolve_resno(protein);
+                AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
+                if (aa)
+                {
+                    aa->movability = MOV_FLEXONLY;
+                    lmc[l++] = (Molecule*)aa;
+                    Atom** Ss = aa->get_most_bindable(1, lmtl);
+                    lpt = lpt.add((Ss && Ss[0]) ? Ss[0]->get_location() : aa->get_barycenter());
+
+                    // If cysteine, make thiolate form.
+                    if (aa->is_thiol())
+                    {
+                        if (Ss)
+                        {
+                            Atom* S = Ss[0];
+                            Atom* H = S->is_bonded_to("H");
+                            if (H)
+                            {
+                                aa->delete_atom(H);
+                                S->increment_charge(-1);
+                            }
+                        }
+                    }
+
+                    if (l <= 2) aa->add_existing_atom(lmtl);
+                    aa->coordmtl = lmtl;
+                }
+            }
+            lmc[l] = nullptr;
+            if (l > 1)
+            {
+                l--;
+                lpt.x /= l; lpt.y /= l; lpt.z /= l;
+                l++;
+
+                lmtl->move(lpt);
+            }
+
+            lmtl->aaletter = '\0';
+            strcpy(lmtl->aa3let, "MTL");
+            lmtl->residue = 0;
+
+            Molecule::conform_molecules(lmc, 50);
+
+            for (j=0; j<mtlcoords[i].coordres.size(); j++)
+            {
+                AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
+                if (aa) aa->movability = MOV_FLXDESEL;
+            }
+        }
+
+        temp_pdb_file = "tmp/metal.pdb";
+
+        pf = fopen(temp_pdb_file.c_str(), "wb");
+        protein->save_pdb(pf);
+        fclose(pf);
+    }
 
     if (bridges.size())
     {
@@ -2277,7 +2157,8 @@ int main(int argc, char** argv)
     for (i=0; i<65536; i++) buffer[i] = 0;
 
     size_t wgaf;
-    switch (ext[0])
+    if (smset) ligand->from_smiles(smiles);
+    else switch (ext[0])
     {
     case 's':
     case 'S':
@@ -2309,6 +2190,8 @@ int main(int argc, char** argv)
         cout << "Unrecognized ligand file extension: " << ext << endl;
         return 0xbadf12e;
     }
+
+    std::vector<std::shared_ptr<AtomGlom>> agc = AtomGlom::get_potential_ligand_gloms(ligand);
 
     m.minimize_internal_clashes();
 
@@ -2352,10 +2235,10 @@ int main(int argc, char** argv)
         lig_grp[0] = ligand;
         lig_grp[1] = nullptr;
         ligand->movability = MOV_NORECEN;
-        Molecule::multimol_conform(lig_grp, prealign_res, prealign_iters, nullptr);
+        Molecule::conform_molecules(lig_grp, prealign_res, prealign_iters, nullptr);
 
         // Then line up residues to ligand.
-        if (flex) Molecule::multimol_conform(prealign_res, lig_grp, prealign_iters, nullptr);
+        if (flex) Molecule::conform_molecules(prealign_res, lig_grp, prealign_iters, nullptr);
         ligand->movability = MOV_ALL;
 
         delete[] words;
@@ -2370,12 +2253,14 @@ int main(int argc, char** argv)
     {
         #if _use_gloms
         AtomGlom glomtmp;
-        int types[3] = { pi, ionic, hbond };
+        int types[5] = { pi, ionic, hbond, 0, 0 };
+
+        if (mtlcoords.size()) types[3] = mcoord;
 
         int lac = ligand->get_atom_count();
         bool dirty[lac+4], dirttmp[lac+4];
 
-        for (n=0; n<3; n++)
+        for (n=0; types[n]; n++)
         {
             for (i=0; i<lac; i++) dirty[i] = false;
             for (i=0; i<lac; i++)
@@ -2388,6 +2273,7 @@ int main(int argc, char** argv)
                 float ac = a->get_charge();
                 float apol = a->is_polar();
                 float api = a->is_pi() && (a->get_Z() > 1);
+                int afam = a->get_family();
                 float rab;
 
                 glomtmp.atoms.clear();
@@ -2416,6 +2302,14 @@ int main(int argc, char** argv)
                                 dirttmp[j] = true;
                             }
                         }
+                    }
+                    break;
+
+                    case mcoord:
+                    if (afam == PNICTOGEN || afam == CHALCOGEN || (afam == HALOGEN && apol))
+                    {
+                        glomtmp.atoms.push_back(a);
+                        dirttmp[i] = true;
                     }
                     break;
 
@@ -2721,7 +2615,7 @@ _try_again:
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
-        ligand->crumple(fiftyseventh*44);
+        ligand->crumple(triangular);
 
         int rcn = required_contacts.size();
         if (rcn)
@@ -2748,6 +2642,21 @@ _try_again:
             protein->load_pdb(pf);
             fclose(pf);
             protein->soft_biases = soft_biases;
+
+            if (mtlcoords.size())
+            {
+                for (i=0; i<mtlcoords.size(); i++)
+                {
+                    for (j=0; j<mtlcoords[i].coordres.size(); j++)
+                    {
+                        AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
+                        if (aa)
+                        {
+                            aa->coordmtl = mtlcoords[i].mtl;
+                        }
+                    }
+                }
+            }
         }
         else
         {
@@ -3523,6 +3432,7 @@ _try_again:
                         if (mvaa)
                         {
                             mvaa->movability = MOV_FORCEFLEX;
+                            flexible_resnos.push_back(mvaa->get_residue_no());
                             #if _dbg_flexion_selection
                             cout << mvaa->get_name() << " forced flexible." << endl;
                             #endif
@@ -3581,21 +3491,52 @@ _try_again:
                 if (debug) *debug << "Initialize null AA pointer." << endl;
                 #endif
 
+                std::vector<std::shared_ptr<ResidueGlom>> scg = ResidueGlom::get_potential_side_chain_gloms(reaches_spheroid[nodeno], ligcen_target);
+                std::vector<std::shared_ptr<GlomPair>> gp = GlomPair::pair_gloms(agc, scg, ligcen_target);
+                ligand->recenter(ligcen_target);
+                GlomPair::align_gloms(ligand, gp);
+
                 // Best-Binding Algorithm
                 // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
-                if (use_bestbind_algorithm)
+                if (false && use_bestbind_algorithm)
                 {
                     for (l=0; l<3; l++)
                     {
                         sc_gloms[l].aminos.clear();
+                        sc_gloms[l].metallic = false;
+                        sc_gloms[l].metal = nullptr;
                         #if _use_gloms
                         // Find the strongest loneliest suitable side chain glom for ligand_gloms[l] and set sc_gloms[l] to equal it.
                         ResidueGlom glomtmp;
                         for (i=0; reaches_spheroid[nodeno][i]; i++)
                         {
                             glomtmp.aminos.clear();
-                            if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
+                            glomtmp.metallic = false;
+                            glomtmp.metal = nullptr;
+                            bool gloms_compatible = false;
+
+                            // If the residue belongs to a mtlcoords element, and the ligand glom is capable of mcoord or cation-pi,
+                            // then glomtmp automatically becomes the residues of that mtlcoords element, with a flag to indicate that
+                            // it's a metallic glom.
+                            MCoord* lmc = search_mtlcoords_for_residue(reaches_spheroid[nodeno][i]);
+                            if (lmc && (ligand_gloms[l].get_polarity() || ligand_gloms[l].get_ionic() || ligand_gloms[l].get_pi()) )
+                            {
+                                int ljlim = lmc->coordres.size();
+                                for (j=0; j<ljlim; j++)
+                                {
+                                    AminoAcid* aa = protein->get_residue(lmc->coordres[j].resno);
+                                    if (aa) glomtmp.aminos.push_back(aa);
+                                }
+
+                                glomtmp.metallic = true;
+                                glomtmp.metal = lmc->mtl;
+                                gloms_compatible = true;
+                                #if _dbg_glomsel
+                                cout << "Considering metal coordination site for glom " << l << "..." << endl;
+                                #endif
+                            }
+                            else if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
                             {
                                 #if _dbg_glomsel
                                 cout << "Considering " << reaches_spheroid[nodeno][i]->get_name() << " for glom " << l << "..." << endl;
@@ -3604,14 +3545,15 @@ _try_again:
                                 for (j=i+1; reaches_spheroid[nodeno][j]; j++)
                                 {
                                     if (!ligand_gloms[l].compatibility(reaches_spheroid[nodeno][j])) continue;
+                                    if (search_mtlcoords_for_residue(reaches_spheroid[nodeno][j])) continue;
                                     Atom* cb = reaches_spheroid[nodeno][j]->get_atom("CB");
                                     if (!cb) continue;
                                     if (frand(0,1) < bb_stochastic) continue;                       // stochastic component.
                                     float r = glomtmp.distance_to(cb->get_location());
                                     if (reaches_spheroid[nodeno][j]->hydrophilicity() >= 0.333)
-                                        r -= (reaches_spheroid[nodeno][j]->get_reach() + 2.5);
+                                        r -= (reaches_spheroid[nodeno][j]->get_reach() + 1.5);
                                     else
-                                        r -= 3.5;
+                                        r -= 2.5;
                                     if (r < ligand_gloms[l].bounds())
                                     {
                                         glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);
@@ -3620,30 +3562,42 @@ _try_again:
                                         #endif
                                     }
                                 }
+                                gloms_compatible = true;
+                            }
 
-                                bool too_similar = false;
+                            bool too_similar = false;
+                            if (gloms_compatible)
+                            {
                                 for (j=0; j<l; j++)
                                 {
-                                    if (sc_gloms[j].aminos == glomtmp.aminos) too_similar = true;
+                                    if (sc_gloms[j].aminos == glomtmp.aminos)
+                                    {
+                                        too_similar = true;
+                                        #if _dbg_glomsel
+                                        if (too_similar) cout << "Identical to an existing glom." << endl << endl;
+                                        #endif
+                                    }
                                     if (sc_gloms[j].aminos.size() == 1
                                         &&
                                         std::find(glomtmp.aminos.begin(), glomtmp.aminos.end(), sc_gloms[j].aminos[0]) != glomtmp.aminos.end()
                                     )
+                                    {   
                                         too_similar = true;
+                                        #if _dbg_glomsel
+                                        if (too_similar) cout << "Potential glom contains an already assigned residue." << endl << endl;
+                                        #endif
+                                    }
                                     if (glomtmp.aminos.size() == 1
                                         &&
                                         std::find(sc_gloms[j].aminos.begin(), sc_gloms[j].aminos.end(), glomtmp.aminos[0]) != sc_gloms[j].aminos.end()
                                     )
+                                    {
                                         too_similar = true;
-                                    // if (sc_gloms[j].get_center().get_3d_distance(glomtmp.get_center()) < 0.01) too_similar = true;
-                                    float rlg = ligand_gloms[j].get_center().get_3d_distance(ligand_gloms[l].get_center());
-                                    float rsg = ligand_gloms[j].get_center().get_3d_distance(glomtmp.get_center());
-                                    if (rsg < 0.9 * rlg) too_similar = true;
+                                        #if _dbg_glomsel
+                                        if (too_similar) cout << "Residue belongs to an existing glom." << endl << endl;
+                                        #endif
+                                    }
                                 }
-
-                                #if _dbg_glomsel
-                                if (too_similar) cout << "Too similar to an existing glom." << endl << endl;
-                                #endif
 
                                 if (!too_similar)
                                 {
@@ -3660,20 +3614,30 @@ _try_again:
                                     {
                                         sc_gloms[l] = glomtmp;
                                         #if _dbg_glomsel
-                                        cout << "Accepted with compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
+                                        colorrgb(0, 255, 0);
+                                        cout << "Accepted";
+                                        colorless();
+                                        cout << " with compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
                                             << " squared = " << tcptbl << "." << endl << endl;
                                         #endif
                                     }
                                     #if _dbg_glomsel
                                     else
                                     {
-                                        cout << "Rejected because compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
+                                        colorrgb(255, 0, 0);
+                                        cout << "Rejected";
+                                        colorless();
+                                        cout << " because compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
                                             << " squared is " << tcptbl << " not greater than previous value of " << ptcptbl << "." << endl << endl;
                                     }
                                     #endif
                                 }
                             }
                         }
+
+                        #if _dbg_glomsel
+                        cout << "------------------------------------------" << endl;
+                        #endif
 
                         #else
                         retain_bindings[l].cardinality = 0;
@@ -3821,7 +3785,7 @@ _try_again:
                 if (debug) *debug << "Alignment AA." << endl;
                 #endif
 
-                if (use_bestbind_algorithm)
+                if (false && use_bestbind_algorithm)
                 {
                     ligand->recenter(loneliest);
                     for (l=0; l<_bb_maxglom; l++)
@@ -3884,10 +3848,12 @@ _try_again:
                             // If there is only one residue in the sc glom, then move the ligand
                             // 2A towards loneliest.
                             n = sc_gloms[l].aminos.size();
+                            if (sc_gloms[l].metallic) n = 1;
                             if (!n) goto _deadglob;
                             #if _dbg_glomsel
                             cout << "Moving primary atom group to vicinity of";
-                            for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            if (sc_gloms[l].metallic) cout << " " << sc_gloms[l].metal->name;
+                            else for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
                             #endif
 
@@ -4124,10 +4090,9 @@ _try_again:
                                 mtmp[2] = nullptr;
                                 m.movability = MOV_FLEXONLY;
                                 alignment_aa[l]->movability = MOV_FLEXONLY;
-                                Molecule::multimol_conform(mtmp);
+                                Molecule::conform_molecules(mtmp);
                                 m.movability = MOV_ALL;
-                                // m.intermol_conform_norecen(alignment_aa[l], iters, reaches_spheroid[nodeno]);
-                                // alignment_aa[l]->intermol_conform_norecen(&m, iters, reaches_spheroid[nodeno]);
+
                                 if (debug) *debug << "Alignment atom " << l << " is "
                                                       << alignment_aa[l]->get_name() << ":" << alca->name
                                                       << " Z " << alca->get_Z() << endl;
@@ -4137,6 +4102,10 @@ _try_again:
                         }
                         #endif
                     }
+
+                    #if _dbg_glomsel
+                    cout << endl << endl;
+                    #endif
 
                     #if enforce_no_bb_pullaway && _use_gloms
                     last_ttl_bb_dist = 0;
@@ -4161,7 +4130,7 @@ _try_again:
                     mtmp[2] = alignment_aa[2];
                     mtmp[3] = nullptr;
                     m.movability = MOV_FLEXONLY;
-                    if (flex) Molecule::multimol_conform(mtmp);
+                    if (flex) Molecule::conform_molecules(mtmp);
                     m.movability = MOV_ALL;
                     #endif
 
@@ -4205,7 +4174,7 @@ _try_again:
 
             if (flex)
             {
-                #if flexion_selection
+                #if false && flexion_selection
                 for (j=0; j<flexible_resnos.size(); j++)
                 {
                     cfmols[i++] = protein->get_residue(flexible_resnos[j]);
@@ -4213,16 +4182,19 @@ _try_again:
                 #else
                 for (j=0; j<sphres; j++)
                 {
+                    #if ! flexion_selection
                     if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
+                    #endif
                     cfmols[i++] = reaches_spheroid[nodeno][j];
                 }
                 #endif
             }
+            int cfmolqty = i;
             for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 
             ligand->reset_conformer_momenta();
 
-            Molecule** delete_me;
+            // Molecule** delete_me;
             int trsz = tripswitch_clashables.size();
             Molecule* trip[j = trsz+4];
 
@@ -4242,19 +4214,33 @@ _try_again:
                 }
             }
 
+            int mcn;
+            Molecule lm("MTL");
+            if (mcn = mtlcoords.size())         // Assignment, not comparison.
+            {
+                for (i=0; i<mcn; i++)
+                {
+                    if (!mtlcoords[i].mtl) continue;                    
+                    lm.add_existing_atom(mtlcoords[i].mtl);
+                }
+
+                lm.movability = MOV_NONE;
+                cfmols[cfmolqty++] = &lm;
+                cfmols[cfmolqty] = nullptr;
+            }
+
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
-            Molecule::multimol_conform(
+            /*Molecule::multimol_conform(
                 cfmols,
                 delete_me = protein->all_residues_as_molecules_except(cfmols),
                 trip,
                 iters,
                 &iteration_callback
-            );
-            delete[] delete_me;
-
-            /*time_t jlgsux = time(NULL);
-            cout << "\nIterations took: " << (jlgsux-preiter) << " seconds." << endl;*/
+            );*/
+            ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
+            Molecule::conform_molecules(cfmols, iters, &iteration_callback);
+            // delete[] delete_me;
 
             #if active_persistence
             for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
@@ -4496,6 +4482,18 @@ _try_again:
             }
             // cout << btot << endl;
 
+            if (mcn = mtlcoords.size())         // Assignment, not comparison.
+            {
+                for (i=0; i<mcn; i++)
+                {
+                    if (!mtlcoords[i].mtl) continue;
+                    Molecule lm("MTL");
+                    lm.add_existing_atom(mtlcoords[i].mtl);
+                    float f = m.get_intermol_binding(&lm);
+                    btot += f;
+                }
+            }
+
             #if _peratom_audit
             cout << endl << "Interatomic Audit:" << endl;
             cout << "Total energy: " << -btot << endl;
@@ -4643,8 +4641,18 @@ _try_again:
                 #endif
             }
 
+            if (mtlcoords.size())
+            {
+                for (l=0; l<mtlcoords.size(); l++)
+                {
+                    mtlcoords[l].mtl->stream_pdb_line(
+                        pdbdat,
+                        9900+l
+                    );
+                }
+            }
+
             dr[drcount][nodeno].pdbdat = pdbdat.str();
-            // cout << "Attempt " << drcount << " node " << nodeno << " pdbdat is " << dr[drcount][nodeno].pdbdat.length() << " chars." << endl;
             if (debug) *debug << "Prepared the PDB strings." << endl;
 
             if (!nodeno)
@@ -4756,7 +4764,9 @@ _try_again:
 
                                 dr[j][k].metric
                                 && dr[j][k].metric[l]
-                                && dr[j][k].metric[l][0];
+                                && dr[j][k].metric[l][0]
+                                && dr[j][k].mkJmol
+                                ;
 
                                 l++
                             )

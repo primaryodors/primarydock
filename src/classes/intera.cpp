@@ -941,6 +941,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 if (br) partial /= br->get_atom_count();
                 else partial /= 6;
             }
+            else if (forces[i]->type == polarpi) partial /= 6;
 
             if (fabs(partial) > fabs(forces[i]->kJ_mol*2) || partial >= 500)
             {

@@ -1566,7 +1566,7 @@ float Atom::get_geometric_bond_angle()
 SCoord* Atom::get_geometry_aligned_to_bonds()
 {
     int bc = get_bonded_atoms_count();
-    if (origgeo>4 && bc && bc <= 4)
+    if (origgeo == 5 && bc && bc <= 4)
     {
         geometry=4;
         if (is_pi()) geometry--;

@@ -190,10 +190,15 @@ int main(int argc, char** argv)
                     clear_color();
                 }
 
-                /*if (!x && !y)
+                if (!x && !y)
                 {
                     int anisg = anisoa->get_geometry();
                     SCoord* anisgeo = anisoa->get_geometry_aligned_to_bonds();
+                    Molecule mptemp("Very temporary");
+
+                    int n = mp.get_atom_count();
+                    for (i=0; i<n; i++) mptemp.add_existing_atom(mp.get_atom(i));
+
                     if (anisgeo)
                         for (i=0; i<anisg; i++)
                         {
@@ -202,16 +207,16 @@ int main(int argc, char** argv)
                             pt = pt.add(aloc);
                             char buffer[10];
                             sprintf(buffer, "He%d", i);
-                            mp.add_atom("He", buffer, &pt, NULL, 0);
+                            mptemp.add_atom("He", buffer, &pt, NULL, 0);
                         }
 
                     FILE* pf = fopen("aniso.sdf", "wb");
                     Molecule* ligands[3];
-                    ligands[0] = &mp;
+                    ligands[0] = &mptemp;
                     ligands[1] = NULL;
                     m.save_sdf(pf, ligands);
                     fclose(pf);
-                }*/
+                }
             }
         }
         cout << endl;

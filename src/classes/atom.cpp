@@ -1966,6 +1966,7 @@ void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
 
 int Bond::count_moves_with_btom()
 {
+    if (!moves_with_btom) fill_moves_with_cache();
     if (!moves_with_btom) return 0;
     int i;
     for (i=0; moves_with_btom[i]; i++);	// Get count.
@@ -1974,6 +1975,7 @@ int Bond::count_moves_with_btom()
 
 int Bond::count_heavy_moves_with_btom()
 {
+    if (!moves_with_btom) fill_moves_with_cache();
     if (!moves_with_btom) return 0;
     int i, j=0;
     for (i=0; moves_with_btom[i]; i++)

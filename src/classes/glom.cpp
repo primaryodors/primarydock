@@ -3,6 +3,7 @@
 
 std::vector<int> extra_wt;
 std::vector<MCoord> mtlcoords;
+std::vector<std::shared_ptr<GlomPair>> gp;
 
 void ResiduePlaceholder::set(const char* str)
 {
@@ -578,7 +579,10 @@ float GlomPair::get_potential()
             {
                 AminoAcid* aa = scg->aminos[j];
                 float partial;
-                if (aa->coordmtl) partial = InteratomicForce::potential_binding(a, aa->coordmtl);
+                if (aa->coordmtl)
+                {
+                    partial = InteratomicForce::potential_binding(a, aa->coordmtl);
+                }
                 else
                 {
                     partial = aa->get_atom_mol_bind_potential(a);
@@ -736,13 +740,12 @@ void GlomPair::align_gloms(Molecule* lig, std::vector<std::shared_ptr<GlomPair>>
     #endif
     lig->rotate(lv, rot.a);
 
-
     // Scooch.
     float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->glom_reach();
     if (r > 0)
     {
         Point rel = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        rel.scale(r);
+        rel.scale(r-2);
         #if _dbg_glomsel
         cout << "Scooching " << *gp[0]->ag << " " << r << "Å into the reach of " << *gp[0]->scg << endl;
         #endif

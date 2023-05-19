@@ -538,6 +538,11 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
 
         float partial = forces[i]->kJ_mol;
 
+        if (forces[i]->type == hbond)
+        {
+            partial *= fabs(a->is_polar()) * fabs(b->is_polar());
+        }
+
         if (forces[i]->type == mcoord)
         {
             partial *= metal_compatibility(a, b);
@@ -546,13 +551,16 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
         potential += partial;
     }
 
-    // Oil and water don't mix.
-    if ((fabs(a->is_polar()) < 0.333 && (fabs(b->is_polar()) >= 0.333 || fabs(b->get_charge())))
-        ||
-        (fabs(b->is_polar()) < 0.333 && (fabs(a->is_polar()) >= 0.333 || fabs(a->get_charge())))
-       )
+    if (!a->is_metal() && !b->is_metal())
     {
-        potential -= ((fabs(a->is_polar()) < 0.333 && a->is_pi()) || (fabs(b->is_polar()) < 0.333 && b->is_pi())) ? 66 : 99;
+        // Oil and water don't mix.
+        if ((fabs(a->is_polar()) < 0.333 && (fabs(b->is_polar()) >= 0.333 || fabs(b->get_charge())))
+            ||
+            (fabs(b->is_polar()) < 0.333 && (fabs(a->is_polar()) >= 0.333 || fabs(a->get_charge())))
+        )
+        {
+            potential -= ((fabs(a->is_polar()) < 0.333 && a->is_pi()) || (fabs(b->is_polar()) < 0.333 && b->is_pi())) ? 66 : 99;
+        }
     }
 
     return potential;

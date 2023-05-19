@@ -429,21 +429,23 @@ void iteration_callback(int iter)
         for (l=0; l<3; l++)
         {
             #if _use_gloms
-            if (ligand_gloms[l].atoms.size() && sc_gloms[l].aminos.size())
+            // if (ligand_gloms[l].atoms.size() && sc_gloms[l].aminos.size())
+            if (gp.size() > l)
             #else
             if (ligbb[l] && alignment_aa[l])
             #endif
             {
                 #if _use_gloms
-                float r = ligand_gloms[l].distance_to(sc_gloms[l].get_center());
+                float r = gp[l]->ag->distance_to(gp[l]->scg->get_center()); //  ligand_gloms[l].distance_to(sc_gloms[l].get_center());
+                float r1 = r;
                 if (r < 2.5) r = 2.5;
                 if (r > _INTERA_R_CUTOFF) r = _INTERA_R_CUTOFF;
-                ttl_bb_dist += r;
+                ttl_bb_dist += r * (1.0 + 1.0 / (l+1));
                 #if _dbg_bb_pullaway
                 cout << "Ligand atoms ";
-                for (i=0; i<ligand_gloms[l].atoms.size(); i++) cout << ligand_gloms[l].atoms[i]->name << " ";
-                cout << "are " << r << " A from residues";
-                for (i=0; i<sc_gloms[l].aminos.size(); i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                for (i=0; i<gp[l]->ag->atoms.size(); i++) cout << gp[l]->ag->atoms[i]->name << " ";
+                cout << "are " << r1 << " A from residues";
+                for (i=0; i<gp[l]->scg->aminos.size(); i++) cout << " " << gp[l]->scg->aminos[i]->get_3letter() << gp[l]->scg->aminos[i]->get_residue_no();
                 cout << "." << endl;
                 #endif
                 #else
@@ -467,12 +469,12 @@ void iteration_callback(int iter)
         cout << endl;
         #endif
 
-        if (!iter || ttl_bb_dist < (1.0+bb_pullaway_allowance)*last_ttl_bb_dist)
+        if (!iter || ttl_bb_dist <= last_ttl_bb_dist)
         {
             pullaway_undo.copy_state(ligand);
             last_ttl_bb_dist = ttl_bb_dist;
         }
-        else
+        else if (iter && ttl_bb_dist > (1.0+bb_pullaway_allowance)*last_ttl_bb_dist)
         {
             pullaway_undo.restore_state(ligand);
         }
@@ -2249,7 +2251,7 @@ int main(int argc, char** argv)
     #endif
 
     // Best-Binding Code
-    if (use_bestbind_algorithm)
+    if (false && use_bestbind_algorithm)
     {
         #if _use_gloms
         AtomGlom glomtmp;
@@ -3492,281 +3494,20 @@ _try_again:
                 #endif
 
                 std::vector<std::shared_ptr<ResidueGlom>> scg = ResidueGlom::get_potential_side_chain_gloms(reaches_spheroid[nodeno], ligcen_target);
-                std::vector<std::shared_ptr<GlomPair>> gp = GlomPair::pair_gloms(agc, scg, ligcen_target);
+                gp = GlomPair::pair_gloms(agc, scg, ligcen_target);
                 ligand->recenter(ligcen_target);
                 GlomPair::align_gloms(ligand, gp);
+
+                int gpn = gp.size();
+                for (l=0; l<3 && l<gpn; l++)
+                {
+                    ligand_gloms[l] = *(gp[l]->ag);
+                    sc_gloms[l] = *(gp[l]->scg);
+                }
 
                 // Best-Binding Algorithm
                 // Find a binding pocket feature with a strong potential binding to the ligand.
                 std::string alignment_name = "";
-                if (false && use_bestbind_algorithm)
-                {
-                    for (l=0; l<3; l++)
-                    {
-                        sc_gloms[l].aminos.clear();
-                        sc_gloms[l].metallic = false;
-                        sc_gloms[l].metal = nullptr;
-                        #if _use_gloms
-                        // Find the strongest loneliest suitable side chain glom for ligand_gloms[l] and set sc_gloms[l] to equal it.
-                        ResidueGlom glomtmp;
-                        for (i=0; reaches_spheroid[nodeno][i]; i++)
-                        {
-                            glomtmp.aminos.clear();
-                            glomtmp.metallic = false;
-                            glomtmp.metal = nullptr;
-                            bool gloms_compatible = false;
-
-                            // If the residue belongs to a mtlcoords element, and the ligand glom is capable of mcoord or cation-pi,
-                            // then glomtmp automatically becomes the residues of that mtlcoords element, with a flag to indicate that
-                            // it's a metallic glom.
-                            MCoord* lmc = search_mtlcoords_for_residue(reaches_spheroid[nodeno][i]);
-                            if (lmc && (ligand_gloms[l].get_polarity() || ligand_gloms[l].get_ionic() || ligand_gloms[l].get_pi()) )
-                            {
-                                int ljlim = lmc->coordres.size();
-                                for (j=0; j<ljlim; j++)
-                                {
-                                    AminoAcid* aa = protein->get_residue(lmc->coordres[j].resno);
-                                    if (aa) glomtmp.aminos.push_back(aa);
-                                }
-
-                                glomtmp.metallic = true;
-                                glomtmp.metal = lmc->mtl;
-                                gloms_compatible = true;
-                                #if _dbg_glomsel
-                                cout << "Considering metal coordination site for glom " << l << "..." << endl;
-                                #endif
-                            }
-                            else if (ligand_gloms[l].compatibility(reaches_spheroid[nodeno][i]))
-                            {
-                                #if _dbg_glomsel
-                                cout << "Considering " << reaches_spheroid[nodeno][i]->get_name() << " for glom " << l << "..." << endl;
-                                #endif
-                                glomtmp.aminos.push_back(reaches_spheroid[nodeno][i]);
-                                for (j=i+1; reaches_spheroid[nodeno][j]; j++)
-                                {
-                                    if (!ligand_gloms[l].compatibility(reaches_spheroid[nodeno][j])) continue;
-                                    if (search_mtlcoords_for_residue(reaches_spheroid[nodeno][j])) continue;
-                                    Atom* cb = reaches_spheroid[nodeno][j]->get_atom("CB");
-                                    if (!cb) continue;
-                                    if (frand(0,1) < bb_stochastic) continue;                       // stochastic component.
-                                    float r = glomtmp.distance_to(cb->get_location());
-                                    if (reaches_spheroid[nodeno][j]->hydrophilicity() >= 0.333)
-                                        r -= (reaches_spheroid[nodeno][j]->get_reach() + 1.5);
-                                    else
-                                        r -= 2.5;
-                                    if (r < ligand_gloms[l].bounds())
-                                    {
-                                        glomtmp.aminos.push_back(reaches_spheroid[nodeno][j]);
-                                        #if _dbg_glomsel
-                                        cout << "Adding " << reaches_spheroid[nodeno][j]->get_name() << " to candidate." << endl;
-                                        #endif
-                                    }
-                                }
-                                gloms_compatible = true;
-                            }
-
-                            bool too_similar = false;
-                            if (gloms_compatible)
-                            {
-                                for (j=0; j<l; j++)
-                                {
-                                    if (sc_gloms[j].aminos == glomtmp.aminos)
-                                    {
-                                        too_similar = true;
-                                        #if _dbg_glomsel
-                                        if (too_similar) cout << "Identical to an existing glom." << endl << endl;
-                                        #endif
-                                    }
-                                    if (sc_gloms[j].aminos.size() == 1
-                                        &&
-                                        std::find(glomtmp.aminos.begin(), glomtmp.aminos.end(), sc_gloms[j].aminos[0]) != glomtmp.aminos.end()
-                                    )
-                                    {   
-                                        too_similar = true;
-                                        #if _dbg_glomsel
-                                        if (too_similar) cout << "Potential glom contains an already assigned residue." << endl << endl;
-                                        #endif
-                                    }
-                                    if (glomtmp.aminos.size() == 1
-                                        &&
-                                        std::find(sc_gloms[j].aminos.begin(), sc_gloms[j].aminos.end(), glomtmp.aminos[0]) != sc_gloms[j].aminos.end()
-                                    )
-                                    {
-                                        too_similar = true;
-                                        #if _dbg_glomsel
-                                        if (too_similar) cout << "Residue belongs to an existing glom." << endl << endl;
-                                        #endif
-                                    }
-                                }
-
-                                if (!too_similar)
-                                {
-                                    float r = glomtmp.distance_to(loneliest);
-                                    float rr = sc_gloms[l].distance_to(loneliest);
-                                    float rg = ligand_gloms[l].distance_to(ligand->get_barycenter());
-
-                                    r -= rg; if (r < 1) r = 1;
-                                    rr -= rg; if (rr < 1) rr = 1;
-
-                                    float tcptbl = glomtmp.compatibility(&ligand_gloms[l]) / (r*r);
-                                    float ptcptbl = sc_gloms[l].compatibility(&ligand_gloms[l]) / (rr*rr);
-                                    if (!i || tcptbl > ptcptbl)
-                                    {
-                                        sc_gloms[l] = glomtmp;
-                                        #if _dbg_glomsel
-                                        colorrgb(0, 255, 0);
-                                        cout << "Accepted";
-                                        colorless();
-                                        cout << " with compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
-                                            << " squared = " << tcptbl << "." << endl << endl;
-                                        #endif
-                                    }
-                                    #if _dbg_glomsel
-                                    else
-                                    {
-                                        colorrgb(255, 0, 0);
-                                        cout << "Rejected";
-                                        colorless();
-                                        cout << " because compatibility " << glomtmp.compatibility(&ligand_gloms[l]) << " over distance " << r
-                                            << " squared is " << tcptbl << " not greater than previous value of " << ptcptbl << "." << endl << endl;
-                                    }
-                                    #endif
-                                }
-                            }
-                        }
-
-                        #if _dbg_glomsel
-                        cout << "------------------------------------------" << endl;
-                        #endif
-
-                        #else
-                        retain_bindings[l].cardinality = 0;
-                        if (!ligbb[l]) continue;
-                        retain_bindings[l].atom = ligbb[l];
-                        ligand->springy_bonds = retain_bindings;
-                        ligand->springy_bondct = l+1;
-                        float alignment_potential = 0;
-                        for (i=0; reaches_spheroid[nodeno][i]; i++)
-                        {
-                            if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][i]))
-                            {
-                                reaches_spheroid[nodeno][i] = NULL;
-                                continue;
-                            }
-
-                            if (l && reaches_spheroid[nodeno][i] == alignment_aa[l-1]) continue;
-                            if (l>1 && reaches_spheroid[nodeno][i] == alignment_aa[l-2]) continue;
-
-                            if (lig_inter_typ[l] == vdW && reaches_spheroid[nodeno][i]->hydrophilicity() >= 0.3) continue;
-                            if (lig_inter_typ[l] == hbond && reaches_spheroid[nodeno][i]->hydrophilicity() < 0.2) continue;
-                            if (lig_inter_typ[l] == ionic && reaches_spheroid[nodeno][i]->hydrophilicity() < 0.3) continue;
-
-                            if (reaches_spheroid[nodeno][i]->is_glycine()) continue;
-
-                            #if _DBG_STEPBYSTEP
-                            if (debug)
-                            {
-                                *debug << "Check capable of inter (" << i << ") ";
-                                *debug << lig_inter_typ[l];
-                                *debug << flush;
-                                Star s;
-                                s.paa = reaches_spheroid[nodeno][i];
-                                *debug << *s.paa << " " << flush;
-                                *debug << *reaches_spheroid[nodeno][i];
-                                *debug << endl;
-                            }
-                            #endif
-
-                            float pottmp = reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbb[l]);
-                            if (ligbbh[l]) pottmp += reaches_spheroid[nodeno][i]->get_atom_mol_bind_potential(ligbbh[l]);
-
-                            if (lig_inter_typ[l] == hbond)
-                            {
-                                pottmp *= (1.0 + reaches_spheroid[nodeno][i]->hydrophilicity() * hydrophilicity_boost);
-                            }
-                            else if (lig_inter_typ[l] == pi || lig_inter_typ[l] == vdW)
-                            {
-                                pottmp *= fmax(0, 1.0 - reaches_spheroid[nodeno][i]->hydrophilicity() * hydrophilicity_boost);
-                            }
-
-                            pottmp *= (1.0 + frand(-best_binding_stochastic, best_binding_stochastic) );
-
-                            if (extra_wt.size()
-                                    &&
-                                    std::find(extra_wt.begin(), extra_wt.end(), reaches_spheroid[nodeno][i]->get_residue_no())!=extra_wt.end()
-                               )
-                            {
-                                pottmp *= 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
-                            }
-                            else
-                            {
-                                pottmp /= pocketcen.get_3d_distance(reaches_spheroid[nodeno][i]->get_barycenter());
-                            }
-                            // cout << reaches_spheroid[nodeno][i]->get_3letter() << reaches_spheroid[nodeno][i]->get_residue_no() << " " << pottmp << endl;
-                            Atom* coi = reaches_spheroid[nodeno][i]->capable_of_inter(lig_inter_typ[l]);
-                            if (coi
-                                    &&
-                                    (	!alignment_aa[l]
-                                        ||
-                                        pottmp > alignment_potential
-                                        ||
-                                        ((pose>1) && pottmp > (0.9 * alignment_potential) && !(rand() % sphres))
-                                    )
-                               )
-                            {
-                                alignment_aa[l] = reaches_spheroid[nodeno][i];
-                                // alignment_name += std::to_string("|") + std::to_string(reaches_spheroid[nodeno][i]->get_residue_no());
-                                alignment_potential = pottmp;
-                                alignment_distance[l] = potential_distance;
-                                retain_bindings[l].btom = coi;
-                                retain_bindings[l].cardinality = 0.25;
-                                retain_bindings[l].type = lig_inter_typ[l];
-                                
-                                bool opml_known = false;
-                                try
-                                {
-                                    retain_bindings[l].optimal_radius = InteratomicForce::coordinate_bond_radius(ligbb[l], coi, lig_inter_typ[l]);
-                                    retain_bindings[l].optimal_radius = InteratomicForce::coordinate_bond_radius(
-                                        retain_bindings[l].atom,
-                                        retain_bindings[l].btom,
-                                        retain_bindings[l].type
-                                        );
-                                    opml_known = true;
-                                }
-                                catch (int ex)
-                                {
-                                    ;
-                                }
-                                if (!opml_known && ligbbh[l] && (retain_bindings[l].btom->get_Z() > 1 || retain_bindings[l].type == vdW))
-                                {
-                                    try
-                                    {
-                                        retain_bindings[l].optimal_radius = InteratomicForce::coordinate_bond_radius(
-                                            ligbbh[l],
-                                            retain_bindings[l].btom,
-                                            retain_bindings[l].type
-                                            );
-                                        retain_bindings[l].atom = ligbbh[l];
-                                        opml_known = true;
-                                    }
-                                    catch (int ex)
-                                    {
-                                        retain_bindings[l].optimal_radius = 2.5;
-                                    }
-                                }
-
-                                alignment_aa[l]->springy_bonds = retain_bindings;
-                                alignment_aa[l]->springy_bondct = l+1;
-                            }
-                            #if _DBG_STEPBYSTEP
-                            if (debug) *debug << "Candidate alignment AA." << endl;
-                            #endif
-                        }
-                        #endif
-                        _found_alignaa:
-                        ;
-                    }
-                }
                 
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Selected an alignment AA." << endl;

@@ -19,6 +19,28 @@ std::vector<std::string> interaudit;
 bool interauditing = false;
 #endif
 
+void InteratomicForce::append_by_Z(int Za, int Zb, InteratomicForce* iff)
+{
+    int i;
+
+    if (!forces_by_Z[Za][Zb])
+    {
+        forces_by_Z[Za][Zb] = new InteratomicForce*[24];
+        for (i=0; i<24; i++)
+            forces_by_Z[Za][Zb][i] = 0;
+    }
+
+    for (i=0; i<23; i++)
+    {
+        if (!forces_by_Z[Za][Zb][i])
+        {
+            forces_by_Z[Za][Zb][i] = iff;
+            // if (all_forces[ifcount]->type == mcoord) cout << all_forces[ifcount]->Za << " " << all_forces[ifcount]->Zb << " " << i << " " << all_forces[ifcount]->type << endl;
+            break;
+        }
+    }
+}
+
 void InteratomicForce::read_all_forces()
 {
     int i, ifcount = 0;
@@ -49,39 +71,35 @@ void InteratomicForce::read_all_forces()
                     all_forces[ifcount]->Zb >= 1 && all_forces[ifcount]->Zb < 36
                 )
                 {
-                    if (!forces_by_Z[all_forces[ifcount]->Za][all_forces[ifcount]->Zb])
-                    {
-                        forces_by_Z[all_forces[ifcount]->Za][all_forces[ifcount]->Zb] = new InteratomicForce*[16];
-                        for (i=0; i<16; i++)
-                            forces_by_Z[all_forces[ifcount]->Za][all_forces[ifcount]->Zb][i] = 0;
-                    }
+                    append_by_Z(all_forces[ifcount]->Za, all_forces[ifcount]->Zb, all_forces[ifcount]);
+                    append_by_Z(all_forces[ifcount]->Zb, all_forces[ifcount]->Za, all_forces[ifcount]);
+                }
 
-                    for (i=0; i<15; i++)
+                if (all_forces[ifcount]->Za == any_element
+                    &&
+                    all_forces[ifcount]->Zb >= 1 && all_forces[ifcount]->Zb < 36
+                )
+                {
+                    for (i=1; i<36; i++)
                     {
-                        if (!forces_by_Z[all_forces[ifcount]->Za][all_forces[ifcount]->Zb][i])
-                        {
-                            forces_by_Z[all_forces[ifcount]->Za][all_forces[ifcount]->Zb][i] = all_forces[ifcount];
-                            // if (all_forces[ifcount]->type == mcoord) cout << all_forces[ifcount]->Za << " " << all_forces[ifcount]->Zb << " " << i << " " << all_forces[ifcount]->type << endl;
-                            break;
-                        }
-                    }
-
-                    if (!forces_by_Z[all_forces[ifcount]->Zb][all_forces[ifcount]->Za])
-                    {
-                        forces_by_Z[all_forces[ifcount]->Zb][all_forces[ifcount]->Za] = new InteratomicForce*[16];
-                        for (i=0; i<16; i++)
-                            forces_by_Z[all_forces[ifcount]->Zb][all_forces[ifcount]->Za][i] = 0;
-                    }
-
-                    for (i=0; i<15; i++)
-                    {
-                        if (!forces_by_Z[all_forces[ifcount]->Zb][all_forces[ifcount]->Za][i])
-                        {
-                            forces_by_Z[all_forces[ifcount]->Zb][all_forces[ifcount]->Za][i] = all_forces[ifcount];
-                            break;
-                        }
+                        append_by_Z(i, all_forces[ifcount]->Zb, all_forces[ifcount]);
+                        append_by_Z(all_forces[ifcount]->Zb, i, all_forces[ifcount]);
                     }
                 }
+
+                if (all_forces[ifcount]->Zb == any_element
+                    &&
+                    all_forces[ifcount]->Za >= 1 && all_forces[ifcount]->Za < 36
+                )
+                {
+                    for (i=1; i<36; i++)
+                    {
+                        append_by_Z(i, all_forces[ifcount]->Za, all_forces[ifcount]);
+                        append_by_Z(all_forces[ifcount]->Za, i, all_forces[ifcount]);
+                    }
+                }
+
+                if (all_forces[ifcount]->Za == any_element && all_forces[ifcount]->Zb == any_element) throw 0x666b75;
 
                 ifcount++;
             }
@@ -520,7 +538,7 @@ float InteratomicForce::metal_compatibility(Atom* a, Atom* b)
 {
     float f = (1.0 + 1.0 * cos(fmin(fabs(((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25)*6), M_PI)));
     #if _dbg_glomsel
-    cout << "Metal compatibility for " << *a << "..." << *b << " = " << f << endl;
+    // cout << "Metal compatibility for " << *a << "..." << *b << " = " << f << endl;
     #endif
     return f;
 }

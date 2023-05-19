@@ -56,6 +56,7 @@ protected:
 
     void read_dat_line(char* line);
     static void read_all_forces();
+    static void append_by_Z(int Za, int Zb, InteratomicForce* iff);
 
     friend std::ostream& operator<<(std::ostream& os, const InteratomicForce& iff);
 };

@@ -497,7 +497,6 @@ void iteration_callback(int iter)
         for (l=0; l<3; l++)
         {
             #if _use_gloms
-            // if (ligand_gloms[l].atoms.size() && sc_gloms[l].aminos.size())
             if (gp.size() > l)
             #else
             if (ligbb[l] && alignment_aa[l])

@@ -402,6 +402,7 @@ std::vector<std::shared_ptr<AtomGlom>> AtomGlom::get_potential_ligand_gloms(Mole
         for (j=0; j<n; j++)
         {
             if (j==i) continue;
+            if (dirty[j]) continue;
 
             Atom* b = mol->get_atom(j);
             if (!b) continue;
@@ -514,6 +515,11 @@ std::vector<std::shared_ptr<ResidueGlom>> ResidueGlom::get_potential_side_chain_
             {
                 float a3d = find_3d_angle(CB->get_location(), pcen, bb->get_CA_location());
                 if (a3d > fiftyseventh*120)
+                {
+                    dirty[j] = true;
+                    continue;
+                }
+                else if (bb->get_num_rings() && bb->ring_is_aromatic(0) && a3d > hexagonal)
                 {
                     dirty[j] = true;
                     continue;

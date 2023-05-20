@@ -331,7 +331,7 @@ void iteration_callback(int iter)
 
         Rotation rot;
 
-        if (scg0.get_3d_distance(ag0) > 2.5)
+        if (scg0.get_3d_distance(ag0) > bb_realign_threshold_distance)
         {
             rot = align_points_3d(ag0, scg0, ag1);
             if (rot.a < 0)
@@ -340,16 +340,16 @@ void iteration_callback(int iter)
                 rot.v.r *= -1;
                 rot.v = (SCoord)((Point)rot.v);
             }
-            if (rot.a > fiftyseventh*10)
+            if (rot.a > bb_realign_threshold_angle)
             {
-                rot.a = fmin(hexagonal, rot.a/3);
+                rot.a = fmin(hexagonal, rot.a*bb_realign_amount) / gp[0]->ag->atoms.size();
                 LocatedVector lv = rot.v;
                 lv.origin = ag1;
                 ligand->rotate(lv, rot.a);
             }
         }
 
-        if (scg1.get_3d_distance(ag1) > 2.5)
+        if (scg1.get_3d_distance(ag1) > bb_realign_threshold_distance)
         {
             rot = align_points_3d(ag1, scg1, ag0);
             if (rot.a < 0)
@@ -358,9 +358,9 @@ void iteration_callback(int iter)
                 rot.v.r *= -1;
                 rot.v = (SCoord)((Point)rot.v);
             }
-            if (rot.a > fiftyseventh*10)
+            if (rot.a > bb_realign_threshold_angle)
             {
-                rot.a = fmin(hexagonal, rot.a/3);
+                rot.a = fmin(hexagonal, rot.a*bb_realign_amount) / gp[1]->ag->atoms.size();
                 LocatedVector lv = rot.v;
                 lv.origin = ag0;
                 ligand->rotate(lv, rot.a);
@@ -372,14 +372,17 @@ void iteration_callback(int iter)
             Point scg2 = gp[2]->scg->get_center();
             Point ag2  = gp[2]->ag->get_center();
 
-            if (scg2.get_3d_distance(ag2) > 2.5)
+            if (scg2.get_3d_distance(ag2) > bb_realign_threshold_distance)
             {
                 float theta = find_angle_along_vector(ag2, scg2, ag0, ag1.subtract(ag0));
 
-                LocatedVector v = (SCoord)ag1.subtract(ag0);
-                v.origin = ag0;
+                if (fabs(theta) > bb_realign_threshold_angle)
+                {
+                    LocatedVector v = (SCoord)ag1.subtract(ag0);
+                    v.origin = ag0;
 
-                ligand->rotate(v, theta / 3);
+                    ligand->rotate(v, theta * bb_realign_amount / gp[2]->ag->atoms.size());
+                }
             }
         }
     }

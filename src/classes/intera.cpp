@@ -558,7 +558,7 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
 
         if (forces[i]->type == hbond)
         {
-            partial *= fabs(a->is_polar()) * fabs(b->is_polar());
+            partial *= fmin(fabs(a->is_polar()), fabs(b->is_polar()));
         }
 
         if (forces[i]->type == mcoord)

@@ -48,13 +48,16 @@ public:
     }
     Atom** get_moves_with_btom();
     int count_moves_with_btom();
+    int count_heavy_moves_with_atom();
     int count_heavy_moves_with_btom();
+    Bond* get_reversed();
     void swing(SCoord newdir);		// Rotate btom, and all its moves_with atoms, about atom so that the bond points to newdir.
 
 protected:
     void fill_moves_with_cache();
     void enforce_moves_with_uniqueness();
     Atom** moves_with_btom = 0;
+    Bond* reversed = nullptr;
 };
 
 enum RING_TYPE

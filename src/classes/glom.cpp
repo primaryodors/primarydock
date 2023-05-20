@@ -334,6 +334,37 @@ float ResidueGlom::glom_reach()
     return retval;
 }
 
+void ResidueGlom::conform_to(Molecule* mol)
+{
+    if (metallic) return;
+
+    int i, n;
+
+    n = aminos.size();
+    if (!n) return;
+
+    for (i=0; i<n; i++)
+    {
+        MovabilityType mt = aminos[i]->movability;
+        if (!(mt & MOV_FORBIDDEN))
+        {
+            aminos[i]->movability = MOV_FORCEFLEX;
+            Star s;
+            int j, n1;
+
+            Molecule* ll[3];
+            ll[0] = mol;
+            s.paa = aminos[i];
+            ll[1] = s.pmol;
+            ll[2] = nullptr;
+
+            Molecule::conform_molecules(ll, 50);
+
+            aminos[i]->movability = mt;
+        }
+    }
+}
+
 std::vector<std::shared_ptr<AtomGlom>> AtomGlom::get_potential_ligand_gloms(Molecule* mol)
 {
     std::vector<std::shared_ptr<AtomGlom>> retval;
@@ -745,12 +776,14 @@ void GlomPair::align_gloms(Molecule* lig, std::vector<std::shared_ptr<GlomPair>>
     if (r > 0)
     {
         Point rel = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        rel.scale(r-2);
+        rel.scale(r-1);
         #if _dbg_glomsel
         cout << "Scooching " << *gp[0]->ag << " " << r << "Å into the reach of " << *gp[0]->scg << endl;
         #endif
         lig->move(rel);
     }
+
+    gp[0]->scg->conform_to(lig);
 
     if (n < 2) return;
     rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
@@ -760,6 +793,8 @@ void GlomPair::align_gloms(Molecule* lig, std::vector<std::shared_ptr<GlomPair>>
     cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
     #endif
     lig->rotate(lv, rot.a);
+
+    gp[1]->scg->conform_to(lig);
 
     if (n < 3) return;
     Point zcen = gp[0]->ag->get_center();
@@ -771,5 +806,7 @@ void GlomPair::align_gloms(Molecule* lig, std::vector<std::shared_ptr<GlomPair>>
     cout << "\"Rotisserie\" aligning " << *gp[2]->ag << " in the direction of " << *gp[2]->scg << endl;
     #endif
     lig->rotate(lv, theta);
+
+    gp[2]->scg->conform_to(lig);
 }
 

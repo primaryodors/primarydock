@@ -24,6 +24,7 @@ struct DockResult
     float* imvdWrepl;
     std::string softrock;
     std::string pdbdat;
+    std::string miscdata;
     float bytype[_INTER_TYPES_LIMIT];
     float ibytype[_INTER_TYPES_LIMIT];
     float proximity;                    // How far the ligand center is from the node's center.
@@ -320,6 +321,54 @@ void iteration_callback(int iter)
         protein->soft_iteration(soft_rgns, ligand);
     }
 
+    #if bb_realign_iters
+    if (gp.size() >= 2)
+    {
+        Point scg0 = gp[0]->scg->get_center();
+        Point scg1 = gp[1]->scg->get_center();
+        Point ag0  = gp[0]->ag->get_center();
+        Point ag1  = gp[1]->ag->get_center();
+
+        Rotation rot;
+
+        if (scg0.get_3d_distance(ag0) > 2)
+        {
+            rot = align_points_3d(ag0, scg0, ag1);
+            if (rot.a < 0)
+            {
+                rot.a *= -1;
+                rot.v.r *= -1;
+                rot.v = (SCoord)((Point)rot.v);
+            }
+            if (rot.a > fiftyseventh*10)
+            {
+                rot.a = fmin(hexagonal, rot.a/3);
+                LocatedVector lv = rot.v;
+                lv.origin = ag1;
+                ligand->rotate(lv, rot.a);
+            }
+        }
+
+        if (scg1.get_3d_distance(ag1) > 2)
+        {
+            rot = align_points_3d(ag1, scg1, ag0);
+            if (rot.a < 0)
+            {
+                rot.a *= -1;
+                rot.v.r *= -1;
+                rot.v = (SCoord)((Point)rot.v);
+            }
+            if (rot.a > fiftyseventh*10)
+            {
+                rot.a = fmin(hexagonal, rot.a/3);
+                LocatedVector lv = rot.v;
+                lv.origin = ag0;
+                ligand->rotate(lv, rot.a);
+            }
+        }
+    }
+    #endif
+
     Point bary = ligand->get_barycenter();
 
     int ac = ligand->get_atom_count();
@@ -442,7 +491,7 @@ void iteration_callback(int iter)
                 if (r > _INTERA_R_CUTOFF) r = _INTERA_R_CUTOFF;
                 ttl_bb_dist += r * (1.0 + 1.0 / (l+1));
                 #if _dbg_bb_pullaway
-                cout << "Ligand atoms ";
+                cout << pose << ":" << iter << ": Ligand atoms ";
                 for (i=0; i<gp[l]->ag->atoms.size(); i++) cout << gp[l]->ag->atoms[i]->name << " ";
                 cout << "are " << r1 << " A from residues";
                 for (i=0; i<gp[l]->scg->aminos.size(); i++) cout << " " << gp[l]->scg->aminos[i]->get_3letter() << gp[l]->scg->aminos[i]->get_residue_no();
@@ -612,7 +661,7 @@ void iteration_callback(int iter)
     if (output_each_iter)
     {
         std::string itersfname = (std::string)"tmp/" /*+ (std::string)protein->get_name()*/ + (std::string)"_iters.dock";
-        int liter = iter + movie_offset;
+        int liter = iter - 1 + movie_offset;
         FILE* fp = fopen(itersfname.c_str(), ((liter == 0 && pose == 1) ? "wb" : "ab") );
         if (fp)
         {
@@ -4265,6 +4314,28 @@ _try_again:
             dr[drcount][nodeno].tripswitch  = tripclash;
             dr[drcount][nodeno].proximity  = ligand->get_barycenter().get_3d_distance(nodecen);
             dr[drcount][nodeno].protclash = protein->get_rel_int_clashes();
+
+            if (use_bestbind_algorithm)
+            {
+                dr[drcount][nodeno].miscdata += (std::string)"Best-Binding Pairs:\n";
+                for (i=0; i<3 && i<gp.size(); i++)
+                {
+                    n = gp[i]->ag->atoms.size();
+                    int j2;
+                    for (j2=0; j2<n; j2++)
+                        dr[drcount][nodeno].miscdata += (std::string)gp[i]->ag->atoms[j2]->name + (std::string)" ";
+                    
+                    dr[drcount][nodeno].miscdata += (std::string)"- ";
+
+                    n = gp[i]->scg->aminos.size();
+                    for (j2=0; j2<n; j2++)
+                        dr[drcount][nodeno].miscdata += (std::string)gp[i]->scg->aminos[j2]->get_name() + (std::string)" ";
+                    
+                    dr[drcount][nodeno].miscdata += (std::string)"\n";
+                }
+                dr[drcount][nodeno].miscdata += (std::string)"\n";
+            }
+
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
@@ -4613,6 +4684,12 @@ _try_again:
                             if (output && do_output_colors) colorize(dr[j][k].kJmol);
                             cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
                             if (output && do_output_colors) colorless();
+                        }
+
+                        if (dr[j][k].miscdata.size())
+                        {
+                            cout << endl << dr[j][k].miscdata << endl;
+                            if (output ) *output << endl << dr[j][k].miscdata << endl;
                         }
 
                         if (dr[j][k].softrock.size())

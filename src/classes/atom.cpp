@@ -1985,6 +1985,21 @@ int Bond::count_heavy_moves_with_btom()
     return j;
 }
 
+Bond* Bond::get_reversed()
+{
+    if (!atom || !btom) return 0;
+    if (!reversed)
+    {
+        reversed = btom->get_bond_between(atom);
+    }
+    return reversed;
+}
+
+int Bond::count_heavy_moves_with_atom()
+{
+    return get_reversed()->count_heavy_moves_with_btom();
+}
+
 int Atom::num_rings()
 {
     if (!member_of) return 0;

@@ -114,6 +114,7 @@
 #define bb_stochastic 0.15
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.13
+#define bb_realign_iters 1
 #define flexion_selection 1
 #define no_zero_flexions 1
 
@@ -307,9 +308,9 @@
 #define _DBG_HISFLIP 0
 #define _DBG_MOLBB 0
 #define _dbg_bb_rots 0
-#define _dbg_bb_pullaway 0
+#define _dbg_bb_pullaway 1
 #define _dbg_soft 0
-#define _dbg_glomsel 1
+#define _dbg_glomsel 0
 #define _dbg_polsat 0
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0

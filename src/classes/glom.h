@@ -54,6 +54,7 @@ class ResidueGlom
     float distance_to(Point pt);
     float compatibility(AtomGlom* ag);
     float glom_reach();
+    void conform_to(Molecule* mol);
 
     static std::vector<std::shared_ptr<ResidueGlom>> get_potential_side_chain_gloms(AminoAcid** aalist, Point pocketcen);
 };

@@ -2227,6 +2227,11 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
                 partial = ifs[j]->get_kJmol();
             }
 
+            if (ifs[j]->get_type() == hbond)
+            {
+                partial *= fmin(fabs(a->is_polar()), fabs(atoms[i]->is_polar()));
+            }
+
             if (ifs[j]->get_type() == polarpi) partial /= 6;            // Config is for benzene rings.
 
             if (ifs[j]->get_type() == mcoord)
@@ -2762,7 +2767,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 
             /**** Linear Motion ****/
             #if allow_linear_motion
-            if (a->movability & MOV_CAN_RECEN)
+            if ((a->movability & MOV_CAN_RECEN) && !(a->movability & MOV_FORBIDDEN))
             {
                 int xyz;
                 for (xyz=0; xyz<3; xyz++)
@@ -2849,7 +2854,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
             /**** End histidine flip ****/
 
             #if allow_axial_tumble
-            if (a->movability & MOV_CAN_AXIAL)
+            if ((a->movability & MOV_CAN_AXIAL) && !(a->movability & MOV_FORBIDDEN))
             {
                 pib.copy_state(a);
                 Point ptrnd(frand(-1,1), frand(-1,1), frand(-1,1));
@@ -2884,15 +2889,17 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 
             #if allow_bond_rots
             pib.copy_state(a);
-            Bond** bb = a->get_rotatable_bonds(a->movability & MOV_CAN_FLEX);
+            Bond** bb = a->get_rotatable_bonds((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN));
             if (bb)
             {
                 int q;
                 for (q=0; bb[q]; q++)
                 {
                     float theta;
-                    if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI);
-                    else if (!bb[q]->count_heavy_moves_with_btom()) theta = frand(-M_PI, M_PI);
+                    if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI) / 2;
+                    else if (!bb[q]->count_heavy_moves_with_btom()) theta = frand(-M_PI, M_PI) / 2;
+                    else if (bb[q]->count_heavy_moves_with_atom() < bb[q]->count_heavy_moves_with_btom())
+                        theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
                     else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
 
                     bb[q]->rotate(theta, false);

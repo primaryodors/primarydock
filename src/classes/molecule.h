@@ -35,6 +35,7 @@ enum MovabilityType
     MOV_FLEXONLY	=     0x70,
     MOV_PINNED      =     0x04,
     MOV_FLXDESEL    =     0x02,
+    MOV_FORBIDDEN   =     0x0f,
     MOV_NONE		=     0x00,
     MOV_BKGRND      = 0x020000,
     MOV_CAN_CLASH   = 0x100000

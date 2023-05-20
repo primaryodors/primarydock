@@ -3,7 +3,7 @@
 
 std::vector<int> extra_wt;
 std::vector<MCoord> mtlcoords;
-std::vector<std::shared_ptr<GlomPair>> gp;
+std::vector<std::shared_ptr<GlomPair>> global_pairs;
 
 void ResiduePlaceholder::set(const char* str)
 {
@@ -694,12 +694,12 @@ std::vector<std::shared_ptr<GlomPair>> GlomPair::pair_gloms(std::vector<std::sha
         for (j=0; j<n; j++)
         {
             if (sdirty[j]) continue;
-            GlomPair gp;
-            gp.ag = ag[i];
-            gp.scg = scg[j];
-            gp.pocketcen = pcen;
+            GlomPair global_pairs;
+            global_pairs.ag = ag[i];
+            global_pairs.scg = scg[j];
+            global_pairs.pocketcen = pcen;
 
-            float p1 = gp.get_potential() * frand(1.0-best_binding_stochastic, 1.0+best_binding_stochastic);
+            float p1 = global_pairs.get_potential() * frand(1.0-best_binding_stochastic, 1.0+best_binding_stochastic);
 
             int r = retval.size();
             for (l=0; l<r; l++)
@@ -721,15 +721,15 @@ std::vector<std::shared_ptr<GlomPair>> GlomPair::pair_gloms(std::vector<std::sha
             if (p1 > p)
             {
                 j1 = j;
-                p = gp.potential;
+                p = global_pairs.potential;
             }
         }
 
         if (j1 < 0) continue;
 
-        std::shared_ptr<GlomPair> gp(new GlomPair());
-        gp->ag = ag[i];
-        gp->scg = scg[j1];
+        std::shared_ptr<GlomPair> global_pairs(new GlomPair());
+        global_pairs->ag = ag[i];
+        global_pairs->scg = scg[j1];
 
         adirty[i] = true;
         sdirty[j1] = true;
@@ -742,23 +742,23 @@ std::vector<std::shared_ptr<GlomPair>> GlomPair::pair_gloms(std::vector<std::sha
         int r = retval.size();
         if (!r)
         {
-            retval.push_back(gp);
+            retval.push_back(global_pairs);
             added = true;
             #if _dbg_glomsel
-            cout << "Beginning result with " << *gp->ag << "-" << *gp->scg << endl;
+            cout << "Beginning result with " << *global_pairs->ag << "-" << *global_pairs->scg << endl;
             #endif
         }
         else for (l=0; l<r; l++)
         {
-            if (gp->get_potential() > retval[l]->get_potential())
+            if (global_pairs->get_potential() > retval[l]->get_potential())
             {
                 std::vector<std::shared_ptr<GlomPair>>::iterator it;
                 it = retval.begin();
-                retval.insert(it+l, gp);
+                retval.insert(it+l, global_pairs);
                 added = true;
                 
                 #if _dbg_glomsel
-                cout << "Inserting " << *gp->ag << "-" << *gp->scg << " before " << *retval[l+1]->ag << "-" << *retval[l+1]->scg << endl;
+                cout << "Inserting " << *global_pairs->ag << "-" << *global_pairs->scg << " before " << *retval[l+1]->ag << "-" << *retval[l+1]->scg << endl;
                 #endif
 
                 break;
@@ -766,10 +766,10 @@ std::vector<std::shared_ptr<GlomPair>> GlomPair::pair_gloms(std::vector<std::sha
         }
         if (!added)
         {
-            retval.push_back(gp);
+            retval.push_back(global_pairs);
             added = true;
             #if _dbg_glomsel
-            cout << "Appending to result " << *gp->ag << "-" << *gp->scg << endl;
+            cout << "Appending to result " << *global_pairs->ag << "-" << *global_pairs->scg << endl;
             #endif
         }
     }
@@ -785,55 +785,55 @@ std::vector<std::shared_ptr<GlomPair>> GlomPair::pair_gloms(std::vector<std::sha
     return retval;
 }
 
-void GlomPair::align_gloms(Molecule* lig, std::vector<std::shared_ptr<GlomPair>> gp)
+void GlomPair::align_gloms(Molecule* lig, std::vector<std::shared_ptr<GlomPair>> global_pairs)
 {
-    int n = gp.size();
+    int n = global_pairs.size();
 
     if (n < 1) return;
-    Rotation rot = align_points_3d(gp[0]->ag->get_center(), gp[0]->scg->get_center(), lig->get_barycenter());
+    Rotation rot = align_points_3d(global_pairs[0]->ag->get_center(), global_pairs[0]->scg->get_center(), lig->get_barycenter());
     LocatedVector lv = rot.v;
     lv.origin = lig->get_barycenter();
     #if _dbg_glomsel
-    cout << "Rotating " << *gp[0]->ag << " in the direction of " << *gp[0]->scg << endl;
+    cout << "Rotating " << *global_pairs[0]->ag << " in the direction of " << *global_pairs[0]->scg << endl;
     #endif
     lig->rotate(lv, rot.a);
 
     // Scooch.
-    float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->glom_reach();
+    float r = global_pairs[0]->ag->get_center().get_3d_distance(global_pairs[0]->scg->get_center()) - global_pairs[0]->scg->glom_reach();
     if (r > 0)
     {
-        Point rel = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
+        Point rel = global_pairs[0]->scg->get_center().subtract(global_pairs[0]->ag->get_center());
         rel.scale(r-1);
         #if _dbg_glomsel
-        cout << "Scooching " << *gp[0]->ag << " " << r << "Å into the reach of " << *gp[0]->scg << endl;
+        cout << "Scooching " << *global_pairs[0]->ag << " " << r << "Å into the reach of " << *global_pairs[0]->scg << endl;
         #endif
         lig->move(rel);
     }
 
-    gp[0]->scg->conform_to(lig);
+    global_pairs[0]->scg->conform_to(lig);
 
     if (n < 2) return;
-    rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
+    rot = align_points_3d(global_pairs[1]->ag->get_center(), global_pairs[1]->scg->get_center(), global_pairs[0]->ag->get_center());
     lv = rot.v;
-    lv.origin = gp[0]->ag->get_center();
+    lv.origin = global_pairs[0]->ag->get_center();
     #if _dbg_glomsel
-    cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
+    cout << "Rotating " << *global_pairs[1]->ag << " in the direction of " << *global_pairs[1]->scg << endl;
     #endif
     lig->rotate(lv, rot.a);
 
-    gp[1]->scg->conform_to(lig);
+    global_pairs[1]->scg->conform_to(lig);
 
     if (n < 3) return;
-    Point zcen = gp[0]->ag->get_center();
-    SCoord axis = gp[1]->ag->get_center().subtract(zcen);
+    Point zcen = global_pairs[0]->ag->get_center();
+    SCoord axis = global_pairs[1]->ag->get_center().subtract(zcen);
     lv = (SCoord)axis;
     lv.origin = zcen;
-    float theta = find_angle_along_vector(gp[2]->ag->get_center(), gp[2]->scg->get_center(), zcen, axis);
+    float theta = find_angle_along_vector(global_pairs[2]->ag->get_center(), global_pairs[2]->scg->get_center(), zcen, axis);
     #if _dbg_glomsel
-    cout << "\"Rotisserie\" aligning " << *gp[2]->ag << " in the direction of " << *gp[2]->scg << endl;
+    cout << "\"Rotisserie\" aligning " << *global_pairs[2]->ag << " in the direction of " << *global_pairs[2]->scg << endl;
     #endif
     lig->rotate(lv, theta);
 
-    gp[2]->scg->conform_to(lig);
+    global_pairs[2]->scg->conform_to(lig);
 }
 

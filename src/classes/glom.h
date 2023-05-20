@@ -80,6 +80,6 @@ std::ostream& operator<<(std::ostream& os, const ResidueGlom& scg);
 
 extern std::vector<int> extra_wt;
 extern std::vector<MCoord> mtlcoords;
-extern std::vector<std::shared_ptr<GlomPair>> gp;
+extern std::vector<std::shared_ptr<GlomPair>> global_pairs;
 
 #endif

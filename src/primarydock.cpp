@@ -322,12 +322,12 @@ void iteration_callback(int iter)
     }
 
     #if bb_realign_iters
-    if (gp.size() >= 2)
+    if (global_pairs.size() >= 2)
     {
-        Point scg0 = gp[0]->scg->get_center();
-        Point scg1 = gp[1]->scg->get_center();
-        Point ag0  = gp[0]->ag->get_center();
-        Point ag1  = gp[1]->ag->get_center();
+        Point scg0 = global_pairs[0]->scg->get_center();
+        Point scg1 = global_pairs[1]->scg->get_center();
+        Point ag0  = global_pairs[0]->ag->get_center();
+        Point ag1  = global_pairs[1]->ag->get_center();
 
         Rotation rot;
 
@@ -342,7 +342,7 @@ void iteration_callback(int iter)
             }
             if (rot.a > bb_realign_threshold_angle)
             {
-                rot.a = fmin(hexagonal, rot.a*bb_realign_amount) / gp[0]->ag->atoms.size();
+                rot.a = fmin(hexagonal, rot.a*bb_realign_amount) / global_pairs[0]->ag->atoms.size();
                 LocatedVector lv = rot.v;
                 lv.origin = ag1;
                 ligand->rotate(lv, rot.a);
@@ -360,17 +360,17 @@ void iteration_callback(int iter)
             }
             if (rot.a > bb_realign_threshold_angle)
             {
-                rot.a = fmin(hexagonal, rot.a*bb_realign_amount) / gp[1]->ag->atoms.size();
+                rot.a = fmin(hexagonal, rot.a*bb_realign_amount) / global_pairs[1]->ag->atoms.size();
                 LocatedVector lv = rot.v;
                 lv.origin = ag0;
                 ligand->rotate(lv, rot.a);
             }
         }
 
-        if (gp.size() >= 3)
+        if (global_pairs.size() >= 3)
         {
-            Point scg2 = gp[2]->scg->get_center();
-            Point ag2  = gp[2]->ag->get_center();
+            Point scg2 = global_pairs[2]->scg->get_center();
+            Point ag2  = global_pairs[2]->ag->get_center();
 
             if (scg2.get_3d_distance(ag2) > bb_realign_threshold_distance)
             {
@@ -381,7 +381,7 @@ void iteration_callback(int iter)
                     LocatedVector v = (SCoord)ag1.subtract(ag0);
                     v.origin = ag0;
 
-                    ligand->rotate(v, theta * bb_realign_amount / gp[2]->ag->atoms.size());
+                    ligand->rotate(v, theta * bb_realign_amount / global_pairs[2]->ag->atoms.size());
                 }
             }
         }
@@ -497,22 +497,22 @@ void iteration_callback(int iter)
         for (l=0; l<3; l++)
         {
             #if _use_gloms
-            if (gp.size() > l)
+            if (global_pairs.size() > l)
             #else
             if (ligbb[l] && alignment_aa[l])
             #endif
             {
                 #if _use_gloms
-                float r = gp[l]->ag->distance_to(gp[l]->scg->get_center()); //  ligand_gloms[l].distance_to(sc_gloms[l].get_center());
+                float r = global_pairs[l]->ag->distance_to(global_pairs[l]->scg->get_center()); //  ligand_gloms[l].distance_to(sc_gloms[l].get_center());
                 float r1 = r;
                 if (r < 2.5) r = 2.5;
                 if (r > _INTERA_R_CUTOFF) r = _INTERA_R_CUTOFF;
                 ttl_bb_dist += r * (1.0 + 1.0 / (l+1));
                 #if _dbg_bb_pullaway
                 cout << pose << ":" << iter << ": Ligand atoms ";
-                for (i=0; i<gp[l]->ag->atoms.size(); i++) cout << gp[l]->ag->atoms[i]->name << " ";
+                for (i=0; i<global_pairs[l]->ag->atoms.size(); i++) cout << global_pairs[l]->ag->atoms[i]->name << " ";
                 cout << "are " << r1 << " A from residues";
-                for (i=0; i<gp[l]->scg->aminos.size(); i++) cout << " " << gp[l]->scg->aminos[i]->get_3letter() << gp[l]->scg->aminos[i]->get_residue_no();
+                for (i=0; i<global_pairs[l]->scg->aminos.size(); i++) cout << " " << global_pairs[l]->scg->aminos[i]->get_3letter() << global_pairs[l]->scg->aminos[i]->get_residue_no();
                 cout << "." << endl;
                 #endif
                 #else
@@ -3286,15 +3286,15 @@ _try_again:
                 #endif
 
                 std::vector<std::shared_ptr<ResidueGlom>> scg = ResidueGlom::get_potential_side_chain_gloms(reaches_spheroid[nodeno], ligcen_target);
-                gp = GlomPair::pair_gloms(agc, scg, ligcen_target);
+                global_pairs = GlomPair::pair_gloms(agc, scg, ligcen_target);
                 ligand->recenter(ligcen_target);
-                GlomPair::align_gloms(ligand, gp);
+                GlomPair::align_gloms(ligand, global_pairs);
 
-                int gpn = gp.size();
+                int gpn = global_pairs.size();
                 for (l=0; l<3 && l<gpn; l++)
                 {
-                    ligand_gloms[l] = *(gp[l]->ag);
-                    sc_gloms[l] = *(gp[l]->scg);
+                    ligand_gloms[l] = *(global_pairs[l]->ag);
+                    sc_gloms[l] = *(global_pairs[l]->scg);
                 }
 
                 // Best-Binding Algorithm
@@ -4061,18 +4061,18 @@ _try_again:
             if (use_bestbind_algorithm)
             {
                 dr[drcount][nodeno].miscdata += (std::string)"Best-Binding Pairs:\n";
-                for (i=0; i<3 && i<gp.size(); i++)
+                for (i=0; i<3 && i<global_pairs.size(); i++)
                 {
-                    n = gp[i]->ag->atoms.size();
+                    n = global_pairs[i]->ag->atoms.size();
                     int j2;
                     for (j2=0; j2<n; j2++)
-                        dr[drcount][nodeno].miscdata += (std::string)gp[i]->ag->atoms[j2]->name + (std::string)" ";
+                        dr[drcount][nodeno].miscdata += (std::string)global_pairs[i]->ag->atoms[j2]->name + (std::string)" ";
                     
                     dr[drcount][nodeno].miscdata += (std::string)"- ";
 
-                    n = gp[i]->scg->aminos.size();
+                    n = global_pairs[i]->scg->aminos.size();
                     for (j2=0; j2<n; j2++)
-                        dr[drcount][nodeno].miscdata += (std::string)gp[i]->scg->aminos[j2]->get_name() + (std::string)" ";
+                        dr[drcount][nodeno].miscdata += (std::string)global_pairs[i]->scg->aminos[j2]->get_name() + (std::string)" ";
                     
                     dr[drcount][nodeno].miscdata += (std::string)"\n";
                 }

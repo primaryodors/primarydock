@@ -656,6 +656,15 @@ int Atom::get_bonded_atoms_count()
     for (i=0; i<geometry; i++) if (bonded_to[i].btom) retval++;
     return retval;
 }
+
+int Atom::get_bonded_heavy_atoms_count()
+{
+    if (!bonded_to) return 0;
+    int i, retval=0;
+    for (i=0; i<geometry; i++) if (bonded_to[i].btom && bonded_to[i].btom->get_Z() > 1) retval++;
+    return retval;
+}
+
 float Atom::is_bonded_to(Atom* lbtom)
 {
     if (!bonded_to) return 0;

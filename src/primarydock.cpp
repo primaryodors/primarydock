@@ -331,7 +331,7 @@ void iteration_callback(int iter)
 
         Rotation rot;
 
-        if (scg0.get_3d_distance(ag0) > 2)
+        if (scg0.get_3d_distance(ag0) > 2.5)
         {
             rot = align_points_3d(ag0, scg0, ag1);
             if (rot.a < 0)
@@ -349,7 +349,7 @@ void iteration_callback(int iter)
             }
         }
 
-        if (scg1.get_3d_distance(ag1) > 2)
+        if (scg1.get_3d_distance(ag1) > 2.5)
         {
             rot = align_points_3d(ag1, scg1, ag0);
             if (rot.a < 0)
@@ -364,6 +364,22 @@ void iteration_callback(int iter)
                 LocatedVector lv = rot.v;
                 lv.origin = ag0;
                 ligand->rotate(lv, rot.a);
+            }
+        }
+
+        if (gp.size() >= 3)
+        {
+            Point scg2 = gp[2]->scg->get_center();
+            Point ag2  = gp[2]->ag->get_center();
+
+            if (scg2.get_3d_distance(ag2) > 2.5)
+            {
+                float theta = find_angle_along_vector(ag2, scg2, ag0, ag1.subtract(ag0));
+
+                LocatedVector v = (SCoord)ag1.subtract(ag0);
+                v.origin = ag0;
+
+                ligand->rotate(v, theta / 3);
             }
         }
     }
@@ -2576,56 +2592,6 @@ int main(int argc, char** argv)
     }
     cout << endl;
     if (output) *output << endl;
-
-    if (use_bestbind_algorithm) for (i=0; i<3; i++)
-        {
-            #if _use_gloms
-            #if _dbg_glomsel
-            cout << "Ligand's ";
-            if (i == 0) cout << "primary";
-            else if (i == 1) cout << "secondary";
-            else if (i == 2) cout << "tertiary";
-            else cout << "accessory";
-            #endif
-
-            int lgsz = ligand_gloms[i].atoms.size();
-
-            #if _dbg_glomsel
-            cout << " atom group has " << lgsz << " atoms." << endl;
-
-            if (lgsz)
-            {
-                for (j = 0; j < lgsz; j++)
-                {
-                    cout << ligand_gloms[i].atoms[j]->name << " ";
-                }
-                cout << endl;
-            }
-            #endif
-
-            #if _dbg_glomsel
-            cout << "Ionic: " << ligand_gloms[i].get_ionic()
-                 << " H-bond: " << ligand_gloms[i].get_polarity()
-                 << " pi-stack: " << ligand_gloms[i].get_pi()
-                ;
-            cout << endl << endl;
-            #endif
-            #else
-            if (ligbb[i])
-            {
-                cout << "# Best binding heavy atom " << i << " of ligand" << endl << "# LBBA: " << ligbb[i]->name
-                    << " type: " << lig_inter_typ[i] << endl;
-                if (output) *output << "# Best binding heavy atom " << i << " of ligand" << endl << "LBBA: " << ligbb[i]->name
-                    << " type: " << lig_inter_typ[i] << endl;
-            }
-            if (ligbbh[i])
-            {
-                cout << "# Best binding hydrogen " << i << " of ligand" << endl << "# LBBH: " << ligbbh[i]->name << endl;
-                if (output) *output << "# Best binding hydrogen " << i << " of ligand" << endl << "LBBH: " << ligbbh[i]->name << endl;
-            }
-            cout << endl;
-            #endif
-        }
 
     i = poses*(triesleft+1)+8;
     DockResult dr[i][pathnodes+2];

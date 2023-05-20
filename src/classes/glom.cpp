@@ -380,10 +380,17 @@ std::vector<std::shared_ptr<AtomGlom>> AtomGlom::get_potential_ligand_gloms(Mole
     {
         if (dirty[i]) continue;
         std::shared_ptr<AtomGlom> g(new AtomGlom());
+        int aliphatic = 0;
+
         Atom* a = mol->get_atom(i);
         if (!a) continue;
-
-        if (!a->is_polar() && !a->get_charge() && !a->is_pi()) continue;
+        if (a->get_Z() == 1) continue;
+        if (!a->is_polar() && !a->get_charge() && !a->is_pi())
+        {
+            aliphatic++;
+            int bh = a->get_bonded_atoms_count() - a->get_bonded_heavy_atoms_count();
+            if (bh > 1) continue;
+        }
 
         Atom* a_ = a;
         g->atoms.push_back(a);
@@ -411,12 +418,22 @@ std::vector<std::shared_ptr<AtomGlom>> AtomGlom::get_potential_ligand_gloms(Mole
 
             if (simil >= 20)
             {
-                g->atoms.push_back(b);
-                #if _dbg_glomsel
-                cout << "Adding " << b->name << " with distance " << r << " and similarity " << simil << endl;
-                #endif
-                a_ = b;
-                dirty[j] = true;
+                if (aliphatic < 3 || b->get_Z() == 1)
+                {
+                    g->atoms.push_back(b);
+                    if (b->get_Z() > 1)
+                    {
+                        if (!b->is_polar() && !b->get_charge() && !b->is_pi()) aliphatic++;
+                        else aliphatic--;
+                    }
+
+                    #if _dbg_glomsel
+                    cout << "Adding " << b->name << " with distance " << r << " and similarity " << simil << " " << aliphatic << endl;
+                    #endif
+
+                    a_ = b;
+                    dirty[j] = true;
+                }
             }
             else
             {
@@ -756,7 +773,6 @@ std::vector<std::shared_ptr<GlomPair>> GlomPair::pair_gloms(std::vector<std::sha
 
     return retval;
 }
-
 
 void GlomPair::align_gloms(Molecule* lig, std::vector<std::shared_ptr<GlomPair>> gp)
 {

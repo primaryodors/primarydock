@@ -387,9 +387,14 @@ std::vector<std::shared_ptr<AtomGlom>> AtomGlom::get_potential_ligand_gloms(Mole
         if (a->get_Z() == 1) continue;
         if (!a->is_polar() && !a->get_charge() && !a->is_pi())
         {
-            aliphatic++;
+            if (retval.size() >= 2)
+            {
+                aliphatic += 10000;
+                continue;
+            }
             int bh = a->get_bonded_atoms_count() - a->get_bonded_heavy_atoms_count();
             if (bh > 1) continue;
+            aliphatic++;
         }
 
         Atom* a_ = a;

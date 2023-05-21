@@ -146,7 +146,7 @@
 #define write_activation_matrix 0
 #define write_active_rotation 1
 
-#define _use_gloms 1
+#define _use_groups 1
 
 #define soft_ligand_importance 20
 #define soft_bias_overlap 0.1
@@ -289,7 +289,7 @@
 // Debugging stuff.
 
 // Should normally be 3:
-#define _bb_maxglom 3
+#define _bb_max_grp 3
 
 // For auditing binding energies between individual atoms:
 #define _peratom_audit 0
@@ -313,7 +313,7 @@
 #define _dbg_bb_rots 0
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
-#define _dbg_glomsel 0
+#define _dbg_groupsel 0
 #define _dbg_polsat 0
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0

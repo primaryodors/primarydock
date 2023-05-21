@@ -1433,7 +1433,7 @@ void Protein::backconnect(int startres, int endres)
     {
     #endif
 
-        // Glom the last residue onto the target.
+        // Glue the last residue onto the target.
         // Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
         // Then do the same for the previous residue, and the one before, etc,
         // all the way back to the starting residue.
@@ -1476,7 +1476,7 @@ void Protein::backconnect(int startres, int endres)
             }
             #endif
 
-            curr->glom(pts, inc > 0);
+            curr->attach_to_prediction(pts, inc > 0);
             delete[] pts;
             // break;
 

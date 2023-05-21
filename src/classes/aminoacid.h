@@ -132,7 +132,7 @@ public:
 
     Point* predict_previous_COCA();
     Point* predict_next_NHCA();
-    void glom(Point* predicted, bool CO = false);		// Glom the AA by moving its NHCA or COCA to the result of a predict().
+    void conglomerate(Point* predicted, bool CO = false);		// Conglomerate the AA by moving its NHCA or COCA to the result of a predict().
 
     // Bond functions.
     bool disulfide_bond(const AminoAcid* bond_to);

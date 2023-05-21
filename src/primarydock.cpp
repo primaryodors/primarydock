@@ -8,7 +8,7 @@
 #include <sstream>
 #include <algorithm>
 #include "classes/protein.h"
-#include "classes/glom.h"
+#include "classes/group.h"
 
 using namespace std;
 
@@ -148,9 +148,9 @@ bool use_prealign = false;
 std::string prealign_residues = "";
 Bond retain_bindings[4];
 
-#if _use_gloms
-AtomGlom ligand_gloms[3];
-ResidueGlom sc_gloms[3];
+#if _use_groups
+AtomGroup ligand_groups[3];
+ResidueGroup sc_groups[3];
 #else
 Atom** ligbb = nullptr;
 Atom** ligbbh = nullptr;
@@ -487,8 +487,8 @@ void iteration_callback(int iter)
     if (iter == (iters-1)) goto _oei;
     
     #if enforce_no_bb_pullaway
-    #if _use_gloms
-    if (ligand_gloms[0].atoms.size())
+    #if _use_groups
+    if (ligand_groups[0].atoms.size())
     #else
     if (ligbb)
     #endif
@@ -496,14 +496,14 @@ void iteration_callback(int iter)
         float ttl_bb_dist = 0;
         for (l=0; l<3; l++)
         {
-            #if _use_gloms
+            #if _use_groups
             if (global_pairs.size() > l)
             #else
             if (ligbb[l] && alignment_aa[l])
             #endif
             {
-                #if _use_gloms
-                float r = global_pairs[l]->ag->distance_to(global_pairs[l]->scg->get_center()); //  ligand_gloms[l].distance_to(sc_gloms[l].get_center());
+                #if _use_groups
+                float r = global_pairs[l]->ag->distance_to(global_pairs[l]->scg->get_center()); //  ligand_groups[l].distance_to(sc_groups[l].get_center());
                 float r1 = r;
                 if (r < 2.5) r = 2.5;
                 if (r > _INTERA_R_CUTOFF) r = _INTERA_R_CUTOFF;
@@ -2178,7 +2178,7 @@ int main(int argc, char** argv)
     pocketcen = loneliest;
     #endif
 
-    #if !_use_gloms
+    #if !_use_groups
     for (i=0; i<3; i++)
     {
         alignment_aa[i] = nullptr;
@@ -2260,7 +2260,7 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
 
-    std::vector<std::shared_ptr<AtomGlom>> agc = AtomGlom::get_potential_ligand_gloms(ligand);
+    std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand);
 
     m.minimize_internal_clashes();
 
@@ -3270,7 +3270,7 @@ _try_again:
                 float alignment_distance[5];
                 for (l=0; l<3; l++)
                 {
-                    #if !_use_gloms
+                    #if !_use_groups
                     alignment_aa[l]=0;
                     #endif
                     alignment_distance[l]=0;
@@ -3285,16 +3285,16 @@ _try_again:
                 if (debug) *debug << "Initialize null AA pointer." << endl;
                 #endif
 
-                std::vector<std::shared_ptr<ResidueGlom>> scg = ResidueGlom::get_potential_side_chain_gloms(reaches_spheroid[nodeno], ligcen_target);
-                global_pairs = GlomPair::pair_gloms(agc, scg, ligcen_target);
+                std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
+                global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
                 ligand->recenter(ligcen_target);
-                GlomPair::align_gloms(ligand, global_pairs);
+                GroupPair::align_groups(ligand, global_pairs);
 
                 int gpn = global_pairs.size();
                 for (l=0; l<3 && l<gpn; l++)
                 {
-                    ligand_gloms[l] = *(global_pairs[l]->ag);
-                    sc_gloms[l] = *(global_pairs[l]->scg);
+                    ligand_groups[l] = *(global_pairs[l]->ag);
+                    sc_groups[l] = *(global_pairs[l]->scg);
                 }
 
                 // Best-Binding Algorithm
@@ -3307,7 +3307,7 @@ _try_again:
 
                 if (use_bestbind_algorithm && met)
                 {
-                    #if !_use_gloms
+                    #if !_use_groups
                     alignment_aa[2] = alignment_aa[1];
                     alignment_aa[1] = alignment_aa[0];
                     alignment_aa[0] = met;
@@ -3321,9 +3321,9 @@ _try_again:
                 if (false && use_bestbind_algorithm)
                 {
                     ligand->recenter(loneliest);
-                    for (l=0; l<_bb_maxglom; l++)
+                    for (l=0; l<_bb_max_grp; l++)
                     {
-                        #if _use_gloms
+                        #if _use_groups
                         Point xform;
                         Point zcen;
                         Point axis;
@@ -3334,16 +3334,16 @@ _try_again:
                         Atom* alca;
                         Atom** alcaa;
                         #if !flexion_selection
-                        if (flex && sc_gloms[l].aminos.size())
+                        if (flex && sc_groups[l].aminos.size())
                         {
-                            for (i=0; i<sc_gloms[l].aminos.size(); i++)
+                            for (i=0; i<sc_groups[l].aminos.size(); i++)
                             {
-                                if (sc_gloms[l].aminos[i]->movability >= MOV_FLEXONLY)
+                                if (sc_groups[l].aminos[i]->movability >= MOV_FLEXONLY)
                                 {
-                                    Bond** rbb = sc_gloms[l].aminos[i]->get_rotatable_bonds();
+                                    Bond** rbb = sc_groups[l].aminos[i]->get_rotatable_bonds();
                                     if (rbb)
                                     {
-                                        alcaa = sc_gloms[l].aminos[i]->get_most_bindable(1, ligand_gloms[l].atoms[0]);
+                                        alcaa = sc_groups[l].aminos[i]->get_most_bindable(1, ligand_groups[l].atoms[0]);
                                         if (!alcaa) continue;
                                         alca = alcaa[0];
                                         delete alcaa;
@@ -3377,27 +3377,27 @@ _try_again:
                         switch (l)
                         {
                             case 0:
-                            // Move ligand to center ligand_gloms[0] at the center of sc_gloms[0].
-                            // If there is only one residue in the sc glom, then move the ligand
+                            // Move ligand to center ligand_groups[0] at the center of sc_groups[0].
+                            // If there is only one residue in the sc group, then move the ligand
                             // 2A towards loneliest.
-                            n = sc_gloms[l].aminos.size();
-                            if (sc_gloms[l].metallic) n = 1;
+                            n = sc_groups[l].aminos.size();
+                            if (sc_groups[l].metallic) n = 1;
                             if (!n) goto _deadglob;
-                            #if _dbg_glomsel
+                            #if _dbg_groupsel
                             cout << "Moving primary atom group to vicinity of";
-                            if (sc_gloms[l].metallic) cout << " " << sc_gloms[l].metal->name;
-                            else for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            if (sc_groups[l].metallic) cout << " " << sc_groups[l].metal->name;
+                            else for (i=0; i<n; i++) cout << " " << sc_groups[l].aminos[i]->get_3letter() << sc_groups[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
                             #endif
 
-                            xform = sc_gloms[l].get_center();
+                            xform = sc_groups[l].get_center();
                             if (n < 4)
                             {
                                 Point ptmp = loneliest.subtract(xform);
                                 ptmp.scale(n+1);
                                 xform = xform.add(ptmp);
                             }
-                            xform = xform.subtract(ligand_gloms[l].get_center());
+                            xform = xform.subtract(ligand_groups[l].get_center());
 
                             ligand->movability = MOV_ALL;
                             ligand->move(xform);
@@ -3417,29 +3417,29 @@ _try_again:
                             break;
 
                             case 1:
-                            // Rotate ligand about ligand_gloms[0] center to get ligand_gloms[1] center
-                            // as close as possible to sc_gloms[1] center.
-                            n = sc_gloms[l].aminos.size();
+                            // Rotate ligand about ligand_groups[0] center to get ligand_groups[1] center
+                            // as close as possible to sc_groups[1] center.
+                            n = sc_groups[l].aminos.size();
                             if (!n)
                             {
-                                #if _dbg_glomsel
+                                #if _dbg_groupsel
                                 cout << "Aligning center of ligand towards center of pocket.";
                                 #endif
-                                zcen = ligand_gloms[0].get_center();
+                                zcen = ligand_groups[0].get_center();
                                 rot = align_points_3d(ligand->get_barycenter(), loneliest, zcen);
                                 lv = rot.v;
                                 lv.origin = zcen;
                                 ligand->rotate(lv, rot.a);
                                 goto _deadglob;
                             }
-                            #if _dbg_glomsel
+                            #if _dbg_groupsel
                             cout << "Aligning secondary atom group towards";
-                            for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            for (i=0; i<n; i++) cout << " " << sc_groups[l].aminos[i]->get_3letter() << sc_groups[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
                             #endif
 
-                            zcen = ligand_gloms[0].get_center();
-                            rot = align_points_3d(ligand_gloms[l].get_center(), sc_gloms[l].get_center(), zcen);
+                            zcen = ligand_groups[0].get_center();
+                            rot = align_points_3d(ligand_groups[l].get_center(), sc_groups[l].get_center(), zcen);
                             lv = rot.v;
                             lv.origin = zcen;
                             ligand->rotate(lv, rot.a);
@@ -3447,21 +3447,21 @@ _try_again:
 
                             case 2:
                             // "Rotisserie" rotate ligand about the imaginary line between
-                            // ligand_gloms[0] center and ligand_gloms[1] center, to bring
-                            // ligand_gloms[2] center as close as possible to sc_gloms[2] center.
-                            n = sc_gloms[l].aminos.size();
+                            // ligand_groups[0] center and ligand_groups[1] center, to bring
+                            // ligand_groups[2] center as close as possible to sc_groups[2] center.
+                            n = sc_groups[l].aminos.size();
                             if (!n) goto _deadglob;
-                            #if _dbg_glomsel
+                            #if _dbg_groupsel
                             cout << "\"Rotisserie\"-aligning tertiary atom group towards";
-                            for (i=0; i<n; i++) cout << " " << sc_gloms[l].aminos[i]->get_3letter() << sc_gloms[l].aminos[i]->get_residue_no();
+                            for (i=0; i<n; i++) cout << " " << sc_groups[l].aminos[i]->get_3letter() << sc_groups[l].aminos[i]->get_residue_no();
                             cout << "." << endl;
                             #endif
 
-                            zcen = ligand_gloms[0].get_center();
-                            axis = ligand_gloms[1].get_center().subtract(zcen);
+                            zcen = ligand_groups[0].get_center();
+                            axis = ligand_groups[1].get_center().subtract(zcen);
                             lv = (SCoord)axis;
                             lv.origin = zcen;
-                            theta = find_angle_along_vector(ligand_gloms[l].get_center(), sc_gloms[l].get_center(), zcen, axis);
+                            theta = find_angle_along_vector(ligand_groups[l].get_center(), sc_groups[l].get_center(), zcen, axis);
                             ligand->rotate(lv, theta);
                             break;
 
@@ -3636,17 +3636,17 @@ _try_again:
                         #endif
                     }
 
-                    #if _dbg_glomsel
+                    #if _dbg_groupsel
                     cout << endl << endl;
                     #endif
 
-                    #if enforce_no_bb_pullaway && _use_gloms
+                    #if enforce_no_bb_pullaway && _use_groups
                     last_ttl_bb_dist = 0;
-                    for (l=0; l<_bb_maxglom; l++)
+                    for (l=0; l<_bb_max_grp; l++)
                     {
-                        if (ligand_gloms[l].atoms.size() && sc_gloms[l].aminos.size())
+                        if (ligand_groups[l].atoms.size() && sc_groups[l].aminos.size())
                         {
-                            float r = ligand_gloms[l].distance_to(sc_gloms[l].get_center());
+                            float r = ligand_groups[l].distance_to(sc_groups[l].get_center());
                             if (r < 2.5) r = 2.5;
                             last_ttl_bb_dist += r;
                         }
@@ -3654,7 +3654,7 @@ _try_again:
                     pullaway_undo.copy_state(ligand);
                     #endif
 
-                    #if !_use_gloms
+                    #if !_use_groups
                     Molecule* mtmp[4], *mbkg[2];
                     mbkg[0] = ligand;
                     mbkg[1] = nullptr;

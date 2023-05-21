@@ -537,7 +537,7 @@ SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
 float InteratomicForce::metal_compatibility(Atom* a, Atom* b)
 {
     float f = (1.0 + 1.0 * cos(fmin(fabs(((a->get_electronegativity() + b->get_electronegativity()) / 2 - 2.25)*6), M_PI)));
-    #if _dbg_glomsel
+    #if _dbg_groupsel
     // cout << "Metal compatibility for " << *a << "..." << *b << " = " << f << endl;
     #endif
     return f;

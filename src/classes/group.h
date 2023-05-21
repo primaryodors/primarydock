@@ -1,6 +1,6 @@
 
-#ifndef _GLOMCLS
-#define _GLOMCLS
+#ifndef _GRPCLS
+#define _GRPCLS
 
 #include <memory>
 #include <algorithm>
@@ -24,7 +24,7 @@ struct MCoord
     std::vector<ResiduePlaceholder> coordres;
 };
 
-class AtomGlom
+class AtomGroup
 {
     public:
     std::vector<Atom*> atoms;
@@ -40,10 +40,10 @@ class AtomGlom
     float bounds();
     float compatibility(AminoAcid* aa);
 
-    static std::vector<std::shared_ptr<AtomGlom>> get_potential_ligand_gloms(Molecule* mol);
+    static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol);
 };
 
-class ResidueGlom
+class ResidueGroup
 {
     public:
     std::vector<AminoAcid*> aminos;
@@ -52,34 +52,34 @@ class ResidueGlom
 
     Point get_center();
     float distance_to(Point pt);
-    float compatibility(AtomGlom* ag);
-    float glom_reach();
+    float compatibility(AtomGroup* ag);
+    float group_reach();
     void conform_to(Molecule* mol);
 
-    static std::vector<std::shared_ptr<ResidueGlom>> get_potential_side_chain_gloms(AminoAcid** aalist, Point pocketcen);
+    static std::vector<std::shared_ptr<ResidueGroup>> get_potential_side_chain_groups(AminoAcid** aalist, Point pocketcen);
 };
 
-class GlomPair
+class GroupPair
 {
     public:
-    std::shared_ptr<AtomGlom> ag;
-    std::shared_ptr<ResidueGlom> scg;
+    std::shared_ptr<AtomGroup> ag;
+    std::shared_ptr<ResidueGroup> scg;
 
     float get_potential();
 
-    static std::vector<std::shared_ptr<GlomPair>> pair_gloms(std::vector<std::shared_ptr<AtomGlom>> agloms, std::vector<std::shared_ptr<ResidueGlom>> scgloms, Point pocketcen);
-    static void align_gloms(Molecule* ligand, std::vector<std::shared_ptr<GlomPair>> glom_pairs);    // Assumes the ligand is already centered in the pocket.
+    static std::vector<std::shared_ptr<GroupPair>> pair_groups(std::vector<std::shared_ptr<AtomGroup>> agroups, std::vector<std::shared_ptr<ResidueGroup>> scgroups, Point pocketcen);
+    static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);    // Assumes the ligand is already centered in the pocket.
 
     protected:
     float potential = 0;
     Point pocketcen;
 };
 
-std::ostream& operator<<(std::ostream& os, const AtomGlom& ag);
-std::ostream& operator<<(std::ostream& os, const ResidueGlom& scg);
+std::ostream& operator<<(std::ostream& os, const AtomGroup& ag);
+std::ostream& operator<<(std::ostream& os, const ResidueGroup& scg);
 
 extern std::vector<int> extra_wt;
 extern std::vector<MCoord> mtlcoords;
-extern std::vector<std::shared_ptr<GlomPair>> global_pairs;
+extern std::vector<std::shared_ptr<GroupPair>> global_pairs;
 
 #endif

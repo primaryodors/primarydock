@@ -7,7 +7,7 @@
 #include <time.h>
 #include <sstream>
 #include "classes/protein.h"
-#include "classes/glom.h"
+#include "classes/group.h"
 
 using namespace std;
 

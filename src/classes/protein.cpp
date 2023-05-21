@@ -1476,7 +1476,7 @@ void Protein::backconnect(int startres, int endres)
             }
             #endif
 
-            curr->conglomerate(pts, inc > 0);
+            curr->attach_to_prediction(pts, inc > 0);
             delete[] pts;
             // break;
 

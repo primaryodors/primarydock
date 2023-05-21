@@ -132,7 +132,7 @@ public:
 
     Point* predict_previous_COCA();
     Point* predict_next_NHCA();
-    void conglomerate(Point* predicted, bool CO = false);		// Conglomerate the AA by moving its NHCA or COCA to the result of a predict().
+    void attach_to_prediction(Point* predicted, bool CO = false);		// Attach the AA to its neighbor by moving its NHCA or COCA to the result of a predict().
 
     // Bond functions.
     bool disulfide_bond(const AminoAcid* bond_to);

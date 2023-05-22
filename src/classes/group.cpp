@@ -371,7 +371,11 @@ bool AtomGroup::is_bonded_to(Atom* a)
     if (!n) return false;
 
     int i;
-    for (i=0; i<n; i++) if (atoms[i]->is_bonded_to(a)) return true;
+    for (i=0; i<n; i++)
+    {
+        if (atoms[i]->is_bonded_to(a)) return true;
+        else if (atoms[i]->shares_bonded_with(a)) return true;
+    }
 
     return false;
 }
@@ -431,9 +435,14 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 //cout << "Rejected " << b->name << " too far away." << endl;
                 #endif
             }
-            float simil = fmax(a->similarity_to(b), a_->similarity_to(b));
+            float simil = 0; // fmax(a->similarity_to(b), a_->similarity_to(b));
 
-            if (simil >= 5)
+            if (a->get_charge() && sgn(a->get_charge()) == sgn(b->get_charge())) simil += 10;
+            if ((bool)a->is_polar() == (bool)b->is_polar()) simil += 7;
+            if (a->is_pi() == b->is_pi()) simil += 3;
+            if (a->is_conjugated_to(b)) simil += 6;
+
+            if (simil >= 8)
             {
                 if (aliphatic < 3 || b->get_Z() == 1)
                 {
@@ -482,6 +491,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         #endif
     }
 
+    throw 0xbadbeef;
     return retval;
 }
 

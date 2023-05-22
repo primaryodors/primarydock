@@ -195,6 +195,8 @@ int main(int argc, char** argv)
     }
     cout << "\n# Moved molecule 2 by " << ttlmv << " A." << endl;*/
 
+    m1.get_intermol_binding(&m2);
+
     cout << "# Initial intermol clashes: " << m1.get_intermol_clashes(&m2) << " cu. A." << endl;
     cout << "# Initial intermol energy level: " << -m1.get_intermol_binding(&m2) << " kJ/mol." << endl;
 

@@ -925,6 +925,7 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
     return false;
 }
 
+#define _dbg_polar_calc 0
 float Atom::is_polar()
 {
     if (charge) polarity = sgn(charge);
@@ -936,6 +937,10 @@ float Atom::is_polar()
             if (bonded_to[i].btom)
             {
                 n++;
+                
+                if (family == TETREL && bonded_to[i].btom->Z == 1) continue;
+                if (bonded_to[i].btom->family == TETREL && Z == 1) continue;
+
                 int v = min(valence, 8-valence);
                 int v1 = min(bonded_to[i].btom->valence, 8-bonded_to[i].btom->valence);
                 float f = (bonded_to[i].btom->elecn - elecn) / fmax(v, v1) * 1.7;
@@ -943,17 +948,21 @@ float Atom::is_polar()
                 if (fabs(f) > fabs(polarity))
                 {
                     polarity = f;
-                    cout << name << " is bonded to " << bonded_to[i].btom->name << " polarity " << polarity << endl;
+                    #if _dbg_polar_calc
+                    cout << "# " << name << " is bonded to " << bonded_to[i].btom->name << " polarity " << polarity << endl;
+                    #endif
                 }
             }
         }
 
         if (Z > 1)
         {
-            if (n == origgeo)
+            if (n == geometry)
             {
                 polarity = 0;
-                cout << name << " is shielded, polarity " << polarity << endl;
+                #if _dbg_polar_calc
+                cout << "# " << name << " is shielded, polarity " << polarity << endl;
+                #endif
             }
         }
 

@@ -944,7 +944,7 @@ float Atom::is_polar()
                 int v = min(valence, 8-valence);
                 int v1 = min(bonded_to[i].btom->valence, 8-bonded_to[i].btom->valence);
                 float f = (bonded_to[i].btom->elecn - elecn) / fmax(v, v1) * 1.7;
-                if (bonded_to[i].btom->polar_calcd && !bonded_to[i].btom->polarity) f = 0;
+                if (Z==1 && bonded_to[i].btom->polar_calcd && !bonded_to[i].btom->polarity) f = 0;
                 if (fabs(f) > fabs(polarity))
                 {
                     polarity = f;

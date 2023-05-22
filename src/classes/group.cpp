@@ -451,7 +451,8 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         }
 
                         #if _dbg_groupsel
-                        cout << "Adding " << b->name << " with distance " << r << " and similarity " << simil << " " << aliphatic << endl;
+                        cout << "Adding " << b->name << " with distance " << r << " and similarity " << simil
+                             << " polarity " << b->is_polar() << " aliphatic " << aliphatic << endl;
                         #endif
 
                         a_ = b;

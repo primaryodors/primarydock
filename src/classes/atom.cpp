@@ -841,6 +841,7 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
                                       );		// Later when we look for rings we update this.
 
             // Hydrogen magic.
+            #if 0
             if (lbtom->Z == 1)
             {
                 switch (Z)
@@ -906,6 +907,7 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
                     ;
                 }
             }
+            #endif
 
             if (!reciprocity)
             {
@@ -926,6 +928,37 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
 float Atom::is_polar()
 {
     if (charge) polarity = sgn(charge);
+    else if (!polar_calcd)
+    {
+        int i, n=0;
+        for (i=0; i<valence; i++)
+        {
+            if (bonded_to[i].btom)
+            {
+                n++;
+                int v = min(valence, 8-valence);
+                int v1 = min(bonded_to[i].btom->valence, 8-bonded_to[i].btom->valence);
+                float f = (bonded_to[i].btom->elecn - elecn) / fmax(v, v1) * 1.7;
+                if (bonded_to[i].btom->polar_calcd && !bonded_to[i].btom->polarity) f = 0;
+                if (fabs(f) > fabs(polarity))
+                {
+                    polarity = f;
+                    cout << name << " is bonded to " << bonded_to[i].btom->name << " polarity " << polarity << endl;
+                }
+            }
+        }
+
+        if (Z > 1)
+        {
+            if (n == origgeo)
+            {
+                polarity = 0;
+                cout << name << " is shielded, polarity " << polarity << endl;
+            }
+        }
+
+        polar_calcd = true;
+    }
     return polarity;
 }
 
@@ -2440,16 +2473,16 @@ float Atom::similarity_to(Atom* b)
 {
     float similarity = 0;
     bool apb = (fabs(is_polar()) > .333), bpb = (fabs(b->is_polar()) > .333);
-    if (apb == bpb) similarity += 10;
-    if (is_pi() && b->is_pi()) similarity += 5;
+    if (apb == bpb) similarity += 15;
+    if (is_pi() == b->is_pi()) similarity += 20;
     if (abs(is_thio()) && abs (b->is_thio())) similarity += 8;
-    if (is_metal() && b->is_metal()) similarity += 15;
+    if (is_metal() && b->is_metal()) similarity += 40;
     similarity += 10.0 / (fabs(get_electronegativity() - b->get_electronegativity()) / 3 + 1);
-    if (is_bonded_to(b) || is_conjugated_to(b)) similarity += 7;
-    if (sgn(get_charge()))
+    if (is_bonded_to(b) || is_conjugated_to(b)) similarity += 5;
+    if (get_charge() && !is_pi())
     {
-        if (sgn(get_charge()) == sgn(b->get_charge())) similarity += 15;
-        else if (sgn(get_charge()) == -sgn(b->get_charge())) similarity -= 15;
+        if (sgn(get_charge()) == sgn(b->get_charge())) similarity += 30;
+        else if (sgn(get_charge()) == -sgn(b->get_charge())) similarity -= 30;
     }
     return similarity;
 }

@@ -310,6 +310,7 @@ protected:
     float charge = 0;					// can be partial.
     float acidbase = 0;					// charge potential; negative = acid / positive = basic.
     float polarity = 0;					// maximum potential relative to -OH...H-.
+    bool polar_calcd = false;
     int thiol = 0;
     Bond* bonded_to = 0;
     bool reciprocity = false;

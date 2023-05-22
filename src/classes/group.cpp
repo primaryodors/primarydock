@@ -365,6 +365,17 @@ void ResidueGroup::conform_to(Molecule* mol)
     }
 }
 
+bool AtomGroup::is_bonded_to(Atom* a)
+{
+    int n = atoms.size();
+    if (!n) return false;
+
+    int i;
+    for (i=0; i<n; i++) if (atoms[i]->is_bonded_to(a)) return true;
+
+    return false;
+}
+
 std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(Molecule* mol)
 {
     std::vector<std::shared_ptr<AtomGroup>> retval;
@@ -392,7 +403,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 aliphatic += 10000;
                 continue;
             }
-            int bh = a->get_bonded_atoms_count() - a->get_bonded_heavy_atoms_count();
+            int bh = a->get_bonded_heavy_atoms_count();
             if (bh > 1) continue;
             aliphatic++;
         }
@@ -422,23 +433,26 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             }
             float simil = fmax(a->similarity_to(b), a_->similarity_to(b));
 
-            if (simil >= 20)
+            if (simil >= 5)
             {
                 if (aliphatic < 3 || b->get_Z() == 1)
                 {
-                    g->atoms.push_back(b);
-                    if (b->get_Z() > 1)
+                    if (g->is_bonded_to(b))
                     {
-                        if (!b->is_polar() && !b->get_charge() && !b->is_pi()) aliphatic++;
-                        else aliphatic--;
+                        g->atoms.push_back(b);
+                        if (b->get_Z() > 1)
+                        {
+                            if (!b->is_polar() && !b->get_charge() && !b->is_pi()) aliphatic++;
+                            else aliphatic--;
+                        }
+
+                        #if _dbg_groupsel
+                        cout << "Adding " << b->name << " with distance " << r << " and similarity " << simil << " " << aliphatic << endl;
+                        #endif
+
+                        a_ = b;
+                        if ((bool)a->is_polar() == (bool)b->is_polar()) dirty[j] = true;
                     }
-
-                    #if _dbg_groupsel
-                    cout << "Adding " << b->name << " with distance " << r << " and similarity " << simil << " " << aliphatic << endl;
-                    #endif
-
-                    a_ = b;
-                    dirty[j] = true;
                 }
             }
             else

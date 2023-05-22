@@ -39,6 +39,7 @@ class AtomGroup
     float distance_to(Point pt);
     float bounds();
     float compatibility(AminoAcid* aa);
+    bool is_bonded_to(Atom* a);
 
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol);
 };

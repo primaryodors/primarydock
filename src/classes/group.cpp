@@ -491,7 +491,6 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         #endif
     }
 
-    throw 0xbadbeef;
     return retval;
 }
 

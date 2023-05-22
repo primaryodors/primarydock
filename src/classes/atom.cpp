@@ -925,7 +925,7 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
     return false;
 }
 
-#define _dbg_polar_calc 1
+#define _dbg_polar_calc 0
 float Atom::is_polar()
 {
     if (charge) polarity = sgn(charge);

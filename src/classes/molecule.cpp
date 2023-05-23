@@ -2394,6 +2394,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         float abind = InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                         if (abind && !isnan(abind) && !isinf(abind))
                         {
+                            if (abind > 0 && minimum_searching_aniso && ligands[l]->priority) abind *= 1.5;
                             kJmol += abind;
                             // cout << atoms[i]->name << "-" << ligands[l]->atoms[j]->name << " " << -abind << endl;
                             atoms[i]->last_bind_energy += abind;

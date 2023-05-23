@@ -306,6 +306,7 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
     return false;
 }
 
+#define _dbg_applicable 0
 InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
@@ -313,6 +314,10 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
     {
         return NULL;
     }
+
+    #if _dbg_applicable
+    cout << "Getting forces between " << a->name << " and " << b->name << "..." << endl;
+    #endif
 
     InteratomicForce** look = all_forces;
     int Za = a->get_Z();

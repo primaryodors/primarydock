@@ -949,7 +949,7 @@ float Atom::is_polar()
                 float f = (bonded_to[i].btom->elecn - elecn);
                 if (Z==1 && bonded_to[i].btom->family == TETREL) f = 0;
 
-                // if (family == PNICTOGEN && bonded_to[i].btom->family == TETREL && !is_bonded_to("H")) f *= 8;
+                if (family == PNICTOGEN && geometry <= 4) f = 1;
 
                 for (j=0; j<valence; j++)
                 {

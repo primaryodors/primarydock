@@ -72,6 +72,8 @@ int main(int argc, char** argv)
     int asciilen = 10;
 
     Atom probe((argc > 3) ? argv[3] : "H");
+    probe.name = new char[256];
+    strcpy(probe.name, probe.get_elem_sym());
     if (probe.is_metal()) probe.increment_charge(probe.get_valence());
     int pz = probe.get_Z();
     Atom oxy(pz == 1 ? "O" : "C");
@@ -85,7 +87,7 @@ int main(int argc, char** argv)
     Molecule mp("probe", aarr);
 
     InteratomicForce** ifs = InteratomicForce::get_applicable(&probe, anisoa);
-    if (!ifs)
+    if (!ifs || !ifs[0])
     {
         cout << "No forces to measure; check bindings.dat." << endl;
         return -1;

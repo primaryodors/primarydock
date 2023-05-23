@@ -753,6 +753,8 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
             int j = interpret_resno(words[i]);
             if (!j) break;
             resnos.push_back(j);
+            AminoAcid* aa = protein->get_residue(j);
+            aa->priority = true;
         }
 
         int sz = resnos.size();
@@ -2161,7 +2163,6 @@ int main(int argc, char** argv)
         }
     }
 
-
     if (!CEN_buf.length())
     {
         cout << "Error: no binding pocket center defined." << endl;
@@ -2169,7 +2170,6 @@ int main(int argc, char** argv)
     }
 
     strcpy(buffer, CEN_buf.c_str());
-
     char** words = chop_spaced_words(buffer);
     pocketcen = pocketcen_from_config_words(words, nullptr);
     loneliest = protein->find_loneliest_point(pocketcen, size);
@@ -2460,6 +2460,10 @@ _try_again:
             protein->soft_biases = soft_biases;
         }
 
+        strcpy(buffer, CEN_buf.c_str());
+        words = chop_spaced_words(buffer);
+        pocketcen = pocketcen_from_config_words(words, nullptr);
+
         freeze_bridged_residues();
         prepare_initb();
 
@@ -2580,6 +2584,10 @@ _try_again:
 
                 freeze_bridged_residues();
                 prepare_initb();
+
+                strcpy(buffer, CEN_buf.c_str());
+                words = chop_spaced_words(buffer);
+                pocketcen = pocketcen_from_config_words(words, nullptr);
 
                 for (i=1; i<=seql; i++)
                 {

@@ -391,6 +391,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     {
         if (dirty[i]) continue;
         std::shared_ptr<AtomGroup> g(new AtomGroup());
+        g->ligand = mol;
         int aliphatic = 0;
 
         Atom* a = mol->get_atom(i);
@@ -699,6 +700,8 @@ float GroupPair::get_potential()
         if (q) potential /= q;
 
         float r = pocketcen.get_3d_distance(scg->get_center());
+        float r1 = ag->get_center().get_3d_distance(ag->get_ligand()->get_barycenter());
+        r = fmax(1.5, r-r1);
         potential /= fmax(1, r-1.5);
 
         return potential;

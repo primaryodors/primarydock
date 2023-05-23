@@ -40,8 +40,12 @@ class AtomGroup
     float bounds();
     float compatibility(AminoAcid* aa);
     bool is_bonded_to(Atom* a);
+    Molecule* get_ligand() { return ligand; }
 
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol);
+
+    protected:
+    Molecule* ligand;
 };
 
 class ResidueGroup

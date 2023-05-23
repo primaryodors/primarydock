@@ -147,6 +147,7 @@ int main(int argc, char** argv)
     m.rotate(&rot.v, rot.a);
 
     aloc = anisoa->get_location();
+    minimum_searching_aniso = 0;
 
     for (y=-size; y<=size; y++)
     {

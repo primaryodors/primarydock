@@ -2207,16 +2207,37 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
 {
     if (noAtoms(atoms)) return 0;
     int i, j;
+
+    float hydro = 0;
+    j = 0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->get_Z() == 1) continue;
+
+        // if (fabs(atoms[i]->is_polar()) > 0.333) hydro += 1;
+        hydro += fabs(atoms[i]->is_polar());
+        j++;
+    }
+
+    if (j) hydro /= j;
+    cout << name << " has hydro " << hydro << endl;
+
     float retval=0;
     potential_distance = 0;
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
+
         InteratomicForce** ifs = InteratomicForce::get_applicable(a, atoms[i]);
         if (!ifs) continue;
+
         for (j=0; ifs[j]; j++)
         {
             float partial;
+
+            if (hydro > 0.333 && ifs[j]->get_type() == vdW) continue;
+
             if (ifs[j]->get_type() == ionic)
             {
                 if (sgn(a->get_charge()) != -sgn(atoms[i]->get_charge())) continue;
@@ -2374,6 +2395,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         if (abind && !isnan(abind) && !isinf(abind))
                         {
                             kJmol += abind;
+                            // cout << atoms[i]->name << "-" << ligands[l]->atoms[j]->name << " " << -abind << endl;
                             atoms[i]->last_bind_energy += abind;
                             if (abind > atoms[i]->strongest_bind_energy)
                             {

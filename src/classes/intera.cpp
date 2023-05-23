@@ -647,7 +647,32 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     #endif
 
     if (achg && sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2);
-    if (apol>0 && sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
+    if (apol>0 && sgn(apol) == sgn(bpol))
+    {
+        float pr = polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
+
+        if (a->get_Z() == 1)
+        {
+            Bond* prb = a->get_bond_by_idx(0);
+            if (prb && prb->btom)
+            {
+                float prtheta = find_3d_angle(b->get_location(), prb->btom->get_location(), a->get_location());
+                pr *= 0.5 + 0.5 * cos(prtheta);
+            }
+        }
+
+        if (b->get_Z() == 1)
+        {
+            Bond* prb = b->get_bond_by_idx(0);
+            if (prb && prb->btom)
+            {
+                float prtheta = find_3d_angle(a->get_location(), prb->btom->get_location(), b->get_location());
+                pr *= 0.5 + 0.5 * cos(prtheta);
+            }
+        }
+
+        kJmol -= pr;
+    }
 
     bool atoms_are_bonded = a->is_bonded_to(b);
 
@@ -673,6 +698,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     }
 
     if (r < 0.5) forces[0] = NULL;
+
+    float atheta, btheta;
 
     for (i=0; forces[i]; i++)
     {
@@ -906,9 +933,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     Point pt(&avec[j]);
                     pt.scale(r);
                     pt = pt.add(aloc);
-                    float theta = find_3d_angle(&bloc, &pt, &aloc);
-                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (theta > M_PI/2) continue;
-                    float contrib = pow(fmax(0,cos(theta)), dpa);
+                    atheta = find_3d_angle(&bloc, &pt, &aloc);
+                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (atheta > M_PI/2) continue;
+                    float contrib = pow(fmax(0,cos(atheta)), dpa);
                     if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
                 }
 
@@ -919,9 +946,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     Point pt(&bvec[j]);
                     pt.scale(r);
                     pt = pt.add(bloc);
-                    float theta = find_3d_angle(&aloc, &pt, &bloc);
-                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (theta > M_PI/2) continue;
-                    float contrib = pow(fmax(0,cos(theta)), dpb);
+                    btheta = find_3d_angle(&aloc, &pt, &bloc);
+                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (btheta > M_PI/2) continue;
+                    float contrib = pow(fmax(0,cos(btheta)), dpb);
                     if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
                 }
 
@@ -930,6 +957,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
                 // Multiply the two sums.
                 aniso = fmax(minimum_searching_aniso, asum * bsum);
+                // cout << aniso << " | " << asum << " | " << bsum << " | " << dpa << " | " << dpb << endl;
             }
 
             if (r1 >= 1)
@@ -999,10 +1027,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         << endl;
             }
 
-            if (achg && bchg) partial = fabs(partial) * sgn(achg) * -sgn(bchg);
+            /*if (achg && bchg) partial = fabs(partial) * sgn(achg) * -sgn(bchg);
             if (achg && !bchg && bpol) partial = fabs(partial) * sgn(achg) * -sgn(bpol);
             if (!achg && apol && bchg) partial = fabs(partial) * sgn(apol) * -sgn(bchg);
-            if (!achg && apol && !bchg && bpol) partial = fabs(partial) * sgn(apol) * -sgn(bpol);
+            if (!achg && apol && !bchg && bpol) partial = fabs(partial) * sgn(apol) * -sgn(bpol);*/
+
+            if (forces[i]->type == hbond) partial *= fabs(apol) * fabs(bpol);
 
             # if 0
             //if (forces[i]->type == polarpi || forces[i]->type == mcoord)
@@ -1090,7 +1120,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 str += (std::string)"unk";
             }
 
-            str += (std::string)" " + to_string(-partial);
+            str += (std::string)" " + to_string(-partial) + (std::string)" (" + to_string(-kJmol) + (std::string)")";
+
+            str += (std::string)" theta: " + to_string(atheta*fiftyseven) + (std::string)", " + to_string(btheta*fiftyseven);
 
             interaudit.push_back(str);
         }

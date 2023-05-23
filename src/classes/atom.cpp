@@ -928,46 +928,58 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
 #define _dbg_polar_calc 0
 float Atom::is_polar()
 {
-    if (charge) polarity = sgn(charge);
+    if (charge) polarity = charge;
     else if (!polar_calcd)
     {
-        int i, n=0;
+        float icc = is_conjugated_to_charge();
+        if (icc)
+        {
+            charge = icc;
+            return charge;
+        }
+
+        int i, j, n=0;
+        polarity = 0;
         for (i=0; i<valence; i++)
         {
             if (bonded_to[i].btom)
             {
                 n++;
-                
-                if (family == TETREL && bonded_to[i].btom->Z == 1) continue;
-                if (bonded_to[i].btom->family == TETREL && Z == 1) continue;
 
-                int v = min(valence, 8-valence);
-                int v1 = min(bonded_to[i].btom->valence, 8-bonded_to[i].btom->valence);
-                float f = (bonded_to[i].btom->elecn - elecn) / fmax(v, v1) * 1.7;
-                if (Z==1 && bonded_to[i].btom->polar_calcd && !bonded_to[i].btom->polarity) f = 0;
-                if (fabs(f) > fabs(polarity))
+                float f = (bonded_to[i].btom->elecn - elecn);
+                if (Z==1 && bonded_to[i].btom->family == TETREL) f = 0;
+
+                // if (family == PNICTOGEN && bonded_to[i].btom->family == TETREL && !is_bonded_to("H")) f *= 8;
+
+                for (j=0; j<valence; j++)
                 {
-                    polarity = f;
+                    if (j==i) continue;
+                    if (!bonded_to[j].btom) continue;
+                    float e = (bonded_to[j].btom->elecn - elecn);
+                    e *= cos(find_3d_angle(bonded_to[i].btom->location, bonded_to[j].btom->location, location));
+                    f += e;
+                }
+
+                if (1) // fabs(f) > fabs(polarity))
+                {
+                    polarity += f;
                     #if _dbg_polar_calc
-                    cout << "# " << name << " is bonded to " << bonded_to[i].btom->name << " polarity " << polarity << endl;
+                    cout << "# " << name << " is bonded to " << bonded_to[i].btom->name << " " << f << ", ";
                     #endif
                 }
             }
         }
 
-        if (Z > 1)
-        {
-            if (n == geometry)
-            {
-                polarity = 0;
-                #if _dbg_polar_calc
-                cout << "# " << name << " is shielded, polarity " << polarity << endl;
-                #endif
-            }
-        }
+        if (n) polarity /= n;
+        #if _dbg_polar_calc
+        cout << "# / " << n << " = polarity " << polarity << endl;
+        #endif
 
         polar_calcd = true;
     }
+    #if _dbg_polar_calc
+    // cout << "# " << name << " has polarity " << polarity << endl;
+    #endif
     return polarity;
 }
 
@@ -2165,6 +2177,49 @@ Ring* Atom::closest_arom_ring_to(Point target)
     }
 
     return nullptr;
+}
+
+float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
+{
+    if (!this) return false;
+    if (!is_pi()) return false;
+    if (this == bir) return false;
+    if (!bir) bir = this;
+    if (bir->recursion_counter > 10) return false;
+
+    bir->recursion_counter++;
+
+    int i;
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom
+            &&
+            bonded_to[i].btom != c
+            &&
+            bonded_to[i].btom != bir
+        )
+        {
+            float f = bonded_to[i].btom->charge;
+            if (f && bonded_to[i].btom->family == family)
+            {
+                bir->recursion_counter = 0;
+                return f;
+            }
+
+            // DANGER: RECURSION.
+            f = bonded_to[i].btom->is_conjugated_to_charge(bir, this);
+            if (f)
+            {
+                bir->recursion_counter = 0;
+                return f;
+            }
+        }
+    }
+
+    if (bir == this) recursion_counter = 0;
+    else bir->recursion_counter--;
+
+    return false;
 }
 
 bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)

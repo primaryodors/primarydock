@@ -206,10 +206,21 @@ int main(int argc, char** argv)
     mols[1] = &m2;
     mols[2] = NULL;
     Molecule::conform_molecules(mols, 200, &iteration_callback);
+    #if _peratom_audit
+    interauditing = true;
+    #endif
     float final_clashes = m1.get_intermol_clashes(&m2);
     // if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " above threshold. FAIL." << endl;
     float energyLevel = m1.get_intermol_binding(&m2);
     cout << "\n# Post-conformation intermol energy level: " << -energyLevel << " kJ/mol." << endl;
+
+    #if _peratom_audit
+    cout << endl << "# Interatomic Audit:" << endl;
+    int ian = interaudit.size(), iai;
+    for (iai=0; iai<ian; iai++) cout << "# " << interaudit[iai] << endl;
+    cout << endl << endl;
+    interauditing = false;
+    #endif
 
     float nodist = 0;
     Atom* O = m1.get_atom("O6");

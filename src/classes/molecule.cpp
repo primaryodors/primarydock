@@ -2206,7 +2206,7 @@ bool Molecule::shielded(Atom* a, Atom* b) const
 float Molecule::get_atom_mol_bind_potential(Atom* a)
 {
     if (noAtoms(atoms)) return 0;
-    int i, j;
+    int i, j, n;
 
     float hydro = 0;
     j = 0;
@@ -2225,6 +2225,7 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
 
     float retval=0;
     potential_distance = 0;
+    n = 0;
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
@@ -2261,13 +2262,15 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
             }
 
             retval += partial;
+            n++;
 
             potential_distance += ifs[j]->get_distance();
         }
         delete[] ifs;
     }
 
-    potential_distance /= retval;
+    if (n) retval /= n;
+    // potential_distance /= retval;
 
     return retval;
 }

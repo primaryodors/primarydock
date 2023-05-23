@@ -1,7 +1,6 @@
 
 #include "group.h"
 
-std::vector<int> extra_wt;
 std::vector<MCoord> mtlcoords;
 std::vector<std::shared_ptr<GroupPair>> global_pairs;
 
@@ -283,10 +282,7 @@ float ResidueGroup::compatibility(AtomGroup* ag)
 
         float f = ag->compatibility(aminos[i]);
 
-        if (extra_wt.size()
-                &&
-                std::find(extra_wt.begin(), extra_wt.end(), aminos[i]->get_residue_no())!=extra_wt.end()
-        )
+        if (aminos[i]->priority)
         {
             f *= 2;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
         }
@@ -665,15 +661,19 @@ float GroupPair::get_potential()
                 else
                 {
                     partial = aa->get_atom_mol_bind_potential(a);
-                    if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like()) partial /= 3;
-                    else if (fabs(a->is_polar()) > 0.333 && aa->hydrophilicity() < 0.333) partial /= 3;
-
-                    if (extra_wt.size()
-                            &&
-                            std::find(extra_wt.begin(), extra_wt.end(), aa->get_residue_no())!=extra_wt.end()
-                    )
+                    if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like())
                     {
-                        partial *= 2.5;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+                        partial /= 3;
+                        #if _dbg_groupsel
+                        cout << *a << " is polar and " << *aa << " is tyrosine-like." << endl;
+                        #endif
+                    }
+                    else if (fabs(a->is_polar()) > 0.333 && fabs(aa->hydrophilicity()) < 0.333)
+                    {
+                        partial /= 3;
+                        #if _dbg_groupsel
+                        cout << *a << " is polar and " << *aa << " is not." << endl;
+                        #endif
                     }
 
                     #if _dbg_groupsel

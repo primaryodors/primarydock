@@ -1657,10 +1657,7 @@ void do_tumble_spheres(Point l_pocket_cen)
                                     {
                                         weight = 1;
 
-                                        if (extra_wt.size()
-                                                &&
-                                                std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
-                                        )
+                                        if (tsphres[j]->priority)
                                         {
                                             weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
                                         }
@@ -2198,13 +2195,6 @@ int main(int argc, char** argv)
         }
     }
 
-    if (!strcmp(words[1], "RES"))
-    {
-        for (i=2; words[i]; i++)
-        {
-            extra_wt.push_back(interpret_resno(words[i]));
-        }
-    }
     pktset = true;
 
     protein->mcoord_resnos = mcoord_resno;
@@ -3052,14 +3042,6 @@ _try_again:
                 }
                 words = chop_spaced_words(buffer);
                 nodecen = pocketcen_from_config_words(&words[1], &nodecen);
-                if (!strcmp(words[2], "RES"))
-                {
-                    extra_wt.clear();
-                    for (i=2; words[i]; i++)
-                    {
-                        extra_wt.push_back(interpret_resno(words[i]));
-                    }
-                }
 
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added whatever points together." << endl;
@@ -3176,21 +3158,6 @@ _try_again:
                                     if (resno >= active_helix_rots[l].start_resno && resno <= active_helix_rots[l].end_resno)
                                     {
                                         weight *= 1.5;
-                                    }
-                                }
-                            }
-
-                            if (extra_wt.size())
-                            {
-                                int l, n = extra_wt.size(), resno = reaches_spheroid[nodeno][i]->get_residue_no();
-                                for (l=0; l<n; l++)
-                                {
-                                    if (resno == extra_wt[l])
-                                    {
-                                        weight *= 20;
-                                        #if _dbg_flexion_selection
-                                        // cout << resno << " boosted." << endl;
-                                        #endif
                                     }
                                 }
                             }

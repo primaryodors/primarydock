@@ -2221,7 +2221,6 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
     }
 
     if (j) hydro /= j;
-    cout << name << " has hydro " << hydro << endl;
 
     float retval=0;
     potential_distance = 0;

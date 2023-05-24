@@ -3948,7 +3948,7 @@ _try_again:
                 }
                 else
                 {
-                    if (lb > 90) lb = 0;
+                    if (lb > 500) lb = 0;
                     mkJmol[metcount] = lb;
                 }
 

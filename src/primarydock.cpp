@@ -3773,14 +3773,21 @@ _try_again:
             if (debug) *debug << "Preparing output." << endl;
             #endif
 
-            char metrics[protein->get_seq_length()+8][10];
-            float mkJmol[protein->get_seq_length()+8];
-            float imkJmol[protein->get_seq_length()+8];
-            float mvdWrepl[protein->get_seq_length()+8];
-            float imvdWrepl[protein->get_seq_length()+8];
+            int psl8 = protein->get_seq_length()+8;
+
+            char metrics[psl8][10];
+            float mkJmol[psl8];
+            float imkJmol[psl8];
+            float mvdWrepl[psl8];
+            float imvdWrepl[psl8];
             int metcount = 0;
             float btot = 0;
             float pstot = 0;
+
+            for (i=0; i<psl8; i++)
+            {
+                mkJmol[i] = imkJmol[i] = mvdWrepl[i] = imvdWrepl[i] = 0;
+            }
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 
@@ -4104,7 +4111,7 @@ _try_again:
             }
 
             // Terminate with an empty string and a null pointer.
-            dr[drcount][nodeno].metric[i] = new char[1];
+            dr[drcount][nodeno].metric[i] = new char[2];
             dr[drcount][nodeno].metric[i][0] = 0;
             dr[drcount][nodeno].metric[i+1] = 0;
             #if _DBG_STEPBYSTEP
@@ -4290,17 +4297,23 @@ _try_again:
                         }
                         cout << "BENERG:" << endl;
                         if (output) *output << "# Binding energies" << endl << "BENERG:" << endl;
+                        #if _dbg_find_blasted_segfault
+                        cout << "alpha " << j << "|" << k << endl;
+                        #endif
                         for (	l=0;
 
-                                dr[j][k].metric
+                                dr[j][k].mkJmol
+                                && dr[j][k].metric
                                 && dr[j][k].metric[l]
                                 && dr[j][k].metric[l][0]
-                                && dr[j][k].mkJmol
                                 ;
 
                                 l++
                             )
                         {
+                            #if _dbg_find_blasted_segfault
+                            cout << "beta " << l << endl;
+                            #endif
                             if (differential_dock)
                             {
                                 cout << dr[j][k].metric[l]
@@ -4317,13 +4330,25 @@ _try_again:
                             else
                             {
                                 if (output && do_output_colors) colorize(dr[j][k].mkJmol[l]);
+                                #if _dbg_find_blasted_segfault
+                                cout << "gamma " << l << endl;
+                                #endif
                                 cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
+                                #if _dbg_find_blasted_segfault
+                                cout << "delta " << l << endl;
+                                #endif
                                 if (do_output_colors) colorless();
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
+                                #if _dbg_find_blasted_segfault
+                                cout << "epsilon " << l << endl;
+                                #endif
                             }
                         }
                         cout << endl;
                         if (output) *output << endl;
+                        #if _dbg_find_blasted_segfault
+                        cout << "zeta " << l << endl;
+                        #endif
 
                         for (l=0; l<_INTER_TYPES_LIMIT; l++)
                         {

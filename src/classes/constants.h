@@ -328,6 +328,7 @@
 #define _dbg_mol_frames 0
 #define _dbg_fitness_plummet 0
 #define _dbg_anemia 0
+#define _dbg_find_blasted_segfault 1
 
 #endif
 

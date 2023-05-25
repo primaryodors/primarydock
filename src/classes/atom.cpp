@@ -949,12 +949,6 @@ float Atom::is_polar()
                 float f = (bonded_to[i].btom->elecn - elecn);
                 if (Z==1 && bonded_to[i].btom->family == TETREL) f = 0;
 
-                if (family == PNICTOGEN && geometry <= 4)
-                {
-                    if (!charge) charge = 0.5;
-                    f = 1;
-                }
-
                 for (j=0; j<valence; j++)
                 {
                     if (j==i) continue;
@@ -2488,6 +2482,39 @@ bool atoms_are_conjugated(Atom** atoms)
 
 void Ring::determine_type()
 {
+    // imidazole-like functionality.
+    int i;
+    if (atoms)
+    {
+        int numC = 0, numN = 0;             // Later, we'll add more atoms.
+        for (i=0; atoms[i]; i++)
+        {
+            int Z = atoms[i]->get_Z();
+            switch (Z)
+            {
+                case 6:
+                numC++;
+                break;
+
+                case 7:
+                numN++;
+                break;
+
+                default:
+                ;
+            }
+        }
+        atcount = i;
+
+        if (atcount == 5 && numC == 3 && numN == 2)         // TODO: Make sure only one CC bond.
+        {
+            for (i=0; i<atcount; i++)
+            {
+                if (atoms[i]->get_family() == PNICTOGEN) atoms[i]->is_imidazole_like = true;
+            }
+        }
+    }
+
     if (!atoms_are_conjugated(atoms))
     {
         type = OTHER;

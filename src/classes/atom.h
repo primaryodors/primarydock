@@ -322,6 +322,7 @@ protected:
     bool chirality_unspecified = true;
     Ring** member_of = nullptr;
     int recursion_counter = 0;
+    bool is_imidazole_like = false;     // Rings having a pKa near the biological pH of 7.4, that aromatic pnictogens can protonate.
 
     static void read_elements();
     void figure_out_valence();

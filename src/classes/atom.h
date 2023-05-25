@@ -144,6 +144,7 @@ public:
     {
         return elecn;
     }
+    bool is_pKa_near_bio_pH() { return is_imidazole_like; }
     float get_acidbase();
     float get_charge();
     float is_polar();						// -1 if atom is H-bond acceptor; +1 if donor.

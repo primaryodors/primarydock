@@ -606,7 +606,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     float achg = a->get_charge(), bchg = b->get_charge()
         , apol = a->is_polar(), bpol = b->is_polar();
-    
+
+    if (a->is_pKa_near_bio_pH() && bchg < 0) achg = 1;
+    if (b->is_pKa_near_bio_pH() && achg < 0) bchg = 1;
+
     if (!achg && a->get_Z() == 1)
     {
         Bond* lb = a->get_bond_by_idx(0);

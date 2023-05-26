@@ -4479,7 +4479,15 @@ _try_again:
                                 l++
                             )
                         {
+                            if (output) *output << endl;
+                            #if _dbg_find_blasted_segfault
+                            cout << "eta " << l << endl;
+                            #endif
                             if (fabs(dr[j][k].mvdWrepl[l]) < 0.001) continue;
+                            if (output) *output << endl;
+                            #if _dbg_find_blasted_segfault
+                            cout << "theta " << l << endl;
+                            #endif
 
                             if (differential_dock)
                             {
@@ -4499,6 +4507,10 @@ _try_again:
                                 cout << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
                             }
+                            if (output) *output << endl;
+                            #if _dbg_find_blasted_segfault
+                            cout << "iota " << l << endl;
+                            #endif
                         }
                         cout << endl;
                         if (output) *output << endl;

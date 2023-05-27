@@ -113,6 +113,7 @@ public:
     float correct_structure(int iters = 500);
     float close_loop(Atom** path, float closing_bond_cardinality);
     void crumple(float theta);					// Randomly rotate all rotatable bonds by +/- the specified angle.
+    std::vector<Atom*> longest_dimension();
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);

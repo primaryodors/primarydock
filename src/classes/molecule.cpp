@@ -604,6 +604,31 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
     return atoms[j];
 }
 
+std::vector<Atom*> Molecule::longest_dimension()
+{
+    std::vector<Atom*> retval;
+    if (!atoms) return retval;
+    int i, j;
+    float rmax = 0;
+
+    for (i=0; atoms[i]; i++)
+    {
+        for (j=i+1; atoms[j]; j++)
+        {
+            float r = atoms[i]->distance_to(atoms[j]);
+            if (r > rmax)
+            {
+                retval.clear();
+                retval.push_back(atoms[i]);
+                retval.push_back(atoms[j]);
+                rmax = r;
+            }
+        }
+    }
+
+    return retval;
+}
+
 float Molecule::bindability_by_type(intera_type t, bool ib)
 {
     if (!atoms) return 0;

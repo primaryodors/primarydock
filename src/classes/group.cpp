@@ -387,6 +387,10 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     bool dirty[n+4];
     for (i=0; i<n; i++) dirty[i] = false;
 
+    std::vector<Atom*> bd = mol->longest_dimension();
+    if (bd.size() < 2) throw 0xbad302;
+    float ld = bd[0]->distance_to(bd[1]);
+
     for (i=0; i<n; i++)
     {
         if (dirty[i]) continue;
@@ -427,10 +431,23 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 //cout << "Rejected " << b->name << " too far away." << endl;
                 #endif
             }
+
+            r = a->distance_to(b);
+            if (r > ld/2) continue;
+            if (b->get_Z() == 6 && r > ld/3) continue;
+
             float simil = 0; // fmax(a->similarity_to(b), a_->similarity_to(b));
 
             if (a->get_charge() && sgn(a->get_charge()) == sgn(b->get_charge())) simil += 10;
+
             if ((bool)a->is_polar() == (bool)b->is_polar()) simil += 7;
+            else simil -= 2;
+
+            /*if (abs(a->is_thio()) == abs(b->is_thio())) simil += 7;
+            else simil -= 7; */
+
+            if (abs(a->get_Z() - b->get_Z()) > 4) simil -= 4;
+
             if (a->is_pi() == b->is_pi()) simil += 3;
             if (a->is_conjugated_to(b)) simil += 6;
 
@@ -490,10 +507,12 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         int ni = retval[i]->atoms.size();
         for (j=l-1; j>i; j--)
         {
+            if (retval[i]->get_center().get_3d_distance(retval[j]->get_center()) > ld/3) continue;
+
             int nj = retval[j]->atoms.size();
             int si = retval[i]->intersecting(retval[j].get());
 
-            if (retval[i]->average_similarity(retval[j].get()) >= 15 && (si >= nj/2 || si >= ni/2))
+            if (retval[i]->average_similarity(retval[j].get()) >= 37 && (si >= nj/2 || si >= ni/2))
             {
                 retval[i]->merge(retval[j].get());
                 std::vector<std::shared_ptr<AtomGroup>>::iterator it;

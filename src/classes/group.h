@@ -41,6 +41,8 @@ class AtomGroup
     float compatibility(AminoAcid* aa);
     bool is_bonded_to(Atom* a);
     Molecule* get_ligand() { return ligand; }
+    int intersecting(AtomGroup* compare_with);
+    void merge(AtomGroup* merge_with);
 
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol);
 

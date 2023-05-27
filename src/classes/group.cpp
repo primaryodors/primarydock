@@ -420,7 +420,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             if (!b) continue;
 
             float r = fmax(0, g->get_center().get_3d_distance(b->get_location()) - 1.5);
-            if (r > 2.5)
+            if (r > 2.5 && !a->shares_bonded_with(b))
             {
                 continue;
                 #if _dbg_groupsel
@@ -461,7 +461,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             {
                 ;
                 #if _dbg_groupsel
-                //cout << "Rejected " << b->name << " similarity " << simil << endl;
+                if (b->get_family() == a->get_family()) cout << "Rejected " << b->name << " distance " << r << " similarity " << simil << endl;
                 #endif
             }
         }
@@ -484,7 +484,69 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         #endif
     }
 
+    l = retval.size();
+    for (i=0; i<l; i++)
+    {
+        int ni = retval[i]->atoms.size();
+        for (j=l-1; j>i; j--)
+        {
+            int nj = retval[j]->atoms.size();
+            int si = retval[i]->intersecting(retval[j].get());
+
+            if (si >= nj/2 || si >= ni/2)
+            {
+                retval[i]->merge(retval[j].get());
+                std::vector<std::shared_ptr<AtomGroup>>::iterator it;
+                it = retval.begin();
+                retval.erase(it+j);
+                l--;
+            }
+        }
+    }
+
     return retval;
+}
+
+int AtomGroup::intersecting(AtomGroup* cw)
+{
+    int samesies = 0;
+
+    int i, j, m = atoms.size(), n = cw->atoms.size();
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = cw->atoms[i];
+
+        for (j=0; j<m; j++)
+        {
+            samesies++;
+        }
+    }
+
+    return samesies;
+}
+
+void AtomGroup::merge(AtomGroup* mw)
+{
+    if (ligand && mw->ligand && ligand != mw->ligand) throw 0xbad3126;
+    if (!ligand) ligand = mw->ligand;
+
+    int i, j, m = atoms.size(), n = mw->atoms.size();
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = mw->atoms[i];
+
+        for (j=0; j<m; j++)
+        {
+            if (atoms[j] == a) goto _already;
+        }
+
+        atoms.push_back(a);
+
+        _already:
+        ;
+    }
 }
 
 std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chain_groups(AminoAcid** aalist, Point pcen)

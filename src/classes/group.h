@@ -43,6 +43,7 @@ class AtomGroup
     Molecule* get_ligand() { return ligand; }
     int intersecting(AtomGroup* compare_with);
     void merge(AtomGroup* merge_with);
+    float average_similarity(AtomGroup* compare_with);
 
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol);
 

@@ -493,7 +493,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             int nj = retval[j]->atoms.size();
             int si = retval[i]->intersecting(retval[j].get());
 
-            if (si >= nj/2 || si >= ni/2)
+            if (retval[i]->average_similarity(retval[j].get()) >= 15 && (si >= nj/2 || si >= ni/2))
             {
                 retval[i]->merge(retval[j].get());
                 std::vector<std::shared_ptr<AtomGroup>>::iterator it;
@@ -505,6 +505,32 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     }
 
     return retval;
+}
+
+float AtomGroup::average_similarity(AtomGroup* cw)
+{
+    float totsim = 0;
+    int simqty = 0;
+
+    int i, j, m = atoms.size(), n = cw->atoms.size();
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = cw->atoms[i];
+
+        for (j=0; j<m; j++)
+        {
+            if (atoms[j] != a)
+            {
+                totsim += a->similarity_to(atoms[j]);
+                simqty++;
+            }
+        }
+    }
+
+    if (!simqty) return 0;
+
+    return totsim / simqty;
 }
 
 int AtomGroup::intersecting(AtomGroup* cw)
@@ -519,7 +545,7 @@ int AtomGroup::intersecting(AtomGroup* cw)
 
         for (j=0; j<m; j++)
         {
-            samesies++;
+            if (atoms[j] == a) samesies++;
         }
     }
 

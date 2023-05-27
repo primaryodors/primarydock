@@ -2486,7 +2486,7 @@ void Ring::determine_type()
     int i;
     if (atoms)
     {
-        int numC = 0, numN = 0;             // Later, we'll add more atoms.
+        int numC = 0, numN = 0, numhCC = 0;             // Later, we'll add more atoms.
         for (i=0; atoms[i]; i++)
         {
             int Z = atoms[i]->get_Z();
@@ -2494,6 +2494,7 @@ void Ring::determine_type()
             {
                 case 6:
                 numC++;
+                numhCC += atoms[i]->num_bonded_to("C");
                 break;
 
                 case 7:
@@ -2506,12 +2507,24 @@ void Ring::determine_type()
         }
         atcount = i;
 
-        if (atcount == 5 && numC == 3 && numN == 2)         // TODO: Make sure only one CC bond.
+        numhCC &= -1;
+        int numCC = numhCC / 2;
+
+        #if _dbg_imidazole_check
+        cout << "# Ring has " << atcount << " atoms: " << numC << " carbons, " << numN << " nitrogens, "
+             << numCC << " carbon-carbon bonds." << endl;
+        #endif
+
+        if (atcount == 5 && numC == 3 && numN == 2 && numCC == 1)
         {
             for (i=0; i<atcount; i++)
             {
                 if (atoms[i]->get_family() == PNICTOGEN) atoms[i]->is_imidazole_like = true;
             }
+
+            #if _dbg_imidazole_check
+            cout << "# Ring is imidazole-like." << endl;
+            #endif
         }
     }
 

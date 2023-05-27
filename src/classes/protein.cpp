@@ -877,6 +877,7 @@ void Protein::set_clashables(int resno, bool recursed)
         {
             if (j == i) continue;
             AminoAcid* resj = get_residue(j);
+            if (!resj) continue;
             if (resi->can_reach(resj))
             {
                 temp[k++] = resj;

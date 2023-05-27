@@ -284,7 +284,7 @@ float ResidueGroup::compatibility(AtomGroup* ag)
 
         if (aminos[i]->priority)
         {
-            f *= 2;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+            f *= 5;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
         }
 
         result += f;
@@ -684,7 +684,7 @@ float GroupPair::get_potential()
 
                 if (aa->priority)
                 {
-                    partial *= 2;
+                    partial *= 5;
                     priority = true;
 
                     #if _dbg_groupsel
@@ -785,9 +785,14 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         }
         else for (l=0; l<r; l++)
         {
-            if (pair->priority && !retval[l]->priority
-                ||
-                pair->get_potential() > retval[l]->get_potential()
+            if  (
+                    (
+                        pair->priority == retval[l]->priority
+                        &&
+                        pair->get_potential() > retval[l]->get_potential()
+                    )
+                    ||
+                    (pair->priority && !retval[l]->priority)
                 )
             {
                 std::vector<std::shared_ptr<GroupPair>>::iterator it;
@@ -816,7 +821,9 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
     cout << endl << endl << "Final pair assignments:" << endl;
     for (i=0; i<retval.size(); i++)
     {
-        cout << *retval[i]->ag << "-" << *retval[i]->scg << endl;
+        cout << *retval[i]->ag << "-" << *retval[i]->scg;
+        if (retval[i]->priority) cout << " *";
+        cout << endl;
     }
     #endif
 

@@ -2361,8 +2361,11 @@ int main(int argc, char** argv)
     if (output) *output << endl;
 
     i = poses*(triesleft+1)+8;
-    DockResult dr[i][pathnodes+2];
-    // cout << "dr[" << i << "] allocated." << endl;
+    j = pathnodes+2;
+    DockResult dr[i][j];
+    #if _dbg_find_blasted_segfault
+    cout << "dr[" << i << "][" << j << "] allocated. " << dr << endl;
+    #endif
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
 
     float rgnxform_r[i][pathnodes+2][PROT_MAX_RGN], rgnxform_theta[i][pathnodes+2][PROT_MAX_RGN], rgnxform_y[i][pathnodes+2][PROT_MAX_RGN];
@@ -3264,6 +3267,10 @@ _try_again:
                 global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
                 ligand->recenter(ligcen_target);
                 GroupPair::align_groups(ligand, global_pairs);
+
+                #if _dbg_groupsel
+                cout << endl;
+                #endif
 
                 int gpn = global_pairs.size();
                 for (l=0; l<3 && l<gpn; l++)
@@ -4470,6 +4477,10 @@ _try_again:
                         }
                         cout << "vdWRPL:" << endl;
                         if (output) *output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
+                        if (output) *output << endl;
+                        #if _dbg_find_blasted_segfault
+                        cout << j << "|" << k << ": " << dr << endl;
+                        #endif
                         for (	l=0;
 
                                 dr[j][k].metric
@@ -4479,12 +4490,11 @@ _try_again:
                                 l++
                             )
                         {
-                            if (output) *output << endl;
                             #if _dbg_find_blasted_segfault
                             cout << "eta " << l << endl;
                             #endif
                             if (fabs(dr[j][k].mvdWrepl[l]) < 0.001) continue;
-                            if (output) *output << endl;
+
                             #if _dbg_find_blasted_segfault
                             cout << "theta " << l << endl;
                             #endif
@@ -4507,7 +4517,7 @@ _try_again:
                                 cout << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
                             }
-                            if (output) *output << endl;
+
                             #if _dbg_find_blasted_segfault
                             cout << "iota " << l << endl;
                             #endif

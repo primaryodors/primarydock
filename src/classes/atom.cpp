@@ -2457,13 +2457,28 @@ bool Ring::Huckel()
 
     for (i=0; atoms[i]; i++)
     {
-        if (atoms[i]->is_pi()) pi_electrons++;
+        if (atoms[i]->is_pi())
+        {
+            pi_electrons++;
+            #if _dbg_Huckel
+            cout << "# " << atoms[i]->name << " adds 1 Hückel electron." << endl;
+            #endif
+        }
 
         switch (atoms[i]->get_family())
         {
         case PNICTOGEN:
+            wiggle_room++;
+            #if _dbg_Huckel
+            cout << "# " << atoms[i]->name << " adds 1 more optional Hückel electron." << endl;
+            #endif
+            break;
+
         case CHALCOGEN:
             wiggle_room += 2;
+            #if _dbg_Huckel
+            cout << "# " << atoms[i]->name << " adds 2 more optional Hückel electrons." << endl;
+            #endif
             break;
 
         default:
@@ -2471,11 +2486,30 @@ bool Ring::Huckel()
         }
     }
 
-    for (i=0; i<=wiggle_room; i+=2)
+    #if _dbg_Huckel
+    cout << "# " << pi_electrons << " pi electrons and " << wiggle_room << " optional electrons." << endl;
+    #endif
+
+    for (i=0; i<=wiggle_room; i++)
     {
         int n = pi_electrons + i;
+
+        #if _dbg_Huckel
+        cout << "# " << n << " pi electrons; ";
+        #endif
+
         n -= 2;
-        if (n && !(n % 4)) return true;
+        if (n && !(n % 4))
+        {
+            #if _dbg_Huckel
+            cout << "Hückel number!" << endl;
+            #endif
+
+            return true;
+        }
+        #if _dbg_Huckel
+        else cout << "not Hückel." << endl;
+        #endif
     }
     return false;
 }
@@ -2546,7 +2580,10 @@ void Ring::determine_type()
              << numCC << " carbon-carbon bonds." << endl;
         #endif
 
-        if (atcount == 5 && numC == 3 && numN == 2 && numCC == 1)
+        if (atcount == 5 && numC == 3 && numN == 2 && numCC == 1
+            &&
+            is_coplanar() && atoms_are_conjugated(atoms) && Huckel()
+            )
         {
             for (i=0; i<atcount; i++)
             {
@@ -2561,12 +2598,20 @@ void Ring::determine_type()
 
     if (!atoms_are_conjugated(atoms))
     {
+        #if _dbg_Huckel
+        cout << "# Ring is not conjugated." << endl;
+        #endif
+
         type = OTHER;
         return;
     }
 
     if (!is_coplanar())
     {
+        #if _dbg_Huckel
+        cout << "# Ring is not coplanar." << endl;
+        #endif
+
         type = OTHER;
         return;
     }

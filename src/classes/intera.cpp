@@ -664,6 +664,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 pr *= 0.5 + 0.5 * cos(prtheta);
             }
         }
+        else
+        {
+            Bond* sb = a->get_bond_closest_to(b->get_location());
+            if (sb->btom && sb->btom->distance_to(b) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+        }
 
         if (b->get_Z() == 1)
         {
@@ -674,9 +679,17 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 pr *= 0.5 + 0.5 * cos(prtheta);
             }
         }
+        else
+        {
+            Bond* sb = b->get_bond_closest_to(a->get_location());
+            if (sb->btom && sb->btom->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+        }
 
         kJmol -= pr;
     }
+
+    no_polar_repuls:
+    ;
 
     bool atoms_are_bonded = a->is_bonded_to(b);
 
@@ -886,7 +899,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
 
             #if _dbg_259
-            if (a->get_family() == PNICTOGEN && b->get_Z() == 1)
+            /*if (a->get_family() == PNICTOGEN && b->get_Z() == 1)
             {
                 for (j=0; j<ag; j++)
                 {
@@ -900,7 +913,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
                     cout << endl;
                 }
-            }
+            }*/
             #endif
 
             if (del_ageo) delete[] ageo;

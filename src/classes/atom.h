@@ -194,6 +194,7 @@ public:
     Bond* get_bond_between(Atom* btom);
     Bond* get_bond_between(const char* bname);
     Bond* get_bond_by_idx(int bidx);
+    Bond* get_bond_closest_to(Point target);
     int get_idx_bond_between(Atom* btom);
 
     float hydrophilicity_rule();

@@ -1613,6 +1613,28 @@ float Atom::get_geometric_bond_angle()
     }
 }
 
+Bond* Atom::get_bond_closest_to(Point pt)
+{
+    int i;
+    float rmin = Avogadro;
+    Bond* retval = nullptr;
+
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom)
+        {
+            float r = bonded_to[i].btom->location.get_3d_distance(pt);
+            if (r < rmin)
+            {
+                retval = &bonded_to[i];
+                rmin = r;
+            }
+        }
+    }
+
+    return retval;
+}
+
 SCoord* Atom::get_geometry_aligned_to_bonds()
 {
     int bc = get_bonded_atoms_count();
@@ -1640,7 +1662,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
     Point center;
     int i, j, k, l;
 
-    // Attempted #259 fix:
+    // #259 fix:
 
     for (i=0; i<geometry; i++)
     {

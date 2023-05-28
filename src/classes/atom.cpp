@@ -2671,28 +2671,54 @@ float Atom::similarity_to(Atom* b)
 {
     float similarity = 0;
 
-    bool apb = (fabs(is_polar()) > .333), bpb = (fabs(b->is_polar()) > .333);
+    // Criteria:
+    //
+    // Both/neither abs polarity >= 0.2                             15%
+    // Both/neither abs polarity >= 0.333                           15%
+    // Abs delta polarity < 0.333                                   17%
+    // One polar and one nonpolar bound to N or O                   15%
+    // Same sgn charge                                              20%
+    // One charged one neutral with abs hydro > 0.333               10%
+    // Opposite charges                                            -20%
+    // Both/neither pi if both/neither polar > 0.333                23%
+    // Neither pi and one polar and one nonpolar bound to N or O    20%
+    // One polar and both pi                                        16%
+    // One polar and only one pi                                    11%
+    // Abs delta electronegativity <= 0.7                           10%
 
-    if (apb == bpb) similarity += 15;
+    bool apb = (fabs(is_polar()) > .2), bpb = (fabs(b->is_polar()) > .2);
+    if (apb == bpb) similarity += 0.15;
 
-    if (is_pi() == b->is_pi()) similarity += 20;
+    apb = (fabs(is_polar()) > .333);
+    bpb = (fabs(b->is_polar()) > .333);
+    if (apb == bpb) similarity += 0.15;
 
-    if (abs(is_thio()) == abs(b->is_thio())) similarity += 8;
-    else similarity -= 4;
-
-    if (is_metal() && b->is_metal()) similarity += 40;
-
-    similarity += 10.0 / (fabs(get_electronegativity() - b->get_electronegativity()) / 3 + 1);
-
-    if (is_bonded_to(b) || is_conjugated_to(b)) similarity += 5;
-
-    if (get_charge() && !is_pi())
+    if (
+        (!apb && bpb && (is_bonded_to("N") || is_bonded_to("O")))
+        ||
+        (!bpb && apb && (b->is_bonded_to("N") || b->is_bonded_to("O")) )
+        )
     {
-        if (sgn(get_charge()) == sgn(b->get_charge())) similarity += 30;
-        else if (sgn(get_charge()) == -sgn(b->get_charge())) similarity -= 30;
+        similarity += 0.15;
+        if (!is_pi() && !b->is_pi()) similarity += 0.20;
     }
 
-    similarity -= abs(Z - b->Z);
+    float delta = fabs(is_polar() - b->is_polar());
+    if (delta < 0.333) similarity += 0.17;
+
+    if (sgn(charge) == sgn(b->charge)) similarity += 0.20;
+    else if (!charge && apb && b->charge) similarity += 0.10;
+    else if (charge && bpb && !b->charge) similarity += 0.10;
+    else if (sgn(charge) == -sgn(b->charge)) similarity -= 0.20;
+
+    if (apb == bpb && is_pi() == b->is_pi()) similarity += 0.23;
+    else if (apb && is_pi() && b->is_pi()) similarity += 0.16;
+    else if (bpb && is_pi() && b->is_pi()) similarity += 0.16;
+    else if (apb && b->is_pi()) similarity += 0.11;
+    else if (bpb && is_pi()) similarity += 0.11;
+
+    delta = fabs(elecn - b->elecn);
+    if (delta <= 0.7) similarity += 0.10;
 
     return similarity;
 }

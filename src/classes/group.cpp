@@ -436,19 +436,9 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             if (r > ld/2) continue;
             if (b->get_Z() == 6 && r > ld/3) continue;
 
-            float simil = 0; // fmax(a->similarity_to(b), a_->similarity_to(b));
+            float simil = a->similarity_to(b);
 
-            if (a->get_charge() && sgn(a->get_charge()) == sgn(b->get_charge())) simil += 10;
-
-            if ((bool)a->is_polar() == (bool)b->is_polar()) simil += 7;
-            else simil -= 2;
-
-            if (abs(a->get_Z() - b->get_Z()) > 4) simil -= 4;
-
-            if (a->is_pi() == b->is_pi()) simil += 3;
-            if (a->is_conjugated_to(b)) simil += 6;
-
-            if (simil >= 8)
+            if (simil >= 0.7)
             {
                 if (aliphatic < 3 || b->get_Z() == 1)
                 {
@@ -509,7 +499,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             int nj = retval[j]->atoms.size();
             int si = retval[i]->intersecting(retval[j].get());
 
-            if (retval[i]->average_similarity(retval[j].get()) >= 37 && (si >= nj/2 || si >= ni/2))
+            if (retval[i]->average_similarity(retval[j].get()) >= 0.5 && (si >= nj/2 || si >= ni/2))
             {
                 retval[i]->merge(retval[j].get());
                 std::vector<std::shared_ptr<AtomGroup>>::iterator it;

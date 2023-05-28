@@ -186,6 +186,7 @@ public:
     Atom* is_bonded_to_pi(const int family, const bool other_atoms_pi);
 
     int num_bonded_to(const char* element);
+    int num_bonded_to_in_ring(const char* element, Ring* member_of);
 
     bool shares_bonded_with(Atom* btom);
 

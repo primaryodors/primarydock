@@ -151,6 +151,7 @@ int main(int argc, char** argv)
     aloc = anisoa->get_location();
     minimum_searching_aniso = 0;
 
+    float best_energy = 0;
     for (y=-size; y<=size; y++)
     {
         for (x=-size*ar; x<=size*ar; x++)
@@ -176,6 +177,9 @@ int main(int argc, char** argv)
                 oxy.clear_geometry_cache();
 
                 float tb = InteratomicForce::total_binding(anisoa, &probe);
+
+                if (tb > best_energy) best_energy = tb;
+
                 tb /= hb->get_kJmol() * 1.5;
                 if (tb<0) tb=0;
 
@@ -224,6 +228,8 @@ int main(int argc, char** argv)
         }
         cout << endl;
     }
+
+    cout << "Binding energy: " << -best_energy << " out of an optimal " << -hb->get_kJmol() << " kJ/mol." << endl;
 
 }
 

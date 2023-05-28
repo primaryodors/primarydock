@@ -569,7 +569,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
 
 float Atom::get_charge()
 {
-    if (Z == 1 && !charge)
+    if (Z == 1)
     {
         if (bonded_to && bonded_to[0].btom)
         {
@@ -707,6 +707,20 @@ int Atom::num_bonded_to(const char* element)
     for (i=0; i<geometry; i++)
         if (bonded_to[i].btom)
             if (!strcmp(bonded_to[i].btom->get_elem_sym(), element)
+               )
+                j++;
+    return j;
+}
+
+int Atom::num_bonded_to_in_ring(const char* element, Ring* member_of)
+{
+    if (!bonded_to) return 0;
+    int i, j=0;
+    for (i=0; i<geometry; i++)
+        if (bonded_to[i].btom)
+            if (!strcmp(bonded_to[i].btom->get_elem_sym(), element)
+                &&
+                bonded_to[i].btom->is_in_ring(member_of)
                )
                 j++;
     return j;
@@ -934,13 +948,10 @@ float Atom::is_polar()
                     f += e;
                 }
 
-                if (1) // fabs(f) > fabs(polarity))
-                {
-                    polarity += f;
-                    #if _dbg_polar_calc
-                    cout << "# " << name << " is bonded to " << bonded_to[i].btom->name << " " << f << ", ";
-                    #endif
-                }
+                polarity += f;
+                #if _dbg_polar_calc
+                cout << "# " << name << " is bonded to " << bonded_to[i].btom->name << " " << f << ", ";
+                #endif
             }
         }
 
@@ -2514,7 +2525,7 @@ void Ring::determine_type()
             {
                 case 6:
                 numC++;
-                numhCC += atoms[i]->num_bonded_to("C");
+                numhCC += atoms[i]->num_bonded_to_in_ring("C", this);
                 break;
 
                 case 7:

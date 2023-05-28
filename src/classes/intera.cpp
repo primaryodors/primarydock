@@ -609,17 +609,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     if (a->is_pKa_near_bio_pH() && bchg < 0) achg = 1;
     if (b->is_pKa_near_bio_pH() && achg < 0) bchg = 1;
-
-    if (!achg && a->get_Z() == 1)
-    {
-        Bond* lb = a->get_bond_by_idx(0);
-        if (lb && lb->btom) achg = lb->btom->get_charge();
-    }
-    if (!bchg && b->get_Z() == 1)
-    {
-        Bond* lb = b->get_bond_by_idx(0);
-        if (lb && lb->btom) bchg = lb->btom->get_charge();
-    }
     
     #if _ALLOW_PROTONATE_PNICTOGENS
     Atom* aheavy = a;
@@ -655,6 +644,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     #endif
 
     if (achg && sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2);
+
+    if (achg) apol += achg;
+    if (bchg) bpol += bchg;
+
     if (apol>0 && sgn(apol) == sgn(bpol))
     {
         float pr = polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);

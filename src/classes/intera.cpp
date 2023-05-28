@@ -247,6 +247,14 @@ void InteratomicForce::read_dat_line(char* line)
             else distance=1;
         }
 
+        if (type == hbond)
+        {
+            if (Za > 1) kJ_mol /= (Atom::electronegativity_from_Z(Za) - 2.5);
+            if (Zb > 1) kJ_mol /= (Atom::electronegativity_from_Z(Zb) - 2.5);
+            if (bZa > 1) kJ_mol /= (Atom::electronegativity_from_Z(bZa) - 2.5);
+            if (bZb > 1) kJ_mol /= (Atom::electronegativity_from_Z(bZb) - 2.5);
+        }
+
         // cout << *this << endl;
     }
     delete[] words;
@@ -306,6 +314,7 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
     return false;
 }
 
+#define _dbg_applicable 0
 InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
@@ -313,6 +322,10 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
     {
         return NULL;
     }
+
+    #if _dbg_applicable
+    cout << "Getting forces between " << a->name << " and " << b->name << "..." << endl;
+    #endif
 
     InteratomicForce** look = all_forces;
     int Za = a->get_Z();
@@ -601,17 +614,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     float achg = a->get_charge(), bchg = b->get_charge()
         , apol = a->is_polar(), bpol = b->is_polar();
-    
-    if (!achg && a->get_Z() == 1)
-    {
-        Bond* lb = a->get_bond_by_idx(0);
-        if (lb && lb->btom) achg = lb->btom->get_charge();
-    }
-    if (!bchg && b->get_Z() == 1)
-    {
-        Bond* lb = b->get_bond_by_idx(0);
-        if (lb && lb->btom) bchg = lb->btom->get_charge();
-    }
+
+    if (a->is_pKa_near_bio_pH() && bchg < 0) achg = 1;
+    if (b->is_pKa_near_bio_pH() && achg < 0) bchg = 1;
+
+    if (achg && a->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) achg = a->get_max_conj_charge();
+    if (bchg && b->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) bchg = b->get_max_conj_charge();
     
     #if _ALLOW_PROTONATE_PNICTOGENS
     Atom* aheavy = a;
@@ -647,7 +655,49 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     #endif
 
     if (achg && sgn(achg) == sgn(bchg)) kJmol -= charge_repulsion * achg*bchg / pow(r, 2);
-    if (apol>0 && sgn(apol) == sgn(bpol)) kJmol -= polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
+
+    if (achg) apol += achg;
+    if (bchg) bpol += bchg;
+
+    if (apol && sgn(apol) == sgn(bpol))
+    {
+        float pr = polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
+
+        if (a->get_Z() == 1)
+        {
+            Bond* prb = a->get_bond_by_idx(0);
+            if (prb && prb->btom)
+            {
+                float prtheta = find_3d_angle(b->get_location(), prb->btom->get_location(), a->get_location());
+                pr *= 0.5 + 0.5 * cos(prtheta);
+            }
+        }
+        else
+        {
+            Bond* sb = a->get_bond_closest_to(b->get_location());
+            if (sb->btom && sb->btom->distance_to(b) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+        }
+
+        if (b->get_Z() == 1)
+        {
+            Bond* prb = b->get_bond_by_idx(0);
+            if (prb && prb->btom)
+            {
+                float prtheta = find_3d_angle(a->get_location(), prb->btom->get_location(), b->get_location());
+                pr *= 0.5 + 0.5 * cos(prtheta);
+            }
+        }
+        else
+        {
+            Bond* sb = b->get_bond_closest_to(a->get_location());
+            if (sb->btom && sb->btom->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+        }
+
+        kJmol -= pr;
+    }
+
+    no_polar_repuls:
+    ;
 
     bool atoms_are_bonded = a->is_bonded_to(b);
 
@@ -673,6 +723,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     }
 
     if (r < 0.5) forces[0] = NULL;
+
+    float atheta, btheta;
 
     for (i=0; forces[i]; i++)
     {
@@ -841,14 +893,36 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             Ring *ar = nullptr, *br = nullptr;
 
             for (j=0; j<ag; j++)
-                avec[j] = SCoord(0,0,0);
-            for (j=anx; j<ag; j++)
-                avec[j-anx] = ageo[j];
+            {
+                avec[j] = ageo[j];
+                Bond* jb = a->get_bond_by_idx(j);
+                if (jb && jb->btom) avec[j].r = 0;
+            }
 
             for (j=0; j<bg; j++)
-                bvec[j] = SCoord(0,0,0);
-            for (j=bnx; j<bg; j++)
-                bvec[j-bnx] = bgeo[j];
+            {
+                bvec[j] = bgeo[j];
+                Bond* jb = b->get_bond_by_idx(j);
+                if (jb && jb->btom) bvec[j].r = 0;
+            }
+
+            #if _dbg_259
+            /*if (a->get_family() == PNICTOGEN && b->get_Z() == 1)
+            {
+                for (j=0; j<ag; j++)
+                {
+                    cout << a->name << " vertex " << j;
+                    Bond* b259 = a->get_bond_by_idx(j);
+                    if (b259 && b259->btom) cout << " occupied by " << b259->btom->name;
+                    else cout << " vacant";
+
+                    float th259 = find_3d_angle(aloc.add(ageo[j]), bloc, aloc);
+                    cout << ", " << (th259*fiftyseven) << "deg from " << b->name;
+
+                    cout << endl;
+                }
+            }*/
+            #endif
 
             if (del_ageo) delete[] ageo;
             if (del_bgeo) delete[] bgeo;
@@ -906,9 +980,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     Point pt(&avec[j]);
                     pt.scale(r);
                     pt = pt.add(aloc);
-                    float theta = find_3d_angle(&bloc, &pt, &aloc);
-                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (theta > M_PI/2) continue;
-                    float contrib = pow(fmax(0,cos(theta)), dpa);
+                    atheta = find_3d_angle(&bloc, &pt, &aloc);
+                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (atheta > M_PI/2) continue;
+                    float contrib = pow(fmax(0,cos(atheta)), dpa);
                     if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
                 }
 
@@ -919,9 +993,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     Point pt(&bvec[j]);
                     pt.scale(r);
                     pt = pt.add(bloc);
-                    float theta = find_3d_angle(&aloc, &pt, &bloc);
-                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (theta > M_PI/2) continue;
-                    float contrib = pow(fmax(0,cos(theta)), dpb);
+                    btheta = find_3d_angle(&aloc, &pt, &bloc);
+                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (btheta > M_PI/2) continue;
+                    float contrib = pow(fmax(0,cos(btheta)), dpb);
                     if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
                 }
 
@@ -999,10 +1073,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         << endl;
             }
 
-            if (achg && bchg) partial = fabs(partial) * sgn(achg) * -sgn(bchg);
-            if (achg && !bchg && bpol) partial = fabs(partial) * sgn(achg) * -sgn(bpol);
-            if (!achg && apol && bchg) partial = fabs(partial) * sgn(apol) * -sgn(bchg);
-            if (!achg && apol && !bchg && bpol) partial = fabs(partial) * sgn(apol) * -sgn(bpol);
+            if (forces[i]->type == hbond) partial *= fabs(apol) * fabs(bpol);
 
             # if 0
             //if (forces[i]->type == polarpi || forces[i]->type == mcoord)
@@ -1090,7 +1161,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 str += (std::string)"unk";
             }
 
-            str += (std::string)" " + to_string(-partial);
+            str += (std::string)" " + to_string(-partial) + (std::string)" (" + to_string(-kJmol) + (std::string)")";
+
+            str += (std::string)" theta: " + to_string(atheta*fiftyseven) + (std::string)", " + to_string(btheta*fiftyseven);
 
             interaudit.push_back(str);
         }

@@ -72,6 +72,8 @@ int main(int argc, char** argv)
     int asciilen = 10;
 
     Atom probe((argc > 3) ? argv[3] : "H");
+    probe.name = new char[256];
+    strcpy(probe.name, probe.get_elem_sym());
     if (probe.is_metal()) probe.increment_charge(probe.get_valence());
     int pz = probe.get_Z();
     Atom oxy(pz == 1 ? "O" : "C");
@@ -85,7 +87,7 @@ int main(int argc, char** argv)
     Molecule mp("probe", aarr);
 
     InteratomicForce** ifs = InteratomicForce::get_applicable(&probe, anisoa);
-    if (!ifs)
+    if (!ifs || !ifs[0])
     {
         cout << "No forces to measure; check bindings.dat." << endl;
         return -1;
@@ -147,7 +149,9 @@ int main(int argc, char** argv)
     m.rotate(&rot.v, rot.a);
 
     aloc = anisoa->get_location();
+    minimum_searching_aniso = 0;
 
+    float best_energy = 0;
     for (y=-size; y<=size; y++)
     {
         for (x=-size*ar; x<=size*ar; x++)
@@ -173,6 +177,9 @@ int main(int argc, char** argv)
                 oxy.clear_geometry_cache();
 
                 float tb = InteratomicForce::total_binding(anisoa, &probe);
+
+                if (tb > best_energy) best_energy = tb;
+
                 tb /= hb->get_kJmol() * 1.5;
                 if (tb<0) tb=0;
 
@@ -221,6 +228,8 @@ int main(int argc, char** argv)
         }
         cout << endl;
     }
+
+    cout << "Binding energy: " << -best_energy << " out of an optimal " << -hb->get_kJmol() << " kJ/mol." << endl;
 
 }
 

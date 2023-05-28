@@ -113,6 +113,7 @@ public:
     float correct_structure(int iters = 500);
     float close_loop(Atom** path, float closing_bond_cardinality);
     void crumple(float theta);					// Randomly rotate all rotatable bonds by +/- the specified angle.
+    std::vector<Atom*> longest_dimension();
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
@@ -209,6 +210,7 @@ public:
     Bond* springy_bonds = nullptr;
     int springy_bondct = 0;
     bool been_flexed = false;
+    bool priority = false;
 
 protected:
     Molecule();
@@ -254,7 +256,6 @@ protected:
     static float cfmol_multibind(Molecule* mol, Molecule** nearby_mols);
 };
 
-extern float potential_distance;
 extern float conformer_momenta_multiplier;
 extern float conformer_tumble_multiplier;
 extern bool allow_ligand_360_tumble;

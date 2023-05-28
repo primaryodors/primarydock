@@ -39,8 +39,16 @@ class AtomGroup
     float distance_to(Point pt);
     float bounds();
     float compatibility(AminoAcid* aa);
+    bool is_bonded_to(Atom* a);
+    Molecule* get_ligand() { return ligand; }
+    int intersecting(AtomGroup* compare_with);
+    void merge(AtomGroup* merge_with);
+    float average_similarity(AtomGroup* compare_with);
 
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol);
+
+    protected:
+    Molecule* ligand;
 };
 
 class ResidueGroup
@@ -66,6 +74,7 @@ class GroupPair
     std::shared_ptr<ResidueGroup> scg;
 
     float get_potential();
+    bool is_priority() { return priority; }
 
     static std::vector<std::shared_ptr<GroupPair>> pair_groups(std::vector<std::shared_ptr<AtomGroup>> agroups, std::vector<std::shared_ptr<ResidueGroup>> scgroups, Point pocketcen);
     static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);    // Assumes the ligand is already centered in the pocket.
@@ -73,12 +82,12 @@ class GroupPair
     protected:
     float potential = 0;
     Point pocketcen;
+    bool priority = false;
 };
 
 std::ostream& operator<<(std::ostream& os, const AtomGroup& ag);
 std::ostream& operator<<(std::ostream& os, const ResidueGroup& scg);
 
-extern std::vector<int> extra_wt;
 extern std::vector<MCoord> mtlcoords;
 extern std::vector<std::shared_ptr<GroupPair>> global_pairs;
 

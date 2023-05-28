@@ -1,7 +1,6 @@
 
 #include "group.h"
 
-std::vector<int> extra_wt;
 std::vector<MCoord> mtlcoords;
 std::vector<std::shared_ptr<GroupPair>> global_pairs;
 
@@ -283,12 +282,9 @@ float ResidueGroup::compatibility(AtomGroup* ag)
 
         float f = ag->compatibility(aminos[i]);
 
-        if (extra_wt.size()
-                &&
-                std::find(extra_wt.begin(), extra_wt.end(), aminos[i]->get_residue_no())!=extra_wt.end()
-        )
+        if (aminos[i]->priority)
         {
-            f *= 2;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+            f *= priority_weight_group;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
         }
 
         result += f;
@@ -365,6 +361,21 @@ void ResidueGroup::conform_to(Molecule* mol)
     }
 }
 
+bool AtomGroup::is_bonded_to(Atom* a)
+{
+    int n = atoms.size();
+    if (!n) return false;
+
+    int i;
+    for (i=0; i<n; i++)
+    {
+        if (atoms[i]->is_bonded_to(a)) return true;
+        else if (atoms[i]->shares_bonded_with(a)) return true;
+    }
+
+    return false;
+}
+
 std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(Molecule* mol)
 {
     std::vector<std::shared_ptr<AtomGroup>> retval;
@@ -376,10 +387,15 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     bool dirty[n+4];
     for (i=0; i<n; i++) dirty[i] = false;
 
+    std::vector<Atom*> bd = mol->longest_dimension();
+    if (bd.size() < 2) throw 0xbad302;
+    float ld = bd[0]->distance_to(bd[1]);
+
     for (i=0; i<n; i++)
     {
         if (dirty[i]) continue;
         std::shared_ptr<AtomGroup> g(new AtomGroup());
+        g->ligand = mol;
         int aliphatic = 0;
 
         Atom* a = mol->get_atom(i);
@@ -387,12 +403,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         if (a->get_Z() == 1) continue;
         if (!a->is_polar() && !a->get_charge() && !a->is_pi())
         {
-            if (retval.size() >= 2)
-            {
-                aliphatic += 10000;
-                continue;
-            }
-            int bh = a->get_bonded_atoms_count() - a->get_bonded_heavy_atoms_count();
+            int bh = a->get_bonded_heavy_atoms_count();
             if (bh > 1) continue;
             aliphatic++;
         }
@@ -413,39 +424,51 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             if (!b) continue;
 
             float r = fmax(0, g->get_center().get_3d_distance(b->get_location()) - 1.5);
-            if (r > 2.5)
+            if (r > 2.5 && !a->shares_bonded_with(b))
             {
                 continue;
                 #if _dbg_groupsel
                 //cout << "Rejected " << b->name << " too far away." << endl;
                 #endif
             }
-            float simil = fmax(a->similarity_to(b), a_->similarity_to(b));
 
-            if (simil >= 20)
+            r = a->distance_to(b);
+            if (r > ld/1.5) continue;
+            if (b->get_Z() == 6 && r > ld/2) continue;
+
+            float simil = a->similarity_to(b);
+
+            // In general, aliphatics and nonpolar aromatics can be regarded as high similarity, since they tend to
+            // be mutually highly soluble in one another. But for grouping of ligand atoms, it is important to
+
+            if (simil >= 0.5)
             {
                 if (aliphatic < 3 || b->get_Z() == 1)
                 {
-                    g->atoms.push_back(b);
-                    if (b->get_Z() > 1)
+                    if (g->is_bonded_to(b))
                     {
-                        if (!b->is_polar() && !b->get_charge() && !b->is_pi()) aliphatic++;
-                        else aliphatic--;
+                        g->atoms.push_back(b);
+                        if (b->get_Z() > 1)
+                        {
+                            if (!b->is_polar() && !b->get_charge() && !b->is_pi()) aliphatic++;
+                            else aliphatic--;
+                        }
+
+                        #if _dbg_groupsel
+                        cout << "Adding " << b->name << " with distance " << r << " and similarity " << simil
+                             << " polarity " << b->is_polar() << " aliphatic " << aliphatic << endl;
+                        #endif
+
+                        a_ = b;
+                        if ((bool)(fabs(a->is_polar()) >= 0.2) == (bool)(fabs(b->is_polar()) >= 0.2)) dirty[j] = true;
                     }
-
-                    #if _dbg_groupsel
-                    cout << "Adding " << b->name << " with distance " << r << " and similarity " << simil << " " << aliphatic << endl;
-                    #endif
-
-                    a_ = b;
-                    dirty[j] = true;
                 }
             }
             else
             {
                 ;
                 #if _dbg_groupsel
-                //cout << "Rejected " << b->name << " similarity " << simil << endl;
+                if (b->get_family() == a->get_family()) cout << "Rejected " << b->name << " distance " << r << " similarity " << simil << endl;
                 #endif
             }
         }
@@ -468,7 +491,97 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         #endif
     }
 
+    l = retval.size();
+    for (i=0; i<l; i++)
+    {
+        int ni = retval[i]->atoms.size();
+        for (j=l-1; j>i; j--)
+        {
+            if (retval[i]->get_center().get_3d_distance(retval[j]->get_center()) > ld/3) continue;
+
+            int nj = retval[j]->atoms.size();
+            int si = retval[i]->intersecting(retval[j].get());
+
+            if (retval[i]->average_similarity(retval[j].get()) >= 0.5 && (si >= nj/2 || si >= ni/2))
+            {
+                retval[i]->merge(retval[j].get());
+                std::vector<std::shared_ptr<AtomGroup>>::iterator it;
+                it = retval.begin();
+                retval.erase(it+j);
+                l--;
+            }
+        }
+    }
+
     return retval;
+}
+
+float AtomGroup::average_similarity(AtomGroup* cw)
+{
+    float totsim = 0;
+    int simqty = 0;
+
+    int i, j, m = atoms.size(), n = cw->atoms.size();
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = cw->atoms[i];
+
+        for (j=0; j<m; j++)
+        {
+            if (atoms[j] != a)
+            {
+                totsim += a->similarity_to(atoms[j]);
+                simqty++;
+            }
+        }
+    }
+
+    if (!simqty) return 0;
+
+    return totsim / simqty;
+}
+
+int AtomGroup::intersecting(AtomGroup* cw)
+{
+    int samesies = 0;
+
+    int i, j, m = atoms.size(), n = cw->atoms.size();
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = cw->atoms[i];
+
+        for (j=0; j<m; j++)
+        {
+            if (atoms[j] == a) samesies++;
+        }
+    }
+
+    return samesies;
+}
+
+void AtomGroup::merge(AtomGroup* mw)
+{
+    if (ligand && mw->ligand && ligand != mw->ligand) throw 0xbad3126;
+    if (!ligand) ligand = mw->ligand;
+
+    int i, j, m = atoms.size(), n = mw->atoms.size();
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = mw->atoms[i];
+
+        for (j=0; j<m; j++)
+        {
+            if (atoms[j] == a) goto _already;
+        }
+
+        atoms.push_back(a);
+
+        _already:
+        ;
+    }
 }
 
 std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chain_groups(AminoAcid** aalist, Point pcen)
@@ -638,6 +751,7 @@ float GroupPair::get_potential()
             {
                 AminoAcid* aa = scg->aminos[j];
                 float partial;
+
                 if (aa->coordmtl)
                 {
                     partial = InteratomicForce::potential_binding(a, aa->coordmtl);
@@ -645,20 +759,36 @@ float GroupPair::get_potential()
                 else
                 {
                     partial = aa->get_atom_mol_bind_potential(a);
-                    if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like()) partial /= 3;
-
-                    if (extra_wt.size()
-                            &&
-                            std::find(extra_wt.begin(), extra_wt.end(), aa->get_residue_no())!=extra_wt.end()
-                    )
+                    if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like())
                     {
-                        partial *= 2.5;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+                        partial /= 3;
+                        #if _dbg_groupsel
+                        cout << *a << " is polar and " << *aa << " is tyrosine-like." << endl;
+                        #endif
+                    }
+                    else if (fabs(a->is_polar()) > 0.333 && fabs(aa->hydrophilicity()) < 0.333)
+                    {
+                        partial /= 3;
+                        #if _dbg_groupsel
+                        cout << *a << " is polar and " << *aa << " is not." << endl;
+                        #endif
                     }
 
                     #if _dbg_groupsel
                     cout << "Potential for " << *a << "..." << *aa << " = " << partial << endl;
                     #endif
                 }
+
+                if (aa->priority)
+                {
+                    partial *= priority_weight_group;
+                    priority = true;
+
+                    #if _dbg_groupsel
+                    cout << *aa << " has priority." << endl;
+                    #endif
+                }
+
                 potential += partial;
                 q++;
             }
@@ -667,6 +797,8 @@ float GroupPair::get_potential()
         if (q) potential /= q;
 
         float r = pocketcen.get_3d_distance(scg->get_center());
+        float r1 = ag->get_center().get_3d_distance(ag->get_ligand()->get_barycenter());
+        r = fmax(1.5, r-r1);
         potential /= fmax(1, r-1.5);
 
         return potential;
@@ -694,12 +826,12 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         for (j=0; j<n; j++)
         {
             if (sdirty[j]) continue;
-            GroupPair global_pairs;
-            global_pairs.ag = ag[i];
-            global_pairs.scg = scg[j];
-            global_pairs.pocketcen = pcen;
+            GroupPair pair;
+            pair.ag = ag[i];
+            pair.scg = scg[j];
+            pair.pocketcen = pcen;
 
-            float p1 = global_pairs.get_potential() * frand(1.0-best_binding_stochastic, 1.0+best_binding_stochastic);
+            float p1 = pair.get_potential() * frand(1.0-best_binding_stochastic, 1.0+best_binding_stochastic);
 
             int r = retval.size();
             for (l=0; l<r; l++)
@@ -721,15 +853,15 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
             if (p1 > p)
             {
                 j1 = j;
-                p = global_pairs.potential;
+                p = pair.potential;
             }
         }
 
         if (j1 < 0) continue;
 
-        std::shared_ptr<GroupPair> global_pairs(new GroupPair());
-        global_pairs->ag = ag[i];
-        global_pairs->scg = scg[j1];
+        std::shared_ptr<GroupPair> pair(new GroupPair());
+        pair->ag = ag[i];
+        pair->scg = scg[j1];
 
         adirty[i] = true;
         sdirty[j1] = true;
@@ -742,23 +874,31 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         int r = retval.size();
         if (!r)
         {
-            retval.push_back(global_pairs);
+            retval.push_back(pair);
             added = true;
             #if _dbg_groupsel
-            cout << "Beginning result with " << *global_pairs->ag << "-" << *global_pairs->scg << endl;
+            cout << "Beginning result with " << *pair->ag << "-" << *pair->scg << endl;
             #endif
         }
         else for (l=0; l<r; l++)
         {
-            if (global_pairs->get_potential() > retval[l]->get_potential())
+            if  (
+                    (
+                        pair->priority == retval[l]->priority
+                        &&
+                        pair->get_potential() > retval[l]->get_potential()
+                    )
+                    ||
+                    (pair->priority && !retval[l]->priority)
+                )
             {
                 std::vector<std::shared_ptr<GroupPair>>::iterator it;
                 it = retval.begin();
-                retval.insert(it+l, global_pairs);
+                retval.insert(it+l, pair);
                 added = true;
                 
                 #if _dbg_groupsel
-                cout << "Inserting " << *global_pairs->ag << "-" << *global_pairs->scg << " before " << *retval[l+1]->ag << "-" << *retval[l+1]->scg << endl;
+                cout << "Inserting " << *pair->ag << "-" << *pair->scg << " before " << *retval[l+1]->ag << "-" << *retval[l+1]->scg << endl;
                 #endif
 
                 break;
@@ -766,10 +906,10 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         }
         if (!added)
         {
-            retval.push_back(global_pairs);
+            retval.push_back(pair);
             added = true;
             #if _dbg_groupsel
-            cout << "Appending to result " << *global_pairs->ag << "-" << *global_pairs->scg << endl;
+            cout << "Appending to result " << *pair->ag << "-" << *pair->scg << endl;
             #endif
         }
     }
@@ -778,62 +918,64 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
     cout << endl << endl << "Final pair assignments:" << endl;
     for (i=0; i<retval.size(); i++)
     {
-        cout << *retval[i]->ag << "-" << *retval[i]->scg << endl;
+        cout << *retval[i]->ag << "-" << *retval[i]->scg;
+        if (retval[i]->priority) cout << " *";
+        cout << endl;
     }
     #endif
 
     return retval;
 }
 
-void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> global_pairs)
+void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)
 {
-    int n = global_pairs.size();
+    int n = gp.size();
 
     if (n < 1) return;
-    Rotation rot = align_points_3d(global_pairs[0]->ag->get_center(), global_pairs[0]->scg->get_center(), lig->get_barycenter());
+    Rotation rot = align_points_3d(gp[0]->ag->get_center(), gp[0]->scg->get_center(), lig->get_barycenter());
     LocatedVector lv = rot.v;
     lv.origin = lig->get_barycenter();
     #if _dbg_groupsel
-    cout << "Rotating " << *global_pairs[0]->ag << " in the direction of " << *global_pairs[0]->scg << endl;
+    cout << "Rotating " << *gp[0]->ag << " in the direction of " << *gp[0]->scg << endl;
     #endif
     lig->rotate(lv, rot.a);
 
     // Scooch.
-    float r = global_pairs[0]->ag->get_center().get_3d_distance(global_pairs[0]->scg->get_center()) - global_pairs[0]->scg->group_reach();
+    float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
     if (r > 0)
     {
-        Point rel = global_pairs[0]->scg->get_center().subtract(global_pairs[0]->ag->get_center());
+        Point rel = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
         rel.scale(r-1);
         #if _dbg_groupsel
-        cout << "Scooching " << *global_pairs[0]->ag << " " << r << "Å into the reach of " << *global_pairs[0]->scg << endl;
+        cout << "Scooching " << *gp[0]->ag << " " << r << "Å into the reach of " << *gp[0]->scg << endl;
         #endif
         lig->move(rel);
     }
 
-    global_pairs[0]->scg->conform_to(lig);
+    gp[0]->scg->conform_to(lig);
 
     if (n < 2) return;
-    rot = align_points_3d(global_pairs[1]->ag->get_center(), global_pairs[1]->scg->get_center(), global_pairs[0]->ag->get_center());
+    rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
     lv = rot.v;
-    lv.origin = global_pairs[0]->ag->get_center();
+    lv.origin = gp[0]->ag->get_center();
     #if _dbg_groupsel
-    cout << "Rotating " << *global_pairs[1]->ag << " in the direction of " << *global_pairs[1]->scg << endl;
+    cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
     #endif
     lig->rotate(lv, rot.a);
 
-    global_pairs[1]->scg->conform_to(lig);
+    gp[1]->scg->conform_to(lig);
 
     if (n < 3) return;
-    Point zcen = global_pairs[0]->ag->get_center();
-    SCoord axis = global_pairs[1]->ag->get_center().subtract(zcen);
+    Point zcen = gp[0]->ag->get_center();
+    SCoord axis = gp[1]->ag->get_center().subtract(zcen);
     lv = (SCoord)axis;
     lv.origin = zcen;
-    float theta = find_angle_along_vector(global_pairs[2]->ag->get_center(), global_pairs[2]->scg->get_center(), zcen, axis);
+    float theta = find_angle_along_vector(gp[2]->ag->get_center(), gp[2]->scg->get_center(), zcen, axis);
     #if _dbg_groupsel
-    cout << "\"Rotisserie\" aligning " << *global_pairs[2]->ag << " in the direction of " << *global_pairs[2]->scg << endl;
+    cout << "\"Rotisserie\" aligning " << *gp[2]->ag << " in the direction of " << *gp[2]->scg << endl;
     #endif
     lig->rotate(lv, theta);
 
-    global_pairs[2]->scg->conform_to(lig);
+    gp[2]->scg->conform_to(lig);
 }
 

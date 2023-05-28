@@ -105,9 +105,11 @@
 // Warning - increasing these constants significantly above their stable branch values
 // will cause docking fails in the Big Three tests.
 #define polar_repulsion 35.0
-#define charge_repulsion 30.0
+#define charge_repulsion 60.0
 
 #define lmpush 0.0005
+
+#define priority_weight_group 4
 
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
@@ -328,6 +330,11 @@
 #define _dbg_mol_frames 0
 #define _dbg_fitness_plummet 0
 #define _dbg_anemia 0
+#define _dbg_find_blasted_segfault 0
+#define _dbg_imidazole_check 0
+#define _dbg_conj_chg 0
+#define _dbg_Huckel 0
+#define _dbg_259 1
 
 #endif
 

@@ -2672,20 +2672,24 @@ float Atom::similarity_to(Atom* b)
     float similarity = 0;
 
     // Criteria
-    #define both_or_neither_abs_polarity_at_least_point2 15
-    #define both_or_neither_abs_polarity_at_least_point333 15
-    #define abs_delta_polarity_within_point333 17
-     #define one_polar_one_sugarlike_nonpolar 15
-    #define same_sgn_charge 20
+    #define both_or_neither_abs_polarity_at_least_point2 13
+    #define both_or_neither_abs_polarity_at_least_point333 13
+    #define abs_delta_polarity_within_point333 15
+     #define one_polar_one_sugarlike_nonpolar 13
+    #define same_sgn_charge 16
      #define one_charged_one_neutral_polar 10
      #define opposite_charges -20
-    #define both_or_neither_pi_and_both_or_neither_polar 23
-     #define neither_pi_one_polar_one_sugary 20
-     #define one_polar_both_pi 16
+    #define both_or_neither_pi_and_both_or_neither_polar 18
+     #define neither_pi_one_polar_one_sugary 15
+     #define one_polar_both_pi 13
      #define one_polar_only_one_pi 11
+    #define neither_pi_or_conjugated_together 15
+     #define one_pi_one_aliphatic -20
     #define abs_delta_elecn_within_point7 10
 
-    #if both_or_neither_abs_polarity_at_least_point2 + both_or_neither_abs_polarity_at_least_point333 + abs_delta_polarity_within_point333 + same_sgn_charge + both_or_neither_pi_and_both_or_neither_polar + abs_delta_elecn_within_point7 != 100
+    #if both_or_neither_abs_polarity_at_least_point2 + both_or_neither_abs_polarity_at_least_point333 + abs_delta_polarity_within_point333\
+        + same_sgn_charge + both_or_neither_pi_and_both_or_neither_polar + abs_delta_elecn_within_point7 + neither_pi_or_conjugated_together\
+        != 100
         #error "Atom similarity constants do not add up to 100%."
     #endif
 
@@ -2719,6 +2723,11 @@ float Atom::similarity_to(Atom* b)
     else if (bpb && is_pi() && b->is_pi()) similarity += 0.01 * one_polar_both_pi;
     else if (apb && b->is_pi()) similarity += 0.01 * one_polar_only_one_pi;
     else if (bpb && is_pi()) similarity += 0.01 * one_polar_only_one_pi;
+
+    if (!is_pi() && !b->is_pi()) similarity += 0.01 * neither_pi_or_conjugated_together;
+    else if (is_conjugated_to(b)) similarity += 0.01 * neither_pi_or_conjugated_together;
+    else if (is_pi() && !b->is_pi() && !bpb) similarity += 0.01 * one_pi_one_aliphatic;
+    else if (!is_pi() && b->is_pi() && !apb) similarity += 0.01 * one_pi_one_aliphatic;
 
     delta = fabs(elecn - b->elecn);
     if (delta <= 0.7) similarity += 0.01 * abs_delta_elecn_within_point7;

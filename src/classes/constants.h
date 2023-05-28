@@ -330,6 +330,7 @@
 #define _dbg_anemia 0
 #define _dbg_find_blasted_segfault 0
 #define _dbg_imidazole_check 0
+#define _dbg_conj_chg 0
 
 #endif
 

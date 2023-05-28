@@ -840,75 +840,6 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
                                        && lbtom->Z != 1
                                       );		// Later when we look for rings we update this.
 
-            // Hydrogen magic.
-            #if 0
-            if (lbtom->Z == 1)
-            {
-                switch (Z)
-                {
-                case 7:
-                    polarity = -0.9;
-                    lbtom->polarity = 0.9;
-                    lbtom->acidbase = 1;
-                    acidbase = 1;
-                    break;
-
-                case 15:
-                    polarity = -0.5;
-                    lbtom->polarity = 0.5;
-                    lbtom->acidbase = 0.75;
-                    acidbase = 0.75;
-                    break;
-
-                case 8:
-                case 9:
-                case 17:
-                case 35:
-                case 53:
-                case 85:
-                case 117:
-                    polarity = -1;
-                    lbtom->polarity = 1;
-                    break;
-
-                case 16:
-                case 34:
-                    polarity = -0.25;
-                    lbtom->polarity = 0.25;
-                    thiol = -1;
-                    lbtom->thiol = 1;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-            else if (1)
-            {
-                // Non-hydrogen magic.
-                switch (lbtom->get_family())
-                {
-                    case TETREL:
-                    if (!polarity && family == CHALCOGEN) polarity = -0.8;
-                    if (!polarity && family == PNICTOGEN) polarity = -0.75;
-                    break;
-
-                    case PNICTOGEN:
-                    if (!polarity && family == CHALCOGEN) polarity = -1;
-                    if (!lbtom->polarity && family == TETREL) lbtom->polarity = -0.75;
-                    break;
-
-                    case CHALCOGEN:
-                    if (!lbtom->polarity && family == PNICTOGEN) lbtom->polarity = -1;
-                    if (!lbtom->polarity && family == TETREL) lbtom->polarity = -0.8;
-                    break;
-
-                    default:
-                    ;
-                }
-            }
-            #endif
-
             if (!reciprocity)
             {
                 lbtom->reciprocity = true;
@@ -931,14 +862,59 @@ float Atom::is_polar()
     if (charge) polarity = charge;
     else if (!polar_calcd)
     {
-        float icc = is_conjugated_to_charge();
-        if (icc)
+        int i, j, n=0;
+
+        if (family == CHALCOGEN || family == PNICTOGEN)
         {
-            charge = icc;
-            return charge;
+            #if _dbg_conj_chg
+            cout << "# " << name << " testing for conjugated charge..." << endl;
+            #endif
+            float icc = is_conjugated_to_charge();
+            if (icc)
+            {
+                #if _dbg_conj_chg
+                cout << "# " << name << " conjugated to charge " << icc << endl;
+                #endif
+
+                std::vector<Atom*> lca = get_conjugated_atoms();
+
+                std::sort( lca.begin(), lca.end() );
+                lca.erase( std::unique( lca.begin(), lca.end() ), lca.end() );
+
+                n = lca.size();
+                #if _dbg_conj_chg
+                cout << "# " << n << " conjugated atoms total." << endl;
+                #endif
+
+                for (i=n-1; i>=0; i--)
+                {
+                    if (lca[i]->family != family)
+                    {
+                        std::vector<Atom*>::iterator it;
+                        it = lca.begin();
+                        lca.erase(it+i);
+                        n--;
+                    }
+                }
+
+                n = lca.size();
+                #if _dbg_conj_chg
+                cout << "# " << n << " conjugated atoms of same family." << endl;
+                #endif
+                
+                for (i=0; i<n; i++)
+                {
+                    lca[i]->charge = icc/n;
+                    #if _dbg_conj_chg
+                    cout << "# " << lca[i]->name << " charge now equals " << (icc/n) << endl;
+                    #endif
+                }
+
+                return charge;
+            }
         }
 
-        int i, j, n=0;
+        n = 0;
         polarity = 0;
         for (i=0; i<valence; i++)
         {
@@ -2179,11 +2155,11 @@ Ring* Atom::closest_arom_ring_to(Point target)
 
 float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
 {
-    if (!this) return false;
-    if (!is_pi()) return false;
-    if (this == bir) return false;
+    if (!this) return 0;
+    if (!is_pi()) return 0;
+    if (this == bir) return 0;
     if (!bir) bir = this;
-    if (bir->recursion_counter > 10) return false;
+    if (bir->recursion_counter > 10) return 0;
 
     bir->recursion_counter++;
 
@@ -2195,10 +2171,12 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
             bonded_to[i].btom != c
             &&
             bonded_to[i].btom != bir
+            &&
+            bonded_to[i].btom->is_pi()
         )
         {
             float f = bonded_to[i].btom->charge;
-            if (f && bonded_to[i].btom->family == family)
+            if (f)
             {
                 bir->recursion_counter = 0;
                 return f;
@@ -2217,7 +2195,7 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
     if (bir == this) recursion_counter = 0;
     else bir->recursion_counter--;
 
-    return false;
+    return 0;
 }
 
 bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
@@ -2242,6 +2220,8 @@ bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
                 &&
                 bonded_to[i].btom != bir
                 &&
+                bonded_to[i].btom->is_pi()
+                &&
                 // DANGER: RECURSION.
                 bonded_to[i].btom->is_conjugated_to(a, bir, this)
                )
@@ -2256,6 +2236,46 @@ bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
     else bir->recursion_counter--;
 
     return false;
+}
+
+std::vector<Atom*> casf;
+std::vector<Atom*> Atom::get_conjugated_atoms(Atom* bir, Atom* c)
+{
+    if (!c)
+    {
+        casf.clear();
+        casf.push_back(this);
+    }
+    if (!is_pi()) return casf;
+    if (!bir) bir = this;
+    if (bir->recursion_counter > 10) return casf;
+
+    bir->recursion_counter++;
+
+    int i;
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom
+            &&
+            bonded_to[i].btom != c
+            &&
+            bonded_to[i].btom != bir
+            &&
+            bonded_to[i].btom->is_pi()
+            )
+        {
+            int n = casf.size();
+            casf.push_back(bonded_to[i].btom);
+
+            // DANGER: RECURSION.
+            std::vector<Atom*> lcasf = bonded_to[i].btom->get_conjugated_atoms(bir, this);
+        }
+    }
+
+    if (bir == this) recursion_counter = 0;
+    else bir->recursion_counter--;
+
+    return casf;
 }
 
 void Ring::fill_with_atoms(Atom** from_atoms)

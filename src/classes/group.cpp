@@ -433,8 +433,8 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             }
 
             r = a->distance_to(b);
-            if (r > ld/2) continue;
-            if (b->get_Z() == 6 && r > ld/3) continue;
+            if (r > ld/1.5) continue;
+            if (b->get_Z() == 6 && r > ld/2) continue;
 
             float simil = a->similarity_to(b);
 

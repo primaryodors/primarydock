@@ -2671,27 +2671,30 @@ float Atom::similarity_to(Atom* b)
 {
     float similarity = 0;
 
-    // Criteria:
-    //
-    // Both/neither abs polarity >= 0.2                             15%
-    // Both/neither abs polarity >= 0.333                           15%
-    // Abs delta polarity < 0.333                                   17%
-    // One polar and one nonpolar bound to N or O                   15%
-    // Same sgn charge                                              20%
-    // One charged one neutral with abs hydro > 0.333               10%
-    // Opposite charges                                            -20%
-    // Both/neither pi if both/neither polar > 0.333                23%
-    // Neither pi and one polar and one nonpolar bound to N or O    20%
-    // One polar and both pi                                        16%
-    // One polar and only one pi                                    11%
-    // Abs delta electronegativity <= 0.7                           10%
+    // Criteria
+    #define both_or_neither_abs_polarity_at_least_point2 15
+    #define both_or_neither_abs_polarity_at_least_point333 15
+    #define abs_delta_polarity_within_point333 17
+     #define one_polar_one_sugarlike_nonpolar 15
+    #define same_sgn_charge 20
+     #define one_charged_one_neutral_polar 10
+     #define opposite_charges -20
+    #define both_or_neither_pi_and_both_or_neither_polar 23
+     #define neither_pi_one_polar_one_sugary 20
+     #define one_polar_both_pi 16
+     #define one_polar_only_one_pi 11
+    #define abs_delta_elecn_within_point7 10
+
+    #if both_or_neither_abs_polarity_at_least_point2 + both_or_neither_abs_polarity_at_least_point333 + abs_delta_polarity_within_point333 + same_sgn_charge + both_or_neither_pi_and_both_or_neither_polar + abs_delta_elecn_within_point7 != 100
+        #error "Atom similarity constants do not add up to 100%."
+    #endif
 
     bool apb = (fabs(is_polar()) > .2), bpb = (fabs(b->is_polar()) > .2);
-    if (apb == bpb) similarity += 0.15;
+    if (apb == bpb) similarity += 0.01 * both_or_neither_abs_polarity_at_least_point2;
 
     apb = (fabs(is_polar()) > .333);
     bpb = (fabs(b->is_polar()) > .333);
-    if (apb == bpb) similarity += 0.15;
+    if (apb == bpb) similarity += 0.01 * both_or_neither_abs_polarity_at_least_point333;
 
     if (
         (!apb && bpb && (is_bonded_to("N") || is_bonded_to("O")))
@@ -2699,26 +2702,26 @@ float Atom::similarity_to(Atom* b)
         (!bpb && apb && (b->is_bonded_to("N") || b->is_bonded_to("O")) )
         )
     {
-        similarity += 0.15;
-        if (!is_pi() && !b->is_pi()) similarity += 0.20;
+        similarity += 0.01 * one_polar_one_sugarlike_nonpolar;
+        if (!is_pi() && !b->is_pi()) similarity += 0.01 * neither_pi_one_polar_one_sugary;
     }
 
     float delta = fabs(is_polar() - b->is_polar());
-    if (delta < 0.333) similarity += 0.17;
+    if (delta < 0.333) similarity += 0.01 * abs_delta_polarity_within_point333;
 
-    if (sgn(charge) == sgn(b->charge)) similarity += 0.20;
-    else if (!charge && apb && b->charge) similarity += 0.10;
-    else if (charge && bpb && !b->charge) similarity += 0.10;
-    else if (sgn(charge) == -sgn(b->charge)) similarity -= 0.20;
+    if (sgn(charge) == sgn(b->charge)) similarity += 0.01 * same_sgn_charge;
+    else if (!charge && apb && b->charge) similarity += 0.01 * one_charged_one_neutral_polar;
+    else if (charge && bpb && !b->charge) similarity += 0.01 * one_charged_one_neutral_polar;
+    else if (sgn(charge) == -sgn(b->charge)) similarity += 0.01 * opposite_charges;
 
-    if (apb == bpb && is_pi() == b->is_pi()) similarity += 0.23;
-    else if (apb && is_pi() && b->is_pi()) similarity += 0.16;
-    else if (bpb && is_pi() && b->is_pi()) similarity += 0.16;
-    else if (apb && b->is_pi()) similarity += 0.11;
-    else if (bpb && is_pi()) similarity += 0.11;
+    if (apb == bpb && is_pi() == b->is_pi()) similarity += 0.01 * both_or_neither_pi_and_both_or_neither_polar;
+    else if (apb && is_pi() && b->is_pi()) similarity += 0.01 * one_polar_both_pi;
+    else if (bpb && is_pi() && b->is_pi()) similarity += 0.01 * one_polar_both_pi;
+    else if (apb && b->is_pi()) similarity += 0.01 * one_polar_only_one_pi;
+    else if (bpb && is_pi()) similarity += 0.01 * one_polar_only_one_pi;
 
     delta = fabs(elecn - b->elecn);
-    if (delta <= 0.7) similarity += 0.10;
+    if (delta <= 0.7) similarity += 0.01 * abs_delta_elecn_within_point7;
 
     return similarity;
 }

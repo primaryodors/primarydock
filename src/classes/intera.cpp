@@ -648,7 +648,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (achg) apol += achg;
     if (bchg) bpol += bchg;
 
-    if (apol>0 && sgn(apol) == sgn(bpol))
+    if (apol && sgn(apol) == sgn(bpol))
     {
         float pr = polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
 
@@ -958,7 +958,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
                 // Multiply the two sums.
                 aniso = fmax(minimum_searching_aniso, asum * bsum);
-                // cout << aniso << " | " << asum << " | " << bsum << " | " << dpa << " | " << dpb << endl;
             }
 
             if (r1 >= 1)
@@ -1027,11 +1026,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         << partial
                         << endl;
             }
-
-            /*if (achg && bchg) partial = fabs(partial) * sgn(achg) * -sgn(bchg);
-            if (achg && !bchg && bpol) partial = fabs(partial) * sgn(achg) * -sgn(bpol);
-            if (!achg && apol && bchg) partial = fabs(partial) * sgn(apol) * -sgn(bchg);
-            if (!achg && apol && !bchg && bpol) partial = fabs(partial) * sgn(apol) * -sgn(bpol);*/
 
             if (forces[i]->type == hbond) partial *= fabs(apol) * fabs(bpol);
 

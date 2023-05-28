@@ -284,7 +284,7 @@ float ResidueGroup::compatibility(AtomGroup* ag)
 
         if (aminos[i]->priority)
         {
-            f *= 5;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
+            f *= priority_weight_group;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
         }
 
         result += f;
@@ -442,9 +442,6 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
             if ((bool)a->is_polar() == (bool)b->is_polar()) simil += 7;
             else simil -= 2;
-
-            /*if (abs(a->is_thio()) == abs(b->is_thio())) simil += 7;
-            else simil -= 7; */
 
             if (abs(a->get_Z() - b->get_Z()) > 4) simil -= 4;
 
@@ -791,7 +788,7 @@ float GroupPair::get_potential()
 
                 if (aa->priority)
                 {
-                    partial *= 5;
+                    partial *= priority_weight_group;
                     priority = true;
 
                     #if _dbg_groupsel

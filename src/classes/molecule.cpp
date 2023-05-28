@@ -15,7 +15,6 @@
 
 using namespace std;
 
-float potential_distance = 0;
 float conformer_momenta_multiplier = 1;
 float conformer_tumble_multiplier = 1;
 
@@ -2240,7 +2239,6 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
         if (atoms[i]->is_backbone) continue;
         if (atoms[i]->get_Z() == 1) continue;
 
-        // if (fabs(atoms[i]->is_polar()) > 0.333) hydro += 1;
         hydro += fabs(atoms[i]->is_polar());
         j++;
     }
@@ -2248,7 +2246,6 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
     if (j) hydro /= j;
 
     float retval=0;
-    potential_distance = 0;
     n = 0;
     for (i=0; atoms[i]; i++)
     {
@@ -2287,14 +2284,11 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
 
             retval += partial;
             n++;
-
-            potential_distance += ifs[j]->get_distance();
         }
         delete[] ifs;
     }
 
     if (n) retval /= n;
-    // potential_distance /= retval;
 
     return retval;
 }
@@ -2423,7 +2417,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         {
                             if (abind > 0 && minimum_searching_aniso && ligands[l]->priority) abind *= 1.5;
                             kJmol += abind;
-                            // cout << atoms[i]->name << "-" << ligands[l]->atoms[j]->name << " " << -abind << endl;
+
                             atoms[i]->last_bind_energy += abind;
                             if (abind > atoms[i]->strongest_bind_energy)
                             {

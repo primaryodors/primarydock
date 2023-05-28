@@ -109,6 +109,8 @@
 
 #define lmpush 0.0005
 
+#define priority_weight_group 4
+
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
@@ -329,9 +331,9 @@
 #define _dbg_fitness_plummet 0
 #define _dbg_anemia 0
 #define _dbg_find_blasted_segfault 0
-#define _dbg_imidazole_check 01
+#define _dbg_imidazole_check 0
 #define _dbg_conj_chg 0
-#define _dbg_Huckel 1
+#define _dbg_Huckel 0
 
 #endif
 

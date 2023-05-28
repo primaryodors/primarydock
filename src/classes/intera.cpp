@@ -874,12 +874,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             for (j=0; j<ag; j++)
                 avec[j] = SCoord(0,0,0);
             for (j=anx; j<ag; j++)
-                avec[j-anx] = ageo[j];
+                avec[j] = ageo[j];
 
             for (j=0; j<bg; j++)
                 bvec[j] = SCoord(0,0,0);
             for (j=bnx; j<bg; j++)
-                bvec[j-bnx] = bgeo[j];
+                bvec[j] = bgeo[j];
 
             if (del_ageo) delete[] ageo;
             if (del_bgeo) delete[] bgeo;

@@ -148,6 +148,7 @@ public:
     bool is_pKa_near_bio_pH() { return is_imidazole_like; }
     float get_acidbase();
     float get_charge();
+    float get_max_conj_charge() { return max_localized_charge; }
     float is_polar();						// -1 if atom is H-bond acceptor; +1 if donor.
     bool is_metal();
     int is_thio();							// -1 if atom is S; +1 if atom is H of a sulfhydryl.
@@ -313,6 +314,7 @@ protected:
     float Eion = 0;
     float Eaffin = 0;
     float charge = 0;					// can be partial.
+    float max_localized_charge = 0;     // for conjugated charged systems.
     float acidbase = 0;					// charge potential; negative = acid / positive = basic.
     float polarity = 0;					// maximum potential relative to -OH...H-.
     bool polar_calcd = false;

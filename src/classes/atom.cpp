@@ -915,10 +915,11 @@ float Atom::is_polar()
                 #if _dbg_conj_chg
                 cout << "# " << n << " conjugated atoms of same family." << endl;
                 #endif
-                
+
                 for (i=0; i<n; i++)
                 {
                     lca[i]->charge = icc/n;
+                    lca[i]->max_localized_charge = icc;
                     #if _dbg_conj_chg
                     cout << "# " << lca[i]->name << " charge now equals " << (icc/n) << endl;
                     #endif

@@ -278,6 +278,7 @@ public:
         else return elem_syms[lZ];
     }
     static void dump_array(Atom** aarr);
+    static float electronegativity_from_Z(int atom_Z) { return electronegativities[atom_Z]; }
 
     // Public member vars.
     float pK = nanf("n/a");         // To be managed and used by external classes.

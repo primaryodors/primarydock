@@ -247,6 +247,12 @@ void InteratomicForce::read_dat_line(char* line)
             else distance=1;
         }
 
+        if (type == hbond)
+        {
+            if (Za > 1) kJ_mol /= (Atom::electronegativity_from_Z(Za) - 2.4);
+            if (Zb > 1) kJ_mol /= (Atom::electronegativity_from_Z(Zb) - 2.4);
+        }
+
         // cout << *this << endl;
     }
     delete[] words;

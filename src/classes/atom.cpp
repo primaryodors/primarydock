@@ -1020,6 +1020,7 @@ bool Atom::is_pi()
     }
 
     if (family == PNICTOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(CHALCOGEN)) return true;
+    if (family == CHALCOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(PNICTOGEN)) return true;
 
     int i;
     for (i=0; i<valence; i++)
@@ -2520,8 +2521,21 @@ bool atoms_are_conjugated(Atom** atoms)
 
     for (i=0; atoms[i]; i++)
     {
-        if (i && !atoms[i]->is_bonded_to(atoms[i-1])) return false;
-        switch (atoms[i]->get_family())
+        if (i && !atoms[i]->is_conjugated_to(atoms[i-1]))
+        {
+            #if _dbg_Huckel
+            //cout << "# " << i << " " << atoms[i]->name << " is not conjugated to " << atoms[i-1]->name << endl;
+            #endif
+
+            return false;
+        }
+        #if _dbg_Huckel
+        else
+        {
+            //if (i) cout << "# " << i << " " << atoms[i]->name << " is conjugated to " << atoms[i-1]->name << endl;
+        }
+        #endif
+        /*switch (atoms[i]->get_family())
         {
         case TETREL:
             // cout << atoms[i]->name << "|" << atoms[i]->get_count_pi_bonds() << "|" << atoms[i]->get_charge() << endl;
@@ -2539,7 +2553,7 @@ bool atoms_are_conjugated(Atom** atoms)
 
         default:
             return false;
-        }
+        }*/
     }
 
     return true;

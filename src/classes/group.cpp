@@ -438,7 +438,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
             float simil = a->similarity_to(b);
 
-            if (simil >= 0.7)
+            if (simil >= 0.5)
             {
                 if (aliphatic < 3 || b->get_Z() == 1)
                 {

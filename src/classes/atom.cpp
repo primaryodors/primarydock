@@ -1631,13 +1631,74 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
 
     if (geov)
     {
-        if (_DBGGEO) cout << name << " returns cached geometry." << endl;
-        return geov;
+        // if (_DBGGEO) cout << name << " returns cached geometry." << endl;
+        // return geov;
+        delete[] geov;
     }
     geov = get_basic_geometry();
 
     Point center;
-    int i, j;
+    int i, j, k, l;
+
+    // Attempted #259 fix:
+
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom)
+        {
+            Rotation rot = align_points_3d(location.add(geov[i]), bonded_to[i].btom->location, location);
+            for (l=0; l<geometry; l++)
+            {
+                Point pt = geov[l];
+                geov[l] = rotate3D(&pt, &center, &rot);
+            }
+            
+            for (j=i+1; j<geometry; j++)
+            {
+                if (bonded_to[j].btom)
+                {
+                    float theta = find_angle_along_vector(location.add(geov[j]), bonded_to[j].btom->location, location, geov[i]);
+                    for (l=0; l<geometry; l++)
+                        geov[l] = rotate3D(geov[l], center, geov[i], theta);
+                    
+                    for (k=j+1; k<geometry; k++)
+                    {
+                        if (bonded_to[k].btom)
+                        {
+                            for (l=j+1; l<geometry; l++)
+                            {
+                                if (!bonded_to[l].btom)
+                                {
+                                    float ktheta = find_3d_angle(bonded_to[k].btom->location, location.add(geov[k]), location);
+                                    float ltheta = find_3d_angle(bonded_to[k].btom->location, location.add(geov[l]), location);
+
+                                    if (ltheta < ktheta)
+                                    {
+                                        SCoord swap = geov[l];
+                                        geov[l] = geov[k];
+                                        geov[k] = swap;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return geov;
+                }
+            }
+
+            return geov;
+        }
+    }
+    
+    return geov;
+    
+
+
+
+
+
+
 
     if (num_conj_rings())
     {

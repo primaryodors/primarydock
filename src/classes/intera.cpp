@@ -872,14 +872,36 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             Ring *ar = nullptr, *br = nullptr;
 
             for (j=0; j<ag; j++)
-                avec[j] = SCoord(0,0,0);
-            for (j=anx; j<ag; j++)
+            {
                 avec[j] = ageo[j];
+                Bond* jb = a->get_bond_by_idx(j);
+                if (jb && jb->btom) avec[j].r = 0;
+            }
 
             for (j=0; j<bg; j++)
-                bvec[j] = SCoord(0,0,0);
-            for (j=bnx; j<bg; j++)
+            {
                 bvec[j] = bgeo[j];
+                Bond* jb = b->get_bond_by_idx(j);
+                if (jb && jb->btom) bvec[j].r = 0;
+            }
+
+            #if _dbg_259
+            if (a->get_family() == PNICTOGEN && b->get_Z() == 1)
+            {
+                for (j=0; j<ag; j++)
+                {
+                    cout << a->name << " vertex " << j;
+                    Bond* b259 = a->get_bond_by_idx(j);
+                    if (b259 && b259->btom) cout << " occupied by " << b259->btom->name;
+                    else cout << " vacant";
+
+                    float th259 = find_3d_angle(aloc.add(ageo[j]), bloc, aloc);
+                    cout << ", " << (th259*fiftyseven) << "deg from " << b->name;
+
+                    cout << endl;
+                }
+            }
+            #endif
 
             if (del_ageo) delete[] ageo;
             if (del_bgeo) delete[] bgeo;

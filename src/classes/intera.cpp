@@ -249,8 +249,8 @@ void InteratomicForce::read_dat_line(char* line)
 
         if (type == hbond)
         {
-            if (Za > 1) kJ_mol /= (Atom::electronegativity_from_Z(Za) - 2.4);
-            if (Zb > 1) kJ_mol /= (Atom::electronegativity_from_Z(Zb) - 2.4);
+            if (Za > 1) kJ_mol /= (Atom::electronegativity_from_Z(Za) - 2.5);
+            if (Zb > 1) kJ_mol /= (Atom::electronegativity_from_Z(Zb) - 2.5);
         }
 
         // cout << *this << endl;

@@ -1061,6 +1061,25 @@ bool Atom::is_amide()
     return false;
 }
 
+bool Atom::is_aldehyde()
+{
+    if (family == CHALCOGEN)
+    {
+        Atom* C = is_bonded_to(TETREL, 2);
+        if (C && C->is_bonded_to("H")) return true;
+    }
+    else if (family == TETREL)
+    {
+        if (is_bonded_to(CHALCOGEN, 2) && is_bonded_to("H")) return true;
+    }
+    else if (Z == 1)
+    {
+        Atom* C = is_bonded_to(TETREL);
+        if (C && C->is_bonded_to(CHALCOGEN, 2)) return true;
+    }
+    return false;
+}
+
 void Atom::set_aa_properties()
 {
     if (!aaletter) return;

@@ -334,7 +334,7 @@
 #define _dbg_imidazole_check 0
 #define _dbg_conj_chg 0
 #define _dbg_Huckel 0
-#define _dbg_259 1
+#define _dbg_259 0
 
 #endif
 

@@ -315,7 +315,7 @@
 #define _dbg_bb_rots 0
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
-#define _dbg_groupsel 01
+#define _dbg_groupsel 0
 #define _dbg_polsat 0
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0
@@ -334,7 +334,7 @@
 #define _dbg_imidazole_check 0
 #define _dbg_conj_chg 0
 #define _dbg_Huckel 0
-#define _dbg_259 1
+#define _dbg_259 0
 
 #endif
 

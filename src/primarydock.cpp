@@ -4174,6 +4174,7 @@ _try_again:
                     if (!laa) continue;
                     if (!laa->been_flexed)
                     {
+                        if (laa->distance_to(ligand) < 4) continue;
                         for (k=0; reaches_spheroid[nodeno][k]; k++)
                         {
                             if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;

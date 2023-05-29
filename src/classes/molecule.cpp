@@ -2973,6 +2973,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                     {
                         benerg = tryenerg;
                         pib.copy_state(a);
+                        a->been_flexed = true;
                     }
                     else
                     {

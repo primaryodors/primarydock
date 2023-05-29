@@ -15,7 +15,6 @@
 
 using namespace std;
 
-float potential_distance = 0;
 float conformer_momenta_multiplier = 1;
 float conformer_tumble_multiplier = 1;
 
@@ -602,6 +601,31 @@ Atom* Molecule::get_nearest_atom(Point loc, intera_type capable_of) const
     }
 
     return atoms[j];
+}
+
+std::vector<Atom*> Molecule::longest_dimension()
+{
+    std::vector<Atom*> retval;
+    if (!atoms) return retval;
+    int i, j;
+    float rmax = 0;
+
+    for (i=0; atoms[i]; i++)
+    {
+        for (j=i+1; atoms[j]; j++)
+        {
+            float r = atoms[i]->distance_to(atoms[j]);
+            if (r > rmax)
+            {
+                retval.clear();
+                retval.push_back(atoms[i]);
+                retval.push_back(atoms[j]);
+                rmax = r;
+            }
+        }
+    }
+
+    return retval;
 }
 
 float Molecule::bindability_by_type(intera_type t, bool ib)
@@ -2206,17 +2230,36 @@ bool Molecule::shielded(Atom* a, Atom* b) const
 float Molecule::get_atom_mol_bind_potential(Atom* a)
 {
     if (noAtoms(atoms)) return 0;
-    int i, j;
-    float retval=0;
-    potential_distance = 0;
+    int i, j, n;
+
+    float hydro = 0;
+    j = 0;
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->get_Z() == 1) continue;
+
+        hydro += fabs(atoms[i]->is_polar());
+        j++;
+    }
+
+    if (j) hydro /= j;
+
+    float retval=0;
+    n = 0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+
         InteratomicForce** ifs = InteratomicForce::get_applicable(a, atoms[i]);
         if (!ifs) continue;
+
         for (j=0; ifs[j]; j++)
         {
             float partial;
+
+            if (hydro > 0.333 && ifs[j]->get_type() == vdW) continue;
+
             if (ifs[j]->get_type() == ionic)
             {
                 if (sgn(a->get_charge()) != -sgn(atoms[i]->get_charge())) continue;
@@ -2240,13 +2283,12 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
             }
 
             retval += partial;
-
-            potential_distance += ifs[j]->get_distance();
+            n++;
         }
         delete[] ifs;
     }
 
-    potential_distance /= retval;
+    if (n) retval /= n;
 
     return retval;
 }
@@ -2373,7 +2415,9 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         float abind = InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                         if (abind && !isnan(abind) && !isinf(abind))
                         {
+                            if (abind > 0 && minimum_searching_aniso && ligands[l]->priority) abind *= 1.5;
                             kJmol += abind;
+
                             atoms[i]->last_bind_energy += abind;
                             if (abind > atoms[i]->strongest_bind_energy)
                             {

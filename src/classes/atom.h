@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <iomanip>
 #include "point.h"
 
@@ -144,8 +145,10 @@ public:
     {
         return elecn;
     }
+    bool is_pKa_near_bio_pH() { return is_imidazole_like; }
     float get_acidbase();
     float get_charge();
+    float get_max_conj_charge() { return max_localized_charge; }
     float is_polar();						// -1 if atom is H-bond acceptor; +1 if donor.
     bool is_metal();
     int is_thio();							// -1 if atom is S; +1 if atom is H of a sulfhydryl.
@@ -184,17 +187,21 @@ public:
     Atom* is_bonded_to_pi(const int family, const bool other_atoms_pi);
 
     int num_bonded_to(const char* element);
+    int num_bonded_to_in_ring(const char* element, Ring* member_of);
 
     bool shares_bonded_with(Atom* btom);
 
     Bond* get_bond_between(Atom* btom);
     Bond* get_bond_between(const char* bname);
     Bond* get_bond_by_idx(int bidx);
+    Bond* get_bond_closest_to(Point target);
     int get_idx_bond_between(Atom* btom);
 
     float hydrophilicity_rule();
 
     bool is_conjugated_to(Atom* a, Atom* break_if_reach = nullptr, Atom* caller = nullptr);
+    float is_conjugated_to_charge(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
+    std::vector<Atom*> get_conjugated_atoms(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
 
     // Ring membership.
     int num_rings();
@@ -271,6 +278,7 @@ public:
         else return elem_syms[lZ];
     }
     static void dump_array(Atom** aarr);
+    static float electronegativity_from_Z(int atom_Z) { return electronegativities[atom_Z]; }
 
     // Public member vars.
     float pK = nanf("n/a");         // To be managed and used by external classes.
@@ -308,8 +316,10 @@ protected:
     float Eion = 0;
     float Eaffin = 0;
     float charge = 0;					// can be partial.
+    float max_localized_charge = 0;     // for conjugated charged systems.
     float acidbase = 0;					// charge potential; negative = acid / positive = basic.
     float polarity = 0;					// maximum potential relative to -OH...H-.
+    bool polar_calcd = false;
     int thiol = 0;
     Bond* bonded_to = 0;
     bool reciprocity = false;
@@ -320,6 +330,7 @@ protected:
     bool chirality_unspecified = true;
     Ring** member_of = nullptr;
     int recursion_counter = 0;
+    bool is_imidazole_like = false;     // Rings having a pKa near the biological pH of 7.4, that aromatic pnictogens can protonate.
 
     static void read_elements();
     void figure_out_valence();

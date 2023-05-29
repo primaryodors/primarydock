@@ -753,6 +753,8 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
             int j = interpret_resno(words[i]);
             if (!j) break;
             resnos.push_back(j);
+            AminoAcid* aa = protein->get_residue(j);
+            aa->priority = true;
         }
 
         int sz = resnos.size();
@@ -1655,10 +1657,7 @@ void do_tumble_spheres(Point l_pocket_cen)
                                     {
                                         weight = 1;
 
-                                        if (extra_wt.size()
-                                                &&
-                                                std::find(extra_wt.begin(), extra_wt.end(), tsphres[j]->get_residue_no())!=extra_wt.end()
-                                        )
+                                        if (tsphres[j]->priority)
                                         {
                                             weight = 1.25;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
                                         }
@@ -2161,7 +2160,6 @@ int main(int argc, char** argv)
         }
     }
 
-
     if (!CEN_buf.length())
     {
         cout << "Error: no binding pocket center defined." << endl;
@@ -2169,7 +2167,6 @@ int main(int argc, char** argv)
     }
 
     strcpy(buffer, CEN_buf.c_str());
-
     char** words = chop_spaced_words(buffer);
     pocketcen = pocketcen_from_config_words(words, nullptr);
     loneliest = protein->find_loneliest_point(pocketcen, size);
@@ -2198,13 +2195,6 @@ int main(int argc, char** argv)
         }
     }
 
-    if (!strcmp(words[1], "RES"))
-    {
-        for (i=2; words[i]; i++)
-        {
-            extra_wt.push_back(interpret_resno(words[i]));
-        }
-    }
     pktset = true;
 
     protein->mcoord_resnos = mcoord_resno;
@@ -2371,8 +2361,11 @@ int main(int argc, char** argv)
     if (output) *output << endl;
 
     i = poses*(triesleft+1)+8;
-    DockResult dr[i][pathnodes+2];
-    // cout << "dr[" << i << "] allocated." << endl;
+    j = pathnodes+2;
+    DockResult dr[i][j];
+    #if _dbg_find_blasted_segfault
+    cout << "dr[" << i << "][" << j << "] allocated. " << dr << endl;
+    #endif
     for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
 
     float rgnxform_r[i][pathnodes+2][PROT_MAX_RGN], rgnxform_theta[i][pathnodes+2][PROT_MAX_RGN], rgnxform_y[i][pathnodes+2][PROT_MAX_RGN];
@@ -2459,6 +2452,10 @@ _try_again:
             fclose(pf);
             protein->soft_biases = soft_biases;
         }
+
+        strcpy(buffer, CEN_buf.c_str());
+        words = chop_spaced_words(buffer);
+        pocketcen = pocketcen_from_config_words(words, nullptr);
 
         freeze_bridged_residues();
         prepare_initb();
@@ -2580,6 +2577,10 @@ _try_again:
 
                 freeze_bridged_residues();
                 prepare_initb();
+
+                strcpy(buffer, CEN_buf.c_str());
+                words = chop_spaced_words(buffer);
+                pocketcen = pocketcen_from_config_words(words, nullptr);
 
                 for (i=1; i<=seql; i++)
                 {
@@ -3044,14 +3045,6 @@ _try_again:
                 }
                 words = chop_spaced_words(buffer);
                 nodecen = pocketcen_from_config_words(&words[1], &nodecen);
-                if (!strcmp(words[2], "RES"))
-                {
-                    extra_wt.clear();
-                    for (i=2; words[i]; i++)
-                    {
-                        extra_wt.push_back(interpret_resno(words[i]));
-                    }
-                }
 
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Added whatever points together." << endl;
@@ -3172,21 +3165,6 @@ _try_again:
                                 }
                             }
 
-                            if (extra_wt.size())
-                            {
-                                int l, n = extra_wt.size(), resno = reaches_spheroid[nodeno][i]->get_residue_no();
-                                for (l=0; l<n; l++)
-                                {
-                                    if (resno == extra_wt[l])
-                                    {
-                                        weight *= 20;
-                                        #if _dbg_flexion_selection
-                                        // cout << resno << " boosted." << endl;
-                                        #endif
-                                    }
-                                }
-                            }
-
                             #if _dbg_flexion_selection
                             if (reaches_spheroid[nodeno][i]->get_residue_no() == 9262)
                                 cout << reaches_spheroid[nodeno][i]->get_name() << " has weight " << weight << endl;
@@ -3289,6 +3267,10 @@ _try_again:
                 global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
                 ligand->recenter(ligcen_target);
                 GroupPair::align_groups(ligand, global_pairs);
+
+                #if _dbg_groupsel
+                cout << endl;
+                #endif
 
                 int gpn = global_pairs.size();
                 for (l=0; l<3 && l<gpn; l++)
@@ -3798,14 +3780,21 @@ _try_again:
             if (debug) *debug << "Preparing output." << endl;
             #endif
 
-            char metrics[protein->get_seq_length()+8][10];
-            float mkJmol[protein->get_seq_length()+8];
-            float imkJmol[protein->get_seq_length()+8];
-            float mvdWrepl[protein->get_seq_length()+8];
-            float imvdWrepl[protein->get_seq_length()+8];
+            int psl8 = protein->get_seq_length()+8;
+
+            char metrics[psl8][10];
+            float mkJmol[psl8];
+            float imkJmol[psl8];
+            float mvdWrepl[psl8];
+            float imvdWrepl[psl8];
             int metcount = 0;
             float btot = 0;
             float pstot = 0;
+
+            for (i=0; i<psl8; i++)
+            {
+                mkJmol[i] = imkJmol[i] = mvdWrepl[i] = imvdWrepl[i] = 0;
+            }
 
             for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 
@@ -3973,7 +3962,7 @@ _try_again:
                 }
                 else
                 {
-                    if (lb > 90) lb = 0;
+                    if (lb > 500) lb = 0;
                     mkJmol[metcount] = lb;
                 }
 
@@ -4129,7 +4118,7 @@ _try_again:
             }
 
             // Terminate with an empty string and a null pointer.
-            dr[drcount][nodeno].metric[i] = new char[1];
+            dr[drcount][nodeno].metric[i] = new char[2];
             dr[drcount][nodeno].metric[i][0] = 0;
             dr[drcount][nodeno].metric[i+1] = 0;
             #if _DBG_STEPBYSTEP
@@ -4316,17 +4305,23 @@ _try_again:
                         }
                         cout << "BENERG:" << endl;
                         if (output) *output << "# Binding energies" << endl << "BENERG:" << endl;
+                        #if _dbg_find_blasted_segfault
+                        cout << "alpha " << j << "|" << k << endl;
+                        #endif
                         for (	l=0;
 
-                                dr[j][k].metric
+                                dr[j][k].mkJmol
+                                && dr[j][k].metric
                                 && dr[j][k].metric[l]
                                 && dr[j][k].metric[l][0]
-                                && dr[j][k].mkJmol
                                 ;
 
                                 l++
                             )
                         {
+                            #if _dbg_find_blasted_segfault
+                            cout << "beta " << l << endl;
+                            #endif
                             if (differential_dock)
                             {
                                 cout << dr[j][k].metric[l]
@@ -4343,13 +4338,25 @@ _try_again:
                             else
                             {
                                 if (output && do_output_colors) colorize(dr[j][k].mkJmol[l]);
+                                #if _dbg_find_blasted_segfault
+                                cout << "gamma " << l << endl;
+                                #endif
                                 cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
+                                #if _dbg_find_blasted_segfault
+                                cout << "delta " << l << endl;
+                                #endif
                                 if (do_output_colors) colorless();
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
+                                #if _dbg_find_blasted_segfault
+                                cout << "epsilon " << l << endl;
+                                #endif
                             }
                         }
                         cout << endl;
                         if (output) *output << endl;
+                        #if _dbg_find_blasted_segfault
+                        cout << "zeta " << l << endl;
+                        #endif
 
                         for (l=0; l<_INTER_TYPES_LIMIT; l++)
                         {
@@ -4471,6 +4478,10 @@ _try_again:
                         }
                         cout << "vdWRPL:" << endl;
                         if (output) *output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
+                        if (output) *output << endl;
+                        #if _dbg_find_blasted_segfault
+                        cout << j << "|" << k << ": " << dr << endl;
+                        #endif
                         for (	l=0;
 
                                 dr[j][k].metric
@@ -4480,7 +4491,14 @@ _try_again:
                                 l++
                             )
                         {
+                            #if _dbg_find_blasted_segfault
+                            cout << "eta " << l << endl;
+                            #endif
                             if (fabs(dr[j][k].mvdWrepl[l]) < 0.001) continue;
+
+                            #if _dbg_find_blasted_segfault
+                            cout << "theta " << l << endl;
+                            #endif
 
                             if (differential_dock)
                             {
@@ -4500,6 +4518,10 @@ _try_again:
                                 cout << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
                                 if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
                             }
+
+                            #if _dbg_find_blasted_segfault
+                            cout << "iota " << l << endl;
+                            #endif
                         }
                         cout << endl;
                         if (output) *output << endl;

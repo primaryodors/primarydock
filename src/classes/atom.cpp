@@ -569,7 +569,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
 
 float Atom::get_charge()
 {
-    if (Z == 1 && !charge)
+    if (Z == 1)
     {
         if (bonded_to && bonded_to[0].btom)
         {
@@ -712,6 +712,20 @@ int Atom::num_bonded_to(const char* element)
     return j;
 }
 
+int Atom::num_bonded_to_in_ring(const char* element, Ring* member_of)
+{
+    if (!bonded_to) return 0;
+    int i, j=0;
+    for (i=0; i<geometry; i++)
+        if (bonded_to[i].btom)
+            if (!strcmp(bonded_to[i].btom->get_elem_sym(), element)
+                &&
+                bonded_to[i].btom->is_in_ring(member_of)
+               )
+                j++;
+    return j;
+}
+
 Bond* Atom::get_bond_between(Atom* btom)
 {
     if (!bonded_to) return 0;
@@ -840,73 +854,6 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
                                        && lbtom->Z != 1
                                       );		// Later when we look for rings we update this.
 
-            // Hydrogen magic.
-            if (lbtom->Z == 1)
-            {
-                switch (Z)
-                {
-                case 7:
-                    polarity = -0.9;
-                    lbtom->polarity = 0.9;
-                    lbtom->acidbase = 1;
-                    acidbase = 1;
-                    break;
-
-                case 15:
-                    polarity = -0.5;
-                    lbtom->polarity = 0.5;
-                    lbtom->acidbase = 0.75;
-                    acidbase = 0.75;
-                    break;
-
-                case 8:
-                case 9:
-                case 17:
-                case 35:
-                case 53:
-                case 85:
-                case 117:
-                    polarity = -1;
-                    lbtom->polarity = 1;
-                    break;
-
-                case 16:
-                case 34:
-                    polarity = -0.25;
-                    lbtom->polarity = 0.25;
-                    thiol = -1;
-                    lbtom->thiol = 1;
-                    break;
-
-                default:
-                    break;
-                }
-            }
-            else if (1)
-            {
-                // Non-hydrogen magic.
-                switch (lbtom->get_family())
-                {
-                    case TETREL:
-                    if (!polarity && family == CHALCOGEN) polarity = -0.8;
-                    if (!polarity && family == PNICTOGEN) polarity = -0.75;
-                    break;
-
-                    case PNICTOGEN:
-                    if (!polarity && family == CHALCOGEN) polarity = -1;
-                    if (!lbtom->polarity && family == TETREL) lbtom->polarity = -0.75;
-                    break;
-
-                    case CHALCOGEN:
-                    if (!lbtom->polarity && family == PNICTOGEN) lbtom->polarity = -1;
-                    if (!lbtom->polarity && family == TETREL) lbtom->polarity = -0.8;
-                    break;
-
-                    default:
-                    ;
-                }
-            }
-
             if (!reciprocity)
             {
                 lbtom->reciprocity = true;
@@ -923,9 +870,102 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
     return false;
 }
 
+#define _dbg_polar_calc 0
 float Atom::is_polar()
 {
-    if (charge) polarity = sgn(charge);
+    if (charge) polarity = charge;
+    else if (!polar_calcd)
+    {
+        int i, j, n=0;
+
+        if (family == CHALCOGEN || family == PNICTOGEN)
+        {
+            #if _dbg_conj_chg
+            cout << "# " << name << " testing for conjugated charge..." << endl;
+            #endif
+            float icc = is_conjugated_to_charge();
+            if (icc)
+            {
+                #if _dbg_conj_chg
+                cout << "# " << name << " conjugated to charge " << icc << endl;
+                #endif
+
+                std::vector<Atom*> lca = get_conjugated_atoms();
+
+                std::sort( lca.begin(), lca.end() );
+                lca.erase( std::unique( lca.begin(), lca.end() ), lca.end() );
+
+                n = lca.size();
+                #if _dbg_conj_chg
+                cout << "# " << n << " conjugated atoms total." << endl;
+                #endif
+
+                for (i=n-1; i>=0; i--)
+                {
+                    if (lca[i]->family != family)
+                    {
+                        std::vector<Atom*>::iterator it;
+                        it = lca.begin();
+                        lca.erase(it+i);
+                        n--;
+                    }
+                }
+
+                n = lca.size();
+                #if _dbg_conj_chg
+                cout << "# " << n << " conjugated atoms of same family." << endl;
+                #endif
+
+                for (i=0; i<n; i++)
+                {
+                    lca[i]->charge = icc/n;
+                    lca[i]->max_localized_charge = icc;
+                    #if _dbg_conj_chg
+                    cout << "# " << lca[i]->name << " charge now equals " << (icc/n) << endl;
+                    #endif
+                }
+
+                return charge;
+            }
+        }
+
+        n = 0;
+        polarity = 0;
+        for (i=0; i<valence; i++)
+        {
+            if (bonded_to[i].btom)
+            {
+                n++;
+
+                float f = (bonded_to[i].btom->elecn - elecn);
+                if (Z==1 && bonded_to[i].btom->family == TETREL) f = 0;
+
+                for (j=0; j<valence; j++)
+                {
+                    if (j==i) continue;
+                    if (!bonded_to[j].btom) continue;
+                    float e = (bonded_to[j].btom->elecn - elecn);
+                    e *= cos(find_3d_angle(bonded_to[i].btom->location, bonded_to[j].btom->location, location));
+                    f += e;
+                }
+
+                polarity += f;
+                #if _dbg_polar_calc
+                cout << "# " << name << " is bonded to " << bonded_to[i].btom->name << " " << f << ", ";
+                #endif
+            }
+        }
+
+        if (n) polarity /= n;
+        #if _dbg_polar_calc
+        cout << "# / " << n << " = polarity " << polarity << endl;
+        #endif
+
+        polar_calcd = true;
+    }
+    #if _dbg_polar_calc
+    // cout << "# " << name << " has polarity " << polarity << endl;
+    #endif
     return polarity;
 }
 
@@ -981,6 +1021,7 @@ bool Atom::is_pi()
     }
 
     if (family == PNICTOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(CHALCOGEN)) return true;
+    if (family == CHALCOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(PNICTOGEN)) return true;
 
     int i;
     for (i=0; i<valence; i++)
@@ -1572,6 +1613,28 @@ float Atom::get_geometric_bond_angle()
     }
 }
 
+Bond* Atom::get_bond_closest_to(Point pt)
+{
+    int i;
+    float rmin = Avogadro;
+    Bond* retval = nullptr;
+
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom)
+        {
+            float r = bonded_to[i].btom->location.get_3d_distance(pt);
+            if (r < rmin)
+            {
+                retval = &bonded_to[i];
+                rmin = r;
+            }
+        }
+    }
+
+    return retval;
+}
+
 SCoord* Atom::get_geometry_aligned_to_bonds()
 {
     int bc = get_bonded_atoms_count();
@@ -1590,13 +1653,74 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
 
     if (geov)
     {
-        if (_DBGGEO) cout << name << " returns cached geometry." << endl;
-        return geov;
+        // if (_DBGGEO) cout << name << " returns cached geometry." << endl;
+        // return geov;
+        delete[] geov;
     }
     geov = get_basic_geometry();
 
     Point center;
-    int i, j;
+    int i, j, k, l;
+
+    // #259 fix:
+
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom)
+        {
+            Rotation rot = align_points_3d(location.add(geov[i]), bonded_to[i].btom->location, location);
+            for (l=0; l<geometry; l++)
+            {
+                Point pt = geov[l];
+                geov[l] = rotate3D(&pt, &center, &rot);
+            }
+            
+            for (j=i+1; j<geometry; j++)
+            {
+                if (bonded_to[j].btom)
+                {
+                    float theta = find_angle_along_vector(location.add(geov[j]), bonded_to[j].btom->location, location, geov[i]);
+                    for (l=0; l<geometry; l++)
+                        geov[l] = rotate3D(geov[l], center, geov[i], theta);
+                    
+                    for (k=j+1; k<geometry; k++)
+                    {
+                        if (bonded_to[k].btom)
+                        {
+                            for (l=j+1; l<geometry; l++)
+                            {
+                                if (!bonded_to[l].btom)
+                                {
+                                    float ktheta = find_3d_angle(bonded_to[k].btom->location, location.add(geov[k]), location);
+                                    float ltheta = find_3d_angle(bonded_to[k].btom->location, location.add(geov[l]), location);
+
+                                    if (ltheta < ktheta)
+                                    {
+                                        SCoord swap = geov[l];
+                                        geov[l] = geov[k];
+                                        geov[k] = swap;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return geov;
+                }
+            }
+
+            return geov;
+        }
+    }
+    
+    return geov;
+    
+
+
+
+
+
+
 
     if (num_conj_rings())
     {
@@ -2125,6 +2249,51 @@ Ring* Atom::closest_arom_ring_to(Point target)
     return nullptr;
 }
 
+float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
+{
+    if (!this) return 0;
+    if (!is_pi()) return 0;
+    if (this == bir) return 0;
+    if (!bir) bir = this;
+    if (bir->recursion_counter > 10) return 0;
+
+    bir->recursion_counter++;
+
+    int i;
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom
+            &&
+            bonded_to[i].btom != c
+            &&
+            bonded_to[i].btom != bir
+            &&
+            bonded_to[i].btom->is_pi()
+        )
+        {
+            float f = bonded_to[i].btom->charge;
+            if (f)
+            {
+                bir->recursion_counter = 0;
+                return f;
+            }
+
+            // DANGER: RECURSION.
+            f = bonded_to[i].btom->is_conjugated_to_charge(bir, this);
+            if (f)
+            {
+                bir->recursion_counter = 0;
+                return f;
+            }
+        }
+    }
+
+    if (bir == this) recursion_counter = 0;
+    else bir->recursion_counter--;
+
+    return 0;
+}
+
 bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
 {
     if (!this || !a) return false;
@@ -2147,6 +2316,8 @@ bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
                 &&
                 bonded_to[i].btom != bir
                 &&
+                bonded_to[i].btom->is_pi()
+                &&
                 // DANGER: RECURSION.
                 bonded_to[i].btom->is_conjugated_to(a, bir, this)
                )
@@ -2161,6 +2332,46 @@ bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
     else bir->recursion_counter--;
 
     return false;
+}
+
+std::vector<Atom*> casf;
+std::vector<Atom*> Atom::get_conjugated_atoms(Atom* bir, Atom* c)
+{
+    if (!c)
+    {
+        casf.clear();
+        casf.push_back(this);
+    }
+    if (!is_pi()) return casf;
+    if (!bir) bir = this;
+    if (bir->recursion_counter > 10) return casf;
+
+    bir->recursion_counter++;
+
+    int i;
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom
+            &&
+            bonded_to[i].btom != c
+            &&
+            bonded_to[i].btom != bir
+            &&
+            bonded_to[i].btom->is_pi()
+            )
+        {
+            int n = casf.size();
+            casf.push_back(bonded_to[i].btom);
+
+            // DANGER: RECURSION.
+            std::vector<Atom*> lcasf = bonded_to[i].btom->get_conjugated_atoms(bir, this);
+        }
+    }
+
+    if (bir == this) recursion_counter = 0;
+    else bir->recursion_counter--;
+
+    return casf;
 }
 
 void Ring::fill_with_atoms(Atom** from_atoms)
@@ -2331,13 +2542,28 @@ bool Ring::Huckel()
 
     for (i=0; atoms[i]; i++)
     {
-        if (atoms[i]->is_pi()) pi_electrons++;
+        if (atoms[i]->is_pi())
+        {
+            pi_electrons++;
+            #if _dbg_Huckel
+            cout << "# " << atoms[i]->name << " adds 1 Hückel electron." << endl;
+            #endif
+        }
 
         switch (atoms[i]->get_family())
         {
         case PNICTOGEN:
+            wiggle_room++;
+            #if _dbg_Huckel
+            cout << "# " << atoms[i]->name << " adds 1 more optional Hückel electron." << endl;
+            #endif
+            break;
+
         case CHALCOGEN:
             wiggle_room += 2;
+            #if _dbg_Huckel
+            cout << "# " << atoms[i]->name << " adds 2 more optional Hückel electrons." << endl;
+            #endif
             break;
 
         default:
@@ -2345,11 +2571,30 @@ bool Ring::Huckel()
         }
     }
 
-    for (i=0; i<=wiggle_room; i+=2)
+    #if _dbg_Huckel
+    cout << "# " << pi_electrons << " pi electrons and " << wiggle_room << " optional electrons." << endl;
+    #endif
+
+    for (i=0; i<=wiggle_room; i++)
     {
         int n = pi_electrons + i;
+
+        #if _dbg_Huckel
+        cout << "# " << n << " pi electrons; ";
+        #endif
+
         n -= 2;
-        if (n && !(n % 4)) return true;
+        if (n && !(n % 4))
+        {
+            #if _dbg_Huckel
+            cout << "Hückel number!" << endl;
+            #endif
+
+            return true;
+        }
+        #if _dbg_Huckel
+        else cout << "not Hückel." << endl;
+        #endif
     }
     return false;
 }
@@ -2360,8 +2605,21 @@ bool atoms_are_conjugated(Atom** atoms)
 
     for (i=0; atoms[i]; i++)
     {
-        if (i && !atoms[i]->is_bonded_to(atoms[i-1])) return false;
-        switch (atoms[i]->get_family())
+        if (i && !atoms[i]->is_conjugated_to(atoms[i-1]))
+        {
+            #if _dbg_Huckel
+            //cout << "# " << i << " " << atoms[i]->name << " is not conjugated to " << atoms[i-1]->name << endl;
+            #endif
+
+            return false;
+        }
+        #if _dbg_Huckel
+        else
+        {
+            //if (i) cout << "# " << i << " " << atoms[i]->name << " is conjugated to " << atoms[i-1]->name << endl;
+        }
+        #endif
+        /*switch (atoms[i]->get_family())
         {
         case TETREL:
             // cout << atoms[i]->name << "|" << atoms[i]->get_count_pi_bonds() << "|" << atoms[i]->get_charge() << endl;
@@ -2379,7 +2637,7 @@ bool atoms_are_conjugated(Atom** atoms)
 
         default:
             return false;
-        }
+        }*/
     }
 
     return true;
@@ -2387,14 +2645,71 @@ bool atoms_are_conjugated(Atom** atoms)
 
 void Ring::determine_type()
 {
+    // imidazole-like functionality.
+    int i;
+    if (atoms)
+    {
+        int numC = 0, numN = 0, numhCC = 0;             // Later, we'll add more atoms.
+        for (i=0; atoms[i]; i++)
+        {
+            int Z = atoms[i]->get_Z();
+            switch (Z)
+            {
+                case 6:
+                numC++;
+                numhCC += atoms[i]->num_bonded_to_in_ring("C", this);
+                break;
+
+                case 7:
+                numN++;
+                break;
+
+                default:
+                ;
+            }
+        }
+        atcount = i;
+
+        numhCC &= -1;
+        int numCC = numhCC / 2;
+
+        #if _dbg_imidazole_check
+        cout << "# Ring has " << atcount << " atoms: " << numC << " carbons, " << numN << " nitrogens, "
+             << numCC << " carbon-carbon bonds." << endl;
+        #endif
+
+        if (atcount == 5 && numC == 3 && numN == 2 && numCC == 1
+            &&
+            is_coplanar() && atoms_are_conjugated(atoms) && Huckel()
+            )
+        {
+            for (i=0; i<atcount; i++)
+            {
+                if (atoms[i]->get_family() == PNICTOGEN) atoms[i]->is_imidazole_like = true;
+            }
+
+            #if _dbg_imidazole_check
+            cout << "# Ring is imidazole-like." << endl;
+            #endif
+        }
+    }
+
     if (!atoms_are_conjugated(atoms))
     {
+        #if _dbg_Huckel
+        cout << "# Ring is not conjugated." << endl;
+        #endif
+
         type = OTHER;
         return;
     }
 
     if (!is_coplanar())
     {
+        #if _dbg_Huckel
+        cout << "# Ring is not coplanar." << endl;
+        #endif
+
         type = OTHER;
         return;
     }
@@ -2439,18 +2754,68 @@ std::ostream& operator<<(std::ostream& os, const Ring& r)
 float Atom::similarity_to(Atom* b)
 {
     float similarity = 0;
-    bool apb = (fabs(is_polar()) > .333), bpb = (fabs(b->is_polar()) > .333);
-    if (apb == bpb) similarity += 10;
-    if (is_pi() && b->is_pi()) similarity += 5;
-    if (abs(is_thio()) && abs (b->is_thio())) similarity += 8;
-    if (is_metal() && b->is_metal()) similarity += 15;
-    similarity += 10.0 / (fabs(get_electronegativity() - b->get_electronegativity()) / 3 + 1);
-    if (is_bonded_to(b) || is_conjugated_to(b)) similarity += 7;
-    if (sgn(get_charge()))
+
+    // Criteria
+    #define both_or_neither_abs_polarity_at_least_point2 13
+    #define both_or_neither_abs_polarity_at_least_point333 13
+    #define abs_delta_polarity_within_point333 15
+     #define one_polar_one_sugarlike_nonpolar 13
+    #define same_sgn_charge 16
+     #define one_charged_one_neutral_polar 10
+     #define opposite_charges -20
+    #define both_or_neither_pi_and_both_or_neither_polar 18
+     #define neither_pi_one_polar_one_sugary 15
+     #define one_polar_both_pi 13
+     #define one_polar_only_one_pi 11
+    #define neither_pi_or_conjugated_together 15
+     #define one_pi_one_aliphatic -20
+    #define abs_delta_elecn_within_point7 10
+
+    #if both_or_neither_abs_polarity_at_least_point2 + both_or_neither_abs_polarity_at_least_point333 + abs_delta_polarity_within_point333\
+        + same_sgn_charge + both_or_neither_pi_and_both_or_neither_polar + abs_delta_elecn_within_point7 + neither_pi_or_conjugated_together\
+        != 100
+        #error "Atom similarity constants do not add up to 100%."
+    #endif
+
+    bool apb = (fabs(is_polar()) > .2), bpb = (fabs(b->is_polar()) > .2);
+    if (apb == bpb) similarity += 0.01 * both_or_neither_abs_polarity_at_least_point2;
+
+    apb = (fabs(is_polar()) > .333);
+    bpb = (fabs(b->is_polar()) > .333);
+    if (apb == bpb) similarity += 0.01 * both_or_neither_abs_polarity_at_least_point333;
+
+    if (
+        (!apb && bpb && (is_bonded_to("N") || is_bonded_to("O")))
+        ||
+        (!bpb && apb && (b->is_bonded_to("N") || b->is_bonded_to("O")) )
+        )
     {
-        if (sgn(get_charge()) == sgn(b->get_charge())) similarity += 15;
-        else if (sgn(get_charge()) == -sgn(b->get_charge())) similarity -= 15;
+        similarity += 0.01 * one_polar_one_sugarlike_nonpolar;
+        if (!is_pi() && !b->is_pi()) similarity += 0.01 * neither_pi_one_polar_one_sugary;
     }
+
+    float delta = fabs(is_polar() - b->is_polar());
+    if (delta < 0.333) similarity += 0.01 * abs_delta_polarity_within_point333;
+
+    if (sgn(charge) == sgn(b->charge)) similarity += 0.01 * same_sgn_charge;
+    else if (!charge && apb && b->charge) similarity += 0.01 * one_charged_one_neutral_polar;
+    else if (charge && bpb && !b->charge) similarity += 0.01 * one_charged_one_neutral_polar;
+    else if (sgn(charge) == -sgn(b->charge)) similarity += 0.01 * opposite_charges;
+
+    if (apb == bpb && is_pi() == b->is_pi()) similarity += 0.01 * both_or_neither_pi_and_both_or_neither_polar;
+    else if (apb && is_pi() && b->is_pi()) similarity += 0.01 * one_polar_both_pi;
+    else if (bpb && is_pi() && b->is_pi()) similarity += 0.01 * one_polar_both_pi;
+    else if (apb && b->is_pi()) similarity += 0.01 * one_polar_only_one_pi;
+    else if (bpb && is_pi()) similarity += 0.01 * one_polar_only_one_pi;
+
+    if (!is_pi() && !b->is_pi()) similarity += 0.01 * neither_pi_or_conjugated_together;
+    else if (is_conjugated_to(b)) similarity += 0.01 * neither_pi_or_conjugated_together;
+    else if (is_pi() && !b->is_pi() && !bpb) similarity += 0.01 * one_pi_one_aliphatic;
+    else if (!is_pi() && b->is_pi() && !apb) similarity += 0.01 * one_pi_one_aliphatic;
+
+    delta = fabs(elecn - b->elecn);
+    if (delta <= 0.7) similarity += 0.01 * abs_delta_elecn_within_point7;
+
     return similarity;
 }
 

@@ -675,7 +675,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         else
         {
             Bond* sb = a->get_bond_closest_to(b->get_location());
-            if (sb->btom && sb->btom->distance_to(b) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+            if (sb && sb->btom && sb->btom->distance_to(b) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
         }
 
         if (b->get_Z() == 1)
@@ -690,7 +690,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         else
         {
             Bond* sb = b->get_bond_closest_to(a->get_location());
-            if (sb->btom && sb->btom->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
+            if (sb && sb->btom && sb->btom->distance_to(a) < (r - 0.5 * sb->optimal_radius) ) goto no_polar_repuls;
         }
 
         kJmol -= pr;

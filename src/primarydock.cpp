@@ -1355,6 +1355,7 @@ void freeze_bridged_residues()
             if (aa1)
             {
                 aa1->movability = MOV_FLXDESEL;
+                aa1->been_flexed = true;
                 Bond** bb = aa1->get_rotatable_bonds();
                 if (bb)
                 {
@@ -1368,6 +1369,7 @@ void freeze_bridged_residues()
             if (aa2)
             {
                 aa2->movability = MOV_FLXDESEL;
+                aa2->been_flexed = true;
                 Bond** bb = aa2->get_rotatable_bonds();
                 if (bb)
                 {
@@ -4163,6 +4165,7 @@ _try_again:
                     if (!laa) continue;
                     if (!laa->been_flexed)
                     {
+                        if (laa->distance_to(ligand) > 5) continue;
                         for (k=0; reaches_spheroid[nodeno][k]; k++)
                         {
                             if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][k])) continue;

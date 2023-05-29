@@ -2476,6 +2476,26 @@ float Molecule::get_intermol_contact_area(Molecule* ligand, bool hpho)
     return result;
 }
 
+float Molecule::distance_to(Molecule* om)
+{
+    if (!atoms || !om || !om->atoms) return nanf("Bad molecule.");
+
+    int i, j;
+    float minr = Avogadro;
+
+    for (i=0; atoms[i]; i++)
+    {
+        for (j=0; om->atoms[j]; j++)
+        {
+            float r = atoms[i]->distance_to(om->atoms[j]);
+
+            if (r < minr) minr = r;
+        }
+    }
+
+    return minr;
+}
+
 float Molecule::get_intermol_polar_sat(Molecule* ligand)
 {
     if (!ligand) return 0;
@@ -2953,6 +2973,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                     {
                         benerg = tryenerg;
                         pib.copy_state(a);
+                        a->been_flexed = true;
                     }
                     else
                     {

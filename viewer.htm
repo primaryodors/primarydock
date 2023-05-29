@@ -1365,7 +1365,46 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
     this.atomColor = function(atom)
     {
         var resno = atom.resno;
-        return rgn_color(resno);
+        var rgnc = rgn_color(resno, true);
+
+		if (!rgnc)
+		{
+			switch (atom.resname.toUpperCase())
+			{
+				case "MET":
+				return 0xcccc99;
+				
+				case "ALA": case "ILE": case "LEU": case "VAL":
+				return 0xcccccc;
+
+				case "PRO":
+				return 0x999999;
+
+				case "GLY":
+				return 0x666666;
+
+				case "CYS":
+				return 0xcccc33;
+
+				case "SER": case "THR":
+				return 0x66cc99;
+
+				case "ASN": case "GLN":
+				return 0x33cc99;
+
+				case "ASP": case "GLU":
+				return 0xff6666;
+
+				case "ARG": case "LYS": case "HIS":
+				return 0x3333ff;
+
+				case "PHE": case "TRP": case "TYR":
+				return 0xcc99cc;
+
+				default:
+				return 0xcc9966;
+			}
+		}
     }
 });
 

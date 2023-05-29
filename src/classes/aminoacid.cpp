@@ -1662,12 +1662,6 @@ bool AminoAcid::is_tyrosine_like()
     return false;
 }
 
-float AminoAcid::get_charge()
-{
-    if (!aadef) return 0;
-    return aadef->charged;
-}
-
 bool AminoAcid::is_glycine()
 {
     if (!atoms) return false;

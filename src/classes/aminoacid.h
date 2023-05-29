@@ -93,7 +93,6 @@ public:
     {
         return aadef;
     }
-    float get_charge();
     bool is_tyrosine_like();		// An amino acid is tyrosine-like if it has an aromatic ring and a non-backbone H-bond acceptor not part of the ring.
     bool is_glycine();              // Glycine is a special case where there are no non-backbone heavy atoms.
     bool conditionally_basic();

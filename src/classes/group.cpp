@@ -759,7 +759,16 @@ float GroupPair::get_potential()
                 else
                 {
                     partial = aa->get_atom_mol_bind_potential(a);
-                    if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like())
+
+                    if ((aa->get_charge() > 1 || aa->conditionally_basic()) && a->is_aldehyde())
+                    {
+                        partial += 60;
+
+                        #if _dbg_groupsel
+                        cout << "Aldehyde-base potential for " << *a << "..." << *aa << " = " << partial << endl;
+                        #endif
+                    }
+                    else if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like())
                     {
                         partial /= 3;
                         #if _dbg_groupsel

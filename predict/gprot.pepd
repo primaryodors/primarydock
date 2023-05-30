@@ -4,9 +4,6 @@
 
 LOAD "pdbs/Gprot/5g53_hGs2.pdb" C
 
-DUMP
-EXIT
-
 ECHO $SEQUENCE
 
 SAVE "pdbs/Gprot/hGs2.pdb"

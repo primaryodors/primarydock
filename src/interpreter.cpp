@@ -495,6 +495,7 @@ int main(int argc, char** argv)
         strcpy(buffer, script_lines[program_counter].c_str());
         char** words = chop_spaced_words(buffer);
         char** owords = words;
+        char chain = 'A';
         if (words && words[0] && words[0][0] && words[0][1])
         {
             for (k=0; words[k]; k++)
@@ -1380,8 +1381,9 @@ int main(int argc, char** argv)
                 if (!words[1]) raise_error("Insufficient parameters given for LOAD.");
                 psz = interpret_single_string(words[1]);
 				n = 0;
-				// if (words[2]) n = atoi(words[2]);
-                if (words[2] /*&& words[3]*/) raise_error("Too many parameters given for LOAD.");
+                chain = 'A';
+				if (words[2]) chain = words[2][0];
+                if (words[2] && words[3]) raise_error("Too many parameters given for LOAD.");
 
                 pf = fopen(psz, "rb");
                 if (!pf)
@@ -1389,7 +1391,7 @@ int main(int argc, char** argv)
                     raise_error( (std::string)"Failed to open " + (std::string)psz + (std::string)" for reading.");
                     return 0xbadf12e;
                 }
-                p.load_pdb(pf, n);
+                p.load_pdb(pf, n, chain);
 
                 fclose(pf);
 

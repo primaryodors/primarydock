@@ -483,7 +483,7 @@ void Protein::find_residue_initial_bindings()
     }
 }
 
-int Protein::load_pdb(FILE* is, int rno)
+int Protein::load_pdb(FILE* is, int rno, char chain)
 {
     AminoAcid* restmp[65536];
     char buffer[1024];
@@ -519,6 +519,7 @@ int Protein::load_pdb(FILE* is, int rno)
                 buffer[3] == 'S'
                )
                 continue;
+
             else if (buffer[0] == 'A' &&
                      buffer[1] == 'T' &&
                      buffer[2] == 'O' &&
@@ -529,6 +530,8 @@ int Protein::load_pdb(FILE* is, int rno)
                      (buffer[25] == ' ' || (buffer[25] >= '0' && buffer[25] <= '9'))
                )
             {
+                if (buffer[21] != ' ' && buffer[21] != chain) continue;
+
                 buffer[16] = ' ';
                 fseek(is, told, SEEK_SET);
 

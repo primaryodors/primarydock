@@ -6,4 +6,11 @@ LOAD "pdbs/Gprot/5g53_hGs2.pdb" C
 
 ECHO $SEQUENCE
 
-SAVE "pdbs/Gprot/hGs2.pdb"
+SAVE "pdbs/Gprot/hGNAS2.pdb"
+
+
+LOAD "pdbs/Gprot/AF-P38405-F1_hGolf-model_v4.pdb"
+
+ECHO $SEQUENCE
+
+SAVE "pdbs/Gprot/hGNAL.pdb"

@@ -100,4 +100,77 @@ int main(int argc, char** argv)
     e392 += 1;
 
     cout << "G-protein contact residues: " << q35 << " " << d215 << " " << e392 << endl;
+
+
+    // Upright both proteins.
+    gpcr.upright();
+
+    Point pt35x4(0,0,0);
+    int i, j=0;
+
+    for (i=q35; i>1 && j<4; i--)
+    {
+        AminoAcid* aa = gnax.get_residue(i);
+        if (aa)
+        {
+            pt35x4 = pt35x4.add(aa->get_CA_location());
+            j++;
+        }
+    }
+
+    if (j)
+    {
+        pt35x4.x /= j;
+        pt35x4.y /= j;
+        pt35x4.z /= j;
+    }
+
+    Point pt1x4(0,0,0);
+
+    j=0;
+    for (i=1; i<q35 && j<4; i++)
+    {
+        AminoAcid* aa = gnax.get_residue(i);
+        if (aa)
+        {
+            pt1x4 = pt1x4.add(aa->get_CA_location());
+            j++;
+        }
+    }
+
+    if (j)
+    {
+        pt1x4.x /= j;
+        pt1x4.y /= j;
+        pt1x4.z /= j;
+    }
+
+    Point axis = pt1x4.subtract(pt35x4);
+    Rotation rot = align_points_3d(axis, Point(-1000,0,0), Point(0,0,0));
+    gnax.rotate_piece(1, 99999, rot, e392);
+
+    axis = gnax.get_residue(e392)->get_CA_location().subtract(pt35x4);
+    axis.x = 0;
+    rot = align_points_3d(axis, Point(0,1000,0), Point(0,0,0));
+    gnax.rotate_piece(1, 99999, rot, e392);
+
+    rot.v = (SCoord)Point(-1000,0,0);
+    rot.a = fiftyseventh*54;
+    gnax.rotate_piece(1, 99999, rot, e392);
+
+    gnax.move_piece(1, 99999, Point(0, -50, 0));
+    gpcr.move_piece(1, 99999, Point(0, 0, 0));
+
+
+    // Go ahead and write the output file now, to see where we're at with development.
+    fp = fopen("output/coupled.pdb", "wb");
+    if (!fp)
+    {
+        cout << "Failed to open output file." << endl;
+        return -1;
+    }
+    gpcr.save_pdb(fp);
+    gnax.save_pdb(fp);
+    gnax.end_pdb(fp);
+    fclose(fp);
 }

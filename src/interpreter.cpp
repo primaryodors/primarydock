@@ -1855,32 +1855,7 @@ int main(int argc, char** argv)
                     threshold = interpret_single_int(words[l++]);
                 }
 
-                n = 0;
-                k = 0;
-                for (i=sr; i<esr; i++)
-                {
-                    m = num_eq = 0;
-                    for (j=0; psz[j]; j++)
-                    {
-                        char c = psz[j], aac = p.get_residue(i+j)->get_letter();
-                        if (c == 'X') c = aac;
-
-                        if (c == aac) num_eq++;
-
-                        sim = p.get_residue(i+j)->similarity_to(c);
-                        // cout << c << "/" << aac << " " << sim << "  ";
-
-                        m += sim;
-                    }
-                    // cout << "___ m: " << m << ", n: " << n << endl;
-
-                    if (m > n && num_eq >= threshold)
-                    {
-                        k = i;
-                        n = m;
-                    }
-                }
-                sim = n;
+                k = p.search_sequence(sr, esr, psz, threshold, &sim);
 
                 delete[] psz;
 

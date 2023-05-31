@@ -81,6 +81,7 @@ public:
     std::vector<std::string> get_remarks(std::string search_for = "");
     void add_remark(std::string new_remark);
     int get_bw50(int helixno);
+    int search_sequence(const int start_resno, const int end_resno, const char* search_for, const int threshold = -1, int* similarity = nullptr);
 
     // Metrics functions.
     float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false);

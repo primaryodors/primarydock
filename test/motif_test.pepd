@@ -15,7 +15,7 @@ IF %motif > 0 THEN ECHO "Found PKML motif at " %motif
 SEARCH 1 %SEQLEN "MAYDRYVAICXPLXY" %motif
 IF %motif > 0 THEN ECHO "Found MAYDRYVAICXPLXY motif at " %motif
 
-SEARCH 100 %SEQLEN "HFFCD" %motif
+SEARCH 150 %SEQLEN "HFFCD" %motif
 IF %motif > 0 THEN ECHO "Found HFFCD motif at " %motif
 
 SEARCH 1 %SEQLEN "GRXKAFSTCASHLXVV" %motif

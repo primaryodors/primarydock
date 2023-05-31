@@ -1198,6 +1198,38 @@ Molecule* Protein::metals_as_molecule()
     return met;
 }
 
+int Protein::search_sequence(const int sr, const int esr, const char* psz, const int threshold, int* psim)
+{
+    int i, j, k = 0, m, n = 0, num_eq, sim;
+    for (i=sr; i<esr; i++)
+    {
+        m = num_eq = 0;
+        for (j=0; psz[j]; j++)
+        {
+            char c = psz[j], aac = get_residue(i+j)->get_letter();
+            if (c == 'X') c = aac;
+
+            if (c == aac) num_eq++;
+
+            sim = get_residue(i+j)->similarity_to(c);
+            // cout << c << "/" << aac << " " << sim << "  ";
+
+            m += sim;
+        }
+        // cout << "___ m: " << m << ", n: " << n << endl;
+
+        if (m > n && num_eq >= threshold)
+        {
+            k = i;
+            n = m;
+        }
+    }
+    sim = n;
+    if (psim) *psim = sim;
+
+    return k;
+}
+
 void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
 {
     AminoAcid* bendy = get_residue(resno);

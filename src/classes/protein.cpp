@@ -1201,17 +1201,23 @@ Molecule* Protein::metals_as_molecule()
 int Protein::search_sequence(const int sr, const int esr, const char* psz, const int threshold, int* psim)
 {
     int i, j, k = 0, m, n = 0, num_eq, sim;
+    char aac;
+    AminoAcid* aa;
+
     for (i=sr; i<esr; i++)
     {
         m = num_eq = 0;
         for (j=0; psz[j]; j++)
         {
-            char c = psz[j], aac = get_residue(i+j)->get_letter();
-            if (c == 'X') c = aac;
+            char c = psz[j];
+            aa = get_residue(i+j);
+            if (!aa) continue;
+            aac = aa->get_letter();
 
+            if (c == 'X') c = aac;
             if (c == aac) num_eq++;
 
-            sim = get_residue(i+j)->similarity_to(c);
+            sim = aa->similarity_to(c);
             // cout << c << "/" << aac << " " << sim << "  ";
 
             m += sim;

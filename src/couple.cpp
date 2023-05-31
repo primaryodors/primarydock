@@ -50,9 +50,9 @@ int main(int argc, char** argv)
     fclose(fp);
     cout << "G-protein: loaded " << gnax.get_seq_length() << " residues." << endl;
 
-    int bw3_50 = -gpcr.get_bw50(3),
-        bw4_50 = -gpcr.get_bw50(4),
-        bw7_50 = -gpcr.get_bw50(7);
+    int bw3_50 = gpcr.get_bw50(3),
+        bw4_50 = gpcr.get_bw50(4),
+        bw7_50 = gpcr.get_bw50(7);
 
     int c438, c359, c756;
 
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
     }
 
     if (bw4_50 > 0) c438 = bw4_50 - 12;
-    else c438 = c359 + 5;
+    else c438 = c359 + 6;
 
     if (bw7_50 > 0) c756 = bw7_50 + 6;
     else

@@ -9,7 +9,7 @@ ECHO $SEQUENCE
 SAVE "pdbs/Gprot/hGNAS2.pdb"
 
 
-LOAD "pdbs/Gprot/AF-P38405-F1_hGolf-model_v4.pdb"
+LOAD "pdbs/TAAR/8iw1.pdb"
 
 ECHO $SEQUENCE
 

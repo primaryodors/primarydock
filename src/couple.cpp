@@ -166,6 +166,24 @@ int main(int argc, char** argv)
     gpcr.move_piece(1, 99999, Point(0, 0, 0));
 
 
+
+    // Move TMR6 out of the way sooner than later.
+    cout << "Moving TMR6..." << endl;
+
+    AminoAcid* aa;
+    aa = gpcr.get_residue(bw5_50);
+    if (!aa) cout << "No BW5.50 residue." << endl;
+    axis = aa->get_CA_location();
+
+    aa = gpcr.get_residue(bw7_50-5);
+    if (!aa) cout << "No BW7.45 residue." << endl;
+    axis = axis.subtract(aa->get_CA_location());
+
+    rot.v = axis;
+    rot.a = fiftyseventh * 15;
+    gpcr.rotate_piece(gpcr.get_region_start("TMR6"), gpcr.get_region_end("TMR6"), rot, bw6_50-2);
+
+
     // Superimpose YELL with 7.56.
     cout << "Aligning C-terminus of G-protein..." << endl;
 
@@ -173,12 +191,11 @@ int main(int argc, char** argv)
     Point ptsrc  = gnax.get_residue(e392)->get_CA_location();
     Point ptcen(0,0,0);
 
-    // Move YELL halfway to the midpoint of 5.64 and 6.33.
-    AminoAcid* aa;
-    j = 2;
+    // Move YELL partway towards the midpoint of 5.64 and 6.33.
+    j = 4;
     if (bw5_50 > 0 && bw6_50 > 0)
     {
-        ptdest = ptdest.multiply_3d_distance(&ptcen, 2);
+        ptdest = ptdest.multiply_3d_distance(&ptcen, 4);
 
         aa = gpcr.get_residue(bw5_50 + 14);
         if (aa)

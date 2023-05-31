@@ -214,6 +214,7 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
     if (!residues) return;
     for (i=0; residues[i]; i++)
     {
+        residues[i]->pdbchain = pdbchain;
         residues[i]->save_pdb(os, offset);
         offset += residues[i]->get_atom_count();
     }

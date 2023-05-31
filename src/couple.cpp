@@ -235,7 +235,10 @@ int main(int argc, char** argv)
         cout << "Failed to open output file." << endl;
         return -1;
     }
+
+    gpcr.pdbchain = 'A';
     gpcr.save_pdb(fp);
+    gnax.pdbchain = 'B';
     gnax.save_pdb(fp);
     gnax.end_pdb(fp);
     fclose(fp);

@@ -1365,7 +1365,9 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
     this.atomColor = function(atom)
     {
         var resno = atom.resno;
-        var rgnc = rgn_color(resno, true);
+        var rgnc = 0;
+		
+		if (atom.chainid == 1) rgnc = rgn_color(resno, true);
 
 		if (!rgnc)
 		{

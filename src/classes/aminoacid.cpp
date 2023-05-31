@@ -1018,6 +1018,7 @@ void AminoAcid::save_pdb(FILE* os, int atomno_offset)
 
     for (i=0; atoms[i]; i++)
     {
+        atoms[i]->pdbchain = pdbchain;
         atoms[i]->save_pdb_line(os, i+1+atomno_offset);
     }
 }

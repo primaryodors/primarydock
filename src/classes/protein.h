@@ -148,6 +148,7 @@ public:
 
     int* mcoord_resnos = NULL;
     std::vector<SoftBias> soft_biases;
+    char pdbchain = ' ';
 
 protected:
     Atom** ca = nullptr;

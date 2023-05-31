@@ -159,6 +159,7 @@ public:
     int atno_offset=0;
     MetalCoord* m_mcoord=0;
     Atom* coordmtl = nullptr;
+    char pdbchain = ' ';
 
 protected:
     void load_aa_defs();

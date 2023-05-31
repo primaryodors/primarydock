@@ -84,4 +84,20 @@ int main(int argc, char** argv)
     }
 
     cout << "GPCR contact residues: " << c359 << " " << c438 << " " << c756 << endl;
+
+    int q35 = gnax.search_sequence(1, 1000, "EKQLQKD", 6);
+    int d215 = gnax.search_sequence(120, 1000, "GIFETKFQVD");
+    int e392 = gnax.search_sequence(gnax.get_end_resno()-10, 1000, "YELL");
+
+    if (q35 < 1 || d215 < 1 || e392 < 1)
+    {
+        cout << "Cannot find G-protein motifs. Coupling fail." << endl;                 // My whole adult life has been coupling fails.
+        return -1;
+    }
+
+    q35 += 8;
+    d215 += 9;
+    e392 += 1;
+
+    cout << "G-protein contact residues: " << q35 << " " << d215 << " " << e392 << endl;
 }

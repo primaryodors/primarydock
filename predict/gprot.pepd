@@ -9,8 +9,10 @@ ECHO $SEQUENCE
 SAVE "pdbs/Gprot/hGNAS2.pdb"
 
 
-LOAD "pdbs/TAAR/8iw1.pdb"
+LOAD "pdbs/TAAR/8iw1.pdb" A
 
 ECHO $SEQUENCE
+
+RENUMBER 1 
 
 SAVE "pdbs/Gprot/hGNAL.pdb"

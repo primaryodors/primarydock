@@ -957,6 +957,50 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
     return retval;
 }
 
+std::vector<AminoAcid*> Protein::get_contact_residues(Protein* op)
+{
+    std::vector<AminoAcid*> retval;
+
+    if (!residues) return retval;
+    if (!op->residues) return retval;
+
+    int m = get_end_resno(), n = op->get_end_resno();
+    bool dirty[n + 4];
+    
+    int i, j;
+    for (i=0; i<n; i++) dirty[i] = false;
+
+    for (i=1; i<m; i++)
+    {
+        AminoAcid* a = get_residue(i);
+        if (!a) continue;
+
+        bool adirty = false;
+
+        for (j=1; j<n; j++)
+        {
+            AminoAcid* b = op->get_residue(j);
+
+            if (b)
+            {
+                if (dirty[j]) continue;
+
+                float f = a->get_reach() + b->get_reach() + 2.5;
+                float r = a->get_CA_location().get_3d_distance(b->get_CA_location());
+
+                if (r < f)
+                {
+                    if (!adirty) retval.push_back(a);
+                    retval.push_back(b);
+                    adirty = dirty[j] = true;
+                }
+            }
+        }
+    }
+
+    return retval;
+}
+
 AminoAcid** Protein::get_residues_can_clash(int resno)
 {
     if (!residues) return 0;

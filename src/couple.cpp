@@ -52,6 +52,8 @@ int main(int argc, char** argv)
 
     int bw3_50 = gpcr.get_bw50(3),
         bw4_50 = gpcr.get_bw50(4),
+        bw5_50 = gpcr.get_bw50(5),
+        bw6_50 = gpcr.get_bw50(6),
         bw7_50 = gpcr.get_bw50(7);
 
     int c438, c359, c756;
@@ -103,8 +105,10 @@ int main(int argc, char** argv)
 
 
     // Upright both proteins.
+    cout << "Turning GPCR upright..." << endl;
     gpcr.upright();
 
+    cout << "Turning G-protein upright..." << endl;
     Point pt35x4(0,0,0);
     int i, j=0;
 
@@ -162,6 +166,51 @@ int main(int argc, char** argv)
     gpcr.move_piece(1, 99999, Point(0, 0, 0));
 
 
+    // Superimpose YELL with 7.56.
+    cout << "Aligning C-terminus of G-protein..." << endl;
+
+    Point ptdest = gpcr.get_residue(c756)->get_CA_location();
+    Point ptsrc  = gnax.get_residue(e392)->get_CA_location();
+    Point ptcen(0,0,0);
+
+    // Move YELL halfway to the midpoint of 5.64 and 6.33.
+    AminoAcid* aa;
+    j = 2;
+    if (bw5_50 > 0 && bw6_50 > 0)
+    {
+        ptdest = ptdest.multiply_3d_distance(&ptcen, 2);
+
+        aa = gpcr.get_residue(bw5_50 + 14);
+        if (aa)
+        {
+            ptdest = ptdest.add(aa->get_CA_location());
+            j++;
+        }
+
+        aa = gpcr.get_residue(bw6_50 - 17);
+        if (aa)
+        {
+            ptdest = ptdest.add(aa->get_CA_location());
+            j++;
+        }
+
+        ptdest = ptdest.multiply_3d_distance(&ptcen, 1.0/j);
+    }
+
+    gnax.move_piece(1, 99999, (SCoord)ptdest.subtract(ptsrc));
+
+
+    // Rotate to align Q35 with *4.38.
+    cout << "Aligning rotation of G-protein..." << endl;
+    ptdest = gpcr.get_residue(c438)->get_CA_location();
+    ptsrc  = gnax.get_residue(q35)->get_CA_location();
+    ptcen = gnax.get_residue(e392)->get_CA_location();
+    ptsrc.y = ptdest.y = ptcen.y;
+    rot = align_points_3d(ptsrc, ptdest, ptcen);
+    gnax.rotate_piece(1, 99999, rot, e392);
+
+
+
     // Go ahead and write the output file now, to see where we're at with development.
     fp = fopen("output/coupled.pdb", "wb");
     if (!fp)
@@ -173,4 +222,5 @@ int main(int argc, char** argv)
     gnax.save_pdb(fp);
     gnax.end_pdb(fp);
     fclose(fp);
+    cout << "Wrote output file." << endl;
 }

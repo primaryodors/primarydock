@@ -7,7 +7,7 @@ DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/amino_test test/aniso_test \
 	  test/group_test_mol test/protein_test test/backbone_test
-APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor
+APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/couple
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
 all: $(DIRS) \
 	 $(OBJS) \
@@ -17,6 +17,7 @@ all: $(DIRS) \
 code: $(OBJS) $(TESTS) molecule_report $(APPS)
 primarydock: $(DIRS) $(OBJS) $(BINDIR)/primarydock
 pepteditor: $(DIRS) $(OBJS) $(BINDIR)/pepteditor
+couple: $(DIRS) $(OBJS) $(BINDIR)/couple
 
 CC=g++
 
@@ -100,6 +101,9 @@ $(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDI
 
 $(BINDIR)/pepteditor: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o
 	$(CC) src/interpreter.cpp $(OBJS) -o $(BINDIR)/pepteditor $(CFLAGS)
+
+$(BINDIR)/couple: src/couple.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o
+	$(CC) src/couple.cpp $(OBJS) -o $(BINDIR)/couple $(CFLAGS)
 
 performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.upright.pdb testdata/CAD_ion.sdf
 	./$(BINDIR)/primarydock testdata/test_TAAR8.config

@@ -1,20 +1,21 @@
 
-LOAD pdbs/OR1/OR1A1.upright.pdb
+LET $prot = "pdbs/OR1/OR1A1.upright.pdb"
+IF $arg2 THEN LET $prot = $arg2
 
+LOAD $prot
 ECHO $SEQUENCE
-
 ECHO "Searching for motifs..."
 
 SEARCH 1 %SEQLEN "HTPMYFFL" %motif
 IF %motif > 0 THEN ECHO "Found HTPMYFFL motif at " %motif
 
-SEARCH 1 %SEQLEN "PKML" %motif
+SEARCH 50 %SEQLEN "PKML" %motif
 IF %motif > 0 THEN ECHO "Found PKML motif at " %motif
 
 SEARCH 1 %SEQLEN "MAYDRYVAICXPLXY" %motif
 IF %motif > 0 THEN ECHO "Found MAYDRYVAICXPLXY motif at " %motif
 
-SEARCH 1 %SEQLEN "HFFCD" %motif
+SEARCH 100 %SEQLEN "HFFCD" %motif
 IF %motif > 0 THEN ECHO "Found HFFCD motif at " %motif
 
 SEARCH 1 %SEQLEN "GRXKAFSTCASHLXVV" %motif

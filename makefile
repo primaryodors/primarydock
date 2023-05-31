@@ -5,7 +5,7 @@ SDFDIR=sdf
 
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o
-TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/amino_test test/aniso_test \
+TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test \
 	  test/group_test_mol test/protein_test test/backbone_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report

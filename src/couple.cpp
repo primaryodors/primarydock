@@ -15,6 +15,8 @@ Protein *ggpcr, *ggnax;
 AminoAcid *pivot1, *pivot2, *pivot3, *pivot4, *pivot5, *pivot6, *pivot7;
 Molecule** gcm;
 
+const float montecarlo = fiftyseventh * 5;
+
 void show_usage()
 {
     cout << "Usage:" << endl;
@@ -22,9 +24,67 @@ void show_usage()
     cout << endl;
 }
 
+float residue_energy()
+{
+    int i;
+    float e = 0;
+
+    for (i=0; gcm[i]; i++)
+    {
+        e += gcm[i]->get_intermol_binding(gcm);
+    }
+
+    return e;
+}
+
 void iteration_callback(int iter)
 {
     cout << iter << " " << flush;
+
+    int tmrno = (iter % 7) + 1;
+    int sr, er;
+    Point pivot, axis(0,0,0);
+
+    char buffer[8];
+    sprintf(buffer, "TMR%d", tmrno);
+    sr = ggpcr->get_region_start(buffer);
+    er = ggpcr->get_region_end(buffer);
+
+    switch (tmrno)
+    {
+        case 1:        pivot = pivot1->get_CA_location();        break;
+        case 2:        pivot = pivot2->get_CA_location();        break;
+        case 3:        pivot = pivot3->get_CA_location();        break;
+        case 4:        pivot = pivot4->get_CA_location();        break;
+        case 5:        pivot = pivot5->get_CA_location();        break;
+        case 6:        pivot = pivot6->get_CA_location();        break;
+        case 7:        pivot = pivot7->get_CA_location();        break;
+    
+        default:
+        break;
+    }
+
+    float e = residue_energy(), e1 = 0, theta;
+
+    int i;
+
+    for (i=0; i<3; i++)
+    {
+        axis = Point( i==0 ? 1000 : 0, i==1 ? 1000 : 0, i==2 ? 1000 : 0 );
+
+        theta = frand(-montecarlo, montecarlo);
+        ggpcr->rotate_piece(sr, er, pivot, axis, theta);
+        e1 = residue_energy();
+        if (e1 >= e)
+        {
+            e = e1;
+        }
+        else
+        {
+            ggpcr->rotate_piece(sr, er, pivot, axis, -theta);
+        }
+    }
+
 }
 
 int main(int argc, char** argv)

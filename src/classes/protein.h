@@ -87,7 +87,7 @@ public:
     char set_pdb_chain(char chain);
 
     // Metrics functions.
-    float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false);
+    float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false, int repack_iters = 15);
     float get_rel_int_clashes();
     float get_internal_binding();
     float get_intermol_clashes(Molecule* ligand);

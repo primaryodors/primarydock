@@ -286,7 +286,7 @@ void Protein::end_pdb(FILE* os)
     fprintf(os, "END\n");
 }
 
-float Protein::get_internal_clashes(int sr, int er, bool repack)
+float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iters)
 {
     if (!residues) return 0;
     int i, j, l, m;
@@ -346,7 +346,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                     cout << "Repacking " << residues[i]->get_name() << " with" << dbgresstr << "..." << endl;
                     #endif
 
-                    Molecule::conform_molecules(interactors, backdrop, 13);
+                    Molecule::conform_molecules(interactors, backdrop, repack_iters);
                 }
 
                 for (l=0; interactors[l]; l++)

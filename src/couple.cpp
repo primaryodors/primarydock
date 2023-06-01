@@ -85,6 +85,8 @@ void iteration_callback(int iter)
         }
     }
 
+    ggpcr->get_internal_clashes(sr, er, true, 5);
+
 }
 
 int main(int argc, char** argv)

@@ -118,9 +118,9 @@ char* Rotation::printable()
 Point Point::multiply_3d_distance(const Point* reference, float r_mult)
 {
     Point retval;
-    retval.x = x*r_mult;
-    retval.y = y*r_mult;
-    retval.z = z*r_mult;
+    retval.x = (x-reference->x)*r_mult+reference->x;
+    retval.y = (y-reference->y)*r_mult+reference->y;
+    retval.z = (z-reference->z)*r_mult+reference->z;
     return retval;
 }
 

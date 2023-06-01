@@ -52,6 +52,7 @@ int main(int argc, char** argv)
 
     int bw3_50 = gpcr.get_bw50(3),
         bw4_50 = gpcr.get_bw50(4),
+        bw45_50 = gpcr.get_bw50(45),
         bw5_50 = gpcr.get_bw50(5),
         bw6_50 = gpcr.get_bw50(6),
         bw7_50 = gpcr.get_bw50(7);
@@ -171,25 +172,89 @@ int main(int argc, char** argv)
     cout << "Moving TMR6..." << endl;
 
     AminoAcid* aa;
-    aa = gpcr.get_residue(bw5_50);
-    if (!aa) cout << "No BW5.50 residue." << endl;
-    axis = aa->get_CA_location();
 
-    aa = gpcr.get_residue(bw7_50-5);
-    if (!aa) cout << "No BW7.45 residue." << endl;
-    axis = axis.subtract(aa->get_CA_location());
+    AminoAcid *sbb = nullptr, *sba = nullptr;
+    for (i=6; i<=11; i++)
+    {
+        aa = gpcr.get_residue(bw6_50+i);
+        if (aa)
+        {
+            char c = aa->get_letter();
+            if (c == 'R' || c == 'K')
+            {
+                AminoAcid* aa1 = gpcr.get_residue(bw45_50 + 1);
+                if (aa1)
+                {
+                    c = aa1->get_letter();
+                    if (c == 'D' || c == 'E')
+                    {
+                        sbb = aa;
+                        sba = aa1;
+                        cout << "Found potential salt bridge between " << *aa << " and " << *aa1 << endl;
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
-    rot.v = axis;
-    rot.a = fiftyseventh * 15;
-    gpcr.rotate_piece(gpcr.get_region_start("TMR6"), gpcr.get_region_end("TMR6"), rot, bw6_50-2);
+    Point ptdest, ptsrc;
+    Point ptcen(0,0,0);
+
+    float salt_reach = 0;
+    float salt_angle = M_PI;
+    if (sba && sbb)
+    {
+        salt_angle = find_3d_angle(sbb->get_atom("CB")->get_location(), sba->get_CA_location(), sbb->get_CA_location());
+        salt_reach = sba->get_reach() + sbb->get_reach() * (0.5 + 0.5 * cos(salt_angle)) + 2;
+    }
+
+    if (sba && sbb)
+    {
+        ptsrc = sbb->get_CA_location();
+        float salt_gap = sbb->get_CA_location().get_3d_distance(sba->get_CA_location());
+        float salt_delta = fmax(salt_gap - salt_reach, 0);
+        cout << "Moving " << *sbb << " " << salt_delta << "A." << endl;
+        ptdest = sba->get_CA_location();
+        ptdest = ptdest.multiply_3d_distance(&ptsrc, salt_delta/salt_gap);
+        cout << "Acid at " << sba->get_CA_location() << " so moving base from " << ptsrc << " to " << ptdest << endl;
+        gpcr.rotate_piece(gpcr.get_region_start("TMR6"), gpcr.get_region_end("TMR6"), sbb->get_residue_no(), ptdest, bw6_50-2);
+
+        Molecule* tobridge[4];
+        tobridge[0] = (Molecule*)sba;
+        tobridge[1] = (Molecule*)sbb;
+        tobridge[2] = nullptr;
+
+        cout << "Forming salt bridge..." << endl;
+        Molecule::conform_molecules(tobridge, 50);
+    }
+    else
+    {
+        aa = gpcr.get_residue(bw5_50);
+        if (!aa) cout << "No BW5.50 residue." << endl;
+        axis = aa->get_CA_location();
+
+        aa = gpcr.get_residue(bw7_50-5);
+        if (!aa) cout << "No BW7.45 residue." << endl;
+        axis = axis.subtract(aa->get_CA_location());
+
+        rot.v = axis;
+        rot.a = fiftyseventh * 15;
+        gpcr.rotate_piece(gpcr.get_region_start("TMR6"), gpcr.get_region_end("TMR6"), rot, bw6_50-2);
+    }
+
+
+    // Line up CYT3 to at least point to TMR6.
+    cout << "Moving CYT3..." << endl;
+    gpcr.rotate_piece(gpcr.get_region_end("TMR5")+1, gpcr.get_region_start("TMR6")-1, gpcr.get_region_start("TMR6")-1,
+        gpcr.get_residue(gpcr.get_region_start("TMR6"))->get_CA_location(), gpcr.get_region_end("TMR5"));
 
 
     // Superimpose YELL with 7.56.
     cout << "Aligning C-terminus of G-protein..." << endl;
 
-    Point ptdest = gpcr.get_residue(c756)->get_CA_location();
-    Point ptsrc  = gnax.get_residue(e392)->get_CA_location();
-    Point ptcen(0,0,0);
+    ptdest = gpcr.get_residue(c756)->get_CA_location();
+    ptsrc  = gnax.get_residue(e392)->get_CA_location();
 
     // Move YELL partway towards the midpoint of 5.64 and 6.33.
     j = 4;
@@ -225,6 +290,12 @@ int main(int argc, char** argv)
     ptsrc.y = ptdest.y = ptcen.y;
     rot = align_points_3d(ptsrc, ptdest, ptcen);
     gnax.rotate_piece(1, 99999, rot, e392);
+
+
+
+    // Do the positional fine tuning.
+    gpcr.pdbchain = 'A';
+    gnax.pdbchain = 'B';
 
 
 

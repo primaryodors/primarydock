@@ -190,6 +190,22 @@ bool Protein::add_sequence(const char* lsequence)
     return true;
 }
 
+char Protein::set_pdb_chain(char c)
+{
+    if (c >= 'A' && c <= 'Z')
+    {
+        pdbchain = c;
+    }
+
+    int i;
+    for (i=0; residues[i]; i++)
+    {
+        residues[i]->set_pdb_chain(pdbchain);
+    }
+
+    return pdbchain;
+}
+
 void Protein::save_pdb(FILE* os, Molecule* lig)
 {
     int i, offset=0;
@@ -214,7 +230,7 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
     if (!residues) return;
     for (i=0; residues[i]; i++)
     {
-        residues[i]->pdbchain = pdbchain;
+        residues[i]->set_pdb_chain(pdbchain);
         residues[i]->save_pdb(os, offset);
         offset += residues[i]->get_atom_count();
     }

@@ -201,6 +201,8 @@ int main(int argc, char** argv)
     Point ptdest, ptsrc;
     Point ptcen(0,0,0);
 
+    AminoAcid* pivot6 = nullptr;
+
     float salt_reach = 0;
     float salt_angle = M_PI;
     if (sba && sbb)
@@ -214,10 +216,10 @@ int main(int argc, char** argv)
         ptsrc = sbb->get_CA_location();
         float salt_gap = sbb->get_CA_location().get_3d_distance(sba->get_CA_location());
         float salt_delta = fmax(salt_gap - salt_reach, 0);
-        cout << "Moving " << *sbb << " " << salt_delta << "A." << endl;
+        // cout << "Moving " << *sbb << " " << salt_delta << "A." << endl;
         ptdest = sba->get_CA_location();
         ptdest = ptdest.multiply_3d_distance(&ptsrc, salt_delta/salt_gap);
-        cout << "Acid at " << sba->get_CA_location() << " so moving base from " << ptsrc << " to " << ptdest << endl;
+        // cout << "Acid at " << sba->get_CA_location() << " so moving base from " << ptsrc << " to " << ptdest << endl;
         gpcr.rotate_piece(gpcr.get_region_start("TMR6"), gpcr.get_region_end("TMR6"), sbb->get_residue_no(), ptdest, bw6_50-2);
 
         Molecule* tobridge[4];
@@ -227,6 +229,8 @@ int main(int argc, char** argv)
 
         cout << "Forming salt bridge..." << endl;
         Molecule::conform_molecules(tobridge, 50);
+
+        pivot6 = sbb;
     }
     else
     {
@@ -241,6 +245,8 @@ int main(int argc, char** argv)
         rot.v = axis;
         rot.a = fiftyseventh * 15;
         gpcr.rotate_piece(gpcr.get_region_start("TMR6"), gpcr.get_region_end("TMR6"), rot, bw6_50-2);
+
+        pivot6 = gpcr.get_residue(bw6_50-2);
     }
 
 
@@ -294,9 +300,15 @@ int main(int argc, char** argv)
 
 
     // Do the positional fine tuning.
-    gpcr.pdbchain = 'A';
-    gnax.pdbchain = 'B';
+    gpcr.set_pdb_chain('A');
+    gnax.set_pdb_chain('B');
 
+    std::vector<AminoAcid*> cr = gpcr.get_contact_residues(&gnax);
+
+    int n = cr.size();
+    cout << "Contact residues: ";
+    for (i=0; i<n; i++) cout << *cr[i] << " ";
+    cout << endl;
 
 
     // Go ahead and write the output file now, to see where we're at with development.
@@ -307,9 +319,9 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    gpcr.pdbchain = 'A';
+    gpcr.set_pdb_chain('A');
     gpcr.save_pdb(fp);
-    gnax.pdbchain = 'B';
+    gnax.set_pdb_chain('B');
     gnax.save_pdb(fp);
     gnax.end_pdb(fp);
     fclose(fp);

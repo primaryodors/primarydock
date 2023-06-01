@@ -83,6 +83,9 @@ public:
     int get_bw50(int helixno);
     int search_sequence(const int start_resno, const int end_resno, const char* search_for, const int threshold = -1, int* similarity = nullptr);
 
+    char get_pdb_chain() const { return pdbchain; }
+    char set_pdb_chain(char chain);
+
     // Metrics functions.
     float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false);
     float get_rel_int_clashes();
@@ -148,7 +151,6 @@ public:
 
     int* mcoord_resnos = NULL;
     std::vector<SoftBias> soft_biases;
-    char pdbchain = ' ';
 
 protected:
     Atom** ca = nullptr;
@@ -169,6 +171,7 @@ protected:
     std::vector<AABridge> aabridges;
     std::vector<Bond*> connections;
     std::vector<Pose> origpdb_residues;
+    char pdbchain = ' ';
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);

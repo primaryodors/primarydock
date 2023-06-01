@@ -1581,6 +1581,22 @@ Ring* AminoAcid::get_most_distal_arom_ring()
     return rings[retidx];
 }
 
+char AminoAcid::set_pdb_chain(char c)
+{
+    if (c >= 'A' && c <= 'Z')
+    {
+        pdbchain = c;
+    }
+
+    int i;
+    if (atoms) for (i=0; atoms[i]; i++)
+    {
+        atoms[i]->pdbchain = pdbchain;
+    }
+
+    return pdbchain;
+}
+
 std::ostream& operator<<(std::ostream& os, const AABondDef& b)
 {
     os << b.aname;
@@ -1697,6 +1713,10 @@ bool AminoAcid::conditionally_basic()
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 {
     if (!&aa) return os;
+
+    char c = aa.get_pdb_chain();
+    if (c && c != ' ') os << c << ":";
+
     try
     {
         AADef* raa = aa.get_aa_definition();
@@ -1706,6 +1726,7 @@ std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
     {
         ;
     }
+
     os << aa.get_residue_no();
     return os;
 }

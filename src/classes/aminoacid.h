@@ -153,13 +153,14 @@ public:
     int similarity_to(const AminoAcid* aa) { return similarity_to(aa->get_letter()); }
     Ring* get_most_distal_arom_ring();
     std::string printable();
+    char get_pdb_chain() const { return pdbchain; }
+    char set_pdb_chain(char chain);
 
     // Public properties.
     int strand;
     int atno_offset=0;
     MetalCoord* m_mcoord=0;
     Atom* coordmtl = nullptr;
-    char pdbchain = ' ';
 
 protected:
     void load_aa_defs();
@@ -171,6 +172,7 @@ protected:
     AADef* aadef=0;
     AminoAcid *prev_aa=0, *next_aa=0;
     float current_phi = M_PI, current_psi = M_PI, current_omega = M_PI;
+    char pdbchain = ' ';
 };
 
 extern AADef aa_defs[256];		// Indexed by ASCII value of one-letter code.

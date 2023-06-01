@@ -65,6 +65,7 @@ void iteration_callback(int iter)
     }
 
     float e = residue_energy(), e1 = 0, theta;
+    e -= ggpcr->get_internal_clashes(sr, er, false);
 
     int i;
 
@@ -75,6 +76,7 @@ void iteration_callback(int iter)
         theta = frand(-montecarlo, montecarlo);
         ggpcr->rotate_piece(sr, er, pivot, axis, theta);
         e1 = residue_energy();
+        e1 -= ggpcr->get_internal_clashes(sr, er, false);
         if (e1 >= e)
         {
             e = e1;

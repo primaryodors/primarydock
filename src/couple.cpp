@@ -15,7 +15,7 @@ Protein *ggpcr, *ggnax;
 AminoAcid *pivot1, *pivot2, *pivot3, *pivot4, *pivot5, *pivot6, *pivot7;
 Molecule** gcm;
 
-const float montecarlo = fiftyseventh * 5;
+const float montecarlo = fiftyseventh * 1;
 
 void show_usage()
 {

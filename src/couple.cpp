@@ -11,11 +11,20 @@
 
 using namespace std;
 
+Protein *ggpcr, *ggnax;
+AminoAcid *pivot1, *pivot2, *pivot3, *pivot4, *pivot5, *pivot6, *pivot7;
+Molecule** gcm;
+
 void show_usage()
 {
     cout << "Usage:" << endl;
     cout << "couple path/to/GPCR.pdb path/to/G-protein.pdb";
     cout << endl;
+}
+
+void iteration_callback(int iter)
+{
+    cout << iter << " " << flush;
 }
 
 int main(int argc, char** argv)
@@ -29,6 +38,9 @@ int main(int argc, char** argv)
     Protein gpcr("GPCR");
     Protein gnax("GNAX");
     FILE* fp;
+
+    ggpcr = &gpcr;
+    ggnax = &gnax;
 
     fp = fopen(argv[1], "rb");
     if (!fp)
@@ -50,7 +62,9 @@ int main(int argc, char** argv)
     fclose(fp);
     cout << "G-protein: loaded " << gnax.get_seq_length() << " residues." << endl;
 
-    int bw3_50 = gpcr.get_bw50(3),
+    int bw1_50 = gpcr.get_bw50(1),
+        bw2_50 = gpcr.get_bw50(2),
+        bw3_50 = gpcr.get_bw50(3),
         bw4_50 = gpcr.get_bw50(4),
         bw45_50 = gpcr.get_bw50(45),
         bw5_50 = gpcr.get_bw50(5),
@@ -201,7 +215,7 @@ int main(int argc, char** argv)
     Point ptdest, ptsrc;
     Point ptcen(0,0,0);
 
-    AminoAcid* pivot6 = nullptr;
+    pivot6 = nullptr;
 
     float salt_reach = 0;
     float salt_angle = M_PI;
@@ -309,6 +323,27 @@ int main(int argc, char** argv)
     cout << "Contact residues: ";
     for (i=0; i<n; i++) cout << *cr[i] << " ";
     cout << endl;
+
+    pivot1 = gpcr.get_residue(bw1_50 - 9);
+    pivot2 = gpcr.get_residue(bw2_50 + 7);
+    pivot3 = gpcr.get_residue(bw3_50 - 14);
+    pivot4 = gpcr.get_residue(bw4_50);
+    pivot5 = gpcr.get_residue(bw5_50);
+    pivot7 = gpcr.get_residue(bw7_50 - 8);
+
+    Molecule* contact_mols[n+4];
+
+    for (i=0; i<n; i++)
+    {
+        contact_mols[i] = (Molecule*)cr[i];
+    }
+    contact_mols[i] = nullptr;
+    gcm = contact_mols;
+
+    cout << "Fine tuning positions..." << endl;
+    Molecule::conform_molecules(contact_mols, 200, &iteration_callback);
+    cout << endl;
+
 
 
     // Go ahead and write the output file now, to see where we're at with development.

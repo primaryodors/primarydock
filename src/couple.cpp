@@ -17,7 +17,8 @@ Molecule** gcm;
 AminoAcid *sbb = nullptr, *sba = nullptr;
 
 const float montecarlo_theta = fiftyseventh * 1;
-const float montecarlo_xform = 0.25;
+const float montecarlo_xform = 0.5;
+const float protein_clash_penalty = 10;
 
 void show_usage()
 {
@@ -67,7 +68,7 @@ void iteration_callback(int iter)
     }
 
     float e = residue_energy(), e1 = 0, theta;
-    e -= ggpcr->get_internal_clashes(sr, er, false)*_kJmol_cuA;
+    e -= ggpcr->get_internal_clashes(sr, er, false)*_kJmol_cuA*protein_clash_penalty;
 
     int i;
 
@@ -78,7 +79,7 @@ void iteration_callback(int iter)
         theta = frand(-montecarlo_theta, montecarlo_theta);
         ggpcr->rotate_piece(sr, er, pivot, axis, theta);
         e1 = residue_energy();
-        e1 -= ggpcr->get_internal_clashes(sr, er, false)*_kJmol_cuA;
+        e1 -= ggpcr->get_internal_clashes(sr, er, false)*_kJmol_cuA*protein_clash_penalty;
         if (e1 >= e)
         {
             e = e1;
@@ -105,7 +106,7 @@ void iteration_callback(int iter)
         axis.scale(frand(-montecarlo_xform, montecarlo_xform));
         ggpcr->move_piece(sr, er, (SCoord)axis);
         e1 = residue_energy();
-        e1 -= ggpcr->get_internal_clashes(sr, er, false)*_kJmol_cuA;
+        e1 -= ggpcr->get_internal_clashes(sr, er, false)*_kJmol_cuA*protein_clash_penalty;
         if (e1 >= e)
         {
             e = e1;
@@ -119,7 +120,7 @@ void iteration_callback(int iter)
 
     float c = ggpcr->get_internal_clashes(sr, er, true, 5);
 
-    for (i=1; i<tmrno; i++) cout << "  ";
+    // for (i=1; i<tmrno; i++) cout << "     ";
     cout << c << endl;
 
 }

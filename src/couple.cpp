@@ -117,13 +117,16 @@ void iteration_callback(int iter)
         }
     }
 
-    ggpcr->get_internal_clashes(sr, er, true, 5);
+    float c = ggpcr->get_internal_clashes(sr, er, true, 5);
+
+    for (i=1; i<tmrno; i++) cout << "  ";
+    cout << c << endl;
 
 }
 
 int main(int argc, char** argv)
 {
-    if (argc < 2)
+    if (argc < 3)
     {
         show_usage();
         return -1;
@@ -157,7 +160,7 @@ int main(int argc, char** argv)
     cout << "G-protein: loaded " << gnax.get_seq_length() << " residues." << endl;
 
     const char* output_fname;
-    if (argc > 2) output_fname = argv[3];
+    if (argc > 3) output_fname = argv[3];
     else output_fname = "output/coupled.pdb";
     cout << "Output filename is " << output_fname << endl;
 

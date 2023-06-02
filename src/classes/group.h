@@ -44,6 +44,7 @@ class AtomGroup
     int intersecting(AtomGroup* compare_with);
     void merge(AtomGroup* merge_with);
     float average_similarity(AtomGroup* compare_with);
+    float hydrophilicity();
 
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol);
 
@@ -63,6 +64,7 @@ class ResidueGroup
     float compatibility(AtomGroup* ag);
     float group_reach();
     void conform_to(Molecule* mol);
+    float hydrophilicity();
 
     static std::vector<std::shared_ptr<ResidueGroup>> get_potential_side_chain_groups(AminoAcid** aalist, Point pocketcen);
 };

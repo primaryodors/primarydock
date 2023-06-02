@@ -121,7 +121,7 @@ void iteration_callback(int iter)
     float c = ggpcr->get_internal_clashes(sr, er, true, 5);
 
     // for (i=1; i<tmrno; i++) cout << "     ";
-    cout << c << endl;
+    // cout << c << endl;
 
 }
 

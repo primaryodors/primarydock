@@ -14,8 +14,10 @@ using namespace std;
 Protein *ggpcr, *ggnax;
 AminoAcid *pivot1, *pivot2, *pivot3, *pivot4, *pivot5, *pivot6, *pivot7;
 Molecule** gcm;
+AminoAcid *sbb = nullptr, *sba = nullptr;
 
-const float montecarlo = fiftyseventh * 1;
+const float montecarlo_theta = fiftyseventh * 1;
+const float montecarlo_xform = 0.25;
 
 void show_usage()
 {
@@ -73,7 +75,7 @@ void iteration_callback(int iter)
     {
         axis = Point( i==0 ? 1000 : 0, i==1 ? 1000 : 0, i==2 ? 1000 : 0 );
 
-        theta = frand(-montecarlo, montecarlo);
+        theta = frand(-montecarlo_theta, montecarlo_theta);
         ggpcr->rotate_piece(sr, er, pivot, axis, theta);
         e1 = residue_energy();
         e1 -= ggpcr->get_internal_clashes(sr, er, false)*_kJmol_cuA;
@@ -84,6 +86,34 @@ void iteration_callback(int iter)
         else
         {
             ggpcr->rotate_piece(sr, er, pivot, axis, -theta);
+        }
+
+        // Do not move salt bridge acid.
+        if (sba)
+        {
+            int resno = sba->get_residue_no();
+            if (resno >= sr && resno <= er) continue;
+        }
+
+        // Do not move salt bridge base.
+        if (sbb)
+        {
+            int resno = sbb->get_residue_no();
+            if (resno >= sr && resno <= er) continue;
+        }
+
+        axis.scale(frand(-montecarlo_xform, montecarlo_xform));
+        ggpcr->move_piece(sr, er, (SCoord)axis);
+        e1 = residue_energy();
+        e1 -= ggpcr->get_internal_clashes(sr, er, false)*_kJmol_cuA;
+        if (e1 >= e)
+        {
+            e = e1;
+        }
+        else
+        {
+            axis.scale(-axis.magnitude());
+            ggpcr->move_piece(sr, er, (SCoord)axis);
         }
     }
 
@@ -125,6 +155,11 @@ int main(int argc, char** argv)
     gnax.load_pdb(fp);
     fclose(fp);
     cout << "G-protein: loaded " << gnax.get_seq_length() << " residues." << endl;
+
+    const char* output_fname;
+    if (argc > 2) output_fname = argv[3];
+    else output_fname = "output/coupled.pdb";
+    cout << "Output filename is " << output_fname << endl;
 
     int bw1_50 = gpcr.get_bw50(1),
         bw2_50 = gpcr.get_bw50(2),
@@ -251,7 +286,6 @@ int main(int argc, char** argv)
 
     AminoAcid* aa;
 
-    AminoAcid *sbb = nullptr, *sba = nullptr;
     for (i=6; i<=11; i++)
     {
         aa = gpcr.get_residue(bw6_50+i);
@@ -410,8 +444,8 @@ int main(int argc, char** argv)
 
 
 
-    // Go ahead and write the output file now, to see where we're at with development.
-    fp = fopen("output/coupled.pdb", "wb");
+    // Write the output file.
+    fp = fopen(output_fname, "wb");
     if (!fp)
     {
         cout << "Failed to open output file." << endl;

@@ -4269,7 +4269,7 @@ _try_again:
     {
         for (j=0; j<poses; j++)
         {
-            if (dr[j][0].pose == i)
+            if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
                 if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)
                 {

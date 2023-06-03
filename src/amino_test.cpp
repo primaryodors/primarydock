@@ -68,55 +68,87 @@ int main(int argc, char** argv)
     }
     else
     {
-        if (argc>1) letter = argv[1][0];
-        AminoAcid aa(letter);
-
-        cout << "Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? "
-             << (aa.is_tyrosine_like() ? "Y" : "N") << endl;
-
-        Bond** bb = aa.get_rotatable_bonds();
-        if (bb && bb[0])
+        if (argc>1)
         {
-            for (i=0; bb[i]; i++)
+            letter = argv[1][0];
+            AminoAcid aa(letter);
+
+            cout << "Charge: " << aa.get_charge() << endl;
+
+            cout << "Is tyrosine-like (i.e. has an aromatic ring and a separate H-bond acceptor)? "
+                << (aa.is_tyrosine_like() ? "Y" : "N") << endl;
+
+            Bond** bb = aa.get_rotatable_bonds();
+            if (bb && bb[0])
             {
-                Atom** baa = bb[i]->get_moves_with_btom();
-                cout << bb[i]->atom->name << "-" << bb[i]->btom->name << " can rotate, bringing ";
-
-                if (baa)
+                for (i=0; bb[i]; i++)
                 {
-                    for (j=0; baa[j]; j++)
-                    {
-                        cout << baa[j]->name << " ";
-                    }
-                    if (!j) cout << "zero atoms.";
-                }
-                else cout << "no atoms.";
+                    Atom** baa = bb[i]->get_moves_with_btom();
+                    cout << bb[i]->atom->name << "-" << bb[i]->btom->name << " can rotate, bringing ";
 
+                    if (baa)
+                    {
+                        for (j=0; baa[j]; j++)
+                        {
+                            cout << baa[j]->name << " ";
+                        }
+                        if (!j) cout << "zero atoms.";
+                    }
+                    else cout << "no atoms.";
+
+                    cout << endl;
+                    delete[] baa;
+                }
+            }
+            else cout << "No rotatable bonds." << endl;
+
+            cout << aa.get_name() << " hydrophilicity = " << aa.hydrophilicity() << endl;
+            cout << "Similarity to A " << aa.similarity_to('A') << endl;
+            cout << "Similarity to D " << aa.similarity_to('D') << endl;
+            cout << "Similarity to R " << aa.similarity_to('R') << endl;
+            cout << "Similarity to F " << aa.similarity_to('F') << endl;
+            cout << "Similarity to C " << aa.similarity_to('C') << endl;
+            cout << "Similarity to S " << aa.similarity_to('S') << endl;
+
+            const char* outfn = "test.pdb";
+            FILE* pf = fopen(outfn, "wb");
+            aa.save_pdb(pf);
+            fclose(pf);
+            cout << "Wrote " << outfn << endl;
+
+            const char* outfn2 = "test.sdf";
+            pf = fopen(outfn2, "wb");
+            aa.save_sdf(pf);
+            fclose(pf);
+            cout << "Wrote " << outfn2 << endl;
+        }
+        else
+        {
+            const char* all_letters = "ARNDCUEQGHIKLMFPSTWYV";
+
+            int i, j, n = strlen(all_letters);
+            AminoAcid* all_aa[n+4];
+
+            for (i=0; i<n; i++)
+            {
+                all_aa[i] = new AminoAcid(all_letters[i]);
+                cout << "    " << all_letters[i];
+            }
+            cout << endl;
+
+            for (i=0; i<n; i++)
+            {
+                cout << all_letters[i] << "  ";
+                for (j=0; j<n; j++)
+                {
+                    float s = all_aa[i]->similarity_to(all_aa[j]);
+                    char buffer[16];
+                    sprintf(buffer, "%0.2f", s);
+                    cout << " " << buffer;
+                }
                 cout << endl;
-                delete[] baa;
             }
         }
-        else cout << "No rotatable bonds." << endl;
-
-        cout << aa.get_name() << " hydrophilicity = " << aa.hydrophilicity() << endl;
-        cout << "Similarity to A " << aa.similarity_to('A') << endl;
-        cout << "Similarity to D " << aa.similarity_to('D') << endl;
-        cout << "Similarity to R " << aa.similarity_to('R') << endl;
-        cout << "Similarity to F " << aa.similarity_to('F') << endl;
-        cout << "Similarity to C " << aa.similarity_to('C') << endl;
-        cout << "Similarity to S " << aa.similarity_to('S') << endl;
-
-        const char* outfn = "test.pdb";
-        FILE* pf = fopen(outfn, "wb");
-        aa.save_pdb(pf);
-        fclose(pf);
-        cout << "Wrote " << outfn << endl;
-
-        const char* outfn2 = "test.sdf";
-        pf = fopen(outfn2, "wb");
-        aa.save_sdf(pf);
-        fclose(pf);
-        cout << "Wrote " << outfn2 << endl;
     }
 
     return 0;

@@ -2131,12 +2131,14 @@ Point Molecule::get_barycenter(bool bond_weighted) const
     return average_of_points(locs, atcount);
 }
 
-float Molecule::get_charge()
+float Molecule::get_charge() const
 {
     int i;
     float charge=0;
     for (i=0; atoms[i]; i++)
     {
+        if (atoms[i]->get_Z() == 1) continue;
+        // cout << name << ":" << atoms[i]->name << " charge: " << atoms[i]->get_charge() << endl;
         charge += atoms[i]->get_charge();
     }
     return charge;

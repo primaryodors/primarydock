@@ -1562,6 +1562,11 @@ float AminoAcid::similarity_to(const AminoAcid* aa)
     }
 
     if (divis) simil /= divis;
+
+    simil -= 0.5*fabs( fmin(1, fabs(hydrophilicity())) - fmin(1, fabs(aa->hydrophilicity())) );
+    simil += 0.5*(sgn(get_charge() * aa->get_charge()));
+    simil = fmax(0, fmin(1, simil));
+
     return simil;
 }
 

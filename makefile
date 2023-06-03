@@ -107,7 +107,8 @@ performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR
 # low-tooling regression tests below
 amino_report: REPORT="test/amino_test.approved.txt"
 amino_report: test/amino_test
-	bash src/amino_tests.bash ARNDCEQGHILKMFPUSTWYV
+	./test/amino_test >test/amino_test.received.txt
+	diff --color --unified $(REPORT) test/amino_test.received.txt
 
 atom_report: REPORT="test/atom_test.approved.txt"
 atom_report: test/atom_test

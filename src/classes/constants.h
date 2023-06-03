@@ -20,6 +20,8 @@
 #define any_element -5141
 #define Avogadro 6.02214076e+23
 
+#define pH 6.0
+
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.
 #define intermol_ESP 0.05
 
@@ -265,9 +267,7 @@
 // Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,
 // if a negatively charged atom is nearby.
 #define _ALLOW_PROTONATE_PNICTOGENS 1
-#define pnictogen_partial_protonation 0.2
-#define pn_protonation_pKa_min 5
-#define _allow_conditional_basicity 0
+#define _allow_conditional_basicity 1
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0

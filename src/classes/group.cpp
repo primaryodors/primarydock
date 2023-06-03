@@ -191,7 +191,7 @@ float AtomGroup::compatibility(AminoAcid* aa)
     float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
 
     float aachg = aa->get_charge();
-    if (aa->conditionally_basic()) aachg += 0.5;
+    if (aa->conditionally_basic()) aachg += protonation(aa->sc_pKa());
     if (lgi && aachg && sgn(lgi) != -sgn(aachg)) return 0;
 
     if (aa->hydrophilicity() > 0.25)
@@ -622,12 +622,6 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
             if (dirty[j]) continue;
             AminoAcid* bb = aalist[j];
 
-            // Debug trap.
-            if (bb->get_residue_no() == 106)
-            {
-                dirty[j] = false;
-            }
-
             CB = bb->get_atom("CB");
             if (CB)
             {
@@ -673,7 +667,7 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
             }
 
             float simil = aa->similarity_to(bb);
-            if (simil >= 4)
+            if (simil >= 0.333)
             {
                 g->aminos.push_back(bb);
                 dirty[j] = true;
@@ -762,7 +756,7 @@ float GroupPair::get_potential()
 
                     if ((aa->get_charge() > 1 || aa->conditionally_basic()) && a->is_aldehyde())
                     {
-                        partial += 60;
+                        partial += protonation(aa->sc_pKa())*60;
 
                         #if _dbg_groupsel
                         cout << "Aldehyde-base potential for " << *a << "..." << *aa << " = " << partial << endl;

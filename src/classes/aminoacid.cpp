@@ -1524,36 +1524,45 @@ bool AminoAcid::can_reach(AminoAcid* other) const
     else return false;
 }
 
-int AminoAcid::similarity_to(const char letter)
+float AminoAcid::similarity_to(const char letter)
 {
     AminoAcid* a = nullptr;
     if (!aa_defs[letter].SMILES.length()) return 0;
-    if (!aa_defs[letter].loaded)
+    
+    a = new AminoAcid(letter);
+    float s = similarity_to(a);
+    delete a;
+
+    return s;
+}
+
+float AminoAcid::similarity_to(const AminoAcid* aa)
+{
+    if (!atoms || !aa->atoms) return 0;
+
+    bool polar1 = (hydrophilicity() > 0.2);
+    bool polar2 = (aa->hydrophilicity() > 0.2);
+
+    int i, j;
+    float simil=0, divis=0;
+    for (i=0; atoms[i]; i++)
     {
-        a = new AminoAcid(letter);
-        delete a;
+        bool apol = fabs(atoms[i]->is_polar()) > 0.333;
+        if (apol != polar1) continue;
+
+        for (j=0; aa->atoms[j]; j++)
+        {
+            bool bpol = fabs(aa->atoms[j]->is_polar()) > 0.333;
+            if (bpol != polar2) continue;
+
+            float f = (apol && bpol) ? 1 : 0.333;
+            simil += f*atoms[i]->similarity_to(aa->atoms[j]);
+            divis += f;
+        }
     }
-    if (!aadef) return 0;
 
-    int retval = 0;
-    if (aadef->hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD
-            &&
-            aa_defs[letter].hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD)
-    {
-        retval += fmin(aadef->hydrophilicity, aa_defs[letter].hydrophilicity)*2;
-        if (aadef->charged == aa_defs[letter].charged) retval += 1;
-    }
-    if (aadef->hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD
-            &&
-            aa_defs[letter].hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD)
-        retval += 2;
-    // cout << aadef->hydrophilicity << "|" << aa_defs[letter].hydrophilicity << endl;
-    // return retval;
-
-    if (aadef->aromatic == aa_defs[letter].aromatic) retval += 2;
-    if (aadef->can_coord_metal == aa_defs[letter].can_coord_metal) retval += 1;
-
-    return retval;
+    if (divis) simil /= divis;
+    return simil;
 }
 
 Ring* AminoAcid::get_most_distal_arom_ring()
@@ -1629,7 +1638,8 @@ bool AminoAcid::is_tyrosine_like()
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
-        if (atoms[i]->get_Z() == 7 || atoms[i]->get_Z() == 8 || atoms[i]->is_polar() < 0)
+        if (atoms[i]->get_Z() == 1) continue;
+        if (atoms[i]->is_polar() < -0.333)
         {
             bool part_of_arom_ring = false;
 
@@ -1651,7 +1661,8 @@ bool AminoAcid::is_tyrosine_like()
             if (!part_of_arom_ring)
             {
                 #if DBG_TYRLIKE
-                cout << atoms[i]->name << " seems to be ringless, yup not missing any important info, derp." << endl;
+                cout << atoms[i]->name << " seems to be ringless, polarity " << atoms[i]->is_polar()
+                     << " yup not missing any important info, derp." << endl;
                 #endif
 
                 return true;
@@ -1674,7 +1685,12 @@ bool AminoAcid::is_glycine()
     return true;
 }
 
-bool AminoAcid::conditionally_basic()
+float AminoAcid::sc_pKa() const
+{
+    return aadef->sidechain_pKa;
+}
+
+bool AminoAcid::conditionally_basic() const
 {
     #if _allow_conditional_basicity
     if (!atoms) return false;
@@ -1686,7 +1702,7 @@ bool AminoAcid::conditionally_basic()
         if (atoms[i]->get_Z() == 1) continue;
         if (atoms[i]->get_family() == PNICTOGEN)
         {
-            if (aadef->sidechain_pKa >= 4 && aadef->sidechain_pKa < 7) return true;
+            if (aadef->sidechain_pKa >= 5 && aadef->sidechain_pKa < 7) return true;
         }
     }
     #endif
@@ -1749,7 +1765,7 @@ Atom* AminoAcid::capable_of_inter(intera_type inter)
     return retval;
 }
 
-float AminoAcid::hydrophilicity()
+float AminoAcid::hydrophilicity() const
 {
     int i, count=0;
     float total=0;
@@ -1761,7 +1777,7 @@ float AminoAcid::hydrophilicity()
         int fam = atoms[i]->get_family();
         if (Z==1) continue;
 
-        if (fam == PNICTOGEN && conditionally_basic()) total += protonation(6.0)*2;         // Histidine is currently the only conditionally basic AA.
+        if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;         // Histidine is currently the only conditionally basic AA.
 
         total += atoms[i]->hydrophilicity_rule();
         count++;

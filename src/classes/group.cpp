@@ -622,12 +622,6 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
             if (dirty[j]) continue;
             AminoAcid* bb = aalist[j];
 
-            // Debug trap.
-            if (bb->get_residue_no() == 106)
-            {
-                dirty[j] = false;
-            }
-
             CB = bb->get_atom("CB");
             if (CB)
             {
@@ -673,7 +667,7 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
             }
 
             float simil = aa->similarity_to(bb);
-            if (simil >= 4)
+            if (simil >= 0.333)
             {
                 g->aminos.push_back(bb);
                 dirty[j] = true;

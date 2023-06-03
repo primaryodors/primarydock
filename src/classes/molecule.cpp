@@ -2138,7 +2138,6 @@ float Molecule::get_charge() const
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->get_Z() == 1) continue;
-        // cout << name << ":" << atoms[i]->name << " charge: " << atoms[i]->get_charge() << endl;
         charge += atoms[i]->get_charge();
     }
     return charge;

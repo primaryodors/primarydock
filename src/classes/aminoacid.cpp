@@ -1782,7 +1782,7 @@ float AminoAcid::hydrophilicity() const
         int fam = atoms[i]->get_family();
         if (Z==1) continue;
 
-        if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;         // Histidine is currently the only conditionally basic AA.
+        if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
 
         total += atoms[i]->hydrophilicity_rule();
         count++;

@@ -5,7 +5,7 @@ SDFDIR=sdf
 
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o
-TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/amino_test test/aniso_test \
+TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test \
 	  test/group_test_mol test/protein_test test/backbone_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
@@ -14,7 +14,7 @@ all: $(DIRS) \
 	 $(TESTS) \
 	 $(APPS) \
 	 $(REPORTS)
-code: $(OBJS) $(TESTS) molecule_report $(APPS)
+code: $(OBJS) $(TESTS) amino_report molecule_report $(APPS)
 primarydock: $(DIRS) $(OBJS) $(BINDIR)/primarydock
 pepteditor: $(DIRS) $(OBJS) $(BINDIR)/pepteditor
 
@@ -107,7 +107,8 @@ performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR
 # low-tooling regression tests below
 amino_report: REPORT="test/amino_test.approved.txt"
 amino_report: test/amino_test
-	bash src/amino_tests.bash ARNDCEQGHILKMFPUSTWYV
+	./test/amino_test >test/amino_test.received.txt
+	diff --color --unified $(REPORT) test/amino_test.received.txt
 
 atom_report: REPORT="test/atom_test.approved.txt"
 atom_report: test/atom_test

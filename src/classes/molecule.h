@@ -98,7 +98,7 @@ public:
     Atom* get_nearest_atom(Point loc) const;
     Atom* get_nearest_atom(Point loc, intera_type capable_of) const;
     Point get_bounding_box() const;				// Return the +x+y+z vertex of a bounding box, including vdW radii, if center={0,0,0}.
-    float get_charge();
+    float get_charge() const;
     int is_residue();
     bool is_thiol();
 

@@ -267,7 +267,7 @@
 #define _ALLOW_PROTONATE_PNICTOGENS 1
 #define pnictogen_partial_protonation 0.2
 #define pn_protonation_pKa_min 5
-#define _allow_conditional_basicity 0
+#define _allow_conditional_basicity 1
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0

@@ -1761,6 +1761,8 @@ float AminoAcid::hydrophilicity()
         int fam = atoms[i]->get_family();
         if (Z==1) continue;
 
+        if (fam == PNICTOGEN && conditionally_basic()) total += 1;
+
         total += atoms[i]->hydrophilicity_rule();
         count++;
     }

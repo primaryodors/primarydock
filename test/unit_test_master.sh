@@ -11,20 +11,40 @@ else
     echo "Make code FAILED."
 fi
 
-# TODO: Some way to evaluate whether dock results exist and have good enough contacts on Asp111 and Asp201.
-bin/primarydock test/testTAAR8.config --colorless --pose 2 --iter 25 --congress > test/received/TAAR8_CAD.txt
+
+bin/primarydock test/testTAAR8.config --colorless --pose 5 --iter 50 --congress > test/received/TAAR8_CAD.txt
 TAAR_RESULT=$?
 if [ "$TAAR_RESULT" -eq "0" ]; then
-    echo "TAAR test succeeded."
+    POSES=$( cat test/received/TAAR8_CAD.txt | grep "pose(s) found" )
+    if [ -z "$POSES" ]; then
+        echo "TAAR test FAILED: no poses."
+    else
+        ASP111=$( cat test/received/TAAR8_CAD.txt | grep -m 1 "Asp111: " )
+        ASP111="${ASP111/Asp111: /}"
+        ASP111="${ASP111/[.][0-9]*/}"
+        ASP201=$( cat test/received/TAAR8_CAD.txt | grep -m 1 "Asp201: " )
+        ASP201="${ASP201/Asp201: /}"
+        ASP201="${ASP201/[.][0-9]*/}"
+        if [[ $ASP111 -gt "-35"  ]] || [[ $ASP201 -gt "-35"  ]]; then
+            echo "TAAR test FAILED: bad contacts."
+        else
+            echo "TAAR test succeeded."
+        fi
+    fi
 else
-    echo "TAAR test FAILED."
+    echo "TAAR test FAILED: return value."
 fi
 
-# TODO: Some way to evaluate whether at least one dock result was returned.
-bin/primarydock test/test1A1.config --colorless --pose 3 --iter 30 --congress > test/received/TAAR8_CAD.txt
+
+bin/primarydock test/test1A1.config --colorless --pose 5 --iter 50 --congress > test/received/OR1A1_dLIMN.txt
 DLIMN_RESULT=$?
 if [ "$DLIMN_RESULT" -eq "0" ]; then
-    echo "d-limonene test succeeded."
+    POSES=$( cat test/received/OR1A1_dLIMN.txt | grep "pose(s) found" )
+    if [ -z "$POSES" ]; then
+        echo "d-limonene test FAILED: no poses."
+    else
+        echo "d-limonene test succeeded."
+    fi
 else
     echo "d-limonene test FAILED."
 fi

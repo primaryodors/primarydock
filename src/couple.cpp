@@ -125,6 +125,24 @@ void iteration_callback(int iter)
 
 }
 
+void do_template_homology(const char* template_path)
+{
+    Protein tpl("Template");
+    fp = fopen(template_path, "rb");
+    if (!fp)
+    {
+        cout << "File not found: " << template_path;
+        return -1;
+    }
+    else
+    {
+        tpl.load_pdb(fp);
+        fclose(fp);
+
+        ggpcr->homology_conform(&tpl);
+    }
+}
+
 int main(int argc, char** argv)
 {
     if (argc < 3)
@@ -288,22 +306,7 @@ int main(int argc, char** argv)
     // Do a homology with the OR51E2 cryo-EM model.
     // Yes this is hard coded for now. Have to design a flat file to hold the params.
     cout << "Applying homology from cryo-EM model..." << endl;
-    Protein tpl("Template");
-    const char* template_path = "pdbs/OR51/OR51E2.8f76.pdb";
-    fp = fopen(template_path, "rb");
-    if (!fp)
-    {
-        cout << "File not found: " << template_path;
-        return -1;
-    }
-    else
-    {
-        tpl.load_pdb(fp);
-        fclose(fp);
-
-        gpcr.homology_conform(&tpl);
-    }
-
+    do_template_homology();
 
 
     // Move TMR6 out of the way sooner than later.

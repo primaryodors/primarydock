@@ -434,13 +434,16 @@ int main(int argc, char** argv)
     int i, j, l, n;
     fp = fopen(prot1fname.c_str(), "rb");
     if (!fp) throw 0xbadcf6;
+    cout << "Reading protein 1..." << endl;
     p1.load_pdb(fp);
     fclose(fp);
     fp = fopen(prot2fname.c_str(), "rb");
     if (!fp) throw 0xbadcf6;
+    cout << "Reading protein 2..." << endl;
     p2.load_pdb(fp);
     fclose(fp);
 
+    cout << "Reading parameters..." << endl;
     n = contacts.size();
     Star swap;
     for (i=0; i<n; i++)
@@ -501,6 +504,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    cout << "Aligning..." << endl;
     Point rel = contacts[l].aa1->get_CA_location().subtract(contacts[l].aa2->get_CA_location());
     int resno1 = contacts[l].aa2->get_residue_no();
     p2.move_piece(1, 99999, (SCoord)rel);
@@ -527,7 +531,8 @@ int main(int argc, char** argv)
     int resno3 = contacts[l].aa2->get_residue_no();
     p2.rotate_piece(1, 99999, resno3, ref, resno2);
 
-    for (i=0; i<100; i++)
+    cout << "Iterating";
+    for (i=0; i<20; i++)
     {
         for (l=0; l<n; l++)
         {
@@ -542,7 +547,10 @@ int main(int argc, char** argv)
 
             p2.rotate_piece(1, 99999, rot, 0);
         }
+
+        cout << "." << flush;
     }
+    cout << endl;
 
     // Next, move p2 away from p1 (along barycenter-to-barycenter axis) until no clashes.
 

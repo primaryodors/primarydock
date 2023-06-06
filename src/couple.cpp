@@ -12,6 +12,8 @@
 
 using namespace std;
 
+Protein *g_prot1, *g_prot2;         // Global protein pointers; not necessarily G-proteins.
+
 class Contact
 {
     public:
@@ -21,9 +23,115 @@ class Contact
 
     void interpret_cfgs()
     {
-        // TODO:
-    }
-}
+        int n, i, j;
+        char c[256];
+        Protein* which;
+        for (n=1; n<=2; n++)
+        {
+            if (n==1) strcpy(c, cfgstr1.c_str());
+            if (n==2) strcpy(c, cfgstr2.c_str());
+
+            i = 0;
+            if (c[1] == ':')
+            {
+                if (c[0] < '1' || c[0] > '2') throw 0xbadcf6;
+                else
+                {
+                    if (n==1) prot1 = (c[0]=='1') ? g_prot1 : g_prot2;
+                    if (n==2) prot2 = (c[0]=='1') ? g_prot1 : g_prot2;
+                    i += 2;
+                }
+            }
+            else
+            {
+                prot1 = g_prot1;
+                prot2 = g_prot2;
+            }
+
+            which = (n==1) ? prot1 : prot2;
+
+            int mode = 0;
+            std::vector<char> allowed_aa;
+            char* has_dot = nullptr;
+            int resno=0, tol=0;
+
+            for (; c[i]; i++)
+            {
+                switch (mode)
+                {
+                    case 0:     // Getting amino acids.
+                    if (c[i] >= '0' && c[i] <= '9') mode = 1;
+                    else
+                    {
+                        allowed_aa.push_back(c[i]);
+                    }
+                    break;
+
+                    case 1:     // Getting residue number.
+                    for (j=i; (c[j] >= '0' && c[j] <= '9') || c[j] == '.'; j++)
+                    {
+                        if (c[j] == '.') has_dot = &c[j];
+                    }
+
+                    if (c[j] == '~') mode = 2;
+                    c[j] = 0;
+                    
+                    if (has_dot)
+                    {
+                        *has_dot = 0;
+                        resno = which->get_bw50(atoi(&c[i]));
+                        *has_dot = '.';
+                        resno += atoi(&has_dot[1]) - 50;
+                    }
+                    else
+                    {
+                        resno = atoi(&c[i]);
+                    }
+
+                    if (mode==2) c[j] = '~';
+                    i = j;
+                    break;
+
+                    case 2:     // Getting tolerance.
+                    tol = atoi(&c[i]);
+                }
+            }
+
+            if (!resno) throw 0xbadcf6;
+
+            bool found = false;
+            for (i = 0; i <= tol; i++)
+            {
+                AminoAcid *aa = which->get_residue(resno+i);
+                if (aa && std::find(allowed_aa.begin(), allowed_aa.end(), aa->get_letter()) != allowed_aa.end())
+                {
+                    if (n==1) aa1 = aa;
+                    if (n==2) aa2 = aa;
+                    found = true;
+                    break;
+                }
+                else
+                {
+                    aa = which->get_residue(resno-i);
+                    if (aa && std::find(allowed_aa.begin(), allowed_aa.end(), aa->get_letter()) != allowed_aa.end())
+                    {
+                        if (n==1) aa1 = aa;
+                        if (n==2) aa2 = aa;
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!found)
+            {            // If fail condition, blank both AA pointers and return. Contact cannot be made and will be skipped.
+                aa1 = aa2 = nullptr;
+                return;
+            }
+
+        }           // for n.
+    }           // interpret cfgs.
+};
 
 class MovablePiece
 {
@@ -38,7 +146,7 @@ class MovablePiece
         // TODO:
     }
 
-    function do_motion(SCoord move_amt)
+    void do_motion(SCoord move_amt)
     {
         if (!prot) throw 0xbadc0de;
         if (!start_residue || !end_residue) throw 0xbadc0de;
@@ -51,7 +159,7 @@ class MovablePiece
             Point pivf = first_pivot->get_CA_location();
             Point old = start_residue->get_CA_location();
             Point nouion = old.add(rel);
-            nouion = nouion.multiply_3d_distance(pivf, old.get_3d_distance(pivf) / nouion.get_3d_distance(pivf) );
+            nouion = nouion.multiply_3d_distance(&pivf, old.get_3d_distance(pivf) / nouion.get_3d_distance(pivf) );
             rel = nouion.subtract(old);
         }
         if (last_pivot)
@@ -59,7 +167,7 @@ class MovablePiece
             Point pivf = last_pivot->get_CA_location();
             Point old = end_residue->get_CA_location();
             Point nouion = old.add(rel);
-            nouion = nouion.multiply_3d_distance(pivf, old.get_3d_distance(pivf) / nouion.get_3d_distance(pivf) );
+            nouion = nouion.multiply_3d_distance(&pivf, old.get_3d_distance(pivf) / nouion.get_3d_distance(pivf) );
             rel = nouion.subtract(old);
         }
 
@@ -100,21 +208,20 @@ class MovablePiece
 
     }
 
-    function do_rotation(SCoord axis, float theta)
+    void do_rotation(SCoord axis, float theta)
     {
         // Check the direction of rotation and correct if necessary.
 
         // TODO:
 
     }
-}
+};
 
-Protein *g_prot1, *g_prot2;         // Global protein pointers; not necessarily G-proteins.
-AminoAcid *pivot1, *pivot2, *pivot3, *pivot4, *pivot5, *pivot6, *pivot7;
 Molecule** g_contacts_as_mols;
 AminoAcid *sbb = nullptr, *sba = nullptr;
 
 std::string prot1fname, prot2fname;
+char output_fname[256];
 std::vector<Contact> contacts;
 std::vector<MovablePiece> segments;
 
@@ -172,6 +279,11 @@ int interpret_cfg_param(char** words)
 
         return i;
     }
+    else if (!strcmp(words[0], "OUT"))
+    {
+        strcpy(output_fname, words[1]);
+        return 2;
+    }
 
     return 0;
 }
@@ -198,99 +310,14 @@ void read_cfg_lines(FILE* fp)
     }
 }
 
-void iteration_callback(int iter)
-{
-    cout << iter << " " << flush;
-
-    int tmrno = (iter % 7) + 1;
-    int sr, er;
-    Point pivot, axis(0,0,0);
-
-    char buffer[8];
-    sprintf(buffer, "TMR%d", tmrno);
-    sr = g_prot1->get_region_start(buffer);
-    er = g_prot1->get_region_end(buffer);
-
-    switch (tmrno)
-    {
-        case 1:        pivot = pivot1->get_CA_location();        break;
-        case 2:        pivot = pivot2->get_CA_location();        break;
-        case 3:        pivot = pivot3->get_CA_location();        break;
-        case 4:        pivot = pivot4->get_CA_location();        break;
-        case 5:        pivot = pivot5->get_CA_location();        break;
-        case 6:        pivot = pivot6->get_CA_location();        break;
-        case 7:        pivot = pivot7->get_CA_location();        break;
-    
-        default:
-        break;
-    }
-
-    float e = residue_energy(), e1 = 0, theta;
-    e -= g_prot1->get_internal_clashes(sr, er, false)*_kJmol_cuA*protein_clash_penalty;
-
-    int i;
-
-    for (i=0; i<3; i++)
-    {
-        axis = Point( i==0 ? 1000 : 0, i==1 ? 1000 : 0, i==2 ? 1000 : 0 );
-
-        theta = frand(-montecarlo_theta, montecarlo_theta);
-        g_prot1->rotate_piece(sr, er, pivot, axis, theta);
-        e1 = residue_energy();
-        e1 -= g_prot1->get_internal_clashes(sr, er, false)*_kJmol_cuA*protein_clash_penalty;
-        if (e1 >= e)
-        {
-            e = e1;
-        }
-        else
-        {
-            g_prot1->rotate_piece(sr, er, pivot, axis, -theta);
-        }
-
-        // Do not move salt bridge acid.
-        if (sba)
-        {
-            int resno = sba->get_residue_no();
-            if (resno >= sr && resno <= er) continue;
-        }
-
-        // Do not move salt bridge base.
-        if (sbb)
-        {
-            int resno = sbb->get_residue_no();
-            if (resno >= sr && resno <= er) continue;
-        }
-
-        axis.scale(frand(-montecarlo_xform, montecarlo_xform));
-        g_prot1->move_piece(sr, er, (SCoord)axis);
-        e1 = residue_energy();
-        e1 -= g_prot1->get_internal_clashes(sr, er, false)*_kJmol_cuA*protein_clash_penalty;
-        if (e1 >= e)
-        {
-            e = e1;
-        }
-        else
-        {
-            axis.scale(-axis.magnitude());
-            g_prot1->move_piece(sr, er, (SCoord)axis);
-        }
-    }
-
-    float c = g_prot1->get_internal_clashes(sr, er, true, 5);
-
-    // for (i=1; i<tmrno; i++) cout << "     ";
-    // cout << c << endl;
-
-}
-
 void do_template_homology(const char* template_path)
 {
     Protein tpl("Template");
-    fp = fopen(template_path, "rb");
+    FILE* fp = fopen(template_path, "rb");
     if (!fp)
     {
         cout << "File not found: " << template_path;
-        return -1;
+        throw 0xbadcf6;
     }
     else
     {
@@ -308,6 +335,8 @@ int main(int argc, char** argv)
         show_usage();
         return -1;
     }
+
+    strcpy(output_fname, "output/coupled.pdb");
 
     Protein p1("Prot1");
     Protein p2("Prot2");
@@ -329,8 +358,14 @@ int main(int argc, char** argv)
     
 
     int i, n;
-    p1.load_pdb(prot1fname);
-    p2.load_pdb(prot2fname);
+    fp = fopen(prot1fname.c_str(), "rb");
+    if (!fp) throw 0xbadcf6;
+    p1.load_pdb(fp);
+    fclose(fp);
+    fp = fopen(prot2fname.c_str(), "rb");
+    if (!fp) throw 0xbadcf6;
+    p2.load_pdb(fp);
+    fclose(fp);
 
     n = contacts.size();
     for (i=0; i<n; i++)
@@ -367,11 +402,11 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    gpcr.set_pdb_chain('A');
-    gpcr.save_pdb(fp);
-    gnax.set_pdb_chain('B');
-    gnax.save_pdb(fp);
-    gnax.end_pdb(fp);
+    p1.set_pdb_chain('A');
+    p1.save_pdb(fp);
+    p2.set_pdb_chain('B');
+    p2.save_pdb(fp);
+    p2.end_pdb(fp);
     fclose(fp);
     cout << "Wrote output file." << endl;
 }

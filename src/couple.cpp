@@ -402,6 +402,22 @@ void do_template_homology(const char* template_path)
     }
 }
 
+void optimize_contacts()
+{
+    int i, n;
+
+    n = contacts.size();
+    for (i=0; i<n; i++)
+    {
+        Molecule* cfmols[4];
+        cfmols[0] = (Molecule*)contacts[i].aa1;
+        cfmols[1] = (Molecule*)contacts[i].aa2;
+        cfmols[2] = nullptr;
+
+        Molecule::conform_molecules(cfmols);
+    }
+}
+
 int main(int argc, char** argv)
 {
     if (argc < 2)
@@ -431,7 +447,7 @@ int main(int argc, char** argv)
     // TODO: Command line args.
     
 
-    int i, j, l, n;
+    int i, j, l, m, n;
     fp = fopen(prot1fname.c_str(), "rb");
     if (!fp) throw 0xbadcf6;
     cout << "Reading protein 1..." << endl;
@@ -491,6 +507,9 @@ int main(int argc, char** argv)
     l = -1;
     for (i=0; i<n; i++)
     {
+        cout << "Found contact residues " << contacts[i].prot1->get_name() << ":" << *contacts[i].aa1
+             << " and " << contacts[i].prot2->get_name() << ":" << *contacts[i].aa2
+             << endl;
         if (contacts[i].prot1 != contacts[i].prot2)
         {
             j++;
@@ -557,11 +576,28 @@ int main(int argc, char** argv)
     }
     cout << endl;
 
-    // Next, move p2 away from p1 (along barycenter-to-barycenter axis) until no clashes.
-
-    // Finally, iteratively wiggle the segments around to get optimal contacts and minimal clashes.
+    // Next, iteratively wiggle the segments around to get optimal contacts and minimal clashes.
     // Include small transformations and rotations of p2 to search the conformational space.
+    Point pcen = p1.get_region_center(1, p1.get_end_resno());
+    std::vector<AminoAcid*> cr = p1.get_contact_residues(&p2);
+    n = cr.size();
+    g_contacts_as_mols = new Molecule*[n+4];
 
+    for (i=0; i<n; i++) g_contacts_as_mols[i] = (Molecule*)cr[i];
+    g_contacts_as_mols[i] = nullptr;
+
+    n = segments.size();
+    for (i=0; i<20; i++)
+    {
+        optimize_contacts();
+
+        //
+
+        for (j=0; j<n; j++)
+        {
+            //
+        }
+    }
 
     // Write the output file.
     fp = fopen(output_fname, "wb");
@@ -571,6 +607,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    optimize_contacts();
     p1.set_pdb_chain('A');
     p1.save_pdb(fp);
     p2.renumber_residues(1, p2.get_end_resno(), 1001);

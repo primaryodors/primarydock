@@ -595,7 +595,7 @@ float Atom::hydrophilicity_rule()
         if (is_bonded_to("H") || is_bonded_to(CHALCOGEN)) total += 1;
     }
 
-    total += fabs(get_charge());
+    total += 1.5*fabs(get_charge());
 
     return total;
 }

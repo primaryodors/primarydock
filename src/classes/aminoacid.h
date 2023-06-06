@@ -95,7 +95,8 @@ public:
     }
     bool is_tyrosine_like();		// An amino acid is tyrosine-like if it has an aromatic ring and a non-backbone H-bond acceptor not part of the ring.
     bool is_glycine();              // Glycine is a special case where there are no non-backbone heavy atoms.
-    bool conditionally_basic();
+    bool conditionally_basic() const;
+    float sc_pKa() const;
     float get_reach() const
     {
         return aadef ? aadef->reach : 2.5;
@@ -144,13 +145,13 @@ public:
     // Intermol functions.
     float get_intermol_binding(AminoAcid* neighbor, bool backbone_atoms_only = false);
     float get_intermol_binding(AminoAcid** neighbors, bool backbone_atoms_only = false);
-    float hydrophilicity();
+    float hydrophilicity() const;
 
     // Misc.
     void delete_sidechain();
     static Molecule** aas_to_mols(AminoAcid** aas);
-    int similarity_to(const char letter);
-    int similarity_to(const AminoAcid* aa) { return similarity_to(aa->get_letter()); }
+    float similarity_to(const char letter);
+    float similarity_to(const AminoAcid* aa);
     Ring* get_most_distal_arom_ring();
     std::string printable();
     char get_pdb_chain() const { return pdbchain; }

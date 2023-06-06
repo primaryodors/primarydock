@@ -271,6 +271,29 @@ float residue_binding_multiplier(int resno)
 }
 #endif
 
+const float pH_minus_pKa[22] = {-1.9, -0.9, -0.4, -0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.6, 2.1, 2.6, 3.1};
+const float f_protonated[22] = {0.988, 0.888, 0.715, 0.666, 0.613, 0.557, 0.5, 0.443, 0.387, 0.334, 0.285, 0.240, 0.201, 0.166, 0.137, 0.112, 0.091, 0.074, 0.024, 0.008, 0.002, 0.001};
+float protonation(float pKa)
+{
+    float d = pH - pKa;
+    int i;
+
+    if (d < pH_minus_pKa[0]) return 1;
+    else if (d > pH_minus_pKa[21]) return 0;
+
+    float f;
+    for (i=0; i<21; i++)
+    {
+        f = (d - pH_minus_pKa[i]) / (pH_minus_pKa[i+1] - pH_minus_pKa[i]);
+        if (f <= 1)
+        {
+            float e = 1.0 - f;
+            return e*f_protonated[i] + f*f_protonated[i+1];
+        }
+    }
+
+    throw 0xbadbca;
+}
 
 
 

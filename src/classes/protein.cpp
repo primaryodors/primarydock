@@ -874,12 +874,11 @@ void Protein::set_clashables(int resno, bool recursed)
     int maxres = get_end_resno();
     if (resno <= 0)
     {
-        if (res_can_clash)
+        if (!res_can_clash)
         {
-            delete[] res_can_clash;
+            res_can_clash = new AminoAcid**[maxres+8];
+            for (i=0; i<=maxres; i++) res_can_clash[i] = nullptr;
         }
-        res_can_clash = new AminoAcid**[maxres+8];
-        for (i=0; i<=maxres; i++) res_can_clash[i] = nullptr;
     }
 
     int sr = get_start_resno(), er = get_end_resno();
@@ -905,8 +904,8 @@ void Protein::set_clashables(int resno, bool recursed)
             }
         }
 
-        if (res_can_clash[0] && res_can_clash[i]) delete res_can_clash[i];
-        res_can_clash[i] = new AminoAcid*[k+8];
+        if (!res_can_clash[i])
+            res_can_clash[i] = new AminoAcid*[maxres+8];
         for (j=0; j<k; j++)
         {
             res_can_clash[i][j] = temp[j];
@@ -2449,8 +2448,8 @@ void Protein::move_piece(int start_res, int end_res, SCoord move_amt)
         aa->movability = MOV_ALL;
         aa->aamove(move_amt);
         aa->movability = mov;
-        set_clashables(i);
     }
+    set_clashables(i);
 }
 
 LocRotation Protein::rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res)

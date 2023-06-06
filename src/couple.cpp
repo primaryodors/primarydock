@@ -507,7 +507,7 @@ int main(int argc, char** argv)
     cout << "Aligning..." << endl;
     Point rel = contacts[l].aa1->get_CA_location().subtract(contacts[l].aa2->get_CA_location());
     int resno1 = contacts[l].aa2->get_residue_no();
-    p2.move_piece(1, 99999, (SCoord)rel);
+    p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
     l++;
     while (contacts[l].prot1 == contacts[l].prot2)
@@ -518,7 +518,7 @@ int main(int argc, char** argv)
 
     Point ref = contacts[l].aa1->get_CA_location();
     int resno2 = contacts[l].aa2->get_residue_no();
-    p2.rotate_piece(1, 99999, resno2, ref, resno1);
+    p2.rotate_piece(1, p2.get_end_resno(), resno2, ref, resno1);
 
     l++;
     while (contacts[l].prot1 == contacts[l].prot2)
@@ -529,7 +529,7 @@ int main(int argc, char** argv)
 
     ref = contacts[l].aa1->get_CA_location();
     int resno3 = contacts[l].aa2->get_residue_no();
-    p2.rotate_piece(1, 99999, resno3, ref, resno2);
+    p2.rotate_piece(1, p2.get_end_resno(), resno3, ref, resno2);
 
     cout << "Iterating";
     for (i=0; i<20; i++)
@@ -540,12 +540,17 @@ int main(int argc, char** argv)
 
             Point pt = contacts[l].aa2->get_CA_location(),
                   algn = contacts[l].aa1->get_CA_location(),
-                  cen = contacts[l].prot2->get_region_center(1, 99999);
+                  cen = contacts[l].prot2->get_region_center(1, contacts[l].prot2->get_end_resno());
             
             Rotation rot = align_points_3d(pt, algn, cen);
             rot.a /= 3;
 
-            p2.rotate_piece(1, 99999, rot, 0);
+            p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
+
+            rel = contacts[l].aa1->get_CA_location().subtract(contacts[l].aa2->get_CA_location());
+            rel.scale(rel.magnitude()/3);
+
+            p2.move_piece(1, 99999, (SCoord)rel);
         }
 
         cout << "." << flush;
@@ -568,6 +573,7 @@ int main(int argc, char** argv)
 
     p1.set_pdb_chain('A');
     p1.save_pdb(fp);
+    p2.renumber_residues(1, p2.get_end_resno(), 1001);
     p2.set_pdb_chain('B');
     p2.save_pdb(fp);
     p2.end_pdb(fp);

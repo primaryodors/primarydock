@@ -2061,10 +2061,11 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     if (strlen(name) < 2) fprintf(pf, " ");
 
     if (!pdbchain) pdbchain = ' ';
-    fprintf(pf, "%s %c ", aa3let, pdbchain);
+    fprintf(pf, "%s %c", aa3let, pdbchain);
 
-    if (residue < 100) fprintf(pf, " ");
-    if (residue <  10) fprintf(pf, " ");
+    if (residue < 1000) fprintf(pf, " ");
+    if (residue <  100) fprintf(pf, " ");
+    if (residue <   10) fprintf(pf, " ");
     fprintf(pf, "%d    ", residue);
 
     if (!location.x) location.x = 0;

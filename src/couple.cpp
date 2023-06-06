@@ -357,7 +357,7 @@ int main(int argc, char** argv)
     // TODO: Command line args.
     
 
-    int i, n;
+    int i, j, l, n;
     fp = fopen(prot1fname.c_str(), "rb");
     if (!fp) throw 0xbadcf6;
     p1.load_pdb(fp);
@@ -368,11 +368,28 @@ int main(int argc, char** argv)
     fclose(fp);
 
     n = contacts.size();
+    Star swap;
     for (i=0; i<n; i++)
     {
         contacts[i].prot1 = &p1;
         contacts[i].prot2 = &p2;
         contacts[i].interpret_cfgs();
+
+        if (contacts[i].prot1 == g_prot2 && contacts[i].prot2 == g_prot1)
+        {
+            swap.pprot = contacts[i].prot2;
+            contacts[i].prot2 = contacts[i].prot1;
+            contacts[i].prot1 = swap.pprot;
+
+            swap.paa = contacts[i].aa2;
+            contacts[i].aa2 = contacts[i].aa1;
+            contacts[i].aa1 = swap.paa;
+        }
+    }
+
+    for (i=n-1; i>=0; i--) if (!contacts[i].aa1 || !contacts[i].aa2)
+    {
+        contacts.erase(contacts.begin()+i);
     }
 
     n = segments.size();
@@ -387,6 +404,66 @@ int main(int argc, char** argv)
 
 
     // Now rotate p2 to align as many contacts as possible.
+    n = contacts.size();
+    j = 0;
+    l = -1;
+    for (i=0; i<n; i++)
+    {
+        if (contacts[i].prot1 != contacts[i].prot2)
+        {
+            j++;
+            if (l < 0) l = i;
+        }
+    }
+
+    if (j < 3)
+    {
+        cout << "Not enough contacts were found between the proteins. At least 3 contacts are required for coupling." << endl;
+        return -1;
+    }
+
+    Point rel = contacts[l].aa1->get_CA_location().subtract(contacts[l].aa2->get_CA_location());
+    int resno1 = contacts[l].aa2->get_residue_no();
+    p2.move_piece(1, 99999, (SCoord)rel);
+
+    l++;
+    while (contacts[l].prot1 == contacts[l].prot2)
+    {
+        l++;
+        if (l >= n) throw 0xbadc0de;
+    }
+
+    Point ref = contacts[l].aa1->get_CA_location();
+    int resno2 = contacts[l].aa2->get_residue_no();
+    p2.rotate_piece(1, 99999, resno2, ref, resno1);
+
+    l++;
+    while (contacts[l].prot1 == contacts[l].prot2)
+    {
+        l++;
+        if (l >= n) throw 0xbadc0de;
+    }
+
+    ref = contacts[l].aa1->get_CA_location();
+    int resno3 = contacts[l].aa2->get_residue_no();
+    p2.rotate_piece(1, 99999, resno3, ref, resno2);
+
+    for (i=0; i<100; i++)
+    {
+        for (l=0; l<n; l++)
+        {
+            if (contacts[l].prot1 == contacts[l].prot2) continue;
+
+            Point pt = contacts[l].aa2->get_CA_location(),
+                  algn = contacts[l].aa1->get_CA_location(),
+                  cen = contacts[l].prot2->get_region_center(1, 99999);
+            
+            Rotation rot = align_points_3d(pt, algn, cen);
+            rot.a /= 3;
+
+            p2.rotate_piece(1, 99999, rot, 0);
+        }
+    }
 
     // Next, move p2 away from p1 (along barycenter-to-barycenter axis) until no clashes.
 

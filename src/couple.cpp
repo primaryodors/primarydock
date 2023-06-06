@@ -152,7 +152,9 @@ class MovablePiece
             int resno;
             const char *c = cfgstrs[i].c_str(), *d;
 
-            if (d = strchr(c, '.'))             // Assignment, not comparison.
+            if (!strcmp(c, "end") || !strcmp(c, "END"))
+                resno = prot->get_end_resno();
+            else if (d = strchr(c, '.'))             // Assignment, not comparison.
                 resno = prot->get_bw50(atoi(c)) + atoi(d+1) - 50;
             else resno = atoi(c);
 

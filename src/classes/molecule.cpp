@@ -2785,6 +2785,19 @@ void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void 
     }
 }
 
+float Molecule::total_intermol_binding(Molecule** l)
+{
+    int i;
+    float f = 0;
+
+    for (i=0; l[i]; i++)
+    {
+        f += l[i]->get_intermol_binding(l);
+    }
+
+    return f;
+}
+
 void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 {
     if (!mm) return;

@@ -414,7 +414,7 @@ void optimize_contacts()
         cfmols[1] = (Molecule*)contacts[i].aa2;
         cfmols[2] = nullptr;
 
-        Molecule::conform_molecules(cfmols);
+        Molecule::conform_molecules(cfmols, 20);
     }
 }
 
@@ -586,18 +586,38 @@ int main(int argc, char** argv)
     for (i=0; i<n; i++) g_contacts_as_mols[i] = (Molecule*)cr[i];
     g_contacts_as_mols[i] = nullptr;
 
+    cout << "Reshaping";
     n = segments.size();
     for (i=0; i<20; i++)
     {
+        Molecule::conform_molecules(g_contacts_as_mols, 10);
         optimize_contacts();
 
-        //
+        float e, f = Molecule::total_intermol_binding(g_contacts_as_mols);
 
         for (j=0; j<n; j++)
         {
-            //
+            // Point seg = segments[j].prot->get_region_center(segments[j].start_residue->get_residue_no(), segments[j].end_residue->get_residue_no());
+            rel = Point( frand(-1, 1), frand(-1, 1), frand(-1, 1) );
+            // seg = seg.add(rel);
+            segments[j].do_motion(rel);
+            optimize_contacts();
+            e = Molecule::total_intermol_binding(g_contacts_as_mols);
+            if (e < f)
+            {
+                rel.scale(-rel.magnitude());
+                segments[j].do_motion(rel);
+                optimize_contacts();
+            }
+            else
+            {
+                f = e;
+            }
         }
+
+        cout << ".";
     }
+    cout << endl;
 
     // Write the output file.
     fp = fopen(output_fname, "wb");

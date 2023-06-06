@@ -10,6 +10,8 @@
 #include "classes/protein.h"
 #include "classes/group.h"
 
+#define _dbg_contacts 0
+
 using namespace std;
 
 Protein *g_prot1, *g_prot2;         // Global protein pointers; not necessarily G-proteins.
@@ -31,6 +33,10 @@ class Contact
             if (n==1) strcpy(c, cfgstr1.c_str());
             if (n==2) strcpy(c, cfgstr2.c_str());
 
+            #if _dbg_contacts
+            cout << "Interpreting contact " << c << endl;
+            #endif
+
             i = 0;
             if (c[1] == ':')
             {
@@ -48,7 +54,15 @@ class Contact
                 prot2 = g_prot2;
             }
 
+            #if _dbg_contacts
+            cout << "Proteins are " << (prot1 ? prot1->get_name() : "null") << ", " << (prot2 ? prot2->get_name() : "null") << endl;
+            #endif
+
             which = (n==1) ? prot1 : prot2;
+
+            #if _dbg_contacts
+            cout << "Processing contact for " << which->get_name() << endl;
+            #endif
 
             int mode = 0;
             std::vector<char> allowed_aa;
@@ -57,13 +71,25 @@ class Contact
 
             for (; c[i]; i++)
             {
+                #if _dbg_contacts
+                cout << "c[" << i << "] = " << c[i] << endl;
+                #endif
+
                 switch (mode)
                 {
                     case 0:     // Getting amino acids.
-                    if (c[i] >= '0' && c[i] <= '9') mode = 1;
+                    if (c[i] >= '0' && c[i] <= '9')
+                    {
+                        mode = 1;
+                        i--;
+                    }
                     else
                     {
                         allowed_aa.push_back(c[i]);
+
+                        #if _dbg_contacts
+                        cout << "Allowed amino acid: " << c[i] << endl;
+                        #endif
                     }
                     break;
 
@@ -78,22 +104,38 @@ class Contact
                     
                     if (has_dot)
                     {
+                        #if _dbg_contacts
+                        cout << "Getting BW number " << &c[i] << "... ";
+                        #endif
+
                         *has_dot = 0;
                         resno = which->get_bw50(atoi(&c[i]));
                         *has_dot = '.';
                         resno += atoi(&has_dot[1]) - 50;
+
+                        #if _dbg_contacts
+                        cout << "residue is " << resno << endl;
+                        #endif
                     }
                     else
                     {
-                        resno = atoi(&c[i]);
+                        if (c[i] >= '0' && c[i] <= '9') resno = atoi(&c[i]);
+
+                        #if _dbg_contacts
+                        cout << "Residue " << &c[i] << " is " << resno << endl;
+                        #endif
                     }
 
                     if (mode==2) c[j] = '~';
-                    i = j;
+                    i = j-1;
                     break;
 
                     case 2:     // Getting tolerance.
                     tol = atoi(&c[i]);
+
+                    #if _dbg_contacts
+                    cout << "Tolerance is " << tol << endl;
+                    #endif
                 }
             }
 
@@ -108,6 +150,11 @@ class Contact
                     if (n==1) aa1 = aa;
                     if (n==2) aa2 = aa;
                     found = true;
+
+                    #if _dbg_contacts
+                    cout << "Found allowed " << aa->get_letter() << " at position " << (resno+i) << endl;
+                    #endif
+
                     break;
                 }
                 else
@@ -118,17 +165,25 @@ class Contact
                         if (n==1) aa1 = aa;
                         if (n==2) aa2 = aa;
                         found = true;
+
+                        #if _dbg_contacts
+                        cout << "Found allowed " << aa->get_letter() << " at position " << (resno-i) << endl;
+                        #endif
+
                         break;
                     }
                 }
             }
+
+            #if _dbg_contacts
+            cout << endl;
+            #endif
 
             if (!found)
             {            // If fail condition, blank both AA pointers and return. Contact cannot be made and will be skipped.
                 aa1 = aa2 = nullptr;
                 return;
             }
-
         }           // for n.
     }           // interpret cfgs.
 };
@@ -251,7 +306,7 @@ const float protein_clash_penalty = 10;
 void show_usage()
 {
     cout << "Usage:" << endl;
-    cout << "couple path/to/GPCR.pdb path/to/G-protein.pdb";
+    cout << "couple path/to/file.cplcfg";
     cout << endl;
 }
 
@@ -349,7 +404,7 @@ void do_template_homology(const char* template_path)
 
 int main(int argc, char** argv)
 {
-    if (argc < 3)
+    if (argc < 2)
     {
         show_usage();
         return -1;

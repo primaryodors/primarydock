@@ -143,7 +143,24 @@ class MovablePiece
 
     void interpret_cfgs()
     {
-        // TODO:
+        prot = g_prot1;
+
+        int i;
+        for (i=0; i<4; i++)
+        {
+            if (i >= cfgstrs.size()) throw 0xbadcf6;
+            int resno;
+            const char *c = cfgstrs[i].c_str(), *d;
+
+            if (d = strchr(c, '.'))             // Assignment, not comparison.
+                resno = prot->get_bw50(atoi(c)) + atoi(d+1) - 50;
+            else resno = atoi(c);
+
+            if (!i) start_residue = prot->get_residue(resno);
+            else if (i==1) end_residue = prot->get_residue(resno);
+            else if (i==2) first_pivot = prot->get_residue(resno);
+            else if (i==3) last_pivot = prot->get_residue(resno);
+        }
     }
 
     void do_motion(SCoord move_amt)
@@ -397,6 +414,11 @@ int main(int argc, char** argv)
     {
         segments[i].prot = &p1;
         segments[i].interpret_cfgs();
+    }
+
+    for (i=n-1; i>=0; i--) if (!segments[i].start_residue || !segments[i].end_residue || (!segments[i].first_pivot && !segments[i].last_pivot))
+    {
+        segments.erase(segments.begin()+i);
     }
 
 

@@ -2457,6 +2457,7 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, int align_res, Poi
     Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
     Point align = get_residue(align_res)->get_barycenter();
     Rotation rot = align_points_3d(&align, &align_target, &pivot);
+    rot.a *= -1;
     return rotate_piece(start_res, end_res, rot, pivot_res);
 }
 

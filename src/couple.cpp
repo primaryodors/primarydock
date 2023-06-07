@@ -11,6 +11,7 @@
 #include "classes/group.h"
 
 #define _dbg_contacts 0
+#define _dbg_segments 0
 
 using namespace std;
 
@@ -200,23 +201,54 @@ class MovablePiece
     {
         prot = g_prot1;
 
+        int n = cfgstrs.size();
+        if (n < 3) throw 0xbadcf6;
+
         int i;
         for (i=0; i<4; i++)
         {
-            if (i >= cfgstrs.size()) throw 0xbadcf6;
+            if (i >= n) continue;
+
+            #if _dbg_segments
+            cout << "Interpreting segment string " << cfgstrs[i] << endl;
+            #endif
+
             int resno;
             const char *c = cfgstrs[i].c_str(), *d;
 
             if (!strcmp(c, "end") || !strcmp(c, "END"))
+            {
                 resno = prot->get_end_resno();
+
+                #if _dbg_segments
+                cout << "Using last residue " << resno << endl;
+                #endif
+            }
             else if (d = strchr(c, '.'))             // Assignment, not comparison.
+            {
                 resno = prot->get_bw50(atoi(c)) + atoi(d+1) - 50;
-            else resno = atoi(c);
+
+                #if _dbg_segments
+                cout << "Using BW residue " << resno << endl;
+                #endif
+            }
+            else
+            {
+                resno = atoi(c);
+
+                #if _dbg_segments
+                cout << "Using literal residue " << resno << endl;
+                #endif
+            }
 
             if (!i) start_residue = prot->get_residue(resno);
             else if (i==1) end_residue = prot->get_residue(resno);
             else if (i==2) first_pivot = prot->get_residue(resno);
             else if (i==3) last_pivot = prot->get_residue(resno);
+
+            #if _dbg_segments
+            cout << endl;
+            #endif
         }
     }
 
@@ -247,38 +279,47 @@ class MovablePiece
 
         // Do the motion.
         prot->move_piece(start_residue->get_residue_no(), end_residue->get_residue_no(), (SCoord)rel);
-        Point srca = prot->get_residue(start_residue->get_residue_no()-1)->get_CA_location().add(rel);
-        Point eca  = prot->get_residue(end_residue->get_residue_no()+1)->get_CA_location().add(rel);
+        Point srca, eca;
 
-        // If first pivot, rotate first pivot thru start residue - 1 about first pivot to align with start residue.
-        if (first_pivot)
+        if (start_residue->get_residue_no() > 1)
         {
-            prot->rotate_piece(first_pivot->get_residue_no(), start_residue->get_residue_no()-1, start_residue->get_residue_no()-1,
-                srca, first_pivot->get_residue_no());
+            srca = prot->get_residue(start_residue->get_residue_no()-1)->get_CA_location().add(rel);
+
+            // If first pivot, rotate first pivot thru start residue - 1 about first pivot to align with start residue.
+            if (first_pivot)
+            {
+                prot->rotate_piece(first_pivot->get_residue_no(), start_residue->get_residue_no()-1, start_residue->get_residue_no()-1,
+                    srca, first_pivot->get_residue_no());
+            }
+
+            // If no first pivot, rotate head through start residue - 1 about last pivot to align with start residue.
+            else
+            {
+                prot->rotate_piece(1, start_residue->get_residue_no()-1, start_residue->get_residue_no()-1,
+                    srca, last_pivot->get_residue_no());
+            }
         }
 
-        // If no first pivot, rotate head through start residue - 1 about last pivot to align with start residue.
-        else
+        if (end_residue->get_residue_no() < prot->get_end_resno())
         {
-            prot->rotate_piece(1, start_residue->get_residue_no()-1, start_residue->get_residue_no()-1,
-                srca, last_pivot->get_residue_no());
+            eca  = prot->get_residue(end_residue->get_residue_no()+1)->get_CA_location().add(rel);
+
+            // If last pivot, rotate end residue + 1 thru last pivot about last pivot to align with end residue.
+            if (last_pivot)
+            {
+                prot->rotate_piece(end_residue->get_residue_no()+1, last_pivot->get_residue_no(), end_residue->get_residue_no()+1,
+                    eca, last_pivot->get_residue_no());
+            }
+
+            // If no last pivot, rotate rotate end residue + 1 thru tail about first pivot to align with end residue.
+            else
+            {
+                prot->rotate_piece(end_residue->get_residue_no()+1, 99999, end_residue->get_residue_no()+1,
+                    eca, first_pivot->get_residue_no());
+            }
         }
 
-        // If last pivot, rotate end residue + 1 thru last pivot about last pivot to align with end residue.
-        if (last_pivot)
-        {
-            prot->rotate_piece(end_residue->get_residue_no()+1, last_pivot->get_residue_no(), end_residue->get_residue_no()+1,
-                eca, last_pivot->get_residue_no());
-        }
-
-        // If no last pivot, rotate rotate end residue + 1 thru tail about first pivot to align with end residue.
-        else
-        {
-            prot->rotate_piece(end_residue->get_residue_no()+1, 99999, end_residue->get_residue_no()+1,
-                eca, first_pivot->get_residue_no());
-        }
-
-        // Realign segment to new locations of start residue - 1 and end residue + 1.
+        // TODO: Realign segment to new locations of start residue - 1 and end residue + 1.
 
     }
 
@@ -293,6 +334,7 @@ class MovablePiece
 
 Molecule** g_contacts_as_mols;
 AminoAcid *sbb = nullptr, *sba = nullptr;
+int iters = 50;
 
 std::string prot1fname, prot2fname;
 char output_fname[256];
@@ -350,8 +392,14 @@ int interpret_cfg_param(char** words)
         MovablePiece p;
         for (i=1; words[i]; i++)
             p.cfgstrs.push_back(words[i]);
+        segments.push_back(p);
 
         return i;
+    }
+    else if (!strcmp(words[0], "ITER"))
+    {
+        iters = atoi(words[1]);
+        return 2;
     }
     else if (!strcmp(words[0], "OUT"))
     {
@@ -402,7 +450,7 @@ void do_template_homology(const char* template_path)
     }
 }
 
-void optimize_contacts()
+void optimize_contacts(int iters = 20)
 {
     int i, n;
 
@@ -414,7 +462,7 @@ void optimize_contacts()
         cfmols[1] = (Molecule*)contacts[i].aa2;
         cfmols[2] = nullptr;
 
-        Molecule::conform_molecules(cfmols, 20);
+        Molecule::conform_molecules(cfmols, iters);
     }
 }
 
@@ -523,7 +571,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    cout << "Aligning..." << endl;
+    cout << "Performing rough alignment..." << endl;
     Point rel = contacts[l].aa1->get_CA_location().subtract(contacts[l].aa2->get_CA_location());
     int resno1 = contacts[l].aa2->get_residue_no();
     p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
@@ -550,7 +598,7 @@ int main(int argc, char** argv)
     int resno3 = contacts[l].aa2->get_residue_no();
     p2.rotate_piece(1, p2.get_end_resno(), resno3, ref, resno2);
 
-    cout << "Iterating";
+    cout << "Fine-tuning alignment...";
     for (i=0; i<20; i++)
     {
         for (l=0; l<n; l++)
@@ -586,12 +634,18 @@ int main(int argc, char** argv)
     for (i=0; i<n; i++) g_contacts_as_mols[i] = (Molecule*)cr[i];
     g_contacts_as_mols[i] = nullptr;
 
-    cout << "Reshaping";
+    // Test.
+    ref = segments[0].prot->get_region_center(segments[0].start_residue->get_residue_no(), segments[0].end_residue->get_residue_no());
+    ref.y = pcen.y;
+    rel = pcen.multiply_3d_distance(&ref, 3);
+    segments[0].do_motion(rel.subtract(ref));
+
+    cout << "Reshaping...";
     n = segments.size();
-    for (i=0; i<20; i++)
+    for (i=0; i<iters; i++)
     {
         Molecule::conform_molecules(g_contacts_as_mols, 10);
-        optimize_contacts();
+        optimize_contacts(50);
 
         float e, f = Molecule::total_intermol_binding(g_contacts_as_mols);
 
@@ -608,14 +662,31 @@ int main(int argc, char** argv)
                 rel.scale(-rel.magnitude());
                 segments[j].do_motion(rel);
                 optimize_contacts();
+                cout << "-";
             }
             else
             {
                 f = e;
+                cout << "+";
             }
         }
 
-        cout << ".";
+        rel = Point( frand(-1, 1), frand(-1, 1), frand(-1, 1) );
+        p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
+        optimize_contacts();
+        e = Molecule::total_intermol_binding(g_contacts_as_mols);
+        if (e < f)
+        {
+            rel.scale(-rel.magnitude());
+            p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
+            optimize_contacts();
+        }
+        else
+        {
+            f = e;
+        }
+
+        cout << "." << flush;
     }
     cout << endl;
 
@@ -627,7 +698,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    optimize_contacts();
+    optimize_contacts(50);
     p1.set_pdb_chain('A');
     p1.save_pdb(fp);
     p2.renumber_residues(1, p2.get_end_resno(), 1001);

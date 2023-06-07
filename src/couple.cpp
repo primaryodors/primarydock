@@ -260,6 +260,7 @@ class MovablePiece
 
         // Check the direction of motion and correct if necessary.
         Point rel = move_amt;
+
         if (first_pivot)
         {
             Point pivf = first_pivot->get_CA_location();
@@ -637,7 +638,7 @@ int main(int argc, char** argv)
     // Test.
     ref = segments[0].prot->get_region_center(segments[0].start_residue->get_residue_no(), segments[0].end_residue->get_residue_no());
     ref.y = pcen.y;
-    rel = pcen.multiply_3d_distance(&ref, 3);
+    rel = ref.multiply_3d_distance(&pcen, 3);
     segments[0].do_motion(rel.subtract(ref));
 
     cout << "Reshaping...";

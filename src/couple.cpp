@@ -12,6 +12,7 @@
 
 #define _dbg_contacts 0
 #define _dbg_segments 0
+#define xyz_step 0.1
 
 using namespace std;
 
@@ -337,7 +338,7 @@ Molecule** g_contacts_as_mols;
 AminoAcid *sbb = nullptr, *sba = nullptr;
 int iters = 50;
 
-std::string prot1fname, prot2fname;
+std::string prot1fname, prot2fname, tplname;
 char output_fname[256];
 std::vector<Contact> contacts;
 std::vector<MovablePiece> segments;
@@ -396,6 +397,11 @@ int interpret_cfg_param(char** words)
         segments.push_back(p);
 
         return i;
+    }
+    else if (!strcmp(words[0], "TEMPLATE"))
+    {
+        tplname = words[1];
+        return 2;
     }
     else if (!strcmp(words[0], "ITER"))
     {
@@ -561,6 +567,10 @@ int main(int argc, char** argv)
 
 
     // TODO: p1 homology.
+    if (tplname)
+    {
+        do_template_homology(tplname.c_str());
+    }
 
 
     // Now rotate p2 to align as many contacts as possible.
@@ -649,7 +659,7 @@ int main(int argc, char** argv)
     g_contacts_as_mols[i] = nullptr;
 
     // Test.
-    #if 1
+    #if 0
     ref = segments[0].prot->get_region_center(segments[0].start_residue->get_residue_no(), segments[0].end_residue->get_residue_no());
     ref.y = pcen.y;
     rel = ref.multiply_3d_distance(&pcen, 2).subtract(ref);
@@ -674,7 +684,7 @@ int main(int argc, char** argv)
         for (j=0; j<n; j++)
         {
             // Point seg = segments[j].prot->get_region_center(segments[j].start_residue->get_residue_no(), segments[j].end_residue->get_residue_no());
-            rel = Point( frand(-1, 1), frand(-1, 1), frand(-1, 1) );
+            rel = Point( frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step) );
             // seg = seg.add(rel);
             segments[j].do_motion(rel);
             optimize_contacts();
@@ -693,7 +703,7 @@ int main(int argc, char** argv)
             }
         }
 
-        rel = Point( frand(-1, 1), frand(-1, 1), frand(-1, 1) );
+        rel = Point( frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step) );
         p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
         optimize_contacts();
         e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding();

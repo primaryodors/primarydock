@@ -567,7 +567,7 @@ int main(int argc, char** argv)
 
 
     // TODO: p1 homology.
-    if (tplname)
+    if (tplname.length())
     {
         do_template_homology(tplname.c_str());
     }

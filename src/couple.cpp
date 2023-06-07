@@ -451,6 +451,19 @@ void do_template_homology(const char* template_path)
     }
 }
 
+float total_contact_binding()
+{
+    int i, n;
+    float f;
+
+    n = contacts.size();
+    for (i=0; i<n; i++)
+    {
+        f += contacts[i].aa1->get_intermol_binding(contacts[i].aa2);
+    }
+    return f;
+}
+
 void optimize_contacts(int iters = 20)
 {
     int i, n;
@@ -636,15 +649,17 @@ int main(int argc, char** argv)
     g_contacts_as_mols[i] = nullptr;
 
     // Test.
-    #if 0
+    #if 1
     ref = segments[0].prot->get_region_center(segments[0].start_residue->get_residue_no(), segments[0].end_residue->get_residue_no());
     ref.y = pcen.y;
     rel = ref.multiply_3d_distance(&pcen, 2).subtract(ref);
     segments[0].do_motion(rel);
-    rel.scale(rel.magnitude() * -1);
-    segments[0].do_motion(rel);
-    rel.scale(rel.magnitude() * -1);
-    segments[0].do_motion(rel);
+
+    ref = segments[1].prot->get_region_center(segments[1].start_residue->get_residue_no(), segments[1].end_residue->get_residue_no());
+    ref.y = pcen.y;
+    rel = ref.multiply_3d_distance(&pcen, 2).subtract(ref);
+    segments[1].do_motion(rel);
+
     #endif
 
     cout << "Reshaping...";
@@ -654,7 +669,7 @@ int main(int argc, char** argv)
         Molecule::conform_molecules(g_contacts_as_mols, 10);
         optimize_contacts(50);
 
-        float e, f = Molecule::total_intermol_binding(g_contacts_as_mols);
+        float e, f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding();
 
         for (j=0; j<n; j++)
         {
@@ -663,7 +678,7 @@ int main(int argc, char** argv)
             // seg = seg.add(rel);
             segments[j].do_motion(rel);
             optimize_contacts();
-            e = Molecule::total_intermol_binding(g_contacts_as_mols);
+            e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding();
             if (e < f)
             {
                 rel.scale(-rel.magnitude());
@@ -681,7 +696,7 @@ int main(int argc, char** argv)
         rel = Point( frand(-1, 1), frand(-1, 1), frand(-1, 1) );
         p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
         optimize_contacts();
-        e = Molecule::total_intermol_binding(g_contacts_as_mols);
+        e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding();
         if (e < f)
         {
             rel.scale(-rel.magnitude());

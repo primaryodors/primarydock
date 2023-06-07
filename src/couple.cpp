@@ -636,10 +636,16 @@ int main(int argc, char** argv)
     g_contacts_as_mols[i] = nullptr;
 
     // Test.
+    #if 0
     ref = segments[0].prot->get_region_center(segments[0].start_residue->get_residue_no(), segments[0].end_residue->get_residue_no());
     ref.y = pcen.y;
-    rel = ref.multiply_3d_distance(&pcen, 3);
-    segments[0].do_motion(rel.subtract(ref));
+    rel = ref.multiply_3d_distance(&pcen, 2).subtract(ref);
+    segments[0].do_motion(rel);
+    rel.scale(rel.magnitude() * -1);
+    segments[0].do_motion(rel);
+    rel.scale(rel.magnitude() * -1);
+    segments[0].do_motion(rel);
+    #endif
 
     cout << "Reshaping...";
     n = segments.size();

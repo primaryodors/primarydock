@@ -13,6 +13,8 @@
 #define _dbg_contacts 0
 #define _dbg_segments 0
 #define xyz_step 0.1
+#define xyz_big_step 1
+#define contact_importance 0.5
 
 using namespace std;
 
@@ -197,15 +199,25 @@ class MovablePiece
     AminoAcid *start_residue = nullptr, *end_residue = nullptr;
     AminoAcid *first_pivot = nullptr, *last_pivot = nullptr;
     std::vector<std::string> cfgstrs;
+    Pose** undo_poses = nullptr;
+
+    ~MovablePiece()
+    {
+        if (undo_poses) delete[] undo_poses;
+    }
 
     void interpret_cfgs()
     {
-        prot = g_prot1;
+        int i, n;
 
-        int n = cfgstrs.size();
+        prot = g_prot1;
+        n = prot->get_end_resno();
+        undo_poses = new Pose*[n+4];
+        for (i=0; i<=n+4; i++) undo_poses[i] = nullptr;
+
+        n = cfgstrs.size();
         if (n < 3) throw 0xbadcf6;
 
-        int i;
         for (i=0; i<4; i++)
         {
             if (i >= n) continue;
@@ -253,11 +265,48 @@ class MovablePiece
         }
     }
 
+    void save_undo_poses()
+    {
+        int i, sr, er;
+
+        sr = first_pivot ? first_pivot->get_residue_no() : start_residue->get_residue_no();
+        er = last_pivot ? last_pivot->get_residue_no() : end_residue->get_residue_no();
+
+        for (i=sr; i<=er; i++)
+        {
+            AminoAcid* aa = prot->get_residue(i);
+            if (aa)
+            {
+                if (!undo_poses[i]) undo_poses[i] = new Pose((Molecule*)aa);
+                else undo_poses[i]->copy_state((Molecule*)aa);
+            }
+        }
+    }
+
+    void undo()
+    {
+        int i, sr, er;
+
+        sr = first_pivot ? first_pivot->get_residue_no() : start_residue->get_residue_no();
+        er = last_pivot ? last_pivot->get_residue_no() : end_residue->get_residue_no();
+
+        for (i=sr; i<=er; i++)
+        {
+            AminoAcid* aa = prot->get_residue(i);
+            if (aa)
+            {
+                if (undo_poses[i]) undo_poses[i]->restore_state((Molecule*)aa);
+            }
+        }
+    }
+
     void do_motion(SCoord move_amt)
     {
         if (!prot) throw 0xbadc0de;
         if (!start_residue || !end_residue) throw 0xbadc0de;
         if (!first_pivot && !last_pivot) throw 0xbadc0de;
+
+        save_undo_poses();
 
         // Check the direction of motion and correct if necessary.
         Point rel = move_amt;
@@ -327,6 +376,8 @@ class MovablePiece
 
     void do_rotation(SCoord axis, float theta)
     {
+        save_undo_poses();
+
         // Check the direction of rotation and correct if necessary.
 
         // TODO:
@@ -460,7 +511,7 @@ void do_template_homology(const char* template_path)
 float total_contact_binding()
 {
     int i, n;
-    float f;
+    float f = 0;
 
     n = contacts.size();
     for (i=0; i<n; i++)
@@ -658,6 +709,11 @@ int main(int argc, char** argv)
     for (i=0; i<n; i++) g_contacts_as_mols[i] = (Molecule*)cr[i];
     g_contacts_as_mols[i] = nullptr;
 
+    cout << "Slight pullapart..." << endl;
+    rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p2.get_end_resno()));
+    rel.scale(5);
+    p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
+
     // Test.
     #if 0
     ref = segments[0].prot->get_region_center(segments[0].start_residue->get_residue_no(), segments[0].end_residue->get_residue_no());
@@ -679,8 +735,10 @@ int main(int argc, char** argv)
         Molecule::conform_molecules(g_contacts_as_mols, 10);
         optimize_contacts(50);
 
-        float e, f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding();
+        float e, f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
 
+        #if 1
+        if (i < 0)
         for (j=0; j<n; j++)
         {
             // Point seg = segments[j].prot->get_region_center(segments[j].start_residue->get_residue_no(), segments[j].end_residue->get_residue_no());
@@ -688,29 +746,48 @@ int main(int argc, char** argv)
             // seg = seg.add(rel);
             segments[j].do_motion(rel);
             optimize_contacts();
-            e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding();
+            e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
             if (e < f)
             {
-                rel.scale(-rel.magnitude());
-                segments[j].do_motion(rel);
+                segments[j].undo();
                 optimize_contacts();
-                cout << "-";
+                // cout << "-";
+                cout << endl << "Was " << f << " now " << e << ", reverting";
             }
             else
             {
+                cout << endl << "Was " << f << " now " << e << ", keeping";
                 f = e;
-                cout << "+";
+                // cout << "+";
             }
         }
+        #endif
 
-        rel = Point( frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step) );
+        rel = Point( frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step) );
         p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
         optimize_contacts();
-        e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding();
+        e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
         if (e < f)
         {
-            rel.scale(-rel.magnitude());
+            rel.negate();
             p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
+            optimize_contacts();
+            cout << endl << "Bue " << f << " now " << e << ", reverting";
+        }
+        else
+        {
+            cout << endl << "Bue " << f << " now " << e << ", keeping";
+            f = e;
+        }
+
+        float a = frand(-1, 1) * fiftyseventh;
+        rel = Point( frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step) );
+        p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, a);
+        optimize_contacts();
+        e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
+        if (e < f)
+        {
+            p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, -a);
             optimize_contacts();
         }
         else

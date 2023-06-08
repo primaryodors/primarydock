@@ -742,6 +742,8 @@ int main(int argc, char** argv)
         if (i < 0)
         for (j=0; j<n; j++)
         {
+            f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
+
             // Point seg = segments[j].prot->get_region_center(segments[j].start_residue->get_residue_no(), segments[j].end_residue->get_residue_no());
             rel = Point( frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step) );
             // seg = seg.add(rel);
@@ -764,6 +766,7 @@ int main(int argc, char** argv)
         }
         #endif
 
+        f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
         rel = Point( frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step) );
         p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
         if (!(i%5)) optimize_contacts();
@@ -781,6 +784,7 @@ int main(int argc, char** argv)
             f = e;
         }
 
+        f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
         float a = frand(-1, 1) * fiftyseventh;
         rel = Point( frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step) );
         p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, a);

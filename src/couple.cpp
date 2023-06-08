@@ -787,11 +787,13 @@ int main(int argc, char** argv)
         e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
         if (e < f)
         {
+            cout << endl << "Etait " << f << " now " << e << ", reverting";
             p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, -a);
             optimize_contacts();
         }
         else
         {
+            cout << endl << "Etait " << f << " now " << e << ", keeping";
             f = e;
         }
 

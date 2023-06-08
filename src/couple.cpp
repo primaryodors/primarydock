@@ -14,7 +14,7 @@
 #define _dbg_segments 0
 #define xyz_step 0.1
 #define xyz_big_step 1
-#define contact_importance 0.5
+#define contact_importance 2.5
 
 using namespace std;
 
@@ -711,7 +711,8 @@ int main(int argc, char** argv)
 
     cout << "Slight pullapart..." << endl;
     rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p2.get_end_resno()));
-    rel.scale(5);
+    rel.scale(7);
+    _INTERA_R_CUTOFF = 10;
     p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
     // Test.
@@ -733,7 +734,7 @@ int main(int argc, char** argv)
     for (i=0; i<iters; i++)
     {
         Molecule::conform_molecules(g_contacts_as_mols, 10);
-        optimize_contacts(50);
+        if (!(i%5)) optimize_contacts(50);
 
         float e, f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
 
@@ -745,12 +746,12 @@ int main(int argc, char** argv)
             rel = Point( frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step) );
             // seg = seg.add(rel);
             segments[j].do_motion(rel);
-            optimize_contacts();
+            if (!(i%5)) optimize_contacts();
             e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
             if (e < f)
             {
                 segments[j].undo();
-                optimize_contacts();
+                if (!(i%5)) optimize_contacts();
                 // cout << "-";
                 cout << endl << "Was " << f << " now " << e << ", reverting";
             }
@@ -765,13 +766,13 @@ int main(int argc, char** argv)
 
         rel = Point( frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step) );
         p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
-        optimize_contacts();
+        if (!(i%5)) optimize_contacts();
         e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
         if (e < f)
         {
             rel.negate();
             p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
-            optimize_contacts();
+            if (!(i%5)) optimize_contacts();
             cout << endl << "Bue " << f << " now " << e << ", reverting";
         }
         else
@@ -783,13 +784,13 @@ int main(int argc, char** argv)
         float a = frand(-1, 1) * fiftyseventh;
         rel = Point( frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step) );
         p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, a);
-        optimize_contacts();
+        if (!(i%5)) optimize_contacts();
         e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
         if (e < f)
         {
             cout << endl << "Etait " << f << " now " << e << ", reverting";
             p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, -a);
-            optimize_contacts();
+            if (!(i%5)) optimize_contacts();
         }
         else
         {

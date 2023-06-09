@@ -751,7 +751,7 @@ int main(int argc, char** argv)
         float e, f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
 
         #if 1
-        if (i < 0)
+        if (i < iters)
         for (j=0; j<n; j++)
         {
             f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;

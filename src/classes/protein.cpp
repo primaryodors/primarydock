@@ -186,6 +186,7 @@ bool Protein::add_sequence(const char* lsequence)
     Molecule::conform_molecules(aas, 25);
 
     set_clashables();
+    allocate_undo_poses();
 
     return true;
 }
@@ -289,6 +290,7 @@ void Protein::end_pdb(FILE* os)
 float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iters)
 {
     if (!residues) return 0;
+    if (repack) save_undo_state();
     int i, j, l, m;
     float result = 0;
     for (i=0; residues[i]; i++)
@@ -511,9 +513,10 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     if (ca) delete[] ca;
     // if (res_reach) delete res_reach;         // This was causing a segfault.
     if (metals) delete[] metals;
-    origpdb_residues.clear();
 
+    origpdb_residues.clear();
     connections.clear();
+
     Atom* pdba[65536];
 
     AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file.
@@ -791,8 +794,58 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     }
 
     initial_int_clashes = get_internal_clashes();
+    allocate_undo_poses();
 
     return rescount;
+}
+
+void Protein::allocate_undo_poses()
+{
+    int i, l;
+    if (undo_poses) delete[] undo_poses;
+
+    l = get_end_resno();
+    undo_poses = new Pose*[l+4];
+    undo_poses[0] = nullptr;
+    for (i=1; i<l+4; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        undo_poses[i] = aa ? new Pose(aa) : nullptr;
+    }
+}
+
+void Protein::save_undo_state()
+{
+    if (mass_undoable) return;
+    if (!undo_poses) allocate_undo_poses();
+
+    int i, n;
+    n = get_end_resno();
+
+    for (i=1; i<=n; i++)
+    {
+        if (undo_poses[i])
+        {
+            AminoAcid* aa = get_residue(i);
+            if (aa) undo_poses[i]->copy_state(aa);
+        }
+    }
+}
+
+void Protein::undo()
+{
+    mass_undoable = false;
+    int i, n;
+    n = get_end_resno();
+
+    for (i=1; i<=n; i++)
+    {
+        if (undo_poses[i])
+        {
+            AminoAcid* aa = get_residue(i);
+            if (aa) undo_poses[i]->restore_state(aa);
+        }
+    }
 }
 
 void Protein::revert_to_pdb()
@@ -807,6 +860,7 @@ void Protein::revert_to_pdb()
         AminoAcid* aa = get_residue(i);
         if (aa) origpdb_residues[i].restore_state(aa);
     }
+    allocate_undo_poses();
 }
 
 int Protein::get_bw50(int helixno)
@@ -1254,6 +1308,8 @@ int Protein::search_sequence(const int sr, const int esr, const char* psz, const
 
 void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
 {
+    save_undo_state();
+
     AminoAcid* bendy = get_residue(resno);
     if (!bendy) return;
     LocatedVector lv = bendy->rotate_backbone(dir, angle);
@@ -1275,6 +1331,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
 
 void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, float angle)
 {
+    save_undo_state();
     if (startres == endres) return;
     int inc = (dir == CA_desc || dir == C_desc) ? -1 : 1;
     if (sgn(endres - startres) != sgn(inc))
@@ -1329,6 +1386,10 @@ void Protein::conform_backbone(int startres, int endres,
                                int iters, bool backbone_atoms_only
                               )
 {
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+
     int inc = sgn(endres-startres);
     int res, i, j, iter;
     bb_rot_dir dir1 = (inc>0) ? N_asc : CA_desc,
@@ -1520,12 +1581,18 @@ void Protein::conform_backbone(int startres, int endres,
     cout << endl;
     #endif
     if (r > 2.5) cout << "Warning - protein strand alignment anomaly outside of tolerance." << endl << "# Anomaly is " << r << " Angstroms." << endl;
+
+    mass_undoable = wmu;
 }
 
 #define DBG_BCKCONN 0
 #define _INCREMENTAL_BKCONN 1
 void Protein::backconnect(int startres, int endres)
 {
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+
     int i;
     int inc = sgn(endres-startres);
 
@@ -1678,6 +1745,8 @@ void Protein::backconnect(int startres, int endres)
         #if _INCREMENTAL_BKCONN
     }
         #endif
+
+    mass_undoable = wmu;
 }
 
 void Protein::make_helix(int startres, int endres, float phi, float psi)
@@ -1688,6 +1757,10 @@ void Protein::make_helix(int startres, int endres, float phi, float psi)
 #define DBG_ASUNDER_HELICES 0
 void Protein::make_helix(int startres, int endres, int stopat, float phi, float psi)
 {
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+
     int inc = sgn(endres-startres);
     if (!inc) inc = sgn(stopat-startres);
     else if (inc != sgn(stopat-startres)) return;
@@ -1845,6 +1918,8 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
     }
     aas[endres-startres+1] = 0;
     Molecule::conform_molecules(aas, 25);
+
+    mass_undoable = wmu;
 }
 
 void Protein::delete_residue(int resno)
@@ -1886,6 +1961,7 @@ void Protein::renumber_residues(int startres, int endres, int new_startres)
     {
         residues[i]->renumber(residues[i]->get_residue_no() + j);
     }
+    allocate_undo_poses();
 }
 
 void Protein::delete_sidechain(int resno)
@@ -2439,6 +2515,8 @@ void Protein::move_piece(int start_res, int end_res, Point new_center)
 
 void Protein::move_piece(int start_res, int end_res, SCoord move_amt)
 {
+    save_undo_state();
+
     int i;
     for (i=start_res; i<=end_res; i++)
     {
@@ -2463,29 +2541,14 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, int align_res, Poi
 LocRotation Protein::rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res)
 {
     Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
-    /*
-    LocatedVector lv(rot.v);
-    lv.origin = pivot;
-    int i;
-    for (i=start_res; i<=end_res; i++)
-    {
-        AminoAcid* aa = get_residue(i);
-        if (!aa) continue;
-        MovabilityType mov = aa->movability;
-        aa->movability = MOV_ALL;
-        aa->rotate(lv, rot.a);
-        aa->movability = mov;
-    }
-
-    LocRotation retval(lv);
-    retval.a = rot.a;
-    return retval;*/
 
     return rotate_piece(start_res, end_res, pivot, rot.v, rot.a);
 }
 
 LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoord axis, float theta)
 {
+    save_undo_state();
+
     LocatedVector lv(axis);
     lv.origin = pivot;
     int i;
@@ -2650,6 +2713,8 @@ bool Protein::disulfide_bond(int resno1, int resno2)
 {
     AminoAcid* res1, *res2;
 
+    save_undo_state();
+
     res1 = get_residue(resno1);
     res2 = get_residue(resno2);
 
@@ -2705,6 +2770,9 @@ bool Protein::disulfide_bond(int resno1, int resno2)
 
 void Protein::upright()
 {
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
     move_piece(1, 9999, Point(0,0,0));
 
     Point extracellular[256], cytoplasmic[256];
@@ -2773,10 +2841,15 @@ void Protein::upright()
         rotate_piece(1, 9999, rot, 0);
     }
 
+    mass_undoable = wmu;
 }
 
 void Protein::homology_conform(Protein* target)
 {
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+
     // Check that both proteins have TM helices and BW numbers set. If not, error out.
     if (!get_region_start("TMR6") || !target->get_region_start("TMR6")) throw 0xbadbeb7;
     if (!Ballesteros_Weinstein.size() || !target->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
@@ -3072,10 +3145,13 @@ void Protein::homology_conform(Protein* target)
     {
         soft_iteration(helices, nullptr);
     }
+
+    mass_undoable = wmu;
 }
 
 void Protein::bridge(int resno1, int resno2)
 {
+    save_undo_state();
     AminoAcid *aa1 = get_residue(resno1), *aa2 = get_residue(resno2);
     if (!aa1 || !aa2) return;
 
@@ -3123,7 +3199,10 @@ SoftBias* Protein::get_soft_bias_from_region(const char* region)
 
 void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
 {
-    //
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+
     int l;
     float prebind;
 
@@ -3313,6 +3392,8 @@ void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
             #endif
         }
     }
+
+    mass_undoable = wmu;
 }
 
 

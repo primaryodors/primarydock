@@ -134,6 +134,7 @@ public:
 
     void backconnect(int startres, int endres);
     void find_residue_initial_bindings();
+    void undo();
 
     void make_helix(int startres, int endres, float phi, float psi);
     void make_helix(int startres, int endres, int stopat, float phi, float psi);
@@ -172,11 +173,15 @@ protected:
     std::vector<Bond*> connections;
     std::vector<Pose> origpdb_residues;
     char pdbchain = ' ';
+    Pose** undo_poses = nullptr;
+    bool mass_undoable = false;
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);
     friend void ext_mtl_coord_cnf_cb(int iter);
     void mtl_coord_cnf_cb(int iter);
+    void allocate_undo_poses();
+    void save_undo_state();
 };
 
 extern float *g_rgnxform_r, *g_rgnxform_theta, *g_rgnxform_y, *g_rgnrot_alpha, *g_rgnrot_w, *g_rgnrot_u;

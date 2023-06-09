@@ -14,7 +14,7 @@
 #define _dbg_segments 0
 #define xyz_step 0.1
 #define xyz_big_step 1
-#define contact_importance 2.5
+#define contact_importance 100
 
 using namespace std;
 
@@ -716,16 +716,28 @@ int main(int argc, char** argv)
     p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
     // Test.
-    #if 0
+    #if 1
+    cout << "Before: interprot binding = " << Molecule::total_intermol_binding(g_contacts_as_mols) << ", contact binding = "
+         << total_contact_binding() << endl;
+
     ref = segments[0].prot->get_region_center(segments[0].start_residue->get_residue_no(), segments[0].end_residue->get_residue_no());
     ref.y = pcen.y;
     rel = ref.multiply_3d_distance(&pcen, 2).subtract(ref);
     segments[0].do_motion(rel);
+    cout << "First test: interprot binding = " << Molecule::total_intermol_binding(g_contacts_as_mols) << ", contact binding = "
+         << total_contact_binding() << endl;
 
     ref = segments[1].prot->get_region_center(segments[1].start_residue->get_residue_no(), segments[1].end_residue->get_residue_no());
     ref.y = pcen.y;
     rel = ref.multiply_3d_distance(&pcen, 2).subtract(ref);
     segments[1].do_motion(rel);
+    cout << "Second test: interprot binding = " << Molecule::total_intermol_binding(g_contacts_as_mols) << ", contact binding = "
+         << total_contact_binding() << endl;
+    
+    segments[0].undo();
+    segments[1].undo();
+    cout << "After undo: interprot binding = " << Molecule::total_intermol_binding(g_contacts_as_mols) << ", contact binding = "
+         << total_contact_binding() << endl;
 
     #endif
 
@@ -773,9 +785,10 @@ int main(int argc, char** argv)
         e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
         if (e < f)
         {
-            rel.negate();
-            p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
-            if (!(i%5)) optimize_contacts();
+            // rel.negate();
+            // p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
+            // if (!(i%5)) optimize_contacts();
+            p2.undo();
             cout << endl << "Bue " << f << " now " << e << ", reverting";
         }
         else
@@ -792,9 +805,10 @@ int main(int argc, char** argv)
         e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
         if (e < f)
         {
-            cout << endl << "Etait " << f << " now " << e << ", reverting";
-            p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, -a);
-            if (!(i%5)) optimize_contacts();
+            // cout << endl << "Etait " << f << " now " << e << ", reverting";
+            // p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, -a);
+            // if (!(i%5)) optimize_contacts();
+            p2.undo();
         }
         else
         {

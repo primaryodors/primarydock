@@ -710,7 +710,7 @@ int main(int argc, char** argv)
     g_contacts_as_mols[i] = nullptr;
 
     cout << "Slight pullapart..." << endl;
-    rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p2.get_end_resno()));
+    rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p1.get_end_resno()));
     rel.scale(7);
     _INTERA_R_CUTOFF = 10;
     p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
@@ -815,6 +815,10 @@ int main(int argc, char** argv)
             cout << endl << "Etait " << f << " now " << e << ", keeping";
             f = e;
         }
+
+        rel = p1.get_region_center(1, p1.get_end_resno()).subtract(p2.get_region_center(1, p2.get_end_resno()));
+        rel.scale(0.1);
+        p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
         cout << "." << flush;
     }

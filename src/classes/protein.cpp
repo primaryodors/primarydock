@@ -1270,7 +1270,8 @@ Molecule* Protein::metals_as_molecule()
 
 int Protein::search_sequence(const int sr, const int esr, const char* psz, const int threshold, int* psim)
 {
-    int i, j, k = 0, m, n = 0, num_eq, sim;
+    int i, j, k = 0, num_eq;
+    float m = 0, n = 0, sim;
     char aac;
     AminoAcid* aa;
 

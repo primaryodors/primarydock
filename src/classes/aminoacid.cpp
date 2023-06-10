@@ -15,6 +15,7 @@ using namespace std;
 
 AADef aa_defs[256];
 char* override_aminos_dat=0;
+float aa_sim_xref[65536];
 
 void AminoAcid::find_his_flips()
 {
@@ -1382,6 +1383,9 @@ void AminoAcid::load_aa_defs()
         char lastletter = '\0';
         bool isbb = false;
         bool proline_like = false;
+
+        for (i=0; i<65536; i++) aa_sim_xref[i] = -1;
+
         while (!feof(pf))
         {
             fgets(buffer, 1011, pf);
@@ -1529,10 +1533,17 @@ float AminoAcid::similarity_to(const char letter)
 {
     AminoAcid* a = nullptr;
     if (!aa_defs[letter].SMILES.length()) return 0;
+
+    int i = (int)letter + 256*(int)this->get_letter();
+    if (aa_sim_xref[i] >= 0) return aa_sim_xref[i];
     
     a = new AminoAcid(letter);
     float s = similarity_to(a);
     delete a;
+
+    aa_sim_xref[i] = s;
+    i = (int)this->get_letter() + 256*(int)letter;
+    aa_sim_xref[i] = s;
 
     return s;
 }
@@ -1545,6 +1556,10 @@ float AminoAcid::similarity_to(const AminoAcid* aa)
     bool polar2 = (aa->hydrophilicity() > 0.2);
 
     int i, j;
+
+    i = (int)aa->get_letter() + 256*(int)this->get_letter();
+    if (aa_sim_xref[i] >= 0) return aa_sim_xref[i];
+
     float simil=0, divis=0;
     for (i=0; atoms[i]; i++)
     {
@@ -1567,6 +1582,11 @@ float AminoAcid::similarity_to(const AminoAcid* aa)
     simil -= 0.5*fabs( fmin(1, fabs(hydrophilicity())) - fmin(1, fabs(aa->hydrophilicity())) );
     simil += 0.5*(sgn(get_charge() * aa->get_charge()));
     simil = fmax(0, fmin(1, simil));
+
+    i = (int)aa->get_letter() + 256*(int)this->get_letter();
+    aa_sim_xref[i] = simil;
+    i = (int)this->get_letter() + 256*(int)aa->get_letter();
+    aa_sim_xref[i] = simil;
 
     return simil;
 }

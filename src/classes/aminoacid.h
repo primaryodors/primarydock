@@ -178,6 +178,7 @@ protected:
 
 extern AADef aa_defs[256];		// Indexed by ASCII value of one-letter code.
 extern char* override_aminos_dat;
+extern float aa_sim_xref[65536];
 
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa);
 std::ostream& operator<<(std::ostream& os, const AABondDef& b);

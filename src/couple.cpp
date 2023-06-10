@@ -10,7 +10,7 @@
 #include "classes/protein.h"
 #include "classes/group.h"
 
-#define _dbg_contacts 0
+#define _dbg_contacts 1
 #define _dbg_segments 0
 #define xyz_step 0.1
 #define xyz_big_step 1
@@ -70,7 +70,7 @@ class Contact
 
             int mode = 0;
             std::vector<char> allowed_aa;
-            char* has_dot = nullptr;
+            char *has_dot = nullptr, *plusminus, *paren, pm;
             int resno=0, tol=0;
 
             for (; c[i]; i++)
@@ -86,6 +86,40 @@ class Contact
                     {
                         mode = 1;
                         i--;
+                    }
+                    else if (c[i] == '(')
+                    {
+                        plusminus = strchr(&c[i], '+');
+                        if (!plusminus) plusminus = strchr(&c[i], '-');
+                        if (!plusminus) throw 0xbadf37;
+                        paren = strchr(plusminus, ')');
+                        if (!paren) throw 0xbadf37;
+                        pm = *plusminus;
+                        *plusminus = 0;
+                        *paren = 0;
+
+                        #if _dbg_contacts
+                        cout << "Searching protein for motif " << &c[i+1] << endl;
+                        #endif
+                        
+                        j = which->search_sequence(1, which->get_end_resno(), &c[i+1]);
+                        if (!j) throw 0xbadcf6;
+
+                        #if _dbg_contacts
+                        cout << "Found motif at position " << j << endl;
+                        #endif
+
+                        if (pm == '+') resno = j + atoi(plusminus+1);
+                        if (pm == '-') resno = j - atoi(plusminus+1);
+
+                        #if _dbg_contacts
+                        cout << "Resno is " << resno << endl << flush;
+                        #endif
+
+                        *plusminus = pm;
+                        *paren = ')';
+                        i = paren - c;
+                        mode = 1;
                     }
                     else
                     {
@@ -521,7 +555,7 @@ float total_contact_binding()
     return f;
 }
 
-void optimize_contacts(int iters = 20)
+void optimize_contacts(int iters = 30)
 {
     int i, n;
 
@@ -767,11 +801,11 @@ int main(int argc, char** argv)
                 segments[j].undo();
                 if (!(i%5)) optimize_contacts();
                 // cout << "-";
-                cout << endl << "Was " << f << " now " << e << ", reverting";
+                cout << endl << "Was " << f << " now " << e << ", reverting.";
             }
             else
             {
-                cout << endl << "Was " << f << " now " << e << ", keeping";
+                cout << endl << "Was " << f << " now " << e << ", keeping.";
                 f = e;
                 // cout << "+";
             }
@@ -789,11 +823,11 @@ int main(int argc, char** argv)
             // p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
             // if (!(i%5)) optimize_contacts();
             p2.undo();
-            cout << endl << "Bue " << f << " now " << e << ", reverting";
+            cout << endl << "Bue " << f << " now " << e << ", reverting.";
         }
         else
         {
-            cout << endl << "Bue " << f << " now " << e << ", keeping";
+            cout << endl << "Bue " << f << " now " << e << ", keeping.";
             f = e;
         }
 
@@ -805,14 +839,14 @@ int main(int argc, char** argv)
         e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
         if (e < f)
         {
-            cout << endl << "Etait " << f << " now " << e << ", reverting";
+            cout << endl << "Etait " << f << " now " << e << ", reverting.";
             // p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, -a);
             // if (!(i%5)) optimize_contacts();
             p2.undo();
         }
         else
         {
-            cout << endl << "Etait " << f << " now " << e << ", keeping";
+            cout << endl << "Etait " << f << " now " << e << ", keeping.";
             f = e;
         }
 
@@ -820,11 +854,11 @@ int main(int argc, char** argv)
         rel.scale(0.1);
         p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
-        cout << "." << flush;
-    }
-    cout << endl;
-
-    // Write the output file.
+        // cout << "." << flush; ///
+    }  //                        //
+    cout << endl;               //
+     //                        //
+    // Write the output file. //
     fp = fopen(output_fname, "wb");
     if (!fp)
     {

@@ -830,7 +830,6 @@ int main(int argc, char** argv)
             ref = contacts[i].aa2->get_CA_location();
             rel = contacts[i].vector_to_contact_horizon(2);
 
-        #if 1
             if (!rel.magnitude()) continue;
             rot = align_points_3d(ref, ref.add(rel), pcen);
             rot.a /= 2;
@@ -845,35 +844,8 @@ int main(int argc, char** argv)
 
         if (total_rotation < 0.01*fiftyseventh) break;
 
-        #else
-            xtheta += find_angle_along_vector(ref, ref.add(rel), pcen, axisx);
-            ytheta += find_angle_along_vector(ref, ref.add(rel), pcen, axisy);
-            ztheta += find_angle_along_vector(ref, ref.add(rel), pcen, axisz);
-        }
-
-        n = -n;
-        xtheta /= n;
-        ytheta /= n;
-        ztheta /= n;
-
-        rot.v = axisx;
-        rot.a = xtheta/2;
-        cout << "Rotating " << (rot.a*fiftyseven) << "deg about X axis..." << endl;
-        p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa2->get_residue_no());
-
-        rot.v = axisy;
-        rot.a = ytheta/2;
-        cout << "Rotating " << (rot.a*fiftyseven) << "deg about Y axis..." << endl;
-        p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa2->get_residue_no());
-
-        rot.v = axisz;
-        rot.a = ztheta/2;
-        cout << "Rotating " << (rot.a*fiftyseven) << "deg about Z axis..." << endl;
-        p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa2->get_residue_no());
-        #endif
-
         #if !_dbg_iters
-        cout << ".";
+        cout << "." << flush;
         #endif
     }
     cout << endl;
@@ -884,7 +856,7 @@ int main(int argc, char** argv)
     {
         ref = contacts[i].vector_to_contact_horizon(2);
         cout << "Vector to contact horizon for " << contacts[i] << ": " << ref << endl;
-        if (!ref.magnitude()) m++;
+        if (ref.magnitude() < 1) m++;
     }
     cout << m << " successful contacts out of " << n << " total." << endl;
 

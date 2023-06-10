@@ -712,7 +712,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    Point rel, avg1, avg2;
+    Point rel, ref, avg1, avg2;
 
     cout << "Performing rough alignment..." << endl;
 
@@ -791,7 +791,6 @@ int main(int argc, char** argv)
 
         cout << "Performing global average rotation..." << endl;
         SCoord axisx = Point(1,0,0), axisz = Point(0,0,1);
-        Point ref;
         float xtheta = 0, ztheta = 0;
         pcen = p2.get_region_center(1, p2.get_end_resno());
 
@@ -820,6 +819,15 @@ int main(int argc, char** argv)
     }
 
 
+    n = contacts.size();
+    m = 0;
+    for (i=0; i<n; i++)
+    {
+        ref = contacts[i].vector_to_contact_horizon(2);
+        cout << "Vector to contact horizon for " << contacts[i] << ": " << ref << endl;
+        if (!ref.magnitude()) m++;
+    }
+    cout << m << " successful contacts out of " << n << " total." << endl;
     
     // Write the output file.
     fp = fopen(output_fname, "wb");

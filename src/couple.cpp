@@ -10,11 +10,12 @@
 #include "classes/protein.h"
 #include "classes/group.h"
 
-#define _dbg_contacts 1
-#define _dbg_segments 0
 #define xyz_step 0.1
 #define xyz_big_step 1
 #define contact_importance 100
+
+#define _dbg_contacts 0
+#define _dbg_segments 0
 
 using namespace std;
 
@@ -791,7 +792,7 @@ int main(int argc, char** argv)
             f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
 
             // Point seg = segments[j].prot->get_region_center(segments[j].start_residue->get_residue_no(), segments[j].end_residue->get_residue_no());
-            rel = Point( frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step), frand(-xyz_step, xyz_step) );
+            rel = Point( frand(-xyz_step, xyz_step), 0, frand(-xyz_step, xyz_step) );
             // seg = seg.add(rel);
             segments[j].do_motion(rel);
             if (!(i%5)) optimize_contacts();

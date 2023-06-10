@@ -712,36 +712,10 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    Point rel;
+    Point rel, avg1, avg2;
 
     cout << "Performing rough alignment..." << endl;
-    /* = contacts[l].aa1->get_CA_location().subtract(contacts[l].aa2->get_CA_location());
-    int resno1 = contacts[l].aa2->get_residue_no();
-    p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
-    l++;
-    while (contacts[l].prot1 == contacts[l].prot2)
-    {
-        l++;
-        if (l >= n) throw 0xbadc0de;
-    }
-
-    Point ref = contacts[l].aa1->get_CA_location();
-    int resno2 = contacts[l].aa2->get_residue_no();
-    p2.rotate_piece(1, p2.get_end_resno(), resno2, ref, resno1);
-
-    l++;
-    while (contacts[l].prot1 == contacts[l].prot2)
-    {
-        l++;
-        if (l >= n) throw 0xbadc0de;
-    }
-
-    ref = contacts[l].aa1->get_CA_location();
-    int resno3 = contacts[l].aa2->get_residue_no();
-    p2.rotate_piece(1, p2.get_end_resno(), resno3, ref, resno2); */
-
-    Point avg1, avg2;
     n = contacts.size();
     for (i=0; i<n; i++)
     {
@@ -763,11 +737,6 @@ int main(int argc, char** argv)
     p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
 
     
-    cout << "Pullapart..." << endl;
-    rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p1.get_end_resno()));
-    rel.scale(25);
-    // _INTERA_R_CUTOFF = 10;
-    p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
 
     cout << "Finding closest and farthest pairs..." << endl;
@@ -789,18 +758,70 @@ int main(int argc, char** argv)
         }
     }
 
-    cout << "Lining up closest pair " << contacts[l] << "..." << endl;
-    rel = contacts[l].vector_to_contact_horizon(2);
-    p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
+    for (m = 0; m < iters; m++)
+    {
+        cout << "Pullapart..." << endl;
+        rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p1.get_end_resno()));
+        rel.scale(25);
+        // _INTERA_R_CUTOFF = 10;
+        p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
-    cout << "Lining up farthest pair " << contacts[j] << "..." << endl;
-    SCoord axis = contacts[l].aa2->get_CA_location().subtract(contacts[l].aa1->get_CA_location());
-    float theta = find_angle_along_vector(contacts[j].aa2->get_CA_location(), contacts[j].aa1->get_CA_location(), contacts[j].aa1->get_CA_location(), axis);
-    rot.v = axis;
-    rot.a = theta;
-    p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa2->get_residue_no());
+        cout << "Lining up closest pair " << contacts[l] << "..." << endl;
+        rel = contacts[l].vector_to_contact_horizon(2);
+        p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
+
+        cout << "Lining up farthest pair " << contacts[j] << "..." << endl;
+        SCoord axis = contacts[l].aa2->get_CA_location().subtract(contacts[l].aa1->get_CA_location());
+        float theta = find_angle_along_vector(contacts[j].aa2->get_CA_location(), contacts[j].aa1->get_CA_location(), contacts[j].aa1->get_CA_location(), axis);
+        rot.v = axis;
+        rot.a = theta;
+        p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa2->get_residue_no());
+
+
+        cout << "Performing global average motion..." << endl;
+        avg2 = Point(0,0,0);
+        for (i=0; i<n; i++)
+        {
+            avg2 = avg2.add(contacts[i].vector_to_contact_horizon());
+        }
+        avg2.scale(avg2.magnitude() / n);
+
+        p2.move_piece(1, p2.get_end_resno(), (SCoord)avg2);
+
+
+        cout << "Performing global average rotation..." << endl;
+        SCoord axisx = Point(1,0,0), axisz = Point(0,0,1);
+        Point ref;
+        float xtheta = 0, ztheta = 0;
+        pcen = p2.get_region_center(1, p2.get_end_resno());
+
+        n = contacts.size();
+        for (i=0; i<n; i++)
+        {
+            ref = contacts[i].aa2->get_CA_location();
+            rel = contacts[i].vector_to_contact_horizon(2);
+
+            xtheta += find_angle_along_vector(ref, ref.add(rel), pcen, axisx);
+            ztheta += find_angle_along_vector(ref, ref.add(rel), pcen, axisz);
+        }
+
+        xtheta /= n;
+        ztheta /= n;
+
+        cout << "Rotating " << (xtheta*fiftyseven) << "deg about X axis..." << endl;
+        rot.v = axisx;
+        rot.a = xtheta;
+        p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
+
+        cout << "Rotating " << (ztheta*fiftyseven) << "deg about Z axis..." << endl;
+        rot.v = axisz;
+        rot.a = ztheta;
+        p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
+    }
+
+
     
-    // Write the output file. //
+    // Write the output file.
     fp = fopen(output_fname, "wb");
     if (!fp)
     {

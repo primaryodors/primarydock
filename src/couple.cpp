@@ -14,8 +14,9 @@
 #define xyz_big_step 1
 #define contact_importance 100
 
-#define _dbg_contacts 0
-#define _dbg_segments 0
+#define _dbg_contacts 1
+#define _dbg_segments 1
+#define _dbg_iters 0
 
 using namespace std;
 
@@ -184,7 +185,19 @@ class Contact
             for (i = 0; i <= tol; i++)
             {
                 AminoAcid *aa = which->get_residue(resno+i);
-                if (aa && std::find(allowed_aa.begin(), allowed_aa.end(), aa->get_letter()) != allowed_aa.end())
+                if (allowed_aa[0] == 'X')
+                {
+                    if (n==1) aa1 = aa;
+                    if (n==2) aa2 = aa;
+                    found = true;
+
+                    #if _dbg_contacts
+                    cout << "Found allowed " << aa->get_letter() << " at position " << (resno+i) << endl;
+                    #endif
+
+                    break;
+                }
+                else if (aa && std::find(allowed_aa.begin(), allowed_aa.end(), aa->get_letter()) != allowed_aa.end())
                 {
                     if (n==1) aa1 = aa;
                     if (n==2) aa2 = aa;
@@ -263,6 +276,7 @@ class MovablePiece
     public:
     Protein* prot = nullptr;
     AminoAcid *start_residue = nullptr, *end_residue = nullptr;
+    AminoAcid *prev_start = nullptr, *next_end = nullptr;
     AminoAcid *first_pivot = nullptr, *last_pivot = nullptr;
     std::vector<std::string> cfgstrs;
     Pose** undo_poses = nullptr;
@@ -284,7 +298,7 @@ class MovablePiece
         n = cfgstrs.size();
         if (n < 3) throw 0xbadcf6;
 
-        for (i=0; i<4; i++)
+        for (i=0; i<6; i++)
         {
             if (i >= n) continue;
 
@@ -322,8 +336,10 @@ class MovablePiece
 
             if (!i) start_residue = prot->get_residue(resno);
             else if (i==1) end_residue = prot->get_residue(resno);
-            else if (i==2) first_pivot = prot->get_residue(resno);
-            else if (i==3) last_pivot = prot->get_residue(resno);
+            else if (i==2) prev_start = first_pivot = prot->get_residue(resno);
+            else if (i==3) next_end = last_pivot = prot->get_residue(resno);
+            else if (i==4) first_pivot = prot->get_residue(resno);
+            else if (i==5) last_pivot = prot->get_residue(resno);
 
             #if _dbg_segments
             cout << endl;
@@ -335,8 +351,8 @@ class MovablePiece
     {
         int i, sr, er;
 
-        sr = first_pivot ? first_pivot->get_residue_no() : start_residue->get_residue_no();
-        er = last_pivot ? last_pivot->get_residue_no() : end_residue->get_residue_no();
+        sr = prev_start ? prev_start->get_residue_no() : start_residue->get_residue_no();
+        er = next_end ? next_end->get_residue_no() : end_residue->get_residue_no();
 
         for (i=sr; i<=er; i++)
         {
@@ -353,8 +369,8 @@ class MovablePiece
     {
         int i, sr, er;
 
-        sr = first_pivot ? first_pivot->get_residue_no() : start_residue->get_residue_no();
-        er = last_pivot ? last_pivot->get_residue_no() : end_residue->get_residue_no();
+        sr = prev_start ? prev_start->get_residue_no() : start_residue->get_residue_no();
+        er = next_end ? next_end->get_residue_no() : end_residue->get_residue_no();
 
         for (i=sr; i<=er; i++)
         {
@@ -370,7 +386,7 @@ class MovablePiece
     {
         if (!prot) throw 0xbadc0de;
         if (!start_residue || !end_residue) throw 0xbadc0de;
-        if (!first_pivot && !last_pivot) throw 0xbadc0de;
+        if (!prev_start && !next_end) throw 0xbadc0de;
 
         save_undo_poses();
 
@@ -402,14 +418,14 @@ class MovablePiece
         {
             srca = prot->get_residue(start_residue->get_residue_no()-1)->get_CA_location().add(rel);
 
-            // If first pivot, rotate first pivot thru start residue - 1 about first pivot to align with start residue.
-            if (first_pivot)
+            // If prev start, rotate prev start thru start residue - 1 about first pivot to align with start residue.
+            if (prev_start)
             {
-                prot->rotate_piece(first_pivot->get_residue_no(), start_residue->get_residue_no()-1, start_residue->get_residue_no()-1,
+                prot->rotate_piece(prev_start->get_residue_no(), start_residue->get_residue_no()-1, start_residue->get_residue_no()-1,
                     srca, first_pivot->get_residue_no());
             }
 
-            // If no first pivot, rotate head through start residue - 1 about last pivot to align with start residue.
+            // If no prev start, rotate head through start residue - 1 about last pivot to align with start residue.
             else
             {
                 prot->rotate_piece(1, start_residue->get_residue_no()-1, start_residue->get_residue_no()-1,
@@ -422,9 +438,9 @@ class MovablePiece
             eca  = prot->get_residue(end_residue->get_residue_no()+1)->get_CA_location().add(rel);
 
             // If last pivot, rotate end residue + 1 thru last pivot about last pivot to align with end residue.
-            if (last_pivot)
+            if (next_end)
             {
-                prot->rotate_piece(end_residue->get_residue_no()+1, last_pivot->get_residue_no(), end_residue->get_residue_no()+1,
+                prot->rotate_piece(end_residue->get_residue_no()+1, next_end->get_residue_no(), end_residue->get_residue_no()+1,
                     eca, last_pivot->get_residue_no());
             }
 
@@ -677,7 +693,7 @@ int main(int argc, char** argv)
         segments[i].interpret_cfgs();
     }
 
-    for (i=n-1; i>=0; i--) if (!segments[i].start_residue || !segments[i].end_residue || (!segments[i].first_pivot && !segments[i].last_pivot))
+    for (i=n-1; i>=0; i--) if (!segments[i].start_residue || !segments[i].end_residue || (!segments[i].prev_start && !segments[i].next_end))
     {
         segments.erase(segments.begin()+i);
     }
@@ -762,7 +778,10 @@ int main(int argc, char** argv)
     {
         if (!m)
         {
+            #if _dbg_iters
             cout << "Pullapart..." << endl;
+            #endif
+
             rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p1.get_end_resno()));
             rel.scale(25);
             // _INTERA_R_CUTOFF = 10;
@@ -782,7 +801,10 @@ int main(int argc, char** argv)
         
         // continue;
 
+        #if _dbg_iters
         cout << "Performing global average motion..." << endl;
+        #endif
+
         avg2 = Point(0,0,0);
         for (i=0; i<n; i++)
         {
@@ -793,7 +815,10 @@ int main(int argc, char** argv)
         p2.move_piece(1, p2.get_end_resno(), (SCoord)avg2);
 
 
+        #if _dbg_iters
         cout << "Performing global average rotation..." << endl;
+        #endif
+
         SCoord axisx = Point(1,0,0), axisy = Point(0,1,0), axisz = Point(0,0,1);
         float xtheta = 0, ytheta = 0, ztheta = 0;
         float total_rotation = 0;
@@ -811,10 +836,15 @@ int main(int argc, char** argv)
             rot.a /= 2;
             total_rotation += rot.a;
 
+            #if _dbg_iters
             cout << "Rotating " << (rot.a*fiftyseven) << " deg to line up " << contacts[i] << endl;
+            #endif
+
             p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa2->get_residue_no());
         }
-        if (total_rotation < 0.1*fiftyseventh) break;
+
+        if (total_rotation < 0.01*fiftyseventh) break;
+
         #else
             xtheta += find_angle_along_vector(ref, ref.add(rel), pcen, axisx);
             ytheta += find_angle_along_vector(ref, ref.add(rel), pcen, axisy);
@@ -841,8 +871,12 @@ int main(int argc, char** argv)
         cout << "Rotating " << (rot.a*fiftyseven) << "deg about Z axis..." << endl;
         p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa2->get_residue_no());
         #endif
-    }
 
+        #if !_dbg_iters
+        cout << ".";
+        #endif
+    }
+    cout << endl;
 
     n = contacts.size();
     m = 0;
@@ -853,7 +887,21 @@ int main(int argc, char** argv)
         if (!ref.magnitude()) m++;
     }
     cout << m << " successful contacts out of " << n << " total." << endl;
-    
+
+    cout << "Optimizing contacts..." << endl;
+    _INTERA_R_CUTOFF = 10;
+    optimize_contacts(50);
+
+    // Add the contacts as binding residues.
+    n = contacts.size();
+    for (i=0; i<n; i++)
+    {
+        std::string bsrrem = "REMARK 800 SITE LIGAND_BINDING " + to_string(contacts[i].aa1->get_residue_no());
+        p1.add_remark(bsrrem);
+        bsrrem = "REMARK 800 SITE LIGAND_BINDING " + to_string(1000+contacts[i].aa2->get_residue_no());
+        p2.add_remark(bsrrem);
+    }
+
     // Write the output file.
     fp = fopen(output_fname, "wb");
     if (!fp)
@@ -861,9 +909,6 @@ int main(int argc, char** argv)
         cout << "Failed to open output file." << endl;
         return -1;
     }
-
-    cout << "Optimizing contacts..." << endl;
-    optimize_contacts(50);
     p1.set_pdb_chain('A');
     p1.save_pdb(fp);
     p2.renumber_residues(1, p2.get_end_resno(), 1001);

@@ -1402,6 +1402,11 @@ void AminoAcid::load_aa_defs()
                         }
 
                     int idx = words[0][0];
+                    if (idx == 'X')
+                    {
+                        cout << "Cannot use X as a letter for amino acids. X means accept any residue in a motif search." << endl;
+                        throw 0xbadaadef;
+                    }
 
                     if (!lastletter || words[0][0] != lastletter)
                     {

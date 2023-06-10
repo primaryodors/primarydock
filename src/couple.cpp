@@ -225,7 +225,38 @@ class Contact
             }
         }           // for n.
     }           // interpret cfgs.
+
+    SCoord vector_to_contact_horizon(int protno = 2)
+    {
+        AminoAcid *mov, *stat;
+
+        if (protno == 2)
+        {
+            mov = aa2;
+            stat = aa1;
+        }
+        else if (protno == 1)
+        {
+            mov = aa1;
+            stat = aa2;
+        }
+        else throw 0xbadc0de;
+
+        SCoord v = stat->get_CA_location().subtract(mov->get_CA_location());
+        v.r = fmax(0, v.r - mov->get_reach() - stat->get_reach() - 2);
+
+        return v;
+    }
 };
+
+std::ostream& operator<<(std::ostream& os, const Contact& c)
+{
+    if (!&c) return os;
+
+    os << c.prot1->get_name() << ":" << *c.aa1 << " ... " << c.prot2->get_name() << ":" << *c.aa2;
+
+    return os;
+}
 
 class MovablePiece
 {
@@ -681,8 +712,10 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    Point rel;
+
     cout << "Performing rough alignment..." << endl;
-    Point rel = contacts[l].aa1->get_CA_location().subtract(contacts[l].aa2->get_CA_location());
+    /* = contacts[l].aa1->get_CA_location().subtract(contacts[l].aa2->get_CA_location());
     int resno1 = contacts[l].aa2->get_residue_no();
     p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
@@ -706,159 +739,67 @@ int main(int argc, char** argv)
 
     ref = contacts[l].aa1->get_CA_location();
     int resno3 = contacts[l].aa2->get_residue_no();
-    p2.rotate_piece(1, p2.get_end_resno(), resno3, ref, resno2);
+    p2.rotate_piece(1, p2.get_end_resno(), resno3, ref, resno2); */
 
-    cout << "Fine-tuning alignment...";
-    for (i=0; i<20; i++)
+    Point avg1, avg2;
+    n = contacts.size();
+    for (i=0; i<n; i++)
     {
-        for (l=0; l<n; l++)
-        {
-            if (contacts[l].prot1 == contacts[l].prot2) continue;
-
-            Point pt = contacts[l].aa2->get_CA_location(),
-                  algn = contacts[l].aa1->get_CA_location(),
-                  cen = contacts[l].prot2->get_region_center(1, contacts[l].prot2->get_end_resno());
-            
-            Rotation rot = align_points_3d(pt, algn, cen);
-            rot.a /= 3;
-
-            p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
-
-            rel = contacts[l].aa1->get_CA_location().subtract(contacts[l].aa2->get_CA_location());
-            rel.scale(rel.magnitude()/3);
-
-            p2.move_piece(1, 99999, (SCoord)rel);
-        }
-
-        cout << "." << flush;
+        avg1 = avg1.add(contacts[i].aa1->get_CA_location());
     }
-    cout << endl;
+    avg1.scale(avg1.magnitude() / n);
 
-    // Next, iteratively wiggle the segments around to get optimal contacts and minimal clashes.
-    // Include small transformations and rotations of p2 to search the conformational space.
-    Point pcen = p1.get_region_center(1, p1.get_end_resno());
-    std::vector<AminoAcid*> cr = p1.get_contact_residues(&p2);
-    n = cr.size();
-    g_contacts_as_mols = new Molecule*[n+4];
+    rel = avg1.subtract(p1.get_region_center(1, p1.get_end_resno()));
+    rel.scale(50);
+    p2.move_piece(1, p2.get_end_resno(), rel);
 
-    for (i=0; i<n; i++) g_contacts_as_mols[i] = (Molecule*)cr[i];
-    g_contacts_as_mols[i] = nullptr;
+    for (i=0; i<n; i++)
+    {
+        avg2 = avg2.add(contacts[i].aa2->get_CA_location());
+    }
+    avg2.scale(avg2.magnitude() / n);
 
-    cout << "Slight pullapart..." << endl;
+    Rotation rot = align_points_3d(avg2, avg1, p2.get_region_center(1, p2.get_end_resno()));
+    p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
+
+    
+    cout << "Pullapart..." << endl;
     rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p1.get_end_resno()));
-    rel.scale(7);
-    _INTERA_R_CUTOFF = 10;
+    rel.scale(25);
+    // _INTERA_R_CUTOFF = 10;
     p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
-    // Test.
-    #if 1
-    cout << "Before: interprot binding = " << Molecule::total_intermol_binding(g_contacts_as_mols) << ", contact binding = "
-         << total_contact_binding() << endl;
 
-    ref = segments[0].prot->get_region_center(segments[0].start_residue->get_residue_no(), segments[0].end_residue->get_residue_no());
-    ref.y = pcen.y;
-    rel = ref.multiply_3d_distance(&pcen, 2).subtract(ref);
-    segments[0].do_motion(rel);
-    cout << "First test: interprot binding = " << Molecule::total_intermol_binding(g_contacts_as_mols) << ", contact binding = "
-         << total_contact_binding() << endl;
-
-    ref = segments[1].prot->get_region_center(segments[1].start_residue->get_residue_no(), segments[1].end_residue->get_residue_no());
-    ref.y = pcen.y;
-    rel = ref.multiply_3d_distance(&pcen, 2).subtract(ref);
-    segments[1].do_motion(rel);
-    cout << "Second test: interprot binding = " << Molecule::total_intermol_binding(g_contacts_as_mols) << ", contact binding = "
-         << total_contact_binding() << endl;
-    
-    segments[0].undo();
-    segments[1].undo();
-    cout << "After undo: interprot binding = " << Molecule::total_intermol_binding(g_contacts_as_mols) << ", contact binding = "
-         << total_contact_binding() << endl;
-
-    #endif
-
-    cout << "Reshaping...";
-    n = segments.size();
-    for (i=0; i<iters; i++)
+    cout << "Finding closest and farthest pairs..." << endl;
+    float rbest = 0, rworst = 0;
+    Point pcen = p1.get_region_center(1, p1.get_end_resno());
+    n = contacts.size();
+    for (i=0; i<n; i++)
     {
-        Molecule::conform_molecules(g_contacts_as_mols, 10);
-        if (!(i%5)) optimize_contacts(50);
-
-        float e, f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
-
-        #if 1
-        if (i < iters)
-        for (j=0; j<n; j++)
+        float r = contacts[i].aa1->get_CA_location().get_3d_distance(pcen);
+        if (!i || r < rbest)
         {
-            f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
-
-            // Point seg = segments[j].prot->get_region_center(segments[j].start_residue->get_residue_no(), segments[j].end_residue->get_residue_no());
-            rel = Point( frand(-xyz_step, xyz_step), 0, frand(-xyz_step, xyz_step) );
-            // seg = seg.add(rel);
-            segments[j].do_motion(rel);
-            if (!(i%5)) optimize_contacts();
-            e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
-            if (e < f)
-            {
-                segments[j].undo();
-                if (!(i%5)) optimize_contacts();
-                // cout << "-";
-                cout << endl << "Was " << f << " now " << e << ", reverting.";
-            }
-            else
-            {
-                cout << endl << "Was " << f << " now " << e << ", keeping.";
-                f = e;
-                // cout << "+";
-            }
+            rbest = r;
+            l = i;
         }
-        #endif
-
-        f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
-        rel = Point( frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step) );
-        p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
-        if (!(i%5)) optimize_contacts();
-        e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
-        if (e < f)
+        else if (r > rworst)
         {
-            // rel.negate();
-            // p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
-            // if (!(i%5)) optimize_contacts();
-            p2.undo();
-            cout << endl << "Bue " << f << " now " << e << ", reverting.";
+            rworst = r;
+            j = i;
         }
-        else
-        {
-            cout << endl << "Bue " << f << " now " << e << ", keeping.";
-            f = e;
-        }
+    }
 
-        f = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
-        float a = frand(-1, 1) * fiftyseventh;
-        rel = Point( frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step), frand(-xyz_big_step, xyz_big_step) );
-        p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, a);
-        if (!(i%5)) optimize_contacts();
-        e = Molecule::total_intermol_binding(g_contacts_as_mols) + total_contact_binding() * contact_importance;
-        if (e < f)
-        {
-            cout << endl << "Etait " << f << " now " << e << ", reverting.";
-            // p2.rotate_piece(1, p2.get_end_resno(), p2.get_region_center(1, p2.get_end_resno()), rel, -a);
-            // if (!(i%5)) optimize_contacts();
-            p2.undo();
-        }
-        else
-        {
-            cout << endl << "Etait " << f << " now " << e << ", keeping.";
-            f = e;
-        }
+    cout << "Lining up closest pair " << contacts[l] << "..." << endl;
+    rel = contacts[l].vector_to_contact_horizon(2);
+    p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
-        rel = p1.get_region_center(1, p1.get_end_resno()).subtract(p2.get_region_center(1, p2.get_end_resno()));
-        rel.scale(0.1);
-        p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
-
-        // cout << "." << flush; ///
-    }  //                        //
-    cout << endl;               //
-     //                        //
+    cout << "Lining up farthest pair " << contacts[j] << "..." << endl;
+    SCoord axis = contacts[l].aa2->get_CA_location().subtract(contacts[l].aa1->get_CA_location());
+    float theta = find_angle_along_vector(contacts[j].aa2->get_CA_location(), contacts[j].aa1->get_CA_location(), contacts[j].aa1->get_CA_location(), axis);
+    rot.v = axis;
+    rot.a = theta;
+    p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa2->get_residue_no());
+    
     // Write the output file. //
     fp = fopen(output_fname, "wb");
     if (!fp)

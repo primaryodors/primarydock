@@ -14,9 +14,10 @@
 #define xyz_big_step 1
 #define contact_importance 100
 
-#define _dbg_contacts 1
-#define _dbg_segments 1
+#define _dbg_contacts 0
+#define _dbg_segments 0
 #define _dbg_iters 0
+#define _dbg_flexion 1
 
 using namespace std;
 
@@ -648,7 +649,7 @@ int main(int argc, char** argv)
     // TODO: Command line args.
     
 
-    int i, j, l, m, n;
+    int i, j, k, l, m, n;
     fp = fopen(prot1fname.c_str(), "rb");
     if (!fp) throw 0xbadcf6;
     cout << "Reading protein 1..." << endl;
@@ -849,6 +850,55 @@ int main(int argc, char** argv)
         #endif
     }
     cout << endl;
+
+    #if _dbg_flexion
+    cout << "Checking segments for backbone flexion...";
+    #endif
+
+    std::vector<AminoAcid*> vca = p1.get_contact_residues(&p2);
+    m = vca.size();
+    n = segments.size();
+    for (i=0; i<n; i++)
+    {
+        int sr = (segments[i].last_pivot ? segments[i].last_pivot : segments[i].end_residue)->get_residue_no(),
+            er = (segments[i].first_pivot ? segments[i].first_pivot : segments[i].start_residue)->get_residue_no();
+        l = er - sr;
+        Point seg_motion(0,0,0);
+        for (j=0; j<l; j++)
+        {
+            AminoAcid* aa = segments[i].prot->get_residue(sr+j);
+            if (!aa) continue;
+
+            for (k=0; k<m; k++)
+            {
+                float r = vca[k]->distance_to((Molecule*)aa), rc, clash;
+                if (r >= 10) continue;
+                rc = vca[k]->get_reach() + aa->get_reach();
+                if (r > rc) continue;
+
+                clash = vca[k]->get_intermol_clashes((Molecule*)aa);
+                if (clash < 2) continue;
+
+                rel = aa->get_CA_location().subtract(vca[k]->get_CA_location());
+                rel.scale(rc - r);
+
+                // TODO: Increase rel according to distance from pivot.
+
+                seg_motion.x = larger(seg_motion.x, rel.x);
+                seg_motion.y = larger(seg_motion.y, rel.y);
+                seg_motion.z = larger(seg_motion.z, rel.z);
+            }
+        }
+
+        if (seg_motion.magnitude() >= 0.1)
+        {
+            #if _dbg_flexion
+            cout << "Moving segment " << i << " by " << seg_motion << "..." << endl;
+            #endif
+
+            segments[i].do_motion(seg_motion);
+        }
+    }
 
     n = contacts.size();
     m = 0;

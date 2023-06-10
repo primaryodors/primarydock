@@ -17,7 +17,8 @@
 #define _dbg_contacts 0
 #define _dbg_segments 0
 #define _dbg_iters 0
-#define _dbg_flexion 1
+#define _dbg_flexion 0
+#define _dbg_contact_rel 0
 
 using namespace std;
 
@@ -852,7 +853,7 @@ int main(int argc, char** argv)
     cout << endl;
 
     #if _dbg_flexion
-    cout << "Checking segments for backbone flexion...";
+    cout << "Checking segments for backbone flexion..." << endl;
     #endif
 
     std::vector<AminoAcid*> vca = p1.get_contact_residues(&p2);
@@ -860,8 +861,8 @@ int main(int argc, char** argv)
     n = segments.size();
     for (i=0; i<n; i++)
     {
-        int sr = (segments[i].last_pivot ? segments[i].last_pivot : segments[i].end_residue)->get_residue_no(),
-            er = (segments[i].first_pivot ? segments[i].first_pivot : segments[i].start_residue)->get_residue_no();
+        int sr = (segments[i].first_pivot ? segments[i].first_pivot : segments[i].start_residue)->get_residue_no(),
+            er = (segments[i].last_pivot ? segments[i].last_pivot : segments[i].end_residue)->get_residue_no();
         l = er - sr;
         Point seg_motion(0,0,0);
         for (j=0; j<l; j++)
@@ -880,7 +881,11 @@ int main(int argc, char** argv)
                 if (clash < 2) continue;
 
                 rel = aa->get_CA_location().subtract(vca[k]->get_CA_location());
-                rel.scale(rc - r);
+                rel.scale((fmin(rc, 5) - r) / 2);
+
+                #if _dbg_flexion
+                cout << *aa << " is clashing with " << *vca[k] << " by " << clash << " cu.A." << endl;
+                #endif
 
                 // TODO: Increase rel according to distance from pivot.
 
@@ -905,8 +910,12 @@ int main(int argc, char** argv)
     for (i=0; i<n; i++)
     {
         ref = contacts[i].vector_to_contact_horizon(2);
+
+        #if _dbg_contact_rel
         cout << "Vector to contact horizon for " << contacts[i] << ": " << ref << endl;
-        if (ref.magnitude() < 1) m++;
+        #endif
+
+        if (ref.magnitude() < 2) m++;
     }
     cout << m << " successful contacts out of " << n << " total." << endl;
 

@@ -852,10 +852,8 @@ int main(int argc, char** argv)
     }
     cout << endl;
 
-    #if _dbg_flexion
-    cout << "Checking segments for backbone flexion..." << endl;
-    #endif
 
+    cout << "Checking segments for backbone flexion..." << endl;
     std::vector<AminoAcid*> vca = p1.get_contact_residues(&p2);
     m = vca.size();
     n = segments.size();
@@ -881,7 +879,7 @@ int main(int argc, char** argv)
                 if (clash < 2) continue;
 
                 rel = aa->get_CA_location().subtract(vca[k]->get_CA_location());
-                rel.scale((fmin(rc, 5) - r) / 2);
+                rel.scale((fmin(rc, 8) - r) / 2);
 
                 #if _dbg_flexion
                 cout << *aa << " is clashing with " << *vca[k] << " by " << clash << " cu.A." << endl;

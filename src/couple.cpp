@@ -772,11 +772,12 @@ int main(int argc, char** argv)
 
         cout << "Lining up farthest pair " << contacts[j] << "..." << endl;
         SCoord axis = contacts[l].aa2->get_CA_location().subtract(contacts[l].aa1->get_CA_location());
-        float theta = find_angle_along_vector(contacts[j].aa2->get_CA_location(), contacts[j].aa1->get_CA_location(), contacts[j].aa1->get_CA_location(), axis);
+        float theta = find_angle_along_vector(contacts[j].aa2->get_CA_location(), contacts[j].aa1->get_CA_location(), contacts[l].aa1->get_CA_location(), axis);
         rot.v = axis;
         rot.a = theta;
         p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa2->get_residue_no());
 
+        // continue;
 
         cout << "Performing global average motion..." << endl;
         avg2 = Point(0,0,0);
@@ -792,7 +793,7 @@ int main(int argc, char** argv)
         cout << "Performing global average rotation..." << endl;
         SCoord axisx = Point(1,0,0), axisz = Point(0,0,1);
         float xtheta = 0, ztheta = 0;
-        pcen = p2.get_region_center(1, p2.get_end_resno());
+        pcen = contacts[l].aa1->get_CA_location(); // p2.get_region_center(1, p2.get_end_resno());
 
         n = contacts.size();
         for (i=0; i<n; i++)
@@ -809,13 +810,13 @@ int main(int argc, char** argv)
 
         cout << "Rotating " << (xtheta*fiftyseven) << "deg about X axis..." << endl;
         rot.v = axisx;
-        rot.a = xtheta;
-        p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
+        rot.a = -xtheta;
+        p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa1->get_residue_no());
 
         cout << "Rotating " << (ztheta*fiftyseven) << "deg about Z axis..." << endl;
         rot.v = axisz;
-        rot.a = ztheta;
-        p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
+        rot.a = -ztheta;
+        p2.rotate_piece(1, p2.get_end_resno(), rot, contacts[l].aa1->get_residue_no());
     }
 
 

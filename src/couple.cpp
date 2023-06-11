@@ -258,7 +258,7 @@ class Contact
         else throw 0xbadc0de;
 
         SCoord v = stat->get_CA_location().subtract(mov->get_CA_location());
-        v.r = fmax(0, v.r - mov->get_reach() - stat->get_reach() - 2);
+        v.r = fmax(0, v.r - mov->get_reach() - stat->get_reach() - 0);
 
         return v;
     }
@@ -758,13 +758,15 @@ int main(int argc, char** argv)
 
 
     cout << "Finding closest and farthest pairs..." << endl;
-    float rbest = 0, rworst = 0;
+    float rbest = 99999, rworst = 0;
     Point pcen = p1.get_region_center(1, p1.get_end_resno());
     n = contacts.size();
     for (i=0; i<n; i++)
     {
+        if (contacts[i].prot1 == contacts[i].prot2) continue;
+
         float r = contacts[i].aa1->get_CA_location().get_3d_distance(pcen);
-        if (!i || r < rbest)
+        if (r < rbest)
         {
             rbest = r;
             l = i;
@@ -810,6 +812,7 @@ int main(int argc, char** argv)
         avg2 = Point(0,0,0);
         for (i=0; i<n; i++)
         {
+            if (contacts[i].prot1 == contacts[i].prot2) continue;
             avg2 = avg2.add(contacts[i].vector_to_contact_horizon());
         }
         avg2.scale(avg2.magnitude() / n);

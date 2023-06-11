@@ -111,10 +111,20 @@ $fp = fopen($cfgf, "wb") or die("FAILED to open $cfgf for writing.");
 fwrite($fp, $cfg);
 fclose($fp);
 
-$cmd = "bin/couple $cfgf";
+$cmd = "bin/couple $cfgf | tee tmp/cplout";
 echo "Running: $cmd\n";
 passthru($cmd);
 unlink($cfgf);
+
+if (!file_exists($fname))
+{
+  $fp = fopen($fname, "wb");
+  if ($fp)
+  {
+    fwrite($fp, file_get_contents("tmp/cplout"));
+    fclose($fp);
+  }
+}
 
 
 

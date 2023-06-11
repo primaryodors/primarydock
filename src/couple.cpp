@@ -928,9 +928,9 @@ int main(int argc, char** argv)
     n = contacts.size();
     for (i=0; i<n; i++)
     {
-        std::string bsrrem = "REMARK 800 SITE LIGAND_BINDING " + to_string(contacts[i].aa1->get_residue_no());
+        std::string bsrrem = "REMARK 800 SITE LIGAND_BINDING " + to_string(contacts[i].aa1->get_residue_no()) + (std::string)"\n";
         p1.add_remark(bsrrem);
-        bsrrem = "REMARK 800 SITE LIGAND_BINDING " + to_string(1000+contacts[i].aa2->get_residue_no());
+        bsrrem = "REMARK 800 SITE LIGAND_BINDING " + to_string(1000+contacts[i].aa2->get_residue_no()) + (std::string)"\n";
         p2.add_remark(bsrrem);
     }
 

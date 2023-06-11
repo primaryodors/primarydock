@@ -2541,7 +2541,8 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, int align_res, Poi
 
 LocRotation Protein::rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res)
 {
-    Point pivot = pivot_res ? get_residue(pivot_res)->get_CA_location() : get_region_center(start_res, end_res);
+    AminoAcid* aa = pivot_res ? get_residue(pivot_res) : nullptr;
+    Point pivot = aa ? aa->get_CA_location() : get_region_center(start_res, end_res);
 
     return rotate_piece(start_res, end_res, pivot, rot.v, rot.a);
 }

@@ -69,6 +69,8 @@ $fam = family_from_protid($gpcrid);
 $cfgf = "tmp/{$gpcrid}_{$gpid}.cplcfg";
 $fname = "$cpl_dir/$fam/{$gpcrid}_{$gpid}.pdb";
 
+if (!file_exists("$cpl_dir/$fam")) mkdir("$cpl_dir/$fam");
+
 $cfg = <<<heredoc
 
 PROT1 pdbs/$fam/$gpcrid.upright.pdb

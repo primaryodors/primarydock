@@ -295,7 +295,7 @@ class MovablePiece
         prot = g_prot1;
         n = prot->get_end_resno();
         undo_poses = new Pose*[n+4];
-        for (i=0; i<=n+4; i++) undo_poses[i] = nullptr;
+        for (i=0; i<=n; i++) undo_poses[i] = nullptr;
 
         n = cfgstrs.size();
         if (n < 3) throw 0xbadcf6;

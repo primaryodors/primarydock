@@ -10,8 +10,8 @@ $Gprots = ["hGNAL", "hGNAS2"];
 
 foreach (@$argv as $a)
 {
-	$a = explode('=',$a,2);
-	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
+	  $a = explode('=',$a,2);
+	  $_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
 }
 
 $max_simultaneous_couples = 4;
@@ -21,45 +21,45 @@ if (!file_exists($cpl_dir)) mkdir($cpl_dir);
 
 if (@$_REQUEST['next'])
 {
-	$cmd = "ps -ef | grep ':[0-9][0-9] bin/couple' | grep -v grep";
-	exec($cmd, $results);
-	if (!@$_REQUEST['force'] && trim(@$results[$max_simultaneous_couples-1])) die("Already running.\n".print_r($results, 1));
-	$already = implode("\n", $results);
+	  $cmd = "ps -ef | grep ':[0-9][0-9] bin/couple' | grep -v grep";
+	  exec($cmd, $results);
+	  if (!@$_REQUEST['force'] && trim(@$results[$max_simultaneous_couples-1])) die("Already running.\n".print_r($results, 1));
+	  $already = implode("\n", $results);
 
-	$gpcrid = @$_REQUEST['rcp'] ?: false;
-	$gpid = @$_REQUEST['gprot'] ?: false;
-	
-	foreach (array_keys($prots) as $rcpid)
-	{
-	    if (false!==strpos($already, "/$rcpid."))
-		{
-			continue;
-		}
-
-		if ($gpcrid && $gpcrid != $rcpid && !preg_match("/^$gpcrid$/", $rcpid) ) continue;
-		foreach ($Gprots as $gprotid)
-		{
-		    if ($gpid && $gpid != $gprotid) continue;
-
-		    $fam = family_from_protid($rcpid);
-		    if (!file_exists("$cpl_dir/$fam")) mkdir("$cpl_dir/$fam");
-
-		    $fname = "$cpl_dir/$fam/{$rcpid}_{$gprotid}.pdb";
-		    if (!file_exists($fname))
+	  $gpcrid = @$_REQUEST['rcp'] ?: false;
+	  $gpid = @$_REQUEST['gprot'] ?: false;
+	  
+	  foreach (array_keys($prots) as $rcpid)
+	  {
+        if (false!==strpos($already, "/$rcpid"))
 		    {
-		        $gpcrid = $rcpid;
-		        $gpid = $gprotid;
-		        goto _found_next;
-	        }
-		}
-	}
-	
-	die("All done!");
+			    continue;
+		    }
+
+		    if ($gpcrid && $gpcrid != $rcpid && !preg_match("/^$gpcrid$/", $rcpid) ) continue;
+		    foreach ($Gprots as $gprotid)
+		    {
+		        if ($gpid && $gpid != $gprotid) continue;
+
+		        $fam = family_from_protid($rcpid);
+		        if (!file_exists("$cpl_dir/$fam")) mkdir("$cpl_dir/$fam");
+
+		        $fname = "$cpl_dir/$fam/{$rcpid}_{$gprotid}.pdb";
+		        if (!file_exists($fname))
+		        {
+		            $gpcrid = $rcpid;
+		            $gpid = $gprotid;
+		            goto _found_next;
+            }
+		    }
+	  }
+	  
+	  die("All done!");
 }
 else
 {
     $gpcrid = @$_REQUEST['rcp'] ?: "OR1A1";
-	$gpid = @$_REQUEST['gprot'] ?: "hGNAL";
+	  $gpid = @$_REQUEST['gprot'] ?: "hGNAL";
 }
 	
 _found_next:
@@ -77,7 +77,7 @@ PROT1 pdbs/$fam/$gpcrid.upright.pdb
 PROT2 pdbs/Gprot/$gpid.pdb
 # TEMPLATE pdbs/OR51/OR51E2.8f76.pdb
 
-CONTACT 1:RK6.58~1 1:DE45.51
+CONTACT 1:RKY6.57~2 1:DE45.51
 CONTACT N4.38~2 DEQRK(LLLLGAGESGKSTIVKQMRILH-8)
 CONTACT RK3.59~1 DE(GIXETXF+9)~1
 CONTACT KR7.57~2 DE(HFTCATDTXNXXFVF+30)~3
@@ -118,12 +118,12 @@ unlink($cfgf);
 
 if (!file_exists($fname))
 {
-  $fp = fopen($fname, "wb");
-  if ($fp)
-  {
-    fwrite($fp, file_get_contents("tmp/cplout"));
-    fclose($fp);
-  }
+    $fp = fopen($fname, "wb");
+    if ($fp)
+    {
+        fwrite($fp, file_get_contents("tmp/cplout"));
+        fclose($fp);
+    }
 }
 
 

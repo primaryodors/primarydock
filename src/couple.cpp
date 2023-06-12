@@ -30,6 +30,14 @@ class Contact
     Protein *prot1 = nullptr, *prot2 = nullptr;
     AminoAcid *aa1 = nullptr, *aa2 = nullptr;
     std::string cfgstr1, cfgstr2;
+    
+    float weight()
+    {
+        if (aa1->get_charge() && sgn(aa1->get_charge()) == -aa2->get_charge()) return 2;
+        if (fabs(aa1->hydrophilicity()) > 0.25 && fabs(aa2->hydrophilicity()) > 0.25) return 1;
+        if (aa1->get_aa_definition()->aromatic && aa2->get_aa_definition()->aromatic) return 0.8;
+        return 0.5;
+    }
 
     void interpret_cfgs()
     {
@@ -650,7 +658,7 @@ int main(int argc, char** argv)
     // TODO: Command line args.
     
 
-    int i, j, k, l, m, n;
+    int h, i, j, k, l, m, n;
     fp = fopen(prot1fname.c_str(), "rb");
     if (!fp) throw 0xbadcf6;
     cout << "Reading protein 1..." << endl;
@@ -765,7 +773,7 @@ int main(int argc, char** argv)
     {
         if (contacts[i].prot1 == contacts[i].prot2) continue;
 
-        float r = contacts[i].aa1->get_CA_location().get_3d_distance(pcen);
+        float r = contacts[i].aa1->get_CA_location().get_3d_distance(pcen) / pow(contacts[i].weight(), 2);
         if (r < rbest)
         {
             rbest = r;
@@ -780,6 +788,10 @@ int main(int argc, char** argv)
 
     for (m = 0; m < iters; m++)
     {
+        std::vector<AminoAcid*> vca = p1.get_contact_residues(&p2);
+        
+        cout << vca.size() << endl;
+        
         if (!m)
         {
             #if _dbg_iters
@@ -790,12 +802,50 @@ int main(int argc, char** argv)
             rel.scale(25);
             // _INTERA_R_CUTOFF = 10;
             p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
+        }
+        else
+        {
+            Molecule** lm = new Molecule*[vca.size()+4];
+            for (i=0; i<vca.size(); i++)
+            {
+                lm[i] = (Molecule*)vca[i];
+            }
+            lm[i] = nullptr;
+            
+            float clash = 0;
+            for (i=0; lm[i]; i++)
+            {
+                clash += lm[i]->get_intermol_clashes(lm);
+            }
+            
+            delete lm;
+            
+            if (clash > 10)
+            {
+                rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p1.get_end_resno()));
+                rel.scale(clash / 10);
+                p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
+                #if _dbg_iters
+                cout << "Realining closest pair " << contacts[l] << "..." << endl;
+                #endif
+                rot = align_points_3d(contacts[l].aa2->get_CA_location(), contacts[l].aa1->get_CA_location(), p2.get_region_center(1, p2.get_end_resno()));
+                rot.a /= 2;
+                p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
+            }
+        }
+
+        if (!m)
+        {
+            #if _dbg_iters
             cout << "Lining up closest pair " << contacts[l] << "..." << endl;
+            #endif
             rel = contacts[l].vector_to_contact_horizon(2);
             p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
+            #if _dbg_iters
             cout << "Lining up farthest pair " << contacts[j] << "..." << endl;
+            #endif
             SCoord axis = contacts[l].aa2->get_CA_location().subtract(contacts[l].aa1->get_CA_location());
             float theta = find_angle_along_vector(contacts[j].aa2->get_CA_location(), contacts[j].aa1->get_CA_location(), contacts[l].aa1->get_CA_location(), axis);
             rot.v = axis;
@@ -810,10 +860,14 @@ int main(int argc, char** argv)
         #endif
 
         avg2 = Point(0,0,0);
+        float w = 0;
         for (i=0; i<n; i++)
         {
             if (contacts[i].prot1 == contacts[i].prot2) continue;
-            avg2 = avg2.add(contacts[i].vector_to_contact_horizon());
+            rel = contacts[i].vector_to_contact_horizon();
+            rel.scale(rel.magnitude() * contacts[i].weight());
+            avg2 = avg2.add(rel);
+            w += contacts[i].weight();
         }
         avg2.scale(avg2.magnitude() / n);
 
@@ -837,6 +891,7 @@ int main(int argc, char** argv)
 
             if (!rel.magnitude()) continue;
             rot = align_points_3d(ref, ref.add(rel), pcen);
+            if (rot.a > hexagonal) continue;
             rot.a /= 2;
             total_rotation += rot.a;
 

@@ -42,6 +42,7 @@ struct Point
         return get_3d_distance(&reference);
     }
     float get_3d_distance(const Point* reference);
+    float get_distance_to_line(const Point a, const Point b);         // Where a and b are the termini of the line.
     Point multiply_3d_distance(const Point* reference, float r_mult);
     bool pt_in_bounding_box(const Point* corner1, const Point* corner2);
     float magnitude();

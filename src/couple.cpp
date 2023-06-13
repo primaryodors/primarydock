@@ -33,10 +33,10 @@ class Contact
     
     float weight()
     {
-        if (aa1->get_charge() && sgn(aa1->get_charge()) == -aa2->get_charge()) return 2;
-        if (fabs(aa1->hydrophilicity()) > 0.25 && fabs(aa2->hydrophilicity()) > 0.25) return 1;
-        if (aa1->get_aa_definition()->aromatic && aa2->get_aa_definition()->aromatic) return 0.8;
-        return 0.5;
+        if (aa1->get_charge() && sgn(aa1->get_charge()) == -aa2->get_charge()) return 6.0;
+        if (fabs(aa1->hydrophilicity()) > 0.25 && fabs(aa2->hydrophilicity()) > 0.25) return 2.0;
+        if (aa1->get_aa_definition()->aromatic && aa2->get_aa_definition()->aromatic) return .5;
+        return .1;
     }
 
     void interpret_cfgs()
@@ -195,6 +195,7 @@ class Contact
             for (i = 0; i <= tol; i++)
             {
                 AminoAcid *aa = which->get_residue(resno+i);
+                if (!aa) continue;
                 if (allowed_aa[0] == 'X')
                 {
                     if (n==1) aa1 = aa;
@@ -773,7 +774,7 @@ int main(int argc, char** argv)
     {
         if (contacts[i].prot1 == contacts[i].prot2) continue;
 
-        float r = contacts[i].aa1->get_CA_location().get_3d_distance(pcen) / pow(contacts[i].weight(), 2);
+        float r = contacts[i].aa1->get_CA_location().get_3d_distance(pcen); // / contacts[i].weight();
         if (r < rbest)
         {
             rbest = r;
@@ -785,12 +786,15 @@ int main(int argc, char** argv)
             j = i;
         }
     }
+    
+    // cout << "Closest pair is " << contacts[l] << " and farthest is " << contacts[j] << endl;
 
+    int m2 = iters / 2;
     for (m = 0; m < iters; m++)
     {
         std::vector<AminoAcid*> vca = p1.get_contact_residues(&p2);
         
-        cout << vca.size() << endl;
+        // cout << vca.size() << endl;
         
         if (!m)
         {
@@ -798,12 +802,13 @@ int main(int argc, char** argv)
             cout << "Pullapart..." << endl;
             #endif
 
-            rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p1.get_end_resno()));
+            // rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p1.get_end_resno()));
+            rel = avg1.subtract(p1.get_region_center(1, p1.get_end_resno()));
             rel.scale(25);
             // _INTERA_R_CUTOFF = 10;
             p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
         }
-        else
+        else if (m > m2)
         {
             Molecule** lm = new Molecule*[vca.size()+4];
             for (i=0; i<vca.size(); i++)
@@ -817,17 +822,18 @@ int main(int argc, char** argv)
             {
                 clash += lm[i]->get_intermol_clashes(lm);
             }
-            
+
             delete lm;
-            
-            if (clash > 10)
+
+            if (clash > 1000)
             {
-                rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p1.get_end_resno()));
-                rel.scale(clash / 10);
+                // rel = p2.get_region_center(1, p2.get_end_resno()).subtract(p1.get_region_center(1, p1.get_end_resno()));
+                rel = avg1.subtract(p1.get_region_center(1, p1.get_end_resno()));
+                rel.scale(fmax(2, clash / 500));
                 p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
 
                 #if _dbg_iters
-                cout << "Realining closest pair " << contacts[l] << "..." << endl;
+                cout << "Realigning closest pair " << contacts[l] << "..." << endl;
                 #endif
                 rot = align_points_3d(contacts[l].aa2->get_CA_location(), contacts[l].aa1->get_CA_location(), p2.get_region_center(1, p2.get_end_resno()));
                 rot.a /= 2;
@@ -892,6 +898,10 @@ int main(int argc, char** argv)
             if (!rel.magnitude()) continue;
             rot = align_points_3d(ref, ref.add(rel), pcen);
             if (rot.a > hexagonal) continue;
+
+            w = fmin(1, pcen.get_3d_distance(ref) / 10);
+            rot.a *= w;
+
             rot.a /= 2;
             total_rotation += rot.a;
 
@@ -936,18 +946,29 @@ int main(int argc, char** argv)
                 clash = vca[k]->get_intermol_clashes((Molecule*)aa);
                 if (clash < 2) continue;
 
-                rel = aa->get_CA_location().subtract(vca[k]->get_CA_location());
-                rel.scale((fmin(rc, 8) - r) / 2);
+                h = 0;
+                while (clash)
+                {
+                    rel = aa->get_CA_location().subtract(vca[k]->get_CA_location());
+                    rel.scale((fmax(1, fmin(rc, 8) - r)) / 3);
 
-                #if _dbg_flexion
-                cout << *aa << " is clashing with " << *vca[k] << " by " << clash << " cu.A." << endl;
-                #endif
+                    #if _dbg_flexion
+                    cout << *aa << " is clashing with " << *vca[k] << " by " << clash << " cu.A." << endl;
+                    #endif
 
-                // TODO: Increase rel according to distance from pivot.
+                    // TODO: Increase rel according to distance from pivot.
 
-                seg_motion.x = larger(seg_motion.x, rel.x);
-                seg_motion.y = larger(seg_motion.y, rel.y);
-                seg_motion.z = larger(seg_motion.z, rel.z);
+                    seg_motion.x = larger(seg_motion.x, rel.x);
+                    seg_motion.y = larger(seg_motion.y, rel.y);
+                    seg_motion.z = larger(seg_motion.z, rel.z);
+                    
+                    h++;
+                    if (h > 10) break;
+                    
+                    r = vca[k]->distance_to((Molecule*)aa), rc, clash;
+                    rc = vca[k]->get_reach() + aa->get_reach();
+                    clash = vca[k]->get_intermol_clashes((Molecule*)aa);
+                }
             }
         }
 

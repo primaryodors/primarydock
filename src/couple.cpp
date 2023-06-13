@@ -511,6 +511,33 @@ float residue_energy()
     return e;
 }
 
+float unmet_contacts(bool same_prot_only = false)
+{
+    int i, n = contacts.size();
+    float f = 0;
+    
+    for (i=0; i<n; i++)
+    {
+        if (same_prot_only)
+        {
+            if (contacts[i].prot1 != contacts[i].prot2) continue;
+        }
+        
+        Atom* a = contacts[i].aa1->get_nearest_atom(contacts[i].aa2->get_CA_location());
+        if (!a) continue;
+        Atom* b = contacts[i].aa2->get_nearest_atom(a->get_location());
+        if (!b) continue;
+        a = contacts[i].aa1->get_nearest_atom(b->get_location());
+        if (!a) continue;
+        
+        float r = fmax(0, a->distance_to(b) - 1.5);
+        
+        if (r) f += r;
+    }
+    
+    return f;
+}
+
 int interpret_cfg_param(char** words)
 {
     int i;

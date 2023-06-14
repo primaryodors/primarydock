@@ -75,7 +75,7 @@ process_dock("");
 // Golf a.k.a. hGNAL
 
 $pdbfname = str_replace("pdbs/", "pdbs/coupled/", $opdbname);
-$pdbfname = str_replace(".upright.", "_hGNAL.", $opdbname);
+$pdbfname = str_replace(".upright.", "_hGNAL.", $pdbfname);
 
 $outfname = str_replace("$protid-", "{$protid}_hGNAL-", $ooutname);
 
@@ -126,7 +126,7 @@ process_dock("");
 // Gαs a.k.a. hGNAS
 
 $pdbfname = str_replace("pdbs/", "pdbs/coupled/", $opdbname);
-$pdbfname = str_replace(".upright.", "_hGNAS.", $opdbname);
+$pdbfname = str_replace(".upright.", "_hGNAS.", $pdbfname);
 
 $outfname = str_replace("$protid-", "{$protid}_hGNAS-", $ooutname);
 

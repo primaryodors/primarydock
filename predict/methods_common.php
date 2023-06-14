@@ -1,6 +1,6 @@
 <?php
 
-global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere;
+global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere, $metrics_to_process;
 
 // Includes
 require("protutils.php");
@@ -23,6 +23,11 @@ if ($result) die("Build fail.\n".print_r($output, true));
 $dock_retries = 5;
 $max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
 if (!isset($do_scwhere)) $do_scwhere = false;
+$metrics_to_process =
+[
+  "BENERG" => "BindingEnergy",
+  "BENERG.rgn" => "BindingEnergy.rgn",
+];
 
 // Load data
 $dock_results = [];
@@ -128,7 +133,7 @@ function prepare_outputs()
 
 function process_dock($metrics_prefix = "", $noclobber = false)
 {
-    global $ligname, $protid, $configf, $dock_retries, $outfname, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere;
+    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere;
     if (!file_exists("tmp")) mkdir("tmp");
     $lignospace = str_replace(" ", "", $ligname);
     $cnfname = "tmp/prediction.$protid.$lignospace.config";
@@ -171,105 +176,137 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     
     unlink($cnfname);
 
-    $benerg = [];
-    $polsat = [];
-    $pclash = [];
-    $acvth = [];
-    $scenerg = [];
-    $vdwrpl = [];
-    $dosce = false;
-    $dovdw = false;
-    $pose = false;
+    $mode = "";
+    $pose = 0;
     $node = -1;
-    $poses_found = 0;
-    $ca_loc = [];
-    $sc_loc = [];
-    $sc_qty = [];
-    $pnlines = [];
+    $outdqty = [];
+    
+    if ($noclobber)
+    {
+        if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
+        $outdata = @$dock_results[$protid][$ligname] ?: [];
+    }
+    else $outdata = [];
+    
     foreach ($outlines as $ln)
     {
         // echo "$ln\n";
-        if (substr($ln, 0, 4) == 'ATOM' || substr($ln, 0, 6) == 'HETATM') $dosce = $dovdw = false;
-        if (!strlen(trim($ln))) $dosce = $dovdw = false;
+        
+        $coldiv = explode(":", $ln);
 
-        if ($pose > 0 && $node >= 0)
+        /*if ($pose > 0 && $node >= 0)
         {
             if (!isset($pnlines[$pose][$node])) $pnlines[$pose][$node] = [];
             $pnlines[$pose][$node][] = $ln;
-        }
-
-        if (substr($ln, 0, 6) == "Pose: ")
-        {
-            $pose = intval(explode(" ", $ln)[1]);
-            $node = -1;
-            $dovdw = false;
-        }
-        if (substr($ln, 0, 6) == "Node: ") $node = intval(explode(" ", $ln)[1]);
+        }*/
+        
         if (trim($ln) == "TER")
         {
             $pose = false;
             $node = -1;
-        }
-
-        if ($dosce)
-        {
-            $pettia = explode(": ", $ln);
-            if (count($pettia) < 2) die("dosce pettia ".print_r($pettia, true));
-            $resno = intval(substr($pettia[0], 3));
-            $e = floatval($pettia[1]);
-            $scenerg[$pose][$node][$resno] = $e;
             continue;
         }
 
-        if ($dovdw)
+        if (count($coldiv) == 2)
         {
-            $pettia = explode(": ", $ln);
-            if (count($pettia) < 2) die("dovdw pettia ".print_r($pettia, true));
-            $resno = intval(substr($pettia[0], 3));
-            $v = floatval($pettia[1]);
-            $vdwrpl[$pose][$node][$resno] = $v;
-            continue;
-        }
-
-        if (substr($ln, 0, 7) == 'BENERG:') { $dosce = true; echo "Reading side chain energies, pose $pose, node $node.\n"; }
-        if (substr($ln, 0, 7) == 'vdWRPL:') $dovdw = true;
-
-        if ($pose && $node>=0 && substr($ln, 0, 5) == "Total")
-        {
-            $benerg[$pose][$node] = floatval(explode(" ", $ln)[1]);
-            $dosce = false;
-            continue;
-        }
-
-        if ($pose && $node>=0 && substr($ln, 0, 25) == "Ligand polar satisfaction")
-        {
-            $polsat[$pose][$node] = floatval(explode(": ", $ln)[1]);
-            $dosce = false;
-            continue;
-        }
-
-        if ($pose && $node>=0 && substr($ln, 0, 15) == "Protein clashes")
-        {
-            $pclash[$pose][$node] = floatval(explode(": ", $ln)[1]);
-            $dosce = false;
-            continue;
-        }
-
-        if ($pose && $node>=0 && strpos($ln, " active theta: "))
-        {
-            $pettias = explode(':', $ln);
-            if (count($pettias) > 1)
+            if ($coldiv[0] == "Pose")
             {
-                $morceaux = explode(' ', $pettias[0]);
-                $acvth[$pose][$node][$morceaux[0]] = floatval($pettias[1]);
+                $pose = intval($coldiv[1]);
+                $node = -1;
+                continue;
+            }
+            else if ($coldiv[0] == "Node")
+            {
+                $node = intval($coldiv[1]);
+                continue;
+            }
+            else if ($coldiv[0] == 'BENERG' || $coldiv[0] == 'vdWRPL')
+            {
+                $mode = $coldiv[0];
+                continue;
+            }
+            else if ($pose && $node>=0)
+            {
+                if (preg_match("/[A-Z][a-z]{2}[0-9]{1,4}/", $coldiv[0]))
+                {
+                    $resno = intval(substr($coldiv[0], 3));
+                    $region = intval(bw_from_resno($protid, $resno));
+                    $lmode = "$mode.$region";
+                    if (isset($metrics_to_process["$mode.rgn"]))
+                    {
+                        $wmode = str_replace(".rgn", ".$region", $metrics_to_process["$mode.rgn"]);
+                        if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
+                        $outdata[$wmode] += floatval($coldiv[1]);
+                        if (!isset($outdqty[$lmode])) $outdqty[$wmode] = 1;
+                        else $outdqty[$wmode]++;
+                    }
+                    continue;
+                }
+                if ($coldiv[0] == "Total")
+                {
+                    if (isset($metrics_to_process[$mode]))
+                    {
+                        $wmode = $metrics_to_process[$mode];
+                        if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
+                        $outdata[$wmode] += floatval($coldiv[1]);
+                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
+                        else $outdqty[$wmode]++;
+                    }
+                    continue;
+                }
+                else if ($coldiv[0] == "Ligand polar satisfaction")
+                {
+                    $mode = "POLSAT";
+                    if (isset($metrics_to_process[$mode]))
+                    {
+                        $wmode = $metrics_to_process[$mode];
+                        if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
+                        $outdata[$wmode] += floatval($coldiv[1]);
+                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
+                        else $outdqty[$wmode]++;
+                    }
+                    continue;
+                }
+                else if ($coldiv[0] == "Protein clashes")
+                {
+                    $mode = "PCLASH";
+                    if (isset($metrics_to_process[$mode]))
+                    {
+                        $wmode = $metrics_to_process[$mode];
+                        if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
+                        $outdata[$wmode] += floatval($coldiv[1]);
+                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
+                        else $outdqty[$wmode]++;
+                    }
+                    continue;
+                }
+                else if (strpos($coldiv[0], " active theta: "))
+                {
+                    $morceaux = explode(' ', $coldiv[0]);
+                    $mode = "ACVTH.{$morceaux[0]}";
+                    if (isset($metrics_to_process[$mode]))
+                    {
+                        $wmode = $metrics_to_process[$mode];
+                        if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
+                        $outdata[$wmode] += floatval($coldiv[1]);
+                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
+                        else $outdqty[$wmode]++;
+                    }
+                    continue;
+                }
             }
         }
 
-        if (!isset($benerg[$pose][$node])) continue;
-
-        $bias = $bias_by_energy ? max(-$benerg[$pose][$node], 1) : 1;
-
-        if (false !== strpos($ln, "pose(s) found")) $poses_found = intval($ln);
+        if (false !== strpos($ln, "pose(s) found"))
+        {
+            $mode = "POSES";
+            if (isset($metrics_to_process[$mode]))
+            {
+                $wmode = $metrics_to_process[$mode];
+                $outdata[$wmode] = intval($ln);
+            }
+            continue;
+        }
 
         if (substr($ln, 0, 5) == 'ATOM ')
         {
@@ -291,223 +328,42 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                 break;
     
                 case 'CA':
-                $ca_loc[$resno] = [$x,$y,$z];
-                if (!isset($sc_loc[$resno]))
+                $ca_loc = [$x,$y,$z];
+                $region = intval(bw_from_resno($protid, $resno));
+                if (isset($metrics_to_process["CALOC.rgn"]))
                 {
-                    $sc_loc[$resno] = [0.0,0.0,0.0];
-                    $sc_qty[$resno] = 0.0;
+                    $wmode = str_replace(".rgn", ".$region", $metrics_to_process["CALOC.rgn"]);
+                    $outdata[$wmode] += floatval($coldiv[1]);
+                    if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
+                    else $outdqty[$wmode]++;
                 }
                 break;
     
                 default:
-                $sc_loc[$resno][0] += ($x - $ca_loc[$resno][0]) * $bias;
-                $sc_loc[$resno][1] += ($y - $ca_loc[$resno][1]) * $bias;
-                $sc_loc[$resno][2] += ($z - $ca_loc[$resno][2]) * $bias;
-                $sc_qty[$resno] += $bias;
-            }
-        }
-    }
-
-    // echo "vdwrpl: "; print_r($vdwrpl); exit;
-    // echo "acvth: "; print_r($acvth); exit;
-
-    $sum = [];
-    $sumps = [];
-    $sumpc = [];
-    $sumat = [];
-    $count = [];
-    $countat = [];
-    $ssce = [];
-    $ssceh = [];
-    $svdw = [];
-    $rsum = [];
-    $rsumv = [];
-    $cbvals = [];
-    $cbcounts = [];
-    foreach ($benerg as $pose => $data)
-    {
-        foreach ($data as $node => $value)
-        {
-            if (!isset($sum[$node]  )) $sum[$node] = 0.0;
-            if (!isset($sumps[$node])) $sumps[$node] = 0.0;
-            if (!isset($count[$node])) $count[$node] = 0;
-            
-            $sum[$node] += $value * $bias;
-            $sumps[$node] += (@$polsat[$pose][$node] ?: 0) * $bias;
-            $sumpc[$node] += (@$pclash[$pose][$node] ?: 0) * $bias;
-            $count[$node] += $bias;
-
-            if (@$acvth[$pose][$node])
-            foreach ($acvth[$pose][$node] as $reg => $theta)
-            {
-                if (!isset($sumat[$node][$reg])) $sumat[$node][$reg] = $theta * $bias;
-                else $sumat[$node][$reg] += $theta * $bias;
-                if (!isset($countat[$node][$reg])) $countat[$node][$reg] = $bias;
-                else $countat[$node][$reg] += $bias;
-            }
-    
-            if (@$scenerg[$pose][$node])
-            foreach ($scenerg[$pose][$node] as $resno => $e)
-            {
-                if (!isset($ssce[$resno])) $ssce[$resno] = floatval($rsum[$resno] = 0);
-                $ssce[$resno] += $e * $bias;
-                $rsum[$resno] += $bias;
-
-                $bw = bw_from_resno($protid, $resno);
-                $tm = intval($bw);
-                if ($tm > 1)
-                {
-                    if (!isset($ssceh[$tm][$node])) $ssceh[$tm][$node] = $e * $bias;
-                    else $ssceh[$tm][$node] += $e * $bias;
-                }
-            }
-    
-            if (@$vdwrpl[$pose][$node])
-            foreach ($vdwrpl[$pose][$node] as $resno => $v)
-            {
-                if (!isset($svdw[$resno])) $svdw[$resno] = floatval($rsumv[$resno] = 0);
-                $svdw[$resno] += $v * $bias;
-                $rsumv[$resno] += $bias;
-            }
-
-            if (function_exists("dockline_callback"))
-            {
-                $raw = dockline_callback($pnlines[$pose][$node]);
-                foreach ($raw as $k => $v)
-                {
-                    if (!isset($cbvals[$k])) $cbvals[$k] = $v;
-                    else $cbvals[$k] += $v * $bias;
-                    if (!isset($cbcounts[$k])) $cbcounts[$k] = $bias;
-                    else $cbcounts[$k] += $bias;
-                }
+                ;
             }
         }
     }
     
-    $sc_avg = [];
-
-    // echo "ca_loc: "; print_r($ca_loc); exit;
-    
-    $sce = [];
-    $vdw = [];
-    foreach ($ca_loc as $resno => $a)
-    {
-        $bw = bw_from_resno($protid, $resno);
-    
-        if ($do_scwhere && $sc_qty[$resno]) 
-        {
-            $sc_avg[$bw] =
-            [
-                round($sc_loc[$resno][0] / $sc_qty[$resno], 3),
-                round($sc_loc[$resno][1] / $sc_qty[$resno], 3),
-                round($sc_loc[$resno][2] / $sc_qty[$resno], 3)
-            ];
-        }
-    
-        // echo "Resno $resno ssce {$ssce[$resno]} / rsum {$rsum[$resno]}.\n";
-        if (@$ssce[$resno] && $rsum[$resno ]) $sce[$bw] = $ssce[$resno] / $rsum[$resno];
-        if (@$svdw[$resno] && $rsumv[$resno]) $vdw[$bw] = $svdw[$resno] / $rsumv[$resno];
-    }
-
-    // echo "sce: "; print_r($sce); exit;
-
-    if ($noclobber)
-    {
-        if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
-        $average = @$dock_results[$protid][$ligname] ?: [];
-    }
-    else $average = [];
-    $average['version'] = $version;
-    $average['Poses'] = $poses_found;
-
-    foreach ($sce as $bw => $e)
-    {
-        // $average["{$metrics_prefix}BEnerg.$bw"] = $e;
-        $tm = intval($bw);
-        $idx = "{$metrics_prefix}BEnerg.TMR$tm";
-        if (!isset($average[$idx])) $average[$idx] = floatval($e);
-        else $average[$idx] += $e;
-    }
-
-    foreach ($ssceh as $tm => $vals)
-        foreach ($vals as $node => $v)
-        {
-            $idx = "BEnerg.TMR$tm.Node$node";
-            $average[$idx] = $v;
-        }
-
-    foreach ($vdw as $bw => $v)
-    {
-        // $average["{$metrics_prefix}vdWrpl.$bw"] = $v;
-        $tm = intval($bw);
-        $idx = "{$metrics_prefix}vdWrpl.TMR$tm";
-        if (!isset($average[$idx])) $average[$idx] = floatval($e);
-        else $average[$idx] += $e;
-    }
-
-    foreach ($sum as $node => $value)
-    {
-        $average["{$metrics_prefix}Node $node"] = round($value / (@$count[$node] ?: 1), 3);
-    }
-
-    foreach ($sumps as $node => $value)
-    {
-        $average["{$metrics_prefix}PolSat.$node"] = round($value / (@$count[$node] ?: 1), 3);
-    }
-
-    foreach ($sumpc as $node => $value)
-    {
-        $average["{$metrics_prefix}PClash.$node"] = round($value / (@$count[$node] ?: 1), 3);
-    }
-
-    foreach ($sumat as $node => $values)
-    {
-        foreach ($values as $reg => $v)
-            $average["{$metrics_prefix}AcvTheta.$reg.$node"] = round($v / (@$countat[$node][$reg] ?: 1), 3);
-    }
-
-    foreach ($cbvals as $k => $v)
-    {
-        if (@$cbcounts[$k]) $v /= $cbcounts[$k];
-        $average[$k] = $v;
-    }
-
-    /*
-    ksort($sc_avg);
-
-    foreach ($sc_avg as $bw => $xyz)
-    {
-        $average["SCW $bw"] = $xyz;
-    }*/
+    $outdata['version'] = $version;
 
     $tme = [];
-    foreach ($average as $k => $v)
+    foreach ($outdata as $k => $v)
     {
-        for ($t = 2; $t <= 7; $t++)
-        {
-            if ( preg_match("/^BEnerg.TMR$t.Node/", $k) )
-            {
-                $node = intval(substr($k, 16));
-                $tme[$t][$node] = floatval($v);
-            }
-        }
-    }
-
-    for ($t = 2; $t <= 7; $t++)
-    {
-        if (@$tme[$t] && count($tme[$t])) $average["TM{$t}_d"] = partial_derivative(array_keys($tme[$t]), $tme[$t]) * abs(correlationCoefficient(array_keys($tme[$t]), $tme[$t]));
+        $div = floatval(@$outdqty[$k]);
+        if ($div) $outdata[$k] = $v / $div;
     }
 
     $actual = best_empirical_pair($protid, $ligname);
     if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
     else $actual = "(unknown)";
 
-    $average["Actual"] = $actual;
+    $outdata["Actual"] = $actual;
 
 
     // Reload to prevent overwriting another process' output.
     if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
-    $dock_results[$protid][$ligname] = $average;
+    $dock_results[$protid][$ligname] = $outdata;
     
     echo "Loaded $json_file with ".count($dock_results)." records.\n";
     

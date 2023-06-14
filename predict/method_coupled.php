@@ -28,17 +28,18 @@ if (!isset($_REQUEST['force']))
 
 prepare_outputs();
 
-$pdbfname = str_replace("pdbs/", "pdbs/coupled/", $pdbfname);
-$pdbfname = str_replace(".upright.", "_hGNAL.", $pdbfname);
+$opdbname = $pdbfname;
+$ooutname = $outfname;
 
-$outfname = str_replace("$protid-", "{$protid}_hGNAL-", $outfname);
 
-if (!file_exists($pdbfname) || filesize($pdbfname) < 100000)
-{
-    $fp = fopen($outfname, "wb");
-    fwrite($fp, "No protein.");
-    fclose($fp);
-}
+
+// Inactive state
+
+$metrics_to_process =
+[
+  "BENERG" => "inactive",
+  "BENERG.rgn" => "inactive.rgn",
+];
 
 $configf = <<<heredoc
 
@@ -68,6 +69,109 @@ ECHO
 heredoc;
 
 process_dock("");
+
+
+
+// Golf a.k.a. hGNAL
+
+$pdbfname = str_replace("pdbs/", "pdbs/coupled/", $opdbname);
+$pdbfname = str_replace(".upright.", "_hGNAL.", $opdbname);
+
+$outfname = str_replace("$protid-", "{$protid}_hGNAL-", $ooutname);
+
+if (!file_exists($pdbfname) || filesize($pdbfname) < 100000)
+{
+    $fp = fopen($outfname, "wb");
+    fwrite($fp, "No protein.");
+    fclose($fp);
+}
+
+$metrics_to_process =
+[
+  "BENERG" => "hGNAL",
+  "BENERG.rgn" => "hGNAL.rgn",
+];
+
+$configf = <<<heredoc
+
+PROT $pdbfname
+LIG sdf/$ligname.sdf
+
+$cenres
+SIZE 7.0 7.0 7.0
+
+EXCL 1 56		# Head, TMR1, and CYT1.
+
+SEARCH TS
+POSE 10
+ELIM 99
+
+FLEX 1
+# H2O 15
+WET
+
+ITERS 50
+
+OUT $outfname
+ECHO
+
+
+
+heredoc;
+
+process_dock("");
+
+
+
+// Gαs a.k.a. hGNAS
+
+$pdbfname = str_replace("pdbs/", "pdbs/coupled/", $opdbname);
+$pdbfname = str_replace(".upright.", "_hGNAS.", $opdbname);
+
+$outfname = str_replace("$protid-", "{$protid}_hGNAS-", $ooutname);
+
+if (!file_exists($pdbfname) || filesize($pdbfname) < 100000)
+{
+    $fp = fopen($outfname, "wb");
+    fwrite($fp, "No protein.");
+    fclose($fp);
+}
+
+$metrics_to_process =
+[
+  "BENERG" => "hGNAS",
+  "BENERG.rgn" => "hGNAS.rgn",
+];
+
+$configf = <<<heredoc
+
+PROT $pdbfname
+LIG sdf/$ligname.sdf
+
+$cenres
+SIZE 7.0 7.0 7.0
+
+EXCL 1 56		# Head, TMR1, and CYT1.
+
+SEARCH TS
+POSE 10
+ELIM 99
+
+FLEX 1
+# H2O 15
+WET
+
+ITERS 50
+
+OUT $outfname
+ECHO
+
+
+
+heredoc;
+
+process_dock("");
+
 
 
 

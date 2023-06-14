@@ -119,16 +119,16 @@ ECHO
 
 heredoc;
 
-process_dock("");
+process_dock("", true);
 
 
 
-// Gαs a.k.a. hGNAS
+// Gαs a.k.a. hGNAS2
 
 $pdbfname = str_replace("pdbs/", "pdbs/coupled/", $opdbname);
-$pdbfname = str_replace(".upright.", "_hGNAS.", $pdbfname);
+$pdbfname = str_replace(".upright.", "_hGNAS2.", $pdbfname);
 
-$outfname = str_replace("$protid-", "{$protid}_hGNAS-", $ooutname);
+$outfname = str_replace("$protid-", "{$protid}_hGNAS2-", $ooutname);
 
 if (!file_exists($pdbfname) || filesize($pdbfname) < 100000)
 {
@@ -139,8 +139,8 @@ if (!file_exists($pdbfname) || filesize($pdbfname) < 100000)
 
 $metrics_to_process =
 [
-  "BENERG" => "hGNAS",
-  "BENERG.rgn" => "hGNAS.rgn",
+  "BENERG" => "hGNAS2",
+  "BENERG.rgn" => "hGNAS2.rgn",
 ];
 
 $configf = <<<heredoc
@@ -170,7 +170,7 @@ ECHO
 
 heredoc;
 
-process_dock("");
+process_dock("", true);
 
 
 

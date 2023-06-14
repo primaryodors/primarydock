@@ -358,6 +358,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
     else $actual = "(unknown)";
 
+    if (function_exists("make_prediction")) $outdata = make_prediction($outdata);
     $outdata["Actual"] = $actual;
 
 

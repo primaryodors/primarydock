@@ -34,6 +34,17 @@ $opdbname = $pdbfname;
 $ooutname = $outfname;
 
 
+function make_prediction($data)
+{
+    if (!isset($data['inactive'])) return $data;
+    $i = floatval($data['inactive']);
+    if (isset($data['hGNAL']) && floatval($data['hGNAL']) < $i) $data['Predicted'] = 'Agonist';
+    else if (isset($data['hGNAS2']) && floatval($data['hGNAS2']) < $i) $data['Predicted'] = 'Agonist';
+    else if (isset($data['hGNAL']) && floatval($data['hGNAL']) > $i) $data['Predicted'] = 'Non-agonist';
+    else if (isset($data['hGNAS2']) && floatval($data['hGNAS2']) > $i) $data['Predicted'] = 'Non-agonist';
+    return $data;
+}
+
 
 // Inactive state
 

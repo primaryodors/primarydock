@@ -322,7 +322,7 @@ void iteration_callback(int iter)
     }
 
     #if bb_realign_iters
-    if (global_pairs.size() >= 2)
+    if (global_pairs.size() >= 2 && ligand->lastbind < 20)
     {
         Point scg0 = global_pairs[0]->scg->get_center();
         Point scg1 = global_pairs[1]->scg->get_center();

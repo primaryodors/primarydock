@@ -12,6 +12,8 @@
 // Configurable variables
 $dock_metals = false;
 $bias_by_energy = true;
+$elima =  5;
+$elimi = 20;
 
 chdir(__DIR__);
 require("methods_common.php");
@@ -53,7 +55,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH TS
 POSE 10
-ELIM 99
+ELIM $elimi
 
 FLEX 1
 # H2O 15
@@ -104,7 +106,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH TS
 POSE 10
-ELIM 99
+ELIM $elima
 
 FLEX 1
 # H2O 15
@@ -155,7 +157,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH TS
 POSE 10
-ELIM 99
+ELIM $elima
 
 FLEX 1
 # H2O 15

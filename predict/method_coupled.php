@@ -73,7 +73,7 @@ FLEX 1
 # H2O 15
 WET
 
-ITERS 50
+ITERS 100
 
 OUT $outfname
 ECHO

@@ -35,7 +35,7 @@ $json_file = "predict/dock_results_$method.json";
 
 // Version
 chdir(__DIR__);
-$version = filemtime("method_$method.php");
+$version = max(filemtime("method_$method.php"), filemtime("methods_common.php"), filemtime("../bin/primarydock"));
 
 chdir("..");
 if (file_exists($json_file))

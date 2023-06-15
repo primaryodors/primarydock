@@ -311,10 +311,33 @@ MCoord* search_mtlcoords_for_residue(AminoAcid* aa)
     return nullptr;
 }
 
-void iteration_callback(int iter)
+Pose iter_best_pose[1000];
+float iter_best_bind;
+void iteration_callback(int iter, Molecule** mols)
 {
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     int l;
+    float f = 0;
+
+    if (iter == 1)
+    {
+        for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
+        iter_best_bind = 0;
+    }
+
+    for (l=0; mols[l]; l++) f += mols[l]->get_intermol_binding(mols);
+
+    if (f > iter_best_bind)
+    {
+        for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
+        iter_best_bind = f;
+        // cout << iter_best_bind << endl << flush;
+    }
+
+    if (iter == iters && iter_best_bind > 0)
+    {
+        for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);
+    }
 
     if (soft_pocket && iter >= 10 && g_rgnrot_alpha && g_rgnrot_u && g_rgnrot_w && g_rgnxform_r && g_rgnxform_theta && g_rgnxform_y)
     {
@@ -322,7 +345,10 @@ void iteration_callback(int iter)
     }
 
     #if bb_realign_iters
-    if (global_pairs.size() >= 2 && ligand->lastbind < 20)
+    #if _dbg_bb_realign
+    cout << ligand->lastbind << (iter == iters ? " ] " : " ") << flush;
+    #endif
+    if (global_pairs.size() >= 2 && ligand->lastbind > bb_realign_b_threshold)
     {
         Point scg0 = global_pairs[0]->scg->get_center();
         Point scg1 = global_pairs[1]->scg->get_center();

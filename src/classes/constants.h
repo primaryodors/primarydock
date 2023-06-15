@@ -68,7 +68,7 @@
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
-#define speed_limit 0.1
+#define speed_limit 0.333
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -119,7 +119,8 @@
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.13
 #define bb_realign_iters 1
-#define bb_realign_amount 0.333
+#define bb_realign_b_threshold 20
+#define bb_realign_amount 0.1
 #define bb_realign_threshold_distance 3.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define flexion_selection 1
@@ -335,6 +336,7 @@
 #define _dbg_conj_chg 0
 #define _dbg_Huckel 0
 #define _dbg_259 0
+#define _dbg_bb_realign 0
 
 #endif
 

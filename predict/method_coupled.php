@@ -11,7 +11,8 @@
 
 // Configurable variables
 $dock_metals = false;
-$bias_by_energy = true;
+
+// Internal variables
 $elima =  5;
 $elimi = 20;
 

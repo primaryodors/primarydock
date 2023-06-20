@@ -333,7 +333,10 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                 if (isset($metrics_to_process["CALOC.rgn"]))
                 {
                     $wmode = str_replace(".rgn", ".$region", $metrics_to_process["CALOC.rgn"]);
-                    $outdata[$wmode] += floatval($coldiv[1]);
+
+                    if (!isset($outdata[$wmode])) $outdata[$wmode] = [0,0,0];
+                    for ($x=0; $x<3; $x++) $outdata[$wmode][$x] += floatval(substr($ln, 29+8*x, 8));
+
                     if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
                     else $outdqty[$wmode]++;
                 }
@@ -351,7 +354,13 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     foreach ($outdata as $k => $v)
     {
         $div = floatval(@$outdqty[$k]);
-        if ($div) $outdata[$k] = $v / $div;
+        if ($div)
+        {
+            if (is_array($v))
+                foreach (array_keys($v) as $k1) $outdata[$k][$k1] /= $div;
+            else
+                $outdata[$k] = $v / $div;
+        }
     }
 
     $actual = best_empirical_pair($protid, $ligname);

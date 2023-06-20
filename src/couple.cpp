@@ -482,7 +482,7 @@ Molecule** g_contacts_as_mols;
 AminoAcid *sbb = nullptr, *sba = nullptr;
 int iters = 50;
 
-std::string prot1fname, prot2fname, tplname;
+std::string prot1fname, prot2fname, tplname, tplrfnm;
 char output_fname[256];
 std::vector<Contact> contacts;
 std::vector<MovablePiece> segments;
@@ -572,7 +572,12 @@ int interpret_cfg_param(char** words)
     else if (!strcmp(words[0], "TEMPLATE"))
     {
         tplname = words[1];
-        return 2;
+        if (words[2])
+        {
+            tplrfnm = words[2];
+            return 3;
+        }
+        else return 2;
     }
     else if (!strcmp(words[0], "ITER"))
     {
@@ -610,7 +615,7 @@ void read_cfg_lines(FILE* fp)
     }
 }
 
-void do_template_homology(const char* template_path)
+void do_template_homology(const char* template_path, const char* reference_path)
 {
     Protein tpl("Template");
     FILE* fp = fopen(template_path, "rb");
@@ -624,7 +629,24 @@ void do_template_homology(const char* template_path)
         tpl.load_pdb(fp);
         fclose(fp);
 
-        g_prot1->homology_conform(&tpl);
+        if (reference_path)
+        {
+            fp = fopen(reference_path, "rb");
+            if (!fp)
+            {
+                cout << "File not found: " << template_path;
+                throw 0xbadcf6;
+            }
+            else
+            {
+                Protein ref("reference");
+                ref.load_pdb(fp);
+                fclose(fp);
+                g_prot1->homology_conform(&tpl, &ref);
+            }
+        }
+
+        else g_prot1->homology_conform(&tpl, nullptr);
     }
 }
 
@@ -740,7 +762,10 @@ int main(int argc, char** argv)
     // TODO: p1 homology.
     if (tplname.length())
     {
-        do_template_homology(tplname.c_str());
+        if (tplrfnm.length())
+            do_template_homology(tplname.c_str(), tplrfnm.c_str());
+        else
+            do_template_homology(tplname.c_str(), nullptr);
     }
 
 

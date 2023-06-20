@@ -91,6 +91,7 @@ char configfname[256];
 char protfname[256];
 char protafname[256];
 char tplfname[256];
+char tplrfnam[256];
 char ligfname[256];
 char smiles[256];
 char outfname[256];
@@ -103,10 +104,11 @@ std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
-bool configset=false, protset=false, tplset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
+bool configset=false, protset=false, tplset=false, tprfset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
 Protein* protein;
 Protein* ptemplt;
+Protein* ptplref;
 int seql = 0;
 int mcoord_resno[256];
 int addl_resno[256];
@@ -1319,7 +1321,15 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "TEMPLATE"))
     {
         tplset = (strcmp(words[1], "off") != 0) && (strcmp(words[1], "OFF") != 0);
-        if (tplset) strcpy(tplfname, words[1]);
+        if (tplset)
+        {
+            strcpy(tplfname, words[1]);
+            if (words[2])
+            {
+                tprfset = true;
+                strcpy(tplrfnam, words[2]);
+            }
+        }
         return 1;
     }
     else if (!strcmp(words[0], "TRIP"))
@@ -2007,7 +2017,20 @@ int main(int argc, char** argv)
         cout << "Homology template is " << tplfname << endl;
         #endif
 
-        protein->homology_conform(ptemplt);
+        if (tprfset)
+        {
+            ptplref = new Protein("reference");
+            pf = fopen(tplrfnam, "r");
+            if (!pf)
+            {
+                cout << "Error trying to read " << tplrfnam << endl;
+                return 0xbadf12e;
+            }
+            ptplref->load_pdb(pf);
+            fclose(pf);
+            protein->homology_conform(ptemplt, ptplref);
+        }
+        else protein->homology_conform(ptemplt, protein);
 
         temp_pdb_file = "tmp/homolog.pdb";
 

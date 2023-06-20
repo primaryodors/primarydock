@@ -2846,11 +2846,13 @@ void Protein::upright()
     mass_undoable = wmu;
 }
 
-void Protein::homology_conform(Protein* target)
+void Protein::homology_conform(Protein* target, Protein* reference)
 {
     save_undo_state();
     bool wmu = mass_undoable;
     mass_undoable = true;
+
+    if (!reference) reference = this;
 
     // Check that both proteins have TM helices and BW numbers set. If not, error out.
     if (!get_region_start("TMR6") || !target->get_region_start("TMR6")) throw 0xbadbeb7;
@@ -2926,16 +2928,81 @@ void Protein::homology_conform(Protein* target)
     // Perform the rotation.
     target->rotate_piece(1, 9999, center, axis, theta);
 
+    if (reference != this)
+    {
+        count = 0;
+        xform_delta = center = Point(0,0,0);
+        resnos1.clear();
+        resnos2.clear();
+
+        for (hxno = 1; hxno <= 7; hxno++)
+        {
+            sprintf(buffer, "TMR%d", hxno);
+            int rgend1 = get_region_end(buffer);
+            int rgstart2 = reference->get_region_start(buffer);
+            int rgend2 = reference->get_region_end(buffer);
+            int bw50a = get_bw50(hxno), bw50b = reference->get_bw50(hxno);
+            for (resno1 = get_region_start(buffer); resno1 <= rgend1; resno1++)
+            {
+                int i = resno1 - bw50a;
+                resno2 = bw50b + i;
+                if (resno2 >= rgstart2 && resno2 <= rgend2)
+                {
+                    Point caloc = get_atom_location(resno1, "CA");
+                    Point ptdiff = caloc.subtract(reference->get_atom_location(resno2, "CA"));
+                    xform_delta = xform_delta.add(ptdiff);
+                    center = center.add(caloc);
+                    count++;
+
+                    resnos1.push_back(resno1);
+                    resnos2.push_back(resno2);
+                }
+            }
+        }
+        if (count)
+        {
+            xform_delta.scale(xform_delta.magnitude() / count);
+            center.scale(center.magnitude() / count);
+        }
+
+        move_amt = xform_delta;
+        reference->move_piece(1, 9999, move_amt);
+
+        // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
+        // the TM CA atoms as closely as possible.
+        int i;
+        float theta = 0;
+        Point axis(0,1,0);
+        count = 0;
+        for (i=0; i<resnos1.size(); i++)
+        {
+            resno1 = resnos1[i];
+            resno2 = resnos2[i];
+            Point pt1 = get_atom_location(resno1, "CA"), pt2 = reference->get_atom_location(resno2, "CA");
+            pt1.y = pt2.y = 0;
+            Rotation rot = align_points_3d(pt2, pt1, center);
+            Point rotv = rot.v;
+            if (rotv.y < 0) theta -= rot.a;
+            else theta += rot.a;
+            count++;
+        }
+
+        if (count) theta /= count;
+
+        // Perform the rotation.
+        reference->rotate_piece(1, 9999, center, axis, theta);
+    }
+
     // Find the rotations and transformations for each TM region to bring its CA atoms as close as
     // possible to those of the target.
     for (hxno = 1; hxno <= 7; hxno++)
     {
         sprintf(buffer, "TMR%d", hxno);
-        int rgstart1 = get_region_start(buffer);
-        int rgend1 = get_region_end(buffer);
+        int rgstart1 = reference->get_region_start(buffer);
+        int rgend1 = reference->get_region_end(buffer);
         int rgstart2 = target->get_region_start(buffer);
         int rgend2 = target->get_region_end(buffer);
-        int bw50a = get_bw50(hxno), bw50b = target->get_bw50(hxno);
+        int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
         Point rcen1(0,0,0);
         Point rcen2(0,0,0);
         count = 0;
@@ -2945,7 +3012,7 @@ void Protein::homology_conform(Protein* target)
             resno2 = bw50b + i;
             if (resno2 >= rgstart2 && resno2 <= rgend2)
             {
-                rcen1 = rcen1.add(get_atom_location(resno1, "CA"));
+                rcen1 = rcen1.add(reference->get_atom_location(resno1, "CA"));
                 rcen2 = rcen2.add(target->get_atom_location(resno2, "CA"));
                 count++;
             }
@@ -2970,7 +3037,7 @@ void Protein::homology_conform(Protein* target)
             resno2 = bw50b + i;
             if (resno2 >= rgstart2 && resno2 <= rgend2)
             {
-                Point caloc1 = get_atom_location(resno1, "CA"),
+                Point caloc1 = reference->get_atom_location(resno1, "CA"),
                       caloc2 = target->get_atom_location(resno2, "CA");
                 Rotation rot = align_points_3d(caloc1, caloc2, rcen);
 
@@ -3018,6 +3085,7 @@ void Protein::homology_conform(Protein* target)
         target_clash[hxno] = target->get_internal_clashes(rgstart2, rgend2, false);
     }
 
+    mass_undoable = wmu;
     return;
 
     // Repack the TM regions, then adjust their locations and rotations to minimize clashes.

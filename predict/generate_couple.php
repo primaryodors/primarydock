@@ -75,7 +75,7 @@ $cfg = <<<heredoc
 
 PROT1 pdbs/$fam/$gpcrid.upright.pdb
 PROT2 pdbs/Gprot/$gpid.pdb
-# TEMPLATE pdbs/OR51/OR51E2.8f76.pdb
+TEMPLATE pdbs/OR51/OR51E2.8f76.pdb pdbs/OR51/OR51E2.upright.pdb
 
 # CONTACT 1:RK6.58~1 1:DE45.51                        # EXR salt bridge for fish-like ORs ***CAUSES CLASHES***
 CONTACT 1:YHNQ6.55 1:DE45.51                        # EXR hbond for tetrapod ORs

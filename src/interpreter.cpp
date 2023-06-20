@@ -979,8 +979,19 @@ int main(int argc, char** argv)
                 {
                     tpl.load_pdb(fp);
                     fclose(fp);
-
-                    p.homology_conform(&tpl);
+                    if (words[2])
+                    {
+                        fp = fopen(words[2], "rb");
+                        if (!fp) raise_error("File not found.");
+                        else
+                        {
+                            Protein ref("reference");
+                            ref.load_pdb(fp);
+                            fclose(fp);
+                            p.homology_conform(&tpl, &ref);
+                        }
+                    }
+                    else p.homology_conform(&tpl, &p);
                 }
             }   // HOMOLOGY
 

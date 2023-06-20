@@ -146,7 +146,7 @@ public:
     );
 
     SoftBias* get_soft_bias_from_region(const char* region);
-    void homology_conform(Protein* target_structure);
+    void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);
     void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
 

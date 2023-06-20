@@ -77,7 +77,7 @@ PROT1 pdbs/$fam/$gpcrid.upright.pdb
 PROT2 pdbs/Gprot/$gpid.pdb
 TEMPLATE pdbs/OR51/OR51E2.8f76.pdb
 
-CONTACT 1:RK6.58~1 1:DE45.51                        # EXR salt bridge for fish-like ORs
+# CONTACT 1:RK6.58~1 1:DE45.51                        # EXR salt bridge for fish-like ORs ***CAUSES CLASHES***
 CONTACT 1:YHNQ6.55 1:DE45.51                        # EXR hbond for tetrapod ORs
 CONTACT N4.38~2 DEQRK(LLLLGAGESGKSTIVKQMRILH-8)     # CYT2 and N-terminus "index finger" helix
 CONTACT KR7.57~2 DE(HFTCATDTXNXXFVF+30)~3           # TMR7/tail joint and tip of C-terminus "thumb" helix

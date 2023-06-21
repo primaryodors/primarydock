@@ -3088,6 +3088,35 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         }
 
         // Do the same for region end forward to the next helix.
+        inarow = 0;
+        helix = 0;
+        int protend = get_end_resno();
+        for (hc = rgend1+1; hc < protend; hc++)
+        {
+            AminoAcid* aa = get_residue(hc);
+            if (!aa) continue;
+            if (aa->is_alpha_helix()) inarow++;
+            else inarow = 0;
+
+            if (inarow >= 4)
+            {
+                helix = hc + inarow - 1;
+                break;
+            }
+        }
+
+        grad_len = helix - rgend1;
+        grad_peraa = (inarow >= 4) ? (1.0 / grad_len) : 0;
+        effect = 1;
+
+        for (hc = rgend1+1; hc < helix && hc <= protend; hc++)
+        {
+            effect -= grad_peraa;
+            SCoord resmov = transformation;
+            resmov.r *= effect;
+            move_piece(hc, hc, resmov);
+            rotate_piece(hc, hc, rcen, axis, theta*effect);
+        }
     }
 
     // Prepare for clash minimization.

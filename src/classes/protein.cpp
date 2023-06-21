@@ -3025,7 +3025,8 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         }
 
         // Perform the TM region transformation.
-        move_piece(rgstart1, rgend1, (SCoord)rcen2.subtract(rcen1));
+        Point transformation = rcen2.subtract(rcen1);
+        move_piece(rgstart1, rgend1, (SCoord)transformation);
 
         Point axis(0,0,0);
         Point rcen = get_region_center(rgstart1, rgend1);
@@ -3055,6 +3056,38 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
         // Perform the TM region rotation.
         rotate_piece(rgstart1, rgend1, rcen, axis, theta);
+
+        // Count from region start backwards until at least four consecutive helix residues.
+        int hc, inarow = 0, helix = 0;
+        for (hc = rgstart1-1; hc > 0; hc--)
+        {
+            AminoAcid* aa = get_residue(hc);
+            if (!aa) continue;
+            if (aa->is_alpha_helix()) inarow++;
+            else inarow = 0;
+
+            if (inarow >= 4)
+            {
+                helix = hc + inarow - 1;
+                break;
+            }
+        }
+
+        // Transform and rotate the flexible loop residues in a gradient from maximum effect at region start to no effect at other helix.
+        int grad_len = rgstart1 - helix;
+        float grad_peraa = (inarow >= 4) ? (1.0 / grad_len) : 0;
+        float effect = 1;
+
+        for (hc = rgstart1-1; hc > helix; hc--)
+        {
+            effect -= grad_peraa;
+            SCoord resmov = transformation;
+            resmov.r *= effect;
+            move_piece(hc, hc, resmov);
+            rotate_piece(hc, hc, rcen, axis, theta*effect);
+        }
+
+        // Do the same for region end forward to the next helix.
     }
 
     // Prepare for clash minimization.

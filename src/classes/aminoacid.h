@@ -141,11 +141,15 @@ public:
     Atom* capable_of_inter(intera_type inter);
     LocRotation enforce_peptide_bond(bool cis = false);				// Peptide bonds should almost always be in the trans (E) configuration.
     void hydrogenate(bool steric_only = false);
+    float get_phi();
+    float get_psi();
+    float get_omega();
 
     // Intermol functions.
     float get_intermol_binding(AminoAcid* neighbor, bool backbone_atoms_only = false);
     float get_intermol_binding(AminoAcid** neighbors, bool backbone_atoms_only = false);
     float hydrophilicity() const;
+    bool is_alpha_helix();
 
     // Misc.
     void delete_sidechain();
@@ -172,7 +176,6 @@ protected:
     char region[25];
     AADef* aadef=0;
     AminoAcid *prev_aa=0, *next_aa=0;
-    float current_phi = M_PI, current_psi = M_PI, current_omega = M_PI;
     char pdbchain = ' ';
 };
 

@@ -1817,6 +1817,95 @@ Atom* AminoAcid::capable_of_inter(intera_type inter)
     return retval;
 }
 
+float AminoAcid::get_phi()
+{
+    if (!prev_aa)
+    {
+        if (!next_aa) return 0;
+        return next_aa->get_phi();
+    }
+
+    Atom *C0, *N, *CA, *C1;
+    C0 = prev_aa->get_atom("C");
+    N  = get_atom("N");
+    CA = get_atom("CA");
+    C1 = get_atom("C");
+
+    if (!C0 || !N || !CA || !C1) return 0;
+
+    SCoord axis = CA->get_location().subtract(N->get_location());
+
+    return find_angle_along_vector(C0->get_location(), C1->get_location(), CA->get_location(), axis);
+}
+
+float AminoAcid::get_psi()
+{
+    
+    if (!next_aa)
+    {
+        if (!prev_aa) return 0;
+        return prev_aa->get_phi();
+    }
+
+    Atom *N0, *CA, *C, *N1;
+    N0 = get_atom("N");
+    CA = get_atom("CA");
+    C  = get_atom("C");
+    N1 = next_aa->get_atom("N");
+
+    if (!N0 || !CA || !C || !N1) return 0;
+
+    SCoord axis = C->get_location().subtract(CA->get_location());
+
+    return find_angle_along_vector(N0->get_location(), N1->get_location(), CA->get_location(), axis);
+}
+
+float AminoAcid::get_omega()
+{
+    // TODO:
+}
+
+bool AminoAcid::is_alpha_helix()
+{
+    int i, j;
+    Atom *a, *b;
+    AminoAcid* aa;
+
+    if (!prev_aa && !next_aa) return false;
+
+    float f = (next_aa) ? (get_psi() + next_aa->get_phi()) : (prev_aa->get_psi() + get_psi());
+    f *= fiftyseven;
+    if (f > 180) f -= 360;
+
+    // cout << residue_no << " has f = " << f << endl;
+    if (fabs(f - -105) > 18) return false;
+
+    for (j=0; j<2; j++)
+    {
+        aa = this;
+        for (i=0; i<4; i++)
+        {
+            aa = j ? aa->next_aa : aa->prev_aa;
+            if (!aa) break;
+        }
+
+        if (aa)
+        {
+            a = (j ? this : aa)->get_atom("O");
+            b = (j ? aa : this)->get_atom("HN");
+            if (!b) b = (j ? aa : this)->get_atom("H");
+
+            if (a && b)
+            {
+                float r = a->distance_to(b);
+                if (r < helix_hbond_cutoff) return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 float AminoAcid::hydrophilicity() const
 {
     int i, count=0;

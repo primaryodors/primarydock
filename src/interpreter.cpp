@@ -905,6 +905,48 @@ int main(int argc, char** argv)
                 continue;
             }	// GOTO
 
+            else if (!strcmp(words[0], "HELICES"))
+            {
+                int sr, er, hc, hf = 0;
+
+                er = p.get_end_resno();
+                sr = -1;
+                for (hc = p.get_start_resno(); hc <= er; hc++)
+                {
+                    AminoAcid *aa = p.get_residue(hc), *aan = p.get_residue(hc+1);
+                    if (!aa) continue;
+
+                    bool is_helix = aa->is_alpha_helix();
+
+                    // Allow single outliers.
+                    if (aan) is_helix |= aan->is_alpha_helix();
+
+                    if (is_helix)
+                    {
+                        if (sr < 0) sr = hc;
+                        // cout << hc << " is part of a helix." << endl;
+                    }
+                    else
+                    {
+                        if (sr > 0 && sr < hc-4)
+                        {
+                            hf++;
+                            std::string hxname = (std::string)"\%helix" + std::to_string(hf) + (std::string)".start";
+                            Star s;
+                            s.n = sr;
+                            set_variable(hxname.c_str(), s);
+
+                            hxname = (std::string)"\%helix" + std::to_string(hf) + (std::string)".end";
+                            s.n = hc - 1;
+                            set_variable(hxname.c_str(), s);
+
+                        }
+                        
+                        sr = -1;
+                    }
+                }
+            }   // HELICES
+
             else if (!strcmp(words[0], "HELIX"))
             {
                 float phi, psi;

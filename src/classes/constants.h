@@ -20,6 +20,8 @@
 #define any_element -5141
 #define Avogadro 6.02214076e+23
 
+#define helix_hbond_cutoff 2.6
+
 #define pH 6.0
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.

@@ -31,6 +31,8 @@ foreach (@$argv as $a)
 $max_simultaneous_couples = 4;
 $cpl_dir = "pdbs/coupled";
 
+if (@$_REQUEST['simul']) $max_simultaneous_couples = intval($_REQUEST['simul']);
+
 if (!file_exists($cpl_dir)) mkdir($cpl_dir);
 
 if (@$_REQUEST['next'])

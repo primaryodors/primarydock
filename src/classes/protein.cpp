@@ -1317,11 +1317,9 @@ int Protein::search_sequence(const int sr, const int esr, const char* psz, const
             if (c == aac) num_eq++;
 
             sim = aa->similarity_to(c);
-            // cout << c << "/" << aac << " " << sim << "  ";
 
             m += sim;
         }
-        // cout << "___ m: " << m << ", n: " << n << endl;
 
         if (m > n && num_eq >= threshold)
         {

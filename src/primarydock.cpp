@@ -329,10 +329,17 @@ void iteration_callback(int iter, Molecule** mols)
 
     for (l=0; mols[l]; l++)
     {
-        float lf = mols[l]->get_intermol_binding(mols);
+        float lf = mols[l]->get_intermol_binding(mols), ptnl = mols[l]->get_intermol_potential(mols);
         f += lf;
 
-        if (flex && lf < 5 && mols[l]->movability == MOV_FLXDESEL && frand(0,1) < 0.2) mols[l]->movability = MOV_FORCEFLEX;
+        if (flex
+            && (lf < 5 || lf < 0.1 * ptnl)
+            && mols[l]->movability == MOV_FLXDESEL
+            && frand(0,1) < 0.2
+            )
+        {
+            mols[l]->movability = MOV_FORCEFLEX;
+        }
     }
 
     if (f > iter_best_bind)

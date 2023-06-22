@@ -6,7 +6,19 @@ chdir("..");
 // Includes
 require("predict/protutils.php");
 
-$Gprots = ["hGNAL", "hGNAS2"];
+// $Gprots = ["hGNAL", "hGNAS2"];
+$Gprots = [];
+
+$c = file_get_contents("data/gprots_aligned.txt");
+foreach (explode("\n", $c) as $ln)
+{
+	if (substr($ln, 0, 1) == '#') continue;
+	$gpid = trim(substr($ln, 0, 10));
+	if ($gpid)
+	{
+		if (file_exists("pdbs/Gprot/$gpid.pdb")) $Gprots[] = $gpid;
+	}
+}
 
 foreach (@$argv as $a)
 {

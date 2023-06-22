@@ -346,7 +346,6 @@ void iteration_callback(int iter, Molecule** mols)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
         iter_best_bind = f;
-        // cout << iter_best_bind << endl << flush;
     }
 
     if (iter == iters && iter_best_bind > 0)

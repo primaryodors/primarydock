@@ -924,7 +924,6 @@ int main(int argc, char** argv)
                     if (is_helix)
                     {
                         if (sr < 0) sr = hc;
-                        // cout << hc << " is part of a helix." << endl;
                     }
                     else
                     {

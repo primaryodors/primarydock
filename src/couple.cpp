@@ -1056,7 +1056,7 @@ int main(int argc, char** argv)
     cout << "Optimizing contacts..." << endl;
     _INTERA_R_CUTOFF = 10;
     optimize_contacts(50);
-    p1.get_internal_clashes(1, p1.get_end_resno(), true, 30);
+    p1.get_internal_clashes(1, p1.get_end_resno(), true, 100);
 
     // Add the contacts as binding residues.
     n = contacts.size();

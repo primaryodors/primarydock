@@ -44,9 +44,12 @@ predictions with at least 80% accuracy, we'd be delighted to accept your pull re
 
 Configurable variables include:
 `$dock_metals`          If true, the dock will use PDBs that end in `.metal.pdb` instead of the default `.upright.pdb`.
+                        You probably won't ever have to use the `$dock_metals` feature.
 `$dock_retries`         The number of times to retry if no poses returned. Each retry increases the energy limit.
+                        Default = 5.
 `$bias_by_energy`       TODO: This has not been implemented yet.
 `$metrics_to_process`   An array of key-value pairs identifying a dock metric and its new key in the output JSON.
+                        Valid keys can be found in the table below; the value becomes the metric's key in the JSON.
 
 Available parameters for `$metrics_to_process` include:
 `BENERG`                Total binding energy between ligand and protein;
@@ -61,3 +64,6 @@ Available parameters for `$metrics_to_process` include:
 
 `POSES`                 Total number of poses found.
 `CALOC.rgn`             Average relative motion of alpha carbon atoms within each region as a result of a "soft dock".
+
+For keys ending with `.rgn`, the `rgn` will be replaced with the actual region name. For example, if the method PHP
+specifies `BENERG.rgn` => `energy.rgn`, then the JSON will contain metrics labeled `energy.TMR3`, `energy.TMR6`, etc.

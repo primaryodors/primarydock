@@ -118,9 +118,9 @@ char* Rotation::printable()
 Point Point::multiply_3d_distance(const Point* reference, float r_mult)
 {
     Point retval;
-    retval.x = x*r_mult;
-    retval.y = y*r_mult;
-    retval.z = z*r_mult;
+    retval.x = (x-reference->x)*r_mult+reference->x;
+    retval.y = (y-reference->y)*r_mult+reference->y;
+    retval.z = (z-reference->z)*r_mult+reference->z;
     return retval;
 }
 
@@ -189,7 +189,17 @@ SCoord::SCoord(float lr, float ltheta, float lphi)
     phi = lphi;
 }
 
-
+// https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+float Point::get_distance_to_line(Point a, Point b)
+{
+    float r2 = pow(a.get_3d_distance(b), 2);
+    if (!r2) return get_3d_distance(a);
+    
+    float t = fmax(0, fmin(1,  ((x - a.x) * (b.x - a.x) + (y - a.y) * (b.y - a.y) + (z - a.z) * (b.z - a.z)) / r2));
+    Point p(a.x + t * (b.x-a.x), a.y + t * (b.y-a.y), a.z + t * (b.z-a.z));
+    
+    return get_3d_distance(p);
+}
 
 
 Point average_of_points(Point* points, int count)

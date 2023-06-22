@@ -171,9 +171,10 @@ public:
 
     float bindability_by_type(intera_type type, bool include_backbone = false);
 
-    static void conform_molecules(Molecule** molecules, int iterations = 50, void (*callback)(int) = nullptr);
-    static void conform_molecules(Molecule** molecules, Molecule** background, int iterations = 50, void (*callback)(int) = nullptr);
-    static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int) = nullptr);
+    static float total_intermol_binding(Molecule** ligands);
+    static void conform_molecules(Molecule** molecules, int iterations = 50, void (*callback)(int, Molecule**) = nullptr);
+    static void conform_molecules(Molecule** molecules, Molecule** background, int iterations = 50, void (*callback)(int, Molecule**) = nullptr);
+    static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int, Molecule**) = nullptr);
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);

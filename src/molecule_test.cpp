@@ -10,7 +10,7 @@ using namespace std;
 
 Molecule* mols[3];
 
-void iteration_callback(int iter)
+void iteration_callback(int iter, Molecule** mols)
 {
     #if _dbg_mol_frames
 

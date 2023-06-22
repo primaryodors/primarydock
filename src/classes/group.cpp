@@ -127,6 +127,31 @@ float AtomGroup::get_avg_elecn()
     return result;
 }
 
+float AtomGroup::hydrophilicity()
+{
+    int atct = atoms.size();
+    if (!atct) return 0;
+    int i, j=0;
+    float result = 0, divisor = 0;
+    for (i=0; i<atct; i++)
+    {
+        if (atoms[i]->get_Z() == 1) continue;
+        float h = fabs(atoms[i]->is_polar());
+        if (h > 0.333)
+        {
+            result += h;
+            divisor += 1;
+        }
+        else
+        {
+            divisor += 1.0/3;
+        }
+    }
+
+    if (divisor) result /= divisor;
+    return result;
+}
+
 int AtomGroup::contains_element(const char* esym)
 {
     int i;
@@ -266,6 +291,32 @@ Point ResidueGroup::get_center()
 float ResidueGroup::distance_to(Point pt)
 {
     return pt.get_3d_distance(get_center());
+}
+
+float ResidueGroup::hydrophilicity()
+{
+    int amsz = aminos.size();
+    if (!amsz) return 0;
+    float result = 0, divisor = 0;
+    int i;
+    bool has_acids = false, has_his = false;
+    for (i=0; i<amsz; i++)
+    {
+        float h = fabs(aminos[i]->hydrophilicity());
+
+        if (h >= 0.2)
+        {
+            result += h;
+            divisor += 1;
+        }
+        else
+        {
+            divisor += 1.5;
+        }
+    }
+
+    if (divisor) result /= divisor;
+    return result;
 }
 
 float ResidueGroup::compatibility(AtomGroup* ag)
@@ -735,6 +786,11 @@ float GroupPair::get_potential()
     {
         int m = ag->atoms.size(), n = scg->aminos.size();
         if (!m || !n) return 0;
+
+        bool polar_atoms = (fabs(ag->hydrophilicity()) >= 0.25);
+        bool polar_res   = (fabs(scg->hydrophilicity()) >= 0.2);
+
+        if (polar_atoms != polar_res) return 0;
 
         int i, j, q=0;
         for (i=0; i<m; i++)

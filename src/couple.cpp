@@ -982,30 +982,35 @@ int main(int argc, char** argv)
         int sr = (segments[i].first_pivot ? segments[i].first_pivot : segments[i].start_residue)->get_residue_no(),
             er = (segments[i].last_pivot ? segments[i].last_pivot : segments[i].end_residue)->get_residue_no();
         l = er - sr;
+
+        std::vector<AminoAcid*> vcc = p1.get_residues_can_clash(sr, er);
+        vcc.insert(vcc.end(), vca.begin(), vca.end());
+        int m1 = vcc.size();
+
         Point seg_motion(0,0,0);
         for (j=0; j<l; j++)
         {
             AminoAcid* aa = segments[i].prot->get_residue(sr+j);
             if (!aa) continue;
 
-            for (k=0; k<m; k++)
+            for (k=0; k<m1; k++)
             {
-                float r = vca[k]->distance_to((Molecule*)aa), rc, clash;
+                float r = vcc[k]->distance_to((Molecule*)aa), rc, clash;
                 if (r >= 10) continue;
-                rc = vca[k]->get_reach() + aa->get_reach();
+                rc = vcc[k]->get_reach() + aa->get_reach();
                 if (r > rc) continue;
 
-                clash = vca[k]->get_intermol_clashes((Molecule*)aa);
+                clash = vcc[k]->get_intermol_clashes((Molecule*)aa);
                 if (clash < 2) continue;
 
                 h = 0;
                 while (clash)
                 {
-                    rel = aa->get_CA_location().subtract(vca[k]->get_CA_location());
+                    rel = aa->get_CA_location().subtract(vcc[k]->get_CA_location());
                     rel.scale((fmax(1, fmin(rc, 8) - r)) / 3);
 
                     #if _dbg_flexion
-                    cout << *aa << " is clashing with " << *vca[k] << " by " << clash << " cu.A." << endl;
+                    cout << *aa << " is clashing with " << *vcc[k] << " by " << clash << " cu.A." << endl;
                     #endif
 
                     // TODO: Increase rel according to distance from pivot.
@@ -1017,9 +1022,9 @@ int main(int argc, char** argv)
                     h++;
                     if (h > 10) break;
                     
-                    r = vca[k]->distance_to((Molecule*)aa), rc, clash;
-                    rc = vca[k]->get_reach() + aa->get_reach();
-                    clash = vca[k]->get_intermol_clashes((Molecule*)aa);
+                    r = vcc[k]->distance_to((Molecule*)aa), rc, clash;
+                    rc = vcc[k]->get_reach() + aa->get_reach();
+                    clash = vcc[k]->get_intermol_clashes((Molecule*)aa);
                 }
             }
         }

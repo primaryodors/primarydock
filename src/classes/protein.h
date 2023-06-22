@@ -93,6 +93,7 @@ public:
     float get_intermol_clashes(Molecule* ligand);
     float get_intermol_binding(Molecule* ligand);
     AminoAcid** get_residues_can_clash(int resno);
+    std::vector<AminoAcid*> get_residues_can_clash(int start_resno, int end_resno);
     int get_residues_can_clash_ligand
     (	AminoAcid** reaches_spheroid,
         Molecule* ligand,

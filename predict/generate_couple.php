@@ -83,8 +83,8 @@ CONTACT N4.38~2 DEQRK(LLLLGAGESGKSTIVKQMRILH-8)     # CYT2 and N-terminus "index
 CONTACT KR7.57~2 DE(HFTCATDTXNXXFVF+30)~3           # TMR7/tail joint and tip of C-terminus "thumb" helix
 CONTACT DE6.29 RK(HFTCATDTXNXXFVF+23)~2             # TMR6 and middle of "thumb" helix
 CONTACT H3.59~1 Y(HFTCATDTXNXXFVF+29)~2             # TMR3 and "thumb" tip
-CONTACT STNQED56.50 K(IIQRMHLKQYELL+7)              # CYT3 and "thumb" tip (olfactory G proteins)
-CONTACT STNQED56.50 K(DAVTDIIIKENLKDCGLF+8)         # CYT3 and "thumb" tip (non-olfactory G proteins)
+# CONTACT STNQED56.50 K(IIQRMHLKQYELL+7)              # CYT3 and "thumb" tip (olfactory G proteins)
+# CONTACT STNQED56.50 K(DAVTDIIIKENLKDCGLF+8)         # CYT3 and "thumb" tip (non-olfactory G proteins)
 CONTACT STNQED7.59 STNQ(LKQYELL+2)                  # TMR7/tail joint and tip of C-terminus "thumb" helix
 CONTACT MAILV5.65 MAILV(LKQYELL+0)                  # TMR2/3/5 and "thumb" tip hydrophobic pocket
 CONTACT MAILV5.61 MAILV(LKQYELL+5)                  # TMR2/3/5 and "thumb" tip hydrophobic pocket
@@ -94,12 +94,17 @@ CONTACT MAILV2.39 MAILV(LKQYELL+5)                  # TMR2/3/5 and "thumb" tip h
 CONTACT MAILV3.46 MAILV(LKQYELL+5)                  # TMR2/3/5 and "thumb" tip hydrophobic pocket
 CONTACT X3.58 X(IEKXLXXEKE+14)                      # Dummy contact to align "index finger" with CYT2.
 CONTACT X3.62 X(IEKXLXXEKE+10)                      # Dummy contact to align "index finger" with CYT2.
+CONTACT ERKSTYNQD56.50 Y(YCYPHFTCAVDTENIRR+0)		# CYT3 region to strand beside "thumb" (olfactory G proteins)
+CONTACT ERKSTYNQD56.50 Y(YSHFTCATDTQNIQFVF+0)		# CYT3 region to strand beside "thumb" (non-olfactory G proteins)
+CONTACT MAILV3.62~2 FHMAILVP(HFTCAXDTXNIXFVF+14)~1	# CYT2 region to middle of "thumb"
 
 SEGMENT 1 1.27 0 1.58
 SEGMENT 1.59 2.37 1.28 2.65
-SEGMENT 2.66 3.20 2.38 3.56
+# SEGMENT 2.66 3.20 2.38 3.56
 SEGMENT 3.57 4.38 3.21 4.64
-SEGMENT 4.65 5.31 4.39 5.67
+# SEGMENT 4.65 5.31 4.39 5.67
+SEGMENT 4.65 4.66 4.39 45.51
+SEGMENT 5.30 5.31 45.58 5.67
 SEGMENT 5.68 6.27 5.32 6.59 5.32 6.48
 SEGMENT 6.60 7.29 6.28 7.56
 SEGMENT 7.57 end 7.30

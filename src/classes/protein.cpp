@@ -1097,6 +1097,34 @@ AminoAcid** Protein::get_residues_can_clash(int resno)
     return 0;
 }
 
+std::vector<AminoAcid*> Protein::get_residues_can_clash(int sr, int er)
+{
+    std::vector<AminoAcid*> result;
+    int i, j;
+    bool already[get_seq_length()+4];
+    for (i=0; residues[i]; i++) already[i] = false;
+
+    for (j=sr; j<=er; j++)
+    {
+        AminoAcid* aa = get_residue(j);
+        for (i=0; residues[i]; i++)
+        {
+            if (already[i]) continue;
+
+            int resno = residues[i]->get_residue_no();
+            if (resno >= sr && resno <= er) continue;
+
+            if (aa->can_reach(residues[i]))
+            {
+                result.push_back(residues[i]);
+                already[i] = true;
+            }
+        }
+    }
+
+    return result;
+}
+
 int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         Molecule* ligand,
         const Point nodecen,
@@ -3087,6 +3115,8 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             rotate_piece(hc, hc, rcen, axis, theta*effect);
         }
 
+        // if (helix) backconnect(helix+1, rgstart1-1);
+
         // Do the same for region end forward to the next helix.
         inarow = 0;
         helix = 0;
@@ -3109,7 +3139,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         grad_peraa = (inarow >= 4) ? (1.0 / grad_len) : 0;
         effect = 1;
 
-        for (hc = rgend1+1; hc < helix && hc <= protend; hc++)
+        for (hc = rgend1+1; (!helix || hc < helix) && hc <= protend; hc++)
         {
             effect -= grad_peraa;
             SCoord resmov = transformation;
@@ -3117,6 +3147,8 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             move_piece(hc, hc, resmov);
             rotate_piece(hc, hc, rcen, axis, theta*effect);
         }
+
+        // if (helix) backconnect(rgend1+1, helix-1);
     }
 
     // Prepare for clash minimization.

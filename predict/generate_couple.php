@@ -20,6 +20,8 @@ foreach (explode("\n", $c) as $ln)
 	}
 }
 
+print_r($Gprots);
+
 foreach (@$argv as $a)
 {
 	  $a = explode('=',$a,2);

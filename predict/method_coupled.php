@@ -78,6 +78,7 @@ ITERS 100
 
 OUT $outfname
 ECHO
+OPEND
 
 
 
@@ -129,6 +130,7 @@ ITERS 50
 
 OUT $outfname
 ECHO
+OPEND
 
 
 
@@ -180,6 +182,7 @@ ITERS 50
 
 OUT $outfname
 ECHO
+OPEND
 
 
 

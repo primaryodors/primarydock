@@ -48,7 +48,7 @@ else
 fi
 
 
-# TODO: This is where mol_assem_test would go, but currently its output must be checked visually.
+./test/mol_assem_tests.sh
 
 
 REPORT="test/amino_test.approved.txt"

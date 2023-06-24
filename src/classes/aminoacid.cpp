@@ -15,6 +15,7 @@ using namespace std;
 
 AADef aa_defs[256];
 char* override_aminos_dat=0;
+float aa_sim_xref[65536];
 
 void AminoAcid::find_his_flips()
 {
@@ -1018,6 +1019,7 @@ void AminoAcid::save_pdb(FILE* os, int atomno_offset)
 
     for (i=0; atoms[i]; i++)
     {
+        atoms[i]->pdbchain = pdbchain;
         atoms[i]->save_pdb_line(os, i+1+atomno_offset);
     }
 }
@@ -1381,6 +1383,9 @@ void AminoAcid::load_aa_defs()
         char lastletter = '\0';
         bool isbb = false;
         bool proline_like = false;
+
+        for (i=0; i<65536; i++) aa_sim_xref[i] = -1;
+
         while (!feof(pf))
         {
             fgets(buffer, 1011, pf);
@@ -1397,6 +1402,11 @@ void AminoAcid::load_aa_defs()
                         }
 
                     int idx = words[0][0];
+                    if (idx == 'X')
+                    {
+                        cout << "Cannot use X as a letter for amino acids. X means accept any residue in a motif search." << endl;
+                        throw 0xbadaadef;
+                    }
 
                     if (!lastletter || words[0][0] != lastletter)
                     {
@@ -1528,10 +1538,17 @@ float AminoAcid::similarity_to(const char letter)
 {
     AminoAcid* a = nullptr;
     if (!aa_defs[letter].SMILES.length()) return 0;
+
+    int i = (int)letter + 256*(int)this->get_letter();
+    if (aa_sim_xref[i] >= 0) return aa_sim_xref[i];
     
     a = new AminoAcid(letter);
     float s = similarity_to(a);
     delete a;
+
+    aa_sim_xref[i] = s;
+    i = (int)this->get_letter() + 256*(int)letter;
+    aa_sim_xref[i] = s;
 
     return s;
 }
@@ -1544,6 +1561,10 @@ float AminoAcid::similarity_to(const AminoAcid* aa)
     bool polar2 = (aa->hydrophilicity() > 0.2);
 
     int i, j;
+
+    i = (int)aa->get_letter() + 256*(int)this->get_letter();
+    if (aa_sim_xref[i] >= 0) return aa_sim_xref[i];
+
     float simil=0, divis=0;
     for (i=0; atoms[i]; i++)
     {
@@ -1566,6 +1587,11 @@ float AminoAcid::similarity_to(const AminoAcid* aa)
     simil -= 0.5*fabs( fmin(1, fabs(hydrophilicity())) - fmin(1, fabs(aa->hydrophilicity())) );
     simil += 0.5*(sgn(get_charge() * aa->get_charge()));
     simil = fmax(0, fmin(1, simil));
+
+    i = (int)aa->get_letter() + 256*(int)this->get_letter();
+    aa_sim_xref[i] = simil;
+    i = (int)this->get_letter() + 256*(int)aa->get_letter();
+    aa_sim_xref[i] = simil;
 
     return simil;
 }
@@ -1592,6 +1618,22 @@ Ring* AminoAcid::get_most_distal_arom_ring()
 
     if (retidx < 0) return nullptr;
     return rings[retidx];
+}
+
+char AminoAcid::set_pdb_chain(char c)
+{
+    if (c >= 'A' && c <= 'Z')
+    {
+        pdbchain = c;
+    }
+
+    int i;
+    if (atoms) for (i=0; atoms[i]; i++)
+    {
+        atoms[i]->pdbchain = pdbchain;
+    }
+
+    return pdbchain;
 }
 
 std::ostream& operator<<(std::ostream& os, const AABondDef& b)
@@ -1717,6 +1759,10 @@ bool AminoAcid::conditionally_basic() const
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 {
     if (!&aa) return os;
+
+    char c = aa.get_pdb_chain();
+    if (c && c != ' ') os << c << ":";
+
     try
     {
         AADef* raa = aa.get_aa_definition();
@@ -1726,6 +1772,7 @@ std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
     {
         ;
     }
+
     os << aa.get_residue_no();
     return os;
 }
@@ -1768,6 +1815,95 @@ Atom* AminoAcid::capable_of_inter(intera_type inter)
     }
 
     return retval;
+}
+
+float AminoAcid::get_phi()
+{
+    if (!prev_aa)
+    {
+        if (!next_aa) return 0;
+        return next_aa->get_phi();
+    }
+
+    Atom *C0, *N, *CA, *C1;
+    C0 = prev_aa->get_atom("C");
+    N  = get_atom("N");
+    CA = get_atom("CA");
+    C1 = get_atom("C");
+
+    if (!C0 || !N || !CA || !C1) return 0;
+
+    SCoord axis = CA->get_location().subtract(N->get_location());
+
+    return find_angle_along_vector(C0->get_location(), C1->get_location(), CA->get_location(), axis);
+}
+
+float AminoAcid::get_psi()
+{
+    
+    if (!next_aa)
+    {
+        if (!prev_aa) return 0;
+        return prev_aa->get_phi();
+    }
+
+    Atom *N0, *CA, *C, *N1;
+    N0 = get_atom("N");
+    CA = get_atom("CA");
+    C  = get_atom("C");
+    N1 = next_aa->get_atom("N");
+
+    if (!N0 || !CA || !C || !N1) return 0;
+
+    SCoord axis = C->get_location().subtract(CA->get_location());
+
+    return find_angle_along_vector(N0->get_location(), N1->get_location(), CA->get_location(), axis);
+}
+
+float AminoAcid::get_omega()
+{
+    // TODO:
+}
+
+bool AminoAcid::is_alpha_helix()
+{
+    int i, j;
+    Atom *a, *b;
+    AminoAcid* aa;
+
+    if (!prev_aa && !next_aa) return false;
+
+    float f = (next_aa) ? (get_psi() + next_aa->get_phi()) : (prev_aa->get_psi() + get_psi());
+    f *= fiftyseven;
+    if (f > 180) f -= 360;
+
+    // cout << residue_no << " has f = " << f << endl;
+    if (fabs(f - -105) > 18) return false;
+
+    for (j=0; j<2; j++)
+    {
+        aa = this;
+        for (i=0; i<4; i++)
+        {
+            aa = j ? aa->next_aa : aa->prev_aa;
+            if (!aa) break;
+        }
+
+        if (aa)
+        {
+            a = (j ? this : aa)->get_atom("O");
+            b = (j ? aa : this)->get_atom("HN");
+            if (!b) b = (j ? aa : this)->get_atom("H");
+
+            if (a && b)
+            {
+                float r = a->distance_to(b);
+                if (r < helix_hbond_cutoff) return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 float AminoAcid::hydrophilicity() const

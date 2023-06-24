@@ -559,9 +559,9 @@ function show_seqdd()
 {
 	var seqdd = $('#seqdd')[0];
 	seqdd.innerHTML = "<b>Show/Hide Side Chains:</b><br><br>";
-	
+
 	var perline = 40;
-	
+
 	var i;
 	var span = document.createElement("span");
 	var dots = ". . . . . . . . .";
@@ -574,6 +574,7 @@ function show_seqdd()
 	for (i=0; i<sequence.length; i++)
 	{
 		var tgl = document.createElement("span");
+		if (typeof restoggled[i+1] == "undefined") restoggled[i+1] = 0;
 		tgl.className = "clickme nodebtn sctgbtn" + (restoggled[i+1] ? " hilite" : "");
 		var rcd = rgn_color_dark(i+1, true);
 		if (rcd) tgl.style.backgroundColor = css_color(rcd);
@@ -911,7 +912,7 @@ function showSideChain(resno)
                 "metalness": mtl_licorice,
                 "clipNear": clipValue,
             });
-			restoggled[mdlidx] = 1;
+			restoggled[resno] = 1;
 			$('#seqddtgl'+resno).addClass('hilite');
 		}
 	}
@@ -927,10 +928,10 @@ function toggleSideChain(resno)
 	try
 	{
 		var mdlidx = mdlresno.indexOf(resno);
-		if (restoggled[mdlidx])
+		if (restoggled[resno])
 		{
 			resmdl[mdlidx].removeAllRepresentations();
-			restoggled[mdlidx] = 0;
+			restoggled[resno] = 0;
 			$('#seqddtgl'+resno).removeClass('hilite');
 		}
 		else
@@ -984,18 +985,17 @@ function showAllSideChains()
 
 function hideAllSideChains()
 {
-	/*var resno = 1;
-	var mdlidx = mdlresno.indexOf(resno);
-	while (typeof resmdl[mdlidx] != "undefined")*/
-	var mdlidx;
-	for (mdlidx = 0; mdlidx < resmdl.length; mdlidx++)
+	var resno = 1;
+	while (typeof restoggled[resno] != "undefined")
 	{
-		resno = mdlresno[mdlidx];
-		resmdl[mdlidx].removeAllRepresentations();
-		restoggled[mdlidx] = 0;
-		$('#seqddtgl'+resno).removeClass('hilite');
-		/*resno++;
-		mdlidx = mdlresno.indexOf(resno);*/
+		var mdlidx = mdlresno.indexOf(resno);
+		if (mdlidx > 0)
+		{
+			resmdl[mdlidx].removeAllRepresentations();
+			restoggled[resno] = 0;
+			$('#seqddtgl'+resno).removeClass('hilite');
+		}
+		resno++;
 	}
 }
 
@@ -1365,7 +1365,9 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
     this.atomColor = function(atom)
     {
         var resno = atom.resno;
-        var rgnc = rgn_color(resno, true);
+        var rgnc = 0;
+		
+		if (!atom.chainIndex) rgnc = rgn_color(resno, true);
 
 		if (!rgnc)
 		{

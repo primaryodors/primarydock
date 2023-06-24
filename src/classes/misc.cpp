@@ -295,7 +295,12 @@ float protonation(float pKa)
     throw 0xbadbca;
 }
 
-
+float larger(float v1, float v2)
+{
+    float v1a = fabs(v1), v2a = fabs(v2);
+    int sign = (v2a > v1a) ? sgn(v2) : sgn(v1);
+    return fmax(v1a, v2a) * sign;
+}
 
 
 

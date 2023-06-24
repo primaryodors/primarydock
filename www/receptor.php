@@ -327,7 +327,7 @@ echo "</p>";*/
 
     ?>
 
-    <h3>Transmembane Helices:</h3>
+    <h3>Transmembrane Helices:</h3>
     <pre style="padding: 5px;"><?php 
     $mxrt = 0; 
     foreach ($rgntext as $rgn => $text) if (substr($rgn,0,3) == 'TMR') 

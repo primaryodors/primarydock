@@ -2060,10 +2060,12 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     if (strlen(name) < 3) fprintf(pf, " ");
     if (strlen(name) < 2) fprintf(pf, " ");
 
-    fprintf(pf, "%s   ", aa3let);
+    if (!pdbchain) pdbchain = ' ';
+    fprintf(pf, "%s %c", aa3let, pdbchain);
 
-    if (residue < 100) fprintf(pf, " ");
-    if (residue <  10) fprintf(pf, " ");
+    if (residue < 1000) fprintf(pf, " ");
+    if (residue <  100) fprintf(pf, " ");
+    if (residue <   10) fprintf(pf, " ");
     fprintf(pf, "%d    ", residue);
 
     if (!location.x) location.x = 0;
@@ -2778,16 +2780,16 @@ float Atom::similarity_to(Atom* b)
     #define both_or_neither_abs_polarity_at_least_point2 13
     #define both_or_neither_abs_polarity_at_least_point333 13
     #define abs_delta_polarity_within_point333 15
-     #define one_polar_one_sugarlike_nonpolar 13
+    #define one_polar_one_sugarlike_nonpolar 13
     #define same_sgn_charge 16
-     #define one_charged_one_neutral_polar 10
-     #define opposite_charges -20
+    #define one_charged_one_neutral_polar 10
+    #define opposite_charges -20
     #define both_or_neither_pi_and_both_or_neither_polar 18
-     #define neither_pi_one_polar_one_sugary 15
-     #define one_polar_both_pi 13
-     #define one_polar_only_one_pi 11
+    #define neither_pi_one_polar_one_sugary 15
+    #define one_polar_both_pi 13
+    #define one_polar_only_one_pi 11
     #define neither_pi_or_conjugated_together 15
-     #define one_pi_one_aliphatic -20
+    #define one_pi_one_aliphatic -20
     #define abs_delta_elecn_within_point7 10
 
     #if both_or_neither_abs_polarity_at_least_point2 + both_or_neither_abs_polarity_at_least_point333 + abs_delta_polarity_within_point333\

@@ -91,6 +91,7 @@ char configfname[256];
 char protfname[256];
 char protafname[256];
 char tplfname[256];
+char tplrfnam[256];
 char ligfname[256];
 char smiles[256];
 char outfname[256];
@@ -103,10 +104,11 @@ std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
-bool configset=false, protset=false, tplset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
+bool configset=false, protset=false, tplset=false, tprfset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
 Protein* protein;
 Protein* ptemplt;
+Protein* ptplref;
 int seql = 0;
 int mcoord_resno[256];
 int addl_resno[256];
@@ -311,10 +313,45 @@ MCoord* search_mtlcoords_for_residue(AminoAcid* aa)
     return nullptr;
 }
 
-void iteration_callback(int iter)
+Pose iter_best_pose[1000];
+float iter_best_bind;
+void iteration_callback(int iter, Molecule** mols)
 {
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     int l;
+    float f = 0;
+
+    if (iter == 1)
+    {
+        for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
+        iter_best_bind = 0;
+    }
+
+    for (l=0; mols[l]; l++)
+    {
+        float lf = mols[l]->get_intermol_binding(mols), ptnl = mols[l]->get_intermol_potential(mols);
+        f += lf;
+
+        if (flex
+            && (lf < 5 || lf < 0.1 * ptnl)
+            && mols[l]->movability == MOV_FLXDESEL
+            && frand(0,1) < 0.2
+            )
+        {
+            mols[l]->movability = MOV_FORCEFLEX;
+        }
+    }
+
+    if (f > iter_best_bind)
+    {
+        for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);
+        iter_best_bind = f;
+    }
+
+    if (iter == iters && iter_best_bind > 0)
+    {
+        for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);
+    }
 
     if (soft_pocket && iter >= 10 && g_rgnrot_alpha && g_rgnrot_u && g_rgnrot_w && g_rgnxform_r && g_rgnxform_theta && g_rgnxform_y)
     {
@@ -322,7 +359,10 @@ void iteration_callback(int iter)
     }
 
     #if bb_realign_iters
-    if (global_pairs.size() >= 2)
+    #if _dbg_bb_realign
+    cout << ligand->lastbind << (iter == iters ? " ] " : " ") << flush;
+    #endif
+    if (global_pairs.size() >= 2 && ligand->lastbind > bb_realign_b_threshold)
     {
         Point scg0 = global_pairs[0]->scg->get_center();
         Point scg1 = global_pairs[1]->scg->get_center();
@@ -1298,7 +1338,15 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "TEMPLATE"))
     {
         tplset = (strcmp(words[1], "off") != 0) && (strcmp(words[1], "OFF") != 0);
-        if (tplset) strcpy(tplfname, words[1]);
+        if (tplset)
+        {
+            strcpy(tplfname, words[1]);
+            if (words[2])
+            {
+                tprfset = true;
+                strcpy(tplrfnam, words[2]);
+            }
+        }
         return 1;
     }
     else if (!strcmp(words[0], "TRIP"))
@@ -1986,7 +2034,20 @@ int main(int argc, char** argv)
         cout << "Homology template is " << tplfname << endl;
         #endif
 
-        protein->homology_conform(ptemplt);
+        if (tprfset)
+        {
+            ptplref = new Protein("reference");
+            pf = fopen(tplrfnam, "r");
+            if (!pf)
+            {
+                cout << "Error trying to read " << tplrfnam << endl;
+                return 0xbadf12e;
+            }
+            ptplref->load_pdb(pf);
+            fclose(pf);
+            protein->homology_conform(ptemplt, ptplref);
+        }
+        else protein->homology_conform(ptemplt, protein);
 
         temp_pdb_file = "tmp/homolog.pdb";
 
@@ -4274,7 +4335,7 @@ _try_again:
     {
         for (j=0; j<poses; j++)
         {
-            if (dr[j][0].pose == i)
+            if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
                 if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)
                 {

@@ -1,0 +1,14 @@
+#
+# Pepteditor script for extracting G proteins to their own PDBs.
+#
+
+LOAD "pdbs/OR51/8f76.pdb" X
+ECHO $SEQUENCE
+HYDRO
+SAVE "pdbs/Gprot/hGNAS2.pdb"
+
+
+LOAD "pdbs/TAAR/8iw1.pdb" A
+ECHO $SEQUENCE
+HYDRO
+SAVE "pdbs/Gprot/hGNAL.pdb"

@@ -143,7 +143,7 @@ int main(int argc, char** argv)
                 {
                     float s = all_aa[i]->similarity_to(all_aa[j]);
                     char buffer[16];
-                    sprintf(buffer, "%0.2f", s);
+                    sprintf(buffer, "%0.2f", 0.02 * roundf(s*50));
                     cout << " " << buffer;
                 }
                 cout << endl;

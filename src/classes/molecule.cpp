@@ -2736,7 +2736,7 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     return tryenerg;
 }
 
-void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int))
+void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**))
 {
     int m, n;
 
@@ -2785,7 +2785,20 @@ void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void 
     }
 }
 
-void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
+float Molecule::total_intermol_binding(Molecule** l)
+{
+    int i;
+    float f = 0;
+
+    for (i=0; l[i]; i++)
+    {
+        f += l[i]->get_intermol_binding(l);
+    }
+
+    return f;
+}
+
+void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molecule**))
 {
     if (!mm) return;
     int i, j, l, n, iter;
@@ -2794,6 +2807,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
 
     for (iter=1; iter<=iters; iter++)
     {
+        for (i=0; mm[i]; i++) mm[i]->lastbind = 0;
+
         for (n=0; mm[n]; n++);      // Get count.
         Molecule* nearby[n+8];
 
@@ -2930,7 +2945,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
                     float theta;
 
                     if (a->movability & MOV_MC_AXIAL && frand(0,1) < 0.2) theta = frand(-M_PI, M_PI);
-                    else theta = frand(-0.25, 0.25)*fiftyseventh*min(20, iter);
+                    else theta = frand(-0.5, 0.5)*fiftyseventh*min(20, iter);
 
                     a->rotate(&axis, theta);
                     tryenerg = cfmol_multibind(a, nearby);
@@ -2987,10 +3002,12 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int))
             #if _dbg_fitness_plummet
             if (!i) cout << benerg << endl;
             #endif
+
+            mm[i]->lastbind = benerg;
         }       // for i
 
         #if allow_iter_cb
-        if (cb) cb(iter);
+        if (cb) cb(iter, mm);
         #endif
 
         minimum_searching_aniso *= 0.99;

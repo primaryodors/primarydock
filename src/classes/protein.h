@@ -54,7 +54,7 @@ public:
     bool disulfide_bond(int resno1, int resno2);
 
     // Serialization.
-    int load_pdb(FILE* infile, int resno_offset = 0);				// Returns number of residues loaded.
+    int load_pdb(FILE* infile, int resno_offset = 0, char chain = 'A');				// Returns number of residues loaded.
     void save_pdb(FILE* outfile, Molecule* ligand = nullptr);
     void end_pdb(FILE* outfile);
     void revert_to_pdb();
@@ -81,14 +81,19 @@ public:
     std::vector<std::string> get_remarks(std::string search_for = "");
     void add_remark(std::string new_remark);
     int get_bw50(int helixno);
+    int search_sequence(const int start_resno, const int end_resno, const char* search_for, const int threshold = -1, int* similarity = nullptr);
+
+    char get_pdb_chain() const { return pdbchain; }
+    char set_pdb_chain(char chain);
 
     // Metrics functions.
-    float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false);
+    float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false, int repack_iters = 15);
     float get_rel_int_clashes();
     float get_internal_binding();
     float get_intermol_clashes(Molecule* ligand);
     float get_intermol_binding(Molecule* ligand);
     AminoAcid** get_residues_can_clash(int resno);
+    std::vector<AminoAcid*> get_residues_can_clash(int start_resno, int end_resno);
     int get_residues_can_clash_ligand
     (	AminoAcid** reaches_spheroid,
         Molecule* ligand,
@@ -98,6 +103,7 @@ public:
     );
 
     std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
+    std::vector<AminoAcid*> get_contact_residues(Protein* other_prot);
     Molecule** all_residues_as_molecules();
     Molecule** all_residues_as_molecules_except(Molecule** mm);
     Point get_region_center(int startres, int endres);
@@ -129,6 +135,7 @@ public:
 
     void backconnect(int startres, int endres);
     void find_residue_initial_bindings();
+    void undo();
 
     void make_helix(int startres, int endres, float phi, float psi);
     void make_helix(int startres, int endres, int stopat, float phi, float psi);
@@ -140,7 +147,7 @@ public:
     );
 
     SoftBias* get_soft_bias_from_region(const char* region);
-    void homology_conform(Protein* target_structure);
+    void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);
     void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
 
@@ -166,11 +173,16 @@ protected:
     std::vector<AABridge> aabridges;
     std::vector<Bond*> connections;
     std::vector<Pose> origpdb_residues;
+    char pdbchain = ' ';
+    Pose** undo_poses = nullptr;
+    bool mass_undoable = false;
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);
     friend void ext_mtl_coord_cnf_cb(int iter);
     void mtl_coord_cnf_cb(int iter);
+    void allocate_undo_poses();
+    void save_undo_state();
 };
 
 extern float *g_rgnxform_r, *g_rgnxform_theta, *g_rgnxform_y, *g_rgnrot_alpha, *g_rgnrot_w, *g_rgnrot_u;

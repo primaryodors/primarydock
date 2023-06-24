@@ -141,11 +141,15 @@ public:
     Atom* capable_of_inter(intera_type inter);
     LocRotation enforce_peptide_bond(bool cis = false);				// Peptide bonds should almost always be in the trans (E) configuration.
     void hydrogenate(bool steric_only = false);
+    float get_phi();
+    float get_psi();
+    float get_omega();
 
     // Intermol functions.
     float get_intermol_binding(AminoAcid* neighbor, bool backbone_atoms_only = false);
     float get_intermol_binding(AminoAcid** neighbors, bool backbone_atoms_only = false);
     float hydrophilicity() const;
+    bool is_alpha_helix();
 
     // Misc.
     void delete_sidechain();
@@ -154,6 +158,8 @@ public:
     float similarity_to(const AminoAcid* aa);
     Ring* get_most_distal_arom_ring();
     std::string printable();
+    char get_pdb_chain() const { return pdbchain; }
+    char set_pdb_chain(char chain);
 
     // Public properties.
     int strand;
@@ -170,11 +176,12 @@ protected:
     char region[25];
     AADef* aadef=0;
     AminoAcid *prev_aa=0, *next_aa=0;
-    float current_phi = M_PI, current_psi = M_PI, current_omega = M_PI;
+    char pdbchain = ' ';
 };
 
 extern AADef aa_defs[256];		// Indexed by ASCII value of one-letter code.
 extern char* override_aminos_dat;
+extern float aa_sim_xref[65536];
 
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa);
 std::ostream& operator<<(std::ostream& os, const AABondDef& b);

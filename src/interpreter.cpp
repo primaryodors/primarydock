@@ -495,6 +495,7 @@ int main(int argc, char** argv)
         strcpy(buffer, script_lines[program_counter].c_str());
         char** words = chop_spaced_words(buffer);
         char** owords = words;
+        char chain = 'A';
         if (words && words[0] && words[0][0] && words[0][1])
         {
             for (k=0; words[k]; k++)
@@ -904,6 +905,47 @@ int main(int argc, char** argv)
                 continue;
             }	// GOTO
 
+            else if (!strcmp(words[0], "HELICES"))
+            {
+                int sr, er, hc, hf = 0;
+
+                er = p.get_end_resno();
+                sr = -1;
+                for (hc = p.get_start_resno(); hc <= er; hc++)
+                {
+                    AminoAcid *aa = p.get_residue(hc), *aan = p.get_residue(hc+1);
+                    if (!aa) continue;
+
+                    bool is_helix = aa->is_alpha_helix();
+
+                    // Allow single outliers.
+                    if (aan) is_helix |= aan->is_alpha_helix();
+
+                    if (is_helix)
+                    {
+                        if (sr < 0) sr = hc;
+                    }
+                    else
+                    {
+                        if (sr > 0 && sr < hc-4)
+                        {
+                            hf++;
+                            std::string hxname = (std::string)"\%helix" + std::to_string(hf) + (std::string)".start";
+                            Star s;
+                            s.n = sr;
+                            set_variable(hxname.c_str(), s);
+
+                            hxname = (std::string)"\%helix" + std::to_string(hf) + (std::string)".end";
+                            s.n = hc - 1;
+                            set_variable(hxname.c_str(), s);
+
+                        }
+                        
+                        sr = -1;
+                    }
+                }
+            }   // HELICES
+
             else if (!strcmp(words[0], "HELIX"))
             {
                 float phi, psi;
@@ -978,8 +1020,19 @@ int main(int argc, char** argv)
                 {
                     tpl.load_pdb(fp);
                     fclose(fp);
-
-                    p.homology_conform(&tpl);
+                    if (words[2])
+                    {
+                        fp = fopen(words[2], "rb");
+                        if (!fp) raise_error("File not found.");
+                        else
+                        {
+                            Protein ref("reference");
+                            ref.load_pdb(fp);
+                            fclose(fp);
+                            p.homology_conform(&tpl, &ref);
+                        }
+                    }
+                    else p.homology_conform(&tpl, &p);
                 }
             }   // HOMOLOGY
 
@@ -1380,8 +1433,9 @@ int main(int argc, char** argv)
                 if (!words[1]) raise_error("Insufficient parameters given for LOAD.");
                 psz = interpret_single_string(words[1]);
 				n = 0;
-				// if (words[2]) n = atoi(words[2]);
-                if (words[2] /*&& words[3]*/) raise_error("Too many parameters given for LOAD.");
+                chain = 'A';
+				if (words[2]) chain = words[2][0];
+                if (words[2] && words[3]) raise_error("Too many parameters given for LOAD.");
 
                 pf = fopen(psz, "rb");
                 if (!pf)
@@ -1389,7 +1443,7 @@ int main(int argc, char** argv)
                     raise_error( (std::string)"Failed to open " + (std::string)psz + (std::string)" for reading.");
                     return 0xbadf12e;
                 }
-                p.load_pdb(pf, n);
+                p.load_pdb(pf, n, chain);
 
                 fclose(pf);
 
@@ -1853,32 +1907,7 @@ int main(int argc, char** argv)
                     threshold = interpret_single_int(words[l++]);
                 }
 
-                n = 0;
-                k = 0;
-                for (i=sr; i<esr; i++)
-                {
-                    m = num_eq = 0;
-                    for (j=0; psz[j]; j++)
-                    {
-                        char c = psz[j], aac = p.get_residue(i+j)->get_letter();
-                        if (c == 'X') c = aac;
-
-                        if (c == aac) num_eq++;
-
-                        sim = p.get_residue(i+j)->similarity_to(c);
-                        // cout << c << "/" << aac << " " << sim << "  ";
-
-                        m += sim;
-                    }
-                    // cout << "___ m: " << m << ", n: " << n << endl;
-
-                    if (m > n && num_eq >= threshold)
-                    {
-                        k = i;
-                        n = m;
-                    }
-                }
-                sim = n;
+                k = p.search_sequence(sr, esr, psz, threshold, &sim);
 
                 delete[] psz;
 

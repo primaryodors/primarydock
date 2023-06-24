@@ -59,6 +59,7 @@ enum STR_PAD {STR_PAD_RIGHT, STR_PAD_LEFT, STR_PAD_BOTH};
 std::string str_pad(const std::string &str, int pad_length, std::string pad_string=" ", STR_PAD pad_type=STR_PAD_RIGHT);
 std::string cardinality_printable(float card);
 float protonation(float pKa);
+float larger(float v1, float v2);
 
 #if active_persistence
 float residue_binding_multiplier(int resno);

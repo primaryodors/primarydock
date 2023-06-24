@@ -18,7 +18,7 @@ of all the olfactory GPCRs coupled to G proteins. This is handled by another cro
 `generate_couple.php`. Here's an example crontab:
 
 ```
-* * * * * php -f /path/to/primarydock/predict/generate_couple.php next
+* * * * * php -f /path/to/primarydock/predict/generate_couple.php next simul=4
 * * * * * php -f /path/to/primarydock/predict/method_coupled.php next simul=4
 ```
 
@@ -32,7 +32,9 @@ executable.
 
 The `simul=4` parameter indicates not to run more than 4 concurrent processes. We recommend a value of half the number
 of cores on your machine, so if you have a server with one 8-core processor, then `simul=4` would be the recommended
-value, whereas if you are running it on a 4-core machine, then we recommend `simul=2` instead.
+value, whereas if you are running it on a 4-core machine, then we recommend `simul=2` instead. If you have `lm-sensors`
+installed (`sudo apt-get install lm-sensors`), then both PHP scripts will automatically limit themselves depending on
+the CPU temperature.
 
 You can use the `predict/progress.sh` shell script to monitor the cron's progress.
 
@@ -67,3 +69,7 @@ Available parameters for `$metrics_to_process` include:
 
 For keys ending with `.rgn`, the `rgn` will be replaced with the actual region name. For example, if the method PHP
 specifies `BENERG.rgn` => `energy.rgn`, then the JSON will contain metrics labeled `energy.TMR3`, `energy.TMR6`, etc.
+
+
+
+

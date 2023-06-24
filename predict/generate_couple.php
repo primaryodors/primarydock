@@ -4,6 +4,7 @@ chdir(__DIR__);
 chdir("..");
 
 // Includes
+require("cputemp.php");
 require("predict/protutils.php");
 
 // $Gprots = ["hGNAL", "hGNAS2"];
@@ -136,6 +137,8 @@ heredoc;
 $fp = fopen($cfgf, "wb") or die("FAILED to open $cfgf for writing.");
 fwrite($fp, $cfg);
 fclose($fp);
+
+die_if_too_hot();
 
 $cmd = "bin/couple $cfgf | tee tmp/cplout";
 echo "Running: $cmd\n";

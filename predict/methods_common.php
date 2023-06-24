@@ -3,10 +3,13 @@
 global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere, $metrics_to_process;
 
 // Includes
+require("cputemp.php");
 require("protutils.php");
 require("odorutils.php");
 require("dock_eval.php");
 require_once("statistics.php");
+
+die_if_too_hot();
 
 echo date("Y-m-d H:i:s.u\n");
 
@@ -156,7 +159,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     {
     	$elim = 0;
         for ($try = 0; $try < $dock_retries; $try++)
-        {
+        {            
             set_time_limit(300);
             $outlines = [];
             $cmd = "bin/primarydock \"$cnfname\"";

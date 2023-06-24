@@ -244,7 +244,7 @@ protected:
     int aidx(Atom* a);
     void reallocate();
     float fsb_lsb_anomaly(Atom* first, Atom* last, float lcard, float bond_length);
-    // void make_coplanar_ring(Atom** ring_members, int ringid);
+    void make_coplanar_ring(Atom** ring_members, int ringid);
     void recenter_ring(int ringid, Point new_ring_cen);
     void rotate_ring(int ringid, Rotation rot);
     bool in_same_ring(Atom* a, Atom* b);

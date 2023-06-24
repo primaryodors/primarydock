@@ -1,0 +1,9 @@
+Created empty molecule named Test.
+Minimizing internal clashes...
+Adjusted internal clashes: 0 cu.A.
+Atom C1 has bond angles: 90 109.471 109.471 109.471 109.471 109.471
+Atom C2 has bond angles: 90 109.471 109.471 109.471 109.471 109.471
+Atom C3 has bond angles: 90 109.471 109.471 109.471 109.471 109.471
+Atom C4 has bond angles: 90 109.471 109.471 109.471 109.471 109.471
+Saved test/received/cyclobutane.received.sdf
+

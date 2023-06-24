@@ -50,8 +50,20 @@ int main(int argc, char** argv)
     }*/
 
     float int_clsh = m.get_internal_clashes();
-    if (int_clsh < 1) cout << "# ";
-    cout << "Internal clashes: " << int_clsh << " cu.A." << endl;
+    cout << "Adjusted internal clashes: " << int_clsh << " cu.A." << endl;
+
+    int i, n = m.get_atom_count();
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = m.get_atom(i);
+        if (a && a->get_Z() > 1)
+        {
+            cout << "Atom " << a->name << " has bond angles:";
+            a->print_bond_angles();
+            cout << endl;
+        }
+    }
 
     char tstoutf[1024];
     if (argc > 2) strcpy(tstoutf, argv[2]);

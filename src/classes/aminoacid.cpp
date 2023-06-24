@@ -1840,7 +1840,6 @@ float AminoAcid::get_phi()
 
 float AminoAcid::get_psi()
 {
-    
     if (!next_aa)
     {
         if (!prev_aa) return 0;
@@ -1862,10 +1861,31 @@ float AminoAcid::get_psi()
 
 float AminoAcid::get_omega()
 {
-    // TODO:
+    if (!next_aa)
+    {
+        if (!prev_aa) return 0;
+        return prev_aa->get_phi();
+    }
+
+    Atom *CA0, *C, *N, *CA1;
+    CA0 = get_atom("CA");
+    C   = get_atom("C");
+    N   = next_aa->get_atom("N");
+    CA1 = next_aa->get_atom("CA");
+
+    if (!CA0 || !C || !N || !CA1) return 0;
+
+    SCoord axis = N->get_location().subtract(C->get_location());
+
+    return find_angle_along_vector(CA0->get_location(), CA1->get_location(), N->get_location(), axis);
 }
 
 bool AminoAcid::is_alpha_helix()
+{
+    return is_helix(4);
+}
+
+bool AminoAcid::is_helix(int p)
 {
     int i, j;
     Atom *a, *b;
@@ -1878,12 +1898,13 @@ bool AminoAcid::is_alpha_helix()
     if (f > 180) f -= 360;
 
     // cout << residue_no << " has f = " << f << endl;
-    if (fabs(f - -105) > 18) return false;
+    float pf = -195.0 + 360.0 / p;
+    if (fabs(f - pf) > 18) return false;
 
     for (j=0; j<2; j++)
     {
         aa = this;
-        for (i=0; i<4; i++)
+        for (i=0; i<p; i++)
         {
             aa = j ? aa->next_aa : aa->prev_aa;
             if (!aa) break;

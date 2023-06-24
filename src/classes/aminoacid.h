@@ -150,6 +150,7 @@ public:
     float get_intermol_binding(AminoAcid** neighbors, bool backbone_atoms_only = false);
     float hydrophilicity() const;
     bool is_alpha_helix();
+    bool is_helix(int periodicity);
 
     // Misc.
     void delete_sidechain();

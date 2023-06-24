@@ -69,13 +69,11 @@ PrimaryDock is stochastic so that its output will be different each time, and re
 previous runs may have missed.
 
 If you would like to contribute to this project:
-<ol><li>I would be sooo very grateful for the help!</li>
-<li>Please create a branch off of stable, then submit a pull request;</li>
-<li>All PRs that change the C++ classes or the primarydock app must pass the Big Three test (see the test/big_three file),
-and receive an all clear 🟩🟩🟩 message, before merge.</li>
-<li>Use whichever { style you prefer; as long as the code is readable and it works, that's all I care about.</li>
-<li>Have fun and try not to let the project vex you. (:</li>
-</ol>
+- We would be sooo very grateful for the help!
+- Please create a branch off of stable, then submit a pull request;
+- All PRs that change the C++ classes or any of the apps must pass the master unit tests (`test/unit_test_master.sh`) before merge.
+- Use whichever { style you prefer; as long as the code is readable and it works, that's all I care about.
+- Have fun and try not to let the project vex you. (:
 
 Note to developers: if you run PrimaryDock under a memory utility such as valgrind, you are likely to see a lot of errors saying that
 uninitialized variables are being used or that conditional jumps depend on them. Most of these are false positives. Many places in the

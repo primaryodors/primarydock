@@ -1,0 +1,13 @@
+Created empty molecule named Test.
+Minimizing internal clashes...
+Adjusted internal clashes: 0 cu.A.
+Atom C1 has bond angles: 126 126 108
+Atom C2 has bond angles: 150 150 60
+Atom C3 has bond angles: 60 165 165
+Atom C4 has bond angles: 60 165 165
+Atom C5 has bond angles: 108 108 144
+Atom C6 has bond angles: 108 108 144
+Atom C7 has bond angles: 108 108 144
+Atom C8 has bond angles: 108 108 144
+Saved test/received/calicene.received.sdf
+

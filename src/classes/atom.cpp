@@ -977,6 +977,21 @@ float Atom::get_acidbase()
 
 int Atom::is_thio()
 {
+    if (!thiol)
+    {
+        if (Z == 1)
+        {
+            if (is_bonded_to("S")) thiol = 1;
+            else if (is_bonded_to("Se")) thiol = 0.5;
+            else if (is_bonded_to("Te")) thiol = 0.2;
+        }
+        else if (family == CHALCOGEN && Z > 8 && is_bonded_to("H"))
+        {
+            if (Z == 16) thiol = -1;
+            else if (Z == 34) thiol = -0.5;
+            else if (Z == 52) thiol = -0.2;
+        }
+    }
     return thiol;
 }
 

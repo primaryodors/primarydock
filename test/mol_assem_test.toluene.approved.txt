@@ -8,5 +8,5 @@ Atom c4 has bond angles: 120 120 120
 Atom c5 has bond angles: 120 120 120
 Atom c6 has bond angles: 120 120 120
 Atom c7 has bond angles: 120 120 120
-Saved test/benzene.received.sdf
+Saved test/received/toluene.received.sdf
 

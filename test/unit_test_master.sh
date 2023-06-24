@@ -16,35 +16,35 @@ fi
 
 
 REPORT="test/point_test.approved.txt"
-./test/point_test | sed '/^#/d' >test/point_test.received.txt
-RESULT=$(diff --unified $REPORT test/point_test.received.txt)
+./test/point_test | sed '/^#/d' >test/received/point_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/point_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Point test succeeded."
 else
     echo "Point test FAILED."
-    diff --color --unified $REPORT test/point_test.received.txt
+    diff --color --unified $REPORT test/received/point_test.received.txt
 fi
 
 
 REPORT="test/atom_test.approved.txt"
-./test/atom_test H | sed '/^#/d' >test/atom_test.received.txt
-RESULT=$(diff --unified $REPORT test/atom_test.received.txt)
+./test/atom_test H | sed '/^#/d' >test/received/atom_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/atom_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Atom test succeeded."
 else
     echo "Atom test FAILED."
-    diff --color --unified $REPORT test/atom_test.received.txt
+    diff --color --unified $REPORT test/received/atom_test.received.txt
 fi
 
 
 REPORT="test/aniso_test.approved.txt"
-./test/aniso_test --asciiart | sed '/^#/d' >test/aniso_test.received.txt
-RESULT=$(diff --unified $REPORT test/aniso_test.received.txt)
+./test/aniso_test --asciiart | sed '/^#/d' >test/received/aniso_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/aniso_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Anisotropy test succeeded."
 else
     echo "Anisotropy test FAILED."
-    diff --color --unified $REPORT test/aniso_test.received.txt
+    diff --color --unified $REPORT test/received/aniso_test.received.txt
 fi
 
 
@@ -52,35 +52,35 @@ fi
 
 
 REPORT="test/amino_test.approved.txt"
-./test/amino_test | sed '/^#/d' >test/amino_test.received.txt
-RESULT=$(diff --unified $REPORT test/amino_test.received.txt)
+./test/amino_test | sed '/^#/d' >test/received/amino_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/amino_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Amino test succeeded."
 else
     echo "Amino test FAILED."
-    diff --color --unified $REPORT test/amino_test.received.txt
+    diff --color --unified $REPORT test/received/amino_test.received.txt
 fi
 
 
 REPORT="test/protein_test.approved.txt"
-./test/protein_test AAAAAAAAAA | sed '/^#/d' > test/protein_test.received.txt
-RESULT=$(diff --unified $REPORT test/protein_test.received.txt)
+./test/protein_test AAAAAAAAAA | sed '/^#/d' > test/received/protein_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/protein_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Protein test succeeded."
 else
     echo "Protein test FAILED."
-    diff --color --unified $REPORT test/protein_test.received.txt
+    diff --color --unified $REPORT test/received/protein_test.received.txt
 fi
 
 
 REPORT="test/motif_test.approved.txt"
-./bin/pepteditor test/motif_test.pepd | sed '/^#/d' >test/motif_test.received.txt
-RESULT=$(diff --unified $REPORT test/motif_test.received.txt)
+./bin/pepteditor test/motif_test.pepd | sed '/^#/d' >test/received/motif_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/motif_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Motif test succeeded."
 else
     echo "Motif test FAILED."
-    diff --color --unified $REPORT test/motif_test.received.txt
+    diff --color --unified $REPORT test/received/motif_test.received.txt
 fi
 
 

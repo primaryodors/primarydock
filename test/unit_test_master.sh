@@ -1,4 +1,9 @@
 #!/bin/bash
+
+RED="\033[38;5;226m\033[48;5;196m"
+GRN="\033[38;5;46m"
+NC="\033[0m"
+
 cd "$(dirname "$0")"
 if [ ! -f "received" ]; then mkdir -p "received"; fi
 cd ..
@@ -8,9 +13,9 @@ clear
 make code | sed '/^#/d' > test/received/make_code.txt
 CODE_RESULT=$?
 if [ $CODE_RESULT -eq 0 ]; then
-    echo "Make code succeeded."
+    printf "${GRN}Make code succeeded.${NC}\n"
 else
-    echo "Make code FAILED."
+    printf "${RED}Make code FAILED.${NC}\n"
     echo $CODE_RESULT
 fi
 
@@ -19,9 +24,9 @@ REPORT="test/point_test.approved.txt"
 ./test/point_test | sed '/^#/d' >test/received/point_test.received.txt
 RESULT=$(diff --unified $REPORT test/received/point_test.received.txt)
 if [ -z "$RESULT" ]; then
-    echo "Point test succeeded."
+    printf "${GRN}Point test succeeded.${NC}\n"
 else
-    echo "Point test FAILED."
+    printf "${RED}Point test FAILED.${NC}\n"
     diff --color --unified $REPORT test/received/point_test.received.txt
 fi
 
@@ -30,9 +35,9 @@ REPORT="test/atom_test.approved.txt"
 ./test/atom_test H | sed '/^#/d' >test/received/atom_test.received.txt
 RESULT=$(diff --unified $REPORT test/received/atom_test.received.txt)
 if [ -z "$RESULT" ]; then
-    echo "Atom test succeeded."
+    printf "${GRN}Atom test succeeded.${NC}\n"
 else
-    echo "Atom test FAILED."
+    printf "${RED}Atom test FAILED.${NC}\n"
     diff --color --unified $REPORT test/received/atom_test.received.txt
 fi
 
@@ -41,9 +46,9 @@ REPORT="test/aniso_test.approved.txt"
 ./test/aniso_test --asciiart | sed '/^#/d' >test/received/aniso_test.received.txt
 RESULT=$(diff --unified $REPORT test/received/aniso_test.received.txt)
 if [ -z "$RESULT" ]; then
-    echo "Anisotropy test succeeded."
+    printf "${GRN}Anisotropy test succeeded.${NC}\n"
 else
-    echo "Anisotropy test FAILED."
+    printf "${RED}Anisotropy test FAILED.${NC}\n"
     diff --color --unified $REPORT test/received/aniso_test.received.txt
 fi
 
@@ -55,9 +60,9 @@ REPORT="test/amino_test.approved.txt"
 ./test/amino_test | sed '/^#/d' >test/received/amino_test.received.txt
 RESULT=$(diff --unified $REPORT test/received/amino_test.received.txt)
 if [ -z "$RESULT" ]; then
-    echo "Amino test succeeded."
+    printf "${GRN}Amino test succeeded.${NC}\n"
 else
-    echo "Amino test FAILED."
+    printf "${RED}Amino test FAILED.${NC}\n"
     diff --color --unified $REPORT test/received/amino_test.received.txt
 fi
 
@@ -66,9 +71,9 @@ REPORT="test/protein_test.approved.txt"
 ./test/protein_test AAAAAAAAAA | sed '/^#/d' > test/received/protein_test.received.txt
 RESULT=$(diff --unified $REPORT test/received/protein_test.received.txt)
 if [ -z "$RESULT" ]; then
-    echo "Protein test succeeded."
+    printf "${GRN}Protein test succeeded.${NC}\n"
 else
-    echo "Protein test FAILED."
+    printf "${RED}Protein test FAILED.${NC}\n"
     diff --color --unified $REPORT test/received/protein_test.received.txt
 fi
 
@@ -77,9 +82,9 @@ REPORT="test/motif_test.approved.txt"
 ./bin/pepteditor test/motif_test.pepd | sed '/^#/d' >test/received/motif_test.received.txt
 RESULT=$(diff --unified $REPORT test/received/motif_test.received.txt)
 if [ -z "$RESULT" ]; then
-    echo "Motif test succeeded."
+    printf "${GRN}Motif test succeeded.${NC}\n"
 else
-    echo "Motif test FAILED."
+    printf "${RED}Motif test FAILED.${NC}\n"
     diff --color --unified $REPORT test/received/motif_test.received.txt
 fi
 
@@ -89,7 +94,7 @@ TAAR_RESULT=$?
 if [ "$TAAR_RESULT" -eq "0" ]; then
     POSES=$( cat test/received/TAAR8_CAD.txt | grep "pose(s) found" )
     if [ -z "$POSES" ]; then
-        echo "TAAR test FAILED: no poses."
+        printf "${RED}TAAR test FAILED: no poses.${NC}\n"
     else
         ASP111=$( cat test/received/TAAR8_CAD.txt | grep -m 1 "Asp111: " )
         ASP111="${ASP111/Asp111: /}"
@@ -98,13 +103,13 @@ if [ "$TAAR_RESULT" -eq "0" ]; then
         ASP201="${ASP201/Asp201: /}"
         ASP201="${ASP201/[.][0-9]*/}"
         if [[ $ASP111 -gt "-30"  ]] || [[ $ASP201 -gt "-30"  ]]; then
-            echo "TAAR test FAILED: bad contacts."
+            printf "${RED}TAAR test FAILED: bad contacts.${NC}\n"
         else
-            echo "TAAR test succeeded."
+            printf "${GRN}TAAR test succeeded.${NC}\n"
         fi
     fi
 else
-    echo "TAAR test FAILED: return value."
+    printf "${RED}TAAR test FAILED: return value.${NC}\n"
 fi
 
 
@@ -113,11 +118,11 @@ DLIMN_RESULT=$?
 if [ "$DLIMN_RESULT" -eq "0" ]; then
     POSES=$( cat test/received/OR1A1_dLIMN.txt | grep "pose(s) found" )
     if [ -z "$POSES" ]; then
-        echo "d-limonene test FAILED: no poses."
+        printf "${RED}d-limonene test FAILED: no poses.${NC}\n"
     else
-        echo "d-limonene test succeeded."
+        printf "${GRN}d-limonene test succeeded.${NC}\n"
     fi
 else
-    echo "d-limonene test FAILED."
+    printf "${RED}d-limonene test FAILED.${NC}\n"
 fi
 

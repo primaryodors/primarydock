@@ -3077,8 +3077,7 @@ bool Molecule::from_smiles(char const * smilesstr)
     
     // hydrogenate(true);
     float anomaly = correct_structure();
-    if (false && anomaly > 0.1) cout << "ERROR: Structural anomaly = " << anomaly << endl;
-    else cout << "# Structural anomaly = " << anomaly << endl;
+    cout << "# Structural anomaly = " << anomaly << endl;
     hydrogenate(false);
 
     return retval;

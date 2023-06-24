@@ -61,7 +61,7 @@ fi
 
 # TODO: A way to check these automatically.
 REPORT="test/protein_test.approved.txt"
-./test/protein_test AAAAAAAAAA > $REPORT
+./test/protein_test AAAAAAAAAA > test/protein_test.received.txt
 # Straight Strand PDB.
 echo "Content of test.pdb:" >> $REPORT
 cat test.pdb >> $REPORT

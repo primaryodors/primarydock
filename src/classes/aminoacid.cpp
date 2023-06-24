@@ -1840,7 +1840,6 @@ float AminoAcid::get_phi()
 
 float AminoAcid::get_psi()
 {
-    
     if (!next_aa)
     {
         if (!prev_aa) return 0;
@@ -1862,7 +1861,23 @@ float AminoAcid::get_psi()
 
 float AminoAcid::get_omega()
 {
-    // TODO:
+    if (!next_aa)
+    {
+        if (!prev_aa) return 0;
+        return prev_aa->get_phi();
+    }
+
+    Atom *CA0, *C, *N, *CA1;
+    CA0 = get_atom("CA");
+    C   = get_atom("C");
+    N   = next_aa->get_atom("N");
+    CA1 = next_aa->get_atom("CA");
+
+    if (!CA0 || !C || !N || !CA1) return 0;
+
+    SCoord axis = N->get_location().subtract(C->get_location());
+
+    return find_angle_along_vector(CA0->get_location(), CA1->get_location(), N->get_location(), axis);
 }
 
 bool AminoAcid::is_alpha_helix()

@@ -3216,7 +3216,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
             if (lastEZ)
             {
                 int EZ = (smilesstr[i] == '/') ? 1 : -1;
-                preva->EZ_flip = EZgiven[dbi-1] = sgn(EZ) != sgn(lastEZ);
+                preva->EZ_flip = EZgiven[dbi-1] = sgn(EZ) == sgn(lastEZ);
                 // cout << preva->name << " EZ flip: " << preva->EZ_flip << endl;
                 lastEZ = 0;
             }

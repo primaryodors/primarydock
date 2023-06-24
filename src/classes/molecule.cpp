@@ -3599,11 +3599,6 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
             Point lpt = rotate3D(&A, &ringcen, &normal, M_PI*2/ringsz*l);
             ring_members[l]->move(&lpt);
         }
-        /*ring_members[l]->arom_center = &ringcen;
-        ring_members[l]->clear_geometry_cache();
-        ring_members[l]->ring_member = max(1, ring_members[l]->ring_member);
-        if (Huckel(ringid)) ring_members[l]->arom_ring_member = max(1, ring_members[l]->arom_ring_member);
-        if (ring_members[l]->get_valence() != 4) ring_members[l]->aromatize();*/
 
         Bond* b2=0;
         int bgeo = ring_members[l]->get_geometry();
@@ -3696,7 +3691,6 @@ float Molecule::close_loop(Atom** path, float lcard)
     if (_DBGCLSLOOP) cout << "Close Loop: found " << k << " rotables." << endl;
 
     if (last == first) return 0;
-    // if (_DBGCLSLOOP) cout << "Last != first." << endl;
     last->mirror_geo = -1;
     int ringsize = k;
 
@@ -3705,6 +3699,7 @@ float Molecule::close_loop(Atom** path, float lcard)
     if (ringsize < 5)
     {
         // TODO: Make equilateral ring, except accommodating any differences in bond length.
+        // But know that cyclopentane and cyclopropane are not coplanar, but rather puckered because of steric hindrance.
     }
 
     int iter;

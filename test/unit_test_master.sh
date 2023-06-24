@@ -80,6 +80,16 @@ echo "Content of test2.sdf:" >> $REPORT
 sed '2d' test2.sdf >> $REPORT
 
 
+REPORT="test/motif_test.approved.txt"
+./bin/pepteditor test/motif_test.pepd >test/motif_test.received.txt
+RESULT=$(diff --color --unified $REPORT test/motif_test.received.txt)
+if [ -z "$RESULT" ]; then
+    echo "Motif test succeeded."
+else
+    echo "Motif test FAILED."
+fi
+
+
 bin/primarydock test/testTAAR8.config --colorless --pose 5 --iter 50 --congress > test/received/TAAR8_CAD.txt
 TAAR_RESULT=$?
 if [ "$TAAR_RESULT" -eq "0" ]; then

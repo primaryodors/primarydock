@@ -50,7 +50,6 @@ int main(int argc, char** argv)
     }*/
 
     float int_clsh = m.get_internal_clashes();
-    // if (int_clsh < 1) cout << "# ";
     cout << "Adjusted internal clashes: " << int_clsh << " cu.A." << endl;
 
     int i, n = m.get_atom_count();

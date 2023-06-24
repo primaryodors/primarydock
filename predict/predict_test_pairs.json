@@ -1,0 +1,373 @@
+{
+    "OR3A1":
+    [
+        "helional",
+        "lilial",
+        "cyclamal",
+        "trifernal",
+        "cinnamyl alcohol",
+        "ethanol",
+        "phenethyl alcohol",
+        "bourgeonal",
+        "methylcinnamaldehyde"
+    ],
+    "OR5M3":
+    [
+        "furaneol",
+        "homofuraneol",
+        "2,2-dimethyl-3(2h)-furanone",
+        "2,5-dimethyl-3(2h)-furanone",
+        "3-methyl-2(5h)-furanone",
+        "caramel furanone",
+        "abhexone"
+    ],
+    "OR8D1":
+    [
+        "caramel furanone",
+        "abhexone",
+        "furaneol",
+        "homofuraneol",
+        "p-cymene",
+        "eugenol",
+        "d-limonene"
+    ],
+    "OR1A2":
+    [
+        "2,4-decadienal",
+        "(R)-(-)-carvone",
+        "(S)-(+)-carvone",
+        "(S)-(-)-citronellal"
+    ],
+    "OR1A1":
+    [
+        "2,4-decadienal",
+        "(R)-(-)-carvone",
+        "(S)-(+)-carvone",
+        "(S)-(-)-citronellal",
+        "(+)-menthol",
+        "methyl eugenol",
+        "ethyl vanillin",
+        "2-ethyl fenchol",
+        "aldehyde C-8",
+        "aldehyde C-9",
+        "aldehyde C-10"
+    ],
+    "OR1D2":
+    [
+        "clonal",
+        "undecanal",
+        "cinnamyl nitrile",
+        "citronellyl nitrile",
+        "bourgeonal",
+        "tetrahydromyrcenol",
+        "floralozone",
+        "citral dimethyl acetal",
+        "gamma-undecalactone",
+        "coranol",
+        "ethyl cinnamate",
+        "(S)-(-)-citronellol",
+        "milk lactone",
+        "1-octen-3-ol",
+        "linalool",
+        "myrac aldehyde"
+    ],
+    "OR1G1":
+    [
+        "vanillin",
+        "2-undecanone",
+        "(S)-methylthiobutanoate",
+        "gamma-decalactone",
+        "hedione",
+        "acetophenone",
+        "cyclohexanone",
+        "cis-4-hexen-1-ol",
+        "eucalyptol",
+        "cinnamaldehyde",
+        "manzanate",
+        "floralozone"
+    ],
+    "OR1N1":
+    [
+        "cinnamaldehyde",
+        "pyridine"
+    ],
+    "OR1N2":
+    [
+        "linalool"
+    ],
+    "OR2AT4":
+    [
+        "sandalore",
+        "brahmanol",
+        "sandranol",
+        "polysantol",
+        "isoeugenol",
+        "raspberry ketone",
+        "phenirate"
+    ],
+    "OR1C1":
+    [
+        "coumarin",
+        "linalool",
+        "pelargonic acid"
+    ],
+    "OR2J1":
+    [
+        "coumarin",
+        "3-methyl-2-hexenoic acid",
+        "1-octanol"
+    ],
+    "OR2J2":
+    [
+        "coumarin",
+        "methyl eugenol",
+        "1-octanol",
+        "phenylacetaldehyde",
+        "cis-3-hexen-1-ol",
+        "cyclohexanone",
+        "acetophenone",
+        "cinnamaldehyde",
+        "citral",
+        "ethyl vanillin",
+        "aldehyde C-10",
+        "geraniol",
+        "pentanol",
+        "1-hexanol",
+        "phenyl acetate"
+    ],
+    "OR2J3":
+    [
+        "cis-3-hexen-1-ol",
+        "geranyl acetate",
+        "cinnamaldehyde",
+        "citral",
+        "oranger crystals",
+        "anisaldehyde",
+        "1-octanol",
+        "methyl eugenol",
+        "allyl phenylacetate",
+        "aldehyde C-10",
+        "ethyl vanillin",
+        "pentanol",
+        "1-nonanol"
+    ],
+    "OR2W1":
+    [
+        "aldehyde C-10",
+        "allyl heptanoate",
+        "butyl butyryl lactate",
+        "camphor",
+        "gamma-caprolactone",
+        "beta-damascone",
+        "ethyl vanillin",
+        "eugenol",
+        "linalool",
+        "lyral",
+        "methyl eugenol",
+        "citronellyl acetate",
+        "nerolidol",
+        "florhydral",
+        "propanal",
+        "allyl phenylacetate",
+        "geraniol",
+        "hexanal",
+        "cinnamaldehyde",
+        "coumarin",
+        "cis-3-hexen-1-ol",
+        "1-octen-3-ol",
+        "1-hexanol",
+        "estragole"
+    ],
+    "OR2W3":
+    [
+        "citralva",
+        "geraniol",
+        "ethyl vanillin",
+        "eugenol",
+        "lilial",
+        "lyral",
+        "maltol",
+        "hedione",
+        "beta-ionone",
+        "linalool",
+        "allyl phenylacetate",
+        "eucalyptol",
+        "isovaleric acid"
+    ],
+    "OR10G3":
+    [
+        "vanillin",
+        "eugenyl acetate",
+        "n-amyl acetate",
+        "citral",
+        "eugenol",
+        "methyl eugenol",
+        "allyl phenylacetate",
+        "pentanol"
+    ],
+    "OR10G4":
+    [
+        "guaiacol",
+        "vanillin",
+        "isoeugenol",
+        "4-vinylguaiacol",
+        "anisaldehyde",
+        "3-octen-2-one"
+    ],
+    "OR10G6":
+    [
+        "1-butanol",
+        "creosol"
+    ],
+    "OR10G7":
+    [
+        "eugenol",
+        "creosol",
+        "guaiacol",
+        "methyl eugenol",
+        "isoeugenol",
+        "4-vinylguaiacol",
+        "eugenyl acetate",
+        "ethyl vanillin",
+        "coumarin",
+        "caramel furanone",
+        "citral",
+        "cis-3-hexen-1-ol",
+        "3-octen-2-one",
+        "propanal",
+        "(+)-menthol",
+        "beta-damascone",
+        "amyl hexanoate"
+    ],
+    "OR10G9":
+    [
+        "guaiacol"
+    ],
+    "OR51E1":
+    [
+        "acetic acid",
+        "propionic acid",
+        "butyric acid",
+        "isovaleric acid",
+        "caproic acid",
+        "caprylic acid",
+        "capric acid",
+        "lauric acid",
+        "myristic acid",
+        "methyl eugenol",
+        "(+)-menthol",
+        "methyl salicylate",
+        "eugenyl acetate",
+        "butyl butyryl lactate",
+        "bourgeonal",
+        "florhydral",
+        "hydroxycitronellal",
+        "linalool",
+        "lyral"
+    ],
+    "OR51E2":
+    [
+        "acetic acid",
+        "propionic acid",
+        "butyric acid",
+        "isovaleric acid",
+        "caproic acid",
+        "caprylic acid",
+        "capric acid",
+        "lauric acid",
+        "myristic acid",
+        "alpha-ionone",
+        "beta-ionone",
+        "delta-decalactone",
+        "diacetyl"
+    ],
+    "OR6C70":
+    [
+        "anethole",
+        "anisaldehyde",
+        "anisole",
+        "estragole"
+    ],
+    "OR9Q2":
+    [
+        "p-cresol",
+        "p-cresyl acetate",
+        "lepidine",
+        "acetylcedrene",
+        "bourgeonal",
+        "nerolidol",
+        "sandranol"
+    ],
+    "OR2T10":
+    [
+        "maltyl isobutyrate",
+        "terpinyl acetate",
+        "alpha-damascone",
+        "vanillin",
+        "cinnamaldehyde"
+    ],
+    "OR2M4":
+    [
+        "estragole",
+        "cinnamaldehyde",
+        "nerolidol",
+        "alpha-damascone",
+        "vanillin",
+        "fructone"
+    ],
+    "OR2T34":
+    [
+        "fructone",
+        "estragole",
+        "cinnamaldehyde",
+        "vanillin",
+        "alpha-damascone",
+        "floralozone",
+        "jasmonyl"
+    ],
+    "OR5AC2":
+    [
+        "fructone",
+        "maltyl isobutyrate",
+        "alpha-damascone",
+        "manzanate",
+        "vanillin",
+        "eugenyl acetate"
+    ],
+    "OR5B17":
+    [
+        "floralozone",
+        "jasmonyl",
+        "eugenyl acetate"
+    ]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+        
+

@@ -46,6 +46,14 @@ if (file_exists($json_file))
 	$dock_results = json_decode(file_get_contents($json_file), true);
 }
 
+$prioritize_pairs = [];
+$json_file_tmp = "predict/predict_test_pairs.json";
+if (file_exists($json_file_tmp))
+{
+	$prioritize_pairs = json_decode(file_get_contents($json_file_tmp), true);
+}
+
+
 foreach (@$argv as $a)
 {
 	$a = explode('=',$a,2);
@@ -63,6 +71,33 @@ if (@$_REQUEST['next'])
 	
 	$protid = @$_REQUEST['prot'] ?: false;
 	$ligname = @$_REQUEST['lig'] ?: false;
+	
+	foreach ($prioritize_pairs as $rcpid => $liglist)
+	{
+	    if ($protid && $protid != $rcpid && !preg_match("/^$protid$/", $rcpid) ) continue;
+	    foreach ($liglist as $lig)
+	    {
+	        $odor = find_odorant($lig);
+			$full_name = $odor['full_name'];
+			$fnnospace = str_replace(" ", "_", $full_name);
+			$lignospace = str_replace(" ", "_", $full_name);
+			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
+                ||
+                max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version
+                )
+			{
+				if (false!==strpos($already, $lignospace))
+				{
+					continue;
+				}
+				
+				$protid = $rcpid;
+				$ligname = $full_name;
+				
+				goto found_next_pair;
+			}
+	    }
+	}
 	
 	foreach (array_keys($prots) as $rcpid)
 	{

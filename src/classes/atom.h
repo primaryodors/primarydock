@@ -270,6 +270,8 @@ public:
         chirality_unspecified = false;
     }
 
+    void print_bond_angles();                   // For unit tests.
+
     // Static fuctions.
     static int Z_from_esym(const char* elem_sym);
     static const char* esym_from_Z(const int lZ)

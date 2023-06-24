@@ -1314,6 +1314,28 @@ void Bond::enforce_moves_with_uniqueness()
     }
 }
 
+void Atom::print_bond_angles()
+{
+    if (!bonded_to) return;
+
+    int i, j;
+
+    for (i=0; i<valence; i++)
+    {
+        if (bonded_to[i].btom)
+        {
+            for (j=i+1; j<valence; j++)
+            {
+                if (bonded_to[j].btom)
+                {
+                    float theta = find_3d_angle(bonded_to[i].btom->location, bonded_to[j].btom->location, location);
+                    cout << " " << (theta * fiftyseven);
+                }
+            }
+        }
+    }
+}
+
 bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
 {
     if (!btom) return false;

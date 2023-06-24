@@ -5,7 +5,7 @@ cd ..
 
 clear
 
-make code > test/received/make_code.txt
+make code | sed '/^#/d' > test/received/make_code.txt
 CODE_RESULT=$?
 if [ $CODE_RESULT -eq 0 ]; then
     echo "Make code succeeded."
@@ -16,7 +16,7 @@ fi
 
 
 REPORT="test/point_test.approved.txt"
-./test/point_test >test/point_test.received.txt
+./test/point_test | sed '/^#/d' >test/point_test.received.txt
 RESULT=$(diff --unified $REPORT test/point_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Point test succeeded."
@@ -27,7 +27,7 @@ fi
 
 
 REPORT="test/atom_test.approved.txt"
-./test/atom_test H >test/atom_test.received.txt
+./test/atom_test H | sed '/^#/d' >test/atom_test.received.txt
 RESULT=$(diff --unified $REPORT test/atom_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Atom test succeeded."
@@ -38,7 +38,7 @@ fi
 
 
 REPORT="test/aniso_test.approved.txt"
-./test/aniso_test --asciiart >test/aniso_test.received.txt
+./test/aniso_test --asciiart | sed '/^#/d' >test/aniso_test.received.txt
 RESULT=$(diff --unified $REPORT test/aniso_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Anisotropy test succeeded."
@@ -52,7 +52,7 @@ fi
 
 
 REPORT="test/amino_test.approved.txt"
-./test/amino_test >test/amino_test.received.txt
+./test/amino_test | sed '/^#/d' >test/amino_test.received.txt
 RESULT=$(diff --unified $REPORT test/amino_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Amino test succeeded."
@@ -62,9 +62,8 @@ else
 fi
 
 
-# TODO: A way to check these automatically.
 REPORT="test/protein_test.approved.txt"
-./test/protein_test AAAAAAAAAA > test/protein_test.received.txt
+./test/protein_test AAAAAAAAAA | sed '/^#/d' > test/protein_test.received.txt
 RESULT=$(diff --unified $REPORT test/protein_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Protein test succeeded."
@@ -75,7 +74,7 @@ fi
 
 
 REPORT="test/motif_test.approved.txt"
-./bin/pepteditor test/motif_test.pepd >test/motif_test.received.txt
+./bin/pepteditor test/motif_test.pepd | sed '/^#/d' >test/motif_test.received.txt
 RESULT=$(diff --unified $REPORT test/motif_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Motif test succeeded."

@@ -3074,7 +3074,7 @@ bool Molecule::from_smiles(char const * smilesstr)
         retval &= from_smiles(paren[i].smilesstr, paren[i].startsfrom);
     }
 
-    delete[] paren;
+    
     // hydrogenate(true);
     float anomaly = correct_structure();
     if (anomaly > 0.1) cout << "ERROR: Structural anomaly = " << anomaly << endl;
@@ -3530,12 +3530,11 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
         prevarom = aromatic;
     }
     atoms[atcount]=0;
-    delete[] paren;
 
     return true;
 }
 
-/*
+
 void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
 {
     if (!ring_members) return;
@@ -3599,11 +3598,11 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
             Point lpt = rotate3D(&A, &ringcen, &normal, M_PI*2/ringsz*l);
             ring_members[l]->move(&lpt);
         }
-        ring_members[l]->arom_center = &ringcen;
+        /*ring_members[l]->arom_center = &ringcen;
         ring_members[l]->clear_geometry_cache();
         ring_members[l]->ring_member = max(1, ring_members[l]->ring_member);
         if (Huckel(ringid)) ring_members[l]->arom_ring_member = max(1, ring_members[l]->arom_ring_member);
-        if (ring_members[l]->get_valence() != 4) ring_members[l]->aromatize();
+        if (ring_members[l]->get_valence() != 4) ring_members[l]->aromatize();*/
 
         Bond* b2=0;
         int bgeo = ring_members[l]->get_geometry();
@@ -3643,7 +3642,7 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
             b2->btom->move_assembly(&ptnew, ring_members[l]);
         }
     }
-}*/
+}
 
 float Molecule::fsb_lsb_anomaly(Atom* first, Atom* last, float lcard, float bond_length)
 {
@@ -4182,11 +4181,11 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
 }
 
 
-#define _DEV_FIX_MSTRUCT 0
+#define _DEV_FIX_MSTRUCT 1
 float Molecule::correct_structure(int iters)
 {
     if (noAtoms(atoms)) return 0;
-    int iter, i, j, k;
+    int iter, i, j, k, n;
     Point zero(0,0,0);
     float error = 0;
     Point aloc, bloc;
@@ -4198,13 +4197,13 @@ float Molecule::correct_structure(int iters)
 
     #if _DEV_FIX_MSTRUCT
     // TODO
-    if (ringcount)
+    if (n = get_num_rings())            // Assignment, not comparison.
     {
-        for (i=0; i<ringcount; i++)
+        for (i=0; i<n; i++)
         {
-            if (ring_aromatic[i] || get_ring_num_atoms(i) < 6)
+            if (ring_is_aromatic(i) || get_ring_num_atoms(i) < 6)
             {
-                make_coplanar_ring(ring_atoms[i], i);
+                make_coplanar_ring(get_ring_atoms(i), i);
             }
         }
     }
@@ -4231,11 +4230,12 @@ float Molecule::correct_structure(int iters)
             // Once a "best fit" point in space is found, move there.
             if (atoms[i]->num_rings() && atoms[i]->is_pi())
             {
-                for (j=0; j<ringcount; j++)
+                for (j=0; j<n; j++)
                 {
-                    for (k=0; ring_atoms[j][k]; k++)
+                    Atom** ring_atoms_j = get_ring_atoms(j);
+                    for (k=0; ring_atoms_j[k]; k++)
                     {
-                        if (ring_atoms[j][k] == atoms[i])
+                        if (ring_atoms_j[k] == atoms[i])
                         {
                             // Get distance from atom to ring center.
                             Point rcen = get_ring_center(j);

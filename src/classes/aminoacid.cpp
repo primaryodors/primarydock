@@ -1882,6 +1882,11 @@ float AminoAcid::get_omega()
 
 bool AminoAcid::is_alpha_helix()
 {
+    return is_helix(4);
+}
+
+bool AminoAcid::is_helix(int p)
+{
     int i, j;
     Atom *a, *b;
     AminoAcid* aa;
@@ -1893,12 +1898,13 @@ bool AminoAcid::is_alpha_helix()
     if (f > 180) f -= 360;
 
     // cout << residue_no << " has f = " << f << endl;
-    if (fabs(f - -105) > 18) return false;
+    float pf = -195.0 + 360.0 / p;
+    if (fabs(f - pf) > 18) return false;
 
     for (j=0; j<2; j++)
     {
         aa = this;
-        for (i=0; i<4; i++)
+        for (i=0; i<p; i++)
         {
             aa = j ? aa->next_aa : aa->prev_aa;
             if (!aa) break;

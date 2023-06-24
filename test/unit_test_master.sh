@@ -11,16 +11,18 @@ if [ $CODE_RESULT -eq 0 ]; then
     echo "Make code succeeded."
 else
     echo "Make code FAILED."
+    echo $CODE_RESULT
 fi
 
 
 REPORT="test/point_test.approved.txt"
 ./test/point_test >test/point_test.received.txt
-RESULT=$(diff --color --unified $REPORT test/point_test.received.txt)
+RESULT=$(diff --unified $REPORT test/point_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Point test succeeded."
 else
     echo "Point test FAILED."
+    diff --color --unified $REPORT test/point_test.received.txt
 fi
 
 
@@ -51,44 +53,35 @@ fi
 
 REPORT="test/amino_test.approved.txt"
 ./test/amino_test >test/amino_test.received.txt
-RESULT=$(diff --color --unified $REPORT test/amino_test.received.txt)
+RESULT=$(diff --unified $REPORT test/amino_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Amino test succeeded."
 else
     echo "Amino test FAILED."
+    diff --color --unified $REPORT test/amino_test.received.txt
 fi
 
 
 # TODO: A way to check these automatically.
 REPORT="test/protein_test.approved.txt"
 ./test/protein_test AAAAAAAAAA > test/protein_test.received.txt
-# Straight Strand PDB.
-echo "Content of test.pdb:" >> $REPORT
-cat test.pdb >> $REPORT
-# Alpha helix PDB.
-echo "Content of test_alpha.pdb:" >> $REPORT
-cat test_alpha.pdb >> $REPORT
-# Beta pleated PDB.
-echo "Content of test_beta.pdb:" >> $REPORT
-cat test_beta.pdb >> $REPORT
-# 3.10 helix PDB.
-echo "Content of test_310.pdb:" >> $REPORT
-cat test_310.pdb >> $REPORT
-# Pi helix PDB.
-echo "Content of test_pi.pdb:" >> $REPORT
-cat test_pi.pdb >> $REPORT
-# SDF of most recent PDB.
-echo "Content of test2.sdf:" >> $REPORT
-sed '2d' test2.sdf >> $REPORT
+RESULT=$(diff --unified $REPORT test/protein_test.received.txt)
+if [ -z "$RESULT" ]; then
+    echo "Protein test succeeded."
+else
+    echo "Protein test FAILED."
+    diff --color --unified $REPORT test/protein_test.received.txt
+fi
 
 
 REPORT="test/motif_test.approved.txt"
 ./bin/pepteditor test/motif_test.pepd >test/motif_test.received.txt
-RESULT=$(diff --color --unified $REPORT test/motif_test.received.txt)
+RESULT=$(diff --unified $REPORT test/motif_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Motif test succeeded."
 else
     echo "Motif test FAILED."
+    diff --color --unified $REPORT test/motif_test.received.txt
 fi
 
 

@@ -9,7 +9,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    int i, seqarg=1, namearg=0;
+    int i, n, seqarg=1, namearg=0;
 
     if (argc < 2)
     {
@@ -54,6 +54,19 @@ int main(int argc, char** argv)
     fclose(pf);
     cout << "Wrote " << outfn << endl;
 
+    n = p.get_end_resno();
+    cout << "Are residues alpha helixed?" << endl;
+    for (i=1; i<n; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (!aa) cout << "*";
+        else
+        {
+            cout << (aa->is_alpha_helix() ? "Y" : "N");
+        }
+    }
+    cout << endl;
+
     p.make_helix(1, p.get_seq_length(), BETA_PHI, BETA_PSI);
     strcpy(outfn, "test_beta.pdb");
     pf = fopen(outfn, "wb");
@@ -70,6 +83,19 @@ int main(int argc, char** argv)
     fclose(pf);
     cout << "Wrote " << outfn << endl;
 
+    n = p.get_end_resno();
+    cout << "Are residues 310 helixed?" << endl;
+    for (i=1; i<n; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (!aa) cout << "*";
+        else
+        {
+            cout << (aa->is_helix(3) ? "Y" : "N");
+        }
+    }
+    cout << endl;
+
     p.make_helix(1, p.get_seq_length(), PI_PHI, PI_PSI);
     strcpy(outfn, "test_pi.pdb");
     pf = fopen(outfn, "wb");
@@ -77,6 +103,19 @@ int main(int argc, char** argv)
     p.end_pdb(pf);
     fclose(pf);
     cout << "Wrote " << outfn << endl;
+
+    n = p.get_end_resno();
+    cout << "Are residues pi helixed?" << endl;
+    for (i=1; i<n; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (!aa) cout << "*";
+        else
+        {
+            cout << (aa->is_helix(5) ? "Y" : "N");
+        }
+    }
+    cout << endl;
 
     p.make_helix(1, p.get_seq_length(), POLYPRO2_PHI, POLYPRO2_PSI);
     strcpy(outfn, "test_ppro2.pdb");

@@ -12,12 +12,17 @@ allsmiles=("c{C1}1ccccc1!" "C{C1}c1ccccc1!" "c{C1}1ccccc1!C" "C{C1}1CCCCC1!" "C{
          \
         )
 
+RED="\033[38;5;226m\033[48;5;196m"
+GRN="\033[38;5;46m"
+CYN="\033[38;5;68m"
+NC="\033[0m"
+
 for i in ${!allmols[@]}; do
     MOLECULE=${allmols[$i]}
     CHAR=${MOLECULE:0:1}
 
     if [ $CHAR == "#" ]; then
-        echo "Skipping $MOLECULE known to be failing."
+        printf "${CYN}Skipping $MOLECULE known to be failing.${NC}\n"
         continue
     fi
 
@@ -26,9 +31,9 @@ for i in ${!allmols[@]}; do
     test/mol_assem_test "$SMILES" "test/received/$MOLECULE.received.sdf" | sed '/^#/d' > "test/received/mol_assem_test.$MOLECULE.received.txt"
     RESULT=$(diff --unified $REPORT "test/received/mol_assem_test.$MOLECULE.received.txt")
     if [ -z "$RESULT" ]; then
-        echo "Molecule assembly test succeeded for $MOLECULE."
+        printf "${GRN}Molecule assembly test succeeded for $MOLECULE.${NC}\n"
     else
-        echo "Protein test FAILED for $MOLECULE."
+        printf "${RED}Protein test FAILED for $MOLECULE.${NC}\n"
         diff --color --unified $REPORT "test/received/mol_assem_test.$MOLECULE.received.txt"
     fi
 done

@@ -25,22 +25,24 @@ fi
 
 
 REPORT="test/atom_test.approved.txt"
-./test/atom_test >test/atom_test.received.txt
-RESULT=$(diff --color --unified $REPORT test/atom_test.received.txt)
+./test/atom_test H >test/atom_test.received.txt
+RESULT=$(diff --unified $REPORT test/atom_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Atom test succeeded."
 else
     echo "Atom test FAILED."
+    diff --color --unified $REPORT test/atom_test.received.txt
 fi
 
 
 REPORT="test/aniso_test.approved.txt"
-./test/aniso_test >test/aniso_test.received.txt
-RESULT=$(diff --color --unified $REPORT test/aniso_test.received.txt)
+./test/aniso_test --asciiart >test/aniso_test.received.txt
+RESULT=$(diff --unified $REPORT test/aniso_test.received.txt)
 if [ -z "$RESULT" ]; then
     echo "Anisotropy test succeeded."
 else
     echo "Anisotropy test FAILED."
+    diff --color --unified $REPORT test/aniso_test.received.txt
 fi
 
 

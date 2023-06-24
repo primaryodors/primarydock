@@ -300,6 +300,7 @@ public:
     Atom* strongest_bind_atom = nullptr;
     float shielding_angle = 0;
     char pdbchain = ' ';
+    bool doing_ring_closure = false;
 
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.

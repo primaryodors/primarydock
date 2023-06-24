@@ -1278,7 +1278,7 @@ void Bond::enforce_moves_with_uniqueness()
     }*/
 
     // Ring bond rotation is not supported currently.
-    if (atom && btom && atom->in_same_ring_as(btom))
+    if (!atom->doing_ring_closure && !btom->doing_ring_closure && atom && btom && atom->in_same_ring_as(btom))
     {
         can_rotate = false;
         if (moves_with_btom) delete[] moves_with_btom;

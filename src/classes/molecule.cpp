@@ -3086,6 +3086,8 @@ bool Molecule::from_smiles(char const * smilesstr)
 
 bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
 {
+    if (!smilesstr) return true;
+
     Atom* stack[256];
     Atom* sequence[65536];
     bool seqarom[65536];
@@ -3670,6 +3672,7 @@ float Molecule::close_loop(Atom** path, float lcard)
 
     for (i=0; path[i]; i++)
     {
+        path[i]->doing_ring_closure = true;
         Bond** b = path[i]->get_bonds();
         if (!b) continue;
         int geo = path[i]->get_geometry();
@@ -3691,8 +3694,10 @@ float Molecule::close_loop(Atom** path, float lcard)
         delete[] b;
     }
     rotables[k] = 0;
+    if (_DBGCLSLOOP) cout << "Close Loop: found " << k << " rotables." << endl;
 
     if (last == first) return 0;
+    // if (_DBGCLSLOOP) cout << "Last != first." << endl;
     last->mirror_geo = -1;
     int ringsize = k;
 
@@ -3731,7 +3736,8 @@ float Molecule::close_loop(Atom** path, float lcard)
                 rotables[i]->btom->move(bloc);
             }
 
-            if (rotables[i]->rotate(bondrot[i]))
+            // issue_5
+            if (rotables[i]->rotate(bondrot[i], true))
             {
                 float newanom = fsb_lsb_anomaly(first, last, lcard, bond_length);
                 float nclash = get_internal_clashes();
@@ -3764,6 +3770,7 @@ float Molecule::close_loop(Atom** path, float lcard)
 
     for (i=0; path[i]; i++)
     {
+        path[i]->doing_ring_closure = false;
         path[i]->clear_geometry_cache();
         if (_DBGCLSLOOP) cout << "Reset " << path[i]->name << " geometry." << endl;
     }

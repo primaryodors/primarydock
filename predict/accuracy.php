@@ -42,11 +42,12 @@ foreach ($data as $orid => $pairs)
 
 foreach (array_keys($data) as $orid)
 {
-    echo "Results for $orid:\n";
-    
     $lnc = (@$nc[$orid] ?: 0);
     $lfp = (@$fp[$orid] ?: 0);
     $lfn = (@$fn[$orid] ?: 0);
+    
+    if (!$lnc && !$lfp && !$lfn) continue;
+    echo "Results for $orid:\n";
     
     $pcnt = round(floatval($lnc) / ($lnc + $lfp + $lfn) * 100, 2);
     

@@ -332,13 +332,18 @@ void iteration_callback(int iter, Molecule** mols)
         float lf = mols[l]->get_intermol_binding(mols), ptnl = mols[l]->get_intermol_potential(mols);
         f += lf;
 
+        int resno;
         if (flex
             && (lf < 5 || lf < 0.1 * ptnl)
+            && (resno = mols[l]->is_residue())                // Assignment not comparison.
             && mols[l]->movability == MOV_FLXDESEL
-            && frand(0,1) < 0.2
+            // && frand(0,1) < 0.2
             )
         {
-            mols[l]->movability = MOV_FORCEFLEX;
+            AminoAcid* aa = protein->get_residue(resno);
+            AADef* aadef;
+            if (aa && (aadef = aa->get_aa_definition()) && (frand(0,3) < aadef->flexion_probability))
+                mols[l]->movability = MOV_FORCEFLEX;
         }
     }
 

@@ -2,6 +2,7 @@
 
 function die_if_too_hot()
 {
+    if (@$_REQUEST['ft']) return;
     $results = [];
     exec("which sensors", $results);            // sudo apt-get install lm-sensors
     if (count($results))

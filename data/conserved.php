@@ -5,6 +5,19 @@ chdir("..");
 
 require("predict/statistics.php");
 
+$colors =
+[
+    "PAILV" => "\033[38;5;247m",
+    "G" => "\033[38;5;243m",
+    "M" => "\033[38;5;185m",
+    "C" => "\033[38;5;220m",
+    "STNQ" => "\033[38;5;49m",
+    "DE" => "\033[38;5;196m",
+    "KR" => "\033[38;5;27m",
+    "H" => "\033[38;5;99m",
+    "FWY" => "\033[38;5;171m"
+];
+
 foreach (@$argv as $a)
 {
 	$a = explode('=',$a,2);
@@ -117,13 +130,16 @@ foreach (["ttpd", "fish", "taar", "vn1r"] as $k => $var)
     for ($i=0; $i<$n; $i++)
     {
         $c = array_keys($$var)[$i];
+
+        foreach ($colors as $kc => $esc) if (false !== strpos($kc, $c)) echo $esc;
+
         echo "$c ";
         $pcnt = round(floatval(array_values($$var)[$i]) / $ttl * 100, 3);
         echo "$pcnt%";
 
         if ($i > $fnd80) echo " " . implode(" ", $$varhas[$c]);
 
-        echo "\n";
+        echo "\033[0m\n";
     }
 
     echo "\n";

@@ -55,7 +55,7 @@ foreach ($lines as $ln)
         for ($i=0; $j!=$rel; $i+=sgn($rel))
         {
             $i1 = $col50+$i;
-            if ($i1<15 || $i1>=strlen($ln)) continue 2; // die("Could not locate BW number $bw.\n");
+            if ($i1<15 || $i1>=strlen($ln)) continue 2;
             $c = substr($ln, $i1, 1);
             if ($c != " ") $j += sgn($rel);
         }

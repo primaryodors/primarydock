@@ -65,15 +65,21 @@ foreach ($lines as $ln)
     {
         $rel = $ofst - 50;
         $j = 0;
-        for ($i=0; $j!=$rel; $i+=sgn($rel))
+        for ($i=0; ; $i+=sgn($rel))
         {
             $i1 = $col50+$i;
             if ($i1<15 || $i1>=strlen($ln)) continue 2;
             $c = substr($ln, $i1, 1);
-            if ($c != " ") $j += sgn($rel);
+            if ($c != " ")
+            {
+                if ($j == $rel)
+                {
+                    $col = $col50 + $i;
+                    break;
+                }
+                $j += sgn($rel);
+            }
         }
-
-        $col = $col50 + $j;
     }
     else
     {

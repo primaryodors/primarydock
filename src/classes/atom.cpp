@@ -977,6 +977,21 @@ float Atom::get_acidbase()
 
 int Atom::is_thio()
 {
+    if (!thiol)
+    {
+        if (Z == 1)
+        {
+            if (is_bonded_to("S")) thiol = 1;
+            else if (is_bonded_to("Se")) thiol = 0.5;
+            else if (is_bonded_to("Te")) thiol = 0.2;
+        }
+        else if (family == CHALCOGEN && Z > 8 && is_bonded_to("H"))
+        {
+            if (Z == 16) thiol = -1;
+            else if (Z == 34) thiol = -0.5;
+            else if (Z == 52) thiol = -0.2;
+        }
+    }
     return thiol;
 }
 
@@ -1263,7 +1278,7 @@ void Bond::enforce_moves_with_uniqueness()
     }*/
 
     // Ring bond rotation is not supported currently.
-    if (atom && btom && atom->in_same_ring_as(btom))
+    if (!atom->doing_ring_closure && !btom->doing_ring_closure && atom && btom && atom->in_same_ring_as(btom))
     {
         can_rotate = false;
         if (moves_with_btom) delete[] moves_with_btom;
@@ -1294,6 +1309,28 @@ void Bond::enforce_moves_with_uniqueness()
                     moves_with_btom[k-1] = moves_with_btom[k];
                 }
                 moves_with_btom[k-1] = 0;
+            }
+        }
+    }
+}
+
+void Atom::print_bond_angles()
+{
+    if (!bonded_to) return;
+
+    int i, j;
+
+    for (i=0; i<valence; i++)
+    {
+        if (bonded_to[i].btom)
+        {
+            for (j=i+1; j<valence; j++)
+            {
+                if (bonded_to[j].btom)
+                {
+                    float theta = find_3d_angle(bonded_to[i].btom->location, bonded_to[j].btom->location, location);
+                    cout << " " << (theta * fiftyseven);
+                }
             }
         }
     }
@@ -2061,7 +2098,7 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     if (strlen(name) < 2) fprintf(pf, " ");
 
     if (!pdbchain) pdbchain = ' ';
-    fprintf(pf, "%s %c", aa3let, pdbchain);
+    fprintf(pf, "%c%c%c %c", aa3let[0] & 0x5f, aa3let[1] & 0x5f, aa3let[2] & 0x5f, pdbchain);
 
     if (residue < 1000) fprintf(pf, " ");
     if (residue <  100) fprintf(pf, " ");
@@ -2102,7 +2139,7 @@ void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
     if (strlen(name) < 3) os << " ";
     if (strlen(name) < 2) os << " ";
 
-    os << aa3let << "  ";
+    os << (aa3let[0] & 0x5f) << (aa3let[1] & 0x5f) << (aa3let[2] & 0x5f) << "  ";
 
     os << setw(4) << residue << "    ";
 

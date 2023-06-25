@@ -948,6 +948,11 @@ int interpret_config_line(char** words)
         do_output_colors = true;
         return 0;
     }
+    else if (!strcmp(words[0], "COLORLESS"))
+    {
+        do_output_colors = false;
+        return 0;
+    }
     else if (!strcmp(words[0], "DEACVNODE"))
     {
         cout << "Notice: DEACVNODE has been deprecated in favor of the HXR option. Please update your config files." << endl;

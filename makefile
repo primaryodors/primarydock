@@ -8,7 +8,7 @@ OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OB
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test \
 	  test/group_test_mol test/protein_test test/backbone_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/couple
-REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report
+REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
 all: $(DIRS) \
 	 $(OBJS) \
 	 $(TESTS) \
@@ -163,5 +163,10 @@ protein_report: test/protein_test
 	# SDF of most recent PDB.
 	echo "Content of test2.sdf:" >> $(REPORT)
 	sed '2d' test2.sdf >> $(REPORT)
+
+motif_report: REPORT="test/motif_test.approved.txt"
+motif_report: bin/pepteditor test/motif_test.pepd
+	./bin/pepteditor test/motif_test.pepd > test/motif_test.received.txt
+	diff --color --unified $(REPORT) test/motif_test.received.txt
 
 reports: $(REPORTS)

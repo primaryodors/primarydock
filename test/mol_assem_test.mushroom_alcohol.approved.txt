@@ -1,0 +1,14 @@
+Created empty molecule named Test.
+Minimizing internal clashes...
+Adjusted internal clashes: 0 cu.A.
+Atom C1 has bond angles: 120 120 120
+Atom C2 has bond angles: 120 120 120
+Atom C3 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
+Atom O4 has bond angles: 109.471
+Atom C5 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
+Atom C6 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
+Atom C7 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
+Atom C8 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
+Atom C9 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
+Saved test/received/mushroom_alcohol.received.sdf
+

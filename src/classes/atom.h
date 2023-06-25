@@ -270,6 +270,8 @@ public:
         chirality_unspecified = false;
     }
 
+    void print_bond_angles();                   // For unit tests.
+
     // Static fuctions.
     static int Z_from_esym(const char* elem_sym);
     static const char* esym_from_Z(const int lZ)
@@ -300,6 +302,7 @@ public:
     Atom* strongest_bind_atom = nullptr;
     float shielding_angle = 0;
     char pdbchain = ' ';
+    bool doing_ring_closure = false;
 
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.

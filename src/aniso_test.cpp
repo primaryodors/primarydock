@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     Atom* anisoa;
     bool colors = true;
 
-    if (argc > 1)
+    if (argc > 1 && argv[1][0] != '-')
     {
         m.from_smiles(argv[1]);
     }
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     m.hydrogenate();
     cout << "Hydrogenated." << endl;
 
-    if (argc > 2)
+    if (argc > 2 && argv[2][0] != '-')
     {
         anisoa = m.get_atom(argv[2]);
         if (!anisoa)
@@ -63,15 +63,20 @@ int main(int argc, char** argv)
         }
     }
 
-    // if (argc > 4 && !strcmp(argv[4], "colors")) colors = true;
+    int i;
+    for (i=0; i<argc; i++)
+    {
+        if (!strcmp(argv[i], "--colors")) colors = true;
+        else if (!strcmp(argv[i], "--asciiart")) colors = false;
+    }
 
     const int size=22;
     const float ar = 2.1;		// Aspect ratio.
-    int x, y, i;
-    const char* asciiart = " .':*+=nm@";
-    int asciilen = 10;
+    int x, y;
+    const char* asciiart = " .':+=inm@";
+    int asciilen = strlen(asciiart);
 
-    Atom probe((argc > 3) ? argv[3] : "H");
+    Atom probe((argc > 3 && argv[3][0] != '-') ? argv[3] : "H");
     probe.name = new char[256];
     strcpy(probe.name, probe.get_elem_sym());
     if (probe.is_metal()) probe.increment_charge(probe.get_valence());

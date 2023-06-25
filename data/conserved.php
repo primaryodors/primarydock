@@ -5,6 +5,19 @@ chdir("..");
 
 require("predict/statistics.php");
 
+$colors =
+[
+    "PAILV" => "\033[38;5;247m",
+    "G" => "\033[38;5;243m",
+    "M" => "\033[38;5;185m",
+    "C" => "\033[38;5;220m",
+    "STNQ" => "\033[38;5;49m",
+    "DE" => "\033[38;5;196m",
+    "KR" => "\033[38;5;27m",
+    "H" => "\033[38;5;99m",
+    "FWY" => "\033[38;5;171m"
+];
+
 foreach (@$argv as $a)
 {
 	$a = explode('=',$a,2);
@@ -52,15 +65,21 @@ foreach ($lines as $ln)
     {
         $rel = $ofst - 50;
         $j = 0;
-        for ($i=0; $j!=$rel; $i+=sgn($rel))
+        for ($i=0; ; $i+=sgn($rel))
         {
             $i1 = $col50+$i;
             if ($i1<15 || $i1>=strlen($ln)) continue 2;
             $c = substr($ln, $i1, 1);
-            if ($c != " ") $j += sgn($rel);
+            if ($c != " ")
+            {
+                if ($j == $rel)
+                {
+                    $col = $col50 + $i;
+                    break;
+                }
+                $j += sgn($rel);
+            }
         }
-
-        $col = $col50 + $j;
     }
     else
     {
@@ -117,13 +136,16 @@ foreach (["ttpd", "fish", "taar", "vn1r"] as $k => $var)
     for ($i=0; $i<$n; $i++)
     {
         $c = array_keys($$var)[$i];
+
+        foreach ($colors as $kc => $esc) if (false !== strpos($kc, $c)) echo $esc;
+
         echo "$c ";
         $pcnt = round(floatval(array_values($$var)[$i]) / $ttl * 100, 3);
         echo "$pcnt%";
 
         if ($i > $fnd80) echo " " . implode(" ", $$varhas[$c]);
 
-        echo "\n";
+        echo "\033[0m\n";
     }
 
     echo "\n";

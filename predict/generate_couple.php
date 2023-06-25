@@ -21,7 +21,7 @@ foreach (explode("\n", $c) as $ln)
     }
 }
 
-print_r($Gprots);
+// print_r($Gprots);
 
 foreach (@$argv as $a)
 {

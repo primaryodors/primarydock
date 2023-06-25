@@ -988,6 +988,14 @@ int main(int argc, char** argv)
         int m1 = vcc.size();
 
         Point seg_motion(0,0,0);
+        Point straight_dir(0,0,0);
+        
+        straight_dir = p1.get_residue(sr)->get_CA_location().add(p1.get_residue(er)->get_CA_location());
+        straight_dir.x /= 2; straight_dir.y = 0; straight_dir.z /= 2;
+        rel = segments[i].start_residue->get_CA_location().add(segments[i].end_residue->get_CA_location());
+        rel.x /= 2; rel.y = 0; rel.z /= 2;
+        straight_dir = straight_dir.subtract(rel);
+        
         for (j=0; j<l; j++)
         {
             AminoAcid* aa = segments[i].prot->get_residue(sr+j);
@@ -1031,6 +1039,9 @@ int main(int argc, char** argv)
 
         if (seg_motion.magnitude() >= 0.1)
         {
+            straight_dir.scale(seg_motion.magnitude() * 1.25);
+            seg_motion = seg_motion.add(straight_dir);
+            
             #if _dbg_flexion
             cout << "Moving segment " << i << " by " << seg_motion << "..." << endl;
             #endif
@@ -1038,6 +1049,62 @@ int main(int argc, char** argv)
             segments[i].do_motion(seg_motion);
         }
     }
+    
+    Point exrloc[8];
+    for (i=1; i<=7; i++)
+    {
+        exrloc[i] = Point(0,0,0);
+        n = 0;
+        AminoAcid* aa;
+        std::string rgn = (std::string)"TMR" + std::to_string(i);
+        if (i & 1)                  // "Descending" sequence.
+        {
+            j = p1.get_region_start(rgn.c_str());
+            for (l=0; l<4; l++)
+            {
+                aa = p1.get_residue(j+l);
+                if (aa)
+                {
+                    exrloc[i] = exrloc[i].add(aa->get_CA_location());
+                    n++;
+                }
+            }
+        }
+        else                        // "Ascending" sequence.
+        {
+            j = p1.get_region_end(rgn.c_str());
+            for (l=0; l<4; l++)
+            {
+                aa = p1.get_residue(j-l);
+                if (aa)
+                {
+                    exrloc[i] = exrloc[i].add(aa->get_CA_location());
+                    n++;
+                }
+            }
+        }
+        
+        if (n)
+        {
+            exrloc[i].x /= n;
+            exrloc[i].y /= n;
+            exrloc[i].z /= n;
+        }
+    }
+    
+    cout << "TMR spacing:" << endl;
+    for (i=1; i<=7; i++)
+    {
+        j = i - 1;
+        if (!j) j = 7;
+        l = i + 1;
+        if (l > 7) l = 1;
+        
+        float f = (exrloc[i].get_3d_distance(exrloc[j]) + exrloc[i].get_3d_distance(exrloc[l])) / 2;
+        
+        cout << f << " ";
+    }
+    cout << endl << endl;
 
     n = contacts.size();
     m = 0;
@@ -1084,3 +1151,10 @@ int main(int argc, char** argv)
     fclose(fp);
     cout << "Wrote output file." << endl;
 }
+
+
+
+
+
+
+

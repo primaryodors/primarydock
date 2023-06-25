@@ -37,10 +37,7 @@ $ooutname = $outfname;
 
 
 function make_prediction($data)
-{
-    // A trick so that incomplete records get redone.
-    if (!isset($data['inactive']) || !isset($data['hGNAL']) || !isset($data['hGNAS2'])) $data['version'] -= 5;
-    
+{    
     if (!isset($data['inactive'])) return $data;
     $i = floatval($data['inactive']);
     if (isset($data['hGNAL']) && floatval($data['hGNAL']) < $i) $data['Predicted'] = 'Agonist';

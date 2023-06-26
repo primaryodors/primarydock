@@ -555,6 +555,35 @@ float contact_binding(std::vector<AminoAcid*> vca)
     return f;
 }
 
+Point contact_center()
+{    
+    int i, j=0, n = contacts.size();
+    Point result(0,0,0);
+    
+    for (i=0; i<n; i++)
+    {
+        if (contacts[i].aa1)
+        {
+            result = result.add(contacts[i].aa1->get_CA_location());
+            j++;
+        }
+        if (contacts[i].aa2)
+        {
+            result = result.add(contacts[i].aa2->get_CA_location());
+            j++;
+        }
+    }
+
+    if (j)
+    {
+        result.x /= j;
+        result.y /= j;
+        result.z /= j;
+    }
+
+    return result;
+}
+
 int interpret_cfg_param(char** words)
 {
     int i;
@@ -990,6 +1019,7 @@ int main(int argc, char** argv)
     }
     cout << endl;
 
+    #define unmet_importance 5
 
     cout << "Flexing segment backbones..." << endl;
     std::vector<AminoAcid*> vca = p1.get_contact_residues(&p2);
@@ -999,11 +1029,25 @@ int main(int argc, char** argv)
     for (iter=0; iter<iters; iter++)
     {
         rel = Point( frand(-2, 2), frand(-2, 2), frand(-2, 2) );
-        
-        float was = contact_binding(vca) - unmet_contacts();
+
+        float was = contact_binding(vca) - unmet_contacts()*unmet_importance;
         p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
         optimize_contacts(20);
-        float now = contact_binding(vca) - unmet_contacts();
+        float now = contact_binding(vca) - unmet_contacts()*unmet_importance;
+        if (now < was)
+        {
+            p2.undo();
+            optimize_contacts(20);
+        }
+
+        ref = contact_center();
+        rel = Point( frand(-2, 2), frand(-2, 2), frand(-2, 2) );
+        float theta = frand(-2, 2) * fiftyseventh;
+
+        was = contact_binding(vca) - unmet_contacts()*unmet_importance;
+        p2.rotate_piece(1, p2.get_end_resno(), ref, rel, theta);
+        optimize_contacts(20);
+        now = contact_binding(vca) - unmet_contacts()*unmet_importance;
         if (now < was)
         {
             p2.undo();
@@ -1075,7 +1119,7 @@ int main(int argc, char** argv)
                 straight_dir.scale(seg_motion.magnitude() * 0.666);
                 seg_motion = seg_motion.add(straight_dir);
 
-                seg_motion.scale(seg_motion.magnitude() / iters);
+                seg_motion.scale(seg_motion.magnitude() / 10);
                 
                 #if _dbg_flexion
                 cout << "Moving segment " << i << " by " << seg_motion << "..." << endl;

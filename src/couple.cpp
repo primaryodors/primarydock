@@ -1039,7 +1039,7 @@ int main(int argc, char** argv)
 
         if (seg_motion.magnitude() >= 0.1)
         {
-            straight_dir.scale(seg_motion.magnitude() * 1.25);
+            straight_dir.scale(seg_motion.magnitude() * 0.666);
             seg_motion = seg_motion.add(straight_dir);
             
             #if _dbg_flexion

@@ -538,6 +538,23 @@ float unmet_contacts(bool same_prot_only = false)
     return f;
 }
 
+float contact_binding(std::vector<AminoAcid*> vca)
+{
+    int i, j, n;
+    float f = 0;
+
+    n = vca.size();
+    for (i=0; i<n; i++)
+    {
+        for (j=i+1; j<n; j++)
+        {
+            f += vca[i]->get_intermol_binding(vca[j]);
+        }
+    }
+
+    return f;
+}
+
 int interpret_cfg_param(char** words)
 {
     int i;
@@ -841,6 +858,7 @@ int main(int argc, char** argv)
     
     // cout << "Closest pair is " << contacts[l] << " and farthest is " << contacts[j] << endl;
 
+    cout << "Iterating...";
     int m2 = iters / 2;
     for (m = 0; m < iters; m++)
     {
@@ -973,83 +991,104 @@ int main(int argc, char** argv)
     cout << endl;
 
 
-    cout << "Checking segments for backbone flexion..." << endl;
+    cout << "Flexing segment backbones..." << endl;
     std::vector<AminoAcid*> vca = p1.get_contact_residues(&p2);
     m = vca.size();
     n = segments.size();
-    for (i=0; i<n; i++)
+    int iter;
+    for (iter=0; iter<iters; iter++)
     {
-        int sr = (segments[i].first_pivot ? segments[i].first_pivot : segments[i].start_residue)->get_residue_no(),
-            er = (segments[i].last_pivot ? segments[i].last_pivot : segments[i].end_residue)->get_residue_no();
-        l = er - sr;
-
-        std::vector<AminoAcid*> vcc = p1.get_residues_can_clash(sr, er);
-        vcc.insert(vcc.end(), vca.begin(), vca.end());
-        int m1 = vcc.size();
-
-        Point seg_motion(0,0,0);
-        Point straight_dir(0,0,0);
+        rel = Point( frand(-2, 2), frand(-2, 2), frand(-2, 2) );
         
-        straight_dir = p1.get_residue(sr)->get_CA_location().add(p1.get_residue(er)->get_CA_location());
-        straight_dir.x /= 2; straight_dir.y = 0; straight_dir.z /= 2;
-        rel = segments[i].start_residue->get_CA_location().add(segments[i].end_residue->get_CA_location());
-        rel.x /= 2; rel.y = 0; rel.z /= 2;
-        straight_dir = straight_dir.subtract(rel);
-        
-        for (j=0; j<l; j++)
+        float was = contact_binding(vca) - unmet_contacts();
+        p2.move_piece(1, p2.get_end_resno(), (SCoord)rel);
+        optimize_contacts(20);
+        float now = contact_binding(vca) - unmet_contacts();
+        if (now < was)
         {
-            AminoAcid* aa = segments[i].prot->get_residue(sr+j);
-            if (!aa) continue;
-
-            for (k=0; k<m1; k++)
-            {
-                float r = vcc[k]->distance_to((Molecule*)aa), rc, clash;
-                if (r >= 10) continue;
-                rc = vcc[k]->get_reach() + aa->get_reach();
-                if (r > rc) continue;
-
-                clash = vcc[k]->get_intermol_clashes((Molecule*)aa);
-                if (clash < 2) continue;
-
-                h = 0;
-                while (clash)
-                {
-                    rel = aa->get_CA_location().subtract(vcc[k]->get_CA_location());
-                    rel.scale((fmax(1, fmin(rc, 8) - r)) / 3);
-
-                    #if _dbg_flexion
-                    cout << *aa << " is clashing with " << *vcc[k] << " by " << clash << " cu.A." << endl;
-                    #endif
-
-                    // TODO: Increase rel according to distance from pivot.
-
-                    seg_motion.x = larger(seg_motion.x, rel.x);
-                    seg_motion.y = larger(seg_motion.y, rel.y);
-                    seg_motion.z = larger(seg_motion.z, rel.z);
-                    
-                    h++;
-                    if (h > 10) break;
-                    
-                    r = vcc[k]->distance_to((Molecule*)aa), rc, clash;
-                    rc = vcc[k]->get_reach() + aa->get_reach();
-                    clash = vcc[k]->get_intermol_clashes((Molecule*)aa);
-                }
-            }
+            p2.undo();
+            optimize_contacts(20);
         }
 
-        if (seg_motion.magnitude() >= 0.1)
+        for (i=0; i<n; i++)
         {
-            straight_dir.scale(seg_motion.magnitude() * 0.666);
-            seg_motion = seg_motion.add(straight_dir);
+            int sr = (segments[i].first_pivot ? segments[i].first_pivot : segments[i].start_residue)->get_residue_no(),
+                er = (segments[i].last_pivot ? segments[i].last_pivot : segments[i].end_residue)->get_residue_no();
+            l = er - sr;
+
+            std::vector<AminoAcid*> vcc = p1.get_residues_can_clash(sr, er);
+            vcc.insert(vcc.end(), vca.begin(), vca.end());
+            int m1 = vcc.size();
+
+            Point seg_motion(0,0,0);
+            Point straight_dir(0,0,0);
             
-            #if _dbg_flexion
-            cout << "Moving segment " << i << " by " << seg_motion << "..." << endl;
-            #endif
+            straight_dir = p1.get_residue(sr)->get_CA_location().add(p1.get_residue(er)->get_CA_location());
+            straight_dir.x /= 2; straight_dir.y = 0; straight_dir.z /= 2;
+            rel = segments[i].start_residue->get_CA_location().add(segments[i].end_residue->get_CA_location());
+            rel.x /= 2; rel.y = 0; rel.z /= 2;
+            straight_dir = straight_dir.subtract(rel);
+            
+            for (j=0; j<l; j++)
+            {
+                AminoAcid* aa = segments[i].prot->get_residue(sr+j);
+                if (!aa) continue;
 
-            segments[i].do_motion(seg_motion);
-        }
-    }
-    
+                for (k=0; k<m1; k++)
+                {
+                    float r = vcc[k]->distance_to((Molecule*)aa), rc, clash;
+                    if (r >= 10) continue;
+                    rc = vcc[k]->get_reach() + aa->get_reach();
+                    if (r > rc) continue;
+
+                    clash = vcc[k]->get_intermol_clashes((Molecule*)aa);
+                    if (clash < 2) continue;
+
+                    h = 0;
+                    if (clash)
+                    {
+                        rel = aa->get_CA_location().subtract(vcc[k]->get_CA_location());
+                        rel.scale((fmax(1, fmin(rc, 8) - r)) / 3);
+
+                        #if _dbg_flexion
+                        cout << *aa << " is clashing with " << *vcc[k] << " by " << clash << " cu.A." << endl;
+                        #endif
+
+                        // TODO: Increase rel according to distance from pivot.
+
+                        seg_motion.x = larger(seg_motion.x, rel.x);
+                        seg_motion.y = larger(seg_motion.y, rel.y);
+                        seg_motion.z = larger(seg_motion.z, rel.z);
+                        
+                        h++;
+                        if (h > 10) break;
+                        
+                        r = vcc[k]->distance_to((Molecule*)aa), rc, clash;
+                        rc = vcc[k]->get_reach() + aa->get_reach();
+                        clash = vcc[k]->get_intermol_clashes((Molecule*)aa);
+                    }
+                }       // for k
+            }       // for j
+
+            if (seg_motion.magnitude() >= 0.1)
+            {
+                straight_dir.scale(seg_motion.magnitude() * 0.666);
+                seg_motion = seg_motion.add(straight_dir);
+
+                seg_motion.scale(seg_motion.magnitude() / iters);
+                
+                #if _dbg_flexion
+                cout << "Moving segment " << i << " by " << seg_motion << "..." << endl;
+                #endif
+
+                segments[i].do_motion(seg_motion);
+            }
+        }           // for i
+
+        cout << "." << flush;
+    }           // for iter
+    cout << endl;
+
     Point exrloc[8];
     for (i=1; i<=7; i++)
     {

@@ -109,8 +109,12 @@ CONTACT MAILV5.68 MAILV(LKQYELL+6)                  # TMR2/3/5 and "thumb" tip h
 CONTACT MAILV3.54 MAILV(LKQYELL+6)                  # TMR2/3/5 and "thumb" tip hydrophobic pocket
 CONTACT MAILV2.39 MAILV(LKQYELL+5)                  # TMR2/3/5 and "thumb" tip hydrophobic pocket
 CONTACT MAILV3.46 MAILV(LKQYELL+5)                  # TMR2/3/5 and "thumb" tip hydrophobic pocket
-CONTACT X3.58 X(IEKXLXXEKE+14)                      # Dummy contact to align "index finger" with CYT2.
-CONTACT X3.62 X(IEKXLXXEKE+10)                      # Dummy contact to align "index finger" with CYT2.
+CONTACT MAILV2.42 MAILV(LKQYELL+5)                  # "thumb" tip deeper into receptor
+CONTACT MAILV2.43 MAILV(LKQYELL+5)                  # "thumb" tip deeper into receptor
+CONTACT MAILV2.46 MAILV(LKQYELL+5)                  # "thumb" tip deeper into receptor
+CONTACT MAILV2.49 MAILV(LKQYELL+5)                  # "thumb" tip deeper into receptor
+CONTACT X3.58 X(LLLLGAGESGKSTIVKQMRILH-8)           # Dummy contact to align "index finger" with CYT2.
+CONTACT X3.62 X(LLLLGAGESGKSTIVKQMRILH-4)           # Dummy contact to align "index finger" with CYT2.
 CONTACT ERKSTYNQD56.50 Y(YCYPHFTCAVDTENIRR+0)		# CYT3 region to strand beside "thumb" (olfactory G proteins)
 CONTACT ERKSTYNQD56.50 Y(YSHFTCATDTQNIQFVF+0)		# CYT3 region to strand beside "thumb" (non-olfactory G proteins)
 CONTACT MAILV3.62~2 FHMAILVP(HFTCAXDTXNIXFVF+14)~1	# CYT2 region to middle of "thumb"

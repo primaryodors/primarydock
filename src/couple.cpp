@@ -24,6 +24,162 @@ using namespace std;
 
 Protein *g_prot1, *g_prot2;         // Global protein pointers; not necessarily G-proteins.
 
+int interpret_resno(Protein* prot, char* str)
+{
+    int i, j, mode = 0;
+    std::vector<char> allowed_aa;
+    char *has_dot = nullptr, *plusminus, *paren, pm;
+    int resno=0, tol=0;
+
+    for (i=0; str[i]; i++)
+    {
+        #if _dbg_contacts
+        cout << "str[" << i << "] = " << str[i] << endl;
+        #endif
+
+        switch (mode)
+        {
+            case 0:     // Getting amino acids.
+            if (str[i] >= '0' && str[i] <= '9')
+            {
+                mode = 1;
+                i--;
+            }
+            else if (str[i] == '(')
+            {
+                plusminus = strchr(&str[i], '+');
+                if (!plusminus) plusminus = strchr(&str[i], '-');
+                if (!plusminus) throw 0xbadf37;
+                paren = strchr(plusminus, ')');
+                if (!paren) throw 0xbadf37;
+                pm = *plusminus;
+                *plusminus = 0;
+                *paren = 0;
+
+                #if _dbg_contacts
+                cout << "Searching protein for motif " << &str[i+1] << endl;
+                #endif
+                
+                j = prot->search_sequence(1, prot->get_end_resno(), &str[i+1]);
+                if (!j) throw 0xbadcf6;
+
+                #if _dbg_contacts
+                cout << "Found motif at position " << j << endl;
+                #endif
+
+                if (pm == '+') resno = j + atoi(plusminus+1);
+                if (pm == '-') resno = j - atoi(plusminus+1);
+
+                #if _dbg_contacts
+                cout << "Resno is " << resno << endl << flush;
+                #endif
+
+                *plusminus = pm;
+                *paren = ')';
+                i = paren - str;
+                mode = 1;
+            }
+            else
+            {
+                allowed_aa.push_back(str[i]);
+
+                #if _dbg_contacts
+                cout << "Allowed amino acid: " << str[i] << endl;
+                #endif
+            }
+            break;
+
+            case 1:     // Getting residue number.
+            for (j=i; (str[j] >= '0' && str[j] <= '9') || str[j] == '.'; j++)
+            {
+                if (str[j] == '.') has_dot = &str[j];
+            }
+
+            if (str[j] == '~') mode = 2;
+            str[j] = 0;
+            
+            if (has_dot)
+            {
+                #if _dbg_contacts
+                cout << "Getting BW number " << &str[i] << "... ";
+                #endif
+
+                *has_dot = 0;
+                resno = prot->get_bw50(atoi(&str[i]));
+                *has_dot = '.';
+                resno += atoi(&has_dot[1]) - 50;
+
+                #if _dbg_contacts
+                cout << "residue is " << resno << endl;
+                #endif
+            }
+            else
+            {
+                if (str[i] >= '0' && str[i] <= '9') resno = atoi(&str[i]);
+
+                #if _dbg_contacts
+                cout << "Residue " << &str[i] << " is " << resno << endl;
+                #endif
+            }
+
+            if (mode==2) str[j] = '~';
+            i = j-1;
+            break;
+
+            case 2:     // Getting tolerance.
+            tol = atoi(&str[i]);
+
+            #if _dbg_contacts
+            cout << "Tolerance is " << tol << endl;
+            #endif
+        }
+    }
+
+    if (!resno) throw 0xbadcf6;
+
+    for (i = 0; i <= tol; i++)
+    {
+        AminoAcid *aa = prot->get_residue(resno+i);
+        if (!aa) continue;
+        if (allowed_aa[0] == 'X')
+        {
+            return resno+i;
+
+            #if _dbg_contacts
+            cout << "Found allowed " << aa->get_letter() << " at position " << (resno+i) << endl;
+            #endif
+
+            break;
+        }
+        else if (aa && std::find(allowed_aa.begin(), allowed_aa.end(), aa->get_letter()) != allowed_aa.end())
+        {
+            return resno+i;
+
+            #if _dbg_contacts
+            cout << "Found allowed " << aa->get_letter() << " at position " << (resno+i) << endl;
+            #endif
+
+            break;
+        }
+        else
+        {
+            aa = prot->get_residue(resno-i);
+            if (aa && std::find(allowed_aa.begin(), allowed_aa.end(), aa->get_letter()) != allowed_aa.end())
+            {
+                return resno+i;
+
+                #if _dbg_contacts
+                cout << "Found allowed " << aa->get_letter() << " at position " << (resno-i) << endl;
+                #endif
+
+                break;
+            }
+        }
+    }
+
+    return 0;
+}
+
 class Contact
 {
     public:
@@ -80,173 +236,17 @@ class Contact
             cout << "Processing contact for " << which->get_name() << endl;
             #endif
 
-            int mode = 0;
-            std::vector<char> allowed_aa;
-            char *has_dot = nullptr, *plusminus, *paren, pm;
-            int resno=0, tol=0;
+            int resno = interpret_resno(which, &c[i]);
+            AminoAcid *aa = which->get_residue(resno);
 
-            for (; c[i]; i++)
-            {
-                #if _dbg_contacts
-                cout << "c[" << i << "] = " << c[i] << endl;
-                #endif
-
-                switch (mode)
-                {
-                    case 0:     // Getting amino acids.
-                    if (c[i] >= '0' && c[i] <= '9')
-                    {
-                        mode = 1;
-                        i--;
-                    }
-                    else if (c[i] == '(')
-                    {
-                        plusminus = strchr(&c[i], '+');
-                        if (!plusminus) plusminus = strchr(&c[i], '-');
-                        if (!plusminus) throw 0xbadf37;
-                        paren = strchr(plusminus, ')');
-                        if (!paren) throw 0xbadf37;
-                        pm = *plusminus;
-                        *plusminus = 0;
-                        *paren = 0;
-
-                        #if _dbg_contacts
-                        cout << "Searching protein for motif " << &c[i+1] << endl;
-                        #endif
-                        
-                        j = which->search_sequence(1, which->get_end_resno(), &c[i+1]);
-                        if (!j) throw 0xbadcf6;
-
-                        #if _dbg_contacts
-                        cout << "Found motif at position " << j << endl;
-                        #endif
-
-                        if (pm == '+') resno = j + atoi(plusminus+1);
-                        if (pm == '-') resno = j - atoi(plusminus+1);
-
-                        #if _dbg_contacts
-                        cout << "Resno is " << resno << endl << flush;
-                        #endif
-
-                        *plusminus = pm;
-                        *paren = ')';
-                        i = paren - c;
-                        mode = 1;
-                    }
-                    else
-                    {
-                        allowed_aa.push_back(c[i]);
-
-                        #if _dbg_contacts
-                        cout << "Allowed amino acid: " << c[i] << endl;
-                        #endif
-                    }
-                    break;
-
-                    case 1:     // Getting residue number.
-                    for (j=i; (c[j] >= '0' && c[j] <= '9') || c[j] == '.'; j++)
-                    {
-                        if (c[j] == '.') has_dot = &c[j];
-                    }
-
-                    if (c[j] == '~') mode = 2;
-                    c[j] = 0;
-                    
-                    if (has_dot)
-                    {
-                        #if _dbg_contacts
-                        cout << "Getting BW number " << &c[i] << "... ";
-                        #endif
-
-                        *has_dot = 0;
-                        resno = which->get_bw50(atoi(&c[i]));
-                        *has_dot = '.';
-                        resno += atoi(&has_dot[1]) - 50;
-
-                        #if _dbg_contacts
-                        cout << "residue is " << resno << endl;
-                        #endif
-                    }
-                    else
-                    {
-                        if (c[i] >= '0' && c[i] <= '9') resno = atoi(&c[i]);
-
-                        #if _dbg_contacts
-                        cout << "Residue " << &c[i] << " is " << resno << endl;
-                        #endif
-                    }
-
-                    if (mode==2) c[j] = '~';
-                    i = j-1;
-                    break;
-
-                    case 2:     // Getting tolerance.
-                    tol = atoi(&c[i]);
-
-                    #if _dbg_contacts
-                    cout << "Tolerance is " << tol << endl;
-                    #endif
-                }
-            }
-
-            if (!resno) throw 0xbadcf6;
-
-            bool found = false;
-            for (i = 0; i <= tol; i++)
-            {
-                AminoAcid *aa = which->get_residue(resno+i);
-                if (!aa) continue;
-                if (allowed_aa[0] == 'X')
-                {
-                    if (n==1) aa1 = aa;
-                    if (n==2) aa2 = aa;
-                    found = true;
-
-                    #if _dbg_contacts
-                    cout << "Found allowed " << aa->get_letter() << " at position " << (resno+i) << endl;
-                    #endif
-
-                    break;
-                }
-                else if (aa && std::find(allowed_aa.begin(), allowed_aa.end(), aa->get_letter()) != allowed_aa.end())
-                {
-                    if (n==1) aa1 = aa;
-                    if (n==2) aa2 = aa;
-                    found = true;
-
-                    #if _dbg_contacts
-                    cout << "Found allowed " << aa->get_letter() << " at position " << (resno+i) << endl;
-                    #endif
-
-                    break;
-                }
-                else
-                {
-                    aa = which->get_residue(resno-i);
-                    if (aa && std::find(allowed_aa.begin(), allowed_aa.end(), aa->get_letter()) != allowed_aa.end())
-                    {
-                        if (n==1) aa1 = aa;
-                        if (n==2) aa2 = aa;
-                        found = true;
-
-                        #if _dbg_contacts
-                        cout << "Found allowed " << aa->get_letter() << " at position " << (resno-i) << endl;
-                        #endif
-
-                        break;
-                    }
-                }
-            }
-
-            #if _dbg_contacts
-            cout << endl;
-            #endif
-
-            if (!found)
+            if (!resno || !aa)
             {            // If fail condition, blank both AA pointers and return. Contact cannot be made and will be skipped.
                 aa1 = aa2 = nullptr;
                 return;
             }
+
+            if (n==1) aa1 = aa;
+            if (n==2) aa2 = aa;
         }           // for n.
     }           // interpret cfgs.
 
@@ -498,15 +498,15 @@ class MovableContact
         if (!fields[0] || strcmp(fields[0], "MAKESURE")) throw 0xbadcf6;
 
         if (!fields[1]) throw 0xbadcf6;
-        aa1 = prot->get_residue(atoi(fields[1]));
+        aa1 = prot->get_residue(interpret_resno(prot, fields[1]));
         if (!aa1) return;
         
         if (!fields[2]) throw 0xbadcf6;
-        aa2 = prot->get_residue(atoi(fields[2]));
+        aa2 = prot->get_residue(interpret_resno(prot, fields[2]));
         if (!aa2) return;
         
         if (!fields[3]) throw 0xbadcf6;
-        i = atoi(fields[3]);
+        i = interpret_resno(prot, fields[3]);
         if (!i) throw 0xbadcf6;
         segstart = prot->get_residue(i);
         if (!segstart)
@@ -520,7 +520,7 @@ class MovableContact
         }
         
         if (!fields[4]) throw 0xbadcf6;
-        i = atoi(fields[4]);
+        i = interpret_resno(prot, fields[4]);
         if (!i) throw 0xbadcf6;
         segend = prot->get_residue(i);
         if (!segend)
@@ -541,7 +541,7 @@ class MovableContact
         }
         else
         {
-            i = atoi(fields[5]);
+            i = interpret_resno(prot, fields[5]);
             if (!i) throw 0xbadcf6;
             pivot = prot->get_residue(i);
             if (!pivot) throw 0xbadcf6;

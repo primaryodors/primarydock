@@ -12,3 +12,16 @@ LOAD "pdbs/TAAR/8iw1.pdb" A
 ECHO $SEQUENCE
 HYDRO
 SAVE "pdbs/Gprot/hGNAL.pdb"
+
+
+LOAD "pdbs/Gprot/6g79.pdb" A
+ECHO $SEQUENCE
+HYDRO
+SAVE "pdbs/Gprot/hGNAO.pdb"
+
+
+LOAD "pdbs/Gprot/7f6h.pdb" B
+ECHO $SEQUENCE
+HYDRO
+SAVE "pdbs/Gprot/hGNAQ.pdb"
+

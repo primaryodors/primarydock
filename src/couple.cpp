@@ -1248,6 +1248,7 @@ int main(int argc, char** argv)
     if (n > 0) cout << "Ensuring internal contacts..." << endl;
     for (i=0; i<n; i++)
     {
+        makesure[i].prot = &p1;
         makesure[i].interpret_config_str();
         makesure[i].ensure_contact();
     }

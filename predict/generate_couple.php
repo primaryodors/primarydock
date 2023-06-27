@@ -150,7 +150,7 @@ die_if_too_hot();
 $cmd = "bin/couple $cfgf | tee tmp/cplout";
 echo "Running: $cmd\n";
 passthru($cmd);
-unlink($cfgf);
+// unlink($cfgf);
 
 if (!file_exists($fname))
 {

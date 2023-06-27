@@ -478,6 +478,110 @@ class MovablePiece
     }
 };
 
+class MovableContact
+{
+    public:
+    Protein *prot = nullptr;
+    AminoAcid *aa1 = nullptr, *aa2 = nullptr, *segstart = nullptr, *segend = nullptr, *pivot = nullptr;
+    std::string cfgstr;
+
+    void interpret_config_str()
+    {
+        if (!prot) throw 0xbadc0de;
+
+        int i, n;
+        char cfg[256];
+        strcpy(cfg, cfgstr.c_str());
+
+        char** fields = chop_spaced_words(cfg);
+
+        if (!fields[0] || strcmp(fields[0], "MAKESURE")) throw 0xbadcf6;
+
+        if (!fields[1]) throw 0xbadcf6;
+        aa1 = prot->get_residue(atoi(fields[1]));
+        if (!aa1) return;
+        
+        if (!fields[2]) throw 0xbadcf6;
+        aa2 = prot->get_residue(atoi(fields[2]));
+        if (!aa2) return;
+        
+        if (!fields[3]) throw 0xbadcf6;
+        i = atoi(fields[3]);
+        if (!i) throw 0xbadcf6;
+        segstart = prot->get_residue(i);
+        if (!segstart)
+        {
+            n = prot->get_end_resno();
+            for (; !segstart; i++)
+            {
+                if (i > n) return;
+                segstart = prot->get_residue(i);
+            }
+        }
+        
+        if (!fields[4]) throw 0xbadcf6;
+        i = atoi(fields[4]);
+        if (!i) throw 0xbadcf6;
+        segend = prot->get_residue(i);
+        if (!segend)
+        {
+            n = prot->get_end_resno();
+            for (; !segend; i--)
+            {
+                if (i < 1) return;
+                segend = prot->get_residue(i);
+            }
+        }
+
+        if (!fields[5])
+        {
+            i = segstart->get_residue_no() + segend->get_residue_no() / 2;
+            pivot = prot->get_residue(i);
+            if (!pivot) throw 0xbadcf6;
+        }
+        else
+        {
+            i = atoi(fields[5]);
+            if (!i) throw 0xbadcf6;
+            pivot = prot->get_residue(i);
+            if (!pivot) throw 0xbadcf6;
+        }
+    }
+
+    void ensure_contact()
+    {
+        if (!aa1 || !aa2 || !segstart || !segend || !pivot) return;
+
+        Point ought, ref;
+        Rotation rot;
+        float r = aa1->get_CA_location().get_3d_distance(aa2->get_CA_location()), rorig;
+        rorig = r;
+        r -= aa1->get_reach();
+        r -= aa2->get_reach();
+        if (r > 0)
+        {
+            ought = aa1->get_CA_location();
+            ref = aa2->get_CA_location();
+            ought = ought.multiply_3d_distance(&ref, r/rorig);
+
+            // get angle
+            rot = align_points_3d(aa1->get_CA_location(), ought, pivot->get_CA_location());
+
+            // rotate
+            prot->rotate_piece(segstart->get_residue_no(), segend->get_residue_no(), rot, pivot->get_residue_no());
+
+            // optimize
+            prot->get_internal_clashes(segstart->get_residue_no(), segend->get_residue_no(), true, 50);
+        }
+
+        Molecule* mols[4];
+        mols[0] = (Molecule*)aa1;
+        mols[1] = (Molecule*)aa2;
+        mols[2] = nullptr;
+        Molecule::conform_molecules(mols);
+    }
+};
+
 Molecule** g_contacts_as_mols;
 AminoAcid *sbb = nullptr, *sba = nullptr;
 int iters = 50;
@@ -486,6 +590,7 @@ std::string prot1fname, prot2fname, tplname, tplrfnm;
 char output_fname[256];
 std::vector<Contact> contacts;
 std::vector<MovablePiece> segments;
+std::vector<MovableContact> makesure;
 
 const float montecarlo_theta = fiftyseventh * 1;
 const float montecarlo_xform = 0.5;
@@ -605,6 +710,13 @@ int interpret_cfg_param(char** words)
         c.cfgstr2 = words[2];
         contacts.push_back(c);
         return 3;
+    }
+    else if (!strcmp(words[0], "MAKESURE"))
+    {
+        MovableContact mc;
+        for (i=1; words[i]; i++)
+            mc.cfgstr += (std::string)words[i];
+        makesure.push_back(mc);
     }
     else if (!strcmp(words[0], "SEGMENT"))
     {
@@ -1131,6 +1243,14 @@ int main(int argc, char** argv)
         cout << "." << flush;
     }           // for iter
     cout << endl;
+
+    n = makesure.size();
+    if (n > 0) cout << "Ensuring internal contacts..." << endl;
+    for (i=0; i<n; i++)
+    {
+        makesure[i].interpret_config_str();
+        makesure[i].ensure_contact();
+    }
 
     Point exrloc[8];
     for (i=1; i<=7; i++)

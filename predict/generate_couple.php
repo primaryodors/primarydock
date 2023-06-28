@@ -98,11 +98,12 @@ TEMPLATE pdbs/OR51/OR51E2.8f76.pdb pdbs/OR51/OR51E2.upright.pdb
 CONTACT 1:YHNQ6.55 1:DE45.51                        # EXR hbond for tetrapod ORs
 CONTACT N4.38~2 DEQRK(LLLLGAGESGKSTIVKQMRILH-8)     # CYT2 and N-terminus "index finger" helix
 CONTACT KR7.57~2 DE(HFTCATDTXNXXFVF+30)~3           # TMR7/tail joint and tip of C-terminus "thumb" helix
-CONTACT DE6.29 RK(HFTCATDTXNXXFVF+23)~2             # TMR6 and middle of "thumb" helix
+CONTACT DE6.29 KR(HFTCATDTXNXXFVF+24)~4             # TMR6 and middle of "thumb" helix
 CONTACT H3.59~1 Y(HFTCATDTXNXXFVF+29)~2             # TMR3 and "thumb" tip
 # CONTACT STNQED56.50 K(IIQRMHLKQYELL+7)              # CYT3 and "thumb" tip (olfactory G proteins)
 # CONTACT STNQED56.50 K(DAVTDIIIKENLKDCGLF+8)         # CYT3 and "thumb" tip (non-olfactory G proteins)
 CONTACT STNQED7.59 STNQ(LKQYELL+2)                  # TMR7/tail joint and tip of C-terminus "thumb" helix
+CONTACT STNQED7.59 STNQ(NLKXCGLF+3)                 # TMR7/tail joint and tip of C-terminus "thumb" helix
 CONTACT MAILV5.65 MAILV(LKQYELL+0)                  # TMR2/3/5 and "thumb" tip hydrophobic pocket
 CONTACT MAILV5.61 MAILV(LKQYELL+5)                  # TMR2/3/5 and "thumb" tip hydrophobic pocket
 CONTACT MAILV5.68 MAILV(LKQYELL+6)                  # TMR2/3/5 and "thumb" tip hydrophobic pocket

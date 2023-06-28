@@ -912,6 +912,7 @@ int main(int argc, char** argv)
 
     for (i=n-1; i>=0; i--) if (!contacts[i].aa1 || !contacts[i].aa2)
     {
+        cout << "No match found for " << contacts[i].cfgstr1 << " - " << contacts[i].cfgstr2 << endl;
         contacts.erase(contacts.begin()+i);
     }
 

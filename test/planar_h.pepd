@@ -6,4 +6,5 @@
 # Test code:
 LOAD "test/planar_noh.pdb"
 HYDRO
+SAVE "test/planar_out.pdb"
 

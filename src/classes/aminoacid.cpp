@@ -2132,6 +2132,8 @@ void AminoAcid::hydrogenate(bool steric_only)
 
     for (i=0; i<l; i++) atoms[i] = atomtmp[i];
     atoms[i] = nullptr;
+
+    ensure_pi_atoms_coplanar();
 }
 
 Point AminoAcid::get_CA_location()

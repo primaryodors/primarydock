@@ -4092,8 +4092,11 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
     if (!b) return error;
     btom = b[0]->btom;
     float card = b[0]->cardinality;
-    delete[] b;
-    if (!btom) return error;
+    if (!btom)
+    {
+        delete[] b;
+        return error;
+    }
 
     bloc = btom->get_location();
     g = atoms[i]->get_geometry();
@@ -4179,6 +4182,7 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
         error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
     }
 
+    delete[] b;
     return error+bestscore;
 }
 

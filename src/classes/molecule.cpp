@@ -417,43 +417,7 @@ void Molecule::hydrogenate(bool steric_only)
         {
             Atom* C = atoms[i]->is_bonded_to_pi(TETREL, true);
             if (!C) C = atoms[i]->is_bonded_to_pi(PNICTOGEN, true);
-            if (C)
-            {
-                atoms[i]->aromatize();
-                Atom* D = nullptr;
-                Bond** bb = C->get_bonds();
-                if (bb) for (j=0; bb[j]; j++)
-                {
-                    if (bb[j]->btom && bb[j]->btom != atoms[i])
-                    {
-                        D = bb[j]->btom;
-                        break;
-                    }
-                }
-                delete[] bb;
-
-                // Rotate atoms[i] geometry to coplanar with pi bond.
-                if (D)
-                {
-                    Rotation rot;
-                    rot.v = atoms[i]->get_location().subtract(C->get_location());
-                    rot.a = 0.25;
-                    float best = are_points_planar(atoms[i]->get_location(), C->get_location(), D->get_location(), atoms[i]->get_location().add(atoms[i]->get_next_free_geometry(1)));
-                    for (j=0; j<200; j++)
-                    {
-                        atoms[i]->rotate_geometry(rot);
-                        float f = are_points_planar(atoms[i]->get_location(), C->get_location(), D->get_location(), atoms[i]->get_location().add(atoms[i]->get_next_free_geometry(1)));
-                        if (f < best)
-                            best = f;
-                        else
-                        {
-                            rot.a *= -1;
-                            atoms[i]->rotate_geometry(rot);
-                            rot.a *= 0.5;
-                        }
-                    }
-                }
-            }
+            if (C) atoms[i]->aromatize();
         }
 
         int h_to_add = round(valence - bcardsum);

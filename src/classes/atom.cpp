@@ -1719,7 +1719,6 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
     int i, j, k, l;
 
     // #259 fix:
-
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].btom)
@@ -1730,7 +1729,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
                 Point pt = geov[l];
                 geov[l] = rotate3D(&pt, &center, &rot);
             }
-            
+
             for (j=i+1; j<geometry; j++)
             {
                 if (bonded_to[j].btom)
@@ -1761,88 +1760,38 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
                         }
                     }
 
-                    return geov;
+                    goto _exit_search;
                 }
             }
 
-            return geov;
+            goto _exit_search;
         }
     }
-    
-    return geov;
-    
 
+    _exit_search:
+    ;
 
-
-
-
-
-
-    if (num_conj_rings())
+    if (is_pi())
     {
-        Point arom_center;
-
-        if (get_count_pi_bonds())
+        j = k = 0;
+        for (i = 0; i < geometry; i++)
         {
-            geometry = 3;
-        }
-
-        if (bonded_to[1].btom)
-        {
-            for (j=0; member_of[j]; j++)
+            if (bonded_to[i].btom)
             {
-                if (bonded_to[0].btom->is_in_ring(member_of[j]) && bonded_to[1].btom->is_in_ring(member_of[j]))
-                    arom_center = member_of[j]->get_center();
-            }
-
-            geov[0] = v_from_pt_sub(bonded_to[0].btom->get_location(), location);
-            geov[1] = v_from_pt_sub(bonded_to[1].btom->get_location(), location);
-            geov[2] = v_from_pt_sub(location, arom_center);
-        }
-        else
-        {
-            for (j=0; member_of[j]; j++)
-            {
-                if (bonded_to[0].btom->is_in_ring(member_of[j]))
-                    arom_center = member_of[j]->get_center();
-            }
-
-            Point bond0v = bonded_to[0].btom->get_location().subtract(&location);
-            Point vanticen = location.subtract(arom_center);
-            bond0v.scale(1);
-            vanticen.scale(1);
-            Point g0(&geov[0]);
-            g0.scale(1);
-            Point g1(&geov[2]);
-            g1.scale(1);
-
-            Rotation* rots = align_2points_3d(&g0, &bond0v, &g1, &vanticen, &center);
-
-            geo_rot_1 = rots[0];
-            geo_rot_2 = rots[1];
-
-            int k;
-            for (k=0; k<2; k++)
-            {
-                for (i=0; i<geometry; i++)
-                {
-                    Point pt1(&geov[i]);
-                    Point pt2 = rotate3D(&pt1, &center, &rots[k]);
-                    SCoord v2(&pt2);
-                    v2.r = 1;
-                    geov[i] = v2;
-                }
+                j++;
+                k = i;
             }
         }
-        if (_DBGGEO) cout << name << " returns aromatic geometry." << endl;
-        return geov;
+
+        if (j == 1)
+        {
+            // SCoord align_to[3];
+            // for (i=0; i<3; i++) align_to[i] = bonded_to[k].btom->geov[i];
+
+            if (bonded_to[k].btom->is_pi()) mirror_geo = k;
+        }
     }
 
-    if (!bonded_to[0].btom)
-    {
-        if (_DBGGEO) cout << name << " returns default geometry." << endl;
-        return geov;
-    }
 
     if (mirror_geo >= 0)
     {
@@ -1880,102 +1829,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
         return geov;
     }
 
-    bool doswings = false;
 
-    if (bonded_to[0].btom)
-    {
-        if (geometry > 2)
-        {
-            j = 0;
-            if (bonded_to[1].btom) j = 1;
-            else if (bonded_to[2].btom) j = 2;
-            int l;
-
-            if (j)
-            {
-                Point g0(&geov[0]);
-                g0.scale(1);
-                Point g1(&geov[j]);
-                g1.scale(1);
-                Point a0 = bonded_to[0].btom->location.subtract(location);
-                a0.scale(1);
-                Point a1 = bonded_to[j].btom->location.subtract(location);
-                a1.scale(1);
-                Rotation* rots = align_2points_3d(&g0, &a0, &g1, &a1, &center);
-
-                geo_rot_1 = rots[0];
-                geo_rot_2 = rots[1];
-
-                int k;
-                for (k=0; k<2; k++)
-                {
-                    for (i=0; i<geometry; i++)
-                    {
-                        Point pt1(&geov[i]);
-                        Point pt2 = rotate3D(&pt1, &center, &rots[k]);
-                        SCoord v2(&pt2);
-                        v2.r = 1;
-                        geov[i] = v2;
-                    }
-                }
-
-                delete[] rots;
-
-                g0 = geov[0];
-                g1 = geov[1];
-                g0.scale(1);
-                g1.scale(1);
-                rots = align_2points_3d(&g1, &a1, &g0, &a0, &center);
-                rots[0].a /= 2;
-                rots[1].a /= 2;
-
-                for (k=0; k<2; k++)
-                {
-                    for (i=0; i<geometry; i++)
-                    {
-                        Point pt1(&geov[i]);
-                        Point pt2 = rotate3D(&pt1, &center, &rots[k]);
-                        SCoord v2(&pt2);
-                        v2.r = 1;
-                        geov[i] = v2;
-                    }
-                }
-
-                delete[] rots;
-
-                if (_DBGGEO) cout << name << " returns " << (j==1?"trans":"cis") << " double-aligned geometry (" << geometry << "):"
-                                      << bonded_to[0].btom->name << ", " << bonded_to[1].btom->name << "."
-                                      << endl;
-                return geov;
-            }
-
-        }
-
-
-        // Get alignment for the first bond.
-        Point pt(&geov[0]);
-        Point aln = bonded_to[0].btom->get_location().subtract(&location);
-        aln.scale(1);
-        Rotation rot = align_points_3d(&pt, &aln, &center);
-        SCoord av(&aln);
-        geo_rot_1 = rot;
-        if (_DBGGEO) cout << name << " bond 0 geometry " << pt.printable() << " align to " << aln.printable() << " for rotation: " << (rot.a * 180/M_PI) << " degrees." << endl;
-
-        float angle;
-
-        // Rotate all geometry according to the first bond alignment.
-        for (i=0; i<geometry; i++)
-        {
-            Point pt1(&geov[i]);
-            Point pt2 = rotate3D(&pt1, &center, &rot);
-            SCoord v2(&pt2);
-            geov[i] = v2;
-        }
-
-        if (_DBGGEO) cout << name << " returns single-aligned geometry (" << geometry << ")." << endl;
-    }
-
-    // Life is a cruel and dismal place, and sometimes you're hit with such an awful turn of events that you really don't know how you can go on.
     return geov;
 }
 
@@ -2004,7 +1858,6 @@ SCoord Atom::get_next_free_geometry(float lcard)
         // if (bonded_to[i].btom) i=j;			// For some reason, this line makes everything go very wrong.
         if (geometry == 4 && chirality_unspecified)
         {
-            if (!strcmp(name, "Tumbolia")) cout << endl;
             for (i=0; i<geometry; i++)
             {
                 Point pt = v[i];

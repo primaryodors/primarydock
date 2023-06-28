@@ -910,10 +910,19 @@ int main(int argc, char** argv)
         }
     }
 
-    for (i=n-1; i>=0; i--) if (!contacts[i].aa1 || !contacts[i].aa2)
+    for (i=n-1; i>=0; i--) 
     {
-        cout << "No match found for " << contacts[i].cfgstr1 << " - " << contacts[i].cfgstr2 << endl;
-        contacts.erase(contacts.begin()+i);
+        if (!contacts[i].aa1 || !contacts[i].aa2)
+        {
+            cout << "No match found for " << contacts[i].cfgstr1 << " - " << contacts[i].cfgstr2 << endl;
+            contacts.erase(contacts.begin()+i);
+        }
+        else
+        {
+            cout << "Found contact residues " << contacts[i].prot1->get_name() << ":" << *contacts[i].aa1
+                 << " and " << contacts[i].prot2->get_name() << ":" << *contacts[i].aa2
+                 << endl;
+        }
     }
 
     n = segments.size();
@@ -953,9 +962,6 @@ int main(int argc, char** argv)
     l = -1;
     for (i=0; i<n; i++)
     {
-        cout << "Found contact residues " << contacts[i].prot1->get_name() << ":" << *contacts[i].aa1
-             << " and " << contacts[i].prot2->get_name() << ":" << *contacts[i].aa2
-             << endl;
         if (contacts[i].prot1 != contacts[i].prot2)
         {
             j++;

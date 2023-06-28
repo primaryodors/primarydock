@@ -921,6 +921,7 @@ int main(int argc, char** argv)
         {
             cout << "Found contact residues " << contacts[i].prot1->get_name() << ":" << *contacts[i].aa1
                  << " and " << contacts[i].prot2->get_name() << ":" << *contacts[i].aa2
+                 << " for " << contacts[i].cfgstr1 << " - " << contacts[i].cfgstr2
                  << endl;
         }
     }

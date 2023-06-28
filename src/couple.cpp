@@ -136,6 +136,7 @@ int interpret_resno(Protein* prot, char* str)
     }
 
     if (!resno) throw 0xbadcf6;
+    if (!allowed_aa.size()) return resno;
 
     for (i = 0; i <= tol; i++)
     {
@@ -548,9 +549,22 @@ class MovableContact
         }
     }
 
+    void prime_contact()
+    {
+        if (!aa1 || !aa2) return;
+
+        Molecule* mols[4];
+        mols[0] = (Molecule*)aa1;
+        mols[1] = (Molecule*)aa2;
+        mols[2] = nullptr;
+        Molecule::conform_molecules(mols);
+    }
+
     void ensure_contact()
     {
         if (!aa1 || !aa2 || !segstart || !segend || !pivot) return;
+
+        prime_contact();
 
         Point ought, ref;
         Rotation rot;
@@ -558,6 +572,7 @@ class MovableContact
         rorig = r;
         r -= aa1->get_reach();
         r -= aa2->get_reach();
+        r -= 2;
         if (r > 0)
         {
             ought = aa1->get_CA_location();
@@ -574,11 +589,7 @@ class MovableContact
             prot->get_internal_clashes(segstart->get_residue_no(), segend->get_residue_no(), true, 50);
         }
 
-        Molecule* mols[4];
-        mols[0] = (Molecule*)aa1;
-        mols[1] = (Molecule*)aa2;
-        mols[2] = nullptr;
-        Molecule::conform_molecules(mols);
+        prime_contact();
     }
 };
 
@@ -714,8 +725,8 @@ int interpret_cfg_param(char** words)
     else if (!strcmp(words[0], "MAKESURE"))
     {
         MovableContact mc;
-        for (i=1; words[i]; i++)
-            mc.cfgstr += (std::string)words[i];
+        for (i=0; words[i]; i++)
+            mc.cfgstr += (std::string)words[i] + (std::string)" ";
         makesure.push_back(mc);
     }
     else if (!strcmp(words[0], "SEGMENT"))
@@ -916,8 +927,16 @@ int main(int argc, char** argv)
         segments.erase(segments.begin()+i);
     }
 
+    n = makesure.size();
+    for (i=0; i<n; i++)
+    {
+        makesure[i].prot = &p1;
+        makesure[i].interpret_config_str();
+        makesure[i].prime_contact();
+    }
 
-    // TODO: p1 homology.
+
+    // p1 homology.
     if (tplname.length())
     {
         if (tplrfnm.length())
@@ -1248,8 +1267,6 @@ int main(int argc, char** argv)
     if (n > 0) cout << "Ensuring internal contacts..." << endl;
     for (i=0; i<n; i++)
     {
-        makesure[i].prot = &p1;
-        makesure[i].interpret_config_str();
         makesure[i].ensure_contact();
     }
 

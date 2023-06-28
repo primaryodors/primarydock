@@ -27,6 +27,17 @@ else
 fi
 
 
+REPORT="test/coplanar_test.approved.txt"
+./bin/pepteditor test/planar_h.pepd | sed '/^#/d' > test/received/coplanar_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/coplanar_test.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Coplanar test succeeded.${NC}\n"
+else
+    printf "${RED}Coplanar test FAILED.${NC}\n"
+    diff --color --unified $REPORT test/received/coplanar_test.received.txt
+fi
+
+
 REPORT="test/motif_test.approved.txt"
 ./bin/pepteditor test/motif_test.pepd | sed '/^#/d' >test/received/motif_test.received.txt
 RESULT=$(diff --unified $REPORT test/received/motif_test.received.txt)

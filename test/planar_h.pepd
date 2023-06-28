@@ -1,0 +1,9 @@
+
+# Code used for generating the test file (hydrogens can be stripped by regex replace in editor):
+# GEN "ARNQHFWY"
+# SAVE "test/planar_h.pdb"
+
+# Test code:
+LOAD "test/planar_noh.pdb"
+HYDRO
+

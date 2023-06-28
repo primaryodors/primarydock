@@ -292,7 +292,7 @@ public:
     char* region;					// "
     bool is_backbone=false;			// "
     char* name;						// "
-    bool used;						// Required for certain algorithms such as Molecule::identify_rings().
+    bool used = false;      		// Required for certain algorithms such as Molecule::identify_rings().
     int mirror_geo=-1;				// If >= 0, mirror the geometry of the btom of bonded_to[mirror_geo].
     bool flip_mirror=false;			// If true, do trans rather than cis bond conformation.
     bool dnh=false;					// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.

@@ -1170,7 +1170,7 @@ Bond* Atom::get_bond_by_idx(int bidx)
 
 void Atom::consolidate_bonds()
 {
-
+    //
 }
 
 void Bond::fill_moves_with_cache()
@@ -1181,7 +1181,7 @@ void Bond::fill_moves_with_cache()
 
     if (!btom) return;
 
-    if (_DBGMOVES) cout << "What moves with " << btom->name << " when rotating about " << atom->name << "?" << endl;
+    if (_DBGMOVES) cout << btom->aa3let << btom->residue << ": What moves with " << btom->name << " when rotating about " << atom->name << "?" << endl;
 
     btom->used = true;
     Bond** b = btom->get_bonds();
@@ -1207,12 +1207,12 @@ void Bond::fill_moves_with_cache()
             {
                 for (i=0; b[i]; i++)
                 {
-                    //if (b[i]->btom) cout << "(" << b[i]->btom->name << "?) ";
+                    if (_DBGMOVES) if (b[i]->btom) cout << "(" << attmp[j]->name << "-" << b[i]->btom->name << (b[i]->btom->used ? "*" : "") << "?) ";
                     if (b[i]->btom && !b[i]->btom->used && b[i]->btom != atom && b[i]->btom->residue == btom->residue)
                     {
                         attmp[tmplen++] = b[i]->btom;
                         b[i]->btom->used = true;
-                        if (_DBGMOVES) cout << b[i]->btom->name << " ";
+                        if (_DBGMOVES) cout << b[i]->btom->name << " " << flush;
                         k++;
                     }
                 }

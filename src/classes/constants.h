@@ -11,6 +11,7 @@
 
 #define _kcal_per_kJ 0.239006
 #define _kJmol_cuA 0.5
+#define coplanar_threshold 0.5
 #define vdw_clash_allowance 1.0
 #define oxytocin 0.007
 #define _DEFAULT_INTERA_R_CUTOFF 8

@@ -16,13 +16,13 @@ struct SCoord;
 
 struct Point
 {
-    float x=0, y=0, z=0;
+    double x=0, y=0, z=0;
     float weight = 1;
 
     Point();
     Point(SCoord v);
     Point(SCoord* v);
-    Point(float x, float y, float z);
+    Point(double x, double y, double z);
     Point add(Point add_to)
     {
         return add(&add_to);
@@ -57,7 +57,7 @@ struct Point
 
 struct SCoord
 {
-    float r=0, theta=0, phi=0;
+    double r=0, theta=0, phi=0;
 
     SCoord()
     {
@@ -65,7 +65,7 @@ struct SCoord
     }
     SCoord(const Point from);
     SCoord(const Point* from);
-    SCoord(float r, float theta, float phi);
+    SCoord(double r, double theta, double phi);
     SCoord negate()
     {
         Point pt(this);

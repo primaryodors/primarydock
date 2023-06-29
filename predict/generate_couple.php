@@ -97,6 +97,7 @@ TEMPLATE pdbs/OR51/OR51E2.8f76.pdb pdbs/OR51/OR51E2.upright.pdb
 CONTACT 1:YHNQ6.55 1:DE45.51                                    # EXR hbond for tetrapod ORs
 CONTACT STYNQ4.38~2 ERKSTYNQD(LLLLGAGESGKSTIVKQMRILH-8)~2       # CYT2 and N-terminus "index finger" helix
 CONTACT KR7.57~2 DE(HFTCATDTXNXXFVF+30)~3                       # TMR7/tail joint and tip of C-terminus "thumb" helix
+CONTACT DE7.59~2 KR(NKEIYCHXTCATDTXNXXXVF+33)~2                 # TMR7/tail joint and tip of C-terminus "thumb" helix
 CONTACT DE6.29 KR(HFTCATDTXNXXFVF+24)~4                         # TMR6 and middle of "thumb" helix
 
 CONTACT NQRHFWY3.59~1 FWY(HFTCATDTXNXXFVF+29)~3                 # TMR3 and "thumb" tip
@@ -111,6 +112,12 @@ CONTACT MAILV5.68 MAILV(LKQYELL+6)                              # TMR2/3/5 and "
 CONTACT MAILV3.54 MAILV(LKQYELL+6)                              # TMR2/3/5 and "thumb" tip hydrophobic pocket
 CONTACT MAILV2.39 MAILV(LKQYELL+5)                              # TMR2/3/5 and "thumb" tip hydrophobic pocket
 CONTACT MAILV3.46 MAILV(LKQYELL+5)                              # TMR2/3/5 and "thumb" tip hydrophobic pocket
+
+CONTACT MAILV3.54 MAILV(DAVTDVIIKNNLK+2)                        # TMR2/3/5 and "thumb" tip hydrophobic pocket
+CONTACT MAILV5.65 MAILV(DAVTDVIIKNNLK+5)                        # TMR2/3/5 and "thumb" tip hydrophobic pocket
+CONTACT MAILV5.65 MAILV(DAVTDVIIKNNLK+6)                        # TMR2/3/5 and "thumb" tip hydrophobic pocket
+CONTACT MAILV5.68 MAILV(DAVTDVIIKNNLK+7)                        # TMR2/3/5 and "thumb" tip hydrophobic pocket
+CONTACT MAILV2.39 MAILV(DAVTDVIIKNNLK+11)                       # TMR2/3/5 and "thumb" tip hydrophobic pocket
 
 CONTACT MAILV2.42 MAILV(LKQYELL+5)                              # "thumb" tip deeper into receptor
 CONTACT MAILV2.43 MAILV(LKQYELL+5)                              # "thumb" tip deeper into receptor

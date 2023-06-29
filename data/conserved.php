@@ -24,7 +24,10 @@ foreach (@$argv as $a)
 	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
 }
 
-$bw = @$_REQUEST["bw"] ?: "6.48";
+$bw = @$_REQUEST["bw"];
+
+if (!$bw) die("Error no BW number.\n");
+
 $pieces = explode(".", $bw);
 $rgno = intval($pieces[0]);
 $ofst = intval(@$pieces[1]) ?: 50;

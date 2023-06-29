@@ -1691,7 +1691,7 @@ Bond* Atom::get_bond_closest_to(Point pt)
     return retval;
 }
 
-SCoord* Atom::get_geometry_aligned_to_bonds()
+SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
 {
     int bc = get_bonded_atoms_count();
     if (origgeo == 5 && bc && bc <= 4)
@@ -1769,7 +1769,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
     }
 
     _exit_search:
-    ;
+    if (prevent_infinite_loop) return geov;
 
     if (is_pi())
     {
@@ -1807,8 +1807,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds()
         if (_DBGGEO) cout << "avg: " << avg.printable() << endl;
 
         j=1;
-        b->btom->mirror_geo = -1;		// Prevent infinite loop.
-        SCoord* bgeov = b->btom->get_geometry_aligned_to_bonds();		// RECURSION!
+        SCoord* bgeov = b->btom->get_geometry_aligned_to_bonds(true);		// RECURSION!
 
         for (i=0; i<b->btom->geometry; i++)
         {

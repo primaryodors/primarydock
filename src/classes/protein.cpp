@@ -82,7 +82,8 @@ bool Protein::add_residue(const int resno, const char aaletter)
     if (i)
     {
         Point* pts = residues[i-1]->predict_next_NHCA();
-        residues[i] = new AminoAcid(aaletter, residues[i-1]);
+        residues[i] = new AminoAcid(aaletter, residues[i-1], false);
+        residues[i]->ensure_pi_atoms_coplanar();
 
         residues[i]->establish_internal_clash_baseline();
 
@@ -109,7 +110,10 @@ bool Protein::add_residue(const int resno, const char aaletter)
         delete[] pts;
     }
     else
-        residues[i] = new AminoAcid(aaletter, 0);
+    {
+        residues[i] = new AminoAcid(aaletter, 0, false);
+        residues[i]->ensure_pi_atoms_coplanar();
+    }
 
     sequence[i] = aaletter;
     ca[i] = residues[i]->get_atom("CA");
@@ -181,9 +185,15 @@ bool Protein::add_sequence(const char* lsequence)
     for (i=1; i<=seql; i++)
     {
         aas[i-1] = get_residue(i);
+        get_residue(i)->ensure_pi_atoms_coplanar();
+        aas[i-1]->clear_all_bond_caches();
         aas[i] = 0;
     }
     Molecule::conform_molecules(aas, 25);
+    for (i=1; i<=seql; i++)
+    {
+        get_residue(i)->ensure_pi_atoms_coplanar();
+    }
 
     set_clashables();
     allocate_undo_poses();
@@ -1340,6 +1350,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
     AminoAcid* bendy = get_residue(resno);
     if (!bendy) return;
     LocatedVector lv = bendy->rotate_backbone(dir, angle);
+    bendy->ensure_pi_atoms_coplanar();
 
     if (lv.r)
     {
@@ -1351,6 +1362,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
         {
             // cout << "Rotating " << i << endl;
             movable->rotate(lv, angle);
+            movable->ensure_pi_atoms_coplanar();
             set_clashables(i);
         }
     }
@@ -1371,6 +1383,7 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
     AminoAcid* bendy = get_residue(startres);
     if (!bendy) return;
     LocatedVector lv = bendy->rotate_backbone(dir, angle);
+    bendy->ensure_pi_atoms_coplanar();
 
     if (lv.r)
     {
@@ -1380,6 +1393,7 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
         for (i=startres+inc; movable = get_residue(i); i+=inc)
         {
             movable->rotate(lv, angle);
+            movable->ensure_pi_atoms_coplanar();
             if (i == endres) break;
         }
     }
@@ -1806,6 +1820,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         AminoAcid* aa = get_residue(res);
 
         LocRotation lr = aa->enforce_peptide_bond();
+        aa->ensure_pi_atoms_coplanar();
 
         if (lr.v.r)
         {
@@ -1816,6 +1831,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                 {
                     LocatedVector lv = lr.get_lv();
                     movable->rotate(lv, lr.a);
+                    movable->ensure_pi_atoms_coplanar();
                     #if DBG_ASUNDER_HELICES
                     cout << i << " ";
                     #endif
@@ -1839,6 +1855,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                     {
                         LocatedVector lv = lr2[j].get_lv();
                         movable->rotate(lv, lr2[j].a);
+                        movable->ensure_pi_atoms_coplanar();
                         #if DBG_ASUNDER_HELICES
                         cout << i << " ";
                         #endif
@@ -1861,21 +1878,23 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 
         // cout << "Rotating " << *aa << " phi " << (phi*fiftyseven) << " degrees." << endl;
         lr = aa->rotate_backbone_abs(dir1, phi);
+        aa->ensure_pi_atoms_coplanar();
 
         if (lr.v.r)
         {
             AminoAcid* movable;
 
             if (res != endres) for (i=res+inc; movable = get_residue(i); i+=inc)
-                {
-                    // cout << i << " ";
-                    LocatedVector lv = lr.get_lv();
-                    movable->rotate(lv, lr.a);
-                    #if DBG_ASUNDER_HELICES
-                    cout << i << " ";
-                    #endif
-                    if (i == stopat) break;
-                }
+            {
+                // cout << i << " ";
+                LocatedVector lv = lr.get_lv();
+                movable->rotate(lv, lr.a);
+                movable->ensure_pi_atoms_coplanar();
+                #if DBG_ASUNDER_HELICES
+                cout << i << " ";
+                #endif
+                if (i == stopat) break;
+            }
             #if DBG_ASUNDER_HELICES
             cout << endl;
             #endif
@@ -1884,6 +1903,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 
         // cout << "Rotating " << *aa << " psi " << (psi*fiftyseven) << " degrees." << endl;
         lr = aa->rotate_backbone_abs(dir2, psi);
+        aa->ensure_pi_atoms_coplanar();
 
         if (lr.v.r)
         {
@@ -1894,6 +1914,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                     // cout << i << " ";
                     LocatedVector lv = lr.get_lv();
                     movable->rotate(lv, lr.a);
+                    movable->ensure_pi_atoms_coplanar();
                     #if DBG_ASUNDER_HELICES
                     cout << i << " ";
                     #endif
@@ -2587,6 +2608,7 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoor
         MovabilityType mov = aa->movability;
         aa->movability = MOV_ALL;
         aa->rotate(lv, theta);
+        aa->ensure_pi_atoms_coplanar();
         aa->movability = mov;
         set_clashables(i);
     }

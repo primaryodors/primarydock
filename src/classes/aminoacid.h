@@ -126,10 +126,11 @@ public:
     {
         return;
     }
-    void rotate(LocatedVector SCoord, float theta);
+    void rotate(LocatedVector vec, float theta);
     LocatedVector rotate_backbone(bb_rot_dir direction, float angle);	// Return the origin and direction of the rotation axis.
     LocRotation rotate_backbone_abs(bb_rot_dir direction, float angle);
     LocRotation* flatten();		// Ensure the peptide bond is coplanar and the CA lies in the same plane. Return LocRotation[5].
+    void ensure_pi_atoms_coplanar();
 
     Point* predict_previous_COCA();
     Point* predict_next_NHCA();

@@ -17,7 +17,7 @@ SAVE "pdbs/Gprot/hGNAL.pdb"
 LOAD "pdbs/Gprot/6g79.pdb" A
 ECHO $SEQUENCE
 HYDRO
-SAVE "pdbs/Gprot/hGNAO.pdb"
+SAVE "pdbs/Gprot/hGNAO1.pdb"
 
 
 LOAD "pdbs/Gprot/7f6h.pdb" B

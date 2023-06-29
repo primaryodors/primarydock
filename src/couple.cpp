@@ -910,10 +910,30 @@ int main(int argc, char** argv)
         }
     }
 
-    for (i=n-1; i>=0; i--) if (!contacts[i].aa1 || !contacts[i].aa2)
+    std::vector<std::string> matches;
+    for (i=n-1; i>=0; i--) 
     {
-        contacts.erase(contacts.begin()+i);
+        if (!contacts[i].aa1 || !contacts[i].aa2)
+        {
+            // cout << "No match found for " << contacts[i].cfgstr1 << " - " << contacts[i].cfgstr2 << endl;
+            matches.push_back((std::string)"No match found for " + contacts[i].cfgstr1 + (std::string)" - " + contacts[i].cfgstr2);
+            contacts.erase(contacts.begin()+i);
+        }
+        else
+        {
+            /*cout << "Found contact residues " << contacts[i].prot1->get_name() << ":" << *contacts[i].aa1
+                 << " and " << contacts[i].prot2->get_name() << ":" << *contacts[i].aa2
+                 << " for " << contacts[i].cfgstr1 << " - " << contacts[i].cfgstr2
+                 << endl;*/
+            matches.push_back((std::string)"Found contact residues " + contacts[i].prot1->get_name() + (std::string)":" + (std::string)contacts[i].aa1->get_name()
+                + (std::string)" and " + contacts[i].prot2->get_name() + (std::string)":" + (std::string)contacts[i].aa2->get_name()
+                + (std::string)" for " + contacts[i].cfgstr1 + (std::string)" - " + contacts[i].cfgstr2
+            );
+        }
     }
+
+    n = matches.size();
+    for (i=n-1; i>=0; i--) cout << matches[i] << endl;
 
     n = segments.size();
     for (i=0; i<n; i++)
@@ -952,9 +972,6 @@ int main(int argc, char** argv)
     l = -1;
     for (i=0; i<n; i++)
     {
-        cout << "Found contact residues " << contacts[i].prot1->get_name() << ":" << *contacts[i].aa1
-             << " and " << contacts[i].prot2->get_name() << ":" << *contacts[i].aa2
-             << endl;
         if (contacts[i].prot1 != contacts[i].prot2)
         {
             j++;

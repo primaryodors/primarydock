@@ -1009,7 +1009,7 @@ int main(int argc, char** argv)
     #if 1
 
 
-    cout << "Finding closest and farthest pairs..." << endl;
+    cout << "Finding closest and farthest pairs to protein 1 center..." << endl;
     float rbest = 99999, rworst = 0;
     Point pcen = p1.get_region_center(1, p1.get_end_resno());
     n = contacts.size();
@@ -1030,7 +1030,7 @@ int main(int argc, char** argv)
         }
     }
     
-    // cout << "Closest pair is " << contacts[l] << " and farthest is " << contacts[j] << endl;
+    cout << "Closest pair is " << contacts[l] << " and farthest is " << contacts[j] << endl;
 
     cout << "Iterating...";
     int m2 = iters / 2;

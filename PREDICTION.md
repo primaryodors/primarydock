@@ -30,11 +30,10 @@ GPCR + known ligand (whether agonist or not) that either is not present in `pred
 a `version` value older than either the prediction method PHP, `methods_common.php`, or the `/bin/primarydock`
 executable.
 
-The `simul=4` parameter indicates not to run more than 4 concurrent processes. We recommend a value of half the number
-of cores on your machine, so if you have a server with one 8-core processor, then `simul=4` would be the recommended
-value, whereas if you are running it on a 4-core machine, then we recommend `simul=2` instead. If you have `lm-sensors`
-installed (`sudo apt-get install lm-sensors`), then both PHP scripts will automatically limit themselves depending on
-the CPU temperature.
+The `simul=4` parameter indicates not to run more than 4 concurrent processes. This number is going to depend on the
+thermal properties of your system, and you might have to use trial and error (and a CPU temp monitor) to find the ideal
+value. If you have `lm-sensors` installed (`sudo apt-get install lm-sensors`), then you can set this to the number of
+physical cores your system has, and both PHP scripts will automatically limit themselves depending on the CPU temperature.
 
 You can use the `predict/progress.sh` shell script to monitor the cron's progress.
 

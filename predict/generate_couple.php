@@ -172,6 +172,7 @@ CONTACT X3.58 X(LLLLGAGESGKST-8)                                # Dummy contact 
 CONTACT X3.62 X(LLLLGAGESGKST-4)                                # Dummy contact to align "index finger" with CYT2.
 CONTACT X3.58 X(LLLLGAGESGKST-3)                                # Dummy contact to align "index finger" with CYT2.
 CONTACT X3.62 X(LLLLGAGESGKST-3)                                # Dummy contact to align "index finger" with CYT2.
+CONTACT 1:YHNQ6.55 1:DE45.51                                    # EXR hbond for tetrapod ORs
 
 SEGMENT 1 1.27 0 1.58
 SEGMENT 1.59 2.37 1.28 2.65

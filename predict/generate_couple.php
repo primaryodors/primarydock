@@ -82,12 +82,16 @@ else
 _found_next:
 ;
 
+$iters = 50;
+if ($gpid == "hGNAO1") $iters = 60;
+
 $fam = family_from_protid($gpcrid);
 $cfgf = "tmp/{$gpcrid}_{$gpid}.cplcfg";
 $fname = "$cpl_dir/$fam/{$gpcrid}_{$gpid}.pdb";
 
 if (!file_exists("$cpl_dir/$fam")) mkdir("$cpl_dir/$fam");
 
+/*
 $cfg = <<<heredoc
 
 PROT1 pdbs/$fam/$gpcrid.upright.pdb
@@ -143,13 +147,55 @@ SEGMENT 7.57 end 7.30
 
 MAKESURE Y6.55 DE45.51 6.27 6.59 6.27
 
-ITER 50
+ITER $iters
 
 OUT $fname
 
 
 
 heredoc;
+*/
+
+$cfg = <<<heredoc
+
+PROT1 pdbs/$fam/$gpcrid.upright.pdb
+PROT2 pdbs/Gprot/$gpid.pdb
+TEMPLATE pdbs/OR51/OR51E2.8f76.pdb pdbs/OR51/OR51E2.upright.pdb
+
+CONTACT X7.59 X(XXXXXX$+0)
+CONTACT MAILVCP3.46 MAILVCPFWY(XXXX$+2)~1
+CONTACT X3.60 X(KLLLLGAGESGKST-4)
+CONTACT X3.54 MAILVCP(XXXXXXX$+0)~1
+CONTACT X5.66 MAILVCP(XXXXXXX$+0)~1
+CONTACT X56.50 H(YXHFTCATDTXNI+2)~1
+CONTACT X3.58 X(LLLLGAGESGKST-8)                                # Dummy contact to align "index finger" with CYT2.
+CONTACT X3.62 X(LLLLGAGESGKST-4)                                # Dummy contact to align "index finger" with CYT2.
+CONTACT X3.58 X(LLLLGAGESGKST-3)                                # Dummy contact to align "index finger" with CYT2.
+CONTACT X3.62 X(LLLLGAGESGKST-3)                                # Dummy contact to align "index finger" with CYT2.
+
+SEGMENT 1 1.27 0 1.58
+SEGMENT 1.59 2.37 1.28 2.65
+# SEGMENT 2.66 3.20 2.38 3.56
+SEGMENT 3.57 4.38 3.21 4.64
+# SEGMENT 4.65 5.31 4.39 5.67
+# SEGMENT 4.65 4.66 4.39 45.51
+# SEGMENT 5.30 5.31 45.58 5.67
+# SEGMENT 5.68 6.27 5.32 6.59 5.32 6.48
+SEGMENT 5.68 6.27 5.32 6.59 5.32 6.59
+SEGMENT 6.60 7.29 6.28 7.56
+SEGMENT 7.57 end 7.30
+
+MAKESURE Y6.55 DE45.51 6.27 6.59 6.27
+
+ITER $iters
+
+OUT $fname
+
+
+
+heredoc;
+
+
 
 $fp = fopen($cfgf, "wb") or die("FAILED to open $cfgf for writing.");
 fwrite($fp, $cfg);

@@ -1894,7 +1894,7 @@ int main(int argc, char** argv)
                 er = interpret_single_int(words[l++]);
                 if (!words[l]) raise_error("Insufficient parameters given for SEARCH.");
                 psz = interpret_single_string(words[l++]);
-                esr = er - strlen(psz);
+                esr = er; // - strlen(psz);
 
                 int threshold = -1;
                 int num_eq;

@@ -1308,34 +1308,55 @@ Molecule* Protein::metals_as_molecule()
 
 int Protein::search_sequence(const int sr, const int esr, const char* psz, const int threshold, int* psim)
 {
-    int i, j, k = 0, num_eq;
+    int i, j, k = 0, l, num_eq;
     float m = 0, n = 0, sim;
     char aac;
     AminoAcid* aa;
 
     for (i=sr; i<esr; i++)
     {
+        // cout << i << " " << esr << ": ";
         m = num_eq = 0;
+        char lc = 0;
+        l = 0;
         for (j=0; psz[j]; j++)
         {
+            if (psz[j] == '^') j++;
             char c = psz[j];
-            aa = get_residue(i+j);
+            aa = get_residue(i+l);
             if (!aa) continue;
             aac = aa->get_letter();
+            // cout << psz[j] << aac << (psz[j+1] == '$' ? "$" : "") << " ";
 
-            if (c == 'X') c = aac;
-            if (c == aac) num_eq++;
+            if (lc == '^' && aa->get_residue_no() != get_start_resno()) goto _wrong_place;
+            if (psz[j+1] == '$' && aa->get_residue_no() != get_end_resno()) goto _wrong_place;
 
-            sim = aa->similarity_to(c);
+            if (c == 'X')
+            {
+                m += 1;
+                num_eq++;
+            }
+            else
+            {
+                if (c == aac) num_eq++;
+                sim = aa->similarity_to(c);
+                m += sim;
+            }
 
-            m += sim;
+            lc = c;
+            l++;
         }
 
         if (m > n && num_eq >= threshold)
         {
             k = i;
             n = m;
+            // cout << m;
         }
+
+        _wrong_place:
+        ;
+        // cout << endl;
     }
     sim = n;
     if (psim) *psim = sim;

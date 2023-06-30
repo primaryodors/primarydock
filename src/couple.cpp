@@ -12,7 +12,7 @@
 
 #define xyz_step 0.1
 #define xyz_big_step 1
-#define contact_importance 100
+#define contact_importance 200
 
 #define _dbg_contacts 0
 #define _dbg_segments 0
@@ -916,16 +916,11 @@ int main(int argc, char** argv)
     {
         if (!contacts[i].aa1 || !contacts[i].aa2)
         {
-            // cout << "No match found for " << contacts[i].cfgstr1 << " - " << contacts[i].cfgstr2 << endl;
             matches.push_back((std::string)"No match found for " + contacts[i].cfgstr1 + (std::string)" - " + contacts[i].cfgstr2);
             contacts.erase(contacts.begin()+i);
         }
         else
         {
-            /*cout << "Found contact residues " << contacts[i].prot1->get_name() << ":" << *contacts[i].aa1
-                 << " and " << contacts[i].prot2->get_name() << ":" << *contacts[i].aa2
-                 << " for " << contacts[i].cfgstr1 << " - " << contacts[i].cfgstr2
-                 << endl;*/
             matches.push_back((std::string)"Found contact residues " + contacts[i].prot1->get_name() + (std::string)":" + (std::string)contacts[i].aa1->get_name()
                 + (std::string)" and " + contacts[i].prot2->get_name() + (std::string)":" + (std::string)contacts[i].aa2->get_name()
                 + (std::string)" for " + contacts[i].cfgstr1 + (std::string)" - " + contacts[i].cfgstr2
@@ -987,6 +982,7 @@ int main(int argc, char** argv)
     }
 
     Point rel, ref, avg1, avg2;
+    SCoord sc;
 
     cout << "Performing rough alignment..." << endl;
 
@@ -1010,7 +1006,7 @@ int main(int argc, char** argv)
     Rotation rot = align_points_3d(avg2, avg1, p2.get_region_center(1, p2.get_end_resno()));
     p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
 
-    
+    #if 1
 
 
     cout << "Finding closest and farthest pairs..." << endl;
@@ -1188,7 +1184,7 @@ int main(int argc, char** argv)
             optimize_contacts(20);
         }
 
-        ref = contact_center();
+        ref = contacts[0].aa1->get_CA_location(); // contact_center();
         rel = Point( frand(-2, 2), frand(-2, 2), frand(-2, 2) );
         float theta = frand(-2, 2) * fiftyseventh;
 
@@ -1200,6 +1196,15 @@ int main(int argc, char** argv)
         {
             p2.undo();
             optimize_contacts(20);
+        }
+
+        // Anchor first contact.
+        sc = contacts[0].aa1->get_CA_location().subtract(contacts[0].aa2->get_CA_location());
+        float r = contacts[0].aa1->get_reach() + contacts[0].aa2->get_reach();
+        if (r < sc.r)
+        {
+            sc.r -= r;
+            p2.move_piece(1, p2.get_end_resno(), sc);
         }
 
         for (i=0; i<n; i++)
@@ -1362,6 +1367,8 @@ int main(int argc, char** argv)
     _INTERA_R_CUTOFF = 10;
     optimize_contacts(50);
     p1.get_internal_clashes(1, p1.get_end_resno(), true, 100);
+
+    #endif
 
     // Add the contacts as binding residues.
     n = contacts.size();

@@ -18,6 +18,7 @@ struct AABondDef
 {
     char aname[7];
     char bname[7];
+    int Za = 0, Zb = 0;
     float cardinality=0;
     float acharge=0;
     bool can_rotate=false;

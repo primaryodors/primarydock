@@ -566,6 +566,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                 aabd[n] = new AABondDef();
                 strcpy(aabd[n]->aname, atoms[i]->name);
                 strcpy(aabd[n]->bname, "<C");
+                aabd[n]->Za = atoms[i]->get_Z();
+                aabd[n]->Zb = 6;
                 aabd[n]->cardinality = 1.5;
                 aabd[n]->acharge = 0;
                 aabd[n]->can_rotate = false;
@@ -579,6 +581,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                     aabd[n] = new AABondDef();
                     strcpy(aabd[n]->aname, bb[j]->atom->name);
                     strcpy(aabd[n]->bname, bb[j]->btom->name);
+                    aabd[n]->Za = bb[j]->atom->get_Z();
+                    aabd[n]->Zb = bb[j]->btom->get_Z();
                     aabd[n]->cardinality = bb[j]->cardinality;
                     aabd[n]->acharge = bb[j]->atom->get_charge();
 

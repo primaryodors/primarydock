@@ -12,7 +12,7 @@
 
 #define xyz_step 0.1
 #define xyz_big_step 1
-#define contact_importance 200
+#define contact_importance 100
 
 #define _dbg_contacts 0
 #define _dbg_segments 0
@@ -180,6 +180,132 @@ int interpret_resno(Protein* prot, char* str)
 
     return 0;
 }
+
+class Line
+{
+    public:
+    Protein* prot[4];
+    AminoAcid* res[4];
+    AminoAcid* anchor = nullptr;
+
+    std::string configln;
+
+    float get_anomaly()
+    {
+        Point p1, p2, p3, p4, pm;
+
+        p1 = res[0]->get_CA_location();
+        p2 = res[1]->get_CA_location();
+        p3 = res[2]->get_CA_location();
+        if (res[3]) p4 = res[3]->get_CA_location();
+
+        float anomaly = 0;
+        Rotation rot = align_points_3d(p3, p2, p1);
+        pm = rotate3D(&p3, &p1, &rot);
+        anomaly += pm.get_3d_distance(p3);
+
+        if (res[3])
+        {
+            rot = align_points_3d(p2, p3, p4);
+            pm = rotate3D(&p2, &p4, &rot);
+            anomaly += pm.get_3d_distance(p2);
+        }
+
+        return anomaly;
+    }
+
+    void enforce(int protid = 2, float amount = 1)
+    {
+        Protein* p2mov;
+        Point p1, p2, p3, p4, pm;
+
+        switch (protid)
+        {
+            case 1: p2mov = g_prot1; break;
+            case 2: p2mov = g_prot2; break;
+            default: throw 0xbadc0de;
+        }
+
+        p1 = res[0]->get_CA_location();
+        p2 = res[1]->get_CA_location();
+        p3 = res[2]->get_CA_location();
+        if (res[3]) p4 = res[3]->get_CA_location();
+
+        Rotation rot = align_points_3d(p3, p2, p1);
+        pm = rotate3D(&p3, &p1, &rot);
+
+        if (anchor)
+        {
+            rot.a *= amount;
+            p2mov->rotate_piece(1, p2mov->get_end_resno(), anchor->get_CA_location(), rot.v, rot.a);
+        }
+        else
+        {
+            pm = pm.subtract(p3);
+            pm.scale(pm.magnitude()*amount);
+
+            p2mov->move_piece(1, p2mov->get_end_resno(), (SCoord)pm);
+        }
+
+        if (res[3])
+        {
+            AminoAcid* piv = ( prot[1] == p2mov ? res[1] : res[2] );
+            rot = align_points_3d(p2, p3, p4);
+            rot.a *= amount;
+            p2mov->rotate_piece(1, p2mov->get_end_resno(), rot, piv->get_residue_no());
+        }
+    }
+
+    void read_config()
+    {
+        char buffer[1024];
+        strcpy(buffer, configln.c_str());
+        char** fields = chop_spaced_words(buffer);
+        char* psz;
+        int i, j;
+
+        for (i=0; i<4; i++)
+        {
+            prot[i] = nullptr;
+            res[i] = nullptr;
+        }
+
+        // Assume prot1 prot1 prot2 [prot2] unless colon notated.
+        for (i=0; i<4; i++)
+        {
+            if (!fields[i])
+            {
+                if (i<3) throw 0xbadcf6;
+                else continue;
+            }
+            psz = fields[i];
+            if (psz[1] == ':')
+            {
+                switch (atoi(psz))
+                {
+                    case 1:
+                    prot[i] = g_prot1;
+                    break;
+
+                    case 2:
+                    prot[i] = g_prot2;
+                    break;
+                
+                    default:
+                    throw 0xbadcf6;
+                }
+
+                psz += 2;
+            }
+            else prot[i] = (i & 2) ? g_prot2 : g_prot1;
+
+            j = interpret_resno(prot[i], psz);
+            if (j < 1) throw 0xbadcf6;
+            else res[i] = prot[i]->get_residue(j);
+            if (!res[i]) throw 0xbadcf6;
+        }
+    }
+};
 
 class Contact
 {
@@ -602,6 +728,7 @@ char output_fname[256];
 std::vector<Contact> contacts;
 std::vector<MovablePiece> segments;
 std::vector<MovableContact> makesure;
+std::vector<Line> lineups;
 
 const float montecarlo_theta = fiftyseventh * 1;
 const float montecarlo_xform = 0.5;
@@ -721,6 +848,13 @@ int interpret_cfg_param(char** words)
         c.cfgstr2 = words[2];
         contacts.push_back(c);
         return 3;
+    }
+    else if (!strcmp(words[0], "LINEUP"))
+    {
+        Line lu;
+        for (i=1; words[i]; i++)
+            lu.configln += (std::string)words[i] + (std::string)" ";
+        lineups.push_back(lu);
     }
     else if (!strcmp(words[0], "MAKESURE"))
     {
@@ -910,7 +1044,7 @@ int main(int argc, char** argv)
         }
     }
 
-
+    n = contacts.size();
     std::vector<std::string> matches;
     for (i=n-1; i>=0; i--) 
     {
@@ -951,6 +1085,13 @@ int main(int argc, char** argv)
         makesure[i].prime_contact();
     }
 
+    n = lineups.size();
+    for (i=0; i<n; i++)
+    {
+        lineups[i].read_config();
+        if (i) lineups[i].anchor = lineups[0].res[2];
+    }
+
 
     // p1 homology.
     if (tplname.length())
@@ -960,6 +1101,28 @@ int main(int argc, char** argv)
         else
             do_template_homology(tplname.c_str(), nullptr);
     }
+
+
+
+    Point rel, ref, avg1, avg2;
+    SCoord sc;
+    Rotation rot;
+    float rbest, rworst;
+    Point pcen;
+    int m2;
+
+    if (n = lineups.size())            // Assignment, not comparison.
+    {
+        for (i=0; i<10; i++)
+        {
+            for (j=0; j<n; j++)
+            {
+                lineups[j].enforce(2, 0.5);
+            }
+        }
+    }
+
+    if (lineups.size() > 1) goto _alignment_done;
 
 
     // Now rotate p2 to align as many contacts as possible.
@@ -981,9 +1144,6 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    Point rel, ref, avg1, avg2;
-    SCoord sc;
-
     cout << "Performing rough alignment..." << endl;
 
     n = contacts.size();
@@ -1003,15 +1163,14 @@ int main(int argc, char** argv)
     }
     avg2.scale(avg2.magnitude() / n);
 
-    Rotation rot = align_points_3d(avg2, avg1, p2.get_region_center(1, p2.get_end_resno()));
+    rot = align_points_3d(avg2, avg1, p2.get_region_center(1, p2.get_end_resno()));
     p2.rotate_piece(1, p2.get_end_resno(), rot, 0);
-
-    #if 1
 
 
     cout << "Finding closest and farthest pairs to protein 1 center..." << endl;
-    float rbest = 99999, rworst = 0;
-    Point pcen = p1.get_region_center(1, p1.get_end_resno());
+    rbest = 99999;
+    rworst = 0;
+    pcen = p1.get_region_center(1, p1.get_end_resno());
     n = contacts.size();
     for (i=0; i<n; i++)
     {
@@ -1033,7 +1192,7 @@ int main(int argc, char** argv)
     cout << "Closest pair is " << contacts[l] << " and farthest is " << contacts[j] << endl;
 
     cout << "Iterating...";
-    int m2 = iters / 2;
+    m2 = iters / 2;
     for (m = 0; m < iters; m++)
     {
         std::vector<AminoAcid*> vca = p1.get_contact_residues(&p2);
@@ -1164,6 +1323,8 @@ int main(int argc, char** argv)
     }
     cout << endl;
 
+    _alignment_done:
+    ;
 
     cout << "Flexing segment backbones..." << endl;
     std::vector<AminoAcid*> vca = p1.get_contact_residues(&p2);
@@ -1184,6 +1345,24 @@ int main(int argc, char** argv)
             optimize_contacts(20);
         }
 
+        // Anchor first contact.
+        sc = contacts[0].aa1->get_CA_location().subtract(contacts[0].aa2->get_CA_location());
+        float r = contacts[0].aa1->get_reach() + contacts[0].aa2->get_reach();
+        if (r < sc.r)
+        {
+            sc.r -= r;
+            p2.move_piece(1, p2.get_end_resno(), sc);
+        }
+        
+        // Enforce lineups.
+        if (n = lineups.size())            // Assignment, not comparison.
+        {
+            for (i=0; i<n; i++)
+            {
+                lineups[i].enforce(2, 0.25);
+            }
+        }
+
         ref = contacts[0].aa1->get_CA_location(); // contact_center();
         rel = Point( frand(-2, 2), frand(-2, 2), frand(-2, 2) );
         float theta = frand(-2, 2) * fiftyseventh;
@@ -1196,15 +1375,6 @@ int main(int argc, char** argv)
         {
             p2.undo();
             optimize_contacts(20);
-        }
-
-        // Anchor first contact.
-        sc = contacts[0].aa1->get_CA_location().subtract(contacts[0].aa2->get_CA_location());
-        float r = contacts[0].aa1->get_reach() + contacts[0].aa2->get_reach();
-        if (r < sc.r)
-        {
-            sc.r -= r;
-            p2.move_piece(1, p2.get_end_resno(), sc);
         }
 
         for (i=0; i<n; i++)
@@ -1366,9 +1536,8 @@ int main(int argc, char** argv)
     cout << "Optimizing contacts..." << endl;
     _INTERA_R_CUTOFF = 10;
     optimize_contacts(50);
-    p1.get_internal_clashes(1, p1.get_end_resno(), true, 100);
+    p1.get_internal_clashes(1, p1.get_end_resno(), true, 50);
 
-    #endif
 
     // Add the contacts as binding residues.
     n = contacts.size();

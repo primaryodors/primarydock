@@ -1022,16 +1022,19 @@ int main(int argc, char** argv)
             {
                 if (!words[1]) raise_error("Insufficient parameters given for HOMOLOGY.");
                 Protein tpl("template");
+                
+                words[1] = interpret_single_string(words[1]);
                 FILE* fp = fopen(words[1], "rb");
-                if (!fp) raise_error("File not found.");
+                if (!fp) raise_error((std::string)"File not found: " + (std::string)words[1]);
                 else
                 {
                     tpl.load_pdb(fp);
                     fclose(fp);
                     if (words[2])
                     {
+                        words[2] = interpret_single_string(words[2]);
                         fp = fopen(words[2], "rb");
-                        if (!fp) raise_error("File not found.");
+                        if (!fp) raise_error((std::string)"File not found: " + (std::string)words[2]);
                         else
                         {
                             Protein ref("reference");
@@ -1685,7 +1688,7 @@ int main(int argc, char** argv)
                 set_variable(words[l++], s);
 
                 if (!words[l]) raise_error("Insufficient parameters given for PTALIGN.");
-                s.f = -rot.a * fiftyseven;
+                s.f = rot.a * fiftyseven;
                 set_variable(words[l++], s);
 
                 if (words[l]) raise_error("Too many parameters given for PTALIGN.");
@@ -1770,13 +1773,24 @@ int main(int argc, char** argv)
 				if (!words[1]) raise_error("Insufficient parameters given for ROTATE.");
                 SCoord axis = interpret_single_point(words[1]);
 				if (!words[2]) raise_error("Insufficient parameters given for ROTATE.");
-                float theta = interpret_single_float(words[2]);
+                float theta = interpret_single_float(words[2]) * fiftyseventh;
                 if (words[3]) raise_error("Too many parameters given for ROTATE.");
 
-                Rotation rot;
-                rot.v = axis;
-                rot.a = theta;
-                working->rotate_piece(1, working->get_end_resno(), rot, 0);
+                LocatedVector lv = axis;
+                int sr = working->get_start_resno(), er = working->get_end_resno();
+                lv.origin = working->get_region_center(sr, er);
+
+                for (i=sr; i<=er; i++)
+                {
+                    AminoAcid* aa = working->get_residue(i);
+                    if (aa)
+                    {
+                        MovabilityType fmov = aa->movability;
+                        aa->movability = MOV_ALL;
+                        aa->rotate(lv, theta);
+                        aa->movability = fmov;
+                    }
+                }
             }
 
             else if (!strcmp(words[0], "ROTBOND"))

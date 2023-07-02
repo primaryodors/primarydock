@@ -83,7 +83,7 @@ _found_next:
 ;
 
 $iters = 50;
-if ($gpid == "hGNAO1") $iters = 60;
+if ($gpid == "hGNAO1") $iters = 20;
 
 $fam = family_from_protid($gpcrid);
 $cfgf = "tmp/{$gpcrid}_{$gpid}.cplcfg";
@@ -95,11 +95,9 @@ switch ($gpid)
 {
     case 'hGNAO1':
     $contacts = <<<heredoc
-LINE X7.62 X7.58 X(XXX$+0)
-LINE 1:X5.58 2:X(DAVTDIIIAN+3) 2:X(XXXXX$+0)
 CONTACT X7.57 STYNQRKH(NLKXXXXX$+0)~1
 CONTACT X7.59 X(XXXXXX$+0)
-CONTACT MAILVCPGHFWY(MAYDRYVAIC+12) MAILV(DIIIANNLRGCGLY$+7)~1
+CONTACT MAILVCPGHFWY(MAYDRYVAIC+0) MAILV(DIIIANNLRGCGLY$+12)~1
 # CONTACT MAILVCP3.46 MAILVCPFWY(XXXX$+2)~1
 CONTACT X56.50 X(YXHMTCATDT+0)
 # CONTACT X3.60 X(KLLLLGAGESGKST-4)

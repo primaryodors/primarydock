@@ -37,7 +37,9 @@ ScriptVar script_var[_VARNUM_MASK+1];
 int vars = 0;
 int program_counter = 0;
 
-Protein p("TheProtein");
+// Protein p("TheProtein");
+Protein* strands[26];
+Protein* working = nullptr;
 
 void raise_error(std::string message)
 {
@@ -277,7 +279,7 @@ Point interpret_single_point(const char* param)
 
     if (param[0] >= '0' && param[0] <= '9')
     {
-        aa = p.get_residue(atoi(param));
+        aa = working->get_residue(atoi(param));
         if (aa)
         {
             pt = aa->get_CA_location();
@@ -292,7 +294,7 @@ Point interpret_single_point(const char* param)
         if (n<0) return pt;
         n &= _VARNUM_MASK;
         pt.x = script_var[n].value.n;
-        aa = p.get_residue(script_var[n].value.n);
+        aa = working->get_residue(script_var[n].value.n);
         if (aa) pt = aa->get_CA_location();
         return pt;
 
@@ -412,6 +414,11 @@ int main(int argc, char** argv)
     string PDB_fname = "";
     FILE* pf;
 
+    for (i=0; i<26; i++) strands[i] = nullptr;
+
+    strands[0] = new Protein("TheProt");
+    working = strands[0];
+
     for (i=0; i<=_VARNUM_MASK; i++)
     {
         script_var[i].name = "";
@@ -496,6 +503,7 @@ int main(int argc, char** argv)
         char** words = chop_spaced_words(buffer);
         char** owords = words;
         char chain = 'A';
+        char new_chain;
         if (words && words[0] && words[0][0] && words[0][1])
         {
             for (k=0; words[k]; k++)
@@ -563,7 +571,7 @@ int main(int argc, char** argv)
                 Point sl(0,0,0);
                 for (i=0; i<eachend; i++)	// It's actually easier to average manually than to screw around with object arrays.
                 {
-                    AminoAcid* aa = p.get_residue(asr+i);
+                    AminoAcid* aa = working->get_residue(asr+i);
                     if (aa) sl = sl.add(aa->get_CA_location());
                 }
 
@@ -573,7 +581,7 @@ int main(int argc, char** argv)
                 SCoord motion = sp.subtract(sl);
                 for (i=sr; i<=er; i++)
                 {
-                    AminoAcid* aa = p.get_residue(i);
+                    AminoAcid* aa = working->get_residue(i);
                     if (aa)
                     {
                         MovabilityType fmov = aa->movability;
@@ -588,7 +596,7 @@ int main(int argc, char** argv)
 
                 for (i=0; i<eachend; i++)
                 {
-                    AminoAcid* aa = p.get_residue(aer-i);
+                    AminoAcid* aa = working->get_residue(aer-i);
                     if (aa) el = el.add(aa->get_CA_location());
                 }
 
@@ -602,7 +610,7 @@ int main(int argc, char** argv)
                 // TODO: Offer the option to align middle residues to point toward some outside landmark.
                 for (i=sr; i<=er; i++)
                 {
-                    AminoAcid* aa = p.get_residue(i);
+                    AminoAcid* aa = working->get_residue(i);
                     if (aa)
                     {
                         MovabilityType fmov = aa->movability;
@@ -640,7 +648,7 @@ int main(int argc, char** argv)
                 theta = interpret_single_float(words[l++]) * fiftyseventh;
                 if (words[l]) raise_error("Too many parameters given for BEND.");
 
-                p.rotate_backbone_partial(sr, er, bbrotd, theta);
+                working->rotate_backbone_partial(sr, er, bbrotd, theta);
 
             }	// BEND
 
@@ -670,9 +678,9 @@ int main(int argc, char** argv)
                 if (script_var[n].vt != SV_FLOAT) raise_error("Wrong variable type given for BENERG; float required.");
 
                 Star a1, a2;
-                a1.paa = p.get_residue(r1);
+                a1.paa = working->get_residue(r1);
                 if (!a1.n) raise_error((std::string)"Residue " + to_string(r1) + (std::string)" not found in protein.");
-                a2.paa = p.get_residue(r2);
+                a2.paa = working->get_residue(r2);
                 if (!a2.n) raise_error((std::string)"Residue " + to_string(r2) + (std::string)" not found in protein.");
 
                 script_var[n].value.f = -(a1.pmol->get_intermol_binding(a2.pmol));
@@ -691,9 +699,9 @@ int main(int argc, char** argv)
                 if (words[l]) raise_error("Too many parameters given for BRIDGE.");
 
                 Star a1, a2;
-                a1.paa = p.get_residue(r1);
+                a1.paa = working->get_residue(r1);
                 if (!a1.n) raise_error((std::string)"Residue " + to_string(r1) + (std::string)" not found in protein.");
-                a2.paa = p.get_residue(r2);
+                a2.paa = working->get_residue(r2);
                 if (!a1.n) raise_error((std::string)"Residue " + to_string(r2) + (std::string)" not found in protein.");
 
                 a1.pmol->movability = MOV_FLEXONLY;
@@ -714,7 +722,7 @@ int main(int argc, char** argv)
                 Point newcen(0,0,0);
                 if (words[l]) newcen = interpret_single_point(words[l++]);
                 if (words[l]) raise_error("Too many parameters given for CENTER.");
-                p.move_piece(1, 9999, newcen);
+                working->move_piece(1, 9999, newcen);
             }	// CENTER
 
             else if (!strcmp(words[0], "CONNECT"))
@@ -730,7 +738,7 @@ int main(int argc, char** argv)
                 er = ct - sgn(ct-sr);
 
                 Atom *a1, *a2, *a3;
-                AminoAcid *cta = p.get_residue(ct), *era = p.get_residue(er);
+                AminoAcid *cta = working->get_residue(ct), *era = working->get_residue(er);
 
                 if (!era || !cta) goto _no_connect;
 
@@ -751,9 +759,9 @@ int main(int argc, char** argv)
                 }
                 a3 = era->get_atom("CA");
 
-                p.conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
+                working->conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
                 delete[] pt3;
-                p.backconnect(sr, er);
+                working->backconnect(sr, er);
 
             _no_connect:
                 goto _pc_continue;
@@ -766,19 +774,19 @@ int main(int argc, char** argv)
                 if (words[2]) er = interpret_single_int(words[2]);
                 if (words[3]) raise_error("Too many parameters given for DELETE.");
 
-                if (er) p.delete_residues(sr, er);
-                else p.delete_residue(sr);
+                if (er) working->delete_residues(sr, er);
+                else working->delete_residue(sr);
 
 				Star sv;
 
-                int seqlen = p.get_seq_length();
+                int seqlen = working->get_seq_length();
                 strcpy(buffer, "%SEQLEN");
                 sv.n = seqlen;
 				set_variable(buffer, sv);
 
                 strcpy(buffer, "$SEQUENCE");
                 sv.psz = new char[seqlen+4];
-                strcpy(sv.psz, p.get_sequence().c_str());
+                strcpy(sv.psz, working->get_sequence().c_str());
 				set_variable(buffer, sv);
             } // DELETE
 
@@ -790,22 +798,22 @@ int main(int argc, char** argv)
                     if ( words[3]) raise_error("DISULF takes either zero or two parameters.");
                     j = interpret_single_int(words[1]);
                     k = interpret_single_int(words[2]);
-                    bool result = p.disulfide_bond(j, k);
+                    bool result = working->disulfide_bond(j, k);
                     if (!result) cout << "WARNING: Failed to form disulfide bond between " << j << " and " << k << "." << endl;
                 }
                 else
                 {
-                    n = p.get_end_resno();
+                    n = working->get_end_resno();
                     for (j=1; j<n; j++)
                     {
-                        AminoAcid* resj = p.get_residue(j);
+                        AminoAcid* resj = working->get_residue(j);
                         if (!resj->is_thiol()) continue;
                         for (k=j+1; k<=n; k++)
                         {
-                            AminoAcid* resk = p.get_residue(k);
+                            AminoAcid* resk = working->get_residue(k);
                             if (resk->is_thiol())
                             {
-                                if (p.disulfide_bond(j, k)) cout << "Disulfide bonded " << *resj << "-" << *resk << "." << endl;
+                                if (working->disulfide_bond(j, k)) cout << "Disulfide bonded " << *resj << "-" << *resk << "." << endl;
                             }
                         }
                     }
@@ -876,9 +884,9 @@ int main(int argc, char** argv)
                 if (!words[1]) raise_error("No sequence given for GEN.");
                 psz = interpret_single_string(words[1]);
 
-                p.add_sequence(psz);
-                // p.conform_backbone(1, p.get_seq_length(), 50); // Takes too long.
-                p.make_helix(1, p.get_seq_length(), M_PI, M_PI);
+                working->add_sequence(psz);
+                // working->conform_backbone(1, working->get_seq_length(), 50); // Takes too long.
+                working->make_helix(1, working->get_seq_length(), M_PI, M_PI);
                 goto _prot_deets;
             } // GEN
 
@@ -909,11 +917,11 @@ int main(int argc, char** argv)
             {
                 int sr, er, hc, hf = 0;
 
-                er = p.get_end_resno();
+                er = working->get_end_resno();
                 sr = -1;
-                for (hc = p.get_start_resno(); hc <= er; hc++)
+                for (hc = working->get_start_resno(); hc <= er; hc++)
                 {
-                    AminoAcid *aa = p.get_residue(hc), *aan = p.get_residue(hc+1);
+                    AminoAcid *aa = working->get_residue(hc), *aan = working->get_residue(hc+1);
                     if (!aa) continue;
 
                     bool is_helix = aa->is_alpha_helix();
@@ -1006,7 +1014,7 @@ int main(int argc, char** argv)
                 if (words[l+2]) sa = interpret_single_int(words[l+2]);
                 if (words[l+2] && words[l+3]) raise_error("Too many parameters given for HELIX.");
 
-                p.make_helix(sr, er, sa, phi, psi);
+                working->make_helix(sr, er, sa, phi, psi);
 
             }	// HELIX
 
@@ -1029,19 +1037,19 @@ int main(int argc, char** argv)
                             Protein ref("reference");
                             ref.load_pdb(fp);
                             fclose(fp);
-                            p.homology_conform(&tpl, &ref);
+                            working->homology_conform(&tpl, &ref);
                         }
                     }
-                    else p.homology_conform(&tpl, &p);
+                    else working->homology_conform(&tpl, working);
                 }
             }   // HOMOLOGY
 
             else if (!strcmp(words[0], "HYDRO"))
             {
-                int resno, endres = p.get_end_resno();
+                int resno, endres = working->get_end_resno();
                 for (resno=1; resno<=endres; resno++)
                 {
-                    AminoAcid* res = p.get_residue(resno);
+                    AminoAcid* res = working->get_residue(resno);
                     if (res) res->hydrogenate();
                 }
             }   // HYDRO
@@ -1434,8 +1442,16 @@ int main(int argc, char** argv)
                 psz = interpret_single_string(words[1]);
 				n = 0;
                 chain = 'A';
+                
 				if (words[2]) chain = words[2][0];
-                if (words[2] && words[3]) raise_error("Too many parameters given for LOAD.");
+                if (words[2] && words[3])
+                {
+                    new_chain = words[3][0];
+                    if (words[4]) raise_error("Too many parameters given for LOAD.");
+
+                    if (!strands[new_chain - 65]) strands[new_chain - 65] = new Protein(psz);
+                    working = strands[new_chain - 65];
+                }
 
                 pf = fopen(psz, "rb");
                 if (!pf)
@@ -1443,7 +1459,7 @@ int main(int argc, char** argv)
                     raise_error( (std::string)"Failed to open " + (std::string)psz + (std::string)" for reading.");
                     return 0xbadf12e;
                 }
-                p.load_pdb(pf, n, chain);
+                working->load_pdb(pf, n, chain);
 
                 fclose(pf);
 
@@ -1458,7 +1474,7 @@ int main(int argc, char** argv)
                 strcpy(sv.psz, psz);
 				set_variable(buffer, sv);
 
-                const char* pname = p.get_name().c_str();
+                const char* pname = working->get_name().c_str();
                 strcpy(buffer, "$PROTEIN");
                 sv.psz = new char[strlen(pname)+4];
                 strcpy(sv.psz, pname);
@@ -1466,17 +1482,17 @@ int main(int argc, char** argv)
 
                 delete[] psz;
 
-                int seqlen = p.get_seq_length();
+                int seqlen = working->get_seq_length();
                 strcpy(buffer, "%SEQLEN");
                 sv.n = seqlen;
 				set_variable(buffer, sv);
 
                 strcpy(buffer, "$SEQUENCE");
                 sv.psz = new char[seqlen+4];
-                strcpy(sv.psz, p.get_sequence().c_str());
+                strcpy(sv.psz, working->get_sequence().c_str());
 				set_variable(buffer, sv);
 
-                std::vector<std::string> rem_hx = p.get_remarks("650 HELIX");
+                std::vector<std::string> rem_hx = working->get_remarks("650 HELIX");
                 for (l=0; l<rem_hx.size(); l++)
                 {
                     strcpy(buffer, rem_hx[l].c_str());
@@ -1492,14 +1508,14 @@ int main(int argc, char** argv)
                     sv.n = atoi(words[5]);
                     set_variable(buffer1, sv);
 
-					p.set_region(words[3], atoi(words[4]), atoi(words[5]));
+					working->set_region(words[3], atoi(words[4]), atoi(words[5]));
 
                     delete[] words;
                 }
 
                 for (l=1; l<=7; l++)
                 {
-                    int bw50 = p.get_bw50(l);
+                    int bw50 = working->get_bw50(l);
                     if (bw50 > 0)
                     {
                         sprintf(buffer1, "%c%d.50", '%', l);
@@ -1510,7 +1526,7 @@ int main(int argc, char** argv)
 
                 for (l=12; l<=67; l+=11)
                 {
-                    int bw50 = p.get_bw50(l);
+                    int bw50 = working->get_bw50(l);
                     if (bw50 > 0)
                     {
                         sprintf(buffer1, "%c%d.50", '%', l);
@@ -1559,7 +1575,7 @@ int main(int argc, char** argv)
                 elem_charge = interpret_single_int(words[l++]);
                 Point pt;
                 ma = new Atom(elem_sym.c_str(), &pt, elem_charge);
-                n = p.get_metals_count() + 1;
+                n = working->get_metals_count() + 1;
                 string mname = elem_sym + std::to_string(n);
                 ma->name = new char[8];
                 strcpy(ma->name, mname.c_str());
@@ -1587,7 +1603,7 @@ int main(int argc, char** argv)
 
                     if (!words[l]) raise_error("Insufficient parameters given for MCOORD.");
                     k = interpret_single_int(words[l]);
-                    AminoAcid* aa = p.get_residue(k);
+                    AminoAcid* aa = working->get_residue(k);
                     resnos[ncr] = k;
 
                     // cout << aa->get_3letter() << k << " is " << (aa->is_tyrosine_like() ? "" : "not ") << "tyrosine-like." << endl;
@@ -1628,7 +1644,7 @@ int main(int argc, char** argv)
                 }
 
                 if (ncr < 3) raise_error("MCOORD requires at least 3 coordinating atoms.");
-                p.coordinate_metal(ma, ncr, resnos, cratoms);
+                working->coordinate_metal(ma, ncr, resnos, cratoms);
 
             } // MCOORD
 
@@ -1643,7 +1659,7 @@ int main(int argc, char** argv)
                 else raise_error("Not enough parameters given for MOVE.");
                 if (words[l]) newcen = interpret_single_point(words[l++]);
                 if (words[l]) raise_error("Too many parameters given for MOVE.");
-                p.move_piece(sr, er, newcen);
+                working->move_piece(sr, er, newcen);
             }	// MOVE
 
             else if (!strcmp(words[0], "PTALIGN"))
@@ -1715,7 +1731,7 @@ int main(int argc, char** argv)
                 er = interpret_single_int(words[l++]);
                 if (words[l]) raise_error("Too many parameters given for REGION.");
 
-                p.set_region(psz, sr, er);
+                working->set_region(psz, sr, er);
 
                 char lbuffer[256];
                 sprintf(lbuffer, "%s%s.s", "%", psz);
@@ -1731,7 +1747,7 @@ int main(int argc, char** argv)
             {
                 sprintf(buffer1, "%s\n", script_lines[program_counter].c_str());
                 for (l=0; buffer1[l] != 'R'; l++);
-                p.add_remark(buffer1+l);
+                working->add_remark(buffer1+l);
             }   // REMARK
 
             else if (!strcmp(words[0], "RENUMBER"))
@@ -1746,8 +1762,22 @@ int main(int argc, char** argv)
                 nsr = interpret_single_int(words[l++]);
                 if (words[l]) raise_error((std::string)"Too many parameters given for " + (std::string)words[0] + (std::string)".");
 
-				p.renumber_residues(sr, er, nsr);
+				working->renumber_residues(sr, er, nsr);
             }	// RENUMBER
+
+            else if (!strcmp(words[0], "ROTATE"))
+            {
+				if (!words[1]) raise_error("Insufficient parameters given for ROTATE.");
+                SCoord axis = interpret_single_point(words[1]);
+				if (!words[2]) raise_error("Insufficient parameters given for ROTATE.");
+                float theta = interpret_single_float(words[2]);
+                if (words[3]) raise_error("Too many parameters given for ROTATE.");
+
+                Rotation rot;
+                rot.v = axis;
+                rot.a = theta;
+                working->rotate_piece(1, working->get_end_resno(), rot, 0);
+            }
 
             else if (!strcmp(words[0], "ROTBOND"))
             {
@@ -1767,8 +1797,14 @@ int main(int argc, char** argv)
                     raise_error( (std::string)"Failed to open " + (std::string)psz + (std::string)" for writing.");
                     return 0xbadf12e;
                 }
-                p.save_pdb(pf);
-                p.end_pdb(pf);
+                for (l=0; l<26; l++)
+                {
+                    if (!strands[l]) continue;
+                    working = strands[l];
+                    working->set_pdb_chain(l+65);
+                    working->save_pdb(pf);
+                }
+                working->end_pdb(pf);
 
                 cout << "Wrote " << psz << "." << endl;
 
@@ -1781,7 +1817,7 @@ int main(int argc, char** argv)
                         return 0;
                     else raise_error((std::string)"Too many parameters given for SAVE: " + (std::string)words[2]);
                 }
-            }
+            }   // SAVE
 
             else if (!strcmp(words[0], "SCENV"))
             {
@@ -1794,8 +1830,8 @@ int main(int argc, char** argv)
                 int bitmask = words[l+1] ? interpret_single_int(words[l++]) : 0xffffffff;
 
                 // Find all residues close enough to interact side chains with resno.
-                AminoAcid** nearby = p.get_residues_can_clash(resno);
-                AminoAcid* residue = p.get_residue(resno);
+                AminoAcid** nearby = working->get_residues_can_clash(resno);
+                AminoAcid* residue = working->get_residue(resno);
                 int ra = residue->get_atom_count();
                 if (nearby)
                 {
@@ -1907,7 +1943,7 @@ int main(int argc, char** argv)
                     threshold = interpret_single_int(words[l++]);
                 }
 
-                k = p.search_sequence(sr, esr, psz, threshold, &sim);
+                k = working->search_sequence(sr, esr, psz, threshold, &sim);
 
                 delete[] psz;
 
@@ -1969,6 +2005,38 @@ int main(int argc, char** argv)
 
             }	// SEARCH
 
+            else if (!strcmp(words[0], "STRAND"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters given for STRAND.");
+                if (words[2])
+                {
+                    if (words[3]) raise_error("Too many parameters given for STRAND.");
+                    chain = words[1][0] - 65;
+                    char new_chain = words[2][0] - 65;
+                    strands[new_chain] = strands[chain];
+                    strands[chain] = nullptr;
+                    working = strands[new_chain];
+                }
+                else
+                {
+                    chain = words[1][0] - 65;
+                    if (!strands[chain]) strands[chain] = new Protein("Another Prot");
+                    working = strands[chain];
+                }
+            }   // STRAND
+
+            else if (!strcmp(words[0], "UNCHAIN"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters given for UNCHAIN.");
+                chain = words[1][0] - 65;
+                if (working == strands[chain]) raise_error("Cannot delete current working strand.");
+                if (nullptr != strands[chain])
+                {
+                    delete strands[chain];
+                    strands[chain] = nullptr;
+                }
+            }
+
             else if (!strcmp(words[0], "UPRIGHT"))
             {
                 l = 1;
@@ -1976,7 +2044,7 @@ int main(int argc, char** argv)
 
                 try
                 {
-                    p.upright();
+                    working->upright();
                 }
                 catch (int ex)
                 {

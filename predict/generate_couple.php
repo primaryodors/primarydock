@@ -97,15 +97,17 @@ switch ($gpid)
     $contacts = <<<heredoc
 CONTACT X7.57 STYNQRKH(NLKXXXXX$+0)~1
 CONTACT X7.59 X(XXXXXX$+0)
-CONTACT MAILVCPGHFWY(MAYDRYVAIC+0) MAILV(DIIIANNLRGCGLY$+12)~1
+CONTACT MAILVCPGHFWY(MAYDRYVAIC+0) MAILV(DIIIANNLRGCGLY$+12)~1  # Thumb tip up inside the GPCR.
+CONTACT MAILVCPGHFWY(MAYDRYVAIC+8) MAILV(DIIIANNLRGCGLY$+2)~1   # Thumb underneath TMR3.
+CONTACT MAILVCPGHFWY(MAYDRYVAIC+8) MAILV(DIIIANNLRGCGLY$+3)~1   # Thumb underneath TMR3.
 # CONTACT MAILVCP3.46 MAILVCPFWY(XXXX$+2)~1
-CONTACT X56.50 X(YXHMTCATDT+0)
+# CONTACT X56.50 X(YXHMTCATDT+0)
 # CONTACT X3.60 X(KLLLLGAGESGKST-4)
-CONTACT X3.54 MAILVCP(XXXXXXX$+0)~1
-CONTACT X5.66 MAILVCP(XXXXXXX$+0)~1
+# CONTACT X3.54 MAILVCP(XXXXXXX$+0)~1
+# CONTACT X5.66 MAILVCP(XXXXXXX$+0)~1
 # CONTACT X56.50 H(YXHFTCATDTXNI+2)~1
-CONTACT X3.58 X(LLLLGAGESGKST-8)                                # Dummy contact to align "index finger" with CYT2.
-CONTACT X3.62 X(LLLLGAGESGKST-4)                                # Dummy contact to align "index finger" with CYT2.
+# CONTACT X3.58 X(LLLLGAGESGKST-8)                                # Dummy contact to align "index finger" with CYT2.
+# CONTACT X3.62 X(LLLLGAGESGKST-4)                                # Dummy contact to align "index finger" with CYT2.
 # CONTACT X3.58 X(LLLLGAGESGKST-3)                                # Dummy contact to align "index finger" with CYT2.
 # CONTACT X3.62 X(LLLLGAGESGKST-3)                                # Dummy contact to align "index finger" with CYT2.
 CONTACT 1:YHNQ6.55 1:DE45.51                                    # EXR hbond for tetrapod ORs

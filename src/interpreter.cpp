@@ -1054,6 +1054,7 @@ int main(int argc, char** argv)
                 {
                     AminoAcid* res = working->get_residue(resno);
                     if (res) res->hydrogenate();
+                    working->minimize_residue_clashes(resno);
                 }
             }   // HYDRO
 

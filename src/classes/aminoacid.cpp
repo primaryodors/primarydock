@@ -467,7 +467,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
         // Sort all the backbone and sidechain atoms into a new array.
         Atom** new_atoms = new Atom*[atcount+4];
-        for (i=0; i<atcount; i++) new_atoms[i] = nullptr;
+        for (i=0; atoms[i]; i++) new_atoms[i] = nullptr;
 
         l=0;
         if (N) new_atoms[l++] = N;
@@ -1976,6 +1976,7 @@ void AminoAcid::hydrogenate(bool steric_only)
         residue_no += 0.0000001;
     }
 
+
     if (aadef)
     {
         for (i=0; aadef->aabonds[i]; i++)
@@ -1996,14 +1997,21 @@ void AminoAcid::hydrogenate(bool steric_only)
                 a = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Za), aadef->aabonds[i]->aname, b, aadef->aabonds[i]->cardinality );
                 a->residue = b->residue;
                 strcpy(a->aa3let, b->aa3let);
+                added_heavies = true;
             }
             else if (!b)
             {
                 b = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Zb), aadef->aabonds[i]->bname, a, aadef->aabonds[i]->cardinality );
                 b->residue = a->residue;
                 strcpy(b->aa3let, a->aa3let);
+                added_heavies = true;
             }
         }
+    }
+
+    if (added_heavies)
+    {
+        minimize_internal_clashes();
     }
 
     Molecule::hydrogenate(steric_only);

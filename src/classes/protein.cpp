@@ -1107,6 +1107,51 @@ AminoAcid** Protein::get_residues_can_clash(int resno)
     return 0;
 }
 
+void Protein::minimize_residue_clashes(int resno)
+{
+    AminoAcid** caa = get_residues_can_clash(resno);
+    if (!caa) return;
+
+    int i;
+    for (i=0; caa[i]; i++);     // count.
+
+    Molecule* mols[i+4];
+    MovabilityType mt[i+4];
+    AminoAcid* aa = get_residue(resno);
+    mols[0] = (Molecule*)aa;
+    if (!aa) return;
+    mt[0] = aa->movability;
+    aa->movability = MOV_FLEXONLY;
+
+    for (i=0; caa[i]; i++)
+    {
+        mt[i+1] = caa[i]->movability;
+        mols[i+1] = (Molecule*)caa[i];
+        caa[i]->movability = MOV_NONE;
+    }
+    mols[i+1] = nullptr;
+
+    Molecule::conform_molecules(mols, 20);
+
+    for (i=0; caa[i]; i++)
+    {
+        caa[i]->movability = mt[i+1];
+    }
+    aa = get_residue(resno);
+    aa->movability = mt[0];
+}
+
+float Protein::binding_to_nearby_residues(int resno)
+{
+    AminoAcid** caa = get_residues_can_clash(resno);
+    if (!caa) return 0;
+
+    AminoAcid* aa = get_residue(resno);
+    if (!aa) return 0;
+
+    return aa->get_intermol_binding(caa);
+}
+
 std::vector<AminoAcid*> Protein::get_residues_can_clash(int sr, int er)
 {
     std::vector<AminoAcid*> result;

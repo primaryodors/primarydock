@@ -2354,7 +2354,7 @@ Atom** Ring::get_atoms() const
     Atom** retval = new Atom*[atcount+2];
     int i;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         retval[i] = atoms[i];
     }
@@ -2426,7 +2426,7 @@ bool Ring::is_coplanar()
 
         int i;
         float anomaly;
-        for (i=3; i<atcount; i++)
+        for (i=3; atoms[i]; i++)
         {
             anomaly = are_points_planar(atoms[0]->get_location(),
                                         atoms[1]->get_location(),
@@ -2597,7 +2597,7 @@ void Ring::determine_type()
             is_coplanar() && atoms_are_conjugated(atoms) && Huckel()
             )
         {
-            for (i=0; i<atcount; i++)
+            for (i=0; atoms[i]; i++)
             {
                 if (atoms[i]->get_family() == PNICTOGEN) atoms[i]->is_imidazole_like = true;
             }

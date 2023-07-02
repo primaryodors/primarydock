@@ -169,6 +169,7 @@ public:
     int atno_offset=0;
     MetalCoord* m_mcoord=0;
     Atom* coordmtl = nullptr;
+    bool added_heavies = false;
 
 protected:
     void load_aa_defs();

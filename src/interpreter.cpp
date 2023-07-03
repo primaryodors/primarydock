@@ -40,6 +40,7 @@ int program_counter = 0;
 // Protein p("TheProtein");
 Protein* strands[26];
 Protein* working = nullptr;
+char g_chain = 'A';
 
 void raise_error(std::string message)
 {
@@ -418,6 +419,7 @@ int main(int argc, char** argv)
 
     strands[0] = new Protein("TheProt");
     working = strands[0];
+    g_chain = 'A';
 
     for (i=0; i<=_VARNUM_MASK; i++)
     {
@@ -1455,6 +1457,7 @@ int main(int argc, char** argv)
 
                     if (!strands[new_chain - 65]) strands[new_chain - 65] = new Protein(psz);
                     working = strands[new_chain - 65];
+                    g_chain = new_chain;
                 }
 
                 pf = fopen(psz, "rb");
@@ -1473,13 +1476,15 @@ int main(int argc, char** argv)
 				char buffer1[1024];
 				Star sv;
 
-				strcpy(buffer, "$PDB");
+				// strcpy(buffer, "$PDB");
+                sprintf(buffer, "$PDB%c", g_chain);
 				sv.psz = new char[strlen(psz)+4];
                 strcpy(sv.psz, psz);
 				set_variable(buffer, sv);
 
                 const char* pname = working->get_name().c_str();
-                strcpy(buffer, "$PROTEIN");
+                // strcpy(buffer, "$PROTEIN");
+                sprintf(buffer, "$PROTEIN%c", g_chain);
                 sv.psz = new char[strlen(pname)+4];
                 strcpy(sv.psz, pname);
 				set_variable(buffer, sv);
@@ -1487,11 +1492,13 @@ int main(int argc, char** argv)
                 delete[] psz;
 
                 int seqlen = working->get_seq_length();
-                strcpy(buffer, "%SEQLEN");
+                // strcpy(buffer, "%SEQLEN");
+                sprintf(buffer, "%cSEQLEN%c", '%', g_chain);
                 sv.n = seqlen;
 				set_variable(buffer, sv);
 
-                strcpy(buffer, "$SEQUENCE");
+                // strcpy(buffer, "$SEQUENCE");
+                sprintf(buffer, "$SEQUENCE%c", g_chain);
                 sv.psz = new char[seqlen+4];
                 strcpy(sv.psz, working->get_sequence().c_str());
 				set_variable(buffer, sv);
@@ -1504,11 +1511,11 @@ int main(int argc, char** argv)
 
 					if (!words[3] || !words[4] || !words[5]) continue;
 
-                    sprintf(buffer1, "%c%s.s", '%', words[3]);
+                    sprintf(buffer1, "%c%c.%s.s", '%', g_chain, words[3]);
                     sv.n = atoi(words[4]);
                     set_variable(buffer1, sv);
 
-                    sprintf(buffer1, "%c%s.e", '%', words[3]);
+                    sprintf(buffer1, "%c%c.%s.e", '%', g_chain, words[3]);
                     sv.n = atoi(words[5]);
                     set_variable(buffer1, sv);
 
@@ -1522,7 +1529,7 @@ int main(int argc, char** argv)
                     int bw50 = working->get_bw50(l);
                     if (bw50 > 0)
                     {
-                        sprintf(buffer1, "%c%d.50", '%', l);
+                        sprintf(buffer1, "%c%c.%d.50", '%', g_chain, l);
                         sv.n = bw50;
                         set_variable(buffer1, sv);
                     }
@@ -1533,7 +1540,7 @@ int main(int argc, char** argv)
                     int bw50 = working->get_bw50(l);
                     if (bw50 > 0)
                     {
-                        sprintf(buffer1, "%c%d.50", '%', l);
+                        sprintf(buffer1, "%c%c.%d.50", '%', g_chain, l);
                         sv.n = bw50;
                         set_variable(buffer1, sv);
                     }
@@ -1816,6 +1823,7 @@ int main(int argc, char** argv)
                 {
                     if (!strands[l]) continue;
                     working = strands[l];
+                    g_chain = l+65;
                     working->set_pdb_chain(l+65);
                     working->save_pdb(pf);
                 }
@@ -2031,12 +2039,14 @@ int main(int argc, char** argv)
                     strands[new_chain] = strands[chain];
                     strands[chain] = nullptr;
                     working = strands[new_chain];
+                    g_chain = new_chain+65;
                 }
                 else
                 {
                     chain = words[1][0] - 65;
                     if (!strands[chain]) strands[chain] = new Protein("Another Prot");
                     working = strands[chain];
+                    g_chain = chain+65;
                 }
             }   // STRAND
 

@@ -181,10 +181,14 @@ default being 50.
 Examples:
 ```
 CTNRG A B &energy
+CTNRG A B &energy @direction
 ```
 
-Gets the contact energy between two strands. In this example, the interaction energy between strands A and B will be stored in `&energy`.
+Gets the contact energy between two strands. In these examples, the interaction energy between strands A and B will be stored in `&energy`.
 Negative values mean favorable interactions, expressed in kJ/mol. Positive values mean atom clashes.
+
+The second example introduces a direction of motion to move the second strand (in this case, B strand) to optimize the contacts between proteins.
+This is useful if e.g. two proteins are too close together and clashing, or too far away and not making good contact.
 
 
 # DELETE

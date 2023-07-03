@@ -67,6 +67,27 @@ VarType type_from_name(const char* varname)
     return SV_NONE;
 }
 
+float contact_energy(Protein* a, Protein* b)
+{
+    std::vector<AminoAcid*> vca = a->get_contact_residues(b);
+    float f=0;
+
+    int i, n = vca.size();
+
+    Molecule* mols[n+4];
+    for (i=0; i<n; i++) mols[i] = (Molecule*)vca[i];
+    mols[i] = nullptr;
+
+    Molecule::conform_molecules(mols, 20);
+
+    for (i=0; i<n; i++)
+    {
+        f -= mols[i]->get_intermol_binding(mols);
+    }
+
+    return f;
+}
+
 int interpret_single_int(const char* param);
 
 float interpret_single_float(const char* param);
@@ -777,21 +798,48 @@ int main(int argc, char** argv)
                 if (!words[2]) raise_error("Insufficient parameters given for CTNRG.");
                 char* sb = interpret_single_string(words[2]);
                 if (!words[3]) raise_error("Insufficient parameters given for CTNRG.");
-                if (words[4]) raise_error("Too many parameters given for CTNRG.");
+                SCoord dir(0,0,0);
+                if (words[4])
+                {
+                    dir = interpret_single_point(words[4]);
+                    if (words[5]) raise_error("Too many parameters given for CTNRG.");
+                }
 
                 sa[0] -= 65;
                 sb[0] -= 65;
-                std::vector<AminoAcid*> vca = strands[sa[0]]->get_contact_residues(strands[sb[0]]);
+
+                if (dir.r)
+                {
+                    dir.r = 1;
+                    float former, latter;
+
+                    former = contact_energy(strands[sa[0]], strands[sb[0]]);
+                    for (i=0; i<200; i++)
+                    {
+                        strands[sb[0]]->move_piece(1, strands[sb[0]]->get_end_resno(), dir);
+                        latter = contact_energy(strands[sa[0]], strands[sb[0]]);
+
+                        if (latter > former)
+                        {
+                            strands[sb[0]]->undo();
+                            dir.r *= -0.75;
+                        }
+                        else
+                        {
+                            former = latter;
+                            dir.r *= 1.1;
+                        }
+
+                        if (fabs(dir.r) < 0.05)
+                        {
+                            cout << "Got it in " << i << endl;
+                            break;
+                        }
+                    }
+                }
 
                 Star s;
-                s.f = 0;
-
-                n = vca.size();
-                for (i=0; i<n; i++)
-                {
-                    for (j=0; j<n; j++)
-                        s.f -= vca[i]->get_intermol_binding(vca[j]);
-                }
+                s.f = contact_energy(strands[sa[0]], strands[sb[0]]);
 
                 set_variable(words[3], s);
             }   // CTNRG

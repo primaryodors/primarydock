@@ -86,7 +86,7 @@ ECHO "Moved to " @gpcen
 
 # Contact energy.
 
-CTNRG "A" "B" &nrg
+CTNRG "A" "B" &nrg [0,-10,0]
 ECHO "Inter-protein energy " &nrg
 
 

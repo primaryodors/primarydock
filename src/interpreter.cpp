@@ -272,10 +272,10 @@ int interpret_single_int(const char* param)
     return round(interpret_single_float(param));
 }
 
-Point interpret_single_point(const char* param)
+Point interpret_single_point(const char* param, Point old_value = Point(0,0,0))
 {
     int n;
-    Point pt(0,0,0);
+    Point pt = old_value;
     AminoAcid* aa;
 
     if (param[0] >= '0' && param[0] <= '9')
@@ -303,6 +303,7 @@ Point interpret_single_point(const char* param)
         n = find_var_index(param);
         if (n<0) return pt;
         n &= _VARNUM_MASK;
+        if (pt.magnitude()) pt.scale(script_var[n].value.f);
         pt.x = script_var[n].value.f;
         return pt;
 
@@ -857,7 +858,7 @@ int main(int argc, char** argv)
                     else
                     {
                         psz = interpret_single_string(words[l]);
-                        cout << psz;
+                        cout << psz << flush;
                         delete[] psz;
                     }
                 }
@@ -1276,8 +1277,8 @@ int main(int argc, char** argv)
                     {
                         if (!strcmp(words[2], "="))
                         {
-                            script_var[n].value.ppt = new Point();
-                            *(script_var[n].value.ppt) = interpret_single_point(words[3]);
+                            if (!script_var[n].value.ppt) script_var[n].value.ppt = new Point();
+                            *(script_var[n].value.ppt) = interpret_single_point(words[3], *script_var[n].value.ppt);
                         }
                         else if (!strcmp(words[2], "+=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->add(interpret_single_point(words[3]));
                         else if (!strcmp(words[2], "-=")) *(script_var[n].value.ppt) = script_var[n].value.ppt->subtract(interpret_single_point(words[3]));
@@ -1691,8 +1692,7 @@ int main(int argc, char** argv)
                 if (!words[l]) raise_error("Insufficient parameters given for PTALIGN.");
                 Star s;
                 rot.v.r = 1;
-                Point p = rot.v;
-                s.ppt = &p;
+                s.ppt = new Point(rot.v);
                 set_variable(words[l++], s);
 
                 if (!words[l]) raise_error("Insufficient parameters given for PTALIGN.");
@@ -1785,6 +1785,7 @@ int main(int argc, char** argv)
                 if (words[3]) raise_error("Too many parameters given for ROTATE.");
 
                 LocatedVector lv = axis;
+                cout << "Axis is " << (Point)axis << endl;
                 int sr = working->get_start_resno(), er = working->get_end_resno();
                 lv.origin = working->get_region_center(sr, er);
 

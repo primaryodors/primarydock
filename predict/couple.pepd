@@ -1,0 +1,90 @@
+
+LET $gpcr = "pdbs/OR1/OR1G1.upright.pdb"
+LET $gp = "pdbs/Gprot/hGNAO1.pdb"
+
+IF $arg2 THEN LET $gpcr = $arg2
+IF $arg3 THEN LET $gp = $arg3
+
+STRAND A
+LOAD $gpcr
+UPRIGHT
+HOMOLOGY "pdbs/OR51/OR51E2.8f76.pdb" "pdbs/OR51/OR51E2.upright.pdb"
+CENTER
+
+STRAND B
+LOAD $gp
+RENUMBER 1 9999 400
+LET @gpcen = [0,-60,0]
+CENTER @gpcen
+
+
+
+# Turn G protein upright
+
+STRAND B
+
+SEARCH 250 999 "XXXXXX$" %last6
+LET %thumb = %last6 + 2
+LET @thumb = %thumb
+ECHO "Thumb is at " @thumb
+
+SEARCH 150 999 "NRMXESLXLF" %bottomn
+LET @bottomn = %bottomn
+ECHO "Bottom is at " @bottomn
+
+SEARCH 200 999 "DAVTD" %davtd
+LET %knuckle = %davtd - 6
+
+LET @up = @bottomn
+LET @up.y = 500
+ECHO "Reaching for " @up
+
+PTALIGN @thumb @up @bottomn @normal &angle
+ECHO "Rotating " &angle " degrees about " @normal
+ROTATE @normal &angle
+LET @thumb = %thumb
+ECHO "Now thumb is at " @thumb
+
+
+
+# Triangulate "thumb tip" location.
+
+STRAND A
+LET %BW2_36 = %A.2.50 - 14
+LET @BW2_36 = %BW2_36
+ECHO "Residue 2.36 is at " @BW2_36
+LET %BW5_55 = %A.5.50 + 5
+LET %BW5_62 = %A.5.50 + 12
+LET @BW5_62 = %BW5_62
+ECHO "Residue 5.62 is at " @BW5_62
+LET %BW7_57 = %A.7.50 + 7
+LET @BW7_57 = %BW7_57
+ECHO "Residue 7.57 is at " @BW7_57
+
+LET @tri  = @BW2_36
+LET @tri += @BW5_62
+LET @tri += @BW5_62
+LET @tri += @BW7_57
+LET @tri += @BW7_57
+LET @tri += @BW7_57
+LET @tri /= 6
+
+LET &fuckthis = @BW7_57.y
+LET @tri.y = @BW7_57.y
+
+STRAND B
+LET @thumb = %last6 + 2
+
+ECHO "Moving from " @gpcen
+ECHO "Adding " @tri " and subtracting " @thumb
+LET @gpcen += @tri
+LET @gpcen -= @thumb
+CENTER @gpcen
+ECHO "Moved to " @gpcen
+
+
+# Save output.
+
+SAVE "output/coupled.pdb"
+
+

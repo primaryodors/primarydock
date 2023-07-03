@@ -33,9 +33,12 @@ Cartesians have members .x, .y, and .z that behave as floats.
 
 Casting a float to an integer rounds the value (e.g. 0.4 rounds to zero but 0.5 rounds to 1).
 
-Casting a float to a Cartesian normally sets the .x member to the float value, leaving .y=0 and .z=0. But a command like `LET @foo = @bar.y` will result in only the value of `@foo.y` being nonzero.
+Casting a float to a Cartesian normally sets the .x member to the float value, leaving .y=0 and .z=0.
+But a command like `LET @foo = @bar.y` will result in only the value of `@foo.y` being nonzero.
 
-Casting an integer to a Cartesian obtains the location of the CA atom for that residue number, if it exists.
+Casting an integer to a Cartesian obtains the location of the CA atom for that residue number, if it exists in the working strand.
+But note that e.g. `LET @foo = %motif + 2` will not work. The arithmetic must come first e.g. `LET %foo = %motif + 2` followed by
+`LET @foo = %foo`.
 
 Casting a Cartesian back to float or integer obtains the magnitude of the Cartesian, equal to sqrt(x^2 + y^2 + z^2).
 

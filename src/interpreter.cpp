@@ -770,6 +770,32 @@ int main(int argc, char** argv)
                 goto _pc_continue;
             }	// CONNECT
 
+            else if (!strcmp(words[0], "CTNRG"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters given for CTNRG.");
+                char* sa = interpret_single_string(words[1]);
+                if (!words[2]) raise_error("Insufficient parameters given for CTNRG.");
+                char* sb = interpret_single_string(words[2]);
+                if (!words[3]) raise_error("Insufficient parameters given for CTNRG.");
+                if (words[4]) raise_error("Too many parameters given for CTNRG.");
+
+                sa[0] -= 65;
+                sb[0] -= 65;
+                std::vector<AminoAcid*> vca = strands[sa[0]]->get_contact_residues(strands[sb[0]]);
+
+                Star s;
+                s.f = 0;
+
+                n = vca.size();
+                for (i=0; i<n; i++)
+                {
+                    for (j=0; j<n; j++)
+                        s.f -= vca[i]->get_intermol_binding(vca[j]);
+                }
+
+                set_variable(words[3], s);
+            }   // CTNRG
+
             else if (!strcmp(words[0], "DELETE"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for DELETE.");

@@ -177,6 +177,16 @@ examples, the program will flex the range of 160-173 and attempt to reunite 173 
 default being 50.
 
 
+# CTNRG
+Examples:
+```
+CTNRG A B &energy
+```
+
+Gets the contact energy between two strands. In this example, the interaction energy between strands A and B will be stored in `&energy`.
+Negative values mean favorable interactions, expressed in kJ/mol. Positive values mean atom clashes.
+
+
 # DELETE
 Example:
 ```

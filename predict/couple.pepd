@@ -83,6 +83,14 @@ CENTER @gpcen
 ECHO "Moved to " @gpcen
 
 
+
+# Contact energy.
+
+CTNRG "A" "B" &nrg
+ECHO "Inter-protein energy " &nrg
+
+
+
 # Save output.
 
 SAVE "output/coupled.pdb"

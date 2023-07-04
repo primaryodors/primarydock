@@ -1205,12 +1205,28 @@ int main(int argc, char** argv)
             else if (!strcmp(words[0], "HYDRO"))
             {
                 int resno, endres = working->get_end_resno();
+                cout << "Hydrogenating...";
                 for (resno=1; resno<=endres; resno++)
                 {
                     AminoAcid* res = working->get_residue(resno);
-                    if (res) res->hydrogenate();
-                    working->minimize_residue_clashes(resno);
+                    if (res)
+                    {
+                        res->hydrogenate();
+
+                        AminoAcid** rcc = working->get_residues_can_clash(resno);
+                        if (!rcc) continue;
+                        for (n=0; rcc[n]; n++);
+                        Molecule* mols[n+4];
+                        for (i=0; i<=n; i++) mols[i] = (Molecule*)rcc[i];
+                        float f = res->get_intermol_clashes(mols);
+                        if (f >= 5)
+                        {
+                            working->minimize_residue_clashes(resno);
+                        }
+                    }
+                    cout << "." << flush;
                 }
+                cout << endl;
             }   // HYDRO
 
             else if (!strcmp(words[0], "IF"))

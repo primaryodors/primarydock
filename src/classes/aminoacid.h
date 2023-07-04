@@ -18,6 +18,7 @@ struct AABondDef
 {
     char aname[7];
     char bname[7];
+    int Za = 0, Zb = 0;
     float cardinality=0;
     float acharge=0;
     bool can_rotate=false;
@@ -126,10 +127,11 @@ public:
     {
         return;
     }
-    void rotate(LocatedVector SCoord, float theta);
+    void rotate(LocatedVector vec, float theta);
     LocatedVector rotate_backbone(bb_rot_dir direction, float angle);	// Return the origin and direction of the rotation axis.
     LocRotation rotate_backbone_abs(bb_rot_dir direction, float angle);
     LocRotation* flatten();		// Ensure the peptide bond is coplanar and the CA lies in the same plane. Return LocRotation[5].
+    void ensure_pi_atoms_coplanar();
 
     Point* predict_previous_COCA();
     Point* predict_next_NHCA();
@@ -167,6 +169,7 @@ public:
     int atno_offset=0;
     MetalCoord* m_mcoord=0;
     Atom* coordmtl = nullptr;
+    bool added_heavies = false;
 
 protected:
     void load_aa_defs();

@@ -111,6 +111,9 @@ public:
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size);
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
+    float binding_to_nearby_residues(int resno);
+
+    void minimize_residue_clashes(int resno);
 
     // Motion functions
     void upright();

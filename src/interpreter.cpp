@@ -942,15 +942,16 @@ int main(int argc, char** argv)
             {
                 if (!words[1]) raise_error("Insufficient parameters for DOWNLOAD.");
                 if (!words[2]) raise_error("Insufficient parameters for DOWNLOAD.");
+                if (!words[3]) raise_error("Insufficient parameters for DOWNLOAD.");
 
                 std::string url = "", retfmt = "", destfn = "";
                 bool skip_if_exists = false;
 
-                if (words[3])
-                {
-                    if (!strcmp(words[3], "ONCE")) skip_if_exists = true;
-                    else destfn = interpret_single_string(words[3]);
+                if (!strcmp(words[3], "ONCE")) raise_error("Insufficient parameters for DOWNLOAD.");
+                else destfn = interpret_single_string(words[3]);
 
+                if (words[4])
+                {
                     if (!strcmp(words[4], "ONCE")) skip_if_exists = true;
 
                     if (words[5]) raise_error("Too many parameters for DOWNLOAD.");
@@ -975,7 +976,7 @@ int main(int argc, char** argv)
                         delete[] dls;
                     }
 
-                    if (!url.size()) raise_error("Download source not found in data file.");
+                    if (!url.length()) raise_error("Download source not found in data file.");
                     j = url.find('%');
                     url.replace(j, 1, interpret_single_string(words[2]));
 
@@ -985,7 +986,33 @@ int main(int argc, char** argv)
                     }
                     else if (retfmt.substr(0, 5) == "JSON:")
                     {
-                        //
+                        std::string key = (std::string)"\"" + retfmt.substr(5) + (std::string)"\":";
+                        n = key.length();
+                        if (!download_file(url, "tmp/.pepdl")) raise_error("JSON retrieval failed.");
+                        FILE* fp = fopen("tmp/.pepdl", "rb");
+                        if (!fp) raise_error("JSON retrieval failed.");
+                        url = "";
+                        while (!feof(fp))
+                        {
+                            fgets(buffer1, 1022, fp);
+                            char* psz = strstr(buffer1, key.c_str());
+                            if (psz)
+                            {
+                                psz += n+1;
+                                char* quot = strchr(psz, '"');
+                                if (quot)
+                                {
+                                    *quot = 0;
+                                    url = psz;
+                                    break;
+                                }
+                            }
+                        }
+                        fclose(fp);
+                        remove("tmp/.pepdl");
+
+                        if (!url.length()) raise_error("URL not found in JSON data.");
+                        if (!download_file(url, destfn)) raise_error("Download failed.");
                     }
                     else raise_error("Unimplemented return format.");
                 }

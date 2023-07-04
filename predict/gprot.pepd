@@ -2,6 +2,10 @@
 # Pepteditor script for extracting G proteins to their own PDBs.
 #
 
+DOWNLOAD AF "Q5QD04" "pdbs/mTAAR9.pdb"
+DIE
+
+
 DOWNLOAD RCSB "8F76" "pdbs/8f76.pdb" ONCE
 LOAD "pdbs/8f76.pdb" X
 ECHO $SEQUENCE
@@ -14,4 +18,6 @@ LOAD "pdbs/8iw1.pdb" A
 ECHO $SEQUENCE
 HYDRO
 SAVE "pdbs/Gprot/hGNAL.pdb"
+
+
 

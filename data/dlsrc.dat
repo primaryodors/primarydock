@@ -1,0 +1,7 @@
+
+# Download Sources for PDBs.
+
+# ID        URL                                                             RETURNS
+RCSB        https://files.rcsb.org/download/%.pdb                           PDBDATA
+AF          https://alphafold.ebi.ac.uk/api/prediction/%                    JSON:pdbUrl
+

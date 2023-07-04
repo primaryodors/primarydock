@@ -526,7 +526,7 @@ char** Molecule::get_atom_names() const
     int i;
     char** retval = new char*[atcount+1];
 
-    for (i=0; i<atcount; i++) retval[i] = atoms[i]->name;
+    for (i=0; atoms[i]; i++) retval[i] = atoms[i]->name;
     retval[atcount] = 0;
 
     return retval;
@@ -2116,7 +2116,7 @@ Point Molecule::get_barycenter(bool bond_weighted) const
     Point locs[atcount];
     int i;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         locs[i] = atoms[i]->get_location();
         locs[i].weight = atoms[i]->get_atomic_weight();
@@ -2162,7 +2162,7 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     Point cen = get_barycenter(bond_weighted);
 
     int i;
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
@@ -2179,7 +2179,7 @@ void Molecule::rotate(LocatedVector lv, float theta)
     if (movability <= MOV_NORECEN) lv.origin = get_barycenter();
 
     int i;
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
@@ -2198,7 +2198,7 @@ bool Molecule::shielded(Atom* a, Atom* b) const
     a->shielding_angle = b->shielding_angle = 0;
 
     Point aloc = a->get_location(), bloc = b->get_location();
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         Atom* ai = atoms[i];
         if (!ai) break;
@@ -2305,7 +2305,7 @@ float Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
 void Molecule::clear_atom_binding_energies()
 {
     int i;
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
         atoms[i]->last_bind_energy = 0;
 }
 
@@ -2324,7 +2324,7 @@ float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
     int i, j, l, n;
     float kJmol = 0;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         if (!atoms[i]) continue;
         Point aloc = atoms[i]->get_location();
@@ -2368,14 +2368,14 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
 
     // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         atoms[i]->last_bind_energy = 0;
         atoms[i]->strongest_bind_energy = 0;
         atoms[i]->strongest_bind_atom = nullptr;
     }
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         Point aloc = atoms[i]->get_location();
         for (l=0; ligands[l]; l++)
@@ -2453,7 +2453,7 @@ float Molecule::get_intermol_contact_area(Molecule* ligand, bool hpho)
     int i, j;
     float result = 0;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         Point aloc = atoms[i]->get_location();
         float avdw = atoms[i]->get_vdW_radius();
@@ -2504,7 +2504,7 @@ float Molecule::get_intermol_polar_sat(Molecule* ligand)
     int i, j, l, n;
     float result = 0;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         Point aloc = atoms[i]->get_location();
         float aapol = fabs(atoms[i]->is_polar());

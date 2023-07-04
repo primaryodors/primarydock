@@ -215,6 +215,19 @@ Note that for `DISULF` to work, the two sulfur atoms must already be moved into 
 will be made to flex bonds to bring the sulfurs into proximity, and if the sulfurs are not already bound to hydrogens, the command will fail.
 
 
+# DOWNLOAD
+Example:
+```
+DOWNLOAD RCSB 8F76 "pdbs/8f76.pdb"
+DOWNLOAD AF Q5QD04 "pdbs/mTAAR9.pdb"
+```
+
+Downloads a protein model from one of the download sources registered in the `data/dlsrc.dat` file.
+The second parameter is the source's unique identifier for the model, e.g. 8F76 for the RCSB model of propionate-activated hOR51E2 on GNAS2,
+or UniProt ID Q5QD04 for mTAAR9 from AlphaFold.
+The third parameter is the destination file name.
+
+
 # DUMP
 Example:
 ```

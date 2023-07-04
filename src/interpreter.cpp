@@ -6,6 +6,13 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sstream>
+#include <unistd.h>
+#include <fstream>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#if _WIN32
+#include <Windows.h>
+#endif
 #include "classes/protein.h"
 #include "classes/group.h"
 
@@ -65,6 +72,36 @@ VarType type_from_name(const char* varname)
         raise_error("Variable names may only start with %, &, @, or $.");
     }
     return SV_NONE;
+}
+
+bool download_file(std::string url, std::string destination)
+{
+    #if _WIN32
+    URLDownloadToFile(NULL, url.c_str(), destination.c_str(), 0, NULL);
+
+    #elif defined(__linux__) || defined(__sun) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
+    pid_t child_pid = fork();
+    if (child_pid == -1)
+    {
+        perror("fork");
+    }
+    else if (child_pid == 0)
+    {
+        execlp("wget", "wget", "-O", destination.c_str(), url.c_str(), (char *)NULL);
+    }
+
+    int status = 0;
+    waitpid(child_pid, &status, 0);
+    if (status) return false;
+
+    #else
+    #error It appears your operating system is not supported yet - would you be willing to add it and submit a pull request?
+    #endif
+
+    struct stat s;
+    if (stat(destination.c_str(), &s) == 0) return true;
+
+    return false;
 }
 
 float contact_energy(Protein* a, Protein* b)
@@ -896,6 +933,47 @@ int main(int argc, char** argv)
                     }
                 }
             } // DISULF
+
+            else if (!strcmp(words[0], "DOWNLOAD"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters for DOWNLOAD.");
+                if (!words[2]) raise_error("Insufficient parameters for DOWNLOAD.");
+
+                std::string url = "", retfmt = "", destfn = "";
+
+                if (words[3])
+                {
+                    destfn = interpret_single_string(words[3]);
+                    if (words[4]) raise_error("Too many parameters for DOWNLOAD.");
+                }
+
+                FILE* fp = fopen("data/dlsrc.dat", "rb");
+                if (!fp) raise_error("Please ensure data/dlsrc.dat file exists.");
+                while (!feof(fp))
+                {
+                    fgets(buffer1, 1022, fp);
+                    if (buffer1[0] == '#') continue;
+                    char** dls = chop_spaced_words(buffer1);
+
+                    if (!strcmp(dls[0], words[1]))
+                    {
+                        url = dls[1];
+                        retfmt = dls[2];
+                    }
+
+                    delete[] dls;
+                }
+
+                if (!url.size()) raise_error("Download source not found in data file.");
+
+                if (retfmt == "PDBDATA")
+                {
+                    j = url.find('%');
+                    url.replace(j, 1, interpret_single_string(words[2]));
+                    if (!download_file(url, destfn)) raise_error("Download failed.");
+                }
+
+            }   // DOWNLOAD
 
             else if (!strcmp(words[0], "DUMP"))
             {

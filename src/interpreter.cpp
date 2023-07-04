@@ -74,6 +74,13 @@ VarType type_from_name(const char* varname)
     return SV_NONE;
 }
 
+bool file_exists(std::string fname)
+{
+    struct stat s;
+    if (stat(fname.c_str(), &s) == 0) return true;
+    else return false;
+}
+
 bool download_file(std::string url, std::string destination)
 {
     #if _WIN32
@@ -98,10 +105,7 @@ bool download_file(std::string url, std::string destination)
     #error It appears your operating system is not supported yet - would you be willing to add it and submit a pull request?
     #endif
 
-    struct stat s;
-    if (stat(destination.c_str(), &s) == 0) return true;
-
-    return false;
+    return file_exists(destination);
 }
 
 float contact_energy(Protein* a, Protein* b)
@@ -940,39 +944,51 @@ int main(int argc, char** argv)
                 if (!words[2]) raise_error("Insufficient parameters for DOWNLOAD.");
 
                 std::string url = "", retfmt = "", destfn = "";
+                bool skip_if_exists = false;
 
                 if (words[3])
                 {
-                    destfn = interpret_single_string(words[3]);
-                    if (words[4]) raise_error("Too many parameters for DOWNLOAD.");
+                    if (!strcmp(words[3], "ONCE")) skip_if_exists = true;
+                    else destfn = interpret_single_string(words[3]);
+
+                    if (!strcmp(words[4], "ONCE")) skip_if_exists = true;
+
+                    if (words[5]) raise_error("Too many parameters for DOWNLOAD.");
                 }
 
-                FILE* fp = fopen("data/dlsrc.dat", "rb");
-                if (!fp) raise_error("Please ensure data/dlsrc.dat file exists.");
-                while (!feof(fp))
+                if (!skip_if_exists || !file_exists(destfn))
                 {
-                    fgets(buffer1, 1022, fp);
-                    if (buffer1[0] == '#') continue;
-                    char** dls = chop_spaced_words(buffer1);
-
-                    if (!strcmp(dls[0], words[1]))
+                    FILE* fp = fopen("data/dlsrc.dat", "rb");
+                    if (!fp) raise_error("Please ensure data/dlsrc.dat file exists.");
+                    while (!feof(fp))
                     {
-                        url = dls[1];
-                        retfmt = dls[2];
+                        fgets(buffer1, 1022, fp);
+                        if (buffer1[0] == '#') continue;
+                        char** dls = chop_spaced_words(buffer1);
+
+                        if (!strcmp(dls[0], words[1]))
+                        {
+                            url = dls[1];
+                            retfmt = dls[2];
+                        }
+
+                        delete[] dls;
                     }
 
-                    delete[] dls;
-                }
-
-                if (!url.size()) raise_error("Download source not found in data file.");
-
-                if (retfmt == "PDBDATA")
-                {
+                    if (!url.size()) raise_error("Download source not found in data file.");
                     j = url.find('%');
                     url.replace(j, 1, interpret_single_string(words[2]));
-                    if (!download_file(url, destfn)) raise_error("Download failed.");
-                }
 
+                    if (retfmt == "PDBDATA")
+                    {
+                        if (!download_file(url, destfn)) raise_error("Download failed.");
+                    }
+                    else if (retfmt.substr(0, 5) == "JSON:")
+                    {
+                        //
+                    }
+                    else raise_error("Unimplemented return format.");
+                }
             }   // DOWNLOAD
 
             else if (!strcmp(words[0], "DUMP"))

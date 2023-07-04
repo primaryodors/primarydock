@@ -9,6 +9,17 @@ To run a Pepteditor script, after building PrimaryDock, please use the following
 bin/pepteditor path/to/script.pepd
 ```
 
+
+# Strands
+
+The PDB format allows each amino acid residue to be given a strand ID, typically a letter between `A` and `Z`.
+Pepteditor allows holding up to 26 strands in memory at any given time.
+One strand is always the current working strand; the default is `A`.
+All commands except `SAVE` apply only to the working strand.
+It is possible to load data from multiple PDBs into multiple strands, move protein data between strands, and delete strands.
+When saving an output PDB, all strands are included in the written file.
+
+
 # Variables
 
 With few exceptions, any variable can stand in for any parameter of any command.
@@ -22,9 +33,12 @@ Cartesians have members .x, .y, and .z that behave as floats.
 
 Casting a float to an integer rounds the value (e.g. 0.4 rounds to zero but 0.5 rounds to 1).
 
-Casting a float to a Cartesian normally sets the .x member to the float value, leaving .y=0 and .z=0. But a command like `LET @foo = @bar.y` will result in only the value of `@foo.y` being nonzero.
+Casting a float to a Cartesian normally sets the .x member to the float value, leaving .y=0 and .z=0.
+But a command like `LET @foo = @bar.y` will result in only the value of `@foo.y` being nonzero.
 
-Casting an integer to a Cartesian obtains the location of the CA atom for that residue number, if it exists.
+Casting an integer to a Cartesian obtains the location of the CA atom for that residue number, if it exists in the working strand.
+But note that e.g. `LET @foo = %motif + 2` will not work. The arithmetic must come first e.g. `LET %foo = %motif + 2` followed by
+`LET @foo = %foo`.
 
 Casting a Cartesian back to float or integer obtains the magnitude of the Cartesian, equal to sqrt(x^2 + y^2 + z^2).
 
@@ -59,13 +73,14 @@ ECHO $three               # outputs Yup!
 ```
 
 
-The following "magic variables" are supplied upon loading a protein:
-- `$PDB` the path and name of the source PDB file.
-- `$PROTEIN` the name of the protein, derived from a `REMARK 6` record if present.
-- `%SEQLEN` the length of the protein sequence.
-- `$SEQUENCE` the sequence of the protein in standard one-letter amino acid code.
-- Region start and end residue numbers from any `REMARK 650 HELIX` records, e.g. `%TMR3.s` and `%TMR3.e` for the start and end resnos of TMR3.
-- Ballesteros-Weinstein n.50 numbers e.g. `%1.50`, `%2.50` etc., from `REMARK 800 SITE BW` records of the PDB if present.
+Some "magic variables" are supplied upon loading a protein. The strand ID is included in the variable name; for the below list, the strand is A:
+
+- `$PDBA` the path and name of the source PDB file.
+- `$PROTEINA` the name of the protein, derived from a `REMARK 6` record if present.
+- `%SEQLENA` the length of the protein sequence.
+- `$SEQUENCEA` the sequence of the protein in standard one-letter amino acid code.
+- Region start and end residue numbers from any `REMARK 650 HELIX` records, e.g. `%A.TMR3.s` and `%A.TMR3.e` for the start and end resnos of TMR3.
+- Ballesteros-Weinstein n.50 numbers e.g. `%A.1.50`, `%A.2.50` etc., from `REMARK 800 SITE BW` records of the PDB if present.
 
 The following commands are supported:
 
@@ -160,6 +175,20 @@ Flexes a section of protein backbone to try to reconnect a broken strand, for ex
 The first parameter is the starting residue number of the section to be flexed. The second parameter is the target residue to reconnect to. In these
 examples, the program will flex the range of 160-173 and attempt to reunite 173 with 174. The last optional parameter is the number of iterations, the
 default being 50.
+
+
+# CTNRG
+Examples:
+```
+CTNRG A B &energy
+CTNRG A B &energy @direction
+```
+
+Gets the contact energy between two strands. In these examples, the interaction energy between strands A and B will be stored in `&energy`.
+Negative values mean favorable interactions, expressed in kJ/mol. Positive values mean atom clashes.
+
+The second example introduces a direction of motion to move the second strand (in this case, B strand) to optimize the contacts between proteins.
+This is useful if e.g. two proteins are too close together and clashing, or too far away and not making good contact.
 
 
 # DELETE
@@ -348,9 +377,14 @@ Substrings are _one-based_ and are indicated with the word FROM and (optinally) 
 Example:
 ```
 LOAD "path/to/protein.pdb"
+LOAD "path/to/protein.pdb" A
+LOAD "path/to/protein.pdb" A B
 ```
 
 Loads the specified protein into working memory. Note only one protein is allowed in memory at a given time.
+If one strand ID is provided, then that strand of the PDB will be loaded. The default strand is A.
+If a second strand ID is provided, then the protein will be loaded into that strand locally and the current working strand will be updated.
+The default is to load the protein into the existing working strand ID.
 
 
 # MCOORD
@@ -439,6 +473,7 @@ SAVE "path/to/output.pdb" QUIT
 ```
 
 Saves the protein in working memory to the specified file path (can be a string variable).
+All strands that contain protein data will be included.
 
 If `QUIT`, `EXIT`, or `END` follows the path parameter, script execution will terminate immediately after saving the protein.
 
@@ -495,6 +530,18 @@ which of two or more motifs a region has, for example it is possible to search a
 values and use an `IF` to take a different action depending which is the better match.
 
 
+# STRAND
+Example:
+```
+STRAND B
+STRAND B C
+
+```
+
+Changes the current working strand to the strand ID specified. If two strand IDs are given, the protein in the first strand is moved to the second
+strand and the working strand is set to the second ID.
+
+
 # UPRIGHT
 Example:
 ```
@@ -513,8 +560,12 @@ maintains compatibility with MS4A proteins since it does not depend on the exist
 UPRIGHT takes no arguments.
 
 
+# UNCHAIN
+Example:
+```
+UNCHAIN A
+```
 
-
-
+Deletes the indicated strand (peptide chain). Note the current working strand cannot be deleted; an error will result.
 
 

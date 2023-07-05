@@ -2282,7 +2282,7 @@ int main(int argc, char** argv)
                 try
                 {
                     working->upright();
-                    cout << (Point)working->last_uprighted_xform << endl;
+                    // cout << (Point)working->last_uprighted_xform << endl;
 
                     for (i=0; i<26; i++)
                     {

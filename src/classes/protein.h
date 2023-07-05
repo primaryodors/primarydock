@@ -157,6 +157,9 @@ public:
     int* mcoord_resnos = NULL;
     std::vector<SoftBias> soft_biases;
 
+    SCoord last_uprighted_xform;
+    LocRotation last_uprighted_A, last_uprighted_B;
+
 protected:
     Atom** ca = nullptr;
     std::string name;

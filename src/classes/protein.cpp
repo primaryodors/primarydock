@@ -2889,6 +2889,8 @@ void Protein::upright()
     save_undo_state();
     bool wmu = mass_undoable;
     mass_undoable = true;
+    Point oldcen = get_region_center(1, 9999).negate();
+    last_uprighted_xform = oldcen;
     move_piece(1, 9999, Point(0,0,0));
 
     Point extracellular[256], cytoplasmic[256];
@@ -2923,6 +2925,9 @@ void Protein::upright()
     Rotation rot = align_points_3d(&exrdir, new Point(0,1e6,0), &cytdir);
 
     rotate_piece(1, 9999, rot, 0);
+    last_uprighted_A.v = rot.v;
+    last_uprighted_A.a = rot.a;
+    last_uprighted_A.origin = get_region_center(1, 9999);
 
     // Rotate to place TMR4 in the +Z direction relative to TMR1.
     int sr = get_region_start("TMR4");
@@ -2955,6 +2960,9 @@ void Protein::upright()
         rot = align_points_3d(&tmr4dir, new Point(0,0,1e9), &tmr1dir);
 
         rotate_piece(1, 9999, rot, 0);
+        last_uprighted_B.v = rot.v;
+        last_uprighted_B.a = rot.a;
+        last_uprighted_B.origin = get_region_center(1, 9999);
     }
 
     mass_undoable = wmu;

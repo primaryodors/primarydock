@@ -2282,6 +2282,17 @@ int main(int argc, char** argv)
                 try
                 {
                     working->upright();
+                    cout << (Point)working->last_uprighted_xform << endl;
+
+                    for (i=0; i<26; i++)
+                    {
+                        if (strands[i] && (strands[i] != working))
+                        {
+                            strands[i]->move_piece(1, 9999, working->last_uprighted_xform);
+                            strands[i]->rotate_piece(1, 9999, working->last_uprighted_A.origin, working->last_uprighted_A.v, working->last_uprighted_A.a);
+                            strands[i]->rotate_piece(1, 9999, working->last_uprighted_B.origin, working->last_uprighted_B.v, working->last_uprighted_B.a);
+                        }
+                    }
                 }
                 catch (int ex)
                 {

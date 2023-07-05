@@ -2,22 +2,131 @@
 # Pepteditor script for extracting G proteins to their own PDBs.
 #
 
-DOWNLOAD AF "Q5QD04" "pdbs/mTAAR9.pdb"
-DIE
+STRAND A
+DOWNLOAD AF "Q5QD04" "pdbs/Q5QD04.pdb" ONCE
+LOAD "pdbs/Q5QD04.pdb"
+UPRIGHT
+HYDRO
+SAVE "pdbs/mTAAR9.pdb"
 
 
 DOWNLOAD RCSB "8F76" "pdbs/8f76.pdb" ONCE
+STRAND A
 LOAD "pdbs/8f76.pdb" X
-ECHO $SEQUENCE
 HYDRO
-SAVE "pdbs/Gprot/hGNAS2.pdb"
+STRAND R
+LOAD "pdbs/8f76.pdb" A
+UPRIGHT
+HYDRO
+SAVE "pdbs/Gprot/hOR51E2-hGNAS2.pdb"
+STRAND A
+UNCHAIN R
 
 
-DOWNLOAD RCSB "8IWI" "pdbs/8iw1.pdb" ONCE
+DOWNLOAD RCSB "8IW1" "pdbs/8iw1.pdb" ONCE
+STRAND A
 LOAD "pdbs/8iw1.pdb" A
-ECHO $SEQUENCE
 HYDRO
-SAVE "pdbs/Gprot/hGNAL.pdb"
+STRAND R
+LOAD "pdbs/8iw1.pdb" R
+UPRIGHT
+HYDRO
+SAVE "pdbs/Gprot/mTAAR9-hGNAL.pdb"
+STRAND A
+UNCHAIN R
+
+
+DOWNLOAD RCSB "8IW4" "pdbs/8iw4.pdb" ONCE
+STRAND A
+LOAD "pdbs/8iw4.pdb" A
+HYDRO
+STRAND R
+LOAD "pdbs/8iw4.pdb" R
+UPRIGHT
+HYDRO
+SAVE "pdbs/Gprot/mTAAR9-hGNAS2-spe.pdb"
+STRAND A
+UNCHAIN R
+
+
+DOWNLOAD RCSB "8IW7" "pdbs/8iw7.pdb" ONCE
+STRAND A
+LOAD "pdbs/8iw7.pdb" A
+HYDRO
+STRAND R
+LOAD "pdbs/8iw7.pdb" R
+UPRIGHT
+HYDRO
+SAVE "pdbs/Gprot/mTAAR9-hGNAS2-pea.pdb"
+STRAND A
+UNCHAIN R
+
+
+DOWNLOAD RCSB "8IW9" "pdbs/8iw9.pdb" ONCE
+STRAND A
+LOAD "pdbs/8iw9.pdb" A
+HYDRO
+STRAND R
+LOAD "pdbs/8iw9.pdb" R
+UPRIGHT
+HYDRO
+SAVE "pdbs/Gprot/mTAAR9-hGNAS2-cad.pdb"
+STRAND A
+UNCHAIN R
+
+
+DOWNLOAD RCSB "8ITF" "pdbs/8itf.pdb" ONCE
+STRAND A
+LOAD "pdbs/8itf.pdb" A
+HYDRO
+STRAND R
+LOAD "pdbs/8itf.pdb" R
+UPRIGHT
+HYDRO
+SAVE "pdbs/Gprot/mTAAR9-hGNAS2-dmcha.pdb"
+STRAND A
+UNCHAIN R
+
+
+DOWNLOAD RCSB "7F6H" "pdbs/7f6h.pdb" ONCE
+LOAD "pdbs/7f6h.pdb" B
+HYDRO
+STRAND R
+LOAD "pdbs/7f6h.pdb" A
+UPRIGHT
+HYDRO
+SAVE "pdbs/Gprot/hBKRB2-hGNAQ.pdb"
+STRAND A
+UNCHAIN R
+
+
+STRAND A
+DOWNLOAD AF "P30411" "pdbs/P30411.pdb" ONCE
+LOAD "pdbs/P30411.pdb"
+UPRIGHT
+HYDRO
+SAVE "pdbs/hBKRB2.pdb"
+
+
+DOWNLOAD RCSB "6FUF" "pdbs/6fuf.pdb" ONCE
+LOAD "pdbs/6fuf.pdb" B
+HYDRO
+STRAND R
+LOAD "pdbs/6fuf.pdb" A
+UPRIGHT
+HYDRO
+SAVE "pdbs/Gprot/btRHO-hGNAO1.pdb"
+STRAND A
+UNCHAIN R
+
+
+STRAND A
+DOWNLOAD AF "P02699" "pdbs/P02699.pdb" ONCE
+LOAD "pdbs/P02699.pdb"
+UPRIGHT
+HYDRO
+SAVE "pdbs/btRHO.pdb"
+
 
 
 

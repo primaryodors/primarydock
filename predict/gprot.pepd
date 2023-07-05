@@ -120,12 +120,19 @@ STRAND A
 UNCHAIN R
 
 
+DOWNLOAD RCSB "1U19" "pdbs/1u19.pdb" ONCE
 STRAND A
-DOWNLOAD AF "P02699" "pdbs/P02699.pdb" ONCE
-LOAD "pdbs/P02699.pdb"
+LOAD "pdbs/1u19.pdb" A
 UPRIGHT
 HYDRO
 SAVE "pdbs/btRHO.pdb"
+
+# STRAND A
+# DOWNLOAD AF "P02699" "pdbs/P02699.pdb" ONCE
+# LOAD "pdbs/P02699.pdb"
+# UPRIGHT
+# HYDRO
+# SAVE "pdbs/btRHO.pdb"
 
 
 

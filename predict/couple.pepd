@@ -48,11 +48,11 @@ not_Gaq:
 IF $arg3 != "hGNAO1" DIE "Unknown G protein " $arg3
 
 STRAND G
-LOAD "pdbs/Gprot/btRHO-hGNAO1.pdb" A
+LOAD "pdbs/Gprot/rNTR1-hGNAO1.pdb" A
 STRAND C
-LOAD "pdbs/Gprot/btRHO-hGNAO1.pdb" R
+LOAD "pdbs/Gprot/rNTR1-hGNAO1.pdb" R
 STRAND I
-LOAD "pdbs/btRHO.pdb"
+LOAD "pdbs/rNTR1.pdb"
 GOTO all_loaded
 
 

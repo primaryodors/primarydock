@@ -1976,7 +1976,7 @@ void AminoAcid::hydrogenate(bool steric_only)
         residue_no += 0.0000001;
     }
 
-
+    #if hydrogenate_add_missing_heavy_atoms
     if (aadef)
     {
         for (i=0; aadef->aabonds[i]; i++)
@@ -2013,6 +2013,7 @@ void AminoAcid::hydrogenate(bool steric_only)
     {
         minimize_internal_clashes();
     }
+    #endif
 
     Molecule::hydrogenate(steric_only);
     int already[128][4];

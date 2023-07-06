@@ -256,6 +256,8 @@
 // Output PDB data to the command line even if an output file was specified.
 #define echo_pdb_data 0
 
+#define hydrogenate_add_missing_heavy_atoms 0
+
 // Auto hydroxy makes geraniol fail in OR1A1. So does pre-rotate side chains.
 // Auto hydroxy was supposed to always point polar hydrogens towards nearby H-bond acceptors.
 // Prerot side chains was supposed to minimize clashes between the ligand and side chains after

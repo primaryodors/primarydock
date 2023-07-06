@@ -35,11 +35,11 @@ not_Gas:
 IF $arg3 != "hGNAQ" GOTO not_Gaq
 
 STRAND G
-LOAD "pdbs/Gprot/hBKRB2-hGNAQ.pdb" A
+LOAD "pdbs/Gprot/hAGTR1-hGNAQ.pdb" A
 STRAND C
-LOAD "pdbs/Gprot/hBKRB2-hGNAQ.pdb" R
+LOAD "pdbs/Gprot/hAGTR1-hGNAQ.pdb" R
 STRAND I
-LOAD "pdbs/hBKRB2.pdb"
+LOAD "pdbs/hAGTR1.pdb"
 GOTO all_loaded
 
 

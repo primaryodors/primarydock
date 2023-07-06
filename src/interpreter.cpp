@@ -1746,7 +1746,7 @@ int main(int argc, char** argv)
                     set_variable(buffer1, sv);
 
 					working->set_region(words[3], atoi(words[4]), atoi(words[5]));
-                    cout << "ln " << program_counter << " set " << g_chain << ":" << words[3] << " to " << atoi(words[4]) << "-" << atoi(words[5]) << endl;
+                    // cout << "ln " << program_counter << " set " << g_chain << ":" << words[3] << " to " << atoi(words[4]) << "-" << atoi(words[5]) << endl;
 
                     delete[] words;
                 }
@@ -2281,12 +2281,13 @@ int main(int argc, char** argv)
             {
                 if (!words[1]) raise_error("Insufficient parameters given for UNCHAIN.");
                 chain = words[1][0] - 65;
-                if (working == strands[chain]) raise_error("Cannot delete current working strand.");
+                // if (working == strands[chain]) raise_error("Cannot delete current working strand.");
                 if (nullptr != strands[chain])
                 {
                     delete strands[chain];
                     strands[chain] = nullptr;
                 }
+                if (g_chain == 65+chain) working = new Protein("TheProt");
             }
 
             else if (!strcmp(words[0], "UPRIGHT"))

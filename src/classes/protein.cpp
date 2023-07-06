@@ -796,7 +796,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
         char** words = chop_spaced_words(buffer);
 
         set_region(words[3], atoi(words[4]), atoi(words[5]));
-        cout << "From PDB: " << words[3] << " to " << atoi(words[4]) << "-" << atoi(words[5]) << endl;
+        // cout << "From PDB: " << words[3] << " to " << atoi(words[4]) << "-" << atoi(words[5]) << endl;
         regions_from = rgn_pdb;
 
         delete[] words;
@@ -2994,6 +2994,8 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     // Check that both proteins have TM helices and BW numbers set. If not, error out.
     if (!get_region_start("TMR6") || !target->get_region_start("TMR6")) throw 0xbadbeb7;
     if (!Ballesteros_Weinstein.size() || !target->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
+    if (!reference->get_region_start("TMR6")) throw 0xbadbeb7;
+    if (!reference->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
 
     upright();
     target->upright();

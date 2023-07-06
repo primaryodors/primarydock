@@ -28,6 +28,9 @@ if (!isset($_REQUEST['force']))
     $results = [];
     exec("ps -ef | grep bin/couple | grep -v sh | grep -v grep", $results);
     if ($results) exit;
+    $results = [];
+    exec("ps -ef | grep bin/pepteditor | grep -v sh | grep -v grep", $results);
+    if ($results) exit;
 }
 
 prepare_outputs();

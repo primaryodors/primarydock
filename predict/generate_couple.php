@@ -44,14 +44,14 @@ if (!file_exists($cpl_dir)) mkdir($cpl_dir);
 
 if (@$_REQUEST['next'])
 {
-    $cmd = "ps -ef | grep ':[0-9][0-9] bin/couple' | grep -v grep";
+    $cmd = "ps -ef | grep ':[0-9][0-9] bin/pepteditor' | grep -v grep";
     exec($cmd, $results);
     if (!@$_REQUEST['force'] && trim(@$results[$max_simultaneous_couples-1])) die("Already running.\n".print_r($results, 1));
     $already = implode("\n", $results);
 
     $gpcrid = @$_REQUEST['rcp'] ?: false;
     $gpid = @$_REQUEST['gprot'] ?: false;
-	  
+
     foreach (array_keys($prots) as $rcpid)
     {
         if (false!==strpos($already, "/$rcpid"))

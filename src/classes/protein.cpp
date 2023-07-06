@@ -796,6 +796,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
         char** words = chop_spaced_words(buffer);
 
         set_region(words[3], atoi(words[4]), atoi(words[5]));
+        cout << "From PDB: " << words[3] << " to " << atoi(words[4]) << "-" << atoi(words[5]) << endl;
         regions_from = rgn_pdb;
 
         delete[] words;
@@ -3137,10 +3138,15 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     for (hxno = 1; hxno <= 7; hxno++)
     {
         sprintf(buffer, "TMR%d", hxno);
+        int rgstart0 = get_region_start(buffer);
+        int rgend0 = get_region_end(buffer);
         int rgstart1 = reference->get_region_start(buffer);
         int rgend1 = reference->get_region_end(buffer);
         int rgstart2 = target->get_region_start(buffer);
         int rgend2 = target->get_region_end(buffer);
+        #if _dbg_homology
+        // cout << "Region " << hxno << " target " << rgstart2 << "-" << rgend2 << ", reference " << rgstart1 << "-" << rgend1 << endl;
+        #endif
         int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
         Point rcen1(0,0,0);
         Point rcen2(0,0,0);
@@ -3165,13 +3171,13 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
         // Perform the TM region transformation.
         Point transformation = rcen2.subtract(rcen1);
-        move_piece(rgstart1, rgend1, (SCoord)transformation);
+        move_piece(rgstart0, rgend0, (SCoord)transformation);
         #if _dbg_homology
-        cout << "Region " << hxno << " (" << rgstart1 << "-" << rgend1 << ")" << " transformed by " << transformation.magnitude() << "A" << endl;
+        cout << "Region " << hxno << " (" << rgstart0 << "-" << rgend0 << ")" << " transformed by " << transformation.magnitude() << "A" << endl;
         #endif
 
         Point axis(0,0,0);
-        Point rcen = get_region_center(rgstart1, rgend1);
+        Point rcen = get_region_center(rgstart2, rgend2);
         float theta = 0;
         count = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
@@ -3197,7 +3203,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         }
 
         // Perform the TM region rotation.
-        rotate_piece(rgstart1, rgend1, rcen, axis, theta);
+        rotate_piece(rgstart0, rgend0, rcen, axis, theta);
         #if _dbg_homology
         cout << "Region " << hxno << " rotated " << theta*fiftyseven << "deg." << endl;
         #endif

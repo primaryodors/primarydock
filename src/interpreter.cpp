@@ -1746,6 +1746,7 @@ int main(int argc, char** argv)
                     set_variable(buffer1, sv);
 
 					working->set_region(words[3], atoi(words[4]), atoi(words[5]));
+                    cout << "ln " << program_counter << " set " << g_chain << ":" << words[3] << " to " << atoi(words[4]) << "-" << atoi(words[5]) << endl;
 
                     delete[] words;
                 }

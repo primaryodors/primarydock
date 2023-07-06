@@ -1,0 +1,72 @@
+
+IF $arg2 = "" OR $arg3 = "" DIE "Usage: bin/pepteditor predict/couple.pepd path/to/receptor.pdb GPROT_ID"
+
+LET $rcpfn = $arg2
+LET $gprot = $arg3
+
+
+
+IF $arg3 != "hGNAL" GOTO not_Golf
+
+STRAND G
+LOAD "pdbs/Gprot/mTAAR9-hGNAL.pdb" A
+STRAND C
+LOAD "pdbs/Gprot/mTAAR9-hGNAL.pdb" R
+STRAND I
+LOAD "pdbs/mTAAR9.pdb"
+GOTO all_loaded
+
+
+not_Golf:
+
+IF $arg3 != "hGNAS2" GOTO not_Gas
+
+STRAND G
+LOAD "pdbs/Gprot/hOR51E2-hGNAS2.pdb" A
+STRAND C
+LOAD "pdbs/Gprot/hOR51E2-hGNAS2.pdb" R
+STRAND I
+LOAD "pdbs/OR51/OR51E2.upright.pdb"
+GOTO all_loaded
+
+
+not_Gas:
+
+IF $arg3 != "hGNAQ" GOTO not_Gaq
+
+STRAND G
+LOAD "pdbs/Gprot/hBKRB2-hGNAQ.pdb" A
+STRAND C
+LOAD "pdbs/Gprot/hBKRB2-hGNAQ.pdb" R
+STRAND I
+LOAD "pdbs/hBKRB2.pdb"
+GOTO all_loaded
+
+
+not_Gaq:
+
+IF $arg3 != "hGNAO1" DIE "Unknown G protein " $arg3
+
+STRAND G
+LOAD "pdbs/Gprot/btRHO-hGNAO1.pdb" A
+STRAND C
+LOAD "pdbs/Gprot/btRHO-hGNAO1.pdb" R
+STRAND I
+LOAD "pdbs/btRHO.pdb"
+GOTO all_loaded
+
+
+all_loaded:
+
+STRAND A
+LOAD $rcpfn
+HOMOLOGY C I
+
+UNCHAIN C
+UNCHAIN I
+STRAND G
+RENUMBER 1 999 500
+
+SAVE "tmp/coupled.pdb"
+
+

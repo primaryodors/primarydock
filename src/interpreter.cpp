@@ -1219,30 +1219,44 @@ int main(int argc, char** argv)
             else if (!strcmp(words[0], "HOMOLOGY"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for HOMOLOGY.");
-                Protein tpl("template");
+                Protein *tpl, *ref;
+                FILE* fp;
                 
                 words[1] = interpret_single_string(words[1]);
-                FILE* fp = fopen(words[1], "rb");
-                if (!fp) raise_error((std::string)"File not found: " + (std::string)words[1]);
+                if (strlen(words[1]) == 1)
+                {
+                    tpl = strands[words[1][0] - 65];
+                }
                 else
                 {
-                    tpl.load_pdb(fp);
+                    fp = fopen(words[1], "rb");
+                    if (!fp) raise_error((std::string)"File not found: " + (std::string)words[1]);
+
+                    tpl = new Protein("template");
+                    tpl->load_pdb(fp);
                     fclose(fp);
-                    if (words[2])
+                }
+
+                if (words[2])
+                {
+                    words[2] = interpret_single_string(words[2]);
+                    if (strlen(words[2]) == 1)
                     {
-                        words[2] = interpret_single_string(words[2]);
+                        ref = strands[words[2][0] - 65];
+                    }
+                    else
+                    {
                         fp = fopen(words[2], "rb");
                         if (!fp) raise_error((std::string)"File not found: " + (std::string)words[2]);
-                        else
-                        {
-                            Protein ref("reference");
-                            ref.load_pdb(fp);
-                            fclose(fp);
-                            working->homology_conform(&tpl, &ref);
-                        }
+
+                        ref = new Protein("reference");
+                        ref->load_pdb(fp);
+                        fclose(fp);
                     }
-                    else working->homology_conform(&tpl, working);
+                    
+                    working->homology_conform(tpl, ref);
                 }
+                else working->homology_conform(tpl, working);
             }   // HOMOLOGY
 
             else if (!strcmp(words[0], "HYDRO"))

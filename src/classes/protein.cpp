@@ -524,6 +524,14 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     // if (res_reach) delete res_reach;         // This was causing a segfault.
     if (metals) delete[] metals;
 
+    int i, j, rescount=0;
+    remarks.clear();
+    for (i=0; i<PROT_MAX_RGN; i++)
+    {
+        regions[i].start = regions[i].end;
+        regions[i].name = "";
+    }
+
     origpdb_residues.clear();
     connections.clear();
 
@@ -532,16 +540,24 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file.
     AminoAcid* prevaa = nullptr;
 
-    int i, j, rescount=0;
-
     for (i=0; i<65536; i++) pdba[i] = nullptr;
 
+    bool got_atoms = false;
     while (!feof(is))
     {
         try
         {
             int told = ftell(is);
             fgets(buffer, 1003, is);
+
+            if (got_atoms &&
+                buffer[0] == 'T' &&
+                buffer[1] == 'E' &&
+                buffer[2] == 'R'
+               )
+            {
+                break;
+            }
 
             if (buffer[0] == 'A' &&
                 buffer[1] == 'N' &&
@@ -570,6 +586,8 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                     tmp3let[i] = buffer[17+i];
                 tmp3let[3] = 0;
                 tmp3let[4] = 0;
+
+                got_atoms = true;
 
                 for (i=0; i<256; i++)
                 {
@@ -2574,10 +2592,6 @@ void Protein::set_region(std::string rgname, int start, int end)
     regions[i].start = start;
     regions[i].end = end;
     regions_from = rgn_manual;
-
-    char buffer[256];
-    sprintf(buffer, "REMARK 650 HELIX %s %d %d\n", rgname.c_str(), start, end);
-    remarks.push_back(buffer);
 }
 
 Region Protein::get_region(const std::string rgname)
@@ -3049,6 +3063,9 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
     // Perform the rotation.
     target->rotate_piece(1, 9999, center, axis, theta);
+    #if _dbg_homology
+    cout << "Rotated about Y axis " << theta*fiftyseven << "deg." << endl;
+    #endif
 
     if (reference != this)
     {
@@ -3149,6 +3166,9 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         // Perform the TM region transformation.
         Point transformation = rcen2.subtract(rcen1);
         move_piece(rgstart1, rgend1, (SCoord)transformation);
+        #if _dbg_homology
+        cout << "Region " << hxno << " (" << rgstart1 << "-" << rgend1 << ")" << " transformed by " << transformation.magnitude() << "A" << endl;
+        #endif
 
         Point axis(0,0,0);
         Point rcen = get_region_center(rgstart1, rgend1);
@@ -3178,6 +3198,9 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
         // Perform the TM region rotation.
         rotate_piece(rgstart1, rgend1, rcen, axis, theta);
+        #if _dbg_homology
+        cout << "Region " << hxno << " rotated " << theta*fiftyseven << "deg." << endl;
+        #endif
 
         // Count from region start backwards until at least four consecutive helix residues.
         int hc, inarow = 0, helix = 0;

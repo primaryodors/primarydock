@@ -15,7 +15,7 @@ bin/pepteditor path/to/script.pepd
 The PDB format allows each amino acid residue to be given a strand ID, typically a letter between `A` and `Z`.
 Pepteditor allows holding up to 26 strands in memory at any given time.
 One strand is always the current working strand; the default is `A`.
-All commands except `SAVE` apply only to the working strand.
+All commands apply only to the working strand unless otherwise noted.
 It is possible to load data from multiple PDBs into multiple strands, move protein data between strands, and delete strands.
 When saving an output PDB, all strands are included in the written file.
 
@@ -303,6 +303,15 @@ because like with helices, the residues' phi and psi bonds are rotated to preset
 Phi and psi angles can also be manually specified as in the second example.
 
 
+# HYDRO
+Examples:
+```
+HYDRO
+```
+
+Hydrogenates the protein.
+
+
 # IF
 Examples:
 ```
@@ -344,15 +353,6 @@ to write a series of `ELSE IF`s, or to combine `IF`s, e.g. `IF &var1 > 0 IF &var
 in exactly this way by transparently replacing `AND` with `IF` behind the scenes.
 
 When using `IF` with `GOTO`, it is possible to create loops as seen in the last example above.
-
-
-# HYDRO
-Examples:
-```
-HYDRO
-```
-
-Hydrogenates the protein.
 
 
 # LET
@@ -566,10 +566,13 @@ Turns the protein "upright", so that the extracellular domain is in the +Y direc
 The entire protein will also be centered at [0, 0, 0].
 
 Valid only for transmembrane proteins with at least one transmembrane helix. The protein must have TMR1 through TMR{n} defined, where n <= 7.
-If the PDB does not contain suitable `REMARK 650 HELIX` records, then the TMRs must be defined with the `REGION` command.
+(Helices beyond 7 will be ignored.)
+If the PDB does not contain suitable `REMARK 650 HELIX` records, then the TMRs must be manually defined with the `REGION` command.
 
 If the protein has a TMR4, it will be rotated to the +Z direction from TMR1. This affords a good view of the binding pocket of 7-helix GPCRs, but also
 maintains compatibility with MS4A proteins since it does not depend on the existence of a TMR5, TMR6, or TMR7.
+
+If multiple strands are loaded in memory, they will all be moved as a unit with the uprighting of the working strand.
 
 UPRIGHT takes no arguments.
 

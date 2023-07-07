@@ -4129,13 +4129,16 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
             }
 
             // Seek optimal bond radii.
-            for (j=1; b[j]; j++)
+            if (b && b[0])
             {
-                if (!b[j]->btom) continue;
-                float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
-                float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
+                for (j=1; b[j]; j++)
+                {
+                    if (!b[j] || !b[j]->btom) continue;
+                    float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+                    float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
 
-                score -= _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
+                    score -= _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
+                }
             }
 
             if (score > bestscore)
@@ -4169,15 +4172,18 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
         error += _SANOM_CLASHES_WEIGHT/fabs(r+0.000000001);
     }
 
-    for (j=1; b[j]; j++)
+    if (b && b[0])
     {
-        if (!b[j]->btom) continue;
-        float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
-        float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
+        for (j=1; b[j]; j++)
+        {
+            if (!b[j]->btom) continue;
+            float optimal = InteratomicForce::covalent_bond_radius(atoms[i], b[j]->btom, b[j]->cardinality);
+            float r = b[j]->btom->get_location().get_3d_distance(lv.to_point());
 
-        error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
+            error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
+        }
     }
-
+    
     return error+bestscore;
 }
 

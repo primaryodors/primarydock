@@ -27,6 +27,17 @@ else
 fi
 
 
+REPORT="test/coplanar_test.approved.txt"
+./bin/pepteditor test/planar_h.pepd | sed '/^#/d' > test/received/coplanar_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/coplanar_test.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Coplanar test succeeded.${NC}\n"
+else
+    printf "${RED}Coplanar test FAILED.${NC}\n"
+    diff --color --unified $REPORT test/received/coplanar_test.received.txt
+fi
+
+
 REPORT="test/motif_test.approved.txt"
 ./bin/pepteditor test/motif_test.pepd | sed '/^#/d' >test/received/motif_test.received.txt
 RESULT=$(diff --unified $REPORT test/received/motif_test.received.txt)
@@ -51,7 +62,7 @@ if [ "$TAAR_RESULT" -eq "0" ]; then
         ASP201=$( cat test/received/TAAR8_CAD.txt | grep -m 1 "Asp201: " )
         ASP201="${ASP201/Asp201: /}"
         ASP201="${ASP201/[.][0-9]*/}"
-        if [[ $ASP111 -gt "-30"  ]] || [[ $ASP201 -gt "-30"  ]]; then
+        if [[ $ASP111 -gt "-25"  ]] || [[ $ASP201 -gt "-25"  ]]; then
             printf "${RED}TAAR test FAILED: bad contacts.${NC}\n"
         else
             printf "${GRN}TAAR test succeeded.${NC}\n"

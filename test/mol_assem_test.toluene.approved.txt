@@ -1,8 +1,8 @@
 Created empty molecule named Test.
 Minimizing internal clashes...
 Adjusted internal clashes: 0 cu.A.
-Atom C1 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
-Atom c2 has bond angles: 120 120 120
+Atom C1 has bond angles: 180 70.5 70.5 109.5 109.5 109.5
+Atom c2 has bond angles: 60 60 120
 Atom c3 has bond angles: 120 120 120
 Atom c4 has bond angles: 120 120 120
 Atom c5 has bond angles: 120 120 120

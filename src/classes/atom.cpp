@@ -1329,7 +1329,7 @@ void Atom::print_bond_angles()
                 if (bonded_to[j].btom)
                 {
                     float theta = find_3d_angle(bonded_to[i].btom->location, bonded_to[j].btom->location, location);
-                    cout << " " << (theta * fiftyseven);
+                    cout << " " << (0.1 * (int)(theta * fiftyseven * 10 + 0.5));
                 }
             }
         }

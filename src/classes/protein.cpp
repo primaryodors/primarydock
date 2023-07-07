@@ -303,6 +303,8 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
     if (repack) save_undo_state();
     int i, j, l, m;
     float result = 0;
+    Point clashttl(0,0,0);
+    float clash_worst = 0;
     for (i=0; residues[i]; i++)
     {
         int resno = residues[i]->get_residue_no();
@@ -327,7 +329,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
                 #endif
                 for (j=0; j<n; j++)
                 {
-                    if (residues[i]->get_intermol_clashes(laa[j]) > 3)
+                    if (residues[i]->get_intermol_clashes(laa[j]) > 5)
                     {
                         #if _dbg_repack
                         dbgresstr += (std::string)" " + (std::string)laa[j]->get_name();
@@ -378,10 +380,16 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
                     if (r > rr) continue;
                 }
 
-                result += residues[i]->get_intermol_clashes(residues[j]);
+                float f = residues[i]->get_intermol_clashes(residues[j]);
+                result += f;
+                clashttl = clashttl.add(residues[j]->get_CA_location().subtract(residues[i]->get_CA_location()));
+                if (f > clash_worst) clash_worst = f;
             }
         }
     }
+    
+    last_int_clash_dir = clashttl;
+    last_int_clash_dir.r = clash_worst;
     return result;
 }
 

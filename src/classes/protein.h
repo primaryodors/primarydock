@@ -159,6 +159,7 @@ public:
 
     SCoord last_uprighted_xform;
     LocRotation last_uprighted_A, last_uprighted_B;
+    SCoord last_int_clash_dir;
 
 protected:
     Atom** ca = nullptr;

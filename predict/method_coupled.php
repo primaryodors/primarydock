@@ -28,6 +28,9 @@ if (!isset($_REQUEST['force']))
     $results = [];
     exec("ps -ef | grep bin/couple | grep -v sh | grep -v grep", $results);
     if ($results) exit;
+    $results = [];
+    exec("ps -ef | grep bin/pepteditor | grep -v sh | grep -v grep", $results);
+    if ($results) exit;
 }
 
 prepare_outputs();
@@ -38,15 +41,25 @@ $ooutname = $outfname;
 
 function make_prediction($data)
 {
-    // A trick so that incomplete records get redone.
-    if (!isset($data['inactive']) || !isset($data['hGNAL']) || !isset($data['hGNAS2'])) $data['version'] -= 5;
-    
-    if (!isset($data['inactive'])) return $data;
-    $i = floatval($data['inactive']);
-    if (isset($data['hGNAL']) && floatval($data['hGNAL']) < $i) $data['Predicted'] = 'Agonist';
-    else if (isset($data['hGNAS2']) && floatval($data['hGNAS2']) < $i) $data['Predicted'] = 'Agonist';
-    else if (isset($data['hGNAL']) && floatval($data['hGNAL']) > $i) $data['Predicted'] = 'Non-agonist';
-    else if (isset($data['hGNAS2']) && floatval($data['hGNAS2']) > $i) $data['Predicted'] = 'Non-agonist';
+    if (!isset($data['inactive']) && !isset($data['hGNAO1'])) return $data;
+    if (!isset($data['hGNAL']) && !isset($data['hGNAS2']) && !isset($data['hGNAQ'])) return $data;
+
+    if ($i >= 13.5) $data['Predicted'] = 'Non-agonist';
+    else
+    {
+        $i = floatval(@$data['inactive'] ?: 0);
+        $o = floatval(@$data['hGNAO1'] ?: 0);
+
+        $l = floatval(@$data['hGNAL'] ?: 0);
+        $s = floatval(@$data['hGNAS2'] ?: 0);
+        $q = floatval(@$data['hGNAQ'] ?: 0);
+
+        if ($l < $i && $l < $o && $l < 0) $data['Predicted'] = 'Agonist';
+        else if ($s < $i && $s < $o && $s < 0) $data['Predicted'] = 'Agonist';
+        else if ($q < $i && $q < $o && $q < 0) $data['Predicted'] = 'Agonist';
+        else $data['Predicted'] = 'Non-agonist';
+    }
+
     return $data;
 }
 
@@ -92,26 +105,27 @@ process_dock("");
 
 
 // Golf a.k.a. hGNAL
-
-$pdbfname = str_replace("pdbs/", "pdbs/coupled/", $opdbname);
-$pdbfname = str_replace(".upright.", "_hGNAL.", $pdbfname);
-
-$outfname = str_replace("$protid-", "{$protid}_hGNAL-", $ooutname);
-
-if (!file_exists($pdbfname) || filesize($pdbfname) < 100000)
+foreach (["hGNAL", "hGNAS2", "hGNAQ", "hGNAO1"] as $gpid)
 {
-    $fp = fopen($outfname, "wb");
-    fwrite($fp, "No protein.");
-    fclose($fp);
-}
+    $pdbfname = str_replace("pdbs/", "pdbs/coupled/", $opdbname);
+    $pdbfname = str_replace(".upright.", "_$gpid.", $pdbfname);
 
-$metrics_to_process =
-[
-  "BENERG" => "hGNAL",
-  "BENERG.rgn" => "hGNAL.rgn",
-];
+    $outfname = str_replace("$protid-", "{$protid}_$gpid-", $ooutname);
 
-$configf = <<<heredoc
+    if (!file_exists($pdbfname) || filesize($pdbfname) < 100000)
+    {
+        $fp = fopen($outfname, "wb");
+        fwrite($fp, "No protein.");
+        fclose($fp);
+    }
+
+    $metrics_to_process =
+    [
+      "BENERG" => "$gpid",
+      "BENERG.rgn" => "$gpid.rgn",
+    ];
+
+    $configf = <<<heredoc
 
 PROT $pdbfname
 LIG sdf/$ligname.sdf
@@ -139,60 +153,6 @@ OPEND
 
 heredoc;
 
-process_dock("", true);
-
-
-
-// Gαs a.k.a. hGNAS2
-
-$pdbfname = str_replace("pdbs/", "pdbs/coupled/", $opdbname);
-$pdbfname = str_replace(".upright.", "_hGNAS2.", $pdbfname);
-
-$outfname = str_replace("$protid-", "{$protid}_hGNAS2-", $ooutname);
-
-if (!file_exists($pdbfname) || filesize($pdbfname) < 100000)
-{
-    $fp = fopen($outfname, "wb");
-    fwrite($fp, "No protein.");
-    fclose($fp);
+    process_dock("", true);
 }
-
-$metrics_to_process =
-[
-  "BENERG" => "hGNAS2",
-  "BENERG.rgn" => "hGNAS2.rgn",
-];
-
-$configf = <<<heredoc
-
-PROT $pdbfname
-LIG sdf/$ligname.sdf
-
-$cenres
-SIZE 7.0 7.0 7.0
-
-EXCL 1 56		# Head, TMR1, and CYT1.
-
-SEARCH TS
-POSE 10
-ELIM $elima
-
-FLEX 1
-# H2O 15
-WET
-
-ITERS 50
-
-OUT $outfname
-ECHO
-OPEND
-
-
-
-heredoc;
-
-process_dock("", true);
-
-
-
 

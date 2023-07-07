@@ -1140,7 +1140,7 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
         	case 'H': return atom.isBackbone() ? 0x79949b : 0xd1f5ff;
 			case 'He': return 0xfcaa93;
 			case 'Ne': return 0xff4e00;
-            
+
         	case 'C':
             if (atom.isBackbone()) return 0x666666;
             else switch (atom.resname)
@@ -1185,8 +1185,8 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
                 return 0x666666;
             }
 
-        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0033FF);
-        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF0000);
+        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0066FF);
+        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF3300);
         	case 'P': return 0xff77c6;
         	case 'S': return 0xffdd00;
         	case 'Se': return 0xffaa00;
@@ -1269,8 +1269,8 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
                 return 0x777777;
             }
 
-        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0033FF);
-        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF2222);
+        	case 'N': return born ? (atom.isBackbone() ? 0x660033 : 0xFF3300) : (atom.isBackbone() ? 0x000066 : 0x0099FF);
+        	case 'O': return born ? (atom.isBackbone() ? 0x003366 : 0x0099FF) : (atom.isBackbone() ? 0x660000 : 0xFF4422);
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;
         	case 'Se': return 0xffb022;
@@ -1308,8 +1308,8 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
         	case 'H': return 0xe1faff;
 			case 'He': return 0xfcaa93;
         	case 'C': return 0xa7ada4;
-        	case 'N': return born ? 0xFF3300 : 0x5555FF;
-        	case 'O': return born ? 0x0099FF : 0xFF2222;
+        	case 'N': return born ? 0xFF3300 : 0x0099FF;
+        	case 'O': return born ? 0x0099FF : 0xFF4433;
 			case 'Ne': return 0xff4e00;
         	case 'P': return 0xff8add;
         	case 'S': return 0xffe022;

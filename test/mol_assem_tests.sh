@@ -37,7 +37,7 @@ for i in ${!allmols[@]}; do
     if [ -z "$RESULT" ]; then
         printf "${GRN}Molecule assembly test succeeded for $MOLECULE.${NC}\n"
     else
-        printf "${RED}Protein test FAILED for $MOLECULE.${NC}\n"
+        printf "${RED}Molecule assembly test FAILED for $MOLECULE.${NC}\n"
         diff --color --unified $REPORT "test/received/mol_assem_test.$MOLECULE.received.txt"
     fi
 done

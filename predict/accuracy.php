@@ -15,14 +15,14 @@ foreach ($data as $orid => $pairs)
     {
         if (!isset($r['Actual']) || !isset($r['Predicted'])) continue;
         
-        if ($r['Actual'] == $r['Predicted'])
+        if (strtolower($r['Actual']) == strtolower($r['Predicted']))
         {
             if (!isset($nc['All'])) $nc['All'] = 1;
             else $nc['All']++;
             if (!isset($nc[$orid])) $nc[$orid] = 1;
             else $nc[$orid]++;
         }
-        else if ($r['Predicted'] == "Agonist")
+        else if (strtolower($r['Predicted']) == "Agonist")
         {
             if (!isset($fp['All'])) $fp['All'] = 1;
             else $fp['All']++;
@@ -35,6 +35,7 @@ foreach ($data as $orid => $pairs)
             else $fn['All']++;
             if (!isset($fn[$orid])) $fn[$orid] = 1;
             else $fn[$orid]++;
+            echo "$odor\n";
         }
     }
 }

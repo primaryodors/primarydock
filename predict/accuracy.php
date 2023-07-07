@@ -15,6 +15,8 @@ foreach ($data as $orid => $pairs)
     {
         if (!isset($r['Actual']) || !isset($r['Predicted'])) continue;
         
+        if (strtolower($r['Actual']) == "(unknown)") continue;
+        
         if (strtolower($r['Actual']) == strtolower($r['Predicted']))
         {
             if (!isset($nc['All'])) $nc['All'] = 1;

@@ -43,17 +43,18 @@ function make_prediction($data)
 {
     if (!isset($data['inactive']) && !isset($data['hGNAO1'])) return $data;
     if (!isset($data['hGNAL']) && !isset($data['hGNAS2']) && !isset($data['hGNAQ'])) return $data;
+    
+    $i = floatval(@$data['inactive'] ?: 0);
+    $o = floatval(@$data['hGNAO1'] ?: 0);
+
+    $l = floatval(@$data['hGNAL'] ?: 0);
+    $s = floatval(@$data['hGNAS2'] ?: 0);
+    $q = floatval(@$data['hGNAQ'] ?: 0);
 
     if ($i >= 13.5) $data['Predicted'] = 'Non-agonist';
     else
     {
-        $i = floatval(@$data['inactive'] ?: 0);
-        $o = floatval(@$data['hGNAO1'] ?: 0);
-
-        $l = floatval(@$data['hGNAL'] ?: 0);
-        $s = floatval(@$data['hGNAS2'] ?: 0);
-        $q = floatval(@$data['hGNAQ'] ?: 0);
-
+        if ($i < 0 && $l >= 0 && $s >= 0 && $q >= 0) $data['Predicted'] = 'Inverse Agonist';
         if ($l < $i && $l < $o && $l < 0) $data['Predicted'] = 'Agonist';
         else if ($s < $i && $s < $o && $s < 0) $data['Predicted'] = 'Agonist';
         else if ($q < $i && $q < $o && $q < 0) $data['Predicted'] = 'Agonist';

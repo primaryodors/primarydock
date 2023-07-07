@@ -22,7 +22,7 @@ foreach ($data as $orid => $pairs)
             if (!isset($nc[$orid])) $nc[$orid] = 1;
             else $nc[$orid]++;
         }
-        else if (strtolower($r['Predicted']) == "Agonist")
+        else if (strtolower($r['Predicted']) == "agonist")
         {
             if (!isset($fp['All'])) $fp['All'] = 1;
             else $fp['All']++;

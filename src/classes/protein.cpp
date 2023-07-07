@@ -3282,6 +3282,9 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         }
 
         // if (helix) backconnect(rgend1+1, helix-1);
+        SCoord clashmov = last_int_clash_dir;
+        clashmov.r *= -1;
+        move_piece(rgstart0, rgend0, clashmov);
     }
 
     // Prepare for clash minimization.

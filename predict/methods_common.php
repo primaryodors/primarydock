@@ -269,13 +269,12 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                 {
                     $resno = intval(substr($coldiv[0], 3));
                     $region = intval(bw_from_resno($protid, $resno));
-                    $lmode = "$mode.$region";
                     if (isset($metrics_to_process["$mode.rgn"]))
                     {
                         $wmode = str_replace(".rgn", ".$region", $metrics_to_process["$mode.rgn"]);
                         if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
                         $outdata[$wmode] += floatval($coldiv[1]);
-                        if (!isset($outdqty[$lmode])) $outdqty[$wmode] = 1;
+                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
                         else $outdqty[$wmode]++;
                     }
                     continue;

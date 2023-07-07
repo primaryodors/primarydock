@@ -35,7 +35,6 @@ foreach ($data as $orid => $pairs)
             else $fn['All']++;
             if (!isset($fn[$orid])) $fn[$orid] = 1;
             else $fn[$orid]++;
-            echo "$odor\n";
         }
     }
 }

@@ -3395,7 +3395,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             sprintf(buffer, "TMR%d", hxno);
             int rgstart0 = get_region_start(buffer);
             int rgend0 = get_region_end(buffer);
-            float threshold = 16 * (rgend0 - rgstart0);
+            float threshold = 15 * (rgend0 - rgstart0);
             float f = get_internal_clashes(rgstart0, rgend0, true, 10);
 
             #if _dbg_homology
@@ -3405,7 +3405,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             if (f < threshold) continue;
 
             SCoord clashmov = last_int_clash_dir;
-            clashmov.r *= -0.005 * (f - threshold);
+            clashmov.r *= -0.001 * (f - threshold);
 
             #if _dbg_homology
             cout << "Moving " << rgstart0 << "-" << rgend0 << " by " << clashmov << " A." << endl;

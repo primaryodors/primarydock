@@ -465,7 +465,10 @@ char* interpret_single_string(const char* param)
                 *dot2 = 0;
                 dot2++;
             }
-            strcpy(buffer, script_var[n].value.psz+interpret_single_int(lbuffer));
+            int i = interpret_single_int(lbuffer);
+            if (!i) raise_error("Subscript out of range.");
+            if (i > strlen(script_var[n].value.psz)) raise_error("Subscript out of range.");
+            strcpy(buffer, script_var[n].value.psz+i-1);
             if (dot2) buffer[interpret_single_int(dot2)] = 0;
             return buffer;
         }
@@ -623,6 +626,7 @@ int main(int argc, char** argv)
             {
                 int sr, er, asr, aer, eachend;
                 Point sp, ep;
+                bool keeps = false, keepe = false;
                 l = 1;
                 if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
                 sr = interpret_single_int(words[l++]);
@@ -636,10 +640,12 @@ int main(int argc, char** argv)
                     if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
                     asr = interpret_single_int(words[l++]);                   
                     if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    if (!strcmp(words[l], "KEEP")) keeps = true;
                     sp = interpret_single_point(words[l++]);
                     if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
                     aer = interpret_single_int(words[l++]);   
                     if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    if (!strcmp(words[l], "KEEP")) keepe = true;
                     ep = interpret_single_point(words[l++]);
                 }
                 else
@@ -647,8 +653,10 @@ int main(int argc, char** argv)
                     asr = sr;
                     aer = er;                    
                     if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    if (!strcmp(words[l], "KEEP")) keeps = true;
                     sp = interpret_single_point(words[l++]);
                     if (!words[l]) raise_error("Insufficient parameters given for ALIGN.");
+                    if (!strcmp(words[l], "KEEP")) keepe = true;
                     ep = interpret_single_point(words[l++]);
                 }
                 if (words[l]) raise_error("Too many parameters given for ALIGN.");
@@ -662,6 +670,20 @@ int main(int argc, char** argv)
                 }
 
                 if (eachend > 1) sl.scale(sl.magnitude()/eachend);
+
+                if (keeps) sp = sl;
+                if (keepe)
+                {
+                    ep = Point(0,0,0);
+
+                    for (i=0; i<eachend; i++)
+                    {
+                        AminoAcid* aa = working->get_residue(aer-i);
+                        if (aa) ep = ep.add(aa->get_CA_location());
+                    }
+
+                    if (eachend > 1) ep.scale(ep.magnitude()/eachend);
+                }
 
                 // Translate the range so that the starting average moves to the target start point.
                 SCoord motion = sp.subtract(sl);
@@ -687,6 +709,8 @@ int main(int argc, char** argv)
                 }
 
                 if (eachend > 1) el.scale(el.magnitude()/eachend);
+                
+
 
                 // Rotate the range about the start point so the ending average moves to the target end point.
                 Rotation rot = align_points_3d(&el, &ep, &sp);

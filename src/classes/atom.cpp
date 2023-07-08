@@ -473,7 +473,7 @@ bool Atom::move(Point* pt)
     if (break_on_move) throw 0xb16fa7012a96eca7;
     #endif
 
-    if (isnan(pt->x) || isnan(pt->y) || isnan(pt->z))
+    if (isnan(pt->x) || isnan(pt->y) || isnan(pt->z) || isinf(pt->x) || isinf(pt->y) || isinf(pt->z) )
     {
         return false;
     }

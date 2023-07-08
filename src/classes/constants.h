@@ -293,6 +293,9 @@
 // to a less favorable state.
 #define _hisflip_binding_threshold 25
 
+#define homology_gradients 0
+#define unconnected_residue_mindist 4.82
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 // Debugging stuff.
@@ -343,6 +346,7 @@
 #define _dbg_Huckel 0
 #define _dbg_259 0
 #define _dbg_bb_realign 0
+#define _dbg_closest_res 0
 
 #endif
 

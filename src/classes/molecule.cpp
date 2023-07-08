@@ -2381,7 +2381,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
         for (l=0; ligands[l]; l++)
         {
             if (ligands[l] == this) continue;
-            for (j=0; j<ligands[l]->atcount; j++)
+            for (j=0; ligands[l]->atoms[j]; j++)
             {
                 // TODO: Fix this in the hydrogenate function, but for now we'll fix it here and hope for the best. 🤞🏼
                 if (!ligands[l]->atoms[j])

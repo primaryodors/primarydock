@@ -3389,28 +3389,33 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     int l;
     for (l=0; l<15; l++)
     {
+        int nummoved = 0;
         for (hxno = 1; hxno <= 7; hxno++)
         {
             sprintf(buffer, "TMR%d", hxno);
             int rgstart0 = get_region_start(buffer);
             int rgend0 = get_region_end(buffer);
+            float threshold = 16 * (rgend0 - rgstart0);
             float f = get_internal_clashes(rgstart0, rgend0, true, 10);
 
             #if _dbg_homology
             cout << "Helix " << hxno << " is clashy " << f << endl;
             #endif
 
-            if (f < 100) continue;
+            if (f < threshold) continue;
 
             SCoord clashmov = last_int_clash_dir;
-            clashmov.r *= -0.1;
+            clashmov.r *= -0.005 * (f - threshold);
 
             #if _dbg_homology
             cout << "Moving " << rgstart0 << "-" << rgend0 << " by " << clashmov << " A." << endl;
             #endif
-            
+
             move_piece(rgstart0, rgend0, clashmov);
+            nummoved++;
         }
+
+        if (!nummoved) break;
     }
 
     // Prepare for clash minimization.

@@ -277,6 +277,20 @@ GEN "MAYDRYVAIC"
 Creates a peptide using the specified sequence.
 
 
+# GOSUB
+Example:
+```
+GOSUB label
+...
+label:
+...
+RETURN
+```
+
+Like `GOTO` (see below), except the label begins a subroutine that ends with a `RETURN` command. Upon finishing the subroutine, script execution
+resumes on the line following the `GOSUB`.
+
+
 # GOTO
 Example:
 ```

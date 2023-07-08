@@ -64,4 +64,15 @@ else
 fi
 
 
+REPORT="test/gosub_test.approved.txt"
+./bin/pepteditor test/gosub_test.pepd | sed '/^#/d' >test/received/gosub_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/gosub_test.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Gosub test succeeded.${NC}\n"
+else
+    printf "${RED}Gosub test FAILED.${NC}\n"
+    diff --color --unified $REPORT test/received/gosub_test.received.txt
+fi
+
+
 

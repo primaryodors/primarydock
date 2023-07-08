@@ -1,0 +1,24 @@
+
+ECHO "Script begin."
+
+GOSUB subroutine
+ECHO "Back from subroutine."
+GOSUB subroutine2
+ECHO "Back from subroutine2."
+
+EXIT
+
+subroutine:
+ECHO "Subroutine called."
+RETURN
+
+subroutine2:
+ECHO "Subroutine2 called."
+GOSUB subroutine3
+ECHO "Back from subroutine3."
+RETURN
+
+subroutine3:
+ECHO "Subroutine3 called."
+RETURN
+

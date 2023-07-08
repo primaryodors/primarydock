@@ -43,6 +43,8 @@ std::vector<string> script_lines;
 ScriptVar script_var[_VARNUM_MASK+1];
 int vars = 0;
 int program_counter = 0;
+std::vector<int> call_stack;
+int stack_pointer = 0;
 
 // Protein p("TheProtein");
 Protein* strands[26];
@@ -1088,8 +1090,16 @@ int main(int argc, char** argv)
                 goto _prot_deets;
             } // GEN
 
+            else if (!strcmp(words[0], "GOSUB"))
+            {
+                call_stack.push_back(program_counter);
+                stack_pointer = call_stack.size();
+                goto _goto;
+            }   // GOSUB
+
             else if (!strcmp(words[0], "GOTO"))
             {
+                _goto:
                 if (!words[1]) raise_error("Insufficient parameters given for GOTO.");
                 sprintf(buffer1, "%s:", words[1]);
                 for (n=0; n<script_lines.size(); n++)
@@ -1110,6 +1120,14 @@ int main(int argc, char** argv)
             _found_goto_target:
                 continue;
             }	// GOTO
+
+            else if (!strcmp(words[0], "RETURN"))
+            {
+                if (!stack_pointer) raise_error("RETURN without GOSUB.");
+                stack_pointer--;
+                program_counter = call_stack[stack_pointer];
+                call_stack.erase(call_stack.begin()+stack_pointer);
+            }   // RETURN
 
             else if (!strcmp(words[0], "HELICES"))
             {

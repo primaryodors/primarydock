@@ -67,6 +67,6 @@ UNCHAIN I
 STRAND G
 RENUMBER 1 999 500
 
-SAVE "tmp/coupled.pdb"
+SAVE "tmp/coupled.pdb" EXIT
 
 

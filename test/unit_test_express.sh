@@ -75,4 +75,15 @@ else
 fi
 
 
+REPORT="test/substr_test.approved.txt"
+./bin/pepteditor test/substr_test.pepd | sed '/^#/d' >test/received/substr_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/substr_test.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Substr test succeeded.${NC}\n"
+else
+    printf "${RED}Substr test FAILED.${NC}\n"
+    diff --color --unified $REPORT test/received/substr_test.received.txt
+fi
+
+
 

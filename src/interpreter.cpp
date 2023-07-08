@@ -450,6 +450,25 @@ char* interpret_single_string(const char* param)
     case '$':
         n = find_var_index(param);
         if (n<0) return buffer;
+        if (n &  _HAS_DOT)
+        {
+            param = strchr(param, '.');
+            if (!param) return 0;
+            param++;
+            char lbuffer[1024];
+            strcpy(lbuffer, param);
+            char* dot2 = strchr(lbuffer, ',');
+            n &= _VARNUM_MASK;
+            if (!script_var[n].value.psz) return buffer;
+            if (dot2)
+            {
+                *dot2 = 0;
+                dot2++;
+            }
+            strcpy(buffer, script_var[n].value.psz+interpret_single_int(lbuffer));
+            if (dot2) buffer[interpret_single_int(dot2)] = 0;
+            return buffer;
+        }
         n &= _VARNUM_MASK;
         if (!script_var[n].value.psz) return buffer;
         strcpy(buffer, script_var[n].value.psz);

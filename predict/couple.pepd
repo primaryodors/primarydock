@@ -61,6 +61,7 @@ all_loaded:
 STRAND A
 LOAD $rcpfn
 HOMOLOGY C I
+GOSUB custom6
 
 UNCHAIN C
 UNCHAIN I
@@ -69,4 +70,11 @@ RENUMBER 1 999 500
 
 SAVE "tmp/coupled.pdb" EXIT
 
+
+custom6:
+
+
+
+
+RETURN
 

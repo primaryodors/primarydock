@@ -1,4 +1,30 @@
 {
+    "OR51E2":
+    [
+        "propionic acid",
+        "caproic acid",
+        "beta-ionone",
+        "acetic acid",
+        "valeric acid",
+        "isovaleric acid",
+        "caprylic acid",
+        "capric acid",
+        "butyric acid"
+    ],
+    "OR51E1":
+    [
+        "isovaleric acid",
+        "caprylic acid",
+        "caproic acid",
+        "butyl butyryl lactate",
+        "capric acid",
+        "lauric acid",
+        "myristic acid",
+        "butyric acid",
+        "propionic acid",
+        "acetic acid",
+        "valeric acid"
+    ],
     "OR3A1":
     [
         "helional",

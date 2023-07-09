@@ -20,8 +20,6 @@ chdir(__DIR__);
 require("methods_common.php");
 chdir(__DIR__);
 
-// $cenres = "CEN RES 2.53 3.29 3.32 3.33 3.36 3.37 3.40 3.41 4.53 4.57 4.60 45.49 45.52 5.39 5.43 5.46 5.47 6.48 6.51 7.38 7.39 7.42";
-$cenres = "CEN RES 3.37 4.60 5.47 6.55";
 
 if (!isset($_REQUEST['force']))
 {
@@ -38,6 +36,19 @@ prepare_outputs();
 $opdbname = $pdbfname;
 $ooutname = $outfname;
 
+// $cenres = "CEN RES 2.53 3.29 3.32 3.33 3.36 3.37 3.40 3.41 4.53 4.57 4.60 45.49 45.52 5.39 5.43 5.46 5.47 6.48 6.51 7.38 7.39 7.42";
+
+switch ($fam)
+{
+    case "OR51":
+    case "OR52":
+    case "OR56":
+    $cenres = "CEN RES 3.33 4.57 4.60 5.39 45.52\nREQSR 0 3.33 4.57 4.60 5.39 45.52\nSTCR 3.33";
+    break;
+
+    default:
+    $cenres = "CEN RES 3.37 4.60 5.47 6.55";
+}
 
 function make_prediction($data)
 {

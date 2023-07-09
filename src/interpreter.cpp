@@ -734,6 +734,23 @@ int main(int argc, char** argv)
 
             else if (!strcmp(words[0], "ATOMTO"))
             {
+                if (!words[1]) raise_error("Insufficient parameters given for ATOMTO.");
+                int resno = interpret_single_int(words[1]);
+                if (!words[2]) raise_error("Insufficient parameters given for ATOMTO.");
+                char* aname = interpret_single_string(words[2]);
+                if (!words[3]) raise_error("Insufficient parameters given for ATOMTO.");
+                Point target = interpret_single_point(words[3]);
+                if (words[4]) raise_error("Too many parameters given for ATOMTO.");
+
+                AminoAcid* aa = working->get_residue(resno);
+                if (!aa) raise_error("Residue not found.");
+
+                Atom* a = aa->get_atom(aname);
+                if (!strcmp("EXTENT", aname)) a = aa->get_reach_atom();
+                if (!a) raise_error("Atom not found.");
+
+                aa->movability = MOV_FLEXONLY;
+                aa->conform_atom_to_location(a->name, target);
             }	// ATOMTO
 
             else if (!strcmp(words[0], "BEND"))

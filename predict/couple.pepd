@@ -60,7 +60,7 @@ all_loaded:
 
 STRAND A
 LOAD $rcpfn
-# HOMOLOGY C I
+HOMOLOGY C I
 GOSUB custom6
 
 UNCHAIN C
@@ -85,26 +85,56 @@ LET @655 = %655
 LET @4551 = %4551
 LET @r = @4551 - @655
 LET &r = @r
-ECHO @655 " and " @4551 " are " &r " A apart."
+# ECHO @655 " and " @4551 " are " &r " A apart."
 
-IF &r < 9 GOTO not_Y655_DE4551
+IF &r < 9 GOTO already_Y655_DE4551
 
 LET &d = &r - 9
 LET &rat = &d / &r
 LET @d = @r
 LET @d *= &rat
 
-ECHO @r @d
+# ECHO @r @d
 
 LET @new = @655 + @d
 LET %628 = %A.6.50 - 22
 LET %648 = %A.6.50 - 2
 LET %660 = %A.6.50 + 10
 ALIGN %628 %660 1 %648 KEEP %655 @new
+
+already_Y655_DE4551:
 BRIDGE %655 %4551
 
 
 not_Y655_DE4551:
+
+LET %659 = %A.6.50 + 9
+LET $659 = $SEQUENCEA.%659,1
+
+IF $659 = "R" LET $atom = "CZ"
+ELSE IF $659 = "K" LET $atom = "NZ"
+ELSE GOTO not_KR659
+
+ECHO $659
+
+LET %539 = %A.5.50 - 11
+LET %4552 = %A.45.50 + 2
+
+LET @539 = %539
+LET @4552 = %4552
+LET @target = @539 + @4552
+LET @target /= 2
+
+ATOMTO %659 $atom @target
+
+LET %651 = %A.6.50 + 1
+LET @651 = %651
+LET %4553 = %A.45.50 + 3
+
+ATOMTO %4553 EXTENT @651
+
+
+not_KR659:
 
 RETURN
 

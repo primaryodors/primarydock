@@ -2192,6 +2192,31 @@ Point AminoAcid::get_CA_location()
     return a->get_location();
 }
 
+Atom* AminoAcid::get_reach_atom()
+{
+    if (!atoms) return nullptr;
+
+    int i;
+    float maxr = 0;
+    Atom* CA = get_atom("CA");
+    Atom* retval = nullptr;
+    if (!CA) return nullptr;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        float r = atoms[i]->distance_to(CA);
+
+        if (r > maxr)
+        {
+            maxr = r;
+            retval = atoms[i];
+        }
+    }
+
+    return retval;
+}
+
 void AminoAcid::aamove(SCoord move_amt)
 {
     if (movability < MOV_ALL) return;

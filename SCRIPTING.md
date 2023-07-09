@@ -109,6 +109,15 @@ The second example aligns residues 174-177 and 179-182 with the same two points,
 the indicated residues.
 
 
+# ATOMTO
+Example:
+```
+ATOMTO %residue_number $atom_name @target
+```
+
+Flexes the side chain of `%residue_number` to bring `$atom_name` as close to `@target` as physically possible.
+
+
 # BEND
 Example:
 ```

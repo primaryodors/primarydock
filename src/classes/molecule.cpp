@@ -3016,6 +3016,22 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
     minimum_searching_aniso = 0;
 }
 
+void Molecule::conform_atom_to_location(char* an, Point t, int iters)
+{
+    if (!atoms) return;
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        if (!strcmp(atoms[i]->name, an))
+        {
+            conform_atom_to_location(i, t, iters);
+            return;
+        }
+    }
+}
+
+#define _dbg_atom_pointing 0
+
 void Molecule::conform_atom_to_location(int i, Point t, int iters)
 {
     if (!(movability & MOV_CAN_FLEX)) return;
@@ -3025,6 +3041,8 @@ void Molecule::conform_atom_to_location(int i, Point t, int iters)
     if (!b) return;
     Atom* a = atoms[i];
     if (!a) return;
+
+    float oc = get_internal_clashes();
 
     for (iter = 0; iter < iters; iter++)
     {
@@ -3036,16 +3054,20 @@ void Molecule::conform_atom_to_location(int i, Point t, int iters)
             {
                 b[j]->rotate(M_PI*2.0/circdiv, false, true);
                 r = a->get_location().get_3d_distance(t);
-                if (r < bestr)
+                float c = get_internal_clashes();
+                if (r < bestr && c < oc+5)
                 {
                     bestr = r;
                     bestth = M_PI*2.0/circdiv * l;
                 }
             }
             b[j]->rotate(bestth);
-            cout << bestr << endl;
+
+            #if _dbg_atom_pointing
+            cout << iter << ": " << circdiv << "|" << bestr << endl;
+            #endif
         }
-        if (!(iter % 5)) circdiv++;
+        if (!(iter % 3)) circdiv++;
     }
 }
 

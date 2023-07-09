@@ -47,6 +47,8 @@ $cub =
 	"6.40" => "HCMDENQ",
 ];
 
+$gprots = [ "hGNAL", "hGNAS2", "hGNAQ", "hGNAO1" ];
+
 $page_title = $rcpid;
 $extra_js = ['js/tabs.js'];
 $extra_css = ['assets/tabs.css'];
@@ -71,7 +73,30 @@ function load_viewer(obj)
                 $("[type=file]", embdd.contentDocument).hide();
                 var filediv = $("#filediv", embdd.contentDocument)[0];
 
+                <?php if (file_exists("../pdbs/coupled/$fam/{$rcpid}_hGNAL.pdb")) { ?>
+                var mdldd = document.createElement("select");
+                var opt = document.createElement("option");
+                opt.innerText = opt.value = "<?php echo @$rcpid; ?>";
+                mdldd.appendChild(opt);
+                // mdldd.value = opt.value;
+
+                <?php foreach ($gprots as $gp)
+                {
+                    if (file_exists("../pdbs/coupled/$fam/{$rcpid}_{$gp}.pdb"))
+                    {
+                        ?>opt = document.createElement("option");
+                        opt.innerText = opt.value = "<?php echo $rcpid.'-'.$gp; ?>";
+                        mdldd.appendChild(opt);
+                        <?php
+                    }
+                } ?>
+
+                mdldd.setAttribute("onclick", "window.location.href = 'viewer.php?url=pdb.php&prot='+this.value;");
+                mdldd.value = embdd.contentWindow.location.href.substr(embdd.contentWindow.location.href.indexOf("prot=")+5).substr(0,embdd.contentWindow.location.href.indexOf("&"))
+                filediv.appendChild(mdldd);
+                <?php } else { ?>
                 filediv.innerText = "<?php echo @$rcpid; ?>";
+                <?php } ?>
 
                 window.setTimeout( function()
                 {

@@ -9,11 +9,13 @@ chdir(__DIR__);
 require_once("../predict/protutils.php");
 
 $protid = @$_REQUEST['p'];
-if (!$protid || !isset($prots[$protid]) )
+$protid = str_replace("-", "_", $protid);
+if (!$protid || !isset($prots[explode("_",$protid)[0]]) )
 {
     header("Location: receptors.php");
     exit;
 }
+
 
 $prot = $prots[$prot];
 
@@ -24,7 +26,8 @@ chdir("..");
 
 $mod = "upright";
 if (@$_REQUEST['mod'] == 'm') $mod = "metal";
-$pdbfn = "pdbs/$fam/$protid.$mod.pdb";
+if (file_exists("pdbs/coupled/$fam/$protid.pdb")) $pdbfn = "pdbs/coupled/$fam/$protid.pdb";
+else $pdbfn = "pdbs/$fam/$protid.$mod.pdb";
 if (!file_exists($pdbfn)) $pdbfn = "pdbs/$fam/$protid.upright.pdb";
 
 if (!file_exists($pdbfn))

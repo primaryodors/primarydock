@@ -3016,6 +3016,40 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
     minimum_searching_aniso = 0;
 }
 
+void Molecule::conform_atom_to_location(int i, Point t, int iters)
+{
+    if (!(movability & MOV_CAN_FLEX)) return;
+
+    int iter, j, l, circdiv = 7;
+    Bond** b = get_rotatable_bonds();
+    if (!b) return;
+    Atom* a = atoms[i];
+    if (!a) return;
+
+    for (iter = 0; iter < iters; iter++)
+    {
+        float r;
+        for (j=0; b[j]; j++)
+        {
+            float bestr = Avogadro, bestth = 0;
+            for (l=0; l<=circdiv; l++)
+            {
+                b[j]->rotate(M_PI*2.0/circdiv, false, true);
+                r = a->get_location().get_3d_distance(t);
+                if (r < bestr)
+                {
+                    bestr = r;
+                    bestth = M_PI*2.0/circdiv * l;
+                }
+            }
+            b[j]->rotate(bestth);
+            cout << bestr << endl;
+        }
+        if (!(iter % 5)) circdiv++;
+    }
+}
+
+
 Atom* numbered[10];
 bool ring_warned = false;
 

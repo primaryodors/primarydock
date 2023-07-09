@@ -92,9 +92,7 @@ IF &r < 9 GOTO not_Y655_DE4551
 LET &d = &r - 9
 LET &rat = &d / &r
 LET @d = @r
-LET @d.x *= &rat
-LET @d.y *= &rat
-LET @d.z *= &rat
+LET @d *= &rat
 
 ECHO @r @d
 

@@ -445,7 +445,7 @@ function rotate3D(point, source, axis, theta)
 	<!-- a id="ptbbbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a -->
 	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
 </div>
-<a id="colcpk" title="Colors: CPK Standard" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colborn').show();">CPK</a>
+<!-- a id="colcpk" title="Colors: CPK Standard" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colborn').show();">CPK</a -->
 <a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
 <a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#bstick').show();">&#x1F388;</a>
 <a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="ballAndStick(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#spcfill').show();" style="display: none;">&#x1F9B4;</a>

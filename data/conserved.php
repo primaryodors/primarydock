@@ -25,6 +25,7 @@ foreach (@$argv as $a)
 }
 
 $bw = @$_REQUEST["bw"] ?: "6.48";
+$list = @$_REQUEST["list"];
 $pieces = explode(".", $bw);
 $rgno = intval($pieces[0]);
 $ofst = intval(@$pieces[1]) ?: 50;
@@ -143,7 +144,7 @@ foreach (["ttpd", "fish", "taar", "vn1r"] as $k => $var)
         $pcnt = round(floatval(array_values($$var)[$i]) / $ttl * 100, 3);
         echo "$pcnt%";
 
-        if ($i > $fnd80) echo " " . implode(" ", $$varhas[$c]);
+        if ($i > $fnd80 || $c == $list) echo " " . implode(" ", $$varhas[$c]);
 
         echo "\033[0m\n";
     }

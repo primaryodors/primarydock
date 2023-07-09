@@ -732,6 +732,10 @@ int main(int argc, char** argv)
 
             }	// ALIGN
 
+            else if (!strcmp(words[0], "ATOMTO"))
+            {
+            }	// ATOMTO
+
             else if (!strcmp(words[0], "BEND"))
             {
                 int sr, er;

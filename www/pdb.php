@@ -9,8 +9,9 @@ chdir(__DIR__);
 require_once("../predict/protutils.php");
 
 $protid = @$_REQUEST['p'];
-$protid = str_replace("-", "_", $protid);
-if (!$protid || !isset($prots[explode("_",$protid)[0]]) )
+$protidu = str_replace("-", "_", $protid);
+$protidp = explode("_",$protidu)[0];
+if (!$protid || !isset($prots[$protidp]) )
 {
     header("Location: receptors.php");
     exit;
@@ -19,14 +20,16 @@ if (!$protid || !isset($prots[explode("_",$protid)[0]]) )
 
 $prot = $prots[$prot];
 
-$fam = family_from_protid($protid);
+$fam = family_from_protid($protidp);
 
 chdir(__DIR__);
 chdir("..");
 
 $mod = "upright";
 if (@$_REQUEST['mod'] == 'm') $mod = "metal";
-if (file_exists("pdbs/coupled/$fam/$protid.pdb")) $pdbfn = "pdbs/coupled/$fam/$protid.pdb";
+
+if (file_exists("output/$fam/$protidp/$protid.dock")) $pdbfn = "output/$fam/$protidp/$protid.dock";
+else if (file_exists("pdbs/coupled/$fam/$protidu.pdb")) $pdbfn = "pdbs/coupled/$fam/$protidu.pdb";
 else $pdbfn = "pdbs/$fam/$protid.$mod.pdb";
 if (!file_exists($pdbfn)) $pdbfn = "pdbs/$fam/$protid.upright.pdb";
 

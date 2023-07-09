@@ -1648,6 +1648,9 @@ if (protid)
 		},
 		success: function(result)
 		{
+			var j = result.indexOf("\nTER\nEND");
+			if (j) result = result.substr(0, j);
+
 			var lines = result.split("\n");
 			$('#posey').hide();
 

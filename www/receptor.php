@@ -78,20 +78,42 @@ function load_viewer(obj)
                 var opt = document.createElement("option");
                 opt.innerText = opt.value = "<?php echo @$rcpid; ?>";
                 mdldd.appendChild(opt);
-                // mdldd.value = opt.value;
 
                 <?php foreach ($gprots as $gp)
                 {
                     if (file_exists("../pdbs/coupled/$fam/{$rcpid}_{$gp}.pdb"))
                     {
                         ?>opt = document.createElement("option");
-                        opt.innerText = opt.value = "<?php echo $rcpid.'-'.$gp; ?>";
+                        opt.innerText = opt.value = "<?php echo "$rcpid-$gp"; ?>";
                         mdldd.appendChild(opt);
                         <?php
                     }
-                } ?>
+                }
 
-                mdldd.setAttribute("onclick", "window.location.href = 'viewer.php?url=pdb.php&prot='+this.value;");
+                if (0)
+                {
+                    // This is not working yet, and I don't want to spend too much time on it.
+                    $dir = dir("../output/$fam/$rcpid/");
+                    if ($dir)
+                    {
+                        while (false !== ($entry = $dir->read()))
+                        {
+                            // echo "// $entry\n";
+                            if (preg_match("/$rcpid.*[.]dock$/", $entry))
+                            {
+                                ?>opt = document.createElement("option");
+                                <?php $entry = str_replace(".dock", "", $entry); ?>
+                                opt.innerText = opt.value = "<?php echo "$entry"; ?>";
+                                mdldd.appendChild(opt);
+                                <?php
+                            }
+                        }
+                    }
+                    // else echo "// dir empty.\n";
+                }
+                ?>
+
+                mdldd.setAttribute("onchange", "window.location.href = 'viewer.php?url=pdb.php&prot='+this.value;");
                 mdldd.value = embdd.contentWindow.location.href.substr(embdd.contentWindow.location.href.indexOf("prot=")+5).substr(0,embdd.contentWindow.location.href.indexOf("&"))
                 filediv.appendChild(mdldd);
                 <?php } else { ?>

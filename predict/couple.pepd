@@ -138,3 +138,24 @@ not_KR659:
 
 RETURN
 
+
+avoid_gprot_clash:
+
+STRAND G
+
+LET %penult = %SEQLENG - 2
+LET @penult = %penult
+
+STRAND A
+
+LET %533 = %A.5.50 - 17
+LET %628 = %A.6.50 - 22
+LET %659 = %A.6.50 + 9
+
+LET @5650 = %A.56.50
+LET @dir = @5650 - @penult
+LET &nrg = 0
+CTNRG G A %533 %659 &nrg @dir
+
+
+RETURN

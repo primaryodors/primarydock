@@ -194,13 +194,22 @@ Examples:
 ```
 CTNRG A B &energy
 CTNRG A B &energy @direction
+CTNRG A %start1 %end1 B %start2 %end2 &energy @direction
+CTNRG A B %start2 %end2 &energy @direction
 ```
 
 Gets the contact energy between two strands. In these examples, the interaction energy between strands A and B will be stored in `&energy`.
 Negative values mean favorable interactions, expressed in kJ/mol. Positive values mean atom clashes.
+The A and B parameters can also be strings.
 
 The second example introduces a direction of motion to move the second strand (in this case, B strand) to optimize the contacts between proteins.
 This is useful if e.g. two proteins are too close together and clashing, or too far away and not making good contact.
+
+The third example limits the function to a specific region of each strand. This is useful to for example optimize only part of the second strand.
+The fourth example limits only the second strand to a region. If a region is specified for only one strand, it must be the second one.
+This may seem counterintuitive but it makes sense for optimizing only part of the second protein against the whole of the first protein.
+
+The direction parameter is always optional, irrespective of any start and end residue numbers given.
 
 
 # DELETE

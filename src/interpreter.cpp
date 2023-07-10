@@ -110,16 +110,35 @@ bool download_file(std::string url, std::string destination)
     return file_exists(destination);
 }
 
-float contact_energy(Protein* a, Protein* b)
+float contact_energy(Protein* a, Protein* b, int a_from = 0, int a_to = 0, int b_from = 0, int b_to = 0)
 {
     std::vector<AminoAcid*> vca = a->get_contact_residues(b);
     float f=0;
 
-    int i, n = vca.size();
+    char cha = a->get_pdb_chain(), chb = b->get_pdb_chain();
+
+    int i, j=0, n = vca.size();
 
     Molecule* mols[n+4];
-    for (i=0; i<n; i++) mols[i] = (Molecule*)vca[i];
-    mols[i] = nullptr;
+    for (i=0; i<n; i++)
+    {
+        char c = vca[i]->get_pdb_chain();
+        int resno = vca[i]->get_residue_no();
+
+        if (c == cha)
+        {
+            if (a_from && (resno < a_from)) continue;
+            if (a_to && (resno > a_to)) continue;
+        }
+        else if (c == chb)
+        {
+            if (b_from && (resno < b_from)) continue;
+            if (b_to && (resno > b_to)) continue;
+        }
+
+        mols[j++] = (Molecule*)vca[i];
+    }
+    mols[j] = nullptr;
 
     Molecule::conform_molecules(mols, 20);
 
@@ -901,15 +920,49 @@ int main(int argc, char** argv)
             else if (!strcmp(words[0], "CTNRG"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for CTNRG.");
-                char* sa = interpret_single_string(words[1]);
-                if (!words[2]) raise_error("Insufficient parameters given for CTNRG.");
-                char* sb = interpret_single_string(words[2]);
-                if (!words[3]) raise_error("Insufficient parameters given for CTNRG.");
+                for (n=1; words[n]; n++);       // count.
+
+                int asr = 1, aer = 9999, bsr = 1, ber = 9999;
+                char* sa, sb;
                 SCoord dir(0,0,0);
-                if (words[4])
+                char* outvar = nullptr;
+
+                switch (n)
                 {
-                    dir = interpret_single_point(words[4]);
-                    if (words[5]) raise_error("Too many parameters given for CTNRG.");
+                    case 2:
+                    raise_error("Insufficient parameters given for CTNRG.");
+
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+
+                    l = 1;                  
+                    sa = interpret_single_string(words[l++]);
+
+                    if (n >= 7)
+                    {
+                        asr = interpret_single_int(words[l++]);
+                        aer = interpret_single_int(words[l++]);
+                    }
+
+                    sb = interpret_single_string(words[l++]);
+
+                    if (n > 4)
+                    {
+                        bsr = interpret_single_int(words[l++]);
+                        ber = interpret_single_int(words[l++]);
+                    }
+
+                    outvar = words[l++];
+                    if (words[l])
+                    {
+                        dir = interpret_single_point(words[l++]);
+                    }
+                    break;
+
+                    default:
+                    raise_error("Too many parameters given for CTNRG.");
                 }
 
                 sa[0] -= 65;
@@ -920,11 +973,11 @@ int main(int argc, char** argv)
                     dir.r = 1;
                     float former, latter;
 
-                    former = contact_energy(strands[sa[0]], strands[sb[0]]);
+                    former = contact_energy(strands[sa[0]], strands[sb[0]], asr, aer, bsr, ber);
                     for (i=0; i<200; i++)
                     {
-                        strands[sb[0]]->move_piece(1, strands[sb[0]]->get_end_resno(), dir);
-                        latter = contact_energy(strands[sa[0]], strands[sb[0]]);
+                        strands[sb[0]]->move_piece(bsr, ber, dir);
+                        latter = contact_energy(strands[sa[0]], strands[sb[0]], asr, aer, bsr, ber);
 
                         if (latter > former)
                         {
@@ -939,16 +992,16 @@ int main(int argc, char** argv)
 
                         if (fabs(dir.r) < 0.05)
                         {
-                            cout << "Got it in " << i << endl;
+                            // cout << "Got it in " << i << endl;
                             break;
                         }
                     }
                 }
 
                 Star s;
-                s.f = contact_energy(strands[sa[0]], strands[sb[0]]);
+                s.f = contact_energy(strands[sa[0]], strands[sb[0]], asr, aer, bsr, ber);
 
-                set_variable(words[3], s);
+                set_variable(outvar, s);
             }   // CTNRG
 
             else if (!strcmp(words[0], "DELETE"))

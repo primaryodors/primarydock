@@ -923,7 +923,7 @@ int main(int argc, char** argv)
                 for (n=1; words[n]; n++);       // count.
 
                 int asr = 1, aer = 9999, bsr = 1, ber = 9999;
-                char* sa, sb;
+                char *sa, *sb;
                 SCoord dir(0,0,0);
                 char* outvar = nullptr;
 

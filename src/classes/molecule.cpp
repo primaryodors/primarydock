@@ -2051,8 +2051,6 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                             bvdW *= vr;
                         }
                     }
-
-                    delete forces;
                 }
 
                 Point ptb = ligands[l]->atoms[j]->get_location();
@@ -2303,7 +2301,6 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
             retval += partial;
             n++;
         }
-        delete ifs;
     }
 
     if (n) retval /= n;
@@ -2356,15 +2353,14 @@ float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
                 InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], ligands[l]->atoms[j]);
 
                 if (iff) for (n=0; iff[n]; n++)
-                    {
-                        if (iff[n]->get_type() == vdW) continue;
+                {
+                    if (iff[n]->get_type() == vdW) continue;
 
-                        if (pure || r < iff[n]->get_distance())
-                            kJmol += iff[n]->get_kJmol();
-                        else
-                            kJmol += iff[n]->get_kJmol()*f;
-                    }
-                delete iff;
+                    if (pure || r < iff[n]->get_distance())
+                        kJmol += iff[n]->get_kJmol();
+                    else
+                        kJmol += iff[n]->get_kJmol()*f;
+                }
             }
         }
     }
@@ -4016,8 +4012,6 @@ Atom** Molecule::get_most_bindable(int max_num, Atom* for_atom)
                 break;
             }
         }
-
-        delete iff;
     }
 
     #if DBG_BINDABLE

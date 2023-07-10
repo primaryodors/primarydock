@@ -10,9 +10,12 @@
 
 using namespace std;
 
+#define max_get_appl_retval 256
+
 float total_binding_by_type[_INTER_TYPES_LIMIT];
 float minimum_searching_aniso = 0;
 InteratomicForce* lif = nullptr;
+InteratomicForce* appl_retval_stack[max_get_appl_retval];
 
 #if _peratom_audit
 std::vector<std::string> interaudit;
@@ -242,17 +245,14 @@ void InteratomicForce::read_dat_line(char* line)
                     }
                     else dirprop = 2;
                 }
-                else kJ_mol = 200;
+                else kJ_mol = 50;
             }
             else distance=1;
         }
 
-        if (type == hbond)
+        if (kJ_mol > 165 && type != covalent)
         {
-            if (Za > 1) kJ_mol /= (Atom::electronegativity_from_Z(Za) - 2.5);
-            if (Zb > 1) kJ_mol /= (Atom::electronegativity_from_Z(Zb) - 2.5);
-            if (bZa > 1) kJ_mol /= (Atom::electronegativity_from_Z(bZa) - 2.5);
-            if (bZb > 1) kJ_mol /= (Atom::electronegativity_from_Z(bZb) - 2.5);
+            cout << "Invalid bond energy." << endl;
         }
 
         // cout << *this << endl;
@@ -315,7 +315,6 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
 }
 
 #define _dbg_applicable 0
-#define max_get_appl_retval 256
 InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
@@ -340,20 +339,19 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         }
     }
 
-    InteratomicForce** retval = new InteratomicForce*[max_get_appl_retval];
-    init_nulls(retval, 16);
+    init_nulls(appl_retval_stack, max_get_appl_retval);
     int i, j=0;
 
     // Charged atoms always attract or repel, irrespective of Z.
     if (a->get_charge() && b->get_charge())
     {
-        retval[j] = &intertmp;
-        retval[j]->Za = a->get_Z();
-        retval[j]->Zb = b->get_Z();
-        retval[j]->type = ionic;
-        retval[j]->kJ_mol = 20; // Do not multiply by sgn charges here or total_binding() will reverse it.
-        retval[j]->distance = 0.584 * (a->get_vdW_radius() + b->get_vdW_radius());		// Based on NH...O and the vdW radii of O and H.
-        retval[j]->dirprop = 0;
+        appl_retval_stack[j] = &intertmp;
+        appl_retval_stack[j]->Za = a->get_Z();
+        appl_retval_stack[j]->Zb = b->get_Z();
+        appl_retval_stack[j]->type = ionic;
+        appl_retval_stack[j]->kJ_mol = 20; // Do not multiply by sgn charges here or total_binding() will reverse it.
+        appl_retval_stack[j]->distance = 0.584 * (a->get_vdW_radius() + b->get_vdW_radius());		// Based on NH...O and the vdW radii of O and H.
+        appl_retval_stack[j]->dirprop = 0;
 
         j++;
     }
@@ -474,7 +472,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
             {
             case covalent:
                 if (a->is_bonded_to(b) == look[i]->arity)
-                    retval[j++] = look[i];
+                    appl_retval_stack[j++] = look[i];
                 break;
 
             case ionic:
@@ -484,18 +482,18 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                         ||
                         ((a == b) && a->get_acidbase())
                    )
-                    retval[j++] = look[i];
+                    appl_retval_stack[j++] = look[i];
                 break;
 
             case hbond:
                 if (a->get_family() == PNICTOGEN && (a->is_backbone || a->is_amide())) break;
                 if (b->get_family() == PNICTOGEN && (b->is_backbone || b->is_amide())) break;
-                retval[j++] = look[i];
+                appl_retval_stack[j++] = look[i];
                 break;
 
             case pi:
                 if (a->is_pi() && b->is_pi())
-                    retval[j++] = look[i];
+                    appl_retval_stack[j++] = look[i];
                 break;
 
             case polarpi:
@@ -503,17 +501,17 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                         ||
                         (b->is_pi() && (a->is_polar() || a->is_metal()) )
                    )
-                    retval[j++] = look[i];
+                    appl_retval_stack[j++] = look[i];
                 break;
 
             case mcoord:
                 if (a->is_metal() || b->is_metal())
-                    retval[j++] = look[i];
+                    appl_retval_stack[j++] = look[i];
                 break;
 
             case vdW:
                 if (!j)
-                    retval[j++] = look[i];
+                    appl_retval_stack[j++] = look[i];
                 break;
 
             default:
@@ -521,9 +519,9 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
             }
         }
     }
-    retval[j] = 0;
+    appl_retval_stack[j] = 0;
 
-    return retval;
+    return appl_retval_stack;
 }
 
 SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
@@ -595,8 +593,6 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
             potential -= ((fabs(a->is_polar()) < 0.333 && a->is_pi()) || (fabs(b->is_polar()) < 0.333 && b->is_pi())) ? 66 : 99;
         }
     }
-
-    delete forces;
 
     return potential;
 }
@@ -743,10 +739,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (forces[i]->type == covalent) continue;
         if (forces[i]->kJ_mol > 165)
         {
-            read_all_forces();
+            cout << "Warning: global forces corrupted: " << *forces[i] << endl;
             continue;
         }
-        
+
         float partial, rdecayed;
         float asum=0, bsum=0, aniso=1;
         bool stacked_pi_rings = false;
@@ -1220,7 +1216,6 @@ _canstill_clash:
         #endif
     }
 
-    delete forces;
     return kJmol;
 }
 
@@ -1238,7 +1233,6 @@ float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
         anomaly += fabs(r - forces[i]->distance);
     }
 
-    delete forces;
     return anomaly;
 }
 

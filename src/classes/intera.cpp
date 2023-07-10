@@ -315,7 +315,7 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
 }
 
 #define _dbg_applicable 0
-#define max_get_appl_retval 32
+#define max_get_appl_retval 256
 InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
@@ -741,6 +741,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         rbind = avdW+bvdW;
 
         if (forces[i]->type == covalent) continue;
+        if (forces[i]->kJ_mol > 165)
+        {
+            read_all_forces();
+            continue;
+        }
         
         float partial, rdecayed;
         float asum=0, bsum=0, aniso=1;

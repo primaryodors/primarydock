@@ -3406,6 +3406,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
             SCoord clashmov = last_int_clash_dir;
             clashmov.r *= -0.001 * (f - threshold);
+            if (clashmov.r < 0.05) continue;
 
             #if _dbg_homology
             cout << "Moving " << rgstart0 << "-" << rgend0 << " by " << clashmov << " A." << endl;

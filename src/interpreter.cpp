@@ -921,6 +921,7 @@ int main(int argc, char** argv)
             {
                 if (!words[1]) raise_error("Insufficient parameters given for CTNRG.");
                 for (n=1; words[n]; n++);       // count.
+                n--;
 
                 int asr = 1, aer = 9999, bsr = 1, ber = 9999;
                 char *sa, *sb;

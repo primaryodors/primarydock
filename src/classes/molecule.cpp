@@ -2040,14 +2040,19 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 InteratomicForce** forces = InteratomicForce::get_applicable(atoms[i], ligands[l]->atoms[j]);
                 avdW = atoms[i]->get_vdW_radius();
                 bvdW = ligands[l]->atoms[j]->get_vdW_radius();
-                if (forces) for (m=0; forces[m]; m++)
+                if (forces)
                 {
-                    float vr = forces[m]->get_distance() / (avdW+bvdW);
-                    if (vr < 1)
+                    for (m=0; forces[m]; m++)
                     {
-                        avdW *= vr;
-                        bvdW *= vr;
+                        float vr = forces[m]->get_distance() / (avdW+bvdW);
+                        if (vr < 1)
+                        {
+                            avdW *= vr;
+                            bvdW *= vr;
+                        }
                     }
+
+                    delete[] forces;
                 }
 
                 Point ptb = ligands[l]->atoms[j]->get_location();

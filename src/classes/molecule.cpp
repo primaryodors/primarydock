@@ -2033,7 +2033,6 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
             if (ligands[l] == this) continue;
             for (j=0; ligands[l]->atoms[j]; j++)
             {
-                // We still check for bonded to because we treat coordinations as bonds with cardinality <1.
                 if (atoms[i]->is_bonded_to(ligands[l]->atoms[j])) continue;
                 if (atoms[i]->shares_bonded_with(ligands[l]->atoms[j])) continue;
 

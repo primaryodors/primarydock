@@ -605,7 +605,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float kJmol = 0;
 
     float r = a->distance_to(b);
-    float avdW = a->get_vdW_radius()*vdw_clash_allowance, bvdW = b->get_vdW_radius()*vdw_clash_allowance;
+    float avdW = a->get_vdW_radius(), bvdW = b->get_vdW_radius();
     float rbind = avdW+bvdW;
 
     float dp = 2;			// Directional propensity. The anisotropic component from each single vertex
@@ -661,7 +661,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     if (apol && sgn(apol) == sgn(bpol))
     {
-        float pr = polar_repulsion / pow(r, 2) * fabs(apol) * fabs(bpol);
+        float pr = polar_repulsion / pow(r, 4) * fabs(apol) * fabs(bpol);
 
         if (a->get_Z() == 1)
         {
@@ -730,6 +730,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     {
         if (!forces[i]->distance) continue;
         float r1 = r / forces[i]->distance;
+
+        float vr = forces[i]->distance / (avdW+bvdW);
+        avdW = fmin(avdW, a->get_vdW_radius()*vr);
+        bvdW = fmin(bvdW, b->get_vdW_radius()*vr);
+        rbind = avdW+bvdW;
 
         if (forces[i]->type == covalent) continue;
         

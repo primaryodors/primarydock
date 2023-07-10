@@ -2014,7 +2014,7 @@ float Molecule::get_intermol_clashes(Molecule* ligand)
 
 float Molecule::get_intermol_clashes(Molecule** ligands)
 {
-    int i, j, l;
+    int i, j, l, m;
     float r;
     Atom* a, *b;
     float clash = 0;
@@ -2026,7 +2026,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
     for (i=0; atoms[i]; i++)
     {
         Point pta = atoms[i]->get_location();
-        float avdW = atoms[i]->get_vdW_radius()*vdw_clash_allowance;
+        float avdW = atoms[i]->get_vdW_radius(), bvdW;
         for (l=0; ligands[l]; l++)
         {
             if (!ligands[l]->atoms) continue;
@@ -2037,8 +2037,20 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 if (atoms[i]->is_bonded_to(ligands[l]->atoms[j])) continue;
                 if (atoms[i]->shares_bonded_with(ligands[l]->atoms[j])) continue;
 
+                InteratomicForce** forces = InteratomicForce::get_applicable(atoms[i], ligands[l]->atoms[j]);
+                avdW = atoms[i]->get_vdW_radius();
+                bvdW = ligands[l]->atoms[j]->get_vdW_radius();
+                if (forces) for (m=0; forces[m]; m++)
+                {
+                    float vr = forces[m]->get_distance() / (avdW+bvdW);
+                    if (vr < 1)
+                    {
+                        avdW *= vr;
+                        bvdW *= vr;
+                    }
+                }
+
                 Point ptb = ligands[l]->atoms[j]->get_location();
-                float bvdW = ligands[l]->atoms[j]->get_vdW_radius()*vdw_clash_allowance;
 
                 r = pta.get_3d_distance(&ptb) + 1e-3;
                 if (r < avdW + bvdW)
@@ -2362,7 +2374,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     int i, j, l;
     float kJmol = 0;
     if (!atoms) return 0;
-    if (subtract_clashes) kJmol -= get_internal_clashes();
+    // if (subtract_clashes) kJmol -= get_internal_clashes();
 
     lastshielded = 0;
 

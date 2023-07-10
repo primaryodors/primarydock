@@ -20,6 +20,14 @@ int main(int argc, char** argv)
         for (j=0; cl[j]; j++)
         {
             if (cl[j] < aa) continue;
+            if (fabs(cl[j]->get_residue_no() - i) < 3) continue;
+
+            if (aa->get_residue_no() == 11 && cl[j]->get_residue_no() == 172)
+            {
+                n++;
+                n--;
+            }
+
             float f = aa->get_intermol_binding(cl[j]);
             if (fabs(f) > 2) cout << *aa << "-" << *cl[j] << ": " << -f << endl;
         }

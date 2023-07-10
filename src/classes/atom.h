@@ -135,7 +135,7 @@ public:
     Point get_location();
     float get_vdW_radius()
     {
-        return vdW_rad;
+        return vdW_rad*eff_vdWrad;
     }
     float get_atomic_weight()
     {

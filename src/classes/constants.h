@@ -11,9 +11,9 @@
 
 #define _kcal_per_kJ 0.239006
 #define _kJmol_cuA 0.5
+#define eff_vdWrad 1.0
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
-#define vdw_clash_allowance 1.0
 #define oxytocin 0.007
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
@@ -108,10 +108,10 @@
 #define POLYPRO1_PSI fiftyseventh*160
 #define POLYPRO1_OMEGA fiftyseventh*113
 
-// Warning - increasing these constants significantly above their stable branch values
-// will cause docking fails in the Big Three tests.
-#define polar_repulsion 35.0
-#define charge_repulsion 60.0
+// Warning - increasing these constants significantly above 35.0 and 60.0
+// will cause docking fails in the unit tests.
+#define polar_repulsion 15.0
+#define charge_repulsion 25.0
 
 #define lmpush 0.0005
 

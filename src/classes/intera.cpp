@@ -1211,7 +1211,7 @@ _canstill_clash:
         #endif
     }
 
-    delete[] forces;
+    delete forces;
     return kJmol;
 }
 

@@ -315,6 +315,7 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
 }
 
 #define _dbg_applicable 0
+#define max_get_appl_retval 32
 InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
@@ -339,7 +340,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         }
     }
 
-    InteratomicForce** retval = new InteratomicForce*[16];
+    InteratomicForce** retval = new InteratomicForce*[max_get_appl_retval];
     init_nulls(retval, 16);
     int i, j=0;
 
@@ -468,6 +469,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                 )
            )
         {
+            if (j >= max_get_appl_retval-1) break;
             switch (look[i]->type)
             {
             case covalent:
@@ -593,6 +595,8 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
             potential -= ((fabs(a->is_polar()) < 0.333 && a->is_pi()) || (fabs(b->is_polar()) < 0.333 && b->is_pi())) ? 66 : 99;
         }
     }
+
+    delete forces;
 
     return potential;
 }
@@ -1229,15 +1233,15 @@ float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
         anomaly += fabs(r - forces[i]->distance);
     }
 
-    delete[] forces;
+    delete forces;
     return anomaly;
 }
 
 float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
-    InteratomicForce** retval = new InteratomicForce*[16];
-    init_nulls(retval, 16);
+    /*InteratomicForce** retval = new InteratomicForce*[16];
+    init_nulls(retval, 16);*/
 
     if (!a || !b || !a->get_Z() || !b->get_Z()) return 0;
 
@@ -1276,8 +1280,8 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality
 float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type btype)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
-    InteratomicForce** retval = new InteratomicForce*[16];
-    init_nulls(retval, 16);
+    /*InteratomicForce** retval = new InteratomicForce*[16];
+    init_nulls(retval, 16);*/
 
     int i, j=0;
     for (i=0; all_forces[i]; i++)

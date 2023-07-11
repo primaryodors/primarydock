@@ -62,10 +62,15 @@ if [ "$TAAR_RESULT" -eq "0" ]; then
         ASP201=$( cat test/received/TAAR8_CAD.txt | grep -m 1 "Asp201: " )
         ASP201="${ASP201/Asp201: /}"
         ASP201="${ASP201/[.][0-9]*/}"
+        TAARPDB=$( cat output/test_TAAR8_cadaverine.dock | grep -m 1 "HETATM 9000  N1  LIG " )
         if [[ $ASP111 -gt "-25"  ]] || [[ $ASP201 -gt "-25"  ]]; then
             printf "${RED}TAAR test FAILED: bad contacts.${NC}\n"
         else
-            printf "${GRN}TAAR test succeeded.${NC}\n"
+            if [ -z "$TAARPDB" ]; then
+                printf "${RED}TAAR test FAILED: bad PDB data.${NC}\n"
+            else
+                printf "${GRN}TAAR test succeeded.${NC}\n"
+            fi
         fi
     fi
 else

@@ -110,7 +110,7 @@ bool download_file(std::string url, std::string destination)
     return file_exists(destination);
 }
 
-float contact_energy(Protein* a, Protein* b, int a_from = 0, int a_to = 0, int b_from = 0, int b_to = 0)
+float contact_energy(Protein* a, Protein* b, bool repack = false, int a_from = 0, int a_to = 0, int b_from = 0, int b_to = 0)
 {
     std::vector<AminoAcid*> vca = a->get_contact_residues(b);
     float f=0;
@@ -140,7 +140,7 @@ float contact_energy(Protein* a, Protein* b, int a_from = 0, int a_to = 0, int b
     }
     mols[j] = nullptr;
 
-    Molecule::conform_molecules(mols, 20);
+    if (repack) Molecule::conform_molecules(mols, 20);
 
     for (i=0; i<n; i++)
     {
@@ -973,38 +973,46 @@ int main(int argc, char** argv)
 
                 if (dir.r)
                 {
-                    dir.r = 1;
                     float former, latter;
 
-                    former = contact_energy(strands[sa[0]], strands[sb[0]], asr, aer, bsr, ber);
+                    former = contact_energy(strands[sa[0]], strands[sb[0]], true, asr, aer, bsr, ber);
+                    dir.r = 2.5;
+                    if (former > 100) dir.r += 0.5;
+                    if (former > 1000) dir.r += 0.5;
+                    if (former > 10000) dir.r += 0.5;
                     for (i=0; i<200; i++)
                     {
                         strands[sb[0]]->move_piece(bsr, ber, dir);
-                        latter = contact_energy(strands[sa[0]], strands[sb[0]], asr, aer, bsr, ber);
+                        break;
+                        latter = contact_energy(strands[sa[0]], strands[sb[0]], false, asr, aer, bsr, ber);
+                        cout << latter << " " << dir.r << endl;
 
                         if (latter > former)
                         {
                             strands[sb[0]]->undo();
-                            dir.r *= -0.75;
+                            dir.r *= -0.8;
                         }
                         else
                         {
                             former = latter;
-                            dir.r *= 1.1;
+                            dir.r *= 1.5;
                         }
 
-                        if (fabs(dir.r) < 0.05)
+                        if (fabs(dir.r) < 0.01)
                         {
-                            // cout << "Got it in " << i << endl;
+                            #if _dbg_homology
+                            cout << "Got it in " << i << endl;
+                            #endif
                             break;
                         }
                     }
                 }
 
                 Star s;
-                s.f = contact_energy(strands[sa[0]], strands[sb[0]], asr, aer, bsr, ber);
+                s.f = contact_energy(strands[sa[0]], strands[sb[0]], true, asr, aer, bsr, ber);
 
                 set_variable(outvar, s);
+                cout << endl;
             }   // CTNRG
 
             else if (!strcmp(words[0], "DELETE"))

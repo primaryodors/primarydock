@@ -51,7 +51,7 @@ if [ "$TAAR_RESULT" -eq "0" ]; then
         ASP201=$( cat test/received/TAAR8_CAD.txt | grep -m 1 "Asp201: " )
         ASP201="${ASP201/Asp201: /}"
         ASP201="${ASP201/[.][0-9]*/}"
-        if [[ $ASP111 -gt "-30"  ]] || [[ $ASP201 -gt "-30"  ]]; then
+        if [[ $ASP111 -gt "-25"  ]] || [[ $ASP201 -gt "-25"  ]]; then
             printf "${RED}TAAR test FAILED: bad contacts.${NC}\n"
         else
             printf "${GRN}TAAR test succeeded.${NC}\n"

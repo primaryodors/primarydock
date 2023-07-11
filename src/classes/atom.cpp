@@ -2139,7 +2139,11 @@ void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
     if (strlen(name) < 3) os << " ";
     if (strlen(name) < 2) os << " ";
 
-    os << (aa3let[0] & 0x5f) << (aa3let[1] & 0x5f) << (aa3let[2] & 0x5f) << "  ";
+    char AA[5];
+    strcpy(AA, aa3let);
+    int i;
+    for (i=0; i<3; i++) AA[i] &= 0x5f;
+    os << AA << "  ";
 
     os << setw(4) << residue << "    ";
 

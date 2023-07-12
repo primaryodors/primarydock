@@ -515,6 +515,17 @@ argument. This is useful in cases where e.g. a chimeric peptide segment is prepe
 to compensate for the longer chain; after deleting the prepended segment, the remaining sequence can be restored to its original numbering.
 
 
+# ROTATE
+Example:
+```
+ROTATE @axis &angle
+```
+
+Rotates the entire protein about its center, using the first parameter as a _relative_ axis of rotation,
+and the second parameter as the rotation angle in degrees.
+In other words, the first param is added to the protein center to get the true axis of rotation.
+
+
 # SAVE
 Example:
 ```

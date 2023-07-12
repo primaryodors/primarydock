@@ -1168,11 +1168,6 @@ Bond* Atom::get_bond_by_idx(int bidx)
     return &bonded_to[bidx];
 }
 
-void Atom::consolidate_bonds()
-{
-    //
-}
-
 void Bond::fill_moves_with_cache()
 {
     Atom* attmp[65536];

@@ -2374,7 +2374,6 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     int i, j, l;
     float kJmol = 0;
     if (!atoms) return 0;
-    // if (subtract_clashes) kJmol -= get_internal_clashes();
 
     lastshielded = 0;
 

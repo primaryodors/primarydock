@@ -714,6 +714,12 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
     Atom* CA = get_atom("CA");
     Atom* CB = get_atom("CB");
 
+    if (CA && CB)
+    {
+        Bond* b = CA->get_bond_between(CB);
+        if (b && minintc) b->rotate(triangular);
+    }
+
     if (prevaa)
     {
         movability = MOV_ALL;
@@ -1970,11 +1976,6 @@ void AminoAcid::hydrogenate(bool steric_only)
     }
 
     int i, j, k, l, n;
-
-    if (residue_no == 349)
-    {
-        residue_no += 0.0000001;
-    }
 
     #if hydrogenate_add_missing_heavy_atoms
     if (aadef)

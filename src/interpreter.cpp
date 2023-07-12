@@ -46,7 +46,6 @@ int program_counter = 0;
 std::vector<int> call_stack;
 int stack_pointer = 0;
 
-// Protein p("TheProtein");
 Protein* strands[26];
 Protein* working = nullptr;
 char g_chain = 'A';
@@ -917,6 +916,7 @@ int main(int argc, char** argv)
                 goto _pc_continue;
             }	// CONNECT
 
+            #define do_ctnrg_iters 0
             else if (!strcmp(words[0], "CTNRG"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for CTNRG.");
@@ -930,6 +930,7 @@ int main(int argc, char** argv)
 
                 switch (n)
                 {
+                    case 1:
                     case 2:
                     raise_error("Insufficient parameters given for CTNRG.");
 
@@ -983,9 +984,13 @@ int main(int argc, char** argv)
                     for (i=0; i<200; i++)
                     {
                         strands[sb[0]]->move_piece(bsr, ber, dir);
+                        #if !do_ctnrg_iters
                         break;
+                        #else
                         latter = contact_energy(strands[sa[0]], strands[sb[0]], false, asr, aer, bsr, ber);
+                        #if _dbg_homology
                         cout << latter << " " << dir.r << endl;
+                        #endif
 
                         if (latter > former)
                         {
@@ -1005,6 +1010,7 @@ int main(int argc, char** argv)
                             #endif
                             break;
                         }
+                        #endif
                     }
                 }
 
@@ -1367,6 +1373,8 @@ int main(int argc, char** argv)
                 if (!words[1]) raise_error("Insufficient parameters given for HOMOLOGY.");
                 Protein *tpl, *ref;
                 FILE* fp;
+
+                bool delete_tpl = false, delete_ref = false;
                 
                 words[1] = interpret_single_string(words[1]);
                 if (strlen(words[1]) == 1)
@@ -1379,6 +1387,7 @@ int main(int argc, char** argv)
                     if (!fp) raise_error((std::string)"File not found: " + (std::string)words[1]);
 
                     tpl = new Protein("template");
+                    delete_tpl = true;
                     tpl->load_pdb(fp);
                     fclose(fp);
                 }
@@ -1396,6 +1405,7 @@ int main(int argc, char** argv)
                         if (!fp) raise_error((std::string)"File not found: " + (std::string)words[2]);
 
                         ref = new Protein("reference");
+                        delete_ref = true;
                         ref->load_pdb(fp);
                         fclose(fp);
                     }
@@ -1403,6 +1413,9 @@ int main(int argc, char** argv)
                     working->homology_conform(tpl, ref);
                 }
                 else working->homology_conform(tpl, working);
+
+                if (delete_tpl) delete tpl;
+                if (delete_ref) delete ref;
             }   // HOMOLOGY
 
             else if (!strcmp(words[0], "HYDRO"))
@@ -1848,14 +1861,12 @@ int main(int argc, char** argv)
 				char buffer1[1024];
 				Star sv;
 
-				// strcpy(buffer, "$PDB");
                 sprintf(buffer, "$PDB%c", g_chain);
 				sv.psz = new char[strlen(psz)+4];
                 strcpy(sv.psz, psz);
 				set_variable(buffer, sv);
 
                 const char* pname = working->get_name().c_str();
-                // strcpy(buffer, "$PROTEIN");
                 sprintf(buffer, "$PROTEIN%c", g_chain);
                 sv.psz = new char[strlen(pname)+4];
                 strcpy(sv.psz, pname);
@@ -1864,12 +1875,10 @@ int main(int argc, char** argv)
                 delete[] psz;
 
                 int seqlen = working->get_seq_length();
-                // strcpy(buffer, "%SEQLEN");
                 sprintf(buffer, "%cSEQLEN%c", '%', g_chain);
                 sv.n = seqlen;
 				set_variable(buffer, sv);
 
-                // strcpy(buffer, "$SEQUENCE");
                 sprintf(buffer, "$SEQUENCE%c", g_chain);
                 sv.psz = new char[seqlen+4];
                 strcpy(sv.psz, working->get_sequence().c_str());
@@ -2326,7 +2335,7 @@ int main(int argc, char** argv)
                 er = interpret_single_int(words[l++]);
                 if (!words[l]) raise_error("Insufficient parameters given for SEARCH.");
                 psz = interpret_single_string(words[l++]);
-                esr = er; // - strlen(psz);
+                esr = er;
 
                 int threshold = -1;
                 int num_eq;
@@ -2427,7 +2436,6 @@ int main(int argc, char** argv)
             {
                 if (!words[1]) raise_error("Insufficient parameters given for UNCHAIN.");
                 chain = words[1][0] - 65;
-                // if (working == strands[chain]) raise_error("Cannot delete current working strand.");
                 if (nullptr != strands[chain])
                 {
                     delete strands[chain];

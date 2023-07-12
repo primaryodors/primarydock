@@ -1712,6 +1712,70 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
 
     Point center;
     int i, j, k, l;
+    Point lgeo[100][10];
+
+    l = 0;
+    for (i=0; i<geometry; i++)
+    {
+        if (bonded_to[i].btom)
+        {
+            if (!prevent_infinite_loop && bonded_to[i].cardinality >= 1.1)
+            {
+                mirror_geo = i;
+                goto do_mirror_geo;
+            }
+            l++;
+        }
+    }
+
+    if (!l) return geov;
+    else if (l == 1)
+    {
+        Rotation rot = align_points_3d(location.add(geov[i]), bonded_to[i].btom->location, location);
+        for (l=0; l<geometry; l++)
+        {
+            Point pt = geov[l];
+            geov[l] = rotate3D(&pt, &center, &rot);
+        }
+        return geov;
+    }
+    else
+    {
+        k = 0;
+        for (i=0; i<geometry; i++)
+        {
+            if (!bonded_to[i].btom) continue;
+            for (j=i+1; j<geometry; j++)
+            {
+                if (bonded_to[j].btom) continue;
+
+                Point pt1 = geov[i];
+                Point pt2 = geov[j];
+                Point al1 = bonded_to[i].btom->get_location().subtract(location);
+                Point al2 = bonded_to[j].btom->get_location().subtract(location);
+                Rotation* rot = align_2points_3d( &pt1, &al1, &pt2, &al2, &center );
+                for (l=0; l<geometry; l++)
+                {
+                    geov[l] = rotate3D(&geov[l], &center, rot);
+                    lgeo[k][l] = geov[l];
+                }
+                k++;
+            }
+        }
+
+        for (i=0; i<geometry; i++)
+        {
+            Point pt(0,0,0);
+            for (l=0; l<k; l++)
+            {
+                pt = pt.add(lgeo[l][i]);
+            }
+            pt.scale(1);
+            geov[i] = pt;
+        }
+
+        return geov;
+    }
 
     // #259 fix:
     for (i=0; i<geometry; i++)
@@ -1788,6 +1852,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
     }
 
 
+    do_mirror_geo:
     if (mirror_geo >= 0)
     {
         Bond* b = &bonded_to[mirror_geo];

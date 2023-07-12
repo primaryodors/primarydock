@@ -34191,6 +34191,26 @@
             }
         }
     },
+    "ac1488fd007aa6d19e042ab86cf199dd":
+    {
+        "full_name": "Williams' ester",
+        "iupac": "(Z)-3-hexen-1-yl (Z)-3-hexenoate",
+        "name1": "cis-3-hexenyl cis-3-hexenoate",
+        "smiles": "CC\\C=C\/CCOC(=O)C\\C=C\/CC",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "green",
+                "tomato leaf",
+                "pear",
+                "melon",
+                "metallic",
+                "fennel",
+                "tropical"
+            ]
+        }
+    },
     "609a61147940ccdd91fd53b3b1493788":
     {
         "full_name": "wine lactone",

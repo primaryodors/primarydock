@@ -38,6 +38,17 @@ else
 fi
 
 
+REPORT="test/delwork_test.approved.txt"
+./bin/pepteditor test/delwork.pepd | sed '/^#/d' > test/received/delwork_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/delwork_test.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Delete working strand test succeeded.${NC}\n"
+else
+    printf "${RED}Delete working strand test FAILED.${NC}\n"
+    diff --color --unified $REPORT test/received/delwork_test.received.txt
+fi
+
+
 REPORT="test/motif_test.approved.txt"
 ./bin/pepteditor test/motif_test.pepd | sed '/^#/d' >test/received/motif_test.received.txt
 RESULT=$(diff --unified $REPORT test/received/motif_test.received.txt)

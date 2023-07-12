@@ -2433,7 +2433,7 @@ int main(int argc, char** argv)
                     delete strands[chain];
                     strands[chain] = nullptr;
                 }
-                if (g_chain == 65+chain) working = new Protein("TheProt");
+                if (g_chain == 65+chain) working = strands[chain] = new Protein("TheProt");
             }
 
             else if (!strcmp(words[0], "UPRIGHT"))

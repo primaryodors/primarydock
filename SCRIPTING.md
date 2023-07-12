@@ -31,8 +31,9 @@ All strings begin with `$`, e.g. `$name`.
 
 Cartesians have members .x, .y, and .z that behave as floats.
 
-Substrings can be accessed via dot notation, e.g. `$string.10` or `$string.10,3` or `$string.%start,%len`.
+Substrings can be accessed via dot-comma notation, e.g. `$string.10` or `$string.10,3` or `$string.%start,%len`.
 If the length is omitted, the substring will continue all the way to the end.
+Note that the start position is separated by a dot, but the length is separated by a comma.
 
 Casting a float to an integer rounds the value (e.g. 0.4 rounds to zero but 0.5 rounds to 1).
 

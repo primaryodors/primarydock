@@ -1,0 +1,17 @@
+
+STRAND C
+GEN "SILLYLITTLEKITTYCAT"
+ECHO "Created test protein C."
+
+STRAND V
+GEN "VACUUMCLEANER"
+ECHO "Created test protein V."
+
+UNCHAIN V
+ECHO "Deleted test protein V."
+
+GEN "TREATS"
+ECHO "Created new test protein V."
+RENUMBER 1 9999 50
+
+SAVE "test/received/delwork.received.pdb"

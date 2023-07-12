@@ -1,0 +1,5 @@
+Created test protein C.
+Created test protein V.
+Deleted test protein V.
+Created new test protein V.
+Wrote test/received/delwork.received.pdb.

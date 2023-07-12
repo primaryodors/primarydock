@@ -208,6 +208,8 @@ char Protein::set_pdb_chain(char c)
         pdbchain = c;
     }
 
+    if (!residues) return pdbchain;
+
     int i;
     for (i=0; residues[i]; i++)
     {

@@ -40,7 +40,7 @@ int main (int argc, char** argv)
          << ", phi=" << v.phi * 180.0 / M_PI
          << ".\n";
 
-    cout << "Point pt6 from SCoord v is " << pt6.get_3d_distance(&pt5) << " Angstroms from pt5.\n";
+    cout << "Point pt6 from SCoord v is " << (0.01 * round(pt6.get_3d_distance(&pt5)*100)) << " Angstroms from pt5.\n";
 
     Point ptrot8, ptref(pt5.x + 0, pt5.y + 0, pt5.z + 1);
 

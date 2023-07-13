@@ -1224,7 +1224,7 @@ int main(int argc, char** argv)
                 case SV_POINT:
                     if (flags & _HAS_DOT)
                     {
-                        float* ff = nullptr;
+                        double* ff = nullptr;
 
                         char* param = strchr(words[1], '.');
                         if (!param) raise_error( (std::string)"Missing member after dot.");

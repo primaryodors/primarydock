@@ -1728,10 +1728,15 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
         }
     }
 
+    #define debug_averaged_geov 1
     if (!l) return geov;
     else if (l == 1)
     {
-        Rotation rot = align_points_3d(location.add(geov[i]), bonded_to[i].btom->location, location);
+        Rotation rot = align_points_3d(location.add(geov[0]), bonded_to[0].btom->location, location);
+        #if debug_averaged_geov
+        cout << name << ": Aligning only bond " << location.add(geov[0]) << " to " << bonded_to[0].btom->location
+             << " relative to " << location << endl;
+        #endif
         for (l=0; l<geometry; l++)
         {
             Point pt = geov[l];
@@ -1747,19 +1752,34 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
             if (!bonded_to[i].btom) continue;
             for (j=i+1; j<geometry; j++)
             {
-                if (bonded_to[j].btom) continue;
+                if (!bonded_to[j].btom) continue;
 
                 Point pt1 = geov[i];
                 Point pt2 = geov[j];
                 Point al1 = bonded_to[i].btom->get_location().subtract(location);
                 Point al2 = bonded_to[j].btom->get_location().subtract(location);
-                Rotation* rot = align_2points_3d( &pt1, &al1, &pt2, &al2, &center );
+                Rotation* rots = align_2points_3d( &pt1, &al1, &pt2, &al2, &center );
+                #if debug_averaged_geov
+                /* cout << name << ": Aligning bonds " << location.add(pt1) << " to " << bonded_to[i].btom->get_location()
+                    << " and " << location.add(pt2) << " to " << bonded_to[j].btom->get_location()
+                    << " relative to " << location << endl; */
+                cout << name << ": bonds to " << bonded_to[i].btom->name << " and " << bonded_to[j].btom->name
+                    << " predict geometry of:";
+                #endif
                 for (l=0; l<geometry; l++)
                 {
-                    geov[l] = rotate3D(&geov[l], &center, rot);
-                    lgeo[k][l] = geov[l];
+                    Point geovl = geov[l];
+                    geovl = rotate3D(&geovl, &center, &rots[0]);
+                    geovl = rotate3D(&geovl, &center, &rots[1]);
+                    lgeo[k][l] = geovl;
+                    #if debug_averaged_geov
+                    cout << " " << lgeo[k][l];
+                    #endif
                 }
                 k++;
+                #if debug_averaged_geov
+                cout << endl;
+                #endif
             }
         }
 
@@ -1772,60 +1792,14 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
             }
             pt.scale(1);
             geov[i] = pt;
+            #if debug_averaged_geov
+            cout << name << ": geov[" << i << "] now = " << pt << endl;
+            #endif
         }
 
         return geov;
     }
 
-    // #259 fix:
-    for (i=0; i<geometry; i++)
-    {
-        if (bonded_to[i].btom)
-        {
-            Rotation rot = align_points_3d(location.add(geov[i]), bonded_to[i].btom->location, location);
-            for (l=0; l<geometry; l++)
-            {
-                Point pt = geov[l];
-                geov[l] = rotate3D(&pt, &center, &rot);
-            }
-
-            for (j=i+1; j<geometry; j++)
-            {
-                if (bonded_to[j].btom)
-                {
-                    float theta = find_angle_along_vector(location.add(geov[j]), bonded_to[j].btom->location, location, geov[i]);
-                    for (l=0; l<geometry; l++)
-                        geov[l] = rotate3D(geov[l], center, geov[i], theta);
-                    
-                    for (k=j+1; k<geometry; k++)
-                    {
-                        if (bonded_to[k].btom)
-                        {
-                            for (l=j+1; l<geometry; l++)
-                            {
-                                if (!bonded_to[l].btom)
-                                {
-                                    float ktheta = find_3d_angle(bonded_to[k].btom->location, location.add(geov[k]), location);
-                                    float ltheta = find_3d_angle(bonded_to[k].btom->location, location.add(geov[l]), location);
-
-                                    if (ltheta < ktheta)
-                                    {
-                                        SCoord swap = geov[l];
-                                        geov[l] = geov[k];
-                                        geov[k] = swap;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    goto _exit_search;
-                }
-            }
-
-            goto _exit_search;
-        }
-    }
 
     _exit_search:
     if (prevent_infinite_loop) return geov;

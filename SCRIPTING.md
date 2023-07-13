@@ -9,6 +9,17 @@ To run a Pepteditor script, after building PrimaryDock, please use the following
 bin/pepteditor path/to/script.pepd
 ```
 
+
+# Strands
+
+The PDB format allows each amino acid residue to be given a strand ID, typically a letter between `A` and `Z`.
+Pepteditor allows holding up to 26 strands in memory at any given time.
+One strand is always the current working strand; the default is `A`.
+All commands apply only to the working strand unless otherwise noted.
+It is possible to load data from multiple PDBs into multiple strands, move protein data between strands, and delete strands.
+When saving an output PDB, all strands are included in the written file.
+
+
 # Variables
 
 With few exceptions, any variable can stand in for any parameter of any command.
@@ -20,11 +31,18 @@ All strings begin with `$`, e.g. `$name`.
 
 Cartesians have members .x, .y, and .z that behave as floats.
 
+Substrings can be accessed via dot-comma notation, e.g. `$string.10` or `$string.10,3` or `$string.%start,%len`.
+If the length is omitted, the substring will continue all the way to the end.
+Note that the start position is separated by a dot, but the length is separated by a comma.
+
 Casting a float to an integer rounds the value (e.g. 0.4 rounds to zero but 0.5 rounds to 1).
 
-Casting a float to a Cartesian normally sets the .x member to the float value, leaving .y=0 and .z=0. But a command like `LET @foo = @bar.y` will result in only the value of `@foo.y` being nonzero.
+Casting a float to a Cartesian normally sets the .x member to the float value, leaving .y=0 and .z=0.
+But a command like `LET @foo = @bar.y` will result in only the value of `@foo.y` being nonzero.
 
-Casting an integer to a Cartesian obtains the location of the CA atom for that residue number, if it exists.
+Casting an integer to a Cartesian obtains the location of the CA atom for that residue number, if it exists in the working strand.
+But note that e.g. `LET @foo = %motif + 2` will not work. The arithmetic must come first e.g. `LET %foo = %motif + 2` followed by
+`LET @foo = %foo`.
 
 Casting a Cartesian back to float or integer obtains the magnitude of the Cartesian, equal to sqrt(x^2 + y^2 + z^2).
 
@@ -59,13 +77,14 @@ ECHO $three               # outputs Yup!
 ```
 
 
-The following "magic variables" are supplied upon loading a protein:
-- `$PDB` the path and name of the source PDB file.
-- `$PROTEIN` the name of the protein, derived from a `REMARK 6` record if present.
-- `%SEQLEN` the length of the protein sequence.
-- `$SEQUENCE` the sequence of the protein in standard one-letter amino acid code.
-- Region start and end residue numbers from any `REMARK 650 HELIX` records, e.g. `%TMR3.s` and `%TMR3.e` for the start and end resnos of TMR3.
-- Ballesteros-Weinstein n.50 numbers e.g. `%1.50`, `%2.50` etc., from `REMARK 800 SITE BW` records of the PDB if present.
+Some "magic variables" are supplied upon loading a protein. The strand ID is included in the variable name; for the below list, the strand is A:
+
+- `$PDBA` the path and name of the source PDB file.
+- `$PROTEINA` the name of the protein, derived from a `REMARK 6` record if present.
+- `%SEQLENA` the length of the protein sequence.
+- `$SEQUENCEA` the sequence of the protein in standard one-letter amino acid code.
+- Region start and end residue numbers from any `REMARK 650 HELIX` records, e.g. `%A.TMR3.s` and `%A.TMR3.e` for the start and end resnos of TMR3.
+- Ballesteros-Weinstein n.50 numbers e.g. `%A.1.50`, `%A.2.50` etc., from `REMARK 800 SITE BW` records of the PDB if present.
 
 The following commands are supported:
 
@@ -89,6 +108,15 @@ pointing from @location1 to @location2.
 
 The second example aligns residues 174-177 and 179-182 with the same two points, but affects the entire protein instead of just the region between
 the indicated residues.
+
+
+# ATOMTO
+Example:
+```
+ATOMTO %residue_number $atom_name @target
+```
+
+Flexes the side chain of `%residue_number` to bring `$atom_name` as close to `@target` as physically possible.
 
 
 # BEND
@@ -162,6 +190,29 @@ examples, the program will flex the range of 160-173 and attempt to reunite 173 
 default being 50.
 
 
+# CTNRG
+Examples:
+```
+CTNRG A B &energy
+CTNRG A B &energy @direction
+CTNRG A %start1 %end1 B %start2 %end2 &energy @direction
+CTNRG A B %start2 %end2 &energy @direction
+```
+
+Gets the contact energy between two strands. In these examples, the interaction energy between strands A and B will be stored in `&energy`.
+Negative values mean favorable interactions, expressed in kJ/mol. Positive values mean atom clashes.
+The A and B parameters can also be strings.
+
+The second example introduces a direction of motion to move the second strand (in this case, B strand) to optimize the contacts between proteins.
+This is useful if e.g. two proteins are too close together and clashing, or too far away and not making good contact.
+
+The third example limits the function to a specific region of each strand. This is useful to for example optimize only part of the second strand.
+The fourth example limits only the second strand to a region. If a region is specified for only one strand, it must be the second one.
+This may seem counterintuitive but it makes sense for optimizing only part of the second protein against the whole of the first protein.
+
+The direction parameter is always optional, irrespective of any start and end residue numbers given.
+
+
 # DELETE
 Example:
 ```
@@ -184,6 +235,20 @@ all combinations of sulfhydryl side chains, and output only the ones it was able
 
 Note that for `DISULF` to work, the two sulfur atoms must already be moved into position, and the side chains must be hydrogenated. No attempt
 will be made to flex bonds to bring the sulfurs into proximity, and if the sulfurs are not already bound to hydrogens, the command will fail.
+
+
+# DOWNLOAD
+Example:
+```
+DOWNLOAD RCSB 8F76 "pdbs/8f76.pdb"
+DOWNLOAD AF Q5QD04 "pdbs/mTAAR9.pdb" ONCE
+```
+
+Downloads a protein model from one of the download sources registered in the `data/dlsrc.dat` file.
+The second parameter is the source's unique identifier for the model, e.g. 8F76 for the RCSB model of propionate-activated hOR51E2 on GNAS2,
+or UniProt ID Q5QD04 for mTAAR9 from AlphaFold.
+The third parameter is the destination file name.
+ONCE is an optional final parameter that tells Pepteditor not to request the source URL if the destination file already exists.
 
 
 # DUMP
@@ -234,6 +299,20 @@ GEN "MAYDRYVAIC"
 Creates a peptide using the specified sequence.
 
 
+# GOSUB
+Example:
+```
+GOSUB label
+...
+label:
+...
+RETURN
+```
+
+Like `GOTO` (see below), except the label begins a subroutine that ends with a `RETURN` command. Upon finishing the subroutine, script execution
+resumes on the line following the `GOSUB`.
+
+
 # GOTO
 Example:
 ```
@@ -258,6 +337,15 @@ Create a helix of the specified residue range. If the helix type is specified, i
 because like with helices, the residues' phi and psi bonds are rotated to preset angles.
 
 Phi and psi angles can also be manually specified as in the second example.
+
+
+# HYDRO
+Examples:
+```
+HYDRO
+```
+
+Hydrogenates the protein.
 
 
 # IF
@@ -303,15 +391,6 @@ in exactly this way by transparently replacing `AND` with `IF` behind the scenes
 When using `IF` with `GOTO`, it is possible to create loops as seen in the last example above.
 
 
-# HYDRO
-Examples:
-```
-HYDRO
-```
-
-Hydrogenates the protein.
-
-
 # LET
 Examples:
 ```
@@ -348,9 +427,14 @@ Substrings are _one-based_ and are indicated with the word FROM and (optinally) 
 Example:
 ```
 LOAD "path/to/protein.pdb"
+LOAD "path/to/protein.pdb" A
+LOAD "path/to/protein.pdb" A B
 ```
 
 Loads the specified protein into working memory. Note only one protein is allowed in memory at a given time.
+If one strand ID is provided, then that strand of the PDB will be loaded. The default strand is A.
+If a second strand ID is provided, then the protein will be loaded into that strand locally and the current working strand will be updated.
+The default is to load the protein into the existing working strand ID.
 
 
 # MCOORD
@@ -431,6 +515,17 @@ argument. This is useful in cases where e.g. a chimeric peptide segment is prepe
 to compensate for the longer chain; after deleting the prepended segment, the remaining sequence can be restored to its original numbering.
 
 
+# ROTATE
+Example:
+```
+ROTATE @axis &angle
+```
+
+Rotates the entire protein about its center, using the first parameter as a _relative_ axis of rotation,
+and the second parameter as the rotation angle in degrees.
+In other words, the first param is added to the protein center to get the true axis of rotation.
+
+
 # SAVE
 Example:
 ```
@@ -439,6 +534,7 @@ SAVE "path/to/output.pdb" QUIT
 ```
 
 Saves the protein in working memory to the specified file path (can be a string variable).
+All strands that contain protein data will be included.
 
 If `QUIT`, `EXIT`, or `END` follows the path parameter, script execution will terminate immediately after saving the protein.
 
@@ -495,6 +591,18 @@ which of two or more motifs a region has, for example it is possible to search a
 values and use an `IF` to take a different action depending which is the better match.
 
 
+# STRAND
+Example:
+```
+STRAND B
+STRAND B C
+
+```
+
+Changes the current working strand to the strand ID specified. If two strand IDs are given, the protein in the first strand is moved to the second
+strand and the working strand is set to the second ID.
+
+
 # UPRIGHT
 Example:
 ```
@@ -505,16 +613,23 @@ Turns the protein "upright", so that the extracellular domain is in the +Y direc
 The entire protein will also be centered at [0, 0, 0].
 
 Valid only for transmembrane proteins with at least one transmembrane helix. The protein must have TMR1 through TMR{n} defined, where n <= 7.
-If the PDB does not contain suitable `REMARK 650 HELIX` records, then the TMRs must be defined with the `REGION` command.
+(Helices beyond 7 will be ignored.)
+If the PDB does not contain suitable `REMARK 650 HELIX` records, then the TMRs must be manually defined with the `REGION` command.
 
 If the protein has a TMR4, it will be rotated to the +Z direction from TMR1. This affords a good view of the binding pocket of 7-helix GPCRs, but also
 maintains compatibility with MS4A proteins since it does not depend on the existence of a TMR5, TMR6, or TMR7.
 
+If multiple strands are loaded in memory, they will all be moved as a unit with the uprighting of the working strand.
+
 UPRIGHT takes no arguments.
 
 
+# UNCHAIN
+Example:
+```
+UNCHAIN A
+```
 
-
-
+Deletes the indicated strand (peptide chain). Note the current working strand cannot be deleted; an error will result.
 
 

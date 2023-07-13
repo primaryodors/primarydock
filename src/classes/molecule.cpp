@@ -491,7 +491,7 @@ char** Molecule::get_atom_names() const
     int i;
     char** retval = new char*[atcount+1];
 
-    for (i=0; i<atcount; i++) retval[i] = atoms[i]->name;
+    for (i=0; atoms[i]; i++) retval[i] = atoms[i]->name;
     retval[atcount] = 0;
 
     return retval;
@@ -2081,7 +2081,7 @@ Point Molecule::get_barycenter(bool bond_weighted) const
     Point locs[atcount];
     int i;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         locs[i] = atoms[i]->get_location();
         locs[i].weight = atoms[i]->get_atomic_weight();
@@ -2127,7 +2127,7 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     Point cen = get_barycenter(bond_weighted);
 
     int i;
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
@@ -2144,7 +2144,7 @@ void Molecule::rotate(LocatedVector lv, float theta)
     if (movability <= MOV_NORECEN) lv.origin = get_barycenter();
 
     int i;
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         // if (atoms[i]->residue) return;
         Point loc = atoms[i]->get_location();
@@ -2163,7 +2163,7 @@ bool Molecule::shielded(Atom* a, Atom* b) const
     a->shielding_angle = b->shielding_angle = 0;
 
     Point aloc = a->get_location(), bloc = b->get_location();
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         Atom* ai = atoms[i];
         if (!ai) break;
@@ -2270,7 +2270,7 @@ float Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
 void Molecule::clear_atom_binding_energies()
 {
     int i;
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
         atoms[i]->last_bind_energy = 0;
 }
 
@@ -2289,7 +2289,7 @@ float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
     int i, j, l, n;
     float kJmol = 0;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         if (!atoms[i]) continue;
         Point aloc = atoms[i]->get_location();
@@ -2333,14 +2333,14 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
 
     // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         atoms[i]->last_bind_energy = 0;
         atoms[i]->strongest_bind_energy = 0;
         atoms[i]->strongest_bind_atom = nullptr;
     }
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         Point aloc = atoms[i]->get_location();
         for (l=0; ligands[l]; l++)
@@ -2418,7 +2418,7 @@ float Molecule::get_intermol_contact_area(Molecule* ligand, bool hpho)
     int i, j;
     float result = 0;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         Point aloc = atoms[i]->get_location();
         float avdw = atoms[i]->get_vdW_radius();
@@ -2469,7 +2469,7 @@ float Molecule::get_intermol_polar_sat(Molecule* ligand)
     int i, j, l, n;
     float result = 0;
 
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         Point aloc = atoms[i]->get_location();
         float aapol = fabs(atoms[i]->is_polar());
@@ -2747,6 +2747,61 @@ void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void 
     for (i=0; i<n; i++)
     {
         bkg[i]->movability = static_cast<MovabilityType>(static_cast<int>(bkg[i]->movability & !MOV_BKGRND));
+    }
+}
+
+void Molecule::conform_atom_to_location(char* an, Point t, int iters)
+{
+    if (!atoms) return;
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        if (!strcmp(atoms[i]->name, an))
+        {
+            conform_atom_to_location(i, t, iters);
+            return;
+        }
+    }
+}
+
+#define _dbg_atom_pointing 0
+
+void Molecule::conform_atom_to_location(int i, Point t, int iters)
+{
+    if (!(movability & MOV_CAN_FLEX)) return;
+
+    int iter, j, l, circdiv = 7;
+    Bond** b = get_rotatable_bonds();
+    if (!b) return;
+    Atom* a = atoms[i];
+    if (!a) return;
+
+    float oc = get_internal_clashes();
+
+    for (iter = 0; iter < iters; iter++)
+    {
+        float r;
+        for (j=0; b[j]; j++)
+        {
+            float bestr = Avogadro, bestth = 0;
+            for (l=0; l<=circdiv; l++)
+            {
+                b[j]->rotate(M_PI*2.0/circdiv, false, true);
+                r = a->get_location().get_3d_distance(t);
+                float c = get_internal_clashes();
+                if (r < bestr && c < oc+5)
+                {
+                    bestr = r;
+                    bestth = M_PI*2.0/circdiv * l;
+                }
+            }
+            b[j]->rotate(bestth);
+
+            #if _dbg_atom_pointing
+            cout << iter << ": " << circdiv << "|" << bestr << endl;
+            #endif
+        }
+        if (!(iter % 3)) circdiv++;
     }
 }
 

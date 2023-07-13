@@ -467,7 +467,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
         // Sort all the backbone and sidechain atoms into a new array.
         Atom** new_atoms = new Atom*[atcount+4];
-        for (i=0; i<atcount; i++) new_atoms[i] = nullptr;
+        for (i=0; atoms[i]; i++) new_atoms[i] = nullptr;
 
         l=0;
         if (N) new_atoms[l++] = N;
@@ -1539,6 +1539,31 @@ bool AminoAcid::can_reach(AminoAcid* other) const
 
     if (r <= 1.15 * (get_reach() + other->get_reach())) return true;
     else return false;
+}
+
+Atom* AminoAcid::get_reach_atom()
+{
+    if (!atoms) return nullptr;
+
+    int i;
+    float maxr = 0;
+    Atom* CA = get_atom("CA");
+    Atom* retval = nullptr;
+    if (!CA) return nullptr;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        float r = atoms[i]->distance_to(CA);
+
+        if (r > maxr)
+        {
+            maxr = r;
+            retval = atoms[i];
+        }
+    }
+
+    return retval;
 }
 
 float AminoAcid::similarity_to(const char letter)

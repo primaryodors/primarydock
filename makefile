@@ -2,8 +2,9 @@ OBJDIR=obj
 BINDIR=bin
 OUTDIR=output
 SDFDIR=sdf
+TMPDIR=tmp
 
-DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR)
+DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR) $(TMPDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test \
 	  test/group_test_mol test/protein_test test/backbone_test
@@ -41,6 +42,9 @@ $(OUTDIR):
 
 $(SDFDIR):
 	if [ ! -f $(SDFDIR) ]; then mkdir -p $(SDFDIR); fi
+
+$(TMPDIR):
+	if [ ! -f $(TMPDIR) ]; then mkdir -p $(TMPDIR); fi
 
 $(OBJDIR)/misc.o: src/classes/misc.h src/classes/misc.cpp src/classes/constants.h
 	$(CC) -c src/classes/misc.cpp -o $(OBJDIR)/misc.o $(CFLAGS)

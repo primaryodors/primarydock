@@ -2823,6 +2823,8 @@ void Protein::upright()
     save_undo_state();
     bool wmu = mass_undoable;
     mass_undoable = true;
+    Point oldcen = get_region_center(1, 9999).negate();
+    last_uprighted_xform = oldcen;
     move_piece(1, 9999, Point(0,0,0));
 
     Point extracellular[256], cytoplasmic[256];
@@ -2857,6 +2859,9 @@ void Protein::upright()
     Rotation rot = align_points_3d(&exrdir, new Point(0,1e6,0), &cytdir);
 
     rotate_piece(1, 9999, rot, 0);
+    last_uprighted_A.v = rot.v;
+    last_uprighted_A.a = rot.a;
+    last_uprighted_A.origin = get_region_center(1, 9999);
 
     // Rotate to place TMR4 in the +Z direction relative to TMR1.
     int sr = get_region_start("TMR4");
@@ -2889,6 +2894,9 @@ void Protein::upright()
         rot = align_points_3d(&tmr4dir, new Point(0,0,1e9), &tmr1dir);
 
         rotate_piece(1, 9999, rot, 0);
+        last_uprighted_B.v = rot.v;
+        last_uprighted_B.a = rot.a;
+        last_uprighted_B.origin = get_region_center(1, 9999);
     }
 
     mass_undoable = wmu;
@@ -2905,6 +2913,8 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     // Check that both proteins have TM helices and BW numbers set. If not, error out.
     if (!get_region_start("TMR6") || !target->get_region_start("TMR6")) throw 0xbadbeb7;
     if (!Ballesteros_Weinstein.size() || !target->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
+    if (!reference->get_region_start("TMR6")) throw 0xbadbeb7;
+    if (!reference->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
 
     upright();
     target->upright();
@@ -2975,6 +2985,9 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
     // Perform the rotation.
     target->rotate_piece(1, 9999, center, axis, theta);
+    #if _dbg_homology
+    cout << "Rotated about Y axis " << theta*fiftyseven << "deg." << endl;
+    #endif
 
     if (reference != this)
     {
@@ -3046,10 +3059,15 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     for (hxno = 1; hxno <= 7; hxno++)
     {
         sprintf(buffer, "TMR%d", hxno);
+        int rgstart0 = get_region_start(buffer);
+        int rgend0 = get_region_end(buffer);
         int rgstart1 = reference->get_region_start(buffer);
         int rgend1 = reference->get_region_end(buffer);
         int rgstart2 = target->get_region_start(buffer);
         int rgend2 = target->get_region_end(buffer);
+        #if _dbg_homology
+        cout << "Region " << hxno << " target " << rgstart2 << "-" << rgend2 << ", reference " << rgstart1 << "-" << rgend1 << endl;
+        #endif
         int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
         Point rcen1(0,0,0);
         Point rcen2(0,0,0);
@@ -3074,10 +3092,13 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
         // Perform the TM region transformation.
         Point transformation = rcen2.subtract(rcen1);
-        move_piece(rgstart1, rgend1, (SCoord)transformation);
+        move_piece(rgstart0, rgend0, (SCoord)transformation);
+        #if _dbg_homology
+        cout << "Region " << hxno << " (" << rgstart0 << "-" << rgend0 << ")" << " transformed by " << transformation.magnitude() << "A" << endl;
+        #endif
 
         Point axis(0,0,0);
-        Point rcen = get_region_center(rgstart1, rgend1);
+        Point rcen = get_region_center(rgstart2, rgend2);
         float theta = 0;
         count = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
@@ -3103,30 +3124,46 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         }
 
         // Perform the TM region rotation.
-        rotate_piece(rgstart1, rgend1, rcen, axis, theta);
+        rotate_piece(rgstart0, rgend0, rcen, axis, theta);
+        #if _dbg_homology
+        cout << "Region " << hxno << " rotated " << theta*fiftyseven << "deg." << endl;
+        #endif
 
+        #if homology_gradients
         // Count from region start backwards until at least four consecutive helix residues.
         int hc, inarow = 0, helix = 0;
-        for (hc = rgstart1-1; hc > 0; hc--)
+        bool looped = false;
+        for (hc = rgstart0-1; hc > 0; hc--)
         {
             AminoAcid* aa = get_residue(hc);
             if (!aa) continue;
             if (aa->is_alpha_helix()) inarow++;
-            else inarow = 0;
+            else
+            {
+                inarow = 0;
+                looped = true;
+            }
 
-            if (inarow >= 4)
+            if (looped && (inarow >= 4))
             {
                 helix = hc + inarow - 1;
                 break;
             }
         }
 
+        if (inarow >= 4) helix += inarow;
+
+        #if _dbg_homology
+        cout << "Gradient adjustment of " << (rgstart0-1) << "-" << (helix+1) << endl;
+        #endif
+
         // Transform and rotate the flexible loop residues in a gradient from maximum effect at region start to no effect at other helix.
-        int grad_len = rgstart1 - helix;
+        int grad_len = rgstart0 - helix;
         float grad_peraa = (inarow >= 4) ? (1.0 / grad_len) : 0;
         float effect = 1;
 
-        for (hc = rgstart1-1; hc > helix; hc--)
+        if (grad_len > 0)
+        for (hc = rgstart0-1; hc > helix; hc--)
         {
             effect -= grad_peraa;
             SCoord resmov = transformation;
@@ -3140,26 +3177,38 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         // Do the same for region end forward to the next helix.
         inarow = 0;
         helix = 0;
+        looped = false;
         int protend = get_end_resno();
-        for (hc = rgend1+1; hc < protend; hc++)
+        for (hc = rgend0+1; hc < protend; hc++)
         {
             AminoAcid* aa = get_residue(hc);
             if (!aa) continue;
             if (aa->is_alpha_helix()) inarow++;
-            else inarow = 0;
+            else
+            {
+                inarow = 0;
+                looped = true;
+            }
 
-            if (inarow >= 4)
+            if (looped && (inarow >= 4))
             {
                 helix = hc + inarow - 1;
                 break;
             }
         }
 
+        if (inarow >= 4 && helix > inarow) helix -= inarow;
+
+        #if _dbg_homology
+        cout << "Gradient adjustment of " << (rgend0+1) << "-" << (helix-1) << endl;
+        #endif
+
         grad_len = helix - rgend1;
         grad_peraa = (inarow >= 4) ? (1.0 / grad_len) : 0;
         effect = 1;
 
-        for (hc = rgend1+1; (!helix || hc < helix) && hc <= protend; hc++)
+        if (grad_len > 0)
+        for (hc = rgend0+1; (!helix || hc < helix) && hc <= protend; hc++)
         {
             effect -= grad_peraa;
             SCoord resmov = transformation;
@@ -3168,7 +3217,42 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             rotate_piece(hc, hc, rcen, axis, theta*effect);
         }
 
+        #endif
+
         // if (helix) backconnect(rgend1+1, helix-1);
+    }
+
+    int l;
+    for (l=0; l<15; l++)
+    {
+        int nummoved = 0;
+        for (hxno = 1; hxno <= 7; hxno++)
+        {
+            sprintf(buffer, "TMR%d", hxno);
+            int rgstart0 = get_region_start(buffer);
+            int rgend0 = get_region_end(buffer);
+            float threshold = 15 * (rgend0 - rgstart0);
+            float f = get_internal_clashes(rgstart0, rgend0, true, 10);
+
+            #if _dbg_homology
+            cout << "Helix " << hxno << " is clashy " << f << endl;
+            #endif
+
+            if (f < threshold) continue;
+
+            SCoord clashmov = last_int_clash_dir;
+            clashmov.r *= -0.001 * (f - threshold);
+            if (clashmov.r < 0.05) continue;
+
+            #if _dbg_homology
+            cout << "Moving " << rgstart0 << "-" << rgend0 << " by " << clashmov << " A." << endl;
+            #endif
+
+            move_piece(rgstart0, rgend0, clashmov);
+            nummoved++;
+        }
+
+        if (!nummoved) break;
     }
 
     // Prepare for clash minimization.
@@ -3580,4 +3664,47 @@ void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
     mass_undoable = wmu;
 }
 
+void Protein::minimize_residue_clashes(int resno)
+{
+    AminoAcid** caa = get_residues_can_clash(resno);
+    if (!caa) return;
 
+    int i;
+    for (i=0; caa[i]; i++);     // count.
+
+    Molecule* mols[i+4];
+    MovabilityType mt[i+4];
+    AminoAcid* aa = get_residue(resno);
+    mols[0] = (Molecule*)aa;
+    if (!aa) return;
+    mt[0] = aa->movability;
+    aa->movability = MOV_FLEXONLY;
+
+    for (i=0; caa[i]; i++)
+    {
+        mt[i+1] = caa[i]->movability;
+        mols[i+1] = (Molecule*)caa[i];
+        caa[i]->movability = MOV_NONE;
+    }
+    mols[i+1] = nullptr;
+
+    Molecule::conform_molecules(mols, 20);
+
+    for (i=0; caa[i]; i++)
+    {
+        caa[i]->movability = mt[i+1];
+    }
+    aa = get_residue(resno);
+    aa->movability = mt[0];
+}
+
+float Protein::binding_to_nearby_residues(int resno)
+{
+    AminoAcid** caa = get_residues_can_clash(resno);
+    if (!caa) return 0;
+
+    AminoAcid* aa = get_residue(resno);
+    if (!aa) return 0;
+
+    return aa->get_intermol_binding(caa);
+}

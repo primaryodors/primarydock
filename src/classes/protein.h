@@ -111,6 +111,8 @@ public:
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size);
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
+    float binding_to_nearby_residues(int resno);
+    void minimize_residue_clashes(int resno);
 
     // Motion functions
     void upright();
@@ -153,6 +155,10 @@ public:
 
     int* mcoord_resnos = NULL;
     std::vector<SoftBias> soft_biases;
+    
+    SCoord last_uprighted_xform;
+    LocRotation last_uprighted_A, last_uprighted_B;
+    SCoord last_int_clash_dir;
 
 protected:
     Atom** ca = nullptr;

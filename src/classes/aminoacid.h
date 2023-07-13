@@ -104,6 +104,7 @@ public:
     bool can_reach(Atom* other) const;
     bool can_reach(Molecule* other) const;
     bool can_reach(AminoAcid* other) const;
+    Atom* get_reach_atom();
     void set_region(const char* regname)
     {
         strcpy(region, regname);

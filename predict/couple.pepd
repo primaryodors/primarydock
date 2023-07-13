@@ -144,21 +144,26 @@ avoid_gprot_clash:
 
 STRAND G
 
-LET %penult = %SEQLENG - 2
+SEARCH 1 9999 "X$" %SEQENDG
+
+LET %penult = %SEQENDG - 2
 LET @penult = %penult
+LET %last6 = %SEQENDG - 6
 
 STRAND A
 
 LET %533 = %A.5.50 - 17
 LET %628 = %A.6.50 - 22
+LET %636 = %A.6.50 - 14
 LET %659 = %A.6.50 + 9
 
 LET @5650 = %A.56.50
-LET %636 = %A.6.50 - 14
 LET @636 = %636
 LET @dir = @636 - @penult
-LET &nrg = 0
-CTNRG G A %533 %659 &nrg @dir
+LET &energy = 0
+ECHO "CTNRG G " %penult " " 9999 " " A " " %636 " " %636 " &energy "
+CTNRG G %penult 9999 A %636 %636 &energy
+ECHO &energy
 
 
 RETURN

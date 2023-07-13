@@ -103,7 +103,7 @@ public:
     );
 
     std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
-    std::vector<AminoAcid*> get_contact_residues(Protein* other_prot);
+    std::vector<AminoAcid*> get_contact_residues(Protein* other_prot, float contact_distance = 2.5);
     Molecule** all_residues_as_molecules();
     Molecule** all_residues_as_molecules_except(Molecule** mm);
     Point get_region_center(int startres, int endres);

@@ -335,6 +335,7 @@ void Molecule::clear_all_bond_caches()
             for (j=0; b[j]; j++) b[j]->clear_moves_with_cache();
             delete[] b;
         }
+        atoms[i]->used = false;
     }
 }
 

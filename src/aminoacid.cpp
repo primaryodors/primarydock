@@ -113,12 +113,10 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
             fclose(pf);
 
             from_sdf(buffer);
-            ensure_pi_atoms_coplanar();
         }
         else
         {
             from_smiles(aa_defs[idx].SMILES.c_str());
-            ensure_pi_atoms_coplanar();
 
             FILE* pf = fopen(fname.c_str(), "wb");
             if (pf)
@@ -467,15 +465,13 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
         // Sort all the backbone and sidechain atoms into a new array.
         Atom** new_atoms = new Atom*[atcount+4];
-        for (i=0; atoms[i]; i++) new_atoms[i] = nullptr;
+        for (i=0; i<atcount; i++) new_atoms[i] = nullptr;
 
         l=0;
         if (N) new_atoms[l++] = N;
         if (HN) new_atoms[l++] = HN;
 
         if (minintc) minimize_internal_clashes();
-        ensure_pi_atoms_coplanar();
-
         for (i=0; atoms[i]; i++)
         {
             if (atom_Greek[i] <= 0) continue;
@@ -547,8 +543,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         return;
     }
 
-    ensure_pi_atoms_coplanar();
-
     if (!atoms || !atoms[0]) cout << "WARNING no atoms for " << aa_defs[idx].name << " (" << aa_defs[idx].SMILES << ")" << endl;
 
     if (!aa_defs[idx].aabonds)
@@ -566,8 +560,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                 aabd[n] = new AABondDef();
                 strcpy(aabd[n]->aname, atoms[i]->name);
                 strcpy(aabd[n]->bname, "<C");
-                aabd[n]->Za = atoms[i]->get_Z();
-                aabd[n]->Zb = 6;
                 aabd[n]->cardinality = 1.5;
                 aabd[n]->acharge = 0;
                 aabd[n]->can_rotate = false;
@@ -581,8 +573,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                     aabd[n] = new AABondDef();
                     strcpy(aabd[n]->aname, bb[j]->atom->name);
                     strcpy(aabd[n]->bname, bb[j]->btom->name);
-                    aabd[n]->Za = bb[j]->atom->get_Z();
-                    aabd[n]->Zb = bb[j]->btom->get_Z();
                     aabd[n]->cardinality = bb[j]->cardinality;
                     aabd[n]->acharge = bb[j]->atom->get_charge();
 
@@ -658,13 +648,9 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         delete[] aabd;
     }
 
-    ensure_pi_atoms_coplanar();
-
     // flatten();
     rotatable_bonds = get_rotatable_bonds();
     if (minintc) minimize_internal_clashes();
-
-    ensure_pi_atoms_coplanar();
 
     identify_acidbase();
     identify_rings();
@@ -725,8 +711,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         movability = MOV_FLEXONLY;
         immobile = true;
     }
-
-    ensure_pi_atoms_coplanar();
 
     find_his_flips();
 }
@@ -1969,52 +1953,12 @@ void AminoAcid::hydrogenate(bool steric_only)
         if (!oxt->get_bond_between(C)) oxt->bond_to(C, 1);
     }
 
-    int i, j, k, l, n;
-
-    #if hydrogenate_add_missing_heavy_atoms
-    if (aadef)
-    {
-        for (i=0; aadef->aabonds[i]; i++)
-        {
-            if (aadef->aabonds[i]->Za < 2 || aadef->aabonds[i]->Zb < 2) continue;
-            Atom* a = get_atom(aadef->aabonds[i]->aname);
-            Atom* b = get_atom(aadef->aabonds[i]->bname);
-
-            if (a && a->is_backbone) continue;
-            if (b && b->is_backbone) continue;
-
-            if (!a && !b)
-            {
-                // TODO
-            }
-            else if (!a)
-            {
-                a = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Za), aadef->aabonds[i]->aname, b, aadef->aabonds[i]->cardinality );
-                a->residue = b->residue;
-                strcpy(a->aa3let, b->aa3let);
-                added_heavies = true;
-            }
-            else if (!b)
-            {
-                b = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Zb), aadef->aabonds[i]->bname, a, aadef->aabonds[i]->cardinality );
-                b->residue = a->residue;
-                strcpy(b->aa3let, a->aa3let);
-                added_heavies = true;
-            }
-        }
-    }
-
-    if (added_heavies)
-    {
-        minimize_internal_clashes();
-    }
-    #endif
-
     Molecule::hydrogenate(steric_only);
     int already[128][4];
     Atom* onlyone[128][4];
     const char* alpha = "ABGDEZH";
 
+    int i, j, k, l, n;
     for (i=0; i<24; i++) for (j=0; j<4; j++)
     {
         already[i][j] = 0;
@@ -2176,8 +2120,6 @@ void AminoAcid::hydrogenate(bool steric_only)
 
     for (i=0; i<l; i++) atoms[i] = atomtmp[i];
     atoms[i] = nullptr;
-
-    ensure_pi_atoms_coplanar();
 }
 
 Point AminoAcid::get_CA_location()
@@ -2185,31 +2127,6 @@ Point AminoAcid::get_CA_location()
     Atom* a = get_atom("CA");
     if (!a) return Point(0,0,0);
     return a->get_location();
-}
-
-Atom* AminoAcid::get_reach_atom()
-{
-    if (!atoms) return nullptr;
-
-    int i;
-    float maxr = 0;
-    Atom* CA = get_atom("CA");
-    Atom* retval = nullptr;
-    if (!CA) return nullptr;
-
-    for (i=0; atoms[i]; i++)
-    {
-        if (atoms[i]->is_backbone) continue;
-        float r = atoms[i]->distance_to(CA);
-
-        if (r > maxr)
-        {
-            maxr = r;
-            retval = atoms[i];
-        }
-    }
-
-    return retval;
 }
 
 void AminoAcid::aamove(SCoord move_amt)
@@ -2232,34 +2149,28 @@ void AminoAcid::aamove(SCoord move_amt)
     }
 }
 
-void AminoAcid::rotate(LocatedVector vec, float theta)
+void AminoAcid::rotate(LocatedVector SCoord, float theta)
 {
     if (!atoms) return;
     // cout << name << " AminoAcid::rotate()" << endl;
 
-    ensure_pi_atoms_coplanar();
-
     int i;
-    for (i=0; atoms[i]; i++)
+    for (i=0; i<atcount; i++)
     {
         Point loc = atoms[i]->get_location();
-        Point nl  = rotate3D(&loc, &vec.origin, &vec, theta);
+        Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
         atoms[i]->move(&nl);
-        // cout << *this << ":" << atoms[i]->name << nl << " " << endl;
+        // cout << atoms[i]->residue << ":" << atoms[i]->name << nl << " ";
     }
     // cout << endl;
-
-    ensure_pi_atoms_coplanar();
 
     // If you have a metal coordination, AND YOU ARE THE FIRST COORDINATING RESIDUE OF THE METAL, move the metal with you.
     if (m_mcoord && m_mcoord->coord_res && m_mcoord->coord_res[0] == this)
     {
         Point loc = m_mcoord->metal->get_location();
-        Point nl  = rotate3D(&loc, &vec.origin, &vec, theta);
+        Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
         m_mcoord->metal->move(&nl);
     }
-
-    ensure_pi_atoms_coplanar();
 }
 
 void AminoAcid::renumber(int new_resno)
@@ -2610,50 +2521,6 @@ LocRotation* AminoAcid::flatten()
     }
 
     return retval;
-}
-
-void AminoAcid::ensure_pi_atoms_coplanar()
-{
-    if (!atoms) return;
-
-    int i, j, n;
-    bool dirty[get_atom_count()];
-    Point conjugated[get_atom_count()];
-    std::string conj_aname[get_atom_count()];
-    for (i=0; atoms[i]; i++) dirty[i] = false;
-
-    for (i=0; atoms[i]; i++)
-    {
-        if (dirty[i]) continue;
-        if (!atoms[i]->is_pi()) continue;
-
-        n = 1;
-        conj_aname[0] = atoms[i]->name;
-        conjugated[0] = atoms[i]->get_location();
-        for (j = i+1; atoms[j]; j++)
-        {
-            if (!atoms[j]->is_pi()) continue;
-            if (!atoms[i]->is_conjugated_to(atoms[j])) continue;
-
-            conj_aname[n] = atoms[j]->name;
-            conjugated[n++] = atoms[j]->get_location();
-            dirty[j] = true;
-        }
-
-        if (n < 4) continue;
-
-        for (j = 3; j < n; j++)
-        {
-            float result = are_points_planar(conjugated[0], conjugated[1], conjugated[2], conjugated[j]);
-            if (result >= coplanar_threshold)
-            {
-                cout << *this << " has non-coplanar pi atoms "
-                    << conj_aname[0] << ", " << conj_aname[1] << ", " << conj_aname[2] << ", " << conj_aname[j]
-                    << " having anomaly " << result
-                    << endl;
-            }
-        }
-    }
 }
 
 LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)

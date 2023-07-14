@@ -1043,7 +1043,6 @@ int main(int argc, char** argv)
                 s.f = contact_energy(strands[sa[0]], strands[sb[0]], true, asr, aer, bsr, ber) - baseline;
 
                 set_variable(outvar, s);
-                cout << endl;
             }   // CTNRG
 
             else if (!strcmp(words[0], "DELETE"))
@@ -2208,7 +2207,6 @@ int main(int argc, char** argv)
                 }
 
                 LocatedVector lv = axis;
-                cout << "Axis is " << (Point)axis << endl;
                 AminoAcid* aapiv = nullptr;
                 if (piv) aapiv = working->get_residue(piv);
                 if (aapiv) lv.origin = aapiv->get_CA_location();

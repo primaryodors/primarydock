@@ -171,9 +171,9 @@ LET @axis = @548 - @648
 LET %i = 10
 g_protein_clash_loop:
 LET &energy = 0
-ECHO "CTNRG G " %penult " " 9999 " " A " " %636 " " %636 " &energy "
+# ECHO "CTNRG G " %penult " " 9999 " " A " " %636 " " %636 " &energy "
 CTNRG G %penult 9999 A %636 %636 &energy
-ECHO &energy
+# ECHO &energy
 IF &energy > 25 ROTATE @axis 1 %648 %533 %659
 LET %i --
 IF &energy > 25 AND %i > 0 GOTO g_protein_clash_loop

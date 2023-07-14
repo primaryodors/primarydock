@@ -2035,6 +2035,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                 a = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Za), aadef->aabonds[i]->aname, b, aadef->aabonds[i]->cardinality );
                 a->residue = b->residue;
                 strcpy(a->aa3let, b->aa3let);
+                a->increment_charge(aadef->aabonds[i]->acharge);
                 c = at->get_atom(aadef->aabonds[i]->aname);
                 if (c) a->move(c->get_location());
                 added_heavies = true;
@@ -2047,6 +2048,10 @@ void AminoAcid::hydrogenate(bool steric_only)
                 c = at->get_atom(aadef->aabonds[i]->bname);
                 if (c) b->move(c->get_location());
                 added_heavies = true;
+            }
+            else if (!a->is_bonded_to(b))
+            {
+                a->bond_to(b, aadef->aabonds[i]->cardinality);
             }
         }
     }

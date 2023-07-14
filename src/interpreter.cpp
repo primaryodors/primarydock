@@ -109,7 +109,7 @@ bool download_file(std::string url, std::string destination)
     return file_exists(destination);
 }
 
-#define debug_contact_energy 1
+#define debug_contact_energy 0
 
 float contact_energy(Protein* a, Protein* b, bool repack = false, int a_from = 0, int a_to = 0, int b_from = 0, int b_to = 0)
 {

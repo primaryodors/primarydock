@@ -536,12 +536,22 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
 
     for (i=0; i<65536; i++) pdba[i] = nullptr;
 
+    bool got_atoms = false;
     while (!feof(is))
     {
         try
         {
             int told = ftell(is);
             fgets(buffer, 1003, is);
+
+            if (got_atoms &&
+                buffer[0] == 'T' &&
+                buffer[1] == 'E' &&
+                buffer[2] == 'R'
+               )
+            {
+                break;
+            }
 
             if (buffer[0] == 'A' &&
                 buffer[1] == 'N' &&
@@ -570,6 +580,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                     tmp3let[i] = buffer[17+i];
                 tmp3let[3] = 0;
                 tmp3let[4] = 0;
+                got_atoms = true;
 
                 for (i=0; i<256; i++)
                 {
@@ -2525,10 +2536,6 @@ void Protein::set_region(std::string rgname, int start, int end)
     regions[i].start = start;
     regions[i].end = end;
     regions_from = rgn_manual;
-
-    char buffer[256];
-    sprintf(buffer, "REMARK 650 HELIX %s %d %d\n", rgname.c_str(), start, end);
-    remarks.push_back(buffer);
 }
 
 Region Protein::get_region(const std::string rgname)

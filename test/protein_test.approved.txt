@@ -1,1 +1,15 @@
-AAAAAAAAAA
+Wrote test.pdb
+Wrote test_alpha.pdb
+Are residues alpha helixed?
+NYYYYYYYY
+Wrote test_beta.pdb
+Wrote test_310.pdb
+Are residues 310 helixed?
+NYYYYYYYY
+Wrote test_pi.pdb
+Are residues pi helixed?
+NYYYYYYYY
+Wrote test_ppro2.pdb
+Wrote test_ppro1.pdb
+Wrote test2.sdf
+Read 10 residue(s).

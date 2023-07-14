@@ -184,7 +184,8 @@ protected:
     char pdbchain = ' ';
 };
 
-extern AADef aa_defs[256];		// Indexed by ASCII value of one-letter code.
+extern AADef aa_defs[256];		        // Indexed by ASCII value of one-letter code.
+extern AminoAcid* aa_archetypes[256];    // Ditto.
 extern char* override_aminos_dat;
 extern float aa_sim_xref[65536];
 

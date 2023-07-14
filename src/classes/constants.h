@@ -291,6 +291,8 @@
 // to a less favorable state.
 #define _hisflip_binding_threshold 25
 
+#define hydrogenate_add_missing_heavy_atoms 1
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 // Debugging stuff.

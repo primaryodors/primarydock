@@ -18,6 +18,7 @@ struct AABondDef
 {
     char aname[7];
     char bname[7];
+    int Za = 0, Zb = 0;
     float cardinality=0;
     float acharge=0;
     bool can_rotate=false;
@@ -169,6 +170,7 @@ public:
     int atno_offset=0;
     MetalCoord* m_mcoord=0;
     Atom* coordmtl = nullptr;
+    bool added_heavies = false;
 
 protected:
     void load_aa_defs();
@@ -182,7 +184,8 @@ protected:
     char pdbchain = ' ';
 };
 
-extern AADef aa_defs[256];		// Indexed by ASCII value of one-letter code.
+extern AADef aa_defs[256];		        // Indexed by ASCII value of one-letter code.
+extern AminoAcid* aa_archetypes[256];    // Ditto.
 extern char* override_aminos_dat;
 extern float aa_sim_xref[65536];
 

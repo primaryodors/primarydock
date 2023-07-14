@@ -16,6 +16,7 @@ using namespace std;
 AADef aa_defs[256];
 char* override_aminos_dat=0;
 float aa_sim_xref[65536];
+AminoAcid* aa_archetypes[256];
 
 void AminoAcid::find_his_flips()
 {
@@ -566,6 +567,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                 aabd[n] = new AABondDef();
                 strcpy(aabd[n]->aname, atoms[i]->name);
                 strcpy(aabd[n]->bname, "<C");
+                aabd[n]->Za = atoms[i]->get_Z();
+                aabd[n]->Zb = 6;
                 aabd[n]->cardinality = 1.5;
                 aabd[n]->acharge = 0;
                 aabd[n]->can_rotate = false;
@@ -579,6 +582,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                     aabd[n] = new AABondDef();
                     strcpy(aabd[n]->aname, bb[j]->atom->name);
                     strcpy(aabd[n]->bname, bb[j]->btom->name);
+                    aabd[n]->Za = bb[j]->atom->get_Z();
+                    aabd[n]->Zb = bb[j]->btom->get_Z();
                     aabd[n]->cardinality = bb[j]->cardinality;
                     aabd[n]->acharge = bb[j]->atom->get_charge();
 
@@ -1392,6 +1397,7 @@ void AminoAcid::load_aa_defs()
         bool proline_like = false;
 
         for (i=0; i<65536; i++) aa_sim_xref[i] = -1;
+        for (i=0; i<256; i++) aa_archetypes[i] = nullptr;
 
         while (!feof(pf))
         {
@@ -1988,14 +1994,80 @@ void AminoAcid::hydrogenate(bool steric_only)
     {
         Atom* C = get_atom("C");
         if (!oxt->get_bond_between(C)) oxt->bond_to(C, 1);
+    }    
+    
+    int i, j, k, l, n;
+
+    #if hydrogenate_add_missing_heavy_atoms
+    if (aadef && get_atom("CB"))
+    {
+        for (i=0; aadef->aabonds[i]; i++)
+        {
+            if (aadef->aabonds[i]->Za < 2 || aadef->aabonds[i]->Zb < 2) continue;
+            Atom* a = get_atom(aadef->aabonds[i]->aname);
+            Atom* b = get_atom(aadef->aabonds[i]->bname);
+
+            if (a && a->is_backbone) continue;
+            if (b && b->is_backbone) continue;
+
+            if (!aa_archetypes[aadef->_1let]) aa_archetypes[aadef->_1let] = new AminoAcid(aadef->_1let);
+            AminoAcid* at = aa_archetypes[aadef->_1let];
+            if (!at->get_atom("CB")) continue;
+
+            at->movability = MOV_ALL;
+            at->aamove(get_CA_location().subtract(at->get_CA_location()));
+            Rotation rot = align_points_3d(at->get_atom("CB")->get_location(), get_atom("CB")->get_location(), get_CA_location());
+            LocatedVector lv;
+            lv = rot.v;
+            lv.origin = get_CA_location();
+            at->rotate(lv, rot.a);
+            Atom* c;
+
+            if (!a && !b)
+            {
+                cout << "Warning: amino acid definition " << aadef->name
+                    << " not compatible with hydrogenate_add_missing_heavy_atoms; atoms "
+                    << aadef->aabonds[i]->aname << " and " << aadef->aabonds[i]->bname
+                    << " are out of sequence." << endl;
+            }
+            else if (!a)
+            {
+                a = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Za), aadef->aabonds[i]->aname, b, aadef->aabonds[i]->cardinality );
+                a->residue = b->residue;
+                strcpy(a->aa3let, b->aa3let);
+                a->increment_charge(aadef->aabonds[i]->acharge);
+                c = at->get_atom(aadef->aabonds[i]->aname);
+                if (c) a->move(c->get_location());
+                added_heavies = true;
+            }
+            else if (!b)
+            {
+                b = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Zb), aadef->aabonds[i]->bname, a, aadef->aabonds[i]->cardinality );
+                b->residue = a->residue;
+                strcpy(b->aa3let, a->aa3let);
+                c = at->get_atom(aadef->aabonds[i]->bname);
+                if (c) b->move(c->get_location());
+                added_heavies = true;
+            }
+            else if (!a->is_bonded_to(b))
+            {
+                a->bond_to(b, aadef->aabonds[i]->cardinality);
+            }
+        }
     }
+
+    if (added_heavies)
+    {
+        minimize_internal_clashes();
+    }
+    #endif
+
 
     Molecule::hydrogenate(steric_only);
     int already[128][4];
     Atom* onlyone[128][4];
     const char* alpha = "ABGDEZH";
 
-    int i, j, k, l, n;
     for (i=0; i<24; i++) for (j=0; j<4; j++)
     {
         already[i][j] = 0;

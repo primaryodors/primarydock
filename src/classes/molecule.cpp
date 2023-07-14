@@ -1710,7 +1710,7 @@ Bond** AminoAcid::get_rotatable_bonds()
     for (i=0; i<65536; i++) btemp[i] = nullptr;
     if (aadef && aadef->aabonds)
     {
-        for (i=0; aadef->aabonds[i]; i++)
+        for (i=0; aadef->aabonds[i] && aadef->aabonds[i]->Za && aadef->aabonds[i]->Zb; i++)
         {
             // cout << (name ? name : "(no name)") << "." << *(aadef->aabonds[i]) << endl;
             if (aadef->aabonds[i]->cardinality == 1

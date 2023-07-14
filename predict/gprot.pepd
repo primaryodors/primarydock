@@ -384,6 +384,7 @@ UNCHAIN A
 DOWNLOAD RCSB "8FN1" "pdbs/8fn1.pdb" ONCE
 STRAND A
 LOAD "pdbs/8fn1.pdb" B
+DELETE 87 87 # Otherwise, the partial chain causes coplanarity errors.
 HYDRO
 STRAND R
 LOAD "pdbs/8fn1.pdb" A

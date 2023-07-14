@@ -536,12 +536,22 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
 
     for (i=0; i<65536; i++) pdba[i] = nullptr;
 
+    bool got_atoms = false;
     while (!feof(is))
     {
         try
         {
             int told = ftell(is);
             fgets(buffer, 1003, is);
+
+            if (got_atoms &&
+                buffer[0] == 'T' &&
+                buffer[1] == 'E' &&
+                buffer[2] == 'R'
+               )
+            {
+                break;
+            }
 
             if (buffer[0] == 'A' &&
                 buffer[1] == 'N' &&
@@ -570,6 +580,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                     tmp3let[i] = buffer[17+i];
                 tmp3let[3] = 0;
                 tmp3let[4] = 0;
+                got_atoms = true;
 
                 for (i=0; i<256; i++)
                 {
@@ -1037,7 +1048,7 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
     return retval;
 }
 
-std::vector<AminoAcid*> Protein::get_contact_residues(Protein* op)
+std::vector<AminoAcid*> Protein::get_contact_residues(Protein* op, float cd)
 {
     std::vector<AminoAcid*> retval;
 
@@ -1065,7 +1076,7 @@ std::vector<AminoAcid*> Protein::get_contact_residues(Protein* op)
             {
                 if (dirty[j]) continue;
 
-                float f = a->get_reach() + b->get_reach() + 2.5;
+                float f = a->get_reach() + b->get_reach() + cd;
                 float r = a->get_CA_location().get_3d_distance(b->get_CA_location());
 
                 if (r < f)
@@ -1308,7 +1319,7 @@ Molecule* Protein::metals_as_molecule()
 
 int Protein::search_sequence(const int sr, const int esr, const char* psz, const int threshold, int* psim)
 {
-    int i, j, k = 0, num_eq;
+    int i, j, k = 0, l, num_eq;
     float m = 0, n = 0, sim;
     char aac;
     AminoAcid* aa;
@@ -1316,19 +1327,33 @@ int Protein::search_sequence(const int sr, const int esr, const char* psz, const
     for (i=sr; i<esr; i++)
     {
         m = num_eq = 0;
+        char lc = 0;
+        l = 0;
         for (j=0; psz[j]; j++)
         {
+            if (psz[j] == '^') j++;
             char c = psz[j];
-            aa = get_residue(i+j);
+            aa = get_residue(i+l);
             if (!aa) continue;
             aac = aa->get_letter();
 
-            if (c == 'X') c = aac;
-            if (c == aac) num_eq++;
+            if (lc == '^' && aa->get_residue_no() != get_start_resno()) goto _wrong_place;
+            if (psz[j+1] == '$' && aa->get_residue_no() != get_end_resno()) goto _wrong_place;
 
-            sim = aa->similarity_to(c);
+            if (c == 'X')
+            {
+                m += 1;
+                num_eq++;
+            }
+            else
+            {
+                if (c == aac) num_eq++;
+                sim = aa->similarity_to(c);
+                m += sim;
+            }
 
-            m += sim;
+            lc = c;
+            l++;
         }
 
         if (m > n && num_eq >= threshold)
@@ -1336,6 +1361,9 @@ int Protein::search_sequence(const int sr, const int esr, const char* psz, const
             k = i;
             n = m;
         }
+
+        _wrong_place:
+        ;
     }
     sim = n;
     if (psim) *psim = sim;
@@ -2508,10 +2536,6 @@ void Protein::set_region(std::string rgname, int start, int end)
     regions[i].start = start;
     regions[i].end = end;
     regions_from = rgn_manual;
-
-    char buffer[256];
-    sprintf(buffer, "REMARK 650 HELIX %s %d %d\n", rgname.c_str(), start, end);
-    remarks.push_back(buffer);
 }
 
 Region Protein::get_region(const std::string rgname)
@@ -3409,10 +3433,10 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         helices.push_back(rgn);
     }
 
-    for (i=0; i<20; i++)
+    /*for (i=0; i<20; i++)
     {
         soft_iteration(helices, nullptr);
-    }
+    }*/
 
     mass_undoable = wmu;
 }

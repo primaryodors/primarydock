@@ -519,11 +519,20 @@ to compensate for the longer chain; after deleting the prepended segment, the re
 Example:
 ```
 ROTATE @axis &angle
+ROTATE @axis &angle %center_resno
+ROTATE @axis &angle %start_resno %end_resno
+ROTATE @axis &angle %center_resno %start_resno %end_resno
 ```
 
 Rotates the entire protein about its center, using the first parameter as a _relative_ axis of rotation,
 and the second parameter as the rotation angle in degrees.
 In other words, the first param is added to the protein center to get the true axis of rotation.
+
+If three arguments are given, the third argument defines a residue whose alpha carbon functions as the center of rotation.
+
+If four arguments are given, the third and fourth define the start and end residue number of the segment to apply the rotation to.
+
+Five arguments means axis, angle, center of rotation, start residue, and end residue.
 
 
 # SAVE

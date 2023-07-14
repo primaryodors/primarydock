@@ -50,4 +50,4 @@ hbond
                            +++++=============================+++++                           
                                  +++=====================+++                                 
                                               =                                              
-Binding energy: -26.2229 out of an optimal -23.7664 kJ/mol.
+Binding energy: -23.1706 out of an optimal -21 kJ/mol.

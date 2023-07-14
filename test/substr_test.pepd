@@ -1,0 +1,8 @@
+
+LET $string = "Pepteditor is a scripting language."
+LET %start = 17
+LET $sub = $string.%start
+ECHO $sub
+LET %len = 9
+LET $sub = $string.%start,%len
+ECHO $sub

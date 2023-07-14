@@ -109,18 +109,25 @@ bool download_file(std::string url, std::string destination)
     return file_exists(destination);
 }
 
+#define debug_contact_energy 0
+
 float contact_energy(Protein* a, Protein* b, bool repack = false, int a_from = 0, int a_to = 0, int b_from = 0, int b_to = 0)
 {
-    std::vector<AminoAcid*> vca = a->get_contact_residues(b);
+    std::vector<AminoAcid*> vca = a->get_contact_residues(b, 2);
     float f=0;
 
     char cha = a->get_pdb_chain(), chb = b->get_pdb_chain();
-
     int i, j=0, n = vca.size();
+    int aend = a->get_end_resno(), bend = b->get_end_resno();
+    bool a_dirty[aend+1], b_dirty[bend+1];
+
+    for (i=0; i<=aend; i++) a_dirty[i] = false;
+    for (i=0; i<=bend; i++) b_dirty[i] = false;
 
     Molecule* mols[n+4];
     for (i=0; i<n; i++)
     {
+        if (!vca[i]) continue;
         char c = vca[i]->get_pdb_chain();
         int resno = vca[i]->get_residue_no();
 
@@ -128,23 +135,35 @@ float contact_energy(Protein* a, Protein* b, bool repack = false, int a_from = 0
         {
             if (a_from && (resno < a_from)) continue;
             if (a_to && (resno > a_to)) continue;
+            if (a_dirty[resno]) continue;
+            a_dirty[resno] = true;
         }
         else if (c == chb)
         {
             if (b_from && (resno < b_from)) continue;
             if (b_to && (resno > b_to)) continue;
+            if (b_dirty[resno]) continue;
+            b_dirty[resno] = true;
         }
 
         mols[j++] = (Molecule*)vca[i];
+        #if debug_contact_energy
+        cout << *vca[i] << endl;
+        #endif
     }
     mols[j] = nullptr;
 
     if (repack) Molecule::conform_molecules(mols, 20);
 
-    for (i=0; i<n; i++)
+    for (i=0; mols[i]; i++)
     {
+        if (!mols[i]) continue;
         f -= mols[i]->get_intermol_binding(mols);
     }
+
+    #if debug_contact_energy
+    cout << endl;
+    #endif
 
     return f;
 }
@@ -916,7 +935,7 @@ int main(int argc, char** argv)
                 goto _pc_continue;
             }	// CONNECT
 
-            #define do_ctnrg_iters 0
+            #define do_ctnrg_iters 1
             else if (!strcmp(words[0], "CTNRG"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for CTNRG.");
@@ -927,6 +946,7 @@ int main(int argc, char** argv)
                 char *sa, *sb;
                 SCoord dir(0,0,0);
                 char* outvar = nullptr;
+                float baseline;
 
                 switch (n)
                 {
@@ -969,6 +989,8 @@ int main(int argc, char** argv)
                     raise_error("Too many parameters given for CTNRG.");
                 }
 
+                strands[sa[0]-65]->set_pdb_chain(sa[0]);
+                strands[sb[0]-65]->set_pdb_chain(sb[0]);
                 sa[0] -= 65;
                 sb[0] -= 65;
 
@@ -976,18 +998,22 @@ int main(int argc, char** argv)
                 {
                     float former, latter;
 
-                    former = contact_energy(strands[sa[0]], strands[sb[0]], true, asr, aer, bsr, ber);
-                    dir.r = 2.5;
-                    if (former > 100) dir.r += 0.5;
-                    if (former > 1000) dir.r += 0.5;
-                    if (former > 10000) dir.r += 0.5;
+                    baseline = contact_energy(strands[sa[0]], strands[sb[0]], true, 9999, 9999, bsr, ber);
+                    baseline += contact_energy(strands[sa[0]], strands[sb[0]], true, asr, aer, 9999, 9999);
+                    former = contact_energy(strands[sa[0]], strands[sb[0]], true, asr, aer, bsr, ber) - baseline;
+                    dir.r = 0.1;
+
+                    #if debug_contact_energy
+                    cout << former << endl << flush;
+                    #endif
+
                     for (i=0; i<200; i++)
                     {
                         strands[sb[0]]->move_piece(bsr, ber, dir);
                         #if !do_ctnrg_iters
                         break;
                         #else
-                        latter = contact_energy(strands[sa[0]], strands[sb[0]], false, asr, aer, bsr, ber);
+                        latter = contact_energy(strands[sa[0]], strands[sb[0]], false, asr, aer, bsr, ber) - baseline;
                         #if _dbg_homology
                         cout << latter << " " << dir.r << endl;
                         #endif
@@ -995,15 +1021,14 @@ int main(int argc, char** argv)
                         if (latter > former)
                         {
                             strands[sb[0]]->undo();
-                            dir.r *= -0.8;
+                            dir.r *= 0.5;
                         }
                         else
                         {
                             former = latter;
-                            dir.r *= 1.5;
                         }
 
-                        if (fabs(dir.r) < 0.01)
+                        if (latter < 100 || fabs(dir.r) < 0.01)
                         {
                             #if _dbg_homology
                             cout << "Got it in " << i << endl;
@@ -1015,10 +1040,9 @@ int main(int argc, char** argv)
                 }
 
                 Star s;
-                s.f = contact_energy(strands[sa[0]], strands[sb[0]], true, asr, aer, bsr, ber);
+                s.f = contact_energy(strands[sa[0]], strands[sb[0]], true, asr, aer, bsr, ber) - baseline;
 
                 set_variable(outvar, s);
-                cout << endl;
             }   // CTNRG
 
             else if (!strcmp(words[0], "DELETE"))
@@ -2159,16 +2183,34 @@ int main(int argc, char** argv)
 
             else if (!strcmp(words[0], "ROTATE"))
             {
+                int sr = working->get_start_resno(), er = working->get_end_resno(), piv = 0;
+
 				if (!words[1]) raise_error("Insufficient parameters given for ROTATE.");
                 SCoord axis = interpret_single_point(words[1]);
 				if (!words[2]) raise_error("Insufficient parameters given for ROTATE.");
                 float theta = interpret_single_float(words[2]) * fiftyseventh;
-                if (words[3]) raise_error("Too many parameters given for ROTATE.");
+                if (words[3])
+                {
+                    piv = interpret_single_int(words[3]);
+                    if (words[4] && !words[5])
+                    {
+                        piv = 0;
+                        sr = interpret_single_int(words[3]);
+                        er = interpret_single_int(words[4]);
+                    }
+                    else if (words[4] && words[5])
+                    {
+                        sr = interpret_single_int(words[4]);
+                        er = interpret_single_int(words[5]);
+                        if (words[6]) raise_error("Too many parameters given for ROTATE.");
+                    }
+                }
 
                 LocatedVector lv = axis;
-                cout << "Axis is " << (Point)axis << endl;
-                int sr = working->get_start_resno(), er = working->get_end_resno();
-                lv.origin = working->get_region_center(sr, er);
+                AminoAcid* aapiv = nullptr;
+                if (piv) aapiv = working->get_residue(piv);
+                if (aapiv) lv.origin = aapiv->get_CA_location();
+                else lv.origin = working->get_region_center(sr, er);
 
                 for (i=sr; i<=er; i++)
                 {

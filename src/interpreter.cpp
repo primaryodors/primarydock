@@ -2184,16 +2184,35 @@ int main(int argc, char** argv)
 
             else if (!strcmp(words[0], "ROTATE"))
             {
+                int sr = working->get_start_resno(), er = working->get_end_resno(), piv = 0;
+
 				if (!words[1]) raise_error("Insufficient parameters given for ROTATE.");
                 SCoord axis = interpret_single_point(words[1]);
 				if (!words[2]) raise_error("Insufficient parameters given for ROTATE.");
                 float theta = interpret_single_float(words[2]) * fiftyseventh;
-                if (words[3]) raise_error("Too many parameters given for ROTATE.");
+                if (words[3])
+                {
+                    piv = interpret_single_int(words[3]);
+                    if (words[4] && !words[5])
+                    {
+                        piv = 0;
+                        sr = interpret_single_int(words[3]);
+                        er = interpret_single_int(words[4]);
+                    }
+                    else if (words[4] && words[5])
+                    {
+                        sr = interpret_single_int(words[4]);
+                        er = interpret_single_int(words[5]);
+                        if (words[6]) raise_error("Too many parameters given for ROTATE.");
+                    }
+                }
 
                 LocatedVector lv = axis;
                 cout << "Axis is " << (Point)axis << endl;
-                int sr = working->get_start_resno(), er = working->get_end_resno();
-                lv.origin = working->get_region_center(sr, er);
+                AminoAcid* aapiv = nullptr;
+                if (piv) aapiv = working->get_residue(piv);
+                if (aapiv) lv.origin = aapiv->get_CA_location();
+                else lv.origin = working->get_region_center(sr, er);
 
                 for (i=sr; i<=er; i++)
                 {

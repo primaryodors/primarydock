@@ -1988,14 +1988,58 @@ void AminoAcid::hydrogenate(bool steric_only)
     {
         Atom* C = get_atom("C");
         if (!oxt->get_bond_between(C)) oxt->bond_to(C, 1);
+    }    
+    
+    int i, j, k, l, n;
+
+    #if hydrogenate_add_missing_heavy_atoms
+    if (aadef)
+    {
+        for (i=0; aadef->aabonds[i]; i++)
+        {
+            if (aadef->aabonds[i]->Za < 2 || aadef->aabonds[i]->Zb < 2) continue;
+            Atom* a = get_atom(aadef->aabonds[i]->aname);
+            Atom* b = get_atom(aadef->aabonds[i]->bname);
+
+            if (a && a->is_backbone) continue;
+            if (b && b->is_backbone) continue;
+
+            if (!a && !b)
+            {
+                cout << "Warning: amino acid definition " << aadef->name
+                    << " not compatible with hydrogenate_add_missing_heavy_atoms; atoms "
+                    << aadef->aabonds[i]->aname << " and " << aadef->aabonds[i]->bname
+                    << " are out of sequence." << endl;
+            }
+            else if (!a)
+            {
+                a = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Za), aadef->aabonds[i]->aname, b, aadef->aabonds[i]->cardinality );
+                a->residue = b->residue;
+                strcpy(a->aa3let, b->aa3let);
+                added_heavies = true;
+            }
+            else if (!b)
+            {
+                b = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Zb), aadef->aabonds[i]->bname, a, aadef->aabonds[i]->cardinality );
+                b->residue = a->residue;
+                strcpy(b->aa3let, a->aa3let);
+                added_heavies = true;
+            }
+        }
     }
+
+    if (added_heavies)
+    {
+        minimize_internal_clashes();
+    }
+    #endif
+
 
     Molecule::hydrogenate(steric_only);
     int already[128][4];
     Atom* onlyone[128][4];
     const char* alpha = "ABGDEZH";
 
-    int i, j, k, l, n;
     for (i=0; i<24; i++) for (j=0; j<4; j++)
     {
         already[i][j] = 0;

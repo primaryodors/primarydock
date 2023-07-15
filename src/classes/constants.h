@@ -14,7 +14,7 @@
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
 #define vdw_clash_allowance 1.0
-#define oxytocin 0.007
+#define oxytocin 0.003
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -72,7 +72,7 @@
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
-#define speed_limit 0.333
+#define speed_limit 0.666
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -113,7 +113,7 @@
 #define polar_repulsion 35.0
 #define charge_repulsion 60.0
 
-#define lmpush 0.0005
+#define lmpush 0.001
 
 #define priority_weight_group 4
 

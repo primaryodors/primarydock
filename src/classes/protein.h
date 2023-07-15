@@ -38,6 +38,22 @@ class Protein
 public:
     // Constructors.
     Protein(const char* name);
+    ~Protein()
+    {
+        connections.clear();
+
+        /*int i, n = remarksz;
+        for (i=0; i<n; i++)
+        {
+            Star s;
+            s.cpsz = remarks[i];
+            cout << hex << s.n << dec << " " << remarks[i];
+        }*/
+
+        delete[] remarks;
+        remarksz = 0;
+        delete[] ca;
+    }
 
     // Build functions.
     bool add_residue(const int resno, const char aaletter);
@@ -78,8 +94,9 @@ public:
         return std::string(name);
     }
     Point get_atom_location(int resno, const char* aname);
-    std::vector<std::string> get_remarks(std::string search_for = "");
+    void add_remark(const char* remark);
     void add_remark(std::string new_remark);
+    std::vector<std::string> get_remarks(std::string search_for = "");
     int get_bw50(int helixno);
     int search_sequence(const int start_resno, const int end_resno, const char* search_for, const int threshold = -1, int* similarity = nullptr);
 
@@ -173,7 +190,8 @@ protected:
     float initial_int_clashes = 0;
     Region regions[PROT_MAX_RGN];
     region_source regions_from = rgn_none;
-    std::vector<string> remarks;
+    char** remarks = nullptr;
+    int remarksz = 0;
     MetalCoord** m_mcoord = nullptr;
     std::vector<int> Ballesteros_Weinstein;
     std::vector<AABridge> aabridges;

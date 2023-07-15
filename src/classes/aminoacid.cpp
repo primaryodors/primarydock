@@ -1170,7 +1170,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     if (!aaa)
                     {
                         fseek(is, lasttell, SEEK_SET);
-                        // delete[] words;
+                        // delete words;
                         goto _return_added;
                         //throw ATOM_NOT_OF_AMINO_ACID;
                     }
@@ -1286,11 +1286,11 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                 else
                 {
                     fseek(is, lasttell, SEEK_SET);
-                    //if (words) delete[] words;
+                    //if (words) delete words;
                     goto _return_added;
                 }
 
-                //if (words) delete[] words;
+                //if (words) delete words;
             }
             else goto _return_added;
         }
@@ -1301,7 +1301,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
         }
         buffer[0] = 0;
 
-        //if (words) delete[] words;
+        //if (words) delete words;
     }
 
 _return_added:
@@ -1479,7 +1479,7 @@ void AminoAcid::load_aa_defs()
                     if (lastwords[i] != words[i]) strcpy(lastwords[i], words[i]);
                 }
 
-                delete[] words;
+                delete words;
             }
             buffer[0] = 0;
         }

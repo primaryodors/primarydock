@@ -116,7 +116,6 @@ process_dock("");
 
 
 
-// Golf a.k.a. hGNAL
 foreach (["hGNAL", "hGNAS2", "hGNAQ", "hGNAO1"] as $gpid)
 {
     $pdbfname = str_replace("pdbs/", "pdbs/coupled/", $opdbname);

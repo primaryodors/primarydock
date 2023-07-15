@@ -42,17 +42,9 @@ public:
     {
         connections.clear();
 
-        /*int i, n = remarksz;
-        for (i=0; i<n; i++)
-        {
-            Star s;
-            s.cpsz = remarks[i];
-            cout << hex << s.n << dec << " " << remarks[i];
-        }*/
-
         delete[] remarks;
         remarksz = 0;
-        delete[] ca;
+        delete ca;
     }
 
     // Build functions.

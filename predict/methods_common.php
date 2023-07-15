@@ -225,18 +225,45 @@ function process_dock($metrics_prefix = "", $noclobber = false)
         $outdata = @$dock_results[$protid][$ligname] ?: [];
     }
     else $outdata = [];
-    
+
+    $weight = [];
+    $pose_node_has_weight = [];
+
     foreach ($outlines as $ln)
     {
-        // echo "$ln\n";
-        
-        $coldiv = explode(":", $ln);
-
-        /*if ($pose > 0 && $node >= 0)
+        if (trim($ln) == "TER")
         {
-            if (!isset($pnlines[$pose][$node])) $pnlines[$pose][$node] = [];
-            $pnlines[$pose][$node][] = $ln;
-        }*/
+            $pose = false;
+            $node = -1;
+            continue;
+        }
+
+        if (count($coldiv) == 2)
+        {
+            if ($coldiv[0] == "Pose")
+            {
+                $pose = intval($coldiv[1]);
+                $node = -1;
+                continue;
+            }
+            else if ($coldiv[0] == "Node")
+            {
+                $node = intval($coldiv[1]);
+                $pose_node_has_weight[$pose][$node] = false;
+                continue;
+            }
+            else if ($coldiv[0] == 'BENERG' && !$node)
+            {
+                $e = floatval($coldiv[1]);
+                if ($e < 1) $e = 1.0 / abs(log($e));
+                $weight[$pose] = $e;
+            }
+        }
+    }
+    
+    foreach ($outlines as $ln)
+    {        
+        $coldiv = explode(":", $ln);
         
         if (trim($ln) == "TER")
         {
@@ -273,9 +300,13 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                     {
                         $wmode = str_replace(".rgn", ".$region", $metrics_to_process["$mode.rgn"]);
                         if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
-                        $outdata[$wmode] += floatval($coldiv[1]);
-                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
-                        else $outdqty[$wmode]++;
+                        $outdata[$wmode] += floatval($coldiv[1]) * $weight[$pose];
+                        if (!@$pose_node_has_weight[$pose][$node])
+                        {
+                            if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
+                            else $outdqty[$wmode] += $weight[$pose];
+                            $pose_node_has_weight[$pose][$node] = true;
+                        }
                     }
                     continue;
                 }
@@ -285,9 +316,9 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                     {
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
-                        $outdata[$wmode] += floatval($coldiv[1]);
-                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
-                        else $outdqty[$wmode]++;
+                        $outdata[$wmode] += floatval($coldiv[1]) * $weight[$pose];
+                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
+                        else $outdqty[$wmode] += $weight[$pose];
                     }
                     continue;
                 }
@@ -298,9 +329,9 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                     {
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
-                        $outdata[$wmode] += floatval($coldiv[1]);
-                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
-                        else $outdqty[$wmode]++;
+                        $outdata[$wmode] += floatval($coldiv[1]) * $weight[$pose];
+                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
+                        else $outdqty[$wmode] += $weight[$pose];
                     }
                     continue;
                 }
@@ -311,9 +342,9 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                     {
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
-                        $outdata[$wmode] += floatval($coldiv[1]);
-                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
-                        else $outdqty[$wmode]++;
+                        $outdata[$wmode] += floatval($coldiv[1]) * $weight[$pose];
+                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
+                        else $outdqty[$wmode] += $weight[$pose];
                     }
                     continue;
                 }
@@ -325,9 +356,9 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                     {
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
-                        $outdata[$wmode] += floatval($coldiv[1]);
-                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
-                        else $outdqty[$wmode]++;
+                        $outdata[$wmode] += floatval($coldiv[1]) * $weight[$pose];
+                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
+                        else $outdqty[$wmode] += $weight[$pose];
                     }
                     continue;
                 }
@@ -372,10 +403,10 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                     $wmode = str_replace(".rgn", ".$region", $metrics_to_process["CALOC.rgn"]);
 
                     if (!isset($outdata[$wmode])) $outdata[$wmode] = [0,0,0];
-                    for ($x=0; $x<3; $x++) $outdata[$wmode][$x] += floatval(substr($ln, 29+8*x, 8));
+                    for ($x=0; $x<3; $x++) $outdata[$wmode][$x] += floatval(substr($ln, 29+8*x, 8)) * $weight[$pose];
 
-                    if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
-                    else $outdqty[$wmode]++;
+                    if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
+                    else $outdqty[$wmode] += $weight[$pose];
                 }
                 break;
     

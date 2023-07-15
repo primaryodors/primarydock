@@ -130,6 +130,10 @@ LET %540 = %539 + 1
 LET %544 = %540 + 4
 BRIDGE %540 %544
 
+LET %543 = %540 + 3
+LET %547 = %540 + 7
+BRIDGE %543 %547
+
 ATOMTO %659 $atom @target
 
 LET %651 = %A.6.50 + 1

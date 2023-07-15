@@ -14,7 +14,7 @@ $dock_metals = false;
 
 // Internal variables
 $elima =  5;
-$elimi = 20;
+$elimi = 25;
 
 chdir(__DIR__);
 require("methods_common.php");
@@ -95,7 +95,7 @@ SIZE 7.0 7.0 7.0
 EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH TS
-POSE 10
+POSE 4
 ELIM $elimi
 
 FLEX 1

@@ -231,6 +231,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     foreach ($outlines as $ln)
     {
+        $coldiv = explode(":", $ln);
+
         if (trim($ln) == "TER")
         {
             $pose = false;
@@ -252,19 +254,20 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                 $pose_node_has_weight[$pose][$node] = false;
                 continue;
             }
-            else if ($coldiv[0] == 'BENERG' && !$node)
+            else if ($coldiv[0] == 'Total' && !$node)
             {
-                $e = floatval($coldiv[1]);
-                if ($e < 1) $e = 1.0 / abs(log($e));
+                $e = -floatval($coldiv[1]);
+                if ($e < 1) $e = 1.0 / abs(log(abs($e)));
                 $weight[$pose] = $e;
+                echo "Weight[$pose] = $e\n";
             }
         }
     }
     
     foreach ($outlines as $ln)
-    {        
+    {
         $coldiv = explode(":", $ln);
-        
+
         if (trim($ln) == "TER")
         {
             $pose = false;
@@ -316,9 +319,9 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                     {
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
-                        $outdata[$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
-                        else $outdqty[$wmode] += $weight[$pose];
+                        $outdata[$wmode] += floatval($coldiv[1]);
+                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
+                        else $outdqty[$wmode]++;
                     }
                     continue;
                 }

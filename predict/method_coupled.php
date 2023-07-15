@@ -147,14 +147,14 @@ SIZE 7.0 7.0 7.0
 EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH TS
-POSE 10
+POSE 4
 ELIM $elima
 
 FLEX 1
 # H2O 15
 WET
 
-ITERS 50
+ITERS 40
 
 OUT $outfname
 ECHO

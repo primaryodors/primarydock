@@ -614,13 +614,6 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
             case ionic:
             c = atoms[i]->get_charge();
             if (c) result += c;
-            else
-            {
-                if (atoms[i]->get_family() == PNICTOGEN && !atoms[i]->is_amide())
-                {
-                    result += 0.5;
-                }
-            }
             break;
 
             case hbond:
@@ -1496,8 +1489,8 @@ void Molecule::identify_acidbase()
                     float arity = c->is_bonded_to(bto);
                     if (arity >= 1.5)
                     {
-                        atoms[i]->increment_charge(0.25);
-                        bto->increment_charge(-0.25);
+                        atoms[i]->increment_charge(amide_zwitterionic_amount);
+                        bto->increment_charge(-amide_zwitterionic_amount);
                     }
                     goto _not_basic;
                 }

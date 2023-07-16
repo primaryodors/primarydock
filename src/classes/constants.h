@@ -115,6 +115,8 @@
 
 #define lmpush 0.0015
 
+#define amide_zwitterionic_amount 0.1
+
 #define priority_weight_group 4
 
 #define _enhanced_pi_stacking 0

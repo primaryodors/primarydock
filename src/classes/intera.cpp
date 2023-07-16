@@ -476,8 +476,8 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                 break;
 
             case hbond:
-                if (a->get_family() == PNICTOGEN && (a->is_backbone || a->is_amide())) break;
-                if (b->get_family() == PNICTOGEN && (b->is_backbone || b->is_amide())) break;
+                // if (a->get_family() == PNICTOGEN && (a->is_backbone || a->is_amide())) break;
+                // if (b->get_family() == PNICTOGEN && (b->is_backbone || b->is_amide())) break;
                 retval[j++] = look[i];
                 break;
 
@@ -622,7 +622,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (ab->btom && ab->btom->get_Z() > 1) aheavy = ab->btom;
     }
     // TODO: Increase this value if multiple negative charges are nearby; decrease if positive nearby.
-    if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !isnan(aheavy->pK)) // || (a->get_Z() == 1 && a->is_bonded_to(PNICTOGEN) )))
+    if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !aheavy->is_amide() && !isnan(aheavy->pK)) // || (a->get_Z() == 1 && a->is_bonded_to(PNICTOGEN) )))
     {
         achg = protonation(aheavy->pK) * fabs(bchg) / pow(fabs(r-1.5)+1, 2);
         /* if (a->residue == 243) cout << "Partial protonation for " << a->residue << ":" << a->name
@@ -636,7 +636,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (tmpb) delete[] tmpb;
     }
     // if (!bchg && achg < 0 && (b->get_family() == PNICTOGEN || (b->get_Z() == 1 && b->is_bonded_to(PNICTOGEN) )))
-    if (!bchg && achg < 0 && bheavy->get_family() == PNICTOGEN && !isnan(bheavy->pK))
+    if (!bchg && achg < 0 && bheavy->get_family() == PNICTOGEN && !bheavy->is_amide() && !isnan(bheavy->pK))
     {
         bchg = protonation(bheavy->pK) * fabs(achg) / pow(fabs(r-1.5)+1, 2);
         /* if (b->residue == 243) cout << "Partial protonation for " << b->residue << ":" << b->name
@@ -702,7 +702,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (forces[i]->type == ionic) goto _has_ionic_already;
         }
 
-    if (!atoms_are_bonded && sgn(achg) == -sgn(bchg)) kJmol += 60.0 * fabs(achg)*fabs(bchg) / pow(r/2, 2);
+    if (!atoms_are_bonded && sgn(achg) == -sgn(bchg)) kJmol += 60.0 * fabs(achg)*fabs(bchg) / pow(r/((avdW+bvdW)*0.6), 2);
     #endif
 
     _has_ionic_already:

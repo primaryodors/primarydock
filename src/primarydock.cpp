@@ -333,9 +333,10 @@ void iteration_callback(int iter, Molecule** mols)
         f += lf;
 
         if (flex
-            && (lf < 5 || lf < 0.1 * ptnl)
+            && iter < 5
+            && (lf < 10 || lf < 0.1 * ptnl)
             && mols[l]->movability == MOV_FLXDESEL
-            && frand(0,1) < 0.2
+            && frand(0,1) < 0.05
             )
         {
             mols[l]->movability = MOV_FORCEFLEX;

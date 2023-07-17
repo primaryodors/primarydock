@@ -345,6 +345,7 @@
 #define _dbg_Huckel 0
 #define _dbg_259 0
 #define _dbg_bb_realign 0
+#define _dbg_mol_flexion 0
 
 #endif
 

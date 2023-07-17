@@ -2982,6 +2982,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
             #if allow_bond_rots
             pib.copy_state(a);
+            #if _dbg_mol_flexion
+            cout << a->name << " movability " << hex << a->movability << dec << endl << flush;
+            #endif
             if ((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN))
             {
                 Bond** bb = a->get_rotatable_bonds();

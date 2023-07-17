@@ -258,7 +258,6 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                 $e = -floatval($coldiv[1]);
                 if ($e < 1) $e = 1.0 / abs(log(abs($e)));
                 $weight[$pose] = $e;
-                echo "Weight[$pose] = $e\n";
             }
         }
     }

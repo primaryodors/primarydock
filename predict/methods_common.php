@@ -251,7 +251,6 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             else if ($coldiv[0] == "Node")
             {
                 $node = intval($coldiv[1]);
-                $pose_node_has_weight[$pose][$node] = false;
                 continue;
             }
             else if ($coldiv[0] == 'Total' && !$node)
@@ -304,11 +303,11 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                         $wmode = str_replace(".rgn", ".$region", $metrics_to_process["$mode.rgn"]);
                         if (!isset($outdata[$wmode])) $outdata[$wmode] = 0.0;
                         $outdata[$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                        if (!@$pose_node_has_weight[$pose][$node])
+                        if (!@$pose_node_has_weight[$wmode][$pose][$node])
                         {
                             if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
                             else $outdqty[$wmode] += $weight[$pose];
-                            $pose_node_has_weight[$pose][$node] = true;
+                            $pose_node_has_weight[$wmode][$pose][$node] = true;
                         }
                     }
                     continue;

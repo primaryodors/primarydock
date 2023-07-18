@@ -109,7 +109,7 @@
 #define POLYPRO1_OMEGA fiftyseventh*113
 
 // Warning - increasing these constants significantly above the original 35.0, 60.0 values
-// will cause docking fails in the Big Three tests.
+// will cause docking fails in the unit tests.
 #define polar_repulsion 15.0
 #define charge_repulsion 10.0
 

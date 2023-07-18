@@ -116,8 +116,6 @@ IF $659 = "R" LET $atom = "CZ"
 ELSE IF $659 = "K" LET $atom = "NZ"
 ELSE GOTO not_KR659
 
-# ECHO $659
-
 LET %539 = %A.5.50 - 11
 LET %4552 = %A.45.50 + 2
 

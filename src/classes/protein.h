@@ -38,14 +38,7 @@ class Protein
 public:
     // Constructors.
     Protein(const char* name);
-    ~Protein()
-    {
-        connections.clear();
-
-        delete[] remarks;
-        remarksz = 0;
-        delete ca;
-    }
+    ~Protein();
 
     // Build functions.
     bool add_residue(const int resno, const char aaletter);

@@ -19,13 +19,20 @@ Protein::Protein(const char* lname)
     name = lname;
     aaptrmin.n = aaptrmax.n = 0;
 
-    // remarks.clear();
-
     residues = nullptr;
     sequence = nullptr;
     ca = nullptr;
     res_reach = nullptr;
     metals = nullptr;
+}
+
+Protein::~Protein()
+{
+    connections.clear();
+
+    delete[] remarks;
+    remarksz = 0;
+    delete ca;
 }
 
 bool Protein::add_residue(const int resno, const char aaletter)

@@ -476,8 +476,6 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                 break;
 
             case hbond:
-                // if (a->get_family() == PNICTOGEN && (a->is_backbone || a->is_amide())) break;
-                // if (b->get_family() == PNICTOGEN && (b->is_backbone || b->is_amide())) break;
                 retval[j++] = look[i];
                 break;
 
@@ -615,18 +613,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     Atom* aheavy = a;
     if (aheavy->get_Z() == 1)
     {
-        /*Bond** tmpb = a->get_bonds();
-        if (tmpb && tmpb[0] && tmpb[0]->btom) aheavy = tmpb[0]->btom;
-        if (tmpb) delete[] tmpb;*/
         Bond* ab = a->get_bond_by_idx(0);
         if (ab->btom && ab->btom->get_Z() > 1) aheavy = ab->btom;
     }
     // TODO: Increase this value if multiple negative charges are nearby; decrease if positive nearby.
-    if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !aheavy->is_amide() && !isnan(aheavy->pK)) // || (a->get_Z() == 1 && a->is_bonded_to(PNICTOGEN) )))
+    if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !aheavy->is_amide() && !isnan(aheavy->pK))
     {
         achg = protonation(aheavy->pK) * fabs(bchg) / pow(fabs(r-1.5)+1, 2);
-        /* if (a->residue == 243) cout << "Partial protonation for " << a->residue << ":" << a->name
-            << " due to proximity of " << b->residue << ":" << b->name << endl; */
     }
     Atom* bheavy = b;
     if (bheavy->get_Z() == 1)
@@ -635,12 +628,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (tmpb && tmpb[0] && tmpb[0]->btom) bheavy = tmpb[0]->btom;
         if (tmpb) delete[] tmpb;
     }
-    // if (!bchg && achg < 0 && (b->get_family() == PNICTOGEN || (b->get_Z() == 1 && b->is_bonded_to(PNICTOGEN) )))
+
     if (!bchg && achg < 0 && bheavy->get_family() == PNICTOGEN && !bheavy->is_amide() && !isnan(bheavy->pK))
     {
         bchg = protonation(bheavy->pK) * fabs(achg) / pow(fabs(r-1.5)+1, 2);
-        /* if (b->residue == 243) cout << "Partial protonation for " << b->residue << ":" << b->name
-            << " due to proximity of " << a->residue << ":" << a->name << endl; */
     }
     #endif
 

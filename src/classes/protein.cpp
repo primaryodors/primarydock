@@ -2966,308 +2966,80 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
     // Get the average location delta for all CA atoms in the TM helices. Match them by BW number.
     // Include only BW numbers that are inside a TMR for both proteins.
-    int hxno, resno1, resno2;
+    int hxno, resno, resno_tgt, resno_ref;
     char buffer[256];
     Point xform_delta(0,0,0), center(0,0,0);
     int count = 0;
 
-    std::vector<int> resnos1, resnos2;
-
     for (hxno = 1; hxno <= 7; hxno++)
     {
         sprintf(buffer, "TMR%d", hxno);
-        int rgend1 = get_region_end(buffer);
-        int rgstart2 = target->get_region_start(buffer);
-        int rgend2 = target->get_region_end(buffer);
-        int bw50a = get_bw50(hxno), bw50b = target->get_bw50(hxno);
-        for (resno1 = get_region_start(buffer); resno1 <= rgend1; resno1++)
+        int rgstart = get_region_start(buffer);
+        int rgend = get_region_end(buffer);
+        int rgstart_tgt = target->get_region_start(buffer);
+        int rgend_tgt = target->get_region_end(buffer);
+        int rgstart_ref = reference->get_region_start(buffer);
+        int rgend_ref = reference->get_region_end(buffer);
+        int bw50 = get_bw50(hxno), bw50_tgt = target->get_bw50(hxno), bw50_ref = reference->get_bw50(hxno);
+        for (resno = rgstart; resno <= rgend; resno++)
         {
-            int i = resno1 - bw50a;
-            resno2 = bw50b + i;
-            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            int i = resno - bw50;
+            resno_tgt = bw50_tgt + i;
+            resno_ref = bw50_ref + i;
+            if (resno_tgt >= rgstart_tgt && resno_tgt <= rgend_tgt)
             {
-                Point caloc = get_atom_location(resno1, "CA");
-                Point ptdiff = caloc.subtract(target->get_atom_location(resno2, "CA"));
-                xform_delta = xform_delta.add(ptdiff);
-                center = center.add(caloc);
-                count++;
+                Point caloc = get_atom_location(resno, "CA");
+                Point caloc_tgt = target->get_atom_location(resno_tgt, "CA");
+                Point caloc_ref;
 
-                resnos1.push_back(resno1);
-                resnos2.push_back(resno2);
-            }
-        }
-    }
-    if (count)
-    {
-        xform_delta.scale(xform_delta.magnitude() / count);
-        center.scale(center.magnitude() / count);
-    }
+                SCoord transform;
 
-    // Transform the target to bring its TM center to coincide with that of the current protein.
-    SCoord move_amt = xform_delta;
-    target->move_piece(1, 9999, move_amt);
-
-    // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
-    // the TM CA atoms as closely as possible.
-    int i;
-    float theta = 0;
-    Point axis(0,1,0);
-    count = 0;
-    for (i=0; i<resnos1.size(); i++)
-    {
-        resno1 = resnos1[i];
-        resno2 = resnos2[i];
-        Point pt1 = get_atom_location(resno1, "CA"), pt2 = target->get_atom_location(resno2, "CA");
-        pt1.y = pt2.y = 0;
-        Rotation rot = align_points_3d(pt2, pt1, center);
-        Point rotv = rot.v;
-        if (rotv.y < 0) theta -= rot.a;
-        else theta += rot.a;
-        count++;
-    }
-
-    if (count) theta /= count;
-
-    // Perform the rotation.
-    target->rotate_piece(1, 9999, center, axis, theta);
-    #if _dbg_homology
-    cout << "Rotated about Y axis " << theta*fiftyseven << "deg." << endl;
-    #endif
-
-    if (reference != this)
-    {
-        count = 0;
-        xform_delta = center = Point(0,0,0);
-        resnos1.clear();
-        resnos2.clear();
-
-        for (hxno = 1; hxno <= 7; hxno++)
-        {
-            sprintf(buffer, "TMR%d", hxno);
-            int rgend1 = get_region_end(buffer);
-            int rgstart2 = reference->get_region_start(buffer);
-            int rgend2 = reference->get_region_end(buffer);
-            int bw50a = get_bw50(hxno), bw50b = reference->get_bw50(hxno);
-            for (resno1 = get_region_start(buffer); resno1 <= rgend1; resno1++)
-            {
-                int i = resno1 - bw50a;
-                resno2 = bw50b + i;
-                if (resno2 >= rgstart2 && resno2 <= rgend2)
+                if (resno_ref >= rgstart_ref && resno_ref <= rgend_ref)
                 {
-                    Point caloc = get_atom_location(resno1, "CA");
-                    Point ptdiff = caloc.subtract(reference->get_atom_location(resno2, "CA"));
-                    xform_delta = xform_delta.add(ptdiff);
-                    center = center.add(caloc);
-                    count++;
-
-                    resnos1.push_back(resno1);
-                    resnos2.push_back(resno2);
+                    caloc_ref = reference->get_atom_location(resno_ref, "CA");
+                    transform = caloc_tgt.subtract(caloc_ref);
                 }
+                else
+                {
+                    transform = caloc_tgt.subtract(caloc);
+                }
+
+                AminoAcid* aa = get_residue(resno);
+                if (!aa) continue;
+                aa->movability = MOV_ALL;
+                aa->aamove(transform);
+
+                Point cbloc, cbloc_tgt, cbloc_ref;
+                Rotation rotation;
+                aa = get_residue(resno);
+                if (aa->is_glycine()) continue;
+                caloc = get_atom_location(resno, "CA");
+                cbloc = get_atom_location(resno, "CB");
+
+                aa = target->get_residue(resno_tgt);
+                if (!aa || aa->is_glycine()) continue;
+                cbloc_tgt = target->get_atom_location(resno_tgt, "CB");
+
+                aa = reference->get_residue(resno_ref);
+                if (aa && !aa->is_glycine())
+                {
+                    cbloc_ref = reference->get_atom_location(resno_ref, "CB");
+
+                    rotation = align_points_3d(cbloc_ref.subtract(caloc_ref), cbloc_tgt.subtract(caloc_tgt), Point(0,0,0));
+                }
+                else
+                {
+                    rotation = align_points_3d(cbloc.subtract(caloc), cbloc_tgt.subtract(caloc_tgt), Point(0,0,0));
+                }
+
+                LocatedVector located = rotation.v;
+                located.origin = caloc;
+                aa->rotate(located, rotation.a);
             }
         }
-        if (count)
-        {
-            xform_delta.scale(xform_delta.magnitude() / count);
-            center.scale(center.magnitude() / count);
-        }
-
-        move_amt = xform_delta;
-        reference->move_piece(1, 9999, move_amt);
-
-        // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
-        // the TM CA atoms as closely as possible.
-        int i;
-        float theta = 0;
-        Point axis(0,1,0);
-        count = 0;
-        for (i=0; i<resnos1.size(); i++)
-        {
-            resno1 = resnos1[i];
-            resno2 = resnos2[i];
-            Point pt1 = get_atom_location(resno1, "CA"), pt2 = reference->get_atom_location(resno2, "CA");
-            pt1.y = pt2.y = 0;
-            Rotation rot = align_points_3d(pt2, pt1, center);
-            Point rotv = rot.v;
-            if (rotv.y < 0) theta -= rot.a;
-            else theta += rot.a;
-            count++;
-        }
-
-        if (count) theta /= count;
-
-        // Perform the rotation.
-        reference->rotate_piece(1, 9999, center, axis, theta);
     }
 
-    // Find the rotations and transformations for each TM region to bring its CA atoms as close as
-    // possible to those of the target.
-    for (hxno = 1; hxno <= 7; hxno++)
-    {
-        sprintf(buffer, "TMR%d", hxno);
-        int rgstart0 = get_region_start(buffer);
-        int rgend0 = get_region_end(buffer);
-        int rgstart1 = reference->get_region_start(buffer);
-        int rgend1 = reference->get_region_end(buffer);
-        int rgstart2 = target->get_region_start(buffer);
-        int rgend2 = target->get_region_end(buffer);
-        #if _dbg_homology
-        cout << "Region " << hxno << " target " << rgstart2 << "-" << rgend2 << ", reference " << rgstart1 << "-" << rgend1 << endl;
-        #endif
-        int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
-        Point rcen1(0,0,0);
-        Point rcen2(0,0,0);
-        count = 0;
-        for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
-        {
-            int i = resno1 - bw50a;
-            resno2 = bw50b + i;
-            if (resno2 >= rgstart2 && resno2 <= rgend2)
-            {
-                rcen1 = rcen1.add(reference->get_atom_location(resno1, "CA"));
-                rcen2 = rcen2.add(target->get_atom_location(resno2, "CA"));
-                count++;
-            }
-        }
-
-        if (count)
-        {
-            rcen1.scale(rcen1.magnitude()/count);
-            rcen2.scale(rcen2.magnitude()/count);
-        }
-
-        // Perform the TM region transformation.
-        Point transformation = rcen2.subtract(rcen1);
-        move_piece(rgstart0, rgend0, (SCoord)transformation);
-        #if _dbg_homology
-        cout << "Region " << hxno << " (" << rgstart0 << "-" << rgend0 << ")" << " transformed by " << transformation.magnitude() << "A" << endl;
-        #endif
-
-        Point axis(0,0,0);
-        Point rcen = get_region_center(rgstart2, rgend2);
-        float theta = 0;
-        count = 0;
-        for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
-        {
-            int i = resno1 - bw50a;
-            resno2 = bw50b + i;
-            if (resno2 >= rgstart2 && resno2 <= rgend2)
-            {
-                Point caloc1 = reference->get_atom_location(resno1, "CA"),
-                      caloc2 = target->get_atom_location(resno2, "CA");
-                Rotation rot = align_points_3d(caloc1, caloc2, rcen);
-
-                axis = axis.add(rot.v);
-                theta += rot.a;
-                count++;
-            }
-        }
-
-        if (count)
-        {
-            axis.scale(axis.magnitude()/count);
-            theta/=count;
-        }
-
-        // Perform the TM region rotation.
-        rotate_piece(rgstart0, rgend0, rcen, axis, theta);
-        #if _dbg_homology
-        cout << "Region " << hxno << " rotated " << theta*fiftyseven << "deg." << endl;
-        #endif
-
-        #if homology_gradients
-        // Count from region start backwards until at least four consecutive helix residues.
-        int hc, inarow = 0, helix = 0;
-        bool looped = false;
-        for (hc = rgstart0-1; hc > 0; hc--)
-        {
-            AminoAcid* aa = get_residue(hc);
-            if (!aa) continue;
-            if (aa->is_alpha_helix()) inarow++;
-            else
-            {
-                inarow = 0;
-                looped = true;
-            }
-
-            if (looped && (inarow >= 4))
-            {
-                helix = hc + inarow - 1;
-                break;
-            }
-        }
-
-        if (inarow >= 4) helix += inarow;
-
-        #if _dbg_homology
-        cout << "Gradient adjustment of " << (rgstart0-1) << "-" << (helix+1) << endl;
-        #endif
-
-        // Transform and rotate the flexible loop residues in a gradient from maximum effect at region start to no effect at other helix.
-        int grad_len = rgstart0 - helix;
-        float grad_peraa = (inarow >= 4) ? (1.0 / grad_len) : 0;
-        float effect = 1;
-
-        if (grad_len > 0)
-        for (hc = rgstart0-1; hc > helix; hc--)
-        {
-            effect -= grad_peraa;
-            SCoord resmov = transformation;
-            resmov.r *= effect;
-            move_piece(hc, hc, resmov);
-            rotate_piece(hc, hc, rcen, axis, theta*effect);
-        }
-
-        // if (helix) backconnect(helix+1, rgstart1-1);
-
-        // Do the same for region end forward to the next helix.
-        inarow = 0;
-        helix = 0;
-        looped = false;
-        int protend = get_end_resno();
-        for (hc = rgend0+1; hc < protend; hc++)
-        {
-            AminoAcid* aa = get_residue(hc);
-            if (!aa) continue;
-            if (aa->is_alpha_helix()) inarow++;
-            else
-            {
-                inarow = 0;
-                looped = true;
-            }
-
-            if (looped && (inarow >= 4))
-            {
-                helix = hc + inarow - 1;
-                break;
-            }
-        }
-
-        if (inarow >= 4 && helix > inarow) helix -= inarow;
-
-        #if _dbg_homology
-        cout << "Gradient adjustment of " << (rgend0+1) << "-" << (helix-1) << endl;
-        #endif
-
-        grad_len = helix - rgend1;
-        grad_peraa = (inarow >= 4) ? (1.0 / grad_len) : 0;
-        effect = 1;
-
-        if (grad_len > 0)
-        for (hc = rgend0+1; (!helix || hc < helix) && hc <= protend; hc++)
-        {
-            effect -= grad_peraa;
-            SCoord resmov = transformation;
-            resmov.r *= effect;
-            move_piece(hc, hc, resmov);
-            rotate_piece(hc, hc, rcen, axis, theta*effect);
-        }
-
-        #endif
-
-        // if (helix) backconnect(rgend1+1, helix-1);
-    }
-
-    int l;
+    int i, l;
     for (l=0; l<15; l++)
     {
         int nummoved = 0;

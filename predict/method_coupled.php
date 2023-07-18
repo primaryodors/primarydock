@@ -36,8 +36,6 @@ prepare_outputs();
 $opdbname = $pdbfname;
 $ooutname = $outfname;
 
-// $cenres = "CEN RES 2.53 3.29 3.32 3.33 3.36 3.37 3.40 3.41 4.53 4.57 4.60 45.49 45.52 5.39 5.43 5.46 5.47 6.48 6.51 7.38 7.39 7.42";
-
 switch ($fam)
 {
     case "OR51":

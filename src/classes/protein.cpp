@@ -312,6 +312,8 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
     if (repack) save_undo_state();
     int i, j, l, m;
     float result = 0;
+    Point clashttl(0,0,0);
+    float clash_worst = 0;
     for (i=0; residues[i]; i++)
     {
         int resno = residues[i]->get_residue_no();
@@ -377,6 +379,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
 
         for (j=i; residues[j]; j++)
         {
+            int resno2 = residues[j]->get_residue_no();
             if (j==i) result += residues[i]->get_internal_clashes();
             else
             {
@@ -387,10 +390,24 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
                     if (r > rr) continue;
                 }
 
-                result += residues[i]->get_intermol_clashes(residues[j]);
+                if (abs(resno2-resno) <= 1) continue;
+                if (resno2 >= sr && resno2 <= er) continue;
+
+                float f = residues[i]->get_intermol_clashes(residues[j]);
+                result += f;
+                SCoord dpos = residues[j]->get_CA_location().subtract(residues[i]->get_CA_location());
+                dpos.r = f;
+                clashttl = clashttl.add(dpos);
+                float limit = unconnected_residue_mindist + sqrt(residues[i]->get_reach()) + sqrt(residues[j]->get_reach());
+                f = fmax(limit - dpos.r, 0);
+                if (f > clash_worst) clash_worst = f;
             }
         }
     }
+
+    last_int_clash_dir = clashttl;
+    last_int_clash_dir.r = clash_worst;
+
     return result;
 }
 
@@ -3056,7 +3073,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             sprintf(buffer, "TMR%d", hxno);
             int rgstart0 = get_region_start(buffer);
             int rgend0 = get_region_end(buffer);
-            float threshold = 5.5 * (rgend0 - rgstart0);
+            float threshold = homology_clash_peraa * (rgend0 - rgstart0);
             float f = get_internal_clashes(rgstart0, rgend0, true, 10);
 
             #if _dbg_homology
@@ -3066,11 +3083,14 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             if (f < threshold) continue;
 
             SCoord clashmov = last_int_clash_dir;
-            clashmov.r *= -0.001 * (f - threshold);
-            if (clashmov.r < 0.05) continue;
+            clashmov.r = -0.001 * (f - threshold);
+            #if _dbg_homology
+            cout << "Motion is " << clashmov.r << " A." << endl;
+            #endif
+            if (clashmov.r < 0.01) continue;
 
             #if _dbg_homology
-            cout << "Moving " << rgstart0 << "-" << rgend0 << " by " << clashmov << " A." << endl;
+            cout << "Moving " << rgstart0 << "-" << rgend0 << " by " << clashmov << endl;
             #endif
 
             move_piece(rgstart0, rgend0, clashmov);

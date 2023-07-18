@@ -43,7 +43,7 @@ switch ($fam)
     case "OR51":
     case "OR52":
     case "OR56":
-    $cenres = "CEN RES 3.33 4.57 4.60 5.39 45.52\nREQSR 0 45.52\nSTCR 3.33 4.57 4.60 5.39";
+    $cenres = "CEN RES 3.33 4.57 4.60 5.39 45.52\nREQSR 0 4.60\nSTCR 3.33 4.57 4.60 5.39";
     break;
 
     default:

@@ -2971,7 +2971,10 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     Point xform_delta(0,0,0), center(0,0,0);
     int count = 0;
 
-    for (hxno = 1; hxno <= 7; hxno++)
+    int i, l;
+    int homology_regions[10] = {1, 2, 3, 4, 45, 5, 56, 6, 7, 0};
+
+    for (i = 0; hxno = homology_regions[i]; i++)
     {
         sprintf(buffer, "TMR%d", hxno);
         int rgstart = get_region_start(buffer);
@@ -3036,31 +3039,15 @@ void Protein::homology_conform(Protein* target, Protein* reference)
                 located.origin = caloc;
                 aa = get_residue(resno);
                 aa->rotate(located, rotation.a);
-
-                AminoAcid* previous = aa->get_prev();
-                if (!previous) continue;
-
-                Point nloc = aa->get_atom_location("N");
-
-                Point prev_cloc = previous->get_atom_location("C");
-                Point prev_oloc = previous->get_atom_location("O");
-                Point prev_caloc = previous->get_atom_location("CA");
-
-                Point opposite = prev_caloc.add(prev_oloc);
-                opposite.scale(opposite.magnitude() / 2);
-
-                SCoord ndir = prev_cloc.subtract(opposite);
-                ndir.r = peptide_bond_length;
-
-                rotation = align_points_3d(nloc, prev_cloc.add(ndir), caloc);
-                located = rotation.v;
-                located.origin = caloc;
-                aa->rotate(located, rotation.a);
             }
         }
     }
 
-    int i, l;
+    #if _dbg_homology
+    cout << "Minimizing clashes..." << endl;
+    #endif
+    get_internal_clashes(1, 9999, true, 25);
+
     for (l=0; l<15; l++)
     {
         int nummoved = 0;
@@ -3069,11 +3056,11 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             sprintf(buffer, "TMR%d", hxno);
             int rgstart0 = get_region_start(buffer);
             int rgend0 = get_region_end(buffer);
-            float threshold = 15 * (rgend0 - rgstart0);
+            float threshold = 5.5 * (rgend0 - rgstart0);
             float f = get_internal_clashes(rgstart0, rgend0, true, 10);
 
             #if _dbg_homology
-            cout << "Helix " << hxno << " is clashy " << f << endl;
+            cout << "Helix " << hxno << " is clashy " << f << " of threshold " << threshold << endl;
             #endif
 
             if (f < threshold) continue;
@@ -3092,6 +3079,8 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
         if (!nummoved) break;
     }
+
+    /*
 
     // Prepare for clash minimization.
     float dx[10], dy[10], dz[10];
@@ -3121,136 +3110,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         target_clash[hxno] = target->get_internal_clashes(rgstart2, rgend2, false);
     }
 
-    mass_undoable = wmu;
-    return;
-
-    // Repack the TM regions, then adjust their locations and rotations to minimize clashes.
-    Pose putitback[get_end_resno()+10];
-    for (i=0; i<100; i++)
-    {
-        bool repack = (i < 10 || i >= 90);
-        int num_attained = 0;
-        for (hxno = 1; hxno <= 7; hxno++)
-        {
-            if (attained[hxno])
-            {
-                num_attained++;
-                continue;
-            }
-
-            sprintf(buffer, "TMR%d", hxno);
-            int rgstart1 = get_region_start(buffer);
-            int rgend1 = get_region_end(buffer);
-
-            float before = get_internal_clashes(rgstart1, rgend1, repack);
-            int j;
-            for (j=rgstart1; j <= rgend1; j++)
-            {
-                AminoAcid* aa = get_residue(j);
-                if (aa) putitback[j].copy_state((Molecule*)aa);
-            }
-
-            // "soft"-manipulate the region to minimize clashes.
-            Point ptx(dx[hxno], 0, 0);
-            move_piece(rgstart1, rgend1, (SCoord)ptx);
-            float after = get_internal_clashes(rgstart1, rgend1, repack);
-
-            if (after > before)
-            {
-                ptx.x *= -1;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].restore_state((Molecule*)aa);
-                }
-                dx[hxno] *= -0.666;
-            }
-            else
-            {
-                before = after;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].copy_state((Molecule*)aa);
-                }
-            }
-
-            Point pty(0, dy[hxno], 0);
-            move_piece(rgstart1, rgend1, (SCoord)pty);
-            after = get_internal_clashes(rgstart1, rgend1, repack);
-
-            if (after > before)
-            {
-                pty.y *= -1;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].restore_state((Molecule*)aa);
-                }
-                dy[hxno] *= -0.666;
-            }
-            else
-            {
-                before = after;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].copy_state((Molecule*)aa);
-                }
-            }
-
-            Point ptz(0, 0, dz[hxno]);
-            move_piece(rgstart1, rgend1, (SCoord)ptz);
-            after = get_internal_clashes(rgstart1, rgend1, repack);
-
-            if (after > before)
-            {
-                ptz.z *= -1;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].restore_state((Molecule*)aa);
-                }
-                dz[hxno] *= -0.666;
-            }
-            else
-            {
-                before = after;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].copy_state((Molecule*)aa);
-                }
-            }
-
-            #if _dbg_homology
-            cout << "Homology iteration " << i << " helix " << hxno << " clashes " << before << " vs. target " << target_clash[hxno] << endl;
-            #endif
-
-            if (before <= target_clash[hxno]) attained[hxno] = true;
-        }
-
-        if (num_attained == 7) break;
-    }
-
-    // TODO: Should figure out how to do homology for the EXR and CYT loops. At minimum the EXR.
-
-
-    std::vector<Region> helices;
-    for (i=1; i<=7; i++)
-    {
-        sprintf(buffer, "TMR%d", i);
-        Region rgn;
-        rgn.end = get_region_end(buffer);
-        rgn.name = buffer;
-        rgn.start = get_region_start(buffer);
-        helices.push_back(rgn);
-    }
-
-    /*for (i=0; i<20; i++)
-    {
-        soft_iteration(helices, nullptr);
-    }*/
+    */
 
     mass_undoable = wmu;
 }

@@ -333,9 +333,10 @@ void iteration_callback(int iter, Molecule** mols)
         f += lf;
 
         if (flex
-            && (lf < 5 || lf < 0.1 * ptnl)
+            && iter < 5
+            && (lf < 10 || lf < 0.1 * ptnl)
             && mols[l]->movability == MOV_FLXDESEL
-            && frand(0,1) < 0.2
+            && frand(0,1) < 0.05
             )
         {
             mols[l]->movability = MOV_FORCEFLEX;
@@ -1384,7 +1385,7 @@ void read_config_file(FILE* pf)
 
             interpret_config_line(words);
 
-            delete[] words;
+            delete words;
         }
         buffer[0] = 0;
     }
@@ -2368,7 +2369,7 @@ int main(int argc, char** argv)
         if (flex) Molecule::conform_molecules(prealign_res, lig_grp, prealign_iters, nullptr);
         ligand->movability = MOV_ALL;
 
-        delete[] words;
+        delete words;
         delete prealign_res;
         delete lig_grp;
     }

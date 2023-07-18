@@ -1161,7 +1161,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         {
                             a->aaletter = aa_defs[i]._1let;
                             aaa = &aa_defs[i];
-                            name = new char[10]; // aa_defs[i].name;
+                            name = new char[10];
                             sprintf(name, "%s%d", aa_defs[i]._3let, atoi(words[4+offset].c_str())+rno);
                             break;
                         }
@@ -1170,9 +1170,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     if (!aaa)
                     {
                         fseek(is, lasttell, SEEK_SET);
-                        // delete[] words;
                         goto _return_added;
-                        //throw ATOM_NOT_OF_AMINO_ACID;
                     }
                     else aadef = aaa;
 
@@ -1196,7 +1194,6 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
                     if (aaa->_1let == 'I')
                     {
-                        // Plus d'marde du code dur.
                         if (!strcmp(a->name, "1HD1")) strcpy(a->name, "HD1");
                         if (!strcmp(a->name, "2HD1")) strcpy(a->name, "HD2");
                         if (!strcmp(a->name, "3HD1")) strcpy(a->name, "HD3");
@@ -1209,7 +1206,6 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                             AABondDef* aab = aaa->aabonds[i];
                             if (!strcmp(aab->aname, a->name))
                             {
-                                // cout << aaa->_1let << ":" << aab->aname << cardinality_printable(aab->cardinality) << aab->bname << endl;
                                 if (aaa->aabonds[i] && aaa->aabonds[i]->acharge)
                                 {
                                     a->increment_charge(aaa->aabonds[i]->acharge);
@@ -1218,7 +1214,6 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                 if (btom)
                                 {
                                     a->bond_to(btom, aab->cardinality);
-                                    // cout << "Greek bond 1: " << a->aa3let << ":" << a->name << cardinality_printable(aab->cardinality) << btom->name << endl;
                                     if (aab->cardinality == 1 && !aab->can_rotate)
                                     {
                                         Bond* b = a->get_bond_between(btom);
@@ -1236,7 +1231,6 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                 if (btom && !btom->is_bonded_to(a))
                                 {
                                     a->bond_to(btom, aab->cardinality);
-                                    // cout << "Greek bond 2: " << a->aa3let << ":" << a->name << cardinality_printable(aab->cardinality) << btom->name << endl;
                                     if (aab->cardinality == 1 && !aab->can_rotate)
                                     {
                                         Bond* b = a->get_bond_between(btom);
@@ -1276,7 +1270,6 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         }
 
                         if (bta) a->bond_to(bta, cardinality);
-                        // cout << "Greek bond 3: " << a->aa3let << ":" << a->name << cardinality_printable(cardinality) << bta->name << endl;
 
                     }
 
@@ -1286,11 +1279,8 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                 else
                 {
                     fseek(is, lasttell, SEEK_SET);
-                    //if (words) delete[] words;
                     goto _return_added;
                 }
-
-                //if (words) delete[] words;
             }
             else goto _return_added;
         }
@@ -1300,8 +1290,6 @@ int AminoAcid::from_pdb(FILE* is, int rno)
             if (ex == NOT_ATOM_RECORD) throw ex;
         }
         buffer[0] = 0;
-
-        //if (words) delete[] words;
     }
 
 _return_added:
@@ -1479,7 +1467,7 @@ void AminoAcid::load_aa_defs()
                     if (lastwords[i] != words[i]) strcpy(lastwords[i], words[i]);
                 }
 
-                delete[] words;
+                delete words;
             }
             buffer[0] = 0;
         }

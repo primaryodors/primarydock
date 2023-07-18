@@ -26,6 +26,15 @@ Protein::Protein(const char* lname)
     metals = nullptr;
 }
 
+Protein::~Protein()
+{
+    connections.clear();
+
+    delete[] remarks;
+    remarksz = 0;
+    delete ca;
+}
+
 bool Protein::add_residue(const int resno, const char aaletter)
 {
     int i;
@@ -221,11 +230,11 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
 {
     int i, offset=0;
 
-    if (remarks.size())
+    if (remarksz)
     {
-        for (i=0; i<remarks.size(); i++)
+        for (i=0; i<remarksz && remarks[i]; i++)
         {
-            fprintf(os, "%s", remarks[i].c_str());
+            fprintf(os, "%s", remarks[i]);
         }
     }
 
@@ -642,7 +651,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                      buffer[5] == 'K'
                 )
             {
-                remarks.push_back(buffer);
+                add_remark(buffer);
                 // cout << "Found remark " << buffer;
 
                 if (buffer[7] == '6' && buffer[8] < '!')
@@ -650,7 +659,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                     char** words = chop_spaced_words(buffer);
                     if (words[2] && !words[3])
                         name = words[2];
-                    delete[] words;
+                    delete words;
                 }
             }
             else if (buffer[0] == 'C'
@@ -719,7 +728,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                         buffer[4] == 'R' &&
                         buffer[5] == 'K'
                    )
-                    remarks.push_back(buffer);
+                    add_remark(buffer);
                 break;
 
             default:
@@ -791,7 +800,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
         set_region(words[3], atoi(words[4]), atoi(words[5]));
         regions_from = rgn_pdb;
 
-        delete[] words;
+        delete words;
     }
 
     std::vector<std::string> rem_st = get_remarks("800 SITE");
@@ -811,7 +820,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
             Ballesteros_Weinstein[f4] = atoi(words[5]);
         }
 
-        delete[] words;
+        delete words;
     }
 
     initial_int_clashes = get_internal_clashes();
@@ -919,14 +928,26 @@ int Protein::get_end_resno()
     return retval;
 }
 
+void Protein::add_remark(const char* remark)
+{
+    if (!remarks) remarks = new char*[65536];
+
+    remarks[remarksz] = new char[strlen(remark)+2];
+    strcpy(remarks[remarksz++], remark);
+}
+
 std::vector<std::string> Protein::get_remarks(std::string search_for)
 {
     std::vector<string> retval;
     int i;
-    for (i=0; i<remarks.size(); i++)
+    for (i=0; i<remarksz; i++)
     {
-        if (!search_for.length() || strstr(remarks[i].c_str(), search_for.c_str()))
-            retval.push_back(remarks[i]);
+        if (!search_for.length() || strstr(remarks[i], search_for.c_str()))
+        {
+            char buffer[1024];
+            strcpy(buffer, remarks[i]);
+            retval.push_back((std::string)buffer);
+        }
     }
 
     return retval;
@@ -934,7 +955,7 @@ std::vector<std::string> Protein::get_remarks(std::string search_for)
 
 void Protein::add_remark(std::string new_remark)
 {
-    remarks.push_back(new_remark);
+    add_remark(new_remark.c_str());
 
     // TODO: Sort remarks by number, becarefuling to preserve the sequence of same numbered remarks.
 }
@@ -2127,7 +2148,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
         char buffer[256];
         sprintf(buffer, "REMARK 800 SITE MCOORD %d %s\n", resnos[i], metal->name);
-        remarks.push_back(buffer);
+        add_remark(buffer);
 
         m_mcoord[j]->coord_res[i] = get_residue(resnos[i]);
         if (!m_mcoord[j]->coord_res[i])
@@ -2149,7 +2170,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     m_mcoord[j]->coord_res[residues] = NULL;
     m_mcoord[j]->coord_atoms[residues] = NULL;
 
-    remarks.push_back("REMARK 800\n");
+    add_remark("REMARK 800\n");
 
     // Get the plane of the coordinating atoms, then get the normal.
     Point ptarr[3] =

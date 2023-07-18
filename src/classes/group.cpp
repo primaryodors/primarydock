@@ -73,13 +73,6 @@ float AtomGroup::get_ionic()
     {
         float c = atoms[i]->get_charge();
         if (c) result += c;
-        else
-        {
-            if (atoms[i]->get_family() == PNICTOGEN && !atoms[i]->is_amide())
-            {
-                result += 0.5;
-            }
-        }
     }
     return result;
 }

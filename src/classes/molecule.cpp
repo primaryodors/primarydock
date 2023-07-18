@@ -614,13 +614,6 @@ float Molecule::bindability_by_type(intera_type t, bool ib)
             case ionic:
             c = atoms[i]->get_charge();
             if (c) result += c;
-            else
-            {
-                if (atoms[i]->get_family() == PNICTOGEN && !atoms[i]->is_amide())
-                {
-                    result += 0.5;
-                }
-            }
             break;
 
             case hbond:
@@ -778,10 +771,10 @@ int Molecule::from_sdf(char const* sdf_dat)
             // cout << "Bonded " << atoms[a1i-1]->name << " to " << atoms[a2i-1]->name << endl;
         }
 
-        if (words) delete[] words;
+        if (words) delete words;
     }
     atoms[atcount] = 0;
-    if (words) delete[] words;
+    if (words) delete words;
 
     identify_rings();
     identify_acidbase();
@@ -853,7 +846,7 @@ int Molecule::from_pdb(FILE* is)
         }
         buffer[0] = 0;
 
-        delete[] words;
+        delete words;
     }
 
     return added;
@@ -1496,8 +1489,8 @@ void Molecule::identify_acidbase()
                     float arity = c->is_bonded_to(bto);
                     if (arity >= 1.5)
                     {
-                        atoms[i]->increment_charge(0.25);
-                        bto->increment_charge(-0.25);
+                        atoms[i]->increment_charge(amide_zwitterionic_amount);
+                        bto->increment_charge(-amide_zwitterionic_amount);
                     }
                     goto _not_basic;
                 }
@@ -2989,42 +2982,48 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
             #if allow_bond_rots
             pib.copy_state(a);
-            Bond** bb = a->get_rotatable_bonds((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN));
-            if (bb)
+            #if _dbg_mol_flexion
+            cout << a->name << " movability " << hex << a->movability << dec << endl << flush;
+            #endif
+            if ((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN))
             {
-                int q;
-                for (q=0; bb[q]; q++)
+                Bond** bb = a->get_rotatable_bonds();
+                if (bb)
                 {
-                    float theta;
-                    if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI) / 2;
-                    else if (!bb[q]->count_heavy_moves_with_btom()) theta = frand(-M_PI, M_PI) / 2;
-                    else if (bb[q]->count_heavy_moves_with_atom() < bb[q]->count_heavy_moves_with_btom())
-                        theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
-                    else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
-
-                    bb[q]->rotate(theta, false);
-                    tryenerg = cfmol_multibind(a, nearby);
-
-                    if (tryenerg > benerg)
+                    int q;
+                    for (q=0; bb[q]; q++)
                     {
-                        benerg = tryenerg;
-                        pib.copy_state(a);
-                        a->been_flexed = true;
-                    }
-                    else
-                    {
-                        pib.restore_state(a);
-                    }
-                }
-            }       // Rotatable bonds.
-            #endif
+                        float theta;
+                        if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI) / 2;
+                        else if (!bb[q]->count_heavy_moves_with_btom()) theta = frand(-M_PI, M_PI) / 2;
+                        else if (bb[q]->count_heavy_moves_with_atom() < bb[q]->count_heavy_moves_with_btom())
+                            theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
+                        else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
 
-            #if _dbg_fitness_plummet
-            if (!i) cout << benerg << endl;
-            #endif
+                        bb[q]->rotate(theta, false);
+                        tryenerg = cfmol_multibind(a, nearby);
 
-            mm[i]->lastbind = benerg;
-        }       // for i
+                        if (tryenerg > benerg)
+                        {
+                            benerg = tryenerg;
+                            pib.copy_state(a);
+                            a->been_flexed = true;
+                        }
+                        else
+                        {
+                            pib.restore_state(a);
+                        }
+                    }
+                }       // Rotatable bonds.
+                #endif
+
+                #if _dbg_fitness_plummet
+                if (!i) cout << benerg << endl;
+                #endif
+
+                mm[i]->lastbind = benerg;
+            }       // for i
+        }       // if MOV_CAN_FLEX
 
         #if allow_iter_cb
         if (cb) cb(iter, mm);

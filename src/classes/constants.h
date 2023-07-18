@@ -14,7 +14,7 @@
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
 #define vdw_clash_allowance 1.0
-#define oxytocin 0.007
+#define oxytocin 0.003
 #define _DEFAULT_INTERA_R_CUTOFF 8
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
@@ -72,7 +72,7 @@
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
-#define speed_limit 0.333
+#define speed_limit 0.666
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -108,12 +108,14 @@
 #define POLYPRO1_PSI fiftyseventh*160
 #define POLYPRO1_OMEGA fiftyseventh*113
 
-// Warning - increasing these constants significantly above their stable branch values
-// will cause docking fails in the Big Three tests.
-#define polar_repulsion 35.0
-#define charge_repulsion 60.0
+// Warning - increasing these constants significantly above the original 35.0, 60.0 values
+// will cause docking fails in the unit tests.
+#define polar_repulsion 15.0
+#define charge_repulsion 10.0
 
-#define lmpush 0.0005
+#define lmpush 0.0015
+
+#define amide_zwitterionic_amount 0.1
 
 #define priority_weight_group 4
 
@@ -343,6 +345,7 @@
 #define _dbg_Huckel 0
 #define _dbg_259 0
 #define _dbg_bb_realign 0
+#define _dbg_mol_flexion 0
 
 #endif
 

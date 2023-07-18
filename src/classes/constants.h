@@ -23,6 +23,7 @@
 #define Avogadro 6.02214076e+23
 
 #define helix_hbond_cutoff 2.8
+#define peptide_bond_length 1.32
 
 #define pH 6.0
 

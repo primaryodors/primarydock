@@ -3034,6 +3034,27 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
                 LocatedVector located = rotation.v;
                 located.origin = caloc;
+                aa = get_residue(resno);
+                aa->rotate(located, rotation.a);
+
+                AminoAcid* previous = aa->get_prev();
+                if (!previous) continue;
+
+                Point nloc = aa->get_atom_location("N");
+
+                Point prev_cloc = previous->get_atom_location("C");
+                Point prev_oloc = previous->get_atom_location("O");
+                Point prev_caloc = previous->get_atom_location("CA");
+
+                Point opposite = prev_caloc.add(prev_oloc);
+                opposite.scale(opposite.magnitude() / 2);
+
+                SCoord ndir = prev_cloc.subtract(opposite);
+                ndir.r = peptide_bond_length;
+
+                rotation = align_points_3d(nloc, prev_cloc.add(ndir), caloc);
+                located = rotation.v;
+                located.origin = caloc;
                 aa->rotate(located, rotation.a);
             }
         }

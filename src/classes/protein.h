@@ -154,6 +154,7 @@ public:
     void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);
     void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
+    void repair_backbone(int iters = 200);
 
     int* mcoord_resnos = NULL;
     std::vector<SoftBias> soft_biases;

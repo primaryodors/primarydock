@@ -939,8 +939,7 @@ Point* AminoAcid::predict_next_NHCA()
     return retval;
 }
 
-#define _dbg_attprdc 0
-void AminoAcid::attach_to_prediction(Point* predicted, bool CO)
+void AminoAcid::attach_to_prediction(Point* predicted, bool CO, float amt)
 {
     MovabilityType fmov = movability;
     movability = MOV_ALL;
@@ -948,6 +947,7 @@ void AminoAcid::attach_to_prediction(Point* predicted, bool CO)
 
     // Translation: move the entire AA so that the N (or C) corresponds to the predicted origin.
     Point moveby = predicted[0].subtract( CO ? get_atom_location("C") : get_atom_location("N") );
+    moveby.scale(moveby.magnitude()*amt);
     aamove(moveby);
     anomaly = predicted[0].get_3d_distance( CO ? get_atom_location("C") : get_atom_location("N") );
     #if _dbg_attprdc
@@ -959,7 +959,7 @@ void AminoAcid::attach_to_prediction(Point* predicted, bool CO)
     Rotation rot = align_points_3d( &pt1, &pt2, &predicted[0] );
     LocatedVector lv = rot.v;
     lv.origin = predicted[0];
-    rotate(lv, rot.a);
+    rotate(lv, rot.a*amt);
     pt1 = CO ? get_atom_location("O") : HN_or_substitute_location();
     anomaly = predicted[1].get_3d_distance(pt1);
     #if _dbg_attprdc
@@ -971,7 +971,7 @@ void AminoAcid::attach_to_prediction(Point* predicted, bool CO)
     SCoord axis = pt1.subtract(lv.origin);
     float theta = find_angle_along_vector(get_atom_location("CA"), predicted[2], lv.origin, axis);
     lv.copy(axis);
-    rotate(lv, -theta);
+    rotate(lv, theta*amt);
 
     // Rotation: rotate the rest of the AA to bring the C-N-CA or N-C-CA angle to 120deg.
     pt2 = get_atom_location("CA");
@@ -985,18 +985,21 @@ void AminoAcid::attach_to_prediction(Point* predicted, bool CO)
         if (!CO && !strcmp(atoms[i]->name, "N")) continue;
         if (!CO && atoms[i] == HN) continue;
 
-        Point pt = rotate3D(atoms[i]->get_location(), lv.origin, rot.v, rot.a);
+        Point pt = rotate3D(atoms[i]->get_location(), lv.origin, rot.v, rot.a*amt);
         atoms[i]->move(pt);
     }
 
     anomaly = predicted[2].get_3d_distance(get_atom_location("CA"));
     if (anomaly > 0.1)
     {
-        rotate(lv, theta*2);
+        rotate(lv, theta*amt*2);
         anomaly = predicted[2].get_3d_distance(get_atom_location("CA"));
     }
     #if _dbg_attprdc
     if (anomaly > 0.1) cout << "Error: CA anomaly outside tolerance!" << endl << "# Anomaly is " << anomaly << "." << endl;
+    #endif
+    #if _dbg_backbone_repair
+    if (residue_no == 251) cout << residue_no << " anomaly: " << anomaly << endl;
     #endif
 
     movability = fmov;

@@ -3100,6 +3100,8 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         if (!nummoved) break;
     }
 
+    repair_backbone();
+
     /*
 
     // Prepare for clash minimization.
@@ -3425,4 +3427,46 @@ float Protein::binding_to_nearby_residues(int resno)
     if (!aa) return 0;
 
     return aa->get_intermol_binding(caa);
+}
+
+void Protein::repair_backbone(int iters)
+{
+    int iter, resno, n = get_end_resno();
+    AminoAcid *aa, *previous, *next;
+
+    for (iter=0; iter<iters; iter++)
+    {
+        #if _dbg_backbone_repair
+        cout << "Backbone repair " << iter << endl << flush;
+        #endif
+        for (resno = 1; resno <= n; resno++)
+        {
+            aa = get_residue(resno);
+            if (!aa) continue;
+
+            previous = aa->get_prev();
+            next = aa->get_next();
+            if (!previous && !next) continue;
+
+            if (previous)
+            {
+                Point* nhca = previous->predict_next_NHCA();
+                if (nhca)
+                {
+                    aa->attach_to_prediction(nhca, false, 0.1);
+                    delete nhca;
+                }
+            }
+
+            if (next)
+            {
+                Point* coca = next->predict_previous_COCA();
+                if (coca)
+                {
+                    aa->attach_to_prediction(coca, true, 0.1);
+                    delete coca;
+                }
+            }
+        }
+    }
 }

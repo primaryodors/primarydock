@@ -14245,7 +14245,7 @@
             [
                 "green",
                 "pea",
-                "pepper"
+                "bell_pepper"
             ]
         },
         "activity":
@@ -28343,12 +28343,11 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "bell",
                 "fatty",
                 "green",
                 "herbal",
                 "mushroom",
-                "pepper",
+                "bell_pepper",
                 "tallow"
             ]
         },
@@ -31635,8 +31634,7 @@
                 "green",
                 "pea",
                 "galbanum",
-                "bell",
-                "pepper"
+                "bell_pepper"
             ]
         },
         "activity":
@@ -31709,7 +31707,7 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "nutty",
-                "pepper",
+                "bell_pepper",
                 "raw"
             ]
         },

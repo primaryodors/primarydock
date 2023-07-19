@@ -63,6 +63,8 @@ LOAD $rcpfn
 HOMOLOGY C I
 GOSUB avoid_gprot_clash
 GOSUB custom6
+STRAND A
+# REPAIR 1000
 
 UNCHAIN C
 UNCHAIN I

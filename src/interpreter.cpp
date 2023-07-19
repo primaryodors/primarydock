@@ -928,7 +928,6 @@ int main(int argc, char** argv)
                 a3 = era->get_atom("CA");
 
                 working->conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
-                delete[] pt3;
                 working->backconnect(sr, er);
 
             _no_connect:
@@ -2077,7 +2076,23 @@ int main(int argc, char** argv)
                 if (words[l]) newcen = interpret_single_point(words[l++]);
                 if (words[l]) raise_error("Too many parameters given for MOVE.");
                 working->move_piece(sr, er, newcen);
+                // working->repair_backbone(1);
             }	// MOVE
+
+            else if (!strcmp(words[0], "MOVEREL"))
+            {
+                l = 1;
+                SCoord move_amt;
+                int sr, er;
+                if (words[l]) sr = interpret_single_int(words[l++]);
+                else raise_error("Not enough parameters given for MOVEREL.");
+                if (words[l]) er = interpret_single_int(words[l++]);
+                else raise_error("Not enough parameters given for MOVEREL.");
+                if (words[l]) move_amt = interpret_single_point(words[l++]);
+                if (words[l]) raise_error("Too many parameters given for MOVEREL.");
+                working->move_piece(sr, er, move_amt);
+                // working->repair_backbone(1);
+            }	// MOVEREL
 
             else if (!strcmp(words[0], "PTALIGN"))
             {
@@ -2180,6 +2195,14 @@ int main(int argc, char** argv)
 
 				working->renumber_residues(sr, er, nsr);
             }	// RENUMBER
+
+            else if (!strcmp(words[0], "REPAIR"))
+            {
+                int iters = 10;
+                if (words[1]) iters = interpret_single_int(words[1]);
+				if (words[2]) raise_error("Too many parameters given for REPAIR.");
+                working->repair_backbone(iters);
+            }   // REPAIR
 
             else if (!strcmp(words[0], "ROTATE"))
             {

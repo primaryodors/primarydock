@@ -465,9 +465,12 @@ Example:
 ```
 MOVE %start_res %end_res @newcen
 MOVE 160 176 [0,25,0]
+MOVEREL 160 176 [0,0,5]
 ```
 
-Recenters the indicated region at the indicated Cartesian location.
+MOVE Recenters the indicated region at the indicated Cartesian location.
+MOVEREL uses the Cartesian as a relative direction of motion instead of as an absolute location,
+and adds the [x,y,z] coordinates to the locations of all residues in range.
 
 
 # PTALIGN

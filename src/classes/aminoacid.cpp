@@ -721,7 +721,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
         Point* pts = prevaa->predict_next_NHCA();
         attach_to_prediction(pts);
-        delete[] pts;
 
         movability = MOV_FLEXONLY;
         immobile = true;
@@ -738,6 +737,7 @@ void AminoAcid::establish_internal_clash_baseline()
     base_internal_clashes = get_internal_clashes();
 }
 
+Point predict_nhca_coca_retval[4];
 
 Point* AminoAcid::predict_previous_COCA()
 {
@@ -754,7 +754,6 @@ Point* AminoAcid::predict_previous_COCA()
     prevOloc = prevOloc.add(prevCloc);
 
     LocatedVector lv;
-    Point* retval = new Point[4];
     Point neighborCA;
     int i;
     for (i=0; i<10; i++)
@@ -832,11 +831,11 @@ Point* AminoAcid::predict_previous_COCA()
         neighborCA = neighborCA.add(prevCloc);
     }
 
-    retval[0] = prevCloc;
-    retval[1] = prevOloc;
-    retval[2] = neighborCA;
+    predict_nhca_coca_retval[0] = prevCloc;
+    predict_nhca_coca_retval[1] = prevOloc;
+    predict_nhca_coca_retval[2] = neighborCA;
 
-    return retval;
+    return predict_nhca_coca_retval;
 }
 
 Point* AminoAcid::predict_next_NHCA()
@@ -854,7 +853,6 @@ Point* AminoAcid::predict_next_NHCA()
     nextHNloc = nextHNloc.add(nextNloc);
 
     LocatedVector lv;
-    Point* retval = new Point[4];
     Point neighborCA;
     int i;
     for (i=0; i<10; i++)
@@ -932,11 +930,16 @@ Point* AminoAcid::predict_next_NHCA()
         neighborCA = neighborCA.add(nextNloc);
     }
 
-    retval[0] = nextNloc;
-    retval[1] = nextHNloc;
-    retval[2] = neighborCA;
+    predict_nhca_coca_retval[0] = nextNloc;
+    predict_nhca_coca_retval[1] = nextHNloc;
+    predict_nhca_coca_retval[2] = neighborCA;
 
-    return retval;
+    /*cout << residue_no << " predicts next N at " << predict_nhca_coca_retval[0]
+        << ", next HN at " << predict_nhca_coca_retval[1]
+        << ", next CA at " << predict_nhca_coca_retval[2]
+        << endl;*/
+
+    return predict_nhca_coca_retval;
 }
 
 void AminoAcid::attach_to_prediction(Point* predicted, bool CO, float amt)

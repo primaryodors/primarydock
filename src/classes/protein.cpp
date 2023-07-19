@@ -115,8 +115,6 @@ bool Protein::add_residue(const int resno, const char aaletter)
             }
         }
         else cout << "Warning: Residue " << resno << " has no N atom." << endl << flush;
-
-        delete[] pts;
     }
     else
     {
@@ -1753,7 +1751,6 @@ void Protein::backconnect(int startres, int endres)
             #endif
 
             curr->attach_to_prediction(pts, inc > 0);
-            delete[] pts;
             // break;
 
             #if DBG_BCKCONN
@@ -1772,7 +1769,6 @@ void Protein::backconnect(int startres, int endres)
                 pts = (inc < 0) ? prev->predict_previous_COCA() : prev->predict_next_NHCA();
                 Point target_heavy = pts[0];
                 Point target_pole = pts[1];
-                delete[] pts;
 
                 #if DBG_BCKCONN
                 cout << "b";
@@ -3454,19 +3450,17 @@ void Protein::repair_backbone(int iters)
                 if (nhca)
                 {
                     aa->attach_to_prediction(nhca, false, 0.1);
-                    delete nhca;
                 }
             }
 
-            if (next)
+            /*if (next)
             {
                 Point* coca = next->predict_previous_COCA();
                 if (coca)
                 {
                     aa->attach_to_prediction(coca, true, 0.1);
-                    delete coca;
                 }
-            }
+            }*/
         }
     }
 }

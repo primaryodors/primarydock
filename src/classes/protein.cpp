@@ -3333,7 +3333,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     #endif
     get_internal_clashes(1, 9999, true, 25);
 
-    for (l=0; l<15; l++)
+    for (l=0; l<50; l++)
     {
         int nummoved = 0;
         for (hxno = 1; hxno <= 7; hxno++)
@@ -3349,13 +3349,14 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             #endif
 
             if (f < threshold) continue;
+            if (hxno == 3) continue;
 
             SCoord clashmov = last_int_clash_dir;
-            clashmov.r = -0.001 * (f - threshold);
+            clashmov.r = -0.003 * (f - threshold);
             #if _dbg_homology
             cout << "Motion is " << clashmov.r << " A." << endl;
             #endif
-            if (clashmov.r < 0.01) continue;
+            if (fabs(clashmov.r) < 0.01) continue;
 
             #if _dbg_homology
             cout << "Moving " << rgstart0 << "-" << rgend0 << " by " << clashmov << endl;

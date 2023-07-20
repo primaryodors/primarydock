@@ -116,14 +116,18 @@ LET $655 = $SEQUENCEA.%655,1
 LET %4551 = %A.45.50 + 1
 LET $4551 = $SEQUENCEA.%4551,1
 
-IF $655 != "Y" GOTO not_Y655_DE4551
+IF $rcpid = "OR2AT4" LET %TM6_handle = %655 + 4
+ELSE LET %TM6_handle = %655
+LET $TM6_handle = $SEQUENCEA FROM %TM6_handle FOR 1
+
+IF $TM6_handle != "Y" GOTO not_Y655_DE4551
 IF $4551 != "D" AND $4551 != "E" GOTO not_Y655_DE4551
 
-LET @655 = %655
+LET @TM6_handle = %TM6_handle
 LET @4551 = %4551
-LET @r = @4551 - @655
+LET @r = @4551 - @TM6_handle
 LET &r = @r
-# ECHO @655 " and " @4551 " are " &r " A apart."
+# ECHO @TM6_handle " and " @4551 " are " &r " A apart."
 
 IF &r < 9 GOTO already_Y655_DE4551
 
@@ -134,14 +138,14 @@ LET @d *= &rat
 
 # ECHO @r @d
 
-LET @new = @655 + @d
+LET @new = @TM6_handle + @d
 LET %628 = %A.6.50 - 22
 LET %648 = %A.6.50 - 2
 LET %660 = %A.6.50 + 10
-ALIGN %628 %660 1 %648 KEEP %655 @new
+ALIGN %628 %660 1 %648 KEEP %TM6_handle @new
 
 already_Y655_DE4551:
-BRIDGE %655 %4551
+BRIDGE %TM6_handle %4551
 
 
 not_Y655_DE4551:

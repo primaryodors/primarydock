@@ -28,11 +28,11 @@ LET %i --
 LET $rcpid = $rcpid FROM 1 FOR %i
 no_dash:
 
-STRPOS $rcpid ".pdb" %i
-IF %i = 0 GOTO no_pdb
+STRPOS $rcpid "." %i
+IF %i = 0 GOTO no_dot
 LET %i --
 LET $rcpid = $rcpid FROM 1 FOR %i
-no_pdb:
+no_dot:
 
 
 

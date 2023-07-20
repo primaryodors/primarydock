@@ -3114,14 +3114,50 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         cout << "Region " << hxno << " target " << rgstart2 << "-" << rgend2 << ", reference " << rgstart1 << "-" << rgend1 << endl;
         #endif
 
-        // Compute the TM region transformation.
+        // Do the phi and psi rotations.
         int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
+        for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
+        {
+            i = resno1 - bw50a;
+            int resno0 = get_bw50(hxno) + i;
+            AminoAcid* aa = get_residue(resno0);
+            if (!aa) continue;
+
+            i = resno1 - bw50a;
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                AminoAcid* aa1 = reference->get_residue(resno1);
+                if (!aa1) continue;
+                AminoAcid* aa2 = target->get_residue(resno1);
+                if (!aa2) continue;
+
+                float theta = aa2->get_phi() - aa1->get_phi();
+                aa->rotate_phi(theta);
+                #if _dbg_homology
+                cout << resno0 << " phi " << (theta*fiftyseven) << " deg." << endl;
+                #endif
+
+                theta = aa2->get_psi() - aa1->get_psi();
+                aa->rotate_psi(theta);
+                #if _dbg_homology
+                cout << resno0 << " psi " << (theta*fiftyseven) << " deg." << endl;
+                #endif
+
+                AminoAcid* aanext = aa->get_next();
+                if (!aanext) continue;
+                Point* nhca = aa->predict_next_NHCA();
+                aanext->attach_to_prediction(nhca);
+            }
+        }
+
+        // Compute the TM region transformation.
         Point rcen1(0,0,0);
         Point rcen2(0,0,0);
         count = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
         {
-            int i = resno1 - bw50a;
+            i = resno1 - bw50a;
             resno2 = bw50b + i;
             if (resno2 >= rgstart2 && resno2 <= rgend2)
             {

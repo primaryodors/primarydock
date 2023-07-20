@@ -105,6 +105,7 @@ if ($fp)
 {
     fwrite($fp, file_get_contents("tmp/coupled.{$gpcrid}.pdb"));
     fclose($fp);
+    unlink("tmp/coupled.{$gpcrid}.pdb");
 }
 
 

@@ -2477,6 +2477,29 @@ int main(int argc, char** argv)
                 }
             }   // STRAND
 
+            else if (!strcmp(words[0], "STRLEN"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters given for STRLEN.");
+                if (!words[2]) raise_error("Insufficient parameters given for STRLEN.");
+                if (words[3]) raise_error("Too many parameters given for STRLEN.");
+
+                char* c = interpret_single_string(words[1]);
+                if (!c) l = 0;
+                else l = strlen(c);
+
+                n = find_var_index(words[2]);
+                if (n<0)
+                {
+                    n = vars++;
+                    script_var[n].name = words[2];
+                    script_var[n].vt = type_from_name(words[2]);
+                }
+                int flags = n & _VARFLAGS_MASK;
+                n &= _VARNUM_MASK;
+
+                script_var[n].value.n = l;
+            }
+
             else if (!strcmp(words[0], "STRPOS"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for STRPOS.");

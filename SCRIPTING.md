@@ -608,6 +608,15 @@ Changes the current working strand to the strand ID specified. If two strand IDs
 strand and the working strand is set to the second ID.
 
 
+# STRLEN
+Example:
+```
+STRPOS $string %out_var
+```
+
+Gets the length of the input string and sets `%out_var` to that number.
+
+
 # STRPOS
 Example:
 ```

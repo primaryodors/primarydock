@@ -3117,6 +3117,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         #if homology_phi_psi_rotations
         // Do the phi and psi rotations.
         int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
+        float theta_carry = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
         {
             i = resno1 - bw50a;
@@ -3137,7 +3138,11 @@ void Protein::homology_conform(Protein* target, Protein* reference)
                 if (phi1 >= M_PI) phi1 -= M_PI*2;
                 if (phi2 >= M_PI) phi2 -= M_PI*2;
                 float theta = phi2 - phi1;
-                bond_rotation_fail_reason phi_fail = aa->rotate_phi(theta);
+
+                bond_rotation_fail_reason phi_fail = aa->rotate_phi(theta + theta_carry);
+                if (phi_fail != bf_none) theta_carry += theta;
+                else theta_carry = 0;
+
                 #if _dbg_homology
                 cout << resno0 << " (t " << resno2 << ", r " << resno1 << ") phi " << (theta*fiftyseven) << " (" << (phi2*fiftyseven) << " - " << (phi1*fiftyseven) << ") deg. " << phi_fail << "." << endl;
                 #endif
@@ -3153,7 +3158,11 @@ void Protein::homology_conform(Protein* target, Protein* reference)
                 if (psi1 >= M_PI) psi1 -= M_PI*2;
                 if (psi2 >= M_PI) psi2 -= M_PI*2;
                 theta = psi2 - psi1;
-                bond_rotation_fail_reason psi_fail = aa->rotate_psi(theta);
+
+                bond_rotation_fail_reason psi_fail = aa->rotate_psi(theta + theta_carry);
+                if (psi_fail != bf_none) theta_carry += theta;
+                else theta_carry = 0;
+
                 #if _dbg_homology
                 cout << resno0 << " (t " << resno2 << ", r " << resno1 << ") psi " << (theta*fiftyseven) << " (" << (psi2*fiftyseven) << " - " << (psi1*fiftyseven) << ") deg. " << psi_fail << "." << endl;
                 #endif

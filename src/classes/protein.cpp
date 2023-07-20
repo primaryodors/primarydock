@@ -3113,7 +3113,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         #if _dbg_homology
         cout << "Region " << hxno << " target " << rgstart2 << "-" << rgend2 << ", reference " << rgstart1 << "-" << rgend1 << endl;
         #endif
-        
+
         int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
 
         #if homology_phi_psi_rotations
@@ -3311,6 +3311,11 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         // if (helix) backconnect(rgend1+1, helix-1);
     }
 
+    #if _dbg_homology
+    cout << "Minimizing clashes..." << endl;
+    #endif
+    get_internal_clashes(1, 9999, true, 25);
+
     for (l=0; l<15; l++)
     {
         int nummoved = 0;
@@ -3319,11 +3324,11 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             sprintf(buffer, "TMR%d", hxno);
             int rgstart0 = get_region_start(buffer);
             int rgend0 = get_region_end(buffer);
-            float threshold = 15 * (rgend0 - rgstart0);
+            float threshold = 5.5 * (rgend0 - rgstart0);
             float f = get_internal_clashes(rgstart0, rgend0, true, 10);
 
             #if _dbg_homology
-            cout << "Helix " << hxno << " is clashy " << f << endl;
+            cout << "Helix " << hxno << " is clashy " << f << " of threshold " << threshold << endl;
             #endif
 
             if (f < threshold) continue;

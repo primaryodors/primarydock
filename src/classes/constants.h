@@ -295,6 +295,9 @@
 
 #define hydrogenate_add_missing_heavy_atoms 1
 
+#define homology_phi_psi_rotations 1
+#define homology_long_axis_rotations 0
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 // Debugging stuff.

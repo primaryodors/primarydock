@@ -1906,23 +1906,25 @@ float AminoAcid::get_omega()
     return find_angle_along_vector(CA0->get_location(), CA1->get_location(), N->get_location(), axis);
 }
 
-void AminoAcid::rotate_phi(float a)
+bond_rotation_fail_reason AminoAcid::rotate_phi(float a)
 {
-    if (aadef->proline_like) return;
+    if (aadef->proline_like) return bf_disallowed_rotation;
     Atom* N  = get_atom("N");
     Atom* CA = get_atom("CA");
     Bond* b = CA->get_bond_between(N);
-    if (!b) return;
+    if (!b) return bf_bond_not_found;
     b->rotate(a, true, true);
+    return b->last_fail;
 }
 
-void AminoAcid::rotate_psi(float a)
+bond_rotation_fail_reason AminoAcid::rotate_psi(float a)
 {
     Atom* CA = get_atom("CA");
     Atom* C  = get_atom("C");
     Bond* b = CA->get_bond_between(C);
-    if (!b) return;
+    if (!b) return bf_bond_not_found;
     b->rotate(a, true, true);
+    return b->last_fail;
 }
 
 bool AminoAcid::is_alpha_helix()

@@ -1338,20 +1338,38 @@ void Atom::print_bond_angles()
 
 bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
 {
-    if (!btom) return false;
+    last_fail = bf_unknown;
+    if (!btom)
+    {
+        last_fail = bf_empty_atom;
+        return false;
+    }
     if (!moves_with_btom) fill_moves_with_cache();
     enforce_moves_with_uniqueness();
-    if (!moves_with_btom) return false;
+    if (!moves_with_btom)
+    {
+        last_fail = bf_terminal_atom;
+        return false;
+    }
 
     if (!can_rotate)
     {
-        if (can_flip) theta = flip_angle;
-        else return false;
+        if (can_flip)
+        {
+            last_fail = bf_limited_rotation;
+            theta = flip_angle;
+        }
+        else
+        {
+            last_fail = bf_disallowed_rotation;
+            return false;
+        }
     }
 
     if (atom->residue && !atom->is_backbone && greek_from_aname(atom->name) > greek_from_aname(btom->name))
     {
         can_rotate = false;
+        last_fail = bf_sidechain_hierarchy;
         return false;
     }
 
@@ -1385,7 +1403,11 @@ bool Bond::rotate(float theta, bool allow_backbone, bool skip_inverse_check)
         }
 
         if (mwb_total_binding < mwbi_total_binding)
-            return inverse->rotate(-theta, allow_backbone, true);				// DANGER! RECURSION.
+        {
+            bool result = inverse->rotate(-theta, allow_backbone, true);				// DANGER! RECURSION.
+            last_fail = inverse->last_fail;
+            return result;
+        }
     }
 _cannot_reverse_bondrot:
     ;
@@ -1424,6 +1446,7 @@ _cannot_reverse_bondrot:
 
     // cout << theta << endl;
 
+    if (last_fail != bf_limited_rotation) last_fail = bf_none;
     return true;
 }
 
@@ -2733,7 +2756,47 @@ float Atom::similarity_to(Atom* b)
     return similarity;
 }
 
+std::ostream& operator<<(std::ostream& os, const bond_rotation_fail_reason& bf)
+{
+    switch (bf)
+    {
+        case bf_bond_not_found:
+        os << "Bond not found";
+        break;
 
+        case bf_disallowed_rotation:
+        os << "Rotation not allowed";
+        break;
+
+        case bf_empty_atom:
+        os << "No B atom";
+        break;
+
+        case bf_limited_rotation:
+        os << "Limited rotation";
+        break;
+
+        case bf_none:
+        os << "Success";
+        break;
+
+        case bf_sidechain_hierarchy:
+        os << "Wrong direction on side chain";
+        break;
+
+        case bf_terminal_atom:
+        os << "Atom B has no other bonded atoms";
+        break;
+
+        case bf_unknown:
+        os << "Unknown failure";
+        break;
+
+        default:
+        os << "Unimplemented failure code";
+    }
+    return os;
+}
 
 
 

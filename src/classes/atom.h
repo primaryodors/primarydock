@@ -19,6 +19,20 @@ enum intera_type
     vdW
 };
 
+enum bond_rotation_fail_reason
+{
+    bf_none,
+    bf_empty_atom,
+    bf_terminal_atom,
+    bf_bond_not_found,
+    bf_limited_rotation,
+    bf_disallowed_rotation,
+    bf_sidechain_hierarchy,
+    bf_unknown
+};
+
+std::ostream& operator<<(std::ostream& os, const bond_rotation_fail_reason& bf);
+
 class Atom;
 class Bond
 {
@@ -33,6 +47,7 @@ public:
     float total_rotations=0;
     intera_type type = covalent;
     float optimal_radius = 1;
+    bond_rotation_fail_reason last_fail = bf_none;
 
     #if _debug_active_bond_rot
     bool echo_on_rotate = false;

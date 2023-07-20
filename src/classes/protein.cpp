@@ -3114,6 +3114,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         cout << "Region " << hxno << " target " << rgstart2 << "-" << rgend2 << ", reference " << rgstart1 << "-" << rgend1 << endl;
         #endif
 
+        #if homology_phi_psi_rotations
         // Do the phi and psi rotations.
         int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
@@ -3129,19 +3130,32 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             {
                 AminoAcid* aa1 = reference->get_residue(resno1);
                 if (!aa1) continue;
-                AminoAcid* aa2 = target->get_residue(resno1);
+                AminoAcid* aa2 = target->get_residue(resno2);
                 if (!aa2) continue;
 
-                float theta = aa2->get_phi() - aa1->get_phi();
-                aa->rotate_phi(theta);
+                float phi1 = aa1->get_phi(), phi2 = aa2->get_phi();
+                if (phi1 >= M_PI) phi1 -= M_PI*2;
+                if (phi2 >= M_PI) phi2 -= M_PI*2;
+                float theta = phi2 - phi1;
+                bond_rotation_fail_reason phi_fail = aa->rotate_phi(theta);
                 #if _dbg_homology
-                cout << resno0 << " phi " << (theta*fiftyseven) << " deg." << endl;
+                cout << resno0 << " (t " << resno2 << ", r " << resno1 << ") phi " << (theta*fiftyseven) << " (" << (phi2*fiftyseven) << " - " << (phi1*fiftyseven) << ") deg. " << phi_fail << "." << endl;
                 #endif
 
-                theta = aa2->get_psi() - aa1->get_psi();
-                aa->rotate_psi(theta);
+                AminoAcid* aaprev = aa->get_prev();
+                if (aaprev)
+                {
+                    Point* nhca = aaprev->predict_next_NHCA();
+                    aa->attach_to_prediction(nhca);
+                }
+ 
+                float psi1 = aa1->get_psi(), psi2 = aa2->get_psi();
+                if (psi1 >= M_PI) psi1 -= M_PI*2;
+                if (psi2 >= M_PI) psi2 -= M_PI*2;
+                theta = psi2 - psi1;
+                bond_rotation_fail_reason psi_fail = aa->rotate_psi(theta);
                 #if _dbg_homology
-                cout << resno0 << " psi " << (theta*fiftyseven) << " deg." << endl;
+                cout << resno0 << " (t " << resno2 << ", r " << resno1 << ") psi " << (theta*fiftyseven) << " (" << (psi2*fiftyseven) << " - " << (psi1*fiftyseven) << ") deg. " << psi_fail << "." << endl;
                 #endif
 
                 AminoAcid* aanext = aa->get_next();
@@ -3150,6 +3164,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
                 aanext->attach_to_prediction(nhca);
             }
         }
+        #endif
 
         // Compute the TM region transformation.
         Point rcen1(0,0,0);
@@ -3214,6 +3229,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         #endif
 
 
+        #if homology_long_axis_rotations
         // Compute the TM region long axes.
         Point rgn_begin(0,0,0), rgn_end(0,0,0);
         l = 0;
@@ -3280,7 +3296,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         #if _dbg_homology
         cout << "Region " << hxno << " long-axis rotated " << theta*fiftyseven << "deg." << endl;
         #endif
-
+        #endif
 
         // if (helix) backconnect(rgend1+1, helix-1);
     }

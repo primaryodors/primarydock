@@ -147,8 +147,8 @@ public:
     float get_phi();
     float get_psi();
     float get_omega();
-    void rotate_phi(float rel_angle);
-    void rotate_psi(float rel_angle);
+    bond_rotation_fail_reason rotate_phi(float rel_angle);
+    bond_rotation_fail_reason rotate_psi(float rel_angle);
 
     // Intermol functions.
     float get_intermol_binding(AminoAcid* neighbor, bool backbone_atoms_only = false);

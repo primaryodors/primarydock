@@ -3242,7 +3242,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         // Perform the TM region long-axis rotation.
         rotate_piece(rgstart0, rgend0, rgn_begin, axis, theta);
         #if _dbg_homology
-        cout << "Region " << hxno << " rotated " << theta*fiftyseven << "deg." << endl;
+        cout << "Region " << hxno << " long-axis rotated " << theta*fiftyseven << "deg." << endl;
         #endif
 
 

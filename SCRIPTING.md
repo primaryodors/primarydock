@@ -31,10 +31,6 @@ All strings begin with `$`, e.g. `$name`.
 
 Cartesians have members .x, .y, and .z that behave as floats.
 
-Substrings can be accessed via dot-comma notation, e.g. `$string.10` or `$string.10,3` or `$string.%start,%len`.
-If the length is omitted, the substring will continue all the way to the end.
-Note that the start position is separated by a dot, but the length is separated by a comma.
-
 Casting a float to an integer rounds the value (e.g. 0.4 rounds to zero but 0.5 rounds to 1).
 
 Casting a float to a Cartesian normally sets the .x member to the float value, leaving .y=0 and .z=0.
@@ -610,6 +606,25 @@ STRAND B C
 
 Changes the current working strand to the strand ID specified. If two strand IDs are given, the protein in the first strand is moved to the second
 strand and the working strand is set to the second ID.
+
+
+# STRLEN
+Example:
+```
+STRPOS $string %out_var
+```
+
+Gets the length of the input string and sets `%out_var` to that number.
+
+
+# STRPOS
+Example:
+```
+STRPOS $haystack $needle %out_var
+```
+
+Searches the `$haystack` string for the `$needle` and, if found, sets the `%out_var` to the 1-based position of the start of the searched string.
+If the second string is not found within the first string, `%out_var` is set to zero.
 
 
 # UPRIGHT

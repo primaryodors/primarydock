@@ -6,6 +6,38 @@ LET $gprot = $arg3
 
 
 
+LET %slash = 1
+loop:
+STRPOS $rcpfn.%slash "/" %i
+IF %i = 0 GOTO done
+LET %slash += %i
+GOTO loop
+done:
+
+LET $rcpid = $rcpfn.%slash
+
+STRPOS $rcpid "_" %i
+IF %i = 0 GOTO no_underscore
+LET %i --
+LET $rcpid = $rcpid FROM 1 FOR %i
+no_underscore:
+
+STRPOS $rcpid "-" %i
+IF %i = 0 GOTO no_dash
+LET %i --
+LET $rcpid = $rcpid FROM 1 FOR %i
+no_dash:
+
+STRPOS $rcpid "." %i
+IF %i = 0 GOTO no_dot
+LET %i --
+LET $rcpid = $rcpid FROM 1 FOR %i
+no_dot:
+
+
+
+
+
 IF $arg3 != "hGNAL" GOTO not_Golf
 
 STRAND G
@@ -73,7 +105,8 @@ UNCHAIN I
 STRAND G
 RENUMBER 1 999 500
 
-SAVE "tmp/coupled.pdb" EXIT
+LET $output_fname = "tmp/coupled." + $rcpid + ".pdb"
+SAVE $output_fname EXIT
 
 
 custom6:

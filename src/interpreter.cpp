@@ -191,6 +191,9 @@ int find_var_index(const char* varname, char** out_varname = nullptr)
     char* c1 = strchr(buffer+1,'%');
     char* c2 = strchr(buffer+1,'$');
 
+    if (c1 && *(c1-1) == '.') c1 = nullptr;
+    if (c2 && *(c2-1) == '.') c2 = nullptr;
+
     if (!c1 && !c2) c = c1;
     if (!c1 &&  c2) c = c2;
     if ( c1 && !c2) c = c1;
@@ -2473,6 +2476,53 @@ int main(int argc, char** argv)
                     g_chain = chain+65;
                 }
             }   // STRAND
+
+            else if (!strcmp(words[0], "STRLEN"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters given for STRLEN.");
+                if (!words[2]) raise_error("Insufficient parameters given for STRLEN.");
+                if (words[3]) raise_error("Too many parameters given for STRLEN.");
+
+                char* c = interpret_single_string(words[1]);
+                if (!c) l = 0;
+                else l = strlen(c);
+
+                n = find_var_index(words[2]);
+                if (n<0)
+                {
+                    n = vars++;
+                    script_var[n].name = words[2];
+                    script_var[n].vt = type_from_name(words[2]);
+                }
+                int flags = n & _VARFLAGS_MASK;
+                n &= _VARNUM_MASK;
+
+                script_var[n].value.n = l;
+            }
+
+            else if (!strcmp(words[0], "STRPOS"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters given for STRPOS.");
+                if (!words[2]) raise_error("Insufficient parameters given for STRPOS.");
+                if (!words[3]) raise_error("Insufficient parameters given for STRPOS.");
+                if (words[4]) raise_error("Too many parameters given for STRPOS.");
+
+                n = find_var_index(words[3]);
+                if (n<0)
+                {
+                    n = vars++;
+                    script_var[n].name = words[3];
+                    script_var[n].vt = type_from_name(words[3]);
+                }
+                int flags = n & _VARFLAGS_MASK;
+                n &= _VARNUM_MASK;
+
+                char* haystack = interpret_single_string(words[1]);
+                char* needle = interpret_single_string(words[2]);
+                char* c = strstr(haystack, needle);
+                if (!c) script_var[n].value.n = 0;
+                else script_var[n].value.n = c - haystack + 1;
+            }   // STRPOS
 
             else if (!strcmp(words[0], "UNCHAIN"))
             {

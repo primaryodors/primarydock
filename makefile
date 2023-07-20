@@ -13,8 +13,7 @@ REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_a
 all: $(DIRS) \
 	 $(OBJS) \
 	 $(TESTS) \
-	 $(APPS) \
-	 $(REPORTS)
+	 $(APPS)
 code: $(DIRS) $(OBJS) $(TESTS) amino_report molecule_report $(APPS)
 primarydock: $(DIRS) $(OBJS) $(BINDIR)/primarydock
 pepteditor: $(DIRS) $(OBJS) $(BINDIR)/pepteditor

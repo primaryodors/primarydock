@@ -295,7 +295,7 @@
 
 #define hydrogenate_add_missing_heavy_atoms 1
 
-#define homology_phi_psi_rotations 1
+#define homology_phi_psi_rotations 0
 #define homology_long_axis_rotations 0
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,7 +337,7 @@
 #define _dbg_null_flexions 0
 #define _dbg_repack 0
 #define _dbg_multiflex 0
-#define _dbg_homology 1
+#define _dbg_homology 0
 #define _dbg_bridges 0
 #define _dbg_mol_frames 0
 #define _dbg_fitness_plummet 0

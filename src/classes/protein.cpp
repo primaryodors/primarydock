@@ -3113,10 +3113,11 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         #if _dbg_homology
         cout << "Region " << hxno << " target " << rgstart2 << "-" << rgend2 << ", reference " << rgstart1 << "-" << rgend1 << endl;
         #endif
+        
+        int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
 
         #if homology_phi_psi_rotations
         // Do the phi and psi rotations.
-        int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
         float theta_carry = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
         {
@@ -3167,10 +3168,10 @@ void Protein::homology_conform(Protein* target, Protein* reference)
                 cout << resno0 << " (t " << resno2 << ", r " << resno1 << ") psi " << (theta*fiftyseven) << " (" << (psi2*fiftyseven) << " - " << (psi1*fiftyseven) << ") deg. " << psi_fail << "." << endl;
                 #endif
 
-                AminoAcid* aanext = aa->get_next();
+                /*AminoAcid* aanext = aa->get_next();
                 if (!aanext) continue;
                 Point* nhca = aa->predict_next_NHCA();
-                aanext->attach_to_prediction(nhca);
+                aanext->attach_to_prediction(nhca);*/
             }
         }
         #endif

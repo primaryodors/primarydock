@@ -3009,7 +3009,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
     // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
     // the TM CA atoms as closely as possible.
-    int i;
+    int i, l;
     float theta = 0;
     Point axis(0,1,0);
     count = 0;
@@ -3113,6 +3113,8 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         #if _dbg_homology
         cout << "Region " << hxno << " target " << rgstart2 << "-" << rgend2 << ", reference " << rgstart1 << "-" << rgend1 << endl;
         #endif
+
+        // Compute the TM region transformation.
         int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
         Point rcen1(0,0,0);
         Point rcen2(0,0,0);
@@ -3142,13 +3144,14 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         cout << "Region " << hxno << " (" << rgstart0 << "-" << rgend0 << ")" << " transformed by " << transformation.magnitude() << "A" << endl;
         #endif
 
+        // Compute the TM region rotation.
         Point axis(0,0,0);
         Point rcen = get_region_center(rgstart2, rgend2);
         float theta = 0;
         count = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
         {
-            int i = resno1 - bw50a;
+            i = resno1 - bw50a;
             resno2 = bw50b + i;
             if (resno2 >= rgstart2 && resno2 <= rgend2)
             {
@@ -3174,100 +3177,78 @@ void Protein::homology_conform(Protein* target, Protein* reference)
         cout << "Region " << hxno << " rotated " << theta*fiftyseven << "deg." << endl;
         #endif
 
-        #if homology_gradients
-        // Count from region start backwards until at least four consecutive helix residues.
-        int hc, inarow = 0, helix = 0;
-        bool looped = false;
-        for (hc = rgstart0-1; hc > 0; hc--)
+
+        // Compute the TM region long axes.
+        Point rgn_begin(0,0,0), rgn_end(0,0,0);
+        l = 0;
+        bool starting = true;
+        for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
         {
-            AminoAcid* aa = get_residue(hc);
+            AminoAcid* aa = get_residue(resno1);
             if (!aa) continue;
-            if (aa->is_alpha_helix()) inarow++;
-            else
-            {
-                inarow = 0;
-                looped = true;
-            }
 
-            if (looped && (inarow >= 4))
+            i = resno1 - bw50a;
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
             {
-                helix = hc + inarow - 1;
-                break;
+                Point caloc2 = target->get_atom_location(resno2, "CA");
+                if (starting) rgn_begin = rgn_begin.add(caloc2);
+                else rgn_end = rgn_end.add(caloc2);
+
+                l++;
+                if (l >= 4)
+                {
+                    if (starting)
+                    {
+                        rgn_begin.scale(rgn_begin.magnitude()/l);
+                        resno1 = rgend1 - 4;
+                        l = 0;
+                        starting = false;
+                    }
+                    else
+                    {
+                        rgn_end.scale(rgn_end.magnitude()/l);
+                        break;
+                    }
+                }
             }
         }
 
-        if (inarow >= 4) helix += inarow;
+        if (starting || !l) continue;
 
+        // Compute the TM region long-axis rotation.
+        axis = rgn_end.subtract(rgn_begin);
+        theta = 0;
+        count = 0;
+        for (resno1 = rgstart0; resno1 <= rgend0; resno1++)
+        {
+            i = resno1 - get_bw50(hxno);
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                Point caloc1 = get_atom_location(resno1, "CA"),
+                      caloc2 = target->get_atom_location(resno2, "CA");
+
+                theta += find_angle_along_vector(caloc1, caloc2, rgn_begin, axis);
+                count++;
+            }
+        }
+
+        if (count)
+        {
+            theta/=count;
+        }
+
+        // Perform the TM region long-axis rotation.
+        rotate_piece(rgstart0, rgend0, rgn_begin, axis, theta);
         #if _dbg_homology
-        cout << "Gradient adjustment of " << (rgstart0-1) << "-" << (helix+1) << endl;
+        cout << "Region " << hxno << " rotated " << theta*fiftyseven << "deg." << endl;
         #endif
 
-        // Transform and rotate the flexible loop residues in a gradient from maximum effect at region start to no effect at other helix.
-        int grad_len = rgstart0 - helix;
-        float grad_peraa = (inarow >= 4) ? (1.0 / grad_len) : 0;
-        float effect = 1;
-
-        if (grad_len > 0)
-        for (hc = rgstart0-1; hc > helix; hc--)
-        {
-            effect -= grad_peraa;
-            SCoord resmov = transformation;
-            resmov.r *= effect;
-            move_piece(hc, hc, resmov);
-            rotate_piece(hc, hc, rcen, axis, theta*effect);
-        }
-
-        // if (helix) backconnect(helix+1, rgstart1-1);
-
-        // Do the same for region end forward to the next helix.
-        inarow = 0;
-        helix = 0;
-        looped = false;
-        int protend = get_end_resno();
-        for (hc = rgend0+1; hc < protend; hc++)
-        {
-            AminoAcid* aa = get_residue(hc);
-            if (!aa) continue;
-            if (aa->is_alpha_helix()) inarow++;
-            else
-            {
-                inarow = 0;
-                looped = true;
-            }
-
-            if (looped && (inarow >= 4))
-            {
-                helix = hc + inarow - 1;
-                break;
-            }
-        }
-
-        if (inarow >= 4 && helix > inarow) helix -= inarow;
-
-        #if _dbg_homology
-        cout << "Gradient adjustment of " << (rgend0+1) << "-" << (helix-1) << endl;
-        #endif
-
-        grad_len = helix - rgend1;
-        grad_peraa = (inarow >= 4) ? (1.0 / grad_len) : 0;
-        effect = 1;
-
-        if (grad_len > 0)
-        for (hc = rgend0+1; (!helix || hc < helix) && hc <= protend; hc++)
-        {
-            effect -= grad_peraa;
-            SCoord resmov = transformation;
-            resmov.r *= effect;
-            move_piece(hc, hc, resmov);
-            rotate_piece(hc, hc, rcen, axis, theta*effect);
-        }
-
-        #endif
 
         // if (helix) backconnect(rgend1+1, helix-1);
     }
 
-    int l;
     for (l=0; l<15; l++)
     {
         int nummoved = 0;

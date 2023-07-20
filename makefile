@@ -125,7 +125,7 @@ atom_report: test/atom_test
 
 aniso_report: REPORT="test/aniso_test.approved.txt"
 aniso_report: test/aniso_test
-	./test/aniso_test >test/aniso_test.received.txt
+	./test/aniso_test --asciiart >test/aniso_test.received.txt
 	diff --color --unified $(REPORT) test/aniso_test.received.txt
 
 point_report: REPORT="test/point_test.approved.txt"

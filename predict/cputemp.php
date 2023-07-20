@@ -18,7 +18,7 @@ function die_if_too_hot()
                 if ($limit)
                 {
                     $limit -= 6;
-                    if (floatval($ln[0]) >= $limit) die("Computer too hot.\n");
+                    if (floatval($ln[0]) >= $limit) die("Processor too hot.\n");
                 }
             }
             else if (preg_match("/:\\s+[+-][0-9]{1,3}[.][0-9]*[^(]*[(]crit =/", $ln))
@@ -29,7 +29,7 @@ function die_if_too_hot()
                 if ($limit)
                 {
                     $limit -= 20;
-                    if (floatval($ln[0]) >= $limit) die("Computer too hot.\n");
+                    if (floatval($ln[0]) >= $limit) die("Processor too hot.\n");
                 }
             }
         }

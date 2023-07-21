@@ -104,8 +104,8 @@ public:
 
     // Spatial functions.
     Point get_barycenter(bool bond_weighted = false) const;
-    virtual void move(SCoord move_amt);
-    virtual void move(Point move_amt);
+    virtual void move(SCoord move_amt, bool override_residue = false);
+    virtual void move(Point move_amt, bool override_residue = false);
     virtual void recenter(Point new_location);
     void rotate(SCoord* SCoord, float theta, bool bond_weighted = false);
     void rotate(LocatedVector SCoord, float theta);

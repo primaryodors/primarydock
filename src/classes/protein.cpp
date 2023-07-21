@@ -3336,6 +3336,40 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     #endif
     get_internal_clashes(1, 9999, true, 25);
 
+    #if homology_region_optimization
+    for (l=0; l<50; l++)
+    {
+        #if _dbg_homology
+        cout << endl << flush;
+        #endif
+
+        for (hxno = 1; hxno <= 7; hxno++)
+        {
+            sprintf(buffer, "TMR%d", hxno);
+            int rgstart = get_region_start(buffer);
+            int rgend = get_region_end(buffer);
+
+            SCoord transform;
+            Rotation rotation;
+
+            region_optimal_positioning(rgstart, rgend, &transform, &rotation, nullptr);
+
+            #if _dbg_homology
+            Point ptx = transform;
+            cout << buffer << " should move " << ptx << " and rotate " << rotation << endl << flush;
+            #endif
+
+            transform.r *= 0.2;
+            rotation.a *= 0.2;
+
+            Point rgncenter = get_region_center(rgstart, rgend);
+
+            move_piece(rgstart, rgend, transform);
+
+            rotate_piece(rgstart, rgend, rgncenter, rotation.v, rotation.a);
+        }
+    }
+    #else
     for (l=0; l<50; l++)
     {
         int nummoved = 0;
@@ -3371,10 +3405,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
         if (!nummoved) break;
     }
-
-    // Prepare for clash minimization.
-    float dx[10], dy[10], dz[10];
-    float target_clash[10], attained[10];
+    #endif
 
     mass_undoable = wmu;
 }

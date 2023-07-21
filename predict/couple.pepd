@@ -202,7 +202,9 @@ STRAND A
 LET %533 = %A.5.50 - 17
 LET %548 = %A.5.50 - 2
 LET %628 = %A.6.50 - 22
+LET %635 = %A.6.50 - 15
 LET %636 = %A.6.50 - 14
+LET %637 = %A.6.50 - 13
 LET %648 = %A.6.50 - 2
 LET %659 = %A.6.50 + 9
 
@@ -218,8 +220,8 @@ LET @axis = @548 - @648
 LET %i = 10
 g_protein_clash_loop:
 LET &energy = 0
-# ECHO "CTNRG G " %penult " " 9999 " " A " " %636 " " %636 " &energy "
-CTNRG G %penult 9999 A %636 %636 &energy
+# ECHO "CTNRG G " %penult " " 9999 " A " %635 " " %637 " &energy "
+CTNRG G %penult 9999 A %635 %637 &energy
 # ECHO &energy
 IF &energy > 25 ROTATE @axis 1 %648 %533 %659
 LET %i --

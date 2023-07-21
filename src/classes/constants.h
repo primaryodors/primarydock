@@ -340,7 +340,7 @@
 #define _dbg_null_flexions 0
 #define _dbg_repack 0
 #define _dbg_multiflex 0
-#define _dbg_homology 1
+#define _dbg_homology 0
 #define _dbg_bridges 0
 #define _dbg_mol_frames 0
 #define _dbg_fitness_plummet 0

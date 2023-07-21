@@ -177,6 +177,7 @@ public:
     static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int, Molecule**) = nullptr);
     void conform_atom_to_location(int atom_idx, Point target, int iterations = 50);
     void conform_atom_to_location(char* atom_name, Point target, int iterations = 50);
+    SCoord motion_to_optimal_contact(Molecule* ligand);
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);

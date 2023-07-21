@@ -3035,6 +3035,62 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
     minimum_searching_aniso = 0;
 }
 
+#define dbg_optimal_contact 0
+SCoord Molecule::motion_to_optimal_contact(Molecule* l)
+{
+    Pose p;
+    p.copy_state(this);
+
+    MovabilityType m = movability, lm = l->movability;
+    movability = l->movability = MOV_FLEXONLY;
+
+    SCoord total_motion(0,0,0);
+    SCoord incremental_motion;
+
+    float energy = -this->get_intermol_binding(l);
+
+    incremental_motion = this->get_barycenter().subtract(l->get_barycenter());
+    incremental_motion.r = sgn(energy);
+
+    int i;
+
+    for (i=0; i<50; i++)
+    {
+        #if dbg_optimal_contact
+        cout << "Energy was " << energy << endl;
+        #endif
+
+        this->move(incremental_motion);
+        float new_energy = -this->get_intermol_binding(l);
+
+        if (new_energy < energy)        // Improvement
+        {
+            energy = new_energy;
+            total_motion = total_motion.add(incremental_motion);
+
+            #if dbg_optimal_contact
+            cout << "Energy has improved to " << energy << "; keeping." << endl;
+            #endif
+        }
+        else
+        {
+            incremental_motion.r *= -1;
+            this->move(incremental_motion);
+            incremental_motion.r *= 0.666;
+
+            #if dbg_optimal_contact
+            cout << "Energy tried " << energy << endl;
+            #endif
+        }
+    }
+
+    p.restore_state(this);
+    movability = m;
+    l->movability = lm;
+
+    return total_motion;
+}
+
 Atom* numbered[10];
 bool ring_warned = false;
 

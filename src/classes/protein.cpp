@@ -1493,6 +1493,9 @@ void Protein::conform_backbone(int startres, int endres,
                                int iters, bool backbone_atoms_only
                               )
 {
+    cout << "conform_backbone() has never worked and probably never will." << endl;
+    throw -1;
+
     save_undo_state();
     bool wmu = mass_undoable;
     mass_undoable = true;
@@ -3666,4 +3669,64 @@ float Protein::binding_to_nearby_residues(int resno)
     if (!aa) return 0;
 
     return aa->get_intermol_binding(caa);
+}
+
+void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r, Protein** p)
+{
+    if (!x || !r)
+    {
+        cout << "Protein::region_optimal_positioning() output parameters cannot be null." << endl;
+        throw -1;
+    }
+
+    int i, j, n;
+    for (j=0; p && p[j]; j++);          // Count other strands.
+
+    Protein* strands[j+2];
+
+    strands[0] = this;
+    for (i=0; i<j; i++) strands[i+1] = p[i];
+    strands[i+1] = nullptr;
+    AminoAcid* reaching[1024];
+
+    int resno, divisor = 0;
+    x->phi = x->theta = x->r = 0;
+
+    Point sum_pt(0,0,0), sum_aln(0,0,0);
+    Point center = get_region_center(sr, er);
+
+    for (resno = sr; resno <= er; resno++)
+    {
+        Star aa;
+        aa.paa = get_residue(resno);
+        if (!aa.n) continue;
+        Point CA = aa.paa->get_CA_location();
+
+        for (i=0; strands[i]; i++)
+        {
+            n = strands[i]->get_residues_can_clash_ligand(reaching, aa.pmol, aa.paa->get_CA_location(), Point(7,7,7), nullptr);
+            for (j=0; j<n; j++)
+            {
+                SCoord motion = aa.pmol->motion_to_optimal_contact(reaching[j]);
+                *x = x->add(motion);
+
+                Point CA_new = CA.add(motion);
+                divisor++;
+
+                if (CA.y > center.y)
+                {
+                    sum_pt = sum_pt.add(CA.subtract(center));
+                    sum_aln = sum_aln.add(CA_new.subtract(center));
+                }
+                else
+                {
+                    sum_pt = sum_pt.add(center.subtract(CA));
+                    sum_aln = sum_aln.add(center.subtract(CA_new));
+                }
+            }
+        }
+    }
+
+    if (divisor) x->r /= divisor;
+    *r = align_points_3d(sum_pt, sum_aln, Point(0,0,0));
 }

@@ -104,8 +104,8 @@ public:
 
     // Spatial functions.
     Point get_barycenter(bool bond_weighted = false) const;
-    virtual void move(SCoord move_amt);
-    virtual void move(Point move_amt);
+    virtual void move(SCoord move_amt, bool override_residue = false);
+    virtual void move(Point move_amt, bool override_residue = false);
     virtual void recenter(Point new_location);
     void rotate(SCoord* SCoord, float theta, bool bond_weighted = false);
     void rotate(LocatedVector SCoord, float theta);
@@ -177,6 +177,7 @@ public:
     static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int, Molecule**) = nullptr);
     void conform_atom_to_location(int atom_idx, Point target, int iterations = 50);
     void conform_atom_to_location(char* atom_name, Point target, int iterations = 50);
+    SCoord motion_to_optimal_contact(Molecule* ligand);
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);

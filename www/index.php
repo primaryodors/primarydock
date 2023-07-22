@@ -1,7 +1,7 @@
 <?php
 chdir(__DIR__);
-require_once("../predict/protutils.php");
-require_once("../predict/odorutils.php");
+require_once("../data/protutils.php");
+require_once("../data/odorutils.php");
 
 include("header.php");
 

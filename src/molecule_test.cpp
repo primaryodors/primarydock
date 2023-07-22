@@ -206,6 +206,9 @@ int main(int argc, char** argv)
     mols[1] = &m2;
     mols[2] = NULL;
     Molecule::conform_molecules(mols, 200, &iteration_callback);
+    SCoord optimize = m1.motion_to_optimal_contact(&m2);
+    cout << "# Optimization moves molecule 1 by " << optimize << endl;
+    m1.move(optimize);
     #if _peratom_audit
     interauditing = true;
     #endif

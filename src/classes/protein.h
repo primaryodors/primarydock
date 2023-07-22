@@ -115,11 +115,12 @@ public:
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
     float binding_to_nearby_residues(int resno);
     void minimize_residue_clashes(int resno);
+    void region_optimal_positioning(int startres, int endres, SCoord* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
 
     // Motion functions
     void upright();
-    void move_piece(int start_res, int end_res, Point new_center);		// After calling this, you should reconnect the broken ends with conform_backbone().
-    void move_piece(int start_res, int end_res, SCoord move_amt);       // "
+    void move_piece(int start_res, int end_res, Point new_center);
+    void move_piece(int start_res, int end_res, SCoord move_amt);
     LocRotation rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.
     LocRotation rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res);
     LocRotation rotate_piece(int start_res, int end_res, Point origin, SCoord axis, float theta);

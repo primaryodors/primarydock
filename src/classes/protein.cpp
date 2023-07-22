@@ -3337,12 +3337,13 @@ void Protein::homology_conform(Protein* target, Protein* reference)
     get_internal_clashes(1, 9999, true, 25);
 
     #if homology_region_optimization
-    for (l=0; l<50; l++)
+    for (l=0; l<20; l++)
     {
         #if _dbg_homology
         cout << endl << flush;
         #endif
 
+        float total_motion = 0;
         for (hxno = 1; hxno <= 7; hxno++)
         {
             sprintf(buffer, "TMR%d", hxno);
@@ -3354,20 +3355,24 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
             region_optimal_positioning(rgstart, rgend, &transform, &rotation, nullptr);
 
+            total_motion += transform.r + rotation.a*fiftyseven;
+
             #if _dbg_homology
             Point ptx = transform;
             cout << buffer << " should move " << ptx << " and rotate " << rotation << endl << flush;
             #endif
 
             transform.r *= 0.2;
-            rotation.a *= 0.2;
+            rotation.a *= 0.333;
 
             Point rgncenter = get_region_center(rgstart, rgend);
 
             move_piece(rgstart, rgend, transform);
 
-            rotate_piece(rgstart, rgend, rgncenter, rotation.v, rotation.a);
+            // rotate_piece(rgstart, rgend, rgncenter, rotation.v, rotation.a);
         }
+
+        if (total_motion < 0.1) break;
     }
     #else
     for (l=0; l<50; l++)
@@ -3732,17 +3737,36 @@ void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r,
         aa.paa = get_residue(resno);
         if (!aa.n) continue;
         Point CA = aa.paa->get_CA_location();
+        bool residue_counted_yet = false;
 
         for (i=0; strands[i]; i++)
         {
             n = strands[i]->get_residues_can_clash_ligand(reaching, aa.pmol, aa.paa->get_CA_location(), Point(7,7,7), nullptr);
             for (j=0; j<n; j++)
             {
+                /*float e = -aa.pmol->get_intermol_binding(reaching[j]);
+                if (e < homology_clash_peraa) continue;*/
+
                 SCoord motion = aa.pmol->motion_to_optimal_contact(reaching[j]);
-                *x = x->add(motion);
+                if (fabs(motion.r) < 0.1) continue;
+
+                Point pt_temp = *x;
+                Point pt_add = motion;
+                Point pt_diff = aa.paa->get_CA_location().subtract(reaching[j]->get_CA_location());
+
+                if (pt_add.x * sgn(pt_diff.x) > pt_temp.x * sgn(pt_diff.x)) pt_temp.x = pt_add.x;
+                if (pt_add.y * sgn(pt_diff.y) > pt_temp.y * sgn(pt_diff.y)) pt_temp.y = pt_add.y;
+                if (pt_add.z * sgn(pt_diff.z) > pt_temp.z * sgn(pt_diff.z)) pt_temp.z = pt_add.z;
+
+                *x = pt_temp;
+
+                if (!residue_counted_yet)
+                {
+                    divisor++;
+                    residue_counted_yet = true;
+                }
 
                 Point CA_new = CA.add(motion);
-                divisor++;
 
                 if (CA.y > center.y)
                 {
@@ -3758,6 +3782,6 @@ void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r,
         }
     }
 
-    if (divisor) x->r /= divisor;
+    // if (divisor) x->r /= divisor;
     *r = align_points_3d(sum_pt, sum_aln, Point(0,0,0));
 }

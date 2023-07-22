@@ -2,7 +2,7 @@
 
 chdir(__DIR__);
 chdir('..');
-require_once("predict/protutils.php");
+require_once("data/protutils.php");
 
 define("_ALPHAFOLD", 22);
 define("_ZHANGLAB",  17);

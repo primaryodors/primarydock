@@ -5,29 +5,7 @@ chdir("..");
 
 // Includes
 require("cputemp.php");
-require("predict/protutils.php");
-
-// $Gprots = ["hGNAL", "hGNAS2"];
-$Gprots = [];
-
-$c = file_get_contents("data/gprots_aligned.txt");
-foreach (explode("\n", $c) as $ln)
-{
-    if (substr($ln, 0, 1) == '#') continue;
-    $gpid = trim(substr($ln, 0, 10));
-    if ($gpid)
-    {
-        $dir = dir("pdbs/Gprot/");
-        $exists = false;
-        while (false !== ($entry = $dir->read()))
-        {
-            if (false!==strpos($entry, "$gpid.pdb")) $exists = true;
-        }
-        if ($exists) $Gprots[] = $gpid;
-    }
-}
-
-// print_r($Gprots);
+require("data/protutils.php");
 
 foreach (@$argv as $a)
 {
@@ -60,7 +38,7 @@ if (@$_REQUEST['next'])
         }
 
         if ($gpcrid && $gpcrid != $rcpid && !preg_match("/^$gpcrid$/", $rcpid) ) continue;
-        foreach ($Gprots as $gprotid)
+        foreach ($gprots as $gprotid => $gpdata)
         {
             if ($gpid && $gpid != $gprotid) continue;
 

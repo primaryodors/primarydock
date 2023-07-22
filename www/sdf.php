@@ -6,7 +6,7 @@ header("Pragma: no-cache");
 header("Expires: 0");
 
 chdir(__DIR__);
-require_once("../predict/odorutils.php");
+require_once("../data/odorutils.php");
 
 if (@$_REQUEST['m'] == "rand") $odor = $odors[array_keys($odors)[rand(0,count($odors)-1)]];
 else

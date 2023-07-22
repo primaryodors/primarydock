@@ -2024,7 +2024,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
     return clash*_kJmol_cuA;
 }
 
-void Molecule::move(SCoord move_amt)
+void Molecule::move(SCoord move_amt, bool override_residue)
 {
     if (noAtoms(atoms)) return;
     if (immobile)
@@ -2036,14 +2036,14 @@ void Molecule::move(SCoord move_amt)
 
     for (i=0; atoms[i]; i++)
     {
-        if (atoms[i]->residue) return;					// If you must move a residue of a protein, use AminoAcid::aamove() instead.
+        if (atoms[i]->residue && !override_residue) return;
         Point loc = atoms[i]->get_location();
         loc = loc.add(&move_amt);
         atoms[i]->move(&loc);
     }
 }
 
-void Molecule::move(Point move_amt)
+void Molecule::move(Point move_amt, bool override_residue)
 {
     if (noAtoms(atoms)) return;
     if (immobile)
@@ -2056,7 +2056,7 @@ void Molecule::move(Point move_amt)
     for (i=0; atoms[i]; i++)
     {
         // cout << atoms[i]->name << " ";
-        if (atoms[i]->residue) return;					// If you must move a residue of a protein, use AminoAcid::aamove() instead.
+        if (atoms[i]->residue && !override_residue) return;
         Point loc = atoms[i]->get_location();
         loc = loc.add(&move_amt);
         atoms[i]->move(&loc);
@@ -3033,6 +3033,64 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
     }       // for iter
 
     minimum_searching_aniso = 0;
+}
+
+#define dbg_optimal_contact 0
+SCoord Molecule::motion_to_optimal_contact(Molecule* l)
+{
+    Pose p;
+    p.copy_state(this);
+
+    MovabilityType m = movability, lm = l->movability;
+    movability = l->movability = MOV_FLEXONLY;
+
+    SCoord total_motion(0,0,0);
+    SCoord incremental_motion;
+
+    float energy = -this->get_intermol_binding(l);
+
+    incremental_motion = this->get_barycenter().subtract(l->get_barycenter());
+    incremental_motion.r = sgn(energy);
+
+    int i;
+
+    #if dbg_optimal_contact
+    cout << "Energy was " << energy << endl;
+    #endif
+
+    for (i=0; i<50; i++)
+    {
+        this->move(incremental_motion, true);
+        float new_energy = -this->get_intermol_binding(l);
+
+        if (new_energy < energy)        // Improvement
+        {
+            energy = new_energy;
+            total_motion = total_motion.add(incremental_motion);
+
+            #if dbg_optimal_contact
+            cout << "Energy has improved to " << energy << "; keeping." << endl;
+            #endif
+        }
+        else
+        {
+            incremental_motion.r *= -1;
+            this->move(incremental_motion, true);
+            incremental_motion.r *= 0.8;
+
+            #if dbg_optimal_contact
+            cout << "Energy tried " << energy << endl;
+            #endif
+        }
+
+        if (fabs(incremental_motion.r) < 0.01) break;
+    }
+
+    p.restore_state(this);
+    movability = m;
+    l->movability = lm;
+
+    return total_motion;
 }
 
 Atom* numbered[10];

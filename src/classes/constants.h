@@ -300,7 +300,7 @@
 
 #define homology_phi_psi_rotations 0
 #define homology_long_axis_rotations 0
-#define homology_region_optimization 1
+#define homology_region_optimization 0
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 

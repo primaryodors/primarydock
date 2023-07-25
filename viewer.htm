@@ -938,33 +938,39 @@ function show_seqdd()
 	// tgl.innerText = "|";
 	seqdd.appendChild(tgl);
 
-	tgl = document.createElement("span");
-	tgl.className = "clickme nodebtn sctgbtn";
-	tgl.innerText = "Ligand Binding";
-	tgl.id = "seqddligbs";
-	tgl.setAttribute("onclick", "event.preventDefault(); showLigandSideChains(); return false;");
-	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
-	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
-	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
-	seqdd.appendChild(tgl);
+	if (ligbs.length)
+	{
+		tgl = document.createElement("span");
+		tgl.className = "clickme nodebtn sctgbtn";
+		tgl.innerText = "Ligand Binding";
+		tgl.id = "seqddligbs";
+		tgl.setAttribute("onclick", "event.preventDefault(); showLigandSideChains(); return false;");
+		tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+		seqdd.appendChild(tgl);
 
-	tgl = document.createElement("span");
-	tgl.innerText = "|";
-	seqdd.appendChild(tgl);
+		tgl = document.createElement("span");
+		tgl.innerText = "|";
+		seqdd.appendChild(tgl);
+	}
 
-	tgl = document.createElement("span");
-	tgl.className = "clickme nodebtn sctgbtn";
-	tgl.innerText = "Metal Coord";
-	tgl.id = "seqddmcoord";
-	tgl.setAttribute("onclick", "event.preventDefault(); showMetalSideChains(); return false;");
-	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
-	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
-	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
-	seqdd.appendChild(tgl);
+	if (mcres.length)
+	{
+		tgl = document.createElement("span");
+		tgl.className = "clickme nodebtn sctgbtn";
+		tgl.innerText = "Metal Coord";
+		tgl.id = "seqddmcoord";
+		tgl.setAttribute("onclick", "event.preventDefault(); showMetalSideChains(); return false;");
+		tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+		seqdd.appendChild(tgl);
 
-	tgl = document.createElement("span");
-	tgl.innerText = "|";
-	seqdd.appendChild(tgl);
+		tgl = document.createElement("span");
+		tgl.innerText = "|";
+		seqdd.appendChild(tgl);
+	}
 
 	/*
 	Show All sidechains makes browsers freeze up.
@@ -2350,6 +2356,9 @@ function loadFile(fileData, fileName = "")
 	mrep = [];
 	mrparams = [];
     gmodel = [];
+	mdlstrands = [];
+	mdlstrandid = [];
+	mdlligands = [];
 	gmvisible = [];
 	gmrep = [];
 	gmrparams = [];
@@ -2453,6 +2462,9 @@ function loadFile(fileData, fileName = "")
 				ligbs = [];
 				mcres = [];
 				gmodel = [];
+				mdlstrands = [];
+				mdlstrandid = [];
+				mdlligands = [];
 				gmvisible = [];
 				bw50r = new Array(99).fill(0);
                 sequence = ["-"];

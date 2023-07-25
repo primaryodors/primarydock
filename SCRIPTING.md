@@ -456,14 +456,17 @@ overriding the default or any global.
 
 
 # MOVE
+# MOVEREL
 
 Example:
 ```
 MOVE %start_res %end_res @newcen
 MOVE 160 176 [0,25,0]
+MOVEREL 160 176 [0,0,1]
 ```
 
-Recenters the indicated region at the indicated Cartesian location.
+`MOVE` Recenters the indicated region at the indicated Cartesian location.
+`MOVEREL` adds the specified relative Cartesian value to the region's location.
 
 
 # PTALIGN

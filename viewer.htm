@@ -318,6 +318,12 @@ option.unknown
 	background-color: #234;
 }
 
+.stranddiv button
+{
+	background-color: transparent;
+	border: 0px;
+}
+
 .sctgbtn
 {
 	font-family: Monospace;
@@ -587,6 +593,34 @@ function show_seqdd_tab(strandid)
 	$("#stab"+strandid).addClass("highlighted");
 }
 
+function getStrandIdxFromID(strandid)
+{
+	var i;
+	for (i=0; i<mdlstrandid.length; i++)
+	{
+		if (mdlstrandid[i] == strandid) return i;
+	}
+	return -1;
+}
+
+function toggleStrand(strandid)
+{
+	var idx = getStrandIdxFromID(strandid);
+	if (idx >= 0)
+	{
+		if (gmvisible[idx])
+		{
+			gmodel[idx].removeAllRepresentations();
+			gmvisible[idx] = false;
+		}
+		else
+		{
+			gmodel[idx].addRepresentation(gmrep[idx], gmrparams[idx]);
+			gmvisible[idx] = true;
+		}
+	}
+}
+
 var tmoid = false;
 function show_seqdd()
 {
@@ -612,14 +646,6 @@ function show_seqdd()
 		var perline = 40;
 
 		var i;
-		var span = document.createElement("span");
-		var dots = ". . . . . . . . .";
-		var dotslen = dots.length;
-		span.innerText = dots+"10 "+dots+"20 "+dots+"30 "+dots+"40 ";
-		span.className = "seqnumln";
-		span.appendChild(document.createElement("br"));
-		sdiv.appendChild(span);
-		var seqoff = 50;
 		var resno;
 
 		var max_resno = 0;
@@ -637,6 +663,21 @@ function show_seqdd()
 		tab.setAttribute("onclick", "show_seqdd_tab('"+strandid+"');");
 		tabs.appendChild(tab);
 
+		var eye = document.createElement("button");
+		eye.innerHTML = "&#x1f441;&#xfe0f;";
+		eye.setAttribute("onclick", "toggleStrand('"+strandid+"')");
+		sdiv.appendChild(eye);
+		sdiv.appendChild(document.createElement("br"));
+
+		var span = document.createElement("span");
+		var dots = ". . . . . . . . .";
+		var dotslen = dots.length;
+		span.innerText = dots+"10 "+dots+"20 "+dots+"30 "+dots+"40 ";
+		span.className = "seqnumln";
+		span.appendChild(document.createElement("br"));
+		sdiv.appendChild(span);
+		var seqoff = 50;
+
 		for (resno = 1; resno <= max_resno; resno++)
 		{
 			var mdlidx = getResMdlIdx(resno, strandid);
@@ -644,7 +685,8 @@ function show_seqdd()
 			var tgl = document.createElement("span");
 			if (typeof restoggled[mdlidx] == "undefined") restoggled[mdlidx] = 0;
 			tgl.className = "clickme nodebtn sctgbtn" + (restoggled[mdlidx] ? " hilite" : "");
-			var rcd = rgn_color_dark(resno, true);
+			var rcd = false;
+			if (strandid == tmstrand) rcd = rgn_color_dark(resno, true);
 			if (rcd) tgl.style.backgroundColor = css_color(rcd);
 
 			var j;
@@ -820,11 +862,11 @@ function show_seqdd()
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
-	seqdd.appendChild(tgl);*/
+	seqdd.appendChild(tgl);
 
 	tgl = document.createElement("span");
 	tgl.innerText = "|";
-	seqdd.appendChild(tgl);
+	seqdd.appendChild(tgl);*/
 
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
@@ -856,6 +898,7 @@ function show_seqdd()
 var stage = new NGL.Stage("viewport");
 
 var gmodel = [], model = [], is_ligand = [], mrep = [], gmrep = [], mrparams = [], gmrparams = [], mpos = [], mnod = [];
+var gmvisible = [];
 
 var mdlstrands = [], mdlstrandid = [], mdlligands = [];
 
@@ -881,12 +924,7 @@ function show_hide_gmdl()
 	}
 	else
 	{
-		gmodel[0].addRepresentation( "cartoon",
-		{
-			opacity: opc_cartoon,
-			colorScheme: PODefRgnScheme,
-			metalness: mtl_cartoon,
-		});
+		gmodel[0].addRepresentation( "cartoon", gmrparams[0]);
 	}
 	gmdl_shown = !gmdl_shown;
 	set_gmdl_opacity();
@@ -897,15 +935,15 @@ function set_gmdl_opacity()
 	if (typeof gmodel[0] == 'undefined') return;
 	if ($("#affichage")[0].style.display == 'none') return;
 	var opc = parseFloat($("#bbvis")[0].value) / 100;
-	if (gmdl_shown)
+	var i;
+	for (i=0; i<gmvisible.length; i++)
 	{
-		gmodel[0].removeAllRepresentations();
-		gmodel[0].addRepresentation( "cartoon",
+		if (gmvisible[i])
 		{
-			opacity: opc,
-			colorScheme: PODefRgnScheme,
-			metalness: mtl_cartoon,
-		});
+			gmodel[i].removeAllRepresentations();
+			gmrparams[i].opacity = opc;
+			gmodel[i].addRepresentation( "cartoon", gmrparams[i]);
+		}
 	}
 }
 
@@ -1149,7 +1187,7 @@ function ballAndStick()
 		if (gmrep[i] == "ball+stick")
 		{
 			gmodel[i].removeAllRepresentations();
-			gmodel[0].addRepresentation(gmrep[i], gmrparams[0]);
+			gmodel[i].addRepresentation(gmrep[i], gmrparams[i]);
 		}
 	}
 	spcfill = false;
@@ -1163,7 +1201,7 @@ function spaceFill()
 		if (gmrep[i] == "ball+stick")
 		{
 			gmodel[i].removeAllRepresentations();
-			gmodel[0].addRepresentation("spacefill", gmrparams[0]);
+			gmodel[i].addRepresentation("spacefill", gmrparams[i]);
 		}
 	}
 	spcfill = true;
@@ -1586,6 +1624,7 @@ function apply_pdb(poresult)
 		comp3.addRepresentation( "cartoon", rp);
 		comp3.setName("backbone");
 		gmodel.push(comp3);
+		gmvisible.push(true);
 		mdlstrands.push(comp3);
 		gmrep.push("cartoon");
 		gmrparams.push(rp);
@@ -1709,6 +1748,7 @@ function apply_pdb(poresult)
 			};
 			comp4.addRepresentation( "spacefill", rp);
 			gmodel.push(comp4);
+			gmvisible.push(true);
 			mdlligands.push(comp4);
 			gmrep.push("spacefill");
 			gmrparams.push(rp);
@@ -1802,6 +1842,7 @@ else if (molid != "~")
 		        }
 		        comp.addRepresentation("ball+stick", rparam);
 		        gmodel.push(comp);
+				gmvisible.push(true);
 				mdlligands.push(comp);
 				gmrep.push("ball+stick");
 				gmrparams.push(rparam);
@@ -2375,6 +2416,7 @@ function loadFile(fileData, fileName = "")
 							};
 							comp.addRepresentation( "ball+stick", rp);
 							gmodel.push(comp);
+							gmvisible.push(true);
 							mdlligands.push(comp);
 							gmrep.push("ball+stick");
 							gmrparams.push(rp);
@@ -2393,6 +2435,7 @@ function loadFile(fileData, fileName = "")
 							};
 							comp.addRepresentation( "cartoon", rp);
 							gmodel.push(comp);
+							gmvisible.push(true);
 							mdlstrands.push(comp);
 							gmrep.push("cartoon");
 							gmrparams.push(rp);
@@ -2431,6 +2474,7 @@ function loadFile(fileData, fileName = "")
 								};
 								comp2.addRepresentation( "spacefill", rp);
 								gmodel.push(comp2);
+								gmvisible.push(true);
 								mdlligands.push(comp2);
 								gmrep.push("spacefill");
 								gmrparams.push(rp);

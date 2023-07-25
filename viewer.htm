@@ -669,15 +669,10 @@ function show_seqdd()
 	var seqdd = $('#seqdd')[0];
 	seqdd.innerHTML = "<b>Show/Hide Side Chains:</b><br><br>";
 
-	var tabs = document.createElement("div");
-	tabs.className = "tab";
-	var strandlbl = document.createElement("div");
-	strandlbl.style.display = "inline-block";
-	strandlbl.innerText = "Strand:\xa0\xa0";
-	tabs.appendChild(strandlbl);
+	if (!mdlstrandid.length) mdlstrandid = [""];
+	var tabs;
 
-	seqdd.appendChild(tabs);
-
+	var first = true;
 	mdlstrandid.forEach(function(strandid)
 	{
 		var sdiv = document.createElement("div");
@@ -699,78 +694,94 @@ function show_seqdd()
 
 		if (!max_resno) return;
 
-		var tab = document.createElement("button");
-		tab.innerText = strandid;
-		tab.id = "stab"+strandid;
-		tab.setAttribute("onclick", "show_seqdd_tab('"+strandid+"');");
-		tabs.appendChild(tab);
+		if (strandid)
+		{
+			if (first)
+			{
+				tabs = document.createElement("div");
+				tabs.className = "tab";
+				var strandlbl = document.createElement("div");
+				strandlbl.style.display = "inline-block";
+				strandlbl.innerText = "Strand:\xa0\xa0";
+				tabs.appendChild(strandlbl);
 
-		var eye = document.createElement("button");
-		eye.innerHTML = "&#x1f441;&#xfe0f;";
-		eye.setAttribute("onclick", "toggleStrand('"+strandid+"')");
-		sdiv.appendChild(eye);
+				seqdd.appendChild(tabs);
 
-		var cbtn = document.createElement("button");
-		cbtn.innerHTML = "&nbsp;&nbsp;";
-		cbtn.style.backgroundColor = "#ff0";
-		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'y');");
-		sdiv.appendChild(cbtn);
+				first = false;
+			}
 
-		cbtn = document.createElement("button");
-		cbtn.innerHTML = "&nbsp;&nbsp;";
-		cbtn.style.backgroundColor = "#9f0";
-		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'g');");
-		sdiv.appendChild(cbtn);
+			var tab = document.createElement("button");
+			tab.innerText = strandid;
+			tab.id = "stab"+strandid;
+			tab.setAttribute("onclick", "show_seqdd_tab('"+strandid+"');");
+			tabs.appendChild(tab);
 
-		cbtn = document.createElement("button");
-		cbtn.innerHTML = "&nbsp;&nbsp;";
-		cbtn.style.backgroundColor = "#0f6";
-		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 't');");
-		sdiv.appendChild(cbtn);
+			var eye = document.createElement("button");
+			eye.innerHTML = "&#x1f441;&#xfe0f;";
+			eye.setAttribute("onclick", "toggleStrand('"+strandid+"')");
+			sdiv.appendChild(eye);
 
-		cbtn = document.createElement("button");
-		cbtn.innerHTML = "&nbsp;&nbsp;";
-		cbtn.style.backgroundColor = "#0ff";
-		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'c');");
-		sdiv.appendChild(cbtn);
+			var cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#ff0";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'y');");
+			sdiv.appendChild(cbtn);
 
-		cbtn = document.createElement("button");
-		cbtn.innerHTML = "&nbsp;&nbsp;";
-		cbtn.style.backgroundColor = "#03f";
-		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'b');");
-		sdiv.appendChild(cbtn);
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#9f0";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'g');");
+			sdiv.appendChild(cbtn);
 
-		cbtn = document.createElement("button");
-		cbtn.innerHTML = "&nbsp;&nbsp;";
-		cbtn.style.backgroundColor = "#60f";
-		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'p');");
-		sdiv.appendChild(cbtn);
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#0f6";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 't');");
+			sdiv.appendChild(cbtn);
 
-		cbtn = document.createElement("button");
-		cbtn.innerHTML = "&nbsp;&nbsp;";
-		cbtn.style.backgroundColor = "#f0c";
-		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'm');");
-		sdiv.appendChild(cbtn);
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#0ff";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'c');");
+			sdiv.appendChild(cbtn);
 
-		cbtn = document.createElement("button");
-		cbtn.innerHTML = "&nbsp;&nbsp;";
-		cbtn.style.backgroundColor = "#f00";
-		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'r');");
-		sdiv.appendChild(cbtn);
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#03f";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'b');");
+			sdiv.appendChild(cbtn);
 
-		cbtn = document.createElement("button");
-		cbtn.innerHTML = "&nbsp;&nbsp;";
-		cbtn.style.backgroundColor = "#f90";
-		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'o');");
-		sdiv.appendChild(cbtn);
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#60f";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'p');");
+			sdiv.appendChild(cbtn);
 
-		cbtn = document.createElement("button");
-		cbtn.innerHTML = "&#x1F308;";
-		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', '*');");
-		sdiv.appendChild(cbtn);
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#f0c";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'm');");
+			sdiv.appendChild(cbtn);
 
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#f00";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'r');");
+			sdiv.appendChild(cbtn);
 
-		sdiv.appendChild(document.createElement("br"));
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#f90";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'o');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&#x1F308;";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', '*');");
+			sdiv.appendChild(cbtn);
+
+			sdiv.appendChild(document.createElement("br"));
+		}
 
 		var span = document.createElement("span");
 		var dots = ". . . . . . . . .";
@@ -995,7 +1006,9 @@ function show_seqdd()
 		if (tmoid) window.clearTimeout(tmoid);
 	});
 
-	$(".tab button")[0].click();
+	var buttons = $(".tab button")
+	if (buttons.length) buttons[0].click();
+	else $(".stranddiv").show();
 }
 
 var stage = new NGL.Stage("viewport");
@@ -1128,6 +1141,8 @@ function showSideChain(resno, strandid)
 {
 	try
 	{
+		if (typeof strandid == "undefined") strandid = "";
+
 		var clipValue = get_clip_value();
 		var mdlidx = getResMdlIdx(resno, strandid);
 		if (!restoggled[mdlidx])
@@ -2335,6 +2350,7 @@ function loadFile(fileData, fileName = "")
 	mrep = [];
 	mrparams = [];
     gmodel = [];
+	gmvisible = [];
 	gmrep = [];
 	gmrparams = [];
     curr_ligand = false;
@@ -2436,6 +2452,8 @@ function loadFile(fileData, fileName = "")
 				tmend = [];
 				ligbs = [];
 				mcres = [];
+				gmodel = [];
+				gmvisible = [];
 				bw50r = new Array(99).fill(0);
                 sequence = ["-"];
 				resstrandid = [""];

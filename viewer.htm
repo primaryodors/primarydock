@@ -479,7 +479,7 @@ function rotate3D(point, source, axis, theta)
 <div id="center">
 <a id="fsbtn" class="nodebtn clickme" onclick="if (is_fullscreen) exitFullscreen(); else openFullscreen(document.body); is_fullscreen = !is_fullscreen">&#x26F6;</a>
 Center:
-<a class="posebtn clickme" onclick="gmodel[0].autoView(); cen_ligand = false;" title="Middle-click an atom to center it.">Model</a>
+<a class="posebtn clickme" onclick="stage.autoView(); cen_ligand = false;" title="Middle-click an atom to center it.">Model</a>
 <a class="posebtn clickme" onclick="centerPocket(); cen_ligand = false;" id="pktbtn" style="display: none;">Pocket</a>
 <a class="posebtn clickme" onclick="curr_ligand.autoView(); cen_ligand = true;" id="ligbtn" style="display: none;">Ligand</a>
 </div>
@@ -533,6 +533,7 @@ var tmcolor =
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 var ligbs = [];
+var tmstrand = "";
 var mcres = [];
 var bw50r = new Array(99).fill(0);
 
@@ -809,6 +810,8 @@ function show_seqdd()
 	tgl.innerText = "|";
 	seqdd.appendChild(tgl);
 
+	/*
+	Show All sidechains makes browsers freeze up.
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "All";
@@ -817,7 +820,7 @@ function show_seqdd()
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
-	seqdd.appendChild(tgl);
+	seqdd.appendChild(tgl);*/
 
 	tgl = document.createElement("span");
 	tgl.innerText = "|";
@@ -1062,7 +1065,6 @@ function showAllSideChains()
 	for (i=0; i<sequence.length; i++)
 	{
 		showSideChain(mdlresno[i], mdlstrandid[i]);
-		resno++;
 	}
 }
 
@@ -1126,7 +1128,7 @@ function showLigandSideChains()
 	var i;
 	for (i=0; i<ligbs.length; i++)
 	{
-		showSideChain(ligbs[i]);
+		showSideChain(ligbs[i], tmstrand);
 	}
 }
 
@@ -1135,7 +1137,7 @@ function showMetalSideChains()
 	var i;
 	for (i=0; i<mcres.length; i++)
 	{
-		showSideChain(mcres[i]);
+		showSideChain(mcres[i], tmstrand);
 	}
 }
 
@@ -1428,6 +1430,53 @@ var PODefSchemeRainbow = NGL.ColormakerRegistry.addScheme(function (params)
 	}
 });
 
+function aa_scheme(atom)
+{
+	switch (atom.resname.toUpperCase())
+	{
+		case "MET":
+		return 0xcccc99;
+		
+		case "ALA": case "ILE": case "LEU": case "VAL":
+		return 0xcccccc;
+
+		case "PRO":
+		return 0x999999;
+
+		case "GLY":
+		return 0x666666;
+
+		case "CYS":
+		return 0xcccc33;
+
+		case "SER": case "THR":
+		return 0x66cc99;
+
+		case "ASN": case "GLN":
+		return 0x33cc99;
+
+		case "ASP": case "GLU":
+		return 0xff6666;
+
+		case "ARG": case "LYS": case "HIS":
+		return 0x3333ff;
+
+		case "PHE": case "TRP": case "TYR":
+		return 0xcc99cc;
+
+		default:
+		return 0xcc9966;
+	}
+}
+
+var POAAScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return aa_scheme(atom);
+	}
+});
+
 var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function(atom)
@@ -1437,44 +1486,7 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 		
 		rgnc = rgn_color(resno, true);
 
-		if (!rgnc)
-		{
-			switch (atom.resname.toUpperCase())
-			{
-				case "MET":
-				return 0xcccc99;
-				
-				case "ALA": case "ILE": case "LEU": case "VAL":
-				return 0xcccccc;
-
-				case "PRO":
-				return 0x999999;
-
-				case "GLY":
-				return 0x666666;
-
-				case "CYS":
-				return 0xcccc33;
-
-				case "SER": case "THR":
-				return 0x66cc99;
-
-				case "ASN": case "GLN":
-				return 0x33cc99;
-
-				case "ASP": case "GLU":
-				return 0xff6666;
-
-				case "ARG": case "LYS": case "HIS":
-				return 0x3333ff;
-
-				case "PHE": case "TRP": case "TYR":
-				return 0xcc99cc;
-
-				default:
-				return 0xcc9966;
-			}
-		}
+		if (!rgnc) rgnc = aa_scheme(atom);
 
 		return rgnc;
     }
@@ -2261,6 +2273,8 @@ function loadFile(fileData, fileName = "")
 							strandid = ln.substr(21,1).trim();
 							var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
 
+							if (!tmstrand && tmstart.length) tmstrand = strandid;
+
 							if (lres != resno)
 							{
 								if (ln.length > 20 || ln.trim() == "TER")
@@ -2348,7 +2362,7 @@ function loadFile(fileData, fileName = "")
                 {
 					var strandid = strandData.substr(strandData.indexOf("\nATOM     "), 100).trim().substr(21,1).trim();
 					var stringBlob = new Blob( [ strandData ], { type: 'text/plain'} );
-					stage.loadFile( stringBlob, { ext: fext } ).then( function( comp )
+					stage.loadFile( stringBlob, { ext: fext, name: strandid } ).then( ( comp ) =>
 					{
 						if (fext == 'sdf')
 						{
@@ -2373,7 +2387,7 @@ function loadFile(fileData, fileName = "")
 							var rp =
 							{
 								opacity: opc_cartoon,
-								colorScheme: PODefRgnScheme,
+								colorScheme: tmstrand == comp.name ? PODefRgnScheme : POAAScheme,
 								// colorScale: 'rainbow',
 								metalness: mtl_cartoon,
 							};
@@ -2422,7 +2436,7 @@ function loadFile(fileData, fileName = "")
 								gmrparams.push(rp);
 							});
 
-							comp.autoView();
+							stage.autoView();
 						}
 					} );
 

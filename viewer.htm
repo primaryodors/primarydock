@@ -322,6 +322,8 @@ option.unknown
 {
 	background-color: transparent;
 	border: 0px;
+	margin-right: 5px;
+	cursor: pointer;
 }
 
 .sctgbtn
@@ -621,6 +623,46 @@ function toggleStrand(strandid)
 	}
 }
 
+function colorizeStrand(strandid, colorCode)
+{
+	var idx = getStrandIdxFromID(strandid);
+	gmodel[idx].removeAllRepresentations();
+	var p = gmrparams[idx];
+	switch(colorCode)
+	{
+		case 'y':
+		p.colorScheme = yellowScheme;
+		break;
+		case 'g':
+		p.colorScheme = greenScheme;
+		break;
+		case 't':
+		p.colorScheme = tealScheme;
+		break;
+		case 'c':
+		p.colorScheme = cyanScheme;
+		break;
+		case 'b':
+		p.colorScheme = blueScheme;
+		break;
+		case 'p':
+		p.colorScheme = purpleScheme;
+		break;
+		case 'm':
+		p.colorScheme = magentaScheme;
+		break;
+		case 'r':
+		p.colorScheme = redScheme;
+		break;
+		case 'o':
+		p.colorScheme = orangeScheme;
+		break;
+		default:
+		p.colorScheme = (strandid == tmstrand) ? PODefRgnScheme : POAAScheme;
+	}
+	gmodel[idx].addRepresentation(gmrep[idx], p);
+}
+
 var tmoid = false;
 function show_seqdd()
 {
@@ -667,6 +709,67 @@ function show_seqdd()
 		eye.innerHTML = "&#x1f441;&#xfe0f;";
 		eye.setAttribute("onclick", "toggleStrand('"+strandid+"')");
 		sdiv.appendChild(eye);
+
+		var cbtn = document.createElement("button");
+		cbtn.innerHTML = "&nbsp;&nbsp;";
+		cbtn.style.backgroundColor = "#ff0";
+		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'y');");
+		sdiv.appendChild(cbtn);
+
+		cbtn = document.createElement("button");
+		cbtn.innerHTML = "&nbsp;&nbsp;";
+		cbtn.style.backgroundColor = "#9f0";
+		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'g');");
+		sdiv.appendChild(cbtn);
+
+		cbtn = document.createElement("button");
+		cbtn.innerHTML = "&nbsp;&nbsp;";
+		cbtn.style.backgroundColor = "#0f6";
+		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 't');");
+		sdiv.appendChild(cbtn);
+
+		cbtn = document.createElement("button");
+		cbtn.innerHTML = "&nbsp;&nbsp;";
+		cbtn.style.backgroundColor = "#0ff";
+		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'c');");
+		sdiv.appendChild(cbtn);
+
+		cbtn = document.createElement("button");
+		cbtn.innerHTML = "&nbsp;&nbsp;";
+		cbtn.style.backgroundColor = "#03f";
+		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'b');");
+		sdiv.appendChild(cbtn);
+
+		cbtn = document.createElement("button");
+		cbtn.innerHTML = "&nbsp;&nbsp;";
+		cbtn.style.backgroundColor = "#60f";
+		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'p');");
+		sdiv.appendChild(cbtn);
+
+		cbtn = document.createElement("button");
+		cbtn.innerHTML = "&nbsp;&nbsp;";
+		cbtn.style.backgroundColor = "#f0c";
+		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'm');");
+		sdiv.appendChild(cbtn);
+
+		cbtn = document.createElement("button");
+		cbtn.innerHTML = "&nbsp;&nbsp;";
+		cbtn.style.backgroundColor = "#f00";
+		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'r');");
+		sdiv.appendChild(cbtn);
+
+		cbtn = document.createElement("button");
+		cbtn.innerHTML = "&nbsp;&nbsp;";
+		cbtn.style.backgroundColor = "#f90";
+		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'o');");
+		sdiv.appendChild(cbtn);
+
+		cbtn = document.createElement("button");
+		cbtn.innerHTML = "&#x1F308;";
+		cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', '*');");
+		sdiv.appendChild(cbtn);
+
+
 		sdiv.appendChild(document.createElement("br"));
 
 		var span = document.createElement("span");
@@ -1528,6 +1631,78 @@ var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 
 		return rgnc;
     }
+});
+
+var yellowScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0xffee00;
+	}
+});
+
+var greenScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x99ff00;
+	}
+});
+
+var tealScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x00ff66;
+	}
+});
+
+var cyanScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x00eeff;
+	}
+});
+
+var blueScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x0033ff;
+	}
+});
+
+var purpleScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x9900ff;
+	}
+});
+
+var magentaScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0xff00cc;
+	}
+});
+
+var redScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0xff0000;
+	}
+});
+
+var orangeScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0xff9900;
+	}
 });
 
 stage.setParameters(

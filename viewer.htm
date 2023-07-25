@@ -2573,10 +2573,10 @@ function loadFile(fileData, fileName = "")
 					enable_spacefill();
             	}
                 
-				var fileStrands = fileData.split("TER\n");
+				var fileStrands = fileData.split("\nTER");
 				fileStrands.forEach(function(strandData)
                 {
-					var strandid = strandData.substr(strandData.indexOf("\nATOM     "), 100).trim().substr(21,1).trim();
+					var strandid = strandData.substr(strandData.indexOf("\nATOM "), 100).trim().substr(21,1).trim();
 					var stringBlob = new Blob( [ strandData ], { type: 'text/plain'} );
 					stage.loadFile( stringBlob, { ext: fext, name: strandid } ).then( ( comp ) =>
 					{

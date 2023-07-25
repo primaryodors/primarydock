@@ -23,6 +23,7 @@ When saving an output PDB, all strands are included in the written file.
 # Variables
 
 With few exceptions, any variable can stand in for any parameter of any command.
+Variable names are case sensitive.
 
 All integers begin with `%`, e.g. `%start_resno`.
 All floats begin with `&`, e.g. `&transpose_amt`.

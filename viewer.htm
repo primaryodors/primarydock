@@ -1097,6 +1097,20 @@ var pocket = [0,0,0];
 
 $("#affichage").hide();
 
+function initialize_arrays()
+{
+	gmodel = []; model = []; is_ligand = []; mrep = []; gmrep = []; mrparams = []; gmrparams = []; mpos = []; mnod = [];
+	gmvisible = [];
+	mdlstrands = []; mdlstrandid = []; mdlligands = []; strand_color = [];
+	acvmatrix = []; acvrot8 = [];
+	ligbs = []; mcres = [];
+	mtlcoord = [];
+	tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
+	tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
+	sequence = ["-"];
+	resmdl = []; resstrandid = [""]; mdlresno = []; restoggled = [];
+}
+
 var gmdl_shown = true;
 function show_hide_gmdl()
 {
@@ -1222,7 +1236,7 @@ function showSideChain(resno, strandid)
             };
 
 			var pc = strandColorSelection(strandid, getStrandColor(strandid));
-			if (pc.colorScheme != PODefRgnScheme) p.colorScheme = pc.colorScheme;
+			if (pc.colorScheme != PODefRgnScheme && pc.colorScheme != POAAScheme) p.colorScheme = pc.colorScheme;
 
 			resmdl[mdlidx].addRepresentation( spcfill ? "spacefill" : "licorice", p);
 			restoggled[mdlidx] = 1;
@@ -2417,22 +2431,7 @@ function loadFile(fileData, fileName = "")
 	
 	$("#affichage").hide();
 	
-    model = [];
-	mrep = [];
-	mrparams = [];
-    gmodel = [];
-	mdlstrands = [];
-	mdlstrandid = [];
-	mdlligands = [];
-	gmvisible = [];
-	gmrep = [];
-	gmrparams = [];
-    curr_ligand = false;
-	resmdl = [];
-	mdlresno = [];
-	restoggled = [];
-	sequence = ["-"];
-	resstrandid = [""];
+    initialize_arrays();
 	
 	mdlresno.push(0);
 	
@@ -2522,18 +2521,8 @@ function loadFile(fileData, fileName = "")
                 stage.removeAllComponents();
                 window.result = fileData;
                 cen_ligand = false;
-				tmstart = [];
-				tmend = [];
-				ligbs = [];
-				mcres = [];
-				gmodel = [];
-				mdlstrands = [];
-				mdlstrandid = [];
-				mdlligands = [];
-				gmvisible = [];
+				initialize_arrays();
 				bw50r = new Array(99).fill(0);
-                sequence = ["-"];
-				resstrandid = [""];
 
                 if (fext == 'pdb')
                 {

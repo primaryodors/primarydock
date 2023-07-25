@@ -296,10 +296,10 @@ option.unknown
 
 #seqdd .tab button
 {
-	background-color: #123;
-    border-top: 2px solid #47a;
-    border-left: 2px solid #369;
-    border-right: 2px solid #234;
+	background-color: #112;
+    border-top: 2px solid #258;
+    border-left: 2px solid #147;
+    border-right: 2px solid #123;
     border-bottom: 0px;
     border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
@@ -309,8 +309,13 @@ option.unknown
 
 #seqdd .tab button.highlighted
 {
+	background-color: #246;
+    border-top: 2px solid #5af;
+    border-left: 2px solid #48c;
+    border-right: 2px solid #369;
 	color: #def;
 	background-color: #234;
+	font-weight: bold;
 }
 
 .stranddiv
@@ -322,6 +327,7 @@ option.unknown
 {
 	background-color: transparent;
 	border: 0px;
+	margin-top: 5px;
 	margin-right: 5px;
 	cursor: pointer;
 }
@@ -623,44 +629,96 @@ function toggleStrand(strandid)
 	}
 }
 
-function colorizeStrand(strandid, colorCode)
+function getStrandColor(strandid)
+{
+	var i;
+	for (i=0; i<mdlstrandid.length; i++)
+	{
+		if (typeof strand_color[i] != "undefined" && mdlstrandid[i] == strandid) return strand_color[i];
+	}
+
+	return '*';
+}
+
+function strandColorSelection(strandid, colorCode)
 {
 	var idx = getStrandIdxFromID(strandid);
-	gmodel[idx].removeAllRepresentations();
 	var p = gmrparams[idx];
+	var tabbtn = $("#stab"+strandid)[0];
+
 	switch(colorCode)
 	{
 		case 'y':
 		p.colorScheme = yellowScheme;
+		tabbtn.style.backgroundColor = "#550";
+		tabbtn.style.color = "#ff0";
 		break;
+
 		case 'g':
 		p.colorScheme = greenScheme;
+		tabbtn.style.backgroundColor = "#350";
+		tabbtn.style.color = "#cf0";
 		break;
+
 		case 't':
 		p.colorScheme = tealScheme;
+		tabbtn.style.backgroundColor = "#053";
+		tabbtn.style.color = "#6f9";
 		break;
+
 		case 'c':
 		p.colorScheme = cyanScheme;
+		tabbtn.style.backgroundColor = "#056";
+		tabbtn.style.color = "#9ff";
 		break;
+
 		case 'b':
 		p.colorScheme = blueScheme;
+		tabbtn.style.backgroundColor = "#039";
+		tabbtn.style.color = "#9cf";
 		break;
+
 		case 'p':
 		p.colorScheme = purpleScheme;
+		tabbtn.style.backgroundColor = "#309";
+		tabbtn.style.color = "#c9f";
 		break;
+
 		case 'm':
 		p.colorScheme = magentaScheme;
+		tabbtn.style.backgroundColor = "#608";
+		tabbtn.style.color = "#f9e";
 		break;
+
 		case 'r':
 		p.colorScheme = redScheme;
+		tabbtn.style.backgroundColor = "#600";
+		tabbtn.style.color = "#f99";
 		break;
+
 		case 'o':
 		p.colorScheme = orangeScheme;
+		tabbtn.style.backgroundColor = "#630";
+		tabbtn.style.color = "#fc9";
 		break;
+
 		default:
 		p.colorScheme = (strandid == tmstrand) ? PODefRgnScheme : POAAScheme;
+		tabbtn.style.backgroundColor = "#234";
 	}
+
+	return p;
+}
+
+function colorizeStrand(strandid, colorCode)
+{
+	var idx = getStrandIdxFromID(strandid);
+	gmodel[idx].removeAllRepresentations();
+	var p = strandColorSelection(strandid, colorCode);
 	gmodel[idx].addRepresentation(gmrep[idx], p);
+
+	while (strand_color.length <= idx) strand_color.push("*");
+	strand_color[idx] = colorCode;
 }
 
 var tmoid = false;
@@ -673,7 +731,7 @@ function show_seqdd()
 	var tabs;
 
 	var first = true;
-	mdlstrandid.forEach(function(strandid)
+	mdlstrandid.forEach(function(strandid, sidx)
 	{
 		var sdiv = document.createElement("div");
 		sdiv.id = "stranddiv"+strandid;
@@ -715,6 +773,8 @@ function show_seqdd()
 			tab.id = "stab"+strandid;
 			tab.setAttribute("onclick", "show_seqdd_tab('"+strandid+"');");
 			tabs.appendChild(tab);
+
+			strandColorSelection(strandid, strand_color[sidx]);
 
 			var eye = document.createElement("button");
 			eye.innerHTML = "&#x1f441;&#xfe0f;";
@@ -1022,7 +1082,7 @@ var stage = new NGL.Stage("viewport");
 var gmodel = [], model = [], is_ligand = [], mrep = [], gmrep = [], mrparams = [], gmrparams = [], mpos = [], mnod = [];
 var gmvisible = [];
 
-var mdlstrands = [], mdlstrandid = [], mdlligands = [];
+var mdlstrands = [], mdlstrandid = [], mdlligands = [], strand_color = [];
 
 var resmdl = [], resstrandid = [""], mdlresno = [], restoggled = [];
 var acvmdl = false;
@@ -1153,13 +1213,18 @@ function showSideChain(resno, strandid)
 		var mdlidx = getResMdlIdx(resno, strandid);
 		if (!restoggled[mdlidx])
 		{
-			resmdl[mdlidx].addRepresentation( spcfill ? "spacefill" : "licorice",
+			var p = 
             {
                 "opacity": spcfill ? 1 : opc_sidechain,
-				"colorScheme": PODefScheme,
+				"colorScheme": PODefSchemeHilite,
                 "metalness": mtl_licorice,
                 "clipNear": clipValue,
-            });
+            };
+
+			var pc = strandColorSelection(strandid, getStrandColor(strandid));
+			if (pc.colorScheme != PODefRgnScheme) p.colorScheme = pc.colorScheme;
+
+			resmdl[mdlidx].addRepresentation( spcfill ? "spacefill" : "licorice", p);
 			restoggled[mdlidx] = 1;
 			$('#seqddtgl'+mdlidx).addClass('hilite');
 		}

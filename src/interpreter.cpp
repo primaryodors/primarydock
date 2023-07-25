@@ -2082,6 +2082,20 @@ int main(int argc, char** argv)
                 working->move_piece(sr, er, newcen);
             }	// MOVE
 
+            else if (!strcmp(words[0], "MOVEREL"))
+            {
+                l = 1;
+                SCoord movamt(0,0,0);
+                int sr, er;
+                if (words[l]) sr = interpret_single_int(words[l++]);
+                else raise_error("Not enough parameters given for MOVEREL.");
+                if (words[l]) er = interpret_single_int(words[l++]);
+                else raise_error("Not enough parameters given for MOVEREL.");
+                if (words[l]) movamt = interpret_single_point(words[l++]);
+                if (words[l]) raise_error("Too many parameters given for MOVEREL.");
+                working->move_piece(sr, er, movamt);
+            }	// MOVEREL
+
             else if (!strcmp(words[0], "PTALIGN"))
             {
                 Point point, align, center;

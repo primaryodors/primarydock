@@ -1206,6 +1206,16 @@ function get_clip_value()
 	return v;
 }
 
+function getResStrandIdx(resmdlidx)
+{
+	var result = -1;
+	mdlstrandid.forEach(function(strandid, idx)
+	{
+		if (strandid == resstrandid[resmdlidx]) result = idx;
+	});
+	return result;
+}
+
 function getResMdlIdx(resno, strandid)
 {
 	var result = -1;
@@ -1305,6 +1315,7 @@ function showAllSideChains()
 	var i;
 	for (i=0; i<sequence.length; i++)
 	{
+		if (!gmvisible[getResStrandIdx(i)]) continue;
 		showSideChain(mdlresno[i], mdlstrandid[i]);
 	}
 }
@@ -1325,6 +1336,7 @@ function showSideChainsByType(show_type)
 	var resno, i;
 	for (i=0; i<sequence.length; i++)
 	{
+		if (!gmvisible[getResStrandIdx(i)]) continue;
 		var aa = sequence[i];
 
 		var show_sc = false;
@@ -1369,6 +1381,7 @@ function showLigandSideChains()
 	var i;
 	for (i=0; i<ligbs.length; i++)
 	{
+		if (!gmvisible[getResStrandIdx(i)]) continue;
 		showSideChain(ligbs[i], tmstrand);
 	}
 }
@@ -1378,6 +1391,7 @@ function showMetalSideChains()
 	var i;
 	for (i=0; i<mcres.length; i++)
 	{
+		if (!gmvisible[getResStrandIdx(i)]) continue;
 		showSideChain(mcres[i], tmstrand);
 	}
 }

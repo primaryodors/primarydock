@@ -643,6 +643,12 @@ function getStrandColor(strandid)
 function strandColorSelection(strandid, colorCode)
 {
 	var idx = getStrandIdxFromID(strandid);
+	if (typeof gmrparams[idx] == "undefined") gmrparams[idx] =
+		{
+			opacity: opc_cartoon,
+			colorScheme: PODefRgnScheme,
+			metalness: mtl_cartoon,
+		};
 	var p = gmrparams[idx];
 	var tabbtn = $("#stab"+strandid)[0];
 
@@ -650,61 +656,88 @@ function strandColorSelection(strandid, colorCode)
 	{
 		case 'y':
 		p.colorScheme = yellowScheme;
-		tabbtn.style.backgroundColor = "#550";
-		tabbtn.style.color = "#ff0";
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#550";
+			tabbtn.style.color = "#ff0";
+		}
 		break;
 
 		case 'g':
 		p.colorScheme = greenScheme;
-		tabbtn.style.backgroundColor = "#350";
-		tabbtn.style.color = "#cf0";
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#350";
+			tabbtn.style.color = "#cf0";
+		}
 		break;
 
 		case 't':
 		p.colorScheme = tealScheme;
-		tabbtn.style.backgroundColor = "#053";
-		tabbtn.style.color = "#6f9";
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#053";
+			tabbtn.style.color = "#6f9";
+		}
 		break;
 
 		case 'c':
 		p.colorScheme = cyanScheme;
-		tabbtn.style.backgroundColor = "#056";
-		tabbtn.style.color = "#9ff";
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#056";
+			tabbtn.style.color = "#9ff";
+		}
 		break;
 
 		case 'b':
 		p.colorScheme = blueScheme;
-		tabbtn.style.backgroundColor = "#039";
-		tabbtn.style.color = "#9cf";
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#039";
+			tabbtn.style.color = "#9cf";
+		}
 		break;
 
 		case 'p':
 		p.colorScheme = purpleScheme;
-		tabbtn.style.backgroundColor = "#309";
-		tabbtn.style.color = "#c9f";
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#309";
+			tabbtn.style.color = "#c9f";
+		}
 		break;
 
 		case 'm':
 		p.colorScheme = magentaScheme;
-		tabbtn.style.backgroundColor = "#608";
-		tabbtn.style.color = "#f9e";
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#608";
+			tabbtn.style.color = "#f9e";
+		}
 		break;
 
 		case 'r':
 		p.colorScheme = redScheme;
-		tabbtn.style.backgroundColor = "#600";
-		tabbtn.style.color = "#f99";
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#600";
+			tabbtn.style.color = "#f99";
+		}
 		break;
 
 		case 'o':
 		p.colorScheme = orangeScheme;
-		tabbtn.style.backgroundColor = "#630";
-		tabbtn.style.color = "#fc9";
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#630";
+			tabbtn.style.color = "#fc9";
+		}
 		break;
 
 		default:
 		p.colorScheme = (strandid == tmstrand) ? PODefRgnScheme : POAAScheme;
-		tabbtn.style.backgroundColor = "#234";
+		if (typeof tabbtn != "undefined") tabbtn.style.backgroundColor = "#234";
 	}
 
 	return p;
@@ -1227,7 +1260,7 @@ function showSideChain(resno, strandid)
 {
 	try
 	{
-		if (typeof strandid == "undefined") strandid = "";
+		if (typeof strandid == "undefined") strandid = "A";
 
 		var clipValue = get_clip_value();
 		var mdlidx = getResMdlIdx(resno, strandid);
@@ -1839,7 +1872,7 @@ function apply_pdb(poresult)
 	var shiny = [];
 	var result = poresult.split("\n");
 	var lres = 0;
-	var lstrandid = "";
+	var lstrandid = "A";
 	var tmpstr = "";
 	for (i=0; i<result.length; i++)
 	{
@@ -2541,7 +2574,7 @@ function loadFile(fileData, fileName = "")
                     var lres = 0;
                     var tmpstr = "";
 					var ligtmp = "";
-					var strandid = "";
+					var strandid = "A";
 					var last_strandid = "";
                     for (i=0; i<lines.length; i++)
                     {

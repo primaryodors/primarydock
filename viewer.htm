@@ -726,8 +726,9 @@ function show_seqdd()
 {
 	var seqdd = $('#seqdd')[0];
 	seqdd.innerHTML = "<b>Show/Hide Side Chains:</b><br><br>";
+	if (!tmstrand) tmstrand = "A";
 
-	if (!mdlstrandid.length) mdlstrandid = [""];
+	if (!mdlstrandid.length) mdlstrandid = ["A"];
 	var tabs;
 
 	var first = true;
@@ -1108,7 +1109,7 @@ function initialize_arrays()
 	tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 	tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 	sequence = ["-"];
-	resmdl = []; resstrandid = [""]; mdlresno = [0]; restoggled = [];
+	resmdl = []; resstrandid = []; mdlresno = []; restoggled = [];
 }
 
 var gmdl_shown = true;
@@ -1850,6 +1851,7 @@ function apply_pdb(poresult)
 		var ln = result[i];
 		var resno = parseInt(ln.substr(22,4));
 		var strandid = ln.substr(21,1).trim();
+		if (!strandid) strandid = "A";
 		var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
 		var aname = ln.substr(12,4).trim();
 		if (ln.substr(17,3) == "MTL") shiny.push(ln);
@@ -2585,6 +2587,7 @@ function loadFile(fileData, fileName = "")
                         {
 							var resno = parseInt(ln.substr(22,4));
 							strandid = ln.substr(21,1).trim();
+							if (!strandid) strandid = "A";
 							var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
 							if (!tmstrand && tmstart[6]) tmstrand = strandid;
 

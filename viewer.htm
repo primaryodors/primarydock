@@ -2563,6 +2563,7 @@ function loadFile(fileData, fileName = "")
 								var tmrno = parseInt(pieces[3].substr(-1));
 								tmstart[tmrno] = parseInt(pieces[4]);
 								tmend[tmrno] = parseInt(pieces[5]);
+								tmstrand = "";			// Force reassignment later on.
 							}
 							else if (pieces[3] == "LIGAND_BINDING")
 							{

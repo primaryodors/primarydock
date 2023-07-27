@@ -1878,7 +1878,8 @@ int main(int argc, char** argv)
                     raise_error( (std::string)"Failed to open " + (std::string)psz + (std::string)" for reading.");
                     return 0xbadf12e;
                 }
-                working->load_pdb(pf, n, chain);
+                l = working->load_pdb(pf, n, chain);
+                if (!l) raise_error("No residues loaded.");
 
                 fclose(pf);
 
@@ -2264,6 +2265,7 @@ int main(int argc, char** argv)
                 {
                     if (!strands[l]) continue;
                     working = strands[l];
+                    if (!working->get_seq_length()) continue;
                     g_chain = l+65;
                     working->set_pdb_chain(l+65);
                     working->save_pdb(pf);

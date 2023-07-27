@@ -1,8 +1,8 @@
 Created empty molecule named Test.
 Added a carbon atom. Its location is [0,0,0].
-Added another carbon atom. Its location is [0,1.54,9.42978e-17].
-Added an oxygen atom. Its location is [1.03923,2.14,7.84597e-08].
-Added another carbon atom. Its location is [-1.33368,2.31,1.5904e-08].
+Added another carbon atom. Its location is [0,1.539,0].
+Added an oxygen atom. Its location is [1.039,2.139,0].
+Added another carbon atom. Its location is [-1.333,2.31,0].
 Hydrogenated.
 hbond
                                               =                                              

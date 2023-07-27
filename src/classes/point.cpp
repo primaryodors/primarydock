@@ -97,7 +97,7 @@ float Point::get_3d_distance(const Point* reference)
 std::string Point::printable() const
 {
     std::stringstream buffer;
-    buffer << "[" << x << "," << y << "," << z << "]";
+    buffer << "[" << (0.001 * (int)(x*1000)) << "," << (0.001 * (int)(y*1000)) << "," << (0.001 * (int)(z*1000)) << "]";
     return buffer.str();
 }
 

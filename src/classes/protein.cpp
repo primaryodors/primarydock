@@ -932,14 +932,14 @@ std::string Protein::get_sequence()
 
 int Protein::get_start_resno()
 {
-    if (!residues) return 0;
+    if (!residues || !residues[0]) return 0;
     else return residues[0]->get_residue_no();
 }
 
 int Protein::get_end_resno()
 {
     int retval = 0;
-    if (!residues) return retval;
+    if (!residues || !residues[0]) return retval;
     int i;
     for (i=0; residues[i]; i++) retval = residues[i]->get_residue_no();
     return retval;
@@ -985,13 +985,10 @@ void Protein::set_clashables(int resno, bool recursed)
 
 
     int maxres = get_end_resno();
-    if (resno <= 0)
+    if (!res_can_clash)
     {
-        if (!res_can_clash)
-        {
-            res_can_clash = new AminoAcid**[maxres+8];
-            for (i=0; i<=maxres; i++) res_can_clash[i] = nullptr;
-        }
+        res_can_clash = new AminoAcid**[maxres+8];
+        for (i=0; i<=maxres; i++) res_can_clash[i] = nullptr;
     }
 
     int sr = get_start_resno(), er = get_end_resno();
@@ -2639,8 +2636,8 @@ void Protein::move_piece(int start_res, int end_res, SCoord move_amt)
         aa->movability = MOV_ALL;
         aa->aamove(move_amt);
         aa->movability = mov;
+        set_clashables(i);
     }
-    set_clashables(i);
 }
 
 LocRotation Protein::rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res)

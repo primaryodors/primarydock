@@ -864,7 +864,7 @@ function show_seqdd()
 			if (rcd) tgl.style.backgroundColor = css_color(rcd);
 
 			var j;
-			for (j=1; j<67; j++) if (bw50r[j] == (i+1)) tgl.className += ' bw50';
+			if (strandid == tmstrand) for (j=1; j<67; j++) if (bw50r[j] == resno) tgl.className += ' bw50';
 
 			if (mdlidx < 0)
 			{
@@ -2586,8 +2586,7 @@ function loadFile(fileData, fileName = "")
 							var resno = parseInt(ln.substr(22,4));
 							strandid = ln.substr(21,1).trim();
 							var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
-
-							if (!tmstrand && tmstart.length) tmstrand = strandid;
+							if (!tmstrand && tmstart[6]) tmstrand = strandid;
 
 							if (lres != resno)
 							{

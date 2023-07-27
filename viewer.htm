@@ -547,7 +547,7 @@ var tmcolor =
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 var ligbs = [];
-var tmstrand = "";
+var tmstrand = "A";
 var mcres = [];
 var bw50r = new Array(99).fill(0);
 
@@ -1180,11 +1180,6 @@ stage.mouseControls.add( "scroll-ctrl+shift", function( stage, delta )
     var ai = stage.getParameters().ambientIntensity;
     stage.setParameters( { ambientIntensity: Math.max( 0, ai + delta / 50 ) } );
 } );
-
-stage.mouseControls.add("clickPick", function(stage, e)
-{
-	toggleSideChain(e.atom.resno);
-});
 
 function centerPocket()
 {
@@ -2675,7 +2670,9 @@ function loadFile(fileData, fileName = "")
 				var fileStrands = fileData.split("\nTER");
 				fileStrands.forEach(function(strandData)
                 {
+					if (strandData.trim().length < 20 || strandData.indexOf("\nATOM ") < 0) return;
 					var strandid = strandData.substr(strandData.indexOf("\nATOM "), 100).trim().substr(21,1).trim();
+					if (!strandid) strandid = "A";
 					var stringBlob = new Blob( [ strandData ], { type: 'text/plain'} );
 					stage.loadFile( stringBlob, { ext: fext, name: strandid } ).then( ( comp ) =>
 					{

@@ -887,6 +887,22 @@ int main(int argc, char** argv)
 
             }	// BRIDGE
 
+            else if (!strcmp(words[0], "BWCENTER"))
+            {
+                if (words[1]) raise_error("Too many parameters given for BWCENTER.");
+                Point bw50_CA[10];
+                for (l=1; l<=7; l++)
+                {
+                    int resno = working->get_bw50(l);
+                    if (resno < 1) raise_error((std::string)"Strand does not have a " + to_string(l) + (std::string)".50 residue.");
+                    bw50_CA[l] = working->get_residue(resno)->get_CA_location();
+                }
+                Point old_center = average_of_points(&bw50_CA[1], 7);
+                SCoord new_center = old_center;
+                new_center.r *= -1;
+                working->move_piece(1, working->get_end_resno(), new_center);
+            }   // BWCENTER
+
             else if (!strcmp(words[0], "CENTER"))
             {
                 l = 1;
@@ -2554,8 +2570,7 @@ int main(int argc, char** argv)
 
             else if (!strcmp(words[0], "UPRIGHT"))
             {
-                l = 1;
-                if (words[l]) raise_error("Too many parameters given for UPRIGHT.");
+                if (words[1] && words[2]) raise_error("Too many parameters given for UPRIGHT.");
 
                 try
                 {
@@ -2564,6 +2579,8 @@ int main(int argc, char** argv)
 
                     for (i=0; i<26; i++)
                     {
+                        if (words[1] && !strchr(words[1], 65+i)) continue;
+
                         if (strands[i] && (strands[i] != working))
                         {
                             strands[i]->move_piece(1, 9999, working->last_uprighted_xform);

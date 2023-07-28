@@ -163,6 +163,18 @@ parameter is given, it represents the number of iterations (default 50). More it
 returns occur with large iteration values.
 
 
+# BWCENTER
+Example:
+```
+BWCENTER
+```
+
+If the current working strand is a seven-helix protein (7HP), with Ballesteros-Weinstein numbering for all its transmembrane helices,
+then `BWCENTER` will obtain the center of all n.50:CA atom locations and recenter the entire protein.
+This is useful for comparing various active and inactive states of GPCRs; the 1.50 through 7.50 residues will be assumed to be the most stationary
+parts of the protein, and variations in structure can be observed with minimal global transformational anomalies.
+
+
 # CENTER
 Example:
 ```
@@ -635,6 +647,8 @@ If the second string is not found within the first string, `%out_var` is set to 
 Example:
 ```
 UPRIGHT
+UPRIGHT A
+UPRIGHT DEFGH
 ```
 
 Turns the protein "upright", so that the extracellular domain is in the +Y direction and the cytoplasmic domain is in the -Y direction.
@@ -647,9 +661,8 @@ If the PDB does not contain suitable `REMARK 650 HELIX` records, then the TMRs m
 If the protein has a TMR4, it will be rotated to the +Z direction from TMR1. This affords a good view of the binding pocket of 7-helix GPCRs, but also
 maintains compatibility with MS4A proteins since it does not depend on the existence of a TMR5, TMR6, or TMR7.
 
-If multiple strands are loaded in memory, they will all be moved as a unit with the uprighting of the working strand.
-
-UPRIGHT takes no arguments.
+`UPRIGHT` takes an optional parameter to indicate which strand(s) are to be moved as a unit with the uprighting of the working strand.
+The default is for all strands in memory to be included.
 
 
 # UNCHAIN

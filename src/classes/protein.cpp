@@ -951,6 +951,21 @@ void Protein::add_remark(const char* remark)
 
     remarks[remarksz] = new char[strlen(remark)+2];
     strcpy(remarks[remarksz++], remark);
+
+    char buffer[1024];
+    strcpy(buffer, remark);
+    char** words = chop_spaced_words(buffer);
+
+    if (!strcmp(words[1], "800")
+        && !strcmp(words[2], "SITE")
+        && !strcmp(words[3], "BW")
+        )
+    {
+        int f4 = atoi(words[4]);
+        while (Ballesteros_Weinstein.size() <= f4) Ballesteros_Weinstein.push_back(0);
+        Ballesteros_Weinstein[f4] = atoi(words[5]);
+    }
+    delete words;
 }
 
 std::vector<std::string> Protein::get_remarks(std::string search_for)

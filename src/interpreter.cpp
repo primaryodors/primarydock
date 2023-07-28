@@ -1503,8 +1503,9 @@ int main(int argc, char** argv)
 
                 if (!strcmp(words[l-1], "EXISTS"))
                 {
-                    l++;
-                    if (file_exists(interpret_single_string(words[2]))) goto _evaluated_true;
+                    char* file_name = interpret_single_string(words[l]);
+                    l--;
+                    if (file_exists(file_name)) goto _evaluated_true;
                     else goto _evaluated_false;
                 }
 
@@ -2621,7 +2622,7 @@ int main(int argc, char** argv)
         }
 
     _pc_continue:
-        delete[] owords;
+        delete owords;
         program_counter++;
     }
 

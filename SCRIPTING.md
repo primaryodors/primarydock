@@ -372,6 +372,8 @@ loop:
 ECHO %iter
 LET %iter ++
 IF %iter <= 10 GOTO loop
+
+IF EXISTS $filename ECHO "File exists."
 ```
 
 The `IF` command evaluates a conditional expression and, if true, executes another command. Currently, only simple A = B type expressions are

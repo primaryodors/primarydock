@@ -1492,16 +1492,8 @@ int main(int argc, char** argv)
             {
                 if (!words[1]) raise_error("Insufficient parameters given for IF.");
                 if (!words[2]) raise_error("Insufficient parameters given for IF.");
+
                 bool inverse_result = false;
-
-                if (!strcmp(words[1], "EXISTS"))
-                {
-                    l++;
-                    if (file_exists(interpret_single_string(words[2]))) goto _evaluated_true;
-                    else goto _evaluated_false;
-                }
-
-                // TODO: IF %var GOTO blah.
                 l = 2;
                 if (!strcmp(words[1], "NOT"))
                 {
@@ -1509,6 +1501,14 @@ int main(int argc, char** argv)
                     l++;
                 }
 
+                if (!strcmp(words[l-1], "EXISTS"))
+                {
+                    l++;
+                    if (file_exists(interpret_single_string(words[2]))) goto _evaluated_true;
+                    else goto _evaluated_false;
+                }
+
+                // TODO: IF %var GOTO blah.
                 // If the operator is =, and both l-value and r-value are strings, do a direct comparison.
                 if (!words[l]) raise_error("Insufficient parameters given for IF.");
                 if (!strcmp(words[l], "THEN"))

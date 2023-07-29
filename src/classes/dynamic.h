@@ -39,11 +39,12 @@ class DynamicMotion
 
     DynamicMotion(Protein* ppro);
     bool add_constraint(DynamicConstraint* new_cons);           // Returns false if unable to add.
+    void read_config_line(const char* line, DynamicMotion** all_motions);
     float apply_incremental(float additional_amount);           // Returns total applied.
     float apply_absolute(float target_amount);                  // Returns actual applied, e.g. within constraints etc.
 
     protected:
-    Protein* prot;
+    Protein* prot = nullptr;
     float applied = 0;
     DynamicConstraint* constraints[MAX_DYN_CONSTRAINTS+1];      // Not using a std::vector since those cause double free errors on destruct.
 };

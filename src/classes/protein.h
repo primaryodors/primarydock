@@ -22,10 +22,13 @@ struct Region
     std::string name="";
 };
 
-struct BallesterosWeinstein
+class BallesterosWeinstein
 {
+    public:
     int helix_no = 0;
     int member_no = 0;
+
+    void from_string(char* inpstr);
 };
 
 struct SoftBias

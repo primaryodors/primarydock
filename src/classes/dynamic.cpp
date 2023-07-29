@@ -142,3 +142,70 @@ float DynamicMotion::apply_absolute(float amt)
 {
     return apply_incremental(amt - applied);
 }
+
+void DynamicMotion::read_config_line(const char* ln, DynamicMotion** all)
+{
+    char buffer[strlen(ln)+16];
+    strcpy(buffer, ln);
+    char** words = chop_spaced_words(buffer);
+    if (!words[0]) throw -1;
+
+    if (!words[1]) throw -1;
+    if (!strcmp(words[1], "ROCK")) type = dyn_rock;
+    else if (!strcmp(words[1], "BEND")) type = dyn_bend;
+    else if (!strcmp(words[1], "MOVE")) type = dyn_move;
+    else if (!strcmp(words[1], "WIND")) type = dyn_wind;
+    else throw -1;
+
+    if (!words[2]) throw -1;
+    name = words[2];
+
+    int i, l = 3;
+    if (!words[l]) throw -1;
+    start_resno.from_string(words[l]);
+    if (!words[++l]) throw -1;
+    end_resno.from_string(words[l]);
+
+    if (type == dyn_rock || type == dyn_move)
+    {
+        if (!words[++l]) throw -1;
+        fulcrum_resno.from_string(words[l]);
+
+        if (!words[++l]) throw -1;
+        axis_resno.from_string(words[l]);
+    }
+
+    if (!words[++l]) throw -1;
+    bias = atof(words[l]);
+
+    while (words[++l])
+    {
+        DynamicConstraint* dc = new DynamicConstraint;
+        if (!strcmp(words[l], "MIN")) dc->type = ddep_MIN;
+        else if (!strcmp(words[l], "MAX")) dc->type = ddep_MAX;
+        else throw -1;
+
+        if (!words[++l]) throw -1;
+        if (!all) throw -1;
+        bool matched = false;
+        for (i=0; all[i]; i++)
+        {
+            if (!strcmp(all[i]->name.c_str(), words[l]))
+            {
+                dc->depends_on = all[i];
+                matched = true;
+                break;
+            }
+        }
+
+        if (!matched)
+        {
+            cout << "Motion " << words[l] << " not found for constraint." << endl;
+            throw -1;
+        }
+
+        add_constraint(dc);
+    }
+    
+    return;
+}

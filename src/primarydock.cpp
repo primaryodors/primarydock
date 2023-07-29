@@ -105,6 +105,9 @@ std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
+DynamicMotion* dyn_motions[64];
+int num_dyn_motions = 0;
+
 bool configset=false, protset=false, tplset=false, tprfset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
 Protein* protein;
@@ -1892,6 +1895,7 @@ int main(int argc, char** argv)
     int i, j;
 
     _momentum_rad_ceiling = fiftyseventh * 5;
+    dyn_motions[0] = nullptr;
 
     for (i=0; i<65536; i++) buffer[i] = 0;
     #if active_persistence

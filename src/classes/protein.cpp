@@ -136,6 +136,13 @@ bool Protein::add_residue(const int resno, const char aaletter)
     return true;
 }
 
+void BallesterosWeinstein::from_string(char* inpstr)
+{
+    helix_no = atoi(inpstr);
+    char* dot = strchr(inpstr, '.');
+    if (dot) member_no = atoi(dot+1);
+}
+
 AminoAcid* Protein::get_residue(int resno)
 {
     if (!resno) return 0;

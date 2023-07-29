@@ -22,6 +22,12 @@ struct Region
     std::string name="";
 };
 
+struct BallesterosWeinstein
+{
+    int helix_no = 0;
+    int member_no = 0;
+}
+
 struct SoftBias
 {
     std::string region_name;
@@ -68,6 +74,8 @@ public:
     Molecule* metals_as_molecule();
     int get_metals_count();
     AminoAcid* get_residue(int resno);
+    AminoAcid* get_residue(BallesterosWeinstein bw);
+    AminoAcid* get_residue_bw(int helixno, int bwno);
     Region get_region(std::string name);
     const Region* get_regions() { return regions; }
     int get_region_end(std::string name);

@@ -150,6 +150,30 @@ AminoAcid* Protein::get_residue(int resno)
     return NULL;
 }
 
+AminoAcid* Protein::get_residue(BallesterosWeinstein bw)
+{
+    return get_residue_bw(bw.helix_no, bw.member_no);
+}
+
+AminoAcid* Protein::get_residue_bw(int hxno, int bwno)
+{
+    if (!Ballesteros_Weinstein.size())
+    {
+        cout << "Call to get_residue_bw() on a protein with no BW numbers set." << endl;
+        throw -1;
+    }
+
+    int bw50 = get_bw50(hxno);
+    if (bw50 < 1)
+    {
+        cout << "BW number not found: " << hxno << ".50." << endl;
+        throw -1;
+    }
+
+    int resno = bw50 - 50 + bwno;
+    return get_residue(resno);
+}
+
 Atom* Protein::get_atom(int resno, const char* aname)
 {
     AminoAcid* aa = get_residue(resno);

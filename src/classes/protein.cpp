@@ -956,7 +956,9 @@ void Protein::add_remark(const char* remark)
     strcpy(buffer, remark);
     char** words = chop_spaced_words(buffer);
 
-    if (!strcmp(words[1], "800")
+    if (words[1]
+        && !strcmp(words[1], "800")
+        && words[2]
         && !strcmp(words[2], "SITE")
         && !strcmp(words[3], "BW")
         )

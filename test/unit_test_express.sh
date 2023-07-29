@@ -64,4 +64,15 @@ else
 fi
 
 
+REPORT="test/ifnot_test.approved.txt"
+./bin/pepteditor test/ifnot.pepd | sed '/^#/d' >test/received/ifnot_test.received.txt
+RESULT=$(diff --unified $REPORT test/received/ifnot_test.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}IF NOT test succeeded.${NC}\n"
+else
+    printf "${RED}IF NOT test FAILED.${NC}\n"
+    diff --color --unified $REPORT test/received/ifnot_test.received.txt
+fi
+
+
 

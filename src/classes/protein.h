@@ -26,7 +26,7 @@ struct BallesterosWeinstein
 {
     int helix_no = 0;
     int member_no = 0;
-}
+};
 
 struct SoftBias
 {

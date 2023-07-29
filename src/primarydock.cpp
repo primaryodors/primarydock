@@ -7,8 +7,9 @@
 #include <time.h>
 #include <sstream>
 #include <algorithm>
-#include "classes/protein.h"
+#include "classes/dynamic.h"
 #include "classes/group.h"
+#include "classes/protein.h"
 
 using namespace std;
 
@@ -22,8 +23,8 @@ struct DockResult
     float* imkJmol;
     float* mvdWrepl;
     float* imvdWrepl;
-    std::string softrock;
     std::string pdbdat;
+    std::string softrock;
     std::string miscdata;
     float bytype[_INTER_TYPES_LIMIT];
     float ibytype[_INTER_TYPES_LIMIT];

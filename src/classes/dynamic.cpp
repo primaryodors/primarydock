@@ -36,11 +36,12 @@ float DynamicMotion::apply_incremental(float amt)
     AminoAcid* aa;
     Point fulcrum, ptaxis;
     SCoord axis;
-    int i, sr, er;
+    int i, j, sr, er;
+    float lamt, lamt_phi, lamt_psi;
+    LocatedVector lv;
 
     switch (type)
     {
-        case dyn_bend:
         case dyn_rock:
         
         aa = prot->get_residue(fulcrum_resno);
@@ -61,7 +62,7 @@ float DynamicMotion::apply_incremental(float amt)
         if (!i) throw -1;
         er = i - 50 + end_resno.member_no;
 
-        float lamt = amt * bias;
+        lamt = amt * bias;
         prot->rotate_piece(sr, er, fulcrum, axis, lamt);
         applied += lamt;
         break;
@@ -87,7 +88,7 @@ float DynamicMotion::apply_incremental(float amt)
         if (!i) throw -1;
         er = i - 50 + end_resno.member_no;
 
-        float lamt = amt * bias;
+        lamt = amt * bias;
         axis.r = lamt;
         prot->move_piece(sr, er, axis);
         applied += lamt;
@@ -95,15 +96,49 @@ float DynamicMotion::apply_incremental(float amt)
 
 
         case dyn_wind:
-        // TODO:
+
+        i = prot->get_bw50(start_resno.helix_no);
+        if (!i) throw -1;
+        sr = i - 50 + start_resno.member_no;
+
+        i = prot->get_bw50(end_resno.helix_no);
+        if (!i) throw -1;
+        er = i - 50 + end_resno.member_no;
+
+        lamt = amt * bias;
+        lamt_phi = lamt/(M_PI*2) * (ALPHA_PHI - -M_PI);
+        lamt_psi = lamt/(M_PI*2) * (ALPHA_PSI - -M_PI);
+
+        for (i=sr; i<=er; i++)
+        {
+            aa = prot->get_residue(i);
+
+            lv = aa->rotate_backbone(N_asc, lamt_phi);
+            for (j=i+1; j<=er; j++)
+            {
+                aa = prot->get_residue(j);
+                aa->rotate(lv, lamt_phi);
+            }
+
+            lv = aa->rotate_backbone(CA_asc, lamt_psi);
+            for (j=i+1; j<=er; j++)
+            {
+                aa = prot->get_residue(j);
+                aa->rotate(lv, lamt_psi);
+            }
+        }
+
         break;
+
 
         default:
         throw -1;
     }
+
+    return applied;
 }
 
 float DynamicMotion::apply_absolute(float amt)
 {
-    apply_incremental(amt - applied);
+    return apply_incremental(amt - applied);
 }

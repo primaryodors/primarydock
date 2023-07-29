@@ -47,3 +47,6 @@ class DynamicMotion
     float applied = 0;
     DynamicConstraint* constraints[MAX_DYN_CONSTRAINTS+1];      // Not using a std::vector since those cause double free errors on destruct.
 };
+
+
+#endif

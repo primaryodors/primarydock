@@ -887,6 +887,22 @@ int main(int argc, char** argv)
 
             }	// BRIDGE
 
+            else if (!strcmp(words[0], "BWCENTER"))
+            {
+                if (words[1]) raise_error("Too many parameters given for BWCENTER.");
+                Point bw50_CA[10];
+                for (l=1; l<=7; l++)
+                {
+                    int resno = working->get_bw50(l);
+                    if (resno < 1) raise_error((std::string)"Strand does not have a " + to_string(l) + (std::string)".50 residue.");
+                    bw50_CA[l] = working->get_residue(resno)->get_CA_location();
+                }
+                Point old_center = average_of_points(&bw50_CA[1], 7);
+                SCoord new_center = old_center;
+                new_center.r *= -1;
+                working->move_piece(1, working->get_end_resno(), new_center);
+            }   // BWCENTER
+
             else if (!strcmp(words[0], "CENTER"))
             {
                 l = 1;
@@ -1477,9 +1493,23 @@ int main(int argc, char** argv)
                 if (!words[1]) raise_error("Insufficient parameters given for IF.");
                 if (!words[2]) raise_error("Insufficient parameters given for IF.");
 
-                // TODO: NOT operator and IF %var GOTO blah.
+                bool inverse_result = false;
                 l = 2;
+                if (!strcmp(words[1], "NOT"))
+                {
+                    inverse_result = true;
+                    l++;
+                }
 
+                if (!strcmp(words[l-1], "EXISTS"))
+                {
+                    char* file_name = interpret_single_string(words[l]);
+                    l--;
+                    if (file_exists(file_name)) goto _evaluated_true;
+                    else goto _evaluated_false;
+                }
+
+                // TODO: IF %var GOTO blah.
                 // If the operator is =, and both l-value and r-value are strings, do a direct comparison.
                 if (!words[l]) raise_error("Insufficient parameters given for IF.");
                 if (!strcmp(words[l], "THEN"))
@@ -1563,6 +1593,8 @@ int main(int argc, char** argv)
                 }
 
             _evaluated_true:
+                if (inverse_result) goto _false_result;
+            _true_result:
                 l += 2;
                 if (!strcmp(words[l], "THEN")) l++;
                 words = &words[l];
@@ -1579,6 +1611,8 @@ int main(int argc, char** argv)
                 goto _interpret_command;
 
             _evaluated_false:
+                if (inverse_result) goto _true_result;
+            _false_result:
                 if (words[l+2] && !strcmp(words[l+2], "OR"))
                 {
                     l += 2;
@@ -2554,8 +2588,7 @@ int main(int argc, char** argv)
 
             else if (!strcmp(words[0], "UPRIGHT"))
             {
-                l = 1;
-                if (words[l]) raise_error("Too many parameters given for UPRIGHT.");
+                if (words[1] && words[2]) raise_error("Too many parameters given for UPRIGHT.");
 
                 try
                 {
@@ -2564,6 +2597,8 @@ int main(int argc, char** argv)
 
                     for (i=0; i<26; i++)
                     {
+                        if (words[1] && !strchr(words[1], 65+i)) continue;
+
                         if (strands[i] && (strands[i] != working))
                         {
                             strands[i]->move_piece(1, 9999, working->last_uprighted_xform);
@@ -2587,7 +2622,7 @@ int main(int argc, char** argv)
         }
 
     _pc_continue:
-        delete[] owords;
+        delete owords;
         program_counter++;
     }
 

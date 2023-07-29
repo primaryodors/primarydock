@@ -1,0 +1,9 @@
+
+LET %i = 1
+
+IF NOT %i = 1 ECHO "%i is not 1."
+IF NOT %i = 2 ECHO "%i is not 2."
+
+IF NOT EXISTS "bin/pepteditor" ECHO "I am a ghost."
+ELSE ECHO "I exist."
+

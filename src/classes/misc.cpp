@@ -78,10 +78,12 @@ char** chop_spaced_words(char* line, char separator)
         {
             retval[j++] = &line[i++];
             for (; line[i] && line[i] != '"'; i++);		// Get to next quote character.
+            bool last = false;
+            if (!line[i+1]) last = true;
             if (line[i] == '"') line[++i] = '\0';
+            if (last) break;
             continue;
         }
-
 
         if (separator == ' ' && line[i] == '\t') line[i] = separator;
         if (line[i-1] == separator && line[i] != separator) retval[j++] = line+i;

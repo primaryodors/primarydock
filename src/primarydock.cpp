@@ -2081,7 +2081,6 @@ int main(int argc, char** argv)
     if (dot) *dot = 0;
 
     protein = new Protein(protid);
-    apply_protein_specific_settings(protein);
     pf = fopen(protfname, "r");
     if (!pf)
     {
@@ -2090,6 +2089,7 @@ int main(int argc, char** argv)
     }
     protein->load_pdb(pf);
     protein->soft_biases = soft_biases;
+    apply_protein_specific_settings(protein);
     fclose(pf);
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
@@ -2567,7 +2567,6 @@ _try_again:
 
         delete protein;
         protein = new Protein(protfname);
-        apply_protein_specific_settings(protein);
 
         if (temp_pdb_file.length())
         {
@@ -2575,6 +2574,7 @@ _try_again:
             protein->load_pdb(pf);
             fclose(pf);
             protein->soft_biases = soft_biases;
+            apply_protein_specific_settings(protein);
 
             if (mtlcoords.size())
             {
@@ -2597,6 +2597,7 @@ _try_again:
             protein->load_pdb(pf);
             fclose(pf);
             protein->soft_biases = soft_biases;
+            apply_protein_specific_settings(protein);
         }
 
         strcpy(buffer, CEN_buf.c_str());
@@ -2715,12 +2716,12 @@ _try_again:
 
                 delete protein;
                 protein = new Protein(protafname);
-                apply_protein_specific_settings(protein);
                 
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
-                protein->soft_biases = soft_biases;
                 fclose(pf);
+                protein->soft_biases = soft_biases;
+                apply_protein_specific_settings(protein);
 
                 freeze_bridged_residues();
                 prepare_initb();

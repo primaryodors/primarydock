@@ -8,6 +8,8 @@
 #define DYN_RANDOM_RANGE 0.333
 #define DYN_BIAS_EFFECT 0.4
 
+#define debug_dyn_motion 1
+
 enum DynamicType
 {
     dyn_rock,

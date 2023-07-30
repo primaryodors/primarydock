@@ -53,6 +53,10 @@ float DynamicMotion::apply_incremental(float amt)
         }
     }
 
+    #if debug_dyn_motion
+    cout << "Trying " << amt << " for " << name << " for a total of " << (applied + amt) << endl;
+    #endif
+
     switch (type)
     {
         case dyn_rock:
@@ -76,9 +80,9 @@ float DynamicMotion::apply_incremental(float amt)
         er = i - 50 + end_resno.member_no;
 
         lamt = amt * bias;
-        last_change = lamt;
+        last_change = amt;
         prot->rotate_piece(sr, er, fulcrum, axis, lamt);
-        applied += lamt;
+        applied += amt;
         break;
 
 
@@ -103,10 +107,10 @@ float DynamicMotion::apply_incremental(float amt)
         er = i - 50 + end_resno.member_no;
 
         lamt = amt * bias;
-        last_change = lamt;
+        last_change = amt;
         axis.r = lamt;
         prot->move_piece(sr, er, axis);
-        applied += lamt;
+        applied += amt;
         break;
 
 
@@ -121,7 +125,7 @@ float DynamicMotion::apply_incremental(float amt)
         er = i - 50 + end_resno.member_no;
 
         lamt = amt * bias;
-        last_change = lamt;
+        last_change = amt;
         lamt_phi = lamt/(M_PI*2) * (ALPHA_PHI - -M_PI);
         lamt_psi = lamt/(M_PI*2) * (ALPHA_PSI - -M_PI);
 
@@ -143,6 +147,7 @@ float DynamicMotion::apply_incremental(float amt)
                 aa->rotate(lv, lamt_psi);
             }
         }
+        applied += amt;
 
         break;
 
@@ -228,11 +233,15 @@ void DynamicMotion::read_config_line(const char* ln, DynamicMotion** all)
 
 void DynamicMotion::make_random_change()
 {
-    float f = frand(-DYN_RANDOM_RANGE, DYN_RANDOM_RANGE) + (bias - applied) * DYN_BIAS_EFFECT;
+    float f = frand(-DYN_RANDOM_RANGE, DYN_RANDOM_RANGE) + (1.0 - applied) * DYN_BIAS_EFFECT;
     apply_incremental(f);
 }
 
 void DynamicMotion::undo()
 {
     apply_incremental(-last_change);
+
+    #if debug_dyn_motion
+    cout << "Reverting " << name << endl;
+    #endif
 }

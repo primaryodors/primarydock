@@ -3918,6 +3918,7 @@ _try_again:
                 std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(pose) + (std::string)".pdb";
                 FILE* pfpdb = fopen(temp_pdb_fn.c_str(), "w");
                 if (!pfpdb) return -1;
+                protein->set_pdb_chain('A');
                 protein->save_pdb(pfpdb, ligand);
                 protein->end_pdb(pfpdb);
                 fclose(pfpdb);

@@ -53,6 +53,10 @@ float DynamicMotion::apply_incremental(float amt)
         }
     }
 
+    new_total = applied + amt;
+    if (new_total < -DYN_MAX_OVERAGE) amt = -DYN_MAX_OVERAGE - applied;
+    else if (new_total > 1.0+DYN_MAX_OVERAGE) amt = (1.0+DYN_MAX_OVERAGE) - applied;
+
     #if debug_dyn_motion
     cout << "Trying " << amt << " for " << name << " for a total of " << (applied + amt) << endl;
     #endif

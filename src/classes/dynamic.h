@@ -7,6 +7,7 @@
 #define MAX_DYN_CONSTRAINTS 5
 #define DYN_RANDOM_RANGE 0.333
 #define DYN_BIAS_EFFECT 0.4
+#define DYN_MAX_OVERAGE 0.25
 
 #define debug_dyn_motion 1
 

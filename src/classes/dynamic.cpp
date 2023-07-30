@@ -135,28 +135,15 @@ float DynamicMotion::apply_incremental_nochecks(float amt)
         if (!i) throw -1;
         er = i - 50 + end_resno.member_no;
 
-        lamt = amt * bias;
+        lamt = amt * bias * fiftyseventh;
         last_change = amt;
         lamt_phi = lamt/(M_PI*2) * (ALPHA_PHI - -M_PI);
         lamt_psi = lamt/(M_PI*2) * (ALPHA_PSI - -M_PI);
 
         for (i=sr; i<=er; i++)
         {
-            aa = prot->get_residue(i);
-
-            lv = aa->rotate_backbone(N_asc, lamt_phi);
-            for (j=i+1; j<=er; j++)
-            {
-                aa = prot->get_residue(j);
-                aa->rotate(lv, lamt_phi);
-            }
-
-            lv = aa->rotate_backbone(CA_asc, lamt_psi);
-            for (j=i+1; j<=er; j++)
-            {
-                aa = prot->get_residue(j);
-                aa->rotate(lv, lamt_psi);
-            }
+            prot->rotate_backbone_partial(i, er, N_asc, lamt_phi);
+            prot->rotate_backbone_partial(i, er, CA_asc, lamt_psi);
         }
         applied += amt;
 

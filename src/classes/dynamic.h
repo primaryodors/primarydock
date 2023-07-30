@@ -9,7 +9,7 @@
 #define DYN_BIAS_EFFECT 0.4
 #define DYN_MAX_OVERAGE 0.25
 
-#define debug_dyn_motion 1
+#define debug_dyn_motion 0
 
 enum DynamicType
 {

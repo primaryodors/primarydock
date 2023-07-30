@@ -105,6 +105,7 @@ std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
+std::vector<std::string> dyn_motion_strings;
 DynamicMotion* dyn_motions[64];
 int num_dyn_motions = 0;
 
@@ -1306,6 +1307,10 @@ int interpret_config_line(char** words)
         optsecho += soft_names + (std::string)" ";
         return i-1;
     }
+    else if (!strcmp(words[0], "DYNAMIC"))
+    {
+        dyn_motion_strings.push_back(origbuff);
+    }
     else if (!strcmp(words[0], "HARD"))
     {
         soft_pocket = false;
@@ -1889,6 +1894,20 @@ void do_tumble_spheres(Point l_pocket_cen)
     // End tumble sphere behavior.
 }
 
+void apply_protein_specific_settings(Protein* p)
+{
+    int i, n = dyn_motion_strings.size();
+
+    for (i=0; i<n; i++)
+    {
+        if (dyn_motions[i]) delete dyn_motions[i];
+        dyn_motions[i] = new DynamicMotion(p);
+        dyn_motions[i]->read_config_line(dyn_motion_strings[i].c_str(), dyn_motions);
+    }
+    num_dyn_motions = i;
+    dyn_motions[i] = nullptr;
+}
+
 int main(int argc, char** argv)
 {
     char buffer[65536];
@@ -1999,10 +2018,6 @@ int main(int argc, char** argv)
     if (kcal) kJmol_cutoff /= _kcal_per_kJ;
     drift = 1.0 / (iters/25+1);
 
-    // Load the protein or return an error.
-    /* Protein p(protfname);
-    protein = &p; */
-
     char protid[255];
     char* slash = strrchr(protfname, '/');
     if (!slash) slash = strrchr(protfname, '\\');
@@ -2011,6 +2026,7 @@ int main(int argc, char** argv)
     if (dot) *dot = 0;
 
     protein = new Protein(protid);
+    apply_protein_specific_settings(protein);
     pf = fopen(protfname, "r");
     if (!pf)
     {
@@ -2496,6 +2512,7 @@ _try_again:
 
         delete protein;
         protein = new Protein(protfname);
+        apply_protein_specific_settings(protein);
 
         if (temp_pdb_file.length())
         {
@@ -2643,6 +2660,7 @@ _try_again:
 
                 delete protein;
                 protein = new Protein(protafname);
+                apply_protein_specific_settings(protein);
                 
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);

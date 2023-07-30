@@ -1202,7 +1202,7 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "OUTPDB"))
     {
         outpdb_poses = atoi(words[1]);
-        outpdb = words[1];
+        outpdb = words[2];
         return 2;
     }
     else if (!strcmp(words[0], "PATH"))
@@ -4525,7 +4525,7 @@ _try_again:
                         cout << "zeta " << l << endl;
                         #endif
 
-                        if (!k && outpdb.length() && j <= outpdb_poses)
+                        if (!k && outpdb.length() && pose <= outpdb_poses)
                         {
                             char protn[64];
                             strcpy(protn, strrchr(protfname, '/')+1);
@@ -4537,14 +4537,19 @@ _try_again:
                             dot = strchr(lign, '.');
                             if (dot) *dot = 0;
 
-                            std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(j) + (std::string)".pdb";
-                            std::string out_pdb_fn = std::regex_replace(outpdb, std::regex("%p"), protn);
-                            out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("%l"), lign);
-                            out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("%o"), to_string(pose));
+                            std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(j+1) + (std::string)".pdb";
+                            std::string out_pdb_fn = std::regex_replace(outpdb, std::regex("[%][p]"), protn);
+                            out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("[%][l]"), lign);
+                            out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("[%][o]"), to_string(pose));
 
                             FILE* pftmp = fopen(temp_pdb_fn.c_str(), "rb");
                             FILE* pfout = fopen(out_pdb_fn.c_str(), "wb");
-                            if (!pftmp || !pfout) return -1;
+                            if (!pftmp || !pfout)
+                            {
+                                if (!pftmp) cout << "Failed to open " << temp_pdb_fn << " for reading." << endl;
+                                if (!pfout) cout << "Failed to open " << out_pdb_fn << " for writing." << endl;
+                                return -1;
+                            }
 
                             char pdbbuffer[1024];
                             size_t bytes_copied;

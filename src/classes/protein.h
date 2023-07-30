@@ -79,6 +79,7 @@ public:
     AminoAcid* get_residue(int resno);
     AminoAcid* get_residue(BallesterosWeinstein bw);
     AminoAcid* get_residue_bw(int helixno, int bwno);
+    AminoAcid* get_residue_bw(const char* bwno);
     Region get_region(std::string name);
     const Region* get_regions() { return regions; }
     int get_region_end(std::string name);

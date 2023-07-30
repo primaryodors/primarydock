@@ -182,6 +182,7 @@ std::vector<int> tripswitch_clashables;
 std::vector<ResiduePlaceholder> required_contacts;
 std::vector<SoftBias> soft_biases;
 std::vector<std::string> bridges;
+std::vector<std::string> atomto;
 
 bool soft_pocket = false;
 std::string soft_names;
@@ -941,6 +942,10 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "APPENDPROT") || !strcmp(words[0], "OPEND"))
     {
         append_pdb = true;
+    }
+    else if (!strcmp(words[0], "ATOMTO"))
+    {
+        atomto.push_back(origbuff);
     }
     else if (!strcmp(words[0], "BRIDGE"))
     {
@@ -1917,6 +1922,41 @@ void apply_protein_specific_settings(Protein* p)
     }
     num_dyn_motions = i;
     dyn_motions[i] = nullptr;
+
+    n = atomto.size();
+    for (i=0; i<n; i++)
+    {
+        char buffer[1024];
+        strcpy(buffer, atomto[i].c_str(), 1022);
+        char** words = chop_spaced_words(buffer);
+
+        if (!words[1]) throw -1;
+        AminoAcid* aa = protein->get_residue_bw(words[1]);
+        if (!words[2]) throw -1;
+        char* aname = words[2];
+        if (!words[3]) throw -1;
+        AminoAcid* target = protein->get_residue_bw(words[3]);
+        if (words[4]) throw -1;
+
+        if (!aa)
+        {
+            cout << "Warning: residue " << words[1] << " not found." << endl;
+            continue;
+        }
+
+        if (!target)
+        {
+            cout << "Warning: residue " << words[3] << " not found." << endl;
+            continue;
+        }
+
+        Atom* a = aa->get_atom(aname);
+        if (!strcmp("EXTENT", aname)) a = aa->get_reach_atom();
+        if (!a) raise_error("Atom not found.");
+
+        aa->movability = MOV_FLEXONLY;
+        aa->conform_atom_to_location(a->name, target->get_CA_location());
+    }
 }
 
 int main(int argc, char** argv)

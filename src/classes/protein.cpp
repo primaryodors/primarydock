@@ -162,6 +162,16 @@ AminoAcid* Protein::get_residue(BallesterosWeinstein bw)
     return get_residue_bw(bw.helix_no, bw.member_no);
 }
 
+AminoAcid* Protein::get_residue_bw(const char* bwno)
+{
+    char buffer[16];
+    strcpy(buffer, bwno, 13);
+    char* dot = strchr(buffer, '.');
+    if (!dot) return get_residue(atoi(bwno));
+    *dot = 0;
+    return get_residue_bw(atoi(buffer), atoi(dot+1));
+}
+
 AminoAcid* Protein::get_residue_bw(int hxno, int bwno)
 {
     if (!Ballesteros_Weinstein.size())

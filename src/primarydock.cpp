@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include <regex>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
@@ -183,6 +184,8 @@ std::vector<ResiduePlaceholder> required_contacts;
 std::vector<SoftBias> soft_biases;
 std::vector<std::string> bridges;
 std::vector<std::string> atomto;
+std::string outpdb;
+int outpdb_poses = 0;
 
 bool soft_pocket = false;
 std::string soft_names;
@@ -1195,6 +1198,12 @@ int interpret_config_line(char** words)
         strcpy(outfname, words[1]);
         optsecho = "Output file is " + (std::string)outfname;
         return 1;
+    }
+    else if (!strcmp(words[0], "OUTPDB"))
+    {
+        outpdb_poses = atoi(words[1]);
+        outpdb = words[1];
+        return 2;
     }
     else if (!strcmp(words[0], "PATH"))
     {
@@ -3904,6 +3913,15 @@ _try_again:
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
             Molecule::conform_molecules(cfmols, iters, &iteration_callback);
             // delete[] delete_me;
+            if (!nodeno && outpdb.length())
+            {
+                std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(pose) + (std::string)".pdb";
+                FILE* pfpdb = fopen(temp_pdb_fn.c_str(), "w");
+                if (!pfpdb) return -1;
+                protein->save_pdb(pfpdb, ligand);
+                protein->end_pdb(pfpdb);
+                fclose(pfpdb);
+            }
 
             #if active_persistence
             for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
@@ -4505,6 +4523,38 @@ _try_again:
                         #if _dbg_find_blasted_segfault
                         cout << "zeta " << l << endl;
                         #endif
+
+                        if (!k && outpdb.length() && j <= outpdb_poses)
+                        {
+                            char protn[64];
+                            strcpy(protn, strrchr(protfname, '/')+1);
+                            char* dot = strchr(protn, '.');
+                            if (dot) *dot = 0;
+
+                            char lign[64];
+                            strcpy(lign, strrchr(ligfname, '/')+1);
+                            dot = strchr(lign, '.');
+                            if (dot) *dot = 0;
+
+                            std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(j) + (std::string)".pdb";
+                            std::string out_pdb_fn = std::regex_replace(outpdb, std::regex("%p"), protn);
+                            out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("%l"), lign);
+                            out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("%o"), to_string(pose));
+
+                            FILE* pftmp = fopen(temp_pdb_fn.c_str(), "rb");
+                            FILE* pfout = fopen(out_pdb_fn.c_str(), "wb");
+                            if (!pftmp || !pfout) return -1;
+
+                            char pdbbuffer[1024];
+                            size_t bytes_copied;
+                            while (bytes_copied = fread(pdbbuffer, 1, 1024, pftmp))
+                            {
+                                fwrite(pdbbuffer, 1, bytes_copied, pfout);
+                            }
+
+                            fclose(pftmp);
+                            fclose(pfout);
+                        }
 
                         for (l=0; l<_INTER_TYPES_LIMIT; l++)
                         {

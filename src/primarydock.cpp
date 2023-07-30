@@ -1927,7 +1927,7 @@ void apply_protein_specific_settings(Protein* p)
     for (i=0; i<n; i++)
     {
         char buffer[1024];
-        strcpy(buffer, atomto[i].c_str(), 1022);
+        strcpy(buffer, atomto[i].c_str());
         char** words = chop_spaced_words(buffer);
 
         if (!words[1]) throw -1;
@@ -1952,7 +1952,11 @@ void apply_protein_specific_settings(Protein* p)
 
         Atom* a = aa->get_atom(aname);
         if (!strcmp("EXTENT", aname)) a = aa->get_reach_atom();
-        if (!a) raise_error("Atom not found.");
+        if (!a)
+        {
+            cout << "Warning: atom not found " << *aa << ":" << aname << endl;
+            continue;
+        }
 
         aa->movability = MOV_FLEXONLY;
         aa->conform_atom_to_location(a->name, target->get_CA_location());

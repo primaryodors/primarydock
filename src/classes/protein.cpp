@@ -165,7 +165,7 @@ AminoAcid* Protein::get_residue(BallesterosWeinstein bw)
 AminoAcid* Protein::get_residue_bw(const char* bwno)
 {
     char buffer[16];
-    strcpy(buffer, bwno, 13);
+    strcpy(buffer, bwno);
     char* dot = strchr(buffer, '.');
     if (!dot) return get_residue(atoi(bwno));
     *dot = 0;

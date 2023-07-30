@@ -33,12 +33,7 @@ bool DynamicMotion::add_constraint(DynamicConstraint* c)
 
 float DynamicMotion::apply_incremental(float amt)
 {
-    AminoAcid* aa;
-    Point fulcrum, ptaxis;
-    SCoord axis;
-    int i, j, sr, er;
-    float lamt, lamt_phi, lamt_psi;
-    LocatedVector lv;
+    int i;
 
     float new_total = applied + amt;
     for (i=0; constraints[i]; i++)
@@ -58,8 +53,20 @@ float DynamicMotion::apply_incremental(float amt)
     else if (new_total > 1.0+DYN_MAX_OVERAGE) amt = (1.0+DYN_MAX_OVERAGE) - applied;
 
     #if debug_dyn_motion
-    cout << "Trying " << amt << " for " << name << " for a total of " << (applied + amt) << endl;
+    if (!strcmp(name.c_str(), "bend7")) cout << "Trying " << amt << " for " << name << " for a total of " << (applied + amt) << endl;
     #endif
+
+    return apply_incremental_nochecks(amt);
+}
+
+float DynamicMotion::apply_incremental_nochecks(float amt)
+{
+    AminoAcid* aa;
+    Point fulcrum, ptaxis;
+    SCoord axis;
+    int i, j, sr, er;
+    float lamt, lamt_phi, lamt_psi;
+    LocatedVector lv;
 
     switch (type)
     {
@@ -85,7 +92,7 @@ float DynamicMotion::apply_incremental(float amt)
 
         lamt = amt * bias;
         last_change = amt;
-        prot->rotate_piece(sr, er, fulcrum, axis, lamt);
+        prot->rotate_piece(sr, er, fulcrum, axis, lamt*fiftyseventh);
         applied += amt;
         break;
 
@@ -243,9 +250,9 @@ void DynamicMotion::make_random_change()
 
 void DynamicMotion::undo()
 {
-    apply_incremental(-last_change);
+    apply_incremental_nochecks(-last_change);
 
     #if debug_dyn_motion
-    cout << "Reverting " << name << endl;
+    // cout << "Reverting " << name << endl;
     #endif
 }

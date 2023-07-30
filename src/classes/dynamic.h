@@ -54,6 +54,7 @@ class DynamicMotion
     Protein* prot = nullptr;
     float applied = 0, last_change = 0;
     DynamicConstraint* constraints[MAX_DYN_CONSTRAINTS+1];      // Not using a std::vector since those cause double free errors on destruct.
+    float apply_incremental_nochecks(float additional_amount);
 };
 
 

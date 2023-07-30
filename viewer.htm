@@ -2709,7 +2709,7 @@ function loadFile(fileData, fileName = "")
 				var fileStrands = fileData.split("\nTER");
 				fileStrands.forEach(function(strandData)
                 {
-					if (strandData.trim().length < 20 || strandData.indexOf("\nATOM ") < 0) return;
+					if (fext != "sdf" && (strandData.trim().length < 20 || strandData.indexOf("\nATOM ") < 0)) return;
 					var strandid = strandData.substr(strandData.indexOf("\nATOM "), 100).trim().substr(21,1).trim();
 					if (!strandid) strandid = "A";
 					var stringBlob = new Blob( [ strandData ], { type: 'text/plain'} );

@@ -364,6 +364,18 @@ void iteration_callback(int iter, Molecule** mols)
         protein->soft_iteration(soft_rgns, ligand);
     }
 
+    int i, j;
+    if (num_dyn_motions)
+    {
+        for (i=0; i<num_dyn_motions; i++)
+        {
+            float energy = -ligand->get_intermol_binding(mols);
+            dyn_motions[i]->make_random_change();
+            float new_energy = -ligand->get_intermol_binding(mols);
+            if (new_energy > energy) dyn_motions[i]->undo();
+        }
+    }
+
     #if bb_realign_iters
     #if _dbg_bb_realign
     cout << ligand->lastbind << (iter == iters ? " ] " : " ") << flush;
@@ -439,7 +451,6 @@ void iteration_callback(int iter, Molecule** mols)
     int ac = ligand->get_atom_count();
     float bbest = 0;
     Atom *atom, *btom;
-    int i, j;
 
     float progress = (float)iter / iters;
     // float lsrca = (1.0 - progress) * soft_rock_clash_allowance;

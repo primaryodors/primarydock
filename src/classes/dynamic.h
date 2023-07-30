@@ -5,6 +5,8 @@
 #include "protein.h"
 
 #define MAX_DYN_CONSTRAINTS 5
+#define DYN_RANDOM_RANGE 0.333
+#define DYN_BIAS_EFFECT 0.4
 
 enum DynamicType
 {
@@ -42,10 +44,12 @@ class DynamicMotion
     void read_config_line(const char* line, DynamicMotion** all_motions);
     float apply_incremental(float additional_amount);           // Returns total applied.
     float apply_absolute(float target_amount);                  // Returns actual applied, e.g. within constraints etc.
+    void make_random_change();
+    void undo();
 
     protected:
     Protein* prot = nullptr;
-    float applied = 0;
+    float applied = 0, last_change = 0;
     DynamicConstraint* constraints[MAX_DYN_CONSTRAINTS+1];      // Not using a std::vector since those cause double free errors on destruct.
 };
 

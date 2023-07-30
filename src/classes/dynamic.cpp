@@ -40,6 +40,19 @@ float DynamicMotion::apply_incremental(float amt)
     float lamt, lamt_phi, lamt_psi;
     LocatedVector lv;
 
+    float new_total = applied + amt;
+    for (i=0; constraints[i]; i++)
+    {
+        if (constraints[i]->type == ddep_MIN)
+        {
+            if (new_total < constraints[i]->depends_on->applied) amt = constraints[i]->depends_on->applied - applied;
+        }
+        else if (constraints[i]->type == ddep_MAX)
+        {
+            if (new_total > constraints[i]->depends_on->applied) amt = constraints[i]->depends_on->applied - applied;
+        }
+    }
+
     switch (type)
     {
         case dyn_rock:
@@ -63,6 +76,7 @@ float DynamicMotion::apply_incremental(float amt)
         er = i - 50 + end_resno.member_no;
 
         lamt = amt * bias;
+        last_change = lamt;
         prot->rotate_piece(sr, er, fulcrum, axis, lamt);
         applied += lamt;
         break;
@@ -89,6 +103,7 @@ float DynamicMotion::apply_incremental(float amt)
         er = i - 50 + end_resno.member_no;
 
         lamt = amt * bias;
+        last_change = lamt;
         axis.r = lamt;
         prot->move_piece(sr, er, axis);
         applied += lamt;
@@ -106,6 +121,7 @@ float DynamicMotion::apply_incremental(float amt)
         er = i - 50 + end_resno.member_no;
 
         lamt = amt * bias;
+        last_change = lamt;
         lamt_phi = lamt/(M_PI*2) * (ALPHA_PHI - -M_PI);
         lamt_psi = lamt/(M_PI*2) * (ALPHA_PSI - -M_PI);
 
@@ -208,4 +224,15 @@ void DynamicMotion::read_config_line(const char* ln, DynamicMotion** all)
     }
     
     return;
+}
+
+void DynamicMotion::make_random_change()
+{
+    float f = frand(-DYN_RANDOM_RANGE, DYN_RANDOM_RANGE) + (bias - applied) * DYN_BIAS_EFFECT;
+    apply_incremental(f);
+}
+
+void DynamicMotion::undo()
+{
+    apply_incremental(-last_change);
 }

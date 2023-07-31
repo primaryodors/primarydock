@@ -3259,7 +3259,7 @@ _try_again:
                         AminoAcid* mvaa = protein->get_residue(forced_static_resnos[i].resno);
                         if (mvaa)
                         {
-                            mvaa->movability = MOV_NONE;
+                            mvaa->movability = MOV_PINNED;
                             #if _dbg_flexion_selection
                             cout << mvaa->get_name() << " forced static." << endl;
                             #endif

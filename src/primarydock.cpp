@@ -3912,8 +3912,9 @@ _try_again:
                 for (i=0; cfmols[i]; i++)
                 {
                     int resno = cfmols[i]->is_residue();
+                    if (!resno) continue;
                     if (cfmols[i]->movability != MOV_PINNED) cfmols[i]->movability = MOV_FORCEFLEX;
-                    if (resno) protein->minimize_residue_clashes(resno);
+                    protein->minimize_residue_clashes(resno);
                 }
 
                 std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(pose) + (std::string)".pdb";

@@ -1442,7 +1442,7 @@ void freeze_bridged_residues()
             AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
             if (aa1)
             {
-                aa1->movability = MOV_FLXDESEL;
+                aa1->movability = MOV_PINNED;
                 aa1->been_flexed = true;
                 Bond** bb = aa1->get_rotatable_bonds();
                 if (bb)
@@ -1456,7 +1456,7 @@ void freeze_bridged_residues()
             }
             if (aa2)
             {
-                aa2->movability = MOV_FLXDESEL;
+                aa2->movability = MOV_PINNED;
                 aa2->been_flexed = true;
                 Bond** bb = aa2->get_rotatable_bonds();
                 if (bb)
@@ -2222,7 +2222,7 @@ int main(int argc, char** argv)
             for (j=0; j<mtlcoords[i].coordres.size(); j++)
             {
                 AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
-                if (aa) aa->movability = MOV_FLXDESEL;
+                if (aa) aa->movability = MOV_PINNED;
             }
         }
 
@@ -2250,8 +2250,8 @@ int main(int argc, char** argv)
             protein->bridge(resno1, resno2);
 
             AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
-            if (aa1) aa1->movability = MOV_FLXDESEL;
-            if (aa2) aa2->movability = MOV_FLXDESEL; 
+            if (aa1) aa1->movability = MOV_PINNED;
+            if (aa2) aa2->movability = MOV_PINNED; 
 
             #if _dbg_bridges
             if (!aa1) cout << resno1 << " not found." << endl;
@@ -3335,7 +3335,7 @@ _try_again:
                         }
                     if (besti >= 0)
                     {
-                        if (reaches_spheroid[nodeno][besti]->movability != MOV_FLXDESEL)
+                        if (!(reaches_spheroid[nodeno][besti]->movability & MOV_PINNED))
                             reaches_spheroid[nodeno][besti]->movability = MOV_FLEXONLY;
                         flexible_resnos.push_back(reaches_spheroid[nodeno][besti]->get_residue_no());
                         #if _dbg_flexion_selection
@@ -3903,18 +3903,19 @@ _try_again:
 
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
-            /*Molecule::multimol_conform(
-                cfmols,
-                delete_me = protein->all_residues_as_molecules_except(cfmols),
-                trip,
-                iters,
-                &iteration_callback
-            );*/
+
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
             Molecule::conform_molecules(cfmols, iters, &iteration_callback);
-            // delete[] delete_me;
+
             if (!nodeno && outpdb.length())
             {
+                for (i=0; cfmols[i]; i++)
+                {
+                    int resno = cfmols[i]->is_residue();
+                    if (cfmols[i]->movability != MOV_PINNED) cfmols[i]->movability = MOV_FORCEFLEX;
+                    if (resno) protein->minimize_residue_clashes(resno);
+                }
+
                 std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(pose) + (std::string)".pdb";
                 FILE* pfpdb = fopen(temp_pdb_fn.c_str(), "w");
                 if (!pfpdb) return -1;

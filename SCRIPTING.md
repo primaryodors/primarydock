@@ -144,7 +144,7 @@ https://proteopedia.org/wiki/index.php/Tutorial:Ramachandran_principle_and_phi_p
 # BENERG
 Example:
 ```
-BEND 251 111 &binding
+BENERG 251 111 &binding
 ```
 
 Reads the non-covalent energy level (negative for binding, positive for clashes) in kJ/mol between two protein residues, and writes that value to a

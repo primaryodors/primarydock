@@ -593,7 +593,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float kJmol = 0;
 
     float r = a->distance_to(b);
-    float avdW = a->get_vdW_radius()*vdw_clash_allowance, bvdW = b->get_vdW_radius()*vdw_clash_allowance;
+    float avdW = a->get_vdW_radius(), bvdW = b->get_vdW_radius();
     float rbind = avdW+bvdW;
 
     float dp = 2;			// Directional propensity. The anisotropic component from each single vertex

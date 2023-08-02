@@ -49,6 +49,7 @@ class DynamicMotion
     float apply_absolute(float target_amount);                  // Returns actual applied, e.g. within constraints etc.
     void make_random_change();
     void undo();
+    float get_total_applied() { return applied; }
 
     protected:
     Protein* prot = nullptr;

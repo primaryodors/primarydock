@@ -4231,6 +4231,19 @@ _try_again:
                 dr[drcount][nodeno].miscdata += (std::string)"\n";
             }
 
+            if (num_dyn_motions)
+            {
+                dr[drcount][nodeno].miscdata += (std::string)"Dynamic Motions:\n";
+                for (i=0; i<num_dyn_motions; i++)
+                {
+                    dr[drcount][nodeno].miscdata += (std::string)dyn_motions[i]->name
+                        + (std::string)" "
+                        + std::to_string(dyn_motions[i]->get_total_applied())
+                        + (std::string)"\n";
+                }
+                dr[drcount][nodeno].miscdata += (std::string)"\n";
+            }
+
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif

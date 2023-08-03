@@ -15508,29 +15508,6 @@
                     "ec50": "-7.7",
                     "adjusted_curve_top": "10"
                 }
-            },
-            "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
-            {
-                "OR1A1":
-                {
-                    "adjusted_curve_top": "0.217391304"
-                },
-                "OR2W1":
-                {
-                    "adjusted_curve_top": "0.869565217"
-                },
-                "OR5P3":
-                {
-                    "adjusted_curve_top": "0.652173913"
-                },
-                "OR10G4":
-                {
-                    "adjusted_curve_top": "10"
-                },
-                "OR10G7":
-                {
-                    "adjusted_curve_top": "4.3478260869565215"
-                }
             }
         }
     },
@@ -24001,9 +23978,13 @@
             },
             "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
             {
-                "OR5AN1":
+                "OR10G4":
                 {
-                    "adjusted_curve_top": 3.043478260869565
+                    "type": "na"
+                },
+                "OR9Q2":
+                {
+                    "type": "na"
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
@@ -27754,7 +27735,8 @@
             {
                 "OR9Q2":
                 {
-                    "adjusted_curve_top": 5.6521739130434785
+                    "type": "ma",
+                    "ec50": "-4.82"
                 }
             },
             "https:\/\/doi.org\/10.1038\/s41598-023-27937-1":

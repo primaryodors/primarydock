@@ -1953,6 +1953,12 @@ float Atom::get_sum_pi_bonds()
 
 void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
 {
+    if (location.x < -9999.999 || location.x > 9999.999
+        || location.y < -9999.999 || location.y > 9999.999
+        || location.z < -9999.999 || location.z > 9999.999
+        )
+        return;
+
     /*
     ATOM   2039  CA  ALA   128      -6.065 -24.834  -5.744  1.00001.00           C
     */
@@ -2003,6 +2009,12 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
 
 void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
 {
+    if (location.x < -9999.999 || location.x > 9999.999
+        || location.y < -9999.999 || location.y > 9999.999
+        || location.z < -9999.999 || location.z > 9999.999
+        )
+        return;
+
     os << (residue ? "ATOM   " : "HETATM ");
     os << setw(4) << atomno << " ";
 

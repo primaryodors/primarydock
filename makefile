@@ -5,7 +5,8 @@ SDFDIR=sdf
 TMPDIR=tmp
 
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR) $(TMPDIR)
-OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o
+OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o \
+	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test \
 	  test/group_test_mol test/protein_test test/backbone_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/couple
@@ -68,6 +69,9 @@ $(OBJDIR)/protein.o: src/classes/protein.h src/classes/protein.cpp $(OBJDIR)/ami
 
 $(OBJDIR)/group.o: src/classes/group.h src/classes/group.cpp $(OBJDIR)/protein.o
 	$(CC) -c src/classes/group.cpp -o $(OBJDIR)/group.o $(CFLAGS)
+
+$(OBJDIR)/dynamic.o: src/classes/dynamic.h src/classes/dynamic.cpp $(OBJDIR)/protein.o
+	$(CC) -c src/classes/dynamic.cpp -o $(OBJDIR)/dynamic.o $(CFLAGS)
 
 test/point_test: src/point_test.cpp $(OBJDIR)/point.o
 	$(CC) src/point_test.cpp $(OBJDIR)/point.o $(OBJDIR)/misc.o -o test/point_test $(CFLAGS)

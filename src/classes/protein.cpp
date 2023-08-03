@@ -136,6 +136,13 @@ bool Protein::add_residue(const int resno, const char aaletter)
     return true;
 }
 
+void BallesterosWeinstein::from_string(char* inpstr)
+{
+    helix_no = atoi(inpstr);
+    char* dot = strchr(inpstr, '.');
+    if (dot) member_no = atoi(dot+1);
+}
+
 AminoAcid* Protein::get_residue(int resno)
 {
     if (!resno) return 0;
@@ -148,6 +155,40 @@ AminoAcid* Protein::get_residue(int resno)
     }
 
     return NULL;
+}
+
+AminoAcid* Protein::get_residue(BallesterosWeinstein bw)
+{
+    return get_residue_bw(bw.helix_no, bw.member_no);
+}
+
+AminoAcid* Protein::get_residue_bw(const char* bwno)
+{
+    char buffer[16];
+    strcpy(buffer, bwno);
+    char* dot = strchr(buffer, '.');
+    if (!dot) return get_residue(atoi(bwno));
+    *dot = 0;
+    return get_residue_bw(atoi(buffer), atoi(dot+1));
+}
+
+AminoAcid* Protein::get_residue_bw(int hxno, int bwno)
+{
+    if (!Ballesteros_Weinstein.size())
+    {
+        cout << "Call to get_residue_bw() on a protein with no BW numbers set." << endl;
+        throw -1;
+    }
+
+    int bw50 = get_bw50(hxno);
+    if (bw50 < 1)
+    {
+        cout << "BW number not found: " << hxno << ".50." << endl;
+        throw -1;
+    }
+
+    int resno = bw50 - 50 + bwno;
+    return get_residue(resno);
 }
 
 Atom* Protein::get_atom(int resno, const char* aname)

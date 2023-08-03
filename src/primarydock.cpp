@@ -2,13 +2,15 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
+#include <regex>
 #include <math.h>
 #include <stdlib.h>
 #include <time.h>
 #include <sstream>
 #include <algorithm>
-#include "classes/protein.h"
+#include "classes/dynamic.h"
 #include "classes/group.h"
+#include "classes/protein.h"
 
 using namespace std;
 
@@ -22,8 +24,8 @@ struct DockResult
     float* imkJmol;
     float* mvdWrepl;
     float* imvdWrepl;
-    std::string softrock;
     std::string pdbdat;
+    std::string softrock;
     std::string miscdata;
     float bytype[_INTER_TYPES_LIMIT];
     float ibytype[_INTER_TYPES_LIMIT];
@@ -104,6 +106,10 @@ std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
+std::vector<std::string> dyn_motion_strings;
+DynamicMotion* dyn_motions[64];
+int num_dyn_motions = 0;
+
 bool configset=false, protset=false, tplset=false, tprfset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
 Protein* protein;
@@ -177,6 +183,9 @@ std::vector<int> tripswitch_clashables;
 std::vector<ResiduePlaceholder> required_contacts;
 std::vector<SoftBias> soft_biases;
 std::vector<std::string> bridges;
+std::vector<std::string> atomto;
+std::string outpdb;
+int outpdb_poses = 0;
 
 bool soft_pocket = false;
 std::string soft_names;
@@ -359,6 +368,18 @@ void iteration_callback(int iter, Molecule** mols)
         protein->soft_iteration(soft_rgns, ligand);
     }
 
+    int i, j;
+    if (num_dyn_motions)
+    {
+        for (i=0; i<num_dyn_motions; i++)
+        {
+            float energy = -ligand->get_intermol_binding(mols);
+            dyn_motions[i]->make_random_change();
+            float new_energy = -ligand->get_intermol_binding(mols);
+            if (new_energy > energy) dyn_motions[i]->undo();
+        }
+    }
+
     #if bb_realign_iters
     #if _dbg_bb_realign
     cout << ligand->lastbind << (iter == iters ? " ] " : " ") << flush;
@@ -434,7 +455,6 @@ void iteration_callback(int iter, Molecule** mols)
     int ac = ligand->get_atom_count();
     float bbest = 0;
     Atom *atom, *btom;
-    int i, j;
 
     float progress = (float)iter / iters;
     // float lsrca = (1.0 - progress) * soft_rock_clash_allowance;
@@ -926,6 +946,10 @@ int interpret_config_line(char** words)
     {
         append_pdb = true;
     }
+    else if (!strcmp(words[0], "ATOMTO"))
+    {
+        atomto.push_back(origbuff);
+    }
     else if (!strcmp(words[0], "BRIDGE"))
     {
         std::string str = words[1];
@@ -1175,6 +1199,12 @@ int interpret_config_line(char** words)
         optsecho = "Output file is " + (std::string)outfname;
         return 1;
     }
+    else if (!strcmp(words[0], "OUTPDB"))
+    {
+        outpdb_poses = atoi(words[1]);
+        outpdb = words[2];
+        return 2;
+    }
     else if (!strcmp(words[0], "PATH"))
     {
         i=1;
@@ -1302,6 +1332,10 @@ int interpret_config_line(char** words)
         optsecho += soft_names + (std::string)" ";
         return i-1;
     }
+    else if (!strcmp(words[0], "DYNAMIC"))
+    {
+        dyn_motion_strings.push_back(origbuff);
+    }
     else if (!strcmp(words[0], "HARD"))
     {
         soft_pocket = false;
@@ -1408,7 +1442,7 @@ void freeze_bridged_residues()
             AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
             if (aa1)
             {
-                aa1->movability = MOV_FLXDESEL;
+                aa1->movability = MOV_PINNED;
                 aa1->been_flexed = true;
                 Bond** bb = aa1->get_rotatable_bonds();
                 if (bb)
@@ -1422,7 +1456,7 @@ void freeze_bridged_residues()
             }
             if (aa2)
             {
-                aa2->movability = MOV_FLXDESEL;
+                aa2->movability = MOV_PINNED;
                 aa2->been_flexed = true;
                 Bond** bb = aa2->get_rotatable_bonds();
                 if (bb)
@@ -1885,12 +1919,66 @@ void do_tumble_spheres(Point l_pocket_cen)
     // End tumble sphere behavior.
 }
 
+void apply_protein_specific_settings(Protein* p)
+{
+    int i, n = dyn_motion_strings.size();
+
+    for (i=0; i<n; i++)
+    {
+        if (dyn_motions[i]) delete dyn_motions[i];
+        dyn_motions[i] = new DynamicMotion(p);
+        dyn_motions[i]->read_config_line(dyn_motion_strings[i].c_str(), dyn_motions);
+    }
+    num_dyn_motions = i;
+    dyn_motions[i] = nullptr;
+
+    n = atomto.size();
+    for (i=0; i<n; i++)
+    {
+        char buffer[1024];
+        strcpy(buffer, atomto[i].c_str());
+        char** words = chop_spaced_words(buffer);
+
+        if (!words[1]) throw -1;
+        AminoAcid* aa = protein->get_residue_bw(words[1]);
+        if (!words[2]) throw -1;
+        char* aname = words[2];
+        if (!words[3]) throw -1;
+        AminoAcid* target = protein->get_residue_bw(words[3]);
+        if (words[4]) throw -1;
+
+        if (!aa)
+        {
+            cout << "Warning: residue " << words[1] << " not found." << endl;
+            continue;
+        }
+
+        if (!target)
+        {
+            cout << "Warning: residue " << words[3] << " not found." << endl;
+            continue;
+        }
+
+        Atom* a = aa->get_atom(aname);
+        if (!strcmp("EXTENT", aname)) a = aa->get_reach_atom();
+        if (!a)
+        {
+            cout << "Warning: atom not found " << *aa << ":" << aname << endl;
+            continue;
+        }
+
+        aa->movability = MOV_FLEXONLY;
+        aa->conform_atom_to_location(a->name, target->get_CA_location());
+    }
+}
+
 int main(int argc, char** argv)
 {
     char buffer[65536];
     int i, j;
 
     _momentum_rad_ceiling = fiftyseventh * 5;
+    dyn_motions[0] = nullptr;
 
     for (i=0; i<65536; i++) buffer[i] = 0;
     #if active_persistence
@@ -1994,10 +2082,6 @@ int main(int argc, char** argv)
     if (kcal) kJmol_cutoff /= _kcal_per_kJ;
     drift = 1.0 / (iters/25+1);
 
-    // Load the protein or return an error.
-    /* Protein p(protfname);
-    protein = &p; */
-
     char protid[255];
     char* slash = strrchr(protfname, '/');
     if (!slash) slash = strrchr(protfname, '\\');
@@ -2014,6 +2098,7 @@ int main(int argc, char** argv)
     }
     protein->load_pdb(pf);
     protein->soft_biases = soft_biases;
+    apply_protein_specific_settings(protein);
     fclose(pf);
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded protein." << endl;
@@ -2137,7 +2222,7 @@ int main(int argc, char** argv)
             for (j=0; j<mtlcoords[i].coordres.size(); j++)
             {
                 AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
-                if (aa) aa->movability = MOV_FLXDESEL;
+                if (aa) aa->movability = MOV_PINNED;
             }
         }
 
@@ -2165,8 +2250,8 @@ int main(int argc, char** argv)
             protein->bridge(resno1, resno2);
 
             AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
-            if (aa1) aa1->movability = MOV_FLXDESEL;
-            if (aa2) aa2->movability = MOV_FLXDESEL; 
+            if (aa1) aa1->movability = MOV_PINNED;
+            if (aa2) aa2->movability = MOV_PINNED; 
 
             #if _dbg_bridges
             if (!aa1) cout << resno1 << " not found." << endl;
@@ -2498,6 +2583,7 @@ _try_again:
             protein->load_pdb(pf);
             fclose(pf);
             protein->soft_biases = soft_biases;
+            apply_protein_specific_settings(protein);
 
             if (mtlcoords.size())
             {
@@ -2520,6 +2606,7 @@ _try_again:
             protein->load_pdb(pf);
             fclose(pf);
             protein->soft_biases = soft_biases;
+            apply_protein_specific_settings(protein);
         }
 
         strcpy(buffer, CEN_buf.c_str());
@@ -2641,8 +2728,9 @@ _try_again:
                 
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
-                protein->soft_biases = soft_biases;
                 fclose(pf);
+                protein->soft_biases = soft_biases;
+                apply_protein_specific_settings(protein);
 
                 freeze_bridged_residues();
                 prepare_initb();
@@ -3171,7 +3259,7 @@ _try_again:
                         AminoAcid* mvaa = protein->get_residue(forced_static_resnos[i].resno);
                         if (mvaa)
                         {
-                            mvaa->movability = MOV_NONE;
+                            mvaa->movability = MOV_PINNED;
                             #if _dbg_flexion_selection
                             cout << mvaa->get_name() << " forced static." << endl;
                             #endif
@@ -3247,7 +3335,7 @@ _try_again:
                         }
                     if (besti >= 0)
                     {
-                        if (reaches_spheroid[nodeno][besti]->movability != MOV_FLXDESEL)
+                        if (!(reaches_spheroid[nodeno][besti]->movability & MOV_PINNED))
                             reaches_spheroid[nodeno][besti]->movability = MOV_FLEXONLY;
                         flexible_resnos.push_back(reaches_spheroid[nodeno][besti]->get_residue_no());
                         #if _dbg_flexion_selection
@@ -3815,16 +3903,22 @@ _try_again:
 
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
-            /*Molecule::multimol_conform(
-                cfmols,
-                delete_me = protein->all_residues_as_molecules_except(cfmols),
-                trip,
-                iters,
-                &iteration_callback
-            );*/
+
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
             Molecule::conform_molecules(cfmols, iters, &iteration_callback);
-            // delete[] delete_me;
+
+            if (!nodeno && outpdb.length())
+            {
+                protein->get_internal_clashes(1, protein->get_end_resno(), true);
+
+                std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(pose) + (std::string)".pdb";
+                FILE* pfpdb = fopen(temp_pdb_fn.c_str(), "w");
+                if (!pfpdb) return -1;
+                protein->set_pdb_chain('A');
+                protein->save_pdb(pfpdb, ligand);
+                protein->end_pdb(pfpdb);
+                fclose(pfpdb);
+            }
 
             #if active_persistence
             for (j=0; j<active_persistence_limit; j++) active_persistence_resno[j] = 0;
@@ -4137,6 +4231,19 @@ _try_again:
                 dr[drcount][nodeno].miscdata += (std::string)"\n";
             }
 
+            if (num_dyn_motions)
+            {
+                dr[drcount][nodeno].miscdata += (std::string)"Dynamic Motions:\n";
+                for (i=0; i<num_dyn_motions; i++)
+                {
+                    dr[drcount][nodeno].miscdata += (std::string)dyn_motions[i]->name
+                        + (std::string)" "
+                        + std::to_string(dyn_motions[i]->get_total_applied())
+                        + (std::string)"\n";
+                }
+                dr[drcount][nodeno].miscdata += (std::string)"\n";
+            }
+
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
@@ -4426,6 +4533,43 @@ _try_again:
                         #if _dbg_find_blasted_segfault
                         cout << "zeta " << l << endl;
                         #endif
+
+                        if (!k && outpdb.length() && pose <= outpdb_poses)
+                        {
+                            char protn[64];
+                            strcpy(protn, strrchr(protfname, '/')+1);
+                            char* dot = strchr(protn, '.');
+                            if (dot) *dot = 0;
+
+                            char lign[64];
+                            strcpy(lign, strrchr(ligfname, '/')+1);
+                            dot = strchr(lign, '.');
+                            if (dot) *dot = 0;
+
+                            std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(j+1) + (std::string)".pdb";
+                            std::string out_pdb_fn = std::regex_replace(outpdb, std::regex("[%][p]"), protn);
+                            out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("[%][l]"), lign);
+                            out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("[%][o]"), to_string(pose));
+
+                            FILE* pftmp = fopen(temp_pdb_fn.c_str(), "rb");
+                            FILE* pfout = fopen(out_pdb_fn.c_str(), "wb");
+                            if (!pftmp || !pfout)
+                            {
+                                if (!pftmp) cout << "Failed to open " << temp_pdb_fn << " for reading." << endl;
+                                if (!pfout) cout << "Failed to open " << out_pdb_fn << " for writing." << endl;
+                                return -1;
+                            }
+
+                            char pdbbuffer[1024];
+                            size_t bytes_copied;
+                            while (bytes_copied = fread(pdbbuffer, 1, 1024, pftmp))
+                            {
+                                fwrite(pdbbuffer, 1, bytes_copied, pfout);
+                            }
+
+                            fclose(pftmp);
+                            fclose(pfout);
+                        }
 
                         for (l=0; l<_INTER_TYPES_LIMIT; l++)
                         {

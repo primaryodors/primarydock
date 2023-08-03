@@ -7691,7 +7691,8 @@
                 "citrus",
                 "dry",
                 "metallic",
-                "orange_peel",
+                "orange",
+                "peel",
                 "spicy"
             ]
         },
@@ -9029,20 +9030,20 @@
     },
     "66f5442bbfde5b89a686df5fe8b80985":
     {
-        "full_name": "decanal",
         "iupac": "decanal",
-        "name1": "aldehyde C-10",
+        "full_name": "aldehyde C-10",
         "smiles": "CCCCCCCCCC=O",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "sweet",
                 "aldehydic",
-                "waxy",
-                "orange_peel",
                 "citrus",
-                "floral"
+                "floral",
+                "orange",
+                "peel",
+                "sweet",
+                "waxy"
             ]
         },
         "activity":
@@ -14244,7 +14245,7 @@
             [
                 "green",
                 "pea",
-                "bell_pepper"
+                "pepper"
             ]
         },
         "activity":
@@ -15506,6 +15507,29 @@
                     "type": "vsa",
                     "ec50": "-7.7",
                     "adjusted_curve_top": "10"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
+            {
+                "OR1A1":
+                {
+                    "adjusted_curve_top": "0.217391304"
+                },
+                "OR2W1":
+                {
+                    "adjusted_curve_top": "0.869565217"
+                },
+                "OR5P3":
+                {
+                    "adjusted_curve_top": "0.652173913"
+                },
+                "OR10G4":
+                {
+                    "adjusted_curve_top": "10"
+                },
+                "OR10G7":
+                {
+                    "adjusted_curve_top": "4.3478260869565215"
                 }
             }
         }
@@ -23977,13 +24001,9 @@
             },
             "https:\/\/patents.google.com\/patent\/EP3305898B1\/en":
             {
-                "OR10G4":
+                "OR5AN1":
                 {
-                    "type": "na"
-                },
-                "OR9Q2":
-                {
-                    "type": "na"
+                    "adjusted_curve_top": 3.043478260869565
                 }
             },
             "https:\/\/patents.google.com\/patent\/JP6276555B2\/en":
@@ -25071,22 +25091,22 @@
     },
     "5275978d29dfd72a5698f468f3a64906":
     {
-        "full_name": "nonanal",
-        "name1": "aldehyde C-9",
+        "full_name": "aldehyde C-9",
         "iupac": "nonanal",
         "smiles": "CCCCCCCCC=O",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "waxy",
                 "aldehydic",
-                "rose",
-                "fresh",
-                "orris",
-                "orange_peel",
                 "fatty",
-                "peely"
+                "fresh",
+                "orange",
+                "orris",
+                "peel",
+                "peely",
+                "rose",
+                "waxy"
             ]
         },
         "activity":
@@ -26088,8 +26108,7 @@
     },
     "90ba0a98060f887bac95703791beebf8":
     {
-        "full_name": "octanal",
-        "name1": "aldehyde C-8",
+        "full_name": "aldehyde C-8",
         "iupac": "octanal",
         "smiles": "CCCCCCCC=O",
         "aroma":
@@ -26097,13 +26116,12 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "aldehydic",
-                "waxy",
                 "citrus",
-                "orange_peel",
+                "fatty",
                 "green",
-                "herbal",
-                "fresh",
-                "fatty"
+                "orange",
+                "peel",
+                "waxy"
             ]
         },
         "activity":
@@ -27736,8 +27754,7 @@
             {
                 "OR9Q2":
                 {
-                    "type": "ma",
-                    "ec50": "-4.82"
+                    "adjusted_curve_top": 5.6521739130434785
                 }
             },
             "https:\/\/doi.org\/10.1038\/s41598-023-27937-1":
@@ -28344,11 +28361,12 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "bell",
                 "fatty",
                 "green",
                 "herbal",
                 "mushroom",
-                "bell_pepper",
+                "pepper",
                 "tallow"
             ]
         },
@@ -31635,7 +31653,8 @@
                 "green",
                 "pea",
                 "galbanum",
-                "bell_pepper"
+                "bell",
+                "pepper"
             ]
         },
         "activity":
@@ -31708,7 +31727,7 @@
             "http:\/\/www.thegoodscentscompany.com":
             [
                 "nutty",
-                "bell_pepper",
+                "pepper",
                 "raw"
             ]
         },
@@ -32396,12 +32415,13 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "waxy",
-                "fatty",
-                "soapy",
+                "citrus",
                 "coconut",
+                "fatty",
+                "peel",
                 "pineapple",
-                "citrus_peel"
+                "soapy",
+                "waxy"
             ]
         },
         "activity":
@@ -33114,14 +33134,15 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "fresh",
-                "clean",
                 "aldehydic",
-                "soapy",
                 "citrus",
+                "clean",
+                "fresh",
+                "grapefruit",
+                "peel",
                 "petal",
-                "waxy",
-                "grapefruit_peel"
+                "soapy",
+                "waxy"
             ]
         },
         "activity":
@@ -33711,7 +33732,8 @@
             [
                 "fresh",
                 "fruity",
-                "orange_peel"
+                "orange",
+                "peel"
             ]
         }
     },
@@ -34185,26 +34207,6 @@
                     "type": "na"
                 }
             }
-        }
-    },
-    "ac1488fd007aa6d19e042ab86cf199dd":
-    {
-        "full_name": "Williams' ester",
-        "iupac": "(Z)-3-hexen-1-yl (Z)-3-hexenoate",
-        "name1": "cis-3-hexenyl cis-3-hexenoate",
-        "smiles": "CC\\C=C\/CCOC(=O)C\\C=C\/CC",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "green",
-                "tomato leaf",
-                "pear",
-                "melon",
-                "metallic",
-                "fennel",
-                "tropical"
-            ]
         }
     },
     "609a61147940ccdd91fd53b3b1493788":

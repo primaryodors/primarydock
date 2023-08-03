@@ -22,7 +22,8 @@ enum DynamicType
 enum DynamicConstraintType
 {
     ddep_MIN,
-    ddep_MAX
+    ddep_MAX,
+    ddep_SYNC
 };
 
 class DynamicMotion;

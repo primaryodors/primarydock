@@ -46,6 +46,10 @@ float DynamicMotion::apply_incremental(float amt)
         {
             if (new_total > constraints[i]->depends_on->applied) amt = constraints[i]->depends_on->applied - applied;
         }
+        else if (constraints[i]->type == ddep_SYNC)
+        {
+            amt = constraints[i]->depends_on->applied - applied;
+        }
     }
 
     new_total = applied + amt;
@@ -202,6 +206,7 @@ void DynamicMotion::read_config_line(const char* ln, DynamicMotion** all)
         DynamicConstraint* dc = new DynamicConstraint;
         if (!strcmp(words[l], "MIN")) dc->type = ddep_MIN;
         else if (!strcmp(words[l], "MAX")) dc->type = ddep_MAX;
+        else if (!strcmp(words[l], "SYNC")) dc->type = ddep_SYNC;
         else throw -1;
 
         if (!words[++l]) throw -1;
@@ -237,7 +242,7 @@ void DynamicMotion::make_random_change()
 
 void DynamicMotion::undo()
 {
-    apply_incremental_nochecks(-last_change);
+    apply_incremental(-last_change);
 
     #if debug_dyn_motion
     // cout << "Reverting " << name << endl;

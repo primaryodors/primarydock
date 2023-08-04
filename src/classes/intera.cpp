@@ -1098,7 +1098,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         #endif
 
         kJmol += partial;
-        if (partial > 0.5 && forces[i]->distance < rbind) rbind = forces[i]->distance;
+        if (partial > 0.5 && forces[i]->distance < rbind) 
+        {
+            float f = forces[i]->distance / rbind;
+            avdW *= f;
+            bvdW *= f;
+            rbind = forces[i]->distance;
+        }
 
         #if _peratom_audit
         if (interauditing)
@@ -1166,7 +1172,7 @@ _canstill_clash:
 
     r += allowable;*/
 
-    if (r < rbind && !atoms_are_bonded && !a->get_charge() && !b->get_charge())
+    if (r < rbind && !atoms_are_bonded && (!a->get_charge() || !b->get_charge()))
     {
         float f = rbind/(avdW+bvdW);
         float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);

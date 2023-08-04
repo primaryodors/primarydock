@@ -498,7 +498,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                 break;
 
             case vdW:
-                if (!j)
+                if (!j && !a->get_charge() && !b->get_charge())
                     retval[j++] = look[i];
                 break;
 
@@ -1166,7 +1166,7 @@ _canstill_clash:
 
     r += allowable;*/
 
-    if (r < rbind && !atoms_are_bonded)
+    if (r < rbind && !atoms_are_bonded && !a->get_charge() && !b->get_charge())
     {
         float f = rbind/(avdW+bvdW);
         float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);

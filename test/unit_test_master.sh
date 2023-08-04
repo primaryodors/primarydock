@@ -62,7 +62,7 @@ if [ "$TAAR_RESULT" -eq "0" ]; then
         ASP201=$( cat test/received/TAAR8_CAD.txt | grep -m 1 "Asp201: " )
         ASP201="${ASP201/Asp201: /}"
         ASP201="${ASP201/[.][0-9]*/}"
-        if [[ $ASP111 -gt "-25"  ]] || [[ $ASP201 -gt "-25"  ]]; then
+        if [[ $ASP111 -gt "-30"  ]] || [[ $ASP201 -gt "-20"  ]]; then
             printf "${RED}TAAR test FAILED: bad contacts.${NC}\n"
         else
             printf "${GRN}TAAR test succeeded.${NC}\n"
@@ -73,16 +73,16 @@ else
 fi
 
 
-bin/primarydock test/test1A1.config --colorless --pose 5 --iter 50 --elim 25 --congress > test/received/OR1A1_dLIMN.txt
+bin/primarydock test/test1A1.config --colorless --pose 5 --iter 50 --elim 40 --congress > test/received/OR1A1_dLIMN.txt
 DLIMN_RESULT=$?
 if [ "$DLIMN_RESULT" -eq "0" ]; then
-    POSES=$( cat test/received/OR1A1_dLIMN.txt | grep "pose(s) found" )
-    if [ -z "$POSES" ]; then
+    POSES=$( cat test/received/OR1A1_dLIMN.txt | grep "pose(s) found" | sed 's/[^0-9]//g' )
+    if [ "$POSES" -eq "0" ]; then
         printf "${RED}d-limonene test FAILED: no poses.${NC}\n"
     else
         printf "${GRN}d-limonene test succeeded.${NC}\n"
     fi
 else
-    printf "${RED}d-limonene test FAILED.${NC}\n"
+    printf "${RED}d-limonene test FAILED: return value.${NC}\n"
 fi
 

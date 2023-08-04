@@ -498,7 +498,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                 break;
 
             case vdW:
-                if (!j)
+                if (!j && !a->get_charge() && !b->get_charge())
                     retval[j++] = look[i];
                 break;
 
@@ -1098,7 +1098,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         #endif
 
         kJmol += partial;
-        if (partial > 0.5 && forces[i]->distance < rbind) rbind = forces[i]->distance;
+        if (partial > 0.5 && forces[i]->distance < rbind) 
+        {
+            float f = forces[i]->distance / rbind;
+            avdW *= f;
+            bvdW *= f;
+            rbind = forces[i]->distance;
+        }
 
         #if _peratom_audit
         if (interauditing)

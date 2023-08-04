@@ -1172,7 +1172,7 @@ _canstill_clash:
 
     r += allowable;*/
 
-    if (r < rbind && !atoms_are_bonded && (!a->get_charge() || !b->get_charge()))
+    if (r < rbind && !atoms_are_bonded)
     {
         float f = rbind/(avdW+bvdW);
         float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);

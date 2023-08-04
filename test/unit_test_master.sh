@@ -76,13 +76,13 @@ fi
 bin/primarydock test/test1A1.config --colorless --pose 5 --iter 50 --elim 25 --congress > test/received/OR1A1_dLIMN.txt
 DLIMN_RESULT=$?
 if [ "$DLIMN_RESULT" -eq "0" ]; then
-    POSES=$( cat test/received/OR1A1_dLIMN.txt | grep "pose(s) found" )
-    if [ -z "$POSES" ]; then
+    POSES=$( cat test/received/OR1A1_dLIMN.txt | grep "pose(s) found" | sed 's/[^0-9]//g' )
+    if [ "$POSES" -eq "0" ]; then
         printf "${RED}d-limonene test FAILED: no poses.${NC}\n"
     else
         printf "${GRN}d-limonene test succeeded.${NC}\n"
     fi
 else
-    printf "${RED}d-limonene test FAILED.${NC}\n"
+    printf "${RED}d-limonene test FAILED: return value.${NC}\n"
 fi
 

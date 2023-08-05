@@ -718,11 +718,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (!forces[i]->distance) continue;
         float r1 = r / forces[i]->distance;
 
-        if (sgn(achg) == sgn(bchg))
-        {
-            r1 += 0.001;
-        }
-
         if (forces[i]->type == covalent) continue;
         
         float partial, rdecayed;
@@ -1053,16 +1048,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
             {
                 partial *= a->get_charge() * -(b->get_charge());
-
-                if (0 && (a->residue == 114 || b->residue == 114))
-                    cout << "Ionic interaction between "
-                        << a->name << " (" << a->get_charge() << ") and "
-                        << b->name << " ("  << b->get_charge() << ")"
-                        << " r=" << r
-                        << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
-                        << " aniso=" << aniso << " (" << asum << "*" << bsum << ") = "
-                        << partial
-                        << endl;
             }
 
             if (forces[i]->type == hbond) partial *= fabs(apol) * fabs(bpol);

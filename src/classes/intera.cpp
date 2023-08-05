@@ -608,25 +608,28 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     if (achg && a->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) achg = a->get_max_conj_charge();
     if (bchg && b->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) bchg = b->get_max_conj_charge();
-    
-    #if _ALLOW_PROTONATE_PNICTOGENS
+
     Atom* aheavy = a;
     if (aheavy->get_Z() == 1)
     {
         Bond* ab = a->get_bond_by_idx(0);
         if (ab->btom && ab->btom->get_Z() > 1) aheavy = ab->btom;
     }
+    Atom* bheavy = b;
+    if (bheavy->get_Z() == 1)
+    {
+        Bond* bb = b->get_bond_by_idx(0);
+        if (bb->btom && bb->btom->get_Z() > 1) bheavy = bb->btom;
+    }
+    float rheavy = aheavy->distance_to(bheavy);
+    float l_heavy_atom_mindist = aheavy->get_vdW_radius() + bheavy->get_vdW_radius();
+
+    #if _ALLOW_PROTONATE_PNICTOGENS
+
     // TODO: Increase this value if multiple negative charges are nearby; decrease if positive nearby.
     if (!achg && bchg < 0 && aheavy->get_family() == PNICTOGEN && !aheavy->is_amide() && !isnan(aheavy->pK))
     {
         achg = protonation(aheavy->pK) * fabs(bchg) / pow(fabs(r-1.5)+1, 2);
-    }
-    Atom* bheavy = b;
-    if (bheavy->get_Z() == 1)
-    {
-        Bond** tmpb = b->get_bonds();
-        if (tmpb && tmpb[0] && tmpb[0]->btom) bheavy = tmpb[0]->btom;
-        if (tmpb) delete[] tmpb;
     }
 
     if (!bchg && achg < 0 && bheavy->get_family() == PNICTOGEN && !bheavy->is_amide() && !isnan(bheavy->pK))
@@ -693,7 +696,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (forces[i]->type == ionic) goto _has_ionic_already;
         }
 
-    if (!atoms_are_bonded && sgn(achg) == -sgn(bchg)) kJmol += 60.0 * fabs(achg)*fabs(bchg) / pow(r/((avdW+bvdW)*0.6), 2);
+    if (!atoms_are_bonded && sgn(achg) == -sgn(bchg))
+    {
+        kJmol += 60.0 * fabs(achg)*fabs(bchg) / pow(r/((avdW+bvdW)*0.6), 2);
+    }
     #endif
 
     _has_ionic_already:
@@ -711,6 +717,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     {
         if (!forces[i]->distance) continue;
         float r1 = r / forces[i]->distance;
+
+        if (sgn(achg) == sgn(bchg))
+        {
+            r1 += 0.001;
+        }
 
         if (forces[i]->type == covalent) continue;
         
@@ -1041,7 +1052,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
             if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
             {
-                partial *= fabs((a->get_charge()) * -(b->get_charge()));
+                partial *= a->get_charge() * -(b->get_charge());
 
                 if (0 && (a->residue == 114 || b->residue == 114))
                     cout << "Ionic interaction between "
@@ -1104,6 +1115,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             avdW *= f;
             bvdW *= f;
             rbind = forces[i]->distance;
+            if (forces[i]->distance < (l_heavy_atom_mindist-1)) l_heavy_atom_mindist = forces[i]->distance + 1;
         }
 
         #if _peratom_audit
@@ -1171,6 +1183,12 @@ _canstill_clash:
     float allowable = give + confidence / sqrt(3);
 
     r += allowable;*/
+
+    if ((rheavy / l_heavy_atom_mindist) < (r / rbind))
+    {
+        rbind = l_heavy_atom_mindist;
+        r = rheavy;
+    }
 
     if (r < rbind && !atoms_are_bonded)
     {

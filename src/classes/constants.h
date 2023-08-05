@@ -10,7 +10,7 @@
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 0.5
+#define _kJmol_cuA 1.0
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
 #define oxytocin 0.003

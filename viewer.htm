@@ -553,9 +553,27 @@ var tmcolor =
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 var ligbs = [];
+var ligbs_bw_orII = ["2.53", "3.46", "3.41", "3.40", "3.37", "3.36", "3.33", "3.32", "3.29", "4.42", "4.39", "4.37", "4.53", "4.57", "4.60", "45.49", "45.52", "5.47", "5.46", "5.43", "5.39", "6.48", "6.51", "6.55", "7.42", "7.39", "7.38"];
+var ligbs_bw_orI = ["3.33", "4.57", "4.60", "45.52", "45.53", "5.39", "5.43", "6.55", "R6.55"];
+var ligbs_bw_taar = ["3.29", "3.32", "5.42", "6.48", "6.51"];
 var tmstrand = ["A"];
 var mcres = [];
 var bw50r = new Array(99).fill(0);
+
+function resno_from_bw(bwnum)
+{
+	var lbw = bwnum.split(".");
+	if (lbw.length < 2) lbw = bwnum.split("x");
+	if (lbw.length < 2) return 0;
+
+	var rgnno = parseInt(lbw[0]);
+	var member = parseInt(lbw[1]);
+
+	if (typeof bw50r[rgnno] == "undefined") return 0;
+	if (!bw50r[rgnno]) return 0;
+
+	return bw50r[rgnno] + member - 50;
+}
 
 function aa_1let_from_3let(laa3let)
 {

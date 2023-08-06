@@ -1266,7 +1266,9 @@ function showSideChain(resno, strandid)
 {
 	if (typeof strandid == "object")
 	{
-		//
+		var i, n = strandid.length;
+		for (i=0; i<n; i++) showSideChain(resno, strandid[i]);
+		return;
 	}
 
 	try

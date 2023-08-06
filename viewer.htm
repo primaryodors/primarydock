@@ -553,7 +553,7 @@ var tmcolor =
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 var ligbs = [];
-var tmstrand = "A";
+var tmstrand = ["A"];
 var mcres = [];
 var bw50r = new Array(99).fill(0);
 
@@ -742,7 +742,7 @@ function strandColorSelection(strandid, colorCode)
 		break;
 
 		default:
-		p.colorScheme = (strandid == tmstrand) ? PODefRgnScheme : POAAScheme;
+		p.colorScheme = (tmstrand.indexOf(strandid) >= 0) ? PODefRgnScheme : POAAScheme;
 		if (typeof tabbtn != "undefined") tabbtn.style.backgroundColor = "#234";
 	}
 
@@ -765,7 +765,7 @@ function show_seqdd()
 {
 	var seqdd = $('#seqdd')[0];
 	seqdd.innerHTML = "<b>Show/Hide Side Chains:</b><br><br>";
-	if (!tmstrand) tmstrand = "A";
+	if (!tmstrand.length) tmstrand = ["A"];
 
 	if (!mdlstrandid.length) mdlstrandid = ["A"];
 	var tabs;
@@ -900,11 +900,11 @@ function show_seqdd()
 			if (typeof restoggled[mdlidx] == "undefined") restoggled[mdlidx] = 0;
 			tgl.className = "clickme nodebtn sctgbtn" + (restoggled[mdlidx] ? " hilite" : "");
 			var rcd = false;
-			if (strandid == tmstrand) rcd = rgn_color_dark(resno, true);
+			if (tmstrand.indexOf(strandid) >= 0) rcd = rgn_color_dark(resno, true);
 			if (rcd) tgl.style.backgroundColor = css_color(rcd);
 
 			var j;
-			if (strandid == tmstrand) for (j=1; j<67; j++) if (bw50r[j] == resno) tgl.className += ' bw50';
+			if (tmstrand.indexOf(strandid) >= 0) for (j=1; j<67; j++) if (bw50r[j] == resno) tgl.className += ' bw50';
 
 			if (mdlidx < 0)
 			{
@@ -2582,12 +2582,15 @@ function loadFile(fileData, fileName = "")
 					var ligtmp = "";
 					var strandid = "A";
 					var last_strandid = "";
+					var strand_has_tms = false;
                     for (i=0; i<lines.length; i++)
                     {
                         var ln = lines[i];
 
                         if (ln.substr(0, 6) == "HETATM" || ln.substr(17,3) == "LIG")
                             ligtmp += ln + "\n";
+
+						if (ln.substr(0, 3) == 'TER') strand_has_tms = false;
 
 						if (ln.substr(0, 6) == 'REMARK')
 						{
@@ -2597,7 +2600,8 @@ function loadFile(fileData, fileName = "")
 								var tmrno = parseInt(pieces[3].substr(-1));
 								tmstart[tmrno] = parseInt(pieces[4]);
 								tmend[tmrno] = parseInt(pieces[5]);
-								tmstrand = "";			// Force reassignment later on.
+								strand_has_tms = true;
+								// tmstrand = [];			// Force reassignment later on.
 							}
 							else if (pieces[3] == "LIGAND_BINDING")
 							{
@@ -2622,7 +2626,7 @@ function loadFile(fileData, fileName = "")
 							strandid = ln.substr(21,1).trim();
 							if (!strandid) strandid = "A";
 							var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
-							if (!tmstrand && tmstart[6]) tmstrand = strandid;
+							if (/* !tmstrand.length && */ strand_has_tms && tmstart[6]) tmstrand.push(strandid);
 
 							if (lres != resno)
 							{
@@ -2705,7 +2709,7 @@ function loadFile(fileData, fileName = "")
 					$('#posey')[0].innerText = fileData.split("\n")[0];
 					enable_spacefill();
             	}
-                
+
 				var fileStrands = fileData.split("\nTER");
 				fileStrands.forEach(function(strandData)
                 {
@@ -2739,7 +2743,7 @@ function loadFile(fileData, fileName = "")
 							var rp =
 							{
 								opacity: opc_cartoon,
-								colorScheme: tmstrand == comp.name ? PODefRgnScheme : POAAScheme,
+								colorScheme: (tmstrand.indexOf(comp.name) >= 0) ? PODefRgnScheme : POAAScheme,
 								// colorScale: 'rainbow',
 								metalness: mtl_cartoon,
 							};

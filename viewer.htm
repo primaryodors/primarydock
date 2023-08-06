@@ -1264,6 +1264,11 @@ function getResMdlIdx(resno, strandid)
 
 function showSideChain(resno, strandid)
 {
+	if (typeof strandid == "object")
+	{
+		//
+	}
+
 	try
 	{
 		if (typeof strandid == "undefined") strandid = "A";
@@ -2626,7 +2631,7 @@ function loadFile(fileData, fileName = "")
 							strandid = ln.substr(21,1).trim();
 							if (!strandid) strandid = "A";
 							var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
-							if (/* !tmstrand.length && */ strand_has_tms && tmstart[6]) tmstrand.push(strandid);
+							if (/* !tmstrand.length && */ strand_has_tms && tmstart[6] && (tmstrand.indexOf(strandid) < 0) ) tmstrand.push(strandid);
 
 							if (lres != resno)
 							{

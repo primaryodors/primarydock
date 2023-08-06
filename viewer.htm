@@ -575,6 +575,15 @@ function resno_from_bw(bwnum)
 	return bw50r[rgnno] + member - 50;
 }
 
+function resno_from_letters_and_bw(bwnum)
+{
+	var lbw = bwnum.replace(/[^0-9.x]/g, '');
+	var resno = resno_from_bw(lbw);
+	var mdlidx = getResMdlIdx(resno, tmstrand[0]);
+	if (lbw == bwnum || bwnum.indexOf(sequence[mdlidx]) >= 0) return resno;
+	else return 0;
+}
+
 function aa_1let_from_3let(laa3let)
 {
 	var retval = "?";

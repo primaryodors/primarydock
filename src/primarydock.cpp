@@ -91,6 +91,7 @@ bool progressbar = false;
 int movie_offset = 0;
 char configfname[256];
 char protfname[256];
+char protstrand = '\0';
 char protafname[256];
 char tplfname[256];
 char tplrfnam[256];
@@ -1254,6 +1255,12 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "PROT"))
     {
         strcpy(protfname, words[1]);
+        char* c = strchr(protfname, ':');
+        if (c)
+        {
+            *c = 0;
+            protstrand = *(++c);
+        }
         protset = true;
         // optsecho = "Protein file is " + (std::string)protfname;
         return 1;
@@ -2096,7 +2103,7 @@ int main(int argc, char** argv)
         cout << "Error trying to read " << protfname << endl;
         return 0xbadf12e;
     }
-    protein->load_pdb(pf);
+    protein->load_pdb(pf, 0, protstrand ?: 'A');
     protein->soft_biases = soft_biases;
     apply_protein_specific_settings(protein);
     fclose(pf);
@@ -2603,7 +2610,7 @@ _try_again:
         else
         {
             pf = fopen(protfname, "r");
-            protein->load_pdb(pf);
+            protein->load_pdb(pf, 0, protstrand ?: 'A');
             fclose(pf);
             protein->soft_biases = soft_biases;
             apply_protein_specific_settings(protein);
@@ -3844,23 +3851,24 @@ _try_again:
                 }
             }
 
+            #if false && flexion_selection
             if (flex)
             {
-                #if false && flexion_selection
                 for (j=0; j<flexible_resnos.size(); j++)
                 {
                     cfmols[i++] = protein->get_residue(flexible_resnos[j]);
                 }
-                #else
-                for (j=0; j<sphres; j++)
-                {
-                    #if ! flexion_selection
-                    if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
-                    #endif
-                    cfmols[i++] = reaches_spheroid[nodeno][j];
-                }
-                #endif
             }
+            #else
+            for (j=0; j<sphres; j++)
+            {
+                #if ! flexion_selection
+                if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
+                #endif
+                if (!flex) reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
+                cfmols[i++] = reaches_spheroid[nodeno][j];
+            }
+            #endif
             int cfmolqty = i;
             for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 

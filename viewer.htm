@@ -556,6 +556,7 @@ var ligbs = [];
 var ligbs_bw_orII = ["2.53", "3.41", "3.40", "3.37", "3.36", "3.33", "3.32", "3.29", "4.53", "4.57", "4.60", "45.49", "45.52", "5.47", "5.46", "5.43", "5.39", "6.48", "6.51", "6.55", "7.42", "7.39", "7.38"];
 var ligbs_bw_orI = ["3.33", "4.57", "4.60", "45.52", "45.53", "5.39", "5.43", "6.55", "R6.59"];
 var ligbs_bw_taar = ["3.29", "3.32", "5.43", "6.48", "6.51"];
+var acvbs = ["1x49", "1x53", "2x43", "2x46", "DENYSK2x50", "STNQKED3x39", "3x40", "VMILFY3x43", "3x46", "DE3x49", "R3x50", "3x51", "3x53", "3x54", "5x51", "5x55", "5x57", "5x58", "5x61", "5x62", "6x33", "6x37", "6x40", "6x41", "FWYMILV6x44", "6x48", "STNQ7x45", "STNQK7x49", "7x50", "7x52", "Y7x53", "7x54", "7x55", "8x50", "8x51"];
 var tmstrand = ["A"];
 var mcres = [];
 var bw50r = new Array(99).fill(0);
@@ -597,6 +598,21 @@ function get_ligbs_from_orid()
 
 	else if (orid.substr(0, 4) == "TAAR")
 		return ligbs_bw_taar;
+
+	else return [];
+}
+
+function get_acvbs_from_orid()
+{
+	if (!orid) return [];
+
+	if (orid.substr(0, 2) == "OR")
+	{
+		return acvbs;
+	}
+
+	else if (orid.substr(0, 4) == "TAAR")
+		return acvbs;
 
 	else return [];
 }
@@ -1099,6 +1115,23 @@ function show_seqdd()
 		seqdd.appendChild(tgl);
 	}
 
+	if (get_acvbs_from_orid().length)
+	{
+		tgl = document.createElement("span");
+		tgl.className = "clickme nodebtn sctgbtn";
+		tgl.innerText = "Activation";
+		tgl.id = "seqddligbs";
+		tgl.setAttribute("onclick", "event.preventDefault(); showActivationSideChains(); return false;");
+		tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+		seqdd.appendChild(tgl);
+
+		tgl = document.createElement("span");
+		tgl.innerText = "|";
+		seqdd.appendChild(tgl);
+	}
+
 	if (mcres.length)
 	{
 		tgl = document.createElement("span");
@@ -1466,7 +1499,27 @@ function showLigandSideChains()
 {
 	var i, j;
 	var lligbs = get_ligbs_from_orid();
-	
+
+	var n = lligbs.length;
+	if (!n) return;
+
+	for (i=0; i<n; i++)
+	{
+		var resno = resno_from_letters_and_bw(lligbs[i]);
+		if (!resno) continue;
+		for (j=0; j<tmstrand.length; j++)
+		{
+			var mdlidx = getStrandIdxFromID(tmstrand[j]);
+			if (gmvisible[mdlidx]) showSideChain(resno, tmstrand[j]);
+		}
+	}
+}
+
+function showActivationSideChains()
+{
+	var i, j;
+	var lligbs = get_acvbs_from_orid();
+
 	var n = lligbs.length;
 	if (!n) return;
 

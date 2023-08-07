@@ -4333,7 +4333,7 @@ _try_again:
             }
             #endif
 
-            if (flex || true)
+            if (flex)
             {
                 int en = protein->get_end_resno();
                 int resno;

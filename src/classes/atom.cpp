@@ -478,11 +478,6 @@ bool Atom::move(Point* pt)
         return false;
     }
 
-    if (residue && (Z>1))
-    {
-        pt->x += 0.000001;
-    }
-
     location = *pt;
     location.weight = at_wt;
     if (geov) delete[] geov;

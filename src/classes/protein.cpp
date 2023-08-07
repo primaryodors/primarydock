@@ -579,6 +579,24 @@ void Protein::find_residue_initial_bindings()
     }
 }
 
+void Protein::set_name_from_pdb_name(const char* pdb_name)
+{
+    char buffer[1024], *begin = buffer;
+    strcpy(buffer, pdb_name);
+
+    char* slash = strchr(buffer, '/');
+    while (slash && slash[1])
+    {
+        begin = slash+1;
+        slash = strchr(begin, '/');
+    }
+
+    char* dot = strchr(begin, '.');
+    if (dot) *dot = 0;
+
+    name = begin;
+}
+
 int Protein::load_pdb(FILE* is, int rno, char chain)
 {
     AminoAcid* restmp[65536];

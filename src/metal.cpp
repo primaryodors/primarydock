@@ -97,6 +97,7 @@ int main(int argc, char** argv)
     }
     p.load_pdb(pf);
     fclose(pf);
+    p.set_name_from_pdb_name(inpfile);
 
     if (rcpfile)
     {

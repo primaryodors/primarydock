@@ -64,6 +64,7 @@ public:
     bool disulfide_bond(int resno1, int resno2);
 
     // Serialization.
+    void set_name_from_pdb_name(const char* pdb_name);
     int load_pdb(FILE* infile, int resno_offset = 0, char chain = 'A');				// Returns number of residues loaded.
     void save_pdb(FILE* outfile, Molecule* ligand = nullptr);
     void end_pdb(FILE* outfile);

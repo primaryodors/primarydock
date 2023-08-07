@@ -74,5 +74,13 @@ else
     diff --color --unified $REPORT test/received/ifnot_test.received.txt
 fi
 
-
+REPORT="test/bwmagic.approved.txt"
+bin/pepteditor test/bwmagic.pepd | sed '/^#/d' >test/received/bwmagic.received.txt
+RESULT=$(diff --unified $REPORT test/received/bwmagic.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}BW magic variables test succeeded.${NC}\n"
+else
+    printf "${RED}BW magic variables test FAILED.${NC}\n"
+    diff --color --unified $REPORT test/received/bwmagic.received.txt
+fi
 

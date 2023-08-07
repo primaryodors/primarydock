@@ -74,14 +74,25 @@ ECHO $three               # outputs Yup!
 ```
 
 
-Some "magic variables" are supplied upon loading a protein. The strand ID is included in the variable name; for the below list, the strand is A:
+Some variables are supplied upon loading a protein. The strand ID is included in the variable name; for the below list, the strand is A:
 
 - `$PDBA` the path and name of the source PDB file.
 - `$PROTEINA` the name of the protein, derived from a `REMARK 6` record if present.
 - `%SEQLENA` the length of the protein sequence.
 - `$SEQUENCEA` the sequence of the protein in standard one-letter amino acid code.
 - Region start and end residue numbers from any `REMARK 650 HELIX` records, e.g. `%A.TMR3.s` and `%A.TMR3.e` for the start and end resnos of TMR3.
-- Ballesteros-Weinstein n.50 numbers e.g. `%A.1.50`, `%A.2.50` etc., from `REMARK 800 SITE BW` records of the PDB if present.
+
+There are also "magic" variables to access residues by Ballesteros-Weinstein number from `REMARK 800 SITE BW` records of the PDB if present.
+
+- The integer formats e.g. `%6.48`, `%A.6.48` obtain the residue number of the indicated BW position;
+- The string formats e.g. `$6.48`, `$A.6.48` obtain the residue letter at the indicated BW position;
+- The Cartesian formats e.g. `@6.48`, `@A.6.48` obtain the location of the residue's CA atom.
+
+In all cases, the magic variable without a strand prefix, e.g. `$6.48`, refers to the current working strand, while the variable with a prefix,
+e.g. `$A.6.48`, refers to the indicated strand, in this example strand A.
+
+
+# Commands
 
 The following commands are supported:
 

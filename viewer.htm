@@ -553,10 +553,23 @@ var tmcolor =
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 var ligbs = [];
+
+// Man et al 2004 https://doi.org/10.1110%2Fps.03296404
 var ligbs_bw_orII = ["2.53", "3.41", "3.40", "3.37", "3.36", "3.33", "3.32", "3.29", "4.53", "4.57", "4.60", "45.49", "45.52", "5.47", "5.46", "5.43", "5.39", "6.48", "6.51", "6.55", "7.42", "7.39", "7.38"];
+
+// Billesbolle et al 2022 https://doi.org/10.1101/2022.12.20.520951
 var ligbs_bw_orI = ["3.33", "4.57", "4.60", "45.52", "45.53", "5.39", "5.43", "6.55", "R6.59"];
+
+// TODO: A more complete TAAR binding site.
 var ligbs_bw_taar = ["3.29", "3.32", "5.43", "6.48", "6.51"];
+
+// Zhou et al 2019 https://doi.org/10.7554/eLife.50279
 var acvbs = ["1x49", "1x53", "2x43", "2x46", "DENYSK2x50", "STNQKED3x39", "3x40", "VMILFY3x43", "3x46", "DE3x49", "R3x50", "3x51", "3x53", "3x54", "5x51", "5x55", "5x57", "5x58", "5x61", "5x62", "6x33", "6x37", "6x40", "6x41", "FWYMILV6x44", "6x48", "STNQ7x45", "STNQK7x49", "7x50", "7x52", "Y7x53", "7x54", "7x55", "8x50", "8x51"];
+
+// Haag et al 2020 https://doi.org/10.1007%2Fs00018-019-03279-y
+// These and M5.46 are conserved in all OR2M, OR2T, OR2V receptors and no others. M5.46 might be a third coordination residue.
+var mtlbs = ["C5.42", "C5.43"];
+
 var tmstrand = ["A"];
 var mcres = [];
 var bw50r = new Array(99).fill(0);
@@ -615,6 +628,18 @@ function get_acvbs_from_orid()
 		return acvbs;
 
 	else return [];
+}
+
+function count_metal_bs()
+{
+	var i, j=0, n = mtlbs.length;
+
+	for (i=0; i<n; i++)
+	{
+		if (resno_from_letters_and_bw(mtlbs[i])) j++;
+	}
+
+	return j;
 }
 
 function aa_1let_from_3let(laa3let)
@@ -1132,7 +1157,7 @@ function show_seqdd()
 		seqdd.appendChild(tgl);
 	}
 
-	if (mcres.length)
+	if (count_metal_bs() == mtlbs.length)
 	{
 		tgl = document.createElement("span");
 		tgl.className = "clickme nodebtn sctgbtn";
@@ -1538,10 +1563,15 @@ function showActivationSideChains()
 function showMetalSideChains()
 {
 	var i;
-	for (i=0; i<mcres.length; i++)
+	for (i=0; i<mtlbs.length; i++)
 	{
-		if (!gmvisible[getResStrandIdx(i)]) continue;
-		showSideChain(mcres[i], tmstrand);
+		var resno = resno_from_letters_and_bw(mtlbs[i]);
+		if (!resno) continue;
+		for (j=0; j<tmstrand.length; j++)
+		{
+			var mdlidx = getStrandIdxFromID(tmstrand[j]);
+			if (gmvisible[mdlidx]) showSideChain(resno, tmstrand[j]);
+		}
 	}
 }
 

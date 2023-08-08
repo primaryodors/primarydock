@@ -1261,6 +1261,7 @@ int interpret_config_line(char** words)
             *c = 0;
             protstrand = *(++c);
         }
+        else protstrand = 0;
         protset = true;
         // optsecho = "Protein file is " + (std::string)protfname;
         return 1;

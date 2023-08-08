@@ -9012,31 +9012,6 @@
                 "orange",
                 "sweet"
             ]
-        },
-        "activity":
-        {
-            "https:\/\/doi.org\/10.1021\/acschemneuro.5b00335":
-            {
-                "OR1A1":
-                {
-                    "type": "na"
-                },
-                "OR1A2":
-                {
-                    "type": "na"
-                }
-            },
-            "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013":
-            {
-                "OR1A1":
-                {
-                    "adjusted_curve_top": "6"
-                },
-                "OR1A2":
-                {
-                    "adjusted_curve_top": "5"
-                }
-            }
         }
     },
     "66f5442bbfde5b89a686df5fe8b80985":
@@ -11668,6 +11643,28 @@
                 {
                     "type": "ma",
                     "ec50": "-5.18"
+                }
+            },
+            "https:\/\/doi.org\/10.1016\/j.jsb.2007.04.013":
+            {
+                "OR1A1":
+                {
+                    "adjusted_curve_top": "6"
+                },
+                "OR1A2":
+                {
+                    "adjusted_curve_top": "5"
+                }
+            },
+            "https:\/\/doi.org\/10.1021\/acschemneuro.5b00335":
+            {
+                "OR1A1":
+                {
+                    "type": "na"
+                },
+                "OR1A2":
+                {
+                    "type": "na"
                 }
             }
         }

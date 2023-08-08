@@ -4,12 +4,18 @@
 int main(int argc, char** argv)
 {
     if (argc < 1) return -1;
+
     Protein p("testing");
     FILE* fp = fopen(argv[1], "rb");
+
     if (argc > 2) p.load_pdb(fp, 0, argv[2][0]);
     else p.load_pdb(fp);
+
     p.set_name_from_pdb_name(argv[1]);
     fclose(fp);
+
+    float threshold = 1.5;
+    if (argc > 3) threshold = atof(argv[3]);
 
     int i, j, n = p.get_end_resno();
     for (i=1; i<=n; i++)
@@ -26,7 +32,7 @@ int main(int argc, char** argv)
 
             float f = aa->get_intermol_binding(cl[j]);
             float r = aa->get_CA_location().get_3d_distance(cl[j]->get_CA_location());
-            if (fabs(f) >= 1.5) cout << *aa << "-" << *cl[j] << ": " << -f << " r=" << r << "Å" << endl;
+            if (fabs(f) >= threshold) cout << *aa << "-" << *cl[j] << ": " << -f << " r=" << r << "Å" << endl;
         }
     }
 }

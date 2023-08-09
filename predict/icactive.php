@@ -64,7 +64,7 @@ foreach ($active_pairs as $pairid => $pair)
     if (!isset($inactive_pairs[$pairid])) continue;
 
     // Filter out pairs whose energy is positive in both the active and inactive states.
-    if ($inactive_pairs[$pairid][0] > 10 && $pair[0] > 10) continue;
+    if ($inactive_pairs[$pairid][0] > 5 && $pair[0] > 5) continue;
 
     $energy_difference = $pair[0] - $inactive_pairs[$pairid][0];
     $radius_difference = $pair[1] - $inactive_pairs[$pairid][1];
@@ -89,3 +89,53 @@ print_r($contacts_made);
 print_r($contacts_broken);
 
 print_r($repacked_pairs);
+
+$get_bw50_resnos = "";
+for ($i=1; $i<=7; $i++) $get_bw50_resnos .= "ECHO \"$i: \" %$i.50\n";
+
+$gpcr_contacts = [ "3x40-6x48", "5x51-6x44", "5x55-6x41", "3x43-7x49", "3x43-7x53", "5x58-6x40", "3x46-7x53", "1x53-7x54", "5x62-6x37", "3x50-7x53" ];
+$measure_contacts = "";
+foreach ($gpcr_contacts as $contacts)
+{
+    $bwnos = explode('-', $contacts);
+    $measure_contacts .= <<<heredoc
+LET @distance = @A.{$bwnos[0]} - @A.{$bwnos[1]}
+LET &active_distance = @distance
+
+LET @distance = @I.{$bwnos[0]} - @I.{$bwnos[1]}
+LET &inactive_distance = @distance
+
+LET &change = &active_distance - &inactive_distance
+ECHO "{$bwnos[0]}|{$bwnos[1]}|" &change
+
+
+heredoc;
+}
+
+$pepd_script = <<<heredoc
+
+LOAD $active_pdbfn $active_chain A
+BWCENTER
+
+LOAD $inactive_pdbfn $inactive_chain I
+BWCENTER
+
+$get_bw50_resnos
+ECHO ""
+
+$measure_contacts
+ECHO ""
+
+
+heredoc;
+
+$pepd_fname = "tmp/icactive.pepd";
+$fp = fopen($pepd_fname, "w") or die("File access or permissions error.\n");
+fwrite($fp, $pepd_script);
+fclose($fp);
+
+$result = [];
+$cmd = "bin/pepteditor $pepd_fname";
+exec($cmd, $result);
+
+print_r($result);

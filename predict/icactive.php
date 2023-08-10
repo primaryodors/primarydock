@@ -139,3 +139,61 @@ $cmd = "bin/pepteditor $pepd_fname";
 exec($cmd, $result);
 
 print_r($result);
+
+$bw50 = [];
+$contacts_made_bw = [];
+
+foreach ($result as $line)
+{
+    $pieces = explode(": ", $line);
+    if (count($pieces) > 1)
+    {
+        $region_no = intval($pieces[0]);
+        $resno = intval($pieces[1]);
+        $bw50[$region_no] = $resno;
+        continue;
+    }
+
+    $pieces = explode("|", $line);
+    if (count($pieces) >= 3)
+    {
+        $contacts_made_bw[$pieces[0]."-".$pieces[1]] = floatval($pieces[2]);
+    }
+}
+
+foreach ($contacts_made as $resnos => $change)
+{
+    $residues = explode("-", $resnos);
+    $resno1 = intval(preg_replace("/[^0-9]/", "", $residues[0]));
+    $resno2 = intval(preg_replace("/[^0-9]/", "", $residues[1]));
+
+    $closest_bw50_helixno = $closest_bw50_resno_delta = 0;
+    foreach ($bw50 as $regno => $resno50)
+    {
+        $delta = abs($resno1 - $resno50);
+        if (!$closest_bw50_helixno || $delta < $closest_bw50_resno_delta)
+        {
+            $closest_bw50_resno_delta = $delta;
+            $closest_bw50_helixno = $regno;
+        }
+    }
+
+    $bw1 = $closest_bw50_helixno . '.' . ($resno1 - $bw50[$closest_bw50_helixno] + 50);
+
+    $closest_bw50_helixno = $closest_bw50_resno_delta = 0;
+    foreach ($bw50 as $regno => $resno50)
+    {
+        $delta = abs($resno2 - $resno50);
+        if (!$closest_bw50_helixno || $delta < $closest_bw50_resno_delta)
+        {
+            $closest_bw50_resno_delta = $delta;
+            $closest_bw50_helixno = $regno;
+        }
+    }
+
+    $bw2 = $closest_bw50_helixno . '.' . ($resno2 - $bw50[$closest_bw50_helixno] + 50);
+
+    $contacts_made_bw["$bw1-$bw2"] = floatval($change);
+}
+
+print_r($contacts_made_bw);

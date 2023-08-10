@@ -84,18 +84,18 @@ foreach ($active_pairs as $pairid => $pair)
         $repacked_pairs[$pairid] = $radius_difference;
 }
 
-print_r($contacts_made);
-
-print_r($contacts_broken);
-
-print_r($repacked_pairs);
+// print_r($contacts_made);
+// print_r($contacts_broken);
+// print_r($repacked_pairs);
 
 $get_bw50_resnos = "";
 for ($i=1; $i<=7; $i++) $get_bw50_resnos .= "ECHO \"$i: \" %$i.50\n";
 
-$gpcr_contacts = [ "3x40-6x48", "5x51-6x44", "5x55-6x41", "3x43-7x49", "3x43-7x53", "5x58-6x40", "3x46-7x53", "1x53-7x54", "5x62-6x37", "3x50-7x53" ];
+$gpcr_contacts_a = [ "3x40-6x48", "5x51-6x44", "5x55-6x41", "3x43-7x49", "3x43-7x53", "5x58-6x40", "3x46-7x53", "1x53-7x54", "5x62-6x37", "3x50-7x53" ];
+$gpcr_contacts_i = [ "3x43-6x40", "3x43-6x41", "6x40-7x49", "3x46-6x37", "1x53-7x53", "7x53-8x50", "7x54-8x51", "3x50-6x37" ];
+
 $measure_contacts = "";
-foreach ($gpcr_contacts as $contacts)
+foreach ($gpcr_contacts_a as $contacts)
 {
     $bwnos = explode('-', $contacts);
     $measure_contacts .= <<<heredoc
@@ -106,7 +106,23 @@ LET @distance = @I.{$bwnos[0]} - @I.{$bwnos[1]}
 LET &inactive_distance = @distance
 
 LET &change = &active_distance - &inactive_distance
-ECHO "{$bwnos[0]}|{$bwnos[1]}|" &change
+ECHO "+{$bwnos[0]}|{$bwnos[1]}|" &change
+
+
+heredoc;
+}
+foreach ($gpcr_contacts_i as $contacts)
+{
+    $bwnos = explode('-', $contacts);
+    $measure_contacts .= <<<heredoc
+LET @distance = @A.{$bwnos[0]} - @A.{$bwnos[1]}
+LET &active_distance = @distance
+
+LET @distance = @I.{$bwnos[0]} - @I.{$bwnos[1]}
+LET &inactive_distance = @distance
+
+LET &change = &active_distance - &inactive_distance
+ECHO "-{$bwnos[0]}|{$bwnos[1]}|" &change
 
 
 heredoc;
@@ -138,10 +154,11 @@ $result = [];
 $cmd = "bin/pepteditor $pepd_fname";
 exec($cmd, $result);
 
-print_r($result);
+// print_r($result);
 
 $bw50 = [];
 $contacts_made_bw = [];
+$contacts_broken_bw = [];
 
 foreach ($result as $line)
 {
@@ -157,7 +174,9 @@ foreach ($result as $line)
     $pieces = explode("|", $line);
     if (count($pieces) >= 3)
     {
-        $contacts_made_bw[$pieces[0]."-".$pieces[1]] = floatval($pieces[2]);
+        $c = substr($pieces[0], 0, 1);
+        if ($c == '+') $contacts_made_bw[substr($pieces[0], 1)."-".$pieces[1]] = floatval($pieces[2]);
+        else if ($c == '-') $contacts_broken_bw[substr($pieces[0], 1)."-".$pieces[1]] = floatval($pieces[2]);
     }
 }
 
@@ -196,4 +215,40 @@ foreach ($contacts_made as $resnos => $change)
     $contacts_made_bw["$bw1-$bw2"] = floatval($change);
 }
 
+foreach ($contacts_broken as $resnos => $change)
+{
+    $residues = explode("-", $resnos);
+    $resno1 = intval(preg_replace("/[^0-9]/", "", $residues[0]));
+    $resno2 = intval(preg_replace("/[^0-9]/", "", $residues[1]));
+
+    $closest_bw50_helixno = $closest_bw50_resno_delta = 0;
+    foreach ($bw50 as $regno => $resno50)
+    {
+        $delta = abs($resno1 - $resno50);
+        if (!$closest_bw50_helixno || $delta < $closest_bw50_resno_delta)
+        {
+            $closest_bw50_resno_delta = $delta;
+            $closest_bw50_helixno = $regno;
+        }
+    }
+
+    $bw1 = $closest_bw50_helixno . '.' . ($resno1 - $bw50[$closest_bw50_helixno] + 50);
+
+    $closest_bw50_helixno = $closest_bw50_resno_delta = 0;
+    foreach ($bw50 as $regno => $resno50)
+    {
+        $delta = abs($resno2 - $resno50);
+        if (!$closest_bw50_helixno || $delta < $closest_bw50_resno_delta)
+        {
+            $closest_bw50_resno_delta = $delta;
+            $closest_bw50_helixno = $regno;
+        }
+    }
+
+    $bw2 = $closest_bw50_helixno . '.' . ($resno2 - $bw50[$closest_bw50_helixno] + 50);
+
+    $contacts_broken_bw["$bw1-$bw2"] = floatval($change);
+}
+
 print_r($contacts_made_bw);
+print_r($contacts_broken_bw);

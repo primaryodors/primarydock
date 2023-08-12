@@ -2,7 +2,7 @@
 
 chdir(__DIR__);
 chdir("..");
-require_once("predict/odorutils.php");
+require_once("data/odorutils.php");
 
 foreach (@$argv as $k => $a)
 {

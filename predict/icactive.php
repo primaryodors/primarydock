@@ -1,5 +1,9 @@
 <?php
 
+chdir(__DIR__);
+chdir("..");
+require_once("data/protutils.php");
+
 // Note this script is unfinished.
 
 $rcpid = @$argv[1] or die("Usage: php -f predict/icactive.php receptor_id\n");
@@ -251,5 +255,41 @@ echo "\nContacts broken: ";
 print_r($contacts_broken_bw);
 
 
-// Ultimately we will want to check residues of $rcpid and list which made/broken contacts are compatible.
+// Check residues of $rcpid and list which made/broken contacts are compatible.
+$pdbfn = filename_protid($rcpid);
+$bw_lookup = [];
+foreach (array_merge($contacts_made_bw, $contacts_broken_bw) as $key => $value)
+{
+    $residues = explode('-', $key);
 
+    for ($i=0; $i<=1; $i++)
+    {
+        // Pepteditor doesn't recognize GPCRDB numbering yet, so we have to assume Ballesteros-Weinstein.
+        // For ORs, the two are almost always the same.
+        $residue_bw = str_replace('x', '.', $residues[$i]);
+        $bw_lookup[$residue_bw] = "ECHO \"$residue_bw|\" \$$residue_bw %$residue_bw \"|\" @$residue_bw";
+    }
+}
+
+$bw_lookup = implode("\n", $bw_lookup);
+
+$pepd_script = <<<heredoc
+
+LOAD "$pdbfn"
+
+$bw_lookup
+
+
+heredoc;
+
+
+$pepd_fname = "tmp/icactive.pepd";
+$fp = fopen($pepd_fname, "w") or die("File access or permissions error.\n");
+fwrite($fp, $pepd_script);
+fclose($fp);
+
+$result = [];
+$cmd = "bin/pepteditor $pepd_fname";
+exec($cmd, $result);
+
+print_r($result);

@@ -111,6 +111,12 @@ function family_from_protid($protid)
 	else return substr($protid, 0, 4);
 }
 
+function filename_protid($protid)
+{
+	$fam = family_from_protid($protid);
+	return "pdbs/$fam/$protid.upright.pdb";
+}
+
 function binding_site($protid)
 {
 	$retval = [];

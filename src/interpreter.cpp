@@ -330,7 +330,7 @@ int interpret_special_resno(const char* varname, char* strandid = nullptr)
 
     int bw50 = p->get_bw50(rgno);
     if (!bw50) return 0;
-    else return bw50 + member - 50;
+    else return max(0, bw50 + member - 50);
 }
 
 Point interpret_Cartesian_literal(const char* param)

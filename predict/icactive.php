@@ -256,7 +256,7 @@ print_r($contacts_broken_bw);
 
 
 // Check residues of $rcpid and list which made/broken contacts are compatible.
-$pdbfn = filename_protid($rcpid);
+$working_pdbfn = filename_protid($rcpid);
 $bw_lookup = [];
 foreach (array_merge($contacts_made_bw, $contacts_broken_bw) as $key => $value)
 {
@@ -267,7 +267,7 @@ foreach (array_merge($contacts_made_bw, $contacts_broken_bw) as $key => $value)
         // Pepteditor doesn't recognize GPCRDB numbering yet, so we have to assume Ballesteros-Weinstein.
         // For ORs, the two are almost always the same.
         $residue_bw = str_replace('x', '.', $residues[$i]);
-        $bw_lookup[$residue_bw] = "ECHO \"$residue_bw|\" \$$residue_bw %$residue_bw \"|\" @$residue_bw";
+        $bw_lookup[$residue_bw] = "ECHO \"$residue_bw|\" \$R.$residue_bw %R.$residue_bw \"|\" @R.$residue_bw \"|\" \$A.$residue_bw";
     }
 }
 
@@ -275,7 +275,11 @@ $bw_lookup = implode("\n", $bw_lookup);
 
 $pepd_script = <<<heredoc
 
-LOAD "$pdbfn"
+STRAND A
+LOAD "$inactive_pdbfn"
+
+STRAND R
+LOAD "$working_pdbfn"
 
 $bw_lookup
 

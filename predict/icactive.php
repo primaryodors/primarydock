@@ -252,3 +252,16 @@ foreach ($contacts_broken as $resnos => $change)
 
 print_r($contacts_made_bw);
 print_r($contacts_broken_bw);
+
+
+// TODO:
+
+// Filter on pairs where target receptor has compatible residues.
+
+// Adjust target distances to accommodate target receptor's residues' reach.
+
+// Movability/flexibility values for TMRs: TMR6 = TMR5 > TMR7 > TMR4 = TMR1 > TMR2 > TMR3.
+
+// Best-fit lines: Y vs. delta-X and Y vs. delta-Z.
+
+// Angles and intersections of best-fit lines relative to fulcra, e.g. 6.57 and 6.50.

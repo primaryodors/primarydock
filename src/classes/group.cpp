@@ -14,6 +14,11 @@ void ResiduePlaceholder::resolve_resno(Protein* prot)
 {
     int hxno = atoi(bw.c_str());
     const char* dot = strchr(bw.c_str(), '.');
+    if (!dot)
+    {
+        resno = atoi(bw.c_str());
+        return;
+    }
     int bwpos = atoi(dot+1);
     resno = prot->get_bw50(hxno) + bwpos - 50;
 }

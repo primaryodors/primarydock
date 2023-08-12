@@ -1,5 +1,7 @@
 <?php
 
+// Note this script is unfinished.
+
 $rcpid = @$argv[1] or die("Usage: php -f predict/icactive.php receptor_id\n");
 
 $energy_threshold = 0.5;
@@ -69,8 +71,6 @@ foreach ($active_pairs as $pairid => $pair)
     $energy_difference = $pair[0] - $inactive_pairs[$pairid][0];
     $radius_difference = $pair[1] - $inactive_pairs[$pairid][1];
 
-    // echo "$pairid: $energy_difference $radius_difference\n";
-
     // Energy improvements with decrease in radius means contacts made during activation.
     if ($energy_difference < -$energy_threshold && $radius_difference < $distance_threshold)
         $contacts_made[$pairid] = $radius_difference;
@@ -83,10 +83,6 @@ foreach ($active_pairs as $pairid => $pair)
     else if (abs($energy_difference) > $energy_threshold)
         $repacked_pairs[$pairid] = $radius_difference;
 }
-
-// print_r($contacts_made);
-// print_r($contacts_broken);
-// print_r($repacked_pairs);
 
 $get_bw50_resnos = "";
 for ($i=1; $i<=7; $i++) $get_bw50_resnos .= "ECHO \"$i: \" %$i.50\n";
@@ -153,8 +149,6 @@ fclose($fp);
 $result = [];
 $cmd = "bin/pepteditor $pepd_fname";
 exec($cmd, $result);
-
-// print_r($result);
 
 $bw50 = [];
 $contacts_made_bw = [];
@@ -250,18 +244,12 @@ foreach ($contacts_broken as $resnos => $change)
     $contacts_broken_bw["$bw1-$bw2"] = floatval($change);
 }
 
+// Output results.
+echo "Contacts made: ";
 print_r($contacts_made_bw);
+echo "\nContacts broken: ";
 print_r($contacts_broken_bw);
 
 
-// TODO:
+// Ultimately we will want to check residues of $rcpid and list which made/broken contacts are compatible.
 
-// Filter on pairs where target receptor has compatible residues.
-
-// Adjust target distances to accommodate target receptor's residues' reach.
-
-// Movability/flexibility values for TMRs: TMR6 = TMR5 > TMR7 > TMR4 = TMR1 > TMR2 > TMR3.
-
-// Best-fit lines: Y vs. delta-X and Y vs. delta-Z.
-
-// Angles and intersections of best-fit lines relative to fulcra, e.g. 6.57 and 6.50.

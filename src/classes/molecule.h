@@ -49,6 +49,8 @@ enum MoleculeType
     MOLTYP_AMINOACID
 };
 
+class GroupPair;
+
 class Pose
 {
 public:

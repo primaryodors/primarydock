@@ -432,7 +432,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     int n = mol->get_atom_count();
     if (!n) return retval;
 
-    int i, j, l;
+    int i, j, k, l;
     bool dirty[n+4];
     for (i=0; i<n; i++) dirty[i] = false;
 
@@ -554,6 +554,9 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
             if (retval[i]->average_similarity(retval[j].get()) >= 0.5 && (si >= nj/2 || si >= ni/2))
             {
+                #if _dbg_groupsel
+                cout << "Merging groups " << *retval[i] << " and " << *retval[j] << endl << endl;
+                #endif
                 retval[i]->merge(retval[j].get());
                 std::vector<std::shared_ptr<AtomGroup>>::iterator it;
                 it = retval.begin();
@@ -563,7 +566,56 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         }
     }
 
+    for (i=0; i<l; i++)
+    {
+        int ni = retval[i]->atoms.size();
+        for (j=l-1; j>i; j--)
+        {
+            int nj = retval[j]->atoms.size();
+            if (retval[i]->intersecting(retval[j].get()))
+            {
+                for (k=0; k<ni; k++)
+                {
+                    if (retval[j]->contains_atom(retval[i]->atoms[k]))
+                    {
+                        if (ni < nj)
+                        {
+                            #if _dbg_groupsel
+                            cout << "Removing atom " << *retval[i]->atoms[k] << " from " << *retval[j] << endl << endl;
+                            #endif
+                            retval[j]->remove_atom(retval[i]->atoms[k]);
+                        }
+                        else
+                        {
+                            #if _dbg_groupsel
+                            cout << "Removing atom " << *retval[i]->atoms[k] << " from " << *retval[i] << endl << endl;
+                            #endif
+                            retval[i]->remove_atom(retval[i]->atoms[k]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     return retval;
+}
+
+bool AtomGroup::contains_atom(Atom* a)
+{
+    int i, n = atoms.size();
+    for (i=0; i<n; i++) if (atoms[i] == a) return true;
+    return false;
+}
+
+void AtomGroup::remove_atom(Atom* a)
+{
+    int i, n = atoms.size();
+    for (i=0; i<n; i++) if (atoms[i] == a)
+    {
+        atoms.erase(atoms.begin()+i);
+        return;
+    }
 }
 
 float AtomGroup::average_similarity(AtomGroup* cw)

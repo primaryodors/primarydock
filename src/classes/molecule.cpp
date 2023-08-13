@@ -2694,7 +2694,7 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     return tryenerg;
 }
 
-void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**))
+void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**), void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>))
 {
     int m, n;
 
@@ -2735,7 +2735,7 @@ void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void 
 
     all[l] = nullptr;
 
-    conform_molecules(all, iters, cb);
+    conform_molecules(all, iters, cb, group_realign);
 
     for (i=0; i<n; i++)
     {
@@ -2811,7 +2811,7 @@ float Molecule::total_intermol_binding(Molecule** l)
     return f;
 }
 
-void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molecule**))
+void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molecule**), void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>))
 {
     if (!mm) return;
     int i, j, l, n, iter;
@@ -3002,9 +3002,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                         bb[q]->rotate(theta, false);
 
-                        if (a->agroups.size() && a->group_realign)
+                        if (a->agroups.size() && group_realign)
                         {
-                            a->group_realign(a, a->agroups);
+                            group_realign(a, a->agroups);
                         }
 
                         tryenerg = cfmol_multibind(a, nearby);

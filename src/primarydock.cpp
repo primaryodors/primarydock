@@ -3906,8 +3906,7 @@ _try_again:
 
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
             ligand->agroups = global_pairs;
-            ligand->group_realign = &GroupPair::align_groups;
-            Molecule::conform_molecules(cfmols, iters, &iteration_callback);
+            Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconfig);
 
             if (!nodeno && outpdb.length())
             {

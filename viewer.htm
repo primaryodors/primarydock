@@ -553,9 +553,94 @@ var tmcolor =
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 var ligbs = [];
-var tmstrand = "A";
+
+// Man et al 2004 https://doi.org/10.1110%2Fps.03296404
+var ligbs_bw_orII = ["2.53", "3.41", "3.40", "3.37", "3.36", "3.33", "3.32", "3.29", "4.53", "4.57", "4.60", "45.49", "45.52", "5.47", "5.46", "5.43", "5.39", "6.48", "6.51", "6.55", "7.42", "7.39", "7.38"];
+
+// Billesbolle et al 2022 https://doi.org/10.1101/2022.12.20.520951
+var ligbs_bw_orI = ["3.33", "4.57", "4.60", "45.52", "45.53", "5.39", "5.43", "6.55", "R6.59"];
+
+// TODO: A more complete TAAR binding site.
+var ligbs_bw_taar = ["3.29", "3.32", "5.43", "6.48", "6.51"];
+
+// Zhou et al 2019 https://doi.org/10.7554/eLife.50279
+var acvbs = ["1x49", "1x53", "2x43", "2x46", "DENYSK2x50", "EKSTNQD3x39", "3x40", "VMILFY3x43", "3x46", "DE3x49", "R3x50", "3x51", "3x53", "3x54", "5x51", "5x55", "5x57", "5x58", "5x61", "5x62", "6x33", "6x37", "6x40", "6x41", "FWYMILV6x44", "6x48", "STNQ7x45", "STNQK7x49", "7x50", "7x52", "Y7x53", "7x54", "7x55", "8x50", "8x51"];
+
+// Haag et al 2020 https://doi.org/10.1007%2Fs00018-019-03279-y
+// These and M5.46 are conserved in all OR2M, OR2T, OR2V receptors and no others. M5.46 might be a third coordination residue.
+var mtlbs = ["C5.42", "C5.43"];
+
+var tmstrand = ["A"];
 var mcres = [];
 var bw50r = new Array(99).fill(0);
+
+function resno_from_bw(bwnum)
+{
+	var lbw = bwnum.split(".");
+	if (lbw.length < 2) lbw = bwnum.split("x");
+	if (lbw.length < 2) return 0;
+
+	var rgnno = parseInt(lbw[0]);
+	var member = parseInt(lbw[1]);
+
+	if (typeof bw50r[rgnno] == "undefined") return 0;
+	if (!bw50r[rgnno]) return 0;
+
+	return bw50r[rgnno] + member - 50;
+}
+
+function resno_from_letters_and_bw(bwnum)
+{
+	var lbw = bwnum.replace(/[^0-9.x]/g, '');
+	var resno = resno_from_bw(lbw);
+	var mdlidx = getResMdlIdx(resno, tmstrand[0]);
+	if (lbw == bwnum || bwnum.indexOf(sequence[mdlidx]) >= 0) return resno;
+	else return 0;
+}
+
+function get_ligbs_from_orid()
+{
+	if (!orid) return [];
+
+	if (orid.substr(0, 2) == "OR")
+	{
+		var fam = parseInt(orid.substr(2, 2));
+		if (fam >= 50) return ligbs_bw_orI;
+		else return ligbs_bw_orII;
+	}
+
+	else if (orid.substr(0, 4) == "TAAR")
+		return ligbs_bw_taar;
+
+	else return [];
+}
+
+function get_acvbs_from_orid()
+{
+	if (!orid) return [];
+
+	if (orid.substr(0, 2) == "OR")
+	{
+		return acvbs;
+	}
+
+	else if (orid.substr(0, 4) == "TAAR")
+		return acvbs;
+
+	else return [];
+}
+
+function count_metal_bs()
+{
+	var i, j=0, n = mtlbs.length;
+
+	for (i=0; i<n; i++)
+	{
+		if (resno_from_letters_and_bw(mtlbs[i])) j++;
+	}
+
+	return j;
+}
 
 function aa_1let_from_3let(laa3let)
 {
@@ -742,7 +827,7 @@ function strandColorSelection(strandid, colorCode)
 		break;
 
 		default:
-		p.colorScheme = (strandid == tmstrand) ? PODefRgnScheme : POAAScheme;
+		p.colorScheme = (tmstrand.indexOf(strandid) >= 0) ? PODefRgnScheme : POAAScheme;
 		if (typeof tabbtn != "undefined") tabbtn.style.backgroundColor = "#234";
 	}
 
@@ -765,7 +850,7 @@ function show_seqdd()
 {
 	var seqdd = $('#seqdd')[0];
 	seqdd.innerHTML = "<b>Show/Hide Side Chains:</b><br><br>";
-	if (!tmstrand) tmstrand = "A";
+	if (!tmstrand.length) tmstrand = ["A"];
 
 	if (!mdlstrandid.length) mdlstrandid = ["A"];
 	var tabs;
@@ -900,11 +985,11 @@ function show_seqdd()
 			if (typeof restoggled[mdlidx] == "undefined") restoggled[mdlidx] = 0;
 			tgl.className = "clickme nodebtn sctgbtn" + (restoggled[mdlidx] ? " hilite" : "");
 			var rcd = false;
-			if (strandid == tmstrand) rcd = rgn_color_dark(resno, true);
+			if (tmstrand.indexOf(strandid) >= 0) rcd = rgn_color_dark(resno, true);
 			if (rcd) tgl.style.backgroundColor = css_color(rcd);
 
 			var j;
-			if (strandid == tmstrand) for (j=1; j<67; j++) if (bw50r[j] == resno) tgl.className += ' bw50';
+			if (tmstrand.indexOf(strandid) >= 0) for (j=1; j<67; j++) if (bw50r[j] == resno) tgl.className += ' bw50';
 
 			if (mdlidx < 0)
 			{
@@ -1038,7 +1123,7 @@ function show_seqdd()
 	// tgl.innerText = "|";
 	seqdd.appendChild(tgl);
 
-	if (ligbs.length)
+	if (get_ligbs_from_orid().length)
 	{
 		tgl = document.createElement("span");
 		tgl.className = "clickme nodebtn sctgbtn";
@@ -1055,7 +1140,24 @@ function show_seqdd()
 		seqdd.appendChild(tgl);
 	}
 
-	if (mcres.length)
+	if (get_acvbs_from_orid().length)
+	{
+		tgl = document.createElement("span");
+		tgl.className = "clickme nodebtn sctgbtn";
+		tgl.innerText = "Activation";
+		tgl.id = "seqddligbs";
+		tgl.setAttribute("onclick", "event.preventDefault(); showActivationSideChains(); return false;");
+		tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+		seqdd.appendChild(tgl);
+
+		tgl = document.createElement("span");
+		tgl.innerText = "|";
+		seqdd.appendChild(tgl);
+	}
+
+	if (count_metal_bs() == mtlbs.length)
 	{
 		tgl = document.createElement("span");
 		tgl.className = "clickme nodebtn sctgbtn";
@@ -1264,6 +1366,13 @@ function getResMdlIdx(resno, strandid)
 
 function showSideChain(resno, strandid)
 {
+	if (typeof strandid == "object")
+	{
+		var i, n = strandid.length;
+		for (i=0; i<n; i++) showSideChain(resno, strandid[i]);
+		return;
+	}
+
 	try
 	{
 		if (typeof strandid == "undefined") strandid = "A";
@@ -1413,21 +1522,56 @@ function showSideChainsByType(show_type)
 
 function showLigandSideChains()
 {
-	var i;
-	for (i=0; i<ligbs.length; i++)
+	var i, j;
+	var lligbs = get_ligbs_from_orid();
+
+	var n = lligbs.length;
+	if (!n) return;
+
+	for (i=0; i<n; i++)
 	{
-		if (!gmvisible[getResStrandIdx(i)]) continue;
-		showSideChain(ligbs[i], tmstrand);
+		var resno = resno_from_letters_and_bw(lligbs[i]);
+		if (!resno) continue;
+		for (j=0; j<tmstrand.length; j++)
+		{
+			var mdlidx = getStrandIdxFromID(tmstrand[j]);
+			if (gmvisible[mdlidx]) showSideChain(resno, tmstrand[j]);
+		}
+	}
+}
+
+function showActivationSideChains()
+{
+	var i, j;
+	var lligbs = get_acvbs_from_orid();
+
+	var n = lligbs.length;
+	if (!n) return;
+
+	for (i=0; i<n; i++)
+	{
+		var resno = resno_from_letters_and_bw(lligbs[i]);
+		if (!resno) continue;
+		for (j=0; j<tmstrand.length; j++)
+		{
+			var mdlidx = getStrandIdxFromID(tmstrand[j]);
+			if (gmvisible[mdlidx]) showSideChain(resno, tmstrand[j]);
+		}
 	}
 }
 
 function showMetalSideChains()
 {
 	var i;
-	for (i=0; i<mcres.length; i++)
+	for (i=0; i<mtlbs.length; i++)
 	{
-		if (!gmvisible[getResStrandIdx(i)]) continue;
-		showSideChain(mcres[i], tmstrand);
+		var resno = resno_from_letters_and_bw(mtlbs[i]);
+		if (!resno) continue;
+		for (j=0; j<tmstrand.length; j++)
+		{
+			var mdlidx = getStrandIdxFromID(tmstrand[j]);
+			if (gmvisible[mdlidx]) showSideChain(resno, tmstrand[j]);
+		}
 	}
 }
 
@@ -2582,12 +2726,15 @@ function loadFile(fileData, fileName = "")
 					var ligtmp = "";
 					var strandid = "A";
 					var last_strandid = "";
+					var strand_has_tms = false;
                     for (i=0; i<lines.length; i++)
                     {
                         var ln = lines[i];
 
                         if (ln.substr(0, 6) == "HETATM" || ln.substr(17,3) == "LIG")
                             ligtmp += ln + "\n";
+
+						if (ln.substr(0, 3) == 'TER') strand_has_tms = false;
 
 						if (ln.substr(0, 6) == 'REMARK')
 						{
@@ -2597,7 +2744,8 @@ function loadFile(fileData, fileName = "")
 								var tmrno = parseInt(pieces[3].substr(-1));
 								tmstart[tmrno] = parseInt(pieces[4]);
 								tmend[tmrno] = parseInt(pieces[5]);
-								tmstrand = "";			// Force reassignment later on.
+								strand_has_tms = true;
+								// tmstrand = [];			// Force reassignment later on.
 							}
 							else if (pieces[3] == "LIGAND_BINDING")
 							{
@@ -2622,7 +2770,7 @@ function loadFile(fileData, fileName = "")
 							strandid = ln.substr(21,1).trim();
 							if (!strandid) strandid = "A";
 							var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
-							if (!tmstrand && tmstart[6]) tmstrand = strandid;
+							if (/* !tmstrand.length && */ strand_has_tms && tmstart[6] && (tmstrand.indexOf(strandid) < 0) ) tmstrand.push(strandid);
 
 							if (lres != resno)
 							{
@@ -2705,7 +2853,7 @@ function loadFile(fileData, fileName = "")
 					$('#posey')[0].innerText = fileData.split("\n")[0];
 					enable_spacefill();
             	}
-                
+
 				var fileStrands = fileData.split("\nTER");
 				fileStrands.forEach(function(strandData)
                 {
@@ -2739,7 +2887,7 @@ function loadFile(fileData, fileName = "")
 							var rp =
 							{
 								opacity: opc_cartoon,
-								colorScheme: tmstrand == comp.name ? PODefRgnScheme : POAAScheme,
+								colorScheme: (tmstrand.indexOf(comp.name) >= 0) ? PODefRgnScheme : POAAScheme,
 								// colorScale: 'rainbow',
 								metalness: mtl_cartoon,
 							};

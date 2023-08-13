@@ -91,6 +91,7 @@ bool progressbar = false;
 int movie_offset = 0;
 char configfname[256];
 char protfname[256];
+char protstrand = '\0';
 char protafname[256];
 char tplfname[256];
 char tplrfnam[256];
@@ -1254,6 +1255,13 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "PROT"))
     {
         strcpy(protfname, words[1]);
+        char* c = strchr(protfname, ':');
+        if (c)
+        {
+            *c = 0;
+            protstrand = *(++c);
+        }
+        else protstrand = 0;
         protset = true;
         // optsecho = "Protein file is " + (std::string)protfname;
         return 1;
@@ -2096,7 +2104,7 @@ int main(int argc, char** argv)
         cout << "Error trying to read " << protfname << endl;
         return 0xbadf12e;
     }
-    protein->load_pdb(pf);
+    protein->load_pdb(pf, 0, protstrand ?: 'A');
     protein->soft_biases = soft_biases;
     apply_protein_specific_settings(protein);
     fclose(pf);
@@ -2603,7 +2611,7 @@ _try_again:
         else
         {
             pf = fopen(protfname, "r");
-            protein->load_pdb(pf);
+            protein->load_pdb(pf, 0, protstrand ?: 'A');
             fclose(pf);
             protein->soft_biases = soft_biases;
             apply_protein_specific_settings(protein);
@@ -3423,7 +3431,7 @@ _try_again:
                 std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
                 global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
                 ligand->recenter(ligcen_target);
-                GroupPair::align_groups(ligand, global_pairs);
+                if (flex) GroupPair::align_groups(ligand, global_pairs);
 
                 #if _dbg_groupsel
                 cout << endl;
@@ -3844,23 +3852,16 @@ _try_again:
                 }
             }
 
-            if (flex)
+
+            for (j=0; j<sphres; j++)
             {
-                #if false && flexion_selection
-                for (j=0; j<flexible_resnos.size(); j++)
-                {
-                    cfmols[i++] = protein->get_residue(flexible_resnos[j]);
-                }
-                #else
-                for (j=0; j<sphres; j++)
-                {
-                    #if ! flexion_selection
-                    if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
-                    #endif
-                    cfmols[i++] = reaches_spheroid[nodeno][j];
-                }
+                #if ! flexion_selection
+                if (reaches_spheroid[nodeno][j]->movability >= MOV_FLEXONLY) reaches_spheroid[nodeno][j]->movability = MOV_FLEXONLY;
                 #endif
+                if (!flex) reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
+                cfmols[i++] = reaches_spheroid[nodeno][j];
             }
+
             int cfmolqty = i;
             for (; i<SPHREACH_MAX; i++) cfmols[i] = NULL;
 
@@ -3905,6 +3906,10 @@ _try_again:
             freeze_bridged_residues();
 
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
+            if (!flex) for (j=0; j<sphres; j++)
+            {
+                reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
+            }
             ligand->agroups = global_pairs;
             Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform);
 

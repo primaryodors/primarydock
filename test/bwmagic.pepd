@@ -1,0 +1,20 @@
+
+STRAND K
+LOAD pdbs/OR5/OR5K1.upright.pdb
+
+ECHO %1.50
+ECHO %2.50
+ECHO @6.48
+
+STRAND T
+LOAD pdbs/OR2/OR2T11.upright.pdb
+
+ECHO %1.50
+ECHO @2.50
+ECHO %6.48
+
+ECHO %K.6.48
+ECHO @T.45.53
+
+ECHO $PROTEINK " has " $K.3.46 $K.3.47 $K.3.48 $K.3.49 $K.3.50 $K.3.51 $K.3.52 $K.3.53 $K.3.54 $K.3.55
+ECHO $PROTEINT " has "  $3.46 $3.47 $3.48 $3.49 $3.50 $3.51 $3.52 $3.53 $3.54 $3.55

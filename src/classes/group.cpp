@@ -14,6 +14,11 @@ void ResiduePlaceholder::resolve_resno(Protein* prot)
 {
     int hxno = atoi(bw.c_str());
     const char* dot = strchr(bw.c_str(), '.');
+    if (!dot)
+    {
+        resno = atoi(bw.c_str());
+        return;
+    }
     int bwpos = atoi(dot+1);
     resno = prot->get_bw50(hxno) + bwpos - 50;
 }
@@ -467,6 +472,8 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             Atom* b = mol->get_atom(j);
             if (!b) continue;
 
+            // if (g->get_ionic() && !b->get_charge() && !b->is_polar() && !b->is_pi()) continue;
+
             float r = fmax(0, g->get_center().get_3d_distance(b->get_location()) - 1.5);
             if (r > 2.5 && !a->shares_bonded_with(b))
             {
@@ -484,7 +491,6 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
             // In general, aliphatics and nonpolar aromatics can be regarded as high similarity, since they tend to
             // be mutually highly soluble in one another. But for grouping of ligand atoms, it is important to
-
             if (simil >= 0.5)
             {
                 if (aliphatic < 3 || b->get_Z() == 1)

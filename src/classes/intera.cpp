@@ -1100,7 +1100,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             avdW *= f;
             bvdW *= f;
             rbind = forces[i]->distance;
-            if (forces[i]->distance < (l_heavy_atom_mindist-1)) l_heavy_atom_mindist = forces[i]->distance + 1;
         }
 
         #if _peratom_audit

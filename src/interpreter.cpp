@@ -277,6 +277,62 @@ int set_variable(const char* vname, const Star vvalue)
     return n;
 }
 
+int interpret_special_resno(const char* varname, char* strandid = nullptr)
+{
+    int rgno, member;
+    Protein* p = working;
+
+    if ( varname[0] >= '0' && varname[0] <= '9'
+        && ( varname[1] == '.' || varname[1] == 'x' )
+        && varname[2] >= '0' && varname[2] <= '9'
+        )
+    {
+        rgno = varname[0] - '0';
+        member = atoi(varname+2);
+        if (strandid) *strandid = g_chain;
+    }
+    else if ( varname[0] >= '0' && varname[0] <= '9'
+        && varname[1] == varname[0] + 1
+        && ( varname[2] == '.' || varname[2] == 'x' )
+        && varname[3] >= '0' && varname[3] <= '9'
+        )
+    {
+        rgno = 10*(varname[0] - '0') + (varname[1] - '0');
+        member = atoi(varname+3);
+        if (strandid) *strandid = g_chain;
+    }
+    else if ( varname[0] >= 'A' && varname[0] <= 'Z'
+        && varname[1] == '.'
+        && varname[2] >= '0' && varname[2] <= '9'
+        && ( varname[3] == '.' || varname[3] == 'x' )
+        && varname[4] >= '0' && varname[4] <= '9'
+        )
+    {
+        p = strands[varname[0] - 'A'];
+        rgno = varname[2] - '0';
+        member = atoi(varname+4);
+        if (strandid) *strandid = varname[0];
+    }
+    else if ( varname[0] >= 'A' && varname[0] <= 'Z'
+        && varname[1] == '.'
+        && varname[2] >= '0' && varname[2] <= '9'
+        && varname[3] == varname[2] + 1
+        && ( varname[4] == '.' || varname[4] == 'x' )
+        && varname[5] >= '0' && varname[5] <= '9'
+        )
+    {
+        p = strands[varname[0] - 'A'];
+        rgno = 10*(varname[2] - '0') + (varname[3] - '0');
+        member = atoi(varname+5);
+        if (strandid) *strandid = varname[0];
+    }
+    else return 0;
+
+    int bw50 = p->get_bw50(rgno);
+    if (!bw50) return 0;
+    else return max(0, bw50 + member - 50);
+}
+
 Point interpret_Cartesian_literal(const char* param)
 {
     char const* next;
@@ -373,6 +429,11 @@ float interpret_single_float(const char* param)
 
 int interpret_single_int(const char* param)
 {
+    if (param[0] == '%')
+    {
+        int resno = interpret_special_resno(param+1);
+        if (resno) return resno;
+    }
     return round(interpret_single_float(param));
 }
 
@@ -381,6 +442,13 @@ Point interpret_single_point(const char* param, Point old_value = Point(0,0,0))
     int n;
     Point pt = old_value;
     AminoAcid* aa;
+
+    if (param[0] == '@')
+    {
+        char lchain = g_chain;
+        int resno = interpret_special_resno(param+1, &lchain);
+        if (resno) return strands[lchain - 'A']->get_residue(resno)->get_CA_location();
+    }
 
     if (param[0] >= '0' && param[0] <= '9')
     {
@@ -458,36 +526,37 @@ char* interpret_single_string(const char* param)
     int n;
     char* buffer = new char[65536];
     for (n=0; n<65536; n++) buffer[n] = 0;
+    char lchain = g_chain;
+    int resno;
 
     switch (param[0])
     {
     case '%':
-        n = find_var_index(param);
-        if (n<0) return buffer;
-        n &= _VARNUM_MASK;
-        sprintf(buffer, "%lld", script_var[n].value.n);
+        sprintf(buffer, "%d", interpret_single_int(param));
         return buffer;
 
     case '&':
-        n = find_var_index(param);
-        if (n<0) return buffer;
-        n &= _VARNUM_MASK;
-        sprintf(buffer, "%f", script_var[n].value.f);
+        sprintf(buffer, "%f", interpret_single_float(param));
         return buffer;
 
     case '@':
         n = find_var_index(param);
-        if (n<0) return buffer;
-        if (n &  _HAS_DOT)
+        if (n >= 0 &  _HAS_DOT)
         {
             sprintf(buffer, "%f", interpret_single_float(param));
             return buffer;
         }
-        n &= _VARNUM_MASK;
-        strcpy(buffer, script_var[n].value.ppt->printable().c_str());
+        sprintf(buffer, "%s", interpret_single_point(param).printable().c_str());
         return buffer;
 
     case '$':
+        resno = interpret_special_resno(param+1, &lchain);
+        if (resno)
+        {
+            sprintf(buffer, "%c", strands[lchain - 'A']->get_residue(resno)->get_letter());
+            return buffer;
+        }
+
         n = find_var_index(param);
         if (n<0) return buffer;
         if (n &  _HAS_DOT)
@@ -1914,6 +1983,7 @@ int main(int argc, char** argv)
                 }
                 l = working->load_pdb(pf, n, chain);
                 if (!l) raise_error("No residues loaded.");
+                working->set_name_from_pdb_name(words[1]);
 
                 fclose(pf);
 

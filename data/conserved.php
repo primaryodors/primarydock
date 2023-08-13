@@ -140,6 +140,7 @@ foreach (["ttpd", "fish", "taar", "vn1r"] as $k => $var)
     for ($i=0; $i<$n; $i++)
     {
         $c = array_keys($$var)[$i];
+        if (!$c) continue;
 
         foreach ($colors as $kc => $esc) if (false !== strpos($kc, $c)) echo $esc;
 

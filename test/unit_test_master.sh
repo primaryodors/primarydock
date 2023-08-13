@@ -49,7 +49,7 @@ else
 fi
 
 
-bin/primarydock test/testTAAR8.config --colorless --pose 5 --iter 50 --congress > test/received/TAAR8_CAD.txt
+bin/primarydock test/testTAAR8.config --colorless --iter 50 --congress > test/received/TAAR8_CAD.txt
 TAAR_RESULT=$?
 if [ "$TAAR_RESULT" -eq "0" ]; then
     POSES=$( cat test/received/TAAR8_CAD.txt | grep "pose(s) found" )

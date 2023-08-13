@@ -5,6 +5,7 @@
 #define _MOLECULE
 
 #include <vector>
+#include <memory>
 
 struct SMILES_Parenthetical
 {
@@ -50,6 +51,7 @@ enum MoleculeType
 };
 
 class GroupPair;
+class AtomGroup;
 
 class Pose
 {
@@ -218,6 +220,8 @@ public:
     int springy_bondct = 0;
     bool been_flexed = false;
     bool priority = false;
+    std::vector<std::shared_ptr<GroupPair>> agroups;
+    void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr;
 
 protected:
     Molecule();

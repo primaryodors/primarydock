@@ -3001,6 +3001,12 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
 
                         bb[q]->rotate(theta, false);
+
+                        if (a->agroups.size() && a->group_realign)
+                        {
+                            a->group_realign(a, a->agroups);
+                        }
+
                         tryenerg = cfmol_multibind(a, nearby);
 
                         if (tryenerg > benerg)

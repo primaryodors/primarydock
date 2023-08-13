@@ -3905,6 +3905,8 @@ _try_again:
             freeze_bridged_residues();
 
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
+            ligand->agroups = global_pairs;
+            ligand->group_realign = &GroupPair::align_groups;
             Molecule::conform_molecules(cfmols, iters, &iteration_callback);
 
             if (!nodeno && outpdb.length())

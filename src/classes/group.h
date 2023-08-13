@@ -36,6 +36,8 @@ class AtomGroup
     float get_sum();
     float get_avg_elecn();
     int contains_element(const char* esym);
+    bool contains_atom(Atom* a);
+    void remove_atom(Atom* a);
     float distance_to(Point pt);
     float bounds();
     float compatibility(AminoAcid* aa);

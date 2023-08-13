@@ -984,7 +984,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     GroupPair::align_groups(lig, gp, true);
 }
 
-void GroupPair::align_groups_noconfig(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)
+void GroupPair::align_groups_noconform(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)
 {
     GroupPair::align_groups(lig, gp, false);
 }

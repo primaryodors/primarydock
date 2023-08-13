@@ -83,10 +83,10 @@ when they definitely should not. We recommend using the --undef-value-errors=no 
 utility of choice.
 
 
-# Web Application
+# Web Application (optional)
 
-You may now host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It is the same web application
-as is used for the Primary Odors website.
+You may now host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It is the same web
+application that is used for the Primary Odors website.
 
 ![Web app screenshot](www/assets/webapp.png?raw=true "Web App")
 

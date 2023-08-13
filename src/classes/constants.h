@@ -200,7 +200,7 @@
 #define sidechain_fullrot_lig_bmult 3
 
 // Extra weight given to sidechain-ligand binding strengths during conformer search.
-#define dock_ligand_bias 3.0
+#define dock_ligand_bias 0.5
 
 // Turns off the 360 degree rotations for all but the zeroth node of a path.
 #define nodes_no_ligand_360_tumble 1

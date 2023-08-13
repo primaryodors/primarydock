@@ -472,7 +472,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             Atom* b = mol->get_atom(j);
             if (!b) continue;
 
-            if (g->get_ionic() && !b->get_charge() && !b->is_polar() && !b->is_pi()) continue;
+            // if (g->get_ionic() && !b->get_charge() && !b->is_polar() && !b->is_pi()) continue;
 
             float r = fmax(0, g->get_center().get_3d_distance(b->get_location()) - 1.5);
             if (r > 2.5 && !a->shares_bonded_with(b))

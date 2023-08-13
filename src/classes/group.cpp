@@ -981,6 +981,16 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
 
 void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)
 {
+    GroupPair::align_groups(lig, gp, true);
+}
+
+void GroupPair::align_groups_noconform(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)
+{
+    GroupPair::align_groups(lig, gp, false);
+}
+
+void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp, bool do_conforms)
+{
     int n = gp.size();
 
     if (n < 1) return;
@@ -1004,7 +1014,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         lig->move(rel);
     }
 
-    gp[0]->scg->conform_to(lig);
+    if (do_conforms) gp[0]->scg->conform_to(lig);
 
     if (n < 2) return;
     rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
@@ -1015,7 +1025,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #endif
     lig->rotate(lv, rot.a);
 
-    gp[1]->scg->conform_to(lig);
+    if (do_conforms) gp[1]->scg->conform_to(lig);
 
     if (n < 3) return;
     Point zcen = gp[0]->ag->get_center();
@@ -1028,6 +1038,6 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #endif
     lig->rotate(lv, theta);
 
-    gp[2]->scg->conform_to(lig);
+    if (do_conforms) gp[2]->scg->conform_to(lig);
 }
 

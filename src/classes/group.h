@@ -79,7 +79,9 @@ class GroupPair
     bool is_priority() { return priority; }
 
     static std::vector<std::shared_ptr<GroupPair>> pair_groups(std::vector<std::shared_ptr<AtomGroup>> agroups, std::vector<std::shared_ptr<ResidueGroup>> scgroups, Point pocketcen);
-    static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);    // Assumes the ligand is already centered in the pocket.
+    static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);
+    static void align_groups_noconform(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);
+    static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs, bool do_conforms);    // Assumes the ligand is already centered in the pocket.
 
     protected:
     float potential = 0;

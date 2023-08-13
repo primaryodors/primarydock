@@ -3910,7 +3910,8 @@ _try_again:
             {
                 reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
             }
-            Molecule::conform_molecules(cfmols, iters, &iteration_callback);
+            ligand->agroups = global_pairs;
+            Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform);
 
             if (!nodeno && outpdb.length())
             {

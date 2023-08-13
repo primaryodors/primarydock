@@ -197,8 +197,8 @@ window.setTimeout( function()
     <th>Receptor</th>
     <th>log10 ec<sub>50</sub></th>
     <th>Adj. Top</th>
-    <th>Antag.?</th>
-    <th>Hypoth.</th>
+    <th>Antagonist?</th>
+    <th>Hypothesized</th>
     <th>Associated Perceptual Qualities</th>
 </tr>
 

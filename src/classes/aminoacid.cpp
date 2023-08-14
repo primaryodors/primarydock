@@ -38,8 +38,8 @@ void AminoAcid::find_his_flips()
 
                     if (h)
                     {
-                        hisflips = new histidine_flip*[4];
-                        hisflips[0] = new histidine_flip;
+                        hisflips = new HistidineFlip*[4];
+                        hisflips[0] = new HistidineFlip;
                         hisflips[0]->C  = atoms[i];
                         hisflips[0]->N1 = a;
                         hisflips[0]->N2 = b;
@@ -590,6 +590,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                     if (!strcmp(bb[j]->atom->name, "OH") && !strcmp(bb[j]->btom->name, "CZ"))
                     {
                         aabd[n]->can_rotate = false;
+                        aabd[n]->can_flip = true;
                     }
                     
                     aabd[n]->can_rotate =
@@ -1218,10 +1219,10 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                     {
                                         Bond* b = a->get_bond_between(btom);
                                         if (b) b->can_rotate = false;
-                                        if (b) b->can_flip = aab->can_flip;
+                                        // if (b) b->can_flip = aab->can_flip;
                                         b = btom->get_bond_between(a);
                                         if (b) b->can_rotate = false;
-                                        if (b) b->can_flip = aab->can_flip;
+                                        // if (b) b->can_flip = aab->can_flip;
                                     }
                                 }
                             }

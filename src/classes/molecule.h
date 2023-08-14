@@ -13,7 +13,7 @@ struct SMILES_Parenthetical
     char* smilesstr=0;
 };
 
-struct histidine_flip
+struct HistidineFlip
 {
     Atom* H;
     Atom* C;
@@ -145,7 +145,7 @@ public:
     Bond** get_all_bonds(bool unidirectional);
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
     bool rotate_bond(const Bond* rot8b, const float angle);
-    void do_histidine_flip(histidine_flip* hf);
+    void do_histidine_flip(HistidineFlip* hf);
 
     // Ring functions.
     int identify_rings();
@@ -215,7 +215,7 @@ public:
     float lastbind = 0;
     float lastbind_history[10];
     float lastshielded = 0;
-    histidine_flip** hisflips = nullptr;
+    HistidineFlip** hisflips = nullptr;
     Bond* springy_bonds = nullptr;
     int springy_bondct = 0;
     bool been_flexed = false;

@@ -1706,9 +1706,17 @@ Bond** AminoAcid::get_rotatable_bonds()
         for (i=0; aadef->aabonds[i] && aadef->aabonds[i]->Za && aadef->aabonds[i]->Zb; i++)
         {
             // cout << (name ? name : "(no name)") << "." << *(aadef->aabonds[i]) << endl;
-            if (aadef->aabonds[i]->cardinality == 1
-                    &&
-                    (aadef->aabonds[i]->can_rotate || aadef->aabonds[i]->can_flip)
+            if (    (
+                        aadef->aabonds[i]->cardinality == 1
+                        &&
+                        (aadef->aabonds[i]->can_rotate || aadef->aabonds[i]->can_flip)
+                    )
+                    ||
+                    (
+                        (aadef->aabonds[i]->cardinality < 2 && aadef->aabonds[i]->Za == 6 && aadef->aabonds[i]->Zb == 8)
+                        ||
+                        (aadef->aabonds[i]->cardinality < 2 && aadef->aabonds[i]->Za == 8 && aadef->aabonds[i]->Zb == 6)
+                    )
                )
             {
                 Atom* la = get_atom(aadef->aabonds[i]->aname);
@@ -1754,7 +1762,11 @@ Bond** AminoAcid::get_rotatable_bonds()
                         // cout << (name ? name : "(no name)") << ":" << *(lb) << endl;
                         // Generally, a single bond between pi atoms cannot rotate.
                         if (lb->atom->is_pi() && lb->btom && lb->btom->is_pi())
-                            aadef->aabonds[i]->can_rotate = false;
+                        {
+                            lb->can_rotate = false;
+                            lb->can_flip = true;
+                            lb->flip_angle = M_PI;
+                        }
 
                         lb->can_rotate = aadef->aabonds[i]->can_rotate;
 
@@ -2539,7 +2551,7 @@ void Molecule::minimize_internal_clashes()
     // cout << " base internal clashes: " << base_internal_clashes << endl;
 }
 
-void Molecule::do_histidine_flip(histidine_flip* hf)
+void Molecule::do_histidine_flip(HistidineFlip* hf)
 {
     Point ptC  = hf->C->get_location();
     Point ptN1 = hf->N1->get_location();
@@ -2999,6 +3011,12 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         else if (bb[q]->count_heavy_moves_with_atom() < bb[q]->count_heavy_moves_with_btom())
                             theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
                         else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
+
+                        if (!bb[q]->can_rotate)
+                        {
+                            bb[q]->can_flip = true;
+                            if (!bb[q]->flip_angle) bb[q]->flip_angle = M_PI;
+                        }
 
                         bb[q]->rotate(theta, false);
 

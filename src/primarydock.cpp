@@ -1478,6 +1478,31 @@ void freeze_bridged_residues()
             }
         }
     }
+
+    if (forced_static_resnos.size())
+    {
+        for (i=0; i<forced_static_resnos.size(); i++)
+        {
+            forced_static_resnos[i].resolve_resno(protein);
+            int resno = forced_static_resnos[i].resno;
+            if (!resno) continue;
+            
+            AminoAcid *aa = protein->get_residue(resno);
+            if (!aa) continue;
+
+            aa->movability = MOV_PINNED;
+            aa->been_flexed = true;
+            Bond** bb = aa->get_rotatable_bonds();
+            if (bb)
+            {
+                for (l=0; bb[l]; l++)
+                {
+                    bb[l]->can_rotate = false;
+                }
+                delete bb;
+            }
+        }
+    }
 }
 
 void prepare_initb()

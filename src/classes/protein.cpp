@@ -3518,8 +3518,8 @@ void Protein::bridge(int resno1, int resno2)
 
     delete mols;
 
-    aa1->movability = MOV_FLXDESEL;
-    aa2->movability = MOV_FLXDESEL;
+    aa1->movability = MOV_PINNED;
+    aa2->movability = MOV_PINNED;
 
     _INTERA_R_CUTOFF = _DEFAULT_INTERA_R_CUTOFF;
 }

@@ -193,7 +193,7 @@ function all_empirical_pairs_for_receptor($protein, $return_1dim = false)
 			{
 				if (!isset($array[$oid]))
 				{
-					if ($acv[$protein]['type'] == 'na') $acv[$protein]['adjusted_curve_top'] = 0;
+					if (@$acv[$protein]['type'] == 'na') $acv[$protein]['adjusted_curve_top'] = 0;
 					$array[$oid] = $acv[$protein];
 					if (isset($array[$oid]['adjusted_curve_top'])) $array[$oid]['top_ref'] = $ref;
 					if (isset($array[$oid]['ec50'])) $array[$oid]['ec50_ref'] = $ref;

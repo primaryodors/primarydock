@@ -1705,11 +1705,6 @@ Bond** AminoAcid::get_rotatable_bonds()
     {
         for (i=0; aadef->aabonds[i] && aadef->aabonds[i]->Za && aadef->aabonds[i]->Zb; i++)
         {
-            if (aadef->_1let == 'Y' && !strcmp(aadef->aabonds[i]->aname, "OH") )
-            {
-                j = 0;
-            }
-
             // cout << (name ? name : "(no name)") << "." << *(aadef->aabonds[i]) << endl;
             if (    (
                         aadef->aabonds[i]->cardinality == 1

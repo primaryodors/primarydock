@@ -178,7 +178,7 @@ function has_antagonists($protein)
 	return false;
 }
 
-function all_empirical_pairs_for_receptor($protein, $return_1dim = false)
+function all_empirical_pairs_for_receptor($protein, $return_1dim = false, $agonists_only = false)
 {
 	global $odors;
 
@@ -191,6 +191,12 @@ function all_empirical_pairs_for_receptor($protein, $return_1dim = false)
 		{
 			if (isset($acv[$protein]))
 			{
+				if ($agonists_only)
+				{
+					if (isset($acv[$protein]['adjusted_curve_top']) && @$acv[$protein]['adjusted_curve_top'] <= 0) continue;
+					if (@$acv[$protein]['type'] == "na" || @$acv[$protein]['type'] == "ia") continue;
+				}
+
 				if (!isset($array[$oid]))
 				{
 					if (@$acv[$protein]['type'] == 'na') $acv[$protein]['adjusted_curve_top'] = 0;

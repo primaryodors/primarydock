@@ -23,6 +23,8 @@ $orphan = "\033[2m\033[3m";
 $deorphan = ""; // "\033[1m";
 $reset = "\033[22m\033[23m\033[24m";
 
+echo "Legend: {$deorphan}Deorphaned receptor$reset {$orphan}Orphan receptor$reset\n\n";
+
 foreach (@$argv as $a)
 {
 	$a = explode('=',$a,2);
@@ -115,7 +117,7 @@ foreach ($lines as $ln)
         else $$var[$c]++;
 
         $varhas = $var."_has";
-        $ligands = count(all_empirical_pairs_for_receptor($orid, true));
+        $ligands = count(all_empirical_pairs_for_receptor($orid, true, true));
         if ($ligands) $$varhas[$c][] = "$deorphan$orid$reset";
         else $$varhas[$c][] = "$orphan$orid$reset";
     }

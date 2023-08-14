@@ -4,6 +4,7 @@ chdir(__DIR__);
 chdir("..");
 
 require("predict/statistics.php");
+require("data/odorutils.php");
 
 $colors =
 [
@@ -17,6 +18,12 @@ $colors =
     "H" => "\033[38;5;99m",
     "FWY" => "\033[38;5;171m"
 ];
+
+$orphan = "\033[2m\033[3m";
+$deorphan = ""; // "\033[1m";
+$reset = "\033[22m\033[23m\033[24m";
+
+echo "Legend: {$deorphan}Deorphaned receptor$reset {$orphan}Orphan receptor$reset\n\n";
 
 foreach (@$argv as $a)
 {
@@ -110,7 +117,9 @@ foreach ($lines as $ln)
         else $$var[$c]++;
 
         $varhas = $var."_has";
-        $$varhas[$c][] = $orid;
+        $ligands = count(all_empirical_pairs_for_receptor($orid, true, true));
+        if ($ligands) $$varhas[$c][] = "$deorphan$orid$reset";
+        else $$varhas[$c][] = "$orphan$orid$reset";
     }
 }
 

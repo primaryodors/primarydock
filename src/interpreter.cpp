@@ -1133,6 +1133,42 @@ int main(int argc, char** argv)
                 set_variable(outvar, s);
             }   // CTNRG
 
+            else if (!strcmp(words[0], "MOC"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters given for MOC.");
+                int resno1 = interpret_single_int(words[1]);
+                if (!words[2]) raise_error("Insufficient parameters given for MOC.");
+                int resno2 = interpret_single_int(words[2]);
+                if (!words[3]) raise_error("Insufficient parameters given for MOC.");
+                char* outvar = words[3];
+
+                Star s;
+                s.n = 0;
+
+                AminoAcid *aa1 = working->get_residue(resno1), *aa2 = working->get_residue(resno2);
+                if (!aa1 || !aa2)
+                {
+                    set_variable(outvar, s);
+                    continue;
+                }
+                SCoord optimize = aa1->motion_to_optimal_contact(aa2);
+
+                switch(outvar[0])
+                {
+                    case '@':
+                    s.ppt = new Point(optimize);
+                    break;
+
+                    case '&':
+                    s.f = optimize.r;
+                    break;
+
+                    default:
+                    raise_error("Ouput variable must be either Cartesian or float.");
+                }
+                set_variable(outvar, s);
+            }   // MOC
+
             else if (!strcmp(words[0], "DELETE"))
             {
                 if (!words[1]) raise_error("Insufficient parameters given for DELETE.");

@@ -280,7 +280,23 @@ foreach (array_keys($sorted) as $rcpid)
 
     if (@$agonist[$rcpid])
     {
-        if (@$prots[$rcpid]['hypothesized']) echo "<td style=\"white-space: nowrap;\">{$prots[$rcpid]['hypothesized']}</td>\n";
+        if (@$prots[$rcpid]['hypothesized'])
+        {
+            if (@$prots[$rcpid]['hypoth_ref'])
+            {
+                $idx = array_search($prots[$rcpid]['hypoth_ref'], $lrefs);
+                if (false===$idx)
+                {
+                    $lrefs[] = $prots[$rcpid]['hypoth_ref'];
+                    $idx = count($lrefs)-1;
+                }
+                echo "<td style=\"white-space: nowrap;\">{$prots[$rcpid]['hypothesized']}";
+                $refno = $idx + 1;
+                echo "<sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup><br>";
+                echo "</td>\n";
+            }
+            else echo "<td style=\"white-space: nowrap;\">{$prots[$rcpid]['hypothesized']}</td>\n";
+        }
         else echo "<td>&nbsp;</td>\n";
 
         $notes = substr(get_notes_for_receptor($rcpid, $correlations), 0, 123);
@@ -319,6 +335,10 @@ foreach ($lrefs as $idx => $refurl)
     echo "</p></a>\n";
 }
 ?>
+<p>References for aroma perceptual qualities should not be taken to indicate that the authors of outside studies necessarily
+assigned aroma notes to the neurons that receive input from any given receptor.
+Rather, the findings of outside studies often constitute the information on which we base our own perceptual quality assignments.
+</p>
 </div>
 </div>
 </div>

@@ -4,6 +4,11 @@
         "short_name": "(own research)",
         "citation": "PrimaryOdors.org"
     },
+    "http:\/\/www.primaryodors.org/differentials.php":
+    {
+        "short_name": "(own research)",
+        "citation": "PrimaryOdors.org differential experiment."
+    },
     "https:\/\/doi.org\/10.3389\/fonc.2018.00162":
     {
         "short_name": "Abaffy et al (2018)",

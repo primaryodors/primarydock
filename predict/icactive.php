@@ -91,7 +91,7 @@ foreach ($active_pairs as $pairid => $pair)
 $get_bw50_resnos = "";
 for ($i=1; $i<=7; $i++) $get_bw50_resnos .= "ECHO \"$i: \" %$i.50\n";
 
-$gpcr_contacts_a = [ "3x40-6x48", "5x51-6x44", "5x55-6x41", "3x43-7x49", "3x43-7x53", "5x58-6x40", "5x58-7x53", "3x46-7x53", "1x53-7x54", "5x62-6x37", "3x50-7x53" ];
+$gpcr_contacts_a = [ "45x51-6x55", "3x40-6x48", "5x51-6x44", "5x55-6x41", "3x43-7x49", "3x43-7x53", "5x58-6x40", "5x58-7x53", "3x46-7x53", "1x53-7x54", "5x62-6x37", "3x50-7x53" ];
 $gpcr_contacts_i = [ "3x43-6x40", "3x43-6x41", "6x40-7x49", "3x46-6x37", "1x53-7x53", "7x53-8x50", "7x54-8x51", "3x50-6x37" ];
 
 $measure_contacts = "";

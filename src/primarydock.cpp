@@ -108,6 +108,7 @@ std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
 std::vector<std::string> dyn_motion_strings;
+float dynamic_minimum = 0;
 DynamicMotion* dyn_motions[64];
 int num_dyn_motions = 0;
 
@@ -1344,6 +1345,10 @@ int interpret_config_line(char** words)
     {
         dyn_motion_strings.push_back(origbuff);
     }
+    else if (!strcmp(words[0], "DYNMIN"))
+    {
+        dynamic_minimum = atof(words[1]);
+    }
     else if (!strcmp(words[0], "HARD"))
     {
         soft_pocket = false;
@@ -1961,6 +1966,8 @@ void apply_protein_specific_settings(Protein* p)
         if (dyn_motions[i]) delete dyn_motions[i];
         dyn_motions[i] = new DynamicMotion(p);
         dyn_motions[i]->read_config_line(dyn_motion_strings[i].c_str(), dyn_motions);
+        dyn_motions[i]->minimum = dynamic_minimum;
+        dyn_motions[i]->apply_absolute(dynamic_minimum);
     }
     num_dyn_motions = i;
     dyn_motions[i] = nullptr;

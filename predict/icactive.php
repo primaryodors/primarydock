@@ -22,6 +22,15 @@ function residues_compatible($aa1, $aa2)
     return false;
 }
 
+function get_distance($xyz1, $xyz2)
+{
+    return sqrt(
+        pow($xyz1["x"]-$xyz2["x"], 2)
+        + pow($xyz1["y"]-$xyz2["y"], 2)
+        + pow($xyz1["z"]-$xyz2["z"], 2)
+    );
+}
+
 // Note this script is unfinished.
 
 $rcpid = @$argv[1] or die("Usage: php -f predict/icactive.php receptor_id\n");
@@ -281,7 +290,7 @@ print_r($contacts_broken_bw);*/
 
 // Check residues of $rcpid and list which made/broken contacts are compatible.
 $working_pdbfn = filename_protid($rcpid);
-$bw_lookup = ["ECHO \"6.59|\" \$R.6.59 %R.6.59 \"|\" @R.6.59 \"|\" \$A.6.59"];
+$bw_lookup_residue = ["6.28", "6.59", "5.33", "5.68", "7.48"];
 foreach (array_merge($contacts_made_bw, $contacts_broken_bw) as $key => $value)
 {
     $residues = explode('-', $key);
@@ -292,9 +301,13 @@ foreach (array_merge($contacts_made_bw, $contacts_broken_bw) as $key => $value)
         // For ORs, the two are almost always the same.
         $residue_bw = str_replace('x', '.', $residues[$i]);
         if ($residue_bw == "ligand") continue;
-        $bw_lookup[$residue_bw] = "ECHO \"$residue_bw|\" \$R.$residue_bw %R.$residue_bw \"|\" @R.$residue_bw \"|\" \$A.$residue_bw";
+        $bw_lookup_residue[] = $residue_bw; // = "ECHO \"$residue_bw|\" \$R.$residue_bw %R.$residue_bw \"|\" @R.$residue_bw \"|\" \$A.$residue_bw";
     }
 }
+
+$bw_lookup = [];
+foreach ($bw_lookup_residue as $residue_bw)
+    $bw_lookup[$residue_bw] = "ECHO \"$residue_bw|\" \$R.$residue_bw %R.$residue_bw \"|\" @R.$residue_bw \"|\" \$A.$residue_bw";
 
 $optimized = [];
 foreach ($contacts_made_bw as $key => $value)
@@ -352,6 +365,8 @@ foreach ($result as $line)
     {
         case 0:
         $line = explode("|", $line);
+        $xyz = explode(',',preg_replace("/[\\[\\]]/", '', $line[2]));
+        $line[2] = ["x" => floatval($xyz[0]), "y" => floatval($xyz[1]), "z" => floatval($xyz[2])];
         $residue_info[$line[0]] = $line;
         break;
 
@@ -402,7 +417,7 @@ foreach ($contact_spacing as $contacts => $spacing)
     if ($delete) unset($contact_spacing[$contacts]);
 }
 
-// print_r($residue_info);
+print_r($residue_info);
 print_r($contact_spacing);
 
 
@@ -410,6 +425,8 @@ print_r($contact_spacing);
 $tmr6type = "?";
 $hasR6x59 = false;
 $exrbend = 0;
+$dynamics = [];
+$tmr6_distance_h = 7.0;
 
 // 6.48 Rock: If there is no 45.51-6.55 contact, and there is room for the EXR end of TMR6 to move toward the EXR2 helix, then TMR6 pivots at 6.48,
 // creating a rift in the cytoplasmic end and closing around the ligand. If R6.59 is present, it partially uncoils and rotates its side chain
@@ -418,7 +435,13 @@ $exrbend = 0;
 if (!isset($contact_spacing["45.51-6.55"]) && floatval(@$contact_spacing["45.53-6.55"]))
 {
     $tmr6type = "6.48 Rock";
+    $m6name = "rock6";
     if (substr($residue_info["6.59"][1], 0, 1) == 'R') $hasR6x59 = true;
+
+    $distance_v = get_distance($residue_info["6.48"][2], $residue_info["6.28"][2]);
+    $distance_h = $tmr6_distance_h;
+    $angle = round(45.0 * $distance_h / $distance_v, 2);            // Approximation.
+    $dynamics[] = "DYNAMIC BEND $m6name 56.50 6.59 6.48 7.43 -$angle";
 }
 
 // 6.48 Bend: If there is a 45.51-6.55 contact and a 3.40-6.48 contact, then TMR6 bends at the 6.48 position to create a cytoplasmic rift, but does
@@ -427,7 +450,13 @@ if (!isset($contact_spacing["45.51-6.55"]) && floatval(@$contact_spacing["45.53-
 else if (isset($contact_spacing["45.51-6.55"]) && isset($contact_spacing["3.40-6.48"]))
 {
     $tmr6type = "6.48 Bend";
+    $m6name = "bend6";
     $exrbend = $contact_spacing["45.51-6.55"];
+
+    $distance_v = get_distance($residue_info["6.48"][2], $residue_info["6.28"][2]);
+    $distance_h = $tmr6_distance_h;
+    $angle = round(45.0 * $distance_h / $distance_v, 2);
+    $dynamics[] = "DYNAMIC BEND $m6name 56.50 6.48 6.48 7.43 -$angle";
 }
 
 // 6.55 Bend: If there is a 45.51-6.55 contact but no strong 3.40-6.48 contact, then TMR6 bends at the 6.55 position and most of its length moves
@@ -436,6 +465,12 @@ else if (isset($contact_spacing["45.51-6.55"]) && isset($contact_spacing["3.40-6
 else if (isset($contact_spacing["45.51-6.55"]) && !isset($contact_spacing["3.40-6.48"]))
 {
     $tmr6type = "6.55 Bend";
+    $m6name = "bend6";
+
+    $distance_v = get_distance($residue_info["6.55"][2], $residue_info["6.28"][2]);
+    $distance_h = $tmr6_distance_h;
+    $angle = round(45.0 * $distance_h / $distance_v, 2);
+    $dynamics[] = "DYNAMIC BEND $m6name 56.50 6.55 6.55 2.64 -$angle";
 }
 
 // The motion of TMR6 shall be sufficient to move the side chain of 6.40 out of the way for 5.58 and 7.53 to make contact. The side chain of 6.40
@@ -446,12 +481,31 @@ echo "TMR6 type: $tmr6type" . ($hasR6x59 ? " with R6.59" : "") . ($exrbend ? " w
 // TMR5 activation motion:
 // TMR5 generally bends at the extracellular end, to keep up with the motion of the cytoplasmic end of TMR6. TMR5 also moves slightly toward TMR6,
 // about 1A at the extracellular end and about 3.5A at the cytoplasmic end, the difference being due to the bend.
+$distance_v = get_distance($residue_info["5.33"][2], $residue_info["5.68"][2]);
+$distance_h = $tmr6_distance_h - 1;
+$angle = round(45.0 * $distance_h / $distance_v, 2);
+$dynamics[] = "DYNAMIC BEND bend5 5.33 56.49 5.33 3.33 -$angle SYNC $m6name";
+$dynamics[] = "DYNAMIC MOVE move5 5.33 56.49 5.43 6.55 1 SYNC bend5";
 
 
 // TMR7 activation motion:
 // The near universal 5.58-7.53 contact is improved by a bend at 7.48. In receptors that lack this contact, the TMR7 bend likely would not occur.
+if (@$contact_spacing["5.58-7.53"])
+{
+    $distance_v = get_distance($residue_info["7.48"][2], $residue_info["7.53"][2]);
+    $distance_h = floatval($contact_spacing["5.58-7.53"]);
+    $angle = round(45.0 * $distance_h / $distance_v, 2);
+    $dynamics[] = "DYNAMIC BEND bend7 7.48 7.56 7.48 2.50 $angle MAX $m6name";
+}
 
 
 // EXR2 activation motion:
 // If R6.59 exists, the inward motion of its side chain causes 45.53 to point "downward" in the cytoplasmic direction, with a bend of the helix
 // in the range of the 45.52-45.54 positions.
+if ($hasR6x59)
+{
+    $dynamics[] = "DYNAMIC BEND bend45 45.52 45.54 45.52 45.54 30 MIN $m6name";
+}
+
+
+echo "\nPRIMARYDOCK_CONFIG_PARAMS:\n".implode("\n", $dynamics)."\n\n";

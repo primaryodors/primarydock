@@ -198,8 +198,8 @@ window.setTimeout( function()
     <th>log10 ec<sub>50</sub></th>
     <th>Adj. Top</th>
     <th>Antagonist?</th>
-    <th>Hypothesized PQ</th>
-    <th>Associated Perceptual Qualities</th>
+    <th style="margin-right: 5px;">Hypothesized PQ</th>
+    <th>Associated Perceptual Qualities (PQs)</th>
 </tr>
 
 <?php

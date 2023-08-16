@@ -195,7 +195,7 @@ window.setTimeout( function()
 
 <tr>
     <th>Receptor</th>
-    <th>log10 ec<sub>50</sub></th>
+    <th>log10 EC<sub>50</sub></th>
     <th>Adj. Top</th>
     <th>Antagonist?</th>
     <th style="padding-right: 15px;">Hypothesized PQ</th>

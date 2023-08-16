@@ -324,6 +324,134 @@ MCoord* search_mtlcoords_for_residue(AminoAcid* aa)
     return nullptr;
 }
 
+int interpret_resno(const char* field)
+{
+    char buffer[strlen(field)+4];
+    strcpy(buffer, field);
+    char* dot = strchr(buffer, '.');
+    if (dot)
+    {
+        *(dot++) = 0;
+        int b = atoi(buffer);
+        int w = atoi(dot);
+        int _50 = protein->get_bw50(b);
+        if (_50 < 1)
+        {
+            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW words." << endl;
+            throw 0xbad12e5;
+        }
+        return _50 + w - 50;
+    }
+    else return atoi(buffer);
+}
+
+void freeze_bridged_residues()
+{
+    int i, l;
+
+    if (bridges.size())
+    {
+        for (i=0; i<bridges.size(); i++)
+        {
+            int resno1 = interpret_resno(bridges[i].c_str());
+            const char* r2 = strchr(bridges[i].c_str(), '|');
+            if (!r2) throw 0xbadc0de;
+            r2++;
+            int resno2 = interpret_resno(r2);
+            
+            AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
+            if (aa1)
+            {
+                aa1->movability = MOV_PINNED;
+                aa1->been_flexed = true;
+                Bond** bb = aa1->get_rotatable_bonds();
+                if (bb)
+                {
+                    for (l=0; bb[l]; l++)
+                    {
+                        bb[l]->can_rotate = false;
+                    }
+                    delete bb;
+                }
+            }
+            if (aa2)
+            {
+                aa2->movability = MOV_PINNED;
+                aa2->been_flexed = true;
+                Bond** bb = aa2->get_rotatable_bonds();
+                if (bb)
+                {
+                    for (l=0; bb[l]; l++)
+                    {
+                        bb[l]->can_rotate = false;
+                    }
+                    delete bb;
+                }
+            }
+        }
+    }
+
+    if (forced_static_resnos.size())
+    {
+        for (i=0; i<forced_static_resnos.size(); i++)
+        {
+            forced_static_resnos[i].resolve_resno(protein);
+            int resno = forced_static_resnos[i].resno;
+            if (!resno) continue;
+            
+            AminoAcid *aa = protein->get_residue(resno);
+            if (!aa) continue;
+
+            aa->movability = MOV_PINNED;
+            aa->been_flexed = true;
+            Bond** bb = aa->get_rotatable_bonds();
+            if (bb)
+            {
+                for (l=0; bb[l]; l++)
+                {
+                    bb[l]->can_rotate = false;
+                }
+                delete bb;
+            }
+        }
+    }
+}
+
+void reconnect_bridges()
+{
+    int i;
+    for (i=0; i<bridges.size(); i++)
+    {
+        int resno1 = interpret_resno(bridges[i].c_str());
+        const char* r2 = strchr(bridges[i].c_str(), '|');
+        if (!r2) throw 0xbadc0de;
+        r2++;
+        int resno2 = interpret_resno(r2);
+
+        #if _dbg_bridges
+        cout << "Bridging " << resno1 << " and " << resno2 << "..." << endl;
+        #endif
+
+        protein->bridge(resno1, resno2);
+
+        AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
+        if (aa1) aa1->movability = MOV_PINNED;
+        if (aa2) aa2->movability = MOV_PINNED; 
+
+        #if _dbg_bridges
+        if (!aa1) cout << resno1 << " not found." << endl;
+        if (!aa2) cout << resno2 << " not found." << endl;
+        if (aa1 && aa2)
+        {
+            float tb = -aa1->get_intermol_binding(aa2);
+            cout << "Bridge energy " << tb << " kJ/mol." << endl;
+        }
+        #endif
+    }
+
+    freeze_bridged_residues();
+}
+
 Pose iter_best_pose[1000];
 float iter_best_bind;
 void iteration_callback(int iter, Molecule** mols)
@@ -380,6 +508,8 @@ void iteration_callback(int iter, Molecule** mols)
             float new_energy = -ligand->get_intermol_binding(mols);
             if (new_energy > energy) dyn_motions[i]->undo();
         }
+
+        reconnect_bridges();
     }
 
     #if bb_realign_iters
@@ -780,27 +910,6 @@ void iteration_callback(int iter, Molecule** mols)
         i = iter % 4;
         cout << ("|/-\\")[i] << " " << (int)percentage << "%.               " << endl;
     }
-}
-
-int interpret_resno(const char* field)
-{
-    char buffer[strlen(field)+4];
-    strcpy(buffer, field);
-    char* dot = strchr(buffer, '.');
-    if (dot)
-    {
-        *(dot++) = 0;
-        int b = atoi(buffer);
-        int w = atoi(dot);
-        int _50 = protein->get_bw50(b);
-        if (_50 < 1)
-        {
-            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW words." << endl;
-            throw 0xbad12e5;
-        }
-        return _50 + w - 50;
-    }
-    else return atoi(buffer);
 }
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
@@ -1435,78 +1544,6 @@ void read_config_file(FILE* pf)
             delete words;
         }
         buffer[0] = 0;
-    }
-}
-
-void freeze_bridged_residues()
-{
-    int i, l;
-
-    if (bridges.size())
-    {
-        for (i=0; i<bridges.size(); i++)
-        {
-            int resno1 = interpret_resno(bridges[i].c_str());
-            const char* r2 = strchr(bridges[i].c_str(), '|');
-            if (!r2) throw 0xbadc0de;
-            r2++;
-            int resno2 = interpret_resno(r2);
-            
-            AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
-            if (aa1)
-            {
-                aa1->movability = MOV_PINNED;
-                aa1->been_flexed = true;
-                Bond** bb = aa1->get_rotatable_bonds();
-                if (bb)
-                {
-                    for (l=0; bb[l]; l++)
-                    {
-                        bb[l]->can_rotate = false;
-                    }
-                    delete bb;
-                }
-            }
-            if (aa2)
-            {
-                aa2->movability = MOV_PINNED;
-                aa2->been_flexed = true;
-                Bond** bb = aa2->get_rotatable_bonds();
-                if (bb)
-                {
-                    for (l=0; bb[l]; l++)
-                    {
-                        bb[l]->can_rotate = false;
-                    }
-                    delete bb;
-                }
-            }
-        }
-    }
-
-    if (forced_static_resnos.size())
-    {
-        for (i=0; i<forced_static_resnos.size(); i++)
-        {
-            forced_static_resnos[i].resolve_resno(protein);
-            int resno = forced_static_resnos[i].resno;
-            if (!resno) continue;
-            
-            AminoAcid *aa = protein->get_residue(resno);
-            if (!aa) continue;
-
-            aa->movability = MOV_PINNED;
-            aa->been_flexed = true;
-            Bond** bb = aa->get_rotatable_bonds();
-            if (bb)
-            {
-                for (l=0; bb[l]; l++)
-                {
-                    bb[l]->can_rotate = false;
-                }
-                delete bb;
-            }
-        }
     }
 }
 
@@ -2275,36 +2312,7 @@ int main(int argc, char** argv)
 
     if (bridges.size())
     {
-        for (i=0; i<bridges.size(); i++)
-        {
-            int resno1 = interpret_resno(bridges[i].c_str());
-            const char* r2 = strchr(bridges[i].c_str(), '|');
-            if (!r2) throw 0xbadc0de;
-            r2++;
-            int resno2 = interpret_resno(r2);
-
-            #if _dbg_bridges
-            cout << "Bridging " << resno1 << " and " << resno2 << "..." << endl;
-            #endif
-
-            protein->bridge(resno1, resno2);
-
-            AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
-            if (aa1) aa1->movability = MOV_PINNED;
-            if (aa2) aa2->movability = MOV_PINNED; 
-
-            #if _dbg_bridges
-            if (!aa1) cout << resno1 << " not found." << endl;
-            if (!aa2) cout << resno2 << " not found." << endl;
-            if (aa1 && aa2)
-            {
-                float tb = -aa1->get_intermol_binding(aa2);
-                cout << "Bridge energy " << tb << " kJ/mol." << endl;
-            }
-            #endif
-        }
-
-        freeze_bridged_residues();
+        reconnect_bridges();
 
         temp_pdb_file = "tmp/bridged.pdb";
 

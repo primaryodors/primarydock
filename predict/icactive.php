@@ -109,13 +109,15 @@ foreach ($active_pairs as $pairid => $pair)
 $get_bw50_resnos = "";
 for ($i=1; $i<=7; $i++) $get_bw50_resnos .= "ECHO \"$i: \" %$i.50\n";
 
-$gpcr_contacts_a = [ "45x51-6x55", "3x40-6x48", "5x47-6x48", "5x51-6x44", "5x55-6x41", "3x43-7x49", "3x43-7x53", "5x58-6x40", "5x58-7x53", "3x46-7x53", "1x53-7x54", "5x62-6x37", "3x50-7x53" ];
+$gpcr_contacts_a = [ "45x51-6x55", "45x53-6x55", "6.59-ligand", "3x40-6x48", "5x47-6x48", "5x51-6x44", "5x55-6x41", "3x43-7x49", "3x43-7x53", "5x58-6x40", "5x58-7x53", "3x46-7x53", "1x53-7x54", "5x62-6x37", "3x50-7x53" ];
 $gpcr_contacts_i = [ "3x43-6x40", "3x43-6x41", "6x40-7x49", "3x46-6x37", "1x53-7x53", "7x53-8x50", "7x54-8x51", "3x50-6x37" ];
 
 $measure_contacts = "";
 foreach ($gpcr_contacts_a as $contacts)
 {
     $bwnos = explode('-', $contacts);
+    if ($bwnos[0] == "ligand" || $bwnos[1] == "ligand") continue;
+
     $measure_contacts .= <<<heredoc
 LET @distance = @A.{$bwnos[0]} - @A.{$bwnos[1]}
 LET &active_distance = @distance
@@ -132,6 +134,8 @@ heredoc;
 foreach ($gpcr_contacts_i as $contacts)
 {
     $bwnos = explode('-', $contacts);
+    if ($bwnos[0] == "ligand" || $bwnos[1] == "ligand") continue;
+
     $measure_contacts .= <<<heredoc
 LET @distance = @A.{$bwnos[0]} - @A.{$bwnos[1]}
 LET &active_distance = @distance
@@ -400,10 +404,10 @@ print_r($contact_spacing);
 
 // Types of TMR6 activation motion:
 
-// 6.48 Rock: If there is no 45.51-6.55 contact, and there is room for the EXR end of TMR6 to move towards the EXR2 helix, then TMR6 pivots at 6.48,
+// 6.48 Rock: If there is no 45.51-6.55 contact, and there is room for the EXR end of TMR6 to move toward the EXR2 helix, then TMR6 pivots at 6.48,
 // creating a rift in the cytoplasmic end and closing around the ligand. If R6.59 is present, it partially uncoils and rotates its side chain
-// inward to make contact with the ligand.
-// Examples of 6.48 rock receptors: OR51E2 (with R6.59), OR1G1 (no 6.59).
+// inward to make contact with the ligand. Else if 45.53 is compatible with 6.55, then that pair becomes the contact.
+// Examples of 6.48 rock receptors: OR51E2 (with R6.59), OR1G1 (N45.53).
 
 // 6.48 Bend: If there is a 45.51-6.55 contact and a 3.40-6.48 contact, then TMR6 bends at the 6.48 position to create a cytoplasmic rift, but does
 // not move the extracellular end unless necessary to complete the 45.51-6.55 contact.

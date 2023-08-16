@@ -4,6 +4,24 @@ chdir(__DIR__);
 chdir("..");
 require_once("data/protutils.php");
 
+function residues_compatible($aa1, $aa2)
+{
+    // Hydrophobic.
+    if (false!==strpos("MAILVGCPHFWY", $aa1) && false!==strpos("MAILVGCPHFWY", $aa2)) return true;
+
+    // Polar uncharged.
+    if (false!==strpos("STYNQ", $aa1) && false!==strpos("STYNQ", $aa2)) return true;
+
+    if (false!==strpos("STYNQEDHRK", $aa1) && false!==strpos("STYNQEDHRK", $aa2))
+    {
+        if (false!==strpos("KR", $aa1) && false!==strpos("KR", $aa2)) return false;
+        else if (false!==strpos("DE", $aa1) && false!==strpos("DE", $aa2)) return false;
+        else return true;
+    }
+
+    return false;
+}
+
 // Note this script is unfinished.
 
 $rcpid = @$argv[1] or die("Usage: php -f predict/icactive.php receptor_id\n");
@@ -249,10 +267,10 @@ foreach ($contacts_broken as $resnos => $change)
 }
 
 // Output results.
-echo "Contacts made: ";
+/*echo "Contacts made: ";
 print_r($contacts_made_bw);
 echo "\nContacts broken: ";
-print_r($contacts_broken_bw);
+print_r($contacts_broken_bw);*/
 
 
 // Check residues of $rcpid and list which made/broken contacts are compatible.
@@ -307,7 +325,7 @@ $result = [];
 $cmd = "bin/pepteditor $pepd_fname";
 exec($cmd, $result);
 
-print_r($result);
+// print_r($result);
 
 
 $residue_info = [];
@@ -331,6 +349,7 @@ foreach ($result as $line)
 
         case 1:
         $line = explode("|", $line);
+        $line[0] = str_replace("x", ".", $line[0]);
         $contact_spacing[$line[0]] = floatval($line[1]);
         break;
 
@@ -339,5 +358,41 @@ foreach ($result as $line)
     }
 }
 
-print_r($residue_info);
+ksort($residue_info);
+// print_r($contact_spacing);
+
+foreach ($contact_spacing as $contacts => $spacing)
+{
+    $residues = explode('-', $contacts);
+    $delete = false;
+
+    if (!isset($residue_info[$residues[0]])) $delete = true;
+    if (!isset($residue_info[$residues[1]])) $delete = true;
+    if (!@$residue_info[$residues[0]][3]) $delete = true;
+    if (!@$residue_info[$residues[1]][3]) $delete = true;
+
+    $tmr0 = intval(explode('.', explode('x', $residues[0])[0])[0]);
+    $tmr1 = intval(explode('.', explode('x', $residues[1])[0])[0]);
+
+    if ($tmr0 == $tmr1) $delete = true;
+
+    if (!$delete)
+    {
+        $aa0 = substr($residue_info[$residues[0]][1], 0, 1);
+        $aa1 = substr($residue_info[$residues[1]][1], 0, 1);
+
+        if ($aa0 != $residue_info[$residues[0]][3] || $aa1 != $residue_info[$residues[1]][3])
+        {
+            if (!residues_compatible($aa0, $aa1))
+            {
+                echo "Delete incompatible $aa0{$residues[0]}-$aa1{$residues[1]}\n";
+                $delete = true;
+            }
+        }
+    }
+
+    if ($delete) unset($contact_spacing[$contacts]);
+}
+
+// print_r($residue_info);
 print_r($contact_spacing);

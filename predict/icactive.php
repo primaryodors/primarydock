@@ -240,6 +240,7 @@ foreach ($contacts_broken as $resnos => $change)
     $residues = explode("-", $resnos);
     $resno1 = intval(preg_replace("/[^0-9]/", "", $residues[0]));
     $resno2 = intval(preg_replace("/[^0-9]/", "", $residues[1]));
+    if ($resno1 == "ligand" || $resno2 == "ligand") continue;
 
     $closest_bw50_helixno = $closest_bw50_resno_delta = 0;
     foreach ($bw50 as $regno => $resno50)
@@ -289,6 +290,7 @@ foreach (array_merge($contacts_made_bw, $contacts_broken_bw) as $key => $value)
         // Pepteditor doesn't recognize GPCRDB numbering yet, so we have to assume Ballesteros-Weinstein.
         // For ORs, the two are almost always the same.
         $residue_bw = str_replace('x', '.', $residues[$i]);
+        if ($residue_bw == "ligand") continue;
         $bw_lookup[$residue_bw] = "ECHO \"$residue_bw|\" \$R.$residue_bw %R.$residue_bw \"|\" @R.$residue_bw \"|\" \$A.$residue_bw";
     }
 }
@@ -297,6 +299,7 @@ $optimized = [];
 foreach ($contacts_made_bw as $key => $value)
 {
     $residues = explode('-', $key);
+    if ($residues[0] == "ligand" || $residues[1] == "ligand") continue;
     $optimized[$key] = "MOC {$residues[0]} {$residues[1]} &optimized\nECHO \"{$residues[0]}\" \"-\" \"{$residues[1]}\" \"|\" &optimized";
 }
 

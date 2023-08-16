@@ -396,3 +396,36 @@ foreach ($contact_spacing as $contacts => $spacing)
 
 // print_r($residue_info);
 print_r($contact_spacing);
+
+
+// Types of TMR6 activation motion:
+
+// 6.48 Rock: If there is no 45.51-6.55 contact, and there is room for the EXR end of TMR6 to move towards the EXR2 helix, then TMR6 pivots at 6.48,
+// creating a rift in the cytoplasmic end and closing around the ligand. If R6.59 is present, it partially uncoils and rotates its side chain
+// inward to make contact with the ligand.
+// Examples of 6.48 rock receptors: OR51E2 (with R6.59), OR1G1 (no 6.59).
+
+// 6.48 Bend: If there is a 45.51-6.55 contact and a 3.40-6.48 contact, then TMR6 bends at the 6.48 position to create a cytoplasmic rift, but does
+// not move the extracellular end unless necessary to complete the 45.51-6.55 contact.
+// Examples of 6.48 bend receptors: OR1A1 (no EXR bend), OR5AN1 (EXR bend).
+
+// 6.55 Bend: If there is a 45.51-6.55 contact but no strong 3.40-6.48 contact, then TMR6 bends at the 6.55 position and most of its length moves
+// as a unit to create the cytoplasmic rift.
+// Examples of possible 6.55 bend receptors: OR8D1, OR14A2.
+
+// The motion of TMR6 shall be sufficient to move the side chain of 6.40 out of the way for 5.58 and 7.53 to make contact. The side chain of 6.40
+// moves to point to 7.52. In OR51E2, the CA of 6.27 moves about 7A away from the CYT2 loop.
+
+
+// TMR5 activation motion:
+// TMR5 generally bends at the extracellular end, to keep up with the motion of the cytoplasmic end of TMR6. TMR5 also moves slightly toward TMR6,
+// about 1A at the extracellular end and about 3.5A at the cytoplasmic end, the difference being due to the bend.
+
+
+// TMR7 activation motion:
+// The near universal 5.58-7.53 contact is improved by a bend at 7.48. In receptors that lack this contact, the TMR7 bend likely would not occur.
+
+
+// EXR2 activation motion:
+// If R6.59 exists, the inward motion of its side chain causes 45.53 to point "downward" in the cytoplasmic direction, with a bend of the helix
+// in the range of the 45.52-45.54 positions.

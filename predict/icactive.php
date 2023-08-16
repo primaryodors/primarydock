@@ -109,8 +109,9 @@ foreach ($active_pairs as $pairid => $pair)
 $get_bw50_resnos = "";
 for ($i=1; $i<=7; $i++) $get_bw50_resnos .= "ECHO \"$i: \" %$i.50\n";
 
-$gpcr_contacts_a = [ "45x51-6x55", "45x53-6x55", "6.59-ligand", "3x40-6x48", "5x47-6x48", "5x51-6x44", "5x55-6x41", "3x43-7x49", "3x43-7x53", "5x58-6x40", "5x58-7x53", "3x46-7x53", "1x53-7x54", "5x62-6x37", "3x50-7x53" ];
+$gpcr_contacts_a = [ "45x51-6x55", "45x53-6x55", "3x40-6x48", "5x47-6x48", "5x51-6x44", "5x55-6x41", "3x43-7x49", "3x43-7x53", "5x58-6x40", "5x58-7x53", "3x46-7x53", "1x53-7x54", "5x62-6x37", "3x50-7x53" ];
 $gpcr_contacts_i = [ "3x43-6x40", "3x43-6x41", "6x40-7x49", "3x46-6x37", "1x53-7x53", "7x53-8x50", "7x54-8x51", "3x50-6x37" ];
+$skip_compat_chk = [ "45.53-6.55" ];
 
 $measure_contacts = "";
 foreach ($gpcr_contacts_a as $contacts)
@@ -280,7 +281,7 @@ print_r($contacts_broken_bw);*/
 
 // Check residues of $rcpid and list which made/broken contacts are compatible.
 $working_pdbfn = filename_protid($rcpid);
-$bw_lookup = [];
+$bw_lookup = ["ECHO \"6.59|\" \$R.6.59 %R.6.59 \"|\" @R.6.59 \"|\" \$A.6.59"];
 foreach (array_merge($contacts_made_bw, $contacts_broken_bw) as $key => $value)
 {
     $residues = explode('-', $key);
@@ -300,7 +301,7 @@ foreach ($contacts_made_bw as $key => $value)
 {
     $residues = explode('-', $key);
     if ($residues[0] == "ligand" || $residues[1] == "ligand") continue;
-    $optimized[$key] = "MOC {$residues[0]} {$residues[1]} &optimized\nECHO \"{$residues[0]}\" \"-\" \"{$residues[1]}\" \"|\" &optimized";
+    $optimized[$key] = "MOC %R.{$residues[0]} %R.{$residues[1]} &optimized\nECHO \"{$residues[0]}\" \"-\" \"{$residues[1]}\" \"|\" &optimized";
 }
 
 $bw_lookup = implode("\n", $bw_lookup);
@@ -388,7 +389,7 @@ foreach ($contact_spacing as $contacts => $spacing)
         $aa0 = substr($residue_info[$residues[0]][1], 0, 1);
         $aa1 = substr($residue_info[$residues[1]][1], 0, 1);
 
-        if ($aa0 != $residue_info[$residues[0]][3] || $aa1 != $residue_info[$residues[1]][3])
+        if (/*($aa0 != $residue_info[$residues[0]][3] || $aa1 != $residue_info[$residues[1]][3]) &&*/ !isset($skip_compat_chk[$contacts]))
         {
             if (!residues_compatible($aa0, $aa1))
             {
@@ -406,22 +407,40 @@ print_r($contact_spacing);
 
 
 // Types of TMR6 activation motion:
+$tmr6type = "?";
+$hasR6x59 = false;
+$exrbend = 0;
 
 // 6.48 Rock: If there is no 45.51-6.55 contact, and there is room for the EXR end of TMR6 to move toward the EXR2 helix, then TMR6 pivots at 6.48,
 // creating a rift in the cytoplasmic end and closing around the ligand. If R6.59 is present, it partially uncoils and rotates its side chain
 // inward to make contact with the ligand. Else if 45.53 is compatible with 6.55, then that pair becomes the contact.
 // Examples of 6.48 rock receptors: OR51E2 (with R6.59), OR1G1 (N45.53).
+if (!isset($contact_spacing["45.51-6.55"]) && floatval(@$contact_spacing["45.53-6.55"]))
+{
+    $tmr6type = "6.48 Rock";
+    if (substr($residue_info["6.59"][1], 0, 1) == 'R') $hasR6x59 = true;
+}
 
 // 6.48 Bend: If there is a 45.51-6.55 contact and a 3.40-6.48 contact, then TMR6 bends at the 6.48 position to create a cytoplasmic rift, but does
 // not move the extracellular end unless necessary to complete the 45.51-6.55 contact.
 // Examples of 6.48 bend receptors: OR1A1 (no EXR bend), OR5AN1 (EXR bend).
+else if (isset($contact_spacing["45.51-6.55"]) && isset($contact_spacing["3.40-6.48"]))
+{
+    $tmr6type = "6.48 Bend";
+    $exrbend = $contact_spacing["45.51-6.55"];
+}
 
 // 6.55 Bend: If there is a 45.51-6.55 contact but no strong 3.40-6.48 contact, then TMR6 bends at the 6.55 position and most of its length moves
 // as a unit to create the cytoplasmic rift.
 // Examples of possible 6.55 bend receptors: OR8D1, OR14A2.
+else if (isset($contact_spacing["45.51-6.55"]) && !isset($contact_spacing["3.40-6.48"]))
+{
+    $tmr6type = "6.55 Bend";
+}
 
 // The motion of TMR6 shall be sufficient to move the side chain of 6.40 out of the way for 5.58 and 7.53 to make contact. The side chain of 6.40
 // moves to point to 7.52. In OR51E2, the CA of 6.27 moves about 7A away from the CYT2 loop.
+echo "TMR6 type: $tmr6type" . ($hasR6x59 ? " with R6.59" : "") . ($exrbend ? " with EXR bend $exrbend" : "") . ".\n";
 
 
 // TMR5 activation motion:

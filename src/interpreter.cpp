@@ -1153,6 +1153,18 @@ int main(int argc, char** argv)
                 }
                 SCoord optimize = aa1->motion_to_optimal_contact(aa2);
 
+                /*Atom *atom1 = aa1->get_nearest_atom(aa2->get_CA_location()), *atom2 = aa2->get_nearest_atom(aa1->get_CA_location());
+                atom1 = aa1->get_nearest_atom(atom2->get_location());
+                atom2 = aa2->get_nearest_atom(atom1->get_location());
+                float nearest_atom_distance = atom1->distance_to(atom2);
+                // cout << *atom1 << " is " << nearest_atom_distance << "A from " << *atom2 << endl;
+
+                if (optimize.r < fmax(nearest_atom_distance - 2.5, 0))
+                {
+                    if (!optimize.r) optimize = atom2->get_location().subtract(atom1->get_location());
+                    else optimize.r = fmax(nearest_atom_distance - 2.5, 0);
+                }*/
+
                 switch(outvar[0])
                 {
                     case '@':

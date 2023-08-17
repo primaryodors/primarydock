@@ -171,9 +171,13 @@ function prepare_outputs()
     $outfname = "output/$fam/$protid/$protid-$ligname.dock";
 }
 
+$multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false)
 {
-    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere;
+    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere, $multicall;
+    $multicall++;
+    if ($multicall > 1) $noclobber = true;
+
     if (!file_exists("tmp")) mkdir("tmp");
     $lignospace = str_replace(" ", "", $ligname);
     $cnfname = "tmp/prediction.$protid.$lignospace.config";
@@ -452,6 +456,12 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     // Reload to prevent overwriting another process' output.
     if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
+    if ($noclobber)
+    {
+        $newdata = $outdata;
+        $outdata = $dock_results[$protid][$ligname];
+        foreach ($newdata as $k => $v) $outdata[$k] = $v;
+    }
     $dock_results[$protid][$ligname] = $outdata;
     
     echo "Loaded $json_file with ".count($dock_results)." records.\n";

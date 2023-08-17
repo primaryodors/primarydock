@@ -371,7 +371,7 @@ void freeze_bridged_residues()
                     {
                         bb[l]->can_rotate = false;
                     }
-                    delete bb;
+                    // delete bb;
                 }
             }
             if (aa2)
@@ -385,7 +385,7 @@ void freeze_bridged_residues()
                     {
                         bb[l]->can_rotate = false;
                     }
-                    delete bb;
+                    // delete bb;
                 }
             }
         }
@@ -411,7 +411,7 @@ void freeze_bridged_residues()
                 {
                     bb[l]->can_rotate = false;
                 }
-                delete bb;
+                // delete bb;
             }
         }
     }
@@ -2767,7 +2767,7 @@ _try_again:
                         }
                         sidechain_bondrotq[i] = j;
 
-                        delete[] b;
+                        // delete[] b;
                     }
                 }
 
@@ -2801,7 +2801,7 @@ _try_again:
                             b[j]->rotate(sidechain_bondrots[i][j]);
                         }
 
-                        delete[] b;
+                        // delete[] b;
                     }
 
                     delete[] sidechain_bondrots[i];

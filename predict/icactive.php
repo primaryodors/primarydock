@@ -428,6 +428,11 @@ $exrbend = 0;
 $dynamics = [];
 $tmr6_distance_h = 7.0;
 
+foreach ($contact_spacing as $key => $value)
+{
+    $dynamics[] = "BRIDGE ".str_replace('-', ' ', $key);
+}
+
 // 6.48 Rock: If there is no 45.51-6.55 contact, and there is room for the EXR end of TMR6 to move toward the EXR2 helix, then TMR6 pivots at 6.48,
 // creating a rift in the cytoplasmic end and closing around the ligand. If R6.59 is present, it partially uncoils and rotates its side chain
 // inward to make contact with the ligand. Else if 45.53 is compatible with 6.55, then that pair becomes the contact.
@@ -484,8 +489,8 @@ echo "TMR6 type: $tmr6type" . ($hasR6x59 ? " with R6.59" : "") . ($exrbend ? " w
 $distance_v = get_distance($residue_info["5.33"][2], $residue_info["5.68"][2]);
 $distance_h = $tmr6_distance_h - 1;
 $angle = round(45.0 * $distance_h / $distance_v, 2);
-$dynamics[] = "DYNAMIC BEND bend5 5.33 56.49 5.33 3.33 -$angle SYNC $m6name";
-$dynamics[] = "DYNAMIC MOVE move5 5.33 56.49 5.43 6.55 1 SYNC bend5";
+$dynamics[] = "DYNAMIC BEND bend5 5.33 56.49 5.33 2.64 -$angle SYNC $m6name";
+// $dynamics[] = "DYNAMIC MOVE move5 5.33 56.49 5.43 6.55 1 SYNC bend5";
 
 
 // TMR7 activation motion:
@@ -496,6 +501,7 @@ if (@$contact_spacing["5.58-7.53"])
     $distance_h = floatval($contact_spacing["5.58-7.53"]);
     $angle = round(45.0 * $distance_h / $distance_v, 2);
     $dynamics[] = "DYNAMIC BEND bend7 7.48 7.56 7.48 2.50 $angle MAX $m6name";
+    $dynamics[] = "DYNAMIC WIND wind7 7.51 7.56 -10 SYNC bend7";
 }
 
 

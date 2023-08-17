@@ -5,7 +5,7 @@
 // Performs a dock of an odorant inside a default inactive-conformer PDB file.
 //
 // Example call syntax:
-// php -f predict/method_optimized.php prot=OR1A1 lig=R-carvone
+// php -f predict/method_optimized.php prot=OR1A1 lig=d-limonene
 //
 
 // Configurable variables

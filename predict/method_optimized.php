@@ -96,7 +96,7 @@ foreach ($result as $line)
     else if (trim($line) == "PRIMARYDOCK_CONFIG_PARAMS:") $reading_params = true;
 }
 
-$reading_params = implode("\n", $reading_params);
+$config_params = implode("\n", $config_params);
 
 $configf = <<<heredoc
 
@@ -116,7 +116,7 @@ PROGRESS
 
 FLEX 1
 WET
-$reading_params
+$config_params
 DYNMIN 0.9
 
 OUT output/$fam/$protid/%p.%l.optimized.dock

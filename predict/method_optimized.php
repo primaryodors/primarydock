@@ -51,6 +51,8 @@ function make_prediction($data)
     return $data;
 }
 
+$outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
+
 $configf = <<<heredoc
 
 PROT $pdbfname
@@ -70,7 +72,7 @@ PROGRESS
 FLEX 1
 WET
 
-OUT output/$fam/$protid/%p.%l.inactive.dock
+OUT $outfname
 
 
 heredoc;
@@ -97,6 +99,7 @@ foreach ($result as $line)
 }
 
 $config_params = implode("\n", $config_params);
+$outfname = "output/$fam/$protid/$protid.$ligname.optimized.dock";
 
 $configf = <<<heredoc
 
@@ -119,7 +122,7 @@ WET
 $config_params
 DYNMIN 0.9
 
-OUT output/$fam/$protid/%p.%l.optimized.dock
+OUT $outfname
 OUTPDB 3 output/$fam/$protid/%p.%l.model%o.pdb
 
 

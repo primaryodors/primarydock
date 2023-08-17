@@ -62,7 +62,7 @@ WET             # Hydrophobic groups stick together as strongly as polar groups 
 
 ITERS 50        # More iters mean slower processing and better results, albeit with diminishing returns.
 
-OUT $outfname
+OUT $outfname   # Note %p and %l cannot be used for this line because methods_common.php must know the output file name.
 
 
 heredoc;

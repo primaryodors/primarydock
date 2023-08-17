@@ -431,7 +431,15 @@ $tmr6_distance_h = 7.0;
 
 foreach ($contact_spacing as $key => $value)
 {
-    $dynamics[] = "BRIDGE ".str_replace('-', ' ', $key);
+    if ($key == "45.53-6.55" && isset($contact_spacing["45.51-6.55"])) continue;
+    
+    $residues = explode('-', $key);
+
+    $aa0 = substr($residue_info[$residues[0]][1], 0, 1);
+    $aa1 = substr($residue_info[$residues[1]][1], 0, 1);
+
+    if (residues_compatible($aa0, $aa1))
+        $dynamics[] = "BRIDGE ".str_replace('-', ' ', $key);
 }
 
 // 6.48 Rock: If there is no 45.51-6.55 contact, and there is room for the EXR end of TMR6 to move toward the EXR2 helix, then TMR6 pivots at 6.48,

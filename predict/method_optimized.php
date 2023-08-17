@@ -45,8 +45,13 @@ $metrics_to_process =
 
 function make_prediction($data)
 {
-    // if (@$data['BindingEnergy'] <= -5) $data['Predicted'] = 'Agonist';
-    // else $data['Predicted'] = 'Non-agonist';
+    if (isset($data["a_BindingEnergy"]))
+    {
+        $ae = floatval($data['a_BindingEnergy']);
+        $ie = floatval(@$data["i_BindingEnergy"]);
+        if ($ae < 0 && $ae < $ie) $data['Predicted'] = 'Agonist';
+        else $data['Predicted'] = 'Non-agonist';
+    }
 
     return $data;
 }

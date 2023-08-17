@@ -56,6 +56,7 @@ else if (substr($rcpid, 0, 4) == "TAAR")
 }
 else die("Unsupported protein.\n");
 
+if (!file_exists("pdbs/Gprot")) mkdir("pdbs/Gprot");
 if (!file_exists($active_pdbfn) || !file_exists($inactive_pdbfn)) passthru("bin/pepteditor predict/gprot.pepd");
 
 $active_pairs_raw = [];

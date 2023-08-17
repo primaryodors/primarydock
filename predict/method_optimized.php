@@ -64,11 +64,11 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 SEARCH BB
 POSE 10
 ELIM 20
+ITERS 50
+PROGRESS
 
 FLEX 1
 WET
-
-ITERS 50
 
 OUT output/$fam/$protid/%p.%l.inactive.dock
 
@@ -110,14 +110,14 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH BB
 POSE 10
-ELIM 20
+ELIM 5
+ITERS 50
+PROGRESS
 
 FLEX 1
 WET
 $reading_params
 DYNMIN 0.9
-
-ITERS 50
 
 OUT output/$fam/$protid/%p.%l.optimized.dock
 OUTPDB 3 output/$fam/$protid/%p.%l.model%o.pdb

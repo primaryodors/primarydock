@@ -440,7 +440,13 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     if ($actual > $sepyt["?"]) $actual = ($actual > 0) ? "Agonist" : ($actual < 0 ? "Inverse Agonist" : "Non-Agonist");
     else $actual = "(unknown)";
 
-    if (function_exists("make_prediction")) $outdata = make_prediction($outdata);
+    if (function_exists("make_prediction"))
+    {
+        $oc = count($outdata);
+        $outdata = make_prediction($outdata);
+        $nc = count($outdata);
+        if ($nc < $oc) die("ERROR: make_prediction() must return the input array with the prediction added.");
+    }
     $outdata["Actual"] = $actual;
 
 

@@ -109,6 +109,8 @@ std::vector<std::string> states;
 
 std::vector<std::string> dyn_motion_strings;
 float dynamic_minimum = 0;
+float dynamic_initial = 1;
+int dynamic_every_iter = 13;
 DynamicMotion* dyn_motions[64];
 int num_dyn_motions = 0;
 
@@ -499,7 +501,7 @@ void iteration_callback(int iter, Molecule** mols)
     }
 
     int i, j;
-    if (num_dyn_motions)
+    if (num_dyn_motions && !(iter % dynamic_every_iter))
     {
         for (i=0; i<num_dyn_motions; i++)
         {
@@ -1457,6 +1459,14 @@ int interpret_config_line(char** words)
     else if (!strcmp(words[0], "DYNMIN"))
     {
         dynamic_minimum = atof(words[1]);
+    }
+    else if (!strcmp(words[0], "DYNINIT"))
+    {
+        dynamic_initial = atof(words[1]);
+    }
+    else if (!strcmp(words[0], "DYNEVERY"))
+    {
+        dynamic_every_iter = atoi(words[1]);
     }
     else if (!strcmp(words[0], "HARD"))
     {

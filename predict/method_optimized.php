@@ -117,15 +117,17 @@ SIZE 7.0 7.0 7.0
 EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH BB
-POSE 10
+POSE 5
 ELIM 5
-ITERS 50
+ITERS 30
 PROGRESS
 
 FLEX 1
 WET
 $config_params
-DYNMIN 0.9
+DYNMIN 0.85
+DYNINIT 1.0
+DYNEVERY 13
 
 OUT $outfname
 OUTPDB 3 output/$fam/$protid/%p.%l.model%o.pdb

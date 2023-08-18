@@ -511,7 +511,42 @@ void iteration_callback(int iter, Molecule** mols)
             if (new_energy > energy) dyn_motions[i]->undo();
         }
 
+        Molecule* repack_residues[1024];
+        MovabilityType repacked_movabilities[1024];
+        int n = protein->get_end_resno();
+        bool already_set_for_repack[n+1];
+        for (i=0; i<n; i++) already_set_for_repack[i] = false;
+
+        n = 0;
+        for (i=0; i<num_dyn_motions; i++)
+        {
+            int j;
+            AminoAcid *sr, *er;
+
+            sr = protein->get_residue(dyn_motions[i]->start_resno);
+            er = protein->get_residue(dyn_motions[i]->end_resno);
+            if (!sr || !er) continue;
+
+            for (j = sr->get_residue_no(); j <= er->get_residue_no(); j++)
+            {
+                if (already_set_for_repack[j]) continue;
+                Star s;
+                s.paa = protein->get_residue(j);
+                if (s.n)
+                {
+                    repacked_movabilities[n] = s.paa->movability;
+                    if (s.paa->movability != MOV_PINNED) s.paa->movability = MOV_FLEXONLY;
+                    repack_residues[n++] = s.pmol;
+                    already_set_for_repack[j] = true;
+                }
+            }
+        }
+        repack_residues[n] = 0;
+
         reconnect_bridges();
+        Molecule::conform_molecules(repack_residues);
+
+        for (i=0; i<n; i++) repack_residues[i]->movability = repacked_movabilities[i];
     }
 
     #if bb_realign_iters

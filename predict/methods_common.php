@@ -236,8 +236,15 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     $weight = [];
     $pose_node_has_weight = [];
+    $num_poses = 0;
 
     foreach ($outlines as $ln)
+    {
+        if (false !== strpos($ln, "pose(s) found")) $num_poses = intval($ln);
+    }
+
+    if (!$num_poses) $outdata[$metrics_prefix."POSES"] = $num_poses;
+    else foreach ($outlines as $ln)
     {
         $coldiv = explode(":", $ln);
 
@@ -312,8 +319,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                         $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
                         if (!@$pose_node_has_weight[$wmode][$pose][$node])
                         {
-                            if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
-                            else $outdqty[$wmode] += $weight[$pose];
+                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
+                            else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
                             $pose_node_has_weight[$wmode][$pose][$node] = true;
                         }
                     }
@@ -326,8 +333,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
                         $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]);
-                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = 1;
-                        else $outdqty[$wmode]++;
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = 1;
+                        else $outdqty[$metrics_prefix.$wmode]++;
                     }
                     continue;
                 }
@@ -339,8 +346,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
                         $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
-                        else $outdqty[$wmode] += $weight[$pose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
                     }
                     continue;
                 }
@@ -352,8 +359,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
                         $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
-                        else $outdqty[$wmode] += $weight[$pose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
                     }
                     continue;
                 }
@@ -366,8 +373,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
                         $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                        if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
-                        else $outdqty[$wmode] += $weight[$pose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
                     }
                     continue;
                 }
@@ -414,8 +421,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                     if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = [0,0,0];
                     for ($x=0; $x<3; $x++) $outdata[$metrics_prefix.$wmode][$x] += floatval(substr($ln, 29+8*x, 8)) * $weight[$pose];
 
-                    if (!isset($outdqty[$wmode])) $outdqty[$wmode] = $weight[$pose];
-                    else $outdqty[$wmode] += $weight[$pose];
+                    if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
+                    else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
                 }
                 break;
     

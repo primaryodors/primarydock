@@ -1,9 +1,11 @@
 
 # Predicting Receptor Responses to Ligands
 
-At this time, no method yet exists to accurately identify agonist and non-agonist ligands from PrimaryDock output.
-To the best of our knowledge, either no one has developed this capability, or they have not released it to the public.
-Nevertheless, we continue to strive towards accurate predictions of GPCR agonism by odorants.
+At this time, no method yet exists to accurately distinguish agonist from non-agonist ligands using PrimaryDock output.
+To the best of our knowledge, either no one has developed the capability to make such predictions, or no accurate
+prediction making utility has been released to the public. Therefore, we continue to strive towards accurate predictions
+of GPCR agonism by odorants.
+
 
 # Prediction Methods
 
@@ -13,30 +15,30 @@ call to `prepare_outputs();` which generates the output file names as well as so
 value named `$configf` is then set, containing the config file to be generated for the `primarydock` app, and then the
 `process_dock()` function is called.
 
-The most current prediction method is `method_coupled.php`. To use this prediction method, one must first set up the
-required data.
+The most current prediction method is `method_optimized.php`. The first time it is run, it will perform a one-time
+setup of required data, including an automatic download of PDB models from the RCSB and AlphaFold websites. An example
+of the command line for running a prediction might be:
 
-1. First, run `bin/pepteditor predict/gprot.pepd` to download the experimental models from RCSB.
-2. Next, the PHP script `predict/generate_couple.php` must be run for every odor receptor. A good way to do this is
-    using a cron, e.g.:
-    ```
-    * * * * * php -f /path/to/primarydock/predict/generate_couple.php next simul=8
-    ```
-3. Finally, the prediction method can be run for all known receptor-ligand pairs. This also lends itself well to
-    running as a cron, e.g.:
-    ```
-    * * * * * php -f /path/to/primarydock/predict/method_coupled.php next simul=8
-    ```
+```
+php -f predict/method_optimized.php prot=OR1A1 lig=cis-3-hexen-1-ol
+```
 
-For both scripts, the `next` parameter means find the next GPCR/G-protein pair or GPCR/ligand pair yet to process, and 
-process it.
+If the name of the ligand contains parentheses, it's a good idea to put the entire lig= parameter in quotes, e.g.:
 
-For `generate_couple.php`, the "next" pair to process is the first combination of GPCR/G-protein that does not yet
-have a PDB file in the `pdbs/coupled/` folder.
+```
+php -f predict/method_optimized.php prot=OR1A1 "lig=(S)-(+)-carvone"
+```
 
-For `method_coupled.php`, the "next" pair to process is the first pair of GPCR + known ligand (whether agonist or not)
-that either is not present in `predict/dock_results_coupled.json` or has a `version` value older than either the
-prediction method PHP, `methods_common.php`, or the `/bin/primarydock` executable.
+The prediction method lends itself well to running as a cron, e.g.:
+
+```
+* * * * * php -f /path/to/primarydock/predict/method_coupled.php next simul=8
+```
+
+In this example, the `next` parameter means to find the next GPCR/G-protein pair or GPCR/ligand pair yet to process,
+and process it. The "next" pair to process is the first pair of GPCR + known ligand (whether agonist or not) that
+either is not present in `predict/dock_results_optimized.json` or has a `version` value older than either the
+prediction method .php, `methods_common.php`, or the `/bin/primarydock` executable.
 
 The `simul=8` parameter indicates not to run more than 8 concurrent processes. We recommend a value of no more than
 the number of physical cores on your machine, so if you have a server with one 8-core processor, then `simul=8` would
@@ -44,6 +46,7 @@ be the maximum recommended value. If you have `lm-sensors` installed (`sudo apt-
 scripts will automatically limit themselves depending on the CPU temperature.
 
 You can use the `predict/progress.sh` shell script to monitor the progress of both PHP scripts.
+
 
 # Writing Your Own Prediction Methods
 

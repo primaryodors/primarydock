@@ -151,6 +151,17 @@ else
 fi
 
 
+MOLECULE="ethyl_pyrazine"
+test/bond_rotation_test "c1nccnc1CC" | sed '/^#/d' > test/received/brot.$MOLECULE.received.txt
+RESULT=$(diff --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Rotatable bond test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Rotatable bond test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt
+fi
+
+
 MOLECULE="hydrogen_peroxide"
 test/bond_rotation_test "OO" | sed '/^#/d' > test/received/brot.$MOLECULE.received.txt
 RESULT=$(diff --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt)

@@ -1566,6 +1566,7 @@ Bond** Molecule::get_rotatable_bonds()
                 if (pia && pib
                     && lb[j]->btom->is_bonded_to(CHALCOGEN)
                     && fa != CHALCOGEN
+                    && !(lb[j]->atom->in_same_ring_as(lb[j]->btom))
                     /* && lb[j]->btom->is_bonded_to("H")
                     && lb[j]->atom->get_Z() > 1 */
                     )

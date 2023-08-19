@@ -84,3 +84,24 @@ else
     diff --color --unified $REPORT test/received/bwmagic.received.txt
 fi
 
+
+MOLECULE="benzaldehyde"
+test/bond_rotation_test "c1ccccc1C=O" | sed '/^#/d' > test/received/brot.$MOLECULE.received.txt
+RESULT=$(diff --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Rotatable bond test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Rotatable bond test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt
+fi
+
+
+MOLECULE="leaf_alcohol"
+test/bond_rotation_test "CC\\C=C/CCO" | sed '/^#/d' > test/received/brot.$MOLECULE.received.txt
+RESULT=$(diff --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Rotatable bond test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Rotatable bond test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt
+fi

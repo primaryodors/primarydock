@@ -1509,7 +1509,7 @@ void Molecule::identify_acidbase()
     }
 }
 
-Bond** Molecule::get_rotatable_bonds(bool ih)
+Bond** Molecule::get_rotatable_bonds()
 {
     if (noAtoms(atoms)) return 0;
     if (ih && mol_typ == MOLTYP_AMINOACID)
@@ -1538,8 +1538,6 @@ Bond** Molecule::get_rotatable_bonds(bool ih)
             for (j=0; j<g && lb[j]; j++)
             {
                 if (lb[j]->count_moves_with_btom() > mwblimit) continue;
-
-                if (!ih && lb[j]->count_heavy_moves_with_btom()) continue;
 
                 if (!lb[j]->atom || !lb[j]->btom) continue;
 

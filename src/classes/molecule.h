@@ -141,7 +141,7 @@ public:
     int has_hbond_acceptors();                    // N+ is not an h-bond acceptor.
 
     // Bond functions.
-    Bond** get_rotatable_bonds(bool include_heavy = true);
+    Bond** get_rotatable_bonds();
     Bond** get_all_bonds(bool unidirectional);
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
     bool rotate_bond(const Bond* rot8b, const float angle);

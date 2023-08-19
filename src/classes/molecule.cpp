@@ -1555,7 +1555,7 @@ Bond** Molecule::get_rotatable_bonds()
                    )
                 {
                     lb[j]->can_rotate = false;
-                    if ((fa == PNICTOGEN || fa == CHALCOGEN || fb == PNICTOGEN || fb == CHALCOGEN)
+                    if ((fa == CHALCOGEN || fb == CHALCOGEN)
                         && fa != fb
                         && lb[j]->btom->get_bonded_atoms_count() > 1
                         ) lb[j]->can_flip = true;

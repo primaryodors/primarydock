@@ -160,3 +160,14 @@ else
     printf "${RED}Rotatable bond test FAILED for $MOLECULE.${NC}\n"
     diff --color --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt
 fi
+
+
+MOLECULE="dipeptide_GG"
+test/bond_rotation_test "NCC(=O)NCC(=O)O" | sed '/^#/d' > test/received/brot.$MOLECULE.received.txt
+RESULT=$(diff --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Rotatable bond test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Rotatable bond test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt
+fi

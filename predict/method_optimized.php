@@ -55,6 +55,8 @@ function make_prediction($data)
         if ($ae < 0 && $ae < $ie) $data['Predicted'] = 'Agonist';
         else if ($a1 < 0 && $a1 < $i1) $data['Predicted'] = 'Agonist';
         else $data['Predicted'] = 'Non-agonist';
+
+        echo "\nResult: " . print_r($data, true) . "\n";
     }
 
     return $data;
@@ -74,7 +76,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH TS
 POSE 10
-ELIM 20
+ELIM 500
 ITERS 50
 PROGRESS
 
@@ -122,7 +124,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH TS
 POSE 10
-ELIM 5
+ELIM 500
 ITERS 50
 PROGRESS
 

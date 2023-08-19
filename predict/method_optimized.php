@@ -134,7 +134,7 @@ WET
 $config_params
 DYNMIN 0.85
 DYNINIT 1.0
-DYNEVERY 13
+DYNEVERY 40
 
 OUT $outfname
 OUTPDB 3 output/$fam/$protid/%p.%l.model%o.pdb

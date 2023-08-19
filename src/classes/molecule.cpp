@@ -1562,11 +1562,12 @@ Bond** Molecule::get_rotatable_bonds()
                 }
 
                 // If atoms a and b are pi, and b is only bound to a, a hydrogen, and a chalcogen, then a-b can flip.
+                // But the acetyl group of e.g. acetophenone can also flip, so the hydrogen is unnecessary.
                 if (pia && pib
                     && lb[j]->btom->is_bonded_to(CHALCOGEN)
                     && fa != CHALCOGEN
-                    && lb[j]->btom->is_bonded_to("H")
-                    && lb[j]->atom->get_Z() > 1
+                    /* && lb[j]->btom->is_bonded_to("H")
+                    && lb[j]->atom->get_Z() > 1 */
                     )
                 {
                     lb[j]->can_rotate = false;

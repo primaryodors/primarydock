@@ -1,0 +1,2 @@
+Bond C6-C7 can flip.
+Bond C7-C9 can rotate.

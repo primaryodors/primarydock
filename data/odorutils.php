@@ -98,7 +98,7 @@ function best_empirical_pair($protein, $aroma, $as_object = false)
 					// echo "Reference $ref says $aroma is a {$acv[$protein]['type']} for $protein.\n";
 
 					// TODO: This is horribly inadequate for $as_object=true.
-					if ($sepyt[$acv[$protein]['type']] > $btyp || $btyp == $sepyt["?"])
+					if (isset($acv[$protein]['type']) && $sepyt[$acv[$protein]['type']] > $btyp || $btyp == $sepyt["?"])
 					{
 						$btyp = $as_object ? $acv[$protein] : $sepyt[trim($acv[$protein]['type'])];
 						if ($as_object) $btyp['ref'] = $ref;

@@ -501,7 +501,7 @@ void iteration_callback(int iter, Molecule** mols)
     }
 
     int i, j;
-    if (num_dyn_motions && !(iter % dynamic_every_iter))
+    if (num_dyn_motions && !((iter-1) % dynamic_every_iter))
     {
         for (i=0; i<num_dyn_motions; i++)
         {

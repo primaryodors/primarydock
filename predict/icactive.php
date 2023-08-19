@@ -496,10 +496,11 @@ echo "TMR6 type: $tmr6type" . ($hasR6x59 ? " with R6.59" : "") . ($exrbend ? " w
 // TMR5 generally bends at the extracellular end, to keep up with the motion of the cytoplasmic end of TMR6. TMR5 also moves slightly toward TMR6,
 // about 1A at the extracellular end and about 3.5A at the cytoplasmic end, the difference being due to the bend.
 $distance_v = get_distance($residue_info["5.33"][2], $residue_info["5.68"][2]);
-$distance_h = $tmr6_distance_h - 1;
+$distance5h = -1.5;
+$distance_h = $tmr6_distance_h - $distance5h;
 $angle = round(45.0 * $distance_h / $distance_v, 2);
 $dynamics[] = "DYNAMIC BEND bend5 5.33 56.49 5.33 2.64 -$angle SYNC $m6name";
-// $dynamics[] = "DYNAMIC MOVE move5 5.33 56.49 5.43 6.55 1 SYNC bend5";
+$dynamics[] = "DYNAMIC MOVE move5 5.33 56.49 5.43 6.55 $distance5h SYNC bend5";
 
 
 // TMR7 activation motion:

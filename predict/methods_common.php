@@ -336,6 +336,12 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                         if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = 1;
                         else $outdqty[$metrics_prefix.$wmode]++;
                     }
+
+                    if ($mode == "BENERG" && isset($metrics_to_process["BEST"]))
+                    {
+                        $wmode = $metrics_to_process["BEST"];
+                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = floatval($coldiv[1]);
+                    }
                     continue;
                 }
                 else if ($coldiv[0] == "Ligand polar satisfaction")

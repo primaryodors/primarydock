@@ -41,6 +41,7 @@ $metrics_to_process =
 [
     "BENERG" => "BindingEnergy",
     "BENERG.rgn" => "BindingEnergy.rgn",
+    "BEST" => "Pose1"
 ];
 
 function make_prediction($data)
@@ -49,7 +50,10 @@ function make_prediction($data)
     {
         $ae = floatval($data['a_BindingEnergy']);
         $ie = floatval(@$data["i_BindingEnergy"]);
+        $a1 = floatval($data['a_Pose1']);
+        $i1 = floatval($data['i_Pose1']);
         if ($ae < 0 && $ae < $ie) $data['Predicted'] = 'Agonist';
+        else if ($a1 < 0 && $a1 < $i1) $data['Predicted'] = 'Agonist';
         else $data['Predicted'] = 'Non-agonist';
     }
 

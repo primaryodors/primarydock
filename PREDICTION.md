@@ -38,7 +38,7 @@ The prediction method lends itself well to running as a cron, e.g.:
 
 In this example, the `next` parameter means to find the next receptor/ligand pair yet to process, and go ahead with the
 calculations for it. The "next" pair to process is the first pair of GPCR + known ligand (whether agonist or not) that
-either is not present in `predict/dock_results_optimized.json` or has a `version` value older than either: the
+either is not present in `predict/dock_results_optimized.json` or has a `version` timestamp older than either: the
 prediction method .php, `methods_common.php`, or the `/bin/primarydock` executable.
 
 The `simul=8` parameter indicates not to run more than 8 concurrent processes. We recommend a value of no more than

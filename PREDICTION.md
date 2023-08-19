@@ -2,18 +2,18 @@
 # Predicting Receptor Responses to Ligands
 
 At this time, no method yet exists to accurately distinguish agonist from non-agonist ligands using PrimaryDock output.
-To the best of our knowledge, either no one has developed the capability to make such predictions, or no accurate
-prediction making utility has been released to the public. Therefore, we continue to strive towards accurate predictions
-of GPCR agonism by odorants.
+To the best of our knowledge, either no one has developed the capability to make predictions of olfactory receptor agonism
+by odorants, or no accurate prediction making utility has been released to the public. Therefore, we continue to strive
+toward accurately predicting receptor responses to odorants in a transparent and publicly accessible way.
 
 
 # Prediction Methods
 
-PrimaryDock prediction methods are cronnable PHP scripts that perform docks of known ligands in PDB files and aggregate
-the resulting data into a JSON file. A prediction method begins with `require("methods_common.php");`, followed by a
-call to `prepare_outputs();` which generates the output file names as well as some other custom variables. A string
-value named `$configf` is then set, containing the config file to be generated for the `primarydock` app, and then the
-`process_dock()` function is called.
+PrimaryDock prediction methods are cronnable PHP scripts that perform docks of empirically measured (or yet to be measured)
+ligands in PDB files and aggregate the resulting data into a JSON file. A prediction method script begins with
+`require("methods_common.php");`, followed by a call to `prepare_outputs();` which generates the output file names based on
+command line input, as well as some other custom variables. A string value named `$configf` is then set, containing the config
+file to be generated for the `primarydock` app, and then the `process_dock()` function is called.
 
 The most current prediction method is `method_optimized.php`. The first time it is run, it will perform a one-time
 setup of required data, including an automatic download of PDB models from the RCSB and AlphaFold websites. An example
@@ -23,7 +23,8 @@ of the command line for running a prediction might be:
 php -f predict/method_optimized.php prot=OR1A1 lig=cis-3-hexen-1-ol
 ```
 
-If the name of the ligand contains parentheses, it's a good idea to put the entire lig= parameter in quotes, e.g.:
+If the name of the ligand contains spaces, then the spaces should be replaced with underscores, e.g. `lig=ethyl_vanillin`.
+If the ligand name contains parentheses, it's a good idea to put the entire lig= parameter in quotes, e.g.:
 
 ```
 php -f predict/method_optimized.php prot=OR1A1 "lig=(S)-(+)-carvone"
@@ -35,17 +36,18 @@ The prediction method lends itself well to running as a cron, e.g.:
 * * * * * php -f /path/to/primarydock/predict/method_coupled.php next simul=8
 ```
 
-In this example, the `next` parameter means to find the next GPCR/G-protein pair or GPCR/ligand pair yet to process,
-and process it. The "next" pair to process is the first pair of GPCR + known ligand (whether agonist or not) that
-either is not present in `predict/dock_results_optimized.json` or has a `version` value older than either the
+In this example, the `next` parameter means to find the next receptor/ligand pair yet to process, and go ahead with the
+calculations for it. The "next" pair to process is the first pair of GPCR + known ligand (whether agonist or not) that
+either is not present in `predict/dock_results_optimized.json` or has a `version` value older than either: the
 prediction method .php, `methods_common.php`, or the `/bin/primarydock` executable.
 
 The `simul=8` parameter indicates not to run more than 8 concurrent processes. We recommend a value of no more than
-the number of physical cores on your machine, so if you have a server with one 8-core processor, then `simul=8` would
-be the maximum recommended value. If you have `lm-sensors` installed (`sudo apt-get install lm-sensors`), then both PHP
-scripts will automatically limit themselves depending on the CPU temperature.
+the number of processor cores or threads on your machine, so if you have a server with one 8-core 16-thread processor,
+then `simul=8` would be the maximum recommended value. We strongly recommend installing `lm-sensors` if your system does
+not already ahve this tool (`sudo apt-get install lm-sensors`), that way the prediction script will automatically limit
+itself depending on the CPU temperature.
 
-You can use the `predict/progress.sh` shell script to monitor the progress of both PHP scripts.
+You can use the `predict/progress.sh` shell script to monitor the progress of the predictions.
 
 
 # Writing Your Own Prediction Methods
@@ -66,6 +68,7 @@ Configurable variables include:
 Available parameters for `$metrics_to_process` include:
 `BENERG`                Total binding energy between ligand and protein;
 `BENERG.rgn`            Total binding energy between ligand and specific regions of the protein, e.g. TMR6;
+`BEST`                  Total ligand-protein binding energy of the most favorable pose.
 `vdWRPL`                Total van der Waals repulsion (i.e. where atoms are < 4Å apart) ligand to protein;
 `vdWRPL.rgn`            Total vdW repulsion between ligand and regions of protein;
 `POLSAT`                Ligand's sum polar satisfaction, a measure of polar-polar and nonpolar-nonpolar proximity;

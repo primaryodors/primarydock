@@ -231,7 +231,6 @@ protected:
     char* smiles = 0;
     Ring** rings = nullptr;
     Bond** rotatable_bonds = nullptr;
-    Bond** rotatable_bonds_nh = nullptr;
     bool immobile = false;
     bool doing_bkbend = false;
     float base_internal_clashes = 0;					// Baseline computed internal clashes due to unavoidably close atoms.

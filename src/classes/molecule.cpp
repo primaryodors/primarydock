@@ -1512,7 +1512,7 @@ void Molecule::identify_acidbase()
 Bond** Molecule::get_rotatable_bonds()
 {
     if (noAtoms(atoms)) return 0;
-    if (ih && mol_typ == MOLTYP_AMINOACID)
+    if (mol_typ == MOLTYP_AMINOACID)
     {
         // TODO: There has to be a better way.
         Star s;
@@ -1523,11 +1523,10 @@ Bond** Molecule::get_rotatable_bonds()
         return rotatable_bonds;
     }
     // cout << name << " Molecule::get_rotatable_bonds()" << endl << flush;
-    if (ih && rotatable_bonds) return rotatable_bonds;
-    if (!ih && rotatable_bonds_nh) return rotatable_bonds_nh;
+    if (rotatable_bonds) return rotatable_bonds;
 
     Bond* btemp[65536];
-    int mwblimit = atcount/2;						// Prevent rotations that move most of the molecule.
+    // int mwblimit = atcount/2;						// Prevent rotations that move most of the molecule.
 
     int i,j, bonds=0;
     if (!immobile)
@@ -1537,7 +1536,7 @@ Bond** Molecule::get_rotatable_bonds()
             int g = atoms[i]->get_geometry();
             for (j=0; j<g && lb[j]; j++)
             {
-                if (lb[j]->count_moves_with_btom() > mwblimit) continue;
+                // if (lb[j]->count_moves_with_btom() > mwblimit) continue;
 
                 if (!lb[j]->atom || !lb[j]->btom) continue;
 
@@ -1557,6 +1556,7 @@ Bond** Molecule::get_rotatable_bonds()
                 {
                     lb[j]->can_rotate = false;
                     if ((fa == PNICTOGEN || fa == CHALCOGEN || fb == PNICTOGEN || fb == CHALCOGEN)
+                        && fa != fb
                         && lb[j]->btom->get_bonded_atoms_count() > 1
                         ) lb[j]->can_flip = true;
                 }
@@ -1593,7 +1593,7 @@ Bond** Molecule::get_rotatable_bonds()
             int g = atoms[i]->get_geometry();
             for (j=0; j<g; j++)
             {
-                if (lb[j]->count_moves_with_btom() > mwblimit) continue;
+                // if (lb[j]->count_moves_with_btom() > mwblimit) continue;
 
                 // Generally, a single bond between pi atoms cannot rotate.
                 // Same if pi atom bonded to a pnictogen or chalcogen without a single bond to other atoms.
@@ -1654,22 +1654,11 @@ Bond** Molecule::get_rotatable_bonds()
             if (lb) delete[] lb;
         }
 
-    if (ih)
-    {
         rotatable_bonds = new Bond*[bonds+1];
         for (i=0; i<=bonds; i++) rotatable_bonds[i] = btemp[i];
         rotatable_bonds[bonds] = 0;
 
         return rotatable_bonds;
-    }
-    else
-    {
-        rotatable_bonds_nh = new Bond*[bonds+1];
-        for (i=0; i<=bonds; i++) rotatable_bonds_nh[i] = btemp[i];
-        rotatable_bonds_nh[bonds] = 0;
-
-        return rotatable_bonds_nh;
-    }
 }
 
 void Molecule::crumple(float theta)

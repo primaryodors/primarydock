@@ -1526,7 +1526,6 @@ Bond** Molecule::get_rotatable_bonds()
     if (rotatable_bonds) return rotatable_bonds;
 
     Bond* btemp[65536];
-    // int mwblimit = atcount/2;						// Prevent rotations that move most of the molecule.
 
     int i,j, bonds=0;
     if (!immobile)
@@ -1536,8 +1535,6 @@ Bond** Molecule::get_rotatable_bonds()
             int g = atoms[i]->get_geometry();
             for (j=0; j<g && lb[j]; j++)
             {
-                // if (lb[j]->count_moves_with_btom() > mwblimit) continue;
-
                 if (!lb[j]->atom || !lb[j]->btom) continue;
 
                 bool pia = lb[j]->atom->is_pi(),
@@ -1595,8 +1592,6 @@ Bond** Molecule::get_rotatable_bonds()
             int g = atoms[i]->get_geometry();
             for (j=0; j<g; j++)
             {
-                // if (lb[j]->count_moves_with_btom() > mwblimit) continue;
-
                 // Generally, a single bond between pi atoms cannot rotate.
                 // Same if pi atom bonded to a pnictogen or chalcogen without a single bond to other atoms.
                 if (lb[j]->atom && lb[j]->btom

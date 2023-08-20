@@ -198,6 +198,62 @@ void reconnect_bridges()
     freeze_bridged_residues();
 }
 
+void apply_protein_specific_settings(Protein* p)
+{
+    int i, n = dyn_motion_strings.size();
+
+    for (i=0; i<n; i++)
+    {
+        if (dyn_motions[i]) delete dyn_motions[i];
+        dyn_motions[i] = new DynamicMotion(p);
+        dyn_motions[i]->read_config_line(dyn_motion_strings[i].c_str(), dyn_motions);
+        dyn_motions[i]->minimum = dynamic_minimum;
+        dyn_motions[i]->apply_absolute(dynamic_minimum);
+    }
+    num_dyn_motions = i;
+    dyn_motions[i] = nullptr;
+
+    n = atomto.size();
+    for (i=0; i<n; i++)
+    {
+        char buffer[1024];
+        strcpy(buffer, atomto[i].c_str());
+        char** words = chop_spaced_words(buffer);
+
+        if (!words[1]) throw -1;
+        AminoAcid* aa = protein->get_residue_bw(words[1]);
+        if (!words[2]) throw -1;
+        char* aname = words[2];
+        if (!words[3]) throw -1;
+        AminoAcid* target = protein->get_residue_bw(words[3]);
+        if (words[4]) throw -1;
+
+        if (!aa)
+        {
+            cout << "Warning: residue " << words[1] << " not found." << endl;
+            continue;
+        }
+
+        if (!target)
+        {
+            cout << "Warning: residue " << words[3] << " not found." << endl;
+            continue;
+        }
+
+        Atom* a = aa->get_atom(aname);
+        if (!strcmp("EXTENT", aname)) a = aa->get_reach_atom();
+        if (!a)
+        {
+            cout << "Warning: atom not found " << *aa << ":" << aname << endl;
+            continue;
+        }
+
+        aa->movability = MOV_FLEXONLY;
+        aa->conform_atom_to_location(a->name, target->get_CA_location());
+    }
+}
+
+
 int main(int argc, char** argv)
 {
     dyn_motions[0] = nullptr;
@@ -262,6 +318,7 @@ int main(int argc, char** argv)
     }
     protein->load_pdb(pf, 0, protstrand ?: 'A');
     fclose(pf);
+    apply_protein_specific_settings(protein);
 
 
     for (i=0; i<num_dyn_motions; i++)

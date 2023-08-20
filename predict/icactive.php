@@ -446,7 +446,12 @@ foreach ($contact_spacing as $key => $value)
 // creating a rift in the cytoplasmic end and closing around the ligand. If R6.59 is present, it partially uncoils and rotates its side chain
 // inward to make contact with the ligand. Else if 45.53 is compatible with 6.55, then that pair becomes the contact.
 // Examples of 6.48 rock receptors: OR51E2 (with R6.59), OR1G1 (N45.53).
-if (!isset($contact_spacing["45.51-6.55"]) && floatval(@$contact_spacing["45.53-6.55"]))
+if (!isset($contact_spacing["45.51-6.55"])
+    &&
+    (   floatval(@$contact_spacing["45.53-6.55"])
+        || substr($residue_info["6.59"][1], 0, 1) == 'R'
+    )
+)
 {
     $tmr6type = "6.48 Rock";
     $m6name = "rock6";

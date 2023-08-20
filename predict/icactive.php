@@ -418,8 +418,8 @@ foreach ($contact_spacing as $contacts => $spacing)
     if ($delete) unset($contact_spacing[$contacts]);
 }
 
-print_r($residue_info);
-print_r($contact_spacing);
+// print_r($residue_info);
+// print_r($contact_spacing);
 
 
 // Types of TMR6 activation motion:
@@ -455,7 +455,11 @@ if (!isset($contact_spacing["45.51-6.55"])
 {
     $tmr6type = "6.48 Rock";
     $m6name = "rock6";
-    if (substr($residue_info["6.59"][1], 0, 1) == 'R') $hasR6x59 = true;
+    if (substr($residue_info["6.59"][1], 0, 1) == 'R')
+    {
+        $hasR6x59 = true;
+        $dynamics[] = "ATOMTO 6.59 EXTENT 5.35";
+    }
 
     $distance_v = get_distance($residue_info["6.48"][2], $residue_info["6.28"][2]);
     $distance_h = $tmr6_distance_h;

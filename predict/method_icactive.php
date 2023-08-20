@@ -102,21 +102,27 @@ chdir("..");
 
 $original_pdb = $pdbfname;
 $pdbfname = str_replace(".upright.pdb", ".icactive.pdb", $original_pdb);
+$result = [];
+exec("php -f predict/icactive.php $protid", $result);
+
+$config_params = [];
+$reading_params = false;
+$flex_constraints = [];
+foreach ($result as $line)
+{
+    if ($reading_params)
+    {
+        $config_params[] = $line;
+        if (substr($line, 0, 5) == "STCR " || substr($line, 0, 5) == "FLXR ") $flex_constraints[] = $line;
+    }
+    else if (trim($line) == "PRIMARYDOCK_CONFIG_PARAMS:") $reading_params = true;
+}
+
+$config_params = implode("\n", $config_params);
+$flex_constraints = implode("\n", $flex_constraints);
+
 if (!file_exists($pdbfname))
 {
-    $result = [];
-    exec("php -f predict/icactive.php $protid", $result);
-
-    $config_params = [];
-    $reading_params = false;
-    foreach ($result as $line)
-    {
-        if ($reading_params) $config_params[] = $line;
-        else if (trim($line) == "PRIMARYDOCK_CONFIG_PARAMS:") $reading_params = true;
-    }
-
-    $config_params = implode("\n", $config_params);
-
     $config_params = <<<heredoc
 
 PROT $original_pdb
@@ -147,6 +153,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 SEARCH TS
 POSE 10
 ELIM 500
+$flex_constraints
 ITERS 50
 PROGRESS
 

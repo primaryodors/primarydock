@@ -291,7 +291,7 @@ print_r($contacts_broken_bw);*/
 
 // Check residues of $rcpid and list which made/broken contacts are compatible.
 $working_pdbfn = filename_protid($rcpid);
-$bw_lookup_residue = ["6.28", "6.59", "5.33", "5.68", "7.48"];
+$bw_lookup_residue = ["6.28", "6.59", "5.33", "5.68", "7.48", "4.57"];
 foreach (array_merge($contacts_made_bw, $contacts_broken_bw) as $key => $value)
 {
     $residues = explode('-', $key);
@@ -440,6 +440,14 @@ foreach ($contact_spacing as $key => $value)
 
     if (residues_compatible($aa0, $aa1))
         $dynamics[] = "BRIDGE ".str_replace('-', ' ', $key);
+}
+
+// This is important for OR51E2 ligand specificity.
+// Motion should be prevented by V5.46, however the docker seems to not be avoiding internal clashes.
+$aa4x57 = substr($residue_info["4.57"][1], 0, 1);
+if ($aa4x57 == 'F' || $aa4x57 == 'W' || $aa4x57 == 'Y')
+{
+    $dynamics[] = "STCR 4.57";
 }
 
 // 6.48 Rock: If there is no 45.51-6.55 contact, and there is room for the EXR end of TMR6 to move toward the EXR2 helix, then TMR6 pivots at 6.48,

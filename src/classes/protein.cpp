@@ -1214,6 +1214,7 @@ AminoAcid** Protein::get_residues_can_clash(int resno)
         if (residues[i]->get_residue_no() == resno)
         {
             if (!res_can_clash[i] || !res_can_clash[i][0]) set_clashables();
+            residues[i]->mclashables = (Molecule**)res_can_clash[i];
             /*cout << i << ": " << flush;
             if (res_can_clash[i] && res_can_clash[i][0])
             {

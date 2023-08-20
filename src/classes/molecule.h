@@ -221,6 +221,7 @@ public:
     bool been_flexed = false;
     bool priority = false;
     std::vector<std::shared_ptr<GroupPair>> agroups;
+    Molecule** mclashables = nullptr;
 
 protected:
     Molecule();

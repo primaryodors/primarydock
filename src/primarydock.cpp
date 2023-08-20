@@ -3885,6 +3885,7 @@ _try_again:
                 #endif
                 if (!flex) reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
                 cfmols[i++] = reaches_spheroid[nodeno][j];
+                protein->get_residues_can_clash(reaches_spheroid[nodeno][j]->get_residue_no());
             }
 
             int cfmolqty = i;

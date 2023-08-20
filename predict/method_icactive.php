@@ -63,6 +63,49 @@ function make_prediction($data)
     return $data;
 }
 
+
+chdir(__DIR__);
+chdir("..");
+
+$pdbfname_active = str_replace(".upright.pdb", ".icactive.pdb", $pdbfname);
+$result = [];
+exec("php -f predict/icactive.php $protid", $result);
+
+$config_params = [];
+$reading_params = false;
+$flex_constraints = [];
+foreach ($result as $line)
+{
+    if ($reading_params)
+    {
+        $config_params[] = $line;
+        if (substr($line, 0, 5) == "STCR " || substr($line, 0, 5) == "FLXR ") $flex_constraints[] = $line;
+    }
+    else if (trim($line) == "PRIMARYDOCK_CONFIG_PARAMS:") $reading_params = true;
+}
+
+$config_params = implode("\n", $config_params);
+$flex_constraints = implode("\n", $flex_constraints);
+
+if (!file_exists($pdbfname_active))
+{
+    $config_params = <<<heredoc
+
+PROT $pdbfname
+$config_params
+OUTPDB $pdbfname_active
+
+heredoc;
+
+    $fp = fopen("tmp/icactive.config", "wb") or die("Failed to write to tmp/ folder.\n");
+    fwrite($fp, $config_params);
+    fclose($fp);
+
+    passthru("bin/ic_active_pdb tmp/icactive.config");
+}
+
+
+
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
 
 $configf = <<<heredoc
@@ -97,46 +140,7 @@ if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
 process_dock("i");
 
 
-chdir(__DIR__);
-chdir("..");
-
-$original_pdb = $pdbfname;
-$pdbfname = str_replace(".upright.pdb", ".icactive.pdb", $original_pdb);
-$result = [];
-exec("php -f predict/icactive.php $protid", $result);
-
-$config_params = [];
-$reading_params = false;
-$flex_constraints = [];
-foreach ($result as $line)
-{
-    if ($reading_params)
-    {
-        $config_params[] = $line;
-        if (substr($line, 0, 5) == "STCR " || substr($line, 0, 5) == "FLXR ") $flex_constraints[] = $line;
-    }
-    else if (trim($line) == "PRIMARYDOCK_CONFIG_PARAMS:") $reading_params = true;
-}
-
-$config_params = implode("\n", $config_params);
-$flex_constraints = implode("\n", $flex_constraints);
-
-if (!file_exists($pdbfname))
-{
-    $config_params = <<<heredoc
-
-PROT $original_pdb
-$config_params
-OUTPDB $pdbfname
-
-heredoc;
-
-    $fp = fopen("tmp/icactive.config", "wb") or die("Failed to write to tmp/ folder.\n");
-    fwrite($fp, $config_params);
-    fclose($fp);
-
-    passthru("bin/ic_active_pdb tmp/icactive.config");
-}
+$pdbfname = $pdbfname_active;
 
 $outfname = "output/$fam/$protid/$protid.$ligname.icactive.dock";
 

@@ -161,30 +161,6 @@ void freeze_bridged_residues()
             }
         }
     }
-
-    if (forced_static_resnos.size())
-    {
-        for (i=0; i<forced_static_resnos.size(); i++)
-        {
-            forced_static_resnos[i].resolve_resno(protein);
-            int resno = forced_static_resnos[i].resno;
-            if (!resno) continue;
-            
-            AminoAcid *aa = protein->get_residue(resno);
-            if (!aa) continue;
-
-            aa->movability = MOV_PINNED;
-            aa->been_flexed = true;
-            Bond** bb = aa->get_rotatable_bonds();
-            if (bb)
-            {
-                for (l=0; bb[l]; l++)
-                {
-                    bb[l]->can_rotate = false;
-                }
-            }
-        }
-    }
 }
 
 void reconnect_bridges()
@@ -226,7 +202,7 @@ int main(int argc, char** argv)
 {
     dyn_motions[0] = nullptr;
 
-    int i;
+    int i, j;
     for (i=0; i<256; i++)
         configfname[i] = protfname[i] = 0;
 
@@ -290,10 +266,7 @@ int main(int argc, char** argv)
 
     for (i=0; i<num_dyn_motions; i++)
     {
-        float energy = -ligand->get_intermol_binding(mols);
-        dyn_motions[i]->make_random_change();
-        float new_energy = -ligand->get_intermol_binding(mols);
-        if (new_energy > energy) dyn_motions[i]->undo();
+        dyn_motions[i]->apply_absolute(1);
     }
 
     Molecule* repack_residues[1024];
@@ -334,7 +307,7 @@ int main(int argc, char** argv)
     FILE* pfout = fopen(outpdb.c_str(), "wb");
     if (!pfout)
     {
-        cout << "Failed to open " << out_pdb_fn << " for writing." << endl;
+        cout << "Failed to open " << outpdb << " for writing." << endl;
         return -1;
     }
 

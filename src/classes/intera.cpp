@@ -696,7 +696,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (forces[i]->type == ionic) goto _has_ionic_already;
         }
 
-    if (!atoms_are_bonded && sgn(achg) == -sgn(bchg))
+    if (!atoms_are_bonded && achg && bchg && sgn(achg) == -sgn(bchg))
     {
         kJmol += 60.0 * fabs(achg)*fabs(bchg) / pow(r/((avdW+bvdW)*0.6), 2);
     }
@@ -1155,7 +1155,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         k = (forces[i]->type - covalent) % _INTER_TYPES_LIMIT;
         total_binding_by_type[k] += partial;
 
-        if (forces[i]->type == ionic && achg && bchg) break;
+        if (forces[i]->type == ionic && achg && bchg)
+        {
+            break;
+        }
     }
 
     if (rbind < 0.7) rbind = 0.7;

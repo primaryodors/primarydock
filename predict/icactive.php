@@ -466,9 +466,9 @@ if (!isset($contact_spacing["45.51-6.55"])
     if (substr($residue_info["6.59"][1], 0, 1) == 'R')
     {
         $hasR6x59 = true;
-        $dynamics[] = "ATOMTO 6.59 CZ 5.35";
+        $dynamics[] = "ATOMTO 6.59 CZ 4.60";
         $dynamics[] = "STCR 6.59";
-        $dynamics[] = "DYNAMIC WIND wind6 6.56 6.59 -22";
+        // $dynamics[] = "DYNAMIC WIND wind6 6.56 6.59 -8";
     }
 
     $distance_v = get_distance($residue_info["6.48"][2], $residue_info["6.28"][2]);

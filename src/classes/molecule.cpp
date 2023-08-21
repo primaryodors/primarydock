@@ -1485,13 +1485,17 @@ void Molecule::identify_acidbase()
                 Atom* bto = c->is_bonded_to("O");
                 if (bto)
                 {
-                    // Amides are weakly zwitterionic.
-                    float arity = c->is_bonded_to(bto);
-                    if (arity >= 1.5)
+                    if (amide_zwitterionic_amount)
                     {
-                        atoms[i]->increment_charge(amide_zwitterionic_amount);
-                        bto->increment_charge(-amide_zwitterionic_amount);
+                        // Amides are weakly zwitterionic.
+                        float arity = c->is_bonded_to(bto);
+                        if (arity >= 1.5)
+                        {
+                            atoms[i]->increment_charge(amide_zwitterionic_amount);
+                            bto->increment_charge(-amide_zwitterionic_amount);
+                        }
                     }
+
                     goto _not_basic;
                 }
             }

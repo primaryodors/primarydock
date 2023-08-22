@@ -515,6 +515,13 @@ echo "TMR6 type: $tmr6type" . ($hasR6x59 ? " with R6.59" : "") . ($exrbend ? " w
 // TMR5 generally bends at the extracellular end, to keep up with the motion of the cytoplasmic end of TMR6. TMR5 also moves slightly toward TMR6,
 // about 1A at the extracellular end and about 3.5A at the cytoplasmic end, the difference being due to the bend.
 $distance_v = get_distance($residue_info["5.33"][2], $residue_info["5.68"][2]);
+
+// TODO: The horizontal motion of TMR5+TMR6 is driven by the 5.58-7.53 contact.
+// 3.43 probably limits the inward bend of TMR7.
+// The overall horizontal motion of TMR5 is limited by multiple residues between 5.43-5.54 and 6.44-6.55.
+// The remaining portion of the gap is closed by rotating all of TMR5 to bring 5.58 near 7.53 and rotating
+// TMR6 about the Y axis so its CYT end aligns with TMR5's CYT end.
+// These motions are important for e.g. OR51E2 in which TMR5 closes onto the ligand binding site, limiting the pocket volume from larger SCFAs.
 $distance5h = -1.5;
 $distance_h = $tmr6_distance_h - $distance5h;
 $angle = round(45.0 * $distance_h / $distance_v, 2);

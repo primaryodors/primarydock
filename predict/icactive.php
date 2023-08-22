@@ -444,11 +444,11 @@ foreach ($contact_spacing as $key => $value)
 
 // This is important for OR51E2 ligand specificity.
 // Motion should be prevented by V5.46, however the docker seems to not be avoiding internal clashes.
-$aa4x57 = substr($residue_info["4.57"][1], 0, 1);
+/*$aa4x57 = substr($residue_info["4.57"][1], 0, 1);
 if ($aa4x57 == 'F' || $aa4x57 == 'W' || $aa4x57 == 'Y')
 {
     $dynamics[] = "STCR 4.57";
-}
+}*/
 
 // 6.48 Rock: If there is no 45.51-6.55 contact, and there is room for the EXR end of TMR6 to move toward the EXR2 helix, then TMR6 pivots at 6.48,
 // creating a rift in the cytoplasmic end and closing around the ligand. If R6.59 is present, it partially uncoils and rotates its side chain
@@ -539,7 +539,7 @@ if (@$contact_spacing["5.58-7.53"])
 // in the range of the 45.52-45.54 positions.
 if ($hasR6x59)
 {
-    $dynamics[] = "DYNAMIC BEND bend45 45.52 45.54 45.52 45.54 30 MIN $m6name";
+    $dynamics[] = "DYNAMIC BEND bend45 45.53 45.54 45.53 45.54 30 MIN $m6name";
 }
 
 

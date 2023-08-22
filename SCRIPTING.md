@@ -186,6 +186,17 @@ This is useful for comparing various active and inactive states of GPCRs; the 1.
 parts of the protein, and variations in structure can be observed with minimal global transformational anomalies.
 
 
+# CANMOVE
+Example:
+```
+CANMOVE %5.43 %5.54 TO %6.44 %6.55 &TMR5x
+```
+
+Determines how far one region of the protein can move in the direction of another. In this case, the region of Ballesteros-Weinstein numbers 5.43
+to 5.54 is tested for space to move toward the region of BW numbers 6.44 to 6.55. The resulting value, a distance expressed in Angstroms, is stored
+in the output parameter, in this case &TMR5x.
+
+
 # CENTER
 Example:
 ```

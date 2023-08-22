@@ -972,6 +972,81 @@ int main(int argc, char** argv)
                 working->move_piece(1, working->get_end_resno(), new_center);
             }   // BWCENTER
 
+            else if (!strcmp(words[0], "CANMOVE"))
+            {
+                int sr1, er1, sr2, er2;
+
+                if (!words[0] || !words[1] || !words[2] || !words[3] || !words[4] || !words[5] || !words[6])
+                    raise_error("Insufficient parameters given for CANMOVE.");
+                else if (words[7])
+                    raise_error("Too many parameters given for CANMOVE.");
+
+                sr1 = interpret_single_int(words[1]);
+                er1 = interpret_single_int(words[2]);
+
+                sr2 = interpret_single_int(words[4]);
+                er2 = interpret_single_int(words[5]);
+
+                if (!strcmp(words[3], "TO"))
+                {
+                    float f = 0, clash_limit = 0;
+                    Point center1 = working->get_region_center(sr1, er1);
+                    Point center2 = working->get_region_center(sr2, er2);
+                    SCoord df = center2.subtract(center1);
+                    df.r = 0.5;
+
+                    Pose poses[er1+1];
+                    for (l=sr1; l<=er1; l++)
+                    {
+                        AminoAcid* aa = working->get_residue(l);
+                        if (aa)
+                        {
+                            poses[l].copy_state(aa);
+                            clash_limit += homology_clash_peraa;
+                        }
+                    }
+
+                    clash_limit /= 2.5;
+
+                    float c = working->get_internal_clashes(sr1, er1);
+                    for (l=0; l<200; l++)
+                    {
+                        working->move_piece(sr1, er1, df);
+                        float c1 = working->get_internal_clashes(sr1, er1);
+                        // cout << c << " " << c1 << endl;
+
+                        if (c1 > clash_limit)
+                        {
+                            df.r *= -1;
+                            working->move_piece(sr1, er1, df);
+                            df.r *= -0.666;
+                        }
+                        else
+                        {
+                            c = c1;
+                            f += df.r;
+                        }
+
+                        if (fabs(df.r) < 0.001) break;
+                    }
+
+                    for (l=sr1; l<=er1; l++)
+                    {
+                        AminoAcid* aa = working->get_residue(l);
+                        if (aa) poses[l].restore_state(aa);
+                    }
+
+                    Star s;
+                    s.f = f;
+                    set_variable(words[6], s);
+                }
+                else
+                {
+                    raise_error((std::string)"Unimplemented direction " + (std::string)words[3] + (std::string)".");
+                }
+
+            }   // CANMOVE
+
             else if (!strcmp(words[0], "CENTER"))
             {
                 l = 1;

@@ -335,6 +335,11 @@ ECHO "-----"
 
 $optimized
 
+ECHO "-----"
+
+CANMOVE %5.43 %5.54 TO %6.44 %6.55 &TMR5x
+ECHO "TMR5x: " &TMR5x
+
 heredoc;
 
 
@@ -347,7 +352,7 @@ $result = [];
 $cmd = "bin/pepteditor $pepd_fname";
 exec($cmd, $result);
 
-// print_r($result);
+print_r($result);
 
 
 $residue_info = [];
@@ -375,6 +380,12 @@ foreach ($result as $line)
         $line = explode("|", $line);
         $line[0] = str_replace("x", ".", $line[0]);
         $contact_spacing[$line[0]] = floatval($line[1]);
+        break;
+
+        case 2:
+        $line = explode(':', $line);
+        $varname = $line[0];
+        $$varname = is_numeric($line[1]) ? floatval($line[1]) : $line[1];
         break;
 
         default:
@@ -522,7 +533,7 @@ $distance_v = get_distance($residue_info["5.33"][2], $residue_info["5.68"][2]);
 // The remaining portion of the gap is closed by rotating all of TMR5 to bring 5.58 near 7.53 and rotating
 // TMR6 about the Y axis so its CYT end aligns with TMR5's CYT end.
 // These motions are important for e.g. OR51E2 in which TMR5 closes onto the ligand binding site, limiting the pocket volume from larger SCFAs.
-$distance5h = -1.5;
+$distance5h = $TMR5x;
 $distance_h = $tmr6_distance_h - $distance5h;
 $angle = round(45.0 * $distance_h / $distance_v, 2);
 $dynamics[] = "DYNAMIC BEND bend5 5.33 56.49 5.33 2.64 -$angle SYNC $m6name";

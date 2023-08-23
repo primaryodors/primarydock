@@ -1518,10 +1518,11 @@ bool AminoAcid::can_reach(Molecule* other) const
 
 bool AminoAcid::can_reach(AminoAcid* other) const
 {
-    Atom* ca1, *ca2;
+    Atom *ca1, *cb1, *ca2;
     float r;
 
     ca1 = get_atom("CA");
+    cb1 = get_atom("CB");
     ca2 = other->get_atom("CA");
 
     if (!ca1 || !ca2)
@@ -1532,7 +1533,14 @@ bool AminoAcid::can_reach(AminoAcid* other) const
 
     r = ca1->get_location().get_3d_distance(ca2->get_location());
 
-    if (r <= 1.15 * (get_reach() + other->get_reach())) return true;
+    float f = 1;
+    if (cb1)
+    {
+        f = find_3d_angle(cb1->get_location(), ca2->get_location(), ca1->get_location());
+        f = 0.5 + 0.5 * cos(f);
+    }
+
+    if (r <= f*(get_reach() + other->get_reach() + 4)) return true;
     else return false;
 }
 

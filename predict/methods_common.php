@@ -85,7 +85,10 @@ if (@$_REQUEST['next'])
 			$lignospace = str_replace(" ", "_", $full_name);
 			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
                 ||
-                max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version
+                (   (max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version)
+                    &&
+                    !max(@$dock_results[$rcpid][$full_name]['locked'], @$dock_results[$rcpid][$fnnospace]['locked'])
+                )
                 )
 			{
 				if (false!==strpos($already, $lignospace))
@@ -115,7 +118,10 @@ if (@$_REQUEST['next'])
 			$lignospace = str_replace(" ", "_", $full_name);
 			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
                 ||
-                max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version
+                (   (max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version)
+                    &&
+                    !max(@$dock_results[$rcpid][$full_name]['locked'], @$dock_results[$rcpid][$fnnospace]['locked'])
+                )
                 )
 			{
 				if (false!==strpos($already, $lignospace))
@@ -463,6 +469,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
         $outdata = make_prediction($outdata);
         $nc = count($outdata);
         if ($nc < $oc) die("ERROR: make_prediction() must return the input array with the prediction added.");
+        if (@$outdata["Predicted"] == $actual) $outdata["locked"] = 1;
     }
     $outdata["Actual"] = $actual;
 

@@ -993,6 +993,7 @@ int main(int argc, char** argv)
                     Point center1 = working->get_region_center(sr1, er1);
                     Point center2 = working->get_region_center(sr2, er2);
                     SCoord df = center2.subtract(center1);
+                    float dfr = df.r - unconnected_residue_mindist;
                     df.r = 0.5;
 
                     Pose poses[er1+1];
@@ -1035,6 +1036,8 @@ int main(int argc, char** argv)
                         AminoAcid* aa = working->get_residue(l);
                         if (aa) poses[l].restore_state(aa);
                     }
+
+                    if (f > dfr) f = dfr;
 
                     Star s;
                     s.f = f;

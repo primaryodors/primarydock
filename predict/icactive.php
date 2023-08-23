@@ -340,6 +340,9 @@ ECHO "-----"
 CANMOVE %5.43 %5.54 TO %6.44 %6.55 &TMR5x
 ECHO "TMR5x: " &TMR5x
 
+CANMOVE %6.58 %6.59 TO %45.53 %45.54 &TMR6ex
+ECHO "TMR6ex: " &TMR6ex
+
 heredoc;
 
 
@@ -482,10 +485,21 @@ if (!isset($contact_spacing["45.51-6.55"])
         // $dynamics[] = "DYNAMIC WIND wind6 6.56 6.59 -8";
     }
 
-    $distance_v = get_distance($residue_info["6.48"][2], $residue_info["6.28"][2]);
+    /*$distance_v = get_distance($residue_info["6.48"][2], $residue_info["6.28"][2]);
     $distance_h = $tmr6_distance_h;
     $angle = round(45.0 * $distance_h / $distance_v, 2);            // Approximation.
+    $dynamics[] = "DYNAMIC BEND $m6name 56.50 6.59 6.48 7.43 -$angle";*/
+
+    $distance_v = get_distance($residue_info["6.48"][2], $residue_info["6.59"][2]);
+    $distance_h = $TMR6ex;
+    $angle = round(180.0/pi() * atan2($distance_h, $distance_v), 2);
+
+    // echo "6.59 is $distance_v A from 6.48 and can move $distance_h A toward 45.53, making a rock6 angle of $angle degrees.\n";
+
     $dynamics[] = "DYNAMIC BEND $m6name 56.50 6.59 6.48 7.43 -$angle";
+
+    // TODO: If the rock6 angle is not enough to move 6.40 out of the way of the 5.58-7.53 contact, then this is a hybrid motion
+    // with an additional bend at 6.48 to bring the CYT domain out more.
 }
 
 // 6.48 Bend: If there is a 45.51-6.55 contact and a 3.40-6.48 contact, then TMR6 bends at the 6.48 position to create a cytoplasmic rift, but does

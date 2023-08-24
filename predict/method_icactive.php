@@ -24,7 +24,8 @@ if (substr($fam, 0, 2) == "OR")
     if ($sub >= 50)
     {
         // https://doi.org/10.1101/2022.12.20.520951
-        $cenres = "CEN RES 4.57 4.60 5.39 45.52";
+        // $cenres = "CEN RES 4.57 4.60 5.39 45.52";
+        $cenres = "CEN RES 45.52 6.59";
     }
     else
     {

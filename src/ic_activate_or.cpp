@@ -198,7 +198,7 @@ int main(int argc, char** argv)
     char l5x58 = aa5x58->get_letter();
     char l7x53 = aa7x53->get_letter();
     float bridge57, scooch6x40, TMR7cz;
-    SCoord TMR6cdir, TMR7cdir, axis7;
+    SCoord TMR5cdir, TMR6cdir, TMR7cdir, axis7;
     Point pt_tmp;
     
     if (l5x58 == 'Y' && l7x53 == 'Y')
@@ -269,6 +269,19 @@ int main(int argc, char** argv)
         // Translate the CYT3 region (BW numbers 56.x) to stay with 5.68 and 6.28 as smoothly as possible.
         bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
         cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
+        TMR5cdir = aa7x53->get_CA_location().subtract(aa5x58->get_CA_location());
+        TMR5cdir.r = bridge57;
+        axis5 = compute_normal(aa5x33->get_CA_location(), aa5x58->get_CA_location(), aa5x58->get_CA_location().add(TMR5cdir));
+        theta = find_3d_angle(aa5x58->get_CA_location(), aa5x58->get_CA_location().add(TMR5cdir), aa5x33->get_CA_location());
+        was = aa56x50->get_CA_location();
+        p.rotate_piece(aa5x33->get_residue_no(), aa56x50->get_residue_no(), aa5x33->get_CA_location(), axis5, theta);
+
+        TMR6cdir = aa56x50->get_CA_location().subtract(was);
+        axis6 = compute_normal(aa6x59->get_CA_location(), was, aa56x50->get_CA_location());
+        theta = find_3d_angle(was, aa56x50->get_CA_location(), aa6x59->get_CA_location());
+        p.rotate_piece(aa56x50->get_residue_no()+1, aa6x59->get_residue_no(), aa6x59->get_CA_location(), axis6, theta);
+
+        p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
     }
 
     // If there is R6.59, adjust its side chain to keep pointing inward while avoiding clashes with other nearby side chains.

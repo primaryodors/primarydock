@@ -1103,16 +1103,12 @@ void Atom::set_aa_properties()
     // https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5441424/
     if (false!=strcmp(name, "O"))
     {
-        charge = -0.53;
         polarity = -1;
         return;
     }
 
     if (false!=strcmp(name, "N"))
     {
-        charge = -0.40;
-        acidbase = 0.3;
-        polarity = -1;
         return;
     }
 
@@ -1121,8 +1117,6 @@ void Atom::set_aa_properties()
             false!=strcmp(name, "NH")
        )
     {
-        charge =  0.29;
-        acidbase = 0.3;
         polarity =  1;
         return;
     }

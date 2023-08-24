@@ -108,6 +108,9 @@ std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
 std::vector<std::string> dyn_motion_strings;
+float dynamic_minimum = 0;
+float dynamic_initial = 1;
+int dynamic_every_iter = 13;
 DynamicMotion* dyn_motions[64];
 int num_dyn_motions = 0;
 
@@ -323,6 +326,134 @@ MCoord* search_mtlcoords_for_residue(AminoAcid* aa)
     return nullptr;
 }
 
+int interpret_resno(const char* field)
+{
+    char buffer[strlen(field)+4];
+    strcpy(buffer, field);
+    char* dot = strchr(buffer, '.');
+    if (dot)
+    {
+        *(dot++) = 0;
+        int b = atoi(buffer);
+        int w = atoi(dot);
+        int _50 = protein->get_bw50(b);
+        if (_50 < 1)
+        {
+            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW words." << endl;
+            throw 0xbad12e5;
+        }
+        return _50 + w - 50;
+    }
+    else return atoi(buffer);
+}
+
+void freeze_bridged_residues()
+{
+    int i, l;
+
+    if (bridges.size())
+    {
+        for (i=0; i<bridges.size(); i++)
+        {
+            int resno1 = interpret_resno(bridges[i].c_str());
+            const char* r2 = strchr(bridges[i].c_str(), '|');
+            if (!r2) throw 0xbadc0de;
+            r2++;
+            int resno2 = interpret_resno(r2);
+            
+            AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
+            if (aa1)
+            {
+                aa1->movability = MOV_PINNED;
+                aa1->been_flexed = true;
+                Bond** bb = aa1->get_rotatable_bonds();
+                if (bb)
+                {
+                    for (l=0; bb[l]; l++)
+                    {
+                        bb[l]->can_rotate = false;
+                    }
+                    // delete bb;
+                }
+            }
+            if (aa2)
+            {
+                aa2->movability = MOV_PINNED;
+                aa2->been_flexed = true;
+                Bond** bb = aa2->get_rotatable_bonds();
+                if (bb)
+                {
+                    for (l=0; bb[l]; l++)
+                    {
+                        bb[l]->can_rotate = false;
+                    }
+                    // delete bb;
+                }
+            }
+        }
+    }
+
+    if (forced_static_resnos.size())
+    {
+        for (i=0; i<forced_static_resnos.size(); i++)
+        {
+            forced_static_resnos[i].resolve_resno(protein);
+            int resno = forced_static_resnos[i].resno;
+            if (!resno) continue;
+            
+            AminoAcid *aa = protein->get_residue(resno);
+            if (!aa) continue;
+
+            aa->movability = MOV_PINNED;
+            aa->been_flexed = true;
+            Bond** bb = aa->get_rotatable_bonds();
+            if (bb)
+            {
+                for (l=0; bb[l]; l++)
+                {
+                    bb[l]->can_rotate = false;
+                }
+                // delete bb;
+            }
+        }
+    }
+}
+
+void reconnect_bridges()
+{
+    int i;
+    for (i=0; i<bridges.size(); i++)
+    {
+        int resno1 = interpret_resno(bridges[i].c_str());
+        const char* r2 = strchr(bridges[i].c_str(), '|');
+        if (!r2) throw 0xbadc0de;
+        r2++;
+        int resno2 = interpret_resno(r2);
+
+        #if _dbg_bridges
+        cout << "Bridging " << resno1 << " and " << resno2 << "..." << endl;
+        #endif
+
+        protein->bridge(resno1, resno2);
+
+        AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
+        if (aa1) aa1->movability = MOV_PINNED;
+        if (aa2) aa2->movability = MOV_PINNED; 
+
+        #if _dbg_bridges
+        if (!aa1) cout << resno1 << " not found." << endl;
+        if (!aa2) cout << resno2 << " not found." << endl;
+        if (aa1 && aa2)
+        {
+            float tb = -aa1->get_intermol_binding(aa2);
+            cout << "Bridge energy " << tb << " kJ/mol." << endl;
+        }
+        #endif
+    }
+
+    freeze_bridged_residues();
+}
+
 Pose iter_best_pose[1000];
 float iter_best_bind;
 void iteration_callback(int iter, Molecule** mols)
@@ -370,7 +501,7 @@ void iteration_callback(int iter, Molecule** mols)
     }
 
     int i, j;
-    if (num_dyn_motions)
+    if (num_dyn_motions && !((iter-1) % dynamic_every_iter))
     {
         for (i=0; i<num_dyn_motions; i++)
         {
@@ -379,13 +510,53 @@ void iteration_callback(int iter, Molecule** mols)
             float new_energy = -ligand->get_intermol_binding(mols);
             if (new_energy > energy) dyn_motions[i]->undo();
         }
+
+        if (iter <= dynamic_every_iter || (iters-iter) <= dynamic_every_iter)
+        {
+            Molecule* repack_residues[1024];
+            MovabilityType repacked_movabilities[1024];
+            int n = protein->get_end_resno();
+            bool already_set_for_repack[n+1];
+            for (i=0; i<n; i++) already_set_for_repack[i] = false;
+
+            n = 0;
+            for (i=0; i<num_dyn_motions; i++)
+            {
+                int j;
+                AminoAcid *sr, *er;
+
+                sr = protein->get_residue(dyn_motions[i]->start_resno);
+                er = protein->get_residue(dyn_motions[i]->end_resno);
+                if (!sr || !er) continue;
+
+                for (j = sr->get_residue_no(); j <= er->get_residue_no(); j++)
+                {
+                    if (already_set_for_repack[j]) continue;
+                    Star s;
+                    s.paa = protein->get_residue(j);
+                    if (s.n)
+                    {
+                        repacked_movabilities[n] = s.paa->movability;
+                        if (s.paa->movability != MOV_PINNED) s.paa->movability = MOV_FLEXONLY;
+                        repack_residues[n++] = s.pmol;
+                        already_set_for_repack[j] = true;
+                    }
+                }
+            }
+            repack_residues[n] = 0;
+
+            reconnect_bridges();
+            Molecule::conform_molecules(repack_residues);
+
+            for (i=0; i<n; i++) repack_residues[i]->movability = repacked_movabilities[i];
+        }
     }
 
     #if bb_realign_iters
     #if _dbg_bb_realign
     cout << ligand->lastbind << (iter == iters ? " ] " : " ") << flush;
     #endif
-    if (global_pairs.size() >= 2 && ligand->lastbind > bb_realign_b_threshold)
+    if (use_bestbind_algorithm && global_pairs.size() >= 2 && ligand->lastbind > bb_realign_b_threshold)
     {
         Point scg0 = global_pairs[0]->scg->get_center();
         Point scg1 = global_pairs[1]->scg->get_center();
@@ -550,7 +721,7 @@ void iteration_callback(int iter, Molecule** mols)
     
     #if enforce_no_bb_pullaway
     #if _use_groups
-    if (ligand_groups[0].atoms.size())
+    if (use_bestbind_algorithm && ligand_groups[0].atoms.size())
     #else
     if (ligbb)
     #endif
@@ -779,27 +950,6 @@ void iteration_callback(int iter, Molecule** mols)
         i = iter % 4;
         cout << ("|/-\\")[i] << " " << (int)percentage << "%.               " << endl;
     }
-}
-
-int interpret_resno(const char* field)
-{
-    char buffer[strlen(field)+4];
-    strcpy(buffer, field);
-    char* dot = strchr(buffer, '.');
-    if (dot)
-    {
-        *(dot++) = 0;
-        int b = atoi(buffer);
-        int w = atoi(dot);
-        int _50 = protein->get_bw50(b);
-        if (_50 < 1)
-        {
-            cout << "Error: unknown BW number " << b << "." << w << ", please ensure PDB file has REMARK 800 SITE BW words." << endl;
-            throw 0xbad12e5;
-        }
-        return _50 + w - 50;
-    }
-    else return atoi(buffer);
 }
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
@@ -1344,6 +1494,18 @@ int interpret_config_line(char** words)
     {
         dyn_motion_strings.push_back(origbuff);
     }
+    else if (!strcmp(words[0], "DYNMIN"))
+    {
+        dynamic_minimum = atof(words[1]);
+    }
+    else if (!strcmp(words[0], "DYNINIT"))
+    {
+        dynamic_initial = atof(words[1]);
+    }
+    else if (!strcmp(words[0], "DYNEVERY"))
+    {
+        dynamic_every_iter = atoi(words[1]);
+    }
     else if (!strcmp(words[0], "HARD"))
     {
         soft_pocket = false;
@@ -1430,78 +1592,6 @@ void read_config_file(FILE* pf)
             delete words;
         }
         buffer[0] = 0;
-    }
-}
-
-void freeze_bridged_residues()
-{
-    int i, l;
-
-    if (bridges.size())
-    {
-        for (i=0; i<bridges.size(); i++)
-        {
-            int resno1 = interpret_resno(bridges[i].c_str());
-            const char* r2 = strchr(bridges[i].c_str(), '|');
-            if (!r2) throw 0xbadc0de;
-            r2++;
-            int resno2 = interpret_resno(r2);
-            
-            AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
-            if (aa1)
-            {
-                aa1->movability = MOV_PINNED;
-                aa1->been_flexed = true;
-                Bond** bb = aa1->get_rotatable_bonds();
-                if (bb)
-                {
-                    for (l=0; bb[l]; l++)
-                    {
-                        bb[l]->can_rotate = false;
-                    }
-                    delete bb;
-                }
-            }
-            if (aa2)
-            {
-                aa2->movability = MOV_PINNED;
-                aa2->been_flexed = true;
-                Bond** bb = aa2->get_rotatable_bonds();
-                if (bb)
-                {
-                    for (l=0; bb[l]; l++)
-                    {
-                        bb[l]->can_rotate = false;
-                    }
-                    delete bb;
-                }
-            }
-        }
-    }
-
-    if (forced_static_resnos.size())
-    {
-        for (i=0; i<forced_static_resnos.size(); i++)
-        {
-            forced_static_resnos[i].resolve_resno(protein);
-            int resno = forced_static_resnos[i].resno;
-            if (!resno) continue;
-            
-            AminoAcid *aa = protein->get_residue(resno);
-            if (!aa) continue;
-
-            aa->movability = MOV_PINNED;
-            aa->been_flexed = true;
-            Bond** bb = aa->get_rotatable_bonds();
-            if (bb)
-            {
-                for (l=0; bb[l]; l++)
-                {
-                    bb[l]->can_rotate = false;
-                }
-                delete bb;
-            }
-        }
     }
 }
 
@@ -1961,6 +2051,8 @@ void apply_protein_specific_settings(Protein* p)
         if (dyn_motions[i]) delete dyn_motions[i];
         dyn_motions[i] = new DynamicMotion(p);
         dyn_motions[i]->read_config_line(dyn_motion_strings[i].c_str(), dyn_motions);
+        dyn_motions[i]->minimum = dynamic_minimum;
+        dyn_motions[i]->apply_absolute(dynamic_minimum);
     }
     num_dyn_motions = i;
     dyn_motions[i] = nullptr;
@@ -2268,36 +2360,7 @@ int main(int argc, char** argv)
 
     if (bridges.size())
     {
-        for (i=0; i<bridges.size(); i++)
-        {
-            int resno1 = interpret_resno(bridges[i].c_str());
-            const char* r2 = strchr(bridges[i].c_str(), '|');
-            if (!r2) throw 0xbadc0de;
-            r2++;
-            int resno2 = interpret_resno(r2);
-
-            #if _dbg_bridges
-            cout << "Bridging " << resno1 << " and " << resno2 << "..." << endl;
-            #endif
-
-            protein->bridge(resno1, resno2);
-
-            AminoAcid *aa1 = protein->get_residue(resno1), *aa2 = protein->get_residue(resno2);
-            if (aa1) aa1->movability = MOV_PINNED;
-            if (aa2) aa2->movability = MOV_PINNED; 
-
-            #if _dbg_bridges
-            if (!aa1) cout << resno1 << " not found." << endl;
-            if (!aa2) cout << resno2 << " not found." << endl;
-            if (aa1 && aa2)
-            {
-                float tb = -aa1->get_intermol_binding(aa2);
-                cout << "Bridge energy " << tb << " kJ/mol." << endl;
-            }
-            #endif
-        }
-
-        freeze_bridged_residues();
+        reconnect_bridges();
 
         temp_pdb_file = "tmp/bridged.pdb";
 
@@ -2752,7 +2815,7 @@ _try_again:
                         }
                         sidechain_bondrotq[i] = j;
 
-                        delete[] b;
+                        // delete[] b;
                     }
                 }
 
@@ -2786,7 +2849,7 @@ _try_again:
                             b[j]->rotate(sidechain_bondrots[i][j]);
                         }
 
-                        delete[] b;
+                        // delete[] b;
                     }
 
                     delete[] sidechain_bondrots[i];
@@ -3490,360 +3553,6 @@ _try_again:
                 if (debug) *debug << "Alignment AA." << endl;
                 #endif
 
-                if (false && use_bestbind_algorithm)
-                {
-                    ligand->recenter(loneliest);
-                    for (l=0; l<_bb_max_grp; l++)
-                    {
-                        #if _use_groups
-                        Point xform;
-                        Point zcen;
-                        Point axis;
-                        LocatedVector lv;
-                        Rotation rot;
-                        float theta, clash;
-
-                        Atom* alca;
-                        Atom** alcaa;
-                        #if !flexion_selection
-                        if (flex && sc_groups[l].aminos.size())
-                        {
-                            for (i=0; i<sc_groups[l].aminos.size(); i++)
-                            {
-                                if (sc_groups[l].aminos[i]->movability >= MOV_FLEXONLY)
-                                {
-                                    Bond** rbb = sc_groups[l].aminos[i]->get_rotatable_bonds();
-                                    if (rbb)
-                                    {
-                                        alcaa = sc_groups[l].aminos[i]->get_most_bindable(1, ligand_groups[l].atoms[0]);
-                                        if (!alcaa) continue;
-                                        alca = alcaa[0];
-                                        delete alcaa;
-
-                                        if (alca)
-                                        {
-                                        	float br = alca->get_location().get_3d_distance(loneliest);
-		                                    float brad = 0;
-		                                    for(j=0; rbb[j]; j++)
-		                                    {
-		                                        float rad;
-		                                        for (rad=0; rad<M_PI*2; rad += square/4)
-		                                        {
-		                                            rbb[j]->rotate(square);
-		                                            float lr = alca->get_location().get_3d_distance(loneliest);
-		                                            if (lr < br)
-		                                            {
-		                                                brad = rad;
-		                                                br = lr;
-		                                            }
-		                                        }
-		                                        if (brad) rbb[j]->rotate(brad);
-		                                    }
-		                                }
-                                    }
-                                }
-                            }
-                        }
-                        #endif
-
-                        switch (l)
-                        {
-                            case 0:
-                            // Move ligand to center ligand_groups[0] at the center of sc_groups[0].
-                            // If there is only one residue in the sc group, then move the ligand
-                            // 2A towards loneliest.
-                            n = sc_groups[l].aminos.size();
-                            if (sc_groups[l].metallic) n = 1;
-                            if (!n) goto _deadglob;
-                            #if _dbg_groupsel
-                            cout << "Moving primary atom group to vicinity of";
-                            if (sc_groups[l].metallic) cout << " " << sc_groups[l].metal->name;
-                            else for (i=0; i<n; i++) cout << " " << sc_groups[l].aminos[i]->get_3letter() << sc_groups[l].aminos[i]->get_residue_no();
-                            cout << "." << endl;
-                            #endif
-
-                            xform = sc_groups[l].get_center();
-                            if (n < 4)
-                            {
-                                Point ptmp = loneliest.subtract(xform);
-                                ptmp.scale(n+1);
-                                xform = xform.add(ptmp);
-                            }
-                            xform = xform.subtract(ligand_groups[l].get_center());
-
-                            ligand->movability = MOV_ALL;
-                            ligand->move(xform);
-                            
-                            // Slowly back the ligand away from whatever it may be clashing into.
-                            reaches_spheroid[nodeno][sphres] = nullptr;
-                            clash = ligand->get_intermol_clashes(reinterpret_cast<Molecule**>(reaches_spheroid[nodeno]));
-                            n = 15;
-                            while (clash > 50)
-                            {
-                                xform = loneliest.subtract(ligand->get_barycenter());
-                                xform.scale(0.1);
-                                ligand->move(xform);
-                                n--;
-                                if (!n) break;          // Prevent infinite loops.
-                            }
-                            break;
-
-                            case 1:
-                            // Rotate ligand about ligand_groups[0] center to get ligand_groups[1] center
-                            // as close as possible to sc_groups[1] center.
-                            n = sc_groups[l].aminos.size();
-                            if (!n)
-                            {
-                                #if _dbg_groupsel
-                                cout << "Aligning center of ligand towards center of pocket.";
-                                #endif
-                                zcen = ligand_groups[0].get_center();
-                                rot = align_points_3d(ligand->get_barycenter(), loneliest, zcen);
-                                lv = rot.v;
-                                lv.origin = zcen;
-                                ligand->rotate(lv, rot.a);
-                                goto _deadglob;
-                            }
-                            #if _dbg_groupsel
-                            cout << "Aligning secondary atom group towards";
-                            for (i=0; i<n; i++) cout << " " << sc_groups[l].aminos[i]->get_3letter() << sc_groups[l].aminos[i]->get_residue_no();
-                            cout << "." << endl;
-                            #endif
-
-                            zcen = ligand_groups[0].get_center();
-                            rot = align_points_3d(ligand_groups[l].get_center(), sc_groups[l].get_center(), zcen);
-                            lv = rot.v;
-                            lv.origin = zcen;
-                            ligand->rotate(lv, rot.a);
-                            break;
-
-                            case 2:
-                            // "Rotisserie" rotate ligand about the imaginary line between
-                            // ligand_groups[0] center and ligand_groups[1] center, to bring
-                            // ligand_groups[2] center as close as possible to sc_groups[2] center.
-                            n = sc_groups[l].aminos.size();
-                            if (!n) goto _deadglob;
-                            #if _dbg_groupsel
-                            cout << "\"Rotisserie\"-aligning tertiary atom group towards";
-                            for (i=0; i<n; i++) cout << " " << sc_groups[l].aminos[i]->get_3letter() << sc_groups[l].aminos[i]->get_residue_no();
-                            cout << "." << endl;
-                            #endif
-
-                            zcen = ligand_groups[0].get_center();
-                            axis = ligand_groups[1].get_center().subtract(zcen);
-                            lv = (SCoord)axis;
-                            lv.origin = zcen;
-                            theta = find_angle_along_vector(ligand_groups[l].get_center(), sc_groups[l].get_center(), zcen, axis);
-                            ligand->rotate(lv, theta);
-                            break;
-
-                            default:
-                            ;
-                        }
-
-                        _deadglob:
-                        ;
-                        #else
-                        if (alignment_aa[l])
-                        {
-                            cout << "# Aligning " << ligbb[l]->name << " to " << alignment_aa[l]->get_name() << "..." << endl;
-                            Atom* alca;
-
-                            if (retain_bindings[l].btom) alca = retain_bindings[l].btom;
-                            else
-                            {
-                                if (alignment_aa[l] == met)
-                                    alca = alignment_aa[l]->get_nearest_atom(ligbb[l]->get_location());
-                                else
-                                {
-                                    Atom** mbb = alignment_aa[l]->get_most_bindable(1);
-                                    alca = mbb[0];
-                                    delete mbb;             // Delete the pointer array, but not the pointers.
-                                }
-                            }
-                            #if _DBG_STEPBYSTEP
-                            if (debug) *debug << "Got alignment atom." << endl;
-                            #endif
-
-                            if (alca)
-                            {
-                                #if _preflex_alignment_res
-                                // If alignment aa is not pinned, and flexion is enabled,
-                                // flex alignment aa so that alca is nearest to loneliest.
-                                if (flex && alignment_aa[l]->movability >= MOV_FLEXONLY)
-                                {
-                                    Bond** rbb = alignment_aa[l]->get_rotatable_bonds();
-                                    if (rbb)
-                                    {
-                                        float br = alca->get_location().get_3d_distance(loneliest);
-                                        float brad = 0;
-                                        for(j=0; rbb[j]; j++)
-                                        {
-                                            float rad;
-                                            for (rad=0; rad<M_PI*2; rad += square)
-                                            {
-                                                rbb[j]->rotate(square);
-                                                float lr = alca->get_location().get_3d_distance(loneliest);
-                                                if (lr < br)
-                                                {
-                                                    brad = rad;
-                                                    br = lr;
-                                                }
-                                            }
-                                            if (brad) rbb[j]->rotate(brad);
-                                        }
-                                    }
-                                }
-                                #endif
-
-                                Point pt, al, cen;
-                                al	= alca->get_location();
-
-                                cen	= (l==1) ? ligbb[0]->get_location() : m.get_barycenter();
-
-                                pt	= ligbb[l]->get_location();
-                                if (ligbbh[l])
-                                {
-                                    Point pth = ligbbh[l]->get_location();
-                                    pt.x += 0.5*(pth.x-pt.x);
-                                    pt.y += 0.5*(pth.y-pt.y);
-                                    pt.z += 0.5*(pth.z-pt.z);
-                                }
-                                
-
-                                Rotation rot;
-                                Point origin = ligbb[0]->get_location();
-                                SCoord axis;
-                                LocatedVector lv;
-                                float theta;
-                                float besttheta = 0, bestr = 100000;
-                                float rstep = fiftyseventh*30;
-                                switch (l)
-                                {
-                                case 0:
-                                    // Pivot about molcen.
-                                    /*append_dummy(pt);
-                                    append_dummy(al);
-                                    append_dummy(cen);*/
-                                    rot = align_points_3d(&pt, &al, &cen);
-                                    m.rotate(&rot.v, rot.a);
-                                    ligand->recenter(cen);
-                                    #if _dbg_bb_rots
-                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand molcen." << endl;
-                                    #endif
-
-                                    if (false && !l)
-                                    {
-                                        Point ptr = alca->get_location().subtract(pt);
-                                        SCoord v(ptr);
-                                        v.r -= alignment_distance[l];
-                                        v.r *= 0.5;
-                                        m.move(v);
-                                        cout << "# Moved ligand " << v.r << "A towards " << alignment_aa[l]->get_name()
-                                             << ":" << alca->name << "." << endl;
-                                    }
-                                    break;
-
-                                case 1:
-                                    // Pivot about bb0.
-                                    origin = ligbb[0]->get_location();
-                                    lv = compute_normal(pt, al, origin);
-                                    lv.origin = origin;
-                                    rot.a = find_angle_along_vector(pt, al, origin, (SCoord)lv);
-                                    m.rotate(lv, rot.a);
-                                    #if _dbg_bb_rots
-                                    cout << "# Pivoted ligand " << (rot.a*fiftyseven) << "deg about ligand " << ligbb[0]->name << "." << endl;
-                                    #endif
-                                    break;
-
-                                case 2:
-                                    // Rotisserie.
-                                    axis = ligbb[1]->get_location().subtract(origin);
-
-                                    for (theta=0; theta < M_PI*2; theta += rstep)
-                                    {
-                                        lv.copy(axis);
-                                        lv.origin = origin;
-                                        m.rotate(lv, rstep);
-
-                                        float r2 = alca->get_location().get_3d_distance(ligbb[l]->get_location());
-                                        if (r2 < bestr)
-                                        {
-                                            bestr = r2;
-                                            besttheta = theta;
-                                        }
-                                    }
-
-                                    lv.copy(axis);
-                                    lv.origin = origin;
-                                    m.rotate(lv, besttheta);
-                                    ligand->recenter(cen);
-                                    #if _dbg_bb_rots
-                                    cout << "# Pivoted ligand " << (besttheta*fiftyseven) << "deg about ligand " << ligbb[0]->name
-                                         << "-" << ligbb[1]->name << " axis." << endl;
-                                    #endif
-                                    break;
-
-                                default:
-                                    ;
-                                }
-
-                                #if preemptively_minimize_intermol_clashes
-                                Molecule* mtmp[3];
-                                mtmp[0] = &m;
-                                mtmp[1] = flex ? alignment_aa[l] : nullptr;
-                                mtmp[2] = nullptr;
-                                m.movability = MOV_FLEXONLY;
-                                alignment_aa[l]->movability = MOV_FLEXONLY;
-                                Molecule::conform_molecules(mtmp);
-                                m.movability = MOV_ALL;
-
-                                if (debug) *debug << "Alignment atom " << l << " is "
-                                                      << alignment_aa[l]->get_name() << ":" << alca->name
-                                                      << " Z " << alca->get_Z() << endl;
-                                #endif
-
-                            }
-                        }
-                        #endif
-                    }
-
-                    #if _dbg_groupsel
-                    cout << endl << endl;
-                    #endif
-
-                    #if enforce_no_bb_pullaway && _use_groups
-                    last_ttl_bb_dist = 0;
-                    for (l=0; l<_bb_max_grp; l++)
-                    {
-                        if (ligand_groups[l].atoms.size() && sc_groups[l].aminos.size())
-                        {
-                            float r = ligand_groups[l].distance_to(sc_groups[l].get_center());
-                            if (r < 2.5) r = 2.5;
-                            last_ttl_bb_dist += r;
-                        }
-                    }
-                    pullaway_undo.copy_state(ligand);
-                    #endif
-
-                    #if !_use_groups
-                    Molecule* mtmp[4], *mbkg[2];
-                    mbkg[0] = ligand;
-                    mbkg[1] = nullptr;
-                    mtmp[0] = alignment_aa[0];
-                    mtmp[1] = alignment_aa[1];
-                    mtmp[2] = alignment_aa[2];
-                    mtmp[3] = nullptr;
-                    m.movability = MOV_FLEXONLY;
-                    if (flex) Molecule::conform_molecules(mtmp);
-                    m.movability = MOV_ALL;
-                    #endif
-
-                    #if _DBG_STEPBYSTEP
-                    cout << endl;
-                    #endif
-                }
-                
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Aligned ligand to AA." << endl;
                 cout << endl;
@@ -3885,6 +3594,7 @@ _try_again:
                 #endif
                 if (!flex) reaches_spheroid[nodeno][j]->movability = MOV_FLXDESEL;
                 cfmols[i++] = reaches_spheroid[nodeno][j];
+                protein->get_residues_can_clash(reaches_spheroid[nodeno][j]->get_residue_no());
             }
 
             int cfmolqty = i;

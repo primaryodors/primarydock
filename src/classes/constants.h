@@ -88,7 +88,7 @@
 
 #define _MAX_NUM_FORCES 65536
 
-#define SPHREACH_MAX 1024
+#define SPHREACH_MAX 128
 
 #define PROT_MAX_RGN 40
 
@@ -127,9 +127,9 @@
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.13
 #define bb_realign_iters 1
-#define bb_realign_b_threshold 20
-#define bb_realign_amount 0.1
-#define bb_realign_threshold_distance 3.5
+#define bb_realign_b_threshold 10
+#define bb_realign_amount 0.333
+#define bb_realign_threshold_distance 2.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define flexion_selection 1
 #define no_zero_flexions 1

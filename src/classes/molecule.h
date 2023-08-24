@@ -180,7 +180,7 @@ public:
     static void conform_molecules(Molecule** molecules, Molecule** background, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
     static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
     void conform_atom_to_location(int atom_idx, Point target, int iterations = 50);
-    void conform_atom_to_location(char* atom_name, Point target, int iterations = 50);
+    void conform_atom_to_location(const char* atom_name, Point target, int iterations = 50);
     SCoord motion_to_optimal_contact(Molecule* ligand);
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
@@ -221,6 +221,7 @@ public:
     bool been_flexed = false;
     bool priority = false;
     std::vector<std::shared_ptr<GroupPair>> agroups;
+    Molecule** mclashables = nullptr;
 
 protected:
     Molecule();

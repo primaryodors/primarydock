@@ -1,6 +1,6 @@
 <?php
 
-$file = "dock_results_coupled.json";
+$file = "dock_results_icactive.json";
 
 chdir(__DIR__);
 $data = json_decode(file_get_contents($file), true);

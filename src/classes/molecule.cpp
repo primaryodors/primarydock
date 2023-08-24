@@ -1485,13 +1485,17 @@ void Molecule::identify_acidbase()
                 Atom* bto = c->is_bonded_to("O");
                 if (bto)
                 {
-                    // Amides are weakly zwitterionic.
-                    float arity = c->is_bonded_to(bto);
-                    if (arity >= 1.5)
+                    if (amide_zwitterionic_amount)
                     {
-                        atoms[i]->increment_charge(amide_zwitterionic_amount);
-                        bto->increment_charge(-amide_zwitterionic_amount);
+                        // Amides are weakly zwitterionic.
+                        float arity = c->is_bonded_to(bto);
+                        if (arity >= 1.5)
+                        {
+                            atoms[i]->increment_charge(amide_zwitterionic_amount);
+                            bto->increment_charge(-amide_zwitterionic_amount);
+                        }
                     }
+
                     goto _not_basic;
                 }
             }
@@ -2694,14 +2698,22 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
 
 float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
 {
-    float tryenerg = 0;
+    float result = 0;
     int j;
     for (j=0; nearby[j]; j++)
     {
         float f = a->intermol_bind_for_multimol_dock(nearby[j], false);
-        tryenerg += f;
+        result += f;
     }
-    return tryenerg;
+    if (a->mclashables)
+    {
+        for (j=0; a->mclashables[j]; j++)
+        {
+            float f = a->intermol_bind_for_multimol_dock(a->mclashables[j], false);
+            result += f;
+        }
+    }
+    return result;
 }
 
 void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void (*cb)(int, Molecule**), void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>))
@@ -2753,7 +2765,7 @@ void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void 
     }
 }
 
-void Molecule::conform_atom_to_location(char* an, Point t, int iters)
+void Molecule::conform_atom_to_location(const char* an, Point t, int iters)
 {
     if (!atoms) return;
     int i;
@@ -2854,11 +2866,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 float r = a->get_nearest_atom(bloc)->distance_to(b->get_nearest_atom(aloc));
                 if (r > _INTERA_R_CUTOFF) continue;
                 nearby[l++] = b;
-
-                float f = a->intermol_bind_for_multimol_dock(b, false);
-                benerg += f;
             }
             nearby[l] = 0;
+            benerg = cfmol_multibind(a, nearby);
 
             #if _dbg_fitness_plummet
             if (!i) cout << "# " << a->name << " " << iter << ": " << benerg << " ";

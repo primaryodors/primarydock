@@ -28,7 +28,7 @@ class BallesterosWeinstein
     int helix_no = 0;
     int member_no = 0;
 
-    void from_string(char* inpstr);
+    void from_string(const char* inpstr);
 };
 
 struct SoftBias
@@ -128,6 +128,7 @@ public:
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
     float binding_to_nearby_residues(int resno);
     void minimize_residue_clashes(int resno);
+    float region_can_move(int startres, int endres, SCoord direction, bool repack = false);
     void region_optimal_positioning(int startres, int endres, SCoord* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
 
     // Motion functions

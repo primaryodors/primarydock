@@ -42,6 +42,7 @@ class DynamicMotion
     std::string name;
     BallesterosWeinstein start_resno, end_resno, fulcrum_resno, axis_resno;
     float bias = 0;
+    float minimum = 0;
 
     DynamicMotion(Protein* ppro);
     bool add_constraint(DynamicConstraint* new_cons);           // Returns false if unable to add.

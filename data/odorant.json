@@ -28216,6 +28216,8 @@
     "77d5458b21d49b234860f71e25ea9a2b":
     {
         "full_name": "pentanol",
+        "name1": "1-pentanol",
+        "iupac": "pentan-1-ol",
         "smiles": "CCCCCO",
         "aroma":
         {

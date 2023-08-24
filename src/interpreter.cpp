@@ -972,6 +972,96 @@ int main(int argc, char** argv)
                 working->move_piece(1, working->get_end_resno(), new_center);
             }   // BWCENTER
 
+            else if (!strcmp(words[0], "CANMOVE"))
+            {
+                int sr1, er1, sr2, er2;
+
+                if (!words[0] || !words[1] || !words[2] || !words[3] || !words[4] || !words[5] || !words[6])
+                    raise_error("Insufficient parameters given for CANMOVE.");
+                else if (words[7])
+                    raise_error("Too many parameters given for CANMOVE.");
+
+                sr1 = interpret_single_int(words[1]);
+                er1 = interpret_single_int(words[2]);
+
+                sr2 = interpret_single_int(words[4]);
+                er2 = interpret_single_int(words[5]);
+
+                if (!strcmp(words[3], "TO"))
+                {
+                    float f = 0, clash_limit = 0;
+                    Point center1 = working->get_region_center(sr1, er1);
+                    Point center2 = working->get_region_center(sr2, er2);
+                    SCoord df = center2.subtract(center1);
+                    float dfr = df.r - unconnected_residue_mindist;
+                    df.r = 0.5;
+
+                    Pose poses[er1+1];
+                    for (l=sr1; l<=er1; l++)
+                    {
+                        AminoAcid* aa = working->get_residue(l);
+                        if (aa)
+                        {
+                            poses[l].copy_state(aa);
+                        }
+                    }
+
+                    clash_limit = homology_clash_peraa;
+
+                    for (l=0; l<200; l++)
+                    {
+                        working->move_piece(sr1, er1, df);
+                        working->get_internal_clashes(sr1, er1, true);
+                        float c = 0, c1;
+
+                        int resno1, resno2;
+                        AminoAcid *aa1, *aa2;
+                        for (resno1 = sr1; resno1 <= er1; resno1++)
+                        {
+                            aa1 = working->get_residue(resno1);
+                            if (!aa1) continue;
+                            for (resno2 = sr2; resno2 <= er2; resno2++)
+                            {
+                                aa2 = working->get_residue(resno2);
+                                c1 = aa1->get_intermol_clashes(aa2);
+                                if (c1 > c) c = c1;
+                            }
+                        }
+                        // cout << (f+df.r) << " " << c << endl;
+
+                        if (c > clash_limit)
+                        {
+                            df.r *= -1;
+                            working->move_piece(sr1, er1, df);
+                            df.r *= -0.666;
+                        }
+                        else
+                        {
+                            f += df.r;
+                        }
+
+                        if (fabs(df.r) < 0.001) break;
+                    }
+
+                    for (l=sr1; l<=er1; l++)
+                    {
+                        AminoAcid* aa = working->get_residue(l);
+                        if (aa) poses[l].restore_state(aa);
+                    }
+
+                    if (f > dfr) f = dfr;
+
+                    Star s;
+                    s.f = f;
+                    set_variable(words[6], s);
+                }
+                else
+                {
+                    raise_error((std::string)"Unimplemented direction " + (std::string)words[3] + (std::string)".");
+                }
+
+            }   // CANMOVE
+
             else if (!strcmp(words[0], "CENTER"))
             {
                 l = 1;
@@ -1132,6 +1222,54 @@ int main(int argc, char** argv)
 
                 set_variable(outvar, s);
             }   // CTNRG
+
+            else if (!strcmp(words[0], "MOC"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters given for MOC.");
+                int resno1 = interpret_single_int(words[1]);
+                if (!words[2]) raise_error("Insufficient parameters given for MOC.");
+                int resno2 = interpret_single_int(words[2]);
+                if (!words[3]) raise_error("Insufficient parameters given for MOC.");
+                char* outvar = words[3];
+
+                Star s;
+                s.n = 0;
+
+                AminoAcid *aa1 = working->get_residue(resno1), *aa2 = working->get_residue(resno2);
+                if (!aa1 || !aa2)
+                {
+                    set_variable(outvar, s);
+                    continue;
+                }
+                SCoord optimize = aa1->motion_to_optimal_contact(aa2);
+
+                /*Atom *atom1 = aa1->get_nearest_atom(aa2->get_CA_location()), *atom2 = aa2->get_nearest_atom(aa1->get_CA_location());
+                atom1 = aa1->get_nearest_atom(atom2->get_location());
+                atom2 = aa2->get_nearest_atom(atom1->get_location());
+                float nearest_atom_distance = atom1->distance_to(atom2);
+                // cout << *atom1 << " is " << nearest_atom_distance << "A from " << *atom2 << endl;
+
+                if (optimize.r < fmax(nearest_atom_distance - 2.5, 0))
+                {
+                    if (!optimize.r) optimize = atom2->get_location().subtract(atom1->get_location());
+                    else optimize.r = fmax(nearest_atom_distance - 2.5, 0);
+                }*/
+
+                switch(outvar[0])
+                {
+                    case '@':
+                    s.ppt = new Point(optimize);
+                    break;
+
+                    case '&':
+                    s.f = optimize.r;
+                    break;
+
+                    default:
+                    raise_error("Ouput variable must be either Cartesian or float.");
+                }
+                set_variable(outvar, s);
+            }   // MOC
 
             else if (!strcmp(words[0], "DELETE"))
             {

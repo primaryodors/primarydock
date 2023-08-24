@@ -9,7 +9,7 @@ OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OB
 	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test \
 	  test/group_test_mol test/protein_test test/backbone_test test/bond_rotation_test
-APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_active_pdb
+APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_active_pdb $(BINDIR)/ic_activate_or
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
 all: $(DIRS) \
 	 $(OBJS) \
@@ -117,6 +117,9 @@ $(BINDIR)/ic: src/ic.cpp $(OBJS) $(OBJDIR)/protein.o
 
 $(BINDIR)/ic_active_pdb: src/ic_active_pdb.cpp $(OBJS) $(OBJDIR)/protein.o
 	$(CC) src/ic_active_pdb.cpp $(OBJS) -o $(BINDIR)/ic_active_pdb $(CFLAGS)
+
+$(BINDIR)/ic_activate_or: src/ic_activate_or.cpp $(OBJS) $(OBJDIR)/protein.o
+	$(CC) src/ic_activate_or.cpp $(OBJS) -o $(BINDIR)/ic_activate_or $(CFLAGS)
 
 performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.upright.pdb testdata/CAD_ion.sdf
 	./$(BINDIR)/primarydock testdata/test_TAAR8.config

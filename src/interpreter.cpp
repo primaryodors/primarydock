@@ -1003,20 +1003,33 @@ int main(int argc, char** argv)
                         if (aa)
                         {
                             poses[l].copy_state(aa);
-                            clash_limit += homology_clash_peraa;
                         }
                     }
 
-                    clash_limit /= 2.5;
+                    clash_limit = homology_clash_peraa;
 
-                    float c = working->get_internal_clashes(sr1, er1);
                     for (l=0; l<200; l++)
                     {
                         working->move_piece(sr1, er1, df);
-                        float c1 = working->get_internal_clashes(sr1, er1);
-                        // cout << c << " " << c1 << endl;
+                        working->get_internal_clashes(sr1, er1, true);
+                        float c = 0, c1;
 
-                        if (c1 > clash_limit)
+                        int resno1, resno2;
+                        AminoAcid *aa1, *aa2;
+                        for (resno1 = sr1; resno1 <= er1; resno1++)
+                        {
+                            aa1 = working->get_residue(resno1);
+                            if (!aa1) continue;
+                            for (resno2 = sr2; resno2 <= er2; resno2++)
+                            {
+                                aa2 = working->get_residue(resno2);
+                                c1 = aa1->get_intermol_clashes(aa2);
+                                if (c1 > c) c = c1;
+                            }
+                        }
+                        // cout << (f+df.r) << " " << c << endl;
+
+                        if (c > clash_limit)
                         {
                             df.r *= -1;
                             working->move_piece(sr1, er1, df);
@@ -1024,7 +1037,6 @@ int main(int argc, char** argv)
                         }
                         else
                         {
-                            c = c1;
                             f += df.r;
                         }
 

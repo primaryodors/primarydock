@@ -136,10 +136,10 @@ bool Protein::add_residue(const int resno, const char aaletter)
     return true;
 }
 
-void BallesterosWeinstein::from_string(char* inpstr)
+void BallesterosWeinstein::from_string(const char* inpstr)
 {
     helix_no = atoi(inpstr);
-    char* dot = strchr(inpstr, '.');
+    const char* dot = strchr(inpstr, '.');
     if (dot) member_no = atoi(dot+1);
 }
 

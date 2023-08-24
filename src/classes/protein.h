@@ -28,7 +28,7 @@ class BallesterosWeinstein
     int helix_no = 0;
     int member_no = 0;
 
-    void from_string(char* inpstr);
+    void from_string(const char* inpstr);
 };
 
 struct SoftBias

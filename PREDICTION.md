@@ -15,25 +15,25 @@ ligands in PDB files and aggregate the resulting data into a JSON file. A predic
 command line input, as well as some other custom variables. A string value named `$configf` is then set, containing the config
 file to be generated for the `primarydock` app, and then the `process_dock()` function is called.
 
-The most current prediction method is `method_optimized.php`. The first time it is run, it will perform a one-time
-setup of required data, including an automatic download of PDB models from the RCSB and AlphaFold websites. An example
-of the command line for running a prediction might be:
+The most current prediction method is `method_icactive.php`. The text "icactive" stands for Internal Contacts Activation,
+meaning the active state of the receptor is predicted based on contacts made between the side chains of its amino acids.
+An example of the command line for running a prediction might be:
 
 ```
-php -f predict/method_optimized.php prot=OR1A1 lig=cis-3-hexen-1-ol
+php -f predict/method_icactive.php prot=OR1A1 lig=cis-3-hexen-1-ol
 ```
 
 If the name of the ligand contains spaces, then the spaces should be replaced with underscores, e.g. `lig=ethyl_vanillin`.
 If the ligand name contains parentheses, it's a good idea to put the entire lig= parameter in quotes, e.g.:
 
 ```
-php -f predict/method_optimized.php prot=OR1A1 "lig=(S)-(+)-carvone"
+php -f predict/method_icactive.php prot=OR1A1 "lig=(S)-(+)-carvone"
 ```
 
 The prediction method lends itself well to running as a cron, e.g.:
 
 ```
-* * * * * php -f /path/to/primarydock/predict/method_coupled.php next simul=8
+* * * * * php -f /path/to/primarydock/predict/method_icactive.php next simul=8
 ```
 
 In this example, the `next` parameter means to find the next receptor/ligand pair yet to process, and go ahead with the

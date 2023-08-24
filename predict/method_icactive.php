@@ -79,8 +79,6 @@ if (!file_exists($pdbfname_active))
 $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
 
-if ($protid == "OR52D1") $flex_constraints .= "ATOMTO 45.53 EXTENT 5.30\n";
-
 
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
 

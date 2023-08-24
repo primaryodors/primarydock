@@ -69,18 +69,28 @@ int main(int argc, char** argv)
     AminoAcid* aa6x58 = p.get_residue_bw("6.58");
     AminoAcid* aa4x60 = p.get_residue_bw("4.60");
     AminoAcid* aa45x53 = p.get_residue_bw("45.53");
+    char l45x53 = aa45x53->get_letter();
     char l6x59 = aa6x59->get_letter();
     if (aa6x59 && aa6x58 && aa45x53 && (aa6x59->get_letter() == 'R'))
     {
-        // Have to move 45.53 and 45.54 out of the way, but leave 45.52 where it is.
-        bend45.start_resno.from_string("45.53");
-        bend45.end_resno.from_string("45.54");
-        bend45.type = dyn_bend;
-        bend45.fulcrum_resno.from_string("45.53");
-        bend45.axis_resno.from_string("45.54");
-        bend45.bias = 30;
-        bend45.apply_absolute(1);
-        aa45x53->conform_atom_to_location(aa45x53->get_reach_atom()->name, Point(0,-1000,0));
+        if (l45x53 == 'Q' || l45x53 == 'N' || l45x53 == 'R' || l45x53 == 'K' || l45x53 == 'E' || l45x53 == 'D')
+        {
+            // Have to move 45.53 and 45.54 out of the way, but leave 45.52 where it is.
+            bend45.start_resno.from_string("45.53");
+            bend45.end_resno.from_string("45.54");
+            bend45.type = dyn_bend;
+            bend45.fulcrum_resno.from_string("45.53");
+            bend45.axis_resno.from_string("45.54");
+            bend45.bias = 30;
+            bend45.apply_absolute(1);
+            aa45x53->conform_atom_to_location(aa45x53->get_reach_atom()->name, Point(0,-1000,0));
+        }
+        else if (l45x53 == 'M' || l45x53 == 'Y')
+        {
+            // OR52D1 fix, hopefully.
+            constraints.push_back((std::string)"ATOMTO 45.53 EXTENT 5.30");
+            constraints.push_back((std::string)"STCR 45.53");
+        }
 
         cout << "R6.59" << endl;
         unwind6.start_resno.from_string("6.58");
@@ -101,7 +111,6 @@ int main(int argc, char** argv)
     AminoAcid *aa5x39 = p.get_residue_bw("5.39");
     char l45x51 = aa45x51->get_letter();
     char l6x58 = aa6x58->get_letter();
-    char l45x53 = aa45x53->get_letter();
     SCoord axis6;
 
     // If S6.58 and P45.53 and D/E45.51, measure how far S6.58 would have to move to make contact with 45.51.

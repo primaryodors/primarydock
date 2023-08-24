@@ -44,7 +44,7 @@ prediction method .php, `methods_common.php`, or the `/bin/primarydock` executab
 The `simul=8` parameter indicates not to run more than 8 concurrent processes. We recommend a value of no more than
 the number of processor cores or threads on your machine, so if you have a server with one 8-core 16-thread processor,
 then `simul=8` would be the maximum recommended value. We strongly recommend installing `lm-sensors` if your system does
-not already ahve this tool (`sudo apt-get install lm-sensors`), that way the prediction script will automatically limit
+not already have this tool (`sudo apt-get install lm-sensors`), that way the prediction script will automatically limit
 itself depending on the CPU temperature.
 
 You can use the `predict/progress.sh` shell script to monitor the progress of the predictions.

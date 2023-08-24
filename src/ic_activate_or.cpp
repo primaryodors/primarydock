@@ -91,15 +91,35 @@ int main(int argc, char** argv)
     }
 
 
-    // If there is no Y6.55 or no D/E45.51, measure how far 6.58-6.59 can move toward 5.39 without clashing. Call it TMR6ex.
     float TMR6ex = 0, TMR6ey;
     AminoAcid *aa6x48 = p.get_residue_bw("6.48");
     AminoAcid *aa6x55 = p.get_residue_bw("6.55");
     AminoAcid *aa45x51 = p.get_residue_bw("45.51");
     AminoAcid *aa5x39 = p.get_residue_bw("5.39");
     char l45x51 = aa45x51->get_letter();
+    char l6x58 = aa6x58->get_letter();
+    char l45x53 = aa45x53->get_letter();
     SCoord axis6;
-    if (aa6x55->get_letter() != 'Y' || (l45x51 != 'D' && l45x51 != 'E'))
+
+    // If S6.58 and P45.53 and D/E45.51, measure how far S6.58 would have to move to make contact with 45.51.
+    if ((l6x58 == 'S' || l6x58 == 'T')
+        &&
+        (l45x53 == 'P' || l45x53 == 'A' || l45x53 == 'G' || l45x53 == 'C' || l45x53 == 'S')
+        &&
+        (l45x51 == 'D' || l45x51 == 'E')
+        )
+    {
+        axis6 = compute_normal(aa6x48->get_CA_location(), aa6x58->get_CA_location(), aa45x51->get_CA_location());
+        p.bridge(aa6x58->get_residue_no(), aa45x51->get_residue_no());
+        Atom* a = aa6x58->get_reach_atom();
+        if (a->get_Z() < 3) a = a->get_bond_by_idx(0)->btom;
+        float cr = a->distance_to(aa45x51->get_nearest_atom(a->get_location()));
+        TMR6ex = fmax(0, cr - 3);
+        TMR6ey = aa6x48->distance_to(aa6x58);
+    }
+
+    // If there is no Y6.55 or no D/E45.51, measure how far 6.58-6.59 can move toward 5.39 without clashing. Call it TMR6ex.
+    else if (aa6x55->get_letter() != 'Y' || (l45x51 != 'D' && l45x51 != 'E'))
     {
         SCoord TMR6edir = aa5x39->get_CA_location().subtract(p.get_region_center(aa6x58->get_residue_no(), aa6x59->get_residue_no()));
         TMR6ex = p.region_can_move(aa6x55->get_residue_no(), aa6x58->get_residue_no(), TMR6edir, true);
@@ -118,6 +138,8 @@ int main(int argc, char** argv)
         if (cr > 3)
         {
             TMR6ex = cr - 3;
+            /*SCoord TMR6edir = aa5x39->get_CA_location().subtract(p.get_region_center(aa6x58->get_residue_no(), aa6x59->get_residue_no()));
+            TMR6ex = min(TMR6ex, p.region_can_move(aa6x55->get_residue_no(), aa6x58->get_residue_no(), TMR6edir, true));*/
             TMR6ey = aa6x55->distance_to(aa6x48);
             cout << "Hybrid6 can move " << TMR6ex << "A in the EXR domain." << endl;
         }
@@ -129,6 +151,7 @@ int main(int argc, char** argv)
             cout << "Bend6 is stationary in the EXR domain." << endl;
         }
     }
+
 
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.
     // TODO: There's also a slight movement of TMR3 that nudges 3.40 out of 5.50's way.

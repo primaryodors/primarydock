@@ -192,11 +192,13 @@ int main(int argc, char** argv)
     // If there is Y5.58 and Y7.53:
     AminoAcid *aa5x58 = p.get_residue_bw("5.58");
     AminoAcid *aa6x40 = p.get_residue_bw("6.40");
+    AminoAcid *aa7x48 = p.get_residue_bw("7.48");
     AminoAcid *aa7x53 = p.get_residue_bw("7.53");
+    AminoAcid *aa7x56 = p.get_residue_bw("7.56");
     char l5x58 = aa5x58->get_letter();
     char l7x53 = aa7x53->get_letter();
-    float bridge57, scooch6x40;
-    SCoord TMR6cdir;
+    float bridge57, scooch6x40, TMR7cz;
+    SCoord TMR6cdir, TMR7cdir, axis7;
     Point pt_tmp;
     
     if (l5x58 == 'Y' && l7x53 == 'Y')
@@ -253,12 +255,20 @@ int main(int argc, char** argv)
         // Re-measure Bridge57. If it is nonzero, determine how far 7.53 can move toward 5.58 without clashing with 3.43. Call it TMR7cz.
         bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
         cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
+        TMR7cdir = aa5x58->get_CA_location().subtract(aa7x53->get_CA_location());
+        TMR7cz = p.region_can_move(aa7x53->get_residue_no(), aa7x53->get_residue_no(), TMR7cdir, false);
         
         // Compute and execute a bend of TMR7 at 7.48 to move 7.53 the minimum distance of TMR7cz and Bridge57 toward 5.58.
+        TMR7cdir.r = fmin(TMR7cz, bridge57);
+        axis7 = compute_normal(aa7x48->get_CA_location(), aa7x53->get_CA_location(), aa7x53->get_CA_location().add(TMR7cdir));
+        theta = find_3d_angle(aa7x53->get_CA_location(), aa7x53->get_CA_location().add(TMR7cdir), aa7x48->get_CA_location());
+        p.rotate_piece(aa7x48->get_residue_no(), aa7x56->get_residue_no(), aa7x48->get_CA_location(), axis7, theta);
         
         // Re-measure Bridge57. If it is nonzero, compute and execute a pivot of TMR5 from 5.33 to move 5.58 the rest of the way to make contact with 7.53.
         // Then compute and execute a y-axis rotation of TMR6 to bring 6.28 as far along horizontally as 5.68 moved.
         // Translate the CYT3 region (BW numbers 56.x) to stay with 5.68 and 6.28 as smoothly as possible.
+        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
+        cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
     }
 
     // If there is R6.59, adjust its side chain to keep pointing inward while avoiding clashes with other nearby side chains.

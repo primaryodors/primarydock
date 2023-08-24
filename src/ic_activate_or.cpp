@@ -150,6 +150,7 @@ int main(int argc, char** argv)
     Point was;
     AminoAcid *aa56x50 = p.get_residue_bw("56.50");
     AminoAcid *aa6x28 = p.get_residue_bw("6.28");
+    AminoAcid *aa5x50 = p.get_residue_bw("5.50");
     SCoord TMR6c, axis5;
     if (TMR6ex)
     {
@@ -160,9 +161,9 @@ int main(int argc, char** argv)
         TMR6c = aa56x50->get_CA_location().subtract(was);
 
         // Compute the axis and angle to rotate TMR5 about 5.33 to match 56.49 to TMR6c, and perform the rotation.
-        axis5 = compute_normal(aa5x33->get_CA_location(), aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c));
-        theta = find_3d_angle(aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c), aa5x33->get_CA_location());
-        p.rotate_piece(aa5x33->get_residue_no(), aa56x50->get_residue_no()-1, aa5x33->get_CA_location(), axis5, theta);
+        axis5 = compute_normal(aa5x50->get_CA_location(), aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c));
+        theta = find_3d_angle(aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c), aa5x50->get_CA_location());
+        p.rotate_piece(aa5x50->get_residue_no(), aa56x50->get_residue_no()-1, aa5x50->get_CA_location(), axis5, theta);
         cout << "TMR5 rotation about " << axis5 << " by " << (theta*fiftyseven) << "deg." << endl;
     }
 

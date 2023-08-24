@@ -3781,6 +3781,73 @@ float Protein::binding_to_nearby_residues(int resno)
     return aa->get_intermol_binding(caa);
 }
 
+float Protein::region_can_move(int startres, int endres, SCoord direction, bool repack)
+{
+    int n = get_end_resno();
+    Pose revert_to[n+1];
+    std::string debug_msg;
+
+    int i, j, l;
+
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid *aa = get_residue(i);
+        if (aa) revert_to[i].copy_state(aa);
+    }
+
+    float result = 0, increment = 1, clash;
+
+    for (l=0; l<200; l++)
+    {
+        direction.r = increment;
+        move_piece(startres, endres, direction);
+        if (repack) get_internal_clashes(startres, endres, true);
+
+        clash = 0;
+        AminoAcid *aa1, *aa2;
+        for (i=startres; i<=endres; i++)
+        {
+            aa1 = get_residue(i);
+            if (!aa1) continue;
+
+            for (j=1; j<=n; j++)
+            {
+                if (j >= startres-7 && j <= endres+7) continue;
+                aa2 = get_residue(j);
+                if (!aa2->can_reach(aa1)) continue;
+                float c = aa1->get_intermol_clashes(aa2);
+                if (c > clash)
+                {
+                    clash = c;
+                    debug_msg = (std::string)aa1->get_3letter() + std::to_string(aa1->get_residue_no())
+                        + (std::string)" clashes by " + std::to_string(c)
+                        + (std::string)" with "
+                        + (std::string)aa2->get_3letter() + std::to_string(aa2->get_residue_no());
+                }
+            }
+        }
+
+        if (clash > homology_clash_peraa)
+        {
+            cout << "At " << (result+increment) << ", " << debug_msg << "." << endl;
+            direction.r *= -1;
+            move_piece(startres, endres, direction);
+            increment *= 0.81;
+        }
+        else result += increment;
+
+        if (fabs(increment) < 0.01) break;
+    }
+
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid *aa = get_residue(i);
+        if (aa) revert_to[i].restore_state(aa);
+    }
+
+    return result;
+}
+
 void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r, Protein** p)
 {
     if (!x || !r)

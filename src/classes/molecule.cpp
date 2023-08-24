@@ -2765,7 +2765,7 @@ void Molecule::conform_molecules(Molecule** mm, Molecule** bkg, int iters, void 
     }
 }
 
-void Molecule::conform_atom_to_location(char* an, Point t, int iters)
+void Molecule::conform_atom_to_location(const char* an, Point t, int iters)
 {
     if (!atoms) return;
     int i;

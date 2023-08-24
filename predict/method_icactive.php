@@ -2,7 +2,7 @@
 
 // method_icactive.php
 //
-// Performs a dock of an odorant inside a default inactive-conformer PDB file.
+// Performs a dock of an odorant inside inactive and internal-contact active conformer PDB files.
 //
 // Example call syntax:
 // php -f predict/method_icactive.php prot=OR1A1 lig=d-limonene
@@ -25,7 +25,7 @@ if (substr($fam, 0, 2) == "OR")
     {
         // https://doi.org/10.1101/2022.12.20.520951
         // $cenres = "CEN RES 4.57 4.60 5.39 45.52";
-        $cenres = "CEN RES 45.52 6.59";
+        $cenres = "CEN RES 45.52 6.59";                 // This fails less badly for OR52D1.
     }
     else
     {

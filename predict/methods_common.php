@@ -25,7 +25,7 @@ exec("make primarydock", $output, $result);
 if ($result) die("Build fail.\n".print_r($output, true));
 
 // Configurable variables
-$dock_retries = 5;
+$dock_retries = 1;
 $max_simultaneous_docks = 2;	// If running this script as a cron, we recommend setting this to no more than half the number of physical cores.
 if (!isset($do_scwhere)) $do_scwhere = false;
 $metrics_to_process =

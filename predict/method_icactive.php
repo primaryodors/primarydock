@@ -74,10 +74,12 @@ $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 if (!file_exists($pdbfname_active))
 {
     passthru("bin/ic_activate_or $protid");
-
-    $flex_constraints = "";
-    if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
 }
+
+$flex_constraints = "";
+if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
+
+if ($protid == "OR52D1") $flex_constraints .= "ATOMTO 45.53 EXTENT 5.30\n";
 
 
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
@@ -94,7 +96,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH TS
 POSE 10
-ELIM 500
+ELIM 5000
 ITERS 50
 PROGRESS
 
@@ -130,7 +132,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH TS
 POSE 10
-ELIM 500
+ELIM 5000
 $flex_constraints
 ITERS 50
 PROGRESS

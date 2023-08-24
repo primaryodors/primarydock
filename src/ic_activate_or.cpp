@@ -193,6 +193,7 @@ int main(int argc, char** argv)
     AminoAcid *aa5x58 = p.get_residue_bw("5.58");
     AminoAcid *aa6x40 = p.get_residue_bw("6.40");
     AminoAcid *aa7x48 = p.get_residue_bw("7.48");
+    AminoAcid *aa7x52 = p.get_residue_bw("7.52");
     AminoAcid *aa7x53 = p.get_residue_bw("7.53");
     AminoAcid *aa7x56 = p.get_residue_bw("7.56");
     char l5x58 = aa5x58->get_letter();
@@ -282,6 +283,47 @@ int main(int argc, char** argv)
         p.rotate_piece(aa56x50->get_residue_no()+1, aa6x59->get_residue_no(), aa6x59->get_CA_location(), axis6, theta);
 
         p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
+        
+        // If 6.40 is once again clashing with 7.53, compute the distance to rotate 6.48 thru 56.50 about 6.48 to eliminate the clash.
+        // Then perform the rotation, then compute the rotation of TMR5 about 5.33 to keep up, and perform that rotation.
+        // Then re-form the 5.58~7.53 bridge.
+        scooch6x40 = 0;
+        clash = aa6x40->get_intermol_clashes(aa7x52) + aa6x40->get_intermol_clashes(aa7x53);
+        if (clash > homology_clash_peraa/4)
+        {
+            Pose pose6x40;
+            pose6x40.copy_state(aa6x40);
+            TMR6cdir = aa6x40->get_CA_location().subtract(aa7x53->get_CA_location());
+            TMR6cdir.r = 0.1;
+
+            aa6x40->movability = MOV_ALL;
+            for (l=0; l<50; l++)
+            {
+                aa6x40->aamove(TMR6cdir);
+                scooch6x40 += TMR6cdir.r;
+                pt_tmp = aa6x40->get_CA_location();
+                clash = aa6x40->get_intermol_clashes(aa7x52) + aa6x40->get_intermol_clashes(aa7x53);
+                if (clash < homology_clash_peraa/4) break;
+            }
+
+            pose6x40.restore_state(aa6x40);
+            cout << "Moving 6.40 again " << scooch6x40 << " out of the way." << endl;
+
+            axis6 = compute_normal(aa6x48->get_CA_location(), aa6x40->get_CA_location(), pt_tmp);
+            theta = find_3d_angle(aa6x40->get_CA_location(), pt_tmp, aa6x48->get_CA_location());
+
+            was = aa56x50->get_CA_location();
+            p.rotate_piece(aa56x50->get_residue_no(), aa6x48->get_residue_no(), aa6x48->get_CA_location(), axis6, theta);
+            TMR6c = aa56x50->get_CA_location().subtract(was);
+            cout << "Bending TMR6 a further " << (theta*fiftyseven) << "deg in the CYT domain." << endl;
+
+            // Compute the axis and angle to rotate TMR5 about 5.33 to match 56.49 to TMR6c, and perform the rotation.
+            axis5 = compute_normal(aa5x58->get_CA_location(), aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c));
+            theta = find_3d_angle(aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c), aa5x58->get_CA_location());
+            p.rotate_piece(aa5x58->get_residue_no(), aa56x50->get_residue_no()-1, aa5x58->get_CA_location(), axis5, theta);
+        
+            p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
+        }
     }
 
     // If there is R6.59, adjust its side chain to keep pointing inward while avoiding clashes with other nearby side chains.

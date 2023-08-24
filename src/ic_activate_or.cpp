@@ -60,26 +60,25 @@ int main(int argc, char** argv)
     fclose(fp);
 
 
-    // Have to move 45.53 and 45.54 out of the way, but leave 45.52 where it is.
-    DynamicMotion bend45(&p);
-    bend45.start_resno.from_string("45.53");
-    bend45.end_resno.from_string("45.54");
-    bend45.type = dyn_bend;
-    bend45.fulcrum_resno.from_string("45.53");
-    bend45.axis_resno.from_string("45.54");
-    bend45.bias = 30;
-    bend45.apply_absolute(1);
-    AminoAcid* aa45x53 = p.get_residue_bw("45.53");
-    aa45x53->conform_atom_to_location(aa45x53->get_reach_atom()->name, Point(0,-1000,0));
-
-
     // If there is an R at position 6.59, perform a slight helix unwind and bring 6.59's side chain inward.
     DynamicMotion unwind6(&p);
+    DynamicMotion bend45(&p);
     AminoAcid* aa6x59 = p.get_residue_bw("6.59");
     AminoAcid* aa6x58 = p.get_residue_bw("6.58");
     AminoAcid* aa4x60 = p.get_residue_bw("4.60");
+    AminoAcid* aa45x53 = p.get_residue_bw("45.53");
     if (aa6x59 && aa6x58 && aa45x53 && (aa6x59->get_letter() == 'R'))
     {
+        // Have to move 45.53 and 45.54 out of the way, but leave 45.52 where it is.
+        bend45.start_resno.from_string("45.53");
+        bend45.end_resno.from_string("45.54");
+        bend45.type = dyn_bend;
+        bend45.fulcrum_resno.from_string("45.53");
+        bend45.axis_resno.from_string("45.54");
+        bend45.bias = 30;
+        bend45.apply_absolute(1);
+        aa45x53->conform_atom_to_location(aa45x53->get_reach_atom()->name, Point(0,-1000,0));
+
         cout << "R6.59" << endl;
         unwind6.start_resno.from_string("6.58");
         unwind6.end_resno.from_string("6.59");
@@ -191,22 +190,76 @@ int main(int argc, char** argv)
     }
 
     // If there is Y5.58 and Y7.53:
+    AminoAcid *aa5x58 = p.get_residue_bw("5.58");
+    AminoAcid *aa6x40 = p.get_residue_bw("6.40");
+    AminoAcid *aa7x53 = p.get_residue_bw("7.53");
+    char l5x58 = aa5x58->get_letter();
+    char l7x53 = aa7x53->get_letter();
+    float bridge57, scooch6x40;
+    SCoord TMR6cdir;
+    Point pt_tmp;
     
+    if (l5x58 == 'Y' && l7x53 == 'Y')
+    {
         // Attempt to bridge 5.58~7.53 and measure the distance necessary to complete the contact. Call it Bridge57.
+        p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
+        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
+        cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
 
         // Move the side chain of 6.40 to face 7.53:CA and ensure that 6.40 is not clashing with 7.53.
+        aa6x40->movability = MOV_ALL;
+        aa6x40->conform_atom_to_location(aa6x40->get_reach_atom()->name, aa7x53->get_CA_location());
         
         // If 6.40 is still clashing with 7.53, compute the distance to rotate 6.48 thru 56.50 about 6.48 to eliminate the clash.
         // Then perform the rotation, then compute the rotation of TMR5 about 5.33 to keep up, and perform that rotation.
         // Then re-form the 5.58~7.53 bridge.
+        float clash = aa6x40->get_intermol_clashes(aa7x53);
+        if (clash > homology_clash_peraa/4)
+        {
+            Pose pose6x40;
+            pose6x40.copy_state(aa6x40);
+            TMR6cdir = aa6x40->get_barycenter().subtract(aa7x53->get_atom_location("HH"));
+            TMR6cdir.r = 0.1;
+
+            aa6x40->movability = MOV_ALL;
+            for (l=0; l<50; l++)
+            {
+                aa6x40->aamove(TMR6cdir);
+                scooch6x40 += TMR6cdir.r;
+                pt_tmp = aa6x40->get_CA_location();
+                clash = aa6x40->get_intermol_clashes(aa7x53);
+                if (clash < homology_clash_peraa/4) break;
+            }
+
+            pose6x40.restore_state(aa6x40);
+            cout << "Moving 6.40 " << scooch6x40 << " out of the way." << endl;
+
+            axis6 = compute_normal(aa6x48->get_CA_location(), aa6x40->get_CA_location(), pt_tmp);
+            theta = find_3d_angle(aa6x40->get_CA_location(), pt_tmp, aa6x48->get_CA_location());
+
+            was = aa56x50->get_CA_location();
+            p.rotate_piece(aa56x50->get_residue_no(), aa6x48->get_residue_no(), aa6x48->get_CA_location(), axis6, theta);
+            TMR6c = aa56x50->get_CA_location().subtract(was);
+            cout << "Bending TMR6 " << (theta*fiftyseven) << "deg in the CYT domain." << endl;
+
+            // Compute the axis and angle to rotate TMR5 about 5.33 to match 56.49 to TMR6c, and perform the rotation.
+            axis5 = compute_normal(aa5x50->get_CA_location(), aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c));
+            theta = find_3d_angle(aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c), aa5x50->get_CA_location());
+            p.rotate_piece(aa5x50->get_residue_no(), aa56x50->get_residue_no()-1, aa5x50->get_CA_location(), axis5, theta);
+        
+            p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
+        }
         
         // Re-measure Bridge57. If it is nonzero, determine how far 7.53 can move toward 5.58 without clashing with 3.43. Call it TMR7cz.
+        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
+        cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
         
         // Compute and execute a bend of TMR7 at 7.48 to move 7.53 the minimum distance of TMR7cz and Bridge57 toward 5.58.
         
         // Re-measure Bridge57. If it is nonzero, compute and execute a pivot of TMR5 from 5.33 to move 5.58 the rest of the way to make contact with 7.53.
         // Then compute and execute a y-axis rotation of TMR6 to bring 6.28 as far along horizontally as 5.68 moved.
         // Translate the CYT3 region (BW numbers 56.x) to stay with 5.68 and 6.28 as smoothly as possible.
+    }
 
     // If there is R6.59, adjust its side chain to keep pointing inward while avoiding clashes with other nearby side chains.
 

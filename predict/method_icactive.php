@@ -33,9 +33,10 @@ if (substr($fam, 0, 2) == "OR")
 }
 else if (substr($fam, 0, 4) == "TAAR")
 {
+    die("There is not yet an internal contacts activation app for TAARs.\n");
     $cenres = "CEN RES 3.32 3.37 5.43 6.48 7.43";
 }
-else die("Unsupported receptor family.");
+else die("Unsupported receptor family.\n");
 
 $metrics_to_process =
 [
@@ -68,42 +69,15 @@ chdir(__DIR__);
 chdir("..");
 
 $pdbfname_active = str_replace(".upright.pdb", ".icactive.pdb", $pdbfname);
-$result = [];
-exec("php -f predict/icactive.php $protid", $result);
-
-$config_params = [];
-$reading_params = false;
-$flex_constraints = [];
-foreach ($result as $line)
-{
-    if ($reading_params)
-    {
-        $config_params[] = $line;
-        if (substr($line, 0, 5) == "STCR " || substr($line, 0, 5) == "FLXR ") $flex_constraints[] = $line;
-    }
-    else if (trim($line) == "PRIMARYDOCK_CONFIG_PARAMS:") $reading_params = true;
-}
-
-$config_params = implode("\n", $config_params);
-$flex_constraints = implode("\n", $flex_constraints);
+$paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
 if (!file_exists($pdbfname_active))
 {
-    $config_params = <<<heredoc
+    passthru("bin/ic_activate_or $protid");
 
-PROT $pdbfname
-$config_params
-OUTPDB $pdbfname_active
-
-heredoc;
-
-    $fp = fopen("tmp/icactive.config", "wb") or die("Failed to write to tmp/ folder.\n");
-    fwrite($fp, $config_params);
-    fclose($fp);
-
-    passthru("bin/ic_active_pdb tmp/icactive.config");
+    $flex_constraints = "";
+    if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
 }
-
 
 
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";

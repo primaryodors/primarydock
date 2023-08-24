@@ -27,6 +27,8 @@ int main(int argc, char** argv)
     if (argc < 2) return -1;
     int i, j, l, m, n;
 
+    std::vector<std::string> constraints;
+
     // One argument, in the form of a protein ID, e.g. OR51E2.
     // If the ID does not conform to the format of OR{family}{subfamily}{member}, return an error code.
     if (argv[1][0] != 'O' || argv[1][1] != 'R') return -2;
@@ -67,6 +69,7 @@ int main(int argc, char** argv)
     AminoAcid* aa6x58 = p.get_residue_bw("6.58");
     AminoAcid* aa4x60 = p.get_residue_bw("4.60");
     AminoAcid* aa45x53 = p.get_residue_bw("45.53");
+    char l6x59 = aa6x59->get_letter();
     if (aa6x59 && aa6x58 && aa45x53 && (aa6x59->get_letter() == 'R'))
     {
         // Have to move 45.53 and 45.54 out of the way, but leave 45.52 where it is.
@@ -87,6 +90,7 @@ int main(int argc, char** argv)
         unwind6.apply_absolute(1);
 
         aa6x59->conform_atom_to_location("CZ", aa4x60->get_CA_location());
+        constraints.push_back((std::string)"STCR 6.59");
     }
 
 
@@ -115,6 +119,7 @@ int main(int argc, char** argv)
         float cr = a->distance_to(aa45x51->get_nearest_atom(a->get_location()));
         TMR6ex = fmax(0, cr - 3);
         TMR6ey = aa6x48->distance_to(aa6x58);
+        constraints.push_back((std::string)"BRIDGE 6.58 45.51");
     }
 
     // If there is no Y6.55 or no D/E45.51, measure how far 6.58-6.59 can move toward 5.39 without clashing. Call it TMR6ex.
@@ -131,6 +136,7 @@ int main(int argc, char** argv)
     // If there is Y6.55 and D/E45.51 but they are not in contact, measure how far 6.55 must move toward 45.51 to make contact. Call it TMR6ex.
     else
     {
+        constraints.push_back((std::string)"BRIDGE 6.55 45.51");
         axis6 = compute_normal(aa6x48->get_CA_location(), aa6x55->get_CA_location(), aa45x51->get_CA_location());
         p.bridge(aa6x55->get_residue_no(), aa45x51->get_residue_no());
         float cr = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom("OH")->get_location()));
@@ -198,12 +204,14 @@ int main(int argc, char** argv)
     AminoAcid *aa7x56 = p.get_residue_bw("7.56");
     char l5x58 = aa5x58->get_letter();
     char l7x53 = aa7x53->get_letter();
-    float bridge57, scooch6x40, TMR7cz;
+    float bridge57, scooch6x40 = 0, TMR7cz;
     SCoord TMR5cdir, TMR6cdir, TMR7cdir, axis7;
     Point pt_tmp;
     
     if (l5x58 == 'Y' && l7x53 == 'Y')
     {
+        constraints.push_back((std::string)"BRIDGE 5.58 7.53");
+
         // Attempt to bridge 5.58~7.53 and measure the distance necessary to complete the contact. Call it Bridge57.
         p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
         bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
@@ -338,5 +346,11 @@ int main(int argc, char** argv)
     cout << "Saved " << out_filename << endl;
 
     // Finally, write all BRIDGE, STCR, and FLXR parameters to a constraints file ending in .params instead of .upright.pdb.
+    std::string cns_filename = path + orid + (std::string)".params";
+    fp = fopen(cns_filename.c_str(), "wb");
+    if (!fp) return -3;
+    n = constraints.size();
+    for (l=0; l<n; l++) fprintf(fp, "%s\n", constraints[l].c_str());
+    fclose(fp);
 }
 

@@ -1177,7 +1177,7 @@ _canstill_clash:
         r = rheavy;
     }
 
-    if (r < rbind && !atoms_are_bonded)
+    if (r < rbind && !atoms_are_bonded && (!achg || !bchg || sgn(achg) != -sgn(bchg)) )
     {
         float f = rbind/(avdW+bvdW);
         float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);

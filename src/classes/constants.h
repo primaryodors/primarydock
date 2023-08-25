@@ -275,7 +275,7 @@
 
 // Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,
 // if a negatively charged atom is nearby.
-#define _ALLOW_PROTONATE_PNICTOGENS 1
+#define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
 
 #define prealign_iters 50

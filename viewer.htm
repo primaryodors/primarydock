@@ -589,6 +589,45 @@ function resno_from_bw(bwnum)
 	return bw50r[rgnno] + member - 50;
 }
 
+function bw_from_resno(resno)
+{
+	var rgnno;
+	for (rgnno = 1; rgnno <= 7; rgnno++)
+	{
+		if (resno >= tmstart[rgnno] && resno <= tmend[rgnno])
+		{
+			if (typeof bw50r[rgnno] == "undefined") return "";
+			else return (""+rgnno) + '.' + (parseInt(resno) - bw50r[rgnno] + 50);
+		}
+	}
+	for (rgnno = 12; rgnno <= 78; rgnno += 11)
+	{
+		var before = parseInt(Math.floor(rgnno / 10));
+		var after = before+1;
+
+		if (resno > tmend[before] && resno < tmstart[after] && typeof bw50r[rgnno] != "undefined" && bw50r[rgnno] > 0)
+			return (""+rgnno) + '.' + (parseInt(resno) - bw50r[rgnno] + 50);
+	}
+	return "";
+}
+
+function superscript_number(num)
+{
+	var str = num.toString();
+	var out = "";
+	var i, n = str.length;
+
+	for (i=0; i<n; i++)
+	{
+		var o = str.charCodeAt(i);
+		if (o >= 0x30 && 0 <= 0x39) out += String.fromCharCode(0x2040 + o);
+		else if (o == 0x2e) out += String.fromCharCode(0x2d9);
+		else out += String.fromCharCode(o);
+	}
+
+	return out;
+}
+
 function resno_from_letters_and_bw(bwnum)
 {
 	var lbw = bwnum.replace(/[^0-9.x]/g, '');
@@ -1004,7 +1043,8 @@ function show_seqdd()
 			{
 				tgl.innerText = sequence[mdlidx];
 				tgl.id = "seqddtgl" + (mdlidx);
-				tgl.title = sequence[mdlidx] + resno;
+				var bw = bw_from_resno(resno);
+				tgl.title = sequence[mdlidx] + resno + (bw ? (' (' + bw + ')') : "");
 				tgl.setAttribute("onclick", "event.preventDefault(); toggleSideChain("+resno+", '"+strandid+"'); return false;");
 				tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 				tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");

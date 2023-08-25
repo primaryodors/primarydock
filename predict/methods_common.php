@@ -74,7 +74,7 @@ if (@$_REQUEST['next'])
 	$protid = @$_REQUEST['prot'] ?: false;
 	$ligname = @$_REQUEST['lig'] ?: false;
 	
-	foreach ($prioritize_pairs as $rcpid => $liglist)
+	/*foreach ($prioritize_pairs as $rcpid => $liglist)
 	{
 	    if ($protid && $protid != $rcpid && !preg_match("/^$protid$/", $rcpid) ) continue;
 	    foreach ($liglist as $lig)
@@ -102,7 +102,7 @@ if (@$_REQUEST['next'])
 				goto found_next_pair;
 			}
 	    }
-	}
+	}*/
 	
 	foreach (array_keys($prots) as $rcpid)
 	{

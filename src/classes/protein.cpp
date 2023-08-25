@@ -3829,7 +3829,7 @@ float Protein::region_can_move(int startres, int endres, SCoord direction, bool 
 
         if (clash > homology_clash_peraa/4)
         {
-            cout << "At " << (result+increment) << ", " << debug_msg << "." << endl;
+            // cout << "At " << (result+increment) << ", " << debug_msg << "." << endl;
             direction.r *= -1;
             move_piece(startres, endres, direction);
             increment *= 0.81;

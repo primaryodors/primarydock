@@ -197,7 +197,7 @@ int main(int argc, char** argv)
         p.rotate_piece(aa56x50->get_residue_no(), aa6x59->get_residue_no(), aa6x48->get_CA_location(), axis6, theta);
         TMR6c = aa56x50->get_CA_location().subtract(was);
 
-        // Compute the axis and angle to rotate TMR5 about 5.33 to match 56.49 to TMR6c, and perform the rotation.
+        // Compute the axis and angle to rotate TMR5 about 5.50 to match 56.49 to TMR6c, and perform the rotation.
         axis5 = compute_normal(aa5x50->get_CA_location(), aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c));
         theta = find_3d_angle(aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c), aa5x50->get_CA_location());
         p.rotate_piece(aa5x50->get_residue_no(), aa56x50->get_residue_no()-1, aa5x50->get_CA_location(), axis5, theta);
@@ -287,6 +287,9 @@ int main(int argc, char** argv)
         // Translate the CYT3 region (BW numbers 56.x) to stay with 5.68 and 6.28 as smoothly as possible.
         bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
         cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
+
+        #if 0
+
         TMR5cdir = aa7x53->get_CA_location().subtract(aa5x58->get_CA_location());
         TMR5cdir.r = bridge57;
         axis5 = compute_normal(aa5x33->get_CA_location(), aa5x58->get_CA_location(), aa5x58->get_CA_location().add(TMR5cdir));
@@ -300,6 +303,10 @@ int main(int argc, char** argv)
         p.rotate_piece(aa56x50->get_residue_no()+1, aa6x59->get_residue_no(), aa6x59->get_CA_location(), axis6, theta);
 
         p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
+        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
+        cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
+
+        #endif
         
         // If 6.40 is once again clashing with 7.53, compute the distance to rotate 6.48 thru 56.50 about 6.48 to eliminate the clash.
         // Then perform the rotation, then compute the rotation of TMR5 about 5.33 to keep up, and perform that rotation.
@@ -343,7 +350,39 @@ int main(int argc, char** argv)
         }
     }
 
+    cout << "Minimizing internal clashes..." << endl;
+    p.get_internal_clashes(1, p.get_end_resno(), true);
+
     // If there is R6.59, adjust its side chain to keep pointing inward while avoiding clashes with other nearby side chains.
+    if (l6x59 == 'R' || l6x59 == 'K')
+    {
+        cout << "Optimizing 6.59 side chain..." << endl;
+
+        Molecule m("Acid");
+        m.from_smiles("[Cl-]");
+        Point pt = aa4x60->get_CA_location().add(aa6x59->get_atom_location("CZ"));
+        pt.scale(pt.magnitude()/2);
+        m.move(pt);
+        m.movability = MOV_PINNED;
+
+        Molecule* mols[256];
+        AminoAcid** can_clash = p.get_residues_can_clash(aa6x59->get_residue_no());
+        l = 0;
+
+        mols[l++] = (Molecule*)aa6x59;
+        aa6x59->movability = MOV_FLEXONLY;
+        mols[l++] = &m;
+
+        for (i=0; can_clash[i]; i++)
+        {
+            can_clash[i]->movability = MOV_FLEXONLY;
+            mols[l++] = (Molecule*)can_clash[i];
+            if (l >= 255) break;
+        }
+        mols[l] = nullptr;
+
+        Molecule::conform_molecules(mols, 50);
+    }
 
     // Now save the output file. It will be the same name as the input file except it will end in .icactive.pdb instead of .upright.pdb.
     std::string out_filename = path + orid + (std::string)".icactive.pdb";

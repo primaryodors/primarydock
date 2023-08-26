@@ -66,6 +66,10 @@ if (@$_REQUEST['simul']) $max_simultaneous_docks = intval($_REQUEST['simul']) ?:
 
 if (@$_REQUEST['next'])
 {
+    $cmd = "ps -ef | grep ':[0-9][0-9] bin/ic_activate_or' | grep -v grep";
+	exec($cmd, $results);
+    if (count($results)) exit;
+
 	$cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|obabel)' | grep -v grep";
 	exec($cmd, $results);
 	if (!@$_REQUEST['force'] && trim(@$results[$max_simultaneous_docks-1])) die("Already running.\n".print_r($results, 1));

@@ -176,15 +176,15 @@ int main(int argc, char** argv)
     int n3x56 = aa3x56->get_residue_no();
     LocatedVector axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
     axis3.origin = aa3x50->get_CA_location();
-    float rock3 = p.region_can_rotate(n3x21, n3x56, axis3, true);
+    float rock3 = p.region_can_rotate(1, n3x56, axis3, true);
     cout << "TMR3 can rotate " << (rock3 * fiftyseven) << " degrees about 3.50 to make room for TMR5." << endl;
 
     // Perform the rotation.
+    // TODO: This should not be hard coded.
     p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, fiftyseventh*3);
 
 
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.
-    // TODO: There's also a slight movement of TMR3 that nudges 3.40 out of 5.50's way.
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
     AminoAcid *aa5x43 = p.get_residue_bw("5.43");
     AminoAcid *aa5x54 = p.get_residue_bw("5.54");

@@ -69,7 +69,7 @@ function make_prediction($data)
 chdir(__DIR__);
 chdir("..");
 
-$pdbfname_active = str_replace(".upright.pdb", ".icactive.pdb", $pdbfname);
+$pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
 if (!file_exists($pdbfname_active))
@@ -117,7 +117,7 @@ process_dock("i");
 
 $pdbfname = $pdbfname_active;
 
-$outfname = "output/$fam/$protid/$protid.$ligname.icactive.dock";
+$outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
 
 $configf = <<<heredoc
 

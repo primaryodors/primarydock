@@ -418,8 +418,8 @@ int main(int argc, char** argv)
         Molecule::conform_molecules(mols, 50);
     }
 
-    // Now save the output file. It will be the same name as the input file except it will end in .icactive.pdb instead of .upright.pdb.
-    std::string out_filename = path + orid + (std::string)".icactive.pdb";
+    // Now save the output file. It will be the same name as the input file except it will end in .active.pdb instead of .upright.pdb.
+    std::string out_filename = path + orid + (std::string)".active.pdb";
     fp = fopen(out_filename.c_str(), "wb");
     if (!fp) return -3;
     p.save_pdb(fp);

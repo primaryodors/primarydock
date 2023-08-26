@@ -167,6 +167,22 @@ int main(int argc, char** argv)
     }
 
 
+    // Perform a slight rotation of TMR3 to give TMR5 more room to move.
+    AminoAcid *aa3x21 = p.get_residue_bw("3.21");
+    AminoAcid *aa3x50 = p.get_residue_bw("3.50");
+    AminoAcid *aa3x56 = p.get_residue_bw("3.56");
+    AminoAcid *aa5x58 = p.get_residue_bw("5.58");
+    int n3x21 = aa3x21->get_residue_no();
+    int n3x56 = aa3x56->get_residue_no();
+    LocatedVector axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
+    axis3.origin = aa3x50->get_CA_location();
+    float rock3 = p.region_can_rotate(n3x21, n3x56, axis3, true);
+    cout << "TMR3 can rotate " << (rock3 * fiftyseven) << " degrees about 3.50 to make room for TMR5." << endl;
+
+    // Perform the rotation.
+    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, fiftyseventh*3);
+
+
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.
     // TODO: There's also a slight movement of TMR3 that nudges 3.40 out of 5.50's way.
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
@@ -205,7 +221,6 @@ int main(int argc, char** argv)
     }
 
     // If there is Y5.58 and Y7.53:
-    AminoAcid *aa5x58 = p.get_residue_bw("5.58");
     AminoAcid *aa6x40 = p.get_residue_bw("6.40");
     AminoAcid *aa7x48 = p.get_residue_bw("7.48");
     AminoAcid *aa7x52 = p.get_residue_bw("7.52");

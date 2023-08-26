@@ -1,0 +1,13 @@
+
+STRAND O
+LOAD pdbs/OR51/OR51E2.8f76.pdb
+UPRIGHT
+BWCENTER
+
+STRAND P
+LOAD pdbs/OR51/OR51E2.icactive.pdb
+UPRIGHT
+BWCENTER
+
+SAVE pdbs/OR51E2.icaccuracy.pdb
+

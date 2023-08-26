@@ -129,6 +129,7 @@ public:
     float binding_to_nearby_residues(int resno);
     void minimize_residue_clashes(int resno);
     float region_can_move(int startres, int endres, SCoord direction, bool repack = false);
+    float region_can_rotate(int startres, int endres, LocatedVector axis, bool repack = false);     // Searches positive theta.
     void region_optimal_positioning(int startres, int endres, SCoord* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
 
     // Motion functions

@@ -62,15 +62,51 @@ int main(int argc, char** argv)
     fclose(fp);
 
 
+    AminoAcid *aa3x21 = p.get_residue_bw("3.21");
+    AminoAcid *aa3x50 = p.get_residue_bw("3.50");
+    AminoAcid *aa3x56 = p.get_residue_bw("3.56");
+    AminoAcid *aa4x53 = p.get_residue_bw("4.53");
+    AminoAcid *aa4x60 = p.get_residue_bw("4.60");
+    AminoAcid *aa4x64 = p.get_residue_bw("4.64");
+    AminoAcid *aa45x51 = p.get_residue_bw("45.51");
+    AminoAcid *aa45x53 = p.get_residue_bw("45.53");
+    AminoAcid *aa5x33 = p.get_residue_bw("5.33");
+    AminoAcid *aa5x39 = p.get_residue_bw("5.39");
+    AminoAcid *aa5x43 = p.get_residue_bw("5.43");
+    AminoAcid *aa5x50 = p.get_residue_bw("5.50");
+    AminoAcid *aa5x54 = p.get_residue_bw("5.54");
+    AminoAcid *aa5x58 = p.get_residue_bw("5.58");
+    AminoAcid *aa5x68 = p.get_residue_bw("5.68");
+    AminoAcid *aa56x50 = p.get_residue_bw("56.50");
+    AminoAcid *aa6x28 = p.get_residue_bw("6.28");
+    AminoAcid *aa6x40 = p.get_residue_bw("6.40");
+    AminoAcid *aa6x44 = p.get_residue_bw("6.44");
+    AminoAcid *aa6x48 = p.get_residue_bw("6.48");
+    AminoAcid *aa6x49 = p.get_residue_bw("6.49");
+    AminoAcid *aa6x55 = p.get_residue_bw("6.55");
+    AminoAcid *aa6x58 = p.get_residue_bw("6.58");
+    AminoAcid *aa6x59 = p.get_residue_bw("6.59");
+    AminoAcid *aa7x48 = p.get_residue_bw("7.48");
+    AminoAcid *aa7x52 = p.get_residue_bw("7.52");
+    AminoAcid *aa7x53 = p.get_residue_bw("7.53");
+    AminoAcid *aa7x56 = p.get_residue_bw("7.56");
+    
+    int n3x21 = aa3x21->get_residue_no();
+    int n3x56 = aa3x56->get_residue_no();
+    int n4x53 = aa4x53->get_residue_no();
+    int n4x64 = aa4x64->get_residue_no();
+
+    char l45x51 = aa45x51->get_letter();
+    char l45x53 = aa45x53->get_letter();
+    char l5x58 = aa5x58->get_letter();
+    char l6x58 = aa6x58->get_letter();
+    char l6x59 = aa6x59->get_letter();
+    char l7x53 = aa7x53->get_letter();
+
+
     // If there is an R at position 6.59, perform a slight helix unwind and bring 6.59's side chain inward.
     DynamicMotion unwind6(&p);
     DynamicMotion bend45(&p);
-    AminoAcid* aa6x59 = p.get_residue_bw("6.59");
-    AminoAcid* aa6x58 = p.get_residue_bw("6.58");
-    AminoAcid* aa4x60 = p.get_residue_bw("4.60");
-    AminoAcid* aa45x53 = p.get_residue_bw("45.53");
-    char l45x53 = aa45x53->get_letter();
-    char l6x59 = aa6x59->get_letter();
     if (aa6x59 && aa6x58 && aa45x53 && (aa6x59->get_letter() == 'R'))
     {
         if (l45x53 == 'Q' || l45x53 == 'N' || l45x53 == 'R' || l45x53 == 'K' || l45x53 == 'E' || l45x53 == 'D')
@@ -105,12 +141,6 @@ int main(int argc, char** argv)
 
 
     float TMR6ex = 0, TMR6ey;
-    AminoAcid *aa6x48 = p.get_residue_bw("6.48");
-    AminoAcid *aa6x55 = p.get_residue_bw("6.55");
-    AminoAcid *aa45x51 = p.get_residue_bw("45.51");
-    AminoAcid *aa5x39 = p.get_residue_bw("5.39");
-    char l45x51 = aa45x51->get_letter();
-    char l6x58 = aa6x58->get_letter();
     SCoord axis6;
 
     // If S6.58 and P45.53 and D/E45.51, measure how far S6.58 would have to move to make contact with 45.51.
@@ -168,12 +198,7 @@ int main(int argc, char** argv)
 
 
     // Perform a slight rotation of TMR3 to give TMR5 more room to move.
-    AminoAcid *aa3x21 = p.get_residue_bw("3.21");
-    AminoAcid *aa3x50 = p.get_residue_bw("3.50");
-    AminoAcid *aa3x56 = p.get_residue_bw("3.56");
-    AminoAcid *aa5x58 = p.get_residue_bw("5.58");
-    int n3x21 = aa3x21->get_residue_no();
-    int n3x56 = aa3x56->get_residue_no();
+    
     LocatedVector axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
     axis3.origin = aa3x50->get_CA_location();
     float rock3 = p.region_can_rotate(n3x21, n3x56, axis3, true);
@@ -183,11 +208,6 @@ int main(int argc, char** argv)
     // TODO: This should not be hard coded.
     p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*2);
 
-    AminoAcid *aa4x53 = p.get_residue_bw("4.53");
-    AminoAcid *aa4x64 = p.get_residue_bw("4.64");
-    AminoAcid *aa6x49 = p.get_residue_bw("6.49");
-    int n4x53 = aa4x53->get_residue_no();
-    int n4x64 = aa4x64->get_residue_no();
     LocatedVector axis4 = (SCoord)aa4x53->get_CA_location().subtract(aa6x49->get_CA_location());
     axis4.origin = aa4x53->get_CA_location();
     float bend4 = p.region_can_rotate(n4x53, n4x64, axis4, true);
@@ -198,11 +218,7 @@ int main(int argc, char** argv)
 
 
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.
-    AminoAcid *aa5x33 = p.get_residue_bw("5.33");
-    AminoAcid *aa5x43 = p.get_residue_bw("5.43");
-    AminoAcid *aa5x54 = p.get_residue_bw("5.54");
-    AminoAcid *aa5x68 = p.get_residue_bw("5.68");
-    AminoAcid *aa6x44 = p.get_residue_bw("6.44");
+    
     SCoord TMR5edir = p.get_region_center(aa6x44->get_residue_no(), aa6x55->get_residue_no()).subtract(p.get_region_center(aa5x43->get_residue_no(), aa5x54->get_residue_no()));
     float TMR5ez = p.region_can_move(aa5x43->get_residue_no(), aa5x54->get_residue_no(), TMR5edir, true);
     cout << "TMR5 moves " << TMR5ez << " toward TMR6." << endl;
@@ -214,9 +230,6 @@ int main(int argc, char** argv)
     // If TMR6ex is nonzero:
     float theta;
     Point was;
-    AminoAcid *aa56x50 = p.get_residue_bw("56.50");
-    AminoAcid *aa6x28 = p.get_residue_bw("6.28");
-    AminoAcid *aa5x50 = p.get_residue_bw("5.50");
     SCoord TMR6c, axis5;
     if (TMR6ex)
     {
@@ -234,13 +247,6 @@ int main(int argc, char** argv)
     }
 
     // If there is Y5.58 and Y7.53:
-    AminoAcid *aa6x40 = p.get_residue_bw("6.40");
-    AminoAcid *aa7x48 = p.get_residue_bw("7.48");
-    AminoAcid *aa7x52 = p.get_residue_bw("7.52");
-    AminoAcid *aa7x53 = p.get_residue_bw("7.53");
-    AminoAcid *aa7x56 = p.get_residue_bw("7.56");
-    char l5x58 = aa5x58->get_letter();
-    char l7x53 = aa7x53->get_letter();
     float bridge57, scooch6x40 = 0, TMR7cz;
     SCoord TMR5cdir, TMR6cdir, TMR7cdir, axis7;
     Point pt_tmp;

@@ -176,7 +176,7 @@ int main(int argc, char** argv)
     int n3x56 = aa3x56->get_residue_no();
     LocatedVector axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
     axis3.origin = aa3x50->get_CA_location();
-    float rock3 = p.region_can_rotate(1, n3x56, axis3, true);
+    float rock3 = p.region_can_rotate(n3x21, n3x56, axis3, true);
     cout << "TMR3 can rotate " << (rock3 * fiftyseven) << " degrees about 3.50 to make room for TMR5." << endl;
 
     // Perform the rotation.

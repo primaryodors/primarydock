@@ -81,7 +81,7 @@ int main(int argc, char** argv)
             bend45.type = dyn_bend;
             bend45.fulcrum_resno.from_string("45.53");
             bend45.axis_resno.from_string("45.54");
-            bend45.bias = 30;
+            bend45.bias = 60;
             bend45.apply_absolute(1);
             aa45x53->conform_atom_to_location(aa45x53->get_reach_atom()->name, Point(0,-1000,0));
         }
@@ -181,7 +181,20 @@ int main(int argc, char** argv)
 
     // Perform the rotation.
     // TODO: This should not be hard coded.
-    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, fiftyseventh*3);
+    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*2);
+
+    AminoAcid *aa4x53 = p.get_residue_bw("4.53");
+    AminoAcid *aa4x64 = p.get_residue_bw("4.64");
+    AminoAcid *aa6x49 = p.get_residue_bw("6.49");
+    int n4x53 = aa4x53->get_residue_no();
+    int n4x64 = aa4x64->get_residue_no();
+    LocatedVector axis4 = (SCoord)aa4x53->get_CA_location().subtract(aa6x49->get_CA_location());
+    axis4.origin = aa4x53->get_CA_location();
+    float bend4 = p.region_can_rotate(n4x53, n4x64, axis4, true);
+    cout << "TMR4 can bend " << (bend4 * fiftyseven) << " degrees about 4.64 to meet TMR3." << endl;
+
+    // Perform the rotation.
+    p.rotate_piece(n4x53, n4x64, aa4x53->get_CA_location(), axis4, bend4);
 
 
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.

@@ -24,18 +24,18 @@ if (substr($fam, 0, 2) == "OR")
     if ($sub >= 50)
     {
         // https://doi.org/10.1101/2022.12.20.520951
-        // $cenres = "CEN RES 4.57 4.60 5.39 45.52";
-        $cenres = "CEN RES 45.52 6.59";                 // This fails less badly for OR52D1.
+        $cenres_active = "CEN RES 4.57 4.60 5.39 45.52 6.59";
+        $cenres_inactive = "CEN RES 4.57 4.60 5.39 45.52";
     }
     else
     {
-        $cenres = "CEN RES 3.37 5.47 6.55 7.41";
+        $cenres_active = $cenres_inactive = "CEN RES 3.37 5.47 6.55 7.41";
     }
 }
 else if (substr($fam, 0, 4) == "TAAR")
 {
     die("There is not yet an internal contacts activation app for TAARs.\n");
-    $cenres = "CEN RES 3.32 3.37 5.43 6.48 7.43";
+    $cenres_active = $cenres_inactive = "CEN RES 3.32 3.37 5.43 6.48 7.43";
 }
 else die("Unsupported receptor family.\n");
 
@@ -69,7 +69,7 @@ function make_prediction($data)
 chdir(__DIR__);
 chdir("..");
 
-$pdbfname_active = str_replace(".upright.pdb", ".icactive.pdb", $pdbfname);
+$pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
 if (!file_exists($pdbfname_active))
@@ -88,12 +88,12 @@ $configf = <<<heredoc
 PROT $pdbfname
 LIG sdf/$ligname.sdf
 
-$cenres
+$cenres_inactive
 SIZE 7.0 7.0 7.0
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
-SEARCH TS
+SEARCH BB
 POSE 10
 ELIM 5000
 ITERS 50
@@ -117,19 +117,19 @@ process_dock("i");
 
 $pdbfname = $pdbfname_active;
 
-$outfname = "output/$fam/$protid/$protid.$ligname.icactive.dock";
+$outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
 
 $configf = <<<heredoc
 
 PROT $pdbfname
 LIG sdf/$ligname.sdf
 
-$cenres
+$cenres_active
 SIZE 7.0 7.0 7.0
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
-SEARCH TS
+SEARCH BB
 POSE 10
 ELIM 5000
 $flex_constraints

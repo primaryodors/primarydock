@@ -62,15 +62,51 @@ int main(int argc, char** argv)
     fclose(fp);
 
 
+    AminoAcid *aa3x21 = p.get_residue_bw("3.21");
+    AminoAcid *aa3x50 = p.get_residue_bw("3.50");
+    AminoAcid *aa3x56 = p.get_residue_bw("3.56");
+    AminoAcid *aa4x53 = p.get_residue_bw("4.53");
+    AminoAcid *aa4x60 = p.get_residue_bw("4.60");
+    AminoAcid *aa4x64 = p.get_residue_bw("4.64");
+    AminoAcid *aa45x51 = p.get_residue_bw("45.51");
+    AminoAcid *aa45x53 = p.get_residue_bw("45.53");
+    AminoAcid *aa5x33 = p.get_residue_bw("5.33");
+    AminoAcid *aa5x39 = p.get_residue_bw("5.39");
+    AminoAcid *aa5x43 = p.get_residue_bw("5.43");
+    AminoAcid *aa5x50 = p.get_residue_bw("5.50");
+    AminoAcid *aa5x54 = p.get_residue_bw("5.54");
+    AminoAcid *aa5x58 = p.get_residue_bw("5.58");
+    AminoAcid *aa5x68 = p.get_residue_bw("5.68");
+    AminoAcid *aa56x50 = p.get_residue_bw("56.50");
+    AminoAcid *aa6x28 = p.get_residue_bw("6.28");
+    AminoAcid *aa6x40 = p.get_residue_bw("6.40");
+    AminoAcid *aa6x44 = p.get_residue_bw("6.44");
+    AminoAcid *aa6x48 = p.get_residue_bw("6.48");
+    AminoAcid *aa6x49 = p.get_residue_bw("6.49");
+    AminoAcid *aa6x55 = p.get_residue_bw("6.55");
+    AminoAcid *aa6x58 = p.get_residue_bw("6.58");
+    AminoAcid *aa6x59 = p.get_residue_bw("6.59");
+    AminoAcid *aa7x48 = p.get_residue_bw("7.48");
+    AminoAcid *aa7x52 = p.get_residue_bw("7.52");
+    AminoAcid *aa7x53 = p.get_residue_bw("7.53");
+    AminoAcid *aa7x56 = p.get_residue_bw("7.56");
+    
+    int n3x21 = aa3x21->get_residue_no();
+    int n3x56 = aa3x56->get_residue_no();
+    int n4x53 = aa4x53->get_residue_no();
+    int n4x64 = aa4x64->get_residue_no();
+
+    char l45x51 = aa45x51->get_letter();
+    char l45x53 = aa45x53->get_letter();
+    char l5x58 = aa5x58->get_letter();
+    char l6x58 = aa6x58->get_letter();
+    char l6x59 = aa6x59->get_letter();
+    char l7x53 = aa7x53->get_letter();
+
+
     // If there is an R at position 6.59, perform a slight helix unwind and bring 6.59's side chain inward.
     DynamicMotion unwind6(&p);
     DynamicMotion bend45(&p);
-    AminoAcid* aa6x59 = p.get_residue_bw("6.59");
-    AminoAcid* aa6x58 = p.get_residue_bw("6.58");
-    AminoAcid* aa4x60 = p.get_residue_bw("4.60");
-    AminoAcid* aa45x53 = p.get_residue_bw("45.53");
-    char l45x53 = aa45x53->get_letter();
-    char l6x59 = aa6x59->get_letter();
     if (aa6x59 && aa6x58 && aa45x53 && (aa6x59->get_letter() == 'R'))
     {
         if (l45x53 == 'Q' || l45x53 == 'N' || l45x53 == 'R' || l45x53 == 'K' || l45x53 == 'E' || l45x53 == 'D')
@@ -81,7 +117,7 @@ int main(int argc, char** argv)
             bend45.type = dyn_bend;
             bend45.fulcrum_resno.from_string("45.53");
             bend45.axis_resno.from_string("45.54");
-            bend45.bias = 30;
+            bend45.bias = 60;
             bend45.apply_absolute(1);
             aa45x53->conform_atom_to_location(aa45x53->get_reach_atom()->name, Point(0,-1000,0));
         }
@@ -105,12 +141,6 @@ int main(int argc, char** argv)
 
 
     float TMR6ex = 0, TMR6ey;
-    AminoAcid *aa6x48 = p.get_residue_bw("6.48");
-    AminoAcid *aa6x55 = p.get_residue_bw("6.55");
-    AminoAcid *aa45x51 = p.get_residue_bw("45.51");
-    AminoAcid *aa5x39 = p.get_residue_bw("5.39");
-    char l45x51 = aa45x51->get_letter();
-    char l6x58 = aa6x58->get_letter();
     SCoord axis6;
 
     // If S6.58 and P45.53 and D/E45.51, measure how far S6.58 would have to move to make contact with 45.51.
@@ -167,13 +197,28 @@ int main(int argc, char** argv)
     }
 
 
+    // Perform a slight rotation of TMR3 to give TMR5 more room to move.
+    
+    LocatedVector axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
+    axis3.origin = aa3x50->get_CA_location();
+    float rock3 = p.region_can_rotate(n3x21, n3x56, axis3, true);
+    cout << "TMR3 can rotate " << (rock3 * fiftyseven) << " degrees about 3.50 to make room for TMR5." << endl;
+
+    // Perform the rotation.
+    // TODO: This should not be hard coded.
+    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*2);
+
+    LocatedVector axis4 = (SCoord)aa4x53->get_CA_location().subtract(aa6x49->get_CA_location());
+    axis4.origin = aa4x53->get_CA_location();
+    float bend4 = p.region_can_rotate(n4x53, n4x64, axis4, true);
+    cout << "TMR4 can bend " << (bend4 * fiftyseven) << " degrees about 4.64 to meet TMR3." << endl;
+
+    // Perform the rotation.
+    p.rotate_piece(n4x53, n4x64, aa4x53->get_CA_location(), axis4, bend4);
+
+
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.
-    // TODO: There's also a slight movement of TMR3 that nudges 3.40 out of 5.50's way.
-    AminoAcid *aa5x33 = p.get_residue_bw("5.33");
-    AminoAcid *aa5x43 = p.get_residue_bw("5.43");
-    AminoAcid *aa5x54 = p.get_residue_bw("5.54");
-    AminoAcid *aa5x68 = p.get_residue_bw("5.68");
-    AminoAcid *aa6x44 = p.get_residue_bw("6.44");
+    
     SCoord TMR5edir = p.get_region_center(aa6x44->get_residue_no(), aa6x55->get_residue_no()).subtract(p.get_region_center(aa5x43->get_residue_no(), aa5x54->get_residue_no()));
     float TMR5ez = p.region_can_move(aa5x43->get_residue_no(), aa5x54->get_residue_no(), TMR5edir, true);
     cout << "TMR5 moves " << TMR5ez << " toward TMR6." << endl;
@@ -185,9 +230,6 @@ int main(int argc, char** argv)
     // If TMR6ex is nonzero:
     float theta;
     Point was;
-    AminoAcid *aa56x50 = p.get_residue_bw("56.50");
-    AminoAcid *aa6x28 = p.get_residue_bw("6.28");
-    AminoAcid *aa5x50 = p.get_residue_bw("5.50");
     SCoord TMR6c, axis5;
     if (TMR6ex)
     {
@@ -197,7 +239,7 @@ int main(int argc, char** argv)
         p.rotate_piece(aa56x50->get_residue_no(), aa6x59->get_residue_no(), aa6x48->get_CA_location(), axis6, theta);
         TMR6c = aa56x50->get_CA_location().subtract(was);
 
-        // Compute the axis and angle to rotate TMR5 about 5.33 to match 56.49 to TMR6c, and perform the rotation.
+        // Compute the axis and angle to rotate TMR5 about 5.50 to match 56.49 to TMR6c, and perform the rotation.
         axis5 = compute_normal(aa5x50->get_CA_location(), aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c));
         theta = find_3d_angle(aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c), aa5x50->get_CA_location());
         p.rotate_piece(aa5x50->get_residue_no(), aa56x50->get_residue_no()-1, aa5x50->get_CA_location(), axis5, theta);
@@ -205,14 +247,6 @@ int main(int argc, char** argv)
     }
 
     // If there is Y5.58 and Y7.53:
-    AminoAcid *aa5x58 = p.get_residue_bw("5.58");
-    AminoAcid *aa6x40 = p.get_residue_bw("6.40");
-    AminoAcid *aa7x48 = p.get_residue_bw("7.48");
-    AminoAcid *aa7x52 = p.get_residue_bw("7.52");
-    AminoAcid *aa7x53 = p.get_residue_bw("7.53");
-    AminoAcid *aa7x56 = p.get_residue_bw("7.56");
-    char l5x58 = aa5x58->get_letter();
-    char l7x53 = aa7x53->get_letter();
     float bridge57, scooch6x40 = 0, TMR7cz;
     SCoord TMR5cdir, TMR6cdir, TMR7cdir, axis7;
     Point pt_tmp;
@@ -287,6 +321,9 @@ int main(int argc, char** argv)
         // Translate the CYT3 region (BW numbers 56.x) to stay with 5.68 and 6.28 as smoothly as possible.
         bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
         cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
+
+        #if 0
+
         TMR5cdir = aa7x53->get_CA_location().subtract(aa5x58->get_CA_location());
         TMR5cdir.r = bridge57;
         axis5 = compute_normal(aa5x33->get_CA_location(), aa5x58->get_CA_location(), aa5x58->get_CA_location().add(TMR5cdir));
@@ -300,6 +337,10 @@ int main(int argc, char** argv)
         p.rotate_piece(aa56x50->get_residue_no()+1, aa6x59->get_residue_no(), aa6x59->get_CA_location(), axis6, theta);
 
         p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
+        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
+        cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
+
+        #endif
         
         // If 6.40 is once again clashing with 7.53, compute the distance to rotate 6.48 thru 56.50 about 6.48 to eliminate the clash.
         // Then perform the rotation, then compute the rotation of TMR5 about 5.33 to keep up, and perform that rotation.
@@ -343,10 +384,42 @@ int main(int argc, char** argv)
         }
     }
 
-    // If there is R6.59, adjust its side chain to keep pointing inward while avoiding clashes with other nearby side chains.
+    cout << "Minimizing internal clashes..." << endl;
+    p.get_internal_clashes(1, p.get_end_resno(), true);
 
-    // Now save the output file. It will be the same name as the input file except it will end in .icactive.pdb instead of .upright.pdb.
-    std::string out_filename = path + orid + (std::string)".icactive.pdb";
+    // If there is R6.59, adjust its side chain to keep pointing inward while avoiding clashes with other nearby side chains.
+    if (l6x59 == 'R' || l6x59 == 'K')
+    {
+        cout << "Optimizing 6.59 side chain..." << endl;
+
+        Molecule m("Acid");
+        m.from_smiles("[Cl-]");
+        Point pt = aa4x60->get_CA_location().add(aa6x59->get_atom_location("CZ"));
+        pt.scale(pt.magnitude()/2);
+        m.move(pt);
+        m.movability = MOV_PINNED;
+
+        Molecule* mols[256];
+        AminoAcid** can_clash = p.get_residues_can_clash(aa6x59->get_residue_no());
+        l = 0;
+
+        mols[l++] = (Molecule*)aa6x59;
+        aa6x59->movability = MOV_FLEXONLY;
+        mols[l++] = &m;
+
+        for (i=0; can_clash[i]; i++)
+        {
+            can_clash[i]->movability = MOV_FLEXONLY;
+            mols[l++] = (Molecule*)can_clash[i];
+            if (l >= 255) break;
+        }
+        mols[l] = nullptr;
+
+        Molecule::conform_molecules(mols, 50);
+    }
+
+    // Now save the output file. It will be the same name as the input file except it will end in .active.pdb instead of .upright.pdb.
+    std::string out_filename = path + orid + (std::string)".active.pdb";
     fp = fopen(out_filename.c_str(), "wb");
     if (!fp) return -3;
     p.save_pdb(fp);

@@ -127,9 +127,9 @@
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.13
 #define bb_realign_iters 1
-#define bb_realign_b_threshold 10
-#define bb_realign_amount 0.333
-#define bb_realign_threshold_distance 2.5
+#define bb_realign_b_threshold 20
+#define bb_realign_amount 0.1
+#define bb_realign_threshold_distance 3.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define flexion_selection 1
 #define no_zero_flexions 1
@@ -275,7 +275,7 @@
 
 // Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,
 // if a negatively charged atom is nearby.
-#define _ALLOW_PROTONATE_PNICTOGENS 1
+#define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
 
 #define prealign_iters 50

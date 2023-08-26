@@ -33,6 +33,23 @@ $bsr = array_flip(
 $fam = family_from_protid($rcpid);
 if ($fam == 'TAAR') $bsr['5.42'] = count($bsr);
 
+$predictions = [];
+if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
+{
+    $dock_results = json_decode(file_get_contents("../predict/dock_results_icactive.json"), true);
+    if (isset($dock_results[$rcpid]))
+    {
+        foreach ($dock_results[$rcpid] as $ligname => $dock)
+        {
+            $odor = find_odorant($ligname);
+            $oid = $odor['oid'];
+            if (isset($dock['DockScore'])) $predictions[$oid] = floatval($dock['DockScore']);
+            else if (isset($dock['a_Pose1']) && isset($dock['i_Pose1']))
+                $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
+        }
+    }
+}
+
 // Copper binding sites for e.g. OR2T11
 // http://pubs.acs.org/doi/abs/10.1021/jacs.6b06983
 $cub =
@@ -459,6 +476,9 @@ echo "</p>";*/
         <th>EC<sub>50</sub></th>
         <th>Adjusted Top</th>
         <th>Antagonist?</th>
+        <?php
+        if (count($predictions)) echo "<th>Predicted</th>";
+        ?>
         <th>Aroma Notes</th>
     </tr>
 
@@ -509,6 +529,12 @@ foreach ($pairs as $oid => $pair)
 
     if (@$pair['antagonist']) echo "<td>Y</td>";
     else echo "<td>&nbsp;</td>";
+
+    if (count($predictions))
+    {
+        if (isset($predictions[$oid])) echo "<td>".round($predictions[$oid], 2)."</td>";
+        else echo "<td>&nbsp;</td>";
+    }        
 
     echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";

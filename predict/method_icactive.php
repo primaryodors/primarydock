@@ -54,10 +54,26 @@ function make_prediction($data)
         $ie = floatval(@$data["i_BindingEnergy"]);
         $a1 = floatval( $data['a_Pose1']);
         $i1 = floatval(@$data['i_Pose1']);
-        if ($ae < 0 && $ae < $ie) $data['Predicted'] = 'Agonist';
-        else if ($a1 < 0 && $a1 < $i1) $data['Predicted'] = 'Agonist';
-        else if ($a1 < 0 && $a1 > $i1) $data['Predicted'] = 'Inverse Agonist';
-        else $data['Predicted'] = 'Non-agonist';
+        if ($a1 < 0 && $a1 < $i1)
+        {
+            $data['Predicted'] = 'Agonist';
+            $data['DockScore'] = ($i1 - $a1) / 2;
+        }
+        else if ($ae < 0 && $ae < $ie)
+        {
+            $data['Predicted'] = 'Agonist';
+            $data['DockScore'] = ($ie - $ae) / 2;
+        }
+        else if ($a1 < 0 && $a1 > $i1)
+        {
+            $data['Predicted'] = 'Inverse Agonist';
+            $data['DockScore'] = ($i1 - $a1) / 2;
+        }
+        else
+        {
+            $data['Predicted'] = 'Non-agonist';
+            $data['DockScore'] = 0.0;
+        }
 
         echo "\nResult: " . print_r($data, true) . "\n";
     }

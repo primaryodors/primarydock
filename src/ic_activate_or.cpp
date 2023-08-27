@@ -414,7 +414,9 @@ int main(int argc, char** argv)
             if (l >= 255) break;
         }
         mols[l] = nullptr;
+        Molecule::conform_molecules(mols, 50);
 
+        mols[2] = nullptr;
         Molecule::conform_molecules(mols, 50);
     }
 

@@ -630,6 +630,7 @@ function superscript_number(num)
 
 function resno_from_letters_and_bw(bwnum)
 {
+	if (bwnum.toString().match(/^[0-9]+$/)) return parseInt(bwnum);
 	var lbw = bwnum.replace(/[^0-9.x]/g, '');
 	var resno = resno_from_bw(lbw);
 	var mdlidx = getResMdlIdx(resno, tmstrand[0]);

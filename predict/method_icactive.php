@@ -57,17 +57,17 @@ function make_prediction($data)
         if ($a1 < 0 && $a1 < $i1)
         {
             $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = ($i1 - $a1) / 2;
+            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
         }
         else if ($ae < 0 && $ae < $ie)
         {
             $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = ($ie - $ae) / 2;
+            $data['DockScore'] = (min($ie, 0) - $ae) / 2;
         }
         else if ($a1 < 0 && $a1 > $i1)
         {
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = ($i1 - $a1) / 2;
+            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
         }
         else
         {

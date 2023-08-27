@@ -394,8 +394,8 @@ int main(int argc, char** argv)
 
         Molecule m("Acid");
         m.from_smiles("[Cl-]");
-        Point pt = aa4x60->get_CA_location().add(aa6x59->get_atom_location("CZ"));
-        pt.scale(pt.magnitude()/2);
+        Point pt = aa4x60->get_CA_location().add(aa6x59->get_CA_location()).add(aa4x60->get_CA_location());
+        pt.scale(pt.magnitude()/3);
         m.move(pt);
         m.movability = MOV_PINNED;
 

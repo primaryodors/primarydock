@@ -2229,6 +2229,9 @@ int main(int argc, char** argv)
     if (debug) *debug << "Loaded protein." << endl;
     #endif
 
+    Pose tmp_pdb_residue[poses+1][protein->get_end_resno()+1];
+    Pose tmp_pdb_ligand[poses+1];
+
     if (tplset)
     {
         ptemplt = new Protein("template");
@@ -3652,6 +3655,7 @@ _try_again:
             {
                 protein->get_internal_clashes(1, protein->get_end_resno(), true);
 
+                /*
                 std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(pose) + (std::string)".pdb";
                 FILE* pfpdb = fopen(temp_pdb_fn.c_str(), "w");
                 if (!pfpdb) return -1;
@@ -3659,6 +3663,14 @@ _try_again:
                 protein->save_pdb(pfpdb, ligand);
                 protein->end_pdb(pfpdb);
                 fclose(pfpdb);
+                */
+                n = protein->get_end_resno();
+                for (j=1; j <= n; j++)
+                {
+                    AminoAcid* aa = protein->get_residue(j);
+                    if (aa) tmp_pdb_residue[pose][j].copy_state(aa);
+                }
+                tmp_pdb_ligand[pose].copy_state(ligand);
             }
 
             #if active_persistence
@@ -4287,28 +4299,41 @@ _try_again:
                             dot = strchr(lign, '.');
                             if (dot) *dot = 0;
 
-                            std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(j+1) + (std::string)".pdb";
+                            // std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(j+1) + (std::string)".pdb";
                             std::string out_pdb_fn = std::regex_replace(outpdb, std::regex("[%][p]"), protn);
                             out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("[%][l]"), lign);
                             out_pdb_fn = std::regex_replace(out_pdb_fn, std::regex("[%][o]"), to_string(pose));
 
-                            FILE* pftmp = fopen(temp_pdb_fn.c_str(), "rb");
+                            // FILE* pftmp = fopen(temp_pdb_fn.c_str(), "rb");
                             FILE* pfout = fopen(out_pdb_fn.c_str(), "wb");
-                            if (!pftmp || !pfout)
+                            if (/*!pftmp ||*/ !pfout)
                             {
-                                if (!pftmp) cout << "Failed to open " << temp_pdb_fn << " for reading." << endl;
+                                // if (!pftmp) cout << "Failed to open " << temp_pdb_fn << " for reading." << endl;
                                 if (!pfout) cout << "Failed to open " << out_pdb_fn << " for writing." << endl;
                                 return -1;
                             }
 
-                            char pdbbuffer[1024];
+                            /*char pdbbuffer[1024];
                             size_t bytes_copied;
                             while (bytes_copied = fread(pdbbuffer, 1, 1024, pftmp))
                             {
                                 fwrite(pdbbuffer, 1, bytes_copied, pfout);
                             }
 
-                            fclose(pftmp);
+                            fclose(pftmp);*/
+
+                            int j1;
+                            int n1 = protein->get_end_resno();
+                            for (j1=1; j1 <= n1; j1++)
+                            {
+                                AminoAcid* aa = protein->get_residue(j);
+                                if (aa) tmp_pdb_residue[j+1][j1].restore_state(aa);
+                            }
+                            tmp_pdb_ligand[j+1].restore_state(ligand);
+
+                            protein->save_pdb(pfout, ligand);
+                            protein->end_pdb(pfout);
+
                             fclose(pfout);
                         }
 

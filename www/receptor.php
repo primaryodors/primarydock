@@ -34,8 +34,10 @@ $fam = family_from_protid($rcpid);
 if ($fam == 'TAAR') $bsr['5.42'] = count($bsr);
 
 $predictions = [];
+$predname = [];
 if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
 {
+    chdir(__DIR__);
     $dock_results = json_decode(file_get_contents("../predict/dock_results_icactive.json"), true);
     if (isset($dock_results[$rcpid]))
     {
@@ -43,6 +45,7 @@ if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
         {
             $odor = find_odorant($ligname);
             $oid = $odor['oid'];
+            $predname[$oid] = $ligname;
             if (isset($dock['DockScore'])) $predictions[$oid] = floatval($dock['DockScore']);
             else if (isset($dock['a_Pose1']) && isset($dock['i_Pose1']))
                 $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
@@ -532,7 +535,13 @@ foreach ($pairs as $oid => $pair)
 
     if (count($predictions))
     {
-        if (isset($predictions[$oid])) echo "<td>".round($predictions[$oid], 2)."</td>";
+        if (isset($predictions[$oid]))
+        {
+            echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor={$predname[$oid]}&mode=";
+            if ($predictions[$oid] > 0) echo "active";
+            else echo "inactive";
+            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</td>";
+        }
         else echo "<td>&nbsp;</td>";
     }        
 

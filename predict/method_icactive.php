@@ -119,6 +119,7 @@ FLEX 1
 WET
 
 OUT $outfname
+OUTPDB 1 output/$fam/$protid/%p.%l.inactive.model%o.pdb
 
 
 heredoc;
@@ -156,7 +157,7 @@ FLEX 1
 WET
 
 OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.model%o.pdb
+OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
 
 
 heredoc;

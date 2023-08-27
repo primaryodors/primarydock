@@ -2273,7 +2273,14 @@ var url = getParameterByName('url') ? getParameterByName('url') : 'http://'+webs
 var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
 var protid = getParameterByName('prot') ? getParameterByName('prot') : false;
 
-if (protid)
+var literal_pdb = false;
+var literal_fname = "";
+
+if (literal_pdb)
+{
+	loadFile(literal_pdb, literal_fname);
+}
+else if (protid)
 {
 	$.ajax(
 	{

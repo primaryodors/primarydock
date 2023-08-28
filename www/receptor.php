@@ -537,7 +537,7 @@ foreach ($pairs as $oid => $pair)
     {
         if (isset($predictions[$oid]))
         {
-            echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor={$predname[$oid]}&mode=";
+            echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor=".urlencode($predname[$oid])."&mode=";
             if ($predictions[$oid] > 0) echo "active";
             else echo "inactive";
             echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</td>";

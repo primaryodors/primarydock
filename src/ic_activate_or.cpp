@@ -416,8 +416,14 @@ int main(int argc, char** argv)
         mols[l] = nullptr;
         Molecule::conform_molecules(mols, 50);
 
-        mols[2] = nullptr;
+        mols[3] = nullptr;
         Molecule::conform_molecules(mols, 50);
+        
+        /*fp = fopen("tmp/dbg6x59.pdb", "wb");
+        if (!fp) return -3;
+        p.save_pdb(fp, &m);
+        p.end_pdb(fp);
+        fclose(fp);*/
     }
 
     // Now save the output file. It will be the same name as the input file except it will end in .active.pdb instead of .upright.pdb.

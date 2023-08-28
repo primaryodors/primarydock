@@ -475,9 +475,10 @@ echo "</p>";*/
 <div class="row content scrollh">
 
 <?php if (count($predictions)) { ?>
-<div style="background-color: #fc9; color: 000; font-size: 0.8em;">We are rolling out the beta version of our predictions on this site,
-including viewable 3D models. The numbers and models are not yet accurate, but we are accepting pull requests
-at <a style="color: #00f;" href="https://github.com/primaryodors/primarydock">our GitHub repository</a>.
+<div style="background-color: #fc9; color: 000; font-size: 0.7em; padding: 2px;">
+This page features beta versions of predictions, including links to viewable 3D models. 
+The numbers and models are not yet fully accurate, but the repository is accepting pull requests at
+<a style="color: #00c;" href="https://github.com/primaryodors/primarydock">https://github.com/primaryodors/primarydock</a>.
 </div>
 <?php } ?>
 

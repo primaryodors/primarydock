@@ -96,11 +96,15 @@ int main(int argc, char** argv)
     int n3x56 = aa3x56->get_residue_no();
     int n4x53 = aa4x53->get_residue_no();
     int n4x64 = aa4x64->get_residue_no();
+    int n45x51 = aa45x51->get_residue_no();
+    int n6x55 = aa6x55->get_residue_no();
 
     char l3x40 = aa3x40->get_letter();
     char l45x51 = aa45x51->get_letter();
     char l45x53 = aa45x53->get_letter();
     char l5x58 = aa5x58->get_letter();
+    char l6x48 = aa6x48->get_letter();
+    char l6x55 = aa6x55->get_letter();
     char l6x58 = aa6x58->get_letter();
     char l6x59 = aa6x59->get_letter();
     char l7x53 = aa7x53->get_letter();
@@ -144,6 +148,41 @@ int main(int argc, char** argv)
 
     float TMR6ex = 0, TMR6ey;
     SCoord axis6;
+
+
+    if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
+    {
+        p.bridge(n6x55, n45x51);
+        float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));
+
+        if (r < 3)
+        {
+            if (l6x48 == 'Y' && (l3x40 == 'S' || l3x40 == 'T' && l3x40 == 'N' || l3x40 == 'Q' || l3x40 == 'E' || l3x40 == 'D'))
+            {
+                // Bend6.
+            }
+            else
+            {
+                // Swing6.
+            }
+        }
+        else
+        {
+            // Hybrid6.
+        }
+    }
+    else
+    {
+        if (l6x59 == 'R' || l6x59 == 'K')
+        {
+            // Rock6 with 6.59.
+        }
+        else
+        {
+            // Rock6 Other.
+        }
+    }
+
 
     // If Y6.48 and hydrophilic 3.40, then find how far TMR6 can rock in the EXR domain.
 

@@ -473,6 +473,14 @@ echo "</p>";*/
 
 <div class="box">
 <div class="row content scrollh">
+
+<?php if (count($predictions)) { ?>
+<div style="background-color: #fc9; color: 000;">We are rolling out the beta version of our predictions on this site,
+including viewable 3D models. The numbers and models are not yet fully accurate. We are, however, accepting pull requests
+at <a href="https://github.com/primaryodors/primarydock">our GitHub repository</a>.
+</div>
+<?php } ?>
+
 <table class="liglist">
     <tr>
         <th>Odorant</th>
@@ -480,7 +488,7 @@ echo "</p>";*/
         <th>Adjusted Top</th>
         <th>Antagonist?</th>
         <?php
-        if (count($predictions)) echo "<th>Predicted</th>";
+        if (count($predictions)) echo "<th>Predicted (BETA)</th>";
         ?>
         <th>Aroma Notes</th>
     </tr>

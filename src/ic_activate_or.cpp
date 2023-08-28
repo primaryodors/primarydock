@@ -63,6 +63,7 @@ int main(int argc, char** argv)
 
 
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
+    AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
     AminoAcid *aa3x56 = p.get_residue_bw("3.56");
     AminoAcid *aa4x53 = p.get_residue_bw("4.53");
@@ -96,6 +97,7 @@ int main(int argc, char** argv)
     int n4x53 = aa4x53->get_residue_no();
     int n4x64 = aa4x64->get_residue_no();
 
+    char l3x40 = aa3x40->get_letter();
     char l45x51 = aa45x51->get_letter();
     char l45x53 = aa45x53->get_letter();
     char l5x58 = aa5x58->get_letter();
@@ -142,6 +144,8 @@ int main(int argc, char** argv)
 
     float TMR6ex = 0, TMR6ey;
     SCoord axis6;
+
+    // If Y6.48 and hydrophilic 3.40, then find how far TMR6 can rock in the EXR domain.
 
     // If S6.58 and P45.53 and D/E45.51, measure how far S6.58 would have to move to make contact with 45.51.
     if ((l6x58 == 'S' || l6x58 == 'T')

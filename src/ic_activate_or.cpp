@@ -15,6 +15,15 @@
 
 using namespace std;
 
+enum TMR6ActivationType
+{
+    Bend6,
+    Swing6,
+    Hybrid6,
+    Rock6x59,
+    Rock6Other
+};
+
 bool file_exists(std::string fname)
 {
     struct stat s;
@@ -97,7 +106,11 @@ int main(int argc, char** argv)
     int n4x53 = aa4x53->get_residue_no();
     int n4x64 = aa4x64->get_residue_no();
     int n45x51 = aa45x51->get_residue_no();
+    int n6x28 = aa6x28->get_residue_no();
+    int n6x48 = aa6x48->get_residue_no();
     int n6x55 = aa6x55->get_residue_no();
+    int n6x58 = aa6x58->get_residue_no();
+    int n6x59 = aa6x59->get_residue_no();
 
     char l3x40 = aa3x40->get_letter();
     char l45x51 = aa45x51->get_letter();
@@ -145,97 +158,60 @@ int main(int argc, char** argv)
         constraints.push_back((std::string)"STCR 6.59");
     }
 
-
-    float TMR6ex = 0, TMR6ey;
+    float theta6 = 0;
     SCoord axis6;
-
+    TMR6ActivationType type6;
 
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
         p.bridge(n6x55, n45x51);
+        constraints.push_back((std::string)"BRIDGE 6.58 45.51");
         float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));
 
-        if (r < 3)
+        if (r <= 3)
         {
             if (l6x48 == 'Y' && (l3x40 == 'S' || l3x40 == 'T' && l3x40 == 'N' || l3x40 == 'Q' || l3x40 == 'E' || l3x40 == 'D'))
             {
-                // Bend6.
+                type6 = Bend6; // No motion of TMR6 in the EXR domain.
+                theta6 = 0;
             }
             else
             {
-                // Swing6.
+                type6 = Swing6;
+                axis6 = compute_normal(aa6x55->get_CA_location(), aa3x40->get_CA_location(), aa6x48->get_CA_location());
+                theta6 = fiftyseventh * 5;      // TODO:
             }
         }
         else
         {
-            // Hybrid6.
+            type6 = Hybrid6;
+            axis6 = compute_normal(aa6x48->get_CA_location(), aa6x58->get_CA_location(), aa45x51->get_CA_location());
+            SCoord span = aa45x51->get_CA_location().subtract(aa6x55->get_CA_location());
+            span.r = r - 3;
+            Point pt = aa6x55->get_CA_location().add(span);
+            LocatedVector lv = axis6;
+            lv.origin = aa6x48->get_CA_location();
+            theta6 = fmin(p.region_can_rotate(n6x48, n6x55, lv, true),
+                find_3d_angle(pt, aa6x55->get_CA_location(), lv.origin));
         }
     }
     else
     {
         if (l6x59 == 'R' || l6x59 == 'K')
         {
-            // Rock6 with 6.59.
+            type6 = Rock6x59;
+            axis6 = compute_normal(aa6x48->get_CA_location(), aa6x59->get_CA_location(), aa5x39->get_CA_location());
+            LocatedVector lv = axis6;
+            lv.origin = aa6x48->get_CA_location();
+            theta6 = p.region_can_rotate(n6x48, n6x59, lv, true);
         }
         else
         {
-            // Rock6 Other.
-        }
-    }
-
-
-    // If Y6.48 and hydrophilic 3.40, then find how far TMR6 can rock in the EXR domain.
-
-    // If S6.58 and P45.53 and D/E45.51, measure how far S6.58 would have to move to make contact with 45.51.
-    if ((l6x58 == 'S' || l6x58 == 'T')
-        &&
-        (l45x53 == 'P' || l45x53 == 'A' || l45x53 == 'G' || l45x53 == 'C' || l45x53 == 'S')
-        &&
-        (l45x51 == 'D' || l45x51 == 'E')
-        )
-    {
-        axis6 = compute_normal(aa6x48->get_CA_location(), aa6x58->get_CA_location(), aa45x51->get_CA_location());
-        p.bridge(aa6x58->get_residue_no(), aa45x51->get_residue_no());
-        Atom* a = aa6x58->get_reach_atom();
-        if (a->get_Z() < 3) a = a->get_bond_by_idx(0)->btom;
-        float cr = a->distance_to(aa45x51->get_nearest_atom(a->get_location()));
-        TMR6ex = fmax(0, cr - 3);
-        TMR6ey = aa6x48->distance_to(aa6x58);
-        constraints.push_back((std::string)"BRIDGE 6.58 45.51");
-    }
-
-    // If there is no Y6.55 or no D/E45.51, measure how far 6.58-6.59 can move toward 5.39 without clashing. Call it TMR6ex.
-    else if (aa6x55->get_letter() != 'Y' || (l45x51 != 'D' && l45x51 != 'E'))
-    {
-        SCoord TMR6edir = aa5x39->get_CA_location().subtract(p.get_region_center(aa6x58->get_residue_no(), aa6x59->get_residue_no()));
-        TMR6ex = p.region_can_move(aa6x55->get_residue_no(), aa6x58->get_residue_no(), TMR6edir, true);
-        TMR6ey = aa6x48->distance_to(aa6x59);
-        cout << "Rock6 can move " << TMR6ex << "A in the EXR domain." << endl;
-
-        axis6 = compute_normal(aa6x48->get_CA_location(), aa6x59->get_CA_location(), aa5x39->get_CA_location());
-    }
-
-    // If there is Y6.55 and D/E45.51 but they are not in contact, measure how far 6.55 must move toward 45.51 to make contact. Call it TMR6ex.
-    else
-    {
-        constraints.push_back((std::string)"BRIDGE 6.55 45.51");
-        axis6 = compute_normal(aa6x48->get_CA_location(), aa6x55->get_CA_location(), aa45x51->get_CA_location());
-        p.bridge(aa6x55->get_residue_no(), aa45x51->get_residue_no());
-        float cr = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom("OH")->get_location()));
-        if (cr > 3)
-        {
-            TMR6ex = cr - 3;
-            /*SCoord TMR6edir = aa5x39->get_CA_location().subtract(p.get_region_center(aa6x58->get_residue_no(), aa6x59->get_residue_no()));
-            TMR6ex = min(TMR6ex, p.region_can_move(aa6x55->get_residue_no(), aa6x58->get_residue_no(), TMR6edir, true));*/
-            TMR6ey = aa6x55->distance_to(aa6x48);
-            cout << "Hybrid6 can move " << TMR6ex << "A in the EXR domain." << endl;
-        }
-
-        // Otherwise set TMR6ex to zero.
-        else
-        {
-            TMR6ex = 0;
-            cout << "Bend6 is stationary in the EXR domain." << endl;
+            type6 = Rock6Other;
+            axis6 = compute_normal(aa6x48->get_CA_location(), aa6x58->get_CA_location(), aa45x53->get_CA_location());
+            LocatedVector lv = axis6;
+            lv.origin = aa6x48->get_CA_location();
+            theta6 = p.region_can_rotate(n6x48, n6x58, lv, true);
         }
     }
 
@@ -274,12 +250,11 @@ int main(int argc, char** argv)
     float theta;
     Point was;
     SCoord TMR6c, axis5;
-    if (TMR6ex)
+    if (theta6)
     {
         // Compute the angle to rotate about 6.48 and perform the rotation. Measure how far 56.50 moved; call it TMR6c.
-        theta = atan2(TMR6ex, TMR6ey);
         was = aa56x50->get_CA_location();
-        p.rotate_piece(aa56x50->get_residue_no(), aa6x59->get_residue_no(), aa6x48->get_CA_location(), axis6, theta);
+        p.rotate_piece(aa56x50->get_residue_no(), aa6x59->get_residue_no(), aa6x48->get_CA_location(), axis6, theta6);
         TMR6c = aa56x50->get_CA_location().subtract(was);
 
         // Compute the axis and angle to rotate TMR5 about 5.50 to match 56.49 to TMR6c, and perform the rotation.

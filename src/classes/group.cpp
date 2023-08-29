@@ -522,9 +522,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         #endif
 
                         a_ = b;
-                        if (((bool)(fabs(a->is_polar()) >= 0.2) == (bool)(fabs(b->is_polar()) >= 0.2))
-                            && (a->is_polar() >= 0.2 || (b->get_family() != PNICTOGEN && b->get_family() != CHALCOGEN))
-                            ) dirty[j] = true;
+                        if ((bool)(fabs(a->is_polar()) >= 0.2) == (bool)(fabs(b->is_polar()) >= 0.2)) dirty[j] = true;
                     }
                 }
             }
@@ -559,21 +557,11 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     for (i=0; i<l; i++)
     {
         int ni = retval[i]->atoms.size();
-        if (retval[i]->heavy_atom_count() == 1 && retval[i]->atoms[0]->is_pi())
-        {
-            int fam = retval[i]->atoms[0]->get_family();
-            if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
-        }
         for (j=l-1; j>i; j--)
         {
             if (retval[i]->get_center().get_3d_distance(retval[j]->get_center()) > ld/3) continue;
 
             int nj = retval[j]->atoms.size();
-            if (retval[j]->heavy_atom_count() == 1 && retval[j]->atoms[0]->is_pi())
-            {
-                int fam = retval[j]->atoms[0]->get_family();
-                if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
-            }
             int si = retval[i]->intersecting(retval[j].get());
 
             if (retval[i]->average_similarity(retval[j].get()) >= 0.5 && (si >= nj/2 || si >= ni/2))
@@ -593,19 +581,9 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     for (i=0; i<l; i++)
     {
         int ni = retval[i]->atoms.size();
-        if (retval[i]->heavy_atom_count() == 1 && retval[i]->atoms[0]->is_pi())
-        {
-            int fam = retval[i]->atoms[0]->get_family();
-            if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
-        }
         for (j=l-1; j>i; j--)
         {
             int nj = retval[j]->atoms.size();
-            if (retval[j]->heavy_atom_count() == 1 && retval[j]->atoms[0]->is_pi())
-            {
-                int fam = retval[j]->atoms[0]->get_family();
-                if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
-            }
             if (retval[i]->intersecting(retval[j].get()))
             {
                 for (k=0; k<ni; k++)
@@ -628,6 +606,33 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         }
                     }
                 }
+            }
+        }
+    }
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = mol->get_atom(i);
+        if (a->is_pi())
+        {
+            int fam = a->get_family();
+            if (fam == CHALCOGEN || fam == PNICTOGEN)
+            {
+                std::shared_ptr<AtomGroup> g(new AtomGroup());
+                g->ligand = mol;
+                g->atoms.push_back(a);
+                
+                Bond** b = a->get_bonds();
+                for (j=0; b[j] && b[j]->btom; j++)
+                {
+                    if (b[j]->btom->get_Z() == 1) g->atoms.push_back(b[j]->btom);
+                }
+                
+                retval.push_back(g);
+
+                #if _dbg_groupsel
+                cout << "Creating group " << *g << endl << endl;
+                #endif
             }
         }
     }

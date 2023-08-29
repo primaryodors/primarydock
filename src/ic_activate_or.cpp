@@ -77,10 +77,12 @@ int main(int argc, char** argv)
     AminoAcid *aa3x56 = p.get_residue_bw("3.56");
     AminoAcid *aa4x53 = p.get_residue_bw("4.53");
     AminoAcid *aa4x60 = p.get_residue_bw("4.60");
+    AminoAcid *aa4x61 = p.get_residue_bw("4.61");
     AminoAcid *aa4x64 = p.get_residue_bw("4.64");
     AminoAcid *aa45x51 = p.get_residue_bw("45.51");
     AminoAcid *aa45x53 = p.get_residue_bw("45.53");
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
+    AminoAcid *aa5x36 = p.get_residue_bw("5.36");
     AminoAcid *aa5x39 = p.get_residue_bw("5.39");
     AminoAcid *aa5x43 = p.get_residue_bw("5.43");
     AminoAcid *aa5x50 = p.get_residue_bw("5.50");
@@ -137,7 +139,7 @@ int main(int argc, char** argv)
             bend45.fulcrum_resno.from_string("45.53");
             bend45.axis_resno.from_string("45.54");
             bend45.bias = 60;
-            bend45.apply_absolute(1);
+            bend45.apply_absolute(1.5);
             aa45x53->conform_atom_to_location(aa45x53->get_reach_atom()->name, Point(0,-1000,0));
         }
         else if (l45x53 == 'M' || l45x53 == 'Y')
@@ -148,7 +150,7 @@ int main(int argc, char** argv)
         }
 
         cout << "R6.59" << endl;
-        unwind6.start_resno.from_string("6.58");
+        unwind6.start_resno.from_string("6.54");
         unwind6.end_resno.from_string("6.59");
         unwind6.type = dyn_wind;
         unwind6.bias = -13;
@@ -200,10 +202,10 @@ int main(int argc, char** argv)
         if (l6x59 == 'R' || l6x59 == 'K')
         {
             type6 = Rock6x59;
-            axis6 = compute_normal(aa6x48->get_CA_location(), aa6x59->get_CA_location(), aa5x39->get_CA_location());
+            axis6 = compute_normal(aa6x48->get_CA_location(), aa6x59->get_CA_location(), aa5x36->get_CA_location());
             LocatedVector lv = axis6;
             lv.origin = aa6x48->get_CA_location();
-            theta6 = p.region_can_rotate(n6x48, n6x59, lv, true);
+            theta6 = p.region_can_rotate(n6x48, n6x59, lv, true, 5);
         }
         else
         {
@@ -412,8 +414,8 @@ int main(int argc, char** argv)
 
         Molecule m("Acid");
         m.from_smiles("[Cl-]");
-        Point pt = aa4x60->get_CA_location().add(aa6x59->get_CA_location()).add(aa4x60->get_CA_location());
-        pt.scale(pt.magnitude()/3);
+        Point pt = aa4x61->get_CA_location().add(aa6x59->get_CA_location()); //.add(aa4x60->get_CA_location());
+        pt.scale(pt.magnitude()/2);
         m.move(pt);
         m.movability = MOV_PINNED;
 
@@ -435,7 +437,7 @@ int main(int argc, char** argv)
         Molecule::conform_molecules(mols, 50);
 
         mols[3] = nullptr;
-        Molecule::conform_molecules(mols, 50);
+        Molecule::conform_molecules(mols, 20);
         
         /*fp = fopen("tmp/dbg6x59.pdb", "wb");
         if (!fp) return -3;

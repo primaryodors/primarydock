@@ -63,7 +63,9 @@ float AtomGroup::get_polarity()
     float result = 0;
     for (i=0; i<atct; i++)
     {
-        result += fabs(atoms[i]->is_polar());
+        if (atoms[i]->get_family() == CHALCOGEN) result += 1;
+        else if (atoms[i]->get_family() == PNICTOGEN) result += 1;
+        else result += fabs(atoms[i]->is_polar());
     }
     return result;
 }

@@ -3894,7 +3894,7 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
 
         if (clash > homology_clash_peraa+eca)
         {
-            cout << "At " << ((result+increment)*fiftyseven) << "deg, " << debug_msg << "." << endl;
+            // cout << "At " << ((result+increment)*fiftyseven) << "deg, " << debug_msg << "." << endl;
             rotate_piece(startres, endres, axis.origin, axis, -increment);
             increment *= 0.81;
         }

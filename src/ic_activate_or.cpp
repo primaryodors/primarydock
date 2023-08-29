@@ -167,7 +167,7 @@ int main(int argc, char** argv)
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
         p.bridge(n6x55, n45x51);
-        constraints.push_back((std::string)"BRIDGE 6.58 45.51");
+        constraints.push_back((std::string)"BRIDGE 6.55 45.51");
         float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));
 
         if (r <= 3)
@@ -176,18 +176,20 @@ int main(int argc, char** argv)
             {
                 type6 = Bend6; // No motion of TMR6 in the EXR domain.
                 theta6 = 0;
+                cout << "Bend6 type activation." << endl;
             }
             else
             {
                 type6 = Swing6;
                 axis6 = compute_normal(aa6x55->get_CA_location(), aa3x40->get_CA_location(), aa6x48->get_CA_location());
-                theta6 = fiftyseventh * 5;      // TODO:
+                theta6 = fiftyseventh * 15;      // TODO:
+                cout << "Swing6 type activation." << endl;
             }
         }
         else
         {
             type6 = Hybrid6;
-            axis6 = compute_normal(aa6x48->get_CA_location(), aa6x58->get_CA_location(), aa45x51->get_CA_location());
+            axis6 = compute_normal(aa6x48->get_CA_location(), aa6x55->get_CA_location(), aa45x51->get_CA_location());
             SCoord span = aa45x51->get_CA_location().subtract(aa6x55->get_CA_location());
             span.r = r - 3;
             Point pt = aa6x55->get_CA_location().add(span);
@@ -195,6 +197,7 @@ int main(int argc, char** argv)
             lv.origin = aa6x48->get_CA_location();
             theta6 = fmin(p.region_can_rotate(n6x48, n6x55, lv, true),
                 find_3d_angle(pt, aa6x55->get_CA_location(), lv.origin));
+            cout << "Hybrid6 type activation with a " << (fiftyseven * theta6) << "deg EXR component." << endl;
         }
     }
     else
@@ -206,6 +209,7 @@ int main(int argc, char** argv)
             LocatedVector lv = axis6;
             lv.origin = aa6x48->get_CA_location();
             theta6 = p.region_can_rotate(n6x48, n6x59, lv, true, 5);
+            cout << "Rock6 type activation with a " << (fiftyseven * theta6) << "deg basic 6.59." << endl;
         }
         else
         {
@@ -214,6 +218,7 @@ int main(int argc, char** argv)
             LocatedVector lv = axis6;
             lv.origin = aa6x48->get_CA_location();
             theta6 = p.region_can_rotate(n6x48, n6x58, lv, true);
+            cout << "Rock6 type activation with a " << (fiftyseven * theta6) << "deg pivot." << endl;
         }
     }
 

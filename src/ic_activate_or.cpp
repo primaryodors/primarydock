@@ -80,6 +80,7 @@ int main(int argc, char** argv)
     AminoAcid *aa4x61 = p.get_residue_bw("4.61");
     AminoAcid *aa4x64 = p.get_residue_bw("4.64");
     AminoAcid *aa45x51 = p.get_residue_bw("45.51");
+    AminoAcid *aa45x52 = p.get_residue_bw("45.52");
     AminoAcid *aa45x53 = p.get_residue_bw("45.53");
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
     AminoAcid *aa5x36 = p.get_residue_bw("5.36");
@@ -116,6 +117,7 @@ int main(int argc, char** argv)
 
     char l3x40 = aa3x40->get_letter();
     char l45x51 = aa45x51->get_letter();
+    char l45x52 = aa45x52->get_letter();
     char l45x53 = aa45x53->get_letter();
     char l5x58 = aa5x58->get_letter();
     char l6x48 = aa6x48->get_letter();
@@ -166,6 +168,9 @@ int main(int argc, char** argv)
 
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
+        // TODO: In OR8H1, F3.32 impinges on where this bridge would form, so it would be more sterically favorable to first point
+        // 6.55's EXTENT toward 45.53's CA and then make the bridge. Since this depends on the exact positioning of atoms around the
+        // neighborhood of 45.51 as well as the side chains of 45.52 and 45.53, it will be different for each receptor.
         p.bridge(n6x55, n45x51);
         constraints.push_back((std::string)"BRIDGE 6.55 45.51");
         float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));

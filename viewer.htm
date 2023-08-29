@@ -630,6 +630,7 @@ function superscript_number(num)
 
 function resno_from_letters_and_bw(bwnum)
 {
+	if (bwnum.toString().match(/^[0-9]+$/)) return parseInt(bwnum);
 	var lbw = bwnum.replace(/[^0-9.x]/g, '');
 	var resno = resno_from_bw(lbw);
 	var mdlidx = getResMdlIdx(resno, tmstrand[0]);
@@ -2273,7 +2274,14 @@ var url = getParameterByName('url') ? getParameterByName('url') : 'http://'+webs
 var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
 var protid = getParameterByName('prot') ? getParameterByName('prot') : false;
 
-if (protid)
+var literal_pdb = false;
+var literal_fname = "";
+
+if (literal_pdb)
+{
+	loadFile(literal_pdb, literal_fname);
+}
+else if (protid)
 {
 	$.ajax(
 	{
@@ -2874,6 +2882,7 @@ function loadFile(fileData, fileName = "")
 							mrparams.push(rparam);
 							is_ligand.push(1);
 							curr_ligand = comp6b;
+							if (curr_ligand) $('#ligbtn, #prsv').show();
 
 							var lpn = comp6b.name.split("|");
 							mpos.push(parseInt(lpn[0]));

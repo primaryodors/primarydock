@@ -33,6 +33,26 @@ $bsr = array_flip(
 $fam = family_from_protid($rcpid);
 if ($fam == 'TAAR') $bsr['5.42'] = count($bsr);
 
+$predictions = [];
+$predname = [];
+if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
+{
+    chdir(__DIR__);
+    $dock_results = json_decode(file_get_contents("../predict/dock_results_icactive.json"), true);
+    if (isset($dock_results[$rcpid]))
+    {
+        foreach ($dock_results[$rcpid] as $ligname => $dock)
+        {
+            $odor = find_odorant($ligname);
+            $oid = $odor['oid'];
+            $predname[$oid] = $ligname;
+            if (isset($dock['DockScore'])) $predictions[$oid] = floatval($dock['DockScore']);
+            else if (isset($dock['a_Pose1']) && isset($dock['i_Pose1']))
+                $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
+        }
+    }
+}
+
 // Copper binding sites for e.g. OR2T11
 // http://pubs.acs.org/doi/abs/10.1021/jacs.6b06983
 $cub =
@@ -453,12 +473,24 @@ echo "</p>";*/
 
 <div class="box">
 <div class="row content scrollh">
+
+<?php if (count($predictions)) { ?>
+<div style="background-color: #fc9; color: 000; font-size: 0.7em; padding: 2px;">
+This page features beta versions of predictions, including links to viewable 3D models. 
+The numbers and models are not yet fully accurate, but the repository is accepting pull requests at
+<a style="color: #00c;" href="https://github.com/primaryodors/primarydock">https://github.com/primaryodors/primarydock</a>.
+</div>
+<?php } ?>
+
 <table class="liglist">
     <tr>
         <th>Odorant</th>
         <th>EC<sub>50</sub></th>
         <th>Adjusted Top</th>
         <th>Antagonist?</th>
+        <?php
+        if (count($predictions)) echo "<th>Predicted (BETA)</th>";
+        ?>
         <th>Aroma Notes</th>
     </tr>
 
@@ -509,6 +541,18 @@ foreach ($pairs as $oid => $pair)
 
     if (@$pair['antagonist']) echo "<td>Y</td>";
     else echo "<td>&nbsp;</td>";
+
+    if (count($predictions))
+    {
+        if (isset($predictions[$oid]))
+        {
+            echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor=".urlencode($predname[$oid])."&mode=";
+            if ($predictions[$oid] > 0) echo "active";
+            else echo "inactive";
+            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</td>";
+        }
+        else echo "<td>&nbsp;</td>";
+    }        
 
     echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";

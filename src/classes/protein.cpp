@@ -3848,7 +3848,7 @@ float Protein::region_can_move(int startres, int endres, SCoord direction, bool 
     return result;
 }
 
-float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, bool repack)
+float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, bool repack, float eca)
 {
     int n = get_end_resno();
     Pose revert_to[n+1];
@@ -3892,9 +3892,9 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
             }
         }
 
-        if (clash > homology_clash_peraa)
+        if (clash > homology_clash_peraa+eca)
         {
-            cout << "At " << ((result+increment)*fiftyseven) << "deg, " << debug_msg << "." << endl;
+            // cout << "At " << ((result+increment)*fiftyseven) << "deg, " << debug_msg << "." << endl;
             rotate_piece(startres, endres, axis.origin, axis, -increment);
             increment *= 0.81;
         }

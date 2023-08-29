@@ -54,10 +54,26 @@ function make_prediction($data)
         $ie = floatval(@$data["i_BindingEnergy"]);
         $a1 = floatval( $data['a_Pose1']);
         $i1 = floatval(@$data['i_Pose1']);
-        if ($ae < 0 && $ae < $ie) $data['Predicted'] = 'Agonist';
-        else if ($a1 < 0 && $a1 < $i1) $data['Predicted'] = 'Agonist';
-        else if ($a1 < 0 && $a1 > $i1) $data['Predicted'] = 'Inverse Agonist';
-        else $data['Predicted'] = 'Non-agonist';
+        if ($a1 < 0 && $a1 < $i1)
+        {
+            $data['Predicted'] = 'Agonist';
+            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
+        }
+        else if ($ae < 0 && $ae < $ie)
+        {
+            $data['Predicted'] = 'Agonist';
+            $data['DockScore'] = (min($ie, 0) - $ae) / 2;
+        }
+        else if ($a1 < 0 && $a1 > $i1)
+        {
+            $data['Predicted'] = 'Inverse Agonist';
+            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
+        }
+        else
+        {
+            $data['Predicted'] = 'Non-agonist';
+            $data['DockScore'] = 0.0;
+        }
 
         echo "\nResult: " . print_r($data, true) . "\n";
     }
@@ -72,7 +88,7 @@ chdir("..");
 $pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
-if (!file_exists($pdbfname_active))
+if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/ic_activate_or"))
 {
     passthru("bin/ic_activate_or $protid");
 }
@@ -103,6 +119,7 @@ FLEX 1
 WET
 
 OUT $outfname
+OUTPDB 1 output/$fam/$protid/%p.%l.inactive.model%o.pdb
 
 
 heredoc;
@@ -140,7 +157,7 @@ FLEX 1
 WET
 
 OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.model%o.pdb
+OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
 
 
 heredoc;

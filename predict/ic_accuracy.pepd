@@ -9,5 +9,10 @@ LOAD pdbs/OR51/OR51E2.active.pdb
 UPRIGHT
 BWCENTER
 
+STRAND I
+LOAD pdbs/OR51/OR51E2.upright.pdb
+UPRIGHT
+BWCENTER
+
 SAVE pdbs/OR51E2.icaccuracy.pdb
 

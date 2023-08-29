@@ -72,6 +72,7 @@ int main(int argc, char** argv)
 
 
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
+    AminoAcid *aa3x32 = p.get_residue_bw("3.32");
     AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
     AminoAcid *aa3x56 = p.get_residue_bw("3.56");
@@ -168,10 +169,52 @@ int main(int argc, char** argv)
 
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
-        // TODO: In OR8H1, F3.32 impinges on where this bridge would form, so it would be more sterically favorable to first point
+        p.bridge(n6x55, n45x51);
+
+        // In OR8H1, F3.32 impinges on where this bridge would form, so it would be more sterically favorable to first point
         // 6.55's EXTENT toward 45.53's CA and then make the bridge. Since this depends on the exact positioning of atoms around the
         // neighborhood of 45.51 as well as the side chains of 45.52 and 45.53, it will be different for each receptor.
-        p.bridge(n6x55, n45x51);
+        if (aa6x55->get_intermol_clashes(aa3x32) > 0)
+        {
+            cout << "3.32 fix for Y6.55 ~ D/E45.51 bridge." << endl;
+            aa6x55->movability = MOV_FLEXONLY;
+
+            Point pt = aa45x51->get_CA_location();
+            l = 1;
+            if (l45x52 == 'S' || l45x52 == 'T')
+            {
+                pt = pt.add(aa45x52->get_CA_location());
+                l++;
+            }
+            if (l45x53 == 'S' || l45x53 == 'T')
+            {
+                pt = pt.add(aa45x53->get_CA_location());
+                l++;
+            }
+
+            pt.scale(pt.magnitude()/l);
+            aa6x55->conform_atom_to_location("OH", pt);
+
+            aa3x32->movability = MOV_PINNED;
+            aa45x51->movability = MOV_PINNED;
+
+            Molecule* mols[6];
+            mols[0] = aa6x55;
+            mols[1] = aa3x32;
+            mols[2] = aa45x51;
+            mols[3] = aa45x52;
+            mols[4] = aa45x53;
+            mols[5] = nullptr;
+
+            Molecule::conform_molecules(mols, 5);
+            // p.bridge(n6x55, n45x51);
+            aa6x55->movability = MOV_PINNED;
+        }
+        fp = fopen("tmp/are_we_even_looking_at_the_same_model.pdb", "wb");
+        p.save_pdb(fp);
+        p.end_pdb(fp);
+        fclose(fp);
+
         constraints.push_back((std::string)"BRIDGE 6.55 45.51");
         float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));
 
@@ -418,7 +461,7 @@ int main(int argc, char** argv)
     p.get_internal_clashes(1, p.get_end_resno(), true);
 
     // If there is R6.59, adjust its side chain to keep pointing inward while avoiding clashes with other nearby side chains.
-    if (l6x59 == 'R' || l6x59 == 'K')
+    if (type6 == Rock6x59 && (l6x59 == 'R' || l6x59 == 'K'))
     {
         cout << "Optimizing 6.59 side chain..." << endl;
 

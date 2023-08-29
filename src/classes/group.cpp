@@ -510,7 +510,8 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         #endif
 
                         a_ = b;
-                        if ((bool)(fabs(a->is_polar()) >= 0.2) == (bool)(fabs(b->is_polar()) >= 0.2)) dirty[j] = true;
+                        // if ((bool)(fabs(a->is_polar()) >= 0.2) == (bool)(fabs(b->is_polar()) >= 0.2)) dirty[j] = true;
+                        if (a->is_polar() >= 0.2 || (b->get_family() != PNICTOGEN && b->get_family() != CHALCOGEN)) dirty[j] = true;
                     }
                 }
             }

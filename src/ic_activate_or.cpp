@@ -210,10 +210,6 @@ int main(int argc, char** argv)
             // p.bridge(n6x55, n45x51);
             aa6x55->movability = MOV_PINNED;
         }
-        fp = fopen("tmp/are_we_even_looking_at_the_same_model.pdb", "wb");
-        p.save_pdb(fp);
-        p.end_pdb(fp);
-        fclose(fp);
 
         constraints.push_back((std::string)"BRIDGE 6.55 45.51");
         float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));

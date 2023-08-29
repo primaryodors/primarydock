@@ -477,7 +477,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
         $outdata = make_prediction($outdata);
         $nc = count($outdata);
         if ($nc < $oc) die("ERROR: make_prediction() must return the input array with the prediction added.");
-        if (@$outdata["Predicted"] == $actual) $outdata["locked"] = 1;
+        // if (@$outdata["Predicted"] == $actual) $outdata["locked"] = 1;
     }
     $outdata["Actual"] = $actual;
 

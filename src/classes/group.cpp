@@ -425,6 +425,18 @@ bool AtomGroup::is_bonded_to(Atom* a)
     return false;
 }
 
+int AtomGroup::heavy_atom_count()
+{
+    int i, n = atoms.size(), result = 0;
+
+    for (i=0; i<n; i++)
+    {
+        if (atoms[i]->get_Z() > 2) result++;
+    }
+
+    return result;
+}
+
 std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(Molecule* mol)
 {
     std::vector<std::shared_ptr<AtomGroup>> retval;
@@ -491,7 +503,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
             // In general, aliphatics and nonpolar aromatics can be regarded as high similarity, since they tend to
             // be mutually highly soluble in one another. But for grouping of ligand atoms, it is important to
-            if (simil >= 0.5)
+            if (simil >= 0.5 || (b->get_Z() == 1 && g->is_bonded_to(b)))
             {
                 if (aliphatic < 3 || b->get_Z() == 1)
                 {
@@ -510,8 +522,9 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         #endif
 
                         a_ = b;
-                        // if ((bool)(fabs(a->is_polar()) >= 0.2) == (bool)(fabs(b->is_polar()) >= 0.2)) dirty[j] = true;
-                        if (a->is_polar() >= 0.2 || (b->get_family() != PNICTOGEN && b->get_family() != CHALCOGEN)) dirty[j] = true;
+                        if (((bool)(fabs(a->is_polar()) >= 0.2) == (bool)(fabs(b->is_polar()) >= 0.2))
+                            && (a->is_polar() >= 0.2 || (b->get_family() != PNICTOGEN && b->get_family() != CHALCOGEN))
+                            ) dirty[j] = true;
                     }
                 }
             }
@@ -546,11 +559,21 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     for (i=0; i<l; i++)
     {
         int ni = retval[i]->atoms.size();
+        if (retval[i]->heavy_atom_count() == 1 && retval[i]->atoms[0]->is_pi())
+        {
+            int fam = retval[i]->atoms[0]->get_family();
+            if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+        }
         for (j=l-1; j>i; j--)
         {
             if (retval[i]->get_center().get_3d_distance(retval[j]->get_center()) > ld/3) continue;
 
             int nj = retval[j]->atoms.size();
+            if (retval[j]->heavy_atom_count() == 1 && retval[j]->atoms[0]->is_pi())
+            {
+                int fam = retval[j]->atoms[0]->get_family();
+                if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+            }
             int si = retval[i]->intersecting(retval[j].get());
 
             if (retval[i]->average_similarity(retval[j].get()) >= 0.5 && (si >= nj/2 || si >= ni/2))
@@ -570,9 +593,19 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     for (i=0; i<l; i++)
     {
         int ni = retval[i]->atoms.size();
+        if (retval[i]->heavy_atom_count() == 1 && retval[i]->atoms[0]->is_pi())
+        {
+            int fam = retval[i]->atoms[0]->get_family();
+            if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+        }
         for (j=l-1; j>i; j--)
         {
             int nj = retval[j]->atoms.size();
+            if (retval[j]->heavy_atom_count() == 1 && retval[j]->atoms[0]->is_pi())
+            {
+                int fam = retval[j]->atoms[0]->get_family();
+                if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+            }
             if (retval[i]->intersecting(retval[j].get()))
             {
                 for (k=0; k<ni; k++)

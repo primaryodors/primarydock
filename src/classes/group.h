@@ -48,6 +48,7 @@ class AtomGroup
     float average_similarity(AtomGroup* compare_with);
     float hydrophilicity();
 
+    int heavy_atom_count();
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol);
 
     protected:

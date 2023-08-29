@@ -2882,6 +2882,7 @@ function loadFile(fileData, fileName = "")
 							mrparams.push(rparam);
 							is_ligand.push(1);
 							curr_ligand = comp6b;
+							if (curr_ligand) $('#ligbtn, #prsv').show();
 
 							var lpn = comp6b.name.split("|");
 							mpos.push(parseInt(lpn[0]));

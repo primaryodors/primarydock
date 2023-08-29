@@ -1,0 +1,3 @@
+atom_group[ O9 H19 ]
+atom_group[ C1 C2 C3 C4 C5 C6 H10 H11 H12 H13 H14 ]
+atom_group[ C7 C8 H15 H16 H17 H18 ]

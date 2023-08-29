@@ -204,3 +204,14 @@ else
     printf "${RED}Rotatable bond test FAILED for $MOLECULE.${NC}\n"
     diff --color --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt
 fi
+
+
+MOLECULE="phenethyl_alcohol"
+test/group_test_mol "c1ccccc1CCO" | sed '/^#/d' > test/received/groups.$MOLECULE.received.txt
+RESULT=$(diff --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt
+fi

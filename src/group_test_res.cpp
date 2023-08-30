@@ -46,9 +46,20 @@ int main(int argc, char** argv)
 
     AminoAcid* reach_residues[SPHREACH_MAX];
     Point target = p.get_residue(10)->get_CA_location();
+    Point center = p.get_region_center(1, p.get_end_resno());
+    SCoord d = target.subtract(center);
+    d.r = 3.5;
+    target = target.add(d);
 
-    Point size(5, 5, 5);
+    Point size(9,9,9);
     int sphres = p.get_residues_can_clash_ligand(reach_residues, &m, target, size, nullptr);
+    cout << "Reach residues:" << endl;
+    for (i=0; i<sphres; i++)
+    {
+        cout << *reach_residues[i] << " ";
+    }
+    cout << endl << endl;
+
     std::vector<std::shared_ptr<ResidueGroup>> sidechain_groups = ResidueGroup::get_potential_side_chain_groups(reach_residues, target);
     n = sidechain_groups.size();
     cout << "Sidechain groups:" << endl;

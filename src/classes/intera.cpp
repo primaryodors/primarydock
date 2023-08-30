@@ -573,12 +573,12 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
     if (!a->is_metal() && !b->is_metal())
     {
         // Oil and water don't mix.
-        if ((fabs(a->is_polar()) < 0.333 && (fabs(b->is_polar()) >= 0.333 || fabs(b->get_charge())))
+        if ((fabs(a->is_polar()) < hydrophilicity_cutoff && (fabs(b->is_polar()) >= hydrophilicity_cutoff || fabs(b->get_charge())))
             ||
-            (fabs(b->is_polar()) < 0.333 && (fabs(a->is_polar()) >= 0.333 || fabs(a->get_charge())))
+            (fabs(b->is_polar()) < hydrophilicity_cutoff && (fabs(a->is_polar()) >= hydrophilicity_cutoff || fabs(a->get_charge())))
         )
         {
-            potential -= ((fabs(a->is_polar()) < 0.333 && a->is_pi()) || (fabs(b->is_polar()) < 0.333 && b->is_pi())) ? 66 : 99;
+            potential -= ((fabs(a->is_polar()) < hydrophilicity_cutoff && a->is_pi()) || (fabs(b->is_polar()) < hydrophilicity_cutoff && b->is_pi())) ? 66 : 99;
         }
     }
 

@@ -2723,8 +2723,8 @@ float Atom::similarity_to(Atom* b)
     bool apb = (fabs(is_polar()) > .2), bpb = (fabs(b->is_polar()) > .2);
     if (apb == bpb) similarity += 0.01 * both_or_neither_abs_polarity_at_least_point2;
 
-    apb = (fabs(is_polar()) > .333);
-    bpb = (fabs(b->is_polar()) > .333);
+    apb = (fabs(is_polar()) > hydrophilicity_cutoff);
+    bpb = (fabs(b->is_polar()) > hydrophilicity_cutoff);
     if (apb == bpb) similarity += 0.01 * both_or_neither_abs_polarity_at_least_point333;
 
     if (
@@ -2738,7 +2738,7 @@ float Atom::similarity_to(Atom* b)
     }
 
     float delta = fabs(is_polar() - b->is_polar());
-    if (delta < 0.333) similarity += 0.01 * abs_delta_polarity_within_point333;
+    if (delta < hydrophilicity_cutoff) similarity += 0.01 * abs_delta_polarity_within_point333;
 
     if (sgn(charge) == sgn(b->charge)) similarity += 0.01 * same_sgn_charge;
     else if (!charge && apb && b->charge) similarity += 0.01 * one_charged_one_neutral_polar;

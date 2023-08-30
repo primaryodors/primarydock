@@ -1603,15 +1603,15 @@ float AminoAcid::similarity_to(const AminoAcid* aa)
     float simil=0, divis=0;
     for (i=0; atoms[i]; i++)
     {
-        bool apol = fabs(atoms[i]->is_polar()) > 0.333;
+        bool apol = fabs(atoms[i]->is_polar()) > hydrophilicity_cutoff;
         if (apol != polar1) continue;
 
         for (j=0; aa->atoms[j]; j++)
         {
-            bool bpol = fabs(aa->atoms[j]->is_polar()) > 0.333;
+            bool bpol = fabs(aa->atoms[j]->is_polar()) > hydrophilicity_cutoff;
             if (bpol != polar2) continue;
 
-            float f = (apol && bpol) ? 1 : 0.333;
+            float f = (apol && bpol) ? 1 : hydrophilicity_cutoff;
             simil += f*atoms[i]->similarity_to(aa->atoms[j]);
             divis += f;
         }
@@ -1721,7 +1721,7 @@ bool AminoAcid::is_tyrosine_like()
     {
         if (atoms[i]->is_backbone) continue;
         if (atoms[i]->get_Z() == 1) continue;
-        if (atoms[i]->is_polar() < -0.333)
+        if (atoms[i]->is_polar() < -hydrophilicity_cutoff)
         {
             bool part_of_arom_ring = false;
 
@@ -1997,8 +1997,14 @@ float AminoAcid::hydrophilicity() const
 
         if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
 
-        total += atoms[i]->hydrophilicity_rule();
+        float h = atoms[i]->hydrophilicity_rule();
+        total += h;
         count++;
+        if (fam != TETREL)
+        {
+            total += h;
+            count++;
+        }
     }
     return count ? (total / count) : 0;
 }

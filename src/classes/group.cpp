@@ -146,7 +146,7 @@ float AtomGroup::hydrophilicity()
             int f = atoms[i]->get_family();
             if (f == PNICTOGEN || f == CHALCOGEN) h = 1;
         }
-        if (h > 0.333)
+        if (h > hydrophilicity_cutoff)
         {
             result += h;
             divisor += 1;
@@ -234,7 +234,7 @@ float AtomGroup::compatibility(AminoAcid* aa)
     }
     else
     {
-        if ((lgh / atct) > 0.33333) return 0;
+        if ((lgh / atct) > hydrophilicity_cutoff) return 0;
     }
 
     if (lgh)
@@ -247,7 +247,7 @@ float AtomGroup::compatibility(AminoAcid* aa)
             if (atct)
             for (i=0; i<atct; i++)
             {
-                if (atoms[i]->is_polar() < 0.333) lgh++;
+                if (atoms[i]->is_polar() < hydrophilicity_cutoff) lgh++;
             }
         }
         else if (!aa->has_hbond_donors())
@@ -256,7 +256,7 @@ float AtomGroup::compatibility(AminoAcid* aa)
             if (atct)
             for (i=0; i<atct; i++)
             {
-                if (atoms[i]->is_polar() > 0.333) lgh++;
+                if (atoms[i]->is_polar() > hydrophilicity_cutoff) lgh++;
             }
         }
     }
@@ -819,7 +819,7 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
             }
 
             float simil = aa->similarity_to(bb);
-            if (simil >= 0.333)
+            if (simil >= hydrophilicity_cutoff)
             {
                 g->aminos.push_back(bb);
                 dirty[j] = true;
@@ -919,14 +919,14 @@ float GroupPair::get_potential()
                         cout << "Aldehyde-base potential for " << *a << "..." << *aa << " = " << partial << endl;
                         #endif
                     }
-                    else if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like())
+                    else if (fabs(a->is_polar()) > hydrophilicity_cutoff && aa->is_tyrosine_like())
                     {
                         partial /= 3;
                         #if _dbg_groupsel
                         cout << *a << " is polar and " << *aa << " is tyrosine-like." << endl;
                         #endif
                     }
-                    else if (fabs(a->is_polar()) > 0.333 && fabs(aa->hydrophilicity()) < 0.333)
+                    else if (fabs(a->is_polar()) > hydrophilicity_cutoff && fabs(aa->hydrophilicity()) < hydrophilicity_cutoff)
                     {
                         partial /= 3;
                         #if _dbg_groupsel

@@ -47,13 +47,14 @@ foreach ($lines as $i => $ln)
 	if (preg_match('/TMR[0-9][-]+/', $ln))
 	{   
         $ln .= '     ';
-	    $rgnames = ['HEAD', 'TMR1', 'CYT1', 'TMR2', 'EXR1', 'TMR3', 'CYT2', 'TMR4', 'EXR2', 'TMR5', 'CYT3', 'TMR6', 'EXR3', 'TMR7', 'TAIL'];
+	    $rgnames = ['HEAD', 'TMR1', 'CYT1', 'TMR2', 'EXR1', 'TMR3', 'CYT2', 'TMR4', 'EXR2', 'TMR5', 'CYT3', 'TMR6', 'EXR3', 'TMR7', 'CYT4', 'HXR8', 'TAIL'];
 	    $rgidx = 0; $k = 0;
 		$rgns = [];
 	    do
 	    {	
             $lk = $k;
 		    $j  = strpos($ln, 'TMR', $k);
+			if (!$j) $j = strpos($ln, 'HXR', $k);
 		    if (!$j)
 		    {
                 $j = strlen($ln)+100;
@@ -117,7 +118,7 @@ foreach ($lines as $i => $ln)
 
 				if ($strgn != $lastrgn) $posL = $posM = $posS = 0;
 
-				if (substr($strgn,0,3) == 'TMR' && $pos == @$ballwein[$strgn])
+				if ((substr($strgn,0,3) == 'TMR' || substr($strgn,0,3) == 'HXR') && $pos == @$ballwein[$strgn])
 				{
 					$tmrno = intval(substr($strgn, 3));
                     $rcpbw[$tmrno] = $r;
@@ -177,7 +178,7 @@ foreach ($lines as $i => $ln)
         foreach ($regionse as $se)
         {
             $region = $se[0];
-            if (substr($region, 0, 3) == "TMR")
+            if (substr($region, 0, 3) == "TMR" || substr($region, 0, 3) == "HXR")
                 $remarks[] = "REMARK 650 HELIX $region {$se[1]} {$se[2]}";
         }
 

@@ -2305,7 +2305,7 @@ else if (protid)
 				if (ln.substr(0, 6) == 'REMARK')
 				{
 					var pieces = ln.split(" ");
-					if (pieces[2] == 'HELIX' && pieces[3].substr(0,3) == 'TMR')
+					if (pieces[2] == 'HELIX' && (pieces[3].substr(0,3) == 'TMR' || pieces[3].substr(0,3) == 'HXR'))
 					{
 						var tmrno = parseInt(pieces[3].substr(-1));
 						tmstart[tmrno] = parseInt(pieces[4]);
@@ -2718,7 +2718,7 @@ function loadFile(fileData, fileName = "")
                 if (ln.substr(0, 7) == "REGION|")
                 {
                     var words = ln.split("|");
-                    if (words[1].substr(0, 3) == "TMR")
+                    if (words[1].substr(0, 3) == "TMR" || words[1].substr(0, 3) == "HXR")
                     {
                         var tmr = parseInt(words[1].substr(3));
                         tmstart[tmr] = parseInt(words[2]);
@@ -2787,7 +2787,7 @@ function loadFile(fileData, fileName = "")
 						if (ln.substr(0, 6) == 'REMARK')
 						{
 							var pieces = ln.split(" ");
-							if (pieces[2] == 'HELIX' && pieces[3].substr(0,3) == 'TMR')
+							if (pieces[2] == 'HELIX' && (pieces[3].substr(0,3) == 'TMR' || pieces[3].substr(0,3) == 'HXR'))
 							{
 								var tmrno = parseInt(pieces[3].substr(-1));
 								tmstart[tmrno] = parseInt(pieces[4]);

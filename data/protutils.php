@@ -66,7 +66,7 @@ function bw_from_resno($protid, $resno)
 	
 	foreach ($prot['region'] as $rgn => $se)
 	{
-		if (substr($rgn, 0, 3) == 'TMR')
+		if (substr($rgn, 0, 3) == 'TMR' || substr($rgn, 0, 3) == 'HXR')
 		{
 			$tmrno = intval(substr($rgn, -1));
 			if ($resno >= $se['start'] && $resno <= $se['end'])
@@ -83,7 +83,7 @@ function bw_from_resno($protid, $resno)
 					 &&
 					 $resno < $se['start']
 					 &&
-					 $resno > @$prot['region']['TMR'.($tmrno-1)]['end'] 
+					 $resno > (@$prot['region']['TMR'.($tmrno-1)]['end'] ?: @$prot['region']['HXR'.($tmrno-1)]['end']) 
 					)
 			{
 				$tmr_1 = $tmrno-1;

@@ -5,7 +5,7 @@
         "uniprot_id": "Q9P1Q5",
         "sequence": "MRENNQSSTLEFILLGVTGQQEQEDFFYILFLFIYPITLIGNLLIVLAICSDVRLHNPMYFLLANLSLVDIFFSSVTIPKMLANHLLGSKSISFGGCLTQMYFMIALGNTDSYILAAMAYDRAVAISRPLHYTTIMSPRSCIWLIAGSWVIGNANALPHTLLTASLSFCGNQEVANFYCDITPLLKLSCSDIHFHVKMMYLGVGIFSVPLLCIIVSYIRVFSTVFQVPSTKGVLKAFSTCGSHLTVVSLYYGTVMGTYFRPLTNYSLKDAVITVMYTAVTPMLNPFIYSLRNRDMKAALRKLFNKRISS",
         "hypothesized": "leafy",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -16,7 +16,9 @@
             "6.50": "253",
             "7.50": "285",
             "45.50": "179",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -79,7 +81,9 @@
             "6.50": "253",
             "7.50": "285",
             "45.50": "179",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -142,7 +146,9 @@
             "6.50": "260",
             "7.50": "293",
             "45.50": "185",
-            "56.50": "236"
+            "56.50": "236",
+            "34.50": "131",
+            "8.50": "307"
         },
         "insertion":
         [
@@ -203,7 +209,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -258,7 +266,7 @@
         "uniprot_id": "P34982",
         "sequence": "MDGGNQSEGSEFLLLGMSESPEQQRILFWMFLSMYLVTVVGNVLIILAISSDSRLHTPVYFFLANLSFTDLFFVTNTIPKMLVNLQSHNKAISYAGCLTQLYFLVSLVALDNLILAVMAYDRYVAICCPLHYTTAMSPKLCILLLSLCWVLSVLYGLIHTLLMTRVTFCGSRKIHYIFCEMYVLLRMACSNIQINHTVLIATGCFIFLIPFGFVIISYVLIIRAILRIPSVSKKYKAFSTCASHLGAVSLFYGTLCMVYLKPLHTYSVKDSVATVMYAVVTPMMNPFIYSLRNKDMHGALGRLLDKHFKRLT",
         "hypothesized": "clean-bright",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -269,7 +277,9 @@
             "6.50": "254",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -329,7 +339,9 @@
             "6.50": "254",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -389,7 +401,9 @@
             "6.50": "254",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -449,7 +463,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "region":
         {
@@ -505,7 +521,9 @@
             "6.50": "263",
             "7.50": "296",
             "45.50": "188",
-            "56.50": "239"
+            "56.50": "239",
+            "34.50": "138",
+            "8.50": "310"
         },
         "region":
         {
@@ -563,7 +581,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "region":
         {
@@ -619,7 +639,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -679,7 +701,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -731,7 +755,7 @@
         "uniprot_id": "P47890",
         "sequence": "MEGKNLTSISECFLLGFSEQLEEQKPLFGSFLFMYLVTVAGNLLIILVIITDTQLHTPMYFFLANLSLADACFVSTTVPKMLANIQIQSQAISYSGCLLQLYFFMLFVMLEAFLLAVMAYDCYVAICHPLHYILIMSPGLCIFLVSASWIMNALHSLLHTLLMNSLSFCANHEIPHFFCDINPLLSLSCTDPFTNELVIFITGGLTGLICVLCLIISYTNVFSTILKIPSAQGKRKAFSTCSSHLSVVSLFFGTSFCVDFSSPSTHSAQKDTVASVMYTVVTPMLNPFIYSLRNQEIKSSLRKLIWVRKIHSP",
         "hypothesized": "waxy",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -742,7 +766,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -802,7 +828,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "insertion":
         [
@@ -866,7 +894,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -928,7 +958,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -990,7 +1022,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -1052,7 +1086,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -1113,7 +1149,9 @@
             "6.50": "304",
             "7.50": "336",
             "45.50": "229",
-            "56.50": "280"
+            "56.50": "280",
+            "34.50": "179",
+            "8.50": "350"
         },
         "deletion":
         [
@@ -1178,7 +1216,9 @@
             "6.50": "254",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -1243,7 +1283,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -1307,7 +1349,9 @@
             "6.50": "291",
             "7.50": "324",
             "45.50": "216",
-            "56.50": "267"
+            "56.50": "267",
+            "34.50": "166",
+            "8.50": "338"
         },
         "deletion":
         [
@@ -1371,7 +1415,9 @@
             "6.50": "255",
             "7.50": "287",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -1436,7 +1482,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -1496,7 +1544,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -1556,7 +1606,9 @@
             "6.50": "271",
             "7.50": "304",
             "45.50": "196",
-            "56.50": "247"
+            "56.50": "247",
+            "34.50": "146",
+            "8.50": "318"
         },
         "deletion":
         [
@@ -1616,7 +1668,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -1680,7 +1734,9 @@
             "6.50": "267",
             "7.50": "300",
             "45.50": "192",
-            "56.50": "243"
+            "56.50": "243",
+            "34.50": "142",
+            "8.50": "314"
         },
         "deletion":
         [
@@ -1740,7 +1796,9 @@
             "6.50": "267",
             "7.50": "300",
             "45.50": "192",
-            "56.50": "243"
+            "56.50": "243",
+            "34.50": "142",
+            "8.50": "314"
         },
         "deletion":
         [
@@ -1800,7 +1858,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -1865,7 +1925,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -1930,7 +1992,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -1995,7 +2059,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -2061,7 +2127,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -2126,7 +2194,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -2192,7 +2262,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -2248,7 +2320,7 @@
         "uniprot_id": "A4D2G3",
         "sequence": "MGGNQTSITEFLLLGFPIGPRIQMLLFGLFSLFYIFILLGNGTILGLISLDSRLHTPMYFFLSHLAVVDIACACSTVPQMLVNLLHPAKPISFAGCMTQMFLFLSFAHTECLLLVVMSYDRYVAICHPLRYSTIMTWKVCITLALTSWILGVLLALVHLVLLLPLSFCGPQKLNHFFCEIMAVLKLACADTHINEVMVLAGAVSVLVGAFFSTVISYVHILCAILKIQSGEGCQKAFSICSSHLCVVGLFYGTAIIMYVEPQYESPKEQKKYLLLFHSLFNPMLNPLIYSLRNKEVQGTLKRMLEKKRTS",
         "hypothesized": "tabagique",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "41",
@@ -2259,7 +2331,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -2324,7 +2398,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -2389,7 +2465,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -2455,7 +2533,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -2520,7 +2600,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -2571,7 +2653,7 @@
         "uniprot_id": "Q5JQS5",
         "sequence": "MKSDNHSFLGDSPKAFILLGVSDRPWLELPLFVVLLLSYVLAMLGNVAIILASRVDPQLHSPMYIFLSHLSFLDLCYTTTTVPQMLVNMGSSQKTISYGGCTVQYAVFHWLGCTECIVLAAMALDRYVAICKPLHYAVLMHRALCQQLVALAWLSGFGNSFVQVVLTVQLPFCGRQVLNNFFCEVPAVIKLSCADTAVNDTILAVLVAFFVLVPLALILLSYGFIARAVLRIQSSKGRHKAFGTCSSHLMIVSLFYLPAIYMYLQPPSSYSQEQGKFISLFYSIITPTLNPFTYTLRNKDMKGALRRLLARIWRLCG",
         "hypothesized": "coffee-bold",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "46",
@@ -2582,7 +2664,9 @@
             "6.50": "258",
             "7.50": "291",
             "45.50": "183",
-            "56.50": "234"
+            "56.50": "234",
+            "34.50": "133",
+            "8.50": "305"
         },
         "deletion":
         [
@@ -2647,7 +2731,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -2711,7 +2797,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -2775,7 +2863,9 @@
             "6.50": "254",
             "7.50": "285",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -2840,7 +2930,9 @@
             "6.50": "270",
             "7.50": "303",
             "45.50": "195",
-            "56.50": "246"
+            "56.50": "246",
+            "34.50": "145",
+            "8.50": "317"
         },
         "deletion":
         [
@@ -2908,7 +3000,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -2975,7 +3069,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -3043,7 +3139,9 @@
             "6.50": "257",
             "7.50": "290",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "132",
+            "8.50": "304"
         },
         "deletion":
         [
@@ -3104,7 +3202,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -3169,7 +3269,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -3230,7 +3332,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -3291,7 +3395,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -3352,7 +3458,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -3405,7 +3513,7 @@
         "uniprot_id": "O76002",
         "sequence": "MMIKKNASSEDFFILLGFSNWPQLEVVLFVVILIFYLMTLTGNLFIIILSYVDSHLHTPMYFFLSNLSFLDLCHTTSSIPQLLVNLRGPEKTISYAGCMVQLYFVLALGITECVLLVVMSYDRYVAVCRPLHYTVLMHPRFCHLLVAASWVIGFTISALHSSFTFWVPLCGHRLVDHFFCEVPALLRLSCVDTHANELTLMVMSSIFVLIPLILILTTYGAIARAVLSMQSTTGLQKVFRTCGAHLMVVSLFFIPVMCMYLQPPSENSPDQGKFIALFYTVVTPSLNPLIYTLRNKHVKGAAKRLLGWEWGK",
         "hypothesized": "smooth",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "43",
@@ -3416,7 +3524,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -3469,7 +3579,7 @@
         "uniprot_id": "O76001",
         "sequence": "MNDDGKVNASSEGYFILVGFSNWPHLEVVIFVVVLIFYLMTLIGNLFIIILSYLDSHLHTPMYFFLSNLSFLDLCYTTSSIPQLLVNLWGPEKTISYAGCMIQLYFVLALGTTECVLLVVMSYDRYAAVCRPLHYTVLMHPRFCHLLAVASWVSGFTNSALHSSFTFWVPLCGHRQVDHFFCEVPALLRLSCVDTHVNELTLMITSSIFVLIPLILILTSYGAIVRAVLRMQSTTGLQKVFGTCGAHLMAVSLFFIPAMCIYLQPPSGNSQDQGKFIALFYTVVTPSLNPLIYTLRNKVVRGAVKRLMGWE",
         "hypothesized": "jagged",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "45",
@@ -3480,7 +3590,9 @@
             "6.50": "257",
             "7.50": "290",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "132",
+            "8.50": "304"
         },
         "deletion":
         [
@@ -3542,7 +3654,9 @@
             "6.50": "282",
             "7.50": "315",
             "45.50": "207",
-            "56.50": "258"
+            "56.50": "258",
+            "34.50": "158",
+            "8.50": "329"
         },
         "deletion":
         [
@@ -3608,7 +3722,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -3665,7 +3781,7 @@
         "uniprot_id": "Q8NG85",
         "sequence": "MENYNQTSTDFILLGFFPPSRIGLFLFILIVFIFLMALIGNLSMILLIFLDTHLHTPMYFLLSQLSLIDLNYISTIVPKMASDFLSGNKSISFTGCGIQSFFFSALGGAEALLLASMAYDRYIAICFPLHYPIRMSKRMCVLMITGSWIIGSINACAHTVYVLHIPYCQSRAINHFFCDVPAMVTLACMDTWVYEGTVFLSTTIFLVFPFIAISCSYGRVLLAVYHMKSAEGRKKAYLTCSTHLTVVTFYYAPFVYTYLRPRSLRSPTEDKVLAVFYTTLTPMLNPIIYSLRNKEVMGALTRVSQRICSGKM",
         "hypothesized": "camphorous",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "41",
@@ -3676,7 +3792,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -3742,7 +3860,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -3808,7 +3928,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -3873,7 +3995,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -3939,7 +4063,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -4007,7 +4133,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -4074,7 +4202,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -4139,7 +4269,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -4211,7 +4343,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -4277,7 +4411,9 @@
             "6.50": "255",
             "7.50": "294",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "308"
         },
         "deletion":
         [
@@ -4350,7 +4486,9 @@
             "6.50": "304",
             "7.50": "337",
             "45.50": "229",
-            "56.50": "280"
+            "56.50": "280",
+            "34.50": "179",
+            "8.50": "351"
         },
         "deletion":
         [
@@ -4416,7 +4554,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -4481,7 +4621,9 @@
             "6.50": "259",
             "7.50": "292",
             "45.50": "184",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "134",
+            "8.50": "306"
         },
         "deletion":
         [
@@ -4542,7 +4684,9 @@
             "6.50": "286",
             "7.50": "319",
             "45.50": "211",
-            "56.50": "262"
+            "56.50": "262",
+            "34.50": "161",
+            "8.50": "333"
         },
         "deletion":
         [
@@ -4607,7 +4751,9 @@
             "6.50": "258",
             "7.50": "291",
             "45.50": "183",
-            "56.50": "234"
+            "56.50": "234",
+            "34.50": "133",
+            "8.50": "305"
         },
         "deletion":
         [
@@ -4674,7 +4820,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -4740,7 +4888,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -4806,7 +4956,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -4873,7 +5025,9 @@
             "6.50": "251",
             "7.50": "284",
             "45.50": "176",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "126",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -4938,7 +5092,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -5003,7 +5159,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -5068,7 +5226,9 @@
             "6.50": "258",
             "7.50": "291",
             "45.50": "183",
-            "56.50": "234"
+            "56.50": "234",
+            "34.50": "133",
+            "8.50": "305"
         },
         "deletion":
         [
@@ -5133,7 +5293,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -5199,7 +5361,9 @@
             "6.50": "259",
             "7.50": "292",
             "45.50": "184",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "134",
+            "8.50": "306"
         },
         "deletion":
         [
@@ -5260,7 +5424,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -5326,7 +5492,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -5391,7 +5559,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -5447,7 +5617,7 @@
         "uniprot_id": "Q9Y3N9",
         "sequence": "MDQSNYSSLHGFILLGFSNHPKMEMILSGVVAIFYLITLVGNTAIILASLLDSQLHTPMYFFLRNLSFLDLCFTTSIIPQMLVNLWGPDKTISYVGCIIQLYVYMWLGSVECLLLAVMSYDRFTAICKPLHYFVVMNPHLCLKMIIMIWSISLANSVVLCTLTLNLPTCGNNILDHFLCELPALVKIACVDTTTVEMSVFALGIIIVLTPLILILISYGYIAKAVLRTKSKASQRKAMNTCGSHLTVVSMFYGTIIYMYLQPGNRASKDQGKFLTLFYTVITPSLNPLIYTLRNKDMKDALKKLMRFHHKSTKIKRNCKS",
         "hypothesized": "allyl-demimetallic",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -5458,7 +5628,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -5516,7 +5688,7 @@
         "uniprot_id": "Q7Z3T1",
         "sequence": "MDGTNGSTQTHFILLGFSDRPHLERILFVVILIAYLLTLVGNTTIILVSRLDPHLHTPMYFFLAHLSFLDLSFTTSSIPQLLYNLNGCDKTISYMGCAIQLFLFLGLGGVECLLLAVMAYDRCVAICKPLHYMVIMNPRLCRGLVSVTWGCGVANSLAMSPVTLRLPRCGHHEVDHFLREMPALIRMACVSTVAIEGTVFVLAVGVVLSPLVFILLSYSYIVRAVLQIRSASGRQKAFGTCGSHLTVVSLFYGNIIYMYMQPGASSSQDQGMFLMLFYNIVTPLLNPLIYTLRNREVKGALGRLLLGKRELGKE",
         "hypothesized": "zesty",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -5527,7 +5699,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -5595,7 +5769,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -5664,7 +5840,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -5733,7 +5911,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -5786,7 +5966,7 @@
         "uniprot_id": "Q9H205",
         "sequence": "MELWNFTLGSGFILVGILNDSGSPELLCATITILYLLALISNGLLLLAITMEARLHMPMYLLLGQLSLMDLLFTSVVTPKALADFLRRENTISFGGCALQMFLALTMGGAEDLLLAFMAYDRYVAICHPLTYMTLMSSRACWLMVATSWILASLSALIYTVYTMHYPFCRAQEIRHLLCEIPHLLKVACADTSRYELMVYVMGVTFLIPSLAAILASYTQILLTVLHMPSNEGRKKALVTCSSHLTVVGMFYGAATFMYVLPSSFHSTRQDNIISVFYTIVTPALNPLIYSLRNKEVMRALRRVLGKYMLPAHSTL",
         "hypothesized": "stemmy",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -5797,7 +5977,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -5853,7 +6035,7 @@
         "uniprot_id": "A6NM03",
         "sequence": "MELRNSTLGSGFILVGILNDSGSPELLYATFTILYMLALTSNGLLLLAITIEARLHMPMYLLLGQLSLMDLLFTSVVTPKALADFLRRENTISFGGCALQMFLALTMGSAEDLLLAFMAYDRYVAICHPLKYMTLMSPRVCWIMVATSWILASLIAIGHTMYTMHLPFCVSWEIRHLLCEIPPLLKLACADTSRYELIIYVTGVTFLLLPISAIVASYTLVLFTVLRMPSNEGRKKALVTCSSHLIVVGMFYGAATFMYVLPSSFHSPKQDNIISVFYTIVTPALNPLIYSLRNKEVMRALRRVLGKYILLAHSTL",
         "hypothesized": "pollinic?",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -5864,7 +6046,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -5929,7 +6113,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -5994,7 +6180,9 @@
             "6.50": "269",
             "7.50": "302",
             "45.50": "194",
-            "56.50": "245"
+            "56.50": "245",
+            "34.50": "144",
+            "8.50": "316"
         },
         "deletion":
         [
@@ -6059,7 +6247,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -6110,7 +6300,7 @@
         "uniprot_id": "A6NND4",
         "sequence": "MDATACNESVDGSPVFYLLGIPSLPETFFLPVFFIFLLFYLLILMGNALILVAVVAEPSLHKPMYFFLINLSTLDILFTTTTVPKMLSLFLLGDRFLSFSSCLLQMYLFQSFTCSEAFILVVMAYDRYVAICHPLHYPVLMNPQTNATLAASAWLTALLLPIPAVVRTSQMAYNSIAYIYHCFCDHLAVVQASCSDTTPQTLMGFCIAMVVSFLPLLLVLLSYVHILASVLRISSLEGRAKAFSTCSSHLLVVGTYYSSIAIAYVAYRADLPLDFHIMGNVVYAILTPILNPLIYTLRNRDVKAAITKIMSQDPGCDRSI",
         "hypothesized": "gritty",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "47",
@@ -6121,7 +6311,9 @@
             "6.50": "258",
             "7.50": "291",
             "45.50": "183",
-            "56.50": "234"
+            "56.50": "234",
+            "34.50": "133",
+            "8.50": "305"
         },
         "deletion":
         [
@@ -6178,7 +6370,7 @@
         "uniprot_id": "P47881",
         "sequence": "MQPESGANGTVIAEFILLGLLEAPGLQPVVFVLFLFAYLVTVRGNLSILAAVLVEPKLHTPMYFFLGNLSVLDVGCISVTVPSMLSRLLSRKRAVPCGACLTQLFFFHLFVGVDCFLLTAMAYDRFLAICRPLTYSTRMSQTVQRMLVAASWACAFTNALTHTVAMSTLNFCGPNVINHFYCDLPQLFQLSCSSTQLNELLLFAVGFIMAGTPMALIVISYIHVAAAVLRIRSVEGRKKAFSTCGSHLTVVAIFYGSGIFNYMRLGSTKLSDKDKAVGIFNTVINPMLNPIIYSFRNPDVQSAIWRMLTGRRSLA",
         "hypothesized": "cyclamic-newspapery",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "45",
@@ -6189,7 +6381,9 @@
             "6.50": "257",
             "7.50": "290",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "132",
+            "8.50": "304"
         },
         "deletion":
         [
@@ -6258,7 +6452,9 @@
             "6.50": "263",
             "7.50": "296",
             "45.50": "188",
-            "56.50": "239"
+            "56.50": "239",
+            "34.50": "138",
+            "8.50": "310"
         },
         "deletion":
         [
@@ -6327,7 +6523,9 @@
             "6.50": "263",
             "7.50": "296",
             "45.50": "188",
-            "56.50": "239"
+            "56.50": "239",
+            "34.50": "138",
+            "8.50": "310"
         },
         "deletion":
         [
@@ -6397,7 +6595,9 @@
             "6.50": "257",
             "7.50": "290",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "132",
+            "8.50": "304"
         },
         "deletion":
         [
@@ -6466,7 +6666,9 @@
             "6.50": "250",
             "7.50": "281",
             "45.50": "176",
-            "56.50": "226"
+            "56.50": "226",
+            "34.50": "127",
+            "8.50": "295"
         },
         "deletion":
         [
@@ -6544,7 +6746,9 @@
             "6.50": "281",
             "7.50": "312",
             "45.50": "207",
-            "56.50": "257"
+            "56.50": "257",
+            "34.50": "157",
+            "8.50": "326"
         },
         "deletion":
         [
@@ -6619,7 +6823,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -6696,7 +6902,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -6771,7 +6979,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -6846,7 +7056,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -6920,7 +7132,9 @@
             "6.50": "266",
             "7.50": "297",
             "45.50": "200",
-            "56.50": "246"
+            "56.50": "246",
+            "34.50": "150",
+            "8.50": "311"
         },
         "deletion":
         [
@@ -6998,7 +7212,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -7072,7 +7288,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -7145,7 +7363,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -7219,7 +7439,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -7293,7 +7515,9 @@
             "6.50": "252",
             "7.50": "283",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "297"
         },
         "deletion":
         [
@@ -7368,7 +7592,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -7443,7 +7669,9 @@
             "6.50": "254",
             "7.50": "284",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -7518,7 +7746,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -7593,7 +7823,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -7666,7 +7898,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -7740,7 +7974,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -7814,7 +8050,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -7888,7 +8126,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -7963,7 +8203,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8037,7 +8279,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8111,7 +8355,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8186,7 +8432,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8259,7 +8507,9 @@
             "6.50": "246",
             "7.50": "277",
             "45.50": "172",
-            "56.50": "223"
+            "56.50": "223",
+            "34.50": "122",
+            "8.50": "291"
         },
         "deletion":
         [
@@ -8333,7 +8583,9 @@
             "6.50": "246",
             "7.50": "277",
             "45.50": "172",
-            "56.50": "223"
+            "56.50": "223",
+            "34.50": "122",
+            "8.50": "291"
         },
         "deletion":
         [
@@ -8407,7 +8659,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8480,7 +8734,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8553,7 +8809,9 @@
             "6.50": "246",
             "7.50": "277",
             "45.50": "172",
-            "56.50": "223"
+            "56.50": "223",
+            "34.50": "122",
+            "8.50": "291"
         },
         "deletion":
         [
@@ -8627,7 +8885,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8700,7 +8960,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8775,7 +9037,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8851,7 +9115,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8924,7 +9190,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -8997,7 +9265,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -9070,7 +9340,9 @@
             "6.50": "254",
             "7.50": "285",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -9143,7 +9415,9 @@
             "6.50": "277",
             "7.50": "308",
             "45.50": "203",
-            "56.50": "254"
+            "56.50": "254",
+            "34.50": "153",
+            "8.50": "322"
         },
         "deletion":
         [
@@ -9217,7 +9491,9 @@
             "6.50": "256",
             "7.50": "287",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "132",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -9290,7 +9566,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -9355,7 +9633,7 @@
         "uniprot_id": "Q8NGD0",
         "sequence": "METANYTKVTEFVLTGLSQTREVQLVLFVIFLSFYLFILPGNILIICTIRLDPHLTSPMYFLLANLALLDIWYSSITAPKMLIDFFVERKIISFGGCIAQLFFLHFVGASEMFLLTVMAYDRYAAICRPLHYATIMNRRLCCILVALSWMGGFIHSIIQVALIVRLPFCGPNELDSYFCDITQVVRIACANTFPEELVMICSSGLISVVCFIALLMSYAFLLALLKKHSGSGENTNRAMSTCYSHITIVVLMFGPSIYIYARPFDSFSLDKVVSVFHTVIFPLLNPIIYTLRNKEVKAAMRKVVTKYILCEEK",
         "hypothesized": "malty",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -9366,7 +9644,9 @@
             "6.50": "255",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -9442,7 +9722,9 @@
             "6.50": "255",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -9518,7 +9800,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -9591,7 +9875,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -9666,7 +9952,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -9737,7 +10025,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -9809,7 +10099,9 @@
             "6.50": "252",
             "7.50": "283",
             "45.50": "180",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "130",
+            "8.50": "297"
         },
         "deletion":
         [
@@ -9881,7 +10173,9 @@
             "6.50": "254",
             "7.50": "285",
             "45.50": "180",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "130",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -9951,7 +10245,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -10022,7 +10318,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -10094,7 +10392,9 @@
             "6.50": "251",
             "7.50": "282",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "296"
         },
         "deletion":
         [
@@ -10166,7 +10466,9 @@
             "6.50": "245",
             "7.50": "276",
             "45.50": "171",
-            "56.50": "221"
+            "56.50": "221",
+            "34.50": "121",
+            "8.50": "290"
         },
         "deletion":
         [
@@ -10241,7 +10543,9 @@
             "6.50": "257",
             "7.50": "290",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "132",
+            "8.50": "304"
         },
         "deletion":
         [
@@ -10313,7 +10617,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -10382,7 +10688,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -10451,7 +10759,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -10521,7 +10831,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -10592,7 +10904,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -10662,7 +10976,9 @@
             "6.50": "251",
             "7.50": "284",
             "45.50": "177",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -10732,7 +11048,9 @@
             "6.50": "258",
             "7.50": "291",
             "45.50": "183",
-            "56.50": "234"
+            "56.50": "234",
+            "34.50": "133",
+            "8.50": "305"
         },
         "deletion":
         [
@@ -10803,7 +11121,9 @@
             "6.50": "256",
             "7.50": "289",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "303"
         },
         "deletion":
         [
@@ -10873,7 +11193,9 @@
             "6.50": "256",
             "7.50": "289",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "303"
         },
         "deletion":
         [
@@ -10943,7 +11265,9 @@
             "6.50": "256",
             "7.50": "289",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "303"
         },
         "deletion":
         [
@@ -11013,7 +11337,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -11083,7 +11409,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -11152,7 +11480,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -11223,7 +11553,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -11294,7 +11626,9 @@
             "6.50": "259",
             "7.50": "292",
             "45.50": "184",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "134",
+            "8.50": "306"
         },
         "deletion":
         [
@@ -11365,7 +11699,9 @@
             "6.50": "270",
             "7.50": "303",
             "45.50": "195",
-            "56.50": "246"
+            "56.50": "246",
+            "34.50": "145",
+            "8.50": "317"
         },
         "deletion":
         [
@@ -11436,7 +11772,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -11507,7 +11845,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -11578,7 +11918,9 @@
             "6.50": "256",
             "7.50": "289",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "303"
         },
         "deletion":
         [
@@ -11648,7 +11990,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -11720,7 +12064,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -11790,7 +12136,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -11860,7 +12208,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -11930,7 +12280,9 @@
             "6.50": "254",
             "7.50": "284",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -12001,7 +12353,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -12070,7 +12424,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -12139,7 +12495,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -12210,7 +12568,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -12280,7 +12640,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -12350,7 +12712,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -12420,7 +12784,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -12490,7 +12856,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -12560,7 +12928,9 @@
             "6.50": "250",
             "7.50": "283",
             "45.50": "175",
-            "56.50": "226"
+            "56.50": "226",
+            "34.50": "125",
+            "8.50": "297"
         },
         "deletion":
         [
@@ -12623,7 +12993,7 @@
         "uniprot_id": "Q8WZ94",
         "sequence": "MGTGNDTTVVEFTLLGLSEDTTVCAILFLVFLGIYVVTLMGNISIIVLIRRSHHLHTPMYIFLCHLAFVDIGYSSSVTPVMLMSFLRKETSLPVAGCVAQLCSVVTFGTAECFLLAAMAYDRYVAICSPLLYSTCMSPGVCIILVGMSYLGGCVNAWTFIGCLLRLSFCGPNKVNHFFCDYSPLLKLACSHDFTFEIIPAISSGSIIVATVCVIAISYIYILITILKMHSTKGRHKAFSTCTSHLTAVTLFYGTITFIYVMPKSSYSTDQNKVVSVFYTVVIPMLNPLIYSLRNKEIKGALKRELRIKIFS",
         "hypothesized": "patchoulic",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -12634,7 +13004,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -12704,7 +13076,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -12774,7 +13148,9 @@
             "6.50": "266",
             "7.50": "299",
             "45.50": "191",
-            "56.50": "242"
+            "56.50": "242",
+            "34.50": "141",
+            "8.50": "313"
         },
         "deletion":
         [
@@ -12846,7 +13222,9 @@
             "6.50": "293",
             "7.50": "326",
             "45.50": "218",
-            "56.50": "269"
+            "56.50": "269",
+            "34.50": "168",
+            "8.50": "340"
         },
         "deletion":
         [
@@ -12918,7 +13296,9 @@
             "6.50": "284",
             "7.50": "317",
             "45.50": "209",
-            "56.50": "260"
+            "56.50": "260",
+            "34.50": "159",
+            "8.50": "331"
         },
         "deletion":
         [
@@ -12989,7 +13369,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -13062,7 +13444,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -13132,7 +13516,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -13204,7 +13590,9 @@
             "6.50": "256",
             "7.50": "289",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "303"
         },
         "deletion":
         [
@@ -13272,7 +13660,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -13340,7 +13730,8 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129"
         },
         "deletion":
         [
@@ -13411,7 +13802,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -13480,7 +13873,9 @@
             "6.50": "260",
             "7.50": "293",
             "45.50": "185",
-            "56.50": "236"
+            "56.50": "236",
+            "34.50": "135",
+            "8.50": "307"
         },
         "deletion":
         [
@@ -13551,7 +13946,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -13621,7 +14018,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -13691,7 +14090,9 @@
             "6.50": "252",
             "7.50": "284",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -13762,7 +14163,9 @@
             "6.50": "305",
             "7.50": "338",
             "45.50": "230",
-            "56.50": "281"
+            "56.50": "281",
+            "34.50": "180",
+            "8.50": "352"
         },
         "deletion":
         [
@@ -13832,7 +14235,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -13902,7 +14307,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -13972,7 +14379,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -14044,7 +14453,9 @@
             "6.50": "259",
             "7.50": "292",
             "45.50": "184",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "134",
+            "8.50": "306"
         },
         "deletion":
         [
@@ -14114,7 +14525,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -14182,7 +14595,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -14253,7 +14668,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -14324,7 +14741,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -14393,7 +14812,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -14461,7 +14882,9 @@
             "6.50": "251",
             "7.50": "284",
             "45.50": "176",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "126",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -14529,7 +14952,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -14597,7 +15022,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -14666,7 +15093,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -14735,7 +15164,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -14806,7 +15237,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -14875,7 +15308,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -14944,7 +15379,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -15013,7 +15450,9 @@
             "6.50": "251",
             "7.50": "284",
             "45.50": "176",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "126",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -15081,7 +15520,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -15151,7 +15592,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -15220,7 +15663,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "178",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "128",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -15290,7 +15735,9 @@
             "6.50": "269",
             "7.50": "302",
             "45.50": "195",
-            "56.50": "245"
+            "56.50": "245",
+            "34.50": "145",
+            "8.50": "316"
         },
         "deletion":
         [
@@ -15361,7 +15808,9 @@
             "6.50": "281",
             "7.50": "314",
             "45.50": "207",
-            "56.50": "257"
+            "56.50": "257",
+            "34.50": "157",
+            "8.50": "328"
         },
         "deletion":
         [
@@ -15431,7 +15880,9 @@
             "6.50": "251",
             "7.50": "284",
             "45.50": "176",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "127",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -15500,7 +15951,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -15569,7 +16022,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -15639,7 +16094,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -15708,7 +16165,9 @@
             "6.50": "258",
             "7.50": "291",
             "45.50": "183",
-            "56.50": "234"
+            "56.50": "234",
+            "34.50": "133",
+            "8.50": "305"
         },
         "deletion":
         [
@@ -15778,7 +16237,9 @@
             "6.50": "257",
             "7.50": "290",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "131",
+            "8.50": "304"
         },
         "deletion":
         [
@@ -15847,7 +16308,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -15917,7 +16380,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -15989,7 +16454,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -16061,7 +16528,9 @@
             "6.50": "259",
             "7.50": "292",
             "45.50": "184",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "134",
+            "8.50": "306"
         },
         "deletion":
         [
@@ -16132,7 +16601,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -16202,7 +16673,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -16273,7 +16746,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -16344,7 +16819,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -16415,7 +16892,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -16487,7 +16966,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -16559,7 +17040,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -16632,7 +17115,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -16704,7 +17189,9 @@
             "6.50": "272",
             "7.50": "305",
             "45.50": "197",
-            "56.50": "248"
+            "56.50": "248",
+            "34.50": "147",
+            "8.50": "319"
         },
         "deletion":
         [
@@ -16775,7 +17262,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -16848,7 +17337,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -16921,7 +17412,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -16992,7 +17485,9 @@
             "6.50": "270",
             "7.50": "303",
             "45.50": "195",
-            "56.50": "246"
+            "56.50": "246",
+            "34.50": "146",
+            "8.50": "317"
         },
         "deletion":
         [
@@ -17064,7 +17559,9 @@
             "6.50": "254",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -17136,7 +17633,9 @@
             "6.50": "254",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -17208,7 +17707,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -17280,7 +17781,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -17352,7 +17855,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -17414,7 +17919,7 @@
         "uniprot_id": "Q8WZ84",
         "sequence": "MTMENYSMAAQFVLDGLTQQAELQLPLFLLFLGIYVVTVVGNLGMILLIAVSPLLHTPMYYFLSSLSFVDFCYSSVITPKMLVNFLGKKNTILYSECMVQLFFFVVFVVAEGYLLTAMAYDRYVAICSPLLYNAIMSSWVCSLLVLAAFFLGFLSALTHTSAMMKLSFCKSHIINHYFCDVLPLLNLSCSNTHLNELLLFIIAGFNTLVPTLAVAVSYAFILYSILHIRSSEGRSKAFGTCSSHLMAVVIFFGSITFMYFKPPSSNSLDQEKVSSVFYTTVIPMLNPLIYSLRNKDVKKALRKVLVGK",
         "hypothesized": "burnt",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -17425,7 +17930,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -17497,7 +18004,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -17569,7 +18078,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -17640,7 +18151,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -17712,7 +18225,8 @@
             "6.50": "267",
             "7.50": "300",
             "45.50": "192",
-            "56.50": "243"
+            "56.50": "243",
+            "34.50": "142"
         },
         "deletion":
         [
@@ -17783,7 +18297,9 @@
             "6.50": "289",
             "7.50": "322",
             "45.50": "214",
-            "56.50": "265"
+            "56.50": "265",
+            "34.50": "164",
+            "8.50": "336"
         },
         "deletion":
         [
@@ -17846,7 +18362,7 @@
         "uniprot_id": "Q8NGG4",
         "sequence": "MGRRNNTNVPDFILTGLSDSEEVQMALFILFLLIYLITMLGNVGMILIIRLDLQLHTPMYFFLTHLSFIDLSYSTVITPKTLANLLTSNYISFMGCFAQMFFFVFLGAAECFLLSSMAYDRYVAICSPLRYPVIMSKRLCCALVTGPYVISFINSFVNVVWMSRLHFCDSNVVRHFFCDTSPILALSCMDTYDIEIMIHILAGSTLMVSLITISASYVSILSTILKINSTSGKQKALSTCASHLLGVTIFYGTMIFTYLKPRKSYSLGRDQVASVFYTIVIPMLNPLIYSLRNKEVKNALIRVMQRRQDSR",
         "hypothesized": "cruciferous",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -17857,7 +18373,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -17927,7 +18445,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -17997,7 +18517,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -18067,7 +18589,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -18136,7 +18660,9 @@
             "6.50": "254",
             "7.50": "288",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -18208,7 +18734,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -18281,7 +18809,9 @@
             "6.50": "260",
             "7.50": "293",
             "45.50": "185",
-            "56.50": "236"
+            "56.50": "236",
+            "34.50": "135",
+            "8.50": "307"
         },
         "deletion":
         [
@@ -18356,7 +18886,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -18430,7 +18962,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -18504,7 +19038,9 @@
             "6.50": "254",
             "7.50": "285",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -18576,7 +19112,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -18648,7 +19186,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -18720,7 +19260,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -18792,7 +19334,9 @@
             "6.50": "250",
             "7.50": "283",
             "45.50": "175",
-            "56.50": "226"
+            "56.50": "226",
+            "34.50": "125",
+            "8.50": "297"
         },
         "deletion":
         [
@@ -18867,7 +19411,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -18942,7 +19488,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -19016,7 +19564,9 @@
             "6.50": "269",
             "7.50": "302",
             "45.50": "194",
-            "56.50": "245"
+            "56.50": "245",
+            "34.50": "144",
+            "8.50": "316"
         },
         "deletion":
         [
@@ -19089,7 +19639,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "region":
         {
@@ -19145,7 +19697,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -19217,7 +19771,9 @@
             "6.50": "279",
             "7.50": "310",
             "45.50": "204",
-            "56.50": "255"
+            "56.50": "255",
+            "34.50": "154",
+            "8.50": "324"
         },
         "deletion":
         [
@@ -19293,7 +19849,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -19354,7 +19912,7 @@
         "uniprot_id": "Q8NGE9",
         "sequence": "MAERNYTVVTEFFLTAFTEHLQWRVPLFLIFLSFYLATMLGNTGMILLIRGDRRLHTPMYFFLSHLSLVDICYSSAIIPQMLAVLWEHGTTISQARCAAQFFLFTFFASIDCYLLAIMAYDRYTAVCQPLLYVTIITEKARWGLVTGAYVAGFFSAFVRTVTAFTLSFCGNNEINFIFCDLPPLLKLSCGDSYTQEVVIIVFALFVMPACILVILVSYLFIIVAILQIHSAGGRAKTFSTCASHLTAVALFFGTLIFMYLRDNTGQSSEGDRVVSVLYTVVTPMLNPLIYSLRNKEVKEATRKALSKSKPARRP",
         "hypothesized": "urinous",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -19365,7 +19923,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -19435,7 +19995,9 @@
             "6.50": "241",
             "7.50": "274",
             "45.50": "166",
-            "56.50": "217"
+            "56.50": "217",
+            "34.50": "116",
+            "8.50": "288"
         },
         "deletion":
         [
@@ -19510,7 +20072,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -19583,7 +20147,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -19659,7 +20225,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -19735,7 +20303,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -19807,7 +20377,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -19880,7 +20452,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -19954,7 +20528,9 @@
             "6.50": "254",
             "7.50": "285",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -20029,7 +20605,9 @@
             "6.50": "252",
             "7.50": "283",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "297"
         },
         "deletion":
         [
@@ -20104,7 +20682,9 @@
             "6.50": "259",
             "7.50": "290",
             "45.50": "184",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "134",
+            "8.50": "304"
         },
         "deletion":
         [
@@ -20180,7 +20760,9 @@
             "6.50": "255",
             "7.50": "286",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -20255,7 +20837,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -20331,7 +20915,9 @@
             "6.50": "275",
             "7.50": "306",
             "45.50": "200",
-            "56.50": "251"
+            "56.50": "251",
+            "34.50": "150",
+            "8.50": "320"
         },
         "deletion":
         [
@@ -20398,7 +20984,7 @@
         "uniprot_id": "Q8NGN6",
         "sequence": "MSNATLLTAFILTGLPHAPGLDAPLFGIFLVVYVLTVLGNLLILLVIRVDSHLHTPMYYFLTNLSFIDMWFSTVTVPKMLMTLVSPSGRTISFHSCVAQLYFFHFLGSTECFLYTVMSYDRYLAISYPLRYTNMMTGRSCALLATGTWLSGSLHSAVQTILTFHLPYCGPNQIQHYFCDAPPILKLACADTSANEMVIFVNIGLVASGCFVLIVLSYVSIVCSILRIRTSEGRHRAFQTCASHCIVVLCFFGPGLFIYLRPGSRDALHGVVAVFYTTLTPLFNPVVYTLRNKEVKKALLKLKNGSVFAQGE",
         "hypothesized": "rosinous",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "40",
@@ -20409,7 +20995,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -20484,7 +21072,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -20560,7 +21150,9 @@
             "6.50": "253",
             "7.50": "284",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -20635,7 +21227,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "179",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "129",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -20717,7 +21311,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "179",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "129",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -20798,7 +21394,9 @@
             "6.50": "256",
             "7.50": "289",
             "45.50": "180",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "130",
+            "8.50": "303"
         },
         "insertion":
         [
@@ -20879,7 +21477,9 @@
             "6.50": "256",
             "7.50": "289",
             "45.50": "180",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "130",
+            "8.50": "303"
         },
         "insertion":
         [
@@ -20959,7 +21559,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "179",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "129",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -21040,7 +21642,9 @@
             "6.50": "264",
             "7.50": "297",
             "45.50": "189",
-            "56.50": "240"
+            "56.50": "240",
+            "34.50": "140",
+            "8.50": "311"
         },
         "insertion":
         [
@@ -21116,7 +21720,9 @@
             "6.50": "255",
             "7.50": "287",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -21192,7 +21798,9 @@
             "6.50": "255",
             "7.50": "287",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "301"
         },
         "insertion":
         [
@@ -21271,7 +21879,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "300"
         },
         "insertion":
         [
@@ -21349,7 +21959,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -21423,7 +22035,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -21497,7 +22111,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -21572,7 +22188,9 @@
             "6.50": "259",
             "7.50": "292",
             "45.50": "184",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "133",
+            "8.50": "306"
         },
         "insertion":
         [
@@ -21647,7 +22265,9 @@
             "6.50": "274",
             "7.50": "307",
             "45.50": "199",
-            "56.50": "250"
+            "56.50": "250",
+            "34.50": "149",
+            "8.50": "321"
         },
         "insertion":
         [
@@ -21723,7 +22343,9 @@
             "6.50": "268",
             "7.50": "299",
             "45.50": "193",
-            "56.50": "244"
+            "56.50": "244",
+            "34.50": "143",
+            "8.50": "313"
         },
         "deletion":
         [
@@ -21799,7 +22421,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "301"
         },
         "insertion":
         [
@@ -21875,7 +22499,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -21953,7 +22579,9 @@
             "6.50": "245",
             "7.50": "278",
             "45.50": "170",
-            "56.50": "221"
+            "56.50": "221",
+            "34.50": "120",
+            "8.50": "292"
         },
         "insertion":
         [
@@ -22031,7 +22659,9 @@
             "6.50": "270",
             "7.50": "300",
             "45.50": "195",
-            "56.50": "246"
+            "56.50": "246",
+            "34.50": "145",
+            "8.50": "314"
         },
         "insertion":
         [
@@ -22111,7 +22741,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -22188,7 +22820,9 @@
             "6.50": "258",
             "7.50": "291",
             "45.50": "183",
-            "56.50": "234"
+            "56.50": "234",
+            "34.50": "133",
+            "8.50": "305"
         },
         "deletion":
         [
@@ -22263,7 +22897,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -22342,7 +22978,9 @@
             "6.50": "245",
             "7.50": "278",
             "45.50": "170",
-            "56.50": "221"
+            "56.50": "221",
+            "34.50": "120",
+            "8.50": "292"
         },
         "deletion":
         [
@@ -22417,7 +23055,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -22497,7 +23137,9 @@
             "6.50": "292",
             "7.50": "325",
             "45.50": "217",
-            "56.50": "268"
+            "56.50": "268",
+            "34.50": "167",
+            "8.50": "339"
         },
         "insertion":
         [
@@ -22574,7 +23216,9 @@
             "6.50": "269",
             "7.50": "302",
             "45.50": "194",
-            "56.50": "245"
+            "56.50": "245",
+            "34.50": "144",
+            "8.50": "316"
         },
         "deletion":
         [
@@ -22651,7 +23295,9 @@
             "6.50": "269",
             "7.50": "302",
             "45.50": "194",
-            "56.50": "245"
+            "56.50": "245",
+            "34.50": "144",
+            "8.50": "316"
         },
         "deletion":
         [
@@ -22729,7 +23375,9 @@
             "6.50": "264",
             "7.50": "297",
             "45.50": "189",
-            "56.50": "240"
+            "56.50": "240",
+            "34.50": "139",
+            "8.50": "311"
         },
         "insertion":
         [
@@ -22807,7 +23455,9 @@
             "6.50": "272",
             "7.50": "305",
             "45.50": "197",
-            "56.50": "248"
+            "56.50": "248",
+            "34.50": "147",
+            "8.50": "319"
         },
         "deletion":
         [
@@ -22887,7 +23537,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "insertion":
         [
@@ -22966,7 +23618,9 @@
             "6.50": "269",
             "7.50": "302",
             "45.50": "194",
-            "56.50": "245"
+            "56.50": "245",
+            "34.50": "144",
+            "8.50": "316"
         },
         "deletion":
         [
@@ -23043,7 +23697,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "insertion":
         [
@@ -23119,7 +23775,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "177",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "127",
+            "8.50": "300"
         },
         "insertion":
         [
@@ -23194,7 +23852,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "177",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "127",
+            "8.50": "300"
         },
         "insertion":
         [
@@ -23271,7 +23931,9 @@
             "6.50": "272",
             "7.50": "305",
             "45.50": "197",
-            "56.50": "248"
+            "56.50": "248",
+            "34.50": "147",
+            "8.50": "319"
         },
         "insertion":
         [
@@ -23348,7 +24010,9 @@
             "6.50": "254",
             "7.50": "293",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "307"
         },
         "insertion":
         [
@@ -23427,7 +24091,9 @@
             "6.50": "284",
             "7.50": "323",
             "45.50": "209",
-            "56.50": "260"
+            "56.50": "260",
+            "34.50": "159",
+            "8.50": "337"
         },
         "insertion":
         [
@@ -23506,7 +24172,9 @@
             "6.50": "254",
             "7.50": "293",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "307"
         },
         "insertion":
         [
@@ -23585,7 +24253,9 @@
             "6.50": "254",
             "7.50": "293",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "307"
         },
         "insertion":
         [
@@ -23664,7 +24334,9 @@
             "6.50": "254",
             "7.50": "293",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "307"
         },
         "insertion":
         [
@@ -23744,7 +24416,9 @@
             "6.50": "254",
             "7.50": "293",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "307"
         },
         "insertion":
         [
@@ -23823,7 +24497,9 @@
             "6.50": "286",
             "7.50": "319",
             "45.50": "211",
-            "56.50": "262"
+            "56.50": "262",
+            "34.50": "161",
+            "8.50": "333"
         },
         "insertion":
         [
@@ -23900,7 +24576,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "insertion":
         [
@@ -23978,7 +24656,9 @@
             "6.50": "251",
             "7.50": "284",
             "45.50": "176",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "126",
+            "8.50": "298"
         },
         "insertion":
         [
@@ -24055,7 +24735,9 @@
             "6.50": "253",
             "7.50": "286",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "300"
         },
         "insertion":
         [
@@ -24133,7 +24815,9 @@
             "6.50": "254",
             "7.50": "287",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "301"
         },
         "insertion":
         [
@@ -24209,7 +24893,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "insertion":
         [
@@ -24284,7 +24970,9 @@
             "6.50": "251",
             "7.50": "284",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "298"
         },
         "deletion":
         [
@@ -24362,7 +25050,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "insertion":
         [
@@ -24436,7 +25126,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "insertion":
         [
@@ -24510,7 +25202,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -24587,7 +25281,9 @@
             "6.50": "252",
             "7.50": "285",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "299"
         },
         "deletion":
         [
@@ -24664,7 +25360,9 @@
             "6.50": "255",
             "7.50": "288",
             "45.50": "180",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "130",
+            "8.50": "302"
         },
         "deletion":
         [
@@ -24740,7 +25438,9 @@
             "6.50": "255",
             "7.50": "290",
             "45.50": "181",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "131",
+            "8.50": "304"
         },
         "insertion":
         [
@@ -24818,7 +25518,9 @@
             "6.50": "255",
             "7.50": "290",
             "45.50": "181",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "131",
+            "8.50": "304"
         },
         "insertion":
         [
@@ -24896,7 +25598,9 @@
             "6.50": "253",
             "7.50": "288",
             "45.50": "179",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -24973,7 +25677,9 @@
             "6.50": "252",
             "7.50": "287",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "301"
         },
         "insertion":
         [
@@ -25048,7 +25754,9 @@
             "6.50": "251",
             "7.50": "286",
             "45.50": "176",
-            "56.50": "227"
+            "56.50": "227",
+            "34.50": "126",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -25127,7 +25835,9 @@
             "6.50": "252",
             "7.50": "287",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "301"
         },
         "insertion":
         [
@@ -25202,7 +25912,9 @@
             "6.50": "252",
             "7.50": "287",
             "45.50": "177",
-            "56.50": "228"
+            "56.50": "228",
+            "34.50": "127",
+            "8.50": "301"
         },
         "deletion":
         [
@@ -25277,7 +25989,9 @@
             "6.50": "267",
             "7.50": "301",
             "45.50": "192",
-            "56.50": "243"
+            "56.50": "243",
+            "34.50": "142",
+            "8.50": "315"
         },
         "deletion":
         [
@@ -25345,7 +26059,7 @@
         "uniprot_id": "Q8TCB6",
         "sequence": "MVDPNGNESSATYFILIGLPGLEEAQFWLAFPLCSLYLIAVLGNLTIIYIVRTEHSLHEPMYIFLCMLSGIDILISTSSMPKMLAIFWFNSTTIQFDACLLQMFAIHSLSGMESTVLLAMAFDRYVAICHPLRHATVLTLPRVTKIGVAAVVRGAALMAPLPVFIKQLPFCRSNILSHSYCLHQDVMKLACDDIRVNVVYGLIVIISAIGLDSLLISFSYLLILKTVLGLTREAQAKAFGTCVSHVCAVFIFYVPFIGLSMVHRFSKRRDSPLPVILANIYLLVPPVLNPIVYGVKTKEIRQRILRLFHVATHASEP",
         "hypothesized": "dairy",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "44",
@@ -25356,7 +26070,9 @@
             "6.50": "255",
             "7.50": "290",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "304"
         },
         "insertion":
         [
@@ -25422,7 +26138,7 @@
         "uniprot_id": "Q9H255",
         "sequence": "MSSCNFTHATFVLIGIPGLEKAHFWVGFPLLSMYVVAMFGNCIVVFIVRTERSLHAPMYLFLCMLAAIDLALSTSTMPKILALFWFDSREISFEACLTQMFFIHALSAIESTILLAMAFDRYVAICHPLRHAAVLNNTVTAQIGIVAVVRGSLFFFPLPLLIKRLAFCHSNVLSHSYCVHQDVMKLAYADTLPNVVYGLTAILLVMGVDVMFISLSYFLIIRTVLQLPSKSERAKAFGTCVSHIGVVLAFYVPLIGLSVVHRFGNSLHPIVRVVMGDIYLLLPPVINPIIYGAKTKQIRTRVLAMFKISCDKDLQAVGGK",
         "hypothesized": "acetic",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "41",
@@ -25433,7 +26149,9 @@
             "6.50": "253",
             "7.50": "288",
             "45.50": "178",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "302"
         },
         "insertion":
         [
@@ -25508,7 +26226,9 @@
             "6.50": "263",
             "7.50": "298",
             "45.50": "188",
-            "56.50": "239"
+            "56.50": "239",
+            "34.50": "138",
+            "8.50": "312"
         },
         "insertion":
         [
@@ -25583,7 +26303,9 @@
             "6.50": "268",
             "7.50": "303",
             "45.50": "193",
-            "56.50": "244"
+            "56.50": "244",
+            "34.50": "143",
+            "8.50": "317"
         },
         "insertion":
         [
@@ -25658,7 +26380,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -25733,7 +26457,9 @@
             "6.50": "259",
             "7.50": "294",
             "45.50": "184",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "134",
+            "8.50": "308"
         },
         "insertion":
         [
@@ -25807,7 +26533,8 @@
             "6.50": "256",
             "7.50": "292",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131"
         },
         "deletion":
         [
@@ -25882,7 +26609,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -25950,7 +26679,7 @@
         "uniprot_id": "Q9H344",
         "sequence": "MGLFNVTHPAFFLLTGIPGLESSHSWLSGPLCVMYAVALGGNTVILQAVRVEPSLHEPMYYFLSMLSFSDVAISMATLPTVLRTFCLNARNITFDACLIQMFLIHFFSMMESGILLAMSFDRYVAICDPLRYATVLTTEVIAAMGLGAAARSFITLFPLPFLIKRLPICRSNVLSHSYCLHPDMMRLACADISINSIYGLFVLVSTFGMDLFFIFLSYVLILRSVMATASREERLKALNTCVSHILAVLAFYVPMIGVSTVHRFGKHVPCYIHVLMSNVYLFVPPVLNPLIYSAKTKEIRRAIFRMFHHIKI",
         "hypothesized": "cheddar-juicy",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "42",
@@ -25961,7 +26690,9 @@
             "6.50": "254",
             "7.50": "289",
             "45.50": "179",
-            "56.50": "230"
+            "56.50": "230",
+            "34.50": "129",
+            "8.50": "303"
         },
         "insertion":
         [
@@ -26038,7 +26769,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "132",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -26106,7 +26839,7 @@
         "uniprot_id": "Q8NGJ5",
         "sequence": "MGDWNNSDAVEPIFILRGFPGLEYVHSWLSILFCLAYLVAFMGNVTILSVIWIESSLHQPMYYFISILAVNDLGMSLSTLPTMLAVLWLDAPEIQASACYAQLFFIHTFTFLESSVLLAMAFDRFVAICHPLHYPTILTNSVIGKIGLACLLRSLGVVLPTPLLLRHYHYCHGNALSHAFCLHQDVLRLSCTDARTNSIYGLCVVIATLGVDSIFILLSYVLILNTVLDIASREEQLKALNTCVSHICVVLIFFVPVIGVSMVHRFGKHLSPIVHILMADIYLLLPPVLNPIVYSVRTKQIRLGILHKFVLRRRF",
         "hypothesized": "syrupy",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "44",
@@ -26117,7 +26850,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -26181,18 +26916,20 @@
     {
         "id": "OR51M1",
         "uniprot_id": "Q9H341",
-        "sequence": "MLLSNITQFSPIFYLTSFPGLEGIKHWIFIPFFFMYMVAISGNCFILIIIKTNPRLHTPMYYLLSLLALTDLGLCVSTLPTTMGIFWFNSHSIYFGACQIQMFCIHSFSFMESSVLLMMSFDRLVAICHPLRYSVIITGQQVVRAGLIVIFRGPVATIPIVLLLKAFPYCGSVVLSHSFCLHQEVIQLACTDITFNNLYGLMVVVFTVMLDLVLIALSYGLILHTVAGLASQEEQRRAFQTCTAHLCAVLVFFVPMMGLSLVHRFGKHAPPAIHLLMANVYLFVPPMLNPIIYSIKTKEIHRAIIKFLGLKKASK",
+        "sequence": "MSVQYSLSPQFMLLSNITQFSPIFYLTSFPGLEGIKHWIFIPFFFMYMVAISGNCFILIIIKTNPRLHTPMYYLLSLLALTDLGLCVSTLPTTMGIFWFNSHSIYFGACQIQMFCIHSFSFMESSVLLMMSFDRLVAICHPLRYSVIITGQQVVRAGLIVIFRGPVATIPIVLLLKAFPYCGSVVLSHSFCLHQEVIQLACTDITFNNLYGLMVVVFTVMLDLVLIALSYGLILHTVAGLASQEEQRRAFQTCTAHLCAVLVFFVPMMGLSLVHRFGKHAPPAIHLLMANVYLFVPPMLNPIIYSIKTKEIHRAIIKFLGLKKASK",
         "bw":
         {
-            "1.50": "43",
-            "2.50": "71",
-            "3.50": "123",
-            "4.50": "150",
-            "5.50": "211",
-            "6.50": "255",
-            "7.50": "290",
-            "45.50": "180",
-            "56.50": "231"
+            "1.50": "54",
+            "2.50": "82",
+            "3.50": "134",
+            "4.50": "161",
+            "5.50": "222",
+            "6.50": "266",
+            "7.50": "301",
+            "45.50": "191",
+            "56.50": "242",
+            "34.50": "141",
+            "8.50": "315"
         },
         "insertion":
         [
@@ -26267,7 +27004,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -26342,7 +27081,9 @@
             "6.50": "261",
             "7.50": "296",
             "45.50": "187",
-            "56.50": "237"
+            "56.50": "237",
+            "34.50": "137",
+            "8.50": "310"
         },
         "insertion":
         [
@@ -26421,7 +27162,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -26496,7 +27239,9 @@
             "6.50": "263",
             "7.50": "298",
             "45.50": "188",
-            "56.50": "239"
+            "56.50": "239",
+            "34.50": "138",
+            "8.50": "312"
         },
         "insertion":
         [
@@ -26571,7 +27316,9 @@
             "6.50": "257",
             "7.50": "292",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "131",
+            "8.50": "306"
         },
         "insertion":
         [
@@ -26646,7 +27393,8 @@
             "6.50": "259",
             "7.50": "293",
             "45.50": "184",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "133"
         },
         "insertion":
         [
@@ -26724,7 +27472,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -26800,7 +27550,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -26866,7 +27618,7 @@
         "uniprot_id": "Q9H346",
         "sequence": "MSDSNLSDNHLPDTFFLTGIPGLEAAHFWIAIPFCAMYLVALVGNAALILVIAMDNALHAPMYLFLCLLSLTDLALSSTTVPKMLAILWLHAGEISFGGCLAQMFCVHSIYALESSILLAMAFDRYVAICNPLRYTTILNHAVIGRIGFVGLFRSVAIVSPFIFLLRRLPYCGHRVMTHTYCEHMGIARLACANITVNIVYGLTVALLAMGLDSILIAISYGFILHAVFHLPSHDAQHKALSTCGSHIGIILVFYIPAFFSFLTHRFGHHEVPKHVHIFLANLYVLVPPVLNPILYGARTKEIRSRLLKLLHLGKTSI",
         "hypothesized": "ethereal",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "45",
@@ -26877,7 +27629,9 @@
             "6.50": "257",
             "7.50": "293",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "132",
+            "8.50": "307"
         },
         "insertion":
         [
@@ -26952,7 +27706,9 @@
             "6.50": "255",
             "7.50": "290",
             "45.50": "181",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "131",
+            "8.50": "304"
         },
         "insertion":
         [
@@ -27028,7 +27784,9 @@
             "6.50": "255",
             "7.50": "290",
             "45.50": "181",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "131",
+            "8.50": "304"
         },
         "insertion":
         [
@@ -27104,7 +27862,9 @@
             "6.50": "255",
             "7.50": "290",
             "45.50": "181",
-            "56.50": "231"
+            "56.50": "231",
+            "34.50": "131",
+            "8.50": "304"
         },
         "insertion":
         [
@@ -27180,7 +27940,9 @@
             "6.50": "259",
             "7.50": "294",
             "45.50": "185",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "135",
+            "8.50": "308"
         },
         "insertion":
         [
@@ -27256,7 +28018,9 @@
             "6.50": "262",
             "7.50": "297",
             "45.50": "187",
-            "56.50": "238"
+            "56.50": "238",
+            "34.50": "137",
+            "8.50": "311"
         },
         "insertion":
         [
@@ -27331,7 +28095,9 @@
             "6.50": "284",
             "7.50": "320",
             "45.50": "209",
-            "56.50": "260"
+            "56.50": "260",
+            "34.50": "159",
+            "8.50": "334"
         },
         "insertion":
         [
@@ -27407,7 +28173,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -27483,7 +28251,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -27559,7 +28329,9 @@
             "6.50": "272",
             "7.50": "307",
             "45.50": "197",
-            "56.50": "248"
+            "56.50": "248",
+            "34.50": "147",
+            "8.50": "321"
         },
         "insertion":
         [
@@ -27637,7 +28409,9 @@
             "6.50": "256",
             "7.50": "292",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "306"
         },
         "insertion":
         [
@@ -27712,7 +28486,9 @@
             "6.50": "263",
             "7.50": "299",
             "45.50": "188",
-            "56.50": "239"
+            "56.50": "239",
+            "34.50": "138",
+            "8.50": "313"
         },
         "insertion":
         [
@@ -27788,7 +28564,9 @@
             "6.50": "256",
             "7.50": "291",
             "45.50": "181",
-            "56.50": "232"
+            "56.50": "232",
+            "34.50": "131",
+            "8.50": "305"
         },
         "insertion":
         [
@@ -27863,7 +28641,9 @@
             "6.50": "259",
             "7.50": "295",
             "45.50": "184",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "134",
+            "8.50": "309"
         },
         "insertion":
         [
@@ -27938,7 +28718,9 @@
             "6.50": "261",
             "7.50": "296",
             "45.50": "186",
-            "56.50": "237"
+            "56.50": "237",
+            "34.50": "136",
+            "8.50": "310"
         },
         "insertion":
         [
@@ -28012,7 +28794,9 @@
             "6.50": "258",
             "7.50": "293",
             "45.50": "183",
-            "56.50": "234"
+            "56.50": "234",
+            "34.50": "133",
+            "8.50": "307"
         },
         "deletion":
         [
@@ -28086,7 +28870,9 @@
             "6.50": "257",
             "7.50": "292",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "132",
+            "8.50": "306"
         },
         "insertion":
         [
@@ -28159,7 +28945,9 @@
             "6.50": "257",
             "7.50": "292",
             "45.50": "182",
-            "56.50": "233"
+            "56.50": "233",
+            "34.50": "132",
+            "8.50": "306"
         },
         "insertion":
         [
@@ -28232,7 +29020,9 @@
             "6.50": "263",
             "7.50": "297",
             "45.50": "188",
-            "56.50": "239"
+            "56.50": "239",
+            "34.50": "138",
+            "8.50": "311"
         },
         "insertion":
         [
@@ -28309,7 +29099,9 @@
             "6.50": "263",
             "7.50": "297",
             "45.50": "188",
-            "56.50": "239"
+            "56.50": "239",
+            "34.50": "138",
+            "8.50": "311"
         },
         "insertion":
         [
@@ -28386,7 +29178,9 @@
             "6.50": "260",
             "7.50": "293",
             "45.50": "185",
-            "56.50": "236"
+            "56.50": "236",
+            "34.50": "135",
+            "8.50": "307"
         },
         "insertion":
         [
@@ -28461,7 +29255,9 @@
             "6.50": "266",
             "7.50": "301",
             "45.50": "169",
-            "56.50": "229"
+            "56.50": "229",
+            "34.50": "128",
+            "8.50": "315"
         },
         "insertion":
         [
@@ -28525,7 +29321,9 @@
             "6.50": "277",
             "7.50": "312",
             "45.50": "189",
-            "56.50": "246"
+            "56.50": "246",
+            "34.50": "148",
+            "8.50": "326"
         },
         "deletion":
         [
@@ -28588,7 +29386,7 @@
         "uniprot_id": "O14804",
         "sequence": "MRAVFIQGAEEHPAAFCYQVNGSCPRTVHTLGIQLVIYLACAAGMLIIVLGNVFVAFAVSYFKALHTPTNFLLLSLALADMFLGLLVLPLSTIRSVESCWFFGDFLCRLHTYLDTLFCLTSIFHLCFISIDRHCAICDPLLYPSKFTVRVALRYILAGWGVPAAYTSLFLYTDVVETRLSQWLEEMPCVGSCQLLLNKFWGWLNFPLFFVPCLIMISLYVKIFVVATRQAQQITTLSKSLAGAAKHERKAAKTLGIAVGIYLLCWLPFTIDTMVDSLLHFITPPLVFDIFIWFAYFNSACNPIIYVFSYQWFRKALKLTLSQKVFSPQTRTVDLYQE",
         "hypothesized": "prawny",
-        "hypoth_ref": "http:\/\/www.primaryodors.org/differentials.php",
+        "hypoth_ref": "http:\/\/www.primaryodors.org\/differentials.php",
         "bw":
         {
             "1.50": "52",
@@ -28599,7 +29397,9 @@
             "6.50": "267",
             "7.50": "302",
             "45.50": "180",
-            "56.50": "237"
+            "56.50": "237",
+            "34.50": "139",
+            "8.50": "316"
         },
         "deletion":
         [
@@ -28666,7 +29466,9 @@
             "6.50": "273",
             "7.50": "308",
             "45.50": "178",
-            "56.50": "236"
+            "56.50": "236",
+            "34.50": "137",
+            "8.50": "322"
         },
         "deletion":
         [
@@ -28727,7 +29529,9 @@
             "6.50": "272",
             "7.50": "307",
             "45.50": "177",
-            "56.50": "235"
+            "56.50": "235",
+            "34.50": "136",
+            "8.50": "321"
         },
         "deletion":
         [
@@ -28787,7 +29591,9 @@
             "6.50": "273",
             "7.50": "308",
             "45.50": "178",
-            "56.50": "236"
+            "56.50": "236",
+            "34.50": "137",
+            "8.50": "322"
         },
         "deletion":
         [

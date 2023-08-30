@@ -66,7 +66,7 @@ int main(int argc, char** argv)
     for (i=0; i<n; i++) cout << *sidechain_groups[i] << endl;
     cout << endl;
 
-    std::vector<std::shared_ptr<GroupPair>> pairs = GroupPair::pair_groups(ligand_groups, sidechain_groups, target);
+    std::vector<std::shared_ptr<GroupPair>> pairs = GroupPair::pair_groups(ligand_groups, sidechain_groups, target, 0);
     m.recenter(target);
     GroupPair::align_groups(&m, pairs);
     n = pairs.size();

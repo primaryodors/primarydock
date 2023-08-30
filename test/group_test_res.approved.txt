@@ -1,0 +1,16 @@
+Reach residues:
+Ala1 Ala2 Ala3 Ala4 Ala5 Gln6 Gly7 Ser8 Ala9 Tyr10 Ala11 Ala12 Val13 Leu14 
+
+Sidechain groups:
+residue_group[ Ala1 Ala2 ]
+residue_group[ Ala3 ]
+residue_group[ Gln6 ]
+residue_group[ Gly7 Tyr10 ]
+residue_group[ Ala9 ]
+residue_group[ Ala12 Leu14 ]
+residue_group[ Val13 ]
+
+Group pairs:
+atom_group[ C1 C2 C3 C4 N5 C6 C7 C8 C9 H10 H11 H12 H13 H14 H15 H16 ] ~ residue_group[ Gly7 Tyr10 ]
+atom_group[ N5 H12 ] ~ residue_group[ Gln6 ]
+

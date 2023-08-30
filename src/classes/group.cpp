@@ -131,12 +131,21 @@ float AtomGroup::hydrophilicity()
 {
     int atct = atoms.size();
     if (!atct) return 0;
-    int i, j=0;
+    int i, j=0, num_heavy_atoms;
     float result = 0, divisor = 0;
+
+    num_heavy_atoms = 0;
+    for (i=0; i<atct; i++) if (atoms[i]->get_Z() > 1) num_heavy_atoms++;
+
     for (i=0; i<atct; i++)
     {
         if (atoms[i]->get_Z() == 1) continue;
         float h = fabs(atoms[i]->is_polar());
+        if (num_heavy_atoms == 1 && atoms[i]->is_pi())
+        {
+            int f = atoms[i]->get_family();
+            if (f == PNICTOGEN || f == CHALCOGEN) h = 1;
+        }
         if (h > 0.333)
         {
             result += h;
@@ -956,7 +965,7 @@ float GroupPair::get_potential()
     }
 }
 
-std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::shared_ptr<AtomGroup>> ag, std::vector<std::shared_ptr<ResidueGroup>> scg, Point pcen)
+std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::shared_ptr<AtomGroup>> ag, std::vector<std::shared_ptr<ResidueGroup>> scg, Point pcen, float rel_stoch)
 {
     std::vector<std::shared_ptr<GroupPair>> retval;
 
@@ -982,7 +991,13 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
             pair.scg = scg[j];
             pair.pocketcen = pcen;
 
-            float p1 = pair.get_potential() * frand(1.0-best_binding_stochastic, 1.0+best_binding_stochastic);
+            // Debug trap.
+            if (ag[i]->atoms[0]->get_family() == PNICTOGEN && scg[j]->aminos[0]->get_residue_no() == 6)
+            {
+                l = n;
+            }
+
+            float p1 = pair.get_potential() * frand(1.0-best_binding_stochastic*rel_stoch, 1.0+best_binding_stochastic*rel_stoch);
 
             int r = retval.size();
             for (l=0; l<r; l++)

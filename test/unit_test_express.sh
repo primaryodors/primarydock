@@ -265,3 +265,12 @@ else
     printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
     diff --color --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt
 fi
+
+test/group_test_res | sed '/^#/d' > test/received/group_test_res.received.txt
+RESULT=$(diff --unified test/group_test_res.approved.txt test/received/group_test_res.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Residue group test succeeded.${NC}\n"
+else
+    printf "${RED}Residue group test FAILED.${NC}\n"
+    diff --color --unified test/group_test_res.approved.txt test/received/group_test_res.received.txt
+fi

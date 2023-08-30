@@ -2,7 +2,7 @@
 Searching for motifs...
 Found MRENNQSSTL motif at 1
 Found HTPMYFFL motif at 56
-Found PKML motif at 196
+Found PKML motif at 79
 Found MAYDRYVAICXPLXY motif at 118
 Found HFFCD motif at 176
 Found GRXKAFSTCASHLXVV motif at 232

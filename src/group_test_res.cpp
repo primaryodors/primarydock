@@ -53,12 +53,13 @@ int main(int argc, char** argv)
 
     Point size(9,9,9);
     int sphres = p.get_residues_can_clash_ligand(reach_residues, &m, target, size, nullptr);
-    cout << "Reach residues:" << endl;
+    cout << "# Reach residues:" << endl;
+    cout << "# ";
     for (i=0; i<sphres; i++)
     {
         cout << *reach_residues[i] << " ";
     }
-    cout << endl << endl;
+    cout << endl << "# " << endl;
 
     std::vector<std::shared_ptr<ResidueGroup>> sidechain_groups = ResidueGroup::get_potential_side_chain_groups(reach_residues, target);
     n = sidechain_groups.size();

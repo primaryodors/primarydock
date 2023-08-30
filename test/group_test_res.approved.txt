@@ -1,6 +1,3 @@
-Reach residues:
-Ala1 Ala2 Ala3 Ala4 Ala5 Gln6 Gly7 Ser8 Ala9 Tyr10 Ala11 Ala12 Val13 Leu14 
-
 Sidechain groups:
 residue_group[ Ala1 Ala2 ]
 residue_group[ Ala3 ]

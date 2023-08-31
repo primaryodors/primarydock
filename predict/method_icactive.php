@@ -18,7 +18,7 @@ $binding_pockets = json_decode(file_get_contents("../data/binding_pocket.json"),
 
 prepare_outputs();
 
-$size = "5.0 6.5 5.0";
+$size = "5.0 6.0 5.0";
 
 if (substr($fam, 0, 2) == "OR")
 {

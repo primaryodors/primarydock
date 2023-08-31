@@ -88,11 +88,14 @@ application that is used for the Primary Odors website.
 
 ![Web app screenshot](www/assets/webapp.png?raw=true "Web App")
 
-To enable the web app, either set up a local web server or checkout primarydock in a folder on a web host. Make sure your server has the 
-`php` and `php-gd` packages installed. Then open the `www/symlink.sh` file in a text editor, make sure the destination folder is correct (by 
-default it will show `/var/www/html/` which is usually correct for Apache2 installations), make sure you have write permissions in the 
-folder (or use `sudo`), and execute `www/symlink.sh` in a command line. If on a local server, you will now have an instance of the web app 
-at http://127.0.0.1/primarydock/ whereas if you are using a web host then you may have to configure your hosting to point one of your 
-registered domains or subfolders to the `primarydock/www` folder.
+To enable the web app:
+- Either set up a local web server or checkout primarydock in a folder on a web host.
+- Make sure your server has the `php`, `php-curl`, and `php-gd` packages installed.
+- Then open the `www/symlink.sh` file in a text editor, make sure the destination folder is correct (by default it will show `/var/www/html/`
+  which is usually correct for Apache2 installations), make sure you have write permissions in the 
+  folder (or use `sudo`), and execute `www/symlink.sh` in a command line.
+- The `www/assets` folder and all contents must also be recursively made writable by the web user.
+- If on a local server, you will now have an instance of the web app at http://127.0.0.1/primarydock/ whereas if you are using a web host
+  then you may have to configure your hosting to point one of your registered domains or subfolders to the `primarydock/www` folder.
 
 If you get a 403 Forbidden error, please make sure that every containing folder of the `primarydock/www` folder has public execute access.

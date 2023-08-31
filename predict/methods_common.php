@@ -285,7 +285,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             else if ($coldiv[0] == 'Total' && !$node)
             {
                 $e = -floatval($coldiv[1]);
-                if ($e < 1) $e = 1.0 / abs(log(abs($e)));
+                if ($e < 1) $e = 0; // 1.0 / abs(log(abs($e)));
                 $weight[$pose] = $e;
             }
         }
@@ -342,7 +342,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                 }
                 if ($coldiv[0] == "Total")
                 {
-                    if (isset($metrics_to_process[$mode]))
+                    if (isset($metrics_to_process[$mode]) && floatval($coldiv[1]) < 0)
                     {
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;

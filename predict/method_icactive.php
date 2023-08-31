@@ -114,6 +114,7 @@ LIG sdf/$ligname.sdf
 
 $cenres_inactive
 SIZE $size
+# H2O 5
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
@@ -151,6 +152,7 @@ LIG sdf/$ligname.sdf
 
 $cenres_active
 SIZE $size
+# H2O 5
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 

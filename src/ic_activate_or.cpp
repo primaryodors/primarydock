@@ -177,6 +177,7 @@ int main(int argc, char** argv)
 
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
+        /*
         for (i=0; i<10; i++)
         {
             b = aa6x55->get_atom("CA")->get_bond_between(aa6x55->get_atom("CB"));
@@ -186,11 +187,15 @@ int main(int argc, char** argv)
             b->can_rotate = bcr;
             // if (i & 1) continue;
             b = aa6x55->get_atom("CB")->get_bond_between(aa6x55->get_atom("CG"));
-            bcr = b->can_rotate;
+            // bcr = b->can_rotate;
             b->can_rotate = false;
             p.bridge(n6x55, n45x51);
-            b->can_rotate = bcr;
+            // b->can_rotate = bcr;
         }
+        */
+        b = aa6x55->get_atom("CB")->get_bond_between(aa6x55->get_atom("CG"));
+        b->can_rotate = false;
+        p.bridge(n6x55, n45x51);
 
         // In OR8H1, F3.32 impinges on where this bridge would form, so it would be more sterically favorable to first point
         // 6.55's EXTENT toward 45.53's CA and then make the bridge. Since this depends on the exact positioning of atoms around the

@@ -18,20 +18,23 @@ $binding_pockets = json_decode(file_get_contents("../data/binding_pocket.json"),
 
 prepare_outputs();
 
+$size = "5.0 6.5 5.0";
+
 if (substr($fam, 0, 2) == "OR")
 {
     $sub = intval(substr($fam, 2));
 
-    if (isset($binding_pockets[$protid]))
+    if (isset($binding_pockets[$protid]["pocket"]))
     {
-        $cenres_active = $cenres_inactive = "CEN RES {$binding_pockets[$protid]}";
+        $cenres_active = $cenres_inactive = "CEN RES {$binding_pockets[$protid]["pocket"]}";
+        if (isset($binding_pockets[$protid]["size"])) $size = $binding_pockets[$protid]["size"];
     }
-    else if ($sub >= 50)
+    /*else if ($sub >= 50)
     {
         // https://doi.org/10.1101/2022.12.20.520951
         $cenres_active = "CEN RES 4.57 4.60 5.39 45.52 6.59";
         $cenres_inactive = "CEN RES 4.57 4.60 5.39 45.52";
-    }
+    }*/
     else
     {
         $cenres_active = $cenres_inactive = "CEN RES 3.37 5.47 6.55 7.41";
@@ -110,7 +113,7 @@ PROT $pdbfname
 LIG sdf/$ligname.sdf
 
 $cenres_inactive
-SIZE 7.0 7.0 7.0
+SIZE $size
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
@@ -134,7 +137,7 @@ chdir("..");
 if (!file_exists("output/$fam")) mkdir("output/$fam");
 if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
 
-process_dock("i");
+if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 
 $pdbfname = $pdbfname_active;
@@ -147,7 +150,7 @@ PROT $pdbfname
 LIG sdf/$ligname.sdf
 
 $cenres_active
-SIZE 7.0 7.0 7.0
+SIZE $size
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 

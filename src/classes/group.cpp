@@ -1033,7 +1033,7 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         sdirty[j1] = true;
 
         #if _dbg_groupsel
-        cout << "Strongest match for " << *ag[i] << " is " << *scg[j1] << endl;
+        cout << "Strongest match for " << *ag[i] << " is " << *scg[j1] << " with potential " << p << endl;
         #endif
         
         bool added = false;

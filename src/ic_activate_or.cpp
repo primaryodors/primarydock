@@ -132,6 +132,9 @@ int main(int argc, char** argv)
     Pose pose6x55;
     bool preserve6x55 = false;
 
+    Bond* b;
+    bool bcr;
+
 
     // If there is an R at position 6.59, perform a slight helix unwind and bring 6.59's side chain inward.
     DynamicMotion unwind6(&p);
@@ -174,7 +177,20 @@ int main(int argc, char** argv)
 
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
-        p.bridge(n6x55, n45x51);
+        for (i=0; i<10; i++)
+        {
+            b = aa6x55->get_atom("CA")->get_bond_between(aa6x55->get_atom("CB"));
+            bcr = b->can_rotate;
+            b->can_rotate = false;
+            aa6x55->conform_atom_to_location("HE1", Point(0,1000,0));
+            b->can_rotate = bcr;
+            // if (i & 1) continue;
+            b = aa6x55->get_atom("CB")->get_bond_between(aa6x55->get_atom("CG"));
+            bcr = b->can_rotate;
+            b->can_rotate = false;
+            p.bridge(n6x55, n45x51);
+            b->can_rotate = bcr;
+        }
 
         // In OR8H1, F3.32 impinges on where this bridge would form, so it would be more sterically favorable to first point
         // 6.55's EXTENT toward 45.53's CA and then make the bridge. Since this depends on the exact positioning of atoms around the

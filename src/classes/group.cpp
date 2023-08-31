@@ -302,6 +302,21 @@ float ResidueGroup::distance_to(Point pt)
     return pt.get_3d_distance(get_center());
 }
 
+float ResidueGroup::pi_stackability()
+{
+    int amsz = aminos.size();
+    if (!amsz) return 0;
+    float result = 0;
+    int i;
+    for (i=0; i<amsz; i++)
+    {
+        result += aminos[i]->pi_stackability(false);
+    }
+
+    result /= amsz;
+    return result;
+}
+
 float ResidueGroup::hydrophilicity()
 {
     int amsz = aminos.size();
@@ -880,6 +895,16 @@ std::ostream& operator<<(std::ostream& os, const ResidueGroup& scg)
     return os;
 }
 
+float GroupPair::get_weighted_potential()
+{
+    float f = get_potential();
+
+    if (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff && fabs(scg->hydrophilicity()) >= hydrophilicity_cutoff) f *= 25;
+    else if ((ag->get_pi()/ag->atoms.size()) >= 0.25 && scg->pi_stackability() > 0.25 ) f *= 7;
+
+    return f;
+}
+
 float GroupPair::get_potential()
 {
     if (potential) return potential;
@@ -888,8 +913,8 @@ float GroupPair::get_potential()
         int m = ag->atoms.size(), n = scg->aminos.size();
         if (!m || !n) return 0;
 
-        bool polar_atoms = (fabs(ag->hydrophilicity()) >= 0.25);
-        bool polar_res   = (fabs(scg->hydrophilicity()) >= 0.2);
+        bool polar_atoms = (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff);
+        bool polar_res   = (fabs(scg->hydrophilicity()) >= hydrophilicity_cutoff);
 
         if (polar_atoms != polar_res) return 0;
 
@@ -991,12 +1016,6 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
             pair.scg = scg[j];
             pair.pocketcen = pcen;
 
-            // Debug trap.
-            if (ag[i]->atoms[0]->get_family() == PNICTOGEN && scg[j]->aminos[0]->get_residue_no() == 6)
-            {
-                l = n;
-            }
-
             float p1 = pair.get_potential() * frand(1.0-best_binding_stochastic*rel_stoch, 1.0+best_binding_stochastic*rel_stoch);
 
             int r = retval.size();
@@ -1028,12 +1047,15 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         std::shared_ptr<GroupPair> pair(new GroupPair());
         pair->ag = ag[i];
         pair->scg = scg[j1];
+        pair->get_potential();          // Determines priority.
 
         adirty[i] = true;
         sdirty[j1] = true;
 
         #if _dbg_groupsel
-        cout << "Strongest match for " << *ag[i] << " is " << *scg[j1] << " with potential " << p << endl;
+        cout << "Strongest match for " << *ag[i] << " is " << *scg[j1] << " with potential " << p;
+        if (pair->is_priority()) cout << " and priority";
+        cout << "." << endl;
         #endif
         
         bool added = false;
@@ -1052,7 +1074,7 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
                     (
                         pair->priority == retval[l]->priority
                         &&
-                        pair->get_potential() > retval[l]->get_potential()
+                        pair->get_weighted_potential() > retval[l]->get_weighted_potential()
                     )
                     ||
                     (pair->priority && !retval[l]->priority)
@@ -1080,7 +1102,7 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         }
     }
 
-    #if _dbg_groupsel
+    #if _dbg_groupsel || _show_final_group_pairs
     cout << endl << endl << "Final pair assignments:" << endl;
     for (i=0; i<retval.size(); i++)
     {

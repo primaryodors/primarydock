@@ -93,8 +93,6 @@
 
 #define PROT_MAX_RGN 40
 
-#define AMINOACID_HYDROPHILICITY_THRESHOLD 0.2
-
 // Torsion angles for various helices and for beta strands.
 #define ALPHA_PHI fiftyseventh*-57.8
 #define ALPHA_PSI fiftyseventh*-47.0
@@ -332,6 +330,7 @@
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
 #define _dbg_groupsel 0
+#define _show_final_group_pairs 0
 #define _dbg_polsat 0
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0

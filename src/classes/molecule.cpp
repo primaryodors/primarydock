@@ -2200,6 +2200,23 @@ bool Molecule::shielded(Atom* a, Atom* b) const
     return false;
 }
 
+float Molecule::pi_stackability(bool ib)
+{
+    if (noAtoms(atoms)) return 0;
+    int i, j=0;
+    float result = 0;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (!ib && atoms[i]->is_backbone) continue;
+        if (atoms[i]->is_pi()) result += 1;
+        j++;
+    }
+
+    if (j) result /= j;
+    return result;
+}
+
 float Molecule::get_atom_mol_bind_potential(Atom* a)
 {
     if (noAtoms(atoms)) return 0;

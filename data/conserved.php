@@ -59,7 +59,12 @@ foreach ($lines as $ln)
     {
         $lookfor = "TMR" . substr($rgno, 0, 1);
         $j = strpos($ln, $lookfor);
-        if ($j < 15) die("Unknown region $rgno.\n");
+        if (!$j)
+        {
+            $lookfor = "HXR" . substr($rgno, 0, 1);
+            $j = strpos($ln, $lookfor);
+        }
+        if ($j < 15) continue; // die("Unknown region $rgno.\n");
 
         if ($rgno < 10)
         {

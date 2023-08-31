@@ -2231,7 +2231,7 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
         {
             float partial;
 
-            if (hydro > 0.333 && ifs[j]->get_type() == vdW) continue;
+            if (hydro > hydrophilicity_cutoff && ifs[j]->get_type() == vdW) continue;
 
             if (ifs[j]->get_type() == ionic)
             {

@@ -204,3 +204,73 @@ else
     printf "${RED}Rotatable bond test FAILED for $MOLECULE.${NC}\n"
     diff --color --unified test/brot.$MOLECULE.approved.txt test/received/brot.$MOLECULE.received.txt
 fi
+
+
+MOLECULE="phenethyl_alcohol"
+test/group_test_mol "c1ccccc1CCO" | sed '/^#/d' > test/received/groups.$MOLECULE.received.txt
+RESULT=$(diff --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt
+fi
+
+MOLECULE="indole"
+test/group_test_mol "C12=C(C=CN2)C=CC=C1" | sed '/^#/d' > test/received/groups.$MOLECULE.received.txt
+RESULT=$(diff --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt
+fi
+
+MOLECULE="pyrazine"
+test/group_test_mol "n1ccncc1" | sed '/^#/d' > test/received/groups.$MOLECULE.received.txt
+RESULT=$(diff --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt
+fi
+
+MOLECULE="cinnamaldehyde"
+test/group_test_mol "c1ccccc1C=CC=O" | sed '/^#/d' > test/received/groups.$MOLECULE.received.txt
+RESULT=$(diff --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt
+fi
+
+MOLECULE="arabinose"
+test/group_test_mol "C1[C@@H]([C@@H]([C@H](C(O1)O)O)O)O" | sed '/^#/d' > test/received/groups.$MOLECULE.received.txt
+RESULT=$(diff --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt
+fi
+
+MOLECULE="adenosine"
+test/group_test_mol "n2c1c(ncnc1n(c2)[C@@H]3O[C@@H]([C@@H](O)[C@H]3O)CO)N" | sed '/^#/d' > test/received/groups.$MOLECULE.received.txt
+RESULT=$(diff --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified test/groups.$MOLECULE.approved.txt test/received/groups.$MOLECULE.received.txt
+fi
+
+test/group_test_res | sed '/^#/d' > test/received/group_test_res.received.txt
+RESULT=$(diff --unified test/group_test_res.approved.txt test/received/group_test_res.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Residue group test succeeded.${NC}\n"
+else
+    printf "${RED}Residue group test FAILED.${NC}\n"
+    diff --color --unified test/group_test_res.approved.txt test/received/group_test_res.received.txt
+fi

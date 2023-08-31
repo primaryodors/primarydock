@@ -48,6 +48,7 @@ class AtomGroup
     float average_similarity(AtomGroup* compare_with);
     float hydrophilicity();
 
+    int heavy_atom_count();
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol);
 
     protected:
@@ -80,7 +81,7 @@ class GroupPair
     float get_potential();
     bool is_priority() { return priority; }
 
-    static std::vector<std::shared_ptr<GroupPair>> pair_groups(std::vector<std::shared_ptr<AtomGroup>> agroups, std::vector<std::shared_ptr<ResidueGroup>> scgroups, Point pocketcen);
+    static std::vector<std::shared_ptr<GroupPair>> pair_groups(std::vector<std::shared_ptr<AtomGroup>> agroups, std::vector<std::shared_ptr<ResidueGroup>> scgroups, Point pocketcen, float rel_stochasticity = 1);
     static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);
     static void align_groups_noconform(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);
     static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs, bool do_conforms);    // Assumes the ligand is already centered in the pocket.

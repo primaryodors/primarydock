@@ -63,7 +63,9 @@ float AtomGroup::get_polarity()
     float result = 0;
     for (i=0; i<atct; i++)
     {
-        result += fabs(atoms[i]->is_polar());
+        if (atoms[i]->get_family() == CHALCOGEN) result += 1;
+        else if (atoms[i]->get_family() == PNICTOGEN) result += 1;
+        else result += fabs(atoms[i]->is_polar());
     }
     return result;
 }
@@ -129,13 +131,22 @@ float AtomGroup::hydrophilicity()
 {
     int atct = atoms.size();
     if (!atct) return 0;
-    int i, j=0;
+    int i, j=0, num_heavy_atoms;
     float result = 0, divisor = 0;
+
+    num_heavy_atoms = 0;
+    for (i=0; i<atct; i++) if (atoms[i]->get_Z() > 1) num_heavy_atoms++;
+
     for (i=0; i<atct; i++)
     {
         if (atoms[i]->get_Z() == 1) continue;
         float h = fabs(atoms[i]->is_polar());
-        if (h > 0.333)
+        if (num_heavy_atoms == 1 && atoms[i]->is_pi())
+        {
+            int f = atoms[i]->get_family();
+            if (f == PNICTOGEN || f == CHALCOGEN) h = 1;
+        }
+        if (h > hydrophilicity_cutoff)
         {
             result += h;
             divisor += 1;
@@ -223,7 +234,7 @@ float AtomGroup::compatibility(AminoAcid* aa)
     }
     else
     {
-        if ((lgh / atct) > 0.33333) return 0;
+        if ((lgh / atct) > hydrophilicity_cutoff) return 0;
     }
 
     if (lgh)
@@ -236,7 +247,7 @@ float AtomGroup::compatibility(AminoAcid* aa)
             if (atct)
             for (i=0; i<atct; i++)
             {
-                if (atoms[i]->is_polar() < 0.333) lgh++;
+                if (atoms[i]->is_polar() < hydrophilicity_cutoff) lgh++;
             }
         }
         else if (!aa->has_hbond_donors())
@@ -245,7 +256,7 @@ float AtomGroup::compatibility(AminoAcid* aa)
             if (atct)
             for (i=0; i<atct; i++)
             {
-                if (atoms[i]->is_polar() > 0.333) lgh++;
+                if (atoms[i]->is_polar() > hydrophilicity_cutoff) lgh++;
             }
         }
     }
@@ -425,6 +436,18 @@ bool AtomGroup::is_bonded_to(Atom* a)
     return false;
 }
 
+int AtomGroup::heavy_atom_count()
+{
+    int i, n = atoms.size(), result = 0;
+
+    for (i=0; i<n; i++)
+    {
+        if (atoms[i]->get_Z() > 2) result++;
+    }
+
+    return result;
+}
+
 std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(Molecule* mol)
 {
     std::vector<std::shared_ptr<AtomGroup>> retval;
@@ -491,7 +514,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
             // In general, aliphatics and nonpolar aromatics can be regarded as high similarity, since they tend to
             // be mutually highly soluble in one another. But for grouping of ligand atoms, it is important to
-            if (simil >= 0.5)
+            if (simil >= 0.5 || (b->get_Z() == 1 && g->is_bonded_to(b)))
             {
                 if (aliphatic < 3 || b->get_Z() == 1)
                 {
@@ -594,6 +617,33 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         }
                     }
                 }
+            }
+        }
+    }
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = mol->get_atom(i);
+        if (a->is_pi())
+        {
+            int fam = a->get_family();
+            if (fam == CHALCOGEN || fam == PNICTOGEN)
+            {
+                std::shared_ptr<AtomGroup> g(new AtomGroup());
+                g->ligand = mol;
+                g->atoms.push_back(a);
+                
+                Bond** b = a->get_bonds();
+                for (j=0; b[j] && b[j]->btom; j++)
+                {
+                    if (b[j]->btom->get_Z() == 1) g->atoms.push_back(b[j]->btom);
+                }
+                
+                retval.push_back(g);
+
+                #if _dbg_groupsel
+                cout << "Creating group " << *g << endl << endl;
+                #endif
             }
         }
     }
@@ -769,7 +819,7 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
             }
 
             float simil = aa->similarity_to(bb);
-            if (simil >= 0.333)
+            if (simil >= hydrophilicity_cutoff)
             {
                 g->aminos.push_back(bb);
                 dirty[j] = true;
@@ -869,14 +919,14 @@ float GroupPair::get_potential()
                         cout << "Aldehyde-base potential for " << *a << "..." << *aa << " = " << partial << endl;
                         #endif
                     }
-                    else if (fabs(a->is_polar()) > 0.333 && aa->is_tyrosine_like())
+                    else if (fabs(a->is_polar()) > hydrophilicity_cutoff && aa->is_tyrosine_like())
                     {
                         partial /= 3;
                         #if _dbg_groupsel
                         cout << *a << " is polar and " << *aa << " is tyrosine-like." << endl;
                         #endif
                     }
-                    else if (fabs(a->is_polar()) > 0.333 && fabs(aa->hydrophilicity()) < 0.333)
+                    else if (fabs(a->is_polar()) > hydrophilicity_cutoff && fabs(aa->hydrophilicity()) < hydrophilicity_cutoff)
                     {
                         partial /= 3;
                         #if _dbg_groupsel
@@ -915,7 +965,7 @@ float GroupPair::get_potential()
     }
 }
 
-std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::shared_ptr<AtomGroup>> ag, std::vector<std::shared_ptr<ResidueGroup>> scg, Point pcen)
+std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::shared_ptr<AtomGroup>> ag, std::vector<std::shared_ptr<ResidueGroup>> scg, Point pcen, float rel_stoch)
 {
     std::vector<std::shared_ptr<GroupPair>> retval;
 
@@ -941,7 +991,13 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
             pair.scg = scg[j];
             pair.pocketcen = pcen;
 
-            float p1 = pair.get_potential() * frand(1.0-best_binding_stochastic, 1.0+best_binding_stochastic);
+            // Debug trap.
+            if (ag[i]->atoms[0]->get_family() == PNICTOGEN && scg[j]->aminos[0]->get_residue_no() == 6)
+            {
+                l = n;
+            }
+
+            float p1 = pair.get_potential() * frand(1.0-best_binding_stochastic*rel_stoch, 1.0+best_binding_stochastic*rel_stoch);
 
             int r = retval.size();
             for (l=0; l<r; l++)

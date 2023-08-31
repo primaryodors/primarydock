@@ -548,7 +548,8 @@ var tmcolor =
     4: hsl_to_rgb( 70,  96,  96),
     5: hsl_to_rgb( 60, 255, 176),
     6: hsl_to_rgb( 25, 240, 160),
-    7: hsl_to_rgb(340, 225, 160),
+    7: hsl_to_rgb(355, 175, 120),
+    8: hsl_to_rgb(260,  85,  60),
 };
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
@@ -592,7 +593,7 @@ function resno_from_bw(bwnum)
 function bw_from_resno(resno)
 {
 	var rgnno;
-	for (rgnno = 1; rgnno <= 7; rgnno++)
+	for (rgnno = 1; rgnno <= 8; rgnno++)
 	{
 		if (resno >= tmstart[rgnno] && resno <= tmend[rgnno])
 		{
@@ -696,7 +697,7 @@ function rgn_color(resno, tm_only = false)
 {
 	var i;
 
-    for (i=1; i<=7; i++)
+    for (i=1; i<=8; i++)
     {
         if (resno >= tmstart[i] && resno <= tmend[i]) return tmcolor[i];
         else if (!tm_only && resno < tmstart[i]) return (i&1) ? 0xccddee : 0xcc9966;
@@ -2305,7 +2306,7 @@ else if (protid)
 				if (ln.substr(0, 6) == 'REMARK')
 				{
 					var pieces = ln.split(" ");
-					if (pieces[2] == 'HELIX' && pieces[3].substr(0,3) == 'TMR')
+					if (pieces[2] == 'HELIX' && (pieces[3].substr(0,3) == 'TMR' || pieces[3].substr(0,3) == 'HXR'))
 					{
 						var tmrno = parseInt(pieces[3].substr(-1));
 						tmstart[tmrno] = parseInt(pieces[4]);
@@ -2718,7 +2719,7 @@ function loadFile(fileData, fileName = "")
                 if (ln.substr(0, 7) == "REGION|")
                 {
                     var words = ln.split("|");
-                    if (words[1].substr(0, 3) == "TMR")
+                    if (words[1].substr(0, 3) == "TMR" || words[1].substr(0, 3) == "HXR")
                     {
                         var tmr = parseInt(words[1].substr(3));
                         tmstart[tmr] = parseInt(words[2]);
@@ -2787,7 +2788,7 @@ function loadFile(fileData, fileName = "")
 						if (ln.substr(0, 6) == 'REMARK')
 						{
 							var pieces = ln.split(" ");
-							if (pieces[2] == 'HELIX' && pieces[3].substr(0,3) == 'TMR')
+							if (pieces[2] == 'HELIX' && (pieces[3].substr(0,3) == 'TMR' || pieces[3].substr(0,3) == 'HXR'))
 							{
 								var tmrno = parseInt(pieces[3].substr(-1));
 								tmstart[tmrno] = parseInt(pieces[4]);

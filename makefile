@@ -8,7 +8,7 @@ DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR) $(TMPDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o \
 	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test \
-	  test/group_test_mol test/protein_test test/backbone_test test/bond_rotation_test
+	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_active_pdb $(BINDIR)/ic_activate_or
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
 all: $(DIRS) \
@@ -90,6 +90,9 @@ test/aniso_test: src/aniso_test.cpp $(OBJS)
 
 test/group_test_mol: src/group_test_mol.cpp $(OBJS)
 	$(CC) src/group_test_mol.cpp $(OBJS) -o test/group_test_mol $(CFLAGS)
+
+test/group_test_res: src/group_test_res.cpp $(OBJS)
+	$(CC) src/group_test_res.cpp $(OBJS) -o test/group_test_res $(CFLAGS)
 
 test/mol_assem_test: src/mol_assem_test.cpp $(OBJS)
 	$(CC) src/mol_assem_test.cpp $(OBJS) -o test/mol_assem_test $(CFLAGS)

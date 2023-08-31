@@ -83,6 +83,7 @@ int main(int argc, char** argv)
     AminoAcid *aa45x51 = p.get_residue_bw("45.51");
     AminoAcid *aa45x52 = p.get_residue_bw("45.52");
     AminoAcid *aa45x53 = p.get_residue_bw("45.53");
+    AminoAcid *aa45x54 = p.get_residue_bw("45.54");
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
     AminoAcid *aa5x36 = p.get_residue_bw("5.36");
     AminoAcid *aa5x39 = p.get_residue_bw("5.39");
@@ -110,6 +111,7 @@ int main(int argc, char** argv)
     int n4x53 = aa4x53->get_residue_no();
     int n4x64 = aa4x64->get_residue_no();
     int n45x51 = aa45x51->get_residue_no();
+    int n56x50 = aa56x50->get_residue_no();
     int n6x28 = aa6x28->get_residue_no();
     int n6x48 = aa6x48->get_residue_no();
     int n6x55 = aa6x55->get_residue_no();
@@ -126,6 +128,9 @@ int main(int argc, char** argv)
     char l6x58 = aa6x58->get_letter();
     char l6x59 = aa6x59->get_letter();
     char l7x53 = aa7x53->get_letter();
+
+    Pose pose6x55;
+    bool preserve6x55 = false;
 
 
     // If there is an R at position 6.59, perform a slight helix unwind and bring 6.59's side chain inward.
@@ -179,7 +184,20 @@ int main(int argc, char** argv)
             cout << "3.32 fix for Y6.55 ~ D/E45.51 bridge." << endl;
             aa6x55->movability = MOV_FLEXONLY;
 
-            Point pt = aa45x51->get_CA_location();
+            if (l45x52 == 'S' || l45x52 == 'T' || l45x52 == 'A' || l45x52 == 'G')
+            {
+                cout << "Small 52." << endl;
+                aa6x55->conform_atom_to_location("OH", aa45x54->get_CA_location());
+                p.bridge(n6x55, n45x51);
+                aa6x55->movability = MOV_PINNED;
+                aa45x51->movability = MOV_FLEXONLY;
+                aa45x51->conform_atom_to_location(aa45x51->get_reach_atom()->name, aa6x55->get_atom_location("HH"));
+                aa45x51->movability = MOV_PINNED;
+                preserve6x55 = true;
+                pose6x55.copy_state(aa6x55);
+            }
+
+            /*Point pt = aa45x51->get_CA_location();
             l = 1;
             if (l45x52 == 'S' || l45x52 == 'T')
             {
@@ -208,8 +226,9 @@ int main(int argc, char** argv)
 
             Molecule::conform_molecules(mols, 5);
             // p.bridge(n6x55, n45x51);
-            aa6x55->movability = MOV_PINNED;
+            aa6x55->movability = MOV_PINNED;*/
         }
+
 
         constraints.push_back((std::string)"BRIDGE 6.55 45.51");
         float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));
@@ -266,7 +285,6 @@ int main(int argc, char** argv)
         }
     }
 
-
     // Perform a slight rotation of TMR3 to give TMR5 more room to move.
     
     LocatedVector axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
@@ -305,7 +323,10 @@ int main(int argc, char** argv)
     {
         // Compute the angle to rotate about 6.48 and perform the rotation. Measure how far 56.50 moved; call it TMR6c.
         was = aa56x50->get_CA_location();
-        p.rotate_piece(aa56x50->get_residue_no(), aa6x59->get_residue_no(), aa6x48->get_CA_location(), axis6, theta6);
+        p.rotate_piece(n56x50,
+            (type6 == Swing6) ? n6x55 : n6x59,
+            ((type6 == Swing6) ? aa6x55 : aa6x48)->get_CA_location(),
+            axis6, theta6);
         TMR6c = aa56x50->get_CA_location().subtract(was);
 
         // Compute the axis and angle to rotate TMR5 about 5.50 to match 56.49 to TMR6c, and perform the rotation.
@@ -496,6 +517,9 @@ int main(int argc, char** argv)
     }
 
     // Now save the output file. It will be the same name as the input file except it will end in .active.pdb instead of .upright.pdb.
+    save_and_exit:
+    if (preserve6x55) pose6x55.restore_state(aa6x55);
+
     std::string out_filename = path + orid + (std::string)".active.pdb";
     fp = fopen(out_filename.c_str(), "wb");
     if (!fp) return -3;

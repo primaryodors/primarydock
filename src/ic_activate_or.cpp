@@ -165,7 +165,7 @@ int main(int argc, char** argv)
         unwind6.apply_absolute(1);
 
         aa6x59->conform_atom_to_location("CZ", aa4x60->get_CA_location());
-        constraints.push_back((std::string)"STCR 6.59");
+        // constraints.push_back((std::string)"STCR 6.59");
     }
 
     float theta6 = 0;

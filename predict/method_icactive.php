@@ -14,6 +14,7 @@ $dock_metals = false;
 chdir(__DIR__);
 require("methods_common.php");
 chdir(__DIR__);
+$binding_pockets = json_decode(file_get_contents("../data/binding_pocket.json"), true);
 
 prepare_outputs();
 
@@ -21,7 +22,11 @@ if (substr($fam, 0, 2) == "OR")
 {
     $sub = intval(substr($fam, 2));
 
-    if ($sub >= 50)
+    if (isset($binding_pockets[$protid]))
+    {
+        $cenres_active = $cenres_inactive = "CEN RES {$binding_pockets[$protid]}";
+    }
+    else if ($sub >= 50)
     {
         // https://doi.org/10.1101/2022.12.20.520951
         $cenres_active = "CEN RES 4.57 4.60 5.39 45.52 6.59";

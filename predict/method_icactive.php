@@ -121,6 +121,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 SEARCH BB
 POSE 10
 ELIM 5000
+$flex_constraints
 ITERS 50
 PROGRESS
 

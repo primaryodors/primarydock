@@ -20,32 +20,49 @@ prepare_outputs();
 
 $size = "5.0 6.0 5.0";
 
-if (substr($fam, 0, 2) == "OR")
-{
-    $sub = intval(substr($fam, 2));
+$mbp = false;                       // Matched binding pocket.
 
-    if (isset($binding_pockets[$protid]["pocket"]))
+if (isset($binding_pockets[$protid])) $mbp = $binding_pockets[$protid];
+else foreach ($binding_pockets as $pocketid => $pocket)
+{
+    if (substr($pocketid, -1) == '*' && substr($pocketid, 0, -1) == substr($protid, 0, strlen($pocketid)-1))
     {
-        $cenres_active = $cenres_inactive = "CEN RES {$binding_pockets[$protid]["pocket"]}";
-        if (isset($binding_pockets[$protid]["size"])) $size = $binding_pockets[$protid]["size"];
+        $mbp = $pocket;
+        echo "Matched $pocketid via wildcard.\n";
+        break;
     }
-    /*else if ($sub >= 50)
+    else if (preg_match("/^$pocketid\$/", $protid))
     {
-        // https://doi.org/10.1101/2022.12.20.520951
-        $cenres_active = "CEN RES 4.57 4.60 5.39 45.52 6.59";
-        $cenres_inactive = "CEN RES 4.57 4.60 5.39 45.52";
-    }*/
-    else
+        $mbp = $pocket;
+        echo "Matched $pocketid via regex.\n";
+        break;
+    }
+}
+
+if ($mbp && isset($mbp["size"])) $size = $mbp["size"];
+
+if ($mbp && isset($mbp["pocket"]))
+{
+    $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
+}
+else if ($mbp && isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))
+{
+    $cenres_active = isset($mbp["active_pocket"]);
+    $cenres_inactive = isset($mbp["inactive_pocket"]);
+}
+else
+{
+    if (substr($fam, 0, 2) == "OR")
     {
         $cenres_active = $cenres_inactive = "CEN RES 3.37 5.47 6.55 7.41";
     }
+    else if (substr($fam, 0, 4) == "TAAR")
+    {
+        die("There is not yet an internal contacts activation app for TAARs.\n");
+        $cenres_active = $cenres_inactive = "CEN RES 3.32 3.37 5.43 6.48 7.43";
+    }
+    else die("Unsupported receptor family.\n");
 }
-else if (substr($fam, 0, 4) == "TAAR")
-{
-    die("There is not yet an internal contacts activation app for TAARs.\n");
-    $cenres_active = $cenres_inactive = "CEN RES 3.32 3.37 5.43 6.48 7.43";
-}
-else die("Unsupported receptor family.\n");
 
 $metrics_to_process =
 [

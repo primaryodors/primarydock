@@ -19,6 +19,10 @@ $binding_pockets = json_decode(file_get_contents("../data/binding_pocket.json"),
 prepare_outputs();
 
 $size = "5.0 6.0 5.0";
+$search = "BB";
+$stcr = "";
+$flxr = "";
+$mcoord = "";
 
 $mbp = false;                       // Matched binding pocket.
 
@@ -39,7 +43,14 @@ else foreach ($binding_pockets as $pocketid => $pocket)
     }
 }
 
-if ($mbp && isset($mbp["size"])) $size = $mbp["size"];
+if ($mbp)
+{
+    if (isset($mbp["size"])) $size = $mbp["size"];
+    if (isset($mbp["search"])) $search = $mbp["search"];
+    if (isset($mbp["mcoord"])) $mcoord = "MCOORD {$mbp["mcoord"]}";
+    if (isset($mbp["stcr"])) $stcr = "STCR {$mbp["stcr"]}";
+    if (isset($mbp["flxr"])) $flxr = "FLXR {$mbp["flxr"]}";
+}
 
 if ($mbp && isset($mbp["pocket"]))
 {
@@ -132,10 +143,13 @@ LIG sdf/$ligname.sdf
 $cenres_inactive
 SIZE $size
 # H2O 5
+$mcoord
+$stcr
+$flxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
-SEARCH BB
+SEARCH $search
 POSE 10
 ELIM 5000
 $flex_constraints
@@ -171,10 +185,13 @@ LIG sdf/$ligname.sdf
 $cenres_active
 SIZE $size
 # H2O 5
+$mcoord
+$stcr
+$flxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
-SEARCH BB
+SEARCH $search
 POSE 10
 ELIM 5000
 $flex_constraints

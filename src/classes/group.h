@@ -68,6 +68,7 @@ class ResidueGroup
     float group_reach();
     void conform_to(Molecule* mol);
     float hydrophilicity();
+    float pi_stackability();
 
     static std::vector<std::shared_ptr<ResidueGroup>> get_potential_side_chain_groups(AminoAcid** aalist, Point pocketcen);
 };
@@ -79,6 +80,7 @@ class GroupPair
     std::shared_ptr<ResidueGroup> scg;
 
     float get_potential();
+    float get_weighted_potential();
     bool is_priority() { return priority; }
 
     static std::vector<std::shared_ptr<GroupPair>> pair_groups(std::vector<std::shared_ptr<AtomGroup>> agroups, std::vector<std::shared_ptr<ResidueGroup>> scgroups, Point pocketcen, float rel_stochasticity = 1);

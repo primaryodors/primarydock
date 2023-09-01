@@ -132,6 +132,9 @@ int main(int argc, char** argv)
     Pose pose6x55;
     bool preserve6x55 = false;
 
+    Bond* b;
+    bool bcr;
+
 
     // If there is an R at position 6.59, perform a slight helix unwind and bring 6.59's side chain inward.
     DynamicMotion unwind6(&p);
@@ -165,7 +168,7 @@ int main(int argc, char** argv)
         unwind6.apply_absolute(1);
 
         aa6x59->conform_atom_to_location("CZ", aa4x60->get_CA_location());
-        constraints.push_back((std::string)"STCR 6.59");
+        // constraints.push_back((std::string)"STCR 6.59");
     }
 
     float theta6 = 0;
@@ -174,7 +177,10 @@ int main(int argc, char** argv)
 
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
+        b = aa6x55->get_atom("CB")->get_bond_between(aa6x55->get_atom("CG"));
+        b->can_rotate = false;
         p.bridge(n6x55, n45x51);
+        constraints.push_back((std::string)"STCR 6.55 45.51");
 
         // In OR8H1, F3.32 impinges on where this bridge would form, so it would be more sterically favorable to first point
         // 6.55's EXTENT toward 45.53's CA and then make the bridge. Since this depends on the exact positioning of atoms around the
@@ -196,41 +202,9 @@ int main(int argc, char** argv)
                 preserve6x55 = true;
                 pose6x55.copy_state(aa6x55);
             }
-
-            /*Point pt = aa45x51->get_CA_location();
-            l = 1;
-            if (l45x52 == 'S' || l45x52 == 'T')
-            {
-                pt = pt.add(aa45x52->get_CA_location());
-                l++;
-            }
-            if (l45x53 == 'S' || l45x53 == 'T')
-            {
-                pt = pt.add(aa45x53->get_CA_location());
-                l++;
-            }
-
-            pt.scale(pt.magnitude()/l);
-            aa6x55->conform_atom_to_location("OH", pt);
-
-            aa3x32->movability = MOV_PINNED;
-            aa45x51->movability = MOV_PINNED;
-
-            Molecule* mols[6];
-            mols[0] = aa6x55;
-            mols[1] = aa3x32;
-            mols[2] = aa45x51;
-            mols[3] = aa45x52;
-            mols[4] = aa45x53;
-            mols[5] = nullptr;
-
-            Molecule::conform_molecules(mols, 5);
-            // p.bridge(n6x55, n45x51);
-            aa6x55->movability = MOV_PINNED;*/
         }
 
-
-        constraints.push_back((std::string)"BRIDGE 6.55 45.51");
+        // constraints.push_back((std::string)"BRIDGE 6.55 45.51");
         float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));
 
         if (r <= 3)

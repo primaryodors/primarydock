@@ -105,6 +105,7 @@ public:
     float get_charge() const;
     int is_residue();
     bool is_thiol();
+    float pi_stackability(bool include_backbone = false);
 
     // Spatial functions.
     Point get_barycenter(bool bond_weighted = false) const;

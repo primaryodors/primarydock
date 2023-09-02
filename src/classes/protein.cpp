@@ -314,6 +314,8 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
         }
     }
 
+    last_saved_atom_number = offset;
+
     // Example CONECT syntax:
     // CONECT  487 1056
     if (connections.size())
@@ -3888,6 +3890,8 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
                         + (std::string)" clashes by " + std::to_string(c)
                         + (std::string)" with "
                         + (std::string)aa2->get_3letter() + std::to_string(aa2->get_residue_no());
+                    stop1 = aa1;
+                    stop2 = aa2;
                 }
             }
         }

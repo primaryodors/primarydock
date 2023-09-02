@@ -178,6 +178,9 @@ public:
     LocRotation last_uprighted_A, last_uprighted_B;
     SCoord last_int_clash_dir;
 
+    AminoAcid *stop1, *stop2;
+    int last_saved_atom_number = 0;
+
 protected:
     Atom** ca = nullptr;
     std::string name;

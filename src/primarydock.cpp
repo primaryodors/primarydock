@@ -2230,7 +2230,9 @@ int main(int argc, char** argv)
     #endif
 
     Pose tmp_pdb_residue[poses+1][protein->get_end_resno()+1];
+    Pose tmp_pdb_waters[poses+1][omaxh2o+1];
     Pose tmp_pdb_ligand[poses+1];
+    Point tmp_pdb_metal_locs[poses+1][mtlcoords.size()+1];
 
     if (tplset)
     {
@@ -3657,20 +3659,23 @@ _try_again:
             {
                 protein->get_internal_clashes(1, protein->get_end_resno(), true);
 
-                /*
-                std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(pose) + (std::string)".pdb";
-                FILE* pfpdb = fopen(temp_pdb_fn.c_str(), "w");
-                if (!pfpdb) return -1;
-                protein->set_pdb_chain('A');
-                protein->save_pdb(pfpdb, ligand);
-                protein->end_pdb(pfpdb);
-                fclose(pfpdb);
-                */
                 n = protein->get_end_resno();
                 for (j=1; j <= n; j++)
                 {
                     AminoAcid* aa = protein->get_residue(j);
                     if (aa) tmp_pdb_residue[pose][j].copy_state(aa);
+                }
+                if (waters)
+                {
+                    for (j=0; waters[j]; j++)
+                    {
+                        tmp_pdb_waters[pose][j].copy_state(waters[j]);
+                    }
+                }
+                n = mtlcoords.size();
+                for (j=0; j < n; j++)
+                {
+                    tmp_pdb_metal_locs[pose][j] = mtlcoords[j].mtl->get_location();
                 }
                 tmp_pdb_ligand[pose].copy_state(ligand);
             }
@@ -4315,14 +4320,6 @@ _try_again:
                                 return -1;
                             }
 
-                            /*char pdbbuffer[1024];
-                            size_t bytes_copied;
-                            while (bytes_copied = fread(pdbbuffer, 1, 1024, pftmp))
-                            {
-                                fwrite(pdbbuffer, 1, bytes_copied, pfout);
-                            }
-
-                            fclose(pftmp);*/
 
                             int j1;
                             int n1 = protein->get_end_resno();
@@ -4332,8 +4329,26 @@ _try_again:
                                 if (aa) tmp_pdb_residue[j+1][j1].restore_state(aa);
                             }
                             tmp_pdb_ligand[j+1].restore_state(ligand);
-
                             protein->save_pdb(pfout, ligand);
+
+                            int atno_offset = protein->last_saved_atom_number;
+                            if (waters)
+                            {
+                                for (j1=0; waters[j1]; j1++)
+                                {
+                                    tmp_pdb_waters[pose][j1].restore_state(waters[j1]);
+                                    waters[j1]->save_pdb(pfout, atno_offset);
+                                    atno_offset += waters[j1]->get_atom_count();
+                                }
+                            }
+
+                            n1 = mtlcoords.size();
+                            for (j1=0; j1 < n1; j1++)
+                            {
+                                mtlcoords[j1].mtl->move(tmp_pdb_metal_locs[pose][j1]);
+                                mtlcoords[j1].mtl->save_pdb_line(pfout, ++atno_offset);
+                            }
+
                             protein->end_pdb(pfout);
 
                             fclose(pfout);

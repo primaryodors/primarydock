@@ -2292,6 +2292,7 @@ int main(int argc, char** argv)
     {
         for (i=0; i<mtlcoords.size(); i++)
         {
+            int charge_left = mtlcoords[i].charge;
             Point lpt;
             Molecule** lmc = new Molecule*[mtlcoords[i].coordres.size()+4];
             lmc[0] = new Molecule("lcm");
@@ -2313,7 +2314,7 @@ int main(int argc, char** argv)
                     lpt = lpt.add((Ss && Ss[0]) ? Ss[0]->get_location() : aa->get_barycenter());
 
                     // If cysteine, make thiolate form.
-                    if (aa->is_thiol())
+                    if (aa->is_thiol() && charge_left)
                     {
                         if (Ss)
                         {
@@ -2323,6 +2324,7 @@ int main(int argc, char** argv)
                             {
                                 aa->delete_atom(H);
                                 S->increment_charge(-1);
+                                charge_left--;
                             }
                         }
                     }

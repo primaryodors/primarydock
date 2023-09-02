@@ -2288,7 +2288,7 @@ int main(int argc, char** argv)
         fclose(pf);
     }
 
-    int l;
+    int l, j1, i2;
 
     if (mtlcoords.size())
     {
@@ -2350,6 +2350,27 @@ int main(int argc, char** argv)
             lmtl->residue = 0;
 
             Molecule::conform_molecules(lmc, 50);
+
+            AminoAcid* can_reach_metal[256];
+            int num_can_reach = protein->get_residues_can_clash_ligand(can_reach_metal, lmc[0], lmtl->get_location(), Point(2.5,2.5,2.5), nullptr);
+            for (j1=0; j1<num_can_reach; j1++)
+            {
+                bool found = false;
+                for (i2=0; i2<mtlcoords[i].coordres.size(); i2++)
+                {
+                    if (mtlcoords[i].coordres[i2].resno == can_reach_metal[j1]->get_residue_no()) found = true;
+                }
+                if (found) continue;
+
+                Atom* a = can_reach_metal[j1]->get_nearest_atom(lmtl->get_location());
+                float r = a->distance_to(lmtl);
+                if (r <= lmtl->get_vdW_radius())
+                {
+                    SCoord to_move = lmtl->get_location().subtract(a->get_location());
+                    to_move.r = lmtl->get_vdW_radius() - r;
+                    lmtl->move_rel(&to_move);
+                }
+            }
 
             for (j=0; j<mtlcoords[i].coordres.size(); j++)
             {

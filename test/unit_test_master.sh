@@ -5,7 +5,7 @@ GRN="\033[38;5;46m"
 NC="\033[0m"
 
 cd "$(dirname "$0")"
-if [ ! -f "received" ]; then mkdir -p "received"; fi
+if [ ! -f "../testdata/received" ]; then mkdir -p "../testdata/received"; fi
 cd ..
 
 clear

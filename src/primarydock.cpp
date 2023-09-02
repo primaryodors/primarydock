@@ -2505,7 +2505,7 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
 
-    std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand);
+    std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
 
     m.minimize_internal_clashes();
 

@@ -2372,6 +2372,7 @@ int main(int argc, char** argv)
                     lmtl->move_rel(&to_move);
                 }
             }
+            Molecule::conform_molecules(lmc, 50);
 
             for (j=0; j<mtlcoords[i].coordres.size(); j++)
             {

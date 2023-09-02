@@ -169,10 +169,10 @@ int main(int argc, char** argv)
         aa6x53->get_atom("CA")->get_bond_between(aa6x53->get_atom("CB"))->rotate(60*fiftyseventh);
         // aa6x54->conform_atom_to_location(aa6x54->get_reach_atom()->name, aa45x51->get_CA_location());
 
-        unwind6.start_resno.from_string("6.55");
-        unwind6.end_resno.from_string("6.59");
+        unwind6.start_resno.from_string("6.54");
+        unwind6.end_resno.from_string("6.55");
         unwind6.type = dyn_wind;
-        unwind6.bias = -50;
+        unwind6.bias = -60;
         unwind6.apply_absolute(1);
 
         pt_tmp = aa1x32->get_CA_location();
@@ -182,7 +182,7 @@ int main(int argc, char** argv)
         axis7 = compute_normal(aa7x41->get_CA_location(), aa7x31->get_CA_location(), pt_tmp);
         LocatedVector lv = axis7;
         lv.origin = aa7x41->get_CA_location();
-        theta = fmin(p.region_can_rotate(n7x31, n7x41, lv, true), fiftyseventh*5);
+        theta = fmin(p.region_can_rotate(n7x31, n7x41, lv, true), fiftyseventh*10);
         p.rotate_piece(n7x31, n7x41, lv.origin, axis7, theta);
 
         axis6 = compute_normal(aa6x48->get_CA_location(), aa6x55->get_CA_location(), aa7x31->get_CA_location());
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
         theta = fmin(p.region_can_rotate(n6x48, n6x59, lv, true), fiftyseventh*2.5);
         p.rotate_piece(n6x48, n6x59, lv.origin, axis7, theta);
 
-        aa3x33->conform_atom_to_location("OG2", aa5x43->get_CA_location());
+        // aa3x33->conform_atom_to_location("OG2", aa5x43->get_CA_location());
     }
     else if (!strcmp(orid.c_str(), "OR8H1"))
     {
@@ -241,6 +241,7 @@ int main(int argc, char** argv)
 
         // constraints.push_back((std::string)"BRIDGE 6.55 45.51");
         float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));
+        aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, Point(0,10000,0));
 
         if (r <= 3)
         {
@@ -319,7 +320,7 @@ int main(int argc, char** argv)
     
     SCoord TMR5edir = p.get_region_center(aa6x44->get_residue_no(), aa6x55->get_residue_no()).subtract(p.get_region_center(aa5x43->get_residue_no(), aa5x54->get_residue_no()));
     float TMR5ez = p.region_can_move(aa5x43->get_residue_no(), aa5x54->get_residue_no(), TMR5edir, true);
-    cout << "TMR5 moves " << TMR5ez << " toward TMR6." << endl;
+    cout << "TMR5 moves " << TMR5ez << " toward TMR6 limited by " << *(p.stop1) << "->" << *(p.stop2) << "." << endl;
 
     // Perform the TMR5ez slide.
     TMR5edir.r = TMR5ez;

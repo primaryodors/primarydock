@@ -2092,8 +2092,10 @@ void apply_protein_specific_settings(Protein* p)
             continue;
         }
 
+        MovabilityType aamov = aa->movability;
         aa->movability = MOV_FLEXONLY;
         aa->conform_atom_to_location(a->name, target->get_CA_location());
+        aa->movability = aamov;
     }
 }
 

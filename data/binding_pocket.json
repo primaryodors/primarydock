@@ -3,7 +3,11 @@
     {
         "mcoord": "Cu +1 5.43 5.42  # These are processed sequentially, so the first Cys will become the charged thiolate.",
         "pocket": "3.33 3.36 5.42 5.43",
-        "flxr": "3.33"
+        "atomto":
+        [
+            "3.33 OG2 5.43"
+        ],
+        "stcr": "3.33 6.55"
     },
     "OR8H1":
     {

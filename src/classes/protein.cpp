@@ -3825,6 +3825,8 @@ float Protein::region_can_move(int startres, int endres, SCoord direction, bool 
                         + (std::string)" clashes by " + std::to_string(c)
                         + (std::string)" with "
                         + (std::string)aa2->get_3letter() + std::to_string(aa2->get_residue_no());
+                    stop1 = aa1;
+                    stop2 = aa2;
                 }
             }
         }

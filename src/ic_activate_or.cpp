@@ -315,6 +315,28 @@ int main(int argc, char** argv)
     // Perform the rotation.
     p.rotate_piece(n4x53, n4x64, aa4x53->get_CA_location(), axis4, bend4);
 
+    if (l6x55 == 'Y')
+    {
+        Point he1 = aa6x55->get_atom_location("HE1");
+        Point he2 = aa6x55->get_atom_location("HE2");
+
+        const char* up_atom = (he1.y > he2.y) ? "HE1" : "HE2";
+
+        b = aa6x55->get_atom("CA")->get_bond_between(aa6x55->get_atom("CB"));
+        b->can_rotate = false;
+        b = aa6x55->get_atom("CB")->get_bond_between(aa6x55->get_atom("CG"));
+        b->can_rotate = true;
+        aa6x55->conform_atom_to_location(up_atom, Point(0,10000,0));
+        b->can_rotate = false;
+        b = aa6x55->get_atom("CA")->get_bond_between(aa6x55->get_atom("CB"));
+        b->can_rotate = true;
+        cout << "Vertical 6.55 ring." << endl;
+
+        fp = fopen("tmp/vertical.pdb", "wb");
+        p.save_pdb(fp);
+        p.end_pdb(fp);
+        fclose(fp);
+    }
 
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.
     

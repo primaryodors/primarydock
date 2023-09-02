@@ -3672,6 +3672,21 @@ _try_again:
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
 
+            n = mtlcoords.size();
+            if (n)
+            {
+                int j1;
+                for (j=0; j<n; j++)
+                {
+                    int n1 = mtlcoords[j].coordres.size();
+                    for (j1=0; j1<n1; j1++)
+                    {
+                        AminoAcid* aa = protein->get_residue(mtlcoords[j].coordres[j1].resno);
+                        if (aa) aa->movability = MOV_PINNED;
+                    }
+                }
+            }
+
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
             if (!flex) for (j=0; j<sphres; j++)
             {

@@ -2364,10 +2364,11 @@ int main(int argc, char** argv)
 
                 Atom* a = can_reach_metal[j1]->get_nearest_atom(lmtl->get_location());
                 float r = a->distance_to(lmtl);
-                if (r <= lmtl->get_vdW_radius())
+                float vdW = lmtl->get_vdW_radius() + a->get_vdW_radius();
+                if (r < vdW)
                 {
                     SCoord to_move = lmtl->get_location().subtract(a->get_location());
-                    to_move.r = lmtl->get_vdW_radius() - r;
+                    to_move.r = vdW - r;
                     lmtl->move_rel(&to_move);
                 }
             }

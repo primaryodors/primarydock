@@ -33,9 +33,7 @@ It will also be necessary to obtain 3D models of your ligand(s). Currently, only
 SDFs can be obtained a few different ways:
 <ul>
   <li>If you have <a href="https://openbabel.org">obabel</a>, you can generate 3 dimensional SDFs from SMILES input. Example syntax:<br>
-    ```
-    obabel -:'CCO' --gen3D -osdf -Osdf/ethanol.sdf
-    ```
+    `obabel -:'CCO' --gen3D -osdf -Osdf/ethanol.sdf`
   </li>
   <li>SDFs are available from PubChem at https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{pubchem_cid}/SDF?record_type=3d</li>
   <li>Or at https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{SMILES}/SDF?record_type=3d</li>

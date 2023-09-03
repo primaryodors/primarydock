@@ -517,7 +517,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             {
                 continue;
                 #if _dbg_groupsel
-                //cout << "Rejected " << b->name << " too far away." << endl;
+                cout << "Rejected " << b->name << " too far away " << r << endl;
                 #endif
             }
 

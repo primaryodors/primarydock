@@ -1,4 +1,1 @@
-atom_group[ C4 O6 O7 O8 H17 H18 ]
-atom_group[ C1 C2 C3 C5 H11 H12 H13 H14 H15 H16 ]
-atom_group[ O9 H19 ]
-atom_group[ O10 H20 ]
+atom_group[ O1 O5 C7 C8 C9 C10 H11 H12 H13 H14 H15 H16 H18 H19 H20 C6 O4 O3 O2 H17 ]

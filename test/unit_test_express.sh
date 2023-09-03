@@ -247,7 +247,7 @@ else
 fi
 
 MOLECULE="arabinose"
-test/group_test_mol "C1[C@@H]([C@@H]([C@H](C(O1)O)O)O)O" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
+test/group_test_mol "sdf/l-arabinose.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
 RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"

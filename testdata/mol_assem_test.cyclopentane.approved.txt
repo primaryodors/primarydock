@@ -6,5 +6,5 @@ Atom C2 has bond angles: 108 109.471 109.471 109.471 109.471 109.471
 Atom C3 has bond angles: 108 109.471 109.471 109.471 109.471 109.471
 Atom C4 has bond angles: 108 109.471 109.471 109.471 109.471 109.471
 Atom C5 has bond angles: 108 109.471 109.471 109.471 109.471 109.471
-Saved test/received/cyclopentane.received.sdf
+Saved testdata/received/cyclopentane.received.sdf
 

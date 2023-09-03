@@ -10,5 +10,5 @@ Atom c6 has bond angles: 120 120 120
 Atom c7 has bond angles: 120 120 120
 Atom C8 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
 Atom C9 has bond angles: 109.472 109.471 109.471 109.472 109.471 109.471
-Saved test/received/2_6-xylenol.received.sdf
+Saved testdata/received/2_6-xylenol.received.sdf
 

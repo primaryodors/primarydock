@@ -4,5 +4,5 @@ Adjusted internal clashes: 0 cu.A.
 Atom C1 has bond angles: 60 109.471 109.471 109.471 109.471 109.471
 Atom C2 has bond angles: 60 109.471 109.471 109.471 109.471 109.471
 Atom C3 has bond angles: 60 109.471 109.471 109.471 109.471 109.471
-Saved test/received/cyclopropane.received.sdf
+Saved testdata/received/cyclopropane.received.sdf
 

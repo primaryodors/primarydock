@@ -332,10 +332,11 @@ int main(int argc, char** argv)
         b->can_rotate = true;
         cout << "Vertical 6.55 ring." << endl;
 
-        fp = fopen("tmp/vertical.pdb", "wb");
+        // Will be using this later.
+        /* fp = fopen("tmp/vertical.pdb", "wb");
         p.save_pdb(fp);
         p.end_pdb(fp);
-        fclose(fp);
+        fclose(fp); */
     }
 
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.

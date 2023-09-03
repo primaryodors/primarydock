@@ -101,6 +101,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
                     int lcard = b->cardinality;
                     if (b->cardinality > 1 && b->cardinality < 2 && card >= 1 && card <= 2) lcard = card;
                     if (lcard != card) return 0;
+                    card = 0;
                 }
 
                 numbered[c-'0'] = nullptr;
@@ -121,6 +122,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
         else if (c == ')')
         {
             parens--;
+            continue;
         }
 
         Bond** b = cursor[parens]->get_bonds();
@@ -131,7 +133,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
         {
             if (!b[j]) continue;
             if (!b[j]->btom) continue;
-            bool used = 0;
+            bool used = false;
             for (l=0; l<atoms_used; l++) if (out_matches[l] == b[j]->btom) used = true;
             if (used) continue;
             if (atom_matches_string(b[j]->btom, buffer))
@@ -142,6 +144,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
                     int lcard = between->cardinality;
                     if (between->cardinality > 1 && between->cardinality < 2 && card >= 1 && card <= 2) lcard = card;
                     if (lcard != card) return 0;
+                    card = 0;
                 }
                 found = true;
                 cursor[parens] = b[j]->btom;

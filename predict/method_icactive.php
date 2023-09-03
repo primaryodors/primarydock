@@ -20,6 +20,7 @@ prepare_outputs();
 
 $size = "5.0 6.0 5.0";
 $search = "BB";
+$atomto = [];
 $stcr = "";
 $flxr = "";
 $mcoord = "";
@@ -50,6 +51,14 @@ if ($mbp)
     if (isset($mbp["mcoord"])) $mcoord = "MCOORD {$mbp["mcoord"]}";
     if (isset($mbp["stcr"])) $stcr = "STCR {$mbp["stcr"]}";
     if (isset($mbp["flxr"])) $flxr = "FLXR {$mbp["flxr"]}";
+
+    if (isset($mbp["atomto"]))
+    {
+        foreach ($mbp["atomto"] as $a2)
+        {
+            $atomto[] = "ATOMTO $a2";
+        }
+    }
 }
 
 if ($mbp && isset($mbp["pocket"]))
@@ -74,6 +83,8 @@ else
     }
     else die("Unsupported receptor family.\n");
 }
+
+$atomto = implode("\n", $atomto);
 
 $metrics_to_process =
 [
@@ -144,6 +155,7 @@ $cenres_inactive
 SIZE $size
 # H2O 5
 $mcoord
+$atomto
 $stcr
 $flxr
 
@@ -186,6 +198,7 @@ $cenres_active
 SIZE $size
 # H2O 5
 $mcoord
+$atomto
 $stcr
 $flxr
 

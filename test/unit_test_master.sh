@@ -16,7 +16,7 @@ clear
 ./test/mol_assem_tests.sh
 
 
-REPORT="test/protein_test.approved.txt"
+REPORT="testdata/protein_test.approved.txt"
 ./test/protein_test AAAAAAAAAA | sed '/^#/d' > testdata/received/protein_test.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/protein_test.received.txt)
 if [ -z "$RESULT" ]; then
@@ -27,7 +27,7 @@ else
 fi
 
 
-REPORT="test/coplanar_test.approved.txt"
+REPORT="testdata/coplanar_test.approved.txt"
 ./bin/pepteditor test/planar_h.pepd | sed '/^#/d' > testdata/received/coplanar_test.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/coplanar_test.received.txt)
 if [ -z "$RESULT" ]; then
@@ -38,7 +38,7 @@ else
 fi
 
 
-REPORT="test/motif_test.approved.txt"
+REPORT="testdata/motif_test.approved.txt"
 ./bin/pepteditor test/motif_test.pepd | sed '/^#/d' >testdata/received/motif_test.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/motif_test.received.txt)
 if [ -z "$RESULT" ]; then

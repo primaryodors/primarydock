@@ -90,6 +90,28 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
             card = 3;
             continue;
         }
+        else if (c >= '0' && c <= '9')
+        {
+            if (numbered[c-'0'])
+            {
+                Bond* b = cursor[parens]->get_bond_between(numbered[c-'0']);
+                if (!b) return 0;
+                if (card)
+                {
+                    int lcard = b->cardinality;
+                    if (b->cardinality > 1 && b->cardinality < 2 && card >= 1 && card <= 2) lcard = card;
+                    if (lcard != card) return 0;
+                }
+
+                numbered[c-'0'] = nullptr;
+                continue;
+            }
+            else
+            {
+                numbered[c-'0'] = cursor[parens];
+                continue;
+            }
+        }
 
         Bond** b = cursor[parens]->get_bonds();
         int bn = cursor[parens]->get_geometry();

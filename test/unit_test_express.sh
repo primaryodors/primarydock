@@ -207,7 +207,7 @@ fi
 
 
 MOLECULE="phenethyl_alcohol"
-test/group_test_mol "c1ccccc1CCO" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
+test/group_test_mol "sdf/$MOLECULE.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
 RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
@@ -217,7 +217,7 @@ else
 fi
 
 MOLECULE="indole"
-test/group_test_mol "C12=C(C=CN2)C=CC=C1" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
+test/group_test_mol "sdf/$MOLECULE.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
 RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
@@ -227,7 +227,7 @@ else
 fi
 
 MOLECULE="pyrazine"
-test/group_test_mol "n1ccncc1" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
+test/group_test_mol "sdf/$MOLECULE.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
 RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
@@ -237,7 +237,7 @@ else
 fi
 
 MOLECULE="cinnamaldehyde"
-test/group_test_mol "c1ccccc1C=CC=O" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
+test/group_test_mol "sdf/$MOLECULE.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
 RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
@@ -257,7 +257,7 @@ else
 fi
 
 MOLECULE="adenosine"
-test/group_test_mol "n2c1c(ncnc1n(c2)[C@@H]3O[C@@H]([C@@H](O)[C@H]3O)CO)N" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
+test/group_test_mol "sdf/$MOLECULE.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
 RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"

@@ -515,10 +515,10 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             float r = fmax(0, g->get_center().get_3d_distance(b->get_location()) - 1.5);
             if (r > 2.5 && !a->shares_bonded_with(b))
             {
-                continue;
                 #if _dbg_groupsel
                 cout << "Rejected " << b->name << " too far away " << r << endl;
                 #endif
+                continue;
             }
 
             r = a->distance_to(b);

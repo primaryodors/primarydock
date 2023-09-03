@@ -10,5 +10,5 @@ Atom C6 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
 Atom C7 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
 Atom C8 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
 Atom C9 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
-Saved test/received/mushroom_alcohol.received.sdf
+Saved testdata/received/mushroom_alcohol.received.sdf
 

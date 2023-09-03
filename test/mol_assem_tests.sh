@@ -31,14 +31,14 @@ for i in ${!allmols[@]}; do
     fi
 
     SMILES=${allsmiles[$i]}
-    REPORT="test/mol_assem_test.$MOLECULE.approved.txt"
-    test/mol_assem_test "$SMILES" "test/received/$MOLECULE.received.sdf" | sed '/^#/d' > "test/received/mol_assem_test.$MOLECULE.received.txt"
-    RESULT=$(diff --unified $REPORT "test/received/mol_assem_test.$MOLECULE.received.txt")
+    REPORT="testdata/mol_assem_test.$MOLECULE.approved.txt"
+    test/mol_assem_test "$SMILES" "testdata/received/$MOLECULE.received.sdf" | sed '/^#/d' > "testdata/received/mol_assem_test.$MOLECULE.received.txt"
+    RESULT=$(diff --unified $REPORT "testdata/received/mol_assem_test.$MOLECULE.received.txt")
     if [ -z "$RESULT" ]; then
         printf "${GRN}Molecule assembly test succeeded for $MOLECULE.${NC}\n"
     else
         printf "${RED}Molecule assembly test FAILED for $MOLECULE.${NC}\n"
-        diff --color --unified $REPORT "test/received/mol_assem_test.$MOLECULE.received.txt"
+        diff --color --unified $REPORT "testdata/received/mol_assem_test.$MOLECULE.received.txt"
     fi
 done
 

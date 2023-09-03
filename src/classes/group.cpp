@@ -515,15 +515,27 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             float r = fmax(0, g->get_center().get_3d_distance(b->get_location()) - 1.5);
             if (r > 2.5 && !a->shares_bonded_with(b))
             {
-                continue;
                 #if _dbg_groupsel
-                //cout << "Rejected " << b->name << " too far away." << endl;
+                cout << "Rejected " << b->name << " too far away " << r << " (criterion 516)." << endl;
                 #endif
+                continue;
             }
 
             r = a->distance_to(b);
-            if (r > ld/1.5) continue;
-            if (b->get_Z() == 6 && r > ld/2) continue;
+            if (r > ld/1.5)
+            {
+                #if _dbg_groupsel
+                cout << "Rejected " << b->name << " too far away " << r << " (criterion 528)." << endl;
+                #endif
+                continue;
+            }
+            if (b->get_Z() == 6 && r > ld/2)
+            {
+                #if _dbg_groupsel
+                cout << "Rejected " << b->name << " too far away " << r << " (criterion 535)." << endl;
+                #endif
+                continue;
+            }
 
             float simil = a->similarity_to(b);
             if (sep_mcoord)

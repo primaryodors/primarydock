@@ -7,5 +7,5 @@ Atom c3 has bond angles: 108 126 126
 Atom O4 has bond angles: 108 126 126
 Atom c5 has bond angles: 108 126 126
 Atom C6 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
-Saved test/received/o-methylfuranium_ion.received.sdf
+Saved testdata/received/o-methylfuranium_ion.received.sdf
 

@@ -5,5 +5,5 @@ Atom C1 has bond angles: 90 135 135
 Atom C2 has bond angles: 90 135 135
 Atom C3 has bond angles: 90 135 135
 Atom C4 has bond angles: 90 135 135
-Saved test/received/cyclobutadiene.received.sdf
+Saved testdata/received/cyclobutadiene.received.sdf
 

@@ -5,7 +5,7 @@ GRN="\033[38;5;46m"
 NC="\033[0m"
 
 cd "$(dirname "$0")"
-if [ ! -f "received" ]; then mkdir -p "received"; fi
+if [ ! -f "../testdata/received" ]; then mkdir -p "../testdata/received"; fi
 cd ..
 
 clear
@@ -16,50 +16,50 @@ clear
 ./test/mol_assem_tests.sh
 
 
-REPORT="test/protein_test.approved.txt"
-./test/protein_test AAAAAAAAAA | sed '/^#/d' > test/received/protein_test.received.txt
-RESULT=$(diff --unified $REPORT test/received/protein_test.received.txt)
+REPORT="testdata/protein_test.approved.txt"
+./test/protein_test AAAAAAAAAA | sed '/^#/d' > testdata/received/protein_test.received.txt
+RESULT=$(diff --unified $REPORT testdata/received/protein_test.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}Protein test succeeded.${NC}\n"
 else
     printf "${RED}Protein test FAILED.${NC}\n"
-    diff --color --unified $REPORT test/received/protein_test.received.txt
+    diff --color --unified $REPORT testdata/received/protein_test.received.txt
 fi
 
 
-REPORT="test/coplanar_test.approved.txt"
-./bin/pepteditor test/planar_h.pepd | sed '/^#/d' > test/received/coplanar_test.received.txt
-RESULT=$(diff --unified $REPORT test/received/coplanar_test.received.txt)
+REPORT="testdata/coplanar_test.approved.txt"
+./bin/pepteditor test/planar_h.pepd | sed '/^#/d' > testdata/received/coplanar_test.received.txt
+RESULT=$(diff --unified $REPORT testdata/received/coplanar_test.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}Coplanar test succeeded.${NC}\n"
 else
     printf "${RED}Coplanar test FAILED.${NC}\n"
-    diff --color --unified $REPORT test/received/coplanar_test.received.txt
+    diff --color --unified $REPORT testdata/received/coplanar_test.received.txt
 fi
 
 
-REPORT="test/motif_test.approved.txt"
-./bin/pepteditor test/motif_test.pepd | sed '/^#/d' >test/received/motif_test.received.txt
-RESULT=$(diff --unified $REPORT test/received/motif_test.received.txt)
+REPORT="testdata/motif_test.approved.txt"
+./bin/pepteditor test/motif_test.pepd | sed '/^#/d' >testdata/received/motif_test.received.txt
+RESULT=$(diff --unified $REPORT testdata/received/motif_test.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}Motif test succeeded.${NC}\n"
 else
     printf "${RED}Motif test FAILED.${NC}\n"
-    diff --color --unified $REPORT test/received/motif_test.received.txt
+    diff --color --unified $REPORT testdata/received/motif_test.received.txt
 fi
 
 
-bin/primarydock test/testTAAR8.config --colorless --iter 50 --congress > test/received/TAAR8_CAD.txt
+bin/primarydock testdata/test_TAAR8.config --colorless --iter 50 --congress > testdata/received/TAAR8_CAD.txt
 TAAR_RESULT=$?
 if [ "$TAAR_RESULT" -eq "0" ]; then
-    POSES=$( cat test/received/TAAR8_CAD.txt | grep "pose(s) found" )
+    POSES=$( cat testdata/received/TAAR8_CAD.txt | grep "pose(s) found" )
     if [ -z "$POSES" ]; then
         printf "${RED}TAAR test FAILED: no poses.${NC}\n"
     else
-        ASP111=$( cat test/received/TAAR8_CAD.txt | grep -m 1 "Asp111: " )
+        ASP111=$( cat testdata/received/TAAR8_CAD.txt | grep -m 1 "Asp111: " )
         ASP111="${ASP111/Asp111: /}"
         ASP111="${ASP111/[.][0-9]*/}"
-        ASP201=$( cat test/received/TAAR8_CAD.txt | grep -m 1 "Asp201: " )
+        ASP201=$( cat testdata/received/TAAR8_CAD.txt | grep -m 1 "Asp201: " )
         ASP201="${ASP201/Asp201: /}"
         ASP201="${ASP201/[.][0-9]*/}"
         if [[ $ASP111 -gt "-15"  ]] || [[ $ASP201 -gt "-10"  ]]; then
@@ -73,10 +73,10 @@ else
 fi
 
 
-bin/primarydock test/test1A1.config --colorless --pose 5 --iter 50 --elim 40 --congress > test/received/OR1A1_dLIMN.txt
+bin/primarydock testdata/test_1A1.config --colorless --pose 5 --iter 50 --elim 40 --congress > testdata/received/OR1A1_dLIMN.txt
 DLIMN_RESULT=$?
 if [ "$DLIMN_RESULT" -eq "0" ]; then
-    POSES=$( cat test/received/OR1A1_dLIMN.txt | grep "pose(s) found" | sed 's/[^0-9]//g' )
+    POSES=$( cat testdata/received/OR1A1_dLIMN.txt | grep "pose(s) found" | sed 's/[^0-9]//g' )
     if [ "$POSES" -eq "0" ]; then
         printf "${RED}d-limonene test FAILED: no poses.${NC}\n"
     else

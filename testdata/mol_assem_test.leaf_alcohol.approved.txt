@@ -8,5 +8,5 @@ Atom C4 has bond angles: 120 120 120
 Atom C5 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
 Atom C6 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
 Atom O7 has bond angles: 109.471
-Saved test/received/leaf_alcohol.received.sdf
+Saved testdata/received/leaf_alcohol.received.sdf
 

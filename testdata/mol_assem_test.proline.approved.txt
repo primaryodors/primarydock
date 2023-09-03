@@ -8,5 +8,5 @@ Atom C5 has bond angles: 108 109.471 109.471 109.471 109.471 109.471
 Atom C6 has bond angles: 108 109.471 109.471 109.471 109.471 109.471
 Atom C7 has bond angles: 120.622 120.038 119.196
 Atom O8 has bond angles: 120
-Saved test/received/proline.received.sdf
+Saved testdata/received/proline.received.sdf
 

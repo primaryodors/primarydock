@@ -1,0 +1,3 @@
+atom_group[ N1 C3 C4 C5 C6 H7 H9 H10 H8 N2 ]
+atom_group[ N1 ]
+atom_group[ N2 ]

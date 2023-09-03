@@ -130,36 +130,36 @@ performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR
 # low-tooling regression tests below
 amino_report: REPORT="testdata/amino_test.approved.txt"
 amino_report: test/amino_test
-	./test/amino_test >test/amino_test.received.txt
-	diff --color --unified $(REPORT) test/amino_test.received.txt
+	./test/amino_test >testdata/received/amino_test.received.txt
+	diff --color --unified $(REPORT) testdata/received/amino_test.received.txt
 
 atom_report: REPORT="testdata/atom_test.approved.txt"
 atom_report: test/atom_test
-	./test/atom_test H >test/atom_test.received.txt
-	diff --color --unified $(REPORT) test/atom_test.received.txt
+	./test/atom_test H >testdata/received/atom_test.received.txt
+	diff --color --unified $(REPORT) testdata/received/atom_test.received.txt
 
 aniso_report: REPORT="testdata/aniso_test.approved.txt"
 aniso_report: test/aniso_test
-	./test/aniso_test --asciiart >test/aniso_test.received.txt
-	diff --color --unified $(REPORT) test/aniso_test.received.txt
+	./test/aniso_test --asciiart >testdata/received/aniso_test.received.txt
+	diff --color --unified $(REPORT) testdata/received/aniso_test.received.txt
 
 point_report: REPORT="testdata/point_test.approved.txt"
 point_report: test/point_test
-	./test/point_test >test/point_test.received.txt
-	diff --color --unified $(REPORT) test/point_test.received.txt
+	./test/point_test >testdata/received/point_test.received.txt
+	diff --color --unified $(REPORT) testdata/received/point_test.received.txt
 
 molecule_report: REPORT="testdata/molecule_test1.approved.txt"
 molecule_report: test/molecule_test
-	./test/molecule_test 'CCO' 'CCO' | tee temp | sed '/^#/d' >test/molecule_test1.received.txt; cat temp # ignore lines starting with #
-	diff --color --unified $(REPORT) test/molecule_test1.received.txt
+	./test/molecule_test 'CCO' 'CCO' | tee temp | sed '/^#/d' >testdata/received/molecule_test1.received.txt; cat temp # ignore lines starting with #
+	diff --color --unified $(REPORT) testdata/received/molecule_test1.received.txt
 
 mol_assem_report: REPORT="testdata/mol_assem_test.approved.txt"
 mol_assem_report: test/mol_assem_test
 	bash ./test/mol_assem_tests.sh	# these must be checked visually.
-	./test/mol_assem_test >test/molecule_test.received.txt
-	echo "Content of test.sdf:" >> test/molecule_test.received.txt
-	sed '2d' test.sdf >> test/molecule_test.received.txt  # remove line 2 (date stamp)
-	diff --color --unified $(REPORT) test/molecule_test.received.txt
+	./test/mol_assem_test >testdata/received/molecule_test.received.txt
+	echo "Content of test.sdf:" >> testdata/received/molecule_test.received.txt
+	sed '2d' test.sdf >> testdata/received/molecule_test.received.txt  # remove line 2 (date stamp)
+	diff --color --unified $(REPORT) testdata/received/molecule_test.received.txt
 
 protein_report: REPORT="testdata/protein_test.approved.txt"
 protein_report: test/protein_test
@@ -185,7 +185,7 @@ protein_report: test/protein_test
 
 motif_report: REPORT="testdata/motif_test.approved.txt"
 motif_report: bin/pepteditor test/motif_test.pepd
-	./bin/pepteditor test/motif_test.pepd > test/motif_test.received.txt
-	diff --color --unified $(REPORT) test/motif_test.received.txt
+	./bin/pepteditor test/motif_test.pepd > testdata/received/motif_test.received.txt
+	diff --color --unified $(REPORT) testdata/received/motif_test.received.txt
 
 reports: $(REPORTS)

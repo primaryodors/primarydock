@@ -112,6 +112,16 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
                 continue;
             }
         }
+        else if (c == '(')
+        {
+            parens++;
+            cursor[parens] = cursor[parens-1];
+            continue;
+        }
+        else if (c == ')')
+        {
+            parens--;
+        }
 
         Bond** b = cursor[parens]->get_bonds();
         int bn = cursor[parens]->get_geometry();

@@ -49,7 +49,7 @@ else
 fi
 
 
-bin/primarydock test/testTAAR8.config --colorless --iter 50 --congress > testdata/received/TAAR8_CAD.txt
+bin/primarydock testdata/test_TAAR8.config --colorless --iter 50 --congress > testdata/received/TAAR8_CAD.txt
 TAAR_RESULT=$?
 if [ "$TAAR_RESULT" -eq "0" ]; then
     POSES=$( cat testdata/received/TAAR8_CAD.txt | grep "pose(s) found" )
@@ -73,7 +73,7 @@ else
 fi
 
 
-bin/primarydock test/test1A1.config --colorless --pose 5 --iter 50 --elim 40 --congress > testdata/received/OR1A1_dLIMN.txt
+bin/primarydock testdata/test_1A1.config --colorless --pose 5 --iter 50 --elim 40 --congress > testdata/received/OR1A1_dLIMN.txt
 DLIMN_RESULT=$?
 if [ "$DLIMN_RESULT" -eq "0" ]; then
     POSES=$( cat testdata/received/OR1A1_dLIMN.txt | grep "pose(s) found" | sed 's/[^0-9]//g' )

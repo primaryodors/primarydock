@@ -35,7 +35,7 @@ bool Moiety::atom_matches_string(Atom* a, char* buffer)
         return (Z == a->get_Z());
     }
 
-    buffer[0] &= 0xd0;
+    buffer[0] &= 0xdf;
     Z = Atom::Z_from_esym(buffer);
 
     if (Z)
@@ -101,6 +101,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
             if (!b[j]->btom) continue;
             bool used = 0;
             for (l=0; l<atoms_used; l++) if (out_matches[l] == b[j]->btom) used = true;
+            if (used) continue;
             if (atom_matches_string(b[j]->btom, buffer))
             {
                 if (card)

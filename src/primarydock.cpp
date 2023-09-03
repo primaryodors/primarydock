@@ -2092,8 +2092,10 @@ void apply_protein_specific_settings(Protein* p)
             continue;
         }
 
+        MovabilityType aamov = aa->movability;
         aa->movability = MOV_FLEXONLY;
         aa->conform_atom_to_location(a->name, target->get_CA_location());
+        aa->movability = aamov;
     }
 }
 
@@ -2230,7 +2232,9 @@ int main(int argc, char** argv)
     #endif
 
     Pose tmp_pdb_residue[poses+1][protein->get_end_resno()+1];
+    Pose tmp_pdb_waters[poses+1][omaxh2o+1];
     Pose tmp_pdb_ligand[poses+1];
+    Point tmp_pdb_metal_locs[poses+1][mtlcoords.size()+1];
 
     if (tplset)
     {
@@ -2286,12 +2290,13 @@ int main(int argc, char** argv)
         fclose(pf);
     }
 
-    int l;
+    int l, j1, i2;
 
     if (mtlcoords.size())
     {
         for (i=0; i<mtlcoords.size(); i++)
         {
+            int charge_left = mtlcoords[i].charge;
             Point lpt;
             Molecule** lmc = new Molecule*[mtlcoords[i].coordres.size()+4];
             lmc[0] = new Molecule("lcm");
@@ -2313,7 +2318,7 @@ int main(int argc, char** argv)
                     lpt = lpt.add((Ss && Ss[0]) ? Ss[0]->get_location() : aa->get_barycenter());
 
                     // If cysteine, make thiolate form.
-                    if (aa->is_thiol())
+                    if (aa->is_thiol() && charge_left)
                     {
                         if (Ss)
                         {
@@ -2323,6 +2328,7 @@ int main(int argc, char** argv)
                             {
                                 aa->delete_atom(H);
                                 S->increment_charge(-1);
+                                charge_left--;
                             }
                         }
                     }
@@ -2345,6 +2351,29 @@ int main(int argc, char** argv)
             strcpy(lmtl->aa3let, "MTL");
             lmtl->residue = 0;
 
+            Molecule::conform_molecules(lmc, 50);
+
+            AminoAcid* can_reach_metal[256];
+            int num_can_reach = protein->get_residues_can_clash_ligand(can_reach_metal, lmc[0], lmtl->get_location(), Point(2.5,2.5,2.5), nullptr);
+            for (j1=0; j1<num_can_reach; j1++)
+            {
+                bool found = false;
+                for (i2=0; i2<mtlcoords[i].coordres.size(); i2++)
+                {
+                    if (mtlcoords[i].coordres[i2].resno == can_reach_metal[j1]->get_residue_no()) found = true;
+                }
+                if (found) continue;
+
+                Atom* a = can_reach_metal[j1]->get_nearest_atom(lmtl->get_location());
+                float r = a->distance_to(lmtl);
+                float vdW = lmtl->get_vdW_radius() + a->get_vdW_radius();
+                if (r < vdW)
+                {
+                    SCoord to_move = lmtl->get_location().subtract(a->get_location());
+                    to_move.r = vdW - r;
+                    lmtl->move_rel(&to_move);
+                }
+            }
             Molecule::conform_molecules(lmc, 50);
 
             for (j=0; j<mtlcoords[i].coordres.size(); j++)
@@ -2503,7 +2532,7 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
 
-    std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand);
+    std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
 
     m.minimize_internal_clashes();
 
@@ -3643,6 +3672,21 @@ _try_again:
             protein->find_residue_initial_bindings();
             freeze_bridged_residues();
 
+            n = mtlcoords.size();
+            if (n)
+            {
+                int j1;
+                for (j=0; j<n; j++)
+                {
+                    int n1 = mtlcoords[j].coordres.size();
+                    for (j1=0; j1<n1; j1++)
+                    {
+                        AminoAcid* aa = protein->get_residue(mtlcoords[j].coordres[j1].resno);
+                        if (aa) aa->movability = MOV_PINNED;
+                    }
+                }
+            }
+
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
             if (!flex) for (j=0; j<sphres; j++)
             {
@@ -3655,20 +3699,23 @@ _try_again:
             {
                 protein->get_internal_clashes(1, protein->get_end_resno(), true);
 
-                /*
-                std::string temp_pdb_fn = (std::string)"tmp/pose" + std::to_string(pose) + (std::string)".pdb";
-                FILE* pfpdb = fopen(temp_pdb_fn.c_str(), "w");
-                if (!pfpdb) return -1;
-                protein->set_pdb_chain('A');
-                protein->save_pdb(pfpdb, ligand);
-                protein->end_pdb(pfpdb);
-                fclose(pfpdb);
-                */
                 n = protein->get_end_resno();
                 for (j=1; j <= n; j++)
                 {
                     AminoAcid* aa = protein->get_residue(j);
                     if (aa) tmp_pdb_residue[pose][j].copy_state(aa);
+                }
+                if (waters)
+                {
+                    for (j=0; waters[j]; j++)
+                    {
+                        tmp_pdb_waters[pose][j].copy_state(waters[j]);
+                    }
+                }
+                n = mtlcoords.size();
+                for (j=0; j < n; j++)
+                {
+                    tmp_pdb_metal_locs[pose][j] = mtlcoords[j].mtl->get_location();
                 }
                 tmp_pdb_ligand[pose].copy_state(ligand);
             }
@@ -4313,14 +4360,6 @@ _try_again:
                                 return -1;
                             }
 
-                            /*char pdbbuffer[1024];
-                            size_t bytes_copied;
-                            while (bytes_copied = fread(pdbbuffer, 1, 1024, pftmp))
-                            {
-                                fwrite(pdbbuffer, 1, bytes_copied, pfout);
-                            }
-
-                            fclose(pftmp);*/
 
                             int j1;
                             int n1 = protein->get_end_resno();
@@ -4330,8 +4369,26 @@ _try_again:
                                 if (aa) tmp_pdb_residue[j+1][j1].restore_state(aa);
                             }
                             tmp_pdb_ligand[j+1].restore_state(ligand);
-
                             protein->save_pdb(pfout, ligand);
+
+                            int atno_offset = protein->last_saved_atom_number;
+                            if (waters)
+                            {
+                                for (j1=0; waters[j1]; j1++)
+                                {
+                                    tmp_pdb_waters[pose][j1].restore_state(waters[j1]);
+                                    waters[j1]->save_pdb(pfout, atno_offset);
+                                    atno_offset += waters[j1]->get_atom_count();
+                                }
+                            }
+
+                            n1 = mtlcoords.size();
+                            for (j1=0; j1 < n1; j1++)
+                            {
+                                mtlcoords[j1].mtl->move(tmp_pdb_metal_locs[pose][j1]);
+                                mtlcoords[j1].mtl->save_pdb_line(pfout, ++atno_offset);
+                            }
+
                             protein->end_pdb(pfout);
 
                             fclose(pfout);

@@ -463,7 +463,7 @@ int AtomGroup::heavy_atom_count()
     return result;
 }
 
-std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(Molecule* mol)
+std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(Molecule* mol, bool sep_mcoord)
 {
     std::vector<std::shared_ptr<AtomGroup>> retval;
     if (!mol) return retval;
@@ -526,6 +526,12 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
             if (b->get_Z() == 6 && r > ld/2) continue;
 
             float simil = a->similarity_to(b);
+            if (sep_mcoord)
+            {
+                int a_fam = a->get_family(), b_fam = b->get_family();
+                if (a_fam == TETREL && (b_fam == CHALCOGEN || b_fam == PNICTOGEN)) simil /= 4;
+                else if (b_fam == TETREL && (a_fam == CHALCOGEN || a_fam == PNICTOGEN)) simil /= 4;
+            }
 
             // In general, aliphatics and nonpolar aromatics can be regarded as high similarity, since they tend to
             // be mutually highly soluble in one another. But for grouping of ligand atoms, it is important to
@@ -899,7 +905,8 @@ float GroupPair::get_weighted_potential()
 {
     float f = get_potential();
 
-    if (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff && fabs(scg->hydrophilicity()) >= hydrophilicity_cutoff) f *= 25;
+    if (scg->metallic) f *= 60;
+    else if (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff && fabs(scg->hydrophilicity()) >= hydrophilicity_cutoff) f *= 25;
     else if ((ag->get_pi()/ag->atoms.size()) >= 0.25 && scg->pi_stackability() > 0.25 ) f *= 7;
 
     return f;

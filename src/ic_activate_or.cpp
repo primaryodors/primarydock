@@ -70,9 +70,11 @@ int main(int argc, char** argv)
     p.load_pdb(fp);
     fclose(fp);
 
-
+    AminoAcid *aa1x32 = p.get_residue_bw("1.32");
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
     AminoAcid *aa3x32 = p.get_residue_bw("3.32");
+    AminoAcid *aa3x33 = p.get_residue_bw("3.33");
+    AminoAcid *aa3x39 = p.get_residue_bw("3.39");
     AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
     AminoAcid *aa3x56 = p.get_residue_bw("3.56");
@@ -98,15 +100,21 @@ int main(int argc, char** argv)
     AminoAcid *aa6x44 = p.get_residue_bw("6.44");
     AminoAcid *aa6x48 = p.get_residue_bw("6.48");
     AminoAcid *aa6x49 = p.get_residue_bw("6.49");
+    AminoAcid *aa6x53 = p.get_residue_bw("6.53");
+    AminoAcid *aa6x54 = p.get_residue_bw("6.54");
     AminoAcid *aa6x55 = p.get_residue_bw("6.55");
     AminoAcid *aa6x58 = p.get_residue_bw("6.58");
     AminoAcid *aa6x59 = p.get_residue_bw("6.59");
+    AminoAcid *aa7x31 = p.get_residue_bw("7.31");
+    AminoAcid *aa7x37 = p.get_residue_bw("7.37");
+    AminoAcid *aa7x41 = p.get_residue_bw("7.41");
     AminoAcid *aa7x48 = p.get_residue_bw("7.48");
     AminoAcid *aa7x52 = p.get_residue_bw("7.52");
     AminoAcid *aa7x53 = p.get_residue_bw("7.53");
     AminoAcid *aa7x56 = p.get_residue_bw("7.56");
     
     int n3x21 = aa3x21->get_residue_no();
+    int n3x39 = aa3x39->get_residue_no();
     int n3x56 = aa3x56->get_residue_no();
     int n4x53 = aa4x53->get_residue_no();
     int n4x64 = aa4x64->get_residue_no();
@@ -117,6 +125,8 @@ int main(int argc, char** argv)
     int n6x55 = aa6x55->get_residue_no();
     int n6x58 = aa6x58->get_residue_no();
     int n6x59 = aa6x59->get_residue_no();
+    int n7x31 = aa7x31->get_residue_no();
+    int n7x41 = aa7x41->get_residue_no();
 
     char l3x40 = aa3x40->get_letter();
     char l45x51 = aa45x51->get_letter();
@@ -134,11 +144,61 @@ int main(int argc, char** argv)
 
     Bond* b;
     bool bcr;
+    bool stiff6x55 = false;
 
+    LocatedVector axis3, axis4;
+    float theta;
+    Point was;
+    SCoord TMR6c, axis5;
+    float theta6 = 0;
+    SCoord axis6;
+    float bridge57, scooch6x40 = 0, TMR7cz;
+    SCoord TMR5cdir, TMR6cdir, TMR7cdir, axis7;
+    Point pt_tmp;
+    TMR6ActivationType type6;
 
     // If there is an R at position 6.59, perform a slight helix unwind and bring 6.59's side chain inward.
     DynamicMotion unwind6(&p);
     DynamicMotion bend45(&p);
+
+
+    if (!strcmp(orid.c_str(), "OR2M3"))
+    {
+        // aa7x41->conform_atom_to_location("OH", aa6x48->get_CA_location());
+        p.bridge(n3x39, n7x41);
+        aa6x53->get_atom("CA")->get_bond_between(aa6x53->get_atom("CB"))->rotate(60*fiftyseventh);
+        // aa6x54->conform_atom_to_location(aa6x54->get_reach_atom()->name, aa45x51->get_CA_location());
+
+        unwind6.start_resno.from_string("6.54");
+        unwind6.end_resno.from_string("6.55");
+        unwind6.type = dyn_wind;
+        unwind6.bias = -60;
+        unwind6.apply_absolute(1);
+
+        pt_tmp = aa1x32->get_CA_location();
+        SCoord delta = aa7x37->get_CA_location().subtract(aa45x51->get_CA_location());
+        delta.r = 2;
+        pt_tmp = pt_tmp.add(delta);
+        axis7 = compute_normal(aa7x41->get_CA_location(), aa7x31->get_CA_location(), pt_tmp);
+        LocatedVector lv = axis7;
+        lv.origin = aa7x41->get_CA_location();
+        theta = fmin(p.region_can_rotate(n7x31, n7x41, lv, true), fiftyseventh*10);
+        p.rotate_piece(n7x31, n7x41, lv.origin, axis7, theta);
+
+        axis6 = compute_normal(aa6x48->get_CA_location(), aa6x55->get_CA_location(), aa7x31->get_CA_location());
+        lv = axis6;
+        lv.origin = aa6x48->get_CA_location();
+        theta = fmin(p.region_can_rotate(n6x48, n6x59, lv, true), fiftyseventh*2.5);
+        p.rotate_piece(n6x48, n6x59, lv.origin, axis7, theta);
+
+        // aa3x33->conform_atom_to_location("OG2", aa5x43->get_CA_location());
+    }
+    else if (!strcmp(orid.c_str(), "OR8H1"))
+    {
+        stiff6x55 = true;
+    }
+
+
     if (aa6x59 && aa6x58 && aa45x53 && (aa6x59->get_letter() == 'R'))
     {
         if (l45x53 == 'Q' || l45x53 == 'N' || l45x53 == 'R' || l45x53 == 'K' || l45x53 == 'E' || l45x53 == 'D')
@@ -171,41 +231,17 @@ int main(int argc, char** argv)
         // constraints.push_back((std::string)"STCR 6.59");
     }
 
-    float theta6 = 0;
-    SCoord axis6;
-    TMR6ActivationType type6;
 
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
-        b = aa6x55->get_atom("CB")->get_bond_between(aa6x55->get_atom("CG"));
-        b->can_rotate = false;
-        p.bridge(n6x55, n45x51);
-        constraints.push_back((std::string)"STCR 6.55 45.51");
-
-        // In OR8H1, F3.32 impinges on where this bridge would form, so it would be more sterically favorable to first point
-        // 6.55's EXTENT toward 45.53's CA and then make the bridge. Since this depends on the exact positioning of atoms around the
-        // neighborhood of 45.51 as well as the side chains of 45.52 and 45.53, it will be different for each receptor.
-        if (aa6x55->get_intermol_clashes(aa3x32) > 0)
-        {
-            cout << "3.32 fix for Y6.55 ~ D/E45.51 bridge." << endl;
-            aa6x55->movability = MOV_FLEXONLY;
-
-            if (l45x52 == 'S' || l45x52 == 'T' || l45x52 == 'A' || l45x52 == 'G')
-            {
-                cout << "Small 52." << endl;
-                aa6x55->conform_atom_to_location("OH", aa45x54->get_CA_location());
-                p.bridge(n6x55, n45x51);
-                aa6x55->movability = MOV_PINNED;
-                aa45x51->movability = MOV_FLEXONLY;
-                aa45x51->conform_atom_to_location(aa45x51->get_reach_atom()->name, aa6x55->get_atom_location("HH"));
-                aa45x51->movability = MOV_PINNED;
-                preserve6x55 = true;
-                pose6x55.copy_state(aa6x55);
-            }
-        }
+        aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, aa45x51->get_reach_atom()->get_location());
+        aa45x51->conform_atom_to_location(aa45x51->get_reach_atom()->name, aa6x55->get_reach_atom()->get_location());
+        aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, aa45x51->get_reach_atom()->get_location());
+        aa45x51->conform_atom_to_location(aa45x51->get_reach_atom()->name, aa6x55->get_reach_atom()->get_location());
 
         // constraints.push_back((std::string)"BRIDGE 6.55 45.51");
         float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));
+        aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, Point(0,10000,0));
 
         if (r <= 3)
         {
@@ -232,9 +268,10 @@ int main(int argc, char** argv)
             Point pt = aa6x55->get_CA_location().add(span);
             LocatedVector lv = axis6;
             lv.origin = aa6x48->get_CA_location();
-            theta6 = fmin(p.region_can_rotate(n6x48, n6x55, lv, true),
-                find_3d_angle(pt, aa6x55->get_CA_location(), lv.origin));
-            cout << "Hybrid6 type activation with a " << (fiftyseven * theta6) << "deg EXR component." << endl;
+            theta6 = fmin(p.region_can_rotate(n6x48, n6x55, lv, true), find_3d_angle(pt, aa6x55->get_CA_location(), lv.origin));
+            
+            cout << "Hybrid6 type activation with a " << (fiftyseven * theta6) << "deg EXR component limited by "
+                << *(p.stop1) << "->" << *(p.stop2) << "." << endl;
         }
     }
     else
@@ -261,7 +298,7 @@ int main(int argc, char** argv)
 
     // Perform a slight rotation of TMR3 to give TMR5 more room to move.
     
-    LocatedVector axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
+    axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
     axis3.origin = aa3x50->get_CA_location();
     float rock3 = p.region_can_rotate(n3x21, n3x56, axis3, true);
     cout << "TMR3 can rotate " << (rock3 * fiftyseven) << " degrees about 3.50 to make room for TMR5." << endl;
@@ -270,7 +307,7 @@ int main(int argc, char** argv)
     // TODO: This should not be hard coded.
     p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*2);
 
-    LocatedVector axis4 = (SCoord)aa4x53->get_CA_location().subtract(aa6x49->get_CA_location());
+    axis4 = (SCoord)aa4x53->get_CA_location().subtract(aa6x49->get_CA_location());
     axis4.origin = aa4x53->get_CA_location();
     float bend4 = p.region_can_rotate(n4x53, n4x64, axis4, true);
     cout << "TMR4 can bend " << (bend4 * fiftyseven) << " degrees about 4.64 to meet TMR3." << endl;
@@ -278,21 +315,41 @@ int main(int argc, char** argv)
     // Perform the rotation.
     p.rotate_piece(n4x53, n4x64, aa4x53->get_CA_location(), axis4, bend4);
 
+    if (l6x55 == 'Y')
+    {
+        Point he1 = aa6x55->get_atom_location("HE1");
+        Point he2 = aa6x55->get_atom_location("HE2");
+
+        const char* up_atom = (he1.y > he2.y) ? "HE1" : "HE2";
+
+        b = aa6x55->get_atom("CA")->get_bond_between(aa6x55->get_atom("CB"));
+        b->can_rotate = false;
+        b = aa6x55->get_atom("CB")->get_bond_between(aa6x55->get_atom("CG"));
+        b->can_rotate = true;
+        aa6x55->conform_atom_to_location(up_atom, Point(0,10000,0));
+        b->can_rotate = false;
+        b = aa6x55->get_atom("CA")->get_bond_between(aa6x55->get_atom("CB"));
+        b->can_rotate = true;
+        cout << "Vertical 6.55 ring." << endl;
+
+        // Will be using this later.
+        /* fp = fopen("tmp/vertical.pdb", "wb");
+        p.save_pdb(fp);
+        p.end_pdb(fp);
+        fclose(fp); */
+    }
 
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.
     
     SCoord TMR5edir = p.get_region_center(aa6x44->get_residue_no(), aa6x55->get_residue_no()).subtract(p.get_region_center(aa5x43->get_residue_no(), aa5x54->get_residue_no()));
     float TMR5ez = p.region_can_move(aa5x43->get_residue_no(), aa5x54->get_residue_no(), TMR5edir, true);
-    cout << "TMR5 moves " << TMR5ez << " toward TMR6." << endl;
+    cout << "TMR5 moves " << TMR5ez << " toward TMR6 limited by " << *(p.stop1) << "->" << *(p.stop2) << "." << endl;
 
     // Perform the TMR5ez slide.
     TMR5edir.r = TMR5ez;
     p.move_piece(aa5x33->get_residue_no(), aa5x68->get_residue_no(), TMR5edir);
 
     // If TMR6ex is nonzero:
-    float theta;
-    Point was;
-    SCoord TMR6c, axis5;
     if (theta6)
     {
         // Compute the angle to rotate about 6.48 and perform the rotation. Measure how far 56.50 moved; call it TMR6c.
@@ -301,6 +358,7 @@ int main(int argc, char** argv)
             (type6 == Swing6) ? n6x55 : n6x59,
             ((type6 == Swing6) ? aa6x55 : aa6x48)->get_CA_location(),
             axis6, theta6);
+        cout << "TMR6 rotation about " << *((type6 == Swing6) ? aa6x55 : aa6x48) << " by " << (theta6*fiftyseven) << "deg." << endl;
         TMR6c = aa56x50->get_CA_location().subtract(was);
 
         // Compute the axis and angle to rotate TMR5 about 5.50 to match 56.49 to TMR6c, and perform the rotation.
@@ -310,10 +368,47 @@ int main(int argc, char** argv)
         cout << "TMR5 rotation about " << axis5 << " by " << (theta*fiftyseven) << "deg." << endl;
     }
 
+    if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
+    {
+        if (stiff6x55)
+        {
+            b = aa6x55->get_atom("CB")->get_bond_between(aa6x55->get_atom("CG"));
+            b->can_rotate = false;
+            constraints.push_back((std::string)"STCR 6.55 45.51");
+        }
+        else
+        {
+            constraints.push_back((std::string)"BRIDGE 6.55 45.51");
+        }
+
+        p.bridge(n6x55, n45x51);
+        aa6x55->movability = aa45x51->movability = MOV_PINNED;
+        cout << "Bridged 6.55 and 45.51." << endl;
+
+        // In OR8H1, F3.32 impinges on where this bridge would form, so it would be more sterically favorable to first point
+        // 6.55's EXTENT toward 45.53's CA and then make the bridge. Since this depends on the exact positioning of atoms around the
+        // neighborhood of 45.51 as well as the side chains of 45.52 and 45.53, it will be different for each receptor.
+        if (aa6x55->get_intermol_clashes(aa3x32) > 0)
+        {
+            cout << "3.32 fix for Y6.55 ~ D/E45.51 bridge." << endl;
+            aa6x55->movability = MOV_FLEXONLY;
+
+            if (l45x52 == 'S' || l45x52 == 'T' || l45x52 == 'A' || l45x52 == 'G')
+            {
+                cout << "Small 52." << endl;
+                aa6x55->conform_atom_to_location("OH", aa45x54->get_CA_location());
+                p.bridge(n6x55, n45x51);
+                aa6x55->movability = MOV_PINNED;
+                aa45x51->movability = MOV_FLEXONLY;
+                aa45x51->conform_atom_to_location(aa45x51->get_reach_atom()->name, aa6x55->get_atom_location("HH"));
+                aa45x51->movability = MOV_PINNED;
+                preserve6x55 = true;
+                pose6x55.copy_state(aa6x55);
+            }
+        }
+    }
+
     // If there is Y5.58 and Y7.53:
-    float bridge57, scooch6x40 = 0, TMR7cz;
-    SCoord TMR5cdir, TMR6cdir, TMR7cdir, axis7;
-    Point pt_tmp;
     
     if (l5x58 == 'Y' && l7x53 == 'Y')
     {

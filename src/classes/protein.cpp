@@ -314,6 +314,8 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
         }
     }
 
+    last_saved_atom_number = offset;
+
     // Example CONECT syntax:
     // CONECT  487 1056
     if (connections.size())
@@ -3823,6 +3825,8 @@ float Protein::region_can_move(int startres, int endres, SCoord direction, bool 
                         + (std::string)" clashes by " + std::to_string(c)
                         + (std::string)" with "
                         + (std::string)aa2->get_3letter() + std::to_string(aa2->get_residue_no());
+                    stop1 = aa1;
+                    stop2 = aa2;
                 }
             }
         }
@@ -3862,7 +3866,7 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
         if (aa) revert_to[i].copy_state(aa);
     }
 
-    float result = 0, increment = fiftyseventh*5, clash;
+    float result = 0, increment = fiftyseventh*5, clash, initclash;
 
     for (l=0; l<200; l++)
     {
@@ -3888,17 +3892,24 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
                         + (std::string)" clashes by " + std::to_string(c)
                         + (std::string)" with "
                         + (std::string)aa2->get_3letter() + std::to_string(aa2->get_residue_no());
+                    stop1 = aa1;
+                    stop2 = aa2;
                 }
             }
         }
 
-        if (clash > homology_clash_peraa+eca)
+        if (!l) initclash = clash;
+        if (clash > homology_clash_peraa+eca && clash > 1.1*initclash)
         {
             // cout << "At " << ((result+increment)*fiftyseven) << "deg, " << debug_msg << "." << endl;
             rotate_piece(startres, endres, axis.origin, axis, -increment);
             increment *= 0.81;
         }
-        else result += increment;
+        else
+        {
+            result += increment;
+            initclash = clash;
+        }
 
         if (fabs(increment) < 0.01) break;
     }

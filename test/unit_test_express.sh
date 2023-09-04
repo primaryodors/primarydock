@@ -206,71 +206,77 @@ else
 fi
 
 
-MOLECULE="phenethyl_alcohol"
-test/group_test_mol "sdf/$MOLECULE.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
-RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
+# group_tests_mol.sh
+
+
+# test/group_test_res | sed '/^#/d' > testdata/received/group_test_res.received.txt
+# RESULT=$(diff --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt)
+# if [ -z "$RESULT" ]; then
+#     printf "${GRN}Residue group test succeeded.${NC}\n"
+# else
+#     printf "${RED}Residue group test FAILED.${NC}\n"
+#     diff --color --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt
+# fi
+
+test/moiety_test sdf/cinnamaldehyde.sdf "HC(C)=O" | sed '/^#/d' > testdata/received/moiety.aldehyde.received.txt
+RESULT=$(diff --unified testdata/moiety.aldehyde.approved.txt testdata/received/moiety.aldehyde.received.txt)
 if [ -z "$RESULT" ]; then
-    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+    printf "${GRN}Moiety test (aldehyde) succeeded.${NC}\n"
 else
-    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
-    diff --color --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt
+    printf "${RED}Moiety test (aldehyde) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.aldehyde.approved.txt testdata/received/moiety.aldehyde.received.txt
 fi
 
-MOLECULE="indole"
-test/group_test_mol "sdf/$MOLECULE.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
-RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
+test/moiety_test sdf/phenethyl_alcohol.sdf "c1ccccc1" | sed '/^#/d' > testdata/received/moiety.bzring.received.txt
+RESULT=$(diff --unified testdata/moiety.bzring.approved.txt testdata/received/moiety.bzring.received.txt)
 if [ -z "$RESULT" ]; then
-    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+    printf "${GRN}Moiety test (benzene ring) succeeded.${NC}\n"
 else
-    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
-    diff --color --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt
+    printf "${RED}Moiety test (benzene ring) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.bzring.approved.txt testdata/received/moiety.bzring.received.txt
 fi
 
-MOLECULE="pyrazine"
-test/group_test_mol "sdf/$MOLECULE.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
-RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
+test/moiety_test sdf/cis-3-hexen-1-ol.sdf "cc" | sed '/^#/d' > testdata/received/moiety.pibond.received.txt
+RESULT=$(diff --unified testdata/moiety.pibond.approved.txt testdata/received/moiety.pibond.received.txt)
 if [ -z "$RESULT" ]; then
-    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+    printf "${GRN}Moiety test (pi bond) succeeded.${NC}\n"
 else
-    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
-    diff --color --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt
+    printf "${RED}Moiety test (pi bond) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.pibond.approved.txt testdata/received/moiety.pibond.received.txt
 fi
 
-MOLECULE="cinnamaldehyde"
-test/group_test_mol "sdf/$MOLECULE.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
-RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
+test/moiety_test sdf/linalool.sdf "COH" | sed '/^#/d' > testdata/received/moiety.alcohol.received.txt
+RESULT=$(diff --unified testdata/moiety.alcohol.approved.txt testdata/received/moiety.alcohol.received.txt)
 if [ -z "$RESULT" ]; then
-    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+    printf "${GRN}Moiety test (alcohol) succeeded.${NC}\n"
 else
-    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
-    diff --color --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt
+    printf "${RED}Moiety test (alcohol) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.alcohol.approved.txt testdata/received/moiety.alcohol.received.txt
 fi
 
-MOLECULE="arabinose"
-test/group_test_mol "sdf/l-arabinose.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
-RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
+test/moiety_test "[Cl]c1ccc([Cl])cc1" "C[Cl]" | sed '/^#/d' > testdata/received/moiety.halide.received.txt
+RESULT=$(diff --unified testdata/moiety.halide.approved.txt testdata/received/moiety.halide.received.txt)
 if [ -z "$RESULT" ]; then
-    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+    printf "${GRN}Moiety test (halide) succeeded.${NC}\n"
 else
-    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
-    diff --color --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt
+    printf "${RED}Moiety test (halide) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.halide.approved.txt testdata/received/moiety.halide.received.txt
 fi
 
-MOLECULE="adenosine"
-test/group_test_mol "sdf/$MOLECULE.sdf" | sed '/^#/d' > testdata/received/groups.$MOLECULE.received.txt
-RESULT=$(diff --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt)
+test/moiety_test sdf/isovalerate.sdf "oc[o-]" | sed '/^#/d' > testdata/received/moiety.acid.received.txt
+RESULT=$(diff --unified testdata/moiety.acid.approved.txt testdata/received/moiety.acid.received.txt)
 if [ -z "$RESULT" ]; then
-    printf "${GRN}Molecule group test succeeded for $MOLECULE.${NC}\n"
+    printf "${GRN}Moiety test (acid) succeeded.${NC}\n"
 else
-    printf "${RED}Molecule group test FAILED for $MOLECULE.${NC}\n"
-    diff --color --unified testdata/groups.$MOLECULE.approved.txt testdata/received/groups.$MOLECULE.received.txt
+    printf "${RED}Moiety test (acid) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.acid.approved.txt testdata/received/moiety.acid.received.txt
 fi
 
-test/group_test_res | sed '/^#/d' > testdata/received/group_test_res.received.txt
-RESULT=$(diff --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt)
+test/moiety_test sdf/cadaverine.sdf "N[H+]" | sed '/^#/d' > testdata/received/moiety.amine.received.txt
+RESULT=$(diff --unified testdata/moiety.amine.approved.txt testdata/received/moiety.amine.received.txt)
 if [ -z "$RESULT" ]; then
-    printf "${GRN}Residue group test succeeded.${NC}\n"
+    printf "${GRN}Moiety test (amine) succeeded.${NC}\n"
 else
-    printf "${RED}Residue group test FAILED.${NC}\n"
-    diff --color --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt
+    printf "${RED}Moiety test (amine) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.amine.approved.txt testdata/received/moiety.amine.received.txt
 fi

@@ -5,6 +5,7 @@
 #include <memory>
 #include <algorithm>
 #include "protein.h"
+#include "moiety.h"
 
 struct ResiduePlaceholder
 {
@@ -52,7 +53,7 @@ class AtomGroup
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol, bool separate_metal_coord = false);
 
     protected:
-    Molecule* ligand;
+    Molecule* ligand = nullptr;
 };
 
 class ResidueGroup
@@ -99,5 +100,6 @@ std::ostream& operator<<(std::ostream& os, const ResidueGroup& scg);
 
 extern std::vector<MCoord> mtlcoords;
 extern std::vector<std::shared_ptr<GroupPair>> global_pairs;
+extern std::vector<Moiety> predef_grp;
 
 #endif

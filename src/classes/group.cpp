@@ -3,6 +3,7 @@
 
 std::vector<MCoord> mtlcoords;
 std::vector<std::shared_ptr<GroupPair>> global_pairs;
+std::vector<Moiety> predef_grp;
 
 void ResiduePlaceholder::set(const char* str)
 {
@@ -470,9 +471,120 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     int n = mol->get_atom_count();
     if (!n) return retval;
 
-    int i, j, k, l;
+    mol->identify_rings();
+
+    if (!predef_grp.size())
+    {
+        FILE* fp = fopen("data/moieties.dat", "rb");
+        if (!fp) throw 0xffff;
+        char buffer[1024];
+        while (!feof(fp))
+        {
+            fgets(buffer, 1022, fp);
+            if (buffer[0])
+            {
+                Moiety m;
+                m.pattern = buffer;
+                predef_grp.push_back(m);
+            }
+        }
+        fclose(fp);
+    }
+
+    int i, j, k, l, m;
     bool dirty[n+4];
     for (i=0; i<n; i++) dirty[i] = false;
+
+    int n1 = predef_grp.size();
+    for (i=0; i<n1; i++)
+    {
+        Atom* matches[n*32];
+        int times = predef_grp[i].contained_by(mol, matches);
+        if (times)
+        {
+            int n2;
+            for (n2=0; matches[n2]; n2++);      // count
+
+            int per_grp = n2 / times;
+            for (l=0; l<times; l++)
+            {
+                bool any_dirty = false;
+                for (j=0; j<per_grp; j++)
+                {
+                    k = mol->atom_idx_from_ptr(matches[l*per_grp+j]);
+                    if (dirty[k])
+                    {
+                        any_dirty = true;
+                        break;
+                    }
+
+                    Bond** bonds = matches[l*per_grp+j]->get_bonds();
+                    for (m=0; bonds[m]; m++)
+                    {
+                        if (!bonds[m]->btom) continue;
+                        if (bonds[m]->btom->get_Z() > 1) continue;
+                        k = mol->atom_idx_from_ptr(bonds[m]->btom);
+                        if (dirty[k])
+                        {
+                            any_dirty = true;
+                            break;
+                        }
+                    }
+                    if (any_dirty) break;
+                }
+                if (any_dirty) continue;
+
+                #if _dbg_groupsel
+                cout << predef_grp[i].pattern << " matched:";
+                for (j=0; matches[j]; j++) cout << " " << *matches[j];
+                cout << endl;
+                #endif
+
+                std::shared_ptr<AtomGroup> g(new AtomGroup());
+                g->ligand = mol;
+                for (j=0; j<per_grp; j++)
+                {
+                    Atom* a = matches[l*per_grp+j];
+                    k = mol->atom_idx_from_ptr(a);
+                    if (dirty[k]) continue;
+                    g->atoms.push_back(a);
+                    int fam = a->get_family();
+
+                    // Pyrazine/indole/furan fix.
+                    bool skip_dirty;
+                    if (!a->is_pi() || (fam != CHALCOGEN && fam != PNICTOGEN))
+                    {
+                        if (fam != CHALCOGEN || !a->is_bonded_to(TETREL, 2))
+                        {
+                            #if _dbg_groupsel
+                            cout << *a << " is in " << a->num_rings() << " rings, "
+                                << (a->is_pi() ? "" : "not ") << "pi, marked dirty." << endl;
+                            #endif
+                            dirty[k] = true;
+                            skip_dirty = false;
+                        }
+                    }
+                    else skip_dirty = true;
+
+                    Bond** bonds = a->get_bonds();
+                    for (m=0; bonds[m]; m++)
+                    {
+                        if (!bonds[m]->btom) continue;
+                        if (bonds[m]->btom->get_Z() > 1) continue;
+                        k = mol->atom_idx_from_ptr(bonds[m]->btom);
+                        if (dirty[k]) continue;
+                        g->atoms.push_back(bonds[m]->btom);
+                        if (!skip_dirty)
+                        {
+                            dirty[k] = true;
+                        }
+                    }
+                }
+
+                retval.push_back(g);
+            }
+        }
+    }
 
     std::vector<Atom*> bd = mol->longest_dimension();
     if (bd.size() < 2) throw 0xbad302;
@@ -601,11 +713,21 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     for (i=0; i<l; i++)
     {
         int ni = retval[i]->atoms.size();
+        if (retval[i]->heavy_atom_count() == 1)
+        {
+            int fam = retval[i]->atoms[0]->get_family();
+            if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+        }
         for (j=l-1; j>i; j--)
         {
             if (retval[i]->get_center().get_3d_distance(retval[j]->get_center()) > ld/3) continue;
 
             int nj = retval[j]->atoms.size();
+            if (retval[j]->heavy_atom_count() == 1)
+            {
+                int fam = retval[j]->atoms[0]->get_family();
+                if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+            }
             int si = retval[i]->intersecting(retval[j].get());
 
             if (retval[i]->average_similarity(retval[j].get()) >= 0.5 && (si >= nj/2 || si >= ni/2))
@@ -625,9 +747,19 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     for (i=0; i<l; i++)
     {
         int ni = retval[i]->atoms.size();
+        if (retval[i]->heavy_atom_count() == 1)
+        {
+            int fam = retval[i]->atoms[0]->get_family();
+            if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+        }
         for (j=l-1; j>i; j--)
         {
             int nj = retval[j]->atoms.size();
+            if (retval[j]->heavy_atom_count() == 1)
+            {
+                int fam = retval[j]->atoms[0]->get_family();
+                if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+            }
             if (retval[i]->intersecting(retval[j].get()))
             {
                 for (k=0; k<ni; k++)
@@ -650,33 +782,6 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         }
                     }
                 }
-            }
-        }
-    }
-
-    for (i=0; i<n; i++)
-    {
-        Atom* a = mol->get_atom(i);
-        if (a->is_pi())
-        {
-            int fam = a->get_family();
-            if (fam == CHALCOGEN || fam == PNICTOGEN)
-            {
-                std::shared_ptr<AtomGroup> g(new AtomGroup());
-                g->ligand = mol;
-                g->atoms.push_back(a);
-                
-                Bond** b = a->get_bonds();
-                for (j=0; b[j] && b[j]->btom; j++)
-                {
-                    if (b[j]->btom->get_Z() == 1) g->atoms.push_back(b[j]->btom);
-                }
-                
-                retval.push_back(g);
-
-                #if _dbg_groupsel
-                cout << "Creating group " << *g << endl << endl;
-                #endif
             }
         }
     }

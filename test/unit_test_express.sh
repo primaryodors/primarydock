@@ -305,8 +305,17 @@ fi
 test/moiety_test sdf/linalool.sdf "COH" | sed '/^#/d' > testdata/received/moiety.alcohol.received.txt
 RESULT=$(diff --unified testdata/moiety.alcohol.approved.txt testdata/received/moiety.alcohol.received.txt)
 if [ -z "$RESULT" ]; then
-    printf "${GRN}Moiety test (pi bond) succeeded.${NC}\n"
+    printf "${GRN}Moiety test (alcohol) succeeded.${NC}\n"
 else
-    printf "${RED}Moiety test (pi bond) FAILED.${NC}\n"
+    printf "${RED}Moiety test (alcohol) FAILED.${NC}\n"
     diff --color --unified testdata/moiety.alcohol.approved.txt testdata/received/moiety.alcohol.received.txt
+fi
+
+test/moiety_test "[Cl]c1ccc([Cl])cc1" "C[Cl]" | sed '/^#/d' > testdata/received/moiety.halide.received.txt
+RESULT=$(diff --unified testdata/moiety.halide.approved.txt testdata/received/moiety.halide.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Moiety test (halide) succeeded.${NC}\n"
+else
+    printf "${RED}Moiety test (halide) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.halide.approved.txt testdata/received/moiety.halide.received.txt
 fi

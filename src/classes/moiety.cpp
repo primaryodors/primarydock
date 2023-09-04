@@ -72,8 +72,6 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
     for (i=1; i<n; i++)
     {
         c = p[i];
-        buffer[0] = c;
-        buffer[1] = 0;
 
         if (c == '-')
         {
@@ -123,6 +121,23 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
         {
             parens--;
             continue;
+        }
+        else if (c == '[')
+        {
+            const char* bracket = strchr(&p[i], ']');
+            if (!bracket) return 0;
+            j = bracket - p - i;
+            for (l=1; l<j; l++)
+            {
+                buffer[l-1] = p[i+l];
+            }
+            buffer[l-1] = 0;
+            i += j;
+        }
+        else
+        {
+            buffer[0] = c;
+            buffer[1] = 0;
         }
 
         Bond** b = cursor[parens]->get_bonds();

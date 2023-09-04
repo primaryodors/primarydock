@@ -137,7 +137,21 @@ $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
 if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/ic_activate_or"))
 {
-    passthru("bin/ic_activate_or $protid");
+    if ($protid == "OR51E2")
+    {
+        $pepd = <<<heredoc
+LOAD pdbs/OR51/OR51E2.8f76.pdb
+HYDRO
+SAVE $pdbfname_active
+
+
+heredoc;
+        $fp = fopen("tmp/8f76.pepd", "wb");
+        fwrite($fp, $pepd);
+        fclose($fp);
+        passthru("bin/pepteditor tmp/8f76.pepd");
+    }
+    else passthru("bin/ic_activate_or $protid");
 }
 
 $flex_constraints = "";

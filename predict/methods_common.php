@@ -82,36 +82,6 @@ if (@$_REQUEST['next'])
 	$protid = @$_REQUEST['prot'] ?: false;
 	$ligname = @$_REQUEST['lig'] ?: false;
 	
-	/*foreach ($prioritize_pairs as $rcpid => $liglist)
-	{
-	    if ($protid && $protid != $rcpid && !preg_match("/^$protid$/", $rcpid) ) continue;
-	    foreach ($liglist as $lig)
-	    {
-	        $odor = find_odorant($lig);
-			$full_name = $odor['full_name'];
-			$fnnospace = str_replace(" ", "_", $full_name);
-			$lignospace = str_replace(" ", "_", $full_name);
-			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
-                ||
-                (   (max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version)
-                    &&
-                    !max(@$dock_results[$rcpid][$full_name]['locked'], @$dock_results[$rcpid][$fnnospace]['locked'])
-                )
-                )
-			{
-				if (false!==strpos($already, $lignospace))
-				{
-					continue;
-				}
-				
-				$protid = $rcpid;
-				$ligname = $full_name;
-				
-				goto found_next_pair;
-			}
-	    }
-	}*/
-	
 	foreach (array_keys($prots) as $rcpid)
 	{
 		if ($protid && $protid != $rcpid && !preg_match("/^$protid$/", $rcpid) ) continue;
@@ -127,8 +97,8 @@ if (@$_REQUEST['next'])
 			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
                 ||
                 (   (max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version)
-                    &&
-                    !max(@$dock_results[$rcpid][$full_name]['locked'], @$dock_results[$rcpid][$fnnospace]['locked'])
+                    /*&&
+                    !max(@$dock_results[$rcpid][$full_name]['locked'], @$dock_results[$rcpid][$fnnospace]['locked'])*/
                 )
                 )
 			{

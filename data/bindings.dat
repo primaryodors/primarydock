@@ -199,7 +199,8 @@ S       Zn     coord    0.5   2.43       24.0           2.5
 
 # To be expanded later.
 # Keep these last or the code will erroneously add them to the other bindings.
-*		H	   vdW		0.1	  4.0		  0.4
+*		C	   vdW		0.1	  4.0		  0.4
+*		H	   vdW		0.1	  3.0		  0.4
 
 
 

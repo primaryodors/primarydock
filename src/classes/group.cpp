@@ -471,6 +471,8 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     int n = mol->get_atom_count();
     if (!n) return retval;
 
+    mol->identify_rings();
+
     if (!predef_grp.size())
     {
         FILE* fp = fopen("data/moieties.dat", "rb");
@@ -532,7 +534,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 }
                 if (any_dirty) continue;
 
-                #if _dbg_moieties
+                #if _dbg_groupsel
                 cout << predef_grp[i].pattern << " matched:";
                 for (j=0; matches[j]; j++) cout << " " << *matches[j];
                 cout << endl;
@@ -549,10 +551,17 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
                     // Pyrazine/indole/furan fix.
                     bool skip_dirty;
-                    if (a->num_rings() != 1 || !a->is_pi() || fam != CHALCOGEN || fam != PNICTOGEN)
+                    if (!a->is_pi() || (fam != CHALCOGEN && fam != PNICTOGEN))
                     {
-                        dirty[k] = true;
-                        skip_dirty = false;
+                        if (fam != CHALCOGEN || !a->is_bonded_to(TETREL, 2))
+                        {
+                            #if _dbg_groupsel
+                            cout << *a << " is in " << a->num_rings() << " rings, "
+                                << (a->is_pi() ? "" : "not ") << "pi, marked dirty." << endl;
+                            #endif
+                            dirty[k] = true;
+                            skip_dirty = false;
+                        }
                     }
                     else skip_dirty = true;
 
@@ -703,11 +712,21 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     for (i=0; i<l; i++)
     {
         int ni = retval[i]->atoms.size();
+        if (retval[i]->heavy_atom_count() == 1)
+        {
+            int fam = retval[i]->atoms[0]->get_family();
+            if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+        }
         for (j=l-1; j>i; j--)
         {
             if (retval[i]->get_center().get_3d_distance(retval[j]->get_center()) > ld/3) continue;
 
             int nj = retval[j]->atoms.size();
+            if (retval[j]->heavy_atom_count() == 1)
+            {
+                int fam = retval[j]->atoms[0]->get_family();
+                if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+            }
             int si = retval[i]->intersecting(retval[j].get());
 
             if (retval[i]->average_similarity(retval[j].get()) >= 0.5 && (si >= nj/2 || si >= ni/2))
@@ -727,9 +746,19 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     for (i=0; i<l; i++)
     {
         int ni = retval[i]->atoms.size();
+        if (retval[i]->heavy_atom_count() == 1)
+        {
+            int fam = retval[i]->atoms[0]->get_family();
+            if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+        }
         for (j=l-1; j>i; j--)
         {
             int nj = retval[j]->atoms.size();
+            if (retval[j]->heavy_atom_count() == 1)
+            {
+                int fam = retval[j]->atoms[0]->get_family();
+                if (fam == CHALCOGEN || fam == PNICTOGEN) continue;
+            }
             if (retval[i]->intersecting(retval[j].get()))
             {
                 for (k=0; k<ni; k++)

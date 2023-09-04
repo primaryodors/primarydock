@@ -786,33 +786,6 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         }
     }
 
-    /*for (i=0; i<n; i++)
-    {
-        Atom* a = mol->get_atom(i);
-        if (a->is_pi())
-        {
-            int fam = a->get_family();
-            if (fam == CHALCOGEN || fam == PNICTOGEN)
-            {
-                std::shared_ptr<AtomGroup> g(new AtomGroup());
-                g->ligand = mol;
-                g->atoms.push_back(a);
-                
-                Bond** b = a->get_bonds();
-                for (j=0; b[j] && b[j]->btom; j++)
-                {
-                    if (b[j]->btom->get_Z() == 1) g->atoms.push_back(b[j]->btom);
-                }
-                
-                retval.push_back(g);
-
-                #if _dbg_groupsel
-                cout << "Creating group " << *g << endl << endl;
-                #endif
-            }
-        }
-    }*/
-
     return retval;
 }
 

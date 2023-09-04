@@ -1,0 +1,4 @@
+Matched 2 atoms.
+Matched 2 atoms.
+Pattern cc occurs 2 times in molecule.
+C4 C5 C5 C4 

@@ -274,3 +274,39 @@ else
     printf "${RED}Residue group test FAILED.${NC}\n"
     diff --color --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt
 fi
+
+test/moiety_test sdf/cinnamaldehyde.sdf "HC(C)=O" | sed '/^#/d' > testdata/received/moiety.aldehyde.received.txt
+RESULT=$(diff --unified testdata/moiety.aldehyde.approved.txt testdata/received/moiety.aldehyde.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Moiety test (aldehyde) succeeded.${NC}\n"
+else
+    printf "${RED}Moiety test (aldehyde) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.aldehyde.approved.txt testdata/received/moiety.aldehyde.received.txt
+fi
+
+test/moiety_test sdf/phenethyl_alcohol.sdf "c1ccccc1" | sed '/^#/d' > testdata/received/moiety.bzring.received.txt
+RESULT=$(diff --unified testdata/moiety.bzring.approved.txt testdata/received/moiety.bzring.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Moiety test (benzene ring) succeeded.${NC}\n"
+else
+    printf "${RED}Moiety test (benzene ring) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.bzring.approved.txt testdata/received/moiety.bzring.received.txt
+fi
+
+test/moiety_test sdf/cis-3-hexen-1-ol.sdf "cc" | sed '/^#/d' > testdata/received/moiety.pibond.received.txt
+RESULT=$(diff --unified testdata/moiety.pibond.approved.txt testdata/received/moiety.pibond.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Moiety test (pi bond) succeeded.${NC}\n"
+else
+    printf "${RED}Moiety test (pi bond) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.pibond.approved.txt testdata/received/moiety.pibond.received.txt
+fi
+
+test/moiety_test sdf/linalool.sdf "COH" | sed '/^#/d' > testdata/received/moiety.alcohol.received.txt
+RESULT=$(diff --unified testdata/moiety.alcohol.approved.txt testdata/received/moiety.alcohol.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Moiety test (pi bond) succeeded.${NC}\n"
+else
+    printf "${RED}Moiety test (pi bond) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.alcohol.approved.txt testdata/received/moiety.alcohol.received.txt
+fi

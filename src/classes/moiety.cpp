@@ -29,6 +29,18 @@ int Moiety::contained_by(Molecule* mol, Atom** out_matches)
 
 bool Moiety::atom_matches_string(Atom* a, char* buffer)
 {
+    char* charge = strchr(buffer, '+');
+    if (!charge) charge = strchr(buffer, '-');
+    if (!charge) charge = strchr(buffer, '0');
+
+    if (charge)
+    {
+        if (*charge == '+' && a->get_charge() <= 0) return false;
+        if (*charge == '-' && a->get_charge() >= 0) return false;
+        if (*charge == '0' && fabs(a->get_charge()) >= 0.2) return false;
+        *charge = 0;
+    }
+
     int Z = Atom::Z_from_esym(buffer);
     if (Z)
     {

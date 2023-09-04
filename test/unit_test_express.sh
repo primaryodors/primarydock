@@ -319,3 +319,21 @@ else
     printf "${RED}Moiety test (halide) FAILED.${NC}\n"
     diff --color --unified testdata/moiety.halide.approved.txt testdata/received/moiety.halide.received.txt
 fi
+
+test/moiety_test sdf/isovalerate.sdf "oc[o-]" | sed '/^#/d' > testdata/received/moiety.acid.received.txt
+RESULT=$(diff --unified testdata/moiety.acid.approved.txt testdata/received/moiety.acid.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Moiety test (acid) succeeded.${NC}\n"
+else
+    printf "${RED}Moiety test (acid) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.acid.approved.txt testdata/received/moiety.acid.received.txt
+fi
+
+test/moiety_test sdf/cadaverine.sdf "N[H+]" | sed '/^#/d' > testdata/received/moiety.amine.received.txt
+RESULT=$(diff --unified testdata/moiety.amine.approved.txt testdata/received/moiety.amine.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Moiety test (amine) succeeded.${NC}\n"
+else
+    printf "${RED}Moiety test (amine) FAILED.${NC}\n"
+    diff --color --unified testdata/moiety.amine.approved.txt testdata/received/moiety.amine.received.txt
+fi

@@ -3,6 +3,7 @@
 
 std::vector<MCoord> mtlcoords;
 std::vector<std::shared_ptr<GroupPair>> global_pairs;
+std::vector<Moiety> predef_grp;
 
 void ResiduePlaceholder::set(const char* str)
 {
@@ -470,9 +471,104 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     int n = mol->get_atom_count();
     if (!n) return retval;
 
-    int i, j, k, l;
+    if (!predef_grp.size())
+    {
+        FILE* fp = fopen("data/moieties.dat", "rb");
+        if (!fp) throw 0xffff;
+        char buffer[1024];
+        while (!feof(fp))
+        {
+            fgets(buffer, 1022, fp);
+            if (buffer[0])
+            {
+                Moiety m;
+                m.pattern = buffer;
+                predef_grp.push_back(m);
+            }
+        }
+        fclose(fp);
+    }
+
+    int i, j, k, l, m;
     bool dirty[n+4];
     for (i=0; i<n; i++) dirty[i] = false;
+
+    int n1 = predef_grp.size();
+    for (i=0; i<n1; i++)
+    {
+        Atom* matches[n*32];
+        int times = predef_grp[i].contained_by(mol, matches);
+        if (times)
+        {
+            int n2;
+            for (n2=0; matches[n2]; n2++);      // count
+
+            int per_grp = n2 / times;
+            for (l=0; l<times; l++)
+            {
+                bool any_dirty = false;
+                for (j=0; j<per_grp; j++)
+                {
+                    k = mol->atom_idx_from_ptr(matches[l*per_grp+j]);
+                    if (dirty[k])
+                    {
+                        any_dirty = true;
+                        break;
+                    }
+
+                    Bond** bonds = matches[l*per_grp+j]->get_bonds();
+                    for (m=0; bonds[m]; m++)
+                    {
+                        if (!bonds[m]->btom) continue;
+                        if (bonds[m]->btom->get_Z() > 1) continue;
+                        k = mol->atom_idx_from_ptr(bonds[m]->btom);
+                        if (dirty[k])
+                        {
+                            any_dirty = true;
+                            break;
+                        }
+                    }
+                    if (any_dirty) break;
+                }
+                if (any_dirty) continue;
+
+                std::shared_ptr<AtomGroup> g(new AtomGroup());
+                for (j=0; j<per_grp; j++)
+                {
+                    Atom* a = matches[l*per_grp+j];
+                    k = mol->atom_idx_from_ptr(a);
+                    if (dirty[k]) continue;
+                    g->atoms.push_back(a);
+                    int fam = a->get_family();
+
+                    // Pyrazine/indole/furan fix.
+                    bool skip_dirty;
+                    if (a->num_rings() != 1 || !a->is_pi() || fam != CHALCOGEN || fam != PNICTOGEN)
+                    {
+                        dirty[k] = true;
+                        skip_dirty = false;
+                    }
+                    else skip_dirty = true;
+
+                    Bond** bonds = a->get_bonds();
+                    for (m=0; bonds[m]; m++)
+                    {
+                        if (!bonds[m]->btom) continue;
+                        if (bonds[m]->btom->get_Z() > 1) continue;
+                        k = mol->atom_idx_from_ptr(bonds[m]->btom);
+                        if (dirty[k]) continue;
+                        g->atoms.push_back(bonds[m]->btom);
+                        if (!skip_dirty)
+                        {
+                            dirty[k] = true;
+                        }
+                    }
+                }
+
+                retval.push_back(g);
+            }
+        }
+    }
 
     std::vector<Atom*> bd = mol->longest_dimension();
     if (bd.size() < 2) throw 0xbad302;
@@ -654,7 +750,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         }
     }
 
-    for (i=0; i<n; i++)
+    /*for (i=0; i<n; i++)
     {
         Atom* a = mol->get_atom(i);
         if (a->is_pi())
@@ -679,7 +775,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 #endif
             }
         }
-    }
+    }*/
 
     return retval;
 }

@@ -1,8 +1,2 @@
-Matched 6 atoms.
-Matched 6 atoms.
-Matched 6 atoms.
-Matched 6 atoms.
-Matched 6 atoms.
-Matched 6 atoms.
 Pattern c1ccccc1 occurs 6 times in molecule.
 C1 C2 C3 C4 C5 C6 C2 C1 C6 C5 C4 C3 C3 C2 C1 C6 C5 C4 C4 C3 C2 C1 C6 C5 C5 C4 C3 C2 C1 C6 C6 C1 C2 C3 C4 C5 

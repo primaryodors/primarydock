@@ -85,6 +85,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
     {
         c = p[i];
 
+        if (c <= ' ') continue;
         if (c == '-')
         {
             card = 1;

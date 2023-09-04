@@ -5,6 +5,7 @@
 #include <memory>
 #include <algorithm>
 #include "protein.h"
+#include "moiety.h"
 
 struct ResiduePlaceholder
 {
@@ -99,5 +100,6 @@ std::ostream& operator<<(std::ostream& os, const ResidueGroup& scg);
 
 extern std::vector<MCoord> mtlcoords;
 extern std::vector<std::shared_ptr<GroupPair>> global_pairs;
+extern std::vector<Moiety> predef_grp;
 
 #endif

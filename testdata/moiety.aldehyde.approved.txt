@@ -1,3 +1,2 @@
-Matched 4 atoms.
 Pattern HC(C)=O occurs 1 times in molecule.
 H18 C9 C8 O10 

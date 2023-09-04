@@ -73,7 +73,7 @@ else
 fi
 
 
-bin/primarydock testdata/test_1A1.config --colorless --pose 5 --iter 50 --elim 40 --congress > testdata/received/OR1A1_dLIMN.txt
+bin/primarydock testdata/test_1A1.config --colorless --congress > testdata/received/OR1A1_dLIMN.txt
 DLIMN_RESULT=$?
 if [ "$DLIMN_RESULT" -eq "0" ]; then
     POSES=$( cat testdata/received/OR1A1_dLIMN.txt | grep "pose(s) found" | sed 's/[^0-9]//g' )

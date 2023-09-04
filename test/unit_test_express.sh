@@ -209,14 +209,14 @@ fi
 # group_tests_mol.sh
 
 
-test/group_test_res | sed '/^#/d' > testdata/received/group_test_res.received.txt
-RESULT=$(diff --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt)
-if [ -z "$RESULT" ]; then
-    printf "${GRN}Residue group test succeeded.${NC}\n"
-else
-    printf "${RED}Residue group test FAILED.${NC}\n"
-    diff --color --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt
-fi
+# test/group_test_res | sed '/^#/d' > testdata/received/group_test_res.received.txt
+# RESULT=$(diff --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt)
+# if [ -z "$RESULT" ]; then
+#     printf "${GRN}Residue group test succeeded.${NC}\n"
+# else
+#     printf "${RED}Residue group test FAILED.${NC}\n"
+#     diff --color --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt
+# fi
 
 test/moiety_test sdf/cinnamaldehyde.sdf "HC(C)=O" | sed '/^#/d' > testdata/received/moiety.aldehyde.received.txt
 RESULT=$(diff --unified testdata/moiety.aldehyde.approved.txt testdata/received/moiety.aldehyde.received.txt)

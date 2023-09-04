@@ -541,6 +541,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 #endif
 
                 std::shared_ptr<AtomGroup> g(new AtomGroup());
+                g->ligand = mol;
                 for (j=0; j<per_grp; j++)
                 {
                     Atom* a = matches[l*per_grp+j];

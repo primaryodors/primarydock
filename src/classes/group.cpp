@@ -532,6 +532,12 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 }
                 if (any_dirty) continue;
 
+                #if _dbg_moieties
+                cout << predef_grp[i].pattern << " matched:";
+                for (j=0; matches[j]; j++) cout << " " << *matches[j];
+                cout << endl;
+                #endif
+
                 std::shared_ptr<AtomGroup> g(new AtomGroup());
                 for (j=0; j<per_grp; j++)
                 {

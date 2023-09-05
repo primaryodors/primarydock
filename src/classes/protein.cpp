@@ -3501,6 +3501,13 @@ void Protein::bridge(int resno1, int resno2)
 
     _INTERA_R_CUTOFF = aa1->get_CA_location().get_3d_distance(aa2->get_CA_location())
         + aa1->get_reach() + aa2->get_reach() + _DEFAULT_INTERA_R_CUTOFF;
+    
+    float r = aa1->get_CA_location().get_3d_distance(aa2->get_CA_location()) - aa1->get_reach() - aa2->get_reach();
+    if (r > 2.5)
+    {
+        aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa2->get_CA_location());
+        aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa1->get_CA_location());
+    }
 
     Molecule** mols = new Molecule*[3];
     mols[0] = aa1;

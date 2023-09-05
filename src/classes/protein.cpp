@@ -381,6 +381,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
                 #endif
                 for (j=0; j<n; j++)
                 {
+                    if (residues[i] == laa[j]) continue;
                     if (residues[i]->get_intermol_clashes(laa[j]) > 3)
                     {
                         #if _dbg_repack
@@ -3505,8 +3506,10 @@ void Protein::bridge(int resno1, int resno2)
     float r = aa1->get_CA_location().get_3d_distance(aa2->get_CA_location()) - aa1->get_reach() - aa2->get_reach();
     if (r > 2.5)
     {
-        aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa2->get_CA_location());
-        aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa1->get_CA_location());
+        aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa2->get_reach_atom()->get_location());
+        aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa1->get_reach_atom()->get_location());
+        aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa2->get_reach_atom()->get_location());
+        aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa1->get_reach_atom()->get_location());
     }
 
     Molecule** mols = new Molecule*[3];

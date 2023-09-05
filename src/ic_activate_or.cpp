@@ -38,6 +38,10 @@ int main(int argc, char** argv)
 
     std::vector<std::string> constraints;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Read program arguments
+    ////////////////////////////////////////////////////////////////////////////////
+
     // One argument, in the form of a protein ID, e.g. OR51E2.
     // If the ID does not conform to the format of OR{family}{subfamily}{member}, return an error code.
     if (argv[1][0] != 'O' || argv[1][1] != 'R') return -2;
@@ -58,6 +62,10 @@ int main(int argc, char** argv)
     if (!mem) return -2;
 
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Load protein
+    ////////////////////////////////////////////////////////////////////////////////
+
     // Locate and load the .upright.pdb in the folder structure, or throw an error if not found.
     std::string path = (std::string)"pdbs/OR" + std::to_string(fam) + (std::string)"/";
     std::string orid = (std::string)"OR" + std::to_string(fam) + sub + std::to_string(mem);
@@ -69,6 +77,11 @@ int main(int argc, char** argv)
     if (!fp) return -3;
     p.load_pdb(fp);
     fclose(fp);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Set up residue vars
+    ////////////////////////////////////////////////////////////////////////////////
 
     AminoAcid *aa1x32 = p.get_residue_bw("1.32");
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
@@ -139,6 +152,11 @@ int main(int argc, char** argv)
     char l6x59 = aa6x59->get_letter();
     char l7x53 = aa7x53->get_letter();
 
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Set up vars for processing.
+    ////////////////////////////////////////////////////////////////////////////////
+
     Pose pose6x55;
     bool preserve6x55 = false;
 
@@ -161,6 +179,10 @@ int main(int argc, char** argv)
     DynamicMotion unwind6(&p);
     DynamicMotion bend45(&p);
 
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Receptor-specific fixes.
+    ////////////////////////////////////////////////////////////////////////////////
 
     if (!strcmp(orid.c_str(), "OR2M3"))
     {
@@ -199,6 +221,10 @@ int main(int argc, char** argv)
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Arg6.59 unwind.
+    ////////////////////////////////////////////////////////////////////////////////
+
     if (aa6x59 && aa6x58 && aa45x53 && (aa6x59->get_letter() == 'R'))
     {
         if (l45x53 == 'Q' || l45x53 == 'N' || l45x53 == 'R' || l45x53 == 'K' || l45x53 == 'E' || l45x53 == 'D')
@@ -232,6 +258,10 @@ int main(int argc, char** argv)
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Determine TMR6 activation type.
+    ////////////////////////////////////////////////////////////////////////////////
+
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
         aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, aa45x51->get_reach_atom()->get_location());
@@ -263,7 +293,8 @@ int main(int argc, char** argv)
         {
             type6 = Hybrid6;
             axis6 = compute_normal(aa6x48->get_CA_location(), aa6x55->get_CA_location(), aa45x51->get_CA_location());
-            SCoord span = aa45x51->get_CA_location().subtract(aa6x55->get_CA_location());
+            // SCoord span = aa45x51->get_CA_location().subtract(aa6x55->get_CA_location());
+            SCoord span = aa45x51->get_reach_atom()->get_location().subtract(aa6x55->get_reach_atom()->get_location());
             span.r = r - 3;
             Point pt = aa6x55->get_CA_location().add(span);
             LocatedVector lv = axis6;
@@ -296,7 +327,11 @@ int main(int argc, char** argv)
         }
     }
 
-    // Perform a slight rotation of TMR3 to give TMR5 more room to move.
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Slight rotation of TMR3 to allow TMR5 motion.
+    ////////////////////////////////////////////////////////////////////////////////
     
     axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
     axis3.origin = aa3x50->get_CA_location();
@@ -314,6 +349,11 @@ int main(int argc, char** argv)
 
     // Perform the rotation.
     p.rotate_piece(n4x53, n4x64, aa4x53->get_CA_location(), axis4, bend4);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Tyr6.55 verticality.
+    ////////////////////////////////////////////////////////////////////////////////
 
     if (l6x55 == 'Y')
     {
@@ -339,6 +379,11 @@ int main(int argc, char** argv)
         fclose(fp); */
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // TMR5 motion toward TMR6.
+    ////////////////////////////////////////////////////////////////////////////////
+
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.
     
     SCoord TMR5edir = p.get_region_center(aa6x44->get_residue_no(), aa6x55->get_residue_no()).subtract(p.get_region_center(aa5x43->get_residue_no(), aa5x54->get_residue_no()));
@@ -348,6 +393,11 @@ int main(int argc, char** argv)
     // Perform the TMR5ez slide.
     TMR5edir.r = TMR5ez;
     p.move_piece(aa5x33->get_residue_no(), aa5x68->get_residue_no(), TMR5edir);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // ********** TMR6 motion. **********
+    ////////////////////////////////////////////////////////////////////////////////
 
     // If TMR6ex is nonzero:
     if (theta6)
@@ -367,6 +417,11 @@ int main(int argc, char** argv)
         p.rotate_piece(aa5x50->get_residue_no(), aa56x50->get_residue_no()-1, aa5x50->get_CA_location(), axis5, theta);
         cout << "TMR5 rotation about " << axis5 << " by " << (theta*fiftyseven) << "deg." << endl;
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // 6.55~45.51 bridge.
+    ////////////////////////////////////////////////////////////////////////////////
 
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
@@ -408,7 +463,10 @@ int main(int argc, char** argv)
         }
     }
 
-    // If there is Y5.58 and Y7.53:
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // TMR5-TMR7 cytoplasmic side contact.
+    ////////////////////////////////////////////////////////////////////////////////
     
     if (l5x58 == 'Y' && l7x53 == 'Y')
     {
@@ -480,26 +538,6 @@ int main(int argc, char** argv)
         // Translate the CYT3 region (BW numbers 56.x) to stay with 5.68 and 6.28 as smoothly as possible.
         bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
         cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
-
-        #if 0
-
-        TMR5cdir = aa7x53->get_CA_location().subtract(aa5x58->get_CA_location());
-        TMR5cdir.r = bridge57;
-        axis5 = compute_normal(aa5x33->get_CA_location(), aa5x58->get_CA_location(), aa5x58->get_CA_location().add(TMR5cdir));
-        theta = find_3d_angle(aa5x58->get_CA_location(), aa5x58->get_CA_location().add(TMR5cdir), aa5x33->get_CA_location());
-        was = aa56x50->get_CA_location();
-        p.rotate_piece(aa5x33->get_residue_no(), aa56x50->get_residue_no(), aa5x33->get_CA_location(), axis5, theta);
-
-        TMR6cdir = aa56x50->get_CA_location().subtract(was);
-        axis6 = compute_normal(aa6x59->get_CA_location(), was, aa56x50->get_CA_location());
-        theta = find_3d_angle(was, aa56x50->get_CA_location(), aa6x59->get_CA_location());
-        p.rotate_piece(aa56x50->get_residue_no()+1, aa6x59->get_residue_no(), aa6x59->get_CA_location(), axis6, theta);
-
-        p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
-        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
-        cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
-
-        #endif
         
         // If 6.40 is once again clashing with 7.53, compute the distance to rotate 6.48 thru 56.50 about 6.48 to eliminate the clash.
         // Then perform the rotation, then compute the rotation of TMR5 about 5.33 to keep up, and perform that rotation.
@@ -545,8 +583,13 @@ int main(int argc, char** argv)
 
     cout << "Minimizing internal clashes..." << endl;
     p.get_internal_clashes(1, p.get_end_resno(), true);
+    p.get_internal_clashes(n3x21, n3x56, true);
 
-    // If there is R6.59, adjust its side chain to keep pointing inward while avoiding clashes with other nearby side chains.
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Arg6.59 positioning.
+    ////////////////////////////////////////////////////////////////////////////////
+
     if (type6 == Rock6x59 && (l6x59 == 'R' || l6x59 == 'K'))
     {
         cout << "Optimizing 6.59 side chain..." << endl;
@@ -585,7 +628,11 @@ int main(int argc, char** argv)
         fclose(fp);*/
     }
 
-    // Now save the output file. It will be the same name as the input file except it will end in .active.pdb instead of .upright.pdb.
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Save output file.
+    ////////////////////////////////////////////////////////////////////////////////
+
     save_and_exit:
     if (preserve6x55) pose6x55.restore_state(aa6x55);
 
@@ -597,7 +644,11 @@ int main(int argc, char** argv)
     fclose(fp);
     cout << "Saved " << out_filename << endl;
 
-    // Finally, write all BRIDGE, STCR, and FLXR parameters to a constraints file ending in .params instead of .upright.pdb.
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Save parameters file.
+    ////////////////////////////////////////////////////////////////////////////////
+
     std::string cns_filename = path + orid + (std::string)".params";
     fp = fopen(cns_filename.c_str(), "wb");
     if (!fp) return -3;

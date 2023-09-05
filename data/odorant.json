@@ -28409,7 +28409,7 @@
     "74c2ae7b4e4756f4ff4c58920598a79a":
     {
         "full_name": "2-pentylpyridine",
-        "smiles": "CCCCCC1=CC=CC=[NH+]1",
+        "smiles": "CCCCCC1=CC=CC=N1",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -30158,7 +30158,7 @@
     "59e66b427c4d4067e81884123ac85898":
     {
         "full_name": "pyridine",
-        "smiles": "C1=CC=[NH+]C=C1",
+        "smiles": "C1=CC=NC=C1",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":

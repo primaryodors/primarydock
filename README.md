@@ -89,6 +89,7 @@ application that is used for the Primary Odors website.
 To enable the web app:
 - Either set up a local web server or checkout primarydock in a folder on a web host.
 - Make sure your server has the `php`, `php-curl`, and `php-gd` packages installed.
+- After installing `php-curl`, it's important to restart the web service e.g. `sudo apache2ctl -k restart`.
 - Then open the `www/symlink.sh` file in a text editor, make sure the destination folder is correct (by default it will show `/var/www/html/`
   which is usually correct for Apache2 installations), make sure you have write permissions in the 
   folder (or use `sudo`), and execute `www/symlink.sh` in a command line.

@@ -92,6 +92,8 @@ int main(int argc, char** argv)
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
     AminoAcid *aa3x56 = p.get_residue_bw("3.56");
     AminoAcid *aa4x53 = p.get_residue_bw("4.53");
+    AminoAcid *aa4x55 = p.get_residue_bw("4.55");
+    AminoAcid *aa4x56 = p.get_residue_bw("4.56");
     AminoAcid *aa4x60 = p.get_residue_bw("4.60");
     AminoAcid *aa4x61 = p.get_residue_bw("4.61");
     AminoAcid *aa4x64 = p.get_residue_bw("4.64");
@@ -142,6 +144,7 @@ int main(int argc, char** argv)
     int n7x41 = aa7x41->get_residue_no();
 
     char l3x40 = aa3x40->get_letter();
+    char l4x56 = aa4x56->get_letter();
     char l45x51 = aa45x51->get_letter();
     char l45x52 = aa45x52->get_letter();
     char l45x53 = aa45x53->get_letter();
@@ -218,6 +221,15 @@ int main(int argc, char** argv)
     else if (!strcmp(orid.c_str(), "OR8H1"))
     {
         stiff6x55 = true;
+    }
+
+    if (l4x56 == 'D' || l4x56 == 'E')
+    {
+        const char* atom_name = (l4x56 == 'D') ? "CG" : "CD";
+        SCoord v = aa4x56->get_CA_location().subtract(aa3x33->get_CA_location());
+        v.r = 10000;
+        aa4x56->conform_atom_to_location(atom_name, v);
+        constraints.push_back((std::string)"STCR 4.56");
     }
 
 

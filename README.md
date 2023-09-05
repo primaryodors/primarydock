@@ -92,7 +92,7 @@ To enable the web app:
 - Then open the `www/symlink.sh` file in a text editor, make sure the destination folder is correct (by default it will show `/var/www/html/`
   which is usually correct for Apache2 installations), make sure you have write permissions in the 
   folder (or use `sudo`), and execute `www/symlink.sh` in a command line.
-- The `www/assets` folder and all contents must also be recursively made writable by the web user.
+- The `data` and `www/assets` folders and all contents must also be recursively made writable by the web user.
 - If on a local server, you will now have an instance of the web app at http://127.0.0.1/primarydock/ whereas if you are using a web host
   then you may have to configure your hosting to point one of your registered domains or subfolders to the `primarydock/www` folder.
 

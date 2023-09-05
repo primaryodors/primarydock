@@ -76,6 +76,17 @@ $pairs = all_empirical_pairs_for_receptor($rcpid);
 include("header.php");
 
 ?>
+<style>
+#skeletal
+{
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    box-shadow: 25px 25px 35px rgba(0,0,0,0.5);
+    z-index: 10000;
+    background: #234;
+}
+</style>
 <script>
 var viewer_loaded = false;
 function load_viewer(obj)
@@ -120,6 +131,26 @@ function load_viewer(obj)
         }, 259); 
         viewer_loaded = true;
     }
+}
+
+function showSkeletal(e, img)
+{
+    var skeletal = $("#skeletal")[0];
+    skeletal.style.left = `${e.pageX}px`;
+    skeletal.style.top = `${e.pageY}px`;
+    skeletal.innerText = "Please wait...";
+    
+	$.ajax(
+	{
+		url: img,
+		cache: false,
+		success: function(result)
+		{
+            skeletal.innerHTML = result;
+        }
+    });
+
+    $(skeletal).show();
 }
 </script>
 
@@ -526,7 +557,14 @@ foreach ($pairs as $oid => $pair)
 
     $ufn = urlencode($odor['full_name']);
     echo "<tr>\n";
-    echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\">{$odor['full_name']}</a></td>\n";
+    echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\"";
+
+    $skelurl = "skeletal.php?oid=$oid";
+
+    echo " onmouseenter=\"showSkeletal(event, '$skelurl');\"";
+    echo " onmouseout=\"$('#skeletal').hide();\"";
+    echo ">{$odor['full_name']}</a>";
+    echo "</td>\n";
 
     echo "<td>" . 
         ($dispec50 = (@$pair['ec50']
@@ -563,6 +601,11 @@ foreach ($pairs as $oid => $pair)
 </div>
 </div>
 </div>
+
+<div id="skeletal"></div>
+<script>
+$('#skeletal').hide();
+</script>
 
 <div id="Comparison" class="tabcontent">
 <div class="box">

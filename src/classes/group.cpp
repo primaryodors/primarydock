@@ -1024,6 +1024,11 @@ float GroupPair::get_weighted_potential()
     else if (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff && fabs(scg->hydrophilicity()) >= hydrophilicity_cutoff) f *= 25;
     else if ((ag->get_pi()/ag->atoms.size()) >= 0.25 && scg->pi_stackability() > 0.25 ) f *= 7;
 
+    // Pair priority never should have overridden binding strength. It was always a means to ensure that specific ligand-protein contacts
+    // be made without undue precedence given to other potential contacts *of the same type*. It was never a feature to allow e.g. a van der
+    // Waals contact to override e.g. a hydrogen bond.
+    if (priority) f *= 2.5;
+
     return f;
 }
 
@@ -1192,15 +1197,7 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         }
         else for (l=0; l<r; l++)
         {
-            if  (
-                    (
-                        pair->priority == retval[l]->priority
-                        &&
-                        pair->get_weighted_potential() > retval[l]->get_weighted_potential()
-                    )
-                    ||
-                    (pair->priority && !retval[l]->priority)
-                )
+            if  (pair->get_weighted_potential() > retval[l]->get_weighted_potential())
             {
                 std::vector<std::shared_ptr<GroupPair>>::iterator it;
                 it = retval.begin();

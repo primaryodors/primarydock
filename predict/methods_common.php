@@ -139,6 +139,7 @@ $outfname = "output.dock";
 function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname;
+    global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $atomto, $stcr, $flxr, $mcoord, $mbp;
 
     chdir(__DIR__);
     chdir("..");
@@ -146,6 +147,8 @@ function prepare_outputs()
     if (!file_exists("output/$fam")) mkdir("output/$fam");
     if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
     if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n");
+
+    $binding_pockets = json_decode(file_get_contents("data/binding_pocket.json"), true);
     
     $ligname = str_replace(" ", "_", $ligname);
     $suffix = ($dock_metals) ? "metal" : "upright";
@@ -153,6 +156,93 @@ function prepare_outputs()
     if ($dock_metals && !file_exists($pdbfname)) $pdbfname = "pdbs/$fam/$protid.upright.pdb";
     if (!file_exists($pdbfname)) die("Missing PDB.\n");
     $outfname = "output/$fam/$protid/$protid-$ligname.dock";
+
+    $size = "7.5 7.5 7.5";
+    $search = "BB";
+    $atomto = [];
+    $stcr = "";
+    $flxr = "";
+    $mcoord = "";
+    
+    $mbp = false;                       // Matched binding pocket.
+    
+    if (isset($binding_pockets[$protid])) $mbp = $binding_pockets[$protid];
+    else foreach ($binding_pockets as $pocketid => $pocket)
+    {
+        if (substr($pocketid, -1) == '*' && substr($pocketid, 0, -1) == substr($protid, 0, strlen($pocketid)-1))
+        {
+            $mbp = $pocket;
+            echo "Matched $pocketid via wildcard.\n";
+            break;
+        }
+        else if (preg_match("/^$pocketid\$/", $protid))
+        {
+            $mbp = $pocket;
+            echo "Matched $pocketid via regex.\n";
+            break;
+        }
+    }
+    
+    if ($mbp)
+    {
+        if (isset($mbp['odorophores']))
+        {
+            $sdfname = "sdf/".(str_replace(' ', '_', $ligname)).".sdf";
+            foreach ($mbp['odorophores'] as $moiety => $params)
+            {
+                $result = [];
+                exec("test/moiety_test \"$sdfname\" \"$moiety\"", $result);
+                foreach ($result as $line)
+                {
+                    if (preg_match("/ occurs [1-9][0-9]* times/", $line))
+                    {
+                        echo "$line\n";
+                        foreach ($params as $key => $value) $mbp[$key] = $value;
+                        break;
+                    }
+                }
+            }
+        }
+    
+        if (isset($mbp["size"])) $size = $mbp["size"];
+        if (isset($mbp["search"])) $search = $mbp["search"];
+        if (isset($mbp["mcoord"])) $mcoord = "MCOORD {$mbp["mcoord"]}";
+        if (isset($mbp["stcr"])) $stcr = "STCR {$mbp["stcr"]}";
+        if (isset($mbp["flxr"])) $flxr = "FLXR {$mbp["flxr"]}";
+    
+        if (isset($mbp["atomto"]))
+        {
+            foreach ($mbp["atomto"] as $a2)
+            {
+                $atomto[] = "ATOMTO $a2";
+            }
+        }
+    }
+    
+    if ($mbp && isset($mbp["pocket"]))
+    {
+        $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
+    }
+    else if ($mbp && isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))
+    {
+        $cenres_active = isset($mbp["active_pocket"]);
+        $cenres_inactive = isset($mbp["inactive_pocket"]);
+    }
+    else
+    {
+        if (substr($fam, 0, 2) == "OR")
+        {
+            $cenres_active = $cenres_inactive = "CEN RES 3.37 5.47 6.55 7.41";
+        }
+        else if (substr($fam, 0, 4) == "TAAR")
+        {
+            die("There is not yet an internal contacts activation app for TAARs.\n");
+            $cenres_active = $cenres_inactive = "CEN RES 3.32 3.37 5.43 6.48 7.43";
+        }
+        else die("Unsupported receptor family.\n");
+    }
+    
+    $atomto = implode("\n", $atomto);    
 }
 
 $multicall = 0;

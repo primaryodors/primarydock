@@ -197,7 +197,16 @@ function prepare_outputs()
                     if (preg_match("/ occurs [1-9][0-9]* times/", $line))
                     {
                         echo "$line\n";
-                        foreach ($params as $key => $value) $mbp[$key] = $value;
+                        foreach ($params as $key => $value)
+                        {
+                            if ($key == "mcoord")
+                            {
+                                if (is_array(@$mbp['mcoord'])) $mbp['mcoord'][] = $value;
+                                else if (@$mbp['mcoord']) $mbp['mcoord'] = [$mbp['mcoord'], $value];
+                                else $mbp['mcoord'] = $value;
+                            }
+                            else $mbp[$key] = $value;
+                        }
                         break;
                     }
                 }
@@ -206,7 +215,11 @@ function prepare_outputs()
     
         if (isset($mbp["size"])) $size = $mbp["size"];
         if (isset($mbp["search"])) $search = $mbp["search"];
-        if (isset($mbp["mcoord"])) $mcoord = "MCOORD {$mbp["mcoord"]}";
+        if (isset($mbp["mcoord"]))
+        {
+            if (!is_array($mbp['mcoord'])) $mbp['mcoord'] = [$mbp['mcoord']];
+            foreach ($mbp['mcoord'] as $mc) $mcoord .= "MCOORD $mc\n";
+        }
         if (isset($mbp["stcr"])) $stcr = "STCR {$mbp["stcr"]}";
         if (isset($mbp["flxr"])) $flxr = "FLXR {$mbp["flxr"]}";
     

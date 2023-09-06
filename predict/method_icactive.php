@@ -100,6 +100,7 @@ $cenres_inactive
 SIZE $size
 # H2O 5
 $mcoord
+MCOORD Na +1 2.50 3.39              # Common to almost all GPCRs in the inactive state only.
 $atomto
 $stcr
 $flxr

@@ -479,6 +479,9 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////////
     // TMR5-TMR7 cytoplasmic side contact.
     ////////////////////////////////////////////////////////////////////////////////
+
+    // TODO: There should be a water molecule between 5.58 and 7.53, and R3.50 should coordinate to Y5.58.
+    // Source: Manglik and Kruse, 2017 doi:10.1021/acs.biochem.7b00747.
     
     if (l5x58 == 'Y' && l7x53 == 'Y')
     {

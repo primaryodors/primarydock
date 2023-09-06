@@ -1,7 +1,13 @@
 {
     "OR2M3":
     {
-        "mcoord": "Cu +1 5.43 5.42",
+        "odorophores":
+        {
+            "S":
+            {
+                "mcoord": "Cu +1 5.43 5.42"
+            }
+        },
         "pocket": "3.33 3.36 5.42 5.43",
         "atomto":
         [
@@ -11,7 +17,13 @@
     },
     "OR2[MTV][0-9]{1,2}":
     {
-        "mcoord": "Cu +1 5.43 5.42  # These are processed sequentially, so the first Cys will become the charged thiolate.",
+        "odorophores":
+        {
+            "S":
+            {
+                "mcoord": "Cu +1 5.43 5.42  # These are processed sequentially, so the first Cys will become the charged thiolate."
+            }
+        },
         "pocket": "3.33 3.36 5.42 5.43"
     },
     "OR8H1":

@@ -46,6 +46,25 @@ else foreach ($binding_pockets as $pocketid => $pocket)
 
 if ($mbp)
 {
+    if (isset($mbp['odorophores']))
+    {
+        $sdfname = "sdf/".(str_replace(' ', '_', $ligname)).".sdf";
+        foreach ($mbp['odorophores'] as $moiety => $params)
+        {
+            $result = [];
+            exec("test/moiety_test \"$sdfname\" \"$moiety\"", $result);
+            foreach ($result as $line)
+            {
+                if (preg_match("/ occurs [1-9][0-9]* times/", $line))
+                {
+                    echo "$line\n";
+                    foreach ($params as $key => $value) $mbp[$key] = $value;
+                    break;
+                }
+            }
+        }
+    }
+
     if (isset($mbp["size"])) $size = $mbp["size"];
     if (isset($mbp["search"])) $search = $mbp["search"];
     if (isset($mbp["mcoord"])) $mcoord = "MCOORD {$mbp["mcoord"]}";

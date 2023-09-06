@@ -552,17 +552,14 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
                     // Pyrazine/indole/furan fix.
                     bool skip_dirty;
-                    if (!a->is_pi() || (fam != CHALCOGEN && fam != PNICTOGEN))
+                    if (!a->is_pi() || (fam != CHALCOGEN && fam != PNICTOGEN) || a->is_bonded_to(TETREL, 2))
                     {
-                        if (fam != CHALCOGEN || !a->is_bonded_to(TETREL, 2))
-                        {
-                            #if _dbg_groupsel
-                            cout << *a << " is in " << a->num_rings() << " rings, "
-                                << (a->is_pi() ? "" : "not ") << "pi, marked dirty." << endl;
-                            #endif
-                            dirty[k] = true;
-                            skip_dirty = false;
-                        }
+                        #if _dbg_groupsel
+                        cout << *a << " is in " << a->num_rings() << " rings, "
+                            << (a->is_pi() ? "" : "not ") << "pi, marked dirty." << endl;
+                        #endif
+                        dirty[k] = true;
+                        skip_dirty = false;
                     }
                     else skip_dirty = true;
 
@@ -1051,11 +1048,6 @@ float GroupPair::get_potential()
             {
                 AminoAcid* aa = scg->aminos[j];
                 float partial;
-
-                if (aa->get_residue_no() == 160 && a->get_Z() == 8)
-                {
-                    partial = 0;
-                }
 
                 if (aa->coordmtl)
                 {

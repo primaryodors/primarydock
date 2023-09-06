@@ -1840,7 +1840,7 @@ _found_aadef:
     return retval;
 }
 
-float Molecule::hydrophilicity()
+float Molecule::hydrophilicity() const
 {
     int i, count = 0;
     float total = 0;
@@ -2240,6 +2240,11 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
+
+        if (atoms[i]->residue == 160)
+        {
+            j = 0;
+        }
 
         InteratomicForce** ifs = InteratomicForce::get_applicable(a, atoms[i]);
         if (!ifs) continue;

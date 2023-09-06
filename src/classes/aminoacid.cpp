@@ -1986,25 +1986,30 @@ bool AminoAcid::is_helix(int p)
 float AminoAcid::hydrophilicity() const
 {
     int i, count=0;
-    float total=0;
+    float total=0, weight;
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
+        if (!strcmp(atoms[i]->name, "HA")) continue;
+
+        weight = 1;
 
         int Z = atoms[i]->get_Z();
         int fam = atoms[i]->get_family();
-        if (Z==1) continue;
+        // if (Z==1) continue;
+        if (Z==1) fam = atoms[i]->get_bond_by_idx(0)->btom->get_family();
+        if (Z==1 && fam == TETREL) continue;
+
+        if (Z == 7) weight = 2.5;
+        else if (Z == 8) weight = 3;
+        else if (Z == 15) weight = 1.5;
+        else if (Z == 16) weight = 1.25;
 
         if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
 
         float h = atoms[i]->hydrophilicity_rule();
-        total += h;
+        total += h*weight;
         count++;
-        if (fam != TETREL)
-        {
-            total += h;
-            count++;
-        }
     }
     return count ? (total / count) : 0;
 }

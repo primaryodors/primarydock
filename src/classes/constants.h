@@ -27,7 +27,7 @@
 #define homology_clash_peraa 4.0
 
 #define pH 6.0
-#define hydrophilicity_cutoff 0.29
+#define hydrophilicity_cutoff 0.25
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.
 #define intermol_ESP 0.05
@@ -329,7 +329,7 @@
 #define _dbg_bb_rots 0
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
-#define _dbg_groupsel 0
+#define _dbg_groupsel 1
 #define _show_final_group_pairs 0
 #define _dbg_polsat 0
 #define _dbg_softrock 0

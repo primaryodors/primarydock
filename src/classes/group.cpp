@@ -1052,6 +1052,11 @@ float GroupPair::get_potential()
                 AminoAcid* aa = scg->aminos[j];
                 float partial;
 
+                if (aa->get_residue_no() == 160 && a->get_Z() == 8)
+                {
+                    partial = 0;
+                }
+
                 if (aa->coordmtl)
                 {
                     partial = InteratomicForce::potential_binding(a, aa->coordmtl);

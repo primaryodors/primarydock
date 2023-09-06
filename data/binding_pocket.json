@@ -5,10 +5,11 @@
         {
             "S":
             {
-                "mcoord": "Cu +1 5.43 5.42"
+                "mcoord": "Cu +1 5.43 5.42",
+                "stcr": "5.42 5.43"
             }
         },
-        "pocket": "3.33 3.36 5.42 5.43",
+        "pocket": "3.33 3.36 5.42 5.43 6.51",
         "atomto":
         [
             "3.33 OG2 5.43"
@@ -21,10 +22,11 @@
         {
             "S":
             {
-                "mcoord": "Cu +1 5.43 5.42  # These are processed sequentially, so the first Cys will become the charged thiolate."
+                "mcoord": "Cu +1 5.43 5.42  # These are processed sequentially, so the first Cys will become the charged thiolate.",
+                "stcr": "5.42 5.43"
             }
         },
-        "pocket": "3.33 3.36 5.42 5.43"
+        "pocket": "3.33 3.36 5.42 5.43 6.51"
     },
     "OR8H1":
     {

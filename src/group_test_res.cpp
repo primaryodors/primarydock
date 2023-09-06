@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 
     int i, n, l;
 
-    std::vector<std::shared_ptr<AtomGroup>> ligand_groups = AtomGroup::get_potential_ligand_groups(&m);
+    std::vector<std::shared_ptr<AtomGroup>> ligand_groups = AtomGroup::get_potential_ligand_groups(&m, true);
 
     AminoAcid* reach_residues[SPHREACH_MAX];
     Point target, center;
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
         target = target.add(d);
     }
 
-    Point size(6,6,6);
+    Point size(7.5,7.5,7.5);
     int sphres = p.get_residues_can_clash_ligand(reach_residues, &m, target, size, nullptr);
     cout << "# Reach residues:" << endl;
     cout << "# ";

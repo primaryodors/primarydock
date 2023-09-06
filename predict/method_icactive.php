@@ -18,7 +18,7 @@ $binding_pockets = json_decode(file_get_contents("../data/binding_pocket.json"),
 
 prepare_outputs();
 
-$size = "7.0 7.0 7.0";
+$size = "7.5 7.5 7.5";
 $search = "BB";
 $atomto = [];
 $stcr = "";

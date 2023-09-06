@@ -446,7 +446,8 @@ bool AtomGroup::is_bonded_to(Atom* a)
     for (i=0; i<n; i++)
     {
         if (atoms[i]->is_bonded_to(a)) return true;
-        else if (atoms[i]->shares_bonded_with(a)) return true;
+        else if (atoms[i]->shares_bonded_with(a) && a->get_Z() > 2
+            && (atoms[i]->get_family() != TETREL || a->get_family() != TETREL)) return true;
     }
 
     return false;

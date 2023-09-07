@@ -107,11 +107,8 @@ std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
-float dynamic_minimum = 0;
-float dynamic_initial = 1;
-int dynamic_every_iter = 13;
-DynamicMotion* dyn_motions[64];
-int num_dyn_motions = 0;
+std::vector<std::string> dyn_strings;
+std::vector<DynamicMotion> dyn_motions;
 
 bool configset=false, protset=false, tplset=false, tprfset=false, ligset=false, ligcmd=false, smset = false, smcmd = false, pktset=false;
 
@@ -491,56 +488,6 @@ void iteration_callback(int iter, Molecule** mols)
     }
 
     int i, j;
-    if (num_dyn_motions && !((iter-1) % dynamic_every_iter))
-    {
-        for (i=0; i<num_dyn_motions; i++)
-        {
-            float energy = -ligand->get_intermol_binding(mols);
-            dyn_motions[i]->make_random_change();
-            float new_energy = -ligand->get_intermol_binding(mols);
-            if (new_energy > energy) dyn_motions[i]->undo();
-        }
-
-        if (iter <= dynamic_every_iter || (iters-iter) <= dynamic_every_iter)
-        {
-            Molecule* repack_residues[1024];
-            MovabilityType repacked_movabilities[1024];
-            int n = protein->get_end_resno();
-            bool already_set_for_repack[n+1];
-            for (i=0; i<n; i++) already_set_for_repack[i] = false;
-
-            n = 0;
-            for (i=0; i<num_dyn_motions; i++)
-            {
-                int j;
-                AminoAcid *sr, *er;
-
-                sr = protein->get_residue(dyn_motions[i]->start_resno);
-                er = protein->get_residue(dyn_motions[i]->end_resno);
-                if (!sr || !er) continue;
-
-                for (j = sr->get_residue_no(); j <= er->get_residue_no(); j++)
-                {
-                    if (already_set_for_repack[j]) continue;
-                    Star s;
-                    s.paa = protein->get_residue(j);
-                    if (s.n)
-                    {
-                        repacked_movabilities[n] = s.paa->movability;
-                        if (s.paa->movability != MOV_PINNED) s.paa->movability = MOV_FLEXONLY;
-                        repack_residues[n++] = s.pmol;
-                        already_set_for_repack[j] = true;
-                    }
-                }
-            }
-            repack_residues[n] = 0;
-
-            reconnect_bridges();
-            Molecule::conform_molecules(repack_residues);
-
-            for (i=0; i<n; i++) repack_residues[i]->movability = repacked_movabilities[i];
-        }
-    }
 
     #if bb_realign_iters
     #if _dbg_bb_realign
@@ -1469,7 +1416,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "SOFT"))
     {
-        //
+        dyn_strings.push_back(origbuff);
         return i-1;
     }
     else if (!strcmp(words[0], "STATE"))
@@ -2360,6 +2307,25 @@ int main(int argc, char** argv)
     #if pocketcen_is_loneliest
     pocketcen = loneliest;
     #endif
+
+    int num_dyn_motions = dyn_strings.size();
+    for (i=0; i<num_dyn_motions; i++)
+    {
+        DynamicMotion dyn(protein);
+        char buffer[1024];
+        strcpy(buffer, dyn_strings[i].c_str());
+        char** words = chop_spaced_words(buffer);
+        AminoAcid* aa1 = protein->get_residue_bw(words[1]);
+        AminoAcid* aa2 = protein->get_residue_bw(words[2]);
+        int resno1 = aa1->get_residue_no();
+        int resno2 = aa2->get_residue_no();
+        dyn.type = dyn_bend;
+        dyn.start_resno.from_string(resno1<resno2 ? words[1] : words[2]);
+        dyn.end_resno.from_string(resno1>resno2 ? words[1] : words[2]);
+        dyn.fulcrum_resno.from_string(words[1]);
+        dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
+        dyn_motions.push_back(dyn);
+    }
 
     #if !_use_groups
     for (i=0; i<3; i++)
@@ -3920,9 +3886,9 @@ _try_again:
                 dr[drcount][nodeno].miscdata += (std::string)"Dynamic Motions:\n";
                 for (i=0; i<num_dyn_motions; i++)
                 {
-                    dr[drcount][nodeno].miscdata += (std::string)dyn_motions[i]->name
+                    dr[drcount][nodeno].miscdata += (std::string)dyn_motions[i].name
                         + (std::string)" "
-                        + std::to_string(dyn_motions[i]->get_total_applied())
+                        + std::to_string(dyn_motions[i].get_total_applied())
                         + (std::string)"\n";
                 }
                 dr[drcount][nodeno].miscdata += (std::string)"\n";

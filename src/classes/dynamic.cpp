@@ -70,7 +70,6 @@ float DynamicMotion::apply_incremental_nochecks(float amt)
 {
     AminoAcid* aa;
     Point fulcrum, ptaxis;
-    SCoord axis;
     int i, j, sr, er;
     float lamt, lamt_phi, lamt_psi;
     LocatedVector lv;
@@ -83,11 +82,14 @@ float DynamicMotion::apply_incremental_nochecks(float amt)
         if (!aa) throw -1;
         fulcrum = aa->get_CA_location();
 
-        aa = prot->get_residue(axis_resno);
-        if (!aa) throw -1;
-        ptaxis = aa->get_CA_location();
+        if (axis_resno.helix_no && !axis.r)
+        {
+            aa = prot->get_residue(axis_resno);
+            if (!aa) throw -1;
+            ptaxis = aa->get_CA_location();
 
-        axis = ptaxis.subtract(fulcrum);
+            axis = ptaxis.subtract(fulcrum);
+        }
 
         i = prot->get_bw50(start_resno.helix_no);
         if (!i) throw -1;
@@ -110,11 +112,14 @@ float DynamicMotion::apply_incremental_nochecks(float amt)
         if (!aa) throw -1;
         fulcrum = aa->get_CA_location();
 
-        aa = prot->get_residue(axis_resno);
-        if (!aa) throw -1;
-        ptaxis = aa->get_CA_location();
+        if (axis_resno.helix_no && !axis.r)
+        {
+            aa = prot->get_residue(axis_resno);
+            if (!aa) throw -1;
+            ptaxis = aa->get_CA_location();
 
-        axis = ptaxis.subtract(fulcrum);
+            axis = ptaxis.subtract(fulcrum);
+        }
 
         i = prot->get_bw50(start_resno.helix_no);
         if (!i) throw -1;

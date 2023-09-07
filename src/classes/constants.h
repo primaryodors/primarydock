@@ -146,7 +146,6 @@
 #define active_persistence_ratio 5
 #define active_persistence_threshold 5
 
-#define redo_tumble_spheres_on_activation 0
 #define redo_tumble_spheres_every_node 1
 
 // Output the activation matrix or the transmembrane regions' active rotations so that

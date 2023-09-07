@@ -8,6 +8,7 @@
 #define DYN_RANDOM_RANGE 0.333
 #define DYN_BIAS_EFFECT 0.4
 #define DYN_MAX_OVERAGE 0.25
+#define MAX_DYN_NEARBY 256
 
 #define debug_dyn_motion 0
 
@@ -53,12 +54,16 @@ class DynamicMotion
     void make_random_change();
     void undo();
     float get_total_applied() { return applied; }
+    float get_nearby_contact_energy();
 
     protected:
+    void fill_nearby_contacts();
+
     Protein* prot = nullptr;
     float applied = 0, last_change = 0;
     DynamicConstraint* constraints[MAX_DYN_CONSTRAINTS+1];      // Not using a std::vector since those cause double free errors on destruct.
     float apply_incremental_nochecks(float additional_amount);
+    AminoAcid* nearby_contacts[MAX_DYN_NEARBY];
 };
 
 

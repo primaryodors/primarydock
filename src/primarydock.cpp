@@ -455,7 +455,7 @@ void iteration_callback(int iter, Molecule** mols)
         for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);
     }
 
-    int i, j;
+    int i, j, n;
 
     #if bb_realign_iters
     #if _dbg_bb_realign
@@ -537,7 +537,7 @@ void iteration_callback(int iter, Molecule** mols)
     // float lsrca = (1.0 - progress) * soft_rock_clash_allowance;
     float lsrca = (progress < 0.5) ? soft_rock_clash_allowance : 0;
 
-    if (dyn_motions.size())
+    if (!(iter % soft_dynamics_every_n_iters) && n = dyn_motions.size())
     {
         // Each dynamic motion, try successively smaller increments/decrements, realigning BB pairs each time, until optimal energy.
         // Include contacts between dynamic motion region and nearby residues in the energy calculation.

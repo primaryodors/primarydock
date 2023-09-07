@@ -147,6 +147,7 @@
 #define active_persistence_threshold 5
 
 #define redo_tumble_spheres_every_node 1
+#define soft_dynamics_every_n_iters 10
 
 // Output the activation matrix or the transmembrane regions' active rotations so that
 // the viewer can update its cartoon backbone.

@@ -14,6 +14,7 @@ DynamicMotion::DynamicMotion(Protein* ppro)
     prot = ppro;
     int i;
     for (i=0; i<=MAX_DYN_CONSTRAINTS; i++) constraints[i] = nullptr;
+    for (i=0; i<MAX_DYN_NEARBY; i++) nearby_contacts[i] = nullptr;
 }
 
 bool DynamicMotion::add_constraint(DynamicConstraint* c)
@@ -29,6 +30,69 @@ bool DynamicMotion::add_constraint(DynamicConstraint* c)
     if (i >= MAX_DYN_CONSTRAINTS) return false;         // Array full.
     constraints[i] = c;
     return true;
+}
+
+float DynamicMotion::get_nearby_contact_energy()
+{
+    if (!prot) throw 0xffff;
+
+    int sr = prot->get_residue(start_resno);
+    int er = prot->get_residue(end_resno);
+    if (!sr || !er) throw 0xffff;
+
+    if (!nearby_contacts[0]) fill_nearby_contacts();
+
+    float result;
+
+    int i, j;
+    for (i=sr; i<=er; i++)
+    {
+        AminoAcid* aa = prot->get_residue(i);
+        if (!aa) continue;
+    
+        for (j=0; nearby_contacts[j]; j++)
+        {
+            if (aa->get_CA_location().get_3d_distance(nearby_contacts[j]->get_CA_location()) > (aa->get_reach() + nearby_contacts[j]->get_reach()) ) continue;
+            result += aa->get_intermol_binding(nearby_contacts[j]);
+        }
+    }
+
+    return result;
+}
+
+void DynamicMotion::fill_nearby_contacts()
+{
+    if (!prot) throw 0xffff;
+
+    int sr = prot->get_residue(start_resno);
+    int er = prot->get_residue(end_resno);
+    if (!sr || !er) throw 0xffff;
+
+    int sr5 = sr-5, er5 = er+5;
+
+    int i, j, l, n;
+    n = prot->get_end_resno();
+    bool resno_used[n+1];
+
+    for (i=1; i<=n; i++) resno_used[i] = false;
+
+    l=0;
+    for (i=sr; i<=er; i++)
+    {
+        AminoAcid** near = prot->get_residues_can_clash(i);
+        if (!near) continue;
+
+        for (j=0; near[j]; j++)
+        {
+            int resno = near[j]->get_residue_no();
+            if (resno_used[resno]) continue;
+            if (resno >= sr5 && resno <= er5) continue;
+
+            nearby_contacts[l++] = rear[j];
+            resno_used[resno] = true;
+        }
+        nearby_contacts[l] = nullptr;
+    }
 }
 
 float DynamicMotion::apply_incremental(float amt)

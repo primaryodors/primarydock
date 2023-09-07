@@ -3537,18 +3537,6 @@ void Protein::bridge(int resno1, int resno2)
     _INTERA_R_CUTOFF = _DEFAULT_INTERA_R_CUTOFF;
 }
 
-SoftBias* Protein::get_soft_bias_from_region(const char* region)
-{
-    int sz = soft_biases.size();
-    if (!sz) return nullptr;
-    int i;
-    for (i=0; i<sz; i++)
-    {
-        if (soft_biases[i].region_name == (std::string)region) return &soft_biases[i];
-    }
-    return nullptr;
-}
-
 void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
 {
     save_undo_state();
@@ -3563,7 +3551,6 @@ void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
     {
         for (l=0; l<sz; l++)
         {
-            SoftBias* sb = get_soft_bias_from_region(l_soft_rgns[l].name.c_str());
             if (!l) prebind = (ligand ? get_intermol_binding(ligand)*soft_ligand_importance : 0) + get_internal_binding()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
             
             #if _dbg_soft
@@ -3572,39 +3559,6 @@ void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
 
             int tweak = rand() % 6;
             float amount = nanf("unbiased");
-
-            if (sb)
-            {
-                switch (tweak)
-                {
-                    case 0:
-                    amount = sb->radial_transform;
-                    break;
-
-                    case 1:
-                    amount = sb->angular_transform;
-                    break;
-
-                    case 2:
-                    amount = sb->vertical_transform;
-                    break;
-
-                    case 3:
-                    amount = sb->helical_rotation;
-                    break;
-
-                    case 4:
-                    amount = sb->radial_rotation;
-                    break;
-
-                    case 5:
-                    amount = sb->transverse_rotation;
-                    break;
-
-                    default:
-                    ;
-                }
-            }
 
             if (isnan(amount) || !amount) amount = frand(-1, 1);
             else

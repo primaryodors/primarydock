@@ -166,13 +166,11 @@ public:
         int iterations
     );
 
-    SoftBias* get_soft_bias_from_region(const char* region);
     void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);
     void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
 
     int* mcoord_resnos = NULL;
-    std::vector<SoftBias> soft_biases;
     
     SCoord last_uprighted_xform;
     LocRotation last_uprighted_A, last_uprighted_B;

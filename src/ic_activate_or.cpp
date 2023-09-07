@@ -351,8 +351,7 @@ int main(int argc, char** argv)
     cout << "TMR3 can rotate " << (rock3 * fiftyseven) << " degrees about 3.50 to make room for TMR5." << endl;
 
     // Perform the rotation.
-    // TODO: This should not be hard coded.
-    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*2);
+    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*1.5);
 
     axis4 = (SCoord)aa4x53->get_CA_location().subtract(aa6x49->get_CA_location());
     axis4.origin = aa4x53->get_CA_location();

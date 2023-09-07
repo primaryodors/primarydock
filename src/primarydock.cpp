@@ -107,7 +107,6 @@ std::string CEN_buf = "";
 std::vector<std::string> pathstrs;
 std::vector<std::string> states;
 
-std::vector<std::string> dyn_motion_strings;
 float dynamic_minimum = 0;
 float dynamic_initial = 1;
 int dynamic_every_iter = 13;
@@ -185,15 +184,11 @@ std::vector<AcvHxRot> orig_active_helix_rots;
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
 std::vector<ResiduePlaceholder> required_contacts;
-std::vector<SoftBias> soft_biases;
 std::vector<std::string> bridges;
 std::vector<std::string> atomto;
 std::string outpdb;
 int outpdb_poses = 0;
 
-bool soft_pocket = false;
-std::string soft_names;
-std::vector<Region> soft_rgns;
 std::vector<int>flexible_resnos;
 std::vector<ResiduePlaceholder>forced_flexible_resnos;
 std::vector<ResiduePlaceholder>forced_static_resnos;
@@ -493,11 +488,6 @@ void iteration_callback(int iter, Molecule** mols)
     if (iter == iters && iter_best_bind > 0)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);
-    }
-
-    if (soft_pocket && iter >= 10 && g_rgnrot_alpha && g_rgnrot_u && g_rgnrot_w && g_rgnxform_r && g_rgnxform_theta && g_rgnxform_y)
-    {
-        protein->soft_iteration(soft_rgns, ligand);
     }
 
     int i, j;
@@ -1479,59 +1469,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "SOFT"))
     {
-        soft_pocket = true;
-        optsecho = "Soft regions ";
-        soft_names = "";
-        for (i=1; words[i]; i++)
-        {
-            if (words[i][0] == '-' && words[i][1] == '-') break;
-            soft_names += (std::string)words[i] + (std::string)" ";
-        }
-        optsecho += soft_names + (std::string)" ";
-        return i-1;
-    }
-    else if (!strcmp(words[0], "DYNAMIC"))
-    {
-        dyn_motion_strings.push_back(origbuff);
-    }
-    else if (!strcmp(words[0], "DYNMIN"))
-    {
-        dynamic_minimum = atof(words[1]);
-    }
-    else if (!strcmp(words[0], "DYNINIT"))
-    {
-        dynamic_initial = atof(words[1]);
-    }
-    else if (!strcmp(words[0], "DYNEVERY"))
-    {
-        dynamic_every_iter = atoi(words[1]);
-    }
-    else if (!strcmp(words[0], "HARD"))
-    {
-        soft_pocket = false;
-    }
-    else if (!strcmp(words[0], "SOFTBIAS"))
-    {
-        SoftBias lbias;
-        i=1;
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.region_name = words[i++];
-
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.radial_transform = atof(words[i++]);
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.angular_transform = atof(words[i++]);
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.vertical_transform = atof(words[i++]);
-
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.helical_rotation = atof(words[i++]);
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.radial_rotation = atof(words[i++]);
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.transverse_rotation = atof(words[i++]);
-
-        soft_biases.push_back(lbias);
+        //
         return i-1;
     }
     else if (!strcmp(words[0], "STATE"))
@@ -2044,18 +1982,7 @@ void do_tumble_spheres(Point l_pocket_cen)
 
 void apply_protein_specific_settings(Protein* p)
 {
-    int i, n = dyn_motion_strings.size();
-
-    for (i=0; i<n; i++)
-    {
-        if (dyn_motions[i]) delete dyn_motions[i];
-        dyn_motions[i] = new DynamicMotion(p);
-        dyn_motions[i]->read_config_line(dyn_motion_strings[i].c_str(), dyn_motions);
-        dyn_motions[i]->minimum = dynamic_minimum;
-        dyn_motions[i]->apply_absolute(dynamic_minimum);
-    }
-    num_dyn_motions = i;
-    dyn_motions[i] = nullptr;
+    int i, n;
 
     n = atomto.size();
     for (i=0; i<n; i++)
@@ -2224,7 +2151,6 @@ int main(int argc, char** argv)
         return 0xbadf12e;
     }
     protein->load_pdb(pf, 0, protstrand ?: 'A');
-    protein->soft_biases = soft_biases;
     apply_protein_specific_settings(protein);
     fclose(pf);
     #if _DBG_STEPBYSTEP
@@ -2290,7 +2216,7 @@ int main(int argc, char** argv)
         fclose(pf);
     }
 
-    int l, j1, i2;
+    int l, j1, i2, miter;
 
     if (mtlcoords.size())
     {
@@ -2355,25 +2281,37 @@ int main(int argc, char** argv)
 
             AminoAcid* can_reach_metal[256];
             int num_can_reach = protein->get_residues_can_clash_ligand(can_reach_metal, lmc[0], lmtl->get_location(), Point(2.5,2.5,2.5), nullptr);
-            for (j1=0; j1<num_can_reach; j1++)
-            {
-                bool found = false;
-                for (i2=0; i2<mtlcoords[i].coordres.size(); i2++)
-                {
-                    if (mtlcoords[i].coordres[i2].resno == can_reach_metal[j1]->get_residue_no()) found = true;
-                }
-                if (found) continue;
+            bool cr_eq_mc[num_can_reach];
 
-                Atom* a = can_reach_metal[j1]->get_nearest_atom(lmtl->get_location());
-                float r = a->distance_to(lmtl);
-                float vdW = lmtl->get_vdW_radius() + a->get_vdW_radius();
-                if (r < vdW)
+            for (miter=0; miter<20; miter++)
+            {
+                for (j1=0; j1<num_can_reach; j1++)
                 {
-                    SCoord to_move = lmtl->get_location().subtract(a->get_location());
-                    to_move.r = vdW - r;
-                    lmtl->move_rel(&to_move);
+                    bool found = false;
+                    if (!miter)
+                    {
+                        for (i2=0; i2<mtlcoords[i].coordres.size(); i2++)
+                        {
+                            if (mtlcoords[i].coordres[i2].resno == can_reach_metal[j1]->get_residue_no()) found = true;
+                        }
+                        cr_eq_mc[j1] = found;
+                    }
+                    else found = cr_eq_mc[j1];
+
+                    if (found) continue;
+
+                    Atom* a = can_reach_metal[j1]->get_nearest_atom(lmtl->get_location());
+                    float r = a->distance_to(lmtl);
+                    float vdW = lmtl->get_vdW_radius() + a->get_vdW_radius();
+                    if (r < vdW)
+                    {
+                        SCoord to_move = lmtl->get_location().subtract(a->get_location());
+                        to_move.r = vdW - r;
+                        lmtl->move_rel(&to_move);
+                    }
                 }
             }
+
             Molecule::conform_molecules(lmc, 50);
 
             for (j=0; j<mtlcoords[i].coordres.size(); j++)
@@ -2406,40 +2344,6 @@ int main(int argc, char** argv)
     for (i=0; i<required_contacts.size(); i++)
     {
         required_contacts[i].resolve_resno(protein);
-    }
-
-    if (soft_pocket)
-    {
-        if (soft_names.size())
-        {
-            char lbuff[soft_names.size()+4];
-            strcpy(lbuff, soft_names.c_str());
-            char** words = chop_spaced_words(lbuff);
-            const Region* prgn = protein->get_regions();
-            for (i=0; i<PROT_MAX_RGN; i++)
-            {
-                if (!prgn[i].start || !prgn[i].end) break;
-                for (l=0; words[l]; l++)
-                {
-                    if (!strcmp(words[l], prgn[i].name.c_str())) soft_rgns.push_back(prgn[i]);
-                }
-            }
-        }
-        else
-        {
-            const Region* prgn = protein->get_regions();
-            for (i=0; i<PROT_MAX_RGN; i++)
-            {
-                if (!prgn[i].start || !prgn[i].end) break;
-                soft_rgns.push_back(prgn[i]);
-            }
-        }
-
-        if (!soft_rgns.size())
-        {
-            cout << "Error: no regions in PDB or specified regions not found." << endl;
-            throw 0xbad5e697;
-        }
     }
 
     if (!CEN_buf.length())
@@ -2710,7 +2614,6 @@ _try_again:
             pf = fopen(temp_pdb_file.c_str(), "r");
             protein->load_pdb(pf);
             fclose(pf);
-            protein->soft_biases = soft_biases;
             apply_protein_specific_settings(protein);
 
             if (mtlcoords.size())
@@ -2733,7 +2636,6 @@ _try_again:
             pf = fopen(protfname, "r");
             protein->load_pdb(pf, 0, protstrand ?: 'A');
             fclose(pf);
-            protein->soft_biases = soft_biases;
             apply_protein_specific_settings(protein);
         }
 
@@ -2769,23 +2671,6 @@ _try_again:
         for (nodeno=0; nodeno<=pathnodes; nodeno++)
         {
             movie_offset = iters * (nodeno /*+ (pose-1)*(pathnodes+1)*/);
-
-            if (soft_pocket)
-            {
-                for (i=0; i<PROT_MAX_RGN; i++)
-                {
-                    rgnxform_r[pose][nodeno][i] = rgnxform_theta[pose][nodeno][i] = rgnxform_y[pose][nodeno][i]
-                        = rgnrot_alpha[pose][nodeno][i] = rgnrot_u[pose][nodeno][i] = rgnrot_w[pose][nodeno][i]
-                        = 0;
-                }
-    
-                g_rgnxform_r = rgnxform_r[pose][nodeno];
-                g_rgnxform_theta = rgnxform_theta[pose][nodeno];
-                g_rgnxform_y = rgnxform_y[pose][nodeno];
-                g_rgnrot_alpha = rgnrot_alpha[pose][nodeno];
-                g_rgnrot_u = rgnrot_u[pose][nodeno];
-                g_rgnrot_w = rgnrot_w[pose][nodeno];
-            }
 
             if (waters)
             {
@@ -2857,7 +2742,6 @@ _try_again:
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
                 fclose(pf);
-                protein->soft_biases = soft_biases;
                 apply_protein_specific_settings(protein);
 
                 freeze_bridged_residues();
@@ -4562,29 +4446,6 @@ _try_again:
                         cout << endl;
                         if (output) *output << endl;
 
-                        if (soft_pocket)
-                        {
-                            cout << "Soft transformations:" << endl;
-                            if (output) *output << "Soft transformations:" << endl;
-                            for (l=0; l<soft_rgns.size(); l++)
-                            {
-                                cout << soft_rgns[l].name << ".Δr: " << rgnxform_r[j][k][l] << endl;
-                                cout << soft_rgns[l].name << ".Δθ: " << rgnxform_theta[j][k][l] << endl;
-                                cout << soft_rgns[l].name << ".Δy: " << rgnxform_y[j][k][l] << endl;
-                                cout << soft_rgns[l].name << ".Δα: " << rgnrot_alpha[j][k][l]*fiftyseven << endl;
-                                cout << soft_rgns[l].name << ".Δφw: " << rgnrot_w[j][k][l]*fiftyseven << endl;
-                                cout << soft_rgns[l].name << ".Δφu: " << rgnrot_u[j][k][l]*fiftyseven << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δr: " << rgnxform_r[j][k][l] << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δθ: " << rgnxform_theta[j][k][l] << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δy: " << rgnxform_y[j][k][l] << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δα: " << rgnrot_alpha[j][k][l]*fiftyseven << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δφw: " << rgnrot_w[j][k][l]*fiftyseven << endl;
-                                if (output) *output << soft_rgns[l].name << ".Δφu: " << rgnrot_u[j][k][l]*fiftyseven << endl;
-                            }
-                            cout << endl;
-                            if (output) *output << endl;
-                        }
-
                         /*if (flex)
                         {*/
                             if (!dr[j][k].pdbdat.length())
@@ -4663,7 +4524,6 @@ _exitposes:
                 return 0xbadf12e;
             }
             protein->load_pdb(pf);
-            protein->soft_biases = soft_biases;
             fclose(pf);
             FILE* pf = fopen(outfname, "ab");
             fprintf(pf, "\nOriginal PDB:\n");

@@ -1275,7 +1275,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 
     for (i=0; i<SPHREACH_MAX; i++) reaches_spheroid[i] = NULL;
 
-    for (i=1; i<=seql; i++)
+    for (i=1; i<seql && residues[i]; i++)
     {
         AminoAcid* aa = residues[i-1];
         if (!aa) continue;

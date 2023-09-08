@@ -86,6 +86,19 @@ include("header.php");
     z-index: 10000;
     background: #234;
 }
+
+#dlmenu
+{
+    position: absolute;
+    box-shadow: 25px 25px 35px rgba(0,0,0,0.5);
+    z-index: 10000;
+    background: #234;
+}
+
+#ctxmenu li
+{
+    display: block;
+}
 </style>
 <script>
 var viewer_loaded = false;
@@ -151,6 +164,14 @@ function showSkeletal(e, img)
     });
 
     $(skeletal).show();
+}
+
+function show_dlmenu(e, prot, lig)
+{
+    var dlmenu = $("#dlmenu")[0];
+
+    $("#dl_acv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=active");
+    $("#dl_iacv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=inactive");
 }
 </script>
 
@@ -515,14 +536,14 @@ The numbers and models are not yet fully accurate, but the repository is accepti
 
 <table class="liglist">
     <tr>
-        <th>Odorant</th>
-        <th>EC<sub>50</sub></th>
-        <th>Adjusted Top</th>
-        <th>Antagonist?</th>
+        <th width="20%">Odorant</th>
+        <th width="10%">EC<sub>50</sub></th>
+        <th width="10%">Adjusted Top</th>
+        <th width="10%">Antagonist?</th>
         <?php
-        if (count($predictions)) echo "<th>Predicted (BETA)</th>";
+        if (count($predictions)) echo "<th colspan=\"2\" width=\"1%\">Predicted (BETA)</th>";
         ?>
-        <th>Aroma Notes</th>
+        <th width="50%">Aroma Notes</th>
     </tr>
 
 <?php 
@@ -587,9 +608,11 @@ foreach ($pairs as $oid => $pair)
             echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor=".urlencode($predname[$oid])."&mode=";
             if ($predictions[$oid] > 0) echo "active";
             else echo "inactive";
-            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</td>";
+            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</a></td>";
+            echo "<td><span style=\"text-decoration: underline;\">&#x21a7;</span>";
+            echo "</td>";
         }
-        else echo "<td>&nbsp;</td>";
+        else echo "<td colspan=\"2\">&nbsp;</td>";
     }        
 
     echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
@@ -605,6 +628,19 @@ foreach ($pairs as $oid => $pair)
 <div id="skeletal"></div>
 <script>
 $('#skeletal').hide();
+</script>
+
+<div id="dlmenu">
+    <ul class="ctxmenu">
+        <li><a id="dl_acv_mdl" href="" target="_dl">Active model</a></li>
+        <li><a id="dl_iacv_mdl" href="" target="_dl">Inactive model</a></li>
+        <li><a id="dl_acv_dc" href="" target="_dl">Active dock</a></li>
+        <li><a id="dl_iacv_dc" href="" target="_dl">Inactive dock</a></li>
+        <li><a id="dl_json" href="" target="_dl">JSON entry</a></li>
+    </ul>
+</div>
+<script>
+$('#dlmenu').hide();
 </script>
 
 <div id="Comparison" class="tabcontent">

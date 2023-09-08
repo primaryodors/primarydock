@@ -147,7 +147,7 @@
 #define active_persistence_threshold 5
 
 #define redo_tumble_spheres_every_node 1
-#define soft_dynamics_every_n_iters 10
+#define soft_dynamics_every_n_iters 20
 
 // Output the activation matrix or the transmembrane regions' active rotations so that
 // the viewer can update its cartoon backbone.
@@ -352,6 +352,7 @@
 #define _dbg_259 0
 #define _dbg_bb_realign 0
 #define _dbg_mol_flexion 0
+#define _dbg_soft_dynamics 1
 
 #endif
 

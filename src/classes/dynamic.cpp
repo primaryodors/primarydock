@@ -32,17 +32,45 @@ bool DynamicMotion::add_constraint(DynamicConstraint* c)
     return true;
 }
 
+float DynamicMotion::get_ligand_contact_energy(Molecule* ligand)
+{
+    if (!prot) throw 0xffff;
+
+    int sr = prot->get_residue(start_resno)->get_residue_no();
+    int er = prot->get_residue(end_resno)->get_residue_no();
+    if (!sr || !er) throw 0xffff;
+
+    float result = 0;
+
+    int i, j;
+    for (i=sr; i<=er; i++)
+    {
+        AminoAcid* aa = prot->get_residue(i);
+        if (!aa) continue;
+    
+        float e = -((Molecule*)aa)->get_intermol_binding(ligand);
+            
+        #if _dbg_soft_dynamics
+        // cout << *aa << " ~ ligand energy: " << e << endl;
+        #endif
+
+        result += e;
+    }
+
+    return result;
+}
+
 float DynamicMotion::get_nearby_contact_energy()
 {
     if (!prot) throw 0xffff;
 
-    int sr = prot->get_residue(start_resno);
-    int er = prot->get_residue(end_resno);
+    int sr = prot->get_residue(start_resno)->get_residue_no();
+    int er = prot->get_residue(end_resno)->get_residue_no();
     if (!sr || !er) throw 0xffff;
 
     if (!nearby_contacts[0]) fill_nearby_contacts();
 
-    float result;
+    float result = 0;
 
     int i, j;
     for (i=sr; i<=er; i++)
@@ -53,7 +81,14 @@ float DynamicMotion::get_nearby_contact_energy()
         for (j=0; nearby_contacts[j]; j++)
         {
             if (aa->get_CA_location().get_3d_distance(nearby_contacts[j]->get_CA_location()) > (aa->get_reach() + nearby_contacts[j]->get_reach()) ) continue;
-            result += aa->get_intermol_binding(nearby_contacts[j]);
+
+            float e = -aa->get_intermol_binding(nearby_contacts[j]);
+            
+            #if _dbg_soft_dynamics
+            // cout << *aa << " ~ " << *(nearby_contacts[j]) << " energy: " << e << endl;
+            #endif
+
+            result += e;
         }
     }
 
@@ -64,8 +99,8 @@ void DynamicMotion::fill_nearby_contacts()
 {
     if (!prot) throw 0xffff;
 
-    int sr = prot->get_residue(start_resno);
-    int er = prot->get_residue(end_resno);
+    int sr = prot->get_residue(start_resno)->get_residue_no();
+    int er = prot->get_residue(end_resno)->get_residue_no();
     if (!sr || !er) throw 0xffff;
 
     int sr5 = sr-5, er5 = er+5;
@@ -88,7 +123,7 @@ void DynamicMotion::fill_nearby_contacts()
             if (resno_used[resno]) continue;
             if (resno >= sr5 && resno <= er5) continue;
 
-            nearby_contacts[l++] = rear[j];
+            nearby_contacts[l++] = near[j];
             resno_used[resno] = true;
         }
         nearby_contacts[l] = nullptr;

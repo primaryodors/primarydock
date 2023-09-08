@@ -537,10 +537,70 @@ void iteration_callback(int iter, Molecule** mols)
     // float lsrca = (1.0 - progress) * soft_rock_clash_allowance;
     float lsrca = (progress < 0.5) ? soft_rock_clash_allowance : 0;
 
-    if (!(iter % soft_dynamics_every_n_iters) && n = dyn_motions.size())
+    n = dyn_motions.size();
+    if (!(iter % soft_dynamics_every_n_iters) && n)
     {
+        #if _dbg_soft_dynamics
+        cout << endl;
+        #endif
+
         // Each dynamic motion, try successively smaller increments/decrements, realigning BB pairs each time, until optimal energy.
         // Include contacts between dynamic motion region and nearby residues in the energy calculation.
+        for (l=0; l<n; l++)
+        {
+            float incr = 0.1;
+            float before = dyn_motions[l].get_nearby_contact_energy() + dyn_motions[l].get_ligand_contact_energy(ligand);
+            float after;
+            #if _dbg_soft_dynamics
+            cout << dyn_motions[l].fulcrum_resno.helix_no << "." << dyn_motions[l].fulcrum_resno.member_no
+                << " starting contact energy " << before << endl;
+            #endif
+
+            for (i=0; i<25; i++)
+            {
+                Pose ligand_was;
+                ligand_was.copy_state(ligand);
+
+                dyn_motions[l].apply_incremental(incr);
+
+                if (use_bestbind_algorithm && global_pairs.size() >= 2)
+                    GroupPair::align_groups(ligand, global_pairs, true, 0.3);
+
+                after = dyn_motions[l].get_nearby_contact_energy() + dyn_motions[l].get_ligand_contact_energy(ligand);
+                #if _dbg_soft_dynamics
+                cout << "New contact energy " << after;
+                #endif
+
+                if (after > before)
+                {
+                    dyn_motions[l].apply_incremental(-incr);
+                    ligand_was.restore_state(ligand);
+                    incr *= -0.666;
+
+                    #if _dbg_soft_dynamics
+                    cout << " reverting.";
+                    #endif
+                }
+                else
+                {
+                    before = after;
+
+                    #if _dbg_soft_dynamics
+                    cout << " total applied " << dyn_motions[l].get_total_applied();
+                    #endif
+                }
+
+                #if _dbg_soft_dynamics
+                cout << endl;
+                #endif
+
+                if (fabs(incr) < 0.01) break;
+            }
+        }
+
+        #if _dbg_soft_dynamics
+        cout << endl;
+        #endif
     }
 
     if (!iter) goto _oei;
@@ -1749,7 +1809,6 @@ int main(int argc, char** argv)
     int i, j;
 
     _momentum_rad_ceiling = fiftyseventh * 5;
-    dyn_motions[0] = nullptr;
 
     for (i=0; i<65536; i++) buffer[i] = 0;
     #if active_persistence
@@ -2094,6 +2153,7 @@ int main(int argc, char** argv)
         dyn.end_resno.from_string(resno1>resno2 ? words[1] : words[2]);
         dyn.fulcrum_resno.from_string(words[1]);
         dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
+        dyn.bias = 15*fiftyseventh;
         dyn_motions.push_back(dyn);
     }
 

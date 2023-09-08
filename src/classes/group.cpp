@@ -1244,7 +1244,7 @@ void GroupPair::align_groups_noconform(Molecule* lig, std::vector<std::shared_pt
     GroupPair::align_groups(lig, gp, false);
 }
 
-void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp, bool do_conforms)
+void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp, bool do_conforms, float amount)
 {
     int n = gp.size();
 
@@ -1255,14 +1255,14 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #if _dbg_groupsel
     cout << "Rotating " << *gp[0]->ag << " in the direction of " << *gp[0]->scg << endl;
     #endif
-    lig->rotate(lv, rot.a);
+    lig->rotate(lv, rot.a*amount);
 
     // Scooch.
     float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
     if (r > 0)
     {
         Point rel = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        rel.scale(r-1);
+        rel.scale((r-1)*amount);
         #if _dbg_groupsel
         cout << "Scooching " << *gp[0]->ag << " " << r << "Å into the reach of " << *gp[0]->scg << endl;
         #endif
@@ -1278,7 +1278,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #if _dbg_groupsel
     cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
     #endif
-    lig->rotate(lv, rot.a);
+    lig->rotate(lv, rot.a*amount);
 
     if (do_conforms) gp[1]->scg->conform_to(lig);
 
@@ -1291,7 +1291,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #if _dbg_groupsel
     cout << "\"Rotisserie\" aligning " << *gp[2]->ag << " in the direction of " << *gp[2]->scg << endl;
     #endif
-    lig->rotate(lv, theta);
+    lig->rotate(lv, theta*amount);
 
     if (do_conforms) gp[2]->scg->conform_to(lig);
 }

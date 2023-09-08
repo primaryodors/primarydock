@@ -55,6 +55,7 @@ class DynamicMotion
     void undo();
     float get_total_applied() { return applied; }
     float get_nearby_contact_energy();
+    float get_ligand_contact_energy(Molecule* ligand);
 
     protected:
     void fill_nearby_contacts();

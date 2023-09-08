@@ -2148,6 +2148,7 @@ int main(int argc, char** argv)
         AminoAcid* aa2 = protein->get_residue_bw(words[2]);
         int resno1 = aa1->get_residue_no();
         int resno2 = aa2->get_residue_no();
+        dyn.name = (std::string)words[1] + (std::string)"-" + (std::string)words[2];
         dyn.type = dyn_bend;
         dyn.start_resno.from_string(resno1<resno2 ? words[1] : words[2]);
         dyn.end_resno.from_string(resno1>resno2 ? words[1] : words[2]);

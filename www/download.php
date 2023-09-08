@@ -31,9 +31,10 @@ switch (@$_REQUEST["obj"])
     
     case "json":
         $prot  = @$_REQUEST["prot"];
-        $lig   = @$_REQUEST["lig" ];
+        $lig   = @$_REQUEST["odor"];
 
-        $json_file = "predict/dock_results_$method.json";
+        chdir(__DIR__);
+        $json_file = "../predict/dock_results_$method.json";
         $dock_results = json_decode(file_get_contents($json_file), true);
 
         if (!isset($dock_results[$prot][$lig]))
@@ -44,7 +45,7 @@ switch (@$_REQUEST["obj"])
 
         $result = [];
         $result[$prot][$lig] = $dock_results[$prot][$lig];
-        header("Content-Disposition: attachment; filename=\"$fn\"");
+        header("Content-Disposition: attachment; filename=\"$prot.$lig.json\"");
         echo json_encode_pretty($result);
 
         exit;

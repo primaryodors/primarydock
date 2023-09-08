@@ -93,11 +93,23 @@ include("header.php");
     box-shadow: 25px 25px 35px rgba(0,0,0,0.5);
     z-index: 10000;
     background: #234;
+    padding: 20px;
 }
 
-#ctxmenu li
+.ctxmenu
+{
+    margin: 0px;
+    padding-inline-start: 0px;
+}
+
+.ctxmenu li
 {
     display: block;
+    border-top: 2px solid #68a;
+    border-left: 2px solid #468;
+    border-right: 2px solid #123;
+    border-bottom: 2px solid #012;
+    margin-bottom: 5px;
 }
 </style>
 <script>
@@ -174,7 +186,7 @@ function show_dlmenu(e, prot, lig)
     $("#dl_iacv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=inactive");
     $("#dl_acv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=active");
     $("#dl_iacv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=inactive");
-    $("#dl_json")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig);
+    $("#dl_json")[0].setAttribute("href", "download.php?obj=json&prot="+prot+"&odor="+lig);
 
     dlmenu.style.left = `${e.pageX}px`;
     dlmenu.style.top = `${e.pageY}px`;
@@ -639,7 +651,7 @@ foreach ($pairs as $oid => $pair)
 $('#skeletal').hide();
 </script>
 
-<div id="dlmenu">
+<div id="dlmenu" onclick="$('#dlmenu').hide();">
     <ul class="ctxmenu">
         <li><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Active model</a></li>
         <li><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Inactive model</a></li>

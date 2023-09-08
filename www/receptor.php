@@ -172,6 +172,14 @@ function show_dlmenu(e, prot, lig)
 
     $("#dl_acv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=active");
     $("#dl_iacv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=inactive");
+    $("#dl_acv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=active");
+    $("#dl_iacv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=inactive");
+    $("#dl_json")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig);
+
+    dlmenu.style.left = `${e.pageX}px`;
+    dlmenu.style.top = `${e.pageY}px`;
+
+    $(dlmenu).show();
 }
 </script>
 
@@ -609,7 +617,8 @@ foreach ($pairs as $oid => $pair)
             if ($predictions[$oid] > 0) echo "active";
             else echo "inactive";
             echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</a></td>";
-            echo "<td><span style=\"text-decoration: underline;\">&#x21a7;</span>";
+            echo "<td><span style=\"text-decoration: underline; cursor: pointer;\"";
+            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."');\">&#x21a7;</span>";
             echo "</td>";
         }
         else echo "<td colspan=\"2\">&nbsp;</td>";
@@ -632,11 +641,11 @@ $('#skeletal').hide();
 
 <div id="dlmenu">
     <ul class="ctxmenu">
-        <li><a id="dl_acv_mdl" href="" target="_dl">Active model</a></li>
-        <li><a id="dl_iacv_mdl" href="" target="_dl">Inactive model</a></li>
-        <li><a id="dl_acv_dc" href="" target="_dl">Active dock</a></li>
-        <li><a id="dl_iacv_dc" href="" target="_dl">Inactive dock</a></li>
-        <li><a id="dl_json" href="" target="_dl">JSON entry</a></li>
+        <li><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Active model</a></li>
+        <li><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Inactive model</a></li>
+        <li><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">Active dock</a></li>
+        <li><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">Inactive dock</a></li>
+        <li><a id="dl_json" href="" target="_dl" onclick="$('#dlmenu').hide();">JSON entry</a></li>
     </ul>
 </div>
 <script>

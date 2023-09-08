@@ -4,12 +4,13 @@ require_once("../data/protutils.php");
 
 $method = "icactive";
 
-switch (@_REQUEST["obj"])
+switch (@$_REQUEST["obj"])
 {
     case "model":
         $prot = @$_REQUEST["prot"];
-        $lig  = @$_REQUEST["lig" ];
+        $lig  = @$_REQUEST["odor"];
         $mode = @$_REQUEST["mode"];
+        $mdlno = @$_REQUEST["mdl"] ?: 1;
 
         $fam = family_from_protid($prot);
 
@@ -19,9 +20,8 @@ switch (@_REQUEST["obj"])
     
     case "dock":
         $prot  = @$_REQUEST["prot"];
-        $lig   = @$_REQUEST["lig" ];
+        $lig   = @$_REQUEST["odor"];
         $mode  = @$_REQUEST["mode"];
-        $mdlno = @$_REQUEST["mdl"] ?: 1;
 
         $fam = family_from_protid($prot);
 
@@ -55,12 +55,12 @@ switch (@_REQUEST["obj"])
 }
 
 chdir(__DIR__);
-if (!file_exists($fn))
+if (!file_exists($path))
 {
     http_response_code(404);
     exit;
 }
 
-$c = file_get_contents($fn);
+$c = file_get_contents($path);
 header("Content-Disposition: attachment; filename=\"$fn\"");
 echo $c;

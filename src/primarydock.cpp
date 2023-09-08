@@ -2387,6 +2387,8 @@ _try_again:
         float lig_min_int_clsh = ligand->get_internal_clashes();
         ligand->crumple(triangular);
 
+        for (i=0; i<num_dyn_motions; i++) dyn_motions[i].apply_absolute(0);
+
         int rcn = required_contacts.size();
         if (rcn)
         {

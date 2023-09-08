@@ -76,6 +76,42 @@ $pairs = all_empirical_pairs_for_receptor($rcpid);
 include("header.php");
 
 ?>
+<style>
+#skeletal
+{
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    box-shadow: 25px 25px 35px rgba(0,0,0,0.5);
+    z-index: 10000;
+    background: #234;
+}
+
+#dlmenu
+{
+    position: absolute;
+    box-shadow: 25px 25px 35px rgba(0,0,0,0.5);
+    z-index: 10000;
+    background: #234;
+    padding: 20px;
+}
+
+.ctxmenu
+{
+    margin: 0px;
+    padding-inline-start: 0px;
+}
+
+.ctxmenu li
+{
+    display: block;
+    border-top: 2px solid #68a;
+    border-left: 2px solid #468;
+    border-right: 2px solid #123;
+    border-bottom: 2px solid #012;
+    margin-bottom: 5px;
+}
+</style>
 <script>
 var viewer_loaded = false;
 function load_viewer(obj)
@@ -120,6 +156,42 @@ function load_viewer(obj)
         }, 259); 
         viewer_loaded = true;
     }
+}
+
+function showSkeletal(e, img)
+{
+    var skeletal = $("#skeletal")[0];
+    skeletal.style.left = `${e.pageX}px`;
+    skeletal.style.top = `${e.pageY}px`;
+    skeletal.innerText = "Please wait...";
+    
+	$.ajax(
+	{
+		url: img,
+		cache: false,
+		success: function(result)
+		{
+            skeletal.innerHTML = result;
+        }
+    });
+
+    $(skeletal).show();
+}
+
+function show_dlmenu(e, prot, lig)
+{
+    var dlmenu = $("#dlmenu")[0];
+
+    $("#dl_acv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=active");
+    $("#dl_iacv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=inactive");
+    $("#dl_acv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=active");
+    $("#dl_iacv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=inactive");
+    $("#dl_json")[0].setAttribute("href", "download.php?obj=json&prot="+prot+"&odor="+lig);
+
+    dlmenu.style.left = `${e.pageX}px`;
+    dlmenu.style.top = `${e.pageY}px`;
+
+    $(dlmenu).show();
 }
 </script>
 
@@ -484,14 +556,14 @@ The numbers and models are not yet fully accurate, but the repository is accepti
 
 <table class="liglist">
     <tr>
-        <th>Odorant</th>
-        <th>EC<sub>50</sub></th>
-        <th>Adjusted Top</th>
-        <th>Antagonist?</th>
+        <th width="20%">Odorant</th>
+        <th width="10%">EC<sub>50</sub></th>
+        <th width="10%">Adjusted Top</th>
+        <th width="10%">Antagonist?</th>
         <?php
-        if (count($predictions)) echo "<th>Predicted (BETA)</th>";
+        if (count($predictions)) echo "<th colspan=\"2\" width=\"1%\">Predicted (BETA)</th>";
         ?>
-        <th>Aroma Notes</th>
+        <th width="50%">Aroma Notes</th>
     </tr>
 
 <?php 
@@ -526,7 +598,14 @@ foreach ($pairs as $oid => $pair)
 
     $ufn = urlencode($odor['full_name']);
     echo "<tr>\n";
-    echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\">{$odor['full_name']}</a></td>\n";
+    echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\"";
+
+    $skelurl = "skeletal.php?oid=$oid";
+
+    echo " onmouseenter=\"showSkeletal(event, '$skelurl');\"";
+    echo " onmouseout=\"$('#skeletal').hide();\"";
+    echo ">{$odor['full_name']}</a>";
+    echo "</td>\n";
 
     echo "<td>" . 
         ($dispec50 = (@$pair['ec50']
@@ -549,9 +628,12 @@ foreach ($pairs as $oid => $pair)
             echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor=".urlencode($predname[$oid])."&mode=";
             if ($predictions[$oid] > 0) echo "active";
             else echo "inactive";
-            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</td>";
+            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</a></td>";
+            echo "<td><span style=\"text-decoration: underline; cursor: pointer;\"";
+            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."');\">&#x21a7;</span>";
+            echo "</td>";
         }
-        else echo "<td>&nbsp;</td>";
+        else echo "<td colspan=\"2\">&nbsp;</td>";
     }        
 
     echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
@@ -563,6 +645,24 @@ foreach ($pairs as $oid => $pair)
 </div>
 </div>
 </div>
+
+<div id="skeletal"></div>
+<script>
+$('#skeletal').hide();
+</script>
+
+<div id="dlmenu" onclick="$('#dlmenu').hide();">
+    <ul class="ctxmenu">
+        <li><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Active model</a></li>
+        <li><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Inactive model</a></li>
+        <li><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">Active dock</a></li>
+        <li><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">Inactive dock</a></li>
+        <li><a id="dl_json" href="" target="_dl" onclick="$('#dlmenu').hide();">JSON entry</a></li>
+    </ul>
+</div>
+<script>
+$('#dlmenu').hide();
+</script>
 
 <div id="Comparison" class="tabcontent">
 <div class="box">

@@ -2009,33 +2009,13 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 if (atoms[i]->is_bonded_to(ligands[l]->atoms[j])) continue;
                 if (atoms[i]->shares_bonded_with(ligands[l]->atoms[j])) continue;
 
-                Point ptb = ligands[l]->atoms[j]->get_location();
-                float bvdW = ligands[l]->atoms[j]->get_vdW_radius();
-
-                r = pta.get_3d_distance(&ptb) + 1e-3;
-                if (r < avdW + bvdW)
-                {
-                    /*float confidence = 2.5;		// TODO: Get this from the PDB.
-                    float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
-
-                    float allowable = give + confidence / sqrt(3);
-
-                    r += allowable;
-                    if (r > (avdW + bvdW)) r = avdW + bvdW;*/
-
-                    float lclash = sphere_intersection(avdW, bvdW, r);
-                    if (lclash > 0)
-                    {
-                        clash += lclash;
-                        /*cout << name << ":" << atoms[i]->name << " clashes with " <<
-                        	ligands[l]->name << ":" << ligands[l]->atoms[j]->name << " by " << lclash << " cu. A." << endl;*/
-                    }
-                }
+                clash -= fmax(InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]), 0);
+                continue;
             }
         }
     }
 
-    return clash*_kJmol_cuA;
+    return clash;
 }
 
 void Molecule::move(SCoord move_amt, bool override_residue)
@@ -2862,7 +2842,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
     minimum_searching_aniso = 0.5;
 
-    for (iter=1; iter<=iters; iter++)
+    for (iter=0; iter<iters; iter++)
     {
         for (i=0; mm[i]; i++) mm[i]->lastbind = 0;
 
@@ -3113,7 +3093,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
         }       // if MOV_CAN_FLEX
 
         #if allow_iter_cb
-        if (cb) cb(iter, mm);
+        if (cb) cb(iter+1, mm);
         #endif
 
         minimum_searching_aniso *= 0.99;

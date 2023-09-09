@@ -201,8 +201,6 @@ S       Zn     coord    0.5   2.43       24.0           2.5
 # Keep these last or the code will erroneously add them to the other bindings.
 *		C	   vdW		0.1	  4.0		  0.4
 *		H	   vdW		0.1	  3.0		  0.4
-*		N	   vdW		0.1	  3.0		  0.4
-*		O	   vdW		0.1	  3.0		  0.4
 
 
 

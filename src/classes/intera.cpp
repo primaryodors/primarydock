@@ -1171,17 +1171,21 @@ _canstill_clash:
 
     r += allowable;*/
 
-    if ((rheavy / l_heavy_atom_mindist) < (r / rbind))
+    /*if ((rheavy / l_heavy_atom_mindist) < (r / rbind))
     {
         rbind = l_heavy_atom_mindist;
         r = rheavy;
-    }
+    }*/
+
+    const float sigma = fmin(rbind, avdW+bvdW) - global_clash_allowance;
+    const float sigma_r = sigma / r;
 
     if (r < rbind && !atoms_are_bonded && (!achg || !bchg || sgn(achg) != -sgn(bchg)) )
     {
-        float f = rbind/(avdW+bvdW);
-        float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 6);
-        kJmol -= clash;
+        // float f = rbind/(avdW+bvdW);
+        // float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 6);
+        float clash = Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
+        kJmol -= fmax(clash, 0);
         
         #if _peratom_audit
         if (interauditing)

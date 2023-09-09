@@ -24,6 +24,8 @@ void iteration_callback(int iter, Molecule** mols)
     mols[0]->save_sdf(pf, ligands);
     fclose(pf);
 
+    cout << iter << ": " << -mols[0]->get_intermol_binding(mols[1]) << endl << flush;
+
     #endif
 }
 

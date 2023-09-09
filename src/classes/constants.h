@@ -114,7 +114,10 @@
 #define polar_repulsion 15.0
 #define charge_repulsion 10.0
 
-#define lmpush 0.001
+#define global_clash_allowance 0.4
+#define Lennard_Jones_epsilon 1.0
+#define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
+#define lmpush 0.0015
 
 #define amide_zwitterionic_amount 0.1
 
@@ -342,7 +345,7 @@
 #define _dbg_multiflex 0
 #define _dbg_homology 0
 #define _dbg_bridges 0
-#define _dbg_mol_frames 0
+#define _dbg_mol_frames 1
 #define _dbg_fitness_plummet 0
 #define _dbg_anemia 0
 #define _dbg_find_blasted_segfault 0

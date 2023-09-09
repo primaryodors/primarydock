@@ -114,7 +114,7 @@
 #define polar_repulsion 15.0
 #define charge_repulsion 10.0
 
-#define lmpush 0.0015
+#define lmpush 0.001
 
 #define amide_zwitterionic_amount 0.1
 
@@ -127,7 +127,7 @@
 #define bb_pullaway_allowance 0.13
 #define bb_realign_iters 1
 #define bb_realign_b_threshold 20
-#define bb_realign_amount 0.2
+#define bb_realign_amount 0.15
 #define bb_realign_threshold_distance 3.0
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define flexion_selection 1

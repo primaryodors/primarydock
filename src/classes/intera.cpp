@@ -1180,7 +1180,7 @@ _canstill_clash:
     if (r < rbind && !atoms_are_bonded && (!achg || !bchg || sgn(achg) != -sgn(bchg)) )
     {
         float f = rbind/(avdW+bvdW);
-        float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);
+        float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 6);
         kJmol -= clash;
         
         #if _peratom_audit

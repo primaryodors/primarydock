@@ -84,8 +84,8 @@ float DynamicMotion::get_nearby_contact_energy()
 
             float e = -aa->get_intermol_binding(nearby_contacts[j]);
             
-            #if _dbg_soft_dynamics
-            // cout << *aa << " ~ " << *(nearby_contacts[j]) << " energy: " << e << endl;
+            #if _dbg_internal_clashes
+            if (e > 0) cout << *aa << " clashes with " << *(nearby_contacts[j]) << " by " << e << endl;
             #endif
 
             result += e;

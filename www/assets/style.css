@@ -109,7 +109,7 @@ p
     z-index: 20000;
 }
 
-#logo h1
+#logo h2
 {
     margin-left: 21px;
     margin-right: 53px;
@@ -121,7 +121,7 @@ p
     float: left;
 }
 
-#logo h1:hover
+#logo h2:hover
 {
     text-decoration: none!important;
 }

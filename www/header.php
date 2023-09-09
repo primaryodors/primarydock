@@ -31,8 +31,10 @@ if ($extra_js  && !is_array($extra_js )) $extra_js  = [$extra_js ];
     <body>
         <div id="logo">
             <?php if (@$customizations['logo']['href']) echo "<a href=\"{$customizations['logo']['href']}\">"; ?>
-            <img src="<?php echo @$customizations['logo']['url'] ?: "assets/logo.png"; ?>" style="float: left;">
-            <?php if (@$customizations['logo']['text']) echo "<h1>{$customizations['logo']['text']}</h1>"; ?>
+            <img src="<?php echo @$customizations['logo']['url'] ?: "assets/logo.png"; ?>"
+               alt="<?php echo @$customizations['logo']['alt'] ?: "Main Logo"; ?>"
+               style="float: left;">            
+            <?php if (@$customizations['logo']['text']) echo "<h2>{$customizations['logo']['text']}</h2>"; ?>
             <?php if (@$customizations['logo']['href']) echo "</a>"; ?>
         </div>
         <div id="side"<?php if (@$customizations['logo']['height'])

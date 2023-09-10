@@ -237,7 +237,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
 
     figure_out_valence();
 
-    bonded_to = new Bond[abs(geometry)];
+    bonded_to = new Bond[abs(geometry)+4];
     int i;
     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");

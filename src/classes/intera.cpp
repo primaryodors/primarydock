@@ -1178,13 +1178,12 @@ _canstill_clash:
     }*/
 
     const float sigma = fmin(rbind, avdW+bvdW) - global_clash_allowance;
-    const float sigma_r = sigma / r;
 
     if (r < rbind && !atoms_are_bonded && (!achg || !bchg || sgn(achg) != -sgn(bchg)) )
     {
         // float f = rbind/(avdW+bvdW);
         // float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 6);
-        float clash = Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
+        float clash = Lennard_Jones(a, b, sigma);
         kJmol -= fmax(clash, 0);
         
         #if _peratom_audit
@@ -1206,6 +1205,14 @@ _canstill_clash:
     return kJmol;
 }
 
+float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
+{
+    if (!sigma) sigma = atom1->get_vdW_radius() + atom2->get_vdW_radius() - global_clash_allowance;
+    float r = atom1->distance_to(atom2);
+    float sigma_r = sigma / r;
+
+    return Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
+}
 
 float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
 {

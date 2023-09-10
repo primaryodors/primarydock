@@ -37,6 +37,7 @@ public:
     static float metal_compatibility(Atom* a, Atom* b);
     static float potential_binding(Atom* a, Atom* b);
     static float total_binding(Atom* a, Atom* b);
+    static float Lennard_Jones(Atom* atom1, Atom* atom2, float sigma = 0);
     static float distance_anomaly(Atom* a, Atom* b);
     static float covalent_bond_radius(Atom* a, Atom* b, float cardinality);
     static float coordinate_bond_radius(Atom* a, Atom* b, intera_type btype);

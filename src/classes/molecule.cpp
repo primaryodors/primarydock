@@ -2009,7 +2009,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 if (atoms[i]->is_bonded_to(ligands[l]->atoms[j])) continue;
                 if (atoms[i]->shares_bonded_with(ligands[l]->atoms[j])) continue;
 
-                clash -= fmax(InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]), 0);
+                clash += fmax(InteratomicForce::Lennard_Jones(atoms[i], ligands[l]->atoms[j]), 0);
                 continue;
             }
         }

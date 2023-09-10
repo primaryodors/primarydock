@@ -3189,6 +3189,7 @@ _try_again:
             interauditing = true;
             #endif
 
+            for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
             for (i=0; i<sphres; i++)
             {
                 if (!reaches_spheroid[nodeno][i]) continue;

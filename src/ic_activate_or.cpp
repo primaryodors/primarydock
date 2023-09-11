@@ -84,6 +84,9 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////////
 
     AminoAcid *aa1x32 = p.get_residue_bw("1.32");
+    AminoAcid *aa1x50 = p.get_residue_bw("1.50");
+    AminoAcid *aa2x50 = p.get_residue_bw("2.50");
+    AminoAcid *aa2x66 = p.get_residue_bw("2.66");
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
     AminoAcid *aa3x32 = p.get_residue_bw("3.32");
     AminoAcid *aa3x33 = p.get_residue_bw("3.33");
@@ -123,11 +126,17 @@ int main(int argc, char** argv)
     AminoAcid *aa7x31 = p.get_residue_bw("7.31");
     AminoAcid *aa7x37 = p.get_residue_bw("7.37");
     AminoAcid *aa7x41 = p.get_residue_bw("7.41");
+    AminoAcid *aa7x42 = p.get_residue_bw("7.42");
     AminoAcid *aa7x48 = p.get_residue_bw("7.48");
+    AminoAcid *aa7x49 = p.get_residue_bw("7.49");
     AminoAcid *aa7x52 = p.get_residue_bw("7.52");
     AminoAcid *aa7x53 = p.get_residue_bw("7.53");
     AminoAcid *aa7x56 = p.get_residue_bw("7.56");
     
+    int n1x32 = aa1x32->get_residue_no();
+    int n1x50 = aa1x50->get_residue_no();
+    int n2x50 = aa2x50->get_residue_no();
+    int n2x66 = aa2x66->get_residue_no();
     int n3x21 = aa3x21->get_residue_no();
     int n3x39 = aa3x39->get_residue_no();
     int n3x56 = aa3x56->get_residue_no();
@@ -142,6 +151,7 @@ int main(int argc, char** argv)
     int n6x59 = aa6x59->get_residue_no();
     int n7x31 = aa7x31->get_residue_no();
     int n7x41 = aa7x41->get_residue_no();
+    int n7x49 = aa7x49->get_residue_no();
 
     char l3x40 = aa3x40->get_letter();
     char l4x56 = aa4x56->get_letter();
@@ -167,14 +177,14 @@ int main(int argc, char** argv)
     bool bcr;
     bool stiff6x55 = false;
 
-    LocatedVector axis3, axis4;
+    LocatedVector axis1, axis2, axis3, axis4, axis7;
     float theta;
     Point was;
     SCoord TMR6c, axis5;
     float theta6 = 0;
     SCoord axis6;
     float bridge57, scooch6x40 = 0, TMR7cz;
-    SCoord TMR5cdir, TMR6cdir, TMR7cdir, axis7;
+    SCoord TMR5cdir, TMR6cdir, TMR7cdir;
     Point pt_tmp;
     TMR6ActivationType type6;
 
@@ -353,6 +363,11 @@ int main(int argc, char** argv)
     // Perform the rotation.
     p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*1.5);
 
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // TMR4 bend to meet TMR3.
+    ////////////////////////////////////////////////////////////////////////////////
+
     axis4 = (SCoord)aa4x53->get_CA_location().subtract(aa6x49->get_CA_location());
     axis4.origin = aa4x53->get_CA_location();
     float bend4 = p.region_can_rotate(n4x53, n4x64, axis4, true);
@@ -360,6 +375,37 @@ int main(int argc, char** argv)
 
     // Perform the rotation.
     p.rotate_piece(n4x53, n4x64, aa4x53->get_CA_location(), axis4, bend4);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // TMR2 and TMR1 bend also.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    axis2 = compute_normal(aa2x50->get_CA_location(), aa2x66->get_CA_location(), aa3x21->get_CA_location());
+    axis2.origin = aa2x50->get_CA_location();
+    float bend2 = bend4 * 1.25;
+    p.rotate_piece(n2x50, n2x66, axis2.origin, axis2, -bend2);
+
+    axis1 = compute_normal(aa1x50->get_CA_location(), aa1x32->get_CA_location(), aa2x66->get_CA_location());
+    axis1.origin = aa1x50->get_CA_location();
+    float bend1 = bend4 * 1.5;
+    p.rotate_piece(n1x32, n1x50, axis1.origin, axis1, bend1);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Bend TMR7 out and back in again.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    axis7 = compute_normal(aa7x49->get_CA_location(), aa7x42->get_CA_location(), aa3x32->get_CA_location());
+    axis7.origin = aa7x42->get_CA_location();
+    float bend7 = -30 * fiftyseventh;
+
+    // Initial rotation.
+    p.rotate_piece(n7x31, n7x49, aa7x49->get_CA_location(), axis7, bend7);
+
+    bend7 = p.region_can_rotate(n7x31, n7x49, axis7, true);
+    p.rotate_piece(n7x31, n7x49, aa7x49->get_CA_location(), axis7, bend7);
+    cout << "Bent TMR7:EXR outward " << (30.0 - (bend7*fiftyseven)) << " degrees." << endl;
 
 
     ////////////////////////////////////////////////////////////////////////////////

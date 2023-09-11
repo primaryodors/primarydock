@@ -196,7 +196,7 @@ protected:
     char** remarks = nullptr;
     int remarksz = 0;
     MetalCoord** m_mcoord = nullptr;
-    std::vector<int> Ballesteros_Weinstein;
+    int Ballesteros_Weinstein[79];
     std::vector<AABridge> aabridges;
     std::vector<Bond*> connections;
     std::vector<Pose> origpdb_residues;

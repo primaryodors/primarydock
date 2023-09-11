@@ -24,6 +24,9 @@ Protein::Protein(const char* lname)
     ca = nullptr;
     res_reach = nullptr;
     metals = nullptr;
+
+    int i;
+    for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
 }
 
 Protein::~Protein()
@@ -173,7 +176,7 @@ AminoAcid* Protein::get_residue_bw(const char* bwno)
 
 AminoAcid* Protein::get_residue_bw(int hxno, int bwno)
 {
-    if (!Ballesteros_Weinstein.size())
+    if (!Ballesteros_Weinstein[3])
     {
         cout << "Call to get_residue_bw() on a protein with no BW numbers set." << endl;
         throw -1;
@@ -891,9 +894,13 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
         int f4 = atoi(words[4]);
         if (!strcmp(words[3], "BW"))
         {
-            while (Ballesteros_Weinstein.size() <= f4) Ballesteros_Weinstein.push_back(0);
             Ballesteros_Weinstein[f4] = atoi(words[5]);
         }
+    }
+
+    for (l=0; l<79; l++)
+    {
+        cout << l << ": " << Ballesteros_Weinstein[l] << endl;
     }
 
     initial_int_clashes = get_internal_clashes();
@@ -968,7 +975,7 @@ void Protein::revert_to_pdb()
 
 int Protein::get_bw50(int helixno)
 {
-    if (Ballesteros_Weinstein.size() <= helixno) return -1;
+    if (helixno < 1 || helixno > 78) return -1;
     return Ballesteros_Weinstein[helixno];
 }
 
@@ -1020,7 +1027,6 @@ void Protein::add_remark(const char* remark)
         )
     {
         int f4 = atoi(words[4]);
-        while (Ballesteros_Weinstein.size() <= f4) Ballesteros_Weinstein.push_back(0);
         Ballesteros_Weinstein[f4] = atoi(words[5]);
     }
 }
@@ -3047,9 +3053,9 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
     // Check that both proteins have TM helices and BW numbers set. If not, error out.
     if (!get_region_start("TMR6") || !target->get_region_start("TMR6")) throw 0xbadbeb7;
-    if (!Ballesteros_Weinstein.size() || !target->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
+    if (!Ballesteros_Weinstein[3] || !target->Ballesteros_Weinstein[3]) throw 0xbadbeb7;
     if (!reference->get_region_start("TMR6")) throw 0xbadbeb7;
-    if (!reference->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
+    if (!reference->Ballesteros_Weinstein[3]) throw 0xbadbeb7;
 
     upright();
     target->upright();
@@ -3505,7 +3511,7 @@ void Protein::bridge(int resno1, int resno2)
         aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa1->get_reach_atom()->get_location());
     }
 
-    Molecule** mols = new Molecule*[3];
+    Molecule* mols[3];
     mols[0] = aa1;
     mols[1] = aa2;
     mols[2] = nullptr;
@@ -3521,8 +3527,6 @@ void Protein::bridge(int resno1, int resno2)
     Molecule::conform_molecules(mols, mols2, 25);
 
     Molecule::conform_molecules(mols, 25);
-
-    delete mols;
 
     aa1->movability = MOV_PINNED;
     aa2->movability = MOV_PINNED;

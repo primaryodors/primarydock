@@ -770,11 +770,8 @@ int Molecule::from_sdf(char const* sdf_dat)
             atoms[a1i-1]->bond_to(atoms[a2i-1], atof(words[2]));
             // cout << "Bonded " << atoms[a1i-1]->name << " to " << atoms[a2i-1]->name << endl;
         }
-
-        if (words) delete words;
     }
     atoms[atcount] = 0;
-    if (words) delete words;
 
     identify_rings();
     identify_acidbase();
@@ -845,8 +842,6 @@ int Molecule::from_pdb(FILE* is)
             }
         }
         buffer[0] = 0;
-
-        delete words;
     }
 
     return added;

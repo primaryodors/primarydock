@@ -69,8 +69,6 @@ void Atom::read_elements()
                         }
                     }
                 }
-
-                delete words;
             }
             buffer[0] = 0;
         }

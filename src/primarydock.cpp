@@ -1302,8 +1302,6 @@ void read_config_file(FILE* pf)
             if (!words) continue;
 
             interpret_config_line(words);
-
-            delete words;
         }
         buffer[0] = 0;
     }
@@ -2282,7 +2280,6 @@ int main(int argc, char** argv)
         if (flex) Molecule::conform_molecules(prealign_res, lig_grp, prealign_iters, nullptr);
         ligand->movability = MOV_ALL;
 
-        delete words;
         delete prealign_res;
         delete lig_grp;
     }

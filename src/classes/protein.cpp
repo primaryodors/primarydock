@@ -737,7 +737,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                     char** words = chop_spaced_words(buffer);
                     if (words[2] && !words[3])
                         name = words[2];
-                    delete words;
                 }
             }
             else if (buffer[0] == 'C'
@@ -877,8 +876,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
 
         set_region(words[3], atoi(words[4]), atoi(words[5]));
         regions_from = rgn_pdb;
-
-        delete words;
     }
 
     std::vector<std::string> rem_st = get_remarks("800 SITE");
@@ -897,8 +894,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
             while (Ballesteros_Weinstein.size() <= f4) Ballesteros_Weinstein.push_back(0);
             Ballesteros_Weinstein[f4] = atoi(words[5]);
         }
-
-        delete words;
     }
 
     initial_int_clashes = get_internal_clashes();
@@ -1028,7 +1023,6 @@ void Protein::add_remark(const char* remark)
         while (Ballesteros_Weinstein.size() <= f4) Ballesteros_Weinstein.push_back(0);
         Ballesteros_Weinstein[f4] = atoi(words[5]);
     }
-    delete words;
 }
 
 std::vector<std::string> Protein::get_remarks(std::string search_for)

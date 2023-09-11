@@ -120,6 +120,8 @@ InteratomicForce::InteratomicForce()
 
 void InteratomicForce::read_dat_line(char* line)
 {
+    Atom::Z_from_esym("H");         // Pre-loads element definitions and avoids a segfault.
+
     char** words = chop_spaced_words(line);
     if (!words) return;
     if (words[0]
@@ -247,7 +249,6 @@ void InteratomicForce::read_dat_line(char* line)
             else distance=1;
         }
     }
-    delete words;
 }
 
 bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)

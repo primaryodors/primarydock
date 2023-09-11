@@ -18,6 +18,7 @@ float pre_ligand_multimol_radius = default_pre_ligand_multimol_radius;
 float pre_ligand_flex_radius = default_pre_ligand_flex_radius;
 
 char asterisk[5] = "*";
+char* separated_word_pointers[256];
 
 #if active_persistence
 int active_persistence_resno[active_persistence_limit];
@@ -67,16 +68,16 @@ char** chop_spaced_words(char* line, char separator)
 {
     if (!line[0]) return nullptr;
 
-    char** retval = new char*[100];
     int i, j=0;
+    for (i=0; i<256; i++) separated_word_pointers[i] = nullptr;
 
     if (separator == ' ' && line[0] == '\t') line[0] = separator;
-    if (line[0] != separator) retval[j++] = line;
+    if (line[0] != separator) separated_word_pointers[j++] = line;
     for (i=1; line[i] && (line[i] != '\n'); i++)
     {
         if (line[i] == '"')
         {
-            retval[j++] = &line[i++];
+            separated_word_pointers[j++] = &line[i++];
             for (; line[i] && line[i] != '"'; i++);		// Get to next quote character.
             bool last = false;
             if (!line[i+1]) last = true;
@@ -86,16 +87,16 @@ char** chop_spaced_words(char* line, char separator)
         }
 
         if (separator == ' ' && line[i] == '\t') line[i] = separator;
-        if (line[i-1] == separator && line[i] != separator) retval[j++] = line+i;
-        else if (line[i-1] == 0 && line[i] != separator) retval[j++] = line+i;
+        if (line[i-1] == separator && line[i] != separator) separated_word_pointers[j++] = line+i;
+        else if (line[i-1] == 0 && line[i] != separator) separated_word_pointers[j++] = line+i;
         else if (line[i-1] != separator && line[i] == separator) line[i] = 0;
         if (line[i] == '\n') line[i] = 0;
         if (j >= 99) break;
     }
     if (line[i] == '\n') line[i] = 0;
-    retval[j] = 0;
+    separated_word_pointers[j] = 0;
 
-    return retval;
+    return separated_word_pointers;
 }
 
 

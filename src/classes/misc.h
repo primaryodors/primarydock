@@ -86,6 +86,7 @@ extern float pre_ligand_multimol_radius;
 extern float pre_ligand_flex_radius;
 
 extern char asterisk[5];
+extern char* separated_word_pointers[256];
 
 #if active_persistence_noflex
 extern bool allow_ligand_flex;

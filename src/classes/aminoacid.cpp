@@ -1467,8 +1467,6 @@ void AminoAcid::load_aa_defs()
                 {
                     if (lastwords[i] != words[i]) strcpy(lastwords[i], words[i]);
                 }
-
-                delete words;
             }
             buffer[0] = 0;
         }

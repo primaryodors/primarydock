@@ -246,7 +246,6 @@ public:
                 }
             }
         }
-        geov=0;
     }
 
     // Serialization
@@ -276,7 +275,7 @@ public:
     void rotate_geometry(Rotation rot);			// Necessary for bond rotation.
     void clear_geometry_cache()
     {
-        geov=0;
+        //
     }
     void swing_all(int startat=0);
     void swap_chirality()
@@ -329,7 +328,7 @@ protected:
     int valence=0;
     int geometry=0;						// number of vertices, so 4 = tetrahedral; 6 = octahedral; etc.
     int origgeo=0;
-    SCoord* geov=0;
+    SCoord geov[10];
     float at_wt = 0;
     float vdW_rad = 0;
     float elecn = 0;

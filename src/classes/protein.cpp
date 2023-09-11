@@ -32,7 +32,6 @@ Protein::~Protein()
 
     delete[] remarks;
     remarksz = 0;
-    delete ca;
 }
 
 bool Protein::add_residue(const int resno, const char aaletter)
@@ -41,7 +40,7 @@ bool Protein::add_residue(const int resno, const char aaletter)
 
     if (!residues)
     {
-        int arrlimit = resno+256;
+        arrlimit = resno+1024;
         residues = new AminoAcid*[arrlimit];
         sequence = new char[arrlimit];
         ca = new Atom*[arrlimit];
@@ -55,13 +54,13 @@ bool Protein::add_residue(const int resno, const char aaletter)
             res_reach[i] = 0;
         }
     }
-    else if (resno % 256)
+    else if (resno >= arrlimit)
     {
         AminoAcid** oldres = residues;
         char* oldseq = sequence;
         Atom** oldca = ca;
         float* oldreach = res_reach;
-        int arrlimit = resno+261;
+        arrlimit = resno+1024;
         residues = new AminoAcid*[arrlimit];
         sequence = new char[arrlimit];
         ca = new Atom*[arrlimit];

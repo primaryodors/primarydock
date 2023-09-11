@@ -638,7 +638,6 @@ void iteration_callback(int iter, Molecule** mols)
                 #else
                 Atom** mbb = alignment_aa[l]->get_most_bindable(1, ligbb[l]);
                 Atom* alca = mbb[0];
-                delete mbb;             // Delete the pointer array, but not the pointers.
 
                 if (alca)
                 {

@@ -379,12 +379,6 @@ Atom::Atom(FILE* is)
 
 Atom::~Atom()
 {
-    /*if (region) delete[] region;
-    if (name) delete[] name;
-    if (bonded_to) delete[] bonded_to;*/
-
-    if (geov) delete[] geov;
-
     if (bonded_to)
     {
         int i;
@@ -480,8 +474,6 @@ bool Atom::move(Point* pt)
 
     location = *pt;
     location.weight = at_wt;
-    if (geov) delete[] geov;
-    geov = NULL;
     return true;
 }
 
@@ -558,8 +550,6 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
         aloc = aloc.add(&mov);
         aloc = rotate3D(&aloc, pt, &rot);
         atoms[i]->move(aloc);
-        if (atoms[i]->geov) delete[] atoms[i]->geov;
-        atoms[i]->geov = NULL;
         atomct++;
         //cout << "Motion includes " << atoms[i]->name << endl;
     }
@@ -645,8 +635,6 @@ void Atom::clear_all_moves_cache()
     if (!bonded_to) return;
     int i;
     for (i=0; i<geometry; i++) bonded_to[i].clear_moves_with_cache();
-    if (geov) delete[] geov;
-    geov = NULL;
 }
 
 int Atom::get_bonded_atoms_count()
@@ -821,19 +809,11 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
     if (!lbtom) return false;
     int i;
 
-    // if (this < lbtom && Z > 1 && lbtom->Z > 1) cout << "Bond " << name << cardinality_printable(lcard) << lbtom->name << endl;
-
-    if (geov) delete[] geov;
-    geov = NULL;
-
     // TODO: This will fail if creating a nitrate or a sulfite.
     if (lcard>=2 && !reciprocity)
     {
         geometry -= (lcard-1);
         lbtom->geometry -= (lcard-1);
-        if (geov) delete[] geov;
-        geov=0;
-        lbtom->geov=0;
     }
 
     if (!reciprocity && !bonded_to[0].btom)
@@ -1486,7 +1466,7 @@ void Bond::swing(SCoord newdir)
 
 SCoord* Atom::get_basic_geometry()
 {
-    SCoord* retval = new SCoord[abs(geometry)+2];
+    SCoord* retval = geov;
 
     int i, j;
     float x, y, z;
@@ -1719,18 +1699,10 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
         {
             int i;
             for (i=0; i<bc; i++) geometry -= fmax(0,bonded_to[i].cardinality-1);
-            if (geov) delete[] geov;
-            geov = NULL;
         }
     }
 
-    if (geov)
-    {
-        // if (_DBGGEO) cout << name << " returns cached geometry." << endl;
-        // return geov;
-        delete[] geov;
-    }
-    geov = get_basic_geometry();
+    get_basic_geometry();
 
     Point center;
     int i, j, k, l;
@@ -1855,8 +1827,6 @@ SCoord Atom::get_next_free_geometry(float lcard)
     if (lcard > 1)
     {
         geometry -= ceil(lcard-1);
-        if (geov) delete[] geov;
-        geov = 0;
     }
     SCoord* v = get_geometry_aligned_to_bonds();
     SCoord retval;

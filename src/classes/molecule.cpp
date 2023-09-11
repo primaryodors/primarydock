@@ -3922,15 +3922,16 @@ float Molecule::close_loop(Atom** path, float lcard)
 Atom** Molecule::get_most_bindable(int max_count)
 {
     if (noAtoms(atoms)) return 0;
+    if (most_bindable) return most_bindable;
 
     int i, j=-1, k, l;
     float best[max_count+2];
-    Atom** retval = new Atom*[max_count+2];
+    most_bindable = new Atom*[max_count+2];
 
     for (k=0; k<max_count; k++)
     {
         best[k]=0;
-        retval[k]=0;
+        most_bindable[k]=0;
     }
 
     for (i=0; atoms[i]; i++)
@@ -3944,26 +3945,26 @@ Atom** Molecule::get_most_bindable(int max_count)
         float score = 0;
         atoms[i]->clear_geometry_cache();
 
-        for (k=0; retval[k] && k<max_count; k++)
+        for (k=0; most_bindable[k] && k<max_count; k++)
         {
-            if (retval[k] == atoms[i])
+            if (most_bindable[k] == atoms[i])
             {
                 #if _DBG_MOLBB
                 cout << "Atom is already in return array." << endl;
                 #endif
                 goto _resume;
             }
-            if (retval[k]->is_bonded_to(atoms[i]) && best[k] >= 10)
+            if (most_bindable[k]->is_bonded_to(atoms[i]) && best[k] >= 10)
             {
                 #if _DBG_MOLBB
-                cout << "Atom is bonded to " << retval[k]->name << ", already in return array." << endl;
+                cout << "Atom is bonded to " << most_bindable[k]->name << ", already in return array." << endl;
                 #endif
                 goto _resume;
             }
-            if (retval[k]->shares_bonded_with(atoms[i]) && best[k] >= 10)
+            if (most_bindable[k]->shares_bonded_with(atoms[i]) && best[k] >= 10)
             {
                 #if _DBG_MOLBB
-                cout << "Atom shares a bond with " << retval[k]->name << ", already in return array." << endl;
+                cout << "Atom shares a bond with " << most_bindable[k]->name << ", already in return array." << endl;
                 #endif
                 goto _resume;
             }
@@ -4000,11 +4001,11 @@ Atom** Molecule::get_most_bindable(int max_count)
                 for (l=max_count; l>k; l--)
                 {
                     best[l] = best[l-1];
-                    retval[l] = retval[l-1];
+                    most_bindable[l] = most_bindable[l-1];
                 }
 
                 best[k] = score;
-                retval[k] = atoms[i];
+                most_bindable[k] = atoms[i];
                 if (!k) j = i;
 
                 break;
@@ -4017,10 +4018,10 @@ Atom** Molecule::get_most_bindable(int max_count)
     _resume:
         ;
     }
-    retval[max_count] = 0;
+    most_bindable[max_count] = 0;
 
     if (j < 0) return 0;
-    else return retval;
+    else return most_bindable;
 }
 
 #define DBG_BINDABLE 0

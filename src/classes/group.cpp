@@ -285,7 +285,6 @@ Point ResidueGroup::get_center()
     {
         Atom** aa = aminos[i]->get_most_bindable(1);
         Atom* a = aa[0];
-        delete aa;
 
         if (a)
         {

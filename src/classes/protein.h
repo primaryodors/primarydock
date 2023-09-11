@@ -181,6 +181,7 @@ public:
 
 protected:
     Atom** ca = nullptr;
+    int arrlimit = 0;
     std::string name;
     char* sequence = nullptr;
     AminoAcid** residues = nullptr;

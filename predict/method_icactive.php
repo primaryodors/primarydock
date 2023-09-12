@@ -149,9 +149,9 @@ $flxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
-SOFT 4.53 4.64
-SOFT 5.50 5.33
-SOFT 6.48 6.59
+# SOFT 4.53 4.64
+# SOFT 5.50 5.33
+# SOFT 6.48 6.59
 
 SEARCH $search
 POSE 10
@@ -169,4 +169,10 @@ OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
 
 heredoc;
 
-process_dock("a");
+$poses = (!@$_REQUEST["softonly"]) ? process_dock("a") : 0;
+
+if (!$poses)
+{
+    $configf = str_replace("# SOFT ", "SOFT ", $configf);
+    process_dock("a");
+}

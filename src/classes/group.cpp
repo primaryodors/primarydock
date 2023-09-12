@@ -429,7 +429,7 @@ void ResidueGroup::conform_to(Molecule* mol)
             ll[1] = s.pmol;
             ll[2] = nullptr;
 
-            Molecule::conform_molecules(ll, 50);
+            Molecule::conform_molecules(ll, 20);
 
             aminos[i]->movability = mt;
         }

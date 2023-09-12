@@ -126,16 +126,20 @@ float DynamicMotion::get_nearby_contact_energy()
                     else if (api && b->is_pi())
                     {
                         r1 = fmax(r / bd, 1);
-                        e -= 7.0 / (r1*r1*r1*r1*r1*r1);
+                        e -= 1.2 / (r1*r1*r1*r1*r1*r1);
                     }
                     else if (r < 6)
                     {
                         r1 = r / bd;
-                        if (r1 >= 1) e -= 4.0 / (r1*r1*r1*r1*r1*r1);
+                        if (r1 >= 1) e -= 0.4 / (r1*r1*r1*r1*r1*r1);
                         // else e += InteratomicForce::Lennard_Jones(a, b);
                     }
                 }
             }
+
+            #if _dbg_soft_dynamics
+            // if (e < 0) cout << *aa << " contacts " << *(nearby_contacts[j]) << " with energy " << e << endl;
+            #endif
 
             #if _dbg_internal_clashes
             if (e > 0) cout << *aa << " clashes with " << *(nearby_contacts[j]) << " by " << e << endl;

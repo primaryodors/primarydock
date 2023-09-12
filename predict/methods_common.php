@@ -305,7 +305,11 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
 
-    if ($retvar || (count($outlines) < 100)) die("Docking FAILED.\n");
+    if ($retvar || (count($outlines) < 100))
+    {
+        echo "Docking FAILED.\n";
+        return 0;
+    }
     
     unlink($cnfname);
 
@@ -580,5 +584,6 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     if (!$f) die("File write FAILED. Make sure have access to write $json_file.");
     fwrite($f, json_encode_pretty($out_results));
     fclose($f);
-    
+
+    return $num_poses;
 }

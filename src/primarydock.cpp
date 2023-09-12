@@ -560,15 +560,24 @@ void iteration_callback(int iter, Molecule** mols)
             {
                 Pose ligand_was;
                 ligand_was.copy_state(ligand);
+                #if _dbg_soft_dynamics
+                cout << "Copied states." << endl << flush;
+                #endif
 
                 dyn_motions[l].apply_incremental(incr);
+                #if _dbg_soft_dynamics
+                cout << "Applied motion." << endl << flush;
+                #endif
 
                 if (use_bestbind_algorithm && global_pairs.size() >= 2)
                     GroupPair::align_groups(ligand, global_pairs, true, 0.3);
+                #if _dbg_soft_dynamics
+                cout << "Aligned groups." << endl << flush;
+                #endif
 
                 after = dyn_motions[l].get_nearby_contact_energy() + dyn_motions[l].get_ligand_contact_energy(ligand);
                 #if _dbg_soft_dynamics
-                cout << "New contact energy " << after;
+                cout << "New contact energy " << after << flush;
                 #endif
 
                 if (after > before)
@@ -591,7 +600,7 @@ void iteration_callback(int iter, Molecule** mols)
                 }
 
                 #if _dbg_soft_dynamics
-                cout << endl;
+                cout << endl << flush;
                 #endif
 
                 if (fabs(incr) < 0.01) break;

@@ -898,11 +898,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
         }
     }
 
-    for (l=0; l<79; l++)
-    {
-        cout << l << ": " << Ballesteros_Weinstein[l] << endl;
-    }
-
     initial_int_clashes = get_internal_clashes();
     allocate_undo_poses();
 

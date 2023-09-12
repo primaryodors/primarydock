@@ -85,6 +85,7 @@ int main(int argc, char** argv)
 
     AminoAcid *aa1x32 = p.get_residue_bw("1.32");
     AminoAcid *aa1x50 = p.get_residue_bw("1.50");
+    AminoAcid *aa2x49 = p.get_residue_bw("2.49");
     AminoAcid *aa2x50 = p.get_residue_bw("2.50");
     AminoAcid *aa2x66 = p.get_residue_bw("2.66");
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
@@ -139,6 +140,7 @@ int main(int argc, char** argv)
     int n2x66 = aa2x66->get_residue_no();
     int n3x21 = aa3x21->get_residue_no();
     int n3x39 = aa3x39->get_residue_no();
+    int n3x40 = aa3x40->get_residue_no();
     int n3x56 = aa3x56->get_residue_no();
     int n4x53 = aa4x53->get_residue_no();
     int n4x64 = aa4x64->get_residue_no();
@@ -163,6 +165,7 @@ int main(int argc, char** argv)
     char l6x55 = aa6x55->get_letter();
     char l6x58 = aa6x58->get_letter();
     char l6x59 = aa6x59->get_letter();
+    char l7x41 = aa7x41->get_letter();
     char l7x53 = aa7x53->get_letter();
 
 
@@ -231,6 +234,10 @@ int main(int argc, char** argv)
     else if (!strcmp(orid.c_str(), "OR8H1"))
     {
         stiff6x55 = true;
+    }
+    else if (l7x41 == 'Y')
+    {
+        aa7x41->conform_atom_to_location(aa7x41->get_reach_atom()->name, aa45x51->get_CA_location());
     }
 
     if (l4x56 == 'D' || l4x56 == 'E')
@@ -352,16 +359,17 @@ int main(int argc, char** argv)
 
 
     ////////////////////////////////////////////////////////////////////////////////
-    // Slight rotation of TMR3 to allow TMR5 motion.
+    // Slight bend of TMR3 to allow TMR5 motion.
     ////////////////////////////////////////////////////////////////////////////////
     
     axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
-    axis3.origin = aa3x50->get_CA_location();
-    float rock3 = p.region_can_rotate(n3x21, n3x56, axis3, true);
-    cout << "TMR3 can rotate " << (rock3 * fiftyseven) << " degrees about 3.50 to make room for TMR5." << endl;
+    axis3.origin = aa3x40->get_CA_location();
+    float rock3 = p.region_can_rotate(n3x21, n3x40, axis3, true);
+    cout << "TMR3 can rotate " << (rock3 * fiftyseven) << " degrees about 3.40 limited by " << *(p.stop1) << "->" << *(p.stop2)
+        << " to make room for TMR5." << endl;
 
     // Perform the rotation.
-    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*1.5);
+    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3);
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -383,29 +391,17 @@ int main(int argc, char** argv)
 
     axis2 = compute_normal(aa2x50->get_CA_location(), aa2x66->get_CA_location(), aa3x21->get_CA_location());
     axis2.origin = aa2x50->get_CA_location();
-    float bend2 = bend4 * 1.25;
+    float bend2 = bend4 * 1.2;
     p.rotate_piece(n2x50, n2x66, axis2.origin, axis2, -bend2);
 
     axis1 = compute_normal(aa1x50->get_CA_location(), aa1x32->get_CA_location(), aa2x66->get_CA_location());
     axis1.origin = aa1x50->get_CA_location();
-    float bend1 = bend4 * 1.5;
+    float bend1 = bend4 * 1.8;
     p.rotate_piece(n1x32, n1x50, axis1.origin, axis1, bend1);
 
-
-    ////////////////////////////////////////////////////////////////////////////////
-    // Bend TMR7 out and back in again.
-    ////////////////////////////////////////////////////////////////////////////////
-
-    axis7 = compute_normal(aa7x49->get_CA_location(), aa7x42->get_CA_location(), aa3x32->get_CA_location());
-    axis7.origin = aa7x42->get_CA_location();
-    float bend7 = -30 * fiftyseventh;
-
-    // Initial rotation.
-    p.rotate_piece(n7x31, n7x49, aa7x49->get_CA_location(), axis7, bend7);
-
-    bend7 = p.region_can_rotate(n7x31, n7x49, axis7, true);
-    p.rotate_piece(n7x31, n7x49, aa7x49->get_CA_location(), axis7, bend7);
-    cout << "Bent TMR7:EXR outward " << (30.0 - (bend7*fiftyseven)) << " degrees." << endl;
+    axis1 = (SCoord)(aa2x49->get_CA_location().subtract(aa1x50->get_CA_location()));
+    bend1 = bend4 * 2;
+    p.rotate_piece(n1x32, n1x50, axis1.origin, axis1, -bend1);
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -661,7 +657,7 @@ int main(int argc, char** argv)
         m.move(pt);
         m.movability = MOV_PINNED;
 
-        Molecule* mols[256];
+        Molecule* mols[512];
         AminoAcid** can_clash = p.get_residues_can_clash(aa6x59->get_residue_no());
         l = 0;
 
@@ -673,13 +669,13 @@ int main(int argc, char** argv)
         {
             can_clash[i]->movability = MOV_FLEXONLY;
             mols[l++] = (Molecule*)can_clash[i];
-            if (l >= 255) break;
+            if (l >= 32) break;
         }
         mols[l] = nullptr;
-        Molecule::conform_molecules(mols, 50);
+        Molecule::conform_molecules(mols, 20);
 
         mols[3] = nullptr;
-        Molecule::conform_molecules(mols, 20);
+        Molecule::conform_molecules(mols, 15);
         
         /*fp = fopen("tmp/dbg6x59.pdb", "wb");
         if (!fp) return -3;

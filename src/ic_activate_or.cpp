@@ -91,6 +91,7 @@ int main(int argc, char** argv)
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
     AminoAcid *aa3x32 = p.get_residue_bw("3.32");
     AminoAcid *aa3x33 = p.get_residue_bw("3.33");
+    AminoAcid *aa3x36 = p.get_residue_bw("3.36");
     AminoAcid *aa3x39 = p.get_residue_bw("3.39");
     AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
@@ -128,6 +129,7 @@ int main(int argc, char** argv)
     AminoAcid *aa7x37 = p.get_residue_bw("7.37");
     AminoAcid *aa7x41 = p.get_residue_bw("7.41");
     AminoAcid *aa7x42 = p.get_residue_bw("7.42");
+    AminoAcid *aa7x43 = p.get_residue_bw("7.43");
     AminoAcid *aa7x48 = p.get_residue_bw("7.48");
     AminoAcid *aa7x49 = p.get_residue_bw("7.49");
     AminoAcid *aa7x52 = p.get_residue_bw("7.52");
@@ -153,6 +155,7 @@ int main(int argc, char** argv)
     int n6x59 = aa6x59->get_residue_no();
     int n7x31 = aa7x31->get_residue_no();
     int n7x41 = aa7x41->get_residue_no();
+    int n7x43 = aa7x43->get_residue_no();
     int n7x49 = aa7x49->get_residue_no();
 
     char l3x40 = aa3x40->get_letter();
@@ -167,6 +170,8 @@ int main(int argc, char** argv)
     char l6x59 = aa6x59->get_letter();
     char l7x41 = aa7x41->get_letter();
     char l7x53 = aa7x53->get_letter();
+
+    float dist67 = aa6x59->get_CA_location().get_3d_distance(p.get_residue(n6x59+1)->get_CA_location());
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -469,6 +474,21 @@ int main(int argc, char** argv)
         theta = find_3d_angle(aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c), aa5x50->get_CA_location());
         p.rotate_piece(aa5x50->get_residue_no(), aa56x50->get_residue_no()-1, aa5x50->get_CA_location(), axis5, theta);
         cout << "TMR5 rotation about " << axis5 << " by " << (theta*fiftyseven) << "deg." << endl;
+
+        // TMR6 takes TMR7 with it.
+        float dist67_new = aa6x59->get_CA_location().get_3d_distance(p.get_residue(n6x59+1)->get_CA_location());
+        int mid67 = (n6x59 + n7x31) / 2;
+        AminoAcid* aamid67 = p.get_residue(mid67);
+        pt_tmp = aamid67->get_CA_location();
+        SCoord v = aa45x51->get_CA_location().subtract(pt_tmp);
+        v.r *= 0.3;
+        pt_tmp = pt_tmp.add(v);
+        axis7 = (SCoord)(aa7x49->get_CA_location().subtract(pt_tmp));
+        axis7.origin = aa7x49->get_CA_location();
+        theta = find_angle_along_vector(p.get_residue(n6x59+1)->get_CA_location(), aa6x59->get_CA_location(), aa7x31->get_CA_location(), axis7);
+        theta *= (dist67_new - dist67) / dist67_new;
+        p.rotate_piece(n6x59+1, n7x49, axis7.origin, axis7, theta);
+        cout << "TMR7 and EXR3 rotation about 7.43 by " << (theta*fiftyseven) << "deg to follow TMR6." << endl;
     }
 
 

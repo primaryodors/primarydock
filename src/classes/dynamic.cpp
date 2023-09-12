@@ -72,18 +72,71 @@ float DynamicMotion::get_nearby_contact_energy()
 
     float result = 0;
 
-    int i, j;
+    int i, j, k, l, m, n;
     for (i=sr; i<=er; i++)
     {
         AminoAcid* aa = prot->get_residue(i);
         if (!aa) continue;
+
+        n = aa->get_atom_count();
     
         for (j=0; nearby_contacts[j]; j++)
         {
             if (aa->get_CA_location().get_3d_distance(nearby_contacts[j]->get_CA_location()) > (aa->get_reach() + nearby_contacts[j]->get_reach()) ) continue;
 
-            float e = -aa->get_intermol_binding(nearby_contacts[j]);
-            
+            float e = 0; // -aa->get_intermol_binding(nearby_contacts[j]);
+            m = nearby_contacts[j]->get_atom_count();
+
+            for (k=0; k<n; k++)
+            {
+                Atom* a = aa->get_atom(k);
+                if (a->is_backbone) continue;
+
+                float apol = a->is_polar();
+                float achg = a->get_charge();
+                bool apolr = fabs(apol) >= hydrophilicity_cutoff;
+                bool achgd = fabs(achg) >= 0.5;
+                bool api = a->is_pi();
+                int apol_sgn = sgn(apol);
+                int achg_sgn = sgn(achg);
+
+                for (l=0; l<m; l++)
+                {
+                    Atom* b = nearby_contacts[j]->get_atom(l);
+                    if (b->is_backbone) continue;
+
+                    float r = a->distance_to(b);
+                    if (r > 10) continue;
+                    float bd, r1;
+
+                    bd = a->get_vdW_radius() + b->get_vdW_radius();
+
+                    if (achgd && fabs(b->get_charge()) >= 0.5 && achg_sgn == -sgn(b->get_charge()))
+                    {
+                        bd *= 0.58;
+                        r1 = fmax(r / bd, 1);
+                        e -= 60.0 / (r1*r1);
+                    }
+                    else if (apolr && fabs(b->is_polar()) >= hydrophilicity_cutoff && apol_sgn == -sgn(b->is_polar()))
+                    {
+                        bd *= 0.75;
+                        r1 = fmax(r / bd, 1);
+                        e -= 25.0 / (r1*r1);
+                    }
+                    else if (api && b->is_pi())
+                    {
+                        r1 = fmax(r / bd, 1);
+                        e -= 7.0 / (r1*r1*r1*r1*r1*r1);
+                    }
+                    else if (r < 6)
+                    {
+                        r1 = r / bd;
+                        if (r1 >= 1) e -= 4.0 / (r1*r1*r1*r1*r1*r1);
+                        // else e += InteratomicForce::Lennard_Jones(a, b);
+                    }
+                }
+            }
+
             #if _dbg_internal_clashes
             if (e > 0) cout << *aa << " clashes with " << *(nearby_contacts[j]) << " by " << e << endl;
             #endif

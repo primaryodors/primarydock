@@ -369,7 +369,7 @@ int main(int argc, char** argv)
         << " to make room for TMR5." << endl;
 
     // Perform the rotation.
-    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3);
+    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*0.3);
 
 
     ////////////////////////////////////////////////////////////////////////////////

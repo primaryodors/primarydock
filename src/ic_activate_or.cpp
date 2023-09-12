@@ -107,6 +107,7 @@ int main(int argc, char** argv)
     AminoAcid *aa45x53 = p.get_residue_bw("45.53");
     AminoAcid *aa45x54 = p.get_residue_bw("45.54");
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
+    AminoAcid *aa5x35 = p.get_residue_bw("5.35");
     AminoAcid *aa5x36 = p.get_residue_bw("5.36");
     AminoAcid *aa5x39 = p.get_residue_bw("5.39");
     AminoAcid *aa5x43 = p.get_residue_bw("5.43");
@@ -375,6 +376,8 @@ int main(int argc, char** argv)
 
     // Perform the rotation.
     p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*0.3);
+
+    aa3x33->conform_atom_to_location(aa3x33->get_reach_atom()->name, aa5x35->get_CA_location());
 
 
     ////////////////////////////////////////////////////////////////////////////////

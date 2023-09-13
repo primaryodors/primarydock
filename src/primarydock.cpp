@@ -570,7 +570,7 @@ void iteration_callback(int iter, Molecule** mols)
                 #endif
 
                 if (use_bestbind_algorithm && global_pairs.size() >= 2)
-                    GroupPair::align_groups(ligand, global_pairs, true, 0.3);
+                    GroupPair::align_groups(ligand, global_pairs, false, 0.3);
                 #if _dbg_soft_dynamics
                 cout << "Aligned groups." << endl << flush;
                 #endif
@@ -2166,7 +2166,7 @@ int main(int argc, char** argv)
         dyn.end_resno.from_string(resno1>resno2 ? words[1] : words[2]);
         dyn.fulcrum_resno.from_string(words[1]);
         dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
-        dyn.bias = 15*fiftyseventh;
+        dyn.bias = 30*fiftyseventh;
         dyn_motions.push_back(dyn);
     }
 

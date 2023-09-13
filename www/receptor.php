@@ -53,6 +53,21 @@ if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
     }
 }
 
+$cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|obabel)' | grep -v grep";
+$result = [];
+exec($cmd, $result);
+
+$ligands_inprogress = [];
+foreach ($result as $line)
+{
+    $pos = strpos($line, ".$rcpid.");
+    if (false == $pos) continue;
+    $ligname = substr($line, $pos+strlen(".$rcpid."));
+    $ligname = preg_replace("/[.]config/", "", $ligname);
+    $odor = find_odorant($ligname);
+    $ligands_inprogress[$odor['oid']] = true;
+}
+
 // Copper binding sites for e.g. OR2T11
 // http://pubs.acs.org/doi/abs/10.1021/jacs.6b06983
 $cub =
@@ -633,6 +648,7 @@ foreach ($pairs as $oid => $pair)
             echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."');\">&#x21a7;</span>";
             echo "</td>";
         }
+        else if (@$ligands_inprogress[$oid]) echo "<td colspan=\"2\">&#x23F3;</td>";
         else echo "<td colspan=\"2\">&nbsp;</td>";
     }        
 

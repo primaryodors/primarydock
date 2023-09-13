@@ -118,6 +118,8 @@
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 0.0015
+#define recapture_ejected_ligand 1
+#define recapture_distance 10
 
 #define amide_zwitterionic_amount 0.1
 

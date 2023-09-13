@@ -422,6 +422,12 @@ void iteration_callback(int iter, Molecule** mols)
     int l;
     float f = 0;
 
+    #if recapture_ejected_ligand
+    Point lig_center = ligand->get_barycenter();
+    float r = lig_center.get_3d_distance(ligcen_target);
+    if (r >= recapture_distance) ligand->recenter(ligcen_target);
+    #endif
+
     if (iter == 1)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].copy_state(mols[l]);

@@ -1165,25 +1165,17 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (rbind < 0.7) rbind = 0.7;
 
 _canstill_clash:
-    /*float confidence = 2.5;		// TODO: Get this from the PDB.
-    float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
 
-    float allowable = give + confidence / sqrt(3);
+    float sigma;
 
-    r += allowable;*/
+    #if ignore_double_hydrogen_clashes
+    if (a->get_Z() == 1 && b->get_Z() == 1 && r > 2.0-global_clash_allowance*3) goto _finished_clashing;
+    #endif
 
-    /*if ((rheavy / l_heavy_atom_mindist) < (r / rbind))
-    {
-        rbind = l_heavy_atom_mindist;
-        r = rheavy;
-    }*/
-
-    const float sigma = fmin(rbind, avdW+bvdW) - global_clash_allowance;
+    sigma = fmin(rbind, avdW+bvdW) - global_clash_allowance;
 
     if (r < rbind && !atoms_are_bonded && (!achg || !bchg || sgn(achg) != -sgn(bchg)) )
     {
-        // float f = rbind/(avdW+bvdW);
-        // float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 6);
         float clash = Lennard_Jones(a, b, sigma);
         kJmol -= fmax(clash, 0);
         
@@ -1202,6 +1194,7 @@ _canstill_clash:
         #endif
     }
 
+    _finished_clashing:
     delete[] forces;
     return kJmol;
 }

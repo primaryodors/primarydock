@@ -115,6 +115,7 @@
 #define charge_repulsion 10.0
 
 #define global_clash_allowance 0.4
+#define ignore_double_hydrogen_clashes 1
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 0.0015

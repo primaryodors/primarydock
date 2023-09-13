@@ -648,7 +648,7 @@ foreach ($pairs as $oid => $pair)
             echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."');\">&#x21a7;</span>";
             echo "</td>";
         }
-        else if (@$ligands_inprogress[$oid]) echo "<td colspan=\"2\">&#x23F3;</td>";
+        else if (@$ligands_inprogress[$oid]) echo "<td colspan=\"2\"><span title=\"A prediction is currently running for this receptor+ligand pair.\">&#x23F3;</span></td>";
         else echo "<td colspan=\"2\">&nbsp;</td>";
     }        
 

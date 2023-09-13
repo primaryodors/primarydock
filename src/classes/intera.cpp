@@ -1169,7 +1169,7 @@ _canstill_clash:
     float sigma;
 
     #if ignore_double_hydrogen_clashes
-    if (a->get_Z() == 1 && b->get_Z() == 1 && r > 2.0-global_clash_allowance*3) goto _finished_clashing;
+    if (a->get_Z() == 1 && b->get_Z() == 1 && r > 1.0) goto _finished_clashing;
     #endif
 
     sigma = fmin(rbind, avdW+bvdW) - global_clash_allowance;

@@ -1393,7 +1393,6 @@ void Molecule::identify_acidbase()
                         int fam = b[j]->btom->get_family();
                         if (fam != CHALCOGEN)
                         {
-                            delete[] b;
                             goto _not_acidic;
                         }
                     }
@@ -1405,7 +1404,6 @@ void Molecule::identify_acidbase()
                 int fam = b[j]->btom->get_family();
                 if (carbon && fam == PNICTOGEN)
                 {
-                    delete[] b;
                     goto _not_acidic;
                 }
                 //cout << "Fam: " << fam << endl;
@@ -1421,7 +1419,6 @@ void Molecule::identify_acidbase()
                         Bond** b1 = b[j]->btom->get_bonds();
                         if (!b1)
                         {
-                            delete[] b;
                             goto _not_acidic;
                         }
                         for (k=0; b1[k]; k++)
@@ -1434,7 +1431,6 @@ void Molecule::identify_acidbase()
                                 break;
                             }
                         }
-                        if (b1) delete[] b1;
                     }
                 }
             }

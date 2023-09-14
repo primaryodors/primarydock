@@ -219,7 +219,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
                                 if (N->num_bonded_to("H") > 1)		// Proline conditional.
                                 {
-                                    if (ab) delete[] ab;
                                     ab = N->get_bonds();
                                     l = 0;
                                     int n;

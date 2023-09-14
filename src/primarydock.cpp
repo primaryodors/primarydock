@@ -807,6 +807,7 @@ void iteration_callback(int iter, Molecule** mols)
     #if recapture_ejected_ligand
     Point lig_center = ligand->get_barycenter();
     float r = lig_center.get_3d_distance(ligcen_target);
+    float recapture_distance = size.magnitude() / 2;
     if (r >= recapture_distance) ligand->recenter(ligcen_target);
     #endif
 

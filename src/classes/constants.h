@@ -75,7 +75,7 @@
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
-#define speed_limit 0.25
+#define speed_limit 0.4
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -118,7 +118,7 @@
 #define ignore_double_hydrogen_clashes 1
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 0.0015
+#define lmpush 0.002
 #define recapture_ejected_ligand 0
 #define recapture_distance 10
 
@@ -336,7 +336,7 @@
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
 #define _dbg_groupsel 0
-#define _show_final_group_pairs 1
+#define _show_final_group_pairs 0
 #define _dbg_polsat 0
 #define _dbg_softrock 0
 #define _dbg_rock_pic 0
@@ -349,7 +349,7 @@
 #define _dbg_homology 0
 #define _dbg_bridges 0
 #define _dbg_mol_frames 0
-#define _dbg_fitness_plummet 1
+#define _dbg_fitness_plummet 0
 #define _dbg_anemia 0
 #define _dbg_find_blasted_segfault 0
 #define _dbg_imidazole_check 0
@@ -358,7 +358,7 @@
 #define _dbg_259 0
 #define _dbg_bb_realign 0
 #define _dbg_mol_flexion 0
-#define _dbg_soft_dynamics 1
+#define _dbg_soft_dynamics 0
 
 #endif
 

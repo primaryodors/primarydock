@@ -335,7 +335,7 @@
 #define _dbg_bb_rots 0
 #define _dbg_bb_pullaway 0
 #define _dbg_soft 0
-#define _dbg_groupsel 0
+#define _dbg_groupsel 1
 #define _show_final_group_pairs 0
 #define _dbg_polsat 0
 #define _dbg_softrock 0
@@ -349,7 +349,7 @@
 #define _dbg_homology 0
 #define _dbg_bridges 0
 #define _dbg_mol_frames 1
-#define _dbg_fitness_plummet 0
+#define _dbg_fitness_plummet 1
 #define _dbg_anemia 0
 #define _dbg_find_blasted_segfault 0
 #define _dbg_imidazole_check 0

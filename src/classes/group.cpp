@@ -945,15 +945,25 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
             }
 
             float r = fmax(0, aa->get_CA_location().get_3d_distance(bb->get_CA_location()) - fmax(aa->get_reach(), bb->get_reach()));
-            if (r > 2.5)
+            if (r > 1.5)
             {
                 #if _dbg_groupsel
-                // cout << "Rejected " << bb->get_name() << " distance " << r << endl;
+                cout << "Rejected " << bb->get_name() << " distance " << r << endl;
                 #endif
                 continue;
             }
 
             float simil = aa->similarity_to(bb);
+            int simil_n = 1, i2;
+
+            for (i2=1; i2 < g->aminos.size(); i2++)
+            {
+                simil += g->aminos[i2]->similarity_to(bb);
+                simil_n++;
+            }
+
+            simil /= simil_n;
+
             if (simil >= hydrophilicity_cutoff)
             {
                 g->aminos.push_back(bb);
@@ -1083,6 +1093,12 @@ float GroupPair::get_potential()
                         #if _dbg_groupsel
                         cout << *a << " is polar and " << *aa << " is not." << endl;
                         #endif
+                    }
+
+                    if (fabs(aa->get_charge()) > hydrophilicity_cutoff && fabs(a->get_charge()) > hydrophilicity_cutoff
+                        && sgn(aa->get_charge()) == -sgn(a->get_charge()))
+                    {
+                        partial += 60.0 * fabs(aa->get_charge()) * fabs(a->get_charge());
                     }
 
                     #if _dbg_groupsel

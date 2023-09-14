@@ -2844,7 +2844,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
         for (n=0; mm[n]; n++);      // Get count.
         Molecule* nearby[n+8];
 
-        bool do_full_rotation = ((iter % _fullrot_every) == 0);
+        bool do_full_rotation = (iter < iters*.666 && (iter % _fullrot_every) == 0);
 
         for (i=0; i<n; i++)
         {
@@ -2870,7 +2870,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             benerg = cfmol_multibind(a, nearby);
 
             #if _dbg_fitness_plummet
-            if (!i) cout << "# " << a->name << " " << iter << ": " << benerg << " ";
+            if (!i) cout << "# mol " << a->name << " iter " << iter << ": initial " << -benerg << " ";
             #endif
 
             float tryenerg;
@@ -2900,7 +2900,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     tryenerg = cfmol_multibind(a, nearby);
 
                     #if _dbg_fitness_plummet
-                    if (!i) cout << "(" << tryenerg << ") ";
+                    if (!i) cout << "(linear motion try " << -tryenerg << ") ";
                     #endif
 
                     if (tryenerg > benerg)
@@ -2937,7 +2937,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
 
             #if _dbg_fitness_plummet
-            if (!i) cout << benerg << " ";
+            if (!i) cout << "linear " << -benerg << " ";
             #endif
 
             /**** Histidine flip ****/
@@ -2996,7 +2996,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
 
             #if _dbg_fitness_plummet
-            if (!i) cout << benerg << " ";
+            if (!i) cout << "axial " << -benerg << " ";
             #endif
 
             #if allow_bond_rots
@@ -3015,12 +3015,18 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         float theta;
                         int heavy_atoms = bb[q]->count_heavy_moves_with_btom();
 
-                        if (do_full_rotation && bb[q]->can_rotate)
+                        if (do_full_rotation && benerg <= 0 && bb[q]->can_rotate)
                         {
                             float best_theta = 0;
                             for (theta=0; theta < M_PI*2; theta += _fullrot_steprad)
                             {
                                 bb[q]->rotate(_fullrot_steprad, false);
+
+                                /*if (a->agroups.size() && group_realign)
+                                {
+                                    group_realign(a, a->agroups);
+                                }*/
+
                                 tryenerg = cfmol_multibind(a, nearby);
 
                                 if (tryenerg > benerg)
@@ -3080,18 +3086,26 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 #endif
 
                 #if _dbg_fitness_plummet
-                if (!i) cout << benerg << endl;
+                if (!i) cout << "flexion " << -benerg << " ";
                 #endif
 
                 mm[i]->lastbind = benerg;
-            }       // for i
-        }       // if MOV_CAN_FLEX
+            }   // if MOV_CAN_FLEX
+
+            #if _dbg_fitness_plummet
+            if (!i) cout << "final " << -benerg << " " << endl << flush;
+            #endif
+        }       // for i
 
         #if allow_iter_cb
         if (cb) cb(iter+1, mm);
         #endif
 
         minimum_searching_aniso *= 0.99;
+
+        #if _dbg_fitness_plummet
+        if (!i) cout << endl << flush;
+        #endif
     }       // for iter
 
     minimum_searching_aniso = 0;

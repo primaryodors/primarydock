@@ -1456,8 +1456,12 @@ int Protein::search_sequence(const int sr, const int esr, const char* psz, const
             }
             else
             {
-                if (c == aac) num_eq++;
-                sim = aa->similarity_to(c);
+                if (c == aac)
+                {
+                    num_eq++;
+                    sim = 1;
+                }
+                else sim = aa->similarity_to(c);
                 m += sim;
             }
 

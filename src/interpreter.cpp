@@ -698,7 +698,15 @@ int main(int argc, char** argv)
         char buffer1[1024];
         for (m=0; m<1024; m++) buffer[m] = buffer1[m] = '\0';
         strcpy(buffer, script_lines[program_counter].c_str());
-        char** words = chop_spaced_words(buffer);
+        char** wordstmp = chop_spaced_words(buffer);
+        char* wordsarr[256];
+        char** words = wordsarr;
+        if (wordstmp)
+        {
+            for (m=0; wordstmp[m]; m++) wordsarr[m] = wordstmp[m];     // Prevent overwriting array.
+            wordsarr[m] = nullptr;
+        }
+        else words = nullptr;
         char** owords = words;
         char chain = 'A';
         char new_chain;
@@ -1832,7 +1840,11 @@ int main(int argc, char** argv)
                 program_counter++;
                 if (!script_lines[program_counter].c_str()) break;
                 strcpy(buffer, script_lines[program_counter].c_str());
-                words = chop_spaced_words(buffer);
+                wordstmp = chop_spaced_words(buffer);
+                if (!wordstmp) goto _pc_continue;
+                for (m=0; wordstmp[m]; m++) wordsarr[m] = wordstmp[m];     // Prevent overwriting array.
+                wordsarr[m] = nullptr;
+                words = wordsarr;
                 if (!words || !words[0]) goto _pc_continue;
                 if (strcmp(words[0], "ELSE")) continue;
 

@@ -238,8 +238,8 @@ function prepare_outputs()
     }
     else if ($mbp && isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))
     {
-        $cenres_active = isset($mbp["active_pocket"]);
-        $cenres_inactive = isset($mbp["inactive_pocket"]);
+        $cenres_active = "CEN RES {$mbp["active_pocket"]}";
+        $cenres_inactive = "CEN RES {$mbp["inactive_pocket"]}";
     }
     else
     {

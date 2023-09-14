@@ -1121,7 +1121,7 @@ float GroupPair::get_potential()
             }
         }
 
-        if (q) potential /= q;
+        // if (q) potential = potential / q + 0.25 * potential;
 
         float r = pocketcen.get_3d_distance(scg->get_center());
         float r1 = ag->get_center().get_3d_distance(ag->get_ligand()->get_barycenter());

@@ -32,7 +32,7 @@ for i in ${!allmols[@]}; do
 
     SMILES=${allsmiles[$i]}
     REPORT="testdata/mol_assem_test.$MOLECULE.approved.txt"
-    test/mol_assem_test "$SMILES" "testdata/received/$MOLECULE.received.sdf" | sed '/^#/d' > "testdata/received/mol_assem_test.$MOLECULE.received.txt"
+    ./test/mol_assem_test "$SMILES" "testdata/received/$MOLECULE.received.sdf" | sed '/^#/d' > "testdata/received/mol_assem_test.$MOLECULE.received.txt"
     RESULT=$(diff --unified $REPORT "testdata/received/mol_assem_test.$MOLECULE.received.txt")
     if [ -z "$RESULT" ]; then
         printf "${GRN}Molecule assembly test succeeded for $MOLECULE.${NC}\n"

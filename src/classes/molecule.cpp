@@ -4313,7 +4313,6 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
         error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
     }
 
-    delete[] b;
     return error+bestscore;
 }
 

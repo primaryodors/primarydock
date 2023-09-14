@@ -1169,7 +1169,12 @@ _canstill_clash:
     float sigma;
 
     #if ignore_double_hydrogen_clashes
-    if (a->get_Z() == 1 && b->get_Z() == 1 && r > 1.0) goto _finished_clashing;
+    if (a->get_Z() == 1 && b->get_Z() == 1 && r > 1.0)
+    {
+        float rheavy = fmin(a->distance_to(bheavy), b->distance_to(aheavy));
+        if (rheavy < r) r = rheavy;
+        else goto _finished_clashing;
+    }
     #endif
 
     sigma = fmin(rbind, avdW+bvdW) - global_clash_allowance;

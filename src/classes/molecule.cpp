@@ -3172,11 +3172,12 @@ bool Molecule::from_smiles(char const * smilesstr)
 
                 // Temporarily reuse buffer as the obabel command.
                 sprintf(buffer, CMD_CALL_3P_SMILES_PARSER, smilesstr);
+                cout << buffer << endl;
                 pf = popen(buffer, "r");
 
                 // Resume using buffer with fgets().
                 int lno = 0;
-                while (buffer[0] != '$')
+                while (buffer[0] != '$' && !feof(pf))
                 {
                     fgets(buffer, 1022, pf);
                     lno++;

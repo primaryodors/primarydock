@@ -1010,7 +1010,7 @@ bool Atom::is_pi()
 
     if (Z == 1)
     {
-        if (bonded_to[0].btom) return bonded_to[0].btom->is_pi();
+        if (bonded_to[0].btom && bonded_to[0].btom->Z > 1) return bonded_to[0].btom->is_pi();
     }
 
     if (family == PNICTOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(CHALCOGEN)) return true;

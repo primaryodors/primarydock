@@ -1367,8 +1367,6 @@ int main(int argc, char** argv)
                             url = dls[1];
                             retfmt = dls[2];
                         }
-
-                        delete[] dls;
                     }
 
                     if (!url.length()) raise_error("Download source not found in data file.");

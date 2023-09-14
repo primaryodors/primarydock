@@ -702,6 +702,7 @@ int main(int argc, char** argv)
         char** owords = words;
         char chain = 'A';
         char new_chain;
+        std::string protname;
         if (words && words[0] && words[0][0] && words[0][1])
         {
             for (k=0; words[k]; k++)
@@ -2101,6 +2102,7 @@ int main(int argc, char** argv)
                 psz = interpret_single_string(words[1]);
 				n = 0;
                 chain = 'A';
+                protname = words[1];
                 
 				if (words[2]) chain = words[2][0];
                 if (words[2] && words[3])
@@ -2121,7 +2123,7 @@ int main(int argc, char** argv)
                 }
                 l = working->load_pdb(pf, n, chain);
                 if (!l) raise_error("No residues loaded.");
-                working->set_name_from_pdb_name(words[1]);
+                working->set_name_from_pdb_name(protname.c_str());
 
                 fclose(pf);
 

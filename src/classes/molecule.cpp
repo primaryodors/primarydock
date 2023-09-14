@@ -333,7 +333,6 @@ void Molecule::clear_all_bond_caches()
         if (b)
         {
             for (j=0; b[j]; j++) b[j]->clear_moves_with_cache();
-            delete[] b;
         }
         atoms[i]->used = false;
     }
@@ -402,7 +401,6 @@ void Molecule::hydrogenate(bool steric_only)
                 if (aib[j]->btom) bcardsum += aib[j]->cardinality;
                 if (aib[j]->cardinality > 1) db++;
             }
-            delete[] aib;
         }
         if (!db && steric_only) continue;
 
@@ -861,8 +859,6 @@ int Molecule::get_bond_count(bool unidirectional) const
         {
             if (b[j]->btom > atoms[i] || !unidirectional) bc++;
         }
-
-        delete[] b;
     }
 
     return bc;
@@ -1340,8 +1336,6 @@ int Molecule::identify_rings()
                 }
             }
 
-            delete[] b;
-
             // If there are no "unused" bonded atoms, delete the chain.
             if (!k) chainlen[i] = 0;
             else active++;
@@ -1389,7 +1383,6 @@ void Molecule::identify_acidbase()
             {
                 if (!atoms[i]->is_pi() || !atoms[i]->is_bonded_to_pi(CHALCOGEN, true))
                 {
-                    delete[] b;
                     goto _not_acidic;
                 }
                 for (j=0; b[j]; j++)
@@ -1445,7 +1438,6 @@ void Molecule::identify_acidbase()
                     }
                 }
             }
-            delete[] b;
         }
         if (sbOH)
         {
@@ -1460,10 +1452,8 @@ void Molecule::identify_acidbase()
                     //cout << "Atom " << b[j]->btom->name << " is acidic." << endl;
                 }
             }
-            if (b) delete[] b;
         }
     _not_acidic:
-        //if (b) delete[] b;
 
         // If it is a pnictogen,
         // And it is not bonded to a chalcogen or a halogen,
@@ -1582,7 +1572,6 @@ Bond** Molecule::get_rotatable_bonds()
                     btemp[bonds] = 0;
                 }
             }
-            if (lb) delete[] lb;
         }
     else
         for (i=0; atoms[i]; i++)
@@ -1647,7 +1636,6 @@ Bond** Molecule::get_rotatable_bonds()
                     btemp[bonds] = 0;
                 }
             }
-            if (lb) delete[] lb;
         }
 
         rotatable_bonds = new Bond*[bonds+1];
@@ -1736,7 +1724,6 @@ Bond** AminoAcid::get_rotatable_bonds()
                             int o, ag = la->get_geometry();
                             for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
                             cout << "." << endl;
-                            delete[] lbb;
                         }
 
                         Atom* lba = get_atom(aadef->aabonds[i]->bname);
@@ -1749,7 +1736,6 @@ Bond** AminoAcid::get_rotatable_bonds()
                                 int o, ag = lba->get_geometry();
                                 for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
                                 cout << "." << endl;
-                                delete[] lbb;
                             }
                         }
                         else cout << aadef->aabonds[i]->bname << " not found." << endl;
@@ -1822,7 +1808,6 @@ Bond** AminoAcid::get_rotatable_bonds()
             }
             else lb[j]->can_rotate = false;
         }
-        if (lb) delete[] lb;
     }
     // cout << endl;
 
@@ -1871,7 +1856,6 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
                 btemp[bonds] = 0;
             }
         }
-        if (lb) delete[] lb;
     }
 
     Bond** retval = new Bond*[bonds+1];
@@ -1919,7 +1903,6 @@ float Molecule::get_internal_clashes()
                     for (k=0; k<g; k++)
                         cout << atoms[i]->name << " is bonded to " << hex << b[k]->btom << dec << " "
                              << (b[k]->btom ? b[k]->btom->name : "") << "." << endl;
-                    delete[] b;
                 }
             }
         }
@@ -3838,7 +3821,6 @@ float Molecule::close_loop(Atom** path, float lcard)
         }
 
         last = path[i];
-        delete[] b;
     }
     rotables[k] = 0;
     if (_DBGCLSLOOP) cout << "Close Loop: found " << k << " rotables." << endl;
@@ -4247,7 +4229,6 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
     float card = b[0]->cardinality;
     if (!btom)
     {
-        delete[] b;
         return error;
     }
 
@@ -4377,7 +4358,6 @@ float Molecule::correct_structure(int iters)
             b = atoms[i]->get_bonds();
             if (!b) return error;
             btom = b[0]->btom;
-            delete[] b;
             if (!btom) return error;
 
             // TODO

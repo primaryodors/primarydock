@@ -372,7 +372,7 @@ std::ostream& operator<<(std::ostream& os, const Atom& a);
 std::ostream& operator<<(std::ostream& os, const Bond& b);
 std::ostream& operator<<(std::ostream& os, const Ring& r);
 
-
+extern Bond* atom_get_bonds_retval[16];
 
 
 #endif

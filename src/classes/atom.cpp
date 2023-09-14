@@ -25,6 +25,8 @@ float Atom::atomic_weights[_ATOM_Z_LIMIT];
 int Atom::valences[_ATOM_Z_LIMIT];
 int Atom::geometries[_ATOM_Z_LIMIT];
 
+Bond* atom_get_bonds_retval[16];
+
 void Atom::read_elements()
 {
     if (read_elem_syms) return;
@@ -616,11 +618,9 @@ Bond** Atom::get_bonds()
     if (!geometry || geometry<0 || isnan(geometry)) geometry=4;
     try
     {
-        Bond** retval = new Bond*[geometry+1];
-        // No init_nulls() because performance.
-        for (i=0; i<geometry; i++) retval[i] = &bonded_to[i];
-        retval[geometry] = 0;
-        return retval;
+        for (i=0; i<geometry; i++) atom_get_bonds_retval[i] = &bonded_to[i];
+        atom_get_bonds_retval[geometry] = 0;
+        return atom_get_bonds_retval;
     }
     catch (int e)
     {
@@ -1167,7 +1167,6 @@ void Bond::fill_moves_with_cache()
             if (_DBGMOVES) cout << b[i]->btom->name << " ";
         }
     }
-    delete[] b;
 
     do
     {
@@ -1188,7 +1187,6 @@ void Bond::fill_moves_with_cache()
                         k++;
                     }
                 }
-                delete[] b;
             }
         }
     }

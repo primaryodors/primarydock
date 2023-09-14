@@ -139,8 +139,6 @@ int main(int argc, char** argv)
         // cout << i << " points for average." << endl;
         if (i) bloc = average_of_points(bblocs, i);
         // mp.add_atom("He", "He1", &bloc, NULL, 0);
-
-        delete bb;
     }
 
 

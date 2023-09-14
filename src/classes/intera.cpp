@@ -369,8 +369,6 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                         break;
                     }
                 }
-
-                delete[] bb;
             }
         }
     }
@@ -392,8 +390,6 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                         break;
                     }
                 }
-
-                delete[] bb;
             }
         }
     }

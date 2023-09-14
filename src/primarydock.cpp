@@ -2392,6 +2392,7 @@ int main(int argc, char** argv)
 _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
+    Point nodecens[pathnodes+1];
     for (pose = 1; pose <= poses; pose++)
     {
         last_ttl_bb_dist = 0;
@@ -2656,6 +2657,7 @@ _try_again:
 
             Point lastnodecen = nodecen;
             ligcen_target = nodecen;
+            nodecens[nodeno] = ligcen_target;
 
             #if redo_tumble_spheres_every_node
             if (!use_bestbind_algorithm && !use_prealign && (!prevent_ligand_360_on_activate)) do_tumble_spheres(ligcen_target);
@@ -3644,6 +3646,12 @@ _try_again:
                                 if (aa) tmp_pdb_residue[j+1][j1].restore_state(aa);
                             }
                             tmp_pdb_ligand[j+1].restore_state(ligand);
+
+                            #if recapture_ejected_ligand
+                            float r = ligand->get_barycenter().get_3d_distance(nodecens[k]);
+                            if (r > size.magnitude()/2) goto _next_pose;
+                            #endif
+                            
                             protein->save_pdb(pfout, ligand);
 
                             int atno_offset = protein->last_saved_atom_number;
@@ -3882,6 +3890,9 @@ _try_again:
 
                 break;
             }
+
+            _next_pose:
+            ;
         }
     }
 

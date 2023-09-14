@@ -73,6 +73,7 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
         $pepd = <<<heredoc
 LOAD pdbs/OR51/OR51E2.8f76.pdb
 CENTER
+UPRIGHT
 HYDRO
 SAVE $pdbfname_active
 

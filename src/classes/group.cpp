@@ -584,8 +584,9 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     }
 
     std::vector<Atom*> bd = mol->longest_dimension();
-    if (bd.size() < 2) throw 0xbad302;
-    float ld = bd[0]->distance_to(bd[1]);
+    float ld;
+    if (bd.size() < 2) ld = 1;
+    else ld = bd[0]->distance_to(bd[1]);
 
     for (i=0; i<n; i++)
     {

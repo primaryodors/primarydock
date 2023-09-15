@@ -2014,7 +2014,19 @@ float AminoAcid::hydrophilicity() const
         int Z = atoms[i]->get_Z();
         int fam = atoms[i]->get_family();
         // if (Z==1) continue;
-        if (Z==1) fam = atoms[i]->get_bond_by_idx(0)->btom->get_family();
+        if (Z==1)
+        {
+            int j;
+            for (j=0; j<atoms[i]->get_geometry(); j++)
+            {
+                Bond* b = atoms[i]->get_bond_by_idx(j);
+                if (b && b->btom)
+                {
+                    fam = b->btom->get_family();
+                    break;
+                }
+            }
+        }
         if (Z==1 && fam == TETREL) continue;
 
         if (Z == 7) weight = 2.5;

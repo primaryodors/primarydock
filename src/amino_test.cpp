@@ -129,10 +129,11 @@ int main(int argc, char** argv)
             int i, j, n = strlen(all_letters);
             AminoAcid* all_aa[n+4];
 
+            cout << "   ";
             for (i=0; i<n; i++)
             {
                 all_aa[i] = new AminoAcid(all_letters[i]);
-                cout << "    " << all_letters[i];
+                cout << all_letters[i] << " ";
             }
             cout << endl;
 
@@ -142,9 +143,14 @@ int main(int argc, char** argv)
                 for (j=0; j<n; j++)
                 {
                     float s = all_aa[i]->similarity_to(all_aa[j]);
-                    char buffer[16];
+                    /*char buffer[16];
                     sprintf(buffer, "%0.2f", 0.02 * roundf(s*50));
-                    cout << " " << buffer;
+                    cout << " " << buffer;*/
+
+                    if (s < 0.1) cout << ". ";
+                    else if (s < 0.25) cout << ": ";
+                    else if (s < 0.5) cout << "+ ";
+                    else cout << "@ ";
                 }
                 cout << endl;
             }

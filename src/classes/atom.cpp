@@ -2706,8 +2706,8 @@ float Atom::similarity_to(Atom* b)
     #define same_sgn_charge 16
     #define one_charged_one_neutral_polar 10
     #define opposite_charges -20
-    #define both_or_neither_pi 9
-    #define both_or_neither_pi_and_both_or_neither_polar 9
+    #define both_or_neither_pi 13
+    #define both_or_neither_pi_and_both_or_neither_polar 5
     #define neither_pi_one_polar_one_sugary 15
     #define one_polar_both_pi 13
     #define one_polar_only_one_pi 11

@@ -2036,23 +2036,25 @@ float AminoAcid::hydrophilicity() const
                 }
             }
         }
-        if (Z==1 && fam == TETREL) continue;
+        if (Z==1 && fam == TETREL && !atoms[i]->is_pi()) continue;
 
-        if (Z == 7) weight = 2.5;
-        else if (Z == 8) weight = 3;
+        if (Z == 7) weight = 3.5;
+        else if (Z == 8) weight = 4;
         else if (Z == 15) weight = 1.5;
         else if (Z == 16) weight = 1.25;
+
+        if (atoms[i]->is_pi() && fam == TETREL) weight = 1.5;
 
         if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
 
         float h = atoms[i]->hydrophilicity_rule();
         total += h;
         count++;
-        if (fam != TETREL)
+        /*if (fam != TETREL)
         {
             total += h*weight;
             count++;
-        }
+        }*/
     }
     return count ? (total / count) : 0;
 }

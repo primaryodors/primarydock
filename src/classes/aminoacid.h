@@ -110,6 +110,7 @@ public:
     {
         strcpy(region, regname);
     }
+    float CB_angle(Point reference);
     Atom* previous_residue_C();
     Atom* next_residue_N();
     Atom* HN_or_substitute();

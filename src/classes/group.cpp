@@ -944,13 +944,28 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
                 continue;
             }
 
-            float r = fmax(0, aa->get_CA_location().get_3d_distance(bb->get_CA_location()) - fmax(aa->get_reach(), bb->get_reach()));
+            // float r = fmax(0, aa->get_CA_location().get_3d_distance(bb->get_CA_location()) - fmax(aa->get_reach(), bb->get_reach()));
+            float r = fmax(0, aa->get_reach_atom()->distance_to(bb->get_reach_atom()) - 2.5);
             if (r > 1.5)
             {
                 #if _dbg_groupsel
                 cout << "Rejected " << bb->get_name() << " distance " << r << endl;
                 #endif
                 continue;
+            }
+
+            float theta = 0;
+            Atom* CB = bb->get_atom("CB");
+            if (CB)
+            {
+                theta = bb->CB_angle(pcen);
+                if (theta > square)
+                {
+                    #if _dbg_groupsel
+                    cout << "Rejected " << bb->get_name() << " pocket center angle " << (theta*fiftyseven) << endl;
+                    #endif
+                    continue;
+                }
             }
 
             float simil = aa->similarity_to(bb);
@@ -969,7 +984,7 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
                 g->aminos.push_back(bb);
                 dirty[j] = true;
                 #if _dbg_groupsel
-                cout << "Adding " << bb->get_name() << " distance " << r << " similarity " << simil << endl;
+                cout << "Adding " << bb->get_name() << " distance " << r << " similarity " << simil << " pocket angle " << (theta*fiftyseven) << endl;
                 #endif
             }
             else
@@ -1072,7 +1087,11 @@ float GroupPair::get_potential()
                 {
                     partial = aa->get_atom_mol_bind_potential(a);
 
-                    if ((aa->get_charge() > 1 || aa->conditionally_basic()) && a->is_aldehyde())
+                    Moiety amide;
+                    amide.pattern = "ocn";
+                    Atom* matches[128];
+
+                    if ((aa->get_charge() > 1 /*|| aa->conditionally_basic()*/) && a->is_aldehyde())
                     {
                         partial += protonation(aa->sc_pKa())*60;
 
@@ -1080,9 +1099,16 @@ float GroupPair::get_potential()
                         cout << "Aldehyde-base potential for " << *a << "..." << *aa << " = " << partial << endl;
                         #endif
                     }
+                    else if (fabs(a->is_polar()) > hydrophilicity_cutoff && amide.contained_by(aa, matches))
+                    {
+                        partial *= 5;
+                        #if _dbg_groupsel
+                        cout << *a << " is polar and " << *aa << " is amide." << endl;
+                        #endif
+                    }
                     else if (fabs(a->is_polar()) > hydrophilicity_cutoff && aa->is_tyrosine_like())
                     {
-                        partial /= 3;
+                        partial /= 4;
                         #if _dbg_groupsel
                         cout << *a << " is polar and " << *aa << " is tyrosine-like." << endl;
                         #endif

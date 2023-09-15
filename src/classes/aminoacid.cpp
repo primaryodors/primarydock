@@ -1559,6 +1559,33 @@ Atom* AminoAcid::get_reach_atom()
     return retval;
 }
 
+float AminoAcid::CB_angle(Point reference)
+{
+    Atom *CB, *HA1, *HA2;
+    CB = get_atom("CB");
+    if (!CB)
+    {
+        HA1 = get_atom("HA1");
+        HA2 = get_atom("HA2");
+
+        CB = (HA1->get_location().get_3d_distance(reference) < HA2->get_location().get_3d_distance(reference)) ? HA1 : HA2;
+    }
+
+    float result = find_3d_angle(CB->get_location(), reference, get_CA_location());
+
+    int i, Greek=0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        int g = greek_from_aname(atoms[i]->name);
+        if (g > Greek) Greek = g;
+    }
+
+    result -= hexagonal/3 * fmax(Greek-1,0);
+
+    return fmax(0, result);
+}
+
 float AminoAcid::similarity_to(const char letter)
 {
     AminoAcid* a = nullptr;

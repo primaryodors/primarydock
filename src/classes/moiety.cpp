@@ -12,6 +12,7 @@ int Moiety::contained_by(Molecule* mol, Atom** out_matches)
     {
         Atom* a = mol->get_atom(i);
         if (!a) break;
+        if (a->is_backbone) continue;
 
         if (j = does_atom_match(a, out_matches + l))
         {

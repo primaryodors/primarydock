@@ -1263,7 +1263,7 @@ int interpret_config_line(char** words)
     }
     else if (!strcmp(words[0], "SOFT"))
     {
-￼        dyn_strings.push_back(origbuff);
+        dyn_strings.push_back(origbuff);
     }
     else if (!strcmp(words[0], "DYNAMIC"))
     {

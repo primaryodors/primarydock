@@ -820,8 +820,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
             if (forces[i]->type == pi && ag >= 3 && bg >= 3)
             {
-                if (del_ageo) delete[] ageo;
-                if (del_bgeo) delete[] bgeo;
                 ageo = get_geometry_for_pi_stack(ageo);
                 bgeo = get_geometry_for_pi_stack(bgeo);
                 ag = bg = 5;
@@ -831,14 +829,12 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             {
                 if (!a->is_polar())
                 {
-                    if (del_ageo) delete[] ageo;
                     ageo = get_geometry_for_pi_stack(ageo);
                     ag = 5;
                     del_ageo = true;
                 }
                 if (!b->is_polar())
                 {
-                    if (del_bgeo) delete[] bgeo;
                     bgeo = get_geometry_for_pi_stack(bgeo);
                     bg = 5;
                     del_bgeo = true;
@@ -907,9 +903,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 }
             }*/
             #endif
-
-            if (del_ageo) delete[] ageo;
-            if (del_bgeo) delete[] bgeo;
 
             // When pi-bonding to a heavy atom of a conjugated coplanar ring, treat the entire ring as if it were one atom.
             if ((forces[i]->type == pi || forces[i]->type == polarpi)

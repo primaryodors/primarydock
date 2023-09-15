@@ -1210,43 +1210,6 @@ void Bond::fill_moves_with_cache()
 
 void Bond::enforce_moves_with_uniqueness()
 {
-    /*if (!strcmp(atom->name, "CD1") && !strcmp(btom->name, "NE1"))
-    {
-    	Ring** rr = atom->get_rings();
-
-    	cout << atom->name << " is a member of:" << endl;
-    	if (rr)
-    	{
-    		int l;
-
-    		for (l=0; rr[l]; l++)
-    		{
-    			cout << *rr[l] << endl;
-    		}
-
-    		delete[] rr;
-    	}
-    	else cout << "(no rings.)" << endl;
-
-    	rr = btom->get_rings();
-
-    	cout << btom->name << " is a member of:" << endl;
-    	if (rr)
-    	{
-    		int l;
-
-    		for (l=0; rr[l]; l++)
-    		{
-    			cout << *rr[l] << endl;
-    		}
-
-    		delete[] rr;
-    	}
-    	else cout << "(no rings.)" << endl;
-
-    	cout << endl;
-    }*/
-
     // Ring bond rotation is not supported currently.
     if (!atom->doing_ring_closure && !btom->doing_ring_closure && atom && btom && atom->in_same_ring_as(btom))
     {
@@ -2117,13 +2080,6 @@ bool Atom::is_in_ring(Ring* ring)
 
     delete[] ra;
 
-    /*if (!strcmp(name, "NE1"))
-    {
-    	cout << "----" << endl;
-    	for (i=0; member_of[i]; i++) cout << *member_of[i] << endl;
-    	cout << "----" << endl << endl;
-    }*/
-
     if (!member_of) return false;
     for (i=0; member_of[i]; i++)
         if (member_of[i] == ring) return true;
@@ -2316,9 +2272,6 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             array[n] = nullptr;
             delete[] atoms[i]->member_of;
             atoms[i]->member_of = array;
-            /*if (atoms[i]->aaletter == 'W') cout << "Ring::Ring(Atom**): "
-            	<< atoms[i]->aaletter << atoms[i]->residue << ":" << atoms[i]->name
-            	<< " is a member of a ring. " << hex << this << dec << endl;*/
         }
     }
 

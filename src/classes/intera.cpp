@@ -1164,24 +1164,23 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (rbind < 0.7) rbind = 0.7;
 
 _canstill_clash:
-    /*float confidence = 2.5;		// TODO: Get this from the PDB.
-    float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
+    float sigma;
 
-    float allowable = give + confidence / sqrt(3);
-
-    r += allowable;*/
-
-    if ((rheavy / l_heavy_atom_mindist) < (r / rbind))
+    #if ignore_double_hydrogen_clashes
+    if (a->get_Z() == 1 && b->get_Z() == 1 && r > 1.0)
     {
-        rbind = l_heavy_atom_mindist;
-        r = rheavy;
+        float rheavy = fmin(a->distance_to(bheavy), b->distance_to(aheavy));
+        if (rheavy < r) r = rheavy;
+        else goto _finished_clashing;
     }
+    #endif
+
+    sigma = fmin(rbind, avdW+bvdW) - global_clash_allowance;
 
     if (r < rbind && !atoms_are_bonded && (!achg || !bchg || sgn(achg) != -sgn(bchg)) )
     {
-        float f = rbind/(avdW+bvdW);
-        float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);
-        kJmol -= clash;
+        float clash = Lennard_Jones(a, b, sigma);
+        kJmol -= fmax(clash, 0);
         
         #if _peratom_audit
         if (interauditing)
@@ -1198,8 +1197,18 @@ _canstill_clash:
         #endif
     }
 
+    _finished_clashing:
     delete[] forces;
     return kJmol;
+}
+
+float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
+{
+    if (!sigma) sigma = atom1->get_vdW_radius() + atom2->get_vdW_radius() - global_clash_allowance;
+    float r = atom1->distance_to(atom2);
+    float sigma_r = sigma / r;
+
+    return Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
 }
 
 

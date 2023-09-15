@@ -217,7 +217,7 @@ Atom::Atom(const char* elem_sym)
 
     figure_out_valence();
 
-    bonded_to = new Bond[abs(geometry)];
+    bonded_to = new Bond[abs(geometry)+4];
     int i;
     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
@@ -1032,7 +1032,7 @@ bool Atom::is_pi()
 
     if (Z == 1)
     {
-        if (bonded_to[0].btom) return bonded_to[0].btom->is_pi();
+        if (bonded_to[0].btom && bonded_to[0].btom->Z > 1) return bonded_to[0].btom->is_pi();
     }
 
     if (family == PNICTOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(CHALCOGEN)) return true;
@@ -2706,7 +2706,8 @@ float Atom::similarity_to(Atom* b)
     #define same_sgn_charge 16
     #define one_charged_one_neutral_polar 10
     #define opposite_charges -20
-    #define both_or_neither_pi_and_both_or_neither_polar 18
+    #define both_or_neither_pi 9
+    #define both_or_neither_pi_and_both_or_neither_polar 9
     #define neither_pi_one_polar_one_sugary 15
     #define one_polar_both_pi 13
     #define one_polar_only_one_pi 11
@@ -2715,7 +2716,8 @@ float Atom::similarity_to(Atom* b)
     #define abs_delta_elecn_within_point7 10
 
     #if both_or_neither_abs_polarity_at_least_point2 + both_or_neither_abs_polarity_at_least_point333 + abs_delta_polarity_within_point333\
-        + same_sgn_charge + both_or_neither_pi_and_both_or_neither_polar + abs_delta_elecn_within_point7 + neither_pi_or_conjugated_together\
+        + same_sgn_charge + both_or_neither_pi + both_or_neither_pi_and_both_or_neither_polar + abs_delta_elecn_within_point7\
+        + neither_pi_or_conjugated_together\
         != 100
         #error "Atom similarity constants do not add up to 100%."
     #endif
@@ -2740,10 +2742,15 @@ float Atom::similarity_to(Atom* b)
     float delta = fabs(is_polar() - b->is_polar());
     if (delta < hydrophilicity_cutoff) similarity += 0.01 * abs_delta_polarity_within_point333;
 
-    if (sgn(charge) == sgn(b->charge)) similarity += 0.01 * same_sgn_charge;
-    else if (!charge && apb && b->charge) similarity += 0.01 * one_charged_one_neutral_polar;
-    else if (charge && bpb && !b->charge) similarity += 0.01 * one_charged_one_neutral_polar;
-    else if (sgn(charge) == -sgn(b->charge)) similarity += 0.01 * opposite_charges;
+    float achg = (fabs(charge) > hydrophilicity_cutoff) ? charge : 0;
+    float bchg = (fabs(b->charge) > hydrophilicity_cutoff) ? b->charge : 0;
+
+    if (sgn(achg) == sgn(bchg)) similarity += 0.01 * same_sgn_charge;
+    else if (!achg && apb && bchg) similarity += 0.01 * one_charged_one_neutral_polar;
+    else if (achg && bpb && !bchg) similarity += 0.01 * one_charged_one_neutral_polar;
+    else if (sgn(achg) == -sgn(bchg)) similarity += 0.01 * opposite_charges;
+
+    if (is_pi() == b->is_pi()) similarity += 0.01 * both_or_neither_pi;
 
     if (apb == bpb && is_pi() == b->is_pi()) similarity += 0.01 * both_or_neither_pi_and_both_or_neither_polar;
     else if (apb && is_pi() && b->is_pi()) similarity += 0.01 * one_polar_both_pi;

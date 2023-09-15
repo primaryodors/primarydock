@@ -166,13 +166,11 @@ public:
         int iterations
     );
 
-    SoftBias* get_soft_bias_from_region(const char* region);
     void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);
     void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
 
     int* mcoord_resnos = NULL;
-    std::vector<SoftBias> soft_biases;
     
     SCoord last_uprighted_xform;
     LocRotation last_uprighted_A, last_uprighted_B;
@@ -183,6 +181,7 @@ public:
 
 protected:
     Atom** ca = nullptr;
+    int arrlimit = 0;
     std::string name;
     char* sequence = nullptr;
     AminoAcid** residues = nullptr;
@@ -197,7 +196,7 @@ protected:
     char** remarks = nullptr;
     int remarksz = 0;
     MetalCoord** m_mcoord = nullptr;
-    std::vector<int> Ballesteros_Weinstein;
+    int Ballesteros_Weinstein[79];
     std::vector<AABridge> aabridges;
     std::vector<Bond*> connections;
     std::vector<Pose> origpdb_residues;

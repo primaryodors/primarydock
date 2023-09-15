@@ -2009,33 +2009,13 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 if (atoms[i]->is_bonded_to(ligands[l]->atoms[j])) continue;
                 if (atoms[i]->shares_bonded_with(ligands[l]->atoms[j])) continue;
 
-                Point ptb = ligands[l]->atoms[j]->get_location();
-                float bvdW = ligands[l]->atoms[j]->get_vdW_radius();
-
-                r = pta.get_3d_distance(&ptb) + 1e-3;
-                if (r < avdW + bvdW)
-                {
-                    /*float confidence = 2.5;		// TODO: Get this from the PDB.
-                    float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
-
-                    float allowable = give + confidence / sqrt(3);
-
-                    r += allowable;
-                    if (r > (avdW + bvdW)) r = avdW + bvdW;*/
-
-                    float lclash = sphere_intersection(avdW, bvdW, r);
-                    if (lclash > 0)
-                    {
-                        clash += lclash;
-                        /*cout << name << ":" << atoms[i]->name << " clashes with " <<
-                        	ligands[l]->name << ":" << ligands[l]->atoms[j]->name << " by " << lclash << " cu. A." << endl;*/
-                    }
-                }
+                clash += fmax(InteratomicForce::Lennard_Jones(atoms[i], ligands[l]->atoms[j]), 0);
+                continue;
             }
         }
     }
 
-    return clash*_kJmol_cuA;
+    return clash; //*_kJmol_cuA;
 }
 
 void Molecule::move(SCoord move_amt, bool override_residue)
@@ -2857,12 +2837,13 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
     minimum_searching_aniso = 0.5;
 
-    for (iter=1; iter<=iters; iter++)
+    for (iter=0; iter<iters; iter++)
     {
         for (i=0; mm[i]; i++) mm[i]->lastbind = 0;
 
         for (n=0; mm[n]; n++);      // Get count.
         Molecule* nearby[n+8];
+        bool do_full_rotation = (iter < iters*.666 && (iter % _fullrot_every) == 0);
 
         for (i=0; i<n; i++)
         {
@@ -2888,7 +2869,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             benerg = cfmol_multibind(a, nearby);
 
             #if _dbg_fitness_plummet
-            if (!i) cout << "# " << a->name << " " << iter << ": " << benerg << " ";
+            if (!i) cout << "# mol " << a->name << " iter " << iter << ": initial " << -benerg << " ";
             #endif
 
             float tryenerg;
@@ -2918,7 +2899,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     tryenerg = cfmol_multibind(a, nearby);
 
                     #if _dbg_fitness_plummet
-                    if (!i) cout << "(" << tryenerg << ") ";
+                    if (!i) cout << "(linear motion try " << -tryenerg << ") ";
                     #endif
 
                     if (tryenerg > benerg)
@@ -2955,7 +2936,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
 
             #if _dbg_fitness_plummet
-            if (!i) cout << benerg << " ";
+            if (!i) cout << "linear " << -benerg << " ";
             #endif
 
             /**** Histidine flip ****/
@@ -3014,7 +2995,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
 
             #if _dbg_fitness_plummet
-            if (!i) cout << benerg << " ";
+            if (!i) cout << "axial " << -benerg << " ";
             #endif
 
             #if allow_bond_rots
@@ -3031,54 +3012,91 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     for (q=0; bb[q]; q++)
                     {
                         float theta;
-                        if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI) / 2;
-                        else if (!bb[q]->count_heavy_moves_with_btom()) theta = frand(-M_PI, M_PI) / 2;
-                        else if (bb[q]->count_heavy_moves_with_atom() < bb[q]->count_heavy_moves_with_btom())
-                            theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
-                        else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
+                        int heavy_atoms = bb[q]->count_heavy_moves_with_btom();
 
-                        if (!bb[q]->can_rotate)
+                        if (do_full_rotation && benerg <= 0 && bb[q]->can_rotate)
                         {
-                            bb[q]->can_flip = true;
-                            if (!bb[q]->flip_angle) bb[q]->flip_angle = M_PI;
-                        }
+                            float best_theta = 0;
+                            for (theta=0; theta < M_PI*2; theta += _fullrot_steprad)
+                            {
+                                bb[q]->rotate(_fullrot_steprad, false);
+                                tryenerg = cfmol_multibind(a, nearby);
+                                if (tryenerg > benerg)
+                                {
+                                    benerg = tryenerg;
+                                    best_theta = theta;
+                                }
+                            }
+                            if (best_theta)
+                            {
+                                bb[q]->rotate(best_theta, false);
+                                a->been_flexed = true;
 
-                        bb[q]->rotate(theta, false);
-
-                        if (a->agroups.size() && group_realign)
-                        {
-                            group_realign(a, a->agroups);
-                        }
-
-                        tryenerg = cfmol_multibind(a, nearby);
-
-                        if (tryenerg > benerg)
-                        {
-                            benerg = tryenerg;
-                            pib.copy_state(a);
-                            a->been_flexed = true;
+                                if (a->agroups.size() && group_realign)
+                                {
+                                    group_realign(a, a->agroups);
+                                }
+                            }
                         }
                         else
                         {
-                            pib.restore_state(a);
+                            if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI) / 2;
+                            else if (!heavy_atoms) theta = frand(-M_PI, M_PI) / 2;
+                            else if (bb[q]->count_heavy_moves_with_atom() < heavy_atoms)
+                                theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
+                            else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
+
+                            if (!bb[q]->can_rotate)
+                            {
+                                bb[q]->can_flip = true;
+                                if (!bb[q]->flip_angle) bb[q]->flip_angle = M_PI;
+                            }
+
+                            bb[q]->rotate(theta, false);
+
+                            if (a->agroups.size() && group_realign)
+                            {
+                                group_realign(a, a->agroups);
+                            }
+
+                            tryenerg = cfmol_multibind(a, nearby);
+
+                            if (tryenerg > benerg)
+                            {
+                                benerg = tryenerg;
+                                pib.copy_state(a);
+                                a->been_flexed = true;
+                            }
+                            else
+                            {
+                                pib.restore_state(a);
+                            }
                         }
                     }
                 }       // Rotatable bonds.
                 #endif
 
                 #if _dbg_fitness_plummet
-                if (!i) cout << benerg << endl;
+                if (!i) cout << "flexion " << -benerg << " ";
                 #endif
 
                 mm[i]->lastbind = benerg;
-            }       // for i
-        }       // if MOV_CAN_FLEX
+            }   // if MOV_CAN_FLEX
+
+            #if _dbg_fitness_plummet
+            if (!i) cout << "final " << -benerg << " " << endl << flush;
+            #endif
+        }       // for i
 
         #if allow_iter_cb
-        if (cb) cb(iter, mm);
+        if (cb) cb(iter+1, mm);
         #endif
 
         minimum_searching_aniso *= 0.99;
+
+        #if _dbg_fitness_plummet
+        if (!i) cout << endl << flush;
+        #endif
     }       // for iter
 
     minimum_searching_aniso = 0;
@@ -3166,7 +3184,7 @@ bool Molecule::from_smiles(char const * smilesstr)
 
                 // Resume using buffer with fgets().
                 int lno = 0;
-                while (buffer[0] != '$')
+                while (buffer[0] != '$' && !feof(pf))
                 {
                     fgets(buffer, 1022, pf);
                     lno++;
@@ -3904,15 +3922,16 @@ float Molecule::close_loop(Atom** path, float lcard)
 Atom** Molecule::get_most_bindable(int max_count)
 {
     if (noAtoms(atoms)) return 0;
+    if (most_bindable) return most_bindable;
 
     int i, j=-1, k, l;
     float best[max_count+2];
-    Atom** retval = new Atom*[max_count+2];
+    most_bindable = new Atom*[max_count+2];
 
     for (k=0; k<max_count; k++)
     {
         best[k]=0;
-        retval[k]=0;
+        most_bindable[k]=0;
     }
 
     for (i=0; atoms[i]; i++)
@@ -3926,26 +3945,26 @@ Atom** Molecule::get_most_bindable(int max_count)
         float score = 0;
         atoms[i]->clear_geometry_cache();
 
-        for (k=0; retval[k] && k<max_count; k++)
+        for (k=0; most_bindable[k] && k<max_count; k++)
         {
-            if (retval[k] == atoms[i])
+            if (most_bindable[k] == atoms[i])
             {
                 #if _DBG_MOLBB
                 cout << "Atom is already in return array." << endl;
                 #endif
                 goto _resume;
             }
-            if (retval[k]->is_bonded_to(atoms[i]) && best[k] >= 10)
+            if (most_bindable[k]->is_bonded_to(atoms[i]) && best[k] >= 10)
             {
                 #if _DBG_MOLBB
-                cout << "Atom is bonded to " << retval[k]->name << ", already in return array." << endl;
+                cout << "Atom is bonded to " << most_bindable[k]->name << ", already in return array." << endl;
                 #endif
                 goto _resume;
             }
-            if (retval[k]->shares_bonded_with(atoms[i]) && best[k] >= 10)
+            if (most_bindable[k]->shares_bonded_with(atoms[i]) && best[k] >= 10)
             {
                 #if _DBG_MOLBB
-                cout << "Atom shares a bond with " << retval[k]->name << ", already in return array." << endl;
+                cout << "Atom shares a bond with " << most_bindable[k]->name << ", already in return array." << endl;
                 #endif
                 goto _resume;
             }
@@ -3982,11 +4001,11 @@ Atom** Molecule::get_most_bindable(int max_count)
                 for (l=max_count; l>k; l--)
                 {
                     best[l] = best[l-1];
-                    retval[l] = retval[l-1];
+                    most_bindable[l] = most_bindable[l-1];
                 }
 
                 best[k] = score;
-                retval[k] = atoms[i];
+                most_bindable[k] = atoms[i];
                 if (!k) j = i;
 
                 break;
@@ -3999,10 +4018,10 @@ Atom** Molecule::get_most_bindable(int max_count)
     _resume:
         ;
     }
-    retval[max_count] = 0;
+    most_bindable[max_count] = 0;
 
     if (j < 0) return 0;
-    else return retval;
+    else return most_bindable;
 }
 
 #define DBG_BINDABLE 0

@@ -15,11 +15,8 @@ chdir(__DIR__);
 require("methods_common.php");
 chdir(__DIR__);
 
-// These residues are based on the binding site identified by Billesbolle et al:
-// https://doi.org/10.1101/2022.12.20.520951
-$cenres = "CEN RES 4.57 4.60 5.39 45.52";
-
-// This will set some variables for the dock, including handling the "next" parameter.
+// This will set some variables for the dock, including handling the "next" parameter
+// and any applicable settings in binding_pocket.json.
 prepare_outputs();
 
 // Optional custom array of output metrics. If removed, the default will be as shown.
@@ -48,12 +45,16 @@ $configf = <<<heredoc
 PROT $pdbfname
 LIG sdf/$ligname.sdf
 
-$cenres
-SIZE 7.0 7.0 7.0
+$cenres_active
+SIZE $size
+SEARCH $search
+$mcoord
+$atomto
+$stcr
+$flxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
-SEARCH TS       # Can use either search method.
 POSE 10
 ELIM 5          # If no poses are found within this energy limit, the limit will be increased until poses are returned.
 

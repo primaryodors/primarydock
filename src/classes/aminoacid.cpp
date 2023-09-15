@@ -1569,6 +1569,33 @@ Atom* AminoAcid::get_reach_atom()
     return retval;
 }
 
+float AminoAcid::CB_angle(Point reference)
+{
+    Atom *CB, *HA1, *HA2;
+    CB = get_atom("CB");
+    if (!CB)
+    {
+        HA1 = get_atom("HA1");
+        HA2 = get_atom("HA2");
+
+        CB = (HA1->get_location().get_3d_distance(reference) < HA2->get_location().get_3d_distance(reference)) ? HA1 : HA2;
+    }
+
+    float result = find_3d_angle(CB->get_location(), reference, get_CA_location());
+
+    int i, Greek=0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        int g = greek_from_aname(atoms[i]->name);
+        if (g > Greek) Greek = g;
+    }
+
+    result -= hexagonal/3 * fmax(Greek-1,0);
+
+    return fmax(0, result);
+}
+
 float AminoAcid::similarity_to(const char letter)
 {
     AminoAcid* a = nullptr;
@@ -1986,14 +2013,35 @@ bool AminoAcid::is_helix(int p)
 float AminoAcid::hydrophilicity() const
 {
     int i, count=0;
-    float total=0;
+    float total=0, weight;
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
+        if (!strcmp(atoms[i]->name, "HA")) continue;
+
+        weight = 1;
 
         int Z = atoms[i]->get_Z();
         int fam = atoms[i]->get_family();
-        if (Z==1) continue;
+        if (Z==1)
+        {
+            int j;
+            for (j=0; j<atoms[i]->get_geometry(); j++)
+            {
+                Bond* b = atoms[i]->get_bond_by_idx(j);
+                if (b && b->btom)
+                {
+                    fam = b->btom->get_family();
+                    break;
+                }
+            }
+        }
+        if (Z==1 && fam == TETREL) continue;
+
+        if (Z == 7) weight = 2.5;
+        else if (Z == 8) weight = 3;
+        else if (Z == 15) weight = 1.5;
+        else if (Z == 16) weight = 1.25;
 
         if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
 
@@ -2002,7 +2050,7 @@ float AminoAcid::hydrophilicity() const
         count++;
         if (fam != TETREL)
         {
-            total += h;
+            total += h*weight;
             count++;
         }
     }

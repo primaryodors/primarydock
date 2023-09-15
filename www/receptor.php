@@ -34,6 +34,7 @@ $fam = family_from_protid($rcpid);
 if ($fam == 'TAAR') $bsr['5.42'] = count($bsr);
 
 $predictions = [];
+$pred_shown = [];
 $predname = [];
 if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
 {
@@ -51,6 +52,21 @@ if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
                 $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
         }
     }
+}
+
+$cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|obabel)' | grep -v grep";
+$result = [];
+exec($cmd, $result);
+
+$ligands_inprogress = [];
+foreach ($result as $line)
+{
+    $pos = strpos($line, ".$rcpid.");
+    if (false == $pos) continue;
+    $ligname = substr($line, $pos+strlen(".$rcpid."));
+    $ligname = preg_replace("/[.]config/", "", $ligname);
+    $odor = find_odorant($ligname);
+    $ligands_inprogress[$odor['oid']] = true;
 }
 
 // Copper binding sites for e.g. OR2T11
@@ -632,12 +648,51 @@ foreach ($pairs as $oid => $pair)
             echo "<td><span style=\"text-decoration: underline; cursor: pointer;\"";
             echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."');\">&#x21a7;</span>";
             echo "</td>";
+            $pred_shown[$oid] = true;
         }
+        else if (@$ligands_inprogress[$oid]) echo "<td colspan=\"2\"><span title=\"A prediction is currently running for this receptor+ligand pair.\">&#x23F3;</span></td>";
         else echo "<td colspan=\"2\">&nbsp;</td>";
     }        
 
     echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";
+}   // Each pair.
+
+if (count($predictions))
+{
+    foreach ($predictions as $oid => $pred)
+    {
+        if (!@$pred_shown[$oid])
+        {
+            $lodor = $odors[$oid];
+            echo "<tr>\n";
+            echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\"";
+
+            $skelurl = "skeletal.php?oid=$oid";
+        
+            echo " onmouseenter=\"showSkeletal(event, '$skelurl');\"";
+            echo " onmouseout=\"$('#skeletal').hide();\"";
+            echo ">{$lodor['full_name']}</td>\n";
+            echo "<td>&nbsp;</td>\n";
+            echo "<td>&nbsp;</td>\n";
+            echo "<td>&nbsp;</td>\n";
+
+            echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor=".urlencode($predname[$oid])."&mode=";
+            if ($predictions[$oid] > 0) echo "active";
+            else echo "inactive";
+            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</a></td>";
+            echo "<td><span style=\"text-decoration: underline; cursor: pointer;\"";
+            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."');\">&#x21a7;</span>";
+            echo "</td>";
+            $pred_shown[$oid] = true;
+
+            $pq = [];
+            foreach ($lodor['aroma'] as $refurl => $notes) $pq = array_merge($pq, $notes);
+            $pq = array_unique($pq);
+            echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
+            echo "</tr>\n";
+        }
+    }
 }
 
 ?>

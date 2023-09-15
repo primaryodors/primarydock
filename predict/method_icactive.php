@@ -14,77 +14,8 @@ $dock_metals = false;
 chdir(__DIR__);
 require("methods_common.php");
 chdir(__DIR__);
-$binding_pockets = json_decode(file_get_contents("../data/binding_pocket.json"), true);
 
 prepare_outputs();
-
-$size = "5.0 6.0 5.0";
-$search = "BB";
-$atomto = [];
-$stcr = "";
-$flxr = "";
-$mcoord = "";
-
-$mbp = false;                       // Matched binding pocket.
-
-if (isset($binding_pockets[$protid])) $mbp = $binding_pockets[$protid];
-else foreach ($binding_pockets as $pocketid => $pocket)
-{
-    if (substr($pocketid, -1) == '*' && substr($pocketid, 0, -1) == substr($protid, 0, strlen($pocketid)-1))
-    {
-        $mbp = $pocket;
-        echo "Matched $pocketid via wildcard.\n";
-        break;
-    }
-    else if (preg_match("/^$pocketid\$/", $protid))
-    {
-        $mbp = $pocket;
-        echo "Matched $pocketid via regex.\n";
-        break;
-    }
-}
-
-if ($mbp)
-{
-    if (isset($mbp["size"])) $size = $mbp["size"];
-    if (isset($mbp["search"])) $search = $mbp["search"];
-    if (isset($mbp["mcoord"])) $mcoord = "MCOORD {$mbp["mcoord"]}";
-    if (isset($mbp["stcr"])) $stcr = "STCR {$mbp["stcr"]}";
-    if (isset($mbp["flxr"])) $flxr = "FLXR {$mbp["flxr"]}";
-
-    if (isset($mbp["atomto"]))
-    {
-        foreach ($mbp["atomto"] as $a2)
-        {
-            $atomto[] = "ATOMTO $a2";
-        }
-    }
-}
-
-if ($mbp && isset($mbp["pocket"]))
-{
-    $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
-}
-else if ($mbp && isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))
-{
-    $cenres_active = isset($mbp["active_pocket"]);
-    $cenres_inactive = isset($mbp["inactive_pocket"]);
-}
-else
-{
-    if (substr($fam, 0, 2) == "OR")
-    {
-        $cenres_active = $cenres_inactive = "CEN RES 3.37 5.47 6.55 7.41";
-    }
-    else if (substr($fam, 0, 4) == "TAAR")
-    {
-        die("There is not yet an internal contacts activation app for TAARs.\n");
-        $cenres_active = $cenres_inactive = "CEN RES 3.32 3.37 5.43 6.48 7.43";
-    }
-    else die("Unsupported receptor family.\n");
-}
-
-$atomto = implode("\n", $atomto);
 
 $metrics_to_process =
 [
@@ -141,6 +72,8 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
     {
         $pepd = <<<heredoc
 LOAD pdbs/OR51/OR51E2.8f76.pdb
+CENTER
+UPRIGHT
 HYDRO
 SAVE $pdbfname_active
 
@@ -218,6 +151,10 @@ $flxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
+# SOFT 4.53 4.64
+# SOFT 5.50 5.33
+# SOFT 6.48 6.59
+
 SEARCH $search
 POSE 10
 ELIM 5000
@@ -234,4 +171,10 @@ OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
 
 heredoc;
 
-process_dock("a");
+$poses = (!@$_REQUEST["softonly"]) ? process_dock("a") : 0;
+
+if (!$poses)
+{
+    $configf = str_replace("# SOFT ", "SOFT ", $configf);
+    process_dock("a");
+}

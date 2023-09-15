@@ -208,7 +208,7 @@ fi
 
 # group_tests_mol.sh
 
-
+# TODO: This test will fail because the cli arguments have changed.
 # test/group_test_res | sed '/^#/d' > testdata/received/group_test_res.received.txt
 # RESULT=$(diff --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt)
 # if [ -z "$RESULT" ]; then

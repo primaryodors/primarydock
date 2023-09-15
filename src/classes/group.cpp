@@ -285,7 +285,6 @@ Point ResidueGroup::get_center()
     {
         Atom** aa = aminos[i]->get_most_bindable(1);
         Atom* a = aa[0];
-        delete aa;
 
         if (a)
         {
@@ -430,7 +429,7 @@ void ResidueGroup::conform_to(Molecule* mol)
             ll[1] = s.pmol;
             ll[2] = nullptr;
 
-            Molecule::conform_molecules(ll, 50);
+            Molecule::conform_molecules(ll, 20);
 
             aminos[i]->movability = mt;
         }
@@ -446,7 +445,8 @@ bool AtomGroup::is_bonded_to(Atom* a)
     for (i=0; i<n; i++)
     {
         if (atoms[i]->is_bonded_to(a)) return true;
-        else if (atoms[i]->shares_bonded_with(a)) return true;
+        else if (atoms[i]->shares_bonded_with(a) && a->get_Z() > 2
+            && (atoms[i]->get_family() != TETREL || a->get_family() != TETREL)) return true;
     }
 
     return false;
@@ -552,17 +552,14 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
                     // Pyrazine/indole/furan fix.
                     bool skip_dirty;
-                    if (!a->is_pi() || (fam != CHALCOGEN && fam != PNICTOGEN))
+                    if (!a->is_pi() || (fam != CHALCOGEN && fam != PNICTOGEN) || a->is_bonded_to(TETREL, 2))
                     {
-                        if (fam != CHALCOGEN || !a->is_bonded_to(TETREL, 2))
-                        {
-                            #if _dbg_groupsel
-                            cout << *a << " is in " << a->num_rings() << " rings, "
-                                << (a->is_pi() ? "" : "not ") << "pi, marked dirty." << endl;
-                            #endif
-                            dirty[k] = true;
-                            skip_dirty = false;
-                        }
+                        #if _dbg_groupsel
+                        cout << *a << " is in " << a->num_rings() << " rings, "
+                            << (a->is_pi() ? "" : "not ") << "pi, marked dirty." << endl;
+                        #endif
+                        dirty[k] = true;
+                        skip_dirty = false;
                     }
                     else skip_dirty = true;
 
@@ -587,8 +584,9 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
     }
 
     std::vector<Atom*> bd = mol->longest_dimension();
-    if (bd.size() < 2) throw 0xbad302;
-    float ld = bd[0]->distance_to(bd[1]);
+    float ld;
+    if (bd.size() < 2) ld = 1;
+    else ld = bd[0]->distance_to(bd[1]);
 
     for (i=0; i<n; i++)
     {
@@ -947,22 +945,47 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
                 continue;
             }
 
-            float r = fmax(0, aa->get_CA_location().get_3d_distance(bb->get_CA_location()) - fmax(aa->get_reach(), bb->get_reach()));
-            if (r > 2.5)
+            // float r = fmax(0, aa->get_CA_location().get_3d_distance(bb->get_CA_location()) - fmax(aa->get_reach(), bb->get_reach()));
+            float r = fmax(0, aa->get_reach_atom()->distance_to(bb->get_reach_atom()) - 2.5);
+            if (r > 1.5)
             {
                 #if _dbg_groupsel
-                // cout << "Rejected " << bb->get_name() << " distance " << r << endl;
+                cout << "Rejected " << bb->get_name() << " distance " << r << endl;
                 #endif
                 continue;
             }
 
+            float theta = 0;
+            Atom* CB = bb->get_atom("CB");
+            if (CB)
+            {
+                theta = bb->CB_angle(pcen);
+                if (theta > square)
+                {
+                    #if _dbg_groupsel
+                    cout << "Rejected " << bb->get_name() << " pocket center angle " << (theta*fiftyseven) << endl;
+                    #endif
+                    continue;
+                }
+            }
+
             float simil = aa->similarity_to(bb);
+            int simil_n = 1, i2;
+
+            for (i2=1; i2 < g->aminos.size(); i2++)
+            {
+                simil += g->aminos[i2]->similarity_to(bb);
+                simil_n++;
+            }
+
+            simil /= simil_n;
+
             if (simil >= hydrophilicity_cutoff)
             {
                 g->aminos.push_back(bb);
                 dirty[j] = true;
                 #if _dbg_groupsel
-                cout << "Adding " << bb->get_name() << " distance " << r << " similarity " << simil << endl;
+                cout << "Adding " << bb->get_name() << " distance " << r << " similarity " << simil << " pocket angle " << (theta*fiftyseven) << endl;
                 #endif
             }
             else
@@ -1026,6 +1049,11 @@ float GroupPair::get_weighted_potential()
     else if (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff && fabs(scg->hydrophilicity()) >= hydrophilicity_cutoff) f *= 25;
     else if ((ag->get_pi()/ag->atoms.size()) >= 0.25 && scg->pi_stackability() > 0.25 ) f *= 7;
 
+    // Pair priority never should have overridden binding strength. It was always a means to ensure that specific ligand-protein contacts
+    // be made without undue precedence given to other potential contacts *of the same type*. It was never a feature to allow e.g. a van der
+    // Waals contact to override e.g. a hydrogen bond.
+    if (priority) f *= 2.5;
+
     return f;
 }
 
@@ -1060,7 +1088,11 @@ float GroupPair::get_potential()
                 {
                     partial = aa->get_atom_mol_bind_potential(a);
 
-                    if ((aa->get_charge() > 1 || aa->conditionally_basic()) && a->is_aldehyde())
+                    Moiety amide;
+                    amide.pattern = "ocn";
+                    Atom* matches[128];
+
+                    if ((aa->get_charge() > 1 /*|| aa->conditionally_basic()*/) && a->is_aldehyde())
                     {
                         partial += protonation(aa->sc_pKa())*60;
 
@@ -1068,9 +1100,16 @@ float GroupPair::get_potential()
                         cout << "Aldehyde-base potential for " << *a << "..." << *aa << " = " << partial << endl;
                         #endif
                     }
+                    else if (fabs(a->is_polar()) > hydrophilicity_cutoff && amide.contained_by(aa, matches))
+                    {
+                        partial *= 5;
+                        #if _dbg_groupsel
+                        cout << *a << " is polar and " << *aa << " is amide." << endl;
+                        #endif
+                    }
                     else if (fabs(a->is_polar()) > hydrophilicity_cutoff && aa->is_tyrosine_like())
                     {
-                        partial /= 3;
+                        partial /= 4;
                         #if _dbg_groupsel
                         cout << *a << " is polar and " << *aa << " is tyrosine-like." << endl;
                         #endif
@@ -1081,6 +1120,12 @@ float GroupPair::get_potential()
                         #if _dbg_groupsel
                         cout << *a << " is polar and " << *aa << " is not." << endl;
                         #endif
+                    }
+
+                    if (fabs(aa->get_charge()) > hydrophilicity_cutoff && fabs(a->get_charge()) > hydrophilicity_cutoff
+                        && sgn(aa->get_charge()) == -sgn(a->get_charge()))
+                    {
+                        partial += 60.0 * fabs(aa->get_charge()) * fabs(a->get_charge());
                     }
 
                     #if _dbg_groupsel
@@ -1103,7 +1148,7 @@ float GroupPair::get_potential()
             }
         }
 
-        if (q) potential /= q;
+        // if (q) potential = potential / q + 0.25 * potential;
 
         float r = pocketcen.get_3d_distance(scg->get_center());
         float r1 = ag->get_center().get_3d_distance(ag->get_ligand()->get_barycenter());
@@ -1194,15 +1239,7 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
         }
         else for (l=0; l<r; l++)
         {
-            if  (
-                    (
-                        pair->priority == retval[l]->priority
-                        &&
-                        pair->get_weighted_potential() > retval[l]->get_weighted_potential()
-                    )
-                    ||
-                    (pair->priority && !retval[l]->priority)
-                )
+            if  (pair->get_weighted_potential() > retval[l]->get_weighted_potential())
             {
                 std::vector<std::shared_ptr<GroupPair>>::iterator it;
                 it = retval.begin();
@@ -1249,7 +1286,7 @@ void GroupPair::align_groups_noconform(Molecule* lig, std::vector<std::shared_pt
     GroupPair::align_groups(lig, gp, false);
 }
 
-void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp, bool do_conforms)
+void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp, bool do_conforms, float amount)
 {
     int n = gp.size();
 
@@ -1260,14 +1297,14 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #if _dbg_groupsel
     cout << "Rotating " << *gp[0]->ag << " in the direction of " << *gp[0]->scg << endl;
     #endif
-    lig->rotate(lv, rot.a);
+    lig->rotate(lv, rot.a*amount);
 
     // Scooch.
     float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
     if (r > 0)
     {
         Point rel = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        rel.scale(r-1);
+        rel.scale((r-1)*amount);
         #if _dbg_groupsel
         cout << "Scooching " << *gp[0]->ag << " " << r << "Å into the reach of " << *gp[0]->scg << endl;
         #endif
@@ -1283,7 +1320,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #if _dbg_groupsel
     cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
     #endif
-    lig->rotate(lv, rot.a);
+    lig->rotate(lv, rot.a*amount);
 
     if (do_conforms) gp[1]->scg->conform_to(lig);
 
@@ -1296,7 +1333,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #if _dbg_groupsel
     cout << "\"Rotisserie\" aligning " << *gp[2]->ag << " in the direction of " << *gp[2]->scg << endl;
     #endif
-    lig->rotate(lv, theta);
+    lig->rotate(lv, theta*amount);
 
     if (do_conforms) gp[2]->scg->conform_to(lig);
 }

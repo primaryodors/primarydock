@@ -1265,50 +1265,6 @@ int interpret_config_line(char** words)
     {
         dyn_strings.push_back(origbuff);
     }
-    else if (!strcmp(words[0], "DYNAMIC"))
-    {
-        dyn_motion_strings.push_back(origbuff);
-    }
-    else if (!strcmp(words[0], "DYNMIN"))
-    {
-        dynamic_minimum = atof(words[1]);
-    }
-    else if (!strcmp(words[0], "DYNINIT"))
-    {
-        dynamic_initial = atof(words[1]);
-    }
-    else if (!strcmp(words[0], "DYNEVERY"))
-    {
-        dynamic_every_iter = atoi(words[1]);
-    }
-    else if (!strcmp(words[0], "HARD"))
-    {
-        soft_pocket = false;
-    }
-    else if (!strcmp(words[0], "SOFTBIAS"))
-    {
-        SoftBias lbias;
-        i=1;
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.region_name = words[i++];
-
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.radial_transform = atof(words[i++]);
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.angular_transform = atof(words[i++]);
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.vertical_transform = atof(words[i++]);
-
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.helical_rotation = atof(words[i++]);
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.radial_rotation = atof(words[i++]);
-        if (!words[i]) throw 0xbad50f7e;
-        lbias.transverse_rotation = atof(words[i++]);
-
-        soft_biases.push_back(lbias);
-        return i-1;
-    }
     else if (!strcmp(words[0], "STATE"))
     {
         states.push_back(origbuff);

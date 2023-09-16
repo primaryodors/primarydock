@@ -1088,25 +1088,24 @@ int main(int argc, char** argv)
 
                 if (!era || !cta) goto _no_connect;
 
-                Point* pt3;
+                Point pt3[4];
                 if (ct > sr)
                 {
                     // Line up the C and O of er to the expected prevaa C and O of ct.
                     a1 = era->get_atom("C");
                     a2 = era->get_atom("O");
-                    pt3 = cta->predict_previous_COCA();
+                    cta->predict_previous_COCA(pt3);
                 }
                 else
                 {
                     // Line up the N and HN (or substitute) of er to the expected nextaa N and HN of ct.
                     a1 = era->get_atom("N");
                     a2 = era->HN_or_substitute();
-                    pt3 = cta->predict_next_NHCA();
+                     cta->predict_next_NHCA(pt3);
                 }
                 a3 = era->get_atom("CA");
 
                 working->conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
-                delete[] pt3;
                 working->backconnect(sr, er);
 
             _no_connect:

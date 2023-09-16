@@ -703,9 +703,9 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
     {
         movability = MOV_ALL;
 
-        Point* pts = prevaa->predict_next_NHCA();
+        Point pts[4];
+        prevaa->predict_next_NHCA(pts);
         attach_to_prediction(pts);
-        delete[] pts;
 
         movability = MOV_FLEXONLY;
         immobile = true;
@@ -723,14 +723,14 @@ void AminoAcid::establish_internal_clash_baseline()
 }
 
 
-Point* AminoAcid::predict_previous_COCA()
+void AminoAcid::predict_previous_COCA(Point* retval)
 {
     Atom* N = get_atom("N");
-    if (!N) return nullptr;
+    if (!N) return;
     N->aromatize();
     Atom* CA = get_atom("CA");
     Atom* HN  = HN_or_substitute();
-    if (!CA || !HN) return nullptr;
+    if (!CA || !HN) return;
 
     Point prevCloc(1.32,0,0), prevOloc(0,1.2,0);
 
@@ -738,7 +738,6 @@ Point* AminoAcid::predict_previous_COCA()
     prevOloc = prevOloc.add(prevCloc);
 
     LocatedVector lv;
-    Point* retval = new Point[4];
     Point neighborCA;
     int i;
     for (i=0; i<10; i++)
@@ -819,18 +818,16 @@ Point* AminoAcid::predict_previous_COCA()
     retval[0] = prevCloc;
     retval[1] = prevOloc;
     retval[2] = neighborCA;
-
-    return retval;
 }
 
-Point* AminoAcid::predict_next_NHCA()
+void AminoAcid::predict_next_NHCA(Point* retval)
 {
     Atom* C = get_atom("C");
-    if (!C) return nullptr;
+    if (!C) return;
     C->aromatize();
     Atom* CA = get_atom("CA");
     Atom* O  = get_atom("O");
-    if (!CA || !O) return nullptr;
+    if (!CA || !O) return;
 
     Point nextNloc(1.32,0,0), nextHNloc(0,1.0,0);
 
@@ -838,7 +835,6 @@ Point* AminoAcid::predict_next_NHCA()
     nextHNloc = nextHNloc.add(nextNloc);
 
     LocatedVector lv;
-    Point* retval = new Point[4];
     Point neighborCA;
     int i;
     for (i=0; i<10; i++)
@@ -919,8 +915,6 @@ Point* AminoAcid::predict_next_NHCA()
     retval[0] = nextNloc;
     retval[1] = nextHNloc;
     retval[2] = neighborCA;
-
-    return retval;
 }
 
 #define _dbg_attprdc 0

@@ -92,7 +92,8 @@ bool Protein::add_residue(const int resno, const char aaletter)
 
     if (i)
     {
-        Point* pts = residues[i-1]->predict_next_NHCA();
+        Point pts[4];
+        residues[i-1]->predict_next_NHCA(pts);
         residues[i] = new AminoAcid(aaletter, residues[i-1], false);
         residues[i]->ensure_pi_atoms_coplanar();
 
@@ -117,8 +118,6 @@ bool Protein::add_residue(const int resno, const char aaletter)
             }
         }
         else cout << "Warning: Residue " << resno << " has no N atom." << endl << flush;
-
-        delete[] pts;
     }
     else
     {
@@ -1813,7 +1812,8 @@ void Protein::backconnect(int startres, int endres)
             cout << pointer << ":";
             #endif
 
-            Point* pts = (inc > 0) ? next->predict_previous_COCA() : next->predict_next_NHCA();
+            Point pts[4];
+            (inc > 0) ? next->predict_previous_COCA(pts) : next->predict_next_NHCA(pts);
             Point ptsc[4];
 
             #if _INCREMENTAL_BKCONN
@@ -1833,7 +1833,6 @@ void Protein::backconnect(int startres, int endres)
             #endif
 
             curr->attach_to_prediction(pts, inc > 0);
-            delete[] pts;
             // break;
 
             #if DBG_BCKCONN
@@ -1849,10 +1848,10 @@ void Protein::backconnect(int startres, int endres)
                 cout << "a";
                 #endif
 
-                pts = (inc < 0) ? prev->predict_previous_COCA() : prev->predict_next_NHCA();
+                pts[4];
+                (inc < 0) ? prev->predict_previous_COCA(pts) : prev->predict_next_NHCA(pts);
                 Point target_heavy = pts[0];
                 Point target_pole = pts[1];
-                delete[] pts;
 
                 #if DBG_BCKCONN
                 cout << "b";

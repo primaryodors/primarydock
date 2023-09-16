@@ -2573,7 +2573,8 @@ int main(int argc, char** argv)
                                 if (r < 7)
                                 {
                                     // TODO:
-                                    InteratomicForce** iff = InteratomicForce::get_applicable(a, b);
+                                    InteratomicForce* iff[32];
+                                    InteratomicForce::fetch_applicable(a, b, iff);
                                     if (iff) for (m=0; iff[m]; m++)
                                     {
                                         if (r < 1.333 * iff[m]->get_distance())

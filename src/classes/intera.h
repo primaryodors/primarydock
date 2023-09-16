@@ -33,7 +33,7 @@ public:
     std::string get_config_string() const;
 
     static bool atom_is_capable_of(Atom* a, intera_type t);
-    static InteratomicForce** get_applicable(Atom* a, Atom* b);
+    static void fetch_applicable(Atom* a, Atom* b, InteratomicForce** result);
     static float metal_compatibility(Atom* a, Atom* b);
     static float potential_binding(Atom* a, Atom* b);
     static float total_binding(Atom* a, Atom* b);

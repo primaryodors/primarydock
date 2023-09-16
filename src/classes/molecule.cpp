@@ -2212,7 +2212,8 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
     {
         if (atoms[i]->is_backbone) continue;
 
-        InteratomicForce** ifs = InteratomicForce::get_applicable(a, atoms[i]);
+        InteratomicForce* ifs[32];
+        InteratomicForce::fetch_applicable(a, atoms[i], ifs);
         if (!ifs) continue;
 
         for (j=0; ifs[j]; j++)
@@ -2246,7 +2247,6 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
             retval += partial;
             n++;
         }
-        delete[] ifs;
     }
 
     if (n) retval /= n;
@@ -2296,18 +2296,18 @@ float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
                 if (!ligands[l]->atoms[j]) continue;
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 float f = 1.0 / r;		// Regular invert rather than inv square so that actual bonding will take over at short range.
-                InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], ligands[l]->atoms[j]);
+                InteratomicForce* iff[32];
+                InteratomicForce::fetch_applicable(atoms[i], ligands[l]->atoms[j], iff);
 
                 if (iff) for (n=0; iff[n]; n++)
-                    {
-                        if (iff[n]->get_type() == vdW) continue;
+                {
+                    if (iff[n]->get_type() == vdW) continue;
 
-                        if (pure || r < iff[n]->get_distance())
-                            kJmol += iff[n]->get_kJmol();
-                        else
-                            kJmol += iff[n]->get_kJmol()*f;
-                    }
-                delete[] iff;
+                    if (pure || r < iff[n]->get_distance())
+                        kJmol += iff[n]->get_kJmol();
+                    else
+                        kJmol += iff[n]->get_kJmol()*f;
+                }
             }
         }
     }
@@ -4042,8 +4042,9 @@ Atom** Molecule::get_most_bindable(int max_num, Atom* for_atom)
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
-        InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], for_atom);
-        if (!iff) continue;
+        InteratomicForce* iff[32];
+        InteratomicForce::fetch_applicable(atoms[i], for_atom, iff);
+        if (!iff[0]) continue;
 
         float lbb = 0;
         for (j=0; iff[j]; j++)

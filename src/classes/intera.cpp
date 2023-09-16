@@ -305,12 +305,13 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
 }
 
 #define _dbg_applicable 0
-InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
+void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** retval)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
     if (!a || !b)
     {
-        return NULL;
+        retval[0] = nullptr;
+        return;
     }
 
     #if _dbg_applicable
@@ -329,8 +330,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         }
     }
 
-    InteratomicForce** retval = new InteratomicForce*[16];
-    init_nulls(retval, 16);
+    retval[0] = nullptr;
     int i, j=0;
 
     // Charged atoms always attract or repel, irrespective of Z.
@@ -346,6 +346,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 
         j++;
     }
+    retval[j] = nullptr;
 
     #if allow_auto_hydroxy
     Atom *H = nullptr, *O = nullptr;
@@ -505,9 +506,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
             }
         }
     }
-    retval[j] = 0;
-
-    return retval;
+    retval[j] = nullptr;
 }
 
 SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
@@ -544,7 +543,8 @@ float InteratomicForce::metal_compatibility(Atom* a, Atom* b)
 
 float InteratomicForce::potential_binding(Atom* a, Atom* b)
 {
-    InteratomicForce** forces = get_applicable(a, b);
+    InteratomicForce* forces[32];
+    fetch_applicable(a, b, forces);
 
     int i;
     float potential = 0;
@@ -585,7 +585,8 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
 
 float InteratomicForce::total_binding(Atom* a, Atom* b)
 {
-    InteratomicForce** forces = get_applicable(a, b);
+    InteratomicForce* forces[32];
+    fetch_applicable(a, b, forces);
 
     int i, j, k;
     float kJmol = 0;
@@ -1196,7 +1197,6 @@ _canstill_clash:
     }
 
     _finished_clashing:
-    delete[] forces;
     return kJmol;
 }
 
@@ -1212,7 +1212,8 @@ float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
 
 float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
 {
-    InteratomicForce** forces = get_applicable(a, b);
+    InteratomicForce* forces[32];
+    fetch_applicable(a, b, forces);
 
     int i;
     float anomaly = 0;
@@ -1223,7 +1224,6 @@ float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
         anomaly += fabs(r - forces[i]->distance);
     }
 
-    delete[] forces;
     return anomaly;
 }
 

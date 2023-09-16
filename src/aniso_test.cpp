@@ -91,7 +91,8 @@ int main(int argc, char** argv)
 
     Molecule mp("probe", aarr);
 
-    InteratomicForce** ifs = InteratomicForce::get_applicable(&probe, anisoa);
+    InteratomicForce* ifs[32];
+    InteratomicForce::fetch_applicable(&probe, anisoa, ifs);
     if (!ifs || !ifs[0])
     {
         cout << "No forces to measure; check bindings.dat." << endl;

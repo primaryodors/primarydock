@@ -1848,15 +1848,6 @@ Atom* AminoAcid::capable_of_inter(intera_type inter)
                 cadist = r;
             }
         }
-        /*InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], atoms[i]);
-        if (!iff) continue;
-        for (j=0; iff[j]; j++)
-            if (iff[j]->get_type() == inter)
-            {
-                // cout << *this << " is capable of " << inter << " binding because of atom " << atoms[i]->name << endl;
-                delete[] iff;
-                return true;
-            }*/
     }
 
     return retval;

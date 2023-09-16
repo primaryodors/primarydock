@@ -2356,6 +2356,7 @@ void Ring::fill_with_atoms(Atom** from_atoms)
         }
     }
 
+    #if !_ALLOW_FLEX_RINGS
     for (i=0; i < atcount; i++)
     {
         if (i)
@@ -2385,6 +2386,7 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             }
         }
     }
+    #endif
 
     atoms[atcount] = nullptr;
 }

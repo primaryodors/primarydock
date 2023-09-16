@@ -173,7 +173,7 @@ heredoc;
 
 $poses = (!@$_REQUEST["softonly"]) ? process_dock("a") : 0;
 
-if (!$poses)
+if (!$poses && !@$_REQUEST["nosoft"])
 {
     $configf = str_replace("# SOFT ", "SOFT ", $configf);
     process_dock("a");

@@ -1189,7 +1189,7 @@ void Bond::fill_moves_with_cache()
             if (_DBGMOVES) cout << b[i]->btom->name << " ";
         }
     }
-    delete[] b;
+    delete b;
 
     do
     {
@@ -1210,7 +1210,7 @@ void Bond::fill_moves_with_cache()
                         k++;
                     }
                 }
-                delete[] b;
+                delete b;
             }
         }
     }
@@ -2355,6 +2355,38 @@ void Ring::fill_with_atoms(Atom** from_atoms)
             	<< " is a member of a ring. " << hex << this << dec << endl;*/
         }
     }
+
+    #if !_ALLOW_FLEX_RINGS
+    for (i=0; i < atcount; i++)
+    {
+        if (i)
+        {
+            Bond* b = atoms[i]->get_bond_between(atoms[i-1]);
+            if (b)
+            {
+                b->can_rotate = b->can_flip = false;
+            }
+            b = atoms[i-1]->get_bond_between(atoms[i]);
+            if (b)
+            {
+                b->can_rotate = b->can_flip = false;
+            }
+        }
+        else
+        {
+            Bond* b = atoms[i]->get_bond_between(atoms[atcount-1]);
+            if (b)
+            {
+                b->can_rotate = b->can_flip = false;
+            }
+            b = atoms[atcount-1]->get_bond_between(atoms[i]);
+            if (b)
+            {
+                b->can_rotate = b->can_flip = false;
+            }
+        }
+    }
+    #endif
 
     atoms[atcount] = nullptr;
 }

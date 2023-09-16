@@ -13,7 +13,25 @@ Molecule mol("TheMolecule");
 int main(int argc, char** argv)
 {
     if (argc > 1)
-        mol.from_smiles(argv[1]);
+    {
+        if (file_exists(argv[1]))
+        {
+            FILE* fp = fopen(argv[1], "rb");
+            char buffer[1024];
+            std::string sdfdat = "";
+            while (!feof(fp))
+            {
+                fgets(buffer, 1022, fp);
+                sdfdat += (std::string)buffer;
+            }
+            fclose(fp);
+            mol.from_sdf(sdfdat.c_str());
+        }
+        else
+        {
+            mol.from_smiles(argv[1]);
+        }
+    }
     else
         mol.from_smiles("c1ccccc1C=O");
     

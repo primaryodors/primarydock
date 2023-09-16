@@ -219,7 +219,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
                                 if (N->num_bonded_to("H") > 1)		// Proline conditional.
                                 {
-                                    if (ab) delete[] ab;
+                                    if (ab) delete ab;
                                     ab = N->get_bonds();
                                     l = 0;
                                     int n;
@@ -247,7 +247,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                             }
                         }
                     }
-                    delete[] ab;
+                    delete ab;
                 }
             }
         }
@@ -280,7 +280,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                     }
                 }
 
-                delete[] ab;
+                delete ab;
             }
         }
 
@@ -313,7 +313,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                         }
                     }
 
-                    delete[] ab;
+                    delete ab;
                 }
             }
         }
@@ -646,7 +646,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                 }
             }
 
-            delete[] bb;
+            delete bb;
         }
 
         aa_defs[idx].aabonds = new AABondDef*[n+2];
@@ -657,7 +657,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         }
         aa_defs[idx].aabonds[i] = nullptr;
 
-        delete[] aabd;
+        delete aabd;
     }
 
     ensure_pi_atoms_coplanar();
@@ -722,7 +722,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
         Point* pts = prevaa->predict_next_NHCA();
         attach_to_prediction(pts);
-        delete[] pts;
+        delete pts;
 
         movability = MOV_FLEXONLY;
         immobile = true;
@@ -1340,7 +1340,7 @@ _return_added:
             }
             lra[j] = nullptr;
 
-            delete[] ringa;
+            delete ringa;
             rings[i] = new Ring(lra, aadef->aarings[i]->get_type());
         }
         rings[i] = nullptr;
@@ -1416,7 +1416,7 @@ void AminoAcid::load_aa_defs()
                         tbdctr = 0;
                         proline_like = false;
 
-                        if (tmpbdefs) delete[] tmpbdefs;
+                        if (tmpbdefs) delete tmpbdefs;
                     }
 
                     if (!aa_defs[idx]._1let)
@@ -1838,15 +1838,6 @@ Atom* AminoAcid::capable_of_inter(intera_type inter)
                 cadist = r;
             }
         }
-        /*InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], atoms[i]);
-        if (!iff) continue;
-        for (j=0; iff[j]; j++)
-            if (iff[j]->get_type() == inter)
-            {
-                // cout << *this << " is capable of " << inter << " binding because of atom " << atoms[i]->name << endl;
-                delete[] iff;
-                return true;
-            }*/
     }
 
     return retval;
@@ -2108,7 +2099,7 @@ void AminoAcid::hydrogenate(bool steric_only)
         bt = atoms[i]->get_bonds();
         if (!bt) continue;
         bb = bt[0];
-        delete[] bt;
+        delete bt;
         if (!bb) continue;
         heavy = bb->btom;
         if (!heavy) continue;
@@ -2186,7 +2177,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                     if (bb && bb->btom == cursor)
                         atomtmp[l++] = atoms[i];
                 }
-                delete[] bt;
+                delete bt;
             }
     }
 
@@ -2217,7 +2208,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                                     if (bb && bb->btom == cursor)
                                         atomtmp[l++] = atoms[k];
                                 }
-                                delete[] bt;
+                                delete bt;
                             }
                     }
                 }
@@ -2245,7 +2236,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                     if (bb && bb->btom == cursor)
                         atomtmp[l++] = atoms[i];
                 }
-                delete[] bt;
+                delete bt;
             }
     }
 
@@ -2396,7 +2387,7 @@ Atom* AminoAcid::HN_or_substitute()
         {
             if (bb[i]->btom && strcmp(bb[i]->btom->name, "CA")) return bb[i]->btom;
         }
-        delete[] bb;
+        delete bb;
     }
     return retval;
 }

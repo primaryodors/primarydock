@@ -76,7 +76,7 @@ int main(int argc, char** argv)
         Atom** ra = m1.get_ring_atoms(i);
         Atom::dump_array(ra);
         cout << endl;
-        delete[] ra;
+        delete ra;
 
         bool cp = false;
         if (m1.ring_is_aromatic(i))
@@ -118,7 +118,7 @@ int main(int argc, char** argv)
                 if (ab) cout << "# Atom " << anames[i] << " has basicity " << ab << endl;
             }
         }
-        delete[] anames;
+        delete anames;
     }
     else cout << "# No names.\n";
 

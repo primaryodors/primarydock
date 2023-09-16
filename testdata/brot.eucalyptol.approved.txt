@@ -1,0 +1,3 @@
+Bond C2-C11 can rotate.
+Bond C8-C9 can rotate.
+Bond C8-C10 can rotate.

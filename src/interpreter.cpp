@@ -75,13 +75,6 @@ VarType type_from_name(const char* varname)
     return SV_NONE;
 }
 
-bool file_exists(std::string fname)
-{
-    struct stat s;
-    if (stat(fname.c_str(), &s) == 0) return true;
-    else return false;
-}
-
 bool download_file(std::string url, std::string destination)
 {
     #if _WIN32
@@ -1106,7 +1099,7 @@ int main(int argc, char** argv)
                 a3 = era->get_atom("CA");
 
                 working->conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
-                delete[] pt3;
+                delete pt3;
                 working->backconnect(sr, er);
 
             _no_connect:
@@ -1359,7 +1352,7 @@ int main(int argc, char** argv)
                             retfmt = dls[2];
                         }
 
-                        delete[] dls;
+                        delete dls;
                     }
 
                     if (!url.length()) raise_error("Download source not found in data file.");
@@ -1440,7 +1433,7 @@ int main(int argc, char** argv)
                     {
                         psz = interpret_single_string(words[l]);
                         cout << psz << flush;
-                        delete[] psz;
+                        delete psz;
                     }
                 }
 
@@ -1492,11 +1485,11 @@ int main(int argc, char** argv)
                     strcpy(psz, script_lines[n].c_str());
                     if (!strcmp(psz, buffer1))
                     {
-                        delete[] psz;
+                        delete psz;
                         program_counter = n+1;
                         goto _found_goto_target;
                     }
-                    delete[] psz;
+                    delete psz;
                 }
                 raise_error( (std::string)"Label not found: \"" + (std::string)buffer1 + (std::string)"\"");
                 return 0x51974c5;
@@ -2003,12 +1996,12 @@ int main(int argc, char** argv)
                     else
                     {
                         psz -= m;
-                        delete[] psz;
+                        delete psz;
                         raise_error( (std::string)"Unimplemented operator " + (std::string)words[2] + (std::string)" for string assignment.");
                         return 0x51974c5;		// If you use your imagination, that says "syntax".
                     }
                     psz -= m;
-                    delete[] psz;
+                    delete psz;
                     break;
 
                 default:
@@ -2142,7 +2135,7 @@ int main(int argc, char** argv)
                 strcpy(sv.psz, pname);
 				set_variable(buffer, sv);
 
-                delete[] psz;
+                delete psz;
 
                 int seqlen = working->get_seq_length();
                 sprintf(buffer, "%cSEQLEN%c", '%', g_chain);
@@ -2517,7 +2510,7 @@ int main(int argc, char** argv)
                 cout << "Wrote " << psz << "." << endl;
 
                 fclose(pf);
-                delete[] psz;
+                delete psz;
 
                 if (words[2])
                 {
@@ -2653,7 +2646,7 @@ int main(int argc, char** argv)
 
                 k = working->search_sequence(sr, esr, psz, threshold, &sim);
 
-                delete[] psz;
+                delete psz;
 
                 n = find_var_index(words[l]);
                 if (n<0) n = vars++;

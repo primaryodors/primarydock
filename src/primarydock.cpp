@@ -1817,6 +1817,28 @@ void apply_protein_specific_settings(Protein* p)
         aa->conform_atom_to_location(a->name, target->get_CA_location());
         aa->movability = aamov;
     }
+
+    dyn_motions.clear();
+    n = dyn_strings.size();
+    for (i=0; i<n; i++)
+    {
+        DynamicMotion dyn(protein);
+        char buffer[1024];
+        strcpy(buffer, dyn_strings[i].c_str());
+        char** words = chop_spaced_words(buffer);
+        AminoAcid* aa1 = protein->get_residue_bw(words[1]);
+        AminoAcid* aa2 = protein->get_residue_bw(words[2]);
+        int resno1 = aa1->get_residue_no();
+        int resno2 = aa2->get_residue_no();
+        dyn.name = (std::string)words[1] + (std::string)"-" + (std::string)words[2];
+        dyn.type = dyn_bend;
+        dyn.start_resno.from_string(resno1<resno2 ? words[1] : words[2]);
+        dyn.end_resno.from_string(resno1>resno2 ? words[1] : words[2]);
+        dyn.fulcrum_resno.from_string(words[1]);
+        dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
+        dyn.bias = 30*fiftyseventh;
+        dyn_motions.push_back(dyn);
+    }
 }
 
 int main(int argc, char** argv)
@@ -2152,26 +2174,6 @@ int main(int argc, char** argv)
     pocketcen = loneliest;
     #endif
 
-    int num_dyn_motions = dyn_strings.size();
-    for (i=0; i<num_dyn_motions; i++)
-    {
-        DynamicMotion dyn(protein);
-        char buffer[1024];
-        strcpy(buffer, dyn_strings[i].c_str());
-        char** words = chop_spaced_words(buffer);
-        AminoAcid* aa1 = protein->get_residue_bw(words[1]);
-        AminoAcid* aa2 = protein->get_residue_bw(words[2]);
-        int resno1 = aa1->get_residue_no();
-        int resno2 = aa2->get_residue_no();
-        dyn.name = (std::string)words[1] + (std::string)"-" + (std::string)words[2];
-        dyn.type = dyn_bend;
-        dyn.start_resno.from_string(resno1<resno2 ? words[1] : words[2]);
-        dyn.end_resno.from_string(resno1>resno2 ? words[1] : words[2]);
-        dyn.fulcrum_resno.from_string(words[1]);
-        dyn.axis = compute_normal(aa1->get_CA_location(), pocketcen, aa2->get_CA_location());
-        dyn.bias = 30*fiftyseventh;
-        dyn_motions.push_back(dyn);
-    }
 
     #if !_use_groups
     for (i=0; i<3; i++)
@@ -2403,7 +2405,7 @@ _try_again:
         float lig_min_int_clsh = ligand->get_internal_clashes();
         ligand->crumple(triangular);
 
-        for (i=0; i<num_dyn_motions; i++) dyn_motions[i].apply_absolute(0);
+        for (i=0; i<dyn_motions.size(); i++) dyn_motions[i].apply_absolute(0);
 
         int rcn = required_contacts.size();
         if (rcn)
@@ -3328,10 +3330,10 @@ _try_again:
                 dr[drcount][nodeno].miscdata += (std::string)"\n";
             }
 
-            if (num_dyn_motions)
+            if (dyn_motions.size())
             {
                 dr[drcount][nodeno].miscdata += (std::string)"Dynamic Motions:\n";
-                for (i=0; i<num_dyn_motions; i++)
+                for (i=0; i<dyn_motions.size(); i++)
                 {
                     dr[drcount][nodeno].miscdata += (std::string)dyn_motions[i].name
                         + (std::string)" "

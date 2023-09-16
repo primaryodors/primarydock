@@ -227,7 +227,7 @@ int find_var_index(const char* varname, char** out_varname = nullptr)
 
                 if (out_varname)
                 {
-                    // delete[] *out_varname;
+                    // TODO: Make this a stack allocation, instead of heap.
                     *out_varname = new char[strlen(buffer)+4];
                     strcpy(*out_varname, buffer);
                 }

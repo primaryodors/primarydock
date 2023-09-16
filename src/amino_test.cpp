@@ -83,21 +83,17 @@ int main(int argc, char** argv)
             {
                 for (i=0; bb[i]; i++)
                 {
-                    Atom** baa = bb[i]->get_moves_with_btom();
+                    Atom* baa[bb[i]->count_moves_with_btom()+1];
+                    bb[i]->fetch_moves_with_btom(baa);
                     cout << bb[i]->atom->name << "-" << bb[i]->btom->name << " can rotate, bringing ";
 
-                    if (baa)
+                    for (j=0; baa[j]; j++)
                     {
-                        for (j=0; baa[j]; j++)
-                        {
-                            cout << baa[j]->name << " ";
-                        }
-                        if (!j) cout << "zero atoms.";
+                        cout << baa[j]->name << " ";
                     }
-                    else cout << "no atoms.";
+                    if (!j) cout << "zero atoms.";
 
                     cout << endl;
-                    delete[] baa;
                 }
             }
             else cout << "No rotatable bonds." << endl;

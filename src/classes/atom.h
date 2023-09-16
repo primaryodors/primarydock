@@ -62,7 +62,7 @@ public:
     {
         moves_with_btom = 0;
     }
-    Atom** get_moves_with_btom();
+    void fetch_moves_with_btom(Atom** result);
     int count_moves_with_btom();
     int count_heavy_moves_with_atom();
     int count_heavy_moves_with_btom();

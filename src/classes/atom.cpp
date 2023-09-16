@@ -447,24 +447,22 @@ Point Atom::get_location()
     return pt;
 }
 
-Atom** Bond::get_moves_with_btom()
+void Bond::fetch_moves_with_btom(Atom** result)
 {
     enforce_moves_with_uniqueness();
 
-    int i, cachesz=0;
+    int i;
     if (!moves_with_btom) fill_moves_with_cache();
-    if (!moves_with_btom) return 0;
-    for (i=0; moves_with_btom[i]; i++)
-        cachesz = i+1;
-    if (!cachesz) return 0;
+    if (!moves_with_btom)
+    {
+        result[0] = nullptr;
+        return;
+    }
 
-    Atom** retval = new Atom*[cachesz+1];
     // Not calling init_nulls() for performance reasons.
-    for (i=0; i<cachesz; i++)
-        retval[i] = moves_with_btom[i];
-    retval[cachesz] = 0;
-
-    return retval;
+    for (i=0; moves_with_btom[i]; i++)
+        result[i] = moves_with_btom[i];
+    result[i] = nullptr;
 }
 
 bool Atom::move(Point* pt)
@@ -514,8 +512,9 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     if (!excluding) return 0;
     int bi = get_idx_bond_between(excluding);
     Bond* palin = excluding->get_bond_between(this);
-    Atom** atoms = palin->get_moves_with_btom();
-    if (!atoms) return 0;
+    Atom* atoms[palin->count_moves_with_btom()];
+    palin->fetch_moves_with_btom(atoms);
+    if (!atoms[0]) return 0;
 
     if (isnan(pt->x) || isnan(pt->y) || isnan(pt->z))
     {

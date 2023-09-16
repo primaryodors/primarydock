@@ -4331,7 +4331,7 @@ float Molecule::correct_structure(int iters)
     float error = 0;
     Point aloc, bloc;
     Atom* btom;
-    Bond** b;
+    Bond* b[16];
     int g, bg;
     float b_bond_angle;
     LocatedVector lv;

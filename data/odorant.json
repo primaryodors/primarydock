@@ -30458,6 +30458,8 @@
     "d644ce426eb9b78f103cd652bae6a5b7":
     {
         "full_name": "(R)-(-)-carvone",
+        "name1": "(R)-carvone",
+        "name2": "l-carvone",
         "smiles": "CC1=CC[C@H](CC1=O)C(=C)C",
         "aroma":
         {
@@ -31264,6 +31266,8 @@
     "08abb2a55a461ac30b7b038a4b1572f9":
     {
         "full_name": "(S)-(+)-carvone",
+        "name1": "(S)-carvone",
+        "name2": "d-carvone",
         "smiles": "CC1=CC[C@@H](CC1=O)C(=C)C",
         "aroma":
         {

@@ -1225,7 +1225,7 @@ void Molecule::find_paths()
                 if (!b[j]->btom) continue;
                 if (b[j]->btom->get_Z() < 2) continue;
                 if (b[j]->btom->get_bonded_heavy_atoms_count() < 2) continue;
-                if (b[i]->btom->residue && b[i]->btom->residue != a->residue) continue;
+                if (b[j]->btom->residue && b[j]->btom->residue != a->residue) continue;
 
                 #if DBG_FND_RNGS
                 cout << "Trying " << b[j]->btom->name << "... ";

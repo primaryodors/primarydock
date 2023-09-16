@@ -620,22 +620,24 @@ Bond::~Bond()
     if (moves_with_btom) delete[] moves_with_btom;
 }
 
-Bond** Atom::get_bonds()
+void Atom::fetch_bonds(Bond** result)
 {
-    if (!bonded_to) return NULL;
+    if (!bonded_to)
+    {
+        result[0] = nullptr;
+        return;
+    }
+
     int i;
     if (!geometry || geometry<0 || isnan(geometry)) geometry=4;
     try
     {
-        Bond** retval = new Bond*[geometry+1];
-        // No init_nulls() because performance.
-        for (i=0; i<geometry; i++) retval[i] = &bonded_to[i];
-        retval[geometry] = 0;
-        return retval;
+        for (i=0; i<geometry; i++) result[i] = &bonded_to[i];
+        result[geometry] = nullptr;
     }
     catch (int e)
     {
-        return NULL;
+        result[0] = nullptr;
     }
 }
 
@@ -1177,7 +1179,8 @@ void Bond::fill_moves_with_cache()
     if (_DBGMOVES) cout << btom->aa3let << btom->residue << ": What moves with " << btom->name << " when rotating about " << atom->name << "?" << endl;
 
     btom->used = true;
-    Bond** b = btom->get_bonds();
+    Bond* b[16];
+    btom->fetch_bonds(b);
     if (!b) return;
     for (i=0; b[i]; i++)
     {
@@ -1188,14 +1191,13 @@ void Bond::fill_moves_with_cache()
             if (_DBGMOVES) cout << b[i]->btom->name << " ";
         }
     }
-    delete[] b;
 
     do
     {
         k=0;
         for (j=0; j<tmplen; j++)
         {
-            b = attmp[j]->get_bonds();
+            attmp[j]->fetch_bonds(b);
             if (b)
             {
                 for (i=0; b[i]; i++)
@@ -1209,7 +1211,6 @@ void Bond::fill_moves_with_cache()
                         k++;
                     }
                 }
-                delete[] b;
             }
         }
     }

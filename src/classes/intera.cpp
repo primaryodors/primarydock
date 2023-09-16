@@ -355,8 +355,9 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         Atom* HO = a->is_bonded_to("O");
         if (HO)
         {
-            Bond** bb = HO->get_bonds();
-            if (bb)
+            Bond* bb[16];
+            HO->fetch_bonds(bb);
+            if (bb[0])
             {
                 for (i=0; bb[i]; i++)
                 {
@@ -368,8 +369,6 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                         break;
                     }
                 }
-
-                delete[] bb;
             }
         }
     }
@@ -378,8 +377,9 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         Atom* HO = b->is_bonded_to("O");
         if (HO)
         {
-            Bond** bb = HO->get_bonds();
-            if (bb)
+            Bond* bb[16];
+            HO->fetch_bonds(bb);
+            if (bb[0])
             {
                 for (i=0; bb[i]; i++)
                 {
@@ -391,8 +391,6 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                         break;
                     }
                 }
-
-                delete[] bb;
             }
         }
     }

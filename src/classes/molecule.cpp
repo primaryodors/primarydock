@@ -329,11 +329,11 @@ void Molecule::clear_all_bond_caches()
     int i, j;
     for (i=0; atoms[i]; i++)
     {
-        Bond** b = atoms[i]->get_bonds();
-        if (b)
+        Bond* b[16];
+        atoms[i]->fetch_bonds(b);
+        if (b[0])
         {
             for (j=0; b[j]; j++) b[j]->clear_moves_with_cache();
-            delete[] b;
         }
         atoms[i]->used = false;
     }
@@ -393,16 +393,16 @@ void Molecule::hydrogenate(bool steric_only)
 
         float bcardsum = 0;
 
-        Bond** aib = atoms[i]->get_bonds();
+        Bond* aib[16];
+        atoms[i]->fetch_bonds(aib);
         int db = 0;
-        if (aib)
+        if (aib[0])
         {
             for (j=0; aib[j]; j++)
             {
                 if (aib[j]->btom) bcardsum += aib[j]->cardinality;
                 if (aib[j]->cardinality > 1) db++;
             }
-            delete[] aib;
         }
         if (!db && steric_only) continue;
 
@@ -859,15 +859,14 @@ int Molecule::get_bond_count(bool unidirectional) const
     if (noAtoms(atoms)) return 0;
     for (i=0; i<atcount && atoms[i]; i++)
     {
-        Bond** b = atoms[i]->get_bonds();
-        if (!b) continue;
+        Bond* b[16];
+        atoms[i]->fetch_bonds(b);
+        if (!b[0]) continue;
 
         for (j=0; b[j]; j++)
         {
             if (b[j]->btom > atoms[i] || !unidirectional) bc++;
         }
-
-        delete[] b;
     }
 
     return bc;
@@ -1109,8 +1108,9 @@ int Molecule::identify_rings()
     // For each "unused" valence>1 atom attached to the start atom, mark it "used" and start a chain.
     // Include the start atom as the first element of the chain.
 
-    Bond** b = a->get_bonds();
-    if (!b) return found_rings;
+    Bond* b[16];
+    a->fetch_bonds(b);
+    if (!b[0]) return found_rings;
     for (i=0; b[i]; i++)
     {
         if (b[i]->btom)
@@ -1296,8 +1296,8 @@ int Molecule::identify_rings()
 
 
             // Advance each chain one step further, incorporating only "unused" atoms.
-            b = a->get_bonds();
-            if (!b) continue;
+            a->fetch_bonds(b);
+            if (!b[0]) continue;
             k=0;
             for (j=0; b[j]; j++)
             {
@@ -1345,8 +1345,6 @@ int Molecule::identify_rings()
                 }
             }
 
-            delete[] b;
-
             // If there are no "unused" bonded atoms, delete the chain.
             if (!k) chainlen[i] = 0;
             else active++;
@@ -1372,7 +1370,7 @@ void Molecule::identify_acidbase()
 
     // For every atom in the molecule:
     int i, j, k;
-    Bond** b = 0;
+    Bond* b[16];
 
     for (i=0; atoms[i]; i++)
     {
@@ -1388,13 +1386,12 @@ void Molecule::identify_acidbase()
         {
             carbon = (atoms[i]->get_Z() == 6);
             //cout << "Atom " << atoms[i]->name << " is of family " << fama << endl;
-            b = atoms[i]->get_bonds();
-            if (!b) goto _not_acidic;
+            atoms[i]->fetch_bonds(b);
+            if (!b[0]) goto _not_acidic;
             if (carbon)
             {
                 if (!atoms[i]->is_pi() || !atoms[i]->is_bonded_to_pi(CHALCOGEN, true))
                 {
-                    delete[] b;
                     goto _not_acidic;
                 }
                 for (j=0; b[j]; j++)
@@ -1405,7 +1402,6 @@ void Molecule::identify_acidbase()
                         int fam = b[j]->btom->get_family();
                         if (fam != CHALCOGEN)
                         {
-                            delete[] b;
                             goto _not_acidic;
                         }
                     }
@@ -1417,7 +1413,6 @@ void Molecule::identify_acidbase()
                 int fam = b[j]->btom->get_family();
                 if (carbon && fam == PNICTOGEN)
                 {
-                    delete[] b;
                     goto _not_acidic;
                 }
                 //cout << "Fam: " << fam << endl;
@@ -1430,10 +1425,10 @@ void Molecule::identify_acidbase()
                     }
                     else
                     {
-                        Bond** b1 = b[j]->btom->get_bonds();
-                        if (!b1)
+                        Bond* b1[16];
+                        b[j]->btom->fetch_bonds(b1);
+                        if (!b1[0])
                         {
-                            delete[] b;
                             goto _not_acidic;
                         }
                         for (k=0; b1[k]; k++)
@@ -1446,15 +1441,13 @@ void Molecule::identify_acidbase()
                                 break;
                             }
                         }
-                        if (b1) delete[] b1;
                     }
                 }
             }
-            delete[] b;
         }
         if (sbOH)
         {
-            b = atoms[i]->get_bonds();
+            atoms[i]->fetch_bonds(b);
             for (j=0; b[j]; j++)
             {
                 if (!b[j]->btom) continue;
@@ -1465,7 +1458,6 @@ void Molecule::identify_acidbase()
                     //cout << "Atom " << b[j]->btom->name << " is acidic." << endl;
                 }
             }
-            if (b) delete[] b;
         }
     _not_acidic:
         //if (b) delete[] b;
@@ -1535,7 +1527,8 @@ Bond** Molecule::get_rotatable_bonds()
     if (!immobile)
         for (i=0; atoms[i]; i++)
         {
-            Bond** lb = atoms[i]->get_bonds();
+            Bond* lb[16];
+            atoms[i]->fetch_bonds(lb);
             int g = atoms[i]->get_geometry();
             for (j=0; j<g && lb[j]; j++)
             {
@@ -1587,12 +1580,12 @@ Bond** Molecule::get_rotatable_bonds()
                     btemp[bonds] = 0;
                 }
             }
-            if (lb) delete[] lb;
         }
     else
         for (i=0; atoms[i]; i++)
         {
-            Bond** lb = atoms[i]->get_bonds();
+            Bond* lb[16];
+            atoms[i]->fetch_bonds(lb);
             int g = atoms[i]->get_geometry();
             for (j=0; j<g; j++)
             {
@@ -1652,7 +1645,6 @@ Bond** Molecule::get_rotatable_bonds()
                     btemp[bonds] = 0;
                 }
             }
-            if (lb) delete[] lb;
         }
 
         rotatable_bonds = new Bond*[bonds+1];
@@ -1734,27 +1726,26 @@ Bond** AminoAcid::get_rotatable_bonds()
                              << " and " << aadef->aabonds[i]->bname
                              << endl << flush;
 
-                        Bond** lbb = la->get_bonds();
-                        if (lbb)
+                        Bond* lbb[16];
+                        la->fetch_bonds(lbb);
+                        if (lbb[0])
                         {
                             cout << la->name << " is bonded to:";
                             int o, ag = la->get_geometry();
                             for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
                             cout << "." << endl;
-                            delete[] lbb;
                         }
 
                         Atom* lba = get_atom(aadef->aabonds[i]->bname);
                         if (lba)
                         {
-                            lbb = lba->get_bonds();
-                            if (lbb)
+                            lba->fetch_bonds(lbb);
+                            if (lbb[0])
                             {
                                 cout << lba->name << " is bonded to:";
                                 int o, ag = lba->get_geometry();
                                 for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
                                 cout << "." << endl;
-                                delete[] lbb;
                             }
                         }
                         else cout << aadef->aabonds[i]->bname << " not found." << endl;
@@ -1804,7 +1795,8 @@ Bond** AminoAcid::get_rotatable_bonds()
     // cout << name << " ";
     for (i=0; atoms[i]; i++)
     {
-        Bond** lb = atoms[i]->get_bonds();
+        Bond* lb[16];
+        atoms[i]->fetch_bonds(lb);
         int g = atoms[i]->get_geometry();
         for (j=0; j<g; j++)
         {
@@ -1827,7 +1819,6 @@ Bond** AminoAcid::get_rotatable_bonds()
             }
             else lb[j]->can_rotate = false;
         }
-        if (lb) delete[] lb;
     }
     // cout << endl;
 
@@ -1863,7 +1854,8 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
     int i,j, bonds=0;
     for (i=0; atoms[i]; i++)
     {
-        Bond** lb = atoms[i]->get_bonds();
+        Bond* lb[16];
+        atoms[i]->fetch_bonds(lb);
         int g = atoms[i]->get_geometry();
         for (j=0; j<g; j++)
         {
@@ -1876,7 +1868,6 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
                 btemp[bonds] = 0;
             }
         }
-        if (lb) delete[] lb;
     }
 
     Bond** retval = new Bond*[bonds+1];
@@ -1919,12 +1910,12 @@ float Molecule::get_internal_clashes()
                     cout << atoms[i]->name << " clashes with " << atoms[j]->name << " by " << lclash << " cu. A. resulting in " << clash << endl;
                     int g = atoms[i]->get_geometry();
                     cout << "Geometry: " << g << endl;
-                    Bond** b = atoms[i]->get_bonds();
+                    Bond* b[16];
+                    atoms[i]->fetch_bonds(b);
                     int k;
                     for (k=0; k<g; k++)
                         cout << atoms[i]->name << " is bonded to " << hex << b[k]->btom << dec << " "
                              << (b[k]->btom ? b[k]->btom->name : "") << "." << endl;
-                    delete[] b;
                 }
             }
         }
@@ -3691,7 +3682,8 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
     {
     	// cout << ring_members[i]->name << " ";
         ringsz = i+1;
-        Bond** ab = ring_members[i]->get_bonds();
+        Bond* ab[16];
+        ring_members[i]->fetch_bonds(ab);
         bool haspi = false;
         for (j=0; ab[j]; j++)
             if (ab[j]->cardinality > 1 && ab[j]->cardinality < 2) haspi = true;
@@ -3710,7 +3702,8 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
 		cout << "Notice: empty ring passed to Molecule::make_coplanar_ring()." << endl;
 		return;
 	}
-    Bond** a0b = ring_members[0]->get_bonds();
+    Bond* a0b[16];
+    ring_members[0]->fetch_bonds(a0b);
     if (!a0b[0]->btom || !a0b[1]->btom)
     {
         cout << "Attempted to form coplanar ring with starting atom bonded to fewer than two other atoms." << endl;
@@ -3811,8 +3804,9 @@ float Molecule::close_loop(Atom** path, float lcard)
     for (i=0; path[i]; i++)
     {
         path[i]->doing_ring_closure = true;
-        Bond** b = path[i]->get_bonds();
-        if (!b) continue;
+        Bond* b[16];
+        path[i]->fetch_bonds(b);
+        if (!b[0]) continue;
         int geo = path[i]->get_geometry();
 
         for (j=0; j<geo; j++)
@@ -3829,7 +3823,6 @@ float Molecule::close_loop(Atom** path, float lcard)
         }
 
         last = path[i];
-        delete[] b;
     }
     rotables[k] = 0;
     if (_DBGCLSLOOP) cout << "Close Loop: found " << k << " rotables." << endl;
@@ -4226,19 +4219,18 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
     float error = 0;
     Point bloc;
     Atom* btom;
-    Bond** b;
+    Bond* b[16];
     int g, bg;
     float b_bond_angle;
     LocatedVector lv;
 
     // Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
-    b = atoms[i]->get_bonds();
-    if (!b) return error;
+    atoms[i]->fetch_bonds(b);
+    if (!b[0]) return error;
     btom = b[0]->btom;
     float card = b[0]->cardinality;
     if (!btom)
     {
-        delete[] b;
         return error;
     }
 
@@ -4326,7 +4318,6 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
         error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
     }
 
-    delete[] b;
     return error+bestscore;
 }
 
@@ -4365,10 +4356,9 @@ float Molecule::correct_structure(int iters)
         for (i=0; atoms[i]; i++)
         {
             // Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
-            b = atoms[i]->get_bonds();
-            if (!b) return error;
+            atoms[i]->fetch_bonds(b);
+            if (!b[0]) return error;
             btom = b[0]->btom;
-            delete[] b;
             if (!btom) return error;
 
             // TODO

@@ -184,7 +184,7 @@ public:
     }
 
     // Bond functions.
-    Bond** get_bonds();
+    void fetch_bonds(Bond** result);
     int get_bonded_atoms_count();
     int get_bonded_heavy_atoms_count();
     int get_count_pi_bonds();

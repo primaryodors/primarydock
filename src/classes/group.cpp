@@ -518,7 +518,8 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                         break;
                     }
 
-                    Bond** bonds = matches[l*per_grp+j]->get_bonds();
+                    Bond* bonds[16];
+                    matches[l*per_grp+j]->fetch_bonds(bonds);
                     for (m=0; bonds[m]; m++)
                     {
                         if (!bonds[m]->btom) continue;
@@ -563,7 +564,8 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                     }
                     else skip_dirty = true;
 
-                    Bond** bonds = a->get_bonds();
+                    Bond* bonds[16];
+                    a->fetch_bonds(bonds);
                     for (m=0; bonds[m]; m++)
                     {
                         if (!bonds[m]->btom) continue;

@@ -176,7 +176,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                 N = atoms[i]->is_bonded_to(PNICTOGEN, 1);
                 if (N)
                 {
-                    Bond** ab = atoms[i]->get_bonds();
+                    Bond* ab[16];
+                    atoms[i]->fetch_bonds(ab);
                     for (j=0; ab[j]; j++)
                     {
                         if (ab[j]->btom
@@ -219,8 +220,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
                                 if (N->num_bonded_to("H") > 1)		// Proline conditional.
                                 {
-                                    if (ab) delete[] ab;
-                                    ab = N->get_bonds();
+                                    N->fetch_bonds(ab);
                                     l = 0;
                                     int n;
                                     for (n=0; ab[n]; n++)
@@ -247,7 +247,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                             }
                         }
                     }
-                    delete[] ab;
                 }
             }
         }
@@ -266,7 +265,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                 j = atom_prev[i];
                 if (atom_Greek[j] > 0 && !atom_Greek[i]) atom_Greek[i] = atom_Greek[j]+1;
 
-                Bond** ab = atoms[i]->get_bonds();
+                Bond* ab[16];
+                atoms[i]->fetch_bonds(ab);
                 int ag = atoms[i]->get_geometry();
                 for (j=0; j<ag; j++)
                 {
@@ -279,8 +279,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                         }
                     }
                 }
-
-                delete[] ab;
             }
         }
 
@@ -291,7 +289,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
             {
                 if (atom_isheavy[i] && atom_Greek[i] > 1)
                 {
-                    Bond** ab = atoms[i]->get_bonds();
+                    Bond* ab[16];
+                    atoms[i]->fetch_bonds(ab);
                     int ag = atoms[i]->get_geometry();
                     for (j=0; j<ag; j++)
                     {
@@ -312,8 +311,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                             }
                         }
                     }
-
-                    delete[] ab;
                 }
             }
         }
@@ -513,19 +510,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         // Delete any atoms that did not get Greeked.
         for (i=atcount-1; i>=0; i--) if (!atom_Greek[i]) delete_atom(atoms[i]);
 
-        // Check correct bonding.
-        /*for (i=0; atoms[i]; i++)
-        {
-        	Bond** bb = atoms[i]->get_bonds();
-        	int ag = atoms[i]->get_geometry();
-        	for (j=0; j<ag; j++)
-        	{
-        		if (bb[j]->btom) cout << atoms[i]->residue << ":" << atoms[i]->name
-        							  << cardinality_printable(bb[j]->cardinality)
-        							  << bb[j]->btom->residue << ":" << bb[j]->btom->name << endl;
-        	}
-        }*/
-
         if (prevaa)
         {
             Atom* prevC = prevaa->get_atom("C");
@@ -559,7 +543,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         // cout << *this << endl;
         for (i=0; atoms[i]; i++)
         {
-            Bond** bb = atoms[i]->get_bonds();
+            Bond* bb[16];
+            atoms[i]->fetch_bonds(bb);
             int bg = atoms[i]->get_geometry();
 
             if (!i)
@@ -645,8 +630,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                     n++;
                 }
             }
-
-            delete[] bb;
         }
 
         aa_defs[idx].aabonds = new AABondDef*[n+2];
@@ -2148,17 +2131,16 @@ void AminoAcid::hydrogenate(bool steric_only)
         onlyone[i][j] = nullptr;
     }
 
-    Bond** bt;
+    Bond* bt[16];
     Bond* bb;
     Atom* heavy;
 
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->get_Z() > 1) continue;
-        bt = atoms[i]->get_bonds();
+        atoms[i]->fetch_bonds(bt);
         if (!bt) continue;
         bb = bt[0];
-        delete[] bt;
         if (!bb) continue;
         heavy = bb->btom;
         if (!heavy) continue;
@@ -2229,14 +2211,13 @@ void AminoAcid::hydrogenate(bool steric_only)
         for (i=0; atoms[i]; i++)
             if (atoms[i]->get_Z() == 1)
             {
-                bt = atoms[i]->get_bonds();
+                atoms[i]->fetch_bonds(bt);
                 if (bt)
                 {
                     bb = bt[0];
                     if (bb && bb->btom == cursor)
                         atomtmp[l++] = atoms[i];
                 }
-                delete[] bt;
             }
     }
 
@@ -2260,14 +2241,13 @@ void AminoAcid::hydrogenate(bool steric_only)
                         for (k=0; atoms[k]; k++)
                             if (atoms[k]->get_Z() == 1)
                             {
-                                bt = atoms[k]->get_bonds();
+                                atoms[k]->fetch_bonds(bt);
                                 if (bt)
                                 {
                                     bb = bt[0];
                                     if (bb && bb->btom == cursor)
                                         atomtmp[l++] = atoms[k];
                                 }
-                                delete[] bt;
                             }
                     }
                 }
@@ -2288,14 +2268,13 @@ void AminoAcid::hydrogenate(bool steric_only)
         for (i=0; atoms[i]; i++)
             if (atoms[i]->get_Z() == 1)
             {
-                bt = atoms[i]->get_bonds();
+                atoms[i]->fetch_bonds(bt);
                 if (bt)
                 {
                     bb = bt[0];
                     if (bb && bb->btom == cursor)
                         atomtmp[l++] = atoms[i];
                 }
-                delete[] bt;
             }
     }
 
@@ -2438,15 +2417,15 @@ Atom* AminoAcid::HN_or_substitute()
         Atom* a = get_atom("N");
         if (!a) return nullptr;
         int i;
-        Bond** bb = a->get_bonds();
-        if (!bb) return nullptr;
+        Bond* bb[16];
+        a->fetch_bonds(bb);
+        if (!bb[0]) return nullptr;
         int g = a->get_geometry();
 
         for (i=0; i<g; i++)
         {
             if (bb[i]->btom && strcmp(bb[i]->btom->name, "CA")) return bb[i]->btom;
         }
-        delete[] bb;
     }
     return retval;
 }

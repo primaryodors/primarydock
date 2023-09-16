@@ -1177,6 +1177,7 @@ void Molecule::find_paths()
     if (!atoms || !atoms[0]) return;
 
     int h, i, j, k, l, m, n = 0, p, limit;
+    Bond* b[16];
     for (i=0; atoms[i]; i++)
     {
         n += atoms[i]->get_bonded_heavy_atoms_count();
@@ -1189,7 +1190,7 @@ void Molecule::find_paths()
     atcount = get_atom_count();
 
     Atom* a = atoms[0];
-    Bond** b = a->get_bonds();
+    a->fetch_bonds(b);
     if (!b) return;
     n=0;
     for (i=0; b[i]; i++)
@@ -1203,7 +1204,6 @@ void Molecule::find_paths()
         paths[n][2] = nullptr;
         n++;
     }
-    delete b;
 
     int num_added;
     do
@@ -1215,7 +1215,7 @@ void Molecule::find_paths()
         {
             m = path_get_length(i);
             a = path_get_terminal_atom(i);
-            b = a->get_bonds();
+            a->fetch_bonds(b);
             if (!b) continue;
 
             k=0;
@@ -1282,8 +1282,6 @@ void Molecule::find_paths()
             #if DBG_FND_RNGS
             cout << endl;
             #endif
-
-            delete b;
         }
 
         for (j=n-2; j>=0; j--)

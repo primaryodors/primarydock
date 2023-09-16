@@ -1893,12 +1893,13 @@ float Molecule::get_internal_clashes()
         for (j=i+1; atoms[j]; j++)
         {
             if (atoms[i]->is_bonded_to(atoms[j])) continue;
-            if (atoms[i]->shares_bonded_with(atoms[j])) continue;
 
             Point ptb = atoms[j]->get_location();
             float bvdW = atoms[j]->get_vdW_radius();
 
             r = pta.get_3d_distance(&ptb);
+            if (r >= 0.9 && atoms[i]->shares_bonded_with(atoms[j])) continue;
+
             if (!r) r += 10e-15;
             if (r < avdW + bvdW)
             {
@@ -2996,6 +2997,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
             if ((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN))
             {
+                float self_clash = 1.1*a->get_internal_clashes();
                 Bond** bb = a->get_rotatable_bonds();
                 if (bb)
                 {
@@ -3012,7 +3014,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             {
                                 bb[q]->rotate(_fullrot_steprad, false);
                                 tryenerg = cfmol_multibind(a, nearby);
-                                if (tryenerg > benerg)
+                                if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
                                 {
                                     benerg = tryenerg;
                                     best_theta = theta;
@@ -3052,7 +3054,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                             tryenerg = cfmol_multibind(a, nearby);
 
-                            if (tryenerg > benerg)
+                            if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
                             {
                                 benerg = tryenerg;
                                 pib.copy_state(a);

@@ -1654,7 +1654,7 @@ void prepare_initb()
                 delete_me = protein->all_residues_as_molecules(),
                 iters*pre_ligand_iteration_ratio
             );
-            delete[] delete_me;
+            delete delete_me;
         }
         #endif
 
@@ -2884,7 +2884,7 @@ _try_again:
                         // delete[] b;
                     }
 
-                    delete[] sidechain_bondrots[i];
+                    delete sidechain_bondrots[i];
                 }
             }
 

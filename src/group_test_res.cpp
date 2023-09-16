@@ -9,13 +9,6 @@
 
 using namespace std;
 
-bool file_exists(std::string fname)
-{
-    struct stat s;
-    if (stat(fname.c_str(), &s) == 0) return true;
-    else return false;
-}
-
 int main(int argc, char** argv)
 {
     Molecule m("Testing");

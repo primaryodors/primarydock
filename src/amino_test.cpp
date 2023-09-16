@@ -97,7 +97,7 @@ int main(int argc, char** argv)
                     else cout << "no atoms.";
 
                     cout << endl;
-                    delete[] baa;
+                    delete baa;
                 }
             }
             else cout << "No rotatable bonds." << endl;

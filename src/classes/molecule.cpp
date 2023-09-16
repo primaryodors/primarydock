@@ -1085,6 +1085,9 @@ int Molecule::add_ring(Atom** atoms)
 #define DBG_FND_RNGS 0
 int Molecule::identify_rings()
 {
+    find_paths();
+    // return 0;
+
     Atom** ringstmp[256];
     int ringcount;
     Atom *a;
@@ -1094,7 +1097,10 @@ int Molecule::identify_rings()
     Atom *cnva, *cnvb;
     Atom *ra, *rb;
 
-    ringcount = 0;
+    if (!rings) return 0;
+
+    for (ringcount = 0; rings[ringcount]; ringcount++);
+    return ringcount;
 
     // Start at any atom, mark it "used".
     a = atoms[0];
@@ -1345,7 +1351,7 @@ int Molecule::identify_rings()
                 }
             }
 
-            delete[] b;
+            delete b;
 
             // If there are no "unused" bonded atoms, delete the chain.
             if (!k) chainlen[i] = 0;
@@ -1357,13 +1363,225 @@ int Molecule::identify_rings()
     }
     while (active);
 
-    // if (b) delete[] b;
-    for (i=0; ringstmp[i]; i++) delete[] ringstmp[i];
+    for (i=0; ringstmp[i]; i++) delete ringstmp[i];
 
     for (i=0; atoms[i]; i++) atoms[i]->used = false;
 
     // Return the number of rings found.
     return found_rings;
+}
+
+int Molecule::path_contains_atom(int path_idx, Atom* a)
+{
+    if (!paths) return 0;
+    if (!paths[path_idx]) return 0;
+
+    int i;
+    for (i=0; paths[path_idx][i]; i++)
+        if (paths[path_idx][i] == a) return i+1;
+
+    return 0;
+}
+
+int Molecule::path_get_length(int path_idx)
+{
+    if (!paths) return 0;
+    if (!paths[path_idx]) return 0;
+
+    int i;
+    for (i=0; paths[path_idx][i]; i++);
+
+    return i;
+}
+
+Atom* Molecule::path_get_terminal_atom(int path_idx)
+{
+    if (!paths) return nullptr;
+    if (!paths[path_idx]) return nullptr;
+
+    int n = path_get_length(path_idx);
+    return paths[path_idx][n-1];
+}
+
+void Molecule::copy_path(int old_idx, int new_idx)
+{
+    if (!paths) return;
+    if (!paths[old_idx]) return;
+
+    if (!paths[new_idx]) paths[new_idx] = new Atom*[get_atom_count()];
+    int i;
+    for (i=0; paths[old_idx][i]; i++)
+        paths[new_idx][i] = paths[old_idx][i];
+    
+    paths[new_idx][i] = nullptr;
+}
+
+bool Molecule::path_is_subset_of(int short_path, int long_path)
+{
+    if (!paths) return false;
+    if (!paths[long_path]) return false;
+    if (!paths[short_path]) return true;
+
+    int i;
+    for (i=0; paths[short_path][i]; i++)
+    {
+        if (paths[long_path][i] != paths[short_path][i]) return false;
+    }
+
+    return true;
+}
+
+void Molecule::echo_path(int i)
+{
+    int j;
+    cout << i << ":";
+    for (j=0; paths[i][j]; j++)
+        cout << " " << paths[i][j]->name;
+    
+    cout << endl;
+}
+
+void Molecule::find_paths()
+{
+    if (!atoms || !atoms[0]) return;
+
+    int h, i, j, k, l, m, n = 0, p, limit;
+    for (i=0; atoms[i]; i++)
+    {
+        n += atoms[i]->get_bonded_heavy_atoms_count();
+    }
+
+    paths = new Atom**[n];              // Total number of paths shouldn't exceed n.
+    for (i=0; i<n; i++) paths[i] = nullptr;
+    limit = n;
+
+    atcount = get_atom_count();
+
+    Atom* a = atoms[0];
+    Bond** b = a->get_bonds();
+    if (!b) return;
+    n=0;
+    for (i=0; b[i]; i++)
+    {
+        if (!b[i]->btom) continue;
+        if (b[i]->btom->get_Z() < 2) continue;
+        paths[n] = new Atom*[atcount];
+        paths[n][0] = a;
+        paths[n][1] = b[i]->btom;
+        paths[n][2] = nullptr;
+        n++;
+    }
+    delete b;
+
+    int num_added;
+    do
+    {
+        num_added = 0;
+        p = n;
+
+        for (i=0; i<p; i++)
+        {
+            m = path_get_length(i);
+            a = path_get_terminal_atom(i);
+            b = a->get_bonds();
+            if (!b) continue;
+
+            k=0;
+            for (j=0; b[j]; j++)
+            {
+                if (!b[j]->btom) continue;
+                if (b[j]->btom->get_Z() < 2) continue;
+                if (b[j]->btom->get_bonded_heavy_atoms_count() < 2) continue;
+
+                #if DBG_FND_RNGS
+                cout << "Trying " << b[j]->btom->name << "... ";
+                #endif
+
+                l = path_contains_atom(i, b[j]->btom);
+                if (l > 0)
+                {
+                    if ((m-l) > 1)
+                    {
+                        Atom* ring_atoms[m];
+                        for (h=l-1; h<m; h++)
+                        {
+                            ring_atoms[h-l] = paths[i][h];
+                        }
+                        ring_atoms[h-l] = b[j]->btom;
+                        h++;
+                        ring_atoms[h-l] = nullptr;
+
+                        add_ring(ring_atoms);
+                        #if DBG_FND_RNGS
+                        cout << "Created ring from ";
+                        Atom::dump_array(ring_atoms);
+                        #endif
+                    }
+                }
+                else
+                {
+                    paths[n] = new Atom*[atcount];
+                    copy_path(i, n);
+                    paths[n][m] = b[j]->btom;
+                    paths[n][m+1] = nullptr;
+
+                    #if DBG_FND_RNGS
+                    cout << "Created ";
+                    echo_path(n);
+                    #endif
+
+                    n++;
+                    if (n >= limit)
+                    {
+                        cout << "Ran out of path space in Molecule::find_paths(). Lives depend on increasing the limit." << endl;
+
+                        #if DBG_FND_RNGS
+                        goto _exit_paths;
+                        #else
+                        throw -1;
+                        #endif
+                    }
+                    k++;
+                    num_added++;
+                }
+            }
+
+            #if DBG_FND_RNGS
+            cout << endl;
+            #endif
+
+            delete b;
+        }
+
+        for (j=n-2; j>=0; j--)
+        {
+            if (path_is_subset_of(j, n-1))
+            {
+                n--;
+                if (path_get_length(j) == path_get_length(n)) num_added--;
+
+                #if DBG_FND_RNGS
+                cout << "Replacing ";
+                echo_path(j);
+                cout << "...with ";
+                echo_path(n);
+                cout << endl;
+                #endif
+
+                copy_path(n, j);
+                delete paths[n];
+                paths[n] = nullptr;
+            }
+        }
+    } while (num_added);
+
+    _exit_paths:
+    #if DBG_FND_RNGS
+    cout << "Paths:" << endl;
+    for (i=0; i<limit && paths[i]; i++) echo_path(i);
+    #else
+    ;
+    #endif
 }
 
 void Molecule::identify_acidbase()

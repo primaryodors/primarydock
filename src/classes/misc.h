@@ -60,6 +60,7 @@ std::string str_pad(const std::string &str, int pad_length, std::string pad_stri
 std::string cardinality_printable(float card);
 float protonation(float pKa);
 float larger(float v1, float v2);
+bool file_exists(std::string fname);
 
 #if active_persistence
 float residue_binding_multiplier(int resno);

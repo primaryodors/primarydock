@@ -1084,6 +1084,9 @@ int Molecule::add_ring(Atom** atoms)
 #define DBG_FND_RNGS 0
 int Molecule::identify_rings()
 {
+    find_paths();
+    // return 0;
+
     Atom** ringstmp[256];
     int ringcount;
     Atom *a;
@@ -1093,275 +1096,225 @@ int Molecule::identify_rings()
     Atom *cnva, *cnvb;
     Atom *ra, *rb;
 
-    ringcount = 0;
+    if (!rings) return 0;
 
-    // Start at any atom, mark it "used".
-    a = atoms[0];
-    a->used = true;
+    for (ringcount = 0; rings[ringcount]; ringcount++);
+    return ringcount;
+}
 
-    #if DBG_FND_RNGS
-    cout << "Identifying rings for " << (name ? name : "(no name molecule)") << "... " << endl;
-    #endif
+int Molecule::path_contains_atom(int path_idx, Atom* a)
+{
+    if (!paths) return 0;
+    if (!paths[path_idx]) return 0;
 
-    for (i=0; i<256; i++) ringstmp[i] = nullptr;
+    int i;
+    for (i=0; paths[path_idx][i]; i++)
+        if (paths[path_idx][i] == a) return i+1;
 
-    // For each "unused" valence>1 atom attached to the start atom, mark it "used" and start a chain.
-    // Include the start atom as the first element of the chain.
+    return 0;
+}
 
-    Bond* b[16];
-    a->fetch_bonds(b);
-    if (!b[0]) return found_rings;
-    for (i=0; b[i]; i++)
+int Molecule::path_get_length(int path_idx)
+{
+    if (!paths) return 0;
+    if (!paths[path_idx]) return 0;
+
+    int i;
+    for (i=0; paths[path_idx][i]; i++);
+
+    return i;
+}
+
+Atom* Molecule::path_get_terminal_atom(int path_idx)
+{
+    if (!paths) return nullptr;
+    if (!paths[path_idx]) return nullptr;
+
+    int n = path_get_length(path_idx);
+    return paths[path_idx][n-1];
+}
+
+void Molecule::copy_path(int old_idx, int new_idx)
+{
+    if (!paths) return;
+    if (!paths[old_idx]) return;
+
+    if (!paths[new_idx]) paths[new_idx] = new Atom*[get_atom_count()];
+    int i;
+    for (i=0; paths[old_idx][i]; i++)
+        paths[new_idx][i] = paths[old_idx][i];
+    
+    paths[new_idx][i] = nullptr;
+}
+
+bool Molecule::path_is_subset_of(int short_path, int long_path)
+{
+    if (!paths) return false;
+    if (!paths[long_path]) return false;
+    if (!paths[short_path]) return true;
+
+    int i;
+    for (i=0; paths[short_path][i]; i++)
     {
-        if (b[i]->btom)
-            if (b[i]->btom->get_valence() > 1)
-            {
-                ringstmp[chains] = new Atom*[256];
-                for (j=0; j<256; j++) ringstmp[chains][j] = nullptr;
-                ringstmp[chains][0] = a;
-                ringstmp[chains][1] = b[i]->btom;
-                ringstmp[chains][2] = 0;
-                is_ring[chains] = 0;
-                chainlen[chains] = 2;
-                b[i]->btom->used = true;
-                chains++;
-            }
+        if (paths[long_path][i] != paths[short_path][i]) return false;
     }
 
-    if (!chains) return found_rings;
+    return true;
+}
 
-    // LOOP
+void Molecule::echo_path(int i)
+{
+    int j;
+    cout << i << ":";
+    for (j=0; paths[i][j]; j++)
+        cout << " " << paths[i][j]->name;
+    
+    cout << endl;
+}
+
+void Molecule::find_paths()
+{
+    if (!atoms || !atoms[0]) return;
+
+    int h, i, j, k, l, m, n = 0, p, limit;
+    for (i=0; atoms[i]; i++)
+    {
+        n += atoms[i]->get_bonded_heavy_atoms_count();
+    }
+
+    paths = new Atom**[n];              // Total number of paths shouldn't exceed n.
+    for (i=0; i<n; i++) paths[i] = nullptr;
+    limit = n;
+
+    atcount = get_atom_count();
+
+    Atom* a = atoms[0];
+    Bond** b = a->get_bonds();
+    if (!b) return;
+    n=0;
+    for (i=0; b[i]; i++)
+    {
+        if (!b[i]->btom) continue;
+        if (b[i]->btom->get_Z() < 2) continue;
+        if (b[i]->btom->residue && b[i]->btom->residue != a->residue) continue;
+        paths[n] = new Atom*[atcount];
+        paths[n][0] = a;
+        paths[n][1] = b[i]->btom;
+        paths[n][2] = nullptr;
+        n++;
+    }
+    delete b;
+
+    int num_added;
     do
     {
-        active = 0;
+        num_added = 0;
+        p = n;
 
-        #if DBG_FND_RNGS
-        for (i=0; i<chains; i++)
-            if (ringstmp[i][0])
-            {
-                cout << "Begin chain " << i << ": ";
-                Atom::dump_array(ringstmp[i]);
-                cout << endl;
-            }
-        #endif
-
-        for (i=0; i<chains; i++)
+        for (i=0; i<p; i++)
         {
-            if (!ringstmp[i] || !chainlen[i]) continue;
+            m = path_get_length(i);
+            a = path_get_terminal_atom(i);
+            b = a->get_bonds();
+            if (!b) continue;
 
-            cnva = cnvb = 0;
-            cnvchain = 0;
-
-            if (!(a = ringstmp[i][chainlen[i]-1])) continue;
-            #if DBG_FND_RNGS
-            cout << "Chain " << i << " ends in atom " << a->name << endl;
-            #endif
-
-            if (!cnva)
-            {
-                for (l=0; l<chains; l++)
-                {
-                    #if DBG_FND_RNGS
-                    cout << "Preparing to check chain " << i << " against chain " << l << " for bond convergence...\n";
-                    #endif
-
-                    if (l != i && chainlen[l] && ringstmp[l][chainlen[l]-1])
-                    {
-                        #if DBG_FND_RNGS
-                        cout << "Checking chain " << i << " against chain " << l << " for bond convergence...\n";
-                        #endif
-
-                        // If two chains converge on a single atom, this is your one converging ato
-                        if (ringstmp[l][chainlen[l]-1] == a)
-                        {
-                            cnva = a;
-                            cnvb = 0;
-
-                            #if DBG_FND_RNGS
-                            cout << "****** Chains " << i << " and " << l << " converge on atom " << cnva->name << " ******" << endl;
-                            #endif
-
-                            cnvchain = l;
-                            break;
-                        }
-                        // If two chains converge on two atoms that are bonded to each other, then there are two converging atoms.
-                        else if (ringstmp[l][chainlen[l]-1]->is_bonded_to(a))
-                        {
-                            cnva = a;
-                            cnvb = ringstmp[l][chainlen[l]-1];
-
-                            #if DBG_FND_RNGS
-                            cout << "***** Chains " << i << " and " << l << " converge on atoms " << cnva->name << " and " << cnvb->name << " *****" << endl;
-                            #endif
-
-                            cnvchain = l;
-                            break;
-                        }
-                    }
-                }
-            _done_l:
-                ;
-            }
-
-
-
-            if (cnva && cnvchain != i)
-            {
-                // Count backwards from one chain until find the diverging atom, then jump to the other chain and count forward
-                // until reach the/a converging atom. This is a RING; add it to the list.
-                n = chainlen[i] + chainlen[cnvchain];
-                Atom* ring_atoms[n];
-                for (m=0; m<n; m++) ring_atoms[m] = nullptr;
-                n = 0;
-
-                #if DBG_FND_RNGS
-                cout << "Counting backwards from " << chainlen[i]-1 << endl;
-                #endif
-
-                for (m = chainlen[i]-1; m >= 0; m--)
-                {
-                    ring_atoms[n++] = ringstmp[i][m];
-
-                    #if DBG_FND_RNGS
-                    cout << "m: " << ringstmp[i][m]->name << " ";
-                    #endif
-
-                    l = in_array(reinterpret_cast<void*>(ringstmp[i][m]),
-                                 reinterpret_cast<void**>(ringstmp[cnvchain])
-                                );
-                    if (l >= 0)
-                    {
-                        l++;
-
-                        #if DBG_FND_RNGS
-                        cout << "\nCounting forwards from " << l << endl;
-                        #endif
-
-                        for (; ringstmp[cnvchain][l]; l++)
-                        {
-                            #if DBG_FND_RNGS
-                            cout << "l: " << ringstmp[cnvchain][l]->name << " ";
-                            #endif
-
-                            ring_atoms[n++] = ringstmp[cnvchain][l];
-
-                            #if DBG_FND_RNGS
-                            cout << "Building " << n << " membered ring: ";
-                            Atom::dump_array(ring_atoms);
-                            cout << endl;
-                            #endif
-
-                            if (n >= 3 && (ringstmp[cnvchain][l] == cnva || ringstmp[cnvchain][l] == cnvb))
-                            {
-                                #if DBG_FND_RNGS
-                                cout << "Found " << n << " membered ring: ";
-                                Atom::dump_array(ring_atoms);
-                                cout << endl;
-                                #endif
-
-                                ring_atoms[n] = 0;
-
-                                int nringid = add_ring(ring_atoms);
-                                #if _ALLOW_FLEX_RINGS
-                                if (!rings[nringid]->is_coplanar())
-                                #else
-                                if (1)
-                                #endif
-                                {
-                                    for (p=0; (ra = ring_atoms[p]); p++)
-                                    {
-                                        rb = ring_atoms[p ? (p-1) : (n-1)];
-                                        int card = (int)ra->is_bonded_to(rb);
-
-                                        Bond* ab = ra->get_bond_between(rb);
-                                        ab->can_rotate = false;
-                                        ab = rb->get_bond_between(ra);
-                                        ab->can_rotate = false;
-                                    }
-                                }
-
-                                goto _exit_m;
-                            }
-                        }
-                    }
-                }
-            _exit_m:
-                ;
-
-                // TODO: The algorithm can sometimes give incorrect results in polycyclic molecules
-                // if a second ring converges onto a used ato
-            }
-            // if (b) delete[] b;
-
-
-
-            // Advance each chain one step further, incorporating only "unused" atoms.
-            a->fetch_bonds(b);
-            if (!b[0]) continue;
             k=0;
             for (j=0; b[j]; j++)
             {
-                if (b[j] && b[j]->btom && b[j]->btom->get_valence() > 1)
+                if (!b[j]->btom) continue;
+                if (b[j]->btom->get_Z() < 2) continue;
+                if (b[j]->btom->get_bonded_heavy_atoms_count() < 2) continue;
+                if (b[j]->btom->residue && b[j]->btom->residue != a->residue) continue;
+
+                #if DBG_FND_RNGS
+                cout << "Trying " << b[j]->btom->name << "... ";
+                #endif
+
+                l = path_contains_atom(i, b[j]->btom);
+                if (l > 0)
                 {
-                    if (!b[j]->btom->used)
+                    if ((m-l) > 1)
                     {
-                        // If there is more than one "unused" bonded atom of an eligible element, create new chains for the surplus atoms.
-                        if (k)
+                        Atom* ring_atoms[m];
+                        for (h=l-1; h<m; h++)
                         {
-                            ringstmp[chains] = new Atom*[256];
-                            for (l=0; l<chainlen[i]-1; l++)
-                                ringstmp[chains][l] = ringstmp[i][l];
-                            ringstmp[chains][l] = b[j]->btom;
-                            ringstmp[chains][l+1] = 0;
-                            is_ring[chains] = 0;
-                            chainlen[chains] = chainlen[i];
-                            b[j]->btom->used = true;
-
-                            #if DBG_FND_RNGS
-                            cout << "Another new chain " << chains << ": ";
-                            Atom::dump_array(ringstmp[chains]);
-                            cout << endl;
-                            #endif
-
-                            chains++;
-                            k++;
-                            // a = 0;
-                            // return 0;
+                            ring_atoms[h-l] = paths[i][h];
                         }
-                        else
-                        {
-                            ringstmp[i][chainlen[i]++] = a = b[j]->btom;
-                            ringstmp[i][chainlen[i]] = 0;
-                            b[j]->btom->used = true;
-                            k++;
+                        ring_atoms[h-l] = b[j]->btom;
+                        h++;
+                        ring_atoms[h-l] = nullptr;
 
-                            #if DBG_FND_RNGS
-                            cout << "Chain " << i << ": ";
-                            Atom::dump_array(ringstmp[i]);
-                            cout << endl;
-                            #endif
-                        }
+                        add_ring(ring_atoms);
+                        #if DBG_FND_RNGS
+                        cout << "Created ring from ";
+                        Atom::dump_array(ring_atoms);
+                        #endif
                     }
+                }
+                else
+                {
+                    paths[n] = new Atom*[atcount];
+                    copy_path(i, n);
+                    paths[n][m] = b[j]->btom;
+                    paths[n][m+1] = nullptr;
+
+                    #if DBG_FND_RNGS
+                    cout << "Created ";
+                    echo_path(n);
+                    #endif
+
+                    n++;
+                    if (n >= limit)
+                    {
+                        cout << "Ran out of path space in Molecule::find_paths(). Lives depend on increasing the limit." << endl;
+
+                        #if DBG_FND_RNGS
+                        goto _exit_paths;
+                        #else
+                        throw -1;
+                        #endif
+                    }
+                    k++;
+                    num_added++;
                 }
             }
 
-            // If there are no "unused" bonded atoms, delete the chain.
-            if (!k) chainlen[i] = 0;
-            else active++;
+            #if DBG_FND_RNGS
+            cout << endl;
+            #endif
 
-        }		// for i
+            delete b;
+        }
 
-        //cout << "------" << endl;
-    }
-    while (active);
+        for (j=n-2; j>=0; j--)
+        {
+            if (path_is_subset_of(j, n-1))
+            {
+                n--;
+                if (path_get_length(j) == path_get_length(n)) num_added--;
 
-    // if (b) delete[] b;
-    for (i=0; ringstmp[i]; i++) delete[] ringstmp[i];
+                #if DBG_FND_RNGS
+                cout << "Replacing ";
+                echo_path(j);
+                cout << "...with ";
+                echo_path(n);
+                cout << endl;
+                #endif
 
-    for (i=0; atoms[i]; i++) atoms[i]->used = false;
+                copy_path(n, j);
+                delete paths[n];
+                paths[n] = nullptr;
+            }
+        }
+    } while (num_added);
 
-    // Return the number of rings found.
-    return found_rings;
+    _exit_paths:
+    #if DBG_FND_RNGS
+    cout << "Paths:" << endl;
+    for (i=0; i<limit && paths[i]; i++) echo_path(i);
+    #else
+    ;
+    #endif
 }
 
 void Molecule::identify_acidbase()

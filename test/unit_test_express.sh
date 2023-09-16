@@ -195,6 +195,17 @@ else
 fi
 
 
+MOLECULE="eucalyptol"
+test/bond_rotation_test "O2C1(CCC(CC1)C2(C)C)C" | sed '/^#/d' > testdata/received/brot.$MOLECULE.received.txt
+RESULT=$(diff --unified testdata/brot.$MOLECULE.approved.txt testdata/received/brot.$MOLECULE.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}Rotatable bond test succeeded for $MOLECULE.${NC}\n"
+else
+    printf "${RED}Rotatable bond test FAILED for $MOLECULE.${NC}\n"
+    diff --color --unified testdata/brot.$MOLECULE.approved.txt testdata/received/brot.$MOLECULE.received.txt
+fi
+
+
 MOLECULE="dipeptide_GG"
 test/bond_rotation_test "NCC(=O)NCC(=O)O" | sed '/^#/d' > testdata/received/brot.$MOLECULE.received.txt
 RESULT=$(diff --unified testdata/brot.$MOLECULE.approved.txt testdata/received/brot.$MOLECULE.received.txt)

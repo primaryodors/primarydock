@@ -640,7 +640,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         }
         aa_defs[idx].aabonds[i] = nullptr;
 
-        delete[] aabd;
+        delete aabd;
     }
 
     ensure_pi_atoms_coplanar();
@@ -1317,7 +1317,7 @@ _return_added:
             }
             lra[j] = nullptr;
 
-            delete[] ringa;
+            delete ringa;
             rings[i] = new Ring(lra, aadef->aarings[i]->get_type());
         }
         rings[i] = nullptr;
@@ -1393,7 +1393,7 @@ void AminoAcid::load_aa_defs()
                         tbdctr = 0;
                         proline_like = false;
 
-                        if (tmpbdefs) delete[] tmpbdefs;
+                        if (tmpbdefs) delete tmpbdefs;
                     }
 
                     if (!aa_defs[idx]._1let)

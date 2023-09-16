@@ -24,13 +24,6 @@ enum TMR6ActivationType
     Rock6Other
 };
 
-bool file_exists(std::string fname)
-{
-    struct stat s;
-    if (stat(fname.c_str(), &s) == 0) return true;
-    else return false;
-}
-
 int main(int argc, char** argv)
 {
     if (argc < 2) return -1;

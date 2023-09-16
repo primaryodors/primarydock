@@ -231,6 +231,7 @@ protected:
     int atcount = 0;
     char* name = 0;
     char* smiles = 0;
+    Atom*** paths = nullptr;
     Ring** rings = nullptr;
     Bond** rotatable_bonds = nullptr;
     bool immobile = false;
@@ -251,6 +252,13 @@ protected:
     int spnum = 0;
     MoleculeType mol_typ = MOLTYP_UNKNOWN;
 
+    void find_paths();
+    int path_contains_atom(int path_idx, Atom* a);
+    int path_get_length(int path_idx);
+    Atom* path_get_terminal_atom(int path_idx);
+    void copy_path(int old_idx, int new_idx);
+    bool path_is_subset_of(int short_path, int long_path);
+    void echo_path(int idx);
     int aidx(Atom* a);
     void reallocate();
     float fsb_lsb_anomaly(Atom* first, Atom* last, float lcard, float bond_length);

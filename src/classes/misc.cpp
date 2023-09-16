@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <fstream>
+#include <sys/stat.h>
 #include "point.h"
 
 using namespace std;
@@ -302,6 +304,13 @@ float larger(float v1, float v2)
     float v1a = fabs(v1), v2a = fabs(v2);
     int sign = (v2a > v1a) ? sgn(v2) : sgn(v1);
     return fmax(v1a, v2a) * sign;
+}
+
+bool file_exists(std::string fname)
+{
+    struct stat s;
+    if (stat(fname.c_str(), &s) == 0) return true;
+    else return false;
 }
 
 

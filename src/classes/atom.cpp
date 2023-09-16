@@ -2356,6 +2356,38 @@ void Ring::fill_with_atoms(Atom** from_atoms)
         }
     }
 
+    #if !_ALLOW_FLEX_RINGS
+    for (i=0; i < atcount; i++)
+    {
+        if (i)
+        {
+            Bond* b = atoms[i]->get_bond_between(atoms[i-1]);
+            if (b)
+            {
+                b->can_rotate = b->can_flip = false;
+            }
+            b = atoms[i-1]->get_bond_between(atoms[i]);
+            if (b)
+            {
+                b->can_rotate = b->can_flip = false;
+            }
+        }
+        else
+        {
+            Bond* b = atoms[i]->get_bond_between(atoms[atcount-1]);
+            if (b)
+            {
+                b->can_rotate = b->can_flip = false;
+            }
+            b = atoms[atcount-1]->get_bond_between(atoms[i]);
+            if (b)
+            {
+                b->can_rotate = b->can_flip = false;
+            }
+        }
+    }
+    #endif
+
     atoms[atcount] = nullptr;
 }
 

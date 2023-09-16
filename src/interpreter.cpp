@@ -609,6 +609,7 @@ int main(int argc, char** argv)
     Point pt;
     std::string builder;
     string PDB_fname = "";
+    Point pt3[4];
     FILE* pf;
 
     for (i=0; i<26; i++) strands[i] = nullptr;
@@ -1088,7 +1089,6 @@ int main(int argc, char** argv)
 
                 if (!era || !cta) goto _no_connect;
 
-                Point pt3[4];
                 if (ct > sr)
                 {
                     // Line up the C and O of er to the expected prevaa C and O of ct.

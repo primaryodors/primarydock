@@ -1,0 +1,14 @@
+#!/bin/bash
+
+PROT="$1"
+LIG="$2"
+
+if [ -z "$PROT" ]; then
+    PROT="OR51E2"
+fi
+
+if [ -z "$LIG" ]; then
+    LIG="propionic_acid"
+fi
+
+php -f predict/method_icactive.php "prot=$PROT" "lig=$LIG"

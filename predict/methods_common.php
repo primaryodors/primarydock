@@ -267,7 +267,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     if (!file_exists("tmp")) mkdir("tmp");
     $lignospace = str_replace(" ", "", $ligname);
-    $cnfname = "tmp/prediction.$protid.$lignospace.config";
+    $prefixfn = $metrics_prefix ? "_$metrics_prefix" : "";
+    $cnfname = "tmp/prediction.$protid$prefixfn.$lignospace.config";
     $f = fopen($cnfname, "wb");
     if (!$f) die("File write error. Check tmp folder is write enabled.\n");
 

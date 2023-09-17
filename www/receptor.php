@@ -62,6 +62,7 @@ $ligands_inprogress = [];
 foreach ($result as $line)
 {
     $pos = strpos($line, ".$rcpid.");
+    if (false == $pos) $pos = strpos($line, ".$rcpid_");
     if (false == $pos) continue;
     $ligname = substr($line, $pos+strlen(".$rcpid."));
     $ligname = preg_replace("/[.]config/", "", $ligname);

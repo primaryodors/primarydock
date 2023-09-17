@@ -83,21 +83,17 @@ int main(int argc, char** argv)
             {
                 for (i=0; bb[i]; i++)
                 {
-                    Atom** baa = bb[i]->get_moves_with_btom();
+                    Atom* baa[bb[i]->count_moves_with_btom()+1];
+                    bb[i]->fetch_moves_with_btom(baa);
                     cout << bb[i]->atom->name << "-" << bb[i]->btom->name << " can rotate, bringing ";
 
-                    if (baa)
+                    for (j=0; baa[j]; j++)
                     {
-                        for (j=0; baa[j]; j++)
-                        {
-                            cout << baa[j]->name << " ";
-                        }
-                        if (!j) cout << "zero atoms.";
+                        cout << baa[j]->name << " ";
                     }
-                    else cout << "no atoms.";
+                    if (!j) cout << "zero atoms.";
 
                     cout << endl;
-                    delete baa;
                 }
             }
             else cout << "No rotatable bonds." << endl;
@@ -129,10 +125,11 @@ int main(int argc, char** argv)
             int i, j, n = strlen(all_letters);
             AminoAcid* all_aa[n+4];
 
+            cout << "   ";
             for (i=0; i<n; i++)
             {
                 all_aa[i] = new AminoAcid(all_letters[i]);
-                cout << "    " << all_letters[i];
+                cout << all_letters[i] << " ";
             }
             cout << endl;
 
@@ -142,9 +139,14 @@ int main(int argc, char** argv)
                 for (j=0; j<n; j++)
                 {
                     float s = all_aa[i]->similarity_to(all_aa[j]);
-                    char buffer[16];
+                    /*char buffer[16];
                     sprintf(buffer, "%0.2f", 0.02 * roundf(s*50));
-                    cout << " " << buffer;
+                    cout << " " << buffer;*/
+
+                    if (s < 0.1) cout << ". ";
+                    else if (s < 0.25) cout << ": ";
+                    else if (s < 0.5) cout << "+ ";
+                    else cout << "@ ";
                 }
                 cout << endl;
             }

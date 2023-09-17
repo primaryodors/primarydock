@@ -31,6 +31,10 @@ int main(int argc, char** argv)
 
     std::vector<std::string> constraints;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Read program arguments
+    ////////////////////////////////////////////////////////////////////////////////
+
     // One argument, in the form of a protein ID, e.g. OR51E2.
     // If the ID does not conform to the format of OR{family}{subfamily}{member}, return an error code.
     if (argv[1][0] != 'O' || argv[1][1] != 'R') return -2;
@@ -51,6 +55,10 @@ int main(int argc, char** argv)
     if (!mem) return -2;
 
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Load protein
+    ////////////////////////////////////////////////////////////////////////////////
+
     // Locate and load the .upright.pdb in the folder structure, or throw an error if not found.
     std::string path = (std::string)"pdbs/OR" + std::to_string(fam) + (std::string)"/";
     std::string orid = (std::string)"OR" + std::to_string(fam) + sub + std::to_string(mem);
@@ -63,15 +71,27 @@ int main(int argc, char** argv)
     p.load_pdb(fp);
     fclose(fp);
 
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Set up residue vars
+    ////////////////////////////////////////////////////////////////////////////////
+
     AminoAcid *aa1x32 = p.get_residue_bw("1.32");
+    AminoAcid *aa1x50 = p.get_residue_bw("1.50");
+    AminoAcid *aa2x49 = p.get_residue_bw("2.49");
+    AminoAcid *aa2x50 = p.get_residue_bw("2.50");
+    AminoAcid *aa2x66 = p.get_residue_bw("2.66");
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
     AminoAcid *aa3x32 = p.get_residue_bw("3.32");
     AminoAcid *aa3x33 = p.get_residue_bw("3.33");
+    AminoAcid *aa3x36 = p.get_residue_bw("3.36");
     AminoAcid *aa3x39 = p.get_residue_bw("3.39");
     AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
     AminoAcid *aa3x56 = p.get_residue_bw("3.56");
     AminoAcid *aa4x53 = p.get_residue_bw("4.53");
+    AminoAcid *aa4x55 = p.get_residue_bw("4.55");
+    AminoAcid *aa4x56 = p.get_residue_bw("4.56");
     AminoAcid *aa4x60 = p.get_residue_bw("4.60");
     AminoAcid *aa4x61 = p.get_residue_bw("4.61");
     AminoAcid *aa4x64 = p.get_residue_bw("4.64");
@@ -80,6 +100,7 @@ int main(int argc, char** argv)
     AminoAcid *aa45x53 = p.get_residue_bw("45.53");
     AminoAcid *aa45x54 = p.get_residue_bw("45.54");
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
+    AminoAcid *aa5x35 = p.get_residue_bw("5.35");
     AminoAcid *aa5x36 = p.get_residue_bw("5.36");
     AminoAcid *aa5x39 = p.get_residue_bw("5.39");
     AminoAcid *aa5x43 = p.get_residue_bw("5.43");
@@ -101,13 +122,21 @@ int main(int argc, char** argv)
     AminoAcid *aa7x31 = p.get_residue_bw("7.31");
     AminoAcid *aa7x37 = p.get_residue_bw("7.37");
     AminoAcid *aa7x41 = p.get_residue_bw("7.41");
+    AminoAcid *aa7x42 = p.get_residue_bw("7.42");
+    AminoAcid *aa7x43 = p.get_residue_bw("7.43");
     AminoAcid *aa7x48 = p.get_residue_bw("7.48");
+    AminoAcid *aa7x49 = p.get_residue_bw("7.49");
     AminoAcid *aa7x52 = p.get_residue_bw("7.52");
     AminoAcid *aa7x53 = p.get_residue_bw("7.53");
     AminoAcid *aa7x56 = p.get_residue_bw("7.56");
     
+    int n1x32 = aa1x32->get_residue_no();
+    int n1x50 = aa1x50->get_residue_no();
+    int n2x50 = aa2x50->get_residue_no();
+    int n2x66 = aa2x66->get_residue_no();
     int n3x21 = aa3x21->get_residue_no();
     int n3x39 = aa3x39->get_residue_no();
+    int n3x40 = aa3x40->get_residue_no();
     int n3x56 = aa3x56->get_residue_no();
     int n4x53 = aa4x53->get_residue_no();
     int n4x64 = aa4x64->get_residue_no();
@@ -120,8 +149,11 @@ int main(int argc, char** argv)
     int n6x59 = aa6x59->get_residue_no();
     int n7x31 = aa7x31->get_residue_no();
     int n7x41 = aa7x41->get_residue_no();
+    int n7x43 = aa7x43->get_residue_no();
+    int n7x49 = aa7x49->get_residue_no();
 
     char l3x40 = aa3x40->get_letter();
+    char l4x56 = aa4x56->get_letter();
     char l45x51 = aa45x51->get_letter();
     char l45x52 = aa45x52->get_letter();
     char l45x53 = aa45x53->get_letter();
@@ -130,7 +162,15 @@ int main(int argc, char** argv)
     char l6x55 = aa6x55->get_letter();
     char l6x58 = aa6x58->get_letter();
     char l6x59 = aa6x59->get_letter();
+    char l7x41 = aa7x41->get_letter();
     char l7x53 = aa7x53->get_letter();
+
+    float dist67 = aa6x59->get_CA_location().get_3d_distance(p.get_residue(n6x59+1)->get_CA_location());
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Set up vars for processing.
+    ////////////////////////////////////////////////////////////////////////////////
 
     Pose pose6x55;
     bool preserve6x55 = false;
@@ -139,14 +179,14 @@ int main(int argc, char** argv)
     bool bcr;
     bool stiff6x55 = false;
 
-    LocatedVector axis3, axis4;
+    LocatedVector axis1, axis2, axis3, axis4, axis7;
     float theta;
     Point was;
     SCoord TMR6c, axis5;
     float theta6 = 0;
     SCoord axis6;
     float bridge57, scooch6x40 = 0, TMR7cz;
-    SCoord TMR5cdir, TMR6cdir, TMR7cdir, axis7;
+    SCoord TMR5cdir, TMR6cdir, TMR7cdir;
     Point pt_tmp;
     TMR6ActivationType type6;
 
@@ -154,6 +194,10 @@ int main(int argc, char** argv)
     DynamicMotion unwind6(&p);
     DynamicMotion bend45(&p);
 
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Receptor-specific fixes.
+    ////////////////////////////////////////////////////////////////////////////////
 
     if (!strcmp(orid.c_str(), "OR2M3"))
     {
@@ -190,7 +234,24 @@ int main(int argc, char** argv)
     {
         stiff6x55 = true;
     }
+    else if (l7x41 == 'Y')
+    {
+        aa7x41->conform_atom_to_location(aa7x41->get_reach_atom()->name, aa45x51->get_CA_location());
+    }
 
+    if (l4x56 == 'D' || l4x56 == 'E')
+    {
+        const char* atom_name = (l4x56 == 'D') ? "CG" : "CD";
+        SCoord v = aa4x56->get_CA_location().subtract(aa3x33->get_CA_location());
+        v.r = 10000;
+        aa4x56->conform_atom_to_location(atom_name, v);
+        constraints.push_back((std::string)"STCR 4.56");
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Arg6.59 unwind.
+    ////////////////////////////////////////////////////////////////////////////////
 
     if (aa6x59 && aa6x58 && aa45x53 && (aa6x59->get_letter() == 'R'))
     {
@@ -225,6 +286,10 @@ int main(int argc, char** argv)
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Determine TMR6 activation type.
+    ////////////////////////////////////////////////////////////////////////////////
+
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
         aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, aa45x51->get_reach_atom()->get_location());
@@ -256,7 +321,8 @@ int main(int argc, char** argv)
         {
             type6 = Hybrid6;
             axis6 = compute_normal(aa6x48->get_CA_location(), aa6x55->get_CA_location(), aa45x51->get_CA_location());
-            SCoord span = aa45x51->get_CA_location().subtract(aa6x55->get_CA_location());
+            // SCoord span = aa45x51->get_CA_location().subtract(aa6x55->get_CA_location());
+            SCoord span = aa45x51->get_reach_atom()->get_location().subtract(aa6x55->get_reach_atom()->get_location());
             span.r = r - 3;
             Point pt = aa6x55->get_CA_location().add(span);
             LocatedVector lv = axis6;
@@ -289,16 +355,27 @@ int main(int argc, char** argv)
         }
     }
 
-    // Perform a slight rotation of TMR3 to give TMR5 more room to move.
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Slight bend of TMR3 to allow TMR5 motion.
+    ////////////////////////////////////////////////////////////////////////////////
     
     axis3 = (SCoord)aa3x50->get_CA_location().subtract(aa5x58->get_CA_location());
-    axis3.origin = aa3x50->get_CA_location();
-    float rock3 = p.region_can_rotate(n3x21, n3x56, axis3, true);
-    cout << "TMR3 can rotate " << (rock3 * fiftyseven) << " degrees about 3.50 to make room for TMR5." << endl;
+    axis3.origin = aa3x40->get_CA_location();
+    float rock3 = p.region_can_rotate(n3x21, n3x40, axis3, true);
+    cout << "TMR3 can rotate " << (rock3 * fiftyseven) << " degrees about 3.40 limited by " << *(p.stop1) << "->" << *(p.stop2)
+        << " to make room for TMR5." << endl;
 
     // Perform the rotation.
-    // TODO: This should not be hard coded.
-    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*2);
+    p.rotate_piece(n3x21, n3x56, aa3x50->get_CA_location(), axis3, rock3*0.3);
+
+    aa3x33->conform_atom_to_location(aa3x33->get_reach_atom()->name, aa5x35->get_CA_location());
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // TMR4 bend to meet TMR3.
+    ////////////////////////////////////////////////////////////////////////////////
 
     axis4 = (SCoord)aa4x53->get_CA_location().subtract(aa6x49->get_CA_location());
     axis4.origin = aa4x53->get_CA_location();
@@ -307,6 +384,30 @@ int main(int argc, char** argv)
 
     // Perform the rotation.
     p.rotate_piece(n4x53, n4x64, aa4x53->get_CA_location(), axis4, bend4);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // TMR2 and TMR1 bend also.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    axis2 = compute_normal(aa2x50->get_CA_location(), aa2x66->get_CA_location(), aa3x21->get_CA_location());
+    axis2.origin = aa2x50->get_CA_location();
+    float bend2 = bend4 * 1.2;
+    p.rotate_piece(n2x50, n2x66, axis2.origin, axis2, -bend2);
+
+    axis1 = compute_normal(aa1x50->get_CA_location(), aa1x32->get_CA_location(), aa2x66->get_CA_location());
+    axis1.origin = aa1x50->get_CA_location();
+    float bend1 = bend4 * 1.8;
+    p.rotate_piece(n1x32, n1x50, axis1.origin, axis1, bend1);
+
+    axis1 = (SCoord)(aa2x49->get_CA_location().subtract(aa1x50->get_CA_location()));
+    bend1 = bend4 * 2;
+    p.rotate_piece(n1x32, n1x50, axis1.origin, axis1, -bend1);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Tyr6.55 verticality.
+    ////////////////////////////////////////////////////////////////////////////////
 
     if (l6x55 == 'Y')
     {
@@ -332,6 +433,11 @@ int main(int argc, char** argv)
         fclose(fp); */
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // TMR5 motion toward TMR6.
+    ////////////////////////////////////////////////////////////////////////////////
+
     // Measure how far 5.43-5.54 can move toward 6.44-6.55 without clashing. Call it TMR5ez.
     
     SCoord TMR5edir = p.get_region_center(aa6x44->get_residue_no(), aa6x55->get_residue_no()).subtract(p.get_region_center(aa5x43->get_residue_no(), aa5x54->get_residue_no()));
@@ -341,6 +447,11 @@ int main(int argc, char** argv)
     // Perform the TMR5ez slide.
     TMR5edir.r = TMR5ez;
     p.move_piece(aa5x33->get_residue_no(), aa5x68->get_residue_no(), TMR5edir);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // ********** TMR6 motion. **********
+    ////////////////////////////////////////////////////////////////////////////////
 
     // If TMR6ex is nonzero:
     if (theta6)
@@ -359,7 +470,27 @@ int main(int argc, char** argv)
         theta = find_3d_angle(aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c), aa5x50->get_CA_location());
         p.rotate_piece(aa5x50->get_residue_no(), aa56x50->get_residue_no()-1, aa5x50->get_CA_location(), axis5, theta);
         cout << "TMR5 rotation about " << axis5 << " by " << (theta*fiftyseven) << "deg." << endl;
+
+        // TMR6 takes TMR7 with it.
+        float dist67_new = aa6x59->get_CA_location().get_3d_distance(p.get_residue(n6x59+1)->get_CA_location());
+        int mid67 = (n6x59 + n7x31) / 2;
+        AminoAcid* aamid67 = p.get_residue(mid67);
+        pt_tmp = aamid67->get_CA_location();
+        SCoord v = aa45x51->get_CA_location().subtract(pt_tmp);
+        v.r *= 0.3;
+        pt_tmp = pt_tmp.add(v);
+        axis7 = (SCoord)(aa7x49->get_CA_location().subtract(pt_tmp));
+        axis7.origin = aa7x49->get_CA_location();
+        theta = find_angle_along_vector(p.get_residue(n6x59+1)->get_CA_location(), aa6x59->get_CA_location(), aa7x31->get_CA_location(), axis7);
+        theta *= (dist67_new - dist67) / dist67_new;
+        p.rotate_piece(n6x59+1, n7x49, axis7.origin, axis7, theta);
+        cout << "TMR7 and EXR3 rotation about 7.43 by " << (theta*fiftyseven) << "deg to follow TMR6." << endl;
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // 6.55~45.51 bridge.
+    ////////////////////////////////////////////////////////////////////////////////
 
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
@@ -401,7 +532,13 @@ int main(int argc, char** argv)
         }
     }
 
-    // If there is Y5.58 and Y7.53:
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // TMR5-TMR7 cytoplasmic side contact.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    // TODO: There should be a water molecule between 5.58 and 7.53, and R3.50 should coordinate to Y5.58.
+    // Source: Manglik and Kruse, 2017 doi:10.1021/acs.biochem.7b00747.
     
     if (l5x58 == 'Y' && l7x53 == 'Y')
     {
@@ -473,26 +610,6 @@ int main(int argc, char** argv)
         // Translate the CYT3 region (BW numbers 56.x) to stay with 5.68 and 6.28 as smoothly as possible.
         bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
         cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
-
-        #if 0
-
-        TMR5cdir = aa7x53->get_CA_location().subtract(aa5x58->get_CA_location());
-        TMR5cdir.r = bridge57;
-        axis5 = compute_normal(aa5x33->get_CA_location(), aa5x58->get_CA_location(), aa5x58->get_CA_location().add(TMR5cdir));
-        theta = find_3d_angle(aa5x58->get_CA_location(), aa5x58->get_CA_location().add(TMR5cdir), aa5x33->get_CA_location());
-        was = aa56x50->get_CA_location();
-        p.rotate_piece(aa5x33->get_residue_no(), aa56x50->get_residue_no(), aa5x33->get_CA_location(), axis5, theta);
-
-        TMR6cdir = aa56x50->get_CA_location().subtract(was);
-        axis6 = compute_normal(aa6x59->get_CA_location(), was, aa56x50->get_CA_location());
-        theta = find_3d_angle(was, aa56x50->get_CA_location(), aa6x59->get_CA_location());
-        p.rotate_piece(aa56x50->get_residue_no()+1, aa6x59->get_residue_no(), aa6x59->get_CA_location(), axis6, theta);
-
-        p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
-        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
-        cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
-
-        #endif
         
         // If 6.40 is once again clashing with 7.53, compute the distance to rotate 6.48 thru 56.50 about 6.48 to eliminate the clash.
         // Then perform the rotation, then compute the rotation of TMR5 about 5.33 to keep up, and perform that rotation.
@@ -538,8 +655,13 @@ int main(int argc, char** argv)
 
     cout << "Minimizing internal clashes..." << endl;
     p.get_internal_clashes(1, p.get_end_resno(), true);
+    p.get_internal_clashes(n3x21, n3x56, true);
 
-    // If there is R6.59, adjust its side chain to keep pointing inward while avoiding clashes with other nearby side chains.
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Arg6.59 positioning.
+    ////////////////////////////////////////////////////////////////////////////////
+
     if (type6 == Rock6x59 && (l6x59 == 'R' || l6x59 == 'K'))
     {
         cout << "Optimizing 6.59 side chain..." << endl;
@@ -551,7 +673,7 @@ int main(int argc, char** argv)
         m.move(pt);
         m.movability = MOV_PINNED;
 
-        Molecule* mols[256];
+        Molecule* mols[512];
         AminoAcid** can_clash = p.get_residues_can_clash(aa6x59->get_residue_no());
         l = 0;
 
@@ -563,13 +685,13 @@ int main(int argc, char** argv)
         {
             can_clash[i]->movability = MOV_FLEXONLY;
             mols[l++] = (Molecule*)can_clash[i];
-            if (l >= 255) break;
+            if (l >= 32) break;
         }
         mols[l] = nullptr;
-        Molecule::conform_molecules(mols, 50);
+        Molecule::conform_molecules(mols, 20);
 
         mols[3] = nullptr;
-        Molecule::conform_molecules(mols, 20);
+        Molecule::conform_molecules(mols, 15);
         
         /*fp = fopen("tmp/dbg6x59.pdb", "wb");
         if (!fp) return -3;
@@ -578,7 +700,11 @@ int main(int argc, char** argv)
         fclose(fp);*/
     }
 
-    // Now save the output file. It will be the same name as the input file except it will end in .active.pdb instead of .upright.pdb.
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Save output file.
+    ////////////////////////////////////////////////////////////////////////////////
+
     save_and_exit:
     if (preserve6x55) pose6x55.restore_state(aa6x55);
 
@@ -590,7 +716,11 @@ int main(int argc, char** argv)
     fclose(fp);
     cout << "Saved " << out_filename << endl;
 
-    // Finally, write all BRIDGE, STCR, and FLXR parameters to a constraints file ending in .params instead of .upright.pdb.
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Save parameters file.
+    ////////////////////////////////////////////////////////////////////////////////
+
     std::string cns_filename = path + orid + (std::string)".params";
     fp = fopen(cns_filename.c_str(), "wb");
     if (!fp) return -3;

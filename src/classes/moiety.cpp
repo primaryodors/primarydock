@@ -12,6 +12,7 @@ int Moiety::contained_by(Molecule* mol, Atom** out_matches)
     {
         Atom* a = mol->get_atom(i);
         if (!a) break;
+        if (a->is_backbone) continue;
 
         if (j = does_atom_match(a, out_matches + l))
         {
@@ -158,7 +159,8 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
                 buffer[1] = 0;
             }
 
-            Bond** b = cursor[parens]->get_bonds();
+            Bond* b[16];
+            cursor[parens]->fetch_bonds(b);
             int bn = cursor[parens]->get_geometry();
 
             bool found = 0;

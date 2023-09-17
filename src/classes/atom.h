@@ -62,7 +62,7 @@ public:
     {
         moves_with_btom = 0;
     }
-    Atom** get_moves_with_btom();
+    void fetch_moves_with_btom(Atom** result);
     int count_moves_with_btom();
     int count_heavy_moves_with_atom();
     int count_heavy_moves_with_btom();
@@ -184,7 +184,7 @@ public:
     }
 
     // Bond functions.
-    Bond** get_bonds();
+    void fetch_bonds(Bond** result);
     int get_bonded_atoms_count();
     int get_bonded_heavy_atoms_count();
     int get_count_pi_bonds();

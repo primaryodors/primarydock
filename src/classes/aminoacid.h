@@ -106,6 +106,7 @@ public:
     bool can_reach(Molecule* other) const;
     bool can_reach(AminoAcid* other) const;
     Atom* get_reach_atom();
+    float CB_angle(Point reference);
     void set_region(const char* regname)
     {
         strcpy(region, regname);
@@ -134,8 +135,8 @@ public:
     LocRotation* flatten();		// Ensure the peptide bond is coplanar and the CA lies in the same plane. Return LocRotation[5].
     void ensure_pi_atoms_coplanar();
 
-    Point* predict_previous_COCA();
-    Point* predict_next_NHCA();
+    void predict_previous_COCA(Point* result);
+    void predict_next_NHCA(Point* result);
     void attach_to_prediction(Point* predicted, bool CO = false);		// Attach the AA to its neighbor by moving its NHCA or COCA to the result of a predict().
 
     // Bond functions.

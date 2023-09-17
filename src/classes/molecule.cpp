@@ -329,11 +329,11 @@ void Molecule::clear_all_bond_caches()
     int i, j;
     for (i=0; atoms[i]; i++)
     {
-        Bond** b = atoms[i]->get_bonds();
-        if (b)
+        Bond* b[16];
+        atoms[i]->fetch_bonds(b);
+        if (b[0])
         {
             for (j=0; b[j]; j++) b[j]->clear_moves_with_cache();
-            delete[] b;
         }
         atoms[i]->used = false;
     }
@@ -393,16 +393,16 @@ void Molecule::hydrogenate(bool steric_only)
 
         float bcardsum = 0;
 
-        Bond** aib = atoms[i]->get_bonds();
+        Bond* aib[16];
+        atoms[i]->fetch_bonds(aib);
         int db = 0;
-        if (aib)
+        if (aib[0])
         {
             for (j=0; aib[j]; j++)
             {
                 if (aib[j]->btom) bcardsum += aib[j]->cardinality;
                 if (aib[j]->cardinality > 1) db++;
             }
-            delete[] aib;
         }
         if (!db && steric_only) continue;
 
@@ -859,15 +859,14 @@ int Molecule::get_bond_count(bool unidirectional) const
     if (noAtoms(atoms)) return 0;
     for (i=0; i<atcount && atoms[i]; i++)
     {
-        Bond** b = atoms[i]->get_bonds();
-        if (!b) continue;
+        Bond* b[16];
+        atoms[i]->fetch_bonds(b);
+        if (!b[0]) continue;
 
         for (j=0; b[j]; j++)
         {
             if (b[j]->btom > atoms[i] || !unidirectional) bc++;
         }
-
-        delete[] b;
     }
 
     return bc;
@@ -1178,6 +1177,7 @@ void Molecule::find_paths()
     if (!atoms || !atoms[0]) return;
 
     int h, i, j, k, l, m, n = 0, p, limit;
+    Bond* b[16];
     for (i=0; atoms[i]; i++)
     {
         n += atoms[i]->get_bonded_heavy_atoms_count();
@@ -1190,7 +1190,7 @@ void Molecule::find_paths()
     atcount = get_atom_count();
 
     Atom* a = atoms[0];
-    Bond** b = a->get_bonds();
+    a->fetch_bonds(b);
     if (!b) return;
     n=0;
     for (i=0; b[i]; i++)
@@ -1204,7 +1204,6 @@ void Molecule::find_paths()
         paths[n][2] = nullptr;
         n++;
     }
-    delete b;
 
     int num_added;
     do
@@ -1216,7 +1215,7 @@ void Molecule::find_paths()
         {
             m = path_get_length(i);
             a = path_get_terminal_atom(i);
-            b = a->get_bonds();
+            a->fetch_bonds(b);
             if (!b) continue;
 
             k=0;
@@ -1283,8 +1282,6 @@ void Molecule::find_paths()
             #if DBG_FND_RNGS
             cout << endl;
             #endif
-
-            delete b;
         }
 
         for (j=n-2; j>=0; j--)
@@ -1324,7 +1321,7 @@ void Molecule::identify_acidbase()
 
     // For every atom in the molecule:
     int i, j, k;
-    Bond** b = 0;
+    Bond* b[16];
 
     for (i=0; atoms[i]; i++)
     {
@@ -1340,13 +1337,12 @@ void Molecule::identify_acidbase()
         {
             carbon = (atoms[i]->get_Z() == 6);
             //cout << "Atom " << atoms[i]->name << " is of family " << fama << endl;
-            b = atoms[i]->get_bonds();
-            if (!b) goto _not_acidic;
+            atoms[i]->fetch_bonds(b);
+            if (!b[0]) goto _not_acidic;
             if (carbon)
             {
                 if (!atoms[i]->is_pi() || !atoms[i]->is_bonded_to_pi(CHALCOGEN, true))
                 {
-                    delete[] b;
                     goto _not_acidic;
                 }
                 for (j=0; b[j]; j++)
@@ -1357,7 +1353,6 @@ void Molecule::identify_acidbase()
                         int fam = b[j]->btom->get_family();
                         if (fam != CHALCOGEN)
                         {
-                            delete[] b;
                             goto _not_acidic;
                         }
                     }
@@ -1369,7 +1364,6 @@ void Molecule::identify_acidbase()
                 int fam = b[j]->btom->get_family();
                 if (carbon && fam == PNICTOGEN)
                 {
-                    delete[] b;
                     goto _not_acidic;
                 }
                 //cout << "Fam: " << fam << endl;
@@ -1382,10 +1376,10 @@ void Molecule::identify_acidbase()
                     }
                     else
                     {
-                        Bond** b1 = b[j]->btom->get_bonds();
-                        if (!b1)
+                        Bond* b1[16];
+                        b[j]->btom->fetch_bonds(b1);
+                        if (!b1[0])
                         {
-                            delete[] b;
                             goto _not_acidic;
                         }
                         for (k=0; b1[k]; k++)
@@ -1398,15 +1392,13 @@ void Molecule::identify_acidbase()
                                 break;
                             }
                         }
-                        if (b1) delete[] b1;
                     }
                 }
             }
-            delete[] b;
         }
         if (sbOH)
         {
-            b = atoms[i]->get_bonds();
+            atoms[i]->fetch_bonds(b);
             for (j=0; b[j]; j++)
             {
                 if (!b[j]->btom) continue;
@@ -1417,7 +1409,6 @@ void Molecule::identify_acidbase()
                     //cout << "Atom " << b[j]->btom->name << " is acidic." << endl;
                 }
             }
-            if (b) delete[] b;
         }
     _not_acidic:
         //if (b) delete[] b;
@@ -1487,7 +1478,8 @@ Bond** Molecule::get_rotatable_bonds()
     if (!immobile)
         for (i=0; atoms[i]; i++)
         {
-            Bond** lb = atoms[i]->get_bonds();
+            Bond* lb[16];
+            atoms[i]->fetch_bonds(lb);
             int g = atoms[i]->get_geometry();
             for (j=0; j<g && lb[j]; j++)
             {
@@ -1539,12 +1531,12 @@ Bond** Molecule::get_rotatable_bonds()
                     btemp[bonds] = 0;
                 }
             }
-            if (lb) delete[] lb;
         }
     else
         for (i=0; atoms[i]; i++)
         {
-            Bond** lb = atoms[i]->get_bonds();
+            Bond* lb[16];
+            atoms[i]->fetch_bonds(lb);
             int g = atoms[i]->get_geometry();
             for (j=0; j<g; j++)
             {
@@ -1604,7 +1596,6 @@ Bond** Molecule::get_rotatable_bonds()
                     btemp[bonds] = 0;
                 }
             }
-            if (lb) delete[] lb;
         }
 
         rotatable_bonds = new Bond*[bonds+1];
@@ -1686,27 +1677,26 @@ Bond** AminoAcid::get_rotatable_bonds()
                              << " and " << aadef->aabonds[i]->bname
                              << endl << flush;
 
-                        Bond** lbb = la->get_bonds();
-                        if (lbb)
+                        Bond* lbb[16];
+                        la->fetch_bonds(lbb);
+                        if (lbb[0])
                         {
                             cout << la->name << " is bonded to:";
                             int o, ag = la->get_geometry();
                             for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
                             cout << "." << endl;
-                            delete[] lbb;
                         }
 
                         Atom* lba = get_atom(aadef->aabonds[i]->bname);
                         if (lba)
                         {
-                            lbb = lba->get_bonds();
-                            if (lbb)
+                            lba->fetch_bonds(lbb);
+                            if (lbb[0])
                             {
                                 cout << lba->name << " is bonded to:";
                                 int o, ag = lba->get_geometry();
                                 for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
                                 cout << "." << endl;
-                                delete[] lbb;
                             }
                         }
                         else cout << aadef->aabonds[i]->bname << " not found." << endl;
@@ -1756,7 +1746,8 @@ Bond** AminoAcid::get_rotatable_bonds()
     // cout << name << " ";
     for (i=0; atoms[i]; i++)
     {
-        Bond** lb = atoms[i]->get_bonds();
+        Bond* lb[16];
+        atoms[i]->fetch_bonds(lb);
         int g = atoms[i]->get_geometry();
         for (j=0; j<g; j++)
         {
@@ -1779,7 +1770,6 @@ Bond** AminoAcid::get_rotatable_bonds()
             }
             else lb[j]->can_rotate = false;
         }
-        if (lb) delete[] lb;
     }
     // cout << endl;
 
@@ -1815,7 +1805,8 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
     int i,j, bonds=0;
     for (i=0; atoms[i]; i++)
     {
-        Bond** lb = atoms[i]->get_bonds();
+        Bond* lb[16];
+        atoms[i]->fetch_bonds(lb);
         int g = atoms[i]->get_geometry();
         for (j=0; j<g; j++)
         {
@@ -1828,7 +1819,6 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
                 btemp[bonds] = 0;
             }
         }
-        if (lb) delete[] lb;
     }
 
     Bond** retval = new Bond*[bonds+1];
@@ -1854,12 +1844,13 @@ float Molecule::get_internal_clashes()
         for (j=i+1; atoms[j]; j++)
         {
             if (atoms[i]->is_bonded_to(atoms[j])) continue;
-            if (atoms[i]->shares_bonded_with(atoms[j])) continue;
 
             Point ptb = atoms[j]->get_location();
             float bvdW = atoms[j]->get_vdW_radius();
 
             r = pta.get_3d_distance(&ptb);
+            if (r >= 0.9 && atoms[i]->shares_bonded_with(atoms[j])) continue;
+
             if (!r) r += 10e-15;
             if (r < avdW + bvdW)
             {
@@ -1871,12 +1862,12 @@ float Molecule::get_internal_clashes()
                     cout << atoms[i]->name << " clashes with " << atoms[j]->name << " by " << lclash << " cu. A. resulting in " << clash << endl;
                     int g = atoms[i]->get_geometry();
                     cout << "Geometry: " << g << endl;
-                    Bond** b = atoms[i]->get_bonds();
+                    Bond* b[16];
+                    atoms[i]->fetch_bonds(b);
                     int k;
                     for (k=0; k<g; k++)
                         cout << atoms[i]->name << " is bonded to " << hex << b[k]->btom << dec << " "
                              << (b[k]->btom ? b[k]->btom->name : "") << "." << endl;
-                    delete[] b;
                 }
             }
         }
@@ -1961,33 +1952,13 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 if (atoms[i]->is_bonded_to(ligands[l]->atoms[j])) continue;
                 if (atoms[i]->shares_bonded_with(ligands[l]->atoms[j])) continue;
 
-                Point ptb = ligands[l]->atoms[j]->get_location();
-                float bvdW = ligands[l]->atoms[j]->get_vdW_radius();
-
-                r = pta.get_3d_distance(&ptb) + 1e-3;
-                if (r < avdW + bvdW)
-                {
-                    /*float confidence = 2.5;		// TODO: Get this from the PDB.
-                    float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
-
-                    float allowable = give + confidence / sqrt(3);
-
-                    r += allowable;
-                    if (r > (avdW + bvdW)) r = avdW + bvdW;*/
-
-                    float lclash = sphere_intersection(avdW, bvdW, r);
-                    if (lclash > 0)
-                    {
-                        clash += lclash;
-                        /*cout << name << ":" << atoms[i]->name << " clashes with " <<
-                        	ligands[l]->name << ":" << ligands[l]->atoms[j]->name << " by " << lclash << " cu. A." << endl;*/
-                    }
-                }
+                clash += fmax(InteratomicForce::Lennard_Jones(atoms[i], ligands[l]->atoms[j]), 0);
+                continue;
             }
         }
     }
 
-    return clash*_kJmol_cuA;
+    return clash; //*_kJmol_cuA;
 }
 
 void Molecule::move(SCoord move_amt, bool override_residue)
@@ -2193,7 +2164,8 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
     {
         if (atoms[i]->is_backbone) continue;
 
-        InteratomicForce** ifs = InteratomicForce::get_applicable(a, atoms[i]);
+        InteratomicForce* ifs[32];
+        InteratomicForce::fetch_applicable(a, atoms[i], ifs);
         if (!ifs) continue;
 
         for (j=0; ifs[j]; j++)
@@ -2227,7 +2199,6 @@ float Molecule::get_atom_mol_bind_potential(Atom* a)
             retval += partial;
             n++;
         }
-        delete[] ifs;
     }
 
     if (n) retval /= n;
@@ -2277,18 +2248,18 @@ float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
                 if (!ligands[l]->atoms[j]) continue;
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 float f = 1.0 / r;		// Regular invert rather than inv square so that actual bonding will take over at short range.
-                InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], ligands[l]->atoms[j]);
+                InteratomicForce* iff[32];
+                InteratomicForce::fetch_applicable(atoms[i], ligands[l]->atoms[j], iff);
 
                 if (iff) for (n=0; iff[n]; n++)
-                    {
-                        if (iff[n]->get_type() == vdW) continue;
+                {
+                    if (iff[n]->get_type() == vdW) continue;
 
-                        if (pure || r < iff[n]->get_distance())
-                            kJmol += iff[n]->get_kJmol();
-                        else
-                            kJmol += iff[n]->get_kJmol()*f;
-                    }
-                delete[] iff;
+                    if (pure || r < iff[n]->get_distance())
+                        kJmol += iff[n]->get_kJmol();
+                    else
+                        kJmol += iff[n]->get_kJmol()*f;
+                }
             }
         }
     }
@@ -2809,12 +2780,13 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
     minimum_searching_aniso = 0.5;
 
-    for (iter=1; iter<=iters; iter++)
+    for (iter=0; iter<iters; iter++)
     {
         for (i=0; mm[i]; i++) mm[i]->lastbind = 0;
 
         for (n=0; mm[n]; n++);      // Get count.
         Molecule* nearby[n+8];
+        bool do_full_rotation = (iter < iters*.666 && (iter % _fullrot_every) == 0);
 
         for (i=0; i<n; i++)
         {
@@ -2840,7 +2812,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             benerg = cfmol_multibind(a, nearby);
 
             #if _dbg_fitness_plummet
-            if (!i) cout << "# " << a->name << " " << iter << ": " << benerg << " ";
+            if (!i) cout << "# mol " << a->name << " iter " << iter << ": initial " << -benerg << " ";
             #endif
 
             float tryenerg;
@@ -2870,7 +2842,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     tryenerg = cfmol_multibind(a, nearby);
 
                     #if _dbg_fitness_plummet
-                    if (!i) cout << "(" << tryenerg << ") ";
+                    if (!i) cout << "(linear motion try " << -tryenerg << ") ";
                     #endif
 
                     if (tryenerg > benerg)
@@ -2907,7 +2879,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
 
             #if _dbg_fitness_plummet
-            if (!i) cout << benerg << " ";
+            if (!i) cout << "linear " << -benerg << " ";
             #endif
 
             /**** Histidine flip ****/
@@ -2966,7 +2938,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
 
             #if _dbg_fitness_plummet
-            if (!i) cout << benerg << " ";
+            if (!i) cout << "axial " << -benerg << " ";
             #endif
 
             #if allow_bond_rots
@@ -2976,6 +2948,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
             if ((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN))
             {
+                float self_clash = 1.1*a->get_internal_clashes();
                 Bond** bb = a->get_rotatable_bonds();
                 if (bb)
                 {
@@ -2983,54 +2956,91 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     for (q=0; bb[q]; q++)
                     {
                         float theta;
-                        if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI) / 2;
-                        else if (!bb[q]->count_heavy_moves_with_btom()) theta = frand(-M_PI, M_PI) / 2;
-                        else if (bb[q]->count_heavy_moves_with_atom() < bb[q]->count_heavy_moves_with_btom())
-                            theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
-                        else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
+                        int heavy_atoms = bb[q]->count_heavy_moves_with_btom();
 
-                        if (!bb[q]->can_rotate)
+                        if (do_full_rotation && benerg <= 0 && bb[q]->can_rotate)
                         {
-                            bb[q]->can_flip = true;
-                            if (!bb[q]->flip_angle) bb[q]->flip_angle = M_PI;
-                        }
+                            float best_theta = 0;
+                            for (theta=0; theta < M_PI*2; theta += _fullrot_steprad)
+                            {
+                                bb[q]->rotate(_fullrot_steprad, false);
+                                tryenerg = cfmol_multibind(a, nearby);
+                                if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
+                                {
+                                    benerg = tryenerg;
+                                    best_theta = theta;
+                                }
+                            }
+                            if (best_theta)
+                            {
+                                bb[q]->rotate(best_theta, false);
+                                a->been_flexed = true;
 
-                        bb[q]->rotate(theta, false);
-
-                        if (a->agroups.size() && group_realign)
-                        {
-                            group_realign(a, a->agroups);
-                        }
-
-                        tryenerg = cfmol_multibind(a, nearby);
-
-                        if (tryenerg > benerg)
-                        {
-                            benerg = tryenerg;
-                            pib.copy_state(a);
-                            a->been_flexed = true;
+                                if (a->agroups.size() && group_realign)
+                                {
+                                    group_realign(a, a->agroups);
+                                }
+                            }
                         }
                         else
                         {
-                            pib.restore_state(a);
+                            if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI) / 2;
+                            else if (!heavy_atoms) theta = frand(-M_PI, M_PI) / 2;
+                            else if (bb[q]->count_heavy_moves_with_atom() < heavy_atoms)
+                                theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
+                            else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
+
+                            if (!bb[q]->can_rotate)
+                            {
+                                bb[q]->can_flip = true;
+                                if (!bb[q]->flip_angle) bb[q]->flip_angle = M_PI;
+                            }
+
+                            bb[q]->rotate(theta, false);
+
+                            if (a->agroups.size() && group_realign)
+                            {
+                                group_realign(a, a->agroups);
+                            }
+
+                            tryenerg = cfmol_multibind(a, nearby);
+
+                            if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
+                            {
+                                benerg = tryenerg;
+                                pib.copy_state(a);
+                                a->been_flexed = true;
+                            }
+                            else
+                            {
+                                pib.restore_state(a);
+                            }
                         }
                     }
                 }       // Rotatable bonds.
                 #endif
 
                 #if _dbg_fitness_plummet
-                if (!i) cout << benerg << endl;
+                if (!i) cout << "flexion " << -benerg << " ";
                 #endif
 
                 mm[i]->lastbind = benerg;
-            }       // for i
-        }       // if MOV_CAN_FLEX
+            }   // if MOV_CAN_FLEX
+
+            #if _dbg_fitness_plummet
+            if (!i) cout << "final " << -benerg << " " << endl << flush;
+            #endif
+        }       // for i
 
         #if allow_iter_cb
-        if (cb) cb(iter, mm);
+        if (cb) cb(iter+1, mm);
         #endif
 
         minimum_searching_aniso *= 0.99;
+
+        #if _dbg_fitness_plummet
+        if (!i) cout << endl << flush;
+        #endif
     }       // for iter
 
     minimum_searching_aniso = 0;
@@ -3118,7 +3128,7 @@ bool Molecule::from_smiles(char const * smilesstr)
 
                 // Resume using buffer with fgets().
                 int lno = 0;
-                while (buffer[0] != '$')
+                while (buffer[0] != '$' && !feof(pf))
                 {
                     fgets(buffer, 1022, pf);
                     lno++;
@@ -3625,7 +3635,8 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
     {
     	// cout << ring_members[i]->name << " ";
         ringsz = i+1;
-        Bond** ab = ring_members[i]->get_bonds();
+        Bond* ab[16];
+        ring_members[i]->fetch_bonds(ab);
         bool haspi = false;
         for (j=0; ab[j]; j++)
             if (ab[j]->cardinality > 1 && ab[j]->cardinality < 2) haspi = true;
@@ -3644,7 +3655,8 @@ void Molecule::make_coplanar_ring(Atom** ring_members, int ringid)
 		cout << "Notice: empty ring passed to Molecule::make_coplanar_ring()." << endl;
 		return;
 	}
-    Bond** a0b = ring_members[0]->get_bonds();
+    Bond* a0b[16];
+    ring_members[0]->fetch_bonds(a0b);
     if (!a0b[0]->btom || !a0b[1]->btom)
     {
         cout << "Attempted to form coplanar ring with starting atom bonded to fewer than two other atoms." << endl;
@@ -3745,8 +3757,9 @@ float Molecule::close_loop(Atom** path, float lcard)
     for (i=0; path[i]; i++)
     {
         path[i]->doing_ring_closure = true;
-        Bond** b = path[i]->get_bonds();
-        if (!b) continue;
+        Bond* b[16];
+        path[i]->fetch_bonds(b);
+        if (!b[0]) continue;
         int geo = path[i]->get_geometry();
 
         for (j=0; j<geo; j++)
@@ -3763,7 +3776,6 @@ float Molecule::close_loop(Atom** path, float lcard)
         }
 
         last = path[i];
-        delete[] b;
     }
     rotables[k] = 0;
     if (_DBGCLSLOOP) cout << "Close Loop: found " << k << " rotables." << endl;
@@ -3856,15 +3868,16 @@ float Molecule::close_loop(Atom** path, float lcard)
 Atom** Molecule::get_most_bindable(int max_count)
 {
     if (noAtoms(atoms)) return 0;
+    if (most_bindable) return most_bindable;
 
     int i, j=-1, k, l;
     float best[max_count+2];
-    Atom** retval = new Atom*[max_count+2];
+    most_bindable = new Atom*[max_count+2];
 
     for (k=0; k<max_count; k++)
     {
         best[k]=0;
-        retval[k]=0;
+        most_bindable[k]=0;
     }
 
     for (i=0; atoms[i]; i++)
@@ -3878,26 +3891,26 @@ Atom** Molecule::get_most_bindable(int max_count)
         float score = 0;
         atoms[i]->clear_geometry_cache();
 
-        for (k=0; retval[k] && k<max_count; k++)
+        for (k=0; most_bindable[k] && k<max_count; k++)
         {
-            if (retval[k] == atoms[i])
+            if (most_bindable[k] == atoms[i])
             {
                 #if _DBG_MOLBB
                 cout << "Atom is already in return array." << endl;
                 #endif
                 goto _resume;
             }
-            if (retval[k]->is_bonded_to(atoms[i]) && best[k] >= 10)
+            if (most_bindable[k]->is_bonded_to(atoms[i]) && best[k] >= 10)
             {
                 #if _DBG_MOLBB
-                cout << "Atom is bonded to " << retval[k]->name << ", already in return array." << endl;
+                cout << "Atom is bonded to " << most_bindable[k]->name << ", already in return array." << endl;
                 #endif
                 goto _resume;
             }
-            if (retval[k]->shares_bonded_with(atoms[i]) && best[k] >= 10)
+            if (most_bindable[k]->shares_bonded_with(atoms[i]) && best[k] >= 10)
             {
                 #if _DBG_MOLBB
-                cout << "Atom shares a bond with " << retval[k]->name << ", already in return array." << endl;
+                cout << "Atom shares a bond with " << most_bindable[k]->name << ", already in return array." << endl;
                 #endif
                 goto _resume;
             }
@@ -3934,11 +3947,11 @@ Atom** Molecule::get_most_bindable(int max_count)
                 for (l=max_count; l>k; l--)
                 {
                     best[l] = best[l-1];
-                    retval[l] = retval[l-1];
+                    most_bindable[l] = most_bindable[l-1];
                 }
 
                 best[k] = score;
-                retval[k] = atoms[i];
+                most_bindable[k] = atoms[i];
                 if (!k) j = i;
 
                 break;
@@ -3951,10 +3964,10 @@ Atom** Molecule::get_most_bindable(int max_count)
     _resume:
         ;
     }
-    retval[max_count] = 0;
+    most_bindable[max_count] = 0;
 
     if (j < 0) return 0;
-    else return retval;
+    else return most_bindable;
 }
 
 #define DBG_BINDABLE 0
@@ -3982,8 +3995,9 @@ Atom** Molecule::get_most_bindable(int max_num, Atom* for_atom)
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
-        InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], for_atom);
-        if (!iff) continue;
+        InteratomicForce* iff[32];
+        InteratomicForce::fetch_applicable(atoms[i], for_atom, iff);
+        if (!iff[0]) continue;
 
         float lbb = 0;
         for (j=0; iff[j]; j++)
@@ -4159,19 +4173,18 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
     float error = 0;
     Point bloc;
     Atom* btom;
-    Bond** b;
+    Bond* b[16];
     int g, bg;
     float b_bond_angle;
     LocatedVector lv;
 
     // Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
-    b = atoms[i]->get_bonds();
-    if (!b) return error;
+    atoms[i]->fetch_bonds(b);
+    if (!b[0]) return error;
     btom = b[0]->btom;
     float card = b[0]->cardinality;
     if (!btom)
     {
-        delete[] b;
         return error;
     }
 
@@ -4259,7 +4272,6 @@ float Molecule::get_atom_error(int i, LocatedVector* best_lv)
         error += _SANOM_BOND_RAD_WEIGHT * fabs(optimal-r);
     }
 
-    delete[] b;
     return error+bestscore;
 }
 
@@ -4273,7 +4285,7 @@ float Molecule::correct_structure(int iters)
     float error = 0;
     Point aloc, bloc;
     Atom* btom;
-    Bond** b;
+    Bond* b[16];
     int g, bg;
     float b_bond_angle;
     LocatedVector lv;
@@ -4298,10 +4310,9 @@ float Molecule::correct_structure(int iters)
         for (i=0; atoms[i]; i++)
         {
             // Get the atom's zero-index bonded atom. Call it btom (because why not overuse a foolish pun?).
-            b = atoms[i]->get_bonds();
-            if (!b) return error;
+            atoms[i]->fetch_bonds(b);
+            if (!b[0]) return error;
             btom = b[0]->btom;
-            delete[] b;
             if (!btom) return error;
 
             // TODO

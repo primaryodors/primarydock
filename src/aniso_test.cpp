@@ -91,7 +91,8 @@ int main(int argc, char** argv)
 
     Molecule mp("probe", aarr);
 
-    InteratomicForce** ifs = InteratomicForce::get_applicable(&probe, anisoa);
+    InteratomicForce* ifs[32];
+    InteratomicForce::fetch_applicable(&probe, anisoa, ifs);
     if (!ifs || !ifs[0])
     {
         cout << "No forces to measure; check bindings.dat." << endl;
@@ -118,7 +119,8 @@ int main(int argc, char** argv)
 
     Point paim(0,10000000,0);
 
-    Bond** bb = anisoa->get_bonds();
+    Bond* bb[16];
+    anisoa->fetch_bonds(bb);
     Point aloc = anisoa->get_location();
     Point bloc;
     Point bblocs[16];
@@ -139,10 +141,7 @@ int main(int argc, char** argv)
         // cout << i << " points for average." << endl;
         if (i) bloc = average_of_points(bblocs, i);
         // mp.add_atom("He", "He1", &bloc, NULL, 0);
-
-        delete bb;
     }
-
 
     paim = paim.add(bloc);
 

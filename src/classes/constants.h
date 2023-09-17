@@ -27,7 +27,7 @@
 #define homology_clash_peraa 4.0
 
 #define pH 6.0
-#define hydrophilicity_cutoff 0.29
+#define hydrophilicity_cutoff 0.25
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.
 #define intermol_ESP 0.05
@@ -114,7 +114,12 @@
 #define polar_repulsion 15.0
 #define charge_repulsion 10.0
 
+#define global_clash_allowance 0.4
+#define ignore_double_hydrogen_clashes 1
+#define Lennard_Jones_epsilon 1.0
+#define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 0.0015
+#define recapture_ejected_ligand 0
 
 #define amide_zwitterionic_amount 0.1
 
@@ -148,6 +153,7 @@
 
 #define redo_tumble_spheres_on_activation 0
 #define redo_tumble_spheres_every_node 1
+#define soft_dynamics_every_n_iters 20
 
 // Output the activation matrix or the transmembrane regions' active rotations so that
 // the viewer can update its cartoon backbone.
@@ -352,6 +358,7 @@
 #define _dbg_259 0
 #define _dbg_bb_realign 0
 #define _dbg_mol_flexion 0
+#define _dbg_soft_dynamics 0
 
 #endif
 

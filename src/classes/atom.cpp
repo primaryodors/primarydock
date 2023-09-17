@@ -217,7 +217,7 @@ Atom::Atom(const char* elem_sym)
 
     figure_out_valence();
 
-    bonded_to = new Bond[abs(geometry)];
+    bonded_to = new Bond[abs(geometry)+4];
     int i;
     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
@@ -237,7 +237,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
 
     figure_out_valence();
 
-    bonded_to = new Bond[abs(geometry)];
+    bonded_to = new Bond[abs(geometry)+4];
     int i;
     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
@@ -447,24 +447,22 @@ Point Atom::get_location()
     return pt;
 }
 
-Atom** Bond::get_moves_with_btom()
+void Bond::fetch_moves_with_btom(Atom** result)
 {
     enforce_moves_with_uniqueness();
 
-    int i, cachesz=0;
+    int i;
     if (!moves_with_btom) fill_moves_with_cache();
-    if (!moves_with_btom) return 0;
-    for (i=0; moves_with_btom[i]; i++)
-        cachesz = i+1;
-    if (!cachesz) return 0;
+    if (!moves_with_btom)
+    {
+        result[0] = nullptr;
+        return;
+    }
 
-    Atom** retval = new Atom*[cachesz+1];
     // Not calling init_nulls() for performance reasons.
-    for (i=0; i<cachesz; i++)
-        retval[i] = moves_with_btom[i];
-    retval[cachesz] = 0;
-
-    return retval;
+    for (i=0; moves_with_btom[i]; i++)
+        result[i] = moves_with_btom[i];
+    result[i] = nullptr;
 }
 
 bool Atom::move(Point* pt)
@@ -514,8 +512,9 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     if (!excluding) return 0;
     int bi = get_idx_bond_between(excluding);
     Bond* palin = excluding->get_bond_between(this);
-    Atom** atoms = palin->get_moves_with_btom();
-    if (!atoms) return 0;
+    Atom* atoms[palin->count_moves_with_btom()];
+    palin->fetch_moves_with_btom(atoms);
+    if (!atoms[0]) return 0;
 
     if (isnan(pt->x) || isnan(pt->y) || isnan(pt->z))
     {
@@ -621,22 +620,24 @@ Bond::~Bond()
     if (moves_with_btom) delete[] moves_with_btom;
 }
 
-Bond** Atom::get_bonds()
+void Atom::fetch_bonds(Bond** result)
 {
-    if (!bonded_to) return NULL;
+    if (!bonded_to)
+    {
+        result[0] = nullptr;
+        return;
+    }
+
     int i;
     if (!geometry || geometry<0 || isnan(geometry)) geometry=4;
     try
     {
-        Bond** retval = new Bond*[geometry+1];
-        // No init_nulls() because performance.
-        for (i=0; i<geometry; i++) retval[i] = &bonded_to[i];
-        retval[geometry] = 0;
-        return retval;
+        for (i=0; i<geometry; i++) result[i] = &bonded_to[i];
+        result[geometry] = nullptr;
     }
     catch (int e)
     {
-        return NULL;
+        result[0] = nullptr;
     }
 }
 
@@ -1032,7 +1033,7 @@ bool Atom::is_pi()
 
     if (Z == 1)
     {
-        if (bonded_to[0].btom) return bonded_to[0].btom->is_pi();
+        if (bonded_to[0].btom && bonded_to[0].btom->Z > 1) return bonded_to[0].btom->is_pi();
     }
 
     if (family == PNICTOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(CHALCOGEN)) return true;
@@ -1178,7 +1179,8 @@ void Bond::fill_moves_with_cache()
     if (_DBGMOVES) cout << btom->aa3let << btom->residue << ": What moves with " << btom->name << " when rotating about " << atom->name << "?" << endl;
 
     btom->used = true;
-    Bond** b = btom->get_bonds();
+    Bond* b[16];
+    btom->fetch_bonds(b);
     if (!b) return;
     for (i=0; b[i]; i++)
     {
@@ -1189,14 +1191,13 @@ void Bond::fill_moves_with_cache()
             if (_DBGMOVES) cout << b[i]->btom->name << " ";
         }
     }
-    delete b;
 
     do
     {
         k=0;
         for (j=0; j<tmplen; j++)
         {
-            b = attmp[j]->get_bonds();
+            attmp[j]->fetch_bonds(b);
             if (b)
             {
                 for (i=0; b[i]; i++)
@@ -1210,7 +1211,6 @@ void Bond::fill_moves_with_cache()
                         k++;
                     }
                 }
-                delete b;
             }
         }
     }
@@ -2738,7 +2738,8 @@ float Atom::similarity_to(Atom* b)
     #define same_sgn_charge 16
     #define one_charged_one_neutral_polar 10
     #define opposite_charges -20
-    #define both_or_neither_pi_and_both_or_neither_polar 18
+    #define both_or_neither_pi 13
+    #define both_or_neither_pi_and_both_or_neither_polar 5
     #define neither_pi_one_polar_one_sugary 15
     #define one_polar_both_pi 13
     #define one_polar_only_one_pi 11
@@ -2747,7 +2748,8 @@ float Atom::similarity_to(Atom* b)
     #define abs_delta_elecn_within_point7 10
 
     #if both_or_neither_abs_polarity_at_least_point2 + both_or_neither_abs_polarity_at_least_point333 + abs_delta_polarity_within_point333\
-        + same_sgn_charge + both_or_neither_pi_and_both_or_neither_polar + abs_delta_elecn_within_point7 + neither_pi_or_conjugated_together\
+        + same_sgn_charge + both_or_neither_pi + both_or_neither_pi_and_both_or_neither_polar + abs_delta_elecn_within_point7\
+        + neither_pi_or_conjugated_together\
         != 100
         #error "Atom similarity constants do not add up to 100%."
     #endif
@@ -2772,10 +2774,15 @@ float Atom::similarity_to(Atom* b)
     float delta = fabs(is_polar() - b->is_polar());
     if (delta < hydrophilicity_cutoff) similarity += 0.01 * abs_delta_polarity_within_point333;
 
-    if (sgn(charge) == sgn(b->charge)) similarity += 0.01 * same_sgn_charge;
-    else if (!charge && apb && b->charge) similarity += 0.01 * one_charged_one_neutral_polar;
-    else if (charge && bpb && !b->charge) similarity += 0.01 * one_charged_one_neutral_polar;
-    else if (sgn(charge) == -sgn(b->charge)) similarity += 0.01 * opposite_charges;
+    float achg = (fabs(charge) > hydrophilicity_cutoff) ? charge : 0;
+    float bchg = (fabs(b->charge) > hydrophilicity_cutoff) ? b->charge : 0;
+
+    if (sgn(achg) == sgn(bchg)) similarity += 0.01 * same_sgn_charge;
+    else if (!achg && apb && bchg) similarity += 0.01 * one_charged_one_neutral_polar;
+    else if (achg && bpb && !bchg) similarity += 0.01 * one_charged_one_neutral_polar;
+    else if (sgn(achg) == -sgn(bchg)) similarity += 0.01 * opposite_charges;
+
+    if (is_pi() == b->is_pi()) similarity += 0.01 * both_or_neither_pi;
 
     if (apb == bpb && is_pi() == b->is_pi()) similarity += 0.01 * both_or_neither_pi_and_both_or_neither_polar;
     else if (apb && is_pi() && b->is_pi()) similarity += 0.01 * one_polar_both_pi;

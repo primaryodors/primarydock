@@ -305,12 +305,13 @@ bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
 }
 
 #define _dbg_applicable 0
-InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
+void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** retval)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
     if (!a || !b)
     {
-        return NULL;
+        retval[0] = nullptr;
+        return;
     }
 
     #if _dbg_applicable
@@ -329,8 +330,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         }
     }
 
-    InteratomicForce** retval = new InteratomicForce*[16];
-    init_nulls(retval, 16);
+    retval[0] = nullptr;
     int i, j=0;
 
     // Charged atoms always attract or repel, irrespective of Z.
@@ -346,6 +346,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
 
         j++;
     }
+    retval[j] = nullptr;
 
     #if allow_auto_hydroxy
     Atom *H = nullptr, *O = nullptr;
@@ -355,8 +356,9 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         Atom* HO = a->is_bonded_to("O");
         if (HO)
         {
-            Bond** bb = HO->get_bonds();
-            if (bb)
+            Bond* bb[16];
+            HO->fetch_bonds(bb);
+            if (bb[0])
             {
                 for (i=0; bb[i]; i++)
                 {
@@ -368,8 +370,6 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                         break;
                     }
                 }
-
-                delete[] bb;
             }
         }
     }
@@ -378,8 +378,9 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
         Atom* HO = b->is_bonded_to("O");
         if (HO)
         {
-            Bond** bb = HO->get_bonds();
-            if (bb)
+            Bond* bb[16];
+            HO->fetch_bonds(bb);
+            if (bb[0])
             {
                 for (i=0; bb[i]; i++)
                 {
@@ -391,8 +392,6 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
                         break;
                     }
                 }
-
-                delete[] bb;
             }
         }
     }
@@ -507,9 +506,7 @@ InteratomicForce** InteratomicForce::get_applicable(Atom* a, Atom* b)
             }
         }
     }
-    retval[j] = 0;
-
-    return retval;
+    retval[j] = nullptr;
 }
 
 SCoord* get_geometry_for_pi_stack(SCoord* in_geo)
@@ -546,7 +543,8 @@ float InteratomicForce::metal_compatibility(Atom* a, Atom* b)
 
 float InteratomicForce::potential_binding(Atom* a, Atom* b)
 {
-    InteratomicForce** forces = get_applicable(a, b);
+    InteratomicForce* forces[32];
+    fetch_applicable(a, b, forces);
 
     int i;
     float potential = 0;
@@ -587,7 +585,8 @@ float InteratomicForce::potential_binding(Atom* a, Atom* b)
 
 float InteratomicForce::total_binding(Atom* a, Atom* b)
 {
-    InteratomicForce** forces = get_applicable(a, b);
+    InteratomicForce* forces[32];
+    fetch_applicable(a, b, forces);
 
     int i, j, k;
     float kJmol = 0;
@@ -1164,24 +1163,23 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (rbind < 0.7) rbind = 0.7;
 
 _canstill_clash:
-    /*float confidence = 2.5;		// TODO: Get this from the PDB.
-    float give = 0.5;			// TODO: Compute this from the receptor secondary structure.
+    float sigma;
 
-    float allowable = give + confidence / sqrt(3);
-
-    r += allowable;*/
-
-    if ((rheavy / l_heavy_atom_mindist) < (r / rbind))
+    #if ignore_double_hydrogen_clashes
+    if (a->get_Z() == 1 && b->get_Z() == 1 && r > 1.0)
     {
-        rbind = l_heavy_atom_mindist;
-        r = rheavy;
+        float rheavy = fmin(a->distance_to(bheavy), b->distance_to(aheavy));
+        if (rheavy < r) r = rheavy;
+        else goto _finished_clashing;
     }
+    #endif
+
+    sigma = fmin(rbind, avdW+bvdW) - global_clash_allowance;
 
     if (r < rbind && !atoms_are_bonded && (!achg || !bchg || sgn(achg) != -sgn(bchg)) )
     {
-        float f = rbind/(avdW+bvdW);
-        float clash = pow(fabs(sphere_intersection(avdW*f, bvdW*f, r)*_kJmol_cuA), 4);
-        kJmol -= clash;
+        float clash = Lennard_Jones(a, b, sigma);
+        kJmol -= fmax(clash, 0);
         
         #if _peratom_audit
         if (interauditing)
@@ -1198,14 +1196,24 @@ _canstill_clash:
         #endif
     }
 
-    delete[] forces;
+    _finished_clashing:
     return kJmol;
+}
+
+float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
+{
+    if (!sigma) sigma = atom1->get_vdW_radius() + atom2->get_vdW_radius() - global_clash_allowance;
+    float r = atom1->distance_to(atom2);
+    float sigma_r = sigma / r;
+
+    return Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
 }
 
 
 float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
 {
-    InteratomicForce** forces = get_applicable(a, b);
+    InteratomicForce* forces[32];
+    fetch_applicable(a, b, forces);
 
     int i;
     float anomaly = 0;
@@ -1216,7 +1224,6 @@ float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
         anomaly += fabs(r - forces[i]->distance);
     }
 
-    delete[] forces;
     return anomaly;
 }
 

@@ -240,6 +240,7 @@ protected:
     std::string sdfgen_aboutline = "";
     Molecule** mandatory_connection = nullptr;
     float* last_mc_binding = nullptr;
+    Atom** most_bindable = nullptr;
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.

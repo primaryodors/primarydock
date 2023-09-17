@@ -220,7 +220,7 @@ int find_var_index(const char* varname, char** out_varname = nullptr)
 
                 if (out_varname)
                 {
-                    // delete[] *out_varname;
+                    // TODO: Make this a stack allocation, instead of heap.
                     *out_varname = new char[strlen(buffer)+4];
                     strcpy(*out_varname, buffer);
                 }
@@ -602,6 +602,7 @@ int main(int argc, char** argv)
     Point pt;
     std::string builder;
     string PDB_fname = "";
+    Point pt3[4];
     FILE* pf;
 
     for (i=0; i<26; i++) strands[i] = nullptr;
@@ -1081,25 +1082,23 @@ int main(int argc, char** argv)
 
                 if (!era || !cta) goto _no_connect;
 
-                Point* pt3;
                 if (ct > sr)
                 {
                     // Line up the C and O of er to the expected prevaa C and O of ct.
                     a1 = era->get_atom("C");
                     a2 = era->get_atom("O");
-                    pt3 = cta->predict_previous_COCA();
+                    cta->predict_previous_COCA(pt3);
                 }
                 else
                 {
                     // Line up the N and HN (or substitute) of er to the expected nextaa N and HN of ct.
                     a1 = era->get_atom("N");
                     a2 = era->HN_or_substitute();
-                    pt3 = cta->predict_next_NHCA();
+                     cta->predict_next_NHCA(pt3);
                 }
                 a3 = era->get_atom("CA");
 
                 working->conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
-                delete pt3;
                 working->backconnect(sr, er);
 
             _no_connect:
@@ -2566,7 +2565,8 @@ int main(int argc, char** argv)
                                 if (r < 7)
                                 {
                                     // TODO:
-                                    InteratomicForce** iff = InteratomicForce::get_applicable(a, b);
+                                    InteratomicForce* iff[32];
+                                    InteratomicForce::fetch_applicable(a, b, iff);
                                     if (iff) for (m=0; iff[m]; m++)
                                     {
                                         if (r < 1.333 * iff[m]->get_distance())

@@ -15,36 +15,78 @@ int main(int argc, char** argv)
     Protein p("TheProtein");
     FILE* fp;
 
+    if (argc <= 2)
+    {
+        cout << "Usage:" << endl
+            << "test/group_test_res path/to/protein.pdb path/to/molecule.sdf" << endl
+            << "test/group_test_res path/to/protein.pdb {SMILES string}" << endl;
+        return -1;
+    }
+
+    /*
     p.add_sequence("AAAAAQGSAYAAVLAAAAAT");
     p.make_helix(1, p.get_seq_length(), M_PI, M_PI);
     p.make_helix(1, p.get_end_resno(), p.get_end_resno(), ALPHA_PHI, ALPHA_PSI);
     p.bridge(8, 10);
+    */
 
-    if (argc > 1)
+    fp = fopen(argv[1], "rb");
+    if (!fp) throw 0xffff;
+    p.load_pdb(fp);
+    fclose(fp);
+
+    if (file_exists(argv[2]))
     {
-        if (file_exists(argv[1]))
-        {
-            m.from_sdf(argv[1]);
-        }
-        else
-        {
-            m.from_smiles(argv[1]);
-        }
+        FILE* fp = fopen(argv[2], "rb");
+
+        fseek(fp, 0L, SEEK_END);
+        int size = ftell(fp);
+        rewind(fp);
+
+        char contents[size+4];
+        fread(contents, size, 1, fp);
+        fclose(fp);
+        m.from_sdf(contents);
     }
-    else m.from_smiles("C12=C(C=CN2)C=CC=C1");
+    else
+    {
+        m.from_smiles(argv[2]);
+    }
 
-    int i, n;
+    int i, n, l;
 
-    std::vector<std::shared_ptr<AtomGroup>> ligand_groups = AtomGroup::get_potential_ligand_groups(&m);
+    std::vector<std::shared_ptr<AtomGroup>> ligand_groups = AtomGroup::get_potential_ligand_groups(&m, true);
 
     AminoAcid* reach_residues[SPHREACH_MAX];
-    Point target = p.get_residue(10)->get_CA_location();
-    Point center = p.get_region_center(1, p.get_end_resno());
-    SCoord d = target.subtract(center);
-    d.r = 3.5;
-    target = target.add(d);
+    Point target, center;
+    std::vector<Point> pocket;
 
-    Point size(9,9,9);
+    for (l=3; l<argc; l++)
+    {
+        AminoAcid* a = p.get_residue_bw(argv[l]);
+        if (!a) continue;
+        pocket.push_back(a->get_CA_location());
+    }
+
+    if (n = pocket.size())
+    {
+        target = Point(0,0,0);
+        for (l=0; l<n; l++)
+        {
+            target = target.add(pocket[l]);
+        }
+        target.scale(target.magnitude()/n);
+    }
+    else
+    {
+        target = p.get_residue(10)->get_CA_location();
+        center = p.get_region_center(1, p.get_end_resno());
+        SCoord d = target.subtract(center);
+        d.r = 3.5;
+        target = target.add(d);
+    }
+
+    Point size(7.5,7.5,7.5);
     int sphres = p.get_residues_can_clash_ligand(reach_residues, &m, target, size, nullptr);
     cout << "# Reach residues:" << endl;
     cout << "# ";

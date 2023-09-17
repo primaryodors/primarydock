@@ -24,6 +24,9 @@ Protein::Protein(const char* lname)
     ca = nullptr;
     res_reach = nullptr;
     metals = nullptr;
+
+    int i;
+    for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
 }
 
 Protein::~Protein()
@@ -32,7 +35,6 @@ Protein::~Protein()
 
     delete[] remarks;
     remarksz = 0;
-    delete ca;
 }
 
 bool Protein::add_residue(const int resno, const char aaletter)
@@ -41,7 +43,7 @@ bool Protein::add_residue(const int resno, const char aaletter)
 
     if (!residues)
     {
-        int arrlimit = resno+256;
+        arrlimit = resno+1024;
         residues = new AminoAcid*[arrlimit];
         sequence = new char[arrlimit];
         ca = new Atom*[arrlimit];
@@ -55,13 +57,13 @@ bool Protein::add_residue(const int resno, const char aaletter)
             res_reach[i] = 0;
         }
     }
-    else if (resno % 256)
+    else if (resno >= arrlimit)
     {
         AminoAcid** oldres = residues;
         char* oldseq = sequence;
         Atom** oldca = ca;
         float* oldreach = res_reach;
-        int arrlimit = resno+261;
+        arrlimit = resno+1024;
         residues = new AminoAcid*[arrlimit];
         sequence = new char[arrlimit];
         ca = new Atom*[arrlimit];
@@ -90,7 +92,8 @@ bool Protein::add_residue(const int resno, const char aaletter)
 
     if (i)
     {
-        Point* pts = residues[i-1]->predict_next_NHCA();
+        Point pts[4];
+        residues[i-1]->predict_next_NHCA(pts);
         residues[i] = new AminoAcid(aaletter, residues[i-1], false);
         residues[i]->ensure_pi_atoms_coplanar();
 
@@ -115,8 +118,6 @@ bool Protein::add_residue(const int resno, const char aaletter)
             }
         }
         else cout << "Warning: Residue " << resno << " has no N atom." << endl << flush;
-
-        delete[] pts;
     }
     else
     {
@@ -174,7 +175,7 @@ AminoAcid* Protein::get_residue_bw(const char* bwno)
 
 AminoAcid* Protein::get_residue_bw(int hxno, int bwno)
 {
-    if (!Ballesteros_Weinstein.size())
+    if (!Ballesteros_Weinstein[3])
     {
         cout << "Call to get_residue_bw() on a protein with no BW numbers set." << endl;
         throw -1;
@@ -381,6 +382,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
                 #endif
                 for (j=0; j<n; j++)
                 {
+                    if (residues[i] == laa[j]) continue;
                     if (residues[i]->get_intermol_clashes(laa[j]) > 3)
                     {
                         #if _dbg_repack
@@ -737,7 +739,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
                     char** words = chop_spaced_words(buffer);
                     if (words[2] && !words[3])
                         name = words[2];
-                    delete words;
                 }
             }
             else if (buffer[0] == 'C'
@@ -877,7 +878,6 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
 
         set_region(words[3], atoi(words[4]), atoi(words[5]));
         regions_from = rgn_pdb;
-
         delete words;
     }
 
@@ -894,10 +894,8 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
         int f4 = atoi(words[4]);
         if (!strcmp(words[3], "BW"))
         {
-            while (Ballesteros_Weinstein.size() <= f4) Ballesteros_Weinstein.push_back(0);
             Ballesteros_Weinstein[f4] = atoi(words[5]);
         }
-
         delete words;
     }
 
@@ -973,7 +971,7 @@ void Protein::revert_to_pdb()
 
 int Protein::get_bw50(int helixno)
 {
-    if (Ballesteros_Weinstein.size() <= helixno) return -1;
+    if (helixno < 1 || helixno > 78) return -1;
     return Ballesteros_Weinstein[helixno];
 }
 
@@ -1025,10 +1023,8 @@ void Protein::add_remark(const char* remark)
         )
     {
         int f4 = atoi(words[4]);
-        while (Ballesteros_Weinstein.size() <= f4) Ballesteros_Weinstein.push_back(0);
         Ballesteros_Weinstein[f4] = atoi(words[5]);
     }
-    delete words;
 }
 
 std::vector<std::string> Protein::get_remarks(std::string search_for)
@@ -1268,13 +1264,13 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         )
 {
     int i, j, sphres = 0;
-    int seql = get_seq_length();
+    int seql = get_end_resno();
     bool resno_already[8192];
     for (i=0; i<8192; i++) resno_already[i] = false;
 
     for (i=0; i<SPHREACH_MAX; i++) reaches_spheroid[i] = NULL;
 
-    for (i=1; i<=seql; i++)
+    for (i=1; i<seql && residues[i]; i++)
     {
         AminoAcid* aa = residues[i-1];
         if (!aa) continue;
@@ -1461,8 +1457,12 @@ int Protein::search_sequence(const int sr, const int esr, const char* psz, const
             }
             else
             {
-                if (c == aac) num_eq++;
-                sim = aa->similarity_to(c);
+                if (c == aac)
+                {
+                    num_eq++;
+                    sim = 1;
+                }
+                else sim = aa->similarity_to(c);
                 m += sim;
             }
 
@@ -1812,7 +1812,8 @@ void Protein::backconnect(int startres, int endres)
             cout << pointer << ":";
             #endif
 
-            Point* pts = (inc > 0) ? next->predict_previous_COCA() : next->predict_next_NHCA();
+            Point pts[4];
+            (inc > 0) ? next->predict_previous_COCA(pts) : next->predict_next_NHCA(pts);
             Point ptsc[4];
 
             #if _INCREMENTAL_BKCONN
@@ -1832,7 +1833,6 @@ void Protein::backconnect(int startres, int endres)
             #endif
 
             curr->attach_to_prediction(pts, inc > 0);
-            delete[] pts;
             // break;
 
             #if DBG_BCKCONN
@@ -1848,10 +1848,10 @@ void Protein::backconnect(int startres, int endres)
                 cout << "a";
                 #endif
 
-                pts = (inc < 0) ? prev->predict_previous_COCA() : prev->predict_next_NHCA();
+                pts[4];
+                (inc < 0) ? prev->predict_previous_COCA(pts) : prev->predict_next_NHCA(pts);
                 Point target_heavy = pts[0];
                 Point target_pole = pts[1];
-                delete[] pts;
 
                 #if DBG_BCKCONN
                 cout << "b";
@@ -3053,9 +3053,9 @@ void Protein::homology_conform(Protein* target, Protein* reference)
 
     // Check that both proteins have TM helices and BW numbers set. If not, error out.
     if (!get_region_start("TMR6") || !target->get_region_start("TMR6")) throw 0xbadbeb7;
-    if (!Ballesteros_Weinstein.size() || !target->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
+    if (!Ballesteros_Weinstein[3] || !target->Ballesteros_Weinstein[3]) throw 0xbadbeb7;
     if (!reference->get_region_start("TMR6")) throw 0xbadbeb7;
-    if (!reference->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
+    if (!reference->Ballesteros_Weinstein[3]) throw 0xbadbeb7;
 
     upright();
     target->upright();
@@ -3501,8 +3501,17 @@ void Protein::bridge(int resno1, int resno2)
 
     _INTERA_R_CUTOFF = aa1->get_CA_location().get_3d_distance(aa2->get_CA_location())
         + aa1->get_reach() + aa2->get_reach() + _DEFAULT_INTERA_R_CUTOFF;
+    
+    float r = aa1->get_CA_location().get_3d_distance(aa2->get_CA_location()) - aa1->get_reach() - aa2->get_reach();
+    if (r > 2.5)
+    {
+        aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa2->get_reach_atom()->get_location());
+        aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa1->get_reach_atom()->get_location());
+        aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa2->get_reach_atom()->get_location());
+        aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa1->get_reach_atom()->get_location());
+    }
 
-    Molecule** mols = new Molecule*[3];
+    Molecule* mols[3];
     mols[0] = aa1;
     mols[1] = aa2;
     mols[2] = nullptr;
@@ -3519,24 +3528,10 @@ void Protein::bridge(int resno1, int resno2)
 
     Molecule::conform_molecules(mols, 25);
 
-    delete mols;
-
     aa1->movability = MOV_PINNED;
     aa2->movability = MOV_PINNED;
 
     _INTERA_R_CUTOFF = _DEFAULT_INTERA_R_CUTOFF;
-}
-
-SoftBias* Protein::get_soft_bias_from_region(const char* region)
-{
-    int sz = soft_biases.size();
-    if (!sz) return nullptr;
-    int i;
-    for (i=0; i<sz; i++)
-    {
-        if (soft_biases[i].region_name == (std::string)region) return &soft_biases[i];
-    }
-    return nullptr;
 }
 
 void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
@@ -3553,7 +3548,6 @@ void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
     {
         for (l=0; l<sz; l++)
         {
-            SoftBias* sb = get_soft_bias_from_region(l_soft_rgns[l].name.c_str());
             if (!l) prebind = (ligand ? get_intermol_binding(ligand)*soft_ligand_importance : 0) + get_internal_binding()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
             
             #if _dbg_soft
@@ -3562,39 +3556,6 @@ void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
 
             int tweak = rand() % 6;
             float amount = nanf("unbiased");
-
-            if (sb)
-            {
-                switch (tweak)
-                {
-                    case 0:
-                    amount = sb->radial_transform;
-                    break;
-
-                    case 1:
-                    amount = sb->angular_transform;
-                    break;
-
-                    case 2:
-                    amount = sb->vertical_transform;
-                    break;
-
-                    case 3:
-                    amount = sb->helical_rotation;
-                    break;
-
-                    case 4:
-                    amount = sb->radial_rotation;
-                    break;
-
-                    case 5:
-                    amount = sb->transverse_rotation;
-                    break;
-
-                    default:
-                    ;
-                }
-            }
 
             if (isnan(amount) || !amount) amount = frand(-1, 1);
             else

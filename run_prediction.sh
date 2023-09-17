@@ -1,4 +1,5 @@
 #!/bin/bash
+clear
 
 PROT="$1"
 LIG="$2"

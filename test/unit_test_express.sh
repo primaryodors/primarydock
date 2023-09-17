@@ -8,8 +8,6 @@ cd "$(dirname "$0")"
 if [ ! -f "../testdata/received" ]; then mkdir -p "../testdata/received"; fi
 cd ..
 
-clear
-
 
 REPORT="testdata/molecule_test1.approved.txt"
 ./test/molecule_test 'CCO' 'CCO' | tee temp | sed '/^#/d' >testdata/received/molecule_test1.received.txt
@@ -295,4 +293,4 @@ else
     diff --color --unified testdata/moiety.amine.approved.txt testdata/received/moiety.amine.received.txt
 fi
 
-printf "\n"
+printf "\n\n"

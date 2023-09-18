@@ -2945,11 +2945,12 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #if allow_bond_rots
             pib.copy_state(a);
             #if _dbg_mol_flexion
-            cout << a->name << " movability " << hex << a->movability << dec << endl << flush;
+            bool is_flexion_dbg_mol = (a->is_residue() == 107);
+            if (is_flexion_dbg_mol) cout << a->name << " movability " << hex << a->movability << dec << endl << flush;
             #endif
-            if ((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN))
+            if (((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN)) || a->movability == MOV_FLXDESEL)
             {
-                float self_clash = 1.1*a->get_internal_clashes();
+                float self_clash = max(1.25*a->base_internal_clashes, homology_clash_peraa);
                 Bond** bb = a->get_rotatable_bonds();
                 if (bb)
                 {
@@ -2959,15 +2960,24 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         if (!bb[q]->count_moves_with_btom()) continue;
                         float theta;
                         int heavy_atoms = bb[q]->count_heavy_moves_with_btom();
-                        // if (heavy_atoms && (!(a->movability & MOV_CAN_FLEX) || (a->movability & MOV_FORBIDDEN))) continue;
+                        if (heavy_atoms && (!(a->movability & MOV_CAN_FLEX) || (a->movability & MOV_FORBIDDEN))) continue;
+
+                        #if _dbg_mol_flexion
+                        bool is_flexion_dbg_mol_bond = is_flexion_dbg_mol & !strcmp(bb[q]->btom->name, "OG");
+                        #endif
 
                         if (do_full_rotation /*&& benerg <= 0*/ && bb[q]->can_rotate)
                         {
                             float best_theta = 0;
-                            for (theta=0; theta < M_PI*2; theta += _fullrot_steprad)
+                            for (theta=_fullrot_steprad; theta < M_PI*2; theta += _fullrot_steprad)
                             {
                                 bb[q]->rotate(_fullrot_steprad, false);
                                 tryenerg = cfmol_multibind(a, nearby);
+
+                                #if _dbg_mol_flexion
+                                if (is_flexion_dbg_mol_bond) cout << (theta*fiftyseven) << "deg: " << -tryenerg << endl;
+                                #endif
+
                                 if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
                                 {
                                     benerg = tryenerg;
@@ -2983,12 +2993,16 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 {
                                     group_realign(a, a->agroups);
                                 }
+
+                                #if _dbg_mol_flexion
+                                if (is_flexion_dbg_mol_bond) cout << "Rotating to " << (best_theta*fiftyseven) << "deg." << endl << endl;
+                                #endif
                             }
                         }
                         else
                         {
-                            if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-M_PI, M_PI) / 2;
-                            else if (!heavy_atoms) theta = frand(-M_PI, M_PI) / 2;
+                            if (a->movability & MOV_MC_FLEX && frand(0,1) < 0.25) theta = frand(-_fullrot_steprad, _fullrot_steprad);
+                            else if (!heavy_atoms) theta = frand(-_fullrot_steprad, _fullrot_steprad);
                             else if (bb[q]->count_heavy_moves_with_atom() < heavy_atoms)
                                 theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
                             else theta = frand(-0.3, 0.3)*fiftyseventh*min(iter, 20);
@@ -3008,15 +3022,27 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                             tryenerg = cfmol_multibind(a, nearby);
 
+                            #if _dbg_mol_flexion
+                            if (is_flexion_dbg_mol_bond) cout << "Trying " << (theta*fiftyseven) << "deg rotation...";
+                            #endif
+
                             if (tryenerg > benerg && a->get_internal_clashes() <= self_clash)
                             {
                                 benerg = tryenerg;
                                 pib.copy_state(a);
                                 a->been_flexed = true;
+
+                                #if _dbg_mol_flexion
+                                if (is_flexion_dbg_mol_bond) cout << " energy now " << -tryenerg << ", keeping." << endl << endl;
+                                #endif
                             }
                             else
                             {
                                 pib.restore_state(a);
+
+                                #if _dbg_mol_flexion
+                                if (is_flexion_dbg_mol_bond) cout << " energy from " << -benerg << " to " << -tryenerg << ", reverting." << endl << endl;
+                                #endif
                             }
                         }
                     }

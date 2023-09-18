@@ -2787,7 +2787,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
         for (n=0; mm[n]; n++);      // Get count.
         Molecule* nearby[n+8];
-        bool do_full_rotation = (iter < iters*.666 && (iter % _fullrot_every) == 0);
+        bool do_full_rotation = ((iter % _fullrot_every) == 0);
 
         for (i=0; i<n; i++)
         {
@@ -2959,7 +2959,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         float theta;
                         int heavy_atoms = bb[q]->count_heavy_moves_with_btom();
 
-                        if (do_full_rotation && benerg <= 0 && bb[q]->can_rotate)
+                        if (do_full_rotation /*&& benerg <= 0*/ && bb[q]->can_rotate)
                         {
                             float best_theta = 0;
                             for (theta=0; theta < M_PI*2; theta += _fullrot_steprad)

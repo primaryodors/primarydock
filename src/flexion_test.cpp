@@ -35,6 +35,18 @@ int main(int argc, char** argv)
     {
         bt->rotate(step);
         during = -m.get_intermol_binding(aa);
-        cout << (theta*fiftyseven) << "deg: " << before << endl;
+        cout << (theta*fiftyseven) << "deg: " << during << endl;
     }
+
+    aa->movability = MOV_FORCEFLEX;
+    m.movability = MOV_PINNED;
+
+    Molecule* mols[4];
+    mols[0] = &m;
+    mols[1] = (Molecule*)aa;
+    mols[2] = nullptr;
+
+    Molecule::conform_molecules(mols);
+    float after = -m.get_intermol_binding(aa);
+    cout << "Final energy: " << after << endl;
 }

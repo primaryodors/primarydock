@@ -62,8 +62,10 @@ $ligands_inprogress = [];
 foreach ($result as $line)
 {
     $pos = strpos($line, ".$rcpid.");
+    if (false == $pos) $pos = strpos($line, ".{$rcpid}_");
     if (false == $pos) continue;
-    $ligname = substr($line, $pos+strlen(".$rcpid."));
+    $pos2 = strpos($line, ".", $pos+1);
+    $ligname = substr($line, $pos2);
     $ligname = preg_replace("/[.]config/", "", $ligname);
     $odor = find_odorant($ligname);
     $ligands_inprogress[$odor['oid']] = true;

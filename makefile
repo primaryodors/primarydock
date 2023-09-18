@@ -15,7 +15,7 @@ all: $(DIRS) \
 	 $(OBJS) \
 	 $(TESTS) \
 	 $(APPS)
-code: $(DIRS) $(OBJS) $(TESTS) amino_report molecule_report $(APPS)
+code: $(DIRS) $(OBJS) $(TESTS) $(APPS)
 primarydock: $(DIRS) $(OBJS) $(BINDIR)/primarydock
 pepteditor: $(DIRS) $(OBJS) $(BINDIR)/pepteditor
 ic: $(DIRS) $(OBJS) $(BINDIR)/ic

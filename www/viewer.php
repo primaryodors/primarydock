@@ -14,7 +14,7 @@ if (@$_REQUEST['view'] == "pred")
 
     $path = "../output/$fam/$protid/$protid.$odor.$mode.model$n.pdb";
     if (!file_exists($path)) $path = "../output/$fam/$protid/$protid.$odor.model$n.pdb";
-    if (!file_exists($path)) die("Something went wrong. $path");
+    if (!file_exists($path)) die("Something went wrong.");
     $pdb = file_get_contents($path);
 
     $ligbs = "	var lligbs = [";

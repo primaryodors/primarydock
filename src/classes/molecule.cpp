@@ -781,7 +781,7 @@ int Molecule::from_sdf(char const* sdf_dat)
     return added;
 }
 
-int Molecule::from_pdb(FILE* is)
+int Molecule::from_pdb(FILE* is, bool het_only)
 {
     /*
     ATOM     55  SG  CYS     4       6.721  -8.103   4.542  1.00001.00           S
@@ -796,9 +796,10 @@ int Molecule::from_pdb(FILE* is)
 
         if (words)
         {
-            if (!strcmp(words[0], "ATOM")
-                    ||
-                    !strcmp(words[0], "HETATM")
+            if (
+                  (!strcmp(words[0], "ATOM") && !het_only)
+                  ||
+                  !strcmp(words[0], "HETATM")
                )
             {
                 try

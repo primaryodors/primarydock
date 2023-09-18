@@ -717,6 +717,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         if (!forces[i]->distance) continue;
         float r1 = r / forces[i]->distance;
 
+        #if _dbg_interatomic_forces
+        bool debug_criteria = forces[i]->type != vdW && !a->is_backbone && !b->is_backbone;
+        if (debug_criteria) cout << a->name << " ~ " << *forces[i] << " ~ " << b->name << endl;
+        #endif
+
         if (forces[i]->type == covalent) continue;
         
         float partial, rdecayed;
@@ -811,6 +816,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             if (forces[i]->type == vdW) dp = 1;					// van der Waals forces are non-directional, but the C-H bond still shields.
             else if (forces[i]->get_dp()) dp = forces[i]->get_dp();
 
+            #if _dbg_interatomic_forces
+            if (debug_criteria) cout << "Anisotropic directional propensity: " << dp << endl;
+            #endif
+
             // Anisotropy.
             SCoord* ageo = a->get_geometry_aligned_to_bonds();
             SCoord* bgeo = b->get_geometry_aligned_to_bonds();
@@ -865,6 +874,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 }
                 else dpa = dpb = dp;
             }
+
+            // Hydrogens have very low directional propensities.
+            // file:///mnt/data/ext2/refs/NIHMS1601788-supplement-1.pdf
+            if (a->get_Z() == 1) dpa = 0.75;
+            if (b->get_Z() == 1) dpb = 0.75;
 
             Point aloc = a->get_location();
             Point bloc = b->get_location();
@@ -970,6 +984,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     if (forces[i]->type != pi && forces[i]->type != polarpi) if (atheta > M_PI/2) continue;
                     float contrib = pow(fmax(0,cos(atheta)), dpa);
                     if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
+
+                    #if _dbg_interatomic_forces
+                    if (debug_criteria) cout << a->name << " anisotropic angle " << (atheta*fiftyseven)
+                        << "deg with dpa = " << dpa
+                        << ", contributing " << contrib
+                        << endl;
+                    #endif
                 }
 
                 // Sum up the anisotropic contribution from each geometry vertex of b.
@@ -983,6 +1004,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     if (forces[i]->type != pi && forces[i]->type != polarpi) if (btheta > M_PI/2) continue;
                     float contrib = pow(fmax(0,cos(btheta)), dpb);
                     if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
+
+                    #if _dbg_interatomic_forces
+                    if (debug_criteria) cout << b->name << " anisotropic angle " << (btheta*fiftyseven)
+                        << "deg with dpb = " << dpb
+                        << ", contributing " << contrib
+                        << endl;
+                    #endif
                 }
 
                 asum = fmin(1, fmax(0, fabs(asum)));
@@ -991,6 +1019,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                 // Multiply the two sums.
                 aniso = fmax(minimum_searching_aniso, asum * bsum);
             }
+
+            #if _dbg_interatomic_forces
+            if (debug_criteria) cout << "Anisotropy: " << aniso << " from " << asum << " * " << bsum << endl;
+            #endif
 
             if (r1 >= 1)
             {
@@ -1063,6 +1095,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             #endif
         }
         
+        #if _dbg_interatomic_forces
+        if (debug_criteria) cout << -partial << endl;
+        #endif
+
         if (fabs(partial) >= 500)
         {
             cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
@@ -1100,6 +1136,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             bvdW *= f;
             rbind = forces[i]->distance;
         }
+
+        #if _dbg_interatomic_forces
+        if (debug_criteria) cout << endl;
+        #endif
+
 
         #if _peratom_audit
         if (interauditing)

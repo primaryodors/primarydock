@@ -317,6 +317,7 @@
 #define _peratom_audit 0
 
 // Should normally be false or zero:
+#define _dbg_interatomic_forces 0
 #define _dummy_atoms_for_debug 0
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0

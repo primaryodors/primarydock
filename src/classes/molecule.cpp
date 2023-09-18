@@ -123,29 +123,33 @@ Pose::Pose(Molecule* m)
 
 Pose::~Pose()
 {
-    // if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete saved_atom_locs;
+    //
 }
 
 void Pose::reset()
 {
     sz = 0;
-    saved_atom_locs = nullptr;
+    saved_atom_locs.clear();
     saved_from = nullptr;
 }
 
 void Pose::copy_state(Molecule* m)
 {
-    if (!saved_atom_locs || saved_from != m)
+    int i;
+    if (!saved_atom_locs.size() || saved_from != m)
     {
-        if (saved_atom_locs > reinterpret_cast<void*>(0xff)) delete[] saved_atom_locs;
+        saved_atom_locs.clear();
         saved_from = m;
         if (!m || !m->atoms) return;
 
         sz = m->get_atom_count();
-        saved_atom_locs = new Point[sz+16];
+        for (i=0; i<=sz; i++)
+        {
+            Point pt;
+            saved_atom_locs.push_back(pt);
+        }
     }
 
-    int i;
     for (i=0; m->atoms[i] && i<sz; i++)
     {
         saved_atom_locs[i] = m->atoms[i]->get_location();

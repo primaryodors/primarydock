@@ -65,7 +65,7 @@ public:
 
 protected:
     int sz = 0;
-    Point* saved_atom_locs = nullptr;
+    std::vector<Point> saved_atom_locs;
     Molecule* saved_from = nullptr;
 };
 

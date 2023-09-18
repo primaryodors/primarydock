@@ -2947,7 +2947,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #if _dbg_mol_flexion
             cout << a->name << " movability " << hex << a->movability << dec << endl << flush;
             #endif
-            if ((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN))
+            if (1) // (a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN))
             {
                 float self_clash = 1.1*a->get_internal_clashes();
                 Bond** bb = a->get_rotatable_bonds();
@@ -2956,8 +2956,18 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     int q;
                     for (q=0; bb[q]; q++)
                     {
+                        if (!bb[q]->count_moves_with_btom()) continue;
                         float theta;
                         int heavy_atoms = bb[q]->count_heavy_moves_with_btom();
+                        if (heavy_atoms && (!(a->movability & MOV_CAN_FLEX) || (a->movability & MOV_FORBIDDEN)))
+                        {
+                            // cout << a->name << ":" << *bb[q] << " cannot flex." << endl;
+                            continue;
+                        }
+                        /*else
+                        {
+                            cout << "...but " << a->name << ":" << *bb[q] << " can." << endl;
+                        }*/
 
                         if (do_full_rotation /*&& benerg <= 0*/ && bb[q]->can_rotate)
                         {

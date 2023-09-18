@@ -69,9 +69,9 @@
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (180.0 * fiftyseventh)
-#define _fullrot_stepdeg 10
+#define _fullrot_stepdeg 20
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
-#define _fullrot_every 10
+#define _fullrot_every 17
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)

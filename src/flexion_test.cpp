@@ -11,7 +11,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    Molecule m("Testing");
+    Molecule m("TheLigand");
     Protein p("TheProtein");
     FILE* fp;
     std::string pdbfn = "testdata/OR12D2.propionic_acid.tester.pdb";

@@ -74,8 +74,7 @@ If you would like to contribute to this project:
 Note to developers: if you run PrimaryDock under a memory utility such as valgrind, you are likely to see a lot of errors saying that
 uninitialized variables are being used or that conditional jumps depend on them. Most of these are false positives. Many places in the
 code create temporary arrays of pointers and then assign those pointers addresses of objects that persist throughout the entire program
-execution. The memory tool "thinks" the objects have not been initialized even when they have, and that the arrays should be `delete[]`ed
-when they definitely should not. We recommend using the --undef-value-errors=no option with valgrind or the equivalent switch in your
+execution. The memory tool "thinks" the objects have not been initialized even when they have. We recommend using the --undef-value-errors=no option with valgrind or the equivalent switch in your
 utility of choice.
 
 

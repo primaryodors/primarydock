@@ -876,7 +876,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             }
 
             // Hydrogens have very low directional propensities.
-            // file:///mnt/data/ext2/refs/NIHMS1601788-supplement-1.pdf
+            // https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7325729/bin/NIHMS1601788-supplement-1.pdf
             if (a->get_Z() == 1) dpa = 0.75;
             if (b->get_Z() == 1) dpb = 0.75;
 

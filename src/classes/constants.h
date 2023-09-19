@@ -14,7 +14,7 @@
 // #define coplanar_threshold 0.5
 #define coplanar_threshold 2.5
 #define oxytocin 0.003
-#define _DEFAULT_INTERA_R_CUTOFF 8
+#define _DEFAULT_INTERA_R_CUTOFF 6
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
 
@@ -69,9 +69,9 @@
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (180.0 * fiftyseventh)
-#define _fullrot_stepdeg 10
+#define _fullrot_stepdeg 20
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
-#define _fullrot_every 10
+#define _fullrot_every 17
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
@@ -317,6 +317,7 @@
 #define _peratom_audit 0
 
 // Should normally be false or zero:
+#define _dbg_interatomic_forces 0
 #define _dummy_atoms_for_debug 0
 #define _DBG_LONELINESS 0
 #define _DBG_STEPBYSTEP 0

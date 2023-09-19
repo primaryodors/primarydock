@@ -18,8 +18,8 @@ int main(int argc, char** argv)
     if (argc <= 2)
     {
         cout << "Usage:" << endl
-            << "test/group_test_res path/to/protein.pdb path/to/molecule.sdf" << endl
-            << "test/group_test_res path/to/protein.pdb {SMILES string}" << endl;
+            << "test/group_test_res path/to/protein.pdb path/to/molecule.sdf {pocket residues}" << endl
+            << "test/group_test_res path/to/protein.pdb {SMILES string} {pocket residues}" << endl;
         return -1;
     }
 

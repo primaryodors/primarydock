@@ -226,7 +226,7 @@ float AtomGroup::compatibility(AminoAcid* aa)
     float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
 
     float aachg = aa->get_charge();
-    if (aa->conditionally_basic()) aachg += protonation(aa->sc_pKa());
+    // if (aa->conditionally_basic()) aachg += protonation(aa->sc_pKa());           // Prevent carboxylic acids from preferring histidine residues.
     if (lgi && aachg && sgn(lgi) != -sgn(aachg)) return 0;
 
     if (aa->hydrophilicity() > 0.25)

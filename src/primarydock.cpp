@@ -11,29 +11,9 @@
 #include "classes/dynamic.h"
 #include "classes/group.h"
 #include "classes/protein.h"
+#include "classes/scoring.h"
 
 using namespace std;
-
-struct DockResult
-{
-    int pose;
-    float kJmol;
-    float ikJmol;
-    char** metric;
-    float* mkJmol;
-    float* imkJmol;
-    float* mvdWrepl;
-    float* imvdWrepl;
-    std::string pdbdat;
-    std::string softrock;
-    std::string miscdata;
-    float bytype[_INTER_TYPES_LIMIT];
-    float ibytype[_INTER_TYPES_LIMIT];
-    float proximity;                    // How far the ligand center is from the node's center.
-    float tripswitch;                   // Effect of the ligand on the receptor's trip switch.
-    float polsat;
-    float protclash;
-};
 
 struct AcvBndRot
 {
@@ -141,10 +121,6 @@ Molecule* alignment_aa[5];
 
 Pose pullaway_undo;
 float last_ttl_bb_dist = 0;
-
-float* initial_binding;
-float* initial_vdWrepl;
-float init_total_binding_by_type[_INTER_TYPES_LIMIT];
 
 std::vector<AcvBndRot> active_bond_rots;
 std::vector<int> tripswitch_clashables;
@@ -2366,7 +2342,6 @@ int main(int argc, char** argv)
     #if _dbg_find_blasted_segfault
     cout << "dr[" << i << "][" << j << "] allocated. " << dr << endl;
     #endif
-    for (i=0; i<poses; i++) dr[i][0].kJmol = 0;
 
     float rgnxform_r[i][pathnodes+2][PROT_MAX_RGN], rgnxform_theta[i][pathnodes+2][PROT_MAX_RGN], rgnxform_y[i][pathnodes+2][PROT_MAX_RGN];
     float rgnrot_alpha[i][pathnodes+2][PROT_MAX_RGN], rgnrot_w[i][pathnodes+2][PROT_MAX_RGN], rgnrot_u[i][pathnodes+2][PROT_MAX_RGN];
@@ -2386,11 +2361,6 @@ int main(int argc, char** argv)
 
     reaches_spheroid = new AminoAcid**[pathnodes+2];
     for (i=0; i<=pathnodes; i++) reaches_spheroid[i] = new AminoAcid*[SPHREACH_MAX];
-
-    #if active_persistence
-    float res_kJmol[seql+8];
-    for (i=0; i<seql+8; i++) res_kJmol[i] = 0;
-    #endif
 
     found_poses = 0;
     int wrote_acvmx = -1, wrote_acvmr = -1;
@@ -2838,11 +2808,6 @@ _try_again:
                     alignment_distance[l]=0;
                 }
 
-                for (l=0; l<=pathnodes; l++)
-                {
-                    dr[drcount][l].metric = 0;
-                }
-
                 #if _DBG_STEPBYSTEP
                 if (debug) *debug << "Initialize null AA pointer." << endl;
                 #endif
@@ -3042,272 +3007,12 @@ _try_again:
             if (debug) *debug << "Preparing output." << endl;
             #endif
 
-            int psl8 = protein->get_seq_length()+8;
-
-            char metrics[psl8][10];
-            float mkJmol[psl8];
-            float imkJmol[psl8];
-            float mvdWrepl[psl8];
-            float imvdWrepl[psl8];
-            int metcount = 0;
-            float btot = 0;
-            float pstot = 0;
-
-            for (i=0; i<psl8; i++)
-            {
-                mkJmol[i] = imkJmol[i] = mvdWrepl[i] = imvdWrepl[i] = 0;
-            }
-
-            for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-
-            if (debug) *debug << "Pose " << pose << " pathnode " << nodeno /*<< " clashes " << clash*/ << endl;
-
-            m.clear_atom_binding_energies();
-
-            if (met)
-            {
-                met->clear_atom_binding_energies();
-                float lb = m.get_intermol_binding(met);
-                strcpy(metrics[metcount], "Metals");
-                mkJmol[metcount] = lb;
-                imkJmol[metcount] = 0;								// TODO
-
-                mvdWrepl[metcount] = 0;
-                mvdWrepl[metcount] += m.get_vdW_repulsion(met);		// TODO: Include repulsions with non-mcoord side chains.
-
-                imvdWrepl[metcount] = 0;							// TODO
-
-                metcount++;
-
-                btot += lb;
-                // cout << "Metal adds " << lb << " to btot, making " << btot << endl;
-            }
-
-            float final_binding[seql+4];
-            float final_vdWrepl[seql+4];
-            for (i=0; i<seql+4; i++) final_binding[i] = final_vdWrepl[i] = 0;
-
-            std::vector<AminoAcid*> allres = protein->get_residues_near(pocketcen, 10000);
-            qpr = allres.size();
-            Molecule* postaa[seql+8];
-            postaa[0] = ligand;
-            for (i=0; i<qpr; i++)
-            {
-                postaa[i+1] = reinterpret_cast<Molecule*>(allres[i]);
-            }
-
-
-            float tripclash = 0;
-
-
-            if (differential_dock)
-            {
-                for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-
-                for (i=0; i<qpr+1; i++)
-                {
-                    int resno = i ? (allres[i-1]->get_residue_no()) : 0;
-                    #if _DBG_TOOLARGE_DIFFNUMS
-                    std::string ibdbg = to_string(resno) + (std::string)" ibdbg:\n";
-                    #endif
-
-                    bool is_trip_i = false;
-                    for (n=0; n<tripswitch_clashables.size(); n++)
-                        if (tripswitch_clashables[n] == resno)
-                        {
-                            is_trip_i = true;
-                            break;
-                        }
-
-                    for (j=0; j<qpr+1; j++)
-                    {
-                        if (j == i) continue;
-                        int jres = j ? allres[j-1]->get_residue_no() : 0;
-
-                        bool is_trip_j = false;
-                        if (is_trip_i && j)
-                            for (n=0; n<tripswitch_clashables.size(); n++)
-                                if (tripswitch_clashables[n] == jres)
-                                {
-                                    is_trip_j = true;
-                                    break;
-                                }
-
-                        float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
-                        if (f < 0 && is_trip_j)
-                        {
-                            tripclash -= f;
-                            f = 0;
-                        }
-                        final_binding[resno] += f;
-
-                        #if _DBG_TOOLARGE_DIFFNUMS
-                        if (f) ibdbg += to_string(postaa[j]->get_atom(0)->residue) + (std::string)" " + to_string(f) + (std::string)"\n";
-                        #endif
-
-                        final_vdWrepl[resno] += postaa[i]->get_vdW_repulsion(postaa[j]);
-                    }
-
-                    #if _DBG_TOOLARGE_DIFFNUMS
-                    if (fabs(final_binding[resno]) >= 200) cout << ibdbg << endl;
-                    #endif
-                }
-            }
-            else
-            {                
-                for (i=0; i<qpr; i++)
-                {
-                    int resno = allres[i]->get_residue_no();
-
-                    bool is_trip_i = false;
-                    for (n=0; n<tripswitch_clashables.size(); n++)
-                        if (tripswitch_clashables[n] == resno)
-                        {
-                            is_trip_i = true;
-                            break;
-                        }
-
-                    for (j=0; j<qpr; j++)
-                    {
-                        if (j == i) continue;
-                        int jres = allres[j]->get_residue_no();
-
-                        bool is_trip_j = false;
-                        if (is_trip_i)
-                            for (n=0; n<tripswitch_clashables.size(); n++)
-                                if (tripswitch_clashables[n] == jres)
-                                {
-                                    is_trip_j = true;
-                                    break;
-                                }
-                        if (!is_trip_j) continue;
-
-                        float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
-                        if (f < 0)
-                        {
-                            tripclash -= f;
-                            f = 0;
-                        }
-                    }
-                }
-            }
-
-            float fin_total_binding_by_type[_INTER_TYPES_LIMIT];
-            for (i=0; i<_INTER_TYPES_LIMIT; i++) fin_total_binding_by_type[i] = total_binding_by_type[i];
-
-            #if active_persistence
-            for (i=0; i<=seql; i++) res_kJmol[i] = 0;
-            #endif
-
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, m.get_barycenter(), size, addl_resno);
-            // cout << "sphres " << sphres << endl;
-            float maxclash = 0;
-
-            #if _peratom_audit
-            interaudit.clear();
-            interauditing = true;
-            #endif
-
-            for (i=0; i<sphres; i++)
-            {
-                if (!reaches_spheroid[nodeno][i]) continue;
-                if (!protein->aa_ptr_in_range(reaches_spheroid[nodeno][i])) continue;
-                reaches_spheroid[nodeno][i]->clear_atom_binding_energies();
-                int resno = reaches_spheroid[nodeno][i]->get_residue_no();
-
-                float lb = m.get_intermol_binding(reaches_spheroid[nodeno][i], false);
-                if (lb < -maxclash) maxclash -= lb;
-
-                if (differential_dock)
-                {
-                    mkJmol[metcount] = final_binding[resno] + lb;
-                }
-                else
-                {
-                    if (lb > 500) lb = 0;
-                    mkJmol[metcount] = lb;
-                }
-
-                #if active_persistence
-                res_kJmol[resno] = lb;
-                #endif
-
-                sprintf(metrics[metcount], "%s%d", reaches_spheroid[nodeno][i]->get_3letter(), resno);
-                // cout << metrics[metcount] << ": " << lb << " . ";
-
-                if (differential_dock)
-                {
-                    imkJmol[metcount] = initial_binding[resno];
-                    mvdWrepl[metcount] = final_vdWrepl[resno];
-                    imvdWrepl[metcount] = initial_vdWrepl[resno];
-                }
-                else
-                {
-                    mvdWrepl[metcount] = 0;
-                    mvdWrepl[metcount] += m.get_vdW_repulsion(reaches_spheroid[nodeno][i]);
-                    /*for (j=0; j<sphres; j++)
-                    {
-                    	if (j == i) continue;
-                    	mvdWrepl[metcount] += reaches_spheroid[nodeno][i]->get_vdW_repulsion(reaches_spheroid[nodeno][j]);
-                    }*/
-                    imkJmol[metcount] = 0;
-                    imvdWrepl[metcount] = 0;
-                }
-                metcount++;
-                btot += lb;
-                // cout << *(reaches_spheroid[nodeno][i]) << " adds " << lb << " to btot, making " << btot << endl;
-
-                float lf = m.get_intermol_polar_sat(reaches_spheroid[nodeno][i]);
-                pstot += lf;
-
-                #if _dbg_polsat
-                cout << *(reaches_spheroid[nodeno][i]) << " adds " << lf << " to pstot, making " << pstot << endl;
-                #endif
-            }
-            // cout << btot << endl;
-
-            if (mcn = mtlcoords.size())         // Assignment, not comparison.
-            {
-                for (i=0; i<mcn; i++)
-                {
-                    if (!mtlcoords[i].mtl) continue;
-                    Molecule lm("MTL");
-                    lm.add_existing_atom(mtlcoords[i].mtl);
-                    float f = m.get_intermol_binding(&lm);
-                    btot += f;
-                }
-            }
-
-            #if _peratom_audit
-            cout << endl << "Interatomic Audit:" << endl;
-            cout << "Total energy: " << -btot << endl;
-            int ian = interaudit.size(), iai;
-            for (iai=0; iai<ian; iai++) cout << interaudit[iai] << endl;
-            cout << endl << endl;
-            interauditing = false;
-            #endif
-
-            if (btot > 60*m.get_atom_count()) btot = 0;
-            if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
-
-            // drcount = pose-1+found_poses;
-
-            #if _DBG_STEPBYSTEP
-            if (debug) *debug << "Prepared metrics." << endl;
-            #endif
-
             // Set the dock result properties and allocate the arrays.
-            dr[drcount][nodeno].kJmol = (differential_dock && (maxclash > individual_clash_limit)) ? -Avogadro : btot;
-            dr[drcount][nodeno].ikJmol = 0;
-            dr[drcount][nodeno].polsat  = pstot;
-            dr[drcount][nodeno].metric   = new char*[metcount+4];
-            dr[drcount][nodeno].mkJmol    = new float[metcount];
-            dr[drcount][nodeno].imkJmol    = new float[metcount];
-            dr[drcount][nodeno].mvdWrepl    = new float[metcount];
-            dr[drcount][nodeno].imvdWrepl    = new float[metcount];
-            dr[drcount][nodeno].tripswitch  = tripclash;
-            dr[drcount][nodeno].proximity  = ligand->get_barycenter().get_3d_distance(nodecen);
-            dr[drcount][nodeno].protclash = protein->get_rel_int_clashes();
+            dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, differential_dock);
+            float btot = dr[drcount][nodeno].kJmol;
+            float pstot = dr[drcount][nodeno].polsat;
+
+            dr[drcount][nodeno].proximity = ligand->get_barycenter().get_3d_distance(nodecen);
 
             if (use_bestbind_algorithm)
             {
@@ -3346,42 +3051,7 @@ _try_again:
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Allocated memory." << endl;
             #endif
-
-            int itn;
-            for (itn=0; itn<_INTER_TYPES_LIMIT; itn++)
-            {
-                i = itn;
-                dr[drcount][nodeno].bytype[i] = differential_dock ? fin_total_binding_by_type[i] : total_binding_by_type[i];
-                dr[drcount][nodeno].ibytype[i] = init_total_binding_by_type[i];
-                dr[drcount][nodeno].ikJmol += init_total_binding_by_type[i];
-                dr[drcount][nodeno].kJmol += fin_total_binding_by_type[i];
-                // cout << drcount << "|" << i << " ";
-            }
-            // cout << endl;
-            #if _DBG_STEPBYSTEP
-            if (debug) *debug << "Filled btypes." << endl;
-            #endif
-
-            // Populate the array.
-            for (i=0; i<metcount; i++)
-            {
-                dr[drcount][nodeno].metric[i] = new char[max(8,(int)strlen(metrics[i])+4)];
-                strcpy(dr[drcount][nodeno].metric[i], metrics[i]);
-                dr[drcount][nodeno].mkJmol[i] = mkJmol[i];
-                dr[drcount][nodeno].imkJmol[i] = imkJmol[i];
-                dr[drcount][nodeno].mvdWrepl[i] = mvdWrepl[i];
-                dr[drcount][nodeno].imvdWrepl[i] = imvdWrepl[i];
-                // cout << "*" << dr[drcount][nodeno].metric[i] << ": " << dr[drcount][nodeno].mkJmol[i] << endl;
-            }
-
-            // Terminate with an empty string and a null pointer.
-            dr[drcount][nodeno].metric[i] = new char[2];
-            dr[drcount][nodeno].metric[i][0] = 0;
-            dr[drcount][nodeno].metric[i+1] = 0;
-            #if _DBG_STEPBYSTEP
-            if (debug) *debug << "More metrics or something idfk." << endl;
-            #endif
-
+            
             std::ostringstream pdbdat;
 
             // Prepare a partial PDB of the ligand atoms and all involved residue sidechains.
@@ -3785,11 +3455,13 @@ _try_again:
                         if (output) *output << "Protein clashes: " << dr[j][k].protclash << endl << endl;
                         cout << "Protein clashes: " << dr[j][k].protclash << endl << endl;
 
+                        #if use_trip_switch
                         if (tripswitch_clashables.size())
                         {
                             if (output) *output << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
                             cout << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
                         }
+                        #endif
 
                         if (differential_dock)
                         {

@@ -37,6 +37,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         mkJmol[i] = imkJmol[i] = mvdWrepl[i] = imvdWrepl[i] = 0;
     }
 
+    for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = 0;
+    for (i=0; i<_INTER_TYPES_LIMIT; i++) fin_total_binding_by_type[i] = 0;
     for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
 
     // if (debug) *debug << "Pose " << pose << " pathnode " << nodeno /*<< " clashes " << clash*/ << endl;
@@ -68,7 +70,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
     std::vector<AminoAcid*> allres = protein->get_residues_near(ligand->get_barycenter(), 100000);
     int qpr = allres.size();
-    Molecule* postaa[end1];
+    Molecule* postaa[qpr];
     postaa[0] = ligand;
     for (i=0; i<qpr; i++)
     {

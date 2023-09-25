@@ -138,6 +138,10 @@
 #define flexion_selection 1
 #define no_zero_flexions 1
 
+// If enabled, the trip switch functionality will have to be moved around in the code.
+// But since we are using an active vs. inactive energy comparison, this feature is obsolete.
+#define use_trip_switch 0
+
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5
 

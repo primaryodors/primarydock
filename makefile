@@ -6,11 +6,11 @@ TMPDIR=tmp
 
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR) $(TMPDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o \
-	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o
+	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o $(OBJDIR)/scoring.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
 	  test/flexion_test
-APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_activate_or
+APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_activate_or $(BINDIR)/score_pdb
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
 all: $(DIRS) \
 	 $(OBJS) \
@@ -77,6 +77,9 @@ $(OBJDIR)/dynamic.o: src/classes/dynamic.h src/classes/dynamic.cpp $(OBJDIR)/pro
 $(OBJDIR)/moiety.o: src/classes/moiety.h src/classes/moiety.cpp $(OBJDIR)/molecule.o
 	$(CC) -c src/classes/moiety.cpp -o $(OBJDIR)/moiety.o $(CFLAGS)
 
+$(OBJDIR)/scoring.o: src/classes/scoring.h src/classes/scoring.cpp $(OBJDIR)/protein.o
+	$(CC) -c src/classes/scoring.cpp -o $(OBJDIR)/scoring.o $(CFLAGS)
+
 test/point_test: src/point_test.cpp $(OBJDIR)/point.o
 	$(CC) src/point_test.cpp $(OBJDIR)/point.o $(OBJDIR)/misc.o -o test/point_test $(CFLAGS)
 
@@ -119,7 +122,7 @@ test/bond_rotation_test: src/bond_rotation_test.cpp $(OBJS) $(OBJDIR)/molecule.o
 test/flexion_test: src/flexion_test.cpp $(OBJS)
 	$(CC) src/flexion_test.cpp $(OBJS) -o test/flexion_test $(CFLAGS)
 
-$(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o
+$(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/scoring.o
 	$(CC) src/primarydock.cpp $(OBJS) -o $(BINDIR)/primarydock $(CFLAGS)
 
 $(BINDIR)/pepteditor: src/interpreter.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o
@@ -130,6 +133,9 @@ $(BINDIR)/ic: src/ic.cpp $(OBJS) $(OBJDIR)/protein.o
 
 $(BINDIR)/ic_activate_or: src/ic_activate_or.cpp $(OBJS) $(OBJDIR)/protein.o
 	$(CC) src/ic_activate_or.cpp $(OBJS) -o $(BINDIR)/ic_activate_or $(CFLAGS)
+
+$(BINDIR)/score_pdb: src/score_pdb.cpp $(OBJS) $(OBJDIR)/protein.o $(OBJDIR)/scoring.o
+	$(CC) src/score_pdb.cpp $(OBJS) -o $(BINDIR)/score_pdb $(CFLAGS)
 
 performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.upright.pdb testdata/CAD_ion.sdf
 	./$(BINDIR)/primarydock testdata/test_TAAR8.config

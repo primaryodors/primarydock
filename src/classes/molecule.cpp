@@ -259,9 +259,9 @@ void Molecule::add_existing_atom(Atom* a)
     clear_all_bond_caches();
 }
 
-Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard)
+Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard, const int charge)
 {
-    Atom* a = new Atom(elemsym, location);
+    Atom* a = new Atom(elemsym, location, charge);
     a->name = new char[strlen(aname)+1];
     a->residue = 0;
     strcpy(a->name, aname);
@@ -797,6 +797,21 @@ int Molecule::from_pdb(FILE* is, bool het_only)
     {
         fgets(buffer, 1003, is);
         char** words = chop_spaced_words(buffer);
+        int charge = 0;
+
+        if (buffer[78] && buffer[78] > ' ')
+        {
+            char chgstr[3];
+            chgstr[0] = buffer[78];
+            chgstr[1] = buffer[79];
+            chgstr[2] = 0;
+
+            if 		(!strcmp(chgstr, "+")) charge = 1;
+            else if	(!strcmp(chgstr, "++")) charge = 2;
+            else if	(!strcmp(chgstr, "-")) charge = -1;
+            else if	(!strcmp(chgstr, "--")) charge = -2;
+            else if (atoi(chgstr)) charge = atoi(chgstr);
+        }
 
         if (words)
         {
@@ -826,7 +841,7 @@ int Molecule::from_pdb(FILE* is, bool het_only)
 
                     Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
 
-                    Atom* a = add_atom(esym, words[2], &aloc, 0, 0);
+                    Atom* a = add_atom(esym, words[2], &aloc, 0, 0, charge);
                     added++;
 
                     // a->residue = atoi(words[4]);

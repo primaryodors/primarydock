@@ -123,7 +123,7 @@ public:
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
-    Atom* add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard);
+    Atom* add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard, const int charge = 0);
     void add_existing_atom(Atom* to_add);
     char** get_atom_names() const;
     Atom* get_atom(const char* aname) const;

@@ -314,6 +314,42 @@ bool file_exists(std::string fname)
 }
 
 
+void colorrgb(int r, int g, int b)
+{
+    r = max(0, min(255, r));
+    g = max(0, min(255, g));
+    b = max(0, min(255, b));
+
+    cout << "\x1b[38;2;" << r << ";" << g << ";" << b << "m";
+}
+
+void colorize(float f)
+{
+    float red, green, blue;
+
+    if (f >= 0)
+    {
+        f = sqrt(f/5);
+        blue = 128 + 128 * f;
+        green = fmax(48, (f-1) * 255);
+        red = fmax(64, (f-2) * 255);
+    }
+    else
+    {
+        f = sqrt(-f)*3;
+        f = fmax(0,fmin(128,f*16));
+        red = 128+f;
+        blue = 128-f;
+        green = 0.333 * red + 0.666 * blue;
+    }
+
+    colorrgb(red, green, blue);
+}
+
+void colorless()
+{
+    cout << "\x1b[0m";
+}
 
 
 

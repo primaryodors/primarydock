@@ -66,6 +66,10 @@ bool file_exists(std::string fname);
 float residue_binding_multiplier(int resno);
 #endif
 
+void colorrgb(int r, int g, int b);
+void colorize(float f);
+void colorless();
+
 // From here: https://stackoverflow.com/questions/1903954/is-there-a-standard-sign-function-signum-sgn-in-c-c
 template <typename T> int sgn(T val)
 {

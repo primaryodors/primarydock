@@ -33,6 +33,8 @@ class DockResult
     #endif
     float polsat = 0;
     float protclash = 0;
+    bool do_output_colors = false;
+    float energy_mult = 1;
 };
 
 extern float init_total_binding_by_type[_INTER_TYPES_LIMIT];
@@ -41,5 +43,6 @@ extern float fin_total_binding_by_type[_INTER_TYPES_LIMIT];
 extern float* initial_binding;
 extern float* initial_vdWrepl;
 
+std::ostream& operator<<(std::ostream& output, const DockResult& dr);
 
 #endif

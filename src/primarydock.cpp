@@ -138,42 +138,6 @@ std::vector<ResiduePlaceholder>forced_static_resnos;
 std::vector<Atom> dummies;
 #endif
 
-void colorrgb(int r, int g, int b)
-{
-    r = max(0, min(255, r));
-    g = max(0, min(255, g));
-    b = max(0, min(255, b));
-
-    cout << "\x1b[38;2;" << r << ";" << g << ";" << b << "m";
-}
-
-void colorize(float f)
-{
-    float red, green, blue;
-
-    if (f >= 0)
-    {
-        f = sqrt(f/5);
-        blue = 128 + 128 * f;
-        green = fmax(48, (f-1) * 255);
-        red = fmax(64, (f-2) * 255);
-    }
-    else
-    {
-        f = sqrt(-f)*3;
-        f = fmax(0,fmin(128,f*16));
-        red = 128+f;
-        blue = 128-f;
-        green = 0.333 * red + 0.666 * blue;
-    }
-
-    colorrgb(red, green, blue);
-}
-
-void colorless()
-{
-    cout << "\x1b[0m";
-}
 
 void append_dummy(Point pt)
 {
@@ -3071,6 +3035,8 @@ _try_again:
             }
             #endif
 
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, pocketcen, size, addl_resno);
+
             if (flex)
             {
                 int en = protein->get_end_resno();
@@ -3213,68 +3179,12 @@ _try_again:
                         cout << "Pose: " << pose << endl << "Node: " << k << endl;
                         if (output) *output << "Pose: " << pose << endl << "Node: " << k << endl;
 
-                        if (differential_dock)
-                        {
-                            cout << "# Binding energies: delta = with ligand minus without ligand." << endl;
-                        }
-                        else
-                        {
-                            cout << "# Binding energies:" << endl;
-                        }
-                        cout << "BENERG:" << endl;
-                        if (output) *output << "# Binding energies" << endl << "BENERG:" << endl;
-                        #if _dbg_find_blasted_segfault
-                        cout << "alpha " << j << "|" << k << endl;
-                        #endif
-                        for (	l=0;
+                        dr[j][k].energy_mult = energy_mult;
+                        dr[j][k].do_output_colors = do_output_colors;
+                        cout << dr[j][k];
+                        dr[j][k].do_output_colors = false;
+                        if (output) *output << dr[j][k];
 
-                                dr[j][k].mkJmol
-                                && dr[j][k].metric
-                                && dr[j][k].metric[l]
-                                && dr[j][k].metric[l][0]
-                                ;
-
-                                l++
-                            )
-                        {
-                            #if _dbg_find_blasted_segfault
-                            cout << "beta " << l << endl;
-                            #endif
-                            if (differential_dock)
-                            {
-                                cout << dr[j][k].metric[l]
-                                     << ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult
-                                     << " = " << -dr[j][k].mkJmol[l]*energy_mult
-                                     << " minus " << -dr[j][k].imkJmol[l]*energy_mult
-                                     << endl;
-                                if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
-                                            << ": " << -(dr[j][k].mkJmol[l] - dr[j][k].imkJmol[l])*energy_mult
-                                            << " = " << -dr[j][k].mkJmol[l]*energy_mult
-                                            << " minus " << -dr[j][k].imkJmol[l]*energy_mult
-                                            << endl;
-                            }
-                            else
-                            {
-                                if (output && do_output_colors) colorize(dr[j][k].mkJmol[l]);
-                                #if _dbg_find_blasted_segfault
-                                cout << "gamma " << l << endl;
-                                #endif
-                                cout << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
-                                #if _dbg_find_blasted_segfault
-                                cout << "delta " << l << endl;
-                                #endif
-                                if (do_output_colors) colorless();
-                                if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << -dr[j][k].mkJmol[l]*energy_mult << endl;
-                                #if _dbg_find_blasted_segfault
-                                cout << "epsilon " << l << endl;
-                                #endif
-                            }
-                        }
-                        cout << endl;
-                        if (output) *output << endl;
-                        #if _dbg_find_blasted_segfault
-                        cout << "zeta " << l << endl;
-                        #endif
 
                         if (!k && outpdb.length() && pose <= outpdb_poses)
                         {
@@ -3342,195 +3252,6 @@ _try_again:
                             fclose(pfout);
                         }
 
-                        for (l=0; l<_INTER_TYPES_LIMIT; l++)
-                        {
-                            char lbtyp[64];
-                            switch (l+covalent)
-                            {
-                            case covalent:
-                                continue; /*strcpy(lbtyp, "Total covalent: ");		break;*/
-                            case ionic:
-                                strcpy(lbtyp, "Total ionic: ");
-                                break;
-                            case hbond:
-                                strcpy(lbtyp, "Total H-bond: ");
-                                break;
-                            case pi:
-                                strcpy(lbtyp, "Total pi stack: ");
-                                break;
-                            case polarpi:
-                                strcpy(lbtyp, "Total polar-pi and cation-pi: ");
-                                break;
-                            case mcoord:
-                                strcpy(lbtyp, "Total metal coordination: ");
-                                break;
-                            case vdW:
-                                strcpy(lbtyp, "Total van der Waals: ");
-                                break;
-                            default:
-                                goto _btyp_unassigned;
-                            }
-
-                            if (differential_dock)
-                            {
-                                cout << lbtyp << -(dr[j][k].bytype[l] - dr[j][k].ibytype[l])*energy_mult
-                                     << " = " << -dr[j][k].bytype[l]*energy_mult
-                                     << " minus " << -dr[j][k].ibytype[l]*energy_mult
-                                     << endl;
-                                if (output) *output << lbtyp << -(dr[j][k].bytype[l] - dr[j][k].ibytype[l])*energy_mult
-                                                        << " = " << -dr[j][k].bytype[l]*energy_mult
-                                                        << " minus " << -dr[j][k].ibytype[l]*energy_mult
-                                                        << endl;
-                            }
-                            else
-                            {
-                                if (output)
-                                {
-                                    *output << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
-                                    if (do_output_colors) colorize(dr[j][k].bytype[l]);
-                                    cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
-                                    if (do_output_colors) colorless();
-                                }
-                                else
-                                {
-                                    cout << lbtyp << -dr[j][k].bytype[l]*energy_mult << endl;
-                                }
-                            }
-                        }
-                        cout << endl;
-                        if (output) *output << endl;
-
-                    _btyp_unassigned:
-
-                        if (differential_dock)
-                        {
-                            if (output) *output << "Total: " << -(dr[j][k].kJmol - dr[j][k].ikJmol)*energy_mult
-                                                    << " = " << -dr[j][k].kJmol*energy_mult
-                                                    << " minus " << -dr[j][k].ikJmol*energy_mult
-                                                    << endl << endl;
-                            cout << "Total: " << -(dr[j][k].kJmol - dr[j][k].ikJmol)*energy_mult
-                                 << " = " << -dr[j][k].kJmol*energy_mult
-                                 << " minus " << -dr[j][k].ikJmol*energy_mult
-                                 << endl << endl;
-                        }
-                        else
-                        {
-                            if (output) *output << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
-                            if (output && do_output_colors) colorize(dr[j][k].kJmol);
-                            cout << "Total: " << -dr[j][k].kJmol*energy_mult << endl << endl;
-                            if (output && do_output_colors) colorless();
-                        }
-
-                        if (dr[j][k].miscdata.size())
-                        {
-                            cout << endl << dr[j][k].miscdata << endl;
-                            if (output ) *output << endl << dr[j][k].miscdata << endl;
-                        }
-
-                        if (dr[j][k].softrock.size())
-                        {
-                            cout << "Active Helix Soft Rotations:" << endl
-                                 << dr[j][k].softrock << endl;
-                            if (output ) *output << "Active Helix Soft Rotations:" << endl
-                                 << dr[j][k].softrock << endl;
-                        }
-
-                        cout << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
-                        if (output) *output << "Ligand polar satisfaction: " << dr[j][k].polsat << endl;
-                        cout << endl;
-                        if (output) *output << endl;
-
-                        if (output) *output << "Proximity: " << dr[j][k].proximity << endl << endl;
-                        cout << "Proximity: " << dr[j][k].proximity << endl << endl;
-
-                        if (output) *output << "Protein clashes: " << dr[j][k].protclash << endl << endl;
-                        cout << "Protein clashes: " << dr[j][k].protclash << endl << endl;
-
-                        #if use_trip_switch
-                        if (tripswitch_clashables.size())
-                        {
-                            if (output) *output << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
-                            cout << "Trip switch: " << dr[j][k].tripswitch << endl << endl;
-                        }
-                        #endif
-
-                        if (differential_dock)
-                        {
-                            cout << "# van der Waals repulsion: delta = with ligand minus without ligand." << endl;
-                        }
-                        else
-                        {
-                            cout << "# van der Waals repulsion:" << endl;
-                        }
-                        cout << "vdWRPL:" << endl;
-                        if (output) *output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
-                        if (output) *output << endl;
-                        #if _dbg_find_blasted_segfault
-                        cout << j << "|" << k << ": " << dr << endl;
-                        #endif
-                        for (	l=0;
-
-                                dr[j][k].metric
-                                && dr[j][k].metric[l]
-                                && dr[j][k].metric[l][0];
-
-                                l++
-                            )
-                        {
-                            #if _dbg_find_blasted_segfault
-                            cout << "eta " << l << endl;
-                            #endif
-                            if (fabs(dr[j][k].mvdWrepl[l]) < 0.001) continue;
-
-                            #if _dbg_find_blasted_segfault
-                            cout << "theta " << l << endl;
-                            #endif
-
-                            if (differential_dock)
-                            {
-                                cout << dr[j][k].metric[l]
-                                     << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
-                                     << " = " << dr[j][k].mvdWrepl[l]*energy_mult
-                                     << " minus " << dr[j][k].imvdWrepl[l]*energy_mult
-                                     << endl;
-                                if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l]
-                                            << ": " << (dr[j][k].mvdWrepl[l] - dr[j][k].imvdWrepl[l])*energy_mult
-                                            << " = " << dr[j][k].mvdWrepl[l]*energy_mult
-                                            << " minus " << dr[j][k].imvdWrepl[l]*energy_mult
-                                            << endl;
-                            }
-                            else
-                            {
-                                cout << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
-                                if (output && dr[j][k].metric[l]) *output << dr[j][k].metric[l] << ": " << dr[j][k].mvdWrepl[l]*energy_mult << endl;
-                            }
-
-                            #if _dbg_find_blasted_segfault
-                            cout << "iota " << l << endl;
-                            #endif
-                        }
-                        cout << endl;
-                        if (output) *output << endl;
-
-                        /*if (flex)
-                        {*/
-                            if (!dr[j][k].pdbdat.length())
-                            {
-                                cout << "WARNING: Failed to generate PDB data." << endl;
-                                if (output) *output << "(Missing PDB data.)" << endl;
-                            }
-                            else
-                            {
-                                if (!output || echo_pdb_data) cout << "# PDB Data" << endl << "PDBDAT:" << endl;
-                                if (output) *output << "# PDB Data" << endl << "PDBDAT:" << endl;
-
-                                if (output) *output << dr[j][k].pdbdat << endl;
-                                if (!output || echo_pdb_data) cout << dr[j][k].pdbdat << endl;
-
-                                if (!output || echo_pdb_data) cout << "TER" << endl << "END" << endl << endl << endl;
-                                if (output) *output << "TER" << endl << "END" << endl << endl << endl;
-                            }
-                        // }
 
                         if (!k) found_poses++;
                     }

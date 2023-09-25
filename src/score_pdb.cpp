@@ -4,7 +4,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <fstream>
-#include "classes/protein.h"
+#include "classes/scoring.h"
 
 using namespace std;
 
@@ -32,6 +32,6 @@ int main(int argc, char** argv)
     fseek(fp, 0, 0);
     m.from_pdb(fp, true);
 
-    // TODO:
+    DockResult dr(&p, &m, Point(10000,10000,10000));
 }
 

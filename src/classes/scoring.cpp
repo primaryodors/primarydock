@@ -326,3 +326,177 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     #endif
 
 }
+
+std::ostream& operator<<(std::ostream& output, const DockResult& dr)
+{
+    int l;
+
+    if (differential_dock)
+    {
+        output << "# Binding energies: delta = with ligand minus without ligand." << endl;
+    }
+    else
+    {
+        output << "# Binding energies:" << endl;
+    }
+
+    output << "BENERG:" << endl;
+    for (	l=0;
+
+            dr.mkJmol
+            && dr.metric
+            && dr.metric[l]
+            && dr.metric[l][0]
+            ;
+
+            l++
+        )
+    {
+        if (differential_dock)
+        {
+            if (dr.metric[l]) output << dr.metric[l]
+                        << ": " << -(dr.mkJmol[l] - dr.imkJmol[l])*dr.energy_mult
+                        << " = " << -dr.mkJmol[l]*dr.energy_mult
+                        << " minus " << -dr.imkJmol[l]*dr.energy_mult
+                        << endl;
+        }
+        else
+        {
+            if (dr.do_output_colors) colorize(dr.mkJmol[l]);
+            output << dr.metric[l] << ": " << -dr.mkJmol[l]*dr.energy_mult << endl;
+            if (dr.do_output_colors) colorless();
+        }
+    }
+    output << endl;
+
+    for (l=0; l<_INTER_TYPES_LIMIT; l++)
+    {
+        char lbtyp[64];
+        switch (l+covalent)
+        {
+            case covalent:
+                continue; /*strcpy(lbtyp, "Total covalent: ");		break;*/
+            case ionic:
+                strcpy(lbtyp, "Total ionic: ");
+                break;
+            case hbond:
+                strcpy(lbtyp, "Total H-bond: ");
+                break;
+            case pi:
+                strcpy(lbtyp, "Total pi stack: ");
+                break;
+            case polarpi:
+                strcpy(lbtyp, "Total polar-pi and cation-pi: ");
+                break;
+            case mcoord:
+                strcpy(lbtyp, "Total metal coordination: ");
+                break;
+            case vdW:
+                strcpy(lbtyp, "Total van der Waals: ");
+                break;
+            default:
+                goto _btyp_unassigned;
+        }
+
+        if (differential_dock)
+        {
+            output << lbtyp << -(dr.bytype[l] - dr.ibytype[l])*dr.energy_mult
+                << " = " << -dr.bytype[l]*dr.energy_mult
+                << " minus " << -dr.ibytype[l]*dr.energy_mult
+                << endl;
+        }
+        else
+        {
+            if (dr.do_output_colors) colorize(dr.bytype[l]);
+            output << lbtyp << -dr.bytype[l]*dr.energy_mult << endl;
+            if (dr.do_output_colors) colorless();
+        }
+    }
+    output << endl;
+
+_btyp_unassigned:
+
+    if (differential_dock)
+    {
+        output << "Total: " << -(dr.kJmol - dr.ikJmol)*dr.energy_mult
+            << " = " << -dr.kJmol*dr.energy_mult
+            << " minus " << -dr.ikJmol*dr.energy_mult
+            << endl << endl;
+    }
+    else
+    {
+        if (dr.do_output_colors) colorize(dr.kJmol);
+        output << "Total: " << -dr.kJmol*dr.energy_mult << endl << endl;
+        if (dr.do_output_colors) colorless();
+    }
+
+    if (dr.miscdata.size())
+    {
+        output << endl << dr.miscdata << endl;
+    }
+
+    if (dr.softrock.size())
+    {
+        output << "Active Helix Soft Rotations:" << endl
+                << dr.softrock << endl;
+    }
+
+    output << "Ligand polar satisfaction: " << dr.polsat << endl;
+    output << endl;
+
+    output << "Proximity: " << dr.proximity << endl << endl;
+
+    output << "Protein clashes: " << dr.protclash << endl << endl;
+
+    #if use_trip_switch
+    if (tripswitch_clashables.size())
+    {
+        output << "Trip switch: " << dr.tripswitch << endl << endl;
+    }
+    #endif
+
+    output << "# van der Waals repulsion" << endl << "vdWRPL:" << endl;
+    output << endl;
+    
+    for (	l=0;
+
+            dr.metric
+            && dr.metric[l]
+            && dr.metric[l][0];
+
+            l++
+        )
+    {
+        if (fabs(dr.mvdWrepl[l]) < 0.001) continue;
+
+        if (differential_dock)
+        {
+            if (dr.metric[l]) output << dr.metric[l]
+                << ": " << (dr.mvdWrepl[l] - dr.imvdWrepl[l])*dr.energy_mult
+                << " = " << dr.mvdWrepl[l]*dr.energy_mult
+                << " minus " << dr.imvdWrepl[l]*dr.energy_mult
+                << endl;
+        }
+        else
+        {
+            if (dr.metric[l]) output << dr.metric[l] << ": " << dr.mvdWrepl[l]*dr.energy_mult << endl;
+        }
+    }
+    output << endl;
+
+    if (!dr.pdbdat.length())
+    {
+        output << "WARNING: Missing PDB data." << endl;
+    }
+    else
+    {
+        output << "# PDB Data" << endl << "PDBDAT:" << endl;
+
+        output << dr.pdbdat << endl;
+
+        output << "TER" << endl << "END" << endl << endl << endl;
+    }
+
+
+    return output;
+}

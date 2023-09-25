@@ -361,7 +361,7 @@ Atom::Atom(FILE* is)
                         else if	(!strcmp(strcharge, "-")) charge = -1;
                         else if	(!strcmp(strcharge, "--")) charge = -2;
                         else if (atoi(strcharge)) charge = atoi(strcharge);
-                        cout << aa3let << residue << ":" << name << " has charge " << charge << endl;
+                        // cout << aa3let << residue << ":" << name << " has charge " << charge << endl;
                     }
 
                     return;

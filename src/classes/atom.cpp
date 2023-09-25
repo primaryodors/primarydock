@@ -1999,7 +1999,7 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     if (fabs(location.z) <  10) fprintf(pf," ");
     fprintf(pf, "%4.3f", location.z);
 
-    fprintf(pf, "  1.00001.00           %s\n", get_elem_sym());
+    fprintf(pf, "  1.00001.00           %s%c\n", get_elem_sym(), fabs(charge) > hydrophilicity_cutoff ? (charge > 0 ? '+' : '-') : ' ' );
 }
 
 void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
@@ -2038,7 +2038,9 @@ void Atom::stream_pdb_line(ostream& os, unsigned int atomno)
     if (!location.z) location.z = 0;
     os << fixed << setprecision(3) << setw(8) << setfill(' ') << location.z;
 
-    os << "  1.00001.00           " << get_elem_sym() << endl;
+    os << "  1.00001.00           " << get_elem_sym();
+    os << (fabs(charge) > hydrophilicity_cutoff ? (charge > 0 ? '+' : '-') : ' ');
+    os << endl;
 }
 
 int Bond::count_moves_with_btom()

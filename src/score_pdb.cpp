@@ -32,6 +32,24 @@ int main(int argc, char** argv)
     fseek(fp, 0, 0);
     m.from_pdb(fp, true);
 
+    AminoAcid* aa = p.get_residue_bw(3, 50);
+    if (!aa) aa = p.get_residue_bw(6, 48);
+    if (!aa) aa = p.get_residue(100);
+    if (!aa) aa = p.get_residue(p.get_end_resno()/2);
+
+    if (aa && aa->get_hydrogen_count() < 3)
+    {
+        int i, n = p.get_end_resno();
+        for (i=0; i<n; i++)
+        {
+            aa = p.get_residue(i);
+            if (aa) aa->hydrogenate();
+        }
+
+        m.hydrogenate();
+    }
+
     DockResult dr(&p, &m, Point(10000,10000,10000));
+    cout << dr;
 }
 

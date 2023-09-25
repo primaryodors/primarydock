@@ -336,6 +336,9 @@ Atom::Atom(FILE* is)
                     Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
                     location = aloc;
 
+                    residue = atoi(words[4]);
+                    strcpy(aa3let, words[3]);
+
                     char* strcharge = 0;
                     int chgoff = strlen(esym);
                     if (words[10])
@@ -358,10 +361,8 @@ Atom::Atom(FILE* is)
                         else if	(!strcmp(strcharge, "-")) charge = -1;
                         else if	(!strcmp(strcharge, "--")) charge = -2;
                         else if (atoi(strcharge)) charge = atoi(strcharge);
+                        cout << aa3let << residue << ":" << name << " has charge " << charge << endl;
                     }
-
-                    residue = atoi(words[4]);
-                    strcpy(aa3let, words[3]);
 
                     return;
                 }

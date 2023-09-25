@@ -352,6 +352,8 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
             l++
         )
     {
+        if (fabs(dr.mkJmol[l]) < 0.001) continue;
+
         if (differential_dock)
         {
             if (dr.metric[l]) output << dr.metric[l]

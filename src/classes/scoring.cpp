@@ -37,10 +37,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         lmkJmol[i] = limkJmol[i] = lmvdWrepl[i] = limvdWrepl[i] = 0;
     }
 
-    for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = 0;
-    for (i=0; i<_INTER_TYPES_LIMIT; i++) fin_total_binding_by_type[i] = 0;
-    for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-
     // if (debug) *debug << "Pose " << pose << " pathnode " << nodeno /*<< " clashes " << clash*/ << endl;
 
     ligand->clear_atom_binding_energies();
@@ -79,8 +75,6 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
     if (differential_dock)
     {
-        for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
-
         for (i=0; i<qpr+1; i++)
         {
             int resno = i ? (allres[i-1]->get_residue_no()) : 0;
@@ -169,8 +163,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
                 if (!is_trip_j) continue;
                 #endif
 
-                float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
                 #if use_trip_switch
+                float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
                 if (f < 0)
                 {
                     tripclash -= f;
@@ -192,6 +186,13 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     interaudit.clear();
     interauditing = true;
     #endif
+
+    for (i=0; i<_INTER_TYPES_LIMIT; i++)
+    {
+        init_total_binding_by_type[i] = 0;
+        fin_total_binding_by_type[i] = 0;
+        total_binding_by_type[i] = 0;
+    }
 
     for (i=0; i<sphres; i++)
     {

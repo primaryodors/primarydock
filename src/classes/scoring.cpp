@@ -205,12 +205,12 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
         if (differential_dock)
         {
-            mkJmol[metcount] = final_binding[resno] + lb;
+            lmkJmol[metcount] = final_binding[resno] + lb;
         }
         else
         {
             if (lb > 500) lb = 0;
-            mkJmol[metcount] = lb;
+            lmkJmol[metcount] = lb;
         }
 
         #if active_persistence
@@ -222,21 +222,21 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
         if (differential_dock)
         {
-            imkJmol[metcount] = initial_binding[resno];
-            mvdWrepl[metcount] = final_vdWrepl[resno];
-            imvdWrepl[metcount] = initial_vdWrepl[resno];
+            limkJmol[metcount] = initial_binding[resno];
+            lmvdWrepl[metcount] = final_vdWrepl[resno];
+            limvdWrepl[metcount] = initial_vdWrepl[resno];
         }
         else
         {
-            mvdWrepl[metcount] = 0;
-            mvdWrepl[metcount] += ligand->get_vdW_repulsion(reaches_spheroid[i]);
+            lmvdWrepl[metcount] = 0;
+            lmvdWrepl[metcount] += ligand->get_vdW_repulsion(reaches_spheroid[i]);
             /*for (j=0; j<sphres; j++)
             {
                 if (j == i) continue;
                 mvdWrepl[metcount] += reaches_spheroid[i]->get_vdW_repulsion(reaches_spheroid[j]);
             }*/
-            imkJmol[metcount] = 0;
-            imvdWrepl[metcount] = 0;
+            limkJmol[metcount] = 0;
+            limvdWrepl[metcount] = 0;
         }
         metcount++;
         btot += lb;

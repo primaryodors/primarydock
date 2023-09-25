@@ -2787,15 +2787,6 @@ _try_again:
                 #endif
             }
 
-            /*cout << "Dock residues for node " << nodeno << ": " << endl;
-            if (output) *output << "Dock residues for node " << nodeno << ": " << endl;
-            for (i=0; i<sphres; i++)
-            {	cout << *reaches_spheroid[nodeno][i] << " ";
-            	if (output) *output << *reaches_spheroid[nodeno][i] << " ";
-            }
-            cout << endl << endl;
-            if (output) *output << endl << endl;*/
-
 
             if (!nodeno)
             {

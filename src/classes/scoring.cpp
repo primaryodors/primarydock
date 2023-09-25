@@ -24,17 +24,17 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     int i, j;
 
     char metrics[end1][10];
-    float mkJmol[end1];
-    float imkJmol[end1];
-    float mvdWrepl[end1];
-    float imvdWrepl[end1];
+    float lmkJmol[end1];
+    float limkJmol[end1];
+    float lmvdWrepl[end1];
+    float limvdWrepl[end1];
     int metcount = 0;
     float btot = 0;
     float pstot = 0;
 
     for (i=0; i<end1; i++)
     {
-        mkJmol[i] = imkJmol[i] = mvdWrepl[i] = imvdWrepl[i] = 0;
+        lmkJmol[i] = limkJmol[i] = lmvdWrepl[i] = limvdWrepl[i] = 0;
     }
 
     for (i=0; i<_INTER_TYPES_LIMIT; i++) init_total_binding_by_type[i] = 0;
@@ -50,13 +50,13 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         met->clear_atom_binding_energies();
         float lb = ligand->get_intermol_binding(met);
         strcpy(metrics[metcount], "Metals");
-        mkJmol[metcount] = lb;
-        imkJmol[metcount] = 0;								// TODO
+        lmkJmol[metcount] = lb;
+        limkJmol[metcount] = 0;								// TODO
 
-        mvdWrepl[metcount] = 0;
-        mvdWrepl[metcount] += ligand->get_vdW_repulsion(met);		// TODO: Include repulsions with non-mcoord side chains.
+        lmvdWrepl[metcount] = 0;
+        lmvdWrepl[metcount] += ligand->get_vdW_repulsion(met);		// TODO: Include repulsions with non-mcoord side chains.
 
-        imvdWrepl[metcount] = 0;							// TODO
+        limvdWrepl[metcount] = 0;							// TODO
 
         metcount++;
 
@@ -309,10 +309,10 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     {
         metric[i] = new char[max(8,(int)strlen(metrics[i])+4)];
         strcpy(metric[i], metrics[i]);
-        mkJmol[i] = mkJmol[i];
-        imkJmol[i] = imkJmol[i];
-        mvdWrepl[i] = mvdWrepl[i];
-        imvdWrepl[i] = imvdWrepl[i];
+        mkJmol[i] = lmkJmol[i];
+        imkJmol[i] = limkJmol[i];
+        mvdWrepl[i] = lmvdWrepl[i];
+        imvdWrepl[i] = limvdWrepl[i];
         // cout << "*" << metric[i] << ": " << mkJmol[i] << endl;
     }
 

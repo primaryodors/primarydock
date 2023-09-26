@@ -130,6 +130,7 @@ void Pose::reset()
 {
     sz = 0;
     saved_atom_locs.clear();
+    saved_atom_Z.clear();
     saved_from = nullptr;
 }
 
@@ -139,6 +140,7 @@ void Pose::copy_state(Molecule* m)
     if (!saved_atom_locs.size() || saved_from != m)
     {
         saved_atom_locs.clear();
+        saved_atom_Z.clear();
         saved_from = m;
         if (!m || !m->atoms) return;
 
@@ -147,20 +149,36 @@ void Pose::copy_state(Molecule* m)
         {
             Point pt;
             saved_atom_locs.push_back(pt);
+            saved_atom_Z.push_back(0);
         }
     }
 
     for (i=0; m->atoms[i] && i<sz; i++)
     {
         saved_atom_locs[i] = m->atoms[i]->get_location();
+        saved_atom_Z[i] = m->atoms[i]->get_Z();
     }
 }
 
 void Pose::restore_state(Molecule* m)
 {
-    if (!m || !m->atoms || !sz || m != saved_from) return;
+    if (!m || !m->atoms || !sz) return;
+    int i, n;
+    if (m != saved_from)
+    {
+        n = saved_atom_locs.size();
+        for (i=0; i<n; i++)
+        {
+            if (n != sz || !m->atoms[i] || (saved_atom_Z[i] != m->atoms[i]->get_Z()))
+            {
+                cout << "Attempt to restore pose to incompatible molecule." << endl;
+                throw -4;
+            }
+        }
 
-    int i;
+        saved_from = m;
+    }
+
     for (i=0; i<sz && m->atoms[i]; i++)
     {
         m->atoms[i]->move(saved_atom_locs[i]);

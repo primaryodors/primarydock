@@ -2977,6 +2977,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     for (q=0; bb[q]; q++)
                     {
                         if (!bb[q]->count_moves_with_btom()) continue;
+                        if (!bb[q]->atom || !bb[q]->btom) continue;         // Sanity check, otherwise we're sure to get random foolish segfaults.
+                        if (bb[q]->atom->is_backbone && strcmp(bb[q]->atom->name, "CA")) continue;
+                        if (bb[q]->btom->is_backbone) continue;
                         float theta;
                         int heavy_atoms = bb[q]->count_heavy_moves_with_btom();
                         if (heavy_atoms && (!(a->movability & MOV_CAN_FLEX) || (a->movability & MOV_FORBIDDEN))) continue;

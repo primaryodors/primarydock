@@ -45,7 +45,7 @@ if (@$_REQUEST['view'] == "pred")
         foreach ($hetatm_xyz as $xyz)
         {
             $r = sqrt(pow($x-$xyz[0], 2) + pow($y-$xyz[1], 2) + pow($z-$xyz[2], 2));
-            if ($r <= 3.5)
+            if ($r <= 5.0)
             {
                 if (count($ligand_residues)) $ligbs .= ", ";
                 $ligbs .= "$resno";

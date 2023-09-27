@@ -14,6 +14,20 @@ using namespace std;
 float *g_rgnxform_r = nullptr, *g_rgnxform_theta = nullptr, *g_rgnxform_y = nullptr;
 float *g_rgnrot_alpha = nullptr, *g_rgnrot_w = nullptr, *g_rgnrot_u = nullptr;
 
+Protein::Protein()
+{
+    aaptrmin.n = aaptrmax.n = 0;
+
+    residues = nullptr;
+    sequence = nullptr;
+    ca = nullptr;
+    res_reach = nullptr;
+    metals = nullptr;
+
+    int i;
+    for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
+}
+
 Protein::Protein(const char* lname)
 {
     name = lname;

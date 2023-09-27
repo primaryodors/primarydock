@@ -130,6 +130,7 @@ void Pose::reset()
 {
     sz = 0;
     saved_atom_locs.clear();
+    saved_atom_Z.clear();
     saved_from = nullptr;
 }
 
@@ -139,6 +140,7 @@ void Pose::copy_state(Molecule* m)
     if (!saved_atom_locs.size() || saved_from != m)
     {
         saved_atom_locs.clear();
+        saved_atom_Z.clear();
         saved_from = m;
         if (!m || !m->atoms) return;
 
@@ -147,20 +149,39 @@ void Pose::copy_state(Molecule* m)
         {
             Point pt;
             saved_atom_locs.push_back(pt);
+            saved_atom_Z.push_back(0);
         }
     }
 
     for (i=0; m->atoms[i] && i<sz; i++)
     {
         saved_atom_locs[i] = m->atoms[i]->get_location();
+        saved_atom_Z[i] = m->atoms[i]->get_Z();
     }
+    sz = i;
 }
 
 void Pose::restore_state(Molecule* m)
 {
-    if (!m || !m->atoms || !sz || m != saved_from) return;
+    if (!m || !m->atoms || !sz) return;
+    int i, n;
+    if (m != saved_from)
+    {
+        n = saved_atom_locs.size();
+        for (i=0; i<n; i++)
+        {
+            if (i == n-1 && !m->atoms[i] && (saved_atom_Z[i] == 1)) break;
+            if (!m->atoms[i] && !saved_atom_Z[i]) break;
+            if (/*n != sz ||*/ !m->atoms[i] || (saved_atom_Z[i] != m->atoms[i]->get_Z()))
+            {
+                cout << "Attempt to restore pose to incompatible molecule." << endl;
+                throw -4;
+            }
+        }
 
-    int i;
+        saved_from = m;
+    }
+
     for (i=0; i<sz && m->atoms[i]; i++)
     {
         m->atoms[i]->move(saved_atom_locs[i]);
@@ -2977,6 +2998,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     for (q=0; bb[q]; q++)
                     {
                         if (!bb[q]->count_moves_with_btom()) continue;
+                        if (!bb[q]->atom || !bb[q]->btom) continue;         // Sanity check, otherwise we're sure to get random foolish segfaults.
+                        if (bb[q]->atom->is_backbone && strcmp(bb[q]->atom->name, "CA")) continue;
+                        if (bb[q]->btom->is_backbone) continue;
                         float theta;
                         int heavy_atoms = bb[q]->count_heavy_moves_with_btom();
                         if (heavy_atoms && (!(a->movability & MOV_CAN_FLEX) || (a->movability & MOV_FORBIDDEN))) continue;

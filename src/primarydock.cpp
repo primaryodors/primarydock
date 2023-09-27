@@ -1897,7 +1897,8 @@ int main(int argc, char** argv)
     char* dot = strchr(protid, '.');
     if (dot) *dot = 0;
 
-    protein = new Protein(protid);
+    Protein pose_proteins[poses];
+    protein = &pose_proteins[0]; // new Protein(protid);
     pf = fopen(protfname, "r");
     if (!pf)
     {
@@ -2357,8 +2358,9 @@ _try_again:
         }
 
 
-        delete protein;
-        protein = new Protein(protfname);
+        // delete protein;
+        // protein = new Protein(protfname);
+        protein = &pose_proteins[pose-1];
 
         if (temp_pdb_file.length())
         {
@@ -2487,8 +2489,9 @@ _try_again:
                     }
                 }
 
-                delete protein;
-                protein = new Protein(protafname);
+                // delete protein;
+                // protein = new Protein(protafname);
+                protein = &pose_proteins[pose-1];
                 
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
@@ -3149,6 +3152,7 @@ _try_again:
     pose = 1;
     for (i=1; i<=poses; i++)
     {
+        protein = &pose_proteins[i-1];
         for (j=0; j<poses; j++)
         {
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
@@ -3217,8 +3221,8 @@ _try_again:
                             int n1 = protein->get_end_resno();
                             for (j1=1; j1 <= n1; j1++)
                             {
-                                AminoAcid* aa = protein->get_residue(j);
-                                if (aa) tmp_pdb_residue[j+1][j1].restore_state(aa);
+                                AminoAcid* aa = protein->get_residue(j1);
+                                if (aa /* && aa->been_flexed */) tmp_pdb_residue[j+1][j1].restore_state(aa);
                             }
                             tmp_pdb_ligand[j+1].restore_state(ligand);
 

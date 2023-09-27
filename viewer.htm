@@ -91,9 +91,20 @@ body
 	overflow: hidden;
 }
 
+body.whtbk
+{
+	color: #346;
+	background-color: #fed;
+}
+
 a
 {	color: #2af;
 	text-decoration: none;
+}
+
+body.whtbk a
+{
+	color: #259;
 }
 
 a:hover
@@ -114,6 +125,11 @@ a:hover
 	padding: 15px;
 	border-radius: 25px;
 	box-shadow: 0px 0px 41px rgba(0,0,0,0.22), 5px 3px 5px rgba(0,0,0,0.41);
+}
+
+body.whtbk #pleasewait
+{
+	background-color: rgba(224, 240, 255, 0.67);
 }
 
 #citefloat
@@ -144,12 +160,22 @@ a:hover
 	width: 150px;
 }
 
+body.whtbk #citefloat span
+{
+	background-color: rgba(255,255,255, 0.67);
+}
+
 #citefloat:hover span
 {
 	color: rgba(192, 192, 192, 1);
 	display: block;
 	height: auto;
 	width: fit-content;
+}
+
+body.whtbk #citefloat:hover span
+{
+	color: #222;
 }
 
 #ctrls div
@@ -165,6 +191,11 @@ a:hover
     padding-right: 5px;
 }
 
+body.whtbk #posey
+{
+	background-color: #bdf;
+}
+
 #dspsett
 {
 	position: absolute;
@@ -173,6 +204,11 @@ a:hover
     padding: 5px;
     background-color: rgba(0, 32, 96, 0.67);
     border-radius: 13px;
+}
+
+body.whtbk #dspsett
+{
+	background-color: rgba(224, 240, 255, 0.67);
 }
 
 .clickme, .clickme:hover
@@ -184,6 +220,11 @@ a:hover
 .clickme:hover
 {
 	color: #9cf;
+}
+
+body.whtbk .clickme:hover
+{
+	color: #06f;
 }
 
 .posebtn
@@ -203,6 +244,16 @@ a:hover
 	font-family: Verdana, Arial, sans-serif;
 }
 
+body.whtbk .posebtn
+{
+	background-color: #9bd;
+    border-top: 2px solid #def;
+    border-left: 2px solid #ace;
+    border-right: 2px solid #69c;
+    border-bottom: 2px solid #468;
+	color: #123;
+}
+
 .posebtn.hilite
 {
 	background-color: #369;
@@ -210,6 +261,16 @@ a:hover
     border-left: 2px solid #579;
     border-right: 2px solid #246;
     border-bottom: 2px solid #135;
+}
+
+body.whtbk .posebtn.hilite
+{
+	background-color: #6bf;
+    border-top: 2px solid #def;
+    border-left: 2px solid #ace;
+    border-right: 2px solid #69c;
+    border-bottom: 2px solid #468;
+	color: #159;
 }
 
 .nodebtn
@@ -225,14 +286,30 @@ a:hover
 	display: inline-block;
 }
 
+body.whtbk .nodebtn
+{
+	background: transparent;
+}
+
 .nodebtn.hilite
 {
 	background-color: #357;
 }
 
+body.whtbk .nodebtn.hilite
+{
+	background: transparent;
+}
+
 .bw50
 {
 	color: #fff;
+}
+
+body.whtbk .bw50
+{
+	color: #600;
+	font-weight: bold;
 }
 
 .symbol
@@ -254,11 +331,23 @@ input, select
     border-radius: 5px;
 }
 
+body.whtbk input, body.whtbk select
+{
+	background-color: #9cf;
+	color: #036;
+}
+
 option.agonist
 {
 	background-color: #044;
 	color: #9ef;
 	font-weight: bold;
+}
+
+body.whtbk option.agonist
+{
+	background-color: #9ef;
+	color: #044;
 }
 
 option.non_agonist
@@ -267,16 +356,34 @@ option.non_agonist
 	color: #bcd;
 }
 
+body.whtbk option.non_agonist
+{
+	background-color: #bcd;
+	color: #234;
+}
+
 option.antagonist
 {
 	background-color: #410;
 	color: #fb9;
 }
 
+body.whtbk option.antagonist
+{
+	background-color: #fb9;
+	color: #410;
+}
+
 option.unknown
 {
 	background-color: #000;
 	color: #999;
+}
+
+body.whtbk option.unknown
+{
+	background-color: #999;
+	color: #000;
 }
 
 #clip, #bbvis, #lght
@@ -300,6 +407,11 @@ option.unknown
 	max-height: 81%;
 }
 
+body.whtbk #seqdd
+{
+	background-color: #bbccffcc;
+}
+
 #seqdd .tab button
 {
 	background-color: #112;
@@ -313,9 +425,17 @@ option.unknown
 	cursor: pointer;
 }
 
+body.whtbk #seqdd .tab button
+{
+	background-color: #ccd;
+    border-top: 2px solid #def;
+    border-left: 2px solid #cde;
+    border-right: 2px solid #68a;
+	color: #135;
+}
+
 #seqdd .tab button.highlighted
 {
-	background-color: #246;
     border-top: 2px solid #5af;
     border-left: 2px solid #48c;
     border-right: 2px solid #369;
@@ -324,9 +444,23 @@ option.unknown
 	font-weight: bold;
 }
 
+body.whtbk #seqdd .tab button.highlighted
+{
+	background-color: #9bf;
+    border-top: 2px solid #fff;
+    border-left: 2px solid #adf;
+    border-right: 2px solid #37b;
+	color: #159;
+}
+
 .stranddiv
 {
 	background-color: #234;
+}
+
+body.whtbk .stranddiv
+{
+	background-color: #bcd;
 }
 
 .stranddiv button
@@ -351,6 +485,12 @@ option.unknown
     color: #9cf;
     padding-left: 4px;
     padding-right: 4px;
+}
+
+body.whtbk .sctgbtn.hilite
+{
+    background-color: #9cf;
+    color: #345;
 }
 
 .seqnumln
@@ -489,6 +629,9 @@ function rotate3D(point, source, axis, theta)
 	<!-- a id="ptbbbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a -->
 	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
 </div>
+<a id="whtbk" title="Switch to Light Background" class="nodebtn clickme symbol smaller" onclick="whtbk=true; stage.setParameters({'backgroundColor': '#fff0e8'}); $(document.body).addClass('whtbk'); if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#blkbk').show(); $('#bkbnsld').hide();">&#x2600;&#xFE0F;</a>
+<a id="blkbk" title="Switch to Dark Background" class="nodebtn clickme symbol smaller" onclick="whtbk=false; stage.setParameters({'backgroundColor': '#020408'}); $(document.body).removeClass('whtbk'); if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#whtbk').show(); $('#bkbnsld').show();" style="display: none; background-color: #000;">&#x1F319;</a>
+
 <a id="colcpk" title="Colors: CPK Standard" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colborn').show();">CPK</a>
 <a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
 <a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#bstick').show();">&#x1F388;</a>
@@ -512,9 +655,11 @@ Clip:
 <input type="checkbox" id="preserve" checked onchange="$('#clip').trigger('input');"> Preserve Ligand
 </span>
 <br>
+<span id="bkbnsld">
 Backbone:
 <input type="range" id="bbvis" min="0" max="100" step="1" value="25" class="slider" onkeyup="this.blur();">
 <br>
+</span>
 Lighting:
 <input type="range" id="lght" min="0" max="170" step="1" value="80" class="slider" onkeyup="this.blur();">
 </div>
@@ -548,8 +693,8 @@ var tmcolor =
     4: hsl_to_rgb( 70,  96,  96),
     5: hsl_to_rgb( 60, 255, 176),
     6: hsl_to_rgb( 25, 240, 160),
-    7: hsl_to_rgb(355, 175, 120),
-    8: hsl_to_rgb(260,  85,  60),
+    7: hsl_to_rgb(355, 175, 130),
+    8: hsl_to_rgb(260,  85, 100),
 };
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
@@ -720,6 +865,30 @@ function rgn_color_dark(resno, tm_only = false)
 	return r + g + b;
 }
 
+function rgn_color_light(resno, tm_only = false)
+{
+	var couleur = rgn_color(resno, tm_only);
+	if (!couleur) return couleur;
+
+	var r = couleur & 0xff0000;
+	var g = couleur & 0x00ff00;
+	var b = couleur & 0x0000ff;
+
+	r = 0xff0000 - r;
+	g = 0x00ff00 - g;
+	b = 0x0000ff - b;
+
+	r = Math.floor(r/2) & 0xff0000;
+	g = Math.ceil(g/2) & 0x00ff00;
+	b = Math.ceil(b/2);
+
+	r = 0xff0000 - r;
+	g = 0x00ff00 - g;
+	b = 0x0000ff - b;
+	
+	return r + g + b;
+}
+
 function css_color(rgb_int)
 {
 	return '#'+("000000" + rgb_int.toString(16)).substr(-6);
@@ -755,7 +924,9 @@ function toggleStrand(strandid)
 		}
 		else
 		{
-			gmodel[idx].addRepresentation(gmrep[idx], gmrparams[idx]);
+			var p = gmrparams[idx];
+			if (whtbk) p.opacity = 1;
+			gmodel[idx].addRepresentation(gmrep[idx], p);
 			gmvisible[idx] = true;
 		}
 	}
@@ -782,6 +953,7 @@ function strandColorSelection(strandid, colorCode)
 			metalness: mtl_cartoon,
 		};
 	var p = gmrparams[idx];
+	if (whtbk) p.opacity = 1;
 	var tabbtn = $("#stab"+strandid)[0];
 
 	switch(colorCode)
@@ -869,7 +1041,7 @@ function strandColorSelection(strandid, colorCode)
 
 		default:
 		p.colorScheme = (tmstrand.indexOf(strandid) >= 0) ? PODefRgnScheme : POAAScheme;
-		if (typeof tabbtn != "undefined") tabbtn.style.backgroundColor = "#234";
+		if (typeof tabbtn != "undefined") tabbtn.style.backgroundColor = whtbk ? "#bcd" : "#234";
 	}
 
 	return p;
@@ -1026,7 +1198,7 @@ function show_seqdd()
 			if (typeof restoggled[mdlidx] == "undefined") restoggled[mdlidx] = 0;
 			tgl.className = "clickme nodebtn sctgbtn" + (restoggled[mdlidx] ? " hilite" : "");
 			var rcd = false;
-			if (tmstrand.indexOf(strandid) >= 0) rcd = rgn_color_dark(resno, true);
+			if (tmstrand.indexOf(strandid) >= 0) rcd = whtbk ? rgn_color_light(resno, true) : rgn_color_dark(resno, true);
 			if (rcd) tgl.style.backgroundColor = css_color(rcd);
 
 			var j;
@@ -1272,7 +1444,7 @@ var resmdl = [], resstrandid = [""], mdlresno = [], restoggled = [];
 var acvmdl = false;
 var acvmatrix = [], acvrot8 = [];
 var acvnode = 387420489;
-var curr_ligand = false, cen_ligand = false;
+var curr_ligand = false, ligand_params = [], cen_ligand = false;
 var gpose = 1, gnode = 0;
 var orid;
 var mtlcoord = [];
@@ -1304,7 +1476,9 @@ function show_hide_gmdl()
 	}
 	else
 	{
-		gmodel[0].addRepresentation( "cartoon", gmrparams[0]);
+		var p = gmrparams[0];
+		if (whtbk) p.opacity = 1;
+		gmodel[0].addRepresentation( "cartoon", p);
 	}
 	gmdl_shown = !gmdl_shown;
 	set_gmdl_opacity();
@@ -1322,7 +1496,9 @@ function set_gmdl_opacity()
 		{
 			gmodel[i].removeAllRepresentations();
 			gmrparams[i].opacity = opc;
-			gmodel[i].addRepresentation( "cartoon", gmrparams[i]);
+			var p = gmrparams[i];
+			if (whtbk) p.opacity = 1;
+			gmodel[i].addRepresentation( "cartoon", p);
 		}
 	}
 }
@@ -1425,7 +1601,7 @@ function showSideChain(resno, strandid)
 		{
 			var p = 
             {
-                "opacity": spcfill ? 1 : opc_sidechain,
+                "opacity": (spcfill | whtbk) ? 1 : opc_sidechain,
 				"colorScheme": PODefSchemeHilite,
                 "metalness": mtl_licorice,
                 "clipNear": clipValue,
@@ -1482,7 +1658,7 @@ function refreshSideChainsVisible()
 				resmdl[i].removeAllRepresentations();
 				resmdl[i].addRepresentation( spcfill ? "spacefill" : "licorice",
 				{
-					"opacity": spcfill ? 1 : opc_sidechain,
+					"opacity": (spcfill | whtbk) ? 1 : opc_sidechain,
 					"colorScheme": PODefScheme,
 					"metalness": mtl_licorice,
 					"clipNear": clipValue,
@@ -1625,8 +1801,17 @@ function ballAndStick()
 		if (gmrep[i] == "ball+stick")
 		{
 			gmodel[i].removeAllRepresentations();
-			gmodel[i].addRepresentation(gmrep[i], gmrparams[i]);
+			var p = gmrparams[i];
+			if (whtbk) p.opacity = 1;
+			gmodel[i].addRepresentation(gmrep[i], p);
 		}
+	}
+	if (curr_ligand)
+	{
+		curr_ligand.removeAllRepresentations();
+		var p = ligand_params;
+		if (whtbk) p.opacity = 1;
+		curr_ligand.addRepresentation(model.length ? "licorice" : "ball+stick", p);
 	}
 	spcfill = false;
 }
@@ -1639,8 +1824,17 @@ function spaceFill()
 		if (gmrep[i] == "ball+stick")
 		{
 			gmodel[i].removeAllRepresentations();
-			gmodel[i].addRepresentation("spacefill", gmrparams[i]);
+			var p = gmrparams[i];
+			if (whtbk) p.opacity = 1;
+			gmodel[i].addRepresentation("spacefill", p);
 		}
+	}
+	if (curr_ligand)
+	{
+		curr_ligand.removeAllRepresentations();
+		var p = ligand_params;
+		if (whtbk) p.opacity = 1;
+		curr_ligand.addRepresentation("spacefill", p);
 	}
 	spcfill = true;
 }
@@ -1662,6 +1856,7 @@ function enable_spacefill()
 }
 
 var born = false;
+var whtbk = false;
 var spcfill = false;
 var sfenable = true;
 if (getParameterByName("born"))
@@ -1669,6 +1864,10 @@ if (getParameterByName("born"))
 	born = true;
 	$("#colborn").show();
 	$("#colcpk").hide();
+}
+if (getParameterByName("whtbk"))
+{
+	whtbk = true;
 }
 var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
@@ -1709,19 +1908,19 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
                 case 'PHE':
                 case 'TRP':
                 case 'TYR':
-                return 0x664466;
+                case 'HIS':
+                return whtbk ? 0xaa99aa : 0x887788;
 
                 case 'SER':
                 case 'THR':
                 case 'GLN':
                 case 'ASN':
-                return 0x55aa93;
+                return whtbk ? 0x339988 : 0x55aa93;
 
                 case 'ASP':
                 case 'GLU':
                 return born ? 0x99bbdd : 0xddbb99;
 
-                case 'HIS':
                 case 'LYS':
                 case 'ARG':
                 case 'PYL':
@@ -1793,6 +1992,7 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
                 case 'PHE':
                 case 'TRP':
                 case 'TYR':
+                case 'HIS':
                 return 0xaa88aa;
 
                 case 'SER':
@@ -1805,7 +2005,6 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
                 case 'GLU':
                 return born ? 0xbbddff : 0xffddbb;
 
-                case 'HIS':
                 case 'LYS':
                 case 'ARG':
                 case 'PYL':
@@ -1853,7 +2052,7 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
         {
         	case 'H': return 0xe1faff;
 			case 'He': return 0xfcaa93;
-        	case 'C': return 0xa7ada4;
+        	case 'C': return whtbk ? 0x333741 : 0xa7ada4;
         	case 'N': return born ? 0xFF3300 : 0x5555FF;
         	case 'O': return born ? 0x0099FF : 0xFF2222;
 			case 'Ne': return 0xff4e00;
@@ -2128,7 +2327,7 @@ function apply_pdb(poresult)
 	{
 		var rp =
 		{
-			opacity: opc_cartoon,
+			opacity: whtbk ? 1 : opc_cartoon,
 			colorScheme: PODefRgnScheme,
 			metalness: mtl_cartoon,
 		};
@@ -2253,7 +2452,7 @@ function apply_pdb(poresult)
 		{
 			var rp = 
 			{
-				opacity: opc_metal,
+				opacity: whtbk ? 1 : opc_metal,
 				colorScheme: PODefScheme,
 				metalness: mtl_metal,
 			};
@@ -2386,9 +2585,13 @@ function showPose(p)
 			model[i].removeAllRepresentations();
 			var lrep = spcfill ? "spacefill" : mrep[i];
 			var lparam = Object.assign({}, mrparams[i]);
-			if (spcfill) lparam.opacity = 1;
+			if (spcfill || whtbk) lparam.opacity = 1;
             model[i].addRepresentation( lrep, lparam );
-            if (is_ligand[i]) curr_ligand = model[i];
+            if (is_ligand[i])
+			{
+				curr_ligand = model[i];
+				ligand_params = mrparams[i];
+			}
         }
         else
             if (model[i].name != 'ligand') model[i].removeAllRepresentations();
@@ -2461,9 +2664,13 @@ function showNode(n)
 			model[i].removeAllRepresentations();
 			var lrep = spcfill ? "spacefill" : mrep[i];
 			var lparam = Object.assign({}, mrparams[i]);
-			if (spcfill) lparam.opacity = 1;
+			if (spcfill || whtbk) lparam.opacity = 1;
             model[i].addRepresentation( lrep, lparam );
-            if (is_ligand[i]) curr_ligand = model[i];
+            if (is_ligand[i])
+			{
+				curr_ligand = model[i];
+				ligand_params = mrparams[i];
+			}
         }
         else
 		if (model[i].name != 'ligand') model[i].removeAllRepresentations();
@@ -2499,7 +2706,7 @@ function showNode(n)
 		{
 			if (!acvmdl.reprList.length) acvmdl.addRepresentation( "cartoon",
             {
-                opacity: opc_cartoon,
+                opacity: whtbk ? 1 : opc_cartoon,
 				colorScheme: PODefRgnScheme,
                 metalness: mtl_cartoon,
             });
@@ -2509,7 +2716,7 @@ function showNode(n)
 		{
 			if (!gmodel[bbi].reprList.length) gmodel[bbi].addRepresentation( "cartoon",
             {
-                opacity: opc_cartoon,
+                opacity: whtbk ? 1 : opc_cartoon,
 				colorScheme: PODefRgnScheme,
                 metalness: mtl_cartoon,
             });
@@ -2556,7 +2763,11 @@ function rainbowNodes()
             model[i].addRepresentation( mrep[i], mrp );
             if (is_ligand[i])
 			{
-				if (mnod[i] == 0) curr_ligand = model[i];
+				if (mnod[i] == 0)
+				{
+					curr_ligand = model[i];
+					ligand_params = mrparams[i];
+				}
 			}
         }
         else
@@ -2883,6 +3094,7 @@ function loadFile(fileData, fileName = "")
 							mrparams.push(rparam);
 							is_ligand.push(1);
 							curr_ligand = comp6b;
+							ligand_params = rparam;
 							if (curr_ligand) $('#ligbtn, #prsv').show();
 
 							var lpn = comp6b.name.split("|");
@@ -2890,7 +3102,7 @@ function loadFile(fileData, fileName = "")
 							mnod.push(parseInt(lpn[1]));
 							$('#clip').trigger("input");
 
-							curr_ligand.addRepresentation( "ball+stick", rparam );
+							curr_ligand.addRepresentation( "licorice", rparam );
 						} );
 						ligtmp = "";
 					}
@@ -3207,12 +3419,13 @@ function loadFile(fileData, fileName = "")
                                 };
 
                                 model.push(comp7b);
-                                mrep.push("ball+stick");
+                                mrep.push("licorice");
                                 mrparams.push(rparam);
                                 is_ligand.push(1);
 								if (!curr_ligand)
 								{
 									curr_ligand = comp7b;
+									ligand_params = rparam;
 									window.setTimeout(function()
 									{
 										showPose(1);
@@ -3274,6 +3487,11 @@ $('input[type=file]').on('input', getFileContents);
 
 <script>
 $('#citefloat span')[0].innerText = nglcitation;
+
+if (getParameterByName("whtbk"))
+{
+	$("#whtbk").click();
+}
 </script>
 
 <div id="pleasewait" style="display: none;">

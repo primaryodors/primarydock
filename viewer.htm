@@ -632,6 +632,9 @@ function rotate3D(point, source, axis, theta)
 <a id="whtbk" title="Switch to Light Background" class="nodebtn clickme symbol smaller" onclick="whtbk=true; stage.setParameters({'backgroundColor': '#fff0e8'}); $(document.body).addClass('whtbk'); if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#blkbk').show(); $('#bkbnsld').hide();">&#x2600;&#xFE0F;</a>
 <a id="blkbk" title="Switch to Dark Background" class="nodebtn clickme symbol smaller" onclick="whtbk=false; stage.setParameters({'backgroundColor': '#020408'}); $(document.body).removeClass('whtbk'); if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#whtbk').show(); $('#bkbnsld').show();" style="display: none; background-color: #000;">&#x1F319;</a>
 
+<a id="nohyd" title="Turn Off Hydrogens" class="nodebtn clickme symbol smaller" onclick="hydrogens=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } update_hydrogens(); $(this).hide(); $('#hydro').show();">&#x1f3dc;&#xFE0F;</a>
+<a id="hydro" title="Turn On Hydrogens" class="nodebtn clickme symbol smaller" onclick="hydrogens=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } update_hydrogens(); $(this).hide(); $('#nohyd').show();" style="display: none;">&#x1F6b0;</a>
+
 <a id="colcpk" title="Colors: CPK Standard" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colborn').show();">CPK</a>
 <a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
 <a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#bstick').show();">&#x1F388;</a>
@@ -1605,6 +1608,7 @@ function showSideChain(resno, strandid)
 				"colorScheme": PODefSchemeHilite,
                 "metalness": mtl_licorice,
                 "clipNear": clipValue,
+				"sele": hydrogens ? "" : "* and not hydrogen",
             };
 
 			var pc = strandColorSelection(strandid, getStrandColor(strandid));
@@ -1662,6 +1666,7 @@ function refreshSideChainsVisible()
 					"colorScheme": PODefScheme,
 					"metalness": mtl_licorice,
 					"clipNear": clipValue,
+					"sele": hydrogens ? "" : "* and not hydrogen",
 				});
 			}
 		}
@@ -1859,6 +1864,7 @@ var born = false;
 var whtbk = false;
 var spcfill = false;
 var sfenable = true;
+var hydrogens = true;
 if (getParameterByName("born"))
 {
 	born = true;
@@ -2799,6 +2805,36 @@ $("body").on("keyup", function(e, obj)
         e.preventDefault();
     }
 });
+
+function update_hydrogens()
+{
+    var i;
+    for (i=0; i<model.length; i++)
+    {
+		model[i].eachRepresentation( function(obj)
+		{
+			obj.setSelection( hydrogens ? "*" : "* and not hydrogen" );
+		});
+	}
+    for (i=0; i<gmodel.length; i++)
+    {
+        gmodel[i].eachRepresentation( function(obj)
+        {
+			obj.setSelection( hydrogens ? "*" : "* and not hydrogen" );
+        });
+    }
+    if (acvmdl) acvmdl.eachRepresentation( function(obj)
+    {
+			obj.setSelection( hydrogens ? "*" : "* and not hydrogen" );
+    });
+    for (i=0; i<resmdl.length; i++)
+    {
+    	resmdl[i].eachRepresentation( function(obj)
+        {
+			obj.setSelection( hydrogens ? "*" : "* and not hydrogen" );
+        });
+	}
+}
 
 $("#clip").on("input", function (e, obj)
 {

@@ -46,6 +46,7 @@ class Protein
 {
 public:
     // Constructors.
+    Protein();
     Protein(const char* name);
     ~Protein();
 

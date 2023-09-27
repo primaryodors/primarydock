@@ -158,6 +158,7 @@ void Pose::copy_state(Molecule* m)
         saved_atom_locs[i] = m->atoms[i]->get_location();
         saved_atom_Z[i] = m->atoms[i]->get_Z();
     }
+    sz = i;
 }
 
 void Pose::restore_state(Molecule* m)
@@ -171,6 +172,7 @@ void Pose::restore_state(Molecule* m)
         {
             // TODO: Arginine residues sometimes end up lacking one of their hydrogens.
             if (i == n-1 && !m->atoms[i] && (saved_atom_Z[i] == 1)) break;
+            if (!m->atoms[i] && !saved_atom_Z[i]) continue;
             if (/*n != sz ||*/ !m->atoms[i] || (saved_atom_Z[i] != m->atoms[i]->get_Z()))
             {
                 cout << "Attempt to restore pose to incompatible molecule." << endl;

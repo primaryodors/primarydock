@@ -433,6 +433,7 @@ int main(int argc, char** argv)
     // Tyr6.55 verticality.
     ////////////////////////////////////////////////////////////////////////////////
 
+    #if 0
     if (l6x55 == 'Y')
     {
         Point he1 = aa6x55->get_atom_location("HE1");
@@ -449,13 +450,8 @@ int main(int argc, char** argv)
         b = aa6x55->get_atom("CA")->get_bond_between(aa6x55->get_atom("CB"));
         b->can_rotate = true;
         cout << "Vertical 6.55 ring." << endl;
-
-        // Will be using this later.
-        /* fp = fopen("tmp/vertical.pdb", "wb");
-        p.save_pdb(fp);
-        p.end_pdb(fp);
-        fclose(fp); */
     }
+    #endif
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -530,8 +526,6 @@ int main(int argc, char** argv)
         }
 
         p.bridge(n6x55, n45x51);
-        aa6x55->movability = aa45x51->movability = MOV_PINNED;
-        cout << "Bridged 6.55 and 45.51." << endl;
 
         // In OR8H1, F3.32 impinges on where this bridge would form, so it would be more sterically favorable to first point
         // 6.55's EXTENT toward 45.53's CA and then make the bridge. Since this depends on the exact positioning of atoms around the
@@ -554,6 +548,28 @@ int main(int argc, char** argv)
                 pose6x55.copy_state(aa6x55);
             }
         }
+    
+        #if 1
+        float e;
+        unwind6.start_resno.from_string("6.51");
+        unwind6.end_resno.from_string("6.55");
+        unwind6.type = dyn_wind;
+        unwind6.bias = -100;
+        for (i=0; i<50 && (e = aa6x55->get_intermol_binding(aa45x51)) < 15; i++)
+        {
+            unwind6.apply_incremental((e<2) ? 0.02 : 0.005);
+
+            cout << (i ? "." : "6.55 unwind...");
+
+            // aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, aa45x51->get_CA_location());
+            p.bridge(n6x55, n45x51);
+            // save_file(p, "tmp/unwind6x55.pdb");
+        }
+        cout << endl;
+        #endif
+
+        aa6x55->movability = aa45x51->movability = MOV_PINNED;
+        cout << "Bridged 6.55 and 45.51." << endl;
     }
 
 

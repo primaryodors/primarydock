@@ -2785,7 +2785,7 @@ void Molecule::conform_atom_to_location(int i, Point t, int iters)
                 b[j]->rotate(M_PI*2.0/circdiv, false, true);
                 r = a->get_location().get_3d_distance(t);
                 float c = get_internal_clashes();
-                if (r < bestr && c < oc+5)
+                if (r < bestr && c < oc+10)
                 {
                     bestr = r;
                     bestth = M_PI*2.0/circdiv * l;

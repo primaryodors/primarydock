@@ -437,7 +437,7 @@ _btyp_unassigned:
         if (dr.do_output_colors) colorless();
     }
 
-    cout << "Ligand internal energy: " << -dr.ligand_self*dr.energy_mult << endl << endl;
+    output << "Ligand internal energy: " << -dr.ligand_self*dr.energy_mult << endl << endl;
 
     if (dr.miscdata.size())
     {

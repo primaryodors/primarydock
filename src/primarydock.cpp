@@ -2329,6 +2329,8 @@ int main(int argc, char** argv)
 
     found_poses = 0;
     int wrote_acvmx = -1, wrote_acvmr = -1;
+    float l_individual_clash_limit = individual_clash_limit - kJmol_cutoff;
+
 _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
@@ -3096,12 +3098,12 @@ _try_again:
                 }
                 // else cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " satisfactory." << endl << endl;
 
-                if (dr[drcount][nodeno].worst_energy < -individual_clash_limit)
+                if (dr[drcount][nodeno].worst_energy > l_individual_clash_limit)
                 {
-                    cout << "Least favorable binding energy " << -dr[drcount][nodeno].worst_energy << " out of range." << endl << endl;
+                    // cout << "Least favorable binding energy " << dr[drcount][nodeno].worst_energy << " out of range." << endl << endl;
                     break;          // Exit nodeno loop.
                 }
-                else cout << "Least favorable binding energy " << -dr[drcount][nodeno].worst_energy << " satisfactory." << endl << endl;
+                // else cout << "Least favorable binding energy " << dr[drcount][nodeno].worst_energy << " satisfactory." << endl << endl;
 
                 if (pose==1) dr[drcount][nodeno].pose = pose;
                 else

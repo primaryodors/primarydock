@@ -2927,7 +2927,13 @@ _try_again:
                 for (j=1; j <= n; j++)
                 {
                     AminoAcid* aa = protein->get_residue(j);
-                    if (aa) tmp_pdb_residue[pose][j].copy_state(aa);
+                    if (aa)
+                    {
+                        tmp_pdb_residue[pose][j].copy_state(aa);
+                        #if _dbg_residue_poses
+                        cout << "tmp_pdb_residue[" << pose << "][" << j << "].copy_state(" << aa->get_name() << ")" << endl;
+                        #endif
+                    }
                 }
                 if (waters)
                 {
@@ -3238,7 +3244,13 @@ _try_again:
                             for (j1=1; j1 <= n1; j1++)
                             {
                                 AminoAcid* aa = protein->get_residue(j1);
-                                if (aa /* && aa->been_flexed */) tmp_pdb_residue[j+1][j1].restore_state(aa);
+                                if (aa /* && aa->been_flexed */)
+                                {
+                                    tmp_pdb_residue[j+1][j1].restore_state(aa);
+                                    #if _dbg_residue_poses
+                                    cout << "tmp_pdb_residue[" << (j+1) << "][" << j1 << "].restore_state(" << aa->get_name() << ")" << endl;
+                                    #endif
+                                }
                             }
                             tmp_pdb_ligand[j+1].restore_state(ligand);
 

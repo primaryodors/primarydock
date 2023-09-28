@@ -285,6 +285,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     this->imkJmol    = new float[metcount];
     this->mvdWrepl    = new float[metcount];
     this->imvdWrepl    = new float[metcount];
+    ligand_self = ligand->get_intermol_binding(ligand);
     #if use_trip_switch
     tripswitch  = tripclash;
     #endif
@@ -431,6 +432,8 @@ _btyp_unassigned:
         output << "Total: " << -dr.kJmol*dr.energy_mult << endl << endl;
         if (dr.do_output_colors) colorless();
     }
+
+    cout << "Ligand internal energy: " << -dr.ligand_self*dr.energy_mult << endl << endl;
 
     if (dr.miscdata.size())
     {

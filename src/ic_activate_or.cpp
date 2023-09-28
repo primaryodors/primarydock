@@ -554,10 +554,10 @@ int main(int argc, char** argv)
         unwind6.start_resno.from_string("6.51");
         unwind6.end_resno.from_string("6.55");
         unwind6.type = dyn_wind;
-        unwind6.bias = -100;
+        unwind6.bias = -30;
         for (i=0; i<50 && (e = aa6x55->get_intermol_binding(aa45x51)) < 15; i++)
         {
-            unwind6.apply_incremental((e<2) ? 0.02 : 0.005);
+            unwind6.apply_incremental((e<2) ? 0.05 : 0.01);
 
             cout << (i ? "." : "6.55 unwind...") << flush;
 

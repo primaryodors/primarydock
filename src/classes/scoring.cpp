@@ -37,6 +37,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         lmkJmol[i] = limkJmol[i] = lmvdWrepl[i] = limvdWrepl[i] = 0;
     }
 
+    worst_energy = 0;
+
     // if (debug) *debug << "Pose " << pose << " pathnode " << nodeno /*<< " clashes " << clash*/ << endl;
 
     ligand->clear_atom_binding_energies();
@@ -212,6 +214,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         {
             if (lb > 500) lb = 0;
             lmkJmol[metcount] = lb;
+
+            if (-lb > worst_energy) worst_energy = -lb;
         }
 
         #if active_persistence
@@ -285,6 +289,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     this->imkJmol    = new float[metcount];
     this->mvdWrepl    = new float[metcount];
     this->imvdWrepl    = new float[metcount];
+    ligand_self = ligand->get_intermol_binding(ligand);
     #if use_trip_switch
     tripswitch  = tripclash;
     #endif
@@ -431,6 +436,8 @@ _btyp_unassigned:
         output << "Total: " << -dr.kJmol*dr.energy_mult << endl << endl;
         if (dr.do_output_colors) colorless();
     }
+
+    output << "Ligand internal energy: " << -dr.ligand_self*dr.energy_mult << endl << endl;
 
     if (dr.miscdata.size())
     {

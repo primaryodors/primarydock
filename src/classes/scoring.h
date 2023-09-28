@@ -22,6 +22,8 @@ class DockResult
     float* imkJmol = 0;
     float* mvdWrepl = 0;
     float* imvdWrepl = 0;
+    float ligand_self = 0;
+    float worst_energy = 0;
     std::string pdbdat;
     std::string softrock;
     std::string miscdata;

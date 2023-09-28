@@ -559,7 +559,7 @@ int main(int argc, char** argv)
         {
             unwind6.apply_incremental((e<2) ? 0.02 : 0.005);
 
-            cout << (i ? "." : "6.55 unwind...");
+            cout << (i ? "." : "6.55 unwind...") << flush;
 
             // aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, aa45x51->get_CA_location());
             p.bridge(n6x55, n45x51);

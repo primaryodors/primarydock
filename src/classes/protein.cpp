@@ -3530,17 +3530,17 @@ void Protein::bridge(int resno1, int resno2)
     mols[1] = aa2;
     mols[2] = nullptr;
 
-    Molecule::conform_molecules(mols, 25);
+    Molecule::conform_molecules(mols, 15);
 
     Molecule** mols2;
 
     mols2 = (Molecule**)get_residues_can_clash(resno1);
-    Molecule::conform_molecules(mols, mols2, 25);
+    Molecule::conform_molecules(mols, mols2, 10);
 
     mols2 = (Molecule**)get_residues_can_clash(resno2);
-    Molecule::conform_molecules(mols, mols2, 25);
+    Molecule::conform_molecules(mols, mols2, 10);
 
-    Molecule::conform_molecules(mols, 25);
+    Molecule::conform_molecules(mols, 15);
 
     aa1->movability = MOV_PINNED;
     aa2->movability = MOV_PINNED;

@@ -3859,7 +3859,21 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
                 if (j >= startres-7 && j <= endres+7) continue;
                 aa2 = get_residue(j);
                 if (!aa2->can_reach(aa1)) continue;
+
                 float c = aa1->get_intermol_clashes(aa2);
+
+                if (repack && c > clash)
+                {
+                    Molecule* mols[3];
+                    mols[0] = (Molecule*)aa1;
+                    mols[1] = (Molecule*)aa2;
+                    mols[2] = nullptr;
+
+                    Molecule::conform_molecules(mols, 20);
+
+                    c = aa1->get_intermol_clashes(aa2);
+                }
+
                 if (c > clash)
                 {
                     clash = c;

@@ -24,6 +24,16 @@ enum TMR6ActivationType
     Rock6Other
 };
 
+void save_file(Protein& p, std::string filename)
+{
+    FILE* fp = fopen(filename.c_str(), "wb");
+    if (!fp) throw -3;
+    p.save_pdb(fp);
+    p.end_pdb(fp);
+    fclose(fp);
+    cout << "Saved " << filename << endl;
+}
+
 int main(int argc, char** argv)
 {
     if (argc < 2) return -1;
@@ -151,6 +161,7 @@ int main(int argc, char** argv)
     int n7x41 = aa7x41->get_residue_no();
     int n7x43 = aa7x43->get_residue_no();
     int n7x49 = aa7x49->get_residue_no();
+    int n7x56 = aa7x56->get_residue_no();
 
     char l3x40 = aa3x40->get_letter();
     char l4x56 = aa4x56->get_letter();
@@ -183,7 +194,7 @@ int main(int argc, char** argv)
     float theta;
     Point was;
     SCoord TMR6c, axis5;
-    float theta6 = 0;
+    float theta6 = 0, theta7 = 0;
     SCoord axis6;
     float bridge57, scooch6x40 = 0, TMR7cz;
     SCoord TMR5cdir, TMR6cdir, TMR7cdir;
@@ -327,8 +338,21 @@ int main(int argc, char** argv)
             Point pt = aa6x55->get_CA_location().add(span);
             LocatedVector lv = axis6;
             lv.origin = aa6x48->get_CA_location();
-            theta6 = fmin(p.region_can_rotate(n6x48, n6x55, lv, true), find_3d_angle(pt, aa6x55->get_CA_location(), lv.origin));
-            
+            float necessary = find_3d_angle(pt, aa6x55->get_CA_location(), lv.origin);
+            theta6 = fmin(p.region_can_rotate(n6x48, n6x55, lv, true, 200), necessary);
+
+            for (i=0; i<10; i++)
+            {
+                if (fabs(theta6 - necessary) < 0.01) break;
+
+                axis7 = compute_normal(aa7x49->get_CA_location(), aa5x33->get_CA_location(), aa7x31->get_CA_location());
+                axis7.origin = aa7x49->get_CA_location();
+                theta7 = 2.0 * fiftyseventh;
+
+                p.rotate_piece(n7x31, n7x56, axis7.origin, axis7, theta7);
+                theta6 = fmin(p.region_can_rotate(n6x48, n6x55, lv, true, 200), necessary);
+            }
+
             cout << "Hybrid6 type activation with a " << (fiftyseven * theta6) << "deg EXR component limited by "
                 << *(p.stop1) << "->" << *(p.stop2) << "." << endl;
         }
@@ -409,6 +433,7 @@ int main(int argc, char** argv)
     // Tyr6.55 verticality.
     ////////////////////////////////////////////////////////////////////////////////
 
+    #if 0
     if (l6x55 == 'Y')
     {
         Point he1 = aa6x55->get_atom_location("HE1");
@@ -425,13 +450,8 @@ int main(int argc, char** argv)
         b = aa6x55->get_atom("CA")->get_bond_between(aa6x55->get_atom("CB"));
         b->can_rotate = true;
         cout << "Vertical 6.55 ring." << endl;
-
-        // Will be using this later.
-        /* fp = fopen("tmp/vertical.pdb", "wb");
-        p.save_pdb(fp);
-        p.end_pdb(fp);
-        fclose(fp); */
     }
+    #endif
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -506,8 +526,6 @@ int main(int argc, char** argv)
         }
 
         p.bridge(n6x55, n45x51);
-        aa6x55->movability = aa45x51->movability = MOV_PINNED;
-        cout << "Bridged 6.55 and 45.51." << endl;
 
         // In OR8H1, F3.32 impinges on where this bridge would form, so it would be more sterically favorable to first point
         // 6.55's EXTENT toward 45.53's CA and then make the bridge. Since this depends on the exact positioning of atoms around the
@@ -530,6 +548,28 @@ int main(int argc, char** argv)
                 pose6x55.copy_state(aa6x55);
             }
         }
+    
+        #if 1
+        float e;
+        unwind6.start_resno.from_string("6.51");
+        unwind6.end_resno.from_string("6.55");
+        unwind6.type = dyn_wind;
+        unwind6.bias = -100;
+        for (i=0; i<50 && (e = aa6x55->get_intermol_binding(aa45x51)) < 15; i++)
+        {
+            unwind6.apply_incremental((e<2) ? 0.02 : 0.005);
+
+            cout << (i ? "." : "6.55 unwind...");
+
+            // aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, aa45x51->get_CA_location());
+            p.bridge(n6x55, n45x51);
+            // save_file(p, "tmp/unwind6x55.pdb");
+        }
+        cout << endl;
+        #endif
+
+        aa6x55->movability = aa45x51->movability = MOV_PINNED;
+        cout << "Bridged 6.55 and 45.51." << endl;
     }
 
 
@@ -709,12 +749,7 @@ int main(int argc, char** argv)
     if (preserve6x55) pose6x55.restore_state(aa6x55);
 
     std::string out_filename = path + orid + (std::string)".active.pdb";
-    fp = fopen(out_filename.c_str(), "wb");
-    if (!fp) return -3;
-    p.save_pdb(fp);
-    p.end_pdb(fp);
-    fclose(fp);
-    cout << "Saved " << out_filename << endl;
+    save_file(p, out_filename);
 
 
     ////////////////////////////////////////////////////////////////////////////////

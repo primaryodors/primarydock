@@ -37,6 +37,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         lmkJmol[i] = limkJmol[i] = lmvdWrepl[i] = limvdWrepl[i] = 0;
     }
 
+    worst_energy = 0;
+
     // if (debug) *debug << "Pose " << pose << " pathnode " << nodeno /*<< " clashes " << clash*/ << endl;
 
     ligand->clear_atom_binding_energies();
@@ -212,6 +214,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         {
             if (lb > 500) lb = 0;
             lmkJmol[metcount] = lb;
+
+            if (-lb > worst_energy) worst_energy = -lb;
         }
 
         #if active_persistence

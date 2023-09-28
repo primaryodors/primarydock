@@ -3089,6 +3089,20 @@ _try_again:
 
             if (!nodeno)
             {
+                if (dr[drcount][nodeno].ligand_self < -individual_clash_limit)
+                {
+                    // cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " out of range." << endl << endl;
+                    break;          // Exit nodeno loop.
+                }
+                // else cout << "Internal ligand energy " << -dr[drcount][nodeno].ligand_self << " satisfactory." << endl << endl;
+
+                if (dr[drcount][nodeno].worst_energy < -individual_clash_limit)
+                {
+                    cout << "Least favorable binding energy " << -dr[drcount][nodeno].worst_energy << " out of range." << endl << endl;
+                    break;          // Exit nodeno loop.
+                }
+                else cout << "Least favorable binding energy " << -dr[drcount][nodeno].worst_energy << " satisfactory." << endl << endl;
+
                 if (pose==1) dr[drcount][nodeno].pose = pose;
                 else
                 {

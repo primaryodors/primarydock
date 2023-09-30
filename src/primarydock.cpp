@@ -8,6 +8,7 @@
 #include <time.h>
 #include <sstream>
 #include <algorithm>
+#include <unistd.h>
 #include "classes/dynamic.h"
 #include "classes/group.h"
 #include "classes/protein.h"
@@ -93,6 +94,7 @@ int triesleft = 0;				// Default is no retry.
 bool echo_progress = false;
 bool hydrogenate_pdb = false;
 std::string temp_pdb_file = "";
+int pid = getpid();
 bool append_pdb = false;
 bool do_output_colors = false;
 
@@ -1948,7 +1950,7 @@ int main(int argc, char** argv)
         }
         else protein->homology_conform(ptemplt, protein);
 
-        temp_pdb_file = "tmp/homolog.pdb";
+        temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_homolog.pdb";
 
         pf = fopen(temp_pdb_file.c_str(), "wb");
         protein->save_pdb(pf);
@@ -1964,7 +1966,7 @@ int main(int argc, char** argv)
             if (res) res->hydrogenate();
         }
 
-        temp_pdb_file = "tmp/hydro.pdb";
+        temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_hydro.pdb";
 
         pf = fopen(temp_pdb_file.c_str(), "wb");
         protein->save_pdb(pf);
@@ -2075,7 +2077,7 @@ int main(int argc, char** argv)
             }
         }
 
-        temp_pdb_file = "tmp/metal.pdb";
+        temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_metal.pdb";
 
         pf = fopen(temp_pdb_file.c_str(), "wb");
         protein->save_pdb(pf);
@@ -2086,7 +2088,7 @@ int main(int argc, char** argv)
     {
         reconnect_bridges();
 
-        temp_pdb_file = "tmp/bridged.pdb";
+        temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_bridged.pdb";
 
         pf = fopen(temp_pdb_file.c_str(), "wb");
         protein->save_pdb(pf);
@@ -3355,6 +3357,8 @@ _exitposes:
         }
         else cout << "ERROR: Append PDB can only be used when specifying an output file." << endl;
     }
+
+    if (temp_pdb_file.length()) std::remove(temp_pdb_file.c_str());
 
     if (debug) debug->close();
 

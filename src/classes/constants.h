@@ -364,7 +364,7 @@
 #define _dbg_bb_realign 0
 #define _dbg_mol_flexion 0
 #define _dbg_soft_dynamics 0
-#define _dbg_residue_poses 1
+#define _dbg_residue_poses 0
 
 #endif
 

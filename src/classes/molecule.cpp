@@ -174,7 +174,7 @@ void Pose::restore_state(Molecule* m)
             if (!m->atoms[i] && !saved_atom_Z[i]) break;
             if (/*n != sz ||*/ !m->atoms[i] || (saved_atom_Z[i] != m->atoms[i]->get_Z()))
             {
-                cout << "Attempt to restore pose to incompatible molecule." << endl;
+                cout << "Attempt to restore pose to incompatible molecule (from " << saved_from->name << " to " << m->name << ")." << endl;
                 throw -4;
             }
         }

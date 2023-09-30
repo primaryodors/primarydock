@@ -1912,13 +1912,10 @@ int main(int argc, char** argv)
     if (debug) *debug << "Loaded protein." << endl;
     #endif
 
-    Pose** tmp_pdb_residue = new Pose*[poses+1];
-    for (i=0; i<=poses; i++) tmp_pdb_residue[i] = new Pose[protein->get_end_resno()+1];
-    Pose** tmp_pdb_waters = new Pose*[poses+1];
-    for (i=0; i<=poses; i++) tmp_pdb_waters[i] = new Pose[omaxh2o+1];
-    Pose* tmp_pdb_ligand = new Pose[poses+1];
-    Point** tmp_pdb_metal_locs = new Point*[poses+1];
-    for (i=0; i<=poses; i++) tmp_pdb_metal_locs[i] = new Point[mtlcoords.size()+1];
+    Pose tmp_pdb_residue[poses+1][protein->get_end_resno()+1];
+    Pose tmp_pdb_waters[poses+1][omaxh2o+1];
+    Pose tmp_pdb_ligand[poses+1];
+    Point tmp_pdb_metal_locs[poses+1][mtlcoords.size()+1];
 
     if (tplset)
     {

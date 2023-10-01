@@ -17,6 +17,8 @@ if (@$_REQUEST['view'] == "pred")
     if (!file_exists($path)) die("Something went wrong.");
     $pdb = file_get_contents($path);
 
+    $dock = "../output/$fam/$protid/$protid.$odor.$mode.dock";
+
     $ligbs = "	var lligbs = [";
     $pdblines = explode("\n", $pdb);
     $atom_lines = [];
@@ -59,6 +61,26 @@ if (@$_REQUEST['view'] == "pred")
     $c = str_replace("	var lligbs = get_ligbs_from_orid();\n", $ligbs, $c);
     $c = str_replace("var literal_pdb = false;\n", "var literal_pdb = `$pdb`;\n", $c);
     $c = str_replace("var literal_fname = \"\";\n", "var literal_fname = \"$protid.$odor.$mode.model$n.pdb\";\n", $c);
+
+    $d = explode("\n", file_get_contents($dock));
+    $dockdisp = [];
+    $ddidx = 0;
+    $dockdisp[$ddidx] = "";
+    foreach ($d as $lineno => $line)
+    {
+        $line2 = trim($d[$lineno+2]);
+        if ($line2 == "PDBDAT:") break;
+
+        $dockdisp[$ddidx] .= "$line\n";
+    }
+
+    $c .= <<<dockdata
+
+<script>
+$('#dockfloat span')[0].innerText = `{$dockdisp[0]}`;
+</script>
+dockdata;
+
 }
 
 echo $c;

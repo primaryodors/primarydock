@@ -178,6 +178,56 @@ body.whtbk #citefloat:hover span
 	color: #222;
 }
 
+#dockfloat
+{
+	position: fixed;
+	text-align: left;
+	left: 0px;
+    top: 10%;
+	font-family: Verdana, Arial, Sans-Serif;
+    font-size: 11px;
+	height: 500px;
+	overflow-y: auto;
+}
+
+#dockfloat, #dockfloat a
+{
+	color: #036;
+}
+
+#dockfloat span
+{
+    background-color: rgba(0,0,0,0.53);
+	color: rgba(0, 128, 255, 0);
+	font-family: 'Courier New', Courier, monospace;
+	font-size: 15px;
+	/* transition: color 1s, width 1s; */
+	text-align: left;
+	display: block;
+	width: 10px;
+	overflow: hidden;
+	height: 500px;
+}
+
+body.whtbk #dockfloat span
+{
+	background-color: rgba(255,255,255, 0.67);
+}
+
+#dockfloat:hover span
+{
+	color: rgba(192, 192, 192, 1);
+	display: block;
+	width: fit-content;
+    padding: 20px;
+	height: fit-content;
+}
+
+body.whtbk #dockfloat:hover span
+{
+	color: #222;
+}
+
 #ctrls div
 {
     margin-left: 15px;
@@ -3513,6 +3563,11 @@ function loadFile(fileData, fileName = "")
 
 $('input[type=file]').on('input', getFileContents);
 </script>
+
+<div id="dockfloat">
+	<span>
+	</span>
+</div>
 
 <div id="citefloat">
 	<span>

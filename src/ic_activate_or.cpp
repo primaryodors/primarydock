@@ -151,6 +151,9 @@ int main(int argc, char** argv)
     int n4x53 = aa4x53->get_residue_no();
     int n4x64 = aa4x64->get_residue_no();
     int n45x51 = aa45x51->get_residue_no();
+    int n5x33 = aa5x33->get_residue_no();
+    int n5x50 = aa5x50->get_residue_no();
+    int n5x68 = aa5x68->get_residue_no();
     int n56x50 = aa56x50->get_residue_no();
     int n6x28 = aa6x28->get_residue_no();
     int n6x48 = aa6x48->get_residue_no();
@@ -696,6 +699,41 @@ int main(int argc, char** argv)
     cout << "Minimizing internal clashes..." << endl;
     p.get_internal_clashes(1, p.get_end_resno(), true);
     p.get_internal_clashes(n3x21, n3x56, true);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // If TMR5 clashes with TMR6, move TMR5.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    float clash;
+    Molecule* mols[256];
+    j = 0;
+    for (i=n5x33; i<n5x50; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (aa) mols[j++] = (Molecule*)aa;
+    }
+    for (i=n6x48; i<n6x59; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (aa) mols[j++] = (Molecule*)aa;
+    }
+    mols[j] = nullptr;
+
+    if ((clash = mols[0]->get_intermol_clashes(mols)) > 0)
+    {
+        cout << "TMR5-6 clash " << clash << endl;
+        for (i=0; i<20; i++)
+        {
+            axis5 = compute_normal(aa5x50->get_CA_location(), aa45x51->get_CA_location(), aa5x43->get_CA_location());
+            theta = 2.5*fiftyseventh;
+
+            p.rotate_piece(n5x33, n5x50, aa5x50->get_CA_location(), axis5, theta);
+            clash = mols[0]->get_intermol_clashes(mols); // p.get_internal_clashes(n5x33, n5x50-3);
+            cout << "TMR5-6 clash " << clash << endl;
+            if (clash < 0.1) break;
+        }
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////

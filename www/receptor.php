@@ -36,6 +36,7 @@ if ($fam == 'TAAR') $bsr['5.42'] = count($bsr);
 $predictions = [];
 $pred_shown = [];
 $predname = [];
+$predate = [];
 if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
 {
     chdir(__DIR__);
@@ -47,6 +48,7 @@ if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
             $odor = find_odorant($ligname);
             $oid = $odor['oid'];
             $predname[$oid] = $ligname;
+            $predate[$oid] = date("Y-m-d H:i:s", $dock['version']);
             if (isset($dock['DockScore'])) $predictions[$oid] = floatval($dock['DockScore']);
             else if (isset($dock['a_Pose1']) && isset($dock['i_Pose1']))
                 $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
@@ -112,6 +114,7 @@ include("header.php");
     z-index: 10000;
     background: #234;
     padding: 20px;
+    font-size: small;
 }
 
 .ctxmenu
@@ -196,10 +199,13 @@ function showSkeletal(e, img)
     $(skeletal).show();
 }
 
-function show_dlmenu(e, prot, lig)
+function show_dlmenu(e, prot, lig, v)
 {
     var dlmenu = $("#dlmenu")[0];
 
+    $("#dl_mnu_prot")[0].innerText = prot;
+    $("#dl_mnu_lig")[0].innerText = decodeURIComponent(lig);
+    $("#dl_cd_v")[0].innerText = v;
     $("#dl_acv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=active");
     $("#dl_iacv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=inactive");
     $("#dl_acv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=active");
@@ -648,7 +654,7 @@ foreach ($pairs as $oid => $pair)
             else echo "inactive";
             echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</a></td>";
             echo "<td><span style=\"text-decoration: underline; cursor: pointer;\"";
-            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."');\">&#x21a7;</span>";
+            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">&#x21a7;</span>";
             echo "</td>";
             $pred_shown[$oid] = true;
         }
@@ -684,7 +690,7 @@ if (count($predictions))
             else echo "inactive";
             echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</a></td>";
             echo "<td><span style=\"text-decoration: underline; cursor: pointer;\"";
-            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."');\">&#x21a7;</span>";
+            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">&#x21a7;</span>";
             echo "</td>";
             $pred_shown[$oid] = true;
 
@@ -709,6 +715,11 @@ $('#skeletal').hide();
 </script>
 
 <div id="dlmenu" onclick="$('#dlmenu').hide();">
+    <div id="dl_mnu_prot">&nbsp;</div>
+    <div id="dl_mnu_lig">&nbsp;</div>
+    <br>
+    Code version:<div id="dl_cd_v">&nbsp;</div><br>
+    Download:<br>
     <ul class="ctxmenu">
         <li><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Active model</a></li>
         <li><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Inactive model</a></li>

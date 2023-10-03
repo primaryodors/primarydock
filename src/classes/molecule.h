@@ -165,6 +165,7 @@ public:
     void minimize_internal_clashes();
     float get_intermol_clashes(Molecule* ligand);
     float get_intermol_clashes(Molecule** ligands);
+    static float total_intermol_clashes(Molecule** ligands);
     float get_intermol_binding(Molecule* ligand, bool subtract_clashes = true);
     float get_intermol_binding(Molecule** ligands, bool subtract_clashes = true);
     float get_intermol_potential(Molecule* ligand, bool disregard_distance = false);
@@ -283,6 +284,8 @@ extern bool allow_ligand_360_tumble;
 extern bool allow_ligand_360_flex;
 extern bool wet_environment;
 extern float _momentum_rad_ceiling;
+extern Molecule *worst_clash_1, *worst_clash_2;
+extern float worst_mol_clash;
 
 #endif
 

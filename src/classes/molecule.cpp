@@ -22,6 +22,9 @@ bool allow_ligand_360_tumble = true;
 bool allow_ligand_360_flex = true;
 bool wet_environment = false;
 
+Molecule *worst_clash_1 = nullptr, *worst_clash_2 = nullptr;
+float worst_mol_clash = 0;
+
 float _momentum_rad_ceiling = fiftyseventh * 30;
 
 Molecule::Molecule(char const* lname)
@@ -1993,13 +1996,36 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 if (atoms[i]->is_bonded_to(ligands[l]->atoms[j])) continue;
                 if (atoms[i]->shares_bonded_with(ligands[l]->atoms[j])) continue;
 
-                clash += fmax(InteratomicForce::Lennard_Jones(atoms[i], ligands[l]->atoms[j]), 0);
+                if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone && abs(atoms[i]->residue - ligands[l]->atoms[j]->residue) < 2) continue;
+
+                float f = fmax(InteratomicForce::Lennard_Jones(atoms[i], ligands[l]->atoms[j]), 0);
+
+                if (f > worst_mol_clash)
+                {
+                    worst_mol_clash = f;
+                    worst_clash_1 = this;
+                    worst_clash_2 = ligands[l];
+                }
+
+                clash += f;
                 continue;
             }
         }
     }
 
     return clash; //*_kJmol_cuA;
+}
+
+float Molecule::total_intermol_clashes(Molecule** ligands)
+{
+    if (!ligands) return 0;
+    int i;
+    float clash = 0;
+    for (i=0; ligands[i]; i++)
+    {
+        clash += ligands[i]->get_intermol_clashes(ligands);
+    }
+    return clash;
 }
 
 void Molecule::move(SCoord move_amt, bool override_residue)

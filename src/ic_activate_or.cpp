@@ -713,7 +713,7 @@ int main(int argc, char** argv)
         AminoAcid* aa = p.get_residue(i);
         if (aa)
         {
-            cout << aa->get_name() << " ";
+            // cout << aa->get_name() << " ";
             mols[j++] = (Molecule*)aa;
         }
     }
@@ -722,23 +722,25 @@ int main(int argc, char** argv)
         AminoAcid* aa = p.get_residue(i);
         if (aa)
         {
-            cout << aa->get_name() << " ";
+            // cout << aa->get_name() << " ";
             mols[j++] = (Molecule*)aa;
         }
     }
     mols[j] = nullptr;
 
     worst_mol_clash = 0;
+    Molecule::conform_molecules(mols, 20);
     Molecule::total_intermol_clashes(mols);
     if (worst_clash_1 && worst_clash_2 && (clash = worst_clash_1->get_intermol_clashes(worst_clash_2)) > 0)
     {
         cout << "TMR5-6 clash " << clash << " for " << worst_clash_1->get_name() << "-" << worst_clash_2->get_name() << endl;
-        for (i=0; i<20; i++)
+        for (i=0; i<30; i++)
         {
-            axis5 = compute_normal(aa5x50->get_CA_location(), aa45x51->get_CA_location(), aa5x43->get_CA_location());
+            axis5 = compute_normal(aa5x50->get_CA_location(), aa6x55->get_CA_location(), aa5x43->get_CA_location());
             theta = 0.5*fiftyseventh;
 
             p.rotate_piece(n5x33, n5x50, aa5x50->get_CA_location(), axis5, theta);
+            // Molecule::conform_molecules(mols, 20);
             clash = worst_clash_1->get_intermol_clashes(worst_clash_2); // p.get_internal_clashes(n5x33, n5x50-3);
             cout << "TMR5-6 clash " << clash << endl;
             if (clash < 0.1) break;

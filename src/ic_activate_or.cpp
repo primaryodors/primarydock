@@ -731,10 +731,25 @@ int main(int argc, char** argv)
     worst_mol_clash = 0;
     Molecule::conform_molecules(mols, 20);
     Molecule::total_intermol_clashes(mols);
-    if (worst_clash_1 && worst_clash_2 && (clash = worst_clash_1->get_intermol_clashes(worst_clash_2)) > 0)
+    if (worst_clash_1 && worst_clash_2 && worst_clash_1->is_residue() && worst_clash_2->is_residue() && (clash = worst_clash_1->get_intermol_clashes(worst_clash_2)) > 0)
     {
+        int res1 = worst_clash_1->is_residue(), res2 = worst_clash_2->is_residue();
+        AminoAcid* aa1 = p.get_residue(res1), *aa2 = p.get_residue(res2);
+        float prob1 = aa1->get_aa_definition()->flexion_probability, prob2 = aa2->get_aa_definition()->flexion_probability;
+
+        if (prob1 > prob2)
+        {
+            AminoAcid* aa3 = p.get_residue(res2+1);
+            aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa3->get_CA_location(), 20);
+        }
+        else
+        {
+            AminoAcid* aa3 = p.get_residue(res1+1);
+            aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa3->get_CA_location(), 20);
+        }
+
         cout << "TMR5-6 clash " << clash << " for " << worst_clash_1->get_name() << "-" << worst_clash_2->get_name() << endl;
-        for (i=0; i<30; i++)
+        for (i=0; i<50; i++)
         {
             axis5 = compute_normal(aa5x50->get_CA_location(), aa6x55->get_CA_location(), aa5x43->get_CA_location());
             theta = 0.5*fiftyseventh;

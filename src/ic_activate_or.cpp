@@ -730,7 +730,7 @@ int main(int argc, char** argv)
     mols[j] = nullptr;
 
     worst_mol_clash = 0;
-    Molecule::conform_molecules(mols, 20);
+    // Molecule::conform_molecules(mols, 20);
     Molecule::total_intermol_clashes(mols);
     if (worst_clash_1 && worst_clash_2 && worst_clash_1->is_residue() && worst_clash_2->is_residue() && (clash = worst_clash_1->get_intermol_clashes(worst_clash_2)) > 0)
     {
@@ -743,12 +743,14 @@ int main(int argc, char** argv)
             AminoAcid* aa3 = aa3x37; // p.get_residue(res2+1);
             aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa3->get_CA_location(), 20);
             cout << "Prob1 " << prob1 << " is more than " << prob2 << ". Pointing " << aa1->get_name() << " at " << aa3->get_name() << endl;
+            aa1->movability = MOV_PINNED;
         }
         else
         {
             AminoAcid* aa3 = aa3x37; // p.get_residue(res1+1);
             aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa3->get_CA_location(), 20);
             cout << "Prob1 " << prob1 << " is less than " << prob2 << ". Pointing " << aa2->get_name() << " at " << aa3->get_name() << endl;
+            aa2->movability = MOV_PINNED;
         }
 
         cout << "TMR5-6 clash " << clash << " for " << worst_clash_1->get_name() << "-" << worst_clash_2->get_name() << endl;

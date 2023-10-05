@@ -95,6 +95,7 @@ int main(int argc, char** argv)
     AminoAcid *aa3x32 = p.get_residue_bw("3.32");
     AminoAcid *aa3x33 = p.get_residue_bw("3.33");
     AminoAcid *aa3x36 = p.get_residue_bw("3.36");
+    AminoAcid *aa3x37 = p.get_residue_bw("3.37");
     AminoAcid *aa3x39 = p.get_residue_bw("3.39");
     AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
@@ -739,13 +740,15 @@ int main(int argc, char** argv)
 
         if (prob1 > prob2)
         {
-            AminoAcid* aa3 = p.get_residue(res2+1);
+            AminoAcid* aa3 = aa3x37; // p.get_residue(res2+1);
             aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa3->get_CA_location(), 20);
+            cout << "Prob1 " << prob1 << " is more than " << prob2 << ". Pointing " << aa1->get_name() << " at " << aa3->get_name() << endl;
         }
         else
         {
-            AminoAcid* aa3 = p.get_residue(res1+1);
+            AminoAcid* aa3 = aa3x37; // p.get_residue(res1+1);
             aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa3->get_CA_location(), 20);
+            cout << "Prob1 " << prob1 << " is less than " << prob2 << ". Pointing " << aa2->get_name() << " at " << aa3->get_name() << endl;
         }
 
         cout << "TMR5-6 clash " << clash << " for " << worst_clash_1->get_name() << "-" << worst_clash_2->get_name() << endl;
@@ -803,6 +806,8 @@ int main(int argc, char** argv)
         p.save_pdb(fp, &m);
         p.end_pdb(fp);
         fclose(fp);*/
+
+        constraints.push_back((std::string)"STCR 6.59");
     }
 
 

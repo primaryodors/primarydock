@@ -1000,7 +1000,7 @@ int main(int argc, char** argv)
                         }
                     }
 
-                    clash_limit = homology_clash_peraa;
+                    clash_limit = clash_limit_per_aa;
 
                     for (l=0; l<200; l++)
                     {

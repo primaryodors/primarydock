@@ -24,7 +24,7 @@
 #define helix_hbond_cutoff 2.8
 #define peptide_bond_length 1.32
 #define unconnected_residue_mindist 4.82
-#define homology_clash_peraa 4.0
+#define clash_limit_per_aa 4.0
 
 #define pH 6.0
 #define hydrophilicity_cutoff 0.25

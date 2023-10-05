@@ -2792,7 +2792,7 @@ void Molecule::conform_atom_to_location(int i, Point t, int iters)
 {
     if (!(movability & MOV_CAN_FLEX)) return;
 
-    int iter, j, l, circdiv = 7;
+    int iter, j, l, circdiv = 18;
     Bond** b = get_rotatable_bonds();
     if (!b) return;
     Atom* a = atoms[i];
@@ -2811,7 +2811,7 @@ void Molecule::conform_atom_to_location(int i, Point t, int iters)
                 b[j]->rotate(M_PI*2.0/circdiv, false, true);
                 r = a->get_location().get_3d_distance(t);
                 float c = get_internal_clashes();
-                if (r < bestr && c < oc+10)
+                if (r < bestr && c < oc+2.5*clash_limit_per_aa)
                 {
                     bestr = r;
                     bestth = M_PI*2.0/circdiv * l;
@@ -2820,7 +2820,7 @@ void Molecule::conform_atom_to_location(int i, Point t, int iters)
             b[j]->rotate(bestth);
 
             #if _dbg_atom_pointing
-            cout << iter << ": " << circdiv << "|" << bestr << endl;
+            cout << name << "." << iter << ": " << circdiv << "|" << bestr << endl;
             #endif
         }
         if (!(iter % 3)) circdiv++;
@@ -3016,7 +3016,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
             if (((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN)) || a->movability == MOV_FLXDESEL)
             {
-                float self_clash = max(1.25*a->base_internal_clashes, homology_clash_peraa);
+                float self_clash = max(1.25*a->base_internal_clashes, clash_limit_per_aa);
                 Bond** bb = a->get_rotatable_bonds();
                 if (bb)
                 {

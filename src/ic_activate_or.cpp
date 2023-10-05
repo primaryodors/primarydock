@@ -602,7 +602,7 @@ int main(int argc, char** argv)
         // Then perform the rotation, then compute the rotation of TMR5 about 5.33 to keep up, and perform that rotation.
         // Then re-form the 5.58~7.53 bridge.
         float clash = aa6x40->get_intermol_clashes(aa7x53);
-        if (clash > homology_clash_peraa/4)
+        if (clash > clash_limit_per_aa/4)
         {
             Pose pose6x40;
             pose6x40.copy_state(aa6x40);
@@ -616,7 +616,7 @@ int main(int argc, char** argv)
                 scooch6x40 += TMR6cdir.r;
                 pt_tmp = aa6x40->get_CA_location();
                 clash = aa6x40->get_intermol_clashes(aa7x53);
-                if (clash < homology_clash_peraa/4) break;
+                if (clash < clash_limit_per_aa/4) break;
             }
 
             pose6x40.restore_state(aa6x40);
@@ -661,7 +661,7 @@ int main(int argc, char** argv)
         // Then re-form the 5.58~7.53 bridge.
         scooch6x40 = 0;
         clash = aa6x40->get_intermol_clashes(aa7x52) + aa6x40->get_intermol_clashes(aa7x53);
-        if (clash > homology_clash_peraa/4)
+        if (clash > clash_limit_per_aa/4)
         {
             Pose pose6x40;
             pose6x40.copy_state(aa6x40);
@@ -675,7 +675,7 @@ int main(int argc, char** argv)
                 scooch6x40 += TMR6cdir.r;
                 pt_tmp = aa6x40->get_CA_location();
                 clash = aa6x40->get_intermol_clashes(aa7x52) + aa6x40->get_intermol_clashes(aa7x53);
-                if (clash < homology_clash_peraa/4) break;
+                if (clash < clash_limit_per_aa/4) break;
             }
 
             pose6x40.restore_state(aa6x40);
@@ -742,6 +742,7 @@ int main(int argc, char** argv)
         if (prob1 > prob2)
         {
             AminoAcid* aa3 = aa3x37; // p.get_residue(res2+1);
+            aa1->movability = MOV_FLEXONLY;
             aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa3->get_CA_location(), 20);
             cout << "Prob1 " << prob1 << " is more than " << prob2 << ". Pointing " << aa1->get_name() << " at " << aa3->get_name() << endl;
             aa1->movability = MOV_PINNED;
@@ -749,6 +750,7 @@ int main(int argc, char** argv)
         else
         {
             AminoAcid* aa3 = aa3x37; // p.get_residue(res1+1);
+            aa2->movability = MOV_FLEXONLY;
             aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa3->get_CA_location(), 20);
             cout << "Prob1 " << prob1 << " is less than " << prob2 << ". Pointing " << aa2->get_name() << " at " << aa3->get_name() << endl;
             aa2->movability = MOV_PINNED;

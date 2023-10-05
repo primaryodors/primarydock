@@ -3473,7 +3473,7 @@ void Protein::homology_conform(Protein* target, Protein* reference)
             sprintf(buffer, "TMR%d", hxno);
             int rgstart0 = get_region_start(buffer);
             int rgend0 = get_region_end(buffer);
-            float threshold = homology_clash_peraa * (rgend0 - rgstart0);
+            float threshold = clash_limit_per_aa * (rgend0 - rgstart0);
             float f = get_internal_clashes(rgstart0, rgend0, true, 10);
 
             #if _dbg_homology
@@ -3806,7 +3806,7 @@ float Protein::region_can_move(int startres, int endres, SCoord direction, bool 
             }
         }
 
-        if (clash > homology_clash_peraa)
+        if (clash > clash_limit_per_aa)
         {
             // cout << "At " << (result+increment) << ", " << debug_msg << "." << endl;
             direction.r *= -1;
@@ -3888,7 +3888,7 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
         }
 
         if (!l) initclash = clash;
-        if (clash > homology_clash_peraa+eca && clash > 1.1*initclash)
+        if (clash > clash_limit_per_aa+eca && clash > 1.1*initclash)
         {
             // cout << "At " << ((result+increment)*fiftyseven) << "deg, " << debug_msg << "." << endl;
             rotate_piece(startres, endres, axis.origin, axis, -increment);
@@ -3950,7 +3950,7 @@ void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r,
             for (j=0; j<n; j++)
             {
                 /*float e = -aa.pmol->get_intermol_binding(reaching[j]);
-                if (e < homology_clash_peraa) continue;*/
+                if (e < clash_limit_per_aa) continue;*/
 
                 SCoord motion = aa.pmol->motion_to_optimal_contact(reaching[j]);
                 if (fabs(motion.r) < 0.1) continue;

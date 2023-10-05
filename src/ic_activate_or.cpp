@@ -407,8 +407,9 @@ int main(int argc, char** argv)
 
     axis4 = (SCoord)aa4x53->get_CA_location().subtract(aa6x49->get_CA_location());
     axis4.origin = aa4x53->get_CA_location();
-    float bend4 = p.region_can_rotate(n4x53, n4x64, axis4, true);
-    cout << "TMR4 can bend " << (bend4 * fiftyseven) << " degrees about 4.64 to meet TMR3." << endl;
+    float bend4 = p.region_can_rotate(n4x53, n4x64, axis4, false);
+    cout << "TMR4 can bend " << (bend4 * fiftyseven) << " degrees about 4.64 limited by " << *(p.stop1) << "->" << *(p.stop2)
+        << " to meet TMR3." << endl;
 
     // Perform the rotation.
     p.rotate_piece(n4x53, n4x64, aa4x53->get_CA_location(), axis4, bend4);

@@ -5801,6 +5801,14 @@
                     "type": "na",
                     "adjusted_curve_top": "0"
                 }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1"
+                }
             }
         }
     },
@@ -7426,6 +7434,14 @@
                 {
                     "type": "ia",
                     "adjusted_curve_top": "-0.16260161995888"
+                }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-0.6"
                 }
             }
         }
@@ -13429,6 +13445,14 @@
                     "type": "vsa",
                     "ec50": "-9"
                 }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                }
             }
         }
     },
@@ -15028,6 +15052,14 @@
                 {
                     "type": "ia",
                     "adjusted_curve_top": "-0.57142859697342"
+                }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
                 }
             }
         }
@@ -25438,6 +25470,14 @@
                     "ec50": "-1.67",
                     "adjusted_curve_top": "0.054157252860632"
                 }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                }
             }
         }
     },
@@ -26743,6 +26783,14 @@
                 {
                     "type": "vsa",
                     "ec50": "-6.52"
+                }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
                 }
             }
         }
@@ -28402,6 +28450,14 @@
                 "OR5P3":
                 {
                     "type": "na"
+                }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
                 }
             }
         }
@@ -30191,6 +30247,14 @@
                     "type": "wa",
                     "adjusted_curve_top": "0.65989842974595"
                 }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "ia",
+                    "adjusted_curve_top": "-1"
+                }
             }
         }
     },
@@ -30699,6 +30763,14 @@
                 {
                     "type": "sa",
                     "ec50": "-5.66"
+                }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.8"
                 }
             }
         }
@@ -31478,6 +31550,14 @@
                 {
                     "type": "vsa",
                     "ec50": "-8.54"
+                }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.4"
                 }
             }
         }
@@ -34109,6 +34189,14 @@
                     "ec50": "-6.3",
                     "adjusted_curve_top": "9.9999997615814",
                     "antagonist": "1"
+                }
+            },
+            "https:\/\/doi.org\/10.1172\/JCI152373":
+            {
+                "OR2L13":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.6"
                 }
             }
         }

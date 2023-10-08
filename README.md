@@ -26,7 +26,7 @@ make
 
 The application will require 3D maps of your target receptor(s) in PDB format. If your model contains heavy atoms only,
 the accuracy of docking results may be severely compromised. Fortunately, PrimaryDock can hydrogenate PDBs automatically
-during docking, or you can use Pepteditor to hydrogenate them manually. PDBs for human olfactory receptors are provided
+during docking, or you can use Pepteditor to hydrogenate them before docking. PDBs for human olfactory receptors are provided
 in the `pdbs/` folder for olfactory docking. They have been modified from the PDBs available from AlphaFold.
 
 It will also be necessary to obtain 3D models of your ligand(s). Currently, only SDF format is supported.

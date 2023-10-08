@@ -26,7 +26,7 @@
 #define unconnected_residue_mindist 4.82
 #define clash_limit_per_aa 4.0
 
-#define pH 6.0
+#define pH 7.0
 #define hydrophilicity_cutoff 0.25
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.

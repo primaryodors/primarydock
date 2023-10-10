@@ -74,6 +74,18 @@ else
     diff --color --unified $REPORT testdata/received/ifnot_test.received.txt
 fi
 
+
+REPORT="testdata/measure_test.approved.txt"
+./bin/pepteditor test/measure.pepd | sed '/^#/d' >testdata/received/measure_test.received.txt
+RESULT=$(diff --unified $REPORT testdata/received/measure_test.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}\u2588${NC}"
+else
+    printf "\n${RED}MEASURE test FAILED.${NC}\n"
+    diff --color --unified $REPORT testdata/received/measure_test.received.txt
+fi
+
+
 REPORT="testdata/bwmagic.approved.txt"
 bin/pepteditor test/bwmagic.pepd | sed '/^#/d' >testdata/received/bwmagic.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/bwmagic.received.txt)

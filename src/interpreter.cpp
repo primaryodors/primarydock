@@ -2303,6 +2303,31 @@ int main(int argc, char** argv)
 
             } // MCOORD
 
+            else if (!strcmp(words[0], "MEASURE"))
+            {
+                for (l=1; words[l]; l++);       // Count params.
+
+                if (l != 4 && l != 6) raise_error("Wrong number of parameters given for MEASURE.");
+
+                bool atom_names = (l >= 5);
+                int res1 = interpret_single_int(words[1]);
+                std::string atom1 = atom_names ? interpret_single_string(words[2]) : "CA";
+                int res2 = interpret_single_int(words[atom_names ? 3 : 2]);
+                std::string atom2 = atom_names ? interpret_single_string(words[4]) : "CA";
+
+                if (!res1 || !working->get_residue(res1)) raise_error("Residue A not found in protein.");
+                if (!res2 || !working->get_residue(res2)) raise_error("Residue B not found in protein.");
+
+                if (!working->get_atom(res1, atom1.c_str())) raise_error(std::to_string(res1) + (std::string)":" + atom1 + (std::string)" not found in protein.");
+                if (!working->get_atom(res2, atom2.c_str())) raise_error(std::to_string(res2) + (std::string)":" + atom2 + (std::string)" not found in protein.");
+
+                float r = working->get_atom_location(res1, atom1.c_str()).get_3d_distance(working->get_atom_location(res2, atom2.c_str()));
+
+                Star s;
+                s.f = r;
+                set_variable(words[l-1], s);
+            } // MEASURE
+
             else if (!strcmp(words[0], "MOVE"))
             {
                 l = 1;

@@ -24,11 +24,11 @@ enum TMR6ActivationType
     Rock6Other
 };
 
-void save_file(Protein& p, std::string filename)
+void save_file(Protein& p, std::string filename, Molecule* ligand = nullptr)
 {
     FILE* fp = fopen(filename.c_str(), "wb");
     if (!fp) throw -3;
-    p.save_pdb(fp);
+    p.save_pdb(fp, ligand);
     p.end_pdb(fp);
     fclose(fp);
     cout << "Saved " << filename << endl;
@@ -151,6 +151,8 @@ int main(int argc, char** argv)
     int n4x53 = aa4x53->get_residue_no();
     int n4x64 = aa4x64->get_residue_no();
     int n45x51 = aa45x51->get_residue_no();
+    int n5x33 = aa5x33->get_residue_no();
+    int n5x68 = aa5x68->get_residue_no();
     int n56x50 = aa56x50->get_residue_no();
     int n6x28 = aa6x28->get_residue_no();
     int n6x48 = aa6x48->get_residue_no();
@@ -177,6 +179,9 @@ int main(int argc, char** argv)
     char l7x53 = aa7x53->get_letter();
 
     float dist67 = aa6x59->get_CA_location().get_3d_distance(p.get_residue(n6x59+1)->get_CA_location());
+
+    Molecule water57("H2O");
+    water57.from_smiles("O");
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -455,6 +460,78 @@ int main(int argc, char** argv)
 
 
     ////////////////////////////////////////////////////////////////////////////////
+    // TMR5-TMR7 water molecule.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    if (l5x58 == 'Y' && l7x53 == 'Y')
+    {
+        Point p5 = aa5x58->get_atom_location("OH");
+        Point p7 = aa7x53->get_atom_location("OH");
+        float r57;
+        pt_tmp = p5.add(p7);
+        pt_tmp.scale(pt_tmp.magnitude()/2);
+        water57.recenter(pt_tmp);
+        water57.movability = MOV_NORECEN;
+
+        Molecule* mols[4];
+        mols[0] = &water57;
+        mols[1] = aa5x58;
+        mols[2] = aa7x53;
+        mols[3] = nullptr;
+        Molecule::conform_molecules(mols, 10);
+        p5 = aa5x58->get_atom_location("OH");
+        p7 = aa7x53->get_atom_location("OH");
+        r57 = p5.get_3d_distance(p7);
+
+        cout << "Y5.58 - Y7.53 distance: " << r57 << endl;
+        save_file(p, "tmp/water57_step1.pdb", &water57);
+
+        // TMR5 moves as far as it can toward TMR7.
+        axis5 = p7.subtract(p5);
+        axis5.r = p.region_can_move(n5x33, n5x68, axis5, false, n6x28, n6x59);
+        p.move_piece(n5x33, n5x68, axis5);
+
+        water57.movability = MOV_ALL;
+        p5 = aa5x58->get_atom_location("OH");
+        p7 = aa7x53->get_atom_location("OH");
+        pt_tmp = p5.add(p7);
+        pt_tmp.scale(pt_tmp.magnitude()/2);
+        water57.recenter(pt_tmp);
+        water57.movability = MOV_NORECEN;
+        Molecule::conform_molecules(mols, 10);
+        p5 = aa5x58->get_atom_location("OH");
+        p7 = aa7x53->get_atom_location("OH");
+        r57 = p5.get_3d_distance(p7);
+
+        cout << "Y5.58 - Y7.53 distance: " << r57 << endl;
+        save_file(p, "tmp/water57_step2.pdb", &water57);
+
+        // TMR7 bends as far as it can toward TMR5.
+        axis7 = compute_normal(aa7x49->get_CA_location(), p7, p5);
+        axis7.origin = aa7x49->get_CA_location();
+        theta = p.region_can_rotate(n7x49, n7x56, axis7, false, 0, n6x28, n6x59);
+        p.rotate_piece(n7x49, n7x56, axis7.origin, axis7, theta);
+
+        water57.movability = MOV_ALL;
+        p5 = aa5x58->get_atom_location("OH");
+        p7 = aa7x53->get_atom_location("OH");
+        pt_tmp = p5.add(p7);
+        pt_tmp.scale(pt_tmp.magnitude()/2);
+        water57.recenter(pt_tmp);
+        water57.movability = MOV_NORECEN;
+        Molecule::conform_molecules(mols, 10);
+        p5 = aa5x58->get_atom_location("OH");
+        p7 = aa7x53->get_atom_location("OH");
+        r57 = p5.get_3d_distance(p7);
+
+        cout << "Y5.58 - Y7.53 distance: " << r57 << endl;
+        save_file(p, "tmp/water57_step3.pdb", &water57);
+
+        // If still no successful contact, TMR5 bends toward TMR7.
+    }
+
+    #if 0
+    ////////////////////////////////////////////////////////////////////////////////
     // TMR5 motion toward TMR6.
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -467,6 +544,7 @@ int main(int argc, char** argv)
     // Perform the TMR5ez slide.
     TMR5edir.r = TMR5ez;
     p.move_piece(aa5x33->get_residue_no(), aa5x68->get_residue_no(), TMR5edir);
+    #endif
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -749,7 +827,7 @@ int main(int argc, char** argv)
     if (preserve6x55) pose6x55.restore_state(aa6x55);
 
     std::string out_filename = path + orid + (std::string)".active.pdb";
-    save_file(p, out_filename);
+    save_file(p, out_filename, &water57);
 
 
     ////////////////////////////////////////////////////////////////////////////////

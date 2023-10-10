@@ -3758,7 +3758,7 @@ float Protein::binding_to_nearby_residues(int resno)
     return aa->get_intermol_binding(caa);
 }
 
-float Protein::region_can_move(int startres, int endres, SCoord direction, bool repack)
+float Protein::region_can_move(int startres, int endres, SCoord direction, bool repack, int isr, int ier)
 {
     int n = get_end_resno();
     Pose revert_to[n+1];
@@ -3790,6 +3790,7 @@ float Protein::region_can_move(int startres, int endres, SCoord direction, bool 
             for (j=1; j<=n; j++)
             {
                 if (j >= startres-7 && j <= endres+7) continue;
+                if (j >= isr && j <= ier) continue;
                 aa2 = get_residue(j);
                 if (!aa2->can_reach(aa1)) continue;
                 float c = aa1->get_intermol_clashes(aa2);
@@ -3827,7 +3828,7 @@ float Protein::region_can_move(int startres, int endres, SCoord direction, bool 
     return result;
 }
 
-float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, bool repack, float eca)
+float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, bool repack, float eca, int isr, int ier)
 {
     int n = get_end_resno();
     Pose revert_to[n+1];
@@ -3857,6 +3858,7 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
             for (j=1; j<=n; j++)
             {
                 if (j >= startres-7 && j <= endres+7) continue;
+                if (j >= isr && j <= ier) continue;
                 aa2 = get_residue(j);
                 if (!aa2->can_reach(aa1)) continue;
 

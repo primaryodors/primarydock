@@ -397,7 +397,8 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
                 for (j=0; j<n; j++)
                 {
                     if (residues[i] == laa[j]) continue;
-                    if (residues[i]->get_intermol_clashes(laa[j]) > 3)
+                    // if (residues[i]->get_intermol_clashes(laa[j]) >= 1)
+                    if (fabs(residues[i]->get_intermol_binding(laa[j])) >= 1)
                     {
                         #if _dbg_repack
                         dbgresstr += (std::string)" " + (std::string)laa[j]->get_name();
@@ -3758,11 +3759,16 @@ float Protein::binding_to_nearby_residues(int resno)
     return aa->get_intermol_binding(caa);
 }
 
+#define dbg_region_can_move 0
+
 float Protein::region_can_move(int startres, int endres, SCoord direction, bool repack, int isr, int ier)
 {
     int n = get_end_resno();
     Pose revert_to[n+1];
     std::string debug_msg;
+
+    stop1 = stop2 = nullptr;
+    stop1a = stop2a = nullptr;
 
     int i, j, l;
 
@@ -3803,13 +3809,18 @@ float Protein::region_can_move(int startres, int endres, SCoord direction, bool 
                         + (std::string)aa2->get_3letter() + std::to_string(aa2->get_residue_no());
                     stop1 = aa1;
                     stop2 = aa2;
+                    stop1a = aa1->clash1;
+                    stop2a = aa1->clash2;
                 }
             }
         }
 
         if (clash > homology_clash_peraa)
         {
-            // cout << "At " << (result+increment) << ", " << debug_msg << "." << endl;
+            #if dbg_region_can_move
+            cout << "At " << (result+increment) << ", " << debug_msg << "." << endl;
+            #endif
+
             direction.r *= -1;
             move_piece(startres, endres, direction);
             increment *= 0.81;
@@ -3833,6 +3844,9 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
     int n = get_end_resno();
     Pose revert_to[n+1];
     std::string debug_msg;
+
+    stop1 = stop2 = nullptr;
+    stop1a = stop2a = nullptr;
 
     int i, j, l;
 
@@ -3885,6 +3899,8 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
                         + (std::string)aa2->get_3letter() + std::to_string(aa2->get_residue_no());
                     stop1 = aa1;
                     stop2 = aa2;
+                    stop1a = aa1->clash1;
+                    stop2a = aa1->clash2;
                 }
             }
         }

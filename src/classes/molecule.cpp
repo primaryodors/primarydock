@@ -2006,9 +2006,13 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
                 if (f > worst)
                 {
                     worst = f;
-                    worst_mol_clash = f;
                     clash1 = atoms[i];
                     clash2 = ligands[l]->atoms[j];
+                }
+
+                if (f > worst_mol_clash)
+                {
+                    worst_mol_clash = f;
                     worst_clash_1 = this;
                     worst_clash_2 = ligands[l];
                 }

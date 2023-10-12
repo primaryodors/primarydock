@@ -103,7 +103,7 @@ public:
     char set_pdb_chain(char chain);
 
     // Metrics functions.
-    float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false, int repack_iters = 15);
+    float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false, int repack_iters = 10);
     float get_rel_int_clashes();
     float get_internal_binding();
     float get_intermol_clashes(Molecule* ligand);
@@ -129,8 +129,8 @@ public:
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
     float binding_to_nearby_residues(int resno);
     void minimize_residue_clashes(int resno);
-    float region_can_move(int startres, int endres, SCoord direction, bool repack = false);
-    float region_can_rotate(int startres, int endres, LocatedVector axis, bool repack = false, float extra_clash_allowance = 0);     // Searches positive theta.
+    float region_can_move(int startres, int endres, SCoord direction, bool repack = false, int ignore_startres = 0, int ignore_endres = 0);
+    float region_can_rotate(int startres, int endres, LocatedVector axis, bool repack = false, float extra_clash_allowance = 0, int ignore_startres = 0, int ignore_endres = 0);     // Searches positive theta.
     void region_optimal_positioning(int startres, int endres, SCoord* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
 
     // Motion functions
@@ -178,6 +178,7 @@ public:
     SCoord last_int_clash_dir;
 
     AminoAcid *stop1, *stop2;
+    Atom *stop1a, *stop2a;
     int last_saved_atom_number = 0;
 
 protected:

@@ -393,7 +393,7 @@ int main(int argc, char** argv)
             axis6 = compute_normal(aa6x48->get_CA_location(), aa6x59->get_CA_location(), aa5x36->get_CA_location());
             LocatedVector lv = axis6;
             lv.origin = aa6x48->get_CA_location();
-            theta6 = p.region_can_rotate(n6x48, n6x59, lv, true, 5);
+            theta6 = p.region_can_rotate(n6x48, n6x59, lv, true, 0);
             cout << "Rock6 type activation with a " << (fiftyseven * theta6) << "deg basic 6.59." << endl;
         }
         else
@@ -488,7 +488,7 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////////
 
     axis1 = (SCoord)(aa1x50->get_CA_location().subtract(aa1x46->get_CA_location()));
-    axis1.r = 3.8;
+    axis1.r = 2.8;
     p.move_piece(n1x32, n2x66, axis1);
 
     axis1 = compute_normal(aa1x50->get_CA_location(), aa8x44->get_CA_location(), aa1x58->get_CA_location());
@@ -503,7 +503,7 @@ int main(int argc, char** argv)
 
     axis7 = compute_normal(aa7x49->get_CA_location(), aa7x56->get_CA_location(), aa1x58->get_CA_location());
     axis7.origin = aa7x49->get_CA_location();
-    theta = p.region_can_rotate(n7x49, n8ter, axis7, true);
+    theta = p.region_can_rotate(n7x49, n8ter, axis7, true, 0);
     p.rotate_piece(n7x49+1, n8ter, axis7.origin, axis7, theta);
     cout << "TMR7/HXR8 motion limited by " << *(p.stop1) << ":" << p.stop1a->name << "->" << *(p.stop2) << ":" << p.stop2a->name << endl;
 
@@ -849,7 +849,7 @@ int main(int argc, char** argv)
         TMR7cdir.r = fmin(TMR7cz, bridge57);
         axis7 = compute_normal(aa7x48->get_CA_location(), aa7x53->get_CA_location(), aa7x53->get_CA_location().add(TMR7cdir));
         theta = find_3d_angle(aa7x53->get_CA_location(), aa7x53->get_CA_location().add(TMR7cdir), aa7x48->get_CA_location());
-        p.rotate_piece(aa7x48->get_residue_no(), aa7x56->get_residue_no(), aa7x48->get_CA_location(), axis7, theta);
+        p.rotate_piece(aa7x48->get_residue_no(), n8ter /*aa7x56->get_residue_no()*/, aa7x48->get_CA_location(), axis7, theta);
         
         // Re-measure Bridge57. If it is nonzero, compute and execute a pivot of TMR5 from 5.33 to move 5.58 the rest of the way to make contact with 7.53.
         // Then compute and execute a y-axis rotation of TMR6 to bring 6.28 as far along horizontally as 5.68 moved.

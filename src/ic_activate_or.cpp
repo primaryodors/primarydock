@@ -15,6 +15,8 @@
 
 using namespace std;
 
+#define dbg_57_contact 0
+
 enum TMR6ActivationType
 {
     Bend6,
@@ -196,7 +198,7 @@ int main(int argc, char** argv)
 
     int n8ter = n8x44;
     AminoAcid* aa8ter;
-    for (i = n8ter; aa8ter = p.get_residue(i); i++ )
+    for (i = n8ter; aa8ter = p.get_residue(i); i++)
     {
         if (aa8ter->is_alpha_helix()) n8ter = i;
         else break;
@@ -529,7 +531,9 @@ int main(int argc, char** argv)
         r57 = p5.get_3d_distance(p7);
 
         cout << "Y5.58 - Y7.53 distance: " << r57 << endl;
+        #if dbg_57_contact
         save_file(p, "tmp/water57_step1.pdb", &water57);
+        #endif
 
         // Most class I ORs have a salt bridge that interferes with steps 2 and 4.
         bool saltbridge45 = ((l4x52 == 'R' || l4x52 == 'K') && (l5x50 == 'D' || l5x50 == 'E'));
@@ -564,7 +568,9 @@ int main(int argc, char** argv)
             r57 = p5.get_3d_distance(p7);
 
             cout << "Y5.58 - Y7.53 distance: " << r57 << endl;
+            #if dbg_57_contact
             save_file(p, "tmp/water57_step2.pdb", &water57);
+            #endif
         }
 
         if (r57 >= 4.5)
@@ -589,7 +595,9 @@ int main(int argc, char** argv)
             r57 = p5.get_3d_distance(p7);
 
             cout << "Y5.58 - Y7.53 distance: " << r57 << endl;
+            #if dbg_57_contact
             save_file(p, "tmp/water57_step3.pdb", &water57);
+            #endif
         }
 
         if (r57 >= 4.5)
@@ -616,13 +624,17 @@ int main(int argc, char** argv)
             r57 = p5.get_3d_distance(p7);
 
             axis5.r = 1;
+            #if dbg_57_contact
             Atom* He = water57.add_atom("He", "He", nullptr, 0);
             He->move(axis5.origin.add((SCoord)axis5));
+            #endif
 
             cout << "Y5.58 - Y7.53 distance: " << r57 << endl;
+            #if dbg_57_contact
             save_file(p, "tmp/water57_step4.pdb", &water57);
 
             water57.delete_atom(He);
+            #endif
         }
 
         if (saltbridge45)

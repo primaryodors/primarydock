@@ -778,7 +778,7 @@ int main(int argc, char** argv)
 
         // Attempt to bridge 5.58~7.53 and measure the distance necessary to complete the contact. Call it Bridge57.
         p.bridge(aa5x58->get_residue_no(), aa7x53->get_residue_no());
-        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
+        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 4);
         cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
 
         // Move the side chain of 6.40 to face 7.53:CA and ensure that 6.40 is not clashing with 7.53.
@@ -826,7 +826,7 @@ int main(int argc, char** argv)
         }
         
         // Re-measure Bridge57. If it is nonzero, determine how far 7.53 can move toward 5.58 without clashing with 3.43. Call it TMR7cz.
-        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
+        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 4);
         cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
         TMR7cdir = aa5x58->get_CA_location().subtract(aa7x53->get_CA_location());
         TMR7cz = p.region_can_move(aa7x53->get_residue_no(), aa7x53->get_residue_no(), TMR7cdir, false);
@@ -840,7 +840,7 @@ int main(int argc, char** argv)
         // Re-measure Bridge57. If it is nonzero, compute and execute a pivot of TMR5 from 5.33 to move 5.58 the rest of the way to make contact with 7.53.
         // Then compute and execute a y-axis rotation of TMR6 to bring 6.28 as far along horizontally as 5.68 moved.
         // Translate the CYT3 region (BW numbers 56.x) to stay with 5.68 and 6.28 as smoothly as possible.
-        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 3);
+        bridge57 = fmax(0, aa5x58->get_atom("OH")->distance_to(aa7x53->get_atom("OH")) - 4);
         cout << "5.58~7.53 bridge must move " << bridge57 << "A together." << endl;
         
         // If 6.40 is once again clashing with 7.53, compute the distance to rotate 6.48 thru 56.50 about 6.48 to eliminate the clash.

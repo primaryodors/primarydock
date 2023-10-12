@@ -908,7 +908,7 @@ int main(int argc, char** argv)
     // If TMR5 clashes with TMR6, move TMR5.
     ////////////////////////////////////////////////////////////////////////////////
 
-    float clash;
+    float clash, lastclash;
     Molecule* mols[256];
     j = 0;
     for (i=n5x33; i<n5x50; i++)
@@ -958,6 +958,7 @@ int main(int argc, char** argv)
         }
 
         cout << "TMR5-6 clash " << clash << " for " << worst_clash_1->get_name() << "-" << worst_clash_2->get_name() << endl;
+        lastclash = clash;
         for (i=0; i<50; i++)
         {
             axis5 = compute_normal(aa5x50->get_CA_location(), aa6x55->get_CA_location(), aa5x43->get_CA_location());
@@ -967,7 +968,8 @@ int main(int argc, char** argv)
             // Molecule::conform_molecules(mols, 20);
             clash = worst_clash_1->get_intermol_clashes(worst_clash_2); // p.get_internal_clashes(n5x33, n5x50-3);
             cout << "TMR5-6 clash " << clash << endl;
-            if (clash < 0.1) break;
+            if (clash < 0.1 || clash == lastclash) break;
+            lastclash = clash;
         }
     }
 

@@ -1,0 +1,9 @@
+
+LOAD pdbs/OR51/OR51E2.8f76.pdb
+
+ECHO %5.58 "~" %7.53 ~
+
+MEASURE %5.58 "OH" %7.53 "OH" &r
+
+ECHO ": atoms are " &r "A apart."
+

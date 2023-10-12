@@ -1978,6 +1978,9 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
     Atom* a, *b;
     float clash = 0;
 
+    clash1 = clash2 = nullptr;
+    float worst = 0;
+
     if (noAtoms(atoms)) return 0;
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
@@ -2000,9 +2003,12 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
 
                 float f = fmax(InteratomicForce::Lennard_Jones(atoms[i], ligands[l]->atoms[j]), 0);
 
-                if (f > worst_mol_clash)
+                if (f > worst)
                 {
+                    worst = f;
                     worst_mol_clash = f;
+                    clash1 = atoms[i];
+                    clash2 = ligands[l]->atoms[j];
                     worst_clash_1 = this;
                     worst_clash_2 = ligands[l];
                 }

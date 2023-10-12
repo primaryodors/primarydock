@@ -225,6 +225,7 @@ public:
     bool priority = false;
     std::vector<std::shared_ptr<GroupPair>> agroups;
     Molecule** mclashables = nullptr;
+    Atom *clash1 = nullptr, *clash2 = nullptr;
 
 protected:
     Molecule();

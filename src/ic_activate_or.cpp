@@ -87,7 +87,10 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////////
 
     AminoAcid *aa1x32 = p.get_residue_bw("1.32");
+    AminoAcid *aa1x46 = p.get_residue_bw("1.46");
     AminoAcid *aa1x50 = p.get_residue_bw("1.50");
+    AminoAcid *aa1x58 = p.get_residue_bw("1.58");
+    AminoAcid *aa2x38 = p.get_residue_bw("2.38");
     AminoAcid *aa2x49 = p.get_residue_bw("2.49");
     AminoAcid *aa2x50 = p.get_residue_bw("2.50");
     AminoAcid *aa2x66 = p.get_residue_bw("2.66");
@@ -140,9 +143,11 @@ int main(int argc, char** argv)
     AminoAcid *aa7x52 = p.get_residue_bw("7.52");
     AminoAcid *aa7x53 = p.get_residue_bw("7.53");
     AminoAcid *aa7x56 = p.get_residue_bw("7.56");
+    AminoAcid *aa8x44 = p.get_residue_bw("8.44");
     
     int n1x32 = aa1x32->get_residue_no();
     int n1x50 = aa1x50->get_residue_no();
+    int n2x38 = aa2x38->get_residue_no();
     int n2x50 = aa2x50->get_residue_no();
     int n2x66 = aa2x66->get_residue_no();
     int n3x21 = aa3x21->get_residue_no();
@@ -167,6 +172,7 @@ int main(int argc, char** argv)
     int n7x43 = aa7x43->get_residue_no();
     int n7x49 = aa7x49->get_residue_no();
     int n7x56 = aa7x56->get_residue_no();
+    int n8x44 = aa8x44->get_residue_no();
 
     char l3x40 = aa3x40->get_letter();
     char l4x52 = aa4x52->get_letter();
@@ -187,6 +193,16 @@ int main(int argc, char** argv)
 
     Molecule water57("H2O");
     water57.from_smiles("O");
+
+    int n8ter = n8x44;
+    AminoAcid* aa8ter;
+    for (i = n8ter; aa8ter = p.get_residue(i); i++ )
+    {
+        if (aa8ter->is_alpha_helix()) n8ter = i;
+        else break;
+    }
+
+    aa8ter = p.get_residue(n8ter);
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -464,6 +480,31 @@ int main(int argc, char** argv)
 
 
     ////////////////////////////////////////////////////////////////////////////////
+    // TMR1 translation and pivot.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    axis1 = (SCoord)(aa1x50->get_CA_location().subtract(aa1x46->get_CA_location()));
+    axis1.r = 3.8;
+    p.move_piece(n1x32, n2x66, axis1);
+
+    axis1 = compute_normal(aa1x50->get_CA_location(), aa8x44->get_CA_location(), aa1x58->get_CA_location());
+    axis1.origin = aa1x50->get_CA_location();
+    theta = 5.0 * fiftyseventh;
+    p.rotate_piece(n1x32, n2x38-1, axis1.origin, axis1, theta);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // TMR7 bend, taking HXR8 with it.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    axis7 = compute_normal(aa7x49->get_CA_location(), aa7x56->get_CA_location(), aa1x58->get_CA_location());
+    axis7.origin = aa7x49->get_CA_location();
+    theta = p.region_can_rotate(n7x49, n8ter, axis7, true);
+    p.rotate_piece(n7x49+1, n8ter, axis7.origin, axis7, theta);
+    cout << "TMR7/HXR8 motion limited by " << *(p.stop1) << ":" << p.stop1a->name << "->" << *(p.stop2) << ":" << p.stop2a->name << endl;
+
+
+    ////////////////////////////////////////////////////////////////////////////////
     // TMR5-TMR7 water molecule.
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -490,18 +531,18 @@ int main(int argc, char** argv)
         cout << "Y5.58 - Y7.53 distance: " << r57 << endl;
         save_file(p, "tmp/water57_step1.pdb", &water57);
 
+        // Most class I ORs have a salt bridge that interferes with steps 2 and 4.
+        bool saltbridge45 = ((l4x52 == 'R' || l4x52 == 'K') && (l5x50 == 'D' || l5x50 == 'E'));
+
+        if (saltbridge45)
+        {
+            pt_tmp = aa4x52->get_CA_location().subtract(aa5x50->get_CA_location());
+            pt_tmp = aa4x52->get_CA_location().add(pt_tmp);
+            aa4x52->conform_atom_to_location(aa4x52->get_reach_atom()->name, pt_tmp);
+        }
+
         if (r57 >= 4.5)
         {
-            // Most class I ORs have a salt bridge that interferes with this step.
-            bool saltbridge45 = ((l4x52 == 'R' || l4x52 == 'K') && (l5x50 == 'D' || l5x50 == 'E'));
-
-            if (saltbridge45)
-            {
-                pt_tmp = aa4x52->get_CA_location().subtract(aa5x50->get_CA_location());
-                pt_tmp = aa4x52->get_CA_location().add(pt_tmp);
-                aa4x52->conform_atom_to_location(aa4x52->get_reach_atom()->name, pt_tmp);
-            }
-
             // TMR5 moves as far as it can toward TMR7.
             pt_tmp = p7.subtract(p5);
             pt_tmp.y = 0;
@@ -522,22 +563,17 @@ int main(int argc, char** argv)
             p7 = aa7x53->get_atom_location("OH");
             r57 = p5.get_3d_distance(p7);
 
-            if (saltbridge45)
-            {
-                p.bridge(n4x52, n5x50);
-            }
-
             cout << "Y5.58 - Y7.53 distance: " << r57 << endl;
             save_file(p, "tmp/water57_step2.pdb", &water57);
         }
 
         if (r57 >= 4.5)
         {
-            /// TMR7 bends as far as it can toward TMR5.
+            // TMR7 bends as far as it can toward TMR5.
             axis7 = compute_normal(aa7x49->get_CA_location(), p7, p5);
             axis7.origin = aa7x49->get_CA_location();
             theta = p.region_can_rotate(n7x49, n7x56, axis7, false, 0, n6x28, n6x59);
-            p.rotate_piece(n7x49, n7x56, axis7.origin, axis7, theta);
+            p.rotate_piece(n7x49+1, n7x56, axis7.origin, axis7, theta);
             cout << "Motion limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
 
             water57.movability = MOV_ALL;
@@ -559,6 +595,8 @@ int main(int argc, char** argv)
         if (r57 >= 4.5)
         {
             // If still no successful contact, TMR5 bends toward TMR7.
+            p5 = aa5x58->get_atom_location("OH");
+            p7 = aa7x53->get_atom_location("OH");
             axis5 = compute_normal(aa5x50->get_CA_location(), p5, p7);
             axis5.origin = aa5x50->get_CA_location();
             theta = p.region_can_rotate(n5x50, n5x68, axis5, false, 0, n6x28, n6x59);
@@ -577,8 +615,19 @@ int main(int argc, char** argv)
             p7 = aa7x53->get_atom_location("OH");
             r57 = p5.get_3d_distance(p7);
 
+            axis5.r = 1;
+            Atom* He = water57.add_atom("He", "He", nullptr, 0);
+            He->move(axis5.origin.add((SCoord)axis5));
+
             cout << "Y5.58 - Y7.53 distance: " << r57 << endl;
             save_file(p, "tmp/water57_step4.pdb", &water57);
+
+            water57.delete_atom(He);
+        }
+
+        if (saltbridge45)
+        {
+            p.bridge(n4x52, n5x50);
         }
 
         if (r57 >= 4.5)

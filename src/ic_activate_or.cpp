@@ -572,7 +572,7 @@ int main(int argc, char** argv)
             // TMR7 bends as far as it can toward TMR5.
             axis7 = compute_normal(aa7x49->get_CA_location(), p7, p5);
             axis7.origin = aa7x49->get_CA_location();
-            theta = p.region_can_rotate(n7x49, n7x56, axis7, false, 0, n6x28, n6x59);
+            theta = fmin(p.region_can_rotate(n7x49, n7x56, axis7, false, 0, n6x28, n6x59), 20.0 * fiftyseventh);
             p.rotate_piece(n7x49+1, n7x56, axis7.origin, axis7, theta);
             cout << "Motion limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
 
@@ -632,7 +632,7 @@ int main(int argc, char** argv)
 
         if (r57 >= 4.5)
         {
-            cout << "Warning: 5.58~7.53 contact FAILED." << endl;
+            // cout << "Warning: 5.58~7.53 contact FAILED." << endl;
         }
     }
 
@@ -654,7 +654,13 @@ int main(int argc, char** argv)
 
 
     ////////////////////////////////////////////////////////////////////////////////
-    // ********** TMR6 motion. **********
+    //                                                                            //
+    // ************************************************************************** //
+    //                                                                            //
+    // ****************************** TMR6 motion. ****************************** //
+    //                                                                            //
+    // ************************************************************************** //
+    //                                                                            //
     ////////////////////////////////////////////////////////////////////////////////
 
     // If TMR6ex is nonzero:
@@ -669,6 +675,7 @@ int main(int argc, char** argv)
         cout << "TMR6 rotation about " << *((type6 == Swing6) ? aa6x55 : aa6x48) << " by " << (theta6*fiftyseven) << "deg." << endl;
         TMR6c = aa56x50->get_CA_location().subtract(was);
 
+        #if 0
         // Compute the axis and angle to rotate TMR5 about 5.50 to match 56.49 to TMR6c, and perform the rotation.
         axis5 = compute_normal(aa5x50->get_CA_location(), aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c));
         theta = find_3d_angle(aa5x68->get_CA_location(), aa5x68->get_CA_location().add(TMR6c), aa5x50->get_CA_location());
@@ -689,6 +696,7 @@ int main(int argc, char** argv)
         theta *= (dist67_new - dist67) / dist67_new;
         p.rotate_piece(n6x59+1, n7x49, axis7.origin, axis7, theta);
         cout << "TMR7 and EXR3 rotation about 7.43 by " << (theta*fiftyseven) << "deg to follow TMR6." << endl;
+        #endif
     }
 
 

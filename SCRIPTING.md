@@ -492,6 +492,18 @@ Yar or YO before the metal symbol applies globally to the coordination residues.
 overriding the default or any global.
 
 
+# MEASURE
+
+Example:
+```
+MEASURE 180 257 &distance                   # Measure the distance between CA atoms.
+MEASURE %6.55 %45.51 &distance              # Same thing but using BW numbering.
+MEASURE %5.58 "OH" %7.53 "OH" &distance     # Specify atoms whose locations to measure.
+```
+
+Computes the distance in Angstroms between any two residues, or any two atoms of the current working protein, and stores the result in an output variable.
+
+
 # MOVE
 # MOVEREL
 

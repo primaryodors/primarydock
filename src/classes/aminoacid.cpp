@@ -2013,7 +2013,7 @@ float AminoAcid::hydrophilicity() const
 
         if (atoms[i]->is_pi() && fam == TETREL) weight = 1.5;
 
-        if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
+        // if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
 
         float h = atoms[i]->hydrophilicity_rule();
         total += h;

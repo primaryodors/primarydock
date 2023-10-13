@@ -8,6 +8,9 @@ cd "$(dirname "$0")"
 cd ..
 
 
+make
+
+
 REPORT="testdata/molecule_test1.approved.txt"
 ./test/molecule_test 'CCO' 'CCO' | tee temp | sed '/^#/d' >testdata/received/molecule_test1.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/molecule_test1.received.txt)

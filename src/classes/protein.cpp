@@ -535,6 +535,7 @@ void Protein::find_residue_initial_bindings()
     {
         AminoAcid** aa = residues; // get_residues_can_clash(residues[i]->get_residue_no());
 
+        #if _ALLOW_PROTONATE_PNICTOGENS
         // If the current residue has one or more negatively charged non-backbone atoms,
         // and a nearby residue has one or more neutral non-backbone pnictogen atoms not part of an amide,
         // put a positive charge on the pnictogen(s).
@@ -562,6 +563,7 @@ void Protein::find_residue_initial_bindings()
                 }
             }
         }
+        #endif
 
         float ib = 0, maxb = 0;
         AABridge aab;

@@ -3048,9 +3048,15 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         if (do_full_rotation /*&& benerg <= 0*/ && bb[q]->can_rotate)
                         {
                             float best_theta = 0;
+                            Pose prior_state;
+                            prior_state.copy_state(a);
                             for (theta=_fullrot_steprad; theta < M_PI*2; theta += _fullrot_steprad)
                             {
                                 bb[q]->rotate(_fullrot_steprad, false);
+                                if (a->agroups.size() && group_realign)
+                                {
+                                    group_realign(a, a->agroups);
+                                }
                                 tryenerg = cfmol_multibind(a, nearby);
 
                                 #if _dbg_mol_flexion
@@ -3065,6 +3071,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             }
                             if (best_theta)
                             {
+                                prior_state.restore_state(a);
                                 bb[q]->rotate(best_theta, false);
                                 a->been_flexed = true;
 

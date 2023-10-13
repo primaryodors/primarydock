@@ -100,6 +100,7 @@ int main(int argc, char** argv)
     AminoAcid *aa3x32 = p.get_residue_bw("3.32");
     AminoAcid *aa3x33 = p.get_residue_bw("3.33");
     AminoAcid *aa3x36 = p.get_residue_bw("3.36");
+    AminoAcid *aa3x37 = p.get_residue_bw("3.37");
     AminoAcid *aa3x39 = p.get_residue_bw("3.39");
     AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
@@ -392,7 +393,7 @@ int main(int argc, char** argv)
             axis6 = compute_normal(aa6x48->get_CA_location(), aa6x59->get_CA_location(), aa5x36->get_CA_location());
             LocatedVector lv = axis6;
             lv.origin = aa6x48->get_CA_location();
-            theta6 = p.region_can_rotate(n6x48, n6x59, lv, true, 5);
+            theta6 = p.region_can_rotate(n6x48, n6x59, lv, true, 0);
             cout << "Rock6 type activation with a " << (fiftyseven * theta6) << "deg basic 6.59." << endl;
         }
         else
@@ -430,8 +431,9 @@ int main(int argc, char** argv)
 
     axis4 = (SCoord)aa4x53->get_CA_location().subtract(aa6x49->get_CA_location());
     axis4.origin = aa4x53->get_CA_location();
-    float bend4 = p.region_can_rotate(n4x53, n4x64, axis4, true);
-    cout << "TMR4 can bend " << (bend4 * fiftyseven) << " degrees about 4.64 to meet TMR3." << endl;
+    float bend4 = p.region_can_rotate(n4x53, n4x64, axis4, false);
+    cout << "TMR4 can bend " << (bend4 * fiftyseven) << " degrees about 4.64 limited by " << *(p.stop1) << "->" << *(p.stop2)
+        << " to meet TMR3." << endl;
 
     // Perform the rotation.
     p.rotate_piece(n4x53, n4x64, aa4x53->get_CA_location(), axis4, bend4);
@@ -486,7 +488,7 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////////
 
     axis1 = (SCoord)(aa1x50->get_CA_location().subtract(aa1x46->get_CA_location()));
-    axis1.r = 3.8;
+    axis1.r = 2.8;
     p.move_piece(n1x32, n2x66, axis1);
 
     axis1 = compute_normal(aa1x50->get_CA_location(), aa8x44->get_CA_location(), aa1x58->get_CA_location());
@@ -501,7 +503,7 @@ int main(int argc, char** argv)
 
     axis7 = compute_normal(aa7x49->get_CA_location(), aa7x56->get_CA_location(), aa1x58->get_CA_location());
     axis7.origin = aa7x49->get_CA_location();
-    theta = p.region_can_rotate(n7x49, n8ter, axis7, true);
+    theta = p.region_can_rotate(n7x49, n8ter, axis7, true, 0);
     p.rotate_piece(n7x49+1, n8ter, axis7.origin, axis7, theta);
     cout << "TMR7/HXR8 motion limited by " << *(p.stop1) << ":" << p.stop1a->name << "->" << *(p.stop2) << ":" << p.stop2a->name << endl;
 
@@ -801,7 +803,7 @@ int main(int argc, char** argv)
         // Then perform the rotation, then compute the rotation of TMR5 about 5.33 to keep up, and perform that rotation.
         // Then re-form the 5.58~7.53 bridge.
         float clash = aa6x40->get_intermol_clashes(aa7x53);
-        if (clash > homology_clash_peraa/4)
+        if (clash > clash_limit_per_aa/4)
         {
             Pose pose6x40;
             pose6x40.copy_state(aa6x40);
@@ -815,7 +817,7 @@ int main(int argc, char** argv)
                 scooch6x40 += TMR6cdir.r;
                 pt_tmp = aa6x40->get_CA_location();
                 clash = aa6x40->get_intermol_clashes(aa7x53);
-                if (clash < homology_clash_peraa/4) break;
+                if (clash < clash_limit_per_aa/4) break;
             }
 
             pose6x40.restore_state(aa6x40);
@@ -847,7 +849,7 @@ int main(int argc, char** argv)
         TMR7cdir.r = fmin(TMR7cz, bridge57);
         axis7 = compute_normal(aa7x48->get_CA_location(), aa7x53->get_CA_location(), aa7x53->get_CA_location().add(TMR7cdir));
         theta = find_3d_angle(aa7x53->get_CA_location(), aa7x53->get_CA_location().add(TMR7cdir), aa7x48->get_CA_location());
-        p.rotate_piece(aa7x48->get_residue_no(), aa7x56->get_residue_no(), aa7x48->get_CA_location(), axis7, theta);
+        p.rotate_piece(aa7x48->get_residue_no(), n8ter /*aa7x56->get_residue_no()*/, aa7x48->get_CA_location(), axis7, theta);
         
         // Re-measure Bridge57. If it is nonzero, compute and execute a pivot of TMR5 from 5.33 to move 5.58 the rest of the way to make contact with 7.53.
         // Then compute and execute a y-axis rotation of TMR6 to bring 6.28 as far along horizontally as 5.68 moved.
@@ -860,7 +862,7 @@ int main(int argc, char** argv)
         // Then re-form the 5.58~7.53 bridge.
         scooch6x40 = 0;
         clash = aa6x40->get_intermol_clashes(aa7x52) + aa6x40->get_intermol_clashes(aa7x53);
-        if (clash > homology_clash_peraa/4)
+        if (clash > clash_limit_per_aa/4)
         {
             Pose pose6x40;
             pose6x40.copy_state(aa6x40);
@@ -874,7 +876,7 @@ int main(int argc, char** argv)
                 scooch6x40 += TMR6cdir.r;
                 pt_tmp = aa6x40->get_CA_location();
                 clash = aa6x40->get_intermol_clashes(aa7x52) + aa6x40->get_intermol_clashes(aa7x53);
-                if (clash < homology_clash_peraa/4) break;
+                if (clash < clash_limit_per_aa/4) break;
             }
 
             pose6x40.restore_state(aa6x40);
@@ -900,6 +902,132 @@ int main(int argc, char** argv)
     cout << "Minimizing internal clashes..." << endl;
     p.get_internal_clashes(1, p.get_end_resno(), true);
     p.get_internal_clashes(n3x21, n3x56, true);
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // If TMR5 clashes with TMR6, move TMR5.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    float clash, lastclash;
+    Molecule* mols[256];
+    j = 0;
+    for (i=n5x33; i<n5x50; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (aa)
+        {
+            // cout << aa->get_name() << " ";
+            mols[j++] = (Molecule*)aa;
+        }
+    }
+    for (i=n6x48; i<n6x59; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (aa)
+        {
+            // cout << aa->get_name() << " ";
+            mols[j++] = (Molecule*)aa;
+        }
+    }
+    mols[j] = nullptr;
+
+    worst_mol_clash = 0;
+    int res1, res2;
+    // Molecule::conform_molecules(mols, 20);
+    Molecule::total_intermol_clashes(mols);
+    if (worst_clash_1 && worst_clash_2
+        && worst_clash_1->is_residue()
+        && worst_clash_2->is_residue()
+        && (clash = worst_clash_1->get_intermol_clashes(worst_clash_2)) > 0)
+    {
+        res1 = worst_clash_1->is_residue();
+        res2 = worst_clash_2->is_residue();
+        AminoAcid* aa1 = p.get_residue(res1), *aa2 = p.get_residue(res2);
+        float prob1 = aa1->get_aa_definition()->flexion_probability, prob2 = aa2->get_aa_definition()->flexion_probability;
+
+        if (prob1 > prob2)
+        {
+            AminoAcid* aa3 = aa3x37; // p.get_residue(res2+1);
+            aa1->movability = MOV_FLEXONLY;
+            aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa3->get_CA_location(), 20);
+            cout << "Prob1 " << prob1 << " is more than " << prob2 << ". Pointing " << aa1->get_name() << " at " << aa3->get_name() << endl;
+            aa1->movability = MOV_PINNED;
+        }
+        else
+        {
+            AminoAcid* aa3 = aa3x37; // p.get_residue(res1+1);
+            aa2->movability = MOV_FLEXONLY;
+            aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa3->get_CA_location(), 20);
+            cout << "Prob1 " << prob1 << " is less than " << prob2 << ". Pointing " << aa2->get_name() << " at " << aa3->get_name() << endl;
+            aa2->movability = MOV_PINNED;
+        }
+
+        cout << "TMR5-6 clash " << clash << " for " << worst_clash_1->get_name() << "-" << worst_clash_2->get_name() << endl;
+        lastclash = clash;
+        for (i=0; i<50; i++)
+        {
+            axis5 = compute_normal(aa5x50->get_CA_location(), aa6x55->get_CA_location(), aa5x43->get_CA_location());
+            theta = 0.5*fiftyseventh;
+
+            p.rotate_piece(n5x33, n5x50, aa5x50->get_CA_location(), axis5, theta);
+            // Molecule::conform_molecules(mols, 20);
+            clash = worst_clash_1->get_intermol_clashes(worst_clash_2); // p.get_internal_clashes(n5x33, n5x50-3);
+            cout << "TMR5-6 clash " << clash << endl;
+            if (clash < 0.1 || clash == lastclash) break;
+            lastclash = clash;
+        }
+    }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // If TMR4 is clashing, bend it.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    j = 0;
+    for (i=n4x52; i<n5x50; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (aa) mols[j++] = (Molecule*)aa;
+    }
+    for (i=n3x21; i<n3x56; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (aa) mols[j++] = (Molecule*)aa;
+    }
+    mols[j] = nullptr;
+
+    worst_mol_clash = 0;
+    Molecule::total_intermol_clashes(mols);
+    if (worst_clash_1 && worst_clash_2)
+    {
+        res1 = worst_clash_1->is_residue();
+        res2 = worst_clash_2->is_residue();
+        if ((res1 > n4x52 && res1 <= n4x64) != (res2 > n4x52 && res2 <= n4x64))
+        {
+            clash = worst_clash_1->get_intermol_clashes(worst_clash_2);
+            if (clash > 0)
+            {
+                AminoAcid* aa4 = p.get_residue((res1 > n4x52 && res1 <= n4x64) ? res1 : res2),
+                    *aaother = p.get_residue((res1 > n4x52 && res1 <= n4x64) ? res2 : res1);
+
+                cout << "TMR4 clash " << clash << " for " << worst_clash_1->get_name() << "-" << worst_clash_2->get_name() << endl;
+                lastclash = clash;
+                for (i=0; i<50; i++)
+                {
+                    axis4 = compute_normal(aa4x52->get_CA_location(), aaother->get_CA_location(), aa4->get_CA_location());
+                    theta = 0.5*fiftyseventh;
+
+                    p.rotate_piece(n4x52, n4x64, aa4x52->get_CA_location(), axis4, theta);
+                    // Molecule::conform_molecules(mols, 20);
+                    clash = worst_clash_1->get_intermol_clashes(worst_clash_2); // p.get_internal_clashes(n5x33, n5x50-3);
+                    cout << "TMR4 clash " << clash << endl;
+                    if (clash < 0.1 || clash == lastclash) break;
+                    lastclash = clash;
+                }
+            }
+        }
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -942,6 +1070,8 @@ int main(int argc, char** argv)
         p.save_pdb(fp, &m);
         p.end_pdb(fp);
         fclose(fp);*/
+
+        constraints.push_back((std::string)"STCR 6.59");
     }
 
 

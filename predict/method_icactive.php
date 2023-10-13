@@ -173,7 +173,8 @@ heredoc;
 
 $poses = (!@$_REQUEST["softonly"]) ? process_dock("a") : 0;
 
-if (!$poses && !@$_REQUEST["nosoft"])
+// This has not borne fruit with ionones in OR51E2.
+if (false) // !$poses && !@$_REQUEST["nosoft"])
 {
     $configf = str_replace("# SOFT ", "SOFT ", $configf);
     process_dock("a");

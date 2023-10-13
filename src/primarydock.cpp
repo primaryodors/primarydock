@@ -403,7 +403,7 @@ void iteration_callback(int iter, Molecule** mols)
     #if _dbg_bb_realign
     cout << ligand->lastbind << (iter == iters ? " ] " : " ") << flush;
     #endif
-    if (use_bestbind_algorithm && global_pairs.size() >= 2 && ligand->lastbind > bb_realign_b_threshold)
+    if (use_bestbind_algorithm && global_pairs.size() >= 2 && ligand->lastbind < bb_realign_b_threshold)
     {
         Point scg0 = global_pairs[0]->scg->get_center();
         Point scg1 = global_pairs[1]->scg->get_center();

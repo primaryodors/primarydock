@@ -932,11 +932,16 @@ int main(int argc, char** argv)
     mols[j] = nullptr;
 
     worst_mol_clash = 0;
+    int res1, res2;
     // Molecule::conform_molecules(mols, 20);
     Molecule::total_intermol_clashes(mols);
-    if (worst_clash_1 && worst_clash_2 && worst_clash_1->is_residue() && worst_clash_2->is_residue() && (clash = worst_clash_1->get_intermol_clashes(worst_clash_2)) > 0)
+    if (worst_clash_1 && worst_clash_2
+        && worst_clash_1->is_residue()
+        && worst_clash_2->is_residue()
+        && (clash = worst_clash_1->get_intermol_clashes(worst_clash_2)) > 0)
     {
-        int res1 = worst_clash_1->is_residue(), res2 = worst_clash_2->is_residue();
+        res1 = worst_clash_1->is_residue();
+        res2 = worst_clash_2->is_residue();
         AminoAcid* aa1 = p.get_residue(res1), *aa2 = p.get_residue(res2);
         float prob1 = aa1->get_aa_definition()->flexion_probability, prob2 = aa2->get_aa_definition()->flexion_probability;
 
@@ -970,6 +975,57 @@ int main(int argc, char** argv)
             cout << "TMR5-6 clash " << clash << endl;
             if (clash < 0.1 || clash == lastclash) break;
             lastclash = clash;
+        }
+    }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // If TMR4 is clashing, bend it.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    j = 0;
+    for (i=n4x52; i<n5x50; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (aa) mols[j++] = (Molecule*)aa;
+    }
+    for (i=n3x21; i<n3x56; i++)
+    {
+        AminoAcid* aa = p.get_residue(i);
+        if (aa) mols[j++] = (Molecule*)aa;
+    }
+    mols[j] = nullptr;
+
+    worst_mol_clash = 0;
+    Molecule::total_intermol_clashes(mols);
+    if (worst_clash_1 && worst_clash_2)
+    {
+        res1 = worst_clash_1->is_residue();
+        res2 = worst_clash_2->is_residue();
+        if ((res1 > n4x52 && res1 <= n4x64) != (res2 > n4x52 && res2 <= n4x64))
+        {
+            clash = worst_clash_1->get_intermol_clashes(worst_clash_2);
+            if (clash > 0)
+            {
+                AminoAcid* aa4 = p.get_residue((res1 > n4x52 && res1 <= n4x64) ? res1 : res2),
+                    *aaother = p.get_residue((res1 > n4x52 && res1 <= n4x64) ? res2 : res1);
+
+                cout << "TMR4 clash " << clash << " for " << worst_clash_1->get_name() << "-" << worst_clash_2->get_name() << endl;
+                lastclash = clash;
+                for (i=0; i<50; i++)
+                {
+                    axis4 = compute_normal(aa4x52->get_CA_location(), aaother->get_CA_location(), aa4->get_CA_location());
+                    theta = 0.5*fiftyseventh;
+
+                    p.rotate_piece(n4x52, n4x64, aa4x52->get_CA_location(), axis4, theta);
+                    // Molecule::conform_molecules(mols, 20);
+                    clash = worst_clash_1->get_intermol_clashes(worst_clash_2); // p.get_internal_clashes(n5x33, n5x50-3);
+                    cout << "TMR4 clash " << clash << endl;
+                    if (clash < 0.1 || clash == lastclash) break;
+                    lastclash = clash;
+                }
+            }
         }
     }
 

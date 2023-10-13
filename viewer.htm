@@ -2642,6 +2642,7 @@ function showPose(p)
 			var lrep = spcfill ? "spacefill" : mrep[i];
 			var lparam = Object.assign({}, mrparams[i]);
 			if (spcfill || whtbk) lparam.opacity = 1;
+			if (!hydrogens) lparam.sele = "* and not hydrogen";
             model[i].addRepresentation( lrep, lparam );
             if (is_ligand[i])
 			{
@@ -3065,6 +3066,8 @@ function loadFile(fileData, fileName = "")
                 if (fext == 'pdb')
                 {
 					disable_spacefill();
+					hydrogens = false;
+					$("#nohyd").click();
                 	var i;
                 	var lines = fileData.split("\n");
                     var lres = 0;
@@ -3287,6 +3290,7 @@ function loadFile(fileData, fileName = "")
 							});
 
 							stage.autoView();
+							if (!hydrogens) $("#nohyd").click();
 						}
 					} );
 
@@ -3302,6 +3306,8 @@ function loadFile(fileData, fileName = "")
                 var lines = fileData.split("\n");
                 cen_ligand = true;
 				disable_spacefill();
+				hydrogens = false;
+				$("#nohyd").click();
                 
                 var i;
                 var mod = "m";
@@ -3515,6 +3521,7 @@ function loadFile(fileData, fileName = "")
 									window.setTimeout(function()
 									{
 										showPose(1);
+										if (!hydrogens) $("#nohyd").click();
 										// curr_ligand.autoView();
 									}, 259);
 								}

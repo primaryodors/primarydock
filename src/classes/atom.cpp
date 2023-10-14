@@ -875,7 +875,7 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
 #define _dbg_polar_calc 0
 float Atom::is_polar()
 {
-    if (charge) polarity = charge;
+    if (charge) polarity = sgn(charge);
     else if (!polar_calcd)
     {
         int i, j, n=0;

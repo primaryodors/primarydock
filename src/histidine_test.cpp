@@ -28,6 +28,10 @@ int main(int argc, char** argv)
     {
         aa155->do_histidine_flip(aa155->hisflips[0]);
         hbond = aa155->get_intermol_binding(aa109);
+        /*fp = fopen("pdbs/OR1/OR1E1.upright.pdb", "wb");
+        if (!fp) throw 0xfffe;
+        p.save_pdb(fp);
+        fclose(fp);*/
     }
     cout << aa109->get_name() << "-" << aa155->get_name() << " energy: " << -hbond << endl;
 }

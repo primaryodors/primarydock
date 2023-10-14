@@ -39,5 +39,14 @@ int main(int argc, char** argv)
     if (!a) a = aa155->get_atom("HE2");
     float polar = a->is_polar();
 
-    cout << aa155->get_name() << " polarity: " << polar << " binding energy " << -a->last_bind_energy << endl;
+    cout << aa155->get_name() << ":" << a->name << " polarity: " << polar << " binding energy " << -a->last_bind_energy << endl;
+
+    Atom* b = aa109->get_atom("OD2");
+    polar = b->is_polar();
+
+    cout << aa109->get_name() << ":" << b->name << " polarity: " << polar << " binding energy " << -b->last_bind_energy << endl;
+
+    float energy = -InteratomicForce::total_binding(a, b);
+
+    cout << "Interatomic energy: " << energy << endl;
 }

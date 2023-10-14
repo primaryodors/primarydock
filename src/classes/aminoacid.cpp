@@ -1177,12 +1177,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         if (!strcmp(a->name, "3HD1")) strcpy(a->name, "HD3");
                     }
 
-                    // This is a kludge but there's no easy way to get the class to recognize HD1 and HE2 with the same code.
-                    if (aaa->_1let == 'H')
-                    {
-                        if (!strcmp(a->name, "HD1")) strcpy(a->name, "HE2");
-                    }
-
+                    bool found_aabond = false;
                     if (aaa && aaa->aabonds)
                     {
                         for (i=0; aaa->aabonds[i]; i++)
@@ -1207,6 +1202,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                         if (b) b->can_rotate = false;
                                         // if (b) b->can_flip = aab->can_flip;
                                     }
+                                    found_aabond = true;
                                 }
                             }
                             else if (!strcmp(aab->bname, a->name))
@@ -1222,11 +1218,13 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                         b = btom->get_bond_between(a);
                                         if (b) b->can_rotate = false;
                                     }
+                                    found_aabond = true;
                                 }
                             }
                         }
                     }
-                    else
+                    
+                    if (!found_aabond)
                     {
                         Atom* bta = nullptr;		// bond to atom.
                         float cardinality = 1;		// TODO:
@@ -1240,6 +1238,30 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
                         // If has Greek > A: if hydrogen, bond to same Greek (mind any suffix!), else bind to earlier Greek.
 
+                        // If H, look for a matching Greek atom and bond to it.
+                        if (!bta && a->name[0] == 'H')
+                        {
+                            char temp[255];
+                            strcpy(temp, a->name);
+                            temp[0] = 'C';
+                            bta = get_atom(temp);
+                            if (!bta)
+                            {
+                                temp[0] = 'N';
+                                bta = get_atom(temp);
+                            }
+                            if (!bta)
+                            {
+                                temp[0] = 'O';
+                                bta = get_atom(temp);
+                            }
+                            if (!bta)
+                            {
+                                temp[0] = 'S';
+                                bta = get_atom(temp);
+                            }
+                        }
+
                         // If C, bond to CA.
                         if (!strcmp(a->name, "C"))
                         {
@@ -1252,13 +1274,15 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                             bta = get_atom("C");
                             cardinality = 2;
                         }
+                        if (!strcmp(a->name, "OXT"))
+                        {
+                            bta = get_atom("C");
+                            cardinality = 1;
+                        }
 
                         if (bta) a->bond_to(bta, cardinality);
-
+                        else if (strcmp(a->name, "N")) cout << "Warning: orphaned atom " << a->name << " of residue " << residue_no << endl;
                     }
-
-
-
                 }
                 else
                 {

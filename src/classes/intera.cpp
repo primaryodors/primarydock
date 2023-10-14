@@ -981,7 +981,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     pt.scale(r);
                     pt = pt.add(aloc);
                     atheta = find_3d_angle(&bloc, &pt, &aloc);
-                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (atheta > M_PI/2) continue;
+                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (atheta > M_PI/2)
+                    {
+                        #if _dbg_interatomic_forces
+                        if (debug_criteria) cout << a->name << " anisotropic angle " << (atheta*fiftyseven)
+                            << "deg, out of range." << endl; 
+                        #endif
+                        continue;
+                    }
                     float contrib = pow(fmax(0,cos(atheta)), dpa);
                     if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
 
@@ -1001,7 +1008,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     pt.scale(r);
                     pt = pt.add(bloc);
                     btheta = find_3d_angle(&aloc, &pt, &bloc);
-                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (btheta > M_PI/2) continue;
+                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (btheta > M_PI/2)
+                    {
+                        #if _dbg_interatomic_forces
+                        if (debug_criteria) cout << b->name << " anisotropic angle " << (btheta*fiftyseven)
+                            << "deg, out of range." << endl; 
+                        #endif
+                        continue;
+                    }
                     float contrib = pow(fmax(0,cos(btheta)), dpb);
                     if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
 

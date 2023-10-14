@@ -1825,6 +1825,11 @@ bool AminoAcid::conditionally_basic() const
     return false;
 }
 
+void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
+{
+    //
+}
+
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 {
     if (!&aa) return os;

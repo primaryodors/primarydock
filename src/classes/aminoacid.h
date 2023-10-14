@@ -157,6 +157,7 @@ public:
     float hydrophilicity() const;
     bool is_alpha_helix();
     bool is_helix(int periodicity);
+    void set_conditional_basicity(Molecule** nearby_mols);
 
     // Misc.
     void delete_sidechain();

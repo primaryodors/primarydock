@@ -24,7 +24,7 @@ int main(int argc, char** argv)
     AminoAcid* aa159 = p.get_residue(159);
 
     float hbond = aa155->get_intermol_binding(aa109);
-    if (hbond < 2 && aa155->hisflips)
+    if (false && hbond < 2 && aa155->hisflips)
     {
         aa155->do_histidine_flip(aa155->hisflips[0]);
         hbond = aa155->get_intermol_binding(aa109);
@@ -34,4 +34,10 @@ int main(int argc, char** argv)
         fclose(fp);*/
     }
     cout << aa109->get_name() << "-" << aa155->get_name() << " energy: " << -hbond << endl;
+
+    Atom* a = aa155->get_atom("HD1");
+    if (!a) a = aa155->get_atom("HE2");
+    float polar = a->is_polar();
+
+    cout << aa155->get_name() << " polarity: " << polar << " binding energy " << -a->last_bind_energy << endl;
 }

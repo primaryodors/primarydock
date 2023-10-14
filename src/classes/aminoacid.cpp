@@ -1177,6 +1177,12 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         if (!strcmp(a->name, "3HD1")) strcpy(a->name, "HD3");
                     }
 
+                    // This is a kludge but there's no easy way to get the class to recognize HD1 and HE2 with the same code.
+                    if (aaa->_1let == 'H')
+                    {
+                        if (!strcmp(a->name, "HD1")) strcpy(a->name, "HE2");
+                    }
+
                     if (aaa && aaa->aabonds)
                     {
                         for (i=0; aaa->aabonds[i]; i++)

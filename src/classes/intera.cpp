@@ -1076,7 +1076,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             else if (forces[i]->type == polarpi) partial /= 6;
 
             if (fabs(partial) > fabs(forces[i]->kJ_mol*2) || partial >= 500)
-            {
+            {                
+                #if ignore_invallid_partial
+                return 0;
+                #endif
                 cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
                     << a->name << "..." << b->name << " r=" << r
                     << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
@@ -1115,6 +1118,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         if (fabs(partial) >= 500)
         {
+            #if ignore_invallid_partial
+            return 0;
+            #endif
             cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
                  << a->name << "...." << b->name << " r=" << r
                  << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed

@@ -137,6 +137,7 @@
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define flexion_selection 1
 #define no_zero_flexions 1
+#define ignore_invallid_partial 1
 
 // If enabled, the trip switch functionality will have to be moved around in the code.
 // But since we are using an active vs. inactive energy comparison, this feature is obsolete.

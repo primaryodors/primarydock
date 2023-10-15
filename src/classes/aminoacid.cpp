@@ -1873,6 +1873,8 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                         throw 0xfffd;
                     }
 
+                    if (proton) return;
+
                     // Create a hydrogen atom and attach it to the bare nitrogen.
                     // Save a pointer to the hydrogen atom for later.
                     char temp[255];
@@ -1884,6 +1886,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
 
                     // Set charge of the heavy atom.
                     protonated->increment_charge(1);
+                    return;
                 }
                 else
                 {
@@ -1896,6 +1899,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
 
                     // Clear charge of the heavy atom.
                     if (protonated) protonated->increment_charge(-1);
+                    return;
                 }
             }
         }

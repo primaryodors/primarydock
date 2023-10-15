@@ -308,6 +308,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
 
     // cout << "Add new " << elemsym << " bonded to " << bondto->name << endl;
 
+    if (bondto->is_pi()) bondto->aromatize();
     SCoord v = bondto->get_next_free_geometry(bcard);
     Atom* a = new Atom(elemsym);
     a->name = new char[strlen(aname)+1];

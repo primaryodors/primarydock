@@ -1827,7 +1827,42 @@ bool AminoAcid::conditionally_basic() const
 
 void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
 {
-    //
+    if (!nearby_mols) return;
+    if (!atoms || !atoms[0]) return;
+
+    int i, j;
+    for (i=0; nearby_mols[i]; i++)
+    {
+        // float f = Molecule::get_intermol_binding(nearby_mols[i]);
+        for (j=0; atoms[j]; j++)
+        {
+            if (atoms[j]->is_backbone) continue;
+            if (atoms[j]->get_family() == TETREL) continue;
+            if (atoms[j]->get_Z() == 1 && atoms[j]->is_polar() < 0.5) continue;
+
+            Atom* a = nearby_mols[i]->get_nearest_atom(atoms[j]->get_location());
+            if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->btom;
+
+            if (a->get_charge() <= -0.5 || a->is_conjugated_to_charge() <= -0.5)
+            {
+                float f = InteratomicForce::total_binding(atoms[j], a);
+                if (f >= 1.5)
+                {
+                    // Create a hydrogen atom and attach it to the bare nitrogen.
+
+                    // Save a pointer to the hydrogen atom for later.
+
+                    // Set charge of the heavy atom.
+                }
+                else
+                {
+                    // Delete the extra hydrogen atom.
+
+                    // Clear charge of the heavy atom.
+                }
+            }
+        }
+    }
 }
 
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)

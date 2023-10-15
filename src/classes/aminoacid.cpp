@@ -1839,6 +1839,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
             if (atoms[j]->is_backbone) continue;
             if (atoms[j]->get_family() == TETREL) continue;
             if (atoms[j]->get_Z() == 1 && atoms[j]->is_polar() < 0.5) continue;
+            if (fabs(atoms[j]->get_charge()) > 0.2) continue;
 
             Atom* a = nearby_mols[i]->get_nearest_atom(atoms[j]->get_location());
             if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->btom;
@@ -1852,9 +1853,11 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     {
                         for (l=0; atoms[l]; l++)
                         {
+                            if (l==j) continue;
                             if (atoms[l]->is_backbone) continue;
                             if (atoms[l]->get_family() == TETREL) continue;
                             if (atoms[l]->get_Z() == 1) continue;
+                            if (atoms[l]->is_bonded_to(atoms[j])) continue;
 
                             if (atoms[l]->is_conjugated_to(atoms[j]))
                             {
@@ -1876,6 +1879,8 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     strcpy(temp, protonated->name);
                     temp[0] = 'H';
                     proton = add_atom("H", temp, protonated, 1);
+                    proton->residue = residue_no;
+                    strcpy(proton->aa3let, aadef->_3let);
 
                     // Set charge of the heavy atom.
                     protonated->increment_charge(1);

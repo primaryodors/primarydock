@@ -49,4 +49,15 @@ int main(int argc, char** argv)
     float energy = -InteratomicForce::total_binding(a, b);
 
     cout << "Interatomic energy: " << energy << endl;
+
+    Molecule* mols[8];
+    mols[0] = (Molecule*)aa109;
+    mols[1] = nullptr;
+    aa155->set_conditional_basicity(mols);
+
+    fp = fopen("tmp/1E1_test.pdb", "wb");
+    if (!fp) throw 0xfffe;
+    p.save_pdb(fp);
+    p.end_pdb(fp);
+    fclose(fp);
 }

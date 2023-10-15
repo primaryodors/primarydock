@@ -1830,7 +1830,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
     if (!nearby_mols) return;
     if (!atoms || !atoms[0]) return;
 
-    int i, j;
+    int i, j, l;
     for (i=0; nearby_mols[i]; i++)
     {
         // float f = Molecule::get_intermol_binding(nearby_mols[i]);
@@ -1848,17 +1848,49 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                 float f = InteratomicForce::total_binding(atoms[j], a);
                 if (f >= 1.5)
                 {
-                    // Create a hydrogen atom and attach it to the bare nitrogen.
+                    if (!protonated)
+                    {
+                        for (l=0; atoms[l]; l++)
+                        {
+                            if (atoms[l]->is_backbone) continue;
+                            if (atoms[l]->get_family() == TETREL) continue;
+                            if (atoms[l]->get_Z() == 1) continue;
 
+                            if (atoms[l]->is_conjugated_to(atoms[j]))
+                            {
+                                protonated = atoms[l];
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!protonated)
+                    {
+                        cout << "No suitable protonation atom found for " << name << endl;
+                        throw 0xfffd;
+                    }
+
+                    // Create a hydrogen atom and attach it to the bare nitrogen.
                     // Save a pointer to the hydrogen atom for later.
+                    char temp[255];
+                    strcpy(temp, protonated->name);
+                    temp[0] = 'H';
+                    proton = add_atom("H", temp, protonated, 1);
 
                     // Set charge of the heavy atom.
+                    protonated->increment_charge(1);
                 }
                 else
                 {
                     // Delete the extra hydrogen atom.
+                    if (proton)
+                    {
+                        delete_atom(proton);
+                        proton = nullptr;
+                    }
 
                     // Clear charge of the heavy atom.
+                    if (protonated) protonated->increment_charge(-1);
                 }
             }
         }

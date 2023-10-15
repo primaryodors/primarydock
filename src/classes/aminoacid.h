@@ -186,6 +186,9 @@ protected:
     AADef* aadef=0;
     AminoAcid *prev_aa=0, *next_aa=0;
     char pdbchain = ' ';
+
+    Atom* proton = nullptr;
+    Atom* protonated = nullptr;
 };
 
 extern AADef aa_defs[256];		        // Indexed by ASCII value of one-letter code.

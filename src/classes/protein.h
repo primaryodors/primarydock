@@ -132,6 +132,7 @@ public:
     float region_can_move(int startres, int endres, SCoord direction, bool repack = false, int ignore_startres = 0, int ignore_endres = 0);
     float region_can_rotate(int startres, int endres, LocatedVector axis, bool repack = false, float extra_clash_allowance = 0, int ignore_startres = 0, int ignore_endres = 0);     // Searches positive theta.
     void region_optimal_positioning(int startres, int endres, SCoord* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
+    void set_conditional_basicities();
 
     // Motion functions
     void upright();

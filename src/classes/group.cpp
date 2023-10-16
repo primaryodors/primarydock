@@ -226,7 +226,6 @@ float AtomGroup::compatibility(AminoAcid* aa)
     float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
 
     float aachg = aa->get_charge();
-    // if (aa->conditionally_basic()) aachg += protonation(aa->sc_pKa());           // Prevent carboxylic acids from preferring histidine residues.
     if (lgi && aachg && sgn(lgi) != -sgn(aachg)) return 0;
 
     if (aa->hydrophilicity() > 0.25)
@@ -364,7 +363,7 @@ float ResidueGroup::compatibility(AtomGroup* ag)
 
         result += f;
     }
-    if (has_acids && has_his && ag->get_ionic() > 0) result -= ag->get_ionic()*30;
+    // if (has_acids && has_his && ag->get_ionic() > 0) result -= ag->get_ionic()*30;
 
     if (metallic)
     {
@@ -885,6 +884,9 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
 
     for (i=0; i<n; i++)
     {
+        #if _dbg_groupsel
+        if (dirty[i]) cout << aalist[i]->get_name() << " already in use." << endl;
+        #endif
         if (dirty[i]) continue;
 
         std::shared_ptr<ResidueGroup> g(new ResidueGroup());
@@ -896,6 +898,10 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
             float a3d = find_3d_angle(CB->get_location(), pcen, aa->get_CA_location());
             if (a3d > fiftyseventh*120)
             {
+                #if _dbg_groupsel
+                cout << "Rejecting " << aa->get_name() << " for CB angle " << (a3d*fiftyseven) << endl;
+                #endif
+
                 dirty[i] = true;
                 continue;
             }
@@ -918,12 +924,12 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
                 float a3d = find_3d_angle(CB->get_location(), pcen, bb->get_CA_location());
                 if (a3d > fiftyseventh*120)
                 {
-                    dirty[j] = true;
+                    // dirty[j] = true;
                     continue;
                 }
                 else if (bb->get_num_rings() && bb->ring_is_aromatic(0) && a3d > hexagonal)
                 {
-                    dirty[j] = true;
+                    // dirty[j] = true;
                     continue;
                 }
             }
@@ -1094,7 +1100,7 @@ float GroupPair::get_potential()
                     amide.pattern = "ocn";
                     Atom* matches[128];
 
-                    if ((aa->get_charge() > 1 /*|| aa->conditionally_basic()*/) && a->is_aldehyde())
+                    if ((aa->get_charge() > 1) && a->is_aldehyde())
                     {
                         partial += protonation(aa->sc_pKa())*60;
 

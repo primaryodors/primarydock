@@ -3214,8 +3214,10 @@ _try_again:
 
                         dr[j][k].energy_mult = energy_mult;
                         dr[j][k].do_output_colors = do_output_colors;
+                        dr[j][k].include_pdb_data = (output == nullptr);
                         cout << dr[j][k];
                         dr[j][k].do_output_colors = false;
+                        dr[j][k].include_pdb_data = true;
                         if (output) *output << dr[j][k];
 
 

@@ -178,6 +178,12 @@ void Pose::restore_state(Molecule* m)
             if (/*n != sz ||*/ !m->atoms[i] || (saved_atom_Z[i] != m->atoms[i]->get_Z()))
             {
                 cout << "Attempt to restore pose to incompatible molecule (from " << saved_from->name << " to " << m->name << ")." << endl;
+                if (m->is_residue())
+                {
+                    Star s;
+                    s.pmol = m;
+                    if (s.paa->conditionally_basic()) return;
+                }
                 throw -4;
             }
         }

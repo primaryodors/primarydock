@@ -50,6 +50,7 @@ int main(int argc, char** argv)
     }
 
     DockResult dr(&p, &m, Point(10000,10000,10000));
+    dr.include_pdb_data = false;
     cout << dr;
 }
 

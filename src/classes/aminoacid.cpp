@@ -1834,9 +1834,9 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
     cout << "Examining conditional basicity for " << name << "..." << endl;
     #endif
 
-    int found_acid = 0;
-    int found_hbond = 0;
-    Atom* found_a = nullptr;
+    bool found_acid = false;
+    bool found_hbond = false;
+    int found_j = 0;
 
     int i, j, l;
     for (i=0; nearby_mols[i]; i++)
@@ -1845,7 +1845,6 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
         cout << "Trying " << nearby_mols[i]->get_name() << endl;
         #endif
 
-        // float f = Molecule::get_intermol_binding(nearby_mols[i]);
         for (j=0; atoms[j]; j++)
         {
             if (atoms[j]->is_backbone) continue;
@@ -1862,17 +1861,15 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                 cout << nearby_mols[i]->get_name() << ":" << a->name << " is " << a->distance_to(atoms[j]) << "A from " << atoms[j]->name << endl;
                 #endif
 
-                found_acid = j;
-                found_a = a;
+                found_acid = true;
+                found_j = j;
 
                 float f = InteratomicForce::total_binding(atoms[j], a);
                 if (f >= 1.5)
                 {
-                    found_hbond = j;
+                    found_hbond = true;
                     break;
                 }
-
-                if (atoms[j]->get_Z() == 1 && nearby_mols[i]->is_residue() == 109) break;
             }
         }
     }
@@ -1885,13 +1882,13 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
             {
                 for (l=0; atoms[l]; l++)
                 {
-                    if (l==found_hbond) continue;
+                    if (l==found_j) continue;
                     if (atoms[l]->is_backbone) continue;
                     if (atoms[l]->get_family() == TETREL) continue;
                     if (atoms[l]->get_Z() == 1) continue;
-                    if (atoms[l]->is_bonded_to(atoms[found_hbond])) continue;
+                    if (atoms[l]->is_bonded_to(atoms[found_j])) continue;
 
-                    if (atoms[l]->is_conjugated_to(atoms[found_hbond]))
+                    if (atoms[l]->is_conjugated_to(atoms[found_j]))
                     {
                         protonated = atoms[l];
                         break;
@@ -1940,10 +1937,6 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
             cout << "Insufficient binding (" << -f << ") for conditional protonation." << endl << endl;
             #endif
 
-            if (residue_no == 155)
-            {
-                InteratomicForce::total_binding(atoms[found_acid], found_a);
-            }
             return;
         }
     }

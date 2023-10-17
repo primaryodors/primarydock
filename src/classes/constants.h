@@ -111,8 +111,8 @@
 
 // Warning - increasing these constants significantly above the original 35.0, 60.0 values
 // will cause docking fails in the unit tests.
-#define polar_repulsion 15.0
-#define charge_repulsion 10.0
+#define polar_repulsion 10.0
+#define charge_repulsion 5.0
 
 #define global_clash_allowance 0.4
 #define ignore_double_hydrogen_clashes 0

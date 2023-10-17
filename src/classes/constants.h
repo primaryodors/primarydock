@@ -129,7 +129,7 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
 #define enforce_no_bb_pullaway 1
-#define bb_pullaway_allowance 0.13
+#define bb_pullaway_allowance 0.5
 #define bb_realign_iters 1
 #define bb_realign_b_threshold 20
 #define bb_realign_amount 0.333
@@ -328,6 +328,7 @@
 #define _dbg_bb_realign 0
 #define _dbg_bb_rots 0
 #define _dbg_bridges 0
+#define _dbg_cond_basic 0
 #define _dbg_conj_chg 0
 #define _dbg_find_blasted_segfault 0
 #define _dbg_fitness_plummet 0

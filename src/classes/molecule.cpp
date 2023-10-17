@@ -2573,6 +2573,8 @@ void Molecule::minimize_internal_clashes()
 
 void Molecule::do_histidine_flip(HistidineFlip* hf)
 {
+    if (hf->N1->get_charge() >= 0.2 || hf->N2->get_charge() >= 0.2) return;
+
     Point ptC  = hf->C->get_location();
     Point ptN1 = hf->N1->get_location();
     Point ptN2 = hf->N2->get_location();

@@ -1830,9 +1830,17 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
     if (!nearby_mols) return;
     if (!atoms || !atoms[0]) return;
 
+    #if _dbg_cond_basic
+    cout << "Examining conditional basicity for " << name << "..." << endl;
+    #endif
+
     int i, j, l;
     for (i=0; nearby_mols[i]; i++)
     {
+        #if _dbg_cond_basic
+        cout << "Trying " << nearby_mols[i]->get_name() << endl;
+        #endif
+
         // float f = Molecule::get_intermol_binding(nearby_mols[i]);
         for (j=0; atoms[j]; j++)
         {
@@ -1846,6 +1854,10 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
 
             if (a->get_charge() <= -0.5 || a->is_conjugated_to_charge() <= -0.5)
             {
+                #if _dbg_cond_basic
+                cout << nearby_mols[i]->get_name() << ":" << a->name << " is " << a->distance_to(atoms[j]) << "A from " << atoms[j]->name << endl;
+                #endif
+
                 float f = InteratomicForce::total_binding(atoms[j], a);
                 if (f >= 1.5)
                 {
@@ -1886,6 +1898,10 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
 
                     // Set charge of the heavy atom.
                     protonated->increment_charge(1);
+
+                    #if _dbg_cond_basic
+                    cout << "Added protonation and incremented charge!" << endl << endl;
+                    #endif
                     return;
                 }
                 else
@@ -1899,11 +1915,19 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
 
                     // Clear charge of the heavy atom.
                     if (protonated) protonated->increment_charge(-1);
-                    return;
+
+                    #if _dbg_cond_basic
+                    cout << "Insufficient binding (" << -f << ") for conditional protonation." << endl << endl;
+                    #endif
+                    // return;
                 }
             }
         }
     }
+
+    #if _dbg_cond_basic
+    cout << "No suitable acids found for conditional basicity." << endl << endl;
+    #endif
 }
 
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
@@ -2097,6 +2121,10 @@ float AminoAcid::hydrophilicity() const
     {
         if (atoms[i]->is_backbone) continue;
         if (!strcmp(atoms[i]->name, "HA")) continue;
+
+        // if (residue_no == 155) cout << atoms[i]->name << " charge " << atoms[i]->get_charge() << endl;
+
+        if (fabs(atoms[i]->get_charge()) > 0.5) return fabs(atoms[i]->get_charge());
 
         weight = 1;
 

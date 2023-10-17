@@ -1110,7 +1110,7 @@ float GroupPair::get_potential()
                     }
                     else if (fabs(a->is_polar()) > hydrophilicity_cutoff && amide.contained_by(aa, matches))
                     {
-                        partial *= 5;
+                        partial *= 3;
                         #if _dbg_groupsel
                         cout << *a << " is polar and " << *aa << " is amide." << endl;
                         #endif
@@ -1134,6 +1134,9 @@ float GroupPair::get_potential()
                         && sgn(aa->get_charge()) == -sgn(a->get_charge()))
                     {
                         partial += 60.0 * fabs(aa->get_charge()) * fabs(a->get_charge());
+                        #if _dbg_groupsel
+                        cout << *a << " and " << *aa << " are charged." << endl;
+                        #endif
                     }
 
                     #if _dbg_groupsel

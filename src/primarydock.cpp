@@ -2976,6 +2976,7 @@ _try_again:
             #endif
 
             // Set the dock result properties and allocate the arrays.
+            protein->set_conditional_basicities();
             dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, differential_dock);
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;

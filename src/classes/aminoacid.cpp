@@ -1834,6 +1834,10 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
     cout << "Examining conditional basicity for " << name << "..." << endl;
     #endif
 
+    int found_acid = 0;
+    int found_hbond = 0;
+    Atom* found_a = nullptr;
+
     int i, j, l;
     for (i=0; nearby_mols[i]; i++)
     {
@@ -1858,70 +1862,89 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                 cout << nearby_mols[i]->get_name() << ":" << a->name << " is " << a->distance_to(atoms[j]) << "A from " << atoms[j]->name << endl;
                 #endif
 
+                found_acid = j;
+                found_a = a;
+
                 float f = InteratomicForce::total_binding(atoms[j], a);
                 if (f >= 1.5)
                 {
-                    if (!protonated)
-                    {
-                        for (l=0; atoms[l]; l++)
-                        {
-                            if (l==j) continue;
-                            if (atoms[l]->is_backbone) continue;
-                            if (atoms[l]->get_family() == TETREL) continue;
-                            if (atoms[l]->get_Z() == 1) continue;
-                            if (atoms[l]->is_bonded_to(atoms[j])) continue;
-
-                            if (atoms[l]->is_conjugated_to(atoms[j]))
-                            {
-                                protonated = atoms[l];
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!protonated)
-                    {
-                        cout << "No suitable protonation atom found for " << name << endl;
-                        throw 0xfffd;
-                    }
-
-                    if (proton) return;
-
-                    // Create a hydrogen atom and attach it to the bare nitrogen.
-                    // Save a pointer to the hydrogen atom for later.
-                    char temp[255];
-                    strcpy(temp, protonated->name);
-                    temp[0] = 'H';
-                    proton = add_atom("H", temp, protonated, 1);
-                    proton->residue = residue_no;
-                    strcpy(proton->aa3let, aadef->_3let);
-
-                    // Set charge of the heavy atom.
-                    protonated->increment_charge(1);
-
-                    #if _dbg_cond_basic
-                    cout << "Added protonation and incremented charge!" << endl << endl;
-                    #endif
-                    return;
+                    found_hbond = j;
+                    break;
                 }
-                else
+
+                if (atoms[j]->get_Z() == 1 && nearby_mols[i]->is_residue() == 109) break;
+            }
+        }
+    }
+
+    if (found_acid)
+    {
+        if (found_hbond)
+        {
+            if (!protonated)
+            {
+                for (l=0; atoms[l]; l++)
                 {
-                    // Delete the extra hydrogen atom.
-                    if (proton)
+                    if (l==found_hbond) continue;
+                    if (atoms[l]->is_backbone) continue;
+                    if (atoms[l]->get_family() == TETREL) continue;
+                    if (atoms[l]->get_Z() == 1) continue;
+                    if (atoms[l]->is_bonded_to(atoms[found_hbond])) continue;
+
+                    if (atoms[l]->is_conjugated_to(atoms[found_hbond]))
                     {
-                        delete_atom(proton);
-                        proton = nullptr;
+                        protonated = atoms[l];
+                        break;
                     }
-
-                    // Clear charge of the heavy atom.
-                    if (protonated) protonated->increment_charge(-1);
-
-                    #if _dbg_cond_basic
-                    cout << "Insufficient binding (" << -f << ") for conditional protonation." << endl << endl;
-                    #endif
-                    // return;
                 }
             }
+
+            if (!protonated)
+            {
+                cout << "No suitable protonation atom found for " << name << endl;
+                throw 0xfffd;
+            }
+
+            if (proton) return;
+
+            // Create a hydrogen atom and attach it to the bare nitrogen.
+            // Save a pointer to the hydrogen atom for later.
+            char temp[255];
+            strcpy(temp, protonated->name);
+            temp[0] = 'H';
+            proton = add_atom("H", temp, protonated, 1);
+            proton->residue = residue_no;
+            strcpy(proton->aa3let, aadef->_3let);
+
+            // Set charge of the heavy atom.
+            protonated->increment_charge(1);
+
+            #if _dbg_cond_basic
+            cout << "Added protonation and incremented charge!" << endl << endl;
+            #endif
+            return;
+        }
+        else
+        {
+            // Delete the extra hydrogen atom.
+            if (proton)
+            {
+                delete_atom(proton);
+                proton = nullptr;
+
+                // Clear charge of the heavy atom.
+                if (protonated) protonated->increment_charge(-1);
+            }
+
+            #if _dbg_cond_basic
+            cout << "Insufficient binding (" << -f << ") for conditional protonation." << endl << endl;
+            #endif
+
+            if (residue_no == 155)
+            {
+                InteratomicForce::total_binding(atoms[found_acid], found_a);
+            }
+            return;
         }
     }
 

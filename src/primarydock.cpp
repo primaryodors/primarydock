@@ -2977,6 +2977,10 @@ _try_again:
 
             // Set the dock result properties and allocate the arrays.
             protein->set_conditional_basicities();
+            #if _dbg_cond_basic
+            AminoAcid* aadbg = protein->get_residue(155);
+            cout << aadbg->get_name() << " charge = " << aadbg->get_charge() << endl;
+            #endif
             dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, differential_dock);
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;

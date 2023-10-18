@@ -1281,7 +1281,9 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         }
 
                         if (bta) a->bond_to(bta, cardinality);
+                        #if warn_orphan_atoms
                         else if (strcmp(a->name, "N")) cout << "Warning: orphaned atom " << a->name << " of residue " << residue_no << endl;
+                        #endif
                     }
                 }
                 else
@@ -1827,6 +1829,7 @@ bool AminoAcid::conditionally_basic() const
 
 void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
 {
+    #if _allow_conditional_basicity
     if (!nearby_mols) return;
     if (!atoms || !atoms[0]) return;
 
@@ -1837,47 +1840,66 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
     bool found_acid = false;
     bool found_hbond = false;
     int found_j = 0;
+    Molecule* found_mol = nullptr;
+    #if _dbg_cond_basic
+    float found_f = 0;
+    #endif
 
-    int i, j, l;
-    for (i=0; nearby_mols[i]; i++)
+    int i, j, l, m;
+    for (m=0; m<2; m++)
     {
-        #if _dbg_cond_basic
-        cout << "Trying " << nearby_mols[i]->get_name() << endl;
-        #endif
-
-        for (j=0; atoms[j]; j++)
+        for (i=0; nearby_mols[i]; i++)
         {
-            if (atoms[j]->is_backbone) continue;
-            if (atoms[j]->get_family() == TETREL) continue;
-            if (atoms[j]->get_Z() == 1 && atoms[j]->is_polar() < 0.5) continue;
-            if (fabs(atoms[j]->get_charge()) > 0.2) continue;
+            #if _dbg_cond_basic
+            cout << "Trying " << nearby_mols[i]->get_name() << endl;
+            #endif
 
-            Atom* a = nearby_mols[i]->get_nearest_atom(atoms[j]->get_location());
-            if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->btom;
-
-            if (a->get_charge() <= -0.5 || a->is_conjugated_to_charge() <= -0.5)
+            for (j=0; atoms[j]; j++)
             {
-                #if _dbg_cond_basic
-                cout << nearby_mols[i]->get_name() << ":" << a->name << " is " << a->distance_to(atoms[j]) << "A from " << atoms[j]->name << endl;
-                #endif
+                if (atoms[j]->is_backbone) continue;
+                if (atoms[j]->get_family() == TETREL) continue;
+                if (atoms[j]->get_Z() == 1 && atoms[j]->is_polar() < 0.5) continue;
+                if (fabs(atoms[j]->get_charge()) > 0.2) continue;
 
-                found_acid = true;
-                found_j = j;
+                Atom* a = nearby_mols[i]->get_nearest_atom(atoms[j]->get_location());
+                if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->btom;
 
-                float f = InteratomicForce::total_binding(atoms[j], a);
-                if (f >= 1.5)
+                if (a->get_charge() <= -0.5 || a->is_conjugated_to_charge() <= -0.5)
                 {
-                    found_hbond = true;
-                    break;
+                    #if _dbg_cond_basic
+                    cout << nearby_mols[i]->get_name() << ":" << a->name << " is " << a->distance_to(atoms[j]) << "A from " << atoms[j]->name << endl;
+                    #endif
+
+                    found_acid = true;
+                    found_j = j;
+                    found_mol = nearby_mols[i];
+
+                    float f = InteratomicForce::total_binding(atoms[j], a);
+                    #if _dbg_cond_basic
+                    found_f = f;
+                    #endif
+                    if (f >= cond_bas_hbond_threshold)
+                    {
+                        found_hbond = true;
+                        break;
+                    }
                 }
             }
         }
+
+        if (found_acid && found_hbond) break;
+
+        if (!hisflips || !hisflips[0]) break;
+        do_histidine_flip(hisflips[0]);
     }
 
     if (found_acid)
     {
         if (found_hbond)
         {
+            movability = MOV_PINNED;
+            found_mol->movability = MOV_PINNED;
+
             if (!protonated)
             {
                 for (l=0; atoms[l]; l++)
@@ -1934,7 +1956,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
             }
 
             #if _dbg_cond_basic
-            cout << "Insufficient binding (" << -f << ") for conditional protonation." << endl << endl;
+            cout << "Insufficient binding (" << -found_f << ") for conditional protonation of " << name << "." << endl << endl;
             #endif
 
             return;
@@ -1943,6 +1965,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
 
     #if _dbg_cond_basic
     cout << "No suitable acids found for conditional basicity." << endl << endl;
+    #endif
     #endif
 }
 

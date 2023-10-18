@@ -76,6 +76,7 @@
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
 #define speed_limit 0.666
+#define warn_orphan_atoms 0
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -287,6 +288,7 @@
 // if a negatively charged atom is nearby.
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
+#define cond_bas_hbond_threshold 1.5
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0

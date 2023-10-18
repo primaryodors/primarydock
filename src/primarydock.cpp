@@ -2774,6 +2774,7 @@ _try_again:
                 if (debug) *debug << "Initialize null AA pointer." << endl;
                 #endif
 
+                protein->set_conditional_basicities();
                 std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
                 global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
                 ligand->recenter(ligcen_target);

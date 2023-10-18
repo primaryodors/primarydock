@@ -988,7 +988,16 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
 
             simil /= simil_n;
 
-            if (bb->get_charge() && sgn(bb->get_charge()) == -sgn(g->aminos[i2]->get_charge()))
+            #if _dbg_groupsel
+            if (aa->get_residue_no() == 109 && bb->get_residue_no() == 164)
+            {
+                cout << aa->get_name() << " charge = " << aa->get_charge() << ", ";
+                cout << bb->get_name() << " charge = " << bb->get_charge() << endl << flush;
+                // throw 0xffff;
+            }
+            #endif
+
+            if (aa->get_charge() && sgn(aa->get_charge()) == -sgn(bb->get_charge()))
             {
                 #if _dbg_groupsel
                 cout << "Rejected " << bb->get_name() << " opposite charges." << endl;

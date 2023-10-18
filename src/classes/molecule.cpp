@@ -2597,7 +2597,10 @@ void Molecule::do_histidine_flip(HistidineFlip* hf)
 
     Atom* was_bonded = hf->H->get_bond_by_idx(0)->btom;
     hf->H->unbond(was_bonded);
-    hf->H->bond_to((was_bonded == hf->N1) ? hf->N2 : hf->N1, 1);
+    float rN1 = newloc.get_3d_distance(ptN1), rN2 = newloc.get_3d_distance(ptN2);
+    Atom* new_bonded = (rN1 > rN2) ? hf->N2 : hf->N1;
+    hf->H->bond_to(new_bonded, 1);
+    strcpy(hf->H->name+1, new_bonded->name+1);
 
     #if _DBG_HISFLIP
     cout << hf->H->name << " moved from " << ptH << " to " << newloc << endl;

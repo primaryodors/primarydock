@@ -1877,6 +1877,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     float f = InteratomicForce::total_binding(atoms[j], a);
                     #if _dbg_cond_basic
                     found_f = f;
+                    cout << "Total " << atoms[j]->name << "..." << a->name << " energy: " << -f << endl;
                     #endif
                     if (f >= cond_bas_hbond_threshold)
                     {

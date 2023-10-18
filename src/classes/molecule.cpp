@@ -2592,6 +2592,10 @@ void Molecule::do_histidine_flip(HistidineFlip* hf)
     Point newloc = rotate3D(ptH, Navg, ptC.subtract(Navg), M_PI);
     hf->H->move(newloc);
 
+    Atom* was_bonded = hf->H->get_bond_by_idx(0)->btom;
+    hf->H->unbond(was_bonded);
+    hf->H->bond_to((was_bonded == hf->N1) ? hf->N2 : hf->N1, 1);
+
     #if _DBG_HISFLIP
     cout << hf->H->name << " moved from " << ptH << " to " << newloc << endl;
     #endif

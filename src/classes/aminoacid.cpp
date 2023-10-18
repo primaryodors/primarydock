@@ -1177,6 +1177,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         if (!strcmp(a->name, "3HD1")) strcpy(a->name, "HD3");
                     }
 
+                    bool found_aabond = false;
                     if (aaa && aaa->aabonds)
                     {
                         for (i=0; aaa->aabonds[i]; i++)
@@ -1201,6 +1202,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                         if (b) b->can_rotate = false;
                                         // if (b) b->can_flip = aab->can_flip;
                                     }
+                                    found_aabond = true;
                                 }
                             }
                             else if (!strcmp(aab->bname, a->name))
@@ -1216,11 +1218,13 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                         b = btom->get_bond_between(a);
                                         if (b) b->can_rotate = false;
                                     }
+                                    found_aabond = true;
                                 }
                             }
                         }
                     }
-                    else
+                    
+                    if (!found_aabond)
                     {
                         Atom* bta = nullptr;		// bond to atom.
                         float cardinality = 1;		// TODO:
@@ -1234,6 +1238,30 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
                         // If has Greek > A: if hydrogen, bond to same Greek (mind any suffix!), else bind to earlier Greek.
 
+                        // If H, look for a matching Greek atom and bond to it.
+                        if (!bta && a->name[0] == 'H')
+                        {
+                            char temp[255];
+                            strcpy(temp, a->name);
+                            temp[0] = 'C';
+                            bta = get_atom(temp);
+                            if (!bta)
+                            {
+                                temp[0] = 'N';
+                                bta = get_atom(temp);
+                            }
+                            if (!bta)
+                            {
+                                temp[0] = 'O';
+                                bta = get_atom(temp);
+                            }
+                            if (!bta)
+                            {
+                                temp[0] = 'S';
+                                bta = get_atom(temp);
+                            }
+                        }
+
                         // If C, bond to CA.
                         if (!strcmp(a->name, "C"))
                         {
@@ -1246,13 +1274,17 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                             bta = get_atom("C");
                             cardinality = 2;
                         }
+                        if (!strcmp(a->name, "OXT"))
+                        {
+                            bta = get_atom("C");
+                            cardinality = 1;
+                        }
 
                         if (bta) a->bond_to(bta, cardinality);
-
+                        #if warn_orphan_atoms
+                        else if (strcmp(a->name, "N")) cout << "Warning: orphaned atom " << a->name << " of residue " << residue_no << endl;
+                        #endif
                     }
-
-
-
                 }
                 else
                 {
@@ -1795,6 +1827,149 @@ bool AminoAcid::conditionally_basic() const
     return false;
 }
 
+void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
+{
+    #if _allow_conditional_basicity
+    if (!nearby_mols) return;
+    if (!atoms || !atoms[0]) return;
+
+    #if _dbg_cond_basic
+    cout << "Examining conditional basicity for " << name << "..." << endl;
+    #endif
+
+    bool found_acid = false;
+    bool found_hbond = false;
+    int found_j = 0;
+    Molecule* found_mol = nullptr;
+    #if _dbg_cond_basic
+    float found_f = 0;
+    #endif
+
+    int i, j, l, m;
+    for (m=0; m<2; m++)
+    {
+        for (i=0; nearby_mols[i]; i++)
+        {
+            #if _dbg_cond_basic
+            cout << "Trying " << nearby_mols[i]->get_name() << endl;
+            #endif
+
+            for (j=0; atoms[j]; j++)
+            {
+                if (atoms[j]->is_backbone) continue;
+                if (atoms[j]->get_family() == TETREL) continue;
+                if (atoms[j]->get_Z() == 1 && atoms[j]->is_polar() < 0.5) continue;
+                if (fabs(atoms[j]->get_charge()) > 0.2) continue;
+
+                Atom* a = nearby_mols[i]->get_nearest_atom(atoms[j]->get_location());
+                if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->btom;
+
+                if (a->get_charge() <= -0.5 || a->is_conjugated_to_charge() <= -0.5)
+                {
+                    #if _dbg_cond_basic
+                    cout << nearby_mols[i]->get_name() << ":" << a->name << " is " << a->distance_to(atoms[j]) << "A from " << atoms[j]->name << endl;
+                    #endif
+
+                    found_acid = true;
+                    found_j = j;
+                    found_mol = nearby_mols[i];
+
+                    float f = InteratomicForce::total_binding(atoms[j], a);
+                    #if _dbg_cond_basic
+                    found_f = f;
+                    cout << "Total " << atoms[j]->name << "..." << a->name << " energy: " << -f << endl;
+                    #endif
+                    if (f >= cond_bas_hbond_threshold)
+                    {
+                        found_hbond = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (found_acid && found_hbond) break;
+
+        if (!hisflips || !hisflips[0]) break;
+        do_histidine_flip(hisflips[0]);
+    }
+
+    if (found_acid)
+    {
+        if (found_hbond)
+        {
+            movability = MOV_PINNED;
+            found_mol->movability = MOV_PINNED;
+
+            if (!protonated)
+            {
+                for (l=0; atoms[l]; l++)
+                {
+                    if (l==found_j) continue;
+                    if (atoms[l]->is_backbone) continue;
+                    if (atoms[l]->get_family() == TETREL) continue;
+                    if (atoms[l]->get_Z() == 1) continue;
+                    if (atoms[l]->is_bonded_to(atoms[found_j])) continue;
+
+                    if (atoms[l]->is_conjugated_to(atoms[found_j]))
+                    {
+                        protonated = atoms[l];
+                        break;
+                    }
+                }
+            }
+
+            if (!protonated)
+            {
+                cout << "No suitable protonation atom found for " << name << endl;
+                throw 0xfffd;
+            }
+
+            if (proton) return;
+
+            // Create a hydrogen atom and attach it to the bare nitrogen.
+            // Save a pointer to the hydrogen atom for later.
+            char temp[255];
+            strcpy(temp, protonated->name);
+            temp[0] = 'H';
+            proton = add_atom("H", temp, protonated, 1);
+            proton->residue = residue_no;
+            strcpy(proton->aa3let, aadef->_3let);
+
+            // Set charge of the heavy atom.
+            protonated->increment_charge(1);
+
+            #if _dbg_cond_basic
+            cout << "Added protonation and incremented charge!" << endl << endl;
+            #endif
+            return;
+        }
+        else
+        {
+            // Delete the extra hydrogen atom.
+            if (proton)
+            {
+                delete_atom(proton);
+                proton = nullptr;
+
+                // Clear charge of the heavy atom.
+                if (protonated) protonated->increment_charge(-1);
+            }
+
+            #if _dbg_cond_basic
+            cout << "Insufficient binding (" << -found_f << ") for conditional protonation of " << name << "." << endl << endl;
+            #endif
+
+            return;
+        }
+    }
+
+    #if _dbg_cond_basic
+    cout << "No suitable acids found for conditional basicity." << endl << endl;
+    #endif
+    #endif
+}
+
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 {
     if (!&aa) return os;
@@ -1987,6 +2162,10 @@ float AminoAcid::hydrophilicity() const
         if (atoms[i]->is_backbone) continue;
         if (!strcmp(atoms[i]->name, "HA")) continue;
 
+        // if (residue_no == 155) cout << atoms[i]->name << " charge " << atoms[i]->get_charge() << endl;
+
+        if (fabs(atoms[i]->get_charge()) > 0.5) return fabs(atoms[i]->get_charge());
+
         weight = 1;
 
         int Z = atoms[i]->get_Z();
@@ -2013,7 +2192,9 @@ float AminoAcid::hydrophilicity() const
 
         if (atoms[i]->is_pi() && fam == TETREL) weight = 1.5;
 
+        #if auto_pK_protonation
         if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
+        #endif
 
         float h = atoms[i]->hydrophilicity_rule();
         total += h;

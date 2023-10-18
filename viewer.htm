@@ -687,8 +687,8 @@ function rotate3D(point, source, axis, theta)
 
 <a id="colcpk" title="Colors: CPK Standard" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colborn').show();">CPK</a>
 <a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
-<a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#bstick').show();">&#x1F388;</a>
-<a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="ballAndStick(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#spcfill').show();" style="display: none;">&#x1F9B4;</a>
+<a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="hydrogens=true; spaceFill(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#bstick').show(); $('#hydro').hide(); $('#nohyd').show(); ">&#x1F388;</a>
+<a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="if (mdlstrands.length) hydrogens=false; ballAndStick(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#spcfill').show(); if (mdlstrands.length) { $('#hydro').show(); $('#nohyd').hide(); } " style="display: none; background-color: #234;">&#x1F9B4;</a>
 <a id="spinon" title="Spin On" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(true); $(this).hide(); $('#spinoff').show();">&#x1F310;</a>
 <a id="spinoff" title="Spin Off" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(false); $(this).hide(); $('#spinon').show();" style="display: none;">&#x1F9F1;</a>
 
@@ -979,6 +979,7 @@ function toggleStrand(strandid)
 		{
 			var p = gmrparams[idx];
 			if (whtbk) p.opacity = 1;
+			if (!hydrogens) p.sele = "* and not hydrogen";
 			gmodel[idx].addRepresentation(gmrep[idx], p);
 			gmvisible[idx] = true;
 		}
@@ -1007,6 +1008,7 @@ function strandColorSelection(strandid, colorCode)
 		};
 	var p = gmrparams[idx];
 	if (whtbk) p.opacity = 1;
+	if (!hydrogens) p.sele = "* and not hydrogen";
 	var tabbtn = $("#stab"+strandid)[0];
 
 	switch(colorCode)
@@ -1531,6 +1533,7 @@ function show_hide_gmdl()
 	{
 		var p = gmrparams[0];
 		if (whtbk) p.opacity = 1;
+		if (!hydrogens) p.sele = "* and not hydrogen";
 		gmodel[0].addRepresentation( "cartoon", p);
 	}
 	gmdl_shown = !gmdl_shown;
@@ -1551,6 +1554,7 @@ function set_gmdl_opacity()
 			gmrparams[i].opacity = opc;
 			var p = gmrparams[i];
 			if (whtbk) p.opacity = 1;
+			if (!hydrogens) p.sele = "* and not hydrogen";
 			gmodel[i].addRepresentation( "cartoon", p);
 		}
 	}
@@ -1858,6 +1862,8 @@ function ballAndStick()
 			gmodel[i].removeAllRepresentations();
 			var p = gmrparams[i];
 			if (whtbk) p.opacity = 1;
+			if (!hydrogens) p.sele = "* and not hydrogen";
+			else p.sele = "";
 			gmodel[i].addRepresentation(gmrep[i], p);
 		}
 	}
@@ -1866,6 +1872,8 @@ function ballAndStick()
 		curr_ligand.removeAllRepresentations();
 		var p = ligand_params;
 		if (whtbk) p.opacity = 1;
+		if (!hydrogens) p.sele = "* and not hydrogen";
+		else p.sele = "";
 		curr_ligand.addRepresentation(model.length ? "licorice" : "ball+stick", p);
 	}
 	spcfill = false;
@@ -1881,6 +1889,8 @@ function spaceFill()
 			gmodel[i].removeAllRepresentations();
 			var p = gmrparams[i];
 			if (whtbk) p.opacity = 1;
+			if (!hydrogens) p.sele = "* and not hydrogen";
+			else p.sele = "";
 			gmodel[i].addRepresentation("spacefill", p);
 		}
 	}
@@ -1889,6 +1899,8 @@ function spaceFill()
 		curr_ligand.removeAllRepresentations();
 		var p = ligand_params;
 		if (whtbk) p.opacity = 1;
+		if (!hydrogens) p.sele = "* and not hydrogen";
+		else p.sele = "";
 		curr_ligand.addRepresentation("spacefill", p);
 	}
 	spcfill = true;
@@ -2722,6 +2734,7 @@ function showNode(n)
 			var lrep = spcfill ? "spacefill" : mrep[i];
 			var lparam = Object.assign({}, mrparams[i]);
 			if (spcfill || whtbk) lparam.opacity = 1;
+			if (!hydrogens) lparam.sele = "* and not hydrogen";
             model[i].addRepresentation( lrep, lparam );
             if (is_ligand[i])
 			{
@@ -2817,6 +2830,8 @@ function rainbowNodes()
 			var mrp = mrparams[i];
 			if (mrp.colorScheme == PODefSchemeLigand) mrp.colorScheme = PODefSchemeRainbow;
 			model[i].removeAllRepresentations();
+			if (spcfill || whtbk) mrp.opacity = 1;
+			if (!hydrogens) mrp.sele = "* and not hydrogen";
             model[i].addRepresentation( mrep[i], mrp );
             if (is_ligand[i])
 			{

@@ -602,8 +602,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float achg = a->get_charge(), bchg = b->get_charge()
         , apol = a->is_polar(), bpol = b->is_polar();
 
+    #if auto_pK_protonation
     if (a->is_pKa_near_bio_pH() && bchg < 0) achg = 1;
     if (b->is_pKa_near_bio_pH() && achg < 0) bchg = 1;
+    #endif
 
     if (achg && a->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) achg = a->get_max_conj_charge();
     if (bchg && b->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) bchg = b->get_max_conj_charge();
@@ -981,7 +983,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     pt.scale(r);
                     pt = pt.add(aloc);
                     atheta = find_3d_angle(&bloc, &pt, &aloc);
-                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (atheta > M_PI/2) continue;
+                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (atheta > M_PI/2)
+                    {
+                        #if _dbg_interatomic_forces
+                        if (debug_criteria) cout << a->name << " anisotropic angle " << (atheta*fiftyseven)
+                            << "deg, out of range." << endl; 
+                        #endif
+                        continue;
+                    }
                     float contrib = pow(fmax(0,cos(atheta)), dpa);
                     if (!isnan(contrib) && !isinf(contrib)) asum += contrib;
 
@@ -1001,7 +1010,14 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                     pt.scale(r);
                     pt = pt.add(bloc);
                     btheta = find_3d_angle(&aloc, &pt, &bloc);
-                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (btheta > M_PI/2) continue;
+                    if (forces[i]->type != pi && forces[i]->type != polarpi) if (btheta > M_PI/2)
+                    {
+                        #if _dbg_interatomic_forces
+                        if (debug_criteria) cout << b->name << " anisotropic angle " << (btheta*fiftyseven)
+                            << "deg, out of range." << endl; 
+                        #endif
+                        continue;
+                    }
                     float contrib = pow(fmax(0,cos(btheta)), dpb);
                     if (!isnan(contrib) && !isinf(contrib)) bsum += contrib;
 
@@ -1062,7 +1078,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
             else if (forces[i]->type == polarpi) partial /= 6;
 
             if (fabs(partial) > fabs(forces[i]->kJ_mol*2) || partial >= 500)
-            {
+            {                
+                #if ignore_invalid_partial
+                return 0;
+                #endif
                 cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
                     << a->name << "..." << b->name << " r=" << r
                     << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
@@ -1101,6 +1120,9 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         if (fabs(partial) >= 500)
         {
+            #if ignore_invalid_partial
+            return 0;
+            #endif
             cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
                  << a->name << "...." << b->name << " r=" << r
                  << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed

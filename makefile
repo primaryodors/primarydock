@@ -9,7 +9,7 @@ OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OB
 	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o $(OBJDIR)/scoring.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
-	  test/flexion_test
+	  test/flexion_test test/histidine_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_activate_or $(BINDIR)/score_pdb
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
 all: $(DIRS) \
@@ -121,6 +121,9 @@ test/bond_rotation_test: src/bond_rotation_test.cpp $(OBJS) $(OBJDIR)/molecule.o
 
 test/flexion_test: src/flexion_test.cpp $(OBJS)
 	$(CC) src/flexion_test.cpp $(OBJS) -o test/flexion_test $(CFLAGS)
+
+test/histidine_test: src/histidine_test.cpp $(OBJS)
+	$(CC) src/histidine_test.cpp $(OBJS) -o test/histidine_test $(CFLAGS)
 
 $(BINDIR)/primarydock: src/primarydock.cpp $(OBJS) $(OBJDIR)/aminoacid.o $(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/scoring.o
 	$(CC) src/primarydock.cpp $(OBJS) -o $(BINDIR)/primarydock $(CFLAGS)

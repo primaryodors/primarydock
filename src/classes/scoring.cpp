@@ -493,19 +493,21 @@ _btyp_unassigned:
     }
     output << endl;
 
-    if (!dr.pdbdat.length())
+    if (dr.include_pdb_data)
     {
-        output << "WARNING: Missing PDB data." << endl;
+        if (!dr.pdbdat.length())
+        {
+            output << "WARNING: Missing PDB data." << endl;
+        }
+        else
+        {
+            output << "# PDB Data" << endl << "PDBDAT:" << endl;
+
+            output << dr.pdbdat << endl;
+
+            output << "TER" << endl << "END" << endl << endl << endl;
+        }
     }
-    else
-    {
-        output << "# PDB Data" << endl << "PDBDAT:" << endl;
-
-        output << dr.pdbdat << endl;
-
-        output << "TER" << endl << "END" << endl << endl << endl;
-    }
-
 
     return output;
 }

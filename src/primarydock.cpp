@@ -403,7 +403,7 @@ void iteration_callback(int iter, Molecule** mols)
     #if _dbg_bb_realign
     cout << ligand->lastbind << (iter == iters ? " ] " : " ") << flush;
     #endif
-    if (use_bestbind_algorithm && global_pairs.size() >= 2 && ligand->lastbind > bb_realign_b_threshold)
+    if (use_bestbind_algorithm && global_pairs.size() >= 2 && ligand->lastbind < bb_realign_b_threshold)
     {
         Point scg0 = global_pairs[0]->scg->get_center();
         Point scg1 = global_pairs[1]->scg->get_center();
@@ -2774,6 +2774,7 @@ _try_again:
                 if (debug) *debug << "Initialize null AA pointer." << endl;
                 #endif
 
+                protein->set_conditional_basicities();
                 std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
                 global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
                 ligand->recenter(ligcen_target);
@@ -2976,6 +2977,11 @@ _try_again:
             #endif
 
             // Set the dock result properties and allocate the arrays.
+            protein->set_conditional_basicities();
+            #if _dbg_cond_basic
+            AminoAcid* aadbg = protein->get_residue(155);
+            cout << aadbg->get_name() << " charge = " << aadbg->get_charge() << endl;
+            #endif
             dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, differential_dock);
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;
@@ -3209,8 +3215,10 @@ _try_again:
 
                         dr[j][k].energy_mult = energy_mult;
                         dr[j][k].do_output_colors = do_output_colors;
+                        dr[j][k].include_pdb_data = (output == nullptr);
                         cout << dr[j][k];
                         dr[j][k].do_output_colors = false;
+                        dr[j][k].include_pdb_data = true;
                         if (output) *output << dr[j][k];
 
 

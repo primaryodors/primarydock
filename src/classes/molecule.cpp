@@ -178,6 +178,12 @@ void Pose::restore_state(Molecule* m)
             if (/*n != sz ||*/ !m->atoms[i] || (saved_atom_Z[i] != m->atoms[i]->get_Z()))
             {
                 cout << "Attempt to restore pose to incompatible molecule (from " << saved_from->name << " to " << m->name << ")." << endl;
+                if (m->is_residue())
+                {
+                    Star s;
+                    s.pmol = m;
+                    if (s.paa->conditionally_basic()) return;
+                }
                 throw -4;
             }
         }
@@ -308,6 +314,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
 
     // cout << "Add new " << elemsym << " bonded to " << bondto->name << endl;
 
+    if (bondto->is_pi()) bondto->aromatize();
     SCoord v = bondto->get_next_free_geometry(bcard);
     Atom* a = new Atom(elemsym);
     a->name = new char[strlen(aname)+1];
@@ -1529,6 +1536,9 @@ Bond** Molecule::get_rotatable_bonds()
             {
                 if (!lb[j]->atom || !lb[j]->btom) continue;
 
+                if (lb[j]->cardinality > 1 && (!lb[j]->atom->is_pi() || !lb[j]->btom->is_pi()) && lb[j]->cardinality < 3)
+                    lb[j]->cardinality = 1;
+
                 bool pia = lb[j]->atom->is_pi(),
                      pib = lb[j]->btom->is_pi();
 
@@ -2572,6 +2582,8 @@ void Molecule::minimize_internal_clashes()
 
 void Molecule::do_histidine_flip(HistidineFlip* hf)
 {
+    if (hf->N1->get_charge() >= 0.2 || hf->N2->get_charge() >= 0.2) return;
+
     Point ptC  = hf->C->get_location();
     Point ptN1 = hf->N1->get_location();
     Point ptN2 = hf->N2->get_location();
@@ -2582,6 +2594,13 @@ void Molecule::do_histidine_flip(HistidineFlip* hf)
 
     Point newloc = rotate3D(ptH, Navg, ptC.subtract(Navg), M_PI);
     hf->H->move(newloc);
+
+    Atom* was_bonded = hf->H->get_bond_by_idx(0)->btom;
+    hf->H->unbond(was_bonded);
+    float rN1 = newloc.get_3d_distance(ptN1), rN2 = newloc.get_3d_distance(ptN2);
+    Atom* new_bonded = (rN1 > rN2) ? hf->N2 : hf->N1;
+    hf->H->bond_to(new_bonded, 1);
+    strcpy(hf->H->name+1, new_bonded->name+1);
 
     #if _DBG_HISFLIP
     cout << hf->H->name << " moved from " << ptH << " to " << newloc << endl;
@@ -2715,6 +2734,8 @@ float Molecule::intermol_bind_for_multimol_dock(Molecule* om, bool is_ac)
 
 float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
 {
+    if (a->is_residue() && ((AminoAcid*)a)->conditionally_basic()) ((AminoAcid*)a)->set_conditional_basicity(nearby);
+
     float result = 0;
     int j;
     for (j=0; nearby[j]; j++)
@@ -3048,9 +3069,15 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         if (do_full_rotation /*&& benerg <= 0*/ && bb[q]->can_rotate)
                         {
                             float best_theta = 0;
+                            Pose prior_state;
+                            prior_state.copy_state(a);
                             for (theta=_fullrot_steprad; theta < M_PI*2; theta += _fullrot_steprad)
                             {
                                 bb[q]->rotate(_fullrot_steprad, false);
+                                if (a->agroups.size() && group_realign)
+                                {
+                                    group_realign(a, a->agroups);
+                                }
                                 tryenerg = cfmol_multibind(a, nearby);
 
                                 #if _dbg_mol_flexion
@@ -3065,6 +3092,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             }
                             if (best_theta)
                             {
+                                prior_state.restore_state(a);
                                 bb[q]->rotate(best_theta, false);
                                 a->been_flexed = true;
 
@@ -3215,9 +3243,10 @@ SCoord Molecule::motion_to_optimal_contact(Molecule* l)
 Atom* numbered[10];
 bool ring_warned = false;
 
-bool Molecule::from_smiles(char const * smilesstr)
+bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
 {
-    if (!strchr(smilesstr, '{'))		// {AtomName} is a nonstandard feature and must be handled by PrimaryDock code, not a third party app.
+    if (strchr(smilesstr, '{')) use_parser = false;	    // {AtomName} is a nonstandard feature and cannot be handled by a third party app.
+    if (use_parser)
     {
         // Check if OpenBabel is installed.
         FILE* pf = popen(CMD_CHECK_INSTALLED_3P_SMILES_PARSER, "r");
@@ -3270,7 +3299,6 @@ bool Molecule::from_smiles(char const * smilesstr)
         retval &= from_smiles(paren[i].smilesstr, paren[i].startsfrom);
     }
 
-    
     // hydrogenate(true);
     float anomaly = correct_structure();
     cout << "# Structural anomaly = " << anomaly << endl;

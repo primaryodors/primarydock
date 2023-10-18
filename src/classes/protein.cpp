@@ -535,6 +535,7 @@ void Protein::find_residue_initial_bindings()
     {
         AminoAcid** aa = residues; // get_residues_can_clash(residues[i]->get_residue_no());
 
+        #if _ALLOW_PROTONATE_PNICTOGENS
         // If the current residue has one or more negatively charged non-backbone atoms,
         // and a nearby residue has one or more neutral non-backbone pnictogen atoms not part of an amide,
         // put a positive charge on the pnictogen(s).
@@ -562,6 +563,7 @@ void Protein::find_residue_initial_bindings()
                 }
             }
         }
+        #endif
 
         float ib = 0, maxb = 0;
         AABridge aab;
@@ -916,6 +918,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
 
     initial_int_clashes = get_internal_clashes();
     allocate_undo_poses();
+    set_conditional_basicities();
 
     return rescount;
 }
@@ -1129,6 +1132,32 @@ void Protein::set_clashables(int resno, bool recursed)
     		cout << *res_can_clash[i][j] << " ";
     	cout << endl;
     }*/
+}
+
+void Protein::set_conditional_basicities()
+{
+    if (!residues) return;
+
+    int i, j, l, n;
+    for (i=0; residues[i]; i++)
+    {
+        if (!residues[i]->conditionally_basic()) continue;
+
+        std::vector<AminoAcid*> nearby = get_residues_near(residues[i]->get_CA_location(), 10, true);
+        n = nearby.size();
+        if (!n) continue;
+
+        Molecule* mols[256];
+        j = 0;
+        for (l=0; l<n; l++)
+        {
+            if (nearby[l]->get_charge() > -0.25) continue;
+            mols[j++] = (Molecule*)nearby[l];
+        }
+        mols[j] = nullptr;
+
+        residues[i]->set_conditional_basicity(mols);
+    }
 }
 
 std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool facing)

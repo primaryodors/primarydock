@@ -26,7 +26,8 @@
 #define unconnected_residue_mindist 4.82
 #define clash_limit_per_aa 4.0
 
-#define pH 7.0
+#define pH 6.0
+#define auto_pK_protonation 0
 #define hydrophilicity_cutoff 0.25
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.
@@ -76,6 +77,7 @@
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
 #define speed_limit 0.666
+#define warn_orphan_atoms 0
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -111,14 +113,14 @@
 
 // Warning - increasing these constants significantly above the original 35.0, 60.0 values
 // will cause docking fails in the unit tests.
-#define polar_repulsion 15.0
-#define charge_repulsion 10.0
+#define polar_repulsion 10.0
+#define charge_repulsion 5.0
 
 #define global_clash_allowance 0.4
 #define ignore_double_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 0.0015
+#define lmpush 0.0025
 #define recapture_ejected_ligand 0
 
 #define amide_zwitterionic_amount 0.1
@@ -129,14 +131,15 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
 #define enforce_no_bb_pullaway 1
-#define bb_pullaway_allowance 0.13
+#define bb_pullaway_allowance 0.5
 #define bb_realign_iters 1
 #define bb_realign_b_threshold 20
-#define bb_realign_amount 0.1
-#define bb_realign_threshold_distance 3.5
+#define bb_realign_amount 0.333
+#define bb_realign_threshold_distance 2.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define flexion_selection 1
 #define no_zero_flexions 1
+#define ignore_invalid_partial 1
 
 // If enabled, the trip switch functionality will have to be moved around in the code.
 // But since we are using an active vs. inactive energy comparison, this feature is obsolete.
@@ -286,6 +289,7 @@
 // if a negatively charged atom is nearby.
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
+#define cond_bas_hbond_threshold 1.5
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0
@@ -321,50 +325,51 @@
 #define _peratom_audit 0
 
 // Should normally be false or zero:
+#define _dbg_259 0
+#define _dbg_anemia 0
+#define _dbg_bb_pullaway 0
+#define _dbg_bb_realign 0
+#define _dbg_bb_rots 0
+#define _dbg_bridges 0
+#define _dbg_cond_basic 0
+#define _dbg_conj_chg 0
+#define _dbg_find_blasted_segfault 0
+#define _dbg_fitness_plummet 0
+#define _dbg_flexion_selection 0
+#define _dbg_groupsel 0
+#define _DBG_H2O_TELEPORT 0
+#define _DBG_HISFLIP 0
+#define _dbg_homology 0
+#define _dbg_Huckel 0
+#define _dbg_hxrax 0
+#define _dbg_imidazole_check 0
 #define _dbg_interatomic_forces 0
-#define _dummy_atoms_for_debug 0
 #define _DBG_LONELINESS 0
+#define _dbg_mand_conn 0
+#define _DBG_MAX_CLASHES 0
+#define _DBG_MOLBB 0
+#define _dbg_mol_flexion 0
+#define _dbg_mol_frames 0
+#define _dbg_multiflex 0
+#define _dbg_null_flexions 0
+#define _dbg_polsat 0
+#define _dbg_repack 0
+#define _DBG_RESBMULT 0
+#define _dbg_residue_poses 0
+#define _dbg_rock_pic 0
+#define _dbg_soft 0
+#define _dbg_soft_dynamics 0
+#define _dbg_softrock 0
+#define _DBG_SPACEDOUT 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0
 #define _DBG_TUMBLE_SPHERES 0
-#define _DBG_MAX_CLASHES 0
-#define output_tumble_debug_docs 0
+#define _debug_active_bond_rot 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0
-#define _DBG_RESBMULT 0
-#define _debug_active_bond_rot 0
-#define _DBG_SPACEDOUT 0
-#define _DBG_H2O_TELEPORT 0
-#define _DBG_HISFLIP 0
-#define _DBG_MOLBB 0
-#define _dbg_bb_rots 0
-#define _dbg_bb_pullaway 0
-#define _dbg_soft 0
-#define _dbg_groupsel 0
+#define _dummy_atoms_for_debug 0
+#define output_tumble_debug_docs 0
 #define _show_final_group_pairs 0
-#define _dbg_polsat 0
-#define _dbg_softrock 0
-#define _dbg_rock_pic 0
-#define _dbg_hxrax 0
-#define _dbg_mand_conn 0
-#define _dbg_flexion_selection 0
-#define _dbg_null_flexions 0
-#define _dbg_repack 0
-#define _dbg_multiflex 0
-#define _dbg_homology 0
-#define _dbg_bridges 0
-#define _dbg_mol_frames 0
-#define _dbg_fitness_plummet 0
-#define _dbg_anemia 0
-#define _dbg_find_blasted_segfault 0
-#define _dbg_imidazole_check 0
-#define _dbg_conj_chg 0
-#define _dbg_Huckel 0
-#define _dbg_259 0
-#define _dbg_bb_realign 0
-#define _dbg_mol_flexion 0
-#define _dbg_soft_dynamics 0
-#define _dbg_residue_poses 0
 
 #endif
 

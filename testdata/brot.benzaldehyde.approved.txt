@@ -1,1 +1,3 @@
-Bond C6-C7 can flip.
+WARNING: Native support of SMILES is still in development. Certain molecules containing rings might not render properly.
+If possible, it is recommended to install OpenBabel (e.g. sudo apt-get install openbabel) so the integration feature can be used and SMILES strings converted seamlessly to the corresponding molecular structures.
+Bond c6-C7 can flip.

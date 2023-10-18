@@ -988,6 +988,14 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
 
             simil /= simil_n;
 
+            if (bb->get_charge() && sgn(bb->get_charge()) == -sgn(g->aminos[i2]->get_charge()))
+            {
+                #if _dbg_groupsel
+                cout << "Rejected " << bb->get_name() << " opposite charges." << endl;
+                #endif
+                continue;
+            }
+
             if (simil >= hydrophilicity_cutoff)
             {
                 g->aminos.push_back(bb);

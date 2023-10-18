@@ -1,4 +1,4 @@
 Bond C1-C2 can rotate.
 Bond C2-O3 can rotate.
-Bond O3-C4 can flip.
-Bond C4-C6 can rotate.
+Bond O3:C4 can flip.
+Bond C4-C5 can rotate.

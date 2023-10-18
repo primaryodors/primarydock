@@ -87,7 +87,7 @@ public:
     void save_pdb(FILE* outf, int atomno_offset=0, bool endpdb = true);
     int from_pdb(FILE* inf, bool het_only = false);  // returns number of atoms loaded.
     void identify_acidbase();				// called within every load.
-    bool from_smiles(char const * smilesstr);
+    bool from_smiles(char const * smilesstr, bool use_parser = true);
     void clear_cache();
 
     // Getters.

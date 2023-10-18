@@ -29,11 +29,11 @@ int main(int argc, char** argv)
         }
         else
         {
-            mol.from_smiles(argv[1]);
+            mol.from_smiles(argv[1], false);        // obabel is too slow for unit test express.
         }
     }
     else
-        mol.from_smiles("c1ccccc1C=O");
+        mol.from_smiles("c1ccccc1C=O", false);
     
     Bond** b = mol.get_rotatable_bonds();
     if (!b || !b[0])

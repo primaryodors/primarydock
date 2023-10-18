@@ -239,6 +239,7 @@ public:
                         ||
                         (	bonded_to[i].cardinality == 1
                             && bonded_to[i].btom->get_Z() > 1
+                            && bonded_to[i].btom->get_bonded_atoms_count() < 4
                         )
                    )
                 {

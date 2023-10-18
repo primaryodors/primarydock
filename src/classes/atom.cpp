@@ -513,7 +513,7 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
     if (!excluding) return 0;
     int bi = get_idx_bond_between(excluding);
     Bond* palin = excluding->get_bond_between(this);
-    Atom* atoms[palin->count_moves_with_btom()];
+    Atom* atoms[palin->count_moves_with_btom()+2];
     palin->fetch_moves_with_btom(atoms);
     if (!atoms[0]) return 0;
 
@@ -1032,6 +1032,18 @@ bool Atom::is_pi()
 {
     if (!bonded_to) return false;
 
+    int i, n;
+    if (family == TETREL)
+    {
+        n=0;
+        for (i=0; i<geometry; i++)
+        {
+            if (bonded_to[i].btom) n++;
+        }
+
+        if (n > 3) return false;
+    }
+
     if (Z == 1)
     {
         if (bonded_to[0].btom && bonded_to[0].btom->Z > 1) return bonded_to[0].btom->is_pi();
@@ -1040,7 +1052,6 @@ bool Atom::is_pi()
     if (family == PNICTOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(CHALCOGEN)) return true;
     if (family == CHALCOGEN && is_bonded_to_pi(TETREL, true) && !is_bonded_to(PNICTOGEN)) return true;
 
-    int i;
     for (i=0; i<valence; i++)
     {
         if (bonded_to[i].cardinality > 1 && bonded_to[i].cardinality <= 2) return true;

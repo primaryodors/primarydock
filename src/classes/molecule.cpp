@@ -1536,6 +1536,9 @@ Bond** Molecule::get_rotatable_bonds()
             {
                 if (!lb[j]->atom || !lb[j]->btom) continue;
 
+                if (lb[j]->cardinality > 1 && (!lb[j]->atom->is_pi() || !lb[j]->btom->is_pi()) && lb[j]->cardinality < 3)
+                    lb[j]->cardinality = 1;
+
                 bool pia = lb[j]->atom->is_pi(),
                      pib = lb[j]->btom->is_pi();
 
@@ -3237,9 +3240,10 @@ SCoord Molecule::motion_to_optimal_contact(Molecule* l)
 Atom* numbered[10];
 bool ring_warned = false;
 
-bool Molecule::from_smiles(char const * smilesstr)
+bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
 {
-    if (!strchr(smilesstr, '{'))		// {AtomName} is a nonstandard feature and must be handled by PrimaryDock code, not a third party app.
+    if (strchr(smilesstr, '{')) use_parser = false;	    // {AtomName} is a nonstandard feature and cannot be handled by a third party app.
+    if (use_parser)
     {
         // Check if OpenBabel is installed.
         FILE* pf = popen(CMD_CHECK_INSTALLED_3P_SMILES_PARSER, "r");
@@ -3292,7 +3296,6 @@ bool Molecule::from_smiles(char const * smilesstr)
         retval &= from_smiles(paren[i].smilesstr, paren[i].startsfrom);
     }
 
-    
     // hydrogenate(true);
     float anomaly = correct_structure();
     cout << "# Structural anomaly = " << anomaly << endl;

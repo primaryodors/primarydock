@@ -602,8 +602,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float achg = a->get_charge(), bchg = b->get_charge()
         , apol = a->is_polar(), bpol = b->is_polar();
 
-    // if (a->is_pKa_near_bio_pH() && bchg < 0) achg = 1;
-    // if (b->is_pKa_near_bio_pH() && achg < 0) bchg = 1;
+    #if auto_pK_protonation
+    if (a->is_pKa_near_bio_pH() && bchg < 0) achg = 1;
+    if (b->is_pKa_near_bio_pH() && achg < 0) bchg = 1;
+    #endif
 
     if (achg && a->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) achg = a->get_max_conj_charge();
     if (bchg && b->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) bchg = b->get_max_conj_charge();
@@ -1077,7 +1079,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
             if (fabs(partial) > fabs(forces[i]->kJ_mol*2) || partial >= 500)
             {                
-                #if ignore_invallid_partial
+                #if ignore_invalid_partial
                 return 0;
                 #endif
                 cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
@@ -1118,7 +1120,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
         if (fabs(partial) >= 500)
         {
-            #if ignore_invallid_partial
+            #if ignore_invalid_partial
             return 0;
             #endif
             cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "

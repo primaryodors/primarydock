@@ -2192,7 +2192,9 @@ float AminoAcid::hydrophilicity() const
 
         if (atoms[i]->is_pi() && fam == TETREL) weight = 1.5;
 
-        // if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
+        #if auto_pK_protonation
+        if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
+        #endif
 
         float h = atoms[i]->hydrophilicity_rule();
         total += h;

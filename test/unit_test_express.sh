@@ -212,7 +212,7 @@ fi
 
 
 MOLECULE="eucalyptol"
-test/bond_rotation_test "O2C1(CCC(CC1)C2(C)C)C" | sed '/^#/d' > testdata/received/brot.$MOLECULE.received.txt
+test/bond_rotation_test "sdf/eucalyptol.sdf" | sed '/^#/d' > testdata/received/brot.$MOLECULE.received.txt
 RESULT=$(diff --unified testdata/brot.$MOLECULE.approved.txt testdata/received/brot.$MOLECULE.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}\u2588${NC}"

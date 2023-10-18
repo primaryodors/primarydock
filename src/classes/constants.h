@@ -134,7 +134,7 @@
 #define bb_realign_iters 1
 #define bb_realign_b_threshold 20
 #define bb_realign_amount 0.333
-#define bb_realign_threshold_distance -3.5
+#define bb_realign_threshold_distance 2.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define flexion_selection 1
 #define no_zero_flexions 1

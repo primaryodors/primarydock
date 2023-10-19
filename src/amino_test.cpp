@@ -143,10 +143,11 @@ int main(int argc, char** argv)
                     sprintf(buffer, "%0.2f", 0.02 * roundf(s*50));
                     cout << " " << buffer;*/
 
-                    if (s < 0.1) cout << ". ";
-                    else if (s < 0.25) cout << ": ";
-                    else if (s < 0.5) cout << "+ ";
-                    else cout << "@ ";
+                    if (s < 0.1) cout << "  ";
+                    else if (s < 0.25) cout << "\u2591\u2591";
+                    else if (s < 0.5) cout << "\u2592\u2592";
+                    else if (s < 0.75) cout << "\u2593\u2593";
+                    else cout << "\u2588\u2588";
                 }
                 cout << endl;
             }

@@ -4219,7 +4219,7 @@ bool Molecule::ring_is_coplanar(int ringid)
     return rings[ringid]->is_coplanar();
 }
 
-bool Molecule::ring_is_aromatic(int ringid)
+bool Molecule::ring_is_aromatic(int ringid) const
 {
     if (!rings) return false;
     return rings[ringid]->get_type() == AROMATIC;
@@ -4279,7 +4279,7 @@ void Molecule::rotate_ring(int ringid, Rotation rot)
     delete[] ring_atoms;
 }
 
-int Molecule::get_num_rings()
+int Molecule::get_num_rings() const
 {
     if (!rings) return 0;
     int i;

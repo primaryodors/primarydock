@@ -146,7 +146,7 @@ int main(int argc, char** argv)
                     if (s < 0.1) cout << "  ";
                     else if (s < 0.25) cout << "\u2591\u2591";
                     else if (s < 0.5) cout << "\u2592\u2592";
-                    else if (s < 0.75) cout << "\u2593\u2593";
+                    else if (s < 0.8) cout << "\u2593\u2593";
                     else cout << "\u2588\u2588";
                 }
                 cout << endl;

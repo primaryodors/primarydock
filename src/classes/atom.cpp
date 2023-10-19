@@ -2765,7 +2765,7 @@ float Atom::similarity_to(Atom* b)
         + same_sgn_charge + both_or_neither_pi + both_or_neither_pi_and_both_or_neither_polar + abs_delta_elecn_within_point7\
         + neither_pi_or_conjugated_together\
         != 100
-        #error "Atom similarity constants do not add up to 100%."
+        #error Atom similarity constants do not add up to 100%.
     #endif
 
     bool apb = (fabs(is_polar()) > .2), bpb = (fabs(b->is_polar()) > .2);

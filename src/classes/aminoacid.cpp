@@ -1626,13 +1626,17 @@ float AminoAcid::similarity_to(const char letter)
 
 float AminoAcid::similarity_to(const AminoAcid* aa)
 {
-    #define aa_same_hydro 0.60
-    #define aa_same_arom 0.15
-    #define aa_arom_conj 0.07
-    #define aa_same_chg 0.10
-    #define aa_same_C 0.10
-    #define aa_diff_C_1 0.08
-    #define aa_diff_C_2 0.05
+    #define aa_same_hydro   60
+    #define aa_same_arom    15
+    #define aa_arom_conj     7
+    #define aa_same_chg     15
+    #define aa_same_C       10
+    #define aa_diff_C_1      8
+    #define aa_diff_C_2      5
+
+    #if aa_same_hydro + aa_same_arom + aa_same_chg + aa_same_C != 100
+    #error Amino similarities do not add to 100.
+    #endif
 
     if (!atoms || !aa->atoms) return 0;
 
@@ -1689,7 +1693,7 @@ float AminoAcid::similarity_to(const AminoAcid* aa)
     else if (n == 1) simil += aa_diff_C_1;
     else if (n == 2) simil += aa_diff_C_2;
 
-    return simil;
+    return 0.01*simil;
 }
 
 Ring* AminoAcid::get_most_distal_arom_ring()

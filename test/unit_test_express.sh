@@ -55,17 +55,16 @@ else
     diff --color --unified $REPORT testdata/received/aniso_test.received.txt
 fi
 
-# The results of this test change way too much.
-#
-# REPORT="testdata/amino_test.approved.txt"
-# ./test/amino_test | sed '/^#/d' >testdata/received/amino_test.received.txt
-# RESULT=$(diff --unified $REPORT testdata/received/amino_test.received.txt)
-# if [ -z "$RESULT" ]; then
-#     printf "${GRN}\u2588${NC}"
-# else
-#     printf "\n${RED}Amino test FAILED.${NC}\n"
-#     diff --color --unified $REPORT testdata/received/amino_test.received.txt
-# fi
+
+REPORT="testdata/amino_test.approved.txt"
+./test/amino_test | sed '/^#/d' >testdata/received/amino_test.received.txt
+RESULT=$(diff --unified $REPORT testdata/received/amino_test.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}\u2588${NC}"
+else
+    printf "\n${RED}Amino test FAILED.${NC}\n"
+    diff --color --unified $REPORT testdata/received/amino_test.received.txt
+fi
 
 
 REPORT="testdata/ifnot_test.approved.txt"

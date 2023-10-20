@@ -3182,9 +3182,9 @@ _try_again:
     pose = 1;
     for (i=1; i<=poses; i++)
     {
-        protein = &pose_proteins[i-1];
         for (j=0; j<poses; j++)
         {
+            protein = &pose_proteins[j];
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
                 if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)

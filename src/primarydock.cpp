@@ -1589,7 +1589,7 @@ void do_tumble_spheres(Point l_pocket_cen)
                         #if _DBG_TUMBLE_SPHERES
                         tsdbgb = tsdbg;
 
-                        cout << "Tumble score " << score << " for ligand box " << m.get_bounding_box() << endl;
+                        cout << "Tumble score " << score << " for ligand box " << ligand->get_bounding_box() << endl;
 
 
                         #if output_tumble_debug_docs
@@ -1695,7 +1695,7 @@ void do_tumble_spheres(Point l_pocket_cen)
                 float rad=0, bestrad=0, clash, bestclash=6.25e24;
                 for (rad=0; rad < M_PI*2; rad += step)
                 {
-                    clash = tsphres[i]->get_intermol_clashes(&m);
+                    clash = tsphres[i]->get_intermol_clashes(ligand);
 
                     if (clash < bestclash)
                     {
@@ -1900,6 +1900,7 @@ int main(int argc, char** argv)
     if (dot) *dot = 0;
 
     Protein pose_proteins[poses];
+    Molecule pose_ligands[poses];
     protein = &pose_proteins[0]; // new Protein(protid);
     pf = fopen(protfname, "r");
     if (!pf)
@@ -2147,61 +2148,66 @@ int main(int argc, char** argv)
     addl_resno[i+l] = 0;
 
     // Load the ligand or return an error.
-    Molecule m(ligfname);
-    ligand = &m;
-    char* ext = get_file_ext(ligfname);
-    if (!ext)
+    // Molecule m(ligfname);
+    // ligand = &m;
+    for (l=0; l<poses; l++)
     {
-        cout << "Ligand file is missing its extension! " << ligfname << endl;
-        return 0xbadf12e;
-    }
-
-    for (i=0; i<65536; i++) buffer[i] = 0;
-
-    size_t wgaf;
-    if (smset) ligand->from_smiles(smiles);
-    else switch (ext[0])
-    {
-    case 's':
-    case 'S':
-        // SDF
-        pf = fopen(ligfname, "r");
-        if (!pf)
+        ligand = &pose_ligands[l];
+        char* ext = get_file_ext(ligfname);
+        if (!ext)
         {
-            cout << "Error trying to read " << ligfname << endl;
+            cout << "Ligand file is missing its extension! " << ligfname << endl;
             return 0xbadf12e;
         }
-        wgaf = fread(buffer, 1, 65535, pf);
-        fclose(pf);
-        m.from_sdf(buffer);
-        break;
 
-    case 'p':
-    case 'P':
-        pf = fopen(ligfname, "r");
-        if (!pf)
+        for (i=0; i<65536; i++) buffer[i] = 0;
+
+        size_t wgaf;
+        if (smset) ligand->from_smiles(smiles);
+        else switch (ext[0])
         {
-            cout << "Error trying to read " << ligfname << endl;
+        case 's':
+        case 'S':
+            // SDF
+            pf = fopen(ligfname, "r");
+            if (!pf)
+            {
+                cout << "Error trying to read " << ligfname << endl;
+                return 0xbadf12e;
+            }
+            wgaf = fread(buffer, 1, 65535, pf);
+            fclose(pf);
+            ligand->from_sdf(buffer);
+            break;
+
+        case 'p':
+        case 'P':
+            pf = fopen(ligfname, "r");
+            if (!pf)
+            {
+                cout << "Error trying to read " << ligfname << endl;
+                return 0xbadf12e;
+            }
+            ligand->from_pdb(pf);
+            fclose(pf);
+            break;
+
+        default:
+            cout << "Unrecognized ligand file extension: " << ext << endl;
             return 0xbadf12e;
         }
-        m.from_pdb(pf);
-        fclose(pf);
-        break;
 
-    default:
-        cout << "Unrecognized ligand file extension: " << ext << endl;
-        return 0xbadf12e;
+        ligand->minimize_internal_clashes();
     }
+    ligand = &pose_ligands[0];
 
     std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
-
-    m.minimize_internal_clashes();
 
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded ligand." << endl;
     #endif
 
-    Point box = m.get_bounding_box();
+    Point box = ligand->get_bounding_box();
 
     if (debug) *debug << "Ligand bounding box corner (centered at zero): " << box.printable() << endl;
     #if _DBG_STEPBYSTEP
@@ -2283,11 +2289,11 @@ int main(int argc, char** argv)
             bclash += laa->get_intermol_clashes(naa);
         }
 
-        bclash += m.get_intermol_clashes(laa);
+        bclash += ligand->get_intermol_clashes(laa);
 
         if (met) bclash += laa->get_intermol_clashes(met);
     }
-    if (met) bclash += m.get_intermol_clashes(met);
+    if (met) bclash += ligand->get_intermol_clashes(met);
     if (debug) *debug << "Initial clashes: " << bclash << endl;
 
     // TODO: Output some basic stats: receptor, ligand, etc.
@@ -2365,6 +2371,7 @@ _try_again:
         // delete protein;
         // protein = new Protein(protfname);
         protein = &pose_proteins[pose-1];
+        ligand = &pose_ligands[pose-1];
 
         if (temp_pdb_file.length())
         {
@@ -2496,6 +2503,7 @@ _try_again:
                 // delete protein;
                 // protein = new Protein(protafname);
                 protein = &pose_proteins[pose-1];
+                ligand = &pose_ligands[pose-1];
                 
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
@@ -2615,17 +2623,17 @@ _try_again:
 
             #if recenter_ligand_each_node
             // Move the ligand to the new node center.
-            m.recenter(nodecen);
+            ligand->recenter(nodecen);
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Molecule recenter (or not)." << endl;
             #endif
-            m.reset_conformer_momenta();
+            ligand->reset_conformer_momenta();
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Conformer momenta reset." << endl;
             #endif
             #endif
 
-            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], &m, nodecen, size, addl_resno);
+            sphres = protein->get_residues_can_clash_ligand(reaches_spheroid[nodeno], ligand, nodecen, size, addl_resno);
             for (i=sphres; i<SPHREACH_MAX; i++) reaches_spheroid[nodeno][i] = NULL;
 
             // Flexion Selection
@@ -2828,8 +2836,8 @@ _try_again:
             for (i=0; i<SPHREACH_MAX+4; i++) cfmols[i] = nullptr;
             gcfmols = cfmols;
             i=0;
-            m.movability = MOV_ALL;
-            cfmols[i++] = &m;
+            ligand->movability = MOV_ALL;
+            cfmols[i++] = ligand;
             if (met)
             {
                 met->movability = MOV_NONE;
@@ -3029,9 +3037,9 @@ _try_again:
             std::ostringstream pdbdat;
 
             // Prepare a partial PDB of the ligand atoms and all involved residue sidechains.
-            n = m.get_atom_count();
+            n = ligand->get_atom_count();
             int offset = n;
-            for (l=0; l<n; l++) m.get_atom(l)->stream_pdb_line(pdbdat, 9000+l);
+            for (l=0; l<n; l++) ligand->get_atom(l)->stream_pdb_line(pdbdat, 9000+l);
             #if _DBG_STEPBYSTEP
             if (debug) *debug << "Prepared ligand PDB." << endl;
             #endif
@@ -3185,6 +3193,7 @@ _try_again:
         for (j=0; j<poses; j++)
         {
             protein = &pose_proteins[j];
+            ligand = &pose_ligands[j];
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
                 if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)

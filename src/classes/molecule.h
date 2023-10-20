@@ -76,6 +76,7 @@ class Molecule
     friend class Pose;
 
 public:
+    Molecule();
     Molecule(const char* name);
     Molecule(const char* name, Atom** collection);
     virtual ~Molecule();
@@ -228,7 +229,6 @@ public:
     Atom *clash1 = nullptr, *clash2 = nullptr;
 
 protected:
-    Molecule();
 
     Atom** atoms = 0;
     int atcount = 0;

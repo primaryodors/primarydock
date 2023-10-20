@@ -6,6 +6,7 @@
 //
 
 chdir(__DIR__);
+include_once("../predict/protutils.php");
 $c = file_get_contents('sequences_aligned.txt', 'rb');
 if (!$c) die ('NO INPUT FILE');
 
@@ -18,7 +19,7 @@ $ballwein = [];     // https://www.sciencedirect.com/science/article/abs/pii/S10
 
 $lln1 = '';
 foreach ($lines as $i => $ln)
-{	
+{
 	$ln = strtoupper(str_replace("\t", '    ', $ln));
 
 	if (substr($ln,0,1) == '#') continue;
@@ -46,13 +47,14 @@ foreach ($lines as $i => $ln)
 	if (preg_match('/TMR[0-9][-]+/', $ln))
 	{   
         $ln .= '     ';
-	    $rgnames = ['HEAD', 'TMR1', 'CYT1', 'TMR2', 'EXR1', 'TMR3', 'CYT2', 'TMR4', 'EXR2', 'TMR5', 'CYT3', 'TMR6', 'EXR3', 'TMR7', 'TAIL'];
+	    $rgnames = ['HEAD', 'TMR1', 'CYT1', 'TMR2', 'EXR1', 'TMR3', 'CYT2', 'TMR4', 'EXR2', 'TMR5', 'CYT3', 'TMR6', 'EXR3', 'TMR7', 'CYT4', 'HXR8', 'TAIL'];
 	    $rgidx = 0; $k = 0;
 		$rgns = [];
 	    do
 	    {	
             $lk = $k;
 		    $j  = strpos($ln, 'TMR', $k);
+			if (!$j) $j = strpos($ln, 'HXR', $k);
 		    if (!$j)
 		    {
                 $j = strlen($ln)+100;
@@ -86,6 +88,7 @@ foreach ($lines as $i => $ln)
 	if (preg_match($match, $ln))
     {
 		$regionse = [];
+        $rcpid = explode(" ", trim(substr($ln, 0, 11)))[0];
 
 		$r = 0; $pos1 = $posL = $posM = $posS = 0; $emmed = $spaced = $lastrgn = false; $lsites = array();
 		$or = trim(substr($ln, 0, 9));
@@ -115,10 +118,11 @@ foreach ($lines as $i => $ln)
 
 				if ($strgn != $lastrgn) $posL = $posM = $posS = 0;
 
-				if (substr($strgn,0,3) == 'TMR' && $pos == @$ballwein[$strgn])
+				if ((substr($strgn,0,3) == 'TMR' || substr($strgn,0,3) == 'HXR') && $pos == @$ballwein[$strgn])
 				{
 					$tmrno = intval(substr($strgn, 3));
                     $rcpbw[$tmrno] = $r;
+					if (isset($prots[$rcpid])) $prots[$rcpid]["bw"]["$tmrno.50"] = "$r";
 				}
 
 				if (substr($strgn,0,3) == 'EXR' && $pos == @$ballwein[$strgn])
@@ -127,6 +131,16 @@ foreach ($lines as $i => $ln)
 					$a = $exrno * 2;
 					$b = $a + 1;
                     $rcpbw[$a.$b] = $r;
+					if (isset($prots[$rcpid])) $prots[$rcpid]["bw"]["$a$b.50"] = "$r";
+				}
+
+				if (substr($strgn,0,3) == 'CYT' && $pos == @$ballwein[$strgn])
+				{
+					$cytno = intval(substr($strgn, 3));
+					$a = $cytno * 2 - 1;
+					$b = $a + 1;
+                    $rcpbw[$a.$b] = $r;
+					if (isset($prots[$rcpid])) $prots[$rcpid]["bw"]["$a$b.50"] = "$r";
 				}
 
 				if (isset($ells[$pos]) && $ells[$pos] != '') 
@@ -136,8 +150,7 @@ foreach ($lines as $i => $ln)
             }
         }
 
-        // TODO: Read the PDB and then rewrite it with updated contents.
-        $rcpid = explode(" ", trim(substr($ln, 0, 11)))[0];
+        // Read the PDB and then rewrite it with updated contents.
         $subdir = substr($rcpid, 0, 4);
         if (substr($rcpid, 0, 2) == "OR") $subdir = "OR".intval(substr($rcpid,2,2));
 
@@ -165,7 +178,7 @@ foreach ($lines as $i => $ln)
         foreach ($regionse as $se)
         {
             $region = $se[0];
-            if (substr($region, 0, 3) == "TMR")
+            if (substr($region, 0, 3) == "TMR" || substr($region, 0, 3) == "HXR")
                 $remarks[] = "REMARK 650 HELIX $region {$se[1]} {$se[2]}";
         }
 
@@ -190,4 +203,11 @@ foreach ($lines as $i => $ln)
 
         // exit;       // debug step.
     }
+}
+
+$fp = fopen("../data/receptor.json", "w");
+if ($fp)
+{
+	fwrite($fp, json_encode_pretty($prots));
+	fclose($fp);
 }

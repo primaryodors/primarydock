@@ -1,7 +1,7 @@
 <?php
 chdir(__DIR__);
-require_once("../predict/protutils.php");
-require_once("../predict/odorutils.php");
+require_once("../data/protutils.php");
+require_once("../data/odorutils.php");
 
 function lum($r, $g, $b)
 {
@@ -12,6 +12,16 @@ function lum($r, $g, $b)
 }
 
 $bkcolor = [0x15, 0x1a, 0x37];
+
+$bkcol_tetrapod = $bkcolor;
+$bkcol_tetrapod[1] += 5;
+
+$bkcol_fishlike = $bkcolor;
+$bkcol_fishlike[2] += 13;
+
+$bkcol_taar = $bkcolor;
+$bkcol_taar[0] += 10;
+
 $bklum = lum($bkcolor[0], $bkcolor[1], $bkcolor[2]);
 
 $odor = find_odorant(@$_REQUEST['o']);
@@ -58,6 +68,39 @@ $h = 300;
 $im = imagecreatetruecolor($w, $h);
 imagefilledrectangle($im, 0,0, $w,$h, imagecolorallocate($im,$bkcolor[0],$bkcolor[1],$bkcolor[2]));
 
+$last4 = "";
+$xmax = count($prots);
+$dxmax = $xmax * $res + $xbuf/2;
+foreach (array_keys($prots) as $x => $orid)
+{
+    $dx  = $x * $res + $xbuf/2;
+
+    $first4 = substr($orid, 0, 4);
+
+    if ($first4 != $last4)
+    {
+        switch ($first4)
+        {
+            case "OR1A":
+            imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_tetrapod[0],$bkcol_tetrapod[1],$bkcol_tetrapod[2]));
+            break;
+
+            case "OR51":
+            imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_fishlike[0],$bkcol_fishlike[1],$bkcol_fishlike[2]));
+            break;
+
+            case "TAAR":
+            imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_taar[0],$bkcol_taar[1],$bkcol_taar[2]));
+            break;
+
+            default:
+            ;
+        }
+    }
+
+    $last4 = $first4;
+}
+
 $maxt = count($t) ? ( @max($t) ?: 1 ) : 1;
 $maxe = count($e) ? ( @max($e) ?: 0 ) : 0;
 $mine = count($e) ? ( @min($e) ?: -6 ) : -6;
@@ -83,26 +126,26 @@ $cyan  = imagecolorallocate($im,32,80,104);
 $pink  = imagecolorallocate($im,192,176,218);
 $white = imagecolorallocate($im,240,240,240);
 
-$or1    = imagecolorallocate($im,0,0,0);
-$or2    = imagecolorallocate($im,160,160,160);
-$or3    = imagecolorallocate($im,192,0,0); 
-$or4    = imagecolorallocate($im,0,160,160);
-$or5    = imagecolorallocate($im,176,0,208);
-$or6    = imagecolorallocate($im,0,160,0); 
-$or7    = imagecolorallocate($im,0,32,255); 
-$or8    = imagecolorallocate($im,176,160,0); 
-$or9    = imagecolorallocate($im,192,96,0);
-$or10   = imagecolorallocate($im,96,64,16); 
-$or11   = imagecolorallocate($im,192,64,128);
-$or12   = imagecolorallocate($im,128,128,128);
-$or13   = imagecolorallocate($im,96,160,96);
-$or14   = imagecolorallocate($im,96,96,240);
-$or51   = imagecolorallocate($im,0,160,96);
-$or52   = imagecolorallocate($im,128,144,32);
-$or56   = imagecolorallocate($im,128,208,0);
-$taar   = imagecolorallocate($im,255,160,96);
-$vn1r   = imagecolorallocate($im,192,128,255);
-$ms4a   = imagecolorallocate($im,64,128,255);
+$or1    = imagecolorallocate($im,255,255,255);
+$or2    = imagecolorallocate($im,250,192,  0);
+$or3    = imagecolorallocate($im,128,160, 96); 
+$or4    = imagecolorallocate($im, 64,  0,255);
+$or5    = imagecolorallocate($im,240,128,192);
+$or6    = imagecolorallocate($im,128,144,160); 
+$or7    = imagecolorallocate($im,255,  0,  0); 
+$or8    = imagecolorallocate($im,255,128,  0); 
+$or9    = imagecolorallocate($im,  0,  0,  0);
+$or10   = imagecolorallocate($im,160, 96, 64); 
+$or11   = imagecolorallocate($im,  0,255,255);
+$or12   = imagecolorallocate($im,255,255,  0);
+$or13   = imagecolorallocate($im,160,255,128);
+$or14   = imagecolorallocate($im,128,144,255);
+$or51   = imagecolorallocate($im,255,255,192);
+$or52   = imagecolorallocate($im,192,  0,224);
+$or56   = imagecolorallocate($im,  0,128,  0);
+$taar   = imagecolorallocate($im,  0,  0,160);
+$vn1r   = imagecolorallocate($im,255,240,224);
+$ms4a   = imagecolorallocate($im, 64,128,255);
 
 $base = $h-$ybuf/2;
 $bsht = 8;
@@ -118,8 +161,8 @@ for ($top = 1; $top <= floor($maxt); $top += 1)
 {   
     $dy = intval($base-1 - $tscale*$top);
     
-    if (!($top & 1)) imageline($im, $xbuf/3,$dy, $w-$xbuf/2,$dy, $wine );
-    imagestring($im, 3, $w-$xbuf/3,$dy-8, $top, $red);
+    if (!($top & 1)) imageline($im, $xbuf/3,$dy, $w-$xbuf/3,$dy, $wine );
+    imagestring($im, 3, $w-$xbuf/6,$dy-8, $top, $red);
 }
 
 // Left labels.
@@ -130,7 +173,7 @@ for ($ec = floor($maxe); $ec >= ceil($mine); $ec -= 1)
 {   
     $dy = intval($base-1 - $escale*($maxe-$ec));
     
-    imageline($im, $xbuf/3,$dy, $w-$xbuf/2,$dy, $cyan);
+    imageline($im, $xbuf/3,$dy, $w-$xbuf/3,$dy, $cyan);
     imagestring($im, 3, 2,$dy-8, $ec, $green);
 }
 

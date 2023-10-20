@@ -14,6 +14,20 @@ using namespace std;
 float *g_rgnxform_r = nullptr, *g_rgnxform_theta = nullptr, *g_rgnxform_y = nullptr;
 float *g_rgnrot_alpha = nullptr, *g_rgnrot_w = nullptr, *g_rgnrot_u = nullptr;
 
+Protein::Protein()
+{
+    aaptrmin.n = aaptrmax.n = 0;
+
+    residues = nullptr;
+    sequence = nullptr;
+    ca = nullptr;
+    res_reach = nullptr;
+    metals = nullptr;
+
+    int i;
+    for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
+}
+
 Protein::Protein(const char* lname)
 {
     name = lname;
@@ -24,6 +38,17 @@ Protein::Protein(const char* lname)
     ca = nullptr;
     res_reach = nullptr;
     metals = nullptr;
+
+    int i;
+    for (i=0; i<79; i++) Ballesteros_Weinstein[i] = 0;
+}
+
+Protein::~Protein()
+{
+    connections.clear();
+
+    delete[] remarks;
+    remarksz = 0;
 }
 
 bool Protein::add_residue(const int resno, const char aaletter)
@@ -32,7 +57,7 @@ bool Protein::add_residue(const int resno, const char aaletter)
 
     if (!residues)
     {
-        int arrlimit = resno+256;
+        arrlimit = resno+1024;
         residues = new AminoAcid*[arrlimit];
         sequence = new char[arrlimit];
         ca = new Atom*[arrlimit];
@@ -46,13 +71,13 @@ bool Protein::add_residue(const int resno, const char aaletter)
             res_reach[i] = 0;
         }
     }
-    else if (resno % 256)
+    else if (resno >= arrlimit)
     {
         AminoAcid** oldres = residues;
         char* oldseq = sequence;
         Atom** oldca = ca;
         float* oldreach = res_reach;
-        int arrlimit = resno+261;
+        arrlimit = resno+1024;
         residues = new AminoAcid*[arrlimit];
         sequence = new char[arrlimit];
         ca = new Atom*[arrlimit];
@@ -81,8 +106,10 @@ bool Protein::add_residue(const int resno, const char aaletter)
 
     if (i)
     {
-        Point* pts = residues[i-1]->predict_next_NHCA();
-        residues[i] = new AminoAcid(aaletter, residues[i-1]);
+        Point pts[4];
+        residues[i-1]->predict_next_NHCA(pts);
+        residues[i] = new AminoAcid(aaletter, residues[i-1], false);
+        residues[i]->ensure_pi_atoms_coplanar();
 
         residues[i]->establish_internal_clash_baseline();
 
@@ -105,11 +132,12 @@ bool Protein::add_residue(const int resno, const char aaletter)
             }
         }
         else cout << "Warning: Residue " << resno << " has no N atom." << endl << flush;
-
-        delete[] pts;
     }
     else
-        residues[i] = new AminoAcid(aaletter, 0);
+    {
+        residues[i] = new AminoAcid(aaletter, 0, false);
+        residues[i]->ensure_pi_atoms_coplanar();
+    }
 
     sequence[i] = aaletter;
     ca[i] = residues[i]->get_atom("CA");
@@ -121,6 +149,13 @@ bool Protein::add_residue(const int resno, const char aaletter)
     if (!aaptrmax.n || residues[i] > aaptrmax.paa) aaptrmax.paa = residues[i];
 
     return true;
+}
+
+void BallesterosWeinstein::from_string(const char* inpstr)
+{
+    helix_no = atoi(inpstr);
+    const char* dot = strchr(inpstr, '.');
+    if (dot) member_no = atoi(dot+1);
 }
 
 AminoAcid* Protein::get_residue(int resno)
@@ -135,6 +170,40 @@ AminoAcid* Protein::get_residue(int resno)
     }
 
     return NULL;
+}
+
+AminoAcid* Protein::get_residue(BallesterosWeinstein bw)
+{
+    return get_residue_bw(bw.helix_no, bw.member_no);
+}
+
+AminoAcid* Protein::get_residue_bw(const char* bwno)
+{
+    char buffer[16];
+    strcpy(buffer, bwno);
+    char* dot = strchr(buffer, '.');
+    if (!dot) return get_residue(atoi(bwno));
+    *dot = 0;
+    return get_residue_bw(atoi(buffer), atoi(dot+1));
+}
+
+AminoAcid* Protein::get_residue_bw(int hxno, int bwno)
+{
+    if (!Ballesteros_Weinstein[3])
+    {
+        cout << "Call to get_residue_bw() on a protein with no BW numbers set." << endl;
+        throw -1;
+    }
+
+    int bw50 = get_bw50(hxno);
+    if (bw50 < 1)
+    {
+        cout << "BW number not found: " << hxno << ".50." << endl;
+        throw -1;
+    }
+
+    int resno = bw50 - 50 + bwno;
+    return get_residue(resno);
 }
 
 Atom* Protein::get_atom(int resno, const char* aname)
@@ -181,24 +250,47 @@ bool Protein::add_sequence(const char* lsequence)
     for (i=1; i<=seql; i++)
     {
         aas[i-1] = get_residue(i);
+        get_residue(i)->ensure_pi_atoms_coplanar();
+        aas[i-1]->clear_all_bond_caches();
         aas[i] = 0;
     }
-    Molecule::multimol_conform(aas, 25);
+    Molecule::conform_molecules(aas, 25);
+    for (i=1; i<=seql; i++)
+    {
+        get_residue(i)->ensure_pi_atoms_coplanar();
+    }
 
     set_clashables();
+    allocate_undo_poses();
 
     return true;
+}
+
+char Protein::set_pdb_chain(char c)
+{
+    if (c >= 'A' && c <= 'Z')
+    {
+        pdbchain = c;
+    }
+
+    int i;
+    for (i=0; residues[i]; i++)
+    {
+        residues[i]->set_pdb_chain(pdbchain);
+    }
+
+    return pdbchain;
 }
 
 void Protein::save_pdb(FILE* os, Molecule* lig)
 {
     int i, offset=0;
 
-    if (remarks.size())
+    if (remarksz)
     {
-        for (i=0; i<remarks.size(); i++)
+        for (i=0; i<remarksz && remarks[i]; i++)
         {
-            fprintf(os, "%s", remarks[i].c_str());
+            fprintf(os, "%s", remarks[i]);
         }
     }
 
@@ -214,6 +306,7 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
     if (!residues) return;
     for (i=0; residues[i]; i++)
     {
+        residues[i]->set_pdb_chain(pdbchain);
         residues[i]->save_pdb(os, offset);
         offset += residues[i]->get_atom_count();
     }
@@ -235,6 +328,8 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
             if (a) a->save_pdb_line(os, ++offset);
         }
     }
+
+    last_saved_atom_number = offset;
 
     // Example CONECT syntax:
     // CONECT  487 1056
@@ -269,11 +364,14 @@ void Protein::end_pdb(FILE* os)
     fprintf(os, "END\n");
 }
 
-float Protein::get_internal_clashes(int sr, int er, bool repack)
+float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iters)
 {
     if (!residues) return 0;
+    if (repack) save_undo_state();
     int i, j, l, m;
     float result = 0;
+    Point clashttl(0,0,0);
+    float clash_worst = 0;
     for (i=0; residues[i]; i++)
     {
         int resno = residues[i]->get_residue_no();
@@ -298,7 +396,9 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                 #endif
                 for (j=0; j<n; j++)
                 {
-                    if (residues[i]->get_intermol_clashes(laa[j]) > 3)
+                    if (residues[i] == laa[j]) continue;
+                    // if (residues[i]->get_intermol_clashes(laa[j]) >= 1)
+                    if (fabs(residues[i]->get_intermol_binding(laa[j])) >= 1)
                     {
                         #if _dbg_repack
                         dbgresstr += (std::string)" " + (std::string)laa[j]->get_name();
@@ -329,7 +429,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                     cout << "Repacking " << residues[i]->get_name() << " with" << dbgresstr << "..." << endl;
                     #endif
 
-                    Molecule::multimol_conform(interactors, backdrop, 13);
+                    Molecule::conform_molecules(interactors, backdrop, repack_iters);
                 }
 
                 for (l=0; interactors[l]; l++)
@@ -339,6 +439,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
 
         for (j=i; residues[j]; j++)
         {
+            int resno2 = residues[j]->get_residue_no();
             if (j==i) result += residues[i]->get_internal_clashes();
             else
             {
@@ -349,10 +450,24 @@ float Protein::get_internal_clashes(int sr, int er, bool repack)
                     if (r > rr) continue;
                 }
 
-                result += residues[i]->get_intermol_clashes(residues[j]);
+                if (abs(resno2-resno) <= 1) continue;
+                if (resno2 >= sr && resno2 <= er) continue;
+
+                float f = residues[i]->get_intermol_clashes(residues[j]);
+                result += f;
+                SCoord dpos = residues[j]->get_CA_location().subtract(residues[i]->get_CA_location());
+                dpos.r = f;
+                clashttl = clashttl.add(dpos);
+                float limit = unconnected_residue_mindist + sqrt(residues[i]->get_reach()) + sqrt(residues[j]->get_reach());
+                f = fmax(limit - dpos.r, 0);
+                if (f > clash_worst) clash_worst = f;
             }
         }
     }
+
+    last_int_clash_dir = clashttl;
+    last_int_clash_dir.r = clash_worst;
+
     return result;
 }
 
@@ -420,6 +535,7 @@ void Protein::find_residue_initial_bindings()
     {
         AminoAcid** aa = residues; // get_residues_can_clash(residues[i]->get_residue_no());
 
+        #if _ALLOW_PROTONATE_PNICTOGENS
         // If the current residue has one or more negatively charged non-backbone atoms,
         // and a nearby residue has one or more neutral non-backbone pnictogen atoms not part of an amide,
         // put a positive charge on the pnictogen(s).
@@ -447,6 +563,7 @@ void Protein::find_residue_initial_bindings()
                 }
             }
         }
+        #endif
 
         float ib = 0, maxb = 0;
         AABridge aab;
@@ -483,7 +600,25 @@ void Protein::find_residue_initial_bindings()
     }
 }
 
-int Protein::load_pdb(FILE* is, int rno)
+void Protein::set_name_from_pdb_name(const char* pdb_name)
+{
+    char buffer[1024], *begin = buffer;
+    strcpy(buffer, pdb_name);
+
+    char* slash = strchr(buffer, '/');
+    while (slash && slash[1])
+    {
+        begin = slash+1;
+        slash = strchr(begin, '/');
+    }
+
+    char* dot = strchr(begin, '.');
+    if (dot) *dot = 0;
+
+    name = begin;
+}
+
+int Protein::load_pdb(FILE* is, int rno, char chain)
 {
     AminoAcid* restmp[65536];
     char buffer[1024];
@@ -494,9 +629,10 @@ int Protein::load_pdb(FILE* is, int rno)
     if (ca) delete[] ca;
     // if (res_reach) delete res_reach;         // This was causing a segfault.
     if (metals) delete[] metals;
-    origpdb_residues.clear();
 
+    origpdb_residues.clear();
     connections.clear();
+
     Atom* pdba[65536];
 
     AminoAcid useless('#');		// Feed it nonsense just so it has to load the data file.
@@ -506,6 +642,7 @@ int Protein::load_pdb(FILE* is, int rno)
 
     for (i=0; i<65536; i++) pdba[i] = nullptr;
 
+    bool got_atoms = false;
     while (!feof(is))
     {
         try
@@ -513,12 +650,22 @@ int Protein::load_pdb(FILE* is, int rno)
             int told = ftell(is);
             fgets(buffer, 1003, is);
 
+            if (got_atoms &&
+                buffer[0] == 'T' &&
+                buffer[1] == 'E' &&
+                buffer[2] == 'R'
+               )
+            {
+                break;
+            }
+
             if (buffer[0] == 'A' &&
                 buffer[1] == 'N' &&
                 buffer[2] == 'I' &&
                 buffer[3] == 'S'
                )
                 continue;
+
             else if (buffer[0] == 'A' &&
                      buffer[1] == 'T' &&
                      buffer[2] == 'O' &&
@@ -529,6 +676,8 @@ int Protein::load_pdb(FILE* is, int rno)
                      (buffer[25] == ' ' || (buffer[25] >= '0' && buffer[25] <= '9'))
                )
             {
+                if (buffer[21] != ' ' && buffer[21] != chain) continue;
+
                 buffer[16] = ' ';
                 fseek(is, told, SEEK_SET);
 
@@ -537,6 +686,7 @@ int Protein::load_pdb(FILE* is, int rno)
                     tmp3let[i] = buffer[17+i];
                 tmp3let[3] = 0;
                 tmp3let[4] = 0;
+                got_atoms = true;
 
                 for (i=0; i<256; i++)
                 {
@@ -598,7 +748,7 @@ int Protein::load_pdb(FILE* is, int rno)
                      buffer[5] == 'K'
                 )
             {
-                remarks.push_back(buffer);
+                add_remark(buffer);
                 // cout << "Found remark " << buffer;
 
                 if (buffer[7] == '6' && buffer[8] < '!')
@@ -606,7 +756,6 @@ int Protein::load_pdb(FILE* is, int rno)
                     char** words = chop_spaced_words(buffer);
                     if (words[2] && !words[3])
                         name = words[2];
-                    delete[] words;
                 }
             }
             else if (buffer[0] == 'C'
@@ -675,7 +824,7 @@ int Protein::load_pdb(FILE* is, int rno)
                         buffer[4] == 'R' &&
                         buffer[5] == 'K'
                    )
-                    remarks.push_back(buffer);
+                    add_remark(buffer);
                 break;
 
             default:
@@ -746,8 +895,7 @@ int Protein::load_pdb(FILE* is, int rno)
 
         set_region(words[3], atoi(words[4]), atoi(words[5]));
         regions_from = rgn_pdb;
-
-        delete[] words;
+        delete words;
     }
 
     std::vector<std::string> rem_st = get_remarks("800 SITE");
@@ -763,16 +911,65 @@ int Protein::load_pdb(FILE* is, int rno)
         int f4 = atoi(words[4]);
         if (!strcmp(words[3], "BW"))
         {
-            while (Ballesteros_Weinstein.size() <= f4) Ballesteros_Weinstein.push_back(0);
             Ballesteros_Weinstein[f4] = atoi(words[5]);
         }
-
-        delete[] words;
+        delete words;
     }
 
     initial_int_clashes = get_internal_clashes();
+    allocate_undo_poses();
+    set_conditional_basicities();
 
     return rescount;
+}
+
+void Protein::allocate_undo_poses()
+{
+    int i, l;
+    if (undo_poses) delete[] undo_poses;
+
+    l = get_end_resno();
+    undo_poses = new Pose*[l+4];
+    undo_poses[0] = nullptr;
+    for (i=1; i<l+4; i++)
+    {
+        AminoAcid* aa = get_residue(i);
+        undo_poses[i] = aa ? new Pose(aa) : nullptr;
+    }
+}
+
+void Protein::save_undo_state()
+{
+    if (mass_undoable) return;
+    if (!undo_poses) allocate_undo_poses();
+
+    int i, n;
+    n = get_end_resno();
+
+    for (i=1; i<=n; i++)
+    {
+        if (undo_poses[i])
+        {
+            AminoAcid* aa = get_residue(i);
+            if (aa) undo_poses[i]->copy_state(aa);
+        }
+    }
+}
+
+void Protein::undo()
+{
+    mass_undoable = false;
+    int i, n;
+    n = get_end_resno();
+
+    for (i=1; i<=n; i++)
+    {
+        if (undo_poses[i])
+        {
+            AminoAcid* aa = get_residue(i);
+            if (aa) undo_poses[i]->restore_state(aa);
+        }
+    }
 }
 
 void Protein::revert_to_pdb()
@@ -787,11 +984,12 @@ void Protein::revert_to_pdb()
         AminoAcid* aa = get_residue(i);
         if (aa) origpdb_residues[i].restore_state(aa);
     }
+    allocate_undo_poses();
 }
 
 int Protein::get_bw50(int helixno)
 {
-    if (Ballesteros_Weinstein.size() <= helixno) return -1;
+    if (helixno < 1 || helixno > 78) return -1;
     return Ballesteros_Weinstein[helixno];
 }
 
@@ -811,27 +1009,54 @@ std::string Protein::get_sequence()
 
 int Protein::get_start_resno()
 {
-    if (!residues) return 0;
+    if (!residues || !residues[0]) return 0;
     else return residues[0]->get_residue_no();
 }
 
 int Protein::get_end_resno()
 {
     int retval = 0;
-    if (!residues) return retval;
+    if (!residues || !residues[0]) return retval;
     int i;
     for (i=0; residues[i]; i++) retval = residues[i]->get_residue_no();
     return retval;
+}
+
+void Protein::add_remark(const char* remark)
+{
+    if (!remarks) remarks = new char*[65536];
+
+    remarks[remarksz] = new char[strlen(remark)+2];
+    strcpy(remarks[remarksz++], remark);
+
+    char buffer[1024];
+    strcpy(buffer, remark);
+    char** words = chop_spaced_words(buffer);
+
+    if (words[1]
+        && !strcmp(words[1], "800")
+        && words[2]
+        && !strcmp(words[2], "SITE")
+        && !strcmp(words[3], "BW")
+        )
+    {
+        int f4 = atoi(words[4]);
+        Ballesteros_Weinstein[f4] = atoi(words[5]);
+    }
 }
 
 std::vector<std::string> Protein::get_remarks(std::string search_for)
 {
     std::vector<string> retval;
     int i;
-    for (i=0; i<remarks.size(); i++)
+    for (i=0; i<remarksz; i++)
     {
-        if (!search_for.length() || strstr(remarks[i].c_str(), search_for.c_str()))
-            retval.push_back(remarks[i]);
+        if (!search_for.length() || strstr(remarks[i], search_for.c_str()))
+        {
+            char buffer[1024];
+            strcpy(buffer, remarks[i]);
+            retval.push_back((std::string)buffer);
+        }
     }
 
     return retval;
@@ -839,7 +1064,7 @@ std::vector<std::string> Protein::get_remarks(std::string search_for)
 
 void Protein::add_remark(std::string new_remark)
 {
-    remarks.push_back(new_remark);
+    add_remark(new_remark.c_str());
 
     // TODO: Sort remarks by number, becarefuling to preserve the sequence of same numbered remarks.
 }
@@ -852,13 +1077,9 @@ void Protein::set_clashables(int resno, bool recursed)
 
 
     int maxres = get_end_resno();
-    if (resno <= 0)
+    if (!res_can_clash)
     {
-        if (res_can_clash)
-        {
-            delete[] res_can_clash;
-        }
-        res_can_clash = new AminoAcid**[maxres+1];
+        res_can_clash = new AminoAcid**[maxres+8];
         for (i=0; i<=maxres; i++) res_can_clash[i] = nullptr;
     }
 
@@ -877,6 +1098,7 @@ void Protein::set_clashables(int resno, bool recursed)
         {
             if (j == i) continue;
             AminoAcid* resj = get_residue(j);
+            if (!resj) continue;
             if (resi->can_reach(resj))
             {
                 temp[k++] = resj;
@@ -884,8 +1106,8 @@ void Protein::set_clashables(int resno, bool recursed)
             }
         }
 
-        if (res_can_clash[0] && res_can_clash[i]) delete res_can_clash[i];
-        res_can_clash[i] = new AminoAcid*[k+1];
+        if (!res_can_clash[i])
+            res_can_clash[i] = new AminoAcid*[maxres+8];
         for (j=0; j<k; j++)
         {
             res_can_clash[i][j] = temp[j];
@@ -910,6 +1132,32 @@ void Protein::set_clashables(int resno, bool recursed)
     		cout << *res_can_clash[i][j] << " ";
     	cout << endl;
     }*/
+}
+
+void Protein::set_conditional_basicities()
+{
+    if (!residues) return;
+
+    int i, j, l, n;
+    for (i=0; residues[i]; i++)
+    {
+        if (!residues[i]->conditionally_basic()) continue;
+
+        std::vector<AminoAcid*> nearby = get_residues_near(residues[i]->get_CA_location(), 10, true);
+        n = nearby.size();
+        if (!n) continue;
+
+        Molecule* mols[256];
+        j = 0;
+        for (l=0; l<n; l++)
+        {
+            if (nearby[l]->get_charge() > -0.25) continue;
+            mols[j++] = (Molecule*)nearby[l];
+        }
+        mols[j] = nullptr;
+
+        residues[i]->set_conditional_basicity(mols);
+    }
 }
 
 std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool facing)
@@ -953,6 +1201,50 @@ std::vector<AminoAcid*> Protein::get_residues_near(Point pt, float maxr, bool fa
     return retval;
 }
 
+std::vector<AminoAcid*> Protein::get_contact_residues(Protein* op, float cd)
+{
+    std::vector<AminoAcid*> retval;
+
+    if (!residues) return retval;
+    if (!op->residues) return retval;
+
+    int m = get_end_resno(), n = op->get_end_resno();
+    bool dirty[n + 4];
+    
+    int i, j;
+    for (i=0; i<n; i++) dirty[i] = false;
+
+    for (i=1; i<m; i++)
+    {
+        AminoAcid* a = get_residue(i);
+        if (!a) continue;
+
+        bool adirty = false;
+
+        for (j=1; j<n; j++)
+        {
+            AminoAcid* b = op->get_residue(j);
+
+            if (b)
+            {
+                if (dirty[j]) continue;
+
+                float f = a->get_reach() + b->get_reach() + cd;
+                float r = a->get_CA_location().get_3d_distance(b->get_CA_location());
+
+                if (r < f)
+                {
+                    if (!adirty) retval.push_back(a);
+                    retval.push_back(b);
+                    adirty = dirty[j] = true;
+                }
+            }
+        }
+    }
+
+    return retval;
+}
+
 AminoAcid** Protein::get_residues_can_clash(int resno)
 {
     if (!residues) return 0;
@@ -964,6 +1256,7 @@ AminoAcid** Protein::get_residues_can_clash(int resno)
         if (residues[i]->get_residue_no() == resno)
         {
             if (!res_can_clash[i] || !res_can_clash[i][0]) set_clashables();
+            residues[i]->mclashables = (Molecule**)res_can_clash[i];
             /*cout << i << ": " << flush;
             if (res_can_clash[i] && res_can_clash[i][0])
             {
@@ -979,6 +1272,34 @@ AminoAcid** Protein::get_residues_can_clash(int resno)
     return 0;
 }
 
+std::vector<AminoAcid*> Protein::get_residues_can_clash(int sr, int er)
+{
+    std::vector<AminoAcid*> result;
+    int i, j;
+    bool already[get_seq_length()+4];
+    for (i=0; residues[i]; i++) already[i] = false;
+
+    for (j=sr; j<=er; j++)
+    {
+        AminoAcid* aa = get_residue(j);
+        for (i=0; residues[i]; i++)
+        {
+            if (already[i]) continue;
+
+            int resno = residues[i]->get_residue_no();
+            if (resno >= sr && resno <= er) continue;
+
+            if (aa->can_reach(residues[i]))
+            {
+                result.push_back(residues[i]);
+                already[i] = true;
+            }
+        }
+    }
+
+    return result;
+}
+
 int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         Molecule* ligand,
         const Point nodecen,
@@ -987,13 +1308,13 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         )
 {
     int i, j, sphres = 0;
-    int seql = get_seq_length();
+    int seql = get_end_resno();
     bool resno_already[8192];
     for (i=0; i<8192; i++) resno_already[i] = false;
 
     for (i=0; i<SPHREACH_MAX; i++) reaches_spheroid[i] = NULL;
 
-    for (i=1; i<=seql; i++)
+    for (i=1; i<seql && residues[i]; i++)
     {
         AminoAcid* aa = residues[i-1];
         if (!aa) continue;
@@ -1150,11 +1471,72 @@ Molecule* Protein::metals_as_molecule()
     return met;
 }
 
+int Protein::search_sequence(const int sr, const int esr, const char* psz, const int threshold, int* psim)
+{
+    int i, j, k = 0, l, num_eq;
+    float m = 0, n = 0, sim;
+    char aac;
+    AminoAcid* aa;
+
+    for (i=sr; i<esr; i++)
+    {
+        m = num_eq = 0;
+        char lc = 0;
+        l = 0;
+        for (j=0; psz[j]; j++)
+        {
+            if (psz[j] == '^') j++;
+            char c = psz[j];
+            aa = get_residue(i+l);
+            if (!aa) continue;
+            aac = aa->get_letter();
+
+            if (lc == '^' && aa->get_residue_no() != get_start_resno()) goto _wrong_place;
+            if (psz[j+1] == '$' && aa->get_residue_no() != get_end_resno()) goto _wrong_place;
+
+            if (c == 'X')
+            {
+                m += 1;
+                num_eq++;
+            }
+            else
+            {
+                if (c == aac)
+                {
+                    num_eq++;
+                    sim = 1;
+                }
+                else sim = aa->similarity_to(c);
+                m += sim;
+            }
+
+            lc = c;
+            l++;
+        }
+
+        if (m > n && num_eq >= threshold)
+        {
+            k = i;
+            n = m;
+        }
+
+        _wrong_place:
+        ;
+    }
+    sim = n;
+    if (psim) *psim = sim;
+
+    return k;
+}
+
 void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
 {
+    save_undo_state();
+
     AminoAcid* bendy = get_residue(resno);
     if (!bendy) return;
     LocatedVector lv = bendy->rotate_backbone(dir, angle);
+    bendy->ensure_pi_atoms_coplanar();
 
     if (lv.r)
     {
@@ -1166,6 +1548,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
         {
             // cout << "Rotating " << i << endl;
             movable->rotate(lv, angle);
+            movable->ensure_pi_atoms_coplanar();
             set_clashables(i);
         }
     }
@@ -1173,6 +1556,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
 
 void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, float angle)
 {
+    save_undo_state();
     if (startres == endres) return;
     int inc = (dir == CA_desc || dir == C_desc) ? -1 : 1;
     if (sgn(endres - startres) != sgn(inc))
@@ -1185,6 +1569,7 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
     AminoAcid* bendy = get_residue(startres);
     if (!bendy) return;
     LocatedVector lv = bendy->rotate_backbone(dir, angle);
+    bendy->ensure_pi_atoms_coplanar();
 
     if (lv.r)
     {
@@ -1194,6 +1579,7 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
         for (i=startres+inc; movable = get_residue(i); i+=inc)
         {
             movable->rotate(lv, angle);
+            movable->ensure_pi_atoms_coplanar();
             if (i == endres) break;
         }
     }
@@ -1227,6 +1613,13 @@ void Protein::conform_backbone(int startres, int endres,
                                int iters, bool backbone_atoms_only
                               )
 {
+    cout << "conform_backbone() has never worked and probably never will." << endl;
+    throw -1;
+
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+
     int inc = sgn(endres-startres);
     int res, i, j, iter;
     bb_rot_dir dir1 = (inc>0) ? N_asc : CA_desc,
@@ -1418,12 +1811,18 @@ void Protein::conform_backbone(int startres, int endres,
     cout << endl;
     #endif
     if (r > 2.5) cout << "Warning - protein strand alignment anomaly outside of tolerance." << endl << "# Anomaly is " << r << " Angstroms." << endl;
+
+    mass_undoable = wmu;
 }
 
 #define DBG_BCKCONN 0
 #define _INCREMENTAL_BKCONN 1
 void Protein::backconnect(int startres, int endres)
 {
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+
     int i;
     int inc = sgn(endres-startres);
 
@@ -1433,7 +1832,7 @@ void Protein::backconnect(int startres, int endres)
     {
     #endif
 
-        // Glom the last residue onto the target.
+        // Glue the last residue onto the target.
         // Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
         // Then do the same for the previous residue, and the one before, etc,
         // all the way back to the starting residue.
@@ -1457,7 +1856,8 @@ void Protein::backconnect(int startres, int endres)
             cout << pointer << ":";
             #endif
 
-            Point* pts = (inc > 0) ? next->predict_previous_COCA() : next->predict_next_NHCA();
+            Point pts[4];
+            (inc > 0) ? next->predict_previous_COCA(pts) : next->predict_next_NHCA(pts);
             Point ptsc[4];
 
             #if _INCREMENTAL_BKCONN
@@ -1476,8 +1876,7 @@ void Protein::backconnect(int startres, int endres)
             }
             #endif
 
-            curr->glom(pts, inc > 0);
-            delete[] pts;
+            curr->attach_to_prediction(pts, inc > 0);
             // break;
 
             #if DBG_BCKCONN
@@ -1493,10 +1892,10 @@ void Protein::backconnect(int startres, int endres)
                 cout << "a";
                 #endif
 
-                pts = (inc < 0) ? prev->predict_previous_COCA() : prev->predict_next_NHCA();
+                pts[4];
+                (inc < 0) ? prev->predict_previous_COCA(pts) : prev->predict_next_NHCA(pts);
                 Point target_heavy = pts[0];
                 Point target_pole = pts[1];
-                delete[] pts;
 
                 #if DBG_BCKCONN
                 cout << "b";
@@ -1576,6 +1975,8 @@ void Protein::backconnect(int startres, int endres)
         #if _INCREMENTAL_BKCONN
     }
         #endif
+
+    mass_undoable = wmu;
 }
 
 void Protein::make_helix(int startres, int endres, float phi, float psi)
@@ -1586,6 +1987,10 @@ void Protein::make_helix(int startres, int endres, float phi, float psi)
 #define DBG_ASUNDER_HELICES 0
 void Protein::make_helix(int startres, int endres, int stopat, float phi, float psi)
 {
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+
     int inc = sgn(endres-startres);
     if (!inc) inc = sgn(stopat-startres);
     else if (inc != sgn(stopat-startres)) return;
@@ -1604,6 +2009,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         AminoAcid* aa = get_residue(res);
 
         LocRotation lr = aa->enforce_peptide_bond();
+        aa->ensure_pi_atoms_coplanar();
 
         if (lr.v.r)
         {
@@ -1614,6 +2020,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                 {
                     LocatedVector lv = lr.get_lv();
                     movable->rotate(lv, lr.a);
+                    movable->ensure_pi_atoms_coplanar();
                     #if DBG_ASUNDER_HELICES
                     cout << i << " ";
                     #endif
@@ -1637,6 +2044,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                     {
                         LocatedVector lv = lr2[j].get_lv();
                         movable->rotate(lv, lr2[j].a);
+                        movable->ensure_pi_atoms_coplanar();
                         #if DBG_ASUNDER_HELICES
                         cout << i << " ";
                         #endif
@@ -1659,21 +2067,23 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 
         // cout << "Rotating " << *aa << " phi " << (phi*fiftyseven) << " degrees." << endl;
         lr = aa->rotate_backbone_abs(dir1, phi);
+        aa->ensure_pi_atoms_coplanar();
 
         if (lr.v.r)
         {
             AminoAcid* movable;
 
             if (res != endres) for (i=res+inc; movable = get_residue(i); i+=inc)
-                {
-                    // cout << i << " ";
-                    LocatedVector lv = lr.get_lv();
-                    movable->rotate(lv, lr.a);
-                    #if DBG_ASUNDER_HELICES
-                    cout << i << " ";
-                    #endif
-                    if (i == stopat) break;
-                }
+            {
+                // cout << i << " ";
+                LocatedVector lv = lr.get_lv();
+                movable->rotate(lv, lr.a);
+                movable->ensure_pi_atoms_coplanar();
+                #if DBG_ASUNDER_HELICES
+                cout << i << " ";
+                #endif
+                if (i == stopat) break;
+            }
             #if DBG_ASUNDER_HELICES
             cout << endl;
             #endif
@@ -1682,6 +2092,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
 
         // cout << "Rotating " << *aa << " psi " << (psi*fiftyseven) << " degrees." << endl;
         lr = aa->rotate_backbone_abs(dir2, psi);
+        aa->ensure_pi_atoms_coplanar();
 
         if (lr.v.r)
         {
@@ -1692,6 +2103,7 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
                     // cout << i << " ";
                     LocatedVector lv = lr.get_lv();
                     movable->rotate(lv, lr.a);
+                    movable->ensure_pi_atoms_coplanar();
                     #if DBG_ASUNDER_HELICES
                     cout << i << " ";
                     #endif
@@ -1742,7 +2154,9 @@ void Protein::make_helix(int startres, int endres, int stopat, float phi, float 
         aas[i-startres+1] = 0;
     }
     aas[endres-startres+1] = 0;
-    Molecule::multimol_conform(aas, 25);
+    Molecule::conform_molecules(aas, 25);
+
+    mass_undoable = wmu;
 }
 
 void Protein::delete_residue(int resno)
@@ -1784,6 +2198,7 @@ void Protein::renumber_residues(int startres, int endres, int new_startres)
     {
         residues[i]->renumber(residues[i]->get_residue_no() + j);
     }
+    allocate_undo_poses();
 }
 
 void Protein::delete_sidechain(int resno)
@@ -1873,7 +2288,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
         char buffer[256];
         sprintf(buffer, "REMARK 800 SITE MCOORD %d %s\n", resnos[i], metal->name);
-        remarks.push_back(buffer);
+        add_remark(buffer);
 
         m_mcoord[j]->coord_res[i] = get_residue(resnos[i]);
         if (!m_mcoord[j]->coord_res[i])
@@ -1882,17 +2297,20 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
             throw 0xbad12e5d;
         }
         m_mcoord[j]->coord_res[i]->m_mcoord = m_mcoord[j];
-        m_mcoord[j]->coord_atoms[i] = m_mcoord[j]->coord_res[i]->get_atom(res_anames[i].c_str());
-        if (!m_mcoord[j]->coord_atoms[i])
+        if (i < res_anames.size())
         {
-            cout << "Attempt to bind metal to " << resnos[i] << ":" << res_anames[i] << " not found in protein!" << endl;
-            throw 0xbada70b;
+            m_mcoord[j]->coord_atoms[i] = m_mcoord[j]->coord_res[i]->get_atom(res_anames[i].c_str());
+            if (!m_mcoord[j]->coord_atoms[i])
+            {
+                cout << "Attempt to bind metal to " << resnos[i] << ":" << res_anames[i] << " not found in protein!" << endl;
+                throw 0xbada70b;
+            }
         }
     }
     m_mcoord[j]->coord_res[residues] = NULL;
     m_mcoord[j]->coord_atoms[residues] = NULL;
 
-    remarks.push_back("REMARK 800\n");
+    add_remark("REMARK 800\n");
 
     // Get the plane of the coordinating atoms, then get the normal.
     Point ptarr[3] =
@@ -2050,7 +2468,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
     // Multimol conform the array.
     gmprot = this;
-    Molecule::multimol_conform(lmols, lbkg, 50); // &ext_mtl_coord_cnf_cb);
+    Molecule::conform_molecules(lmols, lbkg, 50); // &ext_mtl_coord_cnf_cb);
     // metal->move(ptmtl);
 
     // Flex the side chains to all be close to the metal.
@@ -2124,8 +2542,6 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     ptmtl = average_of_points(pt4avg, l);
     #endif
     metal->move(ptmtl);
-
-    // Molecule::multimol_conform(lmols, lbkg, 50, &ext_mtl_coord_cnf_cb);
 
     // Set the coordinating residues' sidechains to immovable.
     for (i=0; m_mcoord[j]->coord_res[i]; i++)
@@ -2281,10 +2697,6 @@ void Protein::set_region(std::string rgname, int start, int end)
     regions[i].start = start;
     regions[i].end = end;
     regions_from = rgn_manual;
-
-    char buffer[256];
-    sprintf(buffer, "REMARK 650 HELIX %s %d %d\n", rgname.c_str(), start, end);
-    remarks.push_back(buffer);
 }
 
 Region Protein::get_region(const std::string rgname)
@@ -2336,6 +2748,8 @@ void Protein::move_piece(int start_res, int end_res, Point new_center)
 
 void Protein::move_piece(int start_res, int end_res, SCoord move_amt)
 {
+    save_undo_state();
+
     int i;
     for (i=start_res; i<=end_res; i++)
     {
@@ -2351,38 +2765,24 @@ void Protein::move_piece(int start_res, int end_res, SCoord move_amt)
 
 LocRotation Protein::rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res)
 {
-    Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
-    Point align = get_residue(align_res)->get_barycenter();
+    Point pivot = pivot_res ? get_residue(pivot_res)->get_CA_location() : get_region_center(start_res, end_res);
+    Point align = get_residue(align_res)->get_CA_location();
     Rotation rot = align_points_3d(&align, &align_target, &pivot);
     return rotate_piece(start_res, end_res, rot, pivot_res);
 }
 
 LocRotation Protein::rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res)
 {
-    Point pivot = pivot_res ? get_residue(pivot_res)->get_barycenter() : get_region_center(start_res, end_res);
-    /*
-    LocatedVector lv(rot.v);
-    lv.origin = pivot;
-    int i;
-    for (i=start_res; i<=end_res; i++)
-    {
-        AminoAcid* aa = get_residue(i);
-        if (!aa) continue;
-        MovabilityType mov = aa->movability;
-        aa->movability = MOV_ALL;
-        aa->rotate(lv, rot.a);
-        aa->movability = mov;
-    }
-
-    LocRotation retval(lv);
-    retval.a = rot.a;
-    return retval;*/
+    AminoAcid* aa = pivot_res ? get_residue(pivot_res) : nullptr;
+    Point pivot = aa ? aa->get_CA_location() : get_region_center(start_res, end_res);
 
     return rotate_piece(start_res, end_res, pivot, rot.v, rot.a);
 }
 
 LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoord axis, float theta)
 {
+    save_undo_state();
+
     LocatedVector lv(axis);
     lv.origin = pivot;
     int i;
@@ -2393,6 +2793,7 @@ LocRotation Protein::rotate_piece(int start_res, int end_res, Point pivot, SCoor
         MovabilityType mov = aa->movability;
         aa->movability = MOV_ALL;
         aa->rotate(lv, theta);
+        aa->ensure_pi_atoms_coplanar();
         aa->movability = mov;
         set_clashables(i);
     }
@@ -2547,6 +2948,8 @@ bool Protein::disulfide_bond(int resno1, int resno2)
 {
     AminoAcid* res1, *res2;
 
+    save_undo_state();
+
     res1 = get_residue(resno1);
     res2 = get_residue(resno2);
 
@@ -2602,6 +3005,11 @@ bool Protein::disulfide_bond(int resno1, int resno2)
 
 void Protein::upright()
 {
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+    Point oldcen = get_region_center(1, 9999).negate();
+    last_uprighted_xform = oldcen;
     move_piece(1, 9999, Point(0,0,0));
 
     Point extracellular[256], cytoplasmic[256];
@@ -2636,6 +3044,9 @@ void Protein::upright()
     Rotation rot = align_points_3d(&exrdir, new Point(0,1e6,0), &cytdir);
 
     rotate_piece(1, 9999, rot, 0);
+    last_uprighted_A.v = rot.v;
+    last_uprighted_A.a = rot.a;
+    last_uprighted_A.origin = get_region_center(1, 9999);
 
     // Rotate to place TMR4 in the +Z direction relative to TMR1.
     int sr = get_region_start("TMR4");
@@ -2668,15 +3079,27 @@ void Protein::upright()
         rot = align_points_3d(&tmr4dir, new Point(0,0,1e9), &tmr1dir);
 
         rotate_piece(1, 9999, rot, 0);
+        last_uprighted_B.v = rot.v;
+        last_uprighted_B.a = rot.a;
+        last_uprighted_B.origin = get_region_center(1, 9999);
     }
 
+    mass_undoable = wmu;
 }
 
-void Protein::homology_conform(Protein* target)
+void Protein::homology_conform(Protein* target, Protein* reference)
 {
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+
+    if (!reference) reference = this;
+
     // Check that both proteins have TM helices and BW numbers set. If not, error out.
     if (!get_region_start("TMR6") || !target->get_region_start("TMR6")) throw 0xbadbeb7;
-    if (!Ballesteros_Weinstein.size() || !target->Ballesteros_Weinstein.size()) throw 0xbadbeb7;
+    if (!Ballesteros_Weinstein[3] || !target->Ballesteros_Weinstein[3]) throw 0xbadbeb7;
+    if (!reference->get_region_start("TMR6")) throw 0xbadbeb7;
+    if (!reference->Ballesteros_Weinstein[3]) throw 0xbadbeb7;
 
     upright();
     target->upright();
@@ -2726,7 +3149,7 @@ void Protein::homology_conform(Protein* target)
 
     // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
     // the TM CA atoms as closely as possible.
-    int i;
+    int i, l;
     float theta = 0;
     Point axis(0,1,0);
     count = 0;
@@ -2747,27 +3170,163 @@ void Protein::homology_conform(Protein* target)
 
     // Perform the rotation.
     target->rotate_piece(1, 9999, center, axis, theta);
+    #if _dbg_homology
+    cout << "Rotated about Y axis " << theta*fiftyseven << "deg." << endl;
+    #endif
+
+    if (reference != this)
+    {
+        count = 0;
+        xform_delta = center = Point(0,0,0);
+        resnos1.clear();
+        resnos2.clear();
+
+        for (hxno = 1; hxno <= 7; hxno++)
+        {
+            sprintf(buffer, "TMR%d", hxno);
+            int rgend1 = get_region_end(buffer);
+            int rgstart2 = reference->get_region_start(buffer);
+            int rgend2 = reference->get_region_end(buffer);
+            int bw50a = get_bw50(hxno), bw50b = reference->get_bw50(hxno);
+            for (resno1 = get_region_start(buffer); resno1 <= rgend1; resno1++)
+            {
+                int i = resno1 - bw50a;
+                resno2 = bw50b + i;
+                if (resno2 >= rgstart2 && resno2 <= rgend2)
+                {
+                    Point caloc = get_atom_location(resno1, "CA");
+                    Point ptdiff = caloc.subtract(reference->get_atom_location(resno2, "CA"));
+                    xform_delta = xform_delta.add(ptdiff);
+                    center = center.add(caloc);
+                    count++;
+
+                    resnos1.push_back(resno1);
+                    resnos2.push_back(resno2);
+                }
+            }
+        }
+        if (count)
+        {
+            xform_delta.scale(xform_delta.magnitude() / count);
+            center.scale(center.magnitude() / count);
+        }
+
+        move_amt = xform_delta;
+        reference->move_piece(1, 9999, move_amt);
+
+        // Get the average necessary rotation, about the +Y axis centered on the TM center, to match
+        // the TM CA atoms as closely as possible.
+        int i;
+        float theta = 0;
+        Point axis(0,1,0);
+        count = 0;
+        for (i=0; i<resnos1.size(); i++)
+        {
+            resno1 = resnos1[i];
+            resno2 = resnos2[i];
+            Point pt1 = get_atom_location(resno1, "CA"), pt2 = reference->get_atom_location(resno2, "CA");
+            pt1.y = pt2.y = 0;
+            Rotation rot = align_points_3d(pt2, pt1, center);
+            Point rotv = rot.v;
+            if (rotv.y < 0) theta -= rot.a;
+            else theta += rot.a;
+            count++;
+        }
+
+        if (count) theta /= count;
+
+        // Perform the rotation.
+        reference->rotate_piece(1, 9999, center, axis, theta);
+    }
 
     // Find the rotations and transformations for each TM region to bring its CA atoms as close as
     // possible to those of the target.
     for (hxno = 1; hxno <= 7; hxno++)
     {
         sprintf(buffer, "TMR%d", hxno);
-        int rgstart1 = get_region_start(buffer);
-        int rgend1 = get_region_end(buffer);
+        int rgstart0 = get_region_start(buffer);
+        int rgend0 = get_region_end(buffer);
+        int rgstart1 = reference->get_region_start(buffer);
+        int rgend1 = reference->get_region_end(buffer);
         int rgstart2 = target->get_region_start(buffer);
         int rgend2 = target->get_region_end(buffer);
-        int bw50a = get_bw50(hxno), bw50b = target->get_bw50(hxno);
+        #if _dbg_homology
+        cout << "Region " << hxno << " target " << rgstart2 << "-" << rgend2 << ", reference " << rgstart1 << "-" << rgend1 << endl;
+        #endif
+
+        int bw50a = reference->get_bw50(hxno), bw50b = target->get_bw50(hxno);
+
+        #if homology_phi_psi_rotations
+        // Do the phi and psi rotations.
+        float theta_carry = 0;
+        for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
+        {
+            i = resno1 - bw50a;
+            int resno0 = get_bw50(hxno) + i;
+            AminoAcid* aa = get_residue(resno0);
+            if (!aa) continue;
+
+            i = resno1 - bw50a;
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                AminoAcid* aa1 = reference->get_residue(resno1);
+                if (!aa1) continue;
+                AminoAcid* aa2 = target->get_residue(resno2);
+                if (!aa2) continue;
+
+                float phi1 = aa1->get_phi(), phi2 = aa2->get_phi();
+                if (phi1 >= M_PI) phi1 -= M_PI*2;
+                if (phi2 >= M_PI) phi2 -= M_PI*2;
+                float theta = phi2 - phi1;
+
+                bond_rotation_fail_reason phi_fail = aa->rotate_phi(theta + theta_carry);
+                if (phi_fail != bf_none) theta_carry += theta;
+                else theta_carry = 0;
+
+                #if _dbg_homology
+                cout << resno0 << " (t " << resno2 << ", r " << resno1 << ") phi " << (theta*fiftyseven) << " (" << (phi2*fiftyseven) << " - " << (phi1*fiftyseven) << ") deg. " << phi_fail << "." << endl;
+                #endif
+
+                AminoAcid* aaprev = aa->get_prev();
+                if (aaprev)
+                {
+                    Point* nhca = aaprev->predict_next_NHCA();
+                    aa->attach_to_prediction(nhca);
+                }
+ 
+                float psi1 = aa1->get_psi(), psi2 = aa2->get_psi();
+                if (psi1 >= M_PI) psi1 -= M_PI*2;
+                if (psi2 >= M_PI) psi2 -= M_PI*2;
+                theta = psi2 - psi1;
+
+                bond_rotation_fail_reason psi_fail = aa->rotate_psi(theta + theta_carry);
+                if (psi_fail != bf_none) theta_carry += theta;
+                else theta_carry = 0;
+
+                #if _dbg_homology
+                cout << resno0 << " (t " << resno2 << ", r " << resno1 << ") psi " << (theta*fiftyseven) << " (" << (psi2*fiftyseven) << " - " << (psi1*fiftyseven) << ") deg. " << psi_fail << "." << endl;
+                #endif
+
+                /*AminoAcid* aanext = aa->get_next();
+                if (!aanext) continue;
+                Point* nhca = aa->predict_next_NHCA();
+                aanext->attach_to_prediction(nhca);*/
+            }
+        }
+        #endif
+
+        // Compute the TM region transformation.
         Point rcen1(0,0,0);
         Point rcen2(0,0,0);
         count = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
         {
-            int i = resno1 - bw50a;
+            i = resno1 - bw50a;
             resno2 = bw50b + i;
             if (resno2 >= rgstart2 && resno2 <= rgend2)
             {
-                rcen1 = rcen1.add(get_atom_location(resno1, "CA"));
+                rcen1 = rcen1.add(reference->get_atom_location(resno1, "CA"));
                 rcen2 = rcen2.add(target->get_atom_location(resno2, "CA"));
                 count++;
             }
@@ -2780,19 +3339,24 @@ void Protein::homology_conform(Protein* target)
         }
 
         // Perform the TM region transformation.
-        move_piece(rgstart1, rgend1, (SCoord)rcen2.subtract(rcen1));
+        Point transformation = rcen2.subtract(rcen1);
+        move_piece(rgstart0, rgend0, (SCoord)transformation);
+        #if _dbg_homology
+        cout << "Region " << hxno << " (" << rgstart0 << "-" << rgend0 << ")" << " transformed by " << transformation.magnitude() << "A" << endl;
+        #endif
 
+        // Compute the TM region rotation.
         Point axis(0,0,0);
-        Point rcen = get_region_center(rgstart1, rgend1);
-        float theta;
+        Point rcen = get_region_center(rgstart2, rgend2);
+        float theta = 0;
         count = 0;
         for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
         {
-            int i = resno1 - bw50a;
+            i = resno1 - bw50a;
             resno2 = bw50b + i;
             if (resno2 >= rgstart2 && resno2 <= rgend2)
             {
-                Point caloc1 = get_atom_location(resno1, "CA"),
+                Point caloc1 = reference->get_atom_location(resno1, "CA"),
                       caloc2 = target->get_atom_location(resno2, "CA");
                 Rotation rot = align_points_3d(caloc1, caloc2, rcen);
 
@@ -2809,211 +3373,217 @@ void Protein::homology_conform(Protein* target)
         }
 
         // Perform the TM region rotation.
-        rotate_piece(rgstart1, rgend1, rcen, axis, theta);
+        rotate_piece(rgstart0, rgend0, rcen, axis, theta);
+        #if _dbg_homology
+        cout << "Region " << hxno << " rotated " << theta*fiftyseven << "deg." << endl;
+        #endif
+
+
+        #if homology_long_axis_rotations
+        // Compute the TM region long axes.
+        Point rgn_begin(0,0,0), rgn_end(0,0,0);
+        l = 0;
+        bool starting = true;
+        for (resno1 = rgstart1; resno1 <= rgend1; resno1++)
+        {
+            AminoAcid* aa = get_residue(resno1);
+            if (!aa) continue;
+
+            i = resno1 - bw50a;
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                Point caloc2 = target->get_atom_location(resno2, "CA");
+                if (starting) rgn_begin = rgn_begin.add(caloc2);
+                else rgn_end = rgn_end.add(caloc2);
+
+                l++;
+                if (l >= 4)
+                {
+                    if (starting)
+                    {
+                        rgn_begin.scale(rgn_begin.magnitude()/l);
+                        resno1 = rgend1 - 4;
+                        l = 0;
+                        starting = false;
+                    }
+                    else
+                    {
+                        rgn_end.scale(rgn_end.magnitude()/l);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (starting || !l) continue;
+
+        // Compute the TM region long-axis rotation.
+        axis = rgn_end.subtract(rgn_begin);
+        theta = 0;
+        count = 0;
+        for (resno1 = rgstart0; resno1 <= rgend0; resno1++)
+        {
+            i = resno1 - get_bw50(hxno);
+            resno2 = bw50b + i;
+            if (resno2 >= rgstart2 && resno2 <= rgend2)
+            {
+                Point caloc1 = get_atom_location(resno1, "CA"),
+                      caloc2 = target->get_atom_location(resno2, "CA");
+
+                theta += find_angle_along_vector(caloc1, caloc2, rgn_begin, axis);
+                count++;
+            }
+        }
+
+        if (count)
+        {
+            theta/=count;
+        }
+
+        // Perform the TM region long-axis rotation.
+        rotate_piece(rgstart0, rgend0, rgn_begin, axis, theta);
+        #if _dbg_homology
+        cout << "Region " << hxno << " long-axis rotated " << theta*fiftyseven << "deg." << endl;
+        #endif
+        #endif
+
+        // if (helix) backconnect(rgend1+1, helix-1);
     }
 
-    // Prepare for clash minimization.
-    float dx[10], dy[10], dz[10];
-    float target_clash[10], attained[10];
+    #if _dbg_homology
+    cout << "Minimizing clashes..." << endl;
+    #endif
+    get_internal_clashes(1, 9999, true, 25);
 
-    if (!target->get_residue(target->get_region_start("TMR3"))->get_hydrogen_count())
+    #if homology_region_optimization
+    for (l=0; l<20; l++)
     {
         #if _dbg_homology
-        cout << "Hydrogenating target..." << endl;
+        cout << endl << flush;
         #endif
-        //
-        for (i=1; i<=target->get_end_resno(); i++)
-        {
-            AminoAcid* aa = target->get_residue(i);
-            if (aa) aa->hydrogenate();
-        }
-    }
 
-    for (hxno = 1; hxno <= 7; hxno++)
-    {
-        dx[hxno] = dy[hxno] = dz[hxno] = 0.5;
-        attained[hxno] = false;
-    
-        sprintf(buffer, "TMR%d", hxno);
-        int rgstart2 = target->get_region_start(buffer);
-        int rgend2 = target->get_region_end(buffer);
-        target_clash[hxno] = target->get_internal_clashes(rgstart2, rgend2, false);
-    }
-
-    return;
-
-    // Repack the TM regions, then adjust their locations and rotations to minimize clashes.
-    Pose putitback[get_end_resno()+10];
-    for (i=0; i<100; i++)
-    {
-        bool repack = (i < 10 || i >= 90);
-        int num_attained = 0;
+        float total_motion = 0;
         for (hxno = 1; hxno <= 7; hxno++)
         {
-            if (attained[hxno])
-            {
-                num_attained++;
-                continue;
-            }
-
             sprintf(buffer, "TMR%d", hxno);
-            int rgstart1 = get_region_start(buffer);
-            int rgend1 = get_region_end(buffer);
+            int rgstart = get_region_start(buffer);
+            int rgend = get_region_end(buffer);
 
-            float before = get_internal_clashes(rgstart1, rgend1, repack);
-            int j;
-            for (j=rgstart1; j <= rgend1; j++)
-            {
-                AminoAcid* aa = get_residue(j);
-                if (aa) putitback[j].copy_state((Molecule*)aa);
-            }
+            SCoord transform;
+            Rotation rotation;
 
-            // "soft"-manipulate the region to minimize clashes.
-            Point ptx(dx[hxno], 0, 0);
-            move_piece(rgstart1, rgend1, (SCoord)ptx);
-            float after = get_internal_clashes(rgstart1, rgend1, repack);
+            region_optimal_positioning(rgstart, rgend, &transform, &rotation, nullptr);
 
-            if (after > before)
-            {
-                ptx.x *= -1;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].restore_state((Molecule*)aa);
-                }
-                dx[hxno] *= -0.666;
-            }
-            else
-            {
-                before = after;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].copy_state((Molecule*)aa);
-                }
-            }
-
-            Point pty(0, dy[hxno], 0);
-            move_piece(rgstart1, rgend1, (SCoord)pty);
-            after = get_internal_clashes(rgstart1, rgend1, repack);
-
-            if (after > before)
-            {
-                pty.y *= -1;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].restore_state((Molecule*)aa);
-                }
-                dy[hxno] *= -0.666;
-            }
-            else
-            {
-                before = after;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].copy_state((Molecule*)aa);
-                }
-            }
-
-            Point ptz(0, 0, dz[hxno]);
-            move_piece(rgstart1, rgend1, (SCoord)ptz);
-            after = get_internal_clashes(rgstart1, rgend1, repack);
-
-            if (after > before)
-            {
-                ptz.z *= -1;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].restore_state((Molecule*)aa);
-                }
-                dz[hxno] *= -0.666;
-            }
-            else
-            {
-                before = after;
-                for (j=rgstart1; j <= rgend1; j++)
-                {
-                    AminoAcid* aa = get_residue(j);
-                    if (aa) putitback[j].copy_state((Molecule*)aa);
-                }
-            }
+            total_motion += transform.r + rotation.a*fiftyseven;
 
             #if _dbg_homology
-            cout << "Homology iteration " << i << " helix " << hxno << " clashes " << before << " vs. target " << target_clash[hxno] << endl;
+            Point ptx = transform;
+            cout << buffer << " should move " << ptx << " and rotate " << rotation << endl << flush;
             #endif
 
-            if (before <= target_clash[hxno]) attained[hxno] = true;
+            transform.r *= 0.2;
+            rotation.a *= 0.333;
+
+            Point rgncenter = get_region_center(rgstart, rgend);
+
+            move_piece(rgstart, rgend, transform);
+
+            // rotate_piece(rgstart, rgend, rgncenter, rotation.v, rotation.a);
         }
 
-        if (num_attained == 7) break;
+        if (total_motion < 0.1) break;
     }
-
-    // TODO: Should figure out how to do homology for the EXR and CYT loops. At minimum the EXR.
-
-
-    std::vector<Region> helices;
-    for (i=1; i<=7; i++)
+    #else
+    for (l=0; l<50; l++)
     {
-        sprintf(buffer, "TMR%d", i);
-        Region rgn;
-        rgn.end = get_region_end(buffer);
-        rgn.name = buffer;
-        rgn.start = get_region_start(buffer);
-        helices.push_back(rgn);
-    }
+        int nummoved = 0;
+        for (hxno = 1; hxno <= 7; hxno++)
+        {
+            sprintf(buffer, "TMR%d", hxno);
+            int rgstart0 = get_region_start(buffer);
+            int rgend0 = get_region_end(buffer);
+            float threshold = clash_limit_per_aa * (rgend0 - rgstart0);
+            float f = get_internal_clashes(rgstart0, rgend0, true, 10);
 
-    for (i=0; i<20; i++)
-    {
-        soft_iteration(helices, nullptr);
+            #if _dbg_homology
+            cout << "Helix " << hxno << " is clashy " << f << " of threshold " << threshold << endl;
+            #endif
+
+            if (f < threshold) continue;
+            if (hxno == 3) continue;
+
+            SCoord clashmov = last_int_clash_dir;
+            clashmov.r = -0.003 * (f - threshold);
+            #if _dbg_homology
+            cout << "Motion is " << clashmov.r << " A." << endl;
+            #endif
+            if (fabs(clashmov.r) < 0.01) continue;
+
+            #if _dbg_homology
+            cout << "Moving " << rgstart0 << "-" << rgend0 << " by " << clashmov << endl;
+            #endif
+
+            move_piece(rgstart0, rgend0, clashmov);
+            nummoved++;
+        }
+
+        if (!nummoved) break;
     }
+    #endif
+
+    mass_undoable = wmu;
 }
 
 void Protein::bridge(int resno1, int resno2)
 {
+    save_undo_state();
     AminoAcid *aa1 = get_residue(resno1), *aa2 = get_residue(resno2);
     if (!aa1 || !aa2) return;
 
     aa1->movability = aa2->movability = MOV_FLEXONLY;
 
-    Molecule** mols = new Molecule*[3];
+    _INTERA_R_CUTOFF = aa1->get_CA_location().get_3d_distance(aa2->get_CA_location())
+        + aa1->get_reach() + aa2->get_reach() + _DEFAULT_INTERA_R_CUTOFF;
+    
+    float r = aa1->get_CA_location().get_3d_distance(aa2->get_CA_location()) - aa1->get_reach() - aa2->get_reach();
+    if (r > 2.5)
+    {
+        aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa2->get_reach_atom()->get_location());
+        aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa1->get_reach_atom()->get_location());
+        aa1->conform_atom_to_location(aa1->get_reach_atom()->name, aa2->get_reach_atom()->get_location());
+        aa2->conform_atom_to_location(aa2->get_reach_atom()->name, aa1->get_reach_atom()->get_location());
+    }
+
+    Molecule* mols[3];
     mols[0] = aa1;
     mols[1] = aa2;
     mols[2] = nullptr;
 
-    Molecule::multimol_conform(mols, 25);
+    Molecule::conform_molecules(mols, 15);
 
     Molecule** mols2;
 
     mols2 = (Molecule**)get_residues_can_clash(resno1);
-    Molecule::multimol_conform(mols, mols2, 25);
+    Molecule::conform_molecules(mols, mols2, 10);
 
     mols2 = (Molecule**)get_residues_can_clash(resno2);
-    Molecule::multimol_conform(mols, mols2, 25);
+    Molecule::conform_molecules(mols, mols2, 10);
 
-    delete mols;
+    Molecule::conform_molecules(mols, 15);
 
-    aa1->movability = MOV_FLXDESEL;
-    aa2->movability = MOV_FLXDESEL;
-}
+    aa1->movability = MOV_PINNED;
+    aa2->movability = MOV_PINNED;
 
-SoftBias* Protein::get_soft_bias_from_region(const char* region)
-{
-    int sz = soft_biases.size();
-    if (!sz) return nullptr;
-    int i;
-    for (i=0; i<sz; i++)
-    {
-        if (soft_biases[i].region_name == (std::string)region) return &soft_biases[i];
-    }
-    return nullptr;
+    _INTERA_R_CUTOFF = _DEFAULT_INTERA_R_CUTOFF;
 }
 
 void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
 {
-    //
+    save_undo_state();
+    bool wmu = mass_undoable;
+    mass_undoable = true;
+
     int l;
     float prebind;
 
@@ -3022,7 +3592,6 @@ void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
     {
         for (l=0; l<sz; l++)
         {
-            SoftBias* sb = get_soft_bias_from_region(l_soft_rgns[l].name.c_str());
             if (!l) prebind = (ligand ? get_intermol_binding(ligand)*soft_ligand_importance : 0) + get_internal_binding()*_kJmol_cuA;         // /'kʒmɑɫ.kju.ə/
             
             #if _dbg_soft
@@ -3031,39 +3600,6 @@ void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
 
             int tweak = rand() % 6;
             float amount = nanf("unbiased");
-
-            if (sb)
-            {
-                switch (tweak)
-                {
-                    case 0:
-                    amount = sb->radial_transform;
-                    break;
-
-                    case 1:
-                    amount = sb->angular_transform;
-                    break;
-
-                    case 2:
-                    amount = sb->vertical_transform;
-                    break;
-
-                    case 3:
-                    amount = sb->helical_rotation;
-                    break;
-
-                    case 4:
-                    amount = sb->radial_rotation;
-                    break;
-
-                    case 5:
-                    amount = sb->transverse_rotation;
-                    break;
-
-                    default:
-                    ;
-                }
-            }
 
             if (isnan(amount) || !amount) amount = frand(-1, 1);
             else
@@ -3203,6 +3739,301 @@ void Protein::soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand)
             #endif
         }
     }
+
+    mass_undoable = wmu;
 }
 
+void Protein::minimize_residue_clashes(int resno)
+{
+    AminoAcid** caa = get_residues_can_clash(resno);
+    if (!caa) return;
 
+    int i;
+    for (i=0; caa[i]; i++);     // count.
+
+    Molecule* mols[i+4];
+    MovabilityType mt[i+4];
+    AminoAcid* aa = get_residue(resno);
+    mols[0] = (Molecule*)aa;
+    if (!aa) return;
+    mt[0] = aa->movability;
+    aa->movability = MOV_FLEXONLY;
+
+    for (i=0; caa[i]; i++)
+    {
+        mt[i+1] = caa[i]->movability;
+        mols[i+1] = (Molecule*)caa[i];
+        caa[i]->movability = MOV_NONE;
+    }
+    mols[i+1] = nullptr;
+
+    Molecule::conform_molecules(mols, 20);
+
+    for (i=0; caa[i]; i++)
+    {
+        caa[i]->movability = mt[i+1];
+    }
+    aa = get_residue(resno);
+    aa->movability = mt[0];
+}
+
+float Protein::binding_to_nearby_residues(int resno)
+{
+    AminoAcid** caa = get_residues_can_clash(resno);
+    if (!caa) return 0;
+
+    AminoAcid* aa = get_residue(resno);
+    if (!aa) return 0;
+
+    return aa->get_intermol_binding(caa);
+}
+
+#define dbg_region_can_move 0
+
+float Protein::region_can_move(int startres, int endres, SCoord direction, bool repack, int isr, int ier)
+{
+    int n = get_end_resno();
+    Pose revert_to[n+1];
+    std::string debug_msg;
+
+    stop1 = stop2 = nullptr;
+    stop1a = stop2a = nullptr;
+
+    int i, j, l;
+
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid *aa = get_residue(i);
+        if (aa) revert_to[i].copy_state(aa);
+    }
+
+    float result = 0, increment = 1, clash;
+
+    for (l=0; l<200; l++)
+    {
+        direction.r = increment;
+        move_piece(startres, endres, direction);
+        if (repack) get_internal_clashes(startres, endres, true);
+
+        clash = 0;
+        AminoAcid *aa1, *aa2;
+        for (i=startres; i<=endres; i++)
+        {
+            aa1 = get_residue(i);
+            if (!aa1) continue;
+
+            for (j=1; j<=n; j++)
+            {
+                if (j >= startres-7 && j <= endres+7) continue;
+                if (j >= isr && j <= ier) continue;
+                aa2 = get_residue(j);
+                if (!aa2->can_reach(aa1)) continue;
+                float c = aa1->get_intermol_clashes(aa2);
+                if (c > clash)
+                {
+                    clash = c;
+                    debug_msg = (std::string)aa1->get_3letter() + std::to_string(aa1->get_residue_no())
+                        + (std::string)" clashes by " + std::to_string(c)
+                        + (std::string)" with "
+                        + (std::string)aa2->get_3letter() + std::to_string(aa2->get_residue_no());
+                    stop1 = aa1;
+                    stop2 = aa2;
+                    stop1a = aa1->clash1;
+                    stop2a = aa1->clash2;
+                }
+            }
+        }
+
+        if (clash > clash_limit_per_aa)
+        {
+            #if dbg_region_can_move
+            cout << "At " << (result+increment) << ", " << debug_msg << "." << endl;
+            #endif
+
+            direction.r *= -1;
+            move_piece(startres, endres, direction);
+            increment *= 0.81;
+        }
+        else result += increment;
+
+        if (fabs(increment) < 0.01) break;
+    }
+
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid *aa = get_residue(i);
+        if (aa) revert_to[i].restore_state(aa);
+    }
+
+    return result;
+}
+
+float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, bool repack, float eca, int isr, int ier)
+{
+    int n = get_end_resno();
+    Pose revert_to[n+1];
+    std::string debug_msg;
+
+    stop1 = stop2 = nullptr;
+    stop1a = stop2a = nullptr;
+
+    int i, j, l;
+
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid *aa = get_residue(i);
+        if (aa) revert_to[i].copy_state(aa);
+    }
+
+    float result = 0, increment = fiftyseventh*5, clash, initclash;
+
+    for (l=0; l<200; l++)
+    {
+        rotate_piece(startres, endres, axis.origin, axis, increment);
+
+        clash = 0;
+        AminoAcid *aa1, *aa2;
+        for (i=startres; i<=endres; i++)
+        {
+            aa1 = get_residue(i);
+            if (!aa1) continue;
+
+            for (j=1; j<=n; j++)
+            {
+                if (j >= startres-7 && j <= endres+7) continue;
+                if (j >= isr && j <= ier) continue;
+                aa2 = get_residue(j);
+                if (!aa2->can_reach(aa1)) continue;
+
+                float c = aa1->get_intermol_clashes(aa2);
+
+                if (repack && c > clash)
+                {
+                    Molecule* mols[3];
+                    mols[0] = (Molecule*)aa1;
+                    mols[1] = (Molecule*)aa2;
+                    mols[2] = nullptr;
+
+                    Molecule::conform_molecules(mols, 20);
+
+                    c = aa1->get_intermol_clashes(aa2);
+                }
+
+                if (c > clash)
+                {
+                    clash = c;
+                    debug_msg = (std::string)aa1->get_3letter() + std::to_string(aa1->get_residue_no())
+                        + (std::string)" clashes by " + std::to_string(c)
+                        + (std::string)" with "
+                        + (std::string)aa2->get_3letter() + std::to_string(aa2->get_residue_no());
+                    stop1 = aa1;
+                    stop2 = aa2;
+                    stop1a = aa1->clash1;
+                    stop2a = aa1->clash2;
+                }
+            }
+        }
+
+        if (!l) initclash = clash;
+        if (clash > clash_limit_per_aa+eca && clash > 1.1*initclash)
+        {
+            // cout << "At " << ((result+increment)*fiftyseven) << "deg, " << debug_msg << "." << endl;
+            rotate_piece(startres, endres, axis.origin, axis, -increment);
+            increment *= 0.81;
+        }
+        else
+        {
+            result += increment;
+            initclash = clash;
+        }
+
+        if (fabs(increment) < 0.01) break;
+    }
+
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid *aa = get_residue(i);
+        if (aa) revert_to[i].restore_state(aa);
+    }
+
+    return result;
+}
+
+void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r, Protein** p)
+{
+    if (!x || !r)
+    {
+        cout << "Protein::region_optimal_positioning() output parameters cannot be null." << endl;
+        throw -1;
+    }
+
+    int i, j, n;
+    for (j=0; p && p[j]; j++);          // Count other strands.
+
+    Protein* strands[j+2];
+
+    strands[0] = this;
+    for (i=0; i<j; i++) strands[i+1] = p[i];
+    strands[i+1] = nullptr;
+    AminoAcid* reaching[1024];
+
+    int resno, divisor = 0;
+    x->phi = x->theta = x->r = 0;
+
+    Point sum_pt(0,0,0), sum_aln(0,0,0);
+    Point center = get_region_center(sr, er);
+
+    for (resno = sr; resno <= er; resno++)
+    {
+        Star aa;
+        aa.paa = get_residue(resno);
+        if (!aa.n) continue;
+        Point CA = aa.paa->get_CA_location();
+        bool residue_counted_yet = false;
+
+        for (i=0; strands[i]; i++)
+        {
+            n = strands[i]->get_residues_can_clash_ligand(reaching, aa.pmol, aa.paa->get_CA_location(), Point(7,7,7), nullptr);
+            for (j=0; j<n; j++)
+            {
+                /*float e = -aa.pmol->get_intermol_binding(reaching[j]);
+                if (e < clash_limit_per_aa) continue;*/
+
+                SCoord motion = aa.pmol->motion_to_optimal_contact(reaching[j]);
+                if (fabs(motion.r) < 0.1) continue;
+
+                Point pt_temp = *x;
+                Point pt_add = motion;
+                Point pt_diff = aa.paa->get_CA_location().subtract(reaching[j]->get_CA_location());
+
+                if (pt_add.x * sgn(pt_diff.x) > pt_temp.x * sgn(pt_diff.x)) pt_temp.x = pt_add.x;
+                if (pt_add.y * sgn(pt_diff.y) > pt_temp.y * sgn(pt_diff.y)) pt_temp.y = pt_add.y;
+                if (pt_add.z * sgn(pt_diff.z) > pt_temp.z * sgn(pt_diff.z)) pt_temp.z = pt_add.z;
+
+                *x = pt_temp;
+
+                if (!residue_counted_yet)
+                {
+                    divisor++;
+                    residue_counted_yet = true;
+                }
+
+                Point CA_new = CA.add(motion);
+
+                if (CA.y > center.y)
+                {
+                    sum_pt = sum_pt.add(CA.subtract(center));
+                    sum_aln = sum_aln.add(CA_new.subtract(center));
+                }
+                else
+                {
+                    sum_pt = sum_pt.add(center.subtract(CA));
+                    sum_aln = sum_aln.add(center.subtract(CA_new));
+                }
+            }
+        }
+    }
+
+    // if (divisor) x->r /= divisor;
+    *r = align_points_3d(sum_pt, sum_aln, Point(0,0,0));
+}

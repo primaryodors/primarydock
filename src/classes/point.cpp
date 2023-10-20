@@ -14,7 +14,7 @@ Point::Point()
     x = y = z = 0;
 }
 
-Point::Point(float px, float py, float pz)
+Point::Point(double px, double py, double pz)
 {
     x = px;
     y = py;
@@ -97,7 +97,7 @@ float Point::get_3d_distance(const Point* reference)
 std::string Point::printable() const
 {
     std::stringstream buffer;
-    buffer << "[" << x << "," << y << "," << z << "]";
+    buffer << "[" << (0.001 * (int)(x*1000)) << "," << (0.001 * (int)(y*1000)) << "," << (0.001 * (int)(z*1000)) << "]";
     return buffer.str();
 }
 
@@ -118,9 +118,9 @@ char* Rotation::printable()
 Point Point::multiply_3d_distance(const Point* reference, float r_mult)
 {
     Point retval;
-    retval.x = x*r_mult;
-    retval.y = y*r_mult;
-    retval.z = z*r_mult;
+    retval.x = (x-reference->x)*r_mult+reference->x;
+    retval.y = (y-reference->y)*r_mult+reference->y;
+    retval.z = (z-reference->z)*r_mult+reference->z;
     return retval;
 }
 
@@ -166,7 +166,7 @@ Point::Point(SCoord v)
 
 SCoord::SCoord(const Point* from)
 {
-    float pxz = from->x*from->x + from->z*from->z;
+    double pxz = from->x*from->x + from->z*from->z;
     r = sqrt(pxz + from->y*from->y);
     pxz = sqrt(pxz);
     phi = find_angle(from->z, from->x);
@@ -175,21 +175,31 @@ SCoord::SCoord(const Point* from)
 
 SCoord::SCoord(const Point from)
 {
-    float pxz = from.x*from.x + from.z*from.z;
+    double pxz = from.x*from.x + from.z*from.z;
     r = sqrt(pxz + from.y*from.y);
     pxz = sqrt(pxz);
     phi = find_angle(from.z, from.x);
     theta = find_angle(pxz, from.y);
 }
 
-SCoord::SCoord(float lr, float ltheta, float lphi)
+SCoord::SCoord(double lr, double ltheta, double lphi)
 {
     r = lr;
     theta = ltheta;
     phi = lphi;
 }
 
-
+// https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+float Point::get_distance_to_line(Point a, Point b)
+{
+    float r2 = pow(a.get_3d_distance(b), 2);
+    if (!r2) return get_3d_distance(a);
+    
+    float t = fmax(0, fmin(1,  ((x - a.x) * (b.x - a.x) + (y - a.y) * (b.y - a.y) + (z - a.z) * (b.z - a.z)) / r2));
+    Point p(a.x + t * (b.x-a.x), a.y + t * (b.y-a.y), a.z + t * (b.z-a.z));
+    
+    return get_3d_distance(p);
+}
 
 
 Point average_of_points(Point* points, int count)
@@ -313,7 +323,7 @@ Point rotate3D(Point point, Point source, SCoord axis, float theta)
 
 Point rotate3D(Point* point, Point* source, SCoord* axis, float theta)
 {
-    // shamelessly copied from http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
+    // Originally from http://inside.mines.edu/fs_home/gmurray/ArbitraryAxisRotation/
 
     if (!source)
     {
@@ -324,9 +334,9 @@ Point rotate3D(Point* point, Point* source, SCoord* axis, float theta)
     if (!axis->r) return *point;
     Point lvec(axis);
 
-    float x = point->x, y = point->y, z = point->z;
-    float u = lvec.x / axis->r, v = lvec.y / axis->r, w = lvec.z / axis->r;
-    float a, b, c;
+    double x = point->x, y = point->y, z = point->z;
+    double u = lvec.x / axis->r, v = lvec.y / axis->r, w = lvec.z / axis->r;
+    double a, b, c;
     if (source)
     {
         a = source->x;
@@ -334,20 +344,20 @@ Point rotate3D(Point* point, Point* source, SCoord* axis, float theta)
         c = source->z;
     }
     else a = b = c = 0;
-    float u2 = u*u;
-    float v2 = v*v;
-    float w2 = w*w;
-    float sint = sin(theta), cost = cos(theta), _1_cost = (1.0 - cost);
+    double u2 = u*u;
+    double v2 = v*v;
+    double w2 = w*w;
+    double sint = sin(theta), cost = cos(theta), _1_cost = (1.0 - cost);
 
-    float x1 = (a * (v2+w2) - u * (b*v + c*w - u*x - v*y - w*z)) * _1_cost
+    double x1 = (a * (v2+w2) - u * (b*v + c*w - u*x - v*y - w*z)) * _1_cost
                + x * cost
                + (-c*v + b*w - w*y + v*z) * sint;
 
-    float y1 = (b * (u2+w2) - v * (a*u + c*w - u*x - v*y - w*z)) * _1_cost
+    double y1 = (b * (u2+w2) - v * (a*u + c*w - u*x - v*y - w*z)) * _1_cost
                + y * cost
                + ( c*u - a*w + w*x - u*z) * sint;
 
-    float z1 = (c * (u2+v2) - w * (a*u + b*v - u*x - v*y - w*z)) * _1_cost
+    double z1 = (c * (u2+v2) - w * (a*u + b*v - u*x - v*y - w*z)) * _1_cost
                + z * cost
                + (-b*u + a*v - v*x + u*y) * sint;
 

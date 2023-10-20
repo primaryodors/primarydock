@@ -19,7 +19,7 @@ C		Cys		cysteine			N[C@H](C(=O)O)CS                                         8.37
 E		Glu		glutamic_acid		N[C@H](C(=O)O)CCC(=O)[O-]                                4.07             .146
 Q		Gln		glutamine			N[C@H](C(=O)O)CCC(=O)N                                   -                .237
 G		Gly		glycine				NCC(=O)O
-H		His		histidine			N[C@H](C(=O)O)CC1N=CNC=1                                 6.04             .063
+H		His		histidine			N[C@H](C(=O)O)Cc1nc[nH]c1                             6.04             .063
 O		Hyp		hydroxyproline		N1[C@H](C(=O)O)CC[C@H]1O
 I		Ile		isoleucine			N[C@H](C(=O)O)[C@H](CC)C                                 -                .142
 L		Leu		leucine				N[C@H](C(=O)O)CC(C)C                                     -                .132
@@ -34,5 +34,4 @@ T		Thr		threonine			N[C@H](C(=O)O)[C@@H](C)O                                 -  
 W		Trp		tryptophan			N[C@H](C(=O)O)CC1=CNc2ccccc21                            -                .020
 Y		Tyr		tyrosine			N[C@H](C(=O)O)Cc1ccc(O)cc1                              10.46             .071
 V		Val		valine				N[C@H](C(=O)O)C(C)C                                      -                .080
-
 

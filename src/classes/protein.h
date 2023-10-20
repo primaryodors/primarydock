@@ -22,6 +22,15 @@ struct Region
     std::string name="";
 };
 
+class BallesterosWeinstein
+{
+    public:
+    int helix_no = 0;
+    int member_no = 0;
+
+    void from_string(const char* inpstr);
+};
+
 struct SoftBias
 {
     std::string region_name;
@@ -37,7 +46,9 @@ class Protein
 {
 public:
     // Constructors.
+    Protein();
     Protein(const char* name);
+    ~Protein();
 
     // Build functions.
     bool add_residue(const int resno, const char aaletter);
@@ -54,7 +65,8 @@ public:
     bool disulfide_bond(int resno1, int resno2);
 
     // Serialization.
-    int load_pdb(FILE* infile, int resno_offset = 0);				// Returns number of residues loaded.
+    void set_name_from_pdb_name(const char* pdb_name);
+    int load_pdb(FILE* infile, int resno_offset = 0, char chain = 'A');				// Returns number of residues loaded.
     void save_pdb(FILE* outfile, Molecule* ligand = nullptr);
     void end_pdb(FILE* outfile);
     void revert_to_pdb();
@@ -67,6 +79,9 @@ public:
     Molecule* metals_as_molecule();
     int get_metals_count();
     AminoAcid* get_residue(int resno);
+    AminoAcid* get_residue(BallesterosWeinstein bw);
+    AminoAcid* get_residue_bw(int helixno, int bwno);
+    AminoAcid* get_residue_bw(const char* bwno);
     Region get_region(std::string name);
     const Region* get_regions() { return regions; }
     int get_region_end(std::string name);
@@ -78,17 +93,23 @@ public:
         return std::string(name);
     }
     Point get_atom_location(int resno, const char* aname);
-    std::vector<std::string> get_remarks(std::string search_for = "");
+    void add_remark(const char* remark);
     void add_remark(std::string new_remark);
+    std::vector<std::string> get_remarks(std::string search_for = "");
     int get_bw50(int helixno);
+    int search_sequence(const int start_resno, const int end_resno, const char* search_for, const int threshold = -1, int* similarity = nullptr);
+
+    char get_pdb_chain() const { return pdbchain; }
+    char set_pdb_chain(char chain);
 
     // Metrics functions.
-    float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false);
+    float get_internal_clashes(int start_resno = 0, int end_resno = 0, bool repack = false, int repack_iters = 10);
     float get_rel_int_clashes();
     float get_internal_binding();
     float get_intermol_clashes(Molecule* ligand);
     float get_intermol_binding(Molecule* ligand);
     AminoAcid** get_residues_can_clash(int resno);
+    std::vector<AminoAcid*> get_residues_can_clash(int start_resno, int end_resno);
     int get_residues_can_clash_ligand
     (	AminoAcid** reaches_spheroid,
         Molecule* ligand,
@@ -98,6 +119,7 @@ public:
     );
 
     std::vector<AminoAcid*> get_residues_near(Point pt, float max_distance, bool facing=true);
+    std::vector<AminoAcid*> get_contact_residues(Protein* other_prot, float contact_distance = 2.5);
     Molecule** all_residues_as_molecules();
     Molecule** all_residues_as_molecules_except(Molecule** mm);
     Point get_region_center(int startres, int endres);
@@ -105,11 +127,17 @@ public:
     float get_helix_orientation(int startres, int endres);
     Point find_loneliest_point(Point search_center, Point spheroid_size);
     Point estimate_pocket_size(std::vector<AminoAcid*> ba);
+    float binding_to_nearby_residues(int resno);
+    void minimize_residue_clashes(int resno);
+    float region_can_move(int startres, int endres, SCoord direction, bool repack = false, int ignore_startres = 0, int ignore_endres = 0);
+    float region_can_rotate(int startres, int endres, LocatedVector axis, bool repack = false, float extra_clash_allowance = 0, int ignore_startres = 0, int ignore_endres = 0);     // Searches positive theta.
+    void region_optimal_positioning(int startres, int endres, SCoord* output_transformation, Rotation* output_rotation, Protein** other_strands = nullptr);
+    void set_conditional_basicities();
 
     // Motion functions
     void upright();
-    void move_piece(int start_res, int end_res, Point new_center);		// After calling this, you should reconnect the broken ends with conform_backbone().
-    void move_piece(int start_res, int end_res, SCoord move_amt);       // "
+    void move_piece(int start_res, int end_res, Point new_center);
+    void move_piece(int start_res, int end_res, SCoord move_amt);
     LocRotation rotate_piece(int start_res, int end_res, int align_res, Point align_target, int pivot_res = 0);		// If no pivot res, rotate about the center.
     LocRotation rotate_piece(int start_res, int end_res, Rotation rot, int pivot_res);
     LocRotation rotate_piece(int start_res, int end_res, Point origin, SCoord axis, float theta);
@@ -129,6 +157,7 @@ public:
 
     void backconnect(int startres, int endres);
     void find_residue_initial_bindings();
+    void undo();
 
     void make_helix(int startres, int endres, float phi, float psi);
     void make_helix(int startres, int endres, int stopat, float phi, float psi);
@@ -139,16 +168,23 @@ public:
         int iterations
     );
 
-    SoftBias* get_soft_bias_from_region(const char* region);
-    void homology_conform(Protein* target_structure);
+    void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);
     void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
 
     int* mcoord_resnos = NULL;
-    std::vector<SoftBias> soft_biases;
+    
+    SCoord last_uprighted_xform;
+    LocRotation last_uprighted_A, last_uprighted_B;
+    SCoord last_int_clash_dir;
+
+    AminoAcid *stop1, *stop2;
+    Atom *stop1a, *stop2a;
+    int last_saved_atom_number = 0;
 
 protected:
     Atom** ca = nullptr;
+    int arrlimit = 0;
     std::string name;
     char* sequence = nullptr;
     AminoAcid** residues = nullptr;
@@ -160,17 +196,23 @@ protected:
     float initial_int_clashes = 0;
     Region regions[PROT_MAX_RGN];
     region_source regions_from = rgn_none;
-    std::vector<string> remarks;
+    char** remarks = nullptr;
+    int remarksz = 0;
     MetalCoord** m_mcoord = nullptr;
-    std::vector<int> Ballesteros_Weinstein;
+    int Ballesteros_Weinstein[79];
     std::vector<AABridge> aabridges;
     std::vector<Bond*> connections;
     std::vector<Pose> origpdb_residues;
+    char pdbchain = ' ';
+    Pose** undo_poses = nullptr;
+    bool mass_undoable = false;
 
     int* get_residues_in_reach(int resno);
     float get_coord_anomaly(Atom* metal, AminoAcid* coord_res);
     friend void ext_mtl_coord_cnf_cb(int iter);
     void mtl_coord_cnf_cb(int iter);
+    void allocate_undo_poses();
+    void save_undo_state();
 };
 
 extern float *g_rgnxform_r, *g_rgnxform_theta, *g_rgnxform_y, *g_rgnrot_alpha, *g_rgnrot_w, *g_rgnrot_u;

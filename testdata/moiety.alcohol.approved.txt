@@ -1,0 +1,2 @@
+Pattern COH occurs 1 times in molecule.
+C2 O1 H21 

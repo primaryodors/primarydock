@@ -1,0 +1,231 @@
+
+IF $arg2 = "" OR $arg3 = "" DIE "Usage: bin/pepteditor predict/couple.pepd path/to/receptor.pdb GPROT_ID"
+
+LET $rcpfn = $arg2
+LET $gprot = $arg3
+
+
+
+LET %slash = 1
+loop:
+STRPOS $rcpfn.%slash "/" %i
+IF %i = 0 GOTO done
+LET %slash += %i
+GOTO loop
+done:
+
+LET $rcpid = $rcpfn.%slash
+
+STRPOS $rcpid "_" %i
+IF %i = 0 GOTO no_underscore
+LET %i --
+LET $rcpid = $rcpid FROM 1 FOR %i
+no_underscore:
+
+STRPOS $rcpid "-" %i
+IF %i = 0 GOTO no_dash
+LET %i --
+LET $rcpid = $rcpid FROM 1 FOR %i
+no_dash:
+
+STRPOS $rcpid "." %i
+IF %i = 0 GOTO no_dot
+LET %i --
+LET $rcpid = $rcpid FROM 1 FOR %i
+no_dot:
+
+
+
+
+
+IF $arg3 != "hGNAL" GOTO not_Golf
+
+STRAND G
+LOAD "pdbs/Gprot/mTAAR9-hGNAL.pdb" A
+STRAND C
+LOAD "pdbs/Gprot/mTAAR9-hGNAL.pdb" R
+STRAND I
+LOAD "pdbs/mTAAR9.pdb"
+GOTO all_loaded
+
+
+not_Golf:
+
+IF $arg3 != "hGNAS2" GOTO not_Gas
+
+STRAND G
+LOAD "pdbs/Gprot/hOR51E2-hGNAS2.pdb" A
+STRAND C
+LOAD "pdbs/Gprot/hOR51E2-hGNAS2.pdb" R
+STRAND I
+LOAD "pdbs/OR51/OR51E2.upright.pdb"
+GOTO all_loaded
+
+
+not_Gas:
+
+IF $arg3 != "hGNAQ" GOTO not_Gaq
+
+STRAND G
+LOAD "pdbs/Gprot/hAGTR1-hGNAQ.pdb" A
+STRAND C
+LOAD "pdbs/Gprot/hAGTR1-hGNAQ.pdb" R
+STRAND I
+LOAD "pdbs/hAGTR1.pdb"
+GOTO all_loaded
+
+
+not_Gaq:
+
+IF $arg3 != "hGNAO1" DIE "Unknown G protein " $arg3
+
+STRAND G
+LOAD "pdbs/Gprot/rNTR1-hGNAO1.pdb" A
+STRAND C
+LOAD "pdbs/Gprot/rNTR1-hGNAO1.pdb" R
+STRAND I
+LOAD "pdbs/rNTR1.pdb"
+GOTO all_loaded
+
+
+all_loaded:
+
+STRAND A
+LOAD $rcpfn
+HOMOLOGY C I
+GOSUB avoid_gprot_clash
+GOSUB custom6
+
+STRAND A
+LET %658 = %A.6.50 + 8
+DELETE %658 %658
+
+UNCHAIN C
+UNCHAIN I
+STRAND G
+RENUMBER 1 999 500
+
+LET $output_fname = "tmp/coupled." + $rcpid + ".pdb"
+SAVE $output_fname EXIT
+
+
+custom6:
+
+LET %655 = %A.6.50 + 5
+LET $655 = $SEQUENCEA.%655,1
+LET %4551 = %A.45.50 + 1
+LET $4551 = $SEQUENCEA.%4551,1
+
+IF $rcpid = "OR2AT4" LET %TM6_handle = %655 + 4
+ELSE LET %TM6_handle = %655
+LET $TM6_handle = $SEQUENCEA FROM %TM6_handle FOR 1
+
+IF $TM6_handle != "Y" GOTO not_Y655_DE4551
+IF $4551 != "D" AND $4551 != "E" GOTO not_Y655_DE4551
+
+LET @TM6_handle = %TM6_handle
+LET @4551 = %4551
+LET @r = @4551 - @TM6_handle
+LET &r = @r
+# ECHO @TM6_handle " and " @4551 " are " &r " A apart."
+
+IF &r < 9 GOTO already_Y655_DE4551
+
+LET &d = &r - 9
+LET &rat = &d / &r
+LET @d = @r
+LET @d *= &rat
+
+# ECHO @r @d
+
+LET @new = @TM6_handle + @d
+LET %628 = %A.6.50 - 22
+LET %648 = %A.6.50 - 2
+LET %660 = %A.6.50 + 10
+ALIGN %628 %660 1 %648 KEEP %TM6_handle @new
+
+already_Y655_DE4551:
+BRIDGE %TM6_handle %4551
+
+
+not_Y655_DE4551:
+
+LET %659 = %A.6.50 + 9
+LET $659 = $SEQUENCEA.%659,1
+
+IF $659 = "R" LET $atom = "CZ"
+ELSE IF $659 = "K" LET $atom = "NZ"
+ELSE GOTO not_KR659
+
+LET %539 = %A.5.50 - 11
+LET %4552 = %A.45.50 + 2
+
+LET @539 = %539
+LET @4552 = %4552
+LET @target = @539 + @4552
+LET @target /= 2
+
+LET %540 = %539 + 1
+LET %544 = %540 + 4
+BRIDGE %540 %544
+
+LET %543 = %540 + 3
+LET %547 = %540 + 7
+BRIDGE %543 %547
+
+ATOMTO %659 $atom @target
+
+LET %651 = %A.6.50 + 1
+LET @651 = %651
+LET %4553 = %A.45.50 + 3
+
+ATOMTO %4553 EXTENT @651
+
+
+not_KR659:
+
+RETURN
+
+
+avoid_gprot_clash:
+
+STRAND G
+
+SEARCH 1 9999 "X$" %SEQENDG
+
+LET %penult = %SEQENDG - 2
+LET @penult = %penult
+LET %last6 = %SEQENDG - 6
+
+STRAND A
+
+LET %533 = %A.5.50 - 17
+LET %548 = %A.5.50 - 2
+LET %628 = %A.6.50 - 22
+LET %635 = %A.6.50 - 15
+LET %636 = %A.6.50 - 14
+LET %637 = %A.6.50 - 13
+LET %648 = %A.6.50 - 2
+LET %659 = %A.6.50 + 9
+
+LET @5650 = %A.56.50
+LET @636 = %636
+LET @dir = @636 - @penult
+
+LET @648 = %648
+LET @548 = %548
+
+LET @axis = @548 - @648
+
+LET %i = 10
+g_protein_clash_loop:
+LET &energy = 0
+# ECHO "CTNRG G " %penult " " 9999 " A " %635 " " %637 " &energy "
+CTNRG G %penult 9999 A %635 %637 &energy
+# ECHO &energy
+IF &energy > 25 ROTATE @axis 1 %648 %533 %659
+LET %i --
+IF &energy > 25 AND %i > 0 GOTO g_protein_clash_loop
+
+
+RETURN

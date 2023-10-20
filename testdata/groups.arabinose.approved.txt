@@ -1,0 +1,6 @@
+atom_group[ O7 H17 ]
+atom_group[ O8 H18 ]
+atom_group[ O9 H19 ]
+atom_group[ O10 H20 ]
+atom_group[ C1 C2 C3 C5 H11 H12 H13 H14 H15 H16 C4 ]
+atom_group[ O6 ]

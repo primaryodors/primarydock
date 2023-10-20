@@ -148,6 +148,7 @@ $cwd = getcwd();
 chdir(__DIR__);
 chdir("..");
 $prots = json_decode(file_get_contents("data/receptor.json"), true);
+$gprots = json_decode(file_get_contents("data/gprot.json"), true);
 chdir($cwd);
 
 $aminos = 

@@ -1,0 +1,306 @@
+
+##################################################################
+# OR51E2
+
+STRAND I
+LOAD "pdbs/OR51/OR51E2.upright.pdb"
+LOAD "pdbs/Gprot/hOR51E2-hGNAS2.pdb" A P
+LOAD "pdbs/Gprot/hOR51E2-hGNAS2.pdb" R A
+
+LET %bw1_60 = %A.1.50 + 10
+LET %bw2_42 = %A.2.50 -  8
+LET %bw3_42 = %A.3.50 -  8
+LET %bw4_54 = %A.4.50 +  4
+LET %bw5_60 = %A.5.50 + 10
+LET %bw6_48 = %A.6.50 -  2
+LET %bw7_66 = %A.7.50 + 16
+
+STRAND A
+
+GOSUB average_of_centers
+LET @A_center = @center
+
+STRAND I
+
+GOSUB average_of_centers
+LET @I_center = @center
+
+LET @rel = @A_center - @I_center
+MOVEREL 1 9999 @rel
+
+SAVE "pdbs/OR51E2.bna.pdb"
+
+UNCHAIN P
+UNCHAIN A
+
+
+##################################################################
+# mTAAR9
+
+STRAND I
+LOAD "pdbs/mTAAR9.pdb"
+LOAD "pdbs/Gprot/mTAAR9-hGNAL.pdb" A P
+LOAD "pdbs/Gprot/mTAAR9-hGNAL.pdb" R A
+LOAD "pdbs/Gprot/mTAAR9-hGNAS2-spe.pdb" A Q
+LOAD "pdbs/Gprot/mTAAR9-hGNAS2-spe.pdb" R B
+LOAD "pdbs/Gprot/mTAAR9-hGNAS2-pea.pdb" A R
+LOAD "pdbs/Gprot/mTAAR9-hGNAS2-pea.pdb" R C
+LOAD "pdbs/Gprot/mTAAR9-hGNAS2-cad.pdb" A S
+LOAD "pdbs/Gprot/mTAAR9-hGNAS2-cad.pdb" R D
+LOAD "pdbs/Gprot/mTAAR9-hGNAS2-dmcha.pdb" A T
+LOAD "pdbs/Gprot/mTAAR9-hGNAS2-dmcha.pdb" R E
+
+LET %bw1_60 = %I.1.50 + 10
+LET %bw2_42 = %I.2.50 -  8
+LET %bw3_42 = %I.3.50 -  8
+LET %bw4_54 = %I.4.50 +  4
+LET %bw5_60 = %I.5.50 + 10
+LET %bw6_48 = %I.6.50 -  2
+LET %bw7_66 = %I.7.50 + 16
+
+STRAND A
+
+GOSUB average_of_centers
+LET @A_center = @center
+
+STRAND B
+
+GOSUB average_of_centers
+LET @B_center = @center
+
+STRAND C
+
+# ECHO "C:"
+GOSUB average_of_centers
+LET @C_center = @center
+
+STRAND D
+
+GOSUB average_of_centers
+LET @D_center = @center
+
+STRAND E
+
+GOSUB average_of_centers
+LET @E_center = @center
+
+STRAND I
+
+GOSUB average_of_centers
+LET @I_center = @center
+
+STRAND A
+LET @rel = @I_center - @A_center
+MOVEREL 1 9999 @rel
+
+STRAND B
+LET @rel = @I_center - @B_center
+MOVEREL 1 9999 @rel
+
+STRAND C
+LET @rel = @I_center - @C_center
+MOVEREL 1 9999 @rel
+
+STRAND D
+LET @rel = @I_center - @D_center
+MOVEREL 1 9999 @rel
+
+STRAND E
+LET @rel = @I_center - @E_center
+MOVEREL 1 9999 @rel
+
+SAVE "pdbs/mTAAR9.bna.pdb"
+
+STRAND I
+UNCHAIN A
+UNCHAIN B
+UNCHAIN C
+UNCHAIN D
+UNCHAIN E
+UNCHAIN P
+UNCHAIN Q
+UNCHAIN R
+UNCHAIN S
+UNCHAIN T
+
+
+##################################################################
+# BKRB2
+
+STRAND I
+LOAD "pdbs/hBKRB2.pdb"
+LOAD "pdbs/Gprot/hBKRB2-hGNAQ.pdb" A P
+LOAD "pdbs/Gprot/hBKRB2-hGNAQ.pdb" R A
+
+LET %bw1_60 = %A.1.50 + 10
+LET %bw2_42 = %A.2.50 -  8
+LET %bw3_42 = %A.3.50 -  8
+LET %bw4_54 = %A.4.50 +  4
+LET %bw5_60 = %A.5.50 + 10
+LET %bw6_48 = %A.6.50 -  2
+LET %bw7_66 = %A.7.50 + 16
+
+STRAND A
+
+GOSUB average_of_centers
+LET @A_center = @center
+
+STRAND I
+
+GOSUB average_of_centers
+LET @I_center = @center
+
+LET @rel = @A_center - @I_center
+MOVEREL 1 9999 @rel
+
+SAVE "pdbs/BKRB2.bna.pdb"
+
+UNCHAIN P
+UNCHAIN A
+
+
+##################################################################
+# AGTR1
+
+STRAND I
+LOAD "pdbs/hAGTR1.pdb"
+LOAD "pdbs/Gprot/hAGTR1-hGNAQ.pdb" A P
+LOAD "pdbs/Gprot/hAGTR1-hGNAQ.pdb" R A
+
+LET %bw1_60 = %A.1.50 + 10
+LET %bw2_42 = %A.2.50 -  8
+LET %bw3_42 = %A.3.50 -  8
+LET %bw4_54 = %A.4.50 +  4
+LET %bw5_60 = %A.5.50 + 10
+LET %bw6_48 = %A.6.50 -  2
+LET %bw7_66 = %A.7.50 + 16
+
+STRAND A
+
+GOSUB average_of_centers
+LET @A_center = @center
+
+STRAND I
+
+GOSUB average_of_centers
+LET @I_center = @center
+
+LET @rel = @A_center - @I_center
+MOVEREL 1 9999 @rel
+
+SAVE "pdbs/AGTR1.bna.pdb"
+
+UNCHAIN P
+UNCHAIN A
+
+
+##################################################################
+# FFAR1
+
+DOWNLOAD RCSB "8EIT" "pdbs/8eit.pdb" ONCE
+DOWNLOAD AF "O14842" "pdbs/O14842.pdb" ONCE
+
+STRAND A
+LOAD "pdbs/O14842.pdb"
+REGION TMR1 5 36
+REGION TMR2 40 67
+REGION TMR3 76 109
+REGION TMR4 111 145
+REGION TMR5 176 211
+REGION TMR6 214 249
+REGION TMR7 256 275
+REMARK 800 SITE BW 1.50 23
+REMARK 800 SITE BW 2.50 52
+REMARK 800 SITE BW 3.50 104
+REMARK 800 SITE BW 4.50 131
+REMARK 800 SITE BW 5.50 194
+REMARK 800 SITE BW 6.50 239
+REMARK 800 SITE BW 7.50 273
+UPRIGHT
+SAVE "pdbs/FFAR1.pdb"
+STRAND A
+UNCHAIN I
+
+LOAD "pdbs/8eit.pdb" A P
+LOAD "pdbs/8eit.pdb" R A
+
+STRAND A
+REGION TMR1 5 36
+REGION TMR2 40 67
+REGION TMR3 76 109
+REGION TMR4 111 145
+REGION TMR5 176 211
+REGION TMR6 214 249
+REGION TMR7 256 275
+REMARK 800 SITE BW 1.50 23
+REMARK 800 SITE BW 2.50 52
+REMARK 800 SITE BW 3.50 104
+REMARK 800 SITE BW 4.50 131
+REMARK 800 SITE BW 5.50 194
+REMARK 800 SITE BW 6.50 239
+REMARK 800 SITE BW 7.50 273
+UPRIGHT
+
+STRAND I
+LOAD "pdbs/FFAR1.pdb"
+
+LET %bw1_60 = %A.1.50 + 10
+LET %bw2_42 = %A.2.50 -  8
+LET %bw3_42 = %A.3.50 -  8
+LET %bw4_54 = %A.4.50 +  4
+LET %bw5_60 = %A.5.50 + 10
+LET %bw6_48 = %A.6.50 -  2
+LET %bw7_66 = %A.7.50
+
+STRAND A
+
+GOSUB average_of_centers
+LET @A_center = @center
+
+STRAND I
+
+GOSUB average_of_centers
+LET @I_center = @center
+
+LET @rel = @A_center - @I_center
+MOVEREL 1 9999 @rel
+
+SAVE "pdbs/FFAR1.bna.pdb"
+
+UNCHAIN P
+UNCHAIN A
+
+
+QUIT
+
+
+average_of_centers:
+
+LET @c1_60 = %bw1_60
+# ECHO %bw1_60 ": " @c1_60
+LET @c2_42 = %bw2_42
+# ECHO %bw2_42 ": " @c2_42
+LET @c3_42 = %bw3_42
+# ECHO %bw3_42 ": " @c3_42
+LET @c4_54 = %bw4_54
+# ECHO %bw4_54 ": " @c4_54
+LET @c5_60 = %bw5_60
+# ECHO %bw5_60 ": " @c5_60
+LET @c6_48 = %bw6_48
+# ECHO %bw6_48 ": " @c6_48
+LET @c7_66 = %bw7_66
+# ECHO %bw7_66 ": " @c7_66
+
+LET @center = @c1_60 + @c2_42
+LET @center += @c3_42
+LET @center += @c4_54
+LET @center += @c5_60
+LET @center += @c6_48
+LET @center += @c7_66
+LET @center /= 7
+
+RETURN
+
+
+
+

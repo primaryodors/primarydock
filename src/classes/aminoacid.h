@@ -18,6 +18,7 @@ struct AABondDef
 {
     char aname[7];
     char bname[7];
+    int Za = 0, Zb = 0;
     float cardinality=0;
     float acharge=0;
     bool can_rotate=false;
@@ -95,7 +96,8 @@ public:
     }
     bool is_tyrosine_like();		// An amino acid is tyrosine-like if it has an aromatic ring and a non-backbone H-bond acceptor not part of the ring.
     bool is_glycine();              // Glycine is a special case where there are no non-backbone heavy atoms.
-    bool conditionally_basic();
+    bool conditionally_basic() const;
+    float sc_pKa() const;
     float get_reach() const
     {
         return aadef ? aadef->reach : 2.5;
@@ -103,6 +105,8 @@ public:
     bool can_reach(Atom* other) const;
     bool can_reach(Molecule* other) const;
     bool can_reach(AminoAcid* other) const;
+    Atom* get_reach_atom();
+    float CB_angle(Point reference);
     void set_region(const char* regname)
     {
         strcpy(region, regname);
@@ -125,14 +129,15 @@ public:
     {
         return;
     }
-    void rotate(LocatedVector SCoord, float theta);
+    void rotate(LocatedVector vec, float theta);
     LocatedVector rotate_backbone(bb_rot_dir direction, float angle);	// Return the origin and direction of the rotation axis.
     LocRotation rotate_backbone_abs(bb_rot_dir direction, float angle);
     LocRotation* flatten();		// Ensure the peptide bond is coplanar and the CA lies in the same plane. Return LocRotation[5].
+    void ensure_pi_atoms_coplanar();
 
-    Point* predict_previous_COCA();
-    Point* predict_next_NHCA();
-    void glom(Point* predicted, bool CO = false);		// Glom the AA by moving its NHCA or COCA to the result of a predict().
+    void predict_previous_COCA(Point* result);
+    void predict_next_NHCA(Point* result);
+    void attach_to_prediction(Point* predicted, bool CO = false);		// Attach the AA to its neighbor by moving its NHCA or COCA to the result of a predict().
 
     // Bond functions.
     bool disulfide_bond(const AminoAcid* bond_to);
@@ -140,23 +145,36 @@ public:
     Atom* capable_of_inter(intera_type inter);
     LocRotation enforce_peptide_bond(bool cis = false);				// Peptide bonds should almost always be in the trans (E) configuration.
     void hydrogenate(bool steric_only = false);
+    float get_phi();
+    float get_psi();
+    float get_omega();
+    bond_rotation_fail_reason rotate_phi(float rel_angle);
+    bond_rotation_fail_reason rotate_psi(float rel_angle);
 
     // Intermol functions.
     float get_intermol_binding(AminoAcid* neighbor, bool backbone_atoms_only = false);
     float get_intermol_binding(AminoAcid** neighbors, bool backbone_atoms_only = false);
-    float hydrophilicity();
+    float hydrophilicity() const;
+    bool is_alpha_helix();
+    bool is_helix(int periodicity);
+    void set_conditional_basicity(Molecule** nearby_mols);
 
     // Misc.
     void delete_sidechain();
     static Molecule** aas_to_mols(AminoAcid** aas);
-    int similarity_to(const char letter);
+    float similarity_to(const char letter);
+    float similarity_to(const AminoAcid* aa);
     Ring* get_most_distal_arom_ring();
     std::string printable();
+    char get_pdb_chain() const { return pdbchain; }
+    char set_pdb_chain(char chain);
 
     // Public properties.
     int strand;
     int atno_offset=0;
     MetalCoord* m_mcoord=0;
+    Atom* coordmtl = nullptr;
+    bool added_heavies = false;
 
 protected:
     void load_aa_defs();
@@ -167,11 +185,16 @@ protected:
     char region[25];
     AADef* aadef=0;
     AminoAcid *prev_aa=0, *next_aa=0;
-    float current_phi = M_PI, current_psi = M_PI, current_omega = M_PI;
+    char pdbchain = ' ';
+
+    Atom* proton = nullptr;
+    Atom* protonated = nullptr;
 };
 
-extern AADef aa_defs[256];		// Indexed by ASCII value of one-letter code.
+extern AADef aa_defs[256];		        // Indexed by ASCII value of one-letter code.
+extern AminoAcid* aa_archetypes[256];    // Ditto.
 extern char* override_aminos_dat;
+extern float aa_sim_xref[65536];
 
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa);
 std::ostream& operator<<(std::ostream& os, const AABondDef& b);

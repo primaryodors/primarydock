@@ -1,0 +1,70 @@
+Point pt is located at 2,-5,3.
+Points pt1 and pt2 are 3.4641 Angstroms apart.
+Point pt is not in bounding box [pt1, pt2].
+Point pt3 is in bounding box [pt1, pt2].
+Points pt and pt1 are 90 degrees apart relative to [0,0,0].
+SCoord v from point pt5 has r=3.55809, theta=60.6047, phi=246.371.
+Point pt6 from SCoord v is 0 Angstroms from pt5.
+Rotation 0 points are 0 degrees apart.
+Rotation 5.72958 points are 5.72957 degrees apart.
+Rotation 11.4592 points are 11.4592 degrees apart.
+Rotation 17.1887 points are 17.1887 degrees apart.
+Rotation 22.9183 points are 22.9183 degrees apart.
+Rotation 28.6479 points are 28.6479 degrees apart.
+Rotation 34.3775 points are 34.3775 degrees apart.
+Rotation 40.107 points are 40.107 degrees apart.
+Rotation 45.8366 points are 45.8366 degrees apart.
+Rotation 51.5662 points are 51.5662 degrees apart.
+Rotation 57.2958 points are 57.2958 degrees apart.
+Rotation 63.0254 points are 63.0254 degrees apart.
+Rotation 68.7549 points are 68.755 degrees apart.
+Rotation 74.4845 points are 74.4845 degrees apart.
+Rotation 80.2141 points are 80.2141 degrees apart.
+Rotation 85.9437 points are 85.9437 degrees apart.
+Rotation 91.6733 points are 91.6733 degrees apart.
+Rotation 97.4028 points are 97.4028 degrees apart.
+Rotation 103.132 points are 103.132 degrees apart.
+Rotation 108.862 points are 108.862 degrees apart.
+Rotation 114.592 points are 114.592 degrees apart.
+Rotation 120.321 points are 120.321 degrees apart.
+Rotation 126.051 points are 126.051 degrees apart.
+Rotation 131.78 points are 131.78 degrees apart.
+Rotation 137.51 points are 137.51 degrees apart.
+Rotation 143.239 points are 143.239 degrees apart.
+Rotation 148.969 points are 148.969 degrees apart.
+Rotation 154.699 points are 154.699 degrees apart.
+Rotation 160.428 points are 160.428 degrees apart.
+Rotation 166.158 points are 166.158 degrees apart.
+Rotation 171.887 points are 171.887 degrees apart.
+Rotation 177.617 points are 177.617 degrees apart.
+Rotation 183.346 points are 176.653 degrees apart.
+Rotation 189.076 points are 170.924 degrees apart.
+Rotation 194.806 points are 165.194 degrees apart.
+Rotation 200.535 points are 159.465 degrees apart.
+Rotation 206.265 points are 153.735 degrees apart.
+Rotation 211.994 points are 148.006 degrees apart.
+Rotation 217.724 points are 142.276 degrees apart.
+Rotation 223.453 points are 136.547 degrees apart.
+Rotation 229.183 points are 130.817 degrees apart.
+Rotation 234.913 points are 125.087 degrees apart.
+Rotation 240.642 points are 119.358 degrees apart.
+Rotation 246.372 points are 113.628 degrees apart.
+Rotation 252.101 points are 107.899 degrees apart.
+Rotation 257.831 points are 102.169 degrees apart.
+Rotation 263.56 points are 96.4395 degrees apart.
+Rotation 269.29 points are 90.71 degrees apart.
+Rotation 275.02 points are 84.9804 degrees apart.
+Rotation 280.749 points are 79.2508 degrees apart.
+Rotation 286.479 points are 73.5212 degrees apart.
+Rotation 292.208 points are 67.7917 degrees apart.
+Rotation 297.938 points are 62.0621 degrees apart.
+Rotation 303.667 points are 56.3325 degrees apart.
+Rotation 309.397 points are 50.6029 degrees apart.
+Rotation 315.127 points are 44.8734 degrees apart.
+Rotation 320.856 points are 39.1438 degrees apart.
+Rotation 326.586 points are 33.4142 degrees apart.
+Rotation 332.315 points are 27.6847 degrees apart.
+Rotation 338.045 points are 21.9551 degrees apart.
+Rotation 343.774 points are 16.2255 degrees apart.
+Rotation 349.504 points are 10.496 degrees apart.
+Rotation 355.234 points are 4.76637 degrees apart.

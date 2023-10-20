@@ -10,15 +10,26 @@
 #define hexagonal (M_PI/3)
 
 #define _kcal_per_kJ 0.239006
-#define _kJmol_cuA 0.5
-#define vdw_clash_allowance 1.0
-#define oxytocin 0.007
-#define _DEFAULT_INTERA_R_CUTOFF 8
+#define _kJmol_cuA 1.0
+// #define coplanar_threshold 0.5
+#define coplanar_threshold 2.5
+#define oxytocin 0.003
+#define _DEFAULT_INTERA_R_CUTOFF 6
 #define _INTER_TYPES_LIMIT 10
 #define BOND_DEF_NOT_FOUND 0xbadb09d
 
 #define any_element -5141
 #define Avogadro 6.02214076e+23
+
+#define helix_hbond_cutoff 2.8
+#define peptide_bond_length 1.32
+#define unconnected_residue_mindist 4.82
+#define clash_limit_per_aa 4.0
+
+#define pH 6.0
+#define auto_pK_protonation 0
+#define hydrophilicity_cutoff 0.25
+#define group_simil_threshold 0.8
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.
 #define intermol_ESP 0.05
@@ -60,12 +71,14 @@
 #define _shield_angle (130.0 * fiftyseventh)
 #define _shield_angle_pi (100.0 * fiftyseventh)
 #define _can_clash_angle (180.0 * fiftyseventh)
-#define _fullrot_stepdeg 30
+#define _fullrot_stepdeg 20
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
-#define _fullrot_every 10
+#define _fullrot_every 17
 #define _def_lin_momentum 0.1
-#define _def_ang_momentum (_fullrot_steprad/3)
-#define _def_bnd_momentum (_fullrot_steprad/3)
+#define _def_ang_momentum (fiftyseventh*5)
+#define _def_bnd_momentum (fiftyseventh*15)
+#define speed_limit 0.666
+#define warn_orphan_atoms 0
 
 #define pi_mult_dkytw 264
 #define pi_CH_dkytw 0.0766
@@ -79,11 +92,9 @@
 
 #define _MAX_NUM_FORCES 65536
 
-#define SPHREACH_MAX 1024
+#define SPHREACH_MAX 128
 
 #define PROT_MAX_RGN 40
-
-#define AMINOACID_HYDROPHILICITY_THRESHOLD 0.2
 
 // Torsion angles for various helices and for beta strands.
 #define ALPHA_PHI fiftyseventh*-57.8
@@ -101,20 +112,39 @@
 #define POLYPRO1_PSI fiftyseventh*160
 #define POLYPRO1_OMEGA fiftyseventh*113
 
-// Warning - increasing these constants significantly above their stable branch values
-// will cause docking fails in the Big Three tests.
-#define polar_repulsion 35.0
-#define charge_repulsion 30.0
+// Warning - increasing these constants significantly above the original 35.0, 60.0 values
+// will cause docking fails in the unit tests.
+#define polar_repulsion 10.0
+#define charge_repulsion 5.0
 
-#define lmpush 0.0005
+#define global_clash_allowance 0.4
+#define ignore_double_hydrogen_clashes 0
+#define Lennard_Jones_epsilon 1.0
+#define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
+#define lmpush 0.0025
+#define recapture_ejected_ligand 0
 
-#define _enhanced_pi_stacking 1
+#define amide_zwitterionic_amount 0.1
+
+#define priority_weight_group 4
+
+#define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
 #define enforce_no_bb_pullaway 1
-#define bb_pullaway_allowance 0.13
+#define bb_pullaway_allowance 0.5
+#define bb_realign_iters 1
+#define bb_realign_b_threshold 20
+#define bb_realign_amount 0.333
+#define bb_realign_threshold_distance 2.5
+#define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define flexion_selection 1
 #define no_zero_flexions 1
+#define ignore_invalid_partial 1
+
+// If enabled, the trip switch functionality will have to be moved around in the code.
+// But since we are using an active vs. inactive energy comparison, this feature is obsolete.
+#define use_trip_switch 0
 
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5
@@ -131,6 +161,7 @@
 
 #define redo_tumble_spheres_on_activation 0
 #define redo_tumble_spheres_every_node 1
+#define soft_dynamics_every_n_iters 20
 
 // Output the activation matrix or the transmembrane regions' active rotations so that
 // the viewer can update its cartoon backbone.
@@ -141,7 +172,7 @@
 #define write_activation_matrix 0
 #define write_active_rotation 1
 
-#define _use_gloms 1
+#define _use_groups 1
 
 #define soft_ligand_importance 20
 #define soft_bias_overlap 0.1
@@ -159,7 +190,7 @@
 #define internode_momentum_only_on_activation 1
 
 // Switches for conformational space search.
-#define allow_axial_tumble 0
+#define allow_axial_tumble 1
 #define allow_bond_rots 1
 #define allow_linear_motion 1
 #define monte_carlo_axial 0
@@ -182,7 +213,7 @@
 #define sidechain_fullrot_lig_bmult 3
 
 // Extra weight given to sidechain-ligand binding strengths during conformer search.
-#define dock_ligand_bias 0.5
+#define dock_ligand_bias 1.0
 
 // Turns off the 360 degree rotations for all but the zeroth node of a path.
 #define nodes_no_ligand_360_tumble 1
@@ -203,7 +234,7 @@
 #define allow_tethered_rotations 1
 
 // Reject any conformation where any single residue's total clashes exceed this threshold.
-#define individual_clash_limit 5
+#define individual_clash_limit 15
 
 // Overwrite the user supplied pocket center with the loneliest point as determined by
 // distances to the nearest residue atoms to the supplied pocket center.
@@ -219,7 +250,7 @@
 #define hydrophilicity_boost 5
 #define best_binding_stochastic 0.3
 
-// For differential docking, whether to multimol_conform() all the protein's residues into an
+// For differential docking, whether to conform_molecules() all the protein's residues into an
 // optimized initial conformation before adding the ligand.
 #define preconform_protein 0
 #define default_pre_ligand_multimol_radius 15
@@ -252,15 +283,14 @@
 // How much variance to allow in the strongest atom-to-atom binding energy when multimol conforming.
 // Decreasing this value requires any positional or rotational change to adhere more tightly to the
 // strongest interatomic interaction.
-#define strongest_loss_tolerance 0.25
+#define strongest_loss_tolerance 0.05
 #define _slt1 (1.0 - strongest_loss_tolerance)
 
 // Whether to add the indicated partial charge to a neutral pnictogen, within pKa limits,
 // if a negatively charged atom is nearby.
-#define _ALLOW_PROTONATE_PNICTOGENS 1
-#define pnictogen_partial_protonation 0.2
-#define pn_protonation_pKa_min 5
-#define _allow_conditional_basicity 0
+#define _ALLOW_PROTONATE_PNICTOGENS 0
+#define _allow_conditional_basicity 1
+#define cond_bas_hbond_threshold 1.5
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0
@@ -269,7 +299,7 @@
 #define _teleport_dissatisfied_waters 1
 // Threshold is positive for binding, negative for clashes.
 #define _water_satisfaction_threshold 5
-#define _water_teleport_tries 25
+#define _water_teleport_tries 200
 
 #define polar_sat_influence_for_dock 30
 #define polar_sat_influence_for_bb 30
@@ -279,48 +309,69 @@
 // to a less favorable state.
 #define _hisflip_binding_threshold 25
 
+#define hydrogenate_add_missing_heavy_atoms 1
+
+#define homology_phi_psi_rotations 0
+#define homology_long_axis_rotations 0
+#define homology_region_optimization 0
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 // Debugging stuff.
 
 // Should normally be 3:
-#define _bb_maxglom 3
+#define _bb_max_grp 3
 
 // For auditing binding energies between individual atoms:
 #define _peratom_audit 0
 
 // Should normally be false or zero:
-#define _dummy_atoms_for_debug 0
+#define _dbg_259 0
+#define _dbg_anemia 0
+#define _dbg_bb_pullaway 0
+#define _dbg_bb_realign 0
+#define _dbg_bb_rots 0
+#define _dbg_bridges 0
+#define _dbg_cond_basic 0
+#define _dbg_conj_chg 0
+#define _dbg_conjugation 0
+#define _dbg_find_blasted_segfault 0
+#define _dbg_fitness_plummet 0
+#define _dbg_flexion_selection 0
+#define _dbg_groupsel 0
+#define _DBG_H2O_TELEPORT 0
+#define _DBG_HISFLIP 0
+#define _dbg_homology 0
+#define _dbg_Huckel 0
+#define _dbg_hxrax 0
+#define _dbg_imidazole_check 0
+#define _dbg_interatomic_forces 0
 #define _DBG_LONELINESS 0
+#define _dbg_mand_conn 0
+#define _DBG_MAX_CLASHES 0
+#define _DBG_MOLBB 0
+#define _dbg_mol_flexion 0
+#define _dbg_mol_frames 0
+#define _dbg_multiflex 0
+#define _dbg_null_flexions 0
+#define _dbg_polsat 0
+#define _dbg_repack 0
+#define _DBG_RESBMULT 0
+#define _dbg_residue_poses 0
+#define _dbg_rock_pic 0
+#define _dbg_soft 0
+#define _dbg_soft_dynamics 0
+#define _dbg_softrock 0
+#define _DBG_SPACEDOUT 0
 #define _DBG_STEPBYSTEP 0
 #define _DBG_TOOLARGE_DIFFNUMS 0
 #define _DBG_TUMBLE_SPHERES 0
-#define _DBG_MAX_CLASHES 0
-#define output_tumble_debug_docs 0
-#define debug_break_on_move 0
+#define _debug_active_bond_rot 0
 #define debug_stop_after_tumble_sphere 0
 #define _DORESPHRES 0
-#define _DBG_RESBMULT 0
-#define _debug_active_bond_rot 0
-#define _DBG_SPACEDOUT 0
-#define _DBG_H2O_TELEPORT 0
-#define _DBG_HISFLIP 0
-#define _DBG_MOLBB 0
-#define _dbg_bb_rots 0
-#define _dbg_bb_pullaway 0
-#define _dbg_soft 0
-#define _dbg_glomsel 0
-#define _dbg_polsat 0
-#define _dbg_softrock 0
-#define _dbg_rock_pic 0
-#define _dbg_hxrax 0
-#define _dbg_mand_conn 0
-#define _dbg_flexion_selection 0
-#define _dbg_null_flexions 0
-#define _dbg_repack 0
-#define _dbg_multiflex 0
-#define _dbg_homology 0
-#define _dbg_bridges 0
+#define _dummy_atoms_for_debug 0
+#define output_tumble_debug_docs 0
+#define _show_final_group_pairs 0
 
 #endif
 

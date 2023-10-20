@@ -1,7 +1,7 @@
 <?php
 chdir(__DIR__);
-require_once("../predict/protutils.php");
-require_once("../predict/odorutils.php");
+require_once("../data/protutils.php");
+require_once("../data/odorutils.php");
 require_once("receptor_notes.php");
 
 $mixttl = preg_replace("/[^A-Za-z0-9 +_-]/", "", @$_REQUEST['mixttl']) ?: "Mixture";

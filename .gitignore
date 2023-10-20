@@ -47,3 +47,5 @@ www/*.bak.php
 predict/training_set.txt
 www/security.json
 www/sidelinks.json
+pdbs/*/*.params
+

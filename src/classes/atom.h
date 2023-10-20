@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <iomanip>
 #include "point.h"
 
@@ -18,6 +19,20 @@ enum intera_type
     vdW
 };
 
+enum bond_rotation_fail_reason
+{
+    bf_none,
+    bf_empty_atom,
+    bf_terminal_atom,
+    bf_bond_not_found,
+    bf_limited_rotation,
+    bf_disallowed_rotation,
+    bf_sidechain_hierarchy,
+    bf_unknown
+};
+
+std::ostream& operator<<(std::ostream& os, const bond_rotation_fail_reason& bf);
+
 class Atom;
 class Bond
 {
@@ -32,6 +47,7 @@ public:
     float total_rotations=0;
     intera_type type = covalent;
     float optimal_radius = 1;
+    bond_rotation_fail_reason last_fail = bf_none;
 
     #if _debug_active_bond_rot
     bool echo_on_rotate = false;
@@ -46,15 +62,18 @@ public:
     {
         moves_with_btom = 0;
     }
-    Atom** get_moves_with_btom();
+    void fetch_moves_with_btom(Atom** result);
     int count_moves_with_btom();
+    int count_heavy_moves_with_atom();
     int count_heavy_moves_with_btom();
+    Bond* get_reversed();
     void swing(SCoord newdir);		// Rotate btom, and all its moves_with atoms, about atom so that the bond points to newdir.
 
 protected:
     void fill_moves_with_cache();
     void enforce_moves_with_uniqueness();
     Atom** moves_with_btom = 0;
+    Bond* reversed = nullptr;
 };
 
 enum RING_TYPE
@@ -137,13 +156,20 @@ public:
     {
         return at_wt;
     }
+    float get_electronegativity()
+    {
+        return elecn;
+    }
+    bool is_pKa_near_bio_pH() { return is_imidazole_like; }
     float get_acidbase();
     float get_charge();
+    float get_max_conj_charge() { return max_localized_charge; }
     float is_polar();						// -1 if atom is H-bond acceptor; +1 if donor.
     bool is_metal();
     int is_thio();							// -1 if atom is S; +1 if atom is H of a sulfhydryl.
     bool is_pi();
     bool is_amide();
+    bool is_aldehyde();
 
     // Setters.
     void set_aa_properties();
@@ -158,8 +184,9 @@ public:
     }
 
     // Bond functions.
-    Bond** get_bonds();
+    void fetch_bonds(Bond** result);
     int get_bonded_atoms_count();
+    int get_bonded_heavy_atoms_count();
     int get_count_pi_bonds();
     float get_sum_pi_bonds();
 
@@ -176,17 +203,21 @@ public:
     Atom* is_bonded_to_pi(const int family, const bool other_atoms_pi);
 
     int num_bonded_to(const char* element);
+    int num_bonded_to_in_ring(const char* element, Ring* member_of);
 
     bool shares_bonded_with(Atom* btom);
 
     Bond* get_bond_between(Atom* btom);
     Bond* get_bond_between(const char* bname);
     Bond* get_bond_by_idx(int bidx);
+    Bond* get_bond_closest_to(Point target);
     int get_idx_bond_between(Atom* btom);
 
     float hydrophilicity_rule();
 
     bool is_conjugated_to(Atom* a, Atom* break_if_reach = nullptr, Atom* caller = nullptr);
+    float is_conjugated_to_charge(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
+    std::vector<Atom*> get_conjugated_atoms(Atom* break_if_reach = nullptr, Atom* caller = nullptr);
 
     // Ring membership.
     int num_rings();
@@ -208,6 +239,7 @@ public:
                         ||
                         (	bonded_to[i].cardinality == 1
                             && bonded_to[i].btom->get_Z() > 1
+                            && bonded_to[i].btom->get_bonded_atoms_count() < 4
                         )
                    )
                 {
@@ -231,7 +263,7 @@ public:
     bool move_rel(SCoord* v);
     int move_assembly(Point* pt, Atom* excluding);			// Return number of atoms moved. Note excluding must be a bonded atom.
     SCoord* get_basic_geometry();
-    SCoord* get_geometry_aligned_to_bonds();
+    SCoord* get_geometry_aligned_to_bonds(bool prevent_infinite_loop = false);
     float get_geometric_bond_angle();
     float get_bond_angle_anomaly(SCoord v, Atom* ignore);	// Assume v is centered on current atom.
     float distance_to(Atom* btom)
@@ -239,6 +271,7 @@ public:
         if (!btom) return -1;
         else return location.get_3d_distance(&btom->location);
     };
+    float similarity_to(Atom* btom);
     SCoord get_next_free_geometry(float lcard);
     int get_idx_next_free_geometry();
     void rotate_geometry(Rotation rot);			// Necessary for bond rotation.
@@ -253,6 +286,8 @@ public:
         chirality_unspecified = false;
     }
 
+    void print_bond_angles();                   // For unit tests.
+
     // Static fuctions.
     static int Z_from_esym(const char* elem_sym);
     static const char* esym_from_Z(const int lZ)
@@ -262,6 +297,7 @@ public:
         else return elem_syms[lZ];
     }
     static void dump_array(Atom** aarr);
+    static float electronegativity_from_Z(int atom_Z) { return electronegativities[atom_Z]; }
 
     // Public member vars.
     float pK = nanf("n/a");         // To be managed and used by external classes.
@@ -272,7 +308,7 @@ public:
     char* region;					// "
     bool is_backbone=false;			// "
     char* name;						// "
-    bool used;						// Required for certain algorithms such as Molecule::identify_rings().
+    bool used = false;      		// Required for certain algorithms such as Molecule::identify_rings().
     int mirror_geo=-1;				// If >= 0, mirror the geometry of the btom of bonded_to[mirror_geo].
     bool flip_mirror=false;			// If true, do trans rather than cis bond conformation.
     bool dnh=false;					// Do Not Hydrogenate. Used for bracketed atoms in SMILES conversion.
@@ -281,6 +317,8 @@ public:
     float strongest_bind_energy = 0;
     Atom* strongest_bind_atom = nullptr;
     float shielding_angle = 0;
+    char pdbchain = ' ';
+    bool doing_ring_closure = false;
 
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.
@@ -299,8 +337,10 @@ protected:
     float Eion = 0;
     float Eaffin = 0;
     float charge = 0;					// can be partial.
+    float max_localized_charge = 0;     // for conjugated charged systems.
     float acidbase = 0;					// charge potential; negative = acid / positive = basic.
     float polarity = 0;					// maximum potential relative to -OH...H-.
+    bool polar_calcd = false;
     int thiol = 0;
     Bond* bonded_to = 0;
     bool reciprocity = false;
@@ -311,6 +351,7 @@ protected:
     bool chirality_unspecified = true;
     Ring** member_of = nullptr;
     int recursion_counter = 0;
+    bool is_imidazole_like = false;     // Rings having a pKa near the biological pH of 7.4, that aromatic pnictogens can protonate.
 
     static void read_elements();
     void figure_out_valence();

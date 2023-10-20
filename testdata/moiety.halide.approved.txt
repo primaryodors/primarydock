@@ -1,0 +1,2 @@
+Pattern C[Cl] occurs 2 times in molecule.
+C2 Cl1 C5 Cl6 

@@ -1,9 +1,0 @@
-Created empty molecule named nothing.
-Created molecule named c1ccccc1.
-Loaded 0 atoms of c1ccccc1 into molecule.
-Found 1 ring(s).
-Ring atoms: C5 C6 C1 C2 C3 C4 
-
-
-Energy level below threshold, SUCCESS.
-Saved output.sdf

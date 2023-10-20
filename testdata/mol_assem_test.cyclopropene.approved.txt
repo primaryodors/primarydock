@@ -1,0 +1,8 @@
+Created empty molecule named Test.
+Minimizing internal clashes...
+Adjusted internal clashes: 0 cu.A.
+Atom C1 has bond angles: 30 165 165
+Atom C2 has bond angles: 30 165 165
+Atom C3 has bond angles: 30 109.471 109.471 109.471 109.471 109.471
+Saved testdata/received/cyclopropene.received.sdf
+

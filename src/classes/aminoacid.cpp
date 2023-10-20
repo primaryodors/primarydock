@@ -15,6 +15,8 @@ using namespace std;
 
 AADef aa_defs[256];
 char* override_aminos_dat=0;
+float aa_sim_xref[65536];
+AminoAcid* aa_archetypes[256];
 
 void AminoAcid::find_his_flips()
 {
@@ -36,12 +38,13 @@ void AminoAcid::find_his_flips()
 
                     if (h)
                     {
-                        hisflips = new histidine_flip*[4];
-                        hisflips[0] = new histidine_flip;
+                        hisflips = new HistidineFlip*[4];
+                        hisflips[0] = new HistidineFlip;
                         hisflips[0]->C  = atoms[i];
                         hisflips[0]->N1 = a;
                         hisflips[0]->N2 = b;
                         hisflips[0]->H  = h;
+                        hisflips[1] = nullptr;
                         break;
                     }
                 }
@@ -111,10 +114,12 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
             fclose(pf);
 
             from_sdf(buffer);
+            ensure_pi_atoms_coplanar();
         }
         else
         {
             from_smiles(aa_defs[idx].SMILES.c_str());
+            ensure_pi_atoms_coplanar();
 
             FILE* pf = fopen(fname.c_str(), "wb");
             if (pf)
@@ -171,7 +176,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                 N = atoms[i]->is_bonded_to(PNICTOGEN, 1);
                 if (N)
                 {
-                    Bond** ab = atoms[i]->get_bonds();
+                    Bond* ab[16];
+                    atoms[i]->fetch_bonds(ab);
                     for (j=0; ab[j]; j++)
                     {
                         if (ab[j]->btom
@@ -214,8 +220,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
                                 if (N->num_bonded_to("H") > 1)		// Proline conditional.
                                 {
-                                    if (ab) delete[] ab;
-                                    ab = N->get_bonds();
+                                    N->fetch_bonds(ab);
                                     l = 0;
                                     int n;
                                     for (n=0; ab[n]; n++)
@@ -242,7 +247,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                             }
                         }
                     }
-                    delete[] ab;
                 }
             }
         }
@@ -261,7 +265,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                 j = atom_prev[i];
                 if (atom_Greek[j] > 0 && !atom_Greek[i]) atom_Greek[i] = atom_Greek[j]+1;
 
-                Bond** ab = atoms[i]->get_bonds();
+                Bond* ab[16];
+                atoms[i]->fetch_bonds(ab);
                 int ag = atoms[i]->get_geometry();
                 for (j=0; j<ag; j++)
                 {
@@ -274,8 +279,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                         }
                     }
                 }
-
-                delete[] ab;
             }
         }
 
@@ -286,7 +289,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
             {
                 if (atom_isheavy[i] && atom_Greek[i] > 1)
                 {
-                    Bond** ab = atoms[i]->get_bonds();
+                    Bond* ab[16];
+                    atoms[i]->fetch_bonds(ab);
                     int ag = atoms[i]->get_geometry();
                     for (j=0; j<ag; j++)
                     {
@@ -307,8 +311,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                             }
                         }
                     }
-
-                    delete[] ab;
                 }
             }
         }
@@ -463,13 +465,15 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
         // Sort all the backbone and sidechain atoms into a new array.
         Atom** new_atoms = new Atom*[atcount+4];
-        for (i=0; i<atcount; i++) new_atoms[i] = nullptr;
+        for (i=0; atoms[i]; i++) new_atoms[i] = nullptr;
 
         l=0;
         if (N) new_atoms[l++] = N;
         if (HN) new_atoms[l++] = HN;
 
         if (minintc) minimize_internal_clashes();
+        ensure_pi_atoms_coplanar();
+
         for (i=0; atoms[i]; i++)
         {
             if (atom_Greek[i] <= 0) continue;
@@ -506,19 +510,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         // Delete any atoms that did not get Greeked.
         for (i=atcount-1; i>=0; i--) if (!atom_Greek[i]) delete_atom(atoms[i]);
 
-        // Check correct bonding.
-        /*for (i=0; atoms[i]; i++)
-        {
-        	Bond** bb = atoms[i]->get_bonds();
-        	int ag = atoms[i]->get_geometry();
-        	for (j=0; j<ag; j++)
-        	{
-        		if (bb[j]->btom) cout << atoms[i]->residue << ":" << atoms[i]->name
-        							  << cardinality_printable(bb[j]->cardinality)
-        							  << bb[j]->btom->residue << ":" << bb[j]->btom->name << endl;
-        	}
-        }*/
-
         if (prevaa)
         {
             Atom* prevC = prevaa->get_atom("C");
@@ -541,6 +532,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         return;
     }
 
+    ensure_pi_atoms_coplanar();
+
     if (!atoms || !atoms[0]) cout << "WARNING no atoms for " << aa_defs[idx].name << " (" << aa_defs[idx].SMILES << ")" << endl;
 
     if (!aa_defs[idx].aabonds)
@@ -550,7 +543,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         // cout << *this << endl;
         for (i=0; atoms[i]; i++)
         {
-            Bond** bb = atoms[i]->get_bonds();
+            Bond* bb[16];
+            atoms[i]->fetch_bonds(bb);
             int bg = atoms[i]->get_geometry();
 
             if (!i)
@@ -558,6 +552,8 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                 aabd[n] = new AABondDef();
                 strcpy(aabd[n]->aname, atoms[i]->name);
                 strcpy(aabd[n]->bname, "<C");
+                aabd[n]->Za = atoms[i]->get_Z();
+                aabd[n]->Zb = 6;
                 aabd[n]->cardinality = 1.5;
                 aabd[n]->acharge = 0;
                 aabd[n]->can_rotate = false;
@@ -571,12 +567,15 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                     aabd[n] = new AABondDef();
                     strcpy(aabd[n]->aname, bb[j]->atom->name);
                     strcpy(aabd[n]->bname, bb[j]->btom->name);
+                    aabd[n]->Za = bb[j]->atom->get_Z();
+                    aabd[n]->Zb = bb[j]->btom->get_Z();
                     aabd[n]->cardinality = bb[j]->cardinality;
                     aabd[n]->acharge = bb[j]->atom->get_charge();
 
                     if (!strcmp(bb[j]->atom->name, "OH") && !strcmp(bb[j]->btom->name, "CZ"))
                     {
                         aabd[n]->can_rotate = false;
+                        aabd[n]->can_flip = true;
                     }
                     
                     aabd[n]->can_rotate =
@@ -631,8 +630,6 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                     n++;
                 }
             }
-
-            delete[] bb;
         }
 
         aa_defs[idx].aabonds = new AABondDef*[n+2];
@@ -643,12 +640,16 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         }
         aa_defs[idx].aabonds[i] = nullptr;
 
-        delete[] aabd;
+        delete aabd;
     }
+
+    ensure_pi_atoms_coplanar();
 
     // flatten();
     rotatable_bonds = get_rotatable_bonds();
     if (minintc) minimize_internal_clashes();
+
+    ensure_pi_atoms_coplanar();
 
     identify_acidbase();
     identify_rings();
@@ -698,23 +699,19 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
     Atom* CA = get_atom("CA");
     Atom* CB = get_atom("CB");
 
-    if (CA && CB)
-    {
-        Bond* b = CA->get_bond_between(CB);
-        if (b && minintc) b->rotate(triangular);
-    }
-
     if (prevaa)
     {
         movability = MOV_ALL;
 
-        Point* pts = prevaa->predict_next_NHCA();
-        glom(pts);
-        delete[] pts;
+        Point pts[4];
+        prevaa->predict_next_NHCA(pts);
+        attach_to_prediction(pts);
 
         movability = MOV_FLEXONLY;
         immobile = true;
     }
+
+    ensure_pi_atoms_coplanar();
 
     find_his_flips();
 }
@@ -726,14 +723,14 @@ void AminoAcid::establish_internal_clash_baseline()
 }
 
 
-Point* AminoAcid::predict_previous_COCA()
+void AminoAcid::predict_previous_COCA(Point* retval)
 {
     Atom* N = get_atom("N");
-    if (!N) return nullptr;
+    if (!N) return;
     N->aromatize();
     Atom* CA = get_atom("CA");
     Atom* HN  = HN_or_substitute();
-    if (!CA || !HN) return nullptr;
+    if (!CA || !HN) return;
 
     Point prevCloc(1.32,0,0), prevOloc(0,1.2,0);
 
@@ -741,7 +738,6 @@ Point* AminoAcid::predict_previous_COCA()
     prevOloc = prevOloc.add(prevCloc);
 
     LocatedVector lv;
-    Point* retval = new Point[4];
     Point neighborCA;
     int i;
     for (i=0; i<10; i++)
@@ -822,18 +818,16 @@ Point* AminoAcid::predict_previous_COCA()
     retval[0] = prevCloc;
     retval[1] = prevOloc;
     retval[2] = neighborCA;
-
-    return retval;
 }
 
-Point* AminoAcid::predict_next_NHCA()
+void AminoAcid::predict_next_NHCA(Point* retval)
 {
     Atom* C = get_atom("C");
-    if (!C) return nullptr;
+    if (!C) return;
     C->aromatize();
     Atom* CA = get_atom("CA");
     Atom* O  = get_atom("O");
-    if (!CA || !O) return nullptr;
+    if (!CA || !O) return;
 
     Point nextNloc(1.32,0,0), nextHNloc(0,1.0,0);
 
@@ -841,7 +835,6 @@ Point* AminoAcid::predict_next_NHCA()
     nextHNloc = nextHNloc.add(nextNloc);
 
     LocatedVector lv;
-    Point* retval = new Point[4];
     Point neighborCA;
     int i;
     for (i=0; i<10; i++)
@@ -922,12 +915,10 @@ Point* AminoAcid::predict_next_NHCA()
     retval[0] = nextNloc;
     retval[1] = nextHNloc;
     retval[2] = neighborCA;
-
-    return retval;
 }
 
-#define _COUT_GLOMANOM 0
-void AminoAcid::glom(Point* predicted, bool CO)
+#define _dbg_attprdc 0
+void AminoAcid::attach_to_prediction(Point* predicted, bool CO)
 {
     MovabilityType fmov = movability;
     movability = MOV_ALL;
@@ -937,7 +928,7 @@ void AminoAcid::glom(Point* predicted, bool CO)
     Point moveby = predicted[0].subtract( CO ? get_atom_location("C") : get_atom_location("N") );
     aamove(moveby);
     anomaly = predicted[0].get_3d_distance( CO ? get_atom_location("C") : get_atom_location("N") );
-    #if _COUT_GLOMANOM
+    #if _dbg_attprdc
     if (anomaly > 0.001) cout << "Error: " << ( CO ? "C" : "N" ) << " anomaly outside tolerance!" << endl << "# Anomaly is " << anomaly << endl;
     #endif
 
@@ -949,7 +940,7 @@ void AminoAcid::glom(Point* predicted, bool CO)
     rotate(lv, rot.a);
     pt1 = CO ? get_atom_location("O") : HN_or_substitute_location();
     anomaly = predicted[1].get_3d_distance(pt1);
-    #if _COUT_GLOMANOM
+    #if _dbg_attprdc
     if (anomaly > 0.1) cout << "Error: " << ( CO ? "O" : "HN" ) << " anomaly outside tolerance!" << endl << "# Anomaly is " << anomaly << endl;
     #endif
 
@@ -982,7 +973,7 @@ void AminoAcid::glom(Point* predicted, bool CO)
         rotate(lv, theta*2);
         anomaly = predicted[2].get_3d_distance(get_atom_location("CA"));
     }
-    #if _COUT_GLOMANOM
+    #if _dbg_attprdc
     if (anomaly > 0.1) cout << "Error: CA anomaly outside tolerance!" << endl << "# Anomaly is " << anomaly << "." << endl;
     #endif
 
@@ -1018,6 +1009,7 @@ void AminoAcid::save_pdb(FILE* os, int atomno_offset)
 
     for (i=0; atoms[i]; i++)
     {
+        atoms[i]->pdbchain = pdbchain;
         atoms[i]->save_pdb_line(os, i+1+atomno_offset);
     }
 }
@@ -1147,7 +1139,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                         {
                             a->aaletter = aa_defs[i]._1let;
                             aaa = &aa_defs[i];
-                            name = new char[10]; // aa_defs[i].name;
+                            name = new char[10];
                             sprintf(name, "%s%d", aa_defs[i]._3let, atoi(words[4+offset].c_str())+rno);
                             break;
                         }
@@ -1156,9 +1148,7 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     if (!aaa)
                     {
                         fseek(is, lasttell, SEEK_SET);
-                        // delete[] words;
                         goto _return_added;
-                        //throw ATOM_NOT_OF_AMINO_ACID;
                     }
                     else aadef = aaa;
 
@@ -1182,12 +1172,12 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
                     if (aaa->_1let == 'I')
                     {
-                        // Plus d'marde du code dur.
                         if (!strcmp(a->name, "1HD1")) strcpy(a->name, "HD1");
                         if (!strcmp(a->name, "2HD1")) strcpy(a->name, "HD2");
                         if (!strcmp(a->name, "3HD1")) strcpy(a->name, "HD3");
                     }
 
+                    bool found_aabond = false;
                     if (aaa && aaa->aabonds)
                     {
                         for (i=0; aaa->aabonds[i]; i++)
@@ -1195,7 +1185,6 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                             AABondDef* aab = aaa->aabonds[i];
                             if (!strcmp(aab->aname, a->name))
                             {
-                                // cout << aaa->_1let << ":" << aab->aname << cardinality_printable(aab->cardinality) << aab->bname << endl;
                                 if (aaa->aabonds[i] && aaa->aabonds[i]->acharge)
                                 {
                                     a->increment_charge(aaa->aabonds[i]->acharge);
@@ -1204,16 +1193,16 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                 if (btom)
                                 {
                                     a->bond_to(btom, aab->cardinality);
-                                    // cout << "Greek bond 1: " << a->aa3let << ":" << a->name << cardinality_printable(aab->cardinality) << btom->name << endl;
                                     if (aab->cardinality == 1 && !aab->can_rotate)
                                     {
                                         Bond* b = a->get_bond_between(btom);
                                         if (b) b->can_rotate = false;
-                                        if (b) b->can_flip = aab->can_flip;
+                                        // if (b) b->can_flip = aab->can_flip;
                                         b = btom->get_bond_between(a);
                                         if (b) b->can_rotate = false;
-                                        if (b) b->can_flip = aab->can_flip;
+                                        // if (b) b->can_flip = aab->can_flip;
                                     }
+                                    found_aabond = true;
                                 }
                             }
                             else if (!strcmp(aab->bname, a->name))
@@ -1222,7 +1211,6 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                 if (btom && !btom->is_bonded_to(a))
                                 {
                                     a->bond_to(btom, aab->cardinality);
-                                    // cout << "Greek bond 2: " << a->aa3let << ":" << a->name << cardinality_printable(aab->cardinality) << btom->name << endl;
                                     if (aab->cardinality == 1 && !aab->can_rotate)
                                     {
                                         Bond* b = a->get_bond_between(btom);
@@ -1230,11 +1218,13 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                                         b = btom->get_bond_between(a);
                                         if (b) b->can_rotate = false;
                                     }
+                                    found_aabond = true;
                                 }
                             }
                         }
                     }
-                    else
+                    
+                    if (!found_aabond)
                     {
                         Atom* bta = nullptr;		// bond to atom.
                         float cardinality = 1;		// TODO:
@@ -1248,6 +1238,30 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
                         // If has Greek > A: if hydrogen, bond to same Greek (mind any suffix!), else bind to earlier Greek.
 
+                        // If H, look for a matching Greek atom and bond to it.
+                        if (!bta && a->name[0] == 'H')
+                        {
+                            char temp[255];
+                            strcpy(temp, a->name);
+                            temp[0] = 'C';
+                            bta = get_atom(temp);
+                            if (!bta)
+                            {
+                                temp[0] = 'N';
+                                bta = get_atom(temp);
+                            }
+                            if (!bta)
+                            {
+                                temp[0] = 'O';
+                                bta = get_atom(temp);
+                            }
+                            if (!bta)
+                            {
+                                temp[0] = 'S';
+                                bta = get_atom(temp);
+                            }
+                        }
+
                         // If C, bond to CA.
                         if (!strcmp(a->name, "C"))
                         {
@@ -1260,23 +1274,23 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                             bta = get_atom("C");
                             cardinality = 2;
                         }
+                        if (!strcmp(a->name, "OXT"))
+                        {
+                            bta = get_atom("C");
+                            cardinality = 1;
+                        }
 
                         if (bta) a->bond_to(bta, cardinality);
-                        // cout << "Greek bond 3: " << a->aa3let << ":" << a->name << cardinality_printable(cardinality) << bta->name << endl;
-
+                        #if warn_orphan_atoms
+                        else if (strcmp(a->name, "N")) cout << "Warning: orphaned atom " << a->name << " of residue " << residue_no << endl;
+                        #endif
                     }
-
-
-
                 }
                 else
                 {
                     fseek(is, lasttell, SEEK_SET);
-                    //if (words) delete[] words;
                     goto _return_added;
                 }
-
-                //if (words) delete[] words;
             }
             else goto _return_added;
         }
@@ -1286,8 +1300,6 @@ int AminoAcid::from_pdb(FILE* is, int rno)
             if (ex == NOT_ATOM_RECORD) throw ex;
         }
         buffer[0] = 0;
-
-        //if (words) delete[] words;
     }
 
 _return_added:
@@ -1337,7 +1349,7 @@ _return_added:
             }
             lra[j] = nullptr;
 
-            delete[] ringa;
+            delete ringa;
             rings[i] = new Ring(lra, aadef->aarings[i]->get_type());
         }
         rings[i] = nullptr;
@@ -1381,6 +1393,10 @@ void AminoAcid::load_aa_defs()
         char lastletter = '\0';
         bool isbb = false;
         bool proline_like = false;
+
+        for (i=0; i<65536; i++) aa_sim_xref[i] = -1;
+        for (i=0; i<256; i++) aa_archetypes[i] = nullptr;
+
         while (!feof(pf))
         {
             fgets(buffer, 1011, pf);
@@ -1397,6 +1413,11 @@ void AminoAcid::load_aa_defs()
                         }
 
                     int idx = words[0][0];
+                    if (idx == 'X')
+                    {
+                        cout << "Cannot use X as a letter for amino acids. X means accept any residue in a motif search." << endl;
+                        throw 0xbadaadef;
+                    }
 
                     if (!lastletter || words[0][0] != lastletter)
                     {
@@ -1404,7 +1425,7 @@ void AminoAcid::load_aa_defs()
                         tbdctr = 0;
                         proline_like = false;
 
-                        if (tmpbdefs) delete[] tmpbdefs;
+                        if (tmpbdefs) delete tmpbdefs;
                     }
 
                     if (!aa_defs[idx]._1let)
@@ -1456,7 +1477,7 @@ void AminoAcid::load_aa_defs()
                     if (lastwords[i] != words[i]) strcpy(lastwords[i], words[i]);
                 }
 
-                delete[] words;
+                delete words;
             }
             buffer[0] = 0;
         }
@@ -1506,10 +1527,11 @@ bool AminoAcid::can_reach(Molecule* other) const
 
 bool AminoAcid::can_reach(AminoAcid* other) const
 {
-    Atom* ca1, *ca2;
+    Atom *ca1, *cb1, *ca2;
     float r;
 
     ca1 = get_atom("CA");
+    cb1 = get_atom("CB");
     ca2 = other->get_atom("CA");
 
     if (!ca1 || !ca2)
@@ -1520,40 +1542,166 @@ bool AminoAcid::can_reach(AminoAcid* other) const
 
     r = ca1->get_location().get_3d_distance(ca2->get_location());
 
-    if (r <= 1.15 * (get_reach() + other->get_reach())) return true;
+    float f = 1;
+    if (cb1)
+    {
+        f = find_3d_angle(cb1->get_location(), ca2->get_location(), ca1->get_location());
+        f = 0.5 + 0.5 * cos(f);
+    }
+
+    if (r <= f*(get_reach() + other->get_reach() + 4)) return true;
     else return false;
 }
 
-int AminoAcid::similarity_to(const char letter)
+Atom* AminoAcid::get_reach_atom()
+{
+    if (!atoms) return nullptr;
+
+    int i;
+    float maxr = 0;
+    Atom* CA = get_atom("CA");
+    Atom* retval = nullptr;
+    if (!CA) return nullptr;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        float r = atoms[i]->distance_to(CA);
+
+        if (r > maxr)
+        {
+            maxr = r;
+            retval = atoms[i];
+        }
+    }
+
+    return retval;
+}
+
+float AminoAcid::CB_angle(Point reference)
+{
+    Atom *CB, *HA1, *HA2;
+    CB = get_atom("CB");
+    if (!CB)
+    {
+        HA1 = get_atom("HA1");
+        HA2 = get_atom("HA2");
+
+        CB = (HA1->get_location().get_3d_distance(reference) < HA2->get_location().get_3d_distance(reference)) ? HA1 : HA2;
+    }
+
+    float result = find_3d_angle(CB->get_location(), reference, get_CA_location());
+
+    int i, Greek=0;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        int g = greek_from_aname(atoms[i]->name);
+        if (g > Greek) Greek = g;
+    }
+
+    result -= hexagonal/3 * fmax(Greek-1,0);
+
+    return fmax(0, result);
+}
+
+float AminoAcid::similarity_to(const char letter)
 {
     AminoAcid* a = nullptr;
     if (!aa_defs[letter].SMILES.length()) return 0;
-    if (!aa_defs[letter].loaded)
+
+    int i = (int)letter + 256*(int)this->get_letter();
+    if (aa_sim_xref[i] >= 0) return aa_sim_xref[i];
+    
+    a = new AminoAcid(letter);
+    float s = similarity_to(a);
+    delete a;
+
+    aa_sim_xref[i] = s;
+    i = (int)this->get_letter() + 256*(int)letter;
+    aa_sim_xref[i] = s;
+
+    return s;
+}
+
+float AminoAcid::similarity_to(const AminoAcid* aa)
+{
+    #define aa_same_hydro   60
+    #define aa_hyd_condbas  50
+    #define aa_same_arom    15
+    #define aa_arom_conj    10
+    #define aa_same_chg     15
+    #define aa_same_C       10
+    #define aa_diff_C_1      8
+    #define aa_diff_C_2      5
+
+    #if aa_same_hydro + aa_same_arom + aa_same_chg + aa_same_C != 100
+    #error Amino similarities do not add to 100.
+    #endif
+
+    if (!atoms || !aa->atoms) return 0;
+
+    bool polar1 = (hydrophilicity() > hydrophilicity_cutoff);
+    bool polar2 = (aa->hydrophilicity() > hydrophilicity_cutoff);
+    bool condbas1 = conditionally_basic();
+    bool condbas2 = aa->conditionally_basic();
+    bool arom1 = false, arom2 = false;
+
+    int i, n;
+
+    if (n = get_num_rings())
     {
-        a = new AminoAcid(letter);
-        delete a;
+        for (i=0; i<n; i++)
+        {
+            if (ring_is_aromatic(i)) arom1 = true;
+        }
     }
-    if (!aadef) return 0;
 
-    int retval = 0;
-    if (aadef->hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD
-            &&
-            aa_defs[letter].hydrophilicity >= AMINOACID_HYDROPHILICITY_THRESHOLD)
+    if (n = aa->get_num_rings())
     {
-        retval += fmin(aadef->hydrophilicity, aa_defs[letter].hydrophilicity)*2;
-        if (aadef->charged == aa_defs[letter].charged) retval += 1;
+        for (i=0; i<n; i++)
+        {
+            if (aa->ring_is_aromatic(i)) arom2 = true;
+        }
     }
-    if (aadef->hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD
-            &&
-            aa_defs[letter].hydrophilicity < AMINOACID_HYDROPHILICITY_THRESHOLD)
-        retval += 2;
-    // cout << aadef->hydrophilicity << "|" << aa_defs[letter].hydrophilicity << endl;
-    // return retval;
 
-    if (aadef->aromatic == aa_defs[letter].aromatic) retval += 2;
-    if (aadef->can_coord_metal == aa_defs[letter].can_coord_metal) retval += 1;
+    int chg1 = sgn(get_charge()), chg2 = sgn(aa->get_charge());
+    int carbons1=0, carbons2=0;
+    bool pi1 = false, pi2 = false;
 
-    return retval;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->get_Z() == 6) carbons1++;
+        if (atoms[i]->is_pi()) pi1 = true;
+    }
+
+    for (i=0; aa->atoms[i]; i++)
+    {
+        if (aa->atoms[i]->is_backbone) continue;
+        if (aa->atoms[i]->get_Z() == 6) carbons2++;
+        if (aa->atoms[i]->is_pi()) pi2 = true;
+    }
+
+    float simil=0;
+
+    if (polar1 == polar2) simil += aa_same_hydro;
+    else if (polar1 && condbas2) simil += aa_hyd_condbas;
+    else if (condbas1 && polar2) simil += aa_hyd_condbas;
+
+    if (arom1 == arom2) simil += aa_same_arom;
+    else if (arom1 && pi2) simil += aa_arom_conj;
+    else if (pi1 && arom2) simil += aa_arom_conj;
+
+    if ((polar1 || condbas1) == (polar2 || condbas2) && chg1 == chg2) simil += aa_same_chg;
+    else if (arom1 == arom2 && chg1 == chg2) simil += aa_same_chg;
+
+    n = abs(carbons1 - carbons2);
+    if (!n) simil += aa_same_C;
+    else if (n == 1) simil += aa_diff_C_1;
+    else if (n == 2) simil += aa_diff_C_2;
+
+    return 0.01*simil;
 }
 
 Ring* AminoAcid::get_most_distal_arom_ring()
@@ -1578,6 +1726,22 @@ Ring* AminoAcid::get_most_distal_arom_ring()
 
     if (retidx < 0) return nullptr;
     return rings[retidx];
+}
+
+char AminoAcid::set_pdb_chain(char c)
+{
+    if (c >= 'A' && c <= 'Z')
+    {
+        pdbchain = c;
+    }
+
+    int i;
+    if (atoms) for (i=0; atoms[i]; i++)
+    {
+        atoms[i]->pdbchain = pdbchain;
+    }
+
+    return pdbchain;
 }
 
 std::ostream& operator<<(std::ostream& os, const AABondDef& b)
@@ -1613,6 +1777,9 @@ bool AminoAcid::is_tyrosine_like()
     for (i=0; rings[i]; i++)
     {
         if (rings[i]->get_type() == AROMATIC) has_aromatic_ring = true;
+        #if DBG_TYRLIKE
+        cout << "Ring " << i << " type " << rings[i]->get_type() << endl;
+        #endif
     }
 
     if (!has_aromatic_ring)
@@ -1626,7 +1793,8 @@ bool AminoAcid::is_tyrosine_like()
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
-        if (atoms[i]->get_Z() == 7 || atoms[i]->get_Z() == 8 || atoms[i]->is_polar() < 0)
+        if (atoms[i]->get_Z() == 1) continue;
+        if (atoms[i]->is_polar() < -hydrophilicity_cutoff)
         {
             bool part_of_arom_ring = false;
 
@@ -1648,7 +1816,8 @@ bool AminoAcid::is_tyrosine_like()
             if (!part_of_arom_ring)
             {
                 #if DBG_TYRLIKE
-                cout << atoms[i]->name << " seems to be ringless, yup not missing any important info, derp." << endl;
+                cout << atoms[i]->name << " seems to be ringless, polarity " << atoms[i]->is_polar()
+                     << " yup not missing any important info, derp." << endl;
                 #endif
 
                 return true;
@@ -1671,7 +1840,12 @@ bool AminoAcid::is_glycine()
     return true;
 }
 
-bool AminoAcid::conditionally_basic()
+float AminoAcid::sc_pKa() const
+{
+    return aadef->sidechain_pKa;
+}
+
+bool AminoAcid::conditionally_basic() const
 {
     #if _allow_conditional_basicity
     if (!atoms) return false;
@@ -1683,16 +1857,175 @@ bool AminoAcid::conditionally_basic()
         if (atoms[i]->get_Z() == 1) continue;
         if (atoms[i]->get_family() == PNICTOGEN)
         {
-            if (aadef->sidechain_pKa >= 4 && aadef->sidechain_pKa < 7) return true;
+            if (aadef->sidechain_pKa >= 5 && aadef->sidechain_pKa < 7) return true;
         }
     }
     #endif
     return false;
 }
 
+void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
+{
+    #if _allow_conditional_basicity
+    if (!nearby_mols) return;
+    if (!atoms || !atoms[0]) return;
+
+    #if _dbg_cond_basic
+    cout << "Examining conditional basicity for " << name << "..." << endl;
+    #endif
+
+    bool found_acid = false;
+    bool found_hbond = false;
+    int found_j = 0;
+    Molecule* found_mol = nullptr;
+    #if _dbg_cond_basic
+    float found_f = 0;
+    #endif
+
+    int i, j, l, m;
+    for (m=0; m<2; m++)
+    {
+        for (i=0; nearby_mols[i]; i++)
+        {
+            #if _dbg_cond_basic
+            cout << "Trying " << nearby_mols[i]->get_name() << endl;
+            #endif
+
+            for (j=0; atoms[j]; j++)
+            {
+                if (atoms[j]->is_backbone) continue;
+                if (atoms[j]->get_family() == TETREL) continue;
+                if (atoms[j]->get_Z() == 1 && atoms[j]->is_polar() < 0.5) continue;
+                if (fabs(atoms[j]->get_charge()) > 0.2) continue;
+
+                Atom* a = nearby_mols[i]->get_nearest_atom(atoms[j]->get_location());
+                if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->btom;
+
+                if (a->get_charge() <= -0.5 || a->is_conjugated_to_charge() <= -0.5)
+                {
+                    #if _dbg_cond_basic
+                    cout << nearby_mols[i]->get_name() << ":" << a->name << " is " << a->distance_to(atoms[j]) << "A from " << atoms[j]->name << endl;
+                    #endif
+
+                    found_acid = true;
+                    found_j = j;
+                    found_mol = nearby_mols[i];
+
+                    float f = InteratomicForce::total_binding(atoms[j], a);
+                    #if _dbg_cond_basic
+                    found_f = f;
+                    cout << "Total " << atoms[j]->name << "..." << a->name << " energy: " << -f << endl;
+                    #endif
+                    if (f >= cond_bas_hbond_threshold)
+                    {
+                        found_hbond = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (found_acid && found_hbond) break;
+
+        if (!hisflips || !hisflips[0]) break;
+        do_histidine_flip(hisflips[0]);
+    }
+
+    if (found_acid)
+    {
+        if (found_hbond)
+        {
+            movability = MOV_PINNED;
+            found_mol->movability = MOV_PINNED;
+
+            if (!protonated)
+            {
+                for (l=0; atoms[l]; l++)
+                {
+                    if (l==found_j) continue;
+                    if (atoms[l]->is_backbone) continue;
+                    if (atoms[l]->get_family() == TETREL) continue;
+                    if (atoms[l]->get_Z() == 1) continue;
+                    if (atoms[l]->is_bonded_to(atoms[found_j]))
+                    {
+                        #if _dbg_conjugation
+                        cout << atoms[l]->name << " is bonded to " << atoms[found_j]->name << ", no good." << endl;
+                        #endif
+                        continue;
+                    }
+
+                    if (atoms[l]->is_conjugated_to(atoms[found_j]))
+                    {
+                        protonated = atoms[l];
+                        break;
+                    }
+                    #if _dbg_conjugation
+                    else
+                    {
+                        cout << atoms[l]->name << " is not conjugated to " << atoms[found_j]->name << ", no good." << endl;
+                    }
+                    #endif
+                }
+            }
+
+            if (!protonated)
+            {
+                cout << "No suitable protonation atom found for " << name << "(acid is " << found_mol->get_name() << ")." << endl;
+                throw 0xfffd;
+            }
+
+            if (proton) return;
+
+            // Create a hydrogen atom and attach it to the bare nitrogen.
+            // Save a pointer to the hydrogen atom for later.
+            char temp[255];
+            strcpy(temp, protonated->name);
+            temp[0] = 'H';
+            proton = add_atom("H", temp, protonated, 1);
+            proton->residue = residue_no;
+            strcpy(proton->aa3let, aadef->_3let);
+
+            // Set charge of the heavy atom.
+            protonated->increment_charge(1);
+
+            #if _dbg_cond_basic
+            cout << "Added protonation and incremented charge!" << endl << endl;
+            #endif
+            return;
+        }
+        else
+        {
+            // Delete the extra hydrogen atom.
+            if (proton)
+            {
+                delete_atom(proton);
+                proton = nullptr;
+
+                // Clear charge of the heavy atom.
+                if (protonated) protonated->increment_charge(-1);
+            }
+
+            #if _dbg_cond_basic
+            cout << "Insufficient binding (" << -found_f << ") for conditional protonation of " << name << "." << endl << endl;
+            #endif
+
+            return;
+        }
+    }
+
+    #if _dbg_cond_basic
+    cout << "No suitable acids found for conditional basicity." << endl << endl;
+    #endif
+    #endif
+}
+
 std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
 {
     if (!&aa) return os;
+
+    char c = aa.get_pdb_chain();
+    if (c && c != ' ') os << c << ":";
+
     try
     {
         AADef* raa = aa.get_aa_definition();
@@ -1702,6 +2035,7 @@ std::ostream& operator<<(std::ostream& os, const AminoAcid& aa)
     {
         ;
     }
+
     os << aa.get_residue_no();
     return os;
 }
@@ -1732,34 +2066,193 @@ Atom* AminoAcid::capable_of_inter(intera_type inter)
                 cadist = r;
             }
         }
-        /*InteratomicForce** iff = InteratomicForce::get_applicable(atoms[i], atoms[i]);
-        if (!iff) continue;
-        for (j=0; iff[j]; j++)
-            if (iff[j]->get_type() == inter)
-            {
-                // cout << *this << " is capable of " << inter << " binding because of atom " << atoms[i]->name << endl;
-                delete[] iff;
-                return true;
-            }*/
     }
 
     return retval;
 }
 
-float AminoAcid::hydrophilicity()
+float AminoAcid::get_phi()
+{
+    if (!prev_aa)
+    {
+        if (!next_aa) return 0;
+        return next_aa->get_phi();
+    }
+
+    Atom *C0, *N, *CA, *C1;
+    C0 = prev_aa->get_atom("C");
+    N  = get_atom("N");
+    CA = get_atom("CA");
+    C1 = get_atom("C");
+
+    if (!C0 || !N || !CA || !C1) return 0;
+
+    SCoord axis = CA->get_location().subtract(N->get_location());
+
+    return find_angle_along_vector(C0->get_location(), C1->get_location(), CA->get_location(), axis);
+}
+
+float AminoAcid::get_psi()
+{
+    if (!next_aa)
+    {
+        if (!prev_aa) return 0;
+        return prev_aa->get_phi();
+    }
+
+    Atom *N0, *CA, *C, *N1;
+    N0 = get_atom("N");
+    CA = get_atom("CA");
+    C  = get_atom("C");
+    N1 = next_aa->get_atom("N");
+
+    if (!N0 || !CA || !C || !N1) return 0;
+
+    SCoord axis = C->get_location().subtract(CA->get_location());
+
+    return find_angle_along_vector(N0->get_location(), N1->get_location(), CA->get_location(), axis);
+}
+
+float AminoAcid::get_omega()
+{
+    if (!next_aa)
+    {
+        if (!prev_aa) return 0;
+        return prev_aa->get_phi();
+    }
+
+    Atom *CA0, *C, *N, *CA1;
+    CA0 = get_atom("CA");
+    C   = get_atom("C");
+    N   = next_aa->get_atom("N");
+    CA1 = next_aa->get_atom("CA");
+
+    if (!CA0 || !C || !N || !CA1) return 0;
+
+    SCoord axis = N->get_location().subtract(C->get_location());
+
+    return find_angle_along_vector(CA0->get_location(), CA1->get_location(), N->get_location(), axis);
+}
+
+bond_rotation_fail_reason AminoAcid::rotate_phi(float a)
+{
+    if (aadef->proline_like) return bf_disallowed_rotation;
+    Atom* N  = get_atom("N");
+    Atom* CA = get_atom("CA");
+    Bond* b = CA->get_bond_between(N);
+    if (!b) return bf_bond_not_found;
+    b->rotate(a, true, true);
+    return b->last_fail;
+}
+
+bond_rotation_fail_reason AminoAcid::rotate_psi(float a)
+{
+    Atom* CA = get_atom("CA");
+    Atom* C  = get_atom("C");
+    Bond* b = CA->get_bond_between(C);
+    if (!b) return bf_bond_not_found;
+    b->rotate(a, true, true);
+    return b->last_fail;
+}
+
+bool AminoAcid::is_alpha_helix()
+{
+    return is_helix(4);
+}
+
+bool AminoAcid::is_helix(int p)
+{
+    int i, j;
+    Atom *a, *b;
+    AminoAcid* aa;
+
+    if (!prev_aa && !next_aa) return false;
+
+    float f = (next_aa) ? (get_psi() + next_aa->get_phi()) : (prev_aa->get_psi() + get_psi());
+    f *= fiftyseven;
+    if (f > 180) f -= 360;
+
+    // cout << residue_no << " has f = " << f << endl;
+    float pf = -195.0 + 360.0 / p;
+    if (fabs(f - pf) > 18) return false;
+
+    for (j=0; j<2; j++)
+    {
+        aa = this;
+        for (i=0; i<p; i++)
+        {
+            aa = j ? aa->next_aa : aa->prev_aa;
+            if (!aa) break;
+        }
+
+        if (aa)
+        {
+            a = (j ? this : aa)->get_atom("O");
+            b = (j ? aa : this)->get_atom("HN");
+            if (!b) b = (j ? aa : this)->get_atom("H");
+
+            if (a && b)
+            {
+                float r = a->distance_to(b);
+                if (r < helix_hbond_cutoff) return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+float AminoAcid::hydrophilicity() const
 {
     int i, count=0;
-    float total=0;
+    float total=0, weight;
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
+        if (!strcmp(atoms[i]->name, "HA")) continue;
+
+        // if (residue_no == 155) cout << atoms[i]->name << " charge " << atoms[i]->get_charge() << endl;
+
+        if (fabs(atoms[i]->get_charge()) > 0.5) return fabs(atoms[i]->get_charge());
+
+        weight = 1;
 
         int Z = atoms[i]->get_Z();
         int fam = atoms[i]->get_family();
-        if (Z==1) continue;
+        if (Z==1)
+        {
+            int j;
+            for (j=0; j<atoms[i]->get_geometry(); j++)
+            {
+                Bond* b = atoms[i]->get_bond_by_idx(j);
+                if (b && b->btom)
+                {
+                    fam = b->btom->get_family();
+                    break;
+                }
+            }
+        }
+        if (Z==1 && fam == TETREL && !atoms[i]->is_pi()) continue;
 
-        total += atoms[i]->hydrophilicity_rule();
+        if (Z == 7) weight = 3.5;
+        else if (Z == 8) weight = 4;
+        else if (Z == 15) weight = 1.5;
+        else if (Z == 16) weight = 1.25;
+
+        if (atoms[i]->is_pi() && fam == TETREL) weight = 1.5;
+
+        #if auto_pK_protonation
+        if (fam == PNICTOGEN && conditionally_basic()) total += protonation(sc_pKa())*2;
+        #endif
+
+        float h = atoms[i]->hydrophilicity_rule();
+        total += h;
         count++;
+        /*if (fam != TETREL)
+        {
+            total += h*weight;
+            count++;
+        }*/
     }
     return count ? (total / count) : 0;
 }
@@ -1773,31 +2266,96 @@ void AminoAcid::hydrogenate(bool steric_only)
     {
         Atom* C = get_atom("C");
         if (!oxt->get_bond_between(C)) oxt->bond_to(C, 1);
+    }    
+    
+    int i, j, k, l, n;
+
+    #if hydrogenate_add_missing_heavy_atoms
+    if (aadef && get_atom("CB"))
+    {
+        for (i=0; aadef->aabonds[i]; i++)
+        {
+            if (aadef->aabonds[i]->Za < 2 || aadef->aabonds[i]->Zb < 2) continue;
+            Atom* a = get_atom(aadef->aabonds[i]->aname);
+            Atom* b = get_atom(aadef->aabonds[i]->bname);
+
+            if (a && a->is_backbone) continue;
+            if (b && b->is_backbone) continue;
+
+            if (!aa_archetypes[aadef->_1let]) aa_archetypes[aadef->_1let] = new AminoAcid(aadef->_1let);
+            AminoAcid* at = aa_archetypes[aadef->_1let];
+            if (!at->get_atom("CB")) continue;
+
+            at->movability = MOV_ALL;
+            at->aamove(get_CA_location().subtract(at->get_CA_location()));
+            Rotation rot = align_points_3d(at->get_atom("CB")->get_location(), get_atom("CB")->get_location(), get_CA_location());
+            LocatedVector lv;
+            lv = rot.v;
+            lv.origin = get_CA_location();
+            at->rotate(lv, rot.a);
+            Atom* c;
+
+            if (!a && !b)
+            {
+                cout << "Warning: amino acid definition " << aadef->name
+                    << " not compatible with hydrogenate_add_missing_heavy_atoms; atoms "
+                    << aadef->aabonds[i]->aname << " and " << aadef->aabonds[i]->bname
+                    << " are out of sequence." << endl;
+            }
+            else if (!a)
+            {
+                a = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Za), aadef->aabonds[i]->aname, b, aadef->aabonds[i]->cardinality );
+                a->residue = b->residue;
+                strcpy(a->aa3let, b->aa3let);
+                a->increment_charge(aadef->aabonds[i]->acharge);
+                c = at->get_atom(aadef->aabonds[i]->aname);
+                if (c) a->move(c->get_location());
+                added_heavies = true;
+            }
+            else if (!b)
+            {
+                b = add_atom( Atom::esym_from_Z(aadef->aabonds[i]->Zb), aadef->aabonds[i]->bname, a, aadef->aabonds[i]->cardinality );
+                b->residue = a->residue;
+                strcpy(b->aa3let, a->aa3let);
+                c = at->get_atom(aadef->aabonds[i]->bname);
+                if (c) b->move(c->get_location());
+                added_heavies = true;
+            }
+            else if (!a->is_bonded_to(b))
+            {
+                a->bond_to(b, aadef->aabonds[i]->cardinality);
+            }
+        }
     }
+
+    if (added_heavies)
+    {
+        minimize_internal_clashes();
+    }
+    #endif
+
 
     Molecule::hydrogenate(steric_only);
     int already[128][4];
     Atom* onlyone[128][4];
     const char* alpha = "ABGDEZH";
 
-    int i, j, k, l, n;
     for (i=0; i<24; i++) for (j=0; j<4; j++)
     {
         already[i][j] = 0;
         onlyone[i][j] = nullptr;
     }
 
-    Bond** bt;
+    Bond* bt[16];
     Bond* bb;
     Atom* heavy;
 
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->get_Z() > 1) continue;
-        bt = atoms[i]->get_bonds();
+        atoms[i]->fetch_bonds(bt);
         if (!bt) continue;
         bb = bt[0];
-        delete[] bt;
         if (!bb) continue;
         heavy = bb->btom;
         if (!heavy) continue;
@@ -1868,14 +2426,13 @@ void AminoAcid::hydrogenate(bool steric_only)
         for (i=0; atoms[i]; i++)
             if (atoms[i]->get_Z() == 1)
             {
-                bt = atoms[i]->get_bonds();
+                atoms[i]->fetch_bonds(bt);
                 if (bt)
                 {
                     bb = bt[0];
                     if (bb && bb->btom == cursor)
                         atomtmp[l++] = atoms[i];
                 }
-                delete[] bt;
             }
     }
 
@@ -1899,14 +2456,13 @@ void AminoAcid::hydrogenate(bool steric_only)
                         for (k=0; atoms[k]; k++)
                             if (atoms[k]->get_Z() == 1)
                             {
-                                bt = atoms[k]->get_bonds();
+                                atoms[k]->fetch_bonds(bt);
                                 if (bt)
                                 {
                                     bb = bt[0];
                                     if (bb && bb->btom == cursor)
                                         atomtmp[l++] = atoms[k];
                                 }
-                                delete[] bt;
                             }
                     }
                 }
@@ -1927,14 +2483,13 @@ void AminoAcid::hydrogenate(bool steric_only)
         for (i=0; atoms[i]; i++)
             if (atoms[i]->get_Z() == 1)
             {
-                bt = atoms[i]->get_bonds();
+                atoms[i]->fetch_bonds(bt);
                 if (bt)
                 {
                     bb = bt[0];
                     if (bb && bb->btom == cursor)
                         atomtmp[l++] = atoms[i];
                 }
-                delete[] bt;
             }
     }
 
@@ -1942,6 +2497,8 @@ void AminoAcid::hydrogenate(bool steric_only)
 
     for (i=0; i<l; i++) atoms[i] = atomtmp[i];
     atoms[i] = nullptr;
+
+    ensure_pi_atoms_coplanar();
 }
 
 Point AminoAcid::get_CA_location()
@@ -1971,28 +2528,34 @@ void AminoAcid::aamove(SCoord move_amt)
     }
 }
 
-void AminoAcid::rotate(LocatedVector SCoord, float theta)
+void AminoAcid::rotate(LocatedVector vec, float theta)
 {
     if (!atoms) return;
     // cout << name << " AminoAcid::rotate()" << endl;
 
+    ensure_pi_atoms_coplanar();
+
     int i;
-    for (i=0; i<atcount; i++)
+    for (i=0; atoms[i]; i++)
     {
         Point loc = atoms[i]->get_location();
-        Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
+        Point nl  = rotate3D(&loc, &vec.origin, &vec, theta);
         atoms[i]->move(&nl);
-        // cout << atoms[i]->residue << ":" << atoms[i]->name << nl << " ";
+        // cout << *this << ":" << atoms[i]->name << nl << " " << endl;
     }
     // cout << endl;
+
+    ensure_pi_atoms_coplanar();
 
     // If you have a metal coordination, AND YOU ARE THE FIRST COORDINATING RESIDUE OF THE METAL, move the metal with you.
     if (m_mcoord && m_mcoord->coord_res && m_mcoord->coord_res[0] == this)
     {
         Point loc = m_mcoord->metal->get_location();
-        Point nl  = rotate3D(&loc, &SCoord.origin, &SCoord, theta);
+        Point nl  = rotate3D(&loc, &vec.origin, &vec, theta);
         m_mcoord->metal->move(&nl);
     }
+
+    ensure_pi_atoms_coplanar();
 }
 
 void AminoAcid::renumber(int new_resno)
@@ -2069,15 +2632,15 @@ Atom* AminoAcid::HN_or_substitute()
         Atom* a = get_atom("N");
         if (!a) return nullptr;
         int i;
-        Bond** bb = a->get_bonds();
-        if (!bb) return nullptr;
+        Bond* bb[16];
+        a->fetch_bonds(bb);
+        if (!bb[0]) return nullptr;
         int g = a->get_geometry();
 
         for (i=0; i<g; i++)
         {
             if (bb[i]->btom && strcmp(bb[i]->btom->name, "CA")) return bb[i]->btom;
         }
-        delete[] bb;
     }
     return retval;
 }
@@ -2343,6 +2906,50 @@ LocRotation* AminoAcid::flatten()
     }
 
     return retval;
+}
+
+void AminoAcid::ensure_pi_atoms_coplanar()
+{
+    if (!atoms) return;
+
+    int i, j, n;
+    bool dirty[get_atom_count()];
+    Point conjugated[get_atom_count()];
+    std::string conj_aname[get_atom_count()];
+    for (i=0; atoms[i]; i++) dirty[i] = false;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (dirty[i]) continue;
+        if (!atoms[i]->is_pi()) continue;
+
+        n = 1;
+        conj_aname[0] = atoms[i]->name;
+        conjugated[0] = atoms[i]->get_location();
+        for (j = i+1; atoms[j]; j++)
+        {
+            if (!atoms[j]->is_pi()) continue;
+            if (!atoms[i]->is_conjugated_to(atoms[j])) continue;
+
+            conj_aname[n] = atoms[j]->name;
+            conjugated[n++] = atoms[j]->get_location();
+            dirty[j] = true;
+        }
+
+        if (n < 4) continue;
+
+        for (j = 3; j < n; j++)
+        {
+            float result = are_points_planar(conjugated[0], conjugated[1], conjugated[2], conjugated[j]);
+            if (result >= coplanar_threshold)
+            {
+                cout << *this << " has non-coplanar pi atoms "
+                    << conj_aname[0] << ", " << conj_aname[1] << ", " << conj_aname[2] << ", " << conj_aname[j]
+                    << " having anomaly " << result
+                    << endl;
+            }
+        }
+    }
 }
 
 LocRotation AminoAcid::rotate_backbone_abs(bb_rot_dir dir, float angle)

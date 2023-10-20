@@ -109,7 +109,7 @@ p
     z-index: 20000;
 }
 
-#logo h1
+#logo h2
 {
     margin-left: 21px;
     margin-right: 53px;
@@ -121,7 +121,7 @@ p
     float: left;
 }
 
-#logo h1:hover
+#logo h2:hover
 {
     text-decoration: none!important;
 }
@@ -218,6 +218,16 @@ p.ref
     float: left;
     display: block;
 }
+
+table.rcplist tr:nth-of-type(odd), table.liglist tr:nth-of-type(odd)
+{
+    background-color: rgba(128,192,224,0.07);
+}
+
+/* table.rcplist tr:nth-of-type(5n+1), table.liglist tr:nth-of-type(5n+1)
+{
+    border-bottom: 1px solid #57759c;
+} */
 
 .idxbuttons td
 {

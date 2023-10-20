@@ -1,7 +1,7 @@
 <?php
 chdir(__DIR__);
-require_once("../predict/protutils.php");
-require_once("../predict/odorutils.php");
+require_once("../data/protutils.php");
+require_once("../data/odorutils.php");
 require_once("../predict/statistics.php");
 
 $rcpid = @$_REQUEST['r'];
@@ -33,6 +33,46 @@ $bsr = array_flip(
 $fam = family_from_protid($rcpid);
 if ($fam == 'TAAR') $bsr['5.42'] = count($bsr);
 
+$predictions = [];
+$pred_shown = [];
+$predname = [];
+$predate = [];
+if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
+{
+    chdir(__DIR__);
+    $dock_results = json_decode(file_get_contents("../predict/dock_results_icactive.json"), true);
+    if (isset($dock_results[$rcpid]))
+    {
+        foreach ($dock_results[$rcpid] as $ligname => $dock)
+        {
+            $odor = find_odorant($ligname);
+            $oid = $odor['oid'];
+            $predname[$oid] = $ligname;
+            $predate[$oid] = date("Y-m-d H:i:s", $dock['version']);
+            if (isset($dock['DockScore'])) $predictions[$oid] = floatval($dock['DockScore']);
+            else if (isset($dock['a_Pose1']) && isset($dock['i_Pose1']))
+                $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
+        }
+    }
+}
+
+$cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|obabel)' | grep -v grep";
+$result = [];
+exec($cmd, $result);
+
+$ligands_inprogress = [];
+foreach ($result as $line)
+{
+    $pos = strpos($line, ".$rcpid.");
+    if (false == $pos) $pos = strpos($line, ".{$rcpid}_");
+    if (false == $pos) continue;
+    $pos2 = strpos($line, ".", $pos+1);
+    $ligname = substr($line, $pos2);
+    $ligname = preg_replace("/[.]config/", "", $ligname);
+    $odor = find_odorant($ligname);
+    $ligands_inprogress[$odor['oid']] = true;
+}
+
 // Copper binding sites for e.g. OR2T11
 // http://pubs.acs.org/doi/abs/10.1021/jacs.6b06983
 $cub =
@@ -56,6 +96,43 @@ $pairs = all_empirical_pairs_for_receptor($rcpid);
 include("header.php");
 
 ?>
+<style>
+#skeletal
+{
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    box-shadow: 25px 25px 35px rgba(0,0,0,0.5);
+    z-index: 10000;
+    background: #234;
+}
+
+#dlmenu
+{
+    position: absolute;
+    box-shadow: 25px 25px 35px rgba(0,0,0,0.5);
+    z-index: 10000;
+    background: #234;
+    padding: 20px;
+    font-size: small;
+}
+
+.ctxmenu
+{
+    margin: 0px;
+    padding-inline-start: 0px;
+}
+
+.ctxmenu li
+{
+    display: block;
+    border-top: 2px solid #68a;
+    border-left: 2px solid #468;
+    border-right: 2px solid #123;
+    border-bottom: 2px solid #012;
+    margin-bottom: 5px;
+}
+</style>
 <script>
 var viewer_loaded = false;
 function load_viewer(obj)
@@ -100,6 +177,45 @@ function load_viewer(obj)
         }, 259); 
         viewer_loaded = true;
     }
+}
+
+function showSkeletal(e, img)
+{
+    var skeletal = $("#skeletal")[0];
+    skeletal.style.left = `${e.pageX}px`;
+    skeletal.style.top = `${e.pageY}px`;
+    skeletal.innerText = "Please wait...";
+    
+	$.ajax(
+	{
+		url: img,
+		cache: false,
+		success: function(result)
+		{
+            skeletal.innerHTML = result;
+        }
+    });
+
+    $(skeletal).show();
+}
+
+function show_dlmenu(e, prot, lig, v)
+{
+    var dlmenu = $("#dlmenu")[0];
+
+    $("#dl_mnu_prot")[0].innerText = prot;
+    $("#dl_mnu_lig")[0].innerText = decodeURIComponent(lig);
+    $("#dl_cd_v")[0].innerText = v;
+    $("#dl_acv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=active");
+    $("#dl_iacv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=inactive");
+    $("#dl_acv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=active");
+    $("#dl_iacv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=inactive");
+    $("#dl_json")[0].setAttribute("href", "download.php?obj=json&prot="+prot+"&odor="+lig);
+
+    dlmenu.style.left = `${e.pageX}px`;
+    dlmenu.style.top = `${e.pageY}px`;
+
+    $(dlmenu).show();
 }
 </script>
 
@@ -327,7 +443,7 @@ echo "</p>";*/
 
     ?>
 
-    <h3>Transmembane Helices:</h3>
+    <h3>Transmembrane Helices:</h3>
     <pre style="padding: 5px;"><?php 
     $mxrt = 0; 
     foreach ($rgntext as $rgn => $text) if (substr($rgn,0,3) == 'TMR') 
@@ -453,13 +569,25 @@ echo "</p>";*/
 
 <div class="box">
 <div class="row content scrollh">
+
+<?php if (count($predictions)) { ?>
+<div style="background-color: #fc9; color: 000; font-size: 0.7em; padding: 2px;">
+This page features beta versions of predictions, including links to viewable 3D models. 
+The numbers and models are not yet fully accurate, but the repository is accepting pull requests at
+<a style="color: #00c;" href="https://github.com/primaryodors/primarydock">https://github.com/primaryodors/primarydock</a>.
+</div>
+<?php } ?>
+
 <table class="liglist">
     <tr>
-        <th>Odorant</th>
-        <th>EC<sub>50</sub></th>
-        <th>Adjusted Top</th>
-        <th>Antagonist?</th>
-        <th>Aroma Notes</th>
+        <th width="20%">Odorant</th>
+        <th width="10%">EC<sub>50</sub></th>
+        <th width="10%">Adjusted Top</th>
+        <th width="10%">Antagonist?</th>
+        <?php
+        if (count($predictions)) echo "<th colspan=\"2\" width=\"1%\">Predicted (BETA)</th>";
+        ?>
+        <th width="50%">Aroma Notes</th>
     </tr>
 
 <?php 
@@ -494,7 +622,14 @@ foreach ($pairs as $oid => $pair)
 
     $ufn = urlencode($odor['full_name']);
     echo "<tr>\n";
-    echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\">{$odor['full_name']}</a></td>\n";
+    echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\"";
+
+    $skelurl = "skeletal.php?oid=$oid";
+
+    echo " onmouseenter=\"showSkeletal(event, '$skelurl');\"";
+    echo " onmouseout=\"$('#skeletal').hide();\"";
+    echo ">{$odor['full_name']}</a>";
+    echo "</td>\n";
 
     echo "<td>" . 
         ($dispec50 = (@$pair['ec50']
@@ -510,8 +645,62 @@ foreach ($pairs as $oid => $pair)
     if (@$pair['antagonist']) echo "<td>Y</td>";
     else echo "<td>&nbsp;</td>";
 
+    if (count($predictions))
+    {
+        if (isset($predictions[$oid]))
+        {
+            echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor=".urlencode($predname[$oid])."&mode=";
+            if ($predictions[$oid] > 0) echo "active";
+            else echo "inactive";
+            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</a></td>";
+            echo "<td><span style=\"text-decoration: underline; cursor: pointer;\"";
+            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">&#x21a7;</span>";
+            echo "</td>";
+            $pred_shown[$oid] = true;
+        }
+        else if (@$ligands_inprogress[$oid]) echo "<td colspan=\"2\"><span title=\"A prediction is currently running for this receptor+ligand pair.\">&#x23F3;</span></td>";
+        else echo "<td colspan=\"2\">&nbsp;</td>";
+    }        
+
     echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";
+}   // Each pair.
+
+if (count($predictions))
+{
+    foreach ($predictions as $oid => $pred)
+    {
+        if (!@$pred_shown[$oid])
+        {
+            $lodor = $odors[$oid];
+            echo "<tr>\n";
+            echo "<td><a href=\"odorant.php?o=$oid\" style=\"white-space: nowrap;\"";
+
+            $skelurl = "skeletal.php?oid=$oid";
+        
+            echo " onmouseenter=\"showSkeletal(event, '$skelurl');\"";
+            echo " onmouseout=\"$('#skeletal').hide();\"";
+            echo ">{$lodor['full_name']}</td>\n";
+            echo "<td>&nbsp;</td>\n";
+            echo "<td>&nbsp;</td>\n";
+            echo "<td>&nbsp;</td>\n";
+
+            echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor=".urlencode($predname[$oid])."&mode=";
+            if ($predictions[$oid] > 0) echo "active";
+            else echo "inactive";
+            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</a></td>";
+            echo "<td><span style=\"text-decoration: underline; cursor: pointer;\"";
+            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">&#x21a7;</span>";
+            echo "</td>";
+            $pred_shown[$oid] = true;
+
+            $pq = [];
+            foreach ($lodor['aroma'] as $refurl => $notes) $pq = array_merge($pq, $notes);
+            $pq = array_unique($pq);
+            echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
+            echo "</tr>\n";
+        }
+    }
 }
 
 ?>
@@ -519,6 +708,29 @@ foreach ($pairs as $oid => $pair)
 </div>
 </div>
 </div>
+
+<div id="skeletal"></div>
+<script>
+$('#skeletal').hide();
+</script>
+
+<div id="dlmenu" onclick="$('#dlmenu').hide();">
+    <div id="dl_mnu_prot">&nbsp;</div>
+    <div id="dl_mnu_lig">&nbsp;</div>
+    <br>
+    Code version:<div id="dl_cd_v">&nbsp;</div><br>
+    Download:<br>
+    <ul class="ctxmenu">
+        <li><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Active model</a></li>
+        <li><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Inactive model</a></li>
+        <li><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">Active dock</a></li>
+        <li><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">Inactive dock</a></li>
+        <li><a id="dl_json" href="" target="_dl" onclick="$('#dlmenu').hide();">JSON entry</a></li>
+    </ul>
+</div>
+<script>
+$('#dlmenu').hide();
+</script>
 
 <div id="Comparison" class="tabcontent">
 <div class="box">

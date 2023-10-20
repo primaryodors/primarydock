@@ -91,9 +91,20 @@ body
 	overflow: hidden;
 }
 
+body.whtbk
+{
+	color: #346;
+	background-color: #fed;
+}
+
 a
 {	color: #2af;
 	text-decoration: none;
+}
+
+body.whtbk a
+{
+	color: #259;
 }
 
 a:hover
@@ -116,6 +127,11 @@ a:hover
 	box-shadow: 0px 0px 41px rgba(0,0,0,0.22), 5px 3px 5px rgba(0,0,0,0.41);
 }
 
+body.whtbk #pleasewait
+{
+	background-color: rgba(224, 240, 255, 0.67);
+}
+
 #citefloat
 {
 	position: fixed;
@@ -124,7 +140,11 @@ a:hover
     bottom: 15px;
 	font-family: Verdana, Arial, Sans-Serif;
     font-size: 11px;
-	color: #06c;
+}
+
+#citefloat, #citefloat a
+{
+	color: #036;
 }
 
 #citefloat span
@@ -137,6 +157,12 @@ a:hover
 	display: block;
 	height: 0px;
 	overflow: hidden;
+	width: 150px;
+}
+
+body.whtbk #citefloat span
+{
+	background-color: rgba(255,255,255, 0.67);
 }
 
 #citefloat:hover span
@@ -144,6 +170,62 @@ a:hover
 	color: rgba(192, 192, 192, 1);
 	display: block;
 	height: auto;
+	width: fit-content;
+}
+
+body.whtbk #citefloat:hover span
+{
+	color: #222;
+}
+
+#dockfloat
+{
+	position: fixed;
+	text-align: left;
+	left: 0px;
+    top: 10%;
+	font-family: Verdana, Arial, Sans-Serif;
+    font-size: 11px;
+	height: 500px;
+	overflow-y: auto;
+}
+
+#dockfloat, #dockfloat a
+{
+	color: #036;
+}
+
+#dockfloat span
+{
+    background-color: rgba(0,0,0,0.53);
+	color: rgba(0, 128, 255, 0);
+	font-family: 'Courier New', Courier, monospace;
+	font-size: 15px;
+	/* transition: color 1s, width 1s; */
+	text-align: left;
+	display: block;
+	width: 10px;
+	overflow: hidden;
+	height: 500px;
+}
+
+body.whtbk #dockfloat span
+{
+	background-color: rgba(255,255,255, 0.67);
+}
+
+#dockfloat:hover span
+{
+	color: rgba(192, 192, 192, 1);
+	display: block;
+	width: fit-content;
+    padding: 20px;
+	height: fit-content;
+}
+
+body.whtbk #dockfloat:hover span
+{
+	color: #222;
 }
 
 #ctrls div
@@ -159,6 +241,11 @@ a:hover
     padding-right: 5px;
 }
 
+body.whtbk #posey
+{
+	background-color: #bdf;
+}
+
 #dspsett
 {
 	position: absolute;
@@ -167,6 +254,11 @@ a:hover
     padding: 5px;
     background-color: rgba(0, 32, 96, 0.67);
     border-radius: 13px;
+}
+
+body.whtbk #dspsett
+{
+	background-color: rgba(224, 240, 255, 0.67);
 }
 
 .clickme, .clickme:hover
@@ -178,6 +270,11 @@ a:hover
 .clickme:hover
 {
 	color: #9cf;
+}
+
+body.whtbk .clickme:hover
+{
+	color: #06f;
 }
 
 .posebtn
@@ -197,6 +294,16 @@ a:hover
 	font-family: Verdana, Arial, sans-serif;
 }
 
+body.whtbk .posebtn
+{
+	background-color: #9bd;
+    border-top: 2px solid #def;
+    border-left: 2px solid #ace;
+    border-right: 2px solid #69c;
+    border-bottom: 2px solid #468;
+	color: #123;
+}
+
 .posebtn.hilite
 {
 	background-color: #369;
@@ -204,6 +311,16 @@ a:hover
     border-left: 2px solid #579;
     border-right: 2px solid #246;
     border-bottom: 2px solid #135;
+}
+
+body.whtbk .posebtn.hilite
+{
+	background-color: #6bf;
+    border-top: 2px solid #def;
+    border-left: 2px solid #ace;
+    border-right: 2px solid #69c;
+    border-bottom: 2px solid #468;
+	color: #159;
 }
 
 .nodebtn
@@ -219,14 +336,30 @@ a:hover
 	display: inline-block;
 }
 
+body.whtbk .nodebtn
+{
+	background: transparent;
+}
+
 .nodebtn.hilite
 {
 	background-color: #357;
 }
 
+body.whtbk .nodebtn.hilite
+{
+	background: transparent;
+}
+
 .bw50
 {
 	color: #fff;
+}
+
+body.whtbk .bw50
+{
+	color: #600;
+	font-weight: bold;
 }
 
 .symbol
@@ -248,11 +381,23 @@ input, select
     border-radius: 5px;
 }
 
+body.whtbk input, body.whtbk select
+{
+	background-color: #9cf;
+	color: #036;
+}
+
 option.agonist
 {
 	background-color: #044;
 	color: #9ef;
 	font-weight: bold;
+}
+
+body.whtbk option.agonist
+{
+	background-color: #9ef;
+	color: #044;
 }
 
 option.non_agonist
@@ -261,16 +406,34 @@ option.non_agonist
 	color: #bcd;
 }
 
+body.whtbk option.non_agonist
+{
+	background-color: #bcd;
+	color: #234;
+}
+
 option.antagonist
 {
 	background-color: #410;
 	color: #fb9;
 }
 
+body.whtbk option.antagonist
+{
+	background-color: #fb9;
+	color: #410;
+}
+
 option.unknown
 {
 	background-color: #000;
 	color: #999;
+}
+
+body.whtbk option.unknown
+{
+	background-color: #999;
+	color: #000;
 }
 
 #clip, #bbvis, #lght
@@ -294,6 +457,71 @@ option.unknown
 	max-height: 81%;
 }
 
+body.whtbk #seqdd
+{
+	background-color: #bbccffcc;
+}
+
+#seqdd .tab button
+{
+	background-color: #112;
+    border-top: 2px solid #258;
+    border-left: 2px solid #147;
+    border-right: 2px solid #123;
+    border-bottom: 0px;
+    border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	color: #9cf;
+	cursor: pointer;
+}
+
+body.whtbk #seqdd .tab button
+{
+	background-color: #ccd;
+    border-top: 2px solid #def;
+    border-left: 2px solid #cde;
+    border-right: 2px solid #68a;
+	color: #135;
+}
+
+#seqdd .tab button.highlighted
+{
+    border-top: 2px solid #5af;
+    border-left: 2px solid #48c;
+    border-right: 2px solid #369;
+	color: #def;
+	background-color: #234;
+	font-weight: bold;
+}
+
+body.whtbk #seqdd .tab button.highlighted
+{
+	background-color: #9bf;
+    border-top: 2px solid #fff;
+    border-left: 2px solid #adf;
+    border-right: 2px solid #37b;
+	color: #159;
+}
+
+.stranddiv
+{
+	background-color: #234;
+}
+
+body.whtbk .stranddiv
+{
+	background-color: #bcd;
+}
+
+.stranddiv button
+{
+	background-color: transparent;
+	border: 0px;
+	margin-top: 5px;
+	margin-right: 5px;
+	cursor: pointer;
+}
+
 .sctgbtn
 {
 	font-family: Monospace;
@@ -307,6 +535,12 @@ option.unknown
     color: #9cf;
     padding-left: 4px;
     padding-right: 4px;
+}
+
+body.whtbk .sctgbtn.hilite
+{
+    background-color: #9cf;
+    color: #345;
 }
 
 .seqnumln
@@ -445,17 +679,23 @@ function rotate3D(point, source, axis, theta)
 	<!-- a id="ptbbbtn" class="nodebtn clickme symbol" onclick="show_hide_gmdl();" title="Protein Backbone">&#xAA5C;</a -->
 	<a id="sdchbtn" class="nodebtn clickme symbol" onclick="show_seqdd();" title="Side Chains">&#x232C;</a>
 </div>
+<a id="whtbk" title="Switch to Light Background" class="nodebtn clickme symbol smaller" onclick="whtbk=true; stage.setParameters({'backgroundColor': '#fff0e8'}); $(document.body).addClass('whtbk'); if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#blkbk').show(); $('#bkbnsld').hide();">&#x2600;&#xFE0F;</a>
+<a id="blkbk" title="Switch to Dark Background" class="nodebtn clickme symbol smaller" onclick="whtbk=false; stage.setParameters({'backgroundColor': '#020408'}); $(document.body).removeClass('whtbk'); if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#whtbk').show(); $('#bkbnsld').show();" style="display: none; background-color: #000;">&#x1F319;</a>
+
+<a id="nohyd" title="Turn Off Hydrogens" class="nodebtn clickme symbol smaller" onclick="hydrogens=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } update_hydrogens(); $(this).hide(); $('#hydro').show();">&#x1f3dc;&#xFE0F;</a>
+<a id="hydro" title="Turn On Hydrogens" class="nodebtn clickme symbol smaller" onclick="hydrogens=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } update_hydrogens(); $(this).hide(); $('#nohyd').show();" style="display: none;">&#x1F6b0;</a>
+
 <a id="colcpk" title="Colors: CPK Standard" class="nodebtn clickme symbol smaller" onclick="born=true; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colborn').show();">CPK</a>
 <a id="colborn" title="Colors: Blue Oxygen, Red Nitrogen" class="nodebtn clickme symbol smaller" onclick="born=false; if (sfenable) { spcfill ? spaceFill() : ballAndStick(); } refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#colcpk').show();" style="display: none;">BORN</a>
-<a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="spaceFill(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#bstick').show();">&#x1F388;</a>
-<a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="ballAndStick(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#spcfill').show();" style="display: none;">&#x1F9B4;</a>
+<a id="spcfill" title="Space Fill" class="nodebtn clickme symbol smaller" onclick="hydrogens=true; spaceFill(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#bstick').show(); $('#hydro').hide(); $('#nohyd').show(); ">&#x1F388;</a>
+<a id="bstick" title="Ball and Stick" class="nodebtn clickme symbol smaller" onclick="if (mdlstrands.length) hydrogens=false; ballAndStick(); refreshSideChainsVisible(); showNode(gnode); $(this).hide(); $('#spcfill').show(); if (mdlstrands.length) { $('#hydro').show(); $('#nohyd').hide(); } " style="display: none; background-color: #234;">&#x1F9B4;</a>
 <a id="spinon" title="Spin On" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(true); $(this).hide(); $('#spinoff').show();">&#x1F310;</a>
 <a id="spinoff" title="Spin Off" class="nodebtn clickme symbol smaller" onclick="stage.setSpin(false); $(this).hide(); $('#spinon').show();" style="display: none;">&#x1F9F1;</a>
 
 <div id="center">
 <a id="fsbtn" class="nodebtn clickme" onclick="if (is_fullscreen) exitFullscreen(); else openFullscreen(document.body); is_fullscreen = !is_fullscreen">&#x26F6;</a>
 Center:
-<a class="posebtn clickme" onclick="gmodel[0].autoView(); cen_ligand = false;" title="Middle-click an atom to center it.">Model</a>
+<a class="posebtn clickme" onclick="stage.autoView(); cen_ligand = false;" title="Middle-click an atom to center it.">Model</a>
 <a class="posebtn clickme" onclick="centerPocket(); cen_ligand = false;" id="pktbtn" style="display: none;">Pocket</a>
 <a class="posebtn clickme" onclick="curr_ligand.autoView(); cen_ligand = true;" id="ligbtn" style="display: none;">Ligand</a>
 </div>
@@ -468,9 +708,11 @@ Clip:
 <input type="checkbox" id="preserve" checked onchange="$('#clip').trigger('input');"> Preserve Ligand
 </span>
 <br>
+<span id="bkbnsld">
 Backbone:
 <input type="range" id="bbvis" min="0" max="100" step="1" value="25" class="slider" onkeyup="this.blur();">
 <br>
+</span>
 Lighting:
 <input type="range" id="lght" min="0" max="170" step="1" value="80" class="slider" onkeyup="this.blur();">
 </div>
@@ -504,13 +746,140 @@ var tmcolor =
     4: hsl_to_rgb( 70,  96,  96),
     5: hsl_to_rgb( 60, 255, 176),
     6: hsl_to_rgb( 25, 240, 160),
-    7: hsl_to_rgb(340, 225, 160),
+    7: hsl_to_rgb(355, 175, 130),
+    8: hsl_to_rgb(260,  85, 100),
 };
 
 var tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0}, tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
 var ligbs = [];
+
+// Man et al 2004 https://doi.org/10.1110%2Fps.03296404
+var ligbs_bw_orII = ["2.53", "3.41", "3.40", "3.37", "3.36", "3.33", "3.32", "3.29", "4.53", "4.57", "4.60", "45.49", "45.52", "5.47", "5.46", "5.43", "5.39", "6.48", "6.51", "6.55", "7.42", "7.39", "7.38"];
+
+// Billesbolle et al 2022 https://doi.org/10.1101/2022.12.20.520951
+var ligbs_bw_orI = ["3.33", "4.57", "4.60", "45.52", "45.53", "5.39", "5.43", "6.55", "R6.59"];
+
+// TODO: A more complete TAAR binding site.
+var ligbs_bw_taar = ["3.29", "3.32", "5.43", "6.48", "6.51"];
+
+// Zhou et al 2019 https://doi.org/10.7554/eLife.50279
+var acvbs = ["1x49", "1x53", "2x43", "2x46", "DENYSK2x50", "EKSTNQD3x39", "3x40", "VMILFY3x43", "3x46", "DE3x49", "R3x50", "3x51", "3x53", "3x54", "5x51", "5x55", "5x57", "5x58", "5x61", "5x62", "6x33", "6x37", "6x40", "6x41", "FWYMILV6x44", "6x48", "STNQ7x45", "STNQK7x49", "7x50", "7x52", "Y7x53", "7x54", "7x55", "8x50", "8x51"];
+
+// Haag et al 2020 https://doi.org/10.1007%2Fs00018-019-03279-y
+// These and M5.46 are conserved in all OR2M, OR2T, OR2V receptors and no others. M5.46 might be a third coordination residue.
+var mtlbs = ["C5.42", "C5.43"];
+
+var tmstrand = ["A"];
 var mcres = [];
 var bw50r = new Array(99).fill(0);
+
+function resno_from_bw(bwnum)
+{
+	var lbw = bwnum.split(".");
+	if (lbw.length < 2) lbw = bwnum.split("x");
+	if (lbw.length < 2) return 0;
+
+	var rgnno = parseInt(lbw[0]);
+	var member = parseInt(lbw[1]);
+
+	if (typeof bw50r[rgnno] == "undefined") return 0;
+	if (!bw50r[rgnno]) return 0;
+
+	return bw50r[rgnno] + member - 50;
+}
+
+function bw_from_resno(resno)
+{
+	var rgnno;
+	for (rgnno = 1; rgnno <= 8; rgnno++)
+	{
+		if (resno >= tmstart[rgnno] && resno <= tmend[rgnno])
+		{
+			if (typeof bw50r[rgnno] == "undefined") return "";
+			else return (""+rgnno) + '.' + (parseInt(resno) - bw50r[rgnno] + 50);
+		}
+	}
+	for (rgnno = 12; rgnno <= 78; rgnno += 11)
+	{
+		var before = parseInt(Math.floor(rgnno / 10));
+		var after = before+1;
+
+		if (resno > tmend[before] && resno < tmstart[after] && typeof bw50r[rgnno] != "undefined" && bw50r[rgnno] > 0)
+			return (""+rgnno) + '.' + (parseInt(resno) - bw50r[rgnno] + 50);
+	}
+	return "";
+}
+
+function superscript_number(num)
+{
+	var str = num.toString();
+	var out = "";
+	var i, n = str.length;
+
+	for (i=0; i<n; i++)
+	{
+		var o = str.charCodeAt(i);
+		if (o >= 0x30 && 0 <= 0x39) out += String.fromCharCode(0x2040 + o);
+		else if (o == 0x2e) out += String.fromCharCode(0x2d9);
+		else out += String.fromCharCode(o);
+	}
+
+	return out;
+}
+
+function resno_from_letters_and_bw(bwnum)
+{
+	if (bwnum.toString().match(/^[0-9]+$/)) return parseInt(bwnum);
+	var lbw = bwnum.replace(/[^0-9.x]/g, '');
+	var resno = resno_from_bw(lbw);
+	var mdlidx = getResMdlIdx(resno, tmstrand[0]);
+	if (lbw == bwnum || bwnum.indexOf(sequence[mdlidx]) >= 0) return resno;
+	else return 0;
+}
+
+function get_ligbs_from_orid()
+{
+	if (!orid) return [];
+
+	if (orid.substr(0, 2) == "OR")
+	{
+		var fam = parseInt(orid.substr(2, 2));
+		if (fam >= 50) return ligbs_bw_orI;
+		else return ligbs_bw_orII;
+	}
+
+	else if (orid.substr(0, 4) == "TAAR")
+		return ligbs_bw_taar;
+
+	else return [];
+}
+
+function get_acvbs_from_orid()
+{
+	if (!orid) return [];
+
+	if (orid.substr(0, 2) == "OR")
+	{
+		return acvbs;
+	}
+
+	else if (orid.substr(0, 4) == "TAAR")
+		return acvbs;
+
+	else return [];
+}
+
+function count_metal_bs()
+{
+	var i, j=0, n = mtlbs.length;
+
+	for (i=0; i<n; i++)
+	{
+		if (resno_from_letters_and_bw(mtlbs[i])) j++;
+	}
+
+	return j;
+}
 
 function aa_1let_from_3let(laa3let)
 {
@@ -526,7 +895,7 @@ function rgn_color(resno, tm_only = false)
 {
 	var i;
 
-    for (i=1; i<=7; i++)
+    for (i=1; i<=8; i++)
     {
         if (resno >= tmstart[i] && resno <= tmend[i]) return tmcolor[i];
         else if (!tm_only && resno < tmstart[i]) return (i&1) ? 0xccddee : 0xcc9966;
@@ -549,9 +918,199 @@ function rgn_color_dark(resno, tm_only = false)
 	return r + g + b;
 }
 
+function rgn_color_light(resno, tm_only = false)
+{
+	var couleur = rgn_color(resno, tm_only);
+	if (!couleur) return couleur;
+
+	var r = couleur & 0xff0000;
+	var g = couleur & 0x00ff00;
+	var b = couleur & 0x0000ff;
+
+	r = 0xff0000 - r;
+	g = 0x00ff00 - g;
+	b = 0x0000ff - b;
+
+	r = Math.floor(r/2) & 0xff0000;
+	g = Math.ceil(g/2) & 0x00ff00;
+	b = Math.ceil(b/2);
+
+	r = 0xff0000 - r;
+	g = 0x00ff00 - g;
+	b = 0x0000ff - b;
+	
+	return r + g + b;
+}
+
 function css_color(rgb_int)
 {
 	return '#'+("000000" + rgb_int.toString(16)).substr(-6);
+}
+
+function show_seqdd_tab(strandid)
+{
+	$(".stranddiv").hide();
+	$("#stranddiv"+strandid).show();
+	$(".tab button").removeClass("highlighted");
+	$("#stab"+strandid).addClass("highlighted");
+}
+
+function getStrandIdxFromID(strandid)
+{
+	var i;
+	for (i=0; i<mdlstrandid.length; i++)
+	{
+		if (mdlstrandid[i] == strandid) return i;
+	}
+	return -1;
+}
+
+function toggleStrand(strandid)
+{
+	var idx = getStrandIdxFromID(strandid);
+	if (idx >= 0)
+	{
+		if (gmvisible[idx])
+		{
+			gmodel[idx].removeAllRepresentations();
+			gmvisible[idx] = false;
+		}
+		else
+		{
+			var p = gmrparams[idx];
+			if (whtbk) p.opacity = 1;
+			if (!hydrogens) p.sele = "* and not hydrogen";
+			gmodel[idx].addRepresentation(gmrep[idx], p);
+			gmvisible[idx] = true;
+		}
+	}
+}
+
+function getStrandColor(strandid)
+{
+	var i;
+	for (i=0; i<mdlstrandid.length; i++)
+	{
+		if (typeof strand_color[i] != "undefined" && mdlstrandid[i] == strandid) return strand_color[i];
+	}
+
+	return '*';
+}
+
+function strandColorSelection(strandid, colorCode)
+{
+	var idx = getStrandIdxFromID(strandid);
+	if (typeof gmrparams[idx] == "undefined") gmrparams[idx] =
+		{
+			opacity: opc_cartoon,
+			colorScheme: PODefRgnScheme,
+			metalness: mtl_cartoon,
+		};
+	var p = gmrparams[idx];
+	if (whtbk) p.opacity = 1;
+	if (!hydrogens) p.sele = "* and not hydrogen";
+	var tabbtn = $("#stab"+strandid)[0];
+
+	switch(colorCode)
+	{
+		case 'y':
+		p.colorScheme = yellowScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#550";
+			tabbtn.style.color = "#ff0";
+		}
+		break;
+
+		case 'g':
+		p.colorScheme = greenScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#350";
+			tabbtn.style.color = "#cf0";
+		}
+		break;
+
+		case 't':
+		p.colorScheme = tealScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#053";
+			tabbtn.style.color = "#6f9";
+		}
+		break;
+
+		case 'c':
+		p.colorScheme = cyanScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#056";
+			tabbtn.style.color = "#9ff";
+		}
+		break;
+
+		case 'b':
+		p.colorScheme = blueScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#039";
+			tabbtn.style.color = "#9cf";
+		}
+		break;
+
+		case 'p':
+		p.colorScheme = purpleScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#309";
+			tabbtn.style.color = "#c9f";
+		}
+		break;
+
+		case 'm':
+		p.colorScheme = magentaScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#608";
+			tabbtn.style.color = "#f9e";
+		}
+		break;
+
+		case 'r':
+		p.colorScheme = redScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#600";
+			tabbtn.style.color = "#f99";
+		}
+		break;
+
+		case 'o':
+		p.colorScheme = orangeScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#630";
+			tabbtn.style.color = "#fc9";
+		}
+		break;
+
+		default:
+		p.colorScheme = (tmstrand.indexOf(strandid) >= 0) ? PODefRgnScheme : POAAScheme;
+		if (typeof tabbtn != "undefined") tabbtn.style.backgroundColor = whtbk ? "#bcd" : "#234";
+	}
+
+	return p;
+}
+
+function colorizeStrand(strandid, colorCode)
+{
+	var idx = getStrandIdxFromID(strandid);
+	gmodel[idx].removeAllRepresentations();
+	var p = strandColorSelection(strandid, colorCode);
+	gmodel[idx].addRepresentation(gmrep[idx], p);
+
+	while (strand_color.length <= idx) strand_color.push("*");
+	strand_color[idx] = colorCode;
 }
 
 var tmoid = false;
@@ -559,242 +1118,409 @@ function show_seqdd()
 {
 	var seqdd = $('#seqdd')[0];
 	seqdd.innerHTML = "<b>Show/Hide Side Chains:</b><br><br>";
-	
-	var perline = 40;
-	
-	var i;
-	var span = document.createElement("span");
-	var dots = ". . . . . . . . .";
-	var dotslen = dots.length;
-	span.innerText = dots+"10 "+dots+"20 "+dots+"30 "+dots+"40 ";
-	span.className = "seqnumln";
-	span.appendChild(document.createElement("br"));
-	seqdd.appendChild(span);
-	var seqoff = 50;
-	for (i=0; i<sequence.length; i++)
+	if (!tmstrand.length) tmstrand = ["A"];
+
+	if (!mdlstrandid.length) mdlstrandid = ["A"];
+	var tabs;
+
+	var first = true;
+	mdlstrandid.forEach(function(strandid, sidx)
 	{
-		var tgl = document.createElement("span");
-		tgl.className = "clickme nodebtn sctgbtn" + (restoggled[i+1] ? " hilite" : "");
-		var rcd = rgn_color_dark(i+1, true);
-		if (rcd) tgl.style.backgroundColor = css_color(rcd);
+		var sdiv = document.createElement("div");
+		sdiv.id = "stranddiv"+strandid;
+		sdiv.style.display = "none";
+		sdiv.className = "stranddiv";
 
-		var j;
-		for (j=1; j<67; j++) if (bw50r[j] == (i+1)) tgl.className += ' bw50';
+		var perline = 40;
 
-		tgl.innerText = sequence.substr(i, 1);
-		tgl.id = "seqddtgl" + (i+1);
-		var ia = aa1let.indexOf(sequence.substr(i,1));
-		tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
-		tgl.setAttribute("onclick", "event.preventDefault(); toggleSideChain("+(i+1)+"); return false;");
-		tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
-		tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
-		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
-		seqdd.appendChild(tgl);
-		
-		if (!((i+1)%perline))
+		var i;
+		var resno;
+
+		var max_resno = 0;
+		for (resno = 1; resno <= resstrandid.length; resno++)
 		{
-			seqdd.appendChild(document.createElement("br"));
-			seqdd.appendChild(document.createElement("br"));
-			span = document.createElement("span");
-			
-			var l;
-			span.innerText = "";
-			for (l=0; l<perline; l+=10)
-			{
-				if (seqoff >= 100) dots = dots.substr(0, dotslen-(seqoff.toString().length-2));
-				span.innerText += dots+seqoff + " ";
-				seqoff += 10;
-			}
-			
-			span.className = "seqnumln";
-			span.appendChild(document.createElement("br"));
-			seqdd.appendChild(span);
+			var mdlidx = getResMdlIdx(resno, strandid);
+			if (mdlidx >= 0) max_resno = resno;
 		}
-	}
-	
+
+		if (!max_resno) return;
+
+		if (strandid)
+		{
+			if (first)
+			{
+				tabs = document.createElement("div");
+				tabs.className = "tab";
+				var strandlbl = document.createElement("div");
+				strandlbl.style.display = "inline-block";
+				strandlbl.innerText = "Strand:\xa0\xa0";
+				tabs.appendChild(strandlbl);
+
+				seqdd.appendChild(tabs);
+
+				first = false;
+			}
+
+			var tab = document.createElement("button");
+			tab.innerText = strandid;
+			tab.id = "stab"+strandid;
+			tab.setAttribute("onclick", "show_seqdd_tab('"+strandid+"');");
+			tabs.appendChild(tab);
+
+			strandColorSelection(strandid, strand_color[sidx]);
+
+			var eye = document.createElement("button");
+			eye.innerHTML = "&#x1f441;&#xfe0f;";
+			eye.setAttribute("onclick", "toggleStrand('"+strandid+"')");
+			sdiv.appendChild(eye);
+
+			var cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#fe0";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'y');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#9f0";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'g');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#0f9";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 't');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#0ef";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'c');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#39f";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'b');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#96f";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'p');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#f3c";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'm');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#f34";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'r');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#f70";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'o');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&#x1F308;";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', '*');");
+			sdiv.appendChild(cbtn);
+
+			sdiv.appendChild(document.createElement("br"));
+		}
+
+		var span = document.createElement("span");
+		var dots = ". . . . . . . . .";
+		var dotslen = dots.length;
+		span.innerText = dots+"10 "+dots+"20 "+dots+"30 "+dots+"40 ";
+		span.className = "seqnumln";
+		span.appendChild(document.createElement("br"));
+		sdiv.appendChild(span);
+		var seqoff = 50;
+
+		for (resno = 1; resno <= max_resno; resno++)
+		{
+			var mdlidx = getResMdlIdx(resno, strandid);
+
+			var tgl = document.createElement("span");
+			if (typeof restoggled[mdlidx] == "undefined") restoggled[mdlidx] = 0;
+			tgl.className = "clickme nodebtn sctgbtn" + (restoggled[mdlidx] ? " hilite" : "");
+			var rcd = false;
+			if (tmstrand.indexOf(strandid) >= 0) rcd = whtbk ? rgn_color_light(resno, true) : rgn_color_dark(resno, true);
+			if (rcd) tgl.style.backgroundColor = css_color(rcd);
+
+			var j;
+			if (tmstrand.indexOf(strandid) >= 0) for (j=1; j<67; j++) if (bw50r[j] == resno) tgl.className += ' bw50';
+
+			if (mdlidx < 0)
+			{
+				tgl.innerText = "-";
+				tgl.id = "seqddtgl" + strandid + resno;
+				tgl.title = resno;
+				tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+				tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+				tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+			}
+			else
+			{
+				tgl.innerText = sequence[mdlidx];
+				tgl.id = "seqddtgl" + (mdlidx);
+				var bw = bw_from_resno(resno);
+				tgl.title = sequence[mdlidx] + resno + (bw ? (' (' + bw + ')') : "");
+				tgl.setAttribute("onclick", "event.preventDefault(); toggleSideChain("+resno+", '"+strandid+"'); return false;");
+				tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+				tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+				tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+			}
+			sdiv.appendChild(tgl);
+
+			if (!((resno)%perline))
+			{
+				sdiv.appendChild(document.createElement("br"));
+				sdiv.appendChild(document.createElement("br"));
+				span = document.createElement("span");
+
+				var l;
+				span.innerText = "";
+				for (l=0; l<perline; l+=10)
+				{
+					if (seqoff >= 100) dots = dots.substr(0, dotslen-(seqoff.toString().length-2));
+					span.innerText += dots+seqoff + " ";
+					seqoff += 10;
+				}
+
+				span.className = "seqnumln";
+				span.appendChild(document.createElement("br"));
+				sdiv.appendChild(span);
+			}
+		}
+
+		seqdd.appendChild(sdiv);
+	});
+
 	seqdd.appendChild(document.createElement("br"));
 	seqdd.appendChild(document.createElement("br"));
-	
+
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Aliphatic";
 	tgl.id = "seqddaliph";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_aliphatic); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.innerText = "|";
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Aromatic";
 	tgl.id = "seqddaroma";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_aromatic); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.innerText = "|";
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Polar Uncharged";
 	tgl.id = "seqddpolar";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_hydrophilic); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.innerText = "|";
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Acidic";
 	tgl.id = "seqddacid";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_acidic); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.innerText = "|";
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Basic";
 	tgl.id = "seqddbasic";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_basic); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.innerText = "|";
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "Sulfur";
 	tgl.id = "seqddsulfur";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
 	tgl.setAttribute("onclick", "event.preventDefault(); showSideChainsByType(aa_sulfur); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("br");
 	// tgl.innerText = "|";
 	seqdd.appendChild(tgl);
-	
-	tgl = document.createElement("span");
-	tgl.className = "clickme nodebtn sctgbtn";
-	tgl.innerText = "Ligand Binding";
-	tgl.id = "seqddligbs";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
-	tgl.setAttribute("onclick", "event.preventDefault(); showLigandSideChains(); return false;");
-	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
-	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
-	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
-	seqdd.appendChild(tgl);
-	
-	tgl = document.createElement("span");
-	tgl.innerText = "|";
-	seqdd.appendChild(tgl);
-	
-	tgl = document.createElement("span");
-	tgl.className = "clickme nodebtn sctgbtn";
-	tgl.innerText = "Metal Coord";
-	tgl.id = "seqddmcoord";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1)); 
-	tgl.setAttribute("onclick", "event.preventDefault(); showMetalSideChains(); return false;");
-	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
-	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
-	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
-	seqdd.appendChild(tgl);
-	
-	tgl = document.createElement("span");
-	tgl.innerText = "|";
-	seqdd.appendChild(tgl);
-	
+
+	if (get_ligbs_from_orid().length)
+	{
+		tgl = document.createElement("span");
+		tgl.className = "clickme nodebtn sctgbtn";
+		tgl.innerText = "Ligand Binding";
+		tgl.id = "seqddligbs";
+		tgl.setAttribute("onclick", "event.preventDefault(); showLigandSideChains(); return false;");
+		tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+		seqdd.appendChild(tgl);
+
+		tgl = document.createElement("span");
+		tgl.innerText = "|";
+		seqdd.appendChild(tgl);
+	}
+
+	if (get_acvbs_from_orid().length)
+	{
+		tgl = document.createElement("span");
+		tgl.className = "clickme nodebtn sctgbtn";
+		tgl.innerText = "Activation";
+		tgl.id = "seqddligbs";
+		tgl.setAttribute("onclick", "event.preventDefault(); showActivationSideChains(); return false;");
+		tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+		seqdd.appendChild(tgl);
+
+		tgl = document.createElement("span");
+		tgl.innerText = "|";
+		seqdd.appendChild(tgl);
+	}
+
+	if (count_metal_bs() == mtlbs.length)
+	{
+		tgl = document.createElement("span");
+		tgl.className = "clickme nodebtn sctgbtn";
+		tgl.innerText = "Metal Coord";
+		tgl.id = "seqddmcoord";
+		tgl.setAttribute("onclick", "event.preventDefault(); showMetalSideChains(); return false;");
+		tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
+		tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
+		seqdd.appendChild(tgl);
+
+		tgl = document.createElement("span");
+		tgl.innerText = "|";
+		seqdd.appendChild(tgl);
+	}
+
+	/*
+	Show All sidechains makes browsers freeze up.
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "All";
 	tgl.id = "seqddall";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
 	tgl.setAttribute("onclick", "event.preventDefault(); showAllSideChains(); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 	seqdd.appendChild(tgl);
-	
+
 	tgl = document.createElement("span");
 	tgl.innerText = "|";
-	seqdd.appendChild(tgl);
+	seqdd.appendChild(tgl);*/
 
 	tgl = document.createElement("span");
 	tgl.className = "clickme nodebtn sctgbtn";
 	tgl.innerText = "None";
 	tgl.id = "seqddnone";
-	tgl.title = (ia>=0) ? (aa3let[ia]+(i+1)) : (sequence.substr(i,1)+(i+1));
 	tgl.setAttribute("onclick", "event.preventDefault(); hideAllSideChains(); return false;");
 	tgl.setAttribute("ondblclick", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousedown", "event.preventDefault(); return false;");
 	tgl.setAttribute("onmousemove", "event.preventDefault(); return false;");
 	seqdd.appendChild(tgl);
-	
-	
+
 	var sdchbtn = $('#sdchbtn')[0];
 	var btnrect = sdchbtn.getBoundingClientRect();
-	$(seqdd
-		).css("top", parseInt(btnrect.bottom).toString()+"px"
-		// ).css("left", parseInt(btnrect.left).toString()+"px"
-		).toggle().on("mouseleave", function()
+	$(seqdd).css("top", parseInt(btnrect.bottom).toString()+"px").toggle().on("mouseleave", function()
+	{
+		if (tmoid) window.clearTimeout(tmoid);
+		tmoid = window.setTimeout(function()
 		{
-			if (tmoid) window.clearTimeout(tmoid);
-			tmoid = window.setTimeout(function()
-			{
-				$('#seqdd').hide();
-			}, 1000);
-		}).on("mousemove", function()
-		{
-			if (tmoid) window.clearTimeout(tmoid);
-		});
-	
+			$('#seqdd').hide();
+		}, 1000);
+	}).on("mousemove", function()
+	{
+		if (tmoid) window.clearTimeout(tmoid);
+	});
+
+	var buttons = $(".tab button")
+	if (buttons.length) buttons[0].click();
+	else $(".stranddiv").show();
 }
 
 var stage = new NGL.Stage("viewport");
+
 var gmodel = [], model = [], is_ligand = [], mrep = [], gmrep = [], mrparams = [], gmrparams = [], mpos = [], mnod = [];
-var resmdl = [], mdlresno = [], restoggled = [];
+var gmvisible = [];
+
+var mdlstrands = [], mdlstrandid = [], mdlligands = [], strand_color = [];
+
+var resmdl = [], resstrandid = [""], mdlresno = [], restoggled = [];
 var acvmdl = false;
 var acvmatrix = [], acvrot8 = [];
 var acvnode = 387420489;
-var curr_ligand = false, cen_ligand = false;
+var curr_ligand = false, ligand_params = [], cen_ligand = false;
 var gpose = 1, gnode = 0;
 var orid;
 var mtlcoord = [];
-var sequence = "";
+var sequence = ["-"];
 var pocket = [0,0,0];
 
 $("#affichage").hide();
+
+function initialize_arrays()
+{
+	gmodel = []; model = []; is_ligand = []; mrep = []; gmrep = []; mrparams = []; gmrparams = []; mpos = []; mnod = [];
+	gmvisible = [];
+	mdlstrands = []; mdlstrandid = []; mdlligands = []; strand_color = [];
+	acvmatrix = []; acvrot8 = [];
+	ligbs = []; mcres = [];
+	mtlcoord = [];
+	tmstart = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
+	tmend = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0};
+	sequence = ["-"];
+	resmdl = []; resstrandid = []; mdlresno = [0]; restoggled = [];
+}
 
 var gmdl_shown = true;
 function show_hide_gmdl()
@@ -805,28 +1531,32 @@ function show_hide_gmdl()
 	}
 	else
 	{
-		gmodel[0].addRepresentation( "cartoon",
-		{
-			opacity: opc_cartoon,
-			colorScheme: PODefRgnScheme,
-			metalness: mtl_cartoon,
-		});
+		var p = gmrparams[0];
+		if (whtbk) p.opacity = 1;
+		if (!hydrogens) p.sele = "* and not hydrogen";
+		gmodel[0].addRepresentation( "cartoon", p);
 	}
 	gmdl_shown = !gmdl_shown;
+	set_gmdl_opacity();
 }
 
 function set_gmdl_opacity()
 {
+	if (typeof gmodel[0] == 'undefined') return;
+	if ($("#affichage")[0].style.display == 'none') return;
 	var opc = parseFloat($("#bbvis")[0].value) / 100;
-	if (gmdl_shown)
+	var i;
+	for (i=0; i<gmvisible.length; i++)
 	{
-		gmodel[0].removeAllRepresentations();
-		gmodel[0].addRepresentation( "cartoon",
+		if (gmvisible[i])
 		{
-			opacity: opc,
-			colorScheme: PODefRgnScheme,
-			metalness: mtl_cartoon,
-		});
+			gmodel[i].removeAllRepresentations();
+			gmrparams[i].opacity = opc;
+			var p = gmrparams[i];
+			if (whtbk) p.opacity = 1;
+			if (!hydrogens) p.sele = "* and not hydrogen";
+			gmodel[i].addRepresentation( "cartoon", p);
+		}
 	}
 }
 
@@ -867,11 +1597,6 @@ stage.mouseControls.add( "scroll-ctrl+shift", function( stage, delta )
     stage.setParameters( { ambientIntensity: Math.max( 0, ai + delta / 50 ) } );
 } );
 
-stage.mouseControls.add("clickPick", function(stage, e)
-{
-	toggleSideChain(e.atom.resno);
-});
-
 function centerPocket()
 {
 	stage.viewerControls.center( 
@@ -893,52 +1618,89 @@ function get_clip_value()
 	return v;
 }
 
-function showSideChain(resno)
+function getResStrandIdx(resmdlidx)
 {
+	var result = -1;
+	mdlstrandid.forEach(function(strandid, idx)
+	{
+		if (strandid == resstrandid[resmdlidx]) result = idx;
+	});
+	return result;
+}
+
+function getResMdlIdx(resno, strandid)
+{
+	var result = -1;
+	mdlresno.forEach(function(mdlres, idx)
+	{
+		if (mdlres == resno && resstrandid[idx] == strandid) result = idx;
+	});
+
+	return result;
+}
+
+function showSideChain(resno, strandid)
+{
+	if (typeof strandid == "object")
+	{
+		var i, n = strandid.length;
+		for (i=0; i<n; i++) showSideChain(resno, strandid[i]);
+		return;
+	}
+
 	try
 	{
+		if (typeof strandid == "undefined") strandid = "A";
+
 		var clipValue = get_clip_value();
-		if (!restoggled[resno])
+		var mdlidx = getResMdlIdx(resno, strandid);
+		if (!restoggled[mdlidx])
 		{
-			var mdlidx = mdlresno.indexOf(resno);
-			resmdl[mdlidx].addRepresentation( spcfill ? "spacefill" : "licorice",
+			var p = 
             {
-                "opacity": spcfill ? 1 : opc_sidechain,
-				"colorScheme": PODefScheme,
+                "opacity": (spcfill | whtbk) ? 1 : opc_sidechain,
+				"colorScheme": PODefSchemeHilite,
                 "metalness": mtl_licorice,
                 "clipNear": clipValue,
-            });
+				"sele": hydrogens ? "" : "* and not hydrogen",
+            };
+
+			var pc = strandColorSelection(strandid, getStrandColor(strandid));
+			if (pc.colorScheme != PODefRgnScheme && pc.colorScheme != POAAScheme) p.colorScheme = pc.colorScheme;
+
+			resmdl[mdlidx].addRepresentation( spcfill ? "spacefill" : "licorice", p);
 			restoggled[mdlidx] = 1;
-			$('#seqddtgl'+resno).addClass('hilite');
+			$('#seqddtgl'+mdlidx).addClass('hilite');
 		}
 	}
 	catch (ex)
 	{
 		;
 	}
-		
+	set_gmdl_opacity();
 }
 
-function toggleSideChain(resno)
+function toggleSideChain(resno, strandid)
 {
 	try
 	{
-		var mdlidx = mdlresno.indexOf(resno);
+		var mdlidx = getResMdlIdx(resno, strandid);
 		if (restoggled[mdlidx])
 		{
 			resmdl[mdlidx].removeAllRepresentations();
 			restoggled[mdlidx] = 0;
-			$('#seqddtgl'+resno).removeClass('hilite');
+			$('#seqddtgl'+mdlidx).removeClass('hilite');
 		}
 		else
 		{
-			showSideChain(resno);
+			showSideChain(resno, strandid);
 		}
 	}
 	catch (ex)
 	{
 		;
 	}
+	set_gmdl_opacity();
 }
 
 function refreshSideChainsVisible()
@@ -954,10 +1716,11 @@ function refreshSideChainsVisible()
 				resmdl[i].removeAllRepresentations();
 				resmdl[i].addRepresentation( spcfill ? "spacefill" : "licorice",
 				{
-					"opacity": spcfill ? 1 : opc_sidechain,
+					"opacity": (spcfill | whtbk) ? 1 : opc_sidechain,
 					"colorScheme": PODefScheme,
 					"metalness": mtl_licorice,
 					"clipNear": clipValue,
+					"sele": hydrogens ? "" : "* and not hydrogen",
 				});
 			}
 		}
@@ -970,100 +1733,122 @@ function refreshSideChainsVisible()
 
 function showAllSideChains()
 {
-	var resno = 1;
-	while (typeof restoggled[resno] != "undefined")
+	var i;
+	for (i=0; i<sequence.length; i++)
 	{
-		showSideChain(resno);
-		resno++;
+		if (!gmvisible[getResStrandIdx(i)]) continue;
+		showSideChain(mdlresno[i], mdlstrandid[i]);
 	}
 }
 
 function hideAllSideChains()
 {
-	/*var resno = 1;
-	var mdlidx = mdlresno.indexOf(resno);
-	while (typeof resmdl[mdlidx] != "undefined")*/
-	var mdlidx;
-	for (mdlidx = 0; mdlidx < resmdl.length; mdlidx++)
+	var i;
+	for (i=0; i<sequence.length; i++)
 	{
-		resno = mdlresno[mdlidx];
-		resmdl[mdlidx].removeAllRepresentations();
-		restoggled[mdlidx] = 0;
-		$('#seqddtgl'+resno).removeClass('hilite');
-		/*resno++;
-		mdlidx = mdlresno.indexOf(resno);*/
+		resmdl[i].removeAllRepresentations();
+		restoggled[i] = 0;
+		$('#seqddtgl'+i).removeClass('hilite');
 	}
 }
 
 function showSideChainsByType(show_type)
 {
-	var resdict = [];
-
-	for (var key in gmodel[0].structure.residueMap.dict)
+	var resno, i;
+	for (i=0; i<sequence.length; i++)
 	{
-		// if (!gmodel[0].structure.residueMap.dict.hasOwnProperties(key)) continue;
-		resdict[gmodel[0].structure.residueMap.dict[key]] = key.split("|")[0];
-	}
+		if (!gmvisible[getResStrandIdx(i)]) continue;
+		var aa = sequence[i];
 
-	var resno = 1;
-	while (typeof restoggled[resno] != "undefined")
-	{
-		var idx = gmodel[0].structure.residueStore.resno.indexOf(resno);
-		if (idx >= 0)
+		var show_sc = false;
+		switch(aa)
 		{
-			var aa = resdict[gmodel[0].structure.residueStore.residueTypeId[idx]];
-
-			var show_sc = false;
-			switch(aa)
-			{
-				case 'MET':
-					show_sc = (show_type == aa_aliphatic || show_type == aa_sulfur);
-					break;
-				case 'ALA': case 'ILE': case 'LEU': case 'VAL': case 'PRO': case 'GLY':
-					show_sc = (show_type == aa_aliphatic);
-					break;
-				case 'CYS':
-					show_sc = (show_type == aa_sulfur);
-					break;
-				case 'PHE': case 'TRP': case 'TYR':
-					show_sc = (show_type == aa_aromatic);
-					break;
-				case 'HIS':
-					show_sc = (show_type == aa_aromatic || show_type == aa_basic);
-					break;
-				case 'ARG': case 'LYS':
-					show_sc = (show_type == aa_basic);
-					break;
-				case 'ASP': case 'GLU':
-					show_sc = (show_type == aa_acidic);
-					break;
-				case 'SER': case 'THR': case 'ASN': case 'GLN':
-					show_sc = (show_type == aa_hydrophilic);
-					break;
-			}
-
-			if (show_sc) showSideChain(resno);
+			case 'M':
+				show_sc = (show_type == aa_aliphatic || show_type == aa_sulfur);
+				break;
+			case 'A': case 'I': case 'L': case 'V': case 'P': case 'G':
+				show_sc = (show_type == aa_aliphatic);
+				break;
+			case 'C':
+				show_sc = (show_type == aa_sulfur);
+				break;
+			case 'F': case 'W': case 'Y':
+				show_sc = (show_type == aa_aromatic);
+				break;
+			case 'H':
+				show_sc = (show_type == aa_aromatic || show_type == aa_basic);
+				break;
+			case 'R': case 'K':
+				show_sc = (show_type == aa_basic);
+				break;
+			case 'D': case 'E':
+				show_sc = (show_type == aa_acidic);
+				break;
+			case 'S': case 'T': case 'N': case 'Q':
+				show_sc = (show_type == aa_hydrophilic);
+				break;
 		}
 
-		resno++;
+		if (show_sc)
+		{
+			resno = mdlresno[i];
+			showSideChain(resno, resstrandid[i]);
+		}
 	}
 }
 
 function showLigandSideChains()
 {
-	var i;
-	for (i=0; i<ligbs.length; i++)
+	var i, j;
+	var lligbs = get_ligbs_from_orid();
+
+	var n = lligbs.length;
+	if (!n) return;
+
+	for (i=0; i<n; i++)
 	{
-		showSideChain(ligbs[i]);
+		var resno = resno_from_letters_and_bw(lligbs[i]);
+		if (!resno) continue;
+		for (j=0; j<tmstrand.length; j++)
+		{
+			var mdlidx = getStrandIdxFromID(tmstrand[j]);
+			if (gmvisible[mdlidx]) showSideChain(resno, tmstrand[j]);
+		}
+	}
+}
+
+function showActivationSideChains()
+{
+	var i, j;
+	var lligbs = get_acvbs_from_orid();
+
+	var n = lligbs.length;
+	if (!n) return;
+
+	for (i=0; i<n; i++)
+	{
+		var resno = resno_from_letters_and_bw(lligbs[i]);
+		if (!resno) continue;
+		for (j=0; j<tmstrand.length; j++)
+		{
+			var mdlidx = getStrandIdxFromID(tmstrand[j]);
+			if (gmvisible[mdlidx]) showSideChain(resno, tmstrand[j]);
+		}
 	}
 }
 
 function showMetalSideChains()
 {
 	var i;
-	for (i=0; i<mcres.length; i++)
+	for (i=0; i<mtlbs.length; i++)
 	{
-		showSideChain(mcres[i]);
+		var resno = resno_from_letters_and_bw(mtlbs[i]);
+		if (!resno) continue;
+		for (j=0; j<tmstrand.length; j++)
+		{
+			var mdlidx = getStrandIdxFromID(tmstrand[j]);
+			if (gmvisible[mdlidx]) showSideChain(resno, tmstrand[j]);
+		}
 	}
 }
 
@@ -1075,8 +1860,21 @@ function ballAndStick()
 		if (gmrep[i] == "ball+stick")
 		{
 			gmodel[i].removeAllRepresentations();
-			gmodel[0].addRepresentation(gmrep[i], gmrparams[0]);
+			var p = gmrparams[i];
+			if (whtbk) p.opacity = 1;
+			if (!hydrogens) p.sele = "* and not hydrogen";
+			else p.sele = "";
+			gmodel[i].addRepresentation(gmrep[i], p);
 		}
+	}
+	if (curr_ligand)
+	{
+		curr_ligand.removeAllRepresentations();
+		var p = ligand_params;
+		if (whtbk) p.opacity = 1;
+		if (!hydrogens) p.sele = "* and not hydrogen";
+		else p.sele = "";
+		curr_ligand.addRepresentation(model.length ? "licorice" : "ball+stick", p);
 	}
 	spcfill = false;
 }
@@ -1089,8 +1887,21 @@ function spaceFill()
 		if (gmrep[i] == "ball+stick")
 		{
 			gmodel[i].removeAllRepresentations();
-			gmodel[0].addRepresentation("spacefill", gmrparams[0]);
+			var p = gmrparams[i];
+			if (whtbk) p.opacity = 1;
+			if (!hydrogens) p.sele = "* and not hydrogen";
+			else p.sele = "";
+			gmodel[i].addRepresentation("spacefill", p);
 		}
+	}
+	if (curr_ligand)
+	{
+		curr_ligand.removeAllRepresentations();
+		var p = ligand_params;
+		if (whtbk) p.opacity = 1;
+		if (!hydrogens) p.sele = "* and not hydrogen";
+		else p.sele = "";
+		curr_ligand.addRepresentation("spacefill", p);
 	}
 	spcfill = true;
 }
@@ -1112,13 +1923,19 @@ function enable_spacefill()
 }
 
 var born = false;
+var whtbk = false;
 var spcfill = false;
 var sfenable = true;
+var hydrogens = true;
 if (getParameterByName("born"))
 {
 	born = true;
 	$("#colborn").show();
 	$("#colcpk").hide();
+}
+if (getParameterByName("whtbk"))
+{
+	whtbk = true;
 }
 var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
@@ -1159,19 +1976,19 @@ var PODefScheme = NGL.ColormakerRegistry.addScheme(function (params)
                 case 'PHE':
                 case 'TRP':
                 case 'TYR':
-                return 0x664466;
+                case 'HIS':
+                return whtbk ? 0xaa99aa : 0x887788;
 
                 case 'SER':
                 case 'THR':
                 case 'GLN':
                 case 'ASN':
-                return 0x55aa93;
+                return whtbk ? 0x339988 : 0x55aa93;
 
                 case 'ASP':
                 case 'GLU':
                 return born ? 0x99bbdd : 0xddbb99;
 
-                case 'HIS':
                 case 'LYS':
                 case 'ARG':
                 case 'PYL':
@@ -1243,6 +2060,7 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
                 case 'PHE':
                 case 'TRP':
                 case 'TYR':
+                case 'HIS':
                 return 0xaa88aa;
 
                 case 'SER':
@@ -1255,7 +2073,6 @@ var PODefSchemeHilite = NGL.ColormakerRegistry.addScheme(function (params)
                 case 'GLU':
                 return born ? 0xbbddff : 0xffddbb;
 
-                case 'HIS':
                 case 'LYS':
                 case 'ARG':
                 case 'PYL':
@@ -1303,7 +2120,7 @@ var PODefSchemeLigand = NGL.ColormakerRegistry.addScheme(function (params)
         {
         	case 'H': return 0xe1faff;
 			case 'He': return 0xfcaa93;
-        	case 'C': return 0xa7ada4;
+        	case 'C': return whtbk ? 0x333741 : 0xa7ada4;
         	case 'N': return born ? 0xFF3300 : 0x5555FF;
         	case 'O': return born ? 0x0099FF : 0xFF2222;
 			case 'Ne': return 0xff4e00;
@@ -1356,13 +2173,138 @@ var PODefSchemeRainbow = NGL.ColormakerRegistry.addScheme(function (params)
 	}
 });
 
+function aa_scheme(atom)
+{
+	switch (atom.resname.toUpperCase())
+	{
+		case "MET":
+		return 0xcccc99;
+		
+		case "ALA": case "ILE": case "LEU": case "VAL":
+		return 0xcccccc;
+
+		case "PRO":
+		return 0x999999;
+
+		case "GLY":
+		return 0x666666;
+
+		case "CYS":
+		return 0xcccc33;
+
+		case "SER": case "THR":
+		return 0x66cc99;
+
+		case "ASN": case "GLN":
+		return 0x33cc99;
+
+		case "ASP": case "GLU":
+		return 0xff6666;
+
+		case "ARG": case "LYS": case "HIS":
+		return 0x3333ff;
+
+		case "PHE": case "TRP": case "TYR":
+		return 0xcc99cc;
+
+		default:
+		return 0xcc9966;
+	}
+}
+
+var POAAScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return aa_scheme(atom);
+	}
+});
+
 var PODefRgnScheme = NGL.ColormakerRegistry.addScheme(function (params)
 {
     this.atomColor = function(atom)
     {
         var resno = atom.resno;
-        return rgn_color(resno);
+        var rgnc = 0;
+		
+		rgnc = rgn_color(resno, true);
+
+		if (!rgnc) rgnc = aa_scheme(atom);
+
+		return rgnc;
     }
+});
+
+var yellowScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0xffee00;
+	}
+});
+
+var greenScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x99ff00;
+	}
+});
+
+var tealScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x00ff99;
+	}
+});
+
+var cyanScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x00eeff;
+	}
+});
+
+var blueScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x3399ff;
+	}
+});
+
+var purpleScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x9966ff;
+	}
+});
+
+var magentaScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0xff33cc;
+	}
+});
+
+var redScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0xff3344;
+	}
+});
+
+var orangeScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0xff7700;
+	}
 });
 
 stage.setParameters(
@@ -1389,11 +2331,15 @@ function apply_pdb(poresult)
 	var shiny = [];
 	var result = poresult.split("\n");
 	var lres = 0;
+	var lstrandid = "A";
 	var tmpstr = "";
 	for (i=0; i<result.length; i++)
 	{
 		var ln = result[i];
 		var resno = parseInt(ln.substr(22,4));
+		var strandid = ln.substr(21,1).trim();
+		if (!strandid) strandid = "A";
+		var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
 		var aname = ln.substr(12,4).trim();
 		if (ln.substr(17,3) == "MTL") shiny.push(ln);
 		
@@ -1401,7 +2347,6 @@ function apply_pdb(poresult)
 		{
 			if (ln.length > 20)
 			{
-				var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
 				if (aa1let != '?')
 				{
 					var stringBlob5 = new Blob( [tmpstr], { type: 'text/plain'} );
@@ -1412,11 +2357,13 @@ function apply_pdb(poresult)
 						disable_spacefill();
 					});
 					mdlresno.push(resno);
+					resstrandid.push(strandid);
 					
 					lres = resno;
+					lstrandid = strandid;
 					tmpstr = "";
 					
-					sequence += aa1let;
+					sequence.push(aa1let);
 					
 					$('#clip').trigger("input");
 				}
@@ -1439,6 +2386,8 @@ function apply_pdb(poresult)
 			$('#clip').trigger("input");
 		});
 		mdlresno.push(resno);
+		resstrandid.push(lstrandid);
+		sequence.push(aa1let);
 	}
 
 	var stringBlob3 = new Blob( [ poresult ], { type: 'text/plain'} );
@@ -1446,13 +2395,15 @@ function apply_pdb(poresult)
 	{
 		var rp =
 		{
-			opacity: opc_cartoon,
+			opacity: whtbk ? 1 : opc_cartoon,
 			colorScheme: PODefRgnScheme,
 			metalness: mtl_cartoon,
 		};
 		comp3.addRepresentation( "cartoon", rp);
 		comp3.setName("backbone");
 		gmodel.push(comp3);
+		gmvisible.push(true);
+		mdlstrands.push(comp3);
 		gmrep.push("cartoon");
 		gmrparams.push(rp);
 		disable_spacefill();
@@ -1569,12 +2520,14 @@ function apply_pdb(poresult)
 		{
 			var rp = 
 			{
-				opacity: opc_metal,
+				opacity: whtbk ? 1 : opc_metal,
 				colorScheme: PODefScheme,
 				metalness: mtl_metal,
 			};
 			comp4.addRepresentation( "spacefill", rp);
 			gmodel.push(comp4);
+			gmvisible.push(true);
+			mdlligands.push(comp4);
 			gmrep.push("spacefill");
 			gmrparams.push(rp);
 			disable_spacefill();
@@ -1582,14 +2535,21 @@ function apply_pdb(poresult)
 		});
 	}
 	
-	
+	set_gmdl_opacity();
 }
 
 var url = getParameterByName('url') ? getParameterByName('url') : 'http://'+website+'/sdf.php';
 var molid = getParameterByName('mol') ? getParameterByName('mol') : 'rand';
 var protid = getParameterByName('prot') ? getParameterByName('prot') : false;
 
-if (protid)
+var literal_pdb = false;
+var literal_fname = "";
+
+if (literal_pdb)
+{
+	loadFile(literal_pdb, literal_fname);
+}
+else if (protid)
 {
 	$.ajax(
 	{
@@ -1601,6 +2561,9 @@ if (protid)
 		},
 		success: function(result)
 		{
+			var j = result.indexOf("\nTER\n");
+			if (j) result = result.substr(0, j);
+
 			var lines = result.split("\n");
 			$('#posey').hide();
 
@@ -1610,7 +2573,7 @@ if (protid)
 				if (ln.substr(0, 6) == 'REMARK')
 				{
 					var pieces = ln.split(" ");
-					if (pieces[2] == 'HELIX' && pieces[3].substr(0,3) == 'TMR')
+					if (pieces[2] == 'HELIX' && (pieces[3].substr(0,3) == 'TMR' || pieces[3].substr(0,3) == 'HXR'))
 					{
 						var tmrno = parseInt(pieces[3].substr(-1));
 						tmstart[tmrno] = parseInt(pieces[4]);
@@ -1664,6 +2627,8 @@ else if (molid != "~")
 		        }
 		        comp.addRepresentation("ball+stick", rparam);
 		        gmodel.push(comp);
+				gmvisible.push(true);
+				mdlligands.push(comp);
 				gmrep.push("ball+stick");
 				gmrparams.push(rparam);
 		        comp.autoView();
@@ -1688,9 +2653,14 @@ function showPose(p)
 			model[i].removeAllRepresentations();
 			var lrep = spcfill ? "spacefill" : mrep[i];
 			var lparam = Object.assign({}, mrparams[i]);
-			if (spcfill) lparam.opacity = 1;
+			if (spcfill || whtbk) lparam.opacity = 1;
+			if (!hydrogens) lparam.sele = "* and not hydrogen";
             model[i].addRepresentation( lrep, lparam );
-            if (is_ligand[i]) curr_ligand = model[i];
+            if (is_ligand[i])
+			{
+				curr_ligand = model[i];
+				ligand_params = mrparams[i];
+			}
         }
         else
             if (model[i].name != 'ligand') model[i].removeAllRepresentations();
@@ -1748,7 +2718,7 @@ function showPose(p)
     $("#clip").trigger("input");
     if (curr_ligand) $('#ligbtn, #prsv').show();
     
-    // if (cen_ligand) curr_ligand.autoView();
+	set_gmdl_opacity();
 }
 
 function showNode(n)
@@ -1763,9 +2733,14 @@ function showNode(n)
 			model[i].removeAllRepresentations();
 			var lrep = spcfill ? "spacefill" : mrep[i];
 			var lparam = Object.assign({}, mrparams[i]);
-			if (spcfill) lparam.opacity = 1;
+			if (spcfill || whtbk) lparam.opacity = 1;
+			if (!hydrogens) lparam.sele = "* and not hydrogen";
             model[i].addRepresentation( lrep, lparam );
-            if (is_ligand[i]) curr_ligand = model[i];
+            if (is_ligand[i])
+			{
+				curr_ligand = model[i];
+				ligand_params = mrparams[i];
+			}
         }
         else
 		if (model[i].name != 'ligand') model[i].removeAllRepresentations();
@@ -1801,7 +2776,7 @@ function showNode(n)
 		{
 			if (!acvmdl.reprList.length) acvmdl.addRepresentation( "cartoon",
             {
-                opacity: opc_cartoon,
+                opacity: whtbk ? 1 : opc_cartoon,
 				colorScheme: PODefRgnScheme,
                 metalness: mtl_cartoon,
             });
@@ -1811,7 +2786,7 @@ function showNode(n)
 		{
 			if (!gmodel[bbi].reprList.length) gmodel[bbi].addRepresentation( "cartoon",
             {
-                opacity: opc_cartoon,
+                opacity: whtbk ? 1 : opc_cartoon,
 				colorScheme: PODefRgnScheme,
                 metalness: mtl_cartoon,
             });
@@ -1826,8 +2801,8 @@ function showNode(n)
 
     $("#clip").trigger("input");
     if (curr_ligand) $('#ligbtn, #prsv').show();
-    
-    // if (cen_ligand) curr_ligand.autoView();
+
+	set_gmdl_opacity();
 }
 
 function rainbowNodes()
@@ -1852,23 +2827,26 @@ function rainbowNodes()
     {
         if (mpos[i] == gpose)
         {
-			// model[i].structure.rnbPos = (0.5 + mnod[i]) / (nmax + 1);
 			var mrp = mrparams[i];
 			if (mrp.colorScheme == PODefSchemeLigand) mrp.colorScheme = PODefSchemeRainbow;
 			model[i].removeAllRepresentations();
+			if (spcfill || whtbk) mrp.opacity = 1;
+			if (!hydrogens) mrp.sele = "* and not hydrogen";
             model[i].addRepresentation( mrep[i], mrp );
             if (is_ligand[i])
 			{
-				if (mnod[i] == 0) curr_ligand = model[i];
+				if (mnod[i] == 0)
+				{
+					curr_ligand = model[i];
+					ligand_params = mrparams[i];
+				}
 			}
-			// cc.list.push(model[i]);
         }
         else
             model[i].removeAllRepresentations();
     }
 
-	// cc.setSelection("*");
-	// cc.autoView();
+	set_gmdl_opacity();
 }
 
 $("body").on("keyup", function(e, obj)
@@ -1894,6 +2872,36 @@ $("body").on("keyup", function(e, obj)
     }
 });
 
+function update_hydrogens()
+{
+    var i;
+    for (i=0; i<model.length; i++)
+    {
+		model[i].eachRepresentation( function(obj)
+		{
+			obj.setSelection( hydrogens ? "*" : "* and not hydrogen" );
+		});
+	}
+    for (i=0; i<gmodel.length; i++)
+    {
+        gmodel[i].eachRepresentation( function(obj)
+        {
+			obj.setSelection( hydrogens ? "*" : "* and not hydrogen" );
+        });
+    }
+    if (acvmdl) acvmdl.eachRepresentation( function(obj)
+    {
+			obj.setSelection( hydrogens ? "*" : "* and not hydrogen" );
+    });
+    for (i=0; i<resmdl.length; i++)
+    {
+    	resmdl[i].eachRepresentation( function(obj)
+        {
+			obj.setSelection( hydrogens ? "*" : "* and not hydrogen" );
+        });
+	}
+}
+
 $("#clip").on("input", function (e, obj)
 {
     var i;
@@ -1904,7 +2912,7 @@ $("#clip").on("input", function (e, obj)
         {
             lcv = clipValue;
             if (is_ligand[i] && $("#preserve")[0].checked) lcv = 0;
-            obj.setParameters( { "clipNear": lcv, } );
+            obj.setParameters( { "clipNear": lcv } );
         });
     }
     for (i=0; i<gmodel.length; i++)
@@ -1979,19 +2987,7 @@ function loadFile(fileData, fileName = "")
 	
 	$("#affichage").hide();
 	
-    model = [];
-	mrep = [];
-	mrparams = [];
-    gmodel = [];
-	gmrep = [];
-	gmrparams = [];
-    curr_ligand = false;
-	resmdl = [];
-	mdlresno = [];
-	restoggled = [];
-	sequence = "";
-	
-	mdlresno.push(0);
+    initialize_arrays();
 	
     var fext = fileName.substr(fileName.lastIndexOf('.')+1);
     orid = false; // 'OR1A1';
@@ -2036,7 +3032,7 @@ function loadFile(fileData, fileName = "")
                 if (ln.substr(0, 7) == "REGION|")
                 {
                     var words = ln.split("|");
-                    if (words[1].substr(0, 3) == "TMR")
+                    if (words[1].substr(0, 3) == "TMR" || words[1].substr(0, 3) == "HXR")
                     {
                         var tmr = parseInt(words[1].substr(3));
                         tmstart[tmr] = parseInt(words[2]);
@@ -2079,21 +3075,22 @@ function loadFile(fileData, fileName = "")
                 stage.removeAllComponents();
                 window.result = fileData;
                 cen_ligand = false;
-				tmstart = [];
-				tmend = [];
-				ligbs = [];
-				mcres = [];
+				initialize_arrays();
 				bw50r = new Array(99).fill(0);
-                
-                sequence = "";
+
                 if (fext == 'pdb')
                 {
 					disable_spacefill();
+					hydrogens = false;
+					$("#nohyd").click();
                 	var i;
                 	var lines = fileData.split("\n");
                     var lres = 0;
                     var tmpstr = "";
 					var ligtmp = "";
+					var strandid = "A";
+					var last_strandid = "";
+					var strand_has_tms = false;
                     for (i=0; i<lines.length; i++)
                     {
                         var ln = lines[i];
@@ -2101,14 +3098,18 @@ function loadFile(fileData, fileName = "")
                         if (ln.substr(0, 6) == "HETATM" || ln.substr(17,3) == "LIG")
                             ligtmp += ln + "\n";
 
+						if (ln.substr(0, 3) == 'TER') strand_has_tms = false;
+
 						if (ln.substr(0, 6) == 'REMARK')
 						{
 							var pieces = ln.split(" ");
-							if (pieces[2] == 'HELIX' && pieces[3].substr(0,3) == 'TMR')
+							if (pieces[2] == 'HELIX' && (pieces[3].substr(0,3) == 'TMR' || pieces[3].substr(0,3) == 'HXR'))
 							{
 								var tmrno = parseInt(pieces[3].substr(-1));
 								tmstart[tmrno] = parseInt(pieces[4]);
 								tmend[tmrno] = parseInt(pieces[5]);
+								strand_has_tms = true;
+								// tmstrand = [];			// Force reassignment later on.
 							}
 							else if (pieces[3] == "LIGAND_BINDING")
 							{
@@ -2130,13 +3131,16 @@ function loadFile(fileData, fileName = "")
 						else
                         {
 							var resno = parseInt(ln.substr(22,4));
+							strandid = ln.substr(21,1).trim();
+							if (!strandid) strandid = "A";
+							var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
+							if (/* !tmstrand.length && */ strand_has_tms && tmstart[6] && (tmstrand.indexOf(strandid) < 0) ) tmstrand.push(strandid);
 
 							if (lres != resno)
 							{
-								if (ln.length > 20)
+								if (ln.length > 20 || ln.trim() == "TER")
 								{
-									var aa1let = aa_1let_from_3let(ln.substr(17,3).trim());
-									if (aa1let != '?')
+									if (aa1let != '?' || ln.trim() == "TER")
 									{
 										var stringBlob6 = new Blob( [tmpstr], { type: 'text/plain'} );
 										stage.loadFile( stringBlob6, { ext: 'pdb' } ).then( function( comp6 )
@@ -2144,22 +3148,26 @@ function loadFile(fileData, fileName = "")
 											resmdl.push(comp6);
 											restoggled.push(0);
 										});
+
+										// console.log(tmpstr);
+										// console.log(aa1let + resno + " of strand " + strandid);
 										
 										lres = resno;
 										mdlresno.push(resno);
+										resstrandid.push(strandid);
 										tmpstr = "";
-										while (sequence.length < resno-1) sequence += "-";
-										sequence += aa1let;
+										sequence.push(aa1let);
 									}
 								}
 							}
 						}
 
                         if (ln.length < 20) continue;
-                        
+
                         tmpstr += ln + "\n";
+						last_strandid = strandid;
                     }
-                    if (tmpstr)
+                    /*if (tmpstr)
                     {
 	                	var stringBlob6a = new Blob( [tmpstr], { type: 'text/plain'} );
 	                	stage.loadFile( stringBlob6a, { ext: 'pdb' } ).then( function( comp6a )
@@ -2168,7 +3176,9 @@ function loadFile(fileData, fileName = "")
 	            			restoggled.push(0);
 	            		});
 	            		mdlresno.push(resno);
-    				}
+						resstrandid.push(last_strandid);
+						sequence.push(aa1let);
+    				}*/
 
 					if (ligtmp.length)
 					{
@@ -2188,13 +3198,15 @@ function loadFile(fileData, fileName = "")
 							mrparams.push(rparam);
 							is_ligand.push(1);
 							curr_ligand = comp6b;
+							ligand_params = rparam;
+							if (curr_ligand) $('#ligbtn, #prsv').show();
 
 							var lpn = comp6b.name.split("|");
 							mpos.push(parseInt(lpn[0]));
 							mnod.push(parseInt(lpn[1]));
 							$('#clip').trigger("input");
 
-							curr_ligand.addRepresentation( "ball+stick", rparam );
+							curr_ligand.addRepresentation( "licorice", rparam );
 						} );
 						ligtmp = "";
 					}
@@ -2207,98 +3219,100 @@ function loadFile(fileData, fileName = "")
 					$('#posey')[0].innerText = fileData.split("\n")[0];
 					enable_spacefill();
             	}
-                
-                var stringBlob = new Blob( [ fileData ], { type: 'text/plain'} );
-                stage.loadFile( stringBlob, { ext: fext } ).then( function( comp )
+
+				var fileStrands = fileData.split("\nTER");
+				fileStrands.forEach(function(strandData)
                 {
-                    if (fext == 'sdf')
-                    {
-						var rp =
-                        {
-                        	opacity: opc_molecule,
-							colorScheme: PODefSchemeHilite,
-							multipleBond: true,
-                        	metalness: mtl_bs,
-                        };
-                        comp.addRepresentation( "ball+stick", rp);
-                        gmodel.push(comp);
-						gmrep.push("ball+stick");
-						gmrparams.push(rp);
-
-                    	comp.autoView();
-                    }
-
-                    if (fext == 'pdb')
-                    {
-						var rp =
-                        {
-                            opacity: opc_cartoon,
-							colorScheme: PODefRgnScheme,
-                            // colorScale: 'rainbow',
-                            metalness: mtl_cartoon,
-                        };
-                        comp.addRepresentation( "cartoon", rp);
-                        gmodel.push(comp);
-						gmrep.push("cartoon");
-						gmrparams.push(rp);
-
-                        var i;
-                        var subset = [], shiny = [];
-                        var result = window.result.split("\n");
-                        for (i=0; i<result.length; i++)
-                        {
-                            var ln = result[i];
-                            var resno = parseInt(ln.substr(22,4));
-                            var aname = ln.substr(12,4).trim();
-                            if (mtlcoord.indexOf(resno) >= 0
-                                    && aname != "N"
-                                    && aname != "HN"
-                                    && aname != "H"
-                                    && aname != "CA"
-                                    && aname != "HA"
-                                    && aname != "HA1"
-                                    && aname != "HA2"
-                                    // Due to a bug in NGL, the C and O atoms are required if including CA in
-                                    // licorice, ball+stick, or line mode. Hyperball avoids this but is slower to render.
-                                    // && aname != "C"
-                                    // && aname != "O"
-                               ) subset.push(ln);
-                            if (ln.substr(17,3) == "MTL") shiny.push(ln);
-                        }
-                        /*var stringBlob1 = new Blob( [ subset.join("\n") ], { type: 'text/plain'} );
-                        stage.loadFile( stringBlob1, { ext: 'pdb' } ).then( function( comp1 )
-                        {
-                            comp1.addRepresentation( "licorice",
-                            {
-                                opacity: opc_sidechain_active,
-								colorScheme: PODefScheme,
-                                metalness: mtl_licorice,
-                            });
-                            gmodel.push(comp1);
-                        });*/
-                        var stringBlob2 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
-                        stage.loadFile( stringBlob2, { ext: 'pdb' } ).then( function( comp2 )
-                        {
+					if (fext != "sdf" && (strandData.trim().length < 20 || strandData.indexOf("\nATOM ") < 0)) return;
+					var strandid = strandData.substr(strandData.indexOf("\nATOM "), 100).trim().substr(21,1).trim();
+					if (!strandid) strandid = "A";
+					var stringBlob = new Blob( [ strandData ], { type: 'text/plain'} );
+					stage.loadFile( stringBlob, { ext: fext, name: strandid } ).then( ( comp ) =>
+					{
+						if (fext == 'sdf')
+						{
 							var rp =
-                            {
-                                opacity: opc_metal,
-								colorScheme: PODefScheme,
-                                metalness: mtl_metal,
-                            };
-                            comp2.addRepresentation( "spacefill", rp);
-                            gmodel.push(comp2);
-							gmrep.push("spacefill");
+							{
+								opacity: opc_molecule,
+								colorScheme: PODefSchemeHilite,
+								multipleBond: true,
+								metalness: mtl_bs,
+							};
+							comp.addRepresentation( "ball+stick", rp);
+							gmodel.push(comp);
+							gmvisible.push(true);
+							mdlligands.push(comp);
+							gmrep.push("ball+stick");
 							gmrparams.push(rp);
-                        });
 
-                    	comp.autoView();
-                        
-                        /*const quaternion = new THREE.Quaternion();
-						quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
-						stage.animationControls.rotate(quaternion);*/
-                    }
-                } );
-                $("#affichage").show();
+							comp.autoView();
+						}
+
+						if (fext == 'pdb')
+						{
+							var rp =
+							{
+								opacity: opc_cartoon,
+								colorScheme: (tmstrand.indexOf(comp.name) >= 0) ? PODefRgnScheme : POAAScheme,
+								// colorScale: 'rainbow',
+								metalness: mtl_cartoon,
+							};
+							comp.addRepresentation( "cartoon", rp);
+							gmodel.push(comp);
+							gmvisible.push(true);
+							mdlstrands.push(comp);
+							gmrep.push("cartoon");
+							gmrparams.push(rp);
+
+							var i;
+							var subset = [], shiny = [];
+							var result = window.result.split("\n");
+							for (i=0; i<result.length; i++)
+							{
+								var ln = result[i];
+								var resno = parseInt(ln.substr(22,4));
+								var aname = ln.substr(12,4).trim();
+								if (mtlcoord.indexOf(resno) >= 0
+										&& aname != "N"
+										&& aname != "HN"
+										&& aname != "H"
+										&& aname != "CA"
+										&& aname != "HA"
+										&& aname != "HA1"
+										&& aname != "HA2"
+										// Due to a bug in NGL, the C and O atoms are required if including CA in
+										// licorice, ball+stick, or line mode. Hyperball avoids this but is slower to render.
+										// && aname != "C"
+										// && aname != "O"
+								) subset.push(ln);
+								if (ln.substr(17,3) == "MTL") shiny.push(ln);
+							}
+							var stringBlob2 = new Blob( [ shiny.join("\n") ], { type: 'text/plain'} );
+							stage.loadFile( stringBlob2, { ext: 'pdb' } ).then( function( comp2 )
+							{
+								var rp =
+								{
+									opacity: opc_metal,
+									colorScheme: PODefScheme,
+									metalness: mtl_metal,
+								};
+								comp2.addRepresentation( "spacefill", rp);
+								gmodel.push(comp2);
+								gmvisible.push(true);
+								mdlligands.push(comp2);
+								gmrep.push("spacefill");
+								gmrparams.push(rp);
+							});
+
+							stage.autoView();
+							if (!hydrogens) $("#nohyd").click();
+						}
+					} );
+
+					mdlstrandid.push(strandid);
+				});
+
+				if (fext != 'sdf') $("#affichage").show();
                 break;
 
             	case 'txt':
@@ -2307,6 +3321,8 @@ function loadFile(fileData, fileName = "")
                 var lines = fileData.split("\n");
                 cen_ligand = true;
 				disable_spacefill();
+				hydrogens = false;
+				$("#nohyd").click();
                 
                 var i;
                 var mod = "m";
@@ -2510,15 +3526,17 @@ function loadFile(fileData, fileName = "")
                                 };
 
                                 model.push(comp7b);
-                                mrep.push("ball+stick");
+                                mrep.push("licorice");
                                 mrparams.push(rparam);
                                 is_ligand.push(1);
 								if (!curr_ligand)
 								{
 									curr_ligand = comp7b;
+									ligand_params = rparam;
 									window.setTimeout(function()
 									{
 										showPose(1);
+										if (!hydrogens) $("#nohyd").click();
 										// curr_ligand.autoView();
 									}, 259);
 								}
@@ -2568,6 +3586,11 @@ function loadFile(fileData, fileName = "")
 $('input[type=file]').on('input', getFileContents);
 </script>
 
+<div id="dockfloat">
+	<span>
+	</span>
+</div>
+
 <div id="citefloat">
 	<span>
 	</span>
@@ -2577,6 +3600,11 @@ $('input[type=file]').on('input', getFileContents);
 
 <script>
 $('#citefloat span')[0].innerText = nglcitation;
+
+if (getParameterByName("whtbk"))
+{
+	$("#whtbk").click();
+}
 </script>
 
 <div id="pleasewait" style="display: none;">

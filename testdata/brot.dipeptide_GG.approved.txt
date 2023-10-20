@@ -1,0 +1,5 @@
+Bond N1-C2 can rotate.
+Bond C2-C3 can rotate.
+Bond N4-C5 can rotate.
+Bond C5-C6 can rotate.
+Bond C6-O7 can rotate.

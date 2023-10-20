@@ -17,27 +17,23 @@ PrimaryDock comes with Pepteditor, a tool for editing proteins using a scripting
 PrimaryDock also offers a web interface that allows you to run a local copy of the same data explorer pages that power
 the PrimaryOdors website.
 
-To use PrimaryDock and Pepteditor, please first clone the repository, then execute the following commands:
+To use PrimaryDock and Pepteditor, please first clone the repository, then enter the `primarydock/` folder and execute
+the following command:
 
 ```
-make primarydock
-make pepteditor
+make
 ```
-
-If you are a developer contributing to the project, you can use `make` to build everything and run the test reports, or 
-`make code` to just build the code and run only the molecule interaction test. This test is important to the function of
-PrimaryDock because any change to the code that causes it to fail, means the docking functionality will be impaired.
 
 The application will require 3D maps of your target receptor(s) in PDB format. If your model contains heavy atoms only,
 the accuracy of docking results may be severely compromised. Fortunately, PrimaryDock can hydrogenate PDBs automatically
-during docking, or you can use Pepteditor to hydrogenate them manually. PDBs for human olfactory receptors are provided
-in the pdbs folder for olfactory docking. They have been modified from the PDBs available from AlphaFold.
+during docking, or you can use Pepteditor to hydrogenate them before docking. PDBs for human olfactory receptors are provided
+in the `pdbs/` folder for olfactory docking. They have been modified from the PDBs available from AlphaFold.
 
 It will also be necessary to obtain 3D models of your ligand(s). Currently, only SDF format is supported.
 SDFs can be obtained a few different ways:
 <ul>
   <li>If you have <a href="https://openbabel.org">obabel</a>, you can generate 3 dimensional SDFs from SMILES input. Example syntax:<br>
-    obabel -:'CCO' --gen3D -osdf -Oethanol.sdf
+    `obabel -:'CCO' --gen3D -osdf -Osdf/ethanol.sdf`
   </li>
   <li>SDFs are available from PubChem at https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{pubchem_cid}/SDF?record_type=3d</li>
   <li>Or at https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{SMILES}/SDF?record_type=3d</li>
@@ -52,10 +48,10 @@ Known issue: please make sure to add an empty line at the end of your config fil
 Once your .config file is ready, and the PrimaryDock code is compiled, simply cd to the primarydock folder and run the following command:
 
 ```
-./bin/primarydock [config file]
+./bin/primarydock {config file}
 ```
 
-(...replacing `[config file]` with the actual name of your config file.)
+(...replacing `{config file}` with the actual name of your config file.)
 
 After a little while, depending on your config settings, PrimaryDock will output data about one or more poses, including binding energy
 per residue, binding energy per type, total binding energy, PDB data of the ligand, and (if flexing is enabled) PDB data of the flexed
@@ -69,38 +65,35 @@ PrimaryDock is stochastic so that its output will be different each time, and re
 previous runs may have missed.
 
 If you would like to contribute to this project:
-<ol><li>I would be sooo very grateful for the help!</li>
-<li>Please create a branch off of stable, then submit a pull request;</li>
-<li>All PRs that change the C++ classes or the primarydock app must pass the Big Three test (see the test/big_three file),
-and receive an all clear 🟩🟩🟩 message, before merge.</li>
-<li>Use whichever { style you prefer; as long as the code is readable and it works, that's all I care about.</li>
-<li>Have fun and try not to let the project vex you. (:</li>
-</ol>
+- We would be sooo very grateful for the help!
+- Please create a branch off of stable, then submit a pull request;
+- All PRs that change the C++ classes or any of the apps must pass the master unit tests (`test/unit_test_master.sh`) before merge.
+- Use whichever { style you prefer; as long as the code is readable and it works, that's all we care about.
+- Have fun and try not to let the project vex you. (:
 
 Note to developers: if you run PrimaryDock under a memory utility such as valgrind, you are likely to see a lot of errors saying that
 uninitialized variables are being used or that conditional jumps depend on them. Most of these are false positives. Many places in the
 code create temporary arrays of pointers and then assign those pointers addresses of objects that persist throughout the entire program
-execution. The memory tool "thinks" the objects have not been initialized even when they have, and that the arrays should be `delete[]`ed
-when they definitely should not. We recommend using the --undef-value-errors=no option with valgrind or the equivalent switch in your
+execution. The memory tool "thinks" the objects have not been initialized even when they have. We recommend using the --undef-value-errors=no option with valgrind or the equivalent switch in your
 utility of choice.
 
 
-# Web Application
+# Web Application (optional)
 
-You may now host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It is the same web application
-as is used for the Primary Odors website.
+You may now host your own PrimaryDock web interface for viewing the contents of the JSON files in the data folder. It is the same web
+application that is used for the Primary Odors website.
 
 ![Web app screenshot](www/assets/webapp.png?raw=true "Web App")
 
-To enable the web app, either set up a local web server or checkout primarydock in a folder on a web host. Make sure your server has the 
-`php` and `php-gd` packages installed. Then open the `www/symlink.sh` file in a text editor, make sure the destination folder is correct (by 
-default it will show `/var/www/html/` which is usually correct for Apache2 installations), make sure you have write permissions in the 
-folder (or use `sudo`), and execute `www/symlink.sh` in a command line. If on a local server, you will now have an instance of the web app 
-at http://127.0.0.1/primarydock/ whereas if you are using a web host then you may have to configure your hosting to point one of your 
-registered domains or subfolders to the `primarydock/www` folder.
+To enable the web app:
+- Either set up a local web server or checkout primarydock in a folder on a web host.
+- Make sure your server has the `php`, `php-curl`, and `php-gd` packages installed.
+- After installing `php-curl`, it's important to restart the web service e.g. `sudo apache2ctl -k restart`.
+- Then open the `www/symlink.sh` file in a text editor, make sure the destination folder is correct (by default it will show `/var/www/html/`
+  which is usually correct for Apache2 installations), make sure you have write permissions in the 
+  folder (or use `sudo`), and execute `www/symlink.sh` in a command line.
+- The `data` and `www/assets` folders and all contents must also be recursively made writable by the web user.
+- If on a local server, you will now have an instance of the web app at http://127.0.0.1/primarydock/ whereas if you are using a web host
+  then you may have to configure your hosting to point one of your registered domains or subfolders to the `primarydock/www` folder.
 
-
-
-
-
-
+If you get a 403 Forbidden error, please make sure that every containing folder of the `primarydock/www` folder has public execute access.

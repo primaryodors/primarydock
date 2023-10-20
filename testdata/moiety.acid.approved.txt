@@ -1,0 +1,2 @@
+Pattern oc[o-] occurs 1 times in molecule.
+O6 C5 O7 

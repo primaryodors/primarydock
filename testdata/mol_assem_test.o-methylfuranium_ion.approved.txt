@@ -1,0 +1,11 @@
+Created empty molecule named Test.
+Minimizing internal clashes...
+Adjusted internal clashes: 0 cu.A.
+Atom C1 has bond angles: 108 126 126
+Atom c2 has bond angles: 108 126 126
+Atom c3 has bond angles: 108 126 126
+Atom O4 has bond angles: 108 126 126
+Atom c5 has bond angles: 108 126 126
+Atom C6 has bond angles: 109.471 109.471 109.471 109.471 109.471 109.471
+Saved testdata/received/o-methylfuranium_ion.received.sdf
+

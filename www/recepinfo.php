@@ -6,7 +6,7 @@ header("Pragma: no-cache");
 header("Expires: 0");
 
 chdir(__DIR__);
-require_once("../predict/protutils.php");
+require_once("../data/protutils.php");
 
 $protid = @$_REQUEST['recep'];
 

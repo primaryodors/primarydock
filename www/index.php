@@ -1,7 +1,9 @@
 <?php
 chdir(__DIR__);
-require_once("../predict/protutils.php");
-require_once("../predict/odorutils.php");
+require_once("../data/protutils.php");
+require_once("../data/odorutils.php");
+
+if (file_exists("tags.php")) include("tags.php");
 
 include("header.php");
 
@@ -19,10 +21,10 @@ else
 <table class="idxbuttons">
     <tr>
         <td>
-            <a href="receptors.php"><img src="assets/receptors.png"></a>
+            <a href="receptors.php"><img src="assets/receptors.png" alt="List of Receptors"></a>
         </td>
         <td>
-            <a href="odorants.php"><img src="assets/odorants.png"></a>
+            <a href="odorants.php"><img src="assets/odorants.png" alt="List of Odorants"></a>
         </td>
     </tr>
 </table>

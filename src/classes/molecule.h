@@ -5,6 +5,7 @@
 #define _MOLECULE
 
 #include <vector>
+#include <memory>
 
 struct SMILES_Parenthetical
 {
@@ -12,7 +13,7 @@ struct SMILES_Parenthetical
     char* smilesstr=0;
 };
 
-struct histidine_flip
+struct HistidineFlip
 {
     Atom* H;
     Atom* C;
@@ -22,13 +23,23 @@ struct histidine_flip
 
 enum MovabilityType
 {
-    MOV_ALL			= 0x1000,
-    MOV_NORECEN		=  0x200,
-    MOV_FORCEFLEX   =   0xc0,
-    MOV_FLEXONLY	=   0x80,
-    MOV_PINNED      =   0x7f,
-    MOV_FLXDESEL    =    0x8,
-    MOV_NONE		=    0x0
+    MOV_CAN_RECEN   =   0x8000,           // Molecule can move through space.
+    MOV_CAN_AXIAL   =    0x800,           // Whole molecule can rotate in space.
+    MOV_MC_AXIAL    =    0x400,           // Monte Carlo whole molecule rotations allowed.
+    MOV_MUST_FLEX   =     0x80,           // Molecule's rotatable bonds are guaranteed free to rotate.
+    MOV_MC_FLEX     =     0x40,           // Monte Carlo flexion is allowed.
+    MOV_CAN_FLEX    =     0x20,           // Molecule's rotatable bonds may rotate if selected for flexion.
+    MOV_ALL			=   0xfff0,
+    MOV_NORECEN		=   0x0ff0,
+    MOV_NOAXIAL     =   0xf0f0,
+    MOV_FORCEFLEX   =     0xf0,
+    MOV_FLEXONLY	=     0x70,
+    MOV_PINNED      =     0x04,
+    MOV_FLXDESEL    =     0x02,
+    MOV_FORBIDDEN   =     0x0f,
+    MOV_NONE		=     0x00,
+    MOV_BKGRND      = 0x020000,
+    MOV_CAN_CLASH   = 0x100000
 };
 
 enum MoleculeType
@@ -38,6 +49,9 @@ enum MoleculeType
     MOLTYP_WATER,
     MOLTYP_AMINOACID
 };
+
+class GroupPair;
+class AtomGroup;
 
 class Pose
 {
@@ -51,7 +65,8 @@ public:
 
 protected:
     int sz = 0;
-    Point* saved_atom_locs = nullptr;
+    std::vector<Point> saved_atom_locs;
+    std::vector<int> saved_atom_Z;
     Molecule* saved_from = nullptr;
 };
 
@@ -61,6 +76,7 @@ class Molecule
     friend class Pose;
 
 public:
+    Molecule();
     Molecule(const char* name);
     Molecule(const char* name, Atom** collection);
     virtual ~Molecule();
@@ -70,9 +86,9 @@ public:
     bool save_sdf(FILE* outf);
     bool save_sdf(FILE* outf, Molecule** included_ligands);
     void save_pdb(FILE* outf, int atomno_offset=0, bool endpdb = true);
-    int from_pdb(FILE* inf);				// returns number of atoms loaded.
+    int from_pdb(FILE* inf, bool het_only = false);  // returns number of atoms loaded.
     void identify_acidbase();				// called within every load.
-    bool from_smiles(char const * smilesstr);
+    bool from_smiles(char const * smilesstr, bool use_parser = true);
     void clear_cache();
 
     // Getters.
@@ -88,14 +104,15 @@ public:
     Atom* get_nearest_atom(Point loc) const;
     Atom* get_nearest_atom(Point loc, intera_type capable_of) const;
     Point get_bounding_box() const;				// Return the +x+y+z vertex of a bounding box, including vdW radii, if center={0,0,0}.
-    float get_charge();
+    float get_charge() const;
     int is_residue();
     bool is_thiol();
+    float pi_stackability(bool include_backbone = false);
 
     // Spatial functions.
     Point get_barycenter(bool bond_weighted = false) const;
-    virtual void move(SCoord move_amt);
-    virtual void move(Point move_amt);
+    virtual void move(SCoord move_amt, bool override_residue = false);
+    virtual void move(Point move_amt, bool override_residue = false);
     virtual void recenter(Point new_location);
     void rotate(SCoord* SCoord, float theta, bool bond_weighted = false);
     void rotate(LocatedVector SCoord, float theta);
@@ -103,16 +120,20 @@ public:
     float correct_structure(int iters = 500);
     float close_loop(Atom** path, float closing_bond_cardinality);
     void crumple(float theta);					// Randomly rotate all rotatable bonds by +/- the specified angle.
+    float distance_to(Molecule* other_mol);
+    std::vector<Atom*> longest_dimension();
 
     // Atom functions.
     Atom* add_atom(const char* elemsym, const char* aname, Atom* bond_to, const float bcard);
-    Atom* add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard);
+    Atom* add_atom(const char* elemsym, const char* aname, const Point* location, Atom* bond_to, const float bcard, const int charge = 0);
+    void add_existing_atom(Atom* to_add);
     char** get_atom_names() const;
     Atom* get_atom(const char* aname) const;
     Atom* get_atom(const int a_idx) const
     {
         return atoms[a_idx];
     }
+    int count_atoms_by_element(const char* esym);
     Point get_atom_location(const char* aname);
     int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);
@@ -127,14 +148,14 @@ public:
     Bond** get_all_bonds(bool unidirectional);
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
     bool rotate_bond(const Bond* rot8b, const float angle);
-    void do_histidine_flip(histidine_flip* hf);
+    void do_histidine_flip(HistidineFlip* hf);
 
     // Ring functions.
     int identify_rings();
-    int get_num_rings();
+    int get_num_rings() const;
     int add_ring(Atom** atoms);
     bool ring_is_coplanar(int ringid);
-    bool ring_is_aromatic(int ringid);
+    bool ring_is_aromatic(int ringid) const;
     Point get_ring_center(int ringid);
     SCoord get_ring_normal(int ringid);
     Atom** get_ring_atoms(int ringid);
@@ -145,6 +166,7 @@ public:
     void minimize_internal_clashes();
     float get_intermol_clashes(Molecule* ligand);
     float get_intermol_clashes(Molecule** ligands);
+    static float total_intermol_clashes(Molecule** ligands);
     float get_intermol_binding(Molecule* ligand, bool subtract_clashes = true);
     float get_intermol_binding(Molecule** ligands, bool subtract_clashes = true);
     float get_intermol_potential(Molecule* ligand, bool disregard_distance = false);
@@ -157,9 +179,13 @@ public:
 
     float bindability_by_type(intera_type type, bool include_backbone = false);
 
-    static void multimol_conform(Molecule** interactors, int iters = 50, void (*iter_callback)(int) = NULL);
-    static void multimol_conform(Molecule** interactors, Molecule** background, int iters = 50, void (*iter_callback)(int) = NULL);
-    static void multimol_conform(Molecule** interactors, Molecule** background, Molecule** allow_clashes, int iters = 50, void (*iter_callback)(int) = NULL);
+    static float total_intermol_binding(Molecule** ligands);
+    static void conform_molecules(Molecule** molecules, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
+    static void conform_molecules(Molecule** molecules, Molecule** background, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
+    static void conform_molecules(Molecule** molecules, Molecule** background, Molecule** clashables, int iterations = 50, void (*callback)(int, Molecule**) = nullptr, void (*group_realign)(Molecule*, std::vector<std::shared_ptr<GroupPair>>) = nullptr);
+    void conform_atom_to_location(int atom_idx, Point target, int iterations = 50);
+    void conform_atom_to_location(const char* atom_name, Point target, int iterations = 50);
+    SCoord motion_to_optimal_contact(Molecule* ligand);
 
     // Returns the sum of all possible atom-molecule interactions if all distances and anisotropies were somehow optimal.
     float get_atom_mol_bind_potential(Atom* a);
@@ -193,18 +219,22 @@ public:
     float lastbind = 0;
     float lastbind_history[10];
     float lastshielded = 0;
-    histidine_flip** hisflips = nullptr;
+    HistidineFlip** hisflips = nullptr;
     Bond* springy_bonds = nullptr;
     int springy_bondct = 0;
     bool been_flexed = false;
+    bool priority = false;
+    std::vector<std::shared_ptr<GroupPair>> agroups;
+    Molecule** mclashables = nullptr;
+    Atom *clash1 = nullptr, *clash2 = nullptr;
 
 protected:
-    Molecule();
 
     Atom** atoms = 0;
     int atcount = 0;
     char* name = 0;
     char* smiles = 0;
+    Atom*** paths = nullptr;
     Ring** rings = nullptr;
     Bond** rotatable_bonds = nullptr;
     bool immobile = false;
@@ -213,6 +243,7 @@ protected:
     std::string sdfgen_aboutline = "";
     Molecule** mandatory_connection = nullptr;
     float* last_mc_binding = nullptr;
+    Atom** most_bindable = nullptr;
 
     // For intermol conformer optimization:
     float lmx=0,lmy=0,lmz=0;			// Linear momentum xyz.
@@ -224,10 +255,17 @@ protected:
     int spnum = 0;
     MoleculeType mol_typ = MOLTYP_UNKNOWN;
 
+    void find_paths();
+    int path_contains_atom(int path_idx, Atom* a);
+    int path_get_length(int path_idx);
+    Atom* path_get_terminal_atom(int path_idx);
+    void copy_path(int old_idx, int new_idx);
+    bool path_is_subset_of(int short_path, int long_path);
+    void echo_path(int idx);
     int aidx(Atom* a);
     void reallocate();
     float fsb_lsb_anomaly(Atom* first, Atom* last, float lcard, float bond_length);
-    // void make_coplanar_ring(Atom** ring_members, int ringid);
+    void make_coplanar_ring(Atom** ring_members, int ringid);
     void recenter_ring(int ringid, Point new_ring_cen);
     void rotate_ring(int ringid, Rotation rot);
     bool in_same_ring(Atom* a, Atom* b);
@@ -238,15 +276,17 @@ protected:
     void intermol_conform_norecen(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule* ligand, int iters, Molecule** avoid_clashing_with, float lastbind);
     void intermol_conform_flexonly(Molecule** ligands, int iters, Molecule** avoid_clashing_with, float lastbind);
+    static float cfmol_multibind(Molecule* mol, Molecule** nearby_mols);
 };
 
-extern float potential_distance;
 extern float conformer_momenta_multiplier;
 extern float conformer_tumble_multiplier;
 extern bool allow_ligand_360_tumble;
 extern bool allow_ligand_360_flex;
 extern bool wet_environment;
 extern float _momentum_rad_ceiling;
+extern Molecule *worst_clash_1, *worst_clash_2;
+extern float worst_mol_clash;
 
 #endif
 

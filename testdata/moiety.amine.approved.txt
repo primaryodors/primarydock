@@ -1,0 +1,2 @@
+Pattern N[H+] occurs 2 times in molecule.
+N1 H8 N7 H21 

@@ -29,6 +29,7 @@
 #define pH 6.0
 #define auto_pK_protonation 0
 #define hydrophilicity_cutoff 0.25
+#define group_simil_threshold 0.8
 
 // Give the atoms a sort of lookahead to know what kind of potential binding they could have if only they would rotate properly.
 #define intermol_ESP 0.05
@@ -333,6 +334,7 @@
 #define _dbg_bridges 0
 #define _dbg_cond_basic 0
 #define _dbg_conj_chg 0
+#define _dbg_conjugation 0
 #define _dbg_find_blasted_segfault 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0

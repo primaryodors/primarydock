@@ -2253,15 +2253,31 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
 
 bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
 {
+    if (a->Z < 2) return (is_conjugated_to(a->bonded_to[0].btom));
+
     if (!this || !a) return false;
     if (!is_pi() || !a->is_pi()) return false;
     if (a == bir) return false;
-    if (!bir) bir = this;
-    if (bir->recursion_counter > 10) return false;
+    if (!bir)
+    {
+        bir = this;
+        recursion_counter = 0;
+    }
+    if (bir->recursion_counter > 50) return false;
 
     bir->recursion_counter++;
 
-    if (is_bonded_to(a)) return true;
+    #if _dbg_conjugation
+    cout << "Testing whether " << name << " is conjugated to " << a->name << "..." << endl;
+    #endif
+
+    if (is_bonded_to(a))
+    {
+        #if _dbg_conjugation
+        cout << name << " is bonded to " << a->name << "." << endl << endl << endl;
+        #endif
+        return true;
+    }
     else
     {
         int i;
@@ -2287,6 +2303,10 @@ bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
 
     if (bir == this) recursion_counter = 0;
     else bir->recursion_counter--;
+
+    #if _dbg_conjugation
+    cout << endl;
+    #endif
 
     return false;
 }
@@ -2765,7 +2785,7 @@ float Atom::similarity_to(Atom* b)
         + same_sgn_charge + both_or_neither_pi + both_or_neither_pi_and_both_or_neither_polar + abs_delta_elecn_within_point7\
         + neither_pi_or_conjugated_together\
         != 100
-        #error "Atom similarity constants do not add up to 100%."
+        #error Atom similarity constants do not add up to 100%.
     #endif
 
     bool apb = (fabs(is_polar()) > .2), bpb = (fabs(b->is_polar()) > .2);

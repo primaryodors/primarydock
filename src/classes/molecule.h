@@ -76,6 +76,7 @@ class Molecule
     friend class Pose;
 
 public:
+    Molecule();
     Molecule(const char* name);
     Molecule(const char* name, Atom** collection);
     virtual ~Molecule();
@@ -151,10 +152,10 @@ public:
 
     // Ring functions.
     int identify_rings();
-    int get_num_rings();
+    int get_num_rings() const;
     int add_ring(Atom** atoms);
     bool ring_is_coplanar(int ringid);
-    bool ring_is_aromatic(int ringid);
+    bool ring_is_aromatic(int ringid) const;
     Point get_ring_center(int ringid);
     SCoord get_ring_normal(int ringid);
     Atom** get_ring_atoms(int ringid);
@@ -228,7 +229,6 @@ public:
     Atom *clash1 = nullptr, *clash2 = nullptr;
 
 protected:
-    Molecule();
 
     Atom** atoms = 0;
     int atcount = 0;

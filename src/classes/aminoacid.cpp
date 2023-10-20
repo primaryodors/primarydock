@@ -1626,45 +1626,82 @@ float AminoAcid::similarity_to(const char letter)
 
 float AminoAcid::similarity_to(const AminoAcid* aa)
 {
+    #define aa_same_hydro   60
+    #define aa_hyd_condbas  50
+    #define aa_same_arom    15
+    #define aa_arom_conj    10
+    #define aa_same_chg     15
+    #define aa_same_C       10
+    #define aa_diff_C_1      8
+    #define aa_diff_C_2      5
+
+    #if aa_same_hydro + aa_same_arom + aa_same_chg + aa_same_C != 100
+    #error Amino similarities do not add to 100.
+    #endif
+
     if (!atoms || !aa->atoms) return 0;
 
-    bool polar1 = (hydrophilicity() > 0.2);
-    bool polar2 = (aa->hydrophilicity() > 0.2);
+    bool polar1 = (hydrophilicity() > hydrophilicity_cutoff);
+    bool polar2 = (aa->hydrophilicity() > hydrophilicity_cutoff);
+    bool condbas1 = conditionally_basic();
+    bool condbas2 = aa->conditionally_basic();
+    bool arom1 = false, arom2 = false;
 
-    int i, j;
+    int i, n;
 
-    i = (int)aa->get_letter() + 256*(int)this->get_letter();
-    if (aa_sim_xref[i] >= 0) return aa_sim_xref[i];
-
-    float simil=0, divis=0;
-    for (i=0; atoms[i]; i++)
+    if (n = get_num_rings())
     {
-        bool apol = fabs(atoms[i]->is_polar()) > hydrophilicity_cutoff;
-        if (apol != polar1) continue;
-
-        for (j=0; aa->atoms[j]; j++)
+        for (i=0; i<n; i++)
         {
-            bool bpol = fabs(aa->atoms[j]->is_polar()) > hydrophilicity_cutoff;
-            if (bpol != polar2) continue;
-
-            float f = (apol && bpol) ? 1 : hydrophilicity_cutoff;
-            simil += f*atoms[i]->similarity_to(aa->atoms[j]);
-            divis += f;
+            if (ring_is_aromatic(i)) arom1 = true;
         }
     }
 
-    if (divis) simil /= divis;
+    if (n = aa->get_num_rings())
+    {
+        for (i=0; i<n; i++)
+        {
+            if (aa->ring_is_aromatic(i)) arom2 = true;
+        }
+    }
 
-    simil -= 0.5*fabs( fmin(1, fabs(hydrophilicity())) - fmin(1, fabs(aa->hydrophilicity())) );
-    simil += 0.5*(sgn(get_charge() * aa->get_charge()));
-    simil = fmax(0, fmin(1, simil));
+    int chg1 = sgn(get_charge()), chg2 = sgn(aa->get_charge());
+    int carbons1=0, carbons2=0;
+    bool pi1 = false, pi2 = false;
 
-    i = (int)aa->get_letter() + 256*(int)this->get_letter();
-    aa_sim_xref[i] = simil;
-    i = (int)this->get_letter() + 256*(int)aa->get_letter();
-    aa_sim_xref[i] = simil;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->get_Z() == 6) carbons1++;
+        if (atoms[i]->is_pi()) pi1 = true;
+    }
 
-    return simil;
+    for (i=0; aa->atoms[i]; i++)
+    {
+        if (aa->atoms[i]->is_backbone) continue;
+        if (aa->atoms[i]->get_Z() == 6) carbons2++;
+        if (aa->atoms[i]->is_pi()) pi2 = true;
+    }
+
+    float simil=0;
+
+    if (polar1 == polar2) simil += aa_same_hydro;
+    else if (polar1 && condbas2) simil += aa_hyd_condbas;
+    else if (condbas1 && polar2) simil += aa_hyd_condbas;
+
+    if (arom1 == arom2) simil += aa_same_arom;
+    else if (arom1 && pi2) simil += aa_arom_conj;
+    else if (pi1 && arom2) simil += aa_arom_conj;
+
+    if ((polar1 || condbas1) == (polar2 || condbas2) && chg1 == chg2) simil += aa_same_chg;
+    else if (arom1 == arom2 && chg1 == chg2) simil += aa_same_chg;
+
+    n = abs(carbons1 - carbons2);
+    if (!n) simil += aa_same_C;
+    else if (n == 1) simil += aa_diff_C_1;
+    else if (n == 2) simil += aa_diff_C_2;
+
+    return 0.01*simil;
 }
 
 Ring* AminoAcid::get_most_distal_arom_ring()
@@ -1909,19 +1946,31 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     if (atoms[l]->is_backbone) continue;
                     if (atoms[l]->get_family() == TETREL) continue;
                     if (atoms[l]->get_Z() == 1) continue;
-                    if (atoms[l]->is_bonded_to(atoms[found_j])) continue;
+                    if (atoms[l]->is_bonded_to(atoms[found_j]))
+                    {
+                        #if _dbg_conjugation
+                        cout << atoms[l]->name << " is bonded to " << atoms[found_j]->name << ", no good." << endl;
+                        #endif
+                        continue;
+                    }
 
                     if (atoms[l]->is_conjugated_to(atoms[found_j]))
                     {
                         protonated = atoms[l];
                         break;
                     }
+                    #if _dbg_conjugation
+                    else
+                    {
+                        cout << atoms[l]->name << " is not conjugated to " << atoms[found_j]->name << ", no good." << endl;
+                    }
+                    #endif
                 }
             }
 
             if (!protonated)
             {
-                cout << "No suitable protonation atom found for " << name << endl;
+                cout << "No suitable protonation atom found for " << name << "(acid is " << found_mol->get_name() << ")." << endl;
                 throw 0xfffd;
             }
 

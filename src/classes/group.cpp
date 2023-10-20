@@ -996,7 +996,7 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
                 continue;
             }
 
-            if (simil >= hydrophilicity_cutoff)
+            if (simil >= group_simil_threshold)
             {
                 g->aminos.push_back(bb);
                 dirty[j] = true;

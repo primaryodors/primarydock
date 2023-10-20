@@ -7,7 +7,7 @@ TMPDIR=tmp
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR) $(TMPDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o \
 	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o $(OBJDIR)/scoring.o
-TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test \
+TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test test/amino_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
 	  test/flexion_test test/histidine_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_activate_or $(BINDIR)/score_pdb

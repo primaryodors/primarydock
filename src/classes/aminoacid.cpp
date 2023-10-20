@@ -1627,8 +1627,9 @@ float AminoAcid::similarity_to(const char letter)
 float AminoAcid::similarity_to(const AminoAcid* aa)
 {
     #define aa_same_hydro   60
+    #define aa_hyd_condbas  50
     #define aa_same_arom    15
-    #define aa_arom_conj     7
+    #define aa_arom_conj    10
     #define aa_same_chg     15
     #define aa_same_C       10
     #define aa_diff_C_1      8
@@ -1642,6 +1643,8 @@ float AminoAcid::similarity_to(const AminoAcid* aa)
 
     bool polar1 = (hydrophilicity() > hydrophilicity_cutoff);
     bool polar2 = (aa->hydrophilicity() > hydrophilicity_cutoff);
+    bool condbas1 = conditionally_basic();
+    bool condbas2 = aa->conditionally_basic();
     bool arom1 = false, arom2 = false;
 
     int i, n;
@@ -1683,10 +1686,15 @@ float AminoAcid::similarity_to(const AminoAcid* aa)
     float simil=0;
 
     if (polar1 == polar2) simil += aa_same_hydro;
+    else if (polar1 && condbas2) simil += aa_hyd_condbas;
+    else if (condbas1 && polar2) simil += aa_hyd_condbas;
+
     if (arom1 == arom2) simil += aa_same_arom;
     else if (arom1 && pi2) simil += aa_arom_conj;
     else if (pi1 && arom2) simil += aa_arom_conj;
-    if (chg1 == chg2) simil += aa_same_chg;
+
+    if ((polar1 || condbas1) == (polar2 || condbas2) && chg1 == chg2) simil += aa_same_chg;
+    else if (arom1 == arom2 && chg1 == chg2) simil += aa_same_chg;
 
     n = abs(carbons1 - carbons2);
     if (!n) simil += aa_same_C;

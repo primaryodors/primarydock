@@ -1946,23 +1946,33 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     if (atoms[l]->is_backbone) continue;
                     if (atoms[l]->get_family() == TETREL) continue;
                     if (atoms[l]->get_Z() == 1) continue;
-                    if (atoms[l]->is_bonded_to(atoms[found_j])) continue;
+                    if (atoms[l]->is_bonded_to(atoms[found_j]))
+                    {
+                        #if _dbg_conjugation
+                        cout << atoms[l]->name << " is bonded to " << atoms[found_j]->name << ", no good." << endl;
+                        #endif
+                        continue;
+                    }
 
                     if (atoms[l]->is_conjugated_to(atoms[found_j]))
                     {
                         protonated = atoms[l];
                         break;
                     }
+                    #if _dbg_conjugation
+                    else
+                    {
+                        cout << atoms[l]->name << " is not conjugated to " << atoms[found_j]->name << ", no good." << endl;
+                    }
+                    #endif
                 }
             }
 
-            #if _dbg_cond_basic
             if (!protonated)
             {
-                cout << "No suitable protonation atom found for " << name << endl;
+                cout << "No suitable protonation atom found for " << name << "(acid is " << found_mol->get_name() << ")." << endl;
                 throw 0xfffd;
             }
-            #endif
 
             if (proton) return;
 

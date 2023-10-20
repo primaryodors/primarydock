@@ -1956,11 +1956,13 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                 }
             }
 
+            #if _dbg_cond_basic
             if (!protonated)
             {
                 cout << "No suitable protonation atom found for " << name << endl;
                 throw 0xfffd;
             }
+            #endif
 
             if (proton) return;
 

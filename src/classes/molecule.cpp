@@ -1234,9 +1234,10 @@ void Molecule::find_paths()
         n += atoms[i]->get_bonded_heavy_atoms_count();
     }
 
-    paths = new Atom**[n];              // Total number of paths shouldn't exceed n.
+    // paths = new Atom**[n];
+    Atom** paths[n];              // Total number of paths shouldn't exceed n.
     for (i=0; i<n; i++) paths[i] = nullptr;
-    limit = n*2;
+    limit = n*n;
 
     atcount = get_atom_count();
 
@@ -1266,6 +1267,7 @@ void Molecule::find_paths()
         {
             m = path_get_length(i);
             a = path_get_terminal_atom(i);
+            if (!a) continue;
             a->fetch_bonds(b);
             if (!b) continue;
 
@@ -1351,7 +1353,7 @@ void Molecule::find_paths()
                 #endif
 
                 copy_path(n, j);
-                delete paths[n];
+                // delete paths[n];
                 paths[n] = nullptr;
             }
         }

@@ -99,6 +99,7 @@ include("header.php");
 <style>
 #skeletal
 {
+    margin: 10px;
     width: 300px;
     height: 300px;
     position: absolute;
@@ -126,11 +127,19 @@ include("header.php");
 .ctxmenu li
 {
     display: block;
+    margin-bottom: 2px;
+}
+
+.ctxmenu a
+{
+    display: inline-block;
     border-top: 2px solid #68a;
     border-left: 2px solid #468;
+    background-color: #246;
     border-right: 2px solid #123;
     border-bottom: 2px solid #012;
-    margin-bottom: 5px;
+    padding: 0px 5px;
+    font-size: small;
 }
 </style>
 <script>
@@ -709,29 +718,6 @@ if (count($predictions))
 </div>
 </div>
 
-<div id="skeletal"></div>
-<script>
-$('#skeletal').hide();
-</script>
-
-<div id="dlmenu" onclick="$('#dlmenu').hide();">
-    <div id="dl_mnu_prot">&nbsp;</div>
-    <div id="dl_mnu_lig">&nbsp;</div>
-    <br>
-    Code version:<div id="dl_cd_v">&nbsp;</div><br>
-    Download:<br>
-    <ul class="ctxmenu">
-        <li><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Active model</a></li>
-        <li><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">Inactive model</a></li>
-        <li><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">Active dock</a></li>
-        <li><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">Inactive dock</a></li>
-        <li><a id="dl_json" href="" target="_dl" onclick="$('#dlmenu').hide();">JSON entry</a></li>
-    </ul>
-</div>
-<script>
-$('#dlmenu').hide();
-</script>
-
 <div id="Comparison" class="tabcontent">
 <div class="box">
 <div class="row content scrollh">
@@ -908,3 +894,28 @@ foreach ($lrefs as $idx => $refurl)
 <div id="Structure" class="tabcontent">
     <iframe id="viewer"></iframe>
 </div>
+
+
+</div>
+<div id="skeletal"></div>
+<script>
+$('#skeletal').hide();
+</script>
+
+<div id="dlmenu" onclick="$('#dlmenu').hide();">
+    <div id="dl_mnu_prot">&nbsp;</div>
+    <div id="dl_mnu_lig">&nbsp;</div>
+    <br>
+    Code version:<div id="dl_cd_v">&nbsp;</div><br>
+    Files:<br>
+    <table class="ctxmenu">
+        <tr><td>Active model:</td><td><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td></tr>
+        <tr><td>Inactive model:</td><td><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td></tr>
+        <tr><td>Active dock:</td><td><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td></tr>
+        <tr><td>Inactive dock:</td><td><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td></tr>
+        <tr><td>JSON entry:</td><td><a id="dl_json" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td></tr>
+    </table>
+</div>
+<script>
+$('#dlmenu').hide();
+</script>

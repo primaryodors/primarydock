@@ -1236,7 +1236,7 @@ void Molecule::find_paths()
 
     paths = new Atom**[n];              // Total number of paths shouldn't exceed n.
     for (i=0; i<n; i++) paths[i] = nullptr;
-    limit = n;
+    limit = n*2;
 
     atcount = get_atom_count();
 
@@ -1317,7 +1317,7 @@ void Molecule::find_paths()
                     n++;
                     if (n >= limit)
                     {
-                        cout << "Ran out of path space in Molecule::find_paths(). Lives depend on increasing the limit." << endl;
+                        cout << "Ran out of path space in Molecule::find_paths(). Necessary to increase the limit." << endl;
 
                         #if DBG_FND_RNGS
                         goto _exit_paths;

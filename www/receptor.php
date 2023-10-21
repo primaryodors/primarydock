@@ -141,6 +141,40 @@ include("header.php");
     padding: 0px 5px;
     font-size: small;
 }
+
+#txtview
+{
+    position: absolute;
+    z-index: 10000;
+    width: 80%;
+    height: 80%;
+    margin: 5% 10%;
+    border-top: 2px solid #68a;
+    border-left: 2px solid #468;
+    background-color: #246;
+    border-right: 2px solid #123;
+    border-bottom: 2px solid #012;
+}
+
+#txttext
+{
+    width: 100%;
+    height: 100%;
+}
+
+.closebtn
+{
+    display: inline-block;
+    border-top: 1px solid #ff0;
+    border-left: 1px solid #f90;
+    background-color: #f00;
+    border-right: 1px solid #900;
+    border-bottom: 1px solid #300;
+    color: #fff!important;
+    text-decoration: none!important;
+    cursor: pointer;
+    padding: 0px 5px;
+}
 </style>
 <script>
 var viewer_loaded = false;
@@ -225,6 +259,25 @@ function show_dlmenu(e, prot, lig, v)
     dlmenu.style.top = `${e.pageY}px`;
 
     $(dlmenu).show();
+}
+
+function view_file(url)
+{
+    var txt = $('#txttext')[0];
+    var vw = $('#txtview');
+    txt.value = "Loading...";
+
+	$.ajax(
+	{
+		url: url,
+		cache: false,
+		success: function(result)
+		{
+            txt.value = result;
+            vw.show();
+        }
+    });
+    vw.show();
 }
 </script>
 
@@ -909,13 +962,37 @@ $('#skeletal').hide();
     Code version:<div id="dl_cd_v">&nbsp;</div><br>
     Files:<br>
     <table class="ctxmenu">
-        <tr><td>Active model:</td><td><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td></tr>
-        <tr><td>Inactive model:</td><td><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td></tr>
-        <tr><td>Active dock:</td><td><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td></tr>
-        <tr><td>Inactive dock:</td><td><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td></tr>
-        <tr><td>JSON entry:</td><td><a id="dl_json" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td></tr>
+        <tr><td>Active model:</td>
+            <td><a href="#" onclick="view_file($('#dl_acv_mdl')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
+        </tr>
+        <tr><td>Inactive model:</td>
+            <td><a href="#" onclick="view_file($('#dl_iacv_mdl')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
+        </tr>
+        <tr><td>Active dock:</td>
+            <td><a href="#" onclick="view_file($('#dl_acv_dc')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
+        </tr>
+        <tr><td>Inactive dock:</td>
+            <td><a href="#" onclick="view_file($('#dl_iacv_dc')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
+        </tr>
+        <tr><td>JSON entry:</td>
+            <td><a href="#" onclick="view_file($('#dl_json')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a id="dl_json" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
+        </tr>
     </table>
 </div>
 <script>
 $('#dlmenu').hide();
 </script>
+
+<div id="txtview" style="display: none;">
+    <div align="right">
+        <a href="#" class="closebtn" onclick="$('#txtview').hide();">&#xd7;</a>
+    </div>
+    <textarea id="txttext" enabled=false>
+        Loading...
+    </textarea>
+</div>

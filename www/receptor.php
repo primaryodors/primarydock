@@ -154,6 +154,7 @@ include("header.php");
     background-color: #246;
     border-right: 2px solid #123;
     border-bottom: 2px solid #012;
+    box-shadow: 0px 0px 50px #000, 0px 0px 100px #000, 0px 0px 200px #000;
 }
 
 #txttext

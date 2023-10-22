@@ -251,9 +251,13 @@ function show_dlmenu(e, prot, lig, v)
     $("#dl_mnu_lig")[0].innerText = decodeURIComponent(lig);
     $("#dl_cd_v")[0].innerText = v;
     $("#dl_acv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=active");
+    $("#vw_acv_mdl_3d")[0].setAttribute("href", "viewer.php?view=pred&prot="+prot+"&odor="+lig+"&mode=active");
     $("#dl_iacv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=inactive");
+    $("#vw_iacv_mdl_3d")[0].setAttribute("href", "viewer.php?view=pred&prot="+prot+"&odor="+lig+"&mode=inactive");
     $("#dl_acv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=active");
+    $("#vw_acv_dc_3d")[0].setAttribute("href", "viewer.php?view=dock&prot="+prot+"&odor="+lig+"&mode=active");
     $("#dl_iacv_dc")[0].setAttribute("href", "download.php?obj=dock&prot="+prot+"&odor="+lig+"&mode=inactive");
+    $("#vw_iacv_dc_3d")[0].setAttribute("href", "viewer.php?view=dock&prot="+prot+"&odor="+lig+"&mode=inactive");
     $("#dl_json")[0].setAttribute("href", "download.php?obj=json&prot="+prot+"&odor="+lig);
 
     dlmenu.style.left = `${e.pageX}px`;
@@ -648,7 +652,7 @@ The numbers and models are not yet fully accurate, but the repository is accepti
         <th width="10%">Adjusted Top</th>
         <th width="10%">Antagonist?</th>
         <?php
-        if (count($predictions)) echo "<th colspan=\"2\" width=\"1%\">Predicted (BETA)</th>";
+        if (count($predictions)) echo "<th width=\"1%\">Predicted</th>";
         ?>
         <th width="50%">Aroma Notes</th>
     </tr>
@@ -712,18 +716,13 @@ foreach ($pairs as $oid => $pair)
     {
         if (isset($predictions[$oid]))
         {
-            echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor=".urlencode($predname[$oid])."&mode=";
-            if ($predictions[$oid] > 0) echo "active";
-            else echo "inactive";
-            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</a></td>";
-            echo "<td><span style=\"text-decoration: underline; cursor: pointer;\"";
-            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">&#x21a7;</span>";
-            echo "</td>";
+            echo "<td><a href=\"#\" onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">"
+                .round($predictions[$oid], 2)."</a></td>";
             $pred_shown[$oid] = true;
         }
-        else if (@$ligands_inprogress[$oid]) echo "<td colspan=\"2\"><span title=\"A prediction is currently running for this receptor+ligand pair.\">&#x23F3;</span></td>";
-        else echo "<td colspan=\"2\">&nbsp;</td>";
-    }        
+        else if (@$ligands_inprogress[$oid]) echo "<td><span title=\"A prediction is currently running for this receptor+ligand pair.\">&#x23F3;</span></td>";
+        else echo "<td>&nbsp;</td>";
+    }
 
     echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
     echo "</tr>\n";
@@ -748,12 +747,8 @@ if (count($predictions))
             echo "<td>&nbsp;</td>\n";
             echo "<td>&nbsp;</td>\n";
 
-            echo "<td><a href=\"viewer.php?view=pred&prot=$rcpid&odor=".urlencode($predname[$oid])."&mode=";
-            if ($predictions[$oid] > 0) echo "active";
-            else echo "inactive";
-            echo "\" target=\"_prediction\">".round($predictions[$oid], 2)."</a></td>";
-            echo "<td><span style=\"text-decoration: underline; cursor: pointer;\"";
-            echo " onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">&#x21a7;</span>";
+            echo "<td><a href=\"#\" onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">"
+                .round($predictions[$oid], 2)."</a></td>";
             echo "</td>";
             $pred_shown[$oid] = true;
 
@@ -957,6 +952,9 @@ $('#skeletal').hide();
 </script>
 
 <div id="dlmenu" onclick="$('#dlmenu').hide();">
+    <div align="right" style="margin-bottom: -25px;">
+        <a href="#" class="closebtn" onclick="$('#dlmenu').hide();">&#xd7;</a>
+    </div>
     <div id="dl_mnu_prot">&nbsp;</div>
     <div id="dl_mnu_lig">&nbsp;</div>
     <br>
@@ -965,22 +963,27 @@ $('#skeletal').hide();
     <table class="ctxmenu">
         <tr><td>Active model:</td>
             <td><a href="#" onclick="view_file($('#dl_acv_mdl')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a id="vw_acv_mdl_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_acv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Inactive model:</td>
             <td><a href="#" onclick="view_file($('#dl_iacv_mdl')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a id="vw_iacv_mdl_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_iacv_mdl" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Active dock:</td>
             <td><a href="#" onclick="view_file($('#dl_acv_dc')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a id="vw_acv_dc_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_acv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>Inactive dock:</td>
             <td><a href="#" onclick="view_file($('#dl_iacv_dc')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td><a id="vw_iacv_dc_3d" href="" target="_3d">3D</a></td>
             <td><a id="dl_iacv_dc" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
         <tr><td>JSON entry:</td>
             <td><a href="#" onclick="view_file($('#dl_json')[0].href); $('#dlmenu').hide();">view</a></td>
+            <td>&nbsp;</td>
             <td><a id="dl_json" href="" target="_dl" onclick="$('#dlmenu').hide();">download</a></td>
         </tr>
     </table>

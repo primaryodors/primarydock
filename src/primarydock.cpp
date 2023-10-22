@@ -3271,7 +3271,7 @@ _try_again:
                                     #endif
                                 }
                             }
-                            // tmp_pdb_ligand[j+1].restore_state(ligand);
+                            tmp_pdb_ligand[j+1].restore_state(ligand);
 
                             #if recapture_ejected_ligand
                             float r = ligand->get_barycenter().get_3d_distance(nodecens[k]);

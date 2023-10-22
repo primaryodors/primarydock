@@ -2153,6 +2153,7 @@ int main(int argc, char** argv)
     for (l=0; l<poses; l++)
     {
         ligand = &pose_ligands[l];
+        ligand->set_name(ligfname);
         char* ext = get_file_ext(ligfname);
         if (!ext)
         {
@@ -2345,6 +2346,9 @@ _try_again:
     Point nodecens[pathnodes+1];
     for (pose = 1; pose <= poses; pose++)
     {
+        ligand = &pose_ligands[pose-1];
+        ligand->movability = MOV_ALL;
+
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
@@ -2371,7 +2375,6 @@ _try_again:
         // delete protein;
         // protein = new Protein(protfname);
         protein = &pose_proteins[pose-1];
-        ligand = &pose_ligands[pose-1];
 
         if (temp_pdb_file.length())
         {
@@ -3265,13 +3268,13 @@ _try_again:
                                 AminoAcid* aa = protein->get_residue(j1);
                                 if (aa /* && aa->been_flexed */)
                                 {
-                                    tmp_pdb_residue[j+1][j1].restore_state(aa);
+                                    // tmp_pdb_residue[j+1][j1].restore_state(aa);
                                     #if _dbg_residue_poses
                                     cout << "tmp_pdb_residue[" << (j+1) << "][" << j1 << "].restore_state(" << aa->get_name() << ")" << endl;
                                     #endif
                                 }
                             }
-                            tmp_pdb_ligand[j+1].restore_state(ligand);
+                            // tmp_pdb_ligand[j+1].restore_state(ligand);
 
                             #if recapture_ejected_ligand
                             float r = ligand->get_barycenter().get_3d_distance(nodecens[k]);

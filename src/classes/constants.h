@@ -121,7 +121,7 @@
 #define ignore_double_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 0.0025
+#define lmpush 0.01
 #define recapture_ejected_ligand 0
 
 #define amide_zwitterionic_amount 0.1
@@ -371,6 +371,7 @@
 #define _DORESPHRES 0
 #define _dummy_atoms_for_debug 0
 #define output_tumble_debug_docs 0
+#define _show_cond_bas_hbond_energy 0
 #define _show_final_group_pairs 0
 
 #endif

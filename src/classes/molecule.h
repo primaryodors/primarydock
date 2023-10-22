@@ -80,6 +80,11 @@ public:
     Molecule(const char* name);
     Molecule(const char* name, Atom** collection);
     virtual ~Molecule();
+    void set_name(const char* new_name)
+    {
+        name = new char[strlen(new_name)+2];
+        strcpy(name, new_name);
+    }
 
     // Load and save functions.
     int from_sdf(const char* sdf_dat);		// returns number of atoms loaded.

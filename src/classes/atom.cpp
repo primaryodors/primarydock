@@ -2458,6 +2458,19 @@ Atom** Ring::get_atoms() const
     return retval;
 }
 
+int Ring::get_overlap_count(Ring* ringb)
+{
+    int i, j, m = get_atom_count(), n = ringb->get_atom_count(), result = 0;
+    for (i=0; i<m; i++)
+    {
+        for (j=0; j<n; j++)
+        {
+            if (atoms[i] == ringb->atoms[j]) result++;
+        }
+    }
+    return result;
+}
+
 RING_TYPE Ring::get_type()
 {
     if (type == UNKNOWN) determine_type();

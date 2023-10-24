@@ -98,6 +98,7 @@ public:
     }
     Atom* get_atom(int index);
     Atom** get_atoms() const;
+    int get_overlap_count(Ring* ringb);
     RING_TYPE get_type();
     Point get_center();
     SCoord get_normal();

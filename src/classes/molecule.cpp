@@ -1106,11 +1106,18 @@ void Molecule::save_pdb(FILE* os, int atomno_offset, bool endpdb)
 int Molecule::add_ring(Atom** atoms)
 {
     int i, ringcount;
+    Ring* r = new Ring(atoms);
+    int m = r->get_atom_count();
 
     if (rings)
     {
-        for (i=0; rings[i]; i++);	// Get count.
+        bool already_exists = false;
+        for (i=0; rings[i]; i++)
+        {
+            if (rings[i]->get_overlap_count(r) == m) already_exists = true; 
+        }
         ringcount = i;
+        if (already_exists) return ringcount;
     }
     else
     {
@@ -1125,7 +1132,7 @@ int Molecule::add_ring(Atom** atoms)
         delete[] rings;
     }
 
-    ringstmp[ringcount++] = new Ring(atoms);
+    ringstmp[ringcount++] = r;
     ringstmp[ringcount] = nullptr;
     rings = ringstmp;
 

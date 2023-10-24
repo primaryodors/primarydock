@@ -64,6 +64,7 @@ class ResidueGroup
     Atom* metal = nullptr;
 
     Point get_center();
+    Atom* get_nearest_atom(Point pt);
     float distance_to(Point pt);
     float compatibility(AtomGroup* ag);
     float group_reach();

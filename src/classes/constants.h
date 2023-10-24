@@ -138,6 +138,7 @@
 #define bb_realign_amount 0.333
 #define bb_realign_threshold_distance 2.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
+#define enable_bb_scooch 0
 #define flexion_selection 1
 #define no_zero_flexions 1
 #define ignore_invalid_partial 1
@@ -338,6 +339,7 @@
 #define _dbg_find_blasted_segfault 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
+#define _dbg_groupsalign 0
 #define _dbg_groupsel 0
 #define _DBG_H2O_TELEPORT 0
 #define _DBG_HISFLIP 0

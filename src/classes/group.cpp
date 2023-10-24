@@ -296,9 +296,31 @@ Point ResidueGroup::get_center()
     return result;
 }
 
+Atom* ResidueGroup::get_nearest_atom(Point pt)
+{
+    int i, n = aminos.size();
+    Atom* result = nullptr;
+    float r = Avogadro;
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = aminos[i]->get_nearest_atom(pt);
+        float r1 = a->get_location().get_3d_distance(pt);
+
+        if (!n || r1 < r)
+        {
+            result = a;
+            r = r1;
+        }
+    }
+
+    return result;
+}
+
 float ResidueGroup::distance_to(Point pt)
 {
-    return pt.get_3d_distance(get_center());
+    return get_nearest_atom(pt)->get_location().get_3d_distance(pt);
+    // return pt.get_3d_distance(get_center());
 }
 
 float ResidueGroup::pi_stackability()
@@ -1313,22 +1335,31 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     Rotation rot = align_points_3d(gp[0]->ag->get_center(), gp[0]->scg->get_center(), lig->get_barycenter());
     LocatedVector lv = rot.v;
     lv.origin = lig->get_barycenter();
-    #if _dbg_groupsel
-    cout << "Rotating " << *gp[0]->ag << " in the direction of " << *gp[0]->scg << endl;
+    #if _dbg_groupsel || _dbg_groupsalign
+    cout << "Rotating " << *gp[0]->ag << "(" << gp[0]->ag->get_center() << ") "
+        << (rot.a * fiftyseven) << "deg about " << rot.v
+        << " in the direction of " << *gp[0]->scg << "(" << gp[0]->scg->get_center() << ")." << endl;
     #endif
     lig->rotate(lv, rot.a*amount);
 
+    #if enable_bb_scooch
     // Scooch.
-    float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
+    // float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
+    float r = gp[0]->scg->distance_to(gp[0]->ag->get_center()) - gp[0]->scg->group_reach();
     if (r > 0)
     {
         Point rel = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
         rel.scale((r-1)*amount);
-        #if _dbg_groupsel
-        cout << "Scooching " << *gp[0]->ag << " " << r << "Å into the reach of " << *gp[0]->scg << endl;
+        #if _dbg_groupsel || _dbg_groupsalign
+        cout << "Atom group is " << gp[0]->scg->distance_to(gp[0]->ag->get_center()) << "A from side chain group. ";
+        cout << "Side chain group reach is " << gp[0]->scg->group_reach() << "A." << endl;
+        cout << "Scooching " << *gp[0]->ag << " " << rel.magnitude() << "Å into the reach of " << *gp[0]->scg << endl;
         #endif
         lig->move(rel);
     }
+    #endif
+
+    // return;
 
     if (do_conforms) gp[0]->scg->conform_to(lig);
 
@@ -1336,7 +1367,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
     lv = rot.v;
     lv.origin = gp[0]->ag->get_center();
-    #if _dbg_groupsel
+    #if _dbg_groupsel || _dbg_groupsalign
     cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
     #endif
     lig->rotate(lv, rot.a*amount);

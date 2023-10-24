@@ -1900,7 +1900,7 @@ int main(int argc, char** argv)
     if (dot) *dot = 0;
 
     Protein pose_proteins[poses];
-    Molecule pose_ligands[poses];
+    Molecule pose_ligands[poses+1];
     protein = &pose_proteins[0]; // new Protein(protid);
     pf = fopen(protfname, "r");
     if (!pf)
@@ -2150,7 +2150,7 @@ int main(int argc, char** argv)
     // Load the ligand or return an error.
     // Molecule m(ligfname);
     // ligand = &m;
-    for (l=0; l<poses; l++)
+    for (l=0; l<=poses; l++)
     {
         ligand = &pose_ligands[l];
         ligand->set_name(ligfname);
@@ -2346,7 +2346,7 @@ _try_again:
     Point nodecens[pathnodes+1];
     for (pose = 1; pose <= poses; pose++)
     {
-        ligand = &pose_ligands[pose-1];
+        ligand = &pose_ligands[pose];
         ligand->movability = MOV_ALL;
 
         last_ttl_bb_dist = 0;
@@ -2448,7 +2448,7 @@ _try_again:
                 maxh2o = omaxh2o;
             }
 
-            if (pathstrs.size() < nodeno) break;
+            // if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 
             if (echo_progress) cout << (time(NULL) - began) << " seconds: starting pose " << pose << " node " << nodeno << "..." << endl;
@@ -2506,8 +2506,7 @@ _try_again:
                 // delete protein;
                 // protein = new Protein(protafname);
                 protein = &pose_proteins[pose-1];
-                ligand = &pose_ligands[pose-1];
-                
+
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
                 fclose(pf);
@@ -2786,20 +2785,26 @@ _try_again:
                 #endif
 
                 protein->set_conditional_basicities();
-                std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
-                global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
-                ligand->recenter(ligcen_target);
-                if (flex) GroupPair::align_groups(ligand, global_pairs);
-
-                #if _dbg_groupsel
-                cout << endl;
-                #endif
-
-                int gpn = global_pairs.size();
-                for (l=0; l<3 && l<gpn; l++)
+                if (use_bestbind_algorithm)
                 {
-                    ligand_groups[l] = *(global_pairs[l]->ag);
-                    sc_groups[l] = *(global_pairs[l]->scg);
+                    std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
+                    global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
+                }
+                ligand->recenter(ligcen_target);
+                if (use_bestbind_algorithm)
+                {
+                    GroupPair::align_groups(ligand, global_pairs, false, 1);
+
+                    #if _dbg_groupsel
+                    cout << endl;
+                    #endif
+
+                    int gpn = global_pairs.size();
+                    for (l=0; l<3 && l<gpn; l++)
+                    {
+                        ligand_groups[l] = *(global_pairs[l]->ag);
+                        sc_groups[l] = *(global_pairs[l]->scg);
+                    }
                 }
 
                 // Best-Binding Algorithm
@@ -2933,7 +2938,7 @@ _try_again:
             ligand->agroups = global_pairs;
             Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform);
 
-            if (!nodeno && outpdb.length())
+            if (!nodeno) // && outpdb.length())
             {
                 protein->get_internal_clashes(1, protein->get_end_resno(), true);
 
@@ -3196,7 +3201,7 @@ _try_again:
         for (j=0; j<poses; j++)
         {
             protein = &pose_proteins[j];
-            ligand = &pose_ligands[j];
+            ligand = &pose_ligands[j+1];
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
                 if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)

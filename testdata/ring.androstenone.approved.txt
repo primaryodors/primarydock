@@ -1,0 +1,7 @@
+Molecule has 6 ring(s).
+Ring 0 consists of C14 C6 C4 C12 C17 C20 
+Ring 1 consists of C4 C2 C3 C9 C11 C6 
+Ring 2 consists of C8 C10 C7 C5 C3 C2 
+Ring 3 consists of C14 C6 C11 C9 C3 C2 C4 C12 C17 C20 
+Ring 4 consists of C7 C16 C19 C13 C5 
+Ring 5 consists of C11 C9 C3 C5 C7 C10 C8 C2 C4 C6 

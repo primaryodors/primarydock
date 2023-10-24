@@ -975,9 +975,30 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
                 continue;
             }
 
-            // float r = fmax(0, aa->get_CA_location().get_3d_distance(bb->get_CA_location()) - fmax(aa->get_reach(), bb->get_reach()));
-            float r = fmax(0, aa->get_reach_atom()->distance_to(bb->get_reach_atom()) - 2.5);
-            if (r > 1.5)
+            Atom *reach1, *reach2;
+            reach1 = aa->get_reach_atom();
+            reach2 = bb->get_reach_atom();
+            if ((fabs(reach1->is_polar()) >= hydrophilicity_cutoff) != (fabs(reach2->is_polar()) >= hydrophilicity_cutoff))
+            {
+                Atom *nearest1, *nearest2;
+                nearest1 = aa->get_nearest_atom(reach2->get_location());
+                nearest2 = bb->get_nearest_atom(reach1->get_location());
+
+                if ((fabs(reach1->is_polar()) >= hydrophilicity_cutoff) == (fabs(nearest2->is_polar()) >= hydrophilicity_cutoff))
+                    reach2 = nearest2;
+                else if ((fabs(nearest1->is_polar()) >= hydrophilicity_cutoff) == (fabs(reach2->is_polar()) >= hydrophilicity_cutoff))
+                    reach1 = nearest1;
+                else
+                {
+                    #if _dbg_groupsel
+                    cout << "Rejected " << bb->get_name() << " incompatible polarities of reach atoms." << endl;
+                    #endif
+                    continue;
+                }
+            }
+
+            float r = fmax(0, reach1->distance_to(reach2));
+            if (r > 2.5)
             {
                 #if _dbg_groupsel
                 cout << "Rejected " << bb->get_name() << " distance " << r << endl;

@@ -337,10 +337,11 @@
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
 #define _dbg_find_blasted_segfault 0
+#define DBG_FND_RNGS 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
 #define _dbg_groupsalign 0
-#define _dbg_groupsel 0
+#define _dbg_groupsel 1
 #define _DBG_H2O_TELEPORT 0
 #define _DBG_HISFLIP 0
 #define _dbg_homology 0

@@ -1139,7 +1139,6 @@ int Molecule::add_ring(Atom** atoms)
     return ringcount-1;
 }
 
-#define DBG_FND_RNGS 0
 int Molecule::identify_rings()
 {
     find_paths();
@@ -1242,10 +1241,10 @@ void Molecule::find_paths()
     }
 
     // paths = new Atom**[n];
-    Atom** lpaths[n];              // Total number of paths shouldn't exceed n.
+    limit = n*n;
+    Atom** lpaths[limit];
     paths = lpaths;
     for (i=0; i<n; i++) paths[i] = nullptr;
-    limit = n*n;
 
     atcount = get_atom_count();
 
@@ -1325,16 +1324,7 @@ void Molecule::find_paths()
                     #endif
 
                     n++;
-                    if (n >= limit)
-                    {
-                        cout << "Ran out of path space in Molecule::find_paths(). Necessary to increase the limit." << endl;
-
-                        #if DBG_FND_RNGS
-                        goto _exit_paths;
-                        #else
-                        throw -1;
-                        #endif
-                    }
+                    if (n >= limit) goto _exit_paths;
                     k++;
                     num_added++;
                 }

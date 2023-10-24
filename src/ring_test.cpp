@@ -29,7 +29,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        cout << "Usage:" << endl << endl << "test/ring_test {path/to/SDF or SMILES string}" << endl << endl;
+        cout << "Usage:" << endl << endl << "test/ring_test {path/to/structure.sdf or SMILES string}" << endl << endl;
         return -1;
     }
 

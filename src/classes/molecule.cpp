@@ -1242,7 +1242,8 @@ void Molecule::find_paths()
     }
 
     // paths = new Atom**[n];
-    Atom** paths[n];              // Total number of paths shouldn't exceed n.
+    Atom** lpaths[n];              // Total number of paths shouldn't exceed n.
+    paths = lpaths;
     for (i=0; i<n; i++) paths[i] = nullptr;
     limit = n*n;
 

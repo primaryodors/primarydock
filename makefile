@@ -9,7 +9,7 @@ OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OB
 	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o $(OBJDIR)/scoring.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test test/amino_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
-	  test/flexion_test test/histidine_test
+	  test/flexion_test test/histidine_test test/ring_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_activate_or $(BINDIR)/score_pdb
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
 all: $(DIRS) \
@@ -88,6 +88,9 @@ test/atom_test: src/atom_test.cpp $(OBJDIR)/point.o $(OBJDIR)/atom.o
 
 test/molecule_test: src/molecule_test.cpp $(OBJS)
 	$(CC) src/molecule_test.cpp $(OBJS) -o test/molecule_test $(CFLAGS)
+
+test/ring_test: src/ring_test.cpp $(OBJDIR)/molecule.o
+	$(CC) src/ring_test.cpp $(OBJS) -o test/ring_test $(CFLAGS)
 
 test/pi_stack_test: src/pi_stack_test.cpp $(OBJS)
 	$(CC) src/pi_stack_test.cpp $(OBJS) -o test/pi_stack_test $(CFLAGS)

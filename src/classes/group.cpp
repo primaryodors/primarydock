@@ -1359,20 +1359,22 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     }
     #endif
 
-    // return;
-
     if (do_conforms) gp[0]->scg->conform_to(lig);
 
     if (n < 2) return;
-    rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
-    lv = rot.v;
-    lv.origin = gp[0]->ag->get_center();
-    #if _dbg_groupsel || _dbg_groupsalign
-    cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
-    #endif
-    lig->rotate(lv, rot.a*amount);
+    r = gp[1]->scg->distance_to(gp[1]->ag->get_center()) - gp[1]->scg->group_reach();
+    if (r > 4)
+    {
+        rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
+        lv = rot.v;
+        lv.origin = gp[0]->ag->get_center();
+        #if _dbg_groupsel || _dbg_groupsalign
+        cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
+        #endif
+        lig->rotate(lv, rot.a*amount);
 
-    if (do_conforms) gp[1]->scg->conform_to(lig);
+        if (do_conforms) gp[1]->scg->conform_to(lig);
+    }
 
     if (n < 3) return;
     Point zcen = gp[0]->ag->get_center();

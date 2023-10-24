@@ -2202,7 +2202,6 @@ int main(int argc, char** argv)
     }
     ligand = &pose_ligands[0];
 
-    std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
 
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded ligand." << endl;
@@ -2415,6 +2414,7 @@ _try_again:
 
         ligand->recenter(pocketcen);
         // cout << "Centered ligand at " << pocketcen << endl;
+        std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
 
         if (!use_bestbind_algorithm && !use_prealign)
         {

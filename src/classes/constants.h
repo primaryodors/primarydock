@@ -138,7 +138,7 @@
 #define bb_realign_amount 0.333
 #define bb_realign_threshold_distance 2.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
-#define enable_bb_scooch 0
+#define enable_bb_scooch 1
 #define flexion_selection 1
 #define no_zero_flexions 1
 #define ignore_invalid_partial 1

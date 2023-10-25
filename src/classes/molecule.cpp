@@ -2928,9 +2928,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                     switch(xyz)
                     {
-                        case 0: motion.x = frand(-speed_limit,speed_limit); break;
-                        case 1: motion.y = frand(-speed_limit,speed_limit); break;
-                        case 2: motion.z = frand(-speed_limit,speed_limit); break;
+                        case 0: motion.x = a->lmx + frand(-speed_limit,speed_limit); break;
+                        case 1: motion.y = a->lmy + frand(-speed_limit,speed_limit); break;
+                        case 2: motion.z = a->lmz + frand(-speed_limit,speed_limit); break;
                         default:
                         ;
                     }
@@ -2952,9 +2952,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     {
                         switch(xyz)
                         {
-                            case 0: motion.x *= -2; break;
-                            case 1: motion.y *= -2; break;
-                            case 2: motion.z *= -2; break;
+                            case 0: motion.x = (motion.x - a->lmx) * -2 + a->lmx; break;
+                            case 1: motion.y = (motion.y - a->lmy) * -2 + a->lmy; break;
+                            case 2: motion.z = (motion.z - a->lmz) * -2 + a->lmz; break;
                             default:
                             ;
                         }
@@ -2973,6 +2973,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         }
                     }
                 }
+
+                a->lmx = a->lmy = a->lmz = 0;
             }       // If can recenter.
             #endif
 

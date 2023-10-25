@@ -998,7 +998,7 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
             }
 
             float r = fmax(0, reach1->distance_to(reach2));
-            if (r > 2.5)
+            if (r > bb_group_distance_cutoff)
             {
                 #if _dbg_groupsel
                 cout << "Rejected " << bb->get_name() << " distance " << r << endl;

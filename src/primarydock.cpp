@@ -2789,6 +2789,19 @@ _try_again:
                 {
                     std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
                     global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
+
+                    if (global_pairs.size() > 2)
+                    {
+                        // TODO: If the 2nd group is closer to the 1st group than the 3rd group is, swap the 2nd and 3rd groups.
+                        Point grpcen1 = global_pairs[0]->ag->get_center(), grpcen2 = global_pairs[1]->ag->get_center(), grpcen3 = global_pairs[2]->ag->get_center();
+
+                        if (grpcen1.get_3d_distance(grpcen2) > grpcen1.get_3d_distance(grpcen3))
+                        {
+                            std::shared_ptr<GroupPair> tmpg = global_pairs[2];
+                            global_pairs[2] = global_pairs[1];
+                            global_pairs[1] = tmpg;
+                        }
+                    }
                 }
                 ligand->recenter(ligcen_target);
                 if (use_bestbind_algorithm)

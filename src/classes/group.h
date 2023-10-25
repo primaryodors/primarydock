@@ -41,7 +41,6 @@ class AtomGroup
     void remove_atom(Atom* a);
     float distance_to(Point pt);
     float bounds();
-    float compatibility(AminoAcid* aa);
     bool is_bonded_to(Atom* a);
     Molecule* get_ligand() { return ligand; }
     int intersecting(AtomGroup* compare_with);
@@ -66,7 +65,6 @@ class ResidueGroup
     Point get_center();
     Atom* get_nearest_atom(Point pt);
     float distance_to(Point pt);
-    float compatibility(AtomGroup* ag);
     float group_reach();
     void conform_to(Molecule* mol);
     float hydrophilicity();

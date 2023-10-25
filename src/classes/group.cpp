@@ -217,59 +217,6 @@ float AtomGroup::bounds()
     return ptmax.get_3d_distance(ptmin);
 }
 
-float AtomGroup::compatibility(AminoAcid* aa)
-{
-    int atct = atoms.size();
-    if (!atct) return 0;
-
-    float result = 0;
-    float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
-
-    float aachg = aa->get_charge();
-    if (lgi && aachg && sgn(lgi) != -sgn(aachg)) return 0;
-
-    if (aa->hydrophilicity() > 0.25)
-    {
-        if ((lgh / atct) < 0.19) return 0;
-    }
-    else
-    {
-        if ((lgh / atct) > hydrophilicity_cutoff) return 0;
-    }
-
-    if (lgh)
-    {
-        int i;
-        int atct = atoms.size();
-        if (!aa->has_hbond_acceptors())
-        {
-            lgh = 0;
-            if (atct)
-            for (i=0; i<atct; i++)
-            {
-                if (atoms[i]->is_polar() < hydrophilicity_cutoff) lgh++;
-            }
-        }
-        else if (!aa->has_hbond_donors())
-        {
-            lgh = 0;
-            if (atct)
-            for (i=0; i<atct; i++)
-            {
-                if (atoms[i]->is_polar() > hydrophilicity_cutoff) lgh++;
-            }
-        }
-    }
-
-    if (lgi) result += lgi * -aa->bindability_by_type(ionic) * 100;
-    if (lgh) result += fabs(lgh) * fabs(aa->bindability_by_type(hbond)) * 30;
-    if (lgp) result += aa->bindability_by_type(pi);
-
-    return result;
-}
-
-
-
 Point ResidueGroup::get_center()
 {
     int amsz = aminos.size();
@@ -361,52 +308,6 @@ float ResidueGroup::hydrophilicity()
     }
 
     if (divisor) result /= divisor;
-    return result;
-}
-
-float ResidueGroup::compatibility(AtomGroup* ag)
-{
-    int amsz = aminos.size();
-    if (!amsz) return 0;
-    float result = 0;
-    int i;
-    bool has_acids = false, has_his = false;
-    for (i=0; i<amsz; i++)
-    {
-        if (aminos[i]->get_charge() < 0) has_acids = true;
-        if (aminos[i]->conditionally_basic()) has_his = true;
-
-        float f = ag->compatibility(aminos[i]);
-
-        if (aminos[i]->priority)
-        {
-            f *= priority_weight_group;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
-        }
-
-        result += f;
-    }
-    // if (has_acids && has_his && ag->get_ionic() > 0) result -= ag->get_ionic()*30;
-
-    if (metallic)
-    {
-        result /= 10;
-        float lmc = 0;
-        lmc += 20.0 * fabs(ag->get_mcoord());
-        // lmc += 1.0 * fmax(0, -ag->get_ionic());
-        // lmc -= 1.0 * fabs(ag->get_polarity());
-
-        float kmims = (ag->get_avg_elecn() + metal->get_electronegativity()) / 2 - 2.25;
-        float lmm = cos(kmims*2);
-        lmc *= lmm;
-
-        #if _dbg_groupsel
-        cout << "Metal multiplier: " << lmm << " from kmims " << kmims << endl;
-        #endif
-
-        lmc += 1.0 * fabs(ag->get_pi());
-        result += lmc;
-    }
-
     return result;
 }
 
@@ -1138,6 +1039,12 @@ float GroupPair::get_potential()
             {
                 AminoAcid* aa = scg->aminos[j];
                 float partial;
+
+                if (polar_atoms && polar_res)
+                {
+                    if (!aa->has_hbond_acceptors() && a->is_polar() > 0) continue;
+                    if (!aa->has_hbond_donors() && a->is_polar() < 0) continue;
+                }
 
                 if (aa->coordmtl)
                 {

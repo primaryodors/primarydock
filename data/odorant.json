@@ -12540,6 +12540,69 @@
             }
         }
     },
+    "4648d6015e6084321b9cf7d382845f06":
+    {
+        "full_name": "2-ethyl-1-butanol",
+        "smiles": "CCC(CC)CO",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "musty",
+                "alcoholic"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1007\/s12257-020-0132-4":
+            {
+                "OR4D11":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.5"
+                }
+            }
+        }
+    },
+    "083ea880d27d5e50a0035511dfe7677a":
+    {
+        "full_name": "2-ethyl hexanal",
+        "smiles": "CCCCC(CC)C=O",
+        "aroma":
+        {
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1007\/s12257-020-0132-4":
+            {
+                "OR4D11":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                }
+            }
+        }
+    },
+    "77799db9051e145ecfbe29ebf8339adc":
+    {
+        "full_name": "2-ethyl hexanoic acid",
+        "smiles": "CCCCC(CC)C(=O)O",
+        "aroma":
+        {
+        },
+        "activity":
+        {
+            "https:\/\/doi.org\/10.1007\/s12257-020-0132-4":
+            {
+                "OR4D11":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                }
+            }
+        }
+    },
     "31094abaa27f09882868de52479af0b7":
     {
         "full_name": "2-ethyl-1-hexanol",
@@ -12570,6 +12633,14 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1.2690354883671"
+                }
+            },
+            "https:\/\/doi.org\/10.1007\/s12257-020-0132-4":
+            {
+                "OR4D11":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "10"
                 }
             }
         }
@@ -16505,6 +16576,14 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/doi.org\/10.1007\/s12257-020-0132-4":
+            {
+                "OR4D11":
+                {
+                    "type": "na",
+                    "adjusted_curve_top": "0"
+                }
             }
         }
     },
@@ -17205,6 +17284,14 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "0.55555558204651"
+                }
+            },
+            "https:\/\/doi.org\/10.1007\/s12257-020-0132-4":
+            {
+                "OR4D11":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.5"
                 }
             }
         }

@@ -204,7 +204,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         int resno = reaches_spheroid[i]->get_residue_no();
 
         float lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
-        if (lb < -maxclash) maxclash -= lb;
+        if (lb < -maxclash) maxclash = -lb;
 
         if (differential_dock)
         {

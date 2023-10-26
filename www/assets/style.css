@@ -19,7 +19,7 @@ html, body
     height: 100%;
 }
 
-input, select
+input, select, textarea
 {
     border-radius: 4px;
     background-color: #aabbb7;

@@ -217,59 +217,6 @@ float AtomGroup::bounds()
     return ptmax.get_3d_distance(ptmin);
 }
 
-float AtomGroup::compatibility(AminoAcid* aa)
-{
-    int atct = atoms.size();
-    if (!atct) return 0;
-
-    float result = 0;
-    float lgi = get_ionic(), lgh = get_polarity(), lgp = get_pi();
-
-    float aachg = aa->get_charge();
-    if (lgi && aachg && sgn(lgi) != -sgn(aachg)) return 0;
-
-    if (aa->hydrophilicity() > 0.25)
-    {
-        if ((lgh / atct) < 0.19) return 0;
-    }
-    else
-    {
-        if ((lgh / atct) > hydrophilicity_cutoff) return 0;
-    }
-
-    if (lgh)
-    {
-        int i;
-        int atct = atoms.size();
-        if (!aa->has_hbond_acceptors())
-        {
-            lgh = 0;
-            if (atct)
-            for (i=0; i<atct; i++)
-            {
-                if (atoms[i]->is_polar() < hydrophilicity_cutoff) lgh++;
-            }
-        }
-        else if (!aa->has_hbond_donors())
-        {
-            lgh = 0;
-            if (atct)
-            for (i=0; i<atct; i++)
-            {
-                if (atoms[i]->is_polar() > hydrophilicity_cutoff) lgh++;
-            }
-        }
-    }
-
-    if (lgi) result += lgi * -aa->bindability_by_type(ionic) * 100;
-    if (lgh) result += fabs(lgh) * fabs(aa->bindability_by_type(hbond)) * 30;
-    if (lgp) result += aa->bindability_by_type(pi);
-
-    return result;
-}
-
-
-
 Point ResidueGroup::get_center()
 {
     int amsz = aminos.size();
@@ -296,9 +243,31 @@ Point ResidueGroup::get_center()
     return result;
 }
 
+Atom* ResidueGroup::get_nearest_atom(Point pt)
+{
+    int i, n = aminos.size();
+    Atom* result = nullptr;
+    float r = Avogadro;
+
+    for (i=0; i<n; i++)
+    {
+        Atom* a = aminos[i]->get_nearest_atom(pt);
+        float r1 = a->get_location().get_3d_distance(pt);
+
+        if (!n || r1 < r)
+        {
+            result = a;
+            r = r1;
+        }
+    }
+
+    return result;
+}
+
 float ResidueGroup::distance_to(Point pt)
 {
-    return pt.get_3d_distance(get_center());
+    return get_nearest_atom(pt)->get_location().get_3d_distance(pt);
+    // return pt.get_3d_distance(get_center());
 }
 
 float ResidueGroup::pi_stackability()
@@ -339,52 +308,6 @@ float ResidueGroup::hydrophilicity()
     }
 
     if (divisor) result /= divisor;
-    return result;
-}
-
-float ResidueGroup::compatibility(AtomGroup* ag)
-{
-    int amsz = aminos.size();
-    if (!amsz) return 0;
-    float result = 0;
-    int i;
-    bool has_acids = false, has_his = false;
-    for (i=0; i<amsz; i++)
-    {
-        if (aminos[i]->get_charge() < 0) has_acids = true;
-        if (aminos[i]->conditionally_basic()) has_his = true;
-
-        float f = ag->compatibility(aminos[i]);
-
-        if (aminos[i]->priority)
-        {
-            f *= priority_weight_group;		// Extra weight for residues mentioned in a CEN RES or PATH RES parameter.
-        }
-
-        result += f;
-    }
-    // if (has_acids && has_his && ag->get_ionic() > 0) result -= ag->get_ionic()*30;
-
-    if (metallic)
-    {
-        result /= 10;
-        float lmc = 0;
-        lmc += 20.0 * fabs(ag->get_mcoord());
-        // lmc += 1.0 * fmax(0, -ag->get_ionic());
-        // lmc -= 1.0 * fabs(ag->get_polarity());
-
-        float kmims = (ag->get_avg_elecn() + metal->get_electronegativity()) / 2 - 2.25;
-        float lmm = cos(kmims*2);
-        lmc *= lmm;
-
-        #if _dbg_groupsel
-        cout << "Metal multiplier: " << lmm << " from kmims " << kmims << endl;
-        #endif
-
-        lmc += 1.0 * fabs(ag->get_pi());
-        result += lmc;
-    }
-
     return result;
 }
 
@@ -953,9 +876,30 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
                 continue;
             }
 
-            // float r = fmax(0, aa->get_CA_location().get_3d_distance(bb->get_CA_location()) - fmax(aa->get_reach(), bb->get_reach()));
-            float r = fmax(0, aa->get_reach_atom()->distance_to(bb->get_reach_atom()) - 2.5);
-            if (r > 1.5)
+            Atom *reach1, *reach2;
+            reach1 = aa->get_reach_atom();
+            reach2 = bb->get_reach_atom();
+            if ((fabs(reach1->is_polar()) >= hydrophilicity_cutoff) != (fabs(reach2->is_polar()) >= hydrophilicity_cutoff))
+            {
+                Atom *nearest1, *nearest2;
+                nearest1 = aa->get_nearest_atom(reach2->get_location());
+                nearest2 = bb->get_nearest_atom(reach1->get_location());
+
+                if ((fabs(reach1->is_polar()) >= hydrophilicity_cutoff) == (fabs(nearest2->is_polar()) >= hydrophilicity_cutoff))
+                    reach2 = nearest2;
+                else if ((fabs(nearest1->is_polar()) >= hydrophilicity_cutoff) == (fabs(reach2->is_polar()) >= hydrophilicity_cutoff))
+                    reach1 = nearest1;
+                else
+                {
+                    #if _dbg_groupsel
+                    cout << "Rejected " << bb->get_name() << " incompatible polarities of reach atoms." << endl;
+                    #endif
+                    continue;
+                }
+            }
+
+            float r = fmax(0, reach1->distance_to(reach2));
+            if (r > bb_group_distance_cutoff)
             {
                 #if _dbg_groupsel
                 cout << "Rejected " << bb->get_name() << " distance " << r << endl;
@@ -1095,6 +1039,12 @@ float GroupPair::get_potential()
             {
                 AminoAcid* aa = scg->aminos[j];
                 float partial;
+
+                if (polar_atoms && polar_res)
+                {
+                    if (!aa->has_hbond_acceptors() && a->is_polar() > 0) continue;
+                    if (!aa->has_hbond_donors() && a->is_polar() < 0) continue;
+                }
 
                 if (aa->coordmtl)
                 {
@@ -1313,35 +1263,46 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     Rotation rot = align_points_3d(gp[0]->ag->get_center(), gp[0]->scg->get_center(), lig->get_barycenter());
     LocatedVector lv = rot.v;
     lv.origin = lig->get_barycenter();
-    #if _dbg_groupsel
-    cout << "Rotating " << *gp[0]->ag << " in the direction of " << *gp[0]->scg << endl;
+    #if _dbg_groupsel || _dbg_groupsalign
+    cout << "Rotating " << *gp[0]->ag << "(" << gp[0]->ag->get_center() << ") "
+        << (rot.a * fiftyseven) << "deg about " << rot.v
+        << " in the direction of " << *gp[0]->scg << "(" << gp[0]->scg->get_center() << ")." << endl;
     #endif
     lig->rotate(lv, rot.a*amount);
 
+    #if enable_bb_scooch
     // Scooch.
-    float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
+    // float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
+    float r = gp[0]->scg->distance_to(gp[0]->ag->get_center()) - gp[0]->scg->group_reach();
     if (r > 0)
     {
         Point rel = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
         rel.scale((r-1)*amount);
-        #if _dbg_groupsel
-        cout << "Scooching " << *gp[0]->ag << " " << r << "Å into the reach of " << *gp[0]->scg << endl;
+        #if _dbg_groupsel || _dbg_groupsalign
+        cout << "Atom group is " << gp[0]->scg->distance_to(gp[0]->ag->get_center()) << "A from side chain group. ";
+        cout << "Side chain group reach is " << gp[0]->scg->group_reach() << "A." << endl;
+        cout << "Scooching " << *gp[0]->ag << " " << rel.magnitude() << "Å into the reach of " << *gp[0]->scg << endl;
         #endif
         lig->move(rel);
     }
+    #endif
 
     if (do_conforms) gp[0]->scg->conform_to(lig);
 
     if (n < 2) return;
-    rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
-    lv = rot.v;
-    lv.origin = gp[0]->ag->get_center();
-    #if _dbg_groupsel
-    cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
-    #endif
-    lig->rotate(lv, rot.a*amount);
+    r = gp[1]->scg->distance_to(gp[1]->ag->get_center()) - gp[1]->scg->group_reach();
+    if (r > 4)
+    {
+        rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
+        lv = rot.v;
+        lv.origin = gp[0]->ag->get_center();
+        #if _dbg_groupsel || _dbg_groupsalign
+        cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
+        #endif
+        lig->rotate(lv, rot.a*amount);
 
-    if (do_conforms) gp[1]->scg->conform_to(lig);
+        if (do_conforms) gp[1]->scg->conform_to(lig);
+    }
 
     if (n < 3) return;
     Point zcen = gp[0]->ag->get_center();

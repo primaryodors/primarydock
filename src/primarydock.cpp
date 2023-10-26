@@ -1900,7 +1900,7 @@ int main(int argc, char** argv)
     if (dot) *dot = 0;
 
     Protein pose_proteins[poses];
-    Molecule pose_ligands[poses];
+    Molecule pose_ligands[poses+1];
     protein = &pose_proteins[0]; // new Protein(protid);
     pf = fopen(protfname, "r");
     if (!pf)
@@ -2150,9 +2150,10 @@ int main(int argc, char** argv)
     // Load the ligand or return an error.
     // Molecule m(ligfname);
     // ligand = &m;
-    for (l=0; l<poses; l++)
+    for (l=0; l<=poses; l++)
     {
         ligand = &pose_ligands[l];
+        ligand->set_name(ligfname);
         char* ext = get_file_ext(ligfname);
         if (!ext)
         {
@@ -2201,7 +2202,6 @@ int main(int argc, char** argv)
     }
     ligand = &pose_ligands[0];
 
-    std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
 
     #if _DBG_STEPBYSTEP
     if (debug) *debug << "Loaded ligand." << endl;
@@ -2345,6 +2345,9 @@ _try_again:
     Point nodecens[pathnodes+1];
     for (pose = 1; pose <= poses; pose++)
     {
+        ligand = &pose_ligands[pose];
+        ligand->movability = MOV_ALL;
+
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
@@ -2371,7 +2374,6 @@ _try_again:
         // delete protein;
         // protein = new Protein(protfname);
         protein = &pose_proteins[pose-1];
-        ligand = &pose_ligands[pose-1];
 
         if (temp_pdb_file.length())
         {
@@ -2412,6 +2414,7 @@ _try_again:
 
         ligand->recenter(pocketcen);
         // cout << "Centered ligand at " << pocketcen << endl;
+        std::vector<std::shared_ptr<AtomGroup>> agc = AtomGroup::get_potential_ligand_groups(ligand, mtlcoords.size() > 0);
 
         if (!use_bestbind_algorithm && !use_prealign)
         {
@@ -2445,7 +2448,7 @@ _try_again:
                 maxh2o = omaxh2o;
             }
 
-            if (pathstrs.size() < nodeno) break;
+            // if (pathstrs.size() < nodeno) break;
             drift = initial_drift;
 
             if (echo_progress) cout << (time(NULL) - began) << " seconds: starting pose " << pose << " node " << nodeno << "..." << endl;
@@ -2503,8 +2506,7 @@ _try_again:
                 // delete protein;
                 // protein = new Protein(protafname);
                 protein = &pose_proteins[pose-1];
-                ligand = &pose_ligands[pose-1];
-                
+
                 pf = fopen(protafname, "r");
                 protein->load_pdb(pf);
                 fclose(pf);
@@ -2783,20 +2785,39 @@ _try_again:
                 #endif
 
                 protein->set_conditional_basicities();
-                std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
-                global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
-                ligand->recenter(ligcen_target);
-                if (flex) GroupPair::align_groups(ligand, global_pairs);
-
-                #if _dbg_groupsel
-                cout << endl;
-                #endif
-
-                int gpn = global_pairs.size();
-                for (l=0; l<3 && l<gpn; l++)
+                if (use_bestbind_algorithm)
                 {
-                    ligand_groups[l] = *(global_pairs[l]->ag);
-                    sc_groups[l] = *(global_pairs[l]->scg);
+                    std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
+                    global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
+
+                    if (global_pairs.size() > 2)
+                    {
+                        // TODO: If the 2nd group is closer to the 1st group than the 3rd group is, swap the 2nd and 3rd groups.
+                        Point grpcen1 = global_pairs[0]->ag->get_center(), grpcen2 = global_pairs[1]->ag->get_center(), grpcen3 = global_pairs[2]->ag->get_center();
+
+                        if (grpcen1.get_3d_distance(grpcen2) > grpcen1.get_3d_distance(grpcen3))
+                        {
+                            std::shared_ptr<GroupPair> tmpg = global_pairs[2];
+                            global_pairs[2] = global_pairs[1];
+                            global_pairs[1] = tmpg;
+                        }
+                    }
+                }
+                ligand->recenter(ligcen_target);
+                if (use_bestbind_algorithm)
+                {
+                    GroupPair::align_groups(ligand, global_pairs, false, 1);
+
+                    #if _dbg_groupsel
+                    cout << endl;
+                    #endif
+
+                    int gpn = global_pairs.size();
+                    for (l=0; l<3 && l<gpn; l++)
+                    {
+                        ligand_groups[l] = *(global_pairs[l]->ag);
+                        sc_groups[l] = *(global_pairs[l]->scg);
+                    }
                 }
 
                 // Best-Binding Algorithm
@@ -2930,7 +2951,7 @@ _try_again:
             ligand->agroups = global_pairs;
             Molecule::conform_molecules(cfmols, iters, &iteration_callback, &GroupPair::align_groups_noconform);
 
-            if (!nodeno && outpdb.length())
+            if (!nodeno) // && outpdb.length())
             {
                 protein->get_internal_clashes(1, protein->get_end_resno(), true);
 
@@ -3193,7 +3214,7 @@ _try_again:
         for (j=0; j<poses; j++)
         {
             protein = &pose_proteins[j];
-            ligand = &pose_ligands[j];
+            ligand = &pose_ligands[j+1];
             if (dr[j][0].pose == i && dr[j][0].pdbdat.length())
             {
                 if (differential_dock || dr[j][0].kJmol >= kJmol_cutoff)
@@ -3265,7 +3286,7 @@ _try_again:
                                 AminoAcid* aa = protein->get_residue(j1);
                                 if (aa /* && aa->been_flexed */)
                                 {
-                                    tmp_pdb_residue[j+1][j1].restore_state(aa);
+                                    // tmp_pdb_residue[j+1][j1].restore_state(aa);
                                     #if _dbg_residue_poses
                                     cout << "tmp_pdb_residue[" << (j+1) << "][" << j1 << "].restore_state(" << aa->get_name() << ")" << endl;
                                     #endif

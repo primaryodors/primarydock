@@ -710,7 +710,13 @@ int Molecule::has_hbond_donors()
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
-        if (atoms[i]->is_polar() > 0) result++;
+        if (atoms[i]->get_family() == TETREL) continue;
+        if (atoms[i]->is_polar() >= hydrophilicity_cutoff)
+        {
+            result++;
+            // if (get_charge() < 0.5) cout << name << ":" << atoms[i]->name << " is an hbond donor." << endl;
+        }
+        if (atoms[i]->get_family() == HALOGEN && atoms[i]->is_bonded_to(TETREL)) result++;
     }
 
     return result;
@@ -724,7 +730,10 @@ int Molecule::has_hbond_acceptors()
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_backbone) continue;
-        if (atoms[i]->is_polar() < 0) result++;
+        if (atoms[i]->get_family() == TETREL) continue;
+        if (atoms[i]->get_family() == HALOGEN && atoms[i]->is_bonded_to(TETREL)) continue;
+        if (atoms[i]->get_bonded_atoms_count() > 3) continue;
+        if (atoms[i]->is_polar() <= -hydrophilicity_cutoff) result++;
     }
 
     return result;
@@ -1106,11 +1115,18 @@ void Molecule::save_pdb(FILE* os, int atomno_offset, bool endpdb)
 int Molecule::add_ring(Atom** atoms)
 {
     int i, ringcount;
+    Ring* r = new Ring(atoms);
+    int m = r->get_atom_count();
 
     if (rings)
     {
-        for (i=0; rings[i]; i++);	// Get count.
+        bool already_exists = false;
+        for (i=0; rings[i]; i++)
+        {
+            if (rings[i]->get_overlap_count(r) == m) already_exists = true; 
+        }
         ringcount = i;
+        if (already_exists) return ringcount;
     }
     else
     {
@@ -1125,14 +1141,13 @@ int Molecule::add_ring(Atom** atoms)
         delete[] rings;
     }
 
-    ringstmp[ringcount++] = new Ring(atoms);
+    ringstmp[ringcount++] = r;
     ringstmp[ringcount] = nullptr;
     rings = ringstmp;
 
     return ringcount-1;
 }
 
-#define DBG_FND_RNGS 0
 int Molecule::identify_rings()
 {
     find_paths();
@@ -1234,9 +1249,11 @@ void Molecule::find_paths()
         n += atoms[i]->get_bonded_heavy_atoms_count();
     }
 
-    paths = new Atom**[n];              // Total number of paths shouldn't exceed n.
+    // paths = new Atom**[n];
+    limit = n*n;
+    Atom** lpaths[limit];
+    paths = lpaths;
     for (i=0; i<n; i++) paths[i] = nullptr;
-    limit = n;
 
     atcount = get_atom_count();
 
@@ -1266,6 +1283,7 @@ void Molecule::find_paths()
         {
             m = path_get_length(i);
             a = path_get_terminal_atom(i);
+            if (!a) continue;
             a->fetch_bonds(b);
             if (!b) continue;
 
@@ -1315,16 +1333,7 @@ void Molecule::find_paths()
                     #endif
 
                     n++;
-                    if (n >= limit)
-                    {
-                        cout << "Ran out of path space in Molecule::find_paths(). Lives depend on increasing the limit." << endl;
-
-                        #if DBG_FND_RNGS
-                        goto _exit_paths;
-                        #else
-                        throw -1;
-                        #endif
-                    }
+                    if (n >= limit) goto _exit_paths;
                     k++;
                     num_added++;
                 }
@@ -1351,7 +1360,7 @@ void Molecule::find_paths()
                 #endif
 
                 copy_path(n, j);
-                delete paths[n];
+                // delete paths[n];
                 paths[n] = nullptr;
             }
         }
@@ -2928,9 +2937,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                     switch(xyz)
                     {
-                        case 0: motion.x = frand(-speed_limit,speed_limit); break;
-                        case 1: motion.y = frand(-speed_limit,speed_limit); break;
-                        case 2: motion.z = frand(-speed_limit,speed_limit); break;
+                        case 0: motion.x = a->lmx + frand(-speed_limit,speed_limit); break;
+                        case 1: motion.y = a->lmy + frand(-speed_limit,speed_limit); break;
+                        case 2: motion.z = a->lmz + frand(-speed_limit,speed_limit); break;
                         default:
                         ;
                     }
@@ -2952,9 +2961,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     {
                         switch(xyz)
                         {
-                            case 0: motion.x *= -2; break;
-                            case 1: motion.y *= -2; break;
-                            case 2: motion.z *= -2; break;
+                            case 0: motion.x = (motion.x - a->lmx) * -2 + a->lmx; break;
+                            case 1: motion.y = (motion.y - a->lmy) * -2 + a->lmy; break;
+                            case 2: motion.z = (motion.z - a->lmz) * -2 + a->lmz; break;
                             default:
                             ;
                         }
@@ -2973,6 +2982,8 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         }
                     }
                 }
+
+                a->lmx = a->lmy = a->lmz = 0;
             }       // If can recenter.
             #endif
 

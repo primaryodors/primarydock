@@ -238,6 +238,14 @@ int main(int argc, char** argv)
     // Receptor-specific fixes.
     ////////////////////////////////////////////////////////////////////////////////
 
+    if (l6x55 == 'D' || l6x55 == 'E' || l6x55 == 'R' || l6x55 == 'K')          // OR1G1 is an example.
+    {
+        pt_tmp = aa6x55->get_CA_location().subtract(aa45x51->get_reach_atom()->get_location());
+        pt_tmp = pt_tmp.add(aa6x55->get_CA_location());
+        aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, pt_tmp);
+        aa6x55->movability = MOV_NONE;
+    }
+
     if (!strcmp(orid.c_str(), "OR2M3"))
     {
         // aa7x41->conform_atom_to_location("OH", aa6x48->get_CA_location());

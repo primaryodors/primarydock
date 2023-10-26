@@ -1,10 +1,27 @@
 
-# Predicting Receptor Responses to Ligands
+# Overview
 
-At this time, no method yet exists to accurately distinguish agonist from non-agonist ligands using PrimaryDock output.
-To the best of our knowledge, either no one has developed the capability to make predictions of olfactory receptor agonism
-by odorants, or no accurate prediction making utility has been released to the public. Therefore, we continue to strive
-toward accurately predicting receptor responses to odorants in a transparent and publicly accessible way.
+PrimaryDock offers a facility for making predictions about receptor responses to ligands. However, since the exact details
+of the activation mechanisms of most olfactory receptors are not yet well understood, there is as yet insufficient basis to
+make accurate predictions. Nevertheless, we continue to strive toward this goal.
+
+
+# Predictions from the Command Line
+
+There is a `run_prediction.sh` script in the project root folder that can be used to generate a prediction with minimal
+user input, e.g.:
+
+```
+./run_prediction.sh OR51E2 propionic_acid
+```
+
+The first argument is the receptor ID, and the second is the name of the ligand. After processing finishes, it will output
+a result showing the empirically observed activity type (e.g. agonist, inverse agonist, non-agonist) if known, as well as
+the predicted activity type and a dock score representing the estimated relative degree of agonism.
+
+Behind the scenes, `run_prediction.sh` calls a prediction method (see section below) which handles such things as making
+sure the code is compiled, making sure the PDB and SDF models exist, and maintaining the prediction results for all
+receptor-ligand pairs in a single JSON file.
 
 
 # Prediction Methods

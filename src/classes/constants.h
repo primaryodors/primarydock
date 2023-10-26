@@ -121,7 +121,7 @@
 #define ignore_double_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 0.0025
+#define lmpush 0.1
 #define recapture_ejected_ligand 0
 
 #define amide_zwitterionic_amount 0.1
@@ -131,6 +131,7 @@
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
+#define bb_group_distance_cutoff 4.3
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.5
 #define bb_realign_iters 1
@@ -138,6 +139,7 @@
 #define bb_realign_amount 0.333
 #define bb_realign_threshold_distance 2.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
+#define enable_bb_scooch 1
 #define flexion_selection 1
 #define no_zero_flexions 1
 #define ignore_invalid_partial 1
@@ -336,8 +338,10 @@
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
 #define _dbg_find_blasted_segfault 0
+#define DBG_FND_RNGS 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
+#define _dbg_groupsalign 0
 #define _dbg_groupsel 0
 #define _DBG_H2O_TELEPORT 0
 #define _DBG_HISFLIP 0
@@ -371,6 +375,7 @@
 #define _DORESPHRES 0
 #define _dummy_atoms_for_debug 0
 #define output_tumble_debug_docs 0
+#define _show_cond_bas_hbond_energy 0
 #define _show_final_group_pairs 0
 
 #endif

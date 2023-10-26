@@ -1,0 +1,4 @@
+Molecule has 3 ring(s).
+Ring 0 consists of C8 O7 C6 C5 O4 C3 C2 
+Ring 1 is aromatic and consists of C9 C10 C11 C12 C5 C6 
+Ring 2 consists of C8 O7 C6 C9 C10 C11 C12 C5 O4 C3 C2 

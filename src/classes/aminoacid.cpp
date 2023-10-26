@@ -1918,6 +1918,9 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     #endif
                     if (f >= cond_bas_hbond_threshold)
                     {
+                        #if _show_cond_bas_hbond_energy || _dbg_cond_basic
+                        cout << name << " can protonate because of " << -f << " hbond energy with " << found_mol->get_name() << "." << endl;
+                        #endif
                         found_hbond = true;
                         break;
                     }

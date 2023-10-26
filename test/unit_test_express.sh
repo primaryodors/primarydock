@@ -243,6 +243,33 @@ else
     diff --color --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt
 fi
 
+test/ring_test sdf/histidine.sdf | sed '/^#/d' > testdata/received/ring.histidine.received.txt
+RESULT=$(diff --unified testdata/ring.histidine.approved.txt testdata/received/ring.histidine.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}\u2588${NC}"
+else
+    printf "\n${RED}Ring test FAILED for histidine.${NC}\n"
+    diff --color --unified testdata/ring.histidine.approved.txt testdata/received/ring.histidine.received.txt
+fi
+
+test/ring_test "O=C1COc2c(OC1)cc(cc2)C" | sed '/^#/d' > testdata/received/ring.calone.received.txt
+RESULT=$(diff --unified testdata/ring.calone.approved.txt testdata/received/ring.calone.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}\u2588${NC}"
+else
+    printf "\n${RED}Ring test FAILED for calone.${NC}\n"
+    diff --color --unified testdata/ring.calone.approved.txt testdata/received/ring.calone.received.txt
+fi
+
+test/ring_test sdf/androstenone.sdf | sed '/^#/d' > testdata/received/ring.androstenone.received.txt
+RESULT=$(diff --unified testdata/ring.androstenone.approved.txt testdata/received/ring.androstenone.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}\u2588${NC}"
+else
+    printf "\n${RED}Ring test FAILED for androstenone.${NC}\n"
+    diff --color --unified testdata/ring.androstenone.approved.txt testdata/received/ring.androstenone.received.txt
+fi
+
 test/moiety_test sdf/cinnamaldehyde.sdf "HC(C)=O" | sed '/^#/d' > testdata/received/moiety.aldehyde.received.txt
 RESULT=$(diff --unified testdata/moiety.aldehyde.approved.txt testdata/received/moiety.aldehyde.received.txt)
 if [ -z "$RESULT" ]; then

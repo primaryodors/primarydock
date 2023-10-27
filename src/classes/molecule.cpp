@@ -1204,6 +1204,7 @@ void Molecule::copy_path(int old_idx, int new_idx)
 {
     if (!paths) return;
     if (!paths[old_idx]) return;
+    if (abs((__int64_t)paths[old_idx][0] - (__int64_t)paths[old_idx]) >= 16777216) return;
 
     if (!paths[new_idx]) paths[new_idx] = new Atom*[get_atom_count()];
     int i;

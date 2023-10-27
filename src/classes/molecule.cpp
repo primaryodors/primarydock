@@ -1285,6 +1285,7 @@ void Molecule::find_paths()
             m = path_get_length(i);
             a = path_get_terminal_atom(i);
             if (!a) continue;
+            if (abs((__int64_t)(atoms[0]) - (__int64_t)a) >= 16777216) continue;
             a->fetch_bonds(b);
             if (!b) continue;
 

@@ -6,7 +6,7 @@
 //
 
 chdir(__DIR__);
-include_once("../predict/protutils.php");
+include_once("protutils.php");
 $c = file_get_contents('sequences_aligned.txt', 'rb');
 if (!$c) die ('NO INPUT FILE');
 
@@ -99,7 +99,7 @@ foreach ($lines as $i => $ln)
         $rcpbs = [];
 
 		foreach(str_split($ln) as $pos => $chr)
-		{	
+		{
 			if ($chr == ' ') $spaced = true;
 			if ($spaced && ($chr == 'M' || $chr == '.')) $emmed = true;
 			if ($emmed)
@@ -111,7 +111,7 @@ foreach ($lines as $i => $ln)
 					{	$strgn = $rg[2];
 						$regionse[$rgi][0] = $strgn;
 						if (!isset($regionse[$rgi][1])) $regionse[$rgi][1] = $r; 
-						$regionse[$rgi][2] = $r;							
+						$regionse[$rgi][2] = $r;						
 						break;
 					}
 				}
@@ -150,6 +150,19 @@ foreach ($lines as $i => $ln)
             }
         }
 
+        foreach ($regionse as $se)
+        {
+            $region = $se[0];
+            if (substr($region, 0, 3) == "TMR" || substr($region, 0, 3) == "HXR")
+            {
+				if (isset($prots[$rcpid]))
+				{
+					$prots[$rcpid]["region"][$se[0]]["start"] = $se[1];
+					$prots[$rcpid]["region"][$se[0]]["end"] = $se[2];
+				}
+			}
+        }
+
         // Read the PDB and then rewrite it with updated contents.
         $subdir = substr($rcpid, 0, 4);
         if (substr($rcpid, 0, 2) == "OR") $subdir = "OR".intval(substr($rcpid,2,2));
@@ -179,7 +192,9 @@ foreach ($lines as $i => $ln)
         {
             $region = $se[0];
             if (substr($region, 0, 3) == "TMR" || substr($region, 0, 3) == "HXR")
-                $remarks[] = "REMARK 650 HELIX $region {$se[1]} {$se[2]}";
+            {
+				$remarks[] = "REMARK 650 HELIX $region {$se[1]} {$se[2]}";
+			}
         }
 
         $remarks[] = "REMARK 800";

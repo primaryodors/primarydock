@@ -143,7 +143,8 @@ foreach ($tree as $path => $protids)
             if (substr($path1, 0, $i+1) != substr($path, 0, $i+1))
             {
                 if ($c === '0') echo "&#x252c;&#x2500;&#x2500;&#x2500;";       // +
-                else echo "&#x2514;&#x2500;&#x2500;&#x2500;";                  // `
+                else if (substr($path1, 0, $i) == substr($path, 0, $i)) echo "&#x2514;&#x2500;&#x2500;&#x2500;";                  // `
+                else echo "&#x2500;&#x2500;&#x2500;&#x2500;";                      // -
             }
             else
             {

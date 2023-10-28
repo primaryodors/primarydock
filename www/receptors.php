@@ -7,6 +7,8 @@ $filter = @$_REQUEST['f'] ?: "";
 $fnum = intval(@substr($filter, 1));
 $filter = substr($filter, 0, 1);
 
+$extra_js = ['js/tabs.js'];
+$extra_css = ['assets/tabs.css'];
 include("header.php");
 
 echo "<h1>Receptors</h1>\n";
@@ -31,13 +33,24 @@ echo "<h1>Receptors</h1>\n";
 <a href="receptors.php?f=o" class="<?php if ($filter == 'o') echo "hilite" ?>">Orphans</a>
 </p>
 </div>
-<div class="row content scrollh"><div class="fam">
+<div class="row content scrollh">
+
+
+<div class="tab" style="display: inline-block; margin-top: 30px;">
+<button class="tablinks <?php if (!@$_REQUEST['tree']) echo "default"; ?>" id="tabList" onclick="openTab(this, 'List');">List</button>
+<button class="tablinks <?php if ( @$_REQUEST['tree']) echo "default"; ?>" id="tabTree" onclick="openTab(this, 'Tree');">Tree</button>
+</div>
+
+
+<div id="List" class="tabcontent">
+<div class="fam">
 <?php
 
 $ffam = "OR1";
 $echoed = 0;
 foreach ($prots as $protid => $p)
 {
+    if (!@$p['region']) continue;
     $fam = family_from_protid($protid);
     if ($echoed && $fam != $ffam)
     {
@@ -91,8 +104,10 @@ foreach ($prots as $protid => $p)
 
 ?>
 </div>
+</div>
 
 
+<div id="Tree" class="tabcontent">
 <?php
 $tree = [];
 foreach ($prots as $protid => $p)
@@ -167,3 +182,5 @@ foreach ($tree as $path => $protids)
     $path1 = $path;
     $lno++;
 }
+
+?></div>

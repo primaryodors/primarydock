@@ -177,9 +177,22 @@ for ($ec = floor($maxe); $ec >= ceil($mine); $ec -= 1)
     imagestring($im, 3, 2,$dy-8, $ec, $green);
 }
 
+$bytree = [];
+foreach ($prots as $rcpid => $p)
+{
+    if (!isset($p['btree'])) continue;
+    $bytree[$p['btree']] = $rcpid;
+}
 
+ksort($bytree, SORT_STRING);
 
-foreach (array_keys($prots) as $x => $orid)
+foreach ($prots as $rcpid => $p)
+{
+    if (!isset($p['btree'])) $bytree[$rcpid] = $rcpid;
+}
+
+// foreach (array_keys($prots) as $x => $orid)
+foreach (array_values($bytree) as $x => $orid)
 {   
     $rcpcol = $white;
     switch (substr($orid,0,2))

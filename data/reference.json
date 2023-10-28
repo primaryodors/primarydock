@@ -959,5 +959,10 @@
     {
         "short_name": "Zhou et al (2019)",
         "citation": "Zhou, Q., Yang, D., Wu, M., Guo, Y., Guo, W., Zhong, L., ... & Zhao, S. (2019). Common activation mechanism of class A GPCRs. Elife, 8, e50279."
+    },
+    "https:\/\/doi.org\/10.1186\/gb-2001-2-6-research0018":
+    {
+        "short_name": "Zozulya et al (2001)",
+        "citation": "Zozulya S, Echeverri F, Nguyen T. The human olfactory receptor repertoire. Genome Biol. 2001;2(6):RESEARCH0018. doi: 10.1186/gb-2001-2-6-research0018. Epub 2001 Jun 1. PMID: 11423007; PMCID: PMC33394."
     }
 }

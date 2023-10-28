@@ -113,6 +113,7 @@ $ktree = array_keys($tree);
 foreach ($tree as $path => $protids)
 {
     $curr = str_split($path);
+    // echo str_pad($path, 50);
     foreach ($curr as $i => $c)
     {
         if ($c == 0)
@@ -141,19 +142,19 @@ foreach ($tree as $path => $protids)
         {
             if (substr($path1, 0, $i+1) != substr($path, 0, $i+1))
             {
-                if ($c === '0') echo "&#x252c;&#x2500;&#x2500;&#x2500;&#x2500;";       // +
-                else echo "&#x2514;&#x2500;&#x2500;&#x2500;&#x2500;";                  // `
+                if ($c === '0') echo "&#x252c;&#x2500;&#x2500;&#x2500;";       // +
+                else echo "&#x2514;&#x2500;&#x2500;&#x2500;";                  // `
             }
             else
             {
-                if ($c === '0') echo "&#x2502;    ";       // |
-                else echo "     ";                         //
+                if ($c === '0') echo "&#x2502;   ";       // |
+                else echo "    ";                         //
             }
         }
         else
         {
-            if ($c == 0) echo "&#x252c;&#x2500;&#x2500;&#x2500;&#x2500;";              // +
-            else echo "&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;";                      // -
+            if ($c == 0) echo "&#x252c;&#x2500;&#x2500;&#x2500;";              // +
+            else echo "&#x2500;&#x2500;&#x2500;&#x2500;";                      // -
         }
     }
 

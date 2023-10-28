@@ -3,6 +3,11 @@
 chdir(__DIR__);
 include_once("protutils.php");
 
+function long_levenshtein($str1, $str2)
+{
+    return levenshtein(substr($str1, 0, 200), substr($str2, 0, 200)) + levenshtein(substr($str1, 200), substr($str2, 200));
+}
+
 $tree = file_get_contents("btree");
 $lines = explode("\n", $tree);
 
@@ -43,8 +48,8 @@ foreach ($prots as $rcpid => $pdata)
             if (!isset($p2['btree'])) continue;
 
             $seq2 = $p2['sequence'];
-            $lev = levenshtein(substr($seq1, 0, 200), substr($seq2, 0, 200)) + levenshtein(substr($seq1, 200), substr($seq2, 200));
-            $lev += levenshtein($rcpid, $rcp2);
+            $lev = long_levenshtein($seq1, $seq2);
+            // $lev += levenshtein($rcpid, $rcp2);
             if ($lev < $best_distance)
             {
                 $best_match = $rcp2;
@@ -55,9 +60,50 @@ foreach ($prots as $rcpid => $pdata)
 
         if ($best_match)
         {
+            /*
             $prots[$best_match]['btree'] .= '0';
             $prots[$rcpid]['btree'] = $best_btree.'1';
-            echo "$rcpid -- $best_match\n";
+            */
+            // echo "$rcpid -- $best_match\n";
+
+            $seq2 = $prots[$best_match]['sequence'];
+            $mrca = $best_btree;
+            $n = strlen($mrca);
+            foreach ($prots as $p3)
+            {
+                if (!isset($p3['btree'])) continue;
+                $seq3 = $p3['sequence'];
+                $lev = long_levenshtein($seq2, $seq3);
+                if ($lev < $best_distance)
+                {
+                    foreach (str_split($p3['btree']) as $i => $c)
+                    {
+                        if ($i >= $n) break;
+                        if ($c != substr($mrca, $i, 1))
+                        {
+                            $mrca = substr($mrca, 0, $i);
+                            $n = strlen($mrca);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // echo "MRCA is $mrca\n";
+            $n = strlen($mrca);
+            foreach ($prots as $l => $p3)
+            {
+                if (!isset($p3['btree'])) continue;
+                if (substr($p3['btree'], 0, $n) === $mrca)
+                {
+                    // echo "\t$l btree was {$p3['btree']}";
+                    $prots[$l]['btree'] = $mrca.'0'.substr($p3['btree'], $n);
+                    // echo " now {$prots[$l]['btree']}\n";
+                }
+            }
+
+            $prots[$rcpid]['btree'] = $mrca.'1';
+            echo "$rcpid btree is now {$prots[$rcpid]['btree']}\n";
         }
         else die("Nobody likes $rcpid.\n");
     }

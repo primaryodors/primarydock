@@ -3,6 +3,8 @@
 chdir(__DIR__);
 include_once("protutils.php");
 
+define("inhouse", false);
+
 function long_levenshtein($str1, $str2)
 {
     return levenshtein(substr($str1, 0, 200), substr($str2, 0, 200)) + levenshtein(substr($str1, 200), substr($str2, 200));
@@ -13,7 +15,17 @@ $lines = explode("\n", $tree);
 
 foreach ($prots as $rcpid => $pdata) unset($prots[$rcpid]['btree']);
 
-foreach ($lines as $lno => $ln)
+
+$prots["TAAR5"]["btree"] = "001";
+$prots["VN1R1"]["btree"] = "01";
+// $prots["MS4A1"]["btree"] = "1";
+
+if (inhouse)
+{
+    $prots["OR2W1"]["btree"] = "0000";
+    $prots["OR52D1"]["btree"] = "0001";
+}
+else foreach ($lines as $lno => $ln)
 {
     if (substr($ln, 0, 1) == '#') continue;
     $pieces = explode(" ", $ln);
@@ -28,7 +40,7 @@ foreach ($lines as $lno => $ln)
     {
         if (isset($prots[$rcpid]))
         {
-            $prots[$rcpid]['btree'] = $binary;
+            $prots[$rcpid]['btree'] = "000$binary";
             echo "$rcpid\n";
         }
     }
@@ -36,10 +48,12 @@ foreach ($lines as $lno => $ln)
 
 foreach ($prots as $rcpid => $pdata)
 {
-    if (substr($rcpid, 0, 2) != "OR") continue;
+    // if (!inhouse && substr($rcpid, 0, 2) != "OR") continue;
+    if (!isset($pdata["region"]["TMR3"]["start"])) continue;
     if (!isset($pdata['btree']))
     {
-        $seq1 = $pdata['sequence'];
+        $len = intval($pdata["region"]["TMR7"]["end"]) - intval($pdata["region"]["TMR3"]["start"]);
+        $seq1 = substr($pdata['sequence'], intval($pdata["region"]["TMR3"]["start"]), $len);
         $best_match = false;
         $best_btree = false;
         $best_distance = 10000;
@@ -47,7 +61,8 @@ foreach ($prots as $rcpid => $pdata)
         {
             if (!isset($p2['btree'])) continue;
 
-            $seq2 = $p2['sequence'];
+            $len = intval($p2["region"]["TMR7"]["end"]) - intval($p2["region"]["TMR3"]["start"]);
+            $seq2 = substr($p2['sequence'], intval($p2["region"]["TMR3"]["start"]), $len);
             $lev = long_levenshtein($seq1, $seq2);
             // $lev += levenshtein($rcpid, $rcp2);
             if ($lev < $best_distance)
@@ -72,7 +87,8 @@ foreach ($prots as $rcpid => $pdata)
             foreach ($prots as $p3)
             {
                 if (!isset($p3['btree'])) continue;
-                $seq3 = $p3['sequence'];
+                $len = intval($p3["region"]["TMR7"]["end"]) - intval($p3["region"]["TMR3"]["start"]);
+                $seq3 = substr($p3['sequence'], intval($p3["region"]["TMR3"]["start"]), $len);
                 $lev = long_levenshtein($seq2, $seq3);
                 if ($lev < $best_distance)
                 {
@@ -81,7 +97,7 @@ foreach ($prots as $rcpid => $pdata)
                         if ($i >= $n) break;
                         if ($c != substr($mrca, $i, 1))
                         {
-                            $mrca = substr($mrca, 0, $i);
+                            $mrca = substr($mrca, 0, $i-1);
                             $n = strlen($mrca);
                             break;
                         }

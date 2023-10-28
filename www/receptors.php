@@ -88,3 +88,56 @@ foreach ($prots as $protid => $p)
     }
     $ffam = $fam;
 }
+
+?>
+</div>
+
+
+<?php
+$tree = [];
+foreach ($prots as $protid => $p)
+{
+    if (!isset($p['btree'])) continue;
+    $path = $p['btree'];
+    if (!isset($tree[$path])) $tree[$path] = [];
+    $tree[$path][] = $protid;
+}
+
+ksort($tree, SORT_STRING);
+
+echo "<pre>";
+$prev = [];
+$path1 = "";
+foreach ($tree as $path => $protids)
+{
+    $curr = str_split($path);
+    foreach ($curr as $i => $c)
+    {
+        if (isset($prev[$i]))
+        {
+            // if ($prev[$i] !== $curr[$i])
+            if (substr($path1, 0, $i+1) != substr($path, 0, $i+1))
+            {
+                if ($c === '0') echo "&#x252c;&#x2500;";       // +
+                else echo "&#x2514;&#x2500;";                  // `
+            }
+            else
+            {
+                if ($c === '0') echo "&#x2502; ";       // |
+                else echo "  ";                         //
+            }
+        }
+        else
+        {
+            if ($c == 0) echo "&#x252c;&#x2500;";              // +
+            else echo "&#x2500;&#x2500;";                      // -
+        }
+    }
+
+    echo "&#x2500; ";
+    foreach ($protids as $r) echo "<a href=\"receptor.php?r=$r\">$r</a>";
+    echo "\n";
+
+    $prev = str_split($path);
+    $path1 = $path;
+}

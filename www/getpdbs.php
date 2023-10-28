@@ -2,6 +2,10 @@
 
 chdir(__DIR__);
 chdir('..');
+
+echo "Reading sequence alignments...\n";
+passthru("php -f data/sequence_update.php");
+
 require_once("data/protutils.php");
 
 define("_ALPHAFOLD", 22);
@@ -75,6 +79,8 @@ foreach ($prots as $protid => $p)
     $infname = "pdbs/$fam/import/".substr($url, strrpos($url, "/")+2);
     $outfname = "pdbs/$fam/$protid.upright.pdb";
 
+    if (file_exists($outfname)) continue;
+
     $antitax_server = true;
     if (!file_exists($infname))
     {
@@ -117,3 +123,4 @@ heredoc;
     }
     // exit;
 }
+

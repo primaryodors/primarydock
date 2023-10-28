@@ -120,6 +120,7 @@ foreach ($tree as $path => $protids)
             $sub = substr($path, 0, $i);
             $sub1 = $sub.'1';
 
+            $found1 = false;
             for ($j=$lno+1; $j<count($tree); $j++)
             {
                 $lookahead = $ktree[$j];
@@ -128,8 +129,13 @@ foreach ($tree as $path => $protids)
                     $c = '1';
                     break;
                 }
-                else if (substr($lookahead, 0, $i+1) == $sub1) break;
+                else if (substr($lookahead, 0, $i+1) == $sub1)
+                {
+                    $found1 = true;
+                    break;
+                }
             }
+            if (!$found1) $c = '1';
         }
         if (isset($prev[$i]))
         {

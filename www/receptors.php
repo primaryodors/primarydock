@@ -3,6 +3,50 @@ chdir(__DIR__);
 require_once("../data/protutils.php");
 require_once("../data/odorutils.php");
 
+function filter_prot($protid, $filter)
+{
+    global $fnum;
+
+    $disp = true;
+    switch ($filter)
+    {
+        case 'a':                   // Has agonists.
+        $ep = all_empirical_pairs_for_receptor($protid, true);
+        foreach ($ep as $k => $v) if ($v <= 0) unset($ep[$k]);
+        if (!count($ep)) $disp = false;
+        else if ($fnum && count($ep) < $fnum) $disp = false;
+        else if (max($ep) <= 0) $disp = false;
+        break;
+
+        case 'i':                   // Has inverse agonists and/or antagonists.
+        $ep = all_empirical_pairs_for_receptor($protid, true);
+        if (!count($ep)) $disp = false;
+        else if (min($ep) >= 0) $disp = false;
+        if (has_antagonists($protid)) $disp = true;
+        break;
+
+        case 'o':                   // Orphan.
+        $ep = all_empirical_pairs_for_receptor($protid, true);
+        foreach ($ep as $k => $v) if ($v == 0) unset($ep[$k]);
+        if (count($ep)) $disp = false;
+        break;
+
+        case 's':
+        $ftxt = substr($_REQUEST['f'], 1);
+        if (substr($protid, 0, strlen($ftxt)) != $ftxt) $disp = false;
+        break;
+
+        case '':
+        break;
+
+        default:
+        $disp = false;
+    }
+
+    return $disp;
+}
+
+
 $filter = @$_REQUEST['f'] ?: "";
 $fnum = intval(@substr($filter, 1));
 $filter = substr($filter, 0, 1);
@@ -42,6 +86,7 @@ echo "<h1>Receptors</h1>\n";
 </div>
 
 
+
 <div id="List" class="tabcontent">
 <div class="fam">
 <?php
@@ -58,43 +103,7 @@ foreach ($prots as $protid => $p)
         $echoed = 0;
     }
 
-    $disp = true;
-    switch ($filter)
-    {
-        case 'a':                   // Has agonists.
-        $ep = all_empirical_pairs_for_receptor($protid, true);
-        foreach ($ep as $k => $v) if ($v <= 0) unset($ep[$k]);
-        if (!count($ep)) $disp = false;
-        else if ($fnum && count($ep) < $fnum) $disp = false;
-        else if (max($ep) <= 0) $disp = false;
-        break;
-
-        case 'i':                   // Has inverse agonists and/or antagonists.
-        $ep = all_empirical_pairs_for_receptor($protid, true);
-        if (!count($ep)) $disp = false;
-        else if (min($ep) >= 0) $disp = false;
-        if (has_antagonists($protid)) $disp = true;
-        break;
-
-        case 'o':                   // Orphan.
-        $ep = all_empirical_pairs_for_receptor($protid, true);
-        foreach ($ep as $k => $v) if ($v == 0) unset($ep[$k]);
-        if (count($ep)) $disp = false;
-        break;
-
-        case 's':
-        $ftxt = substr($_REQUEST['f'], 1);
-        if (substr($protid, 0, strlen($ftxt)) != $ftxt) $disp = false;
-        break;
-
-        case '':
-        break;
-
-        default:
-        $disp = false;
-    }
-
-    if ($disp)
+    if (filter_prot($protid, $filter))
     {
         echo "<a class=\"rcptile\" href=\"receptor.php?r=$protid\">$protid</a>\n";
         $echoed++;
@@ -113,6 +122,7 @@ $tree = [];
 foreach ($prots as $protid => $p)
 {
     if (!isset($p['btree'])) continue;
+    if (!filter_prot($protid, $filter)) continue;
     $path = $p['btree'];
     if (!isset($tree[$path])) $tree[$path] = [];
     $tree[$path][] = $protid;
@@ -174,8 +184,8 @@ foreach ($tree as $path => $protids)
         }
     }
 
-    echo "&#x2500;&#x2500;&#x2500; ";
-    foreach ($protids as $r) echo "<a href=\"receptor.php?r=$r\">$r</a>";
+    echo "&#x2500;&#x2500;&#x2500;";
+    foreach ($protids as $r) echo " <a href=\"receptor.php?r=$r\">$r</a>";
     echo "\n";
 
     $prev = str_split($path);

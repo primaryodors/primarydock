@@ -209,7 +209,7 @@ foreach ($lines as $i => $ln)
             $remarks[] = "REMARK 800 SITE LIGAND_BINDING $bsr";
         }
 
-        $pdbdat = implode("\n", $remarks) . "\n" . implode("\n", $not_remarks) . "\n\n";
+        $pdbdat = trim(implode("\n", $remarks) . "\n" . implode("\n", $not_remarks)) . "\n\n";
 
         $f = fopen($pdbname, "wb");
         if (!$f) die("FAILED to open $pdbname for writing; ensure have access.\n");

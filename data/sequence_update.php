@@ -83,7 +83,7 @@ foreach ($lines as $i => $ln)
 	}
 
 
-	$match = "/^(OR[0-9]{1,2}[A-Z]{1,2}[0-9]{1,2}\s+[.AC-IK-NP-TVWY]+)|(TAAR[0-9]\s+[.AC-IK-NP-TVWY]+)|(VN1R[0-9]\s+[.AC-IK-NP-TVWY]+)/";
+	$match = "/^(OR[0-9]{1,2}[A-Z]{1,2}[0-9]{1,2}\s+[. AC-IK-NP-TVWY-]+)|(TAAR[0-9]\s+[. AC-IK-NP-TVWY-]+)|(VN1R[0-9]\s+[. AC-IK-NP-TVWY-]+)/";
 
 	if (preg_match($match, $ln))
     {

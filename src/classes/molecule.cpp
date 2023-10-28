@@ -2423,6 +2423,8 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             !ligands[l]->shielded(atoms[i], ligands[l]->atoms[j])
                        )
                     {
+                        missed_connection.r = 0;
+                        // cout << ligands[l]->atoms[j]->get_location().subtract(atoms[i]->get_location()) << ": ";
                         float abind = InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                         if (abind && !isnan(abind) && !isinf(abind))
                         {
@@ -2444,6 +2446,11 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 lmz += lmpush * sgn(ptd.z);
                             }
                         }
+                        Point mc = missed_connection;
+                        // cout << mc << endl;
+                        lmx += lmpull * mc.x;
+                        lmy += lmpull * mc.y;
+                        lmz += lmpull * mc.z;
                     }
                     else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                 }
@@ -2932,10 +2939,19 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #if allow_linear_motion
             if ((a->movability & MOV_CAN_RECEN) && !(a->movability & MOV_FORBIDDEN))
             {
+                Point motion(a->lmx, a->lmy, a->lmz);
+                if (motion.magnitude() > speed_limit)
+                {
+                    motion.scale(speed_limit);
+                    a->lmx = motion.x;
+                    a->lmy = motion.y;
+                    a->lmz = motion.z;
+                }
+
                 int xyz;
                 for (xyz=0; xyz<3; xyz++)
                 {
-                    Point motion(0, 0, 0);
+                    motion.scale(0);
 
                     switch(xyz)
                     {

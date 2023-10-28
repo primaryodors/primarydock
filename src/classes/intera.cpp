@@ -13,6 +13,7 @@ using namespace std;
 float total_binding_by_type[_INTER_TYPES_LIMIT];
 float minimum_searching_aniso = 0;
 InteratomicForce* lif = nullptr;
+SCoord missed_connection(0,0,0);
 
 #if _peratom_audit
 std::vector<std::string> interaudit;
@@ -1051,6 +1052,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         ? r1*r1*r1*r1*r1*r1
                         : r1*r1;
                 partial = aniso * forces[i]->kJ_mol / rdecayed;
+
+                SCoord mc = bloc.subtract(aloc);
+                mc.r = fabs((r1 - 1) * (1.0 - (partial / forces[i]->kJ_mol)) / (r1*r1));
+                missed_connection = missed_connection.add(mc);
             }
             else
             {
@@ -1122,12 +1127,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         {
             #if ignore_invalid_partial
             return 0;
-            #endif
+            #else
             cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
                  << a->name << "...." << b->name << " r=" << r
                  << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
                  << " aniso=" << aniso << " (" << asum << "*" << bsum << ")" << endl;
             throw 0xbadf0ace;
+            #endif
         }
 
         #if active_persistence

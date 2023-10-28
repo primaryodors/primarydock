@@ -108,36 +108,54 @@ ksort($tree, SORT_STRING);
 echo "<pre>";
 $prev = [];
 $path1 = "";
+$lno = 0;
+$ktree = array_keys($tree);
 foreach ($tree as $path => $protids)
 {
     $curr = str_split($path);
     foreach ($curr as $i => $c)
     {
+        if ($c == 0)
+        {
+            $sub = substr($path, 0, $i);
+            $sub1 = $sub.'1';
+
+            for ($j=$lno+1; $j<count($tree); $j++)
+            {
+                $lookahead = $ktree[$j];
+                if (substr($lookahead, 0, $i) != $sub)
+                {
+                    $c = '1';
+                    break;
+                }
+                else if (substr($lookahead, 0, $i+1) == $sub1) break;
+            }
+        }
         if (isset($prev[$i]))
         {
-            // if ($prev[$i] !== $curr[$i])
             if (substr($path1, 0, $i+1) != substr($path, 0, $i+1))
             {
-                if ($c === '0') echo "&#x252c;&#x2500;";       // +
-                else echo "&#x2514;&#x2500;";                  // `
+                if ($c === '0') echo "&#x252c;&#x2500;&#x2500;&#x2500;&#x2500;";       // +
+                else echo "&#x2514;&#x2500;&#x2500;&#x2500;&#x2500;";                  // `
             }
             else
             {
-                if ($c === '0') echo "&#x2502; ";       // |
-                else echo "  ";                         //
+                if ($c === '0') echo "&#x2502;    ";       // |
+                else echo "     ";                         //
             }
         }
         else
         {
-            if ($c == 0) echo "&#x252c;&#x2500;";              // +
-            else echo "&#x2500;&#x2500;";                      // -
+            if ($c == 0) echo "&#x252c;&#x2500;&#x2500;&#x2500;&#x2500;";              // +
+            else echo "&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;";                      // -
         }
     }
 
-    echo "&#x2500; ";
+    echo "&#x2500;&#x2500;&#x2500; ";
     foreach ($protids as $r) echo "<a href=\"receptor.php?r=$r\">$r</a>";
     echo "\n";
 
     $prev = str_split($path);
     $path1 = $path;
+    $lno++;
 }

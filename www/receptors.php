@@ -173,8 +173,8 @@ foreach ($tree as $path => $protids)
             }
             else
             {
-                if ($c === '0') echo "&#x2502;   ";       // |
-                else echo "    ";                         //
+                if ($c === '0') echo "&#x2502;&nbsp;&nbsp;&nbsp;";       // |
+                else echo "&nbsp;&nbsp;&nbsp;&nbsp;";                         //
             }
         }
         else

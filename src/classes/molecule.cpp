@@ -3132,7 +3132,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         bool is_flexion_dbg_mol_bond = is_flexion_dbg_mol & !strcmp(bb[q]->btom->name, "OG");
                         #endif
 
-                        if (do_full_rotation /*&& benerg <= 0*/ && bb[q]->can_rotate)
+                        if (do_full_rotation && a->is_residue() /*&& benerg <= 0*/ && bb[q]->can_rotate)
                         {
                             float best_theta = 0;
                             Pose prior_state;

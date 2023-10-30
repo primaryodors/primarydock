@@ -360,10 +360,6 @@ Pose iter_best_pose[1000];
 float iter_best_bind;
 void iteration_callback(int iter, Molecule** mols)
 {
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
-    #endif
-
     // if (kJmol_cutoff > 0 && ligand->lastbind >= kJmol_cutoff) iter = (iters-1);
     int l;
     float f = 0;
@@ -379,21 +375,25 @@ void iteration_callback(int iter, Molecule** mols)
         float lf = mols[l]->get_intermol_binding(mols), ptnl = mols[l]->get_intermol_potential(mols);
         f += lf;
 
+        int lres = mols[l]->is_residue();
+        float prob = 1;
+        if (lres)
+        {
+            AminoAcid* aa = protein->get_residue(lres);
+            if (aa) prob = aa->get_aa_definition()->flexion_probability;
+        }
+
         if (flex
             && iter < 5
-            && (lf < 10 || lf < 0.1 * ptnl)
+            && (lf < -10 || lf < 0.1 * ptnl)
             && mols[l]->movability == MOV_FLXDESEL
-            && mols[l]->is_residue()
-            && frand(0,1) < 0.05
+            && lres
+            && frand(0,1) < 0.25 * prob
             )
         {
             mols[l]->movability = MOV_FORCEFLEX;
         }
     }
-
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
-    #endif
 
     if (f > iter_best_bind)
     {
@@ -405,10 +405,6 @@ void iteration_callback(int iter, Molecule** mols)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);
     }
-    
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
-    #endif
     
     int i, j, n;
 
@@ -480,10 +476,6 @@ void iteration_callback(int iter, Molecule** mols)
             }
         }
     }
-    #endif
-    
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
     #endif
 
     Point bary = ligand->get_barycenter();
@@ -571,10 +563,6 @@ void iteration_callback(int iter, Molecule** mols)
         cout << endl;
         #endif
     }
-    
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
-    #endif
 
     if (!iter) goto _oei;
     if (iter == (iters-1)) goto _oei;
@@ -641,10 +629,6 @@ void iteration_callback(int iter, Molecule** mols)
     }
     #endif
     
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
-    #endif
-    
     bary = ligand->get_barycenter();
 
     for (i=0; i < ac; i++)
@@ -656,10 +640,6 @@ void iteration_callback(int iter, Molecule** mols)
             btom = atom->strongest_bind_atom;
         }
     }
-    
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
-    #endif
 
     if (bbest >= 15)
     {
@@ -710,10 +690,6 @@ void iteration_callback(int iter, Molecule** mols)
 
         #endif
     }
-    
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
-    #endif
 
     #if _teleport_dissatisfied_waters
     if (waters && (iter % 5) == 4)
@@ -734,10 +710,6 @@ void iteration_callback(int iter, Molecule** mols)
             }
         }
     }
-    #endif
-    
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
     #endif
 
     if (gcfmols && seql)
@@ -781,10 +753,6 @@ void iteration_callback(int iter, Molecule** mols)
         for (i=0; discrete[i].n; i++) gcfmols[i] = discrete[i].pmol;
         gcfmols[i] = nullptr;
     }
-    
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
-    #endif
 
     _oei:
     ;
@@ -794,10 +762,6 @@ void iteration_callback(int iter, Molecule** mols)
     float r = lig_center.get_3d_distance(ligcen_target);
     float recapture_distance = size.magnitude() / 2;
     if (r >= recapture_distance) ligand->recenter(ligcen_target);
-    #endif
-    
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
     #endif
 
     if (output_each_iter)
@@ -825,10 +789,6 @@ void iteration_callback(int iter, Molecule** mols)
             fclose(fp);
         }
     }
-    
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
-    #endif
 
     if (progressbar)
     {
@@ -845,10 +805,6 @@ void iteration_callback(int iter, Molecule** mols)
         i = iter % 4;
         cout << ("|/-\\")[i] << " " << (int)percentage << "%.               " << endl;
     }
-    
-    #if _dbg_linear_motion
-    if (ligand->movability & MOV_FORBIDDEN) throw 0xbadbad;
-    #endif
 }
 
 Point pocketcen_from_config_words(char** words, Point* old_pocketcen)

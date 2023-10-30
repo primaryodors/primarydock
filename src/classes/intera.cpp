@@ -1243,7 +1243,10 @@ _canstill_clash:
     }
     #endif
 
-    sigma = fmin(rbind, avdW+bvdW) - global_clash_allowance;
+    float local_clash_allowance = global_clash_allowance;
+    if (a->get_Z() == 1 && b->get_Z() == 1) local_clash_allowance *= 2;
+
+    sigma = fmin(rbind, avdW+bvdW) - local_clash_allowance;
 
     if (r < rbind && !atoms_are_bonded && (!achg || !bchg || sgn(achg) != -sgn(bchg)) )
     {
@@ -1271,7 +1274,10 @@ _canstill_clash:
 
 float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
 {
-    if (!sigma) sigma = atom1->get_vdW_radius() + atom2->get_vdW_radius() - global_clash_allowance;
+    float local_clash_allowance = global_clash_allowance;
+    if (atom1->get_Z() == 1 && atom2->get_Z() == 1) local_clash_allowance *= 2;
+
+    if (!sigma) sigma = atom1->get_vdW_radius() + atom2->get_vdW_radius() - local_clash_allowance;
     float r = atom1->distance_to(atom2);
     float sigma_r = sigma / r;
 

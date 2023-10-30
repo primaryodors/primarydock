@@ -122,7 +122,8 @@
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 0.1
-#define lmpull 0.1
+#define lmpull 0.25
+#define lmsteps 10
 #define recapture_ejected_ligand 0
 
 #define amide_zwitterionic_amount 0.1
@@ -138,7 +139,7 @@
 #define bb_realign_iters 1
 #define bb_realign_b_threshold 20
 #define bb_realign_amount 0.333
-#define bb_realign_threshold_distance 2.5
+#define bb_realign_threshold_distance 1.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1
 #define flexion_selection 1

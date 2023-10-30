@@ -2903,18 +2903,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
         for (n=0; mm[n]; n++);      // Get count.
         Molecule* nearby[n+8];
         bool do_full_rotation = ((iter % _fullrot_every) == 0);
-    
-        #if _dbg_linear_motion
-        if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
-        #endif
 
         for (i=0; i<n; i++)
         {
             Molecule* a = mm[i];
-    
-            #if _dbg_linear_motion
-            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
-            #endif
 
             if (a->movability & MOV_BKGRND) continue;
 
@@ -2934,10 +2926,6 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             }
             nearby[l] = 0;
             benerg = cfmol_multibind(a, nearby);
-    
-            #if _dbg_linear_motion
-            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
-            #endif
 
             #if _dbg_fitness_plummet
             if (!i) cout << "# mol " << a->name << " iter " << iter << ": initial " << -benerg << " ";
@@ -2953,7 +2941,26 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             {
                 Point motion(a->lmx, a->lmy, a->lmz);
                 if (motion.magnitude() > speed_limit) motion.scale(speed_limit);
-                a->move(motion);
+
+                benerg = cfmol_multibind(a, nearby);
+                if (motion.magnitude() > 0.01*speed_limit)
+                {
+                    pib.copy_state(a);
+                    motion.scale(motion.magnitude()/lmsteps);
+                    for (l=0; l<lmsteps; l++)
+                    {
+                        a->move(motion);
+                        tryenerg = cfmol_multibind(a, nearby);
+
+                        if (tryenerg > benerg)
+                        {
+                            benerg = tryenerg;
+                            pib.copy_state(a);
+                        }
+                    }
+                    pib.restore_state(a);
+                    benerg = cfmol_multibind(a, nearby);
+                }
                 pib.copy_state(a);
 
                 #if _dbg_linear_motion
@@ -3034,10 +3041,6 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             }
             #endif
             #endif
-    
-            #if _dbg_linear_motion
-            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
-            #endif
 
             #if _dbg_fitness_plummet
             if (!i) cout << "linear " << -benerg << " ";
@@ -3067,10 +3070,6 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 }
             }
             /**** End histidine flip ****/
-    
-            #if _dbg_linear_motion
-            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
-            #endif
 
             #if allow_axial_tumble
             if ((a->movability & MOV_CAN_AXIAL) && !(a->movability & MOV_FORBIDDEN))
@@ -3100,10 +3099,6 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     }
                 }
             }       // If can axial rotate.
-            #endif
-    
-            #if _dbg_linear_motion
-            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
             #endif
 
             #if _dbg_fitness_plummet
@@ -3233,26 +3228,14 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                 mm[i]->lastbind = benerg;
             }   // if MOV_CAN_FLEX
-    
-            #if _dbg_linear_motion
-            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
-            #endif
 
             #if _dbg_fitness_plummet
             if (!i) cout << "final " << -benerg << " " << endl << flush;
             #endif
         }       // for i
 
-        #if _dbg_linear_motion
-        if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
-        #endif
-
         #if allow_iter_cb
         if (cb) cb(iter+1, mm);
-        #endif
-    
-        #if _dbg_linear_motion
-        if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
         #endif
 
         minimum_searching_aniso *= 0.99;

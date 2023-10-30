@@ -1938,8 +1938,11 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
     {
         if (found_hbond)
         {
-            movability = MOV_PINNED;
-            found_mol->movability = MOV_PINNED;
+            if (found_mol->is_residue())
+            {
+                movability = MOV_PINNED;
+                found_mol->movability = MOV_PINNED;
+            }
 
             if (!protonated)
             {

@@ -77,7 +77,7 @@
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
-#define speed_limit 0.333
+#define speed_limit 0.666
 #define warn_orphan_atoms 0
 
 #define pi_mult_dkytw 264
@@ -121,7 +121,7 @@
 #define ignore_double_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 0.6
+#define lmpush 0.1
 #define lmpull 0.1
 #define recapture_ejected_ligand 0
 
@@ -351,6 +351,7 @@
 #define _dbg_hxrax 0
 #define _dbg_imidazole_check 0
 #define _dbg_interatomic_forces 0
+#define _dbg_linear_motion 0
 #define _DBG_LONELINESS 0
 #define _dbg_mand_conn 0
 #define _DBG_MAX_CLASHES 0

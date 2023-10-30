@@ -2903,10 +2903,18 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
         for (n=0; mm[n]; n++);      // Get count.
         Molecule* nearby[n+8];
         bool do_full_rotation = ((iter % _fullrot_every) == 0);
+    
+        #if _dbg_linear_motion
+        if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
+        #endif
 
         for (i=0; i<n; i++)
         {
             Molecule* a = mm[i];
+    
+            #if _dbg_linear_motion
+            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
+            #endif
 
             if (a->movability & MOV_BKGRND) continue;
 
@@ -2926,6 +2934,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             }
             nearby[l] = 0;
             benerg = cfmol_multibind(a, nearby);
+    
+            #if _dbg_linear_motion
+            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
+            #endif
 
             #if _dbg_fitness_plummet
             if (!i) cout << "# mol " << a->name << " iter " << iter << ": initial " << -benerg << " ";
@@ -2933,20 +2945,22 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
             float tryenerg;
             Pose pib;
-            pib.copy_state(a);
+            // pib.copy_state(a);
 
             /**** Linear Motion ****/
             #if allow_linear_motion
             if ((a->movability & MOV_CAN_RECEN) && !(a->movability & MOV_FORBIDDEN))
             {
                 Point motion(a->lmx, a->lmy, a->lmz);
-                if (motion.magnitude() > speed_limit)
-                {
-                    motion.scale(speed_limit);
-                    a->lmx = motion.x;
-                    a->lmy = motion.y;
-                    a->lmz = motion.z;
-                }
+                if (motion.magnitude() > speed_limit) motion.scale(speed_limit);
+                a->move(motion);
+                pib.copy_state(a);
+
+                #if _dbg_linear_motion
+                if (!a->is_residue()) cout << iter << "! ";
+                #endif
+
+                a->lmx = a->lmy = a->lmz = 0;
 
                 int xyz;
                 for (xyz=0; xyz<3; xyz++)
@@ -2955,9 +2969,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                     switch(xyz)
                     {
-                        case 0: motion.x = a->lmx + frand(-speed_limit,speed_limit); break;
-                        case 1: motion.y = a->lmy + frand(-speed_limit,speed_limit); break;
-                        case 2: motion.z = a->lmz + frand(-speed_limit,speed_limit); break;
+                        case 0: motion.x = frand(-speed_limit,speed_limit); break;
+                        case 1: motion.y = frand(-speed_limit,speed_limit); break;
+                        case 2: motion.z = frand(-speed_limit,speed_limit); break;
                         default:
                         ;
                     }
@@ -2974,14 +2988,18 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     {
                         benerg = tryenerg;
                         pib.copy_state(a);
+
+                        #if _dbg_linear_motion
+                        if (!a->is_residue()) cout << ">";
+                        #endif
                     }
                     else
                     {
                         switch(xyz)
                         {
-                            case 0: motion.x = (motion.x - a->lmx) * -2 + a->lmx; break;
-                            case 1: motion.y = (motion.y - a->lmy) * -2 + a->lmy; break;
-                            case 2: motion.z = (motion.z - a->lmz) * -2 + a->lmz; break;
+                            case 0: motion.x *= -2; break;
+                            case 1: motion.y *= -2; break;
+                            case 2: motion.z *= -2; break;
                             default:
                             ;
                         }
@@ -2993,16 +3011,32 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         {
                             benerg = tryenerg;
                             pib.copy_state(a);
+
+                            #if _dbg_linear_motion
+                            if (!a->is_residue()) cout << "<";
+                            #endif
                         }
                         else
                         {
                             pib.restore_state(a);
+
+                            #if _dbg_linear_motion
+                            if (!a->is_residue()) cout << "-" << flush;
+                            #endif
                         }
                     }
                 }
-
-                a->lmx = a->lmy = a->lmz = 0;
             }       // If can recenter.
+            #if _dbg_linear_motion
+            else
+            {
+                if (!a->is_residue()) cout << iter << "* ";
+            }
+            #endif
+            #endif
+    
+            #if _dbg_linear_motion
+            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
             #endif
 
             #if _dbg_fitness_plummet
@@ -3033,6 +3067,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 }
             }
             /**** End histidine flip ****/
+    
+            #if _dbg_linear_motion
+            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
+            #endif
 
             #if allow_axial_tumble
             if ((a->movability & MOV_CAN_AXIAL) && !(a->movability & MOV_FORBIDDEN))
@@ -3062,6 +3100,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     }
                 }
             }       // If can axial rotate.
+            #endif
+    
+            #if _dbg_linear_motion
+            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
             #endif
 
             #if _dbg_fitness_plummet
@@ -3191,14 +3233,26 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                 mm[i]->lastbind = benerg;
             }   // if MOV_CAN_FLEX
+    
+            #if _dbg_linear_motion
+            if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
+            #endif
 
             #if _dbg_fitness_plummet
             if (!i) cout << "final " << -benerg << " " << endl << flush;
             #endif
         }       // for i
 
+        #if _dbg_linear_motion
+        if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
+        #endif
+
         #if allow_iter_cb
         if (cb) cb(iter+1, mm);
+        #endif
+    
+        #if _dbg_linear_motion
+        if (mm[0]->movability & MOV_FORBIDDEN) throw 0xbadbad;
         #endif
 
         minimum_searching_aniso *= 0.99;
@@ -3207,6 +3261,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
         if (!i) cout << endl << flush;
         #endif
     }       // for iter
+
+    #if _dbg_linear_motion
+    cout << endl;
+    #endif
 
     minimum_searching_aniso = 0;
 }

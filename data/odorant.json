@@ -23943,6 +23943,24 @@
             }
         }
     },
+    "6d7d045de46e20204d950ef52f08e77f":
+    {
+        "full_name": "muguissimo",
+        "iupac": "5-cyclohexyl-2,4-dimethylpent-4-enal",
+        "smiles": "C1CCCCC1C=C(C)CC(C)C=O",
+        "aroma":
+        {
+            "https:\/\/www.firmenich.com\/product\/muguissimor-pe-961822":
+            [
+                "muguet",
+                "aldehydic",
+                "watery",
+                "cyclamen",
+                "citrus",
+                "anisic"
+            ]
+        }
+    },
     "f398b18d22ce80147b9c5644ce59f61a":
     {
         "full_name": "muscenone",

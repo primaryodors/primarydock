@@ -1260,7 +1260,7 @@ void Molecule::find_paths()
 
     Atom* a = atoms[0];
     a->fetch_bonds(b);
-    if (!b) return;
+    if (!b[0]) return;
     n=0;
     for (i=0; b[i]; i++)
     {
@@ -1287,11 +1287,12 @@ void Molecule::find_paths()
             if (!a) continue;
             if (abs((__int64_t)(atoms[0]) - (__int64_t)a) >= 16777216) continue;
             a->fetch_bonds(b);
-            if (!b) continue;
+            if (!b[0]) continue;
 
             k=0;
             for (j=0; b[j]; j++)
             {
+                if (abs((__int64_t)(a) - (__int64_t)b[j]) > 65536) break;
                 if (!b[j]->btom) continue;
                 if (b[j]->btom->get_Z() < 2) continue;
                 if (b[j]->btom->get_bonded_heavy_atoms_count() < 2) continue;

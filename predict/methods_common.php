@@ -564,10 +564,8 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     if (function_exists("make_prediction"))
     {
         $oc = count($outdata);
-        $outdata = make_prediction($outdata);
-        $nc = count($outdata);
-        if ($nc < $oc) die("ERROR: make_prediction() must return the input array with the prediction added.");
-        // if (@$outdata["Predicted"] == $actual) $outdata["locked"] = 1;
+        $prediction = make_prediction($outdata);
+        $outdata = array_merge($outdata, $prediction);
     }
     $outdata["Actual"] = $actual;
 

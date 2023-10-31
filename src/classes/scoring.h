@@ -24,6 +24,8 @@ class DockResult
     float* imvdWrepl = 0;
     float ligand_self = 0;
     float worst_energy = 0;
+    const char** m_atom1_name = nullptr;
+    const char** m_atom2_name = nullptr;
     std::string pdbdat;
     std::string softrock;
     std::string miscdata;
@@ -37,6 +39,8 @@ class DockResult
     float protclash = 0;
     bool do_output_colors = false;
     bool include_pdb_data = true;
+    bool display_clash_atom1 = false;
+    bool display_clash_atom2 = false;
     float energy_mult = 1;
 };
 

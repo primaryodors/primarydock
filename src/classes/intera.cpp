@@ -608,9 +608,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (b->is_pKa_near_bio_pH() && achg < 0) bchg = 1;
     #endif
 
-    if (achg && a->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) achg = a->get_max_conj_charge();
-    if (bchg && b->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) bchg = b->get_max_conj_charge();
-
     Atom* aheavy = a;
     if (aheavy->get_Z() == 1)
     {
@@ -625,6 +622,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     }
     float rheavy = aheavy->distance_to(bheavy);
     float l_heavy_atom_mindist = aheavy->get_vdW_radius() + bheavy->get_vdW_radius();
+
+    float ahcg = aheavy->is_conjugated_to_charge(), bhcg = bheavy->is_conjugated_to_charge();
+    if (!achg && ahcg) achg = ahcg;
+    if (!bchg && bhcg) bchg = bhcg;
+    // if (!strcmp(a->name, "O6") && !strcmp(b->name, "HD1") && b->residue == 180 ) cout << ahcg << " " << bhcg << endl;
 
     #if _ALLOW_PROTONATE_PNICTOGENS
 
@@ -1248,8 +1250,9 @@ _canstill_clash:
 
     sigma = fmin(rbind, avdW+bvdW) - local_clash_allowance;
 
-    if (r < rbind && !atoms_are_bonded && (!achg || !bchg || sgn(achg) != -sgn(bchg)) )
+    if (r < rbind && !atoms_are_bonded && (!achg || !bchg || (sgn(achg) != -sgn(bchg))) )
     {
+        // if (!strcmp(a->name, "O6") && !strcmp(b->name, "HD1") && b->residue == 180 ) cout << achg << " " << bchg << endl;
         float clash = Lennard_Jones(a, b, sigma);
         kJmol -= fmax(clash, 0);
         

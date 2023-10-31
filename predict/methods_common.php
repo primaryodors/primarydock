@@ -306,7 +306,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
 
-    if ($retvar || (count($outlines) < 100))
+    if ($retvar)
     {
         echo "Docking FAILED.\n";
         return 0;
@@ -330,9 +330,21 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     $pose_node_has_weight = [];
     $num_poses = 0;
 
+    $posesln = false;
     foreach ($outlines as $ln)
     {
-        if (false !== strpos($ln, "pose(s) found")) $num_poses = intval($ln);
+        if (false !== strpos($ln, "pose(s) found"))
+        {
+            $num_poses = intval($ln);
+            $posesln = true;
+            break;
+        }
+    }
+
+    if (!$posesln)
+    {
+        echo "Docking FAILED.\n";
+        return 0;
     }
 
     if (!$num_poses) $outdata[$metrics_prefix."POSES"] = $num_poses;

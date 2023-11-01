@@ -1212,10 +1212,10 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                             AABondDef* aab = aaa->aabonds[i];
                             if (!strcmp(aab->aname, a->name))
                             {
-                                /* if (aaa->aabonds[i] && aaa->aabonds[i]->acharge)
+                                if (aaa->aabonds[i] && aaa->aabonds[i]->acharge && !a->get_charge())
                                 {
                                     a->increment_charge(aaa->aabonds[i]->acharge);
-                                } */
+                                }
 
 
                                 Atom* btom = get_atom(aab->bname);

@@ -1905,7 +1905,6 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
 
     bool found_acid = false;
     bool found_hbond = false;
-    bool found_stable = false;
     int found_j = 0;
     Molecule* found_mol = nullptr;
     #if _dbg_cond_basic
@@ -1925,14 +1924,13 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
             {
                 if (atoms[j]->is_backbone) continue;
                 if (atoms[j]->get_family() == TETREL) continue;
-                // if (atoms[j]->get_Z() == 1 && atoms[j]->is_polar() < 0.5) continue;
-                // if (fabs(atoms[j]->is_polar()) > 0.2) continue;
+                if (atoms[j]->get_Z() == 1 && atoms[j]->is_polar() < 0.5) continue;
+                if (fabs(atoms[j]->get_charge()) > 0.2) continue;
 
                 Atom* a = nearby_mols[i]->get_nearest_atom(atoms[j]->get_location());
                 if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->btom;
 
-                if (!(atoms[j]->get_Z() == 1 && atoms[j]->is_polar() < 0.5)
-                    && a->get_charge() <= -0.5 || a->is_conjugated_to_charge() <= -0.5)
+                if (a->get_charge() <= -0.5 || a->is_conjugated_to_charge() <= -0.5)
                 {
                     #if _dbg_cond_basic
                     cout << nearby_mols[i]->get_name() << ":" << a->name << " is " << a->distance_to(atoms[j]) << "A from " << atoms[j]->name << endl;
@@ -1956,25 +1954,9 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                         break;
                     }
                 }
-                else
-                {
-                    float r = atoms[j]->distance_to(a);
-                    float f = InteratomicForce::total_binding(atoms[j], a);
-                    float e = fabs(atoms[j]->is_polar() * a->is_polar() * 30.0 / pow(r/2.5, 2));
-                    if (residue_no == 180) cout << residue_no << ":" << atoms[j]->name << " ... " << a->residue << ":" << a->name << " = " << e << endl;
-                    if (abs(f) >= cond_bas_hbond_threshold || e >= cond_bas_hbond_threshold)
-                    {
-                        found_stable = true;
-                    }
-                }
             }
         }
 
-        if (found_stable)
-        {
-            found_hbond = false;
-            break;
-        }
         if (found_acid && found_hbond) break;
 
         if (!hisflips || !hisflips[0]) break;

@@ -1961,7 +1961,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     float r = atoms[j]->distance_to(a);
                     float f = InteratomicForce::total_binding(atoms[j], a);
                     float e = fabs(atoms[j]->is_polar() * a->is_polar() * 30.0 / pow(r/2.5, 2));
-                    // if (residue_no == 180) cout << residue_no << ":" << atoms[j]->name << " ... " << a->residue << ":" << a->name << " = " << e << endl;
+                    if (residue_no == 180) cout << residue_no << ":" << atoms[j]->name << " ... " << a->residue << ":" << a->name << " = " << e << endl;
                     if (abs(f) >= cond_bas_hbond_threshold || e >= cond_bas_hbond_threshold)
                     {
                         found_stable = true;

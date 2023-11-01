@@ -563,7 +563,6 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
     if (function_exists("make_prediction"))
     {
-        $oc = count($outdata);
         $prediction = make_prediction($outdata);
         $outdata = array_merge($outdata, $prediction);
     }

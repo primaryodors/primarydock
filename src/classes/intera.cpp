@@ -1250,7 +1250,7 @@ _canstill_clash:
 
     sigma = fmin(rbind, avdW+bvdW) - local_clash_allowance;
 
-    if (r < rbind && !atoms_are_bonded && (!achg || !bchg || (sgn(achg) != -sgn(bchg))) )
+    if (r < rbind && !atoms_are_bonded) // && (!achg || !bchg || (sgn(achg) != -sgn(bchg))) )
     {
         // if (!strcmp(a->name, "O6") && !strcmp(b->name, "HD1") && b->residue == 180 ) cout << achg << " " << bchg << endl;
         float clash = Lennard_Jones(a, b, sigma);

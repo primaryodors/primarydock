@@ -2801,10 +2801,17 @@ _try_again:
 
                     if (global_pairs.size() > 2)
                     {
-                        // TODO: If the 2nd group is closer to the 1st group than the 3rd group is, swap the 2nd and 3rd groups.
-                        Point grpcen1 = global_pairs[0]->ag->get_center(), grpcen2 = global_pairs[1]->ag->get_center(), grpcen3 = global_pairs[2]->ag->get_center();
+                        // If the 2nd group is closer to the 1st group than the 3rd group is, swap the 2nd and 3rd groups.
+                        Point grpcen1 = global_pairs[0]->ag->get_center(),
+                            grpcen2 = global_pairs[1]->ag->get_center(),
+                            grpcen3 = global_pairs[2]->ag->get_center();
 
-                        if (grpcen1.get_3d_distance(grpcen2) > grpcen1.get_3d_distance(grpcen3))
+                        float r12 = grpcen1.get_3d_distance(grpcen2),
+                            r13 = grpcen1.get_3d_distance(grpcen3);
+                        
+                        // cout << r12 << " " << r13 << endl;
+
+                        if (r12 < r13)
                         {
                             std::shared_ptr<GroupPair> tmpg = global_pairs[2];
                             global_pairs[2] = global_pairs[1];

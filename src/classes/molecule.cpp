@@ -1292,7 +1292,7 @@ void Molecule::find_paths()
             k=0;
             for (j=0; b[j]; j++)
             {
-                if (abs((__int64_t)(a) - (__int64_t)b[j]) > 65536) break;
+                if (abs((__int64_t)(a) - (__int64_t)b[j]) > 16777216) break;
                 if (!b[j]->btom) continue;
                 if (b[j]->btom->get_Z() < 2) continue;
                 if (b[j]->btom->get_bonded_heavy_atoms_count() < 2) continue;

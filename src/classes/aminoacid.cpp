@@ -1920,6 +1920,8 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
             cout << "Trying " << nearby_mols[i]->get_name() << endl;
             #endif
 
+            if (!nearby_mols[i]->is_residue()) continue;            // Temporary fix to get OR51E2 test passing for merge.
+
             for (j=0; atoms[j]; j++)
             {
                 if (atoms[j]->is_backbone) continue;

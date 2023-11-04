@@ -254,7 +254,7 @@ Atom* ResidueGroup::get_nearest_atom(Point pt)
         Atom* a = aminos[i]->get_nearest_atom(pt);
         float r1 = a->get_location().get_3d_distance(pt);
 
-        if (!n || r1 < r)
+        if (!i || r1 < r)
         {
             result = a;
             r = r1;
@@ -1323,7 +1323,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     lv = (SCoord)axis;
     lv.origin = zcen;
     float theta = find_angle_along_vector(gp[2]->ag->get_center(), gp[2]->scg->get_center(), zcen, axis);
-    #if _dbg_groupsel
+    #if _dbg_groupsel || _dbg_groupsalign
     cout << "\"Rotisserie\" aligning " << *gp[2]->ag << " in the direction of " << *gp[2]->scg << endl;
     #endif
     lig->rotate(lv, theta*amount);

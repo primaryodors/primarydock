@@ -134,6 +134,13 @@ void Point::scale(float new_magn)
     z *= multiplier;
 }
 
+void Point::multiply(float m)
+{
+    x *= m;
+    y *= m;
+    z *= m;
+}
+
 bool Point::pt_in_bounding_box(const Point* corner1, const Point* corner2)
 {
     if (x > std::max(corner1->x, corner2->x)) return false;

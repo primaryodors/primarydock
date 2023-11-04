@@ -138,7 +138,6 @@
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.5
 #define bb_realign_b_threshold 20
-#define bb_realign_amount 0.666
 #define bb_realign_threshold_distance 1.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1
@@ -324,7 +323,7 @@
 // Debugging stuff.
 
 // Should normally be 3:
-#define _bb_max_grp 2
+#define _bb_max_grp 3
 
 // For auditing binding energies between individual atoms:
 #define _peratom_audit 0
@@ -343,7 +342,7 @@
 #define DBG_FND_RNGS 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
-#define _dbg_groupsalign 1
+#define _dbg_groupsalign 0
 #define _dbg_groupsel 0
 #define _DBG_H2O_TELEPORT 0
 #define _DBG_HISFLIP 0

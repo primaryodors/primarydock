@@ -254,6 +254,8 @@ Atom* ResidueGroup::get_nearest_atom(Point pt)
         Atom* a = aminos[i]->get_nearest_atom(pt);
         float r1 = a->get_location().get_3d_distance(pt);
 
+        if (r1 > 10000) throw 0xbad;
+
         if (!i || r1 < r)
         {
             result = a;
@@ -1280,17 +1282,18 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     if (r0 > 0)
     {
         Point pt = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        pt.scale((r-0)/* *amount*/);
+        pt.scale((r0-0)/* *amount*/);
         rel = rel.add(pt);
     }
     if (r1 > 0)
     {
         Point pt = gp[1]->scg->get_center().subtract(gp[1]->ag->get_center());
-        pt.scale((r-0)/* *amount*/);
+        pt.scale((r1-0)/* *amount*/);
         rel = rel.add(pt);
     }
     if (rel.magnitude())
     {
+        if (rel.magnitude() > speed_limit*3) throw 0xbad;
         #if _dbg_groupsel || _dbg_groupsalign
         cout << "Atom group is " << gp[0]->scg->distance_to(gp[0]->ag->get_center()) << "A from side chain group. ";
         cout << "Side chain group reach is " << gp[0]->scg->group_reach() << "A." << endl;

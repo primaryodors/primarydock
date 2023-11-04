@@ -1271,29 +1271,29 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         << (rot.a * fiftyseven) << "deg about " << rot.v
         << " in the direction of " << *gp[0]->scg << "(" << gp[0]->scg->get_center() << ")." << endl;
     #endif
-    lig->rotate(lv, rot.a*amount);
+    if (rot.a >= bb_realign_threshold_angle) lig->rotate(lv, rot.a*amount);
 
     #if enable_bb_scooch
     // Scooch.
     // float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
-    float r0 = gp[0]->scg->distance_to(gp[0]->ag->get_center()) - gp[0]->scg->group_reach();
-    float r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center()) - gp[1]->scg->group_reach();
+    float r0 = gp[0]->scg->distance_to(gp[0]->ag->get_center()); // - gp[0]->scg->group_reach();
+    float r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center()); // - gp[1]->scg->group_reach();
     Point rel(0,0,0);
     if (r0 > 0)
     {
         Point pt = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        pt.scale((r0-0)/* *amount*/);
+        pt.scale((r0-2)/* *amount*/);
         rel = rel.add(pt);
     }
     if (r1 > 0)
     {
         Point pt = gp[1]->scg->get_center().subtract(gp[1]->ag->get_center());
-        pt.scale((r1-0)/* *amount*/);
+        pt.scale((r1-2)/* *amount*/);
         rel = rel.add(pt);
     }
     if (rel.magnitude())
     {
-        if (rel.magnitude() > speed_limit*3) throw 0xbad;
+        if (rel.magnitude() > speed_limit*100) throw 0xbad;
         #if _dbg_groupsel || _dbg_groupsalign
         cout << "Atom group is " << gp[0]->scg->distance_to(gp[0]->ag->get_center()) << "A from side chain group. ";
         cout << "Side chain group reach is " << gp[0]->scg->group_reach() << "A." << endl;
@@ -1306,14 +1306,16 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     if (do_conforms) gp[0]->scg->conform_to(lig);
 
     if (n < 2) return;
-    r = gp[1]->scg->distance_to(gp[1]->ag->get_center()) - gp[1]->scg->group_reach();
-    if (r > 0)
+    r = gp[1]->scg->distance_to(gp[1]->ag->get_center()); // - gp[1]->scg->group_reach();
+    if (r > 2)
     {
-        rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
+        rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->scg->get_center());
         lv = rot.v;
-        lv.origin = gp[0]->ag->get_center();
+        lv.origin = gp[0]->scg->get_center();
         #if _dbg_groupsel || _dbg_groupsalign
-        cout << "Rotating " << *gp[1]->ag << " in the direction of " << *gp[1]->scg << endl;
+        cout << "Rotating " << *gp[1]->ag
+            << (rot.a * fiftyseven) << "deg about " << rot.v
+            << " in the direction of " << *gp[1]->scg << endl;
         #endif
         lig->rotate(lv, rot.a*amount);
 

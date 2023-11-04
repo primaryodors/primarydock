@@ -137,7 +137,6 @@
 #define bb_group_distance_cutoff 4.3
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.5
-#define bb_realign_iters 1
 #define bb_realign_b_threshold 20
 #define bb_realign_amount 0.666
 #define bb_realign_threshold_distance 1.5
@@ -195,7 +194,7 @@
 #define internode_momentum_only_on_activation 1
 
 // Switches for conformational space search.
-#define allow_axial_tumble 1
+#define allow_axial_tumble 0
 #define allow_bond_rots 1
 #define allow_linear_motion 1
 #define monte_carlo_axial 0

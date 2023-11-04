@@ -1257,9 +1257,10 @@ void GroupPair::align_groups_noconform(Molecule* lig, std::vector<std::shared_pt
 
 void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp, bool do_conforms, float amount)
 {
-    int n = gp.size();
-
+    int n = min((int)gp.size(), _bb_max_grp);
     if (n < 1) return;
+    float r;
+
     Rotation rot = align_points_3d(gp[0]->ag->get_center(), gp[0]->scg->get_center(), lig->get_barycenter());
     LocatedVector lv = rot.v;
     lv.origin = lig->get_barycenter();
@@ -1273,11 +1274,23 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #if enable_bb_scooch
     // Scooch.
     // float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
-    float r = gp[0]->scg->distance_to(gp[0]->ag->get_center()) - gp[0]->scg->group_reach();
-    if (r > 0)
+    float r0 = gp[0]->scg->distance_to(gp[0]->ag->get_center()) - gp[0]->scg->group_reach();
+    float r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center()) - gp[1]->scg->group_reach();
+    Point rel(0,0,0);
+    if (r0 > 0)
     {
-        Point rel = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        rel.scale((r-1)*amount);
+        Point pt = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
+        pt.scale((r-0)/* *amount*/);
+        rel = rel.add(pt);
+    }
+    if (r1 > 0)
+    {
+        Point pt = gp[1]->scg->get_center().subtract(gp[1]->ag->get_center());
+        pt.scale((r-0)/* *amount*/);
+        rel = rel.add(pt);
+    }
+    if (rel.magnitude())
+    {
         #if _dbg_groupsel || _dbg_groupsalign
         cout << "Atom group is " << gp[0]->scg->distance_to(gp[0]->ag->get_center()) << "A from side chain group. ";
         cout << "Side chain group reach is " << gp[0]->scg->group_reach() << "A." << endl;
@@ -1291,7 +1304,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
 
     if (n < 2) return;
     r = gp[1]->scg->distance_to(gp[1]->ag->get_center()) - gp[1]->scg->group_reach();
-    if (r > 4)
+    if (r > 0)
     {
         rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), gp[0]->ag->get_center());
         lv = rot.v;

@@ -354,6 +354,7 @@ Atom::Atom(FILE* is)
                                 words[9][chgoff]
                            ) strcharge = &words[9][chgoff];
                     }
+
                     if (strcharge)
                     {
                         if 		(!strcmp(strcharge, "+")) charge = 1;
@@ -574,6 +575,7 @@ float Atom::get_charge()
         if (bonded_to && bonded_to[0].btom)
         {
             float bchg = bonded_to[0].btom->charge;
+            if (!bchg) bchg = bonded_to[0].btom->is_conjugated_to_charge();
             if (bchg > 0) return bchg;
         }
     }

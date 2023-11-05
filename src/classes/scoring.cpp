@@ -31,6 +31,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     int metcount = 0;
     float btot = 0;
     float pstot = 0;
+    char* lma1n[end1];
+    char* lma2n[end1];
 
     for (i=0; i<end1; i++)
     {
@@ -218,6 +220,9 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
             if (-lb > worst_energy) worst_energy = -lb;
         }
 
+        lma1n[metcount] = ligand->clash1 ? ligand->clash1->name : nullptr;
+        lma2n[metcount] = ligand->clash2 ? ligand->clash2->name : nullptr;
+
         #if active_persistence
         res_kJmol[resno] = lb;
         #endif
@@ -289,6 +294,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     this->imkJmol    = new float[metcount];
     this->mvdWrepl    = new float[metcount];
     this->imvdWrepl    = new float[metcount];
+    this->m_atom1_name  = new const char*[metcount];
+    this->m_atom2_name  = new const char*[metcount];
     ligand_self = ligand->get_intermol_binding(ligand);
     #if use_trip_switch
     tripswitch  = tripclash;
@@ -319,6 +326,8 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         imkJmol[i] = limkJmol[i];
         mvdWrepl[i] = lmvdWrepl[i];
         imvdWrepl[i] = limvdWrepl[i];
+        m_atom1_name[i] = lma1n[i];
+        m_atom2_name[i] = lma2n[i];
         // cout << "*" << metric[i] << ": " << mkJmol[i] << endl;
     }
 
@@ -370,7 +379,10 @@ std::ostream& operator<<(std::ostream& output, const DockResult& dr)
         else
         {
             if (dr.do_output_colors) colorize(dr.mkJmol[l]);
-            output << dr.metric[l] << ": " << -dr.mkJmol[l]*dr.energy_mult << endl;
+            output << dr.metric[l] << ": " << -dr.mkJmol[l]*dr.energy_mult;
+            if (dr.display_clash_atom1) output << " " << (dr.m_atom1_name[l] ? dr.m_atom1_name[l] : "-");
+            if (dr.display_clash_atom2) output << " " << (dr.m_atom2_name[l] ? dr.m_atom2_name[l] : "-");
+            output << endl;
             if (dr.do_output_colors) colorless();
         }
     }

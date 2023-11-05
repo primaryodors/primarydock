@@ -1260,7 +1260,7 @@ void Molecule::find_paths()
 
     Atom* a = atoms[0];
     a->fetch_bonds(b);
-    if (!b) return;
+    if (!b[0]) return;
     n=0;
     for (i=0; b[i]; i++)
     {
@@ -1287,11 +1287,12 @@ void Molecule::find_paths()
             if (!a) continue;
             if (abs((__int64_t)(atoms[0]) - (__int64_t)a) >= 16777216) continue;
             a->fetch_bonds(b);
-            if (!b) continue;
+            if (!b[0]) continue;
 
             k=0;
             for (j=0; b[j]; j++)
             {
+                if (abs((__int64_t)(a) - (__int64_t)b[j]) > 16777216) break;
                 if (!b[j]->btom) continue;
                 if (b[j]->btom->get_Z() < 2) continue;
                 if (b[j]->btom->get_bonded_heavy_atoms_count() < 2) continue;
@@ -2375,6 +2376,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     if (subtract_clashes) kJmol -= get_internal_clashes();
 
     lastshielded = 0;
+    clash1 = clash2 = nullptr;
 
     // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
 
@@ -2385,6 +2387,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
         atoms[i]->strongest_bind_atom = nullptr;
     }
 
+    float worst = 0;
     for (i=0; atoms[i]; i++)
     {
         Point aloc = atoms[i]->get_location();
@@ -2423,6 +2426,8 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             !ligands[l]->shielded(atoms[i], ligands[l]->atoms[j])
                        )
                     {
+                        missed_connection.r = 0;
+                        // cout << ligands[l]->atoms[j]->get_location().subtract(atoms[i]->get_location()) << ": ";
                         float abind = InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                         if (abind && !isnan(abind) && !isinf(abind))
                         {
@@ -2436,6 +2441,13 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 atoms[i]->strongest_bind_atom = ligands[l]->atoms[j];
                             }
 
+                            if (abind < 0 && -abind > worst)
+                            {
+                                worst = -abind;
+                                clash1 = atoms[i];
+                                clash2 = ligands[l]->atoms[j];
+                            }
+
                             if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
@@ -2444,6 +2456,11 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                                 lmz += lmpush * sgn(ptd.z);
                             }
                         }
+                        Point mc = missed_connection;
+                        // cout << mc << endl;
+                        lmx += lmpull * mc.x;
+                        lmy += lmpull * mc.y;
+                        lmz += lmpull * mc.z;
                     }
                     else lastshielded += InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
                 }
@@ -2926,22 +2943,52 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
             float tryenerg;
             Pose pib;
-            pib.copy_state(a);
+            // pib.copy_state(a);
 
             /**** Linear Motion ****/
             #if allow_linear_motion
             if ((a->movability & MOV_CAN_RECEN) && !(a->movability & MOV_FORBIDDEN))
             {
+                Point motion(a->lmx, a->lmy, a->lmz);
+                if (motion.magnitude() > speed_limit) motion.scale(speed_limit);
+
+                benerg = cfmol_multibind(a, nearby);
+                if (motion.magnitude() > 0.01*speed_limit)
+                {
+                    pib.copy_state(a);
+                    motion.scale(motion.magnitude()/lmsteps);
+                    for (l=0; l<lmsteps; l++)
+                    {
+                        a->move(motion);
+                        tryenerg = cfmol_multibind(a, nearby);
+
+                        if (tryenerg > benerg)
+                        {
+                            benerg = tryenerg;
+                            pib.copy_state(a);
+                        }
+                    }
+                    pib.restore_state(a);
+                    benerg = cfmol_multibind(a, nearby);
+                }
+                pib.copy_state(a);
+
+                #if _dbg_linear_motion
+                if (!a->is_residue()) cout << iter << "! ";
+                #endif
+
+                a->lmx = a->lmy = a->lmz = 0;
+
                 int xyz;
                 for (xyz=0; xyz<3; xyz++)
                 {
-                    Point motion(0, 0, 0);
+                    motion.scale(0);
 
                     switch(xyz)
                     {
-                        case 0: motion.x = a->lmx + frand(-speed_limit,speed_limit); break;
-                        case 1: motion.y = a->lmy + frand(-speed_limit,speed_limit); break;
-                        case 2: motion.z = a->lmz + frand(-speed_limit,speed_limit); break;
+                        case 0: motion.x = frand(-speed_limit,speed_limit); break;
+                        case 1: motion.y = frand(-speed_limit,speed_limit); break;
+                        case 2: motion.z = frand(-speed_limit,speed_limit); break;
                         default:
                         ;
                     }
@@ -2958,14 +3005,18 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     {
                         benerg = tryenerg;
                         pib.copy_state(a);
+
+                        #if _dbg_linear_motion
+                        if (!a->is_residue()) cout << ">";
+                        #endif
                     }
                     else
                     {
                         switch(xyz)
                         {
-                            case 0: motion.x = (motion.x - a->lmx) * -2 + a->lmx; break;
-                            case 1: motion.y = (motion.y - a->lmy) * -2 + a->lmy; break;
-                            case 2: motion.z = (motion.z - a->lmz) * -2 + a->lmz; break;
+                            case 0: motion.x *= -2; break;
+                            case 1: motion.y *= -2; break;
+                            case 2: motion.z *= -2; break;
                             default:
                             ;
                         }
@@ -2977,16 +3028,28 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         {
                             benerg = tryenerg;
                             pib.copy_state(a);
+
+                            #if _dbg_linear_motion
+                            if (!a->is_residue()) cout << "<";
+                            #endif
                         }
                         else
                         {
                             pib.restore_state(a);
+
+                            #if _dbg_linear_motion
+                            if (!a->is_residue()) cout << "-" << flush;
+                            #endif
                         }
                     }
                 }
-
-                a->lmx = a->lmy = a->lmz = 0;
             }       // If can recenter.
+            #if _dbg_linear_motion
+            else
+            {
+                if (!a->is_residue()) cout << iter << "* ";
+            }
+            #endif
             #endif
 
             #if _dbg_fitness_plummet
@@ -3079,7 +3142,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         bool is_flexion_dbg_mol_bond = is_flexion_dbg_mol & !strcmp(bb[q]->btom->name, "OG");
                         #endif
 
-                        if (do_full_rotation /*&& benerg <= 0*/ && bb[q]->can_rotate)
+                        if (do_full_rotation && a->is_residue() /*&& benerg <= 0*/ && bb[q]->can_rotate)
                         {
                             float best_theta = 0;
                             Pose prior_state;
@@ -3191,6 +3254,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
         if (!i) cout << endl << flush;
         #endif
     }       // for iter
+
+    #if _dbg_linear_motion
+    cout << endl;
+    #endif
 
     minimum_searching_aniso = 0;
 }

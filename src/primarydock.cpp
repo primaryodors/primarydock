@@ -375,11 +375,20 @@ void iteration_callback(int iter, Molecule** mols)
         float lf = mols[l]->get_intermol_binding(mols), ptnl = mols[l]->get_intermol_potential(mols);
         f += lf;
 
+        int lres = mols[l]->is_residue();
+        float prob = 1;
+        if (lres)
+        {
+            AminoAcid* aa = protein->get_residue(lres);
+            if (aa) prob = aa->get_aa_definition()->flexion_probability;
+        }
+
         if (flex
             && iter < 5
-            && (lf < 10 || lf < 0.1 * ptnl)
+            && (lf < -10 || lf < 0.1 * ptnl)
             && mols[l]->movability == MOV_FLXDESEL
-            && frand(0,1) < 0.05
+            && lres
+            && frand(0,1) < 0.25 * prob
             )
         {
             mols[l]->movability = MOV_FORCEFLEX;
@@ -398,76 +407,6 @@ void iteration_callback(int iter, Molecule** mols)
     }
     
     int i, j, n;
-
-    #if bb_realign_iters
-    #if _dbg_bb_realign
-    cout << ligand->lastbind << (iter == iters ? " ] " : " ") << flush;
-    #endif
-    if (use_bestbind_algorithm && global_pairs.size() >= 2 && ligand->lastbind < bb_realign_b_threshold)
-    {
-        Point scg0 = global_pairs[0]->scg->get_center();
-        Point scg1 = global_pairs[1]->scg->get_center();
-        Point ag0  = global_pairs[0]->ag->get_center();
-        Point ag1  = global_pairs[1]->ag->get_center();
-
-        Rotation rot;
-
-        if (scg0.get_3d_distance(ag0) > bb_realign_threshold_distance)
-        {
-            rot = align_points_3d(ag0, scg0, ag1);
-            if (rot.a < 0)
-            {
-                rot.a *= -1;
-                rot.v.r *= -1;
-                rot.v = (SCoord)((Point)rot.v);
-            }
-            if (rot.a > bb_realign_threshold_angle)
-            {
-                rot.a = fmin(hexagonal, rot.a*bb_realign_amount) / global_pairs[0]->ag->atoms.size();
-                LocatedVector lv = rot.v;
-                lv.origin = ag1;
-                ligand->rotate(lv, rot.a);
-            }
-        }
-
-        if (scg1.get_3d_distance(ag1) > bb_realign_threshold_distance)
-        {
-            rot = align_points_3d(ag1, scg1, ag0);
-            if (rot.a < 0)
-            {
-                rot.a *= -1;
-                rot.v.r *= -1;
-                rot.v = (SCoord)((Point)rot.v);
-            }
-            if (rot.a > bb_realign_threshold_angle)
-            {
-                rot.a = fmin(hexagonal, rot.a*bb_realign_amount) / global_pairs[1]->ag->atoms.size();
-                LocatedVector lv = rot.v;
-                lv.origin = ag0;
-                ligand->rotate(lv, rot.a);
-            }
-        }
-
-        if (global_pairs.size() >= 3)
-        {
-            Point scg2 = global_pairs[2]->scg->get_center();
-            Point ag2  = global_pairs[2]->ag->get_center();
-
-            if (scg2.get_3d_distance(ag2) > bb_realign_threshold_distance)
-            {
-                float theta = find_angle_along_vector(ag2, scg2, ag0, ag1.subtract(ag0));
-
-                if (fabs(theta) > bb_realign_threshold_angle)
-                {
-                    LocatedVector v = (SCoord)ag1.subtract(ag0);
-                    v.origin = ag0;
-
-                    ligand->rotate(v, theta * bb_realign_amount / global_pairs[2]->ag->atoms.size());
-                }
-            }
-        }
-    }
-    #endif
 
     Point bary = ligand->get_barycenter();
 
@@ -2792,10 +2731,17 @@ _try_again:
 
                     if (global_pairs.size() > 2)
                     {
-                        // TODO: If the 2nd group is closer to the 1st group than the 3rd group is, swap the 2nd and 3rd groups.
-                        Point grpcen1 = global_pairs[0]->ag->get_center(), grpcen2 = global_pairs[1]->ag->get_center(), grpcen3 = global_pairs[2]->ag->get_center();
+                        // If the 2nd group is closer to the 1st group than the 3rd group is, swap the 2nd and 3rd groups.
+                        Point grpcen1 = global_pairs[0]->ag->get_center(),
+                            grpcen2 = global_pairs[1]->ag->get_center(),
+                            grpcen3 = global_pairs[2]->ag->get_center();
 
-                        if (grpcen1.get_3d_distance(grpcen2) > grpcen1.get_3d_distance(grpcen3))
+                        float r12 = grpcen1.get_3d_distance(grpcen2),
+                            r13 = grpcen1.get_3d_distance(grpcen3);
+                        
+                        // cout << r12 << " " << r13 << endl;
+
+                        if (r12 < r13)
                         {
                             std::shared_ptr<GroupPair> tmpg = global_pairs[2];
                             global_pairs[2] = global_pairs[1];

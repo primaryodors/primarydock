@@ -1131,6 +1131,33 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                     a->residue = atoi(words[4+offset].c_str())+rno;
                     strcpy(a->aa3let, words[3].c_str());
                     AADef* aaa=0;
+                    
+                    char* strcharge = 0;
+                    int chgoff = strlen(esym);
+                    if (words[12].length())
+                    {
+                        if (words[12][chgoff-1] && words[12][chgoff]) strcharge = &words[12][chgoff];
+                    }
+                    else if (words[11].length())
+                    {
+                        if (words[11][0] == esym[0]
+                                &&
+                                words[11][chgoff-1]
+                                &&
+                                words[11][chgoff]
+                        ) strcharge = &words[11][chgoff];
+                    }
+
+                    if (strcharge)
+                    {
+                        if (strcharge[strlen(strcharge)-1] == '\n') strcharge[strlen(strcharge)-1] = 0;
+                        if 		(!strcmp(strcharge, "+")) a->increment_charge(1);
+                        else if	(!strcmp(strcharge, "++")) a->increment_charge(2);
+                        else if	(!strcmp(strcharge, "-")) a->increment_charge(-1);
+                        else if	(!strcmp(strcharge, "--")) a->increment_charge(-2);
+                        else if (atoi(strcharge)) a->increment_charge(atoi(strcharge));
+                        // cout << aa3let << residue << ":" << name << " has charge " << charge << endl;
+                    }
 
                     name=0;
                     for (i=0; i<256; i++)
@@ -1185,10 +1212,12 @@ int AminoAcid::from_pdb(FILE* is, int rno)
                             AABondDef* aab = aaa->aabonds[i];
                             if (!strcmp(aab->aname, a->name))
                             {
-                                if (aaa->aabonds[i] && aaa->aabonds[i]->acharge)
+                                if (aaa->aabonds[i] && aaa->aabonds[i]->acharge && !a->get_charge())
                                 {
                                     a->increment_charge(aaa->aabonds[i]->acharge);
                                 }
+
+
                                 Atom* btom = get_atom(aab->bname);
                                 if (btom)
                                 {
@@ -1891,6 +1920,8 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
             cout << "Trying " << nearby_mols[i]->get_name() << endl;
             #endif
 
+            if (!nearby_mols[i]->is_residue()) continue;            // Temporary fix to get OR51E2 test passing for merge.
+
             for (j=0; atoms[j]; j++)
             {
                 if (atoms[j]->is_backbone) continue;
@@ -1938,8 +1969,11 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
     {
         if (found_hbond)
         {
-            movability = MOV_PINNED;
-            found_mol->movability = MOV_PINNED;
+            if (found_mol->is_residue())
+            {
+                movability = MOV_PINNED;
+                found_mol->movability = MOV_PINNED;
+            }
 
             if (!protonated)
             {

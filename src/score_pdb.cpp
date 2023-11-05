@@ -17,6 +17,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    cout << " _" << endl << "|/\\" << endl << "|//\\                   PrimaryDock application suite" << endl << "|///\\" << endl << " \\///\\           ___" << endl << "  \\///\\   ____ _/      SSS                          PPPP  DDD   BBBB" << endl << "    \\/| _/ /^\\\\       S   S                         P   P D  D  B   B" << endl << "    //// \\_\\_//       S       CC    O   R RR    EE  P   P D   D B   B" << endl << "   / ----v \\_/\\        SSS   C  C  O O  RR  R  E  E PPPP  D   D BBBB" << endl << "  |||----v                S C     O   O R     EEEEE P     D   D B   B" << endl << "   \\ ----v     ~\\\\    S   S  C  C  O O  R      E    P     D  D  B   B" << endl << "    \\\\\\\\_________/|    SSS    CC    O   R       EEE P     DDD   BBBB" << endl << "     \\__|__|__|__|/" << endl << "     " << endl << "" << endl << endl;
+
     Protein p("TheProtein");
     Molecule m("TheLigand");
     FILE* fp = fopen(argv[1], "rb");
@@ -51,6 +53,8 @@ int main(int argc, char** argv)
 
     DockResult dr(&p, &m, Point(10000,10000,10000));
     dr.include_pdb_data = false;
+    dr.display_clash_atom1 = true;
+    dr.display_clash_atom2 = true;
     cout << dr;
 }
 

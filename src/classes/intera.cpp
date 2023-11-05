@@ -13,6 +13,7 @@ using namespace std;
 float total_binding_by_type[_INTER_TYPES_LIMIT];
 float minimum_searching_aniso = 0;
 InteratomicForce* lif = nullptr;
+SCoord missed_connection(0,0,0);
 
 #if _peratom_audit
 std::vector<std::string> interaudit;
@@ -607,9 +608,6 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     if (b->is_pKa_near_bio_pH() && achg < 0) bchg = 1;
     #endif
 
-    if (achg && a->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) achg = a->get_max_conj_charge();
-    if (bchg && b->get_max_conj_charge() && sgn(achg) == -sgn(bchg)) bchg = b->get_max_conj_charge();
-
     Atom* aheavy = a;
     if (aheavy->get_Z() == 1)
     {
@@ -624,6 +622,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     }
     float rheavy = aheavy->distance_to(bheavy);
     float l_heavy_atom_mindist = aheavy->get_vdW_radius() + bheavy->get_vdW_radius();
+
+    float ahcg = aheavy->is_conjugated_to_charge(), bhcg = bheavy->is_conjugated_to_charge();
+    if (!achg && ahcg) achg = ahcg;
+    if (!bchg && bhcg) bchg = bhcg;
+    // if (!strcmp(a->name, "O6") && !strcmp(b->name, "HD1") && b->residue == 180 ) cout << ahcg << " " << bhcg << endl;
 
     #if _ALLOW_PROTONATE_PNICTOGENS
 
@@ -1051,6 +1054,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
                         ? r1*r1*r1*r1*r1*r1
                         : r1*r1;
                 partial = aniso * forces[i]->kJ_mol / rdecayed;
+
+                SCoord mc = bloc.subtract(aloc);
+                mc.r = fabs((r1 - 1) * (1.0 - (partial / forces[i]->kJ_mol)) / (r1*r1));
+                missed_connection = missed_connection.add(mc);
             }
             else
             {
@@ -1122,12 +1129,13 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         {
             #if ignore_invalid_partial
             return 0;
-            #endif
+            #else
             cout << "Invalid partial! " << partial << " (max " << forces[i]->kJ_mol << ") from "
                  << a->name << "...." << b->name << " r=" << r
                  << " (optimal " << forces[i]->distance << ") rdecayed=" << rdecayed
                  << " aniso=" << aniso << " (" << asum << "*" << bsum << ")" << endl;
             throw 0xbadf0ace;
+            #endif
         }
 
         #if active_persistence
@@ -1237,10 +1245,14 @@ _canstill_clash:
     }
     #endif
 
-    sigma = fmin(rbind, avdW+bvdW) - global_clash_allowance;
+    float local_clash_allowance = global_clash_allowance;
+    if (a->get_Z() == 1 && b->get_Z() == 1) local_clash_allowance *= double_hydrogen_clash_allowance_multiplier;
 
-    if (r < rbind && !atoms_are_bonded && (!achg || !bchg || sgn(achg) != -sgn(bchg)) )
+    sigma = fmin(rbind, avdW+bvdW) - local_clash_allowance;
+
+    if (r < rbind && !atoms_are_bonded) // && (!achg || !bchg || (sgn(achg) != -sgn(bchg))) )
     {
+        // if (!strcmp(a->name, "O6") && !strcmp(b->name, "HD1") && b->residue == 180 ) cout << achg << " " << bchg << endl;
         float clash = Lennard_Jones(a, b, sigma);
         kJmol -= fmax(clash, 0);
         
@@ -1265,7 +1277,10 @@ _canstill_clash:
 
 float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
 {
-    if (!sigma) sigma = atom1->get_vdW_radius() + atom2->get_vdW_radius() - global_clash_allowance;
+    float local_clash_allowance = global_clash_allowance;
+    if (atom1->get_Z() == 1 && atom2->get_Z() == 1) local_clash_allowance *= double_hydrogen_clash_allowance_multiplier;
+
+    if (!sigma) sigma = atom1->get_vdW_radius() + atom2->get_vdW_radius() - local_clash_allowance;
     float r = atom1->distance_to(atom2);
     float sigma_r = sigma / r;
 

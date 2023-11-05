@@ -5,7 +5,7 @@ require_once("../data/odorutils.php");
 
 function filter_prot($protid, $filter)
 {
-    global $fnum;
+    global $fnum, $prots;
 
     $disp = true;
     switch ($filter)
@@ -34,6 +34,10 @@ function filter_prot($protid, $filter)
         case 's':
         $ftxt = substr($_REQUEST['f'], 1);
         if (substr($protid, 0, strlen($ftxt)) != $ftxt) $disp = false;
+        break;
+
+        case 'q':
+        $disp = (@$prots[$protid]['hypothesized']);
         break;
 
         case '':
@@ -173,8 +177,8 @@ foreach ($tree as $path => $protids)
             }
             else
             {
-                if ($c === '0') echo "&#x2502;   ";       // |
-                else echo "    ";                         //
+                if ($c === '0') echo "&#x2502;&nbsp;&nbsp;&nbsp;";       // |
+                else echo "&nbsp;&nbsp;&nbsp;&nbsp;";                         //
             }
         }
         else
@@ -185,7 +189,11 @@ foreach ($tree as $path => $protids)
     }
 
     echo "&#x2500;&#x2500;&#x2500;";
-    foreach ($protids as $r) echo " <a href=\"receptor.php?r=$r\">$r</a>";
+    foreach ($protids as $r)
+    {
+        echo " <a href=\"receptor.php?r=$r\">$r</a>";
+        if ($filter == 'q') echo " ".$prots[$r]['hypothesized'];
+    }
     echo "\n";
 
     $prev = str_split($path);

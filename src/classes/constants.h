@@ -73,7 +73,7 @@
 #define _can_clash_angle (180.0 * fiftyseventh)
 #define _fullrot_stepdeg 20
 #define _fullrot_steprad (fiftyseventh*_fullrot_stepdeg)
-#define _fullrot_every 17
+#define _fullrot_every 7
 #define _def_lin_momentum 0.1
 #define _def_ang_momentum (fiftyseventh*5)
 #define _def_bnd_momentum (fiftyseventh*15)
@@ -118,10 +118,13 @@
 #define charge_repulsion 5.0
 
 #define global_clash_allowance 0.4
+#define double_hydrogen_clash_allowance_multiplier 1.5
 #define ignore_double_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 0.1
+#define lmpull 0.25
+#define lmsteps 10
 #define recapture_ejected_ligand 0
 
 #define amide_zwitterionic_amount 0.1
@@ -134,10 +137,8 @@
 #define bb_group_distance_cutoff 4.3
 #define enforce_no_bb_pullaway 1
 #define bb_pullaway_allowance 0.5
-#define bb_realign_iters 1
 #define bb_realign_b_threshold 20
-#define bb_realign_amount 0.333
-#define bb_realign_threshold_distance 2.5
+#define bb_realign_threshold_distance 1.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1
 #define flexion_selection 1
@@ -350,6 +351,7 @@
 #define _dbg_hxrax 0
 #define _dbg_imidazole_check 0
 #define _dbg_interatomic_forces 0
+#define _dbg_linear_motion 0
 #define _DBG_LONELINESS 0
 #define _dbg_mand_conn 0
 #define _DBG_MAX_CLASHES 0

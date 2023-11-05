@@ -193,7 +193,7 @@
 #define internode_momentum_only_on_activation 1
 
 // Switches for conformational space search.
-#define allow_axial_tumble 0
+#define allow_axial_tumble 1
 #define allow_bond_rots 1
 #define allow_linear_motion 1
 #define monte_carlo_axial 0

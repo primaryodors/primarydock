@@ -1329,7 +1329,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
             << " in the direction of " << *gp[1]->scg << " (" << gp[1]->scg->get_center() << ")." << endl;
         #endif
         lig->rotate(lv, rot.a*amount);
-        float r2 = gp[1]->scg->distance_to(gp[1]->ag->get_center());
+        // cout << r << " ~ " << gp[1]->scg->distance_to(gp[1]->ag->get_center()) << endl << endl;
 
         if (do_conforms) gp[1]->scg->conform_to(lig);
     }

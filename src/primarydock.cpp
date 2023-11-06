@@ -590,6 +590,10 @@ void iteration_callback(int iter, Molecule** mols)
     else
     {
         #if allow_drift
+
+        Pose predrift(ligand);
+        float predrift_binding = ligand->get_intermol_binding(mols);
+
         #if !pocketcen_is_loneliest
         if (ligand->lastbind <= -100)
         {
@@ -617,6 +621,10 @@ void iteration_callback(int iter, Molecule** mols)
         }
 
         ligand->recenter(bary);
+
+        float postdrift_binding = ligand->get_intermol_binding(mols);
+
+        if (postdrift_binding < predrift_binding) predrift.restore_state(ligand);
 
         #endif
     }

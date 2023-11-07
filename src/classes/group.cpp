@@ -1070,7 +1070,7 @@ float GroupPair::get_potential()
                     }
                     else if (fabs(a->is_polar()) > hydrophilicity_cutoff && amide.contained_by(aa, matches))
                     {
-                        partial *= 3;
+                        partial *= 2;
                         #if _dbg_groupsel
                         cout << *a << " is polar and " << *aa << " is amide." << endl;
                         #endif
@@ -1114,7 +1114,8 @@ float GroupPair::get_potential()
                     #endif
                 }
 
-                potential += partial;
+                // potential += partial;
+                potential = fmax(potential, partial);
                 q++;
             }
         }

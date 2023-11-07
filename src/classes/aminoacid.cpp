@@ -1942,6 +1942,16 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     found_j = j;
                     found_mol = nearby_mols[i];
 
+                    float r = atoms[j]->distance_to(a);
+                    if (r >= 2.0) continue;
+                    if (atoms[j]->get_Z() == 1)
+                    {
+                        Atom* b = atoms[j]->get_bond_by_idx(0)->btom;
+                        if (!b) continue;
+                        r = atoms[j]->distance_to(b);
+                        if (r >= 1.333) continue;
+                    }
+
                     float f = InteratomicForce::total_binding(atoms[j], a);
                     #if _dbg_cond_basic
                     found_f = f;

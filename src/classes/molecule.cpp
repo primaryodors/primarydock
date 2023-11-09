@@ -3247,7 +3247,12 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
             if (a->agroups.size() && group_realign)
             {
+                Pose pre_realign(a);
+                benerg = cfmol_multibind(a, nearby);
                 group_realign(a, a->agroups);
+                tryenerg = cfmol_multibind(a, nearby);
+
+                if (tryenerg < benerg) pre_realign.restore_state(a);
             }
         }       // for i
 

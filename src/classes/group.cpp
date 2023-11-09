@@ -1325,7 +1325,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
 
     if (n < 2) return;
     r = gp[1]->scg->distance_to(gp[1]->ag->get_center()); // - gp[1]->scg->group_reach();
-    cout << r << endl << endl;
+    // cout << r << endl << endl;
     if (r >= bb_realign_threshold_distance)
     {
         origin = gp[0]->ag->get_center();

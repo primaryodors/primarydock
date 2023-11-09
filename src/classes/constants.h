@@ -138,10 +138,10 @@
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
 #define bb_realign_b_threshold 20
-#define bb_realign_threshold_distance 2.5
+#define bb_realign_threshold_distance 2.0
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1
-#define bb_scooch_threshold_distance 2.5
+#define bb_scooch_threshold_distance 2.0
 #define flexion_selection 1
 #define no_zero_flexions 1
 #define ignore_invalid_partial 1

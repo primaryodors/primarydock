@@ -2451,6 +2451,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
+                                ptd.multiply(fmin(sqrt(-abind) / 30, 1));
                                 lmx += lmpush * sgn(ptd.x);
                                 lmy += lmpush * sgn(ptd.y);
                                 lmz += lmpush * sgn(ptd.z);
@@ -2950,7 +2951,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             if ((a->movability & MOV_CAN_RECEN) && !(a->movability & MOV_FORBIDDEN))
             {
                 Point motion(a->lmx, a->lmy, a->lmz);
-                if (motion.magnitude() > speed_limit) motion.scale(speed_limit);
+                if (motion.magnitude() > speed_limit/2) motion.scale(speed_limit/2);
 
                 benerg = cfmol_multibind(a, nearby);
                 if (motion.magnitude() > 0.01*speed_limit)
@@ -2960,6 +2961,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     for (l=0; l<lmsteps; l++)
                     {
                         a->move(motion);
+                        // if (a->agroups.size() && group_realign) group_realign(a, a->agroups);
                         tryenerg = cfmol_multibind(a, nearby);
 
                         if (tryenerg > benerg)
@@ -3152,7 +3154,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 bb[q]->rotate(_fullrot_steprad, false);
                                 if (a->agroups.size() && group_realign)
                                 {
-                                    group_realign(a, a->agroups);
+                                    // group_realign(a, a->agroups);
                                 }
                                 tryenerg = cfmol_multibind(a, nearby);
 
@@ -3174,7 +3176,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                                 if (a->agroups.size() && group_realign)
                                 {
-                                    group_realign(a, a->agroups);
+                                    // group_realign(a, a->agroups);
                                 }
 
                                 #if _dbg_mol_flexion
@@ -3200,7 +3202,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                             if (a->agroups.size() && group_realign)
                             {
-                                group_realign(a, a->agroups);
+                                // group_realign(a, a->agroups);
                             }
 
                             tryenerg = cfmol_multibind(a, nearby);
@@ -3242,6 +3244,11 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #if _dbg_fitness_plummet
             if (!i) cout << "final " << -benerg << " " << endl << flush;
             #endif
+
+            if (a->agroups.size() && group_realign)
+            {
+                group_realign(a, a->agroups);
+            }
         }       // for i
 
         #if allow_iter_cb

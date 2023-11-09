@@ -1263,17 +1263,24 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     int n = min((int)gp.size(), _bb_max_grp);
     if (n < 1) return;
     float r;
+    Point origin;
+    Rotation rot;
+    LocatedVector lv;
 
-    Point origin = (n > 1) ? gp[1]->ag->get_center() : lig->get_barycenter();
-    Rotation rot = align_points_3d(gp[0]->ag->get_center(), gp[0]->scg->get_center(), origin);
-    LocatedVector lv = rot.v;
-    lv.origin = origin;
-    #if _dbg_groupsel || _dbg_groupsalign
-    cout << "I. Rotating " << *gp[0]->ag << "(" << gp[0]->ag->get_center() << ") "
-        << (rot.a * fiftyseven) << "deg about " << rot.v
-        << " in the direction of " << *gp[0]->scg << "(" << gp[0]->scg->get_center() << ")." << endl;
-    #endif
-    if (rot.a >= bb_realign_threshold_angle) lig->rotate(lv, rot.a*amount);
+    r = gp[0]->scg->distance_to(gp[0]->ag->get_center());
+    if (r >= bb_realign_threshold_distance)
+    {
+        origin = (n > 1) ? gp[1]->ag->get_center() : lig->get_barycenter();
+        rot = align_points_3d(gp[0]->ag->get_center(), gp[0]->scg->get_center(), origin);
+        lv = rot.v;
+        lv.origin = origin;
+        #if _dbg_groupsel || _dbg_groupsalign
+        cout << "I. Rotating " << *gp[0]->ag << "(" << gp[0]->ag->get_center() << ") "
+            << (rot.a * fiftyseven) << "deg about " << rot.v
+            << " in the direction of " << *gp[0]->scg << "(" << gp[0]->scg->get_center() << ")." << endl;
+        #endif
+        if (rot.a >= bb_realign_threshold_angle) lig->rotate(lv, rot.a*amount);
+    }
 
     #if enable_bb_scooch
     // Scooch.
@@ -1282,17 +1289,17 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     float r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center()); // - gp[1]->scg->group_reach();
     bool do0 = false, do1 = false;
     Point rel(0,0,0);
-    if (r0 > 2)
+    if (r0 > bb_scooch_threshold_distance)
     {
         Point pt = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        pt.scale((r0-2) *amount);
+        pt.scale((r0-bb_scooch_threshold_distance) *amount);
         rel = rel.add(pt);
         do0 = true;
     }
-    if (r1 > 2)
+    if (r1 > bb_scooch_threshold_distance)
     {
         Point pt = gp[1]->scg->get_center().subtract(gp[1]->ag->get_center());
-        pt.scale((r1-2) *amount);
+        pt.scale((r1-bb_scooch_threshold_distance) *amount);
         rel = rel.add(pt);
         do1 = true;
     }
@@ -1318,7 +1325,8 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
 
     if (n < 2) return;
     r = gp[1]->scg->distance_to(gp[1]->ag->get_center()); // - gp[1]->scg->group_reach();
-    if (r > 2)
+    cout << r << endl << endl;
+    if (r >= bb_realign_threshold_distance)
     {
         origin = gp[0]->ag->get_center();
         rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), origin);

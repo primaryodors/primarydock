@@ -123,7 +123,7 @@
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 0.1
-#define lmpull 0.25
+#define lmpull 0.3
 #define lmsteps 10
 #define recapture_ejected_ligand 0
 
@@ -135,12 +135,13 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
 #define bb_group_distance_cutoff 4.3
-#define enforce_no_bb_pullaway 1
+#define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
 #define bb_realign_b_threshold 20
-#define bb_realign_threshold_distance 1.5
+#define bb_realign_threshold_distance 2.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1
+#define bb_scooch_threshold_distance 2.5
 #define flexion_selection 1
 #define no_zero_flexions 1
 #define ignore_invalid_partial 1
@@ -193,9 +194,9 @@
 #define internode_momentum_only_on_activation 1
 
 // Switches for conformational space search.
+#define allow_linear_motion 1
 #define allow_axial_tumble 1
 #define allow_bond_rots 1
-#define allow_linear_motion 1
 #define monte_carlo_axial 0
 #define monte_carlo_flex 1
 #define multiflex 0

@@ -1920,7 +1920,9 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
             cout << "Trying " << nearby_mols[i]->get_name() << endl;
             #endif
 
-            // if (!nearby_mols[i]->is_residue()) continue;            // Temporary fix to get OR51E2 test passing for merge.
+            #if !_allow_conditional_basicity_with_acid_ligand
+            if (!nearby_mols[i]->is_residue()) continue;
+            #endif
 
             for (j=0; atoms[j]; j++)
             {
@@ -1943,7 +1945,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     found_mol = nearby_mols[i];
 
                     float r = atoms[j]->distance_to(a);
-                    if (r >= 2.0) continue;
+                    if (r >= cond_bas_hbond_distance_threshold) continue;
                     if (atoms[j]->get_Z() == 1)
                     {
                         Atom* b = atoms[j]->get_bond_by_idx(0)->btom;
@@ -1957,7 +1959,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                     found_f = f;
                     cout << "Total " << atoms[j]->name << "..." << a->name << " energy: " << -f << endl;
                     #endif
-                    if (f >= cond_bas_hbond_threshold)
+                    if (f >= cond_bas_hbond_energy_threshold)
                     {
                         #if _show_cond_bas_hbond_energy || _dbg_cond_basic
                         cout << name << " can protonate because of " << -f << " hbond energy with " << found_mol->get_name() << "." << endl;

@@ -138,10 +138,10 @@
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
 #define bb_realign_b_threshold 20
-#define bb_realign_threshold_distance 2.0
+#define bb_realign_threshold_distance 1.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1
-#define bb_scooch_threshold_distance 2.0
+#define bb_scooch_threshold_distance 1.5
 #define flexion_selection 1
 #define no_zero_flexions 1
 #define ignore_invalid_partial 1
@@ -294,7 +294,9 @@
 // if a negatively charged atom is nearby.
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
-#define cond_bas_hbond_threshold 1.5
+#define _allow_conditional_basicity_with_acid_ligand 1
+#define cond_bas_hbond_energy_threshold 1.5
+#define cond_bas_hbond_distance_threshold 2.3
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0
@@ -351,6 +353,7 @@
 #define _dbg_Huckel 0
 #define _dbg_hxrax 0
 #define _dbg_imidazole_check 0
+#define _dbg_improvements_only_rule 0
 #define _dbg_interatomic_forces 0
 #define _dbg_linear_motion 0
 #define _DBG_LONELINESS 0

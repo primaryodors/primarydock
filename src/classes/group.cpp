@@ -1279,6 +1279,11 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
             << (rot.a * fiftyseven) << "deg about " << rot.v
             << " in the direction of " << *gp[0]->scg << "(" << gp[0]->scg->get_center() << ")." << endl;
         #endif
+
+        #if _dbg_improvements_only_rule
+        excuse_deterioration = true;
+        #endif
+
         if (rot.a >= bb_realign_threshold_angle) lig->rotate(lv, rot.a*amount);
     }
 
@@ -1317,6 +1322,11 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         if (do1) cout << *gp[1]->scg << " ";
         cout << endl;
         #endif
+
+        #if _dbg_improvements_only_rule
+        excuse_deterioration = true;
+        #endif
+
         lig->move(rel);
     }
     #endif
@@ -1325,7 +1335,6 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
 
     if (n < 2) return;
     r = gp[1]->scg->distance_to(gp[1]->ag->get_center()); // - gp[1]->scg->group_reach();
-    // cout << r << endl << endl;
     if (r >= bb_realign_threshold_distance)
     {
         origin = gp[0]->ag->get_center();
@@ -1337,6 +1346,11 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
             << (rot.a * fiftyseven) << "deg about " << rot.v
             << " in the direction of " << *gp[1]->scg << " (" << gp[1]->scg->get_center() << ")." << endl;
         #endif
+
+        #if _dbg_improvements_only_rule
+        excuse_deterioration = true;
+        #endif
+
         lig->rotate(lv, rot.a*amount);
         // cout << r << " ~ " << gp[1]->scg->distance_to(gp[1]->ag->get_center()) << endl << endl;
 
@@ -1352,6 +1366,11 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #if _dbg_groupsel || _dbg_groupsalign
     cout << "III. \"Rotisserie\" aligning " << *gp[2]->ag << " in the direction of " << *gp[2]->scg << endl;
     #endif
+
+    #if _dbg_improvements_only_rule
+    excuse_deterioration = true;
+    #endif
+
     lig->rotate(lv, theta*amount);
 
     if (do_conforms) gp[2]->scg->conform_to(lig);

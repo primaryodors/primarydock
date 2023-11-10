@@ -293,5 +293,11 @@ extern float _momentum_rad_ceiling;
 extern Molecule *worst_clash_1, *worst_clash_2;
 extern float worst_mol_clash;
 
+#if _dbg_improvements_only_rule
+extern Molecule** check_mols;
+extern Molecule* check_ligand;
+extern bool excuse_deterioration;
+#endif
+
 #endif
 

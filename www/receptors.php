@@ -97,8 +97,17 @@ echo "<h1>Receptors</h1>\n";
 
 $ffam = "OR1";
 $echoed = 0;
-foreach ($prots as $protid => $p)
+
+$byrcpid = [];
+
+foreach ($prots as $poid => $p) $byrcpid[$poid] = $p['id'];
+natsort($byrcpid);
+
+echo "<!-- ".print_r($byrcpid,1)." -->\n";
+
+foreach ($byrcpid as $poid => $protid)
 {
+    $p = $prots[$poid];
     if (!@$p['region']) continue;
     $fam = family_from_protid($protid);
     if ($echoed && $fam != $ffam)
@@ -109,7 +118,8 @@ foreach ($prots as $protid => $p)
 
     if (filter_prot($protid, $filter))
     {
-        echo "<a class=\"rcptile\" href=\"receptor.php?r=$protid\">$protid</a>\n";
+        $disp = (substr($poid, 2) == substr($protid, 2)) ? $poid : "$poid ($protid)";
+        echo "<a class=\"rcptile\" href=\"receptor.php?r=$poid\">$disp</a>\n";
         $echoed++;
     }
     $ffam = $fam;

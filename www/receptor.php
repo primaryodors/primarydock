@@ -4,19 +4,33 @@ require_once("../data/protutils.php");
 require_once("../data/odorutils.php");
 require_once("../predict/statistics.php");
 
-$rcpid = @$_REQUEST['r'];
-if (!$rcpid)
+$poid = @$_REQUEST['r'];
+if (!$poid)
 {
     header("Location: receptors.php");
     exit;
 }
 
-$receptor = @$prots[$rcpid];
+$receptor = @$prots[$poid];
+if (!$receptor)
+{
+    foreach ($prots as $k => $p)
+    {
+        if ($p['id'] == $poid)
+        {
+            $poid = $k;
+            $receptor = $p;
+            break;
+        }
+    }
+}
 if (!$receptor)
 {
     header("Location: receptors.php");
     exit;
 }
+
+$rcpid = $receptor['id'];
 
 // Binding site residues from https://doi.org/10.1110%2Fps.03296404
 $bsr = array_flip(
@@ -87,7 +101,7 @@ $cub =
 	"6.40" => "HCMDENQ",
 ];
 
-$page_title = $rcpid;
+$page_title = "$poid / $rcpid";
 $extra_js = ['js/tabs.js'];
 $extra_css = ['assets/tabs.css'];
 
@@ -192,7 +206,7 @@ function load_viewer(obj)
                 $("[type=file]", embdd.contentDocument).hide();
                 var filediv = $("#filediv", embdd.contentDocument)[0];
 
-                filediv.innerText = "<?php echo @$rcpid; ?>";
+                filediv.innerText = "<?php echo @$poid; ?>";
 
                 window.setTimeout( function()
                 {
@@ -202,7 +216,7 @@ function load_viewer(obj)
                     {
                         try
                         {
-                            $resno = resno_from_bw($rcpid, $bw);
+                            $resno = resno_from_bw($poid, $bw);
                             echo "window.setTimeout( function()\n";
                             echo "{\n";
                             echo "embdd.contentWindow.showSideChain($resno);\n";
@@ -292,7 +306,18 @@ function view_file(url)
 
 <?php
 
-if (substr($fam, 0, 2) == "OR")
+$pofam = family_from_protid($poid);
+if (substr($pofam, 0, 2) == "PO")
+{
+    echo "Olfactory receptor ";
+    $fmn = intval(preg_replace("/[^0-9]/", "", $fam));
+    echo "<a href=\"receptors.php?f=sPO$fmn\">trunk $fmn</a>, ";
+    $sub = preg_replace("/[^A-Z]/", "", substr($rcpid, strlen($fam)) );
+    echo "<a href=\"receptors.php?f=sPO$fmn$sub\">branch $sub</a>, ";
+    $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
+    echo "member $mbr";
+}
+else if (substr($fam, 0, 2) == "OR")
 {
     echo "Olfactory receptor ";
     $fmn = intval(preg_replace("/[^0-9]/", "", $fam));
@@ -391,9 +416,9 @@ else
         }
 
         $between = ($nxtmr-1)."$nxtmr.50";
-        if (($i+1) == resno_from_bw($rcpid, "$nxtmr.50")
+        if (($i+1) == resno_from_bw($poid, "$nxtmr.50")
             ||
-            ( isset($prots[$rcpid]["bw"][$between]) && ($i+1) == resno_from_bw($rcpid, $between) )
+            ( isset($prots[$rcpid]["bw"][$between]) && ($i+1) == resno_from_bw($poid, $between) )
             )
             $lets .= "<span style=\"background-color: #ddd; color: #000;\">".substr($seq,$i,1)."</span>";
         else
@@ -432,7 +457,7 @@ else
         {
             if (substr($bw, 0, 2) == "$i.")
             {
-                $resno = resno_from_bw($rcpid, $bw);
+                $resno = resno_from_bw($poid, $bw);
                 $offset = $resno - intval($receptor['region']["TMR$i"]['start']);
                 $angle = (pi()*4 / 7 * $offset) % (pi()*2);
                 $x += sin($angle);
@@ -489,7 +514,7 @@ $lcub = [];
 foreach ($cub as $bw => $allowed)
 {
 	$res = "<span title=\"$bw\">";
-	$resno = resno_from_bw($rcpid, $bw);
+	$resno = resno_from_bw($poid, $bw);
 	$c = substr($seq, $resno-1, 1);
 	if (false !== strpos($allowed, $c))
 	{
@@ -562,7 +587,7 @@ echo "</p>";*/
                     // $col = aacolor($ch);
                     echo "<span ";
                     
-                    $bw = bw_from_resno($rcpid, $rc[$tmr]); // $rc[$tmr] + 50 - $receptor['bw']["$tmr.50"];
+                    $bw = bw_from_resno($poid, $rc[$tmr]); // $rc[$tmr] + 50 - $receptor['bw']["$tmr.50"];
                     
                     if ($ch != ' ') echo "title=\"$bw {$aminos[$ch]}{$rc[$tmr]}\" ";
                     echo "style=\"";

@@ -100,6 +100,10 @@ function correlate_receptors_aromanotes()
 
 function get_notes_for_receptor($rcpid, $correlations)
 {
+	$prot = find_prot($rcpid);
+	if (!$prot) die("Protein not found: $rcpid.\n");
+	$rcpid = $prot['id'];
+
     if (!isset($correlations[$rcpid])) return "(insufficient data)";
 
     $maxcorr = floatval(max($correlations[$rcpid]));

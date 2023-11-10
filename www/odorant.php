@@ -216,40 +216,41 @@ if (@$odor['activity']) foreach ($odor['activity'] as $refurl => $acv)
     $lrefs[] = $refurl;
     foreach ($acv as $rcpid => $a)
     {
-        $maxcurvtop[$rcpid] = false;
-        $minec50[$rcpid] = false;
+        $poid = find_poid($rcpid);
+        $maxcurvtop[$poid] = false;
+        $minec50[$poid] = false;
 
-        if (@$a['antagonist']) $antagonist[$rcpid] = "Y";
+        if (@$a['antagonist']) $antagonist[$poid] = "Y";
 
-        if (!isset($sorted[$rcpid])) $sorted[$rcpid] = 0.0;
+        if (!isset($sorted[$poid])) $sorted[$poid] = 0.0;
         $ssamples = 0;
         if (!isset($a['adjusted_curve_top']) && @$a['type'] == 'na') $a['adjusted_curve_top'] = 0;
         if (isset($a['adjusted_curve_top']))
         {
-            if (!isset($tbltops[$rcpid])) $tbltops[$rcpid] = "";
-            else $tbltops[$rcpid] .= ", ";
+            if (!isset($tbltops[$poid])) $tbltops[$poid] = "";
+            else $tbltops[$poid] .= ", ";
 
-            $tbltops[$rcpid] .= round($a['adjusted_curve_top'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup>";
-            $sorted[$rcpid] += $a['adjusted_curve_top'];
+            $tbltops[$poid] .= round($a['adjusted_curve_top'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup>";
+            $sorted[$poid] += $a['adjusted_curve_top'];
             $ssamples++;
 
-            if (false===$maxcurvtop[$rcpid] || $a['adjusted_curve_top'] > $maxcurvtop[$rcpid]) $maxcurvtop[$rcpid] = $a['adjusted_curve_top'];
+            if (false===$maxcurvtop[$poid] || $a['adjusted_curve_top'] > $maxcurvtop[$poid]) $maxcurvtop[$poid] = $a['adjusted_curve_top'];
         }
         if (isset($a['ec50']))
         {
-            if (!isset($tblec50[$rcpid])) $tblec50[$rcpid] = "";
-            else $tblec50[$rcpid] .= ", ";
+            if (!isset($tblec50[$poid])) $tblec50[$poid] = "";
+            else $tblec50[$poid] .= ", ";
 
-            $tblec50[$rcpid] .= round($a['ec50'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup>";
+            $tblec50[$poid] .= round($a['ec50'], 4) . " <sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup>";
             if (!isset($a['adjusted_curve_top']) || floatval($a['adjusted_curve_top']) > 0)
             {
-              $sorted[$rcpid] -= $a['ec50']*2;
+              $sorted[$poid] -= $a['ec50']*2;
               $ssamples++;
             }
 
-            if (false===$minec50[$rcpid] || $a['ec50'] < $minec50[$rcpid]) $minec50[$rcpid] = $a['ec50'];
+            if (false===$minec50[$poid] || $a['ec50'] < $minec50[$poid]) $minec50[$poid] = $a['ec50'];
         }
-        if ($ssamples) $sorted[$rcpid] /= $ssamples;
+        if ($ssamples) $sorted[$poid] /= $ssamples;
     }
     $refno++;
 
@@ -264,6 +265,7 @@ arsort($sorted);
 
 foreach (array_keys($sorted) as $rcpid)
 {
+    $poid = find_poid($rcpid);
     echo "<tr>\n";
     echo "<td><a href=\"receptor.php?r=$rcpid\">$rcpid</a></td>\n";
 
@@ -280,26 +282,26 @@ foreach (array_keys($sorted) as $rcpid)
 
     if (@$agonist[$rcpid])
     {
-        if (@$prots[$rcpid]['hypothesized'])
+        if (@$prots[$poid]['hypothesized'])
         {
-            if (@$prots[$rcpid]['hypoth_ref'])
+            if (@$prots[$poid]['hypoth_ref'])
             {
-                $idx = array_search($prots[$rcpid]['hypoth_ref'], $lrefs);
+                $idx = array_search($prots[$poid]['hypoth_ref'], $lrefs);
                 if (false===$idx)
                 {
-                    $lrefs[] = $prots[$rcpid]['hypoth_ref'];
+                    $lrefs[] = $prots[$poid]['hypoth_ref'];
                     $idx = count($lrefs)-1;
                 }
-                echo "<td style=\"white-space: nowrap;\">{$prots[$rcpid]['hypothesized']}";
+                echo "<td style=\"white-space: nowrap;\">{$prots[$poid]['hypothesized']}";
                 $refno = $idx + 1;
                 echo "<sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup><br>";
                 echo "</td>\n";
             }
-            else echo "<td style=\"white-space: nowrap;\">{$prots[$rcpid]['hypothesized']}</td>\n";
+            else echo "<td style=\"white-space: nowrap;\">{$prots[$poid]['hypothesized']}</td>\n";
         }
         else echo "<td>&nbsp;</td>\n";
 
-        $notes = substr(get_notes_for_receptor($rcpid, $correlations), 0, 123);
+        $notes = substr(get_notes_for_receptor($poid, $correlations), 0, 123);
         if (substr($notes, 0, 1) == '(')
         {
             $notes = "<i class=\"dim\">$notes</i>";

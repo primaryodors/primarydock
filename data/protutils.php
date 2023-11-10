@@ -7,6 +7,14 @@
 
 global $prots, $aminos;
 
+function find_poid($id)
+{
+	global $prots;
+	if (isset($prots[$id])) return $id;
+	foreach ($prots as $k => $p) if ($p['id'] == $id) return $k;
+	return false;
+}
+
 function find_prot($id)
 {
 	global $prots;

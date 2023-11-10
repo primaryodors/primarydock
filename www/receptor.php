@@ -310,9 +310,9 @@ $pofam = family_from_protid($poid);
 if (substr($pofam, 0, 2) == "PO")
 {
     echo "Olfactory receptor ";
-    $fmn = intval(preg_replace("/[^0-9]/", "", $fam));
+    $fmn = intval(preg_replace("/[^0-9]/", "", $pofam));
     echo "<a href=\"receptors.php?f=sPO$fmn\">trunk $fmn</a>, ";
-    $sub = preg_replace("/[^A-Z]/", "", substr($poid, strlen($fam)) );
+    $sub = preg_replace("/[^A-Z]/", "", substr($poid, strlen($pofam)) );
     echo "<a href=\"receptors.php?f=sPO$fmn$sub\">branch $sub</a>, ";
     $mbr = intval(preg_replace("/[^0-9]/", "", substr($poid, strlen($fam)) ));
     echo "member $mbr";

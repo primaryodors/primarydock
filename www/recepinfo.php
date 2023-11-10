@@ -10,9 +10,9 @@ require_once("../data/protutils.php");
 
 $protid = @$_REQUEST['recep'];
 
-if (!isset($prots[$protid])) die("$protid not found.");
-
-$rcp = $prots[$protid];
+$rcp = find_prot($protid);
+if (!$rcp) die("$protid not found.");
+$protid = $rcp['id'];
 echo "id={$rcp['id']}|";
 echo "id={$rcp['uniprot_id']}|";
 echo "id={$rcp['sequence']}|";

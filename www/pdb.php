@@ -9,14 +9,14 @@ chdir(__DIR__);
 require_once("../data/protutils.php");
 
 $protid = @$_REQUEST['p'];
-if (!$protid || !isset($prots[$protid]) )
+$prot = find_prot($protid);
+if (!$protid || !$prot)
 {
     header("Location: receptors.php");
     exit;
 }
 
-$prot = $prots[$prot];
-
+$protid = $prot['id'];
 $fam = family_from_protid($protid);
 
 chdir(__DIR__);

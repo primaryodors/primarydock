@@ -7,6 +7,14 @@
 
 global $prots, $aminos;
 
+function find_prot($id)
+{
+	global $prots;
+	if (isset($prots[$id])) return $prots[$id];
+	foreach ($prots as $p) if ($p['id'] == $id) return $p;
+	return false;
+}
+
 function bw_insdel($prot, $tmrno, $offset)
 {
 	$insdel = 0;
@@ -43,15 +51,17 @@ function bw_insdel($prot, $tmrno, $offset)
 function resno_from_bw($protid, $bw)
 {
 	global $prots;
-	if (!isset($prots[$protid])) die("Protein not found: $protid.\n");
+	$prot = find_prot($protid);
+	if (!$prot) die("Protein not found: $protid.\n");
+	$protid = $prot['id'];
 	
 	$pettia = explode(".", $bw);
 	$tmrno = intval($pettia[0]);
 	$offset = intval($pettia[1]);
 
-	$insdel = bw_insdel($prots[$protid], $tmrno, $offset);
+	$insdel = bw_insdel($prot, $tmrno, $offset);
 	
-	$res50 = intval(@$prots[$protid]["bw"]["$tmrno.50"]);
+	$res50 = intval(@$prot["bw"]["$tmrno.50"]);
 	if (!$res50) throw new Exception("Unknown Ballesteros-Weinstein number $bw");
 	
 	return $res50 + $offset - 50 + $insdel;
@@ -60,9 +70,9 @@ function resno_from_bw($protid, $bw)
 function bw_from_resno($protid, $resno)
 {
 	global $prots;
-	if (!isset($prots[$protid])) die("Protein not found: $protid.\n");
-
-	$prot = $prots[$protid];
+	$prot = find_prot($protid);
+	if (!$prot) die("Protein not found: $protid.\n");
+	$protid = $prot['id'];
 	
 	foreach ($prot['region'] as $rgn => $se)
 	{
@@ -108,6 +118,7 @@ function bw_from_resno($protid, $resno)
 function family_from_protid($protid)
 {
 	if (substr($protid, 0, 2) == "OR") return "OR".intval(substr($protid, 2, 2));
+	else if (substr($protid, 0, 2) == "PO") return "PO".intval(substr($protid, 2, 2));
 	else return substr($protid, 0, 4);
 }
 

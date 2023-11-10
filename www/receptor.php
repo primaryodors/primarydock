@@ -301,7 +301,7 @@ function view_file(url)
 </script>
 
 <div class="tab" style="display: inline-block; margin-top: 30px;">
-    <button class="tabstatic" id="tabGene"><b><?php echo $rcpid; ?></b>:
+    <button class="tabstatic" id="tabGene"><b><?php echo $poid; ?> / <?php echo $rcpid; ?></b>:
 
 
 <?php
@@ -312,9 +312,9 @@ if (substr($pofam, 0, 2) == "PO")
     echo "Olfactory receptor ";
     $fmn = intval(preg_replace("/[^0-9]/", "", $fam));
     echo "<a href=\"receptors.php?f=sPO$fmn\">trunk $fmn</a>, ";
-    $sub = preg_replace("/[^A-Z]/", "", substr($rcpid, strlen($fam)) );
+    $sub = preg_replace("/[^A-Z]/", "", substr($poid, strlen($fam)) );
     echo "<a href=\"receptors.php?f=sPO$fmn$sub\">branch $sub</a>, ";
-    $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
+    $mbr = intval(preg_replace("/[^0-9]/", "", substr($poid, strlen($fam)) ));
     echo "member $mbr";
 }
 else if (substr($fam, 0, 2) == "OR")
@@ -368,27 +368,6 @@ else
 </div>
 
 <div id="Info" class="tabcontent">
-    <?php 
-    if (substr($rcpid,0,2) == 'OR')
-    { 
-        $substr = substr($rcpid,2);
-        $lettre = preg_replace("/[^A-Z]/", "", $substr);
-        $numero = explode($lettre, $substr);
-
-        echo "<h3>Olfactory Receptor family {$numero[0]} subfamily $lettre member {$numero[1]}.</h3>";
-    } 
-    else if (substr($rcpid,0,1) == 'TAAR')
-    { 
-        $numero = substr($rcpid,-1);
-        echo "<h3>Trace Amine Associated Receptor $numero.</h3>";
-    }
-    else if (substr($rcpid,0,1) == 'VN1R')
-    { 
-        $numero = substr($rcpid,-1);
-        echo "<h3>Vomeronasal type 1 Receptor $numero.</h3>";
-    }
-    
-    ?>
     <h3>Sequence:</h3>
     <pre id="protseq"><?php 
     $seq = $receptor['sequence']; 

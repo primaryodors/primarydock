@@ -116,7 +116,7 @@ foreach ($byrcpid as $poid => $protid)
         $echoed = 0;
     }
 
-    if (filter_prot($protid, $filter))
+    if (filter_prot($poid, $filter))
     {
         $disp = (substr($poid, 2) == substr($protid, 2)) ? $poid : "$poid ($protid)";
         echo "<a class=\"rcptile\" href=\"receptor.php?r=$poid\">$disp</a>\n";

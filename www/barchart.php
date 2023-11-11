@@ -82,15 +82,17 @@ foreach (array_keys($prots) as $x => $orid)
         switch ($first4)
         {
             case "OR1A":
-            imagefilledrectangle($im, $dx,0, $dx+3,$h, imagecolorallocate($im,$bkcol_tetrapod[0],$bkcol_tetrapod[1],$bkcol_tetrapod[2]));
+            case "PO14":
+            imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_tetrapod[0],$bkcol_tetrapod[1],$bkcol_tetrapod[2]));
             break;
 
             case "OR51":
-            imagefilledrectangle($im, $dx,0, $dx+3,$h, imagecolorallocate($im,$bkcol_fishlike[0],$bkcol_fishlike[1],$bkcol_fishlike[2]));
+            case "PO56":
+            imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_fishlike[0],$bkcol_fishlike[1],$bkcol_fishlike[2]));
             break;
 
             case "TAAR":
-            imagefilledrectangle($im, $dx,0, $dx+3,$h, imagecolorallocate($im,$bkcol_taar[0],$bkcol_taar[1],$bkcol_taar[2]));
+            imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_taar[0],$bkcol_taar[1],$bkcol_taar[2]));
             break;
 
             default:

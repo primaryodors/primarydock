@@ -66,9 +66,12 @@ chdir("..");
 $pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
+$protid = find_poid($protid);
+$prot = find_prot($protid);
+
 if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/ic_activate_or"))
 {
-    if ($protid == "OR51E2")
+    if ($protid == "PO51E2" || $protid == "OR51E2")
     {
         $pepd = <<<heredoc
 LOAD pdbs/OR51/OR51E2.8f76.pdb
@@ -84,7 +87,7 @@ heredoc;
         fclose($fp);
         passthru("bin/pepteditor tmp/8f76.pepd");
     }
-    else passthru("bin/ic_activate_or $protid");
+    else passthru("bin/ic_activate_or {$prot['id']}");
 }
 
 $flex_constraints = "";

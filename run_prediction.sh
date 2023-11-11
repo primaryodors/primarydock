@@ -5,7 +5,7 @@ PROT="$1"
 LIG="$2"
 
 if [ -z "$PROT" ]; then
-    PROT="OR51E2"
+    PROT="PO51E2"
 fi
 
 if [ -z "$LIG" ]; then

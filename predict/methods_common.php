@@ -1,6 +1,6 @@
 <?php
 
-global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere, $metrics_to_process;
+global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $prots, $fam, $do_scwhere, $metrics_to_process;
 
 // Includes
 chdir(__DIR__);
@@ -81,12 +81,12 @@ if (@$_REQUEST['next'])
 	
 	$protid = @$_REQUEST['prot'] ?: false;
 	$ligname = @$_REQUEST['lig'] ?: false;
+    $protid = find_poid($protid);
 	
-	foreach (array_keys($prots) as $rcpid)
+	foreach (array_keys($prots) as $poid)
 	{
-		if ($protid && $protid != $rcpid && !preg_match("/^$protid$/", $rcpid) ) continue;
-		// if (!$protid && $rcpid == 'OR1A1') continue;
-		$odorids = array_keys(all_empirical_pairs_for_receptor($rcpid));
+		if ($protid && $protid != $poid && !preg_match("/^$protid$/", $poid) ) continue;
+		$odorids = array_keys(all_empirical_pairs_for_receptor($poid));
 		// shuffle($odorids);
 
 		foreach ($odorids as $oid)
@@ -94,11 +94,11 @@ if (@$_REQUEST['next'])
 			$full_name = $odors[$oid]['full_name'];
 			$fnnospace = str_replace(" ", "_", $full_name);
 			$lignospace = str_replace(" ", "_", $full_name);
-			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
+			if ((!isset($dock_results[$poid][$full_name]) && !isset($dock_results[$poid][$fnnospace]))
                 ||
-                (   (max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version)
+                (   (max(@$dock_results[$poid][$full_name]['version'], @$dock_results[$poid][$fnnospace]['version']) < $version)
                     /*&&
-                    !max(@$dock_results[$rcpid][$full_name]['locked'], @$dock_results[$rcpid][$fnnospace]['locked'])*/
+                    !max(@$dock_results[$poid][$full_name]['locked'], @$dock_results[$poid][$fnnospace]['locked'])*/
                 )
                 )
 			{
@@ -107,7 +107,7 @@ if (@$_REQUEST['next'])
 					continue;
 				}
 				
-				$protid = $rcpid;
+				$protid = $poid;
 				$ligname = $full_name;
 				
 				goto found_next_pair;
@@ -121,8 +121,9 @@ if (@$_REQUEST['next'])
 }
 else
 {
-	$protid = @$_REQUEST['prot'] ?: "OR1A1";
+	$protid = @$_REQUEST['prot'] ?: "PO1A1";
 	$ligname = @$_REQUEST['lig'] ?: "geraniol";
+    $protid = find_poid($protid);
 }
 
 
@@ -130,7 +131,7 @@ ensure_sdf_exists($ligname);
 
 echo "Beginning dock of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);
-
+$fam1 = family_from_protid(find_prot($protid)['id']);
 
 extract(binding_site($protid));
 
@@ -138,7 +139,7 @@ $outfname = "output.dock";
 
 function prepare_outputs()
 {
-    global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname;
+    global $ligname, $dock_metals, $protid, $fam, $fam1, $outfname, $pdbfname;
     global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $atomto, $stcr, $flxr, $mcoord, $mbp;
 
     chdir(__DIR__);
@@ -152,8 +153,9 @@ function prepare_outputs()
     
     $ligname = str_replace(" ", "_", $ligname);
     $suffix = ($dock_metals) ? "metal" : "upright";
-    $pdbfname = "pdbs/$fam/$protid.$suffix.pdb";
-    if ($dock_metals && !file_exists($pdbfname)) $pdbfname = "pdbs/$fam/$protid.upright.pdb";
+    $prot = find_prot($protid);
+    $pdbfname = "pdbs/$fam1/{$prot['id']}.$suffix.pdb";
+    if ($dock_metals && !file_exists($pdbfname)) $pdbfname = "pdbs/$fam1/{$prot['id']}.upright.pdb";
     if (!file_exists($pdbfname)) die("Missing PDB.\n");
     $outfname = "output/$fam/$protid/$protid-$ligname.dock";
 
@@ -166,7 +168,11 @@ function prepare_outputs()
     
     $mbp = false;                       // Matched binding pocket.
     
-    if (isset($binding_pockets[$protid])) $mbp = $binding_pockets[$protid];
+    if (isset($binding_pockets[$protid]))
+    {
+        $mbp = $binding_pockets[$protid];
+        echo "Matched $protid.\n";
+    }
     else foreach ($binding_pockets as $pocketid => $pocket)
     {
         if (substr($pocketid, -1) == '*' && substr($pocketid, 0, -1) == substr($protid, 0, strlen($pocketid)-1))

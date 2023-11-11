@@ -184,6 +184,9 @@ function all_empirical_pairs_for_receptor($protein, $return_1dim = false, $agoni
 
 	$array = [];
 	$sortable = [];
+
+	$prot = find_prot($protein);
+	$protein = $prot['id'];
 	
 	foreach ($odors as $oid => $o)
 	{

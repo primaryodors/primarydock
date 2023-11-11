@@ -68,35 +68,60 @@ $h = 300;
 $im = imagecreatetruecolor($w, $h);
 imagefilledrectangle($im, 0,0, $w,$h, imagecolorallocate($im,$bkcolor[0],$bkcolor[1],$bkcolor[2]));
 
+$bytree = [];
+foreach ($prots as $poid => $p)
+{
+    if (!isset($p['btree'])) continue;
+    $bytree[$p['btree']] = [$poid, $p['id']];
+}
+
+ksort($bytree, SORT_STRING);
+
+foreach ($prots as $rcpid => $p)
+{
+    if (!isset($p['btree'])) $bytree[$rcpid] = [$rcpid, $rcpid];
+}
+
 $last4 = "";
 $xmax = count($prots);
 $dxmax = $xmax * $res + $xbuf/2;
-foreach (array_keys($prots) as $x => $orid)
+foreach (array_values($bytree) as $x => $ids)
 {
+    $poid = $ids[0];
     $dx  = $x * $res + $xbuf/2;
 
-    $first4 = substr($orid, 0, 4);
+    $first4 = substr($poid, 0, 4);
 
     if ($first4 != $last4)
     {
         switch ($first4)
         {
             case "OR1A":
-            case "PO14":
             imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_tetrapod[0],$bkcol_tetrapod[1],$bkcol_tetrapod[2]));
             break;
 
             case "OR51":
-            case "PO56":
             imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_fishlike[0],$bkcol_fishlike[1],$bkcol_fishlike[2]));
             break;
 
             case "TAAR":
+            case "VN1R":
+            case "MS4A":
             imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_taar[0],$bkcol_taar[1],$bkcol_taar[2]));
             break;
 
             default:
-            ;
+            $fam = family_from_protid($poid);
+            $i = intval(substr($fam, 2));
+            if (!$i) continue;
+            if ($i >= 50)
+            {
+                imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_fishlike[0],$bkcol_fishlike[1],$bkcol_fishlike[2]));
+            }
+            else
+            {
+                imagefilledrectangle($im, $dx,0, $dxmax,$h, imagecolorallocate($im,$bkcol_tetrapod[0],$bkcol_tetrapod[1],$bkcol_tetrapod[2]));
+            }
         }
     }
 
@@ -128,32 +153,32 @@ $cyan  = imagecolorallocate($im,32,80,104);
 $pink  = imagecolorallocate($im,192,176,218);
 $white = imagecolorallocate($im,240,240,240);
 
-$or1    = imagecolorallocate($im,255,255,255);
-$or2    = imagecolorallocate($im,250,192,  0);
-$or3    = imagecolorallocate($im,128,160, 96); 
-$or4    = imagecolorallocate($im, 64,  0,255);
-$or5    = imagecolorallocate($im,240,128,192);
-$or6    = imagecolorallocate($im,128,144,160); 
-$or7    = imagecolorallocate($im,255,  0,  0); 
-$or8    = imagecolorallocate($im,255,128,  0); 
-$or9    = imagecolorallocate($im, 64, 32,  0);
-$or10   = imagecolorallocate($im,160, 96, 64); 
-$or11   = imagecolorallocate($im,  0,255,255);
-$or12   = imagecolorallocate($im,255,255,  0);
-$or13   = imagecolorallocate($im,160,255,128);
-$or14   = imagecolorallocate($im,128,144,255);
-$or16   = imagecolorallocate($im,158,174,190); 
-$or17   = imagecolorallocate($im,255,128,128); 
-$or18   = imagecolorallocate($im,255,192,128); 
-$or19   = imagecolorallocate($im, 96, 80, 76);
-$or21   = imagecolorallocate($im,250,160,  0);
-$or22   = imagecolorallocate($im,250,208,  0);
-$or23   = imagecolorallocate($im,240,255,  0);
-$or51   = imagecolorallocate($im,255,255,192);
-$or52   = imagecolorallocate($im,192,  0,224);
-$or56   = imagecolorallocate($im,  0,128,  0);
-$or58   = imagecolorallocate($im,128,128,  0);
-$or59   = imagecolorallocate($im,160,128,  0);
+$po1    = imagecolorallocate($im,255,255,255);
+$po2    = imagecolorallocate($im,250,192,  0);
+$po3    = imagecolorallocate($im,128,160, 96); 
+$po4    = imagecolorallocate($im, 64,  0,255);
+$po5    = imagecolorallocate($im,240,128,192);
+$po6    = imagecolorallocate($im,128,144,160); 
+$po7    = imagecolorallocate($im,255,  0,  0); 
+$po8    = imagecolorallocate($im,255,128,  0); 
+$po9    = imagecolorallocate($im, 64, 32,  0);
+$po10   = imagecolorallocate($im,160,176,192); 
+$po11   = imagecolorallocate($im,  0,255,255);
+$po12   = imagecolorallocate($im,255,255,  0);
+$po13   = imagecolorallocate($im,160,255,128);
+$po14   = imagecolorallocate($im,128,144,255);
+$po16   = imagecolorallocate($im,158,174,190); 
+$po17   = imagecolorallocate($im,255,128,128); 
+$po18   = imagecolorallocate($im,255,192,128); 
+$po19   = imagecolorallocate($im,192, 96, 64);
+$po21   = imagecolorallocate($im,250,160,  0);
+$po22   = imagecolorallocate($im,250,208,  0);
+$po23   = imagecolorallocate($im,240,255,  0);
+$po51   = imagecolorallocate($im,255,255,192);
+$po52   = imagecolorallocate($im,192,  0,224);
+$po56   = imagecolorallocate($im,  0,128,  0);
+$po58   = imagecolorallocate($im,128,128,  0);
+$po59   = imagecolorallocate($im,160,128,  0);
 $taar   = imagecolorallocate($im,  0,  0,160);
 $vn1r   = imagecolorallocate($im,255,240,224);
 $ms4a   = imagecolorallocate($im, 64,128,255);
@@ -188,30 +213,19 @@ for ($ec = floor($maxe); $ec >= ceil($mine); $ec -= 1)
     imagestring($im, 3, 2,$dy-8, $ec, $green);
 }
 
-$bytree = [];
-foreach ($prots as $rcpid => $p)
-{
-    if (!isset($p['btree'])) continue;
-    $bytree[$p['btree']] = $p['id'];
-}
 
-ksort($bytree, SORT_STRING);
-
-foreach ($prots as $rcpid => $p)
-{
-    if (!isset($p['btree'])) $bytree[$rcpid] = $rcpid;
-}
 
 // foreach (array_keys($prots) as $x => $orid)
-foreach (array_values($bytree) as $x => $orid)
+foreach (array_values($bytree) as $x => $ids)
 {
-    $poid = find_poid($orid);
+    $poid = $ids[0];
+    $orid = $ids[1];
     $rcpcol = $white;
     switch (substr($poid,0,2))
     {
         case 'OR':
         case 'PO':
-        $bcol = 'or'.intval(preg_replace("/[^0-9]/","",substr($poid,2,2)));
+        $bcol = 'po'.intval(preg_replace("/[^0-9]/","",substr($poid,2,2)));
         $bcol = $$bcol;
         break;
         

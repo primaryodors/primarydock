@@ -1849,7 +1849,7 @@ float Protein::reconnect(int startres, int endres)
     float best_score[reconnect_keepbest];
     float anomaly;
 
-    int ikept, icand, ires, jres;
+    int ikept, icand, ires, i, j, l;
     int working_candidate[length+1];
 
     Point should_be_at[4];
@@ -1873,6 +1873,12 @@ float Protein::reconnect(int startres, int endres)
 
     for (gen=0; gen<reconnect_generations; gen++)
     {
+        cout << "gen " << gen << ": ";
+        for (ikept=0; ikept < reconnect_keepbest; ikept++)
+        {
+            best_score[ikept] = -1;
+        }
+
         // TODO: try every possible combination of starting phi,psi angles +/- the angle variable.
         for (ikept=0; ikept < (gen ? reconnect_keepbest : 1); ikept++)
         {
@@ -1895,8 +1901,12 @@ float Protein::reconnect(int startres, int endres)
                         cout << "Attempt to reconnect discontinuous strand." << endl;
                         throw 0xb5712a9d;
                     }
-                    candidates[ikept][icand][ires] = 
-                        ((ires & 0x1) ? aa->get_psi() : aa->get_phi())      // TODO: Persist previous best candidates.
+                    candidates[ikept][icand][ires] =
+                        (
+                            gen
+                            ? best_candidates[ikept][ires]                      // Persist previous best candidates.
+                            : ((ires & 0x1) ? aa->get_psi() : aa->get_phi())
+                        )
                         + angle * working_candidate[ires];
 
                     cout << candidates[ikept][icand][ires]*fiftyseven << " ";
@@ -1917,9 +1927,23 @@ float Protein::reconnect(int startres, int endres)
                 
                 cout << anomaly;
 
-                cout << endl;
+                // Keep the best reconnect_keepbest from each generation.
+                for (i=0; i < reconnect_keepbest; i++)
+                {
+                    if (best_score[i] < 0 || best_score[i] > anomaly)
+                    {
+                        for (j=reconnect_keepbest-2; j>=i; j--)
+                        {
+                            best_score[j+1] = best_score[j];
+                            for (l=0; l<length; l++) best_candidates[j+1][l] = best_candidates[j][l];
+                        }
 
-                // TODO: Keep the best reconnect_keepbest from each generation and retry.
+                        best_score[i] = anomaly;
+                        for (l=0; l<length; l++) best_candidates[j][l] = candidates[ikept][icand][l];
+                    }
+                }
+
+                cout << endl;
             }
         }
 

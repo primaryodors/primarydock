@@ -1823,19 +1823,47 @@ float Protein::reconnect(int startres, int endres)
         cout << "Attempt to reconnect strand in excess of length limit." << endl;
         throw 0xb5712a9d;
     }
-    int connres = (startres > endres) ? (endres - 1) : (endres + 1);
+    int dir = sgn(endres - startres);
+    int connres = (dir<0) ? (endres - 1) : (endres + 1);
     float angle = triangular;
     int gen;
-    int max_candidates = pow(3, length) * reconnect_keepbest;
+    int max_candidates = pow(3, length);
     float candidates[reconnect_keepbest][max_candidates+1][length+1];
     float best_candidates[reconnect_keepbest][length+1];
     float best_score[reconnect_keepbest];
 
+    int ikept, icand, ires, jres;
+    int working_candidate[length+1];
+
     for (gen=0; gen<reconnect_generations; gen++)
     {
         // TODO: try every possible combination of starting phi,psi angles +/- the angle variable.
-        // Keep the best reconnect_keepbest from each generation and retry.
-        // Score each candidate's anomaly using distance_to_connres + reconnect_angle_importance * anomaly_angle.
+        for (ikept=0; ikept < (gen ? reconnect_keepbest : 1); ikept++)
+        {
+            for (ires = 0; ires < length; ires++) working_candidate[ires] = -1;
+            for (icand = 0; icand < max_candidates; icand++)
+            {
+                for (ires = 0; ires < length; ires++)
+                {
+                    working_candidate[ires]++;
+                    if (working_candidate[ires] > 1) working_candidate[ires] = -1;
+                    else break;
+                }
+
+                for (ires = 0; ires < length; ires++)
+                {
+                    int resno = startres + dir*(ires>>1);
+                    candidates[ikept][icand][ires] = 
+                        ((ires & 0x1) ? get_residue(resno)->get_psi() : get_residue(resno)->get_phi())
+                        + angle * working_candidate[ires];
+
+                    // TODO: Rotate and score the backbone.
+                    // Score each candidate's anomaly using distance_to_connres + reconnect_angle_importance * anomaly_angle.
+                }
+
+                // TODO: Keep the best reconnect_keepbest from each generation and retry.
+            }
+        }
 
         angle /= 2;
     }

@@ -1817,8 +1817,8 @@ void Protein::conform_backbone(int startres, int endres,
 
 float Protein::reconnect(int startres, int endres)
 {
-    int length = abs(endres - startres) + 1;
-    if (length > reconnect_length_limit)
+    int strandlength = abs(endres - startres) + 1, length = strandlength*2;
+    if (strandlength > reconnect_length_limit)
     {
         cout << "Attempt to reconnect strand in excess of length limit." << endl;
         throw 0xb5712a9d;
@@ -1841,6 +1841,7 @@ float Protein::reconnect(int startres, int endres)
         throw 0xb5712a9d;
     }
 
+    char working_candidate[length+1];
     float angle = triangular;
     int gen;
     int max_candidates = pow(3, length);
@@ -1850,7 +1851,6 @@ float Protein::reconnect(int startres, int endres)
     float anomaly;
 
     int ikept, icand, ires, i, j, l;
-    int working_candidate[length+1];
 
     Point should_be_at[4];
     Atom* is_at[4];
@@ -1873,7 +1873,6 @@ float Protein::reconnect(int startres, int endres)
 
     for (gen=0; gen<reconnect_generations; gen++)
     {
-        cout << "gen " << gen << ": ";
         for (ikept=0; ikept < reconnect_keepbest; ikept++)
         {
             best_score[ikept] = -1;
@@ -1885,12 +1884,7 @@ float Protein::reconnect(int startres, int endres)
             for (ires = 0; ires < length; ires++) working_candidate[ires] = -1;
             for (icand = 0; icand < max_candidates; icand++)
             {
-                for (ires = 0; ires < length; ires++)
-                {
-                    working_candidate[ires]++;
-                    if (working_candidate[ires] > 1) working_candidate[ires] = -1;
-                    else break;
-                }
+                cout << "gen " << gen << " kept " << ikept << " iter " << icand << " ";
 
                 for (ires = 0; ires < length; ires++)
                 {
@@ -1901,6 +1895,7 @@ float Protein::reconnect(int startres, int endres)
                         cout << "Attempt to reconnect discontinuous strand." << endl;
                         throw 0xb5712a9d;
                     }
+
                     candidates[ikept][icand][ires] =
                         (
                             gen
@@ -1942,10 +1937,24 @@ float Protein::reconnect(int startres, int endres)
                         for (l=0; l<length; l++) best_candidates[j][l] = candidates[ikept][icand][l];
                     }
                 }
+                
+                for (ires = 0; ires < length; ires++)
+                {
+                    working_candidate[ires]++;
+                    if (working_candidate[ires] > 1) working_candidate[ires] = -1;
+                    else break;
+                }
 
                 cout << endl;
             }
         }
+
+        cout << endl << "Best from generation:" << endl;
+        for (i=0; i < reconnect_keepbest; i++)
+        {
+            cout << i+1 << ": " << best_score[i] << endl;
+        }
+        cout << endl;
 
         angle /= 2;
     }

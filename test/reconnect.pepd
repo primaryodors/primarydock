@@ -5,4 +5,4 @@ LET @axis = @5.50 - @6.48
 ECHO @axis
 
 ROTATE @axis -15 %6.48 %6.28 %6.59
-CONNECT %6.63 %6.59
+CONNECT %6.61 %6.59

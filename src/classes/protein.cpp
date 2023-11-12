@@ -1954,7 +1954,9 @@ float Protein::reconnect(int startres, int endres)
         cout << endl << "Best from generation:" << endl;
         for (i=0; i < reconnect_keepbest; i++)
         {
-            cout << i+1 << ": " << best_score[i] << endl;
+            cout << i+1 << ": ";
+            for (l=0; l<length; l++) cout << best_candidates[i][l]*fiftyseven << " ";
+            cout << "= " << best_score[i] << endl;
         }
         cout << endl;
 

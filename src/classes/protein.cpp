@@ -1854,12 +1854,15 @@ float Protein::reconnect(int startres, int endres)
                 {
                     int resno = startres + dir*(ires>>1);
                     candidates[ikept][icand][ires] = 
-                        ((ires & 0x1) ? get_residue(resno)->get_psi() : get_residue(resno)->get_phi())
+                        ((ires & 0x1) ? get_residue(resno)->get_psi() : get_residue(resno)->get_phi())      // TODO: Persist previous best candidates.
                         + angle * working_candidate[ires];
+
+                    cout << candidates[ikept][icand][ires]*fiftyseven << " ";
 
                     // TODO: Rotate and score the backbone.
                     // Score each candidate's anomaly using distance_to_connres + reconnect_angle_importance * anomaly_angle.
                 }
+                cout << endl;
 
                 // TODO: Keep the best reconnect_keepbest from each generation and retry.
             }

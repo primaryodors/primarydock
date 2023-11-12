@@ -1073,10 +1073,10 @@ int main(int argc, char** argv)
                 sr = interpret_single_int(words[l++]);
                 if (!words[l]) raise_error("Insufficient parameters given for CONNECT.");
                 ct = interpret_single_int(words[l++]);
-                if (words[l]) iters = interpret_single_int(words[l++]);
+                // if (words[l]) iters = interpret_single_int(words[l++]);
                 if (words[l]) raise_error("Too many parameters given for CONNECT.");
                 er = ct - sgn(ct-sr);
-
+/*
                 Atom *a1, *a2, *a3;
                 AminoAcid *cta = working->get_residue(ct), *era = working->get_residue(er);
 
@@ -1099,7 +1099,9 @@ int main(int argc, char** argv)
                 a3 = era->get_atom("CA");
 
                 working->conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
-                working->backconnect(sr, er);
+                working->backconnect(sr, er);*/
+
+                working->reconnect(sr, er);
 
             _no_connect:
                 goto _pc_continue;

@@ -1815,168 +1815,34 @@ void Protein::conform_backbone(int startres, int endres,
     mass_undoable = wmu;
 }
 
-#define DBG_BCKCONN 0
-#define _INCREMENTAL_BKCONN 1
-void Protein::backconnect(int startres, int endres)
+float Protein::reconnect(int startres, int endres)
 {
-    save_undo_state();
-    bool wmu = mass_undoable;
-    mass_undoable = true;
-
-    int i;
-    int inc = sgn(endres-startres);
-
-    #if _INCREMENTAL_BKCONN
-    int iter;
-    for (iter=24; iter>=0; iter--)
+    int length = abs(endres - startres) + 1;
+    if (length > reconnect_length_limit)
     {
-    #endif
-
-        // Glue the last residue onto the target.
-        // Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
-        // Then do the same for the previous residue, and the one before, etc,
-        // all the way back to the starting residue.
-        // Give a warning if the starting residue has an anomaly > 0.1A.
-        AminoAcid *next, *curr, *prev;
-        int pointer = endres;
-        float movfactor = 1, decrement, anomaly = 0;
-
-        decrement = 1.0 / fabs(endres - startres);		// if exterior is the opposite of interior, what's the opposite of increment?
-
-        next = get_residue(endres+inc);
-        curr = get_residue(pointer);
-        prev = get_residue(pointer-inc);
-
-        #if DBG_BCKCONN
-        cout << "backconnect( " << startres << ", " << endres << ")" << endl;
-        #endif
-        while (next && curr)
-        {
-            #if DBG_BCKCONN
-            cout << pointer << ":";
-            #endif
-
-            Point pts[4];
-            (inc > 0) ? next->predict_previous_COCA(pts) : next->predict_next_NHCA(pts);
-            Point ptsc[4];
-
-            #if _INCREMENTAL_BKCONN
-            ptsc[0] = (inc > 0) ? curr->get_atom_location("C") : curr->get_atom_location("N");
-            ptsc[1] = (inc > 0) ? curr->get_atom_location("O") : curr->HN_or_substitute_location();
-            ptsc[2] = curr->get_atom_location("CA");
-
-            Point _4avg[3];
-            for (i=0; i<3; i++)
-            {
-                _4avg[0] = pts[i];
-                _4avg[1] = ptsc[i];
-                _4avg[0].weight = movfactor;
-                _4avg[1].weight = 1.0 - movfactor;
-                pts[i] = average_of_points(_4avg, 2);
-            }
-            #endif
-
-            curr->attach_to_prediction(pts, inc > 0);
-            // break;
-
-            #if DBG_BCKCONN
-            cout << "g";
-            #endif
-
-            if (prev)
-            {
-                MovabilityType fmov = curr->movability;
-                curr->movability = MOV_ALL;
-
-                #if DBG_BCKCONN
-                cout << "a";
-                #endif
-
-                pts[4];
-                (inc < 0) ? prev->predict_previous_COCA(pts) : prev->predict_next_NHCA(pts);
-                Point target_heavy = pts[0];
-                Point target_pole = pts[1];
-
-                #if DBG_BCKCONN
-                cout << "b";
-                #endif
-
-                float theta, step = fiftyseventh*1.0, r, btheta = 0, bestr;
-                for (theta=0; theta < M_PI*2; theta += step)
-                {
-                    r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
-                    // r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
-                    if (inc > 0) r -= target_pole.get_3d_distance(curr->HN_or_substitute_location());
-
-                    if (!theta || (r < bestr))
-                    {
-                        bestr = r;
-                        btheta = theta;
-                    }
-
-                    curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc, step );
-                }
-                curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc, btheta );
-
-                #if DBG_BCKCONN
-                cout << "c";
-                #endif
-
-                btheta=0;
-                for (theta=0; theta < M_PI*2; theta += step)
-                {
-                    r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
-                    // r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
-                    if (inc < 0) r -= target_pole.get_3d_distance(curr->get_atom_location("O"));
-
-                    if (!theta || (r < bestr))
-                    {
-                        bestr = r;
-                        btheta = theta;
-                    }
-
-                    curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc, step );
-                }
-                curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc, btheta );
-                anomaly = bestr;
-
-                #if DBG_BCKCONN
-                cout << "d";
-                #endif
-
-                curr->movability = fmov;
-            }
-
-            if (pointer == startres)
-            {
-                #if DBG_BCKCONN
-                cout << ". ";
-                #endif
-                break;
-            }
-
-            pointer -= inc;
-            next = curr;
-            curr = prev;
-            prev = get_residue(pointer-inc);
-            movfactor -= decrement;
-
-            #if DBG_BCKCONN
-            cout << ", ";
-            #endif
-        };
-
-        #if DBG_BCKCONN
-        cout << endl;
-        #endif
-
-        /*if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
-        						<< "# " << (startres-inc) << " anomaly: " << anomaly << endl;*/
-        #if _INCREMENTAL_BKCONN
+        cout << "Attempt to reconnect strand in excess of length limit." << endl;
+        throw 0xb5712a9d;
     }
-        #endif
+    int connres = (startres > endres) ? (endres - 1) : (endres + 1);
+    float angle = triangular;
+    int gen;
+    int max_candidates = pow(3, length) * reconnect_keepbest;
+    float candidates[reconnect_keepbest][max_candidates+1][length+1];
+    float best_candidates[reconnect_keepbest][length+1];
+    float best_score[reconnect_keepbest];
 
-    mass_undoable = wmu;
+    for (gen=0; gen<reconnect_generations; gen++)
+    {
+        // TODO: try every possible combination of starting phi,psi angles +/- the angle variable.
+        // Keep the best reconnect_keepbest from each generation and retry.
+        // Score each candidate's anomaly using distance_to_connres + reconnect_angle_importance * anomaly_angle.
+
+        angle /= 2;
+    }
+
+    // TODO: Use the best candidate and trial-and-error it onto connres.
+
+    // TODO: Return the anomaly.
 }
 
 void Protein::make_helix(int startres, int endres, float phi, float psi)

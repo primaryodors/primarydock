@@ -318,6 +318,11 @@
 #define homology_long_axis_rotations 0
 #define homology_region_optimization 0
 
+#define reconnect_length_limit 5
+#define reconnect_generations 8
+#define reconnect_keepbest 4
+#define reconnect_angle_importance 0.1
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 // Debugging stuff.

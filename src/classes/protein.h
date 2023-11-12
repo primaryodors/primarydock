@@ -155,7 +155,7 @@ public:
                           int iters, bool backbone_atoms_only
                          );
 
-    void backconnect(int startres, int endres);
+    float reconnect(int startres, int endres);
     void find_residue_initial_bindings();
     void undo();
 

@@ -1823,17 +1823,53 @@ float Protein::reconnect(int startres, int endres)
         cout << "Attempt to reconnect strand in excess of length limit." << endl;
         throw 0xb5712a9d;
     }
-    int dir = sgn(endres - startres);
+
+    int dir = sgn(endres - startres); if (!dir) dir = 1;
+
     int connres = (dir<0) ? (endres - 1) : (endres + 1);
+    AminoAcid* connaa = get_residue(connres);
+    if (!connaa)
+    {
+        cout << "Attempt to reconnect strand to nonexistent target." << endl;
+        throw 0xb5712a9d;
+    }
+
+    AminoAcid* endaa = get_residue(endres);
+    if (!endaa)
+    {
+        cout << "Attempt to reconnect discontinuous strand." << endl;
+        throw 0xb5712a9d;
+    }
+
     float angle = triangular;
     int gen;
     int max_candidates = pow(3, length);
     float candidates[reconnect_keepbest][max_candidates+1][length+1];
     float best_candidates[reconnect_keepbest][length+1];
     float best_score[reconnect_keepbest];
+    float anomaly;
 
     int ikept, icand, ires, jres;
     int working_candidate[length+1];
+
+    Point should_be_at[4];
+    Atom* is_at[4];
+    if (dir > 0)
+    {
+        connaa->predict_previous_COCA(should_be_at);
+        is_at[0] = endaa->get_atom("C");
+        is_at[1] = endaa->get_atom("O");
+        is_at[2] = endaa->get_atom("CA");
+        is_at[3] = nullptr;
+    }
+    else
+    {
+        connaa->predict_next_NHCA(should_be_at);
+        is_at[0] = endaa->get_atom("N");
+        is_at[1] = endaa->HN_or_substitute();
+        is_at[2] = endaa->get_atom("CA");
+        is_at[3] = nullptr;
+    }
 
     for (gen=0; gen<reconnect_generations; gen++)
     {
@@ -1853,15 +1889,34 @@ float Protein::reconnect(int startres, int endres)
                 for (ires = 0; ires < length; ires++)
                 {
                     int resno = startres + dir*(ires>>1);
+                    AminoAcid* aa = get_residue(resno);
+                    if (!aa)
+                    {
+                        cout << "Attempt to reconnect discontinuous strand." << endl;
+                        throw 0xb5712a9d;
+                    }
                     candidates[ikept][icand][ires] = 
-                        ((ires & 0x1) ? get_residue(resno)->get_psi() : get_residue(resno)->get_phi())      // TODO: Persist previous best candidates.
+                        ((ires & 0x1) ? aa->get_psi() : aa->get_phi())      // TODO: Persist previous best candidates.
                         + angle * working_candidate[ires];
 
                     cout << candidates[ikept][icand][ires]*fiftyseven << " ";
 
-                    // TODO: Rotate and score the backbone.
-                    // Score each candidate's anomaly using distance_to_connres + reconnect_angle_importance * anomaly_angle.
+                    // Rotate the backbone.
+                    MovabilityType was_mov = aa->movability;
+                    aa->movability = MOV_ALL;
+                    if (ires & 0x1) rotate_backbone_partial(startres, endres, (dir>0) ? CA_asc : C_desc, candidates[ikept][icand][ires] - aa->get_psi());
+                    else rotate_backbone_partial(startres, endres, (dir>0) ? N_asc : CA_desc, candidates[ikept][icand][ires] - aa->get_phi());
+                    aa->movability = was_mov;
                 }
+
+                // TODO: Score the candidate's anomaly using distance_to_connres + reconnect_angle_importance * anomaly_angle.
+                anomaly = is_at[0]->get_location().get_3d_distance(should_be_at[0])
+                    + reconnect_angle_importance * is_at[1]->get_location().get_3d_distance(should_be_at[1])
+                    + reconnect_angle_importance * is_at[2]->get_location().get_3d_distance(should_be_at[2])
+                    ;
+                
+                cout << anomaly;
+
                 cout << endl;
 
                 // TODO: Keep the best reconnect_keepbest from each generation and retry.
@@ -1873,7 +1928,7 @@ float Protein::reconnect(int startres, int endres)
 
     // TODO: Use the best candidate and trial-and-error it onto connres.
 
-    // TODO: Return the anomaly.
+    return anomaly;
 }
 
 void Protein::make_helix(int startres, int endres, float phi, float psi)

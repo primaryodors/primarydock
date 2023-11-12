@@ -134,9 +134,11 @@ int main(int argc, char** argv)
     AminoAcid *aa6x53 = p.get_residue_bw("6.53");
     AminoAcid *aa6x54 = p.get_residue_bw("6.54");
     AminoAcid *aa6x55 = p.get_residue_bw("6.55");
+    AminoAcid *aa6x57 = p.get_residue_bw("6.57");
     AminoAcid *aa6x58 = p.get_residue_bw("6.58");
     AminoAcid *aa6x59 = p.get_residue_bw("6.59");
     AminoAcid *aa7x31 = p.get_residue_bw("7.31");
+    AminoAcid *aa7x34 = p.get_residue_bw("7.34");
     AminoAcid *aa7x37 = p.get_residue_bw("7.37");
     AminoAcid *aa7x41 = p.get_residue_bw("7.41");
     AminoAcid *aa7x42 = p.get_residue_bw("7.42");
@@ -162,12 +164,14 @@ int main(int argc, char** argv)
     int n4x64 = aa4x64->get_residue_no();
     int n45x51 = aa45x51->get_residue_no();
     int n5x33 = aa5x33->get_residue_no();
+    int n5x39 = aa5x39->get_residue_no();
     int n5x50 = aa5x50->get_residue_no();
     int n5x68 = aa5x68->get_residue_no();
     int n56x50 = aa56x50->get_residue_no();
     int n6x28 = aa6x28->get_residue_no();
     int n6x48 = aa6x48->get_residue_no();
     int n6x55 = aa6x55->get_residue_no();
+    int n6x57 = aa6x57->get_residue_no();
     int n6x58 = aa6x58->get_residue_no();
     int n6x59 = aa6x59->get_residue_no();
     int n7x31 = aa7x31->get_residue_no();
@@ -180,15 +184,19 @@ int main(int argc, char** argv)
     char l3x40 = aa3x40->get_letter();
     char l4x52 = aa4x52->get_letter();
     char l4x56 = aa4x56->get_letter();
+    char l4x60 = aa4x60->get_letter();
     char l45x51 = aa45x51->get_letter();
     char l45x52 = aa45x52->get_letter();
     char l45x53 = aa45x53->get_letter();
+    char l5x39 = aa5x39->get_letter();
     char l5x50 = aa5x50->get_letter();
     char l5x58 = aa5x58->get_letter();
     char l6x48 = aa6x48->get_letter();
     char l6x55 = aa6x55->get_letter();
+    char l6x57 = aa6x57->get_letter();
     char l6x58 = aa6x58->get_letter();
     char l6x59 = aa6x59->get_letter();
+    char l7x34 = aa7x34->get_letter();
     char l7x41 = aa7x41->get_letter();
     char l7x53 = aa7x53->get_letter();
 
@@ -218,6 +226,7 @@ int main(int argc, char** argv)
     Bond* b;
     bool bcr;
     bool stiff6x55 = false;
+    bool or6abpy = false;
 
     LocatedVector axis1, axis2, axis3, axis4, axis5, axis6, axis7;
     float theta;
@@ -237,6 +246,11 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////////
     // Receptor-specific fixes.
     ////////////////////////////////////////////////////////////////////////////////
+
+    if (l4x60 == 'K' && l5x39 == 'D' && (l6x57 == 'R' || l6x57 == 'K') && (l7x34 == 'N' || l7x34 == 'Q'))
+    {
+        or6abpy = true;
+    }
 
     if (l6x55 == 'D' || l6x55 == 'E' || l6x55 == 'R' || l6x55 == 'K')          // OR1G1 is an example.
     {
@@ -348,7 +362,7 @@ int main(int argc, char** argv)
         float r = aa6x55->get_atom("OH")->distance_to(aa45x51->get_nearest_atom(aa6x55->get_atom_location("HH")));
         aa6x55->conform_atom_to_location(aa6x55->get_reach_atom()->name, Point(0,10000,0));
 
-        if (r <= 3)
+        if (false) // r <= 3)
         {
             if (l6x48 == 'Y' && (l3x40 == 'S' || l3x40 == 'T' && l3x40 == 'N' || l3x40 == 'Q' || l3x40 == 'E' || l3x40 == 'D'))
             {
@@ -691,7 +705,7 @@ int main(int argc, char** argv)
         // Compute the angle to rotate about 6.48 and perform the rotation. Measure how far 56.50 moved; call it TMR6c.
         was = aa56x50->get_CA_location();
         p.rotate_piece(n56x50,
-            (type6 == Swing6) ? n6x55 : n6x59,
+            (type6 == Swing6) ? (or6abpy ? n6x57 : n6x55) : n6x59,
             ((type6 == Swing6) ? aa6x55 : aa6x48)->get_CA_location(),
             axis6, theta6);
         cout << "TMR6 rotation about " << *((type6 == Swing6) ? aa6x55 : aa6x48) << " by " << (theta6*fiftyseven) << "deg." << endl;
@@ -784,6 +798,13 @@ int main(int argc, char** argv)
 
         aa6x55->movability = aa45x51->movability = MOV_PINNED;
         cout << "Bridged 6.55 and 45.51." << endl;
+    }
+
+    if (or6abpy)
+    {
+        aa5x39->movability = aa6x57->movability = MOV_FLEXONLY;
+        p.bridge(n5x39, n6x57);
+        aa5x39->movability = aa6x57->movability = MOV_PINNED;
     }
 
 

@@ -1935,6 +1935,8 @@ float Protein::reconnect(int startres, int endres)
 
                         best_score[i] = anomaly;
                         for (l=0; l<length; l++) best_candidates[j][l] = candidates[ikept][icand][l];
+
+                        break;
                     }
                 }
                 

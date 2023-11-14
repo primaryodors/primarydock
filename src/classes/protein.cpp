@@ -1554,7 +1554,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
     }
 }
 
-void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, float angle)
+void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, float angle, bool bbao)
 {
     save_undo_state();
     if (startres == endres) return;
@@ -1568,8 +1568,50 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
 
     AminoAcid* bendy = get_residue(startres);
     if (!bendy) return;
-    LocatedVector lv = bendy->rotate_backbone(dir, angle);
-    bendy->ensure_pi_atoms_coplanar();
+    LocatedVector lv;
+    if (bbao)
+    {
+        Atom *N = bendy->get_atom("N"), *H = bendy->HN_or_substitute(), *CA = bendy->get_atom("CA"), *C = bendy->get_atom("C"), *O = bendy->get_atom("O");
+        Bond* b;
+        switch(dir)
+        {
+            case N_asc:
+            b = N->get_bond_between(CA);
+            lv = (SCoord)CA->get_location().subtract(N->get_location());
+            lv.origin = N->get_location();
+            b->rotate(angle, true, true);
+            break;
+
+            case CA_desc:
+            b = CA->get_bond_between(N);
+            lv = (SCoord)CA->get_location().subtract(N->get_location());
+            lv.origin = CA->get_location();
+            b->rotate(angle, true, true);
+            break;
+
+            case CA_asc:
+            b = CA->get_bond_between(C);
+            lv = (SCoord)CA->get_location().subtract(C->get_location());
+            lv.origin = CA->get_location();
+            b->rotate(angle, true, true);
+            break;
+
+            case C_desc:
+            b = C->get_bond_between(CA);
+            lv = (SCoord)C->get_location().subtract(CA->get_location());
+            lv.origin = C->get_location();
+            b->rotate(angle, true, true);
+            break;
+
+            default:
+            ;
+        }
+    }
+    else
+    {
+        lv = bendy->rotate_backbone(dir, angle);
+        bendy->ensure_pi_atoms_coplanar();
+    }
 
     if (lv.r)
     {
@@ -1579,12 +1621,12 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
         for (i=startres+inc; movable = get_residue(i); i+=inc)
         {
             movable->rotate(lv, angle);
-            movable->ensure_pi_atoms_coplanar();
+            if (!bbao) movable->ensure_pi_atoms_coplanar();
             if (i == endres) break;
         }
     }
 
-    set_clashables();
+    if (!bbao) set_clashables();
 }
 
 void Protein::conform_backbone(int startres, int endres, int iters, bool backbone_atoms_only)
@@ -1909,8 +1951,12 @@ float Protein::reconnect(int startres, int endres)
                     // Rotate the backbone.
                     MovabilityType was_mov = aa->movability;
                     aa->movability = MOV_ALL;
-                    if (ires & 0x1) rotate_backbone_partial(startres, endres, (dir>0) ? CA_asc : C_desc, candidates[ikept][icand][ires] - aa->get_psi());
-                    else rotate_backbone_partial(startres, endres, (dir>0) ? N_asc : CA_desc, candidates[ikept][icand][ires] - aa->get_phi());
+                    if (ires & 0x1) rotate_backbone_partial(resno, endres,
+                        (dir>0) ? CA_asc : C_desc,
+                        candidates[ikept][icand][ires] - aa->get_psi(), true);
+                    else rotate_backbone_partial(resno, endres,
+                        (dir>0) ? N_asc : CA_desc,
+                        candidates[ikept][icand][ires] - aa->get_phi(), true);
                     aa->movability = was_mov;
                 }
 
@@ -1964,7 +2010,24 @@ float Protein::reconnect(int startres, int endres)
     }
 
     // TODO: Use the best candidate and trial-and-error it onto connres.
+    for (ires=0; ires<length; ires++)
+    {
+        int resno = startres + dir*(ires>>1);
+        AminoAcid* aa = get_residue(resno);
 
+        // Rotate the backbone.
+        MovabilityType was_mov = aa->movability;
+        aa->movability = MOV_ALL;
+        if (ires & 0x1) rotate_backbone_partial(resno, endres,
+            (dir>0) ? CA_asc : C_desc,
+            best_candidates[0][ires] - aa->get_psi(), true);
+        else rotate_backbone_partial(resno, endres,
+            (dir>0) ? N_asc : CA_desc,
+            best_candidates[0][ires] - aa->get_phi(), true);
+        aa->movability = was_mov;
+    }
+
+    set_clashables();
     return anomaly;
 }
 

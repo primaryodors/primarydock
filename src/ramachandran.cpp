@@ -51,7 +51,12 @@ int main(int argc, char** argv)
 
     float scale = 1.0 / max;
     cout << endl << "Ramachandran plot for " << p.get_name() << endl << endl;
-    cout << "-180                                \u03c6                                +180" << endl;
+    cout << "-180";
+    for (i=0; i<32; i++) cout << " ";
+    cout << "\u03c6";
+    for (i=0; i<32; i++) cout << " ";
+    cout << "+180" << endl;
+
     for (y=0; y<36; y++)
     {
         if (y == 18)

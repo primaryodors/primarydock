@@ -21,10 +21,10 @@ int main(int argc, char** argv)
 
         if (argc > (i+1)) p.load_pdb(fp, 0, argv[i+1][0]);
         else p.load_pdb(fp);
+        p.set_name_from_pdb_name(argv[i]);
     }
     if (!fp) return -1;
 
-    p.set_name_from_pdb_name(argv[1]);
     fclose(fp);
 
     int er = p.get_end_resno();
@@ -50,10 +50,20 @@ int main(int argc, char** argv)
     }
 
     float scale = 1.0 / max;
+    cout << endl << "Ramachandran plot for " << p.get_name() << endl << endl;
+    cout << "-180                                \u03c6                                +180" << endl;
     for (y=0; y<36; y++)
     {
+        if (y == 18)
+        {
+            for (i=0; i<36; i++) cout << "\u2500";
+            cout << "\u253c";
+            for (i=0; i<36; i++) cout << "\u2500";
+            cout << " \u03c8" << endl;
+        }
         for (x=0; x<36; x++)
         {
+            if (x == 18) cout << "\u2502";
             if (show_colors)
             {
                 float value = scale * grid[x][y];
@@ -63,6 +73,8 @@ int main(int argc, char** argv)
             }
             else cout << grid[x][y] << " ";
         }
+        if (!y) cout << " +180";
+        else if (y == 35) cout << " -180";
         cout << endl;
     }
 }

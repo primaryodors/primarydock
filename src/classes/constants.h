@@ -319,8 +319,8 @@
 #define homology_region_optimization 0
 
 #define reconnect_length_limit 5
-#define reconnect_generations 8
-#define reconnect_keepbest 4
+#define reconnect_generations 10
+#define reconnect_keepbest 5
 #define reconnect_angle_importance 0.1
 
 //////////////////////////////////////////////////////////////////////////////////////////////

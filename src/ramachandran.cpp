@@ -10,12 +10,22 @@ int main(int argc, char** argv)
     FILE* fp;
     bool show_colors = true;
     bool skip_helices = false;
+    bool include_glycine = true, include_not_glycine = true;
+    bool include_proline = true, include_not_proline = true;
+    bool include_pre_proline = true, include_not_pre_proline = true;
     for (i=1; i<argc; i++)
     {
         if (argv[i][0] == '-')
         {
             if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--numbers")) show_colors = false;
             if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--skip-helices")) skip_helices = true;
+            if (!strcmp(argv[i], "-g") || !strcmp(argv[i], "--omit-glycine")) include_glycine = false;
+            if (!strcmp(argv[i], "-G") || !strcmp(argv[i], "--only-glycine")) include_not_glycine = false;
+            if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--omit-proline")) include_proline = false;
+            if (!strcmp(argv[i], "-P") || !strcmp(argv[i], "--only-proline")) include_not_proline = false;
+            if (!strcmp(argv[i], "-b") || !strcmp(argv[i], "--omit-pre-proline")) include_pre_proline = false;
+            if (!strcmp(argv[i], "-B") || !strcmp(argv[i], "--only-pre-proline")) include_not_pre_proline = false;
+            if (!include_glycine && !include_not_glycine) return -1;
             continue;
         }
 
@@ -40,6 +50,30 @@ int main(int argc, char** argv)
         AminoAcid* aa = p.get_residue(i);
         if (!aa) continue;
         if (skip_helices && aa->is_alpha_helix()) continue;
+        if (aa->get_letter() == 'G')
+        {
+            if (!include_glycine || !include_not_proline) continue;
+        }
+        else if (aa->get_letter() == 'P')
+        {
+            if (!include_proline || !include_not_glycine) continue;
+        }
+        else if (!include_not_glycine || !include_not_proline) continue;
+
+        if (!include_pre_proline || !include_not_pre_proline)
+        {
+            AminoAcid* next = p.get_residue(i+1);
+            if (next)
+            {
+                if (next->get_letter() == 'P')
+                {
+                    if (!include_pre_proline) continue;
+                }
+                else if (!include_not_pre_proline) continue;
+            }
+        }
+
+
         float phi = aa->get_phi(), psi = aa->get_psi();
 
         phi = fmod(phi, (M_PI*2)); if (phi >= M_PI) phi -= M_PI*2;

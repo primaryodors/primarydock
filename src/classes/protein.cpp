@@ -1953,10 +1953,10 @@ float Protein::reconnect(int startres, int endres)
                     aa->movability = MOV_ALL;
                     if (ires & 0x1) rotate_backbone_partial(resno, endres,
                         (dir>0) ? CA_asc : C_desc,
-                        candidates[ikept][icand][ires] - aa->get_psi(), true);
+                        (candidates[ikept][icand][ires] - aa->get_psi()) * dir, true);
                     else rotate_backbone_partial(resno, endres,
                         (dir>0) ? N_asc : CA_desc,
-                        candidates[ikept][icand][ires] - aa->get_phi(), true);
+                        (candidates[ikept][icand][ires] - aa->get_phi()) * dir, true);
                     aa->movability = was_mov;
                 }
 
@@ -2020,10 +2020,10 @@ float Protein::reconnect(int startres, int endres)
         aa->movability = MOV_ALL;
         if (ires & 0x1) rotate_backbone_partial(resno, endres,
             (dir>0) ? CA_asc : C_desc,
-            best_candidates[0][ires] - aa->get_psi(), true);
+            (best_candidates[0][ires] - aa->get_psi()) * dir, true);
         else rotate_backbone_partial(resno, endres,
             (dir>0) ? N_asc : CA_desc,
-            best_candidates[0][ires] - aa->get_phi(), true);
+            (best_candidates[0][ires] - aa->get_phi()) * dir, true);
         aa->movability = was_mov;
     }
 

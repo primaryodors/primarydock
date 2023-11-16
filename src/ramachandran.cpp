@@ -9,11 +9,13 @@ int main(int argc, char** argv)
     int i;
     FILE* fp;
     bool show_colors = true;
+    bool skip_helices = false;
     for (i=1; i<argc; i++)
     {
         if (argv[i][0] == '-')
         {
             if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--numbers")) show_colors = false;
+            if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "--skip-helices")) skip_helices = true;
             continue;
         }
 
@@ -37,6 +39,7 @@ int main(int argc, char** argv)
     {
         AminoAcid* aa = p.get_residue(i);
         if (!aa) continue;
+        if (skip_helices && aa->is_alpha_helix()) continue;
         float phi = aa->get_phi(), psi = aa->get_psi();
 
         phi = fmod(phi, (M_PI*2)); if (phi >= M_PI) phi -= M_PI*2;

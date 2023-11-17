@@ -228,7 +228,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         #endif
 
         sprintf(metrics[metcount], "%s%d", reaches_spheroid[i]->get_3letter(), resno);
-        // cout << metrics[metcount] << ": " << lb << " . ";
+        // cout << metrics[metcount] << ": " << lb << ". ";
 
         if (differential_dock)
         {

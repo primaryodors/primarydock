@@ -10,6 +10,8 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+    _INTERA_R_CUTOFF = _DEFAULT_INTERA_R_CUTOFF;
+
     if (argc < 2)
     {
         cout << "Usage:" << endl << endl;
@@ -34,13 +36,12 @@ int main(int argc, char** argv)
     fseek(fp, 0, 0);
     m.from_pdb(fp, true);
 
-    AminoAcid* aa = p.get_residue_bw(3, 50);
-    if (!aa) aa = p.get_residue_bw(6, 48);
-    if (!aa) aa = p.get_residue(100);
+    AminoAcid* aa = p.get_residue(100);
     if (!aa) aa = p.get_residue(p.get_end_resno()/2);
 
     if (aa && aa->get_hydrogen_count() < 3)
     {
+        cout << "Hydrogenating..." << endl;
         int i, n = p.get_end_resno();
         for (i=0; i<n; i++)
         {

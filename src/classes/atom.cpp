@@ -572,7 +572,7 @@ float Atom::get_charge()
 {
     if (Z == 1)
     {
-        if (bonded_to && bonded_to[0].btom)
+        if (bonded_to[0].btom)
         {
             float bchg = bonded_to[0].btom->charge;
             if (!bchg) bchg = bonded_to[0].btom->is_conjugated_to_charge();

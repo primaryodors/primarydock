@@ -423,6 +423,7 @@ void Molecule::hydrogenate(bool steric_only)
 
         float valence = atoms[i]->get_valence();
         if (valence > 4) valence = 8 - valence;
+        if (valence > 1) valence += atoms[i]->get_charge();
 
         // cout << atoms[i]->name << " has valence " << valence << endl;
 
@@ -461,7 +462,7 @@ void Molecule::hydrogenate(bool steric_only)
             char hname[5];
             sprintf(hname, "H%d", atcount+1);
             Atom* H = add_atom("H", hname, atoms[i], 1);
-            //cout << "Adding " << hname << " to " << atoms[i]->name << " whose valence is " << valence << " and has " << bcardsum << " bonds already." << endl;
+            // if (!is_residue()) cout << "Adding " << hname << " to " << atoms[i]->name << " whose valence is " << valence << " and has " << bcardsum << " bonds already." << endl;
 
             /*atoms[i]->clear_geometry_cache();
             SCoord v = atoms[i]->get_next_free_geometry(1);
@@ -879,10 +880,16 @@ int Molecule::from_pdb(FILE* is, bool het_only)
                     }
                     esym[1] &= 0x5f;
 
-                    Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
+                    int offset = 0;
+                    if (words[4][0] >= 'A' || words[5] < &buffer[29]) offset++;
+
+                    Point aloc(atof(words[5+offset]), atof(words[6+offset]),atof(words[7+offset]));
+
+                    // cout << esym << " " << aloc << endl;
 
                     Atom* a = add_atom(esym, words[2], &aloc, 0, 0, charge);
                     added++;
+                    a->pdbidx = atoi(words[1]);
 
                     // a->residue = atoi(words[4]);
 
@@ -902,6 +909,20 @@ int Molecule::from_pdb(FILE* is, bool het_only)
                 {
                     ;
                 }
+            }
+            else if (!strcmp(words[0], "CONECT"))
+            {
+                int i, i1 = atoi(words[1]), i2 = atoi(words[2]);
+                Atom *a = nullptr, *b = nullptr;
+
+                for (i=0; atoms[i]; i++)
+                {
+                    if (atoms[i]->pdbidx == i1) a = atoms[i];
+                    if (atoms[i]->pdbidx == i2) b = atoms[i];
+                    if (a && b) break;
+                }
+
+                if (a && b) a->bond_to(b, 1);              // TODO: Detect coplanar atoms and add pi bonds where found.
             }
         }
         buffer[0] = 0;
@@ -2402,7 +2423,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                     ligands[l]->atcount = j;
                     break;
                 }
-                if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone
+                if (atoms[i]->is_backbone && atoms[i]->residue && ligands[l]->atoms[j]->is_backbone && ligands[l]->atoms[j]->residue
                     &&
                     (	(	atoms[i]->residue == ligands[l]->atoms[j]->residue - 1
                             &&
@@ -2421,14 +2442,20 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                 float r = ligands[l]->atoms[j]->get_location().get_3d_distance(&aloc);
                 if (r < _INTERA_R_CUTOFF)
                 {
+                    // cout << "🐝 ";
                     if (	!shielded(atoms[i], ligands[l]->atoms[j])
                             &&
                             !ligands[l]->shielded(atoms[i], ligands[l]->atoms[j])
                        )
                     {
                         missed_connection.r = 0;
+                        // if (ligands[l]->atoms[j]->residue) cout << ligands[l]->atoms[j]->residue << ":";
+                        // cout << ligands[l]->atoms[j]->name << " " << ligands[l]->atoms[j]->get_charge() << " ~ ";
+                        // if (atoms[i]->residue) cout << atoms[i]->residue << ":";
+                        // cout << atoms[i]->name << " " << atoms[i]->get_charge() << " ";
                         // cout << ligands[l]->atoms[j]->get_location().subtract(atoms[i]->get_location()) << ": ";
                         float abind = InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
+                        // cout << abind << endl;
                         if (abind && !isnan(abind) && !isinf(abind))
                         {
                             if (abind > 0 && minimum_searching_aniso && ligands[l]->priority) abind *= 1.5;

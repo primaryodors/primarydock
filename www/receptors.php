@@ -81,6 +81,24 @@ echo "<h1>Receptors</h1>\n";
 <a href="receptors.php?f=o" class="<?php if ($filter == 'o') echo "hilite" ?>">Orphans</a>
 </p>
 </div>
+<p style="position: absolute; right: 0px"><a href="#" onclick="$('#aboutpo').show();">About PO Numbering</a></p>
+
+<div id="aboutpo" style="display: none;"><p>
+The PO numbering system used on these pages is designed to address some problems with the prevailing OR numbering system.
+The current dominant system groups olfactory receptors into families, denoted by a number 1-15 or 51-56;
+then a subfamily denoted by one or two letters, with Z being followed by AA, AB, etc;
+then a number representing the individual member gene of the subfamily, as well as the protein it encodes.
+The families and subfamilies are assigned on the basis of sequence similarity.
+However, phylogenetic analysis reveals that the family numbers are unreliable;
+OR7 is for example a subset of OR1, while OR8, OR9, and most of OR5 form a single large branch of intermingled
+subfamilies and individuals with no pattern to distinguish which parts should be numbered 5, 8, or 9.
+Furthermore, several of the higher lettered OR5 subfamilies are actually part of OR14.</p>
+
+<p>To address these issues, a new numbering scheme is proposed, one that strives to keep the existing subfamilies
+and individuals as much as possible, but which more faithfully adheres to the phylogeny of the receptors.
+</p></div>
+
+
 <div class="row content scrollh">
 
 

@@ -14,7 +14,7 @@
 // php -f predict/activate.php all
 //
 
-require("protutils.php");
+require("../data/protutils.php");
 
 if (!file_exists("tmp")) mkdir("tmp");
 

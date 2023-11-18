@@ -126,7 +126,7 @@ function bw_from_resno($protid, $resno)
 function family_from_protid($protid)
 {
 	if (substr($protid, 0, 2) == "OR") return "OR".intval(substr($protid, 2, 2));
-	else if (substr($protid, 0, 2) == "PO") return "PO".intval(substr($protid, 2, 2));
+	else if (substr(strtoupper($protid), 0, 3) == "ODR") return "Odr".intval(substr($protid, 3, 2));
 	else return substr($protid, 0, 4);
 }
 

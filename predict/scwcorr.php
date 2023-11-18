@@ -1,8 +1,8 @@
 <?php
 
 chdir(__DIR__);
-require_once("protutils.php");
-require_once("odorutils.php");
+require_once("../data/protutils.php");
+require_once("../data/odorutils.php");
 require_once("statistics.php");
 
 define('_PALLETE_TEST', false);

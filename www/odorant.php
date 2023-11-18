@@ -267,7 +267,7 @@ foreach (array_keys($sorted) as $rcpid)
 {
     $poid = find_poid($rcpid);
     echo "<tr>\n";
-    echo "<td><a href=\"receptor.php?r=$rcpid\">$rcpid</a></td>\n";
+    echo "<td><a href=\"receptor.php?r=$poid\">$poid</a></td>\n";
 
     echo "<td style=\"white-space: nowrap;\">" . $dispec50 = (@$tblec50[$rcpid] ?: "-") . "</td>\n";
     echo "<td style=\"white-space: nowrap;\">" . $disptop =

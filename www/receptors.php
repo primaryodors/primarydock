@@ -84,7 +84,7 @@ echo "<h1>Receptors</h1>\n";
 <p style="position: absolute; right: 0px"><a href="#" onclick="$('#aboutpo').show();">About PO Numbering</a></p>
 
 <div id="aboutpo" style="display: none;"><p>
-The PO numbering system used on these pages is designed to address some problems with the prevailing OR numbering system.
+The numbering system used on these pages is designed to address some problems with the prevailing OR numbering system.
 The current dominant system groups olfactory receptors into families, denoted by a number 1-15 or 51-56;
 then a subfamily denoted by one or two letters, with Z being followed by AA, AB, etc;
 then a number representing the individual member gene of the subfamily, as well as the protein it encodes.

@@ -121,7 +121,7 @@ if (@$_REQUEST['next'])
 }
 else
 {
-	$protid = @$_REQUEST['prot'] ?: "PO1A1";
+	$protid = @$_REQUEST['prot'] ?: "Odr1A1";
 	$ligname = @$_REQUEST['lig'] ?: "geraniol";
     $protid = find_poid($protid);
 }

@@ -228,6 +228,11 @@ foreach (array_values($bytree) as $x => $ids)
         $bcol = 'po'.intval(preg_replace("/[^0-9]/","",substr($poid,2,2)));
         $bcol = $$bcol;
         break;
+
+        case 'Od':
+        $bcol = 'po'.intval(preg_replace("/[^0-9]/","",substr($poid,3,2)));
+        $bcol = $$bcol;
+        break;
         
         case 'TA':
         $bcol = $taar;
@@ -273,7 +278,7 @@ foreach (array_values($bytree) as $x => $ids)
         }
     }
     
-    if ($dy < $h/1.25) $texts[] = [$dx, $dy-5, $poid];
+    if ($dy < $h/1.25) $texts[] = [$dx, $dy-5, substr($poid, 3)];
     
     imagefilledrectangle($im, $dx,$base, $dx+$res-1,$base+$bsht, $bcol);
 

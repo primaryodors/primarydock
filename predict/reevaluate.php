@@ -2,8 +2,8 @@
 
 // Scan all duck_results and rerun their values through the evaluate_result() fuction.
 
-require("protutils.php");
-require("odorutils.php");
+require("../data/protutils.php");
+require("../data/odorutils.php");
 require("dock_eval.php");
 
 // Load data

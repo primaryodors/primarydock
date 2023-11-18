@@ -71,7 +71,7 @@ $prot = find_prot($protid);
 
 if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/ic_activate_or"))
 {
-    if ($protid == "PO51E2" || $protid == "OR51E2")
+    if ($protid == "Odr51E2" || $protid == "OR51E2")
     {
         $pepd = <<<heredoc
 LOAD pdbs/OR51/OR51E2.8f76.pdb

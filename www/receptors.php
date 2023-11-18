@@ -108,53 +108,43 @@ However, some classification groups are paraphyletic, such as the terms "fish", 
 and so is the human Odr5 branch.
 </p>
 
-<p>Here's an overview of the correspondences that will allow recognition of the majority of Odr numbers:
-    <ul>
-        <li>Odr1 single-letter generally equals OR1, with a few exceptions;</li>
-        <li>Odr1AA through Odr1AG equals OR7 exactly;</li>
-        <li>Odr21A generally equals OR2A and OR2AT;</li>
-        <li>Odr21G corresponds to OR2AG;</li>
-        <li>Odr21L/W/Y equal OR2L/W/Y;</li>
-        <li>Odr21M, 21T, and 21V have been regrouped from original OR2M, 2T, 2V, and 2Z;</li>
-        <li>Odr22C,H,J equal OR13C,H,J; Odr22K consists of OR13D and OR13F;</li>
-        <li>Odr22D and Odr22F equal OR2D and OR2F;</li>
-        <li>Odr23B 2,3,6 equals OR2B 2,3,6;</li>
-        <li>Odr23G mostly corresponds to OR2G, however Odr23G11 is OR2B11;</li>
-        <li>Odr23H/J/K mostly equals OR2H/J/K;</li>
-        <li>Odr3A equals OR3A;</li>
-        <li>Odr3B equals OR13A and OR13G;</li>
-        <li>Odr4 mostly equals OR4, with a few exceptions;</li>
-        <li>Some OR4C receptors have been assigned to Odr4AC;</li>
-        <li>OR4M1,2 have been assigned to Odr4N11,12, as have OR4X1,2 to Odr4B11,12;</li>
-        <li>Odr4S4 is OR4P4;</li>
-        <li>Odr5A consists of OR5A and OR5AN;</li>
-        <li>Odr5F,H,K correspond to OR5F,H,K, except Odr5F also includes OR8H and OR8I;</li>
-        <li>OR5M has been split into Odr5M and Odr8M;</li>
-        <li>Odr5P corresponds to OR5P, OR5J, and OR5AK;</li>
-        <li>OR5U and most of the two-letter OR5 receptors have been assigned to Odr14;</li>
-        <li>Odr5GK consists of OR9G and OR9K; Odr5Q corresponds to OR9Q;</li>
-        <li>Odr9B,D,L equal OR5B,D,L;</li>
-        <li>Odr9C1-5 consist of OR5C,W,I,AR,AS;</li>
-        <li>Odr9T consists of OR5T and OR5AP;</li>
-        <li>OR6 has been split up, with almost all members keeping the same letter and member number, into
-            Odr18B, 17C, 17F, 17J, 16K, 16N, 18P, 18Q, 17S, 17T, 17V, and 17X;</li>
-        <li>Odr18B12 is OR6A2; Odr17J2 is OR6M1; Odr18P2 is OR6Y1;</li>
-        <li>Odr8B2-12 corresponds to OR8B2-12, and Odr8B21-25 to OR8G1-5;</li>
-        <li>Odr8D equals OR8D, except Odr8D5 is OR8A1;</li>
-        <li>Odr8J,K,U equal OR8J,K,U;</li>
-        <li>Odr10A mostly equals OR10A; Odr10H equals OR10H; Odr10K equals OR10K;</li>
-        <li>Odr10C consists of OR10C and OR10P; Odr10J of OR10J,X,Z; Odr10Q of OR10Q,V,W,AC; Odr10R of OR10R,T;</li>
-        <li>Odr10A10 is OR8S1; Odr10AV1 is OR5V1;</li>
-        <li>Odr11 and Odr12 equal OR11 and OR12 exactly;</li>
-        <li>Odr17V is OR9A;</li>
-        <li>Odr19D and Odr19G equal OR10D and OR10G, except Odr19G19 is OR10S1;</li>
-        <li>14A2, 14I1, and 14J1 are the same in both systems;</li>
-        <li>Odr51 is identical to OR51 except: Odr51E3 is OR51D1; Odr51G3 is OR51J1; Odr51B7 is OR51V1;</li>
-        <li>Odr58A equals OR52I;</li>
-        <li>Odr52E10 is OR52D1; Odr52B8 is OR52H1; Odr52A6 is OR52N4; Odr52A5 is OR52N5;</li>
-        <li>All other Odr52 receptors equal OR52 exactly;</li>
-        <li>Odr56 equals OR56 exactly.</li>
-    </ul>
+<p>Here's an overview of the correspondences that will allow recognition of the majority of Odr numbers:</p>
+
+<ul>
+    <li>The following receptors and subfamilies are the same in both systems:<br>
+    1A, 1J, 1M, 1S, 3A, 4A, 4B1, 4C11, 4C16, 4E, 4F, 4K, 4L, 5F1, 5K, 5M1, 5M10, 5P1-3, 8B1-12, 8J, 8K, 10C1, 10H,10K, 10Q1, 10R2, 11, 12,
+    14A2, 14I1, 14J1, 51A, 51F, 51H, 51I, 51L, 51M, 51Q, 51S, 51T, 52A1-4, 52K, 52L, 52P, 52W, 56.
+    <br>&nbsp;
+    </li>
+
+    <li>The following receptors and subfamilies are mostly the same in both systems:<br>
+    1B (except Odr1B2 = OR1K1), 1D (except Odr1D6 = OR1N2), 1E (Odr1E4 = OR1N1), 1F (Odr1F3 = OR1C1), 1G (Odr1G2 = OR1I1),
+    1L (Odr1L21 = OR1Q1), 4D, 4N, 4Q (Odr4Q5 = OR4D5), 4S (Odr4S4 = OR4P4), 5A (Odr5A3 = OR5AN1), 5H (Odr5H32 = OR5AC2),
+    8D (Odr8D5 = OR8A1), 8U (Odr8U11 = OR5R1), 10A (Odr10A10 = OR8S1, Odr10A17 = OR10AG1),
+    10J (Odr10J6 = OR10X1, Odr10J7 = OR10Z1),
+    Odr19D = OR10D, 51B (Odr51B7 = OR51V1), 51E (Odr51E3 = OR51D1), 51G (Odr51G3 = OR51J1), 52B (Odr52B8 = OR52H1), 52E (Odr52E10 = OR52D1).
+    <br>&nbsp;
+    </li>
+
+    <li>The following are direct equivalents:<br>
+    Odr1A = OR7, Odr21G = OR2AG, Odr22D = OR2D, Odr22F = OR2F, Odr22H = OR13H, Odr22J = OR13J, Odr23B1-6 = OR2B1-6, Odr4N11-12 = OR4M1-2,
+    Odr23J = OR2J, Odr23W = OR2W, Odr4AC = OR4C (not 11 or 16), Odr5P6-7 = OR5AK2-3, Odr5GK1,2,4,9 = OR9G1,K2,G4,G9, Odr16K,N = OR6K,N,
+    Odr17F = OR6F, Odr17J1 = OR6J1, Odr17S = OR6S, Odr17T = OR6T, Odr17V1 = OR6V1, Odr17V2-4 = OR9A2-4, Odr17X = OR6X, Odr18P1 = OR6P1,
+    Odr18Q = OR6Q, Odr8B21-25 = OR8G1-5, Odr8M = OR5M, Odr9B = OR5B, Odr9C1 = OR5C1, Odr9D = OR5D, Odr9L = OR5L, Odr13A1 = OR10AD1,
+    Odr19G = OR10G (Odr19G19 = OR10S1), Odr52A5 = OR52N5, Odr52A6 = OR52N4, Odr58A = OR52I.
+    <br>&nbsp;
+    </li>
+
+    <li>The following are mostly direct equivalents:<br>
+    Odr21A = 2A (Odr21A34 = OR2AT4), Odr21L = OR2L (Odr21L21 = OR2AJ1), Odr22C = OR13C (Odr22C10 = OR2S2), Odr23G = OR2G (Odr23G11 = OR2B11),
+    Odr23H = OR2H (Odr23H3 = OR2C1), Odr5Q = OR9Q (Odr5Q3 = OR9I1), Odr17C = OR6C (Odr17C80 = OR2AP1), Odr18B = OR6B (Odr18B12 = OR6A2),
+    Odr9T = OR5T (Odr9T4 = OR5AP2).
+    <br>&nbsp;
+    </li>
+
+    <li>OR2M/T/V/Z have been reassigned into Odr21M, 21T, and 21V according to their phylogeny.</li>
+</ul>
+
     <a href="#" onclick="$('#aboutpo').hide();">(close)</a>
 </p>
 </div>

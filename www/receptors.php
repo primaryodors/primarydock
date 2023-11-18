@@ -98,9 +98,14 @@ Furthermore, several of the higher lettered OR5 subfamilies are actually part of
 and individuals as much as possible, but which more faithfully adheres to the phylogeny of the receptors.
 The new numbers begin with Odr, short for &quot;odor receptor&quot;, followed by a trunk number, a branch letter,
 and a member number, so that the format stays very similar to the old system.
-The Odr numbers are arranged in the list below according to their OR numbers in order to easily find them.
 By design, many receptors have the same number in both systems, such as Odr1G1/OR1G1; others necessarily required a
 different number, for example Odr1G2/OR1I1.
+</p>
+
+<p>While the new Odr scheme strives to keep all its trunks and branches monophyletic, Odr5 is not.
+Therefore, Odr5/8/9 suffers from the same limitation as OR1/7 does.
+However, some classification groups are paraphyletic, such as the terms "fish", "crustacean", and "monkey",
+and so is the human Odr5 branch.
 </p>
 
 <p>Here's an overview of the correspondences that will allow recognition of the majority of Odr numbers:
@@ -175,15 +180,15 @@ $echoed = 0;
 $byrcpid = [];
 
 foreach ($prots as $poid => $p) $byrcpid[$poid] = $p['id'];
-natsort($byrcpid);
+uksort($byrcpid, "rcpid_cmp");
 
-echo "<!-- ".print_r($byrcpid,1)." -->\n";
+// echo "<!-- ".print_r($byrcpid,1)." -->\n";
 
 foreach ($byrcpid as $poid => $protid)
 {
     $p = $prots[$poid];
     if (!@$p['region']) continue;
-    $fam = family_from_protid($protid);
+    $fam = family_from_protid($poid);
     if ($echoed && $fam != $ffam)
     {
         echo "</div><hr><div class=\"fam\">\n";

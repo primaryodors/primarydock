@@ -130,6 +130,46 @@ function family_from_protid($protid)
 	else return substr($protid, 0, 4);
 }
 
+function rcpid_cmp($a, $b)
+{
+	if (substr($a, 0, 4) == "MS4A" && substr($b, 0, 4) != "MS4A") return 1;
+	if (substr($a, 0, 4) != "MS4A" && substr($b, 0, 4) == "MS4A") return -1;
+
+	if (substr($a, 0, 2) > substr($b, 0, 2)) return 1;
+	if (substr($a, 0, 2) < substr($b, 0, 2)) return -1;
+
+	$fam1 = intval(preg_replace("/[^0-9]/", "", family_from_protid($a)));
+	$fam2 = intval(preg_replace("/[^0-9]/", "", family_from_protid($b)));
+
+	if ($fam1 > 20 && $fam1 < 30) $fam1 = floatval($fam1) / 10;
+	if ($fam2 > 20 && $fam2 < 30) $fam2 = floatval($fam2) / 10;
+
+	if ($fam1 >= 16 && $fam1 <= 18) $fam1 = floatval($fam1-10) / 10 + 6;
+	if ($fam2 >= 16 && $fam2 <= 18) $fam2 = floatval($fam2-10) / 10 + 6;
+
+	if ($fam1 < $fam2) return -1;
+	else if ($fam1 > $fam2) return 1;
+
+	$fam1 = family_from_protid($a);
+	$fam2 = family_from_protid($b);
+
+	$sub1 = preg_replace("/[0-9]/", "", substr($a, strlen($fam1)));
+	$sub2 = preg_replace("/[0-9]/", "", substr($b, strlen($fam2)));
+
+	if (strlen($sub1) < strlen($sub2)) return -1;
+	else if (strlen($sub1) > strlen($sub2)) return 1;
+
+	if ($sub1 < $sub2) return -1;
+	else if ($sub1 > $sub2) return 1;
+
+	$a = intval(substr($a, strlen($fam1) + strlen($sub1)));
+	$b = intval(substr($b, strlen($fam2) + strlen($sub2)));
+
+	if ($a < $b) return -1;
+	else if ($a > $b) return 1;
+	else return 0;
+}
+
 function filename_protid($protid)
 {
 	$fam = family_from_protid($protid);

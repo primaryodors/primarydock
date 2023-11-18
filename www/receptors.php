@@ -112,33 +112,25 @@ and so is the human Odr5 branch.
 
 <ul>
     <li>The following receptors and subfamilies are the same in both systems:<br>
-    1A, 1J, 1M, 1S, 3A, 4A, 4B1, 4C11, 4C16, 4E, 4F, 4K, 4L, 5F1, 5K, 5M1, 5M10, 5P1-3, 8B1-12, 8J, 8K, 10C1, 10H,10K, 10Q1, 10R2, 11, 12,
-    14A2, 14I1, 14J1, 51A, 51F, 51H, 51I, 51L, 51M, 51Q, 51S, 51T, 52A1-4, 52K, 52L, 52P, 52W, 56.
-    <br>&nbsp;
-    </li>
-
-    <li>The following receptors and subfamilies are mostly the same in both systems:<br>
-    1B (except Odr1B2 = OR1K1), 1D (except Odr1D6 = OR1N2), 1E (Odr1E4 = OR1N1), 1F (Odr1F3 = OR1C1), 1G (Odr1G2 = OR1I1),
-    1L (Odr1L21 = OR1Q1), 4D, 4N, 4Q (Odr4Q5 = OR4D5), 4S (Odr4S4 = OR4P4), 5A (Odr5A3 = OR5AN1), 5H (Odr5H32 = OR5AC2),
-    8D (Odr8D5 = OR8A1), 8U (Odr8U11 = OR5R1), 10A (Odr10A10 = OR8S1, Odr10A17 = OR10AG1),
-    10J (Odr10J6 = OR10X1, Odr10J7 = OR10Z1),
-    Odr19D = OR10D, 51B (Odr51B7 = OR51V1), 51E (Odr51E3 = OR51D1), 51G (Odr51G3 = OR51J1), 52B (Odr52B8 = OR52H1), 52E (Odr52E10 = OR52D1).
+    1A, 1B1, 1D1-5, 1E1-3, 1F1-2, 1G1, 1J, 1L1-8, 1M, 1S, 3A, 4A, 4B1, 4C11, 4C16, 4D1-4, 4D6-11, 4E, 4F, 4K, 4L, 4N1-9, 4Q1-3,
+    4S1-2, 5A1-2, 5H1-15, 5F1, 5K, 5M1, 5M10, 5P1-3, 8B1-12, 8D1-4, 8J, 8K, 8U1-9, 10A1-7, 10C1, 10H, 10J1-5, 10K, 10Q1, 10R2, 11, 12,
+    14A2, 14I1, 14J1, 51A, 51B1-6, 51E1-2, 51F, 51G1-2, 51H, 51I, 51L, 51M, 51Q, 51S, 51T, 52A1-4, 52B1-6, 52E1-8, 52K, 52L, 52P, 52W, 56.
     <br>&nbsp;
     </li>
 
     <li>The following are direct equivalents:<br>
     Odr1A = OR7, Odr21G = OR2AG, Odr22D = OR2D, Odr22F = OR2F, Odr22H = OR13H, Odr22J = OR13J, Odr23B1-6 = OR2B1-6, Odr4N11-12 = OR4M1-2,
-    Odr23J = OR2J, Odr23W = OR2W, Odr4AC = OR4C (not 11 or 16), Odr5P6-7 = OR5AK2-3, Odr5GK1,2,4,9 = OR9G1,K2,G4,G9, Odr16K,N = OR6K,N,
-    Odr17F = OR6F, Odr17J1 = OR6J1, Odr17S = OR6S, Odr17T = OR6T, Odr17V1 = OR6V1, Odr17V2-4 = OR9A2-4, Odr17X = OR6X, Odr18P1 = OR6P1,
-    Odr18Q = OR6Q, Odr8B21-25 = OR8G1-5, Odr8M = OR5M, Odr9B = OR5B, Odr9C1 = OR5C1, Odr9D = OR5D, Odr9L = OR5L, Odr13A1 = OR10AD1,
-    Odr19G = OR10G (Odr19G19 = OR10S1), Odr52A5 = OR52N5, Odr52A6 = OR52N4, Odr58A = OR52I.
+    Odr23J = OR2J, Odr23W = OR2W, Odr4AC = OR4C (not 11 or 16), Odr5H32 = OR5AC2, Odr5P6-7 = OR5AK2-3, Odr5GK1,2,4,9 = OR9G1,K2,G4,G9,
+    Odr16K,N = OR6K,N, Odr17F = OR6F, Odr17J1 = OR6J1, Odr17S = OR6S, Odr17T = OR6T, Odr17V1 = OR6V1, Odr17V2-4 = OR9A2-4, Odr17X = OR6X,
+    Odr18P1 = OR6P1, Odr18Q = OR6Q, Odr8B21-25 = OR8G1-5, Odr8M = OR5M, Odr9B = OR5B, Odr9C1 = OR5C1, Odr9D = OR5D, Odr9L = OR5L,
+    Odr13A1 = OR10AD1, Odr19D = OR10D, Odr52A5 = OR52N5, Odr52A6 = OR52N4, Odr58A = OR52I.
     <br>&nbsp;
     </li>
 
     <li>The following are mostly direct equivalents:<br>
     Odr21A = 2A (Odr21A34 = OR2AT4), Odr21L = OR2L (Odr21L21 = OR2AJ1), Odr22C = OR13C (Odr22C10 = OR2S2), Odr23G = OR2G (Odr23G11 = OR2B11),
     Odr23H = OR2H (Odr23H3 = OR2C1), Odr5Q = OR9Q (Odr5Q3 = OR9I1), Odr17C = OR6C (Odr17C80 = OR2AP1), Odr18B = OR6B (Odr18B12 = OR6A2),
-    Odr9T = OR5T (Odr9T4 = OR5AP2).
+    Odr9T = OR5T (Odr9T4 = OR5AP2), Odr19G = OR10G (Odr19G19 = OR10S1).
     <br>&nbsp;
     </li>
 

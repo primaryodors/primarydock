@@ -993,6 +993,13 @@ int Protein::get_bw50(int helixno)
     return Ballesteros_Weinstein[helixno];
 }
 
+void Protein::set_bw50(int hxno, int resno)
+{
+    if (hxno < 1 || hxno > 78) return;
+    if (Ballesteros_Weinstein[hxno]) return;
+    Ballesteros_Weinstein[hxno] = resno;
+}
+
 int Protein::get_seq_length()
 {
     if (!sequence) return 0;

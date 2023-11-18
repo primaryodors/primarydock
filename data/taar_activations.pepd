@@ -1,0 +1,17 @@
+
+LOAD "pdbs/TAAR/TAAR1.upright.pdb" A I
+CENTER
+UPRIGHT I
+BWCENTER
+
+LOAD "pdbs/8jlj.pdb" R A
+CENTER
+
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+
+# DUMP QUIT
+
+SAVE "pdbs/TAAR1.3-iodothyronamine.pdb"
+

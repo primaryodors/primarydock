@@ -964,7 +964,28 @@ int main(int argc, char** argv)
                 SCoord new_center = old_center;
                 new_center.r *= -1;
                 working->move_piece(1, working->get_end_resno(), new_center);
-            }   // BWCENTER
+            }	// BWCENTER
+
+            else if (!strcmp(words[0], "BWCOPY"))
+            {
+                if (!words[1] || !words[2]) raise_error("Insufficient parameters given for BWCOPY.");
+
+                char c = words[1][0];
+                if (c < 'A' || c > 'Z') raise_error("Invalid source strand given for BWCOPY.");
+                Protein* source = strands[c-'A'];
+
+                c = words[2][0];
+                if (c < 'A' || c > 'Z') raise_error("Invalid destination strand given for BWCOPY.");
+                Protein* dest = strands[c-'A'];
+
+                for (l=1; l<=8; l++)
+                {
+                    std::string rgname = (std::string)"TMR" + std::to_string(l);
+                    int sr = source->get_region_start(rgname), er = source->get_region_end(rgname), bw50 = source->get_bw50(l);
+                    if (sr > 0 && er > 0) dest->set_region(rgname, sr, er);
+                    if (bw50 > 0) dest->set_bw50(l, bw50);
+                }
+            }   // BWCOPY
 
             else if (!strcmp(words[0], "CANMOVE"))
             {

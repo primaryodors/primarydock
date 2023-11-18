@@ -2213,9 +2213,11 @@ bool Molecule::shielded(Atom* a, Atom* b) const
     a->shielding_angle = b->shielding_angle = 0;
 
     Point aloc = a->get_location(), bloc = b->get_location();
+    float achg = a->get_charge(), bchg = b->get_charge();
     for (i=0; atoms[i]; i++)
     {
         Atom* ai = atoms[i];
+        float aichg = ai->get_charge();
         if (!ai) break;
         if (ai == a || ai == b) continue;
         float rai = ai->distance_to(a);
@@ -2228,15 +2230,11 @@ bool Molecule::shielded(Atom* a, Atom* b) const
         if (f3da > a->shielding_angle) a->shielding_angle = b->shielding_angle = f3da;
         if (f3da > _shield_angle)
         {
-            if (last_iter && (a->residue == 114 || b->residue == 114) && ((a->residue + b->residue) == 114))
-            {
-                /*cout << ai->name << " shields "
-                	 << a->residue << ":" << a->name << "..."
-                	 << b->residue << ":" << b->name
-                	 << " angle " << (f3da*fiftyseven)
-                	 << endl;*/
-                return true;
-            }
+            return true;
+        }
+        if (sgn(achg) == sgn(bchg) && sgn(achg) == -sgn(aichg) && f3da > _shield_angle_opposite_charge)
+        {
+            return true;
         }
     }
 

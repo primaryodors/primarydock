@@ -81,7 +81,7 @@ echo "<h1>Receptors</h1>\n";
 <a href="receptors.php?f=o" class="<?php if ($filter == 'o') echo "hilite" ?>">Orphans</a>
 </p>
 </div>
-<p style="position: absolute; right: 0px"><a href="#" onclick="$('#aboutpo').show();">About PO Numbering</a></p>
+<p style="position: absolute; right: 0px"><a href="#" onclick="$('#aboutpo').show(); document.body.style.overflowY = 'auto';">About Odr Numbering</a></p>
 
 <div id="aboutpo" style="display: none;"><p>
 The numbering system used on these pages is designed to address some problems with the prevailing OR numbering system.
@@ -96,7 +96,63 @@ Furthermore, several of the higher lettered OR5 subfamilies are actually part of
 
 <p>To address these issues, a new numbering scheme is proposed, one that strives to keep the existing subfamilies
 and individuals as much as possible, but which more faithfully adheres to the phylogeny of the receptors.
-</p></div>
+The new numbers begin with Odr, short for &quot;odor receptor&quot;, followed by a trunk number, a branch letter,
+and a member number, so that the format stays very similar to the old system.
+The Odr numbers are arranged in the list below according to their OR numbers in order to easily find them.
+By design, many receptors have the same number in both systems, such as Odr1G1/OR1G1; others necessarily required a
+different number, for example Odr1G2/OR1I1.
+</p>
+
+<p>Here's an overview of the correspondences that will allow recognition of the majority of Odr numbers:
+    <ul>
+        <li>Odr1 single-letter generally equals OR1, with a few exceptions;</li>
+        <li>Odr1AA through Odr1AG equals OR7 exactly;</li>
+        <li>Odr21A generally equals OR2A and OR2AT;</li>
+        <li>Odr21G corresponds to OR2AG;</li>
+        <li>Odr21L/W/Y equal OR2L/W/Y;</li>
+        <li>Odr21M, 21T, and 21V have been regrouped from original OR2M, 2T, 2V, and 2Z;</li>
+        <li>Odr22C,H,J equal OR13C,H,J; Odr22K consists of OR13D and OR13F;</li>
+        <li>Odr22D and Odr22F equal OR2D and OR2F;</li>
+        <li>Odr23B 2,3,6 equals OR2B 2,3,6;</li>
+        <li>Odr23G mostly corresponds to OR2G, however Odr23G11 is OR2B11;</li>
+        <li>Odr23H/J/K mostly equals OR2H/J/K;</li>
+        <li>Odr3A equals OR3A;</li>
+        <li>Odr3B equals OR13A and OR13G;</li>
+        <li>Odr4 mostly equals OR4, with a few exceptions;</li>
+        <li>Some OR4C receptors have been assigned to Odr4AC;</li>
+        <li>OR4M1,2 have been assigned to Odr4N11,12, as have OR4X1,2 to Odr4B11,12;</li>
+        <li>Odr4S4 is OR4P4;</li>
+        <li>Odr5A consists of OR5A and OR5AN;</li>
+        <li>Odr5F,H,K correspond to OR5F,H,K, except Odr5F also includes OR8H and OR8I;</li>
+        <li>OR5M has been split into Odr5M and Odr8M;</li>
+        <li>Odr5P corresponds to OR5P, OR5J, and OR5AK;</li>
+        <li>OR5U and most of the two-letter OR5 receptors have been assigned to Odr14;</li>
+        <li>Odr5GK consists of OR9G and OR9K; Odr5Q corresponds to OR9Q;</li>
+        <li>Odr9B,D,L equal OR5B,D,L;</li>
+        <li>Odr9C1-5 consist of OR5C,W,I,AR,AS;</li>
+        <li>Odr9T consists of OR5T and OR5AP;</li>
+        <li>OR6 has been split up, with almost all members keeping the same letter and member number, into
+            Odr18B, 17C, 17F, 17J, 16K, 16N, 18P, 18Q, 17S, 17T, 17V, and 17X;</li>
+        <li>Odr18B12 is OR6A2; Odr17J2 is OR6M1; Odr18P2 is OR6Y1;</li>
+        <li>Odr8B2-12 corresponds to OR8B2-12, and Odr8B21-25 to OR8G1-5;</li>
+        <li>Odr8D equals OR8D, except Odr8D5 is OR8A1;</li>
+        <li>Odr8J,K,U equal OR8J,K,U;</li>
+        <li>Odr10A mostly equals OR10A; Odr10H equals OR10H; Odr10K equals OR10K;</li>
+        <li>Odr10C consists of OR10C and OR10P; Odr10J of OR10J,X,Z; Odr10Q of OR10Q,V,W,AC; Odr10R of OR10R,T;</li>
+        <li>Odr10A10 is OR8S1; Odr10AV1 is OR5V1;</li>
+        <li>Odr11 and Odr12 equal OR11 and OR12 exactly;</li>
+        <li>Odr17V is OR9A;</li>
+        <li>Odr19D and Odr19G equal OR10D and OR10G, except Odr19G19 is OR10S1;</li>
+        <li>14A2, 14I1, and 14J1 are the same in both systems;</li>
+        <li>Odr51 is identical to OR51 except: Odr51E3 is OR51D1; Odr51G3 is OR51J1; Odr51B7 is OR51V1;</li>
+        <li>Odr58A equals OR52I;</li>
+        <li>Odr52E10 is OR52D1; Odr52B8 is OR52H1; Odr52A6 is OR52N4; Odr52A5 is OR52N5;</li>
+        <li>All other Odr52 receptors equal OR52 exactly;</li>
+        <li>Odr56 equals OR56 exactly.</li>
+    </ul>
+    <a href="#" onclick="$('#aboutpo').hide();">(close)</a>
+</p>
+</div>
 
 
 <div class="row content scrollh">

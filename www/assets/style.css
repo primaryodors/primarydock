@@ -93,7 +93,7 @@ a[href]:hover
     text-decoration: underline;
 }
 
-p
+p, li
 {
     font-family: Verdana, Arial, Sans-Serif;
     font-size: 14px;

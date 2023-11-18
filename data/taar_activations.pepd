@@ -1,17 +1,51 @@
 
 LOAD "pdbs/TAAR/TAAR1.upright.pdb" A I
-CENTER
 UPRIGHT I
 BWCENTER
 
-LOAD "pdbs/8jlj.pdb" R A
-CENTER
-
+DOWNLOAD RCSB 8JLN "pdbs/8jln.pdb" ONCE
+LOAD "pdbs/8jln.pdb" R A
 BWCOPY I A
 UPRIGHT A
 BWCENTER
-
-# DUMP QUIT
-
 SAVE "pdbs/TAAR1.3-iodothyronamine.pdb"
 
+
+DOWNLOAD RCSB 8JLO "pdbs/8jlo.pdb" ONCE
+LOAD "pdbs/8jlo.pdb" R A
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.ulotaront.pdb"
+
+
+DOWNLOAD RCSB 8JLP "pdbs/8jlp.pdb" ONCE
+LOAD "pdbs/8jlp.pdb" R A
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.ralmitaront.pdb"
+
+
+DOWNLOAD RCSB 8JLQ "pdbs/8jlq.pdb" ONCE
+LOAD "pdbs/8jlq.pdb" R A
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.fenoldopam.pdb"
+
+
+DOWNLOAD RCSB 8JLR "pdbs/8jlr.pdb" ONCE
+LOAD "pdbs/8jlr.pdb" R A
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.A77636.pdb"
+
+
+DOWNLOAD RCSB 8JSO "pdbs/8jso.pdb" ONCE
+LOAD "pdbs/8jso.pdb" R A
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.amphetamine.pdb"

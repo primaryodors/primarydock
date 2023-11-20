@@ -178,6 +178,13 @@ function has_antagonists($protein)
 	return false;
 }
 
+function make_clickable_notes($notes)
+{
+	$result = [];
+	foreach ($notes as $key => $note) $result[$key] = "<a href=\"note.php?n=$note\">$note</a>";
+	return $result;
+}
+
 function all_empirical_pairs_for_receptor($protein, $return_1dim = false, $agonists_only = false)
 {
 	global $odors;

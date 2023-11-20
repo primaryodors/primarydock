@@ -40,11 +40,12 @@ arsort($orlist);
 $page_title = $note;
 include("header.php");
 
-echo "<h1>$note</h1>";
+echo "<h1>Receptors that correlate to $note</h1>";
 echo "<table width=\"50%\">\n";
 foreach ($orlist as $orid => $strength)
 {
-    if ($strength < 0.5 * $max) break;
+    if ($strength < 0.25 * $max) break;
     $width = $strength * 100.0 / $max;
-    echo "<tr><th width=\"5%\">$orid</th><td><div style=\"display: inline-block; background-color: #ffc; width: $width%;\">&nbsp;</div></td></tr>\n";
+    echo "<tr><th width=\"5%\"><a href=\"receptor.php?r=$orid\">$orid</a></th>
+        <td><div style=\"display: inline-block; background-color: #ffc; width: $width%;\">&nbsp;</div></td></tr>\n";
 }

@@ -41,6 +41,7 @@ $page_title = $note;
 include("header.php");
 
 echo "<h1>Receptors that correlate to $note</h1>";
+if (!count($orlist)) die("Insufficient data.");
 echo "<table width=\"50%\">\n";
 foreach ($orlist as $orid => $strength)
 {

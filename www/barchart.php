@@ -267,20 +267,20 @@ if (!file_exists($fontfile = "assets/Montserrat.ttf"))
 $x = 53*$res;
 $x1 = $x + 10*strlen($odor['full_name']);
 
-foreach ($texts as $t)
+foreach ($texts as $txt)
 {   
-    imagettftext($im, 9, 35, $t[0], $t[1], $pink, $fontfile, $t[2]);
+    imagettftext($im, 9, 35, $txt[0], $txt[1], $pink, $fontfile, $txt[2]);
 
-    if ($t[0] >= $x && $t[0] <= $x1) $x = $t[0] + 50;
+    if ($txt[0] >= $x && $txt[0] <= $x1) $x = $txt[0] + 50;
 }
 
-
-
+if ((!count($t) || !max($t)) && (!count($e) || !min($e)))
+{   
+    imagettftext($im, 28, 0, $w*0.42, $h*0.44, $pink, $fontfile, "(no data)");
+}
 
 // Odorant Name
 imagestring($im, 5, $x, 2, $odor['full_name'], $blue);
-
-
 
 header('Content-Type: image/png');
 header('Content-Disposition: inline; filename="barchart.png"');

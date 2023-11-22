@@ -45,8 +45,9 @@ if (!count($orlist)) die("Insufficient data.");
 echo "<table width=\"50%\">\n";
 foreach ($orlist as $orid => $strength)
 {
+    $poid = find_poid($orid);
     if ($strength < 0.25 * $max) break;
     $width = $strength * 100.0 / $max;
-    echo "<tr><th width=\"5%\"><a href=\"receptor.php?r=$orid\">$orid</a></th>
+    echo "<tr><th width=\"5%\"><a href=\"receptor.php?r=$poid\">$poid</a></th>
         <td><div style=\"display: inline-block; background-color: #ffc; width: $width%;\">&nbsp;</div></td></tr>\n";
 }

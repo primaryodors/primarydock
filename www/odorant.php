@@ -186,6 +186,8 @@ window.setTimeout( function()
         $lrefs[] = $refurl;
         $refno++;
     }
+
+    if (@$odor['comment']) echo "<br>{$odor['comment']}<br>";
     ?>
 </p>
 
@@ -300,6 +302,8 @@ foreach (array_keys($sorted) as $rcpid)
         else echo "<td>&nbsp;</td>\n";
 
         $notes = substr(get_notes_for_receptor($rcpid, $correlations), 0, 123);
+        $notes = make_clickable_notes(explode(", ", $notes));
+        $notes = implode(", ", $notes);
         if (substr($notes, 0, 1) == '(')
         {
             $notes = "<i class=\"dim\">$notes</i>";

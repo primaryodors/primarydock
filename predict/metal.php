@@ -8,7 +8,7 @@
 // php -f predict/metal.php force
 //
 
-require("protutils.php");
+require("../data/protutils.php");
 
 foreach (@$argv as $a)
 {

@@ -1,6 +1,6 @@
 <?php
 
-require_once("protutils.php");
+require_once("../data/protutils.php");
 
 foreach (@$argv as $a)
 {

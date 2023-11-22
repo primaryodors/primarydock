@@ -728,7 +728,7 @@ foreach ($pairs as $oid => $pair)
         else echo "<td>&nbsp;</td>";
     }
 
-    echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
+    echo "<td style=\"white-space: nowrap;\">" . implode(", ",make_clickable_notes($pq)) . "</td>\n";
     echo "</tr>\n";
 }   // Each pair.
 
@@ -759,7 +759,7 @@ if (count($predictions))
             $pq = [];
             foreach ($lodor['aroma'] as $refurl => $notes) $pq = array_merge($pq, $notes);
             $pq = array_unique($pq);
-            echo "<td style=\"white-space: nowrap;\">" . implode(", ",$pq) . "</td>\n";
+            echo "<td style=\"white-space: nowrap;\">" . implode(", ",make_clickable_notes($pq)) . "</td>\n";
             echo "</tr>\n";
         }
     }

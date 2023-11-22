@@ -34,7 +34,8 @@ SDFs can be obtained a few different ways:
 <ul>
   <li>If you have <a href="https://openbabel.org">obabel</a>, you can generate 3 dimensional SDFs from SMILES input. Example syntax:<br>
     <code>obabel -:'CCO' --gen3D -osdf -Osdf/ethanol.sdf</code><br>
-    There is also a script located at <code>data/gensdf.sh</code> that will make the obabel call if given a compound name and a SMILES string.
+    There is also a PHP script located at <code>data/gensdf.php</code> that will make the obabel call, as well as add the molecule to
+    odorants.json, if given a compound name and a SMILES string.
   </li>
   <li>SDFs are available from PubChem at https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{pubchem_cid}/SDF?record_type=3d</li>
   <li>Or at https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/{SMILES}/SDF?record_type=3d</li>

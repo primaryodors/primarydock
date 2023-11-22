@@ -375,6 +375,26 @@
         },
         "oid": "0127a30c8fa8582be06902e26cefab54"
     },
+    "015c30901a10889c7b4db5ab86feb454":
+    {
+        "full_name": "vanoris",
+        "name1": "nonisyl acetate",
+        "iupac": "3,5,5-trimethylhexyl acetate",
+        "smiles": "CC(CCOC(=O)C)CC(C)(C)C",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "sweet",
+                "orris",
+                "cumin",
+                "woody",
+                "fruity",
+                "spicy"
+            ]
+        },
+        "oid": "015c30901a10889c7b4db5ab86feb454"
+    },
     "01c401e3e42a0217b362e491ca1cbae7":
     {
         "full_name": "ethanethiol",
@@ -22839,6 +22859,7 @@
     {
         "full_name": "isononyl alcohol",
         "smiles": "CC(C)CCCCCCO",
+        "comment": "It is not clear whether Manteniotis et al (2016) and Tsai et al (2017) mean this compound or nonisyl alcohol in regards to activity for OR51B5.",
         "aroma":
         {
             "http:\/\/www.thegoodscentscompany.com":
@@ -25486,6 +25507,12 @@
             ]
         },
         "oid": "b984499508e50402f1998274a7eac486"
+    },
+    "b99f54f72cc373ce0d067031c265142f":
+    {
+        "full_name": "nonisyl alcohol",
+        "smiles": "CC(CCO)CC(C)(C)C",
+        "oid": "b99f54f72cc373ce0d067031c265142f"
     },
     "ba119fa996e35d7222b5582a8060a940":
     {
@@ -28165,6 +28192,19 @@
     {
         "full_name": "hivernal",
         "smiles": "c1c(CCC=O)cc2c(c1)C(C)(C)CC2",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "aldehydic",
+                "muguet",
+                "green",
+                "fresh",
+                "clean",
+                "laundered_cloth"
+            ]
+        },
+        "comment": "This structure represents one isomer. The actual substance is a mixture of isomers that vary by which aryl carbon attaches to the propanal group.",
         "oid": "ce80b5519d0fb549ac4016ff788486cb"
     },
     "d0a6910e697722b693023d286f5e8c4d":

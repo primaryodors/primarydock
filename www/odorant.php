@@ -186,6 +186,8 @@ window.setTimeout( function()
         $lrefs[] = $refurl;
         $refno++;
     }
+
+    if (@$odor['comment']) echo "<br>{$odor['comment']}<br>";
     ?>
 </p>
 

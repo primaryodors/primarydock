@@ -27,4 +27,4 @@ $fp = fopen("odorant.json", "wb");
 fwrite($fp, json_encode_pretty($odors));
 
 chdir("..");
-passthru("obabel -:\"$smiles\" --gen3D -osdf -Osdf/$name.sdf");
+passthru("obabel -:\"$smiles\" --gen3D -osdf -O\"sdf/$name.sdf\"");

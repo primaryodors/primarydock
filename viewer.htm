@@ -2964,11 +2964,11 @@ function getFileContents(event)
     {
         return function(e)
         {
-			curr_ligand = null;
-			window.setTimeout(function()
-			{
-				$("#clip").trigger("input");
-			}, 259);
+            curr_ligand = null;
+            window.setTimeout(function()
+            {
+                $("#clip").trigger("input");
+            }, 259);
             return loadFile(e.target.result, e.target.fname);
         };
     })(f);

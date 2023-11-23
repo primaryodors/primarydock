@@ -10,7 +10,7 @@ OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OB
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test test/amino_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
 	  test/flexion_test test/histidine_test test/ring_test
-APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_activate_or $(BINDIR)/score_pdb
+APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_activate_or $(BINDIR)/score_pdb $(BINDIR)/ramachandran
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
 all: $(DIRS) \
 	 $(OBJS) \
@@ -142,6 +142,9 @@ $(BINDIR)/ic_activate_or: src/ic_activate_or.cpp $(OBJS) $(OBJDIR)/protein.o
 
 $(BINDIR)/score_pdb: src/score_pdb.cpp $(OBJS) $(OBJDIR)/protein.o $(OBJDIR)/scoring.o
 	$(CC) src/score_pdb.cpp $(OBJS) -o $(BINDIR)/score_pdb $(CFLAGS)
+
+$(BINDIR)/ramachandran: src/ramachandran.cpp $(OBJS) $(OBJDIR)/protein.o
+	$(CC) src/ramachandran.cpp $(OBJS) -o $(BINDIR)/ramachandran $(CFLAGS)
 
 performance_test: $(BINDIR)/primarydock testdata/test_TAAR8.config testdata/TAAR8.upright.pdb testdata/CAD_ion.sdf
 	./$(BINDIR)/primarydock testdata/test_TAAR8.config

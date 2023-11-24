@@ -223,7 +223,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         }
         else
         {
-            // if (lb > 500) lb = 0;
+            if (lb > 500) lb = 0;
             lmkJmol[metcount] = lb;
 
             if (-lb > worst_energy) worst_energy = -lb;
@@ -292,7 +292,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     interauditing = false;
     #endif
 
-    if (btot > 60*ligand->get_atom_count()) btot = 0;
+    if (btot > 100*ligand->get_atom_count()) btot = 0;
     if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
 
     kJmol = (differential_dock && (maxclash > individual_clash_limit)) ? -Avogadro : btot;

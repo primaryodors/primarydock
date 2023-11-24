@@ -340,6 +340,7 @@
 #define _dbg_bb_rots 0
 #define _dbg_bridges 0
 #define _dbg_cond_basic 0
+#define _dbg_cond_basic_acd_lig 1
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
 #define _dbg_find_blasted_segfault 0

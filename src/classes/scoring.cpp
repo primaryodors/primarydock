@@ -223,7 +223,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         }
         else
         {
-            if (lb > 500) lb = 0;
+            // if (lb > 500) lb = 0;
             lmkJmol[metcount] = lb;
 
             if (-lb > worst_energy) worst_energy = -lb;

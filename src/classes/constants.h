@@ -295,7 +295,7 @@
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
 #define _allow_conditional_basicity_with_acid_ligand 1
-#define cond_bas_hbond_energy_threshold 1.5
+#define cond_bas_hbond_energy_threshold 1.0
 #define cond_bas_hbond_distance_threshold 2.3
 
 #define prealign_iters 50
@@ -340,7 +340,7 @@
 #define _dbg_bb_rots 0
 #define _dbg_bridges 0
 #define _dbg_cond_basic 0
-#define _dbg_cond_basic_acd_lig 1
+#define _dbg_cond_basic_acd_lig 0
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
 #define _dbg_find_blasted_segfault 0

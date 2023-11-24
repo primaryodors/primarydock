@@ -976,7 +976,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
             if (forces[i]->type != ionic)
             {
-                if (a->get_bonded_atoms_count() == ag || b->get_bonded_atoms_count() == bg)
+                if (a->get_bonded_atoms_count() >= ag || b->get_bonded_atoms_count() >= bg)
                     continue;
 
                 // Sum up the anisotropic contribution from each geometry vertex of a.

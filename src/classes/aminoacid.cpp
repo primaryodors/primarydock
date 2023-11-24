@@ -1930,13 +1930,6 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
                 if (atoms[j]->get_family() == TETREL) continue;
                 if (atoms[j]->get_Z() == 1 && atoms[j]->is_polar() < 0.1) continue;
 
-                #if _dbg_cond_basic_acd_lig
-                if (nearby_mols[i]->get_charge() < 0 && atoms[j]->get_Z() == 1 && atoms[j]->is_polar())
-                {
-                    l = 0;
-                }
-                #endif
-
                 if (fabs(atoms[j]->get_charge()) > 0.2) continue;
 
                 Atom* a = nearby_mols[i]->get_nearest_atom(atoms[j]->get_location());

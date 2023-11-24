@@ -182,6 +182,7 @@ public:
     void increment_charge(float lcharge)
     {
         charge += lcharge;
+        origchg = charge;
     }
 
     // Bond functions.
@@ -338,6 +339,7 @@ protected:
     float Eion = 0;
     float Eaffin = 0;
     float charge = 0;					// can be partial.
+    float origchg = 0;
     float max_localized_charge = 0;     // for conjugated charged systems.
     float acidbase = 0;					// charge potential; negative = acid / positive = basic.
     float polarity = 0;					// maximum potential relative to -OH...H-.

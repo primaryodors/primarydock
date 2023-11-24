@@ -333,6 +333,7 @@
 
 // Should normally be false or zero:
 #define _dbg_259 0
+#define _dbg_51e2_ionic 1
 #define _dbg_anemia 0
 #define _dbg_bb_pullaway 0
 #define _dbg_bb_realign 0

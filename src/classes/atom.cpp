@@ -250,7 +250,7 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
     location.y = l_location->y;
     location.z = l_location->z;
     location.weight = at_wt;
-    charge = lcharge;
+    charge = origchg = lcharge;
 
     Z = Z_from_esym(elem_sym);
 
@@ -362,6 +362,7 @@ Atom::Atom(FILE* is)
                         else if	(!strcmp(strcharge, "-")) charge = -1;
                         else if	(!strcmp(strcharge, "--")) charge = -2;
                         else if (atoi(strcharge)) charge = atoi(strcharge);
+                        origchg = charge;
                         // cout << aa3let << residue << ":" << name << " has charge " << charge << endl;
                     }
 
@@ -2230,7 +2231,7 @@ float Atom::is_conjugated_to_charge(Atom* bir, Atom* c)
             bonded_to[i].btom->is_pi()
         )
         {
-            float f = bonded_to[i].btom->charge;
+            float f = bonded_to[i].btom->origchg;
             if (f)
             {
                 bir->recursion_counter = 0;

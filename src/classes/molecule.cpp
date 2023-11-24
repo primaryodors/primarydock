@@ -2455,6 +2455,13 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
         Point aloc = atoms[i]->get_location();
         for (l=0; ligands[l]; l++)
         {
+            #if _dbg_51e2_ionic
+            if (!is_residue() && atoms[i]->get_family() == CHALCOGEN && ligands[l]->is_residue() == 262)
+            {
+                j = 0;
+            }
+            #endif
+
             if (ligands[l] == this) continue;
             for (j=0; j<ligands[l]->atcount; j++)
             {

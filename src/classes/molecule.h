@@ -154,6 +154,7 @@ public:
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
     bool rotate_bond(const Bond* rot8b, const float angle);
     void do_histidine_flip(HistidineFlip* hf);
+    void identify_conjugations();
 
     // Ring functions.
     int identify_rings();

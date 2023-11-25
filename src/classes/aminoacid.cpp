@@ -63,6 +63,7 @@ AminoAcid::AminoAcid(FILE* instream, AminoAcid* prevaa, int rno)
     mol_typ = MOLTYP_AMINOACID;
     prev_aa = prevaa;
     if (prevaa) prevaa->next_aa = this;
+    identify_conjugations();
     find_his_flips();
 }
 
@@ -653,6 +654,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
     identify_acidbase();
     identify_rings();
+    identify_conjugations();
 
     if (rings && !aa_defs[idx].aarings)
     {
@@ -1384,6 +1386,7 @@ _return_added:
         rings[i] = nullptr;
     }
     // identify_rings();
+    identify_conjugations();
 
     return added;
 }

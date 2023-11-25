@@ -116,6 +116,7 @@ Molecule::Molecule(char const* lname, Atom** collection)
     smiles = nullptr;
     rings = nullptr;
     reset_conformer_momenta();
+    identify_conjugations();
     rotatable_bonds = 0;
 }
 
@@ -826,9 +827,26 @@ int Molecule::from_sdf(char const* sdf_dat)
     atoms[atcount] = 0;
     if (words) delete words;
 
+    identify_conjugations();
     identify_rings();
     identify_acidbase();
     return added;
+}
+
+void Molecule::identify_conjugations()
+{
+    if (!atoms) return;
+
+    int i;
+    for (i=0; atoms[i]; i++) atoms[i]->conjugation = nullptr;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_pi() && !atoms[i]->conjugation)
+        {
+            Conjugation* conj = new Conjugation(atoms[i]);          // Don't have to save this pointer because the atoms will save it.
+        }
+    }
 }
 
 int Molecule::from_pdb(FILE* is, bool het_only)
@@ -915,6 +933,7 @@ int Molecule::from_pdb(FILE* is, bool het_only)
         delete words;
     }
 
+    identify_conjugations();
     return added;
 }
 
@@ -3485,6 +3504,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
     float anomaly = correct_structure();
     cout << "# Structural anomaly = " << anomaly << endl;
     hydrogenate(false);
+    identify_conjugations();
 
     return retval;
 }
@@ -3938,6 +3958,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     }
     atoms[atcount]=0;
 
+    identify_conjugations();
     return true;
 }
 

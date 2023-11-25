@@ -334,14 +334,20 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
     retval[0] = nullptr;
     int i, j=0;
 
-    // Charged atoms always attract or repel, irrespective of Z.
-    if (a->get_charge() && b->get_charge())
+    // Charged atoms always attract or repel, irrespective of Z. But charges in conjugated systems move to interact.
+    bool do_ionic = (a->get_charge() && b->get_charge());
+    if (do_ionic)
+    {
+        if (a->conjugation &&  a != a->conjugation->get_nearest_atom(b->conjugation)) do_ionic = false;
+        if (b->conjugation &&  b != b->conjugation->get_nearest_atom(a->conjugation)) do_ionic = false;
+    }
+    if (do_ionic)
     {
         retval[j] = &intertmp;
         retval[j]->Za = a->get_Z();
         retval[j]->Zb = b->get_Z();
         retval[j]->type = ionic;
-        retval[j]->kJ_mol = 20; // Do not multiply by sgn charges here or total_binding() will reverse it.
+        retval[j]->kJ_mol = 60; // Do not multiply by sgn charges here or total_binding() will reverse it.
         retval[j]->distance = 0.584 * (a->get_vdW_radius() + b->get_vdW_radius());		// Based on NH...O and the vdW radii of O and H.
         // retval[j]->distance = 0.7 * (a->get_vdW_radius() + b->get_vdW_radius());		// Based on NaCl.
         retval[j]->dirprop = 0;

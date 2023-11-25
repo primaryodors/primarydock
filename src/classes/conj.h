@@ -16,7 +16,7 @@ class Conjugation
     ~Conjugation();
 
     void add_atom(Atom* add);
-    float get_net_charge() { return net_charge; }
+    float get_net_charge();
     Point get_barycenter();
     Atom* get_nearest_atom(Point pt);
     Atom* get_nearest_atom(Conjugation* conj);

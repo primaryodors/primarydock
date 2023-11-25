@@ -15,7 +15,7 @@ Conjugation::Conjugation(Atom* from_atom)
     add_atom(from_atom);
 }
 
-Conjugation::~Conjugation();
+Conjugation::~Conjugation()
 {
     delete[] atoms;
 }
@@ -112,6 +112,8 @@ Atom* Conjugation::get_nearest_atom(Point pt)
             best_r = r;
         }
     }
+
+    return best_a;
 }
 
 Atom* Conjugation::get_nearest_atom(Conjugation* conj)

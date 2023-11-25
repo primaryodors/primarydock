@@ -341,7 +341,7 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
         retval[j]->Za = a->get_Z();
         retval[j]->Zb = b->get_Z();
         retval[j]->type = ionic;
-        retval[j]->kJ_mol = 60; // Do not multiply by sgn charges here or total_binding() will reverse it.
+        retval[j]->kJ_mol = 20; // Do not multiply by sgn charges here or total_binding() will reverse it.
         retval[j]->distance = 0.584 * (a->get_vdW_radius() + b->get_vdW_radius());		// Based on NH...O and the vdW radii of O and H.
         // retval[j]->distance = 0.7 * (a->get_vdW_radius() + b->get_vdW_radius());		// Based on NaCl.
         retval[j]->dirprop = 0;

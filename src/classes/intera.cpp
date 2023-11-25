@@ -733,6 +733,10 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     {
         if (forces[i]->type == ionic)
         {
+            /*if (!a->residue && b->residue == 262)
+            {
+                i = 0;
+            }*/
             if (a->conjugation && b->conjugation)
             {
                 if (a != a->conjugation->get_nearest_atom(b->conjugation)) continue;

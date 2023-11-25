@@ -118,12 +118,12 @@ Atom* Conjugation::get_nearest_atom(Point pt)
 
 Atom* Conjugation::get_nearest_atom(Conjugation* conj)
 {
-    if (mutual == conj)
+    /*if (mutual == conj)
     {
         mutual->mutual = nullptr;
         mutual = nullptr;
         return mutual_nearest;
-    }
+    }*/
 
     Point bcen1 = get_barycenter(), bcen2 = conj->get_barycenter();
     Atom* a = get_nearest_atom(bcen2), *b = conj->get_nearest_atom(bcen1);

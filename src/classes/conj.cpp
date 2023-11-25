@@ -120,7 +120,8 @@ Atom* Conjugation::get_nearest_atom(Conjugation* conj)
 {
     if (mutual == conj)
     {
-        mutual->mutual = mutual = nullptr;
+        mutual->mutual = nullptr;
+        mutual = nullptr;
         return mutual_nearest;
     }
 

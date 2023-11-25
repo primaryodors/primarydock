@@ -334,12 +334,17 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
     retval[0] = nullptr;
     int i, j=0;
 
-    // Charged atoms always attract or repel, irrespective of Z. But charges in conjugated systems move to interact.
+    // Charged atoms always attract or repel, irrespective of Z. But charges in conjugated systems move to interact at the mutual nearest atoms.
     bool do_ionic = (a->get_charge() && b->get_charge());
     if (do_ionic)
     {
-        if (a->conjugation &&  a != a->conjugation->get_nearest_atom(b->conjugation)) do_ionic = false;
-        if (b->conjugation &&  b != b->conjugation->get_nearest_atom(a->conjugation)) do_ionic = false;
+        if (a->conjugation && b->conjugation)
+        {
+            if (a != a->conjugation->get_nearest_atom(b->conjugation)) do_ionic = false;
+            if (b != b->conjugation->get_nearest_atom(a->conjugation)) do_ionic = false;
+        }
+        else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) do_ionic = false;
+        else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) do_ionic = false;
     }
     if (do_ionic)
     {
@@ -726,6 +731,17 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     for (i=0; forces[i]; i++)
     {
+        if (forces[i]->type == ionic)
+        {
+            if (a->conjugation && b->conjugation)
+            {
+                if (a != a->conjugation->get_nearest_atom(b->conjugation)) continue;
+                if (b != b->conjugation->get_nearest_atom(a->conjugation)) continue;
+            }
+            else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) continue;
+            else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) continue;
+        }
+
         if (!forces[i]->distance) continue;
         float r1 = r / forces[i]->distance;
 

@@ -48,7 +48,6 @@ public:
     intera_type type = covalent;
     float optimal_radius = 1;
     bond_rotation_fail_reason last_fail = bf_none;
-    Conjugation* conjugation = nullptr;
 
     #if _debug_active_bond_rot
     bool echo_on_rotate = false;
@@ -165,6 +164,7 @@ public:
     bool is_pKa_near_bio_pH() { return is_imidazole_like; }
     float get_acidbase();
     float get_charge();
+    float get_orig_charge() { return origchg; }
     float get_max_conj_charge() { return max_localized_charge; }
     float is_polar();						// -1 if atom is H-bond acceptor; +1 if donor.
     bool is_metal();
@@ -322,6 +322,7 @@ public:
     float shielding_angle = 0;
     char pdbchain = ' ';
     bool doing_ring_closure = false;
+    Conjugation* conjugation = nullptr;
 
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.

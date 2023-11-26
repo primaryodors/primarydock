@@ -1070,7 +1070,7 @@ float GroupPair::get_potential()
                     }
                     else if (fabs(a->is_polar()) > hydrophilicity_cutoff && amide.contained_by(aa, matches))
                     {
-                        partial *= 3;
+                        partial *= 2;
                         #if _dbg_groupsel
                         cout << *a << " is polar and " << *aa << " is amide." << endl;
                         #endif
@@ -1114,7 +1114,8 @@ float GroupPair::get_potential()
                     #endif
                 }
 
-                potential += partial;
+                // potential += partial;
+                potential = fmax(potential, partial);
                 q++;
             }
         }
@@ -1262,17 +1263,29 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     int n = min((int)gp.size(), _bb_max_grp);
     if (n < 1) return;
     float r;
+    Point origin;
+    Rotation rot;
+    LocatedVector lv;
 
-    Point origin = (n > 1) ? gp[1]->ag->get_center() : lig->get_barycenter();
-    Rotation rot = align_points_3d(gp[0]->ag->get_center(), gp[0]->scg->get_center(), origin);
-    LocatedVector lv = rot.v;
-    lv.origin = origin;
-    #if _dbg_groupsel || _dbg_groupsalign
-    cout << "I. Rotating " << *gp[0]->ag << "(" << gp[0]->ag->get_center() << ") "
-        << (rot.a * fiftyseven) << "deg about " << rot.v
-        << " in the direction of " << *gp[0]->scg << "(" << gp[0]->scg->get_center() << ")." << endl;
-    #endif
-    if (rot.a >= bb_realign_threshold_angle) lig->rotate(lv, rot.a*amount);
+    r = gp[0]->scg->distance_to(gp[0]->ag->get_center());
+    if (r >= bb_realign_threshold_distance)
+    {
+        origin = (n > 1) ? gp[1]->ag->get_center() : lig->get_barycenter();
+        rot = align_points_3d(gp[0]->ag->get_center(), gp[0]->scg->get_center(), origin);
+        lv = rot.v;
+        lv.origin = origin;
+        #if _dbg_groupsel || _dbg_groupsalign
+        cout << "I. Rotating " << *gp[0]->ag << "(" << gp[0]->ag->get_center() << ") "
+            << (rot.a * fiftyseven) << "deg about " << rot.v
+            << " in the direction of " << *gp[0]->scg << "(" << gp[0]->scg->get_center() << ")." << endl;
+        #endif
+
+        #if _dbg_improvements_only_rule
+        excuse_deterioration = true;
+        #endif
+
+        if (rot.a >= bb_realign_threshold_angle) lig->rotate(lv, rot.a*amount);
+    }
 
     #if enable_bb_scooch
     // Scooch.
@@ -1281,17 +1294,17 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     float r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center()); // - gp[1]->scg->group_reach();
     bool do0 = false, do1 = false;
     Point rel(0,0,0);
-    if (r0 > 2)
+    if (r0 > bb_scooch_threshold_distance)
     {
         Point pt = gp[0]->scg->get_center().subtract(gp[0]->ag->get_center());
-        pt.scale((r0-2) *amount);
+        pt.scale((r0-bb_scooch_threshold_distance) *amount);
         rel = rel.add(pt);
         do0 = true;
     }
-    if (r1 > 2)
+    if (r1 > bb_scooch_threshold_distance)
     {
         Point pt = gp[1]->scg->get_center().subtract(gp[1]->ag->get_center());
-        pt.scale((r1-2) *amount);
+        pt.scale((r1-bb_scooch_threshold_distance) *amount);
         rel = rel.add(pt);
         do1 = true;
     }
@@ -1309,6 +1322,11 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         if (do1) cout << *gp[1]->scg << " ";
         cout << endl;
         #endif
+
+        #if _dbg_improvements_only_rule
+        excuse_deterioration = true;
+        #endif
+
         lig->move(rel);
     }
     #endif
@@ -1317,7 +1335,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
 
     if (n < 2) return;
     r = gp[1]->scg->distance_to(gp[1]->ag->get_center()); // - gp[1]->scg->group_reach();
-    if (r > 2)
+    if (r >= bb_realign_threshold_distance)
     {
         origin = gp[0]->ag->get_center();
         rot = align_points_3d(gp[1]->ag->get_center(), gp[1]->scg->get_center(), origin);
@@ -1328,6 +1346,11 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
             << (rot.a * fiftyseven) << "deg about " << rot.v
             << " in the direction of " << *gp[1]->scg << " (" << gp[1]->scg->get_center() << ")." << endl;
         #endif
+
+        #if _dbg_improvements_only_rule
+        excuse_deterioration = true;
+        #endif
+
         lig->rotate(lv, rot.a*amount);
         // cout << r << " ~ " << gp[1]->scg->distance_to(gp[1]->ag->get_center()) << endl << endl;
 
@@ -1343,6 +1366,11 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #if _dbg_groupsel || _dbg_groupsalign
     cout << "III. \"Rotisserie\" aligning " << *gp[2]->ag << " in the direction of " << *gp[2]->scg << endl;
     #endif
+
+    #if _dbg_improvements_only_rule
+    excuse_deterioration = true;
+    #endif
+
     lig->rotate(lv, theta*amount);
 
     if (do_conforms) gp[2]->scg->conform_to(lig);

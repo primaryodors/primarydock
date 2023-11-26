@@ -16,6 +16,7 @@ struct LocatedVector;
 struct Rotation;
 struct LocRotation;
 class Atom;
+class Conjugation;
 struct Tug;
 class Bond;
 class InteratomicForce;
@@ -44,6 +45,7 @@ union Star
     Protein* pprot;
     Region* preg;
     Rotation* prot;
+    Conjugation* pcon;
 };
 
 int in_array(void* needle, void** haystack);

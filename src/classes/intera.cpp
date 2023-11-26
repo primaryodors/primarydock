@@ -334,15 +334,27 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
     retval[0] = nullptr;
     int i, j=0;
 
-    // Charged atoms always attract or repel, irrespective of Z.
-    if (a->get_charge() && b->get_charge())
+    // Charged atoms always attract or repel, irrespective of Z. But charges in conjugated systems move to interact at the mutual nearest atoms.
+    bool do_ionic = (a->get_charge() && b->get_charge());
+    if (do_ionic)
+    {
+        if (a->conjugation && b->conjugation)
+        {
+            if (a != a->conjugation->get_nearest_atom(b->conjugation)) do_ionic = false;
+            if (b != b->conjugation->get_nearest_atom(a->conjugation)) do_ionic = false;
+        }
+        else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) do_ionic = false;
+        else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) do_ionic = false;
+    }
+    if (do_ionic)
     {
         retval[j] = &intertmp;
         retval[j]->Za = a->get_Z();
         retval[j]->Zb = b->get_Z();
         retval[j]->type = ionic;
-        retval[j]->kJ_mol = 20; // Do not multiply by sgn charges here or total_binding() will reverse it.
+        retval[j]->kJ_mol = 60; // Do not multiply by sgn charges here or total_binding() will reverse it.
         retval[j]->distance = 0.584 * (a->get_vdW_radius() + b->get_vdW_radius());		// Based on NH...O and the vdW radii of O and H.
+        // retval[j]->distance = 0.7 * (a->get_vdW_radius() + b->get_vdW_radius());		// Based on NaCl.
         retval[j]->dirprop = 0;
 
         j++;
@@ -624,8 +636,8 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
     float l_heavy_atom_mindist = aheavy->get_vdW_radius() + bheavy->get_vdW_radius();
 
     float ahcg = aheavy->is_conjugated_to_charge(), bhcg = bheavy->is_conjugated_to_charge();
-    if (!achg && ahcg) achg = ahcg;
-    if (!bchg && bhcg) bchg = bhcg;
+    if (fabs(ahcg) > fabs(achg)) achg = ahcg;
+    if (fabs(bhcg) > fabs(bchg)) bchg = bhcg;
     // if (!strcmp(a->name, "O6") && !strcmp(b->name, "HD1") && b->residue == 180 ) cout << ahcg << " " << bhcg << endl;
 
     #if _ALLOW_PROTONATE_PNICTOGENS
@@ -719,6 +731,17 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
     for (i=0; forces[i]; i++)
     {
+        if (forces[i]->type == ionic)
+        {
+            if (a->conjugation && b->conjugation)
+            {
+                if (a != a->conjugation->get_nearest_atom(b->conjugation)) continue;
+                if (b != b->conjugation->get_nearest_atom(a->conjugation)) continue;
+            }
+            else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) continue;
+            else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) continue;
+        }
+
         if (!forces[i]->distance) continue;
         float r1 = r / forces[i]->distance;
 
@@ -975,7 +998,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
             if (forces[i]->type != ionic)
             {
-                if (a->get_bonded_atoms_count() == ag || b->get_bonded_atoms_count() == bg)
+                if (a->get_bonded_atoms_count() >= ag || b->get_bonded_atoms_count() >= bg)
                     continue;
 
                 // Sum up the anisotropic contribution from each geometry vertex of a.
@@ -1104,7 +1127,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
             if (forces[i]->type == ionic && a->get_charge() && b->get_charge())
             {
-                partial *= a->get_charge() * -(b->get_charge());
+                partial *= achg * -bchg;
             }
 
             if (forces[i]->type == hbond) partial *= fabs(apol) * fabs(bpol);
@@ -1123,6 +1146,18 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         
         #if _dbg_interatomic_forces
         if (debug_criteria) cout << -partial << endl;
+        #endif
+
+        #if _dbg_51e2_ionic
+        if (forces[i]->type == ionic && achg < 0 && bchg > 0 && !a->residue && b->residue == 262)
+        {
+            cout << a->name << " charge " << achg << " ~ "
+                << r << " ~ " << b->residue << ":" << b->name
+                << ", max energy " << forces[i]->kJ_mol
+                << ", optimal distance " << forces[i]->distance
+                << "; aniso " << aniso << " = " << partial
+                << endl;
+        }
         #endif
 
         if (fabs(partial) >= 500)

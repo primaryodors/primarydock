@@ -164,6 +164,7 @@ public:
     bool is_pKa_near_bio_pH() { return is_imidazole_like; }
     float get_acidbase();
     float get_charge();
+    float get_orig_charge() { return origchg; }
     float get_max_conj_charge() { return max_localized_charge; }
     float is_polar();						// -1 if atom is H-bond acceptor; +1 if donor.
     bool is_metal();
@@ -182,6 +183,7 @@ public:
     void increment_charge(float lcharge)
     {
         charge += lcharge;
+        origchg = charge;
     }
 
     // Bond functions.
@@ -320,6 +322,7 @@ public:
     float shielding_angle = 0;
     char pdbchain = ' ';
     bool doing_ring_closure = false;
+    Conjugation* conjugation = nullptr;
 
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.
@@ -338,6 +341,7 @@ protected:
     float Eion = 0;
     float Eaffin = 0;
     float charge = 0;					// can be partial.
+    float origchg = 0;
     float max_localized_charge = 0;     // for conjugated charged systems.
     float acidbase = 0;					// charge potential; negative = acid / positive = basic.
     float polarity = 0;					// maximum potential relative to -OH...H-.

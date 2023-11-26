@@ -573,18 +573,6 @@ void iteration_callback(int iter, Molecule** mols)
 
     if (bbest >= 15)
     {
-        Point A = btom->get_location();
-        Point B = bary;
-        Point C = ligcen_target;
-
-        SCoord N = compute_normal(A, B, C);
-
-        float theta = find_3d_angle(B, C, A);
-        theta /= 3;
-        LocatedVector lv = N;
-        lv.origin = A;
-        ligand->rotate(lv, theta);
-
         bary = ligand->get_barycenter();
     }
     else
@@ -2896,6 +2884,10 @@ _try_again:
                     }
                 }
             }
+
+            #if _dbg_improvements_only_rule
+            check_ligand = ligand;
+            #endif
 
             ligand->movability = (MovabilityType)(MOV_ALL - MOV_MC_AXIAL);
             if (!flex) for (j=0; j<sphres; j++)

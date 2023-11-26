@@ -154,6 +154,7 @@ public:
     void clear_all_bond_caches();					// Call this any time you add or remove an atom.
     bool rotate_bond(const Bond* rot8b, const float angle);
     void do_histidine_flip(HistidineFlip* hf);
+    void identify_conjugations();
 
     // Ring functions.
     int identify_rings();
@@ -292,6 +293,12 @@ extern bool wet_environment;
 extern float _momentum_rad_ceiling;
 extern Molecule *worst_clash_1, *worst_clash_2;
 extern float worst_mol_clash;
+
+#if _dbg_improvements_only_rule
+extern Molecule** check_mols;
+extern Molecule* check_ligand;
+extern bool excuse_deterioration;
+#endif
 
 #endif
 

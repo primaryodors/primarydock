@@ -1,5 +1,5 @@
 
-#include "atom.h"
+#include "conj.h"
 #include <vector>
 
 #ifndef _INTERATOMIC

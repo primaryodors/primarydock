@@ -208,6 +208,15 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         float lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
         if (lb < -maxclash) maxclash = -lb;
 
+        #if _dbg_51e2_ionic
+        if (resno == 262)
+        {
+            cout << endl << resno << " charge " << reaches_spheroid[i]->get_charge()
+                << " vs. ligand charge " << ligand->get_charge()
+                << ": " << lb << endl << endl;
+        }
+        #endif
+
         if (differential_dock)
         {
             lmkJmol[metcount] = final_binding[resno] + lb;
@@ -283,7 +292,7 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     interauditing = false;
     #endif
 
-    if (btot > 60*ligand->get_atom_count()) btot = 0;
+    if (btot > 100*ligand->get_atom_count()) btot = 0;
     if (differential_dock && (maxclash > individual_clash_limit)) btot = -Avogadro;
 
     kJmol = (differential_dock && (maxclash > individual_clash_limit)) ? -Avogadro : btot;

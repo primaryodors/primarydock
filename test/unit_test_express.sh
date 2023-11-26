@@ -235,12 +235,21 @@ fi
 # group_tests_mol.sh
 
 test/group_test_res pdbs/TAAR/TAAR8.upright.pdb sdf/cadaverine.sdf 3.32 3.37 5.42 6.48 7.43 | sed '/^#/d' > testdata/received/group_test_res.received.txt
-RESULT=$(diff --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt)
+RESULT=$(diff --unified testdata/group_test_res.taar8.approved.txt testdata/received/group_test_res.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}\u2588${NC}"
 else
-    printf "\n${RED}Residue group test FAILED.${NC}\n"
-    diff --color --unified testdata/group_test_res.approved.txt testdata/received/group_test_res.received.txt
+    printf "\n${RED}Residue group test FAILED for TAAR8.${NC}\n"
+    diff --color --unified testdata/group_test_res.taar8.approved.txt testdata/received/group_test_res.received.txt
+fi
+
+test/group_test_res pdbs/OR51/OR51E2.active.pdb sdf/propionic_acid.sdf 4.57 6.59 | sed '/^#/d' > testdata/received/group_test_res.received.txt
+RESULT=$(diff --unified testdata/group_test_res.51e2.approved.txt testdata/received/group_test_res.received.txt)
+if [ -z "$RESULT" ]; then
+    printf "${GRN}\u2588${NC}"
+else
+    printf "\n${RED}Residue group test FAILED for OR51E2.${NC}\n"
+    diff --color --unified testdata/group_test_res.51e2.approved.txt testdata/received/group_test_res.received.txt
 fi
 
 test/ring_test sdf/histidine.sdf | sed '/^#/d' > testdata/received/ring.histidine.received.txt

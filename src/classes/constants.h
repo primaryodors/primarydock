@@ -122,8 +122,8 @@
 #define ignore_double_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 0.1
-#define lmpull 0.25
+#define lmpush 0.5
+#define lmpull 0.3
 #define lmsteps 10
 #define recapture_ejected_ligand 0
 
@@ -135,12 +135,13 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
 #define bb_group_distance_cutoff 4.3
-#define enforce_no_bb_pullaway 1
+#define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
 #define bb_realign_b_threshold 20
 #define bb_realign_threshold_distance 1.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1
+#define bb_scooch_threshold_distance 1.5
 #define flexion_selection 1
 #define no_zero_flexions 1
 #define ignore_invalid_partial 1
@@ -193,9 +194,9 @@
 #define internode_momentum_only_on_activation 1
 
 // Switches for conformational space search.
+#define allow_linear_motion 1
 #define allow_axial_tumble 1
 #define allow_bond_rots 1
-#define allow_linear_motion 1
 #define monte_carlo_axial 0
 #define monte_carlo_flex 1
 #define multiflex 0
@@ -293,7 +294,9 @@
 // if a negatively charged atom is nearby.
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
-#define cond_bas_hbond_threshold 1.5
+#define _allow_conditional_basicity_with_acid_ligand 1
+#define cond_bas_hbond_energy_threshold 1.0
+#define cond_bas_hbond_distance_threshold 2.3
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0
@@ -330,12 +333,14 @@
 
 // Should normally be false or zero:
 #define _dbg_259 0
+#define _dbg_51e2_ionic 0
 #define _dbg_anemia 0
 #define _dbg_bb_pullaway 0
 #define _dbg_bb_realign 0
 #define _dbg_bb_rots 0
 #define _dbg_bridges 0
 #define _dbg_cond_basic 0
+#define _dbg_cond_basic_acd_lig 0
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
 #define _dbg_find_blasted_segfault 0
@@ -350,6 +355,7 @@
 #define _dbg_Huckel 0
 #define _dbg_hxrax 0
 #define _dbg_imidazole_check 0
+#define _dbg_improvements_only_rule 0
 #define _dbg_interatomic_forces 0
 #define _dbg_linear_motion 0
 #define _DBG_LONELINESS 0

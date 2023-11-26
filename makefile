@@ -6,7 +6,7 @@ TMPDIR=tmp
 
 DIRS=$(OBJDIR) $(BINDIR) $(OUTDIR) $(SDFDIR) $(TMPDIR)
 OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OBJDIR)/molecule.o $(OBJDIR)/aminoacid.o \
-	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o $(OBJDIR)/scoring.o
+	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o $(OBJDIR)/scoring.o $(OBJDIR)/conj.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test test/amino_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
 	  test/flexion_test test/histidine_test test/ring_test
@@ -56,7 +56,10 @@ $(OBJDIR)/point.o: src/classes/point.h src/classes/point.cpp $(OBJDIR)/misc.o sr
 $(OBJDIR)/atom.o: src/classes/atom.h src/classes/atom.cpp $(OBJDIR)/point.o
 	$(CC) -c src/classes/atom.cpp -o $(OBJDIR)/atom.o $(CFLAGS)
 
-$(OBJDIR)/intera.o: src/classes/intera.h src/classes/intera.cpp $(OBJDIR)/atom.o
+$(OBJDIR)/conj.o: src/classes/conj.h src/classes/conj.cpp $(OBJDIR)/atom.o
+	$(CC) -c src/classes/conj.cpp -o $(OBJDIR)/conj.o $(CFLAGS)
+
+$(OBJDIR)/intera.o: src/classes/intera.h src/classes/intera.cpp $(OBJDIR)/conj.o
 	$(CC) -c src/classes/intera.cpp -o $(OBJDIR)/intera.o $(CFLAGS)
 
 $(OBJDIR)/molecule.o: src/classes/molecule.h src/classes/molecule.cpp $(OBJDIR)/intera.o

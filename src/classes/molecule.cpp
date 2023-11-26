@@ -25,6 +25,12 @@ bool wet_environment = false;
 Molecule *worst_clash_1 = nullptr, *worst_clash_2 = nullptr;
 float worst_mol_clash = 0;
 
+#if _dbg_improvements_only_rule
+Molecule** check_mols = nullptr;
+Molecule* check_ligand = nullptr;
+bool excuse_deterioration = false;
+#endif
+
 float _momentum_rad_ceiling = fiftyseventh * 30;
 
 Molecule::Molecule(char const* lname)
@@ -110,6 +116,7 @@ Molecule::Molecule(char const* lname, Atom** collection)
     smiles = nullptr;
     rings = nullptr;
     reset_conformer_momenta();
+    identify_conjugations();
     rotatable_bonds = 0;
 }
 
@@ -820,9 +827,26 @@ int Molecule::from_sdf(char const* sdf_dat)
     atoms[atcount] = 0;
     if (words) delete words;
 
+    identify_conjugations();
     identify_rings();
     identify_acidbase();
     return added;
+}
+
+void Molecule::identify_conjugations()
+{
+    if (!atoms) return;
+
+    int i;
+    for (i=0; atoms[i]; i++) atoms[i]->conjugation = nullptr;
+
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->is_pi() && !atoms[i]->conjugation)
+        {
+            Conjugation* conj = new Conjugation(atoms[i]);          // Don't have to save this pointer because the atoms will save it.
+        }
+    }
 }
 
 int Molecule::from_pdb(FILE* is, bool het_only)
@@ -909,6 +933,7 @@ int Molecule::from_pdb(FILE* is, bool het_only)
         delete words;
     }
 
+    identify_conjugations();
     return added;
 }
 
@@ -2070,6 +2095,11 @@ void Molecule::move(SCoord move_amt, bool override_residue)
     }
     int i;
 
+    #if _dbg_improvements_only_rule
+    float before;
+    if (check_ligand && check_mols && !excuse_deterioration) before = cfmol_multibind(check_ligand, check_mols);
+    #endif
+
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->residue && !override_residue) return;
@@ -2077,6 +2107,15 @@ void Molecule::move(SCoord move_amt, bool override_residue)
         loc = loc.add(&move_amt);
         atoms[i]->move(&loc);
     }
+
+    #if _dbg_improvements_only_rule
+    if (check_ligand && check_mols && !excuse_deterioration) 
+    {
+        float after = cfmol_multibind(check_ligand, check_mols);
+        if (after < before) throw 0xb0661;
+    }
+    excuse_deterioration = false;
+    #endif
 }
 
 void Molecule::move(Point move_amt, bool override_residue)
@@ -2089,6 +2128,11 @@ void Molecule::move(Point move_amt, bool override_residue)
     }
     int i;
 
+    #if _dbg_improvements_only_rule
+    float before;
+    if (check_ligand && check_mols && !excuse_deterioration) before = cfmol_multibind(check_ligand, check_mols);
+    #endif
+
     for (i=0; atoms[i]; i++)
     {
         // cout << atoms[i]->name << " ";
@@ -2097,6 +2141,15 @@ void Molecule::move(Point move_amt, bool override_residue)
         loc = loc.add(&move_amt);
         atoms[i]->move(&loc);
     }
+
+    #if _dbg_improvements_only_rule
+    if (check_ligand && check_mols && !excuse_deterioration) 
+    {
+        float after = cfmol_multibind(check_ligand, check_mols);
+        if (after < before) throw 0xb0661;
+    }
+    excuse_deterioration = false;
+    #endif
 }
 
 Point Molecule::get_barycenter(bool bond_weighted) const
@@ -2155,6 +2208,11 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
     if (movability <= MOV_NORECEN) bond_weighted = false;
     Point cen = get_barycenter(bond_weighted);
 
+    #if _dbg_improvements_only_rule
+    float before;
+    if (check_ligand && check_mols && !excuse_deterioration) before = cfmol_multibind(check_ligand, check_mols);
+    #endif
+
     int i;
     for (i=0; atoms[i]; i++)
     {
@@ -2163,6 +2221,15 @@ void Molecule::rotate(SCoord* SCoord, float theta, bool bond_weighted)
         Point nl  = rotate3D(&loc, &cen, SCoord, theta);
         atoms[i]->move(&nl);
     }
+
+    #if _dbg_improvements_only_rule
+    if (check_ligand && check_mols && !excuse_deterioration) 
+    {
+        float after = cfmol_multibind(check_ligand, check_mols);
+        if (after < before) throw 0xb0661;
+    }
+    excuse_deterioration = false;
+    #endif
 }
 
 void Molecule::rotate(LocatedVector lv, float theta)
@@ -2172,6 +2239,11 @@ void Molecule::rotate(LocatedVector lv, float theta)
     if (movability <= MOV_FLEXONLY) return;
     if (movability <= MOV_NORECEN) lv.origin = get_barycenter();
 
+    #if _dbg_improvements_only_rule
+    float before;
+    if (check_ligand && check_mols && !excuse_deterioration) before = cfmol_multibind(check_ligand, check_mols);
+    #endif
+
     int i;
     for (i=0; atoms[i]; i++)
     {
@@ -2180,6 +2252,15 @@ void Molecule::rotate(LocatedVector lv, float theta)
         Point nl  = rotate3D(&loc, &lv.origin, &lv, theta);
         atoms[i]->move(&nl);
     }
+
+    #if _dbg_improvements_only_rule
+    if (check_ligand && check_mols && !excuse_deterioration) 
+    {
+        float after = cfmol_multibind(check_ligand, check_mols);
+        if (after < before) throw 0xb0661;
+    }
+    excuse_deterioration = false;
+    #endif
 }
 
 bool Molecule::shielded(Atom* a, Atom* b) const
@@ -2393,6 +2474,13 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
         Point aloc = atoms[i]->get_location();
         for (l=0; ligands[l]; l++)
         {
+            #if _dbg_51e2_ionic
+            if (!is_residue() && atoms[i]->get_family() == CHALCOGEN && ligands[l]->is_residue() == 262)
+            {
+                j = 0;
+            }
+            #endif
+
             if (ligands[l] == this) continue;
             for (j=0; j<ligands[l]->atcount; j++)
             {
@@ -2451,6 +2539,7 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                             if (abind < 0 && ligands[l]->is_residue() && movability >= MOV_ALL)
                             {
                                 Point ptd = aloc.subtract(ligands[l]->atoms[j]->get_location());
+                                ptd.multiply(fmin(fabs(-abind) / 1000, 1));
                                 lmx += lmpush * sgn(ptd.x);
                                 lmy += lmpush * sgn(ptd.y);
                                 lmz += lmpush * sgn(ptd.z);
@@ -2906,6 +2995,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
     minimum_searching_aniso = 0.5;
 
+    #if _dbg_improvements_only_rule
+    check_mols = mm;
+    #endif
+
     for (iter=0; iter<iters; iter++)
     {
         for (i=0; mm[i]; i++) mm[i]->lastbind = 0;
@@ -2950,7 +3043,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             if ((a->movability & MOV_CAN_RECEN) && !(a->movability & MOV_FORBIDDEN))
             {
                 Point motion(a->lmx, a->lmy, a->lmz);
-                if (motion.magnitude() > speed_limit) motion.scale(speed_limit);
+                if (motion.magnitude() > speed_limit/2) motion.scale(speed_limit/2);
 
                 benerg = cfmol_multibind(a, nearby);
                 if (motion.magnitude() > 0.01*speed_limit)
@@ -2959,7 +3052,12 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     motion.scale(motion.magnitude()/lmsteps);
                     for (l=0; l<lmsteps; l++)
                     {
+                        #if _dbg_improvements_only_rule
+                        excuse_deterioration = true;
+                        #endif
+
                         a->move(motion);
+                        // if (a->agroups.size() && group_realign) group_realign(a, a->agroups);
                         tryenerg = cfmol_multibind(a, nearby);
 
                         if (tryenerg > benerg)
@@ -2993,6 +3091,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                         ;
                     }
 
+                    #if _dbg_improvements_only_rule
+                    excuse_deterioration = true;
+                    #endif
+
                     a->move(motion);
 
                     tryenerg = cfmol_multibind(a, nearby);
@@ -3020,6 +3122,11 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                             default:
                             ;
                         }
+
+                        #if _dbg_improvements_only_rule
+                        excuse_deterioration = true;
+                        #endif
+
                         a->move(motion);
 
                         tryenerg = cfmol_multibind(a, nearby);
@@ -3095,6 +3202,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                     if (a->movability & MOV_MC_AXIAL && frand(0,1) < 0.2) theta = frand(-M_PI, M_PI);
                     else theta = frand(-0.5, 0.5)*fiftyseventh*min(20, iter);
 
+                    #if _dbg_improvements_only_rule
+                    excuse_deterioration = true;
+                    #endif
+
                     a->rotate(&axis, theta);
                     tryenerg = cfmol_multibind(a, nearby);
 
@@ -3152,7 +3263,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                                 bb[q]->rotate(_fullrot_steprad, false);
                                 if (a->agroups.size() && group_realign)
                                 {
-                                    group_realign(a, a->agroups);
+                                    // group_realign(a, a->agroups);
                                 }
                                 tryenerg = cfmol_multibind(a, nearby);
 
@@ -3174,7 +3285,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                                 if (a->agroups.size() && group_realign)
                                 {
-                                    group_realign(a, a->agroups);
+                                    // group_realign(a, a->agroups);
                                 }
 
                                 #if _dbg_mol_flexion
@@ -3200,7 +3311,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                             if (a->agroups.size() && group_realign)
                             {
-                                group_realign(a, a->agroups);
+                                // group_realign(a, a->agroups);
                             }
 
                             tryenerg = cfmol_multibind(a, nearby);
@@ -3242,6 +3353,16 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #if _dbg_fitness_plummet
             if (!i) cout << "final " << -benerg << " " << endl << flush;
             #endif
+
+            if (a->agroups.size() && group_realign)
+            {
+                Pose pre_realign(a);
+                benerg = cfmol_multibind(a, nearby);
+                group_realign(a, a->agroups);
+                tryenerg = cfmol_multibind(a, nearby);
+
+                if (tryenerg < benerg) pre_realign.restore_state(a);
+            }
         }       // for i
 
         #if allow_iter_cb
@@ -3383,6 +3504,7 @@ bool Molecule::from_smiles(char const * smilesstr, bool use_parser)
     float anomaly = correct_structure();
     cout << "# Structural anomaly = " << anomaly << endl;
     hydrogenate(false);
+    identify_conjugations();
 
     return retval;
 }
@@ -3836,6 +3958,7 @@ bool Molecule::from_smiles(char const * smilesstr, Atom* ipreva)
     }
     atoms[atcount]=0;
 
+    identify_conjugations();
     return true;
 }
 

@@ -69,6 +69,7 @@ int main(int argc, char** argv)
     std::string orid = (std::string)"OR" + std::to_string(fam) + sub + std::to_string(mem);
     std::string in_filename = path + orid + (std::string)".upright.pdb";
     if (!file_exists(in_filename)) return -3;
+    std::string out_filename = path + orid + (std::string)".fygactive.pdb";
 
     Protein p(orid.c_str());
     FILE* fp = fopen(in_filename.c_str(), "rb");
@@ -173,11 +174,33 @@ int main(int argc, char** argv)
     char l7x53 = aa7x53->get_letter();
 
 
-    // TODO:
-    LocatedVector lv1 = aa6x49->get_phi_vector(), lv2 = aa6x49->get_psi_vector();
+    // TMR6 motion.
+    LocatedVector lv6 = aa6x49->get_psi_vector();
+    p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*30);
 
-    // p.rotate_piece(n6x28, n6x49, lv1.origin, lv1, -fiftyseventh*30);
-    p.rotate_piece(n6x28, n6x49, lv2.origin, lv2, -fiftyseventh*30);
+    SCoord move5 = aa6x49->get_CA_location().subtract(aa5x50->get_CA_location());
+    move5.r = p.region_can_move(n5x33, n5x68, move5, false, n6x28, n6x59);
+    p.move_piece(n5x33, n5x68, move5);
+    cout << "TMR5 moves " << move5.r << "A toward TMR6, limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
 
-    save_file(p, "tmp/fyg_active.pdb");
+    p.bridge(n5x58, n7x53);
+
+    LocatedVector lv5 = compute_normal(aa5x58->get_CA_location(), aa7x53->get_CA_location(), aa5x33->get_CA_location());
+    lv5.origin = aa5x33->get_CA_location();
+
+    float theta5 = p.region_can_rotate(n5x33, n5x68, lv5, false, 0, n6x28, n6x59);
+    Point pt = aa7x53->get_reach_atom()->get_location().subtract(aa5x58->get_reach_atom()->get_location());
+    pt.scale(fmax(0, pt.magnitude() - contact_r_5x58_7x53));
+    if (pt.magnitude())
+    {
+        Point pt5x58 = aa5x58->get_reach_atom()->get_location();
+        float f = find_3d_angle(pt5x58, pt5x58.add(pt), lv5.origin);
+        if (f < theta5) theta5 = f;
+
+        p.rotate_piece(n5x33, n5x68, lv5.origin, lv5, theta5);
+        cout << "TMR5 rotates " << theta5*fiftyseven << "deg, limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+    }
+    else cout << "5.58~7.53 bridge already met." << endl;
+
+    save_file(p, out_filename.c_str());
 }

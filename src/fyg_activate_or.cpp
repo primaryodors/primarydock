@@ -175,14 +175,17 @@ int main(int argc, char** argv)
 
 
     // TMR6 motion.
+    float theta6_initial = 40;
     LocatedVector lv6 = aa6x49->get_psi_vector();
-    p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*30);
+    p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_initial);
 
+    // TMR5 translation.
     SCoord move5 = aa6x49->get_CA_location().subtract(aa5x50->get_CA_location());
     move5.r = p.region_can_move(n5x33, n5x68, move5, false, n6x28, n6x59);
     p.move_piece(n5x33, n5x68, move5);
     cout << "TMR5 moves " << move5.r << "A toward TMR6, limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
 
+    // 5.58 ~ 7.53 contact.
     p.bridge(n5x58, n7x53);
 
     LocatedVector lv5 = compute_normal(aa5x58->get_CA_location(), aa7x53->get_CA_location(), aa5x33->get_CA_location());
@@ -201,6 +204,12 @@ int main(int argc, char** argv)
         cout << "TMR5 rotates " << theta5*fiftyseven << "deg, limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
     }
     else cout << "5.58~7.53 bridge already met." << endl;
+
+    // Adjust TMR6.
+    float theta6 = p.region_can_rotate(n6x28, n6x49, lv6);
+    cout << "TMR6 rotated " << (theta6_initial - theta6 * fiftyseven) << "deg." << endl;
+    p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, theta6);
+
 
     save_file(p, out_filename.c_str());
 }

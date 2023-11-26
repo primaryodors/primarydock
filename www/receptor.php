@@ -295,12 +295,12 @@ function view_file(url)
 if (substr($fam, 0, 2) == "OR")
 {
     echo "Olfactory receptor ";
-    $fmn = intval(preg_replace("/[^0-9]/", "", $fam));
+    /*$fmn = intval(preg_replace("/[^0-9]/", "", $fam));
     echo "<a href=\"receptors.php?f=sOR$fmn\">family $fmn</a>, ";
     $sub = preg_replace("/[^A-Z]/", "", substr($rcpid, strlen($fam)) );
     echo "<a href=\"receptors.php?f=sOR$fmn$sub\">subfamily $sub</a>, ";
     $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-    echo "member $mbr";
+    echo "member $mbr";*/
 }
 else
 {
@@ -309,24 +309,44 @@ else
         case 'TAAR':
         echo "Trace amine-associated receptor ";
         $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-        echo "$mbr";
+        // echo "$mbr";
         break;
 
         case 'VN1R':
         echo "Vomeronasal type 1 receptor ";
         $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-        echo "$mbr";
+        // echo "$mbr";
         break;
 
         case 'MS4A':
         echo "Membrane-spanning 4A receptor ";
         $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-        echo "$mbr";
+        // echo "$mbr";
         break;
 
         default:
         ;
     }
+}
+
+if (@$receptor['class'])
+{
+    echo " <a href=\"receptors.php?c={$receptor['class']}&tree=1\">Class {$receptor['class']}</a>";
+
+    if (@$receptor['trunk'])
+    {
+        echo " <a href=\"receptors.php?c={$receptor['class']}&t={$receptor['trunk']}&tree=1\">Trunk {$receptor['trunk']}</a>";
+        
+        if (@$receptor['branch'])
+        {
+            echo " <a href=\"receptors.php?c={$receptor['class']}&t={$receptor['trunk']}&b={$receptor['branch']}&tree=1\">Branch {$receptor['branch']}</a>";
+
+            if (@$receptor['cluster'])
+                echo " <a href=\"receptors.php?c={$receptor['class']}&t={$receptor['trunk']}&b={$receptor['branch']}&x={$receptor['cluster']}&tree=1\">Cluster {$receptor['cluster']}</a>";
+        }
+    }
+
+    echo " Member {$receptor['id']}";
 }
 
 ?>

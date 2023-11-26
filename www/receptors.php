@@ -47,6 +47,23 @@ function filter_prot($protid, $filter)
         $disp = false;
     }
 
+    if (@$_REQUEST['c'])
+    {
+        if (@$prots[$protid]['class'] != $_REQUEST['c']) $disp = false;
+        if (@$_REQUEST['t'])
+        {
+            if (@$prots[$protid]['trunk'] != $_REQUEST['t']) $disp = false;
+            if (@$_REQUEST['b'])
+            {
+                if (@$prots[$protid]['branch'] != $_REQUEST['b']) $disp = false;
+                if (@$_REQUEST['x'])
+                {
+                    if (@$prots[$protid]['cluster'] != $_REQUEST['x']) $disp = false;
+                }
+            }
+        }
+    }
+
     return $disp;
 }
 

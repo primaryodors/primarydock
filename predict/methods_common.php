@@ -36,7 +36,7 @@ $metrics_to_process =
 
 // Load data
 $dock_results = [];
-$json_file = "predict/dock_results_$method.json";
+$json_file = "predict/dock_results.json";
 
 // Version
 chdir(__DIR__);
@@ -543,6 +543,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     }
     
     $outdata['version'] = $version;
+    $outdata['method'] = $method;
 
     $tme = [];
     foreach ($outdata as $k => $v)

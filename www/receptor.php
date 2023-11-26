@@ -40,7 +40,7 @@ $predate = [];
 if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
 {
     chdir(__DIR__);
-    $dock_results = json_decode(file_get_contents("../predict/dock_results_icactive.json"), true);
+    $dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
     if (isset($dock_results[$rcpid]))
     {
         foreach ($dock_results[$rcpid] as $ligname => $dock)

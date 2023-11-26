@@ -34,7 +34,7 @@ switch (@$_REQUEST["obj"])
         $lig   = @$_REQUEST["odor"];
 
         chdir(__DIR__);
-        $json_file = "../predict/dock_results_$method.json";
+        $json_file = "../predict/dock_results.json";
         $dock_results = json_decode(file_get_contents($json_file), true);
 
         if (!isset($dock_results[$prot][$lig]))

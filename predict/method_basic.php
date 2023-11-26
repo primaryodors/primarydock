@@ -70,8 +70,7 @@ heredoc;
 
 
 // The following will execute the bin/primarydock app with the provided options, then
-// save the data specified in $metrics_to_process to a JSON file, in this case named
-// predict/dock_results_basic.json reflecting the name of the prediction method.
+// save the data specified in $metrics_to_process to the predict/dock_results.json file.
 // If a make_prediction() function has been specified, it will be called before saving
 // the dock result so that the changes made by make_prediction() will be included in
 // the JSON file.

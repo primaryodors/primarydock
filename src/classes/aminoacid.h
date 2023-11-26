@@ -43,6 +43,7 @@ struct AADef
     bool isoleucine_fix = false;
     float sidechain_pKa = nanf("n/a");
     float flexion_probability = 0;
+    float alpha_helix_penalty = 0;
 };
 
 struct AABridge
@@ -118,6 +119,7 @@ public:
     Point HN_or_substitute_location();
     void establish_internal_clash_baseline();
     void renumber(int new_resno);
+    float get_alpha_helix_penalty() { return aadef->alpha_helix_penalty; }
 
     // Serialization.
     int from_pdb(FILE* instream, int resno_offset = 0);							// returns number of atoms loaded.

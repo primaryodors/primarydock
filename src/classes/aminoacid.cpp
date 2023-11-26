@@ -1486,6 +1486,11 @@ void AminoAcid::load_aa_defs()
                             {
                                 aa_defs[idx].flexion_probability = atof(words[5]);
                                 if (aa_defs[idx].flexion_probability < 0 || aa_defs[idx].flexion_probability > 1) throw 0xbadf1ec5;
+
+                                if (words[6])
+                                {
+                                    aa_defs[idx].alpha_helix_penalty = atof(words[6]);
+                                }
                             }
                         }
                     }

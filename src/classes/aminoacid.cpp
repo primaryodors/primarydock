@@ -2213,6 +2213,24 @@ bond_rotation_fail_reason AminoAcid::rotate_psi(float a)
     return b->last_fail;
 }
 
+LocatedVector AminoAcid::get_phi_vector()
+{
+    Atom* N  = get_atom("N");
+    Atom* CA = get_atom("CA");
+    LocatedVector result = (SCoord)(N->get_location().subtract(CA->get_location()));
+    result.origin = CA->get_location();
+    return result;
+}
+
+LocatedVector AminoAcid::get_psi_vector()
+{
+    Atom* CA = get_atom("CA");
+    Atom* C  = get_atom("C");
+    LocatedVector result = (SCoord)(C->get_location().subtract(CA->get_location()));
+    result.origin = CA->get_location();
+    return result;
+}
+
 bool AminoAcid::is_alpha_helix()
 {
     return is_helix(4);

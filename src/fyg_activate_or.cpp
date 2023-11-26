@@ -174,5 +174,10 @@ int main(int argc, char** argv)
 
 
     // TODO:
+    LocatedVector lv1 = aa6x49->get_phi_vector(), lv2 = aa6x49->get_psi_vector();
 
+    // p.rotate_piece(n6x28, n6x49, lv1.origin, lv1, -fiftyseventh*30);
+    p.rotate_piece(n6x28, n6x49, lv2.origin, lv2, -fiftyseventh*30);
+
+    save_file(p, "tmp/fyg_active.pdb");
 }

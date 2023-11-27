@@ -68,7 +68,7 @@ $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
 if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/fyg_activate_or"))
 {
-    if (false) // $protid == "OR51E2")
+    if ($protid == "OR51E2")
     {
         $pepd = <<<heredoc
 LOAD pdbs/OR51/OR51E2.8f76.pdb

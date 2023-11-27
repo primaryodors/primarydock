@@ -63,7 +63,7 @@ function make_prediction($data)
 chdir(__DIR__);
 chdir("..");
 
-$pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
+$pdbfname_active = str_replace(".upright.pdb", ".fygactive.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
 if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/fyg_activate_or"))

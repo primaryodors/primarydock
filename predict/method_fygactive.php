@@ -134,7 +134,7 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 $pdbfname = $pdbfname_active;
 
-$outfname = "output/$fam/$protid/$protid.$ligname.fygactive.dock";
+$outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
 
 $configf = <<<heredoc
 

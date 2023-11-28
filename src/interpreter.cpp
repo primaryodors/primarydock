@@ -987,6 +987,33 @@ int main(int argc, char** argv)
                 }
             }   // BWCOPY
 
+            else if (!strcmp(words[0], "BWMOTIF"))
+            {
+                if (!words[1] || !words[2]) raise_error("Insufficient parameters given for BWMOTIF.");
+
+                l = atoi(words[1]);
+                char rgn[8];
+                if (l < 8) sprintf(rgn, "TMR%d", l);
+                else sprintf(rgn, "HXR%d", l);
+                int sr = working->get_region_start(rgn), er = working->get_region_end(rgn);
+                if (!sr || !er) raise_error((std::string)"Region " + std::to_string(l) + (std::string)" not found in strand.");
+
+                n = -1;
+                for (i=0; words[2][i]; i++)
+                {
+                    if (words[2][i] >= 'A' && words[2][i] <= 'Z') n = i;
+                    else words[2][i] &= 0x5f;
+                }
+
+                if (n < 0) raise_error("Motif must indicate BW50 residue by capitalization.");
+
+                k = working->search_sequence(sr, er, words[2], 4, nullptr);
+                if (!k) raise_error("Motif not found in region of strand.");
+                cout << l << ".50 = " << k << endl;
+
+                working->set_bw50(l, k);
+            }
+
             else if (!strcmp(words[0], "CANMOVE"))
             {
                 int sr1, er1, sr2, er2;

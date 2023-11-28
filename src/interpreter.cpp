@@ -1009,7 +1009,7 @@ int main(int argc, char** argv)
 
                 k = working->search_sequence(sr, er, words[2], 4, nullptr);
                 if (!k) raise_error("Motif not found in region of strand.");
-                cout << l << ".50 = " << k << endl;
+                // cout << l << ".50 = " << k << endl;
 
                 working->set_bw50(l, k);
             }

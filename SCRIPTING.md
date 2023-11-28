@@ -181,9 +181,20 @@ BWCENTER
 ```
 
 If the current working strand is a seven-helix protein (7HP), with Ballesteros-Weinstein numbering for all its transmembrane helices,
-then `BWCENTER` will obtain the center of all n.50:CA atom locations and recenter the entire protein.
+then `BWCENTER` will obtain the center of all n.50:CA atom locations and recenter the entire strand.
 This is useful for comparing various active and inactive states of GPCRs; the 1.50 through 7.50 residues will be assumed to be the most stationary
 parts of the protein, and variations in structure can be observed with minimal global transformational anomalies.
+
+
+# BWCOPY
+Example:
+```
+BWCOPY A B
+```
+
+Copies the transmembrane helix regions and Ballesteros-Weinstein numbers from one strand to another. This is useful if working with two models of
+the same protein, one of which is missing the region definitions, for example if one of the models is included with PrimaryDock and the other is not.
+The first parameter is the source strand; the second is the destination.
 
 
 # CANMOVE

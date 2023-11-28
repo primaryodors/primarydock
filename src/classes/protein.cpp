@@ -993,6 +993,13 @@ int Protein::get_bw50(int helixno)
     return Ballesteros_Weinstein[helixno];
 }
 
+void Protein::set_bw50(int hxno, int resno)
+{
+    if (hxno < 1 || hxno > 78) return;
+    if (Ballesteros_Weinstein[hxno]) return;
+    Ballesteros_Weinstein[hxno] = resno;
+}
+
 int Protein::get_seq_length()
 {
     if (!sequence) return 0;
@@ -1554,7 +1561,7 @@ void Protein::rotate_backbone(int resno, bb_rot_dir dir, float angle)
     }
 }
 
-void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, float angle)
+void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, float angle, bool bbao)
 {
     save_undo_state();
     if (startres == endres) return;
@@ -1568,8 +1575,50 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
 
     AminoAcid* bendy = get_residue(startres);
     if (!bendy) return;
-    LocatedVector lv = bendy->rotate_backbone(dir, angle);
-    bendy->ensure_pi_atoms_coplanar();
+    LocatedVector lv;
+    if (bbao)
+    {
+        Atom *N = bendy->get_atom("N"), *H = bendy->HN_or_substitute(), *CA = bendy->get_atom("CA"), *C = bendy->get_atom("C"), *O = bendy->get_atom("O");
+        Bond* b;
+        switch(dir)
+        {
+            case N_asc:
+            b = N->get_bond_between(CA);
+            lv = (SCoord)CA->get_location().subtract(N->get_location());
+            lv.origin = N->get_location();
+            b->rotate(angle, true, true);
+            break;
+
+            case CA_desc:
+            b = CA->get_bond_between(N);
+            lv = (SCoord)CA->get_location().subtract(N->get_location());
+            lv.origin = CA->get_location();
+            b->rotate(angle, true, true);
+            break;
+
+            case CA_asc:
+            b = CA->get_bond_between(C);
+            lv = (SCoord)CA->get_location().subtract(C->get_location());
+            lv.origin = CA->get_location();
+            b->rotate(angle, true, true);
+            break;
+
+            case C_desc:
+            b = C->get_bond_between(CA);
+            lv = (SCoord)C->get_location().subtract(CA->get_location());
+            lv.origin = C->get_location();
+            b->rotate(angle, true, true);
+            break;
+
+            default:
+            ;
+        }
+    }
+    else
+    {
+        lv = bendy->rotate_backbone(dir, angle);
+        bendy->ensure_pi_atoms_coplanar();
+    }
 
     if (lv.r)
     {
@@ -1579,12 +1628,12 @@ void Protein::rotate_backbone_partial(int startres, int endres, bb_rot_dir dir, 
         for (i=startres+inc; movable = get_residue(i); i+=inc)
         {
             movable->rotate(lv, angle);
-            movable->ensure_pi_atoms_coplanar();
+            if (!bbao) movable->ensure_pi_atoms_coplanar();
             if (i == endres) break;
         }
     }
 
-    set_clashables();
+    if (!bbao) set_clashables();
 }
 
 void Protein::conform_backbone(int startres, int endres, int iters, bool backbone_atoms_only)
@@ -1815,168 +1864,178 @@ void Protein::conform_backbone(int startres, int endres,
     mass_undoable = wmu;
 }
 
-#define DBG_BCKCONN 0
-#define _INCREMENTAL_BKCONN 1
-void Protein::backconnect(int startres, int endres)
+float Protein::reconnect(int startres, int endres)
 {
-    save_undo_state();
-    bool wmu = mass_undoable;
-    mass_undoable = true;
-
-    int i;
-    int inc = sgn(endres-startres);
-
-    #if _INCREMENTAL_BKCONN
-    int iter;
-    for (iter=24; iter>=0; iter--)
+    int strandlength = abs(endres - startres) + 1, length = strandlength*2;
+    if (strandlength > reconnect_length_limit)
     {
-    #endif
-
-        // Glue the last residue onto the target.
-        // Then adjust its inner bonds so the other end points as closely to the previous residue as possible.
-        // Then do the same for the previous residue, and the one before, etc,
-        // all the way back to the starting residue.
-        // Give a warning if the starting residue has an anomaly > 0.1A.
-        AminoAcid *next, *curr, *prev;
-        int pointer = endres;
-        float movfactor = 1, decrement, anomaly = 0;
-
-        decrement = 1.0 / fabs(endres - startres);		// if exterior is the opposite of interior, what's the opposite of increment?
-
-        next = get_residue(endres+inc);
-        curr = get_residue(pointer);
-        prev = get_residue(pointer-inc);
-
-        #if DBG_BCKCONN
-        cout << "backconnect( " << startres << ", " << endres << ")" << endl;
-        #endif
-        while (next && curr)
-        {
-            #if DBG_BCKCONN
-            cout << pointer << ":";
-            #endif
-
-            Point pts[4];
-            (inc > 0) ? next->predict_previous_COCA(pts) : next->predict_next_NHCA(pts);
-            Point ptsc[4];
-
-            #if _INCREMENTAL_BKCONN
-            ptsc[0] = (inc > 0) ? curr->get_atom_location("C") : curr->get_atom_location("N");
-            ptsc[1] = (inc > 0) ? curr->get_atom_location("O") : curr->HN_or_substitute_location();
-            ptsc[2] = curr->get_atom_location("CA");
-
-            Point _4avg[3];
-            for (i=0; i<3; i++)
-            {
-                _4avg[0] = pts[i];
-                _4avg[1] = ptsc[i];
-                _4avg[0].weight = movfactor;
-                _4avg[1].weight = 1.0 - movfactor;
-                pts[i] = average_of_points(_4avg, 2);
-            }
-            #endif
-
-            curr->attach_to_prediction(pts, inc > 0);
-            // break;
-
-            #if DBG_BCKCONN
-            cout << "g";
-            #endif
-
-            if (prev)
-            {
-                MovabilityType fmov = curr->movability;
-                curr->movability = MOV_ALL;
-
-                #if DBG_BCKCONN
-                cout << "a";
-                #endif
-
-                pts[4];
-                (inc < 0) ? prev->predict_previous_COCA(pts) : prev->predict_next_NHCA(pts);
-                Point target_heavy = pts[0];
-                Point target_pole = pts[1];
-
-                #if DBG_BCKCONN
-                cout << "b";
-                #endif
-
-                float theta, step = fiftyseventh*1.0, r, btheta = 0, bestr;
-                for (theta=0; theta < M_PI*2; theta += step)
-                {
-                    r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
-                    // r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
-                    if (inc > 0) r -= target_pole.get_3d_distance(curr->HN_or_substitute_location());
-
-                    if (!theta || (r < bestr))
-                    {
-                        bestr = r;
-                        btheta = theta;
-                    }
-
-                    curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc, step );
-                }
-                curr->rotate_backbone( (inc > 0) ? CA_desc : N_asc, btheta );
-
-                #if DBG_BCKCONN
-                cout << "c";
-                #endif
-
-                btheta=0;
-                for (theta=0; theta < M_PI*2; theta += step)
-                {
-                    r = target_heavy.get_3d_distance( (inc > 0) ? curr->get_atom_location("N") : curr->get_atom_location("C") );
-                    // r -= target_pole.get_3d_distance( (inc > 0) ? curr->HN_or_substitute_location() : curr->get_atom_location("O") );
-                    if (inc < 0) r -= target_pole.get_3d_distance(curr->get_atom_location("O"));
-
-                    if (!theta || (r < bestr))
-                    {
-                        bestr = r;
-                        btheta = theta;
-                    }
-
-                    curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc, step );
-                }
-                curr->rotate_backbone( (inc > 0) ? C_desc : CA_asc, btheta );
-                anomaly = bestr;
-
-                #if DBG_BCKCONN
-                cout << "d";
-                #endif
-
-                curr->movability = fmov;
-            }
-
-            if (pointer == startres)
-            {
-                #if DBG_BCKCONN
-                cout << ". ";
-                #endif
-                break;
-            }
-
-            pointer -= inc;
-            next = curr;
-            curr = prev;
-            prev = get_residue(pointer-inc);
-            movfactor -= decrement;
-
-            #if DBG_BCKCONN
-            cout << ", ";
-            #endif
-        };
-
-        #if DBG_BCKCONN
-        cout << endl;
-        #endif
-
-        /*if (anomaly > 0.1) cout << "Warning! conform_backbone( " << startres << ", " << endres << " ) anomaly out of range." << endl
-        						<< "# " << (startres-inc) << " anomaly: " << anomaly << endl;*/
-        #if _INCREMENTAL_BKCONN
+        cout << "Attempt to reconnect strand in excess of length limit." << endl;
+        throw 0xb5712a9d;
     }
-        #endif
 
-    mass_undoable = wmu;
+    int dir = sgn(endres - startres); if (!dir) dir = 1;
+
+    int connres = (dir<0) ? (endres - 1) : (endres + 1);
+    AminoAcid* connaa = get_residue(connres);
+    if (!connaa)
+    {
+        cout << "Attempt to reconnect strand to nonexistent target." << endl;
+        throw 0xb5712a9d;
+    }
+
+    AminoAcid* endaa = get_residue(endres);
+    if (!endaa)
+    {
+        cout << "Attempt to reconnect discontinuous strand." << endl;
+        throw 0xb5712a9d;
+    }
+
+    char working_candidate[length+1];
+    float angle = triangular;
+    int gen;
+    int max_candidates = pow(3, length);
+    float candidates[reconnect_keepbest][max_candidates+1][length+1];
+    float best_candidates[reconnect_keepbest][length+1];
+    float best_score[reconnect_keepbest];
+    float anomaly;
+
+    int ikept, icand, ires, i, j, l;
+
+    Point should_be_at[4];
+    Atom* is_at[4];
+    if (dir > 0)
+    {
+        connaa->predict_previous_COCA(should_be_at);
+        is_at[0] = endaa->get_atom("C");
+        is_at[1] = endaa->get_atom("O");
+        is_at[2] = endaa->get_atom("CA");
+        is_at[3] = nullptr;
+    }
+    else
+    {
+        connaa->predict_next_NHCA(should_be_at);
+        is_at[0] = endaa->get_atom("N");
+        is_at[1] = endaa->HN_or_substitute();
+        is_at[2] = endaa->get_atom("CA");
+        is_at[3] = nullptr;
+    }
+
+    for (gen=0; gen<reconnect_generations; gen++)
+    {
+        for (ikept=0; ikept < reconnect_keepbest; ikept++)
+        {
+            best_score[ikept] = -1;
+        }
+
+        // TODO: try every possible combination of starting phi,psi angles +/- the angle variable.
+        for (ikept=0; ikept < (gen ? reconnect_keepbest : 1); ikept++)
+        {
+            for (ires = 0; ires < length; ires++) working_candidate[ires] = -1;
+            for (icand = 0; icand < max_candidates; icand++)
+            {
+                cout << "gen " << gen << " kept " << ikept << " iter " << icand << " ";
+
+                for (ires = 0; ires < length; ires++)
+                {
+                    int resno = startres + dir*(ires>>1);
+                    AminoAcid* aa = get_residue(resno);
+                    if (!aa)
+                    {
+                        cout << "Attempt to reconnect discontinuous strand." << endl;
+                        throw 0xb5712a9d;
+                    }
+
+                    candidates[ikept][icand][ires] =
+                        (
+                            gen
+                            ? best_candidates[ikept][ires]                      // Persist previous best candidates.
+                            : ((ires & 0x1) ? aa->get_psi() : aa->get_phi())
+                        )
+                        + angle * working_candidate[ires];
+
+                    cout << candidates[ikept][icand][ires]*fiftyseven << " ";
+
+                    // Rotate the backbone.
+                    MovabilityType was_mov = aa->movability;
+                    aa->movability = MOV_ALL;
+                    if (ires & 0x1) rotate_backbone_partial(resno, endres,
+                        (dir>0) ? CA_asc : C_desc,
+                        (candidates[ikept][icand][ires] - aa->get_psi()) * dir, true);
+                    else rotate_backbone_partial(resno, endres,
+                        (dir>0) ? N_asc : CA_desc,
+                        (candidates[ikept][icand][ires] - aa->get_phi()) * dir, true);
+                    aa->movability = was_mov;
+                }
+
+                // TODO: Score the candidate's anomaly using distance_to_connres + reconnect_angle_importance * anomaly_angle.
+                anomaly = is_at[0]->get_location().get_3d_distance(should_be_at[0])
+                    + reconnect_angle_importance * is_at[1]->get_location().get_3d_distance(should_be_at[1])
+                    + reconnect_angle_importance * is_at[2]->get_location().get_3d_distance(should_be_at[2])
+                    ;
+                
+                cout << anomaly;
+
+                // Keep the best reconnect_keepbest from each generation.
+                for (i=0; i < reconnect_keepbest; i++)
+                {
+                    if (best_score[i] < 0 || best_score[i] > anomaly)
+                    {
+                        for (j=reconnect_keepbest-2; j>=i; j--)
+                        {
+                            best_score[j+1] = best_score[j];
+                            for (l=0; l<length; l++) best_candidates[j+1][l] = best_candidates[j][l];
+                        }
+
+                        best_score[i] = anomaly;
+                        for (l=0; l<length; l++) best_candidates[j][l] = candidates[ikept][icand][l];
+
+                        break;
+                    }
+                }
+                
+                for (ires = 0; ires < length; ires++)
+                {
+                    working_candidate[ires]++;
+                    if (working_candidate[ires] > 1) working_candidate[ires] = -1;
+                    else break;
+                }
+
+                cout << endl;
+            }
+        }
+
+        cout << endl << "Best from generation:" << endl;
+        for (i=0; i < reconnect_keepbest; i++)
+        {
+            cout << i+1 << ": ";
+            for (l=0; l<length; l++) cout << best_candidates[i][l]*fiftyseven << " ";
+            cout << "= " << best_score[i] << endl;
+        }
+        cout << endl;
+
+        angle /= 2;
+    }
+
+    // TODO: Use the best candidate and trial-and-error it onto connres.
+    for (ires=0; ires<length; ires++)
+    {
+        int resno = startres + dir*(ires>>1);
+        AminoAcid* aa = get_residue(resno);
+
+        // Rotate the backbone.
+        MovabilityType was_mov = aa->movability;
+        aa->movability = MOV_ALL;
+        if (ires & 0x1) rotate_backbone_partial(resno, endres,
+            (dir>0) ? CA_asc : C_desc,
+            (best_candidates[0][ires] - aa->get_psi()) * dir, true);
+        else rotate_backbone_partial(resno, endres,
+            (dir>0) ? N_asc : CA_desc,
+            (best_candidates[0][ires] - aa->get_phi()) * dir, true);
+        aa->movability = was_mov;
+    }
+
+    set_clashables();
+    return anomaly;
 }
 
 void Protein::make_helix(int startres, int endres, float phi, float psi)

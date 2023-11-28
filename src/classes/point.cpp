@@ -301,7 +301,7 @@ float find_angle_along_vector(Point* pt1, Point* pt2, Point* source, SCoord* v)
     Point lpt2 = pt2->subtract(source);
 
     // Rotate points so v becomes Z axis.
-    Point cen;
+    Point cen(0,0,0);
     Point z(0,0,1);
     Rotation rots = align_points_3d(&vp, &z, &cen);
     Point npt1 = rotate3D(&lpt1, &cen, &rots.v, rots.a);

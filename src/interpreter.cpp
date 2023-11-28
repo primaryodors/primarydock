@@ -964,7 +964,28 @@ int main(int argc, char** argv)
                 SCoord new_center = old_center;
                 new_center.r *= -1;
                 working->move_piece(1, working->get_end_resno(), new_center);
-            }   // BWCENTER
+            }	// BWCENTER
+
+            else if (!strcmp(words[0], "BWCOPY"))
+            {
+                if (!words[1] || !words[2]) raise_error("Insufficient parameters given for BWCOPY.");
+
+                char c = words[1][0];
+                if (c < 'A' || c > 'Z') raise_error("Invalid source strand given for BWCOPY.");
+                Protein* source = strands[c-'A'];
+
+                c = words[2][0];
+                if (c < 'A' || c > 'Z') raise_error("Invalid destination strand given for BWCOPY.");
+                Protein* dest = strands[c-'A'];
+
+                for (l=1; l<=8; l++)
+                {
+                    std::string rgname = (std::string)"TMR" + std::to_string(l);
+                    int sr = source->get_region_start(rgname), er = source->get_region_end(rgname), bw50 = source->get_bw50(l);
+                    if (sr > 0 && er > 0) dest->set_region(rgname, sr, er);
+                    if (bw50 > 0) dest->set_bw50(l, bw50);
+                }
+            }   // BWCOPY
 
             else if (!strcmp(words[0], "CANMOVE"))
             {
@@ -1073,10 +1094,10 @@ int main(int argc, char** argv)
                 sr = interpret_single_int(words[l++]);
                 if (!words[l]) raise_error("Insufficient parameters given for CONNECT.");
                 ct = interpret_single_int(words[l++]);
-                if (words[l]) iters = interpret_single_int(words[l++]);
+                // if (words[l]) iters = interpret_single_int(words[l++]);
                 if (words[l]) raise_error("Too many parameters given for CONNECT.");
                 er = ct - sgn(ct-sr);
-
+/*
                 Atom *a1, *a2, *a3;
                 AminoAcid *cta = working->get_residue(ct), *era = working->get_residue(er);
 
@@ -1099,7 +1120,9 @@ int main(int argc, char** argv)
                 a3 = era->get_atom("CA");
 
                 working->conform_backbone(sr, er, a1, pt3[0], a2, pt3[1], iters);
-                working->backconnect(sr, er);
+                working->backconnect(sr, er);*/
+
+                working->reconnect(sr, er);
 
             _no_connect:
                 goto _pc_continue;

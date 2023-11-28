@@ -61,6 +61,7 @@ public:
     void delete_sidechains(int startres, int endres);
     MetalCoord* coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames);
     void set_region(std::string name, int start, int end);
+    void set_bw50(int helixno, int resno);
     void renumber_residues(int startres, int endres, int new_startres);
     bool disulfide_bond(int resno1, int resno2);
 
@@ -143,8 +144,8 @@ public:
     LocRotation rotate_piece(int start_res, int end_res, Point origin, SCoord axis, float theta);
 
     void rotate_backbone(int residue_no, bb_rot_dir direction, float angle);
+    void rotate_backbone_partial(int startres, int endres, bb_rot_dir direction, float angle, bool backbone_atoms_only = false);
     void conform_backbone(int startres, int endres, Atom* a, Point target, int iters = 50);
-    void rotate_backbone_partial(int startres, int endres, bb_rot_dir direction, float angle);
     void conform_backbone(int startres, int endres, int iters = 50, bool backbone_atoms_only = false);
     void conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, Atom* a3, Point target3, int iters = 50);
     void conform_backbone(int startres, int endres, Atom* a1, Point target1, Atom* a2, Point target2, int iters = 50, bool backbone_atoms_only = false);
@@ -155,7 +156,7 @@ public:
                           int iters, bool backbone_atoms_only
                          );
 
-    void backconnect(int startres, int endres);
+    float reconnect(int startres, int endres);
     void find_residue_initial_bindings();
     void undo();
 

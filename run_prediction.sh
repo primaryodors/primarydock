@@ -12,4 +12,4 @@ if [ -z "$LIG" ]; then
     LIG="propionic_acid"
 fi
 
-php -f predict/method_icactive.php "prot=$PROT" "lig=$LIG"
+php -f predict/method_fygactive.php "prot=$PROT" "lig=$LIG"

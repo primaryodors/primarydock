@@ -9,7 +9,7 @@
 //
 
 // Configurable variables
-$dock_metals = false;
+$flex = 1;
 
 chdir(__DIR__);
 require("methods_common.php");
@@ -115,7 +115,7 @@ $flex_constraints
 ITERS 50
 PROGRESS
 
-FLEX 1
+FLEX $flex
 WET
 
 OUT $outfname
@@ -162,7 +162,7 @@ $flex_constraints
 ITERS 50
 PROGRESS
 
-FLEX 1
+FLEX $flex
 WET
 
 OUT $outfname

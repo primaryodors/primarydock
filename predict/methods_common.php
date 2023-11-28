@@ -261,7 +261,7 @@ function prepare_outputs()
 $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false)
 {
-    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere, $multicall;
+    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere, $multicall, $method;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
 

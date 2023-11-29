@@ -197,6 +197,19 @@ the same protein, one of which is missing the region definitions, for example if
 The first parameter is the source strand; the second is the destination.
 
 
+# BWMOTIF
+Example:
+```
+BWMOTIF 3 maydRyvaic
+BWMOTIF 6 fllxwlP
+BWMOTIF 6 cxshlxxxxfygX
+```
+
+Searches the indicated region of the active strand for the specified sequence, then assigns the capitalized residue as the BW x.50 of that region.
+Note all other residues of the motif must be lower case. The first residue of the motif must lie within the bounds of the region, otherwise the
+search will fail and the interpreter will exit with an error.
+
+
 # CANMOVE
 Example:
 ```

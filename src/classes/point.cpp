@@ -221,11 +221,21 @@ Point average_of_points(Point* points, int count)
         y += points[i].weight * points[i].y;
         z += points[i].weight * points[i].z;
         sum += points[i].weight;
+
+        #if _dbg_point_avg
+        cout << "Adding " << points[i] << " for total [" << x << "," << y << "," << z << "]." << endl;
+        #endif
     }
 
+    #if _dbg_point_avg
+    cout << "Sum of weights: " << sum << "; return value = [";
+    #endif
     x /= sum;
     y /= sum;
     z /= sum;
+    #if _dbg_point_avg
+    cout << x << "," << y << "," << z << "]." << endl << endl;
+    #endif
 
     Point retval(x, y, z);
     return retval;

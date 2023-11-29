@@ -996,7 +996,7 @@ int Protein::get_bw50(int helixno)
 void Protein::set_bw50(int hxno, int resno)
 {
     if (hxno < 1 || hxno > 78) return;
-    if (Ballesteros_Weinstein[hxno]) return;
+    // if (Ballesteros_Weinstein[hxno]) return;
     Ballesteros_Weinstein[hxno] = resno;
 }
 

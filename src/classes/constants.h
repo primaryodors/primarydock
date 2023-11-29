@@ -366,6 +366,7 @@
 #define _dbg_mol_frames 0
 #define _dbg_multiflex 0
 #define _dbg_null_flexions 0
+#define _dbg_point_avg 0
 #define _dbg_polsat 0
 #define _dbg_repack 0
 #define _DBG_RESBMULT 0

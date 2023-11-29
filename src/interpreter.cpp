@@ -959,12 +959,34 @@ int main(int argc, char** argv)
                     int resno = working->get_bw50(l);
                     if (resno < 1) raise_error((std::string)"Strand does not have a " + to_string(l) + (std::string)".50 residue.");
                     bw50_CA[l] = working->get_residue(resno)->get_CA_location();
+                    bw50_CA[l].weight = 1;
                 }
                 Point old_center = average_of_points(&bw50_CA[1], 7);
-                SCoord new_center = old_center;
-                new_center.r *= -1;
+                Point new_center = working->get_region_center(1, working->get_end_resno()).subtract(old_center);
                 working->move_piece(1, working->get_end_resno(), new_center);
+
             }   // BWCENTER
+
+            #if _dbg_point_avg
+            else if (!strcmp(words[0], "DBGBWCEN"))
+            {
+                Point bw50_CA[10];
+                for (l=1; l<=7; l++)
+                {
+                    int resno = working->get_bw50(l);
+                    if (resno < 1) raise_error((std::string)"Strand does not have a " + to_string(l) + (std::string)".50 residue.");
+                    bw50_CA[l] = working->get_residue(resno)->get_CA_location();
+                    bw50_CA[l].weight = 1;
+                    
+                    AminoAcid* aa = working->get_residue(resno);
+                    Atom* a = aa->get_atom("CA");
+                    cout << "Residue " << resno << " CA is located at " << a->get_location()
+                        << "; function returned " << bw50_CA[l] << endl;
+                }
+                Point old_center = average_of_points(&bw50_CA[1], 7);
+                cout << old_center << endl;
+            }
+            #endif
 
             else if (!strcmp(words[0], "BWCOPY"))
             {
@@ -1012,7 +1034,7 @@ int main(int argc, char** argv)
                 // cout << l << ".50 = " << k << endl;
 
                 working->set_bw50(l, k);
-            }
+            }   // BWMOTIF
 
             else if (!strcmp(words[0], "CANMOVE"))
             {

@@ -120,7 +120,7 @@ public:
     virtual void move(Point move_amt, bool override_residue = false);
     virtual void recenter(Point new_location);
     void rotate(SCoord* SCoord, float theta, bool bond_weighted = false);
-    void rotate(LocatedVector SCoord, float theta);
+    void rotate(LocatedVector vec, float theta);
     bool shielded(Atom* a, Atom* b) const;
     float correct_structure(int iters = 500);
     float close_loop(Atom** path, float closing_bond_cardinality);
@@ -142,6 +142,7 @@ public:
     Point get_atom_location(const char* aname);
     int atom_idx_from_ptr(Atom* a);
     void delete_atom(Atom* a);
+    void delete_all_atoms();
     int get_hydrogen_count();
     virtual void hydrogenate(bool steric_only = false);
     void clear_atom_binding_energies();

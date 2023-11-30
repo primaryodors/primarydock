@@ -232,6 +232,20 @@ void Molecule::delete_atom(Atom* a)
     throw 0xbada70b;
 }
 
+void Molecule::delete_all_atoms()
+{
+    if (!atoms) return;
+
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        delete atoms[i];
+    }
+    
+    delete[] atoms;
+    atoms = nullptr;
+}
+
 void Molecule::reset_conformer_momenta()
 {
     srand (time(nullptr));

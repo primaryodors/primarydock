@@ -49,6 +49,8 @@ int stack_pointer = 0;
 Protein* strands[26];
 Protein* working = nullptr;
 char g_chain = 'A';
+Molecule ligand("ligand");
+char lig_chain = '\0';
 
 void raise_error(std::string message)
 {
@@ -696,6 +698,7 @@ int main(int argc, char** argv)
         char** owords = words;
         char chain = 'A';
         char new_chain;
+        bool include_ligand;
         if (words && words[0] && words[0][0] && words[0][1])
         {
             for (k=0; words[k]; k++)
@@ -965,6 +968,10 @@ int main(int argc, char** argv)
                 Point new_center = working->get_region_center(1, working->get_end_resno()).subtract(old_center);
                 working->move_piece(1, working->get_end_resno(), new_center);
 
+                if (lig_chain == g_chain && ligand.get_atom_count())
+                {
+                    ligand.move(new_center.subtract(old_center));
+                }
             }   // BWCENTER
 
             #if _dbg_point_avg
@@ -1132,6 +1139,12 @@ int main(int argc, char** argv)
                 Point newcen(0,0,0);
                 if (words[l]) newcen = interpret_single_point(words[l++]);
                 if (words[l]) raise_error("Too many parameters given for CENTER.");
+
+                if (lig_chain == g_chain && ligand.get_atom_count())
+                {
+                    ligand.move(newcen.subtract(working->get_region_center(1, working->get_end_resno()));
+                }
+
                 working->move_piece(1, 9999, newcen);
             }	// CENTER
 
@@ -2168,7 +2181,17 @@ int main(int argc, char** argv)
                 if (words[2] && words[3])
                 {
                     new_chain = words[3][0];
-                    if (words[4]) raise_error("Too many parameters given for LOAD.");
+                    if (words[4])
+                    {
+                        if (words[5]) raise_error("Too many parameters given for LOAD.");
+                        else if (strcmp(words[4], "+")) raise_error("Too many parameters given for LOAD.");
+                        else
+                        {
+                            ligand.delete_all_atoms();
+                            include_ligand = true;
+                            lig_chain = new_chain;
+                        }
+                    }
 
                     if (!strands[new_chain - 65]) strands[new_chain - 65] = new Protein(psz);
                     working = strands[new_chain - 65];
@@ -2184,6 +2207,7 @@ int main(int argc, char** argv)
                 l = working->load_pdb(pf, n, chain);
                 if (!l) raise_error("No residues loaded.");
                 working->set_name_from_pdb_name(words[1]);
+                if (include_ligand) ligand.from_pdb(pf, true);
 
                 fclose(pf);
 
@@ -2410,6 +2434,8 @@ int main(int argc, char** argv)
                 if (words[l]) newcen = interpret_single_point(words[l++]);
                 if (words[l]) raise_error("Too many parameters given for MOVE.");
                 working->move_piece(sr, er, newcen);
+
+                // TODO: Option to include ligand in motion.
             }	// MOVE
 
             else if (!strcmp(words[0], "MOVEREL"))
@@ -2424,6 +2450,8 @@ int main(int argc, char** argv)
                 if (words[l]) movamt = interpret_single_point(words[l++]);
                 if (words[l]) raise_error("Too many parameters given for MOVEREL.");
                 working->move_piece(sr, er, movamt);
+
+                // TODO: Option to include ligand in motion.
             }	// MOVEREL
 
             else if (!strcmp(words[0], "PTALIGN"))
@@ -2597,7 +2625,7 @@ int main(int argc, char** argv)
                     if (!working->get_seq_length()) continue;
                     g_chain = l+65;
                     working->set_pdb_chain(l+65);
-                    working->save_pdb(pf);
+                    working->save_pdb(pf, ligand.get_atom_count() ? &ligand : nullptr);
                 }
                 working->end_pdb(pf);
 
@@ -2880,7 +2908,14 @@ int main(int argc, char** argv)
                     strands[chain] = nullptr;
                 }
                 if (g_chain == 65+chain) working = strands[chain] = new Protein("TheProt");
-            }
+            }   // UNCHAIN
+
+            else if (!strcmp(words[0], "UNLIG"))
+            {
+                if (words[1]) raise_error("Too many parameters given for UNLIG.");
+                ligand.delete_all_atoms();
+                lig_chain = '\0';
+            }   // UNLIG
 
             else if (!strcmp(words[0], "UPRIGHT"))
             {
@@ -2900,6 +2935,17 @@ int main(int argc, char** argv)
                             strands[i]->move_piece(1, 9999, working->last_uprighted_xform);
                             strands[i]->rotate_piece(1, 9999, working->last_uprighted_A.origin, working->last_uprighted_A.v, working->last_uprighted_A.a);
                             strands[i]->rotate_piece(1, 9999, working->last_uprighted_B.origin, working->last_uprighted_B.v, working->last_uprighted_B.a);
+                        }
+
+                        if (lig_chain == 65+i && ligand.get_atom_count())
+                        {
+                            ligand.move(working->last_uprighted_xform);
+                            LocatedVector lv = working->last_uprighted_A.v;
+                            lv.origin = working->last_uprighted_A.origin;
+                            ligand.rotate(lv, working->last_uprighted_A.a);
+                            lv = working->last_uprighted_B.v;
+                            lv.origin = working->last_uprighted_B.origin;
+                            ligand.rotate(lv, working->last_uprighted_B.a);
                         }
                     }
                 }

@@ -486,12 +486,15 @@ Example:
 LOAD "path/to/protein.pdb"
 LOAD "path/to/protein.pdb" A
 LOAD "path/to/protein.pdb" A B
+LOAD "path/to/protein.pdb" A B +
 ```
 
 Loads the specified protein into working memory. Note only one protein is allowed in memory at a given time.
 If one strand ID is provided, then that strand of the PDB will be loaded. The default strand is A.
 If a second strand ID is provided, then the protein will be loaded into that strand locally and the current working strand will be updated.
 The default is to load the protein into the existing working strand ID.
+If a + (plus) character follows the second strand ID, then any ligand(s) present in the PDB file will also be loaded.
+Such ligands will be included in any subsequent `SAVE` commands, unless cleared by the `UNLIG` command.
 
 
 # MCOORD
@@ -734,3 +737,10 @@ UNCHAIN A
 Deletes the indicated strand (peptide chain). Note the current working strand cannot be deleted; an error will result.
 
 
+# UNLIG
+Example:
+```
+UNLIG
+```
+
+Deletes any ligands that were loaded from a PDB by a `LOAD` command. Takes no arguments.

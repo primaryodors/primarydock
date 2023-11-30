@@ -244,6 +244,7 @@ void Molecule::delete_all_atoms()
     
     delete[] atoms;
     atoms = nullptr;
+    atcount = 0;
 }
 
 void Molecule::reset_conformer_momenta()
@@ -874,8 +875,8 @@ int Molecule::from_pdb(FILE* is, bool het_only)
     while (!feof(is))
     {
         fgets(buffer, 1003, is);
+        int charge = 0, offset = (buffer[21] != ' ' && buffer[22] == ' ') ? 1 : 0;
         char** words = chop_spaced_words(buffer);
-        int charge = 0;
 
         if (buffer[78] && buffer[78] > ' ')
         {
@@ -917,7 +918,8 @@ int Molecule::from_pdb(FILE* is, bool het_only)
                     }
                     esym[1] &= 0x5f;
 
-                    Point aloc(atof(words[5]), atof(words[6]),atof(words[7]));
+                    // cout << buffer[21] << buffer[22] << " " << offset << endl;
+                    Point aloc(atof(words[5+offset]), atof(words[6+offset]),atof(words[7+offset]));
 
                     Atom* a = add_atom(esym, words[2], &aloc, 0, 0, charge);
                     added++;

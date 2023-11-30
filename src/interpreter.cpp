@@ -970,7 +970,8 @@ int main(int argc, char** argv)
 
                 if (lig_chain == g_chain && ligand.get_atom_count())
                 {
-                    ligand.move(new_center.subtract(old_center));
+                    // cout << old_center << " -> " << new_center << endl;
+                    ligand.move(Point(0,0,0).subtract(old_center));
                 }
             }   // BWCENTER
 
@@ -1142,7 +1143,7 @@ int main(int argc, char** argv)
 
                 if (lig_chain == g_chain && ligand.get_atom_count())
                 {
-                    ligand.move(newcen.subtract(working->get_region_center(1, working->get_end_resno()));
+                    ligand.move(newcen.subtract(working->get_region_center(1, working->get_end_resno())));
                 }
 
                 working->move_piece(1, 9999, newcen);
@@ -1768,6 +1769,7 @@ int main(int argc, char** argv)
                     cout << "." << flush;
                 }
                 cout << endl;
+                // if (lig_chain && ligand.get_atom_count()) ligand.hydrogenate();
             }   // HYDRO
 
             else if (!strcmp(words[0], "IF"))
@@ -2939,6 +2941,7 @@ int main(int argc, char** argv)
 
                         if (lig_chain == 65+i && ligand.get_atom_count())
                         {
+                            // cout << "Upright with ligand: " << ligand.get_barycenter() << " x " << (Point)working->last_uprighted_xform << endl;
                             ligand.move(working->last_uprighted_xform);
                             LocatedVector lv = working->last_uprighted_A.v;
                             lv.origin = working->last_uprighted_A.origin;

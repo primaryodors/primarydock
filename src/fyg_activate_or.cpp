@@ -320,6 +320,7 @@ int main(int argc, char** argv)
             float r = p.region_can_move(sr, er, motion, false, sr1, er1);
             if (r < motion.r) motion.r = r;
 
+            cout << "Applying helix " << i << " translation..." << endl;
             p.move_piece(sr, er, motion);
         }
     }
@@ -340,6 +341,7 @@ int main(int argc, char** argv)
                 return -1;
             }
 
+            cout << "Applying helix " << i << " extracellular bend..." << endl;
             do_template_bend(p, aasrc, aaterm, i, exr[i], xl8[i]);
         }
 
@@ -353,6 +355,7 @@ int main(int argc, char** argv)
                 return -1;
             }
 
+            cout << "Applying helix " << i << " cytoplasmic bend..." << endl;
             do_template_bend(p, aasrc, aaterm, i, cyt[i], xl8[i]);
         }
     }

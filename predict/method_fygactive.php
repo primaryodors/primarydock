@@ -9,10 +9,13 @@
 //
 
 // Configurable variables
-$flex = 1;
+$flex = 1;                      // Flexion (0 or 1) for active dock.
+$flexi = 0;                     // Flexion for inactive dock.
 
 chdir(__DIR__);
-require("methods_common.php");
+require_once("methods_common.php");
+chdir(__DIR__);
+require_once("../data/protutils.php");
 chdir(__DIR__);
 
 prepare_outputs();
@@ -63,12 +66,75 @@ function make_prediction($data)
 chdir(__DIR__);
 chdir("..");
 
-$pdbfname_active = str_replace(".upright.pdb", ".fygactive.pdb", $pdbfname);
+$pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
 if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/fyg_activate_or"))
 {
-    if ($protid == "OR51E2")
+    $cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
+
+    $args = "";
+    $template = [];
+
+    if (substr($protid, 0, 4) == "TAAR")
+    {
+        $template = $cryoem["mTAAR9"];
+        // TODO: Blend mTAAR9 with TAAR1 depending on sequence similarity.
+    }
+    else if (substr($protid, 0, 2) == "OR")
+    {
+        $fam = intval(substr($protid, 2, 2));
+        if ($fam >= 50)
+        {
+            $template = $cryoem["OR51E2"];
+        }
+        else
+        {
+            foreach ($cryoem["OR51E2"] as $hxno => $metrics)
+            {
+                foreach ($metrics as $metric => $dimensions)
+                {
+                    foreach (array_keys($dimensions) as $dimension)
+                    {
+                        // TODO: Make the proportions dependent on sequence similarity.
+                        $template[$hxno][$metric][$dimension]
+                            = 0.66 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
+                            + 0.25 * $cryoem["mTAAR9"][$hxno][$metric][$dimension]
+                            + 0.09 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
+                    }
+                }
+            }
+        }
+    }
+
+    // Get typology. Do a no-save run of fyg_activate_or to determine whether protein has FYG or rock6 capabilities.
+    $output = [];
+    exec("bin/fyg_activate_or --nosave $protid", $output);
+    $has_rock6 = $has_fyg = false;
+    foreach ($output as $line)
+    {
+        if (false!==strpos($line, "Performing rock6")) $has_rock6 = true;
+        if (false!==strpos($line, "Performing FYG activation")) $has_fyg = true;
+    }
+
+    foreach ($template as $hxno => $metrics)
+    {
+        foreach ($metrics as $metric => $dimensions)
+        {
+            if ($hxno == 6)
+            {
+                if ($metric == "cyt" && ($has_fyg || $has_rock6)) continue;
+                else if ($metric == "exr" && $has_rock6) continue;
+            }
+
+            $cmdarg = "--" . substr($metric, 0, 1) . $hxno;
+            $args .= "$cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']} ";
+        }
+    }
+
+    $args .= "$protid";
+
+    if (false) // $protid == "OR51E2")
     {
         $pepd = <<<heredoc
 LOAD pdbs/OR51/OR51E2.8f76.pdb
@@ -84,7 +150,12 @@ heredoc;
         fclose($fp);
         passthru("bin/pepteditor tmp/8f76.pepd");
     }
-    else passthru("bin/fyg_activate_or $protid");
+    else
+    {
+        $cmd = "bin/fyg_activate_or $args";
+        echo "$cmd\n";
+        passthru($cmd);
+    }
 }
 
 $flex_constraints = "";
@@ -115,7 +186,7 @@ $flex_constraints
 ITERS 50
 PROGRESS
 
-FLEX $flex
+FLEX $flexi
 WET
 
 OUT $outfname

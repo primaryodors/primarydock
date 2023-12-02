@@ -1303,11 +1303,6 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
         if (n > 1 && gp.at(1) && gp[1]->scg && gp[1]->ag
             && abs((long)gp[1]->ag.get() - (long)gp[1]->scg.get()) < 16777216)
             r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center());
-        else
-        {
-            gp[1]->scg = nullptr;
-            gp[1]->ag = nullptr;
-        }
     }
     catch (...)
     {

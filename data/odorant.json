@@ -23731,6 +23731,11 @@
         },
         "oid": "ad6461d1d2e7a3c328e5f6ad2d9e75dc"
     },
+    "ade9624205e50bca68c44cc299f90e88":
+    {
+        "full_name": "ammonia",
+        "smiles": "[NH4+]"
+    },
     "ae1f74269e9f977d95cc58c3410e2189":
     {
         "full_name": "methyl camomille",

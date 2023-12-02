@@ -1298,7 +1298,22 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     // float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
     float r0 = gp[0]->scg->distance_to(gp[0]->ag->get_center());
     float r1 = 0;
-    if (gp[1] && gp[1]->scg && gp[1]->ag) r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center());
+    try
+    {
+        if (n > 1 && gp.at(1) && gp[1]->scg && gp[1]->ag
+            && abs((long)gp[1]->ag.get() - (long)gp[1]->scg.get()) < 16777216)
+            r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center());
+        else
+        {
+            gp[1]->scg = nullptr;
+            gp[1]->ag = nullptr;
+        }
+    }
+    catch (...)
+    {
+        ;
+    }
+
     bool do0 = false, do1 = false;
     Point rel(0,0,0);
     if (r0 > bb_scooch_threshold_distance)

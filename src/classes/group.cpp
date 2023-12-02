@@ -246,6 +246,9 @@ Point ResidueGroup::get_center()
 Atom* ResidueGroup::get_nearest_atom(Point pt)
 {
     int i, n = aminos.size();
+
+    if (n<1 || n>29) return nullptr;
+
     Atom* result = nullptr;
     float r = Avogadro;
 
@@ -268,7 +271,10 @@ Atom* ResidueGroup::get_nearest_atom(Point pt)
 
 float ResidueGroup::distance_to(Point pt)
 {
-    return get_nearest_atom(pt)->get_location().get_3d_distance(pt);
+    if (!this) return 0;
+    Atom* a = get_nearest_atom(pt);
+    if (!a) return 0;
+    return a->get_location().get_3d_distance(pt);
     // return pt.get_3d_distance(get_center());
 }
 
@@ -1290,8 +1296,9 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     #if enable_bb_scooch
     // Scooch.
     // float r = gp[0]->ag->get_center().get_3d_distance(gp[0]->scg->get_center()) - gp[0]->scg->group_reach();
-    float r0 = gp[0]->scg->distance_to(gp[0]->ag->get_center()); // - gp[0]->scg->group_reach();
-    float r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center()); // - gp[1]->scg->group_reach();
+    float r0 = gp[0]->scg->distance_to(gp[0]->ag->get_center());
+    float r1 = 0;
+    if (gp[1] && gp[1]->scg && gp[1]->ag) r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center());
     bool do0 = false, do1 = false;
     Point rel(0,0,0);
     if (r0 > bb_scooch_threshold_distance)

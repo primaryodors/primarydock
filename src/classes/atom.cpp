@@ -400,6 +400,8 @@ Atom::~Atom()
 void Atom::unbond(Atom* btom)
 {
     // if (btom) cout << "Unbonding " << btom->name << " from " << name << endl;
+    geometry_dirty = true;
+    btom->geometry_dirty = true;
     if (bonded_to)
     {
         int i;
@@ -483,6 +485,7 @@ bool Atom::move(Point* pt)
     location.weight = at_wt;
     if (geov) delete[] geov;
     geov = NULL;
+    geometry_dirty = true;
     return true;
 }
 
@@ -825,6 +828,8 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
 {
     if (!lbtom) return false;
     int i;
+
+    geometry_dirty = true;
 
     // if (this < lbtom && Z > 1 && lbtom->Z > 1) cout << "Bond " << name << cardinality_printable(lcard) << lbtom->name << endl;
 
@@ -1725,6 +1730,8 @@ Bond* Atom::get_bond_closest_to(Point pt)
 
 SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
 {
+    if (geov && !geometry_dirty) return geov;
+
     int bc = get_bonded_atoms_count();
     if (origgeo == 5 && bc && bc <= 4)
     {
@@ -1801,6 +1808,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
     }
 
     _exit_search:
+    geometry_dirty = false;
     if (prevent_infinite_loop) return geov;
 
     if (is_pi())

@@ -333,6 +333,7 @@ protected:
     Point location;
     int valence=0;
     int geometry=0;						// number of vertices, so 4 = tetrahedral; 6 = octahedral; etc.
+    bool geometry_dirty = true;
     int origgeo=0;
     SCoord* geov=0;
     float at_wt = 0;

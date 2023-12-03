@@ -10,7 +10,9 @@
 
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1) for active dock.
-$flexi = 0;                     // Flexion for inactive dock.
+$flei = 0;                      // Flexion for inactive dock.
+$pose = 10;
+$iter = 50;
 
 chdir(__DIR__);
 require_once("methods_common.php");
@@ -56,6 +58,12 @@ function make_prediction($data)
             $data['DockScore'] = 0.0;
         }
 
+        echo "\nResult: " . print_r($data, true) . "\n";
+    }
+    else if (isset($data["a_POSES"]) && !$data["a_POSES"])
+    {
+        $data['Predicted'] = 'Non-agonist';
+        $data['DockScore'] = 0.0;
         echo "\nResult: " . print_r($data, true) . "\n";
     }
 
@@ -180,13 +188,13 @@ $flxr
 EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
-POSE 10
+POSE $pose
 ELIM 5000
 $flex_constraints
-ITERS 50
+ITERS $iter
 PROGRESS
 
-FLEX $flexi
+FLEX $flei
 WET
 
 OUT $outfname
@@ -227,10 +235,10 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 # SOFT 6.48 6.59
 
 SEARCH $search
-POSE 10
+POSE $pose
 ELIM 5000
 $flex_constraints
-ITERS 50
+ITERS $iter
 PROGRESS
 
 FLEX $flex

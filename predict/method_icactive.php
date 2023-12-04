@@ -55,6 +55,12 @@ function make_prediction($data)
 
         echo "\nResult: " . print_r($data, true) . "\n";
     }
+    else if (isset($data["a_POSES"]) && !$data["a_POSES"])
+    {
+        $data['Predicted'] = 'Non-agonist';
+        $data['DockScore'] = 0.0;
+        echo "\nResult: " . print_r($data, true) . "\n";
+    }
 
     return $data;
 }

@@ -31,7 +31,7 @@ void save_file(Protein& p, std::string filename, Molecule* ligand = nullptr)
     cout << "Saved " << filename << endl;
 }
 
-void do_template_bend(Protein& p, AminoAcid* aasrc, AminoAcid* aaref, int hxno, SCoord rel_tgt, SCoord x50, AminoAcid* aaopposite_term = nullptr)
+float do_template_bend(Protein& p, AminoAcid* aasrc, AminoAcid* aaref, int hxno, SCoord rel_tgt, SCoord x50, AminoAcid* aaopposite_term = nullptr)
 {
     int ressrc = aasrc->get_residue_no();
     int resref = aaref->get_residue_no();
@@ -63,6 +63,7 @@ void do_template_bend(Protein& p, AminoAcid* aasrc, AminoAcid* aaref, int hxno, 
     if (theta1 < theta) theta = theta1;
 
     p.rotate_piece(sr, er, axis.origin, axis, theta);
+    return theta;
 }
 
 int main(int argc, char** argv)
@@ -191,6 +192,7 @@ int main(int argc, char** argv)
     std::string in_filename = path + orid + (std::string)".upright.pdb";
     if (!file_exists(in_filename)) return -3;
     std::string out_filename = path + orid + (std::string)".active.pdb";
+    std::string cns_filename = path + orid + (std::string)".params";
 
     Protein p(orid.c_str());
     FILE* fp = fopen(in_filename.c_str(), "rb");
@@ -212,6 +214,9 @@ int main(int argc, char** argv)
     AminoAcid *aa2x66 = p.get_residue_bw("2.66");
 
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
+    AminoAcid *aa3x33 = p.get_residue_bw("3.33");
+    AminoAcid *aa3x36 = p.get_residue_bw("3.36");
+    AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
     AminoAcid *aa3x56 = p.get_residue_bw("3.56");
 
@@ -224,6 +229,7 @@ int main(int argc, char** argv)
     AminoAcid *aa45x54 = p.get_residue_bw("45.54");
 
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
+    AminoAcid *aa5x47 = p.get_residue_bw("5.47");
     AminoAcid *aa5x50 = p.get_residue_bw("5.50");
     AminoAcid *aa5x58 = p.get_residue_bw("5.58");
     AminoAcid *aa5x68 = p.get_residue_bw("5.68");
@@ -234,6 +240,7 @@ int main(int argc, char** argv)
     AminoAcid *aa6x40 = p.get_residue_bw("6.40");
     AminoAcid *aa6x48 = p.get_residue_bw("6.48");
     AminoAcid *aa6x49 = p.get_residue_bw("6.49");
+    AminoAcid *aa6x51 = p.get_residue_bw("6.51");
     AminoAcid *aa6x55 = p.get_residue_bw("6.55");
     AminoAcid *aa6x59 = p.get_residue_bw("6.59");
 
@@ -379,12 +386,15 @@ int main(int argc, char** argv)
         Atom* reach45x51 = aa45x51->get_nearest_atom(reach6x55->get_location());
         float r = reach6x55->distance_to(reach45x51);
         if (r >= 2) rock6_dir = reach45x51->get_location().subtract(reach6x55->get_location());
+        constraints.push_back("STCR 45.51");
+        constraints.push_back("STCR 6.55");
     }
 
     if (allow_rock6 && rock6_dir.r)
     {
         cout << "Performing rock6..." << endl;
-        do_template_bend(p, aa6x48, aa6x59, 6, rock6_dir, SCoord(0,0,0), aa6x28);
+        float theta = do_template_bend(p, aa6x48, aa6x59, 6, rock6_dir, SCoord(0,0,0), aa6x28);
+        cout << "TMR6 rocks " << (theta*fiftyseven) << "deg." << endl;
     }
 
     
@@ -429,9 +439,65 @@ int main(int argc, char** argv)
 
         // Adjust TMR6.
         float theta6 = p.region_can_rotate(n6x28, n6x49, lv6);
-        cout << "TMR6 rotated " << (theta6_initial - theta6 * fiftyseven) << "deg." << endl;
+        cout << "TMR6 bends " << (theta6_initial - theta6 * fiftyseven) << "deg." << endl;
         p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, theta6);
     }
 
-    if (allow_save) save_file(p, out_filename.c_str());
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Make room near trip switch.
+    // Assume at least one of rock6 / FYG bend has occurred.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    Molecule inert;
+    
+    aa5x47->movability = MOV_FLEXONLY;
+    pt = aa5x47->get_CA_location().subtract(aa3x33->get_CA_location());
+    pt = pt.add(aa5x47->get_CA_location());
+    aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
+    aa6x51->movability = MOV_FLEXONLY;
+    pt = aa6x51->get_CA_location().subtract(aa3x36->get_CA_location());
+    pt = pt.add(aa6x51->get_CA_location());
+    aa6x51->conform_atom_to_location(aa6x51->get_reach_atom()->name, pt);
+
+    inert.from_smiles("I[Si](I)(I)I");
+    pt = aa6x48->get_CA_location().add(aa3x40->get_CA_location());
+    pt = pt.add(aa3x36->get_CA_location());
+    pt = pt.add(aa5x47->get_CA_location());
+    pt = pt.add(aa6x51->get_CA_location());
+    pt.multiply(1.0/5);
+    inert.recenter(pt);
+    inert.movability = MOV_NORECEN;
+
+    AminoAcid* reachres[256];
+    int nearby = p.get_residues_can_clash_ligand(reachres, &inert, pt, Point(1.5,1.5,1.5), nullptr);
+    Molecule* mols[nearby+4];
+    j = 0;
+    mols[j++] = &inert;
+    for (i=0; i<nearby; i++)
+    {
+        reachres[i]->movability = MOV_FLEXONLY;
+        mols[j++] = reinterpret_cast<Molecule*>(reachres[i]);
+    }
+    mols[j] = nullptr;
+
+    cout << "Flexing " << nearby << " side chains away from trip switch area." << endl;
+    Molecule::conform_molecules(mols, 20);
+    aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
+
+
+    if (allow_save)
+    {
+        save_file(p, out_filename.c_str());
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // Save parameters file.
+        ////////////////////////////////////////////////////////////////////////////////
+
+        fp = fopen(cns_filename.c_str(), "wb");
+        if (!fp) return -3;
+        n = constraints.size();
+        for (l=0; l<n; l++) fprintf(fp, "%s\n", constraints[l].c_str());
+        fclose(fp);
+    }
 }

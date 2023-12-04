@@ -209,7 +209,7 @@
 
 // Drift pulls the ligand towards the loneliest point if it encounters clashes.
 // Turning it off can cause the ligand to be ejected from the protein.
-#define allow_drift 1
+#define allow_drift 0
 #define initial_drift 0.333
 #define drift_decay_rate 0.2
 

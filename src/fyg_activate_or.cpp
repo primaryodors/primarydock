@@ -475,7 +475,7 @@ int main(int argc, char** argv)
         inert.movability = MOV_NORECEN;
 
         AminoAcid* reachres[256];
-        int nearby = p.get_residues_can_clash_ligand(reachres, &inert, pt, Point(1.5,1.5,1.5), nullptr);
+        int nearby = p.get_residues_can_clash_ligand(reachres, &inert, pt, Point(8,8,8), nullptr);
         Molecule* mols[nearby+4];
         j = 0;
         mols[j++] = &inert;

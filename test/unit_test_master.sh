@@ -52,7 +52,7 @@ echo "Running prediction tests and docking tests; these will take some time. Ple
 
 REPORT="testdata/OR51E2_propionate_pred.approved.txt"
 # php -f predict/method_icactive.php prot=OR51E2 lig=propionic_acid | tee >( grep '[[]Predicted[]] => ' > testdata/received/OR51E2_propionate_pred.received.txt)
-php -f predict/method_icactive.php prot=OR51E2 lig=propionic_acid nosoft=1 | grep '[[]Predicted[]] => ' > testdata/received/OR51E2_propionate_pred.received.txt
+php -f predict/method_fygactive.php prot=OR51E2 lig=propionic_acid | grep '[[]Predicted[]] => ' > testdata/received/OR51E2_propionate_pred.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/OR51E2_propionate_pred.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}OR51E2 propionate prediction test succeeded.${NC}\n"
@@ -76,29 +76,49 @@ fi
 
 # php -f predict/method_icactive.php prot=OR1A1 lig=d-limonene | tee >( grep '[[]Predicted[]] => ' > testdata/received/OR1A1_d-limonene_pred.received.txt)
 
-
-bin/primarydock testdata/test_TAAR8.config --colorless --iter 50 --congress > testdata/received/TAAR8_CAD.txt
-TAAR_RESULT=$?
-if [ "$TAAR_RESULT" -eq "0" ]; then
-    POSES=$( cat testdata/received/TAAR8_CAD.txt | grep "pose(s) found" )
-    if [ -z "$POSES" ]; then
-        printf "${RED}TAAR test FAILED: no poses.${NC}\n"
+REPORT="testdata/TAAR8_cadaverine_pred.approved.txt"
+php -f predict/method_fygactive.php prot=TAAR8 lig=cadaverine | grep '[[]Predicted[]] => ' > testdata/received/TAAR8_cadaverine_pred.received.txt
+RESULT=$(diff --unified $REPORT testdata/received/TAAR8_cadaverine_pred.received.txt)
+if [ -z "$RESULT" ]; then
+    # printf "${GRN}TAAR8 cadaverine prediction test succeeded.${NC}\n"
+    ASP111=$( cat output/TAAR/TAAR8/TAAR8.cadaverine.active.dock | grep -m 1 "Asp111: " )
+    ASP111="${ASP111/Asp111: /}"
+    ASP111="${ASP111/[.][0-9]*/}"
+    ASP201=$( cat output/TAAR/TAAR8/TAAR8.cadaverine.active.dock | grep -m 1 "Asp201: " )
+    ASP201="${ASP201/Asp201: /}"
+    ASP201="${ASP201/[.][0-9]*/}"
+    if [[ $ASP111 -gt "-30"  ]] || [[ $ASP201 -gt "-30"  ]]; then
+        printf "${RED}TAAR test FAILED: bad contacts.${NC}\n"
     else
-        ASP111=$( cat testdata/received/TAAR8_CAD.txt | grep -m 1 "Asp111: " )
-        ASP111="${ASP111/Asp111: /}"
-        ASP111="${ASP111/[.][0-9]*/}"
-        ASP201=$( cat testdata/received/TAAR8_CAD.txt | grep -m 1 "Asp201: " )
-        ASP201="${ASP201/Asp201: /}"
-        ASP201="${ASP201/[.][0-9]*/}"
-        if [[ $ASP111 -gt "-15"  ]] || [[ $ASP201 -gt "-10"  ]]; then
-            printf "${RED}TAAR test FAILED: bad contacts.${NC}\n"
-        else
-            printf "${GRN}TAAR test succeeded.${NC}\n"
-        fi
+        printf "${GRN}TAAR test succeeded.${NC}\n"
     fi
 else
-    printf "${RED}TAAR test FAILED: return value.${NC}\n"
+    printf "${RED}TAAR8 cadaverine prediction test FAILED to predict agonist.${NC}\n"
+    diff --color --unified $REPORT testdata/received/OR51E2_propionate_pred.received.txt
 fi
+
+# bin/primarydock testdata/test_TAAR8.config --colorless --iter 50 --congress > testdata/received/TAAR8_CAD.txt
+# TAAR_RESULT=$?
+# if [ "$TAAR_RESULT" -eq "0" ]; then
+#     POSES=$( cat testdata/received/TAAR8_CAD.txt | grep "pose(s) found" )
+#     if [ -z "$POSES" ]; then
+#         printf "${RED}TAAR test FAILED: no poses.${NC}\n"
+#     else
+#         ASP111=$( cat testdata/received/TAAR8_CAD.txt | grep -m 1 "Asp111: " )
+#         ASP111="${ASP111/Asp111: /}"
+#         ASP111="${ASP111/[.][0-9]*/}"
+#         ASP201=$( cat testdata/received/TAAR8_CAD.txt | grep -m 1 "Asp201: " )
+#         ASP201="${ASP201/Asp201: /}"
+#         ASP201="${ASP201/[.][0-9]*/}"
+#         if [[ $ASP111 -gt "-15"  ]] || [[ $ASP201 -gt "-10"  ]]; then
+#             printf "${RED}TAAR test FAILED: bad contacts.${NC}\n"
+#         else
+#             printf "${GRN}TAAR test succeeded.${NC}\n"
+#         fi
+#     fi
+# else
+#     printf "${RED}TAAR test FAILED: return value.${NC}\n"
+# fi
 
 
 # bin/primarydock testdata/test_1A1.config --colorless --congress > testdata/received/OR1A1_dLIMN.txt

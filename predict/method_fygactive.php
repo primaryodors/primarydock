@@ -10,7 +10,7 @@
 
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1) for active dock.
-$flei = 0;                      // Flexion for inactive dock.
+$flxi = 0;                      // Flexion for inactive dock.
 $pose = 25;
 $iter = 20;
 
@@ -31,6 +31,8 @@ $metrics_to_process =
 
 function make_prediction($data)
 {
+    global $protid, $ligname;
+
     if (isset($data["a_Pose1"]))
     {
         $ae = floatval(@$data['a_BindingEnergy']);
@@ -58,12 +60,15 @@ function make_prediction($data)
             $data['DockScore'] = 0.0;
         }
 
+        echo "\nProtein: $protid\nLigand: $ligname";
         echo "\nResult: " . print_r($data, true) . "\n";
     }
     else if (isset($data["a_POSES"]) && !$data["a_POSES"])
     {
         $data['Predicted'] = 'Non-agonist';
         $data['DockScore'] = 0.0;
+
+        echo "\nProtein: $protid\nLigand: $ligname";
         echo "\nResult: " . print_r($data, true) . "\n";
     }
 
@@ -194,7 +199,7 @@ $flex_constraints
 ITERS $iter
 PROGRESS
 
-FLEX $flei
+FLEX $flxi
 WET
 
 OUT $outfname

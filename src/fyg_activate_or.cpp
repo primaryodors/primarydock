@@ -231,6 +231,7 @@ int main(int argc, char** argv)
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
     AminoAcid *aa5x47 = p.get_residue_bw("5.47");
     AminoAcid *aa5x50 = p.get_residue_bw("5.50");
+    AminoAcid *aa5x51 = p.get_residue_bw("5.51");
     AminoAcid *aa5x58 = p.get_residue_bw("5.58");
     AminoAcid *aa5x68 = p.get_residue_bw("5.68");
 
@@ -238,6 +239,7 @@ int main(int argc, char** argv)
 
     AminoAcid *aa6x28 = p.get_residue_bw("6.28");
     AminoAcid *aa6x40 = p.get_residue_bw("6.40");
+    AminoAcid *aa6x44 = p.get_residue_bw("6.44");
     AminoAcid *aa6x48 = p.get_residue_bw("6.48");
     AminoAcid *aa6x49 = p.get_residue_bw("6.49");
     AminoAcid *aa6x51 = p.get_residue_bw("6.51");
@@ -296,6 +298,7 @@ int main(int argc, char** argv)
     char l5x50 = aa5x50->get_letter();
     char l5x58 = aa5x58->get_letter();
 
+    char l6x44 = aa6x44->get_letter();
     char l6x48 = aa6x48->get_letter();
     char l6x49 = aa6x49->get_letter();
     char l6x55 = aa6x55->get_letter();
@@ -451,39 +454,50 @@ int main(int argc, char** argv)
 
     Molecule inert;
     
-    aa5x47->movability = MOV_FLEXONLY;
-    pt = aa5x47->get_CA_location().subtract(aa3x33->get_CA_location());
-    pt = pt.add(aa5x47->get_CA_location());
-    aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
-    aa6x51->movability = MOV_FLEXONLY;
-    pt = aa6x51->get_CA_location().subtract(aa3x36->get_CA_location());
-    pt = pt.add(aa6x51->get_CA_location());
-    aa6x51->conform_atom_to_location(aa6x51->get_reach_atom()->name, pt);
-
-    inert.from_smiles("I[Si](I)(I)I");
-    pt = aa6x48->get_CA_location().add(aa3x40->get_CA_location());
-    pt = pt.add(aa3x36->get_CA_location());
-    pt = pt.add(aa5x47->get_CA_location());
-    pt = pt.add(aa6x51->get_CA_location());
-    pt.multiply(1.0/5);
-    inert.recenter(pt);
-    inert.movability = MOV_NORECEN;
-
-    AminoAcid* reachres[256];
-    int nearby = p.get_residues_can_clash_ligand(reachres, &inert, pt, Point(1.5,1.5,1.5), nullptr);
-    Molecule* mols[nearby+4];
-    j = 0;
-    mols[j++] = &inert;
-    for (i=0; i<nearby; i++)
+    if (l6x48 != 'W')
     {
-        reachres[i]->movability = MOV_FLEXONLY;
-        mols[j++] = reinterpret_cast<Molecule*>(reachres[i]);
-    }
-    mols[j] = nullptr;
+        aa5x47->movability = MOV_FLEXONLY;
+        pt = aa5x47->get_CA_location().subtract(aa3x33->get_CA_location());
+        pt = pt.add(aa5x47->get_CA_location());
+        aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
+        aa6x51->movability = MOV_FLEXONLY;
+        pt = aa6x51->get_CA_location().subtract(aa3x36->get_CA_location());
+        pt = pt.add(aa6x51->get_CA_location());
+        aa6x51->conform_atom_to_location(aa6x51->get_reach_atom()->name, pt);
 
-    cout << "Flexing " << nearby << " side chains away from trip switch area." << endl;
-    Molecule::conform_molecules(mols, 20);
-    aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
+        inert.from_smiles("I[Si](I)(I)I");
+        pt = aa6x48->get_CA_location().add(aa3x40->get_CA_location());
+        pt = pt.add(aa3x36->get_CA_location());
+        pt = pt.add(aa5x47->get_CA_location());
+        pt = pt.add(aa6x51->get_CA_location());
+        pt.multiply(1.0/5);
+        inert.recenter(pt);
+        inert.movability = MOV_NORECEN;
+
+        AminoAcid* reachres[256];
+        int nearby = p.get_residues_can_clash_ligand(reachres, &inert, pt, Point(1.5,1.5,1.5), nullptr);
+        Molecule* mols[nearby+4];
+        j = 0;
+        mols[j++] = &inert;
+        for (i=0; i<nearby; i++)
+        {
+            reachres[i]->movability = MOV_FLEXONLY;
+            mols[j++] = reinterpret_cast<Molecule*>(reachres[i]);
+        }
+        mols[j] = nullptr;
+
+        cout << "Flexing " << nearby << " side chains away from trip switch area." << endl;
+        Molecule::conform_molecules(mols, 20);
+        aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
+    }
+
+    // This side chain shift is observed in all cryo-EM models of active states of TAARs:
+    if (l6x44 == 'F' || l6x44 == 'Y')
+    {
+        aa6x44->movability = MOV_FLEXONLY;
+        aa6x44->conform_atom_to_location(aa6x44->get_reach_atom()->name, aa5x51->get_CA_location());
+        constraints.push_back("STCR 6.44");
+    }
 
 
     if (allow_save)

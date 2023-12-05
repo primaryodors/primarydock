@@ -128,7 +128,7 @@ else
 
 ensure_sdf_exists($ligname);
 
-echo "Beginning dock of $ligname in $protid...\n\n";
+echo "Beginning prediction of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);
 
 

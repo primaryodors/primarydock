@@ -11224,6 +11224,20 @@
         },
         "oid": "53593b4a71638a116082eded92de4ced"
     },
+    "539d1d03f5d142b02bddfb98ec8c7c3c":
+    {
+        "full_name": "silane",
+        "smiles": "[SiH4]",
+        "aroma":
+        {
+            "https://en.wikipedia.org/wiki/Silane#cite_note-5":
+            [
+                "sharp",
+                "pungent",
+                "acetic"
+            ]
+        }
+    },
     "53c0eb17a8ac0498e4d08eb65800591a":
     {
         "full_name": "2-methylbutanoic acid",
@@ -23742,7 +23756,8 @@
     "ade9624205e50bca68c44cc299f90e88":
     {
         "full_name": "ammonia",
-        "smiles": "[NH4+]"
+        "smiles": "[NH4+]",
+        "oid": "ade9624205e50bca68c44cc299f90e88"
     },
     "ae1f74269e9f977d95cc58c3410e2189":
     {

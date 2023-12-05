@@ -25,7 +25,7 @@ prepare_outputs();
 $metrics_to_process =
 [
     "BENERG" => "BindingEnergy",
-    "BENERG.rgn" => "BindingEnergy.rgn",
+    // "BENERG.rgn" => "BindingEnergy.rgn",
     "BEST" => "Pose1"
 ];
 

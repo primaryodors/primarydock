@@ -145,6 +145,7 @@
 #define bb_scooch_threshold_distance 1.5
 #define flexion_selection 1
 #define no_zero_flexions 1
+#define flexion_probability_multiplier 0.4
 #define ignore_invalid_partial 1
 
 // If enabled, the trip switch functionality will have to be moved around in the code.
@@ -296,8 +297,8 @@
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
 #define _allow_conditional_basicity_with_acid_ligand 1
-#define cond_bas_hbond_energy_threshold 1.0
-#define cond_bas_hbond_distance_threshold 2.3
+#define cond_bas_hbond_energy_threshold 5.0
+#define cond_bas_hbond_distance_threshold 2.2
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0

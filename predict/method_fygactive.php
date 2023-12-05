@@ -11,8 +11,8 @@
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1) for active dock.
 $flei = 0;                      // Flexion for inactive dock.
-$pose = 10;
-$iter = 50;
+$pose = 25;
+$iter = 20;
 
 chdir(__DIR__);
 require_once("methods_common.php");

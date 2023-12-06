@@ -56,7 +56,7 @@ if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
     }
 }
 
-$cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|obabel)' | grep -v grep";
+$cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|bin/fyg|obabel)' | grep -v grep";
 $result = [];
 exec($cmd, $result);
 

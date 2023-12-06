@@ -635,6 +635,11 @@ void Atom::fetch_bonds(Bond** result)
         return;
     }
 
+    if (geometry > 10)
+    {
+        geometry = 10;
+    }
+
     int i;
     if (!geometry || geometry<0 || isnan(geometry)) geometry=4;
     try

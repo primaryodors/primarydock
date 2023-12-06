@@ -215,7 +215,8 @@ void Pose::restore_state(Molecule* m)
 void Molecule::delete_atom(Atom* a)
 {
     if (!a) return;
-    // return;
+    paths = nullptr;
+
     int i, j;
 
     if (hasAtoms(atoms))
@@ -241,6 +242,8 @@ void Molecule::delete_atom(Atom* a)
 void Molecule::delete_all_atoms()
 {
     if (!atoms) return;
+    if (paths) delete[] paths;
+    paths = nullptr;
 
     int i;
     for (i=0; atoms[i]; i++)
@@ -319,6 +322,8 @@ void Molecule::add_existing_atom(Atom* a)
 
 Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard, const int charge)
 {
+    paths = nullptr;
+
     Atom* a = new Atom(elemsym, location, charge);
     a->name = new char[strlen(aname)+1];
     a->residue = 0;
@@ -339,6 +344,8 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
         Point pt;
         return add_atom(elemsym, aname, &pt, bondto, bcard);
     }
+
+    paths = nullptr;
 
     // cout << "Add new " << elemsym << " bonded to " << bondto->name << endl;
 
@@ -1248,6 +1255,7 @@ Atom* Molecule::path_get_terminal_atom(int path_idx)
     if (!paths[path_idx]) return nullptr;
 
     int n = path_get_length(path_idx);
+    if (!n) return nullptr;
     return paths[path_idx][n-1];
 }
 
@@ -1294,6 +1302,8 @@ void Molecule::find_paths()
 {
     if (!atoms || !atoms[0]) return;
 
+    if (paths) return;
+
     int h, i, j, k, l, m, n = 0, p, limit;
     Bond* b[16];
     for (i=0; atoms[i]; i++)
@@ -1336,6 +1346,7 @@ void Molecule::find_paths()
             m = path_get_length(i);
             a = path_get_terminal_atom(i);
             if (!a) continue;
+            if (!a->name) continue;
             if (abs((__int64_t)(atoms[0]) - (__int64_t)a) >= 16777216) continue;
             a->fetch_bonds(b);
             if (!b[0]) continue;

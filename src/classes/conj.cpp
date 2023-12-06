@@ -39,7 +39,6 @@ void Conjugation::add_atom(Atom* a, Atom* prev, Atom* orig)
     atoms[j] = a;
     atoms[j+1] = nullptr;
     net_charge_known = false;
-    // if (a->conjugation) delete[] a->conjugation;
     a->conjugation = std::shared_ptr<Conjugation>(this);
 
     Bond* b[16];

@@ -74,6 +74,12 @@ Molecule::~Molecule()
     if (smiles) delete[] smiles;
     if (rings) delete[] rings;
     if (rotatable_bonds) delete[] rotatable_bonds;
+    /* if (paths)
+    {
+        int i;
+        for (i=0; paths[i]; i++) delete[] paths[i];
+        delete[] paths;
+    } */
 }
 
 int length(Atom** array)
@@ -837,10 +843,10 @@ int Molecule::from_sdf(char const* sdf_dat)
             // cout << "Bonded " << atoms[a1i-1]->name << " to " << atoms[a2i-1]->name << endl;
         }
 
-        if (words) delete words;
+        if (words) delete[] words;
     }
     atoms[atcount] = 0;
-    if (words) delete words;
+    if (words) delete[] words;
 
     identify_conjugations();
     identify_rings();
@@ -853,7 +859,7 @@ void Molecule::identify_conjugations()
     if (!atoms) return;
 
     int i;
-    for (i=0; atoms[i]; i++) atoms[i]->conjugation = nullptr;
+    // for (i=0; atoms[i]; i++) atoms[i]->conjugation = nullptr;
 
     for (i=0; atoms[i]; i++)
     {
@@ -1167,7 +1173,11 @@ int Molecule::add_ring(Atom** atoms)
             if (rings[i]->get_overlap_count(r) == m) already_exists = true; 
         }
         ringcount = i;
-        if (already_exists) return ringcount;
+        if (already_exists)
+        {
+            delete r;
+            return ringcount;
+        }
     }
     else
     {
@@ -1262,7 +1272,7 @@ bool Molecule::path_is_subset_of(int short_path, int long_path)
     if (!paths[short_path]) return true;
 
     int i;
-    for (i=0; paths[short_path][i]; i++)
+    for (i=0; paths[short_path][i] && paths[long_path][i]; i++)
     {
         if (paths[long_path][i] != paths[short_path][i]) return false;
     }
@@ -1366,6 +1376,7 @@ void Molecule::find_paths()
                 }
                 else
                 {
+                    if (paths[n]) delete[] paths[n];
                     paths[n] = new Atom*[atcount];
                     copy_path(i, n);
                     paths[n][m] = b[j]->btom;
@@ -1404,7 +1415,7 @@ void Molecule::find_paths()
                 #endif
 
                 copy_path(n, j);
-                // delete paths[n];
+                delete[] paths[n];
                 paths[n] = nullptr;
             }
         }

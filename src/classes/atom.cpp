@@ -70,7 +70,7 @@ void Atom::read_elements()
                     }
                 }
 
-                delete words;
+                delete[] words;
             }
             buffer[0] = 0;
         }
@@ -2370,7 +2370,6 @@ void Ring::fill_with_atoms(Atom** from_atoms)
     for (i=0; from_atoms[i]; i++);	// Get count.
     atcount = i;
 
-    atoms = new Atom*[atcount+2];
     for (i=0; i < atcount; i++)
     {
         atoms[i] = from_atoms[i];

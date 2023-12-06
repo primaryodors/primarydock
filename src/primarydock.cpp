@@ -1197,7 +1197,7 @@ void read_config_file(FILE* pf)
 
             interpret_config_line(words);
 
-            delete words;
+            delete[] words;
         }
         buffer[0] = 0;
     }

@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <iomanip>
+#include <memory>
 #include "point.h"
 
 #ifndef _ATOM
@@ -108,7 +109,7 @@ public:
     bool Huckel();						// Compiler doesn't allow ü in an identifier - boo hiss!
 
 protected:
-    Atom** atoms = nullptr;
+    Atom* atoms[256];
     int atcount = 0;
     RING_TYPE type = UNKNOWN;
 
@@ -322,7 +323,7 @@ public:
     float shielding_angle = 0;
     char pdbchain = ' ';
     bool doing_ring_closure = false;
-    Conjugation* conjugation = nullptr;
+    std::shared_ptr<Conjugation> conjugation = nullptr;
 
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.

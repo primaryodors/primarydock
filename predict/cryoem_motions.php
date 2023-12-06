@@ -42,8 +42,6 @@ foreach ($output as $line)
     }
 }
 
-// print_r($data);
-
 $average = [];
 foreach ($data as $prot => $values)
 {
@@ -119,7 +117,6 @@ foreach ($deviation as $prot => $helices)
     }
 }
 
-// print_r($output);
 $ofname = "data/cryoem_motions.json";
 $fp = fopen($ofname, "wb");
 if (!$fp) die("Failed to open $ofname for writing.");

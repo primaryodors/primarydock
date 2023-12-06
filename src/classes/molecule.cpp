@@ -1417,9 +1417,10 @@ void Molecule::find_paths()
                 copy_path(n, j);
                 delete[] paths[n];
                 paths[n] = nullptr;
+                num_added--;
             }
         }
-    } while (num_added);
+    } while (num_added > 0);
 
     _exit_paths:
     #if DBG_FND_RNGS

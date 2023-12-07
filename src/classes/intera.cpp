@@ -340,8 +340,8 @@ void InteratomicForce::fetch_applicable(Atom* a, Atom* b, InteratomicForce** ret
     {
         if (a->conjugation && b->conjugation)
         {
-            if (a != a->conjugation.get()->get_nearest_atom(b->conjugation.get())) do_ionic = false;
-            if (b != b->conjugation.get()->get_nearest_atom(a->conjugation.get())) do_ionic = false;
+            if (a != a->conjugation->get_nearest_atom(b->conjugation)) do_ionic = false;
+            if (b != b->conjugation->get_nearest_atom(a->conjugation)) do_ionic = false;
         }
         else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) do_ionic = false;
         else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) do_ionic = false;
@@ -735,11 +735,11 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
         {
             if (a->conjugation && b->conjugation)
             {
-                if (a != a->conjugation.get()->get_nearest_atom(b->conjugation.get())) continue;
-                if (b != b->conjugation.get()->get_nearest_atom(a->conjugation.get())) continue;
+                if (a != a->conjugation->get_nearest_atom(b->conjugation)) continue;
+                if (b != b->conjugation->get_nearest_atom(a->conjugation)) continue;
             }
-            else if (a->conjugation.get() && a != a->conjugation.get()->get_nearest_atom(b->get_location())) continue;
-            else if (b->conjugation.get() && b != b->conjugation.get()->get_nearest_atom(a->get_location())) continue;
+            else if (a->conjugation && a != a->conjugation->get_nearest_atom(b->get_location())) continue;
+            else if (b->conjugation && b != b->conjugation->get_nearest_atom(a->get_location())) continue;
         }
 
         if (!forces[i]->distance) continue;

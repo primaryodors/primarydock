@@ -323,7 +323,7 @@ public:
     float shielding_angle = 0;
     char pdbchain = ' ';
     bool doing_ring_closure = false;
-    std::shared_ptr<Conjugation> conjugation = nullptr;
+    Conjugation* conjugation = nullptr;
 
     #if debug_break_on_move
     bool break_on_move = false;		// debugging feature.

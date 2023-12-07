@@ -637,7 +637,8 @@ void Atom::fetch_bonds(Bond** result)
 
     if (geometry > 10)
     {
-        geometry = 10;
+        result[0] = nullptr;
+        return;
     }
 
     int i;

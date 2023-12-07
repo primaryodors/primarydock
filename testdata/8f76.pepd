@@ -1,0 +1,6 @@
+LOAD pdbs/OR51/OR51E2.8f76.pdb
+CENTER
+UPRIGHT
+HYDRO
+SAVE pdbs/OR51/OR51E2.active.pdb
+

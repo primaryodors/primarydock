@@ -1338,7 +1338,7 @@ void Molecule::find_paths()
     limit = n*n;
     Atom** lpaths[limit];
     paths = lpaths;
-    for (i=0; i<n; i++) paths[i] = nullptr;
+    for (i=0; i<limit; i++) paths[i] = nullptr;
 
     atcount = get_atom_count();
 

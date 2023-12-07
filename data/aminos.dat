@@ -10,28 +10,28 @@
 # If you add a new entry to this file, make sure to also add the 1-letter and 3-letter codes to the constants in the top of viewer.htm.
 #
 
-#AA		3let	name				SMILES                                                  sidechain_pKa     flexion_prob
-A		Ala		alanine				N[C@H](C(=O)O)C
-R		Arg		arginine			N[C@H](C(=O)O)CCCNC(N)=[NH2+]                           12.48             .254
-N		Asn		asparagine			N[C@H](C(=O)O)CC(=O)N                                    -                .105
-D		Asp		aspartic_acid		N[C@H](C(=O)O)CC(=O)[O-]                                 3.90             .058
-C		Cys		cysteine			N[C@H](C(=O)O)CS                                         8.37             .024
-E		Glu		glutamic_acid		N[C@H](C(=O)O)CCC(=O)[O-]                                4.07             .146
-Q		Gln		glutamine			N[C@H](C(=O)O)CCC(=O)N                                   -                .237
-G		Gly		glycine				NCC(=O)O
-H		His		histidine			N[C@H](C(=O)O)Cc1nc[nH]c1                             6.04             .063
+#AA		3let	name				SMILES                                                  sidechain_pKa     flexion_prob     α_penalty
+A		Ala		alanine				N[C@H](C(=O)O)C                                                                             0.00
+R		Arg		arginine			N[C@H](C(=O)O)CCCNC(N)=[NH2+]                           12.48             .254              0.88
+N		Asn		asparagine			N[C@H](C(=O)O)CC(=O)N                                    -                .105              2.72
+D		Asp		aspartic_acid		N[C@H](C(=O)O)CC(=O)[O-]                                 3.90             .058              2.89
+C		Cys		cysteine			N[C@H](C(=O)O)CS                                         8.37             .024              2.85
+E		Glu		glutamic_acid		N[C@H](C(=O)O)CCC(=O)[O-]                                4.07             .146              1.67
+Q		Gln		glutamine			N[C@H](C(=O)O)CCC(=O)N                                   -                .237              1.63
+G		Gly		glycine				NCC(=O)O                                                                                    4.18
+H		His		histidine			N[C@H](C(=O)O)Cc1nc[nH]c1                             6.04             .063                 2.55
 O		Hyp		hydroxyproline		N1[C@H](C(=O)O)CC[C@H]1O
-I		Ile		isoleucine			N[C@H](C(=O)O)[C@H](CC)C                                 -                .142
-L		Leu		leucine				N[C@H](C(=O)O)CC(C)C                                     -                .132
-K		Lys		lysine				N[C@H](C(=O)O)CCCC[NH3+]                                10.54             .392
-M		Met		methionine			N[C@H](C(=O)O)CCSC                                       -                .204
-F		Phe		phenylalanine		N[C@H](C(=O)O)Cc1ccccc1                                  -                .015
-P		Pro		proline				N1[C@H](C(=O)O)CCC1                                      -                .0
+I		Ile		isoleucine			N[C@H](C(=O)O)[C@H](CC)C                                 -                .142              1.72
+L		Leu		leucine				N[C@H](C(=O)O)CC(C)C                                     -                .132              0.88
+K		Lys		lysine				N[C@H](C(=O)O)CCCC[NH3+]                                10.54             .392              1.09
+M		Met		methionine			N[C@H](C(=O)O)CCSC                                       -                .204              1.00
+F		Phe		phenylalanine		N[C@H](C(=O)O)Cc1ccccc1                                  -                .015              2.26
+P		Pro		proline				N1[C@H](C(=O)O)CCC1                                      -                .0               13.22
 o		Pyl		pyrrolysine			N[C@H](C(=O)O)CCCC[NH+]=C([O-])[C@@H]1N=CC[C@H]1C
 U		Sec		selenocysteine		N[C@H](C(=O)O)C[SeH]
-S		Ser		serine				N[C@H](C(=O)O)CO                                         -                .065
-T		Thr		threonine			N[C@H](C(=O)O)[C@@H](C)O                                 -                .080
-W		Trp		tryptophan			N[C@H](C(=O)O)CC1=CNc2ccccc21                            -                .020
-Y		Tyr		tyrosine			N[C@H](C(=O)O)Cc1ccc(O)cc1                              10.46             .071
-V		Val		valine				N[C@H](C(=O)O)C(C)C                                      -                .080
+S		Ser		serine				N[C@H](C(=O)O)CO                                         -                .065              2.09
+T		Thr		threonine			N[C@H](C(=O)O)[C@@H](C)O                                 -                .080              2.76
+W		Trp		tryptophan			N[C@H](C(=O)O)CC1=CNc2ccccc21                            -                .020              2.05
+Y		Tyr		tyrosine			N[C@H](C(=O)O)Cc1ccc(O)cc1                              10.46             .071              2.22
+V		Val		valine				N[C@H](C(=O)O)C(C)C                                      -                .080              2.55
 

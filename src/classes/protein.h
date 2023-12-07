@@ -28,6 +28,9 @@ class BallesterosWeinstein
     int helix_no = 0;
     int member_no = 0;
 
+    BallesterosWeinstein() { ; }
+    BallesterosWeinstein(const char* fromstr) { this->from_string(fromstr); }
+
     void from_string(const char* inpstr);
 };
 

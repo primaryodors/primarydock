@@ -442,7 +442,15 @@ Point interpret_single_point(const char* param, Point old_value = Point(0,0,0))
     {
         char lchain = g_chain;
         int resno = interpret_special_resno(param+1, &lchain);
-        if (resno) return strands[lchain - 'A']->get_residue(resno)->get_CA_location();
+        if (resno)
+        {
+            AminoAcid* aa = strands[lchain - 'A']->get_residue(resno);
+            if (!aa)
+            {
+                raise_error((std::string)"Residue " + std::to_string(resno) + (std::string)" is missing from strand.");
+            }
+            return aa->get_CA_location();
+        }
     }
 
     if (param[0] >= '0' && param[0] <= '9')

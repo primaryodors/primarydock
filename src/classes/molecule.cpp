@@ -67,8 +67,6 @@ Molecule::~Molecule()
 {
     if (atoms)
     {
-        // int i;
-        // for (i=0; atoms[i]; i++) delete atoms[i];
         delete[] atoms;
     }
     if (smiles) delete[] smiles;
@@ -209,7 +207,8 @@ void Pose::restore_state(Molecule* m)
 void Molecule::delete_atom(Atom* a)
 {
     if (!a) return;
-    // return;
+    paths = nullptr;
+
     int i, j;
 
     if (hasAtoms(atoms))
@@ -235,6 +234,8 @@ void Molecule::delete_atom(Atom* a)
 void Molecule::delete_all_atoms()
 {
     if (!atoms) return;
+    if (paths) delete[] paths;
+    paths = nullptr;
 
     int i;
     for (i=0; atoms[i]; i++)
@@ -313,6 +314,8 @@ void Molecule::add_existing_atom(Atom* a)
 
 Atom* Molecule::add_atom(char const* elemsym, char const* aname, const Point* location, Atom* bond_to, const float bcard, const int charge)
 {
+    paths = nullptr;
+
     Atom* a = new Atom(elemsym, location, charge);
     a->name = new char[strlen(aname)+1];
     a->residue = 0;
@@ -334,7 +337,7 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
         return add_atom(elemsym, aname, &pt, bondto, bcard);
     }
 
-    // cout << "Add new " << elemsym << " bonded to " << bondto->name << endl;
+    paths = nullptr;
 
     if (bondto->is_pi()) bondto->aromatize();
     SCoord v = bondto->get_next_free_geometry(bcard);
@@ -810,7 +813,6 @@ int Molecule::from_sdf(char const* sdf_dat)
             nb = atoi(words[1]);
 
             atoms = new Atom*[na+4];
-            // cout << "Allocated " << na << " atoms." << endl;
         }
         else if (added < na)
         {
@@ -824,8 +826,6 @@ int Molecule::from_sdf(char const* sdf_dat)
             atoms[atcount++] = a;
             atoms[atcount] = nullptr;
             added++;
-
-            // cout << "Added " << a->name << endl;
         }
         else
         {
@@ -834,13 +834,12 @@ int Molecule::from_sdf(char const* sdf_dat)
 
             if (!a1i || !a2i) break;
             atoms[a1i-1]->bond_to(atoms[a2i-1], atof(words[2]));
-            // cout << "Bonded " << atoms[a1i-1]->name << " to " << atoms[a2i-1]->name << endl;
         }
 
-        if (words) delete words;
+        if (words) delete[] words;
     }
     atoms[atcount] = 0;
-    if (words) delete words;
+    if (words) delete[] words;
 
     identify_conjugations();
     identify_rings();
@@ -853,7 +852,6 @@ void Molecule::identify_conjugations()
     if (!atoms) return;
 
     int i;
-    for (i=0; atoms[i]; i++) atoms[i]->conjugation = nullptr;
 
     for (i=0; atoms[i]; i++)
     {
@@ -1155,8 +1153,37 @@ void Molecule::save_pdb(FILE* os, int atomno_offset, bool endpdb)
 
 int Molecule::add_ring(Atom** atoms)
 {
-    int i, ringcount;
-    Ring* r = new Ring(atoms);
+    int i, j, l, n, ringcount;
+
+    l = 0;
+    Atom* min_atom = nullptr;
+    for (i=0; atoms[i]; i++)
+    {
+        if (!min_atom || atoms[i] < min_atom)
+        {
+            min_atom = atoms[i];
+            l = i;
+        }
+    }
+    n = i;
+
+    i = l-1; if (i<0) i += n;
+    j = l+1; if (j>=n) j -= n;
+    bool reversed = (atoms[j] > atoms[i]);
+
+    Atom* atoms_ordered[n+4];
+    for (i=0; i<n; i++)
+    {
+        if (reversed) j = l - i;
+        else j = i + l;
+        if (j < 0) j += n;
+        if (j >= n) j -= n;
+        atoms_ordered[i] = atoms[j];
+    }
+    atoms_ordered[n] = nullptr;
+
+
+    Ring* r = new Ring(atoms_ordered);
     int m = r->get_atom_count();
 
     if (rings)
@@ -1167,7 +1194,11 @@ int Molecule::add_ring(Atom** atoms)
             if (rings[i]->get_overlap_count(r) == m) already_exists = true; 
         }
         ringcount = i;
-        if (already_exists) return ringcount;
+        if (already_exists)
+        {
+            delete r;
+            return ringcount;
+        }
     }
     else
     {
@@ -1238,6 +1269,7 @@ Atom* Molecule::path_get_terminal_atom(int path_idx)
     if (!paths[path_idx]) return nullptr;
 
     int n = path_get_length(path_idx);
+    if (!n) return nullptr;
     return paths[path_idx][n-1];
 }
 
@@ -1262,7 +1294,7 @@ bool Molecule::path_is_subset_of(int short_path, int long_path)
     if (!paths[short_path]) return true;
 
     int i;
-    for (i=0; paths[short_path][i]; i++)
+    for (i=0; paths[short_path][i] && paths[long_path][i]; i++)
     {
         if (paths[long_path][i] != paths[short_path][i]) return false;
     }
@@ -1284,6 +1316,17 @@ void Molecule::find_paths()
 {
     if (!atoms || !atoms[0]) return;
 
+    if (paths)
+    {
+        #if _dbg_path_search
+        cout << "Paths already set; skipping." << endl;
+        #endif
+        return;
+    }
+    #if _dbg_path_search
+    cout << "Searching for paths..." << endl;
+    #endif
+
     int h, i, j, k, l, m, n = 0, p, limit;
     Bond* b[16];
     for (i=0; atoms[i]; i++)
@@ -1295,7 +1338,7 @@ void Molecule::find_paths()
     limit = n*n;
     Atom** lpaths[limit];
     paths = lpaths;
-    for (i=0; i<n; i++) paths[i] = nullptr;
+    for (i=0; i<limit; i++) paths[i] = nullptr;
 
     atcount = get_atom_count();
 
@@ -1315,8 +1358,8 @@ void Molecule::find_paths()
         n++;
     }
 
-    int num_added;
-    do
+    int num_added, iter;
+    for (iter=0; iter<1000; iter++)
     {
         num_added = 0;
         p = n;
@@ -1326,6 +1369,7 @@ void Molecule::find_paths()
             m = path_get_length(i);
             a = path_get_terminal_atom(i);
             if (!a) continue;
+            if (!a->name) continue;
             if (abs((__int64_t)(atoms[0]) - (__int64_t)a) >= 16777216) continue;
             a->fetch_bonds(b);
             if (!b[0]) continue;
@@ -1339,7 +1383,7 @@ void Molecule::find_paths()
                 if (b[j]->btom->get_bonded_heavy_atoms_count() < 2) continue;
                 if (b[j]->btom->residue && b[j]->btom->residue != a->residue) continue;
 
-                #if DBG_FND_RNGS
+                #if _dbg_path_search
                 cout << "Trying " << b[j]->btom->name << "... ";
                 #endif
 
@@ -1358,7 +1402,7 @@ void Molecule::find_paths()
                         ring_atoms[h-l] = nullptr;
 
                         add_ring(ring_atoms);
-                        #if DBG_FND_RNGS
+                        #if _dbg_path_search
                         cout << "Created ring from ";
                         Atom::dump_array(ring_atoms);
                         #endif
@@ -1366,12 +1410,13 @@ void Molecule::find_paths()
                 }
                 else
                 {
+                    if (paths[n]) delete[] paths[n];
                     paths[n] = new Atom*[atcount];
                     copy_path(i, n);
                     paths[n][m] = b[j]->btom;
                     paths[n][m+1] = nullptr;
 
-                    #if DBG_FND_RNGS
+                    #if _dbg_path_search
                     cout << "Created ";
                     echo_path(n);
                     #endif
@@ -1383,7 +1428,7 @@ void Molecule::find_paths()
                 }
             }
 
-            #if DBG_FND_RNGS
+            #if _dbg_path_search
             cout << endl;
             #endif
         }
@@ -1393,9 +1438,12 @@ void Molecule::find_paths()
             if (path_is_subset_of(j, n-1))
             {
                 n--;
-                if (path_get_length(j) == path_get_length(n)) num_added--;
+                int plj = path_get_length(j);
+                int pln = path_get_length(n);
+                if (plj == pln) num_added--;
 
-                #if DBG_FND_RNGS
+                #if _dbg_path_search
+                cout << plj << "/" << pln << " ";
                 cout << "Replacing ";
                 echo_path(j);
                 cout << "...with ";
@@ -1404,14 +1452,16 @@ void Molecule::find_paths()
                 #endif
 
                 copy_path(n, j);
-                // delete paths[n];
+                delete[] paths[n];
                 paths[n] = nullptr;
             }
         }
-    } while (num_added);
+
+        if (!num_added) break;
+    }
 
     _exit_paths:
-    #if DBG_FND_RNGS
+    #if _dbg_path_search
     cout << "Paths:" << endl;
     for (i=0; i<limit && paths[i]; i++) echo_path(i);
     #else

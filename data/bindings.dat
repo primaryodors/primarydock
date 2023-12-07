@@ -160,6 +160,10 @@ C       NH     plpi     0.25  2.8?        1.91?			3
 # C       O      plpi     0.25  2.9?        2.08?			3
 C       OH     plpi     0.25  2.9?        2.08?			3
 
+# https://onlinelibrary.wiley.com/action/downloadSupplement?doi=10.1002%2Fasia.201801156&file=asia201801156-sup-0001-misc_information.pdf
+SiH     OH     hbond    0.25  2.2?        7.95          5?
+SiH     NH     hbond    0.25  2.1?        3.95?         5?
+
 # Based on 57.8 * (2.5-electronegativity) / (vdW_radius^2). Multiply by the number of carbons and the charge of the ion.
 C       Fe     plpi     0.25  0.595      15.9			3
 C       Co     plpi     0.25  0.57       15.5			3

@@ -66,6 +66,7 @@ int main(int argc, char** argv)
 
     cout << "# Loaded " << nloaded << " atoms of " << tstname << " into molecule.\n";
 
+
     int rc = m1.get_num_rings();
     if (rc) cout << "# Found " << rc << " ring(s)." << endl;
 

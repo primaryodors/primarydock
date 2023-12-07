@@ -895,7 +895,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
 
         set_region(words[3], atoi(words[4]), atoi(words[5]));
         regions_from = rgn_pdb;
-        delete words;
+        delete[] words;
     }
 
     std::vector<std::string> rem_st = get_remarks("800 SITE");
@@ -913,7 +913,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
         {
             Ballesteros_Weinstein[f4] = atoi(words[5]);
         }
-        delete words;
+        delete[] words;
     }
 
     initial_int_clashes = get_internal_clashes();
@@ -3892,7 +3892,7 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
         if (aa) revert_to[i].copy_state(aa);
     }
 
-    float result = 0, increment = fiftyseventh*5, clash, initclash;
+    float result = 0, increment = fiftyseventh*5, clash=0, initclash=0;
 
     for (l=0; l<200; l++)
     {

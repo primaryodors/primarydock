@@ -43,6 +43,7 @@ struct AADef
     bool isoleucine_fix = false;
     float sidechain_pKa = nanf("n/a");
     float flexion_probability = 0;
+    float alpha_helix_penalty = 0;
 };
 
 struct AABridge
@@ -118,6 +119,7 @@ public:
     Point HN_or_substitute_location();
     void establish_internal_clash_baseline();
     void renumber(int new_resno);
+    float get_alpha_helix_penalty() { return aadef->alpha_helix_penalty; }
 
     // Serialization.
     int from_pdb(FILE* instream, int resno_offset = 0);							// returns number of atoms loaded.
@@ -150,6 +152,8 @@ public:
     float get_omega();
     bond_rotation_fail_reason rotate_phi(float rel_angle);
     bond_rotation_fail_reason rotate_psi(float rel_angle);
+    LocatedVector get_phi_vector();
+    LocatedVector get_psi_vector();
 
     // Intermol functions.
     float get_intermol_binding(AminoAcid* neighbor, bool backbone_atoms_only = false);

@@ -40,7 +40,7 @@ $predate = [];
 if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
 {
     chdir(__DIR__);
-    $dock_results = json_decode(file_get_contents("../predict/dock_results_icactive.json"), true);
+    $dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
     if (isset($dock_results[$rcpid]))
     {
         foreach ($dock_results[$rcpid] as $ligname => $dock)
@@ -56,7 +56,7 @@ if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
     }
 }
 
-$cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|obabel)' | grep -v grep";
+$cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|bin/fyg|obabel)' | grep -v grep";
 $result = [];
 exec($cmd, $result);
 

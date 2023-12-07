@@ -25,6 +25,7 @@
 #define peptide_bond_length 1.32
 #define unconnected_residue_mindist 4.82
 #define clash_limit_per_aa 4.0
+#define contact_r_5x58_7x53 3.93
 
 #define pH 6.0
 #define auto_pK_protonation 0
@@ -144,6 +145,7 @@
 #define bb_scooch_threshold_distance 1.5
 #define flexion_selection 1
 #define no_zero_flexions 1
+#define flexion_probability_multiplier 0.4
 #define ignore_invalid_partial 1
 
 // If enabled, the trip switch functionality will have to be moved around in the code.
@@ -208,7 +210,7 @@
 
 // Drift pulls the ligand towards the loneliest point if it encounters clashes.
 // Turning it off can cause the ligand to be ejected from the protein.
-#define allow_drift 1
+#define allow_drift 0
 #define initial_drift 0.333
 #define drift_decay_rate 0.2
 
@@ -295,8 +297,8 @@
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
 #define _allow_conditional_basicity_with_acid_ligand 1
-#define cond_bas_hbond_energy_threshold 1.0
-#define cond_bas_hbond_distance_threshold 2.3
+#define cond_bas_hbond_energy_threshold 5.0
+#define cond_bas_hbond_distance_threshold 2.7
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0
@@ -344,7 +346,6 @@
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
 #define _dbg_find_blasted_segfault 0
-#define DBG_FND_RNGS 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
 #define _dbg_groupsalign 0
@@ -366,6 +367,7 @@
 #define _dbg_mol_frames 0
 #define _dbg_multiflex 0
 #define _dbg_null_flexions 0
+#define _dbg_path_search 0
 #define _dbg_point_avg 0
 #define _dbg_polsat 0
 #define _dbg_repack 0

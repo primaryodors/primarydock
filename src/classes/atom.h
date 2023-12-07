@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <iomanip>
+#include <memory>
 #include "point.h"
 
 #ifndef _ATOM
@@ -108,7 +109,7 @@ public:
     bool Huckel();						// Compiler doesn't allow ü in an identifier - boo hiss!
 
 protected:
-    Atom** atoms = nullptr;
+    Atom* atoms[256];
     int atcount = 0;
     RING_TYPE type = UNKNOWN;
 

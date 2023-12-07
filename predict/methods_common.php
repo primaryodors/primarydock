@@ -36,7 +36,7 @@ $metrics_to_process =
 
 // Load data
 $dock_results = [];
-$json_file = "predict/dock_results_$method.json";
+$json_file = "predict/dock_results.json";
 
 // Version
 chdir(__DIR__);
@@ -74,7 +74,7 @@ if (@$_REQUEST['next'])
 	exec($cmd, $results);
     if (count($results)) exit;
 
-	$cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|obabel)' | grep -v grep";
+	$cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|bin/fyg|obabel)' | grep -v grep";
 	exec($cmd, $results);
 	if (!@$_REQUEST['force'] && trim(@$results[$max_simultaneous_docks-1])) die("Already running.\n".print_r($results, 1));
 	$already = implode("\n", $results);
@@ -128,7 +128,7 @@ else
 
 ensure_sdf_exists($ligname);
 
-echo "Beginning dock of $ligname in $protid...\n\n";
+echo "Beginning prediction of $ligname in $protid...\n\n";
 $fam = family_from_protid($protid);
 
 
@@ -261,7 +261,7 @@ function prepare_outputs()
 $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false)
 {
-    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere, $multicall;
+    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere, $multicall, $method;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
 
@@ -543,6 +543,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     }
     
     $outdata['version'] = $version;
+    $outdata['method'] = $method;
 
     $tme = [];
     foreach ($outdata as $k => $v)

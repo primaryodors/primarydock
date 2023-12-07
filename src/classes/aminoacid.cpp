@@ -641,7 +641,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
         }
         aa_defs[idx].aabonds[i] = nullptr;
 
-        delete aabd;
+        delete[] aabd;
     }
 
     ensure_pi_atoms_coplanar();
@@ -1380,7 +1380,7 @@ _return_added:
             }
             lra[j] = nullptr;
 
-            delete ringa;
+            delete[] ringa;
             rings[i] = new Ring(lra, aadef->aarings[i]->get_type());
         }
         rings[i] = nullptr;
@@ -1486,6 +1486,11 @@ void AminoAcid::load_aa_defs()
                             {
                                 aa_defs[idx].flexion_probability = atof(words[5]);
                                 if (aa_defs[idx].flexion_probability < 0 || aa_defs[idx].flexion_probability > 1) throw 0xbadf1ec5;
+
+                                if (words[6])
+                                {
+                                    aa_defs[idx].alpha_helix_penalty = atof(words[6]);
+                                }
                             }
                         }
                     }
@@ -1509,7 +1514,7 @@ void AminoAcid::load_aa_defs()
                     if (lastwords[i] != words[i]) strcpy(lastwords[i], words[i]);
                 }
 
-                delete words;
+                delete[] words;
             }
             buffer[0] = 0;
         }
@@ -2206,6 +2211,24 @@ bond_rotation_fail_reason AminoAcid::rotate_psi(float a)
     if (!b) return bf_bond_not_found;
     b->rotate(a, true, true);
     return b->last_fail;
+}
+
+LocatedVector AminoAcid::get_phi_vector()
+{
+    Atom* N  = get_atom("N");
+    Atom* CA = get_atom("CA");
+    LocatedVector result = (SCoord)(N->get_location().subtract(CA->get_location()));
+    result.origin = CA->get_location();
+    return result;
+}
+
+LocatedVector AminoAcid::get_psi_vector()
+{
+    Atom* CA = get_atom("CA");
+    Atom* C  = get_atom("C");
+    LocatedVector result = (SCoord)(C->get_location().subtract(CA->get_location()));
+    result.origin = CA->get_location();
+    return result;
 }
 
 bool AminoAcid::is_alpha_helix()

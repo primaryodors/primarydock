@@ -388,7 +388,7 @@ void iteration_callback(int iter, Molecule** mols)
             && (lf < -10 || lf < 0.1 * ptnl)
             && mols[l]->movability == MOV_FLXDESEL
             && lres
-            && frand(0,1) < 0.25 * prob
+            && frand(0,1) < flexion_probability_multiplier * prob
             )
         {
             mols[l]->movability = MOV_FORCEFLEX;
@@ -1197,7 +1197,7 @@ void read_config_file(FILE* pf)
 
             interpret_config_line(words);
 
-            delete words;
+            delete[] words;
         }
         buffer[0] = 0;
     }

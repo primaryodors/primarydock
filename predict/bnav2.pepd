@@ -1,0 +1,197 @@
+
+DOWNLOAD RCSB 8F76 "pdbs/8f76.pdb" ONCE
+
+LOAD "pdbs/OR51/OR51E2.upright.pdb" A I
+UPRIGHT I
+BWCENTER
+
+LOAD "pdbs/8f76.pdb" A A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/OR51E2.propionate.bna.pdb"
+GOSUB measure
+UNLIG
+
+
+
+DOWNLOAD AF Q5QD04 "pdbs/TAAR/mTAAR9.pdb" ONCE
+
+UNCHAIN I
+LOAD "pdbs/TAAR/mTAAR9.pdb" A I
+REGION TMR1 34 54
+REGION TMR2 69 89
+REGION TMR3 108 128
+REGION TMR4 148 168
+REGION TMR5 198 218
+REGION TMR6 260 280
+REGION TMR7 295 315
+REGION HXR8 315 348
+BWMOTIF 1 gNllv
+BWMOTIF 2 Dfllg
+BWMOTIF 3 cfisidRyxa
+BWMOTIF 4 sWxpyxxdavid
+BWMOTIF 5 ffiPxxim
+BWMOTIF 6 fllcwlP
+BWMOTIF 7 nPliyaffyp
+BWMOTIF 8 pwfrkaLk
+
+UPRIGHT
+BWCENTER
+
+DOWNLOAD RCSB 8IWE "pdbs/8iwe.pdb" ONCE
+DOWNLOAD RCSB 8IWM "pdbs/8iwm.pdb" ONCE
+DOWNLOAD RCSB 8ITF "pdbs/8itf.pdb" ONCE
+DOWNLOAD RCSB 8IW9 "pdbs/8iw9.pdb" ONCE
+
+UNCHAIN A
+LOAD "pdbs/8iwe.pdb" R A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/mTAAR9.spermidine.bna.pdb
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "pdbs/8iwm.pdb" R A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/mTAAR9.phenethylamine.bna.pdb
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "pdbs/8itf.pdb" R A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/mTAAR9.dimethylcyclohexylamine.bna.pdb
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "pdbs/8iw9.pdb" R A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/mTAAR9.cadaverine.bna.pdb
+GOSUB measure
+UNLIG
+
+
+DOWNLOAD RCSB 8JLN "pdbs/8jln.pdb" ONCE
+DOWNLOAD RCSB 8JLO "pdbs/8jlo.pdb" ONCE
+DOWNLOAD RCSB 8JLP "pdbs/8jlp.pdb" ONCE
+DOWNLOAD RCSB 8JLQ "pdbs/8jlq.pdb" ONCE
+DOWNLOAD RCSB 8JLR "pdbs/8jlr.pdb" ONCE
+DOWNLOAD RCSB 8JSO "pdbs/8jso.pdb" ONCE
+
+UNCHAIN I
+LOAD "pdbs/TAAR/TAAR1.upright.pdb" A I
+UPRIGHT I
+BWCENTER
+
+UNCHAIN A
+LOAD "pdbs/8jln.pdb" R A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.3-iodothyronamine.bna.pdb
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "pdbs/8jlo.pdb" R A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.ulotaront.bna.pdb
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "pdbs/8jlp.pdb" R A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.ralmitaront.bna.pdb
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "pdbs/8jlq.pdb" R A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.fenoldopam.bna.pdb
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "pdbs/8jlr.pdb" R A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.A77636.bna.pdb
+GOSUB measure
+UNLIG
+
+UNCHAIN A
+LOAD "pdbs/8jso.pdb" R A +
+# HYDRO
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/TAAR1.amphetamine.bna.pdb
+GOSUB measure
+UNLIG
+
+
+QUIT
+
+measure:
+
+LET @delta1 = @A.1.50 - @I.1.50
+LET @exr1 = @A.1.40 - @I.1.40
+LET @cyt1 = @A.1.55 - @I.1.55
+ECHO "1: " @delta1 " | " @exr1 " | " @cyt1
+LET @delta2 = @A.2.50 - @I.2.50
+LET @exr2 = @A.2.63 - @I.2.63
+LET @cyt2 = @A.2.40 - @I.2.40
+ECHO "2: " @delta2 " | " @exr2 " | " @cyt2
+LET @delta3 = @A.3.50 - @I.3.50
+LET @exr3 = @A.3.22 - @I.3.22
+LET @cyt3 = @A.3.55 - @I.3.55
+ECHO "3: " @delta3 " | " @exr3 " | " @cyt3
+LET @delta4 = @A.4.50 - @I.4.50
+LET @exr4 = @A.4.60 - @I.4.60
+LET @cyt4 = @A.4.40 - @I.4.40
+ECHO "4: " @delta4 " | " @exr4 " | " @cyt4
+LET @delta5 = @A.5.50 - @I.5.50
+LET @exr5 = @A.5.35 - @I.5.35
+LET @cyt5 = @A.5.58 - @I.5.58
+ECHO "5: " @delta5 " | " @exr5 " | " @cyt5
+LET @delta6 = @A.6.50 - @I.6.50
+LET @exr6 = @A.6.55 - @I.6.55
+LET @cyt6 = @A.6.40 - @I.6.40
+ECHO "6: " @delta6 " | " @exr6 " | " @cyt6
+LET @delta7 = @A.7.50 - @I.7.50
+LET @exr7 = @A.7.32 - @I.7.32
+LET @cyt7 = @A.7.53 - @I.7.53
+ECHO "7: " @delta7 " | " @exr7 " | " @cyt7
+ECHO ""
+
+RETURN
+

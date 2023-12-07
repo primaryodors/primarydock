@@ -1343,9 +1343,6 @@ float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
 float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
-    InteratomicForce** retval = new InteratomicForce*[16];
-    init_nulls(retval, 16);
-
     if (!a || !b || !a->get_Z() || !b->get_Z()) return 0;
 
     int i, j=0;
@@ -1371,7 +1368,6 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality
                     )
                )
             {
-                delete[] retval;
                 return all_forces[i]->distance;
             }
     }
@@ -1384,8 +1380,6 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality
 float InteratomicForce::coordinate_bond_radius(Atom* a, Atom* b, intera_type btype)
 {
     if (!read_forces_dat && !reading_forces) read_all_forces();
-    InteratomicForce** retval = new InteratomicForce*[16];
-    init_nulls(retval, 16);
 
     int i, j=0;
     for (i=0; all_forces[i]; i++)

@@ -298,7 +298,7 @@
 #define _allow_conditional_basicity 1
 #define _allow_conditional_basicity_with_acid_ligand 1
 #define cond_bas_hbond_energy_threshold 5.0
-#define cond_bas_hbond_distance_threshold 2.2
+#define cond_bas_hbond_distance_threshold 2.7
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0

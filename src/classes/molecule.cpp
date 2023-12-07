@@ -1153,8 +1153,37 @@ void Molecule::save_pdb(FILE* os, int atomno_offset, bool endpdb)
 
 int Molecule::add_ring(Atom** atoms)
 {
-    int i, ringcount;
-    Ring* r = new Ring(atoms);
+    int i, j, l, n, ringcount;
+
+    l = 0;
+    Atom* min_atom = nullptr;
+    for (i=0; atoms[i]; i++)
+    {
+        if (!min_atom || atoms[i] < min_atom)
+        {
+            min_atom = atoms[i];
+            l = i;
+        }
+    }
+    n = i;
+
+    i = l-1; if (i<0) i += n;
+    j = l+1; if (j>=n) j -= n;
+    bool reversed = (atoms[j] > atoms[i]);
+
+    Atom* atoms_ordered[n+4];
+    for (i=0; i<n; i++)
+    {
+        if (reversed) j = l - i;
+        else j = i + l;
+        if (j < 0) j += n;
+        if (j >= n) j -= n;
+        atoms_ordered[i] = atoms[j];
+    }
+    atoms_ordered[n] = nullptr;
+
+
+    Ring* r = new Ring(atoms_ordered);
     int m = r->get_atom_count();
 
     if (rings)

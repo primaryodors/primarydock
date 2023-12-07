@@ -1,2 +1,2 @@
 Molecule has 1 ring(s).
-Ring 0 is aromatic and consists of C11 N10 C9 N8 C7 
+Ring 0 is aromatic and consists of C7 N8 C9 N10 C11 

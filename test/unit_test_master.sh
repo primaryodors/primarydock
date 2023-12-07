@@ -62,19 +62,6 @@ else
 fi
 
 
-# OR1A1-hexenol test often fails.
-# REPORT="testdata/OR1A1_hexenol_pred.approved.txt"
-# php -f predict/method_icactive.php prot=OR1A1 lig=cis-3-hexen-1-ol nosoft=1 | grep '[[]Predicted[]] => ' > testdata/received/OR1A1_hexenol_pred.received.txt
-# RESULT=$(diff --unified $REPORT testdata/received/OR1A1_hexenol_pred.received.txt)
-# if [ -z "$RESULT" ]; then
-#     printf "${GRN}OR1A1 hexenol prediction test succeeded.${NC}\n"
-# else
-#     printf "${RED}OR1A1 hexenol prediction test FAILED.${NC}\n"
-#     diff --color --unified $REPORT testdata/received/OR1A1_hexenol_pred.received.txt
-# fi
-
-
-# php -f predict/method_icactive.php prot=OR1A1 lig=d-limonene | tee >( grep '[[]Predicted[]] => ' > testdata/received/OR1A1_d-limonene_pred.received.txt)
 
 REPORT="testdata/TAAR8_cadaverine_pred.approved.txt"
 php -f predict/method_fygactive.php prot=TAAR8 lig=cadaverine | grep '[[]Predicted[]] => ' > testdata/received/TAAR8_cadaverine_pred.received.txt
@@ -96,41 +83,3 @@ else
     printf "${RED}TAAR8 cadaverine prediction test FAILED to predict agonist.${NC}\n"
     diff --color --unified $REPORT testdata/received/OR51E2_propionate_pred.received.txt
 fi
-
-# bin/primarydock testdata/test_TAAR8.config --colorless --iter 50 --congress > testdata/received/TAAR8_CAD.txt
-# TAAR_RESULT=$?
-# if [ "$TAAR_RESULT" -eq "0" ]; then
-#     POSES=$( cat testdata/received/TAAR8_CAD.txt | grep "pose(s) found" )
-#     if [ -z "$POSES" ]; then
-#         printf "${RED}TAAR test FAILED: no poses.${NC}\n"
-#     else
-#         ASP111=$( cat testdata/received/TAAR8_CAD.txt | grep -m 1 "Asp111: " )
-#         ASP111="${ASP111/Asp111: /}"
-#         ASP111="${ASP111/[.][0-9]*/}"
-#         ASP201=$( cat testdata/received/TAAR8_CAD.txt | grep -m 1 "Asp201: " )
-#         ASP201="${ASP201/Asp201: /}"
-#         ASP201="${ASP201/[.][0-9]*/}"
-#         if [[ $ASP111 -gt "-15"  ]] || [[ $ASP201 -gt "-10"  ]]; then
-#             printf "${RED}TAAR test FAILED: bad contacts.${NC}\n"
-#         else
-#             printf "${GRN}TAAR test succeeded.${NC}\n"
-#         fi
-#     fi
-# else
-#     printf "${RED}TAAR test FAILED: return value.${NC}\n"
-# fi
-
-
-# bin/primarydock testdata/test_1A1.config --colorless --congress > testdata/received/OR1A1_dLIMN.txt
-# DLIMN_RESULT=$?
-# if [ "$DLIMN_RESULT" -eq "0" ]; then
-#     POSES=$( cat testdata/received/OR1A1_dLIMN.txt | grep "pose(s) found" | sed 's/[^0-9]//g' )
-#     if [ "$POSES" -eq "0" ]; then
-#         printf "${RED}d-limonene test FAILED: no poses.${NC}\n"
-#     else
-#         printf "${GRN}d-limonene test succeeded.${NC}\n"
-#     fi
-# else
-#     printf "${RED}d-limonene test FAILED: return value.${NC}\n"
-# fi
-

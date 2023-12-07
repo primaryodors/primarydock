@@ -448,7 +448,6 @@ Point interpret_single_point(const char* param, Point old_value = Point(0,0,0))
             if (!aa)
             {
                 raise_error((std::string)"Residue " + std::to_string(resno) + (std::string)" is missing from strand.");
-                // return Point(0,0,0);
             }
             return aa->get_CA_location();
         }

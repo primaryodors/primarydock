@@ -67,55 +67,6 @@ int main(int argc, char** argv)
     cout << "# Loaded " << nloaded << " atoms of " << tstname << " into molecule.\n";
 
 
-    if (!strcmp(m1.get_name(), "sdf/cyclobutanecarboxylic_acid.sdf"))
-    {
-        Atom* a = m1.get_atom("C2");
-        Atom* b = m1.get_atom("C4");
-        Atom* src = m1.get_atom("C1");
-
-        float theta = find_3d_angle(a->get_location(), b->get_location(), src->get_location());
-
-        src = m1.get_atom("C3");
-        theta += find_3d_angle(a->get_location(), b->get_location(), src->get_location());
-
-        a = m1.get_atom("C1");
-        b = m1.get_atom("C3");
-        src = m1.get_atom("C2");
-        theta += find_3d_angle(a->get_location(), b->get_location(), src->get_location());
-
-        src = m1.get_atom("C4");
-        theta += find_3d_angle(a->get_location(), b->get_location(), src->get_location());
-
-        cout << theta/4*fiftyseven << " ";
-
-        cout << endl;
-    }
-
-    if (!strcmp(m1.get_name(), "sdf/alpha-pinene.sdf"))
-    {
-        Atom* a = m1.get_atom("C2");
-        Atom* b = m1.get_atom("C3");
-        Atom* src = m1.get_atom("C1");
-
-        float theta = find_3d_angle(a->get_location(), b->get_location(), src->get_location());
-
-        src = m1.get_atom("C4");
-        theta += find_3d_angle(a->get_location(), b->get_location(), src->get_location());
-
-        a = m1.get_atom("C1");
-        b = m1.get_atom("C4");
-        src = m1.get_atom("C2");
-        theta += find_3d_angle(a->get_location(), b->get_location(), src->get_location());
-
-        src = m1.get_atom("C3");
-        theta += find_3d_angle(a->get_location(), b->get_location(), src->get_location());
-
-        cout << theta/4*fiftyseven << " ";
-
-        cout << endl;
-    }
-
-
     int rc = m1.get_num_rings();
     if (rc) cout << "# Found " << rc << " ring(s)." << endl;
 

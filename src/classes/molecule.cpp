@@ -67,19 +67,11 @@ Molecule::~Molecule()
 {
     if (atoms)
     {
-        // int i;
-        // for (i=0; atoms[i]; i++) delete atoms[i];
         delete[] atoms;
     }
     if (smiles) delete[] smiles;
     if (rings) delete[] rings;
     if (rotatable_bonds) delete[] rotatable_bonds;
-    /* if (paths)
-    {
-        int i;
-        for (i=0; paths[i]; i++) delete[] paths[i];
-        delete[] paths;
-    } */
 }
 
 int length(Atom** array)
@@ -346,8 +338,6 @@ Atom* Molecule::add_atom(char const* elemsym, char const* aname, Atom* bondto, c
     }
 
     paths = nullptr;
-
-    // cout << "Add new " << elemsym << " bonded to " << bondto->name << endl;
 
     if (bondto->is_pi()) bondto->aromatize();
     SCoord v = bondto->get_next_free_geometry(bcard);
@@ -823,7 +813,6 @@ int Molecule::from_sdf(char const* sdf_dat)
             nb = atoi(words[1]);
 
             atoms = new Atom*[na+4];
-            // cout << "Allocated " << na << " atoms." << endl;
         }
         else if (added < na)
         {
@@ -837,8 +826,6 @@ int Molecule::from_sdf(char const* sdf_dat)
             atoms[atcount++] = a;
             atoms[atcount] = nullptr;
             added++;
-
-            // cout << "Added " << a->name << endl;
         }
         else
         {
@@ -847,7 +834,6 @@ int Molecule::from_sdf(char const* sdf_dat)
 
             if (!a1i || !a2i) break;
             atoms[a1i-1]->bond_to(atoms[a2i-1], atof(words[2]));
-            // cout << "Bonded " << atoms[a1i-1]->name << " to " << atoms[a2i-1]->name << endl;
         }
 
         if (words) delete[] words;
@@ -866,7 +852,6 @@ void Molecule::identify_conjugations()
     if (!atoms) return;
 
     int i;
-    // for (i=0; atoms[i]; i++) atoms[i]->conjugation = nullptr;
 
     for (i=0; atoms[i]; i++)
     {

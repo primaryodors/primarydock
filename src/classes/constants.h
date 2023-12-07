@@ -346,7 +346,6 @@
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
 #define _dbg_find_blasted_segfault 0
-#define DBG_FND_RNGS 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
 #define _dbg_groupsalign 0
@@ -368,6 +367,7 @@
 #define _dbg_mol_frames 0
 #define _dbg_multiflex 0
 #define _dbg_null_flexions 0
+#define _dbg_path_search 0
 #define _dbg_point_avg 0
 #define _dbg_polsat 0
 #define _dbg_repack 0

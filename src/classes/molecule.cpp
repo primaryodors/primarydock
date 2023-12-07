@@ -1287,7 +1287,16 @@ void Molecule::find_paths()
 {
     if (!atoms || !atoms[0]) return;
 
-    if (paths) return;
+    if (paths)
+    {
+        #if _dbg_path_search
+        cout << "Paths already set; skipping." << endl;
+        #endif
+        return;
+    }
+    #if _dbg_path_search
+    cout << "Searching for paths..." << endl;
+    #endif
 
     int h, i, j, k, l, m, n = 0, p, limit;
     Bond* b[16];
@@ -1320,8 +1329,8 @@ void Molecule::find_paths()
         n++;
     }
 
-    int num_added;
-    do
+    int num_added, iter;
+    for (iter=0; iter<1000; iter++)
     {
         num_added = 0;
         p = n;
@@ -1345,7 +1354,7 @@ void Molecule::find_paths()
                 if (b[j]->btom->get_bonded_heavy_atoms_count() < 2) continue;
                 if (b[j]->btom->residue && b[j]->btom->residue != a->residue) continue;
 
-                #if DBG_FND_RNGS
+                #if _dbg_path_search
                 cout << "Trying " << b[j]->btom->name << "... ";
                 #endif
 
@@ -1364,7 +1373,7 @@ void Molecule::find_paths()
                         ring_atoms[h-l] = nullptr;
 
                         add_ring(ring_atoms);
-                        #if DBG_FND_RNGS
+                        #if _dbg_path_search
                         cout << "Created ring from ";
                         Atom::dump_array(ring_atoms);
                         #endif
@@ -1378,7 +1387,7 @@ void Molecule::find_paths()
                     paths[n][m] = b[j]->btom;
                     paths[n][m+1] = nullptr;
 
-                    #if DBG_FND_RNGS
+                    #if _dbg_path_search
                     cout << "Created ";
                     echo_path(n);
                     #endif
@@ -1390,7 +1399,7 @@ void Molecule::find_paths()
                 }
             }
 
-            #if DBG_FND_RNGS
+            #if _dbg_path_search
             cout << endl;
             #endif
         }
@@ -1400,9 +1409,12 @@ void Molecule::find_paths()
             if (path_is_subset_of(j, n-1))
             {
                 n--;
-                if (path_get_length(j) == path_get_length(n)) num_added--;
+                int plj = path_get_length(j);
+                int pln = path_get_length(n);
+                if (plj == pln) num_added--;
 
-                #if DBG_FND_RNGS
+                #if _dbg_path_search
+                cout << plj << "/" << pln << " ";
                 cout << "Replacing ";
                 echo_path(j);
                 cout << "...with ";
@@ -1413,13 +1425,14 @@ void Molecule::find_paths()
                 copy_path(n, j);
                 delete[] paths[n];
                 paths[n] = nullptr;
-                num_added--;
             }
         }
-    } while (num_added > 0);
+
+        if (!num_added) break;
+    }
 
     _exit_paths:
-    #if DBG_FND_RNGS
+    #if _dbg_path_search
     cout << "Paths:" << endl;
     for (i=0; i<limit && paths[i]; i++) echo_path(i);
     #else

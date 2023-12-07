@@ -70,7 +70,7 @@ void Atom::read_elements()
                     }
                 }
 
-                delete words;
+                delete[] words;
             }
             buffer[0] = 0;
         }

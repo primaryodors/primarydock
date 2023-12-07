@@ -248,7 +248,7 @@ void InteratomicForce::read_dat_line(char* line)
             else distance=1;
         }
     }
-    delete words;
+    delete[] words;
 }
 
 bool InteratomicForce::atom_is_capable_of(Atom* a, intera_type t)
@@ -1371,6 +1371,7 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality
                     )
                )
             {
+                delete[] retval;
                 return all_forces[i]->distance;
             }
     }

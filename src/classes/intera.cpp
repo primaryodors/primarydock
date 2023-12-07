@@ -1371,6 +1371,7 @@ float InteratomicForce::covalent_bond_radius(Atom* a, Atom* b, float cardinality
                     )
                )
             {
+                delete[] retval;
                 return all_forces[i]->distance;
             }
     }

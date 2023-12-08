@@ -499,6 +499,11 @@ int main(int argc, char** argv)
         constraints.push_back("STCR 6.44");
     }
 
+    if (l6x59 == 'R' || l6x59 == 'K')
+    {
+        aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa45x52->get_reach_atom()->get_location());
+    }
+
 
     if (allow_save)
     {

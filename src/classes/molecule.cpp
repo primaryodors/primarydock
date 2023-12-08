@@ -1196,7 +1196,7 @@ int Molecule::add_ring(Atom** atoms)
         ringcount = i;
         if (already_exists)
         {
-            delete r;
+            // delete r;                // For some reason, uncommenting this line causes segfaults.
             return ringcount;
         }
     }

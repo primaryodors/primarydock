@@ -519,7 +519,7 @@ int main(int argc, char** argv)
                 aa7x49->get_CA_location());
             axis = (SCoord)compute_normal(aa7x53->get_atom_location("OH"), aa5x58->get_atom_location("OH"), aa7x49->get_CA_location());
             axis.origin = aa7x49->get_CA_location();
-            thcr = p.region_can_rotate(n7x49, n7x53, axis, false, 10, n6x28, n6x59);
+            thcr = p.region_can_rotate(n7x49, n7x53, axis, false, 0, n6x28, n6x59);
             p.rotate_piece(n7x49, n7x53, axis.origin, axis, fmin(theta, thcr));
             cout << "TMR7 bend " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.bridge(n5x58, n7x53);
@@ -535,7 +535,7 @@ int main(int argc, char** argv)
                 aa5x58->get_atom_location("OH"),
                 aa5x33->get_CA_location());
             axis = (SCoord)compute_normal(aa5x58->get_atom_location("OH"), aa7x53->get_atom_location("OH"), aa5x33->get_CA_location());
-            thcr = p.region_can_rotate(n5x33, n5x68, axis, false, 20, n6x28, n6x59);
+            thcr = p.region_can_rotate(n5x33, n5x68, axis, false, 0, n6x28, n6x59);
             p.rotate_piece(n5x33, n5x68, axis.origin, axis, fmin(theta, thcr));
             cout << "TMR5 pivot " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.bridge(n5x58, n7x53);
@@ -551,7 +551,7 @@ int main(int argc, char** argv)
                 aa5x58->get_atom_location("OH"),
                 aa5x50->get_CA_location());
             axis = (SCoord)compute_normal(aa5x58->get_atom_location("OH"), aa7x53->get_atom_location("OH"), aa5x50->get_CA_location());
-            thcr = p.region_can_rotate(n5x50, n5x68, axis, false, 20, n6x28, n6x59);
+            thcr = p.region_can_rotate(n5x50, n5x68, axis, false, 0, n6x28, n6x59);
             p.rotate_piece(n5x50, n5x68, axis.origin, axis, fmin(theta, thcr));
             cout << "TMR5 pivot " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.bridge(n5x58, n7x53);
@@ -563,6 +563,10 @@ int main(int argc, char** argv)
         if (r57 > 1.2 * contact_r_5x58_7x53)
         {
             cout << "WARNING: 5.58...7.53 H-bond FAILED (" << r57 << "A)." << endl;
+        }
+        else
+        {
+            cout << "5.58...7.53 contact distance: " << r57 << "A." << endl;
         }
     }
 

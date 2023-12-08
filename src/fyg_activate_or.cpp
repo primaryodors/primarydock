@@ -373,16 +373,12 @@ int main(int argc, char** argv)
 
 
     ////////////////////////////////////////////////////////////////////////////////
-    // Rocking motion, if applicable.
+    // Parameters and eligibility for rock6 motion.
     ////////////////////////////////////////////////////////////////////////////////
 
     SCoord rock6_dir(0,0,0);
-    if (l6x59 == 'R')
-    {
-        rock6_dir = aa4x49->get_CA_location().subtract(aa6x55->get_CA_location());
-        aa6x59->conform_atom_to_location("NE", aa6x59->get_CA_location().add(rock6_dir));
-    }
-    else if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
+    bool exr2_bend = false;
+    if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
         p.bridge(aa45x51->get_residue_no(), aa6x55->get_residue_no());
         Atom* reach6x55 = aa6x55->get_reach_atom();
@@ -392,12 +388,43 @@ int main(int argc, char** argv)
         constraints.push_back("STCR 45.51");
         constraints.push_back("STCR 6.55");
     }
+    else if (l6x59 == 'R')
+    {
+        rock6_dir = aa4x49->get_CA_location().subtract(aa6x55->get_CA_location());
+        aa6x59->conform_atom_to_location("NE", aa6x59->get_CA_location().add(rock6_dir));
+        exr2_bend = true;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Bend EXR2 so that TMR6 can rock.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    if (exr2_bend)
+    {
+        LocatedVector axis = (SCoord)aa45x52->get_CA_location().subtract(aa45x54->get_CA_location());
+        axis.origin = aa45x52->get_CA_location();
+        p.rotate_piece(n45x52, n45x54, axis.origin, axis, fiftyseventh*40);
+        aa45x53->conform_atom_to_location(aa45x53->get_reach_atom()->name, aa45x53->get_CA_location().add(Point(0,-10000,0)));
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Rocking motion, if applicable.
+    ////////////////////////////////////////////////////////////////////////////////
 
     if (allow_rock6 && rock6_dir.r)
     {
+        DynamicMotion dyn(&p);
+        dyn.type = dyn_wind;
+        dyn.start_resno = BallesterosWeinstein("6.56");
+        dyn.end_resno = BallesterosWeinstein("6.60");
+        dyn.bias = -18;
+        dyn.apply_absolute(1);
+
         cout << "Performing rock6..." << endl;
         float theta = do_template_bend(p, aa6x48, aa6x59, 6, rock6_dir, SCoord(0,0,0), aa6x28);
-        cout << "TMR6 rocks " << (theta*fiftyseven) << "deg." << endl;
+        cout << "TMR6 rocks " << (theta*fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
     }
 
     
@@ -442,8 +469,101 @@ int main(int argc, char** argv)
 
         // Adjust TMR6.
         float theta6 = p.region_can_rotate(n6x28, n6x49, lv6);
-        cout << "TMR6 bends " << (theta6_initial - theta6 * fiftyseven) << "deg." << endl;
+        cout << "TMR6 bends " << (theta6_initial - theta6 * fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
         p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, theta6);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // 5-7 H-bond.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    float r57, rcm, thcr;
+    if (l5x58 == 'Y' && l7x53 == 'Y')
+    {
+        LocatedVector axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+        r57 = axis.r;
+
+        if (r57 > contact_r_5x58_7x53)
+        {
+            axis = (SCoord)aa6x48->get_CA_location().subtract(aa5x50->get_CA_location());
+            rcm = p.region_can_move(n5x33, n5x68, axis, true, n6x28, n6x59);
+            if (rcm < axis.r) axis.r = rcm;
+            axis.r += 0.5;
+            p.move_piece(n5x33, n5x68, axis);
+            cout << "TMR5 translation I " << axis.r << "A limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        if (r57 > contact_r_5x58_7x53)
+        {
+            rcm = p.region_can_move(n5x33, n5x68, axis, true, n6x28, n6x59);
+            if (rcm < axis.r) axis.r = rcm;
+            axis.r += 0.5;
+            p.move_piece(n5x33, n5x68, axis);
+            cout << "TMR5 translation II " << axis.r << "A limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        if (r57 > contact_r_5x58_7x53)
+        {
+            axis.r = contact_r_5x58_7x53;
+            float theta = find_3d_angle(aa7x53->get_atom_location("OH"),
+                aa5x58->get_atom_location("OH").add((SCoord)axis),
+                aa7x49->get_CA_location());
+            axis = (SCoord)compute_normal(aa7x53->get_atom_location("OH"), aa5x58->get_atom_location("OH"), aa7x49->get_CA_location());
+            axis.origin = aa7x49->get_CA_location();
+            thcr = p.region_can_rotate(n7x49, n7x53, axis, false, 10, n6x28, n6x59);
+            p.rotate_piece(n7x49, n7x53, axis.origin, axis, fmin(theta, thcr));
+            cout << "TMR7 bend " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        if (r57 > contact_r_5x58_7x53)
+        {
+            axis.r = contact_r_5x58_7x53;
+            float theta = find_3d_angle(aa7x53->get_atom_location("OH").subtract((SCoord)axis),
+                aa5x58->get_atom_location("OH"),
+                aa5x33->get_CA_location());
+            axis = (SCoord)compute_normal(aa5x58->get_atom_location("OH"), aa7x53->get_atom_location("OH"), aa5x33->get_CA_location());
+            thcr = p.region_can_rotate(n5x33, n5x68, axis, false, 20, n6x28, n6x59);
+            p.rotate_piece(n5x33, n5x68, axis.origin, axis, fmin(theta, thcr));
+            cout << "TMR5 pivot " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        if (r57 > contact_r_5x58_7x53)
+        {
+            axis.r = contact_r_5x58_7x53;
+            float theta = find_3d_angle(aa7x53->get_atom_location("OH").subtract((SCoord)axis),
+                aa5x58->get_atom_location("OH"),
+                aa5x50->get_CA_location());
+            axis = (SCoord)compute_normal(aa5x58->get_atom_location("OH"), aa7x53->get_atom_location("OH"), aa5x50->get_CA_location());
+            thcr = p.region_can_rotate(n5x50, n5x68, axis, false, 20, n6x28, n6x59);
+            p.rotate_piece(n5x50, n5x68, axis.origin, axis, fmin(theta, thcr));
+            cout << "TMR5 pivot " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        if (r57 > 1.2 * contact_r_5x58_7x53)
+        {
+            cout << "WARNING: 5.58...7.53 H-bond FAILED (" << r57 << "A)." << endl;
+        }
     }
 
 
@@ -501,7 +621,7 @@ int main(int argc, char** argv)
 
     if (l6x59 == 'R' || l6x59 == 'K')
     {
-        aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa45x52->get_reach_atom()->get_location());
+        aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
     }
 
 

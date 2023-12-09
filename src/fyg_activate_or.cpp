@@ -404,7 +404,7 @@ int main(int argc, char** argv)
     {
         LocatedVector axis = (SCoord)aa45x52->get_CA_location().subtract(aa45x54->get_CA_location());
         axis.origin = aa45x52->get_CA_location();
-        p.rotate_piece(n45x52, n45x54, axis.origin, axis, fiftyseventh*40);
+        p.rotate_piece(n45x52, n45x54, axis.origin, axis, -fiftyseventh*40);
         aa45x53->conform_atom_to_location(aa45x53->get_reach_atom()->name, aa45x53->get_CA_location().add(Point(0,-10000,0)));
     }
 

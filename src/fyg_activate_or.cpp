@@ -484,12 +484,13 @@ int main(int argc, char** argv)
         LocatedVector axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
         r57 = axis.r;
 
+        // Move TMR5 toward TMR6.
         if (r57 > contact_r_5x58_7x53)
         {
             axis = (SCoord)aa6x48->get_CA_location().subtract(aa5x50->get_CA_location());
             rcm = p.region_can_move(n5x33, n5x68, axis, true, n6x28, n6x59);
             if (rcm < axis.r) axis.r = rcm;
-            axis.r += 0.5;
+            // axis.r += 0.5;
             p.move_piece(n5x33, n5x68, axis);
             cout << "TMR5 translation I " << axis.r << "A limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.bridge(n5x58, n7x53);
@@ -498,11 +499,12 @@ int main(int argc, char** argv)
             r57 = axis.r;
         }
 
+        // Move TMR5 toward TMR7.
         if (r57 > contact_r_5x58_7x53)
         {
             rcm = p.region_can_move(n5x33, n5x68, axis, true, n6x28, n6x59);
             if (rcm < axis.r) axis.r = rcm;
-            axis.r += 0.5;
+            // axis.r += 0.5;
             p.move_piece(n5x33, n5x68, axis);
             cout << "TMR5 translation II " << axis.r << "A limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.bridge(n5x58, n7x53);
@@ -511,6 +513,7 @@ int main(int argc, char** argv)
             r57 = axis.r;
         }
 
+        // Bend TMR7 toward TMR5.
         if (r57 > contact_r_5x58_7x53)
         {
             axis.r = contact_r_5x58_7x53;
@@ -528,6 +531,7 @@ int main(int argc, char** argv)
             r57 = axis.r;
         }
 
+        // Tilt TMR5 toward TMR7.
         if (r57 > contact_r_5x58_7x53)
         {
             axis.r = contact_r_5x58_7x53;
@@ -544,6 +548,24 @@ int main(int argc, char** argv)
             r57 = axis.r;
         }
 
+        // Bend TMR5 toward TMR6.
+        if (r57 > contact_r_5x58_7x53)
+        {
+            axis.r = contact_r_5x58_7x53;
+            float theta = find_3d_angle(aa6x28->get_CA_location(),
+                aa5x58->get_atom_location("OH"),
+                aa5x50->get_CA_location());
+            axis = (SCoord)compute_normal(aa5x58->get_atom_location("OH"), aa6x28->get_atom_location("OH"), aa5x50->get_CA_location());
+            thcr = p.region_can_rotate(n5x50, n5x68, axis, false, 0, n6x28, n6x59);
+            p.rotate_piece(n5x50, n5x68, axis.origin, axis, fmin(theta, thcr));
+            cout << "TMR5 bend " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        // Bend TMR5 toward TMR7.
         if (r57 > contact_r_5x58_7x53)
         {
             axis.r = contact_r_5x58_7x53;
@@ -553,13 +575,14 @@ int main(int argc, char** argv)
             axis = (SCoord)compute_normal(aa5x58->get_atom_location("OH"), aa7x53->get_atom_location("OH"), aa5x50->get_CA_location());
             thcr = p.region_can_rotate(n5x50, n5x68, axis, false, 0, n6x28, n6x59);
             p.rotate_piece(n5x50, n5x68, axis.origin, axis, fmin(theta, thcr));
-            cout << "TMR5 pivot " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            cout << "TMR5 bend " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.bridge(n5x58, n7x53);
 
             axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
             r57 = axis.r;
         }
 
+        // Check the result.
         if (r57 > 1.2 * contact_r_5x58_7x53)
         {
             cout << "WARNING: 5.58...7.53 H-bond FAILED (" << r57 << "A)." << endl;

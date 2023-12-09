@@ -490,7 +490,7 @@ int main(int argc, char** argv)
             axis = (SCoord)aa6x48->get_CA_location().subtract(aa5x50->get_CA_location());
             rcm = p.region_can_move(n5x33, n5x68, axis, true, n6x28, n6x59);
             if (rcm < axis.r) axis.r = rcm;
-            // axis.r += 0.5;
+            // axis.r += 0.25;
             p.move_piece(n5x33, n5x68, axis);
             cout << "TMR5 translation I " << axis.r << "A limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.bridge(n5x58, n7x53);
@@ -504,7 +504,7 @@ int main(int argc, char** argv)
         {
             rcm = p.region_can_move(n5x33, n5x68, axis, true, n6x28, n6x59);
             if (rcm < axis.r) axis.r = rcm;
-            // axis.r += 0.5;
+            // axis.r += 0.25;
             p.move_piece(n5x33, n5x68, axis);
             cout << "TMR5 translation II " << axis.r << "A limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.bridge(n5x58, n7x53);
@@ -523,12 +523,31 @@ int main(int argc, char** argv)
             axis = (SCoord)compute_normal(aa7x53->get_atom_location("OH"), aa5x58->get_atom_location("OH"), aa7x49->get_CA_location());
             axis.origin = aa7x49->get_CA_location();
             thcr = p.region_can_rotate(n7x49, n7x53, axis, false, 0, n6x28, n6x59);
+            thcr += fiftyseventh*10;
             p.rotate_piece(n7x49, n7x53, axis.origin, axis, fmin(theta, thcr));
             cout << "TMR7 bend " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.bridge(n5x58, n7x53);
 
             axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
             r57 = axis.r;
+        }
+
+        // TODO: TMR7 does this weird unwind-wind thing. The following code does not.
+        if (false) // r57 > contact_r_5x58_7x53)
+        {
+            DynamicMotion dyn7u(&p);
+            dyn7u.type = dyn_wind;
+            dyn7u.start_resno = BallesterosWeinstein("7.50");
+            dyn7u.end_resno = BallesterosWeinstein("7.53");
+            dyn7u.bias = -50;
+            dyn7u.apply_absolute(1);
+
+            DynamicMotion dyn7w(&p);
+            dyn7w.type = dyn_wind;
+            dyn7w.start_resno = BallesterosWeinstein("7.53");
+            dyn7w.end_resno = BallesterosWeinstein("7.57");
+            dyn7w.bias = 50;
+            dyn7w.apply_absolute(1);
         }
 
         // Tilt TMR5 toward TMR7.
@@ -542,23 +561,6 @@ int main(int argc, char** argv)
             thcr = p.region_can_rotate(n5x33, n5x68, axis, false, 0, n6x28, n6x59);
             p.rotate_piece(n5x33, n5x68, axis.origin, axis, fmin(theta, thcr));
             cout << "TMR5 pivot " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
-            p.bridge(n5x58, n7x53);
-
-            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
-            r57 = axis.r;
-        }
-
-        // Bend TMR5 toward TMR6.
-        if (r57 > contact_r_5x58_7x53)
-        {
-            axis.r = contact_r_5x58_7x53;
-            float theta = find_3d_angle(aa6x28->get_CA_location(),
-                aa5x58->get_atom_location("OH"),
-                aa5x50->get_CA_location());
-            axis = (SCoord)compute_normal(aa5x58->get_atom_location("OH"), aa6x28->get_atom_location("OH"), aa5x50->get_CA_location());
-            thcr = p.region_can_rotate(n5x50, n5x68, axis, false, 0, n6x28, n6x59);
-            p.rotate_piece(n5x50, n5x68, axis.origin, axis, fmin(theta, thcr));
-            cout << "TMR5 bend " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.bridge(n5x58, n7x53);
 
             axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));

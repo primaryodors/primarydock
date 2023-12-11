@@ -219,6 +219,7 @@ int main(int argc, char** argv)
     AminoAcid *aa3x33 = p.get_residue_bw("3.33");
     AminoAcid *aa3x34 = p.get_residue_bw("3.34");
     AminoAcid *aa3x36 = p.get_residue_bw("3.36");
+    AminoAcid *aa3x37 = p.get_residue_bw("3.37");
     AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
     AminoAcid *aa3x56 = p.get_residue_bw("3.56");
@@ -293,6 +294,9 @@ int main(int argc, char** argv)
     int n7x53 = aa7x53->get_residue_no();
 
     int n8x44 = aa8x44->get_residue_no();
+
+    char l3x37 = aa3x37->get_letter();
+    char l3x40 = aa3x40->get_letter();
 
     char l45x51 = aa45x51->get_letter();
     char l45x52 = aa45x52->get_letter();
@@ -678,7 +682,12 @@ int main(int argc, char** argv)
 
         cout << "Flexing " << nearby << " side chains away from trip switch area." << endl;
         Molecule::conform_molecules(mols, 20);
-        aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
+
+        if (l3x37 == 'S' || l3x37 == 'N' || l3x37 == 'Q' || l3x37 == 'K' || l3x37 == 'R' || l3x37 == 'D' || l3x37 == 'E')
+            aa3x37->conform_atom_to_location(aa3x37->get_reach_atom()->name, pt);
+        
+        if (l3x40 == 'S' || l3x40 == 'N' || l3x40 == 'Q' || l3x40 == 'K' || l3x40 == 'R' || l3x40 == 'D' || l3x40 == 'E')
+            aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
     }
 
     if (l5x47 == 'F' || l5x47 == 'L' || l5x47 == 'I' || l5x47 == 'H')

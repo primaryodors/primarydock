@@ -440,6 +440,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
         for (j=i; residues[j]; j++)
         {
             int resno2 = residues[j]->get_residue_no();
+            if (abs(resno - resno2) < 5) continue;
             if (j==i) result += residues[i]->get_internal_clashes();
             else
             {

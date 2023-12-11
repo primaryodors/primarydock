@@ -609,6 +609,10 @@ int main(int argc, char** argv)
         }
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Minimize internal clashes. TODO: exr and cyt domains of all TM helices.
+    ////////////////////////////////////////////////////////////////////////////////
     float clash = p.get_internal_clashes(n6x28, n6x49, true);
 
     if (clash > initial_clash_6)
@@ -625,7 +629,8 @@ int main(int argc, char** argv)
         {
             p.rotate_piece(n6x28, n6x49, axis.origin, axis, theta);
             float new_clash = p.get_internal_clashes(n6x28, n6x49);
-            cout << *p.stop1 << ", " << *p.stop2 << " " << theta << " " << new_clash << endl;
+            // cout << *p.stop1 << ", " << *p.stop2 << " " << theta << " " << new_clash << endl;
+
             if (new_clash > clash)
             {
                 p.rotate_piece(n6x28, n6x49, axis.origin, axis, -theta);

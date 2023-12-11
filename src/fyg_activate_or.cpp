@@ -200,6 +200,8 @@ int main(int argc, char** argv)
     p.load_pdb(fp);
     fclose(fp);
 
+    cout << "Internal clashes of starting model: " << p.get_internal_clashes() << endl;
+
 
     ////////////////////////////////////////////////////////////////////////////////
     // Set up residue vars
@@ -215,6 +217,7 @@ int main(int argc, char** argv)
 
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
     AminoAcid *aa3x33 = p.get_residue_bw("3.33");
+    AminoAcid *aa3x34 = p.get_residue_bw("3.34");
     AminoAcid *aa3x36 = p.get_residue_bw("3.36");
     AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
@@ -295,6 +298,7 @@ int main(int argc, char** argv)
     char l45x52 = aa45x52->get_letter();
     char l45x53 = aa45x53->get_letter();
 
+    char l5x47 = aa5x47->get_letter();
     char l5x50 = aa5x50->get_letter();
     char l5x58 = aa5x58->get_letter();
 
@@ -305,6 +309,9 @@ int main(int argc, char** argv)
     char l6x59 = aa6x59->get_letter();
     
     char l7x53 = aa7x53->get_letter();
+
+
+    float initial_clash_6 = p.get_internal_clashes(n6x28, n6x49);
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -595,6 +602,40 @@ int main(int argc, char** argv)
         }
     }
 
+    float clash = p.get_internal_clashes(n6x28, n6x49, true);
+
+    if (clash > initial_clash_6)
+    {
+        cout << "Minimizing TMR6 cytoplasmic clashes..." << endl;
+
+        if (p.stop1 && p.stop2) pt = aa6x40->get_CA_location().add(p.stop1->get_CA_location().subtract(p.stop2->get_CA_location()));
+        else pt = aa6x40->get_CA_location().subtract(p.last_int_clash_dir);
+        LocatedVector axis = compute_normal(aa6x40->get_CA_location(), pt, aa6x49->get_CA_location());
+        axis.origin = aa6x49->get_CA_location();
+
+        float theta = fiftyseventh * 15 / 50;
+        for (i=0; i<50; i++)
+        {
+            p.rotate_piece(n6x28, n6x49, axis.origin, axis, theta);
+            float new_clash = p.get_internal_clashes(n6x28, n6x49);
+            cout << *p.stop1 << ", " << *p.stop2 << " " << theta << " " << new_clash << endl;
+            if (new_clash > clash)
+            {
+                p.rotate_piece(n6x28, n6x49, axis.origin, axis, -theta);
+                theta *= -0.75;
+            }
+            else
+            {
+                clash = new_clash;
+            }
+            if (new_clash <= initial_clash_6) break;
+            if (fabs(theta) < 1e-5) break;
+
+            axis = compute_normal(p.stop2->get_CA_location(), p.stop1->get_CA_location(), aa6x49->get_CA_location());
+            axis.origin = aa6x49->get_CA_location();
+        }
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////
     // Make room near trip switch.
@@ -640,6 +681,12 @@ int main(int argc, char** argv)
         aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
     }
 
+    if (l5x47 == 'F' || l5x47 == 'L' || l5x47 == 'I' || l5x47 == 'H')
+    {
+        pt = aa5x47->get_CA_location().subtract(aa3x34->get_CA_location()).add(aa5x47->get_CA_location());
+        aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
+    }
+
     // This side chain shift is observed in all cryo-EM models of active states of TAARs:
     if (l6x44 == 'F' || l6x44 == 'Y')
     {
@@ -653,6 +700,12 @@ int main(int argc, char** argv)
         aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Final active protein. No more changes can be made past this point.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    cout << "Internal clashes of final model: " << p.get_internal_clashes() << endl;
 
     if (allow_save)
     {

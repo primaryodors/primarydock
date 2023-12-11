@@ -369,7 +369,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
     if (!residues) return 0;
     if (repack) save_undo_state();
     int i, j, l, m;
-    float result = 0;
+    float result = 0, r;
     Point clashttl(0,0,0);
     float clash_worst = 0;
     for (i=0; residues[i]; i++)
@@ -445,10 +445,15 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
             {
                 if (repack)
                 {
-                    float r = residues[i]->get_CA_location().get_3d_distance(residues[j]->get_CA_location());
+                    r = residues[i]->get_CA_location().get_3d_distance(residues[j]->get_CA_location());
                     float rr = residues[i]->get_reach() + residues[j]->get_reach();
                     if (r > rr) continue;
                 }
+
+                Atom* ia = residues[i]->get_nearest_atom(residues[j]->get_CA_location());
+                Atom* ja = residues[j]->get_nearest_atom(ia->get_location());
+                r = ia->distance_to(ja);
+                if (r > ia->get_vdW_radius() + ja->get_vdW_radius()) continue;
 
                 if (abs(resno2-resno) <= 1) continue;
                 if (resno2 >= sr && resno2 <= er) continue;
@@ -460,7 +465,12 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
                 clashttl = clashttl.add(dpos);
                 float limit = unconnected_residue_mindist + sqrt(residues[i]->get_reach()) + sqrt(residues[j]->get_reach());
                 f = fmax(limit - dpos.r, 0);
-                if (f > clash_worst) clash_worst = f;
+                if (f > clash_worst)
+                {
+                    clash_worst = f;
+                    stop1 = residues[i];
+                    stop2 = residues[j];
+                }
             }
         }
     }

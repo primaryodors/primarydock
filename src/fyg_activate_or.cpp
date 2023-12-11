@@ -624,17 +624,19 @@ int main(int argc, char** argv)
         LocatedVector axis = compute_normal(aa6x40->get_CA_location(), pt, aa6x49->get_CA_location());
         axis.origin = aa6x49->get_CA_location();
 
-        float theta = fiftyseventh * 15 / 50;
-        for (i=0; i<50; i++)
+        float theta = fiftyseventh * 15 / 20;
+        int fulcrum = n6x49, nstop1 = 0;
+        AminoAcid* aafulcrum = p.get_residue(fulcrum);
+        for (i=0; i<200; i++)
         {
-            p.rotate_piece(n6x28, n6x49, axis.origin, axis, theta);
-            float new_clash = p.get_internal_clashes(n6x28, n6x49);
-            // cout << *p.stop1 << ", " << *p.stop2 << " " << theta << " " << new_clash << endl;
+            p.rotate_piece(n6x28, fulcrum, axis.origin, axis, theta);
+            float new_clash = p.get_internal_clashes(n6x28, fulcrum);
+            cout << *p.stop1 << ", " << *p.stop2 << " " << theta << " " << new_clash << endl;
 
             if (new_clash > clash)
             {
-                p.rotate_piece(n6x28, n6x49, axis.origin, axis, -theta);
-                theta *= -0.75;
+                p.rotate_piece(n6x28, fulcrum, axis.origin, axis, -theta);
+                theta *= -1;
             }
             else
             {
@@ -645,6 +647,16 @@ int main(int argc, char** argv)
 
             axis = compute_normal(p.stop2->get_CA_location(), p.stop1->get_CA_location(), aa6x49->get_CA_location());
             axis.origin = aa6x49->get_CA_location();
+
+            nstop1 = p.stop1->get_residue_no();
+            if (fulcrum == nstop1) break;
+            if (nstop1 < n6x28 || nstop1 > n6x59) break;
+
+            if (p.last_int_clash_dir.r <= clash_limit_per_aa)
+            {
+                fulcrum = nstop1;
+                aafulcrum = p.get_residue(fulcrum);
+            }
         }
     }
 

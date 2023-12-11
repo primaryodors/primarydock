@@ -192,7 +192,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
 POSE $pose
-ELIM 5000
+ELIM 10000
 $flex_constraints
 ITERS $iter
 PROGRESS
@@ -239,7 +239,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
 POSE $pose
-ELIM 5000
+ELIM 10000
 $flex_constraints
 ITERS $iter
 PROGRESS

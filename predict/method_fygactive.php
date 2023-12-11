@@ -86,7 +86,7 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
 {
     $cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
 
-    $args = "";
+    $args = "$protid";
     $template = [];
 
     if (substr($protid, 0, 4) == "TAAR")
@@ -141,11 +141,9 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
             }
 
             $cmdarg = "--" . substr($metric, 0, 1) . $hxno;
-            $args .= "$cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']} ";
+            $args .= " $cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']}";
         }
     }
-
-    $args .= "$protid";
 
     if (false) // $protid == "OR51E2")
     {

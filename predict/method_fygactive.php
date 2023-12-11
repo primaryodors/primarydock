@@ -172,7 +172,7 @@ heredoc;
 $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
 
-
+$fam = family_from_protid($protid);
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
 
 $configf = <<<heredoc

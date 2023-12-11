@@ -66,6 +66,42 @@ float do_template_bend(Protein& p, AminoAcid* aasrc, AminoAcid* aaref, int hxno,
     return theta;
 }
 
+float reduce_iclash_iter(Protein& p, int& fulcrum, bool cterm, float clash, float& theta, int region_start, int region_end)
+{
+    AminoAcid* aafulcrum = p.get_residue(fulcrum);
+    LocatedVector axis = compute_normal(p.stop2->get_CA_location(), p.stop1->get_CA_location(), aafulcrum->get_CA_location());
+    axis.origin = aafulcrum->get_CA_location();
+
+    p.rotate_piece(cterm ? fulcrum : region_start, cterm ? region_end : fulcrum, axis.origin, axis, theta);
+    float new_clash = p.get_internal_clashes(cterm ? fulcrum : region_start, cterm ? region_end : fulcrum);
+    cout << region_start << "-" << region_end << "  " << *p.stop1 << ", " << *p.stop2 << " " << theta << " " << new_clash << endl;
+
+    if (new_clash > clash)
+    {
+        p.rotate_piece(cterm ? fulcrum : region_start, cterm ? region_end : fulcrum, axis.origin, axis, -theta);
+        theta *= -0.8;
+    }
+    else
+    {
+        clash = new_clash;
+    }
+
+    int nstop1 = p.stop1->get_residue_no();
+    if (nstop1 < region_start || nstop1 > region_end)
+    {
+        // return 0;
+    }
+    else if (p.last_int_clash_dir.r <= clash_limit_per_aa) fulcrum = nstop1;
+
+    // if (new_clash <= initial_clash) return 0;
+    if (fabs(theta) < 1e-6) return 0;
+
+    if (fulcrum == nstop1) return 0;
+
+    return new_clash;
+}
+
+
 int main(int argc, char** argv)
 {
     if (argc < 2)
@@ -315,7 +351,13 @@ int main(int argc, char** argv)
     char l7x53 = aa7x53->get_letter();
 
 
-    float initial_clash_6 = p.get_internal_clashes(n6x28, n6x49);
+    float initial_clash_[10];
+
+    for (i=1; i<=7; i++)
+    {
+        std::string region = (std::string)"TMR" + std::to_string(i);
+        initial_clash_[i] = p.get_internal_clashes(p.get_region_start(region), p.get_region_end(region));
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -615,7 +657,7 @@ int main(int argc, char** argv)
     ////////////////////////////////////////////////////////////////////////////////
     float clash = p.get_internal_clashes(n6x28, n6x49, true);
 
-    if (clash > initial_clash_6)
+    if (clash > initial_clash_[6])
     {
         cout << "Minimizing TMR6 cytoplasmic clashes..." << endl;
 
@@ -625,38 +667,31 @@ int main(int argc, char** argv)
         axis.origin = aa6x49->get_CA_location();
 
         float theta = fiftyseventh * 15 / 20;
-        int fulcrum = n6x49, nstop1 = 0;
-        AminoAcid* aafulcrum = p.get_residue(fulcrum);
+        int fulcrum = n6x49;
         for (i=0; i<200; i++)
         {
-            p.rotate_piece(n6x28, fulcrum, axis.origin, axis, theta);
-            float new_clash = p.get_internal_clashes(n6x28, fulcrum);
-            cout << *p.stop1 << ", " << *p.stop2 << " " << theta << " " << new_clash << endl;
+            clash = reduce_iclash_iter(p, fulcrum, false, clash, theta, n6x28, fulcrum);
+            if (clash <= initial_clash_[6]) break;
+        }
+    }
 
-            if (new_clash > clash)
-            {
-                p.rotate_piece(n6x28, fulcrum, axis.origin, axis, -theta);
-                theta *= -1;
-            }
-            else
-            {
-                clash = new_clash;
-            }
-            if (new_clash <= initial_clash_6) break;
-            if (fabs(theta) < 1e-5) break;
+    for (n=1; n<=7; n++)
+    {
+        std::string region = (std::string)"TMR" + std::to_string(n);
+        float theta = fiftyseventh * 15 / 20;
+        AminoAcid* aafulcrum = p.get_residue_bw(n, 50);
+        if (!aafulcrum) continue;
+        int fulcrum = aafulcrum->get_residue_no();
+        int term = (n&1) ? p.get_region_start(region) : p.get_region_end(region);
+        cout << "Minimizing " << region << " extracellular clashes..." << endl;
 
-            axis = compute_normal(p.stop2->get_CA_location(), p.stop1->get_CA_location(), aa6x49->get_CA_location());
-            axis.origin = aa6x49->get_CA_location();
-
-            nstop1 = p.stop1->get_residue_no();
-            if (fulcrum == nstop1) break;
-            if (nstop1 < n6x28 || nstop1 > n6x59) break;
-
-            if (p.last_int_clash_dir.r <= clash_limit_per_aa)
-            {
-                fulcrum = nstop1;
-                aafulcrum = p.get_residue(fulcrum);
-            }
+        for (i=0; i<200; i++)
+        {
+            clash = (n&1)
+                ? reduce_iclash_iter(p, fulcrum, false, clash, theta, term, fulcrum)
+                : reduce_iclash_iter(p, fulcrum, true , clash, theta, fulcrum, term)
+                ;
+            if (clash <= initial_clash_[i]) break;
         }
     }
 

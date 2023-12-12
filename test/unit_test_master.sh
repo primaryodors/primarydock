@@ -49,7 +49,7 @@ else
 fi
 
 
-echo "${CYN}Running prediction tests and docking tests; these will take some time. Please wait.${NC}"
+printf "${CYN}Running prediction tests and docking tests; these will take some time. Please wait.${NC}\n"
 
 REPORT="testdata/OR51E2_propionate_pred.approved.txt"
 # php -f predict/method_icactive.php prot=OR51E2 lig=propionic_acid | tee >( grep '[[]Predicted[]] => ' > testdata/received/OR51E2_propionate_pred.received.txt)

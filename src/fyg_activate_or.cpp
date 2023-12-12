@@ -350,6 +350,27 @@ int main(int argc, char** argv)
     char l7x53 = aa7x53->get_letter();
 
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Make room for TMR5 to shift.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    if (l6x48 != 'W')
+    {
+        aa5x47->movability = MOV_FLEXONLY;
+        pt = aa5x47->get_CA_location().subtract(aa3x33->get_CA_location());
+        pt = pt.add(aa5x47->get_CA_location());
+        aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
+        aa6x51->movability = MOV_FLEXONLY;
+        pt = aa6x51->get_CA_location().subtract(aa3x36->get_CA_location());
+        pt = pt.add(aa6x51->get_CA_location());
+        aa6x51->conform_atom_to_location(aa6x51->get_reach_atom()->name, pt);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Compute initial internal clashes.
+    ////////////////////////////////////////////////////////////////////////////////
+
     float initial_clash_[10];
 
     for (i=1; i<=7; i++)

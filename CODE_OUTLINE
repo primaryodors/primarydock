@@ -1,0 +1,53 @@
+# Code Outline for PrimaryDock
+
+# Classes
+
+The core class hierarchy consists of the Atom, Bond, InteratomicForce, Molecule, AminoAcid, and Protein classes.
+
+The Atom class contains all the details about atoms including atomic number, charge, atomic weight, location in 3D space, etc.
+Isotopes are not currently included. The parameters of the atom such as polarity and van der Waals radius are involved in
+code outside the Atom class that computes binding energies and clashes between molecules. Atomic data are stored in the
+`data/elements.dat` file.
+
+The Bond class is defined alongside the Atom class. It has two Atom* pointers, creatively named `atom` and `btom`, as well
+as a bond cardinality. The Bond class keeps track of whether each bond can flex, as well as which atoms move in unison when
+a given bond does flex. Bond rotations are accomplished by calling the `Bond::rotate()` function.
+
+There is also a Ring class defined alongside Atom and Bond. Ring functionality is important for computing aromatic
+interactions, but this class currently isn't used for much else. Ultimately, the hope is to have code for ring flexions,
+including chair and boat forms of carvones and menthols, as well as full flexibility of macrocyclic musks.
+
+The InteratomicForce class contains the code for computing interactions and clashes between atoms. Interatomic force data
+are stored in `data/bindings.dat` and loaded into this class at runtime. The static `InteratomicForce::get_applicable()`
+function returns all non-covalent forces possible between any two atoms, taking into account each atom's properties within
+its parent molecule. The static `InteratomicForce::total_binding()` function returns a number representing the total binding
+energy between two atoms. Note positive means attractive binding energy while negative means repulsive forces and clashes.
+
+The Molecule class contains an Atom* named `atoms`, containing pointers to all the atoms of that molecule. These atoms and
+their bonds exist as separate objects from their Molecule object. Also, the Atom class keeps track of Bond objects, so the
+Molecule class doesn't actually have its own list of bonds, though it does keep an array of pointers to rotatable bonds.
+The Molecule class contains various serialization functions, getters, motion and flexion functions, atom addition/removal/access
+functions, and ring functions, but the biggest piece of its functionality is the static `Molecule::conform_molecules()` function,
+whose overloaded declarations allow passing in an array of Molecule pointers representing a system of molecules that can be
+repositioned and flexed to maximize intermolecular binding and minimize clashes.
+
+The AminoAcid class inherets from Molecule and adds amino-acid-specific features such as one-letter and three-letter codes,
+proline-type functionality, histidine-like functionality, tyrosine-like character, etc. Amino acid data are stored in 
+`data/aminos.dat` and loaded at runtime into this class.
+
+The Protein class contains an array of AminoAcid pointers called `residues`. Various functions allow serialization of Protein
+objects, as well as manipulation of regions of the protein in space. Note that the various `conform_backbone()` overloads
+currently are not fully functional in repairing breaks in the backbone chain, so proteins with parts moved or rotated will
+generally have discontinuities in the backbone chain. The algorithm for repairing these discontinuities has so far eluded all
+attempts to code it.
+
+The AtomGlom and ResidueGlom classes, using "glom" as a shorthand for "conglomeration", handles the functionality of grouping
+ligand atoms and protein residues, respectively, into associated groupings that can be aligned for the best-binding algorithm.
+This algorithm seeks to pair functional groups of the ligand with features of the protein's binding pocket in order to
+optimize the placement of the former within the latter before fine tuning the poses using `Molecule::conform_molecules()`.
+
+
+
+
+
+

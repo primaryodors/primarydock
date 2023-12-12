@@ -653,7 +653,8 @@ int main(int argc, char** argv)
 
 
     ////////////////////////////////////////////////////////////////////////////////
-    // Minimize internal clashes. TODO: exr and cyt domains of all TM helices.
+    // Minimize internal clashes.
+    // TODO: cyt domains of all TM helices, preserving the 5~7 bridge.
     ////////////////////////////////////////////////////////////////////////////////
     float clash = p.get_internal_clashes(n6x28, n6x49, true);
 

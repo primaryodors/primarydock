@@ -71,6 +71,8 @@ Protein* ptplref;
 int seql = 0;
 int mcoord_resno[256];
 int addl_resno[256];
+const Region* regions;
+SCoord region_clashes[85][3];
 Molecule* ligand;
 Molecule** waters = nullptr;
 Molecule** owaters = nullptr;
@@ -2278,6 +2280,17 @@ _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
     Point nodecens[pathnodes+1];
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // Main loop.
+    /////////////////////////////////////////////////////////////////////////////////
+
+    regions = protein->get_regions();
+    for (i=0; regions[i].start; i++)
+    {
+        region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
+    }
+
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
@@ -2961,6 +2974,22 @@ _try_again:
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;
 
+            n = protein->get_end_resno();
+            for (i=1; i<=n; i++)
+            {
+                if (dr[drcount][nodeno].residue_clash[i])
+                {
+                    for (j=0; regions[j].start; j++)
+                    {
+                        if (i >= regions[j].start && i <= regions[j].end)
+                        {
+                            k = (i - regions[j].start) * 3 / (regions[j].end - regions[j].start);
+                            region_clashes[j][k] = region_clashes[j][k].add(dr[drcount][nodeno].res_clash_dir[i]);
+                        }
+                    }
+                }
+            }
+
             dr[drcount][nodeno].proximity = ligand->get_barycenter().get_3d_distance(nodecen);
 
             if (use_bestbind_algorithm)
@@ -3312,6 +3341,23 @@ _exitposes:
     cout << found_poses << " pose(s) found." << endl;
     if (output) *output << found_poses << " pose(s) found." << endl;
     if (debug) *debug << found_poses << " pose(s) found." << endl;
+
+    if (regions)
+    {
+        cout << endl;
+        for (i=0; regions[i].start; i++)
+        {
+            for (j=0; j<3; j++) if (region_clashes[i][j].r)
+            {
+                cout << regions[i].name;
+                if (!j) cout << ".nseg";
+                else if (j==1) cout << ".center";
+                else if (j==2) cout << ".cseg";
+                cout << ".clashdir = " << (Point)region_clashes[i][j] << endl;
+            }
+        }
+        cout << endl;
+    }
 
     if (met) delete met;
 

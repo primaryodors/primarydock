@@ -2,6 +2,7 @@
 
 RED="\033[31;1m"
 GRN="\033[32m"
+CYN="\033[36m"
 NC="\033[0m"
 
 cd "$(dirname "$0")"
@@ -48,7 +49,7 @@ else
 fi
 
 
-echo "Running prediction tests and docking tests; these will take some time. Please wait."
+printf "${CYN}Running prediction tests and docking tests; these will take some time. Please wait.${NC}\n"
 
 REPORT="testdata/OR51E2_propionate_pred.approved.txt"
 # php -f predict/method_icactive.php prot=OR51E2 lig=propionic_acid | tee >( grep '[[]Predicted[]] => ' > testdata/received/OR51E2_propionate_pred.received.txt)

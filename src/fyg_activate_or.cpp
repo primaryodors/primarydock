@@ -66,6 +66,41 @@ float do_template_bend(Protein& p, AminoAcid* aasrc, AminoAcid* aaref, int hxno,
     return theta;
 }
 
+float reduce_iclash_iter(Protein& p, int& fulcrum, bool cterm, float clash, float& theta, int region_start, int region_end)
+{
+    AminoAcid* aafulcrum = p.get_residue(fulcrum);
+    LocatedVector axis = compute_normal(p.stop2->get_CA_location(), p.stop1->get_CA_location(), aafulcrum->get_CA_location());
+    axis.origin = aafulcrum->get_CA_location();
+
+    p.rotate_piece(cterm ? fulcrum : region_start, cterm ? region_end : fulcrum, axis.origin, axis, theta);
+    float new_clash = p.get_internal_clashes(cterm ? fulcrum : region_start, cterm ? region_end : fulcrum);
+
+    if (new_clash > clash)
+    {
+        p.rotate_piece(cterm ? fulcrum : region_start, cterm ? region_end : fulcrum, axis.origin, axis, -theta);
+        theta *= -0.8;
+    }
+    else
+    {
+        clash = new_clash;
+    }
+
+    int nstop1 = p.stop1->get_residue_no();
+    if (nstop1 < region_start || nstop1 > region_end)
+    {
+        // return 0;
+    }
+    else if (p.last_int_clash_dir.r <= clash_limit_per_aa) fulcrum = nstop1;
+
+    // if (new_clash <= initial_clash) return 0;
+    if (fabs(theta) < 1e-6) return 0;
+
+    if (fulcrum == nstop1) return 0;
+
+    return new_clash;
+}
+
+
 int main(int argc, char** argv)
 {
     if (argc < 2)
@@ -200,6 +235,8 @@ int main(int argc, char** argv)
     p.load_pdb(fp);
     fclose(fp);
 
+    cout << "Internal clashes of starting model: " << p.get_internal_clashes() << endl;
+
 
     ////////////////////////////////////////////////////////////////////////////////
     // Set up residue vars
@@ -215,7 +252,9 @@ int main(int argc, char** argv)
 
     AminoAcid *aa3x21 = p.get_residue_bw("3.21");
     AminoAcid *aa3x33 = p.get_residue_bw("3.33");
+    AminoAcid *aa3x34 = p.get_residue_bw("3.34");
     AminoAcid *aa3x36 = p.get_residue_bw("3.36");
+    AminoAcid *aa3x37 = p.get_residue_bw("3.37");
     AminoAcid *aa3x40 = p.get_residue_bw("3.40");
     AminoAcid *aa3x50 = p.get_residue_bw("3.50");
     AminoAcid *aa3x56 = p.get_residue_bw("3.56");
@@ -291,10 +330,14 @@ int main(int argc, char** argv)
 
     int n8x44 = aa8x44->get_residue_no();
 
+    char l3x37 = aa3x37->get_letter();
+    char l3x40 = aa3x40->get_letter();
+
     char l45x51 = aa45x51->get_letter();
     char l45x52 = aa45x52->get_letter();
     char l45x53 = aa45x53->get_letter();
 
+    char l5x47 = aa5x47->get_letter();
     char l5x50 = aa5x50->get_letter();
     char l5x58 = aa5x58->get_letter();
 
@@ -305,6 +348,36 @@ int main(int argc, char** argv)
     char l6x59 = aa6x59->get_letter();
     
     char l7x53 = aa7x53->get_letter();
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Make room for TMR5 to shift.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    if (l6x48 != 'W')
+    {
+        aa5x47->movability = MOV_FLEXONLY;
+        pt = aa5x47->get_CA_location().subtract(aa3x33->get_CA_location());
+        pt = pt.add(aa5x47->get_CA_location());
+        aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
+        aa6x51->movability = MOV_FLEXONLY;
+        pt = aa6x51->get_CA_location().subtract(aa3x36->get_CA_location());
+        pt = pt.add(aa6x51->get_CA_location());
+        aa6x51->conform_atom_to_location(aa6x51->get_reach_atom()->name, pt);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Compute initial internal clashes.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    float initial_clash_[10];
+
+    for (i=1; i<=7; i++)
+    {
+        std::string region = (std::string)"TMR" + std::to_string(i);
+        initial_clash_[i] = p.get_internal_clashes(p.get_region_start(region), p.get_region_end(region));
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -373,16 +446,12 @@ int main(int argc, char** argv)
 
 
     ////////////////////////////////////////////////////////////////////////////////
-    // Rocking motion, if applicable.
+    // Parameters and eligibility for rock6 motion.
     ////////////////////////////////////////////////////////////////////////////////
 
     SCoord rock6_dir(0,0,0);
-    if (l6x59 == 'R')
-    {
-        rock6_dir = aa4x49->get_CA_location().subtract(aa6x55->get_CA_location());
-        aa6x59->conform_atom_to_location("NE", aa6x59->get_CA_location().add(rock6_dir));
-    }
-    else if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
+    bool exr2_bend = false;
+    if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
         p.bridge(aa45x51->get_residue_no(), aa6x55->get_residue_no());
         Atom* reach6x55 = aa6x55->get_reach_atom();
@@ -392,12 +461,43 @@ int main(int argc, char** argv)
         constraints.push_back("STCR 45.51");
         constraints.push_back("STCR 6.55");
     }
+    else if (l6x59 == 'R')
+    {
+        rock6_dir = aa4x49->get_CA_location().subtract(aa6x55->get_CA_location());
+        aa6x59->conform_atom_to_location("NE", aa6x59->get_CA_location().add(rock6_dir));
+        exr2_bend = true;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Bend EXR2 so that TMR6 can rock.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    if (exr2_bend)
+    {
+        LocatedVector axis = (SCoord)aa45x52->get_CA_location().subtract(aa45x54->get_CA_location());
+        axis.origin = aa45x52->get_CA_location();
+        p.rotate_piece(n45x52, n45x54, axis.origin, axis, -fiftyseventh*40);
+        aa45x53->conform_atom_to_location(aa45x53->get_reach_atom()->name, aa45x53->get_CA_location().add(Point(0,-10000,0)));
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Rocking motion, if applicable.
+    ////////////////////////////////////////////////////////////////////////////////
 
     if (allow_rock6 && rock6_dir.r)
     {
+        DynamicMotion dyn(&p);
+        dyn.type = dyn_wind;
+        dyn.start_resno = BallesterosWeinstein("6.56");
+        dyn.end_resno = BallesterosWeinstein("6.60");
+        dyn.bias = -18;
+        dyn.apply_absolute(1);
+
         cout << "Performing rock6..." << endl;
         float theta = do_template_bend(p, aa6x48, aa6x59, 6, rock6_dir, SCoord(0,0,0), aa6x28);
-        cout << "TMR6 rocks " << (theta*fiftyseven) << "deg." << endl;
+        cout << "TMR6 rocks " << (theta*fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
     }
 
     
@@ -442,8 +542,178 @@ int main(int argc, char** argv)
 
         // Adjust TMR6.
         float theta6 = p.region_can_rotate(n6x28, n6x49, lv6);
-        cout << "TMR6 bends " << (theta6_initial - theta6 * fiftyseven) << "deg." << endl;
+        cout << "TMR6 bends " << (theta6_initial - theta6 * fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
         p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, theta6);
+    }
+
+
+    if (!allow_save) return 0;
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // 5-7 H-bond.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    float r57, rcm, thcr;
+    if (l5x58 == 'Y' && l7x53 == 'Y')
+    {
+        LocatedVector axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+        r57 = axis.r;
+
+        // Move TMR5 toward TMR6.
+        if (r57 > contact_r_5x58_7x53)
+        {
+            axis = (SCoord)aa6x48->get_CA_location().subtract(aa5x50->get_CA_location());
+            rcm = p.region_can_move(n5x33, n5x68, axis, true, n6x28, n6x59);
+            if (rcm < axis.r) axis.r = rcm;
+            // axis.r += 0.25;
+            p.move_piece(n5x33, n5x68, axis);
+            cout << "TMR5 translation I " << axis.r << "A limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        // Move TMR5 toward TMR7.
+        if (r57 > contact_r_5x58_7x53)
+        {
+            rcm = p.region_can_move(n5x33, n5x68, axis, true, n6x28, n6x59);
+            if (rcm < axis.r) axis.r = rcm;
+            // axis.r += 0.25;
+            p.move_piece(n5x33, n5x68, axis);
+            cout << "TMR5 translation II " << axis.r << "A limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        // Bend TMR7 toward TMR5.
+        if (r57 > contact_r_5x58_7x53)
+        {
+            axis.r = contact_r_5x58_7x53;
+            float theta = find_3d_angle(aa7x53->get_atom_location("OH"),
+                aa5x58->get_atom_location("OH").add((SCoord)axis),
+                aa7x49->get_CA_location());
+            axis = (SCoord)compute_normal(aa7x53->get_atom_location("OH"), aa5x58->get_atom_location("OH"), aa7x49->get_CA_location());
+            axis.origin = aa7x49->get_CA_location();
+            thcr = p.region_can_rotate(n7x49, n7x53, axis, false, 0, n6x28, n6x59);
+            thcr += fiftyseventh*10;
+            p.rotate_piece(n7x49, n7x53, axis.origin, axis, fmin(theta, thcr));
+            cout << "TMR7 bend " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        // TODO: TMR7 does this weird unwind-wind thing. The following code does not.
+        if (false) // r57 > contact_r_5x58_7x53)
+        {
+            DynamicMotion dyn7u(&p);
+            dyn7u.type = dyn_wind;
+            dyn7u.start_resno = BallesterosWeinstein("7.50");
+            dyn7u.end_resno = BallesterosWeinstein("7.53");
+            dyn7u.bias = -50;
+            dyn7u.apply_absolute(1);
+
+            DynamicMotion dyn7w(&p);
+            dyn7w.type = dyn_wind;
+            dyn7w.start_resno = BallesterosWeinstein("7.53");
+            dyn7w.end_resno = BallesterosWeinstein("7.57");
+            dyn7w.bias = 50;
+            dyn7w.apply_absolute(1);
+        }
+
+        // Tilt TMR5 toward TMR7.
+        if (r57 > contact_r_5x58_7x53)
+        {
+            axis.r = contact_r_5x58_7x53;
+            float theta = find_3d_angle(aa7x53->get_atom_location("OH").subtract((SCoord)axis),
+                aa5x58->get_atom_location("OH"),
+                aa5x33->get_CA_location());
+            axis = (SCoord)compute_normal(aa5x58->get_atom_location("OH"), aa7x53->get_atom_location("OH"), aa5x33->get_CA_location());
+            thcr = p.region_can_rotate(n5x33, n5x68, axis, false, 0, n6x28, n6x59);
+            p.rotate_piece(n5x33, n5x68, axis.origin, axis, fmin(theta, thcr));
+            cout << "TMR5 pivot " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        // Bend TMR5 toward TMR7.
+        if (r57 > contact_r_5x58_7x53)
+        {
+            axis.r = contact_r_5x58_7x53;
+            float theta = find_3d_angle(aa7x53->get_atom_location("OH").subtract((SCoord)axis),
+                aa5x58->get_atom_location("OH"),
+                aa5x50->get_CA_location());
+            axis = (SCoord)compute_normal(aa5x58->get_atom_location("OH"), aa7x53->get_atom_location("OH"), aa5x50->get_CA_location());
+            thcr = p.region_can_rotate(n5x50, n5x68, axis, false, 0, n6x28, n6x59);
+            p.rotate_piece(n5x50, n5x68, axis.origin, axis, fmin(theta, thcr));
+            cout << "TMR5 bend " << theta*fiftyseven << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+            p.bridge(n5x58, n7x53);
+
+            axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
+            r57 = axis.r;
+        }
+
+        // Check the result.
+        if (r57 > 1.2 * contact_r_5x58_7x53)
+        {
+            cout << "WARNING: 5.58...7.53 H-bond FAILED (" << r57 << "A)." << endl;
+        }
+        else
+        {
+            cout << "5.58...7.53 contact distance: " << r57 << "A." << endl;
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Minimize internal clashes.
+    // TODO: cyt domains of all TM helices, preserving the 5~7 bridge.
+    ////////////////////////////////////////////////////////////////////////////////
+    float clash = p.get_internal_clashes(n6x28, n6x49, true);
+
+    if (clash > initial_clash_[6])
+    {
+        cout << "Minimizing TMR6 cytoplasmic clashes..." << endl;
+
+        if (p.stop1 && p.stop2) pt = aa6x40->get_CA_location().add(p.stop1->get_CA_location().subtract(p.stop2->get_CA_location()));
+        else pt = aa6x40->get_CA_location().subtract(p.last_int_clash_dir);
+        LocatedVector axis = compute_normal(aa6x40->get_CA_location(), pt, aa6x49->get_CA_location());
+        axis.origin = aa6x49->get_CA_location();
+
+        float theta = fiftyseventh * 15 / 20;
+        int fulcrum = n6x49;
+        for (i=0; i<200; i++)
+        {
+            clash = reduce_iclash_iter(p, fulcrum, false, clash, theta, n6x28, fulcrum);
+            if (clash <= initial_clash_[6]) break;
+        }
+    }
+
+    for (n=1; n<=7; n++)
+    {
+        std::string region = (std::string)"TMR" + std::to_string(n);
+        float theta = fiftyseventh * 15 / 20;
+        AminoAcid* aafulcrum = p.get_residue_bw(n, 50);
+        if (!aafulcrum) continue;
+        int fulcrum = aafulcrum->get_residue_no();
+        int term = (n&1) ? p.get_region_start(region) : p.get_region_end(region);
+        cout << "Minimizing " << region << " extracellular clashes..." << endl;
+
+        for (i=0; i<200; i++)
+        {
+            clash = (n&1)
+                ? reduce_iclash_iter(p, fulcrum, false, clash, theta, term, fulcrum)
+                : reduce_iclash_iter(p, fulcrum, true , clash, theta, fulcrum, term)
+                ;
+            if (clash <= initial_clash_[i]) break;
+        }
     }
 
 
@@ -488,7 +758,18 @@ int main(int argc, char** argv)
 
         cout << "Flexing " << nearby << " side chains away from trip switch area." << endl;
         Molecule::conform_molecules(mols, 20);
-        aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
+
+        if (l3x37 == 'S' || l3x37 == 'N' || l3x37 == 'Q' || l3x37 == 'K' || l3x37 == 'R' || l3x37 == 'D' || l3x37 == 'E')
+            aa3x37->conform_atom_to_location(aa3x37->get_reach_atom()->name, pt);
+        
+        if (l3x40 == 'S' || l3x40 == 'N' || l3x40 == 'Q' || l3x40 == 'K' || l3x40 == 'R' || l3x40 == 'D' || l3x40 == 'E')
+            aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
+    }
+
+    if (l5x47 == 'F' || l5x47 == 'L' || l5x47 == 'I' || l5x47 == 'H')
+    {
+        pt = aa5x47->get_CA_location().subtract(aa3x34->get_CA_location()).add(aa5x47->get_CA_location());
+        aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
     }
 
     // This side chain shift is observed in all cryo-EM models of active states of TAARs:
@@ -499,6 +780,17 @@ int main(int argc, char** argv)
         constraints.push_back("STCR 6.44");
     }
 
+    if (l6x59 == 'R' || l6x59 == 'K')
+    {
+        aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Final active protein. No more changes can be made past this point.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    cout << "Internal clashes of final model: " << p.get_internal_clashes() << endl;
 
     if (allow_save)
     {

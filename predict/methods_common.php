@@ -70,7 +70,7 @@ if (@$_REQUEST['next'])
 	exec($cmd, $results);
     if (count($results)) exit;
 
-	$cmd = "ps -ef | grep ':[0-9][0-9] bin/ic_activate_or' | grep -v grep";
+	$cmd = "ps -ef | grep ':[0-9][0-9] bin/(ic|fyg)_activate_or' | grep -v grep";
 	exec($cmd, $results);
     if (count($results)) exit;
 

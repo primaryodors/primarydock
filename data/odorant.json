@@ -176,10 +176,10 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "caramellic",
-                "creamy",
                 "sweet",
-                "vanilla"
+                "creamy",
+                "vanilla",
+                "caramellic"
             ]
         },
         "activity":
@@ -2698,12 +2698,16 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
-                "aldehydic",
+                "waxy",
                 "fatty",
-                "floral",
+                "earthy",
                 "green",
-                "orange",
-                "rose"
+                "cilantro",
+                "mushroom",
+                "aldehydic",
+                "fried",
+                "chicken_fat",
+                "tallow"
             ]
         },
         "activity":

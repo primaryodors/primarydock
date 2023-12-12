@@ -86,7 +86,7 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
 {
     $cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
 
-    $args = "";
+    $args = "$protid";
     $template = [];
 
     if (substr($protid, 0, 4) == "TAAR")
@@ -141,11 +141,9 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
             }
 
             $cmdarg = "--" . substr($metric, 0, 1) . $hxno;
-            $args .= "$cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']} ";
+            $args .= " $cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']}";
         }
     }
-
-    $args .= "$protid";
 
     if (false) // $protid == "OR51E2")
     {
@@ -174,7 +172,7 @@ heredoc;
 $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
 
-
+$fam = family_from_protid($protid);
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
 
 $configf = <<<heredoc
@@ -194,7 +192,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
 POSE $pose
-ELIM 5000
+ELIM 10000
 $flex_constraints
 ITERS $iter
 PROGRESS
@@ -241,7 +239,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
 POSE $pose
-ELIM 5000
+ELIM 10000
 $flex_constraints
 ITERS $iter
 PROGRESS

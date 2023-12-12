@@ -74,7 +74,6 @@ float reduce_iclash_iter(Protein& p, int& fulcrum, bool cterm, float clash, floa
 
     p.rotate_piece(cterm ? fulcrum : region_start, cterm ? region_end : fulcrum, axis.origin, axis, theta);
     float new_clash = p.get_internal_clashes(cterm ? fulcrum : region_start, cterm ? region_end : fulcrum);
-    cout << region_start << "-" << region_end << "  " << *p.stop1 << ", " << *p.stop2 << " " << theta << " " << new_clash << endl;
 
     if (new_clash > clash)
     {

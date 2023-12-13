@@ -13,7 +13,7 @@ $flex = 1;                      // Flexion (0 or 1) for active dock.
 $flxi = 0;                      // Flexion for inactive dock.
 $pose = 20;
 $iter = 20;
-$num_std_devs = 1;              // How many standard deviations to move the helices for active clash compensation.
+$num_std_devs = 2;              // How many standard deviations to move the helices for active clash compensation.
 
 chdir(__DIR__);
 require_once("methods_common.php");
@@ -280,7 +280,10 @@ if ((!$poses || $best_energy >= 0) && count($clashcomp))
                     foreach ($lmetrics as $lmetric => $total)
                     {
                         if (!isset($template[$lhelix][$lmetric]["sigma"]))
-                            $template[$lhelix][$lmetric]["sigma"] = $total / $counts[$lhelix][$lmetric];
+                        {
+                            if ($counts[$lhelix][$lmetric]) $total /= $counts[$lhelix][$lmetric];
+                            $template[$lhelix][$lmetric]["sigma"] = $total;
+                        }
                     }
                 }
 

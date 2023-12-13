@@ -292,40 +292,55 @@ function view_file(url)
 
 <?php
 
-if (substr($fam, 0, 2) == "OR")
+if (@$receptor["btree"])
 {
-    echo "Olfactory receptor ";
-    $fmn = intval(preg_replace("/[^0-9]/", "", $fam));
-    echo "<a href=\"receptors.php?f=sOR$fmn\">family $fmn</a>, ";
-    $sub = preg_replace("/[^A-Z]/", "", substr($rcpid, strlen($fam)) );
-    echo "<a href=\"receptors.php?f=sOR$fmn$sub\">subfamily $sub</a>, ";
-    $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-    echo "member $mbr";
+    foreach ($treenodes as $nodeid => $nodename)
+    {
+        $len = strlen($nodeid);
+        if (substr($receptor["btree"], 0, $len) === $nodeid)
+        {
+            echo "<a href=\"receptors.php?tree=1&bt=$nodeid\">$nodename</a>, ";
+        }
+    }
+    echo $rcpid;
 }
 else
 {
-    switch ($fam)
+    if (substr($fam, 0, 2) == "OR")
     {
-        case 'TAAR':
-        echo "Trace amine-associated receptor ";
+        echo "Olfactory receptor ";
+        $fmn = intval(preg_replace("/[^0-9]/", "", $fam));
+        echo "<a href=\"receptors.php?f=sOR$fmn\">family $fmn</a>, ";
+        $sub = preg_replace("/[^A-Z]/", "", substr($rcpid, strlen($fam)) );
+        echo "<a href=\"receptors.php?f=sOR$fmn$sub\">subfamily $sub</a>, ";
         $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-        echo "$mbr";
-        break;
+        echo "member $mbr";
+    }
+    else
+    {
+        switch ($fam)
+        {
+            case 'TAAR':
+            echo "Trace amine-associated receptor ";
+            $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
+            echo "$mbr";
+            break;
 
-        case 'VN1R':
-        echo "Vomeronasal type 1 receptor ";
-        $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-        echo "$mbr";
-        break;
+            case 'VN1R':
+            echo "Vomeronasal type 1 receptor ";
+            $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
+            echo "$mbr";
+            break;
 
-        case 'MS4A':
-        echo "Membrane-spanning 4A receptor ";
-        $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
-        echo "$mbr";
-        break;
+            case 'MS4A':
+            echo "Membrane-spanning 4A receptor ";
+            $mbr = intval(preg_replace("/[^0-9]/", "", substr($rcpid, strlen($fam)) ));
+            echo "$mbr";
+            break;
 
-        default:
-        ;
+            default:
+            ;
+        }
     }
 }
 

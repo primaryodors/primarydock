@@ -341,7 +341,7 @@ if ((!$poses || $best_energy >= 0) && count($clashcomp))
     passthru($cmd);
 
 
-    $configf = str_replace($outfname, $tmpoutpdb, $configf);
+    $configf = str_replace($pdbfname, $tmpoutpdb, $configf);
     $poses = process_dock("a");
 
     // Delete the tmp PDB.

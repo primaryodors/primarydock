@@ -11,7 +11,7 @@
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1) for active dock.
 $flxi = 0;                      // Flexion for inactive dock.
-$pose = 25;
+$pose = 20;
 $iter = 20;
 $num_std_devs = 1;              // How many standard deviations to move the helices for active clash compensation.
 
@@ -76,18 +76,9 @@ function make_prediction($data)
     return $data;
 }
 
-
-chdir(__DIR__);
-chdir("..");
-
-$pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
-$paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
-$template = [];
-$args = "$protid";
-
-if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/fyg_activate_or"))
+function build_template()
 {
-    $cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
+    global $template, $protid, $cryoem, $has_rock6, $has_fyg, $args;
 
     if (substr($protid, 0, 4) == "TAAR")
     {
@@ -129,6 +120,22 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
         if (false!==strpos($line, "Performing rock6")) $has_rock6 = true;
         if (false!==strpos($line, "Performing FYG activation")) $has_fyg = true;
     }
+}
+
+
+chdir(__DIR__);
+chdir("..");
+
+$pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
+$paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
+$template = [];
+$args = "$protid";
+
+$cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
+
+if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/fyg_activate_or"))
+{
+    build_template();
 
     foreach ($template as $hxno => $metrics)
     {
@@ -238,6 +245,8 @@ $poses = process_dock("a");
 
 if ((!$poses || $best_energy >= 0) && count($clashcomp))
 {
+    if (!count($template)) build_template();
+
     // Ensure template contains standard deviations. If not, average the ones from the templates that do.
     foreach ($template as $hxno => $metrics)
     {
@@ -300,6 +309,7 @@ if ((!$poses || $best_energy >= 0) && count($clashcomp))
             // Apply the corrected compensation.
             foreach (['x','y','z'] as $var)
             {
+                $$var = round($$var, 3);
                 $template[$tmrno][$segment][$var] = floatval($template[$tmrno][$segment][$var]) + $$var;
                 echo "Compensating TMR$tmrno.$segment.$var to {$template[$tmrno][$segment][$var]}...\n";
             }
@@ -334,6 +344,6 @@ if ((!$poses || $best_energy >= 0) && count($clashcomp))
     $configf = str_replace($outfname, $tmpoutpdb, $configf);
     $poses = process_dock("a");
 
-    // Remember to delete the tmp PDB.
+    // Delete the tmp PDB.
     unlink($tmpoutpdb);
 }

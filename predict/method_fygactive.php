@@ -13,6 +13,7 @@ $flex = 1;                      // Flexion (0 or 1) for active dock.
 $flxi = 0;                      // Flexion for inactive dock.
 $pose = 25;
 $iter = 20;
+$num_std_devs = 1;              // How many standard deviations to move the helices for active clash compensation.
 
 chdir(__DIR__);
 require_once("methods_common.php");
@@ -81,13 +82,12 @@ chdir("..");
 
 $pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
+$template = [];
+$args = "$protid";
 
 if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/fyg_activate_or"))
 {
     $cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
-
-    $args = "$protid";
-    $template = [];
 
     if (substr($protid, 0, 4) == "TAAR")
     {
@@ -145,28 +145,9 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
         }
     }
 
-    if (false) // $protid == "OR51E2")
-    {
-        $pepd = <<<heredoc
-LOAD pdbs/OR51/OR51E2.8f76.pdb
-CENTER
-UPRIGHT
-HYDRO
-SAVE $pdbfname_active
-
-
-heredoc;
-        $fp = fopen("tmp/8f76.pepd", "wb");
-        fwrite($fp, $pepd);
-        fclose($fp);
-        passthru("bin/pepteditor tmp/8f76.pepd");
-    }
-    else
-    {
-        $cmd = "bin/fyg_activate_or $args";
-        echo "$cmd\n";
-        passthru($cmd);
-    }
+    $cmd = "bin/fyg_activate_or $args";
+    echo "$cmd\n";
+    passthru($cmd);
 }
 
 $flex_constraints = "";
@@ -254,3 +235,105 @@ OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
 heredoc;
 
 $poses = process_dock("a");
+
+if ((!$poses || $best_energy >= 0) && count($clashcomp))
+{
+    // Ensure template contains standard deviations. If not, average the ones from the templates that do.
+    foreach ($template as $hxno => $metrics)
+    {
+        foreach ($metrics as $metric => $xyz)
+        {
+            if (!isset($xyz["sigma"]))
+            {
+                $averages = [];
+                $counts = [];
+
+                foreach ($cryoem as $lrecep => $lhelixes)
+                {
+                    foreach ($lhelixes as $lhelix => $lmetrics)
+                    {
+                        foreach ($lmetrics as $lmetric => $lxyz)
+                        {
+                            if (isset($lxyz["sigma"]))
+                            {
+                                if (!isset($averages[$lhelix][$lmetric])) $averages[$lhelix][$lmetric] = floatval($lxyz["sigma"]);
+                                else $averages[$lhelix][$lmetric] += floatval($lxyz["sigma"]);
+
+                                if (!isset($counts[$lhelix][$lmetric])) $counts[$lhelix][$lmetric] = 1;
+                                else $counts[$lhelix][$lmetric]++;
+                            }
+                        }
+                    }
+                }
+
+                foreach ($averages as $lhelix => $lmetrics)
+                {
+                    foreach ($lmetrics as $lmetric => $total)
+                    {
+                        if (!isset($template[$lhelix][$lmetric]["sigma"]))
+                            $template[$lhelix][$lmetric]["sigma"] = $total / $counts[$lhelix][$lmetric];
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    foreach ($clashcomp as $tmrno => $cc)
+    {
+        foreach ($cc as $segment => $xyz)
+        {
+            // Check each clash compensation is within the SD limit. If not, reduce the magnitude to the deviation limit.
+            $sigma = floatval(@$template[$tmrno][$segment]["sigma"]);
+            $rlimit = $sigma*$num_std_devs;
+            if (!$sigma) continue;
+            $tmparr = []; foreach (['x','y','z'] as $idx => $var) $tmparr[$var] = floatval($xyz[$idx]); extract($tmparr);
+            $r = sqrt($x*$x+$y*$y+$z*$z);
+
+            if ($r > $rlimit)
+            {
+                $divisor = $rlimit / $r;
+                $x *= $divisor; $y *= $divisor; $z *= $divisor;
+            }
+
+            // Apply the corrected compensation.
+            foreach (['x','y','z'] as $var)
+            {
+                $template[$tmrno][$segment][$var] = floatval($template[$tmrno][$segment][$var]) + $$var;
+                echo "Compensating TMR$tmrno.$segment.$var to {$template[$tmrno][$segment][$var]}...\n";
+            }
+        }
+    }
+
+    // Create a temporary custom output PDB and retry the active dock.
+    $args = "$protid";
+    foreach ($template as $hxno => $metrics)
+    {
+        foreach ($metrics as $metric => $dimensions)
+        {
+            if ($hxno == 6)
+            {
+                if ($metric == "cyt" && ($has_fyg || $has_rock6)) continue;
+                else if ($metric == "exr" && $has_rock6) continue;
+            }
+
+            $cmdarg = "--" . substr($metric, 0, 1) . $hxno;
+            $args .= " $cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']}";
+        }
+    }
+
+    $tmpoutpdb = "tmp/$protid.".getmypid().".pdb";
+    $args .= " -o $tmpoutpdb";
+
+    $cmd = "bin/fyg_activate_or $args";
+    echo "$cmd\n";
+    passthru($cmd);
+
+
+    $configf = str_replace($outfname, $tmpoutpdb, $configf);
+    $poses = process_dock("a");
+
+    // Remember to delete the tmp PDB.
+    unlink($tmpoutpdb);
+}

@@ -119,6 +119,7 @@ int main(int argc, char** argv)
     bool allow_fyg = true;
     bool allow_rock6 = true;
     bool allow_save = true;
+    char* override_ofname = nullptr;
 
     SCoord xl8[10];
     SCoord exr[10];
@@ -136,6 +137,7 @@ int main(int argc, char** argv)
             if (!strcmp(argv[i], "--nofyg")) allow_fyg = false;
             else if (!strcmp(argv[i], "--norock")) allow_rock6 = false;
             else if (!strcmp(argv[i], "--nosave")) allow_save = false;
+            else if (!strcmp(argv[i], "-o")) override_ofname = argv[++i];
             else if (argv[i][1] == '-'
                 && (argv[i][2] == 'x' || argv[i][2] == 'e' || argv[i][2] == 'c')
                 && argv[i][3] >= '1' && argv[i][3] <= '7'
@@ -226,7 +228,7 @@ int main(int argc, char** argv)
 
     std::string in_filename = path + orid + (std::string)".upright.pdb";
     if (!file_exists(in_filename)) return -3;
-    std::string out_filename = path + orid + (std::string)".active.pdb";
+    std::string out_filename = override_ofname ? (std::string)override_ofname : (path + orid + (std::string)".active.pdb");
     std::string cns_filename = path + orid + (std::string)".params";
 
     Protein p(orid.c_str());
@@ -800,10 +802,13 @@ int main(int argc, char** argv)
         // Save parameters file.
         ////////////////////////////////////////////////////////////////////////////////
 
-        fp = fopen(cns_filename.c_str(), "wb");
-        if (!fp) return -3;
-        n = constraints.size();
-        for (l=0; l<n; l++) fprintf(fp, "%s\n", constraints[l].c_str());
-        fclose(fp);
+        if (!override_ofname)
+        {
+            fp = fopen(cns_filename.c_str(), "wb");
+            if (!fp) return -3;
+            n = constraints.size();
+            for (l=0; l<n; l++) fprintf(fp, "%s\n", constraints[l].c_str());
+            fclose(fp);
+        }
     }
 }

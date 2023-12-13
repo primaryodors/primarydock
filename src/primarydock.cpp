@@ -3345,18 +3345,34 @@ _exitposes:
     if (regions)
     {
         cout << endl;
+        if (output) *output << endl;
         for (i=0; regions[i].start; i++)
         {
             for (j=0; j<3; j++) if (region_clashes[i][j].r)
             {
                 cout << regions[i].name;
-                if (!j) cout << ".nseg";
-                else if (j==1) cout << ".center";
-                else if (j==2) cout << ".cseg";
+                if (output) *output << regions[i].name;
+                if (!j)
+                {
+                    cout << ".nseg";
+                    if (output) *output << ".nseg";
+                }
+                else if (j==1)
+                {
+                    cout << ".center";
+                    if (output) *output << ".center";
+                }
+                else if (j==2)
+                {
+                    cout << ".cseg";
+                    if (output) *output << ".cseg";
+                }
                 cout << ".clashdir = " << (Point)region_clashes[i][j] << endl;
+                if (output) *output << ".clashdir = " << (Point)region_clashes[i][j] << endl;
             }
         }
         cout << endl;
+        if (output) *output << endl;
     }
 
     if (met) delete met;

@@ -1,6 +1,6 @@
 <?php
 
-global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere, $metrics_to_process;
+global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere, $metrics_to_process, $clashcomp, $best_energy;
 
 // Includes
 chdir(__DIR__);
@@ -14,6 +14,8 @@ require_once("predict/statistics.php");
 die_if_too_hot();
 
 echo date("Y-m-d H:i:s.u\n");
+
+$clashcomp = [];
 
 $method = explode("_", $_SERVER['PHP_SELF'])[1];
 $method = explode(".", $method)[0];
@@ -261,7 +263,8 @@ function prepare_outputs()
 $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false)
 {
-    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere, $multicall, $method;
+    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version;
+    global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
 
@@ -280,6 +283,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     fclose($f);
 
     $retvar = 0;
+    $best_energy = false;
 
     $outlines = [];
     if (@$_REQUEST['saved'])
@@ -333,11 +337,46 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     $posesln = false;
     foreach ($outlines as $ln)
     {
+        if (preg_match("/TMR[1-7][.](nseg|center|cseg)[.]clashdir = /", $ln))
+        {
+            $tmrno = intval(substr($ln, 3, 1));
+
+            $segment = false;
+            switch (@explode('.', $ln)[1])
+            {
+                case "nseg":
+                $segment = ($tmrno & 1) ? "exr" : "cyt";
+                break;
+
+                case "center":
+                $segment = "x.50";
+                break;
+
+                case "cseg":
+                $segment = ($tmrno & 1) ? "cyt" : "exr";
+                break;
+
+                default:
+                ;
+            }
+
+            if ($segment)
+            {
+                $coords = explode(" = ", $ln)[1];
+                $coords = str_replace('[', '', $coords);
+                $coords = str_replace(']', '', $coords);
+                $coords = explode(',', $coords);
+                foreach ($coords as $k => $c) $coords[$k] = floatval($c);
+
+                $clashcomp[$tmrno][$segment] = $coords;
+                continue;
+            }
+        }
+
         if (false !== strpos($ln, "pose(s) found"))
         {
             $num_poses = intval($ln);
             $posesln = true;
-            break;
         }
     }
 
@@ -439,6 +478,12 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                         $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]);
                         if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = 1;
                         else $outdqty[$metrics_prefix.$wmode]++;
+                    }
+
+                    if ($mode == "BENERG")
+                    {
+                        $benerg = floatval($coldiv[1]);
+                        if (false===$best_energy || $benerg < $best_energy) $best_energy = $benerg;
                     }
 
                     if ($mode == "BENERG" && isset($metrics_to_process["BEST"]))

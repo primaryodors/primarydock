@@ -1526,8 +1526,6 @@ void AminoAcid::load_aa_defs()
 void AminoAcid::set_prev(AminoAcid* aa)
 {
     if (!aa) return;
-    if (!aa->residue_no) aa->residue_no = this->residue_no - 1;
-    else if (aa->residue_no >= this->residue_no) return;
 
     if (prev_aa)
     {
@@ -1542,8 +1540,6 @@ void AminoAcid::set_prev(AminoAcid* aa)
 void AminoAcid::set_next(AminoAcid* aa)
 {
     if (!aa) return;
-    if (!aa->residue_no) aa->residue_no = this->residue_no + 1;
-    else if (aa->residue_no <= this->residue_no) return;
 
     if (next_aa)
     {

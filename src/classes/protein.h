@@ -46,6 +46,13 @@ struct SoftBias
     float transverse_rotation = 0;              // Rotation about the imaginary line perpendicular to the pocket center.
 };
 
+struct AARenumber
+{
+    AminoAcid* aa = nullptr;
+    AminoAcid* replace_with = nullptr;
+    int new_resno = 0;
+};
+
 class Protein
 {
 public:

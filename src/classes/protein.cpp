@@ -1009,6 +1009,51 @@ void Protein::set_bw50(int hxno, int resno)
     if (hxno < 1 || hxno > 78) return;
     // if (Ballesteros_Weinstein[hxno]) return;
     Ballesteros_Weinstein[hxno] = resno;
+
+    if (!remarks) return;
+
+    int i;
+    bool remark_set = false;
+    for (i=0; remarks[i]; i++)
+    {
+        if (remarks[i][7] == '8' && remarks[i][8] == '0' && remarks[i][9] == '0')
+        {
+            if (remarks[i][16] == 'B' && remarks[i][17] == 'W')
+            {
+                if (hxno < 10)
+                {
+                    if (remarks[i][19] == '0'+hxno && remarks[i][20] == '.')
+                    {
+                        char* new_remark = new char[strlen(remarks[i])+8];
+                        strcpy(new_remark, remarks[i]);
+                        sprintf(new_remark+24, "%d\n", resno);
+                        remarks[i] = new_remark;
+                        remark_set = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (remarks[i][19] == '0'+(int)(hxno/10) && remarks[i][20] == '0'+(hxno % 10) && remarks[i][21] == '.')
+                    {
+                        char* new_remark = new char[strlen(remarks[i])+8];
+                        strcpy(new_remark, remarks[i]);
+                        sprintf(new_remark+25, "%d\n", resno);
+                        remarks[i] = new_remark;
+                        remark_set = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!remark_set)
+    {
+        char* new_remark = new char[256];
+        sprintf(new_remark, "REMARK 800 SITE BW %d.50 %d\n", hxno, resno);
+        add_remark(new_remark);
+    }
 }
 
 int Protein::get_seq_length()
@@ -4059,6 +4104,8 @@ void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r,
 BallesterosWeinstein Protein::get_bw_from_resno(int resno)
 {
     int i, b=0, w=0;
+    std::string region;
+    Region r;
 
     i=1;
     do
@@ -4067,6 +4114,14 @@ BallesterosWeinstein Protein::get_bw_from_resno(int resno)
         if (j<0) continue;
 
         int x = 50 + resno-j;
+
+        if (i<10)
+        {
+            region = (std::string)"TMR" + std::to_string(i);
+            r = get_region(region);
+            if (resno >= r.start && resno <= r.end) return BallesterosWeinstein(i, x);
+        }
+
         if (!w || abs(x-50) < abs(w-50))
         {
             w = x;
@@ -4083,6 +4138,7 @@ BallesterosWeinstein Protein::get_bw_from_resno(int resno)
 int Protein::replace_side_chains_from_other_protein(Protein* other)
 {
     int i, j, l, n = other->get_end_resno(), num_applied = 0;
+    std::vector<AARenumber> renumber_later;
 
     for (i=1; i<=n; i++)
     {
@@ -4093,7 +4149,30 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
         if (get_bw50(bw.helix_no) < 1) continue;
         AminoAcid* dest = get_residue(bw);
         if (!dest) continue;
-        if (source->get_aa_definition() == dest->get_aa_definition()) continue;
+
+        AARenumber rn;
+        if (source->get_aa_definition() == dest->get_aa_definition())
+        {
+            rn.aa = dest;
+            rn.new_resno = source->get_residue_no();
+            renumber_later.push_back(rn);
+
+            /*add_remark( (std::string)"REMARK 999 "
+                + (std::string)dest->get_aa_definition()->_3let + std::to_string(dest->get_residue_no())
+                + " is being renumbered to match other protein's "
+                + (std::string)source->get_aa_definition()->_3let + std::to_string(source->get_residue_no())
+                + (std::string)".\n"
+                );*/
+
+            continue;
+        }
+
+        /*add_remark( (std::string)"REMARK 999 "
+            + (std::string)dest->get_aa_definition()->_3let + std::to_string(dest->get_residue_no())
+            + " is being replaced by other protein's "
+            + (std::string)source->get_aa_definition()->_3let + std::to_string(source->get_residue_no())
+            + (std::string)".\n"
+            );*/
 
         // cout << *source << " -> " << *dest << endl;
 
@@ -4149,15 +4228,20 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
         {
             if (residues[j] == dest)
             {
-                residues[j] = source;
+                /*residues[j] = source;
                 source->set_prev(dest->get_prev());
-                source->set_next(dest->get_next());
+                source->set_next(dest->get_next());*/
+
+                rn.aa = dest;
+                rn.new_resno = source->get_residue_no();
+                rn.replace_with = source;
+                renumber_later.push_back(rn);
 
                 break;
             }
         }
 
-        for (j=0; other->residues[j]; j++)
+        /*for (j=0; other->residues[j]; j++)
         {
             if (other->residues[j] == source)
             {
@@ -4167,9 +4251,43 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
                 }
                 break;
             }
-        }
+        }*/
 
         num_applied++;
+    }
+
+    n = renumber_later.size();
+    for (i=n-1; i>=0; i--)
+    {
+        if (!renumber_later[i].replace_with)
+        {
+            renumber_later[i].aa->renumber(renumber_later[i].new_resno);
+        }
+        else
+        {
+            for (j=0; residues[j]; j++)
+            {
+                if (residues[j] == renumber_later[i].aa)
+                {
+                    residues[j] = renumber_later[i].replace_with;
+                    residues[j]->set_prev(renumber_later[i].aa->get_prev());
+                    residues[j]->set_next(renumber_later[i].aa->get_next());
+
+                    break;
+                }
+            }
+        }
+    }
+
+    for (i=0; other->regions[i].start; i++)
+    {
+        regions[i] = other->regions[i];
+    }
+    regions[i].start = 0;
+
+    for (i=1; i<=78; i++) if (other->Ballesteros_Weinstein[i])
+    {
+        set_bw50(i, other->Ballesteros_Weinstein[i]);
     }
 
     return num_applied;

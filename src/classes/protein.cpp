@@ -4082,7 +4082,7 @@ BallesterosWeinstein Protein::get_bw_from_resno(int resno)
 
 int Protein::replace_side_chains_from_other_protein(Protein* other)
 {
-    int i, j, l, n = other->get_end_resno();
+    int i, j, l, n = other->get_end_resno(), num_applied = 0;
 
     for (i=1; i<=n; i++)
     {
@@ -4107,17 +4107,65 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
         
         // TODO: Write a way to copy an amino acid, including all atoms and bonds. For now:
         // Move the source CA to coincide with the dest CA.
+        SCoord motion = dCA->get_location().subtract(sCA->get_location());
+        source->movability = MOV_ALL;
+        source->move(motion, true);
 
         // Rotate the source so that the N coincides with the dest N.
+        LocatedVector lv;
+        Rotation rot = align_points_3d(sN->get_location(), dN->get_location(), sCA->get_location());
+        lv = rot.v;
+        lv.origin = sCA->get_location();
+        source->rotate(lv, rot.a);
 
         // Rotate the source about the N-CA axis so that the C coincides with the dest C.
+        lv = (SCoord)sCA->get_location().subtract(sN->get_location());
+        lv.origin = sCA->get_location();
+        float theta = find_angle_along_vector(sC->get_location(), dC->get_location(), sCA->get_location(), lv);
+        source->rotate(lv, theta);
 
         // Rotate the CA-N bond so that the HN coincides with the dest HN.
+        lv = (SCoord)sN->get_location().subtract(sCA->get_location());
+        theta = find_angle_along_vector(sHN->get_location(), dHN->get_location(), sN->get_location(), lv);
+        Bond* b = sCA->get_bond_between(sN);
+        if (!b) cout << "WARNING - " << *source << ":" << sCA->name << " is not bonded to " << sN->name << endl;
+        b->rotate(theta);
 
         // Rotate the CA-C bond so that the O coincides with the dest O.
+        lv = (SCoord)sC->get_location().subtract(sCA->get_location());
+        theta = find_angle_along_vector(sO->get_location(), dO->get_location(), sC->get_location(), lv);
+        b = sCA->get_bond_between(sC);
+        if (!b) cout << "WARNING - " << *source << ":" << sCA->name << " is not bonded to " << sC->name << endl;
+        b->rotate(theta);
 
         // Replace the dest residue with the source residue and delete the source residue from the other protein.
-
         // Repoint the source residue's prevaa and nextaa, as well as those of its neighbors.
+        for (j=0; residues[j]; j++)
+        {
+            if (residues[j] == dest)
+            {
+                residues[j] = source;
+                source->set_prev(dest->get_prev());
+                source->set_next(dest->get_next());
+
+                break;
+            }
+        }
+
+        for (j=0; other->residues[j]; j++)
+        {
+            if (other->residues[j] == source)
+            {
+                for (l=j+1; other->residues[l-1]; l++)
+                {
+                    other->residues[l-1] = other->residues[l];
+                }
+                break;
+            }
+        }
+
+        num_applied++;
     }
+
+    return num_applied;
 }

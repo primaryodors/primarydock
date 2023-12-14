@@ -1,0 +1,4 @@
+
+LOAD "pdbs/OR1/OR1A1.upright.pdb"
+SIDEREPL "pdbs/OR1/OR1A2.upright.pdb"
+SAVE "tmp/siderepl.test.pdb"

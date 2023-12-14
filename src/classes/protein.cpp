@@ -4090,9 +4090,12 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
         if (!source) continue;
         BallesterosWeinstein bw = other->get_bw_from_resno(i);
         if (!bw.helix_no) continue;
+        if (get_bw50(bw.helix_no) < 1) continue;
         AminoAcid* dest = get_residue(bw);
         if (!dest) continue;
         if (source->get_aa_definition() == dest->get_aa_definition()) continue;
+
+        cout << *source << " -> " << *dest << endl;
 
         Atom *sN = source->get_atom("N"),
             *sHN = source->HN_or_substitute(),

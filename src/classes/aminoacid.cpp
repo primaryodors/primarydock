@@ -1529,7 +1529,7 @@ void AminoAcid::set_prev(AminoAcid* aa)
     if (!aa->residue_no) aa->residue_no = this->residue_no - 1;
     else if (aa->residue_no >= this->residue_no) return;
 
-    prev_aa->next_aa = nullptr;
+    if (prev_aa) prev_aa->next_aa = nullptr;
     prev_aa = aa;
     aa->next_aa = this;
 }
@@ -1540,7 +1540,7 @@ void AminoAcid::set_next(AminoAcid* aa)
     if (!aa->residue_no) aa->residue_no = this->residue_no + 1;
     else if (aa->residue_no <= this->residue_no) return;
 
-    next_aa->prev_aa = nullptr;
+    if (next_aa) next_aa->prev_aa = nullptr;
     next_aa = aa;
     aa->prev_aa = this;
 }

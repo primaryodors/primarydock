@@ -636,7 +636,7 @@ int Protein::load_pdb(FILE* is, int rno, char chain)
     Atom* a;
 
     if (residues) delete[] residues;
-    if (sequence) delete sequence;
+    if (sequence) delete[] sequence;
     if (ca) delete[] ca;
     // if (res_reach) delete res_reach;         // This was causing a segfault.
     if (metals) delete[] metals;

@@ -691,7 +691,6 @@ float Atom::is_bonded_to(Atom* lbtom)
         {
             if (bonded_to[i].btom == lbtom) return bonded_to[i].cardinality;
         }
-        else bonded_to[i].btom = nullptr;
     }
     return 0;
 }
@@ -1192,6 +1191,7 @@ void Atom::dump_array(Atom** aarr)
 
 Bond* Atom::get_bond_by_idx(int bidx)
 {
+    if (bidx<0 || bidx >= abs(geometry)) return nullptr;
     return &bonded_to[bidx];
 }
 
@@ -1518,7 +1518,7 @@ void Bond::swing(SCoord newdir)
 
 SCoord* Atom::get_basic_geometry()
 {
-    SCoord* retval = new SCoord[abs(geometry)+2];
+    SCoord* retval = new SCoord[abs(geometry)+8];
 
     int i, j;
     float x, y, z;

@@ -4095,7 +4095,7 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
         if (!dest) continue;
         if (source->get_aa_definition() == dest->get_aa_definition()) continue;
 
-        cout << *source << " -> " << *dest << endl;
+        // cout << *source << " -> " << *dest << endl;
 
         Atom *sN = source->get_atom("N"),
             *sHN = source->HN_or_substitute(),
@@ -4107,6 +4107,8 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
             *dCA = dest->get_atom("CA"),
             *dC  = dest->get_atom("C"),
             *dO  = dest->get_atom("O");
+        
+        if (!sN || !sHN || !sCA || !sC || !sO || !dN || !dHN || !dCA || !dC || !dO) continue;
         
         // TODO: Write a way to copy an amino acid, including all atoms and bonds. For now:
         // Move the source CA to coincide with the dest CA.

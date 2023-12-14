@@ -684,9 +684,15 @@ float Atom::is_bonded_to(Atom* lbtom)
     if (!bonded_to) return 0;
     int i;
     for (i=0; i<geometry; i++)
-        if (bonded_to[i].btom)
-            if (bonded_to[i].btom == lbtom)
-                return bonded_to[i].cardinality;
+    {
+        if (bonded_to[i].btom
+            && abs(reinterpret_cast<long>(bonded_to[i].btom) - reinterpret_cast<long>(bonded_to)) < 33554432
+            && bonded_to[i].btom->get_Z() > 0 && bonded_to[i].btom->get_Z() <= 118)
+        {
+            if (bonded_to[i].btom == lbtom) return bonded_to[i].cardinality;
+        }
+        else bonded_to[i].btom = nullptr;
+    }
     return 0;
 }
 

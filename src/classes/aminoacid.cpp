@@ -1529,7 +1529,12 @@ void AminoAcid::set_prev(AminoAcid* aa)
     if (!aa->residue_no) aa->residue_no = this->residue_no - 1;
     else if (aa->residue_no >= this->residue_no) return;
 
-    if (prev_aa) prev_aa->next_aa = nullptr;
+    if (prev_aa)
+    {
+        prev_aa->next_aa = nullptr;
+        Atom *a = prev_aa->get_atom("C"), *b = get_atom("N");
+        if (a && b && a->is_bonded_to(b)) a->unbond(b);
+    }
     prev_aa = aa;
     aa->next_aa = this;
 }
@@ -1540,7 +1545,12 @@ void AminoAcid::set_next(AminoAcid* aa)
     if (!aa->residue_no) aa->residue_no = this->residue_no + 1;
     else if (aa->residue_no <= this->residue_no) return;
 
-    if (next_aa) next_aa->prev_aa = nullptr;
+    if (next_aa)
+    {
+        next_aa->prev_aa = nullptr;
+        Atom *a = next_aa->get_atom("N"), *b = get_atom("C");
+        if (a && b && a->is_bonded_to(b)) a->unbond(b);
+    }
     next_aa = aa;
     aa->prev_aa = this;
 }

@@ -4105,6 +4105,19 @@ int Protein::replace_side_chains_from_other_protein(Protein* other)
             *dC  = dest->get_atom("C"),
             *dO  = dest->get_atom("O");
         
-        //
+        // TODO: Write a way to copy an amino acid, including all atoms and bonds. For now:
+        // Move the source CA to coincide with the dest CA.
+
+        // Rotate the source so that the N coincides with the dest N.
+
+        // Rotate the source about the N-CA axis so that the C coincides with the dest C.
+
+        // Rotate the CA-N bond so that the HN coincides with the dest HN.
+
+        // Rotate the CA-C bond so that the O coincides with the dest O.
+
+        // Replace the dest residue with the source residue and delete the source residue from the other protein.
+
+        // Repoint the source residue's prevaa and nextaa, as well as those of its neighbors.
     }
 }

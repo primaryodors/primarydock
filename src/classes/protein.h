@@ -29,6 +29,7 @@ class BallesterosWeinstein
     int member_no = 0;
 
     BallesterosWeinstein() { ; }
+    BallesterosWeinstein(int b, int w) { helix_no = b; member_no = w; }
     BallesterosWeinstein(const char* fromstr) { this->from_string(fromstr); }
 
     void from_string(const char* inpstr);
@@ -86,6 +87,7 @@ public:
     AminoAcid* get_residue(BallesterosWeinstein bw);
     AminoAcid* get_residue_bw(int helixno, int bwno);
     AminoAcid* get_residue_bw(const char* bwno);
+    BallesterosWeinstein get_bw_from_resno(int resno);
     Region get_region(std::string name);
     const Region* get_regions() { return regions; }
     int get_region_end(std::string name);
@@ -175,6 +177,7 @@ public:
     void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);
     void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
+    int replace_side_chains_from_other_protein(Protein* other);
 
     int* mcoord_resnos = NULL;
 

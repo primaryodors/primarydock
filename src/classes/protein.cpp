@@ -4055,3 +4055,56 @@ void Protein::region_optimal_positioning(int sr, int er, SCoord* x, Rotation* r,
     // if (divisor) x->r /= divisor;
     *r = align_points_3d(sum_pt, sum_aln, Point(0,0,0));
 }
+
+BallesterosWeinstein Protein::get_bw_from_resno(int resno)
+{
+    int i, b=0, w=0;
+
+    i=1;
+    do
+    {
+        int j = this->get_bw50(i);
+        if (j<0) continue;
+
+        int x = 50 + resno-j;
+        if (!w || abs(x-50) < abs(w-50))
+        {
+            w = x;
+            b = i;
+        }
+
+        if (i > 10) i %= 10;
+        else i = i*10 + i+1;
+    } while (i != 8);
+
+    return BallesterosWeinstein(b, w);
+}
+
+int Protein::replace_side_chains_from_other_protein(Protein* other)
+{
+    int i, j, l, n = other->get_end_resno();
+
+    for (i=1; i<=n; i++)
+    {
+        AminoAcid* source = other->get_residue(i);
+        if (!source) continue;
+        BallesterosWeinstein bw = other->get_bw_from_resno(i);
+        if (!bw.helix_no) continue;
+        AminoAcid* dest = get_residue(bw);
+        if (!dest) continue;
+        if (source->get_aa_definition() == dest->get_aa_definition()) continue;
+
+        Atom *sN = source->get_atom("N"),
+            *sHN = source->HN_or_substitute(),
+            *sCA = source->get_atom("CA"),
+            *sC  = source->get_atom("C"),
+            *sO  = source->get_atom("O"),
+            *dN  = dest->get_atom("N"),
+            *dHN = dest->HN_or_substitute(),
+            *dCA = dest->get_atom("CA"),
+            *dC  = dest->get_atom("C"),
+            *dO  = dest->get_atom("O");
+        
+        //
+    }
+}

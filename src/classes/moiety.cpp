@@ -14,6 +14,12 @@ int Moiety::contained_by(Molecule* mol, Atom** out_matches)
         if (!a) break;
         if (a->is_backbone) continue;
 
+        for (j=0; j<molsize; j++)
+        {
+            Atom* b = mol->get_atom(j);
+            if (b) b->used = false;
+        }
+
         if (j = does_atom_match(a, out_matches + l))
         {
             #if _dbg_moieties
@@ -73,6 +79,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
     Atom* dud_atoms[32];
     int num_duds = 0;
     int atoms_used = 0;
+    int num_numbers = 0;
 
     for (iter=0; iter<10; iter++)
     {
@@ -86,6 +93,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
         buffer[1] = 0;
         if (!atom_matches_string(cursor[parens], buffer)) return 0;
         out_matches[atoms_used++] = cursor[parens];
+        cursor[parens]->used = true;
 
         for (i=1; i<n; i++)
         {
@@ -122,11 +130,13 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
                     }
 
                     numbered[c-'0'] = nullptr;
+                    num_numbers--;
                     continue;
                 }
                 else
                 {
                     numbered[c-'0'] = cursor[parens];
+                    num_numbers++;
                     continue;
                 }
             }
@@ -168,6 +178,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
             {
                 if (!b[j]) continue;
                 if (!b[j]->btom) continue;
+                if (b[j]->btom->used) continue;
                 bool used = false;
                 for (l=0; l<atoms_used; l++) if (out_matches[l] == b[j]->btom) used = true;
                 for (l=0; l<num_duds; l++) if (dud_atoms[l] == b[j]->btom) used = true;
@@ -187,6 +198,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
                     // cout << "Good!" << endl;
                     cursor[parens] = b[j]->btom;
                     out_matches[atoms_used++] = b[j]->btom;
+                    b[j]->btom->used = true;
                     break;
                 }
             }
@@ -203,6 +215,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
         if (atoms_used) break;
     }
     out_matches[atoms_used] = nullptr;
+    if (num_numbers) return 0;
     // cout << "Result: " << atoms_used << endl;
     return atoms_used;
 }

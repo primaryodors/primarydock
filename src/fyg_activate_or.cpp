@@ -263,6 +263,7 @@ int main(int argc, char** argv)
 
     AminoAcid *aa4x49 = p.get_residue_bw("4.49");
     AminoAcid *aa4x60 = p.get_residue_bw("4.60");
+    AminoAcid *aa4x64 = p.get_residue_bw("4.64");
 
     AminoAcid *aa45x51 = p.get_residue_bw("45.51");
     AminoAcid *aa45x52 = p.get_residue_bw("45.52");
@@ -270,6 +271,7 @@ int main(int argc, char** argv)
     AminoAcid *aa45x54 = p.get_residue_bw("45.54");
 
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
+    AminoAcid *aa5x35 = p.get_residue_bw("5.35");
     AminoAcid *aa5x47 = p.get_residue_bw("5.47");
     AminoAcid *aa5x50 = p.get_residue_bw("5.50");
     AminoAcid *aa5x51 = p.get_residue_bw("5.51");
@@ -468,6 +470,10 @@ int main(int argc, char** argv)
         rock6_dir = aa4x49->get_CA_location().subtract(aa6x55->get_CA_location());
         aa6x59->conform_atom_to_location("NE", aa6x59->get_CA_location().add(rock6_dir));
         exr2_bend = true;
+
+        pt = aa4x64->get_CA_location().add(aa5x35->get_CA_location());
+        pt.multiply(0.5);
+        aa45x52->conform_atom_to_location(aa45x52->get_reach_atom()->name, pt);
     }
 
 
@@ -494,7 +500,7 @@ int main(int argc, char** argv)
         dyn.type = dyn_wind;
         dyn.start_resno = BallesterosWeinstein("6.56");
         dyn.end_resno = BallesterosWeinstein("6.60");
-        dyn.bias = -18;
+        dyn.bias = -13.5; // -18;     // The greater unwind brings R6.55 too deep into the binding pocket.
         dyn.apply_absolute(1);
 
         cout << "Performing rock6..." << endl;

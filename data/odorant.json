@@ -10783,7 +10783,8 @@
     },
     "5275978d29dfd72a5698f468f3a64906":
     {
-        "full_name": "aldehyde C-9",
+        "full_name": "nonanal",
+        "name1": "aldehyde C-9",
         "iupac": "nonanal",
         "smiles": "CCCCCCCCC=O",
         "aroma":
@@ -13874,8 +13875,9 @@
     },
     "66f5442bbfde5b89a686df5fe8b80985":
     {
+        "full_name": "decanal",
+        "name1": "aldehyde C-10",
         "iupac": "decanal",
-        "full_name": "aldehyde C-10",
         "smiles": "CCCCCCCCCC=O",
         "aroma":
         {
@@ -20351,7 +20353,8 @@
     },
     "90ba0a98060f887bac95703791beebf8":
     {
-        "full_name": "aldehyde C-8",
+        "full_name": "octanal",
+        "name1": "aldehyde C-8",
         "iupac": "octanal",
         "smiles": "CCCCCCCC=O",
         "aroma":
@@ -22728,7 +22731,8 @@
     },
     "a4ab9878b90e5cc5ece9d53bff1b3703":
     {
-        "full_name": "aldehyde MNA",
+        "full_name": "methyl nonyl acetaldehyde",
+        "name1": "aldehyde MNA",
         "iupac": "2-methylundecanal",
         "smiles": "O=CC(C)CCCCCCCCC",
         "aroma":

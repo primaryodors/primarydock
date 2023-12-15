@@ -1383,6 +1383,7 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         if (!aa) continue;
 
         int resno = aa->get_residue_no();
+        if (resno_already[resno]) continue;
 
         if (addl_resno)
         {
@@ -1417,6 +1418,13 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         Point pt2;
         if (a) pt2 = a->get_location();
         else   pt2 = ligand->get_barycenter();
+
+        if (pt2.get_3d_distance(ca->get_location()) < 4)
+        {
+            reaches_spheroid[sphres++] = aa;
+            resno_already[resno] = true;
+            continue;
+        }
 
         if (cb)
         {
@@ -1460,19 +1468,16 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
 
         if (dir.r <= 1)
         {
-            if (!resno_already[resno])
+            reaches_spheroid[sphres++] = aa;
+            resno_already[resno] = true;
+            #if _DBG_REACHLIG
+            if (debug)
             {
-                reaches_spheroid[sphres++] = aa;
-                resno_already[resno] = true;
-                #if _DBG_REACHLIG
-                if (debug)
-                {
-                    Star s;
-                    s.paa = aa;
-                    *debug << std::hex << s.n << std::dec << " " << flush;
-                }
-                #endif
+                Star s;
+                s.paa = aa;
+                *debug << std::hex << s.n << std::dec << " " << flush;
             }
+            #endif
         }
 
         aa->reset_conformer_momenta();

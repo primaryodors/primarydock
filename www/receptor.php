@@ -260,8 +260,11 @@ function show_dlmenu(e, prot, lig, v)
     $("#vw_iacv_dc_3d")[0].setAttribute("href", "viewer.php?view=dock&prot="+prot+"&odor="+lig+"&mode=inactive");
     $("#dl_json")[0].setAttribute("href", "download.php?obj=json&prot="+prot+"&odor="+lig);
 
-    dlmenu.style.left = `${e.pageX}px`;
-    dlmenu.style.top = `${e.pageY}px`;
+    var x = e.pageX + 5, y = e.pageY;
+    if (y > window.innerHeight - 350) y = window.innerHeight - 350;
+
+    dlmenu.style.left = `${x}px`;
+    dlmenu.style.top = `${y}px`;
 
     $(dlmenu).show();
 }

@@ -4579,6 +4579,11 @@
         },
         "oid": "1d025b490045791da7f288ebcf3fbb37"
     },
+    "1daef48e0166e1ff1c0ab6a294f90a22":
+    {
+        "full_name": "isoamyl_salicylate",
+        "smiles": "O=C(OCCC(C)C)c1ccccc1O"
+    },
     "1ea6d7635c212df4bc2071e35d838f91":
     {
         "full_name": "cyclohexyl salicylate",
@@ -11234,13 +11239,14 @@
         "smiles": "[SiH4]",
         "aroma":
         {
-            "https://en.wikipedia.org/wiki/Silane#cite_note-5":
+            "https:\/\/en.wikipedia.org\/wiki\/Silane#cite_note-5":
             [
                 "sharp",
                 "pungent",
                 "acetic"
             ]
-        }
+        },
+        "oid": "539d1d03f5d142b02bddfb98ec8c7c3c"
     },
     "53c0eb17a8ac0498e4d08eb65800591a":
     {
@@ -18501,6 +18507,12 @@
             }
         },
         "oid": "8405df5160056c2a3a7c26dd38b616fe"
+    },
+    "8491ff7449c0079506fd40c1267e06d8":
+    {
+        "full_name": "ethyl_salicylate",
+        "smiles": "O=C(OCC)c1ccccc1O",
+        "oid": "8491ff7449c0079506fd40c1267e06d8"
     },
     "853853d1fa9f2eff2e3141817aff7748":
     {

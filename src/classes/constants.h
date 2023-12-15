@@ -123,7 +123,7 @@
 #define ignore_double_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 0.5
+#define lmpush 3.0
 #define lmpull 0.3
 #define lmsteps 10
 #define recapture_ejected_ligand 0

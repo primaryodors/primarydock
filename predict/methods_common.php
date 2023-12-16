@@ -568,7 +568,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
         $prediction = make_prediction($outdata);
         $outdata = array_merge($outdata, $prediction);
 
-        if (stream_isatty() && isset($outdata['Predicted']))
+        if (stream_isatty(STDOUT) && isset($outdata['Predicted']))
         {
             $hassox = [];
             exec("which sox", $hassox);

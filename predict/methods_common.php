@@ -612,9 +612,29 @@ function process_dock($metrics_prefix = "", $noclobber = false)
         $oc = count($outdata);
         $prediction = make_prediction($outdata);
         $outdata = array_merge($outdata, $prediction);
+
+        if (stream_isatty(STDOUT) && isset($outdata['Predicted']) && file_exists("predict/soundalert"))
+        {
+            $hassox = [];
+            exec("which sox", $hassox);
+            if (count($hassox))
+            {
+                if (strtolower($outdata['Predicted']) == 'agonist')
+                {
+                    if (strtolower($outdata['Predicted']) == strtolower($actual)) exec("play success.mp3 &");
+                    else if (strtolower($actual) == "(unknown)") exec("play agonist.mp3 &");
+                    else exec("play fail.mp3 &");
+                }
+                else
+                {
+                    if (strtolower($actual) == 'agonist') exec("play fail.mp3 &");
+                    else if (strtolower($actual) == "(unknown)") exec("play non-agonist.mp3 &");
+                    else exec("play success.mp3 &");
+                }
+            }
+        }
     }
     $outdata["Actual"] = $actual;
-
 
     // Reload to prevent overwriting another process' output.
     if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);

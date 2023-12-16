@@ -2613,6 +2613,13 @@ Point AminoAcid::get_CA_location()
     return a->get_location();
 }
 
+Point AminoAcid::get_reach_atom_location()
+{
+    Atom* a = get_reach_atom();
+    if (!a) return get_CA_location();
+    return a->get_location();
+}
+
 void AminoAcid::aamove(SCoord move_amt)
 {
     if (movability < MOV_ALL) return;

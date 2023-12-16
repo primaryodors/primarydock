@@ -752,14 +752,23 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
             aa->priority = true;
         }
 
-        int sz = resnos.size();
+        int sz = resnos.size(), div=0;
         Point foravg[sz + 2];
         for (i=0; i<sz; i++)
         {
+            #if pocketcen_from_reach_atoms
+            AminoAcid* aa = protein->get_residue(resnos[i]);
+            if (aa)
+            {
+                foravg[i] = aa->get_reach_atom_location();
+                div++;
+            }
+            #else
             foravg[i] = protein->get_atom_location(resnos[i], "CA");
+            #endif
         }
 
-        return average_of_points(foravg, sz);
+        return average_of_points(foravg, div?:1);
     }
     else if (!strcmp(words[i], "REL"))
     {

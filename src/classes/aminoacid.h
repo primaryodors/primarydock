@@ -120,6 +120,7 @@ public:
     Atom* next_residue_N();
     Atom* HN_or_substitute();
     Point get_CA_location();
+    Point get_reach_atom_location();
     Point HN_or_substitute_location();
     void establish_internal_clash_baseline();
     void renumber(int new_resno);

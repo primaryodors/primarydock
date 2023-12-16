@@ -13,6 +13,7 @@ $flex = 1;                      // Flexion (0 or 1) for active dock.
 $flxi = 1;                      // Flexion for inactive dock.
 $pose = 10;
 $iter = 50;
+$elim = -0.1;                   // Energy limit for poses. (Not the tailor/spy from the space station.)
 $num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
 
 chdir(__DIR__);
@@ -180,7 +181,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
 POSE $pose
-ELIM 10000
+ELIM $elim
 $flex_constraints
 ITERS $iter
 PROGRESS
@@ -227,7 +228,7 @@ EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
 POSE $pose
-ELIM 10000
+ELIM $elim
 $flex_constraints
 ITERS $iter
 PROGRESS

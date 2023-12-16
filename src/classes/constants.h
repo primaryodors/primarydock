@@ -245,6 +245,7 @@
 // Overwrite the user supplied pocket center with the loneliest point as determined by
 // distances to the nearest residue atoms to the supplied pocket center.
 #define pocketcen_is_loneliest 1
+#define pocketcen_from_reach_atoms 1
 
 // Switches whether the best-binding algorithm is active by default, instead of tumble spheres.
 #define default_bestbind 1

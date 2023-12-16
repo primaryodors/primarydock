@@ -104,7 +104,6 @@ function build_template()
                     $template[$hxno][$metric]["sigma"]
                         + 0.4 * $cryoem["TAAR1"][$hxno][$metric]["sigma"]
                         + 0.6 * $cryoem["mTAAR9"][$hxno][$metric]["sigma"];
-                    }
                 }
             }
         }

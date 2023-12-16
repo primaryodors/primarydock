@@ -67,6 +67,15 @@ itself depending on the CPU temperature.
 You can use the `predict/progress.sh` shell script to monitor the progress of the predictions.
 
 
+# Alert Sounds
+
+If there is a file named `soundalert` in the `predict/` folder, a sound will play on completion of the prediction,
+indicating whether the prediction was correct or not, or in the case of an empirically unknown receptor-ligand pair,
+whether the algorithm predicted an agonist. Playing the sound requires the `sox` package to be installed. To enable
+the alert sounds, simply create a new text file e.g. `echo "y" > predict/soundalert`. To disable the alert sounds,
+simply delete the `predict/soundalert` file.
+
+
 # Writing Your Own Prediction Methods
 
 Until an accurate prediction method exists, we encourage you to write your own prediction methods. You can use the

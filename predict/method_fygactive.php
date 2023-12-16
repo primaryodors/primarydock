@@ -89,9 +89,24 @@ function build_template()
     else if (substr($protid, 0, 2) == "OR")
     {
         $fam = intval(substr($protid, 2, 2));
-        if ($fam >= 50)
+        if ($fam == 51)
         {
             $template = $cryoem["OR51E2"];
+        }
+        else if ($fam == 52)
+        {
+            foreach ($cryoem["OR52"] as $hxno => $metrics)
+            {
+                foreach ($metrics as $metric => $dimensions)
+                {
+                    $template[$hxno][$metric] = $cryoem["OR52"][$hxno][$metric];
+
+                    $template[$hxno][$metric]["sigma"]
+                        + 0.4 * $cryoem["TAAR1"][$hxno][$metric]["sigma"]
+                        + 0.6 * $cryoem["mTAAR9"][$hxno][$metric]["sigma"];
+                    }
+                }
+            }
         }
         else
         {
@@ -101,11 +116,21 @@ function build_template()
                 {
                     foreach (array_keys($dimensions) as $dimension)
                     {
-                        // TODO: Make the proportions dependent on sequence similarity.
-                        $template[$hxno][$metric][$dimension]
-                            = 0.66 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
-                            + 0.25 * $cryoem["mTAAR9"][$hxno][$metric][$dimension]
-                            + 0.09 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
+                        if ($dimension == "sigma")
+                        {
+                            $template[$hxno][$metric][$dimension]
+                                = 0.4 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
+                                + 0.6 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
+                        }
+                        else
+                        {
+                            // TODO: Make the proportions dependent on sequence similarity.
+                            $template[$hxno][$metric][$dimension]
+                                = 0.40 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
+                                + 0.30 * $cryoem["OR52"][$hxno][$metric][$dimension]
+                                + 0.10 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
+                                + 0.20 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
+                        }
                     }
                 }
             }

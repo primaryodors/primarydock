@@ -568,7 +568,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
         $prediction = make_prediction($outdata);
         $outdata = array_merge($outdata, $prediction);
 
-        if (stream_isatty(STDOUT) && isset($outdata['Predicted']))
+        if (stream_isatty(STDOUT) && isset($outdata['Predicted']) && file_exists("predict/soundalert"))
         {
             $hassox = [];
             exec("which sox", $hassox);
@@ -576,15 +576,15 @@ function process_dock($metrics_prefix = "", $noclobber = false)
             {
                 if (strtolower($outdata['Predicted']) == 'agonist')
                 {
-                    if (strtolower($outdata['Predicted']) == strtolower($actual)) exec("play success.mp3");
-                    else if (strtolower($actual) == "(unknown)") exec("play agonist.mp3");
-                    else exec("play fail.mp3");
+                    if (strtolower($outdata['Predicted']) == strtolower($actual)) exec("play success.mp3 &");
+                    else if (strtolower($actual) == "(unknown)") exec("play agonist.mp3 &");
+                    else exec("play fail.mp3 &");
                 }
                 else
                 {
-                    if (strtolower($actual) == 'agonist') exec("play fail.mp3");
-                    else if (strtolower($actual) == "(unknown)") exec("play non-agonist.mp3");
-                    else exec("play success.mp3");
+                    if (strtolower($actual) == 'agonist') exec("play fail.mp3 &");
+                    else if (strtolower($actual) == "(unknown)") exec("play non-agonist.mp3 &");
+                    else exec("play success.mp3 &");
                 }
             }
         }

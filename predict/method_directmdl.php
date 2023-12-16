@@ -25,7 +25,7 @@ prepare_outputs();
 $metrics_to_process =
 [
     "BENERG" => "BindingEnergy",
-    // "BENERG.rgn" => "BindingEnergy.rgn",
+    "BENERG.rgn" => "BindingEnergy.rgn",
     "BEST" => "Pose1"
 ];
 
@@ -35,21 +35,22 @@ function make_prediction($data)
 
     if (isset($data["a_Pose1"]))
     {
-        $ae = floatval(@$data['a_BindingEnergy']);
-        $ie = floatval(@$data["i_BindingEnergy"]);
-        $a1 = floatval( $data['a_Pose1']);
-        $i1 = floatval(@$data['i_Pose1']);
-        if ($a1 < 0 && $a1 < $i1)
+        $ae = min(0, floatval(@$data['a_BindingEnergy']));
+        $ie = min(0, floatval(@$data["i_BindingEnergy"]));
+        $a1 = min(0, floatval( $data['a_Pose1']));
+        $i1 = min(0, floatval(@$data['i_Pose1']));
+        $a6 = min(0, floatval(@$data["a_BindingEnergy.6"]));
+        $i6 = min(0, floatval(@$data["i_BindingEnergy.6"]));
+
+        $ascore = -min(0, $ae - $a6) * $a6 + $a1;
+        $iscore = -min(0, $ie - $i6) * $i6 + $i1;
+
+        if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
             $data['DockScore'] = (min($i1, 0) - $a1) / 2;
         }
-        else if ($ae < 0 && $ae < $ie)
-        {
-            $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($ie, 0) - $ae) / 2;
-        }
-        else if ($a1 < 0 && $a1 > $i1)
+        else if ($i1 < 0 && $iscore < $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
             $data['DockScore'] = (min($i1, 0) - $a1) / 2;

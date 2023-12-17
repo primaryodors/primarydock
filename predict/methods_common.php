@@ -615,9 +615,20 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
         if (stream_isatty(STDOUT) && isset($outdata['Predicted']) && file_exists("predict/soundalert"))
         {
+            $play_sound = true;
+            $sa = explode(",",file_get_contents("predict/soundalert"));
+            if (count($sa) == 2)
+            {
+                $hfrom = intval($sa[0]);
+                $hto = intval($sa[1]);
+                $hnow = intval(date("H"));
+
+                if ($hnow < $hfrom || $hnow > $hto) $play_sound = false;
+            }
+
             $hassox = [];
             exec("which sox", $hassox);
-            if (count($hassox))
+            if ($play_sound && count($hassox))
             {
                 if (strtolower($outdata['Predicted']) == 'agonist')
                 {

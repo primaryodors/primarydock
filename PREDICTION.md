@@ -71,9 +71,13 @@ You can use the `predict/progress.sh` shell script to monitor the progress of th
 
 If there is a file named `soundalert` in the `predict/` folder, a sound will play on completion of the prediction,
 indicating whether the prediction was correct or not, or in the case of an empirically unknown receptor-ligand pair,
-whether the algorithm predicted an agonist. Playing the sound requires the `sox` package to be installed. To enable
-the alert sounds, simply create a new text file e.g. `echo "y" > predict/soundalert`. To disable the alert sounds,
-simply delete the `predict/soundalert` file.
+whether the algorithm predicted an agonist. Playing the sound requires the `sox` package to be installed.
+
+To enable the alert sounds, simply create a new text file e.g. `echo "y" > predict/soundalert`. You can also specify
+a time range to allow the sounds to play, e.g. `echo "7,21" > predict/soundalert` to only allow sounds between 7:00 and
+21:59 local time.
+
+To disable the alert sounds, simply delete the `predict/soundalert` file.
 
 
 # Writing Your Own Prediction Methods

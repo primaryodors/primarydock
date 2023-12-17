@@ -86,10 +86,12 @@ if (@$_REQUEST['next'])
 	
 	foreach (array_keys($prots) as $rcpid)
 	{
-		if ($protid && $protid != $rcpid && !preg_match("/^$protid$/", $rcpid) ) continue;
-		// if (!$protid && $rcpid == 'OR1A1') continue;
+		if ($protid
+            && $protid != $rcpid
+            && !preg_match("/^$protid$/", $rcpid)
+            && (substr($protid, -1) != '*' || substr($rcpid, 0, strlen($protid)-1) != substr($protid, 0, -1) )
+            ) continue;
 		$odorids = array_keys(all_empirical_pairs_for_receptor($rcpid));
-		// shuffle($odorids);
 
 		foreach ($odorids as $oid)
 		{
@@ -99,8 +101,6 @@ if (@$_REQUEST['next'])
 			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
                 ||
                 (   (max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version)
-                    /*&&
-                    !max(@$dock_results[$rcpid][$full_name]['locked'], @$dock_results[$rcpid][$fnnospace]['locked'])*/
                 )
                 )
 			{

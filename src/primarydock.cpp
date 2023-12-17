@@ -764,7 +764,7 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
                 div++;
             }
             #else
-            foravg[i] = protein->get_atom_location(resnos[i], "CA");
+            foravg[div++] = protein->get_atom_location(resnos[i], "CA");
             #endif
         }
 

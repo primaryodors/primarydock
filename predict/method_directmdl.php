@@ -147,10 +147,6 @@ $flxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
-# SOFT 4.53 4.64
-# SOFT 5.50 5.33
-# SOFT 6.48 6.59
-
 SEARCH $search
 POSE $pose
 ELIM 10000

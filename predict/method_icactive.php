@@ -157,10 +157,6 @@ $flxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
-# SOFT 4.53 4.64
-# SOFT 5.50 5.33
-# SOFT 6.48 6.59
-
 SEARCH $search
 POSE 10
 ELIM 5000
@@ -178,10 +174,3 @@ OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
 heredoc;
 
 $poses = (!@$_REQUEST["softonly"]) ? process_dock("a") : 0;
-
-// This has not borne fruit with ionones in OR51E2.
-if (false) // !$poses && !@$_REQUEST["nosoft"])
-{
-    $configf = str_replace("# SOFT ", "SOFT ", $configf);
-    process_dock("a");
-}

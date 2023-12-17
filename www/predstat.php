@@ -41,3 +41,10 @@ include("header.php");
 
 <label for="pa">Prediction Accuracy:</label><br>
 <progress id="pa" value="<?php echo $percent; ?>" max="100" style="width: 90%;"></progress> <?php echo $percent; ?>%
+
+<script language="JavaScript">
+window.setTimeout(function()
+{
+    window.location.reload();
+}, 5*60*1000);
+</script>

@@ -32,7 +32,8 @@ foreach ($dr as $rcpid => $ligands)
     }
 }
 
-$percent = round(100.0 * $corr / ($corr+$fail), 2);
+if (!$corr && !$fail) $percent = 0;
+else $percent = round(100.0 * $corr / ($corr+$fail), 2);
 
 $page_title = "$percent% Prediction Status";
 include("header.php");

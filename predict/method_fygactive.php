@@ -13,7 +13,7 @@ $flex = 1;                      // Flexion (0 or 1) for active dock.
 $flxi = 1;                      // Flexion for inactive dock.
 $pose = 10;
 $iter = 50;
-$elim = -0.1;                   // Energy limit for poses. (Not the tailor/spy from the space station.)
+$elim = 1e4;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
 $num_std_devs = 1.0;            // How many standard deviations to move the helices for active clash compensation.
 
 chdir(__DIR__);
@@ -27,7 +27,7 @@ prepare_outputs();
 $metrics_to_process =
 [
     "BENERG" => "BindingEnergy",
-    // "BENERG.rgn" => "BindingEnergy.rgn",
+    "BENERG.rgn" => "BindingEnergy.rgn",
     "BEST" => "Pose1"
 ];
 

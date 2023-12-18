@@ -4005,7 +4005,9 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
         if (!l) initclash = clash;
         if (clash > clash_limit_per_aa+eca && clash > 1.1*initclash)
         {
-            // cout << "At " << ((result+increment)*fiftyseven) << "deg, " << debug_msg << "." << endl;
+            #if _dbg_can_rotate
+            cout << "At " << ((result+increment)*fiftyseven) << "deg, " << debug_msg << "." << endl;
+            #endif
             rotate_piece(startres, endres, axis.origin, axis, -increment);
             increment *= 0.81;
         }

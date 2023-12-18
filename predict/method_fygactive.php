@@ -180,6 +180,7 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
     $cmd = "bin/fyg_activate_or $args";
     echo "$cmd\n";
     passthru($cmd);
+    exec("bin/pepteditor predict/model_accuracy.pepd");
 }
 
 $flex_constraints = "";

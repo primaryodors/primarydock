@@ -3895,6 +3895,7 @@ float Protein::region_can_move(int startres, int endres, SCoord direction, bool 
                 if (j >= startres-7 && j <= endres+7) continue;
                 if (j >= isr && j <= ier) continue;
                 aa2 = get_residue(j);
+                if (!aa2) continue;
                 if (!aa2->can_reach(aa1)) continue;
                 float c = aa1->get_intermol_clashes(aa2);
                 if (c > clash)
@@ -3971,6 +3972,7 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
                 if (j >= startres-7 && j <= endres+7) continue;
                 if (j >= isr && j <= ier) continue;
                 aa2 = get_residue(j);
+                if (!aa2) continue;
                 if (!aa2->can_reach(aa1)) continue;
 
                 float c = aa1->get_intermol_clashes(aa2);

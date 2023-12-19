@@ -123,7 +123,8 @@
         {
             "O-":
             {
-                "inactive_pocket": "6.59"
+                "inactive_pocket": "6.59",
+                "stcr": "3.33 4.57 6.59"
             }
         }
     },
@@ -135,7 +136,8 @@
         {
             "O-":
             {
-                "inactive_pocket": "6.59"
+                "inactive_pocket": "6.59",
+                "stcr": "3.33 6.59"
             }
         }
     },
@@ -146,10 +148,10 @@
         {
             "O-":
             {
-                "inactive_pocket": "6.59"
+                "inactive_pocket": "6.59",
+                "stcr": "3.33 4.57 6.59"
             }
         },
-        "inactive_pocket": "6.59",
         "stcr": "3.33 4.57",
         "size": "3.5 3.5 3.5",
         "reference": "https:\/\/doi.org\/10.1101\/2022.12.20.520951"

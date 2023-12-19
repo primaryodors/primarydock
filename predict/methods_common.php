@@ -263,7 +263,6 @@ function prepare_outputs()
         }
         else if (substr($fam, 0, 4) == "TAAR")
         {
-            die("There is not yet an internal contacts activation app for TAARs.\n");
             $cenres_active = $cenres_inactive = "CEN RES 3.32 3.37 5.43 6.48 7.43";
         }
         else die("Unsupported receptor family.\n");

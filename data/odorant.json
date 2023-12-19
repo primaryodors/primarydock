@@ -697,8 +697,18 @@
     },
     "0301e2bc8f625dcc3011f979ceb3504c":
     {
-        "full_name": "3-hydroxy-3-methyl hexanoic acid",
+        "full_name": "3-hydroxy-3-methylhexanoic acid",
         "smiles": "[O-]C(=O)CC(C)(O)CCC",
+        "aroma":
+        {
+            "http:\/\/www.leffingwell.com\/chirality\/3-hydroxy-3-methylhexanoicacid.htm":
+            [
+                "cumin",
+                "sweaty",
+                "spicy",
+                "animalic"
+            ]
+        },
         "activity":
         {
             "https:\/\/patents.google.com\/patent\/JP6422665B2\/en":
@@ -708,6 +718,15 @@
                     "type": "wa",
                     "ec50": "-4",
                     "adjusted_curve_top": "1.4000000208616"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR52E8":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.3",
+                    "ec50": "-3.98"
                 }
             }
         },
@@ -2813,6 +2832,24 @@
             }
         },
         "oid": "0e1edf46ec9b9afeeb5a9caa1d03f60a"
+    },
+    "0e25e9dd050fcede9f2da8031ac1a5ca":
+    {
+        "full_name": "3-methylhexanoic acid",
+        "smiles": "CCCC(C)CC(=O)[O-]",
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR51I2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "7.6",
+                    "ec50": "-3.08"
+                }
+            }
+        },
+        "oid": "0e25e9dd050fcede9f2da8031ac1a5ca"
     },
     "0e2b7f9c8fcd5b25bd83c6dd0499802b":
     {
@@ -6110,6 +6147,21 @@
                     "type": "na",
                     "adjusted_curve_top": "0"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR52B2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.2",
+                    "ec50": "-4.28"
+                },
+                "OR56A5":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "5.3",
+                    "ec50": "-4.4"
+                }
             }
         },
         "oid": "28c1256869a1b671970feda9b3a06c31"
@@ -6421,6 +6473,27 @@
                 {
                     "type": "na",
                     "adjusted_curve_top": "0"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR51I2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "6.0",
+                    "ec50": "-3.73"
+                },
+                "OR52B2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.37",
+                    "ec50": "-3.83"
+                },
+                "OR56A5":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.9",
+                    "ec50": "-2.83"
                 }
             }
         },
@@ -7883,6 +7956,21 @@
                     "type": "wa",
                     "adjusted_curve_top": "0.4"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR52L1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.6",
+                    "ec50": "-3.05"
+                },
+                "OR51I2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "7.8",
+                    "ec50": "-4.07"
+                }
             }
         },
         "oid": "34f2927e969be7b997d136ab7873fbac"
@@ -9245,6 +9333,40 @@
             }
         },
         "oid": "4152229d1ebe991be4fa3a219facc6f7"
+    },
+    "4190d40ce5b841371cd6dfd1bb51c2ac":
+    {
+        "full_name": "2-methylhexanoic acid",
+        "smiles": "CCCCC(C)C(=O)[O-]",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "fruity",
+                "cheesy",
+                "oily",
+                "fatty",
+                "lard",
+                "acidic",
+                "chicken",
+                "chicken_fat",
+                "roasted",
+                "savory"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR51I2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "3.0",
+                    "ec50": "-3.41"
+                }
+            }
+        },
+        "oid": "4190d40ce5b841371cd6dfd1bb51c2ac"
     },
     "41ba128c81016cff75b6fb440bf9c302":
     {
@@ -13391,6 +13513,15 @@
                 {
                     "type": "na"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR51I2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "10",
+                    "ec50": "-4.33"
+                }
             }
         },
         "oid": "630d10e253e7d6ee18166807cf6bd6d4"
@@ -13741,6 +13872,15 @@
                     "type": "sa",
                     "ec50": "-4.4",
                     "adjusted_curve_top": "9.0909093618393"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR51I2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "7.9",
+                    "ec50": "-4.17"
                 }
             }
         },
@@ -18937,6 +19077,21 @@
                     "adjusted_curve_top": "0.7",
                     "ec50": "-2.5"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR52E1":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.25",
+                    "ec50": "-4.43"
+                },
+                "OR51I2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "6.1",
+                    "ec50": "-3.61"
+                }
             }
         },
         "oid": "856552991e50ec3120124fb0cb155e93"
@@ -19581,6 +19736,21 @@
                     "type": "na",
                     "adjusted_curve_top": "0"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR52B2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.3",
+                    "ec50": "-4.56"
+                },
+                "OR56A5":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "5",
+                    "ec50": "-3.24"
+                }
             }
         },
         "oid": "8af195107ab4c26419e3aa32c936b524"
@@ -20011,6 +20181,34 @@
             }
         },
         "oid": "8d7e99c73cd5a10adaaf4c9f9a520368"
+    },
+    "8dce98d8045ad83366816ee72eaecaca":
+    {
+        "full_name": "2-methylheptanoic acid",
+        "smiles": "CCCCCC(C)C(=O)[O-]",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "waxy",
+                "green",
+                "cheesy",
+                "sweaty",
+                "buttermilk"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR56A5":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "10",
+                    "ec50": "-3.12"
+                }
+            }
+        }
     },
     "8df44dcfeb1f036aa4ec084a0dc4a5dc":
     {
@@ -23994,6 +24192,21 @@
                     "type": "na",
                     "adjusted_curve_top": "0"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR52B2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "1.2",
+                    "ec50": "-4.08"
+                },
+                "OR56A5":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "7.7",
+                    "ec50": "-4.42"
+                }
             }
         },
         "oid": "ae2fb03b006ca5a141676fa9b7266be0"
@@ -24147,6 +24360,34 @@
             }
         },
         "oid": "afa04033d1d2de19cf3999850099a08b"
+    },
+    "afd5ef2c8a9deab5a58799a633e4416a":
+    {
+        "full_name": "4-ethyloctanoic acid",
+        "smiles": "CCCCC(CC)CCC(=O)[O-]",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "goaty",
+                "lamb",
+                "mutton",
+                "fatty"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR52A5":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "4.9",
+                    "ec50": "-4.52"
+                }
+            }
+        },
+        "oid": "afd5ef2c8a9deab5a58799a633e4416a"
     },
     "b003cb0b50c7bec00513a55c2653cabe":
     {
@@ -25873,6 +26114,15 @@
                     "ec50": "-4.52",
                     "adjusted_curve_top": "5.0000000745058"
                 }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR51I2":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "8.3",
+                    "ec50": "-4.42"
+                }
             }
         },
         "oid": "bfd6d55c31a15054ccded6100bd3b0d6"
@@ -26888,6 +27138,41 @@
             }
         },
         "oid": "c6171874e786d41f2bc4bfeae1aac68c"
+    },
+    "c63d864c72bb0b2ec67e69dd82b03bd3":
+    {
+        "full_name": "undecanoic acid",
+        "smiles": "CCCCCCCCCCC(=O)[O-]",
+        "aroma":
+        {
+            "http:\/\/www.thegoodscentscompany.com":
+            [
+                "waxy",
+                "creamy",
+                "cheesy",
+                "fatty",
+                "coconut"
+            ]
+        },
+        "activity":
+        {
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR52B2":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "2.2",
+                    "ec50": "-4.47"
+                },
+                "OR56A5":
+                {
+                    "type": "sa",
+                    "adjusted_curve_top": "10",
+                    "ec50": "-3.97"
+                }
+            }
+        },
+        "oid": "c63d864c72bb0b2ec67e69dd82b03bd3"
     },
     "c6af06796684a2aca46f79634c4d0de6":
     {
@@ -34915,6 +35200,21 @@
                 {
                     "type": "wa",
                     "adjusted_curve_top": "1"
+                }
+            },
+            "https:\/\/patents.google.com\/patent\/WO2014191047A1\/en":
+            {
+                "OR52B2":
+                {
+                    "type": "wa",
+                    "adjusted_curve_top": "0.9",
+                    "ec50": "-3.83"
+                },
+                "OR56A5":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "5.7",
+                    "ec50": "-4.1"
                 }
             }
         },

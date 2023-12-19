@@ -201,6 +201,8 @@ $mcoord
 $atomto
 $stcr
 $flxr
+$istcr
+$iflxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
@@ -244,6 +246,8 @@ $mcoord
 $atomto
 $stcr
 $flxr
+$astcr
+$aflxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 

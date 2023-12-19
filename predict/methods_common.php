@@ -141,7 +141,8 @@ $outfname = "output.dock";
 function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname;
-    global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $atomto, $stcr, $flxr, $mcoord, $mbp;
+    global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search;
+    global $atomto, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
     chdir(__DIR__);
     chdir("..");
@@ -164,8 +165,12 @@ function prepare_outputs()
     $atomto = [];
     $stcr = "";
     $flxr = "";
+    $astcr = "";
+    $aflxr = "";
+    $istcr = "";
+    $iflxr = "";
     $mcoord = "";
-    
+
     $mbp = false;                       // Matched binding pocket.
     
     if (isset($binding_pockets[$protid])) $mbp = $binding_pockets[$protid];
@@ -222,8 +227,12 @@ function prepare_outputs()
             if (!is_array($mbp['mcoord'])) $mbp['mcoord'] = [$mbp['mcoord']];
             foreach ($mbp['mcoord'] as $mc) $mcoord .= "MCOORD $mc\n";
         }
-        if (isset($mbp["stcr"])) $stcr = "STCR {$mbp["stcr"]}";
-        if (isset($mbp["flxr"])) $flxr = "FLXR {$mbp["flxr"]}";
+        if (isset($mbp["stcr" ])) $stcr  = "STCR {$mbp["stcr"]}";
+        if (isset($mbp["astcr"])) $astcr = "STCR {$mbp["astcr"]}";
+        if (isset($mbp["istcr"])) $istcr = "STCR {$mbp["istcr"]}";
+        if (isset($mbp["flxr" ])) $flxr  = "FLXR {$mbp["flxr"]}";
+        if (isset($mbp["aflxr"])) $aflxr = "FLXR {$mbp["aflxr"]}";
+        if (isset($mbp["iflxr"])) $iflxr = "FLXR {$mbp["iflxr"]}";
     
         if (isset($mbp["atomto"]))
         {
@@ -238,9 +247,12 @@ function prepare_outputs()
     {
         $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
     }
-    else if ($mbp && isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))
+    if ($mbp && isset($mbp["active_pocket"]))
     {
         $cenres_active = "CEN RES {$mbp["active_pocket"]}";
+    }
+    if ($mbp && isset($mbp["inactive_pocket"]))
+    {
         $cenres_inactive = "CEN RES {$mbp["inactive_pocket"]}";
     }
     else

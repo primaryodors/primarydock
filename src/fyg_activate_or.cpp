@@ -480,6 +480,7 @@ int main(int argc, char** argv)
         pt = aa4x64->get_CA_location().add(aa5x35->get_CA_location());
         pt.multiply(0.5);
         aa45x52->conform_atom_to_location(aa45x52->get_reach_atom()->name, pt);
+        aa45x52->movability = MOV_PINNED;
     }
 
 

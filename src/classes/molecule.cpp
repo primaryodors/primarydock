@@ -1327,7 +1327,7 @@ void Molecule::find_paths()
     cout << "Searching for paths..." << endl;
     #endif
 
-    int h, i, j, k, l, m, n = 0, p, limit;
+    int h, i, j, k, l, m, n = 0, p, q, limit;
     Bond* b[16];
     for (i=0; atoms[i]; i++)
     {
@@ -1352,6 +1352,7 @@ void Molecule::find_paths()
         if (b[i]->btom->get_Z() < 2) continue;
         if (b[i]->btom->residue && b[i]->btom->residue != a->residue) continue;
         paths[n] = new Atom*[atcount];
+        for (q=0; q<atcount; q++) paths[n][q] = nullptr;
         paths[n][0] = a;
         paths[n][1] = b[i]->btom;
         paths[n][2] = nullptr;
@@ -1413,6 +1414,7 @@ void Molecule::find_paths()
                 {
                     if (paths[n]) delete[] paths[n];
                     paths[n] = new Atom*[atcount];
+                    for (q=0; q<atcount; q++) paths[n][q] = nullptr;
                     copy_path(i, n);
                     paths[n][m] = b[j]->btom;
                     paths[n][m+1] = nullptr;

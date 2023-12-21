@@ -50,6 +50,7 @@ class AtomGroup
 
     int heavy_atom_count();
     static std::vector<std::shared_ptr<AtomGroup>> get_potential_ligand_groups(Molecule* mol, bool separate_metal_coord = false);
+    void remove_duplicates();
 
     protected:
     Molecule* ligand = nullptr;

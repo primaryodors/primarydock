@@ -119,7 +119,7 @@ foreach ($deviation as $prot => $helices)
 
 $ofname = "data/cryoem_motions.json";
 $fp = fopen($ofname, "wb");
-if (!$fp) die("Failed to open $ofname for writing.");
+if (!$fp) die("Failed to open $ofname for writing.\n");
 fwrite($fp, json_encode_pretty($output));
 fclose($fp);
 echo "Wrote $ofname.\n";

@@ -66,11 +66,11 @@ if (@$_REQUEST['simul']) $max_simultaneous_docks = intval($_REQUEST['simul']) ?:
 
 if (@$_REQUEST['next'])
 {
-    $cmd = "ps -ef | grep ':[0-9][0-9] bin/obabel' | grep -v grep";
+    $cmd = "ps -ef | grep -E ':[0-9][0-9] bin/obabel' | grep -v grep";
 	exec($cmd, $results);
     if (count($results)) exit;
 
-	$cmd = "ps -ef | grep ':[0-9][0-9] bin/(ic|fyg)_activate_or' | grep -v grep";
+	$cmd = "ps -ef | grep -E ':[0-9][0-9] bin/(ic|fyg)_activate_or' | grep -v grep";
 	exec($cmd, $results);
     if (count($results)) exit;
 
@@ -84,7 +84,11 @@ if (@$_REQUEST['next'])
 	
 	foreach (array_keys($prots) as $rcpid)
 	{
-		if ($protid && $protid != $rcpid && !preg_match("/^$protid$/", $rcpid) ) continue;
+		if ($protid
+            && $protid != $rcpid
+            && !preg_match("/^$protid$/", $rcpid)
+            && (substr($protid, -1) != '*' || substr($rcpid, 0, strlen($protid)-1) != substr($protid, 0, -1) )
+            ) continue;
 		// if (!$protid && $rcpid == 'OR1A1') continue;
 		$odorids = array_keys(all_empirical_pairs_for_receptor($rcpid));
 		// shuffle($odorids);
@@ -570,9 +574,20 @@ function process_dock($metrics_prefix = "", $noclobber = false)
 
         if (stream_isatty(STDOUT) && isset($outdata['Predicted']) && file_exists("predict/soundalert"))
         {
+            $play_sound = true;
+            $sa = explode(",",file_get_contents("predict/soundalert"));
+            if (count($sa) == 2)
+            {
+                $hfrom = intval($sa[0]);
+                $hto = intval($sa[1]);
+                $hnow = intval(date("H"));
+
+                if ($hnow < $hfrom || $hnow > $hto) $play_sound = false;
+            }
+
             $hassox = [];
             exec("which sox", $hassox);
-            if (count($hassox))
+            if ($play_sound && count($hassox))
             {
                 if (strtolower($outdata['Predicted']) == 'agonist')
                 {

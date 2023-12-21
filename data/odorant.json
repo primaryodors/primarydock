@@ -4616,6 +4616,11 @@
         },
         "oid": "1d025b490045791da7f288ebcf3fbb37"
     },
+    "1daef48e0166e1ff1c0ab6a294f90a22":
+    {
+        "full_name": "isoamyl_salicylate",
+        "smiles": "O=C(OCCC(C)C)c1ccccc1O"
+    },
     "1ea6d7635c212df4bc2071e35d838f91":
     {
         "full_name": "cyclohexyl salicylate",
@@ -10900,7 +10905,8 @@
     },
     "5275978d29dfd72a5698f468f3a64906":
     {
-        "full_name": "aldehyde C-9",
+        "full_name": "nonanal",
+        "name1": "aldehyde C-9",
         "iupac": "nonanal",
         "smiles": "CCCCCCCCC=O",
         "aroma":
@@ -14009,8 +14015,9 @@
     },
     "66f5442bbfde5b89a686df5fe8b80985":
     {
+        "full_name": "decanal",
+        "name1": "aldehyde C-10",
         "iupac": "decanal",
-        "full_name": "aldehyde C-10",
         "smiles": "CCCCCCCCCC=O",
         "aroma":
         {
@@ -18643,6 +18650,12 @@
         },
         "oid": "8405df5160056c2a3a7c26dd38b616fe"
     },
+    "8491ff7449c0079506fd40c1267e06d8":
+    {
+        "full_name": "ethyl_salicylate",
+        "smiles": "O=C(OCC)c1ccccc1O",
+        "oid": "8491ff7449c0079506fd40c1267e06d8"
+    },
     "853853d1fa9f2eff2e3141817aff7748":
     {
         "full_name": "hexyl octanoate",
@@ -20538,7 +20551,8 @@
     },
     "90ba0a98060f887bac95703791beebf8":
     {
-        "full_name": "aldehyde C-8",
+        "full_name": "octanal",
+        "name1": "aldehyde C-8",
         "iupac": "octanal",
         "smiles": "CCCCCCCC=O",
         "aroma":
@@ -22915,7 +22929,8 @@
     },
     "a4ab9878b90e5cc5ece9d53bff1b3703":
     {
-        "full_name": "aldehyde MNA",
+        "full_name": "methyl nonyl acetaldehyde",
+        "name1": "aldehyde MNA",
         "iupac": "2-methylundecanal",
         "smiles": "O=CC(C)CCCCCCCCC",
         "aroma":

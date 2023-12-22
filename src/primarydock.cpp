@@ -71,6 +71,8 @@ Protein* ptplref;
 int seql = 0;
 int mcoord_resno[256];
 int addl_resno[256];
+const Region* regions;
+SCoord region_clashes[85][3];
 Molecule* ligand;
 Molecule** waters = nullptr;
 Molecule** owaters = nullptr;
@@ -750,14 +752,23 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
             aa->priority = true;
         }
 
-        int sz = resnos.size();
+        int sz = resnos.size(), div=0;
         Point foravg[sz + 2];
         for (i=0; i<sz; i++)
         {
-            foravg[i] = protein->get_atom_location(resnos[i], "CA");
+            #if pocketcen_from_reach_atoms
+            AminoAcid* aa = protein->get_residue(resnos[i]);
+            if (aa)
+            {
+                foravg[i] = aa->get_reach_atom_location();
+                div++;
+            }
+            #else
+            foravg[div++] = protein->get_atom_location(resnos[i], "CA");
+            #endif
         }
 
-        return average_of_points(foravg, sz);
+        return average_of_points(foravg, div?:1);
     }
     else if (!strcmp(words[i], "REL"))
     {
@@ -2278,6 +2289,17 @@ _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
     Point nodecens[pathnodes+1];
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // Main loop.
+    /////////////////////////////////////////////////////////////////////////////////
+
+    regions = protein->get_regions();
+    for (i=0; regions[i].start; i++)
+    {
+        region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
+    }
+
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
@@ -2961,6 +2983,22 @@ _try_again:
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;
 
+            n = protein->get_end_resno();
+            for (i=1; i<=n; i++)
+            {
+                if (dr[drcount][nodeno].residue_clash[i])
+                {
+                    for (j=0; regions[j].start; j++)
+                    {
+                        if (i >= regions[j].start && i <= regions[j].end)
+                        {
+                            k = (i - regions[j].start) * 3 / (regions[j].end - regions[j].start);
+                            region_clashes[j][k] = region_clashes[j][k].add(dr[drcount][nodeno].res_clash_dir[i]);
+                        }
+                    }
+                }
+            }
+
             dr[drcount][nodeno].proximity = ligand->get_barycenter().get_3d_distance(nodecen);
 
             if (use_bestbind_algorithm)
@@ -3312,6 +3350,39 @@ _exitposes:
     cout << found_poses << " pose(s) found." << endl;
     if (output) *output << found_poses << " pose(s) found." << endl;
     if (debug) *debug << found_poses << " pose(s) found." << endl;
+
+    if (regions)
+    {
+        cout << endl;
+        if (output) *output << endl;
+        for (i=0; regions[i].start; i++)
+        {
+            for (j=0; j<3; j++) if (region_clashes[i][j].r)
+            {
+                cout << regions[i].name;
+                if (output) *output << regions[i].name;
+                if (!j)
+                {
+                    cout << ".nseg";
+                    if (output) *output << ".nseg";
+                }
+                else if (j==1)
+                {
+                    cout << ".center";
+                    if (output) *output << ".center";
+                }
+                else if (j==2)
+                {
+                    cout << ".cseg";
+                    if (output) *output << ".cseg";
+                }
+                cout << ".clashdir = " << (Point)region_clashes[i][j] << endl;
+                if (output) *output << ".clashdir = " << (Point)region_clashes[i][j] << endl;
+            }
+        }
+        cout << endl;
+        if (output) *output << endl;
+    }
 
     if (met) delete met;
 

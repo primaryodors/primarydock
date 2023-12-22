@@ -155,6 +155,7 @@ chdir(__DIR__);
 chdir("..");
 $prots = json_decode(file_get_contents("data/receptor.json"), true);
 $gprots = json_decode(file_get_contents("data/gprot.json"), true);
+$treenodes = json_decode(file_get_contents("data/tree_nodes.json"), true);
 chdir($cwd);
 
 $aminos = 

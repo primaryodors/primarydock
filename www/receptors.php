@@ -7,6 +7,13 @@ function filter_prot($protid, $filter)
 {
     global $fnum, $prots;
 
+    if (@$_REQUEST['bt'])
+    {
+        if (!@$prots[$protid]['btree']) return false;
+        $len = strlen($_REQUEST['bt']);
+        if (substr($prots[$protid]['btree'], 0, $len) !== $_REQUEST['bt']) return false;
+    }
+
     $disp = true;
     switch ($filter)
     {
@@ -135,6 +142,9 @@ foreach ($prots as $protid => $p)
 ksort($tree, SORT_STRING);
 
 echo "<pre>";
+
+if (@$_REQUEST['bt']) echo "<a href=\"receptors.php?tree=1&bt=".substr($_REQUEST['bt'], 0, strlen($_REQUEST['bt'])-1)."\">&#x21b0;</a>\n";
+
 $prev = [];
 $path1 = "";
 $lno = 0;

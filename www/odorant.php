@@ -200,8 +200,7 @@ window.setTimeout( function()
     <th>log10 EC<sub>50</sub></th>
     <th>Adj. Top</th>
     <th>Antagonist?</th>
-    <th style="padding-right: 15px;">Hypothesized PQ</th>
-    <th>Associated Perceptual Qualities (PQs)</th>
+    <th>Correlated Perceptual Qualities</th>
 </tr>
 
 <?php
@@ -282,25 +281,6 @@ foreach (array_keys($sorted) as $rcpid)
 
     if (@$agonist[$rcpid])
     {
-        if (@$prots[$rcpid]['hypothesized'])
-        {
-            if (@$prots[$rcpid]['hypoth_ref'])
-            {
-                $idx = array_search($prots[$rcpid]['hypoth_ref'], $lrefs);
-                if (false===$idx)
-                {
-                    $lrefs[] = $prots[$rcpid]['hypoth_ref'];
-                    $idx = count($lrefs)-1;
-                }
-                echo "<td style=\"white-space: nowrap;\">{$prots[$rcpid]['hypothesized']}";
-                $refno = $idx + 1;
-                echo "<sup><a href=\"#\" onclick=\"openTab($('#tabRefs')[0], 'Refs');\">$refno</a></sup><br>";
-                echo "</td>\n";
-            }
-            else echo "<td style=\"white-space: nowrap;\">{$prots[$rcpid]['hypothesized']}</td>\n";
-        }
-        else echo "<td>&nbsp;</td>\n";
-
         $notes = substr(get_notes_for_receptor($rcpid, $correlations), 0, 123);
         $notes = make_clickable_notes(explode(", ", $notes));
         $notes = implode(", ", $notes);

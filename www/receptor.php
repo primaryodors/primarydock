@@ -37,7 +37,7 @@ $predictions = [];
 $pred_shown = [];
 $predname = [];
 $predate = [];
-if (file_exists("../pdbs/$fam/$rcpid.active.pdb"))
+if (file_exists("../pdbs/$fam/$rcpid.active.pdb") || file_exists("../pdbs/$fam/$rcpid.bound.pdb"))
 {
     chdir(__DIR__);
     $dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);

@@ -1,18 +1,23 @@
 <?php
 
-// method_icactive.php
+// method_fygactive.php
 //
-// Performs a dock of an odorant inside inactive and internal-contact active conformer PDB files.
+// Performs a dock of an odorant inside inactive and FYG-motif active conformer PDB files.
 //
 // Example call syntax:
-// php -f predict/method_icactive.php prot=OR1A1 lig=d-limonene
+// php -f predict/method_fygactive.php prot=OR1A1 lig=d-limonene
 //
 
 // Configurable variables
-$dock_metals = false;
+$flex = 1;                      // Flexion (0 or 1) for active dock.
+$flxi = 1;                      // Flexion for inactive dock.
+$pose = 20;
+$iter = 40;
 
 chdir(__DIR__);
-require("methods_common.php");
+require_once("methods_common.php");
+chdir(__DIR__);
+require_once("../data/protutils.php");
 chdir(__DIR__);
 
 prepare_outputs();
@@ -26,23 +31,26 @@ $metrics_to_process =
 
 function make_prediction($data)
 {
+    global $protid, $ligname;
+
     if (isset($data["a_Pose1"]))
     {
-        $ae = floatval(@$data['a_BindingEnergy']);
-        $ie = floatval(@$data["i_BindingEnergy"]);
-        $a1 = floatval( $data['a_Pose1']);
-        $i1 = floatval(@$data['i_Pose1']);
-        if ($a1 < 0 && $a1 < $i1)
+        $ae = min(0, floatval(@$data['a_BindingEnergy']));
+        $ie = min(0, floatval(@$data["i_BindingEnergy"]));
+        $a1 = min(0, floatval( $data['a_Pose1']));
+        $i1 = min(0, floatval(@$data['i_Pose1']));
+        $a6 = min(0, floatval(@$data["a_BindingEnergy.6"]));
+        $i6 = min(0, floatval(@$data["i_BindingEnergy.6"]));
+
+        $ascore = -min(0, $ae - $a6) * $a6 + $a1;
+        $iscore = -min(0, $ie - $i6) * $i6 + $i1;
+
+        if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
             $data['DockScore'] = (min($i1, 0) - $a1) / 2;
         }
-        else if ($ae < 0 && $ae < $ie)
-        {
-            $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($ie, 0) - $ae) / 2;
-        }
-        else if ($a1 < 0 && $a1 > $i1)
+        else if ($i1 < 0 && $iscore < $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
             $data['DockScore'] = (min($i1, 0) - $a1) / 2;
@@ -53,12 +61,15 @@ function make_prediction($data)
             $data['DockScore'] = 0.0;
         }
 
+        echo "\nProtein: $protid\nLigand: $ligname";
         echo "\nResult: " . print_r($data, true) . "\n";
     }
     else if (isset($data["a_POSES"]) && !$data["a_POSES"])
     {
         $data['Predicted'] = 'Non-agonist';
         $data['DockScore'] = 0.0;
+
+        echo "\nProtein: $protid\nLigand: $ligname";
         echo "\nResult: " . print_r($data, true) . "\n";
     }
 
@@ -69,39 +80,19 @@ function make_prediction($data)
 chdir(__DIR__);
 chdir("..");
 
-$pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
+$pdbfname_inactive = str_replace(".upright.pdb", ".apo.pdb", $pdbfname);
+$pdbfname_active = str_replace(".upright.pdb", ".bound.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
-
-if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/ic_activate_or"))
-{
-    if ($protid == "OR51E2")
-    {
-        $pepd = <<<heredoc
-LOAD pdbs/OR51/OR51E2.8f76.pdb
-CENTER
-UPRIGHT
-HYDRO
-SAVE $pdbfname_active
-
-
-heredoc;
-        $fp = fopen("tmp/8f76.pepd", "wb");
-        fwrite($fp, $pepd);
-        fclose($fp);
-        passthru("bin/pepteditor tmp/8f76.pepd");
-    }
-    else passthru("bin/ic_activate_or $protid");
-}
 
 $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
 
-
+$fam = family_from_protid($protid);
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
 
 $configf = <<<heredoc
 
-PROT $pdbfname
+PROT $pdbfname_inactive
 LIG sdf/$ligname.sdf
 
 $cenres_inactive
@@ -115,13 +106,13 @@ $flxr
 EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
-POSE 10
-ELIM 5000
+POSE $pose
+ELIM 10000
 $flex_constraints
-ITERS 50
+ITERS $iter
 PROGRESS
 
-FLEX 1
+FLEX $flxi
 WET
 
 OUT $outfname
@@ -139,7 +130,6 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 
 $pdbfname = $pdbfname_active;
-
 $outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
 
 $configf = <<<heredoc
@@ -158,13 +148,13 @@ $flxr
 EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
-POSE 10
-ELIM 5000
+POSE $pose
+ELIM 10000
 $flex_constraints
-ITERS 50
+ITERS $iter
 PROGRESS
 
-FLEX 1
+FLEX $flex
 WET
 
 OUT $outfname
@@ -173,4 +163,4 @@ OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
 
 heredoc;
 
-$poses = (!@$_REQUEST["softonly"]) ? process_dock("a") : 0;
+$poses = process_dock("a");

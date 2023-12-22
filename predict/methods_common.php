@@ -1,6 +1,6 @@
 <?php
 
-global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere, $metrics_to_process;
+global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere, $metrics_to_process, $clashcomp, $best_energy;
 
 // Includes
 chdir(__DIR__);
@@ -14,6 +14,8 @@ require_once("predict/statistics.php");
 die_if_too_hot();
 
 echo date("Y-m-d H:i:s.u\n");
+
+$clashcomp = [];
 
 $method = explode("_", $_SERVER['PHP_SELF'])[1];
 $method = explode(".", $method)[0];
@@ -89,9 +91,7 @@ if (@$_REQUEST['next'])
             && !preg_match("/^$protid$/", $rcpid)
             && (substr($protid, -1) != '*' || substr($rcpid, 0, strlen($protid)-1) != substr($protid, 0, -1) )
             ) continue;
-		// if (!$protid && $rcpid == 'OR1A1') continue;
 		$odorids = array_keys(all_empirical_pairs_for_receptor($rcpid));
-		// shuffle($odorids);
 
 		foreach ($odorids as $oid)
 		{
@@ -101,8 +101,6 @@ if (@$_REQUEST['next'])
 			if ((!isset($dock_results[$rcpid][$full_name]) && !isset($dock_results[$rcpid][$fnnospace]))
                 ||
                 (   (max(@$dock_results[$rcpid][$full_name]['version'], @$dock_results[$rcpid][$fnnospace]['version']) < $version)
-                    /*&&
-                    !max(@$dock_results[$rcpid][$full_name]['locked'], @$dock_results[$rcpid][$fnnospace]['locked'])*/
                 )
                 )
 			{
@@ -143,7 +141,8 @@ $outfname = "output.dock";
 function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname;
-    global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $atomto, $stcr, $flxr, $mcoord, $mbp;
+    global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search;
+    global $atomto, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
     chdir(__DIR__);
     chdir("..");
@@ -166,8 +165,12 @@ function prepare_outputs()
     $atomto = [];
     $stcr = "";
     $flxr = "";
+    $astcr = "";
+    $aflxr = "";
+    $istcr = "";
+    $iflxr = "";
     $mcoord = "";
-    
+
     $mbp = false;                       // Matched binding pocket.
     
     if (isset($binding_pockets[$protid])) $mbp = $binding_pockets[$protid];
@@ -224,8 +227,12 @@ function prepare_outputs()
             if (!is_array($mbp['mcoord'])) $mbp['mcoord'] = [$mbp['mcoord']];
             foreach ($mbp['mcoord'] as $mc) $mcoord .= "MCOORD $mc\n";
         }
-        if (isset($mbp["stcr"])) $stcr = "STCR {$mbp["stcr"]}";
-        if (isset($mbp["flxr"])) $flxr = "FLXR {$mbp["flxr"]}";
+        if (isset($mbp["stcr" ])) $stcr  = "STCR {$mbp["stcr"]}";
+        if (isset($mbp["astcr"])) $astcr = "STCR {$mbp["astcr"]}";
+        if (isset($mbp["istcr"])) $istcr = "STCR {$mbp["istcr"]}";
+        if (isset($mbp["flxr" ])) $flxr  = "FLXR {$mbp["flxr"]}";
+        if (isset($mbp["aflxr"])) $aflxr = "FLXR {$mbp["aflxr"]}";
+        if (isset($mbp["iflxr"])) $iflxr = "FLXR {$mbp["iflxr"]}";
     
         if (isset($mbp["atomto"]))
         {
@@ -240,9 +247,12 @@ function prepare_outputs()
     {
         $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
     }
-    else if ($mbp && isset($mbp["active_pocket"]) && isset($mbp["inactive_pocket"]))
+    if ($mbp && isset($mbp["active_pocket"]))
     {
         $cenres_active = "CEN RES {$mbp["active_pocket"]}";
+    }
+    if ($mbp && isset($mbp["inactive_pocket"]))
+    {
         $cenres_inactive = "CEN RES {$mbp["inactive_pocket"]}";
     }
     else
@@ -253,7 +263,6 @@ function prepare_outputs()
         }
         else if (substr($fam, 0, 4) == "TAAR")
         {
-            die("There is not yet an internal contacts activation app for TAARs.\n");
             $cenres_active = $cenres_inactive = "CEN RES 3.32 3.37 5.43 6.48 7.43";
         }
         else die("Unsupported receptor family.\n");
@@ -265,7 +274,8 @@ function prepare_outputs()
 $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false)
 {
-    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version, $sepyt, $json_file, $do_scwhere, $multicall, $method;
+    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version;
+    global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
 
@@ -284,6 +294,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     fclose($f);
 
     $retvar = 0;
+    $best_energy = false;
 
     $outlines = [];
     if (@$_REQUEST['saved'])
@@ -337,11 +348,46 @@ function process_dock($metrics_prefix = "", $noclobber = false)
     $posesln = false;
     foreach ($outlines as $ln)
     {
+        if (preg_match("/TMR[1-7][.](nseg|center|cseg)[.]clashdir = /", $ln))
+        {
+            $tmrno = intval(substr($ln, 3, 1));
+
+            $segment = false;
+            switch (@explode('.', $ln)[1])
+            {
+                case "nseg":
+                $segment = ($tmrno & 1) ? "exr" : "cyt";
+                break;
+
+                case "center":
+                $segment = "x.50";
+                break;
+
+                case "cseg":
+                $segment = ($tmrno & 1) ? "cyt" : "exr";
+                break;
+
+                default:
+                ;
+            }
+
+            if ($segment)
+            {
+                $coords = explode(" = ", $ln)[1];
+                $coords = str_replace('[', '', $coords);
+                $coords = str_replace(']', '', $coords);
+                $coords = explode(',', $coords);
+                foreach ($coords as $k => $c) $coords[$k] = floatval($c);
+
+                $clashcomp[$tmrno][$segment] = $coords;
+                continue;
+            }
+        }
+
         if (false !== strpos($ln, "pose(s) found"))
         {
             $num_poses = intval($ln);
             $posesln = true;
-            break;
         }
     }
 
@@ -443,6 +489,12 @@ function process_dock($metrics_prefix = "", $noclobber = false)
                         $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]);
                         if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = 1;
                         else $outdqty[$metrics_prefix.$wmode]++;
+                    }
+
+                    if ($mode == "BENERG")
+                    {
+                        $benerg = floatval($coldiv[1]);
+                        if (false===$best_energy || $benerg < $best_energy) $best_energy = $benerg;
                     }
 
                     if ($mode == "BENERG" && isset($metrics_to_process["BEST"]))

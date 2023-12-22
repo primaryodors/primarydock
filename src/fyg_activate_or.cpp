@@ -47,8 +47,8 @@ float do_template_bend(Protein& p, AminoAcid* aasrc, AminoAcid* aaref, int hxno,
     if (hxno<7 && !aaopposite_term)
     {
         std::string name = (std::string)"TMR" + to_string(hxno+1);
-        sr1 = p.get_region_start(name);
-        er1 = p.get_region_end(name);
+        sr1 = p.get_region_start(name)-2;
+        er1 = p.get_end_resno(); // p.get_region_end(name)+2;
     }
 
     Point source = aasrc->get_CA_location();
@@ -59,7 +59,7 @@ float do_template_bend(Protein& p, AminoAcid* aasrc, AminoAcid* aaref, int hxno,
     LocatedVector axis = compute_normal(was, target, source);
     axis.origin = source;
 
-    float theta1 = p.region_can_rotate(sr, er, axis, false, 0, sr1, er1);
+    float theta1 = p.region_can_rotate(sr, er, axis, true, 0, sr1, er1);
     if (theta1 < theta) theta = theta1;
 
     p.rotate_piece(sr, er, axis.origin, axis, theta);
@@ -263,6 +263,7 @@ int main(int argc, char** argv)
 
     AminoAcid *aa4x49 = p.get_residue_bw("4.49");
     AminoAcid *aa4x60 = p.get_residue_bw("4.60");
+    AminoAcid *aa4x64 = p.get_residue_bw("4.64");
 
     AminoAcid *aa45x51 = p.get_residue_bw("45.51");
     AminoAcid *aa45x52 = p.get_residue_bw("45.52");
@@ -270,6 +271,8 @@ int main(int argc, char** argv)
     AminoAcid *aa45x54 = p.get_residue_bw("45.54");
 
     AminoAcid *aa5x33 = p.get_residue_bw("5.33");
+    AminoAcid *aa5x35 = p.get_residue_bw("5.35");
+    AminoAcid *aa5x39 = p.get_residue_bw("5.39");
     AminoAcid *aa5x47 = p.get_residue_bw("5.47");
     AminoAcid *aa5x50 = p.get_residue_bw("5.50");
     AminoAcid *aa5x51 = p.get_residue_bw("5.51");
@@ -285,6 +288,7 @@ int main(int argc, char** argv)
     AminoAcid *aa6x49 = p.get_residue_bw("6.49");
     AminoAcid *aa6x51 = p.get_residue_bw("6.51");
     AminoAcid *aa6x55 = p.get_residue_bw("6.55");
+    AminoAcid *aa6x58 = p.get_residue_bw("6.58");
     AminoAcid *aa6x59 = p.get_residue_bw("6.59");
 
     AminoAcid *aa7x31 = p.get_residue_bw("7.31");
@@ -397,15 +401,15 @@ int main(int argc, char** argv)
             if (i<7)
             {
                 name = (std::string)"TMR" + to_string(i+1);
-                sr1 = p.get_region_start(name);
-                er1 = p.get_region_end(name);
+                sr1 = p.get_region_start(name)-2;
+                er1 = p.get_end_resno(); // p.get_region_end(name)+2;
             }
 
             SCoord motion = xl8[i];
-            float r = p.region_can_move(sr, er, motion, false, sr1, er1);
+            float r = p.region_can_move(sr, er, motion, true, sr1, er1);
             if (r < motion.r) motion.r = r;
 
-            cout << "Applying helix " << i << " translation..." << endl;
+            cout << "Applying helix " << i << " translation " << motion.r << "A of " << xl8[i].r << " limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
             p.move_piece(sr, er, motion);
         }
     }
@@ -426,8 +430,9 @@ int main(int argc, char** argv)
                 return -1;
             }
 
-            cout << "Applying helix " << i << " extracellular bend..." << endl;
+            cout << "Applying helix " << i << " extracellular bend ";
             do_template_bend(p, aasrc, aaterm, i, exr[i], xl8[i]);
+            cout << " limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
         }
 
         if (cyt[i].r)
@@ -440,8 +445,9 @@ int main(int argc, char** argv)
                 return -1;
             }
 
-            cout << "Applying helix " << i << " cytoplasmic bend..." << endl;
+            cout << "Applying helix " << i << " cytoplasmic bend ";
             do_template_bend(p, aasrc, aaterm, i, cyt[i], xl8[i]);
+            cout << " limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
         }
     }
 
@@ -465,9 +471,16 @@ int main(int argc, char** argv)
     }
     else if (l6x59 == 'R')
     {
-        rock6_dir = aa4x49->get_CA_location().subtract(aa6x55->get_CA_location());
-        aa6x59->conform_atom_to_location("NE", aa6x59->get_CA_location().add(rock6_dir));
+        rock6_dir = aa5x39->get_CA_location().subtract(aa6x55->get_CA_location());
+        // aa6x59->conform_atom_to_location("NE", aa6x59->get_CA_location().add(rock6_dir));
+        aa6x59->conform_atom_to_location("NE", Point(0,10000,0));
+        aa6x59->movability = MOV_PINNED;
         exr2_bend = true;
+
+        pt = aa4x64->get_CA_location().add(aa5x35->get_CA_location());
+        pt.multiply(0.5);
+        aa45x52->conform_atom_to_location(aa45x52->get_reach_atom()->name, pt);
+        aa45x52->movability = MOV_PINNED;
     }
 
 
@@ -494,7 +507,7 @@ int main(int argc, char** argv)
         dyn.type = dyn_wind;
         dyn.start_resno = BallesterosWeinstein("6.56");
         dyn.end_resno = BallesterosWeinstein("6.60");
-        dyn.bias = -18;
+        dyn.bias = -12; // -18;     // The greater unwind brings R6.59 too deep into the binding pocket.
         dyn.apply_absolute(1);
 
         cout << "Performing rock6..." << endl;
@@ -561,6 +574,10 @@ int main(int argc, char** argv)
     {
         LocatedVector axis = (SCoord)aa7x53->get_atom_location("OH").subtract(aa5x58->get_atom_location("OH"));
         r57 = axis.r;
+
+        sr = n45x54 + 1;
+        er = n45x52 + 10;
+        p.delete_residues(sr, er);
 
         // Move TMR5 toward TMR6.
         if (r57 > contact_r_5x58_7x53)
@@ -784,6 +801,7 @@ int main(int argc, char** argv)
 
     if (l6x59 == 'R' || l6x59 == 'K')
     {
+        aa6x59->movability = MOV_FLEXONLY;
         aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
     }
 

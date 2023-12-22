@@ -36,6 +36,6 @@ residue_group[ Met305 ]
 Group pairs:
 atom_group[ N1 H8 H9 H10 ] ~ residue_group[ Asp111 ]
 atom_group[ N7 H21 H22 H23 ] ~ residue_group[ Asp201 ]
-atom_group[ C2 C3 C4 C5 H11 H12 H13 H14 H15 H16 H17 H18 ] ~ residue_group[ Tyr116 ]
+atom_group[ C2 H11 H12 C3 H13 H14 C4 H15 H16 C5 H17 H18 ] ~ residue_group[ Tyr116 ]
 atom_group[ C6 H19 H20 ] ~ residue_group[ Val112 ]
 

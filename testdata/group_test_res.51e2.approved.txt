@@ -31,6 +31,6 @@ residue_group[ Leu282 ]
 residue_group[ Pro283 ]
 
 Group pairs:
-atom_group[ O4 O5 C3 ] ~ residue_group[ Arg262 ]
-atom_group[ C1 C2 H6 H7 H8 H9 H10 ] ~ residue_group[ Gly198 ]
+atom_group[ O4 C3 O5 ] ~ residue_group[ Arg262 ]
+atom_group[ C1 H6 H7 H8 C2 H9 H10 ] ~ residue_group[ Gly198 ]
 

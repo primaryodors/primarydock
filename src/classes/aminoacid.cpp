@@ -1523,6 +1523,34 @@ void AminoAcid::load_aa_defs()
     }
 }
 
+void AminoAcid::set_prev(AminoAcid* aa)
+{
+    if (!aa) return;
+
+    if (prev_aa)
+    {
+        prev_aa->next_aa = nullptr;
+        Atom *a = prev_aa->get_atom("C"), *b = get_atom("N");
+        if (a && b && a->is_bonded_to(b)) a->unbond(b);
+    }
+    prev_aa = aa;
+    aa->next_aa = this;
+}
+
+void AminoAcid::set_next(AminoAcid* aa)
+{
+    if (!aa) return;
+
+    if (next_aa)
+    {
+        next_aa->prev_aa = nullptr;
+        Atom *a = next_aa->get_atom("N"), *b = get_atom("C");
+        if (a && b && a->is_bonded_to(b)) a->unbond(b);
+    }
+    next_aa = aa;
+    aa->prev_aa = this;
+}
+
 bool AminoAcid::can_reach(Atom* other) const
 {
     Atom* ca1;
@@ -1942,6 +1970,7 @@ void AminoAcid::set_conditional_basicity(Molecule** nearby_mols)
 
                 Atom* a = nearby_mols[i]->get_nearest_atom(atoms[j]->get_location());
                 if (a->get_Z() == 1) a = a->get_bond_by_idx(0)->btom;
+                if (!a) continue;
 
                 if (a->get_charge() <= -0.5 || a->is_conjugated_to_charge() <= -0.5)
                 {
@@ -2581,6 +2610,13 @@ Point AminoAcid::get_CA_location()
 {
     Atom* a = get_atom("CA");
     if (!a) return Point(0,0,0);
+    return a->get_location();
+}
+
+Point AminoAcid::get_reach_atom_location()
+{
+    Atom* a = get_reach_atom();
+    if (!a) return get_CA_location();
     return a->get_location();
 }
 

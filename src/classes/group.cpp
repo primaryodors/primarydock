@@ -483,7 +483,7 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
 
                     // Pyrazine/indole/furan fix.
                     bool skip_dirty;
-                    if (!a->is_pi() || (fam != CHALCOGEN && fam != PNICTOGEN) || a->is_bonded_to(TETREL, 2))
+                    if (a->num_rings() && (!a->is_pi() || (fam != CHALCOGEN && fam != PNICTOGEN) || a->is_bonded_to(TETREL, 2)))
                     {
                         #if _dbg_groupsel
                         cout << *a << " is in " << a->num_rings() << " rings, "
@@ -510,8 +510,20 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                     }
                 }
 
+                g->remove_duplicates();
                 retval.push_back(g);
             }
+        }
+    }
+
+    int groupcount = retval.size();
+    for (j=0; j<groupcount; j++)
+    {
+        int groupsize = retval[j]->atoms.size();
+        for (m=0; m<groupsize; m++)
+        {
+            int idx = mol->atom_idx_from_ptr(retval[j]->atoms[m]);
+            if (idx >= 0) dirty[idx] = true;
         }
     }
 
@@ -542,6 +554,32 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
         #if _dbg_groupsel
         cout << "Creating group from " << a->name << "..." << endl;
         #endif
+
+        if (a->get_Z() > 1)
+        {
+            Bond* bb[16];
+            a->fetch_bonds(bb);
+            if (bb)
+            {
+                int h, bbhidx;
+                for (h=0; bb[h]; h++)
+                {
+                    if (bb[h]->btom && bb[h]->btom->get_Z() == 1)
+                    {
+                        bbhidx = mol->atom_idx_from_ptr(bb[h]->btom);
+                        if (bbhidx >= 0 && !dirty[bbhidx])
+                        {
+                            g->atoms.push_back(bb[h]->btom);
+                            dirty[bbhidx] = true;
+
+                            #if _dbg_groupsel
+                            cout << "Adding " << bb[h]->btom->name << "." << endl;
+                            #endif
+                        }
+                    }
+                }
+            }
+        }
 
         dirty[i] = true;
         for (j=0; j<n; j++)
@@ -607,6 +645,32 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                              << " polarity " << b->is_polar() << " aliphatic " << aliphatic << endl;
                         #endif
 
+                        if (b->get_Z() > 1)
+                        {
+                            Bond* bb[16];
+                            b->fetch_bonds(bb);
+                            if (bb)
+                            {
+                                int h, bbhidx;
+                                for (h=0; bb[h]; h++)
+                                {
+                                    if (bb[h]->btom && bb[h]->btom->get_Z() == 1)
+                                    {
+                                        bbhidx = mol->atom_idx_from_ptr(bb[h]->btom);
+                                        if (bbhidx >= 0 && !dirty[bbhidx])
+                                        {
+                                            g->atoms.push_back(bb[h]->btom);
+                                            dirty[bbhidx] = true;
+
+                                            #if _dbg_groupsel
+                                            cout << "Adding " << bb[h]->btom->name << "." << endl;
+                                            #endif
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                         a_ = b;
                         if ((bool)(fabs(a->is_polar()) >= 0.2) == (bool)(fabs(b->is_polar()) >= 0.2)) dirty[j] = true;
                     }
@@ -633,7 +697,11 @@ std::vector<std::shared_ptr<AtomGroup>> AtomGroup::get_potential_ligand_groups(M
                 break;
             }
         }
-        if (!added) retval.push_back(g);
+        if (!added)
+        {
+            g->remove_duplicates();
+            retval.push_back(g);
+        }
         #if _dbg_groupsel
         cout << "Group complete." << endl << endl;
         #endif
@@ -1393,3 +1461,18 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     if (do_conforms) gp[2]->scg->conform_to(lig);
 }
 
+void AtomGroup::remove_duplicates()
+{
+    int i, j, n = atoms.size();
+    for (i=n-1; i; i--)
+    {
+        for (j=0; j<i; j++)
+        {
+            if (atoms[i] == atoms[j])
+            {
+                atoms.erase(atoms.begin()+i);
+                break;
+            }
+        }
+    }
+}

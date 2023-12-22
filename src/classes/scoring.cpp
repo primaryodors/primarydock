@@ -135,12 +135,12 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         }
     }
     else
-    {                
+    {      
+        #if use_trip_switch          
         for (i=0; i<qpr; i++)
         {
             int resno = allres[i]->get_residue_no();
 
-            #if use_trip_switch
             bool is_trip_i = false;
             for (n=0; n<tripswitch_clashables.size(); n++)
                 if (tripswitch_clashables[n] == resno)
@@ -148,14 +148,12 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
                     is_trip_i = true;
                     break;
                 }
-            #endif
 
             for (j=0; j<qpr; j++)
             {
                 if (j == i) continue;
                 int jres = allres[j]->get_residue_no();
 
-                #if use_trip_switch
                 bool is_trip_j = false;
                 if (is_trip_i)
                     for (n=0; n<tripswitch_clashables.size(); n++)
@@ -165,18 +163,16 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
                             break;
                         }
                 if (!is_trip_j) continue;
-                #endif
 
-                #if use_trip_switch
                 float f = postaa[i]->get_intermol_binding(postaa[j], j==0);
                 if (f < 0)
                 {
                     tripclash -= f;
                     f = 0;
                 }
-                #endif
             }
         }
+        #endif
     }
 
     for (i=0; i<_INTER_TYPES_LIMIT; i++) fin_total_binding_by_type[i] = total_binding_by_type[i];
@@ -198,6 +194,16 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
         total_binding_by_type[i] = 0;
     }
 
+    int prot_seq_len = protein->get_end_resno();
+    residue_clash = new float[prot_seq_len+8];
+    res_clash_dir = new SCoord[prot_seq_len+8];
+
+    for (i=0; i<=prot_seq_len; i++)
+    {
+        residue_clash[i] = 0;
+        res_clash_dir[i] = SCoord(0,0,0);
+    }
+
     for (i=0; i<sphres; i++)
     {
         if (!reaches_spheroid[i]) continue;
@@ -207,6 +213,14 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
 
         float lb = ligand->get_intermol_binding(reaches_spheroid[i], false);
         if (lb < -maxclash) maxclash = -lb;
+
+        if (lb > 0 && ligand->clash1 && ligand->clash2)
+        {
+            residue_clash[resno] += lb;
+            SCoord clashdir = ligand->clash2->get_location().subtract(ligand->clash1->get_location());
+            clashdir.r = ligand->clash1->get_vdW_radius() + ligand->clash2->get_vdW_radius() - ligand->clash1->distance_to(ligand->clash2);
+            res_clash_dir[resno] = res_clash_dir[resno].add(clashdir);
+        }
 
         #if _dbg_51e2_ionic
         if (resno == 262)

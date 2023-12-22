@@ -123,7 +123,7 @@
 #define ignore_double_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 0.5
+#define lmpush 3.0
 #define lmpull 0.3
 #define lmsteps 10
 #define recapture_ejected_ligand 0
@@ -210,8 +210,8 @@
 
 // Drift pulls the ligand towards the loneliest point if it encounters clashes.
 // Turning it off can cause the ligand to be ejected from the protein.
-#define allow_drift 0
-#define initial_drift 0.333
+#define allow_drift 1
+#define initial_drift 0.1
 #define drift_decay_rate 0.2
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
@@ -245,6 +245,7 @@
 // Overwrite the user supplied pocket center with the loneliest point as determined by
 // distances to the nearest residue atoms to the supplied pocket center.
 #define pocketcen_is_loneliest 1
+#define pocketcen_from_reach_atoms 1
 
 // Switches whether the best-binding algorithm is active by default, instead of tumble spheres.
 #define default_bestbind 1
@@ -297,8 +298,8 @@
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
 #define _allow_conditional_basicity_with_acid_ligand 1
-#define cond_bas_hbond_energy_threshold 5.0
-#define cond_bas_hbond_distance_threshold 2.7
+#define cond_bas_hbond_energy_threshold 2.0
+#define cond_bas_hbond_distance_threshold 3.0
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0
@@ -341,6 +342,7 @@
 #define _dbg_bb_realign 0
 #define _dbg_bb_rots 0
 #define _dbg_bridges 0
+#define _dbg_can_rotate 0
 #define _dbg_cond_basic 0
 #define _dbg_cond_basic_acd_lig 0
 #define _dbg_conj_chg 0

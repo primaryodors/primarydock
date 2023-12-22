@@ -10,9 +10,11 @@
 
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1) for active dock.
-$flxi = 0;                      // Flexion for inactive dock.
-$pose = 25;
-$iter = 20;
+$flxi = 1;                      // Flexion for inactive dock.
+$pose = 10;
+$iter = 50;
+$elim = 1e4;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
+$num_std_devs = 1.5;            // How many standard deviations to move the helices for active clash compensation.
 
 chdir(__DIR__);
 require_once("methods_common.php");
@@ -25,7 +27,7 @@ prepare_outputs();
 $metrics_to_process =
 [
     "BENERG" => "BindingEnergy",
-    // "BENERG.rgn" => "BindingEnergy.rgn",
+    "BENERG.rgn" => "BindingEnergy.rgn",
     "BEST" => "Pose1"
 ];
 
@@ -75,19 +77,9 @@ function make_prediction($data)
     return $data;
 }
 
-
-chdir(__DIR__);
-chdir("..");
-
-$pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
-$paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
-
-if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/fyg_activate_or"))
+function build_template()
 {
-    $cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
-
-    $args = "$protid";
-    $template = [];
+    global $template, $protid, $cryoem, $has_rock6, $has_fyg, $args;
 
     if (substr($protid, 0, 4) == "TAAR")
     {
@@ -97,9 +89,23 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
     else if (substr($protid, 0, 2) == "OR")
     {
         $fam = intval(substr($protid, 2, 2));
-        if ($fam >= 50)
+        if ($fam == 51)
         {
             $template = $cryoem["OR51E2"];
+        }
+        else if ($fam == 52)
+        {
+            foreach ($cryoem["OR52"] as $hxno => $metrics)
+            {
+                foreach ($metrics as $metric => $dimensions)
+                {
+                    $template[$hxno][$metric] = $cryoem["OR52"][$hxno][$metric];
+
+                    $template[$hxno][$metric]["sigma"]
+                        + 0.4 * $cryoem["TAAR1"][$hxno][$metric]["sigma"]
+                        + 0.6 * $cryoem["mTAAR9"][$hxno][$metric]["sigma"];
+                }
+            }
         }
         else
         {
@@ -109,11 +115,21 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
                 {
                     foreach (array_keys($dimensions) as $dimension)
                     {
-                        // TODO: Make the proportions dependent on sequence similarity.
-                        $template[$hxno][$metric][$dimension]
-                            = 0.66 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
-                            + 0.25 * $cryoem["mTAAR9"][$hxno][$metric][$dimension]
-                            + 0.09 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
+                        if ($dimension == "sigma")
+                        {
+                            $template[$hxno][$metric][$dimension]
+                                = 0.4 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
+                                + 0.6 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
+                        }
+                        else
+                        {
+                            // TODO: Make the proportions dependent on sequence similarity.
+                            $template[$hxno][$metric][$dimension]
+                                = 0.40 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
+                                + 0.30 * $cryoem["OR52"][$hxno][$metric][$dimension]
+                                + 0.10 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
+                                + 0.20 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
+                        }
                     }
                 }
             }
@@ -129,6 +145,22 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
         if (false!==strpos($line, "Performing rock6")) $has_rock6 = true;
         if (false!==strpos($line, "Performing FYG activation")) $has_fyg = true;
     }
+}
+
+
+chdir(__DIR__);
+chdir("..");
+
+$pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
+$paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
+$template = [];
+$args = "$protid";
+
+$cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
+
+if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/fyg_activate_or"))
+{
+    build_template();
 
     foreach ($template as $hxno => $metrics)
     {
@@ -145,28 +177,10 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
         }
     }
 
-    if (false) // $protid == "OR51E2")
-    {
-        $pepd = <<<heredoc
-LOAD pdbs/OR51/OR51E2.8f76.pdb
-CENTER
-UPRIGHT
-HYDRO
-SAVE $pdbfname_active
-
-
-heredoc;
-        $fp = fopen("tmp/8f76.pepd", "wb");
-        fwrite($fp, $pepd);
-        fclose($fp);
-        passthru("bin/pepteditor tmp/8f76.pepd");
-    }
-    else
-    {
-        $cmd = "bin/fyg_activate_or $args";
-        echo "$cmd\n";
-        passthru($cmd);
-    }
+    $cmd = "bin/fyg_activate_or $args";
+    echo "$cmd\n";
+    passthru($cmd);
+    // exec("bin/pepteditor predict/model_accuracy.pepd");
 }
 
 $flex_constraints = "";
@@ -187,12 +201,14 @@ $mcoord
 $atomto
 $stcr
 $flxr
+$istcr
+$iflxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
 SEARCH $search
 POSE $pose
-ELIM 10000
+ELIM $elim
 $flex_constraints
 ITERS $iter
 PROGRESS
@@ -230,16 +246,14 @@ $mcoord
 $atomto
 $stcr
 $flxr
+$astcr
+$aflxr
 
 EXCL 1 56		# Head, TMR1, and CYT1.
 
-# SOFT 4.53 4.64
-# SOFT 5.50 5.33
-# SOFT 6.48 6.59
-
 SEARCH $search
 POSE $pose
-ELIM 10000
+ELIM $elim
 $flex_constraints
 ITERS $iter
 PROGRESS
@@ -254,3 +268,111 @@ OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
 heredoc;
 
 $poses = process_dock("a");
+
+if ((!$poses || $best_energy >= 0) && count($clashcomp))
+{
+    if (!count($template)) build_template();
+
+    // Ensure template contains standard deviations. If not, average the ones from the templates that do.
+    foreach ($template as $hxno => $metrics)
+    {
+        foreach ($metrics as $metric => $xyz)
+        {
+            if (!isset($xyz["sigma"]))
+            {
+                $averages = [];
+                $counts = [];
+
+                foreach ($cryoem as $lrecep => $lhelixes)
+                {
+                    foreach ($lhelixes as $lhelix => $lmetrics)
+                    {
+                        foreach ($lmetrics as $lmetric => $lxyz)
+                        {
+                            if (isset($lxyz["sigma"]))
+                            {
+                                if (!isset($averages[$lhelix][$lmetric])) $averages[$lhelix][$lmetric] = floatval($lxyz["sigma"]);
+                                else $averages[$lhelix][$lmetric] += floatval($lxyz["sigma"]);
+
+                                if (!isset($counts[$lhelix][$lmetric])) $counts[$lhelix][$lmetric] = 1;
+                                else $counts[$lhelix][$lmetric]++;
+                            }
+                        }
+                    }
+                }
+
+                foreach ($averages as $lhelix => $lmetrics)
+                {
+                    foreach ($lmetrics as $lmetric => $total)
+                    {
+                        if (!isset($template[$lhelix][$lmetric]["sigma"]))
+                        {
+                            if ($counts[$lhelix][$lmetric]) $total /= $counts[$lhelix][$lmetric];
+                            $template[$lhelix][$lmetric]["sigma"] = $total;
+                        }
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    foreach ($clashcomp as $tmrno => $cc)
+    {
+        foreach ($cc as $segment => $xyz)
+        {
+            // Check each clash compensation is within the SD limit. If not, reduce the magnitude to the deviation limit.
+            $sigma = floatval(@$template[$tmrno][$segment]["sigma"]);
+            $rlimit = $sigma*$num_std_devs;
+            if (!$sigma) continue;
+            $tmparr = []; foreach (['x','y','z'] as $idx => $var) $tmparr[$var] = floatval($xyz[$idx]); extract($tmparr);
+            $r = sqrt($x*$x+$y*$y+$z*$z);
+
+            if ($r > $rlimit)
+            {
+                $divisor = $rlimit / $r;
+                $x *= $divisor; $y *= $divisor; $z *= $divisor;
+            }
+
+            // Apply the corrected compensation.
+            foreach (['x','y','z'] as $var)
+            {
+                $$var = round($$var, 3);
+                $template[$tmrno][$segment][$var] = floatval($template[$tmrno][$segment][$var]) + $$var;
+                echo "Compensating TMR$tmrno.$segment.$var to {$template[$tmrno][$segment][$var]}...\n";
+            }
+        }
+    }
+
+    // Create a temporary custom output PDB and retry the active dock.
+    $args = "$protid";
+    foreach ($template as $hxno => $metrics)
+    {
+        foreach ($metrics as $metric => $dimensions)
+        {
+            if ($hxno == 6)
+            {
+                if ($metric == "cyt" && ($has_fyg || $has_rock6)) continue;
+                else if ($metric == "exr" && $has_rock6) continue;
+            }
+
+            $cmdarg = "--" . substr($metric, 0, 1) . $hxno;
+            $args .= " $cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']}";
+        }
+    }
+
+    $tmpoutpdb = "tmp/$protid.".getmypid().".pdb";
+    $args .= " -o $tmpoutpdb";
+
+    $cmd = "bin/fyg_activate_or $args";
+    echo "$cmd\n";
+    passthru($cmd);
+
+
+    $configf = str_replace($pdbfname, $tmpoutpdb, $configf);
+    $poses = process_dock("a");
+
+    // Delete the tmp PDB.
+    unlink($tmpoutpdb);
+}

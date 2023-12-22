@@ -24,6 +24,8 @@ class DockResult
     float* imvdWrepl = 0;
     float ligand_self = 0;
     float worst_energy = 0;
+    float* residue_clash = nullptr;
+    SCoord* res_clash_dir = nullptr;
     const char** m_atom1_name = nullptr;
     const char** m_atom2_name = nullptr;
     std::string pdbdat;

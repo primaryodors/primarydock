@@ -526,6 +526,8 @@ Point interpret_single_point(const char* param, Point old_value = Point(0,0,0))
 
 char* interpret_single_string(const char* param)
 {
+    if (!param) return nullptr;
+
     int n;
     char* buffer = new char[65536];
     for (n=0; n<65536; n++) buffer[n] = 0;
@@ -707,6 +709,7 @@ int main(int argc, char** argv)
         char chain = 'A';
         char new_chain;
         bool include_ligand;
+        Protein ptmp("RipMeAsunder");
         if (words && words[0] && words[0][0] && words[0][1])
         {
             for (k=0; words[k]; k++)
@@ -2838,6 +2841,19 @@ int main(int argc, char** argv)
                 }
 
             }	// SEARCH
+
+            else if (!strcmp(words[0], "SIDEREPL"))
+            {
+                if (!words[1]) raise_error("Insufficient parameters given for SIDEREPL.");
+                if (words[2] && words[3]) raise_error("Too many parameters given for SIDEREPL.");
+
+                pf = fopen(interpret_single_string(words[1]), "rb");
+                if (!pf) raise_error((std::string)"File not found" + (std::string)words[1] + (std::string)".");
+                if (words[2]) words[2] = interpret_single_string(words[2]);
+                ptmp.load_pdb(pf, 0, words[2] ? words[2][0] : 'A');
+
+                working->replace_side_chains_from_other_protein(&ptmp);
+            }   // SIDEREPL
 
             else if (!strcmp(words[0], "STRAND"))
             {

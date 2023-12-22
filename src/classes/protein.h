@@ -29,6 +29,7 @@ class BallesterosWeinstein
     int member_no = 0;
 
     BallesterosWeinstein() { ; }
+    BallesterosWeinstein(int b, int w) { helix_no = b; member_no = w; }
     BallesterosWeinstein(const char* fromstr) { this->from_string(fromstr); }
 
     void from_string(const char* inpstr);
@@ -43,6 +44,13 @@ struct SoftBias
     float helical_rotation = 0;                 // Rotation about the helical axis.
     float radial_rotation = 0;                  // Rotation about the imaginary line to the pocket center.
     float transverse_rotation = 0;              // Rotation about the imaginary line perpendicular to the pocket center.
+};
+
+struct AARenumber
+{
+    AminoAcid* aa = nullptr;
+    AminoAcid* replace_with = nullptr;
+    int new_resno = 0;
 };
 
 class Protein
@@ -86,6 +94,7 @@ public:
     AminoAcid* get_residue(BallesterosWeinstein bw);
     AminoAcid* get_residue_bw(int helixno, int bwno);
     AminoAcid* get_residue_bw(const char* bwno);
+    BallesterosWeinstein get_bw_from_resno(int resno);
     Region get_region(std::string name);
     const Region* get_regions() { return regions; }
     int get_region_end(std::string name);
@@ -175,9 +184,10 @@ public:
     void homology_conform(Protein* target_structure, Protein* reference_structure);
     void bridge(int resno1, int resno2);
     void soft_iteration(std::vector<Region> l_soft_rgns, Molecule* ligand = nullptr);
+    int replace_side_chains_from_other_protein(Protein* other);
 
     int* mcoord_resnos = NULL;
-    
+
     SCoord last_uprighted_xform;
     LocRotation last_uprighted_A, last_uprighted_B;
     SCoord last_int_clash_dir;

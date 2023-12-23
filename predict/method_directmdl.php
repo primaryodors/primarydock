@@ -84,6 +84,12 @@ $pdbfname_inactive = str_replace(".upright.pdb", ".apo.pdb", $pdbfname);
 $pdbfname_active = str_replace(".upright.pdb", ".bound.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
+if (!file_exists($pdbfname_inactive) || !file_exists($pdbfname_active))
+{
+    exec("php -f predict/cryoem_motions.php");
+    exec("bin/pepteditor data/OR52.pepd");
+}
+
 $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
 

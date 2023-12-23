@@ -749,7 +749,7 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
             if (!j) break;
             resnos.push_back(j);
             AminoAcid* aa = protein->get_residue(j);
-            aa->priority = true;
+            if (aa) aa->priority = true;
         }
 
         int sz = resnos.size(), div=0;

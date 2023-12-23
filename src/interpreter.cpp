@@ -1052,7 +1052,7 @@ int main(int argc, char** argv)
                 if (!k) raise_error("Motif not found in region of strand.");
                 // cout << l << ".50 = " << k << endl;
 
-                working->set_bw50(l, k);
+                working->set_bw50(l, k+n);
             }   // BWMOTIF
 
             else if (!strcmp(words[0], "CANMOVE"))

@@ -15,6 +15,36 @@ GOSUB measure
 UNLIG
 
 
+DOWNLOAD RCSB 8J46 "pdbs/8j46.pdb" ONCE
+DOWNLOAD RCSB 8HTI "pdbs/8hti.pdb" ONCE
+
+UNCHAIN I
+LOAD "pdbs/8j46.pdb" A I
+REGION TMR1 27 52
+REGION TMR2 60 90
+REGION TMR3 96 130
+REGION TMR4 140 168
+REGION TMR5 194 226
+REGION TMR6 237 265
+REGION TMR7 272 294
+BWMOTIF 1 llgNstllv
+BWMOTIF 2 pmyfflamxxxxD
+BWMOTIF 3 llamaydRyvaicxpl
+BWMOTIF 4 plryxxiltxxxxxxxglaxXxrxxxxxxp
+BWMOTIF 5 llivglDvilialsy
+BWMOTIF 6 kaxstcgshlcvilxfyxP
+BWMOTIF 7 llanlyllvppmlnPliy
+UPRIGHT I
+BWCENTER
+
+LOAD "pdbs/8hti.pdb" R A +
+BWCOPY I A
+UPRIGHT A
+BWCENTER
+SAVE "pdbs/OR52.octanoate.bna.pdb"
+GOSUB measure
+UNLIG
+
 
 DOWNLOAD AF Q5QD04 "pdbs/TAAR/mTAAR9.pdb" ONCE
 
@@ -176,11 +206,11 @@ LET @exr3 = @A.3.22 - @I.3.22
 LET @cyt3 = @A.3.55 - @I.3.55
 ECHO "3: " @delta3 " | " @exr3 " | " @cyt3
 LET @delta4 = @A.4.50 - @I.4.50
-LET @exr4 = @A.4.60 - @I.4.60
+LET @exr4 = @A.4.58 - @I.4.58
 LET @cyt4 = @A.4.40 - @I.4.40
 ECHO "4: " @delta4 " | " @exr4 " | " @cyt4
 LET @delta5 = @A.5.50 - @I.5.50
-LET @exr5 = @A.5.35 - @I.5.35
+LET @exr5 = @A.5.38 - @I.5.38
 LET @cyt5 = @A.5.58 - @I.5.58
 ECHO "5: " @delta5 " | " @exr5 " | " @cyt5
 LET @delta6 = @A.6.50 - @I.6.50

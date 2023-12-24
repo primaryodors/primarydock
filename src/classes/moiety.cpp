@@ -36,9 +36,16 @@ int Moiety::contained_by(Molecule* mol, Atom** out_matches)
 
 bool Moiety::atom_matches_string(Atom* a, char* buffer)
 {
-    char* charge = strchr(buffer, '+');
-    if (!charge) charge = strchr(buffer, '-');
-    if (!charge) charge = strchr(buffer, '0');
+    char* charge = nullptr;
+    if (buffer[0] == '[')
+    {
+        charge = strchr(buffer, '+');
+        if (!charge) charge = strchr(buffer, '-');
+        if (!charge) charge = strchr(buffer, '0');
+        buffer++;
+        char* c = strchr(buffer, ']');
+        if (c) *c = 0;
+    }
 
     if (charge)
     {
@@ -67,13 +74,14 @@ bool Moiety::atom_matches_string(Atom* a, char* buffer)
     return false;
 }
 
+#define max_bracketed_moiety 10
 int Moiety::does_atom_match(Atom* a, Atom** out_matches)
 {
     if (!molsize) throw 0xffff;
 
     const char* p = pattern.c_str();
     int i, j, l, n = strlen(p), result = 0, parens = 0, card = 0, iter;
-    char c, buffer[10];
+    char c, buffer[max_bracketed_moiety];
     Atom* cursor[20];
     Atom* numbered[10];
     Atom* dud_atoms[32];
@@ -89,22 +97,43 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
 
         cursor[parens] = a;
         c = p[0];
-        buffer[0] = c;
-        buffer[1] = 0;
+        if (c == '[')
+        {
+            const char* c1 = strchr(p, ']');
+            if (!c1)
+            {
+                cout << "Bad moiety string." << endl;
+                throw 0xffff;
+            }
+            i = c1 - p;
+            if (i >= max_bracketed_moiety)
+            {
+                cout << "max_bracketed_moiety too small." << endl;
+                throw 0xffff;
+            }
+            buffer[i+1] = 0;
+            for (; i>=0; i--) buffer[i] = p[i];
+        }
+        else
+        {
+            buffer[0] = c;
+            buffer[1] = 0;
+        }
+        i = strlen(buffer);
         if (!atom_matches_string(cursor[parens], buffer)) return 0;
         out_matches[atoms_used++] = cursor[parens];
         cursor[parens]->used = true;
 
-        for (i=1; i<n; i++)
+        for (; i<n; i++)
         {
             c = p[i];
 
             if (c <= ' ') continue;
-            if (c == '-')
+            /*if (c == '-')
             {
                 card = 1;
                 continue;
-            }
+            }*/
             else if (c == '=')
             {
                 card = 2;

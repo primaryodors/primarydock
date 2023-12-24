@@ -5,8 +5,6 @@
 #include <string>
 #include "molecule.h"
 
-#define _dbg_moieties 0
-
 class Moiety
 {
     public:

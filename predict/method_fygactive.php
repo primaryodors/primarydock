@@ -37,9 +37,9 @@ function make_prediction($data)
 
     if (isset($data["a_Pose1"]))
     {
-        $ae = floatval(@$data['a_BindingEnergy']);
+        $ae = min(floatval(@$data['a_BindingEnergy']), floatval(@$data['ad_BindingEnergy']));
         $ie = floatval(@$data["i_BindingEnergy"]);
-        $a1 = floatval( $data['a_Pose1']);
+        $a1 = min(floatval($data['a_Pose1']), floatval(@$data['ad_Pose1']));
         $i1 = floatval(@$data['i_Pose1']);
         if ($a1 < 0 && $a1 < $i1)
         {
@@ -267,7 +267,7 @@ OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
 
 heredoc;
 
-$poses = process_dock("a");
+$poses = process_dock("a", false, true);
 
 if ((!$poses || $best_energy >= 0) && count($clashcomp))
 {
@@ -371,7 +371,7 @@ if ((!$poses || $best_energy >= 0) && count($clashcomp))
 
 
     $configf = str_replace($pdbfname, $tmpoutpdb, $configf);
-    $poses = process_dock("a");
+    $poses = process_dock("ad");
 
     // Delete the tmp PDB.
     unlink($tmpoutpdb);

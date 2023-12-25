@@ -141,7 +141,7 @@ $outfname = "output.dock";
 function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname;
-    global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search;
+    global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
     global $atomto, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
     chdir(__DIR__);
@@ -233,6 +233,8 @@ function prepare_outputs()
         if (isset($mbp["flxr" ])) $flxr  = "FLXR {$mbp["flxr"]}";
         if (isset($mbp["aflxr"])) $aflxr = "FLXR {$mbp["aflxr"]}";
         if (isset($mbp["iflxr"])) $iflxr = "FLXR {$mbp["iflxr"]}";
+
+        if (isset($mbp["stddev"])) $num_std_devs = floatval($mbp["stddev"]);
     
         if (isset($mbp["atomto"]))
         {

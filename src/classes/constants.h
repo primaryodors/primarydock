@@ -136,7 +136,7 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
 #define bb_group_distance_cutoff 4.3
-#define bb_enable_residue_disqualifications 0
+#define bb_enable_residue_disqualifications 1
 #define bb_disqualification_energy 1000
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5

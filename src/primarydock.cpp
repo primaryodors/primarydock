@@ -586,37 +586,40 @@ void iteration_callback(int iter, Molecule** mols)
         Pose predrift(ligand);
         float predrift_binding = ligand->get_intermol_binding(mols);
 
-        #if !pocketcen_is_loneliest
-        if (ligand->lastbind <= -100)
+        if (predrift_binding < -drift_energy_threshold)
         {
-            ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
-            ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
-            ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
-        }
-        #endif
-
-        if (bary.get_3d_distance(ligcen_target) > size.magnitude())
-        {
-            //cout << "Wrangle! " << bary << ": " << bary.get_3d_distance(ligcen_target) << " vs. " << size.magnitude() << endl;
-            bary = ligcen_target;
-            // ligand->reset_conformer_momenta();
-        }
-        else
-        {
-            if (ligand->lastbind < 0)
+            #if !pocketcen_is_loneliest
+            if (ligand->lastbind <= -100)
             {
-                bary.x += (ligcen_target.x - bary.x) * drift;
-                bary.y += (ligcen_target.y - bary.y) * drift;
-                bary.z += (ligcen_target.z - bary.z) * drift;
+                ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
+                ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
+                ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
             }
-            else drift *= (1.0 - drift_decay_rate/iters);
+            #endif
+
+            if (bary.get_3d_distance(ligcen_target) > size.magnitude())
+            {
+                //cout << "Wrangle! " << bary << ": " << bary.get_3d_distance(ligcen_target) << " vs. " << size.magnitude() << endl;
+                bary = ligcen_target;
+                // ligand->reset_conformer_momenta();
+            }
+            else
+            {
+                if (ligand->lastbind < 0)
+                {
+                    bary.x += (ligcen_target.x - bary.x) * drift;
+                    bary.y += (ligcen_target.y - bary.y) * drift;
+                    bary.z += (ligcen_target.z - bary.z) * drift;
+                }
+                else drift *= (1.0 - drift_decay_rate/iters);
+            }
+
+            ligand->recenter(bary);
+
+            // float postdrift_binding = ligand->get_intermol_binding(mols);
+
+            // if (postdrift_binding < predrift_binding) predrift.restore_state(ligand);
         }
-
-        ligand->recenter(bary);
-
-        float postdrift_binding = ligand->get_intermol_binding(mols);
-
-        if (postdrift_binding < predrift_binding) predrift.restore_state(ligand);
 
         #endif
     }
@@ -2776,6 +2779,26 @@ _try_again:
 
                     #if _dbg_groupsel
                     cout << endl;
+                    #endif
+
+                    Molecule* lmols[256];
+                    for (l=0; reaches_spheroid[nodeno][l]; l++)
+                    {
+                        lmols[l] = (Molecule*)reaches_spheroid[nodeno][l];
+                    }
+
+                    #if bb_enable_residue_disqualifications
+                    if (ligand->get_intermol_clashes(lmols) >= bb_disqualification_energy)
+                    {
+                        #if _dbg_groupsel
+                        cout << "Primary residue group is disqualified." << endl;
+                        #endif
+
+                        global_pairs[0]->disqualify();
+                        std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
+                        global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
+                        GroupPair::align_groups(ligand, global_pairs, false, 1);
+                    }
                     #endif
 
                     int gpn = global_pairs.size();

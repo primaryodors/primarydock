@@ -4,6 +4,7 @@
 std::vector<MCoord> mtlcoords;
 std::vector<std::shared_ptr<GroupPair>> global_pairs;
 std::vector<Moiety> predef_grp;
+std::vector<AminoAcid*> ResidueGroup::disqualified_residues;
 
 void ResiduePlaceholder::set(const char* str)
 {
@@ -876,7 +877,7 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
 {
     std::vector<std::shared_ptr<ResidueGroup>> retval;
     if (!aalist) return retval;
-    int i, j, n;
+    int i, j, m, n;
     for (n=0; aalist[n]; n++);          // Get count.
     bool dirty[n+4];
     for (i=0; i<n; i++) dirty[i] = false;
@@ -890,6 +891,11 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
 
         std::shared_ptr<ResidueGroup> g(new ResidueGroup());
         AminoAcid* aa = aalist[i];
+
+        m = disqualified_residues.size();
+        bool dq = false;
+        for (j=0; j<m; j++) if (disqualified_residues[j] == aa) dq = true;
+        if (dq) continue;
 
         Atom* CB = aa->get_atom("CB");
         if (CB)
@@ -1327,6 +1333,17 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
     #endif
 
     return retval;
+}
+
+void GroupPair::disqualify()
+{
+    if (!scg) return;
+    if (!scg->aminos.size()) return;
+    int i, n = scg->aminos.size();
+    for (i=0; i<n; i++)
+    {
+        if (scg->aminos[i]) ResidueGroup::disqualified_residues.push_back(scg->aminos[i]);
+    }
 }
 
 void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)

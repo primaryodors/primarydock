@@ -136,6 +136,8 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.15
 #define bb_group_distance_cutoff 4.3
+#define bb_enable_residue_disqualifications 0
+#define bb_disqualification_energy 1000
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
 #define bb_realign_amount 0.2
@@ -213,8 +215,9 @@
 // Drift pulls the ligand towards the loneliest point if it encounters clashes.
 // Turning it off can cause the ligand to be ejected from the protein.
 #define allow_drift 1
-#define initial_drift 0.1
-#define drift_decay_rate 0.2
+#define initial_drift 0.3
+#define drift_decay_rate 0.01
+#define drift_energy_threshold 1000
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
 #define allow_mol_fullrot_iter 0

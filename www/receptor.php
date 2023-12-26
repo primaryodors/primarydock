@@ -299,6 +299,7 @@ if (@$receptor["btree"])
 {
     foreach ($treenodes as $nodeid => $nodename)
     {
+        $nodeid = str_replace('*', '', $nodeid);
         $len = strlen($nodeid);
         if (substr($receptor["btree"], 0, $len) === $nodeid)
         {

@@ -141,6 +141,23 @@ foreach ($prots as $protid => $p)
 
 ksort($tree, SORT_STRING);
 
+$major = [];
+foreach ($treenodes as $nodeid => $nodename)
+{
+    if (substr($nodeid, 0, 1) == '*')
+    {
+        $major[$nodename] = "<a href=\"receptors.php?tree=1&bt=".substr($nodeid,1)."\">$nodename</a>";
+    }
+}
+if (count($major))
+{
+    $keys = array_keys($major);
+    natsort($keys);
+    $disparr = [];
+    foreach ($keys as $k) $disparr[] = $major[$k];
+    echo "<small>Major nodes: ".implode(" | ",$disparr)."</small><br>";
+}
+
 echo "<pre>";
 
 if (@$_REQUEST['bt']) echo "<a href=\"receptors.php?tree=1&bt=".substr($_REQUEST['bt'], 0, strlen($_REQUEST['bt'])-1)."\">&#x21b0;</a>\n";

@@ -155,7 +155,7 @@ if (count($major))
     natsort($keys);
     $disparr = [];
     foreach ($keys as $k) $disparr[] = $major[$k];
-    echo implode(" | ",$disparr);
+    echo "<small>Major nodes: ".implode(" | ",$disparr)."</small><br>";
 }
 
 echo "<pre>";

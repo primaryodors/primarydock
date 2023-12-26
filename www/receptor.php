@@ -299,6 +299,7 @@ if (@$receptor["btree"])
 {
     foreach ($treenodes as $nodeid => $nodename)
     {
+        $nodeid = str_replace('*', '', $nodeid);
         $len = strlen($nodeid);
         if (substr($receptor["btree"], 0, $len) === $nodeid)
         {
@@ -350,7 +351,7 @@ else
 ?>
     </button>
 	<button class="tablinks <?php if (!count($pairs)) echo "default"; ?>" id="tabInfo" onclick="openTab(this, 'Info');">Info</button>
-    <?php if (count($pairs)) { ?>
+    <?php if (count($pairs) || count($predictions)) { ?>
     <button class="tablinks default" id="tabLigands" onclick="openTab(this, 'Ligands');">Ligands</button>
     <?php } ?>
     <button class="tablinks" id="tabRefs" onclick="openTab(this, 'Refs');">References</button>

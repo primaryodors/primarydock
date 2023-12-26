@@ -1173,6 +1173,13 @@ float GroupPair::get_potential()
                         #endif
                     }
 
+                    if (!a->get_charge() || !aa->get_charge())
+                    {
+                        bool apol = fabs(a->is_polar()) > hydrophilicity_cutoff;
+                        bool aapol = fabs(aa->hydrophilicity()) > hydrophilicity_cutoff;
+                        if (apol != aapol) partial /= 3;
+                    }
+
                     #if _dbg_groupsel
                     cout << "Potential for " << *a << "..." << *aa << " = " << partial << endl;
                     #endif

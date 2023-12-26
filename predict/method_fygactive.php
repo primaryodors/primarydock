@@ -14,7 +14,7 @@ $flxi = 1;                      // Flexion for inactive dock.
 $pose = 10;
 $iter = 50;
 $elim = 1e6;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
-$num_std_devs = 1.5;            // How many standard deviations to move the helices for active clash compensation.
+$num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
 
 chdir(__DIR__);
 require_once("methods_common.php");

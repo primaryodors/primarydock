@@ -1336,7 +1336,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
 
 void GroupPair::align_groups_noconform(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)
 {
-    GroupPair::align_groups(lig, gp, false);
+    GroupPair::align_groups(lig, gp, false, bb_realign_amount);
 }
 
 void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp, bool do_conforms, float amount)

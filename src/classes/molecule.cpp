@@ -3423,6 +3423,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             if (!i) cout << "final " << -benerg << " " << endl << flush;
             #endif
 
+            #if bb_realign_mol
             if (a->agroups.size() && group_realign)
             {
                 Pose pre_realign(a);
@@ -3432,6 +3433,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
                 if (tryenerg < benerg) pre_realign.restore_state(a);
             }
+            #endif
         }       // for i
 
         #if allow_iter_cb

@@ -403,10 +403,12 @@ void iteration_callback(int iter, Molecule** mols)
         iter_best_bind = f;
     }
 
+    #if use_best_binding_iteration
     if (iter == iters && iter_best_bind > 0)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);
     }
+    #endif
     
     int i, j, n;
 
@@ -453,7 +455,7 @@ void iteration_callback(int iter, Molecule** mols)
                 #endif
 
                 if (use_bestbind_algorithm && global_pairs.size() >= 2)
-                    GroupPair::align_groups(ligand, global_pairs, false, 0.3);
+                    GroupPair::align_groups(ligand, global_pairs, false, bb_realign_amount);
                 #if _dbg_soft_dynamics
                 cout << "Aligned groups." << endl << flush;
                 #endif

@@ -123,8 +123,8 @@
 #define ignore_double_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
-#define lmpush 1.0
-#define lmpull 0.3
+#define lmpush 3.0
+#define lmpull 0.5
 #define lmsteps 10
 #define recapture_ejected_ligand 0
 
@@ -138,7 +138,8 @@
 #define bb_group_distance_cutoff 4.3
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
-#define bb_realign_b_threshold 20
+#define bb_realign_amount 0.2
+#define bb_realign_mol 0
 #define bb_realign_threshold_distance 1.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1
@@ -147,6 +148,7 @@
 #define no_zero_flexions 1
 #define flexion_probability_multiplier 0.4
 #define ignore_invalid_partial 1
+#define use_best_binding_iteration 0
 
 // If enabled, the trip switch functionality will have to be moved around in the code.
 // But since we are using an active vs. inactive energy comparison, this feature is obsolete.

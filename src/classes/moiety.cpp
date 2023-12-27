@@ -135,11 +135,11 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
             c = p[i];
 
             if (c <= ' ') continue;
-            /*if (c == '-')
+            if (c == '-')
             {
                 card = 1;
                 continue;
-            }*/
+            }
             else if (c == '=')
             {
                 card = 2;
@@ -282,6 +282,7 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
         next_iter:
         if (atoms_used) break;
     }
+    if (card) return 0;
     out_matches[atoms_used] = nullptr;
     if (num_numbers) return 0;
     // cout << "Result: " << atoms_used << endl;

@@ -799,7 +799,14 @@ int main(int argc, char** argv)
         constraints.push_back("STCR 6.44");
     }
 
-    if (l6x59 == 'R' || l6x59 == 'K')
+    if (l6x59 == 'R')
+    {
+        aa6x59->movability = MOV_FLEXONLY;
+        pt = aa6x59->get_CA_location().add(aa5x39->get_CA_location());
+        pt.multiply(0.5);
+        aa6x59->conform_atom_to_location("NE", pt);
+    }
+    else if (l6x59 == 'K')
     {
         aa6x59->movability = MOV_FLEXONLY;
         aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());

@@ -6613,7 +6613,8 @@
                 "muguet",
                 "lily"
             ]
-        }
+        },
+        "oid": "2a84a1793e17c969c9cb0e5aeee39832"
     },
     "2b22de90d14c97467edeb0f9e49a5137":
     {
@@ -21514,6 +21515,22 @@
             }
         },
         "oid": "98b53a93656cbe9cb4888249ea47875a"
+    },
+    "98ea90b210c054c7d211587849b6322c":
+    {
+        "full_name": "anthraquinone",
+        "smiles": "O=C1c2ccccc2C(=O)c3ccccc13",
+        "activity":
+        {
+            "https:\/\/doi.org\/10.3390\/s21103468":
+            {
+                "OR6M1":
+                {
+                    "type": "ma",
+                    "adjusted_curve_top": "10"
+                }
+            }
+        }
     },
     "995a30359f65486f6be166e403f78971":
     {

@@ -26,6 +26,7 @@
 #define unconnected_residue_mindist 4.82
 #define clash_limit_per_aa 4.0
 #define contact_r_5x58_7x53 3.93
+#define memsanity 0x10000000
 
 #define pH 6.0
 #define auto_pK_protonation 0

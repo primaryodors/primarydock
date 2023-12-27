@@ -863,10 +863,51 @@ void Molecule::identify_conjugations()
 bool Molecule::check_Greek_continuity()
 {
     if (!atoms) return true;
-    int i;
+    int i, j, k, l, m;
     for (i=0; atoms[i]; i++)
     {
         if (!atoms[i]->check_Greek_continuity()) return false;
+
+        continue;
+
+        if (!atoms[i]->residue) continue;
+        if (atoms[i]->is_backbone) continue;
+        if (atoms[i]->get_Z() < 2) continue;
+
+        int n = atoms[i]->get_geometry();
+        if (!n) continue;
+        Bond* bb[n+8];
+        for (j=0; j<n+8; j++) bb[j] = nullptr;
+        atoms[i]->fetch_bonds(bb);
+
+        int ig = greek_from_aname(atoms[i]->name);
+        if (ig < 0) continue;
+        for (j=i+1; atoms[j]; j++)
+        {
+            if (atoms[j]->get_Z() < 5) continue;
+            int jg = greek_from_aname(atoms[j]->name);
+            if (jg > ig)
+            {
+                bool found = false;
+                for (k=0; bb[k]; k++)
+                {
+                    Atom* mwb[256];
+                    for (l=0; l<256; l++) mwb[l] = nullptr;
+                    bb[k]->fetch_moves_with_btom(mwb);
+                    for (l=0; mwb[l]; l++)
+                    {
+                        if (mwb[l] == atoms[j])
+                        {
+                            found = true;
+                            goto _exit_mwbsearch;
+                        }
+                    }
+                }
+                if (!found) return false;
+            }
+            _exit_mwbsearch:
+            ;
+        }
     }
 
     return true;
@@ -1287,7 +1328,7 @@ void Molecule::copy_path(int old_idx, int new_idx)
 {
     if (!paths) return;
     if (!paths[old_idx]) return;
-    if (abs((__int64_t)paths[old_idx][0] - (__int64_t)paths[old_idx]) >= 16777216) return;
+    if (abs((__int64_t)paths[old_idx][0] - (__int64_t)paths[old_idx]) >= memsanity) return;
 
     if (!paths[new_idx]) paths[new_idx] = new Atom*[get_atom_count()];
     int i;
@@ -1381,15 +1422,15 @@ void Molecule::find_paths()
             a = path_get_terminal_atom(i);
             if (!a) continue;
             if (!a->name) continue;
-            if (abs((__int64_t)(atoms[0]) - (__int64_t)a) >= 16777216) continue;
+            if (abs((__int64_t)(atoms[0]) - (__int64_t)a) >= memsanity) continue;
             a->fetch_bonds(b);
             if (!b[0]) continue;
 
             k=0;
             for (j=0; b[j]; j++)
             {
-                if (abs((__int64_t)(a) - (__int64_t)b[j]) > 16777216) break;
-                if (abs((__int64_t)(b[j]) - (__int64_t)b[j]->btom) > 16777216) break;
+                if (abs((__int64_t)(a) - (__int64_t)b[j]) > memsanity) break;
+                if (abs((__int64_t)(b[j]) - (__int64_t)b[j]->btom) > memsanity) break;
                 if (!b[j]->btom) continue;
                 if (b[j]->btom->get_Z() < 2) continue;
                 if (b[j]->btom->get_bonded_heavy_atoms_count() < 2) continue;
@@ -3090,6 +3131,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
         {
             Molecule* a = mm[i];
 
+            #if _dbg_asunder_atoms
+            if (!a->check_Greek_continuity()) throw 0xbadc0de;
+            #endif
+
             if (a->movability & MOV_BKGRND) continue;
 
             Point aloc = a->get_barycenter();
@@ -3111,6 +3156,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
             #if _dbg_fitness_plummet
             if (!i) cout << "# mol " << a->name << " iter " << iter << ": initial " << -benerg << " ";
+            #endif
+
+            #if _dbg_asunder_atoms
+            if (!a->check_Greek_continuity()) throw 0xbadc0de;
             #endif
 
             float tryenerg;
@@ -3242,6 +3291,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             if (!i) cout << "linear " << -benerg << " ";
             #endif
 
+            #if _dbg_asunder_atoms
+            if (!a->check_Greek_continuity()) throw 0xbadc0de;
+            #endif
+
             /**** Histidine flip ****/
             if (mm[i]->hisflips)
             {
@@ -3266,6 +3319,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 }
             }
             /**** End histidine flip ****/
+            
+            #if _dbg_asunder_atoms
+            if (!a->check_Greek_continuity()) throw 0xbadc0de;
+            #endif
 
             #if allow_axial_tumble
             if ((a->movability & MOV_CAN_AXIAL) && !(a->movability & MOV_FORBIDDEN))
@@ -3303,6 +3360,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
 
             #if _dbg_fitness_plummet
             if (!i) cout << "axial " << -benerg << " ";
+            #endif
+
+            #if _dbg_asunder_atoms
+            if (!a->check_Greek_continuity()) throw 0xbadc0de;
             #endif
 
             #if allow_bond_rots

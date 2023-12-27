@@ -686,7 +686,7 @@ float Atom::is_bonded_to(Atom* lbtom)
     for (i=0; i<geometry; i++)
     {
         if (bonded_to[i].btom
-            && abs(reinterpret_cast<long>(bonded_to[i].btom) - reinterpret_cast<long>(bonded_to)) < 33554432
+            && abs(reinterpret_cast<long>(bonded_to[i].btom) - reinterpret_cast<long>(bonded_to)) < memsanity
             && bonded_to[i].btom->get_Z() > 0 && bonded_to[i].btom->get_Z() <= 118)
         {
             if (bonded_to[i].btom == lbtom) return bonded_to[i].cardinality;
@@ -710,6 +710,7 @@ bool Atom::check_Greek_continuity()
     if (!residue) return true;
     if (is_backbone) return true;
     if (Z < 5) return true;
+    if (!strcmp(name, "OXT")) return true;
     int a = greek_from_aname(name);
     if (a <= 0) return true;
     if (!origgeo) return true;

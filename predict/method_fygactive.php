@@ -269,7 +269,7 @@ heredoc;
 
 $poses = process_dock("a", false, true);
 
-if ((!$poses || $best_energy >= 0) && count($clashcomp))
+if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
 {
     if (!count($template)) build_template();
 

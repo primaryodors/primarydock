@@ -134,7 +134,7 @@
 
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
-#define bb_stochastic 0.15
+#define bb_stochastic 0.25
 #define bb_group_distance_cutoff 4.3
 #define bb_enable_residue_disqualifications 1
 #define bb_disqualification_energy 1000
@@ -343,6 +343,7 @@
 #define _dbg_259 0
 #define _dbg_51e2_ionic 0
 #define _dbg_anemia 0
+#define _dbg_asunder_atoms 0
 #define _dbg_bb_pullaway 0
 #define _dbg_bb_realign 0
 #define _dbg_bb_rots 0

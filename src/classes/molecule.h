@@ -156,6 +156,7 @@ public:
     bool rotate_bond(const Bond* rot8b, const float angle);
     void do_histidine_flip(HistidineFlip* hf);
     void identify_conjugations();
+    bool check_Greek_continuity();
 
     // Ring functions.
     int identify_rings();

@@ -293,7 +293,6 @@ foreach (array_keys($sorted) as $rcpid)
     else
     {
         echo "<td>&nbsp;</td>\n";
-        echo "<td>&nbsp;</td>\n";
     }    
 
     echo "</tr>\n";

@@ -210,6 +210,7 @@ public:
     int num_bonded_to_in_ring(const char* element, Ring* member_of);
 
     bool shares_bonded_with(Atom* btom);
+    bool check_Greek_continuity();
 
     Bond* get_bond_between(Atom* btom);
     Bond* get_bond_between(const char* bname);

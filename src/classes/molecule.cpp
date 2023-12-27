@@ -850,9 +850,7 @@ int Molecule::from_sdf(char const* sdf_dat)
 void Molecule::identify_conjugations()
 {
     if (!atoms) return;
-
     int i;
-
     for (i=0; atoms[i]; i++)
     {
         if (atoms[i]->is_pi() && !atoms[i]->conjugation)
@@ -860,6 +858,18 @@ void Molecule::identify_conjugations()
             Conjugation* conj = new Conjugation(atoms[i]);          // Don't have to save this pointer because the atoms will save it.
         }
     }
+}
+
+bool Molecule::check_Greek_continuity()
+{
+    if (!atoms) return true;
+    int i;
+    for (i=0; atoms[i]; i++)
+    {
+        if (!atoms[i]->check_Greek_continuity()) return false;
+    }
+
+    return true;
 }
 
 int Molecule::from_pdb(FILE* is, bool het_only)
@@ -3303,6 +3313,10 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             #endif
             if (((a->movability & MOV_CAN_FLEX) && !(a->movability & MOV_FORBIDDEN)) || a->movability == MOV_FLXDESEL)
             {
+                #if _dbg_asunder_atoms
+                if (!a->check_Greek_continuity()) throw 0xbadc0de;
+                #endif
+
                 float self_clash = max(1.25*a->base_internal_clashes, clash_limit_per_aa);
                 Bond** bb = a->get_rotatable_bonds();
                 if (bb)

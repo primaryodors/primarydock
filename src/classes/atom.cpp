@@ -705,6 +705,30 @@ bool Atom::shares_bonded_with(Atom* btom)
     return false;
 }
 
+bool Atom::check_Greek_continuity()
+{
+    if (!residue) return true;
+    if (is_backbone) return true;
+    if (Z < 5) return true;
+    int a = greek_from_aname(name);
+    if (a <= 0) return true;
+    if (!origgeo) return true;
+
+    int i;
+    for (i=0; i<origgeo; i++)
+    {
+        if (!bonded_to[i].btom) continue;
+        int b = greek_from_aname(bonded_to[i].btom->name);
+        if (b>=0 && b == a-1)
+        {
+            if (!bonded_to[i].btom->is_bonded_to(this)) throw 0xface;
+            else return true;
+        }
+    }
+
+    return false;
+}
+
 Atom* Atom::is_bonded_to(const char* element)
 {
     if (!bonded_to) return 0;

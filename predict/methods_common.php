@@ -629,7 +629,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         if (stream_isatty(STDOUT) && isset($outdata['Predicted']) && file_exists("predict/soundalert"))
         {
             $play_sound = true;
-            if ($no_sound_if_clashing && !count($clashcomp)) $play_sound = false;
+            if ($no_sound_if_clashing && count($clashcomp)) $play_sound = false;
             $sa = explode(",",file_get_contents("predict/soundalert"));
             if (count($sa) == 2)
             {

@@ -472,7 +472,6 @@ int main(int argc, char** argv)
     else if (l6x59 == 'R')
     {
         rock6_dir = aa5x39->get_CA_location().subtract(aa6x55->get_CA_location());
-        // aa6x59->conform_atom_to_location("NE", aa6x59->get_CA_location().add(rock6_dir));
         aa6x59->conform_atom_to_location("NE", Point(0,10000,0));
         aa6x59->movability = MOV_PINNED;
         exr2_bend = true;
@@ -507,7 +506,7 @@ int main(int argc, char** argv)
         dyn.type = dyn_wind;
         dyn.start_resno = BallesterosWeinstein("6.56");
         dyn.end_resno = BallesterosWeinstein("6.60");
-        dyn.bias = -12; // -18;     // The greater unwind brings R6.59 too deep into the binding pocket.
+        dyn.bias = -12;
         dyn.apply_absolute(1);
 
         cout << "Performing rock6..." << endl;

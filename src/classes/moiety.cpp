@@ -251,7 +251,6 @@ int Moiety::does_atom_match(Atom* a, Atom** out_matches)
                             #if _dbg_moieties
                             cout << "Skipping " << b[j]->btom->name << " for bond cardinality..." << endl;
                             #endif
-                            // return 0;
                             continue;
                         }
                         card = 0;

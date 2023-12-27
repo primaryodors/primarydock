@@ -214,7 +214,7 @@ int main(int argc, char** argv)
     interauditing = true;
     #endif
     float final_clashes = m1.get_intermol_clashes(&m2);
-    // if (final_clashes > 5.0) cout << "Intermol clashes " << final_clashes << " are above threshold. FAIL." << endl;
+
     float energyLevel = m1.get_intermol_binding(&m2);
     cout << "\n# Post-conformation intermol energy level: " << -energyLevel << " kJ/mol." << endl;
 

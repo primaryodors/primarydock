@@ -16,6 +16,8 @@ $iter = 50;
 $elim = 1e6;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
 $num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
 
+$accuracy_receptors = ["OR51E2", "TAAR1"];
+
 chdir(__DIR__);
 require_once("methods_common.php");
 chdir(__DIR__);
@@ -180,7 +182,26 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
     $cmd = "bin/fyg_activate_or $args";
     echo "$cmd\n";
     passthru($cmd);
-    // exec("bin/pepteditor predict/model_accuracy.pepd");
+
+    if (in_array($protid, $accuracy_receptors) && file_exists("devenv"))
+    {
+        $c = file_get_contents("predict/model_accuracy.sh");
+        $lines = explode("\n", $c);
+        foreach ($lines as $lno => $ln)
+        {
+            if (false!==strpos($ln, "bin/fyg_activate_or $protid "))
+            {
+                $lines[$lno] = "make bin/fyg_activate_or && $cmd";
+            }
+        }
+        $c = implode("\n", $lines);
+        $fp = fopen("predict/model_accuracy.sh", "w");
+        if ($fp)
+        {
+            fwrite($fp, $c);
+            fclose($fp);
+        }
+    }
 }
 
 $flex_constraints = "";

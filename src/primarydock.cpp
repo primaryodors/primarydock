@@ -3013,7 +3013,10 @@ _try_again:
                     {
                         if (i >= regions[j].start && i <= regions[j].end)
                         {
-                            k = (i - regions[j].start) * 3 / (regions[j].end - regions[j].start);
+                            int rgcen = (regions[j].start + regions[j].end)/2;
+                            k = abs(i - rgcen);
+                            if (k < 5) k = 1;
+                            else k = (i < rgcen) ? 0 : 2;
                             region_clashes[j][k] = region_clashes[j][k].add(dr[drcount][nodeno].res_clash_dir[i]);
                         }
                     }

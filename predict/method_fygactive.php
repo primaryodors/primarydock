@@ -11,9 +11,9 @@
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1) for active dock.
 $flxi = 1;                      // Flexion for inactive dock.
-$pose = 10;
-$iter = 50;
-$elim = 1e6;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
+$pose = 15;
+$iter = 30;
+$elim = 1e3;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
 $num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
 
 $accuracy_receptors = ["OR51E2", "TAAR1"];
@@ -191,7 +191,7 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
         {
             if (false!==strpos($ln, "bin/fyg_activate_or $protid "))
             {
-                $lines[$lno] = "make bin/fyg_activate_or && $cmd";
+                $lines[$lno] = "make bin/fyg_activate_or && $cmd && bin/pepteditor predict/model_accuracy.pepd";
             }
         }
         $c = implode("\n", $lines);

@@ -4,6 +4,7 @@
 std::vector<MCoord> mtlcoords;
 std::vector<std::shared_ptr<GroupPair>> global_pairs;
 std::vector<Moiety> predef_grp;
+std::vector<AminoAcid*> ResidueGroup::disqualified_residues;
 
 void ResiduePlaceholder::set(const char* str)
 {
@@ -876,7 +877,7 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
 {
     std::vector<std::shared_ptr<ResidueGroup>> retval;
     if (!aalist) return retval;
-    int i, j, n;
+    int i, j, m, n;
     for (n=0; aalist[n]; n++);          // Get count.
     bool dirty[n+4];
     for (i=0; i<n; i++) dirty[i] = false;
@@ -890,6 +891,11 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
 
         std::shared_ptr<ResidueGroup> g(new ResidueGroup());
         AminoAcid* aa = aalist[i];
+
+        m = disqualified_residues.size();
+        bool dq = false;
+        for (j=0; j<m; j++) if (disqualified_residues[j] == aa) dq = true;
+        if (dq) continue;
 
         Atom* CB = aa->get_atom("CB");
         if (CB)
@@ -1173,6 +1179,13 @@ float GroupPair::get_potential()
                         #endif
                     }
 
+                    if (!a->get_charge() || !aa->get_charge())
+                    {
+                        bool apol = fabs(a->is_polar()) > hydrophilicity_cutoff;
+                        bool aapol = fabs(aa->hydrophilicity()) > hydrophilicity_cutoff;
+                        if (apol != aapol) partial /= 3;
+                    }
+
                     #if _dbg_groupsel
                     cout << "Potential for " << *a << "..." << *aa << " = " << partial << endl;
                     #endif
@@ -1322,6 +1335,17 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
     return retval;
 }
 
+void GroupPair::disqualify()
+{
+    if (!scg) return;
+    if (!scg->aminos.size()) return;
+    int i, n = scg->aminos.size();
+    for (i=0; i<n; i++)
+    {
+        if (scg->aminos[i]) ResidueGroup::disqualified_residues.push_back(scg->aminos[i]);
+    }
+}
+
 void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)
 {
     GroupPair::align_groups(lig, gp, true);
@@ -1329,7 +1353,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
 
 void GroupPair::align_groups_noconform(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp)
 {
-    GroupPair::align_groups(lig, gp, false);
+    GroupPair::align_groups(lig, gp, false, bb_realign_amount);
 }
 
 void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPair>> gp, bool do_conforms, float amount)
@@ -1369,7 +1393,7 @@ void GroupPair::align_groups(Molecule* lig, std::vector<std::shared_ptr<GroupPai
     try
     {
         if (n > 1 && gp.at(1) && gp[1]->scg && gp[1]->ag
-            && abs((long)gp[1]->ag.get() - (long)gp[1]->scg.get()) < 16777216)
+            && abs((long)gp[1]->ag.get() - (long)gp[1]->scg.get()) < memsanity)
             r1 = gp[1]->scg->distance_to(gp[1]->ag->get_center());
     }
     catch (...)

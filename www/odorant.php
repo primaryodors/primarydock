@@ -293,7 +293,6 @@ foreach (array_keys($sorted) as $rcpid)
     else
     {
         echo "<td>&nbsp;</td>\n";
-        echo "<td>&nbsp;</td>\n";
     }    
 
     echo "</tr>\n";
@@ -319,10 +318,10 @@ foreach ($lrefs as $idx => $refurl)
     echo "</p></a>\n";
 }
 ?>
-<p>References for aroma perceptual qualities should not be taken to indicate that the authors of outside studies necessarily
+<!-- p>References for aroma perceptual qualities should not be taken to indicate that the authors of outside studies necessarily
 assigned aroma notes to the neurons that receive input from any given receptor.
 Rather, the findings of outside studies often constitute the information on which we base our own perceptual quality assignments.
-</p>
+</p -->
 </div>
 </div>
 </div>

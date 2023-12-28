@@ -11,10 +11,12 @@
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1) for active dock.
 $flxi = 1;                      // Flexion for inactive dock.
-$pose = 10;
-$iter = 50;
-$elim = 1e4;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
-$num_std_devs = 1.5;            // How many standard deviations to move the helices for active clash compensation.
+$pose = 15;
+$iter = 30;
+$elim = 1e3;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
+$num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
+
+$accuracy_receptors = ["OR51E2", "TAAR1"];
 
 chdir(__DIR__);
 require_once("methods_common.php");
@@ -37,9 +39,9 @@ function make_prediction($data)
 
     if (isset($data["a_Pose1"]))
     {
-        $ae = floatval(@$data['a_BindingEnergy']);
+        $ae = min(floatval(@$data['a_BindingEnergy']), floatval(@$data['ad_BindingEnergy']));
         $ie = floatval(@$data["i_BindingEnergy"]);
-        $a1 = floatval( $data['a_Pose1']);
+        $a1 = min(floatval($data['a_Pose1']), floatval(@$data['ad_Pose1']));
         $i1 = floatval(@$data['i_Pose1']);
         if ($a1 < 0 && $a1 < $i1)
         {
@@ -180,7 +182,26 @@ if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("b
     $cmd = "bin/fyg_activate_or $args";
     echo "$cmd\n";
     passthru($cmd);
-    // exec("bin/pepteditor predict/model_accuracy.pepd");
+
+    if (in_array($protid, $accuracy_receptors) && file_exists("devenv"))
+    {
+        $c = file_get_contents("predict/model_accuracy.sh");
+        $lines = explode("\n", $c);
+        foreach ($lines as $lno => $ln)
+        {
+            if (false!==strpos($ln, "bin/fyg_activate_or $protid "))
+            {
+                $lines[$lno] = "make bin/fyg_activate_or && $cmd && bin/pepteditor predict/model_accuracy.pepd";
+            }
+        }
+        $c = implode("\n", $lines);
+        $fp = fopen("predict/model_accuracy.sh", "w");
+        if ($fp)
+        {
+            fwrite($fp, $c);
+            fclose($fp);
+        }
+    }
 }
 
 $flex_constraints = "";
@@ -267,9 +288,9 @@ OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
 
 heredoc;
 
-$poses = process_dock("a");
+$poses = process_dock("a", false, true);
 
-if ((!$poses || $best_energy >= 0) && count($clashcomp))
+if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
 {
     if (!count($template)) build_template();
 
@@ -371,7 +392,7 @@ if ((!$poses || $best_energy >= 0) && count($clashcomp))
 
 
     $configf = str_replace($pdbfname, $tmpoutpdb, $configf);
-    $poses = process_dock("a");
+    $poses = process_dock("ad");
 
     // Delete the tmp PDB.
     unlink($tmpoutpdb);

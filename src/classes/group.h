@@ -72,6 +72,8 @@ class ResidueGroup
     float pi_stackability();
 
     static std::vector<std::shared_ptr<ResidueGroup>> get_potential_side_chain_groups(AminoAcid** aalist, Point pocketcen);
+
+    static std::vector<AminoAcid*> disqualified_residues;
 };
 
 class GroupPair
@@ -88,6 +90,8 @@ class GroupPair
     static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);
     static void align_groups_noconform(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs);
     static void align_groups(Molecule* ligand, std::vector<std::shared_ptr<GroupPair>> group_pairs, bool do_conforms, float amount=1);    // Assumes the ligand is already centered in the pocket.
+
+    void disqualify();
 
     protected:
     float potential = 0;

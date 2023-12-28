@@ -71,6 +71,8 @@ Protein* ptplref;
 int seql = 0;
 int mcoord_resno[256];
 int addl_resno[256];
+const Region* regions;
+SCoord region_clashes[85][3];
 Molecule* ligand;
 Molecule** waters = nullptr;
 Molecule** owaters = nullptr;
@@ -401,10 +403,12 @@ void iteration_callback(int iter, Molecule** mols)
         iter_best_bind = f;
     }
 
+    #if use_best_binding_iteration
     if (iter == iters && iter_best_bind > 0)
     {
         for (l=0; mols[l]; l++) iter_best_pose[l].restore_state(mols[l]);
     }
+    #endif
     
     int i, j, n;
 
@@ -451,7 +455,7 @@ void iteration_callback(int iter, Molecule** mols)
                 #endif
 
                 if (use_bestbind_algorithm && global_pairs.size() >= 2)
-                    GroupPair::align_groups(ligand, global_pairs, false, 0.3);
+                    GroupPair::align_groups(ligand, global_pairs, false, bb_realign_amount);
                 #if _dbg_soft_dynamics
                 cout << "Aligned groups." << endl << flush;
                 #endif
@@ -582,37 +586,36 @@ void iteration_callback(int iter, Molecule** mols)
         Pose predrift(ligand);
         float predrift_binding = ligand->get_intermol_binding(mols);
 
-        #if !pocketcen_is_loneliest
-        if (ligand->lastbind <= -100)
+        if (predrift_binding < -drift_energy_threshold)
         {
-            ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
-            ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
-            ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
-        }
-        #endif
-
-        if (bary.get_3d_distance(ligcen_target) > size.magnitude())
-        {
-            //cout << "Wrangle! " << bary << ": " << bary.get_3d_distance(ligcen_target) << " vs. " << size.magnitude() << endl;
-            bary = ligcen_target;
-            // ligand->reset_conformer_momenta();
-        }
-        else
-        {
-            if (ligand->lastbind < 0)
+            #if !pocketcen_is_loneliest
+            if (ligand->lastbind <= -100)
             {
-                bary.x += (ligcen_target.x - bary.x) * drift;
-                bary.y += (ligcen_target.y - bary.y) * drift;
-                bary.z += (ligcen_target.z - bary.z) * drift;
+                ligcen_target.x += (loneliest.x - ligcen_target.x) * drift;
+                ligcen_target.y += (loneliest.y - ligcen_target.y) * drift;
+                ligcen_target.z += (loneliest.z - ligcen_target.z) * drift;
             }
-            else drift *= (1.0 - drift_decay_rate/iters);
+            #endif
+
+            if (bary.get_3d_distance(ligcen_target) > size.magnitude())
+            {
+                //cout << "Wrangle! " << bary << ": " << bary.get_3d_distance(ligcen_target) << " vs. " << size.magnitude() << endl;
+                bary = ligcen_target;
+                // ligand->reset_conformer_momenta();
+            }
+            else
+            {
+                if (ligand->lastbind < 0)
+                {
+                    bary.x += (ligcen_target.x - bary.x) * drift;
+                    bary.y += (ligcen_target.y - bary.y) * drift;
+                    bary.z += (ligcen_target.z - bary.z) * drift;
+                }
+                else drift *= (1.0 - drift_decay_rate/iters);
+            }
+
+            ligand->recenter(bary);
         }
-
-        ligand->recenter(bary);
-
-        float postdrift_binding = ligand->get_intermol_binding(mols);
-
-        if (postdrift_binding < predrift_binding) predrift.restore_state(ligand);
 
         #endif
     }
@@ -747,17 +750,26 @@ Point pocketcen_from_config_words(char** words, Point* old_pocketcen)
             if (!j) break;
             resnos.push_back(j);
             AminoAcid* aa = protein->get_residue(j);
-            aa->priority = true;
+            if (aa) aa->priority = true;
         }
 
-        int sz = resnos.size();
+        int sz = resnos.size(), div=0;
         Point foravg[sz + 2];
         for (i=0; i<sz; i++)
         {
-            foravg[i] = protein->get_atom_location(resnos[i], "CA");
+            #if pocketcen_from_reach_atoms
+            AminoAcid* aa = protein->get_residue(resnos[i]);
+            if (aa)
+            {
+                foravg[i] = aa->get_reach_atom_location();
+                div++;
+            }
+            #else
+            foravg[div++] = protein->get_atom_location(resnos[i], "CA");
+            #endif
         }
 
-        return average_of_points(foravg, sz);
+        return average_of_points(foravg, div?:1);
     }
     else if (!strcmp(words[i], "REL"))
     {
@@ -2278,6 +2290,17 @@ _try_again:
     // srand(0xb00d1cca);
     srand(time(NULL));
     Point nodecens[pathnodes+1];
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // Main loop.
+    /////////////////////////////////////////////////////////////////////////////////
+
+    regions = protein->get_regions();
+    for (i=0; regions[i].start; i++)
+    {
+        region_clashes[i][0] = region_clashes[i][1] = region_clashes[i][2] = SCoord(0,0,0);
+    }
+
     for (pose = 1; pose <= poses; pose++)
     {
         ligand = &pose_ligands[pose];
@@ -2754,6 +2777,26 @@ _try_again:
                     cout << endl;
                     #endif
 
+                    Molecule* lmols[256];
+                    for (l=0; reaches_spheroid[nodeno][l]; l++)
+                    {
+                        lmols[l] = (Molecule*)reaches_spheroid[nodeno][l];
+                    }
+
+                    #if bb_enable_residue_disqualifications
+                    if (ligand->get_intermol_clashes(lmols) >= bb_disqualification_energy)
+                    {
+                        #if _dbg_groupsel
+                        cout << "Primary residue group is disqualified." << endl;
+                        #endif
+
+                        global_pairs[0]->disqualify();
+                        std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
+                        global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
+                        GroupPair::align_groups(ligand, global_pairs, false, 1);
+                    }
+                    #endif
+
                     int gpn = global_pairs.size();
                     for (l=0; l<3 && l<gpn; l++)
                     {
@@ -2960,6 +3003,27 @@ _try_again:
             dr[drcount][nodeno] = DockResult(protein, ligand, size, addl_resno, drcount, differential_dock);
             float btot = dr[drcount][nodeno].kJmol;
             float pstot = dr[drcount][nodeno].polsat;
+
+            n = protein->get_end_resno();
+            for (i=1; i<=n; i++)
+            {
+                if (dr[drcount][nodeno].residue_clash[i])
+                {
+                    for (j=0; regions[j].start; j++)
+                    {
+                        if (i >= regions[j].start && i <= regions[j].end)
+                        {
+                            int rgcen, hxno = atoi(&regions[j].name[3]);
+                            if (hxno >= 1 && hxno <= 7) rgcen = protein->get_bw50(hxno);
+                            else rgcen = (regions[j].start + regions[j].end)/2;
+                            k = abs(i - rgcen);
+                            if (k < 5) k = 1;
+                            else k = (i < rgcen) ? 0 : 2;
+                            region_clashes[j][k] = region_clashes[j][k].add(dr[drcount][nodeno].res_clash_dir[i]);
+                        }
+                    }
+                }
+            }
 
             dr[drcount][nodeno].proximity = ligand->get_barycenter().get_3d_distance(nodecen);
 
@@ -3312,6 +3376,39 @@ _exitposes:
     cout << found_poses << " pose(s) found." << endl;
     if (output) *output << found_poses << " pose(s) found." << endl;
     if (debug) *debug << found_poses << " pose(s) found." << endl;
+
+    if (regions)
+    {
+        cout << endl;
+        if (output) *output << endl;
+        for (i=0; regions[i].start; i++)
+        {
+            for (j=0; j<3; j++) if (region_clashes[i][j].r)
+            {
+                cout << regions[i].name;
+                if (output) *output << regions[i].name;
+                if (!j)
+                {
+                    cout << ".nseg";
+                    if (output) *output << ".nseg";
+                }
+                else if (j==1)
+                {
+                    cout << ".center";
+                    if (output) *output << ".center";
+                }
+                else if (j==2)
+                {
+                    cout << ".cseg";
+                    if (output) *output << ".cseg";
+                }
+                cout << ".clashdir = " << (Point)region_clashes[i][j] << endl;
+                if (output) *output << ".clashdir = " << (Point)region_clashes[i][j] << endl;
+            }
+        }
+        cout << endl;
+        if (output) *output << endl;
+    }
 
     if (met) delete met;
 

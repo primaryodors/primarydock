@@ -141,7 +141,7 @@ $outfname = "output.dock";
 function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname;
-    global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search;
+    global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
     global $atomto, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
     chdir(__DIR__);
@@ -233,6 +233,8 @@ function prepare_outputs()
         if (isset($mbp["flxr" ])) $flxr  = "FLXR {$mbp["flxr"]}";
         if (isset($mbp["aflxr"])) $aflxr = "FLXR {$mbp["aflxr"]}";
         if (isset($mbp["iflxr"])) $iflxr = "FLXR {$mbp["iflxr"]}";
+
+        if (isset($mbp["stddev"])) $num_std_devs = floatval($mbp["stddev"]);
     
         if (isset($mbp["atomto"]))
         {
@@ -272,7 +274,7 @@ function prepare_outputs()
 }
 
 $multicall = 0;
-function process_dock($metrics_prefix = "", $noclobber = false)
+function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_clashing = false)
 {
     global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version;
     global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy;
@@ -627,6 +629,7 @@ function process_dock($metrics_prefix = "", $noclobber = false)
         if (stream_isatty(STDOUT) && isset($outdata['Predicted']) && file_exists("predict/soundalert"))
         {
             $play_sound = true;
+            if ($no_sound_if_clashing && count($clashcomp)) $play_sound = false;
             $sa = explode(",",file_get_contents("predict/soundalert"));
             if (count($sa) == 2)
             {

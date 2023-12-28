@@ -26,6 +26,7 @@
 #define unconnected_residue_mindist 4.82
 #define clash_limit_per_aa 4.0
 #define contact_r_5x58_7x53 3.93
+#define memsanity 0x10000000
 
 #define pH 6.0
 #define auto_pK_protonation 0
@@ -124,7 +125,7 @@
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 3.0
-#define lmpull 0.3
+#define lmpull 0.5
 #define lmsteps 10
 #define recapture_ejected_ligand 0
 
@@ -134,11 +135,14 @@
 
 #define _enhanced_pi_stacking 0
 #define _preflex_alignment_res 1
-#define bb_stochastic 0.15
+#define bb_stochastic 0.25
 #define bb_group_distance_cutoff 4.3
+#define bb_enable_residue_disqualifications 1
+#define bb_disqualification_energy 1000
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
-#define bb_realign_b_threshold 20
+#define bb_realign_amount 0.2
+#define bb_realign_mol 0
 #define bb_realign_threshold_distance 1.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
 #define enable_bb_scooch 1
@@ -147,6 +151,7 @@
 #define no_zero_flexions 1
 #define flexion_probability_multiplier 0.4
 #define ignore_invalid_partial 1
+#define use_best_binding_iteration 0
 
 // If enabled, the trip switch functionality will have to be moved around in the code.
 // But since we are using an active vs. inactive energy comparison, this feature is obsolete.
@@ -211,8 +216,9 @@
 // Drift pulls the ligand towards the loneliest point if it encounters clashes.
 // Turning it off can cause the ligand to be ejected from the protein.
 #define allow_drift 1
-#define initial_drift 0.1
-#define drift_decay_rate 0.2
+#define initial_drift 0.3
+#define drift_decay_rate 0.01
+#define drift_energy_threshold 1000
 
 // Allows full 360 degree whole molecule rotations to search for lower energy configurations.
 #define allow_mol_fullrot_iter 0
@@ -338,6 +344,7 @@
 #define _dbg_259 0
 #define _dbg_51e2_ionic 0
 #define _dbg_anemia 0
+#define _dbg_asunder_atoms 0
 #define _dbg_bb_pullaway 0
 #define _dbg_bb_realign 0
 #define _dbg_bb_rots 0
@@ -347,6 +354,7 @@
 #define _dbg_cond_basic_acd_lig 0
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
+#define _dbg_moieties 0
 #define _dbg_find_blasted_segfault 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0

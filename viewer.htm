@@ -1855,6 +1855,7 @@ function showMetalSideChains()
 
 function ballAndStick()
 {
+	
 	var i;
 	for (i=0; i<gmodel.length && i<gmrparams.length && i<gmrep.length; i++)
 	{
@@ -1865,7 +1866,7 @@ function ballAndStick()
 			if (whtbk) p.opacity = 1;
 			if (!hydrogens) p.sele = "* and not hydrogen";
 			else p.sele = "";
-			gmodel[i].addRepresentation(gmrep[i], p);
+			gmodel[i].addRepresentation((resmdl.length || hydrogens) ? "ball+stick" : "licorice", p);
 		}
 	}
 	if (curr_ligand)

@@ -1388,6 +1388,10 @@ _return_added:
     // identify_rings();
     identify_conjugations();
 
+    #if _dbg_asunder_atoms
+    if (!check_Greek_continuity()) throw 0xbadc0de;
+    #endif
+
     return added;
 }
 

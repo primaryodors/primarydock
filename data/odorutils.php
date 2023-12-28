@@ -180,6 +180,7 @@ function has_antagonists($protein)
 
 function make_clickable_notes($notes)
 {
+	if ($notes[0] == "(insufficient data)") return $notes;
 	$result = [];
 	foreach ($notes as $key => $note) $result[$key] = "<a href=\"note.php?n=$note\">$note</a>";
 	return $result;

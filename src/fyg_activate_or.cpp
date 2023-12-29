@@ -794,12 +794,10 @@ int main(int argc, char** argv)
         }
     }
 
+    #if _dbg_active_clashmin
     n = p.get_end_resno();
     for (i=1; i<=n; i++)
     {
-        // AminoAcid* aa = p.get_residue(i);
-        // if (!aa) continue;
-
         BallesterosWeinstein bw = p.get_bw_from_resno(i);
 
         p.last_int_clash_dir.r = 0;
@@ -813,6 +811,7 @@ int main(int argc, char** argv)
                 << endl;
         }
     }
+    #endif
 
     ////////////////////////////////////////////////////////////////////////////////
     // Make room near trip switch.

@@ -135,7 +135,7 @@ foreach (["ttpd", "fish", "taar", "vn1r"] as $k => $var)
     arsort($$var);
     $varhas = $var."_has";
 
-    echo ["Tetrapod-like", "Fish-like", "Trace amine", "Vomeronasal"][$k] . ":\n";
+    echo ["Class II", "Class I", "Trace amine", "Vomeronasal"][$k] . ":\n";
 
     $n = count($$var);
     $ttl = array_sum($$var);

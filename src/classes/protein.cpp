@@ -462,7 +462,7 @@ float Protein::get_internal_clashes(int sr, int er, bool repack, int repack_iter
                 float f = residues[i]->get_intermol_clashes(residues[j]);
                 result += f;
                 SCoord dpos = residues[j]->get_CA_location().subtract(residues[i]->get_CA_location());
-                dpos.r = f;
+                // dpos.r = f;
                 clashttl = clashttl.add(dpos);
                 float limit = unconnected_residue_mindist + sqrt(residues[i]->get_reach()) + sqrt(residues[j]->get_reach());
                 f = fmax(limit - dpos.r, 0);

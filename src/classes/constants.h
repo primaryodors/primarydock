@@ -157,6 +157,8 @@
 // But since we are using an active vs. inactive energy comparison, this feature is obsolete.
 #define use_trip_switch 0
 
+#define movable_fulcra_activation 0
+
 // Mandatory coordination bindings that meet this kJ/mol threshold may freely fluctuate above it.
 #define mandatory_coordination_threshold 5
 
@@ -343,6 +345,7 @@
 // Should normally be false or zero:
 #define _dbg_259 0
 #define _dbg_51e2_ionic 0
+#define _dbg_active_clashmin 1
 #define _dbg_anemia 0
 #define _dbg_asunder_atoms 0
 #define _dbg_bb_pullaway 0

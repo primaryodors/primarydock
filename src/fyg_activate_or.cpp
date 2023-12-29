@@ -735,19 +735,22 @@ int main(int argc, char** argv)
     }
 
     int iter;
-    for (iter=0; iter<3; iter++)
+    for (iter=0; iter<10; iter++)
     {
         for (n=1; n<=7; n++)
         {
+            if (n==3) continue;
             std::string region = (std::string)"TMR" + std::to_string(n);
-            float theta = fiftyseventh * 5;
+            float theta = fiftyseventh * 0.5;
             AminoAcid* aafulcrum = p.get_residue_bw(n, 50);
             if (!aafulcrum) continue;
             int fulcrum = aafulcrum->get_residue_no();
             int term = (n&1) ? p.get_region_start(region) : p.get_region_end(region);
             cout << "Minimizing " << region << " extracellular clashes... ";
 
-            for (i=0; i<100; i++)
+            clash = p.get_internal_clashes(min(term, fulcrum), max(term, fulcrum));
+
+            for (i=0; i<20; i++)
             {
                 clash = (n&1)
                     ? reduce_iclash_iter(p, fulcrum, false, clash, theta, term, fulcrum)
@@ -764,15 +767,18 @@ int main(int argc, char** argv)
 
         for (n=1; n<=7; n++)
         {
+            if (n==3) continue;
             std::string region = (std::string)"TMR" + std::to_string(n);
-            float theta = fiftyseventh * 5;
+            float theta = fiftyseventh * 0.5;
             AminoAcid* aafulcrum = p.get_residue_bw(n, 50);
             if (!aafulcrum) continue;
             int fulcrum = aafulcrum->get_residue_no();
             int term = (n&1) ? p.get_region_end(region) : p.get_region_start(region);
             cout << "Minimizing " << region << " cytoplasmic clashes... ";
 
-            for (i=0; i<100; i++)
+            clash = p.get_internal_clashes(min(term, fulcrum), max(term, fulcrum));
+
+            for (i=0; i<20; i++)
             {
                 clash = (n&1)
                     ? reduce_iclash_iter(p, fulcrum, true , clash, theta, fulcrum, term)

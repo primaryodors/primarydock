@@ -2784,10 +2784,11 @@ _try_again:
                     }
 
                     #if bb_enable_residue_disqualifications
-                    if (ligand->get_intermol_clashes(lmols) >= bb_disqualification_energy)
+                    float dqc = ligand->get_intermol_clashes(lmols);
+                    if (dqc >= bb_disqualification_energy)
                     {
                         #if _dbg_groupsel
-                        cout << "Primary residue group is disqualified." << endl;
+                        cout << "Primary residue group is disqualified with initial clash " << dqc << endl << endl;
                         #endif
 
                         global_pairs[0]->disqualify();

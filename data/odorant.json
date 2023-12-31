@@ -8523,6 +8523,18 @@
         },
         "oid": "39156613d880f2e50d7c2af1b81ae8fb"
     },
+    "3986fe5aee1cd9e8a7b35cfc4dab0ce0":
+    {
+        "full_name": "methyl pivalate",
+        "smiles": "CC(C)(C)C(=O)OC",
+        "aroma":
+        {
+            "https:\/\/en.wikipedia.org\/wiki\/Methyl_pivalate":
+            [
+                "vinegar"
+            ]
+        }
+    },
     "3a0e3585a836381dc1abec00bfa68dcd":
     {
         "full_name": "1,4-cineol",
@@ -21530,7 +21542,8 @@
                     "adjusted_curve_top": "10"
                 }
             }
-        }
+        },
+        "oid": "98ea90b210c054c7d211587849b6322c"
     },
     "995a30359f65486f6be166e403f78971":
     {

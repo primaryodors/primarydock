@@ -467,11 +467,15 @@ void Atom::update_nearbys()
             global_nearby_atoms[global_index][j] = nullptr;
 
             bool foundthis = false;
-            for (l=0; global_nearby_atoms[i][l]; l++)
+            for (l=0; l < MAX_NEARBY_PERATOM && global_nearby_atoms[i][l]; l++)
             {
-                if (global_nearby_atoms[i][l] == this) foundthis = true;
+                if (global_nearby_atoms[i][l] == this)
+                {
+                    foundthis = true;
+                    break;
+                }
             }
-            if (!foundthis)
+            if (!foundthis && l < MAX_NEARBY_PERATOM)
             {
                 global_nearby_atoms[i][l] = this;
                 global_nearby_atoms[i][++l] = nullptr;
@@ -2998,7 +3002,7 @@ float Atom::location_favorability(Point potential_new_loc)
         // Angle to bonded atom's other bonds.
     }
 
-    for (i=0; global_nearby_atoms[global_index][i]; i++)
+    for (i=0; i < MAX_NEARBY_PERATOM && global_nearby_atoms[global_index][i]; i++)
     {
         // Ionic bonding.
 

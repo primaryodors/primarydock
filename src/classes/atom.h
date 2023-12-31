@@ -252,7 +252,7 @@ public:
                 }
             }
         }
-        geov=0;
+        geometry_dirty = true;
     }
 
     // Serialization
@@ -282,7 +282,7 @@ public:
     void rotate_geometry(Rotation rot);			// Necessary for bond rotation.
     void clear_geometry_cache()
     {
-        geov=0;
+        geometry_dirty = true;
     }
     void swing_all(int startat=0);
     void swap_chirality()
@@ -338,7 +338,7 @@ protected:
     int geometry=0;						// number of vertices, so 4 = tetrahedral; 6 = octahedral; etc.
     bool geometry_dirty = true;
     int origgeo=0;
-    SCoord* geov=0;
+    SCoord geov[16];
     float at_wt = 0;
     float vdW_rad = 0;
     float elecn = 0;
@@ -384,9 +384,12 @@ std::ostream& operator<<(std::ostream& os, const Atom& a);
 std::ostream& operator<<(std::ostream& os, const Bond& b);
 std::ostream& operator<<(std::ostream& os, const Ring& r);
 
-extern Atom* global_all_atoms[65536];
+#define MAX_GLOBAL_ATOMS 65536
+#define MAX_NEARBY_PERATOM 50
+
+extern Atom* global_all_atoms[MAX_GLOBAL_ATOMS];
 extern int global_all_atom_count;
-extern Atom* global_nearby_atoms[65536][50];
+extern Atom* global_nearby_atoms[MAX_GLOBAL_ATOMS][MAX_NEARBY_PERATOM];
 
 
 

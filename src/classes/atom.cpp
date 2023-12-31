@@ -434,7 +434,7 @@ Atom::~Atom()
     if (name) delete[] name;
     if (bonded_to) delete[] bonded_to;*/
 
-    if (geov) delete[] geov;
+    // if (geov) delete[] geov;
 
     int i;
     for (i=global_index; i<global_all_atom_count; i++)
@@ -564,11 +564,12 @@ bool Atom::move(Point* pt)
         return false;
     }
 
+    float r = location.get_3d_distance(pt);
+
     location = *pt;
     location.weight = at_wt;
-    if (geov) delete[] geov;
-    geov = NULL;
     geometry_dirty = true;
+    if (r >= 1.0) update_nearbys();
     return true;
 }
 
@@ -646,8 +647,9 @@ int Atom::move_assembly(Point* pt, Atom* excluding)
         aloc = aloc.add(&mov);
         aloc = rotate3D(&aloc, pt, &rot);
         atoms[i]->move(aloc);
-        if (atoms[i]->geov) delete[] atoms[i]->geov;
-        atoms[i]->geov = NULL;
+        // if (atoms[i]->geov) delete[] atoms[i]->geov;
+        // atoms[i]->geov = NULL;
+        atoms[i]->geometry_dirty = true;
         atomct++;
         //cout << "Motion includes " << atoms[i]->name << endl;
     }
@@ -742,8 +744,9 @@ void Atom::clear_all_moves_cache()
     if (!bonded_to) return;
     int i;
     for (i=0; i<geometry; i++) bonded_to[i].clear_moves_with_cache();
-    if (geov) delete[] geov;
-    geov = NULL;
+    // if (geov) delete[] geov;
+    // geov = NULL;
+    geometry_dirty = true;
 }
 
 int Atom::get_bonded_atoms_count()
@@ -952,17 +955,19 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
 
     // if (this < lbtom && Z > 1 && lbtom->Z > 1) cout << "Bond " << name << cardinality_printable(lcard) << lbtom->name << endl;
 
-    if (geov) delete[] geov;
-    geov = NULL;
+    // if (geov) delete[] geov;
+    // geov = NULL;
 
     // TODO: This will fail if creating a nitrate or a sulfite.
     if (lcard>=2 && !reciprocity)
     {
         geometry -= (lcard-1);
         lbtom->geometry -= (lcard-1);
-        if (geov) delete[] geov;
-        geov=0;
-        lbtom->geov=0;
+        geometry_dirty = true;
+        lbtom->geometry_dirty = true;
+        // if (geov) delete[] geov;
+        // geov=0;
+        // lbtom->geov=0;
     }
 
     if (!reciprocity && !bonded_to[0].btom)
@@ -1586,7 +1591,8 @@ _cannot_reverse_bondrot:
 
 void Atom::rotate_geometry(Rotation rot)
 {
-    if (!geov) return;				// If no cached geometry, it will be calculated the next time it's required.
+    // if (!geov) return;				// If no cached geometry, it will be calculated the next time it's required.
+    if (geometry_dirty) get_geometry_aligned_to_bonds();
 
     Point center;
 
@@ -1626,7 +1632,7 @@ void Bond::swing(SCoord newdir)
 
 SCoord* Atom::get_basic_geometry()
 {
-    SCoord* retval = new SCoord[abs(geometry)+8];
+    SCoord* retval = geov;
 
     int i, j;
     float x, y, z;
@@ -1635,7 +1641,7 @@ SCoord* Atom::get_basic_geometry()
     {
         for (i=0; i<-geometry; i++)
         {
-            retval[i] = new SCoord(1, 0, M_PI/abs(geometry/2)*i);
+            retval[i] = SCoord(1, 0, M_PI/abs(geometry/2)*i);
         }
     }
     else if (geometry == 1)
@@ -1861,8 +1867,9 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
         {
             int i;
             for (i=0; i<bc; i++) geometry -= fmax(0,bonded_to[i].cardinality-1);
-            if (geov) delete[] geov;
-            geov = NULL;
+            // if (geov) delete[] geov;
+            // geov = NULL;
+            geometry_dirty = true;
         }
     }
 
@@ -1870,9 +1877,9 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
     {
         // if (_DBGGEO) cout << name << " returns cached geometry." << endl;
         // return geov;
-        delete[] geov;
+        // delete[] geov;
     }
-    geov = get_basic_geometry();
+    /* geov = */ get_basic_geometry();
 
     Point center;
     int i, j, k, l;
@@ -1998,8 +2005,9 @@ SCoord Atom::get_next_free_geometry(float lcard)
     if (lcard > 1)
     {
         geometry -= ceil(lcard-1);
-        if (geov) delete[] geov;
-        geov = 0;
+        // if (geov) delete[] geov;
+        // geov = 0;
+        geometry_dirty = true;
     }
     SCoord* v = get_geometry_aligned_to_bonds();
     SCoord retval;

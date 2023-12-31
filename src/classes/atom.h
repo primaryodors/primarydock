@@ -290,6 +290,7 @@ public:
         swapped_chirality = !swapped_chirality;
         chirality_unspecified = false;
     }
+    float location_favorability(Point potential_new_loc);
 
     void print_bond_angles();                   // For unit tests.
 

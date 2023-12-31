@@ -2986,6 +2986,32 @@ float Atom::similarity_to(Atom* b)
     return similarity;
 }
 
+float Atom::location_favorability(Point potential_new_loc)
+{
+    int i;
+    float result = 0;
+
+    for (i=0; i<geometry; i++)
+    {
+        // Distance to bonded atom.
+
+        // Angle to bonded atom's other bonds.
+    }
+
+    for (i=0; global_nearby_atoms[global_index][i]; i++)
+    {
+        // Ionic bonding.
+
+        // Polar, hbond, halogen bond, polar-pi, or cation-pi bonding.
+
+        // Pi stacking.
+
+        // Clashes.
+    }
+
+    return result;
+}
+
 std::ostream& operator<<(std::ostream& os, const bond_rotation_fail_reason& bf)
 {
     switch (bf)

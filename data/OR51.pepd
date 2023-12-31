@@ -1,119 +1,117 @@
 
 LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+HYDRO
+SAVE "pdbs/OR51/OR51E2.bound.pdb"
 SIDEREPL "pdbs/OR51/OR51A2.upright.pdb"
 SAVE "pdbs/OR51/OR51A2.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51A4.upright.pdb"
 SAVE "pdbs/OR51/OR51A4.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51A7.upright.pdb"
 SAVE "pdbs/OR51/OR51A7.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51B2.upright.pdb"
 SAVE "pdbs/OR51/OR51B2.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51B4.upright.pdb"
 SAVE "pdbs/OR51/OR51B4.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51B5.upright.pdb"
 SAVE "pdbs/OR51/OR51B5.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51B6.upright.pdb"
 SAVE "pdbs/OR51/OR51B6.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51D1.upright.pdb"
 SAVE "pdbs/OR51/OR51D1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51E1.upright.pdb"
 SAVE "pdbs/OR51/OR51E1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
-SAVE "pdbs/OR51/OR51E2.bound.pdb"
-UNCHAIN A
-
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51F1.upright.pdb"
 SAVE "pdbs/OR51/OR51F1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51F2.upright.pdb"
 SAVE "pdbs/OR51/OR51F2.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51G1.upright.pdb"
 SAVE "pdbs/OR51/OR51G1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51G2.upright.pdb"
 SAVE "pdbs/OR51/OR51G2.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51H1.upright.pdb"
 SAVE "pdbs/OR51/OR51H1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51I1.upright.pdb"
 SAVE "pdbs/OR51/OR51I1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51I2.upright.pdb"
 SAVE "pdbs/OR51/OR51I2.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51J1.upright.pdb"
 SAVE "pdbs/OR51/OR51J1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51L1.upright.pdb"
 SAVE "pdbs/OR51/OR51L1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51M1.upright.pdb"
 SAVE "pdbs/OR51/OR51M1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51Q1.upright.pdb"
 SAVE "pdbs/OR51/OR51Q1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51S1.upright.pdb"
 SAVE "pdbs/OR51/OR51S1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51T1.upright.pdb"
 SAVE "pdbs/OR51/OR51T1.bound.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
+LOAD "pdbs/OR51/OR51E2.bound.pdb" A A
 SIDEREPL "pdbs/OR51/OR51V1.upright.pdb"
 SAVE "pdbs/OR51/OR51V1.bound.pdb"
 UNCHAIN A

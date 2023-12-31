@@ -25,6 +25,10 @@ float Atom::atomic_weights[_ATOM_Z_LIMIT];
 int Atom::valences[_ATOM_Z_LIMIT];
 int Atom::geometries[_ATOM_Z_LIMIT];
 
+Atom* global_all_atoms[MAX_GLOBAL_ATOMS];
+int global_all_atom_count=0;
+Atom* global_nearby_atoms[MAX_GLOBAL_ATOMS][MAX_NEARBY_PERATOM];
+
 void Atom::read_elements()
 {
     if (read_elem_syms) return;
@@ -222,6 +226,17 @@ Atom::Atom(const char* elem_sym)
     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
+
+    global_index = global_all_atom_count;
+    global_all_atoms[global_all_atom_count] = this;
+    global_all_atom_count++;
+    if (global_all_atom_count >= MAX_GLOBAL_ATOMS)
+    {
+        cout << "Too many atoms." << endl;
+        throw 0xffff;
+    }
+    global_nearby_atoms[global_index][0] = nullptr;
+    update_nearbys();
 }
 
 Atom::Atom(const char* elem_sym, const Point* l_location)
@@ -242,6 +257,17 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
+
+    global_index = global_all_atom_count;
+    global_all_atoms[global_all_atom_count] = this;
+    global_all_atom_count++;
+    if (global_all_atom_count >= MAX_GLOBAL_ATOMS)
+    {
+        cout << "Too many atoms." << endl;
+        throw 0xffff;
+    }
+    global_nearby_atoms[global_index][0] = nullptr;
+    update_nearbys();
 }
 
 Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
@@ -263,6 +289,17 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
     for (i=0; i<geometry; i++) bonded_to[i].btom = nullptr;
     strcpy(aa3let, "LIG");
     residue = 999;
+
+    global_index = global_all_atom_count;
+    global_all_atoms[global_all_atom_count] = this;
+    global_all_atom_count++;
+    if (global_all_atom_count >= MAX_GLOBAL_ATOMS)
+    {
+        cout << "Too many atoms." << endl;
+        throw 0xffff;
+    }
+    global_nearby_atoms[global_index][0] = nullptr;
+    update_nearbys();
 }
 
 Atom::Atom(FILE* is)
@@ -378,6 +415,17 @@ Atom::Atom(FILE* is)
         }
         buffer[0] = 0;
     }
+
+    global_index = global_all_atom_count;
+    global_all_atoms[global_all_atom_count] = this;
+    global_all_atom_count++;
+    if (global_all_atom_count >= MAX_GLOBAL_ATOMS)
+    {
+        cout << "Too many atoms." << endl;
+        throw 0xffff;
+    }
+    global_nearby_atoms[global_index][0] = nullptr;
+    update_nearbys();
 }
 
 Atom::~Atom()
@@ -388,12 +436,47 @@ Atom::~Atom()
 
     if (geov) delete[] geov;
 
+    int i;
+    for (i=global_index; i<global_all_atom_count; i++)
+    {
+        global_all_atoms[i] = global_all_atoms[i+1];
+        global_all_atoms[i]->global_index--;
+    }
+    global_all_atom_count--;
+
     if (bonded_to)
     {
-        int i;
         for (i=0; i<geometry; i++)
             if (bonded_to[i].btom)
                 bonded_to[i].btom->unbond(this);
+    }
+}
+
+void Atom::update_nearbys()
+{
+    int i, j=0, l;
+    for (i=0; i<global_all_atom_count; i++)
+    {
+        if (i == global_index) continue;
+        else if (global_all_atoms[i] == this) throw 0xc01212b7;
+
+        float r = this->distance_to(global_all_atoms[i]);
+        if (r < _INTERA_R_CUTOFF)
+        {
+            global_nearby_atoms[global_index][j++] = global_all_atoms[i];
+            global_nearby_atoms[global_index][j] = nullptr;
+
+            bool foundthis = false;
+            for (l=0; global_nearby_atoms[i][l]; l++)
+            {
+                if (global_nearby_atoms[i][l] == this) foundthis = true;
+            }
+            if (!foundthis)
+            {
+                global_nearby_atoms[i][l] = this;
+                global_nearby_atoms[i][++l] = nullptr;
+            }
+        }
     }
 }
 

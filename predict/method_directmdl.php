@@ -84,9 +84,13 @@ $pdbfname_inactive = str_replace(".upright.pdb", ".apo.pdb", $pdbfname);
 $pdbfname_active = str_replace(".upright.pdb", ".bound.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
-if (!file_exists($pdbfname_inactive) || !file_exists($pdbfname_active))
+if (!file_exists($pdbfname_inactive) && file_exists($pdbfname_active))
+    $pdbfname_inactive = $pdbfname;
+
+if (!file_exists($pdbfname_active))
 {
     exec("php -f predict/cryoem_motions.php");
+    exec("bin/pepteditor data/OR51.pepd");
     exec("bin/pepteditor data/OR52.pepd");
 }
 

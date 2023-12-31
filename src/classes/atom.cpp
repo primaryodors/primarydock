@@ -25,9 +25,9 @@ float Atom::atomic_weights[_ATOM_Z_LIMIT];
 int Atom::valences[_ATOM_Z_LIMIT];
 int Atom::geometries[_ATOM_Z_LIMIT];
 
-Atom* global_all_atoms[MAX_GLOBAL_ATOMS];
 int global_all_atom_count=0;
-Atom* global_nearby_atoms[MAX_GLOBAL_ATOMS][MAX_NEARBY_PERATOM];
+Atom* global_all_atoms[MAX_GLOBAL_ATOMS+16];
+Atom* global_nearby_atoms[MAX_GLOBAL_ATOMS+16][MAX_NEARBY_PERATOM+4];
 
 void Atom::read_elements()
 {
@@ -1967,36 +1967,39 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
     if (mirror_geo >= 0)
     {
         Bond* b = &bonded_to[mirror_geo];
-        if (_DBGGEO) cout << name << " location: " << location.printable() << endl;
-        if (_DBGGEO) cout << b->btom->name << " location: " << b->btom->location.printable() << endl;
-        geov[0] = v_from_pt_sub(b->btom->location, location);
-        geov[0].r = 1;
-        Point _4avg[2];
-        _4avg[0] = b->btom->location;
-        _4avg[1] = location;
-        Point avg = average_of_points(_4avg, 2);
-        if (_DBGGEO) cout << "avg: " << avg.printable() << endl;
-
-        j=1;
-        SCoord* bgeov = b->btom->get_geometry_aligned_to_bonds(true);		// RECURSION!
-
-        for (i=0; i<b->btom->geometry; i++)
+        if (b->btom)
         {
-            if (!b->btom->bonded_to[i].btom || b->btom->bonded_to[i].btom != this)
+            if (_DBGGEO) cout << name << " location: " << location.printable() << endl;
+            if (_DBGGEO) cout << b->btom->name << " location: " << b->btom->location.printable() << endl;
+            geov[0] = v_from_pt_sub(b->btom->location, location);
+            geov[0].r = 1;
+            Point _4avg[2];
+            _4avg[0] = b->btom->location;
+            _4avg[1] = location;
+            Point avg = average_of_points(_4avg, 2);
+            if (_DBGGEO) cout << "avg: " << avg.printable() << endl;
+
+            j=1;
+            SCoord* bgeov = b->btom->get_geometry_aligned_to_bonds(true);		// RECURSION!
+
+            for (i=0; i<b->btom->geometry; i++)
             {
-                Point bgp(&bgeov[i]);
-                bgp = bgp.add(b->btom->location);
-                if (_DBGGEO) cout << "bgp: " << bgp.printable() << " from SCoord φ=" << bgeov[i].phi << " θ=" << bgeov[i].theta << " r=" << bgeov[i].r << endl;
-                Point mirr = avg.subtract(bgp.subtract(&avg));
-                if (_DBGGEO) cout << "mirr: " << mirr.printable() << endl;
-                if (flip_mirror) mirr = rotate3D(&mirr, &avg, &geov[mirror_geo], M_PI);
-                geov[j++] = v_from_pt_sub(mirr, location);
+                if (!b->btom->bonded_to[i].btom || b->btom->bonded_to[i].btom != this)
+                {
+                    Point bgp(&bgeov[i]);
+                    bgp = bgp.add(b->btom->location);
+                    if (_DBGGEO) cout << "bgp: " << bgp.printable() << " from SCoord φ=" << bgeov[i].phi << " θ=" << bgeov[i].theta << " r=" << bgeov[i].r << endl;
+                    Point mirr = avg.subtract(bgp.subtract(&avg));
+                    if (_DBGGEO) cout << "mirr: " << mirr.printable() << endl;
+                    if (flip_mirror) mirr = rotate3D(&mirr, &avg, &geov[mirror_geo], M_PI);
+                    geov[j++] = v_from_pt_sub(mirr, location);
+                }
             }
+
+            if (_DBGGEO) cout << name << " returns mirrored geometry." << endl;
+
+            return geov;
         }
-
-        if (_DBGGEO) cout << name << " returns mirrored geometry." << endl;
-
-        return geov;
     }
 
 

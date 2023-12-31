@@ -388,9 +388,9 @@ std::ostream& operator<<(std::ostream& os, const Ring& r);
 #define MAX_GLOBAL_ATOMS 65536
 #define MAX_NEARBY_PERATOM 50
 
-extern Atom* global_all_atoms[MAX_GLOBAL_ATOMS];
 extern int global_all_atom_count;
-extern Atom* global_nearby_atoms[MAX_GLOBAL_ATOMS][MAX_NEARBY_PERATOM];
+extern Atom* global_all_atoms[MAX_GLOBAL_ATOMS+16];
+extern Atom* global_nearby_atoms[MAX_GLOBAL_ATOMS+16][MAX_NEARBY_PERATOM+4];
 
 
 

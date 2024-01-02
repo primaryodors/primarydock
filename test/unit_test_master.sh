@@ -53,7 +53,7 @@ printf "${CYN}Running prediction tests and docking tests; these will take some t
 
 REPORT="testdata/OR51E2_propionate_pred.approved.txt"
 # php -f predict/method_icactive.php prot=OR51E2 lig=propionic_acid | tee >( grep '[[]Predicted[]] => ' > testdata/received/OR51E2_propionate_pred.received.txt)
-php -f predict/method_fygactive.php prot=OR51E2 lig=propionic_acid | grep '[[]Predicted[]] => ' > testdata/received/OR51E2_propionate_pred.received.txt
+php -f predict/method_directmdl.php prot=OR51E2 lig=propionic_acid | grep '[[]Predicted[]] => ' > testdata/received/OR51E2_propionate_pred.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/OR51E2_propionate_pred.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}OR51E2 propionate prediction test succeeded.${NC}\n"

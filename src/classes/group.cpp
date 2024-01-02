@@ -1109,12 +1109,64 @@ float GroupPair::get_potential()
         int m = ag->atoms.size(), n = scg->aminos.size();
         if (!m || !n) return 0;
 
+        bool metallic = false;
+
+        int i, j, q=0;
+        for (i=0; i<n; i++)
+        {
+            AminoAcid* aa = scg->aminos[i];
+            if (!aa) continue;
+            if (aa->coordmtl)
+            {
+                Atom* mtl = aa->coordmtl;
+                #if _dbg_groupsel
+                cout << *aa << " coordinates to " << mtl->get_elem_sym() << endl;
+                #endif
+                if (mtl->get_electronegativity() >= 1.4)
+                {
+                    metallic = true;
+                    #if _dbg_groupsel
+                    cout << "Group is metallic." << endl;
+                    #endif
+                }
+            }
+
+            if (aa->priority)
+            {
+                priority = true;
+
+                #if _dbg_groupsel
+                cout << *aa << " has priority." << endl;
+                #endif
+            }
+        }
+
+        if (metallic)
+        {
+            for (i=0; i<m; i++)
+            {
+                Atom* a = ag->atoms[i];
+                if (a->get_electronegativity() >= 3.2) continue;
+                int fam = a->get_family();
+                if (fam == CHALCOGEN)
+                {
+                    #if _dbg_groupsel
+                    cout << "Atom group coordinates to residue group's metal." << endl;
+                    #endif
+                    return 100;
+                }
+                if (fam == PNICTOGEN)
+                {
+                    if (a->get_charge() < -hydrophilicity_cutoff && a->get_bonded_atoms_count() <= 3) return 75;
+                }
+            }
+        }
+
         bool polar_atoms = (fabs(ag->hydrophilicity()) >= hydrophilicity_cutoff);
         bool polar_res   = (fabs(scg->hydrophilicity()) >= hydrophilicity_cutoff);
 
         if (polar_atoms != polar_res) return 0;
 
-        int i, j, q=0;
         for (i=0; i<m; i++)
         {
             Atom* a = ag->atoms[i];
@@ -1268,7 +1320,10 @@ std::vector<std::shared_ptr<GroupPair>> GroupPair::pair_groups(std::vector<std::
             if (p1 > p)
             {
                 j1 = j;
-                p = pair.potential;
+                p = p1;
+                #if _dbg_groupsel
+                cout << "New best best candidate set. Potential must exceed " << p1 << " for consideration." << endl;
+                #endif
             }
         }
 

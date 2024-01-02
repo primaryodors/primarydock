@@ -2784,17 +2784,20 @@ _try_again:
                     }
 
                     #if bb_enable_residue_disqualifications
-                    float dqc = ligand->get_intermol_clashes(lmols);
-                    if (dqc >= bb_disqualification_energy)
+                    if (!global_pairs[0]->is_priority())
                     {
-                        #if _dbg_groupsel
-                        cout << "Primary residue group is disqualified with initial clash " << dqc << endl << endl;
-                        #endif
+                        float dqc = ligand->get_intermol_clashes(lmols);
+                        if (dqc >= bb_disqualification_energy)
+                        {
+                            #if _dbg_groupsel
+                            cout << "Primary residue group is disqualified with initial clash " << dqc << endl << endl;
+                            #endif
 
-                        global_pairs[0]->disqualify();
-                        std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
-                        global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
-                        GroupPair::align_groups(ligand, global_pairs, false, 1);
+                            global_pairs[0]->disqualify();
+                            std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
+                            global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
+                            GroupPair::align_groups(ligand, global_pairs, false, 1);
+                        }
                     }
                     #endif
 

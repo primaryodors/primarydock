@@ -12,4 +12,12 @@ if [ -z "$LIG" ]; then
     LIG="propionic_acid"
 fi
 
-php -f predict/method_fygactive.php "prot=$PROT" "lig=$LIG"
+FIRST4=${PROT:0:4}
+
+if [[ "$FIRST4" = "OR51" ]]; then
+    php -f predict/method_directmdl.php "prot=$PROT" "lig=$LIG"
+elif [[ "$FIRST4" = "OR52" ]]; then
+    php -f predict/method_directmdl.php "prot=$PROT" "lig=$LIG"
+else
+    php -f predict/method_fygactive.php "prot=$PROT" "lig=$LIG"
+fi

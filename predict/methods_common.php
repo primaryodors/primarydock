@@ -19,6 +19,7 @@ $clashcomp = [];
 
 $method = explode("_", $_SERVER['PHP_SELF'])[1];
 $method = explode(".", $method)[0];
+echo "Method is $method.\n";
 
 $result = $output = false;
 chdir(__DIR__);

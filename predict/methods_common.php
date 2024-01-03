@@ -193,6 +193,11 @@ function prepare_outputs()
     
     if ($mbp)
     {
+        foreach ($mbp as $k => $v)
+        {
+            if (substr($k,0,1)=='#') unset($mbp[$k]);
+        }
+
         if (isset($mbp['odorophores']))
         {
             $sdfname = "sdf/".(str_replace(' ', '_', $ligname)).".sdf";

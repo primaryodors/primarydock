@@ -739,7 +739,7 @@ int Molecule::has_hbond_donors()
         if (atoms[i]->is_polar() >= hydrophilicity_cutoff)
         {
             result++;
-            // if (get_charge() < 0.5) cout << name << ":" << atoms[i]->name << " is an hbond donor." << endl;
+            cout << name << ":" << atoms[i]->name << " is an hbond donor." << endl;
         }
         if (atoms[i]->get_family() == HALOGEN && atoms[i]->is_bonded_to(TETREL)) result++;
     }

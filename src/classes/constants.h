@@ -359,7 +359,7 @@
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
 #define _dbg_groupsalign 0
-#define _dbg_groupsel 0
+#define _dbg_groupsel 1
 #define _DBG_H2O_TELEPORT 0
 #define _DBG_HISFLIP 0
 #define _dbg_homology 0
@@ -379,6 +379,7 @@
 #define _dbg_null_flexions 0
 #define _dbg_path_search 0
 #define _dbg_point_avg 0
+#define _dbg_polar_calc 0
 #define _dbg_polsat 0
 #define _dbg_repack 0
 #define _DBG_RESBMULT 0

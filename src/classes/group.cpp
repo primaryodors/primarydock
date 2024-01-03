@@ -1178,6 +1178,12 @@ float GroupPair::get_potential()
 
                 if (polar_atoms && polar_res)
                 {
+                    #if _dbg_groupsel
+                    cout << "Atom polarity = " << a->is_polar() << " vs. "
+                        << *aa << " has hbond donors? " << (aa->has_hbond_donors() ? "Y" : "N")
+                        << "; has hbond acceptors? " << (aa->has_hbond_acceptors() ? "Y" : "N")
+                        <<endl;
+                    #endif
                     if (!aa->has_hbond_acceptors() && a->is_polar() > 0) continue;
                     if (!aa->has_hbond_donors() && a->is_polar() < 0) continue;
                 }

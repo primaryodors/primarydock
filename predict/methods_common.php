@@ -139,6 +139,34 @@ extract(binding_site($protid));
 
 $outfname = "output.dock";
 
+function dock_failed()
+{
+    echo "Docking FAILED.\n";
+
+    if (stream_isatty(STDOUT) && file_exists("predict/soundalert"))
+    {
+        $play_sound = true;
+        $sa = explode(",",file_get_contents("predict/soundalert"));
+        if (count($sa) == 2)
+        {
+            $hfrom = intval($sa[0]);
+            $hto = intval($sa[1]);
+            $hnow = intval(date("H"));
+
+            if ($hnow < $hfrom || $hnow > $hto) $play_sound = false;
+        }
+
+        $hassox = [];
+        exec("which sox", $hassox);
+        if ($play_sound && count($hassox))
+        {
+            exec("play fail.mp3 &");
+        }
+    }
+
+    exit;
+}
+
 function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname;
@@ -332,7 +360,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 
     if ($retvar)
     {
-        echo "Docking FAILED.\n";
+        dock_failed();
         return 0;
     }
     
@@ -402,9 +430,11 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 
     if (!$posesln)
     {
-        echo "Docking FAILED.\n";
+        dock_failed();
         return 0;
     }
+
+    
 
     if (!$num_poses) $outdata[$metrics_prefix."POSES"] = $num_poses;
     else foreach ($outlines as $ln)

@@ -1026,6 +1026,20 @@ int main(int argc, char** argv)
                     if (sr > 0 && er > 0) dest->set_region(rgname, sr, er);
                     if (bw50 > 0) dest->set_bw50(l, bw50);
                 }
+                for (l=1; l<=3; l++)
+                {
+                    std::string rgname = (std::string)"CYT" + std::to_string(l);
+                    int bwhx = 10 + (l-1)*20 + (l*2);
+                    int sr = source->get_region_start(rgname), er = source->get_region_end(rgname), bw50 = source->get_bw50(bwhx);
+                    if (sr > 0 && er > 0) dest->set_region(rgname, sr, er);
+                    if (bw50 > 0) dest->set_bw50(bwhx, bw50);
+
+                    rgname = (std::string)"EXR" + std::to_string(l);
+                    bwhx += 11;
+                    sr = source->get_region_start(rgname), er = source->get_region_end(rgname), bw50 = source->get_bw50(bwhx);
+                    if (sr > 0 && er > 0) dest->set_region(rgname, sr, er);
+                    if (bw50 > 0) dest->set_bw50(bwhx, bw50);
+                }
             }   // BWCOPY
 
             else if (!strcmp(words[0], "BWMOTIF"))
@@ -1035,9 +1049,29 @@ int main(int argc, char** argv)
                 l = atoi(words[1]);
                 char rgn[8];
                 if (l < 8) sprintf(rgn, "TMR%d", l);
+                else if (l >= 12 && l <= 78)
+                {
+                    int preced = floor(0.1*l);
+                    int subseq = l % 10;
+                    l = subseq >> 1;
+
+                    if (preced & 1)
+                    {
+                        // Cytoplasmic.
+                        sprintf(rgn, "CYT%d", l);
+                    }
+                    else
+                    {
+                        // Extracellular.
+                        sprintf(rgn, "EXR%d", l);
+                    }
+                    l = atoi(words[1]);
+                }
                 else sprintf(rgn, "HXR%d", l);
                 int sr = working->get_region_start(rgn), er = working->get_region_end(rgn);
-                if (!sr || !er) raise_error((std::string)"Region " + std::to_string(l) + (std::string)" not found in strand.");
+                if (!sr || !er) raise_error((std::string)"Region " + std::to_string(atoi(words[1]))
+                    + (std::string)"/" + (std::string)rgn
+                    + (std::string)" not found in strand.");
 
                 n = -1;
                 for (i=0; words[2][i]; i++)
@@ -1053,6 +1087,11 @@ int main(int argc, char** argv)
                 // cout << l << ".50 = " << k << endl;
 
                 working->set_bw50(l, k+n);
+                /*cout << l << ".50 = ";
+                AminoAcid* aa = working->get_residue(k+n);
+                if (aa) cout << *aa;
+                else cout << k+n;
+                cout << "." << endl;*/
             }   // BWMOTIF
 
             else if (!strcmp(words[0], "CANMOVE"))

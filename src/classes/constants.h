@@ -137,7 +137,7 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.25
 #define bb_group_distance_cutoff 4.3
-#define bb_enable_residue_disqualifications 1
+#define bb_enable_residue_disqualifications 0
 #define bb_disqualification_energy 500000
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
@@ -304,7 +304,7 @@
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
 #define _allow_conditional_basicity_with_acid_ligand 1
-#define cond_bas_hbond_energy_threshold 5.0
+#define cond_bas_hbond_energy_threshold 10.0
 #define cond_bas_hbond_distance_threshold 2.8
 
 #define prealign_iters 50
@@ -359,7 +359,7 @@
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
 #define _dbg_groupsalign 0
-#define _dbg_groupsel 1
+#define _dbg_groupsel 0
 #define _DBG_H2O_TELEPORT 0
 #define _DBG_HISFLIP 0
 #define _dbg_homology 0

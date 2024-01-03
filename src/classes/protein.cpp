@@ -1385,6 +1385,13 @@ int Protein::get_residues_can_clash_ligand(AminoAcid** reaches_spheroid,
         int resno = aa->get_residue_no();
         if (resno_already[resno]) continue;
 
+        if (aa->priority)
+        {
+            reaches_spheroid[sphres++] = aa;
+            resno_already[resno] = true;
+            continue;
+        }
+
         if (addl_resno)
         {
             for (j=0; addl_resno[j]; j++)

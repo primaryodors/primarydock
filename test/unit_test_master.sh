@@ -53,6 +53,7 @@ fi
 printf "${CYN}Running prediction tests and docking tests; these will take some time. Please wait.${NC}\n"
 
 
+# TODO: Would like to ensure that the ligand sits vertically in the binding pocket.
 REPORT="testdata/OR51E1_caprylate_pred.approved.txt"
 php -f predict/method_directmdl.php prot=OR51E1 lig=caprylic_acid | grep '[[]Predicted[]] => ' > testdata/received/OR51E1_caprylate_pred.received.txt
 RESULT=$(diff --unified $REPORT testdata/received/OR51E1_caprylate_pred.received.txt)

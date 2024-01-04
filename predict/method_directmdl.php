@@ -33,24 +33,17 @@ function make_prediction($data)
 {
     global $protid, $ligname;
 
-    if (isset($data["a_Pose1"]))
+    if (isset($data["a_BENERG"]))
     {
-        $ae = min(0, floatval(@$data['a_BindingEnergy']));
-        $ie = min(0, floatval(@$data["i_BindingEnergy"]));
-        $a1 = min(0, floatval( $data['a_Pose1']));
-        $i1 = min(0, floatval(@$data['i_Pose1']));
-        $a6 = min(0, floatval(@$data["a_BindingEnergy.6"]));
-        $i6 = min(0, floatval(@$data["i_BindingEnergy.6"]));
-
-        $ascore = -min(0, $ae - $a6) * $a6 + $a1;
-        $iscore = -min(0, $ie - $i6) * $i6 + $i1;
+        $ascore = min(0, floatval( $data['a_BENERG']));
+        $iscore = min(0, floatval(@$data['i_BENERG']));
 
         if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
             $data['DockScore'] = (min($i1, 0) - $a1) / 2;
         }
-        else if ($i1 < 0 && $iscore < $ascore)
+        else if ($iscore < 0 && $iscore < $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
             $data['DockScore'] = (min($i1, 0) - $a1) / 2;
@@ -96,36 +89,14 @@ if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname)
 $fam = family_from_protid($protid);
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
 
-$configf = <<<heredoc
+// Filter out everything except ATOM records.
+exec("cat $pdbfname_inactive | grep ATOM > tmp/prot.pdb");
 
-PROT $pdbfname_inactive
-LIG sdf/$ligname.sdf
+// Convert to PDBQT format.
+exec("obabel -i pdb tmp/prot.pdb -xr -o pdbqt -O tmp/prot.pdbqt");
 
-$cenres_inactive
-SIZE $size
-# H2O 5
-$mcoord
-$atomto
-$stcr
-$flxr
-
-EXCL 1 56		# Head, TMR1, and CYT1.
-
-SEARCH $search
-POSE $pose
-ELIM 10000
-$flex_constraints
-ITERS $iter
-PROGRESS
-
-FLEX $flxi
-WET
-
-OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.inactive.model%o.pdb
-
-
-heredoc;
+// Convert ligand as well.
+exec("obabel -i sdf sdf/$ligname.sdf -o pdbqt -O tmp/lig.pdbqt");
 
 chdir(__DIR__);
 chdir("..");
@@ -138,35 +109,10 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 $pdbfname = $pdbfname_active;
 $outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
 
-$configf = <<<heredoc
+// Filter out everything except ATOM records.
+exec("cat $pdbfname_active | grep ATOM > tmp/prot.pdb");
 
-PROT $pdbfname
-LIG sdf/$ligname.sdf
-
-$cenres_active
-SIZE $size
-# H2O 5
-$mcoord
-$atomto
-$stcr
-$flxr
-
-EXCL 1 56		# Head, TMR1, and CYT1.
-
-SEARCH $search
-POSE $pose
-ELIM 10000
-$flex_constraints
-ITERS $iter
-PROGRESS
-
-FLEX $flex
-WET
-
-OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
-
-
-heredoc;
+// Convert to PDBQT format.
+exec("obabel -i pdb tmp/prot.pdb -xr -o pdbqt -O tmp/prot.pdbqt");
 
 $poses = process_dock("a");

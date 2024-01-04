@@ -231,6 +231,7 @@ Point ResidueGroup::get_center()
     for (i=0; i<amsz; i++)
     {
         Atom** aa = aminos[i]->get_most_bindable(1);
+        if (!aa) continue;
         Atom* a = aa[0];
 
         if (a)
@@ -960,7 +961,9 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
 
             Atom *reach1, *reach2;
             reach1 = aa->get_reach_atom();
+            if (!reach1) reach1 = aa->get_atom("CA");
             reach2 = bb->get_reach_atom();
+            if (!reach2) reach2 = bb->get_atom("CA");
             if ((fabs(reach1->is_polar()) >= hydrophilicity_cutoff) != (fabs(reach2->is_polar()) >= hydrophilicity_cutoff))
             {
                 Atom *nearest1, *nearest2;

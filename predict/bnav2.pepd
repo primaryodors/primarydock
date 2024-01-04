@@ -25,6 +25,7 @@ REGION TMR1 27 52
 REGION TMR2 60 90
 REGION TMR3 96 130
 REGION TMR4 140 168
+REGION EXR2 169 193
 REGION TMR5 194 226
 REGION TMR6 237 265
 REGION TMR7 272 294
@@ -32,6 +33,7 @@ BWMOTIF 1 llgNstllv
 BWMOTIF 2 pmyfflamxxxxD
 BWMOTIF 3 llamaydRyvaicxpl
 BWMOTIF 4 plryxxiltxxxxxxxglaxXxrxxxxxxp
+BWMOTIF 45 niiphtyCehmgvakl
 BWMOTIF 5 llivglDvilialsy
 BWMOTIF 6 kaxstcgshlcvilxfyxP
 BWMOTIF 7 llanlyllvppmlnPliy

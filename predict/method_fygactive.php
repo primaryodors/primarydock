@@ -284,6 +284,7 @@ WET
 
 OUT $outfname
 OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
+APPENDPROT
 
 
 heredoc;

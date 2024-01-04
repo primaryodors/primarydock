@@ -44,7 +44,7 @@ float do_template_bend(Protein& p, AminoAcid* aasrc, AminoAcid* aaref, int hxno,
     int er = max(resoppo, resterm);
 
     int sr1=0, er1=0;
-    if (hxno<7 && !aaopposite_term)
+    if (hxno<7)
     {
         std::string name = (std::string)"TMR" + to_string(hxno+1);
         sr1 = p.get_region_start(name)-2;
@@ -472,7 +472,7 @@ int main(int argc, char** argv)
     else if (l6x59 == 'R')
     {
         rock6_dir = aa5x39->get_CA_location().subtract(aa6x55->get_CA_location());
-        aa6x59->conform_atom_to_location("NE", Point(0,10000,0));
+        aa6x59->conform_atom_to_location("NE", Point(5000,10000,0));
         aa6x59->movability = MOV_PINNED;
         exr2_bend = true;
 
@@ -714,6 +714,7 @@ int main(int argc, char** argv)
         }
     }
 
+/*
     for (n=1; n<=7; n++)
     {
         std::string region = (std::string)"TMR" + std::to_string(n);
@@ -733,7 +734,7 @@ int main(int argc, char** argv)
             if (clash <= initial_clash_[i]) break;
         }
     }
-
+*/
 
     ////////////////////////////////////////////////////////////////////////////////
     // Make room near trip switch.

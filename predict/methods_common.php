@@ -19,6 +19,7 @@ $clashcomp = [];
 
 $method = explode("_", $_SERVER['PHP_SELF'])[1];
 $method = explode(".", $method)[0];
+echo "Method is $method.\n";
 
 $result = $output = false;
 chdir(__DIR__);
@@ -138,6 +139,34 @@ extract(binding_site($protid));
 
 $outfname = "output.dock";
 
+function dock_failed()
+{
+    echo "Docking FAILED.\n";
+
+    if (stream_isatty(STDOUT) && file_exists("predict/soundalert"))
+    {
+        $play_sound = true;
+        $sa = explode(",",file_get_contents("predict/soundalert"));
+        if (count($sa) == 2)
+        {
+            $hfrom = intval($sa[0]);
+            $hto = intval($sa[1]);
+            $hnow = intval(date("H"));
+
+            if ($hnow < $hfrom || $hnow > $hto) $play_sound = false;
+        }
+
+        $hassox = [];
+        exec("which sox", $hassox);
+        if ($play_sound && count($hassox))
+        {
+            exec("play fail.mp3 &");
+        }
+    }
+
+    exit;
+}
+
 function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname;
@@ -192,6 +221,11 @@ function prepare_outputs()
     
     if ($mbp)
     {
+        foreach ($mbp as $k => $v)
+        {
+            if (substr($k,0,1)=='#') unset($mbp[$k]);
+        }
+
         if (isset($mbp['odorophores']))
         {
             $sdfname = "sdf/".(str_replace(' ', '_', $ligname)).".sdf";
@@ -248,14 +282,15 @@ function prepare_outputs()
     if ($mbp && isset($mbp["pocket"]))
     {
         $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
-    }
-    if ($mbp && isset($mbp["active_pocket"]))
-    {
-        $cenres_active = "CEN RES {$mbp["active_pocket"]}";
-    }
-    if ($mbp && isset($mbp["inactive_pocket"]))
-    {
-        $cenres_inactive = "CEN RES {$mbp["inactive_pocket"]}";
+    
+        if ($mbp && isset($mbp["active_pocket"]))
+        {
+            $cenres_active = "CEN RES {$mbp["active_pocket"]}";
+        }
+        if ($mbp && isset($mbp["inactive_pocket"]))
+        {
+            $cenres_inactive = "CEN RES {$mbp["inactive_pocket"]}";
+        }
     }
     else
     {
@@ -309,7 +344,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 
     if ($retvar)
     {
-        echo "Docking FAILED.\n";
+        dock_failed();
         return 0;
     }
     
@@ -356,7 +391,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 
     if (!$posesln)
     {
-        echo "Docking FAILED.\n";
+        dock_failed();
         return 0;
     }
 

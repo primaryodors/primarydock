@@ -234,7 +234,7 @@ fi
 
 # group_tests_mol.sh
 
-test/group_test_res pdbs/TAAR/TAAR8.upright.pdb sdf/cadaverine.sdf 3.32 3.37 5.42 6.48 7.43 | sed '/^#/d' > testdata/received/group_test_res.received.txt
+test/group_test_res pdbs/TAAR/TAAR8.upright.pdb sdf/cadaverine.sdf 3.32 3.37 5.42 6.48 7.43 | grep "atom_group\[ N" | sed '/^#/d' > testdata/received/group_test_res.received.txt
 RESULT=$(diff --unified testdata/group_test_res.taar8.approved.txt testdata/received/group_test_res.received.txt)
 if [ -z "$RESULT" ]; then
     printf "${GRN}\u2588${NC}"

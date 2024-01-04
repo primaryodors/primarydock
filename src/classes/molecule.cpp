@@ -1826,9 +1826,21 @@ void Molecule::crumple(float theta)
     int i;
     for (i=0; b[i]; i++)
     {
-        float ltheta = frand(-theta, theta);
-        b[i]->rotate(ltheta);
-        if (get_internal_clashes() > int_clsh*2) b[i]->rotate(-ltheta);
+        if (b[i]->can_rotate)
+        {
+            float ltheta = frand(-theta, theta);
+            b[i]->rotate(ltheta);
+            if (get_internal_clashes() > int_clsh*4) b[i]->rotate(-ltheta);
+        }
+        else if (b[i]->can_flip)
+        {
+            float sint = sin(theta);
+            if (frand(0,2) <= sint)
+            {
+                b[i]->rotate(b[i]->flip_angle);
+                if (get_internal_clashes() > int_clsh*4) b[i]->rotate(b[i]->flip_angle);
+            }
+        }
     }
 }
 

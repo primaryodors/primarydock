@@ -137,7 +137,7 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.25
 #define bb_group_distance_cutoff 4.3
-#define bb_enable_residue_disqualifications 1
+#define bb_enable_residue_disqualifications 0
 #define bb_disqualification_energy 1000
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
@@ -303,9 +303,9 @@
 // if a negatively charged atom is nearby.
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
-#define _allow_conditional_basicity_with_acid_ligand 1
-#define cond_bas_hbond_energy_threshold 2.0
-#define cond_bas_hbond_distance_threshold 3.0
+#define _allow_conditional_basicity_with_acid_ligand 0
+#define cond_bas_hbond_energy_threshold 10.0
+#define cond_bas_hbond_distance_threshold 2.9
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0

@@ -362,8 +362,6 @@ Atom::Atom(FILE* is)
                         else if	(!strcmp(strcharge, "-")) charge = -1;
                         else if	(!strcmp(strcharge, "--")) charge = -2;
                         else if (atoi(strcharge)) charge = atoi(strcharge);
-                        if (strchr(strcharge, '-')) charge = -fabs(charge);
-                        // cout << name << " has " << strcharge << " charge " << charge << endl;
                         origchg = charge;
                         // cout << aa3let << residue << ":" << name << " has charge " << charge << endl;
                     }
@@ -918,17 +916,13 @@ bool Atom::bond_to(Atom* lbtom, float lcard)
     return false;
 }
 
+#define _dbg_polar_calc 0
 float Atom::is_polar()
 {
     if (charge) polarity = sgn(charge);
     else if (!polar_calcd)
     {
         int i, j, n=0;
-
-        if (family == CHALCOGEN && residue == 183)
-        {
-            j = 1;
-        }
 
         if (family == CHALCOGEN || family == PNICTOGEN)
         {

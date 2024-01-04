@@ -137,15 +137,15 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.25
 #define bb_group_distance_cutoff 4.3
-#define bb_enable_residue_disqualifications 0
-#define bb_disqualification_energy 500000
+#define bb_enable_residue_disqualifications 1
+#define bb_disqualification_energy 1000
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
 #define bb_realign_amount 0.2
 #define bb_realign_mol 0
 #define bb_realign_threshold_distance 1.5
 #define bb_realign_threshold_angle (fiftyseventh * 22.5)
-#define enable_bb_scooch 0
+#define enable_bb_scooch 1
 #define bb_scooch_threshold_distance 1.5
 #define flexion_selection 1
 #define no_zero_flexions 1
@@ -304,8 +304,8 @@
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
 #define _allow_conditional_basicity_with_acid_ligand 1
-#define cond_bas_hbond_energy_threshold 10.0
-#define cond_bas_hbond_distance_threshold 2.8
+#define cond_bas_hbond_energy_threshold 2.0
+#define cond_bas_hbond_distance_threshold 3.0
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0
@@ -379,7 +379,6 @@
 #define _dbg_null_flexions 0
 #define _dbg_path_search 0
 #define _dbg_point_avg 0
-#define _dbg_polar_calc 0
 #define _dbg_polsat 0
 #define _dbg_repack 0
 #define _DBG_RESBMULT 0

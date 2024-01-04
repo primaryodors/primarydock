@@ -1152,17 +1152,13 @@ int AminoAcid::from_pdb(FILE* is, int rno)
 
                     if (strcharge)
                     {
-                        float charge = 0;
                         if (strcharge[strlen(strcharge)-1] == '\n') strcharge[strlen(strcharge)-1] = 0;
-                        if 		(!strcmp(strcharge, "+")) charge = 1;
-                        else if	(!strcmp(strcharge, "++")) charge = 2;
-                        else if	(!strcmp(strcharge, "-")) charge = -1;
-                        else if	(!strcmp(strcharge, "--")) charge = -2;
-                        else if (atoi(strcharge)) charge = atoi(strcharge);
-                        if (strchr(strcharge, '-')) charge = -fabs(charge);
-                        // if (charge) cout << a->name << " has " << strcharge << " charge " << charge << endl;
+                        if 		(!strcmp(strcharge, "+")) a->increment_charge(1);
+                        else if	(!strcmp(strcharge, "++")) a->increment_charge(2);
+                        else if	(!strcmp(strcharge, "-")) a->increment_charge(-1);
+                        else if	(!strcmp(strcharge, "--")) a->increment_charge(-2);
+                        else if (atoi(strcharge)) a->increment_charge(atoi(strcharge));
                         // cout << aa3let << residue << ":" << name << " has charge " << charge << endl;
-                        if (charge) a->increment_charge(charge);
                     }
 
                     name=0;

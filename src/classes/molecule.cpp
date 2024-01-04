@@ -739,7 +739,7 @@ int Molecule::has_hbond_donors()
         if (atoms[i]->is_polar() >= hydrophilicity_cutoff)
         {
             result++;
-            // cout << name << ":" << atoms[i]->name << " is an hbond donor." << endl;
+            // if (get_charge() < 0.5) cout << name << ":" << atoms[i]->name << " is an hbond donor." << endl;
         }
         if (atoms[i]->get_family() == HALOGEN && atoms[i]->is_bonded_to(TETREL)) result++;
     }
@@ -1826,21 +1826,9 @@ void Molecule::crumple(float theta)
     int i;
     for (i=0; b[i]; i++)
     {
-        if (b[i]->can_rotate)
-        {
-            float ltheta = frand(-theta, theta);
-            b[i]->rotate(ltheta);
-            if (get_internal_clashes() > int_clsh*4) b[i]->rotate(-ltheta);
-        }
-        else if (b[i]->can_flip)
-        {
-            float sint = sin(theta);
-            if (frand(0,2) <= sint)
-            {
-                b[i]->rotate(b[i]->flip_angle);
-                if (get_internal_clashes() > int_clsh*4) b[i]->rotate(b[i]->flip_angle);
-            }
-        }
+        float ltheta = frand(-theta, theta);
+        b[i]->rotate(ltheta);
+        if (get_internal_clashes() > int_clsh*2) b[i]->rotate(-ltheta);
     }
 }
 

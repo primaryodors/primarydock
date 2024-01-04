@@ -2090,10 +2090,9 @@ int main(int argc, char** argv)
 
     protein->mcoord_resnos = mcoord_resno;
 
-    l=0;
-    for (i=0; mcoord_resno[i]; i++) addl_resno[l++] = mcoord_resno[i];
-    for (i=0; i < tripswitch_clashables.size(); i++) addl_resno[l++] = tripswitch_clashables[i];
-    addl_resno[l] = 0;
+    for (i=0; mcoord_resno[i]; i++) addl_resno[i] = mcoord_resno[i];
+    for (l=0; l < tripswitch_clashables.size(); l++) addl_resno[i+l] = tripswitch_clashables[l];
+    addl_resno[i+l] = 0;
 
     // Load the ligand or return an error.
     // Molecule m(ligfname);
@@ -2310,7 +2309,7 @@ _try_again:
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
-        ligand->crumple(M_PI);
+        ligand->crumple(triangular);
 
         for (i=0; i<dyn_motions.size(); i++) dyn_motions[i].apply_absolute(0);
 
@@ -2711,12 +2710,6 @@ _try_again:
             cout << endl;
             #endif
 
-            #if _dbg_groupsel
-            cout << "Candidate binding residues: ";
-            for (i=0; i<sphres; i++) cout << *reaches_spheroid[nodeno][i] << " ";
-            cout << endl;
-            #endif
-
             for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
             for (i=0; i<sphres; i++)
             {
@@ -2752,12 +2745,6 @@ _try_again:
                 protein->set_conditional_basicities();
                 if (use_bestbind_algorithm)
                 {
-                    #if _dbg_groupsel
-                    cout << "Candidate binding residues: ";
-                    for (i=0; i<sphres; i++) cout << *reaches_spheroid[nodeno][i] << " ";
-                    cout << endl;
-                    #endif
-
                     std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
                     global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
 
@@ -2797,20 +2784,16 @@ _try_again:
                     }
 
                     #if bb_enable_residue_disqualifications
-                    if (!global_pairs[0]->is_priority())
+                    if (ligand->get_intermol_clashes(lmols) >= bb_disqualification_energy)
                     {
-                        float dqc = ligand->get_intermol_clashes(lmols);
-                        if (dqc >= bb_disqualification_energy)
-                        {
-                            #if _dbg_groupsel
-                            cout << "Primary residue group is disqualified with initial clash " << dqc << endl << endl;
-                            #endif
+                        #if _dbg_groupsel
+                        cout << "Primary residue group is disqualified." << endl;
+                        #endif
 
-                            global_pairs[0]->disqualify();
-                            std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
-                            global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
-                            GroupPair::align_groups(ligand, global_pairs, false, 1);
-                        }
+                        global_pairs[0]->disqualify();
+                        std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
+                        global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
+                        GroupPair::align_groups(ligand, global_pairs, false, 1);
                     }
                     #endif
 

@@ -1139,6 +1139,8 @@ float GroupPair::get_potential()
                 {
                     partial = aa->get_atom_mol_bind_potential(a);
 
+                    if (polar_atoms && polar_res && aa->get_charge()) partial *= 1.0 + fabs(aa->get_charge());
+
                     Moiety amide;
                     amide.pattern = "ocn";
                     Atom* matches[128];

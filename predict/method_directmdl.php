@@ -48,7 +48,7 @@ function make_prediction($data)
         if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
+            $data['DockScore'] = (min($iscore, 0) - $ascore) / 2;
         }
         else if ($i1 < 0 && $iscore < $ascore)
         {

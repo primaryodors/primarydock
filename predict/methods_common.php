@@ -417,7 +417,8 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         if (substr($ln, 0, 5) != "ATOM ") continue;
         $atno = intval(substr($ln, 7, 4));
         if ($atno < $fatno) break;
-        $ln = "HETATM ".(9000+$atno).substr($ln, 11, 6)."LIG".substr($ln, 20);
+        $esym = trim(substr($ln, 13, 2));
+        $ln = "HETATM ".(9000+$atno)."  ".str_pad($esym.$atno, 4)."LIG".substr($ln, 20,57).$esym;
         $outpdb .= "$ln\n";
         $fatno = $atno;
     }

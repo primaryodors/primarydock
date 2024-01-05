@@ -311,7 +311,7 @@ function prepare_outputs()
 $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_clashing = false)
 {
-    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version;
+    global $ligname, $protid, $configf, $dock_retries, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
     global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
@@ -335,7 +335,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         }
         set_time_limit(300);
         $outlines = [];
-        $cmd = "bin/vina --receptor tmp/prot.pdbqt --ligand tmp/lig.pdbqt --center_x 0 --center_y 15 --center_z 0 --size_x 15 --size_y 15 --size_z 15 --exhaustiveness 20";
+        $cmd = "bin/vina --receptor tmp/prot.pdbqt --ligand tmp/lig.pdbqt --center_x 0 --center_y 15 --center_z 0 --size_x 20 --size_y 20 --size_z 20 --exhaustiveness 20";
         echo "$cmd\n";
         exec($cmd, $outlines, $retvar);
     }
@@ -365,11 +365,23 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     $pose_node_has_weight = [];
     $num_poses = 0;
 
+    $outpdb = file_get_contents($pdbfname);
+
     $posesln = false;
     $affinities = [];
-    foreach ($outlines as $ln)
+    $mustattribute = true;
+    $attribution = "";
+    foreach ($outlines as $lno => $ln)
     {
         echo "$ln\n";
+
+        if ($mustattribute && $lno > 2)
+        {
+            if (false !== strpos($ln, "####")) $mustattribute = false;
+            $ln = trim(str_replace('#', '', $ln));
+            $attribution .= "REMARK   1 $ln\n";
+            continue;
+        }
 
         if (false !== strpos($ln, "affinity"))
         {
@@ -387,13 +399,37 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         }
     }
 
-    print_r($affinities);
+    $outpdb = $attribution.$outpdb;
+
+    // print_r($affinities);
 
     if (!$posesln)
     {
         dock_failed();
         return 0;
     }
+
+    $outpdb = str_replace("TER\n", "", $outpdb);
+    $outpdb = str_replace("END\n", "", $outpdb);
+
+    $ol = explode("\n", file_get_contents("tmp/lig_out.pdbqt"));
+    $fatno = 0;
+    foreach($ol as $ln)
+    {
+        if (substr($ln, 0, 5) != "ATOM ") continue;
+        $atno = intval(substr($ln, 7, 4));
+        if ($atno < $fatno) break;
+        $ln = substr($ln, 0, 7).(9000+$atno).substr($ln, 11, 6)."LIG".substr($ln, 20);
+        $outpdb .= "$ln\n";
+        $fatno = $atno;
+    }
+
+    $outpdb .= "\nTER\nEND\n";
+
+    $fp = fopen($outfname, "w");
+    if (!$fp) die("Failed to write to $outfname.\n");
+    fwrite($fp, $outpdb);
+    fclose($fp);
 
     if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
 

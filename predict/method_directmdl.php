@@ -41,12 +41,12 @@ function make_prediction($data)
         if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($iscore, 0) - $ascore) / 2;
+            $data['DockScore'] = (min($iscore, 0) - $ascore);
         }
         else if ($iscore < 0 && $iscore < $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
+            $data['DockScore'] = (min($iscore, 0) - $ascore);
         }
         else
         {
@@ -91,7 +91,8 @@ $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
 
 $fam = family_from_protid($protid);
-$outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
+$pdbfname = $pdbfname_inactive;
+$outfname = "output/$fam/$protid/$protid.$ligname.inactive.model1.pdb";
 
 // Filter out everything except ATOM records.
 exec("cat $pdbfname_inactive | grep ATOM > tmp/prot.pdb");
@@ -111,7 +112,7 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 
 $pdbfname = $pdbfname_active;
-$outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
+$outfname = "output/$fam/$protid/$protid.$ligname.active.model1.pdb";
 
 // Filter out everything except ATOM records.
 exec("cat $pdbfname_active | grep ATOM > tmp/prot.pdb");

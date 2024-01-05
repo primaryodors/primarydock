@@ -150,6 +150,35 @@ function json_encode_pretty($array)
 	return preg_replace("/([ \t]*)([^\\s]*) ([{\\[])\n/", "\$1\$2\n\$1\$3\n", json_encode($array, JSON_PRETTY_PRINT));
 }
 
+function split_pdb_to_rigid_and_flex($protid, $pdblines, $flxr_array)
+{
+	$rigid = [];
+	$flex  = [];
+
+	$flxr_res = [];
+	foreach ($flxr_array as $bw)
+	{
+		if (false===strpos($bw, "."))
+		{
+			if (intval($bw)) $flxr_res[] = intval($bw);
+			continue;
+		}
+		$resno = resno_from_bw($protid, $bw);
+		if ($resno) $flxr_res[] = $resno;
+	}
+
+	foreach ($pdblines as $ln)
+	{
+		if (substr($ln, 0, 5) != "ATOM ") continue;
+		$y = floatval(substr($ln, 38, 8));
+		$resno = intval(substr($ln, 22, 4));
+		if (in_array($resno, $flxr_res)) $flex[] = $ln;
+		else $rigid[] = $ln;
+	}
+
+	return [$rigid,$flex];
+}
+
 $cwd = getcwd();
 chdir(__DIR__);
 chdir("..");

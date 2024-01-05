@@ -508,7 +508,7 @@ void Molecule::hydrogenate(bool steric_only)
                     Bond* b1 = atoms[i]->get_bond_by_idx(k++);
                     if (!b1->btom || b1->btom == H) b1 = atoms[i]->get_bond_by_idx(k++);
 
-                    if (b0->btom && b1->btom)
+                    if (b0->btom && b1->btom && (abs((__int64_t)(b1) - (__int64_t)b1->btom) < memsanity))
                     {
                         Point source = atoms[i]->get_location();
                         /*Point axis = b0->btom->get_location();

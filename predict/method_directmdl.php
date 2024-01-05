@@ -95,10 +95,21 @@ $pdbfname = $pdbfname_inactive;
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.model1.pdb";
 
 // Filter out everything except ATOM records.
-exec("cat $pdbfname_inactive | grep ATOM > tmp/prot.pdb");
+// exec("cat $pdbfname_inactive | grep ATOM > tmp/prot.pdb");
+$lines = explode("\n", file_get_contents($pdbfname_inactive));
+$rf = split_pdb_to_rigid_and_flex($protid, $lines, explode(" ", "$flxr $iflxr"));
+$fp = fopen("tmp/prot.pdb", "w");
+if (!$fp) die("Failed to write to tmp/prot.pdb.\n");
+fwrite($fp, implode("\n",$rf[0]));
+fclose($fp);
+$fp = fopen("tmp/flex.pdb", "w");
+if (!$fp) die("Failed to write to tmp/flex.pdb.\n");
+fwrite($fp, implode("\n",$rf[1]));
+fclose($fp);
 
 // Convert to PDBQT format.
 exec("obabel -i pdb tmp/prot.pdb -xr -o pdbqt -O tmp/prot.pdbqt");
+exec("obabel -i pdb tmp/flex.pdb -xs -o pdbqt -O tmp/flex.pdbqt");
 
 // Convert ligand as well.
 exec("obabel -i sdf sdf/$ligname.sdf -o pdbqt -O tmp/lig.pdbqt");
@@ -115,9 +126,20 @@ $pdbfname = $pdbfname_active;
 $outfname = "output/$fam/$protid/$protid.$ligname.active.model1.pdb";
 
 // Filter out everything except ATOM records.
-exec("cat $pdbfname_active | grep ATOM > tmp/prot.pdb");
+// exec("cat $pdbfname_active | grep ATOM > tmp/prot.pdb");
+$lines = explode("\n", file_get_contents($pdbfname_active));
+$rf = split_pdb_to_rigid_and_flex($protid, $lines, explode(" ", "$flxr $aflxr"));
+$fp = fopen("tmp/prot.pdb", "w");
+if (!$fp) die("Failed to write to tmp/prot.pdb.\n");
+fwrite($fp, implode("\n",$rf[0]));
+fclose($fp);
+$fp = fopen("tmp/flex.pdb", "w");
+if (!$fp) die("Failed to write to tmp/flex.pdb.\n");
+fwrite($fp, implode("\n",$rf[1]));
+fclose($fp);
 
 // Convert to PDBQT format.
 exec("obabel -i pdb tmp/prot.pdb -xr -o pdbqt -O tmp/prot.pdbqt");
+exec("obabel -i pdb tmp/flex.pdb -xs -o pdbqt -O tmp/flex.pdbqt");
 
 $poses = process_dock("a");

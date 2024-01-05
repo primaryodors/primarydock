@@ -335,7 +335,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         }
         set_time_limit(300);
         $outlines = [];
-        $cmd = "bin/vina --receptor tmp/prot.pdbqt --ligand tmp/lig.pdbqt --center_x 0 --center_y 15 --center_z 0 --size_x 20 --size_y 20 --size_z 20 --exhaustiveness 20";
+        $cmd = "bin/vina --receptor tmp/prot.pdbqt --flex tmp/flex.pdbqt --ligand tmp/lig.pdbqt --center_x 0 --center_y 15 --center_z 0 --size_x 20 --size_y 20 --size_z 20 --exhaustiveness 20 --cpu 1";
         echo "$cmd\n";
         exec($cmd, $outlines, $retvar);
     }
@@ -401,8 +401,6 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 
     $outpdb = $attribution.$outpdb;
 
-    // print_r($affinities);
-
     if (!$posesln)
     {
         dock_failed();
@@ -438,6 +436,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     $scoring = [];
     exec("bin/score_pdb $outfname | grep \"Total: \"", $scoring);
     $outdata[$metrics_prefix."BENERG"] = floatval(substr($scoring[0], 7));
+    echo $scoring[0]."\n";
     
     $outdata['version'] = $version;
     $outdata['method'] = $method;

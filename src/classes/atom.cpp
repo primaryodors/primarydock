@@ -712,7 +712,7 @@ bool Atom::shares_bonded_with(Atom* btom)
     if (!bonded_to) return false;
     int i;
     for (i=0; i<geometry; i++)
-        if (bonded_to[i].btom)
+        if (bonded_to[i].btom && abs(reinterpret_cast<long>(bonded_to[i].btom) - reinterpret_cast<long>(this)) < memsanity)
             if (bonded_to[i].btom->is_bonded_to(btom)) return true;
     return false;
 }
@@ -1809,6 +1809,11 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
     // #259 fix:
     for (i=0; i<geometry; i++)
     {
+        if (abs((__int64_t)(bonded_to) - (__int64_t)bonded_to[i].btom) > memsanity)
+        {
+            bonded_to[i].btom = nullptr;
+            break;
+        }
         if (bonded_to[i].btom)
         {
             Rotation rot = align_points_3d(location.add(geov[i]), bonded_to[i].btom->location, location);
@@ -1820,6 +1825,7 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
 
             for (j=i+1; j<geometry; j++)
             {
+                if (abs((__int64_t)(bonded_to) - (__int64_t)bonded_to[j].btom) > memsanity) break;
                 if (bonded_to[j].btom)
                 {
                     float theta = find_angle_along_vector(location.add(geov[j]), bonded_to[j].btom->location, location, geov[i]);
@@ -2344,6 +2350,8 @@ bool Atom::is_conjugated_to(Atom* a, Atom* bir, Atom* c)
         for (i=0; i<geometry; i++)
         {
             if (bonded_to[i].btom
+                &&
+                (abs((__int64_t)(this) - (__int64_t)bonded_to[i].btom) < memsanity)
                 &&
                 bonded_to[i].btom != c
                 &&

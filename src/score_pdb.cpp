@@ -33,6 +33,7 @@ int main(int argc, char** argv)
     p.load_pdb(fp, 0, strand);
     fseek(fp, 0, 0);
     m.from_pdb(fp, true);
+    fclose(fp);
 
     AminoAcid* aa = p.get_residue_bw(3, 50);
     if (!aa) aa = p.get_residue_bw(6, 48);
@@ -47,9 +48,14 @@ int main(int argc, char** argv)
             aa = p.get_residue(i);
             if (aa) aa->hydrogenate();
         }
-
-        m.hydrogenate();
     }
+
+    m.identify_acidbase();
+    m.hydrogenate();
+
+    fp = fopen("tmp/primarysuck.sdf", "w");
+    m.save_sdf(fp);
+    fclose(fp);
 
     DockResult dr(&p, &m, Point(10000,10000,10000));
     dr.include_pdb_data = false;

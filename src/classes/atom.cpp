@@ -645,7 +645,19 @@ void Atom::fetch_bonds(Bond** result)
     if (!geometry || geometry<0 || isnan(geometry)) geometry=4;
     try
     {
-        for (i=0; i<geometry; i++) result[i] = &bonded_to[i];
+        for (i=0; i<geometry; i++)
+        {
+            result[i] = nullptr;
+        }
+
+        for (i=0; i<geometry; i++)
+        {
+            if (abs((__int64_t)(this) - (__int64_t)bonded_to[i].atom) > memsanity) break;
+            if (!bonded_to[i].atom) continue;
+            if (!bonded_to[i].atom->Z) continue;
+            result[i] = &bonded_to[i];
+        }
+        result[i] = nullptr;
         result[geometry] = nullptr;
     }
     catch (int e)

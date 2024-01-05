@@ -271,6 +271,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                 int ag = atoms[i]->get_geometry();
                 for (j=0; j<ag; j++)
                 {
+                    if (!ab[j]) continue;
                     if (ab[j]->btom)
                     {
                         k = atom_idx_from_ptr(ab[j]->btom);
@@ -295,6 +296,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
                     int ag = atoms[i]->get_geometry();
                     for (j=0; j<ag; j++)
                     {
+                         if (!ab[j]) continue;
                         if (ab[j]->btom)
                         {
                             // cout << atoms[i]->name << " is bonded to " << ab[j]->btom->name << name << endl;
@@ -563,6 +565,7 @@ AminoAcid::AminoAcid(const char letter, AminoAcid* prevaa, bool minintc)
 
             for (j=0; j<bg; j++)
             {
+                if (!bb[j]) break;
                 if (bb[j]->btom && bb[j]->btom < bb[j]->atom)
                 {
                     aabd[n] = new AABondDef();

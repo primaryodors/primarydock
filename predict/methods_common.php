@@ -419,7 +419,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         if (substr($ln, 0, 5) != "ATOM ") continue;
         $atno = intval(substr($ln, 7, 4));
         if ($atno < $fatno) break;
-        $ln = substr($ln, 0, 7).(9000+$atno).substr($ln, 11, 6)."LIG".substr($ln, 20);
+        $ln = "HETATM ".(9000+$atno).substr($ln, 11, 6)."LIG".substr($ln, 20);
         $outpdb .= "$ln\n";
         $fatno = $atno;
     }
@@ -434,7 +434,10 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
 
     $outdata[$metrics_prefix."POSES"] = $num_poses;
-    $outdata[$metrics_prefix."BENERG"] = $affinities[0];
+    // $outdata[$metrics_prefix."BENERG"] = $affinities[0];
+    $scoring = [];
+    exec("bin/score_pdb $outfname | grep \"Total: \"", $scoring);
+    $outdata[$metrics_prefix."BENERG"] = floatval(substr($scoring[0], 7));
     
     $outdata['version'] = $version;
     $outdata['method'] = $method;

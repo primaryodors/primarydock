@@ -1528,7 +1528,7 @@ void Molecule::identify_acidbase()
     if (noAtoms(atoms)) return;
 
     // For every atom in the molecule:
-    int i, j, k;
+    int i, j, k, l;
     Bond* b[16];
 
     for (i=0; atoms[i]; i++)
@@ -1541,12 +1541,64 @@ void Molecule::identify_acidbase()
         int sbOH = 0;
         int fama = atoms[i]->get_family();
         bool carbon = false;
+
         if (fama == TETREL || fama == PNICTOGEN || fama == CHALCOGEN || fama == HALOGEN)
         {
             carbon = (atoms[i]->get_Z() == 6);
             //cout << "Atom " << atoms[i]->name << " is of family " << fama << endl;
             atoms[i]->fetch_bonds(b);
             if (!b[0]) goto _not_acidic;
+
+            int nb2 = atoms[i]->get_bonded_atoms_count();
+            if ((fama == TETREL || fama == PNICTOGEN) && !atoms[i]->is_pi() && nb2 < 4)
+            {
+                if (nb2 == 3)
+                {
+                    l=0;
+                    Point planarity_check[4];
+                    planarity_check[l++] = atoms[i]->get_location();
+                    for (j=0; j<3; j++)
+                    {
+                        if (!b[j]) break;
+                        if (!b[j]->btom) break;
+                        if (!b[j]->btom->get_Z()) break;
+                        planarity_check[l++] = b[j]->btom->get_location();
+                    }
+
+                    if (l > 3)
+                    {
+                        float coplanarity = are_points_planar(planarity_check[0], planarity_check[1], planarity_check[2], planarity_check[3]);
+                        if (coplanarity < 1)
+                        {
+                            atoms[i]->aromatize();
+                            int chalcogens = 0;
+                            for (j=0; j<3; j++)
+                            {
+                                if (!b[j]) break;
+                                if (!b[j]->btom) break;
+                                if (!b[j]->btom->get_Z()) break;
+                                int bfam = b[j]->btom->get_family();
+                                if (bfam == PNICTOGEN || bfam == CHALCOGEN)
+                                {
+                                    b[j]->btom->aromatize();
+                                    b[j]->cardinality = 1.5;
+
+                                    if (bfam == CHALCOGEN)
+                                    {
+                                        chalcogens++;
+                                        if (chalcogens > 1 && !b[j]->btom->get_charge())
+                                        {
+                                            b[j]->btom->increment_charge(-1);
+                                            chalcogens = -65536;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if (carbon)
             {
                 if (!atoms[i]->is_pi() || !atoms[i]->is_bonded_to_pi(CHALCOGEN, true))
@@ -1974,6 +2026,7 @@ Bond** AminoAcid::get_rotatable_bonds()
         int g = atoms[i]->get_geometry();
         for (j=0; j<g; j++)
         {
+            if (!lb[j]) break;
             if (lb[j]->can_rotate
                     &&
                     lb[j]->atom && lb[j]->btom
@@ -2033,6 +2086,7 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
         int g = atoms[i]->get_geometry();
         for (j=0; j<g; j++)
         {
+            if (!lb[j]) break;
             if (lb[j]->atom < lb[j]->btom
                     ||
                     !unidirectional
@@ -2528,6 +2582,7 @@ float Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
 
 void Molecule::clear_atom_binding_energies()
 {
+    if (!atoms) return;
     int i;
     for (i=0; atoms[i]; i++)
         atoms[i]->last_bind_energy = 0;

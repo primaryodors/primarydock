@@ -1087,7 +1087,12 @@ int Protein::get_end_resno()
 
 void Protein::add_remark(const char* remark)
 {
-    if (!remarks) remarks = new char*[65536];
+    if (!remarks)
+    {
+        remarks = new char*[65536];
+        int i;
+        for (i=0; i<65536; i++) remarks[i] = nullptr;
+    }
 
     remarks[remarksz] = new char[strlen(remark)+2];
     strcpy(remarks[remarksz++], remark);
@@ -1138,7 +1143,6 @@ void Protein::set_clashables(int resno, bool recursed)
 
     // cout << "Setting clashables." << endl;
 
-
     int maxres = get_end_resno();
     if (!res_can_clash)
     {
@@ -1156,6 +1160,7 @@ void Protein::set_clashables(int resno, bool recursed)
 
         if (debug) *debug << endl << "Testing residue " << resi->get_residue_no() << endl;
         AminoAcid* temp[maxres+1];
+        for (j=0; j<=maxres; j++) temp[j] = nullptr;
         k=0;
         for (j=sr1; j<=er1; j++)
         {
@@ -1169,8 +1174,7 @@ void Protein::set_clashables(int resno, bool recursed)
             }
         }
 
-        if (!res_can_clash[i])
-            res_can_clash[i] = new AminoAcid*[maxres+8];
+        res_can_clash[i] = new AminoAcid*[maxres+8];
         for (j=0; j<k; j++)
         {
             res_can_clash[i][j] = temp[j];

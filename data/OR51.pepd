@@ -1,4 +1,6 @@
 
+ECHO "Extrapolating active protein structures from known cryo-EM models. This will take some time."
+
 LOAD "pdbs/OR51E2.propionate.bna.pdb" A A
 HYDRO
 SAVE "pdbs/OR51/OR51E2.bound.pdb"

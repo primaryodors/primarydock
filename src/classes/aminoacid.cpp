@@ -2506,6 +2506,7 @@ void AminoAcid::hydrogenate(bool steric_only)
                 else   sprintf(aname, "H%c%d", greek, k);
                 aname[4] = 0;       // Molecule class imposes a 4-char limit.
 
+                atoms[i]->name = new char[strlen(aname)+8];
                 strcpy(atoms[i]->name, aname);
             }
         }

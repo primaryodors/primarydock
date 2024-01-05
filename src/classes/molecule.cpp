@@ -1958,7 +1958,13 @@ Bond** AminoAcid::get_rotatable_bonds()
                         {
                             cout << la->name << " is bonded to:";
                             int o, ag = la->get_geometry();
-                            for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
+                            for (o=0; o<ag; o++)
+                                if (lbb[o]
+                                    && (abs((__int64_t)(this) - (__int64_t)lbb[o]) < memsanity)
+                                    && lbb[o]->btom
+                                    && (abs((__int64_t)(this) - (__int64_t)lbb[o]->btom) < memsanity)
+                                    )
+                                    cout << " " << lbb[o]->btom->name;
                             cout << "." << endl;
                         }
 

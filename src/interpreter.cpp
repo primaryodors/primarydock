@@ -263,7 +263,7 @@ int set_variable(const char* vname, const Star vvalue)
     script_var[n].vt = type_from_name(vname);
     if (script_var[n].vt == SV_STRING)
     {
-        if (script_var[n].value.psz) delete script_var[n].value.psz;
+        if (script_var[n].value.psz) delete[] script_var[n].value.psz;
         script_var[n].value.psz = new char[strlen(vvalue.psz)+4];
         strcpy(script_var[n].value.psz, vvalue.psz);
     }
@@ -708,7 +708,7 @@ int main(int argc, char** argv)
         char** owords = words;
         char chain = 'A';
         char new_chain;
-        bool include_ligand;
+        bool include_ligand = false;
         Protein ptmp("RipMeAsunder");
         if (words && words[0] && words[0][0] && words[0][1])
         {
@@ -1562,7 +1562,7 @@ int main(int argc, char** argv)
                     {
                         psz = interpret_single_string(words[l]);
                         cout << psz << flush;
-                        delete psz;
+                        delete[] psz;
                     }
                 }
 
@@ -2224,6 +2224,7 @@ int main(int argc, char** argv)
                 psz = interpret_single_string(words[1]);
 				n = 0;
                 chain = 'A';
+                include_ligand = false;
                 
 				if (words[2]) chain = words[2][0];
                 if (words[2] && words[3])
@@ -2276,7 +2277,7 @@ int main(int argc, char** argv)
                 strcpy(sv.psz, pname);
 				set_variable(buffer, sv);
 
-                delete psz;
+                delete[] psz;
 
                 int seqlen = working->get_seq_length();
                 sprintf(buffer, "%cSEQLEN%c", '%', g_chain);
@@ -2307,7 +2308,7 @@ int main(int argc, char** argv)
 					working->set_region(words[3], atoi(words[4]), atoi(words[5]));
                     // cout << "ln " << program_counter << " set " << g_chain << ":" << words[3] << " to " << atoi(words[4]) << "-" << atoi(words[5]) << endl;
 
-                    delete words;
+                    delete[] words;
                 }
 
                 for (l=1; l<=7; l++)
@@ -2680,7 +2681,7 @@ int main(int argc, char** argv)
                 cout << "Wrote " << psz << "." << endl;
 
                 fclose(pf);
-                delete psz;
+                delete[] psz;
 
                 if (words[2])
                 {
@@ -2888,6 +2889,13 @@ int main(int argc, char** argv)
                 ptmp.load_pdb(pf, 0, words[2] ? words[2][0] : 'A');
 
                 working->replace_side_chains_from_other_protein(&ptmp);
+
+                n = working->get_end_resno();
+                for (l=1; l<=n; l++)
+                {
+                    f = working->get_internal_clashes(l, l);
+                    if (f > clash_limit_per_aa) working->minimize_residue_clashes(l);
+                }
             }   // SIDEREPL
 
             else if (!strcmp(words[0], "STRAND"))
@@ -3026,7 +3034,7 @@ int main(int argc, char** argv)
         }
 
     _pc_continue:
-        delete owords;
+        delete[] owords;
         program_counter++;
     }
 

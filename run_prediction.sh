@@ -8,7 +8,7 @@ if [ -z "$PROT" ]; then
     PROT="OR51E2"
 fi
 
-if [[ "$LIG" -eq "next" ]]; then
+if [[ "$LIG" = "next" ]]; then
     LIG="next=1"
 elif [ -z "$LIG" ]; then
     LIG="propionic_acid"

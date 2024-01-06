@@ -344,7 +344,10 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
             {
                 $ln = substr($ln, 4);
                 $psiz = explode(",",str_replace('[','',str_replace(']','',$ln)));
-                $size = "--size_x {$psiz[0]} --size_y {$psiz[1]} --size_z {$psiz[2]}";
+                $sx = floatval($psiz[0]) + 5;
+                $sy = floatval($psiz[1]) + 5;
+                $sz = floatval($psiz[2]) + 5;
+                $size = "--size_x $sx --size_y $sy --size_z $sz";
             }
         }
     }

@@ -80,6 +80,7 @@ if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname)
 $fam = family_from_protid($protid);
 $pdbfname = $pdbfname_inactive;
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.model1.pdb";
+$cenres = substr($cenres_inactive, 8);
 
 // Filter out everything except ATOM records.
 // exec("cat $pdbfname_inactive | grep ATOM > tmp/prot.pdb");
@@ -111,6 +112,7 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 $pdbfname = $pdbfname_active;
 $outfname = "output/$fam/$protid/$protid.$ligname.active.model1.pdb";
+$cenres = substr($cenres_active, 8);
 
 // Filter out everything except ATOM records.
 // exec("cat $pdbfname_active | grep ATOM > tmp/prot.pdb");

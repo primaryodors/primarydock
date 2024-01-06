@@ -216,7 +216,7 @@ if (count($p))
     {   
         $dy = intval($base-1 - $pscale*$score);
 
-        imageline($im, $xbuf/3,$dy, $w-$xbuf/3,$dy, $sapphire );
+        imageline($im, $xbuf/3,$dy, $w-$xbuf/3,$dy, $sapphire);
         imagestring($im, 3, $w-$xbuf/6,$dy-8, $score, $azure);
     }
 }
@@ -275,7 +275,7 @@ foreach (array_values($bytree) as $x => $orid)
     $base1 = $base2 = $base;
     if ($dyt >= $base) { $dyt += $bsht; $base1 += $bsht; }
     if ($dye >= $base) { $dye += $bsht; $base2 += $bsht; }
-    
+
     $dy = $base;
     if (false!==$dyt && false===$dye)   imagefilledrectangle($im, $dx,$base1, $dx+$res-2,$dy=$dyt, $red);
     if (false!==$dye && false===$dyt)   imagefilledrectangle($im, $dx,$base2, $dx+$res-2,$dy=$dye, $green);
@@ -292,7 +292,7 @@ foreach (array_values($bytree) as $x => $orid)
         }
     }
 
-    if (false!==$dyp) imagefilledrectangle($im, $dx,$base2, $dx+$res-1,$dy=$dyp, $azure);
+    if (false!==$dyp) imagefilledrectangle($im, $dx+2,$base2, $dx+$res-1,$dy=$dyp, $azure);
     
     if ($dy < $h/1.25) $texts[] = [$dx, $dy-5, $orid];
     

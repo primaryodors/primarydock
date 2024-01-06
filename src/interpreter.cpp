@@ -2176,10 +2176,11 @@ int main(int argc, char** argv)
 
                     case SV_POINT:
                         pt = interpret_single_point(words[5+l]);
+                        f = interpret_single_float(words[5+l]);
                         if (!strcmp(words[4+l], "+")) *script_var[n].value.ppt = script_var[n].value.ppt->add(pt);
                         else if (!strcmp(words[4+l], "-")) *script_var[n].value.ppt = script_var[n].value.ppt->subtract(pt);
-                        else if (!strcmp(words[4+l], "*")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() * pt.magnitude());
-                        else if (!strcmp(words[4+l], "/")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() / pt.magnitude());
+                        else if (!strcmp(words[4+l], "*")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() * f); // pt.magnitude());
+                        else if (!strcmp(words[4+l], "/")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() / f); // pt.magnitude());
                         else
                         {
                             // cout << "Bad operator " << words[4+l] << " for point." << endl;

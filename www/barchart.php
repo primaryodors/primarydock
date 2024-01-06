@@ -135,6 +135,7 @@ $maxp = count($p) ? ( @max($p) ?: 1 ) : 1;
 
 if ($maxt < 1) $maxt = 1;
 if ($maxp < 1) $maxp = 1;
+if ($maxp > 50) $maxp = 50;
 
 if ($maxe <= $mine+2) { $maxe += 1; $mine -= 1; }
 
@@ -182,13 +183,20 @@ $bsht = 8;
 
 imageline($im, 0,$base, $w,$base, $blue);
 
-// Right labels first, so that left lines take precedence.
-imagestring($im, 3, $w-29, 0, "Rel.", $red);
-imagestring($im, 3, $w-29,15, "Top" , $red);
-
+if (count($t))
+{
+    imagestring($im, 3, $w-29, 0, "Rel.", $red);
+    imagestring($im, 3, $w-29,15, "Top" , $red);
+}
+else if (count($p))
+{
+    imagestring($im, 3, $w-29,0, "Dock", $azure);
+    imagestring($im, 3, $w-36,15, "Score" , $azure);
+}
 
 if (count($t) || count($e))
 {
+    // Right labels first, so that left lines take precedence.
     for ($top = 1; $top <= floor($maxt); $top += 1)
     {   
         $dy = intval($base-1 - $tscale*$top);
@@ -212,7 +220,7 @@ if (count($t) || count($e))
 
 if (count($p))
 {
-    for ($score = floor($maxp); $score > 1; $score -= 4)
+    for ($score = floor($maxp); $score > 1; $score -= 7)
     {   
         $dy = intval($base-1 - $pscale*$score);
 
@@ -294,6 +302,7 @@ foreach (array_values($bytree) as $x => $orid)
 
     if (false!==$dyp) imagefilledrectangle($im, $dx+2,$base2, $dx+$res-1,$dy=$dyp, $azure);
     
+    if ($dy < $h/7) $dy = $h/7;
     if ($dy < $h/1.25) $texts[] = [$dx, $dy-5, $orid];
     
     imagefilledrectangle($im, $dx,$base, $dx+$res-1,$base+$bsht, $bcol);

@@ -365,7 +365,9 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         $outlines = [];
         $cmd = "bin/vina --receptor tmp/prot.pdbqt --flex tmp/flex.pdbqt --ligand tmp/lig.pdbqt $center $size --exhaustiveness 20 --cpu 1";
         echo "$cmd\n";
-        exec($cmd, $outlines, $retvar);
+        // exec($cmd, $outlines, $retvar);
+        passthru("$cmd | tee tmp/vina.out");
+        $outlines = explode("\n", file_get_contents("tmp/vina.out"));
     }
 
     if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";

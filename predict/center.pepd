@@ -21,6 +21,8 @@ IF @r.x = %r THEN GOTO noresidue
 LET @sum += @r
 LET %num ++
 
+ECHO %r ": " @r
+
 IF @r.x > @max.x THEN LET @max.x = @r.x
 IF @r.x < @min.x OR %num < 2 LET @min.x = @r.x
 IF @r.y > @max.y THEN LET @max.y = @r.y
@@ -34,7 +36,7 @@ IF $arg%i THEN GOTO loop
 
 
 # Center.
-# ECHO @sum " / " %num
+ECHO @sum " / " %num
 LET @avg = @sum / %num
 
 
@@ -70,7 +72,7 @@ LET @size.z = &z
 
 
 # Output.
-ECHO @avg
+ECHO "CEN: " @avg
 # ECHO @max
 # ECHO @min
-ECHO @size
+ECHO "SZ: " @size

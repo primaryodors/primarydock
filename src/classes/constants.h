@@ -355,7 +355,6 @@
 #define _dbg_cond_basic_acd_lig 0
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
-#define _dbg_moieties 0
 #define _dbg_find_blasted_segfault 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
@@ -369,10 +368,12 @@
 #define _dbg_imidazole_check 0
 #define _dbg_improvements_only_rule 0
 #define _dbg_interatomic_forces 0
+#define _dbg_internal_energy 0
 #define _dbg_linear_motion 0
 #define _DBG_LONELINESS 0
 #define _dbg_mand_conn 0
 #define _DBG_MAX_CLASHES 0
+#define _dbg_moieties 0
 #define _DBG_MOLBB 0
 #define _dbg_mol_flexion 0
 #define _dbg_mol_frames 0

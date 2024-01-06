@@ -332,15 +332,20 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         $censz = [];
         exec($cmd, $censz);
 
-        if (trim(@$censz[0]))
+        foreach ($censz as $ln)
         {
-            $pcen = explode(",",str_replace('[','',str_replace(']','',$censz[0])));
-            $center = "--center_x {$pcen[0]} --center_y {$pcen[1]} --center_z {$pcen[2]}";
-        }
-        if (trim(@$censz[1]))
-        {
-            $psiz = explode(",",str_replace('[','',str_replace(']','',$censz[1])));
-            $size = "--size_x {$psiz[0]} --size_y {$psiz[1]} --size_z {$psiz[2]}";
+            if (substr($ln, 0, 5) == "CEN: ")
+            {
+                $ln = substr($ln, 5);
+                $pcen = explode(",",str_replace('[','',str_replace(']','',$ln)));
+                $center = "--center_x {$pcen[0]} --center_y {$pcen[1]} --center_z {$pcen[2]}";
+            }
+            if (substr($ln, 0, 4) == "SZ: ")
+            {
+                $ln = substr($ln, 4);
+                $psiz = explode(",",str_replace('[','',str_replace(']','',$ln)));
+                $size = "--size_x {$psiz[0]} --size_y {$psiz[1]} --size_z {$psiz[2]}";
+            }
         }
     }
 

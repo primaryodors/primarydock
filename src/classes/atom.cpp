@@ -2808,6 +2808,27 @@ void Ring::determine_type()
     else type = COPLANAR;
 }
 
+Atom* Atom::get_heaviest_bonded_atom_that_isnt(Atom* e)
+{
+    int i;
+    float wt = 0;
+    Atom* result = nullptr;
+
+    for (i=0; i<geometry; i++)
+    {
+        if (!bonded_to[i].btom) continue;
+        if (abs((__int64_t)(bonded_to) - (__int64_t)bonded_to[i].btom) > memsanity) continue;
+        if (bonded_to[i].btom == e) continue;
+        if (bonded_to[i].btom->at_wt > wt)
+        {
+            wt = bonded_to[i].btom->at_wt;
+            result = bonded_to[i].btom;
+        }
+    }
+
+    return result;
+}
+
 std::ostream& operator<<(std::ostream& os, const Atom& a)
 {
     if (a.residue) os << a.residue << ":";

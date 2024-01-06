@@ -320,6 +320,10 @@ DockResult::DockResult(Protein* protein, Molecule* ligand, Point size, int* addl
     this->m_atom1_name  = new const char*[metcount];
     this->m_atom2_name  = new const char*[metcount];
     ligand_self = ligand->get_intermol_binding(ligand);
+    kJmol += ligand_self;
+    #if _dbg_internal_energy
+    cout << "Ligand internal = " << ligand_self << endl;
+    #endif
     #if use_trip_switch
     tripswitch  = tripclash;
     #endif

@@ -1280,7 +1280,8 @@ _canstill_clash:
         else goto _finished_clashing;
     }
     #elif ignore_nonpolar_hydrogen_clashes                   // The leading molecular docker seems to.
-    if (a->get_Z() == 1 && b->get_Z() == 1 && r > 1.0
+    if ((a->get_Z() == 1 || b->get_Z() == 1)
+        && r > 1.0
         && fabs(a->is_polar()) < hydrophilicity_cutoff
         && fabs(b->is_polar()) < hydrophilicity_cutoff
         )

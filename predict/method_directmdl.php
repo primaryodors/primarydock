@@ -99,7 +99,7 @@ exec("obabel -i pdb tmp/prot.pdb -xr -o pdbqt -O tmp/prot.pdbqt");
 exec("obabel -i pdb tmp/flex.pdb -xs -o pdbqt -O tmp/flex.pdbqt");
 
 // Convert ligand as well.
-exec("obabel -i sdf sdf/$ligname.sdf -o pdbqt -O tmp/lig.pdbqt");
+exec("obabel -i sdf \"sdf/$ligname.sdf\" -o pdbqt -O tmp/lig.pdbqt");
 
 chdir(__DIR__);
 chdir("..");

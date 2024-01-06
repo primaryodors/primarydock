@@ -436,7 +436,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     $outdata[$metrics_prefix."POSES"] = $num_poses;
     // $outdata[$metrics_prefix."BENERG"] = $affinities[0];
     $scoring = [];
-    $cmd = "bin/score_pdb $outfname | grep \"Total: \"";
+    $cmd = "bin/score_pdb \"$outfname\" | grep \"Total: \"";
     exec($cmd, $scoring);
     echo "$cmd\n";
     $outdata[$metrics_prefix."BENERG"] = floatval(substr($scoring[0], 7));

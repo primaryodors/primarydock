@@ -53,7 +53,7 @@ int main(int argc, char** argv)
     m.identify_acidbase();
     m.hydrogenate();
 
-    fp = fopen("tmp/primarysuck.sdf", "w");
+    fp = fopen("tmp/scored_ligand.sdf", "w");
     m.save_sdf(fp);
     fclose(fp);
 

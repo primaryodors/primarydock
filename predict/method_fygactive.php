@@ -8,16 +8,6 @@
 // php -f predict/method_fygactive.php prot=OR1A1 lig=d-limonene
 //
 
-// Configurable variables
-$flex = 1;                      // Flexion (0 or 1) for active dock.
-$flxi = 1;                      // Flexion for inactive dock.
-$pose = 15;
-$iter = 30;
-$elim = 1e3;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
-$num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
-
-$accuracy_receptors = ["OR51E2", "TAAR1"];
-
 chdir(__DIR__);
 require_once("methods_common.php");
 chdir(__DIR__);
@@ -26,37 +16,24 @@ chdir(__DIR__);
 
 prepare_outputs();
 
-$metrics_to_process =
-[
-    "BENERG" => "BindingEnergy",
-    "BENERG.rgn" => "BindingEnergy.rgn",
-    "BEST" => "Pose1"
-];
-
 function make_prediction($data)
 {
     global $protid, $ligname;
 
-    if (isset($data["a_Pose1"]))
+    if (isset($data["a_BENERG"]))
     {
-        $ae = min(floatval(@$data['a_BindingEnergy']), floatval(@$data['ad_BindingEnergy']));
-        $ie = floatval(@$data["i_BindingEnergy"]);
-        $a1 = min(floatval($data['a_Pose1']), floatval(@$data['ad_Pose1']));
-        $i1 = floatval(@$data['i_Pose1']);
-        if ($a1 < 0 && $a1 < $i1)
+        $ascore = min(0, floatval( $data['a_BENERG']));
+        $iscore = min(0, floatval(@$data['i_BENERG']));
+
+        if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
+            $data['DockScore'] = (min($iscore, 0) - $ascore);
         }
-        else if ($ae < 0 && $ae < $ie)
-        {
-            $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($ie, 0) - $ae) / 2;
-        }
-        else if ($a1 < 0 && $a1 > $i1)
+        else if ($iscore < 0 && $iscore < $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
+            $data['DockScore'] = (min($iscore, 0) - $ascore);
         }
         else
         {
@@ -149,7 +126,6 @@ function build_template()
     }
 }
 
-
 chdir(__DIR__);
 chdir("..");
 
@@ -208,40 +184,27 @@ $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
 
 $fam = family_from_protid($protid);
-$outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
+$outfname = "output/$fam/$protid/$protid.$ligname.inactive.model1.pdb";
 
-$configf = <<<heredoc
+// Filter out everything except ATOM records.
+// exec("cat $pdbfname_inactive | grep ATOM > tmp/prot.pdb");
+$lines = explode("\n", file_get_contents($pdbfname));
+$rf = split_pdb_to_rigid_and_flex($protid, $lines, explode(" ", "$flxr $iflxr"));
+$fp = fopen("tmp/prot.pdb", "w");
+if (!$fp) die("Failed to write to tmp/prot.pdb.\n");
+fwrite($fp, implode("\n",$rf[0]));
+fclose($fp);
+$fp = fopen("tmp/flex.pdb", "w");
+if (!$fp) die("Failed to write to tmp/flex.pdb.\n");
+fwrite($fp, implode("\n",$rf[1]));
+fclose($fp);
 
-PROT $pdbfname
-LIG sdf/$ligname.sdf
+// Convert to PDBQT format.
+exec("obabel -i pdb tmp/prot.pdb -xr -o pdbqt -O tmp/prot.pdbqt");
+exec("obabel -i pdb tmp/flex.pdb -xs -o pdbqt -O tmp/flex.pdbqt");
 
-$cenres_inactive
-SIZE $size
-# H2O 5
-$mcoord
-$atomto
-$stcr
-$flxr
-$istcr
-$iflxr
-
-EXCL 1 56		# Head, TMR1, and CYT1.
-
-SEARCH $search
-POSE $pose
-ELIM $elim
-$flex_constraints
-ITERS $iter
-PROGRESS
-
-FLEX $flxi
-WET
-
-OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.inactive.model%o.pdb
-
-
-heredoc;
+// Convert ligand as well.
+exec("obabel -i sdf sdf/$ligname.sdf -o pdbqt -O tmp/lig.pdbqt");
 
 chdir(__DIR__);
 chdir("..");
@@ -252,44 +215,28 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 
 $pdbfname = $pdbfname_active;
+$outfname = "output/$fam/$protid/$protid.$ligname.active.model1.pdb";
 
-$outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
+// Filter out everything except ATOM records.
+// exec("cat $pdbfname_active | grep ATOM > tmp/prot.pdb");
+$lines = explode("\n", file_get_contents($pdbfname_active));
+$rf = split_pdb_to_rigid_and_flex($protid, $lines, explode(" ", "$flxr $aflxr"));
+$fp = fopen("tmp/prot.pdb", "w");
+if (!$fp) die("Failed to write to tmp/prot.pdb.\n");
+fwrite($fp, implode("\n",$rf[0]));
+fclose($fp);
+$fp = fopen("tmp/flex.pdb", "w");
+if (!$fp) die("Failed to write to tmp/flex.pdb.\n");
+fwrite($fp, implode("\n",$rf[1]));
+fclose($fp);
 
-$configf = <<<heredoc
+// Convert to PDBQT format.
+exec("obabel -i pdb tmp/prot.pdb -xr -o pdbqt -O tmp/prot.pdbqt");
+exec("obabel -i pdb tmp/flex.pdb -xs -o pdbqt -O tmp/flex.pdbqt");
 
-PROT $pdbfname
-LIG sdf/$ligname.sdf
+$poses = process_dock("a");
 
-$cenres_active
-SIZE $size
-# H2O 5
-$mcoord
-$atomto
-$stcr
-$flxr
-$astcr
-$aflxr
-
-EXCL 1 56		# Head, TMR1, and CYT1.
-
-SEARCH $search
-POSE $pose
-ELIM $elim
-$flex_constraints
-ITERS $iter
-PROGRESS
-
-FLEX $flex
-WET
-
-OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
-APPENDPROT
-
-
-heredoc;
-
-$poses = process_dock("a", false, true);
+exit;     // TODO: Bring back all that stuff in methods_common get from scorpdbee what used to get from primarysuck.
 
 if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
 {
@@ -398,3 +345,36 @@ if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
     // Delete the tmp PDB.
     unlink($tmpoutpdb);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

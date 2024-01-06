@@ -8,12 +8,6 @@
 // php -f predict/method_fygactive.php prot=OR1A1 lig=d-limonene
 //
 
-// Configurable variables
-$flex = 1;                      // Flexion (0 or 1) for active dock.
-$flxi = 1;                      // Flexion for inactive dock.
-$pose = 20;
-$iter = 40;
-
 chdir(__DIR__);
 require_once("methods_common.php");
 chdir(__DIR__);
@@ -21,13 +15,6 @@ require_once("../data/protutils.php");
 chdir(__DIR__);
 
 prepare_outputs();
-
-$metrics_to_process =
-[
-    "BENERG" => "BindingEnergy",
-    "BENERG.rgn" => "BindingEnergy.rgn",
-    "BEST" => "Pose1"
-];
 
 function make_prediction($data)
 {

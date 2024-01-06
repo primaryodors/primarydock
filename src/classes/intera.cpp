@@ -1270,6 +1270,7 @@ float InteratomicForce::total_binding(Atom* a, Atom* b)
 
 _canstill_clash:
     float sigma;
+    float local_clash_allowance = global_clash_allowance;
 
     #if ignore_double_hydrogen_clashes
     if (a->get_Z() == 1 && b->get_Z() == 1 && r > 1.0)
@@ -1278,9 +1279,18 @@ _canstill_clash:
         if (rheavy < r) r = rheavy;
         else goto _finished_clashing;
     }
+    #elif ignore_nonpolar_hydrogen_clashes                   // The leading molecular docker seems to.
+    if (a->get_Z() == 1 && b->get_Z() == 1 && r > 1.0
+        && fabs(a->is_polar()) < hydrophilicity_cutoff
+        && fabs(b->is_polar()) < hydrophilicity_cutoff
+        )
+    {
+        float rheavy = fmin(a->distance_to(bheavy), b->distance_to(aheavy));
+        if (rheavy < r) r = rheavy;
+        else goto _finished_clashing;
+    }
     #endif
 
-    float local_clash_allowance = global_clash_allowance;
     if (a->get_Z() == 1 && b->get_Z() == 1) local_clash_allowance *= double_hydrogen_clash_allowance_multiplier;
 
     sigma = fmin(rbind, avdW+bvdW) - local_clash_allowance;

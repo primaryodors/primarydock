@@ -365,6 +365,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     $pose_node_has_weight = [];
     $num_poses = 0;
 
+    echo "Getting FUCK SHIT FUCK from $pdbfname...\n";
     $outpdb = file_get_contents($pdbfname);
 
     $posesln = false;

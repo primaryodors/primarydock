@@ -1568,7 +1568,7 @@ void Molecule::identify_acidbase()
                     if (l > 3)
                     {
                         float coplanarity = are_points_planar(planarity_check[0], planarity_check[1], planarity_check[2], planarity_check[3]);
-                        if (coplanarity < 1)
+                        if (coplanarity < coplanar_threshold)
                         {
                             atoms[i]->aromatize();
                             int chalcogens = 0;
@@ -1583,7 +1583,7 @@ void Molecule::identify_acidbase()
                                     b[j]->btom->aromatize();
                                     b[j]->cardinality = 1.5;
 
-                                    if (bfam == CHALCOGEN)
+                                    if (bfam == CHALCOGEN && b[j]->btom->get_bonded_heavy_atoms_count() < 2)
                                     {
                                         chalcogens++;
                                         if (chalcogens > 1 && !b[j]->btom->get_charge())

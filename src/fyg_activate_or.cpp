@@ -286,6 +286,7 @@ int main(int argc, char** argv)
     AminoAcid *aa6x44 = p.get_residue_bw("6.44");
     AminoAcid *aa6x48 = p.get_residue_bw("6.48");
     AminoAcid *aa6x49 = p.get_residue_bw("6.49");
+    AminoAcid *aa6x50 = p.get_residue_bw("6.50");
     AminoAcid *aa6x51 = p.get_residue_bw("6.51");
     AminoAcid *aa6x55 = p.get_residue_bw("6.55");
     AminoAcid *aa6x58 = p.get_residue_bw("6.58");
@@ -327,6 +328,7 @@ int main(int argc, char** argv)
     int n6x40 = aa6x40->get_residue_no();
     int n6x48 = aa6x48->get_residue_no();
     int n6x49 = aa6x49->get_residue_no();
+    int n6x50 = aa6x50->get_residue_no();
     int n6x55 = aa6x55->get_residue_no();
     int n6x59 = aa6x59->get_residue_no();
 
@@ -519,17 +521,37 @@ int main(int argc, char** argv)
     // FYG motion, if applicable.
     ////////////////////////////////////////////////////////////////////////////////
 
-    if (l6x49 == 'G' && allow_fyg)
+    AminoAcid* aapivot = aa6x49;
+    int npivot = n6x49;
+    bool found_fyg = false;
+
+    if (allow_fyg)
+    {
+        for (i=n6x50; i>n6x40; i--)
+        {
+            AminoAcid* aatmp = p.get_residue(i);
+            char ltmp = aatmp->get_letter();
+            if (ltmp == 'G' || ltmp == 'C' || ltmp == 'S' || ltmp == 'T')
+            {
+                aapivot = aatmp;
+                npivot = i;
+                found_fyg = true;
+                break;
+            }
+        }
+    }
+
+    if (found_fyg && allow_fyg)
     {
         cout << "Performing FYG activation..." << endl;
 
         // TMR6 motion.
         float theta6_initial = 40;
-        LocatedVector lv6 = aa6x49->get_psi_vector();
-        p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_initial);
+        LocatedVector lv6 = aapivot->get_psi_vector();
+        p.rotate_piece(n6x28, npivot, lv6.origin, lv6, -fiftyseventh*theta6_initial);
 
         // TMR5 translation.
-        SCoord move5 = aa6x49->get_CA_location().subtract(aa5x50->get_CA_location());
+        SCoord move5 = aapivot->get_CA_location().subtract(aa5x50->get_CA_location());
         move5.r = p.region_can_move(n5x33, n5x68, move5, false, n6x28, n6x59);
         p.move_piece(n5x33, n5x68, move5);
         cout << "TMR5 moves " << move5.r << "A toward TMR6, limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
@@ -555,9 +577,9 @@ int main(int argc, char** argv)
         else cout << "5.58~7.53 bridge already met." << endl;
 
         // Adjust TMR6.
-        float theta6 = p.region_can_rotate(n6x28, n6x49, lv6);
+        float theta6 = p.region_can_rotate(n6x28, npivot, lv6);
         cout << "TMR6 bends " << (theta6_initial - theta6 * fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
-        p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, theta6);
+        p.rotate_piece(n6x28, npivot, lv6.origin, lv6, theta6);
     }
 
 
@@ -694,7 +716,7 @@ int main(int argc, char** argv)
     // Minimize internal clashes.
     // TODO: cyt domains of all TM helices, preserving the 5~7 bridge.
     ////////////////////////////////////////////////////////////////////////////////
-    float clash = p.get_internal_clashes(n6x28, n6x49, true);
+    float clash = p.get_internal_clashes(n6x28, npivot, true);
 
     if (clash > initial_clash_[6])
     {
@@ -702,11 +724,11 @@ int main(int argc, char** argv)
 
         if (p.stop1 && p.stop2) pt = aa6x40->get_CA_location().add(p.stop1->get_CA_location().subtract(p.stop2->get_CA_location()));
         else pt = aa6x40->get_CA_location().subtract(p.last_int_clash_dir);
-        LocatedVector axis = compute_normal(aa6x40->get_CA_location(), pt, aa6x49->get_CA_location());
-        axis.origin = aa6x49->get_CA_location();
+        LocatedVector axis = compute_normal(aa6x40->get_CA_location(), pt, aapivot->get_CA_location());
+        axis.origin = aapivot->get_CA_location();
 
         float theta = fiftyseventh * 15 / 20;
-        int fulcrum = n6x49;
+        int fulcrum = npivot;
         for (i=0; i<200; i++)
         {
             clash = reduce_iclash_iter(p, fulcrum, false, clash, theta, n6x28, fulcrum);

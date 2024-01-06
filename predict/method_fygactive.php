@@ -14,6 +14,9 @@ chdir(__DIR__);
 require_once("../data/protutils.php");
 chdir(__DIR__);
 
+$num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
+$accuracy_receptors = ["OR51E2", "TAAR1"];
+
 prepare_outputs();
 
 function make_prediction($data)

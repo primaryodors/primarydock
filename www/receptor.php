@@ -37,24 +37,23 @@ $predictions = [];
 $pred_shown = [];
 $predname = [];
 $predate = [];
-if (file_exists("../pdbs/$fam/$rcpid.active.pdb") || file_exists("../pdbs/$fam/$rcpid.bound.pdb"))
+
+chdir(__DIR__);
+$dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
+if (isset($dock_results[$rcpid]))
 {
-    chdir(__DIR__);
-    $dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
-    if (isset($dock_results[$rcpid]))
+    foreach ($dock_results[$rcpid] as $ligname => $dock)
     {
-        foreach ($dock_results[$rcpid] as $ligname => $dock)
-        {
-            $odor = find_odorant($ligname);
-            $oid = $odor['oid'];
-            $predname[$oid] = $ligname;
-            $predate[$oid] = date("Y-m-d H:i:s", $dock['version']);
-            if (isset($dock['DockScore'])) $predictions[$oid] = floatval($dock['DockScore']);
-            else if (isset($dock['a_Pose1']) && isset($dock['i_Pose1']))
-                $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
-        }
+        $odor = find_odorant($ligname);
+        $oid = $odor['oid'];
+        $predname[$oid] = $ligname;
+        $predate[$oid] = date("Y-m-d H:i:s", $dock['version']);
+        if (isset($dock['DockScore'])) $predictions[$oid] = floatval($dock['DockScore']);
+        else if (isset($dock['a_Pose1']) && isset($dock['i_Pose1']))
+            $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
     }
 }
+
 
 $cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|bin/fyg|obabel)' | grep -v grep";
 $result = [];

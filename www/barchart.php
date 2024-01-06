@@ -31,31 +31,56 @@ if (!$odor)
     exit;
 }
 
+$mode = 'e';            // Empirical.
+if (isset($_REQUEST["m"])) $mode = $_REQUEST["m"];
 
 $t = [];
 $e = [];
+$p = [];
 
-foreach ($odor['activity'] as $ref => $acv)
+switch ($mode)
 {
-    foreach ($acv as $rcpid => $a)
+    case 'e':
+    foreach ($odor['activity'] as $ref => $acv)
     {
-        $act = @$a['adjusted_curve_top'] ?: false;
-        if (!isset($t[$rcpid])) $t[$rcpid] = $act;
-        else
+        foreach ($acv as $rcpid => $a)
         {
-            if ($t[$rcpid] < $act) $t[$rcpid] = $act;
-        }
-
-        $ec50 = @$a['ec50'] ?: 0;
-        if (!isset($e[$rcpid])) $e[$rcpid] = $ec50;
-        else
-        {
-            if ($ec50)
+            $act = @$a['adjusted_curve_top'] ?: false;
+            if (!isset($t[$rcpid])) $t[$rcpid] = $act;
+            else
             {
-                if (!$e[$rcpid] || $ec50 < $e[$rcpid]) $e[$rcpid] = $ec50;
+                if ($t[$rcpid] < $act) $t[$rcpid] = $act;
+            }
+
+            $ec50 = @$a['ec50'] ?: 0;
+            if (!isset($e[$rcpid])) $e[$rcpid] = $ec50;
+            else
+            {
+                if ($ec50)
+                {
+                    if (!$e[$rcpid] || $ec50 < $e[$rcpid]) $e[$rcpid] = $ec50;
+                }
             }
         }
     }
+    break;
+
+    case 'p':
+    $predictions = [];
+    chdir(__DIR__);
+    $dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
+    $odorname_under = str_replace(' ', '_', $odor["full_name"]);
+    foreach ($dock_results as $protid => $dr)
+    {
+        if (isset($dr[$odorname_under]))
+        {
+            $p[$protid] = floatval($dr[$odorname_under]["DockScore"]);
+        }
+    }
+    break;
+
+    default:
+    die("Unsupported mode $mode.\n");
 }
 
 $res = 3;
@@ -106,8 +131,10 @@ $maxe = count($e) ? ( @max($e) ?: 0 ) : 0;
 $mine = count($e) ? ( @min($e) ?: -6 ) : -6;
 if ($maxe) $maxe += 0.5;
 $mine -= 0.5;
+$maxp = count($p) ? ( @max($p) ?: 1 ) : 1;
 
-if ($maxt < 0) $maxt = 1;
+if ($maxt < 1) $maxt = 1;
+if ($maxp < 1) $maxp = 1;
 
 if ($maxe <= $mine+2) { $maxe += 1; $mine -= 1; }
 
@@ -115,6 +142,7 @@ if ($mine <= -3 && $maxt < 2) $maxt = 2;
 
 $tscale = floatval($h-$ybuf) / $maxt;
 $escale = floatval($h-$ybuf) / ($maxe-$mine);
+$pscale = floatval($h-$ybuf) / $maxp;
 
 $red   = imagecolorallocate($im,255,96,80);
 $wine  = imagecolorallocate($im,128,32,48);
@@ -125,6 +153,8 @@ $blue  = imagecolorallocate($im,128,160,255);
 $cyan  = imagecolorallocate($im,32,80,104);
 $pink  = imagecolorallocate($im,192,176,218);
 $white = imagecolorallocate($im,240,240,240);
+$azure = imagecolorallocate($im,32,96,255);
+$sapphire = imagecolorallocate($im,32,16,224);
 
 $or1    = imagecolorallocate($im,255,255,255);
 $or2    = imagecolorallocate($im,250,192,  0);
@@ -157,38 +187,52 @@ imagestring($im, 3, $w-29, 0, "Rel.", $red);
 imagestring($im, 3, $w-29,15, "Top" , $red);
 
 
-for ($top = 1; $top <= floor($maxt); $top += 1)
-{   
-    $dy = intval($base-1 - $tscale*$top);
-    
-    if (!($top & 1)) imageline($im, $xbuf/3,$dy, $w-$xbuf/3,$dy, $wine );
-    imagestring($im, 3, $w-$xbuf/6,$dy-8, $top, $red);
+if (count($t) || count($e))
+{
+    for ($top = 1; $top <= floor($maxt); $top += 1)
+    {   
+        $dy = intval($base-1 - $tscale*$top);
+        
+        if (!($top & 1)) imageline($im, $xbuf/3,$dy, $w-$xbuf/3,$dy, $wine );
+        imagestring($im, 3, $w-$xbuf/6,$dy-8, $top, $red);
+    }
+
+    // Left labels.
+    imagestring($im, 3, 2,0, "log10", $green);
+    imagestring($im, 3, 2,15, "EC50", $green);
+
+    for ($ec = floor($maxe); $ec >= ceil($mine); $ec -= 1)
+    {   
+        $dy = intval($base-1 - $escale*($maxe-$ec));
+        
+        imageline($im, $xbuf/3,$dy, $w-$xbuf/3,$dy, $cyan);
+        imagestring($im, 3, 2,$dy-8, $ec, $green);
+    }
 }
 
-// Left labels.
-imagestring($im, 3, 2,0, "log10", $green);
-imagestring($im, 3, 2,15, "EC50", $green);
+if (count($p))
+{
+    for ($score = floor($maxp); $score > 1; $score -= 4)
+    {   
+        $dy = intval($base-1 - $pscale*$score);
 
-for ($ec = floor($maxe); $ec >= ceil($mine); $ec -= 1)
-{   
-    $dy = intval($base-1 - $escale*($maxe-$ec));
-    
-    imageline($im, $xbuf/3,$dy, $w-$xbuf/3,$dy, $cyan);
-    imagestring($im, 3, 2,$dy-8, $ec, $green);
+        imageline($im, $xbuf/3,$dy, $w-$xbuf/3,$dy, $sapphire );
+        imagestring($im, 3, $w-$xbuf/6,$dy-8, $score, $azure);
+    }
 }
 
 $bytree = [];
-foreach ($prots as $rcpid => $p)
+foreach ($prots as $rcpid => $pp)
 {
-    if (!isset($p['btree'])) continue;
-    $bytree[$p['btree']] = $rcpid;
+    if (!isset($pp['btree'])) continue;
+    $bytree[$pp['btree']] = $rcpid;
 }
 
 ksort($bytree, SORT_STRING);
 
-foreach ($prots as $rcpid => $p)
+foreach ($prots as $rcpid => $pp)
 {
-    if (!isset($p['btree'])) $bytree[$rcpid] = $rcpid;
+    if (!isset($pp['btree'])) $bytree[$rcpid] = $rcpid;
 }
 
 // foreach (array_keys($prots) as $x => $orid)
@@ -224,6 +268,9 @@ foreach (array_values($bytree) as $x => $orid)
     $dye = (isset($e[$orid]) && $e[$orid])
          ? intval($base-1 - $escale*($maxe-$e[$orid]))
          : false;
+    $dyp = isset($p[$orid])
+        ? intval($base-1 - $pscale*$p[$orid])
+        : false;
     
     $base1 = $base2 = $base;
     if ($dyt >= $base) { $dyt += $bsht; $base1 += $bsht; }
@@ -244,6 +291,8 @@ foreach (array_values($bytree) as $x => $orid)
             imagefilledrectangle($im, $dx,$base2, $dx+$res-2,$dye, $yellow);
         }
     }
+
+    if (false!==$dyp) imagefilledrectangle($im, $dx,$base2, $dx+$res-1,$dy=$dyp, $azure);
     
     if ($dy < $h/1.25) $texts[] = [$dx, $dy-5, $orid];
     
@@ -274,7 +323,7 @@ foreach ($texts as $txt)
     if ($txt[0] >= $x && $txt[0] <= $x1) $x = $txt[0] + 50;
 }
 
-if ((!count($t) || !max($t)) && (!count($e) || !min($e)))
+if ((!count($t) || !max($t)) && (!count($e) || !min($e)) && !count($p))
 {   
     imagettftext($im, 28, 0, $w*0.42, $h*0.44, $pink, $fontfile, "(no data)");
 }

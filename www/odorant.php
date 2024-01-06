@@ -325,7 +325,7 @@ foreach (array_keys($sorted) as $rcpid)
 <div class="scrollw">
     <div>
         <img class="skeletal" src="<?php echo $imgfname; ?>">
-        <img class="barchart" src="barchart.php?m=p&o=<?php echo urlencode($odor['smiles']); ?>">
+        <img class="barchart" src="barchart.php?m=p&o=<?php echo urlencode($odor['smiles']); ?>&t=<?php echo time(); ?>">
     </div>
 </div>
 

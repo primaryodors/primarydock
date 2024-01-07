@@ -47,8 +47,17 @@ float do_template_bend(Protein& p, AminoAcid* aasrc, AminoAcid* aaref, int hxno,
     if (hxno<7)
     {
         std::string name = (std::string)"TMR" + to_string(hxno+1);
-        sr1 = p.get_region_start(name)-2;
-        er1 = p.get_end_resno(); // p.get_region_end(name)+2;
+        if (hxno == 6)
+        {
+            std::string name = (std::string)"TMR" + to_string(hxno);
+            sr1 = p.get_region_start(name)-2;
+            er1 = aasrc->get_residue_no();
+        }
+        else
+        {
+            sr1 = p.get_region_start(name)-2;
+            er1 = p.get_end_resno(); // p.get_region_end(name)+2;
+        }
     }
 
     Point source = aasrc->get_CA_location();
@@ -483,6 +492,16 @@ int main(int argc, char** argv)
         aa45x52->conform_atom_to_location(aa45x52->get_reach_atom()->name, pt);
         aa45x52->movability = MOV_PINNED;
     }
+    else if ((l6x55 == 'D' || l6x55 == 'E') && (l45x53 == 'N' || l45x53 == 'Q'))
+    {
+        p.bridge(n45x53, n6x55);
+        Atom* reach6x55 = aa6x55->get_reach_atom();
+        Atom* reach45x53 = aa45x53->get_nearest_atom(reach6x55->get_location());
+        float r = reach6x55->distance_to(reach45x53);
+        if (r >= 2) rock6_dir = reach45x53->get_location().subtract(reach6x55->get_location());
+        constraints.push_back("STCR 45.53");
+        constraints.push_back("STCR 6.55");
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -514,6 +533,9 @@ int main(int argc, char** argv)
         cout << "Performing rock6..." << endl;
         float theta = do_template_bend(p, aa6x48, aa6x59, 6, rock6_dir, SCoord(0,0,0), aa6x28);
         cout << "TMR6 rocks " << (theta*fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+
+        if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E')) p.bridge(n45x51, n6x55);
+        else if ((l6x55 == 'D' || l6x55 == 'E') && (l45x53 == 'N' || l45x53 == 'Q')) p.bridge(n45x53, n6x55);
     }
 
     
@@ -527,7 +549,7 @@ int main(int argc, char** argv)
 
     if (allow_fyg)
     {
-        for (i=n6x50; i>n6x40; i--)
+        for (i=n6x49; i>n6x40; i--)
         {
             AminoAcid* aatmp = p.get_residue(i);
             char ltmp = aatmp->get_letter();
@@ -543,7 +565,7 @@ int main(int argc, char** argv)
 
     if (found_fyg && allow_fyg)
     {
-        cout << "Performing FYG activation..." << endl;
+        cout << "Performing FYG activation using " << *aapivot << "..." << endl;
 
         // TMR6 motion.
         float theta6_initial = 40;
@@ -578,6 +600,15 @@ int main(int argc, char** argv)
 
         // Adjust TMR6.
         float theta6 = p.region_can_rotate(n6x28, npivot, lv6);
+        Point pt6x28 = rotate3D(aa6x28->get_CA_location(), aapivot->get_CA_location(), lv6, theta6);
+        float r56 = pt6x28.get_3d_distance(aa5x68->get_CA_location());
+        cout << "r56 = " << r56 << endl;
+        if (r56 > 4)
+        {
+            theta6 = fmin(theta6, find_3d_angle(aa5x68->get_CA_location(), aa6x28->get_CA_location(), aapivot->get_CA_location()));
+            p.stop1 = aa5x68;
+            p.stop2 = aa6x28;
+        }
         cout << "TMR6 bends " << (theta6_initial - theta6 * fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
         p.rotate_piece(n6x28, npivot, lv6.origin, lv6, theta6);
     }

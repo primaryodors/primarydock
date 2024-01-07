@@ -3975,6 +3975,7 @@ float Protein::region_can_rotate(int startres, int endres, LocatedVector axis, b
         AminoAcid *aa1, *aa2;
         for (i=startres; i<=endres; i++)
         {
+            if (i >= isr && i <= ier) continue;
             aa1 = get_residue(i);
             if (!aa1) continue;
 

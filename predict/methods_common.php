@@ -378,8 +378,6 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         $outlines = explode("\n", file_get_contents("tmp/vina.out"));
     }
 
-    if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
-
     if ($retvar)
     {
         dock_failed();
@@ -412,8 +410,6 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     $attribution = "";
     foreach ($outlines as $lno => $ln)
     {
-        echo "$ln\n";
-
         if ($mustattribute && $lno > 2)
         {
             if (false !== strpos($ln, "####")) $mustattribute = false;
@@ -433,7 +429,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
             $ln = trim($ln);
             $ln = preg_replace("/\\s+/", " ", $ln);
             $ln = explode(" ", $ln);
-            $affinities[] = floatval($ln[1]) * 4.184;
+            $affinities[] = floatval(@$ln[1]) * 4.184;
             $num_poses++;
         }
     }

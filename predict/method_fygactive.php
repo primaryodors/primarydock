@@ -25,6 +25,11 @@ function make_prediction($data)
 
     if (isset($data["a_BENERG"]))
     {
+        // TODO: For ascore and iscore each, require contact between ligand and TMR6 and
+        // contact between ligand and any of TMR3, TMR4, EXR2, TMR5, TMR7. If either condition
+        // not met, zero out that score. For FYG activation receptors with no rock6, also require
+        // that the ligand extend far enough in the -Y direction impinge on the vdW space of at
+        // least one side chain displaced by FYG activation.
         $ascore = min(0, floatval( $data['a_BENERG']));
         $iscore = min(0, floatval(@$data['i_BENERG']));
 

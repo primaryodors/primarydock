@@ -38,6 +38,13 @@ $pred_shown = [];
 $predname = [];
 $predate = [];
 
+function predcmp($a, $b)
+{
+    if ($a < $b) return 1;
+    else if ($b < $a) return -1;
+    else return 0;
+}
+
 chdir(__DIR__);
 $dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
 if (isset($dock_results[$rcpid]))
@@ -54,6 +61,7 @@ if (isset($dock_results[$rcpid]))
     }
 }
 
+uasort($predictions, "predcmp");
 
 $cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|bin/fyg|obabel)' | grep -v grep";
 $result = [];

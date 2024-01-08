@@ -731,6 +731,8 @@ int main(int argc, char** argv)
             r57 = axis.r;
         }
 
+        p.bridge(n5x58, n7x53);
+
         // Check the result.
         if (r57 > 1.2 * contact_r_5x58_7x53)
         {
@@ -864,6 +866,13 @@ int main(int argc, char** argv)
         aa6x59->movability = MOV_FLEXONLY;
         aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
     }
+
+    aa45x51->movability = MOV_FLEXONLY;
+    aa6x55->movability  = MOV_FLEXONLY;
+    aa5x58->movability  = MOV_FLEXONLY;
+    aa7x53->movability  = MOV_FLEXONLY;
+    if ((l45x51 == 'D' || l45x51 == 'E') && l6x55 == 'Y') p.bridge(n45x51, n6x55);
+    if (l5x58 == 'Y' && l7x53 == 'Y') p.bridge(n5x58, n7x53);
 
 
     ////////////////////////////////////////////////////////////////////////////////

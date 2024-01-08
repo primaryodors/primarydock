@@ -1288,7 +1288,7 @@ _canstill_clash:
     if (r < rbind && !atoms_are_bonded) // && (!achg || !bchg || (sgn(achg) != -sgn(bchg))) )
     {
         // if (!strcmp(a->name, "O6") && !strcmp(b->name, "HD1") && b->residue == 180 ) cout << achg << " " << bchg << endl;
-        float clash = Lennard_Jones(a, b, sigma);
+        float clash = Atom::Lennard_Jones(a, b, sigma);
         kJmol -= fmax(clash, 0);
         
         #if _peratom_audit
@@ -1309,19 +1309,6 @@ _canstill_clash:
     _finished_clashing:
     return kJmol;
 }
-
-float InteratomicForce::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
-{
-    float local_clash_allowance = global_clash_allowance;
-    if (atom1->get_Z() == 1 && atom2->get_Z() == 1) local_clash_allowance *= double_hydrogen_clash_allowance_multiplier;
-
-    if (!sigma) sigma = atom1->get_vdW_radius() + atom2->get_vdW_radius() - local_clash_allowance;
-    float r = atom1->distance_to(atom2);
-    float sigma_r = sigma / r;
-
-    return Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
-}
-
 
 float InteratomicForce::distance_anomaly(Atom* a, Atom* b)
 {

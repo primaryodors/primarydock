@@ -2170,7 +2170,7 @@ float Molecule::get_intermol_clashes(Molecule** ligands)
 
                 if (atoms[i]->is_backbone && ligands[l]->atoms[j]->is_backbone && abs(atoms[i]->residue - ligands[l]->atoms[j]->residue) < 2) continue;
 
-                float f = fmax(InteratomicForce::Lennard_Jones(atoms[i], ligands[l]->atoms[j]), 0);
+                float f = fmax(Atom::Lennard_Jones(atoms[i], ligands[l]->atoms[j]), 0);
 
                 if (f > worst)
                 {

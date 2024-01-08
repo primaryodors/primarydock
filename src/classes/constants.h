@@ -343,7 +343,7 @@
 // Should normally be false or zero:
 #define _dbg_259 0
 #define _dbg_51e2_ionic 0
-#define _dbg_allatom_allocate 1
+#define _dbg_allatom_allocate 0
 #define _dbg_anemia 0
 #define _dbg_asunder_atoms 0
 #define _dbg_bb_pullaway 0

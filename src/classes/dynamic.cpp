@@ -132,7 +132,7 @@ float DynamicMotion::get_nearby_contact_energy()
                     {
                         r1 = r / bd;
                         if (r1 >= 1) e -= 0.4 / (r1*r1*r1*r1*r1*r1);
-                        // else e += InteratomicForce::Lennard_Jones(a, b);
+                        // else e += Atom::Lennard_Jones(a, b);
                     }
                 }
             }

@@ -3044,27 +3044,76 @@ float Atom::similarity_to(Atom* b)
     return similarity;
 }
 
+float Atom::Lennard_Jones(Atom* atom1, Atom* atom2, float sigma)
+{
+    float local_clash_allowance = global_clash_allowance;
+    if (atom1->get_Z() == 1 && atom2->get_Z() == 1) local_clash_allowance *= double_hydrogen_clash_allowance_multiplier;
+
+    if (!sigma) sigma = atom1->get_vdW_radius() + atom2->get_vdW_radius() - local_clash_allowance;
+    float r = atom1->distance_to(atom2);
+    float sigma_r = sigma / r;
+
+    return Lennard_Jones_epsilon_x4 * (pow(sigma_r, 12) - 2.0*pow(sigma_r, 6));
+}
+
 float Atom::location_favorability(Point potential_new_loc)
 {
     __uint64_t i;
+    int j;
     float result = 0;
 
     for (i=0; i<geometry; i++)
     {
+        if (!bonded_to[i].cardinality || !bonded_to[i].btom) continue;
+        if (abs((__int64_t)(bonded_to[i].btom) - (__int64_t)this) >= memsanity) continue;
+
         // Distance to bonded atom.
+        float r = fabs(bonded_to[i].optimal_radius - distance_to(bonded_to[i].btom));
+        result -= pow(r*10, 2);
 
         // Angle to bonded atom's other bonds.
+        float optimal_theta = tetrahedral, optimal_theta2 = 0;
+        if (bonded_to[i].btom->is_pi()) optimal_theta = triangular;
+        if (bonded_to[i].btom->geometry == 5)
+        {
+            optimal_theta = square;
+            optimal_theta2 = triangular;
+        }
+        if (bonded_to[i].btom->geometry >= 6) optimal_theta = square;
+
+        for (j=0; j<bonded_to[i].btom->geometry; j++)
+        {
+            if (!bonded_to[i].btom->bonded_to[j].cardinality || !bonded_to[i].btom->bonded_to[j].btom) continue;
+            if (abs((__int64_t)(bonded_to[i].btom->bonded_to[j].btom) - (__int64_t)bonded_to[i].btom) >= memsanity) continue;
+
+            float theta = find_3d_angle(location, bonded_to[i].btom->bonded_to[j].btom->location, bonded_to[i].btom->location);
+            float anomaly = fabs(theta-optimal_theta);
+            if (optimal_theta2) anomaly = fmin(anomaly, fabs(theta-optimal_theta2));
+            result -= pow(theta*10, 3);
+        }
     }
 
     for (i=0; i < MAX_NEARBY_PERATOM && global_nearby_atoms[global_index*MAX_NEARBY_PERATOM+i]; i++)
     {
+        Atom* a = global_nearby_atoms[global_index*MAX_NEARBY_PERATOM+i];
+        float f;
+
         // Ionic bonding.
+        f = get_charge() * a->get_charge();
+        if (f) result += 120 * f;
 
         // Polar, hbond, halogen bond, polar-pi, or cation-pi bonding.
+        f = is_polar() * a->is_polar();
+        if (f) result += 30 * f;
+
+        if (is_polar() && a->is_pi()) result += 7.0 * fabs(is_polar());
+        else if (a->is_polar() && is_pi()) result += 7.0 * fabs(a->is_polar());
 
         // Pi stacking.
+        if (is_pi() && a->is_pi()) result += 12;
 
         // Clashes.
+        result -= fmax(0, Atom::Lennard_Jones(this, a));
     }
 
     return result;

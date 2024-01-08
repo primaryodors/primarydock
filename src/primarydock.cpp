@@ -2303,6 +2303,8 @@ _try_again:
 
     for (pose = 1; pose <= poses; pose++)
     {
+        protein = &pose_proteins[pose-1];
+
         ligand = &pose_ligands[pose];
         ligand->movability = MOV_ALL;
 
@@ -2327,11 +2329,6 @@ _try_again:
                 if (s.n) ligand->add_mandatory_connection(s.pmol);
             }
         }
-
-
-        // delete protein;
-        // protein = new Protein(protfname);
-        protein = &pose_proteins[pose-1];
 
         if (temp_pdb_file.length())
         {

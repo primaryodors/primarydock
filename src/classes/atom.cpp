@@ -25,9 +25,76 @@ float Atom::atomic_weights[_ATOM_Z_LIMIT];
 int Atom::valences[_ATOM_Z_LIMIT];
 int Atom::geometries[_ATOM_Z_LIMIT];
 
-int global_all_atom_count=0;
-Atom* global_all_atoms[MAX_GLOBAL_ATOMS+16];
-Atom* global_nearby_atoms[MAX_GLOBAL_ATOMS+16][MAX_NEARBY_PERATOM+4];
+__uint64_t global_all_atom_count=0;
+__uint64_t global_all_atom_allocd=0;
+Atom** global_all_atoms;
+Atom** global_nearby_atoms;
+
+void Atom::check_all_atom_allocated()
+{
+    __uint64_t i, j, n;
+    if (!global_all_atom_allocd)
+    {
+        #if _dbg_allatom_allocate
+        cout << "Allocating... " << flush;
+        #endif
+
+        global_all_atoms = new Atom*[global_all_atom_allocd = INIT_GLOBAL_ATOMS+16];
+        global_nearby_atoms = new Atom*[global_all_atom_allocd*MAX_NEARBY_PERATOM+16];
+        for (i=0; i<global_all_atom_allocd; i++)
+        {
+            global_all_atoms[i] = nullptr;
+            for (j=0; j<MAX_NEARBY_PERATOM; j++)
+            {
+                global_nearby_atoms[j+i*MAX_NEARBY_PERATOM] = nullptr;
+            }
+        }
+        #if _dbg_allatom_allocate
+        cout << "allocated memory for " << global_all_atom_allocd << " atoms." << endl << endl;
+        #endif
+    }
+    else if (global_all_atom_count > global_all_atom_allocd-64)
+    {
+        #if _dbg_allatom_allocate
+        cout << "Allocating... " << flush;
+        #endif
+
+        n = global_all_atom_allocd;
+        global_all_atom_allocd += INIT_GLOBAL_ATOMS;
+        Atom** new_all = new Atom*[global_all_atom_allocd];
+        Atom** new_near = new Atom*[global_all_atom_allocd*MAX_NEARBY_PERATOM];
+
+        for (i=0; i<global_all_atom_allocd; i++)
+        {
+            if (i<n)
+            {
+                new_all[i] = global_all_atoms[i];
+                for (j=0; j<MAX_NEARBY_PERATOM; j++)
+                {
+                    new_near[j+i*MAX_NEARBY_PERATOM] = global_nearby_atoms[j+i*MAX_NEARBY_PERATOM];
+                }
+            }
+            else
+            {
+                new_all[i] = nullptr;
+                for (j=0; j<MAX_NEARBY_PERATOM; j++)
+                {
+                    new_near[j+i*MAX_NEARBY_PERATOM] = nullptr;
+                }
+            }
+        }
+
+        delete[] global_all_atoms;
+        delete[] global_nearby_atoms;
+
+        global_all_atoms = new_all;
+        global_nearby_atoms = new_near;
+
+        #if _dbg_allatom_allocate
+        cout << "allocated memory for " << global_all_atom_allocd << " atoms; " << global_all_atom_count << " in use." << endl << endl;
+        #endif
+    }
+}
 
 void Atom::read_elements()
 {
@@ -227,15 +294,10 @@ Atom::Atom(const char* elem_sym)
     strcpy(aa3let, "LIG");
     residue = 999;
 
+    check_all_atom_allocated();
     global_index = global_all_atom_count;
     global_all_atoms[global_all_atom_count] = this;
     global_all_atom_count++;
-    if (global_all_atom_count >= MAX_GLOBAL_ATOMS)
-    {
-        cout << "Too many atoms." << endl;
-        throw 0xffff;
-    }
-    global_nearby_atoms[global_index][0] = nullptr;
     update_nearbys();
 }
 
@@ -258,15 +320,10 @@ Atom::Atom(const char* elem_sym, const Point* l_location)
     strcpy(aa3let, "LIG");
     residue = 999;
 
+    check_all_atom_allocated();
     global_index = global_all_atom_count;
     global_all_atoms[global_all_atom_count] = this;
     global_all_atom_count++;
-    if (global_all_atom_count >= MAX_GLOBAL_ATOMS)
-    {
-        cout << "Too many atoms." << endl;
-        throw 0xffff;
-    }
-    global_nearby_atoms[global_index][0] = nullptr;
     update_nearbys();
 }
 
@@ -290,15 +347,10 @@ Atom::Atom(const char* elem_sym, const Point* l_location, const float lcharge)
     strcpy(aa3let, "LIG");
     residue = 999;
 
+    check_all_atom_allocated();
     global_index = global_all_atom_count;
     global_all_atoms[global_all_atom_count] = this;
     global_all_atom_count++;
-    if (global_all_atom_count >= MAX_GLOBAL_ATOMS)
-    {
-        cout << "Too many atoms." << endl;
-        throw 0xffff;
-    }
-    global_nearby_atoms[global_index][0] = nullptr;
     update_nearbys();
 }
 
@@ -416,15 +468,10 @@ Atom::Atom(FILE* is)
         buffer[0] = 0;
     }
 
+    check_all_atom_allocated();
     global_index = global_all_atom_count;
     global_all_atoms[global_all_atom_count] = this;
     global_all_atom_count++;
-    if (global_all_atom_count >= MAX_GLOBAL_ATOMS)
-    {
-        cout << "Too many atoms." << endl;
-        throw 0xffff;
-    }
-    global_nearby_atoms[global_index][0] = nullptr;
     update_nearbys();
 }
 
@@ -440,6 +487,7 @@ Atom::~Atom()
     for (i=global_index; i<global_all_atom_count; i++)
     {
         global_all_atoms[i] = global_all_atoms[i+1];
+        if (!global_all_atoms[i]) break;
         global_all_atoms[i]->global_index--;
     }
     global_all_atom_count--;
@@ -454,22 +502,24 @@ Atom::~Atom()
 
 void Atom::update_nearbys()
 {
-    int i, j=0, l;
+    __uint64_t i, j=0, l;
     for (i=0; i<global_all_atom_count; i++)
     {
-        if (i == global_index) continue;
+        if (!global_all_atoms[i]) break;
+        else if (i == global_index) continue;
         else if (global_all_atoms[i] == this) throw 0xc01212b7;
 
         float r = this->distance_to(global_all_atoms[i]);
         if (r < _INTERA_R_CUTOFF)
         {
-            global_nearby_atoms[global_index][j++] = global_all_atoms[i];
-            global_nearby_atoms[global_index][j] = nullptr;
+            global_nearby_atoms[global_index*MAX_NEARBY_PERATOM+j] = global_all_atoms[i];
+            j++;
+            global_nearby_atoms[global_index*MAX_NEARBY_PERATOM+j] = nullptr;
 
             bool foundthis = false;
-            for (l=0; l < MAX_NEARBY_PERATOM && global_nearby_atoms[i][l]; l++)
+            for (l=0; l < MAX_NEARBY_PERATOM && global_nearby_atoms[i*MAX_NEARBY_PERATOM+l]; l++)
             {
-                if (global_nearby_atoms[i][l] == this)
+                if (global_nearby_atoms[i*MAX_NEARBY_PERATOM+l] == this)
                 {
                     foundthis = true;
                     break;
@@ -477,8 +527,9 @@ void Atom::update_nearbys()
             }
             if (!foundthis && l < MAX_NEARBY_PERATOM)
             {
-                global_nearby_atoms[i][l] = this;
-                global_nearby_atoms[i][++l] = nullptr;
+                global_nearby_atoms[i*MAX_NEARBY_PERATOM+l] = this;
+                l++;
+                global_nearby_atoms[i*MAX_NEARBY_PERATOM+l] = nullptr;
             }
         }
     }
@@ -2995,7 +3046,7 @@ float Atom::similarity_to(Atom* b)
 
 float Atom::location_favorability(Point potential_new_loc)
 {
-    int i;
+    __uint64_t i;
     float result = 0;
 
     for (i=0; i<geometry; i++)
@@ -3005,7 +3056,7 @@ float Atom::location_favorability(Point potential_new_loc)
         // Angle to bonded atom's other bonds.
     }
 
-    for (i=0; i < MAX_NEARBY_PERATOM && global_nearby_atoms[global_index][i]; i++)
+    for (i=0; i < MAX_NEARBY_PERATOM && global_nearby_atoms[global_index*MAX_NEARBY_PERATOM+i]; i++)
     {
         // Ionic bonding.
 

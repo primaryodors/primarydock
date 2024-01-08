@@ -47,6 +47,9 @@ Protein::~Protein()
 {
     connections.clear();
 
+    int i;
+    for (i=0; residues[i]; i++) delete residues[i];
+
     delete[] remarks;
     remarksz = 0;
 }

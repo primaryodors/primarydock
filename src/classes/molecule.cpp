@@ -67,6 +67,8 @@ Molecule::~Molecule()
 {
     if (atoms)
     {
+        int i;
+        for (i=0; atoms[i]; i++) delete atoms[i];
         delete[] atoms;
     }
     if (smiles) delete[] smiles;

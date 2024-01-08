@@ -333,7 +333,7 @@ public:
 
 protected:
     int Z=0;
-    int global_index;
+    __uint64_t global_index;
     Point location;
     int valence=0;
     int geometry=0;						// number of vertices, so 4 = tetrahedral; 6 = octahedral; etc.
@@ -366,6 +366,7 @@ protected:
     static void read_elements();
     void figure_out_valence();
     void update_nearbys();
+    void check_all_atom_allocated();
 
     static char* elem_syms[_ATOM_Z_LIMIT];
     static float vdW_radii[_ATOM_Z_LIMIT];
@@ -385,12 +386,13 @@ std::ostream& operator<<(std::ostream& os, const Atom& a);
 std::ostream& operator<<(std::ostream& os, const Bond& b);
 std::ostream& operator<<(std::ostream& os, const Ring& r);
 
-#define MAX_GLOBAL_ATOMS 65536
-#define MAX_NEARBY_PERATOM 50
+#define INIT_GLOBAL_ATOMS 65536
+#define MAX_NEARBY_PERATOM 64
 
-extern int global_all_atom_count;
-extern Atom* global_all_atoms[MAX_GLOBAL_ATOMS+16];
-extern Atom* global_nearby_atoms[MAX_GLOBAL_ATOMS+16][MAX_NEARBY_PERATOM+4];
+extern __uint64_t global_all_atom_count;
+extern __uint64_t global_all_atom_allocd;
+extern Atom** global_all_atoms;
+extern Atom** global_nearby_atoms;
 
 
 

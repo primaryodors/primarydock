@@ -3154,7 +3154,9 @@ double Atom::allatom_seek_favorability(float resolution)
         result += best;
     }
 
+    #if _dbg_allatom_optimize
     cout << "Motion: " << total_motion << " ";
+    #endif
     return result;
 }
 

@@ -3057,6 +3057,7 @@ void AminoAcid::ensure_pi_atoms_coplanar()
         for (j = 3; j < n; j++)
         {
             float result = are_points_planar(conjugated[0], conjugated[1], conjugated[2], conjugated[j]);
+            #if !_dbg_allatom_optimize
             if (result >= coplanar_threshold)
             {
                 cout << *this << " has non-coplanar pi atoms "
@@ -3064,6 +3065,7 @@ void AminoAcid::ensure_pi_atoms_coplanar()
                     << " having anomaly " << result
                     << endl;
             }
+            #endif
         }
     }
 }

@@ -305,7 +305,7 @@ public:
     static void dump_array(Atom** aarr);
     static float electronegativity_from_Z(int atom_Z) { return electronegativities[atom_Z]; }
     static float Lennard_Jones(Atom* atom1, Atom* atom2, float sigma = 0);
-    static double allatom_seek_favorability(float resolution = 1);
+    static double allatom_seek_favorability(float resolution = 0.1);
 
     // Public member vars.
     float pK = nanf("n/a");         // To be managed and used by external classes.

@@ -512,7 +512,6 @@ int main(int argc, char** argv)
         cout << "Performing rock6..." << endl;
         float theta = do_template_bend(p, aa6x48, aa6x59, 6, rock6_dir, SCoord(0,0,0), aa6x28);
         cout << "TMR6 rocks " << (theta*fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
-        Atom::allatom_seek_favorability();
     }
 
     
@@ -820,9 +819,14 @@ int main(int argc, char** argv)
     for (l=0; l<1000; l++)
     {
         double f = Atom::allatom_seek_favorability();
+        #if _dbg_allatom_optimize
         cout << "Favorability: " << f << endl;
+        #else
+        cout << (l ? "." : "Optimizing atom favorabilities...");
+        #endif
         if (f > 0) break;
     }
+    cout << endl;
 
 
     ////////////////////////////////////////////////////////////////////////////////

@@ -524,9 +524,12 @@ int main(int argc, char** argv)
         cout << "Performing FYG activation..." << endl;
 
         // TMR6 motion.
-        float theta6_initial = 40;
-        LocatedVector lv6 = aa6x49->get_psi_vector();
-        p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_initial);
+        float theta6_phi_initial = 8;
+        LocatedVector lv6 = aa6x49->get_phi_vector();
+        p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_phi_initial);
+        float theta6_psi_initial = 40;
+        lv6 = aa6x49->get_psi_vector();
+        p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_psi_initial);
 
         // TMR5 translation.
         SCoord move5 = aa6x49->get_CA_location().subtract(aa5x50->get_CA_location());
@@ -555,8 +558,9 @@ int main(int argc, char** argv)
         else cout << "5.58~7.53 bridge already met." << endl;
 
         // Adjust TMR6.
+        lv6 = aa6x49->get_psi_vector();
         float theta6 = p.region_can_rotate(n6x28, n6x49, lv6);
-        cout << "TMR6 bends " << (theta6_initial - theta6 * fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+        cout << "TMR6 bends " << (theta6_phi_initial + theta6_psi_initial - theta6 * fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
         p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, theta6);
     }
 

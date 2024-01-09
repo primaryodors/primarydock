@@ -2012,7 +2012,7 @@ int main(int argc, char** argv)
                     {
                         SCoord to_move = lmtl->get_location().subtract(a->get_location());
                         to_move.r = vdW - r;
-                        lmtl->move_rel(&to_move);
+                        lmtl->move_rel(to_move);
                     }
                 }
             }

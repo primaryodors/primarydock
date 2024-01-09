@@ -265,7 +265,7 @@ public:
     {
         return move(&pt);
     }
-    bool move_rel(SCoord* v);
+    bool move_rel(SCoord v);
     int move_assembly(Point* pt, Atom* excluding);			// Return number of atoms moved. Note excluding must be a bonded atom.
     SCoord* get_basic_geometry();
     SCoord* get_geometry_aligned_to_bonds(bool prevent_infinite_loop = false);
@@ -305,6 +305,7 @@ public:
     static void dump_array(Atom** aarr);
     static float electronegativity_from_Z(int atom_Z) { return electronegativities[atom_Z]; }
     static float Lennard_Jones(Atom* atom1, Atom* atom2, float sigma = 0);
+    static double allatom_seek_favorability(float resolution = 1);
 
     // Public member vars.
     float pK = nanf("n/a");         // To be managed and used by external classes.

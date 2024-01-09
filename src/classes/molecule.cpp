@@ -4609,7 +4609,7 @@ void Molecule::recenter_ring(int ringid, Point new_ring_cen)
     int i;
     Atom** ring_atoms = rings[ringid]->get_atoms();
     for (i=0; ring_atoms[i]; i++)
-        ring_atoms[i]->move_rel(&motion);
+        ring_atoms[i]->move_rel(motion);
 
     delete[] ring_atoms;
 }

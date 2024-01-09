@@ -628,26 +628,17 @@ bool Atom::move(Point* pt)
     return true;
 }
 
-bool Atom::move_rel(SCoord* v)
+bool Atom::move_rel(SCoord v)
 {
     #if debug_break_on_move
     if (break_on_move) throw 0xb16fa7012a96eca7;
     #endif
 
-    if (isnan(v->phi) || isnan(v->theta) || isnan(v->r))
+    if (isnan(v.phi) || isnan(v.theta) || isnan(v.r))
     {
         return false;
     }
 
-    /*if (name && !strcmp(name, "CB"))
-    {
-    	Bond* b = get_bond_between("CA");
-    	if (b && b->btom)
-    	{
-    		float r = b->btom->get_location().get_3d_distance(location.add(v));
-    		if (r > 1.55) throw 0x7e57196;
-    	}
-    }*/
     move(location.add(v));
     return true;
 }
@@ -3068,7 +3059,7 @@ float Atom::location_favorability(Point potential_new_loc)
         if (abs((__int64_t)(bonded_to[i].btom) - (__int64_t)this) >= memsanity) continue;
 
         // Distance to bonded atom.
-        float r = fabs(bonded_to[i].optimal_radius - distance_to(bonded_to[i].btom));
+        float r = fabs(bonded_to[i].optimal_radius - potential_new_loc.get_3d_distance(bonded_to[i].btom->location));
         result -= pow(r*10, 2);
 
         // Angle to bonded atom's other bonds.
@@ -3086,7 +3077,7 @@ float Atom::location_favorability(Point potential_new_loc)
             if (!bonded_to[i].btom->bonded_to[j].cardinality || !bonded_to[i].btom->bonded_to[j].btom) continue;
             if (abs((__int64_t)(bonded_to[i].btom->bonded_to[j].btom) - (__int64_t)bonded_to[i].btom) >= memsanity) continue;
 
-            float theta = find_3d_angle(location, bonded_to[i].btom->bonded_to[j].btom->location, bonded_to[i].btom->location);
+            float theta = find_3d_angle(potential_new_loc, bonded_to[i].btom->bonded_to[j].btom->location, bonded_to[i].btom->location);
             float anomaly = fabs(theta-optimal_theta);
             if (optimal_theta2) anomaly = fmin(anomaly, fabs(theta-optimal_theta2));
             result -= pow(theta*10, 3);
@@ -3096,26 +3087,74 @@ float Atom::location_favorability(Point potential_new_loc)
     for (i=0; i < MAX_NEARBY_PERATOM && global_nearby_atoms[global_index*MAX_NEARBY_PERATOM+i]; i++)
     {
         Atom* a = global_nearby_atoms[global_index*MAX_NEARBY_PERATOM+i];
-        float f;
+        float f, r = potential_new_loc.get_3d_distance(a->location);
+        float vdWr = this->vdW_rad + a->vdW_rad;
 
         // Ionic bonding.
         f = get_charge() * a->get_charge();
-        if (f) result += 120 * f;
+        if (f) result += 120 * f / pow(fmax(1,r/vdWr), 2);
 
         // Polar, hbond, halogen bond, polar-pi, or cation-pi bonding.
         f = is_polar() * a->is_polar();
-        if (f) result += 30 * f;
+        if (f) result += 30 * f / pow(fmax(1,r/2), 2);
 
-        if (is_polar() && a->is_pi()) result += 7.0 * fabs(is_polar());
-        else if (a->is_polar() && is_pi()) result += 7.0 * fabs(a->is_polar());
+        if (is_polar() && a->is_pi()) result += 7.0 * fabs(is_polar()) / pow(fmax(1,r/4), 2);
+        else if (a->is_polar() && is_pi()) result += 7.0 * fabs(a->is_polar()) / pow(fmax(1,r/4), 2);
 
         // Pi stacking.
-        if (is_pi() && a->is_pi()) result += 12;
+        if (is_pi() && a->is_pi()) result += 12 / pow(fmax(1,r/4), 2);
 
         // Clashes.
         result -= fmax(0, Atom::Lennard_Jones(this, a));
     }
 
+    return result;
+}
+
+double Atom::allatom_seek_favorability(float resolution)
+{
+    __uint64_t i;
+
+    float x, y, z;
+    float steps = resolution / 2;
+    double best = -Avogadro, result=0, total_motion=0;
+    Point best_place(0,0,0);
+
+    for (i=0; i<global_all_atom_count; i++)
+    {
+        Atom* a = global_all_atoms[i];
+        if (!a) continue;
+
+        bool first = true;
+        best_place = Point(0,0,0);
+        for (y = -resolution; y <= resolution; y += steps)
+        {
+            for (x = -resolution; x <= resolution; x += steps)
+            {
+                for (z = -resolution; z <= resolution; z += steps)
+                {
+                    Point pt = Point(x, y, z);
+                    double f = a->location_favorability(a->location.add(pt));
+                    if (first || (f > best))
+                    {
+                        best = f;
+                        best_place = pt;
+                        first = false;
+                    }
+                }
+            }
+        }
+
+        SCoord rel_motion = best_place;
+        if (rel_motion.r)
+        {
+            total_motion += rel_motion.r;
+            a->move_rel(rel_motion);
+        }
+        result += best;
+    }
+
+    cout << "Motion: " << total_motion << " ";
     return result;
 }
 

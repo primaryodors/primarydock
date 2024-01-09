@@ -2631,7 +2631,7 @@ void Protein::mtl_coord_cnf_cb(int iter)
         // SCoord delta(m_mcoord[i]->coord_atom_avg_loc().subtract(m_mcoord[i]->metal->get_location()));
         SCoord delta(gmtgt.subtract(m_mcoord[i]->metal->get_location()));
         delta.r *= 0.1;
-        m_mcoord[i]->metal->move_rel(&delta);
+        m_mcoord[i]->metal->move_rel(delta);
     }
 }
 

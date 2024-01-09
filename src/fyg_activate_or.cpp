@@ -512,6 +512,7 @@ int main(int argc, char** argv)
         cout << "Performing rock6..." << endl;
         float theta = do_template_bend(p, aa6x48, aa6x59, 6, rock6_dir, SCoord(0,0,0), aa6x28);
         cout << "TMR6 rocks " << (theta*fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+        Atom::allatom_seek_favorability();
     }
 
     
@@ -809,6 +810,18 @@ int main(int argc, char** argv)
     {
         aa6x59->movability = MOV_FLEXONLY;
         aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Iterative all-atom model optimization.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    for (l=0; l<1000; l++)
+    {
+        double f = Atom::allatom_seek_favorability();
+        cout << "Favorability: " << f << endl;
+        if (f > 0) break;
     }
 
 

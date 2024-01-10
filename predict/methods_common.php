@@ -176,9 +176,9 @@ function dock_failed()
     exit;
 }
 
-function prepare_receptor($pdbinfname)
+function prepare_receptor($pdbinfname, $lflxr)
 {
-    global $docker;
+    global $docker, $protid;
     switch(strtolower($docker))
     {
         case "pd":
@@ -187,7 +187,7 @@ function prepare_receptor($pdbinfname)
         case "vina":
         // Filter out everything except ATOM records.
         $lines = explode("\n", file_get_contents($pdbinfname));
-        $rf = split_pdb_to_rigid_and_flex($protid, $lines, explode(" ", "$flxr $iflxr"));
+        $rf = split_pdb_to_rigid_and_flex($protid, $lines, explode(" ", "$lflxr"));
         $fp = fopen("tmp/prot.pdb", "w");
         if (!$fp) die("Failed to write to tmp/prot.pdb.\n");
         fwrite($fp, implode("\n",$rf[0]));
@@ -207,7 +207,7 @@ function prepare_receptor($pdbinfname)
     }
 }
 
-function prepare_ligand($liginfname)
+function prepare_ligand($lig_name)
 {
     global $docker;
     switch(strtolower($docker))
@@ -216,7 +216,7 @@ function prepare_ligand($liginfname)
         break;
 
         case "vina":
-        exec("obabel -i sdf \"sdf/$liginfname.sdf\" -o pdbqt -O tmp/lig.pdbqt");
+        exec("obabel -i sdf \"sdf/$lig_name.sdf\" -o pdbqt -O tmp/lig.pdbqt");
         break;
 
         default:

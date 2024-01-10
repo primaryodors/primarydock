@@ -82,10 +82,10 @@ $pdbfname = $pdbfname_inactive;
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.model1.pdb";
 $cenres = substr($cenres_inactive, 8);
 
-prepare_receptor($pdbfname);
+prepare_receptor($pdbfname, "$flxr $iflxr");
 
 // Convert ligand as well.
-prepare_ligand($ligfname);
+prepare_ligand($ligname);
 
 chdir(__DIR__);
 chdir("..");
@@ -99,6 +99,6 @@ $pdbfname = $pdbfname_active;
 $outfname = "output/$fam/$protid/$protid.$ligname.active.model1.pdb";
 $cenres = substr($cenres_active, 8);
 
-prepare_receptor($pdbfname);
+prepare_receptor($pdbfname, "$flxr $aflxr");
 
 $poses = process_dock("a");

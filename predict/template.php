@@ -7,6 +7,15 @@ chdir(__DIR__);
 chdir("..");
 $cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
 
+foreach (@$argv as $a)
+{
+	$a = explode('=',$a,2);
+	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
+}
+
+$max_simul = 4;
+if (@$_REQUEST["simul"]) $max_simul = intval($_REQUEST["simul"]);
+
 function build_template()
 {
     global $template, $protid, $cryoem, $has_rock6, $has_fyg, $args;
@@ -79,12 +88,15 @@ function build_template()
 
 function check_already_fyg_activating($protid)
 {
+    global $max_simul;
     $output = [];
-    exec("ps -ef | grep bin/fyg_ | grep -v grep", $output);
+    exec("ps -ef | grep -e \"[0-9] bin/fyg_\" | grep -v grep", $output);
     foreach ($output as $o)
     {
         if (false!== strpos($o, $protid)) return true;                // This will give a false positive for e.g. OR2T2 if OR2T29 is running, but this is a minor bug.
     }
+
+    if (count($output) > $max_simul) die("Too many simultaneous activations.");
 
     if (file_exists("tmp/$protid.fyg"))
     {

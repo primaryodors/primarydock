@@ -502,12 +502,15 @@ int main(int argc, char** argv)
 
     if (allow_rock6 && rock6_dir.r)
     {
-        DynamicMotion dyn(&p);
-        dyn.type = dyn_wind;
-        dyn.start_resno = BallesterosWeinstein("6.56");
-        dyn.end_resno = BallesterosWeinstein("6.60");
-        dyn.bias = -12;
-        dyn.apply_absolute(1);
+        if (l6x59 == 'R')
+        {
+            DynamicMotion dyn(&p);
+            dyn.type = dyn_wind;
+            dyn.start_resno = BallesterosWeinstein("6.56");
+            dyn.end_resno = BallesterosWeinstein("6.60");
+            dyn.bias = -12;
+            dyn.apply_absolute(1);
+        }
 
         cout << "Performing rock6..." << endl;
         float theta = do_template_bend(p, aa6x48, aa6x59, 6, rock6_dir, SCoord(0,0,0), aa6x28);
@@ -524,7 +527,7 @@ int main(int argc, char** argv)
         cout << "Performing FYG activation..." << endl;
 
         // TMR6 motion.
-        float theta6_phi_initial = 8;
+        float theta6_phi_initial = 10;
         LocatedVector lv6 = aa6x49->get_phi_vector();
         p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_phi_initial);
         float theta6_psi_initial = 40;

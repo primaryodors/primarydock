@@ -65,6 +65,10 @@ foreach (@$argv as $a)
 	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
 }
 
+$docker = "pd";
+if (@$_REQUEST["docker"]) $docker = $_REQUEST["docker"];
+echo "Docker is $docker.\n";
+
 if (@$_REQUEST['simul']) $max_simultaneous_docks = intval($_REQUEST['simul']) ?: 2;
 
 if (@$_REQUEST['next'])
@@ -139,6 +143,11 @@ extract(binding_site($protid));
 
 $outfname = "output.dock";
 
+function bad_docker_code()
+{
+    die("Unrecognized docker. The choices are pd or vina.\n");
+}
+
 function dock_failed()
 {
     echo "Docking FAILED.\n";
@@ -167,6 +176,54 @@ function dock_failed()
     exit;
 }
 
+function prepare_receptor($pdbinfname)
+{
+    global $docker;
+    switch(strtolower($docker))
+    {
+        case "pd":
+        break;
+
+        case "vina":
+        // Filter out everything except ATOM records.
+        $lines = explode("\n", file_get_contents($pdbinfname));
+        $rf = split_pdb_to_rigid_and_flex($protid, $lines, explode(" ", "$flxr $iflxr"));
+        $fp = fopen("tmp/prot.pdb", "w");
+        if (!$fp) die("Failed to write to tmp/prot.pdb.\n");
+        fwrite($fp, implode("\n",$rf[0]));
+        fclose($fp);
+        $fp = fopen("tmp/flex.pdb", "w");
+        if (!$fp) die("Failed to write to tmp/flex.pdb.\n");
+        fwrite($fp, implode("\n",$rf[1]));
+        fclose($fp);
+
+        // Convert to PDBQT format.
+        exec("obabel -i pdb tmp/prot.pdb -xr -o pdbqt -O tmp/prot.pdbqt");
+        exec("obabel -i pdb tmp/flex.pdb -xs -o pdbqt -O tmp/flex.pdbqt");
+        break;
+
+        default:
+        bad_docker_code();
+    }
+}
+
+function prepare_ligand($liginfname)
+{
+    global $docker;
+    switch(strtolower($docker))
+    {
+        case "pd":
+        break;
+
+        case "vina":
+        exec("obabel -i sdf \"sdf/$liginfname.sdf\" -o pdbqt -O tmp/lig.pdbqt");
+        break;
+
+        default:
+        bad_docker_code();
+    }
+}
+
 function prepare_outputs()
 {
     global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname, $docker;
@@ -181,9 +238,6 @@ function prepare_outputs()
     if (!file_exists("output/$fam/$protid")) die("Failed to create output folder.\n");
 
     $binding_pockets = json_decode(file_get_contents("data/binding_pocket.json"), true);
-
-    $docker = "pd";
-    if (@$_REQUEST["docker"]) $docker = $_REQUEST["docker"];
     
     $ligname = str_replace(" ", "_", $ligname);
     $suffix = ($dock_metals) ? "metal" : "upright";
@@ -324,9 +378,6 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 
     switch(strtolower($docker))
     {
-        case "ad":
-        case "adv":
-        case "autodock":
         case "vina":
         $cenresno = [];
         $center = "--center_x 0 --center_y 15 --center_z 0";
@@ -485,8 +536,8 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         break;
 
         case "pd":
-        case "primarydock":
-        default:
+
+        // TODO: generate $configf.
             
         $lignospace = str_replace(" ", "", $ligname);
         $prefixfn = $metrics_prefix ? "_$metrics_prefix" : "";
@@ -804,8 +855,12 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
             }
         }
 
+        break;
+
+        default:
+        bad_docker_code();
     }
-    
+
     $outdata['version'] = $version;
     $outdata['method'] = $method;
 

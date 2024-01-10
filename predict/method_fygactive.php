@@ -13,6 +13,8 @@ require_once("methods_common.php");
 chdir(__DIR__);
 require_once("../data/protutils.php");
 chdir(__DIR__);
+require_once("template.php");
+chdir(__DIR__);
 
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1).
@@ -20,7 +22,6 @@ $pose = 15;
 $iter = 30;
 $elim = 1e3;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
 $num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
-$accuracy_receptors = ["OR51E2", "TAAR1"];
 
 prepare_outputs();
 
@@ -71,128 +72,29 @@ function make_prediction($data)
     return $data;
 }
 
-function build_template()
-{
-    global $template, $protid, $cryoem, $has_rock6, $has_fyg, $args;
-
-    if (substr($protid, 0, 4) == "TAAR")
-    {
-        $template = $cryoem["mTAAR9"];
-        // TODO: Blend mTAAR9 with TAAR1 depending on sequence similarity.
-    }
-    else if (substr($protid, 0, 2) == "OR")
-    {
-        $fam = intval(substr($protid, 2, 2));
-        if ($fam == 51)
-        {
-            $template = $cryoem["OR51E2"];
-        }
-        else if ($fam == 52)
-        {
-            foreach ($cryoem["OR52"] as $hxno => $metrics)
-            {
-                foreach ($metrics as $metric => $dimensions)
-                {
-                    $template[$hxno][$metric] = $cryoem["OR52"][$hxno][$metric];
-
-                    $template[$hxno][$metric]["sigma"]
-                        + 0.4 * $cryoem["TAAR1"][$hxno][$metric]["sigma"]
-                        + 0.6 * $cryoem["mTAAR9"][$hxno][$metric]["sigma"];
-                }
-            }
-        }
-        else
-        {
-            foreach ($cryoem["OR51E2"] as $hxno => $metrics)
-            {
-                foreach ($metrics as $metric => $dimensions)
-                {
-                    foreach (array_keys($dimensions) as $dimension)
-                    {
-                        if ($dimension == "sigma")
-                        {
-                            $template[$hxno][$metric][$dimension]
-                                = 0.4 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
-                                + 0.6 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
-                        }
-                        else
-                        {
-                            // TODO: Make the proportions dependent on sequence similarity.
-                            $template[$hxno][$metric][$dimension]
-                                = 0.40 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
-                                + 0.30 * $cryoem["OR52"][$hxno][$metric][$dimension]
-                                + 0.10 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
-                                + 0.20 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Get typology. Do a no-save run of fyg_activate_or to determine whether protein has FYG or rock6 capabilities.
-    $output = [];
-    exec("bin/fyg_activate_or --nosave $protid", $output);
-    $has_rock6 = $has_fyg = false;
-    foreach ($output as $line)
-    {
-        if (false!==strpos($line, "Performing rock6")) $has_rock6 = true;
-        if (false!==strpos($line, "Performing FYG activation")) $has_fyg = true;
-    }
-}
-
 chdir(__DIR__);
 chdir("..");
 
 $pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 $template = [];
-$args = "$protid";
-
-$cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
 
 if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/fyg_activate_or"))
 {
-    build_template();
-
-    foreach ($template as $hxno => $metrics)
+    if (check_already_fyg_activating($protid))
     {
-        foreach ($metrics as $metric => $dimensions)
+        echo "Waiting on activation...";
+        sleep(30);
+        while (check_already_fyg_activating($protid))
         {
-            if ($hxno == 6)
-            {
-                if ($metric == "cyt" && ($has_fyg || $has_rock6)) continue;
-                else if ($metric == "exr" && $has_rock6) continue;
-            }
-
-            $cmdarg = "--" . substr($metric, 0, 1) . $hxno;
-            $args .= " $cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']}";
+            echo ".";
+            sleep(10);
         }
+        echo "\n";
+
+        if (!file_exists($pdbfname_active)) dock_failed();
     }
-
-    $cmd = "bin/fyg_activate_or $args";
-    echo "$cmd\n";
-    passthru($cmd);
-
-    if (in_array($protid, $accuracy_receptors) && file_exists("devenv"))
-    {
-        $c = file_get_contents("predict/model_accuracy.sh");
-        $lines = explode("\n", $c);
-        foreach ($lines as $lno => $ln)
-        {
-            if (false!==strpos($ln, "bin/fyg_activate_or $protid "))
-            {
-                $lines[$lno] = "make bin/fyg_activate_or && $cmd && bin/pepteditor predict/model_accuracy.pepd";
-            }
-        }
-        $c = implode("\n", $lines);
-        $fp = fopen("predict/model_accuracy.sh", "w");
-        if ($fp)
-        {
-            fwrite($fp, $c);
-            fclose($fp);
-        }
-    }
+    else do_templated_activation();
 }
 
 $flex_constraints = "";

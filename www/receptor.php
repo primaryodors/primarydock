@@ -401,7 +401,8 @@ else
         if (!($i % 10)) $nums .= str_pad($i+10, 10, ' ', STR_PAD_LEFT).' ';
         if ($nxtmr > 7)
         {
-            $lets .= substr($seq,$i,1);
+            if (@$_REQUEST["abc"]) $lets .= chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($seq,$i,1)));
+            else $lets .= substr($seq,$i,1);
             goto _tail;
         }
 
@@ -417,9 +418,16 @@ else
             ||
             ( isset($prots[$rcpid]["bw"][$between]) && ($i+1) == resno_from_bw($rcpid, $between) )
             )
-            $lets .= "<span style=\"background-color: #ddd; color: #000;\">".substr($seq,$i,1)."</span>";
+        {
+            if (@$_REQUEST["abc"]) $lc = chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($seq,$i,1)));
+            else $lc = substr($seq,$i,1);
+            $lets .= "<span style=\"background-color: #ddd; color: #000;\">$lc</span>";
+        }
         else
-            $lets .= substr($seq,$i,1);
+        {
+            if (@$_REQUEST["abc"]) $lets .= chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($seq,$i,1)));
+            else $lets .= substr($seq,$i,1);
+        }
 
         if (($i+1) == $receptor['region']["TMR$nxtmr"]['end']) 
         {
@@ -604,7 +612,8 @@ echo "</p>";*/
                         echo "font-weight: bold; ";
                     }
                     echo "\">";
-                    echo substr($text[$i],$j,1);
+                    if (@$_REQUEST["abc"]) echo chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($text[$i],$j,1)));
+                    else echo substr($text[$i],$j,1);
                     echo "</span>";
                     echo " ";
                     

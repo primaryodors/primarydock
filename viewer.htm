@@ -1095,6 +1095,42 @@ function strandColorSelection(strandid, colorCode)
 		}
 		break;
 
+		case 'w':
+		p.colorScheme = brownScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#321";
+			tabbtn.style.color = "#c96";
+		}
+		break;
+
+		case 'k':
+		p.colorScheme = blackScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#000";
+			tabbtn.style.color = "#666";
+		}
+		break;
+
+		case 'h':
+		p.colorScheme = grayScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#333";
+			tabbtn.style.color = "#999";
+		}
+		break;
+
+		case 'i':
+		p.colorScheme = whiteScheme;
+		if (typeof tabbtn != "undefined") 
+		{
+			tabbtn.style.backgroundColor = "#999";
+			tabbtn.style.color = "#fff";
+		}
+		break;
+
 		default:
 		p.colorScheme = (tmstrand.indexOf(strandid) >= 0) ? PODefRgnScheme : POAAScheme;
 		if (typeof tabbtn != "undefined") tabbtn.style.backgroundColor = whtbk ? "#bcd" : "#234";
@@ -1227,6 +1263,30 @@ function show_seqdd()
 			cbtn.innerHTML = "&nbsp;&nbsp;";
 			cbtn.style.backgroundColor = "#f70";
 			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'o');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#963";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'w');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#000";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'k');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#666";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'h');");
+			sdiv.appendChild(cbtn);
+
+			cbtn = document.createElement("button");
+			cbtn.innerHTML = "&nbsp;&nbsp;";
+			cbtn.style.backgroundColor = "#ccc";
+			cbtn.setAttribute("onclick", "colorizeStrand('"+strandid+"', 'i');");
 			sdiv.appendChild(cbtn);
 
 			cbtn = document.createElement("button");
@@ -2306,6 +2366,38 @@ var orangeScheme = NGL.ColormakerRegistry.addScheme(function (params)
     this.atomColor = function(atom)
     {
 		return 0xff7700;
+	}
+});
+
+var brownScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x996633;
+	}
+});
+
+var blackScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x333333;
+	}
+});
+
+var grayScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0x999999;
+	}
+});
+
+var whiteScheme = NGL.ColormakerRegistry.addScheme(function (params)
+{
+    this.atomColor = function(atom)
+    {
+		return 0xeeeeee;
 	}
 });
 

@@ -802,8 +802,52 @@ int main(int argc, char** argv)
     // Assume at least one of rock6 / FYG bend has occurred.
     ////////////////////////////////////////////////////////////////////////////////
 
+    if (l5x47 == 'F' || l5x47 == 'L' || l5x47 == 'I' || l5x47 == 'H')
+    {
+        pt = aa5x47->get_CA_location().subtract(aa3x34->get_CA_location()).add(aa5x47->get_CA_location());
+        aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
+    }
+
+    // This side chain shift is observed in all cryo-EM models of active states of TAARs:
+    if (l6x44 == 'F' || l6x44 == 'Y')
+    {
+        aa6x44->movability = MOV_FLEXONLY;
+        aa6x44->conform_atom_to_location(aa6x44->get_reach_atom()->name, aa5x51->get_CA_location());
+        constraints.push_back("STCR 6.44");
+        aa6x44->movability = MOV_PINNED;
+    }
+
+    if (l6x59 == 'R')
+    {
+        aa6x59->movability = MOV_FLEXONLY;
+        pt = aa6x59->get_CA_location().add(aa5x39->get_CA_location());
+        pt.multiply(0.5);
+        aa6x59->conform_atom_to_location("NE", pt);
+    }
+    else if (l6x59 == 'K')
+    {
+        aa6x59->movability = MOV_FLEXONLY;
+        aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
+    }
+
+    aa45x51->movability = MOV_FLEXONLY;
+    aa6x55->movability  = MOV_FLEXONLY;
+    aa5x58->movability  = MOV_FLEXONLY;
+    aa7x53->movability  = MOV_FLEXONLY;
+    if ((l45x51 == 'D' || l45x51 == 'E') && l6x55 == 'Y')
+    {
+        p.bridge(n45x51, n6x55);
+        aa45x51->movability = MOV_PINNED;
+        aa6x55->movability = MOV_PINNED;
+    }
+    if (l5x58 == 'Y' && l7x53 == 'Y')
+    {
+        p.bridge(n5x58, n7x53);
+        aa5x58->movability = MOV_PINNED;
+        aa7x53->movability = MOV_PINNED;
+    }
+
     Molecule inert;
-    
     if (l6x48 != 'W')
     {
         aa5x47->movability = MOV_FLEXONLY;
@@ -831,7 +875,6 @@ int main(int argc, char** argv)
         mols[j++] = &inert;
         for (i=0; i<nearby; i++)
         {
-            reachres[i]->movability = MOV_FLEXONLY;
             mols[j++] = reinterpret_cast<Molecule*>(reachres[i]);
         }
         mols[j] = nullptr;
@@ -845,40 +888,6 @@ int main(int argc, char** argv)
         if (l3x40 == 'S' || l3x40 == 'N' || l3x40 == 'Q' || l3x40 == 'K' || l3x40 == 'R' || l3x40 == 'D' || l3x40 == 'E')
             aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
     }
-
-    if (l5x47 == 'F' || l5x47 == 'L' || l5x47 == 'I' || l5x47 == 'H')
-    {
-        pt = aa5x47->get_CA_location().subtract(aa3x34->get_CA_location()).add(aa5x47->get_CA_location());
-        aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
-    }
-
-    // This side chain shift is observed in all cryo-EM models of active states of TAARs:
-    if (l6x44 == 'F' || l6x44 == 'Y')
-    {
-        aa6x44->movability = MOV_FLEXONLY;
-        aa6x44->conform_atom_to_location(aa6x44->get_reach_atom()->name, aa5x51->get_CA_location());
-        constraints.push_back("STCR 6.44");
-    }
-
-    if (l6x59 == 'R')
-    {
-        aa6x59->movability = MOV_FLEXONLY;
-        pt = aa6x59->get_CA_location().add(aa5x39->get_CA_location());
-        pt.multiply(0.5);
-        aa6x59->conform_atom_to_location("NE", pt);
-    }
-    else if (l6x59 == 'K')
-    {
-        aa6x59->movability = MOV_FLEXONLY;
-        aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
-    }
-
-    aa45x51->movability = MOV_FLEXONLY;
-    aa6x55->movability  = MOV_FLEXONLY;
-    aa5x58->movability  = MOV_FLEXONLY;
-    aa7x53->movability  = MOV_FLEXONLY;
-    if ((l45x51 == 'D' || l45x51 == 'E') && l6x55 == 'Y') p.bridge(n45x51, n6x55);
-    if (l5x58 == 'Y' && l7x53 == 'Y') p.bridge(n5x58, n7x53);
 
 
     ////////////////////////////////////////////////////////////////////////////////

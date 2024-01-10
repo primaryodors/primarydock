@@ -303,7 +303,7 @@ foreach (array_values($bytree) as $x => $orid)
     if (false!==$dyp) imagefilledrectangle($im, $dx+2,$base2, $dx+$res-1,$dy=$dyp, $azure);
     
     if ($dy < $h/7) $dy = $h/7;
-    if ($dy < $h/1.25) $texts[] = [$dx, $dy-5, $orid];
+    if ($dy < $h/1.4) $texts[] = [$dx, $dy-5, $orid];
     
     imagefilledrectangle($im, $dx,$base, $dx+$res-1,$base+$bsht, $bcol);
 

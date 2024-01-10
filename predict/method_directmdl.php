@@ -23,6 +23,8 @@ $num_std_devs = 2.0;            // How many standard deviations to move the heli
 
 prepare_outputs();
 
+$metrics_to_process["BEST"] = "Pose1";
+
 function make_prediction($data)
 {
     global $protid, $ligname;

@@ -24,19 +24,21 @@ $accuracy_receptors = ["OR51E2", "TAAR1"];
 
 prepare_outputs();
 
+$metrics_to_process["BEST"] = "Pose1";
+
 function make_prediction($data)
 {
     global $protid, $ligname;
 
-    if (isset($data["a_BENERG"]))
+    if (isset($data["a_BENERG"]) || isset($data["a_BindingEnergy"]))
     {
         // TODO: For ascore and iscore each, require contact between ligand and TMR6 and
         // contact between ligand and any of TMR3, TMR4, EXR2, TMR5, TMR7. If either condition
         // not met, zero out that score. For FYG activation receptors with no rock6, also require
         // that the ligand extend far enough in the -Y direction impinge on the vdW space of at
         // least one side chain displaced by FYG activation.
-        $ascore = min(0, floatval( $data['a_BENERG']));
-        $iscore = min(0, floatval(@$data['i_BENERG']));
+        $ascore = min(0, floatval(@$data['a_BENERG']), floatval(@$data['a_BindingEnergy']));
+        $iscore = min(0, floatval(@$data['i_BENERG']), floatval(@$data['i_BindingEnergy']));
 
         if ($ascore < 0 && $ascore < $iscore)
         {

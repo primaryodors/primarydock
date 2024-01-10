@@ -574,7 +574,7 @@ int main(int argc, char** argv)
         float theta6_phi_initial = 10;
         LocatedVector lv6 = aa6x49->get_phi_vector();
         p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_phi_initial);
-        float theta6_psi_initial = 30;
+        float theta6_psi_initial = 40;
         lv6 = aa6x49->get_psi_vector();
         p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_psi_initial);
 

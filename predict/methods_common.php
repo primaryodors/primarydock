@@ -35,6 +35,7 @@ $metrics_to_process =
 [
   "BENERG" => "BindingEnergy",
   "BENERG.rgn" => "BindingEnergy.rgn",
+  "POSES" => "POSES"
 ];
 
 // Load data
@@ -373,13 +374,13 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     global $cenres, $size, $docker, $mcoord, $atomto, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
-    if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
 
     if (!file_exists("tmp")) mkdir("tmp");
 
     switch(strtolower($docker))
     {
         case "vina":
+        if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
         $cenresno = [];
         $center = "--center_x 0 --center_y 15 --center_z 0";
         $size = "--size_x 20 --size_y 20 --size_z 20";
@@ -650,7 +651,7 @@ heredoc;
         unlink($cnfname);
 
         $mode = "";
-        $pose = 0;
+        $lpose = 0;
         $node = -1;
         $outdqty = [];
         
@@ -724,7 +725,7 @@ heredoc;
 
             if (trim($ln) == "TER")
             {
-                $pose = false;
+                $lpose = false;
                 $node = -1;
                 continue;
             }
@@ -733,7 +734,7 @@ heredoc;
             {
                 if ($coldiv[0] == "Pose")
                 {
-                    $pose = intval($coldiv[1]);
+                    $lpose = intval($coldiv[1]);
                     $node = -1;
                     continue;
                 }
@@ -746,18 +747,19 @@ heredoc;
                 {
                     $e = -floatval($coldiv[1]);
                     if ($e < 1) $e = 0; // 1.0 / abs(log(abs($e)));
-                    $weight[$pose] = $e;
+                    $weight[$lpose] = $e;
                 }
             }
         }
         
-        foreach ($outlines as $ln)
+        foreach ($outlines as $lno => $ln)
         {
+            // echo "$lno: $ln\n";
             $coldiv = explode(":", $ln);
 
             if (trim($ln) == "TER")
             {
-                $pose = false;
+                $lpose = false;
                 $node = -1;
                 continue;
             }
@@ -766,7 +768,7 @@ heredoc;
             {
                 if ($coldiv[0] == "Pose")
                 {
-                    $pose = intval($coldiv[1]);
+                    $lpose = intval($coldiv[1]);
                     $node = -1;
                     continue;
                 }
@@ -780,7 +782,7 @@ heredoc;
                     $mode = $coldiv[0];
                     continue;
                 }
-                else if ($pose && $node>=0)
+                else if ($lpose && $node>=0)
                 {
                     if (preg_match("/[A-Z][a-z]{2}[0-9]{1,4}/", $coldiv[0]))
                     {
@@ -790,12 +792,12 @@ heredoc;
                         {
                             $wmode = str_replace(".rgn", ".$region", $metrics_to_process["$mode.rgn"]);
                             if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                            if (!@$pose_node_has_weight[$wmode][$pose][$node])
+                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                            if (!@$pose_node_has_weight[$wmode][$lpose][$node])
                             {
-                                if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
-                                else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
-                                $pose_node_has_weight[$wmode][$pose][$node] = true;
+                                if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                                else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
+                                $pose_node_has_weight[$wmode][$lpose][$node] = true;
                             }
                         }
                         continue;
@@ -831,9 +833,9 @@ heredoc;
                         {
                             $wmode = $metrics_to_process[$mode];
                             if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
-                            else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
+                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                            else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
                         }
                         continue;
                     }
@@ -844,9 +846,9 @@ heredoc;
                         {
                             $wmode = $metrics_to_process[$mode];
                             if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
-                            else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
+                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                            else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
                         }
                         continue;
                     }
@@ -858,9 +860,9 @@ heredoc;
                         {
                             $wmode = $metrics_to_process[$mode];
                             if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
-                            else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
+                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                            else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
                         }
                         continue;
                     }
@@ -905,10 +907,10 @@ heredoc;
                         $wmode = str_replace(".rgn", ".$region", $metrics_to_process["CALOC.rgn"]);
 
                         if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = [0,0,0];
-                        for ($x=0; $x<3; $x++) $outdata[$metrics_prefix.$wmode][$x] += floatval(substr($ln, 29+8*x, 8)) * $weight[$pose];
+                        for ($x=0; $x<3; $x++) $outdata[$metrics_prefix.$wmode][$x] += floatval(substr($ln, 29+8*x, 8)) * $weight[$lpose];
 
-                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
-                        else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
                     }
                     break;
         
@@ -927,7 +929,7 @@ heredoc;
     $outdata['version'] = $version;
     $outdata['method'] = $method;
 
-    // print_r($outdata);
+    print_r($outdata);
 
     $tme = [];
     foreach ($outdata as $k => $v)

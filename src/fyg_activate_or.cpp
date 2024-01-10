@@ -574,7 +574,7 @@ int main(int argc, char** argv)
         float theta6_phi_initial = 10;
         LocatedVector lv6 = aa6x49->get_phi_vector();
         p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_phi_initial);
-        float theta6_psi_initial = 40;
+        float theta6_psi_initial = 30;
         lv6 = aa6x49->get_psi_vector();
         p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_psi_initial);
 
@@ -774,28 +774,6 @@ int main(int argc, char** argv)
             if (clash <= initial_clash_[6]) break;
         }
     }
-
-/*
-    for (n=1; n<=7; n++)
-    {
-        std::string region = (std::string)"TMR" + std::to_string(n);
-        float theta = fiftyseventh * 15 / 20;
-        AminoAcid* aafulcrum = p.get_residue_bw(n, 50);
-        if (!aafulcrum) continue;
-        int fulcrum = aafulcrum->get_residue_no();
-        int term = (n&1) ? p.get_region_start(region) : p.get_region_end(region);
-        cout << "Minimizing " << region << " extracellular clashes..." << endl;
-
-        for (i=0; i<200; i++)
-        {
-            clash = (n&1)
-                ? reduce_iclash_iter(p, fulcrum, false, clash, theta, term, fulcrum)
-                : reduce_iclash_iter(p, fulcrum, true , clash, theta, fulcrum, term)
-                ;
-            if (clash <= initial_clash_[i]) break;
-        }
-    }
-*/
 
     ////////////////////////////////////////////////////////////////////////////////
     // Make room near trip switch.

@@ -63,34 +63,6 @@
         },
         "oid": "006e9fa100ae90b705ed9146e8ade453"
     },
-    "0073ee6fc7173146b1047519a883f21f":
-    {
-        "full_name": "anethole",
-        "smiles": "O(c1ccc(\\C=C\\C)cc1)C",
-        "aroma":
-        {
-            "http:\/\/www.thegoodscentscompany.com":
-            [
-                "anise",
-                "licorice",
-                "medicinal",
-                "mimosa",
-                "sweet"
-            ]
-        },
-        "activity":
-        {
-            "https:\/\/doi.org\/10.1016\/j.cub.2020.09.012":
-            {
-                "OR6C70":
-                {
-                    "type": "vsa",
-                    "adjusted_curve_top": "10"
-                }
-            }
-        },
-        "oid": "0073ee6fc7173146b1047519a883f21f"
-    },
     "009a4e9b0c028a2fcb175db5a0e8ed6d":
     {
         "full_name": "isobutyraldehyde",
@@ -7741,14 +7713,24 @@
         {
             "http:\/\/www.thegoodscentscompany.com":
             [
+                "sweet",
                 "anise",
                 "licorice",
+                "mimosa",
                 "medicinal",
-                "sweet"
+                "spicy"
             ]
         },
         "activity":
         {
+            "https:\/\/doi.org\/10.1016\/j.cub.2020.09.012":
+            {
+                "OR6C70":
+                {
+                    "type": "vsa",
+                    "adjusted_curve_top": "10"
+                }
+            },
             "https:\/\/doi.org\/10.1093\/chemse\/bji002":
             {
                 "OR1G1":

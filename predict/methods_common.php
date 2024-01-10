@@ -368,8 +368,9 @@ function prepare_outputs()
 $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_clashing = false)
 {
-    global $ligname, $protid, $configf, $dock_retries, $pdbfname, $outfname, $cenres, $metrics_to_process, $bias_by_energy, $version;
-    global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy, $docker;
+    global $ligname, $protid, $configf, $dock_retries, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
+    global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy;
+    global $cenres, $size, $docker, $mcoord, $atomto, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
     if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
@@ -536,9 +537,71 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         break;
 
         case "pd":
+        if ($cenres)
+        {
+            foreach (explode(" ", $cenres) as $bw)
+            {
+                $cenresno[] = resno_from_bw($protid, $bw);
+            }
 
-        // TODO: generate $configf.
-            
+            $cenresno = implode(" ", $cenresno);
+            $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";
+            echo "$cmd\n";
+            $censz = [];
+            exec($cmd, $censz);
+
+            foreach ($censz as $ln)
+            {
+                if (substr($ln, 0, 4) == "SZ: ")
+                {
+                    $ln = substr($ln, 4);
+                    $psiz = explode(",",str_replace('[','',str_replace(']','',$ln)));
+                    $sx = floatval($psiz[0]) + 5;
+                    $sy = floatval($psiz[1]) + 5;
+                    $sz = floatval($psiz[2]) + 5;
+                    $size = "$sx $sy $sz";
+                }
+            }
+        }
+
+        $fam = family_from_protid($protid);
+
+        $configf = <<<heredoc
+
+PROT $pdbfname
+LIG sdf/$ligname.sdf
+
+CEN RES $cenres
+SIZE $size
+# H2O 5
+$mcoord
+$atomto
+$stcr
+$flxr
+
+EXCL 1 56		# Head, TMR1, and CYT1.
+
+SEARCH $search
+POSE $pose
+ELIM $elim
+$flex_constraints
+ITERS $iter
+PROGRESS
+
+FLEX 1
+WET
+
+OUT $outfname
+OUTPDB 1 output/$fam/$protid/%p.%l.inactive.model%o.pdb
+
+
+heredoc;
+        
+        chdir(__DIR__);
+        chdir("..");
+        if (!file_exists("output/$fam")) mkdir("output/$fam");
+        if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
+
         $lignospace = str_replace(" ", "", $ligname);
         $prefixfn = $metrics_prefix ? "_$metrics_prefix" : "";
         $cnfname = "tmp/prediction.$protid$prefixfn.$lignospace.config";

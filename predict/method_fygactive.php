@@ -41,6 +41,13 @@ function make_prediction($data)
         $ascore = min(0, floatval(@$data['a_BENERG']), floatval(@$data['a_BindingEnergy']));
         $iscore = min(0, floatval(@$data['i_BENERG']), floatval(@$data['i_BindingEnergy']));
 
+        if (!@$data["a_BindingEnergy.6"]) $ascore = 0;
+        if (!@$data["a_BindingEnergy.3"] && !@$data["a_BindingEnergy.4"] && !@$data["a_BindingEnergy.45"]
+            && !@$data["a_BindingEnergy.5"] && !@$data["a_BindingEnergy.7"]) $iscore = 0;
+        if (!@$data["i_BindingEnergy.6"]) $iscore = 0;
+        if (!@$data["i_BindingEnergy.3"] && !@$data["i_BindingEnergy.4"] && !@$data["i_BindingEnergy.45"]
+            && !@$data["i_BindingEnergy.5"] && !@$data["i_BindingEnergy.7"]) $iscore = 0;
+
         if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
@@ -234,36 +241,3 @@ if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
     // Delete the tmp PDB.
     unlink($tmpoutpdb);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

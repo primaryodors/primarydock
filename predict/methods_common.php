@@ -149,9 +149,10 @@ function bad_docker_code()
     die("Unrecognized docker. The choices are pd or vina.\n");
 }
 
-function dock_failed()
+function dock_failed($reason = "")
 {
-    echo "Docking FAILED.\n";
+    if ($reason) echo "Docking FAILED: $reason.\n";
+    else echo "Docking FAILED.\n";
 
     if (stream_isatty(STDOUT) && file_exists("predict/soundalert"))
     {
@@ -376,11 +377,12 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     if ($multicall > 1) $noclobber = true;
 
     if (!file_exists("tmp")) mkdir("tmp");
+    $modelfname = preg_replace("/.dock$/", ".model%o.pdb", $outfname);
+    $retvar = 0;
 
     switch(strtolower($docker))
     {
         case "vina":
-        $outfname = str_replace(".dock", ".model1.pdb", $outfname);
 
         if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
         $cenresno = [];
@@ -419,7 +421,6 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
             }
         }
 
-        $retvar = 0;
         $best_energy = false;
 
         $outlines = [];
@@ -438,16 +439,9 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
             $outlines = [];
             $cmd = "bin/vina --receptor tmp/prot.pdbqt --flex tmp/flex.pdbqt --ligand tmp/lig.pdbqt $center $size --exhaustiveness 20 --cpu 1";
             echo "$cmd\n";
-            // exec($cmd, $outlines, $retvar);
-            passthru("$cmd | tee tmp/vina.out");
+            passthru("$cmd | tee tmp/vina.out", $retvar);
             $outlines = explode("\n", file_get_contents("tmp/vina.out"));
         }
-
-        if ($retvar)
-        {
-            dock_failed();
-            return 0;
-        }    
 
         $mode = "";
         $pose = 0;
@@ -466,7 +460,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         $num_poses = 0;
 
         echo "Loading $pdbfname...\n";
-        $outpdb = file_get_contents($pdbfname);
+        $origpdb = $outpdb = file_get_contents($pdbfname);
 
         $posesln = false;
         $affinities = [];
@@ -502,40 +496,91 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 
         if (!$posesln)
         {
-            dock_failed();
+            dock_failed("no affinities");
             return 0;
         }
 
         $outpdb = str_replace("TER\n", "", $outpdb);
         $outpdb = str_replace("END\n", "", $outpdb);
 
+        $dockpdb = [];
         $ol = explode("\n", file_get_contents("tmp/lig_out.pdbqt"));
         $fatno = 0;
+        $lnposeno = 1;
+        $dockpdb[$lnposeno] = "";
         foreach($ol as $ln)
         {
             if (substr($ln, 0, 5) != "ATOM ") continue;
             $atno = intval(substr($ln, 7, 4));
-            if ($atno < $fatno) break;
+            if ($atno < $fatno)
+            {
+                $lnposeno++;
+                $dockpdb[$lnposeno] = "";
+            }
             $esym = trim(substr($ln, 13, 2));
             $ln = "HETATM ".(9000+$atno)."  ".str_pad($esym.$atno, 4)."LIG".substr($ln, 20,57).$esym;
-            $outpdb .= "$ln\n";
+            $dockpdb[$lnposeno] .= "$ln\n";
             $fatno = $atno;
         }
 
-        $outpdb .= "\nTER\nEND\n";
+        $dockout = <<<heredoc
+PDB file: $pdbfname
+Ligand: sdf/$ligname.sdf
 
+External dock using third party docker.
+
+heredoc;
+        
+        foreach ($dockpdb as $poseno => $lpdb)
+        {
+            $loutpdb = $outpdb."\n".$lpdb;
+            $loutpdb .= "\nTER\nEND\n";
+
+            $lmodelfname = str_replace("%o", $poseno, $modelfname);
+            $fp = fopen($lmodelfname, "w");
+            if (!$fp) die("Failed to write to $lmodelfname.\n");
+            fwrite($fp, $loutpdb);
+            fclose($fp);
+
+            $outdata[$metrics_prefix."POSES"] = $num_poses;
+            $scoring = [];
+            $cmd = "bin/score_pdb -n \"$lmodelfname\"";
+            exec($cmd, $scoring);
+            // echo "$cmd\n";
+            $scoring = implode("\n", $scoring);
+
+            $dockout .= <<<heredoc
+
+Pose: $poseno
+Node: 0
+$scoring
+
+# PDB Data
+PDBDAT:
+$lpdb
+TER
+END
+
+
+heredoc;
+
+        }
+
+        $dockout .= <<<heredoc
+
+$num_poses pose(s) found.
+
+Original PDB:
+$origpdb
+
+heredoc;
+
+        echo "$dockout\n";
         $fp = fopen($outfname, "w");
         if (!$fp) die("Failed to write to $outfname.\n");
-        fwrite($fp, $outpdb);
+        fwrite($fp, $dockout);
         fclose($fp);
-
-        $outdata[$metrics_prefix."POSES"] = $num_poses;
-        $scoring = [];
-        $cmd = "bin/score_pdb \"$outfname\" | grep \"Total: \"";
-        exec($cmd, $scoring);
-        echo "$cmd\n";
-        $outdata[$metrics_prefix."BENERG"] = floatval(substr($scoring[0], 7));
-        echo $scoring[0]."\n";
+        $outlines = explode("\n", file_get_contents($outfname));
 
         break;
 
@@ -568,7 +613,6 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         }
 
         $fam = family_from_protid($protid);
-        $modelfname = str_replace(".dock", ".model%o.pdb", $outfname);
 
         $configf = <<<heredoc
 
@@ -645,289 +689,287 @@ heredoc;
         }
 
         if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
-
-        if ($retvar)
-        {
-            echo "Docking FAILED.\n";
-            return 0;
-        }
-        
         unlink($cnfname);
-
-        $mode = "";
-        $lpose = 0;
-        $node = -1;
-        $outdqty = [];
-        
-        if ($noclobber)
-        {
-            if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
-            $outdata = @$dock_results[$protid][$ligname] ?: [];
-        }
-        else $outdata = [];
-
-        $weight = [];
-        $pose_node_has_weight = [];
-        $num_poses = 0;
-
-        $posesln = false;
-        foreach ($outlines as $ln)
-        {
-            if (preg_match("/TMR[1-7][.](nseg|center|cseg)[.]clashdir = /", $ln))
-            {
-                $tmrno = intval(substr($ln, 3, 1));
-
-                $segment = false;
-                switch (@explode('.', $ln)[1])
-                {
-                    case "nseg":
-                    $segment = ($tmrno & 1) ? "exr" : "cyt";
-                    break;
-
-                    case "center":
-                    $segment = "x.50";
-                    break;
-
-                    case "cseg":
-                    $segment = ($tmrno & 1) ? "cyt" : "exr";
-                    break;
-
-                    default:
-                    ;
-                }
-
-                if ($segment)
-                {
-                    $coords = explode(" = ", $ln)[1];
-                    $coords = str_replace('[', '', $coords);
-                    $coords = str_replace(']', '', $coords);
-                    $coords = explode(',', $coords);
-                    foreach ($coords as $k => $c) $coords[$k] = floatval($c);
-
-                    $clashcomp[$tmrno][$segment] = $coords;
-                    continue;
-                }
-            }
-
-            if (false !== strpos($ln, "pose(s) found"))
-            {
-                $num_poses = intval($ln);
-                $posesln = true;
-            }
-        }
-
-        if (!$posesln)
-        {
-            echo "Docking FAILED.\n";
-            return 0;
-        }
-
-        if (!$num_poses) $outdata[$metrics_prefix."POSES"] = $num_poses;
-        else foreach ($outlines as $ln)
-        {
-            $coldiv = explode(":", $ln);
-
-            if (trim($ln) == "TER")
-            {
-                $lpose = false;
-                $node = -1;
-                continue;
-            }
-
-            if (count($coldiv) == 2)
-            {
-                if ($coldiv[0] == "Pose")
-                {
-                    $lpose = intval($coldiv[1]);
-                    $node = -1;
-                    continue;
-                }
-                else if ($coldiv[0] == "Node")
-                {
-                    $node = intval($coldiv[1]);
-                    continue;
-                }
-                else if ($coldiv[0] == 'Total' && !$node)
-                {
-                    $e = -floatval($coldiv[1]);
-                    if ($e < 1) $e = 0; // 1.0 / abs(log(abs($e)));
-                    $weight[$lpose] = $e;
-                }
-            }
-        }
-        
-        foreach ($outlines as $lno => $ln)
-        {
-            // echo "$lno: $ln\n";
-            $coldiv = explode(":", $ln);
-
-            if (trim($ln) == "TER")
-            {
-                $lpose = false;
-                $node = -1;
-                continue;
-            }
-
-            if (count($coldiv) == 2)
-            {
-                if ($coldiv[0] == "Pose")
-                {
-                    $lpose = intval($coldiv[1]);
-                    $node = -1;
-                    continue;
-                }
-                else if ($coldiv[0] == "Node")
-                {
-                    $node = intval($coldiv[1]);
-                    continue;
-                }
-                else if ($coldiv[0] == 'BENERG' || $coldiv[0] == 'vdWRPL')
-                {
-                    $mode = $coldiv[0];
-                    continue;
-                }
-                else if ($lpose && $node>=0)
-                {
-                    if (preg_match("/[A-Z][a-z]{2}[0-9]{1,4}/", $coldiv[0]))
-                    {
-                        $resno = intval(substr($coldiv[0], 3));
-                        $region = intval(bw_from_resno($protid, $resno));
-                        if (isset($metrics_to_process["$mode.rgn"]))
-                        {
-                            $wmode = str_replace(".rgn", ".$region", $metrics_to_process["$mode.rgn"]);
-                            if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
-                            if (!@$pose_node_has_weight[$wmode][$lpose][$node])
-                            {
-                                if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
-                                else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
-                                $pose_node_has_weight[$wmode][$lpose][$node] = true;
-                            }
-                        }
-                        continue;
-                    }
-                    if ($coldiv[0] == "Total")
-                    {
-                        if (isset($metrics_to_process[$mode]) && floatval($coldiv[1]) < 0)
-                        {
-                            $wmode = $metrics_to_process[$mode];
-                            if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]);
-                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = 1;
-                            else $outdqty[$metrics_prefix.$wmode]++;
-                        }
-
-                        if ($mode == "BENERG")
-                        {
-                            $benerg = floatval($coldiv[1]);
-                            if (false===$best_energy || $benerg < $best_energy) $best_energy = $benerg;
-                        }
-
-                        if ($mode == "BENERG" && isset($metrics_to_process["BEST"]))
-                        {
-                            $wmode = $metrics_to_process["BEST"];
-                            if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = floatval($coldiv[1]);
-                        }
-                        continue;
-                    }
-                    else if ($coldiv[0] == "Ligand polar satisfaction")
-                    {
-                        $mode = "POLSAT";
-                        if (isset($metrics_to_process[$mode]))
-                        {
-                            $wmode = $metrics_to_process[$mode];
-                            if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
-                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
-                            else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
-                        }
-                        continue;
-                    }
-                    else if ($coldiv[0] == "Protein clashes")
-                    {
-                        $mode = "PCLASH";
-                        if (isset($metrics_to_process[$mode]))
-                        {
-                            $wmode = $metrics_to_process[$mode];
-                            if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
-                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
-                            else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
-                        }
-                        continue;
-                    }
-                    else if (strpos($coldiv[0], " active theta: "))
-                    {
-                        $morceaux = explode(' ', $coldiv[0]);
-                        $mode = "ACVTH.{$morceaux[0]}";
-                        if (isset($metrics_to_process[$mode]))
-                        {
-                            $wmode = $metrics_to_process[$mode];
-                            if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                            $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
-                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
-                            else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
-                        }
-                        continue;
-                    }
-                }
-            }
-
-            if (false !== strpos($ln, "pose(s) found"))
-            {
-                $mode = "POSES";
-                if (isset($metrics_to_process[$mode]))
-                {
-                    $wmode = $metrics_to_process[$mode];
-                    $outdata[$metrics_prefix.$wmode] = intval($ln);
-                }
-                continue;
-            }
-
-            if (substr($ln, 0, 5) == 'ATOM ')
-            {
-                $ln = preg_replace("/\\s+/", " ", trim($ln));
-                $ln = explode(" ", $ln);
-        
-                $aname = $ln[2];
-                $resno = intval($ln[4]);
-                $x = floatval($ln[5]);
-                $y = floatval($ln[6]);
-                $z = floatval($ln[7]);
-        
-                switch ($aname)
-                {
-                    case 'N': case 'H': case 'HN': case 'HA': case 'HB': case 'C': case 'O':
-                    break;
-        
-                    case 'CB': case 'HB': case 'HB1': case 'HB2': case 'HB3':
-                    break;
-        
-                    case 'CA':
-                    $ca_loc = [$x,$y,$z];
-                    $region = intval(bw_from_resno($protid, $resno));
-                    if (isset($metrics_to_process["CALOC.rgn"]))
-                    {
-                        $wmode = str_replace(".rgn", ".$region", $metrics_to_process["CALOC.rgn"]);
-
-                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = [0,0,0];
-                        for ($x=0; $x<3; $x++) $outdata[$metrics_prefix.$wmode][$x] += floatval(substr($ln, 29+8*x, 8)) * $weight[$lpose];
-
-                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
-                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
-                    }
-                    break;
-        
-                    default:
-                    ;
-                }
-            }
-        }
 
         break;
 
         default:
         bad_docker_code();
+    }
+
+    if ($retvar)
+    {
+        dock_failed("return value");
+        return 0;
+    }    
+
+    $mode = "";
+    $lpose = 0;
+    $node = -1;
+    $outdqty = [];
+    
+    if ($noclobber)
+    {
+        if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
+        $outdata = @$dock_results[$protid][$ligname] ?: [];
+    }
+    else $outdata = [];
+
+    $weight = [];
+    $pose_node_has_weight = [];
+    $num_poses = 0;
+
+    $posesln = false;
+    foreach ($outlines as $ln)
+    {
+        if (preg_match("/TMR[1-7][.](nseg|center|cseg)[.]clashdir = /", $ln))
+        {
+            $tmrno = intval(substr($ln, 3, 1));
+
+            $segment = false;
+            switch (@explode('.', $ln)[1])
+            {
+                case "nseg":
+                $segment = ($tmrno & 1) ? "exr" : "cyt";
+                break;
+
+                case "center":
+                $segment = "x.50";
+                break;
+
+                case "cseg":
+                $segment = ($tmrno & 1) ? "cyt" : "exr";
+                break;
+
+                default:
+                ;
+            }
+
+            if ($segment)
+            {
+                $coords = explode(" = ", $ln)[1];
+                $coords = str_replace('[', '', $coords);
+                $coords = str_replace(']', '', $coords);
+                $coords = explode(',', $coords);
+                foreach ($coords as $k => $c) $coords[$k] = floatval($c);
+
+                $clashcomp[$tmrno][$segment] = $coords;
+                continue;
+            }
+        }
+
+        if (false !== strpos($ln, "pose(s) found"))
+        {
+            $num_poses = intval($ln);
+            $posesln = true;
+        }
+    }
+
+    if (!$posesln)
+    {
+        dock_failed("no poses");
+        return 0;
+    }
+
+    if (!$num_poses) $outdata[$metrics_prefix."POSES"] = $num_poses;
+    else foreach ($outlines as $ln)
+    {
+        $coldiv = explode(":", $ln);
+
+        if (trim($ln) == "TER")
+        {
+            $lpose = false;
+            $node = -1;
+            continue;
+        }
+
+        if (count($coldiv) == 2)
+        {
+            if ($coldiv[0] == "Pose")
+            {
+                $lpose = intval($coldiv[1]);
+                $node = -1;
+                continue;
+            }
+            else if ($coldiv[0] == "Node")
+            {
+                $node = intval($coldiv[1]);
+                continue;
+            }
+            else if ($coldiv[0] == 'Total' && !$node)
+            {
+                $e = -floatval($coldiv[1]);
+                if ($e < 1) $e = 0; // 1.0 / abs(log(abs($e)));
+                $weight[$lpose] = $e;
+            }
+        }
+    }
+
+    foreach ($outlines as $lno => $ln)
+    {
+        $coldiv = explode(":", $ln);
+
+        if (trim($ln) == "TER")
+        {
+            $lpose = false;
+            $node = -1;
+            continue;
+        }
+
+        if (count($coldiv) == 2)
+        {
+            if ($coldiv[0] == "Pose")
+            {
+                $lpose = intval($coldiv[1]);
+                $node = -1;
+                continue;
+            }
+            else if ($coldiv[0] == "Node")
+            {
+                $node = intval($coldiv[1]);
+                continue;
+            }
+            else if ($coldiv[0] == 'BENERG' || $coldiv[0] == 'vdWRPL')
+            {
+                $mode = $coldiv[0];
+                continue;
+            }
+            else if ($lpose && $node>=0)
+            {
+                if (preg_match("/[A-Z][a-z]{2}[0-9]{1,4}/", $coldiv[0]))
+                {
+                    $resno = intval(substr($coldiv[0], 3));
+                    $region = intval(bw_from_resno($protid, $resno));
+                    if (isset($metrics_to_process["$mode.rgn"]))
+                    {
+                        $wmode = str_replace(".rgn", ".$region", $metrics_to_process["$mode.rgn"]);
+                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                        if (!@$pose_node_has_weight[$wmode][$lpose][$node])
+                        {
+                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                            else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
+                            $pose_node_has_weight[$wmode][$lpose][$node] = true;
+                        }
+                    }
+                    continue;
+                }
+                if ($coldiv[0] == "Total")
+                {
+                    if (isset($metrics_to_process[$mode]) && floatval($coldiv[1]) < 0)
+                    {
+                        $wmode = $metrics_to_process[$mode];
+                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]);
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = 1;
+                        else $outdqty[$metrics_prefix.$wmode]++;
+                    }
+
+                    if ($mode == "BENERG")
+                    {
+                        $benerg = floatval($coldiv[1]);
+                        if (false===$best_energy || $benerg < $best_energy) $best_energy = $benerg;
+                    }
+
+                    if ($mode == "BENERG" && isset($metrics_to_process["BEST"]))
+                    {
+                        $wmode = $metrics_to_process["BEST"];
+                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = floatval($coldiv[1]);
+                    }
+                    continue;
+                }
+                else if ($coldiv[0] == "Ligand polar satisfaction")
+                {
+                    $mode = "POLSAT";
+                    if (isset($metrics_to_process[$mode]))
+                    {
+                        $wmode = $metrics_to_process[$mode];
+                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
+                    }
+                    continue;
+                }
+                else if ($coldiv[0] == "Protein clashes")
+                {
+                    $mode = "PCLASH";
+                    if (isset($metrics_to_process[$mode]))
+                    {
+                        $wmode = $metrics_to_process[$mode];
+                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
+                    }
+                    continue;
+                }
+                else if (strpos($coldiv[0], " active theta: "))
+                {
+                    $morceaux = explode(' ', $coldiv[0]);
+                    $mode = "ACVTH.{$morceaux[0]}";
+                    if (isset($metrics_to_process[$mode]))
+                    {
+                        $wmode = $metrics_to_process[$mode];
+                        if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
+                    }
+                    continue;
+                }
+            }
+        }
+
+        if (false !== strpos($ln, "pose(s) found"))
+        {
+            $mode = "POSES";
+            if (isset($metrics_to_process[$mode]))
+            {
+                $wmode = $metrics_to_process[$mode];
+                $outdata[$metrics_prefix.$wmode] = intval($ln);
+            }
+            continue;
+        }
+
+        if (substr($ln, 0, 5) == 'ATOM ')
+        {
+            $ln = preg_replace("/\\s+/", " ", trim($ln));
+            $ln = explode(" ", $ln);
+    
+            $aname = $ln[2];
+            $resno = intval($ln[4]);
+            $x = floatval($ln[5]);
+            $y = floatval($ln[6]);
+            $z = floatval($ln[7]);
+    
+            switch ($aname)
+            {
+                case 'N': case 'H': case 'HN': case 'HA': case 'HB': case 'C': case 'O':
+                break;
+    
+                case 'CB': case 'HB': case 'HB1': case 'HB2': case 'HB3':
+                break;
+    
+                case 'CA':
+                $ca_loc = [$x,$y,$z];
+                $region = intval(bw_from_resno($protid, $resno));
+                if (isset($metrics_to_process["CALOC.rgn"]))
+                {
+                    $wmode = str_replace(".rgn", ".$region", $metrics_to_process["CALOC.rgn"]);
+
+                    if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = [0,0,0];
+                    for ($x=0; $x<3; $x++) $outdata[$metrics_prefix.$wmode][$x] += floatval(substr($ln, 29+8*x, 8)) * $weight[$lpose];
+
+                    if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                    else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
+                }
+                break;
+    
+                default:
+                ;
+            }
+        }
     }
 
     $outdata['version'] = $version;

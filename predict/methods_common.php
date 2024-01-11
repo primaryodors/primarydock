@@ -380,6 +380,8 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
     switch(strtolower($docker))
     {
         case "vina":
+        $outfname = str_replace(".dock", ".model1.pdb", $outfname);
+
         if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
         $cenresno = [];
         $center = "--center_x 0 --center_y 15 --center_z 0";
@@ -566,6 +568,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         }
 
         $fam = family_from_protid($protid);
+        $modelfname = str_replace(".dock", ".model%o.pdb", $outfname);
 
         $configf = <<<heredoc
 
@@ -593,7 +596,7 @@ FLEX 1
 WET
 
 OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.inactive.model%o.pdb
+OUTPDB 1 $modelfname
 
 
 heredoc;

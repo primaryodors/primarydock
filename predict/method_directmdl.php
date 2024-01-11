@@ -88,7 +88,7 @@ if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname)
 
 $fam = family_from_protid($protid);
 $pdbfname = $pdbfname_inactive;
-$outfname = "output/$fam/$protid/$protid.$ligname.inactive.model1.pdb";
+$outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
 $cenres = substr($cenres_inactive, 8);
 
 prepare_receptor($pdbfname, "$flxr $iflxr");
@@ -105,7 +105,7 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 
 $pdbfname = $pdbfname_active;
-$outfname = "output/$fam/$protid/$protid.$ligname.active.model1.pdb";
+$outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
 $cenres = substr($cenres_active, 8);
 
 prepare_receptor($pdbfname, "$flxr $aflxr");

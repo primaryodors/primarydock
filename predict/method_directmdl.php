@@ -29,10 +29,10 @@ function make_prediction($data)
 {
     global $protid, $ligname;
 
-    if (isset($data["a_BENERG"]))
+    if (isset($data["a_BENERG"]) || isset($data["a_BindingEnergy"]))
     {
-        $ascore = min(0, floatval( $data['a_BENERG']));
-        $iscore = min(0, floatval(@$data['i_BENERG']));
+        $ascore = min(0, floatval(@$data['a_BENERG']), floatval(@$data['a_BindingEnergy']));
+        $iscore = min(0, floatval(@$data['i_BENERG']), floatval(@$data['i_BindingEnergy']));
 
         if ($ascore < 0 && $ascore < $iscore)
         {

@@ -2138,10 +2138,10 @@ float Molecule::get_internal_clashes()
         float avdW = atoms[i]->get_vdW_radius();
         for (j=i+1; atoms[j]; j++)
         {
-            if (atoms[i]->is_bonded_to(atoms[j]))
+            if (atoms[i]->is_bonded_to(atoms[j]) || atoms[j]->is_bonded_to(atoms[i]))
             {
                 Bond* ab = atoms[i]->get_bond_between(atoms[j]);
-                if (atoms[i] < atoms[j] && atoms[i]->is_pi() && atoms[j]->is_pi())
+                if (atoms[i] < atoms[j] && atoms[i]->is_pi() && atoms[j]->is_pi() && !atoms[i]->in_same_ring_as(atoms[j]))
                 {
                     // https://laney.edu/corlett/wp-content/uploads/sites/234/2012/01/ch17.pdf
                     Atom* c = atoms[i]->get_heaviest_bonded_atom_that_isnt(atoms[j]);

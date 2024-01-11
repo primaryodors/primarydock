@@ -127,7 +127,7 @@
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 3.0
 #define lmpull 0.5
-#define lmsteps 10
+#define lmsteps 3
 #define recapture_ejected_ligand 0
 
 #define amide_zwitterionic_amount 0.1

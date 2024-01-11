@@ -1764,6 +1764,13 @@ Bond** Molecule::get_rotatable_bonds()
 
                 int fa = lb[j]->atom->get_family(),
                     fb = lb[j]->btom->get_family();
+                
+                // 2 years of development and still no ring rotations.
+                if (lb[j]->atom->in_same_ring_as(lb[j]->btom))
+                {
+                    lb[j]->can_rotate = lb[j]->can_flip = false;
+                    continue;
+                }
 
                 // Generally, a single bond from a pi atom to an amino group cannot rotate.
                 if (	(pia && (fb == PNICTOGEN || fb == CHALCOGEN))
@@ -3283,7 +3290,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             if ((a->movability & MOV_CAN_RECEN) && !(a->movability & MOV_FORBIDDEN))
             {
                 Point motion(a->lmx, a->lmy, a->lmz);
-                if (motion.magnitude() > speed_limit/2) motion.scale(speed_limit/2);
+                if (motion.magnitude() > speed_limit) motion.scale(speed_limit);
 
                 benerg = cfmol_multibind(a, nearby);
                 if (motion.magnitude() > 0.01*speed_limit)
@@ -4361,7 +4368,7 @@ float Molecule::close_loop(Atom** path, float lcard)
 
         for (j=0; j<geo; j++)
         {
-            if (b[j]->btom
+            if (b[j] && b[j]->btom
                     &&
                     (	b[j]->can_rotate
                         ||

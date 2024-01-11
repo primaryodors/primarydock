@@ -1809,11 +1809,6 @@ SCoord* Atom::get_geometry_aligned_to_bonds(bool prevent_infinite_loop)
     // #259 fix:
     for (i=0; i<geometry; i++)
     {
-        if (abs((__int64_t)(bonded_to) - (__int64_t)bonded_to[i].btom) > memsanity)
-        {
-            bonded_to[i].btom = nullptr;
-            break;
-        }
         if (bonded_to[i].btom)
         {
             Rotation rot = align_points_3d(location.add(geov[i]), bonded_to[i].btom->location, location);

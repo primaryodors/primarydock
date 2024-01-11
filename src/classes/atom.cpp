@@ -2153,7 +2153,9 @@ Bond* Bond::get_reversed()
 
 int Bond::count_heavy_moves_with_atom()
 {
-    return get_reversed()->count_heavy_moves_with_btom();
+    Bond* rev = get_reversed();
+    if (!rev) return 0;
+    return rev->count_heavy_moves_with_btom();
 }
 
 int Atom::num_rings()

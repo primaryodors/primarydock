@@ -466,15 +466,33 @@ int main(int argc, char** argv)
 
     SCoord rock6_dir(0,0,0);
     bool exr2_bend = false;
+
+    AminoAcid* acid45 = nullptr, *ohbridge6 = nullptr;
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
-        p.bridge(aa45x51->get_residue_no(), aa6x55->get_residue_no());
-        Atom* reach6x55 = aa6x55->get_reach_atom();
-        Atom* reach45x51 = aa45x51->get_nearest_atom(reach6x55->get_location());
+        acid45 = aa45x51;
+        ohbridge6 = aa6x55;
+    }
+    else if (l6x55 == 'Y' && (l45x52 == 'D' || l45x52 == 'E'))
+    {
+        acid45 = aa45x52;
+        ohbridge6 = aa6x55;
+    }
+    else if (l6x55 == 'Y' && (l45x53 == 'D' || l45x53 == 'E' || l45x53 == 'N' || l45x53 == 'Q'))
+    {
+        acid45 = aa45x53;
+        ohbridge6 = aa6x55;
+    }
+
+    if (acid45 && ohbridge6)
+    {
+        p.bridge(acid45->get_residue_no(), ohbridge6->get_residue_no());
+        Atom* reach6x55 = ohbridge6->get_reach_atom();
+        Atom* reach45x51 = acid45->get_nearest_atom(reach6x55->get_location());
         float r = reach6x55->distance_to(reach45x51);
         if (r >= 2) rock6_dir = reach45x51->get_location().subtract(reach6x55->get_location());
-        constraints.push_back("STCR 45.51");
-        constraints.push_back("STCR 6.55");
+        constraints.push_back("STCR "+std::to_string(acid45->get_residue_no()));
+        constraints.push_back("STCR "+std::to_string(ohbridge6->get_residue_no()));
     }
     else if (l6x59 == 'R')
     {
@@ -533,8 +551,7 @@ int main(int argc, char** argv)
         float theta = do_template_bend(p, aa6x48, aa6x59, 6, rock6_dir, SCoord(0,0,0), aa6x28);
         cout << "TMR6 rocks " << (theta*fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
 
-        if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E')) p.bridge(n45x51, n6x55);
-        else if ((l6x55 == 'D' || l6x55 == 'E') && (l45x53 == 'N' || l45x53 == 'Q')) p.bridge(n45x53, n6x55);
+        if (acid45 && ohbridge6) p.bridge(acid45->get_residue_no(), ohbridge6->get_residue_no());
     }
 
     
@@ -804,15 +821,15 @@ int main(int argc, char** argv)
         aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
     }
 
-    aa45x51->movability = MOV_FLEXONLY;
-    aa6x55->movability  = MOV_FLEXONLY;
     aa5x58->movability  = MOV_FLEXONLY;
     aa7x53->movability  = MOV_FLEXONLY;
-    if ((l45x51 == 'D' || l45x51 == 'E') && l6x55 == 'Y')
+    if (acid45 && ohbridge6)
     {
-        p.bridge(n45x51, n6x55);
-        aa45x51->movability = MOV_PINNED;
-        aa6x55->movability = MOV_PINNED;
+        acid45->movability = MOV_FLEXONLY;
+        ohbridge6->movability  = MOV_FLEXONLY;
+        p.bridge(acid45->get_residue_no(), ohbridge6->get_residue_no());
+        acid45->movability = MOV_PINNED;
+        ohbridge6->movability = MOV_PINNED;
     }
     if (l5x58 == 'Y' && l7x53 == 'Y')
     {

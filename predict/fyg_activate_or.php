@@ -19,7 +19,7 @@ foreach ($prots as $protid => $prot)
         else
         {
             do_templated_activation();
-            exit;
+            if (file_exists($pdbfname_active) && filemtime($pdbfname_active) > filemtime("bin/fyg_activate_or")) exit;
         }
     }
 }

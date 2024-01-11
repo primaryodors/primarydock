@@ -483,6 +483,11 @@ int main(int argc, char** argv)
         acid45 = aa45x53;
         ohbridge6 = aa6x55;
     }
+    else if (l6x55 == 'D' && (l45x53 == 'N' || l45x53 == 'Q'))
+    {
+        acid45 = aa45x53;
+        ohbridge6 = aa6x55;
+    }
 
     if (acid45 && ohbridge6)
     {
@@ -797,6 +802,8 @@ int main(int argc, char** argv)
     {
         pt = aa5x47->get_CA_location().subtract(aa3x34->get_CA_location()).add(aa5x47->get_CA_location());
         aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
+
+        // TODO: 5.44 bend so 5.47 doesn't clash with 5.43.
     }
 
     // This side chain shift is observed in all cryo-EM models of active states of TAARs:

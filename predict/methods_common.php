@@ -597,6 +597,7 @@ WET
 
 OUT $outfname
 OUTPDB 1 $modelfname
+OPEND
 
 
 heredoc;
@@ -931,6 +932,7 @@ heredoc;
 
     $outdata['version'] = $version;
     $outdata['method'] = $method;
+    $outdata['docker'] = $docker;
 
     print_r($outdata);
 

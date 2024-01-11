@@ -37,6 +37,7 @@ $predictions = [];
 $pred_shown = [];
 $predname = [];
 $predate = [];
+$preddock = [];
 
 function predcmp($a, $b)
 {
@@ -55,6 +56,7 @@ if (isset($dock_results[$rcpid]))
         $oid = $odor['oid'];
         $predname[$oid] = $ligname;
         $predate[$oid] = date("Y-m-d H:i:s", $dock['version']);
+        $preddock[$oid] = $dock['docker'];
         if (isset($dock['DockScore'])) $predictions[$oid] = floatval($dock['DockScore']);
         else if (isset($dock['a_Pose1']) && isset($dock['i_Pose1']))
             $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
@@ -250,13 +252,14 @@ function showSkeletal(e, img)
     $(skeletal).show();
 }
 
-function show_dlmenu(e, prot, lig, v)
+function show_dlmenu(e, prot, lig, v, d)
 {
     var dlmenu = $("#dlmenu")[0];
 
     $("#dl_mnu_prot")[0].innerText = prot;
     $("#dl_mnu_lig")[0].innerText = decodeURIComponent(lig);
     $("#dl_cd_v")[0].innerText = v;
+    $("#dl_dock")[0].innerText = d;
     $("#dl_acv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=active");
     $("#vw_acv_mdl_3d")[0].setAttribute("href", "viewer.php?view=pred&prot="+prot+"&odor="+lig+"&mode=active");
     $("#dl_iacv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=inactive");
@@ -751,7 +754,7 @@ foreach ($pairs as $oid => $pair)
     {
         if (isset($predictions[$oid]))
         {
-            echo "<td><a href=\"#\" onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">"
+            echo "<td><a href=\"#\" onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}', '{$preddock[$oid]}');\">"
                 .round($predictions[$oid], 2)."</a></td>";
             $pred_shown[$oid] = true;
         }
@@ -782,7 +785,7 @@ if (count($predictions))
             echo "<td>&nbsp;</td>\n";
             echo "<td>&nbsp;</td>\n";
 
-            echo "<td><a href=\"#\" onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">"
+            echo "<td><a href=\"#\" onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}', '{$preddock[$oid]}');\">"
                 .round($predictions[$oid], 2)."</a></td>";
             echo "</td>";
             $pred_shown[$oid] = true;
@@ -994,6 +997,7 @@ $('#skeletal').hide();
     <div id="dl_mnu_lig">&nbsp;</div>
     <br>
     Code version:<div id="dl_cd_v">&nbsp;</div><br>
+    Docker used:<div id="dl_dock">&nbsp;</div><br>
     Files:<br>
     <table class="ctxmenu">
         <tr><td>Active model:</td>

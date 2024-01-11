@@ -318,6 +318,16 @@ void Protein::save_pdb(FILE* os, Molecule* lig)
             m_mcoord[i]->metal->save_pdb_line(os, ++offset);
         }
     }
+    if (m_mcoords.size())
+    {
+        for (i=0; i<m_mcoords.size(); i++)
+        {
+            if (!m_mcoords[i].mtl) continue;
+            cout << "Saving " << m_mcoords[i].mtl->name << endl;
+            m_mcoords[i].mtl->save_pdb_line(os, ++offset);
+        }
+    }
+
 
     if (lig)
     {
@@ -2628,6 +2638,117 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
 
     m_mcoord[j]->locked = true;
     return m_mcoord[j];
+}
+
+void Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
+{
+    int i, j, l, miter, i2, j1;
+
+    for (i=0; i<mtlcoords.size(); i++)
+    {
+        m_mcoords.push_back(mtlcoords[i]);
+        int charge_left = mtlcoords[i].charge;
+        Point lpt;
+        Molecule** lmc = new Molecule*[mtlcoords[i].coordres.size()+4];
+        lmc[0] = new Molecule("lcm");
+        Atom* lmtl;
+        if (!mtlcoords[i].mtl)
+        {
+            lmtl = lmc[0]->add_atom(Atom::esym_from_Z(mtlcoords[i].Z), Atom::esym_from_Z(mtlcoords[i].Z), nullptr, 0);
+            lmtl->increment_charge(mtlcoords[i].charge);
+            mtlcoords[i].mtl = lmtl;
+        }
+        else lmc[0]->add_existing_atom(lmtl = mtlcoords[i].mtl);
+        lmc[0]->movability = MOV_ALL;
+
+        l = 1;
+        for (j=0; j<mtlcoords[i].coordres.size(); j++)
+        {
+            mtlcoords[i].coordres[j].resolve_resno(this);
+            AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
+            if (aa)
+            {
+                aa->movability = MOV_FLEXONLY;
+                lmc[l++] = (Molecule*)aa;
+                Atom** Ss = aa->get_most_bindable(1, lmtl);
+                lpt = lpt.add((Ss && Ss[0]) ? Ss[0]->get_location() : aa->get_barycenter());
+
+                // If cysteine, make thiolate form.
+                if (aa->is_thiol() && charge_left)
+                {
+                    if (Ss)
+                    {
+                        Atom* S = Ss[0];
+                        Atom* H = S->is_bonded_to("H");
+                        if (H)
+                        {
+                            aa->delete_atom(H);
+                            S->increment_charge(-1);
+                            charge_left--;
+                        }
+                    }
+                }
+
+                aa->coordmtl = lmtl;
+            }
+        }
+        lmc[l] = nullptr;
+        if (l > 1)
+        {
+            l--;
+            lpt.x /= l; lpt.y /= l; lpt.z /= l;
+            l++;
+
+            lmtl->move(lpt);
+        }
+
+        lmtl->aaletter = '\0';
+        strcpy(lmtl->aa3let, "MTL");
+        lmtl->residue = 0;
+
+        Molecule::conform_molecules(lmc, 50);
+
+        AminoAcid* can_reach_metal[256];
+        int num_can_reach = get_residues_can_clash_ligand(can_reach_metal, lmc[0], lmtl->get_location(), Point(2.5,2.5,2.5), nullptr);
+        bool cr_eq_mc[num_can_reach];
+
+        for (miter=0; miter<20; miter++)
+        {
+            for (j1=0; j1<num_can_reach; j1++)
+            {
+                bool found = false;
+                if (!miter)
+                {
+                    for (i2=0; i2<mtlcoords[i].coordres.size(); i2++)
+                    {
+                        if (mtlcoords[i].coordres[i2].resno == can_reach_metal[j1]->get_residue_no()) found = true;
+                    }
+                    cr_eq_mc[j1] = found;
+                }
+                else found = cr_eq_mc[j1];
+
+                if (found) continue;
+
+                Atom* a = can_reach_metal[j1]->get_nearest_atom(lmtl->get_location());
+                float r = a->distance_to(lmtl);
+                float vdW = lmtl->get_vdW_radius() + a->get_vdW_radius();
+                if (r < vdW)
+                {
+                    SCoord to_move = lmtl->get_location().subtract(a->get_location());
+                    to_move.r = vdW - r;
+                    lmtl->move_rel(&to_move);
+                }
+            }
+        }
+        Molecule::conform_molecules(lmc, 50);
+
+        for (j=0; j<mtlcoords[i].coordres.size(); j++)
+        {
+            AminoAcid* aa = get_residue(mtlcoords[i].coordres[j].resno);
+            if (aa) aa->movability = MOV_PINNED;
+        }
+    }
+
 }
 
 void Protein::mtl_coord_cnf_cb(int iter)

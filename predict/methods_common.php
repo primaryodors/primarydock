@@ -180,15 +180,47 @@ function dock_failed($reason = "")
 
 function prepare_receptor($pdbinfname, $lflxr)
 {
-    global $docker, $protid;
+    global $docker, $protid, $mcoord;
     switch(strtolower($docker))
     {
         case "pd":
         break;
 
         case "vina":
-        // Filter out everything except ATOM records.
-        $lines = explode("\n", file_get_contents($pdbinfname));
+        if ($mcoord)
+        {
+            $pieces = explode(" ", $mcoord);
+            foreach ($pieces as $k => $pc)
+            {
+                if (preg_match("/^[0-9]{1,2}[.x][0-9]{1,2}$/", $pc)) $pieces[$k] = "%$pc";
+            }
+            $mcoord = implode(" ", $pieces);
+            $pid = getmypid();
+            $lpdbinfname = "tmp/mtl$pid.pdb";
+            file_put_contents("tmp/mtl$pid.pepd", <<<heredoc
+LOAD $pdbinfname
+$mcoord
+SAVE $lpdbinfname
+
+
+heredoc
+            );
+            $cmd = "bin/pepteditor tmp/mtl$pid.pepd";
+            echo "$cmd\n";
+            exec($cmd);
+
+            if (!file_exists($lpdbinfname))
+            {
+                dock_failed();
+                exit;
+            }
+        }
+        else
+        {
+            $lpdbinfname = $pdbinfname;
+        }
+
+        $lines = explode("\n", file_get_contents($lpdbinfname));
         $rf = split_pdb_to_rigid_and_flex($protid, $lines, explode(" ", "$lflxr"));
         $fp = fopen("tmp/prot.pdb", "w");
         if (!$fp) die("Failed to write to tmp/prot.pdb.\n");
@@ -198,6 +230,12 @@ function prepare_receptor($pdbinfname, $lflxr)
         if (!$fp) die("Failed to write to tmp/flex.pdb.\n");
         fwrite($fp, implode("\n",$rf[1]));
         fclose($fp);
+
+        if ($mcoord)
+        {
+            unlink($lpdbinfname);
+            unlink("tmp/mtl$pid.pepd");
+        }
 
         // Convert to PDBQT format.
         exec("obabel -i pdb tmp/prot.pdb -xr -o pdbqt -O tmp/prot.pdbqt");
@@ -570,12 +608,16 @@ heredoc;
 
 $num_poses pose(s) found.
 
+heredoc;
+
+        echo "$dockout\n";
+
+        $dockout .= <<<heredoc
+
 Original PDB:
 $origpdb
 
 heredoc;
-
-        echo "$dockout\n";
         $fp = fopen($outfname, "w");
         if (!$fp) die("Failed to write to $outfname.\n");
         fwrite($fp, $dockout);

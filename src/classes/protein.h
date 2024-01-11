@@ -35,6 +35,16 @@ class BallesterosWeinstein
     void from_string(const char* inpstr);
 };
 
+struct ResiduePlaceholder
+{
+    int node = 0;
+    int resno = 0;
+    std::string bw;
+
+    void set(const char* str);
+    void resolve_resno(Protein* prot);
+};
+
 struct SoftBias
 {
     std::string region_name;
@@ -44,6 +54,14 @@ struct SoftBias
     float helical_rotation = 0;                 // Rotation about the helical axis.
     float radial_rotation = 0;                  // Rotation about the imaginary line to the pocket center.
     float transverse_rotation = 0;              // Rotation about the imaginary line perpendicular to the pocket center.
+};
+
+struct MCoord
+{
+    int Z = 29;
+    int charge = 2;
+    Atom* mtl = nullptr;
+    std::vector<ResiduePlaceholder> coordres;
 };
 
 struct AARenumber
@@ -71,6 +89,7 @@ public:
     void delete_residues(int startres, int endres);
     void delete_sidechains(int startres, int endres);
     MetalCoord* coordinate_metal(Atom* metal, int residues, int* resnos, std::vector<string> res_anames);
+    void coordinate_metal(std::vector<MCoord> mtlcoords);
     void set_region(std::string name, int start, int end);
     void set_bw50(int helixno, int resno);
     void renumber_residues(int startres, int endres, int new_startres);
@@ -213,6 +232,7 @@ protected:
     char** remarks = nullptr;
     int remarksz = 0;
     MetalCoord** m_mcoord = nullptr;
+    std::vector<MCoord> m_mcoords;
     int Ballesteros_Weinstein[79];
     std::vector<AABridge> aabridges;
     std::vector<Bond*> connections;

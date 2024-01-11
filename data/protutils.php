@@ -169,10 +169,12 @@ function split_pdb_to_rigid_and_flex($protid, $pdblines, $flxr_array)
 
 	foreach ($pdblines as $ln)
 	{
-		if (substr($ln, 0, 5) != "ATOM ") continue;
+		if (substr($ln, 0, 7) != "ATOM   " && substr($ln, 17, 3) != "MTL") continue;
+		$ln = trim("ATOM   ".substr($ln, 7));
+		if (strlen($ln) > 79) $ln = substr($ln, 0, 76).substr($ln, 77);
 		$y = floatval(substr($ln, 38, 8));
 		$resno = intval(substr($ln, 22, 4));
-		if (in_array($resno, $flxr_res)) $flex[] = $ln;
+		if ($resno && in_array($resno, $flxr_res)) $flex[] = $ln;
 		else $rigid[] = $ln;
 	}
 

@@ -14,6 +14,7 @@ void ResiduePlaceholder::set(const char* str)
 
 void ResiduePlaceholder::resolve_resno(Protein* prot)
 {
+    if (resno && !bw.length()) return;
     int hxno = atoi(bw.c_str());
     const char* dot = strchr(bw.c_str(), '.');
     if (!dot)

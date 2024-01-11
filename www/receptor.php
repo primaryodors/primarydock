@@ -259,7 +259,9 @@ function show_dlmenu(e, prot, lig, v, d)
     $("#dl_mnu_prot")[0].innerText = prot;
     $("#dl_mnu_lig")[0].innerText = decodeURIComponent(lig);
     $("#dl_cd_v")[0].innerText = v;
-    $("#dl_dock")[0].innerText = d;
+    if (d == "pd") $("#dl_dock")[0].innerText = "PrimaryDock";
+    else if (d == "vina") $("#dl_dock")[0].innerText = "AutoDock Vina";
+    else $("#dl_dock")[0].innerText = "(unknown)";
     $("#dl_acv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=active");
     $("#vw_acv_mdl_3d")[0].setAttribute("href", "viewer.php?view=pred&prot="+prot+"&odor="+lig+"&mode=active");
     $("#dl_iacv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=inactive");

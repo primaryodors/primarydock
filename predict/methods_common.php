@@ -934,8 +934,6 @@ heredoc;
     $outdata['method'] = $method;
     $outdata['docker'] = $docker;
 
-    print_r($outdata);
-
     $tme = [];
     foreach ($outdata as $k => $v)
     {

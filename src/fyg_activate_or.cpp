@@ -304,8 +304,6 @@ int main(int argc, char** argv)
     AminoAcid *aa7x31 = p.get_residue_bw("7.31");
     AminoAcid *aa7x49 = p.get_residue_bw("7.49");
     AminoAcid *aa7x53 = p.get_residue_bw("7.53");
-    
-    AminoAcid *aa8x44 = p.get_residue_bw("8.44");
 
     int n1x32 = aa1x32->get_residue_no();
     int n1x50 = aa1x50->get_residue_no();
@@ -344,8 +342,6 @@ int main(int argc, char** argv)
     int n7x31 = aa7x31->get_residue_no();
     int n7x49 = aa7x49->get_residue_no();
     int n7x53 = aa7x53->get_residue_no();
-
-    int n8x44 = aa8x44->get_residue_no();
 
     char l3x37 = aa3x37->get_letter();
     char l3x40 = aa3x40->get_letter();

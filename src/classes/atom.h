@@ -211,6 +211,7 @@ public:
 
     bool shares_bonded_with(Atom* btom);
     bool check_Greek_continuity();
+    Atom* get_heaviest_bonded_atom_that_isnt(Atom* excluded);
 
     Bond* get_bond_between(Atom* btom);
     Bond* get_bond_between(const char* bname);

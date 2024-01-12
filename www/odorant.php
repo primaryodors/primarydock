@@ -27,6 +27,19 @@ else
     $correlations = json_decode(file_get_contents($pqcorr), true);
 }
 
+$predictions = [];
+chdir(__DIR__);
+$dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
+$odorname_under = str_replace(' ', '_', $odor["full_name"]);
+foreach ($dock_results as $protid => $dr)
+{
+    if (isset($dr[$odorname_under]))
+    {
+        $predictions[$protid] = $dr[$odorname_under]["DockScore"];
+    }
+}
+
+
 $md5 = md5($odor['smiles']);
 $imgfname = "assets/pngs/$md5.png";
 if ( @$_REQUEST['refresh'] || !file_exists($imgfname))
@@ -134,6 +147,9 @@ window.setTimeout( function()
 <div class="tab" style="display: inline-block; margin-top: 30px;">
     <button class="tabstatic" id="tabFullName"><?php echo $odor['full_name']; ?></button>
 	<button class="tablinks" id="tabAroma" onclick="openTab(this, 'Aroma');">Notes & Receptors</button>
+    <?php if (count($predictions)) { ?>
+	<button class="tablinks" id="tabPred" onclick="openTab(this, 'Predict');">Predictions</button>
+    <?php } ?>
     <button class="tablinks" id="tabRefs" onclick="openTab(this, 'Refs');">References</button>
 	<button	class="tablinks"
 			id="tabStructure"
@@ -280,6 +296,97 @@ foreach (array_keys($sorted) as $rcpid)
     else echo "<td>&nbsp;</td>";
 
     if (@$agonist[$rcpid])
+    {
+        $notes = substr(get_notes_for_receptor($rcpid, $correlations), 0, 123);
+        $notes = make_clickable_notes(explode(", ", $notes));
+        $notes = implode(", ", $notes);
+        if (substr($notes, 0, 1) == '(')
+        {
+            $notes = "<i class=\"dim\">$notes</i>";
+        }
+        echo "<td style=\"white-space: nowrap;\">$notes</td>\n";
+    }
+    else
+    {
+        echo "<td>&nbsp;</td>\n";
+    }    
+
+    echo "</tr>\n";
+}
+
+?>
+</table>
+</div>
+</div>
+
+</div>
+<div id="Predict" class="tabcontent">
+
+<div class="scrollw">
+    <div>
+        <img class="skeletal" src="<?php echo $imgfname; ?>">
+        <img class="barchart" src="barchart.php?m=p&o=<?php echo urlencode($odor['smiles']); ?>&t=<?php echo time(); ?>">
+    </div>
+</div>
+
+<p class="aromainfo">
+    <?php
+    for ($i=1; isset($odor["name$i"]); $i++)
+    {
+        if ($i > 1) echo ", ";
+        echo $odor["name$i"];
+    }
+    if (isset($odor["iupac"]))
+    {
+        if ($i > 1) echo ", ";
+        echo $odor["iupac"];
+        if ($i == 1) echo "<br><br>";
+    }
+    if ($i > 1) echo "<br><br>";
+    ?>
+	<strong>SMILES:</strong><br>
+	<?php echo $odor['smiles']; ?><br>
+	<br>
+    <strong>Aroma Description:</strong>
+    <br>
+    <?php 
+    foreach ($odor['aroma'] as $refurl => $notes)
+    {
+        $comma = false;
+        foreach ($notes as $note)
+        {
+            if ($comma) echo ", ";
+            echo "$note";
+            $comma = true;
+        }
+    }
+
+    if (@$odor['comment']) echo "<br>{$odor['comment']}<br>";
+    ?>
+</p>
+
+<div class="box" style="height: auto!important;">
+<div class="row content scrollh">
+<table class="rcplist">
+
+<tr>
+    <th>Receptor</th>
+    <th>Docking Score</th>
+    <th>Correlated Perceptual Qualities</th>
+</tr>
+
+<?php
+
+arsort($predictions);
+
+foreach ($predictions as $rcpid => $score)
+{
+    echo "<tr>\n";
+    echo "<td><a href=\"receptor.php?r=$rcpid\">$rcpid</a></td>\n";
+
+    echo "<td style=\"white-space: nowrap;\">$score</td>\n";
+
+    if ($score > 0)
     {
         $notes = substr(get_notes_for_receptor($rcpid, $correlations), 0, 123);
         $notes = make_clickable_notes(explode(", ", $notes));

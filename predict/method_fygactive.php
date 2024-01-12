@@ -8,55 +8,61 @@
 // php -f predict/method_fygactive.php prot=OR1A1 lig=d-limonene
 //
 
-// Configurable variables
-$flex = 1;                      // Flexion (0 or 1) for active dock.
-$flxi = 1;                      // Flexion for inactive dock.
-$pose = 15;
-$iter = 30;
-$elim = 1e3;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
-$num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
-
-$accuracy_receptors = ["OR51E2", "TAAR1"];
-
 chdir(__DIR__);
 require_once("methods_common.php");
 chdir(__DIR__);
 require_once("../data/protutils.php");
 chdir(__DIR__);
+require_once("template.php");
+chdir(__DIR__);
+
+// Configurable variables
+$flex = 1;                      // Flexion (0 or 1).
+$pose = 15;
+$iter = 30;
+$elim = 1e3;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
+$num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
 
 prepare_outputs();
 
-$metrics_to_process =
-[
-    "BENERG" => "BindingEnergy",
-    "BENERG.rgn" => "BindingEnergy.rgn",
-    "BEST" => "Pose1"
-];
+$metrics_to_process["BEST"] = "Pose1";
 
 function make_prediction($data)
 {
     global $protid, $ligname;
 
-    if (isset($data["a_Pose1"]))
+    if (isset($data["a_BENERG"]) || isset($data["a_BindingEnergy"]))
     {
-        $ae = min(floatval(@$data['a_BindingEnergy']), floatval(@$data['ad_BindingEnergy']));
-        $ie = floatval(@$data["i_BindingEnergy"]);
-        $a1 = min(floatval($data['a_Pose1']), floatval(@$data['ad_Pose1']));
-        $i1 = floatval(@$data['i_Pose1']);
-        if ($a1 < 0 && $a1 < $i1)
+        // TODO: For ascore and iscore each, require contact between ligand and TMR6 and
+        // contact between ligand and any of TMR3, TMR4, EXR2, TMR5, TMR7. If either condition
+        // not met, zero out that score. For FYG activation receptors with no rock6, also require
+        // that the ligand extend far enough in the -Y direction impinge on the vdW space of at
+        // least one side chain displaced by FYG activation.
+        $ascore = min(0, floatval(@$data['a_BENERG']), floatval(@$data['a_BindingEnergy']));
+        $iscore = min(0, floatval(@$data['i_BENERG']), floatval(@$data['i_BindingEnergy']));
+
+        if (floatval(@$data['a_Pose1']) < floatval(@$data['i_Pose1']))
+        {
+            $ascore = floatval(@$data['a_Pose1']);
+            $iscore = floatval(@$data['i_Pose1']);
+        }
+
+        if (!@$data["a_BindingEnergy.6"]) $ascore = 0;
+        if (!@$data["a_BindingEnergy.3"] && !@$data["a_BindingEnergy.4"] && !@$data["a_BindingEnergy.45"]
+            && !@$data["a_BindingEnergy.5"] && !@$data["a_BindingEnergy.7"]) $iscore = 0;
+        if (!@$data["i_BindingEnergy.6"]) $iscore = 0;
+        if (!@$data["i_BindingEnergy.3"] && !@$data["i_BindingEnergy.4"] && !@$data["i_BindingEnergy.45"]
+            && !@$data["i_BindingEnergy.5"] && !@$data["i_BindingEnergy.7"]) $iscore = 0;
+
+        if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
+            $data['DockScore'] = (min($iscore, 0) - $ascore);
         }
-        else if ($ae < 0 && $ae < $ie)
-        {
-            $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($ie, 0) - $ae) / 2;
-        }
-        else if ($a1 < 0 && $a1 > $i1)
+        else if ($iscore < 0 && $iscore < $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
+            $data['DockScore'] = (min($iscore, 0) - $ascore);
         }
         else
         {
@@ -79,129 +85,29 @@ function make_prediction($data)
     return $data;
 }
 
-function build_template()
-{
-    global $template, $protid, $cryoem, $has_rock6, $has_fyg, $args;
-
-    if (substr($protid, 0, 4) == "TAAR")
-    {
-        $template = $cryoem["mTAAR9"];
-        // TODO: Blend mTAAR9 with TAAR1 depending on sequence similarity.
-    }
-    else if (substr($protid, 0, 2) == "OR")
-    {
-        $fam = intval(substr($protid, 2, 2));
-        if ($fam == 51)
-        {
-            $template = $cryoem["OR51E2"];
-        }
-        else if ($fam == 52)
-        {
-            foreach ($cryoem["OR52"] as $hxno => $metrics)
-            {
-                foreach ($metrics as $metric => $dimensions)
-                {
-                    $template[$hxno][$metric] = $cryoem["OR52"][$hxno][$metric];
-
-                    $template[$hxno][$metric]["sigma"]
-                        + 0.4 * $cryoem["TAAR1"][$hxno][$metric]["sigma"]
-                        + 0.6 * $cryoem["mTAAR9"][$hxno][$metric]["sigma"];
-                }
-            }
-        }
-        else
-        {
-            foreach ($cryoem["OR51E2"] as $hxno => $metrics)
-            {
-                foreach ($metrics as $metric => $dimensions)
-                {
-                    foreach (array_keys($dimensions) as $dimension)
-                    {
-                        if ($dimension == "sigma")
-                        {
-                            $template[$hxno][$metric][$dimension]
-                                = 0.4 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
-                                + 0.6 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
-                        }
-                        else
-                        {
-                            // TODO: Make the proportions dependent on sequence similarity.
-                            $template[$hxno][$metric][$dimension]
-                                = 0.40 * $cryoem["OR51E2"][$hxno][$metric][$dimension]
-                                + 0.30 * $cryoem["OR52"][$hxno][$metric][$dimension]
-                                + 0.10 * $cryoem["TAAR1"][$hxno][$metric][$dimension]
-                                + 0.20 * $cryoem["mTAAR9"][$hxno][$metric][$dimension];
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Get typology. Do a no-save run of fyg_activate_or to determine whether protein has FYG or rock6 capabilities.
-    $output = [];
-    exec("bin/fyg_activate_or --nosave $protid", $output);
-    $has_rock6 = $has_fyg = false;
-    foreach ($output as $line)
-    {
-        if (false!==strpos($line, "Performing rock6")) $has_rock6 = true;
-        if (false!==strpos($line, "Performing FYG activation")) $has_fyg = true;
-    }
-}
-
-
 chdir(__DIR__);
 chdir("..");
 
 $pdbfname_active = str_replace(".upright.pdb", ".active.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 $template = [];
-$args = "$protid";
-
-$cryoem = json_decode(file_get_contents("data/cryoem_motions.json"), true);
 
 if (!file_exists($pdbfname_active) || filemtime($pdbfname_active) < filemtime("bin/fyg_activate_or"))
 {
-    build_template();
-
-    foreach ($template as $hxno => $metrics)
+    if (check_already_fyg_activating($protid))
     {
-        foreach ($metrics as $metric => $dimensions)
+        echo "Waiting on activation...";
+        sleep(30);
+        while (check_already_fyg_activating($protid))
         {
-            if ($hxno == 6)
-            {
-                if ($metric == "cyt" && ($has_fyg || $has_rock6)) continue;
-                else if ($metric == "exr" && $has_rock6) continue;
-            }
-
-            $cmdarg = "--" . substr($metric, 0, 1) . $hxno;
-            $args .= " $cmdarg {$dimensions['x']} {$dimensions['y']} {$dimensions['z']}";
+            echo ".";
+            sleep(10);
         }
+        echo "\n";
+
+        if (!file_exists($pdbfname_active)) dock_failed();
     }
-
-    $cmd = "bin/fyg_activate_or $args";
-    echo "$cmd\n";
-    passthru($cmd);
-
-    if (in_array($protid, $accuracy_receptors) && file_exists("devenv"))
-    {
-        $c = file_get_contents("predict/model_accuracy.sh");
-        $lines = explode("\n", $c);
-        foreach ($lines as $lno => $ln)
-        {
-            if (false!==strpos($ln, "bin/fyg_activate_or $protid "))
-            {
-                $lines[$lno] = "make bin/fyg_activate_or && $cmd && bin/pepteditor predict/model_accuracy.pepd";
-            }
-        }
-        $c = implode("\n", $lines);
-        $fp = fopen("predict/model_accuracy.sh", "w");
-        if ($fp)
-        {
-            fwrite($fp, $c);
-            fclose($fp);
-        }
-    }
+    else do_templated_activation();
 }
 
 $flex_constraints = "";
@@ -209,39 +115,12 @@ if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname)
 
 $fam = family_from_protid($protid);
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
+$cenres = substr($cenres_inactive, 8);
 
-$configf = <<<heredoc
+prepare_receptor($pdbfname, "$flxr $iflxr");
 
-PROT $pdbfname
-LIG sdf/$ligname.sdf
-
-$cenres_inactive
-SIZE $size
-# H2O 5
-$mcoord
-$atomto
-$stcr
-$flxr
-$istcr
-$iflxr
-
-EXCL 1 56		# Head, TMR1, and CYT1.
-
-SEARCH $search
-POSE $pose
-ELIM $elim
-$flex_constraints
-ITERS $iter
-PROGRESS
-
-FLEX $flxi
-WET
-
-OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.inactive.model%o.pdb
-
-
-heredoc;
+// Convert ligand as well.
+prepare_ligand($ligname);
 
 chdir(__DIR__);
 chdir("..");
@@ -252,43 +131,14 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 
 $pdbfname = $pdbfname_active;
-
 $outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
+$cenres = substr($cenres_active, 8);
 
-$configf = <<<heredoc
+prepare_receptor($pdbfname, "$flxr $aflxr");
 
-PROT $pdbfname
-LIG sdf/$ligname.sdf
+$poses = process_dock("a");
 
-$cenres_active
-SIZE $size
-# H2O 5
-$mcoord
-$atomto
-$stcr
-$flxr
-$astcr
-$aflxr
-
-EXCL 1 56		# Head, TMR1, and CYT1.
-
-SEARCH $search
-POSE $pose
-ELIM $elim
-$flex_constraints
-ITERS $iter
-PROGRESS
-
-FLEX $flex
-WET
-
-OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
-
-
-heredoc;
-
-$poses = process_dock("a", false, true);
+exit;     // TODO: Bring back all that stuff in methods_common get from scorpdbee what used to get from primarysuck.
 
 if ((!$poses || $best_energy >= 0) && count($clashcomp) && $num_std_devs)
 {

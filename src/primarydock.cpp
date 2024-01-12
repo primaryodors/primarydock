@@ -1925,105 +1925,7 @@ int main(int argc, char** argv)
 
     if (mtlcoords.size())
     {
-        for (i=0; i<mtlcoords.size(); i++)
-        {
-            int charge_left = mtlcoords[i].charge;
-            Point lpt;
-            Molecule** lmc = new Molecule*[mtlcoords[i].coordres.size()+4];
-            lmc[0] = new Molecule("lcm");
-            Atom* lmtl = lmc[0]->add_atom(Atom::esym_from_Z(mtlcoords[i].Z), Atom::esym_from_Z(mtlcoords[i].Z), nullptr, 0);
-            lmtl->increment_charge(mtlcoords[i].charge);
-            mtlcoords[i].mtl = lmtl;
-            lmc[0]->movability = MOV_ALL;
-
-            l = 1;
-            for (j=0; j<mtlcoords[i].coordres.size(); j++)
-            {
-                mtlcoords[i].coordres[j].resolve_resno(protein);
-                AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
-                if (aa)
-                {
-                    aa->movability = MOV_FLEXONLY;
-                    lmc[l++] = (Molecule*)aa;
-                    Atom** Ss = aa->get_most_bindable(1, lmtl);
-                    lpt = lpt.add((Ss && Ss[0]) ? Ss[0]->get_location() : aa->get_barycenter());
-
-                    // If cysteine, make thiolate form.
-                    if (aa->is_thiol() && charge_left)
-                    {
-                        if (Ss)
-                        {
-                            Atom* S = Ss[0];
-                            Atom* H = S->is_bonded_to("H");
-                            if (H)
-                            {
-                                aa->delete_atom(H);
-                                S->increment_charge(-1);
-                                charge_left--;
-                            }
-                        }
-                    }
-
-                    if (l <= 2) aa->add_existing_atom(lmtl);
-                    aa->coordmtl = lmtl;
-                }
-            }
-            lmc[l] = nullptr;
-            if (l > 1)
-            {
-                l--;
-                lpt.x /= l; lpt.y /= l; lpt.z /= l;
-                l++;
-
-                lmtl->move(lpt);
-            }
-
-            lmtl->aaletter = '\0';
-            strcpy(lmtl->aa3let, "MTL");
-            lmtl->residue = 0;
-
-            Molecule::conform_molecules(lmc, 50);
-
-            AminoAcid* can_reach_metal[256];
-            int num_can_reach = protein->get_residues_can_clash_ligand(can_reach_metal, lmc[0], lmtl->get_location(), Point(2.5,2.5,2.5), nullptr);
-            bool cr_eq_mc[num_can_reach];
-
-            for (miter=0; miter<20; miter++)
-            {
-                for (j1=0; j1<num_can_reach; j1++)
-                {
-                    bool found = false;
-                    if (!miter)
-                    {
-                        for (i2=0; i2<mtlcoords[i].coordres.size(); i2++)
-                        {
-                            if (mtlcoords[i].coordres[i2].resno == can_reach_metal[j1]->get_residue_no()) found = true;
-                        }
-                        cr_eq_mc[j1] = found;
-                    }
-                    else found = cr_eq_mc[j1];
-
-                    if (found) continue;
-
-                    Atom* a = can_reach_metal[j1]->get_nearest_atom(lmtl->get_location());
-                    float r = a->distance_to(lmtl);
-                    float vdW = lmtl->get_vdW_radius() + a->get_vdW_radius();
-                    if (r < vdW)
-                    {
-                        SCoord to_move = lmtl->get_location().subtract(a->get_location());
-                        to_move.r = vdW - r;
-                        lmtl->move_rel(&to_move);
-                    }
-                }
-            }
-            Molecule::conform_molecules(lmc, 50);
-
-            for (j=0; j<mtlcoords[i].coordres.size(); j++)
-            {
-                AminoAcid* aa = protein->get_residue(mtlcoords[i].coordres[j].resno);
-                if (aa) aa->movability = MOV_PINNED;
-            }
-        }
+        mtlcoords = protein->coordinate_metal(mtlcoords);
 
         temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_metal.pdb";
 
@@ -2090,9 +1992,10 @@ int main(int argc, char** argv)
 
     protein->mcoord_resnos = mcoord_resno;
 
-    for (i=0; mcoord_resno[i]; i++) addl_resno[i] = mcoord_resno[i];
-    for (l=0; l < tripswitch_clashables.size(); l++) addl_resno[i+l] = tripswitch_clashables[l];
-    addl_resno[i+l] = 0;
+    l=0;
+    for (i=0; mcoord_resno[i]; i++) addl_resno[l++] = mcoord_resno[i];
+    for (i=0; i < tripswitch_clashables.size(); i++) addl_resno[l++] = tripswitch_clashables[i];
+    addl_resno[l] = 0;
 
     // Load the ligand or return an error.
     // Molecule m(ligfname);
@@ -2309,7 +2212,7 @@ _try_again:
         last_ttl_bb_dist = 0;
         ligand->minimize_internal_clashes();
         float lig_min_int_clsh = ligand->get_internal_clashes();
-        ligand->crumple(triangular);
+        ligand->crumple(M_PI);
 
         for (i=0; i<dyn_motions.size(); i++) dyn_motions[i].apply_absolute(0);
 
@@ -2710,6 +2613,12 @@ _try_again:
             cout << endl;
             #endif
 
+            #if _dbg_groupsel
+            cout << "Candidate binding residues: ";
+            for (i=0; i<sphres; i++) cout << *reaches_spheroid[nodeno][i] << " ";
+            cout << endl;
+            #endif
+
             for (i=0; i<_INTER_TYPES_LIMIT; i++) total_binding_by_type[i] = 0;
             for (i=0; i<sphres; i++)
             {
@@ -2745,6 +2654,12 @@ _try_again:
                 protein->set_conditional_basicities();
                 if (use_bestbind_algorithm)
                 {
+                    #if _dbg_groupsel
+                    cout << "Candidate binding residues: ";
+                    for (i=0; i<sphres; i++) cout << *reaches_spheroid[nodeno][i] << " ";
+                    cout << endl;
+                    #endif
+
                     std::vector<std::shared_ptr<ResidueGroup>> scg = ResidueGroup::get_potential_side_chain_groups(reaches_spheroid[nodeno], ligcen_target);
                     global_pairs = GroupPair::pair_groups(agc, scg, ligcen_target);
 

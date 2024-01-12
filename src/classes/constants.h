@@ -122,11 +122,12 @@
 #define global_clash_allowance 0.4
 #define double_hydrogen_clash_allowance_multiplier 1.5
 #define ignore_double_hydrogen_clashes 0
+#define ignore_nonpolar_hydrogen_clashes 1
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 3.0
 #define lmpull 0.5
-#define lmsteps 10
+#define lmsteps 3
 #define recapture_ejected_ligand 0
 
 #define amide_zwitterionic_amount 0.1
@@ -137,7 +138,7 @@
 #define _preflex_alignment_res 1
 #define bb_stochastic 0.25
 #define bb_group_distance_cutoff 4.3
-#define bb_enable_residue_disqualifications 1
+#define bb_enable_residue_disqualifications 0
 #define bb_disqualification_energy 1000
 #define enforce_no_bb_pullaway 0
 #define bb_pullaway_allowance 0.5
@@ -303,9 +304,9 @@
 // if a negatively charged atom is nearby.
 #define _ALLOW_PROTONATE_PNICTOGENS 0
 #define _allow_conditional_basicity 1
-#define _allow_conditional_basicity_with_acid_ligand 1
-#define cond_bas_hbond_energy_threshold 2.0
-#define cond_bas_hbond_distance_threshold 3.0
+#define _allow_conditional_basicity_with_acid_ligand 0
+#define cond_bas_hbond_energy_threshold 10.0
+#define cond_bas_hbond_distance_threshold 2.9
 
 #define prealign_iters 50
 #define prealign_momenta_mult 0
@@ -354,7 +355,6 @@
 #define _dbg_cond_basic_acd_lig 0
 #define _dbg_conj_chg 0
 #define _dbg_conjugation 0
-#define _dbg_moieties 0
 #define _dbg_find_blasted_segfault 0
 #define _dbg_fitness_plummet 0
 #define _dbg_flexion_selection 0
@@ -368,10 +368,12 @@
 #define _dbg_imidazole_check 0
 #define _dbg_improvements_only_rule 0
 #define _dbg_interatomic_forces 0
+#define _dbg_internal_energy 0
 #define _dbg_linear_motion 0
 #define _DBG_LONELINESS 0
 #define _dbg_mand_conn 0
 #define _DBG_MAX_CLASHES 0
+#define _dbg_moieties 0
 #define _DBG_MOLBB 0
 #define _dbg_mol_flexion 0
 #define _dbg_mol_frames 0

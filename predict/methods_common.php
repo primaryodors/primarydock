@@ -1,6 +1,6 @@
 <?php
 
-global $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere, $metrics_to_process, $clashcomp, $best_energy;
+global $docker, $dock_metals, $bias_by_energy, $dock_results, $pdbfname, $fam, $do_scwhere, $metrics_to_process, $clashcomp, $best_energy;
 
 // Includes
 chdir(__DIR__);
@@ -19,6 +19,7 @@ $clashcomp = [];
 
 $method = explode("_", $_SERVER['PHP_SELF'])[1];
 $method = explode(".", $method)[0];
+echo "Method is $method.\n";
 
 $result = $output = false;
 chdir(__DIR__);
@@ -34,6 +35,7 @@ $metrics_to_process =
 [
   "BENERG" => "BindingEnergy",
   "BENERG.rgn" => "BindingEnergy.rgn",
+  "POSES" => "POSES"
 ];
 
 // Load data
@@ -63,6 +65,10 @@ foreach (@$argv as $a)
 	$a = explode('=',$a,2);
 	$_REQUEST[$a[0]] = (count($a)>1) ? $a[1] : true;
 }
+
+$docker = "pd";
+if (@$_REQUEST["docker"]) $docker = $_REQUEST["docker"];
+echo "Docker is $docker.\n";
 
 if (@$_REQUEST['simul']) $max_simultaneous_docks = intval($_REQUEST['simul']) ?: 2;
 
@@ -138,9 +144,129 @@ extract(binding_site($protid));
 
 $outfname = "output.dock";
 
+function bad_docker_code()
+{
+    die("Unrecognized docker. The choices are pd or vina.\n");
+}
+
+function dock_failed($reason = "")
+{
+    if ($reason) echo "Docking FAILED: $reason.\n";
+    else echo "Docking FAILED.\n";
+
+    if (stream_isatty(STDOUT) && file_exists("predict/soundalert"))
+    {
+        $play_sound = true;
+        $sa = explode(",",file_get_contents("predict/soundalert"));
+        if (count($sa) == 2)
+        {
+            $hfrom = intval($sa[0]);
+            $hto = intval($sa[1]);
+            $hnow = intval(date("H"));
+
+            if ($hnow < $hfrom || $hnow > $hto) $play_sound = false;
+        }
+
+        $hassox = [];
+        exec("which sox", $hassox);
+        if ($play_sound && count($hassox))
+        {
+            exec("play crash.mp3 &");
+        }
+    }
+
+    exit;
+}
+
+function prepare_receptor($pdbinfname, $lflxr)
+{
+    global $docker, $protid, $mcoord;
+    switch(strtolower($docker))
+    {
+        case "pd":
+        break;
+
+        case "vina":
+        if ($mcoord)
+        {
+            $pieces = explode(" ", $mcoord);
+            foreach ($pieces as $k => $pc)
+            {
+                if (preg_match("/^[0-9]{1,2}[.x][0-9]{1,2}$/", $pc)) $pieces[$k] = "%$pc";
+            }
+            $mcoord = implode(" ", $pieces);
+            $pid = getmypid();
+            $lpdbinfname = "tmp/mtl$pid.pdb";
+            file_put_contents("tmp/mtl$pid.pepd", <<<heredoc
+LOAD $pdbinfname
+$mcoord
+SAVE $lpdbinfname
+
+
+heredoc
+            );
+            $cmd = "bin/pepteditor tmp/mtl$pid.pepd";
+            echo "$cmd\n";
+            exec($cmd);
+
+            if (!file_exists($lpdbinfname))
+            {
+                dock_failed();
+                exit;
+            }
+        }
+        else
+        {
+            $lpdbinfname = $pdbinfname;
+        }
+
+        $lines = explode("\n", file_get_contents($lpdbinfname));
+        $rf = split_pdb_to_rigid_and_flex($protid, $lines, explode(" ", "$lflxr"));
+        $fp = fopen("tmp/prot.pdb", "w");
+        if (!$fp) die("Failed to write to tmp/prot.pdb.\n");
+        fwrite($fp, implode("\n",$rf[0]));
+        fclose($fp);
+        $fp = fopen("tmp/flex.pdb", "w");
+        if (!$fp) die("Failed to write to tmp/flex.pdb.\n");
+        fwrite($fp, implode("\n",$rf[1]));
+        fclose($fp);
+
+        if ($mcoord)
+        {
+            unlink($lpdbinfname);
+            unlink("tmp/mtl$pid.pepd");
+        }
+
+        // Convert to PDBQT format.
+        exec("obabel -i pdb tmp/prot.pdb -xr -o pdbqt -O tmp/prot.pdbqt");
+        exec("obabel -i pdb tmp/flex.pdb -xs -o pdbqt -O tmp/flex.pdbqt");
+        break;
+
+        default:
+        bad_docker_code();
+    }
+}
+
+function prepare_ligand($lig_name)
+{
+    global $docker;
+    switch(strtolower($docker))
+    {
+        case "pd":
+        break;
+
+        case "vina":
+        exec("obabel -i sdf \"sdf/$lig_name.sdf\" -o pdbqt -O tmp/lig.pdbqt");
+        break;
+
+        default:
+        bad_docker_code();
+    }
+}
+
 function prepare_outputs()
 {
-    global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname;
+    global $ligname, $dock_metals, $protid, $fam, $outfname, $pdbfname, $docker;
     global $binding_pockets, $cenres_active, $cenres_inactive, $size, $search, $num_std_devs;
     global $atomto, $stcr, $flxr, $mcoord, $mbp, $astcr, $istcr, $aflxr, $iflxr;
 
@@ -192,6 +318,11 @@ function prepare_outputs()
     
     if ($mbp)
     {
+        foreach ($mbp as $k => $v)
+        {
+            if (substr($k,0,1)=='#') unset($mbp[$k]);
+        }
+
         if (isset($mbp['odorophores']))
         {
             $sdfname = "sdf/".(str_replace(' ', '_', $ligname)).".sdf";
@@ -248,14 +379,15 @@ function prepare_outputs()
     if ($mbp && isset($mbp["pocket"]))
     {
         $cenres_active = $cenres_inactive = "CEN RES {$mbp["pocket"]}";
-    }
-    if ($mbp && isset($mbp["active_pocket"]))
-    {
-        $cenres_active = "CEN RES {$mbp["active_pocket"]}";
-    }
-    if ($mbp && isset($mbp["inactive_pocket"]))
-    {
-        $cenres_inactive = "CEN RES {$mbp["inactive_pocket"]}";
+    
+        if ($mbp && isset($mbp["active_pocket"]))
+        {
+            $cenres_active = "CEN RES {$mbp["active_pocket"]}";
+        }
+        if ($mbp && isset($mbp["inactive_pocket"]))
+        {
+            $cenres_inactive = "CEN RES {$mbp["inactive_pocket"]}";
+        }
     }
     else
     {
@@ -276,63 +408,345 @@ function prepare_outputs()
 $multicall = 0;
 function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_clashing = false)
 {
-    global $ligname, $protid, $configf, $dock_retries, $outfname, $metrics_to_process, $bias_by_energy, $version;
+    global $ligname, $protid, $configf, $dock_retries, $pdbfname, $outfname, $metrics_to_process, $bias_by_energy, $version;
     global $sepyt, $json_file, $do_scwhere, $multicall, $method, $clashcomp, $best_energy;
+    global $cenres, $size, $docker, $mcoord, $atomto, $stcr, $flxr, $search, $pose, $elim, $flex_constraints, $iter, $flex;
     $multicall++;
     if ($multicall > 1) $noclobber = true;
 
     if (!file_exists("tmp")) mkdir("tmp");
-    $lignospace = str_replace(" ", "", $ligname);
-    $prefixfn = $metrics_prefix ? "_$metrics_prefix" : "";
-    $cnfname = "tmp/prediction.$protid$prefixfn.$lignospace.config";
-    $f = fopen($cnfname, "wb");
-    if (!$f) die("File write error. Check tmp folder is write enabled.\n");
-
-    if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
-
-    // echo $configf;
-
-    fwrite($f, $configf);
-    fclose($f);
-
+    $modelfname = preg_replace("/.dock$/", ".model%o.pdb", $outfname);
     $retvar = 0;
-    $best_energy = false;
 
-    $outlines = [];
-    if (@$_REQUEST['saved'])
+    switch(strtolower($docker))
     {
-        $outlines = explode("\n", file_get_contents($outfname)); // $_REQUEST['saved']));
-    }
-    else
-    {
-    	$elim = 0;
-        for ($try = 0; $try < $dock_retries; $try++)
-        {            
+        case "vina":
+
+        if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
+        $cenresno = [];
+        $center = "--center_x 0 --center_y 15 --center_z 0";
+        $size = "--size_x 20 --size_y 20 --size_z 20";
+        if ($cenres)
+        {
+            foreach (explode(" ", $cenres) as $bw)
+            {
+                $cenresno[] = resno_from_bw($protid, $bw);
+            }
+
+            $cenresno = implode(" ", $cenresno);
+            $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";
+            echo "$cmd\n";
+            $censz = [];
+            exec($cmd, $censz);
+
+            foreach ($censz as $ln)
+            {
+                if (substr($ln, 0, 5) == "CEN: ")
+                {
+                    $ln = substr($ln, 5);
+                    $pcen = explode(",",str_replace('[','',str_replace(']','',$ln)));
+                    $center = "--center_x {$pcen[0]} --center_y {$pcen[1]} --center_z {$pcen[2]}";
+                }
+                if (substr($ln, 0, 4) == "SZ: ")
+                {
+                    $ln = substr($ln, 4);
+                    $psiz = explode(",",str_replace('[','',str_replace(']','',$ln)));
+                    $sx = floatval($psiz[0]) + 5;
+                    $sy = floatval($psiz[1]) + 5;
+                    $sz = floatval($psiz[2]) + 5;
+                    $size = "--size_x $sx --size_y $sy --size_z $sz";
+                }
+            }
+        }
+
+        $best_energy = false;
+
+        $outlines = [];
+        if (@$_REQUEST['saved'])
+        {
+            $outlines = explode("\n", file_get_contents($outfname));
+        }
+        else
+        {
+            if (!file_exists("bin/vina"))
+            {
+                exec("wget https://github.com/ccsb-scripps/AutoDock-Vina/releases/download/v1.2.5/vina_1.2.5_linux_x86_64 -O bin/vina");
+                exec("chmod +x bin/vina");
+            }
             set_time_limit(300);
             $outlines = [];
-            $cmd = "bin/primarydock \"$cnfname\"";
-            if ($elim) $cmd .= " --elim $elim";
+            $cmd = "bin/vina --receptor tmp/prot.pdbqt --flex tmp/flex.pdbqt --ligand tmp/lig.pdbqt $center $size --exhaustiveness 20 --cpu 1";
             echo "$cmd\n";
-            passthru($cmd, $retvar);
-            $outlines = explode("\n", file_get_contents($outfname));
-            if (count($outlines) >= 200) break;
-            if (!$elim) $elim = 99;
-            else $elim *= 1.333;
+            passthru("$cmd | tee tmp/vina.out", $retvar);
+            $outlines = explode("\n", file_get_contents("tmp/vina.out"));
         }
-    }
 
-    if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
+        $mode = "";
+        $pose = 0;
+        $node = -1;
+        $outdqty = [];
+        
+        if ($noclobber)
+        {
+            if (file_exists($json_file)) $dock_results = json_decode(file_get_contents($json_file), true);
+            $outdata = @$dock_results[$protid][$ligname] ?: [];
+        }
+        else $outdata = [];
+
+        $weight = [];
+        $pose_node_has_weight = [];
+        $num_poses = 0;
+
+        echo "Loading $pdbfname...\n";
+        $origpdb = $outpdb = file_get_contents($pdbfname);
+
+        $posesln = false;
+        $affinities = [];
+        $mustattribute = true;
+        $attribution = "";
+        foreach ($outlines as $lno => $ln)
+        {
+            if ($mustattribute && $lno > 2)
+            {
+                if (false !== strpos($ln, "####")) $mustattribute = false;
+                $ln = trim(str_replace('#', '', $ln));
+                $attribution .= "REMARK   1 $ln\n";
+                continue;
+            }
+
+            if (false !== strpos($ln, "affinity"))
+            {
+                $posesln = true;
+                continue;
+            }
+
+            if (intval($ln))
+            {
+                $ln = trim($ln);
+                $ln = preg_replace("/\\s+/", " ", $ln);
+                $ln = explode(" ", $ln);
+                $affinities[] = floatval(@$ln[1]) * 4.184;
+                $num_poses++;
+            }
+        }
+
+        $outpdb = $attribution.$outpdb;
+
+        if (!$posesln)
+        {
+            dock_failed("no affinities");
+            return 0;
+        }
+
+        $outpdb = str_replace("TER\n", "", $outpdb);
+        $outpdb = str_replace("END\n", "", $outpdb);
+
+        $dockpdb = [];
+        $ol = explode("\n", file_get_contents("tmp/lig_out.pdbqt"));
+        $fatno = 0;
+        $lnposeno = 1;
+        $dockpdb[$lnposeno] = "";
+        foreach($ol as $ln)
+        {
+            if (substr($ln, 0, 5) != "ATOM ") continue;
+            $atno = intval(substr($ln, 7, 4));
+            if ($atno < $fatno)
+            {
+                $lnposeno++;
+                $dockpdb[$lnposeno] = "";
+            }
+            $esym = trim(substr($ln, 13, 2));
+            $ln = "HETATM ".(9000+$atno)."  ".str_pad($esym.$atno, 4)."LIG".substr($ln, 20,57).$esym;
+            $dockpdb[$lnposeno] .= "$ln\n";
+            $fatno = $atno;
+        }
+
+        $dockout = <<<heredoc
+PDB file: $pdbfname
+Ligand: sdf/$ligname.sdf
+
+External dock using third party docker.
+
+heredoc;
+        
+        foreach ($dockpdb as $poseno => $lpdb)
+        {
+            $loutpdb = $outpdb."\n".$lpdb;
+            $loutpdb .= "\nTER\nEND\n";
+
+            $lmodelfname = str_replace("%o", $poseno, $modelfname);
+            $fp = fopen($lmodelfname, "w");
+            if (!$fp) die("Failed to write to $lmodelfname.\n");
+            fwrite($fp, $loutpdb);
+            fclose($fp);
+
+            $outdata[$metrics_prefix."POSES"] = $num_poses;
+            $scoring = [];
+            $cmd = "bin/score_pdb -n \"$lmodelfname\"";
+            exec($cmd, $scoring);
+            // echo "$cmd\n";
+            $scoring = implode("\n", $scoring);
+
+            $dockout .= <<<heredoc
+
+Pose: $poseno
+Node: 0
+$scoring
+
+# PDB Data
+PDBDAT:
+$lpdb
+TER
+END
+
+
+heredoc;
+
+        }
+
+        $dockout .= <<<heredoc
+
+$num_poses pose(s) found.
+
+heredoc;
+
+        echo "$dockout\n";
+
+        $dockout .= <<<heredoc
+
+Original PDB:
+$origpdb
+
+heredoc;
+        $fp = fopen($outfname, "w");
+        if (!$fp) die("Failed to write to $outfname.\n");
+        fwrite($fp, $dockout);
+        fclose($fp);
+        $outlines = explode("\n", file_get_contents($outfname));
+
+        break;
+
+        case "pd":
+        if ($cenres)
+        {
+            foreach (explode(" ", $cenres) as $bw)
+            {
+                $cenresno[] = resno_from_bw($protid, $bw);
+            }
+
+            $cenresno = implode(" ", $cenresno);
+            $cmd = "bin/pepteditor predict/center.pepd $pdbfname $cenresno";
+            echo "$cmd\n";
+            $censz = [];
+            exec($cmd, $censz);
+
+            foreach ($censz as $ln)
+            {
+                if (substr($ln, 0, 4) == "SZ: ")
+                {
+                    $ln = substr($ln, 4);
+                    $psiz = explode(",",str_replace('[','',str_replace(']','',$ln)));
+                    $sx = floatval($psiz[0]) + 5;
+                    $sy = floatval($psiz[1]) + 5;
+                    $sz = floatval($psiz[2]) + 5;
+                    $size = "$sx $sy $sz";
+                }
+            }
+        }
+
+        $fam = family_from_protid($protid);
+
+        $configf = <<<heredoc
+
+PROT $pdbfname
+LIG sdf/$ligname.sdf
+
+CEN RES $cenres
+SIZE $size
+# H2O 5
+$mcoord
+$atomto
+$stcr
+$flxr
+
+EXCL 1 56		# Head, TMR1, and CYT1.
+
+SEARCH $search
+POSE $pose
+ELIM $elim
+$flex_constraints
+ITERS $iter
+PROGRESS
+
+FLEX 1
+WET
+
+OUT $outfname
+OUTPDB 1 $modelfname
+OPEND
+
+
+heredoc;
+        
+        chdir(__DIR__);
+        chdir("..");
+        if (!file_exists("output/$fam")) mkdir("output/$fam");
+        if (!file_exists("output/$fam/$protid")) mkdir("output/$fam/$protid");
+
+        $lignospace = str_replace(" ", "", $ligname);
+        $prefixfn = $metrics_prefix ? "_$metrics_prefix" : "";
+        $cnfname = "tmp/prediction.$protid$prefixfn.$lignospace.config";
+        $f = fopen($cnfname, "wb");
+        if (!$f) die("File write error. Check tmp folder is write enabled.\n");
+
+        if ($metrics_prefix && substr($metrics_prefix, -1) != '_') $metrics_prefix .= '_';
+
+        fwrite($f, $configf);
+        fclose($f);
+
+        $retvar = 0;
+        $best_energy = false;
+
+        $outlines = [];
+        if (@$_REQUEST['saved'])
+        {
+            $outlines = explode("\n", file_get_contents($outfname));
+        }
+        else
+        {
+            $elim = 0;
+            for ($try = 0; $try < $dock_retries; $try++)
+            {            
+                set_time_limit(300);
+                $outlines = [];
+                $cmd = "bin/primarydock \"$cnfname\"";
+                if ($elim) $cmd .= " --elim $elim";
+                echo "$cmd\n";
+                passthru($cmd, $retvar);
+                $outlines = explode("\n", file_get_contents($outfname));
+                if (count($outlines) >= 200) break;
+                if (!$elim) $elim = 99;
+                else $elim *= 1.333;
+            }
+        }
+
+        if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
+        if (!$retvar) unlink($cnfname);
+
+        break;
+
+        default:
+        bad_docker_code();
+    }
 
     if ($retvar)
     {
-        echo "Docking FAILED.\n";
+        dock_failed("return value");
         return 0;
-    }
-    
-    unlink($cnfname);
+    }    
 
     $mode = "";
-    $pose = 0;
+    $lpose = 0;
     $node = -1;
     $outdqty = [];
     
@@ -395,7 +809,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 
     if (!$posesln)
     {
-        echo "Docking FAILED.\n";
+        dock_failed("no poses");
         return 0;
     }
 
@@ -406,7 +820,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
 
         if (trim($ln) == "TER")
         {
-            $pose = false;
+            $lpose = false;
             $node = -1;
             continue;
         }
@@ -415,7 +829,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         {
             if ($coldiv[0] == "Pose")
             {
-                $pose = intval($coldiv[1]);
+                $lpose = intval($coldiv[1]);
                 $node = -1;
                 continue;
             }
@@ -428,18 +842,18 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
             {
                 $e = -floatval($coldiv[1]);
                 if ($e < 1) $e = 0; // 1.0 / abs(log(abs($e)));
-                $weight[$pose] = $e;
+                $weight[$lpose] = $e;
             }
         }
     }
-    
-    foreach ($outlines as $ln)
+
+    foreach ($outlines as $lno => $ln)
     {
         $coldiv = explode(":", $ln);
 
         if (trim($ln) == "TER")
         {
-            $pose = false;
+            $lpose = false;
             $node = -1;
             continue;
         }
@@ -448,7 +862,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
         {
             if ($coldiv[0] == "Pose")
             {
-                $pose = intval($coldiv[1]);
+                $lpose = intval($coldiv[1]);
                 $node = -1;
                 continue;
             }
@@ -462,7 +876,7 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
                 $mode = $coldiv[0];
                 continue;
             }
-            else if ($pose && $node>=0)
+            else if ($lpose && $node>=0)
             {
                 if (preg_match("/[A-Z][a-z]{2}[0-9]{1,4}/", $coldiv[0]))
                 {
@@ -472,12 +886,12 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
                     {
                         $wmode = str_replace(".rgn", ".$region", $metrics_to_process["$mode.rgn"]);
                         if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                        if (!@$pose_node_has_weight[$wmode][$pose][$node])
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                        if (!@$pose_node_has_weight[$wmode][$lpose][$node])
                         {
-                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
-                            else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
-                            $pose_node_has_weight[$wmode][$pose][$node] = true;
+                            if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                            else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
+                            $pose_node_has_weight[$wmode][$lpose][$node] = true;
                         }
                     }
                     continue;
@@ -513,9 +927,9 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
                     {
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
-                        else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
                     }
                     continue;
                 }
@@ -526,9 +940,9 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
                     {
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
-                        else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
                     }
                     continue;
                 }
@@ -540,9 +954,9 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
                     {
                         $wmode = $metrics_to_process[$mode];
                         if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = 0.0;
-                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$pose];
-                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
-                        else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
+                        $outdata[$metrics_prefix.$wmode] += floatval($coldiv[1]) * $weight[$lpose];
+                        if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                        else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
                     }
                     continue;
                 }
@@ -587,10 +1001,10 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
                     $wmode = str_replace(".rgn", ".$region", $metrics_to_process["CALOC.rgn"]);
 
                     if (!isset($outdata[$metrics_prefix.$wmode])) $outdata[$metrics_prefix.$wmode] = [0,0,0];
-                    for ($x=0; $x<3; $x++) $outdata[$metrics_prefix.$wmode][$x] += floatval(substr($ln, 29+8*x, 8)) * $weight[$pose];
+                    for ($x=0; $x<3; $x++) $outdata[$metrics_prefix.$wmode][$x] += floatval(substr($ln, 29+8*x, 8)) * $weight[$lpose];
 
-                    if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$pose];
-                    else $outdqty[$metrics_prefix.$wmode] += $weight[$pose];
+                    if (!isset($outdqty[$metrics_prefix.$wmode])) $outdqty[$metrics_prefix.$wmode] = $weight[$lpose];
+                    else $outdqty[$metrics_prefix.$wmode] += $weight[$lpose];
                 }
                 break;
     
@@ -599,9 +1013,10 @@ function process_dock($metrics_prefix = "", $noclobber = false, $no_sound_if_cla
             }
         }
     }
-    
+
     $outdata['version'] = $version;
     $outdata['method'] = $method;
+    $outdata['docker'] = $docker;
 
     $tme = [];
     foreach ($outdata as $k => $v)

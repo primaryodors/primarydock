@@ -37,24 +37,33 @@ $predictions = [];
 $pred_shown = [];
 $predname = [];
 $predate = [];
-if (file_exists("../pdbs/$fam/$rcpid.active.pdb") || file_exists("../pdbs/$fam/$rcpid.bound.pdb"))
+$preddock = [];
+
+function predcmp($a, $b)
 {
-    chdir(__DIR__);
-    $dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
-    if (isset($dock_results[$rcpid]))
+    if ($a < $b) return 1;
+    else if ($b < $a) return -1;
+    else return 0;
+}
+
+chdir(__DIR__);
+$dock_results = json_decode(file_get_contents("../predict/dock_results.json"), true);
+if (isset($dock_results[$rcpid]))
+{
+    foreach ($dock_results[$rcpid] as $ligname => $dock)
     {
-        foreach ($dock_results[$rcpid] as $ligname => $dock)
-        {
-            $odor = find_odorant($ligname);
-            $oid = $odor['oid'];
-            $predname[$oid] = $ligname;
-            $predate[$oid] = date("Y-m-d H:i:s", $dock['version']);
-            if (isset($dock['DockScore'])) $predictions[$oid] = floatval($dock['DockScore']);
-            else if (isset($dock['a_Pose1']) && isset($dock['i_Pose1']))
-                $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
-        }
+        $odor = find_odorant($ligname);
+        $oid = $odor['oid'];
+        $predname[$oid] = $ligname;
+        $predate[$oid] = date("Y-m-d H:i:s", $dock['version']);
+        $preddock[$oid] = $dock['docker'];
+        if (isset($dock['DockScore'])) $predictions[$oid] = floatval($dock['DockScore']);
+        else if (isset($dock['a_Pose1']) && isset($dock['i_Pose1']))
+            $predictions[$oid] = (floatval($dock['i_Pose1']) - floatval($dock['a_Pose1'])) / 2;
     }
 }
+
+uasort($predictions, "predcmp");
 
 $cmd = "ps -ef | grep -E ':[0-9][0-9] (bin/primarydock|bin/pepteditor|bin/ic|bin/fyg|obabel)' | grep -v grep";
 $result = [];
@@ -243,13 +252,16 @@ function showSkeletal(e, img)
     $(skeletal).show();
 }
 
-function show_dlmenu(e, prot, lig, v)
+function show_dlmenu(e, prot, lig, v, d)
 {
     var dlmenu = $("#dlmenu")[0];
 
     $("#dl_mnu_prot")[0].innerText = prot;
     $("#dl_mnu_lig")[0].innerText = decodeURIComponent(lig);
     $("#dl_cd_v")[0].innerText = v;
+    if (d == "pd") $("#dl_dock")[0].innerText = "PrimaryDock";
+    else if (d == "vina") $("#dl_dock")[0].innerText = "AutoDock Vina";
+    else $("#dl_dock")[0].innerText = "(unknown)";
     $("#dl_acv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=active");
     $("#vw_acv_mdl_3d")[0].setAttribute("href", "viewer.php?view=pred&prot="+prot+"&odor="+lig+"&mode=active");
     $("#dl_iacv_mdl")[0].setAttribute("href", "download.php?obj=model&prot="+prot+"&odor="+lig+"&mode=inactive");
@@ -398,7 +410,8 @@ else
         if (!($i % 10)) $nums .= str_pad($i+10, 10, ' ', STR_PAD_LEFT).' ';
         if ($nxtmr > 7)
         {
-            $lets .= substr($seq,$i,1);
+            if (@$_REQUEST["abc"]) $lets .= chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($seq,$i,1)));
+            else $lets .= substr($seq,$i,1);
             goto _tail;
         }
 
@@ -414,9 +427,16 @@ else
             ||
             ( isset($prots[$rcpid]["bw"][$between]) && ($i+1) == resno_from_bw($rcpid, $between) )
             )
-            $lets .= "<span style=\"background-color: #ddd; color: #000;\">".substr($seq,$i,1)."</span>";
+        {
+            if (@$_REQUEST["abc"]) $lc = chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($seq,$i,1)));
+            else $lc = substr($seq,$i,1);
+            $lets .= "<span style=\"background-color: #ddd; color: #000;\">$lc</span>";
+        }
         else
-            $lets .= substr($seq,$i,1);
+        {
+            if (@$_REQUEST["abc"]) $lets .= chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($seq,$i,1)));
+            else $lets .= substr($seq,$i,1);
+        }
 
         if (($i+1) == $receptor['region']["TMR$nxtmr"]['end']) 
         {
@@ -601,7 +621,8 @@ echo "</p>";*/
                         echo "font-weight: bold; ";
                     }
                     echo "\">";
-                    echo substr($text[$i],$j,1);
+                    if (@$_REQUEST["abc"]) echo chr(65+strpos("ARNDCEQGHILKMFPSTWYV", substr($text[$i],$j,1)));
+                    else echo substr($text[$i],$j,1);
                     echo "</span>";
                     echo " ";
                     
@@ -735,7 +756,7 @@ foreach ($pairs as $oid => $pair)
     {
         if (isset($predictions[$oid]))
         {
-            echo "<td><a href=\"#\" onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">"
+            echo "<td><a href=\"#\" onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}', '{$preddock[$oid]}');\">"
                 .round($predictions[$oid], 2)."</a></td>";
             $pred_shown[$oid] = true;
         }
@@ -766,7 +787,7 @@ if (count($predictions))
             echo "<td>&nbsp;</td>\n";
             echo "<td>&nbsp;</td>\n";
 
-            echo "<td><a href=\"#\" onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}');\">"
+            echo "<td><a href=\"#\" onclick=\"show_dlmenu(event, '$rcpid', '".urlencode($predname[$oid])."', '{$predate[$oid]}', '{$preddock[$oid]}');\">"
                 .round($predictions[$oid], 2)."</a></td>";
             echo "</td>";
             $pred_shown[$oid] = true;
@@ -978,6 +999,7 @@ $('#skeletal').hide();
     <div id="dl_mnu_lig">&nbsp;</div>
     <br>
     Code version:<div id="dl_cd_v">&nbsp;</div><br>
+    Docker used:<div id="dl_dock">&nbsp;</div><br>
     Files:<br>
     <table class="ctxmenu">
         <tr><td>Active model:</td>

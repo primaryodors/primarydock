@@ -4043,20 +4043,20 @@
     {
         "id": "OR2K2",
         "uniprot_id": "Q8NGT1",
-        "sequence": "MNITLYSFLYVLRLNEGNSTGRNIDERKKMQGENFTIWSIFFLEGFSQYPGLEVVLFVFSLVMYLTTLLGNSTLILITILDSRLKTPMYLFLGNLSFMDICYTSASVPTLLVNLLSSQKTIIFSGCAVQMYLSLAMGSTECVLLAVMAYDRYVAICNPLRYSIIMNRCVCARMATVSWVTGCLTALLETSFALQIPLCGNLIDHFTCEILAVLKLACTSSLLMNTIMLVVSILLLPIPMLLVCISYIFILSTILRITSAEGRNKAFSTCGAHLTVVILYYGAALSMYLKPSSSNAQKIDKIISLLYGVLTPMLNPIIYSLRNKEVKDAMKKLLGKITLHQTHEHL",
+        "sequence": "MQGENFTIWSIFFLEGFSQYPGLEVVLFVFSLVMYLTTLLGNSTLILITILDSRLKTPMYLFLGNLSFMDICYTSASVPTLLVNLLSSQKTIIFSGCAVQMYLSLAMGSTECVLLAVMAYDRYVAICNPLRYSIIMNRCVCARMATVSWVTGCLTALLETSFALQIPLCGNLIDHFTCEILAVLKLACTSSLLMNTIMLVVSILLLPIPMLLVCISYIFILSTILRITSAEGRNKAFSTCGAHLTVVILYYGAALSMYLKPSSSNAQKIDKIISLLYGVLTPMLNPIIYSLRNKEVKDAMKKLLGKITLHQTHEHL",
         "bw":
         {
-            "1.50": "71",
-            "2.50": "99",
-            "3.50": "151",
-            "4.50": "178",
-            "5.50": "238",
-            "6.50": "282",
-            "7.50": "315",
-            "45.50": "207",
-            "56.50": "258",
-            "34.50": "158",
-            "8.50": "329"
+            "1.50": "42",
+            "2.50": "70",
+            "3.50": "122",
+            "4.50": "149",
+            "5.50": "209",
+            "6.50": "253",
+            "7.50": "286",
+            "45.50": "178",
+            "56.50": "229",
+            "34.50": "129",
+            "8.50": "300"
         },
         "deletion":
         [
@@ -4072,43 +4072,43 @@
         {
             "TMR1":
             {
-                "start": 49,
-                "end": 79
+                "start": 20,
+                "end": 50
             },
             "TMR2":
             {
-                "start": 87,
-                "end": 115
+                "start": 58,
+                "end": 86
             },
             "TMR3":
             {
-                "start": 122,
-                "end": 157
+                "start": 93,
+                "end": 128
             },
             "TMR4":
             {
-                "start": 167,
-                "end": 193
+                "start": 138,
+                "end": 164
             },
             "TMR5":
             {
-                "start": 220,
-                "end": 256
+                "start": 191,
+                "end": 227
             },
             "TMR6":
             {
-                "start": 259,
-                "end": 292
+                "start": 230,
+                "end": 263
             },
             "TMR7":
             {
-                "start": 296,
-                "end": 321
+                "start": 267,
+                "end": 292
             },
             "HXR8":
             {
-                "start": 323,
-                "end": 345
+                "start": 294,
+                "end": 316
             }
         },
         "btree": "000000101000100"

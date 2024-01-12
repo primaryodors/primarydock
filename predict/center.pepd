@@ -1,0 +1,78 @@
+
+# Protein.
+LET $pdbfn = $arg2
+LOAD $pdbfn
+
+#Initialization.
+LET @sum = [0,0,0]
+LET %num = 0
+LET @max = [0,0,0]
+LET @min = [0,0,0]
+
+
+# Args loop.
+LET %i = 3
+loop:
+LET $r = $arg%i
+LET %r = $r
+IF %r = 0 THEN GOTO noresidue
+LET @r = %r
+IF @r.x = %r THEN GOTO noresidue
+LET @sum += @r
+LET %num ++
+
+ECHO %r ": " @r
+
+IF @r.x > @max.x THEN LET @max.x = @r.x
+IF @r.x < @min.x OR %num < 2 LET @min.x = @r.x
+IF @r.y > @max.y THEN LET @max.y = @r.y
+IF @r.y < @min.y OR %num < 2 LET @min.y = @r.y
+IF @r.z > @max.z THEN LET @max.z = @r.z
+IF @r.z < @min.z OR %num < 2 LET @min.z = @r.z
+
+noresidue:
+LET %i ++
+IF $arg%i THEN GOTO loop
+
+
+# Center.
+ECHO @sum " / " %num
+LET @avg = @sum / %num
+
+
+# Size.
+LET @size = [0,0,0]
+
+LET &xm = @max.x
+LET &xi = @min.x
+LET &xa = @avg.x
+LET &x1 = &xm - &xa
+LET &x2 = &xa - &xi
+LET &x = &x1
+IF &x2 > &x1 LET &x = &x2
+LET @size.x = &x * 2
+
+LET &ym = @max.y
+LET &yi = @min.y
+LET &ya = @avg.y
+LET &y1 = &ym - &ya
+LET &y2 = &ya - &yi
+LET &y = &y1
+IF &y2 > &y1 LET &y = &y2
+LET @size.y = &y * 2
+
+LET &zm = @max.z
+LET &zi = @min.z
+LET &za = @avg.z
+LET &z1 = &zm - &za
+LET &z2 = &za - &zi
+LET &z = &z1
+IF &z2 > &z1 LET &z = &z2
+LET @size.z = &z * 2
+
+
+# Output.
+ECHO "CEN: " @avg
+# ECHO @max
+# ECHO @min
+ECHO "SZ: " @size

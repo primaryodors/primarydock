@@ -263,7 +263,7 @@ int set_variable(const char* vname, const Star vvalue)
     script_var[n].vt = type_from_name(vname);
     if (script_var[n].vt == SV_STRING)
     {
-        if (script_var[n].value.psz) delete script_var[n].value.psz;
+        if (script_var[n].value.psz) delete[] script_var[n].value.psz;
         script_var[n].value.psz = new char[strlen(vvalue.psz)+4];
         strcpy(script_var[n].value.psz, vvalue.psz);
     }
@@ -708,7 +708,7 @@ int main(int argc, char** argv)
         char** owords = words;
         char chain = 'A';
         char new_chain;
-        bool include_ligand;
+        bool include_ligand = false;
         Protein ptmp("RipMeAsunder");
         if (words && words[0] && words[0][0] && words[0][1])
         {
@@ -1026,6 +1026,20 @@ int main(int argc, char** argv)
                     if (sr > 0 && er > 0) dest->set_region(rgname, sr, er);
                     if (bw50 > 0) dest->set_bw50(l, bw50);
                 }
+                for (l=1; l<=3; l++)
+                {
+                    std::string rgname = (std::string)"CYT" + std::to_string(l);
+                    int bwhx = 10 + (l-1)*20 + (l*2);
+                    int sr = source->get_region_start(rgname), er = source->get_region_end(rgname), bw50 = source->get_bw50(bwhx);
+                    if (sr > 0 && er > 0) dest->set_region(rgname, sr, er);
+                    if (bw50 > 0) dest->set_bw50(bwhx, bw50);
+
+                    rgname = (std::string)"EXR" + std::to_string(l);
+                    bwhx += 11;
+                    sr = source->get_region_start(rgname), er = source->get_region_end(rgname), bw50 = source->get_bw50(bwhx);
+                    if (sr > 0 && er > 0) dest->set_region(rgname, sr, er);
+                    if (bw50 > 0) dest->set_bw50(bwhx, bw50);
+                }
             }   // BWCOPY
 
             else if (!strcmp(words[0], "BWMOTIF"))
@@ -1035,9 +1049,30 @@ int main(int argc, char** argv)
                 l = atoi(words[1]);
                 char rgn[8];
                 if (l < 8) sprintf(rgn, "TMR%d", l);
+                else if (l >= 12 && l <= 78)
+                {
+                    int preced = floor(0.1*l);
+                    int subseq = l % 10;
+                    l = subseq >> 1;
+
+                    if (preced & 1)
+                    {
+                        // Cytoplasmic.
+                        sprintf(rgn, "CYT%d", l);
+                    }
+                    else
+                    {
+                        // Extracellular.
+                        sprintf(rgn, "EXR%d", l);
+                    }
+                    l = atoi(words[1]);
+                }
                 else sprintf(rgn, "HXR%d", l);
                 int sr = working->get_region_start(rgn), er = working->get_region_end(rgn);
-                if (!sr || !er) raise_error((std::string)"Region " + std::to_string(l) + (std::string)" not found in strand.");
+                
+                if (!sr || !er) raise_error((std::string)"Region " + std::to_string(atoi(words[1]))
+                    + (std::string)"/" + (std::string)rgn
+                    + (std::string)" not found in strand.");
 
                 n = -1;
                 for (i=0; words[2][i]; i++)
@@ -1527,7 +1562,7 @@ int main(int argc, char** argv)
                     {
                         psz = interpret_single_string(words[l]);
                         cout << psz << flush;
-                        delete psz;
+                        delete[] psz;
                     }
                 }
 
@@ -2141,10 +2176,11 @@ int main(int argc, char** argv)
 
                     case SV_POINT:
                         pt = interpret_single_point(words[5+l]);
+                        f = interpret_single_float(words[5+l]);
                         if (!strcmp(words[4+l], "+")) *script_var[n].value.ppt = script_var[n].value.ppt->add(pt);
                         else if (!strcmp(words[4+l], "-")) *script_var[n].value.ppt = script_var[n].value.ppt->subtract(pt);
-                        else if (!strcmp(words[4+l], "*")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() * pt.magnitude());
-                        else if (!strcmp(words[4+l], "/")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() / pt.magnitude());
+                        else if (!strcmp(words[4+l], "*")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() * f); // pt.magnitude());
+                        else if (!strcmp(words[4+l], "/")) script_var[n].value.ppt->scale(script_var[n].value.ppt->magnitude() / f); // pt.magnitude());
                         else
                         {
                             // cout << "Bad operator " << words[4+l] << " for point." << endl;
@@ -2189,6 +2225,7 @@ int main(int argc, char** argv)
                 psz = interpret_single_string(words[1]);
 				n = 0;
                 chain = 'A';
+                include_ligand = false;
                 
 				if (words[2]) chain = words[2][0];
                 if (words[2] && words[3])
@@ -2241,7 +2278,7 @@ int main(int argc, char** argv)
                 strcpy(sv.psz, pname);
 				set_variable(buffer, sv);
 
-                delete psz;
+                delete[] psz;
 
                 int seqlen = working->get_seq_length();
                 sprintf(buffer, "%cSEQLEN%c", '%', g_chain);
@@ -2272,7 +2309,7 @@ int main(int argc, char** argv)
 					working->set_region(words[3], atoi(words[4]), atoi(words[5]));
                     // cout << "ln " << program_counter << " set " << g_chain << ":" << words[3] << " to " << atoi(words[4]) << "-" << atoi(words[5]) << endl;
 
-                    delete words;
+                    delete[] words;
                 }
 
                 for (l=1; l<=7; l++)
@@ -2309,24 +2346,28 @@ int main(int argc, char** argv)
                 std::vector<string> cratoms;	// coordinating residue atoms.																						oh god I hooked up with this guy once who used kratom and after we both finished goddamn all he did was yipyapyipyapyipyap all night until finally I said babe, I n**d my sleep, and I musta finally dozed off at something like 5am, yeah kinda like the song. Then it's morning and he goes home and a hot drummer/songwriter is coming over to audition for my rock band that day and I'm running on 3 hours of sleep, what a way to make a first impression, thank flying spaghetti monster our guitarist was my roommate because at least someone in the house was awake. Ahhh, my 30s, when I still had (false) hope. Good times, those.
                 bool force_tyrosine_O = false;
                 bool thiolate = false;
+                bool uses_fancy_options = false;
                 Atom** ba = nullptr;
 
                 _yes_I_used_goto_for_this:
                 if (!strcmp(words[l], "YO"))
                 {
                     force_tyrosine_O = true;
+                    uses_fancy_options = true;
                     l++;
                     goto _yes_I_used_goto_for_this;
                 }
                 else if (!strcmp(words[l], "YAr"))
                 {
                     force_tyrosine_O = false;
+                    uses_fancy_options = true;
                     l++;
                     goto _yes_I_used_goto_for_this;
                 }
                 else if (!strcmp(words[l], "Th8"))
                 {
                     thiolate = true;
+                    uses_fancy_options = true;
                     l++;
                     goto _yes_I_used_goto_for_this;
                 }
@@ -2353,12 +2394,14 @@ int main(int argc, char** argv)
                     if (!strcmp(words[l], "YO"))
                     {
                         local_O = true;
+                        uses_fancy_options = true;
                         l++;
                         goto _another_goto;
                     }
                     else if (!strcmp(words[l], "YAr"))
                     {
                         local_O = false;
+                        uses_fancy_options = true;
                         l++;
                         goto _another_goto;
                     }
@@ -2405,9 +2448,28 @@ int main(int argc, char** argv)
 
                 }
 
-                if (ncr < 3) raise_error("MCOORD requires at least 3 coordinating atoms.");
-                working->coordinate_metal(ma, ncr, resnos, cratoms);
+                if (ncr < 2) raise_error("MCOORD requires at least 2 coordinating atoms.");
+                if (ncr < 3 && uses_fancy_options) raise_error("MCOORD with YO, YAr, or Th8 requires at least 3 coordinating atoms.");
+                if (uses_fancy_options) working->coordinate_metal(ma, ncr, resnos, cratoms);
+                else
+                {
+                    std::vector<MCoord> mtlcoords;
+                    MCoord mc;
+                    mc.Z = ma->get_Z();
+                    mc.charge = elem_charge;
+                    mc.mtl = ma;
 
+                    for (l=0; l<ncr; l++)
+                    {
+                        ResiduePlaceholder rp;
+                        rp.resno = resnos[l];
+                        mc.coordres.push_back(rp);
+                    }
+
+                    mtlcoords.push_back(mc);
+
+                    working->coordinate_metal(mtlcoords);
+                }
             } // MCOORD
 
             else if (!strcmp(words[0], "MEASURE"))
@@ -2645,7 +2707,7 @@ int main(int argc, char** argv)
                 cout << "Wrote " << psz << "." << endl;
 
                 fclose(pf);
-                delete psz;
+                delete[] psz;
 
                 if (words[2])
                 {
@@ -2853,6 +2915,13 @@ int main(int argc, char** argv)
                 ptmp.load_pdb(pf, 0, words[2] ? words[2][0] : 'A');
 
                 working->replace_side_chains_from_other_protein(&ptmp);
+
+                n = working->get_end_resno();
+                for (l=1; l<=n; l++)
+                {
+                    f = working->get_internal_clashes(l, l);
+                    if (f > clash_limit_per_aa) working->minimize_residue_clashes(l);
+                }
             }   // SIDEREPL
 
             else if (!strcmp(words[0], "STRAND"))
@@ -2991,7 +3060,7 @@ int main(int argc, char** argv)
         }
 
     _pc_continue:
-        delete owords;
+        delete[] owords;
         program_counter++;
     }
 

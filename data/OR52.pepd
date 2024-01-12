@@ -1,219 +1,225 @@
 
+ECHO "Extrapolating active and inactive protein structures from known cryo-EM models. This will take some time."
+
 LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+HYDRO
+SAVE "pdbs/OR52.apo.pdb"
 SIDEREPL "pdbs/OR52/OR52A1.upright.pdb"
 SAVE "pdbs/OR52/OR52A1.apo.pdb"
 UNCHAIN A
 
 LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+HYDRO
+SAVE "pdbs/OR52.bound.pdb"
 SIDEREPL "pdbs/OR52/OR52A1.upright.pdb"
 SAVE "pdbs/OR52/OR52A1.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52A4.upright.pdb"
 SAVE "pdbs/OR52/OR52A4.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52A4.upright.pdb"
 SAVE "pdbs/OR52/OR52A4.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52B2.upright.pdb"
 SAVE "pdbs/OR52/OR52B2.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52B2.upright.pdb"
 SAVE "pdbs/OR52/OR52B2.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52B4.upright.pdb"
 SAVE "pdbs/OR52/OR52B4.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52B4.upright.pdb"
 SAVE "pdbs/OR52/OR52B4.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52B6.upright.pdb"
 SAVE "pdbs/OR52/OR52B6.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52B6.upright.pdb"
 SAVE "pdbs/OR52/OR52B6.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52D1.upright.pdb"
 SAVE "pdbs/OR52/OR52D1.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52D1.upright.pdb"
 SAVE "pdbs/OR52/OR52D1.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52E2.upright.pdb"
 SAVE "pdbs/OR52/OR52E2.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52E2.upright.pdb"
 SAVE "pdbs/OR52/OR52E2.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52E4.upright.pdb"
 SAVE "pdbs/OR52/OR52E4.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52E4.upright.pdb"
 SAVE "pdbs/OR52/OR52E4.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52E6.upright.pdb"
 SAVE "pdbs/OR52/OR52E6.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52E6.upright.pdb"
 SAVE "pdbs/OR52/OR52E6.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52E8.upright.pdb"
 SAVE "pdbs/OR52/OR52E8.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52E8.upright.pdb"
 SAVE "pdbs/OR52/OR52E8.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52H1.upright.pdb"
 SAVE "pdbs/OR52/OR52H1.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52H1.upright.pdb"
 SAVE "pdbs/OR52/OR52H1.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52I1.upright.pdb"
 SAVE "pdbs/OR52/OR52I1.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52I1.upright.pdb"
 SAVE "pdbs/OR52/OR52I1.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52I2.upright.pdb"
 SAVE "pdbs/OR52/OR52I2.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52I2.upright.pdb"
 SAVE "pdbs/OR52/OR52I2.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52K1.upright.pdb"
 SAVE "pdbs/OR52/OR52K1.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52K1.upright.pdb"
 SAVE "pdbs/OR52/OR52K1.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52K2.upright.pdb"
 SAVE "pdbs/OR52/OR52K2.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52K2.upright.pdb"
 SAVE "pdbs/OR52/OR52K2.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52L1.upright.pdb"
 SAVE "pdbs/OR52/OR52L1.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52L1.upright.pdb"
 SAVE "pdbs/OR52/OR52L1.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52N4.upright.pdb"
 SAVE "pdbs/OR52/OR52N4.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52N4.upright.pdb"
 SAVE "pdbs/OR52/OR52N4.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52N5.upright.pdb"
 SAVE "pdbs/OR52/OR52N5.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52N5.upright.pdb"
 SAVE "pdbs/OR52/OR52N5.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52P1.upright.pdb"
 SAVE "pdbs/OR52/OR52P1.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52P1.upright.pdb"
 SAVE "pdbs/OR52/OR52P1.bound.pdb"
 UNCHAIN A
 
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" I A
+LOAD "pdbs/OR52.apo.pdb" A
 SIDEREPL "pdbs/OR52/OR52W1.upright.pdb"
 SAVE "pdbs/OR52/OR52W1.apo.pdb"
 UNCHAIN A
 
-LOAD "pdbs/OR52.octanoate.bna.pdb" A A
+LOAD "pdbs/OR52.bound.pdb" A
 SIDEREPL "pdbs/OR52/OR52W1.upright.pdb"
 SAVE "pdbs/OR52/OR52W1.bound.pdb"
 UNCHAIN A

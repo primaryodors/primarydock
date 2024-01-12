@@ -7,24 +7,6 @@
 #include "protein.h"
 #include "moiety.h"
 
-struct ResiduePlaceholder
-{
-    int node = 0;
-    int resno = 0;
-    std::string bw;
-
-    void set(const char* str);
-    void resolve_resno(Protein* prot);
-};
-
-struct MCoord
-{
-    int Z = 29;
-    int charge = 2;
-    Atom* mtl = nullptr;
-    std::vector<ResiduePlaceholder> coordres;
-};
-
 class AtomGroup
 {
     public:

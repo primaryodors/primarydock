@@ -14,6 +14,7 @@ void ResiduePlaceholder::set(const char* str)
 
 void ResiduePlaceholder::resolve_resno(Protein* prot)
 {
+    if (resno && !bw.length()) return;
     int hxno = atoi(bw.c_str());
     const char* dot = strchr(bw.c_str(), '.');
     if (!dot)
@@ -231,6 +232,7 @@ Point ResidueGroup::get_center()
     for (i=0; i<amsz; i++)
     {
         Atom** aa = aminos[i]->get_most_bindable(1);
+        if (!aa) continue;
         Atom* a = aa[0];
 
         if (a)
@@ -960,7 +962,9 @@ std::vector<std::shared_ptr<ResidueGroup>> ResidueGroup::get_potential_side_chai
 
             Atom *reach1, *reach2;
             reach1 = aa->get_reach_atom();
+            if (!reach1) reach1 = aa->get_atom("CA");
             reach2 = bb->get_reach_atom();
+            if (!reach2) reach2 = bb->get_atom("CA");
             if ((fabs(reach1->is_polar()) >= hydrophilicity_cutoff) != (fabs(reach2->is_polar()) >= hydrophilicity_cutoff))
             {
                 Atom *nearest1, *nearest2;
@@ -1135,6 +1139,8 @@ float GroupPair::get_potential()
                 else
                 {
                     partial = aa->get_atom_mol_bind_potential(a);
+
+                    if (polar_atoms && polar_res && aa->get_charge()) partial *= 1.0 + fabs(aa->get_charge());
 
                     Moiety amide;
                     amide.pattern = "ocn";

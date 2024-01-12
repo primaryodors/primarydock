@@ -8,52 +8,41 @@
 // php -f predict/method_fygactive.php prot=OR1A1 lig=d-limonene
 //
 
-// Configurable variables
-$flex = 1;                      // Flexion (0 or 1) for active dock.
-$flxi = 1;                      // Flexion for inactive dock.
-$pose = 20;
-$iter = 40;
-
 chdir(__DIR__);
 require_once("methods_common.php");
 chdir(__DIR__);
 require_once("../data/protutils.php");
 chdir(__DIR__);
 
+// Configurable variables
+$flex = 1;                      // Flexion (0 or 1).
+$pose = 15;
+$iter = 30;
+$elim = 1e3;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
+$num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
+
 prepare_outputs();
 
-$metrics_to_process =
-[
-    "BENERG" => "BindingEnergy",
-    "BENERG.rgn" => "BindingEnergy.rgn",
-    "BEST" => "Pose1"
-];
+$metrics_to_process["BEST"] = "Pose1";
 
 function make_prediction($data)
 {
     global $protid, $ligname;
 
-    if (isset($data["a_Pose1"]))
+    if (isset($data["a_BENERG"]) || isset($data["a_BindingEnergy"]))
     {
-        $ae = min(0, floatval(@$data['a_BindingEnergy']));
-        $ie = min(0, floatval(@$data["i_BindingEnergy"]));
-        $a1 = min(0, floatval( $data['a_Pose1']));
-        $i1 = min(0, floatval(@$data['i_Pose1']));
-        $a6 = min(0, floatval(@$data["a_BindingEnergy.6"]));
-        $i6 = min(0, floatval(@$data["i_BindingEnergy.6"]));
-
-        $ascore = -min(0, $ae - $a6) * $a6 + $a1;
-        $iscore = -min(0, $ie - $i6) * $i6 + $i1;
+        $ascore = min(0, floatval(@$data['a_BENERG']), floatval(@$data['a_BindingEnergy']));
+        $iscore = min(0, floatval(@$data['i_BENERG']), floatval(@$data['i_BindingEnergy']));
 
         if ($ascore < 0 && $ascore < $iscore)
         {
             $data['Predicted'] = 'Agonist';
-            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
+            $data['DockScore'] = (min($iscore, 0) - $ascore);
         }
-        else if ($i1 < 0 && $iscore < $ascore)
+        else if ($iscore < 0 && $iscore < $ascore)
         {
             $data['Predicted'] = 'Inverse Agonist';
-            $data['DockScore'] = (min($i1, 0) - $a1) / 2;
+            $data['DockScore'] = (min($iscore, 0) - $ascore);
         }
         else
         {
@@ -84,9 +73,13 @@ $pdbfname_inactive = str_replace(".upright.pdb", ".apo.pdb", $pdbfname);
 $pdbfname_active = str_replace(".upright.pdb", ".bound.pdb", $pdbfname);
 $paramfname = str_replace(".upright.pdb", ".params", $pdbfname);
 
-if (!file_exists($pdbfname_inactive) || !file_exists($pdbfname_active))
+if (!file_exists($pdbfname_inactive) && file_exists($pdbfname_active))
+    $pdbfname_inactive = $pdbfname;
+
+if (!file_exists($pdbfname_active))
 {
     exec("php -f predict/cryoem_motions.php");
+    exec("bin/pepteditor data/OR51.pepd");
     exec("bin/pepteditor data/OR52.pepd");
 }
 
@@ -94,38 +87,14 @@ $flex_constraints = "";
 if (file_exists($paramfname)) $flex_constraints = file_get_contents($paramfname);
 
 $fam = family_from_protid($protid);
+$pdbfname = $pdbfname_inactive;
 $outfname = "output/$fam/$protid/$protid.$ligname.inactive.dock";
+$cenres = substr($cenres_inactive, 8);
 
-$configf = <<<heredoc
+prepare_receptor($pdbfname, "$flxr $iflxr");
 
-PROT $pdbfname_inactive
-LIG sdf/$ligname.sdf
-
-$cenres_inactive
-SIZE $size
-# H2O 5
-$mcoord
-$atomto
-$stcr
-$flxr
-
-EXCL 1 56		# Head, TMR1, and CYT1.
-
-SEARCH $search
-POSE $pose
-ELIM 10000
-$flex_constraints
-ITERS $iter
-PROGRESS
-
-FLEX $flxi
-WET
-
-OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.inactive.model%o.pdb
-
-
-heredoc;
+// Convert ligand as well.
+prepare_ligand($ligname);
 
 chdir(__DIR__);
 chdir("..");
@@ -137,36 +106,8 @@ if (!@$_REQUEST["acvonly"]) process_dock("i");
 
 $pdbfname = $pdbfname_active;
 $outfname = "output/$fam/$protid/$protid.$ligname.active.dock";
+$cenres = substr($cenres_active, 8);
 
-$configf = <<<heredoc
-
-PROT $pdbfname
-LIG sdf/$ligname.sdf
-
-$cenres_active
-SIZE $size
-# H2O 5
-$mcoord
-$atomto
-$stcr
-$flxr
-
-EXCL 1 56		# Head, TMR1, and CYT1.
-
-SEARCH $search
-POSE $pose
-ELIM 10000
-$flex_constraints
-ITERS $iter
-PROGRESS
-
-FLEX $flex
-WET
-
-OUT $outfname
-OUTPDB 1 output/$fam/$protid/%p.%l.active.model%o.pdb
-
-
-heredoc;
+prepare_receptor($pdbfname, "$flxr $aflxr");
 
 $poses = process_dock("a");

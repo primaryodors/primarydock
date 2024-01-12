@@ -508,7 +508,7 @@ void Molecule::hydrogenate(bool steric_only)
                     Bond* b1 = atoms[i]->get_bond_by_idx(k++);
                     if (!b1->btom || b1->btom == H) b1 = atoms[i]->get_bond_by_idx(k++);
 
-                    if (b0->btom && b1->btom)
+                    if (b0->btom && b1->btom && (abs((__int64_t)(b1) - (__int64_t)b1->btom) < memsanity))
                     {
                         Point source = atoms[i]->get_location();
                         /*Point axis = b0->btom->get_location();
@@ -1528,7 +1528,7 @@ void Molecule::identify_acidbase()
     if (noAtoms(atoms)) return;
 
     // For every atom in the molecule:
-    int i, j, k;
+    int i, j, k, l;
     Bond* b[16];
 
     for (i=0; atoms[i]; i++)
@@ -1541,12 +1541,75 @@ void Molecule::identify_acidbase()
         int sbOH = 0;
         int fama = atoms[i]->get_family();
         bool carbon = false;
+
         if (fama == TETREL || fama == PNICTOGEN || fama == CHALCOGEN || fama == HALOGEN)
         {
             carbon = (atoms[i]->get_Z() == 6);
             //cout << "Atom " << atoms[i]->name << " is of family " << fama << endl;
             atoms[i]->fetch_bonds(b);
             if (!b[0]) goto _not_acidic;
+
+            int nb2 = atoms[i]->get_bonded_atoms_count();
+            if ((fama == TETREL || fama == PNICTOGEN) && !atoms[i]->is_pi() && nb2 < 4)
+            {
+                if (nb2 >= 2)
+                {
+                    l=0;
+                    Point planarity_check[4];
+                    planarity_check[l++] = atoms[i]->get_location();
+                    for (j=0; j<nb2; j++)
+                    {
+                        if (!b[j]) break;
+                        if (!b[j]->btom) break;
+                        if (!b[j]->btom->get_Z()) break;
+                        planarity_check[l++] = b[j]->btom->get_location();
+                    }
+
+                    bool lplanar = false;
+                    if (l > 3)
+                    {
+                        float coplanarity = are_points_planar(planarity_check[0], planarity_check[1], planarity_check[2], planarity_check[3]);
+                        if (coplanarity < coplanar_threshold) lplanar = true;
+                    }
+                    else if (l == 3)
+                    {
+                        float theta = find_3d_angle(planarity_check[1], planarity_check[2], planarity_check[0]);
+                        if (theta > square && theta < M_PI && fabs(theta-triangular) < fabs(theta - tetrahedral)) lplanar = true;
+                        #if _dbg_internal_energy
+                        if (!atoms[i]->residue) cout << atoms[i]->name << " " << (theta*fiftyseven) << (lplanar ? " pi" : "") << endl;
+                        #endif
+                    }
+
+                    if (lplanar)
+                    {
+                        atoms[i]->aromatize();
+                        int chalcogens = 0;
+                        for (j=0; j<l; j++)
+                        {
+                            if (!b[j]) break;
+                            if (!b[j]->btom) break;
+                            if (!b[j]->btom->get_Z()) break;
+                            int bfam = b[j]->btom->get_family();
+                            if (bfam == PNICTOGEN || bfam == CHALCOGEN)
+                            {
+                                b[j]->btom->aromatize();
+                                b[j]->cardinality = 1.5;
+
+                                if (bfam == CHALCOGEN && b[j]->btom->get_bonded_heavy_atoms_count() < 2)
+                                {
+                                    chalcogens++;
+                                    if (chalcogens > 1 && !b[j]->btom->get_charge())
+                                    {
+                                        b[j]->btom->increment_charge(-1);
+                                        chalcogens = -65536;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if (carbon)
             {
                 if (!atoms[i]->is_pi() || !atoms[i]->is_bonded_to_pi(CHALCOGEN, true))
@@ -1701,11 +1764,16 @@ Bond** Molecule::get_rotatable_bonds()
 
                 int fa = lb[j]->atom->get_family(),
                     fb = lb[j]->btom->get_family();
+                
+                // 2 years of development and still no ring rotations.
+                if (lb[j]->atom->in_same_ring_as(lb[j]->btom))
+                {
+                    lb[j]->can_rotate = lb[j]->can_flip = false;
+                    continue;
+                }
 
-                // Generally, a single bond between pi atoms, or a bond from a pi atom to an amino group, cannot rotate.
-                if (	(pia && pib)
-                        ||
-                        (pia && (fb == PNICTOGEN || fb == CHALCOGEN))
+                // Generally, a single bond from a pi atom to an amino group cannot rotate.
+                if (	(pia && (fb == PNICTOGEN || fb == CHALCOGEN))
                         ||
                         (pib && (fa == PNICTOGEN || fa == CHALCOGEN))
                    )
@@ -1717,17 +1785,13 @@ Bond** Molecule::get_rotatable_bonds()
                         ) lb[j]->can_flip = true;
                 }
 
-                // If atoms a and b are pi, and b is only bound to a, a hydrogen, and a chalcogen, then a-b can flip.
-                // But the acetyl group of e.g. acetophenone can also flip, so the hydrogen is unnecessary.
-                if (pia && pib
+                // If atoms a and b are pi, and a-b cannot rotate, then a-b can flip.
+                if (!lb[j]->can_rotate
                     && lb[j]->btom->is_bonded_to(CHALCOGEN)
                     && fa != CHALCOGEN
                     && !(lb[j]->atom->in_same_ring_as(lb[j]->btom))
-                    /* && lb[j]->btom->is_bonded_to("H")
-                    && lb[j]->atom->get_Z() > 1 */
                     )
                 {
-                    lb[j]->can_rotate = false;
                     lb[j]->can_flip = true;
                 }
 
@@ -1826,9 +1890,21 @@ void Molecule::crumple(float theta)
     int i;
     for (i=0; b[i]; i++)
     {
-        float ltheta = frand(-theta, theta);
-        b[i]->rotate(ltheta);
-        if (get_internal_clashes() > int_clsh*2) b[i]->rotate(-ltheta);
+        if (b[i]->can_rotate)
+        {
+            float ltheta = frand(-theta, theta);
+            b[i]->rotate(ltheta);
+            if (get_internal_clashes() > int_clsh*4) b[i]->rotate(-ltheta);
+        }
+        else if (b[i]->can_flip)
+        {
+            float sint = sin(theta);
+            if (frand(0,2) <= sint)
+            {
+                b[i]->rotate(b[i]->flip_angle);
+                if (get_internal_clashes() > int_clsh*4) b[i]->rotate(b[i]->flip_angle);
+            }
+        }
     }
 }
 
@@ -1894,7 +1970,13 @@ Bond** AminoAcid::get_rotatable_bonds()
                         {
                             cout << la->name << " is bonded to:";
                             int o, ag = la->get_geometry();
-                            for (o=0; o<ag; o++) if (lbb[o]->btom) cout << " " << lbb[o]->btom->name;
+                            for (o=0; o<ag; o++)
+                                if (lbb[o]
+                                    && (abs((__int64_t)(this) - (__int64_t)lbb[o]) < memsanity)
+                                    && lbb[o]->btom
+                                    && (abs((__int64_t)(this) - (__int64_t)lbb[o]->btom) < memsanity)
+                                    )
+                                    cout << " " << lbb[o]->btom->name;
                             cout << "." << endl;
                         }
 
@@ -1962,6 +2044,7 @@ Bond** AminoAcid::get_rotatable_bonds()
         int g = atoms[i]->get_geometry();
         for (j=0; j<g; j++)
         {
+            if (!lb[j]) break;
             if (lb[j]->can_rotate
                     &&
                     lb[j]->atom && lb[j]->btom
@@ -2021,6 +2104,7 @@ Bond** Molecule::get_all_bonds(bool unidirectional)
         int g = atoms[i]->get_geometry();
         for (j=0; j<g; j++)
         {
+            if (!lb[j]) break;
             if (lb[j]->atom < lb[j]->btom
                     ||
                     !unidirectional
@@ -2054,7 +2138,32 @@ float Molecule::get_internal_clashes()
         float avdW = atoms[i]->get_vdW_radius();
         for (j=i+1; atoms[j]; j++)
         {
-            if (atoms[i]->is_bonded_to(atoms[j])) continue;
+            if (atoms[i]->is_bonded_to(atoms[j]) || atoms[j]->is_bonded_to(atoms[i]))
+            {
+                Bond* ab = atoms[i]->get_bond_between(atoms[j]);
+                if (atoms[i] < atoms[j] && atoms[i]->is_pi() && atoms[j]->is_pi() && !atoms[i]->in_same_ring_as(atoms[j]))
+                {
+                    // https://laney.edu/corlett/wp-content/uploads/sites/234/2012/01/ch17.pdf
+                    Atom* c = atoms[i]->get_heaviest_bonded_atom_that_isnt(atoms[j]);
+                    Atom* d = atoms[j]->get_heaviest_bonded_atom_that_isnt(atoms[i]);
+
+                    if (c && d)
+                    {
+                        SCoord axis = atoms[j]->get_location().subtract(atoms[i]->get_location());
+                        float theta = find_angle_along_vector(c->get_location(), d->get_location(), atoms[i]->get_location(), axis);
+                        float cpartial = 13.5 - 13.5 * cos(theta*2);
+                        #if _dbg_internal_energy
+                        if (!is_residue())
+                            cout << "Conjugated " << atoms[i]->name << "-" << atoms[j]->name
+                                << " " << ab->cardinality << " bond theta = " << (theta*fiftyseven) << "deg."
+                                << " adding " << cpartial << " kJ/mol."
+                                << endl;
+                        clash += cpartial;
+                        #endif
+                    }
+                }
+                continue;
+            }
 
             Point ptb = atoms[j]->get_location();
             float bvdW = atoms[j]->get_vdW_radius();
@@ -2065,7 +2174,7 @@ float Molecule::get_internal_clashes()
             if (!r) r += 10e-15;
             if (r < avdW + bvdW)
             {
-                float lclash = sphere_intersection(avdW, bvdW, r);
+                float lclash = fmax(InteratomicForce::Lennard_Jones(atoms[i], atoms[j]), 0); // sphere_intersection(avdW, bvdW, r);
                 clash += lclash;
 
                 if (false && lclash > 3)
@@ -2084,7 +2193,7 @@ float Molecule::get_internal_clashes()
         }
     }
 
-    return clash-base_internal_clashes;
+    return clash; // -base_internal_clashes;
 }
 
 float Molecule::get_vdW_repulsion(Molecule* ligand)
@@ -2516,6 +2625,7 @@ float Molecule::get_intermol_binding(Molecule* ligand, bool subtract_clashes)
 
 void Molecule::clear_atom_binding_energies()
 {
+    if (!atoms) return;
     int i;
     for (i=0; atoms[i]; i++)
         atoms[i]->last_bind_energy = 0;
@@ -2531,6 +2641,7 @@ float Molecule::get_intermol_potential(Molecule* ligand, bool pure)
 
 float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
 {
+    if (!atoms) return 0;
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
     int i, j, l, n;
@@ -2579,7 +2690,9 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
     lastshielded = 0;
     clash1 = clash2 = nullptr;
 
-    // cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
+    #if _dbg_internal_energy
+    cout << (name ? name : "") << " base internal clashes: " << base_internal_clashes << "; final internal clashes " << -kJmol << endl;
+    #endif
 
     for (i=0; atoms[i]; i++)
     {
@@ -2637,6 +2750,13 @@ float Molecule::get_intermol_binding(Molecule** ligands, bool subtract_clashes)
                         missed_connection.r = 0;
                         // cout << ligands[l]->atoms[j]->get_location().subtract(atoms[i]->get_location()) << ": ";
                         float abind = InteratomicForce::total_binding(atoms[i], ligands[l]->atoms[j]);
+                        #if _dbg_internal_energy
+                        if (ligands[l] == this)
+                        {
+                            cout << "Energy between " << atoms[i]->name << "..." << ligands[l]->atoms[j]->name
+                                << " = " << abind << " kJ/mol." << endl;
+                        }
+                        #endif
                         if (abind && !isnan(abind) && !isinf(abind))
                         {
                             if (abind > 0 && minimum_searching_aniso && ligands[l]->priority) abind *= 1.5;
@@ -3147,7 +3267,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 Molecule* b = mm[j];
                 Point bloc = b->get_barycenter();
 
-                float r = a->get_nearest_atom(bloc)->distance_to(b->get_nearest_atom(aloc));
+                Atom* na = a->get_nearest_atom(bloc);
+                if (!na) continue;
+                float r = na->distance_to(b->get_nearest_atom(aloc));
                 if (r > _INTERA_R_CUTOFF) continue;
                 nearby[l++] = b;
             }
@@ -3171,7 +3293,7 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
             if ((a->movability & MOV_CAN_RECEN) && !(a->movability & MOV_FORBIDDEN))
             {
                 Point motion(a->lmx, a->lmy, a->lmz);
-                if (motion.magnitude() > speed_limit/2) motion.scale(speed_limit/2);
+                if (motion.magnitude() > speed_limit) motion.scale(speed_limit);
 
                 benerg = cfmol_multibind(a, nearby);
                 if (motion.magnitude() > 0.01*speed_limit)
@@ -4249,7 +4371,7 @@ float Molecule::close_loop(Atom** path, float lcard)
 
         for (j=0; j<geo; j++)
         {
-            if (b[j]->btom
+            if (b[j] && b[j]->btom
                     &&
                     (	b[j]->can_rotate
                         ||

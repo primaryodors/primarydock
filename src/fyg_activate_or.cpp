@@ -44,11 +44,20 @@ float do_template_bend(Protein& p, AminoAcid* aasrc, AminoAcid* aaref, int hxno,
     int er = max(resoppo, resterm);
 
     int sr1=0, er1=0;
-    if (hxno<7 && !aaopposite_term)
+    if (hxno<7)
     {
         std::string name = (std::string)"TMR" + to_string(hxno+1);
-        sr1 = p.get_region_start(name)-2;
-        er1 = p.get_end_resno(); // p.get_region_end(name)+2;
+        if (hxno == 6)
+        {
+            std::string name = (std::string)"TMR" + to_string(hxno);
+            sr1 = p.get_region_start(name)-2;
+            er1 = aasrc->get_residue_no();
+        }
+        else
+        {
+            sr1 = p.get_region_start(name)-2;
+            er1 = p.get_end_resno(); // p.get_region_end(name)+2;
+        }
     }
 
     Point source = aasrc->get_CA_location();
@@ -286,6 +295,7 @@ int main(int argc, char** argv)
     AminoAcid *aa6x44 = p.get_residue_bw("6.44");
     AminoAcid *aa6x48 = p.get_residue_bw("6.48");
     AminoAcid *aa6x49 = p.get_residue_bw("6.49");
+    AminoAcid *aa6x50 = p.get_residue_bw("6.50");
     AminoAcid *aa6x51 = p.get_residue_bw("6.51");
     AminoAcid *aa6x55 = p.get_residue_bw("6.55");
     AminoAcid *aa6x58 = p.get_residue_bw("6.58");
@@ -294,8 +304,6 @@ int main(int argc, char** argv)
     AminoAcid *aa7x31 = p.get_residue_bw("7.31");
     AminoAcid *aa7x49 = p.get_residue_bw("7.49");
     AminoAcid *aa7x53 = p.get_residue_bw("7.53");
-    
-    AminoAcid *aa8x44 = p.get_residue_bw("8.44");
 
     int n1x32 = aa1x32->get_residue_no();
     int n1x50 = aa1x50->get_residue_no();
@@ -327,14 +335,13 @@ int main(int argc, char** argv)
     int n6x40 = aa6x40->get_residue_no();
     int n6x48 = aa6x48->get_residue_no();
     int n6x49 = aa6x49->get_residue_no();
+    int n6x50 = aa6x50->get_residue_no();
     int n6x55 = aa6x55->get_residue_no();
     int n6x59 = aa6x59->get_residue_no();
 
     int n7x31 = aa7x31->get_residue_no();
     int n7x49 = aa7x49->get_residue_no();
     int n7x53 = aa7x53->get_residue_no();
-
-    int n8x44 = aa8x44->get_residue_no();
 
     char l3x37 = aa3x37->get_letter();
     char l3x40 = aa3x40->get_letter();
@@ -459,20 +466,43 @@ int main(int argc, char** argv)
 
     SCoord rock6_dir(0,0,0);
     bool exr2_bend = false;
+
+    AminoAcid* acid45 = nullptr, *ohbridge6 = nullptr;
     if (l6x55 == 'Y' && (l45x51 == 'D' || l45x51 == 'E'))
     {
-        p.bridge(aa45x51->get_residue_no(), aa6x55->get_residue_no());
-        Atom* reach6x55 = aa6x55->get_reach_atom();
-        Atom* reach45x51 = aa45x51->get_nearest_atom(reach6x55->get_location());
+        acid45 = aa45x51;
+        ohbridge6 = aa6x55;
+    }
+    else if (l6x55 == 'Y' && (l45x52 == 'D' || l45x52 == 'E'))
+    {
+        acid45 = aa45x52;
+        ohbridge6 = aa6x55;
+    }
+    else if (l6x55 == 'Y' && (l45x53 == 'D' || l45x53 == 'E' || l45x53 == 'N' || l45x53 == 'Q'))
+    {
+        acid45 = aa45x53;
+        ohbridge6 = aa6x55;
+    }
+    else if (l6x55 == 'D' && (l45x53 == 'N' || l45x53 == 'Q'))
+    {
+        acid45 = aa45x53;
+        ohbridge6 = aa6x55;
+    }
+
+    if (acid45 && ohbridge6)
+    {
+        p.bridge(acid45->get_residue_no(), ohbridge6->get_residue_no());
+        Atom* reach6x55 = ohbridge6->get_reach_atom();
+        Atom* reach45x51 = acid45->get_nearest_atom(reach6x55->get_location());
         float r = reach6x55->distance_to(reach45x51);
         if (r >= 2) rock6_dir = reach45x51->get_location().subtract(reach6x55->get_location());
-        constraints.push_back("STCR 45.51");
-        constraints.push_back("STCR 6.55");
+        constraints.push_back("STCR "+std::to_string(acid45->get_residue_no()));
+        constraints.push_back("STCR "+std::to_string(ohbridge6->get_residue_no()));
     }
     else if (l6x59 == 'R')
     {
         rock6_dir = aa5x39->get_CA_location().subtract(aa6x55->get_CA_location());
-        aa6x59->conform_atom_to_location("NE", Point(0,10000,0));
+        aa6x59->conform_atom_to_location("NE", Point(5000,10000,0));
         aa6x59->movability = MOV_PINNED;
         exr2_bend = true;
 
@@ -480,6 +510,16 @@ int main(int argc, char** argv)
         pt.multiply(0.5);
         aa45x52->conform_atom_to_location(aa45x52->get_reach_atom()->name, pt);
         aa45x52->movability = MOV_PINNED;
+    }
+    else if ((l6x55 == 'D' || l6x55 == 'E') && (l45x53 == 'N' || l45x53 == 'Q'))
+    {
+        p.bridge(n45x53, n6x55);
+        Atom* reach6x55 = aa6x55->get_reach_atom();
+        Atom* reach45x53 = aa45x53->get_nearest_atom(reach6x55->get_location());
+        float r = reach6x55->distance_to(reach45x53);
+        if (r >= 2) rock6_dir = reach45x53->get_location().subtract(reach6x55->get_location());
+        constraints.push_back("STCR 45.53");
+        constraints.push_back("STCR 6.55");
     }
 
 
@@ -515,6 +555,8 @@ int main(int argc, char** argv)
         cout << "Performing rock6..." << endl;
         float theta = do_template_bend(p, aa6x48, aa6x59, 6, rock6_dir, SCoord(0,0,0), aa6x28);
         cout << "TMR6 rocks " << (theta*fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
+
+        if (acid45 && ohbridge6) p.bridge(acid45->get_residue_no(), ohbridge6->get_residue_no());
     }
 
     
@@ -522,9 +564,29 @@ int main(int argc, char** argv)
     // FYG motion, if applicable.
     ////////////////////////////////////////////////////////////////////////////////
 
-    if (l6x49 == 'G' && allow_fyg)
+    AminoAcid* aapivot = aa6x49;
+    int npivot = n6x49;
+    bool found_fyg = false;
+
+    if (allow_fyg)
     {
-        cout << "Performing FYG activation..." << endl;
+        for (i=n6x49; i>n6x40; i--)
+        {
+            AminoAcid* aatmp = p.get_residue(i);
+            char ltmp = aatmp->get_letter();
+            if (ltmp == 'G' || ltmp == 'C' || ltmp == 'S' || ltmp == 'T')
+            {
+                aapivot = aatmp;
+                npivot = i;
+                found_fyg = true;
+                break;
+            }
+        }
+    }
+
+    if (found_fyg && allow_fyg)
+    {
+        cout << "Performing FYG activation using " << *aapivot << "..." << endl;
 
         // TMR6 motion.
         float theta6_phi_initial = 10;
@@ -535,7 +597,7 @@ int main(int argc, char** argv)
         p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, -fiftyseventh*theta6_psi_initial);
 
         // TMR5 translation.
-        SCoord move5 = aa6x49->get_CA_location().subtract(aa5x50->get_CA_location());
+        SCoord move5 = aapivot->get_CA_location().subtract(aa5x50->get_CA_location());
         move5.r = p.region_can_move(n5x33, n5x68, move5, false, n6x28, n6x59);
         p.move_piece(n5x33, n5x68, move5);
         cout << "TMR5 moves " << move5.r << "A toward TMR6, limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
@@ -561,10 +623,18 @@ int main(int argc, char** argv)
         else cout << "5.58~7.53 bridge already met." << endl;
 
         // Adjust TMR6.
-        lv6 = aa6x49->get_psi_vector();
-        float theta6 = p.region_can_rotate(n6x28, n6x49, lv6);
+        float theta6 = p.region_can_rotate(n6x28, npivot, lv6);
+        Point pt6x28 = rotate3D(aa6x28->get_CA_location(), aapivot->get_CA_location(), lv6, theta6);
+        float r56 = pt6x28.get_3d_distance(aa5x68->get_CA_location());
+        cout << "r56 = " << r56 << endl;
+        if (r56 > 4)
+        {
+            theta6 = fmin(theta6, find_3d_angle(aa5x68->get_CA_location(), aa6x28->get_CA_location(), aapivot->get_CA_location()));
+            p.stop1 = aa5x68;
+            p.stop2 = aa6x28;
+        }
         cout << "TMR6 bends " << (theta6_phi_initial + theta6_psi_initial - theta6 * fiftyseven) << "deg limited by " << *(p.stop1) << "->" << *(p.stop2) << endl;
-        p.rotate_piece(n6x28, n6x49, lv6.origin, lv6, theta6);
+        p.rotate_piece(n6x28, npivot, lv6.origin, lv6, theta6);
     }
 
 
@@ -685,6 +755,8 @@ int main(int argc, char** argv)
             r57 = axis.r;
         }
 
+        p.bridge(n5x58, n7x53);
+
         // Check the result.
         if (r57 > 1.2 * contact_r_5x58_7x53)
         {
@@ -701,7 +773,7 @@ int main(int argc, char** argv)
     // Minimize internal clashes.
     // TODO: cyt domains of all TM helices, preserving the 5~7 bridge.
     ////////////////////////////////////////////////////////////////////////////////
-    float clash = p.get_internal_clashes(n6x28, n6x49, true);
+    float clash = p.get_internal_clashes(n6x28, npivot, true);
 
     if (clash > initial_clash_[6])
     {
@@ -709,11 +781,11 @@ int main(int argc, char** argv)
 
         if (p.stop1 && p.stop2) pt = aa6x40->get_CA_location().add(p.stop1->get_CA_location().subtract(p.stop2->get_CA_location()));
         else pt = aa6x40->get_CA_location().subtract(p.last_int_clash_dir);
-        LocatedVector axis = compute_normal(aa6x40->get_CA_location(), pt, aa6x49->get_CA_location());
-        axis.origin = aa6x49->get_CA_location();
+        LocatedVector axis = compute_normal(aa6x40->get_CA_location(), pt, aapivot->get_CA_location());
+        axis.origin = aapivot->get_CA_location();
 
         float theta = fiftyseventh * 15 / 20;
-        int fulcrum = n6x49;
+        int fulcrum = npivot;
         for (i=0; i<200; i++)
         {
             clash = reduce_iclash_iter(p, fulcrum, false, clash, theta, n6x28, fulcrum);
@@ -721,34 +793,59 @@ int main(int argc, char** argv)
         }
     }
 
-    for (n=1; n<=7; n++)
-    {
-        std::string region = (std::string)"TMR" + std::to_string(n);
-        float theta = fiftyseventh * 15 / 20;
-        AminoAcid* aafulcrum = p.get_residue_bw(n, 50);
-        if (!aafulcrum) continue;
-        int fulcrum = aafulcrum->get_residue_no();
-        int term = (n&1) ? p.get_region_start(region) : p.get_region_end(region);
-        cout << "Minimizing " << region << " extracellular clashes..." << endl;
-
-        for (i=0; i<200; i++)
-        {
-            clash = (n&1)
-                ? reduce_iclash_iter(p, fulcrum, false, clash, theta, term, fulcrum)
-                : reduce_iclash_iter(p, fulcrum, true , clash, theta, fulcrum, term)
-                ;
-            if (clash <= initial_clash_[i]) break;
-        }
-    }
-
-
     ////////////////////////////////////////////////////////////////////////////////
     // Make room near trip switch.
     // Assume at least one of rock6 / FYG bend has occurred.
     ////////////////////////////////////////////////////////////////////////////////
 
+    if (l5x47 == 'F' || l5x47 == 'L' || l5x47 == 'I' || l5x47 == 'H')
+    {
+        pt = aa5x47->get_CA_location().subtract(aa3x34->get_CA_location()).add(aa5x47->get_CA_location());
+        aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
+
+        // TODO: 5.44 bend so 5.47 doesn't clash with 5.43.
+    }
+
+    // This side chain shift is observed in all cryo-EM models of active states of TAARs:
+    if (l6x44 == 'F' || l6x44 == 'Y')
+    {
+        aa6x44->movability = MOV_FLEXONLY;
+        aa6x44->conform_atom_to_location(aa6x44->get_reach_atom()->name, aa5x51->get_CA_location());
+        constraints.push_back("STCR 6.44");
+        aa6x44->movability = MOV_PINNED;
+    }
+
+    if (l6x59 == 'R')
+    {
+        aa6x59->movability = MOV_FLEXONLY;
+        pt = aa6x59->get_CA_location().add(aa5x39->get_CA_location());
+        pt.multiply(0.5);
+        aa6x59->conform_atom_to_location("NE", pt);
+    }
+    else if (l6x59 == 'K')
+    {
+        aa6x59->movability = MOV_FLEXONLY;
+        aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
+    }
+
+    aa5x58->movability  = MOV_FLEXONLY;
+    aa7x53->movability  = MOV_FLEXONLY;
+    if (acid45 && ohbridge6)
+    {
+        acid45->movability = MOV_FLEXONLY;
+        ohbridge6->movability  = MOV_FLEXONLY;
+        p.bridge(acid45->get_residue_no(), ohbridge6->get_residue_no());
+        acid45->movability = MOV_PINNED;
+        ohbridge6->movability = MOV_PINNED;
+    }
+    if (l5x58 == 'Y' && l7x53 == 'Y')
+    {
+        p.bridge(n5x58, n7x53);
+        aa5x58->movability = MOV_PINNED;
+        aa7x53->movability = MOV_PINNED;
+    }
+
     Molecule inert;
-    
     if (l6x48 != 'W')
     {
         aa5x47->movability = MOV_FLEXONLY;
@@ -776,7 +873,6 @@ int main(int argc, char** argv)
         mols[j++] = &inert;
         for (i=0; i<nearby; i++)
         {
-            reachres[i]->movability = MOV_FLEXONLY;
             mols[j++] = reinterpret_cast<Molecule*>(reachres[i]);
         }
         mols[j] = nullptr;
@@ -789,33 +885,6 @@ int main(int argc, char** argv)
         
         if (l3x40 == 'S' || l3x40 == 'N' || l3x40 == 'Q' || l3x40 == 'K' || l3x40 == 'R' || l3x40 == 'D' || l3x40 == 'E')
             aa3x40->conform_atom_to_location(aa3x40->get_reach_atom()->name, pt);
-    }
-
-    if (l5x47 == 'F' || l5x47 == 'L' || l5x47 == 'I' || l5x47 == 'H')
-    {
-        pt = aa5x47->get_CA_location().subtract(aa3x34->get_CA_location()).add(aa5x47->get_CA_location());
-        aa5x47->conform_atom_to_location(aa5x47->get_reach_atom()->name, pt);
-    }
-
-    // This side chain shift is observed in all cryo-EM models of active states of TAARs:
-    if (l6x44 == 'F' || l6x44 == 'Y')
-    {
-        aa6x44->movability = MOV_FLEXONLY;
-        aa6x44->conform_atom_to_location(aa6x44->get_reach_atom()->name, aa5x51->get_CA_location());
-        constraints.push_back("STCR 6.44");
-    }
-
-    if (l6x59 == 'R')
-    {
-        aa6x59->movability = MOV_FLEXONLY;
-        pt = aa6x59->get_CA_location().add(aa5x39->get_CA_location());
-        pt.multiply(0.5);
-        aa6x59->conform_atom_to_location("NE", pt);
-    }
-    else if (l6x59 == 'K')
-    {
-        aa6x59->movability = MOV_FLEXONLY;
-        aa6x59->conform_atom_to_location(aa6x59->get_reach_atom()->name, aa4x60->get_CA_location());
     }
 
 

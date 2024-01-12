@@ -6,26 +6,6 @@ std::vector<std::shared_ptr<GroupPair>> global_pairs;
 std::vector<Moiety> predef_grp;
 std::vector<AminoAcid*> ResidueGroup::disqualified_residues;
 
-void ResiduePlaceholder::set(const char* str)
-{
-    if (strchr(str, '.')) bw = str;
-    else resno = atoi(str);
-}
-
-void ResiduePlaceholder::resolve_resno(Protein* prot)
-{
-    if (resno && !bw.length()) return;
-    int hxno = atoi(bw.c_str());
-    const char* dot = strchr(bw.c_str(), '.');
-    if (!dot)
-    {
-        resno = atoi(bw.c_str());
-        return;
-    }
-    int bwpos = atoi(dot+1);
-    resno = prot->get_bw50(hxno) + bwpos - 50;
-}
-
 Point AtomGroup::get_center()
 {
     int i;

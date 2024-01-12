@@ -653,6 +653,55 @@ std::vector<Atom*> Molecule::longest_dimension()
     return retval;
 }
 
+float Molecule::total_eclipses()
+{
+    if (!atoms) return 0;
+    float result = 0;
+    int i, j, k, l, m, n;
+    for (i=0; atoms[i]; i++)
+    {
+        if (atoms[i]->get_Z() < 2) continue;
+        Bond* abt[16];
+        atoms[i]->fetch_bonds(abt);
+        n = atoms[i]->get_geometry();
+        for (j=0; j<n; j++)
+        {
+            if (abt[j]->cardinality > 1) continue;
+            if (!abt[j]->can_rotate) continue;
+            if (!abt[j]->btom) continue;
+            if (abt[j]->btom->get_Z() < 2) continue;
+            if (atoms[i]->is_pi() && abt[j]->btom->is_pi()) continue;
+            SCoord axis = abt[j]->btom->get_location().subtract(atoms[i]->get_location());
+            Bond* bbt[16];
+            abt[j]->btom->fetch_bonds(bbt);
+            m = abt[j]->btom->get_geometry();
+            for (k=0; k<m; k++)
+            {
+                if (!bbt[k]->btom) continue;
+                if (bbt[k]->btom == atoms[i]) continue;
+                for (l=0; l<n; l++)
+                {
+                    if (!abt[l]->btom) continue;
+                    if (l == j) continue;
+                    float theta = find_angle_along_vector(bbt[k]->btom->get_location(), abt[l]->btom->get_location(), atoms[i]->get_location(), axis);
+                    if (theta >= -hexagonal && theta <= hexagonal)
+                    {
+                        #if _dbg_eclipses
+                        cout << bbt[k]->btom->name << " is " << (theta*fiftyseven) << "deg from " << abt[l]->btom->name
+                            << " along the " << atoms[i]->name << " - " << abt[j]->btom->name << " axis."
+                            << endl;
+                        #endif
+                        theta = hexagonal - fabs(theta);
+                        result += theta;
+                    }
+                }
+            }
+        }
+    }
+
+    return result*eclipsing_kJmol_per_radian;
+}
+
 float Molecule::bindability_by_type(intera_type t, bool ib)
 {
     if (!atoms) return 0;

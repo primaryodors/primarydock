@@ -9,7 +9,7 @@ OBJS=$(OBJDIR)/misc.o $(OBJDIR)/point.o $(OBJDIR)/atom.o $(OBJDIR)/intera.o $(OB
 	$(OBJDIR)/protein.o $(OBJDIR)/group.o $(OBJDIR)/dynamic.o $(OBJDIR)/moiety.o $(OBJDIR)/scoring.o $(OBJDIR)/conj.o
 TESTS=test/point_test test/atom_test test/molecule_test test/pi_stack_test test/mol_assem_test test/aniso_test test/amino_test \
 	  test/group_test_mol test/group_test_res test/protein_test test/backbone_test test/bond_rotation_test test/moiety_test \
-	  test/flexion_test test/histidine_test test/ring_test
+	  test/flexion_test test/histidine_test test/ring_test test/eclipsing_test
 APPS=$(BINDIR)/primarydock $(BINDIR)/pepteditor $(BINDIR)/ic $(BINDIR)/ic_activate_or $(BINDIR)/fyg_activate_or \
 	 $(BINDIR)/score_pdb $(BINDIR)/ramachandran
 REPORTS=amino_report atom_report aniso_report point_report molecule_report mol_assem_report protein_report motif_report
@@ -113,6 +113,9 @@ test/moiety_test: src/moiety_test.cpp $(OBJS)
 
 test/mol_assem_test: src/mol_assem_test.cpp $(OBJS)
 	$(CC) src/mol_assem_test.cpp $(OBJS) -o test/mol_assem_test $(CFLAGS)
+
+test/eclipsing_test: src/eclipsing_test.cpp $(OBJS)
+	$(CC) src/eclipsing_test.cpp $(OBJS) -o test/eclipsing_test $(CFLAGS)
 
 test/amino_test: src/amino_test.cpp $(OBJS) $(OBJDIR)/aminoacid.o
 	$(CC) src/amino_test.cpp $(OBJS) -o test/amino_test $(CFLAGS)

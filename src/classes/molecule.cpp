@@ -666,23 +666,27 @@ float Molecule::total_eclipses()
         n = atoms[i]->get_geometry();
         for (j=0; j<n; j++)
         {
+            if (!abt[j]) continue;
             if (abt[j]->cardinality > 1) continue;
             if (!abt[j]->can_rotate) continue;
             if (!abt[j]->btom) continue;
             if (abt[j]->btom->get_Z() < 2) continue;
             if (atoms[i]->is_pi() && abt[j]->btom->is_pi()) continue;
+            if (atoms[i]->is_backbone && abt[j]->btom->is_backbone) continue;
             SCoord axis = abt[j]->btom->get_location().subtract(atoms[i]->get_location());
             Bond* bbt[16];
             abt[j]->btom->fetch_bonds(bbt);
             m = abt[j]->btom->get_geometry();
             for (k=0; k<m; k++)
             {
+                if (!bbt[k]) continue;
                 if (!bbt[k]->btom) continue;
                 if (bbt[k]->btom == atoms[i]) continue;
                 for (l=0; l<n; l++)
                 {
-                    if (!abt[l]->btom) continue;
                     if (l == j) continue;
+                    if (!abt[l]) continue;
+                    if (!abt[l]->btom) continue;
                     float theta = find_angle_along_vector(bbt[k]->btom->get_location(), abt[l]->btom->get_location(), atoms[i]->get_location(), axis);
                     if (theta >= -hexagonal && theta <= hexagonal)
                     {
@@ -3146,7 +3150,7 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
     int j;
     for (j=0; nearby[j]; j++)
     {
-        float f = a->intermol_bind_for_multimol_dock(nearby[j], false);
+        float f = a->intermol_bind_for_multimol_dock(nearby[j], false) - a->total_eclipses();
         result += f;
     }
     if (a->mclashables)

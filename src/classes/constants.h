@@ -123,7 +123,7 @@
 #define global_clash_allowance 0.4
 #define double_hydrogen_clash_allowance_multiplier 1.5
 #define ignore_double_hydrogen_clashes 0
-#define ignore_nonpolar_hydrogen_clashes 1
+#define ignore_nonpolar_hydrogen_clashes 0
 #define Lennard_Jones_epsilon 1.0
 #define Lennard_Jones_epsilon_x4 Lennard_Jones_epsilon*4
 #define lmpush 3.0

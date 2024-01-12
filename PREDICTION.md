@@ -1,15 +1,16 @@
 
 # Overview
 
-PrimaryDock offers a facility for making predictions about receptor responses to ligands. However, since the exact details
-of the activation mechanisms of most olfactory receptors are not yet well understood, there is as yet insufficient basis to
-make accurate predictions. Nevertheless, we continue to strive toward this goal.
+PrimaryDock offers a facility for making predictions about receptor responses to ligands. Advances in cryogenic electron
+microscopy (cryo-EM) have begun to reveal the structural changes by receptors in response to odorants, making it possible
+to estimate odorant activity for each receptor by docking the odorant in the protein's active and inactive states. There
+is still a long way to go to be able to make accurate predictions for all combinations of receptor and odorant, and we
+continue to strive toward that goal.
 
 
 # Predictions from the Command Line
 
-There is a `run_prediction.sh` script in the project root folder that can be used to generate a prediction with minimal
-user input, e.g.:
+The current best way to make predictions is to use the `run_prediction.sh` script in the project root folder, e.g.:
 
 ```
 ./run_prediction.sh OR51E2 propionic_acid
@@ -23,48 +24,51 @@ Behind the scenes, `run_prediction.sh` calls a prediction method (see section be
 sure the code is compiled, making sure the PDB and SDF models exist, and maintaining the prediction results for all
 receptor-ligand pairs in a single JSON file.
 
+It is also possible to choose which molecular docker to use to make the prediction. Currently the options are PrimaryDock
+(`pd`) or AutoDock Vina (`vina`). PrimaryDock is not as fast as Vina, but offers support for ionic and metallic bonds which
+Vina lacks. This is important for receptors for acids, amines, and thiols. To specify the docker to use, simply add `pd`
+or `vina` as an extra command line argument like so:
+
+```
+./run_prediction.sh OR51E2 propionic_acid vina
+```
+
 
 # Prediction Methods
 
 PrimaryDock prediction methods are cronnable PHP scripts that perform docks of empirically measured (or yet to be measured)
-ligands in PDB files and aggregate the resulting data into a JSON file. A prediction method script begins with
-`require("methods_common.php");`, followed by a call to `prepare_outputs();` which generates the output file names based on
-command line input, as well as some other custom variables. A string value named `$configf` is then set, containing the config
-file to be generated for the `primarydock` app, and then the `process_dock()` function is called.
+ligands in PDB files and aggregate the resulting data into a JSON file. Prediction method scripts start by including
+`methods_common.php`, followed by several calls to functions that set up necessary local variables for docking. When the
+`process_dock()` function is called, a dock is performed and the difference between active and inactive dock results is
+used by the `make_prediction()` function to ascertain whether the odorant is likely to be an agonist for the receptor.
 
-The most current prediction method is `method_icactive.php`. The text "icactive" stands for Internal Contacts Activation,
-meaning the active state of the receptor is predicted based on contacts made between the side chains of its amino acids.
+The currently prediction methods are `method_fygactive.php` and `method_directmdl.php`.
+
+The `fygactive` method is useful for class II ORs and uses a utility application called `bin/fyg_activate_or` to examine
+the structure and sequence of the receptor and determine 1.) whether it includes the FYG motif in transmembrane region VI
+(TMR6), and 2.) whether TMR6 has room to perform a rocking motion (rock6) based on contact potential between the conserved
+Y6.55 and D/E45.51 of most class II ORs. If the receptor cannot perform a rock6 motion, but it has the FYG motif, then the
+utility will create an active state model by performing a TMR6 bend at the flexible Gly6.49 residue.
+
+The `directmdl` method, by contrast, is used when a cryo-EM model of the active state is available for either the target
+receptor, or one that is deemed similar enough for the cryo-EM model to act as a substitute. Currently, only the OR51,
+OR52, and TAAR families are eligible for the `directmdl` method. It works by taking the backbone skeleton of the cryo-EM
+model and substituting its side chains with those from the target protein, using Ballesteros-Weinstein numbers to align
+the two sequences. Any residue which is conserved in both proteins is not replaced. This results in mostly good results for
+SCFA predictions in OR51E2, though predictions for other class I ORs and/or non-acidic ligands may be less optimal.
+
 An example of the command line for running a prediction might be:
 
 ```
-php -f predict/method_icactive.php prot=OR1A1 lig=cis-3-hexen-1-ol
+php -f predict/method_fygactive.php prot=OR1A1 lig=cis-3-hexen-1-ol
 ```
 
-If the name of the ligand contains spaces, then the spaces should be replaced with underscores, e.g. `lig=ethyl_vanillin`.
+If the name of the ligand contains spaces, then the spaces should be replaced with underscores, e.g. `lig=isoamyl_acetate`.
 If the ligand name contains parentheses, it's a good idea to put the entire lig= parameter in quotes, e.g.:
 
 ```
 php -f predict/method_icactive.php prot=OR1A1 "lig=(S)-(+)-carvone"
 ```
-
-The prediction method lends itself well to running as a cron, e.g.:
-
-```
-* * * * * php -f /path/to/primarydock/predict/method_icactive.php next simul=8
-```
-
-In this example, the `next` parameter means to find the next receptor/ligand pair yet to process, and go ahead with the
-calculations for it. The "next" pair to process is the first pair of GPCR + known ligand (whether agonist or not) that
-either is not present in `predict/dock_results.json` or has a `version` timestamp older than either: the prediction method
-.php, `methods_common.php`, or the `/bin/primarydock` executable.
-
-The `simul=8` parameter indicates not to run more than 8 concurrent processes. We recommend a value of no more than
-the number of processor cores or threads on your machine, so if you have a server with one 8-core 16-thread processor,
-then `simul=8` would be the maximum recommended value. We strongly recommend installing `lm-sensors` if your system does
-not already have this tool (`sudo apt-get install lm-sensors`), that way the prediction script will automatically limit
-itself depending on the CPU temperature.
-
-You can use the `predict/progress.sh` shell script to monitor the progress of the predictions.
 
 
 # Alert Sounds
@@ -82,16 +86,11 @@ To disable the alert sounds, simply delete the `predict/soundalert` file.
 
 # Writing Your Own Prediction Methods
 
-Until an accurate prediction method exists, we encourage you to write your own prediction methods. You can use the
-`method_basic.php` script as a template, and then apply any variations you wish. If you create a method that makes
-predictions with at least 80% accuracy, we'd be delighted to accept your pull request.
+You may wish to write your own prediction methods. You can make a copy of the `method_directmdl.php` script and then
+change the copy as you see fit. If you create a method that makes predictions with at least 80% accuracy, we'd be
+delighted to accept your pull request.
 
 Configurable variables include:
-- `$dock_metals`          If true, the dock will use PDBs that end in `.metal.pdb` instead of the default `.upright.pdb`.
-                          You probably won't ever have to use the `$dock_metals` feature.
-- `$dock_retries`         The number of times to retry if no poses returned. Each retry increases the energy limit.
-                          Default = 5.
-- `$bias_by_energy`       TODO: This has not been implemented yet.
 - `$metrics_to_process`   An array of key-value pairs identifying a dock metric and its new key in the output JSON.
                           Valid keys can be found in the table below; the value becomes the metric's key in the JSON.
 

@@ -2020,6 +2020,8 @@ float Atom::get_sum_pi_bonds()
 
 void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
 {
+    char numbuf[16];
+
     if (location.x < -9999.999 || location.x > 9999.999
         || location.y < -9999.999 || location.y > 9999.999
         || location.z < -9999.999 || location.z > 9999.999
@@ -2030,10 +2032,8 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     ATOM   2039  CA  ALA   128      -6.065 -24.834  -5.744  1.00001.00           C
     */
     fprintf(pf, residue ? "ATOM   " : "HETATM ");
-    if (atomno<1000) fprintf(pf," ");
-    if (atomno< 100) fprintf(pf," ");
-    if (atomno<  10) fprintf(pf," ");
-    fprintf(pf, "%d ", atomno);
+    sprintf(numbuf, "%d", atomno);
+    fprintf(pf, "%4s ", numbuf);
 
     pdbidx = atomno;
 
@@ -2048,28 +2048,20 @@ void Atom::save_pdb_line(FILE* pf, unsigned int atomno)
     if (!pdbchain) pdbchain = ' ';
     fprintf(pf, "%c%c%c %c", aa3let[0] & 0x5f, aa3let[1] & 0x5f, aa3let[2] & 0x5f, pdbchain);
 
-    if (residue < 1000) fprintf(pf, " ");
-    if (residue <  100) fprintf(pf, " ");
-    if (residue <   10) fprintf(pf, " ");
-    fprintf(pf, "%d    ", residue);
+    sprintf(numbuf, "%d", residue);
+    fprintf(pf, "%4s    ", numbuf);
 
     if (!location.x) location.x = 0;
-    if (location.x>=0) fprintf(pf," ");
-    if (fabs(location.x) < 100) fprintf(pf," ");
-    if (fabs(location.x) <  10) fprintf(pf," ");
-    fprintf(pf, "%4.3f", location.x);
+    sprintf(numbuf, "%4.3f", location.x);
+    fprintf(pf, "%7s ", numbuf);
 
     if (!location.y) location.y = 0;
-    if (location.y>=0) fprintf(pf," ");
-    if (fabs(location.y) < 100) fprintf(pf," ");
-    if (fabs(location.y) <  10) fprintf(pf," ");
-    fprintf(pf, "%4.3f", location.y);
+    sprintf(numbuf, "%4.3f", location.y);
+    fprintf(pf, "%7s ", numbuf);
 
     if (!location.z) location.z = 0;
-    if (location.z>=0) fprintf(pf," ");
-    if (fabs(location.z) < 100) fprintf(pf," ");
-    if (fabs(location.z) <  10) fprintf(pf," ");
-    fprintf(pf, "%4.3f", location.z);
+    sprintf(numbuf, "%4.3f", location.z);
+    fprintf(pf, "%7s ", numbuf);
 
     fprintf(pf, "  1.00001.00           %s%c\n", get_elem_sym(), fabs(charge) > hydrophilicity_cutoff ? (charge > 0 ? '+' : '-') : ' ' );
 }

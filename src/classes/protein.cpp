@@ -2640,7 +2640,7 @@ MetalCoord* Protein::coordinate_metal(Atom* metal, int residues, int* resnos, st
     return m_mcoord[j];
 }
 
-void Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
+std::vector<MCoord> Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
 {
     int i, j, l, miter, i2, j1;
 
@@ -2749,6 +2749,7 @@ void Protein::coordinate_metal(std::vector<MCoord> mtlcoords)
         }
     }
 
+    return mtlcoords;
 }
 
 void Protein::mtl_coord_cnf_cb(int iter)

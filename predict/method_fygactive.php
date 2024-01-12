@@ -41,6 +41,12 @@ function make_prediction($data)
         $ascore = min(0, floatval(@$data['a_BENERG']), floatval(@$data['a_BindingEnergy']));
         $iscore = min(0, floatval(@$data['i_BENERG']), floatval(@$data['i_BindingEnergy']));
 
+        if (floatval(@$data['a_Pose1']) < floatval(@$data['i_Pose1']))
+        {
+            $ascore = floatval(@$data['a_Pose1']);
+            $iscore = floatval(@$data['i_Pose1']);
+        }
+
         if (!@$data["a_BindingEnergy.6"]) $ascore = 0;
         if (!@$data["a_BindingEnergy.3"] && !@$data["a_BindingEnergy.4"] && !@$data["a_BindingEnergy.45"]
             && !@$data["a_BindingEnergy.5"] && !@$data["a_BindingEnergy.7"]) $iscore = 0;

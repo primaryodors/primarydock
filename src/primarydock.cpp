@@ -1925,7 +1925,7 @@ int main(int argc, char** argv)
 
     if (mtlcoords.size())
     {
-        protein->coordinate_metal(mtlcoords);
+        mtlcoords = protein->coordinate_metal(mtlcoords);
 
         temp_pdb_file = (std::string)"tmp/" + std::to_string(pid) + (std::string)"_metal.pdb";
 

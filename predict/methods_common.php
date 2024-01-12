@@ -171,7 +171,7 @@ function dock_failed($reason = "")
         exec("which sox", $hassox);
         if ($play_sound && count($hassox))
         {
-            exec("play fail.mp3 &");
+            exec("play crash.mp3 &");
         }
     }
 
@@ -731,7 +731,7 @@ heredoc;
         }
 
         if (@$_REQUEST['echo']) echo implode("\n", $outlines) . "\n\n";
-        unlink($cnfname);
+        if (!$retvar) unlink($cnfname);
 
         break;
 

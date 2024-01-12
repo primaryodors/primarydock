@@ -2641,6 +2641,7 @@ float Molecule::get_intermol_potential(Molecule* ligand, bool pure)
 
 float Molecule::get_intermol_potential(Molecule** ligands, bool pure)
 {
+    if (!atoms) return 0;
     if (!ligands) return 0;
     if (!ligands[0]) return 0;
     int i, j, l, n;
@@ -3266,7 +3267,9 @@ void Molecule::conform_molecules(Molecule** mm, int iters, void (*cb)(int, Molec
                 Molecule* b = mm[j];
                 Point bloc = b->get_barycenter();
 
-                float r = a->get_nearest_atom(bloc)->distance_to(b->get_nearest_atom(aloc));
+                Atom* na = a->get_nearest_atom(bloc);
+                if (!na) continue;
+                float r = na->distance_to(b->get_nearest_atom(aloc));
                 if (r > _INTERA_R_CUTOFF) continue;
                 nearby[l++] = b;
             }

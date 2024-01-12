@@ -16,9 +16,9 @@ chdir(__DIR__);
 
 // Configurable variables
 $flex = 1;                      // Flexion (0 or 1).
-$pose = 15;
+$pose = 5;
 $iter = 30;
-$elim = 1e33;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
+$elim = 1e18;                    // Energy limit for poses. (Not the tailor/spy from the space station.)
 $num_std_devs = 2.0;            // How many standard deviations to move the helices for active clash compensation.
 
 prepare_outputs();

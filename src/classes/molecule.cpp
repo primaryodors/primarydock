@@ -3146,11 +3146,11 @@ float Molecule::cfmol_multibind(Molecule* a, Molecule** nearby)
 {
     if (a->is_residue() && ((AminoAcid*)a)->conditionally_basic()) ((AminoAcid*)a)->set_conditional_basicity(nearby);
 
-    float result = 0;
+    float result = -a->total_eclipses();
     int j;
     for (j=0; nearby[j]; j++)
     {
-        float f = a->intermol_bind_for_multimol_dock(nearby[j], false) - a->total_eclipses();
+        float f = a->intermol_bind_for_multimol_dock(nearby[j], false);
         result += f;
     }
     if (a->mclashables)
